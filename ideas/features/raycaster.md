@@ -6,7 +6,7 @@
 
 ## Purpose
 
-DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit results (distance, texture coord, hit position, side) that Lua scripts render as screen columns via `luna.gfx` fill/quad calls. Satisfies A-03 (2D graphics only) — pseudo-3D via 2D draw calls.
+DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit results (distance, texture coord, hit position, side) that Lua scripts render as screen columns via `lurek.gfx` fill/quad calls. Satisfies A-03 (2D graphics only) — pseudo-3D via 2D draw calls.
 
 ## Current Feature Summary
 
@@ -48,10 +48,10 @@ DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit 
 ## Suggestions
 
 1. **Expose extension types to Lua** (critical): Every Rust type should have a Lua binding:
-   - `luna.raycaster.newDoorManager()` → `doorMgr:addDoor(x, y, speed)`, `doorMgr:update(dt)`, `doorMgr:getDoorState(x, y)`
-   - `luna.raycaster.newHeightMap(w, h)` → `hm:setFloor(x, y, h)`, `hm:setCeiling(x, y, h)`
-   - `luna.raycaster.newDepthBuffer(screenWidth)` → `db:test(x, depth)`, `db:set(x, depth)`
-   - `luna.raycaster.newLight(x, y, radius, intensity, r, g, b)` → lighting support
+   - `lurek.raycaster.newDoorManager()` → `doorMgr:addDoor(x, y, speed)`, `doorMgr:update(dt)`, `doorMgr:getDoorState(x, y)`
+   - `lurek.raycaster.newHeightMap(w, h)` → `hm:setFloor(x, y, h)`, `hm:setCeiling(x, y, h)`
+   - `lurek.raycaster.newDepthBuffer(screenWidth)` → `db:test(x, depth)`, `db:set(x, depth)`
+   - `lurek.raycaster.newLight(x, y, radius, intensity, r, g, b)` → lighting support
 2. **Add column batch rendering helper**: `raycaster:castAndBatch(ox, oy, angle, fov, screenW, screenH)` → returns complete render-ready column data including wall heights, shade, and texture coordinates.
 3. **Add textured floor/ceiling casting**: `raycaster:castFloor(px, py, angle, fov, screenW, screenH)` → per-pixel floor/ceiling texture coordinates.
 4. **Add sprite manager**: `raycaster:addSprite(id, x, y, texture)` / `raycaster:projectSprites(px, py, angle, fov, screenW, depthBuffer)` → batch sprite projection with depth sorting.
@@ -59,9 +59,9 @@ DDA-based 2D grid raycaster for retro FPS and dungeon crawlers. Produces RayHit 
 
 ## Competitor Comparison
 
-No competitor 2D Lua engine has a built-in raycaster. This is unique to Luna2D.
+No competitor 2D Lua engine has a built-in raycaster. This is unique to Lurek2D.
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy | Custom raycasters |
+| Feature | Lurek2D | Engine A | Engine B | Engine D | Custom raycasters |
 |---|---|---|---|---|---|
 | DDA grid | ✅ | ❌ | ❌ | ❌ | ✅ |
 | Fan cast | ✅ | N/A | N/A | N/A | ✅ |

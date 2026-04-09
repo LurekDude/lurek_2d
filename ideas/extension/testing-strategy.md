@@ -18,7 +18,7 @@ Test individual providers in isolation with mock VS Code APIs.
 
 | Provider | Test Focus | Complexity |
 |---|---|---|
-| completion.ts | Correct completions for luna.* prefixes | High |
+| completion.ts | Correct completions for lurek.* prefixes | High |
 | diagnostics.ts | All 9 diagnostic rules fire correctly | High |
 | typeInference.ts | Factory return types resolve correctly | Medium |
 | luacatsProvider.ts | Annotation parsing accuracy | Medium |
@@ -34,8 +34,8 @@ import { CompletionProvider } from '../../src/providers/completion';
 import { MockDocument, MockPosition } from '../mocks/vscode';
 
 describe('CompletionProvider', () => {
-  it('completes luna.gfx.* methods', () => { ... });
-  it('completes builtins after luna.', () => { ... });
+  it('completes lurek.gfx.* methods', () => { ... });
+  it('completes builtins after lurek.', () => { ... });
   it('does not complete outside luna namespace', () => { ... });
   it('includes parameter snippets', () => { ... });
 });
@@ -61,11 +61,11 @@ Test the full activation lifecycle:
 // test/integration/activation.test.ts
 describe('Extension Activation', () => {
   it('registers all commands', async () => {
-    const ext = vscode.extensions.getExtension('luna2d.luna-toolkit');
+    const ext = vscode.extensions.getExtension('lurek2d.luna-toolkit');
     await ext.activate();
     const commands = await vscode.commands.getCommands();
-    expect(commands).toContain('luna.runGame');
-    expect(commands).toContain('luna.test.all');
+    expect(commands).toContain('lurek.runGame');
+    expect(commands).toContain('lurek.test.all');
     // ... verify all 90+ commands
   });
 
@@ -93,7 +93,7 @@ describe('TileMapEditor', () => {
 
 Capture expected output for regression detection:
 - Completion list snapshots for known documents
-- Hover content snapshots for luna.* functions
+- Hover content snapshots for lurek.* functions
 - Diagnostic output snapshots for known-bad code
 
 ### 6. E2E Tests

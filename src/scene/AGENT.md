@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.scene`                                         |
+| **Lua API**    | `lurek.scene`                                         |
 | **Source**      | `src/scene/`                                         |
 | **Rust Tests** | `tests/rust/unit/scene_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_scene.lua`                      |
@@ -32,6 +32,6 @@ the one below it, with its full state intact.
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/scene.md`](../../specs/scene.md)
+→ [`docs/specs/scene.md`](../../docs/specs/scene.md)
 
-_Update both this file **and** `specs/scene.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/scene.md` whenever source files, public types, or Lua bindings change._

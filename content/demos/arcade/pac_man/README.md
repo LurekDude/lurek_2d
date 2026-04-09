@@ -5,10 +5,10 @@ Eat a power pellet to turn the tables and devour frightened ghosts.
 
 ## What It Demonstrates
 
-- `luna.gfx.circle()` — pac-man, ghosts, and dots
-- `luna.gfx.rectangle()` — maze walls and header bar
-- `luna.input.isKeyDown()` — directional movement with input buffering
-- `luna.gfx.print()` — score and status overlays
+- `lurek.gfx.circle()` — pac-man, ghosts, and dots
+- `lurek.gfx.rectangle()` — maze walls and header bar
+- `lurek.input.isKeyDown()` — directional movement with input buffering
+- `lurek.gfx.print()` — score and status overlays
 
 ## Controls
 

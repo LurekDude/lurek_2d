@@ -1,12 +1,12 @@
 ﻿//! Vfs implementation for the `filesystem` subsystem.
 //!
-//! This module is part of Luna2D's `filesystem` subsystem and provides the implementation
+//! This module is part of Lurek2D's `filesystem` subsystem and provides the implementation
 //! details for vfs-related operations and data management.
 //! Key types exported from this module: `FileInfo`, `FileType`, `GameFS`.
 //! Primary functions: `new()`, `base_dir()`, `read_string()`, `read_bytes()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use crate::engine::error::{EngineError, EngineResult};
 use crate::engine::log_messages::{FS01_GAMEFS_INIT, FS04_PATH_TRAVERSAL, FS05_VFS_MOUNT};
@@ -593,7 +593,7 @@ impl GameFS {
     /// Reads file bytes from the VFS, searching mount layers newest-first before
     /// falling back to the base game directory.
     ///
-    /// Useful for `luna.fs.load()` — returns raw bytes for Lua compilation.
+    /// Useful for `lurek.fs.load()` — returns raw bytes for Lua compilation.
     ///
     /// # Parameters
     /// - `path` — `&str`. Virtual path to the file.

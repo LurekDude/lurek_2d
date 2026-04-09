@@ -1,21 +1,21 @@
 # Physics Sandbox
 
-A free-form interactive playground for the Luna2D physics engine. Spawn circles and rectangles, drag them around, connect pairs with distance joints, toggle gravity and wind, and delete anything you no longer need. A useful testbed for understanding how `luna.physics` bodies behave before using them in a real game.
+A free-form interactive playground for the Lurek2D physics engine. Spawn circles and rectangles, drag them around, connect pairs with distance joints, toggle gravity and wind, and delete anything you no longer need. A useful testbed for understanding how `lurek.physics` bodies behave before using them in a real game.
 
 ## What It Demonstrates
 
-- `luna.physics.newCircleBody()` and `luna.physics.newBody()` for dynamic objects
-- `luna.physics.setBodySize()` and `luna.physics.setBodyRestitution()` for shape and bounce tuning
-- `luna.physics.getBody()` to read simulated positions back into Lua each frame
-- `luna.physics.setBodyPosition()` for manual drag (kinematic override during drag)
-- `luna.physics.newJoint()` to connect two bodies with a distance constraint
-- `luna.physics.setGravity()` to toggle gravity on/off at runtime
+- `lurek.physics.newCircleBody()` and `lurek.physics.newBody()` for dynamic objects
+- `lurek.physics.setBodySize()` and `lurek.physics.setBodyRestitution()` for shape and bounce tuning
+- `lurek.physics.getBody()` to read simulated positions back into Lua each frame
+- `lurek.physics.setBodyPosition()` for manual drag (kinematic override during drag)
+- `lurek.physics.newJoint()` to connect two bodies with a distance constraint
+- `lurek.physics.setGravity()` to toggle gravity on/off at runtime
 - Right-click deletion and `Delete` key full-clear patterns
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/physics_sandbox
+cargo run -- content/demos/physics_sandbox
 ```
 
 ## Controls

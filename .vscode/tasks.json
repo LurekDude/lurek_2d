@@ -4,7 +4,7 @@
         // ─── 🔨 BUILD ─────────────────────────────────────────────────────────
         {
             "label": "Build: Debug",
-            "detail": "🔨 Compile the Luna2D engine in debug mode — fast compile with full debug symbols. Default build task (Ctrl+Shift+B).",
+            "detail": "🔨 Compile the Lurek2D engine in debug mode — fast compile with full debug symbols. Default build task (Ctrl+Shift+B).",
             "type": "cargo",
             "command": "build",
             "group": { "kind": "build", "isDefault": true },
@@ -93,7 +93,7 @@
         },
         {
             "label": "Test: Lua bindings",
-            "detail": "🌙 Run only Lua binding tests — exercises the full luna.* API surface headlessly (no window).",
+            "detail": "🌙 Run only Lua binding tests — exercises the full lurek.* API surface headlessly (no window).",
             "type": "cargo",
             "command": "test",
             "args": ["--test", "lua_tests"],
@@ -183,7 +183,7 @@
         // ─── 📖 DOCUMENTATION ─────────────────────────────────────────────────
         {
             "label": "Docs: Open in Browser",
-            "detail": "📖 Generate rustdoc for luna2d and open the HTML output in the default browser (cargo doc --open).",
+            "detail": "📖 Generate rustdoc for lurek2d and open the HTML output in the default browser (cargo doc --open).",
             "type": "shell",
             "command": "cargo doc --open --no-deps",
             "problemMatcher": []
@@ -247,21 +247,21 @@
         // ─── 📦 INSTALL ───────────────────────────────────────────────────────
         {
             "label": "Install: Local (Windows)",
-            "detail": "📦 Build release binary and install luna.exe to %USERPROFILE%\\bin. Copies demos/ too. Run once — then use 'Run (Installed):' tasks.",
+            "detail": "📦 Build release binary and install lurek.exe to %USERPROFILE%\\bin. Copies content/demos/ too. Run once — then use 'Run (Installed):' tasks.",
             "type": "shell",
             "command": "powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1",
             "problemMatcher": []
         },
         {
             "label": "Install: Local (Linux / macOS)",
-            "detail": "📦 Build release binary and install luna2d to /usr/local/bin. Copies demos/ folder. May require sudo.",
+            "detail": "📦 Build release binary and install lurek2d to /usr/local/bin. Copies content/demos/ folder. May require sudo.",
             "type": "shell",
             "command": "bash tools/dist/install.sh",
             "problemMatcher": []
         },
         {
             "label": "Uninstall: Local (Windows)",
-            "detail": "🗑️  Remove luna.exe from %USERPROFILE%\\bin and the installed demos/ folder.",
+            "detail": "🗑️  Remove lurek.exe from %USERPROFILE%\\bin and the installed content/demos/ folder.",
             "type": "shell",
             "command": "powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1 --uninstall",
             "problemMatcher": []
@@ -270,28 +270,28 @@
         // Requires 'Install: Local (Windows)' to have been run at least once.
         {
             "label": "Run (Installed): Hello World",
-            "detail": "🌙 Run demos/hello_world with the installed luna2d binary (no recompile). Run 'Install: Local (Windows)' first.",
+            "detail": "🌙 Run content/demos/hello_world with the installed lurek2d binary (no recompile). Run 'Install: Local (Windows)' first.",
             "type": "shell",
-            "command": "luna demos/hello_world",
+            "command": "luna content/demos/hello_world",
             "problemMatcher": []
         },
         {
             "label": "Run (Installed): Physics Demo",
-            "detail": "🌙 Run demos/physics_demo with the installed luna2d binary (no recompile).",
+            "detail": "🌙 Run content/demos/physics_demo with the installed lurek2d binary (no recompile).",
             "type": "shell",
-            "command": "luna demos/physics_demo",
+            "command": "luna content/demos/physics_demo",
             "problemMatcher": []
         },
         {
             "label": "Run (Installed): Sprites",
-            "detail": "🌙 Run demos/sprites with the installed luna2d binary (no recompile).",
+            "detail": "🌙 Run content/demos/sprites with the installed lurek2d binary (no recompile).",
             "type": "shell",
-            "command": "luna demos/sprites",
+            "command": "luna content/demos/sprites",
             "problemMatcher": []
         },
         {
             "label": "Run (Installed): Splash Screen",
-            "detail": "🌙 Launch the installed luna2d binary with no game argument — displays the Luna2D splash screen.",
+            "detail": "🌙 Launch the installed lurek2d binary with no game argument — displays the Lurek2D splash screen.",
             "type": "shell",
             "command": "luna",
             "problemMatcher": []
@@ -300,14 +300,14 @@
             "label": "Run Debug: Splash (drag-drop ready)",
             "detail": "⚡ Launch the debug binary from build/debug WITHOUT rebuilding — fast startup for drag-drop folder loading. Build once first with 'Build: Debug'.",
             "type": "shell",
-            "command": "${workspaceFolder}/build/debug/luna2d",
+            "command": "${workspaceFolder}/build/debug/lurek2d",
             "problemMatcher": []
         },
         {
             "label": "Run Release: Splash (drag-drop ready)",
             "detail": "⚡ Launch the release binary from build/release WITHOUT rebuilding — fastest startup for drag-drop testing. Build once first with 'Build: Release'.",
             "type": "shell",
-            "command": "${workspaceFolder}/build/release/luna2d",
+            "command": "${workspaceFolder}/build/release/lurek2d",
             "problemMatcher": []
         },
         {
@@ -327,7 +327,7 @@
         // ─── 🚀 DISTRIBUTION ──────────────────────────────────────────────────
         {
             "label": "Dist: Package Windows",
-            "detail": "🚀 Release build → dist/luna2d-windows-x86_64/ folder + .zip archive. Output is ready to distribute to end users.",
+            "detail": "🚀 Release build → dist/lurek2d-windows-x86_64/ folder + .zip archive. Output is ready to distribute to end users.",
             "type": "shell",
             "command": "powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1",
             "problemMatcher": []
@@ -341,14 +341,14 @@
         },
         {
             "label": "Dist: Package Linux / macOS",
-            "detail": "🚀 Release build → dist/luna2d-<os>-<arch>/ folder + .tar.gz archive. Run in WSL or a Linux/macOS shell.",
+            "detail": "🚀 Release build → dist/lurek2d-<os>-<arch>/ folder + .tar.gz archive. Run in WSL or a Linux/macOS shell.",
             "type": "shell",
             "command": "bash tools/dist/dist.sh",
             "problemMatcher": []
         },
         {
             "label": "Dist: NSIS Installer (Windows)",
-            "detail": "📦 Build a Windows installer from tools/dist/installer.nsi → dist/luna2d-0.5.0-setup.exe. Requires NSIS 3.x on PATH.",
+            "detail": "📦 Build a Windows installer from tools/dist/installer.nsi → dist/lurek2d-0.5.0-setup.exe. Requires NSIS 3.x on PATH.",
             "type": "shell",
             "command": "makensis tools/dist/installer.nsi",
             "problemMatcher": []
@@ -370,14 +370,14 @@
             "type": "pickString",
             "description": "Choose a demo to run",
             "options": [
-                { "label": "Hello World",   "value": "demos/hello_world"  },
-                { "label": "Physics Demo",  "value": "demos/physics_demo" },
-                { "label": "Sprites",       "value": "demos/sprites"      },
-                { "label": "Platformer",    "value": "demos/platformer"   },
-                { "label": "Scene Demo",    "value": "demos/scene_demo"   },
-                { "label": "Demo Game",     "value": "demos/demo_game"    }
+                { "label": "Hello World",   "value": "content/demos/hello_world"  },
+                { "label": "Physics Demo",  "value": "content/demos/physics_demo" },
+                { "label": "Sprites",       "value": "content/demos/sprites"      },
+                { "label": "Platformer",    "value": "content/demos/platformer"   },
+                { "label": "Scene Demo",    "value": "content/demos/scene_demo"   },
+                { "label": "Demo Game",     "value": "content/demos/demo_game"    }
             ],
-            "default": "demos/hello_world"
+            "default": "content/demos/hello_world"
         }
     ]
 }

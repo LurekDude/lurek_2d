@@ -1,16 +1,16 @@
-# `luna.tween` — Property Tweening System
+# `lurek.tween` — Property Tweening System
 
 ## Purpose
 
-`luna.tween` provides **runtime property animation** for any Lua table field. Unlike
+`lurek.tween` provides **runtime property animation** for any Lua table field. Unlike
 the math-level `src/math/tween.rs` primitive (which interpolates between two numeric
 values on demand), this system owns the timing loop, applies easing, and writes
-results directly into target tables each frame. It mirrors Godot's
+results directly into target tables each frame. It mirrors Engine C's
 `Tween.tween_property` workflow:
 
 ```lua
 -- animate any table field by string name
-luna.tween.tween(1.0, player, { x = 500 }, "cubicOut")
+lurek.tween.tween(1.0, player, { x = 500 }, "cubicOut")
 ```
 
 ---
@@ -45,8 +45,8 @@ luna.tween.tween(1.0, player, { x = 500 }, "cubicOut")
 bodies that immediately delegate to domain types. All business logic, `impl` blocks,
 and algorithms live in `src/tween/`.
 
-**Update model**: Manual. The script calls `luna.tween.update(dt)` from
-`luna.process(dt)`. No automatic engine tick.
+**Update model**: Manual. The script calls `lurek.tween.update(dt)` from
+`lurek.process(dt)`. No automatic engine tick.
 
 **Start value capture**: Lazy — start values are read from the target table on the
 first update tick, not at tween creation. This means the script may move the target
@@ -97,7 +97,7 @@ for unknown names (callers may fall back to linear).
 ### `builtin_easing_names() -> &'static [&'static str]`
 
 Returns a 23-entry slice of all built-in easing names. Used by
-`luna.tween.getEasingNames()`.
+`lurek.tween.getEasingNames()`.
 
 ---
 
@@ -117,7 +117,7 @@ surviving entries, avoiding double-borrow.
 
 ### `LuaTween` (UserData, src/tween/handle.rs)
 
-Created by `luna.tween.tween(duration, target, fields, easing)`.
+Created by `lurek.tween.tween(duration, target, fields, easing)`.
 
 | Field | Type | Description |
 |---|---|---|
@@ -155,7 +155,7 @@ Created by `luna.tween.tween(duration, target, fields, easing)`.
 
 ### `LuaTweenSequence` (UserData, src/tween/handle.rs)
 
-Created by `luna.tween.sequence()`. Inactive until `:start()`.
+Created by `lurek.tween.sequence()`. Inactive until `:start()`.
 
 Steps (enum `SequenceStep`):
 - `Tween { state, target_key, fields, end_values, start_values, starts_captured }`
@@ -176,7 +176,7 @@ Steps (enum `SequenceStep`):
 
 ### `LuaTweenParallel` (UserData, src/tween/handle.rs)
 
-Created by `luna.tween.parallel()`. Inactive until `:start()`.
+Created by `lurek.tween.parallel()`. Inactive until `:start()`.
 
 Entries (struct `ParallelEntry`): inline tween data with `done: bool`.
 
@@ -193,21 +193,21 @@ Entries (struct `ParallelEntry`): inline tween data with `done: bool`.
 
 ---
 
-## Lua API Reference (`luna.tween.*`)
+## Lua API Reference (`lurek.tween.*`)
 
-### `luna.tween.update(dt: number)`
+### `lurek.tween.update(dt: number)`
 
-Advance all active tweens, sequences, and parallels. Call from `luna.process(dt)`.
+Advance all active tweens, sequences, and parallels. Call from `lurek.process(dt)`.
 
 ```lua
-luna.process = function(dt)
-    luna.tween.update(dt)
+lurek.process = function(dt)
+    lurek.tween.update(dt)
 end
 ```
 
 ---
 
-### `luna.tween.tween(duration, target, fields[, easing]) -> LuaTween`
+### `lurek.tween.tween(duration, target, fields[, easing]) -> LuaTween`
 
 Create and immediately register a property tween.
 
@@ -220,7 +220,7 @@ Create and immediately register a property tween.
 
 ```lua
 local obj = { x = 0, alpha = 1 }
-luna.tween.tween(0.5, obj, { x = 300, alpha = 0 }, "cubicOut")
+lurek.tween.tween(0.5, obj, { x = 300, alpha = 0 }, "cubicOut")
     :onComplete(function()
         print("done", obj.x)
     end)
@@ -228,12 +228,12 @@ luna.tween.tween(0.5, obj, { x = 300, alpha = 0 }, "cubicOut")
 
 ---
 
-### `luna.tween.sequence() -> LuaTweenSequence`
+### `lurek.tween.sequence() -> LuaTweenSequence`
 
 Build a step-by-step animation chain. Inactive until `:start()`.
 
 ```lua
-luna.tween.sequence()
+lurek.tween.sequence()
     :tween(0.3, sprite, { y = sprite.y - 20 }, "sineOut")
     :delay(0.1)
     :tween(0.3, sprite, { y = sprite.y    }, "sineIn")
@@ -242,12 +242,12 @@ luna.tween.sequence()
 
 ---
 
-### `luna.tween.parallel() -> LuaTweenParallel`
+### `lurek.tween.parallel() -> LuaTweenParallel`
 
 Animate multiple targets simultaneously; completes when all children finish.
 
 ```lua
-luna.tween.parallel()
+lurek.tween.parallel()
     :tween(1.0, player,  { x = 400 }, "quadOut")
     :tween(1.0, bg,      { x = 200 }, "quadOut")
     :onComplete(function() print("all done") end)
@@ -256,44 +256,44 @@ luna.tween.parallel()
 
 ---
 
-### `luna.tween.delay(seconds[, callback])`
+### `lurek.tween.delay(seconds[, callback])`
 
 Standalone delay. Registered immediately.
 
 ```lua
-luna.tween.delay(2.0, function()
+lurek.tween.delay(2.0, function()
     print("2 seconds elapsed")
 end)
 ```
 
 ---
 
-### `luna.tween.cancelAll()`
+### `lurek.tween.cancelAll()`
 
 Cancel every active tracked tween/sequence/parallel. Fires `onCancel` for each.
 
 ---
 
-### `luna.tween.getActiveCount() -> number`
+### `lurek.tween.getActiveCount() -> number`
 
 Number of currently active tracked objects.
 
 ---
 
-### `luna.tween.registerEasing(name: string, fn: function(t:number) -> number)`
+### `lurek.tween.registerEasing(name: string, fn: function(t:number) -> number)`
 
 Register a custom easing function. `t` is the raw normalised time [0, 1].
 
 ```lua
-luna.tween.registerEasing("spring", function(t)
+lurek.tween.registerEasing("spring", function(t)
     return 1 - math.cos(t * math.pi * 4.5) * (1 - t)
 end)
-luna.tween.tween(1.0, obj, { x = 100 }, "spring")
+lurek.tween.tween(1.0, obj, { x = 100 }, "spring")
 ```
 
 ---
 
-### `luna.tween.getEasingNames() -> table`
+### `lurek.tween.getEasingNames() -> table`
 
 Returns an array-table of all easing names (built-in + custom).
 
@@ -322,7 +322,7 @@ backIn    backOut
 
 ```lua
 modules = {
-    tween = true,   -- Enable luna.tween (default: true)
+    tween = true,   -- Enable lurek.tween (default: true)
 }
 ```
 
@@ -358,15 +358,15 @@ Four distinct systems handle different animation needs — they do not overlap:
 
 | System | Namespace | Source | What it does |
 |---|---|---|---|
-| **Property tweening** | `luna.tween` | `src/tween/` | Animates numeric fields of Lua tables over time with callbacks, sequences, parallels, repeat/yoyo. The system covered by this spec. |
-| **Frame animation** | `luna.animation` | `src/animation/` | Plays sprite clip timelines (`AnimClip`) using frame indices and FPS. No numeric interpolation — switches frames discretely. |
-| **Numeric interpolation** | `luna.math.newTween` | `src/math/tween.rs` | Standalone clock-driven value interpolator with no auto-registration. The script manually calls `:update(dt)` and reads values with `:getValue()`. No callbacks or table fields. |
-| **Skeletal animation** | `luna.spine` | `src/spine/` | Hierarchical bone transforms (Spine-style): parent/child bones, world-transform propagation, slot management. No property tweening. |
+| **Property tweening** | `lurek.tween` | `src/tween/` | Animates numeric fields of Lua tables over time with callbacks, sequences, parallels, repeat/yoyo. The system covered by this spec. |
+| **Frame animation** | `lurek.animation` | `src/animation/` | Plays sprite clip timelines (`AnimClip`) using frame indices and FPS. No numeric interpolation — switches frames discretely. |
+| **Numeric interpolation** | `lurek.math.newTween` | `src/math/tween.rs` | Standalone clock-driven value interpolator with no auto-registration. The script manually calls `:update(dt)` and reads values with `:getValue()`. No callbacks or table fields. |
+| **Skeletal animation** | `lurek.spine` | `src/spine/` | Hierarchical bone transforms (Spine-style): parent/child bones, world-transform propagation, slot management. No property tweening. |
 
 ## Cross-Module References
 
 - **`src/math/easing.rs`** — supplies all easing function pointers used by `TweenState`
-- **`src/math/tween.rs`** — separate low-level numeric interpolator; `luna.math.newTween()` not auto-registered
+- **`src/math/tween.rs`** — separate low-level numeric interpolator; `lurek.math.newTween()` not auto-registered
 - **`src/animation/`** — frame-based sprite animation; unrelated to property tweening
 - **`src/spine/`** — skeletal bone hierarchy; unrelated to property tweening
 - **`src/lua_api/tween_api.rs`** — thin-wrapper registration layer for this module

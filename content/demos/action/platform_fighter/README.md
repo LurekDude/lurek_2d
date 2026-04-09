@@ -14,7 +14,7 @@ A two-player Smash Bros-style arena fighter with damage percentage, knockback sc
 ## How to Run
 
 ```powershell
-cargo run -- demos/platform_fighter
+cargo run -- content/demos/platform_fighter
 ```
 
 ## Controls

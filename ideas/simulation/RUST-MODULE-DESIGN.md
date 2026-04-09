@@ -8,7 +8,7 @@
 
 - **No heap allocation in the hot tick loop.** Block queues, item pools, resource ledgers, and monitor buffers are all pre-allocated from `SimSpec` at compile time. The tick loop only swaps pointers and updates counters.
 - **Deterministic by construction.** Given identical spec and identical external inputs (approval resolutions, anomaly injections), two runs with the same seed must produce identical event logs and monitor samples.
-- **No Lua in the tick loop.** The bridge calls Rust once per step via `luna.sim.step(n)`. Rust returns after `n` ticks. All script-level logic inside blocks uses a typed `ScriptTable` that the compiler resolves to enum-driven Rust code, not Lua closures.
+- **No Lua in the tick loop.** The bridge calls Rust once per step via `lurek.sim.step(n)`. Rust returns after `n` ticks. All script-level logic inside blocks uses a typed `ScriptTable` that the compiler resolves to enum-driven Rust code, not Lua closures.
 - **Headless always.** Zero dependency on `SharedState`, wgpu, winit, rodio, or any OS display handle.
 - **Errors via `SimError`.** All error paths return `SimError` variants; the bridge converts them to `LuaError::external` at the boundary.
 
@@ -18,7 +18,7 @@
 
 ### 2.1 SimSpec
 
-The validated, normalized representation of a simulation graph. Created by parsing Lua tables (from the bridge) or TOML text (via `luna.data.parseToml`). Immutable after construction.
+The validated, normalized representation of a simulation graph. Created by parsing Lua tables (from the bridge) or TOML text (via `lurek.data.parseToml`). Immutable after construction.
 
 ```
 SimSpec {

@@ -1,5 +1,5 @@
 ﻿-- tests/lua/unit/test_terminal.lua
--- BDD tests for the luna.terminal.* API.
+-- BDD tests for the lurek.terminal.* API.
 
 require("tests/lua/init")
 
@@ -8,22 +8,22 @@ local function click_cell(term, col, row, button)
     term:mousepressed((col - 1) * cell_w + 1, (row - 1) * cell_h + 1, button or 1)
 end
 
-describe("luna.terminal module", function()
+describe("lurek.terminal module", function()
     it("exposes terminal constructors", function()
-        expect_type("table", luna.terminal)
-        expect_type("function", luna.terminal.newTerminal)
-        expect_type("function", luna.terminal.newLabel)
-        expect_type("function", luna.terminal.newButton)
-        expect_type("function", luna.terminal.newTextBox)
-        expect_type("function", luna.terminal.newList)
-        expect_type("function", luna.terminal.newBorder)
-        expect_type("function", luna.terminal.newPanel)
+        expect_type("table", lurek.terminal)
+        expect_type("function", lurek.terminal.newTerminal)
+        expect_type("function", lurek.terminal.newLabel)
+        expect_type("function", lurek.terminal.newButton)
+        expect_type("function", lurek.terminal.newTextBox)
+        expect_type("function", lurek.terminal.newList)
+        expect_type("function", lurek.terminal.newBorder)
+        expect_type("function", lurek.terminal.newPanel)
     end)
 end)
 
 describe("terminal handles", function()
     it("creates terminal userdata and accepts colon or explicit self syntax", function()
-        local term = luna.terminal.newTerminal(40, 20)
+        local term = lurek.terminal.newTerminal(40, 20)
         expect_equal("userdata", type(term))
 
         local cols1, rows1 = term:getDimensions()
@@ -35,7 +35,7 @@ describe("terminal handles", function()
     end)
 
     it("reports the default cell size through colon and explicit self syntax", function()
-        local term = luna.terminal.newTerminal(10, 5)
+        local term = lurek.terminal.newTerminal(10, 5)
         local cell_w1, cell_h1 = term:getCellSize()
         local cell_w2, cell_h2 = term.getCellSize(term)
 
@@ -46,7 +46,7 @@ describe("terminal handles", function()
     end)
 
     it("sets and gets cells with colon syntax", function()
-        local term = luna.terminal.newTerminal(10, 5)
+        local term = lurek.terminal.newTerminal(10, 5)
         term:set(2, 3, "A", 1, 0.5, 0, 1)
 
         local ch, fr, fg, fb, fa = term:get(2, 3)
@@ -58,7 +58,7 @@ describe("terminal handles", function()
     end)
 
     it("clears cells back to defaults", function()
-        local term = luna.terminal.newTerminal(10, 5)
+        local term = lurek.terminal.newTerminal(10, 5)
         term:set(2, 2, "X", 1, 0, 0, 1)
         term:clear()
 
@@ -67,7 +67,7 @@ describe("terminal handles", function()
     end)
 
     it("supports explicit self syntax on widget handles", function()
-        local label = luna.terminal.newLabel(1, 1, "Hello")
+        local label = lurek.terminal.newLabel(1, 1, "Hello")
         expect_equal("Hello", label.getText(label))
 
         label.setText(label, "Updated")
@@ -77,8 +77,8 @@ end)
 
 describe("widget attachment and focus", function()
     it("attaches detached widgets to a terminal", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local label = luna.terminal.newLabel(2, 3, "Status")
+        local term = lurek.terminal.newTerminal(20, 10)
+        local label = lurek.terminal.newLabel(2, 3, "Status")
 
         expect_equal(0, term:getWidgetCount())
         term:addWidget(label)
@@ -90,8 +90,8 @@ describe("widget attachment and focus", function()
     end)
 
     it("removeWidget detaches the handle and clears focus for the removed widget", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local button = luna.terminal.newButton(2, 2, 8, 1, "Play")
+        local term = lurek.terminal.newTerminal(20, 10)
+        local button = lurek.terminal.newButton(2, 2, 8, 1, "Play")
 
         term:addWidget(button)
         term:setFocus(button)
@@ -105,9 +105,9 @@ describe("widget attachment and focus", function()
     end)
 
     it("clearWidgets detaches all handles and clears focus", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local label = luna.terminal.newLabel(1, 1, "HUD")
-        local input = luna.terminal.newTextBox(1, 2, 10)
+        local term = lurek.terminal.newTerminal(20, 10)
+        local label = lurek.terminal.newLabel(1, 1, "HUD")
+        local input = lurek.terminal.newTextBox(1, 2, 10)
 
         term:addWidget(label)
         term:addWidget(input)
@@ -124,8 +124,8 @@ describe("widget attachment and focus", function()
     end)
 
     it("setFocus and getFocused work with attached widget handles", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local input = luna.terminal.newTextBox(1, 1, 10)
+        local term = lurek.terminal.newTerminal(20, 10)
+        local input = lurek.terminal.newTextBox(1, 1, 10)
 
         term:addWidget(input)
         term:setFocus(input)
@@ -138,9 +138,9 @@ describe("widget attachment and focus", function()
     end)
 
     it("panel addChild auto-attaches detached children when the panel is attached", function()
-        local term = luna.terminal.newTerminal(30, 12)
-        local panel = luna.terminal.newPanel(1, 1, 20, 8)
-        local child = luna.terminal.newLabel(2, 2, "Child")
+        local term = lurek.terminal.newTerminal(30, 12)
+        local panel = lurek.terminal.newPanel(1, 1, 20, 8)
+        local child = lurek.terminal.newLabel(2, 2, "Child")
 
         term:addWidget(panel)
         panel:addChild(child)
@@ -151,8 +151,8 @@ describe("widget attachment and focus", function()
     end)
 
     it("mousepressed miss clears focus", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local button = luna.terminal.newButton(3, 2, 8, 1, "OK")
+        local term = lurek.terminal.newTerminal(20, 10)
+        local button = lurek.terminal.newButton(3, 2, 8, 1, "OK")
 
         term:addWidget(button)
         term:setFocus(button)
@@ -164,8 +164,8 @@ end)
 
 describe("widget property helpers", function()
     it("supports visibility, enabled, and tag helpers on attached widgets", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local label = luna.terminal.newLabel(1, 1, "Status")
+        local term = lurek.terminal.newTerminal(20, 10)
+        local label = lurek.terminal.newLabel(1, 1, "Status")
 
         term:addWidget(label)
 
@@ -184,8 +184,8 @@ describe("widget property helpers", function()
     end)
 
     it("supports setColor and getColor on labels and borders", function()
-        local label = luna.terminal.newLabel(1, 1, "Info")
-        local border = luna.terminal.newBorder(1, 2, 12, 4)
+        local label = lurek.terminal.newLabel(1, 1, "Info")
+        local border = lurek.terminal.newBorder(1, 2, 12, 4)
 
         label:setColor(0.25, 0.5, 0.75, 0.9)
         border:setColor(1.0, 0.2, 0.1, 0.8)
@@ -205,8 +205,8 @@ describe("widget property helpers", function()
     end)
 
     it("supports setText and getText on buttons and text boxes", function()
-        local button = luna.terminal.newButton(1, 1, 8, 1, "Old")
-        local textbox = luna.terminal.newTextBox(1, 2, 10)
+        local button = lurek.terminal.newButton(1, 1, 8, 1, "Old")
+        local textbox = lurek.terminal.newTextBox(1, 2, 10)
 
         button:setText("Launch")
         textbox.setText(textbox, "Updated")
@@ -216,7 +216,7 @@ describe("widget property helpers", function()
     end)
 
     it("supports setMaxLength and getMaxLength on text boxes", function()
-        local textbox = luna.terminal.newTextBox(1, 1, 10)
+        local textbox = lurek.terminal.newTextBox(1, 1, 10)
 
         textbox:setMaxLength(4)
         textbox:setText("abcdef")
@@ -226,7 +226,7 @@ describe("widget property helpers", function()
     end)
 
     it("supports list item management helpers", function()
-        local list = luna.terminal.newList(1, 1, 20, 5)
+        local list = lurek.terminal.newList(1, 1, 20, 5)
         list:addItem("Alpha")
         list:addItem("Beta")
         list:addItem("Gamma")
@@ -244,10 +244,10 @@ describe("widget property helpers", function()
     end)
 
     it("supports panel child management helpers", function()
-        local term = luna.terminal.newTerminal(30, 12)
-        local panel = luna.terminal.newPanel(1, 1, 20, 8)
-        local child1 = luna.terminal.newLabel(2, 2, "One")
-        local child2 = luna.terminal.newLabel(2, 3, "Two")
+        local term = lurek.terminal.newTerminal(30, 12)
+        local panel = lurek.terminal.newPanel(1, 1, 20, 8)
+        local child1 = lurek.terminal.newLabel(2, 2, "One")
+        local child2 = lurek.terminal.newLabel(2, 3, "Two")
 
         term:addWidget(panel)
         panel:addChild(child1)
@@ -267,7 +267,7 @@ describe("widget property helpers", function()
     end)
 
     it("supports border style and title updates", function()
-        local border = luna.terminal.newBorder(1, 1, 12, 5)
+        local border = lurek.terminal.newBorder(1, 1, 12, 5)
         border:setStyle("double")
         border:setTitle("Menu")
 
@@ -278,8 +278,8 @@ end)
 
 describe("button callbacks", function()
     it("keeps onClick callbacks working after attachment and reattachment", function()
-        local term = luna.terminal.newTerminal(20, 10)
-        local button = luna.terminal.newButton(3, 2, 8, 1, "OK")
+        local term = lurek.terminal.newTerminal(20, 10)
+        local button = lurek.terminal.newButton(3, 2, 8, 1, "OK")
         local clicks = 0
 
         button:setOnClick(function()
@@ -307,8 +307,8 @@ end)
 
 describe("text box callbacks", function()
     it("fires onChange for setText, textinput, backspace, and delete", function()
-        local term = luna.terminal.newTerminal(30, 10)
-        local input = luna.terminal.newTextBox(1, 1, 12)
+        local term = lurek.terminal.newTerminal(30, 10)
+        local input = lurek.terminal.newTextBox(1, 1, 12)
         local changes = 0
 
         input:setOnChange(function()
@@ -338,8 +338,8 @@ end)
 
 describe("list callbacks", function()
     it("fires onSelect for setSelected, keyboard navigation, and mouse presses", function()
-        local term = luna.terminal.newTerminal(30, 12)
-        local list = luna.terminal.newList(1, 1, 12, 4)
+        local term = lurek.terminal.newTerminal(30, 12)
+        local list = lurek.terminal.newList(1, 1, 12, 4)
         local selections = {}
 
         list:addItem("One")

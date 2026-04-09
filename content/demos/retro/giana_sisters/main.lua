@@ -1,7 +1,7 @@
--- The Great Giana Sisters — C-64 Classic (Luna2D demo)
+-- The Great Giana Sisters — C-64 Classic (Lurek2D demo)
 -- Side-scrolling platformer inspired by the infamous 1987 C-64 game.
 -- Collect gems and reach the exit on each level. Jump on enemies to defeat them.
--- Run with: cargo run -- demos/retro/giana_sisters
+-- Run with: cargo run -- content/demos/retro/giana_sisters
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -106,21 +106,21 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.3, 0.5, 0.9)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.3, 0.5, 0.9)
     score = 0; lives = 3; level = 1
     init_level()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
 
     -- Player horizontal
     local move = 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a")  then move = -1 end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then move =  1 end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a")  then move = -1 end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then move =  1 end
     player.vx = move * PLAYER_SPEED
     if move ~= 0 then player.facing = move end
 
@@ -188,7 +188,7 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     local cam = math.floor(camera_x)
 
     -- Tiles
@@ -200,10 +200,10 @@ function luna.render()
             local sx = (col - 1) * TILE - cam
             local sy = (row - 1) * TILE
             if ch == "1" then
-                luna.gfx.setColor(0.55, 0.38, 0.15)
-                luna.gfx.rectangle("fill", sx, sy, TILE, TILE)
-                luna.gfx.setColor(0.7, 0.5, 0.25)
-                luna.gfx.rectangle("line", sx, sy, TILE, TILE)
+                lurek.gfx.setColor(0.55, 0.38, 0.15)
+                lurek.gfx.rectangle("fill", sx, sy, TILE, TILE)
+                lurek.gfx.setColor(0.7, 0.5, 0.25)
+                lurek.gfx.rectangle("line", sx, sy, TILE, TILE)
             end
         end
     end
@@ -211,19 +211,19 @@ function luna.render()
     -- Exit
     if exit_tile.x then
         local sx = exit_tile.x - cam
-        luna.gfx.setColor(0.1, 0.9, 0.3)
-        luna.gfx.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
-        luna.gfx.setColor(0, 0, 0)
-        luna.gfx.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
+        lurek.gfx.setColor(0.1, 0.9, 0.3)
+        lurek.gfx.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
+        lurek.gfx.setColor(0, 0, 0)
+        lurek.gfx.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
     end
 
     -- Gems
     for _, g in ipairs(gems) do
         if g.alive then
-            luna.gfx.setColor(1, 0.2, 0.8)
-            luna.gfx.circle("fill", g.x - cam + 8, g.y + 8, 8)
-            luna.gfx.setColor(1, 0.7, 1)
-            luna.gfx.circle("fill", g.x - cam + 5, g.y + 5, 3)
+            lurek.gfx.setColor(1, 0.2, 0.8)
+            lurek.gfx.circle("fill", g.x - cam + 8, g.y + 8, 8)
+            lurek.gfx.setColor(1, 0.7, 1)
+            lurek.gfx.circle("fill", g.x - cam + 5, g.y + 5, 3)
         end
     end
 
@@ -231,51 +231,51 @@ function luna.render()
     for _, e in ipairs(enemies) do
         if e.alive then
             local sx = e.x - cam
-            luna.gfx.setColor(0.9, 0.3, 0.1)
-            luna.gfx.rectangle("fill", sx + 2, e.y + 2, e.w - 4, e.h - 4)
-            luna.gfx.setColor(1, 1, 1)
-            luna.gfx.circle("fill", sx + (e.vx > 0 and e.w - 8 or 8), e.y + 8, 5)
+            lurek.gfx.setColor(0.9, 0.3, 0.1)
+            lurek.gfx.rectangle("fill", sx + 2, e.y + 2, e.w - 4, e.h - 4)
+            lurek.gfx.setColor(1, 1, 1)
+            lurek.gfx.circle("fill", sx + (e.vx > 0 and e.w - 8 or 8), e.y + 8, 5)
         end
     end
 
     -- Player
     local px = player.x - cam
-    luna.gfx.setColor(0.2, 0.2, 0.8)
-    luna.gfx.rectangle("fill", px + 2, player.y + player.h/3, player.w - 4, player.h * 2/3)
-    luna.gfx.setColor(0.9, 0.7, 0.5)
-    luna.gfx.circle("fill", px + player.w/2, player.y + 14, 12)
+    lurek.gfx.setColor(0.2, 0.2, 0.8)
+    lurek.gfx.rectangle("fill", px + 2, player.y + player.h/3, player.w - 4, player.h * 2/3)
+    lurek.gfx.setColor(0.9, 0.7, 0.5)
+    lurek.gfx.circle("fill", px + player.w/2, player.y + 14, 12)
     -- Hair / hat
-    luna.gfx.setColor(1, 0.8, 0.1)
-    luna.gfx.rectangle("fill", px + 2, player.y - 4, player.w - 4, 10)
+    lurek.gfx.setColor(1, 0.8, 0.1)
+    lurek.gfx.rectangle("fill", px + 2, player.y - 4, player.w - 4, 10)
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.5)
-    luna.gfx.rectangle("fill", 0, 0, W, 28)
-    luna.gfx.setColor(1, 1, 0)
-    luna.gfx.print("GIANA  Score: " .. score, 8, 5, 1.5)
-    luna.gfx.setColor(1, 0.5, 0.5)
-    luna.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
-    luna.gfx.setColor(0.5, 1, 0.5)
-    luna.gfx.print("Level " .. level, W/2 - 30, 5, 1.5)
+    lurek.gfx.setColor(0, 0, 0, 0.5)
+    lurek.gfx.rectangle("fill", 0, 0, W, 28)
+    lurek.gfx.setColor(1, 1, 0)
+    lurek.gfx.print("GIANA  Score: " .. score, 8, 5, 1.5)
+    lurek.gfx.setColor(1, 0.5, 0.5)
+    lurek.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
+    lurek.gfx.setColor(0.5, 1, 0.5)
+    lurek.gfx.print("Level " .. level, W/2 - 30, 5, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground then
         player.vy = JUMP_VEL

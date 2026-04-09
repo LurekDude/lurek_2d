@@ -1,6 +1,6 @@
-//! Integration tests for `luna2d::pipeline` — DAG pipeline orchestrator.
+//! Integration tests for `lurek2d::pipeline` — DAG pipeline orchestrator.
 
-use luna2d::pipeline::*;
+use lurek2d::pipeline::*;
 
 // ── DAG Construction ─────────────────────────────────────────────────────────
 

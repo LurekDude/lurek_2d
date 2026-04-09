@@ -5,7 +5,7 @@
 | **Tier** | Tier 3 - Lunasome (pure Lua, no Rust dependencies) |
 | **Source** | `library/dialog/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_dialog.lua` |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 | **Test count** | 40 tests, 40 passing |
 
 ## Summary

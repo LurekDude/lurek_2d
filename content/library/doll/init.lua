@@ -1,10 +1,10 @@
---- luna.doll — Socket-Based Visual Composition Engine
+--- lurek.doll — Socket-Based Visual Composition Engine
 -- Assembles composite visual objects (characters, vehicles, faces) from
 -- interchangeable Part sprites attached to named Socket positions on a
 -- DollTemplate blueprint. No physics, no collision, no gameplay logic —
 -- purely visual composition with draw ordering.
 --
--- @module luna.doll
+-- @module lurek.doll
 
 local M = {}
 
@@ -316,11 +316,11 @@ function M.newDoll(template)
         return list
     end
 
-    --- Convenience draw method — renders all visible parts via luna.gfx.
-    -- Requires luna.gfx to be available in the global environment.
+    --- Convenience draw method — renders all visible parts via lurek.gfx.
+    -- Requires lurek.gfx to be available in the global environment.
     function doll:draw()
         if not _visible then return end
-        local g = luna and luna.gfx
+        local g = luna and lurek.gfx
         if not g then return end
 
         local drawList = self:getDrawList()

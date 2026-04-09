@@ -1,7 +1,7 @@
 -- Hex Strategy Game
 -- Controls: Click hex to select, C to place city on selected hex, N for next turn, Escape to quit
 -- Gather resources and expand your territory!
--- Run with: cargo run -- demos/strategy/hex_strategy
+-- Run with: cargo run -- content/demos/strategy/hex_strategy
 
 local HEX_SIZE = 36
 local OX, OY = 400, 300
@@ -57,14 +57,14 @@ local function drawHex(cx, cy, size, mode)
         table.insert(verts, cx + size * math.cos(angle))
         table.insert(verts, cy + size * math.sin(angle))
     end
-    luna.gfx.polygon(mode, verts)
+    lurek.gfx.polygon(mode, verts)
 end
 
 local function getRandomTerrain(q, r)
     -- Two independent simplex samples: one for elevation, one for biome
     -- Layering two noise frequencies avoids uniformly noisy or blobby maps
-    local n = luna.math.simplex2d(q * 0.4, r * 0.4)
-    local n2 = luna.math.simplex2d(q * 0.2 + 100, r * 0.2 + 100)
+    local n = lurek.math.simplex2d(q * 0.4, r * 0.4)
+    local n2 = lurek.math.simplex2d(q * 0.2 + 100, r * 0.2 + 100)
     if n < -0.3 then return "water" end
     if n > 0.4 then return "mountain" end
     if n2 > 0.3 then return "forest" end
@@ -72,9 +72,9 @@ local function getRandomTerrain(q, r)
     return "grass"
 end
 
-function luna.init()
-    luna.window.setTitle("Hex Strategy")
-    luna.gfx.setBackgroundColor(0.08, 0.06, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Hex Strategy")
+    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.12)
     -- Generate hex map
     for q = -MAP_RADIUS, MAP_RADIUS do
         for r = -MAP_RADIUS, MAP_RADIUS do
@@ -117,53 +117,53 @@ local function gatherResources()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
 end
 
-function luna.render()
+function lurek.render()
     -- Draw hexes
     for _, h in pairs(hexes) do
         local px, py = hexToPixel(h.q, h.r)
         local t = TERRAIN[h.terrain]
-        luna.gfx.setColor(t.r, t.g, t.b, 1)
+        lurek.gfx.setColor(t.r, t.g, t.b, 1)
         drawHex(px, py, HEX_SIZE - 1, "fill")
-        luna.gfx.setColor(0.1, 0.1, 0.1, 0.5)
+        lurek.gfx.setColor(0.1, 0.1, 0.1, 0.5)
         drawHex(px, py, HEX_SIZE - 1, "line")
 
         -- City marker
         if h.hasCity then
-            luna.gfx.setColor(1, 0.85, 0.2, 1)
-            luna.gfx.rectangle("fill", px - 8, py - 10, 16, 14)
-            luna.gfx.setColor(0.9, 0.6, 0.1, 1)
-            luna.gfx.polygon("fill", { px - 10, py - 10, px, py - 18, px + 10, py - 10 })
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("C", px - 4, py - 8)
+            lurek.gfx.setColor(1, 0.85, 0.2, 1)
+            lurek.gfx.rectangle("fill", px - 8, py - 10, 16, 14)
+            lurek.gfx.setColor(0.9, 0.6, 0.1, 1)
+            lurek.gfx.polygon("fill", { px - 10, py - 10, px, py - 18, px + 10, py - 10 })
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("C", px - 4, py - 8)
         end
     end
 
     -- Selection highlight
     if selected then
         local px, py = hexToPixel(selected.q, selected.r)
-        luna.gfx.setColor(1, 1, 0, 0.7)
-        luna.gfx.setLineWidth(3)
+        lurek.gfx.setColor(1, 1, 0, 0.7)
+        lurek.gfx.setLineWidth(3)
         drawHex(px, py, HEX_SIZE, "line")
-        luna.gfx.setLineWidth(1)
+        lurek.gfx.setLineWidth(1)
     end
 
     -- HUD panel
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, 0, 220, 130)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Turn: " .. turnNum, 10, 10)
-    luna.gfx.setColor(1, 0.85, 0.2, 1)
-    luna.gfx.print("Gold: " .. resources.gold, 10, 30)
-    luna.gfx.setColor(0.5, 0.35, 0.15, 1)
-    luna.gfx.print("Wood: " .. resources.wood, 10, 50)
-    luna.gfx.setColor(0.4, 0.85, 0.3, 1)
-    luna.gfx.print("Food: " .. resources.food, 10, 70)
-    luna.gfx.setColor(0.8, 0.8, 0.8, 1)
-    luna.gfx.print("Cities: " .. #cities, 10, 90)
-    luna.gfx.print("[N] Next Turn  [C] Place City", 10, 110)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, 0, 220, 130)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Turn: " .. turnNum, 10, 10)
+    lurek.gfx.setColor(1, 0.85, 0.2, 1)
+    lurek.gfx.print("Gold: " .. resources.gold, 10, 30)
+    lurek.gfx.setColor(0.5, 0.35, 0.15, 1)
+    lurek.gfx.print("Wood: " .. resources.wood, 10, 50)
+    lurek.gfx.setColor(0.4, 0.85, 0.3, 1)
+    lurek.gfx.print("Food: " .. resources.food, 10, 70)
+    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+    lurek.gfx.print("Cities: " .. #cities, 10, 90)
+    lurek.gfx.print("[N] Next Turn  [C] Place City", 10, 110)
 
     -- Info panel for selected hex
     if selected then
@@ -171,25 +171,25 @@ function luna.render()
         local h = hexes[key]
         if h then
             local t = TERRAIN[h.terrain]
-            luna.gfx.setColor(0, 0, 0, 0.7)
-            luna.gfx.rectangle("fill", 580, 0, 220, 110)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("Hex (" .. h.q .. "," .. h.r .. ")", 590, 10)
-            luna.gfx.print("Terrain: " .. h.terrain, 590, 30)
-            luna.gfx.print("Gold/turn: " .. t.gold, 590, 50)
-            luna.gfx.print("Wood/turn: " .. t.wood, 590, 70)
-            luna.gfx.print("Food/turn: " .. t.food, 590, 90)
+            lurek.gfx.setColor(0, 0, 0, 0.7)
+            lurek.gfx.rectangle("fill", 580, 0, 220, 110)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("Hex (" .. h.q .. "," .. h.r .. ")", 590, 10)
+            lurek.gfx.print("Terrain: " .. h.terrain, 590, 30)
+            lurek.gfx.print("Gold/turn: " .. t.gold, 590, 50)
+            lurek.gfx.print("Wood/turn: " .. t.wood, 590, 70)
+            lurek.gfx.print("Food/turn: " .. t.food, 590, 90)
         end
     end
 
     -- Info text
     if infoText ~= "" then
-        luna.gfx.setColor(1, 1, 0.5, 1)
-        luna.gfx.print(infoText, 240, 570)
+        lurek.gfx.setColor(1, 1, 0.5, 1)
+        lurek.gfx.print(infoText, 240, 570)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     local q, r = pixelToHex(x, y)
     local key = hexKey(q, r)
     if hexes[key] then
@@ -198,8 +198,8 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "n" then
         turnNum = turnNum + 1
         gatherResources()

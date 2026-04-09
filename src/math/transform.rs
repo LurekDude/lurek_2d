@@ -3,13 +3,13 @@
 //! Compatible with standard 2D transform API for translate, rotate, scale,
 //! shear, and point transformation.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! This module is part of Lurek2D's `math` subsystem and provides the implementation
 //! details for transform-related operations and data management.
 //! Key types exported from this module: `Transform`.
 //! Primary functions: `new()`, `from_components()`, `translate()`, `rotate()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::mat3::Mat3;
 use crate::math::vec2::Vec2;

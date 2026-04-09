@@ -1,8 +1,8 @@
 -- Automation Demo
--- Demonstrates the luna.simulator input automation system.
+-- Demonstrates the lurek.simulator input automation system.
 -- The simulator replays scripted input events (key presses, mouse moves, etc.)
 -- into the engine's event queue, useful for testing, replays, and tutorials.
--- Run with: cargo run -- demos/showcase/automation_demo
+-- Run with: cargo run -- content/demos/showcase/automation_demo
 
 local status = "idle"
 local log = {}
@@ -16,11 +16,11 @@ local function addLog(msg)
     end
 end
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.15, 0.15, 0.2)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.15, 0.15, 0.2)
 
     -- Load a demo script with mixed input events
-    luna.simulator.load("demo_sequence", {
+    lurek.simulator.load("demo_sequence", {
         steps = {
             { action = "keypress",     key = "w",     time = 0.5 },
             { action = "keyrelease",   key = "w",     time = 0.7 },
@@ -37,7 +37,7 @@ function luna.init()
     })
 
     -- Load a simple script using the standard table format
-    luna.simulator.load("toml_script", {
+    lurek.simulator.load("toml_script", {
         steps = {
             { action = "keypress",   key = "space", time = 0.0 },
             { action = "keyrelease", key = "space", time = 0.2 },
@@ -53,103 +53,103 @@ function luna.init()
     addLog("Press P to pause/resume, S to stop")
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Update the simulator (dispatches events into the engine queue)
-    luna.simulator.update(dt)
+    lurek.simulator.update(dt)
 
     -- Update status display
-    if luna.simulator.isRunning() then
-        local name = luna.simulator.getCurrentScript() or "?"
-        local step = luna.simulator.getCurrentStep()
-        local total = luna.simulator.getStepCount()
-        local elapsed = luna.simulator.getElapsedTime()
+    if lurek.simulator.isRunning() then
+        local name = lurek.simulator.getCurrentScript() or "?"
+        local step = lurek.simulator.getCurrentStep()
+        local total = lurek.simulator.getStepCount()
+        local elapsed = lurek.simulator.getElapsedTime()
         status = string.format("Running: %s [step %d/%d] %.1fs", name, step, total, elapsed)
-    elseif luna.simulator.isPaused() then
+    elseif lurek.simulator.isPaused() then
         status = "Paused"
-    elseif luna.simulator.isComplete() then
+    elseif lurek.simulator.isComplete() then
         status = "Complete"
     else
         status = "Idle"
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Title
-    luna.gfx.setColor(1, 1, 0.6)
-    luna.gfx.print("Automation Demo", 20, 20)
+    lurek.gfx.setColor(1, 1, 0.6)
+    lurek.gfx.print("Automation Demo", 20, 20)
 
     -- Status
-    luna.gfx.setColor(0.6, 1, 0.6)
-    luna.gfx.print("Status: " .. status, 20, 50)
+    lurek.gfx.setColor(0.6, 1, 0.6)
+    lurek.gfx.print("Status: " .. status, 20, 50)
 
     -- Scripts loaded
-    luna.gfx.setColor(0.8, 0.8, 0.8)
-    local scripts = luna.simulator.getScripts()
-    luna.gfx.print("Scripts loaded: " .. #scripts, 20, 80)
+    lurek.gfx.setColor(0.8, 0.8, 0.8)
+    local scripts = lurek.simulator.getScripts()
+    lurek.gfx.print("Scripts loaded: " .. #scripts, 20, 80)
     for i, name in ipairs(scripts) do
-        luna.gfx.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
+        lurek.gfx.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
     end
 
     -- Controls
-    luna.gfx.setColor(0.6, 0.8, 1)
+    lurek.gfx.setColor(0.6, 0.8, 1)
     local y = 180
-    luna.gfx.print("Controls:", 20, y)
-    luna.gfx.print("  1 = Play demo_sequence", 30, y + 20)
-    luna.gfx.print("  2 = Play toml_script", 30, y + 40)
-    luna.gfx.print("  P = Pause / Resume", 30, y + 60)
-    luna.gfx.print("  S = Stop", 30, y + 80)
+    lurek.gfx.print("Controls:", 20, y)
+    lurek.gfx.print("  1 = Play demo_sequence", 30, y + 20)
+    lurek.gfx.print("  2 = Play toml_script", 30, y + 40)
+    lurek.gfx.print("  P = Pause / Resume", 30, y + 60)
+    lurek.gfx.print("  S = Stop", 30, y + 80)
 
     -- Log
-    luna.gfx.setColor(0.7, 0.7, 0.7)
+    lurek.gfx.setColor(0.7, 0.7, 0.7)
     local logY = y + 120
-    luna.gfx.print("Log:", 20, logY)
+    lurek.gfx.print("Log:", 20, logY)
     for i, entry in ipairs(log) do
-        luna.gfx.print(entry, 30, logY + i * 18)
+        lurek.gfx.print(entry, 30, logY + i * 18)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "1" then
-        luna.simulator.start("demo_sequence")
+        lurek.simulator.start("demo_sequence")
         addLog("Started demo_sequence")
     elseif key == "2" then
-        luna.simulator.start("toml_script")
+        lurek.simulator.start("toml_script")
         addLog("Started toml_script")
     elseif key == "p" then
-        if luna.simulator.isPaused() then
-            luna.simulator.resume()
+        if lurek.simulator.isPaused() then
+            lurek.simulator.resume()
             addLog("Resumed")
-        elseif luna.simulator.isRunning() then
-            luna.simulator.pause()
+        elseif lurek.simulator.isRunning() then
+            lurek.simulator.pause()
             addLog("Paused")
         end
     elseif key == "s" then
-        luna.simulator.stop()
+        lurek.simulator.stop()
         addLog("Stopped")
     else
         addLog("Key: " .. key .. " (simulated or real)")
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     addLog(string.format("Mouse press: (%d,%d) btn=%d", x, y, button))
 end
 
-function luna.mousereleased(x, y, button)
+function lurek.mousereleased(x, y, button)
     addLog(string.format("Mouse release: (%d,%d) btn=%d", x, y, button))
 end
 
-function luna.mousemoved(x, y, dx, dy)
+function lurek.mousemoved(x, y, dx, dy)
     -- Only log simulated moves (large dx/dy)
     if math.abs(dx) > 5 or math.abs(dy) > 5 then
         addLog(string.format("Mouse move: (%d,%d) d=(%d,%d)", x, y, dx, dy))
     end
 end
 
-function luna.textinput(text)
+function lurek.textinput(text)
     addLog("Text input: " .. text)
 end
 
-function luna.wheelmoved(x, y)
+function lurek.wheelmoved(x, y)
     addLog(string.format("Wheel: (%d,%d)", x, y))
 end

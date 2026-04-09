@@ -1,4 +1,4 @@
-//! Security and boundary tests for the Luna2D engine.
+//! Security and boundary tests for the Lurek2D engine.
 //!
 //! Covers: path traversal prevention, Lua sandbox isolation, input boundary
 //! conditions, and safe memory handling at public API surfaces.
@@ -9,8 +9,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -77,7 +77,7 @@ fn lua_sandbox_require_restricted() {
 
 #[test]
 fn filesystem_reject_dotdot_path() {
-    use luna2d::filesystem::GameFS;
+    use lurek2d::filesystem::GameFS;
     let fs = GameFS::new(PathBuf::from("tests/fixtures"));
     // Attempt to escape sandbox via ..
     let result = fs.read_string("../../Cargo.toml");
@@ -86,7 +86,7 @@ fn filesystem_reject_dotdot_path() {
 
 #[test]
 fn filesystem_reject_absolute_path() {
-    use luna2d::filesystem::GameFS;
+    use lurek2d::filesystem::GameFS;
     let fs = GameFS::new(PathBuf::from("tests/fixtures"));
     // Try absolute path
     let result = fs.read_string("/etc/passwd");
@@ -95,7 +95,7 @@ fn filesystem_reject_absolute_path() {
 
 #[test]
 fn filesystem_reject_null_byte_in_path() {
-    use luna2d::filesystem::GameFS;
+    use lurek2d::filesystem::GameFS;
     let fs = GameFS::new(PathBuf::from("tests/fixtures"));
     // Null-byte injection
     let result = fs.read_string("file\x00.lua");
@@ -108,7 +108,7 @@ fn filesystem_reject_null_byte_in_path() {
 
 #[test]
 fn math_no_panic_on_nan_input() {
-    use luna2d::math::Vec2;
+    use lurek2d::math::Vec2;
     let v = Vec2::new(f32::NAN, f32::NAN);
     let _len = v.length(); // must not panic
     let _norm = v.normalize(); // must not panic
@@ -116,7 +116,7 @@ fn math_no_panic_on_nan_input() {
 
 #[test]
 fn math_no_panic_on_infinite_input() {
-    use luna2d::math::Vec2;
+    use lurek2d::math::Vec2;
     let v = Vec2::new(f32::INFINITY, f32::NEG_INFINITY);
     let _len = v.length();
     let _norm = v.normalize();
@@ -124,7 +124,7 @@ fn math_no_panic_on_infinite_input() {
 
 #[test]
 fn terminal_zero_size_does_not_panic() {
-    use luna2d::terminal::Terminal;
+    use lurek2d::terminal::Terminal;
     // A 0×0 terminal should degrade to minimum size without panicking
     let t = Terminal::new(0, 0);
     let (cols, _rows) = t.get_dimensions();
@@ -133,7 +133,7 @@ fn terminal_zero_size_does_not_panic() {
 
 #[test]
 fn terminal_oob_write_does_not_panic() {
-    use luna2d::terminal::Terminal;
+    use lurek2d::terminal::Terminal;
     let mut t = Terminal::new(5, 3);
     // Writing out of bounds should be a no-op, not a panic
     t.set(100, 100, b'X' as u32, [1.0; 4], [0.0; 4]);

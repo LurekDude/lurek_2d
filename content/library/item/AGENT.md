@@ -5,7 +5,7 @@
 | **Tier** | Tier 3 — Lunasome (pure Lua, no Rust dependencies) |
 | **Source** | `library/item/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_item.lua` |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 | **Test count** | 107 tests, 0 failures |
 
 ## Summary
@@ -15,7 +15,7 @@ pools, and stack management. `TypeRegistry` stores blueprints with base stats,
 tags, metadata, and an optional display name. `Item` instances are cloned from a
 type definition and own their own stats, tags, **counters** (named integers),
 metadata, owner reference, **display name**, and **slot/position name**. Items
-are fully serialisable with `luna.save`.
+are fully serialisable with `lurek.save`.
 
 `Stack` is an ordered, capacity-bounded collection of `Item` instances; it
 supports LIFO push/pop, FIFO pop-bottom/push-bottom, arbitrary removal by
@@ -140,7 +140,7 @@ Analysis helpers (operate on flat item arrays)
 | **Tier** | Tier 3 — Lunasome (pure Lua, no Rust dependencies) |
 | **Source** | `library/item/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_item.lua` |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 
 ## Summary
 
@@ -150,7 +150,7 @@ each definition carries a base stat table, a tag set, default metadata, and an
 optional `max_stack` limit. `Item` instances are cloned from a type definition
 and own their own stats, tags, counters, metadata, and an optional owner
 identifier. Items never reference the engine runtime making them safe to
-serialise completely with `luna.save`.
+serialise completely with `lurek.save`.
 
 `Stack` is an ordered, capacity-bounded collection of `Item` instances; it
 supports both LIFO push/pop semantics and FIFO shift/unshift, arbitrary removal

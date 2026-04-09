@@ -6,7 +6,7 @@ into danger.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — terrain tiles, lemming sprites
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — terrain tiles, lemming sprites
 - Complex per-frame agent logic for multiple independently-moving entities
 - Destructible terrain via a 2D boolean grid
 - Job-system state machine per agent (walk, block, dig, build, bash)

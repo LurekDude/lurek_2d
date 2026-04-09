@@ -3,13 +3,13 @@
 //! Provides `ModInfo` for mod metadata and `ModManager` for registration,
 //! dependency resolution, load ordering, folder scanning, and hot-reload queuing.
 //!
-//! This module is part of Luna2D's `modding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `modding` subsystem and provides the implementation
 //! details for mod manager-related operations and data management.
 //! Key types exported from this module: `ModInfo`, `ModManager`.
 //! Primary functions: `new()`, `new()`, `register_mod()`, `unregister_mod()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{MD01_MGR_INIT, MD02_MOD_REG, MD04_ORDER_OK};
 use crate::log_msg;

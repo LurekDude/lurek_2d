@@ -1,4 +1,4 @@
-//! JSON parsing and serialization for Luna2D.
+//! JSON parsing and serialization for Lurek2D.
 //!
 //! Converts between JSON strings and `SerialValue` using `serde_json`.
 

@@ -1,9 +1,9 @@
 ---
 name: cross-platform
-description: "Load this skill when dealing with platform-specific code, conditional compilation, or cross-platform compatibility in Luna2D. It owns platform abstraction patterns and OS-specific workarounds. Skip it for pure game logic or Lua scripting."
+description: "Load this skill when dealing with platform-specific code, conditional compilation, or cross-platform compatibility in Lurek2D. It owns platform abstraction patterns and OS-specific workarounds. Skip it for pure game logic or Lua scripting."
 ---
 
-# Cross-Platform — Luna2D Engine
+# Cross-Platform — Lurek2D Engine
 
 ## Load When
 

@@ -10,12 +10,12 @@ A tower defense game where the player controls both the maze and the towers. Pla
 - Bullet-enemy circular collision detection with sweep cleanup
 - Gold economy: enemies award gold on death, walls and towers have costs
 - Path blocking guard: if a wall would seal the exit the placement is rejected
-- Screen-space grid drawing with `luna.gfx.drawRect` per cell
+- Screen-space grid drawing with `lurek.gfx.drawRect` per cell
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/maze_defense
+cargo run -- content/demos/maze_defense
 ```
 
 ## Controls

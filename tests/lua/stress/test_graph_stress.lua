@@ -1,9 +1,9 @@
--- Luna2D Stress Test: Graph Flow Simulation
+-- Lurek2D Stress Test: Graph Flow Simulation
 -- Tests large graph creation, edge traversal, and simulation ticks
 
 describe("graph stress: large graph creation", function()
     it("creates a 500-node chain graph", function()
-        local g = luna.graph.newGraph()
+        local g = lurek.graph.newGraph()
 
         local nodes = {}
         for i = 1, 500 do
@@ -21,7 +21,7 @@ describe("graph stress: large graph creation", function()
     end)
 
     it("creates a mesh-connected graph", function()
-        local g = luna.graph.newGraph()
+        local g = lurek.graph.newGraph()
 
         -- 20x20 grid = 400 nodes
         local size = 20
@@ -54,7 +54,7 @@ end)
 
 describe("graph stress: simulation ticks", function()
     it("runs 100 ticks on a 200-node pipeline", function()
-        local g = luna.graph.newGraph()
+        local g = lurek.graph.newGraph()
 
         local nodes = {}
         for i = 1, 200 do

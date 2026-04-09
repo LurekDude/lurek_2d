@@ -1,8 +1,8 @@
-//! Integration tests for the Luna2D network module.
+//! Integration tests for the Lurek2D network module.
 
-use luna2d::network::constants::{DEFAULT_CHANNELS, DEFAULT_PEERS, MAX_CHANNELS, MAX_PEERS};
-use luna2d::network::error::NetworkError;
-use luna2d::network::host::NetworkHost;
+use lurek2d::network::constants::{DEFAULT_CHANNELS, DEFAULT_PEERS, MAX_CHANNELS, MAX_PEERS};
+use lurek2d::network::error::NetworkError;
+use lurek2d::network::host::NetworkHost;
 use std::net::SocketAddr;
 
 // ── Constants ────────────────────────────────────────────────────────

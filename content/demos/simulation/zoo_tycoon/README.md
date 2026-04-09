@@ -15,7 +15,7 @@ A top-down zoo management simulation on a 20 × 15 grid. Build paths, fences, an
 ## How to Run
 
 ```powershell
-cargo run -- demos/zoo_tycoon
+cargo run -- content/demos/zoo_tycoon
 ```
 
 ## Controls

@@ -1,6 +1,6 @@
--- Wildlife Photography — Luna2D Demo
+-- Wildlife Photography — Lurek2D Demo
 -- Explore a nature reserve, photograph animals, fill your encyclopedia
--- Run with: cargo run -- demos/simulation/wildlife_photo
+-- Run with: cargo run -- content/demos/simulation/wildlife_photo
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -60,7 +60,7 @@ local function spawn_animal()
     }
 end
 
-function luna.init()
+function lurek.init()
     gen_biome_map()
     player = {x = MAP_W / 2, y = MAP_H / 2, crouching = false}
     camera_mode = false
@@ -84,7 +84,7 @@ local function dist(x1, y1, x2, y2)
     return math.sqrt(dx*dx + dy*dy)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
     -- day cycle
@@ -100,13 +100,13 @@ function luna.process(dt)
     local moving = false
     if player.crouching then speed = 50 end
 
-    if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then
+    if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then
         player.y = player.y - speed * dt; moving = true end
-    if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then
+    if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then
         player.y = player.y + speed * dt; moving = true end
-    if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then
+    if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then
         player.x = player.x - speed * dt; moving = true end
-    if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then
+    if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then
         player.x = player.x + speed * dt; moving = true end
 
     player.x = clamp(player.x, 10, MAP_W - 10)
@@ -164,7 +164,7 @@ function luna.process(dt)
 end
 
 local function take_photo()
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     -- convert screen to world
     local wx = mx + (player.x - W / 2)
     local wy = my + (player.y - H / 2)
@@ -200,15 +200,15 @@ local function take_photo()
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if key == "c" then camera_mode = not camera_mode end
     if key == "space" and camera_mode then take_photo() end
     if key == "lshift" or key == "rshift" then player.crouching = not player.crouching end
 end
 
-function luna.render()
+function lurek.render()
     -- camera offset
     local ox = player.x - W / 2
     local oy = player.y - H / 2
@@ -223,8 +223,8 @@ function luna.render()
         for x = sx + 1, ex do
             if biomes[y] and biomes[y][x] then
                 local c = BIOME_COLORS[biomes[y][x]]
-                luna.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
-                luna.gfx.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
+                lurek.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
+                lurek.gfx.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
             end
         end
     end
@@ -237,15 +237,15 @@ function luna.render()
             local c = a.species.color
             local alpha = 1
             if a.state == "sleep" then alpha = 0.6 end
-            luna.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
-            luna.gfx.circle("fill", ax, ay, a.species.size)
+            lurek.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
+            lurek.gfx.circle("fill", ax, ay, a.species.size)
             -- state indicator
             if a.state == "sleep" then
-                luna.gfx.setColor(1,1,1,0.5*visibility)
-                luna.gfx.print("z", ax+6, ay-10, 0.7)
+                lurek.gfx.setColor(1,1,1,0.5*visibility)
+                lurek.gfx.print("z", ax+6, ay-10, 0.7)
             elseif a.state == "flee" then
-                luna.gfx.setColor(1,0.3,0.3,0.7)
-                luna.gfx.print("!", ax+6, ay-10, 0.7)
+                lurek.gfx.setColor(1,0.3,0.3,0.7)
+                lurek.gfx.print("!", ax+6, ay-10, 0.7)
             end
         end
     end
@@ -253,69 +253,69 @@ function luna.render()
     -- player
     local px, py = W / 2, H / 2
     local pr = player.crouching and 5 or 7
-    luna.gfx.setColor(0.9, 0.85, 0.3, 1)
-    luna.gfx.circle("fill", px, py, pr)
-    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-    luna.gfx.circle("line", px, py, pr)
+    lurek.gfx.setColor(0.9, 0.85, 0.3, 1)
+    lurek.gfx.circle("fill", px, py, pr)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+    lurek.gfx.circle("line", px, py, pr)
 
     -- camera mode crosshair
     if camera_mode then
-        local mx, my = luna.mouse.getPosition()
-        luna.gfx.setColor(1, 1, 1, 0.8)
-        luna.gfx.line(mx - 15, my, mx + 15, my)
-        luna.gfx.line(mx, my - 15, mx, my + 15)
-        luna.gfx.circle("line", mx, my, 25)
-        luna.gfx.setColor(1,0.3,0.3,0.6)
-        luna.gfx.print("CAMERA", mx + 20, my - 8, 0.8)
+        local mx, my = lurek.mouse.getPosition()
+        lurek.gfx.setColor(1, 1, 1, 0.8)
+        lurek.gfx.line(mx - 15, my, mx + 15, my)
+        lurek.gfx.line(mx, my - 15, mx, my + 15)
+        lurek.gfx.circle("line", mx, my, 25)
+        lurek.gfx.setColor(1,0.3,0.3,0.6)
+        lurek.gfx.print("CAMERA", mx + 20, my - 8, 0.8)
     end
 
     -- night overlay
     if visibility < 0.9 then
-        luna.gfx.setColor(0, 0, 0.05, 1 - visibility)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0, 0, 0.05, 1 - visibility)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, 0, W, 28)
-    luna.gfx.setColor(1,1,1,1)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, 0, W, 28)
+    lurek.gfx.setColor(1,1,1,1)
     local discovered = 0
     for _ in pairs(encyclopedia) do discovered = discovered + 1 end
-    luna.gfx.print("Photos: " .. #photos .. "  Best: " .. best_score
+    lurek.gfx.print("Photos: " .. #photos .. "  Best: " .. best_score
         .. "  Species: " .. discovered .. "/" .. #SPECIES, 10, 5, 0.9)
-    luna.gfx.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
-    luna.gfx.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 740, 5, 0.7)
+    lurek.gfx.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
+    lurek.gfx.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 740, 5, 0.7)
 
     -- noise meter
-    luna.gfx.setColor(0.3,0.3,0.3,0.7)
-    luna.gfx.rectangle("fill", 10, H-22, 80, 12)
+    lurek.gfx.setColor(0.3,0.3,0.3,0.7)
+    lurek.gfx.rectangle("fill", 10, H-22, 80, 12)
     local np = noise_level / 100
-    luna.gfx.setColor(np, 1-np, 0, 0.8)
-    luna.gfx.rectangle("fill", 10, H-22, 80*np, 12)
-    luna.gfx.setColor(1,1,1,0.7)
-    luna.gfx.print("Noise", 14, H-24, 0.7)
+    lurek.gfx.setColor(np, 1-np, 0, 0.8)
+    lurek.gfx.rectangle("fill", 10, H-22, 80*np, 12)
+    lurek.gfx.setColor(1,1,1,0.7)
+    lurek.gfx.print("Noise", 14, H-24, 0.7)
 
     -- photo log (last 5)
     if #photos > 0 then
-        luna.gfx.setColor(0,0,0,0.5)
-        luna.gfx.rectangle("fill", W-160, H-110, 155, 105)
-        luna.gfx.setColor(1,1,1,0.9)
-        luna.gfx.print("Recent Photos:", W-155, H-108, 0.7)
+        lurek.gfx.setColor(0,0,0,0.5)
+        lurek.gfx.rectangle("fill", W-160, H-110, 155, 105)
+        lurek.gfx.setColor(1,1,1,0.9)
+        lurek.gfx.print("Recent Photos:", W-155, H-108, 0.7)
         local start = clamp(#photos - 4, 1, #photos)
         for i = start, #photos do
             local p = photos[i]
             local yi = (i - start) * 16 + (H - 92)
-            luna.gfx.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
+            lurek.gfx.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
         end
     end
 
     -- message
     if message and msg_timer > 0 then
-        luna.gfx.setColor(1,1,0.4,1)
-        luna.gfx.print(message, 200, 50, 1.1)
+        lurek.gfx.setColor(1,1,0.4,1)
+        lurek.gfx.print(message, 200, 50, 1.1)
     end
 
-    luna.gfx.setColor(0.6,0.6,0.6,0.7)
-    luna.gfx.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
+    lurek.gfx.setColor(0.6,0.6,0.6,0.7)
+    lurek.gfx.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
 end

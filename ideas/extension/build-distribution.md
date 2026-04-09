@@ -22,10 +22,10 @@
 
 | Field | package.json (v1) | package2.json (v2) |
 |---|---|---|
-| name | luna2d-vscode | luna-toolkit |
+| name | lurek2d-vscode | luna-toolkit |
 | version | 0.1.0 | 0.9.0 |
 | main | ./out/extension.js | ./dist/extension.js |
-| displayName | Luna2D | Luna Toolkit |
+| displayName | Lurek2D | Luna Toolkit |
 | dependencies | @modelcontextprotocol/sdk | @modelcontextprotocol/sdk + more |
 
 ---

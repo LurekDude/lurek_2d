@@ -4,13 +4,13 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::data::byte_data::ByteData;
-use luna2d::data::compress::{compress, decompress, CompressFormat};
-use luna2d::data::encode::{decode, encode, EncodeFormat};
-use luna2d::data::hash::{hash, HashAlgorithm};
-use luna2d::data::toml_convert;
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::data::byte_data::ByteData;
+use lurek2d::data::compress::{compress, decompress, CompressFormat};
+use lurek2d::data::encode::{decode, encode, EncodeFormat};
+use lurek2d::data::hash::{hash, HashAlgorithm};
+use lurek2d::data::toml_convert;
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -59,7 +59,7 @@ fn byte_data_clone() {
 
 #[test]
 fn compress_decompress_deflate() {
-    let original = b"Hello, Luna2D! This is a test of deflate compression.";
+    let original = b"Hello, Lurek2D! This is a test of deflate compression.";
     let compressed = compress(original, CompressFormat::Deflate, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Deflate).unwrap();
     assert_eq!(decompressed, original);
@@ -67,7 +67,7 @@ fn compress_decompress_deflate() {
 
 #[test]
 fn compress_decompress_gzip() {
-    let original = b"Hello, Luna2D! This is a test of gzip compression.";
+    let original = b"Hello, Lurek2D! This is a test of gzip compression.";
     let compressed = compress(original, CompressFormat::Gzip, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Gzip).unwrap();
     assert_eq!(decompressed, original);
@@ -75,7 +75,7 @@ fn compress_decompress_gzip() {
 
 #[test]
 fn compress_decompress_zlib() {
-    let original = b"Hello, Luna2D! This is a test of zlib compression.";
+    let original = b"Hello, Lurek2D! This is a test of zlib compression.";
     let compressed = compress(original, CompressFormat::Zlib, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Zlib).unwrap();
     assert_eq!(decompressed, original);
@@ -83,7 +83,7 @@ fn compress_decompress_zlib() {
 
 #[test]
 fn compress_decompress_lz4() {
-    let original = b"Hello, Luna2D! This is a test of LZ4 compression.";
+    let original = b"Hello, Lurek2D! This is a test of LZ4 compression.";
     let compressed = compress(original, CompressFormat::Lz4, 0).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Lz4).unwrap();
     assert_eq!(decompressed, original);
@@ -121,7 +121,7 @@ fn hash_sha1_known() {
 
 #[test]
 fn encode_decode_base64() {
-    let original = b"Hello, Luna2D!";
+    let original = b"Hello, Lurek2D!";
     let encoded = encode(EncodeFormat::Base64, original);
     assert_eq!(encoded, "SGVsbG8sIEx1bmEyRCE=");
     let decoded = decode(EncodeFormat::Base64, &encoded).unwrap();
@@ -139,7 +139,7 @@ fn encode_decode_hex() {
 
 // ── DataView tests ───────────────────────────────────────────────────────────
 
-use luna2d::data::DataView;
+use lurek2d::data::DataView;
 
 #[test]
 fn data_dataview_reads_bytes() {
@@ -179,9 +179,9 @@ fn data_dataview_out_of_bounds_error() {
     assert!(dv.get_u32(0).is_err());
 }
 
-// ── Luna2D Binary Pack Format tests ──────────────────────────────────────────
+// ── Lurek2D Binary Pack Format tests ──────────────────────────────────────────
 
-use luna2d::data::bin_pack::{measure_size, read, write, BinValue};
+use lurek2d::data::bin_pack::{measure_size, read, write, BinValue};
 
 #[test]
 fn binary_write_read_u32_f32_roundtrip() {
@@ -345,19 +345,19 @@ fn binary_dataview_from_write() {
 
 // ── Merged from data_tests2.rs ────────────────────────────────────────────
 
-use luna2d::data::pack::{get_packed_size, pack, unpack, PackValue};
+use lurek2d::data::pack::{get_packed_size, pack, unpack, PackValue};
 
 #[test]
 fn toml_parse_basic_types() {
     let input = r#"
-        name = "Luna2D"
+        name = "Lurek2D"
         version = 4
         pi = 3.14
         enabled = true
     "#;
     let val = toml_convert::parse_toml(input).unwrap();
     let t = val.as_table().unwrap();
-    assert_eq!(t["name"].as_str(), Some("Luna2D"));
+    assert_eq!(t["name"].as_str(), Some("Lurek2D"));
     assert_eq!(t["version"].as_integer(), Some(4));
     assert!((t["pi"].as_float().unwrap() - 3.14).abs() < 1e-5);
     assert_eq!(t["enabled"].as_bool(), Some(true));
@@ -393,11 +393,11 @@ fn toml_parse_array() {
 #[test]
 fn toml_encode_basic() {
     let mut map = toml::map::Map::new();
-    map.insert("name".into(), toml::Value::String("Luna2D".into()));
+    map.insert("name".into(), toml::Value::String("Lurek2D".into()));
     map.insert("version".into(), toml::Value::Integer(4));
     let val = toml::Value::Table(map);
     let result = toml_convert::encode_toml(&val).unwrap();
-    assert!(result.contains("name = \"Luna2D\""));
+    assert!(result.contains("name = \"Lurek2D\""));
     assert!(result.contains("version = 4"));
 }
 
@@ -428,11 +428,11 @@ fn test_lua_parse_toml_nested() {
     let lua = make_vm();
     lua.load(
         r#"
-        local toml_str = '[window]\nwidth = 800\nheight = 600\ntitle = "Luna2D"'
+        local toml_str = '[window]\nwidth = 800\nheight = 600\ntitle = "Lurek2D"'
         local t = luna.data.parseToml(toml_str)
         assert(t.window.width == 800)
         assert(t.window.height == 600)
-        assert(t.window.title == "Luna2D")
+        assert(t.window.title == "Lurek2D")
         "#,
     )
     .exec()

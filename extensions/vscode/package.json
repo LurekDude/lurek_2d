@@ -1,9 +1,9 @@
 {
-  "name": "luna2d-vscode",
-  "displayName": "Luna2D",
-  "description": "AI-first IDE support for Luna2D game engine",
+  "name": "lurek2d-vscode",
+  "displayName": "Lurek2D",
+  "description": "AI-first IDE support for Lurek2D game engine",
   "version": "0.1.0",
-  "publisher": "luna2d",
+  "publisher": "lurek2d",
   "icon": "media/luna-logo.png",
   "engines": {
     "vscode": "^1.90.0"
@@ -20,20 +20,20 @@
   "contributes": {
     "commands": [
       {
-        "command": "luna2d.runExample",
-        "title": "Luna2D: Run Example"
+        "command": "lurek2d.runExample",
+        "title": "Lurek2D: Run Example"
       },
       {
-        "command": "luna2d.listExamples",
-        "title": "Luna2D: List Examples"
+        "command": "lurek2d.listExamples",
+        "title": "Lurek2D: List Examples"
       },
       {
-        "command": "luna2d.checkBuild",
-        "title": "Luna2D: Check Build"
+        "command": "lurek2d.checkBuild",
+        "title": "Lurek2D: Check Build"
       },
       {
-        "command": "luna2d.getApiDoc",
-        "title": "Luna2D: Get API Documentation"
+        "command": "lurek2d.getApiDoc",
+        "title": "Lurek2D: Get API Documentation"
       }
     ]
   },

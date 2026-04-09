@@ -4,17 +4,17 @@ Moves a coloured rectangle around the screen with keyboard input. Demonstrates r
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — polling multiple keys each frame
-- `luna.mouse.getPosition()` / `luna.mouse.isDown()` — mouse input
-- `luna.gfx.rectangle()` with fill and outline modes
+- `lurek.keyboard.isDown()` — polling multiple keys each frame
+- `lurek.mouse.getPosition()` / `lurek.mouse.isDown()` — mouse input
+- `lurek.gfx.rectangle()` with fill and outline modes
 - Delta-time movement: `pos = pos + speed * dt`
 - Boundary clamping to keep entities on screen
-- `luna.gfx.getWidth()` / `getHeight()` — window size query
+- `lurek.gfx.getWidth()` / `getHeight()` — window size query
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/sprites
+cargo run -- content/demos/sprites
 ```
 
 ## Controls

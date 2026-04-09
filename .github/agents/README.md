@@ -1,10 +1,10 @@
-# Luna2D Agent Layer
+# Lurek2D Agent Layer
 
-This README is the canonical layer-level map for all Luna2D agents. Shared contracts live here — individual `*.agent.md` files carry specialist workflow only.
+This README is the canonical layer-level map for all Lurek2D agents. Shared contracts live here — individual `*.agent.md` files carry specialist workflow only.
 
 ## Overview
 
-Luna2D has 20 specialist agents. Each owns a distinct role in the game engine development workflow. This file defines shared execution defaults, the canonical handoff contract, routing heuristics, and boundary rules that apply across all agents.
+Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine development workflow. This file defines shared execution defaults, the canonical handoff contract, routing heuristics, and boundary rules that apply across all agents.
 
 ## Agent Directory
 
@@ -15,7 +15,7 @@ Luna2D has 20 specialist agents. Each owns a distinct role in the game engine de
 | `Research`     | Search web/docs/codebase for facts          | External knowledge needed before implementation   |
 | `Solver`       | Root-cause analysis and solution selection  | Hard problem with no obvious answer               |
 | `Developer`    | Implement Rust engine features              | Writing or modifying Rust source code             |
-| `Lua-Designer` | Design the `luna.*` Lua API surface         | Adding/changing Lua-facing APIs                   |
+| `Lua-Designer` | Design the `lurek.*` Lua API surface         | Adding/changing Lua-facing APIs                   |
 | `Renderer`     | Graphics pipeline and rendering             | Working on wgpu, DrawCommand, textures       |
 | `Physicist`    | Physics engine implementation               | Collision, bodies, world step, forces             |
 | `Audio-Eng`    | Audio system and rodio integration          | Sound loading, playback, mixer                    |
@@ -52,7 +52,7 @@ Luna2D has 20 specialist agents. Each owns a distinct role in the game engine de
 | `Research`     | Evidence gathering, web/codebase search   | Shadow Developer implementing solutions  |
 | `Solver`       | Root cause, alternatives, recommendation  | Shadow Developer writing implementation  |
 | `Developer`    | Rust implementation, bug fixes            | Shadow Architect redesigning modules     |
-| `Lua-Designer` | `luna.*` API surface, binding patterns    | Shadow Developer for engine internals    |
+| `Lua-Designer` | `lurek.*` API surface, binding patterns    | Shadow Developer for engine internals    |
 | `Renderer`     | Graphics pipeline, draw commands          | Shadow Physicist or Audio-Eng            |
 | `Physicist`    | Physics simulation, collision             | Shadow Renderer for visual output        |
 | `Audio-Eng`    | Audio pipeline, rodio integration         | Shadow Developer for non-audio code      |
@@ -73,7 +73,7 @@ Luna2D has 20 specialist agents. Each owns a distinct role in the game engine de
 ### Route by Artifact
 
 - Rust source file change → `Developer`
-- New `luna.*` function → `Lua-Designer` then `Developer`
+- New `lurek.*` function → `Lua-Designer` then `Developer`
 - DrawCommand or Renderer change → `Renderer`
 - Physics body/world/collision → `Physicist`
 - Audio mixer/source → `Audio-Eng`

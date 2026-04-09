@@ -1,6 +1,6 @@
 -- Factory Automation — Grid-based logistics demo
 -- Click to place, 1-4 select type, R rotate, right-click delete
--- Run with: cargo run -- demos/simulation/factory
+-- Run with: cargo run -- content/demos/simulation/factory
 
 local TILE = 32
 local COLS, ROWS = 25, 18
@@ -34,9 +34,9 @@ local function output_pos(c, r, dir)
     return c + DIR_DX[dir], r + DIR_DY[dir]
 end
 
-function luna.init()
-    luna.window.setTitle("Factory Automation")
-    luna.gfx.setBackgroundColor(0.12, 0.14, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Factory Automation")
+    lurek.gfx.setBackgroundColor(0.12, 0.14, 0.12)
     grid = {}
     for r = 1, ROWS do
         grid[r] = {}
@@ -79,7 +79,7 @@ local function try_push_item(item_type, to_c, to_r)
     return false
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- machines tick
     for r = 1, ROWS do
         for c = 1, COLS do
@@ -135,29 +135,29 @@ end
 local function draw_arrow(cx, cy, dir, size)
     local dx, dy = DIR_DX[dir] * size, DIR_DY[dir] * size
     local px, py = -dy * 0.4, dx * 0.4
-    luna.gfx.polygon("fill", {
+    lurek.gfx.polygon("fill", {
         cx + dx, cy + dy,
         cx - dx * 0.3 + px, cy - dy * 0.3 + py,
         cx - dx * 0.3 - px, cy - dy * 0.3 - py
     })
 end
 
-function luna.render()
+function lurek.render()
     -- grid lines
-    luna.gfx.setColor(0.2, 0.22, 0.2, 0.5)
+    lurek.gfx.setColor(0.2, 0.22, 0.2, 0.5)
     for r = 0, ROWS do
-        luna.gfx.line(0, r * TILE, W, r * TILE)
+        lurek.gfx.line(0, r * TILE, W, r * TILE)
     end
     for c = 0, COLS do
-        luna.gfx.line(c * TILE, 0, c * TILE, H)
+        lurek.gfx.line(c * TILE, 0, c * TILE, H)
     end
 
     -- ore patches
     for key, _ in pairs(ore_patches) do
         local pr = math.floor(key / 100)
         local pc = key - pr * 100
-        luna.gfx.setColor(0.4, 0.3, 0.15, 0.5)
-        luna.gfx.rectangle("fill", (pc - 1) * TILE + 2, (pr - 1) * TILE + 2, TILE - 4, TILE - 4)
+        lurek.gfx.setColor(0.4, 0.3, 0.15, 0.5)
+        lurek.gfx.rectangle("fill", (pc - 1) * TILE + 2, (pr - 1) * TILE + 2, TILE - 4, TILE - 4)
     end
 
     -- buildings
@@ -166,18 +166,18 @@ function luna.render()
             local cell = grid[r][c]
             if cell then
                 local col = TYPE_COLORS[cell.type]
-                luna.gfx.setColor(col[1], col[2], col[3], 0.85)
-                luna.gfx.rectangle("fill", (c - 1) * TILE + 1, (r - 1) * TILE + 1, TILE - 2, TILE - 2)
+                lurek.gfx.setColor(col[1], col[2], col[3], 0.85)
+                lurek.gfx.rectangle("fill", (c - 1) * TILE + 1, (r - 1) * TILE + 1, TILE - 2, TILE - 2)
                 -- direction arrow
-                luna.gfx.setColor(1, 1, 1, 0.7)
+                lurek.gfx.setColor(1, 1, 1, 0.7)
                 local cx = (c - 1) * TILE + TILE / 2
                 local cy = (r - 1) * TILE + TILE / 2
                 draw_arrow(cx, cy, cell.dir, 8)
 
                 -- input count indicator
                 if cell.input_count and cell.input_count > 0 then
-                    luna.gfx.setColor(1, 1, 1, 1)
-                    luna.gfx.print(tostring(cell.input_count), (c - 1) * TILE + 2, (r - 1) * TILE + 1, 0.7)
+                    lurek.gfx.setColor(1, 1, 1, 1)
+                    lurek.gfx.print(tostring(cell.input_count), (c - 1) * TILE + 2, (r - 1) * TILE + 1, 0.7)
                 end
             end
         end
@@ -190,31 +190,31 @@ function luna.render()
         local bx = (it.c - 1) * TILE + TILE / 2 + DIR_DX[dir] * (it.progress - 0.5) * TILE
         local by = (it.r - 1) * TILE + TILE / 2 + DIR_DY[dir] * (it.progress - 0.5) * TILE
         local ic = ITEM_COLORS[it.kind] or { 1, 1, 1 }
-        luna.gfx.setColor(ic[1], ic[2], ic[3], 1)
-        luna.gfx.rectangle("fill", bx - 4, by - 4, 8, 8)
+        lurek.gfx.setColor(ic[1], ic[2], ic[3], 1)
+        lurek.gfx.rectangle("fill", bx - 4, by - 4, 8, 8)
     end
 
     -- ghost preview
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     local gc = math.floor(mx / TILE) + 1
     local gr = math.floor(my / TILE) + 1
     if in_bounds(gc, gr) then
         local col = TYPE_COLORS[place_type]
-        luna.gfx.setColor(col[1], col[2], col[3], 0.35)
-        luna.gfx.rectangle("fill", (gc - 1) * TILE, (gr - 1) * TILE, TILE, TILE)
-        luna.gfx.setColor(1, 1, 1, 0.5)
+        lurek.gfx.setColor(col[1], col[2], col[3], 0.35)
+        lurek.gfx.rectangle("fill", (gc - 1) * TILE, (gr - 1) * TILE, TILE, TILE)
+        lurek.gfx.setColor(1, 1, 1, 0.5)
         draw_arrow((gc - 1) * TILE + TILE / 2, (gr - 1) * TILE + TILE / 2, place_dir, 8)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, H, W, 30)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Placing: " .. TYPE_NAMES[place_type] .. "  Dir: " .. ({"R","D","L","U"})[place_dir + 1]
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, H, W, 30)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Placing: " .. TYPE_NAMES[place_type] .. "  Dir: " .. ({"R","D","L","U"})[place_dir + 1]
         .. "  |  Products: " .. product_count .. "  |  1-4: type  R: rotate  Click: place  RightClick: delete", 8, H + 6, 0.8)
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     local gc = math.floor(x / TILE) + 1
     local gr = math.floor(y / TILE) + 1
     if not in_bounds(gc, gr) then return end
@@ -226,8 +226,8 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "1" then place_type = 1 end
     if key == "2" then place_type = 2 end
     if key == "3" then place_type = 3 end

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.scene`                                         |
+| **Lua API**    | `lurek.scene`                                         |
 | **Source**      | `src/scene/`                                         |
 | **Rust Tests** | `tests/rust/unit/scene_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_scene.lua`                      |
@@ -22,7 +22,7 @@ the one below it, with its full state intact.
 Ten lifecycle callbacks are supported per scene table: `enter`, `leave`, `pause`,
 `resume`, `ready`, `update` (legacy), `draw` (legacy), `process`, `process_physics`,
 `process_late`, `render`, and `render_ui`. `ready` fires exactly once after `enter`,
-on the first `luna.scene.process()` tick — tracked per-scene by
+on the first `lurek.scene.process()` tick — tracked per-scene by
 `SceneState.scene_ready_pending`. The stack automatically calls `pause` on the
 outgoing top scene when a new scene is pushed, and `resume` when it is revealed
 again by a pop. `enter` and `leave` bookend the entire lifetime of a scene on the
@@ -53,7 +53,7 @@ optional method keys; the module imposes no base class or inheritance hierarchy.
 ## Architecture
 
 ```
-luna.scene (Lua API — scene_api.rs)
+lurek.scene (Lua API — scene_api.rs)
   │
   ├── SceneState (API-layer internal state)
   │     ├── stack: SceneStack          ← Rust-side LIFO stack
@@ -94,22 +94,22 @@ push(scene_b)           pop()                   switchTo(scene_c)
   ├─ b.enter(params)      └─ revealed.resume()    └─ c.enter(params)
   └─ b added to ready_pending
 
-First luna.scene.process(dt) after enter:
+First lurek.scene.process(dt) after enter:
   ready_pending.remove(b) → b:ready()   [only once per push]
   → b:process(dt)
 
-Subsequent luna.scene.process(dt) calls:
+Subsequent lurek.scene.process(dt) calls:
   → b:process(dt)          [ready is NOT called again]
 ```
 
 ### Per-Frame Pipeline Callbacks
 
 ```
-luna.scene.processPhysics(fixed_dt)  → top scene:process_physics(fixed_dt)
-luna.scene.process(dt)               → [first tick: ready()] then top scene:process(dt)
-luna.scene.processLate(dt)           → top scene:process_late(dt)
-luna.scene.render()                  → ALL scenes (bottom→top): scene:render()
-luna.scene.renderUi()                → ALL scenes (bottom→top): scene:render_ui()
+lurek.scene.processPhysics(fixed_dt)  → top scene:process_physics(fixed_dt)
+lurek.scene.process(dt)               → [first tick: ready()] then top scene:process(dt)
+lurek.scene.processLate(dt)           → top scene:process_late(dt)
+lurek.scene.render()                  → ALL scenes (bottom→top): scene:render()
+lurek.scene.renderUi()                → ALL scenes (bottom→top): scene:render_ui()
 ```
 
 ## Source Files
@@ -215,28 +215,28 @@ Two convenience helpers let you define scenes without manual `__index` boilerpla
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.new` | `(def: table) → table` | Create a scene **instance** directly from a methods table — equivalent to `setmetatable({}, {__index = def})` |
-| `luna.scene.define` | `(def: table) → function` | Create a reusable scene **class** — returns a zero-argument constructor that produces fresh instances sharing `def` as their metatable |
+| `lurek.scene.new` | `(def: table) → table` | Create a scene **instance** directly from a methods table — equivalent to `setmetatable({}, {__index = def})` |
+| `lurek.scene.define` | `(def: table) → function` | Create a reusable scene **class** — returns a zero-argument constructor that produces fresh instances sharing `def` as their metatable |
 
-**`luna.scene.define` pattern (recommended for reusable scenes):**
+**`lurek.scene.define` pattern (recommended for reusable scenes):**
 
 ```lua
 -- Define a class once
-local GameScene = luna.scene.define({})
+local GameScene = lurek.scene.define({})
 
 function GameScene:ready()   self.score = 0 end
 function GameScene:process(dt) ... end
 function GameScene:render()    ... end
 
 -- Instantiate with ()
-luna.scene.push(GameScene())
-luna.scene.switchTo(GameScene(), nil, 0.5, nil)
+lurek.scene.push(GameScene())
+lurek.scene.switchTo(GameScene(), nil, 0.5, nil)
 ```
 
-**`luna.scene.new` pattern (for one-off or inline scenes):**
+**`lurek.scene.new` pattern (for one-off or inline scenes):**
 
 ```lua
-luna.scene.push(luna.scene.new({
+lurek.scene.push(lurek.scene.new({
     ready   = function(self) ... end,
     process = function(self, dt) ... end,
     render  = function(self) ... end,
@@ -247,57 +247,57 @@ luna.scene.push(luna.scene.new({
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.push` | `(scene, transition?, duration?, params?)` | Push a scene table; calls `prev:pause()` then `scene:enter(params)`; marks scene for `ready` on next `process` |
-| `luna.scene.pop` | `(transition?, duration?)` | Pop top scene; calls `top:leave()` then `revealed:resume()` |
-| `luna.scene.switchTo` | `(scene, transition?, duration?, params?)` | Replace top scene; calls `old:leave()` then `scene:enter(params)`; marks new scene for `ready` |
-| `luna.scene.clear` | `()` | Remove all scenes, calling `leave()` on each |
-| `luna.scene.popTo` | `(name) → boolean` | Pop until named registered scene is on top; returns false if not found |
-| `luna.scene.update` | `(dt)` | Update transition timer and call `top:update(dt)` *(legacy — prefer `process`)* |
-| `luna.scene.draw` | `()` | Call `draw()` on every scene bottom-to-top *(legacy — prefer `render`)* |
+| `lurek.scene.push` | `(scene, transition?, duration?, params?)` | Push a scene table; calls `prev:pause()` then `scene:enter(params)`; marks scene for `ready` on next `process` |
+| `lurek.scene.pop` | `(transition?, duration?)` | Pop top scene; calls `top:leave()` then `revealed:resume()` |
+| `lurek.scene.switchTo` | `(scene, transition?, duration?, params?)` | Replace top scene; calls `old:leave()` then `scene:enter(params)`; marks new scene for `ready` |
+| `lurek.scene.clear` | `()` | Remove all scenes, calling `leave()` on each |
+| `lurek.scene.popTo` | `(name) → boolean` | Pop until named registered scene is on top; returns false if not found |
+| `lurek.scene.update` | `(dt)` | Update transition timer and call `top:update(dt)` *(legacy — prefer `process`)* |
+| `lurek.scene.draw` | `()` | Call `draw()` on every scene bottom-to-top *(legacy — prefer `render`)* |
 
 ### Pipeline Dispatch
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.process` | `(dt: number)` | Fire `scene:ready(self)` once on first tick after push/switchTo, then call `scene:process(dt)` on the top scene |
-| `luna.scene.processPhysics` | `(dt: number)` | Call `scene:process_physics(dt)` on the top scene (fixed timestep) |
-| `luna.scene.processLate` | `(dt: number)` | Call `scene:process_late(dt)` on the top scene (after `process`, before `render`) |
-| `luna.scene.render` | `()` | Call `scene:render(self)` on **all** scenes bottom-to-top |
-| `luna.scene.renderUi` | `()` | Call `scene:render_ui(self)` on **all** scenes bottom-to-top (UI/HUD overlay) |
+| `lurek.scene.process` | `(dt: number)` | Fire `scene:ready(self)` once on first tick after push/switchTo, then call `scene:process(dt)` on the top scene |
+| `lurek.scene.processPhysics` | `(dt: number)` | Call `scene:process_physics(dt)` on the top scene (fixed timestep) |
+| `lurek.scene.processLate` | `(dt: number)` | Call `scene:process_late(dt)` on the top scene (after `process`, before `render`) |
+| `lurek.scene.render` | `()` | Call `scene:render(self)` on **all** scenes bottom-to-top |
+| `lurek.scene.renderUi` | `()` | Call `scene:render_ui(self)` on **all** scenes bottom-to-top (UI/HUD overlay) |
 
 ### Stack Query
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.getStackSize` | `() → integer` | Number of scenes on the stack |
-| `luna.scene.isEmpty` | `() → boolean` | Whether the stack has no scenes |
-| `luna.scene.getCurrent` | `() → table?` | Top scene table, or nil if empty |
+| `lurek.scene.getStackSize` | `() → integer` | Number of scenes on the stack |
+| `lurek.scene.isEmpty` | `() → boolean` | Whether the stack has no scenes |
+| `lurek.scene.getCurrent` | `() → table?` | Top scene table, or nil if empty |
 
 ### Transitions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.isTransitioning` | `() → boolean` | Whether a transition is active |
-| `luna.scene.getTransitionProgress` | `() → number` | Progress from 0.0 to 1.0 |
+| `lurek.scene.isTransitioning` | `() → boolean` | Whether a transition is active |
+| `lurek.scene.getTransitionProgress` | `() → number` | Progress from 0.0 to 1.0 |
 
 ### Registry
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.registerScene` | `(name, scene)` | Register a scene table by name |
-| `luna.scene.getRegistered` | `(name) → table?` | Get a registered scene by name |
-| `luna.scene.hasRegistered` | `(name) → boolean` | Check if a name is registered |
-| `luna.scene.unregisterScene` | `(name)` | Remove a scene from the registry |
-| `luna.scene.getRegisteredNames` | `() → table` | List all registered scene names |
+| `lurek.scene.registerScene` | `(name, scene)` | Register a scene table by name |
+| `lurek.scene.getRegistered` | `(name) → table?` | Get a registered scene by name |
+| `lurek.scene.hasRegistered` | `(name) → boolean` | Check if a name is registered |
+| `lurek.scene.unregisterScene` | `(name)` | Remove a scene from the registry |
+| `lurek.scene.getRegisteredNames` | `() → table` | List all registered scene names |
 
 ### Data Store
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.scene.setData` | `(key, value)` | Store a value by string key |
-| `luna.scene.getData` | `(key) → any?` | Retrieve a value by key, or nil |
-| `luna.scene.hasData` | `(key) → boolean` | Check if a key exists |
-| `luna.scene.removeData` | `(key)` | Delete a key-value pair |
+| `lurek.scene.setData` | `(key, value)` | Store a value by string key |
+| `lurek.scene.getData` | `(key) → any?` | Retrieve a value by key, or nil |
+| `lurek.scene.hasData` | `(key) → boolean` | Check if a key exists |
+| `lurek.scene.removeData` | `(key)` | Delete a key-value pair |
 
 ### Scene Callback Contract
 
@@ -310,20 +310,20 @@ are silently skipped. Implement only what your scene needs.
 | `scene:leave()` | Scene is popped or replaced by switchTo |
 | `scene:pause()` | A new scene is pushed on top of this one |
 | `scene:resume()` | The scene above this one is popped |
-| `scene:ready()` | First `luna.scene.process()` tick after enter (once per push) |
-| `scene:process(dt)` | Every frame via `luna.scene.process(dt)` |
-| `scene:process_physics(dt)` | Fixed timestep via `luna.scene.processPhysics(dt)` |
-| `scene:process_late(dt)` | After process, before render via `luna.scene.processLate(dt)` |
-| `scene:render()` | Every frame via `luna.scene.render()` — all scenes |
-| `scene:render_ui()` | Every frame via `luna.scene.renderUi()` — UI overlay, all scenes |
-| `scene:update(dt)` | Legacy; via `luna.scene.update(dt)` — top scene only |
-| `scene:draw()` | Legacy; via `luna.scene.draw()` — all scenes |
+| `scene:ready()` | First `lurek.scene.process()` tick after enter (once per push) |
+| `scene:process(dt)` | Every frame via `lurek.scene.process(dt)` |
+| `scene:process_physics(dt)` | Fixed timestep via `lurek.scene.processPhysics(dt)` |
+| `scene:process_late(dt)` | After process, before render via `lurek.scene.processLate(dt)` |
+| `scene:render()` | Every frame via `lurek.scene.render()` — all scenes |
+| `scene:render_ui()` | Every frame via `lurek.scene.renderUi()` — UI overlay, all scenes |
+| `scene:update(dt)` | Legacy; via `lurek.scene.update(dt)` — top scene only |
+| `scene:draw()` | Legacy; via `lurek.scene.draw()` — all scenes |
 
 ### Factory
 
 | Function | Signature | Description |
 |--------|-----------|-------------|
-| `luna.scene.newDepthSorter` | `() → DepthSorter` | Create a new depth-sorted draw batcher |
+| `lurek.scene.newDepthSorter` | `() → DepthSorter` | Create a new depth-sorted draw batcher |
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
@@ -347,10 +347,10 @@ local menu = {
     ready  = function(self) print("Menu ready — one-time setup") end,
     process = function(self, dt) end,
     render  = function(self)
-        luna.gfx.print("Main Menu - Press Enter", 100, 100)
+        lurek.gfx.print("Main Menu - Press Enter", 100, 100)
     end,
     render_ui = function(self)
-        luna.gfx.print("[Press Enter to start]", 100, 130)
+        lurek.gfx.print("[Press Enter to start]", 100, 130)
     end,
 }
 
@@ -369,42 +369,42 @@ local game = {
     process_physics    = function(self, dt) end,
     process_late       = function(self, dt) end,
     render             = function(self)
-        luna.gfx.print("Level " .. self.level, 100, 100)
+        lurek.gfx.print("Level " .. self.level, 100, 100)
     end,
     render_ui          = function(self)
-        luna.gfx.print("HUD", 10, 10)
+        lurek.gfx.print("HUD", 10, 10)
     end,
 }
 
-function luna.init()
-    luna.scene.push(menu)
+function lurek.init()
+    lurek.scene.push(menu)
 end
 
-function luna.process_physics(dt)
-    luna.scene.processPhysics(dt)
+function lurek.process_physics(dt)
+    lurek.scene.processPhysics(dt)
 end
 
-function luna.process(dt)
-    luna.scene.process(dt)
+function lurek.process(dt)
+    lurek.scene.process(dt)
 end
 
-function luna.process_late(dt)
-    luna.scene.processLate(dt)
+function lurek.process_late(dt)
+    lurek.scene.processLate(dt)
 end
 
-function luna.render()
-    luna.scene.render()
+function lurek.render()
+    lurek.scene.render()
 end
 
-function luna.render_ui()
-    luna.scene.renderUi()
+function lurek.render_ui()
+    lurek.scene.renderUi()
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "return" then
-        luna.scene.switchTo(game, "fade", 0.5, { level = 1 })
+        lurek.scene.switchTo(game, "fade", 0.5, { level = 1 })
     elseif key == "escape" then
-        luna.scene.pop("slideleft", 0.3)
+        lurek.scene.pop("slideleft", 0.3)
     end
 end
 ```
@@ -412,13 +412,13 @@ end
 ### Depth-sorted rendering
 
 ```lua
-local sorter = luna.scene.newDepthSorter()
+local sorter = lurek.scene.newDepthSorter()
 
-function luna.render()
+function lurek.render()
     -- Add draw calls at different depths (lower = drawn first)
-    sorter:add(function() luna.gfx.print("Background", 0, 0) end, 0)
-    sorter:add(function() luna.gfx.print("Player", 100, 100) end, 50)
-    sorter:add(function() luna.gfx.print("UI", 200, 10) end, 100)
+    sorter:add(function() lurek.gfx.print("Background", 0, 0) end, 0)
+    sorter:add(function() lurek.gfx.print("Player", 100, 100) end, 50)
+    sorter:add(function() lurek.gfx.print("UI", 200, 10) end, 100)
 
     -- Flush invokes them in depth order: 0, 50, 100
     sorter:flush()
@@ -428,19 +428,19 @@ end
 ### Named registry and inter-scene data
 
 ```lua
-function luna.init()
-    luna.scene.registerScene("menu", {
+function lurek.init()
+    lurek.scene.registerScene("menu", {
         enter = function(self) end,
         draw  = function(self)
-            luna.gfx.print("Menu", 10, 10)
+            lurek.gfx.print("Menu", 10, 10)
         end,
     })
 
     -- Share data between scenes
-    luna.scene.setData("highscore", 0)
+    lurek.scene.setData("highscore", 0)
 
     -- Push by reference (popTo uses registry names)
-    luna.scene.push(luna.scene.getRegistered("menu"))
+    lurek.scene.push(lurek.scene.getRegistered("menu"))
 end
 ```
 

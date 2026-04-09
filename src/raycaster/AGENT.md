@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                           |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.raycaster`                                     |
+| **Lua API**    | `lurek.raycaster`                                     |
 | **Source**      | `src/raycaster/`                                     |
 | **Rust Tests** | `tests/rust/unit/raycaster_tests.rs`                 |
 | **Lua Tests**  | `tests/lua/unit/test_raycaster.lua`                  |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wolfenstein-style retro FPS and dungeon-crawler games. It operates entirely on a flat integer cell grid (`Raycaster2D`) and produces results as plain numeric data — distances, texture coordinates, hit positions — that Lua scripts consume to drive their own column rendering via `luna.gfx` draw calls. The module is intentionally renderer-agnostic: it never writes GPU resources, pushes draw commands, or accesses SharedState resource pools. The engine owns column drawing; the raycaster provides the geometry.
+The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wolfenstein-style retro FPS and dungeon-crawler games. It operates entirely on a flat integer cell grid (`Raycaster2D`) and produces results as plain numeric data — distances, texture coordinates, hit positions — that Lua scripts consume to drive their own column rendering via `lurek.gfx` draw calls. The module is intentionally renderer-agnostic: it never writes GPU resources, pushes draw commands, or accesses SharedState resource pools. The engine owns column drawing; the raycaster provides the geometry.
 
 ## Source Files
 
@@ -36,6 +36,6 @@ The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wol
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/raycaster.md`](../../specs/raycaster.md)
+→ [`docs/specs/raycaster.md`](../../docs/specs/raycaster.md)
 
-_Update both this file **and** `specs/raycaster.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/raycaster.md` whenever source files, public types, or Lua bindings change._

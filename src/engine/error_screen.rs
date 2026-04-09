@@ -1,14 +1,14 @@
 //! Visual error screen for displaying Lua and engine errors to the user.
 //!
-//! Generates `DrawCommand` sequences that render a Love2D-style blue error
-//! screen, including the error title, message, traceback, and instructions
+//! Generates `DrawCommand` sequences that render a blue error screen,
+//! including the error title, message, traceback, and instructions
 //! to quit or restart.
 
 use crate::engine::error::EngineError;
 use crate::engine::resource_keys::FontKey;
 use crate::graphics::renderer::{DrawCommand, DrawMode};
 
-/// Love2D-style blue error screen background color.
+/// Blue error screen background color.
 const ERROR_BG: [f32; 4] = [0.11, 0.22, 0.53, 1.0];
 /// Highlight color for the "Error" heading.
 const ERROR_TITLE_COLOR: [f32; 4] = [0.9, 0.6, 0.6, 1.0];

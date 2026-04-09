@@ -1,163 +1,163 @@
-﻿-- Luna2D Timer API Tests
+﻿-- Lurek2D Timer API Tests
 
-describe("luna.time module exists", function()
-    it("luna.time is a table", function()
-        expect_type("table", luna.time)
+describe("lurek.time module exists", function()
+    it("lurek.time is a table", function()
+        expect_type("table", lurek.time)
     end)
 end)
 
-describe("luna.time functions", function()
+describe("lurek.time functions", function()
     it("getDelta is a function", function()
-        expect_type("function", luna.time.getDelta)
+        expect_type("function", lurek.time.getDelta)
     end)
 
     it("getDelta returns a number", function()
-        local dt = luna.time.getDelta()
+        local dt = lurek.time.getDelta()
         expect_type("number", dt)
     end)
 
     it("getDelta returns non-negative", function()
-        local dt = luna.time.getDelta()
+        local dt = lurek.time.getDelta()
         expect_true(dt >= 0, "delta >= 0")
     end)
 
     it("getFPS is a function", function()
-        expect_type("function", luna.time.getFPS)
+        expect_type("function", lurek.time.getFPS)
     end)
 
     it("getFPS returns a number", function()
-        local fps = luna.time.getFPS()
+        local fps = lurek.time.getFPS()
         expect_type("number", fps)
     end)
 
     it("getFPS returns non-negative", function()
-        local fps = luna.time.getFPS()
+        local fps = lurek.time.getFPS()
         expect_true(fps >= 0, "fps >= 0")
     end)
 
     it("getTime is a function", function()
-        expect_type("function", luna.time.getTime)
+        expect_type("function", lurek.time.getTime)
     end)
 
     it("getTime returns a number", function()
-        local t = luna.time.getTime()
+        local t = lurek.time.getTime()
         expect_type("number", t)
     end)
 
     it("getTime returns non-negative", function()
-        local t = luna.time.getTime()
+        local t = lurek.time.getTime()
         expect_true(t >= 0, "time >= 0")
     end)
 
     it("getAverageDelta is a function", function()
-        expect_type("function", luna.time.getAverageDelta)
+        expect_type("function", lurek.time.getAverageDelta)
     end)
 
     it("getAverageDelta returns a number", function()
-        local avg = luna.time.getAverageDelta()
+        local avg = lurek.time.getAverageDelta()
         expect_type("number", avg)
     end)
 
     it("getAverageDelta returns non-negative", function()
-        local avg = luna.time.getAverageDelta()
+        local avg = lurek.time.getAverageDelta()
         expect_true(avg >= 0, "average delta >= 0")
     end)
 
     it("getMicroTime is a function", function()
-        expect_type("function", luna.time.getMicroTime)
+        expect_type("function", lurek.time.getMicroTime)
     end)
 
     it("getMicroTime returns a number", function()
-        local t = luna.time.getMicroTime()
+        local t = lurek.time.getMicroTime()
         expect_type("number", t)
     end)
 
     it("getMicroTime returns non-negative", function()
-        local t = luna.time.getMicroTime()
+        local t = lurek.time.getMicroTime()
         expect_true(t >= 0, "getMicroTime >= 0")
     end)
 
     it("getMicroTime is monotonically increasing", function()
-        local t1 = luna.time.getMicroTime()
-        local t2 = luna.time.getMicroTime()
+        local t1 = lurek.time.getMicroTime()
+        local t2 = lurek.time.getMicroTime()
         expect_true(t2 >= t1, "getMicroTime must not go backward")
     end)
 
     it("sleep is a function", function()
-        expect_type("function", luna.time.sleep)
+        expect_type("function", lurek.time.sleep)
     end)
 
     it("sleep with zero or negative does not error", function()
-        luna.time.sleep(0)
-        luna.time.sleep(-1)
+        lurek.time.sleep(0)
+        lurek.time.sleep(-1)
         expect_true(true, "sleep with zero/negative is safe")
     end)
 
     it("step is a function", function()
-        expect_type("function", luna.time.step)
+        expect_type("function", lurek.time.step)
     end)
 
     it("step returns a number", function()
-        local dt = luna.time.step()
+        local dt = lurek.time.step()
         expect_type("number", dt)
     end)
 
     it("step returns non-negative delta", function()
-        local dt = luna.time.step()
+        local dt = lurek.time.step()
         expect_true(dt >= 0, "step() delta >= 0")
     end)
 
     it("step updates getDelta", function()
-        local dt = luna.time.step()
-        local after = luna.time.getDelta()
+        local dt = lurek.time.step()
+        local after = lurek.time.getDelta()
         -- After step(), getDelta() should return the same value step() returned
         expect_true(math.abs(after - dt) < 1e-9, "getDelta matches step() result")
     end)
 end)
 
-describe("luna.time physics delta", function()
+describe("lurek.time physics delta", function()
     it("getPhysicsDelta is a function", function()
-        expect_type("function", luna.time.getPhysicsDelta)
+        expect_type("function", lurek.time.getPhysicsDelta)
     end)
 
     it("setPhysicsDelta is a function", function()
-        expect_type("function", luna.time.setPhysicsDelta)
+        expect_type("function", lurek.time.setPhysicsDelta)
     end)
 
     it("getPhysicsDelta returns default 1/60", function()
-        local dt = luna.time.getPhysicsDelta()
+        local dt = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 60.0, dt, 1e-9)
     end)
 
     it("setPhysicsDelta changes the value", function()
-        local original = luna.time.getPhysicsDelta()
-        luna.time.setPhysicsDelta(1.0 / 30.0)
-        local after = luna.time.getPhysicsDelta()
+        local original = lurek.time.getPhysicsDelta()
+        lurek.time.setPhysicsDelta(1.0 / 30.0)
+        local after = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 30.0, after, 1e-9)
         -- restore
-        luna.time.setPhysicsDelta(original)
+        lurek.time.setPhysicsDelta(original)
     end)
 
     it("setPhysicsDelta clamps to minimum 1/240", function()
-        luna.time.setPhysicsDelta(0.001) -- ~1000 Hz, too fast
-        local dt = luna.time.getPhysicsDelta()
+        lurek.time.setPhysicsDelta(0.001) -- ~1000 Hz, too fast
+        local dt = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 240.0, dt, 1e-9)
         -- restore
-        luna.time.setPhysicsDelta(1.0 / 60.0)
+        lurek.time.setPhysicsDelta(1.0 / 60.0)
     end)
 
     it("setPhysicsDelta clamps to maximum 1/10", function()
-        luna.time.setPhysicsDelta(1.0) -- 1 Hz, too slow
-        local dt = luna.time.getPhysicsDelta()
+        lurek.time.setPhysicsDelta(1.0) -- 1 Hz, too slow
+        local dt = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 10.0, dt, 1e-9)
         -- restore
-        luna.time.setPhysicsDelta(1.0 / 60.0)
+        lurek.time.setPhysicsDelta(1.0 / 60.0)
     end)
 
     it("default physics tick rate is consistent with 60 Hz", function()
         -- Restore to default first, then verify it is near 1/60.
-        luna.time.setPhysicsDelta(1.0 / 60.0)
-        local dt = luna.time.getPhysicsDelta()
+        lurek.time.setPhysicsDelta(1.0 / 60.0)
+        local dt = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 60.0, dt, 1e-6)
     end)
 end)

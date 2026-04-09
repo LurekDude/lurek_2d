@@ -4,19 +4,19 @@
 -- ============================================================
 -- Signal creation
 -- ============================================================
-describe("luna.signal.newSignal", function()
+describe("lurek.signal.newSignal", function()
     it("should create a Signal userdata", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_not_nil(sig, "newSignal should return a value")
     end)
 
     it("should have type 'Signal'", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_equal("Signal", sig:type(), "type should be Signal")
     end)
 
     it("should support typeOf check", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_true(sig:typeOf("Signal"), "typeOf('Signal') should be true")
         expect_true(sig:typeOf("Object"), "typeOf('Object') should be true")
         expect_false(sig:typeOf("Entity"), "typeOf('Entity') should be false")
@@ -28,14 +28,14 @@ end)
 -- ============================================================
 describe("Signal:register and Signal:emit", function()
     it("should register a callback and return a handle", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local handle = sig:register("test", function() end)
         expect_equal("number", type(handle), "handle should be a number")
         expect_true(handle > 0, "handle should be positive")
     end)
 
     it("should return monotonically increasing handles", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local h1 = sig:register("test", function() end)
         local h2 = sig:register("test", function() end)
         local h3 = sig:register("other", function() end)
@@ -44,7 +44,7 @@ describe("Signal:register and Signal:emit", function()
     end)
 
     it("should emit to registered callbacks", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local called = false
         sig:register("ping", function()
             called = true
@@ -54,7 +54,7 @@ describe("Signal:register and Signal:emit", function()
     end)
 
     it("should pass extra arguments to callbacks", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local received_a, received_b
         sig:register("data", function(a, b)
             received_a = a
@@ -66,7 +66,7 @@ describe("Signal:register and Signal:emit", function()
     end)
 
     it("should call multiple callbacks in registration order", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local order = {}
         sig:register("go", function() table.insert(order, "first") end)
         sig:register("go", function() table.insert(order, "second") end)
@@ -79,7 +79,7 @@ describe("Signal:register and Signal:emit", function()
     end)
 
     it("should not fire callbacks for other event names", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local called = false
         sig:register("click", function() called = true end)
         sig:emit("hover")
@@ -87,7 +87,7 @@ describe("Signal:register and Signal:emit", function()
     end)
 
     it("should handle emit with no registered listeners", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         -- Should not error
         sig:emit("nothing")
     end)
@@ -98,7 +98,7 @@ end)
 -- ============================================================
 describe("Signal:remove", function()
     it("should remove a callback by handle", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local count = 0
         local h = sig:register("tick", function() count = count + 1 end)
         sig:emit("tick")
@@ -110,12 +110,12 @@ describe("Signal:remove", function()
     end)
 
     it("should return false for nonexistent handle", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_false(sig:remove(999), "remove of unknown handle")
     end)
 
     it("should not affect other callbacks", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         local a_count, b_count = 0, 0
         local ha = sig:register("go", function() a_count = a_count + 1 end)
         local hb = sig:register("go", function() b_count = b_count + 1 end)
@@ -131,7 +131,7 @@ end)
 -- ============================================================
 describe("Signal:clear and Signal:clearAll", function()
     it("should clear all callbacks for one event name", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         sig:register("click", function() end)
         sig:register("click", function() end)
         sig:register("hover", function() end)
@@ -142,12 +142,12 @@ describe("Signal:clear and Signal:clearAll", function()
     end)
 
     it("should return 0 for clearing nonexistent event", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_equal(0, sig:clear("nope"))
     end)
 
     it("should clearAll subscriptions", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         sig:register("a", function() end)
         sig:register("b", function() end)
         sig:register("c", function() end)
@@ -162,7 +162,7 @@ end)
 -- ============================================================
 describe("Signal:getCount and Signal:getTotalCount", function()
     it("should return counts per event name", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         sig:register("click", function() end)
         sig:register("click", function() end)
         sig:register("hover", function() end)
@@ -172,7 +172,7 @@ describe("Signal:getCount and Signal:getTotalCount", function()
     end)
 
     it("should return total count", function()
-        local sig = luna.signal.newSignal()
+        local sig = lurek.signal.newSignal()
         expect_equal(0, sig:getTotalCount())
         sig:register("a", function() end)
         sig:register("b", function() end)
@@ -185,8 +185,8 @@ end)
 -- ============================================================
 describe("Multiple Signal instances", function()
     it("should be independent", function()
-        local sig1 = luna.signal.newSignal()
-        local sig2 = luna.signal.newSignal()
+        local sig1 = lurek.signal.newSignal()
+        local sig2 = lurek.signal.newSignal()
         local count1, count2 = 0, 0
         sig1:register("go", function() count1 = count1 + 1 end)
         sig2:register("go", function() count2 = count2 + 1 end)

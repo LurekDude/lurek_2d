@@ -1,4 +1,4 @@
--- Luna2D Stress Test: Data Structure Operations
+-- Lurek2D Stress Test: Data Structure Operations
 -- Tests large tables, string operations, and data encoding at scale
 
 describe("data stress: large tables", function()
@@ -14,7 +14,7 @@ describe("data stress: large tables", function()
     it("sorts 5000 entries", function()
         local t = {}
         for i = 1, 5000 do
-            t[i] = luna.math.random(1, 100000)
+            t[i] = lurek.math.random(1, 100000)
         end
 
         table.sort(t)
@@ -55,9 +55,9 @@ describe("data stress: string operations", function()
 
     it("pattern matching 1000 times", function()
         local count = 0
-        local text = "Luna2D game engine version 0.4.0 built with Rust"
+        local text = "Lurek2D game engine version 0.4.0 built with Rust"
         for i = 1, 1000 do
-            if string.find(text, "Luna2D") then
+            if string.find(text, "Lurek2D") then
                 count = count + 1
             end
         end

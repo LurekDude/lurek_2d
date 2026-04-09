@@ -1,6 +1,6 @@
-//! Integration tests for `luna2d::devtools` — structured logger, profiler, frame stats, file watcher.
+//! Integration tests for `lurek2d::devtools` — structured logger, profiler, frame stats, file watcher.
 
-use luna2d::devtools::*;
+use lurek2d::devtools::*;
 
 // ── Logger ────────────────────────────────────────────────────────────────────
 

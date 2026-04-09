@@ -1,11 +1,11 @@
-//! Draw command types, blend modes, and texture data for the Luna2D rendering pipeline.
+//! Draw command types, blend modes, and texture data for the Lurek2D rendering pipeline.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for renderer-related operations and data management.
 //! Key types exported from this module: `CompareMode`, `StencilAction`, `TextAlign`, `DrawMode`, `BlendMode`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
@@ -13,7 +13,7 @@ use crate::engine::resource_keys::{
 use crate::graphics::image_effect::ShaderPassDescriptor;
 use crate::graphics::mesh::Mesh;
 
-/// Stencil comparison mode for `luna.gfx.setStencilTest`.
+/// Stencil comparison mode for `lurek.gfx.setStencilTest`.
 ///
 /// # Variants
 /// - `Equal` — Equal variant.
@@ -44,7 +44,7 @@ pub enum CompareMode {
     Never,
 }
 
-/// Stencil write action for `luna.gfx.stencil` and `luna.gfx.setStencilMode`.
+/// Stencil write action for `lurek.gfx.stencil` and `lurek.gfx.setStencilMode`.
 ///
 /// # Variants
 /// - `Keep` — Keep variant.
@@ -106,7 +106,7 @@ impl Default for StencilMode {
     }
 }
 
-/// Depth test comparison mode for `luna.gfx.setDepthMode`.
+/// Depth test comparison mode for `lurek.gfx.setDepthMode`.
 ///
 /// # Variants
 /// - `Always` — Always variant.
@@ -191,7 +191,7 @@ pub enum BlendMode {
     Screen,
 }
 
-/// A single deferred draw operation queued during `luna.draw()` and executed by `GpuRenderer`.
+/// A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.
 ///
 /// # Variants
 /// - `SetColor(r, g, b, a)` — Sets the active draw color; affects all subsequent draw calls.
@@ -638,7 +638,7 @@ pub struct ParticleInstance {
     pub quad_tex_dims: Option<(f32, f32)>,
 }
 
-/// Type discriminator for resources that can be passed to luna.gfx.draw.
+/// Type discriminator for resources that can be passed to lurek.gfx.draw.
 ///
 /// Used to dispatch the polymorphic draw(drawable, ...) Lua API to the
 /// correct DrawCommand variant based on resource type.

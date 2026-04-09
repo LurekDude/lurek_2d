@@ -1,6 +1,6 @@
 ---
 description: >
-  Design the architecture for a Luna2D game. Decompose the game into systems,
+  Design the architecture for a Lurek2D game. Decompose the game into systems,
   define data flow, propose module structure, identify shared state.
   Does not write Lua code.
 model: claude-sonnet-4-5

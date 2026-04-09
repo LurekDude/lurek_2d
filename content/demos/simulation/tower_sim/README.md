@@ -14,7 +14,7 @@ A Doodle Tower-style stacking game where a block swings back and forth on a pend
 ## How to Run
 
 ```powershell
-cargo run -- demos/tower_sim
+cargo run -- content/demos/tower_sim
 ```
 
 ## Controls

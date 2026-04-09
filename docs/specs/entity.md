@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.entity`                                        |
+| **Lua API**    | `lurek.entity`                                        |
 | **Source**      | `src/entity/`                                        |
 | **Rust Tests** | `tests/rust/unit/entity_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_entity.lua`                     |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The entity module provides Luna2D's lightweight entity-component-system (ECS) built around the `Universe` struct — a self-contained ECS world that manages entity lifecycle, components, tags, layers, blueprints, parent-child hierarchies, and ordered system dispatch. Entities are identified by generational packed IDs: the upper 8 bits store a generation counter and the lower 24 bits store the slot index, so a stale entity ID from a previously destroyed entity is detected at the Rust boundary before it can access wrong data. This prevents use-after-free bugs without requiring garbage collection or `unsafe` code.
+The entity module provides Lurek2D's lightweight entity-component-system (ECS) built around the `Universe` struct — a self-contained ECS world that manages entity lifecycle, components, tags, layers, blueprints, parent-child hierarchies, and ordered system dispatch. Entities are identified by generational packed IDs: the upper 8 bits store a generation counter and the lower 24 bits store the slot index, so a stale entity ID from a previously destroyed entity is detected at the Rust boundary before it can access wrong data. This prevents use-after-free bugs without requiring garbage collection or `unsafe` code.
 
 Component storage is delegated entirely to Lua registry tables indexed by entity slot — there are no Rust-side component types. This hybrid design allows game scripts to attach arbitrary duck-typed data to any entity at any time without schema registration, while Rust enforces ID validity and provides efficient tag-based and component-based queries. The module also includes a generic `RelationshipManager` for tracking symmetric numeric relations and named-state levels between entity pairs, useful for diplomacy, trade, reputation, or any pairwise game mechanic.
 
@@ -21,7 +21,7 @@ The module intentionally avoids the archetype-based storage model used by full E
 ## Architecture
 
 ```
-luna.entity.newUniverse()
+lurek.entity.newUniverse()
         │
         ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -131,13 +131,13 @@ No public enums in this module.
 
 ## Lua API
 
-Exposed under `luna.entity.*` by `src/lua_api/entity_api.rs`. The module registers a single factory function `luna.entity.newUniverse()` that returns a `LuaUniverse` UserData object. All further operations are methods on the Universe instance.
+Exposed under `lurek.entity.*` by `src/lua_api/entity_api.rs`. The module registers a single factory function `lurek.entity.newUniverse()` that returns a `LuaUniverse` UserData object. All further operations are methods on the Universe instance.
 
 ### Factory
 
 | Function                  | Returns    | Description                           |
 |---------------------------|------------|---------------------------------------|
-| `luna.entity.newUniverse()` | `Universe` | Creates a new empty ECS universe      |
+| `lurek.entity.newUniverse()` | `Universe` | Creates a new empty ECS universe      |
 
 ### Universe Methods — Entity Lifecycle
 
@@ -230,9 +230,9 @@ Exposed under `luna.entity.*` by `src/lua_api/entity_api.rs`. The module registe
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create a new ECS universe
-    world = luna.entity.newUniverse()
+    world = lurek.entity.newUniverse()
 
     -- Spawn entities with components
     player = world:spawn()
@@ -287,7 +287,7 @@ function luna.init()
     world:setParent(weapon, player)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Run all systems in registration order
     world:update(dt)
 
@@ -304,7 +304,7 @@ function luna.process(dt)
     local sorted = world:getEntitiesSorted()
 end
 
-function luna.render()
+function lurek.render()
     world:draw()
 end
 ```
@@ -324,7 +324,7 @@ end
 |------------|---------------|--------------------------------------------------------------------|
 | `engine`   | Imports from  | Uses `log_messages` constants (`EN01_UNIVERSE_INIT`, `EN02_ENTITY_SPAWN`, `RL01`–`RL03`) |
 | `math`     | Imports from  | Position components typically use `Vec2` but stored as Lua tables   |
-| `lua_api`  | Imported by   | `src/lua_api/entity_api.rs` registers `luna.entity.*` and wraps `Universe` as `LuaUniverse` UserData |
+| `lua_api`  | Imported by   | `src/lua_api/entity_api.rs` registers `lurek.entity.*` and wraps `Universe` as `LuaUniverse` UserData |
 | `ai`       | Related       | AI behaviours (FSMs, behaviour trees) often drive entity state via the component API |
 | `scene`    | Related       | Scene systems may manage groups of entities through Universe instances |
 
@@ -335,7 +335,7 @@ The `RelationshipManager` is a standalone Rust-only type not currently exposed t
 - **Generational IDs**: Entity IDs pack an 8-bit generation counter in the upper bits and a 24-bit slot index in the lower bits. This limits the maximum number of unique entity slots to ~16 million and the recycle count per slot to 256 before wrapping. The generation check prevents stale-handle access after an entity is killed and its slot recycled.
 - **Component storage**: Components are stored in Lua registry tables, not Rust containers. This means component access crosses the Rust↔Lua boundary and is slower than native Rust `HashMap` lookups, but gives game scripts freedom to use arbitrary values without schema registration.
 - **Bitmap tag limit**: A maximum of 63 bitmap tag definitions are allowed per Universe (stored as bits in a `u64`). String tags have no such limit but are slower for set-intersection queries.
-- **Blueprint persistence**: `clear()` and `release()` remove all entities, components, tags, layers, and systems but preserve blueprint definitions. This allows blueprints to be defined once in `luna.load()` and reused across level resets.
+- **Blueprint persistence**: `clear()` and `release()` remove all entities, components, tags, layers, and systems but preserve blueprint definitions. This allows blueprints to be defined once in `lurek.load()` and reused across level resets.
 - **System dispatch order**: Systems execute in the order they were added via `addSystem()`. Each system is a Lua table with optional `update(self, world, dt)`, `draw(self, world)`, and arbitrary event handler methods dispatched via `emit()`.
 - **RelationshipManager**: The `RelationshipManager` type is a Rust-only utility not currently bound to Lua. Relationships are symmetric: pair keys are normalised to `(min(a,b), max(a,b))` so setting `A→B` and `B→A` access the same record.
 - **Thread safety**: `Universe` is not `Send` or `Sync` — it holds `RegistryKey` values bound to a specific Lua VM. Never share a Universe across threads.

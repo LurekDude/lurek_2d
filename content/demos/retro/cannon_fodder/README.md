@@ -6,8 +6,8 @@ Eliminate every enemy, then lead your squad to the red flag.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — soldier and enemy sprites
-- `luna.input.isKeyDown()` — move squad target cursor
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — soldier and enemy sprites
+- `lurek.input.isKeyDown()` — move squad target cursor
 - Automatic squad pathfinding using a shared move-target
 - Auto-fire AI — soldiers shoot the nearest visible enemy
 

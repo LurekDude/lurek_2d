@@ -8,7 +8,7 @@ One test file per Lunasome `library/` module (Tier 3 pure-Lua).
 
 ## Coverage
 
-Tests exercise the library's public API using only luna.* engine primitives.
+Tests exercise the library's public API using only lurek.* engine primitives.
 No Rust engine internals may be accessed from library test code.
 
 ## Harness

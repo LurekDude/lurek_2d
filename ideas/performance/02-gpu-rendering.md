@@ -2,10 +2,10 @@
 
 ## Current Architecture
 
-Luna2D renders via wgpu 22 with this per-frame pipeline:
+Lurek2D renders via wgpu 22 with this per-frame pipeline:
 
 ```
-luna.draw() Lua callback
+lurek.draw() Lua callback
     ↓ pushes DrawCommand variants to Vec<DrawCommand>
 CPU tessellation (render_pass.rs)
     ↓ converts DrawCommand → ColorVertex / TexVertex arrays
@@ -89,10 +89,10 @@ Reference engines handle this differently:
 
 | Engine | Approach |
 |--------|----------|
-| Love2D | `SpriteBatch` (user builds atlas manually) |
-| ggez | `SpriteBatch` with `InstanceArray` |
-| macroquad | Automatic batching by texture+pipeline state |
-| Unity | Sprite Atlas asset + SRP Batcher |
+| Engine A | `SpriteBatch` (user builds atlas manually) |
+| Engine E | `SpriteBatch` with `InstanceArray` |
+| Engine F | Automatic batching by texture+pipeline state |
+| Engine G | Sprite Atlas asset + SRP Batcher |
 
 ### Solution A: Automatic Texture Atlas (Runtime)
 At texture load time, pack small textures into shared atlas pages (e.g., 2048×2048).
@@ -120,7 +120,7 @@ wgpu instancing instead of per-sprite tessellation.
 **Impact**: 10–100× draw call reduction for particle-like sprite effects.
 
 ### Solution C: SpriteBatch Improvements (Low Effort)
-Luna2D already has `SpriteBatch` (`src/graphics/sprite_batch.rs`). Ensure it:
+Lurek2D already has `SpriteBatch` (`src/graphics/sprite_batch.rs`). Ensure it:
 - Supports add/remove individual sprites without full rebuild
 - Caches vertex data between frames
 - Only re-uploads dirty regions
@@ -138,13 +138,13 @@ Add a cached draw mode where tessellated geometry is stored and reused:
 
 ```lua
 -- Lua API concept
-local bg = luna.gfx.newGeometryCache()
+local bg = lurek.gfx.newGeometryCache()
 bg:begin()
-  luna.gfx.rectangle("fill", 0, 0, 800, 600)
-  luna.gfx.draw(background_img, 0, 0)
+  lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+  lurek.gfx.draw(background_img, 0, 0)
 bg:finish()
 
-function luna.render()
+function lurek.render()
   bg:draw()  -- Reuses cached vertices, zero tessellation
   -- ... dynamic stuff below
 end

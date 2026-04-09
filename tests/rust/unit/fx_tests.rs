@@ -5,11 +5,11 @@
 //!
 //! These tests are purely in-memory (no GPU, no window, no audio).
 
-use luna2d::fx::{
+use lurek2d::fx::{
     AmbientState, FadeState, FilmGrainState, FogState, HeatHazeState, Overlay, ShakeState,
     VignetteState, WeatherType,
 };
-use luna2d::fx::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::fx::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
 
 // ═════════════════════════════════════════════════════════════════════════
 // PostFxEffectType

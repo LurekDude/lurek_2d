@@ -1,7 +1,7 @@
-//! Integration tests for the Luna2D threading module.
+//! Integration tests for the Lurek2D threading module.
 
-use luna2d::thread::channel::{Channel, ChannelValue};
-use luna2d::thread::worker::LuaThread;
+use lurek2d::thread::channel::{Channel, ChannelValue};
+use lurek2d::thread::worker::LuaThread;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_lua_api_data.py — Generate Luna2D master API data file.
+gen_lua_api_data.py — Generate Lurek2D master API data file.
 
 Scans ALL src/ Rust files (public items + Lua API bindings) and tests/*.rs,
 producing a single machine-readable JSON used as the source for all other
@@ -410,7 +410,7 @@ def _apply_overlay(lua_api: dict, overlay: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Generate Luna2D master API data JSON.",
+        description="Generate Lurek2D master API data JSON.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

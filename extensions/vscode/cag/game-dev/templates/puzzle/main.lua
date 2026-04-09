@@ -4,25 +4,25 @@ local grid
 local moves = 0
 local won = false
 
-function luna.init()
+function lurek.init()
     grid = Grid.new(8, 8, 60)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Puzzle logic runs on input, not per-frame
 end
 
-function luna.render()
-    luna.gfx.clear(0.12, 0.12, 0.18)
+function lurek.render()
+    lurek.gfx.clear(0.12, 0.12, 0.18)
     grid:draw()
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Moves: " .. moves, 10, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Moves: " .. moves, 10, 10)
     if won then
-        luna.gfx.print("You Win!", 250, 280)
+        lurek.gfx.print("You Win!", 250, 280)
     end
 end
 
-function luna.mousepressed(x, y, btn)
+function lurek.mousepressed(x, y, btn)
     if won then return end
     if btn == 1 then
         local changed = grid:click(x, y)
@@ -33,8 +33,8 @@ function luna.mousepressed(x, y, btn)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then
         grid = Grid.new(8, 8, 60)
         moves = 0

@@ -1,9 +1,9 @@
-﻿-- Luna2D Integration Test: Timer + Math
+﻿-- Lurek2D Integration Test: Timer + Math
 -- Tests that timer and math functions work together for game-loop scenarios
 
 describe("timer + math integration", function()
     it("getDelta returns a number", function()
-        local dt = luna.time.getDelta()
+        local dt = lurek.time.getDelta()
         expect_not_nil(dt, "getDelta returns a value")
         expect_true(type(dt) == "number", "dt is a number")
     end)
@@ -27,9 +27,9 @@ describe("timer + math integration", function()
     it("oscillation with sin and time", function()
         -- Simulate oscillating value: sin(time * frequency)
         local frequency = 2.0
-        local time = luna.math.pi / (2 * frequency)
+        local time = lurek.math.pi / (2 * frequency)
 
-        local value = luna.math.sin(time * frequency)
+        local value = lurek.math.sin(time * frequency)
         expect_near(1.0, value, 0.001, "sin peak at quarter period")
     end)
 

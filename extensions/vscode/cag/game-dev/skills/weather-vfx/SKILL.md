@@ -53,11 +53,11 @@ local function update_rain(dt, screen_w, screen_h)
 end
 
 local function draw_rain()
-    luna.gfx.setColor(0.6, 0.7, 0.9, 0.5)
+    lurek.gfx.setColor(0.6, 0.7, 0.9, 0.5)
     for _, d in ipairs(rain_drops) do
-        luna.gfx.line(d.x, d.y, d.x + weather.wind_x * 0.02, d.y + RAIN_LENGTH)
+        lurek.gfx.line(d.x, d.y, d.x + weather.wind_x * 0.02, d.y + RAIN_LENGTH)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -93,11 +93,11 @@ local function update_snow(dt, screen_w, screen_h)
 end
 
 local function draw_snow()
-    luna.gfx.setColor(1, 1, 1, 0.8)
+    lurek.gfx.setColor(1, 1, 1, 0.8)
     for _, s in ipairs(snowflakes) do
-        luna.gfx.circle("fill", s.x, s.y, s.size)
+        lurek.gfx.circle("fill", s.x, s.y, s.size)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -127,9 +127,9 @@ end
 
 local function draw_lightning(screen_w, screen_h)
     if lightning.flash > 0 then
-        luna.gfx.setColor(1, 1, 1, lightning.flash * 0.7)
-        luna.gfx.rectangle("fill", 0, 0, screen_w, screen_h)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(1, 1, 1, lightning.flash * 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, screen_w, screen_h)
+        lurek.gfx.setColor(1, 1, 1, 1)
     end
 end
 ```
@@ -139,9 +139,9 @@ end
 ```lua
 local function draw_fog(screen_w, screen_h, density)
     density = density or 0.3
-    luna.gfx.setColor(0.5, 0.5, 0.6, density)
-    luna.gfx.rectangle("fill", 0, 0, screen_w, screen_h)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(0.5, 0.5, 0.6, density)
+    lurek.gfx.rectangle("fill", 0, 0, screen_w, screen_h)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

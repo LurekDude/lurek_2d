@@ -5,17 +5,17 @@ A structural engineering puzzle. Place connection nodes across a gap, link them 
 ## What It Demonstrates
 
 - Two-mode architecture: `build` phase (mouse-driven node/beam placement) and `test` phase (simulated crossing)
-- `luna.physics` — vehicle body rolling across beams during the test phase
+- `lurek.physics` — vehicle body rolling across beams during the test phase
 - Budget constraint system: each beam deducts from a gold budget based on material and length
 - Stress simulation: per-beam stress computed from deflection and load, visualised as colour lerp from white → red
-- `luna.mouse.getPosition()` and `luna.mousepressed` for node snapping and beam creation
+- `lurek.mouse.getPosition()` and `lurek.mousepressed` for node snapping and beam creation
 - Combo detection: click node → click second node → beam auto-placed with duplicate guard
-- `luna.gfx.line()` for beam drawing with stress-driven colour tinting
+- `lurek.gfx.line()` for beam drawing with stress-driven colour tinting
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/bridge_builder
+cargo run -- content/demos/bridge_builder
 ```
 
 ## Controls

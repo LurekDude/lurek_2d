@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                           |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.raycaster`                                     |
+| **Lua API**    | `lurek.raycaster`                                     |
 | **Source**      | `src/raycaster/`                                     |
 | **Rust Tests** | `tests/rust/unit/raycaster_tests.rs`                 |
 | **Lua Tests**  | `tests/lua/unit/test_raycaster.lua`                  |
@@ -12,13 +12,13 @@
 
 ## Summary
 
-The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wolfenstein-style retro FPS and dungeon-crawler games. It operates entirely on a flat integer cell grid (`Raycaster2D`) and produces results as plain numeric data — distances, texture coordinates, hit positions — that Lua scripts consume to drive their own column rendering via `luna.gfx` draw calls. The module is intentionally renderer-agnostic: it never writes GPU resources, pushes draw commands, or accesses SharedState resource pools. The engine owns column drawing; the raycaster provides the geometry.
+The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wolfenstein-style retro FPS and dungeon-crawler games. It operates entirely on a flat integer cell grid (`Raycaster2D`) and produces results as plain numeric data — distances, texture coordinates, hit positions — that Lua scripts consume to drive their own column rendering via `lurek.gfx` draw calls. The module is intentionally renderer-agnostic: it never writes GPU resources, pushes draw commands, or accesses SharedState resource pools. The engine owns column drawing; the raycaster provides the geometry.
 
 The core DDA algorithm (`dda.rs`) traverses cells along a ray direction, returning `RayHit` results with perpendicular (fisheye-corrected) distance, wall side, texture U coordinate, and world-space hit position. Single-ray (`cast_ray`), multi-ray fan (`cast_rays` / `cast_rays_flat`), and line-of-sight (`line_of_sight`) queries are all provided. A separate geometry-only path (`segment.rs` / `visibility.rs`) casts rays against arbitrary 2D line segments rather than a grid, supporting visibility polygon computation for lighting and fog-of-war effects.
 
-Extension subsystems are all optional and additive — a game can use only `castRays` and nothing else. `ColumnBatch` stores per-column projected wall data ready for batch rendering. `DoorManager` drives sliding-door animations with per-frame `update(dt)`. `HeightMap` adds per-cell variable floor and ceiling heights for stepped environments. `DepthBuffer` provides a 1D per-column depth tracker for correct sprite-vs-wall occlusion. `PointLight` and `compute_lighting` aggregate ambient + point-light illumination. `extract_minimap` rasterises a view-radius top-down crop of the grid to a flat RGBA pixel buffer suitable for `luna.img`.
+Extension subsystems are all optional and additive — a game can use only `castRays` and nothing else. `ColumnBatch` stores per-column projected wall data ready for batch rendering. `DoorManager` drives sliding-door animations with per-frame `update(dt)`. `HeightMap` adds per-cell variable floor and ceiling heights for stepped environments. `DepthBuffer` provides a 1D per-column depth tracker for correct sprite-vs-wall occlusion. `PointLight` and `compute_lighting` aggregate ambient + point-light illumination. `extract_minimap` rasterises a view-radius top-down crop of the grid to a flat RGBA pixel buffer suitable for `lurek.img`.
 
-This module satisfies design constraint A-03 (2D graphics only) — the raycaster produces 2D column draw data, not a 3D scene graph, making it an explicitly allowed use of pseudo-3D rendering within Luna2D's 2D-only architecture.
+This module satisfies design constraint A-03 (2D graphics only) — the raycaster produces 2D column draw data, not a 3D scene graph, making it an explicitly allowed use of pseudo-3D rendering within Lurek2D's 2D-only architecture.
 
 ## Architecture
 
@@ -220,9 +220,9 @@ Animation state of a door. Variants: `Closed`, `Opening`, `Open`, `Closing`.
 
 ## Lua API
 
-The Lua-facing surface is registered in `src/lua_api/raycaster_api.rs` under the `luna.raycaster` namespace. The API exposes a `LuaRaycaster` UserData wrapping `Raycaster2D` and two free helper functions.
+The Lua-facing surface is registered in `src/lua_api/raycaster_api.rs` under the `lurek.raycaster` namespace. The API exposes a `LuaRaycaster` UserData wrapping `Raycaster2D` and two free helper functions.
 
-### Module functions (`luna.raycaster.*`)
+### Module functions (`lurek.raycaster.*`)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -263,8 +263,8 @@ local px, py, pa = 3.5, 3.5, 0.0
 local fov = math.pi / 3
 local columns = 320
 
-function luna.init()
-    rc = luna.raycaster.new(16, 16)
+function lurek.init()
+    rc = lurek.raycaster.new(16, 16)
     -- Build a walled enclosure
     for x = 0, 15 do
         rc:setCell(x, 0, 1)
@@ -279,29 +279,29 @@ function luna.init()
     rc:setCell(10, 8, 3)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Simple movement
-    if luna.keyboard.isDown("w") then
+    if lurek.keyboard.isDown("w") then
         px = px + math.cos(pa) * 3 * dt
         py = py + math.sin(pa) * 3 * dt
     end
-    if luna.keyboard.isDown("a") then pa = pa - 2 * dt end
-    if luna.keyboard.isDown("d") then pa = pa + 2 * dt end
+    if lurek.keyboard.isDown("a") then pa = pa - 2 * dt end
+    if lurek.keyboard.isDown("d") then pa = pa + 2 * dt end
 end
 
-function luna.render()
-    local w, h = luna.gfx.getDimensions()
+function lurek.render()
+    local w, h = lurek.gfx.getDimensions()
     local rays = rc:castRays(px, py, pa, fov, columns, 20.0)
 
     for i, hit in ipairs(rays) do
         if hit.hit then
-            local wall_h, start, stop = luna.raycaster.projectColumn(hit.distance, fov, h)
-            local shade = luna.raycaster.distanceShade(hit.distance, 20.0)
+            local wall_h, start, stop = lurek.raycaster.projectColumn(hit.distance, fov, h)
+            local shade = lurek.raycaster.distanceShade(hit.distance, 20.0)
             -- Darker on vertical side hits
             if hit.side == 1 then shade = shade * 0.7 end
-            luna.gfx.setColor(shade, shade, shade)
+            lurek.gfx.setColor(shade, shade, shade)
             local col_w = w / columns
-            luna.gfx.rectangle("fill", (i - 1) * col_w, start, col_w, stop - start)
+            lurek.gfx.rectangle("fill", (i - 1) * col_w, start, col_w, stop - start)
         end
     end
 end
@@ -318,7 +318,7 @@ end
 local sp = rc:projectSprite(10.5, 8.5, px, py, pa, fov, 640)
 if sp.visible then
     local size = 64 * sp.scale
-    luna.gfx.draw(enemy_img, sp.screen_x - size / 2, 240 - size / 2, 0, sp.scale, sp.scale)
+    lurek.gfx.draw(enemy_img, sp.screen_x - size / 2, 240 - size / 2, 0, sp.scale, sp.scale)
 end
 ```
 
@@ -338,15 +338,15 @@ end
 | `math`          | Imports from | `Color` type used by `ColumnBatch` floor/ceiling colors  |
 | `engine`        | Imports from | `log_messages` constants for structured logging          |
 | `lua_api`       | Imported by  | `raycaster_api.rs` binds `Raycaster2D` as UserData       |
-| `graphics`      | Consumed by  | Lua scripts use `luna.gfx` to draw column output    |
-| `image`         | Related      | `extract_minimap` produces RGBA data usable with `luna.img.newImageData` |
+| `graphics`      | Consumed by  | Lua scripts use `lurek.gfx` to draw column output    |
+| `image`         | Related      | `extract_minimap` produces RGBA data usable with `lurek.img.newImageData` |
 | `minimap`       | Similar      | `minimap` module handles full minimap rendering; `raycaster::minimap_overlay` is a lightweight pixel-buffer extraction specific to raycaster grids |
 | `pathfinding`   | Similar      | Both operate on grids; raycaster does ray traversal, pathfinding does graph search |
 
 ## Notes
 
-- **Constraint A-03 compliance**: The raycaster produces 2D column draw data (screen Y ranges, shading, texture coordinates) that Lua scripts render as filled rectangles or textured quads via `luna.gfx`. No 3D scene graph or perspective projection pipeline is involved — it is pseudo-3D rendering via 2D draw calls, which is explicitly allowed under A-03.
-- **Renderer-agnostic**: The module never touches `DrawCommand`, `SharedState` resource pools, or GPU types. All output is plain `f32`/`u32`/`Vec<u8>` data that the Lua layer consumes through the `luna.raycaster` API and renders independently.
+- **Constraint A-03 compliance**: The raycaster produces 2D column draw data (screen Y ranges, shading, texture coordinates) that Lua scripts render as filled rectangles or textured quads via `lurek.gfx`. No 3D scene graph or perspective projection pipeline is involved — it is pseudo-3D rendering via 2D draw calls, which is explicitly allowed under A-03.
+- **Renderer-agnostic**: The module never touches `DrawCommand`, `SharedState` resource pools, or GPU types. All output is plain `f32`/`u32`/`Vec<u8>` data that the Lua layer consumes through the `lurek.raycaster` API and renders independently.
 - **Cell type `u32`**: Wall cells store `u32` values. Zero means empty; any positive value is a wall type that scripts can use for multi-texture lookup.
 - **Fisheye correction**: `cast_rays` applies `cos(angle_diff)` correction to perpendicular distances. `cast_ray` returns the raw perpendicular distance. The `raw_distance` field always holds the uncorrected Euclidean distance.
 - **`cast_rays_flat` layout**: 5 floats per ray in order: `[distance, cell_value, side, tex_u, hit(0/1)]`. This flat format is optimised for `ColumnBatch::update_from_ray_data` and avoids per-ray Lua table creation overhead.

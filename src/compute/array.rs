@@ -1,12 +1,12 @@
 //! Core NdArray type and DataType enum.
 //!
-//! This module is part of Luna2D's `compute` subsystem and provides the implementation
+//! This module is part of Lurek2D's `compute` subsystem and provides the implementation
 //! details for array-related operations and data management.
 //! Key types exported from this module: `DataType`, `NdArray`.
 //! Primary functions: `parse()`, `byte_size()`, `name()`, `new()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// Maximum number of elements allowed in a single NdArray.
 use crate::engine::log_messages::{CP01_NDARRAY_ALLOC, CP02_NDARRAY_LARGE};

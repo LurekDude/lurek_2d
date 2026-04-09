@@ -1,12 +1,12 @@
 //! Unit-aware pathfinder with result caching and convenience methods.
 //!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `pathfinding` subsystem and provides the implementation
 //! details for unit pathfinder-related operations and data management.
 //! Key types exported from this module: `Waypoint`, `UnitPathfinder`.
 //! Primary functions: `new()`, `find_path()`, `find_path_smooth()`, `get_path_length()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};

@@ -15,16 +15,16 @@ Health bars, minimap, inventory slots, tooltips, damage numbers, cooldown indica
 local function draw_health_bar(x, y, w, h, hp, max_hp)
     local pct = hp / max_hp
     -- Background
-    luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    luna.gfx.rectangle("fill", x, y, w, h)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.gfx.rectangle("fill", x, y, w, h)
     -- Bar color: green → yellow → red
     local r = pct < 0.5 and 1.0 or (1.0 - pct) * 2
     local g = pct > 0.5 and 1.0 or pct * 2
-    luna.gfx.setColor(r, g, 0, 1)
-    luna.gfx.rectangle("fill", x, y, w * pct, h)
+    lurek.gfx.setColor(r, g, 0, 1)
+    lurek.gfx.rectangle("fill", x, y, w * pct, h)
     -- Border
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.rectangle("line", x, y, w, h)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.rectangle("line", x, y, w, h)
 end
 ```
 
@@ -52,10 +52,10 @@ end
 local function draw_floaters()
     for _, f in ipairs(floaters) do
         local alpha = f.life / f.max_life
-        luna.gfx.setColor(1, 0.2, 0.2, alpha)
-        luna.gfx.print(f.text, f.x, f.y)
+        lurek.gfx.setColor(1, 0.2, 0.2, alpha)
+        lurek.gfx.print(f.text, f.x, f.y)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -64,10 +64,10 @@ end
 ```lua
 local function draw_cooldown(x, y, size, remaining, total)
     local pct = remaining / total
-    luna.gfx.setColor(0, 0, 0, 0.5)
-    luna.gfx.rectangle("fill", x, y, size, size * pct)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.rectangle("line", x, y, size, size)
+    lurek.gfx.setColor(0, 0, 0, 0.5)
+    lurek.gfx.rectangle("fill", x, y, size, size * pct)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.rectangle("line", x, y, size, size)
 end
 ```
 
@@ -77,10 +77,10 @@ end
 local function draw_tooltip(mx, my, text)
     local tw = #text * 8 + 16
     local th = 24
-    luna.gfx.setColor(0, 0, 0, 0.85)
-    luna.gfx.rectangle("fill", mx + 12, my, tw, th)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print(text, mx + 20, my + 4)
+    lurek.gfx.setColor(0, 0, 0, 0.85)
+    lurek.gfx.rectangle("fill", mx + 12, my, tw, th)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print(text, mx + 20, my + 4)
 end
 ```
 
@@ -96,17 +96,17 @@ local function draw_inventory_grid(inv, ox, oy)
         local row = math.floor((i - 1) / 5)
         local sx = ox + col * (SLOT_SIZE + SLOT_PAD)
         local sy = oy + row * (SLOT_SIZE + SLOT_PAD)
-        luna.gfx.setColor(0.3, 0.3, 0.3, 0.9)
-        luna.gfx.rectangle("fill", sx, sy, SLOT_SIZE, SLOT_SIZE)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 0.9)
+        lurek.gfx.rectangle("fill", sx, sy, SLOT_SIZE, SLOT_SIZE)
         if inv.slots[i] then
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(inv.slots[i].id, sx + 2, sy + 2)
-            luna.gfx.print(inv.slots[i].count, sx + 20, sy + 20)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(inv.slots[i].id, sx + 2, sy + 2)
+            lurek.gfx.print(inv.slots[i].count, sx + 20, sy + 20)
         end
-        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-        luna.gfx.rectangle("line", sx, sy, SLOT_SIZE, SLOT_SIZE)
+        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+        lurek.gfx.rectangle("line", sx, sy, SLOT_SIZE, SLOT_SIZE)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -114,6 +114,6 @@ end
 
 - **Drawing HUD in world space** — always pop camera transforms before HUD. Elements should not scroll with the world.
 - **Hardcoded positions** — anchor to screen edges or percentages. Breaks on resolution change otherwise.
-- **Color leak** — always reset `luna.gfx.setColor(1,1,1,1)` after drawing colored HUD elements.
+- **Color leak** — always reset `lurek.gfx.setColor(1,1,1,1)` after drawing colored HUD elements.
 - **Floaters accumulation** — remove dead floaters. Without cleanup, the table grows every hit.
 - **Z-order** — draw HUD last. Tooltips last of all. Order: world → HUD → overlay → tooltip.

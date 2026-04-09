@@ -9,12 +9,12 @@ A transport logistics game on a 25 × 19 tile grid. Place track tiles to connect
 - Station-based cargo production and consumption with a stock/capacity system
 - Day cycle timer driving revenue per delivery and a history array for the revenue chart
 - Train spawning via `T` and automatic pathfinding along placed track
-- `luna.gfx.drawLine` for the track shapes and `drawRect` for train cars
+- `lurek.gfx.drawLine` for the track shapes and `drawRect` for train cars
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/railroad
+cargo run -- content/demos/railroad
 ```
 
 ## Controls

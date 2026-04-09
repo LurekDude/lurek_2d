@@ -1,4 +1,4 @@
-//! `luna.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
+//! `lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -202,7 +202,7 @@ impl LuaUserData for LuaRaycaster {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.raycaster` API table with the Lua VM.
+/// Registers the `lurek.raycaster` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

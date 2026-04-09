@@ -1,4 +1,4 @@
-//! Rapier2d-backed physics world with backward-compatible Luna2D API.
+//! Rapier2d-backed physics world with backward-compatible Lurek2D API.
 //!
 //! Wraps the rapier2d simulation pipeline while exposing the same `Body`-based
 //! interface. The `Body` struct is a sync buffer: mutations via `get_body_mut()`

@@ -1,6 +1,6 @@
-//! Integration tests for `luna.item.*`.
+//! Integration tests for `lurek.item.*`.
 
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;

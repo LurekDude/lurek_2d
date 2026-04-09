@@ -1,14 +1,12 @@
 -- examples/pathfinding.lua
--- luna.pathfinding — Grid-based A*, flow fields, hierarchical pathfinding,
+-- lurek.pathfinding — Grid-based A*, flow fields, hierarchical pathfinding,
 -- NavGrid, UnitPathfinder, PathGrid, FlowField, and AiFlowField.
--- All luna.pathfinding API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── NavGrid ───────────────────────────────────────────────────────────────────
 
 -- newNavGrid(width, height) → NavGrid
 -- All cells start walkable (cost 1.0).
-local grid = luna.pathfinding.newNavGrid(40, 30)  -- 40 columns, 30 rows
+local grid = lurek.pathfinding.newNavGrid(40, 30)  -- 40 columns, 30 rows
 
 -- getDimensions() → w, h
 local gw, gh = grid:getDimensions()
@@ -58,7 +56,7 @@ grid:clearDirty()
 -- ── UnitPathfinder (A* + smoothed paths) ─────────────────────────────────────
 
 -- newPathfinder(navGrid) → UnitPathfinder
-local pf = luna.pathfinding.newPathfinder(grid)
+local pf = lurek.pathfinding.newPathfinder(grid)
 
 -- findPath(sx, sy, ex, ey) → {x1,y1, x2,y2, ...}? (nil if unreachable)
 -- Returns cell coordinates along the path (0-based).
@@ -87,7 +85,7 @@ local partial = pf:findPartialPath(0, 0, 38, 28, 100)
 
 -- newFlowField(navGrid) → FlowField
 -- Efficient for many-to-one pathfinding (all units converge on a target).
-local flow = luna.pathfinding.newFlowField(grid)
+local flow = lurek.pathfinding.newFlowField(grid)
 
 -- setGoal(x, y) — BFS expands from this cell
 flow:setGoal(20, 15)
@@ -105,7 +103,7 @@ local flow_cost = flow:getCost(5, 5)
 
 -- newPathGrid(width, height, cellSize) → PathGrid
 -- Same as NavGrid but explicitly stores cell sizes for world-space conversions.
-local pg = luna.pathfinding.newPathGrid(80, 60, 16)  -- 80×60 tiles, 16-pixel cells
+local pg = lurek.pathfinding.newPathGrid(80, 60, 16)  -- 80×60 tiles, 16-pixel cells
 
 -- setCost(x, y, cost)  /  getCost(x, y) → number
 pg:setCost(20, 15, 5.0)  -- mud — expensive
@@ -125,7 +123,7 @@ local world_path = pg:findPath(32, 32, 640, 480)
 -- ── AiFlowField (BFS from PathGrid for crowd pathfinding) ────────────────────
 
 -- newPathFlowField(pathGrid) → AiFlowField
-local ai_flow = luna.pathfinding.newPathFlowField(pg)
+local ai_flow = lurek.pathfinding.newPathFlowField(pg)
 
 -- compute(goalX, goalY) — BFS from world-space goal
 ai_flow:compute(640, 480)
@@ -142,20 +140,20 @@ local path_idx = 1
 local unit_x, unit_y = 64, 64
 local TILE_SIZE = 32
 
-function luna.init()
-    nav_grid = luna.pathfinding.newNavGrid(20, 20)
+function lurek.init()
+    nav_grid = lurek.pathfinding.newNavGrid(20, 20)
     -- Place some walls
     nav_grid:fillRect(5, 0, 2, 15, true)
     nav_grid:fillRect(8, 5, 2, 15, true)
     nav_grid:setDiagonalMode("whenNotBlocked")
     nav_grid:rebuildAbstract()
 
-    pathfinder = luna.pathfinding.newPathfinder(nav_grid)
+    pathfinder = lurek.pathfinding.newPathfinder(nav_grid)
     path_nodes = pathfinder:findPathSmooth(2, 2, 18, 18) or {}
     path_idx = 1
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if path_idx <= #path_nodes - 1 then
         local tx = path_nodes[path_idx]   * TILE_SIZE + TILE_SIZE / 2
         local ty = path_nodes[path_idx+1] * TILE_SIZE + TILE_SIZE / 2
@@ -170,9 +168,9 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
-    luna.gfx.setColor(0.3, 0.7, 1.0)
-    luna.gfx.circle("fill", unit_x, unit_y, 8)
+function lurek.render()
+    lurek.gfx.setColor(0.3, 0.7, 1.0)
+    lurek.gfx.circle("fill", unit_x, unit_y, 8)
 end
 ]]
 
@@ -274,19 +272,19 @@ pf:clearCache()                          -- stale cached paths through modified 
 local unitpathfinder_type    = pf:type()                   -- "UnitPathfinder"
 local unitpathfinder_is_type = pf:typeOf("UnitPathfinder") -- true
 
--- ─── luna.pathfinding module functions ───────────────────────────────────────
+-- ─── lurek.pathfinding module functions ───────────────────────────────────────
 -- Module-level helpers for background thread control and TileMap-driven grid creation.
 
 -- getThreadCount() / setThreadCount(n) — background worker threads for pathfinding
 -- 0 = synchronous (blocking); raise for large maps with many simultaneously active units.
-local worker_threads = luna.pathfinding.getThreadCount()   -- 0 by default (synchronous)
-luna.pathfinding.setThreadCount(2)    -- offload BFS / A★ computation to 2 workers
-luna.pathfinding.setThreadCount(0)    -- revert to synchronous single-threaded mode
+local worker_threads = lurek.pathfinding.getThreadCount()   -- 0 by default (synchronous)
+lurek.pathfinding.setThreadCount(2)    -- offload BFS / A★ computation to 2 workers
+lurek.pathfinding.setThreadCount(0)    -- revert to synchronous single-threaded mode
 
 -- newNavGridFromTileMap(tilemap, layer, blocked_gids) → NavGrid
 -- Builds a NavGrid directly from a TileMap layer — no manual setBlocked() loop needed.
 -- Pass GID integers for tile types that should be treated as solid obstacles.
-local world_map  = luna.tilemap.load("assets/levels/world.lua")
+local world_map  = lurek.tilemap.load("assets/levels/world.lua")
 local solid_gids = { 12, 13, 14, 47 }    -- GIDs of wall / water / lava tiles in the atlas
-local nav_map    = luna.pathfinding.newNavGridFromTileMap(world_map, 1, solid_gids)
-local map_pf     = luna.pathfinding.newPathfinder(nav_map)  -- ready to use immediately
+local nav_map    = lurek.pathfinding.newNavGridFromTileMap(world_map, 1, solid_gids)
+local map_pf     = lurek.pathfinding.newPathfinder(nav_map)  -- ready to use immediately

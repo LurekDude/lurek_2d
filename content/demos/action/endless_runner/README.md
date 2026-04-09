@@ -4,17 +4,17 @@ A side-scrolling infinite runner where your character auto-moves right through a
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — ground, obstacle, and player body rendering
-- `luna.gfx.circle()` — coin pickups with radius-based collection detection
-- `luna.gfx.setColor()` — parallax layer tinting and death-flash effect
-- `luna.gfx.print()` — live score, high score, and game-over overlay text
-- `luna.keyboard.isDown()` — held Space for jump, held Down for slide
-- `luna.gfx.setBackgroundColor()` — night-sky dark blue atmosphere
+- `lurek.gfx.rectangle()` — ground, obstacle, and player body rendering
+- `lurek.gfx.circle()` — coin pickups with radius-based collection detection
+- `lurek.gfx.setColor()` — parallax layer tinting and death-flash effect
+- `lurek.gfx.print()` — live score, high score, and game-over overlay text
+- `lurek.keyboard.isDown()` — held Space for jump, held Down for slide
+- `lurek.gfx.setBackgroundColor()` — night-sky dark blue atmosphere
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/endless_runner
+cargo run -- content/demos/endless_runner
 ```
 
 ## Controls

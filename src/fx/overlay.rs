@@ -22,11 +22,11 @@ use crate::log_msg;
 ///
 /// Typical Lua usage:
 /// ```lua
-/// local o = luna.overlay.newOverlay(800, 600)
+/// local o = lurek.overlay.newOverlay(800, 600)
 /// o:setWeather("rain")   -- enable rain
 /// o:setWeatherEnabled(true)
 /// o:flash(1, 1, 1)        -- quick white flash
-/// -- in luna.update(dt):
+/// -- in lurek.update(dt):
 /// o:update(dt)
 /// ```
 ///

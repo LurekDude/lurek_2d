@@ -1,4 +1,4 @@
-//! `luna.pipeline` — DAG-based pipeline orchestrator for composing multi-step workflows.
+//! `lurek.pipeline` — DAG-based pipeline orchestrator for composing multi-step workflows.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -974,7 +974,7 @@ impl LuaUserData for LuaPipeline {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.pipeline` API table with the Lua VM.
+/// Registers the `lurek.pipeline` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

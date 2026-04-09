@@ -1,6 +1,6 @@
-//! Integration tests for `luna2d::graph` — directed graph with item flow simulation.
+//! Integration tests for `lurek2d::graph` — directed graph with item flow simulation.
 
-use luna2d::graph::*;
+use lurek2d::graph::*;
 
 // ============================================================
 // 1. Graph creation and basic node CRUD

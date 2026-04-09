@@ -1,14 +1,14 @@
-# `compute` — Agent Reference
+# `compute` ï¿½ Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.compute`                                       |
+| **Tier**       | Tier 1 ï¿½ Core Engine Subsystems                      |
+| **Status**     | Implemented ï¿½ Full                                   |
+| **Lua API**    | `lurek.compute`                                       |
 | **Source**      | `src/compute/`                                       |
 | **Rust Tests** | `tests/rust/unit/compute_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_compute.lua`                    |
-| **Architecture** | —                                                  |
+| **Architecture** | ï¿½                                                  |
 
 ## Purpose
 
@@ -31,6 +31,6 @@ and `get_i32`/`set_i32` accessors that handle byte-level serialisation internall
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-› [`specs/compute.md`](../../specs/compute.md)
+ï¿½ [`docs/specs/compute.md`](../../docs/specs/compute.md)
 
-_Update both this file **and** `specs/compute.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/compute.md` whenever source files, public types, or Lua bindings change._

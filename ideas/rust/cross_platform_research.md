@@ -1,11 +1,11 @@
-# Luna2D Cross-Platform Feasibility Research
+# Lurek2D Cross-Platform Feasibility Research
 
 **Date:** March 2026
 **Scope:** Android, iOS, Web/HTML (WebAssembly), Linux, macOS
 **Engine version:** v0.2.0
 **Verdict format:** Ready / Feasible-with-work / Major-refactoring-required / Not-possible
 
-> Note: This document is a historical research snapshot. Several platform conclusions below assume the older `minifb`/`tiny-skia` runtime that predated Luna2D's current `winit` + `wgpu` primary stack. See `docs/architecture.md` for the current architecture.
+> Note: This document is a historical research snapshot. Several platform conclusions below assume the older `minifb`/`tiny-skia` runtime that predated Lurek2D's current `winit` + `wgpu` primary stack. See `docs/architecture.md` for the current architecture.
 
 ---
 
@@ -164,10 +164,10 @@ Cross-compiling to macOS from a non-Apple OS is possible with `osxcross` (Linux)
 
 ### Notes
 
-- minifb's macOS backend uses Objective-C (17% of minifb's code). It creates native NSWindow instances. This is transparent to Luna2D.
+- minifb's macOS backend uses Objective-C (17% of minifb's code). It creates native NSWindow instances. This is transparent to Lurek2D.
 - `build.rs` `winresource` is `#[cfg(target_os = "windows")]` — no macOS issues.
-- The `directories` crate maps `AppDataDir` to `~/Library/Application Support/luna2d/` on macOS.
-- macOS requires no code changes in Luna2D.
+- The `directories` crate maps `AppDataDir` to `~/Library/Application Support/lurek2d/` on macOS.
+- macOS requires no code changes in Lurek2D.
 
 ---
 
@@ -175,7 +175,7 @@ Cross-compiling to macOS from a non-Apple OS is possible with `osxcross` (Linux)
 
 ### Status: MAJOR REFACTORING REQUIRED
 
-Web/HTML builds require fundamental architectural changes to Luna2D. In the current architecture, three separate blockers make a straightforward WASM build impossible.
+Web/HTML builds require fundamental architectural changes to Lurek2D. In the current architecture, three separate blockers make a straightforward WASM build impossible.
 
 ### Blocker 1: mlua WASM Target Incompatibility
 
@@ -185,7 +185,7 @@ The Emscripten target (`wasm32-unknown-emscripten`) uses an entirely different C
 
 **Consequence:** Lua scripting and modern browser Web APIs are on incompatible WASM targets. There is no currently maintained path to run mlua in a `wasm32-unknown-unknown` build.
 
-**Potential resolution:** Replace mlua with a pure-Rust Lua implementation that targets `wasm32-unknown-unknown`, such as a Lua interpreter written entirely in Rust (none exist at production quality today). Alternatively, switch from Lua to a pure-Rust scripting language (Rhai, Rune) for the WASM target — but this would break the entire `luna.*` Lua API contract.
+**Potential resolution:** Replace mlua with a pure-Rust Lua implementation that targets `wasm32-unknown-unknown`, such as a Lua interpreter written entirely in Rust (none exist at production quality today). Alternatively, switch from Lua to a pure-Rust scripting language (Rhai, Rune) for the WASM target — but this would break the entire `lurek.*` Lua API contract.
 
 ### Blocker 2: minifb Has Partial/Experimental WASM Support Only
 

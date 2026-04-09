@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.time`                                         |
+| **Lua API**    | `lurek.time`                                         |
 | **Source**     | `src/timer/`                                         |
 | **Rust Tests** | `tests/rust/unit/timer_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_timer.lua`                      |
@@ -18,14 +18,14 @@ tracks frame delta (elapsed seconds since the last tick), total elapsed time
 since game start, rolling FPS computed over a 1-second sliding window, and a
 60-frame rolling average delta useful for smooth HUD display of frame time.
 `Clock` is stored inside `SharedState` and ticked once per engine frame by the
-main loop in `src/engine/app.rs`; the `dt` that `luna.update(dt)` receives is
+main loop in `src/engine/app.rs`; the `dt` that `lurek.update(dt)` receives is
 the `Clock`'s last-tick delta.
 
-> **`Clock` is the canonical source for fps, delta, and average frame delta in Luna2D.**
-> Use `luna.time.getDelta()`, `luna.time.getFps()`, and `luna.time.getAverageDelta()` for all
+> **`Clock` is the canonical source for fps, delta, and average frame delta in Lurek2D.**
+> Use `lurek.time.getDelta()`, `lurek.time.getFps()`, and `lurek.time.getAverageDelta()` for all
 > basic frame-timing needs — no setup required. Other modules (`debugbridge`, `devtools.FrameStats`)
 > maintain derivative buffers for specialized purposes (TCP delivery and percentile analysis
-> respectively), but `luna.time` should always be the first-choice API for game scripts. The module also exposes a free function
+> respectively), but `lurek.time` should always be the first-choice API for game scripts. The module also exposes a free function
 `sleep(seconds)` that blocks the calling thread — a convenience for loading
 screens or startup delays that should never be called in the hot loop.
 
@@ -37,7 +37,7 @@ bullet-time, or 2.0 for fast-forward (clamped to 0.0–100.0). Named events
 replace existing events with the same name, preventing timer accumulation when
 setup code runs repeatedly on scene re-entry. Per-event pause and resume allow
 individual timers to be suspended without stopping the entire scheduler.
-Schedulers are created on the Lua side via `luna.time.newScheduler()` and
+Schedulers are created on the Lua side via `lurek.time.newScheduler()` and
 wrapped in a `LuaScheduler` UserData that pairs the Rust `Scheduler` with a
 `HashMap<u32, LuaRegistryKey>` for callback storage. Expired callbacks are
 automatically unregistered from the Lua registry after each `update()` call.
@@ -84,7 +84,7 @@ lua_api/timer_api.rs
   │         getRemaining, getInterval, getRepeatCount, getCount,
   │         isEmpty, setInterval, resetEvent, setTimeScale,
   │         getTimeScale, update
-  └── luna.time table
+  └── lurek.time table
         ├── getDelta, getFPS, getTime, getAverageDelta
         ├── step, getMicroTime, sleep
         └── newScheduler → LuaScheduler
@@ -205,26 +205,26 @@ No public enums in this module.
 
 ## Lua API
 
-Registered by `src/lua_api/timer_api.rs` under `luna.time`. The file defines
+Registered by `src/lua_api/timer_api.rs` under `lurek.time`. The file defines
 a `LuaScheduler` UserData struct that wraps a Rust `Scheduler` with a
 `HashMap<u32, LuaRegistryKey>` for Lua callback storage and a
 `HashMap<String, u32>` for named event ID tracking. Expired callbacks are
 automatically unregistered from the Lua registry after each `update()` call.
 
-### `luna.time` table functions
+### `lurek.time` table functions
 
 | Function                          | Signature                 | Description                                                                      |
 |-----------------------------------|---------------------------|----------------------------------------------------------------------------------|
-| `luna.time.getDelta()`           | `() → number`            | Frame delta time in seconds from `SharedState.delta_time`                        |
-| `luna.time.getFPS()`             | `() → number`            | Current FPS from `SharedState.fps`                                               |
-| `luna.time.getTime()`            | `() → number`            | Total elapsed time from `SharedState.total_time`                                 |
-| `luna.time.getAverageDelta()`    | `() → number`            | Rolling 60-frame average delta from `Clock.average_delta()`                      |
-| `luna.time.step()`               | `() → number`            | Advance clock one tick; returns delta. Calls `SharedState.step_timer()`          |
-| `luna.time.getMicroTime()`       | `() → number`            | High-resolution elapsed time from `Clock.elapsed()`                              |
-| `luna.time.sleep(seconds)`       | `(number) → nil`         | Block the main thread for `seconds` (≤ 0 is ignored)                            |
-| `luna.time.newScheduler()`       | `() → Scheduler`         | Create a new independent `LuaScheduler` UserData                                 |
-| `luna.time.getPhysicsDelta()`    | `() → number`            | Returns the current fixed physics timestep in seconds (default `1/60`)           |
-| `luna.time.setPhysicsDelta(dt)`  | `(number) → nil`         | Sets the physics timestep; clamped to [1/240, 1/10]. See also `performance.physics_tick_rate` in `conf.lua` |
+| `lurek.time.getDelta()`           | `() → number`            | Frame delta time in seconds from `SharedState.delta_time`                        |
+| `lurek.time.getFPS()`             | `() → number`            | Current FPS from `SharedState.fps`                                               |
+| `lurek.time.getTime()`            | `() → number`            | Total elapsed time from `SharedState.total_time`                                 |
+| `lurek.time.getAverageDelta()`    | `() → number`            | Rolling 60-frame average delta from `Clock.average_delta()`                      |
+| `lurek.time.step()`               | `() → number`            | Advance clock one tick; returns delta. Calls `SharedState.step_timer()`          |
+| `lurek.time.getMicroTime()`       | `() → number`            | High-resolution elapsed time from `Clock.elapsed()`                              |
+| `lurek.time.sleep(seconds)`       | `(number) → nil`         | Block the main thread for `seconds` (≤ 0 is ignored)                            |
+| `lurek.time.newScheduler()`       | `() → Scheduler`         | Create a new independent `LuaScheduler` UserData                                 |
+| `lurek.time.getPhysicsDelta()`    | `() → number`            | Returns the current fixed physics timestep in seconds (default `1/60`)           |
+| `lurek.time.setPhysicsDelta(dt)`  | `(number) → nil`         | Sets the physics timestep; clamped to [1/240, 1/10]. See also `performance.physics_tick_rate` in `conf.lua` |
 
 ### `Scheduler` UserData methods
 
@@ -255,17 +255,17 @@ automatically unregistered from the Lua registry after each `update()` call.
 
 ```lua
 -- Basic frame timing
-function luna.process(dt)
-    local fps = luna.time.getFPS()
-    local total = luna.time.getTime()
-    local avg = luna.time.getAverageDelta()
+function lurek.process(dt)
+    local fps = lurek.time.getFPS()
+    local total = lurek.time.getTime()
+    local avg = lurek.time.getAverageDelta()
 end
 ```
 
 ```lua
 -- Scheduler: one-shot, repeating, named, pause/resume
-function luna.init()
-    sched = luna.time.newScheduler()
+function lurek.init()
+    sched = lurek.time.newScheduler()
 
     -- Fire once after 3 seconds
     sched:after(3.0, function()
@@ -286,14 +286,14 @@ function luna.init()
     sched:setTimeScale(0.5)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     sched:update(dt)
 
     -- Pause/resume example
-    if luna.keyboard.isDown("p") then
+    if lurek.keyboard.isDown("p") then
         sched:pause(some_id)
     end
-    if luna.keyboard.isDown("r") then
+    if lurek.keyboard.isDown("r") then
         sched:resume(some_id)
     end
 end
@@ -301,9 +301,9 @@ end
 
 ```lua
 -- High-resolution timing for benchmarks
-local t1 = luna.time.getMicroTime()
+local t1 = lurek.time.getMicroTime()
 do_expensive_work()
-local elapsed = luna.time.getMicroTime() - t1
+local elapsed = lurek.time.getMicroTime() - t1
 print("Took " .. elapsed .. " seconds")
 ```
 
@@ -322,17 +322,17 @@ print("Took " .. elapsed .. " seconds")
 |-----------|---------------|--------------------------------------------------------------|
 | `engine`  | Imports from  | `Clock` stored in `SharedState`; `delta_time`, `fps`, `total_time` fields mirrored from `Clock` |
 | `math`    | —             | No direct dependency; timer is pure `std::time`              |
-| `lua_api`  | Imported by  | `src/lua_api/timer_api.rs` registers `luna.time.*`          |
+| `lua_api`  | Imported by  | `src/lua_api/timer_api.rs` registers `lurek.time.*`          |
 | `animation` | Similar     | Animation/tweening uses delta time but does NOT own timing — consumes `dt` from timer |
 | `engine::log_messages` | Imports from | Uses log message constants `TI01`–`TI04` for debug logging |
 
 ## Notes
 
-- **Clock is engine-owned**: `Clock` lives inside `SharedState` and is ticked by the engine loop. Game scripts read timing through `luna.time.getDelta()` / `luna.time.getFPS()` / `luna.time.getTime()` rather than ticking the clock themselves. `luna.time.step()` exists but is primarily for test harness use.
-- **Schedulers are Lua-owned**: Each call to `luna.time.newScheduler()` creates an independent scheduler. Games can have multiple schedulers (e.g., one for UI, one for gameplay with different time scales). The scheduler is a UserData object — its lifetime is managed by Lua's garbage collector.
+- **Clock is engine-owned**: `Clock` lives inside `SharedState` and is ticked by the engine loop. Game scripts read timing through `lurek.time.getDelta()` / `lurek.time.getFPS()` / `lurek.time.getTime()` rather than ticking the clock themselves. `lurek.time.step()` exists but is primarily for test harness use.
+- **Schedulers are Lua-owned**: Each call to `lurek.time.newScheduler()` creates an independent scheduler. Games can have multiple schedulers (e.g., one for UI, one for gameplay with different time scales). The scheduler is a UserData object — its lifetime is managed by Lua's garbage collector.
 - **Callback cleanup**: `LuaScheduler` stores callbacks as `LuaRegistryKey` values. After `update()`, any event IDs no longer in the Scheduler's active set are cleaned up from both the callback map and the named-IDs map, preventing registry leaks.
-- **Named event replacement**: `afterNamed` / `everyNamed` cancel and remove the old callback before inserting the new one. This is safe for scene re-entry patterns where `luna.load()` sets up timers that might already exist.
+- **Named event replacement**: `afterNamed` / `everyNamed` cancel and remove the old callback before inserting the new one. This is safe for scene re-entry patterns where `lurek.load()` sets up timers that might already exist.
 - **Time scale clamping**: `set_time_scale` clamps to [0.0, 100.0]. A scale of 0.0 freezes all timers without cancelling them. Scale does not affect `Clock` — only `Scheduler`.
 - **`sleep()` blocks the thread**: `timer::sleep(seconds)` calls `std::thread::sleep`. Values ≤ 0 are silently ignored. Never call this in the game loop — it freezes the entire engine.
-- **No heap allocation in update**: `Scheduler::update()` allocates a `Vec<u32>` for fired IDs. This is acceptable because scheduler updates are not per-draw-call — they run once per frame in `luna.update`.
+- **No heap allocation in update**: `Scheduler::update()` allocates a `Vec<u32>` for fired IDs. This is acceptable because scheduler updates are not per-draw-call — they run once per frame in `lurek.update`.
 - **Test coverage**: 11 Rust integration tests in `tests/rust/unit/timer_tests.rs` covering `Clock` and `Scheduler`. 17 inline unit tests in `scheduler.rs` `#[cfg(test)]` module. 21 Lua BDD tests in `tests/lua/unit/test_timer.lua`. Additional Lua integration tests in `tests/lua/integration/test_timer_math.lua`.

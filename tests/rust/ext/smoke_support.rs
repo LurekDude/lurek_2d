@@ -50,19 +50,19 @@ pub(crate) fn prepare_example_copy(example_name: &str) -> io::Result<(TempDir, P
     Ok((temp_dir, target_dir))
 }
 
-pub(crate) fn resolve_luna2d_binary() -> PathBuf {
-    if let Some(path) = std::env::var_os("CARGO_BIN_EXE_luna2d") {
+pub(crate) fn resolve_lurek2d_binary() -> PathBuf {
+    if let Some(path) = std::env::var_os("CARGO_BIN_EXE_lurek2d") {
         return PathBuf::from(path);
     }
 
-    if let Some(path) = option_env!("CARGO_BIN_EXE_luna2d") {
+    if let Some(path) = option_env!("CARGO_BIN_EXE_lurek2d") {
         return PathBuf::from(path);
     }
 
     let exe_name = if cfg!(windows) {
-        "luna2d.exe"
+        "lurek2d.exe"
     } else {
-        "luna2d"
+        "lurek2d"
     };
 
     Path::new(env!("CARGO_MANIFEST_DIR"))

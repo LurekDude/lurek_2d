@@ -1,34 +1,34 @@
--- Luna2D battle API tests
+-- Lurek2D battle API tests
 
-describe("luna.turnbattle module exists", function()
+describe("lurek.turnbattle module exists", function()
     it("is a table", function()
-        expect_type("table", luna.turnbattle)
+        expect_type("table", lurek.turnbattle)
     end)
 end)
 
-describe("luna.turnbattle.newCombatant", function()
+describe("lurek.turnbattle.newCombatant", function()
     it("creates a combatant with basic accessors", function()
-        local c = luna.turnbattle.newCombatant("hero")
+        local c = lurek.turnbattle.newCombatant("hero")
         expect_not_nil(c)
         expect_equal("hero", c:getName())
         expect_true(c:isAlive())
     end)
 end)
 
-describe("luna.turnbattle.newBattle", function()
+describe("lurek.turnbattle.newBattle", function()
     it("creates a battle and resolves a simple attack", function()
-        local battle = luna.turnbattle.newBattle("arena")
-        local hero = luna.turnbattle.newCombatant("hero")
+        local battle = lurek.turnbattle.newBattle("arena")
+        local hero = lurek.turnbattle.newCombatant("hero")
         hero:setTeam("player")
         hero:setHp(100)
         hero:setMaxHp(100)
 
-        local enemy = luna.turnbattle.newCombatant("enemy")
+        local enemy = lurek.turnbattle.newCombatant("enemy")
         enemy:setTeam("enemy")
         enemy:setHp(100)
         enemy:setMaxHp(100)
 
-        local strike = luna.turnbattle.newAction("strike")
+        local strike = lurek.turnbattle.newAction("strike")
         strike:setBaseDamage(25)
         strike:setAccuracy(1.0)
 

@@ -21,8 +21,8 @@
             "request": "launch",
             "name": "🐛 Build Debug (no game)",
             "cargo": {
-                "args": ["build", "--bin=luna2d"],
-                "filter": { "name": "luna2d", "kind": "bin" }
+                "args": ["build", "--bin=lurek2d"],
+                "filter": { "name": "lurek2d", "kind": "bin" }
             },
             "args": [],
             "cwd": "${workspaceFolder}",
@@ -37,8 +37,8 @@
             "request": "launch",
             "name": "🚀 Build Release (no game)",
             "cargo": {
-                "args": ["build", "--bin=luna2d", "--release"],
-                "filter": { "name": "luna2d", "kind": "bin" }
+                "args": ["build", "--bin=lurek2d", "--release"],
+                "filter": { "name": "lurek2d", "kind": "bin" }
             },
             "args": [],
             "cwd": "${workspaceFolder}",
@@ -54,7 +54,7 @@
             "request": "launch",
             "name": "⚡ Run Debug Splash (cargo run)",
             "cargo": {
-                "args": ["run", "--bin", "luna2d"]
+                "args": ["run", "--bin", "lurek2d"]
             },
             "args": [],
             "cwd": "${workspaceFolder}"
@@ -66,7 +66,7 @@
             "request": "launch",
             "name": "⚡ Run Release Splash (cargo run)",
             "cargo": {
-                "args": ["run", "--bin", "luna2d", "--release"]
+                "args": ["run", "--bin", "lurek2d", "--release"]
             },
             "args": [],
             "cwd": "${workspaceFolder}"

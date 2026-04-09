@@ -8,17 +8,17 @@ The v2 manifest defines a "Luna Toolkit" sidebar container with 4 views:
 
 | View ID | Name | Provider |
 |---|---|---|
-| luna.projectTools | Project | ProjectToolsProvider |
-| luna.devTools | Dev Tools | DevToolsProvider |
-| luna.assetExplorer | Assets | AssetExplorerProvider |
-| luna.aiCopilot | AI & Copilot | AiToolsProvider |
+| lurek.projectTools | Project | ProjectToolsProvider |
+| lurek.devTools | Dev Tools | DevToolsProvider |
+| lurek.assetExplorer | Assets | AssetExplorerProvider |
+| lurek.aiCopilot | AI & Copilot | AiToolsProvider |
 
 **Docs** (01-sidebar-design.md) planned 3 views: PROJECT, DEV TOOLS, AI & COPILOT.
 **Implementation** adds a 4th: **Assets** (asset explorer tree view).
 
 ### Welcome View
 ```
-No Luna2D project detected.
+No Lurek2D project detected.
 [Create New Project]
 [Open Folder with main.lua]
 ```
@@ -32,7 +32,7 @@ No Luna2D project detected.
 **Current**: Create, Package, Libraries.
 
 **Additions**:
-- **Recent Projects** — list of recently opened Luna2D games
+- **Recent Projects** — list of recently opened Lurek2D games
 - **Project Health** — quick status indicators:
   - ✅ conf.lua exists
   - ✅ main.lua exists
@@ -59,7 +59,7 @@ No Luna2D project detected.
 - **Thumbnail previews** for images/sprites
 - **Audio waveform** preview for sound files
 - **Search/filter** within asset tree
-- **Drag-and-drop** assets into editor to insert `luna.gfx.newImage("path")`
+- **Drag-and-drop** assets into editor to insert `lurek.gfx.newImage("path")`
 - **Missing asset highlighting** — red marker on referenced-but-missing assets
 - **Asset usage count** — show how many Lua files reference each asset
 - **Asset size** — file size and dimensions for images
@@ -77,7 +77,7 @@ No Luna2D project detected.
 
 ### 5. Status Bar Improvements
 
-**Current**: "$(rocket) Luna2D" status bar item, running/stopped states.
+**Current**: "$(rocket) Lurek2D" status bar item, running/stopped states.
 
 **Additional status bar items**:
 - **FPS/frame time** when game is running (from debug bridge)
@@ -106,7 +106,7 @@ No Luna2D project detected.
 - **"Open in Luna Editor"** — for .tilemap.lua, .particle.lua, .scene.lua files
 - **"Run This File"** — for standalone Lua scripts
 - **"Generate Docs"** — for undocumented Lua functions
-- **"Find References in Game"** — for luna.* API calls
+- **"Find References in Game"** — for lurek.* API calls
 - **"Add Watch"** — for variable names under cursor (when debugging)
 - **"Preview Asset"** — for image/audio file paths under cursor
 
@@ -117,7 +117,7 @@ No Luna2D project detected.
 **Flow**:
 1. Detect first activation (no `conf.lua` in workspace)
 2. Show welcome walkthrough (VS Code walkthrough API)
-3. Steps: Install Luna2D → Create Project → Write First Script → Run Game → Open Editor
+3. Steps: Install Lurek2D → Create Project → Write First Script → Run Game → Open Editor
 4. Interactive code snippets in walkthrough
 5. Link to tutorial docs
 

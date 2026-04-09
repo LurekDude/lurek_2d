@@ -1,4 +1,4 @@
-//! CSV parsing and serialization for Luna2D.
+//! CSV parsing and serialization for Lurek2D.
 //!
 //! Converts between CSV strings and `SerialValue` using the `csv` crate.
 //! Parses CSV rows into ordered maps keyed by header columns.

@@ -11,11 +11,11 @@
 //! - [`GraphicsConfig`] — GPU backend selection and power preference, resolved at startup.
 //! - [`ModulesConfig`] — boolean feature-flags for optional engine subsystems (audio,
 //!   physics, graphics, etc.).  Disabling a module avoids the startup cost and prevents
-//!   the matching `luna.*` API calls from being registered.
+//!   the matching `lurek.*` API calls from being registered.
 //! - [`PerformanceConfig`] — target frame-rate cap (`fps_cap`).
 //!
 //! The `identity` field sets the name of the per-user save directory returned by
-//! `luna.fs.getSaveDirectory()`.  If unset, the engine uses the game directory
+//! `lurek.fs.getSaveDirectory()`.  If unset, the engine uses the game directory
 //! name as a fallback.
 //!
 //! # Example `conf.toml`
@@ -64,7 +64,7 @@ pub struct Config {
     pub performance: PerformanceConfig,
     pub identity: Option<String>,
     pub version: Option<String>,
-    /// Path to the log file, relative to the game directory. Defaults to `"luna2d.log"` in the current working directory.
+    /// Path to the log file, relative to the game directory. Defaults to `"lurek2d.log"` in the current working directory.
     pub log_file: Option<String>,
     /// If `true`, appends to an existing log file instead of truncating it on startup.
     pub log_append: bool,
@@ -141,36 +141,36 @@ pub struct WindowConfig {
 ///
 /// All flags default to `true` (all systems on) except `debug`, which defaults to
 /// `true` only in debug builds.  Set a flag to `false` in `conf.lua` to skip
-/// registering the matching `luna.*` namespace entirely.
+/// registering the matching `lurek.*` namespace entirely.
 ///
 /// # Fields
-/// - `audio` — rodio audio subsystem (`luna.audio`).
-/// - `physics` — rapier2d physics world (`luna.physics`).
-/// - `graphics` — GPU render pipeline (`luna.gfx`, `luna.font`, `luna.sprite`).
-/// - `input` — keyboard / mouse / gamepad input (`luna.input`).
-/// - `timer` — frame timer and scheduled callbacks (`luna.time`).
-/// - `filesystem` — sandboxed game filesystem (`luna.fs`).
-/// - `window` — window state queries (`luna.window`).
-/// - `particle` — 2D particle emitters (`luna.particles`).
-/// - `image` — CPU-side image manipulation (`luna.img`).
-/// - `gui` — retained-mode GUI widgets (`luna.ui`).
-/// - `overlay` — fullscreen overlay and post-processing effects (`luna.overlay`, `luna.postfx`).
-/// - `tilemap` — tile maps, tile sets, and map generation (`luna.tilemap`).
-/// - `scene` — scene stack and transition management (`luna.scene`).
-/// - `savegame` — save/load orchestration and schema versioning (`luna.savegame`).
-/// - `entity` — lightweight ECS primitives (`luna.entity`).
-/// - `ai` — FSMs, behaviour trees, and steering (`luna.ai`, `luna.steering`).
-/// - `pathfinding` — A★ and flow-field navigation grids (`luna.pathfinding`).
-/// - `thread` — background Rust threads and `Channel` objects (`luna.thread`).
-/// - `graph` — directed graphs and flow simulation (`luna.graph`).
-/// - `data` — binary data helpers, encoding/compression, and serial (`luna.data`, `luna.codec`).
-/// - `compute` — dense numerical arrays and `DataFrame` (`luna.gpu`, `luna.dataframe`).
-/// - `minimap` — minimap extraction and FOV masking (`luna.minimap`).
-/// - `modding` — mod discovery and load ordering (`luna.modding`).
-/// - `pipeline` — data transformation pipelines and pattern helpers (`luna.pipeline`, `luna.patterns`).
-/// - `system` — system information queries (`luna.platform`).
-/// - `localization` — string localisation tables (`luna.localization`).
-/// - `debug` — debug bridge, doc server, and automation helpers (`luna.debug`, `luna.debugbridge`, `luna.docs`, `luna.automation`).
+/// - `audio` — rodio audio subsystem (`lurek.audio`).
+/// - `physics` — rapier2d physics world (`lurek.physics`).
+/// - `graphics` — GPU render pipeline (`lurek.gfx`, `lurek.font`, `lurek.sprite`).
+/// - `input` — keyboard / mouse / gamepad input (`lurek.input`).
+/// - `timer` — frame timer and scheduled callbacks (`lurek.time`).
+/// - `filesystem` — sandboxed game filesystem (`lurek.fs`).
+/// - `window` — window state queries (`lurek.window`).
+/// - `particle` — 2D particle emitters (`lurek.particles`).
+/// - `image` — CPU-side image manipulation (`lurek.img`).
+/// - `gui` — retained-mode GUI widgets (`lurek.ui`).
+/// - `overlay` — fullscreen overlay and post-processing effects (`lurek.overlay`, `lurek.postfx`).
+/// - `tilemap` — tile maps, tile sets, and map generation (`lurek.tilemap`).
+/// - `scene` — scene stack and transition management (`lurek.scene`).
+/// - `savegame` — save/load orchestration and schema versioning (`lurek.savegame`).
+/// - `entity` — lightweight ECS primitives (`lurek.entity`).
+/// - `ai` — FSMs, behaviour trees, and steering (`lurek.ai`, `lurek.steering`).
+/// - `pathfinding` — A★ and flow-field navigation grids (`lurek.pathfinding`).
+/// - `thread` — background Rust threads and `Channel` objects (`lurek.thread`).
+/// - `graph` — directed graphs and flow simulation (`lurek.graph`).
+/// - `data` — binary data helpers, encoding/compression, and serial (`lurek.data`, `lurek.codec`).
+/// - `compute` — dense numerical arrays and `DataFrame` (`lurek.gpu`, `lurek.dataframe`).
+/// - `minimap` — minimap extraction and FOV masking (`lurek.minimap`).
+/// - `modding` — mod discovery and load ordering (`lurek.modding`).
+/// - `pipeline` — data transformation pipelines and pattern helpers (`lurek.pipeline`, `lurek.patterns`).
+/// - `system` — system information queries (`lurek.platform`).
+/// - `localization` — string localisation tables (`lurek.localization`).
+/// - `debug` — debug bridge, doc server, and automation helpers (`lurek.debug`, `lurek.debugbridge`, `lurek.docs`, `lurek.automation`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModulesConfig {
     pub audio: bool,
@@ -200,21 +200,21 @@ pub struct ModulesConfig {
     pub system: bool,
     pub localization: bool,
     pub debug: bool,
-    /// Enable luna.animation sprite animation API (frame clips, named animations).
+    /// Enable lurek.animation sprite animation API (frame clips, named animations).
     pub animation: bool,
-    /// Enable luna.tween property tweening API (animate any Lua table field).
+    /// Enable lurek.tween property tweening API (animate any Lua table field).
     pub tween: bool,
-    /// Enable luna.camera Camera2D API.
+    /// Enable lurek.camera Camera2D API.
     pub camera: bool,
-    /// Enable luna.network UDP networking API.
+    /// Enable lurek.network UDP networking API.
     pub network: bool,
-    /// Enable luna.procgen procedural generation API.
+    /// Enable lurek.procgen procedural generation API.
     pub procgen: bool,
-    /// Enable luna.raycaster DDA raycaster API.
+    /// Enable lurek.raycaster DDA raycaster API.
     pub raycaster: bool,
-    /// Enable luna.spine skeletal animation API.
+    /// Enable lurek.spine skeletal animation API.
     pub spine: bool,
-    /// Enable luna.terminal text-mode terminal emulator API.
+    /// Enable lurek.terminal text-mode terminal emulator API.
     pub terminal: bool,
 }
 
@@ -272,9 +272,9 @@ impl Default for Config {
                 width: 800,
                 height: 600,
                 title: if cfg!(debug_assertions) {
-                    format!("Luna2D v{} [DEBUG]", env!("CARGO_PKG_VERSION"))
+                    format!("Lurek2D v{} [DEBUG]", env!("CARGO_PKG_VERSION"))
                 } else {
-                    format!("Luna2D v{}", env!("CARGO_PKG_VERSION"))
+                    format!("Lurek2D v{}", env!("CARGO_PKG_VERSION"))
                 },
                 vsync: true,
                 fullscreen: false,
@@ -709,7 +709,7 @@ mod tests {
     #[test]
     fn default_title_contains_luna2d() {
         let c = Config::default();
-        assert!(c.window.title.contains("Luna2D"));
+        assert!(c.window.title.contains("Lurek2D"));
     }
 
     #[test]

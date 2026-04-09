@@ -4,19 +4,19 @@ A grid-based factory automation demo in the style of Factorio. Place miners on o
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — grid cell backgrounds, building footprints, and item dots
-- `luna.gfx.polygon()` — directional arrows drawn on each machine to show output direction
-- `luna.gfx.line()` — grid line overlay over the entire play area
-- `luna.gfx.setColor()` — distinct colours per machine type and item type
-- `luna.gfx.print()` — product and ingot counters, placement HUD, and input queue display
-- `luna.mouse.getPosition()` — grid cursor calculation from pixel coordinates
-- `luna.mouse.isPressed()` — left-click place, right-click delete
-- `luna.keyboard.isPressed()` — 1–4 to select machine, R to rotate output direction
+- `lurek.gfx.rectangle()` — grid cell backgrounds, building footprints, and item dots
+- `lurek.gfx.polygon()` — directional arrows drawn on each machine to show output direction
+- `lurek.gfx.line()` — grid line overlay over the entire play area
+- `lurek.gfx.setColor()` — distinct colours per machine type and item type
+- `lurek.gfx.print()` — product and ingot counters, placement HUD, and input queue display
+- `lurek.mouse.getPosition()` — grid cursor calculation from pixel coordinates
+- `lurek.mouse.isPressed()` — left-click place, right-click delete
+- `lurek.keyboard.isPressed()` — 1–4 to select machine, R to rotate output direction
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/factory
+cargo run -- content/demos/factory
 ```
 
 ## Controls

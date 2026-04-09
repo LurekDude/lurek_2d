@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                           |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.savegame`                                      |
+| **Lua API**    | `lurek.savegame`                                      |
 | **Source**     | `src/savegame/`                                      |
 | **Rust Tests** | `tests/rust/unit/savegame_tests.rs`                  |
 | **Lua Tests**  | `tests/lua/unit/test_savegame.lua`                   |
@@ -31,6 +31,6 @@ just valid Lua source.
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/savegame.md`](../../specs/savegame.md)
+→ [`docs/specs/savegame.md`](../../docs/specs/savegame.md)
 
-_Update both this file **and** `specs/savegame.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/savegame.md` whenever source files, public types, or Lua bindings change._

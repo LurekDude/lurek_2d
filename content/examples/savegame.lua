@@ -1,14 +1,12 @@
 -- examples/savegame.lua
--- luna.savegame — Slot-based persistent save-file manager with schema
+-- lurek.savegame — Slot-based persistent save-file manager with schema
 -- versioning, automatic migration, dirty-tracking, and auto-save.
--- All luna.savegame API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── SaveManager ───────────────────────────────────────────────────────────────
 
 -- newSaveManager() → SaveManager
 -- Each game creates one manager instance and registers collector/restorer pairs.
-local save = luna.savegame.newSaveManager()
+local save = lurek.savegame.newSaveManager()
 
 -- ── Schema Versioning ─────────────────────────────────────────────────────────
 
@@ -81,7 +79,7 @@ save:register("world",
 )
 
 -- unregister(name) — remove a module's callbacks
--- save:unregister("world")
+save:unregister("world")
 
 -- ── Dirty Tracking ────────────────────────────────────────────────────────────
 
@@ -145,7 +143,7 @@ local raw = save:collect()
 save:restore(raw)
 
 -- reset() — remove ALL registered callbacks and clear state
--- save:reset()
+save:reset()
 
 -- ── Auto-Save ─────────────────────────────────────────────────────────────────
 
@@ -153,12 +151,12 @@ save:restore(raw)
 save:enableAutoSave(300, "autosave")   -- save to "autosave" every 5 minutes
 
 -- disableAutoSave()
--- save:disableAutoSave()
+save:disableAutoSave()
 
 -- update(dt) → slotName?
 -- Call this every frame; returns slot name when an auto-save fires, else nil.
 --[[
-function luna.process(dt)
+function lurek.process(dt)
     local auto_slot = save:update(dt)
     if auto_slot then
         -- auto-save fired; you can show "Saving..." UI here
@@ -171,8 +169,8 @@ end
 --[[
 local save_mgr
 
-function luna.init()
-    save_mgr = luna.savegame.newSaveManager()
+function lurek.init()
+    save_mgr = lurek.savegame.newSaveManager()
     save_mgr:setSchemaVersion(1)
     save_mgr:setSummary("New Game")
     save_mgr:register("game",
@@ -186,11 +184,11 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     save_mgr:update(dt)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "f5" then save_mgr:save("quicksave") end
     if key == "f9" then save_mgr:load("quicksave") end
 end

@@ -1,4 +1,4 @@
-# dataframe — Feature Analysis
+# dataframe ï¿½ Feature Analysis
 
 **Tier**: 2 (Extension)
 **Spec**: `specs/dataframe.md`
@@ -23,7 +23,7 @@ Column-oriented tabular data structure for game data analysis, scoring tables, s
 ## Feature Gaps
 
 1. **No pivot tables**: Can't reshape data from long to wide format.
-2. **No window functions**: Rolling averages, running totals, rank — common for leaderboards and time series.
+2. **No window functions**: Rolling averages, running totals, rank ï¿½ common for leaderboards and time series.
 3. **No expression-based column creation**: Must transform column-by-column. No `df:eval("health * 1.5 + armor")` expression parsing.
 4. **No visualization integration**: Can't plot DataFrame data as charts/graphs directly.
 5. **No Excel/SQLite import**: Only CSV. Excel and SQLite are common data sources for game balancing.
@@ -36,17 +36,17 @@ Column-oriented tabular data structure for game data analysis, scoring tables, s
 
 ## Suggestions
 
-1. **Consider moving to Tier 3 library**: `library/dataframe/` as pure Lua — no Rust overhead. Use `luna.codec` for CSV import and `luna.compute` for numerics.
-2. **Add window functions**: `df:rollingMean("column", windowSize)` — enables time series analysis, rolling averages for game stats.
-3. **Add SQLite import**: `luna.dataframe.fromSQLite(path, query)` — useful for modders and data-driven game design.
+1. **Consider moving to Tier 3 library**: `library/dataframe/` as pure Lua ï¿½ no Rust overhead. Use `lurek.codec` for CSV import and `lurek.compute` for numerics.
+2. **Add window functions**: `df:rollingMean("column", windowSize)` ï¿½ enables time series analysis, rolling averages for game stats.
+3. **Add SQLite import**: `lurek.dataframe.fromSQLite(path, query)` ï¿½ useful for modders and data-driven game design.
 4. **Document use cases**: The module is powerful but users need to understand why they'd use DataFrames in a game. Add examples: leaderboard analysis, balance tuning, event log analysis.
-5. **Add simple charting**: `df:plot("column", x, y, w, h)` — even a basic bar/line chart for debug overlays would make DataFrames much more practical.
+5. **Add simple charting**: `df:plot("column", x, y, w, h)` ï¿½ even a basic bar/line chart for debug overlays would make DataFrames much more practical.
 
 ## Competitor Comparison
 
 No competitor 2D game engine has a built-in DataFrame. This is unique but potentially over-engineered for the target audience.
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy | Pandas (ref) |
+| Feature | Lurek2D | Engine A | Engine B | Engine D | Pandas (ref) |
 |---|---|---|---|---|---|
 | DataFrame | ? | ? | ? | ? | ? |
 | Group by | ? | N/A | N/A | N/A | ? |
@@ -57,4 +57,4 @@ No competitor 2D game engine has a built-in DataFrame. This is unique but potent
 
 ## Priority
 
-**LOW** — Module is functional but niche. Consider Tier 3 migration. Use cases should be better documented.
+**LOW** ï¿½ Module is functional but niche. Consider Tier 3 migration. Use cases should be better documented.

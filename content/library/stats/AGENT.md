@@ -6,7 +6,7 @@
 | **Source** | `library/stats/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_stats.lua` |
 | **Test count** | 70 tests — all passing |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 
 ## Summary
 

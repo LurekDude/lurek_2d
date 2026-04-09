@@ -4,19 +4,19 @@ A scrollable terrain minimap with fog of war, object markers, pings, and a dragg
 
 ## What It Demonstrates
 
-- `luna.minimap.new()` — create a minimap canvas
-- `luna.minimap.setTerrain()` — define terrain tile colours
-- `luna.minimap.setFog()` — per-cell fog of war
-- `luna.minimap.addObject()` / `removeObject()` — dynamic entity markers
-- `luna.minimap.addPing()` — temporary highlight animation
-- `luna.minimap.setViewport()` — overlay a viewport rectangle
-- `luna.minimap.draw()` — render the minimap at a given position/scale
-- `luna.keyboard.isDown()` for player movement driving fog reveal
+- `lurek.minimap.new()` — create a minimap canvas
+- `lurek.minimap.setTerrain()` — define terrain tile colours
+- `lurek.minimap.setFog()` — per-cell fog of war
+- `lurek.minimap.addObject()` / `removeObject()` — dynamic entity markers
+- `lurek.minimap.addPing()` — temporary highlight animation
+- `lurek.minimap.setViewport()` — overlay a viewport rectangle
+- `lurek.minimap.draw()` — render the minimap at a given position/scale
+- `lurek.keyboard.isDown()` for player movement driving fog reveal
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/minimap_demo
+cargo run -- content/demos/minimap_demo
 ```
 
 ## Controls

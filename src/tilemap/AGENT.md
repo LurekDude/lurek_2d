@@ -7,7 +7,7 @@
 | **Tier** | Tier 2 — Engine Extension |
 | **Imports** | `math` (Vec2, Rect, Color), `engine` (log_messages) |
 | **Peer deps** | None (no Tier 2 ↔ Tier 2 cross-imports) |
-| **Lua namespace** | `luna.tilemap` |
+| **Lua namespace** | `lurek.tilemap` |
 | **API file** | `src/lua_api/tilemap_api.rs` |
 | **Test files** | `tests/rust/unit/tilemap_tests.rs` (159 tests), `tests/lua/unit/test_tilemap.lua` (151 tests), `tests/lua/integration/test_tilemap_physics.lua`, `tests/lua/integration/test_tilemap_physics2.lua`, `tests/lua/stress/test_tilemap_stress.lua`, `tests/lua/stress/test_tilemap_stress2.lua` |
 
@@ -36,6 +36,6 @@ The `tilemap` module provides a comprehensive tilemap toolkit for 2D game develo
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/tilemap.md`](../../specs/tilemap.md)
+→ [`docs/specs/tilemap.md`](../../docs/specs/tilemap.md)
 
-_Update both this file **and** `specs/tilemap.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/tilemap.md` whenever source files, public types, or Lua bindings change._

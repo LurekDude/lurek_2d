@@ -40,17 +40,17 @@ print("================")
 
 describe("newSequencer", function()
     it("creates a sequencer", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_type(seq, "userdata", "sequencer")
     end)
 
     it("has type Sequencer", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_eq(seq:type(), "Sequencer")
     end)
 
     it("typeOf Object", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_eq(seq:typeOf("Object"), true)
         expect_eq(seq:typeOf("Sequencer"), true)
         expect_eq(seq:typeOf("Image"), false)
@@ -59,24 +59,24 @@ end)
 
 describe("initial state", function()
     it("starts idle", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_eq(seq:getState(), "idle")
     end)
 
     it("is not active", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_eq(seq:isActive(), false)
     end)
 
     it("default speed is 30", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         expect_eq(seq:getSpeed(), 30)
     end)
 end)
 
 describe("load and start", function()
     it("loads a say node and starts typing", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "say", speaker = "Alice", text = "Hello world" },
         })
@@ -88,7 +88,7 @@ describe("load and start", function()
     end)
 
     it("handles empty script gracefully", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({})
         seq:start()
         expect_eq(seq:getState(), "done")
@@ -98,13 +98,13 @@ end)
 
 describe("setSpeed / getSpeed", function()
     it("changes typing speed", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(60)
         expect_eq(seq:getSpeed(), 60)
     end)
 
     it("speed 0 means instant reveal", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
         seq:load({
             { type = "say", speaker = "X", text = "Instant" },
@@ -117,7 +117,7 @@ end)
 
 describe("advance and skip", function()
     it("skip goes from typing to waiting", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "say", speaker = "A", text = "Hello" },
         })
@@ -129,7 +129,7 @@ describe("advance and skip", function()
     end)
 
     it("advance from typing skips to waiting", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "say", speaker = "A", text = "Hello" },
         })
@@ -139,7 +139,7 @@ describe("advance and skip", function()
     end)
 
     it("advance from waiting goes to next node", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "say", speaker = "A", text = "First" },
             { type = "say", speaker = "B", text = "Second" },
@@ -153,7 +153,7 @@ describe("advance and skip", function()
     end)
 
     it("advance past last node goes to done", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
         seq:load({
             { type = "say", speaker = "A", text = "Only" },
@@ -167,7 +167,7 @@ end)
 
 describe("choice nodes", function()
     it("enters choice state", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "choice", text = "Pick one", options = {
                 { label = "Option A" },
@@ -181,7 +181,7 @@ describe("choice nodes", function()
     end)
 
     it("getChoiceLabels returns labels", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "choice", text = "Decide", options = {
                 { label = "Yes" },
@@ -198,7 +198,7 @@ describe("choice nodes", function()
     end)
 
     it("choose selects a branch", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
         seq:load({
             { type = "choice", text = "Pick", options = {
@@ -218,7 +218,7 @@ end)
 
 describe("wait nodes", function()
     it("enters paused state with timer", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "wait", time = 2.0 },
         })
@@ -230,7 +230,7 @@ end)
 describe("call nodes", function()
     it("invokes callback on start", function()
         local called = false
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:load({
             { type = "call", fn = function() called = true end },
         })
@@ -242,7 +242,7 @@ end)
 describe("events", function()
     it("fires line event on say node", function()
         local event_speaker, event_text = nil, nil
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:on("line", function(speaker, text)
             event_speaker = speaker
             event_text = text
@@ -257,7 +257,7 @@ describe("events", function()
 
     it("fires choice event", function()
         local choice_fired = false
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:on("choice", function() choice_fired = true end)
         seq:load({
             { type = "choice", text = "Pick", options = {
@@ -270,7 +270,7 @@ describe("events", function()
 
     it("fires finished event", function()
         local finished = false
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
         seq:on("finished", function() finished = true end)
         seq:load({
@@ -283,7 +283,7 @@ describe("events", function()
 
     it("off removes event handler", function()
         local count = 0
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:on("line", function() count = count + 1 end)
         seq:load({
             { type = "say", speaker = "A", text = "One" },
@@ -301,7 +301,7 @@ end)
 
 describe("update with dt", function()
     it("reveals characters over time", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10) -- 10 chars per second
         seq:load({
             { type = "say", speaker = "A", text = "Hello" },
@@ -317,7 +317,7 @@ describe("update with dt", function()
     end)
 
     it("transitions to waiting when fully revealed", function()
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10)
         seq:load({
             { type = "say", speaker = "A", text = "Hi" },
@@ -332,7 +332,7 @@ end)
 describe("full workflow", function()
     it("complete dialog sequence", function()
         local events = {}
-        local seq = luna.dialog.newSequencer()
+        local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0) -- instant for testing
 
         seq:on("line", function(speaker, text)

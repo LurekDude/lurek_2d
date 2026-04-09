@@ -9,12 +9,12 @@ A surgical workflow minigame where the player operates on a series of five patie
 - Click-region validation distinguishing the tool palette from the body area and the target zone
 - Multi-patient progression: completing one patient advances to the next automatically
 - Penalty / bonus scoring: score per patient is `200 − (complications × 30)`, floored at 50
-- `luna.gfx.drawCircle` and `drawRect` for all UI and body rendering
+- `lurek.gfx.drawCircle` and `drawRect` for all UI and body rendering
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/medical_sim
+cargo run -- content/demos/medical_sim
 ```
 
 ## Controls

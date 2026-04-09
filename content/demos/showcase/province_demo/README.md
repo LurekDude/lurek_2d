@@ -1,6 +1,6 @@
 # Province Demo
 
-Demonstrates the Luna2D province map system, inspired by Europa Universalis-style grand strategy games.
+Demonstrates the Lurek2D province map system, inspired by Europa Universalis-style grand strategy games.
 
 ## Features Shown
 
@@ -22,5 +22,5 @@ Demonstrates the Luna2D province map system, inspired by Europa Universalis-styl
 ## Run
 
 ```sh
-cargo run -- demos/province_demo
+cargo run -- content/demos/province_demo
 ```

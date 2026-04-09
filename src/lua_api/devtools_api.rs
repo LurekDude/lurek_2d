@@ -1,4 +1,4 @@
-//! Registers the `luna.devtools.*` runtime diagnostics and developer-tools API.
+//! Registers the `lurek.devtools.*` runtime diagnostics and developer-tools API.
 //!
 //! Thin Lua bridge that delegates to the [`devtools`][crate::devtools] domain module.
 //! All state management happens in [`crate::devtools`]; this file only converts
@@ -77,7 +77,7 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `luna.devtools.*`.
+/// Registers `lurek.devtools.*`.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let shared = Rc::new(RefCell::new(DevtoolsShared::new()));

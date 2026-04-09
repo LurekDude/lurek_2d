@@ -15,16 +15,16 @@ Scene table pattern, transitions, scene stacking, preloading, and cleanup for mu
 ```lua
 local title_scene = {}
 function title_scene.load()
-    title_scene.bg = luna.gfx.newImage("title_bg.png")
+    title_scene.bg = lurek.gfx.newImage("title_bg.png")
 end
 function title_scene.update(dt)
-    if luna.keyboard.isDown("return") then
+    if lurek.keyboard.isDown("return") then
         switch_scene(game_scene)
     end
 end
 function title_scene.draw()
-    luna.gfx.draw(title_scene.bg, 0, 0)
-    luna.gfx.print("Press ENTER", 300, 400)
+    lurek.gfx.draw(title_scene.bg, 0, 0)
+    lurek.gfx.print("Press ENTER", 300, 400)
 end
 function title_scene.unload()
     title_scene.bg = nil
@@ -92,16 +92,16 @@ end
 
 local function draw_transition()
     if not transition.active then return end
-    luna.gfx.setColor(0, 0, 0, transition.alpha)
-    luna.gfx.rectangle("fill", 0, 0, 800, 600)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(0, 0, 0, transition.alpha)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
 ## Engine Hooks
 
 ```lua
-function luna.process(dt)
+function lurek.process(dt)
     update_transition(dt)
     if not transition.active then
         local s = current_scene()
@@ -109,7 +109,7 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     local s = current_scene()
     if s and s.draw then s.draw() end
     draw_transition()
@@ -118,7 +118,7 @@ end
 
 ## Common Pitfalls
 
-- **Leaking callbacks** — if a scene registers `luna.keypressed`, clear it in `unload` or gate it with a scene check.
+- **Leaking callbacks** — if a scene registers `lurek.keypressed`, clear it in `unload` or gate it with a scene check.
 - **Drawing under overlay** — when a pause menu is pushed, still draw the game scene underneath. Iterate the stack bottom-up for draw.
 - **Transition skips load** — always call `new_scene.load()` between fade-out and fade-in, not after fade-in.
 - **Nil scene on empty stack** — guard `current_scene()` returns in update/draw.

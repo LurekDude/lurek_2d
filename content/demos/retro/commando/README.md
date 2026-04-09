@@ -5,9 +5,9 @@ Shoot enemy soldiers, throw grenades, and rescue POW prisoners.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — character sprites without textures
-- `luna.input.isKeyDown()` — 8-directional player movement
-- `luna.keypressed()` — shooting and grenade throwing
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — character sprites without textures
+- `lurek.input.isKeyDown()` — 8-directional player movement
+- `lurek.keypressed()` — shooting and grenade throwing
 - Procedural background tile scrolling
 - Basic enemy AI (move toward player + fire bullets)
 

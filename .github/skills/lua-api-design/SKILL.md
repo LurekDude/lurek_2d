@@ -1,20 +1,20 @@
 ---
 name: lua-api-design
-description: "Load this skill when designing or modifying the luna.* Lua API surface. It owns naming conventions, parameter patterns, callback contracts, and API consistency rules. Skip it for Rust internals or pure Lua scripting."
+description: "Load this skill when designing or modifying the lurek.* Lua API surface. It owns naming conventions, parameter patterns, callback contracts, and API consistency rules. Skip it for Rust internals or pure Lua scripting."
 ---
 
-# Lua API Design - Luna2D Engine
+# Lua API Design - Lurek2D Engine
 
 ## Load When
 
 - Creating or updating any `src/lua_api/*_api.rs` file
-- Adding a new `luna.*` function or UserData method
+- Adding a new `lurek.*` function or UserData method
 - Designing the API surface for a domain module
 - Code-reviewing a lua_api file
 
 ## Owns
 
-- `luna.*` namespace structure and naming conventions
+- `lurek.*` namespace structure and naming conventions
 - File structure, import order, section separator format
 - Inline closure docstring format (`@param`/`@return` - NEVER `# Parameters`/`# Returns`)
 - Registration pattern - ALL files MUST follow the pattern exactly
@@ -68,12 +68,12 @@ These are the canonical mlua patterns enforced in this codebase:
 ### 1. File Header
 
 ```rust
-//! `luna.<module>` - One-line description of what this module provides.
+//! `lurek.<module>` - One-line description of what this module provides.
 ```
 
 - Must be the first line of the file.
 - Format: `//!` + space + backtick-module-name + ` - ` + one sentence.
-- Module name must exactly match the key passed to `luna.set("module", tbl)`.
+- Module name must exactly match the key passed to `lurek.set("module", tbl)`.
 
 ### 2. Imports (exact order)
 
@@ -226,20 +226,20 @@ Clean up: `lua.remove_registry_value(key)?` in a `cancel`/`destroy` method.
 ### 6. Register Section
 
 ```rust
-/// Registers the `luna.<module>` API table with the Lua VM.
+/// Registers the `lurek.<module>` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // ... entries ...
 
-    luna.set("<module>", tbl)?;
+    lurek.set("<module>", tbl)?;
     Ok(())
 }
 ```
 
 - Signature is FIXED: `(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`
 - Table variable is ALWAYS named `tbl`.
-- Last two lines: `luna.set("<module>", tbl)?;` then `Ok(())`.
+- Last two lines: `lurek.set("<module>", tbl)?;` then `Ok(())`.
 
 ### 7. Function Entry Pattern (4-space indent in register)
 
@@ -399,7 +399,7 @@ Exit code `0` = pass. Exit code `1` = errors.
 | `/// @return any` | Too vague — use specific type |
 | Missing `/// @return` above single-line `tbl.set(` | Undocumented function |
 | No `//!` header | Missing module doc |
-| No `luna.set("module", tbl)` | Module not registered |
+| No `lurek.set("module", tbl)` | Module not registered |
 
 ## Anti-Patterns the Validator Does NOT Catch (verify manually)
 

@@ -1,7 +1,7 @@
 -- Physics Sandbox: Spawn, drag, and connect 2D physics objects
 -- C=circle R=rect, right-click=delete, drag=move, G=gravity,
 -- Space=pause, Delete=clear, J+click two=joint, B=bounce, +/-=size
--- Run with: cargo run -- demos/simulation/physics_sandbox
+-- Run with: cargo run -- content/demos/simulation/physics_sandbox
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -60,8 +60,8 @@ local function remove_object(idx)
     table.remove(objects, idx)
 end
 
-function luna.init()
-    world = luna.physics.newWorld(0, 400)
+function lurek.init()
+    world = lurek.physics.newWorld(0, 400)
 
     -- Ground
     local ground = world:newBody(SCREEN_W / 2, SCREEN_H - 10, "static")
@@ -74,12 +74,12 @@ function luna.init()
     world:addFixture(right:getId(), "rectangle", 1, 0.3, 0, false, 10, SCREEN_H)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if not paused then
         -- Wind
         if wind_on then
             for _, o in ipairs(objects) do
-                o.body:setVelocity(100 * math.sin(luna.time.getTime() * 2), 0)
+                o.body:setVelocity(100 * math.sin(lurek.time.getTime() * 2), 0)
             end
         end
 
@@ -88,7 +88,7 @@ function luna.process(dt)
 
     -- Dragging
     if dragging then
-        local mx, my = luna.mouse.getPosition()
+        local mx, my = lurek.mouse.getPosition()
         local ox, oy = dragging.body:getPosition()
         local fx = (mx - ox) * 15
         local fy = (my - oy) * 15
@@ -96,7 +96,7 @@ function luna.process(dt)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if button == 1 then
         if joint_mode then
             local idx, obj = find_object_at(mx, my)
@@ -124,11 +124,11 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.mousereleased(mx, my, button)
+function lurek.mousereleased(mx, my, button)
     if button == 1 then dragging = nil end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "c" then spawn_mode = "circle" end
     if key == "r" then spawn_mode = "rect" end
     if key == "g" then
@@ -156,61 +156,61 @@ function luna.keypressed(key)
     if key == "-" then
         spawn_size = clamp(spawn_size - 5, 10, 60)
     end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.1, 0.1, 0.12)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.12)
 
     -- Ground
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
 
     -- Joints
-    luna.gfx.setLineWidth(2)
+    lurek.gfx.setLineWidth(2)
     for _, j in ipairs(joints) do
         local ax, ay = j.a.body:getPosition()
         local bx, by = j.b.body:getPosition()
-        luna.gfx.setColor(0.6, 0.9, 0.3, 0.7)
-        luna.gfx.line(ax, ay, bx, by)
+        lurek.gfx.setColor(0.6, 0.9, 0.3, 0.7)
+        lurek.gfx.line(ax, ay, bx, by)
     end
-    luna.gfx.setLineWidth(1)
+    lurek.gfx.setLineWidth(1)
 
     -- Objects
     for _, o in ipairs(objects) do
         local ox, oy = o.body:getPosition()
 
         local cr, cg, cb = o.color[1], o.color[2], o.color[3]
-        luna.gfx.setColor(cr, cg, cb, 1)
+        lurek.gfx.setColor(cr, cg, cb, 1)
 
         if o.kind == "circle" then
-            luna.gfx.circle("fill", ox, oy, o.size)
-            luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            luna.gfx.circle("line", ox, oy, o.size)
+            lurek.gfx.circle("fill", ox, oy, o.size)
+            lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            lurek.gfx.circle("line", ox, oy, o.size)
         else
-            luna.gfx.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
-            luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            luna.gfx.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            lurek.gfx.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            lurek.gfx.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
         end
     end
 
     -- Joint mode indicator
     if joint_mode then
-        luna.gfx.setColor(0.3, 1, 0.3, 0.5)
+        lurek.gfx.setColor(0.3, 1, 0.3, 0.5)
         if joint_first then
             local ax, ay = joint_first.body:getPosition()
-            local mx, my = luna.mouse.getPosition()
-            luna.gfx.line(ax, ay, mx, my)
+            local mx, my = lurek.mouse.getPosition()
+            lurek.gfx.line(ax, ay, mx, my)
         end
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Objects: " .. #objects .. "  FPS: " .. luna.time.getFPS(), 10, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Objects: " .. #objects .. "  FPS: " .. lurek.time.getFPS(), 10, 10)
 
     -- Mode display
     local mode_text = "Mode: " .. spawn_mode:upper() .. "  Size: " .. spawn_size .. "  Bounce: " .. (math.floor(bounciness * 100)) .. "%"
-    luna.gfx.print(mode_text, 10, 30)
+    lurek.gfx.print(mode_text, 10, 30)
 
     -- Status flags
     local flags = {}
@@ -218,10 +218,10 @@ function luna.render()
     if wind_on then flags[#flags + 1] = "WIND" end
     if paused then flags[#flags + 1] = "PAUSED" end
     if joint_mode then flags[#flags + 1] = "JOINT" end
-    luna.gfx.setColor(0.8, 0.8, 0.3, 1)
-    luna.gfx.print(table.concat(flags, " | "), 10, 50)
+    lurek.gfx.setColor(0.8, 0.8, 0.3, 1)
+    lurek.gfx.print(table.concat(flags, " | "), 10, 50)
 
     -- Controls
-    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
-    luna.gfx.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+    lurek.gfx.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
 end

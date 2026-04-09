@@ -1,6 +1,5 @@
 -- examples/physics.lua
--- Luna2D luna.physics API Reference
--- This file is documentation code, not a runnable game.
+-- Lurek2D lurek.physics API Reference
 -- Demonstrates world creation, bodies, shapes, joints, queries, and events.
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -9,7 +8,7 @@
 
 -- Create a world with gravity (pixels-per-second² in each axis)
 -- Positive Y is downward in screen space.
-local world = luna.physics.newWorld(0, 980)  -- standard Earth gravity
+local world = lurek.physics.newWorld(0, 980)  -- standard Earth gravity
 
 -- Scale factor: how many pixels equal 1 physics metre (default = 64)
 world:setMeter(64)
@@ -23,8 +22,8 @@ local m  = world:toPhysics(96)    -- 96 pixels  → metres
 world:setGravity(0, 0)
 local gx, gy = world:getGravity()
 
--- Step the simulation (call once per frame from luna.process)
-function luna.process(dt)
+-- Step the simulation (call once per frame from lurek.process)
+function lurek.process(dt)
     world:step(dt)
 end
 
@@ -33,9 +32,9 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Body types:
---   "dynamic"  — fully simulated; affected by gravity and forces
---   "static"   — immovable; used for terrain, walls, platforms
---   "kinematic"— moved manually via setPosition/setVelocity; ignores gravity
+"dynamic"  -- fully simulated; affected by gravity and forces
+"static"  -- immovable; used for terrain, walls, platforms
+"kinematic"  -- moved manually via setPosition/setVelocity; ignores gravity
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Creating Bodies
@@ -207,10 +206,10 @@ local body_ids   = world:getBodyIds()  -- table of numeric ids
 
 -- Destroy a body by id (removes it from the simulation)
 local enemy_id = ball:getId()
--- world:destroyBody(enemy_id)
+world:destroyBody(enemy_id)
 
 -- Remove all bodies and joints
--- world:clear()
+world:clear()
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Joints
@@ -252,7 +251,7 @@ local motor_id = world:addMotorJoint(id_a, id_b, 0.5)  -- correction factor
 local mouse_id = world:addMouseJoint(id_a, 300, 200, 5000)  -- max force
 
 -- Pulley joint (rope over a pulley)
--- local pulley_id = world:addPulleyJoint(id_a, id_b, gax, gay, gbx, gby, ax, ay, bx, by, ratio)
+local pulley_id = world:addPulleyJoint(id_a, id_b, gax, gay, gbx, gby, ax, ay, bx, by, ratio)
 
 -- ── Joint Management ────────────────────────────────────────────────────────
 
@@ -267,7 +266,7 @@ local ba_id, bb_id = world:getJointBodies(rev_id)
 local jtype = world:getJointType(rev_id)
 
 -- Destroy a joint
--- world:destroyJoint(rope_id)
+world:destroyJoint(rope_id)
 
 -- ── Motor / Limit Controls (for hinges, sliders) ──────────────────────────
 
@@ -310,7 +309,7 @@ end
 -- Collision Events (process AFTER world:step)
 -- ─────────────────────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     world:step(dt)
 
     -- All contacts currently active (pair per step)
@@ -348,7 +347,7 @@ end
 player:setFilterData(0x0002, 0x0001 | 0x0004)
 
 -- Enemy: category=4, collide with player (2) and terrain (1)
--- ball:setFilterData(0x0004, 0x0002 | 0x0001)
+ball:setFilterData(0x0004, 0x0002 | 0x0001)
 
 -- ─── Body ──────────────────────────────────────────────────────────────────────
 
@@ -374,18 +373,18 @@ local bounding_box = physicsshape:getBoundingBox()  -- Returns the axis-aligned 
 local radius = physicsshape:getRadius()  -- Returns the radius. Only valid for circle shapes
 local type_val = physicsshape:getType()  -- Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain"
 
--- ─── luna.physics ──────────────────────────────────────────────────────────────
-luna.physics.attachShape(body, shape)  -- Attaches a standalone shape to a body as an additional fixture
-luna.physics.destroyWorld(world)  -- Marks a physics world for destruction. Subsequent operations on the world
-local body = luna.physics.getBody(world, body)  -- Returns the position and velocity of a body (x, y, vx, vy)
-local collisions = luna.physics.getCollisions(world)  -- Returns all collision events from the last simulation step
-local is_sleeping_allowed = luna.physics.isSleepingAllowed(world, body)  -- Returns whether the body is allowed to sleep
-local body = luna.physics.newBody(world, 1.0, 1.0, "type")  -- Creates a new rectangular body in the given world
-local chain_shape = luna.physics.newChainShape(false)  -- Creates a chain shape userdata from flat variadic vertex pairs
-local circle_shape = luna.physics.newCircleShape(1.0)  -- Creates a circle shape userdata
-local edge_shape = luna.physics.newEdgeShape(1.0, 1.0, 1.0, 1.0)  -- Creates an edge (line segment) shape userdata
-local polygon_shape = luna.physics.newPolygonShape()  -- Creates a convex polygon shape userdata from flat variadic vertex pairs
-local rectangle_shape = luna.physics.newRectangleShape(1.0, 1.0)  -- Creates a rectangle shape userdata
-luna.physics.setBodyVelocity(world, body, 1.0, 1.0)  -- Sets the velocity of a body
-luna.physics.setSleepingAllowed(world, body, false)  -- Sets whether the body is allowed to sleep
-luna.physics.step(world, 1.0)  -- Advances the physics world by dt seconds
+-- ─── lurek.physics ──────────────────────────────────────────────────────────────
+lurek.physics.attachShape(body, shape)  -- Attaches a standalone shape to a body as an additional fixture
+lurek.physics.destroyWorld(world)  -- Marks a physics world for destruction. Subsequent operations on the world
+local body = lurek.physics.getBody(world, body)  -- Returns the position and velocity of a body (x, y, vx, vy)
+local collisions = lurek.physics.getCollisions(world)  -- Returns all collision events from the last simulation step
+local is_sleeping_allowed = lurek.physics.isSleepingAllowed(world, body)  -- Returns whether the body is allowed to sleep
+local body = lurek.physics.newBody(world, 1.0, 1.0, "type")  -- Creates a new rectangular body in the given world
+local chain_shape = lurek.physics.newChainShape(false)  -- Creates a chain shape userdata from flat variadic vertex pairs
+local circle_shape = lurek.physics.newCircleShape(1.0)  -- Creates a circle shape userdata
+local edge_shape = lurek.physics.newEdgeShape(1.0, 1.0, 1.0, 1.0)  -- Creates an edge (line segment) shape userdata
+local polygon_shape = lurek.physics.newPolygonShape()  -- Creates a convex polygon shape userdata from flat variadic vertex pairs
+local rectangle_shape = lurek.physics.newRectangleShape(1.0, 1.0)  -- Creates a rectangle shape userdata
+lurek.physics.setBodyVelocity(world, body, 1.0, 1.0)  -- Sets the velocity of a body
+lurek.physics.setSleepingAllowed(world, body, false)  -- Sets whether the body is allowed to sleep
+lurek.physics.step(world, 1.0)  -- Advances the physics world by dt seconds

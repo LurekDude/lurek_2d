@@ -1,4 +1,4 @@
-//! `luna.camera` — Camera2D creation and manipulation for 2D viewport control.
+//! `lurek.camera` — Camera2D creation and manipulation for 2D viewport control.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -224,7 +224,7 @@ impl LuaUserData for LuaCamera2D {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.camera` API table with the Lua VM.
+/// Registers the `lurek.camera` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

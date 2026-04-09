@@ -10,7 +10,7 @@
 |---|---|---|---|
 | 0 | Spike & Migration Audit | No engine code; research only | YAML→TOML feasibility confirmed; algorithm gaps in math identified |
 | 1 | Flat Kernel Core | Rust types + spec + compiler + basic tick | A flat graph of 3+ blocks runs headlessly end-to-end with Rust tests |
-| 2 | Lua Bridge + Basic API | Bridge + lifecycle + step + inspect | `luna.sim.create/step/run/snapshot/destroy` all work; Lua BDD tests pass |
+| 2 | Lua Bridge + Basic API | Bridge + lifecycle + step + inspect | `lurek.sim.create/step/run/snapshot/destroy` all work; Lua BDD tests pass |
 | 3 | Monitor & Event Log | Monitor engine + event log + drain API | All 21 monitor types sample correctly; alert thresholds fire; Lua drain works |
 | 4 | Anomaly Engine | Full anomaly lifecycle + all 8 effect types | Anomaly inject/expire, cascade, block-effect, and event log work; headless tests green |
 | 5 | Operational Mechanics | DLQ, approval, circuit breaker, replay, checkpoint | All operational lifecycle tests pass; poll-step approval pattern documented |
@@ -75,7 +75,7 @@
 
 ## Phase 2 — Lua Bridge + Basic API
 
-**Scope:** `src/lua_api/blocksim_api.rs` created. Registered in `src/lua_api/mod.rs` behind `modules.blocksim` flag. `luna.sim.create`, `luna.sim.step`, `luna.sim.run`, `luna.sim.snapshot`, `luna.sim.destroy`, `luna.sim.validate_spec`, `luna.sim.load_toml` implemented.
+**Scope:** `src/lua_api/blocksim_api.rs` created. Registered in `src/lua_api/mod.rs` behind `modules.blocksim` flag. `lurek.sim.create`, `lurek.sim.step`, `lurek.sim.run`, `lurek.sim.snapshot`, `lurek.sim.destroy`, `lurek.sim.validate_spec`, `lurek.sim.load_toml` implemented.
 
 **New files:**
 `src/lua_api/blocksim_api.rs`
@@ -87,13 +87,13 @@
 `tests/lua/unit/test_blocksim.lua` (+ entry in `tests/lua/harness.rs`)
 
 **Acceptance gates:**
-- [ ] `luna.sim.create(spec)` accepts a Lua table, returns a sim userdata
-- [ ] `luna.sim.step(sim, 10)` returns a stats table
-- [ ] `luna.sim.run(sim)` runs to natural end
-- [ ] `luna.sim.snapshot(sim)` returns a Lua table with `tick`, `blocks` subtable
-- [ ] `luna.sim.destroy(sim)` does not panic or leak
-- [ ] `luna.sim.validate_spec(bad_spec)` returns `nil, err_table` with field names
-- [ ] `modules.blocksim = false` in config → `luna.sim` is nil; logs clear warning
+- [ ] `lurek.sim.create(spec)` accepts a Lua table, returns a sim userdata
+- [ ] `lurek.sim.step(sim, 10)` returns a stats table
+- [ ] `lurek.sim.run(sim)` runs to natural end
+- [ ] `lurek.sim.snapshot(sim)` returns a Lua table with `tick`, `blocks` subtable
+- [ ] `lurek.sim.destroy(sim)` does not panic or leak
+- [ ] `lurek.sim.validate_spec(bad_spec)` returns `nil, err_table` with field names
+- [ ] `modules.blocksim = false` in config → `lurek.sim` is nil; logs clear warning
 - [ ] Lua BDD test file has ≥ 10 passing tests
 - [ ] `cargo test --test lua_tests lua_test_unit_blocksim` green
 
@@ -105,7 +105,7 @@
 
 ## Phase 3 — Monitor and Event Log
 
-**Scope:** `monitor.rs` implemented with phase-8 sampling. `event_log.rs` implemented. `luna.sim.drain_monitors`, `luna.sim.peek_monitors`, `luna.sim.drain_events` added to bridge.
+**Scope:** `monitor.rs` implemented with phase-8 sampling. `event_log.rs` implemented. `lurek.sim.drain_monitors`, `lurek.sim.peek_monitors`, `lurek.sim.drain_events` added to bridge.
 
 **New files:** `src/blocksim/monitor.rs` `src/blocksim/event_log.rs`
 
@@ -113,7 +113,7 @@
 - [ ] All 21 monitor types can be declared and return samples
 - [ ] Alert threshold rules (`gt`, `lt`, `eq`, `ne`, `between`) fire correctly
 - [ ] Monitor buffer is a ring buffer; exceeding max-samples does not panic
-- [ ] `luna.sim.drain_monitors()` returns correctly shaped Lua tables
+- [ ] `lurek.sim.drain_monitors()` returns correctly shaped Lua tables
 - [ ] Rust test: monitor values match hand-calculated expected values for a known spec
 - [ ] Lua BDD: monitor declared, sim run 100 ticks, drain returns at least one sample per monitor
 
@@ -125,7 +125,7 @@
 
 ## Phase 4 — Anomaly Engine
 
-**Scope:** `anomaly.rs` implemented with all lifecycle states (`Inactive/Active/Expired/Blocked/Cascade`). All 8 effect types implemented. `luna.sim.inject_anomaly`, `luna.sim.expire_anomaly`, `luna.sim.anomaly_status` added.
+**Scope:** `anomaly.rs` implemented with all lifecycle states (`Inactive/Active/Expired/Blocked/Cascade`). All 8 effect types implemented. `lurek.sim.inject_anomaly`, `lurek.sim.expire_anomaly`, `lurek.sim.anomaly_status` added.
 
 **New files:** `src/blocksim/anomaly.rs`
 
@@ -150,9 +150,9 @@
 
 **Acceptance gates:**
 - [ ] Approval hold stops item at block; other blocks continue processing
-- [ ] `luna.sim.pending_approvals()` returns held items; `luna.sim.approve()` releases them
-- [ ] `luna.sim.reject()` sends item to DLQ
-- [ ] DLQ captures overflow items; `luna.sim.replay_dlq()` re-injects correctly
+- [ ] `lurek.sim.pending_approvals()` returns held items; `lurek.sim.approve()` releases them
+- [ ] `lurek.sim.reject()` sends item to DLQ
+- [ ] DLQ captures overflow items; `lurek.sim.replay_dlq()` re-injects correctly
 - [ ] Circuit breaker transitions: CLOSED → OPEN on consecutive failures; HALF_OPEN on probe; CLOSED on recovery
 - [ ] Checkpoint save + restore: two runs from the same checkpoint produce identical monitor samples (determinism test)
 
@@ -221,7 +221,7 @@
 
 ## Phase 9 — Integration and Examples
 
-**Scope:** End-to-end integration tests. `examples/blocksim.lua` single-file example. Integration test across `blocksim` + `dataframe` + `thread`. Demo app using `luna.sim` + `luna.terminal` as a text-mode dashboard.
+**Scope:** End-to-end integration tests. `examples/blocksim.lua` single-file example. Integration test across `blocksim` + `dataframe` + `thread`. Demo app using `lurek.sim` + `lurek.terminal` as a text-mode dashboard.
 
 **New files:** `examples/blocksim.lua` `tests/lua/integration/test_blocksim_dataframe.lua` `demos/block_sim_demo/` (optional)
 
@@ -236,7 +236,7 @@
 
 ## Phase 10 — Performance and Polish
 
-**Scope:** Benchmark the hot tick path. Profile if below 10k ticks/second for a 50-block graph. Document full `luna.sim.*` API. Spec validation error messages improved. AGENT.md and specs/blocksim.md written.
+**Scope:** Benchmark the hot tick path. Profile if below 10k ticks/second for a 50-block graph. Document full `lurek.sim.*` API. Spec validation error messages improved. AGENT.md and specs/blocksim.md written.
 
 **Acceptance gates:**
 - [ ] Benchmark result ≥ 10k ticks/s (50-block flat graph, 5 monitors, no anomalies)

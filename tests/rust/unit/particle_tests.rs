@@ -4,10 +4,10 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::graphics::renderer::{DrawCommand, ParticleRenderShape};
-use luna2d::lua_api::{create_lua_vm, SharedState};
-use luna2d::particle::{
+use lurek2d::engine::config::Config;
+use lurek2d::graphics::renderer::{DrawCommand, ParticleRenderShape};
+use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::particle::{
     interpolate_colors, interpolate_sizes, AreaDistribution, EmissionShape, InsertMode,
     ParticleConfig, ParticleShape, ParticleSystem, RelativeMode,
 };
@@ -59,44 +59,44 @@ fn test_phase01_released_particle_handle_reuse_reports_invalid_system() {
 fn test_phase01_released_particle_long_tail_accessors_report_invalid_system() {
     let cases = [
         (
-            "luna.particles.getEmitterLifetime(released)",
-            "luna.particles.getEmitterLifetime: invalid or already-released particle system handle",
+            "lurek.particles.getEmitterLifetime(released)",
+            "lurek.particles.getEmitterLifetime: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getDirection(released)",
-            "luna.particles.getDirection: invalid or already-released particle system handle",
+            "lurek.particles.getDirection(released)",
+            "lurek.particles.getDirection: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getSpread(released)",
-            "luna.particles.getSpread: invalid or already-released particle system handle",
+            "lurek.particles.getSpread(released)",
+            "lurek.particles.getSpread: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getLinearAcceleration(released)",
-            "luna.particles.getLinearAcceleration: invalid or already-released particle system handle",
+            "lurek.particles.getLinearAcceleration(released)",
+            "lurek.particles.getLinearAcceleration: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getRadialAcceleration(released)",
-            "luna.particles.getRadialAcceleration: invalid or already-released particle system handle",
+            "lurek.particles.getRadialAcceleration(released)",
+            "lurek.particles.getRadialAcceleration: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getTangentialAcceleration(released)",
-            "luna.particles.getTangentialAcceleration: invalid or already-released particle system handle",
+            "lurek.particles.getTangentialAcceleration(released)",
+            "lurek.particles.getTangentialAcceleration: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getSizes(released)",
-            "luna.particles.getSizes: invalid or already-released particle system handle",
+            "lurek.particles.getSizes(released)",
+            "lurek.particles.getSizes: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getColors(released)",
-            "luna.particles.getColors: invalid or already-released particle system handle",
+            "lurek.particles.getColors(released)",
+            "lurek.particles.getColors: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getInsertMode(released)",
-            "luna.particles.getInsertMode: invalid or already-released particle system handle",
+            "lurek.particles.getInsertMode(released)",
+            "lurek.particles.getInsertMode: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.getBufferSize(released)",
-            "luna.particles.getBufferSize: invalid or already-released particle system handle",
+            "lurek.particles.getBufferSize(released)",
+            "lurek.particles.getBufferSize: invalid or already-released particle system handle",
         ),
     ];
 
@@ -120,16 +120,16 @@ fn test_phase01_released_particle_long_tail_accessors_report_invalid_system() {
 fn test_phase01_released_particle_long_tail_mutators_report_invalid_system() {
     let cases = [
         (
-            "luna.particles.setEmitterLifetime(released, 5.0)",
-            "luna.particles.setEmitterLifetime: invalid or already-released particle system handle",
+            "lurek.particles.setEmitterLifetime(released, 5.0)",
+            "lurek.particles.setEmitterLifetime: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.setDirection(released, 1.25)",
-            "luna.particles.setDirection: invalid or already-released particle system handle",
+            "lurek.particles.setDirection(released, 1.25)",
+            "lurek.particles.setDirection: invalid or already-released particle system handle",
         ),
         (
-            "luna.particles.setSizes(released, 1, 2)",
-            "luna.particles.setSizes: invalid or already-released particle system handle",
+            "lurek.particles.setSizes(released, 1, 2)",
+            "lurek.particles.setSizes: invalid or already-released particle system handle",
         ),
     ];
 
@@ -1493,10 +1493,10 @@ fn interpolate_colors_empty_returns_white() {
 #[test]
 fn particle_files_are_split() {
     // Verify each sub-module is publicly reachable from the crate.
-    use luna2d::particle::config::ParticleConfig as _Cfg;
-    use luna2d::particle::emitter::ParticleSystem as _Sys;
-    use luna2d::particle::math::interpolate_sizes as _IS;
-    use luna2d::particle::shapes::ParticleShape as _Shape;
+    use lurek2d::particle::config::ParticleConfig as _Cfg;
+    use lurek2d::particle::emitter::ParticleSystem as _Sys;
+    use lurek2d::particle::math::interpolate_sizes as _IS;
+    use lurek2d::particle::shapes::ParticleShape as _Shape;
     let _ = _IS(&[], 0.0, 0.0);
     let _ = _Cfg::default();
     let _ = _Sys::new(_Cfg::default());
@@ -1558,8 +1558,8 @@ fn particle_lua_default_shape_is_square() {
 
 // ── Trail ──────────────────────────────────────────────────────────────────
 
-use luna2d::math::Color;
-use luna2d::particle::Trail;
+use lurek2d::math::Color;
+use lurek2d::particle::Trail;
 
 #[test]
 fn trail_new_starts_empty() {

@@ -1,4 +1,4 @@
-# Lua API Design — `luna.sim.*`
+# Lua API Design — `lurek.sim.*`
 
 > See also: [ARCHITECTURE.md](ARCHITECTURE.md) · [RUST-MODULE-DESIGN.md](RUST-MODULE-DESIGN.md) · [CONFIG-DECOMPOSITION.md](CONFIG-DECOMPOSITION.md)
 
@@ -6,10 +6,10 @@
 
 ## 1. Design Principles
 
-- All functions live under `luna.sim.*` — no bare globals, no external prefixes.
-- The API is **synchronous from the script's perspective**. `luna.sim.step(n)` blocks until n ticks are complete.
-- Callbacks are optional. A blank script that just calls `luna.sim.create(spec)` and `luna.sim.run(sim)` is valid.
-- Background batch runs use `luna.thread` with channels — the simulation kernel itself is not threaded.
+- All functions live under `lurek.sim.*` — no bare globals, no external prefixes.
+- The API is **synchronous from the script's perspective**. `lurek.sim.step(n)` blocks until n ticks are complete.
+- Callbacks are optional. A blank script that just calls `lurek.sim.create(spec)` and `lurek.sim.run(sim)` is valid.
+- Background batch runs use `lurek.thread` with channels — the simulation kernel itself is not threaded.
 - Sensible defaults everywhere. A beginner should not need to specify more than `blocks` and `edges` for a working scenario.
 - Errors return `nil, err_string` (two-return convention) rather than throwing whenever the operation is recoverable.
 
@@ -17,36 +17,36 @@
 
 ## 2. Lifecycle API
 
-### `luna.sim.create(spec) → sim, err`
+### `lurek.sim.create(spec) → sim, err`
 
 Create a new simulation instance from a spec table. Parses, validates, and compiles the spec on the Rust side.
 
 ```lua
-local sim, err = luna.sim.create({
+local sim, err = lurek.sim.create({
     blocks = { ... },
     edges  = { ... },
 })
 if not sim then error(err) end
 ```
 
-### `luna.sim.destroy(sim)`
+### `lurek.sim.destroy(sim)`
 
 Explicitly free the simulation. Happens automatically on GC if not called.
 
-### `luna.sim.load_toml(toml_string) → sim, err`
+### `lurek.sim.load_toml(toml_string) → sim, err`
 
-Convenience: parse a TOML string (e.g., from `luna.data.parseToml` or a file read) into a spec and create the simulation in one call.
+Convenience: parse a TOML string (e.g., from `lurek.data.parseToml` or a file read) into a spec and create the simulation in one call.
 
 ```lua
-local source = luna.fs.read("scenarios/factory.toml")
-local sim, err = luna.sim.load_toml(source)
+local source = lurek.fs.read("scenarios/factory.toml")
+local sim, err = lurek.sim.load_toml(source)
 ```
 
-### `luna.sim.save_checkpoint(sim) → checkpoint_string, err`
+### `lurek.sim.save_checkpoint(sim) → checkpoint_string, err`
 
-Serialize the full current runtime state to an opaque string. Pass back to `luna.sim.restore_checkpoint` to replay from exactly this tick.
+Serialize the full current runtime state to an opaque string. Pass back to `lurek.sim.restore_checkpoint` to replay from exactly this tick.
 
-### `luna.sim.restore_checkpoint(sim, checkpoint_string) → ok, err`
+### `lurek.sim.restore_checkpoint(sim, checkpoint_string) → ok, err`
 
 Restore a simulation runtime from a previously saved checkpoint. The `ExecutionPlan` (compiled spec) is reused; only runtime state is replaced.
 
@@ -54,12 +54,12 @@ Restore a simulation runtime from a previously saved checkpoint. The `ExecutionP
 
 ## 3. Step and Run API
 
-### `luna.sim.step(sim, n) → stats, err`
+### `lurek.sim.step(sim, n) → stats, err`
 
 Advance the simulation by `n` ticks. Returns a summary stats table.
 
 ```lua
-local stats, err = luna.sim.step(sim, 100)
+local stats, err = lurek.sim.step(sim, 100)
 -- stats.ticks_run     int
 -- stats.items_emitted int
 -- stats.items_sinked  int
@@ -70,21 +70,21 @@ local stats, err = luna.sim.step(sim, 100)
 -- stats.dlq_depth int
 ```
 
-### `luna.sim.run(sim) → stats, err`
+### `lurek.sim.run(sim) → stats, err`
 
 Run to natural end (all sources drained and all queues empty) or to the configured max_ticks limit.
 
-### `luna.sim.run_until(sim, condition_fn) → stats, err`
+### `lurek.sim.run_until(sim, condition_fn) → stats, err`
 
 Run until `condition_fn(snapshot)` returns true or natural end is reached.
 
 ```lua
-local stats, err = luna.sim.run_until(sim, function(snap)
+local stats, err = lurek.sim.run_until(sim, function(snap)
     return snap.sink_total >= 1000
 end)
 ```
 
-### `luna.sim.reset(sim) → ok, err`
+### `lurek.sim.reset(sim) → ok, err`
 
 Reset to tick 0 without recompiling the spec. Clears all queues, counters, monitor buffers, anomaly state.
 
@@ -92,12 +92,12 @@ Reset to tick 0 without recompiling the spec. Clears all queues, counters, monit
 
 ## 4. Inspection API
 
-### `luna.sim.snapshot(sim) → table`
+### `lurek.sim.snapshot(sim) → table`
 
 Return a shallow snapshot of the entire current simulation state as a Lua table.
 
 ```lua
-local snap = luna.sim.snapshot(sim)
+local snap = lurek.sim.snapshot(sim)
 -- snap.tick             int
 -- snap.running          bool
 -- snap.blocks           {[block_id] = BlockSnap}
@@ -113,11 +113,11 @@ local snap = luna.sim.snapshot(sim)
 -- .utilization          float  (0..1)
 ```
 
-### `luna.sim.block_state(sim, block_id) → table, err`
+### `lurek.sim.block_state(sim, block_id) → table, err`
 
 Returns detailed state for one block only (cheaper than a full snapshot for targeted inspection).
 
-### `luna.sim.tick(sim) → int`
+### `lurek.sim.tick(sim) → int`
 
 Returns the current tick counter.
 
@@ -125,12 +125,12 @@ Returns the current tick counter.
 
 ## 5. Monitor API
 
-### `luna.sim.drain_monitors(sim) → {MonitorSample}`
+### `lurek.sim.drain_monitors(sim) → {MonitorSample}`
 
 Return and clear the current monitor sample buffer as a Lua array. Each element is a table:
 
 ```lua
-local samples = luna.sim.drain_monitors(sim)
+local samples = lurek.sim.drain_monitors(sim)
 for _, s in ipairs(samples) do
     -- s.monitor_id  string
     -- s.tick        int
@@ -140,7 +140,7 @@ for _, s in ipairs(samples) do
 end
 ```
 
-### `luna.sim.peek_monitors(sim) → {MonitorSample}`
+### `lurek.sim.peek_monitors(sim) → {MonitorSample}`
 
 Same as `drain_monitors` but does not clear the buffer.
 
@@ -148,15 +148,15 @@ Same as `drain_monitors` but does not clear the buffer.
 
 ## 6. Anomaly API
 
-### `luna.sim.inject_anomaly(sim, anomaly_id) → ok, err`
+### `lurek.sim.inject_anomaly(sim, anomaly_id) → ok, err`
 
 Manually force-activate a declared anomaly by id, bypassing its trigger condition. Useful for testing specific failure scenarios.
 
-### `luna.sim.expire_anomaly(sim, anomaly_id) → ok, err`
+### `lurek.sim.expire_anomaly(sim, anomaly_id) → ok, err`
 
 Force-expire an active anomaly immediately.
 
-### `luna.sim.anomaly_status(sim) → {[anomaly_id] = status_string}`
+### `lurek.sim.anomaly_status(sim) → {[anomaly_id] = status_string}`
 
 Returns `"inactive"`, `"active"`, `"blocked"`, or `"expired"` for all anomalies declared in the spec.
 
@@ -164,12 +164,12 @@ Returns `"inactive"`, `"active"`, `"blocked"`, or `"expired"` for all anomalies 
 
 ## 7. Approval API
 
-### `luna.sim.pending_approvals(sim) → {ApprovalRequest}`
+### `lurek.sim.pending_approvals(sim) → {ApprovalRequest}`
 
 Return all items currently waiting for approval:
 
 ```lua
-local reqs = luna.sim.pending_approvals(sim)
+local reqs = lurek.sim.pending_approvals(sim)
 for _, r in ipairs(reqs) do
     -- r.approval_id  string
     -- r.block_id     string
@@ -179,11 +179,11 @@ for _, r in ipairs(reqs) do
 end
 ```
 
-### `luna.sim.approve(sim, approval_id) → ok, err`
+### `lurek.sim.approve(sim, approval_id) → ok, err`
 
 Release a held item, allowing it to proceed to the next block.
 
-### `luna.sim.reject(sim, approval_id, reason) → ok, err`
+### `lurek.sim.reject(sim, approval_id, reason) → ok, err`
 
 Send the held item to the DLQ instead of proceeding.
 
@@ -191,19 +191,19 @@ Send the held item to the DLQ instead of proceeding.
 
 ## 8. DLQ and Replay API
 
-### `luna.sim.dlq_entries(sim) → {DlqEntry}`
+### `lurek.sim.dlq_entries(sim) → {DlqEntry}`
 
 Inspect all items currently in the dead-letter queue.
 
-### `luna.sim.replay_dlq(sim, entry_id) → ok, err`
+### `lurek.sim.replay_dlq(sim, entry_id) → ok, err`
 
 Re-inject a specific DLQ entry back into its original target block's input queue.
 
-### `luna.sim.replay_all_dlq(sim) → count, err`
+### `lurek.sim.replay_all_dlq(sim) → count, err`
 
 Re-inject all DLQ entries in FIFO order.
 
-### `luna.sim.clear_dlq(sim) → count`
+### `lurek.sim.clear_dlq(sim) → count`
 
 Remove all DLQ entries.
 
@@ -211,12 +211,12 @@ Remove all DLQ entries.
 
 ## 9. Event Log API
 
-### `luna.sim.drain_events(sim) → {SimEvent}`
+### `lurek.sim.drain_events(sim) → {SimEvent}`
 
 Return and clear the event log buffer:
 
 ```lua
-local events = luna.sim.drain_events(sim)
+local events = lurek.sim.drain_events(sim)
 for _, e in ipairs(events) do
     -- e.kind       string  e.g. "BLOCK_EXEC", "ANOMALY_ACTIVATED", "DLQ_CAPTURED"
     -- e.tick       int
@@ -230,15 +230,15 @@ end
 
 ## 10. Clock and Speed Control
 
-### `luna.sim.set_speed(sim, multiplier)`
+### `lurek.sim.set_speed(sim, multiplier)`
 
 Set the real-time speed multiplier (affects wall-clock display only; no effect in headless step mode).
 
-### `luna.sim.fast_forward(sim, target_tick) → stats, err`
+### `lurek.sim.fast_forward(sim, target_tick) → stats, err`
 
 Step from current tick to `target_tick` with full acceleration (no real-time throttling).
 
-### `luna.sim.set_calendar(sim, calendar_table) → ok, err`
+### `lurek.sim.set_calendar(sim, calendar_table) → ok, err`
 
 Override or update the simulation calendar (time-of-day, day-of-week, holiday tables).
 
@@ -246,16 +246,16 @@ Override or update the simulation calendar (time-of-day, day-of-week, holiday ta
 
 ## 11. Utility
 
-### `luna.sim.version() → string`
+### `lurek.sim.version() → string`
 
 Returns the blocksim kernel version string (for diagnostics).
 
-### `luna.sim.validate_spec(spec_table) → ok, err_table`
+### `lurek.sim.validate_spec(spec_table) → ok, err_table`
 
 Validate a spec table without compiling or creating a runtime. Returns an array of validation errors if any.
 
 ```lua
-local ok, errs = luna.sim.validate_spec(spec)
+local ok, errs = lurek.sim.validate_spec(spec)
 if not ok then
     for _, e in ipairs(errs) do
         print(e.field, e.message)
@@ -268,7 +268,7 @@ end
 ## 12. Example: Minimal Run
 
 ```lua
-local sim, err = luna.sim.create({
+local sim, err = lurek.sim.create({
     config = { max_ticks = 1000 },
     blocks = {
         { id = "source",    type = "source",    ports = {{ id = "out", side = "right", kind = "data" }},
@@ -287,16 +287,16 @@ local sim, err = luna.sim.create({
 })
 assert(sim, err)
 
-local stats = luna.sim.run(sim)
+local stats = lurek.sim.run(sim)
 print("Ticks:", stats.ticks_run)
 print("Sinked:", stats.items_sinked)
 
-local samples = luna.sim.drain_monitors(sim)
+local samples = lurek.sim.drain_monitors(sim)
 for _, s in ipairs(samples) do
     print(s.monitor_id, s.tick, s.value)
 end
 
-luna.sim.destroy(sim)
+lurek.sim.destroy(sim)
 ```
 
 ---
@@ -304,29 +304,29 @@ luna.sim.destroy(sim)
 ## 13. Example: Multi-run with Anomaly Comparison
 
 ```lua
-local spec = luna.data.parseToml(luna.fs.read("scenarios/factory.toml"))
+local spec = lurek.data.parseToml(lurek.fs.read("scenarios/factory.toml"))
 
 -- Baseline run
-local baseline, err = luna.sim.load_toml(luna.data.encodeToml(spec))
+local baseline, err = lurek.sim.load_toml(lurek.data.encodeToml(spec))
 assert(baseline, err)
-luna.sim.run(baseline)
-local baseline_samples = luna.sim.drain_monitors(baseline)
-luna.sim.destroy(baseline)
+lurek.sim.run(baseline)
+local baseline_samples = lurek.sim.drain_monitors(baseline)
+lurek.sim.destroy(baseline)
 
 -- Anomaly run
-local anomaly_spec = luna.data.mergeTable(spec, {
+local anomaly_spec = lurek.data.mergeTable(spec, {
     anomalies = {{ id = "machine_jam", type = "block_state", target = "press",
                    trigger = { after_tick = 300 }, effect = { pause = true },
                    expiry = { after_ticks = 50 } }}
 })
-local variant, err2 = luna.sim.create(anomaly_spec)
+local variant, err2 = lurek.sim.create(anomaly_spec)
 assert(variant, err2)
-luna.sim.run(variant)
-local variant_samples = luna.sim.drain_monitors(variant)
-luna.sim.destroy(variant)
+lurek.sim.run(variant)
+local variant_samples = lurek.sim.drain_monitors(variant)
+lurek.sim.destroy(variant)
 
--- Post-run comparison using luna.dataframe
-local df_base = luna.dataframe.fromArray(baseline_samples, {"monitor_id","tick","value"})
-local df_var  = luna.dataframe.fromArray(variant_samples,  {"monitor_id","tick","value"})
+-- Post-run comparison using lurek.dataframe
+local df_base = lurek.dataframe.fromArray(baseline_samples, {"monitor_id","tick","value"})
+local df_var  = lurek.dataframe.fromArray(variant_samples,  {"monitor_id","tick","value"})
 -- ... further analysis ...
 ```

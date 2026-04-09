@@ -64,12 +64,12 @@ function apply_shake(dt)
     return ox, oy
 end
 
-function luna.render()
+function lurek.render()
     local ox, oy = apply_shake(dt_global)
-    luna.gfx.push()
-    luna.gfx.translate(-cam.x + ox, -cam.y + oy)
+    lurek.gfx.push()
+    lurek.gfx.translate(-cam.x + ox, -cam.y + oy)
     -- draw world here
-    luna.gfx.pop()
+    lurek.gfx.pop()
 end
 ```
 

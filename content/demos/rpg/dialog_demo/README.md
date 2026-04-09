@@ -4,17 +4,17 @@ A dialog sequencer: typewriter text rendering, branching choices, and scripted e
 
 ## What It Demonstrates
 
-- `luna.dialog.newSequencer()` — create a dialog sequence runner
-- `luna.dialog.newNode()` — text, choice, event, and call node types
+- `lurek.dialog.newSequencer()` — create a dialog sequence runner
+- `lurek.dialog.newNode()` — text, choice, event, and call node types
 - Typewriter effect: revealing text character by character per frame
 - Choice menus: rendering option lists and handling selection
-- `luna.dialog.onEvent()` — callback when an event node fires
+- `lurek.dialog.onEvent()` — callback when an event node fires
 - Integrating dialog output into game state (log lines)
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/dialog_demo
+cargo run -- content/demos/dialog_demo
 ```
 
 ## Controls

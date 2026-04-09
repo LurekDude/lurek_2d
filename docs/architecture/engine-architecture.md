@@ -1,4 +1,4 @@
-# Luna2D — Engine Architecture
+# Lurek2D — Engine Architecture
 
 > **Source of truth** for the runtime module structure, rendering pipeline, and internal subsystem design.
 > Companion documents: [philosophy.md](philosophy.md) (principles + design assumptions) · [test-framework.md](test-framework.md) (test architecture).
@@ -15,7 +15,7 @@
 6. [Bridge Layer — lua_api](#bridge-layer--lua_api)
 7. [Tier 1 — Core Engine Subsystems](#tier-1--core-engine-subsystems)
 8. [Tier 2 — Reusable Engine Extensions](#tier-2--reusable-engine-extensions)
-9. [Tier 3 — Lunasome (library/)](#tier-3--lunasome-library)
+9. [Tier 3 — Lunasome (content/library/)](#tier-3--lunasome-library)
 10. [Boot Sequence](#boot-sequence)
 11. [Game Loop and Frame Model](#game-loop-and-frame-model)
 12. [State Architecture](#state-architecture)
@@ -43,9 +43,9 @@
 
 ## Overview
 
-Luna2D is a 2D game engine written in **Rust** that loads and executes **Lua** game scripts. It is an **AI-first** project — every API, every module, and every document is designed so that both humans and AI agents can use the engine effectively.
+Lurek2D is a 2D game engine written in **Rust** that loads and executes **Lua** game scripts. It is an **AI-first** project — every API, every module, and every document is designed so that both humans and AI agents can use the engine effectively.
 
-The engine provides a complete `luna.*` Lua API for graphics, audio, input, physics, windowing, filesystems, math, data processing, particles, multi-threading, scenes, tilemaps, pathfinding, and more. Games consist of a `main.lua` (and optionally `conf.lua`) loaded at startup from a game directory.
+The engine provides a complete `lurek.*` Lua API for graphics, audio, input, physics, windowing, filesystems, math, data processing, particles, multi-threading, scenes, tilemaps, pathfinding, and more. Games consist of a `main.lua` (and optionally `conf.lua`) loaded at startup from a game directory.
 
 **Runtime stack**: winit 0.30 (event loop + windowing) → wgpu 22 (GPU rendering via Vulkan/DX12/Metal) → mlua 0.9 (Lua scripting, vendored) → rapier2d 0.32 (physics) → rodio 0.17 (audio).
 
@@ -55,13 +55,13 @@ The engine provides a complete `luna.*` Lua API for graphics, audio, input, phys
 
 ## Project Identity
 
-Luna2D is a rebellion against bloated game engines. The project symbol tells the story:
+Lurek2D is a rebellion against bloated game engines. The project symbol tells the story:
 
 - **🌙 Moon (Luna/Lua)** — The scripting language is the heart. Lua means "moon" in Portuguese. The crescent moon in the logo represents the lightweight, elegant scripting layer that game creators interact with.
 - **⚙️ Gear (Rust)** — "Rdza" means "rust" in Polish. The gear symbolizes the Rust engine core — industrial-strength, memory-safe, zero-cost abstractions powering the runtime beneath the Lua surface.
 - **🟡 Pacman (Game Engine)** — The gear is shaped like a Pacman, representing the game engine that *consumes* game scripts and produces interactive experiences. It eats `main.lua` and runs your game.
-- **🤖 AI (Holistic Integration)** — Luna2D is an AI-first project. Every API is designed so a Copilot agent can use it correctly without a clarifying question. The VS Code extension, CAG layer, and documentation pipeline all serve AI-assisted development.
-- **🧊 Cube (The Goliath)** — The small cube orbiting the gear represents the industry giants — Unity, Unreal, Godot. Luna2D is David: a 20 MB engine that, powered by AI, can compete with multi-gigabyte engines. The cube orbits Luna2D, not the other way around.
+- **🤖 AI (Holistic Integration)** — Lurek2D is an AI-first project. Every API is designed so a Copilot agent can use it correctly without a clarifying question. The VS Code extension, CAG layer, and documentation pipeline all serve AI-assisted development.
+- **🧊 Cube (The Goliath)** — The small cube orbiting the gear represents the industry giants — Engine G, Engine H, Engine C. Lurek2D is David: a 20 MB engine that, powered by AI, can compete with multi-gigabyte engines. The cube orbits Lurek2D, not the other way around.
 
 **The thesis**: A single-binary game engine weighing 20 MB, powered by Lua scripting and Rust performance, augmented by AI at every layer, can deliver features that rival engines 100× its size. This is the fight: small, sharp, AI-augmented vs. large, sprawling, manual.
 
@@ -69,23 +69,23 @@ Luna2D is a rebellion against bloated game engines. The project symbol tells the
 
 ## Active Layer Model
 
-Luna2D uses an **active four-layer runtime model** plus one bridge layer. This is a **logical dependency model**, not a filesystem grouping scheme. Most Rust engine modules live in flat `src/<module>/` directories. The layer contract is carried by import direction, not by nested folders.
+Lurek2D uses an **active four-layer runtime model** plus one bridge layer. This is a **logical dependency model**, not a filesystem grouping scheme. Most Rust engine modules live in flat `src/<module>/` directories. The layer contract is carried by import direction, not by nested folders.
 
 | Layer | Path | Role |
 |---|---|---|
 | **Baseline** | `src/math/`, `src/engine/` | Always-on runtime substrate — foundational algorithms and lifecycle |
 | **Tier 1** | `src/<module>/` | Core engine subsystems built directly on Baseline |
 | **Tier 2** | `src/<module>/` | Reusable engine extensions built on Baseline + Tier 1 |
-| **Bridge** | `src/lua_api/` | Registers the public `luna.*` API; not a numbered tier |
-| **Tier 3** | `library/` | **Lunasome**: pure-Lua gameplay libraries consuming the public API |
+| **Bridge** | `src/lua_api/` | Registers the public `lurek.*` API; not a numbered tier |
+| **Tier 3** | `content/library/` | **Lunasome**: pure-Lua gameplay libraries consuming the public API |
 
 ### Boundary Rules
 
 - **Baseline** (`math`, `engine`) is always available to all layers.
 - **Tier 1** modules may depend **only** on Baseline. No Tier 1 ↔ Tier 1 cross-imports.
 - **Tier 2** modules may depend on Baseline + Tier 1. No Tier 2 ↔ Tier 2 cross-imports.
-- **`lua_api`** (bridge) imports engine layers and exposes `luna.*`. Domain Rust modules must **never** import it.
-- **Tier 3 Lunasome** lives in `library/` and consumes only public Lua-facing APIs. Lower engine layers do not depend on Tier 3.
+- **`lua_api`** (bridge) imports engine layers and exposes `lurek.*`. Domain Rust modules must **never** import it.
+- **Tier 3 Lunasome** lives in `content/library/` and consumes only public Lua-facing APIs. Lower engine layers do not depend on Tier 3.
 - **Examples** consume the public Lua surface but are not part of the numbered layer model.
 
 ---
@@ -93,11 +93,11 @@ Luna2D uses an **active four-layer runtime model** plus one bridge layer. This i
 ## Module Dependency Graph
 
 ```
-game scripts and examples/
+game scripts and content/examples/
             │
             ▼
-library/  (Tier 3: Lunasome, pure Lua)
-            │ consumes public luna.* API
+content/library/  (Tier 3: Lunasome, pure Lua)
+            │ consumes public lurek.* API
             ▼
       src/lua_api/  (bridge layer)
             │ binds runtime to Lua
@@ -120,7 +120,7 @@ Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState)
 | Tier 1 modules | `math`, `engine` only |
 | Tier 2 modules | `math`, `engine`, any Tier 1 module |
 | `lua_api` (bridge) | Everything above |
-| `library/` (Tier 3) | Public `luna.*` API only |
+| `content/library/` (Tier 3) | Public `lurek.*` API only |
 | Domain modules | **Never** `lua_api` |
 
 **No circular dependencies** — the graph is always a DAG.
@@ -131,7 +131,7 @@ Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState)
 
 ### `math/` — Foundational Algorithms
 
-`math` is the leaf of the dependency graph. It has zero internal Luna2D dependencies and provides:
+`math` is the leaf of the dependency graph. It has zero internal Lurek2D dependencies and provides:
 
 - **Vectors**: `Vec2`, `Vec3`
 - **Matrices**: `Mat3` (affine transforms)
@@ -167,7 +167,7 @@ All other layers may freely import `math`.
 
 ## Bridge Layer — lua_api
 
-`lua_api` sits above the engine layers. It imports runtime modules and exposes them through the `luna.*` namespace.
+`lua_api` sits above the engine layers. It imports runtime modules and exposes them through the `lurek.*` namespace.
 
 - It is **not** a numbered tier.
 - It may import Baseline, Tier 1, Tier 2, and migration-state gameplay Rust modules.
@@ -183,53 +183,53 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
 | Namespace | API File | Scope |
 |---|---|---|
-| `luna.gfx` | `graphics_api.rs` | Drawing, images, fonts, canvases, meshes, shaders, sprite batches |
-| `luna.audio` | `audio_api.rs` | Sound loading, playback, volume, pitch, panning, buses |
-| `luna.keyboard` | `input_api.rs` | Key state, scancodes, text input |
-| `luna.mouse` | `input_api.rs` | Position, buttons, cursor, scroll, grab |
-| `luna.gamepad` | `input_api.rs` | Joystick state, buttons, axes, vibration |
-| `luna.touch` | `input_api.rs` | Touch points, pressure |
-| `luna.time` | `timer_api.rs` | Delta time, FPS, sleep |
-| `luna.math` | `math_api.rs` | Trig, random, noise, transforms, Bezier, triangulation |
-| `luna.physics` | `physics_api.rs` | Worlds, bodies, shapes, joints, raycasting |
-| `luna.fs` | `filesystem_api.rs` | Sandboxed I/O, directories, archive mounting |
-| `luna.window` | `window_api.rs` | Fullscreen, VSync, display info, DPI, clipboard |
-| `luna.signal` | `event_api.rs` | Event queue, quit, push/poll/clear |
-| `luna.platform` | `system_api.rs` | OS info, processor count, openURL, locales |
-| `luna.particles` | `particle_api.rs` | Particle emitters, configuration, rendering |
-| `luna.data` | `data_api.rs` | Binary data, compression, hashing, encoding |
-| `luna.img` | `image_api.rs` | CPU pixel buffers, pixel manipulation |
-| `luna.thread` | `thread_api.rs` | Worker threads, channels |
-| `luna.tween` | `animation_api.rs` | Frame-based sprite animation, named clips, speed control |
-| `luna.camera` | `camera_api.rs` | Camera2D, viewport transforms |
-| `luna.simulator` | `automation_api.rs` | Automated input simulation and replay |
-| `luna.entity` | `entity_api.rs` | Lightweight ECS primitives |
-| `luna.scene` | `scene_api.rs` | Scene stack management and transitions |
-| `luna.gpu` | `compute_api.rs` | Dense numerical arrays, CPU-side compute |
-| `luna.savegame` | `savegame_api.rs` | Slot-based save/load, schema versioning |
-| `luna.codec` | `serial_api.rs` | JSON, TOML, MessagePack serialization |
-| `luna.dataframe` | `dataframe_api.rs` | Column-major tabular data structures |
-| `luna.light` | `light_api.rs` | 2D dynamic lighting and shadow casting |
-| `luna.modding` | `modding_api.rs` | Mod discovery, dependency resolution, load ordering |
-| `luna.raycaster` | `raycaster_api.rs` | DDA grid raycasting for retro rendering |
-| `luna.spine` | `spine_api.rs` | Spine 2D skeletal animation runtime |
-| `luna.procgen` | `procgen_api.rs` | Procedural content generation algorithms |
-| `luna.network` | `network_api.rs` | UDP networking, packet framing |
-| `luna.minimap` | `minimap_api.rs` | Grid-based minimap extraction and FOV masking |
-| `luna.pathfinding` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields |
-| `luna.terminal` | `terminal_api.rs` | In-game developer terminal / REPL |
-| `luna.pipeline` | `pipeline_api.rs` | DAG pipeline orchestration and caching |
-| `luna.patterns` | `patterns_api.rs` | Game programming design patterns toolkit |
-| `luna.graph` | `graph_api.rs` | Directed graphs, flow simulation |
-| `luna.ai` | `ai_api.rs` | FSMs, behaviour trees, GOAP, steering |
-| `luna.postfx` | `fx_api.rs` | Post-processing effects, screen overlays |
-| `luna.ui` | `gui_api.rs` | Retained-mode widget UI |
-| `luna.tilemap` | `tilemap_api.rs` | Tilemaps, tilesets, coordinate helpers |
-| `luna.devtools` | `devtools_api.rs` | Developer diagnostics and runtime profiling |
-| `luna.debugbridge` | `debugbridge_api.rs` | JSON-over-TCP debug server for remote inspection |
-| `luna.localization` | `localization_api.rs` | Multi-locale string catalogs with plural rules |
-| `luna.log` | `log_api.rs` | Structured game-script logging |
-| `luna.docs` | `docs_api.rs` | API documentation reference management |
+| `lurek.gfx` | `graphics_api.rs` | Drawing, images, fonts, canvases, meshes, shaders, sprite batches |
+| `lurek.audio` | `audio_api.rs` | Sound loading, playback, volume, pitch, panning, buses |
+| `lurek.keyboard` | `input_api.rs` | Key state, scancodes, text input |
+| `lurek.mouse` | `input_api.rs` | Position, buttons, cursor, scroll, grab |
+| `lurek.gamepad` | `input_api.rs` | Joystick state, buttons, axes, vibration |
+| `lurek.touch` | `input_api.rs` | Touch points, pressure |
+| `lurek.time` | `timer_api.rs` | Delta time, FPS, sleep |
+| `lurek.math` | `math_api.rs` | Trig, random, noise, transforms, Bezier, triangulation |
+| `lurek.physics` | `physics_api.rs` | Worlds, bodies, shapes, joints, raycasting |
+| `lurek.fs` | `filesystem_api.rs` | Sandboxed I/O, directories, archive mounting |
+| `lurek.window` | `window_api.rs` | Fullscreen, VSync, display info, DPI, clipboard |
+| `lurek.signal` | `event_api.rs` | Event queue, quit, push/poll/clear |
+| `lurek.platform` | `system_api.rs` | OS info, processor count, openURL, locales |
+| `lurek.particles` | `particle_api.rs` | Particle emitters, configuration, rendering |
+| `lurek.data` | `data_api.rs` | Binary data, compression, hashing, encoding |
+| `lurek.img` | `image_api.rs` | CPU pixel buffers, pixel manipulation |
+| `lurek.thread` | `thread_api.rs` | Worker threads, channels |
+| `lurek.tween` | `animation_api.rs` | Frame-based sprite animation, named clips, speed control |
+| `lurek.camera` | `camera_api.rs` | Camera2D, viewport transforms |
+| `lurek.simulator` | `automation_api.rs` | Automated input simulation and replay |
+| `lurek.entity` | `entity_api.rs` | Lightweight ECS primitives |
+| `lurek.scene` | `scene_api.rs` | Scene stack management and transitions |
+| `lurek.gpu` | `compute_api.rs` | Dense numerical arrays, CPU-side compute |
+| `lurek.savegame` | `savegame_api.rs` | Slot-based save/load, schema versioning |
+| `lurek.codec` | `serial_api.rs` | JSON, TOML, MessagePack serialization |
+| `lurek.dataframe` | `dataframe_api.rs` | Column-major tabular data structures |
+| `lurek.light` | `light_api.rs` | 2D dynamic lighting and shadow casting |
+| `lurek.modding` | `modding_api.rs` | Mod discovery, dependency resolution, load ordering |
+| `lurek.raycaster` | `raycaster_api.rs` | DDA grid raycasting for retro rendering |
+| `lurek.spine` | `spine_api.rs` | Spine 2D skeletal animation runtime |
+| `lurek.procgen` | `procgen_api.rs` | Procedural content generation algorithms |
+| `lurek.network` | `network_api.rs` | UDP networking, packet framing |
+| `lurek.minimap` | `minimap_api.rs` | Grid-based minimap extraction and FOV masking |
+| `lurek.pathfinding` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields |
+| `lurek.terminal` | `terminal_api.rs` | In-game developer terminal / REPL |
+| `lurek.pipeline` | `pipeline_api.rs` | DAG pipeline orchestration and caching |
+| `lurek.patterns` | `patterns_api.rs` | Game programming design patterns toolkit |
+| `lurek.graph` | `graph_api.rs` | Directed graphs, flow simulation |
+| `lurek.ai` | `ai_api.rs` | FSMs, behaviour trees, GOAP, steering |
+| `lurek.postfx` | `fx_api.rs` | Post-processing effects, screen overlays |
+| `lurek.ui` | `gui_api.rs` | Retained-mode widget UI |
+| `lurek.tilemap` | `tilemap_api.rs` | Tilemaps, tilesets, coordinate helpers |
+| `lurek.devtools` | `devtools_api.rs` | Developer diagnostics and runtime profiling |
+| `lurek.debugbridge` | `debugbridge_api.rs` | JSON-over-TCP debug server for remote inspection |
+| `lurek.localization` | `localization_api.rs` | Multi-locale string catalogs with plural rules |
+| `lurek.log` | `log_api.rs` | Structured game-script logging |
+| `lurek.docs` | `docs_api.rs` | API documentation reference management |
 
 ---
 
@@ -293,26 +293,26 @@ Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many 
 
 ---
 
-## Tier 3 — Lunasome (library/)
+## Tier 3 — Lunasome (content/library/)
 
-Tier 3 is **Lunasome**: the pure-Lua standard library shipped alongside the engine. It is **not** embedded in the Rust binary. It lives under `library/` and consumes only the public `luna.*` API.
+Tier 3 is **Lunasome**: the pure-Lua standard library shipped alongside the engine. It is **not** embedded in the Rust binary. It lives under `content/library/` and consumes only the public `lurek.*` API.
 
 Lunasome is the target home for genre-specific and gameplay-domain-specific libraries. When functionality can live as pure Lua on top of the engine API, it belongs here.
 
 | Library | Path | Responsibility |
 |---|---|---|
-| `battle` | `library/battle/` | Turn-based battle helpers |
-| `cardgame` | `library/cardgame/` | Cards, decks, slots, and card pools |
-| `combat` | `library/combat/` | Combat-oriented gameplay helpers |
-| `crafting` | `library/crafting/` | Recipes, queues, and crafting logic |
-| `dialog` | `library/dialog/` | Dialogue sequencing and branching |
-| `doll` | `library/doll/` | Paper-doll character compositing |
-| `economy` | `library/economy/` | Gameplay resource economy helpers |
-| `inventory` | `library/inventory/` | Inventory logic and container management |
-| `item` | `library/item/` | Item definitions and stack logic |
-| `province_map` | `library/province_map/` | Province-map gameplay helpers |
-| `quest` | `library/quest/` | Quest log and objective tracking |
-| `stats` | `library/stats/` | Gameplay stat and modifier systems |
+| `battle` | `content/library/battle/` | Turn-based battle helpers |
+| `cardgame` | `content/library/cardgame/` | Cards, decks, slots, and card pools |
+| `combat` | `content/library/combat/` | Combat-oriented gameplay helpers |
+| `crafting` | `content/library/crafting/` | Recipes, queues, and crafting logic |
+| `dialog` | `content/library/dialog/` | Dialogue sequencing and branching |
+| `doll` | `content/library/doll/` | Paper-doll character compositing |
+| `economy` | `content/library/economy/` | Gameplay resource economy helpers |
+| `inventory` | `content/library/inventory/` | Inventory logic and container management |
+| `item` | `content/library/item/` | Item definitions and stack logic |
+| `province_map` | `content/library/province_map/` | Province-map gameplay helpers |
+| `quest` | `content/library/quest/` | Quest log and objective tracking |
+| `stats` | `content/library/stats/` | Gameplay stat and modifier systems |
 
 ---
 
@@ -324,7 +324,7 @@ main.rs
   ├── Parse CLI arguments (game directory path)
   │
   ├── Config::load_from_conf_lua(game_dir)
-  │     └── Temporary Lua VM → execute conf.lua → call luna.conf(t) → read back → Config struct
+  │     └── Temporary Lua VM → execute conf.lua → call lurek.conf(t) → read back → Config struct
   │
   ├── App::new(config)
   │     ├── Create winit Window (title, size, min size, decorations, icon, display index)
@@ -346,7 +346,7 @@ main.rs
   │
   ├── Load game_dir/main.lua (or display splash screen if no game directory)
   │
-  ├── Call luna.load()
+  ├── Call lurek.load()
   │
   └── Enter RunState::Running → game loop
 ```
@@ -355,7 +355,7 @@ If any step fails, the engine transitions to `RunState::Error(ErrorScreen)`.
 
 ### No-Game Behaviour
 
-When no game directory is provided, the engine displays a built-in splash screen — the Luna2D logo and project identity rendered through the same DrawCommand system. The splash screen runs at 60 FPS until the user closes the window. **Drag-and-drop** is supported: drop a game folder onto the splash window to load it immediately.
+When no game directory is provided, the engine displays a built-in splash screen — the Lurek2D logo and project identity rendered through the same DrawCommand system. The splash screen runs at 60 FPS until the user closes the window. **Drag-and-drop** is supported: drop a game folder onto the splash window to load it immediately.
 
 ---
 
@@ -380,12 +380,12 @@ The game loop runs inside `App::run()` using winit's `ApplicationHandler` trait.
 │                                   touchreleased                 │
 │ 4. Fire window callbacks       → focus, visible, resize         │
 │ 5. Fire gamepad hotplug        → joystickadded, joystickremoved │
-│ 6a. Call luna.process_physics(fixed_dt) [0–N fixed steps]       │
-│ 6b. Call luna.process(dt)      → game logic                     │
-│ 6c. Call luna.process_late(dt) → post-logic update              │
+│ 6a. Call lurek.process_physics(fixed_dt) [0–N fixed steps]       │
+│ 6b. Call lurek.process(dt)      → game logic                     │
+│ 6c. Call lurek.process_late(dt) → post-logic update              │
 │ 7.  Clear draw command queue                                    │
-│ 8a. Call luna.render()         → game pushes DrawCommands       │
-│ 8b. Call luna.render_ui()      → UI/HUD overlay DrawCommands    │
+│ 8a. Call lurek.render()         → game pushes DrawCommands       │
+│ 8b. Call lurek.render_ui()      → UI/HUD overlay DrawCommands    │
 │ 9. GpuRenderer::render_frame()                                 │
 │    ├── Flush pending resource removals (deferred destruction)   │
 │    ├── Update auto-uniforms (time, screen size)                 │
@@ -513,14 +513,14 @@ Compile-time type safety: a `TextureKey` cannot be passed where a `FontKey` is e
 ### Resource Lifecycle
 
 ```
-Lua: local img = luna.gfx.newImage("player.png")
+Lua: local img = lurek.gfx.newImage("player.png")
   │
   ▼
 Rust: load pixels → insert into textures SlotMap → upload to GPU
       → return LuaImage(TextureKey) as UserData to Lua
   │
   ▼
-Lua: luna.gfx.draw(img, 100, 200)
+Lua: lurek.gfx.draw(img, 100, 200)
   │
   ▼
 Rust: push DrawImage { texture_key, ... } into draw_commands
@@ -614,12 +614,12 @@ Affine transforms managed via a push/pop stack. Each entry stores translation, r
 All major resource types are exposed to Lua as `mlua::UserData` objects, providing an object-oriented API:
 
 ```lua
-local img = luna.gfx.newImage("player.png")
+local img = lurek.gfx.newImage("player.png")
 img:getWidth()
 img:getHeight()
 img:release()
 
-local source = luna.audio.newSource("music.ogg", "stream")
+local source = lurek.audio.newSource("music.ogg", "stream")
 source:play()
 source:setVolume(0.8)
 source:setLooping(true)
@@ -663,7 +663,7 @@ This provides `type()`, `typeOf()`, and `__tostring` metamethods automatically.
 
 ### Drawable Protocol
 
-Types that implement the Drawable protocol can be passed to `luna.gfx.draw()`:
+Types that implement the Drawable protocol can be passed to `lurek.gfx.draw()`:
 Image, Canvas, SpriteBatch, Mesh, ParticleSystem.
 
 ---
@@ -673,21 +673,21 @@ Image, Canvas, SpriteBatch, Mesh, ParticleSystem.
 ```
 winit WindowEvent
   │
-  ├── KeyEvent → KeyboardState (logical + physical keys) → luna.keypressed/keyreleased
-  ├── Ime(Commit) → luna.textinput(text)
-  ├── CursorMoved → MouseState → luna.mousemoved(x, y, dx, dy, istouch)
-  ├── MouseInput → MouseState.buttons → luna.mousepressed/mousereleased
-  ├── MouseWheel → MouseState.scroll → luna.wheelmoved(x, y)
-  ├── Touch → TouchState → luna.touchpressed/moved/released
-  ├── Focused → luna.focus(focused)
-  ├── Occluded → luna.visible(!occ)
-  └── Resized → luna.resize(w, h)
+  ├── KeyEvent → KeyboardState (logical + physical keys) → lurek.keypressed/keyreleased
+  ├── Ime(Commit) → lurek.textinput(text)
+  ├── CursorMoved → MouseState → lurek.mousemoved(x, y, dx, dy, istouch)
+  ├── MouseInput → MouseState.buttons → lurek.mousepressed/mousereleased
+  ├── MouseWheel → MouseState.scroll → lurek.wheelmoved(x, y)
+  ├── Touch → TouchState → lurek.touchpressed/moved/released
+  ├── Focused → lurek.focus(focused)
+  ├── Occluded → lurek.visible(!occ)
+  └── Resized → lurek.resize(w, h)
 
 gilrs events (polled per frame)
-  ├── ButtonChanged → luna.gamepadpressed/released
-  ├── AxisChanged → luna.gamepadaxis
-  ├── Connected → luna.joystickadded(id)
-  └── Disconnected → luna.joystickremoved(id)
+  ├── ButtonChanged → lurek.gamepadpressed/released
+  ├── AxisChanged → lurek.gamepadaxis
+  ├── Connected → lurek.joystickadded(id)
+  └── Disconnected → lurek.joystickremoved(id)
 ```
 
 ---
@@ -695,7 +695,7 @@ gilrs events (polled per frame)
 ## Audio Pipeline
 
 ```
-luna.audio.newSource("file.ogg", "stream")
+lurek.audio.newSource("file.ogg", "stream")
   │
   ▼
 AudioSource: path, source_type (Static|Stream), volume, pitch, pan, looping
@@ -715,7 +715,7 @@ Mixer: rodio OutputStream + SlotMap<SoundKey, AudioEntry>
 ## Physics Pipeline
 
 ```
-luna.physics.newWorld(gx, gy)
+lurek.physics.newWorld(gx, gy)
   │
   ▼
 World: rapier2d PhysicsPipeline + RigidBodySet + ColliderSet
@@ -759,18 +759,18 @@ pub struct ParticleSystem {
 
 ## Data and Image Modules
 
-### luna.data — Binary Data Processing
+### lurek.data — Binary Data Processing
 
 - **ByteData**: `Vec<u8>` accessible from Lua for binary manipulation
 - **Compression**: deflate/gzip/lz4/zlib via flate2 + lz4_flex
 - **Hashing**: MD5/SHA-1/SHA-256/SHA-512 via sha2 + md-5
 - **Encoding**: Base64/hex encoding and decoding
 
-### luna.img — CPU Pixel Manipulation
+### lurek.img — CPU Pixel Manipulation
 
-`ImageData`: RGBA8 pixel buffer with `getPixel`, `setPixel`, `mapPixel`, `paste`, `encode("png")`. Can be uploaded to GPU: `luna.gfx.newImage(imageData)`.
+`ImageData`: RGBA8 pixel buffer with `getPixel`, `setPixel`, `mapPixel`, `paste`, `encode("png")`. Can be uploaded to GPU: `lurek.gfx.newImage(imageData)`.
 
-> **Note**: `SoundData` (interleaved PCM `Vec<f32>`) previously lived in a separate `sound` module. It has been merged into `src/audio/` and is accessible through `luna.audio`.
+> **Note**: `SoundData` (interleaved PCM `Vec<f32>`) previously lived in a separate `sound` module. It has been merged into `src/audio/` and is accessible through `lurek.audio`.
 
 ---
 
@@ -793,7 +793,7 @@ File reads search mount points in reverse order (last mounted = highest priority
 
 ### FileHandle
 
-`luna.fs.newFile(path, mode)` → FileHandle UserData with `read()`, `write()`, `lines()`, `close()`, `isOpen()`, `getMode()`.
+`lurek.fs.newFile(path, mode)` → FileHandle UserData with `read()`, `write()`, `lines()`, `close()`, `isOpen()`, `getMode()`.
 
 ---
 
@@ -816,7 +816,7 @@ The main game loop and all Lua callbacks run on a single thread. Worker threads 
 
 ```
 Main Thread                          Worker Thread N
-├── Lua VM (full luna.* API)         ├── Separate Lua VM
+├── Lua VM (full lurek.* API)         ├── Separate Lua VM
 ├── SharedState (Rc<RefCell<>>)      ├── Thread-safe modules ONLY:
 ├── GpuRenderer                      │   math, thread, timer (read),
 └── Game Loop                        │   filesystem (read), system
@@ -844,9 +844,9 @@ Operations: `push`, `pop`, `demand` (blocking), `peek`, `getCount`, `clear`.
 ### Error Flow
 
 ```
-Lua runtime error during luna.process()/luna.render()/luna.render_ui()
+Lua runtime error during lurek.process()/lurek.render()/lurek.render_ui()
   │
-  ├── luna.errorhandler(msg) defined? → call it → use returned message
+  ├── lurek.errorhandler(msg) defined? → call it → use returned message
   │
   ▼
 RunState::Error(ErrorScreen)
@@ -871,7 +871,7 @@ RunState::Error(ErrorScreen)
 ### conf.lua Processing
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title = "My Game"
     t.window.width = 1280
     t.window.height = 720
@@ -899,45 +899,45 @@ All callbacks are optional — the engine checks if the function exists before c
 
 | Callback | Arguments | When Fired |
 |---|---|---|
-| `luna.conf(t)` | config table | During conf.lua processing |
-| `luna.init()` | — | Once after main.lua loads |
-| `luna.ready()` | — | Once before the first `process` frame (after init, after window is fully set up) |
-| `luna.exit()` | — | Engine shutdown |
-| `luna.quit()` | — | Close requested (return `true` to cancel) |
-| `luna.errorhandler(msg)` | error message | Uncaught Lua error |
+| `lurek.conf(t)` | config table | During conf.lua processing |
+| `lurek.init()` | — | Once after main.lua loads |
+| `lurek.ready()` | — | Once before the first `process` frame (after init, after window is fully set up) |
+| `lurek.exit()` | — | Engine shutdown |
+| `lurek.quit()` | — | Close requested (return `true` to cancel) |
+| `lurek.errorhandler(msg)` | error message | Uncaught Lua error |
 
 ### Frame Pipeline Callbacks (per-frame order)
 
 | Callback | Arguments | When Fired |
 |---|---|---|
-| `luna.process_physics(dt)` | fixed delta (seconds) | 0–N times per frame at fixed timestep (default 1/60s) |
-| `luna.process(dt)` | delta time (seconds) | Once per frame (variable timestep) |
-| `luna.process_late(dt)` | delta time (seconds) | Once per frame, after `process`, before `render` |
-| `luna.render()` | — | Once per frame (push DrawCommands here) |
-| `luna.render_ui()` | — | Once per frame, after `render` (UI/HUD overlay) |
+| `lurek.process_physics(dt)` | fixed delta (seconds) | 0–N times per frame at fixed timestep (default 1/60s) |
+| `lurek.process(dt)` | delta time (seconds) | Once per frame (variable timestep) |
+| `lurek.process_late(dt)` | delta time (seconds) | Once per frame, after `process`, before `render` |
+| `lurek.render()` | — | Once per frame (push DrawCommands here) |
+| `lurek.render_ui()` | — | Once per frame, after `render` (UI/HUD overlay) |
 
 ### Input Callbacks
 
 | Callback | Arguments | When Fired |
 |---|---|---|
-| `luna.keypressed(key, scancode, isrepeat)` | key name, scancode, repeat flag | Key press |
-| `luna.keyreleased(key, scancode)` | key name, scancode | Key release |
-| `luna.textinput(text)` | Unicode text | Character input |
-| `luna.mousepressed(x, y, btn, istouch, presses)` | position, button, touch flag, click count | Mouse down |
-| `luna.mousereleased(x, y, btn, istouch, presses)` | position, button, touch flag, click count | Mouse up |
-| `luna.mousemoved(x, y, dx, dy, istouch)` | position, delta, touch flag | Mouse move |
-| `luna.wheelmoved(x, y)` | scroll deltas | Scroll wheel |
-| `luna.gamepadpressed(id, button)` | gamepad ID, button name | Gamepad button down |
-| `luna.gamepadreleased(id, button)` | gamepad ID, button name | Gamepad button up |
-| `luna.gamepadaxis(id, axis, value)` | gamepad ID, axis name, value | Gamepad axis change |
-| `luna.joystickadded(id)` | gamepad ID | Gamepad connected |
-| `luna.joystickremoved(id)` | gamepad ID | Gamepad disconnected |
-| `luna.touchpressed(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch start |
-| `luna.touchmoved(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch move |
-| `luna.touchreleased(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch end |
-| `luna.focus(focused)` | boolean | Window focus change |
-| `luna.visible(visible)` | boolean | Window visibility change |
-| `luna.resize(w, h)` | new dimensions | Window resize |
+| `lurek.keypressed(key, scancode, isrepeat)` | key name, scancode, repeat flag | Key press |
+| `lurek.keyreleased(key, scancode)` | key name, scancode | Key release |
+| `lurek.textinput(text)` | Unicode text | Character input |
+| `lurek.mousepressed(x, y, btn, istouch, presses)` | position, button, touch flag, click count | Mouse down |
+| `lurek.mousereleased(x, y, btn, istouch, presses)` | position, button, touch flag, click count | Mouse up |
+| `lurek.mousemoved(x, y, dx, dy, istouch)` | position, delta, touch flag | Mouse move |
+| `lurek.wheelmoved(x, y)` | scroll deltas | Scroll wheel |
+| `lurek.gamepadpressed(id, button)` | gamepad ID, button name | Gamepad button down |
+| `lurek.gamepadreleased(id, button)` | gamepad ID, button name | Gamepad button up |
+| `lurek.gamepadaxis(id, axis, value)` | gamepad ID, axis name, value | Gamepad axis change |
+| `lurek.joystickadded(id)` | gamepad ID | Gamepad connected |
+| `lurek.joystickremoved(id)` | gamepad ID | Gamepad disconnected |
+| `lurek.touchpressed(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch start |
+| `lurek.touchmoved(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch move |
+| `lurek.touchreleased(id, x, y, dx, dy, pressure)` | touch ID, position, delta, pressure | Touch end |
+| `lurek.focus(focused)` | boolean | Window focus change |
+| `lurek.visible(visible)` | boolean | Window visibility change |
+| `lurek.resize(w, h)` | new dimensions | Window resize |
 
 ### Frame Pipeline Execution Order
 
@@ -1079,16 +1079,16 @@ src/
     ├── image_api.rs, thread_api.rs, terminal_api.rs,
     ├── thread_channel.rs, thread_worker.rs
 
-library/                             Tier 3: Lunasome (pure Lua)
+content/library/                             Tier 3: Lunasome (pure Lua)
 ├── battle/, cardgame/, combat/, crafting/, dialog/, doll/,
 ├── economy/, inventory/, item/, province_map/, quest/, stats/
 
-examples/                            Lua game examples (27+ demos)
+content/examples/                            Lua game examples (27+ demos)
 tests/                               Test suite (see test-framework.md)
 docs/                                Documentation
 tools/                               CLI scripts and build tools
 .github/                             CAG layer (AI agents, skills, prompts, instructions)
-vscode-extension/                    First-party VS Code extension
+extensions/vscode/                    First-party VS Code extension
 assets/                              Engine assets (splash, icon, fonts)
 ```
 
@@ -1096,11 +1096,11 @@ assets/                              Engine assets (splash, icon, fonts)
 
 ## Legacy and Migration-State Modules
 
-Several gameplay-oriented Rust modules still exist under `src/`. They remain buildable and testable but are **not** the active Tier 3 architecture target. The canonical Tier 3 location is `library/` (pure Lua).
+Several gameplay-oriented Rust modules still exist under `src/`. They remain buildable and testable but are **not** the active Tier 3 architecture target. The canonical Tier 3 location is `content/library/` (pure Lua).
 
 | Module | Status | Notes |
 |---|---|---|
-| `src/battle/`, `src/cardgame/`, `src/combat/`, `src/crafting/` | Migration-state | Being superseded by `library/` equivalents |
+| `src/battle/`, `src/cardgame/`, `src/combat/`, `src/crafting/` | Migration-state | Being superseded by `content/library/` equivalents |
 | `src/dialog/`, `src/economy/`, `src/inventory/`, `src/item/` | Migration-state | Keep buildable, do not document as current Tier 3 |
 | `src/province_map/`, `src/quest/`, `src/stats/` | Migration-state | Future: may be removed when Lunasome equivalents are mature |
 
@@ -1115,4 +1115,4 @@ The layer model supports future build variants (not yet implemented at the Cargo
 | **Baseline** | Baseline + bridge | Minimal runtime substrate |
 | **Core** | Baseline + Tier 1 + bridge | Core engine without extensions |
 | **Extended** | Baseline + Tier 1 + Tier 2 + bridge | General-purpose runtime |
-| **Lunasome** | Extended + `library/` | Full runtime + standard Lua libraries |
+| **Lunasome** | Extended + `content/library/` | Full runtime + standard Lua libraries |

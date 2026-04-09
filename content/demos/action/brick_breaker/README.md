@@ -4,7 +4,7 @@ Classic Arkanoid / Breakout clone with multi-ball, wide-paddle and slow-ball pow
 
 ## What It Demonstrates
 
-- `luna.mouse.getPosition()` — mouse-driven paddle following with clamped AABB boundary
+- `lurek.mouse.getPosition()` — mouse-driven paddle following with clamped AABB boundary
 - Axis-aligned ball physics using velocity reflection (no physics engine needed)
 - AABB collision with overlap-axis heuristic to decide horizontal vs. vertical bounce direction
 - Angle-steering: paddle hit position maps to a reflected bounce angle
@@ -16,7 +16,7 @@ Classic Arkanoid / Breakout clone with multi-ball, wide-paddle and slow-ball pow
 ## How to Run
 
 ```powershell
-cargo run -- demos/brick_breaker
+cargo run -- content/demos/brick_breaker
 ```
 
 ## Controls

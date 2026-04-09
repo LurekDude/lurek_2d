@@ -4,18 +4,18 @@ A Pokémon-inspired RPG demo with overworld exploration and turn-based battles. 
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — tile map rendering with per-tile colour coding
-- `luna.gfx.circle()` — creature sprites and player avatar on the overworld
-- `luna.gfx.print()` — battle log, HP values, party summary HUD
-- `luna.gfx.setColor()` — type-coloured creature indicators and HP bar gradient
-- `luna.keyboard.isDown()` — grid-based WASD movement with cooldown gating
-- `luna.keyboard.isPressed()` — battle menu navigation (1=attack, 2=switch, 3=catch, 4=run)
-- `luna.gfx.setBackgroundColor()` — distinct overworld vs. battle scene backgrounds
+- `lurek.gfx.rectangle()` — tile map rendering with per-tile colour coding
+- `lurek.gfx.circle()` — creature sprites and player avatar on the overworld
+- `lurek.gfx.print()` — battle log, HP values, party summary HUD
+- `lurek.gfx.setColor()` — type-coloured creature indicators and HP bar gradient
+- `lurek.keyboard.isDown()` — grid-based WASD movement with cooldown gating
+- `lurek.keyboard.isPressed()` — battle menu navigation (1=attack, 2=switch, 3=catch, 4=run)
+- `lurek.gfx.setBackgroundColor()` — distinct overworld vs. battle scene backgrounds
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/creature_collector
+cargo run -- content/demos/creature_collector
 ```
 
 ## Controls

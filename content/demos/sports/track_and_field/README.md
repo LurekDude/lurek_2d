@@ -5,8 +5,8 @@ your way to the best scores.
 
 ## What It Demonstrates
 
-- `luna.keypressed()` — rapid alternating key detection for running speed
-- `luna.input.isKeyDown()` — continuous power bar control
+- `lurek.keypressed()` — rapid alternating key detection for running speed
+- `lurek.input.isKeyDown()` — continuous power bar control
 - Physics simulation — projectile arcs, hurdle clearing with gravity
 - State machines — event sequencing and per-event sub-states
 - UI panels — event HUD, power bar, running speed display

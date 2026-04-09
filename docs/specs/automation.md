@@ -4,7 +4,7 @@
 |----------------|----------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                   |
 | **Status**     | Implemented — Full                           |
-| **Lua API**    | `luna.simulator`                             |
+| **Lua API**    | `lurek.simulator`                             |
 | **Source**      | `src/automation/`                            |
 | **Rust Tests** | `tests/rust/unit/automation_tests.rs`        |
 | **Lua Tests**  | `tests/lua/unit/test_automation.lua`         |
@@ -16,7 +16,7 @@ The `automation` module provides automated input simulation through timed step s
 
 A `Script` contains an ordered list of `Step` records, each pairing a wall-clock offset (seconds from script start) with an `Action` variant — one of eight kinds: `KeyPress`, `KeyRelease`, `TextInput`, `MouseMove`, `MousePress`, `MouseRelease`, `MouseWheel`, and `Wait`. The `Simulator` plays back a loaded script by comparing elapsed game time against each step's timestamp and injecting the corresponding synthetic event into the engine's `EventQueue`. Injected events are indistinguishable from real hardware input as far as the game is concerned.
 
-Primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions. Scripts are loaded from Lua tables via `luna.simulator.load` and can be replayed multiple times. The `Simulator` owns a named registry of scripts; loading a script with an existing name replaces the previous one. Steps beyond `MAX_STEPS` (100 000) are silently truncated to cap memory at roughly 12 MB per script (CSF-010 allocation guard).
+Primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions. Scripts are loaded from Lua tables via `lurek.simulator.load` and can be replayed multiple times. The `Simulator` owns a named registry of scripts; loading a script with an existing name replaces the previous one. Steps beyond `MAX_STEPS` (100 000) are silently truncated to cap memory at roughly 12 MB per script (CSF-010 allocation guard).
 
 The `Simulator` follows a strict playback lifecycle: `Idle → Running → Complete`, with optional `Paused` transitions. Stopping resets elapsed time and step index. The module only injects events into the `EventQueue`; it does not consume them. Actual input handling remains in `src/input/`. The `Simulator` is not `Send` or `Sync` — it is owned by the main Lua thread via `Rc<RefCell<Simulator>>`.
 
@@ -25,8 +25,8 @@ The `Simulator` follows a strict playback lifecycle: `Idle → Running → Compl
 ```
                         Lua game script
                               │
-                 luna.simulator.load("demo", data)
-                 luna.simulator.start("demo")
+                 lurek.simulator.load("demo", data)
+                 lurek.simulator.start("demo")
                               │
                               ▼
                    ┌──────────────────┐
@@ -162,26 +162,26 @@ The action type for a simulation step. Each variant maps to a synthetic input ev
 
 ## Lua API
 
-Exposed under `luna.simulator.*` by `src/lua_api/automation_api.rs`. The API provides 16 functions for loading, controlling, and querying script playback. Scripts are loaded from Lua tables containing a `steps` array and optional `meta` table. The bridge function `parse_steps` converts Lua step tables into `Vec<Step>`.
+Exposed under `lurek.simulator.*` by `src/lua_api/automation_api.rs`. The API provides 16 functions for loading, controlling, and querying script playback. Scripts are loaded from Lua tables containing a `steps` array and optional `meta` table. The bridge function `parse_steps` converts Lua step tables into `Vec<Step>`.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.simulator.load` | `(name: string, data: table)` | Load a named script from a table with `steps` array and optional `meta.description` |
-| `luna.simulator.unload` | `(name: string) → boolean` | Remove a loaded script; returns true if it existed |
-| `luna.simulator.hasScript` | `(name: string) → boolean` | Check if a script name is registered |
-| `luna.simulator.getScripts` | `() → table` | Return array of all registered script names |
-| `luna.simulator.start` | `(name: string)` | Start playback of named script from the beginning |
-| `luna.simulator.stop` | `()` | Stop playback, reset to idle |
-| `luna.simulator.pause` | `()` | Pause playback at current position |
-| `luna.simulator.resume` | `()` | Resume from paused position |
-| `luna.simulator.update` | `(dt: number)` | Advance clock by dt seconds, dispatch due steps |
-| `luna.simulator.isRunning` | `() → boolean` | True if actively playing a script |
-| `luna.simulator.isPaused` | `() → boolean` | True if paused |
-| `luna.simulator.isComplete` | `() → boolean` | True if all steps in active script dispatched |
-| `luna.simulator.getCurrentStep` | `() → integer` | Index of next step to dispatch |
-| `luna.simulator.getStepCount` | `() → integer` | Total steps in active script |
-| `luna.simulator.getCurrentScript` | `() → string?` | Name of active script, or nil if idle |
-| `luna.simulator.getElapsedTime` | `() → number` | Seconds elapsed since playback started |
+| `lurek.simulator.load` | `(name: string, data: table)` | Load a named script from a table with `steps` array and optional `meta.description` |
+| `lurek.simulator.unload` | `(name: string) → boolean` | Remove a loaded script; returns true if it existed |
+| `lurek.simulator.hasScript` | `(name: string) → boolean` | Check if a script name is registered |
+| `lurek.simulator.getScripts` | `() → table` | Return array of all registered script names |
+| `lurek.simulator.start` | `(name: string)` | Start playback of named script from the beginning |
+| `lurek.simulator.stop` | `()` | Stop playback, reset to idle |
+| `lurek.simulator.pause` | `()` | Pause playback at current position |
+| `lurek.simulator.resume` | `()` | Resume from paused position |
+| `lurek.simulator.update` | `(dt: number)` | Advance clock by dt seconds, dispatch due steps |
+| `lurek.simulator.isRunning` | `() → boolean` | True if actively playing a script |
+| `lurek.simulator.isPaused` | `() → boolean` | True if paused |
+| `lurek.simulator.isComplete` | `() → boolean` | True if all steps in active script dispatched |
+| `lurek.simulator.getCurrentStep` | `() → integer` | Index of next step to dispatch |
+| `lurek.simulator.getStepCount` | `() → integer` | Total steps in active script |
+| `lurek.simulator.getCurrentScript` | `() → string?` | Name of active script, or nil if idle |
+| `lurek.simulator.getElapsedTime` | `() → number` | Seconds elapsed since playback started |
 
 ### Step Table Format
 
@@ -206,8 +206,8 @@ Each entry in the `steps` array is a table with these fields:
 
 ```lua
 -- Load a script with keyboard and mouse steps
-function luna.init()
-    luna.simulator.load("test_input", {
+function lurek.init()
+    lurek.simulator.load("test_input", {
         steps = {
             { time = 0.1, action = "keypress",    key = "space" },
             { time = 0.3, action = "keyrelease",  key = "space" },
@@ -219,33 +219,33 @@ function luna.init()
         },
         meta = { description = "Integration test: basic input sequence" },
     })
-    luna.simulator.start("test_input")
+    lurek.simulator.start("test_input")
 end
 
-function luna.process(dt)
-    luna.simulator.update(dt)
+function lurek.process(dt)
+    lurek.simulator.update(dt)
 
-    if luna.simulator.isComplete() then
-        print("Script finished after " .. luna.simulator.getElapsedTime() .. "s")
-        luna.simulator.stop()
+    if lurek.simulator.isComplete() then
+        print("Script finished after " .. lurek.simulator.getElapsedTime() .. "s")
+        lurek.simulator.stop()
     end
 end
 ```
 
 ```lua
 -- Pause/resume and introspection
-function luna.process(dt)
-    luna.simulator.update(dt)
+function lurek.process(dt)
+    lurek.simulator.update(dt)
 
     -- Pause on a specific step
-    if luna.simulator.getCurrentStep() >= 3 and luna.simulator.isRunning() then
-        luna.simulator.pause()
+    if lurek.simulator.getCurrentStep() >= 3 and lurek.simulator.isRunning() then
+        lurek.simulator.pause()
     end
 
     -- Report progress
-    local step = luna.simulator.getCurrentStep()
-    local total = luna.simulator.getStepCount()
-    local name = luna.simulator.getCurrentScript() or "none"
+    local step = lurek.simulator.getCurrentStep()
+    local total = lurek.simulator.getStepCount()
+    local name = lurek.simulator.getCurrentScript() or "none"
     print(string.format("Script '%s': step %d/%d", name, step, total))
 end
 ```
@@ -265,24 +265,24 @@ end
 |-----------|-------------|--------------------------------------------------------------|
 | `engine`  | Imports from | Log messages (`log_msg!`, `AT01_SIM_INIT`, `AT02_SCRIPT_LOAD`) |
 | `event`   | Imports from | `Event`, `EventArg`, `EventQueue` — step dispatch target     |
-| `lua_api` | Imported by  | Registers `luna.simulator.*` via `automation_api.rs`          |
+| `lua_api` | Imported by  | Registers `lurek.simulator.*` via `automation_api.rs`          |
 | `input`   | Related      | Automation injects events that the input module consumes; the two modules do not import each other |
 
 ## Notes
 
 - **Tier classification**: The module is Tier 2 (not Tier 1) because it imports `crate::event`, which is Tier 1. The Tier 1 no-cross-import rule prohibits this at the same tier.
-- **Lua namespace**: The API is `luna.simulator.*`, not `luna.automation.*`. The table is registered via `luna.set("simulator", tbl)`.
+- **Lua namespace**: The API is `lurek.simulator.*`, not `lurek.automation.*`. The table is registered via `lurek.set("simulator", tbl)`.
 - **Simulator ownership**: `Simulator` is `Rc<RefCell<Simulator>>` in the Lua API — separate from `SharedState`. It is not stored in `SharedState`; the automation API creates and owns its own instance during registration.
 - **Event injection only**: The module pushes synthetic `Event` objects into the `EventQueue`. It never reads or consumes events. The input module (`src/input/`) handles actual input state.
 - **Memory cap**: `MAX_STEPS = 100_000` per script (~12 MB at ~120 bytes/step). Steps beyond this are silently truncated during `Script::new`. This is a security guard (CSF-010).
 - **PlaybackState is private**: The four-state FSM (`Idle`, `Running`, `Paused`, `Complete`) is private to `simulator.rs`. External code queries state via `is_running()`, `is_paused()`, `is_complete()`.
 - **No persistence**: Scripts exist only in memory. There is no built-in save/load to disk — scripts are constructed from Lua tables each time.
 - **Thread safety**: `Simulator` is not `Send` or `Sync`. It must remain on the main thread.
-- **Breaking change surface**: Renaming step action strings (`"keypress"`, `"mousemove"`, etc.) or the `luna.simulator.*` function names would break all existing automation scripts.
+- **Breaking change surface**: Renaming step action strings (`"keypress"`, `"mousemove"`, etc.) or the `lurek.simulator.*` function names would break all existing automation scripts.
 
 ## See Also
 
 | Module | Relationship |
 |---|---|
-| `timer::Scheduler` | For timed Lua callbacks (`after(delay)` / `every(interval)`), use `luna.time.newScheduler()`. `automation.Simulator` is for replaying **recorded input scripts**, not general timed callbacks. |
-| `patterns::StateMachine` | `Simulator` contains an internal 4-state FSM (`Idle/Running/Paused/Complete`). For **game-level** FSM needs (menus, NPC states, combat phases), use `luna.patterns.newStateMachine()` instead. |
+| `timer::Scheduler` | For timed Lua callbacks (`after(delay)` / `every(interval)`), use `lurek.time.newScheduler()`. `automation.Simulator` is for replaying **recorded input scripts**, not general timed callbacks. |
+| `patterns::StateMachine` | `Simulator` contains an internal 4-state FSM (`Idle/Running/Paused/Complete`). For **game-level** FSM needs (menus, NPC states, combat phases), use `lurek.patterns.newStateMachine()` instead. |

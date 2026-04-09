@@ -1,13 +1,13 @@
-//! Game-level integration tests for the Luna2D AI system.
+//! Game-level integration tests for the Lurek2D AI system.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::ai::*;
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::ai::*;
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 // ===========================================================================
 // Helpers

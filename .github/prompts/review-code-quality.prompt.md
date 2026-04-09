@@ -1,12 +1,12 @@
 ---
-description: "Run a full code review against Luna2D quality gates: compilation, lint, format, tests, conventions."
+description: "Run a full code review against Lurek2D quality gates: compilation, lint, format, tests, conventions."
 ---
 
 # Review Code Quality
 
 ## Purpose
 
-Systematic code review against all Luna2D quality gates.
+Systematic code review against all Lurek2D quality gates.
 
 ## Inputs
 
@@ -20,7 +20,7 @@ Systematic code review against all Luna2D quality gates.
 4. Run `cargo test` — verify all tests pass
 5. Check for `unsafe` blocks without `// SAFETY:` comments
 6. Check module dependency direction (no cross-domain imports)
-7. Check Lua API naming consistency (`luna.*` namespace)
+7. Check Lua API naming consistency (`lurek.*` namespace)
 8. Check visibility (`pub(crate)` preferred over `pub`)
 9. Check error handling (no `.unwrap()` in production paths)
 10. Report findings with severity: BLOCKER / WARNING / NOTE

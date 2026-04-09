@@ -1,6 +1,6 @@
 //! Stress tests for the physics module — mass body creation, simulation, and determinism.
 
-use luna2d::physics::{Body, BodyType, World};
+use lurek2d::physics::{Body, BodyType, World};
 
 #[test]
 fn stress_create_1000_bodies() {

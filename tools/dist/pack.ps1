@@ -1,24 +1,24 @@
 # tools/pack.ps1
 # =============================================================================
-# Pack a Luna2D game directory into a .lunar archive.
+# Pack a Lurek2D game directory into a .lurek archive.
 #
-# A .lunar file is a ZIP archive (low compression) containing all game assets
-# with main.lua at the root. Double-clicking it on a machine that has Luna2D
+# A .lurek file is a ZIP archive (low compression) containing all game assets
+# with main.lua at the root. Double-clicking it on a machine that has Lurek2D
 # installed will launch the game via the registered file association.
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File tools\pack.ps1 <game_dir> [output]
 #
 #   <game_dir>  Path to the game folder containing main.lua (required).
-#   [output]    Output path for the .lunar file.
-#               Defaults to <game_dir_name>.lunar in the current directory.
+#   [output]    Output path for the .lurek file.
+#               Defaults to <game_dir_name>.lurek in the current directory.
 #
 # Examples:
 #   tools\pack.ps1 examples\hello_world
-#     → hello_world.lunar
+#     → hello_world.lurek
 #
-#   tools\pack.ps1 examples\physics_demo dist\physics_demo.lunar
-#     → dist\physics_demo.lunar
+#   tools\pack.ps1 examples\physics_demo dist\physics_demo.lurek
+#     → dist\physics_demo.lurek
 # =============================================================================
 
 param(
@@ -43,7 +43,7 @@ if (-not (Test-Path "$GameDir\main.lua")) {
 # ── Determine output path ─────────────────────────────────────────────────────
 if ($Output -eq "") {
     $gameName = Split-Path $GameDir -Leaf
-    $Output   = Join-Path (Get-Location) "$gameName.lunar"
+    $Output   = Join-Path (Get-Location) "$gameName.lurek"
 }
 
 # Ensure the output directory exists

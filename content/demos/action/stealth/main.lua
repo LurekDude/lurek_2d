@@ -1,6 +1,6 @@
 -- Stealth Action Demo — top-down sneaking with guard vision cones
 -- WASD to move, LShift to crouch, Escape to quit
--- Run with: cargo run -- demos/action/stealth
+-- Run with: cargo run -- content/demos/action/stealth
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -63,9 +63,9 @@ local function canSee(guard, tx, ty)
     return true
 end
 
-function luna.init()
-    luna.window.setTitle("Stealth Action")
-    luna.gfx.setBackgroundColor(0.1, 0.12, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Stealth Action")
+    lurek.gfx.setBackgroundColor(0.1, 0.12, 0.1)
 
     -- walls
     walls = {
@@ -107,18 +107,18 @@ local function resetLevel()
     noiseRipples = {}
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if player.caught or player.won then return end
 
     -- player movement
     local speed = player.speed
-    player.crouching = luna.keyboard.isDown("lshift")
+    player.crouching = lurek.keyboard.isDown("lshift")
     if player.crouching then speed = speed * 0.4 end
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") then dy = -1 end
-    if luna.keyboard.isDown("s") then dy = 1 end
-    if luna.keyboard.isDown("a") then dx = -1 end
-    if luna.keyboard.isDown("d") then dx = 1 end
+    if lurek.keyboard.isDown("w") then dy = -1 end
+    if lurek.keyboard.isDown("s") then dy = 1 end
+    if lurek.keyboard.isDown("a") then dx = -1 end
+    if lurek.keyboard.isDown("d") then dx = 1 end
     if dx ~= 0 or dy ~= 0 then
         local len = math.sqrt(dx * dx + dy * dy)
         dx, dy = dx / len, dy / len
@@ -213,27 +213,27 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- hide spots
     for _, hs in ipairs(hideSpots) do
-        luna.gfx.setColor(0.05, 0.08, 0.05, 1)
-        luna.gfx.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
-        luna.gfx.setColor(0.2, 0.3, 0.2, 1)
-        luna.gfx.rectangle("line", hs.x, hs.y, hs.w, hs.h)
+        lurek.gfx.setColor(0.05, 0.08, 0.05, 1)
+        lurek.gfx.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
+        lurek.gfx.setColor(0.2, 0.3, 0.2, 1)
+        lurek.gfx.rectangle("line", hs.x, hs.y, hs.w, hs.h)
     end
 
     -- walls
     for _, w in ipairs(walls) do
-        luna.gfx.setColor(0.35, 0.3, 0.25, 1)
-        luna.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
+        lurek.gfx.setColor(0.35, 0.3, 0.25, 1)
+        lurek.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
     end
 
     -- exit zone
-    luna.gfx.setColor(0.2, 0.8, 0.2, 0.5)
-    luna.gfx.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    luna.gfx.setColor(0.2, 1, 0.2, 1)
-    luna.gfx.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    luna.gfx.print("EXIT", exitZone.x + 8, exitZone.y + 20)
+    lurek.gfx.setColor(0.2, 0.8, 0.2, 0.5)
+    lurek.gfx.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    lurek.gfx.setColor(0.2, 1, 0.2, 1)
+    lurek.gfx.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    lurek.gfx.print("EXIT", exitZone.x + 8, exitZone.y + 20)
 
     -- guard vision cones
     for _, g in ipairs(guards) do
@@ -243,7 +243,7 @@ function luna.render()
         local a = 0.12
         if g.state == "chase" then r, gr, b, a = 1, 0, 0, 0.2
         elseif g.suspicion > 0.5 then r, gr, b, a = 1, 0.5, 0, 0.15 end
-        luna.gfx.setColor(r, gr, b, a)
+        lurek.gfx.setColor(r, gr, b, a)
         for i = 0, segments - 1 do
             local a1 = g.angle - g.fov + step * i
             local a2 = g.angle - g.fov + step * (i + 1)
@@ -252,67 +252,67 @@ function luna.render()
                 g.x + math.cos(a1) * g.viewDist, g.y + math.sin(a1) * g.viewDist,
                 g.x + math.cos(a2) * g.viewDist, g.y + math.sin(a2) * g.viewDist,
             }
-            luna.gfx.polygon("fill", verts)
+            lurek.gfx.polygon("fill", verts)
         end
     end
 
     -- noise ripples
     for _, nr in ipairs(noiseRipples) do
-        luna.gfx.setColor(1, 1, 0.5, nr.alpha * 0.3)
-        luna.gfx.circle("line", nr.x, nr.y, nr.r)
+        lurek.gfx.setColor(1, 1, 0.5, nr.alpha * 0.3)
+        lurek.gfx.circle("line", nr.x, nr.y, nr.r)
     end
 
     -- guards
     for _, g in ipairs(guards) do
         if g.state == "chase" then
-            luna.gfx.setColor(1, 0.1, 0.1, 1)
+            lurek.gfx.setColor(1, 0.1, 0.1, 1)
         elseif g.suspicion > 0.5 then
-            luna.gfx.setColor(1, 0.6, 0.1, 1)
+            lurek.gfx.setColor(1, 0.6, 0.1, 1)
         else
-            luna.gfx.setColor(0.8, 0.8, 0.2, 1)
+            lurek.gfx.setColor(0.8, 0.8, 0.2, 1)
         end
-        luna.gfx.circle("fill", g.x, g.y, 10)
+        lurek.gfx.circle("fill", g.x, g.y, 10)
         -- direction indicator
-        luna.gfx.setColor(1, 1, 1, 0.8)
-        luna.gfx.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
+        lurek.gfx.setColor(1, 1, 1, 0.8)
+        lurek.gfx.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
     end
 
     -- player
     local pa = player.hidden and 0.4 or 1
     local pr = player.crouching and 5 or player.r
-    luna.gfx.setColor(0.2, 0.6, 1, pa)
-    luna.gfx.circle("fill", player.x, player.y, pr)
+    lurek.gfx.setColor(0.2, 0.6, 1, pa)
+    lurek.gfx.circle("fill", player.x, player.y, pr)
     if player.crouching then
-        luna.gfx.setColor(0.4, 0.8, 1, 0.3)
-        luna.gfx.circle("line", player.x, player.y, 12)
+        lurek.gfx.setColor(0.4, 0.8, 1, 0.3)
+        lurek.gfx.circle("line", player.x, player.y, 12)
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
     if player.hidden then
-        luna.gfx.setColor(0.3, 1, 0.3, 1)
-        luna.gfx.print("HIDDEN", 10, 30)
+        lurek.gfx.setColor(0.3, 1, 0.3, 1)
+        lurek.gfx.print("HIDDEN", 10, 30)
     end
-    luna.gfx.setColor(1, 1, 1, 0.5)
-    luna.gfx.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
+    lurek.gfx.setColor(1, 1, 1, 0.5)
+    lurek.gfx.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
 
     -- game over / win
     if player.caught then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 250, 250, 300, 80)
-        luna.gfx.setColor(1, 0.2, 0.2, 1)
-        luna.gfx.print("CAUGHT! Press R to retry", 290, 280, 1.2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
+        lurek.gfx.setColor(1, 0.2, 0.2, 1)
+        lurek.gfx.print("CAUGHT! Press R to retry", 290, 280, 1.2)
     end
     if player.won then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 250, 250, 300, 80)
-        luna.gfx.setColor(0.2, 1, 0.2, 1)
-        luna.gfx.print("ESCAPED! Press R to replay", 285, 280, 1.2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
+        lurek.gfx.setColor(0.2, 1, 0.2, 1)
+        lurek.gfx.print("ESCAPED! Press R to replay", 285, 280, 1.2)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then resetLevel() end
 end

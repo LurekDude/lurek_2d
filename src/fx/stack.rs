@@ -27,7 +27,7 @@ use crate::log_msg;
 /// - `height` — Internal canvas height in pixels.
 ///
 /// The stack manages ping-pong canvases internally for multi-pass rendering.
-/// During `luna.draw`, the user calls `beginCapture()` → draws scene →
+/// During `lurek.draw`, the user calls `beginCapture()` → draws scene →
 /// `endCapture()` → `apply()` to render the post-processed result.
 pub struct PostFxStack {
     /// Ordered effect indices referencing external effect storage.

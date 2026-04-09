@@ -10,7 +10,7 @@ Multi-threading with isolated Lua VMs: spawn worker threads with separate LuaJIT
 
 ## Current Feature Summary
 
-- `luna.thread.new(code)`: spawn isolated Lua VM in OS thread
+- `lurek.thread.new(code)`: spawn isolated Lua VM in OS thread
 - Channel: MPMC with `push/pop/peek/demand/supply`
 - 4 channel value types: Nil, Bool, Number, String (no tables!)
 - `ThreadState` enum: Running, Finished, Error
@@ -38,15 +38,15 @@ Multi-threading with isolated Lua VMs: spawn worker threads with separate LuaJIT
 ## Suggestions
 
 1. **Add table serialization**: `channel:pushTable(t)` — serialize Lua table to bytes internally, reconstruct on the other side. Even if limited to primitive-valued tables, this eliminates JSON round-trips.
-2. **Add thread pool**: `luna.thread.newPool(workerCount, code)` — reusable worker pool. `pool:submit(data)` / `pool:collect()`.
-3. **Add Promise/Future**: `local result = luna.thread.async(fn, args)` — returns a future that resolves in the next frame. Sugar over channel patterns.
+2. **Add thread pool**: `lurek.thread.newPool(workerCount, code)` — reusable worker pool. `pool:submit(data)` / `pool:collect()`.
+3. **Add Promise/Future**: `local result = lurek.thread.async(fn, args)` — returns a future that resolves in the next frame. Sugar over channel patterns.
 4. **Allow filesystem access in workers**: Workers should be able to read files (read-only) for background loading tasks. This is the most common use case for game threading.
 5. **Add channel timeout**: `channel:demand(timeout)` — blocks for at most N seconds. Returns nil on timeout.
 6. **Add ByteData channel type**: Allow sending `data.ByteData` through channels as a 5th type — enables efficient binary data exchange.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Thread model | Isolated VMs | ✅ (Threads) | ❌ (coroutines) | ✅ (Rayon) |
 | Channels | ✅ (4 types) | ✅ (any type) | N/A | ✅ (any type) |

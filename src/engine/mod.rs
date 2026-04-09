@@ -1,7 +1,7 @@
 //! Core engine lifecycle: application loop, configuration, error handling, and diagnostics.
 //!
-//! This module owns the highest-level runtime structures in the Luna2D engine.
-//! [`App`] drives the winit event loop, fires `luna.load/update/draw/keypressed/…` Lua
+//! This module owns the highest-level runtime structures in the Lurek2D engine.
+//! [`App`] drives the winit event loop, fires `lurek.load/update/draw/keypressed/…` Lua
 //! callbacks at the right moments, and holds every domain subsystem inside a
 //! `Rc<RefCell<SharedState>>` that is shared with the Lua VM.
 //!
@@ -23,7 +23,7 @@
 //! - [`resource_keys`] — typed newtype keys (`SoundKey`, `TextureKey`, `ShaderId`, …) for
 //!   all slot-map resource pools in the engine.
 
-/// Entry point for the Luna2D engine lifecycle and game loop.
+/// Entry point for the Lurek2D engine lifecycle and game loop.
 pub mod app;
 /// Engine and window configuration structs (Config, WindowConfig, etc.).
 pub mod config;

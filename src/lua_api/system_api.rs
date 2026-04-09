@@ -1,12 +1,12 @@
 ﻿//! System Api implementation for the `lua_api` subsystem.
 //!
-//! This module is part of Luna2D's `lua_api` subsystem and provides the implementation
+//! This module is part of Lurek2D's `lua_api` subsystem and provides the implementation
 //! details for system api-related operations and data management.
 //! Key types exported from this module: `PowerState`.
 //! Primary functions: `get_processor_count()`, `get_memory_size()`, `open_url()`, `get_preferred_locales()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -149,7 +149,7 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
     (PowerState::Unknown, None, None)
 }
 
-/// Registers `luna.platform.*` platform query functions into the Lua VM.
+/// Registers `lurek.platform.*` platform query functions into the Lua VM.
 ///
 /// # Parameters
 /// - `lua` ÔÇö The active Lua VM instance.
@@ -160,7 +160,7 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
 
-    // luna.platform.getOS() -> string
+    // lurek.platform.getOS() -> string
     /// Returns the host operating system name ('Windows', 'Linux', 'macOS').
     /// @return any
     system.set(
@@ -182,15 +182,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getVersion() -> string
-    /// Returns the Luna2D engine version string.
+    // lurek.platform.getVersion() -> string
+    /// Returns the Lurek2D engine version string.
     /// @return any
     system.set(
         "getVersion",
         lua.create_function(|_, ()| Ok(env!("CARGO_PKG_VERSION").to_string()))?,
     )?;
 
-    // luna.platform.getProcessorCount() -> integer
+    // lurek.platform.getProcessorCount() -> integer
     /// Returns the number of logical CPU cores available.
     /// @return any
     system.set(
@@ -198,7 +198,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, ()| Ok(get_processor_count()))?,
     )?;
 
-    // luna.platform.getMemorySize() -> integer (MiB)
+    // lurek.platform.getMemorySize() -> integer (MiB)
     /// Returns the total amount of installed system RAM in megabytes.
     /// @return any
     ///
@@ -209,7 +209,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, ()| Ok(get_memory_size()))?,
     )?;
 
-    // luna.platform.openURL(url) -> bool
+    // lurek.platform.openURL(url) -> bool
     /// Opens a URL in the system's default browser.
     /// @param url : string
     /// @return any
@@ -218,7 +218,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, url: String| Ok(open_url(&url)))?,
     )?;
 
-    // luna.platform.getPreferredLocales() -> table of strings
+    // lurek.platform.getPreferredLocales() -> table of strings
     /// Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
     /// @return any
     ///
@@ -229,7 +229,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, ()| Ok(get_preferred_locales()))?,
     )?;
 
-    // luna.platform.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
+    // lurek.platform.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
     /// Returns battery state, percentage charged, and estimated time remaining.
     /// @return any
     ///
@@ -243,7 +243,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
+    // lurek.platform.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
     /// Returns a table of system information including OS name, CPU model, and installed RAM.
     /// @return any
     ///
@@ -254,7 +254,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|lua, ()| {
             let info = lua.create_table()?;
             /// Engine.
-            info.set("engine", "Luna2D")?;
+            info.set("engine", "Lurek2D")?;
             /// Version.
             info.set("version", env!("CARGO_PKG_VERSION"))?;
             /// Lua_version.
@@ -282,7 +282,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.setClipboardText(text) ÔÇö writes text to the system clipboard.
+    // lurek.platform.setClipboardText(text) ÔÇö writes text to the system clipboard.
     /// Replaces the system clipboard contents with the given string.
     /// @param text : string
     system.set(
@@ -302,7 +302,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getClipboardText() -> string ÔÇö reads text from the system clipboard.
+    // lurek.platform.getClipboardText() -> string ÔÇö reads text from the system clipboard.
     /// Returns the current contents of the system clipboard.
     /// @return any
     system.set(
@@ -325,7 +325,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // Clone for getLastError below (before state is consumed by getDebugOverlay)
     let state_for_error = state.clone();
 
-    // luna.platform.setDebugOverlay(enabled)
+    // lurek.platform.setDebugOverlay(enabled)
     /// Shows or hides the FPS/draw-call debug overlay.
     let s = state.clone();
     /// @param enabled : boolean
@@ -337,7 +337,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getDebugOverlay() -> bool
+    // lurek.platform.getDebugOverlay() -> bool
     let s = state;
     /// Returns whether the debug overlay is currently visible.
     system.set(
@@ -354,7 +354,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     ///
     /// # Parameters
     /// - `level` ÔÇö One of 'debug', 'info', 'warn', or 'error'.
-    // luna.platform.setLogLevel(level)
+    // lurek.platform.setLogLevel(level)
     /// @param level : string
     system.set(
         "setLogLevel",
@@ -369,7 +369,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     ///
     /// # Returns
     /// One of 'debug', 'info', 'warn', or 'error'.
-    // luna.platform.getLogLevel()
+    // lurek.platform.getLogLevel()
     system.set(
         "getLogLevel",
         lua.create_function(|_, ()| Ok(log_messages::get_log_level().to_string()))?,
@@ -377,7 +377,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     #[allow(unused_doc_comments)]
     /// Emit a log message from Lua at the specified level.
-    // luna.platform.log(level, message)
+    // lurek.platform.log(level, message)
     /// @param level : string
     /// @param message : string
     system.set(
@@ -397,7 +397,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     #[allow(unused_doc_comments)]
     /// Get the last engine error as a structured table, or nil.
-    // luna.platform.getLastError()
+    // lurek.platform.getLastError()
     {
         /// Returns the last unhandled error message, or nil.
         let s = state_for_error.clone();
@@ -426,7 +426,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?;
     }
 
-    // luna.platform.getArch() -> string
+    // lurek.platform.getArch() -> string
     /// Returns the CPU architecture string for the current machine.
     /// @return any
     ///
@@ -437,7 +437,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, ()| Ok(std::env::consts::ARCH.to_string()))?,
     )?;
 
-    // luna.platform.getEnv(name) -> string|nil
+    // lurek.platform.getEnv(name) -> string|nil
     /// Returns the value of the named OS environment variable, or nil if not set.
     /// @param name : string
     /// @return any
@@ -455,7 +455,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getArgs() -> table
+    // lurek.platform.getArgs() -> table
     /// Returns the command-line arguments as a table.
     /// @return table
     system.set(
@@ -470,7 +470,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
+    // lurek.platform.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
     /// Parses a command-line argument string and returns a structured key/value table.
     /// @param args : table?
     /// @return any
@@ -542,7 +542,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.runBatch(tasks [, opts]) -> results table
+    // lurek.platform.runBatch(tasks [, opts]) -> results table
     /// Runs a list of shell commands in parallel and returns immediately without blocking.
     /// @param tasks : table
     /// @param opts : table?
@@ -600,7 +600,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    // luna.platform.getBatchResults(results) -> passed, failed, skipped
+    // lurek.platform.getBatchResults(results) -> passed, failed, skipped
     /// Returns the output table from the most recently completed runBatch call.
     /// @param results : table
     /// @return any

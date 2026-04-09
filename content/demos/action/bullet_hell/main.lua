@@ -1,7 +1,7 @@
 -- Bullet Hell Shooter
 -- Controls: Arrow keys to move, Space to shoot, Escape to quit
 -- Survive waves of enemies and their bullet patterns!
--- Run with: cargo run -- demos/action/bullet_hell
+-- Run with: cargo run -- content/demos/action/bullet_hell
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -19,9 +19,9 @@ local wave = 1
 local shootTimer = 0
 local W, H = 800, 600
 
-function luna.init()
-    luna.window.setTitle("Bullet Hell")
-    luna.gfx.setBackgroundColor(0.05, 0.02, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Bullet Hell")
+    lurek.gfx.setBackgroundColor(0.05, 0.02, 0.1)
     player.x = W / 2
     player.y = H - 60
     player.w = 20
@@ -65,14 +65,14 @@ local function fireEnemyBullet(e, angle, speed)
     })
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
 
     -- Player movement
-    if luna.keyboard.isDown("left") then player.x = player.x - player.speed * dt end
-    if luna.keyboard.isDown("right") then player.x = player.x + player.speed * dt end
-    if luna.keyboard.isDown("up") then player.y = player.y - player.speed * dt end
-    if luna.keyboard.isDown("down") then player.y = player.y + player.speed * dt end
+    if lurek.keyboard.isDown("left") then player.x = player.x - player.speed * dt end
+    if lurek.keyboard.isDown("right") then player.x = player.x + player.speed * dt end
+    if lurek.keyboard.isDown("up") then player.y = player.y - player.speed * dt end
+    if lurek.keyboard.isDown("down") then player.y = player.y + player.speed * dt end
     player.x = clamp(player.x, 10, W - 10)
     player.y = clamp(player.y, 10, H - 10)
 
@@ -171,19 +171,19 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Stars background
-    luna.gfx.setColor(0.3, 0.3, 0.4, 0.6)
+    lurek.gfx.setColor(0.3, 0.3, 0.4, 0.6)
     for i = 1, 60 do
         local sx = (i * 137) % W
-        local sy = ((i * 251) + luna.time.getTime() * (20 + i % 3 * 10)) % H
-        luna.gfx.rectangle("fill", sx, sy, 2, 2)
+        local sy = ((i * 251) + lurek.time.getTime() * (20 + i % 3 * 10)) % H
+        lurek.gfx.rectangle("fill", sx, sy, 2, 2)
     end
 
     -- Player
     if not gameOver then
-        luna.gfx.setColor(0.3, 0.7, 1, 1)
-        luna.gfx.polygon("fill", {
+        lurek.gfx.setColor(0.3, 0.7, 1, 1)
+        lurek.gfx.polygon("fill", {
             player.x, player.y - 14,
             player.x - 10, player.y + 10,
             player.x + 10, player.y + 10
@@ -191,47 +191,47 @@ function luna.render()
     end
 
     -- Player bullets
-    luna.gfx.setColor(0.4, 1, 0.4, 1)
+    lurek.gfx.setColor(0.4, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 10)
+        lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 10)
     end
 
     -- Enemies
-    luna.gfx.setColor(1, 0.3, 0.3, 1)
+    lurek.gfx.setColor(1, 0.3, 0.3, 1)
     for _, e in ipairs(enemies) do
-        luna.gfx.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
-        luna.gfx.setColor(1, 0.6, 0, 1)
-        luna.gfx.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
-        luna.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
+        lurek.gfx.setColor(1, 0.6, 0, 1)
+        lurek.gfx.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
+        lurek.gfx.setColor(1, 0.3, 0.3, 1)
     end
 
     -- Enemy bullets
-    luna.gfx.setColor(1, 1, 0.2, 1)
+    lurek.gfx.setColor(1, 1, 0.2, 1)
     for _, b in ipairs(enemyBullets) do
-        luna.gfx.circle("fill", b.x, b.y, 4)
+        lurek.gfx.circle("fill", b.x, b.y, 4)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2)
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Score: " .. score, 10, 10)
-    luna.gfx.print("Lives: " .. lives, 10, 30)
-    luna.gfx.print("Wave: " .. wave, 10, 50)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 90, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Score: " .. score, 10, 10)
+    lurek.gfx.print("Lives: " .. lives, 10, 30)
+    lurek.gfx.print("Wave: " .. wave, 10, 50)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 90, 10)
 
     if gameOver then
-        luna.gfx.setColor(1, 0.2, 0.2, 1)
-        luna.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
+        lurek.gfx.setColor(1, 0.2, 0.2, 1)
+        lurek.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 end

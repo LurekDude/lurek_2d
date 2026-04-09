@@ -10,7 +10,7 @@ General-purpose DAG (Directed Acyclic Graph) task pipeline: define named stages 
 
 ## Current Feature Summary
 
-- `luna.pipeline.new(name?)` — create a new pipeline
+- `lurek.pipeline.new(name?)` — create a new pipeline
 - `pipeline:addStage(name, fn, opts)` — add a stage with dependencies
 - `pipeline:run(context?)` — execute stages in dependency order
 - `pipeline:getResult(stageName)` — get stage output
@@ -51,13 +51,13 @@ General-purpose DAG (Directed Acyclic Graph) task pipeline: define named stages 
 3. **Add progress callbacks**: `pipeline:onProgress(function(stage, index, total) end)` — track execution.
 4. **Add pipeline visualization**: `pipeline:toAscii()` — render DAG as ASCII art for debugging.
 5. **Document use cases clearly**: Provide concrete examples: asset pipeline, mod loading order, game initialization. Without examples, users won't know why this module exists.
-6. **If keeping as Tier 2**: Add parallel execution support via `luna.thread` workers for independent stages. This would be the strongest justification for keeping it in Rust.
+6. **If keeping as Tier 2**: Add parallel execution support via `lurek.thread` workers for independent stages. This would be the strongest justification for keeping it in Rust.
 
 ## Competitor Comparison
 
-No competitor 2D Lua engine has a built-in pipeline orchestrator. This is unique to Luna2D, but its uniqueness may indicate it doesn't belong in a game engine.
+No competitor 2D Lua engine has a built-in pipeline orchestrator. This is unique to Lurek2D, but its uniqueness may indicate it doesn't belong in a game engine.
 
-| Feature | Luna2D | Love2D | Solar2D | Build tools |
+| Feature | Lurek2D | Engine A | Engine B | Build tools |
 |---|---|---|---|---|
 | DAG scheduling | ✅ | ❌ | ❌ | ✅ (Make, Gulp) |
 | Dependency resolution | ✅ | N/A | N/A | ✅ |

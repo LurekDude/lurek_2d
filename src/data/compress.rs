@@ -1,12 +1,12 @@
 //! Data compression and decompression using deflate, gzip, zlib, and LZ4.
 //!
-//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! This module is part of Lurek2D's `data` subsystem and provides the implementation
 //! details for compress-related operations and data management.
 //! Key types exported from this module: `CompressFormat`.
 //! Primary functions: `parse_str()`, `compress()`, `decompress()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::io::{Read, Write};
 

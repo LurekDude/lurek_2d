@@ -7,7 +7,7 @@
 
 ## Current State
 
-Luna2D uses a lightweight ECS with:
+Lurek2D uses a lightweight ECS with:
 - `SlotMap<EntityId, EntityData>` for entity storage
 - HashSet<String> per entity for string tags
 - 64-bit bitmap mask per entity for numeric tags
@@ -188,7 +188,7 @@ pub fn movement_system(universe: &mut Universe, dt: f32) {
 ```
 
 This requires a split-borrow pattern or unsafe code to parallelize,
-but can be achieved with the read/write separation design seen in Bevy's
+but can be achieved with the read/write separation design seen in Engine D's
 ECS `par_iter` system.
 
 ---

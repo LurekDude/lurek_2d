@@ -1,23 +1,22 @@
 -- examples/network.lua
 -- UDP networking via ENet for multiplayer games
--- API: luna.network
+-- API: lurek.network
 --
 -- Based on the ENet reliable UDP library. Supports peer-to-peer and
 -- client/server topologies, multiple channels, bandwidth throttling,
 -- and both reliable and unreliable packet delivery.
 --
--- This file is documentation code, not a runnable game.
--- NOTE: luna.network requires the network module enabled in conf.lua
---   function luna.conf(t)
---     t.modules.network = true
---   end
+-- NOTE: lurek.network requires the network module enabled in conf.lua
+function lurek.conf(t)
+t.modules.network = true
+end
 
 --------------------------------------------------------------------------------
 -- Creating a host
 --------------------------------------------------------------------------------
 
 -- Server: bind to a fixed port, accept up to 16 peers on 2 channels
-local server = luna.network.newHost({
+local server = lurek.network.newHost({
     addr         = "0.0.0.0:27015",   -- bind address (host:port)
     peers        = 16,                 -- max simultaneous peers
     channels     = 2,                  -- channel count (default 1)
@@ -26,9 +25,9 @@ local server = luna.network.newHost({
 })
 
 -- Client: bind to any ephemeral port (no addr required)
-local client = luna.network.newHost({})
+local client = lurek.network.newHost({})
 -- Or with a specific source address:
--- local client = luna.network.newHost({ addr = "0.0.0.0:0" })
+local client = lurek.network.newHost({ addr = "0.0.0.0:0" })
 
 --------------------------------------------------------------------------------
 -- Connecting (client side)
@@ -43,9 +42,9 @@ local peer_id = client:connect("127.0.0.1:27015", 2, 0)
 --------------------------------------------------------------------------------
 
 -- service() → event table or nil (non-blocking poll for ONE event)
--- Call per-frame inside luna.process(dt)
+-- Call per-frame inside lurek.process(dt)
 
-luna.process = function(dt)
+lurek.process = function(dt)
     -- Server event pump
     local ev = server:service()
     while ev ~= nil do
@@ -171,7 +170,7 @@ server:destroy()
 local gone = server:isDestroyed()   -- true
 
 -- Good practice in luna cleanup:
-luna.quit = function()
+lurek.quit = function()
     if not client:isDestroyed() then
         client:disconnect(peer_id)
         client:flush()
@@ -194,12 +193,12 @@ local net_client = nil
 local my_peer_id = nil
 
 local function startServer()
-    net_server = luna.network.newHost({ addr = "0.0.0.0:" .. HOST_PORT, peers = 8, channels = 2 })
+    net_server = lurek.network.newHost({ addr = "0.0.0.0:" .. HOST_PORT, peers = 8, channels = 2 })
     print("Server listening on :" .. HOST_PORT)
 end
 
 local function startClient(host_ip)
-    net_client = luna.network.newHost({})
+    net_client = lurek.network.newHost({})
     my_peer_id = net_client:connect(host_ip .. ":" .. HOST_PORT, 2)
     print("Connecting to", host_ip)
 end
@@ -210,7 +209,7 @@ local function pumpServer()
     while ev do
         if ev.type == "connect" then
             -- Send welcome message
-            net_server:send(ev.peer_id, 0, "welcome:servertime=" .. luna.time.getTime())
+            net_server:send(ev.peer_id, 0, "welcome:servertime=" .. lurek.time.getTime())
         elseif ev.type == "receive" then
             -- Echo back (simple test)
             net_server:broadcast(0, "echo:" .. ev.data)
@@ -234,7 +233,7 @@ local function pumpClient()
     end
 end
 
-luna.process = function(dt)
+lurek.process = function(dt)
     pumpServer()
     pumpClient()
 end

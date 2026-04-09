@@ -60,7 +60,7 @@ src/lua_api/*.rs  →  tools/gen_api_data.py  →  data/api_data.json  →  apiD
 2. Copy or symlink `docs/api_data.json` → `vscode-extension/data/api_data.json`
 3. Modify `apiData.ts` to load and parse the JSON file at activation
 4. Remove hardcoded API definitions from `apiData.ts`
-5. Add a VS Code command: `luna.api.regenerate` → runs gen_api_data.py → reloads
+5. Add a VS Code command: `lurek.api.regenerate` → runs gen_api_data.py → reloads
 
 **Benefit**: All 1523 functions automatically available in IntelliSense. Zero manual sync.
 
@@ -93,13 +93,13 @@ Verify that the existing `docs/api_data.json` contains all fields needed by prov
 **Concept**: Visual report of API documentation coverage.
 
 **Features**:
-- Show % of luna.* functions with docstrings
+- Show % of lurek.* functions with docstrings
 - Show % of parameters documented
 - Show % of return types documented
 - Highlight undocumented functions
 - Link each gap to the source file for easy fixing
 
-**Implementation**: Already partially exists as `luna.apiCoverage` command.
+**Implementation**: Already partially exists as `lurek.apiCoverage` command.
 
 ### 5. Data Validation
 

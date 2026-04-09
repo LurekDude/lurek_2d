@@ -1,8 +1,8 @@
 //! UDP networking via ENet — reliable packet transport for multiplayer games.
 //!
 //! This module wraps the [`rusty_enet`] crate to provide both a high-level
-//! `luna.network` API (options tables, event tables, camelCase) and a raw
-//! `luna.net` / `enet` API (direct ENet signatures, underscore naming,
+//! `lurek.network` API (options tables, event tables, camelCase) and a raw
+//! `lurek.net` / `enet` API (direct ENet signatures, underscore naming,
 //! multi-value returns).
 //!
 //! An ENet host acts as both server and client endpoint simultaneously:

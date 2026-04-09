@@ -76,9 +76,9 @@ impl AsyncSaveSystem {
 
 **Lua API**:
 ```lua
-luna.savegame.save(1, data)         -- fire-and-forget (no frame stall)
-luna.savegame.save_sync(1, data)    -- wait for confirmation
-local pending = luna.savegame.is_pending(1)  -- poll for completion
+lurek.savegame.save(1, data)         -- fire-and-forget (no frame stall)
+lurek.savegame.save_sync(1, data)    -- wait for confirmation
+local pending = lurek.savegame.is_pending(1)  -- poll for completion
 ```
 
 ---
@@ -206,7 +206,7 @@ impl ModWatcher {
 Hot-reload path:
 1. `file_watcher` thread detects `.lua` file change in mod folder
 2. Sends `PathBuf` over mpsc to main thread
-3. Main thread's `luna.update` polls → triggers mod reload on next frame
+3. Main thread's `lurek.update` polls → triggers mod reload on next frame
    (no blocking required)
 
 ---
@@ -232,11 +232,11 @@ Pre-announce assets that will be needed 2–3 seconds in future:
 
 ```lua
 -- In a loading screen:
-luna.fs.prefetch("level_data/world2.dat")
-luna.fs.prefetch("audio/boss_music.ogg")
+lurek.fs.prefetch("level_data/world2.dat")
+lurek.fs.prefetch("audio/boss_music.ogg")
 
 -- When actually used 3 seconds later:
-local data = luna.fs.read("level_data/world2.dat")  -- already in cache
+local data = lurek.fs.read("level_data/world2.dat")  -- already in cache
 ```
 
 ---

@@ -1,6 +1,6 @@
--- Creature Collector — Luna2D Demo
+-- Creature Collector — Lurek2D Demo
 -- WASD to walk, random encounters, catch creatures
--- Run with: cargo run -- demos/rpg/creature_collector
+-- Run with: cargo run -- content/demos/rpg/creature_collector
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -96,23 +96,23 @@ local function doAttack(attacker, defender)
     return dmg, mult
 end
 
-function luna.init()
-    luna.window.setTitle("Creature Collector")
-    luna.gfx.setBackgroundColor(0.05, 0.08, 0.05)
+function lurek.init()
+    lurek.window.setTitle("Creature Collector")
+    lurek.gfx.setBackgroundColor(0.05, 0.08, 0.05)
     genMap()
     -- starter creature
     party[1] = makeCreature(creatureDB[1], 3)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if state == "overworld" then
         moveCD = moveCD - dt
         if moveCD <= 0 then
             local dx, dy = 0, 0
-            if luna.keyboard.isDown("w") then dy = -1
-            elseif luna.keyboard.isDown("s") then dy = 1
-            elseif luna.keyboard.isDown("a") then dx = -1
-            elseif luna.keyboard.isDown("d") then dx = 1
+            if lurek.keyboard.isDown("w") then dy = -1
+            elseif lurek.keyboard.isDown("s") then dy = 1
+            elseif lurek.keyboard.isDown("a") then dx = -1
+            elseif lurek.keyboard.isDown("d") then dx = 1
             end
             if dx ~= 0 or dy ~= 0 then
                 local nx, ny = player.gx + dx, player.gy + dy
@@ -133,97 +133,97 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     if state == "overworld" then
         -- map
         for y = 1, ROWS do
             for x = 1, COLS do
                 local t = map[y][x]
                 local c = tileColors[t] or tileColors.grass
-                luna.gfx.setColor(c[1], c[2], c[3], 1)
-                luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+                lurek.gfx.setColor(c[1], c[2], c[3], 1)
+                lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
             end
         end
 
         -- player
-        luna.gfx.setColor(1, 0.85, 0.2, 1)
-        luna.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+        lurek.gfx.setColor(1, 0.85, 0.2, 1)
+        lurek.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
         -- HUD
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
+        lurek.gfx.setColor(1, 1, 1, 1)
         local partyStr = "Party: "
         for i, c in ipairs(party) do
             partyStr = partyStr .. c.name .. "(HP:" .. c.hp .. "/" .. c.maxHp .. ") "
         end
-        luna.gfx.print(partyStr, 10, ROWS * TILE + 5)
-        luna.gfx.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
+        lurek.gfx.print(partyStr, 10, ROWS * TILE + 5)
+        lurek.gfx.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
 
     elseif state == "battle" then
         local active = party[battle.activeIdx]
         local wild = battle.wild
 
         -- background
-        luna.gfx.setColor(0.1, 0.15, 0.1, 1)
-        luna.gfx.rectangle("fill", 0, 0, 800, 600)
+        lurek.gfx.setColor(0.1, 0.15, 0.1, 1)
+        lurek.gfx.rectangle("fill", 0, 0, 800, 600)
 
         -- wild creature (right)
-        luna.gfx.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
-        luna.gfx.circle("fill", 580, 180, 45)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
+        lurek.gfx.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
+        lurek.gfx.circle("fill", 580, 180, 45)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
         -- hp bar
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", 500, 130, 160, 12)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", 500, 130, 160, 12)
         local whp = clamp(wild.hp / wild.maxHp, 0, 1)
-        luna.gfx.setColor(1 - whp, whp, 0.1, 1)
-        luna.gfx.rectangle("fill", 500, 130, 160 * whp, 12)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
+        lurek.gfx.setColor(1 - whp, whp, 0.1, 1)
+        lurek.gfx.rectangle("fill", 500, 130, 160 * whp, 12)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
 
         -- player creature (left)
         if active then
-            luna.gfx.setColor(active.color[1], active.color[2], active.color[3], 1)
-            luna.gfx.circle("fill", 200, 350, 45)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
-            luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-            luna.gfx.rectangle("fill", 100, 300, 160, 12)
+            lurek.gfx.setColor(active.color[1], active.color[2], active.color[3], 1)
+            lurek.gfx.circle("fill", 200, 350, 45)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
+            lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+            lurek.gfx.rectangle("fill", 100, 300, 160, 12)
             local php = clamp(active.hp / active.maxHp, 0, 1)
-            luna.gfx.setColor(1 - php, php, 0.1, 1)
-            luna.gfx.rectangle("fill", 100, 300, 160 * php, 12)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(active.hp .. "/" .. active.maxHp, 120, 315)
+            lurek.gfx.setColor(1 - php, php, 0.1, 1)
+            lurek.gfx.rectangle("fill", 100, 300, 160 * php, 12)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(active.hp .. "/" .. active.maxHp, 120, 315)
         end
 
         -- battle log
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 20, 440, 760, 50)
-        luna.gfx.setColor(1, 1, 0.7, 1)
-        luna.gfx.print(battleLog, 30, 450)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 20, 440, 760, 50)
+        lurek.gfx.setColor(1, 1, 0.7, 1)
+        lurek.gfx.print(battleLog, 30, 450)
 
         -- menu
         if battle.turn == "player" then
             local opts = { "Attack", "Capture", "Run" }
-            luna.gfx.setColor(0, 0, 0, 0.8)
-            luna.gfx.rectangle("fill", 20, 500, 760, 90)
+            lurek.gfx.setColor(0, 0, 0, 0.8)
+            lurek.gfx.rectangle("fill", 20, 500, 760, 90)
             for i, opt in ipairs(opts) do
                 if i == battleChoice then
-                    luna.gfx.setColor(1, 1, 0.3, 1)
-                    luna.gfx.print("> " .. opt, 30 + (i - 1) * 200, 530)
+                    lurek.gfx.setColor(1, 1, 0.3, 1)
+                    lurek.gfx.print("> " .. opt, 30 + (i - 1) * 200, 530)
                 else
-                    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-                    luna.gfx.print("  " .. opt, 30 + (i - 1) * 200, 530)
+                    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+                    lurek.gfx.print("  " .. opt, 30 + (i - 1) * 200, 530)
                 end
             end
         elseif battle.turn == "result" then
-            luna.gfx.setColor(0, 0, 0, 0.8)
-            luna.gfx.rectangle("fill", 20, 500, 760, 90)
-            luna.gfx.setColor(0.3, 1, 0.5, 1)
-            luna.gfx.print(battle.result, 30, 520)
-            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-            luna.gfx.print("Press SPACE to continue", 30, 550)
+            lurek.gfx.setColor(0, 0, 0, 0.8)
+            lurek.gfx.rectangle("fill", 20, 500, 760, 90)
+            lurek.gfx.setColor(0.3, 1, 0.5, 1)
+            lurek.gfx.print(battle.result, 30, 520)
+            lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+            lurek.gfx.print("Press SPACE to continue", 30, 550)
         end
     end
 end
@@ -248,8 +248,8 @@ local function enemyTurn()
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 
     if state == "battle" then
         if battle.turn == "player" then

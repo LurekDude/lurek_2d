@@ -1,11 +1,11 @@
 # Post-FX Demo
 
-Demonstrates Luna2D's post-processing effects stack. Effects are toggled, reordered, and parameter-tuned at runtime using keyboard controls.
+Demonstrates Lurek2D's post-processing effects stack. Effects are toggled, reordered, and parameter-tuned at runtime using keyboard controls.
 
 ## What It Demonstrates
 
-- `luna.postfx.newEffect()` — create a named post-processing effect
-- `luna.postfx.newStack()` — compose multiple effects in order
+- `lurek.postfx.newEffect()` — create a named post-processing effect
+- `lurek.postfx.newStack()` — compose multiple effects in order
 - `stack:addEffect()` / `removeEffect()` — dynamic pipeline editing
 - `stack:setEnabled()` — toggle effects without removing them
 - `stack:setParam()` — adjust effect parameters at runtime
@@ -15,7 +15,7 @@ Demonstrates Luna2D's post-processing effects stack. Effects are toggled, reorde
 ## How to Run
 
 ```powershell
-cargo run -- demos/postfx_demo
+cargo run -- content/demos/postfx_demo
 ```
 
 ## Controls

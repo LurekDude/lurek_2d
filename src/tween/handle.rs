@@ -2,7 +2,7 @@
 //!
 //! # Purpose
 //!
-//! This module defines the three Lua-facing handle types for `luna.tween`:
+//! This module defines the three Lua-facing handle types for `lurek.tween`:
 //!
 //! - [`LuaTween`] — animates named numeric fields on a Lua table over time.
 //! - [`LuaTweenSequence`] — runs a list of tween/delay/callback steps in order.
@@ -404,7 +404,7 @@ pub enum SequenceStep {
 ///
 /// Each step can be a tween, a wait delay, or an arbitrary Lua callback. Steps are
 /// added via `:tween()`, `:delay()`, and `:callback()` (all return `self` for builder
-/// chaining). The sequence begins executing when `:start()` is called; the `luna.tween`
+/// chaining). The sequence begins executing when `:start()` is called; the `lurek.tween`
 /// engine then ticks it each frame via `update(dt)`.
 ///
 /// # Fields
@@ -633,7 +633,7 @@ impl LuaUserData for LuaTweenSequence {
         );
 
         // ── start ─────────────────────────────────────────────────────────
-        /// Marks the sequence as active so `luna.tween.update(dt)` begins ticking it. Returns self.
+        /// Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
         /// @return TweenSequence
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenSequence>()?.active = true;
@@ -708,7 +708,7 @@ pub struct ParallelEntry {
 ///
 /// Child tweens are added via `:add(tween)` (adopts an existing `LuaTween`) or
 /// created inline with `:tween()`. Call `:start()` to activate the group and register
-/// it with the `luna.tween` engine. The parallel completes when every child entry
+/// it with the `lurek.tween` engine. The parallel completes when every child entry
 /// finishes; `on_complete` fires at that point.
 ///
 /// # Fields

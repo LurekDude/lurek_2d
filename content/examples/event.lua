@@ -1,6 +1,5 @@
 -- examples/event.lua
--- Luna2D luna.signal API Reference
--- This file is documentation code, not a runnable game.
+-- Lurek2D lurek.signal API Reference
 -- Covers the Signal event bus and the engine event queue.
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -8,7 +7,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Create a standalone signal object (not tied to a name)
-local signal = luna.signal.newSignal()
+local signal = lurek.signal.newSignal()
 
 -- Subscribe a listener; returns an opaque handle for later removal
 local handle = signal:register("player_died", function(player_id, cause)
@@ -36,8 +35,8 @@ local total = signal:getTotalCount()
 -- ── Named global signals ─────────────────────────────────────────────────────
 
 -- Get (or create) a globally named signal — same name returns the same object
-local ui_events = luna.signal.getSignal("ui")
-local sfx_bus   = luna.signal.getSignal("sfx")
+local ui_events = lurek.signal.getSignal("ui")
+local sfx_bus   = lurek.signal.getSignal("sfx")
 
 -- Multiple subscribers on the same signal
 local h1 = ui_events:register("button_click", function(id)
@@ -55,9 +54,9 @@ ui_events:emit("button_click", "start_button")
 
 -- Define all game events in one place:
 local events = {
-    game_over = luna.signal.newSignal(),
-    item_picked_up = luna.signal.newSignal(),
-    level_complete = luna.signal.newSignal(),
+    game_over = lurek.signal.newSignal(),
+    item_picked_up = lurek.signal.newSignal(),
+    level_complete = lurek.signal.newSignal(),
 }
 
 -- Subscribe from different systems:
@@ -77,25 +76,25 @@ events.item_picked_up:emit("item_picked_up", "health_potion", 1)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Push a custom event into the queue with optional payload values
-luna.signal.push("score_changed", 1500)
-luna.signal.push("cutscene_start", "intro")
-luna.signal.push("achievement_unlocked", "first_kill", { icon = "sword" })
+lurek.signal.push("score_changed", 1500)
+lurek.signal.push("cutscene_start", "intro")
+lurek.signal.push("achievement_unlocked", "first_kill", { icon = "sword" })
 
 -- Count events currently waiting in the queue
-local queued = luna.signal.getCount()
+local queued = lurek.signal.getCount()
 
 -- Poll the next event from the queue (returns name + extra values, or nil if empty)
-local name, a1, a2 = luna.signal.poll()
+local name, a1, a2 = lurek.signal.poll()
 if name then
     print("event:", name, a1, a2)
 end
 
 -- Process all queued events in a loop (typical main loop pattern):
-function luna.process(dt)
+function lurek.process(dt)
     local ev, v1, v2, v3
     local safety = 0
     repeat
-        ev, v1, v2, v3 = luna.signal.poll()
+        ev, v1, v2, v3 = lurek.signal.poll()
         if ev == "score_changed" then
             -- update score display using v1
         elseif ev == "cutscene_start" then
@@ -108,25 +107,25 @@ function luna.process(dt)
 end
 
 -- Discard all remaining queued events
-luna.signal.clear()
+lurek.signal.clear()
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Quitting
 -- ─────────────────────────────────────────────────────────────────────────────
 
--- Request the engine to exit cleanly (runs luna.quit() callback if defined)
--- luna.signal.quit()
+-- Request the engine to exit cleanly (runs lurek.quit() callback if defined)
+lurek.signal.quit()
 
 -- Request exit with a specific process exit code
--- luna.signal.quit(1)  -- non-zero = error exit
+lurek.signal.quit(1)  -- non-zero = error exit
 
 -- ─── Signal ────────────────────────────────────────────────────────────────────
 
 local signal_type = signal:type()  -- "Signal"
 local signal_is_type = signal:typeOf("Signal")  -- Returns true if the given type name matches this object's type or any parent type
 
--- ─── luna.signal ───────────────────────────────────────────────────────────────
-luna.signal.exit()  -- Pushes an exit event, requesting the engine to stop
-luna.signal.pump()  -- Syncs OS-level events into the queue (no-op in Luna2D push model)
-luna.signal.restart()  -- Requests that the engine restart at the beginning of the next frame
-local wait = luna.signal.wait()  -- Blocks until the next event arrives or the optional timeout elapses
+-- ─── lurek.signal ───────────────────────────────────────────────────────────────
+lurek.signal.exit()  -- Pushes an exit event, requesting the engine to stop
+lurek.signal.pump()  -- Syncs OS-level events into the queue (no-op in Lurek2D push model)
+lurek.signal.restart()  -- Requests that the engine restart at the beginning of the next frame
+local wait = lurek.signal.wait()  -- Blocks until the next event arrives or the optional timeout elapses

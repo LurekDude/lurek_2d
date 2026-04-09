@@ -52,9 +52,9 @@ Grid-based terminal emulator: character cells with foreground/background colors,
 
 ## Competitor Comparison
 
-No competitor 2D Lua engine has a built-in terminal emulator. This is unique to Luna2D.
+No competitor 2D Lua engine has a built-in terminal emulator. This is unique to Lurek2D.
 
-| Feature | Luna2D | Love2D | Solar2D | BearLibTerminal |
+| Feature | Lurek2D | Engine A | Engine B | a terminal rendering library |
 |---|---|---|---|---|
 | Character grid | ✅ | ❌ | ❌ | ✅ |
 | Widgets | ✅ (6 types) | N/A | N/A | ❌ |
@@ -63,7 +63,7 @@ No competitor 2D Lua engine has a built-in terminal emulator. This is unique to 
 | ANSI codes | ❌ | N/A | N/A | ❌ |
 | Custom fonts | ❌ | N/A | N/A | ✅ |
 
-The terminal module is a genuine differentiator for roguelike and retro game development. BearLibTerminal is the closest equivalent, but Luna2D integrates it with a full game engine.
+The terminal module is a genuine differentiator for roguelike and retro game development. a terminal rendering library is the closest equivalent, but Lurek2D integrates it with a full game engine.
 
 ## Priority
 

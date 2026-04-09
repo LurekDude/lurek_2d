@@ -6,7 +6,7 @@ description: "Run full quality gates: build, clippy, format check, and all tests
 
 ## Purpose
 
-Execute all Luna2D quality gates in sequence.
+Execute all Lurek2D quality gates in sequence.
 
 ## Steps
 

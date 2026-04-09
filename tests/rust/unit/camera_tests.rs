@@ -1,7 +1,7 @@
-//! Unit tests for the Luna2D camera module (`luna2d::camera`).
+//! Unit tests for the Lurek2D camera module (`lurek2d::camera`).
 
-use luna2d::camera::{Camera, Camera2D, ScaleMode, Viewport, ViewportScale};
-use luna2d::math::Vec2;
+use lurek2d::camera::{Camera, Camera2D, ScaleMode, Viewport, ViewportScale};
+use lurek2d::math::Vec2;
 
 // ── Camera::default ───────────────────────────────────────────────────────────
 

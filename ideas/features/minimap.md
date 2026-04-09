@@ -46,9 +46,9 @@ Minimap system: render a scaled-down view of the game world with icons for entit
 
 ## Competitor Comparison
 
-No competitor 2D Lua engine has a built-in minimap module. This is unique to Luna2D.
+No competitor 2D Lua engine has a built-in minimap module. This is unique to Lurek2D.
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Minimap | ✅ | ❌ | ❌ | ❌ |
 | Fog of war | ✅ | ❌ | ❌ | ❌ |

@@ -1,16 +1,16 @@
--- Luna2D Validation Test: SaveManager Edge Cases
+-- Lurek2D Validation Test: SaveManager Edge Cases
 -- Tests save/load with corrupted data, missing fields, and edge cases
 
 describe("validation: savegame edge cases", function()
     it("creates save manager without crash", function()
         expect_no_error(function()
-            local mgr = luna.savegame.newSaveManager()
+            local mgr = lurek.savegame.newSaveManager()
             expect_not_nil(mgr, "save manager created")
         end)
     end)
 
     it("register and unregister collectors", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:register("player", function() return {hp = 100} end, function(data) end)
         mgr:register("inventory", function() return {} end, function(data) end)
 
@@ -21,27 +21,27 @@ describe("validation: savegame edge cases", function()
     end)
 
     it("unregister nonexistent collector does not crash", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         expect_no_error(function()
             mgr:unregister("nonexistent")
         end, "unregister nonexistent should not crash")
     end)
 
     it("schema versioning works", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:setSchemaVersion(5)
         expect_equal(5, mgr:getSchemaVersion(), "version set correctly")
     end)
 
     it("dirty tracking works", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         expect_false(mgr:isDirty(), "initially not dirty")
         mgr:markDirty()
         expect_true(mgr:isDirty(), "dirty after mark")
     end)
 
     it("auto-save configuration", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:enableAutoSave(30.0, "auto")
 
         -- update returns whether autosave triggered
@@ -53,13 +53,13 @@ describe("validation: savegame edge cases", function()
     end)
 
     it("summary get/set", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:setSummary("Test save game")
         expect_equal("Test save game", mgr:getSummary(), "summary preserved")
     end)
 
     it("reset clears state", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:register("test", function() return {} end, function(data) end)
         mgr:markDirty()
         mgr:setSummary("to be cleared")
@@ -70,7 +70,7 @@ end)
 
 describe("validation: savegame migration", function()
     it("adds migration functions", function()
-        local mgr = luna.savegame.newSaveManager()
+        local mgr = lurek.savegame.newSaveManager()
         mgr:addMigration(1, function(data) return data end)
         mgr:addMigration(2, function(data) return data end)
         -- Should not crash

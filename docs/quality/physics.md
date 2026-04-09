@@ -16,7 +16,7 @@
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 98, line 1708
 - [ ] **R-02** — Dependency direction: body: Tier1 imports log_msg(unassigned); world: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 18, line 19, line 334, line 385, line 592
-- [ ] **W-02** — API surface coverage: Functions absent from examples/physics.lua: normalX, normalY, toi, normalX, normalY, isTouching (+3 more)
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/physics.lua: normalX, normalY, toi, normalX, normalY, isTouching (+3 more)
 
 ### 🟡 Warnings — Should Fix
 
@@ -29,7 +29,7 @@
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: bodyId, x, y, normalX, normalY (+1 more)
 - [ ] **B-04** — No business logic in closures: '<closure@1549>' has if/match/for — extract to src/physics/ | '<closure@1643>' has if/match/for — extract to src/physics/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_friction_slows_body, test_angle_changes_under_torque, test_apply_impulse_changes_velocity, test_raycast_hits_body, test_raycast_misses_empty_world (+6 more)
-- [ ] **W-04** — Example–spec sync: In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md | In spec but not example: toi — add to examples/physics.lua
+- [ ] **W-04** — Example–spec sync: In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md | In spec but not example: toi — add to content/examples/physics.lua
 - [ ] **Q-04** — Error handling: .unwrap() calls: world:39, world:51
 
 ## Full Check Results
@@ -119,10 +119,10 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/physics.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/physics.lua: normalX, normalY, toi, normalX, normalY, isTouching (+3 more) |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/physics.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md \| In spec but not example: toi — add to examples/physics.lua |
+| **W-01** Example file exists | ✅ PASS | content/examples/physics.lua present |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/physics.lua: normalX, normalY, toi, normalX, normalY, isTouching (+3 more) |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/physics.lua has realistic one-line comments per call |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md \| In spec but not example: toi — add to content/examples/physics.lua |
 | **W-05** Wiki page | ✅ PASS | wiki\Physics-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -150,7 +150,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
 

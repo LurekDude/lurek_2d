@@ -4,7 +4,7 @@
 |----------|-------|
 | **Tier** | Tier 1 — Core Engine Subsystems |
 | **Status** | Implemented — Full |
-| **Lua API** | `luna.data` |
+| **Lua API** | `lurek.data` |
 | **Source** | `src/data/` |
 | **Rust Tests** | `tests/rust/unit/data_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_data.lua` |
@@ -12,9 +12,9 @@
 
 ## Summary
 
-The `data` module is Luna2D's pure-CPU data processing layer. It provides binary data
+The `data` module is Lurek2D's pure-CPU data processing layer. It provides binary data
 manipulation, compression, hashing, encoding, and two independent binary
-pack/unpack systems — all exposed to Lua scripts through the `luna.data` namespace.
+pack/unpack systems — all exposed to Lua scripts through the `lurek.data` namespace.
 
 **ByteData** wraps a `Vec<u8>` with indexed get/set operations and string conversion, serving
 as the primary mutable byte buffer exchanged between Lua and the engine. **DataView** offers a
@@ -39,7 +39,7 @@ filesystem, or physics dependencies. It depends only on `math` and `engine` (Bas
 ## Architecture
 
 ```
-luna.data.*  (Lua API — src/lua_api/data_api.rs)
+lurek.data.*  (Lua API — src/lua_api/data_api.rs)
     │
     ▼
 src/data/mod.rs  (re-exports all submodules)
@@ -63,27 +63,27 @@ src/data/mod.rs  (re-exports all submodules)
     │                   └── LÖVE2D-compatible single-char format strings
     │
     ├── bin_pack.rs ─── BinValue enum + write()/read()/measure_size()
-    │                   └── Luna2D named-token format strings
+    │                   └── Lurek2D named-token format strings
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| `bin_pack.rs` | Luna2D Binary Pack Format — space-separated named-token binary serialization (`write`, `read`, `measure_size`). Tokens: `u8`–`u64`, `i8`–`i64`, `f32`, `f64`, `bool`, `str`, `cstr`, `pad`, `le`/`be` endian modifiers. |
+| `bin_pack.rs` | Lurek2D Binary Pack Format — space-separated named-token binary serialization (`write`, `read`, `measure_size`). Tokens: `u8`–`u64`, `i8`–`i64`, `f32`, `f64`, `bool`, `str`, `cstr`, `pad`, `le`/`be` endian modifiers. |
 | `byte_data.rs` | Contiguous byte buffer (`ByteData`) wrapping `Vec<u8>` with indexed get/set, string conversion, and mlua `UserData` implementation. |
 | `compress.rs` | Data compression and decompression using deflate, gzip, zlib (flate2) and LZ4 (lz4_flex). Configurable compression level 0–9. |
 | `dataview.rs` | Read-only windowed view (`DataView`) into a shared `Arc<Vec<u8>>` buffer. Typed little-endian accessors for u8 through f64 with bounds checking. |
 | `encode.rs` | Base64 (RFC 4648) and hexadecimal encoding/decoding for data serialization. |
 | `hash.rs` | Cryptographic hash functions — MD5, SHA-1, SHA-256, SHA-512 — returning hex-string digests. |
 | `pack.rs` | LÖVE2D-compatible binary pack/unpack with single-character format strings (`<`, `>`, `b`/`B`, `h`/`H`, `i`/`I`, `l`/`L`, `f`, `d`, `s`, `z`, `x`). |
-| `bin_pack.rs` | Luna2D Binary Pack Format — space-separated named-token binary serialization. |
+| `bin_pack.rs` | Lurek2D Binary Pack Format — space-separated named-token binary serialization. |
 
 ## Submodules
 
 ### `data::bin_pack`
 
-Luna2D Binary Pack Format — format-string based binary serialization using space-separated
+Lurek2D Binary Pack Format — format-string based binary serialization using space-separated
 named type tokens. Provides `write()`, `read()`, and `measure_size()`. Endianness is controlled
 by `le`/`be` tokens (default: little-endian). Supported tokens: `u8`–`u64`, `i8`–`i64`, `f32`,
 `f64`, `bool`, `str` (u32-length-prefixed UTF-8), `cstr` (null-terminated UTF-8), `pad` (zero byte).
@@ -165,7 +165,7 @@ are bounds-checked. Fields: `data` (Arc), `offset`, `size`.
 
 #### `data::bin_pack::BinValue`
 
-Tagged union of serializable binary values for the Luna2D Binary Pack Format. Variants: `U8(u8)`,
+Tagged union of serializable binary values for the Lurek2D Binary Pack Format. Variants: `U8(u8)`,
 `U16(u16)`, `U32(u32)`, `U64(u64)`, `I8(i8)`, `I16(i16)`, `I32(i32)`, `I64(i64)`, `F32(f32)`,
 `F64(f64)`, `Bool(bool)`, `Str(String)`, `Bytes(Vec<u8>)`.
 
@@ -191,26 +191,26 @@ Tagged union for LÖVE2D-compatible pack/unpack operations. Variants: `Int(i64)`
 
 ## Lua API
 
-Exposed under `luna.data.*` by `src/lua_api/data_api.rs`. The API provides 15 module-level
+Exposed under `lurek.data.*` by `src/lua_api/data_api.rs`. The API provides 15 module-level
 functions plus two UserData types with their own methods.
 
 ### Module Functions
 
 | Function | Description |
 |----------|-------------|
-| `luna.data.pack(format, ...)` | Packs values into a binary byte string using LÖVE2D-compatible single-character format strings. Returns a string. |
-| `luna.data.unpack(format, data, offset?)` | Unpacks values from a binary byte string. Returns decoded values followed by the next byte offset. Default offset is 0. |
-| `luna.data.getPackedSize(format, ...)` | Returns the byte count the given format and values would occupy when packed. |
-| `luna.data.compress(format, data, level?)` | Compresses a string using the given algorithm (`"deflate"`, `"gzip"`, `"zlib"`, `"lz4"`). Default level is 6. |
-| `luna.data.decompress(format, data)` | Decompresses a string using the given algorithm. |
-| `luna.data.encode(format, data)` | Encodes binary data to a string (`"base64"` or `"hex"`). |
-| `luna.data.decode(format, encoded)` | Decodes an encoded string back to binary data. |
-| `luna.data.hash(algorithm, data)` | Computes a cryptographic hash (`"md5"`, `"sha1"`, `"sha256"`, `"sha512"`). Returns a hex string. |
-| `luna.data.newByteData(value)` | Creates a mutable byte buffer from a size (integer) or string. |
-| `luna.data.newDataView(data, offset?, size?)` | Creates a read-only windowed view into a byte string. |
-| `luna.data.write(format, ...)` | Writes values using the Luna2D Binary Pack Format (space-separated named tokens). |
-| `luna.data.read(format, data, offset?)` | Reads values using the Luna2D Binary Pack Format. Returns decoded values. |
-| `luna.data.size(format)` | Returns the byte size of a Luna2D Binary Pack Format string (fixed-width tokens only). |
+| `lurek.data.pack(format, ...)` | Packs values into a binary byte string using LÖVE2D-compatible single-character format strings. Returns a string. |
+| `lurek.data.unpack(format, data, offset?)` | Unpacks values from a binary byte string. Returns decoded values followed by the next byte offset. Default offset is 0. |
+| `lurek.data.getPackedSize(format, ...)` | Returns the byte count the given format and values would occupy when packed. |
+| `lurek.data.compress(format, data, level?)` | Compresses a string using the given algorithm (`"deflate"`, `"gzip"`, `"zlib"`, `"lz4"`). Default level is 6. |
+| `lurek.data.decompress(format, data)` | Decompresses a string using the given algorithm. |
+| `lurek.data.encode(format, data)` | Encodes binary data to a string (`"base64"` or `"hex"`). |
+| `lurek.data.decode(format, encoded)` | Decodes an encoded string back to binary data. |
+| `lurek.data.hash(algorithm, data)` | Computes a cryptographic hash (`"md5"`, `"sha1"`, `"sha256"`, `"sha512"`). Returns a hex string. |
+| `lurek.data.newByteData(value)` | Creates a mutable byte buffer from a size (integer) or string. |
+| `lurek.data.newDataView(data, offset?, size?)` | Creates a read-only windowed view into a byte string. |
+| `lurek.data.write(format, ...)` | Writes values using the Lurek2D Binary Pack Format (space-separated named tokens). |
+| `lurek.data.read(format, data, offset?)` | Reads values using the Lurek2D Binary Pack Format. Returns decoded values. |
+| `lurek.data.size(format)` | Returns the byte size of a Lurek2D Binary Pack Format string (fixed-width tokens only). |
 
 ### ByteData Methods
 
@@ -240,40 +240,40 @@ functions plus two UserData types with their own methods.
 
 ```lua
 -- Compression round-trip
-function luna.init()
-    local original = "Hello, Luna2D! Compress me!"
-    local compressed = luna.data.compress("gzip", original, 6)
-    local restored = luna.data.decompress("gzip", compressed)
-    print(restored) -- "Hello, Luna2D! Compress me!"
+function lurek.init()
+    local original = "Hello, Lurek2D! Compress me!"
+    local compressed = lurek.data.compress("gzip", original, 6)
+    local restored = lurek.data.decompress("gzip", compressed)
+    print(restored) -- "Hello, Lurek2D! Compress me!"
 
     -- Hashing
-    local digest = luna.data.hash("sha256", "secret data")
+    local digest = lurek.data.hash("sha256", "secret data")
     print("SHA-256: " .. digest)
 
     -- Encoding
-    local b64 = luna.data.encode("base64", "binary\0data")
-    local decoded = luna.data.decode("base64", b64)
+    local b64 = lurek.data.encode("base64", "binary\0data")
+    local decoded = lurek.data.decode("base64", b64)
 
     -- Pack/unpack (LÖVE2D-compatible)
-    local packed = luna.data.pack("<If", 42, 3.14)
-    local val1, val2, next_pos = luna.data.unpack("<If", packed)
+    local packed = lurek.data.pack("<If", 42, 3.14)
+    local val1, val2, next_pos = lurek.data.unpack("<If", packed)
     print(val1, val2) -- 42, 3.14...
 
     -- ByteData
-    local bd = luna.data.newByteData(16)
+    local bd = lurek.data.newByteData(16)
     bd:setByte(0, 255)
     print(bd:getByte(0)) -- 255
     print(bd:getSize())  -- 16
 
     -- DataView (read-only typed cursor)
-    local raw = luna.data.pack("<Hf", 1000, 1.5)
-    local dv = luna.data.newDataView(raw)
+    local raw = lurek.data.pack("<Hf", 1000, 1.5)
+    local dv = lurek.data.newDataView(raw)
     print(dv:getUInt16(0)) -- 1000
     print(dv:getFloat(2))  -- 1.5
 
-    -- Luna2D Binary Pack (named tokens)
-    local buf = luna.data.write("u32 f32 str", 42, 3.14, "hello")
-    local a, b, c = luna.data.read("u32 f32 str", buf)
+    -- Lurek2D Binary Pack (named tokens)
+    local buf = lurek.data.write("u32 f32 str", 42, 3.14, "hello")
+    local a, b, c = lurek.data.read("u32 f32 str", buf)
     print(a, b, c) -- 42, 3.14..., "hello"
 end
 ```
@@ -293,7 +293,7 @@ end
 |--------|--------------|-------|
 | `engine` | Imports from | Uses `SharedState` via `Rc<RefCell<>>` in the Lua API registration |
 | `math` | Imports from | Baseline dependency (no types currently used directly) |
-| `lua_api` | Imported by | `data_api.rs` binds all public types and functions to `luna.data.*` |
+| `lua_api` | Imported by | `data_api.rs` binds all public types and functions to `lurek.data.*` |
 
 **Similar modules**:
 
@@ -302,13 +302,13 @@ end
 | `image` | `ImageData` is a pixel buffer (RGBA8) for graphics; `ByteData` is raw bytes with no pixel semantics |
 | `sound` | `SoundData` is interleaved PCM audio samples; `ByteData` is format-agnostic binary data |
 | `filesystem` | Filesystem handles file I/O on disk; `data` processes in-memory byte buffers |
-| `serial` | Text format I/O (JSON, TOML, CSV) is the sole responsibility of `serial` (`luna.codec`). `data` handles binary buffers only — use `luna.codec.fromToml` / `luna.codec.toToml` for TOML conversion. |
+| `serial` | Text format I/O (JSON, TOML, CSV) is the sole responsibility of `serial` (`lurek.codec`). `data` handles binary buffers only — use `lurek.codec.fromToml` / `lurek.codec.toToml` for TOML conversion. |
 ## Notes
 
-- **Two pack systems**: The module deliberately ships two binary pack APIs. `pack.rs` (LÖVE2D-compatible) uses terse single-character format strings for familiarity with existing Lua game code. `bin_pack.rs` (Luna2D-native) uses space-separated named tokens for readability. Both produce `ByteData` output.
+- **Two pack systems**: The module deliberately ships two binary pack APIs. `pack.rs` (LÖVE2D-compatible) uses terse single-character format strings for familiarity with existing Lua game code. `bin_pack.rs` (Lurek2D-native) uses space-separated named tokens for readability. Both produce `ByteData` output.
 - **External crate versions**: flate2 1.x (deflate/gzip/zlib), lz4_flex 0.11 (LZ4), sha2 0.10, md-5 0.10, sha1 (latest), base64 (latest), hex (latest). These are all pure-Rust crates with no native C dependencies.
 - **DataView uses `Arc`**: `DataView` wraps `Arc<Vec<u8>>` (not `Rc`) because it may be shared across multiple Lua userdata references. The Lua API creates a fresh `Arc` from the input string bytes.
 - **No streaming**: All compression, hashing, and encoding operations work on complete in-memory buffers. There is no streaming/chunked API. This is intentional — Lua scripts operate on finite data.
 - **Hash algorithms for integrity, not security**: MD5 and SHA-1 are included for compatibility (save file checksums, asset verification) but should not be used for cryptographic security. The docstrings document this.
 - **Endianness defaults**: `pack.rs` defaults to little-endian (`<`); `bin_pack.rs` also defaults to little-endian (`le`). `DataView` reads are always little-endian with no endian-switch option.
-- **Breaking change surface**: Renaming or removing any `luna.data.*` function breaks game scripts. The pack format strings (`<If`, `"u32 f32 str"`) are part of the API contract — changing token meanings would silently corrupt saved binary data.
+- **Breaking change surface**: Renaming or removing any `lurek.data.*` function breaks game scripts. The pack format strings (`<If`, `"u32 f32 str"`) are part of the API contract — changing token meanings would silently corrupt saved binary data.

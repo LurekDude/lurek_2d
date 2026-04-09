@@ -1,4 +1,4 @@
-# Luna2D — Test Framework Architecture
+# Lurek2D — Test Framework Architecture
 
 > **Source of truth** for the test suite structure, naming conventions, BDD framework, and CI quality gates.
 > Companion documents: [engine-architecture.md](engine-architecture.md) (runtime module structure) · [philosophy.md](philosophy.md) (principles + design assumptions).
@@ -29,7 +29,7 @@
 
 ## Overview
 
-Luna2D uses a **two-layer test system** executed entirely through `cargo test`:
+Lurek2D uses a **two-layer test system** executed entirely through `cargo test`:
 
 1. **Rust tests** — compiled Rust test binaries that exercise engine modules directly via crate imports (unit, stress, golden, config, security, ext).
 2. **Lua BDD tests** — `.lua` scripts using a custom `describe`/`it`/`expect_*` framework, dispatched by a Rust harness (unit, library, integration, stress, security, golden, config, demos).
@@ -38,13 +38,13 @@ Both layers run headless — no window, no GPU, no audio device required. This e
 
 ### Examples vs Demos
 
-| | `examples/` | `demos/` |
+| | `content/examples/` | `content/demos/` |
 |---|---|---|
-| Purpose | Documentation — shows one `luna.*` API in isolation | Fully functional game showcases |
+| Purpose | Documentation — shows one `lurek.*` API in isolation | Fully functional game showcases |
 | Testable? | **No** — these are read-only reference scripts | **Yes** — every demo must have a test |
 | Format | Single-file, heavily commented | Folder with `main.lua` and optional `conf.lua` |
 
-Examples are not tested. They exist to document API usage and are not expected to execute in a test harness. **Demos must all pass CI** — each demo has exactly one test file in `tests/lua/demos/`.
+Examples are not tested. They exist to document API usage and are not expected to execute in a test harness. **Demos must all pass CI** — each demo has exactly one test file in `tests/lua/content/demos/`.
 
 ---
 
@@ -68,20 +68,20 @@ cargo test
   └── Lua BDD Harness ─────────────────────────────────────────────┘
       └── tests/lua/harness.rs
           ├── unit/           One file per engine module (API surface)
-          ├── library/        One file per Lunasome library
+          ├── content/library/        One file per Lunasome library
           ├── integration/    Tests BETWEEN two or more modules
           ├── stress/         Throughput + allocation Lua tests
           ├── security/       Lua sandboxing + input validation
           ├── golden/         Deterministic output comparison
           ├── config/         Configuration loading tests
-          └── demos/          One file per demo in demos/
+          └── content/demos/          One file per demo in content/demos/
 ```
 
 ### Why Two Layers?
 
 - **Rust tests** cover internal engine contracts: struct invariants, error handling, resource lifecycle, mathematical correctness. Direct crate access allows testing private-via-crate internals.
-- **Lua tests** cover the public `luna.*` API surface: function signatures, return types, error messages, and end-to-end workflows. They run in the same VM game scripts use, catching API regressions from the user's perspective.
-- **Library tests** (`tests/lua/library/`) exclusively test Tier 3 Lunasome pure-Lua libraries. These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `library/` not in the engine.
+- **Lua tests** cover the public `lurek.*` API surface: function signatures, return types, error messages, and end-to-end workflows. They run in the same VM game scripts use, catching API regressions from the user's perspective.
+- **Library tests** (`tests/lua/content/library/`) exclusively test Tier 3 Lunasome pure-Lua libraries. These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `content/library/` not in the engine.
 
 ---
 
@@ -154,7 +154,7 @@ tests/
     ├── harness.rs                   Rust harness — one #[test] per .lua file
     ├── init.lua                     BDD framework (describe/it/expect_*)
     │
-    ├── unit/                        One file per engine module (luna.* API surface)
+    ├── unit/                        One file per engine module (lurek.* API surface)
     │   ├── test_math.lua
     │   ├── test_graphics.lua
     │   ├── test_audio.lua
@@ -174,7 +174,7 @@ tests/
     │   ├── test_terminal.lua
     │   └── ...
     │
-    ├── library/                     One file per Lunasome library in library/
+    ├── content/library/                     One file per Lunasome library in content/library/
     │   ├── test_library_battle.lua
     │   ├── test_library_cardgame.lua
     │   ├── test_library_combat.lua
@@ -189,7 +189,7 @@ tests/
     │   └── test_library_stats.lua
     │
     ├── integration/                 Tests BETWEEN modules A + B (or A + B + C)
-    │   │   Rule: every test here must exercise ≥2 distinct luna.* namespaces.
+    │   │   Rule: every test here must exercise ≥2 distinct lurek.* namespaces.
     │   │   Name format: test_<moduleA>_<moduleB>.lua
     │   ├── test_ai_physics.lua
     │   ├── test_entity_ai.lua
@@ -219,8 +219,8 @@ tests/
     ├── config/                      Configuration loading tests
     │   └── test_config.lua
     │
-    └── demos/                       One test file per demo in demos/
-        │   Rule: every demo in demos/ must have a corresponding file here.
+    └── content/demos/                       One test file per demo in content/demos/
+        │   Rule: every demo in content/demos/ must have a corresponding file here.
         │   Name format: test_demo_<name>.lua
         ├── test_demo_hello_world.lua
         ├── test_demo_physics_demo.lua
@@ -248,7 +248,7 @@ path = "tests/lua/harness.rs"
 
 ### tests/rust/game/ — Retired
 
-`tests/rust/game/` previously held Rust tests for game systems (battle, cardgame, combat, crafting, inventory, quest, stats). Those systems are now **pure-Lua libraries** in `library/`. Their tests live in `tests/lua/library/`. Do not add new files to `tests/rust/game/`.
+`tests/rust/game/` previously held Rust tests for game systems (battle, cardgame, combat, crafting, inventory, quest, stats). Those systems are now **pure-Lua libraries** in `content/library/`. Their tests live in `tests/lua/content/library/`. Do not add new files to `tests/rust/game/`.
 
 ---
 
@@ -265,7 +265,7 @@ path = "tests/lua/harness.rs"
 | **Security** | `tests/rust/security/` | Sandbox audit, path-traversal guards | `security_tests.rs`: GameFS escapes |
 | **Ext** | `tests/rust/ext/` | Cross-module Rust smoke tests | `graphics_ext_tests.rs`: mesh + texture |
 
-> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are now pure-Lua libraries tested in `tests/lua/library/`.
+> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are now pure-Lua libraries tested in `tests/lua/content/library/`.
 
 ### Test Structure Pattern
 
@@ -317,14 +317,14 @@ All Lua tests use a custom BDD framework defined in `tests/lua/init.lua`. This f
 
 | Category | Path | Scope | Rule |
 |---|---|---|---|
-| **Unit** | `tests/lua/unit/` | One engine module per file (API surface) | One `.lua` per `luna.*` namespace |
-| **Library** | `tests/lua/library/` | One Lunasome library per file | One `.lua` per `library/<name>` |
+| **Unit** | `tests/lua/unit/` | One engine module per file (API surface) | One `.lua` per `lurek.*` namespace |
+| **Library** | `tests/lua/content/library/` | One Lunasome library per file | One `.lua` per `content/library/<name>` |
 | **Integration** | `tests/lua/integration/` | Tests between ≥2 modules | Name: `test_<moduleA>_<moduleB>.lua` |
 | **Stress** | `tests/lua/stress/` | Throughput + allocation from Lua | High iteration counts, timing checks |
 | **Security** | `tests/lua/security/` | Sandboxing + input validation | Nil spam, path traversal, bad types |
 | **Golden** | `tests/lua/golden/` | Deterministic output comparison | Compare against saved reference data |
 | **Config** | `tests/lua/config/` | Configuration loading | TOML keys, defaults, missing fields |
-| **Demos** | `tests/lua/demos/` | One file per demo in `demos/` | Name: `test_demo_<name>.lua` |
+| **Demos** | `tests/lua/content/demos/` | One file per demo in `content/demos/` | Name: `test_demo_<name>.lua` |
 
 ### Framework API
 
@@ -351,25 +351,25 @@ All Lua tests use a custom BDD framework defined in `tests/lua/init.lua`. This f
 
 ```lua
 -- tests/lua/unit/test_modulename.lua
--- Tests for luna.modulename API
+-- Tests for lurek.modulename API
 
-describe("luna.modulename", function()
+describe("lurek.modulename", function()
     describe("someFunction", function()
         it("should return expected result", function()
-            local result = luna.modulename.someFunction(42)
+            local result = lurek.modulename.someFunction(42)
             expect_equal(84, result)
         end)
 
         it("should handle edge cases", function()
             expect_error(function()
-                luna.modulename.someFunction(nil)
+                lurek.modulename.someFunction(nil)
             end)
         end)
     end)
 
     describe("anotherFunction", function()
         it("should accept default params", function()
-            local val = luna.modulename.anotherFunction()
+            local val = lurek.modulename.anotherFunction()
             expect_not_nil(val)
             expect_type(val, "number")
         end)
@@ -381,13 +381,13 @@ test_summary()
 
 ### Library Test Template
 
-Library tests live in `tests/lua/library/` and use `require()` to load from `library/`.
+Library tests live in `tests/lua/content/library/` and use `require()` to load from `content/library/`.
 
 ```lua
--- tests/lua/library/test_library_combat.lua
+-- tests/lua/content/library/test_library_combat.lua
 -- Tests for the Lunasome combat library
 
-local combat = require("library/combat")
+local combat = require("content/library/combat")
 
 describe("combat library", function()
     describe("resolve_attack", function()
@@ -404,15 +404,15 @@ test_summary()
 
 ### Integration Test Rule
 
-An integration test **must** exercise at least two distinct `luna.*` module namespaces (or one engine module + one library). Testing a single module with complex data does **not** qualify as integration.
+An integration test **must** exercise at least two distinct `lurek.*` module namespaces (or one engine module + one library). Testing a single module with complex data does **not** qualify as integration.
 
 ```lua
 -- tests/lua/integration/test_physics_timer.lua
--- Integration: luna.physics + luna.time (two distinct namespaces)
+-- Integration: lurek.physics + lurek.time (two distinct namespaces)
 
 describe("physics + timer integration", function()
     it("should simulate body movement over elapsed time", function()
-        -- uses luna.physics AND luna.time
+        -- uses lurek.physics AND lurek.time
     end)
 end)
 
@@ -421,21 +421,21 @@ test_summary()
 
 ### Demo Test Rule
 
-Every folder in `demos/` must have exactly one corresponding `test_demo_<name>.lua` in `tests/lua/demos/`. The demo test:
+Every folder in `content/demos/` must have exactly one corresponding `test_demo_<name>.lua` in `tests/lua/content/demos/`. The demo test:
 - Loads the demo's `main.lua` via `dofile` or `require`
 - Verifies that the demo initialises without error
 - Runs at least one frame cycle (load + update step)
 - Does NOT require GPU, audio, or window
 
 ```lua
--- tests/lua/demos/test_demo_hello_world.lua
--- Smoke test for demos/hello_world
+-- tests/lua/content/demos/test_demo_hello_world.lua
+-- Smoke test for content/demos/hello_world
 
 describe("hello_world demo", function()
     it("should load without error", function()
         expect_not_nil(luna)
         -- load callback runs cleanly
-        dofile("demos/hello_world/main.lua")
+        dofile("content/demos/hello_world/main.lua")
     end)
 end)
 
@@ -462,13 +462,13 @@ fn run_lua_test(path: &str) {
 fn lua_test_math() { run_lua_test("unit/test_math.lua"); }
 
 #[test]
-fn lua_test_library_combat() { run_lua_test("library/test_library_combat.lua"); }
+fn lua_test_library_combat() { run_lua_test("content/library/test_library_combat.lua"); }
 
 #[test]
 fn lua_test_integration_physics_timer() { run_lua_test("integration/test_physics_timer.lua"); }
 
 #[test]
-fn lua_test_demo_hello_world() { run_lua_test("demos/test_demo_hello_world.lua"); }
+fn lua_test_demo_hello_world() { run_lua_test("content/demos/test_demo_hello_world.lua"); }
 
 // ... one entry per Lua test file
 ```
@@ -525,7 +525,7 @@ Two Rust-side helpers create test Lua VMs:
 Returns a fully-initialized Lua VM with:
 - BDD framework (`init.lua`) loaded
 - `_test_results` global table ready
-- All `luna.*` API modules registered
+- All `lurek.*` API modules registered
 - **Headless**: no window, GPU, or audio device
 
 Used by: Lua BDD harness.
@@ -561,7 +561,7 @@ Returns `(Rc<RefCell<SharedState>>, Lua)` — a SharedState + Lua VM pair for st
 ### Lua Tests
 
 - File naming: `test_<module>.lua`
-- `describe()` blocks named after the API namespace: `"luna.math"`, `"luna.gfx"`
+- `describe()` blocks named after the API namespace: `"lurek.math"`, `"lurek.gfx"`
 - `it()` blocks use natural language: `"should return zero for empty input"`
 
 ---
@@ -612,7 +612,7 @@ These constraints are **mandatory** and enforced by CI:
 | Tests must NOT play audio | CI runners may lack audio devices |
 | Tests must NOT write outside `build/` | Prevent pollution of working tree |
 | Tests must NOT use network I/O | Tests must be reproducible offline |
-| New `luna.*` API functions require ≥1 Lua test | Prevent untested API surface growth |
+| New `lurek.*` API functions require ≥1 Lua test | Prevent untested API surface growth |
 | Bug fixes require a regression test first | Red → green → refactor cycle |
 | Every Lua test file ends with `test_summary()` | Framework validation gate |
 
@@ -645,13 +645,13 @@ Choose the correct category:
 
 | You are testing... | Category | Path |
 |---|---|---|
-| A `luna.*` engine API function | **unit** | `tests/lua/unit/test_<module>.lua` |
-| A Lunasome library in `library/` | **library** | `tests/lua/library/test_library_<name>.lua` |
+| A `lurek.*` engine API function | **unit** | `tests/lua/unit/test_<module>.lua` |
+| A Lunasome library in `content/library/` | **library** | `tests/lua/content/library/test_library_<name>.lua` |
 | Interaction between ≥2 modules | **integration** | `tests/lua/integration/test_<a>_<b>.lua` |
 | High-load / many iterations | **stress** | `tests/lua/stress/test_<topic>_stress.lua` |
 | Nil spam / bad inputs / sandbox | **security** | `tests/lua/security/test_<topic>.lua` |
 | Config file loading | **config** | `tests/lua/config/test_config.lua` |
-| A demo in `demos/` | **demos** | `tests/lua/demos/test_demo_<name>.lua` |
+| A demo in `content/demos/` | **demos** | `tests/lua/content/demos/test_demo_<name>.lua` |
 
 Steps for all categories:
 1. Create the `.lua` file in the correct subdirectory using the template
@@ -743,7 +743,7 @@ Every commit must pass all of these:
 ### Lua (Describe → Script → Run)
 
 1. **Describe**: Write a `test_<module>.lua` file with `describe`/`it`/`expect_*` blocks
-2. **Script**: Write a `main.lua` in `examples/` that exercises the new API
+2. **Script**: Write a `main.lua` in `content/examples/` that exercises the new API
 3. **Run**: `cargo test lua_test_<module>` — confirm failures
 4. **Implement**: Add the Lua binding in `src/lua_api/`
 5. **Verify**: Re-run both the test and the example
@@ -765,8 +765,8 @@ These are documented issues in the test suite that should be addressed over time
 | Issue | Description | Impact |
 |---|---|---|
 | `tests/rust/game/` retirement | Files remain but the category is retired — game systems are now Lua libraries | Medium — stale tests may give false confidence |
-| Missing demo tests | Not every demo in `demos/` has a corresponding file in `tests/lua/demos/` | High — demos are supposed to be fully tested |
-| `tests/lua/examples/` stale | `tests/lua/examples/` should be removed — examples are documentation and not testable | Low — confusing category, misleads contributors |
+| Missing demo tests | Not every demo in `content/demos/` has a corresponding file in `tests/lua/content/demos/` | High — demos are supposed to be fully tested |
+| `tests/lua/content/examples/` stale | `tests/lua/content/examples/` should be removed — examples are documentation and not testable | Low — confusing category, misleads contributors |
 | Framework consistency | A few Lua test files define local helpers instead of using global `init.lua` | Low — tests pass, but framework is duplicated |
 | Missing `test_summary()` | Some older Lua test files may lack the mandatory `test_summary()` call | Medium — framework can't report totals |
 | Unregistered test files | `.rs` files in `tests/rust/` not listed in `Cargo.toml` are silently ignored | Medium — tests exist but never run |

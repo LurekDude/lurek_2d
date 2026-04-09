@@ -3,13 +3,13 @@
 //! Supports arbitrary-degree curves with control point manipulation,
 //! rendering to polylines, derivative computation, and geometric transforms.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! This module is part of Lurek2D's `math` subsystem and provides the implementation
 //! details for bezier-related operations and data management.
 //! Key types exported from this module: `BezierCurve`.
 //! Primary functions: `new()`, `evaluate()`, `render()`, `render_segment()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::vec2::Vec2;
 

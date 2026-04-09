@@ -1,9 +1,9 @@
 //! Stress tests for the data module — compression, hashing, encoding at scale.
 
-use luna2d::data::compress::{compress, decompress, CompressFormat};
-use luna2d::data::encode::{decode, encode, EncodeFormat};
-use luna2d::data::hash::{hash, HashAlgorithm};
-use luna2d::data::toml_convert::{encode_toml, parse_toml};
+use lurek2d::data::compress::{compress, decompress, CompressFormat};
+use lurek2d::data::encode::{decode, encode, EncodeFormat};
+use lurek2d::data::hash::{hash, HashAlgorithm};
+use lurek2d::data::toml_convert::{encode_toml, parse_toml};
 
 #[test]
 fn stress_compress_all_formats_roundtrip() {

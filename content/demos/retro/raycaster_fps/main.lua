@@ -1,14 +1,14 @@
-﻿-- demos/retro/raycaster_fps/main.lua
--- Raycaster FPS — Wolfenstein-style smooth FPS with procedurally generated
+-- demos/retro/raycaster_fps/main.lua
+-- Raycaster FPS � Wolfenstein-style smooth FPS with procedurally generated
 --   textured walls (6 types), textured floor/ceiling gradient, distance fog,
 --   weather overlays (rain/snow), billboard item sprites, depth buffer
 -- Controls: WASD move/strafe, Q/E rotate, F1/F2/F3 weather, Escape quit
--- Run with: cargo run -- demos/retro/raycaster_fps
+-- Run with: cargo run -- content/demos/retro/raycaster_fps
 
--- ── constants ─────────────────────────────────────────────────
+-- �� constants �������������������������������������������������
 local SW, SH      = 960, 540        -- screen resolution
 local RW, RH      = 320, 180        -- low-res render canvas
-local FOV         = math.pi / 2.5   -- ~72° horizontal FOV
+local FOV         = math.pi / 2.5   -- ~72� horizontal FOV
 local MAX_DIST    = 16.0
 local MOVE_SPEED  = 3.5
 local ROT_SPEED   = 2.2
@@ -16,7 +16,7 @@ local MAP_W, MAP_H = 16, 16
 local TEX_W, TEX_H = 64, 64         -- texture atlas size per texture
 local NBANDS      = 16              -- floor/ceiling gradient bands
 
--- ── map ───────────────────────────────────────────────────────
+-- �� map �������������������������������������������������������
 -- 0=empty, 1=stone, 2=brick, 3=blue_stone, 4=red_stone, 5=mossy, 6=gold
 local MAP = {
     1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -42,7 +42,7 @@ local ITEM_CELLS = {
     {5, 4}, {11, 4}, {5, 11}, {11, 11},
 }
 
--- ── wall tints (RGB, multiplied with greyscale texture) ────────
+-- �� wall tints (RGB, multiplied with greyscale texture) ��������
 local WALL_TINT = {
     [1] = {0.60, 0.58, 0.55},  -- stone grey
     [2] = {0.76, 0.50, 0.28},  -- brick tan
@@ -52,7 +52,7 @@ local WALL_TINT = {
     [6] = {0.78, 0.65, 0.18},  -- yellow gold
 }
 
--- ── state ─────────────────────────────────────────────────────
+-- �� state �����������������������������������������������������
 local rc
 local view_canvas
 local px, py = 1.5, 1.5   -- player world position
@@ -62,7 +62,7 @@ local pa = 0.0             -- player angle
 local wall_textures = {}   -- wall_textures[1..6]
 local floor_texture        -- floor image
 local ceil_texture         -- ceiling image
--- Shared quads: since all textures are TEX_W×TEX_H, one set of quads suffices
+-- Shared quads: since all textures are TEX_W�TEX_H, one set of quads suffices
 local shared_quads = {}    -- shared_quads[0..TEX_W-1]
 
 -- Weather
@@ -75,16 +75,16 @@ local items = {}
 local score = 0
 local msg_timer = 0.0
 
--- ── texture generators ────────────────────────────────────────
+-- �� texture generators ����������������������������������������
 -- All textures are greyscale (brightness only), setColor applies the tint.
 
 local function noise2(px_, py_)
     return ((px_ * 37 + py_ * 53 + px_ * py_ * 3) % 29) / 29
 end
 
--- Pattern 1: brick — horizontal mortar lines + offset vertical joints
+-- Pattern 1: brick � horizontal mortar lines + offset vertical joints
 local function makeBrickTex(bH, bW)
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         local row   = math.floor(py_ / bH)
         local off   = (row % 2 == 0) and 0 or math.floor(bW / 2)
@@ -102,12 +102,12 @@ local function makeBrickTex(bH, bW)
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 -- Pattern 2: large stone blocks
 local function makeStoneTex(bH, bW)
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         local row = math.floor(py_ / bH)
         local off = (row % 2 == 0) and 0 or math.floor(bW / 2)
@@ -131,12 +131,12 @@ local function makeStoneTex(bH, bW)
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 -- Pattern 3: rough cracked stone
 local function makeCrackedTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_,       py_)
@@ -154,12 +154,12 @@ local function makeCrackedTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 -- Pattern 4: mossy surface (dark with lighter patches)
 local function makeMossyTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_,     py_)
@@ -174,13 +174,13 @@ local function makeMossyTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 -- Floor texture: stone tiles with grout lines
 local function makeFloorTex()
     local TILE = 16
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local tx = px_ % TILE
@@ -197,12 +197,12 @@ local function makeFloorTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 -- Ceiling texture: rough dark stone
 local function makeCeilTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_, py_)
@@ -215,10 +215,10 @@ local function makeCeilTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
--- ── helpers ───────────────────────────────────────────────────
+-- �� helpers ���������������������������������������������������
 local function cellAt(x, y)
     local gx = math.floor(x)
     local gy = math.floor(y)
@@ -241,13 +241,13 @@ local function initParticles()
     end
 end
 
--- ── load ──────────────────────────────────────────────────────
-function luna.init()
-    luna.window.setTitle("Raycaster FPS")
-    luna.gfx.setBackgroundColor(0.02, 0.02, 0.04)
+-- �� load ������������������������������������������������������
+function lurek.init()
+    lurek.window.setTitle("Raycaster FPS")
+    lurek.gfx.setBackgroundColor(0.02, 0.02, 0.04)
 
     -- Build raycaster grid (items are open cells here)
-    rc = luna.raycaster.new(MAP_W, MAP_H)
+    rc = lurek.raycaster.new(MAP_W, MAP_H)
     rc:setCells(MAP)
 
     -- Extract item positions
@@ -269,11 +269,11 @@ function luna.init()
 
     -- Build shared quads (one per texture column 0..TEX_W-1)
     for s = 0, TEX_W - 1 do
-        shared_quads[s] = luna.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
+        shared_quads[s] = lurek.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
     end
 
     -- Low-res render canvas
-    view_canvas = luna.gfx.newCanvas(RW, RH)
+    view_canvas = lurek.gfx.newCanvas(RW, RH)
 
     -- Default weather
     weather = "rain"
@@ -283,23 +283,23 @@ function luna.init()
     pa = 0.0
 end
 
--- ── update ────────────────────────────────────────────────────
-function luna.process(dt)
+-- �� update ����������������������������������������������������
+function lurek.process(dt)
     -- Movement
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") then
+    if lurek.keyboard.isDown("w") then
         dx = dx + math.cos(pa) * MOVE_SPEED * dt
         dy = dy + math.sin(pa) * MOVE_SPEED * dt
     end
-    if luna.keyboard.isDown("s") then
+    if lurek.keyboard.isDown("s") then
         dx = dx - math.cos(pa) * MOVE_SPEED * dt
         dy = dy - math.sin(pa) * MOVE_SPEED * dt
     end
-    if luna.keyboard.isDown("a") then
+    if lurek.keyboard.isDown("a") then
         dx = dx + math.cos(pa - math.pi / 2) * MOVE_SPEED * dt
         dy = dy + math.sin(pa - math.pi / 2) * MOVE_SPEED * dt
     end
-    if luna.keyboard.isDown("d") then
+    if lurek.keyboard.isDown("d") then
         dx = dx + math.cos(pa + math.pi / 2) * MOVE_SPEED * dt
         dy = dy + math.sin(pa + math.pi / 2) * MOVE_SPEED * dt
     end
@@ -311,8 +311,8 @@ function luna.process(dt)
         py = py + dy
     end
     -- Rotation
-    if luna.keyboard.isDown("q") then pa = pa - ROT_SPEED * dt end
-    if luna.keyboard.isDown("e") then pa = pa + ROT_SPEED * dt end
+    if lurek.keyboard.isDown("q") then pa = pa - ROT_SPEED * dt end
+    if lurek.keyboard.isDown("e") then pa = pa + ROT_SPEED * dt end
 
     -- Item pickup
     for _, it in ipairs(items) do
@@ -342,11 +342,11 @@ function luna.process(dt)
     end
 end
 
--- ── draw ──────────────────────────────────────────────────────
-function luna.render()
-    luna.gfx.setCanvas(view_canvas)
+-- �� draw ������������������������������������������������������
+function lurek.render()
+    lurek.gfx.setCanvas(view_canvas)
 
-    -- ── Ceiling bands (horizon→top: lighter→darker) ────────────
+    -- �� Ceiling bands (horizon�top: lighter�darker) ������������
     local half_h = math.floor(RH / 2)
     local band_h = math.max(1, math.ceil(half_h / NBANDS))
     for b = 0, NBANDS - 1 do
@@ -356,21 +356,21 @@ function luna.render()
         -- Sample ceiling texture column (repeating tile effect per band)
         local tex_row = math.floor(t * (TEX_H - 1))
         local tv = noise2(b * 3, 0) * 0.025
-        luna.gfx.setColor(br + tv, br + tv, br * 1.1 + tv)
-        luna.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
+        lurek.gfx.setColor(br + tv, br + tv, br * 1.1 + tv)
+        lurek.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
     end
 
-    -- ── Floor bands (horizon→bottom: darker→lighter) ───────────
+    -- �� Floor bands (horizon�bottom: darker�lighter) �����������
     for b = 0, NBANDS - 1 do
         local t  = b / NBANDS               -- 0=horizon, 1=bottom
         local br = 0.05 + t * 0.15          -- darker at horizon, lighter near player
         local checker = (b % 2 == 0) and 1.0 or 0.88    -- checkerboard illusion
         local strip_y = half_h + b * band_h
-        luna.gfx.setColor(br * 0.95 * checker, br * 0.85 * checker, br * 0.68 * checker)
-        luna.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
+        lurek.gfx.setColor(br * 0.95 * checker, br * 0.85 * checker, br * 0.68 * checker)
+        lurek.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
     end
 
-    -- ── Cast all rays ──────────────────────────────────────────
+    -- �� Cast all rays ������������������������������������������
     local rays  = rc:castRaysFlat(px, py, pa, FOV, RW, MAX_DIST)
     local depth = {}   -- depth buffer for sprite occlusion
 
@@ -385,17 +385,17 @@ function luna.render()
 
         if dist < MAX_DIST and cv > 0 then
             local wall_h, draw_start =
-                luna.raycaster.projectColumn(dist, FOV, RH)
+                lurek.raycaster.projectColumn(dist, FOV, RH)
 
             -- Distance fog brightness
-            local bright = luna.raycaster.distanceShade(dist, MAX_DIST)
+            local bright = lurek.raycaster.distanceShade(dist, MAX_DIST)
             -- Side walls darker (simulates directional light)
             if side == 1 then bright = bright * 0.65 end
 
             -- Wall color tint
             local wt = WALL_TINT[cv] or {0.55, 0.55, 0.55}
 
-            luna.gfx.setColor(
+            lurek.gfx.setColor(
                 wt[1] * bright,
                 wt[2] * bright,
                 wt[3] * bright
@@ -407,11 +407,11 @@ function luna.render()
             local tex   = wall_textures[cv] or wall_textures[1]
             local wy    = wall_h / TEX_H    -- vertical scale
 
-            luna.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wy)
+            lurek.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wy)
         end
     end
 
-    -- ── Billboard item sprites ─────────────────────────────────
+    -- �� Billboard item sprites ���������������������������������
     for _, it in ipairs(items) do
         if not it.collected then
             local proj = rc:projectSprite(it.x, it.y, px, py, pa, FOV, RW)
@@ -419,61 +419,61 @@ function luna.render()
                 local col = math.floor(proj.screen_x)
                 local sz  = math.floor(proj.scale * RH * 0.45)
                 if sz > 1 and depth[col] and proj.distance < depth[col] then
-                    local bd = luna.raycaster.distanceShade(proj.distance, MAX_DIST)
+                    local bd = lurek.raycaster.distanceShade(proj.distance, MAX_DIST)
                     local sy = math.floor(RH / 2 - sz / 2)
                     -- Gold orb body
-                    luna.gfx.setColor(1.0 * bd, 0.82 * bd, 0.08 * bd)
-                    luna.gfx.rectangle("fill", col - math.floor(sz/2), sy, sz, sz)
+                    lurek.gfx.setColor(1.0 * bd, 0.82 * bd, 0.08 * bd)
+                    lurek.gfx.rectangle("fill", col - math.floor(sz/2), sy, sz, sz)
                     -- Orb highlight
-                    luna.gfx.setColor(1.0, 1.0, 0.6, 0.7)
+                    lurek.gfx.setColor(1.0, 1.0, 0.6, 0.7)
                     local hi = math.max(1, math.floor(sz * 0.25))
-                    luna.gfx.rectangle("fill",
+                    lurek.gfx.rectangle("fill",
                         col - math.floor(sz/2) + hi, sy + hi, hi * 2, hi * 2)
                 end
             end
         end
     end
 
-    -- ── Weather overlay ────────────────────────────────────────
+    -- �� Weather overlay ����������������������������������������
     if weather == "rain" then
-        luna.gfx.setColor(0.55, 0.70, 0.90, 0.50)
+        lurek.gfx.setColor(0.55, 0.70, 0.90, 0.50)
         for _, p in ipairs(particles) do
-            luna.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y),
+            lurek.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y),
                                1, math.floor(p.len))
         end
     elseif weather == "snow" then
-        luna.gfx.setColor(0.95, 0.97, 1.0, 0.75)
+        lurek.gfx.setColor(0.95, 0.97, 1.0, 0.75)
         for _, p in ipairs(particles) do
-            luna.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y), 2, 2)
+            lurek.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y), 2, 2)
         end
     end
 
-    -- ── Fog vignette (darkens screen edges) ───────────────────
-    luna.gfx.setColor(0, 0, 0, 0.40)
-    luna.gfx.rectangle("fill", 0,        0,   RW, RH / 6)
-    luna.gfx.rectangle("fill", 0, RH * 5/6,   RW, RH / 6)
+    -- �� Fog vignette (darkens screen edges) �������������������
+    lurek.gfx.setColor(0, 0, 0, 0.40)
+    lurek.gfx.rectangle("fill", 0,        0,   RW, RH / 6)
+    lurek.gfx.rectangle("fill", 0, RH * 5/6,   RW, RH / 6)
 
-    luna.gfx.setCanvas(nil)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setCanvas(nil)
+    lurek.gfx.setColor(1, 1, 1, 1)
 
     -- Upscale low-res canvas to full window
-    luna.gfx.draw(view_canvas, 0, 0, 0, SW / RW, SH / RH)
+    lurek.gfx.draw(view_canvas, 0, 0, 0, SW / RW, SH / RH)
 
-    -- ── HUD ───────────────────────────────────────────────────
-    luna.gfx.setColor(0.9, 0.9, 0.9)
-    luna.gfx.print("Score: " .. score, 12, 12)
-    luna.gfx.print("Weather [" .. weather .. "]  F1=none  F2=rain  F3=snow", 12, 32)
-    luna.gfx.print("WASD move   Q/E rotate   Escape quit", 12, 52)
+    -- �� HUD ���������������������������������������������������
+    lurek.gfx.setColor(0.9, 0.9, 0.9)
+    lurek.gfx.print("Score: " .. score, 12, 12)
+    lurek.gfx.print("Weather [" .. weather .. "]  F1=none  F2=rain  F3=snow", 12, 32)
+    lurek.gfx.print("WASD move   Q/E rotate   Escape quit", 12, 52)
 
     if msg_timer > 0 then
-        luna.gfx.setColor(1.0, 0.85, 0.1)
-        luna.gfx.print("+ 100  ITEM COLLECTED!", SW / 2 - 90, SH / 2 - 20)
+        lurek.gfx.setColor(1.0, 0.85, 0.1)
+        lurek.gfx.print("+ 100  ITEM COLLECTED!", SW / 2 - 90, SH / 2 - 20)
     end
 end
 
--- ── keypressed ────────────────────────────────────────────────
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+-- �� keypressed ������������������������������������������������
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "f1" then weather = "none";  particles = {} end
     if key == "f2" then weather = "rain";  initParticles() end
     if key == "f3" then weather = "snow";  initParticles() end

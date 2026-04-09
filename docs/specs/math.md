@@ -6,15 +6,15 @@
 | **Architecture**   | 15 submodule files, flat layout under `src/math/` |
 | **Path**           | `src/math/` |
 | **Depends on**     | `fastrand` (external); `crate::engine::log_messages` (log constants in `spatial_hash.rs` only) |
-| **Depended on by** | Every other Luna2D module |
-| **Lua API**        | `luna.math` via `src/lua_api/math_api.rs` |
+| **Depended on by** | Every other Lurek2D module |
+| **Lua API**        | `lurek.math` via `src/lua_api/math_api.rs` |
 | **Tests — Rust**   | `tests/rust/unit/math_tests.rs` (~60 tests, 857 lines) |
 | **Tests — Lua**    | `tests/lua/unit/test_math.lua` (~20 tests, 128 lines) |
 | **Inline tests**   | `easing.rs`, `tween.rs`, `spatial_hash.rs`, `geometry.rs`, `noise_generator.rs` |
 
 ## Summary
 
-`math` is the **leaf of the dependency graph** — it has zero Tier-1+ internal Luna2D dependencies. Every other module may freely import it. It provides the core mathematical primitives, procedural generation utilities, and interpolation tools used throughout the engine.
+`math` is the **leaf of the dependency graph** — it has zero Tier-1+ internal Lurek2D dependencies. Every other module may freely import it. It provides the core mathematical primitives, procedural generation utilities, and interpolation tools used throughout the engine.
 
 The module is organised as 15 flat source files, each owning one cohesive domain. All primary types (`Vec2`, `Mat3`, `Rect`, `Color`) are `Copy`, designed for zero-overhead use in per-frame game loops. Higher-level types (`BezierCurve`, `RandomGenerator`, `NoiseGenerator`, `Tween`, `SpatialHash`, `Transform`) are `Clone` and carry heap-allocated state.
 
@@ -209,31 +209,31 @@ Internal file dependencies:
 
 ## Lua API Surface
 
-Registered via `src/lua_api/math_api.rs` as `luna.math`.
+Registered via `src/lua_api/math_api.rs` as `lurek.math`.
 
 ### Factory Functions
 
 | Lua Function | Returns | Description |
 |---|---|---|
-| `luna.math.newRandomGenerator(seed?)` | `RandomGenerator` | New RNG, optionally seeded |
-| `luna.math.newTransform(x?,y?,angle?,sx?,sy?,ox?,oy?,kx?,ky?)` | `Transform` | Affine transform (identity if no args) |
-| `luna.math.newBezierCurve(points)` | `BezierCurve` | From flat `{x1,y1, x2,y2, ...}` table (≥ 4 numbers) |
-| `luna.math.newTween(duration, easingName?)` | `Tween` | Multi-value interpolation driver |
-| `luna.math.newSpatialHash(cellSize)` | `SpatialHash` | Grid-based spatial query structure |
-| `luna.math.newNoiseGenerator(seed?)` | `NoiseGenerator` | Seeded procedural noise generator |
+| `lurek.math.newRandomGenerator(seed?)` | `RandomGenerator` | New RNG, optionally seeded |
+| `lurek.math.newTransform(x?,y?,angle?,sx?,sy?,ox?,oy?,kx?,ky?)` | `Transform` | Affine transform (identity if no args) |
+| `lurek.math.newBezierCurve(points)` | `BezierCurve` | From flat `{x1,y1, x2,y2, ...}` table (≥ 4 numbers) |
+| `lurek.math.newTween(duration, easingName?)` | `Tween` | Multi-value interpolation driver |
+| `lurek.math.newSpatialHash(cellSize)` | `SpatialHash` | Grid-based spatial query structure |
+| `lurek.math.newNoiseGenerator(seed?)` | `NoiseGenerator` | Seeded procedural noise generator |
 
 ### Free Noise Functions
 
 | Lua Function | Description |
 |---|---|
-| `luna.math.perlin2d(x, y, seed?)` | 2D Perlin noise |
-| `luna.math.perlin3d(x, y, z, seed?)` | 3D Perlin noise |
-| `luna.math.simplex2d(x, y, seed?)` | 2D Simplex noise |
-| `luna.math.fbm(x, y, seed?, octaves?, lac?, gain?)` | Fractal Brownian motion |
+| `lurek.math.perlin2d(x, y, seed?)` | 2D Perlin noise |
+| `lurek.math.perlin3d(x, y, z, seed?)` | 3D Perlin noise |
+| `lurek.math.simplex2d(x, y, seed?)` | 2D Simplex noise |
+| `lurek.math.fbm(x, y, seed?, octaves?, lac?, gain?)` | Fractal Brownian motion |
 
 ### Easing Functions
 
-`luna.math.applyEasing(name, t)` — case-insensitive lookup across all 22 easing names.
+`lurek.math.applyEasing(name, t)` — case-insensitive lookup across all 22 easing names.
 
 22 individual functions: `linear`, `inQuad`, `outQuad`, `inOutQuad`, `inCubic`, `outCubic`, `inOutCubic`, `inQuart`, `outQuart`, `inOutQuart`, `inSine`, `outSine`, `inOutSine`, `inExpo`, `outExpo`, `inOutExpo`, `inElastic`, `outElastic`, `outBounce`, `inBounce`, `inBack`, `outBack`.
 
@@ -241,10 +241,10 @@ Registered via `src/lua_api/math_api.rs` as `luna.math`.
 
 | Lua Function | Returns | Description |
 |---|---|---|
-| `luna.math.triangulate(polygon)` | table of triangle tables | Ear-clipping triangulation (flat `{x1,y1,...}` input) |
-| `luna.math.isConvex(polygon)` | boolean | Convexity test (flat input) |
-| `luna.math.gammaToLinear(c)` | number | sRGB → linear color space |
-| `luna.math.linearToGamma(c)` | number | Linear → sRGB color space |
+| `lurek.math.triangulate(polygon)` | table of triangle tables | Ear-clipping triangulation (flat `{x1,y1,...}` input) |
+| `lurek.math.isConvex(polygon)` | boolean | Convexity test (flat input) |
+| `lurek.math.gammaToLinear(c)` | number | sRGB → linear color space |
+| `lurek.math.linearToGamma(c)` | number | Linear → sRGB color space |
 
 ### UserData Methods — RandomGenerator
 
@@ -360,7 +360,7 @@ Registered via `src/lua_api/math_api.rs` as `luna.math`.
 
 - **External crate**: `fastrand` — used by `RandomGenerator` for fast PRNG.
 - **Internal**: `crate::engine::log_messages` — used by `SpatialHash` for log-message constants (`HX01`, `HX02`) only. No logic dependency on the engine module.
-- **Downstream**: every Luna2D module may import `crate::math::*`.
+- **Downstream**: every Lurek2D module may import `crate::math::*`.
 
 ## Testing
 
@@ -408,7 +408,7 @@ Covers: constants (`pi`), trigonometry (`sin`, `cos`, `tan`, `atan2`), basic fun
 | `spatial_hash.rs` methods | `math_api.rs` LuaSpatialHash | New query method → add Lua binding |
 | `tween.rs` methods | `math_api.rs` LuaTween | New tween method → add Lua binding |
 | All public API | `tests/unit/math_tests.rs` | New public item → at least one test |
-| All `luna.math.*` functions | `tests/lua/unit/test_math.lua` | New Lua function → at least one Lua test |
+| All `lurek.math.*` functions | `tests/lua/unit/test_math.lua` | New Lua function → at least one Lua test |
 
 ## Extension Points
 

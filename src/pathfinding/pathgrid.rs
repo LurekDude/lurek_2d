@@ -1,13 +1,13 @@
 //! Weighted grid pathfinding (A*, Dijkstra) with obstacle support.
-//! Moved from `ai/pathgrid`; used by the Lua `luna.ai.newPathGrid` API.
+//! Moved from `ai/pathgrid`; used by the Lua `lurek.ai.newPathGrid` API.
 //!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `pathfinding` subsystem and provides the implementation
 //! details for pathgrid-related operations and data management.
 //! Key types exported from this module: `Cell`, `PathGrid`.
 //! Primary functions: `new()`, `in_bounds()`, `set_walkable()`, `is_walkable()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;

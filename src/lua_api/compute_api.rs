@@ -1,4 +1,4 @@
-//! `luna.compute` — Dense N-dimensional numerical arrays with NumPy-style operations.
+//! `lurek.compute` — Dense N-dimensional numerical arrays with NumPy-style operations.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -649,7 +649,7 @@ impl LuaUserData for LuaArray {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.compute` API table with the Lua VM.
+/// Registers the `lurek.compute` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

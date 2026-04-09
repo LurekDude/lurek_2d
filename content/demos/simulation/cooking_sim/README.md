@@ -4,19 +4,19 @@ An Overcooked-inspired kitchen simulation where you control a chef navigating be
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — station footprints, plate display, and order timer bars
-- `luna.gfx.setColor()` — per-ingredient colour coding and stove burn state
-- `luna.gfx.print()` — live on-screen feedback messages and score/money HUD
-- `luna.keyboard.isDown()` — four-directional WASD/arrow chef movement
-- `luna.keyboard.isPressed()` — Space to interact with the station the chef is standing on
-- `luna.keyboard.isPressed()` — number keys 1–6 to select an ingredient from the shelf
-- `luna.gfx.circle()` — chef avatar and ingredient held-in-hand indicator
-- `luna.gfx.setBackgroundColor()` — warm kitchen atmosphere
+- `lurek.gfx.rectangle()` — station footprints, plate display, and order timer bars
+- `lurek.gfx.setColor()` — per-ingredient colour coding and stove burn state
+- `lurek.gfx.print()` — live on-screen feedback messages and score/money HUD
+- `lurek.keyboard.isDown()` — four-directional WASD/arrow chef movement
+- `lurek.keyboard.isPressed()` — Space to interact with the station the chef is standing on
+- `lurek.keyboard.isPressed()` — number keys 1–6 to select an ingredient from the shelf
+- `lurek.gfx.circle()` — chef avatar and ingredient held-in-hand indicator
+- `lurek.gfx.setBackgroundColor()` — warm kitchen atmosphere
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/cooking_sim
+cargo run -- content/demos/cooking_sim
 ```
 
 ## Controls

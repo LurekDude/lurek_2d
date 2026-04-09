@@ -1,6 +1,6 @@
 -- 2D Fighting Game Demo — Player vs AI with rounds, combos, and super meter
 -- P1: WASD move, F punch, G kick, H block | Escape to quit
--- Run with: cargo run -- demos/action/fighting_game
+-- Run with: cargo run -- content/demos/action/fighting_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -32,9 +32,9 @@ local function resetRound()
     comboTexts = {}
 end
 
-function luna.init()
-    luna.window.setTitle("Fighting Game")
-    luna.gfx.setBackgroundColor(0.08, 0.05, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Fighting Game")
+    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.15)
     resetRound()
 end
 
@@ -158,17 +158,17 @@ local function aiUpdate(ai, target, dt)
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if roundDelay > 0 then
         roundDelay = roundDelay - dt
         return
     end
 
     -- P1 input
-    P1.blocking = luna.keyboard.isDown("h")
-    if luna.keyboard.isDown("a") then P1.x = P1.x - P1.speed * dt end
-    if luna.keyboard.isDown("d") then P1.x = P1.x + P1.speed * dt end
-    if luna.keyboard.isDown("w") and P1.y >= stageFloor then P1.vy = P1.jumpForce end
+    P1.blocking = lurek.keyboard.isDown("h")
+    if lurek.keyboard.isDown("a") then P1.x = P1.x - P1.speed * dt end
+    if lurek.keyboard.isDown("d") then P1.x = P1.x + P1.speed * dt end
+    if lurek.keyboard.isDown("w") and P1.y >= stageFloor then P1.vy = P1.jumpForce end
     P1.facing = P2.x > P1.x and 1 or -1
 
     -- AI
@@ -224,13 +224,13 @@ local function drawFighter(f, r, g, b)
     local by = f.y - f.h + shakeY
 
     -- body
-    luna.gfx.setColor(r, g, b, 1)
-    luna.gfx.rectangle("fill", bx, by, f.w, f.h)
+    lurek.gfx.setColor(r, g, b, 1)
+    lurek.gfx.rectangle("fill", bx, by, f.w, f.h)
 
     -- blocking indicator
     if f.blocking then
-        luna.gfx.setColor(0.5, 0.5, 1, 0.4)
-        luna.gfx.rectangle("fill", bx - 4, by - 4, f.w + 8, f.h + 8)
+        lurek.gfx.setColor(0.5, 0.5, 1, 0.4)
+        lurek.gfx.rectangle("fill", bx - 4, by - 4, f.w + 8, f.h + 8)
     end
 
     -- attack hitbox
@@ -239,36 +239,36 @@ local function drawFighter(f, r, g, b)
         local ax = f.x + ab.ox - ab.w / 2 + shakeX
         local ay = f.y + ab.oy - ab.h / 2 + shakeY
         if f.state == "super" then
-            luna.gfx.setColor(1, 1, 0, 0.6)
+            lurek.gfx.setColor(1, 1, 0, 0.6)
         else
-            luna.gfx.setColor(1, 0.3, 0.3, 0.4)
+            lurek.gfx.setColor(1, 0.3, 0.3, 0.4)
         end
-        luna.gfx.rectangle("fill", ax, ay, ab.w, ab.h)
+        lurek.gfx.rectangle("fill", ax, ay, ab.w, ab.h)
     end
 end
 
 local function drawHealthBar(x, y, w, hp, maxHp, r, g, b)
-    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-    luna.gfx.rectangle("fill", x, y, w, 18)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+    lurek.gfx.rectangle("fill", x, y, w, 18)
     local ratio = hp / maxHp
-    luna.gfx.setColor(r, g, b, 1)
-    luna.gfx.rectangle("fill", x, y, w * ratio, 18)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.rectangle("line", x, y, w, 18)
+    lurek.gfx.setColor(r, g, b, 1)
+    lurek.gfx.rectangle("fill", x, y, w * ratio, 18)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.rectangle("line", x, y, w, 18)
 end
 
 local function drawSuperBar(x, y, w, s, maxS)
-    luna.gfx.setColor(0.15, 0.15, 0.15, 1)
-    luna.gfx.rectangle("fill", x, y, w, 8)
+    lurek.gfx.setColor(0.15, 0.15, 0.15, 1)
+    lurek.gfx.rectangle("fill", x, y, w, 8)
     local ratio = s / maxS
-    luna.gfx.setColor(1, 1, 0, 1)
-    luna.gfx.rectangle("fill", x, y, w * ratio, 8)
+    lurek.gfx.setColor(1, 1, 0, 1)
+    lurek.gfx.rectangle("fill", x, y, w * ratio, 8)
 end
 
-function luna.render()
+function lurek.render()
     -- stage floor
-    luna.gfx.setColor(0.25, 0.2, 0.3, 1)
-    luna.gfx.rectangle("fill", 0, stageFloor + shakeY, 800, 80)
+    lurek.gfx.setColor(0.25, 0.2, 0.3, 1)
+    lurek.gfx.rectangle("fill", 0, stageFloor + shakeY, 800, 80)
 
     -- fighters
     drawFighter(P1, 0.2, 0.5, 1)
@@ -281,51 +281,51 @@ function luna.render()
     drawSuperBar(470, 42, 300, P2.super, P2.maxSuper)
 
     -- round wins
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
     for i = 1, P1.wins do
-        luna.gfx.circle("fill", 340 - i * 20, 28, 6)
+        lurek.gfx.circle("fill", 340 - i * 20, 28, 6)
     end
     for i = 1, P2.wins do
-        luna.gfx.circle("fill", 460 + i * 20, 28, 6)
+        lurek.gfx.circle("fill", 460 + i * 20, 28, 6)
     end
 
     -- labels
-    luna.gfx.setColor(0.5, 0.7, 1, 1)
-    luna.gfx.print("P1", 30, 5)
-    luna.gfx.setColor(1, 0.5, 0.4, 1)
-    luna.gfx.print("AI", 740, 5)
-    luna.gfx.setColor(1, 1, 1, 0.6)
-    luna.gfx.print("VS", 390, 5)
+    lurek.gfx.setColor(0.5, 0.7, 1, 1)
+    lurek.gfx.print("P1", 30, 5)
+    lurek.gfx.setColor(1, 0.5, 0.4, 1)
+    lurek.gfx.print("AI", 740, 5)
+    lurek.gfx.setColor(1, 1, 1, 0.6)
+    lurek.gfx.print("VS", 390, 5)
 
     -- combo texts
     for _, ct in ipairs(comboTexts) do
-        luna.gfx.setColor(1, 1, 0, clamp(ct.timer, 0, 1))
-        luna.gfx.print(ct.text, ct.x - 20 + shakeX, ct.y + shakeY, 1.3)
+        lurek.gfx.setColor(1, 1, 0, clamp(ct.timer, 0, 1))
+        lurek.gfx.print(ct.text, ct.x - 20 + shakeX, ct.y + shakeY, 1.3)
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 0.5)
-    luna.gfx.print("WASD: Move | F: Punch | G: Kick | H: Block | V: Super (when full)", 120, 575)
+    lurek.gfx.setColor(1, 1, 1, 0.5)
+    lurek.gfx.print("WASD: Move | F: Punch | G: Kick | H: Block | V: Super (when full)", 120, 575)
 
     -- round start / game over
     if roundDelay > 0 then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 250, 250, 300, 80)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
+        lurek.gfx.setColor(1, 1, 1, 1)
         if P1.wins >= roundsToWin then
-            luna.gfx.print("P1 WINS THE MATCH!", 300, 270, 1.3)
-            luna.gfx.print("Press R to rematch", 320, 300)
+            lurek.gfx.print("P1 WINS THE MATCH!", 300, 270, 1.3)
+            lurek.gfx.print("Press R to rematch", 320, 300)
         elseif P2.wins >= roundsToWin then
-            luna.gfx.print("AI WINS THE MATCH!", 300, 270, 1.3)
-            luna.gfx.print("Press R to rematch", 320, 300)
+            lurek.gfx.print("AI WINS THE MATCH!", 300, 270, 1.3)
+            lurek.gfx.print("Press R to rematch", 320, 300)
         else
-            luna.gfx.print("ROUND " .. (P1.wins + P2.wins + 1), 340, 275, 1.5)
+            lurek.gfx.print("ROUND " .. (P1.wins + P2.wins + 1), 340, 275, 1.5)
         end
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then P1 = nil; P2 = nil; resetRound(); P1.wins = 0; P2.wins = 0 end
     if key == "f" then startAttack(P1, "punch") end
     if key == "g" then startAttack(P1, "kick") end

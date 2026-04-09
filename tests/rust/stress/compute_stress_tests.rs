@@ -1,7 +1,7 @@
 //! Stress tests for the compute module — large array operations.
 
-use luna2d::compute::ops;
-use luna2d::compute::*;
+use lurek2d::compute::ops;
+use lurek2d::compute::*;
 
 #[test]
 fn stress_large_1d_array_creation() {

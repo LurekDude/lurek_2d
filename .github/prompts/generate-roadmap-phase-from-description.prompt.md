@@ -1,6 +1,6 @@
 ---
 name: generate-roadmap-phase-from-description
-description: Generate a complete Luna2D roadmap phase file from a natural language description of scope and goals.
+description: Generate a complete Lurek2D roadmap phase file from a natural language description of scope and goals.
 ---
 
 # Generate Roadmap Phase from Description
@@ -31,10 +31,10 @@ Work through every stage in order. Do not skip stages or merge them.
 
 Read the description carefully and extract:
 
-1. **Feature domain** — which Luna2D module(s) does this touch? (graphics, physics, audio, input, filesystem, math, timer, window, data, image, sound, event, thread, system, or a new module)
+1. **Feature domain** — which Lurek2D module(s) does this touch? (graphics, physics, audio, input, filesystem, math, timer, window, data, image, sound, event, thread, system, or a new module)
 2. **Core capability** — one sentence: what can the game developer do after this phase that they cannot do today?
 3. **Scope signal** — is this a small addition (1–3 new functions), a medium module extension (new sub-system), or a large new module (brand-new `src/<name>/` + `lua_api/<name>_api.rs`)?
-4. **Lua API surface sketch** — list the `luna.*` function names implied by the description. If none are named, invent canonical names following the `luna.<module>.<verb><Noun>` pattern.
+4. **Lua API surface sketch** — list the `lurek.*` function names implied by the description. If none are named, invent canonical names following the `lurek.<module>.<verb><Noun>` pattern.
 5. **Rust implementation surface sketch** — list the struct/trait/module names the implementation will likely need.
 
 Output a short internal analysis block (not part of the final file). Use this format:
@@ -44,7 +44,7 @@ Output a short internal analysis block (not part of the final file). Use this fo
 Domain       : <module name(s)>
 Core cap     : <one sentence>
 Scope        : Small | Medium | Large
-Lua API      : luna.X.foo(), luna.X.bar(), ...
+Lua API      : lurek.X.foo(), lurek.X.bar(), ...
 Rust surface : StructName, fn_name, mod name
 ```
 
@@ -57,7 +57,7 @@ For each domain module identified in Stage 1, explore the repository and build a
 ```
 list_dir src/<domain>/
 list_dir src/lua_api/
-grep_search "luna.<module>" in src/lua_api/
+grep_search "lurek.<module>" in src/lua_api/
 grep_search "<StructName>" in src/
 file_search **/<slug>*.rs
 ```
@@ -71,14 +71,14 @@ Build two lists:
 
 **Already implemented** — functions/structs that exist and work today:
 ```
-✅  luna.X.foo()        →  FooImpl::new()          src/X/foo.rs:42
-✅  luna.X.bar()        →  BarStruct               src/lua_api/x_api.rs:88
+✅  lurek.X.foo()        →  FooImpl::new()          src/X/foo.rs:42
+✅  lurek.X.bar()        →  BarStruct               src/lua_api/x_api.rs:88
 ```
 
 **Missing / gaps** — things described but not present in the codebase:
 ```
-❌  luna.X.baz()        →  Not found anywhere
-❌  luna.X.qux(a, b)    →  Partial: struct exists but no Lua binding
+❌  lurek.X.baz()        →  Not found anywhere
+❌  lurek.X.qux(a, b)    →  Partial: struct exists but no Lua binding
 ```
 
 ### Stage 3 — Phase Numbering and Metadata
@@ -106,7 +106,7 @@ For each sub-task:
 - **File(s)** — exact paths relative to workspace root. For new files, state they are new. For modified files, confirm they exist (use the audit from Stage 2).
 - **Description** — what to build. When the data shape is non-obvious, include:
   - A Rust struct/enum snippet showing the proposed type signature
-  - A Lua API snippet showing the exact `luna.*` calls and return types
+  - A Lua API snippet showing the exact `lurek.*` calls and return types
 - **Agent** — which specialist implements this task:
   - `Developer` — general Rust/engine work
   - `Renderer` — all `src/graphics/` code
@@ -152,7 +152,7 @@ After saving the file, verify:
 - [ ] All file paths in Implementation Tasks exist in the repo OR are marked as new files
 - [ ] `Depends On` references are accurate (open each referenced phase file to confirm it exists)
 - [ ] `Blocks` field is updated in any phase that this new phase enables
-- [ ] No `luna.` prefix replaced with any external engine prefix anywhere in the file
+- [ ] No `lurek.` prefix replaced with any external engine prefix anywhere in the file
 - [ ] Acceptance gates are all binary (pass/fail), not subjective
 
 Report any checklist failures as warnings after saving.

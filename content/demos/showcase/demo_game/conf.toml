@@ -1,7 +1,7 @@
 # conf.toml — engine configuration for demo_game
 
 [window]
-title = "Luna2D Demo Game"
+title = "Lurek2D Demo Game"
 width = 800
 height = 600
 

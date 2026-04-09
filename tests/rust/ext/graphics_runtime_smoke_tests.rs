@@ -5,7 +5,7 @@ use std::time::Duration;
 mod smoke_support;
 
 use smoke_support::{
-    decode_png, prepare_example_copy, resolve_luna2d_binary, run_smoke_process,
+    decode_png, prepare_example_copy, resolve_lurek2d_binary, run_smoke_process,
     summarize_image_content, unsupported_headless_linux,
 };
 
@@ -22,7 +22,7 @@ fn sprites_smoke_mode_writes_non_blank_800x600_png() {
     let (_temp_dir, game_dir) =
         prepare_example_copy("sprites").expect("Failed to prepare sprites copy");
     let screenshot_path = game_dir.join(SCREENSHOT_REL_PATH);
-    let binary_path = resolve_luna2d_binary();
+    let binary_path = resolve_lurek2d_binary();
 
     assert!(
         binary_path.is_file(),

@@ -1,7 +1,7 @@
-//! Unit tests for the Luna2D animation module (`luna2d::animation`).
+//! Unit tests for the Lurek2D animation module (`lurek2d::animation`).
 
-use luna2d::animation::{AnimEvent, Animation};
-use luna2d::math::Rect;
+use lurek2d::animation::{AnimEvent, Animation};
+use lurek2d::math::Rect;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

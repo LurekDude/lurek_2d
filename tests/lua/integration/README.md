@@ -1,6 +1,6 @@
 # tests/lua/integration — Lua Integration Tests
 
-Tests that verify two or more `luna.*` modules working together. Both namespaces must appear in each file.
+Tests that verify two or more `lurek.*` modules working together. Both namespaces must appear in each file.
 
 ## Naming
 
@@ -8,7 +8,7 @@ Tests that verify two or more `luna.*` modules working together. Both namespaces
 
 ## Rules
 
-- Minimum 2 distinct `luna.*` namespaces per file
+- Minimum 2 distinct `lurek.*` namespaces per file
 - Headless — no GPU/audio/window calls
 - Each file ends with `test_summary()`
 

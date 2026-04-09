@@ -10,14 +10,14 @@ Lightweight multiplayer networking: create/join sessions, send/receive data over
 
 ## Current Feature Summary
 
-- `luna.network.host(port, maxPeers?)` — start a host (server) on a port
-- `luna.network.connect(host, port)` — connect to a host as client
-- `luna.network.send(peerId, data, reliable?)` — send data to a specific peer
-- `luna.network.broadcast(data, reliable?)` — send data to all connected peers
-- `luna.network.poll()` — poll for events (connect, disconnect, receive)
-- `luna.network.disconnect(peerId?)` — disconnect specific peer or all
-- `luna.network.getPeers()` — list connected peers with round-trip time
-- `luna.network.getStats()` — bandwidth and packet stats
+- `lurek.network.host(port, maxPeers?)` — start a host (server) on a port
+- `lurek.network.connect(host, port)` — connect to a host as client
+- `lurek.network.send(peerId, data, reliable?)` — send data to a specific peer
+- `lurek.network.broadcast(data, reliable?)` — send data to all connected peers
+- `lurek.network.poll()` — poll for events (connect, disconnect, receive)
+- `lurek.network.disconnect(peerId?)` — disconnect specific peer or all
+- `lurek.network.getPeers()` — list connected peers with round-trip time
+- `lurek.network.getStats()` — bandwidth and packet stats
 - Event-driven: `on_connect`, `on_disconnect`, `on_receive` callbacks
 - ENet reliable ordered delivery (TCP-like) AND unreliable channels
 - Max 8 peers (hardcoded)
@@ -41,23 +41,23 @@ Lightweight multiplayer networking: create/join sessions, send/receive data over
 
 - **Correct Tier 1 placement**: Networking is a core subsystem. No Tier 1 cross-dependencies.
 - **UDP-only is correct for game networking**: TCP is wrong for real-time games. ENet's reliable UDP is the right choice.
-- **No thread integration**: Network polling is synchronous on the main thread. Should support polling from a `luna.thread` worker for non-blocking operation.
-- **"network" is a big scope**: The module is currently small (basic UDP), but the feature gaps suggest it should grow significantly. Consider sub-namespaces: `luna.network.udp.*`, `luna.network.http.*`.
+- **No thread integration**: Network polling is synchronous on the main thread. Should support polling from a `lurek.thread` worker for non-blocking operation.
+- **"network" is a big scope**: The module is currently small (basic UDP), but the feature gaps suggest it should grow significantly. Consider sub-namespaces: `lurek.network.udp.*`, `lurek.network.http.*`.
 
 ## Suggestions
 
 1. **Increase peer limit**: Make max peers configurable at host creation time, with a reasonable default (32-64).
-2. **Add HTTP client**: `luna.network.httpGet(url, callback)` / `luna.network.httpPost(url, body, callback)` — essential for leaderboards, analytics, content downloads. Run in a background thread.
-3. **Add WebSocket**: `luna.network.websocket(url)` — persistent connection for real-time web services.
+2. **Add HTTP client**: `lurek.network.httpGet(url, callback)` / `lurek.network.httpPost(url, body, callback)` — essential for leaderboards, analytics, content downloads. Run in a background thread.
+3. **Add WebSocket**: `lurek.network.websocket(url)` — persistent connection for real-time web services.
 4. **Add NAT punchthrough**: Even basic UDP hole-punching with a relay server would make casual multiplayer viable.
-5. **Add state sync helpers**: `luna.network.syncEntity(id, data)` / `luna.network.onEntityUpdate(callback)` — automatic serialization and delta compression for entity states.
-6. **Add input prediction/rollback**: `luna.network.sendInput(frame, input)` with configurable rollback window. Complex but transformative for fighting/action games.
-7. **Add lobby system**: `luna.network.createLobby(name, maxPlayers)` / `luna.network.listLobbies()` — even a LAN discovery version would help.
-8. **Add background polling**: Allow `luna.network.poll()` to run on a worker thread via `luna.thread`, returning events on the main thread.
+5. **Add state sync helpers**: `lurek.network.syncEntity(id, data)` / `lurek.network.onEntityUpdate(callback)` — automatic serialization and delta compression for entity states.
+6. **Add input prediction/rollback**: `lurek.network.sendInput(frame, input)` with configurable rollback window. Complex but transformative for fighting/action games.
+7. **Add lobby system**: `lurek.network.createLobby(name, maxPlayers)` / `lurek.network.listLobbies()` — even a LAN discovery version would help.
+8. **Add background polling**: Allow `lurek.network.poll()` to run on a worker thread via `lurek.thread`, returning events on the main thread.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy | Godot |
+| Feature | Lurek2D | Engine A | Engine B | Engine D | Engine C |
 |---|---|---|---|---|---|
 | UDP (ENet) | ✅ | ✅ (enet) | ❌ | ❌ | ✅ |
 | Reliable channels | ✅ | ✅ | N/A | N/A | ✅ |
@@ -68,8 +68,8 @@ Lightweight multiplayer networking: create/join sessions, send/receive data over
 | Lobby/matchmaking | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Max peers | 8 | 64+ | N/A | Unlimited | 4096 |
 
-Luna2D's 8-peer limit and lack of HTTP/WebSocket are the critical gaps. Most competitors at least offer HTTP for web service communication.
+Lurek2D's 8-peer limit and lack of HTTP/WebSocket are the critical gaps. Most competitors at least offer HTTP for web service communication.
 
 ## Priority
 
-**HIGH** — HTTP client is the highest-priority addition (leaderboards, content delivery, OAuth). Peer limit increase is a quick fix. NAT traversal and state sync are medium-term improvements that would make Luna2D competitive for multiplayer games.
+**HIGH** — HTTP client is the highest-priority addition (leaderboards, content delivery, OAuth). Peer limit increase is a quick fix. NAT traversal and state sync are medium-term improvements that would make Lurek2D competitive for multiplayer games.

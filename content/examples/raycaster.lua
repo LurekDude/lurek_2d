@@ -1,15 +1,14 @@
 -- examples/raycaster.lua
--- luna.raycaster — DDA-based grid raycasting for retro FPS and dungeon-crawler games.
+-- lurek.raycaster — DDA-based grid raycasting for retro FPS and dungeon-crawler games.
 -- Cast rays through a cell grid, project wall columns, check line of sight.
--- All luna.raycaster API methods and utilities demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- All lurek.raycaster API methods and utilities demonstrated with code and comments.
 
 -- ── Creating the Raycaster ────────────────────────────────────────────────────
 
--- luna.raycaster.new(w, h) → Raycaster
+local new = lurek.raycaster.new(w, h)
 -- w, h: grid dimensions in cells (e.g. 32×32 maze grid)
 local MAP_W, MAP_H = 32, 32
-local rc = luna.raycaster.new(MAP_W, MAP_H)
+local rc = lurek.raycaster.new(MAP_W, MAP_H)
 
 -- ── Populating the Cell Grid ──────────────────────────────────────────────────
 
@@ -100,9 +99,9 @@ local fov = math.pi / 2
 for col = 1, SCREEN_W do
     local h = hits[col]
     if h and h.hit then
-        local top, col_h, bottom = luna.raycaster.projectColumn(h.distance, fov, SCREEN_H)
+        local top, col_h, bottom = lurek.raycaster.projectColumn(h.distance, fov, SCREEN_H)
         -- draw textured vertical stripe at screen column (col-1)
-        -- luna.gfx.draw(wall_tex, col-1, top, 0, 1, col_h / wall_h, h.tex_u, 0, 1, 1)
+lurek.gfx.draw(wall_tex, col-1, top, 0, 1, col_h / wall_h, h.tex_u, 0, 1, 1)
     end
 end
 
@@ -115,8 +114,8 @@ local max_dist = 20.0
 for col = 1, SCREEN_W do
     local h = hits[col]
     if h and h.hit then
-        local brightness = luna.raycaster.distanceShade(h.distance, max_dist)
-        -- luna.gfx.setColor(brightness, brightness, brightness)
+        local brightness = lurek.raycaster.distanceShade(h.distance, max_dist)
+lurek.gfx.setColor(brightness, brightness, brightness)
     end
 end
 
@@ -148,7 +147,7 @@ if sp.visible then
     local sprite_h = SCREEN_H * sp.scale
     local draw_x   = sp.screen_x - sprite_h / 2
     local draw_y   = (SCREEN_H - sprite_h) / 2
-    -- luna.gfx.draw(sprite_img, draw_x, draw_y, 0, sp.scale, sp.scale)
+lurek.gfx.draw(sprite_img, draw_x, draw_y, 0, sp.scale, sp.scale)
 end
 
 -- ── Minimal FPS-Style Game Loop ───────────────────────────────────────────────
@@ -157,29 +156,29 @@ end
 local rc, player = nil, { x=16.5, y=16.5, angle=0 }
 local SPEED, TURN = 2.5, 2.0
 
-function luna.init()
-    rc = luna.raycaster.new(MAP_W, MAP_H)
+function lurek.init()
+    rc = lurek.raycaster.new(MAP_W, MAP_H)
     rc:setCells(flat_map)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     local dx = math.cos(player.angle) * SPEED * dt
     local dy = math.sin(player.angle) * SPEED * dt
-    if luna.keyboard.isDown("w") and not rc:isBlocked(math.floor(player.x+dx), math.floor(player.y)) then player.x = player.x + dx end
-    if luna.keyboard.isDown("s") and not rc:isBlocked(math.floor(player.x-dx), math.floor(player.y)) then player.x = player.x - dx end
-    if luna.keyboard.isDown("a") then player.angle = player.angle - TURN * dt end
-    if luna.keyboard.isDown("d") then player.angle = player.angle + TURN * dt end
+    if lurek.keyboard.isDown("w") and not rc:isBlocked(math.floor(player.x+dx), math.floor(player.y)) then player.x = player.x + dx end
+    if lurek.keyboard.isDown("s") and not rc:isBlocked(math.floor(player.x-dx), math.floor(player.y)) then player.x = player.x - dx end
+    if lurek.keyboard.isDown("a") then player.angle = player.angle - TURN * dt end
+    if lurek.keyboard.isDown("d") then player.angle = player.angle + TURN * dt end
 end
 
-function luna.render()
+function lurek.render()
     local hits_frame = rc:castRays(player.x, player.y, player.angle, math.pi/2, SCREEN_W, 20)
     for col = 1, SCREEN_W do
         local h = hits_frame[col]
         if h and h.hit then
-            local top, col_h, _ = luna.raycaster.projectColumn(h.distance, math.pi/2, SCREEN_H)
-            local brightness = luna.raycaster.distanceShade(h.distance, 20)
-            luna.gfx.setColor(brightness, brightness * 0.5, 0)   -- brownish
-            luna.gfx.rectangle("fill", col-1, top, 1, col_h)
+            local top, col_h, _ = lurek.raycaster.projectColumn(h.distance, math.pi/2, SCREEN_H)
+            local brightness = lurek.raycaster.distanceShade(h.distance, 20)
+            lurek.gfx.setColor(brightness, brightness * 0.5, 0)   -- brownish
+            lurek.gfx.rectangle("fill", col-1, top, 1, col_h)
         end
     end
 end

@@ -1,6 +1,6 @@
-//! Integration tests for the Luna2D filesystem module.
+//! Integration tests for the Lurek2D filesystem module.
 
-use luna2d::filesystem::{FileHandle, FileMode, FileType, GameFS};
+use lurek2d::filesystem::{FileHandle, FileMode, FileType, GameFS};
 use tempfile::TempDir;
 
 fn make_test_fs() -> (TempDir, GameFS) {
@@ -16,7 +16,7 @@ fn make_test_fs() -> (TempDir, GameFS) {
 #[test]
 fn file_handle_write_and_read_roundtrip() {
     let (_tmp, fs) = make_test_fs();
-    let content = "Hello, Luna2D!";
+    let content = "Hello, Lurek2D!";
 
     // Write
     let mut wh = FileHandle::open(&fs, "save/test.txt", FileMode::Write).unwrap();

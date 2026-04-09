@@ -1,6 +1,6 @@
-# Luna2D — Test Suite Overview
+# Lurek2D — Test Suite Overview
 
-Luna2D uses a **two-tier test model**: Rust integration tests and Lua BDD tests.
+Lurek2D uses a **two-tier test model**: Rust integration tests and Lua BDD tests.
 Both tiers are executed via `cargo test`.
 
 ## Quick Run Commands
@@ -33,20 +33,20 @@ tests/
 └── lua/                   ← Lua BDD tests (dispatched by tests/lua/harness.rs)
     ├── harness.rs         ← Rust dispatcher — one #[test] per .lua file
     ├── init.lua           ← BDD framework (describe/it/expect_*)
-    ├── unit/              ← one file per engine module (luna.* API surface)
-    ├── library/           ← one file per Lunasome library in library/
+    ├── unit/              ← one file per engine module (lurek.* API surface)
+    ├── content/library/           ← one file per Lunasome library in content/library/
     ├── integration/       ← tests BETWEEN ≥2 modules (name: test_<a>_<b>.lua)
     ├── stress/            ← Lua throughput tests (high iteration counts)
     ├── security/          ← Lua sandboxing + nil-spam + path-traversal
     ├── golden/            ← deterministic Lua output tests
     ├── config/            ← configuration loading tests
-    ├── demos/             ← one file per demo in demos/
+    ├── content/demos/             ← one file per demo in content/demos/
     ├── performance/       ← Lua benchmark helpers
     └── fixtures/          ← Lua-specific test assets
 ```
 
-> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are pure-Lua libraries and tested in `tests/lua/library/`.
-> **Note**: `tests/lua/examples/` should not be used. Examples are documentation and are not testable in the BDD harness.
+> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are pure-Lua libraries and tested in `tests/lua/content/library/`.
+> **Note**: `tests/lua/content/examples/` should not be used. Examples are documentation and are not testable in the BDD harness.
 
 ## Tier 1: Rust Tests
 
@@ -81,14 +81,14 @@ Each `.lua` file must be registered with a `#[test]` entry in `harness.rs`.
 
 | Category | Path | Scope |
 |---|---|---|
-| **unit** | `tests/lua/unit/` | One engine module per file (luna.* API) |
-| **library** | `tests/lua/library/` | One Lunasome library per file |
+| **unit** | `tests/lua/unit/` | One engine module per file (lurek.* API) |
+| **library** | `tests/lua/content/library/` | One Lunasome library per file |
 | **integration** | `tests/lua/integration/` | Tests between ≥2 distinct modules |
 | **stress** | `tests/lua/stress/` | High-iteration throughput/load tests |
 | **security** | `tests/lua/security/` | Sandbox, nil spam, path traversal |
 | **golden** | `tests/lua/golden/` | Deterministic output comparison |
 | **config** | `tests/lua/config/` | Configuration loading/validation |
-| **demos** | `tests/lua/demos/` | One smoke test per demo folder |
+| **demos** | `tests/lua/content/demos/` | One smoke test per demo folder |
 
 ## Golden Tests
 

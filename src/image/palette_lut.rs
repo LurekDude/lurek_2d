@@ -3,13 +3,13 @@
 //! Maps source colors to target colors, allowing sprites to be
 //! re-colored at render time without modifying the original texture.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for palette lut-related operations and data management.
 //! Key types exported from this module: `PaletteLUT`.
 //! Primary functions: `new()`, `get_color_count()`, `set_color()`, `get_from_color()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::Color;
 

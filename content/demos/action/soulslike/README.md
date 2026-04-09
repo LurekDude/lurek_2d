@@ -15,7 +15,7 @@ A 1v1 boss duel with a stamina resource that governs every action. Light attacks
 ## How to Run
 
 ```powershell
-cargo run -- demos/soulslike
+cargo run -- content/demos/soulslike
 ```
 
 ## Controls

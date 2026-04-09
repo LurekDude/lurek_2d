@@ -9,12 +9,12 @@ A side-view precision shooting game with realistic bullet physics. Wind pushes b
 - Scope sway implemented as a circular oscillator (`sin(t * 2.1) + cos(t * 1.7)`) with `Shift` damping
 - Headshot detection: separate hit zones for body rectangle and head circle with different score values
 - Round configuration table: `{ wind, dist_min, dist_max, target_count }` drives difficulty scaling
-- `luna.mouse.getPosition()` mapped from screen space to sniper scope space for aiming
+- `lurek.mouse.getPosition()` mapped from screen space to sniper scope space for aiming
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/sniper
+cargo run -- content/demos/sniper
 ```
 
 ## Controls

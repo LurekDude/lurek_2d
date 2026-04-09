@@ -35,7 +35,7 @@ local drawList = doll:getDrawList()
 
 ## Dependencies
 
-- None (pure Lua, optionally calls `luna.gfx` in `draw()`)
+- None (pure Lua, optionally calls `lurek.gfx` in `draw()`)
 
 ## Tests
 

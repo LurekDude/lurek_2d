@@ -2,7 +2,7 @@
 ///
 /// Validates DDA grid setup, cell queries, and ray casting results. All
 /// tests are headless with no GPU or audio requirements.
-use luna2d::raycaster::Raycaster2D;
+use lurek2d::raycaster::Raycaster2D;
 
 // ── Construction and grid operations ─────────────────────────────────────────
 

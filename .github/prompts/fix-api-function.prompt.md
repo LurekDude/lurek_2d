@@ -6,11 +6,11 @@ description: "Fix a broken or incorrect Lua API function: signature, behavior, o
 
 ## Purpose
 
-Fix a broken `luna.*` API function.
+Fix a broken `lurek.*` API function.
 
 ## Inputs
 
-- **Function**: Which `luna.*` function is broken
+- **Function**: Which `lurek.*` function is broken
 - **Expected behavior**: What it should do
 - **Actual behavior**: What it currently does
 

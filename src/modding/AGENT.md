@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.modding`                                       |
+| **Lua API**    | `lurek.modding`                                       |
 | **Source**     | `src/modding/`                                       |
 | **Rust Tests** | `tests/rust/unit/modding_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_modding.lua`                    |
@@ -29,6 +29,6 @@ Baseline (`engine`, `math`) and uses the `toml` crate for manifest parsing and
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/modding.md`](../../specs/modding.md)
+→ [`docs/specs/modding.md`](../../docs/specs/modding.md)
 
-_Update both this file **and** `specs/modding.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/modding.md` whenever source files, public types, or Lua bindings change._

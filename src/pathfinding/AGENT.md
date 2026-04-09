@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.pathfinding`                                   |
+| **Lua API**    | `lurek.pathfinding`                                   |
 | **Source**      | `src/pathfinding/`                                   |
 | **Rust Tests** | `tests/unit/pathfinding_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_pathfinding.lua`                |
@@ -35,6 +35,6 @@ The pathfinding module provides a comprehensive multi-layer grid pathfinding sta
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/pathfinding.md`](../../specs/pathfinding.md)
+→ [`docs/specs/pathfinding.md`](../../docs/specs/pathfinding.md)
 
-_Update both this file **and** `specs/pathfinding.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/pathfinding.md` whenever source files, public types, or Lua bindings change._

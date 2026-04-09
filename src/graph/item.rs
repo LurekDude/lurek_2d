@@ -1,12 +1,12 @@
 //! Graph item — a typed entity that flows through the network.
 //!
-//! This module is part of Luna2D's `graph` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graph` subsystem and provides the implementation
 //! details for item-related operations and data management.
 //! Key types exported from this module: `ItemPosition`, `GraphItem`.
 //! Primary functions: `new()`, `kill()`, `is_alive()`, `get_type()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// Where a `GraphItem` currently resides. Consult the module-level documentation for the broader usage context and preconditions.
 ///

@@ -3,13 +3,13 @@
 //! Entries are queued with a z-order value and flushed in ascending order
 //! so that lower z-values are drawn first (back-to-front).
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for draw layer-related operations and data management.
 //! Key types exported from this module: `LayerEntry`, `DrawLayer`.
 //! Primary functions: `new()`, `queue()`, `flush()`, `clear()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// A queued draw entry with its z-order. Consult the module-level documentation for the broader usage context and preconditions.
 ///

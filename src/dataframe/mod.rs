@@ -1,7 +1,7 @@
 //! In-memory column-major tabular data with query, analytics, and SQL.
 //!
 //! Provides `DataFrame` for named-column data tables and `Database` for
-//! multi-table catalogs. Used by the `luna.dataframe` Lua module.
+//! multi-table catalogs. Used by the `lurek.dataframe` Lua module.
 
 /// Column-major DataFrame and Database types.
 pub mod frame;

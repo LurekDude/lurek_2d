@@ -35,22 +35,22 @@ Programmatic input simulation: inject keyboard, mouse, gamepad, and touch events
 
 ## Suggestions
 
-1. **Add named macros**: `luna.automation.saveMacro("combo", sequence)` / `luna.automation.playMacro("combo")` — reusable input scripts.
-2. **Add wait-for-condition**: `luna.automation.waitUntil(predicate, timeout)` — blocks automation queue until condition met.
+1. **Add named macros**: `lurek.automation.saveMacro("combo", sequence)` / `lurek.automation.playMacro("combo")` — reusable input scripts.
+2. **Add wait-for-condition**: `lurek.automation.waitUntil(predicate, timeout)` — blocks automation queue until condition met.
 3. **Add screenshot comparison**: Integration with `saveScreenshot()` + `image` module for visual regression testing.
-4. **Add variable speed playback**: `luna.automation.setPlaybackSpeed(factor)` — slow down or speed up replay.
+4. **Add variable speed playback**: `lurek.automation.setPlaybackSpeed(factor)` — slow down or speed up replay.
 5. **Add highlight mode**: During replay, show visual indicators of simulated inputs (cursor position, key presses) for debugging.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Input simulation | ✅ | ❌ | ❌ | ❌ |
 | Input recording | ✅ | ❌ | ❌ | ❌ |
 | Input replay | ✅ | ❌ | ❌ | ❌ |
 | Visual testing | ❌ | ❌ | ❌ | ❌ |
 
-Luna2D is unique in having built-in automation. This is a genuine differentiator. Polish it.
+Lurek2D is unique in having built-in automation. This is a genuine differentiator. Polish it.
 
 ## Priority
 

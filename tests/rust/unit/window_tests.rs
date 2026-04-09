@@ -1,7 +1,7 @@
-//! Integration tests for the Luna2D window state and missing surface API.
+//! Integration tests for the Lurek2D window state and missing surface API.
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -141,27 +141,27 @@ fn window_is_high_dpi_allowed_returns_bool() {
 #[test]
 fn window_focus_can_be_called_without_error() {
     let (_state, lua) = make_vm();
-    lua.load("luna.window.focus()").exec().unwrap();
+    lua.load("lurek.window.focus()").exec().unwrap();
 }
 
 // ── Window Scaling — Config defaults ─────────────────────────────────────────
 
 #[test]
 fn window_config_scale_mode_defaults_to_none() {
-    let config = luna2d::engine::Config::default();
+    let config = lurek2d::engine::Config::default();
     assert_eq!(config.window.scale_mode, "none");
 }
 
 #[test]
 fn window_config_game_dimensions_default_none() {
-    let config = luna2d::engine::Config::default();
+    let config = lurek2d::engine::Config::default();
     assert!(config.window.game_width.is_none());
     assert!(config.window.game_height.is_none());
 }
 
 #[test]
 fn window_config_maximized_defaults_false() {
-    let config = luna2d::engine::Config::default();
+    let config = lurek2d::engine::Config::default();
     assert!(!config.window.maximized);
 }
 
@@ -169,7 +169,7 @@ fn window_config_maximized_defaults_false() {
 
 #[test]
 fn window_state_viewport_scale_defaults_are_one() {
-    let ws = luna2d::engine::WindowState::default();
+    let ws = lurek2d::engine::WindowState::default();
     assert!(
         (ws.viewport_scale_x - 1.0).abs() < 1e-5,
         "viewport_scale_x should default to 1.0, got {}",
@@ -184,7 +184,7 @@ fn window_state_viewport_scale_defaults_are_one() {
 
 #[test]
 fn window_state_viewport_offsets_default_to_zero() {
-    let ws = luna2d::engine::WindowState::default();
+    let ws = lurek2d::engine::WindowState::default();
     assert!(
         ws.viewport_offset_x.abs() < 1e-5,
         "viewport_offset_x should default to 0.0, got {}",
@@ -199,13 +199,13 @@ fn window_state_viewport_offsets_default_to_zero() {
 
 #[test]
 fn window_state_scale_mode_str_defaults_to_none() {
-    let ws = luna2d::engine::WindowState::default();
+    let ws = lurek2d::engine::WindowState::default();
     assert_eq!(ws.scale_mode_str, "none");
 }
 
 #[test]
 fn window_state_game_dimensions_default_to_800x600() {
-    let ws = luna2d::engine::WindowState::default();
+    let ws = lurek2d::engine::WindowState::default();
     assert!(
         (ws.game_width - 800.0).abs() < 1e-5,
         "default game_width should be 800.0"
@@ -218,6 +218,6 @@ fn window_state_game_dimensions_default_to_800x600() {
 
 #[test]
 fn window_state_pending_scale_mode_defaults_none() {
-    let ws = luna2d::engine::WindowState::default();
+    let ws = lurek2d::engine::WindowState::default();
     assert!(ws.pending_scale_mode.is_none());
 }

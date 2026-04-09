@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Entity management system with generational IDs, component storage, parent-child hierarchies, blueprints, and system scheduling. Luna2D's ECS is Lua-table-oriented rather than archetype-based.
+Entity management system with generational IDs, component storage, parent-child hierarchies, blueprints, and system scheduling. Lurek2D's ECS is Lua-table-oriented rather than archetype-based.
 
 ## Current Feature Summary
 
@@ -33,8 +33,8 @@ Entity management system with generational IDs, component storage, parent-child 
 
 ## Structural Issues
 
-- **Lua-table components vs typed components**: Design choice to use Lua tables means flexibility but no type safety or performance optimization. This is fine for Luna2D's target audience (indie/hobbyist) but limits scale.
-- **Systems are simple**: Systems are just named functions — no query builders, no exclusive/shared access, no parallelism. Compared to Bevy's ECS this is very basic.
+- **Lua-table components vs typed components**: Design choice to use Lua tables means flexibility but no type safety or performance optimization. This is fine for Lurek2D's target audience (indie/hobbyist) but limits scale.
+- **Systems are simple**: Systems are just named functions — no query builders, no exclusive/shared access, no parallelism. Compared to Engine D's ECS this is very basic.
 - **Clean module boundary**: Entity correctly doesn't import physics, graphics, etc. Components are user-defined.
 
 ## Suggestions
@@ -48,7 +48,7 @@ Entity management system with generational IDs, component storage, parent-child 
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | ECS | ✅ (Lua tables) | ❌ | ❌ (display tree) | ✅ (full archetype) |
 | Generational IDs | ✅ | N/A | N/A | ✅ |

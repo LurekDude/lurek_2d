@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-module_audit.py — Luna2D module restructuring audit.
+module_audit.py — Lurek2D module restructuring audit.
 
-Compares Luna2D module layout against reference modules and produces
+Compares Lurek2D module layout against reference modules and produces
 a mapping table with recommendations for alignment, splits, or merges.
 
 Usage:
@@ -27,7 +27,7 @@ REFERENCE_MODULES_DIR = WORKSPACE_ROOT / "references" / "similar-engine-ref" / "
 
 
 def collect_luna_modules() -> Dict[str, dict]:
-    """Collect Luna2D module info from src/."""
+    """Collect Lurek2D module info from src/."""
     modules = {}
     for child in sorted(SRC_DIR.iterdir()):
         if child.is_dir() and not child.name.startswith("."):
@@ -62,7 +62,7 @@ def collect_reference_modules() -> Dict[str, dict]:
     return modules
 
 
-# Manual mapping: Luna2D module -> generic reference module(s)
+# Manual mapping: Lurek2D module -> generic reference module(s)
 LUNA_TO_REFERENCE_MAP = {
     "audio": {"reference_modules": ["audio", "sound"], "status": "aligned",
               "notes": "Audio playback and sample handling."},
@@ -114,11 +114,11 @@ def generate_report(
 ) -> str:
     """Generate the module audit Markdown report."""
     lines = [
-        "# Luna2D Module Restructuring Audit",
+        "# Lurek2D Module Restructuring Audit",
         "",
-        "## Luna2D Module Mapping",
+        "## Lurek2D Module Mapping",
         "",
-        "| Luna2D Module | Similar Engine Equivalent(s) | Status | Files | Pub Items | Notes |",
+        "| Lurek2D Module | Similar Engine Equivalent(s) | Status | Files | Pub Items | Notes |",
         "|---------------|---------------------|--------|-------|-----------|-------|",
     ]
 
@@ -134,14 +134,14 @@ def generate_report(
 
     lines.append("")
 
-    # Reference modules not in Luna2D
+    # Reference modules not in Lurek2D
     luna_covered = set()
     for mapping in LUNA_TO_REFERENCE_MAP.values():
         luna_covered.update(mapping["reference_modules"])
 
     uncovered = set(ref_mods.keys()) - luna_covered
     if uncovered:
-        lines.append("## Modules Not Yet in Luna2D")
+        lines.append("## Modules Not Yet in Lurek2D")
         lines.append("")
         for name in sorted(uncovered):
             lines.append(f"- **{name}** ({ref_mods[name]['files']} files)")
@@ -151,7 +151,7 @@ def generate_report(
     luna_only = [m for m, mapping in LUNA_TO_REFERENCE_MAP.items()
                  if mapping["status"] == "luna_only" and m in luna_mods]
     if luna_only:
-        lines.append("## Luna2D-Only Modules (beyond similar engines)")
+        lines.append("## Lurek2D-Only Modules (beyond similar engines)")
         lines.append("")
         for name in sorted(luna_only):
             lines.append(f"- **{name}**: {LUNA_TO_REFERENCE_MAP[name]['notes']}")
@@ -163,7 +163,7 @@ def generate_report(
         "",
         "### High Priority",
         "1. **input → sub-namespaces**: Luna `input` merges keyboard/mouse/joystick/touch/sensor. "
-        "The Lua API already uses `luna.keyboard`, `luna.mouse` etc. — ensure Rust module "
+        "The Lua API already uses `lurek.keyboard`, `lurek.mouse` etc. — ensure Rust module "
         "structure reflects this if split is needed.",
         "2. **audio + sound overlap**: Two modules both deal with audio. Clarify boundaries "
         "(sound = decoding, audio = playback) or merge.",
@@ -171,11 +171,11 @@ def generate_report(
         "### Low Priority",
         "3. **particle → graphics sub-module**: Some engines include particles in graphics. "
         "Consider whether separate module is justified by size.",
-        "4. **font module**: Some engines have a separate font module. Luna2D keeps fonts in graphics. "
+        "4. **font module**: Some engines have a separate font module. Lurek2D keeps fonts in graphics. "
         "Current approach is fine if graphics doesn't grow too large.",
         "",
         "### No Action Needed",
-        "- `compute`, `dataframe`, `ai`, `graph`, `tilemap` — Luna2D extensions beyond similar engines. "
+        "- `compute`, `dataframe`, `ai`, `graph`, `tilemap` — Lurek2D extensions beyond similar engines. "
         "Keep as separate modules.",
         "",
     ])
@@ -185,7 +185,7 @@ def generate_report(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D module restructuring audit",
+        description="Lurek2D module restructuring audit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
@@ -198,7 +198,7 @@ def main() -> int:
     luna_mods = collect_luna_modules()
     ref_mods = collect_reference_modules()
 
-    print(f"[INFO] Luna2D modules: {len(luna_mods)}", file=sys.stderr)
+    print(f"[INFO] Lurek2D modules: {len(luna_mods)}", file=sys.stderr)
     print(f"[INFO] Reference modules: {len(ref_mods)}", file=sys.stderr)
 
     if args.json:

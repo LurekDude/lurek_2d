@@ -27,7 +27,7 @@ python tools/validate/cag_validate.py --type prompt
 python tools/validate/cag_validate.py --file .github/agents/developer.agent.md
 
 # Validate a game directory
-python tools/validate/validate_game.py demos/hello_world/
+python tools/validate/validate_game.py content/demos/hello_world/
 python tools/validate/validate_game.py --all-examples
 
 # Validate a lua_api file

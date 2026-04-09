@@ -1,6 +1,6 @@
-﻿--- Luna2D item system — type catalog, items, stacks, pools, history, and analysis.
+﻿--- Lurek2D item system — type catalog, items, stacks, pools, history, and analysis.
 --
--- A pure-Lua replacement for the former `luna.item` Rust binding.
+-- A pure-Lua replacement for the former `lurek.item` Rust binding.
 -- Provides a type registry, Item objects with tags/stats/meta/owner, capacity-aware
 -- Stacks with positional access, weighted ItemPools with bulk draws, bounded StackHistory,
 -- a StackManager, and functional analysis helpers.

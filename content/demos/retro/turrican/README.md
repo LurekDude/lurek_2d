@@ -6,9 +6,9 @@ Collect power crystals and reach the exit to advance.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — character and environment rendering
-- `luna.input.isKeyDown()` — movement and held beam activation
-- `luna.keypressed()` — jumping and shooting
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — character and environment rendering
+- `lurek.input.isKeyDown()` — movement and held beam activation
+- `lurek.keypressed()` — jumping and shooting
 - Full tile collision resolution with wall bounce
 - Hold-to-fire beam weapon with real-time enemy damage
 

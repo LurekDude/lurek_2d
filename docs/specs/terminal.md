@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.terminal`                                      |
+| **Lua API**    | `lurek.terminal`                                      |
 | **Source**      | `src/terminal/`                                      |
 | **Rust Tests** | `tests/rust/unit/terminal_tests.rs`                       |
 | **Lua Tests**  | `tests/lua/unit/test_terminal.lua`                   |
@@ -25,7 +25,7 @@ The rendering pipeline converts composited cells into `DrawCommand::Print` seque
 ## Architecture
 
 ```
-luna.terminal.newTerminal(cols, rows)
+lurek.terminal.newTerminal(cols, rows)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
@@ -55,7 +55,7 @@ luna.terminal.newTerminal(cols, rows)
 ### Input Flow
 
 ```
-luna.keypressed(key) ─► Terminal:keypressed(key)
+lurek.keypressed(key) ─► Terminal:keypressed(key)
                             │
                             ▼
                    focused widget routing
@@ -64,10 +64,10 @@ luna.keypressed(key) ─► Terminal:keypressed(key)
                    ├── Button: return/space → ButtonClicked event
                    └── TerminalEvent → callback dispatch
 
-luna.textinput(text) ─► Terminal:textinput(text)
+lurek.textinput(text) ─► Terminal:textinput(text)
                             └── TextBox: insert at cursor
 
-luna.mousepressed(x, y) ─► Terminal:mousepressed(px, py)
+lurek.mousepressed(x, y) ─► Terminal:mousepressed(px, py)
                             └── pixel → grid coord conversion
                                 └── hit test widgets (reverse order)
 ```
@@ -163,19 +163,19 @@ Concrete widget type discriminant with six variants:
 
 ## Lua API
 
-Exposed under `luna.terminal.*` by `src/lua_api/terminal_api.rs`. The API provides two UserData types — `Terminal` and `Widget` — with method-based interfaces. Widgets can be created independently and then attached to terminals, or detached and reattached later while preserving their state via snapshot binding.
+Exposed under `lurek.terminal.*` by `src/lua_api/terminal_api.rs`. The API provides two UserData types — `Terminal` and `Widget` — with method-based interfaces. Widgets can be created independently and then attached to terminals, or detached and reattached later while preserving their state via snapshot binding.
 
 ### Factory Functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.terminal.newTerminal` | `(cols?, rows?) → Terminal` | Create a terminal grid (default 80×40) |
-| `luna.terminal.newLabel` | `(col, row, text?) → Widget` | Create a label widget |
-| `luna.terminal.newButton` | `(col, row, width, height?, text?) → Widget` | Create a button widget |
-| `luna.terminal.newTextBox` | `(col, row, width) → Widget` | Create a text box widget |
-| `luna.terminal.newList` | `(col, row, width, height) → Widget` | Create a list widget |
-| `luna.terminal.newBorder` | `(col, row, width, height) → Widget` | Create a border widget |
-| `luna.terminal.newPanel` | `(col, row, width?, height?) → Widget` | Create a panel widget |
+| `lurek.terminal.newTerminal` | `(cols?, rows?) → Terminal` | Create a terminal grid (default 80×40) |
+| `lurek.terminal.newLabel` | `(col, row, text?) → Widget` | Create a label widget |
+| `lurek.terminal.newButton` | `(col, row, width, height?, text?) → Widget` | Create a button widget |
+| `lurek.terminal.newTextBox` | `(col, row, width) → Widget` | Create a text box widget |
+| `lurek.terminal.newList` | `(col, row, width, height) → Widget` | Create a list widget |
+| `lurek.terminal.newBorder` | `(col, row, width, height) → Widget` | Create a border widget |
+| `lurek.terminal.newPanel` | `(col, row, width?, height?) → Widget` | Create a panel widget |
 
 ### Terminal Methods
 
@@ -249,24 +249,24 @@ Exposed under `luna.terminal.*` by `src/lua_api/terminal_api.rs`. The API provid
 
 local term, input, output, border
 
-function luna.init()
+function lurek.init()
     -- Create a 60×20 terminal grid
-    term = luna.terminal.newTerminal(60, 20)
+    term = lurek.terminal.newTerminal(60, 20)
 
     -- Decorative border around the entire grid
-    border = luna.terminal.newBorder(1, 1, 60, 20)
+    border = lurek.terminal.newBorder(1, 1, 60, 20)
     border:setTitle("Debug Console")
     border:setStyle("double")
     term:addWidget(border)
 
     -- Scrollable output list
-    output = luna.terminal.newList(2, 2, 56, 16)
-    output:addItem("Welcome to Luna2D debug console.")
+    output = lurek.terminal.newList(2, 2, 56, 16)
+    output:addItem("Welcome to Lurek2D debug console.")
     output:addItem("Type a command and press Enter.")
     term:addWidget(output)
 
     -- Text input box at the bottom
-    input = luna.terminal.newTextBox(2, 19, 56)
+    input = lurek.terminal.newTextBox(2, 19, 56)
     input:setMaxLength(80)
     input:setOnChange(function()
         -- Fires on every keystroke
@@ -275,7 +275,7 @@ function luna.init()
     term:setFocus(input)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "return" then
         local cmd = input:getText()
         if #cmd > 0 then
@@ -287,11 +287,11 @@ function luna.keypressed(key)
     end
 end
 
-function luna.textinput(text)
+function lurek.textinput(text)
     term:textinput(text)
 end
 
-function luna.render()
+function lurek.render()
     term:draw(20, 20)
 end
 ```
@@ -301,31 +301,31 @@ end
 
 local term, btn_start, btn_quit
 
-function luna.init()
-    term = luna.terminal.newTerminal(30, 10)
+function lurek.init()
+    term = lurek.terminal.newTerminal(30, 10)
 
-    local title = luna.terminal.newLabel(8, 2, "== Main Menu ==")
+    local title = lurek.terminal.newLabel(8, 2, "== Main Menu ==")
     term:addWidget(title)
 
-    btn_start = luna.terminal.newButton(8, 5, 14, 1, "Start Game")
+    btn_start = lurek.terminal.newButton(8, 5, 14, 1, "Start Game")
     btn_start:setOnClick(function()
         print("Starting game!")
     end)
     term:addWidget(btn_start)
     term:setFocus(btn_start)
 
-    btn_quit = luna.terminal.newButton(8, 7, 14, 1, "Quit")
+    btn_quit = lurek.terminal.newButton(8, 7, 14, 1, "Quit")
     btn_quit:setOnClick(function()
-        luna.signal.quit()
+        lurek.signal.quit()
     end)
     term:addWidget(btn_quit)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     term:keypressed(key)
 end
 
-function luna.render()
+function lurek.render()
     term:draw(100, 80)
 end
 ```
@@ -364,4 +364,4 @@ end
 - **Panel children by index**: `Panel` children are stored as indices into the parent terminal's widget list. When widgets are removed, all panels in the terminal have their child indices adjusted via `adjust_panel_children_after_removal()`.
 - **No GPU ownership**: The module creates zero GPU resources. It depends on whichever font is currently active in `SharedState` for text rendering resolution.
 - **Unicode support**: Cells store full `u32` codepoints. Box-drawing characters (used by `BorderStyle::Single` and `Double`) are UTF-8 encoded in the source file.
-- **Breaking change surface**: Renaming or removing any `luna.terminal.*` factory function or `Terminal:*` / `Widget:*` method will break Lua scripts that use the terminal widget system. The `demos/terminal_demo/` example exercises the full API.
+- **Breaking change surface**: Renaming or removing any `lurek.terminal.*` factory function or `Terminal:*` / `Widget:*` method will break Lua scripts that use the terminal widget system. The `demos/terminal_demo/` example exercises the full API.

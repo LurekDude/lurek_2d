@@ -1,6 +1,6 @@
 //! Integration tests for the scene module: SceneStack, TransitionType, ActiveTransition, DepthSorter.
 
-use luna2d::scene::{ActiveTransition, DepthSorter, SceneStack, TransitionType};
+use lurek2d::scene::{ActiveTransition, DepthSorter, SceneStack, TransitionType};
 
 // ============================================================
 // TransitionType

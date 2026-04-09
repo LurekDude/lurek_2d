@@ -1,6 +1,6 @@
 ---
 description: >
-  Design game mechanics and "game feel" for a Luna2D game. Produces mechanic
+  Design game mechanics and "game feel" for a Lurek2D game. Produces mechanic
   spec documents, parameter tables, and juice checklists. Not a code agent.
 model: claude-sonnet-4-5
 tools:

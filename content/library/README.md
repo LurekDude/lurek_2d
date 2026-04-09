@@ -1,22 +1,22 @@
-﻿# Lunasome ÔÇö Luna2D Standard Library
+# Lunasome ��� Lurek2D Standard Library
 
-The `library/` folder is Tier 3 in Luna2D's active layer model. It contains pure-Lua gameplay libraries that ship alongside the engine but are not embedded in the binary.
+The `content/library/` folder is Tier 3 in Lurek2D's active layer model. It contains pure-Lua gameplay libraries that ship alongside the engine but are not embedded in the binary.
 
 ## Layer Contract
 
 - Baseline, Tier 1, and Tier 2 live in the Rust runtime under `src/`.
-- `src/lua_api/` is the bridge that exposes the public `luna.*` surface.
-- Tier 3 lives here in `library/`.
-- Lunasome modules consume public `luna.*` APIs and other Lua modules; the Rust engine does not depend on `library/`.
-- `demos/` is a consumer of the public Lua surface, not part of the numbered layer model.
+- `src/lua_api/` is the bridge that exposes the public `lurek.*` surface.
+- Tier 3 lives here in `content/library/`.
+- Lunasome modules consume public `lurek.*` APIs and other Lua modules; the Rust engine does not depend on `content/library/`.
+- `content/demos/` is a consumer of the public Lua surface, not part of the numbered layer model.
 
 ## Deliverables
 
 | Deliverable | Role |
 |---|---|
-| `luna2d[.exe]` | Engine runtime binary ÔÇö windowing, GPU, physics, audio, input, filesystem |
-| `library/` | Lunasome standard library ÔÇö pure-Lua gameplay systems |
-| `demos/` | Reference games and verification targets built on the public Lua surface |
+| `lurek2d[.exe]` | Engine runtime binary ��� windowing, GPU, physics, audio, input, filesystem |
+| `content/library/` | Lunasome standard library ��� pure-Lua gameplay systems |
+| `content/demos/` | Reference games and verification targets built on the public Lua surface |
 
 ## Usage
 
@@ -27,27 +27,27 @@ local item = require("library.item")
 local inventory = require("library.inventory")
 ```
 
-The engine automatically adds the correct search paths so `require("library.*")` resolves to the `library/` folder placed next to the engine binary or game directory.
+The engine automatically adds the correct search paths so `require("library.*")` resolves to the `content/library/` folder placed next to the engine binary or game directory.
 
 ## Module Index
 
 | Module | Description | Status |
 |---|---|---|
-| `library.dialog` | Typewriter dialog sequencer with choices, waits, and call nodes | Ôťů Full |
-| `library.item` | Item type catalog, pools, stacks, builders, and history | Ôťů Full |
-| `library.inventory` | Containers, weighted bags, slots, and inventories | Ôťů Full |
-| `library.province_map` | Province maps, Voronoi generation, map modes (wraps `luna.province`) | Ôťů Proxy |
-| `library.quest` | Quest tracking, objectives, and branching completion states | ­čöž Stub |
-| `library.battle` | Turn-based battle system ÔÇö combatants, actions, and turn order | ­čöž Stub |
-| `library.stats` | Character attributes, derived stats, and modifiers | ­čöž Stub |
-| `library.economy` | Named resource economy with flow rates, decay, and conversions | ­čöž Stub |
-| `library.crafting` | Recipe system, ingredient matching, and crafting queues | ­čöž Stub |
-| `library.cardgame` | Cards, stacks, deck building, slots, and card pools | ­čöž Stub |
-| `library.combat` | Vehicle combat ÔÇö chassis, turrets, weapons, and projectiles | ­čöž Stub |
+| `library.dialog` | Typewriter dialog sequencer with choices, waits, and call nodes | ԝ� Full |
+| `library.item` | Item type catalog, pools, stacks, builders, and history | ԝ� Full |
+| `library.inventory` | Containers, weighted bags, slots, and inventories | ԝ� Full |
+| `library.province_map` | Province maps, Voronoi generation, map modes (wraps `lurek.province`) | ԝ� Proxy |
+| `library.quest` | Quest tracking, objectives, and branching completion states | ���� Stub |
+| `library.battle` | Turn-based battle system ��� combatants, actions, and turn order | ���� Stub |
+| `library.stats` | Character attributes, derived stats, and modifiers | ���� Stub |
+| `library.economy` | Named resource economy with flow rates, decay, and conversions | ���� Stub |
+| `library.crafting` | Recipe system, ingredient matching, and crafting queues | ���� Stub |
+| `library.cardgame` | Cards, stacks, deck building, slots, and card pools | ���� Stub |
+| `library.combat` | Vehicle combat ��� chassis, turrets, weapons, and projectiles | ���� Stub |
 
 ## Validation
 
-There is no separate `library/tests/` tree today. Library behavior is currently verified through the Lua harness in `tests/lua/unit/`, including `test_library_dialog.lua` and `test_library_quest.lua`. When you add or change a library module, add or update coverage there and, when relevant, verify a representative example under `demos/`.
+There is no separate `content/library/tests/` tree today. Library behavior is currently verified through the Lua harness in `tests/lua/unit/`, including `test_library_dialog.lua` and `test_library_quest.lua`. When you add or change a library module, add or update coverage there and, when relevant, verify a representative example under `content/demos/`.
 
 ## LDoc Conventions
 

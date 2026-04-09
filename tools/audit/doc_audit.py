@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-doc_audit.py — Luna2D unified documentation audit.
+doc_audit.py — Lurek2D unified documentation audit.
 
 Runs both collect_docs.py and gen_lua_api.py to produce a combined
 documentation coverage report. Shows per-module breakdowns for both
@@ -124,7 +124,7 @@ def _analyze_lua_api(data: dict) -> dict:
 def generate_report(rust_analysis: dict, lua_analysis: dict) -> str:
     """Generate a human-readable Markdown report."""
     lines = [
-        "# Luna2D Documentation Audit Report",
+        "# Lurek2D Documentation Audit Report",
         "",
         "## Summary",
         "",
@@ -192,7 +192,7 @@ def generate_report(rust_analysis: dict, lua_analysis: dict) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D unified documentation audit",
+        description="Lurek2D unified documentation audit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

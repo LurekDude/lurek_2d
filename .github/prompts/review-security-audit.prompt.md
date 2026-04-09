@@ -1,10 +1,10 @@
 ---
-description: "Security audit for Luna2D Lua sandboxing, filesystem access, and input validation. Use when adding filesystem features, untrusted script loading, or path APIs. Produces a threat model and finding list."
+description: "Security audit for Lurek2D Lua sandboxing, filesystem access, and input validation. Use when adding filesystem features, untrusted script loading, or path APIs. Produces a threat model and finding list."
 ---
 
 # Review: Security Audit
 
-**Purpose**: Audit the Luna2D engine for security issues: Lua sandbox escapes, path traversal, untrusted script execution, and memory safety.
+**Purpose**: Audit the Lurek2D engine for security issues: Lua sandbox escapes, path traversal, untrusted script execution, and memory safety.
 **Use When**: Adding filesystem access to Lua API, loading scripts from user-supplied paths, or modifying the `GameFS` sandbox.
 **Do Not Use When**: Reviewing pure rendering or physics logic with no external inputs.
 **Scope**: `src/filesystem/`, `src/lua_api/filesystem_api.rs`, `src/engine/app.rs`, and any newly added Lua API that accepts path or shell arguments.
@@ -12,7 +12,7 @@ description: "Security audit for Luna2D Lua sandboxing, filesystem access, and i
 ## Inputs
 
 - `CHANGED_FILES` — list of Rust files that changed or are new
-- `THREAT_CONCERN` — specific concern to prioritize (e.g., "path traversal in `luna.fs.read`", "arbitrary Lua module loading")
+- `THREAT_CONCERN` — specific concern to prioritize (e.g., "path traversal in `lurek.fs.read`", "arbitrary Lua module loading")
 
 ## Steps
 

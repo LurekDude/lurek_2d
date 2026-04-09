@@ -1,12 +1,12 @@
 //! Flow field pathfinding for steering many units toward one or more targets.
 //!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `pathfinding` subsystem and provides the implementation
 //! details for flow field-related operations and data management.
 //! Key types exported from this module: `FlowField`.
 //! Primary functions: `new()`, `calculate()`, `calculate_multi()`, `get_direction()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::cell::RefCell;
 use std::collections::VecDeque;

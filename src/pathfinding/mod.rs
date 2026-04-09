@@ -2,7 +2,7 @@
 //! Also includes adjacency-graph A★ for province and world-graph navigation.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// AI flow field (simple walkability grid, moved from ai/flowfield).
 pub mod ai_flow_field;

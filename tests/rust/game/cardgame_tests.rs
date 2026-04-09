@@ -1,9 +1,9 @@
-//! Integration tests for `luna.cardgame.*`.
+//! Integration tests for `lurek.cardgame.*`.
 
 
 
-use luna2d::lua_api::{create_lua_vm, SharedState};
-use luna2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
 
 use std::cell::RefCell;
 

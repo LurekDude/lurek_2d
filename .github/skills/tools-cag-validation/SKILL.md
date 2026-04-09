@@ -3,7 +3,7 @@ name: tools-cag-validation
 description: "Load this skill when validating, debugging, or maintaining the CAG layer files. It owns the cag_validate.py script usage, validation rules, severity model, and CAG quality standards. Skip it for engine code or game scripts."
 ---
 
-# CAG Validation Tools — Luna2D Engine
+# CAG Validation Tools — Lurek2D Engine
 
 ## Load When
 

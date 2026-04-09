@@ -1,4 +1,4 @@
-# conf.toml — engine configuration loaded before luna.load()
+# conf.toml — engine configuration loaded before lurek.load()
 
 [window]
 title = "Hello World"

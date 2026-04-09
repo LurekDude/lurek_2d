@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dist.sh — Build and package Luna2D for Linux / macOS distribution.
+# dist.sh — Build and package Lurek2D for Linux / macOS distribution.
 #
 # Usage:
 #   bash tools/dist.sh                    # Build + package to dist/
@@ -9,12 +9,12 @@
 #
 # Output layout:
 #   dist/
-#     luna2d-linux-x86_64/            (or macos-aarch64 etc.)
-#       luna2d                        ← engine binary
+#     lurek2d-linux-x86_64/            (or macos-aarch64 etc.)
+#       lurek2d                        ← engine binary
 #       assets/                       ← engine assets
-#       demos/                     ← bundled example games
+#       content/demos/                     ← bundled example games
 #       LICENSE  README.md  HOW-TO-RUN.txt
-#     luna2d-linux-x86_64.tar.gz      ← distributable archive
+#     lurek2d-linux-x86_64.tar.gz      ← distributable archive
 
 set -euo pipefail
 
@@ -42,7 +42,7 @@ VERSION="0.4.0"
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m)"
 TARGET_TRIPLE="${OS}-${ARCH}"
-ARCH_NAME="luna2d-${TARGET_TRIPLE}"
+ARCH_NAME="lurek2d-${TARGET_TRIPLE}"
 
 [[ -z "$OUT_DIR" ]] && OUT_DIR="$WORKSPACE/dist"
 
@@ -67,7 +67,7 @@ fi
 
 # ── 2. Release build ───────────────────────────────────────────────────────────
 if [[ $SKIP_BUILD -eq 0 ]]; then
-    step "Building Luna2D (release) …"
+    step "Building Lurek2D (release) …"
     (cd "$WORKSPACE" && cargo build --release)
     ok "Build succeeded."
 else
@@ -86,17 +86,17 @@ chmod +x "$PACKAGE_DIR/luna"
 ok "Copied luna binary."
 
 [[ -d "$WORKSPACE/assets"   ]] && cp -r "$WORKSPACE/assets"   "$PACKAGE_DIR/assets"   && ok "Copied assets/"
-[[ -d "$WORKSPACE/examples" ]] && cp -r "$WORKSPACE/examples" "$PACKAGE_DIR/examples" && ok "Copied demos/"
+[[ -d "$WORKSPACE/examples" ]] && cp -r "$WORKSPACE/examples" "$PACKAGE_DIR/examples" && ok "Copied content/demos/"
 [[ -f "$WORKSPACE/README.md" ]] && cp "$WORKSPACE/README.md" "$PACKAGE_DIR/"
 [[ -f "$WORKSPACE/LICENSE"  ]]  && cp "$WORKSPACE/LICENSE"  "$PACKAGE_DIR/"
 
 cat > "$PACKAGE_DIR/HOW-TO-RUN.txt" << EOF
-LUNA2D $VERSION — ${TARGET_TRIPLE} Distribution
+LUREK2D $VERSION — ${TARGET_TRIPLE} Distribution
 =================================================
 
 How to run a game
 -----------------
-  ./luna  demos/hello_world
+  ./luna  content/demos/hello_world
   ./luna  path/to/your_game
 
 How to show the splash screen (no game)
@@ -105,14 +105,14 @@ How to show the splash screen (no game)
 
 Bundled examples
 ----------------
-  demos/hello_world   — shapes, text, FPS counter
-  demos/physics_demo  — falling ball with AABB physics
-  demos/sprites       — keyboard-controlled sprite
+  content/demos/hello_world   — shapes, text, FPS counter
+  content/demos/physics_demo  — falling ball with AABB physics
+  content/demos/sprites       — keyboard-controlled sprite
 
 Writing your own game
 ---------------------
   1. Create a folder, e.g. my_game/
-  2. Add main.lua with luna.load() / luna.update(dt) / luna.draw()
+  2. Add main.lua with lurek.load() / lurek.update(dt) / lurek.draw()
   3. Run:  ./luna my_game
 
 API reference:  see README.md

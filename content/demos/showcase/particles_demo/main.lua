@@ -1,4 +1,4 @@
--- Luna2D Particles Demo
+-- Lurek2D Particles Demo
 -- Showcases all 5 particle shapes with gravity, color gradients, and burst emission.
 --
 -- Controls:
@@ -6,7 +6,7 @@
 --   LEFT/RIGHT arrow keys — cycle presets
 --   SPACE      burst-fire at mouse position
 --   G          toggle gravity on/off for current preset
--- Run with: cargo run -- demos/showcase/particles_demo
+-- Run with: cargo run -- content/demos/showcase/particles_demo
 
 local W = 900
 local H = 600
@@ -30,7 +30,7 @@ end
 
 -- (1) FIRE — Square, warm palette, upward rise, turbulence, no downward gravity
 local function make_fire()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles  = 500,
         emissionRate  = 140,
         lifetimeMin   = 0.5,
@@ -58,7 +58,7 @@ end
 
 -- (2) EXPLOSION — Spark, radial burst, fast + gravity, short-lived
 local function make_explosion()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles  = 400,
         emissionRate  = 0,              -- burst-only; emit() on SPACE
         lifetimeMin   = 0.3,
@@ -84,7 +84,7 @@ end
 
 -- (3) SMOKE — Circle, slow rise, large puffs, high turbulence
 local function make_smoke()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles  = 100,
         emissionRate  = 18,
         lifetimeMin   = 2.5,
@@ -111,7 +111,7 @@ end
 
 -- (4) SPARKS — Diamond, radial fountain, strong gravity, drag, spin
 local function make_sparks()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles  = 600,
         emissionRate  = 100,
         lifetimeMin   = 0.6,
@@ -138,7 +138,7 @@ end
 
 -- (5) MAGIC — Triangle, rainbow palette, full-circle spread, slow spin, no gravity
 local function make_magic()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles  = 250,
         emissionRate  = 60,
         lifetimeMin   = 1.4,
@@ -165,7 +165,7 @@ end
 
 -- (6) SNOW — Circle, wide-area horizontal line emitter, slow downward drift
 local function make_snow()
-    local ps = luna.particles.newSystem({
+    local ps = lurek.particles.newSystem({
         maxParticles          = 350,
         emissionRate          = 45,
         lifetimeMin           = 3.5,
@@ -203,10 +203,10 @@ local preset_defs = {
     { name = "Snow",      shape = "circle",   make = make_snow,      gx = 0, gy = 25   },
 }
 
--- ── luna.init ──────────────────────────────────────────────────────────────
-function luna.init()
-    luna.window.setTitle("Luna2D — Particles Demo")
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+-- ── lurek.init ──────────────────────────────────────────────────────────────
+function lurek.init()
+    lurek.window.setTitle("Lurek2D — Particles Demo")
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
 
     for i, def in ipairs(preset_defs) do
         presets[i]       = def.make()
@@ -242,8 +242,8 @@ local function activate(idx)
     end
 end
 
--- ── luna.process ────────────────────────────────────────────────────────────
-function luna.process(dt)
+-- ── lurek.process ────────────────────────────────────────────────────────────
+function lurek.process(dt)
     local ps = presets[active]
     -- Non-snow presets follow the mouse
     if active ~= 6 then
@@ -252,51 +252,51 @@ function luna.process(dt)
     ps:update(dt)
 end
 
--- ── luna.render ──────────────────────────────────────────────────────────────
-function luna.render()
+-- ── lurek.render ──────────────────────────────────────────────────────────────
+function lurek.render()
     local ps  = presets[active]
     local def = preset_defs[active]
     local cnt = ps:count()
-    local fps = math.floor(luna.time.getFPS())
+    local fps = math.floor(lurek.time.getFPS())
     local pg  = preset_gravity[active]
 
     -- Particle systems render automatically via the engine render loop.
-    -- (luna.gfx.draw does not accept ParticleSystem userdata)
+    -- (lurek.gfx.draw does not accept ParticleSystem userdata)
 
     -- ── HUD bottom strip ─────────────────────────────────────────────────
-    luna.gfx.setColor(0.0, 0.0, 0.0, 0.6)
-    luna.gfx.rectangle("fill", 0, H - 84, W, 84)
+    lurek.gfx.setColor(0.0, 0.0, 0.0, 0.6)
+    lurek.gfx.rectangle("fill", 0, H - 84, W, 84)
 
     -- Preset name
-    luna.gfx.setColor(1.0, 0.88, 0.25)
-    luna.gfx.print(def.name, 14, H - 76, 3)
+    lurek.gfx.setColor(1.0, 0.88, 0.25)
+    lurek.gfx.print(def.name, 14, H - 76, 3)
 
     -- Shape label
-    luna.gfx.setColor(0.65, 0.80, 1.0)
-    luna.gfx.print("Shape: " .. def.shape, 14, H - 46, 1.5)
+    lurek.gfx.setColor(0.65, 0.80, 1.0)
+    lurek.gfx.print("Shape: " .. def.shape, 14, H - 46, 1.5)
 
     -- Particle count
-    luna.gfx.setColor(0.65, 0.80, 1.0)
-    luna.gfx.print("Particles: " .. tostring(cnt), 14, H - 28, 1.5)
+    lurek.gfx.setColor(0.65, 0.80, 1.0)
+    lurek.gfx.print("Particles: " .. tostring(cnt), 14, H - 28, 1.5)
 
     -- FPS (right side)
-    luna.gfx.setColor(0.45, 0.90, 0.50)
-    luna.gfx.print("FPS: " .. tostring(fps), W - 115, H - 46, 1.5)
+    lurek.gfx.setColor(0.45, 0.90, 0.50)
+    lurek.gfx.print("FPS: " .. tostring(fps), W - 115, H - 46, 1.5)
 
     -- Gravity state indicator
     if pg.on then
-        luna.gfx.setColor(0.30, 1.0, 0.45)
-        luna.gfx.print("Gravity: ON", W - 150, H - 28, 1.5)
+        lurek.gfx.setColor(0.30, 1.0, 0.45)
+        lurek.gfx.print("Gravity: ON", W - 150, H - 28, 1.5)
     else
-        luna.gfx.setColor(1.0, 0.40, 0.35)
-        luna.gfx.print("Gravity: OFF", W - 160, H - 28, 1.5)
+        lurek.gfx.setColor(1.0, 0.40, 0.35)
+        lurek.gfx.print("Gravity: OFF", W - 160, H - 28, 1.5)
     end
 
     -- ── Controls hint (top bar) ───────────────────────────────────────────
-    luna.gfx.setColor(0.0, 0.0, 0.0, 0.45)
-    luna.gfx.rectangle("fill", 0, 0, W, 22)
-    luna.gfx.setColor(0.38, 0.38, 0.48)
-    luna.gfx.print(
+    lurek.gfx.setColor(0.0, 0.0, 0.0, 0.45)
+    lurek.gfx.rectangle("fill", 0, 0, W, 22)
+    lurek.gfx.setColor(0.38, 0.38, 0.48)
+    lurek.gfx.print(
         "1-6 / \xE2\x86\x90\xE2\x86\x92 : switch preset   SPACE : burst   G : toggle gravity",
         8, 4, 1.2
     )
@@ -307,23 +307,23 @@ function luna.render()
     for i = 1, #presets do
         local dx = dot_x0 + (i - 1) * 20
         if i == active then
-            luna.gfx.setColor(1.0, 0.88, 0.25)
-            luna.gfx.circle("fill", dx, dot_y, 5)
+            lurek.gfx.setColor(1.0, 0.88, 0.25)
+            lurek.gfx.circle("fill", dx, dot_y, 5)
         else
-            luna.gfx.setColor(0.28, 0.28, 0.38)
-            luna.gfx.circle("fill", dx, dot_y, 4)
+            lurek.gfx.setColor(0.28, 0.28, 0.38)
+            lurek.gfx.circle("fill", dx, dot_y, 4)
         end
     end
 end
 
--- ── luna.mousemoved ────────────────────────────────────────────────────────
-function luna.mousemoved(x, y, dx, dy)
+-- ── lurek.mousemoved ────────────────────────────────────────────────────────
+function lurek.mousemoved(x, y, dx, dy)
     mouse_x = x
     mouse_y = y
 end
 
--- ── luna.keypressed ────────────────────────────────────────────────────────
-function luna.keypressed(key)
+-- ── lurek.keypressed ────────────────────────────────────────────────────────
+function lurek.keypressed(key)
     -- Numbered preset switching
     if     key == "1" then activate(1)
     elseif key == "2" then activate(2)

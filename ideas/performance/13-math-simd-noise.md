@@ -80,11 +80,11 @@ Generate in a single dispatch call, result available as GPU texture.
 **Luna API**:
 ```lua
 -- CPU (current): slow for large maps
-local map = luna.math.noiseMap(512, 512, {octaves=6, seed=42})
+local map = lurek.math.noiseMap(512, 512, {octaves=6, seed=42})
 
 -- GPU (proposed): instant
-local tex = luna.math.noiseTexture(512, 512, {octaves=6, seed=42})
-luna.gfx.draw(tex, 0, 0)
+local tex = lurek.math.noiseTexture(512, 512, {octaves=6, seed=42})
+lurek.gfx.draw(tex, 0, 0)
 ```
 
 ---

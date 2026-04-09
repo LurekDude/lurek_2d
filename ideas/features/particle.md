@@ -48,7 +48,7 @@
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Emitter-based | ✅ | ✅ | ✅ | ✅ |
 | Emission shapes | ✅ (5) | ✅ (4) | ❌ | ✅ |

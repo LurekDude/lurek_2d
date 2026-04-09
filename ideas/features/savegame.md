@@ -26,7 +26,7 @@ Game save system: serialize game state to files, manage save slots, versioning, 
 2. **No save migration**: Version field exists but no framework for automatically migrating saves between game versions (renaming fields, adding defaults).
 3. **No cloud save support**: No integration with cloud storage for cross-device saves.
 4. **No thumbnail generation**: Can't capture a screenshot to attach to save file for visual save selection.
-5. **No save compression**: Large saves are stored uncompressed (could use `luna.data` compress).
+5. **No save compression**: Large saves are stored uncompressed (could use `lurek.data` compress).
 6. **No encrypted saves**: Saves are readable/editable. No tamper protection.
 7. **No save event hooks**: No `onBeforeSave`, `onAfterLoad` callbacks for cleanup.
 
@@ -38,15 +38,15 @@ Game save system: serialize game state to files, manage save slots, versioning, 
 
 ## Suggestions
 
-1. **Add save migration framework**: `luna.savegame.registerMigration(fromVersion, toVersion, fn)` — transform save data during load when version doesn't match.
-2. **Add save compression**: Use `luna.data.compress()` internally — saves should be compressed by default.
-3. **Add screenshot attachment**: `luna.savegame.saveWithScreenshot(slot, data)` — capture current frame as thumbnail.
-4. **Add entity serialization bridge**: `luna.savegame.saveEntities(universe)` / `luna.savegame.loadEntities(data, universe)` — seamless entity state persistence.
-5. **Add save event hooks**: `luna.savegame.onBeforeSave(fn)` / `luna.savegame.onAfterLoad(fn)`.
+1. **Add save migration framework**: `lurek.savegame.registerMigration(fromVersion, toVersion, fn)` — transform save data during load when version doesn't match.
+2. **Add save compression**: Use `lurek.data.compress()` internally — saves should be compressed by default.
+3. **Add screenshot attachment**: `lurek.savegame.saveWithScreenshot(slot, data)` — capture current frame as thumbnail.
+4. **Add entity serialization bridge**: `lurek.savegame.saveEntities(universe)` / `lurek.savegame.loadEntities(data, universe)` — seamless entity state persistence.
+5. **Add save event hooks**: `lurek.savegame.onBeforeSave(fn)` / `lurek.savegame.onAfterLoad(fn)`.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Gideros |
+| Feature | Lurek2D | Engine A | Engine B | Engine I |
 |---|---|---|---|---|
 | Save system | ✅ (built-in) | ❌ (manual) | ❌ (manual) | ❌ |
 | Save slots | ✅ | N/A | N/A | N/A |
@@ -55,7 +55,7 @@ Game save system: serialize game state to files, manage save slots, versioning, 
 | Auto-save | ✅ | N/A | N/A | N/A |
 | Migration | ❌ | N/A | N/A | N/A |
 
-Luna2D is unique in having a built-in save system. Most engines leave this entirely to the developer.
+Lurek2D is unique in having a built-in save system. Most engines leave this entirely to the developer.
 
 ## Priority
 

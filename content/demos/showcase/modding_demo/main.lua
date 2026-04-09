@@ -1,34 +1,34 @@
--- Modding Demo for Luna2D
--- Demonstrates luna.fs.mount / unmount and load via luna.fs.load.
+-- Modding Demo for Lurek2D
+-- Demonstrates lurek.fs.mount / unmount and load via lurek.fs.load.
 -- Mounts a local "mods" folder and loads a Lua chunk from it.
--- Run with: cargo run -- demos/showcase/modding_demo
+-- Run with: cargo run -- content/demos/showcase/modding_demo
 
 local mod_greeting = "No mod loaded."
 local mod_init_ran = false
 
-function luna.init()
+function lurek.init()
     -- Mount the mod directory at a virtual path
-    local ok = luna.fs.mount("mods/hello_mod", "/hello_mod")
+    local ok = lurek.fs.mount("mods/hello_mod", "/hello_mod")
     if ok then
         mod_greeting = "Mod mounted at /hello_mod"
 
         -- Load a Lua chunk from the mod and execute it (load_chunk resolves VFS mounts)
-        local ok2, chunk = pcall(luna.fs.load, "/hello_mod/init.lua")
+        local ok2, chunk = pcall(lurek.fs.load, "/hello_mod/init.lua")
         if ok2 and type(chunk) == "function" then
             chunk()
             mod_init_ran = true
         end
 
         -- Unmount when done
-        luna.fs.unmount("/hello_mod")
+        lurek.fs.unmount("/hello_mod")
     else
         mod_greeting = "Mount failed (mods/hello_mod/ not found)."
     end
 end
 
-function luna.render()
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print(mod_greeting, 20, 20)
-    luna.gfx.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
-    luna.gfx.print("luna.fs.mount / unmount / load demo", 20, 80)
+function lurek.render()
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print(mod_greeting, 20, 20)
+    lurek.gfx.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
+    lurek.gfx.print("lurek.fs.mount / unmount / load demo", 20, 80)
 end

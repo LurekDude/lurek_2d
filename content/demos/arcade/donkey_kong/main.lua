@@ -1,7 +1,7 @@
--- Donkey Kong — Classic Arcade (Luna2D demo)
+-- Donkey Kong — Classic Arcade (Lurek2D demo)
 -- Climb ladders and jump over barrels to rescue Pauline at the top.
 -- WASD or Arrow keys to move, Space to jump.
--- Run with: cargo run -- demos/arcade/donkey_kong
+-- Run with: cargo run -- content/demos/arcade/donkey_kong
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -89,15 +89,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
     score = 0; lives = 3; level = 1
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then
         if game_state == "win" then
             win_flash = win_flash + dt
@@ -126,15 +126,15 @@ function luna.process(dt)
 
     -- Player input
     local move_input = 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a") then move_input = -1 end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then move_input = 1 end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a") then move_input = -1 end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then move_input = 1 end
 
     local on_lad = on_ladder_near(player.x + player.w/2, player.y + player.h/2)
     if on_lad then
-        if luna.input.isKeyDown("up") or luna.input.isKeyDown("w") then
+        if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w") then
             player.on_ladder = true
         end
-        if luna.input.isKeyDown("down") or luna.input.isKeyDown("s") then
+        if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s") then
             player.on_ladder = true
         end
     else
@@ -143,10 +143,10 @@ function luna.process(dt)
 
     if player.on_ladder and on_lad then
         player.vy = 0; player.vx = 0
-        if luna.input.isKeyDown("up") or luna.input.isKeyDown("w") then
+        if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w") then
             player.y = player.y - 120 * dt
         end
-        if luna.input.isKeyDown("down") or luna.input.isKeyDown("s") then
+        if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s") then
             player.y = player.y + 120 * dt
         end
         -- Exit ladder at top
@@ -240,9 +240,9 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Platforms
-    luna.gfx.setColor(0.5, 0.35, 0.2)
+    lurek.gfx.setColor(0.5, 0.35, 0.2)
     for _, p in ipairs(PLATFORMS) do
         local y1 = platform_y_at(p, p.x1)
         local y2 = platform_y_at(p, p.x2)
@@ -254,44 +254,44 @@ function luna.render()
             local lx = p.x1 + t1 * (p.x2 - p.x1)
             local ly = y1 + t1 * (y2 - y1)
             local rw = (p.x2 - p.x1) / steps
-            luna.gfx.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
+            lurek.gfx.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
         end
     end
 
     -- Ladders
-    luna.gfx.setColor(0.8, 0.65, 0.2)
+    lurek.gfx.setColor(0.8, 0.65, 0.2)
     for _, lad in ipairs(LADDERS) do
-        luna.gfx.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
+        lurek.gfx.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
         -- Rungs
         local num_rungs = math.floor((lad.y_bot - lad.y_top) / 20)
         for r = 0, num_rungs do
             local ry = lad.y_top + r * 20
-            luna.gfx.rectangle("fill", lad.x - 12, ry, 24, 4)
+            lurek.gfx.rectangle("fill", lad.x - 12, ry, 24, 4)
         end
     end
 
     -- Pauline (goal) at top
-    luna.gfx.setColor(1, 0.6, 0.6)
-    luna.gfx.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
-    luna.gfx.circle("fill", W - 190, H - 440 - 48, 12)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
+    lurek.gfx.setColor(1, 0.6, 0.6)
+    lurek.gfx.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
+    lurek.gfx.circle("fill", W - 190, H - 440 - 48, 12)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
 
     -- Donkey Kong at top
-    luna.gfx.setColor(0.45, 0.25, 0.1)
-    luna.gfx.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
-    luna.gfx.circle("fill", W - 275, H - 440 - 60, 18)
+    lurek.gfx.setColor(0.45, 0.25, 0.1)
+    lurek.gfx.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
+    lurek.gfx.circle("fill", W - 275, H - 440 - 60, 18)
     -- DK arms
-    luna.gfx.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
-    luna.gfx.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
+    lurek.gfx.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
+    lurek.gfx.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
 
     -- Barrels
     for _, b in ipairs(barrels) do
         local roll = math.sin(b.roll_anim) * 5
-        luna.gfx.setColor(0.6, 0.35, 0.1)
-        luna.gfx.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
-        luna.gfx.setColor(0.8, 0.55, 0.2)
-        luna.gfx.line(
+        lurek.gfx.setColor(0.6, 0.35, 0.1)
+        lurek.gfx.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
+        lurek.gfx.setColor(0.8, 0.55, 0.2)
+        lurek.gfx.line(
             b.x + b.w/2 + math.cos(b.roll_anim) * b.w/2 * 0.7,
             b.y + b.h/2 + math.sin(b.roll_anim) * b.h/2 * 0.7,
             b.x + b.w/2 - math.cos(b.roll_anim) * b.w/2 * 0.7,
@@ -300,50 +300,50 @@ function luna.render()
     end
 
     -- Player
-    luna.gfx.setColor(0.9, 0.2, 0.2)
-    luna.gfx.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
-    luna.gfx.setColor(0.9, 0.7, 0.4)
-    luna.gfx.circle("fill", player.x + player.w/2, player.y + 12, 12)
+    lurek.gfx.setColor(0.9, 0.2, 0.2)
+    lurek.gfx.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
+    lurek.gfx.setColor(0.9, 0.7, 0.4)
+    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 12, 12)
     -- Hat
-    luna.gfx.setColor(0.6, 0.15, 0.1)
-    luna.gfx.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
-    luna.gfx.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
+    lurek.gfx.setColor(0.6, 0.15, 0.1)
+    lurek.gfx.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
+    lurek.gfx.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 0)
-    luna.gfx.print("DONKEY KONG", 10, 8, 2)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. score, 10, 30, 1.5)
-    luna.gfx.setColor(1, 0.3, 0.3)
-    luna.gfx.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
-    luna.gfx.setColor(0.6, 0.8, 1)
-    luna.gfx.print("Level " .. level, W - 90, 8, 1.5)
+    lurek.gfx.setColor(1, 1, 0)
+    lurek.gfx.print("DONKEY KONG", 10, 8, 2)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. score, 10, 30, 1.5)
+    lurek.gfx.setColor(1, 0.3, 0.3)
+    lurek.gfx.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
+    lurek.gfx.setColor(0.6, 0.8, 1)
+    lurek.gfx.print("Level " .. level, W - 90, 8, 1.5)
 
     -- Win overlay
     if game_state == "win" then
-        luna.gfx.setColor(0, 0, 0, 0.5)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
-        luna.gfx.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
+        lurek.gfx.setColor(0, 0, 0, 0.5)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
+        lurek.gfx.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
     end
     -- Game over overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground and not player.on_ladder then
         player.vy = JUMP_VEL

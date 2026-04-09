@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                |
 | **Status**     | Implemented — Full                             |
-| **Lua API**    | `luna.thread`                                  |
+| **Lua API**    | `lurek.thread`                                  |
 | **Source**     | `src/thread/`                                  |
 | **Rust Tests** | `tests/rust/unit/thread_tests.rs`              |
 | **Lua Tests**  | `tests/lua/unit/test_thread.lua`               |
@@ -12,21 +12,21 @@
 
 ## Summary
 
-The `thread` module provides Luna2D's only concurrency primitive: background Lua worker threads communicating through typed MPMC channels. It directly implements design constraint B-04 — concurrency lives in Rust threads; LuaJIT VMs cannot share state; cross-VM communication uses typed `Channel` objects.
+The `thread` module provides Lurek2D's only concurrency primitive: background Lua worker threads communicating through typed MPMC channels. It directly implements design constraint B-04 — concurrency lives in Rust threads; LuaJIT VMs cannot share state; cross-VM communication uses typed `Channel` objects.
 
-Each `LuaThread` accepts a Lua code string, spawns a dedicated OS thread running its own isolated `mlua::Lua` VM, and communicates with the main game thread exclusively through `Channel` objects. The worker VM receives a minimal API surface — only `luna.thread.getChannel(name)` and a global `arg` table — deliberately excluding `luna.gfx`, `luna.audio`, `luna.window`, `luna.input`, `luna.physics`, `luna.particles`, and anything that touches `SharedState`. This hard boundary prevents an entire category of concurrency bugs.
+Each `LuaThread` accepts a Lua code string, spawns a dedicated OS thread running its own isolated `mlua::Lua` VM, and communicates with the main game thread exclusively through `Channel` objects. The worker VM receives a minimal API surface — only `lurek.thread.getChannel(name)` and a global `arg` table — deliberately excluding `lurek.gfx`, `lurek.audio`, `lurek.window`, `lurek.input`, `lurek.physics`, `lurek.particles`, and anything that touches `SharedState`. This hard boundary prevents an entire category of concurrency bugs.
 
 `ChannelValue` is the wire format: `Nil`, `Bool(bool)`, `Number(f64)`, or `String(String)`. Only these four Lua-native primitive types can cross thread boundaries. Tables, functions, coroutines, and UserData are rejected at the send boundary with a descriptive runtime error. The `Channel` struct is an MPMC queue backed by `Mutex<VecDeque<ChannelValue>>` with a `Condvar` for the blocking `demand()` call. Channels can be unnamed (created per-use) or named (registered in a global `HashMap` shared across all worker threads for the session).
 
-The module intentionally does not include: thread pools, async/await, futures, work-stealing schedulers, or shared-memory concurrency. It is designed so that a game script author writes synchronous Lua, delegates heavy work to a background thread via `luna.thread.newThread(code)`, and polls results each frame with `channel:pop()`.
+The module intentionally does not include: thread pools, async/await, futures, work-stealing schedulers, or shared-memory concurrency. It is designed so that a game script author writes synchronous Lua, delegates heavy work to a background thread via `lurek.thread.newThread(code)`, and polls results each frame with `channel:pop()`.
 
 ## Architecture
 
 ```
 Main Thread                          Worker Thread N
 ┌────────────────────────┐           ┌────────────────────────┐
-│ Lua VM (full luna.*)   │           │ Lua VM (isolated)      │
-│ SharedState (Rc<Ref>)  │           │ luna.thread.getChannel  │
+│ Lua VM (full lurek.*)   │           │ Lua VM (isolated)      │
+│ SharedState (Rc<Ref>)  │           │ lurek.thread.getChannel  │
 │ GpuRenderer            │           │ arg table               │
 │ Game Loop              │           │ NO SharedState          │
 └────────┬───────────────┘           └───────────┬────────────┘
@@ -74,7 +74,7 @@ Background Lua thread with independent VM.
 
 - **`ThreadState`** (enum) — Execution lifecycle: `Pending`, `Running`, `Completed`, `Error(String)`.
 - **`LuaThread`** (struct) — Owns a Lua code string, spawns an OS thread via `std::thread::spawn`, runs an isolated `mlua::Lua` VM. Tracks state via `Arc<Mutex<ThreadState>>`. Methods: `new`, `start`, `wait`, `is_running`, `get_error`.
-- **`register_thread_safe_modules`** (fn, private) — Sets up the worker VM with only `luna.thread.getChannel` and the `arg` global table.
+- **`register_thread_safe_modules`** (fn, private) — Sets up the worker VM with only `lurek.thread.getChannel` and the `arg` global table.
 
 ## Key Types
 
@@ -98,7 +98,7 @@ Lua UserData wrapper for a thread-safe channel. Holds `Arc<Channel>` so the same
 
 #### `thread::worker::LuaThread`
 
-A background Lua thread running its own isolated VM. Created via `luna.thread.newThread(code)`. The thread starts in `Pending` state and does not execute until `start()` is called with optional arguments.
+A background Lua thread running its own isolated VM. Created via `lurek.thread.newThread(code)`. The thread starts in `Pending` state and does not execute until `start()` is called with optional arguments.
 
 **Fields**: `code: String`, `state: Arc<Mutex<ThreadState>>`, `handle: Option<thread::JoinHandle<()>>`, `channels: Arc<Mutex<HashMap<String, Arc<Channel>>>>`.
 
@@ -120,15 +120,15 @@ Execution state of a background Lua thread, tracked via `Arc<Mutex<ThreadState>>
 
 ## Lua API
 
-Registered by `src/lua_api/thread_api.rs` under `luna.thread.*`. The register function creates a shared `Arc<Mutex<HashMap<String, Arc<Channel>>>>` for named channel resolution across all threads in the session.
+Registered by `src/lua_api/thread_api.rs` under `lurek.thread.*`. The register function creates a shared `Arc<Mutex<HashMap<String, Arc<Channel>>>>` for named channel resolution across all threads in the session.
 
 ### Module Functions
 
 | Function                        | Signature                            | Description                                                     |
 |---------------------------------|--------------------------------------|-----------------------------------------------------------------|
-| `luna.thread.newThread(code)`   | `(string) → Thread`                 | Creates a background thread handle from a Lua code string       |
-| `luna.thread.newChannel()`      | `() → Channel`                      | Creates an unnamed channel for inter-thread communication       |
-| `luna.thread.getChannel(name)`  | `(string) → Channel`                | Gets or creates a named global channel shared across threads    |
+| `lurek.thread.newThread(code)`   | `(string) → Thread`                 | Creates a background thread handle from a Lua code string       |
+| `lurek.thread.newChannel()`      | `() → Channel`                      | Creates an unnamed channel for inter-thread communication       |
+| `lurek.thread.getChannel(name)`  | `(string) → Channel`                | Gets or creates a named global channel shared across threads    |
 
 ### Thread UserData Methods (`LuaThreadHandle`)
 
@@ -159,23 +159,23 @@ Registered by `src/lua_api/thread_api.rs` under `luna.thread.*`. The register fu
 
 Inside a worker thread's Lua VM, only the following are available:
 
-- `luna.thread.getChannel(name)` — access named channels shared with the main thread
+- `lurek.thread.getChannel(name)` — access named channels shared with the main thread
 - `arg` — table of arguments passed to `thread:start(...)`
 
-All other `luna.*` modules are unavailable.
+All other `lurek.*` modules are unavailable.
 
 ## Lua Examples
 
 ### Background computation with channel polling
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create a named channel for results
-    local ch = luna.thread.getChannel("results")
+    local ch = lurek.thread.getChannel("results")
 
     -- Spawn a background worker that computes squares
-    worker = luna.thread.newThread([[
-        local ch = luna.thread.getChannel("results")
+    worker = lurek.thread.newThread([[
+        local ch = lurek.thread.getChannel("results")
         for i = 1, 1000 do
             ch:push(i * i)
         end
@@ -184,9 +184,9 @@ function luna.init()
     worker:start()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Poll for results without blocking the game loop
-    local ch = luna.thread.getChannel("results")
+    local ch = lurek.thread.getChannel("results")
     local val = ch:pop()
     if val == "done" then
         print("Worker finished all computations")
@@ -199,11 +199,11 @@ end
 ### Bidirectional communication with arguments
 
 ```lua
-function luna.init()
-    local ch = luna.thread.getChannel("pipe")
+function lurek.init()
+    local ch = lurek.thread.getChannel("pipe")
 
-    worker = luna.thread.newThread([[
-        local ch = luna.thread.getChannel("pipe")
+    worker = lurek.thread.newThread([[
+        local ch = lurek.thread.getChannel("pipe")
         -- Read arguments passed to start()
         local multiplier = arg[1]
         -- Wait for input from main thread
@@ -216,8 +216,8 @@ function luna.init()
     ch:push(10)  -- send input value
 end
 
-function luna.process(dt)
-    local ch = luna.thread.getChannel("pipe")
+function lurek.process(dt)
+    local ch = lurek.thread.getChannel("pipe")
     local result = ch:pop()
     if result then
         print("Result: " .. result)  -- prints 50
@@ -228,14 +228,14 @@ end
 ### Error handling
 
 ```lua
-function luna.init()
-    worker = luna.thread.newThread([[
+function lurek.init()
+    worker = lurek.thread.newThread([[
         error("something went wrong")
     ]])
     worker:start()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if not worker:isRunning() then
         local err = worker:getError()
         if err then
@@ -260,7 +260,7 @@ end
 |--------------|--------------|--------------------------------------------------------------|
 | `engine`     | Imports from | Uses `log_messages` constants for structured logging         |
 | `math`       | Peer (Tier 1)| Leaf module — safe to use conceptually alongside thread, but not exposed in worker VMs |
-| `lua_api`    | Imported by  | `src/lua_api/thread_api.rs` registers `luna.thread.*` and defines `LuaThreadHandle` UserData |
+| `lua_api`    | Imported by  | `src/lua_api/thread_api.rs` registers `lurek.thread.*` and defines `LuaThreadHandle` UserData |
 
 ### Similar Modules
 
@@ -270,9 +270,9 @@ end
 ## Notes
 
 - **Constraint B-04**: Each worker thread creates its own isolated Lua VM via `mlua::Lua::new()`. Worker VMs do NOT share `SharedState` — they have no access to `Rc<RefCell<SharedState>>` at all. This is the fundamental concurrency safety guarantee.
-- **Worker VM surface**: Worker threads receive only `luna.thread.getChannel(name)` and `arg`. No graphics, audio, window, input, physics, particle, or filesystem modules are registered. The `register_thread_safe_modules()` function in `worker.rs` is the gatekeeper.
+- **Worker VM surface**: Worker threads receive only `lurek.thread.getChannel(name)` and `arg`. No graphics, audio, window, input, physics, particle, or filesystem modules are registered. The `register_thread_safe_modules()` function in `worker.rs` is the gatekeeper.
 - **Channel safety**: `Channel` uses `Arc` + `Mutex<VecDeque>` + `Condvar` — standard Rust thread-safe primitives. No `unsafe` code anywhere in the module.
-- **Named channel registry**: Named channels are stored in `Arc<Mutex<HashMap<String, Arc<Channel>>>>` created once during `luna.thread` registration. The same `Arc` is cloned into every `LuaThread`, so all workers share the same named channel namespace.
+- **Named channel registry**: Named channels are stored in `Arc<Mutex<HashMap<String, Arc<Channel>>>>` created once during `lurek.thread` registration. The same `Arc` is cloned into every `LuaThread`, so all workers share the same named channel namespace.
 - **`demand()` deadlock risk**: `demand(None)` blocks forever if no value is ever pushed. Always use a timeout (`demand(5.0)`) or ensure the producer will push. Never call `demand()` on the main game thread without a timeout.
 - **Thread restart prevention**: `LuaThread::start()` returns `Err` if the thread is already in `Running` state, preventing double-start bugs.
 - **Argument passing**: `thread:start(...)` converts varargs to `Vec<ChannelValue>` and injects them as the global `arg` table in the worker VM (1-indexed).

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.graph`                                         |
+| **Lua API**    | `lurek.graph`                                         |
 | **Source**      | `src/graph/`                                         |
 | **Rust Tests** | `tests/rust/unit/graph_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_graph.lua`                      |
@@ -34,6 +34,6 @@ The graph module provides a general-purpose directed weighted graph with item fl
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/graph.md`](../../specs/graph.md)
+→ [`docs/specs/graph.md`](../../docs/specs/graph.md)
 
-_Update both this file **and** `specs/graph.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/graph.md` whenever source files, public types, or Lua bindings change._

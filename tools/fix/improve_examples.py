@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 tools/fix/improve_examples.py
-Luna2D — Quality-improve all examples/*.lua stubs.
+Lurek2D — Quality-improve all content/examples/*.lua stubs.
 
 Pass A — Remove trivial :type() / :typeOf() stubs from class sections; add a
           single consolidated "Type introspection" note instead.
@@ -24,7 +24,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-EXAMPLES_DIR = ROOT / "examples"
+EXAMPLES_DIR = ROOT / "content" / "examples"
 API_JSON = ROOT / "docs" / "logs" / "lua_api_data.json"
 
 # Map module name -> example file stem
@@ -352,7 +352,7 @@ def process_file(path: Path, method_table: dict, dry_run: bool = False) -> bool:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Improve stub quality in examples/*.lua")
+    parser = argparse.ArgumentParser(description="Improve stub quality in content/examples/*.lua")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--module", help="Only process the example for this module name")
     args = parser.parse_args()

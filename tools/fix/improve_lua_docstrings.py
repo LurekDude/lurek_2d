@@ -884,7 +884,7 @@ OVERRIDES: dict[tuple[str, str], tuple[str, list, str | None]] = {
         None,
     ),
     ("SaveManager", "update"): (
-        "Ticks the autosave timer. Must be called from `luna.update(dt)` when autosave is enabled.",
+        "Ticks the autosave timer. Must be called from `lurek.update(dt)` when autosave is enabled.",
         [("dt", "number", "Elapsed seconds since the last frame.")],
         None,
     ),

@@ -34,11 +34,11 @@ local player = { x = 100, y = 100, vx = 0, vy = 0, grounded = false }
 local coyote_timer = 0
 local jump_buffer  = 0
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Horizontal acceleration
     local ix = 0
-    if luna.keyboard.isDown("left")  then ix = ix - 1 end
-    if luna.keyboard.isDown("right") then ix = ix + 1 end
+    if lurek.keyboard.isDown("left")  then ix = ix - 1 end
+    if lurek.keyboard.isDown("right") then ix = ix + 1 end
 
     if ix ~= 0 then
         player.vx = player.vx + ix * ACCEL * dt
@@ -70,12 +70,12 @@ function luna.process(dt)
     player.y = player.y + player.vy * dt
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then jump_buffer = JUMP_BUFFER_FRAMES end
     -- Variable jump height: release early for short hop
 end
 
-function luna.keyreleased(key)
+function lurek.keyreleased(key)
     if key == "space" and player.vy < 0 then
         player.vy = player.vy * 0.4
     end

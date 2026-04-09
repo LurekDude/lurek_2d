@@ -1,52 +1,50 @@
 -- examples/light.lua
--- luna.light — 2D lighting, shadow occluders, and ambient control.
--- All luna.light API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.light — 2D lighting, shadow occluders, and ambient control.
 
 -- ── System-level controls ─────────────────────────────────────────────────────
 
 -- setEnabled(bool) — master switch for the lighting system
-luna.light.setEnabled(true)
+lurek.light.setEnabled(true)
 
 -- isEnabled() → boolean
-local active = luna.light.isEnabled()
+local active = lurek.light.isEnabled()
 
 -- setAmbient(r, g, b, a?) — global background illumination (0..1 per channel)
-luna.light.setAmbient(0.05, 0.05, 0.15, 1.0)   -- near-dark blue night sky
+lurek.light.setAmbient(0.05, 0.05, 0.15, 1.0)   -- near-dark blue night sky
 
 -- getAmbient() → r, g, b, a
-local ar, ag, ab, aa = luna.light.getAmbient()
+local ar, ag, ab, aa = lurek.light.getAmbient()
 
 -- ── Creating a Light ──────────────────────────────────────────────────────────
 
 -- newLight(x, y, radius, opts?) → Light
 -- opts is an optional table of named properties (all optional):
---   color         {r,g,b,a}   — tint (default white)
---   intensity     number      — overall brightness scale (default 1)
---   energy        number      — secondary multiplier
---   type          string      — "point" | "directional" | "spot" (default "point")
---   blend         string      — "add" | "sub" | "mix" (default "add")
---   falloff       string      — "linear" | "smooth" | "constant" (default "linear")
---   shadowEnabled boolean     — cast shadows (default false)
---   shadowColor   {r,g,b,a}   — shadow tint
---   shadowFilter  string      — "none" | "pcf5" | "pcf13" (softness)
---   shadowSmooth  number      — soft-shadow edge blur
---   lightMask     integer     — bitmask which occluders block this light
---   shadowMask    integer     — bitmask which occluder groups cast shadows
---   enabled       boolean     — on/off switch (default true)
---   direction     number      — angle in radians (directional/spot lights)
---   innerAngle    number      — spot inner cone angle (radians)
---   outerAngle    number      — spot outer cone angle (radians)
---   groupId       integer     — group for multi-pass or masking
---   volumetric    boolean     — render light shaft
---   flickerSpeed  number      — flicker frequency (enables flicker if > 0)
---   flickerStrength number    — flicker amplitude
---   attConstant   number      — attenuation constant term
---   attLinear     number      — attenuation linear term
---   attQuadratic  number      — attenuation quadratic term
+color         {r,g,b,a}  -- tint (default white)
+intensity     number  -- overall brightness scale (default 1)
+energy        number  -- secondary multiplier
+type          string  -- "point" | "directional" | "spot" (default "point")
+blend         string  -- "add" | "sub" | "mix" (default "add")
+falloff       string  -- "linear" | "smooth" | "constant" (default "linear")
+shadowEnabled boolean  -- cast shadows (default false)
+shadowColor   {r,g,b,a}  -- shadow tint
+shadowFilter  string  -- "none" | "pcf5" | "pcf13" (softness)
+shadowSmooth  number  -- soft-shadow edge blur
+lightMask     integer  -- bitmask which occluders block this light
+shadowMask    integer  -- bitmask which occluder groups cast shadows
+enabled       boolean  -- on/off switch (default true)
+direction     number  -- angle in radians (directional/spot lights)
+innerAngle    number  -- spot inner cone angle (radians)
+outerAngle    number  -- spot outer cone angle (radians)
+groupId       integer  -- group for multi-pass or masking
+volumetric    boolean  -- render light shaft
+flickerSpeed  number  -- flicker frequency (enables flicker if > 0)
+flickerStrength number  -- flicker amplitude
+attConstant   number  -- attenuation constant term
+attLinear     number  -- attenuation linear term
+attQuadratic  number  -- attenuation quadratic term
 
 -- Point light (torch)
-local torch = luna.light.newLight(400, 300, 200, {
+local torch = lurek.light.newLight(400, 300, 200, {
     color         = {1.0, 0.8, 0.4, 1.0},
     intensity     = 1.2,
     blend         = "add",
@@ -58,7 +56,7 @@ local torch = luna.light.newLight(400, 300, 200, {
 })
 
 -- Spot light (flashlight)
-local flashlight = luna.light.newLight(0, 0, 350, {
+local flashlight = lurek.light.newLight(0, 0, 350, {
     type       = "spot",
     color      = {0.9, 0.95, 1.0, 1.0},
     intensity  = 2.0,
@@ -70,7 +68,7 @@ local flashlight = luna.light.newLight(0, 0, 350, {
 })
 
 -- Directional light (sun / moon)
-local sun = luna.light.newLight(0, 0, 0, {
+local sun = lurek.light.newLight(0, 0, 0, {
     type      = "directional",
     color     = {1.0, 0.95, 0.8, 1.0},
     intensity = 0.6,
@@ -131,7 +129,7 @@ flashlight:setInnerAngle(0.25)
 flashlight:setOuterAngle(0.7)
 
 -- remove() — destroys the light
--- torch:remove()
+torch:remove()
 
 -- ── Shadow Occluders ──────────────────────────────────────────────────────────
 
@@ -140,7 +138,7 @@ flashlight:setOuterAngle(0.7)
 -- opts: opacity, lightMask, enabled
 
 -- Wall segment
-local wall = luna.light.newOccluder(
+local wall = lurek.light.newOccluder(
     {100,100,  300,100,  300,200,  100,200},   -- rectangle
     { opacity = 1.0, lightMask = 0xFFFF, enabled = true }
 )
@@ -151,16 +149,16 @@ local ox, oy = wall:getPosition()
 wall:setOpacity(1.0)             -- 0=transparent shadow, 1=full opaque shadow
 wall:setEnabled(true)
 wall:setLightMask(0xFFFF)        -- bitmask controls which lights cast on it
--- wall:remove()                  -- free the occluder
+wall:remove()  -- free the occluder
 
 -- ── Typical Usage ─────────────────────────────────────────────────────────────
 
 --[[
-function luna.init()
-    luna.light.setEnabled(true)
-    luna.light.setAmbient(0.04, 0.04, 0.1, 1.0)
+function lurek.init()
+    lurek.light.setEnabled(true)
+    lurek.light.setAmbient(0.04, 0.04, 0.1, 1.0)
 
-    player_light = luna.light.newLight(400, 300, 180, {
+    player_light = lurek.light.newLight(400, 300, 180, {
         color         = {1.0, 0.85, 0.5, 1.0},
         shadowEnabled = true,
         shadowFilter  = "pcf5",
@@ -169,15 +167,15 @@ function luna.init()
     })
 end
 
-function luna.process(dt)
-    local mx, my = luna.mouse.getPosition()
+function lurek.process(dt)
+    local mx, my = lurek.mouse.getPosition()
     player_light:setPosition(mx, my)
 end
 
-function luna.render()
+function lurek.render()
     -- draw scene (lighting composited automatically)
-    luna.gfx.setColor(0.6, 0.4, 0.2)
-    luna.gfx.rectangle("fill", 200, 200, 80, 80)
+    lurek.gfx.setColor(0.6, 0.4, 0.2)
+    lurek.gfx.rectangle("fill", 200, 200, 80, 80)
 end
 ]]
 
@@ -217,14 +215,14 @@ local vertices = occluder:getVertices()  -- Returns the polygon vertices as a fl
 local is_valid = occluder:isValid()  -- Returns whether this occluder handle is still valid
 occluder:setVertices({})  -- Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}
 
--- ─── luna.light ────────────────────────────────────────────────────────────────
-luna.light.advanceFlickers(1.0)  -- Advances flicker phase for all lights with flicker enabled
-luna.light.clear()  -- Removes all lights and occluders, resets ambient to default
-local group_count = luna.light.getGroupCount(1)  -- Returns the number of lights in the given group
-local light_count = luna.light.getLightCount()  -- Returns the number of lights in the world
-local max_lights = luna.light.getMaxLights()  -- Returns the maximum number of lights processed per frame
-local occluder_count = luna.light.getOccluderCount()  -- Returns the number of occluders in the world
-luna.light.setGroupColor(1, 1.0, 1.0, 1.0)  -- Sets the color for all lights in the given group
-luna.light.setGroupEnabled(1, false)  -- Sets the enabled state for all lights in the given group
-luna.light.setGroupIntensity(1, 1.0)  -- Sets the intensity for all lights in the given group
-luna.light.setMaxLights(1)  -- Sets the maximum number of lights processed per frame (clamped 1–256)
+-- ─── lurek.light ────────────────────────────────────────────────────────────────
+lurek.light.advanceFlickers(1.0)  -- Advances flicker phase for all lights with flicker enabled
+lurek.light.clear()  -- Removes all lights and occluders, resets ambient to default
+local group_count = lurek.light.getGroupCount(1)  -- Returns the number of lights in the given group
+local light_count = lurek.light.getLightCount()  -- Returns the number of lights in the world
+local max_lights = lurek.light.getMaxLights()  -- Returns the maximum number of lights processed per frame
+local occluder_count = lurek.light.getOccluderCount()  -- Returns the number of occluders in the world
+lurek.light.setGroupColor(1, 1.0, 1.0, 1.0)  -- Sets the color for all lights in the given group
+lurek.light.setGroupEnabled(1, false)  -- Sets the enabled state for all lights in the given group
+lurek.light.setGroupIntensity(1, 1.0)  -- Sets the intensity for all lights in the given group
+lurek.light.setMaxLights(1)  -- Sets the maximum number of lights processed per frame (clamped 1–256)

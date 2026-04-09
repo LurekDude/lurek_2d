@@ -1,7 +1,7 @@
--- Cannon Fodder — Amiga 500 Classic (Luna2D demo)
+-- Cannon Fodder — Amiga 500 Classic (Lurek2D demo)
 -- Point-and-click squad-based top-down shooter inspired by Sensible Software's 1993 title.
 -- Lead your three soldiers through the jungle, eliminate all enemies, and reach the flag.
--- Run with: cargo run -- demos/retro/cannon_fodder
+-- Run with: cargo run -- content/demos/retro/cannon_fodder
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -68,15 +68,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.15, 0.32, 0.1)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.15, 0.32, 0.1)
     score = 0; mission = 1
     build_mission(mission)
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
 
@@ -209,42 +209,42 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Ground
-    luna.gfx.setColor(0.15, 0.32, 0.1)
-    luna.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.gfx.setColor(0.15, 0.32, 0.1)
+    lurek.gfx.rectangle("fill", 0, 0, W, H)
 
     -- Path / sand track
-    luna.gfx.setColor(0.55, 0.48, 0.3, 0.5)
-    luna.gfx.rectangle("fill", W/2 - 30, 0, 60, H)
+    lurek.gfx.setColor(0.55, 0.48, 0.3, 0.5)
+    lurek.gfx.rectangle("fill", W/2 - 30, 0, 60, H)
 
     -- Trees
     for _, t in ipairs(trees) do
-        luna.gfx.setColor(0.08, 0.22, 0.06)
-        luna.gfx.circle("fill", t.x, t.y, t.r)
-        luna.gfx.setColor(0.12, 0.30, 0.10)
-        luna.gfx.circle("fill", t.x - 4, t.y - 4, t.r * 0.7)
+        lurek.gfx.setColor(0.08, 0.22, 0.06)
+        lurek.gfx.circle("fill", t.x, t.y, t.r)
+        lurek.gfx.setColor(0.12, 0.30, 0.10)
+        lurek.gfx.circle("fill", t.x - 4, t.y - 4, t.r * 0.7)
     end
 
     -- Flag (objective)
     local all_dead = true
     for _, e in ipairs(enemies) do if e.alive then all_dead = false; break end end
     if all_dead then
-        luna.gfx.setColor(0.9, 0.1, 0.1)
-        luna.gfx.rectangle("fill", flag.x, flag.y, flag.w, flag.h)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("FLAG", flag.x + 1, flag.y + 5, 1.1)
+        lurek.gfx.setColor(0.9, 0.1, 0.1)
+        lurek.gfx.rectangle("fill", flag.x, flag.y, flag.w, flag.h)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("FLAG", flag.x + 1, flag.y + 5, 1.1)
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
         if e.alive then
-            luna.gfx.setColor(0.6, 0.4, 0.15)
-            luna.gfx.rectangle("fill", e.x, e.y, 18, 20)
-            luna.gfx.setColor(0.7, 0.55, 0.35)
-            luna.gfx.circle("fill", e.x + 9, e.y + 6, 7)
-            luna.gfx.setColor(0.5, 0.35, 0.1)
-            luna.gfx.rectangle("fill", e.x - 1, e.y, 20, 6)
+            lurek.gfx.setColor(0.6, 0.4, 0.15)
+            lurek.gfx.rectangle("fill", e.x, e.y, 18, 20)
+            lurek.gfx.setColor(0.7, 0.55, 0.35)
+            lurek.gfx.circle("fill", e.x + 9, e.y + 6, 7)
+            lurek.gfx.setColor(0.5, 0.35, 0.1)
+            lurek.gfx.rectangle("fill", e.x - 1, e.y, 20, 6)
         end
     end
 
@@ -252,72 +252,72 @@ function luna.render()
     for i, s in ipairs(squad) do
         if s.alive then
             local pulsing = i == 1 and (0.8 + 0.2 * math.sin(anim * 5)) or 1
-            luna.gfx.setColor(0.3 * pulsing, 0.6 * pulsing, 0.3 * pulsing)
-            luna.gfx.rectangle("fill", s.x, s.y, 16, 18)
-            luna.gfx.setColor(0.85, 0.7, 0.5)
-            luna.gfx.circle("fill", s.x + 8, s.y + 6, 7)
-            luna.gfx.setColor(0.3, 0.55, 0.3)
-            luna.gfx.rectangle("fill", s.x - 1, s.y, 18, 6)
+            lurek.gfx.setColor(0.3 * pulsing, 0.6 * pulsing, 0.3 * pulsing)
+            lurek.gfx.rectangle("fill", s.x, s.y, 16, 18)
+            lurek.gfx.setColor(0.85, 0.7, 0.5)
+            lurek.gfx.circle("fill", s.x + 8, s.y + 6, 7)
+            lurek.gfx.setColor(0.3, 0.55, 0.3)
+            lurek.gfx.rectangle("fill", s.x - 1, s.y, 18, 6)
         end
     end
 
     -- Bullets
-    luna.gfx.setColor(1, 0.9, 0.3)
+    lurek.gfx.setColor(1, 0.9, 0.3)
     for _, b in ipairs(bullets) do
-        if not b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
+        if not b.enemy then lurek.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
     end
-    luna.gfx.setColor(1, 0.3, 0.1)
+    lurek.gfx.setColor(1, 0.3, 0.1)
     for _, b in ipairs(bullets) do
-        if b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
+        if b.enemy then lurek.gfx.rectangle("fill", b.x - 2, b.y - 2, 5, 5) end
     end
 
     -- Target cursor
-    luna.gfx.setColor(1, 1, 0, 0.6)
-    luna.gfx.circle("line", mouse_target.x, mouse_target.y, 10)
-    luna.gfx.line(mouse_target.x - 14, mouse_target.y, mouse_target.x + 14, mouse_target.y)
-    luna.gfx.line(mouse_target.x, mouse_target.y - 14, mouse_target.x, mouse_target.y + 14)
+    lurek.gfx.setColor(1, 1, 0, 0.6)
+    lurek.gfx.circle("line", mouse_target.x, mouse_target.y, 10)
+    lurek.gfx.line(mouse_target.x - 14, mouse_target.y, mouse_target.x + 14, mouse_target.y)
+    lurek.gfx.line(mouse_target.x, mouse_target.y - 14, mouse_target.x, mouse_target.y + 14)
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.65)
-    luna.gfx.rectangle("fill", 0, 0, W, 30)
-    luna.gfx.setColor(0.6, 1, 0.3)
-    luna.gfx.print("CANNON FODDER", 8, 4, 1.8)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Mission " .. mission .. "/5", W/2 - 50, 4, 1.7)
-    luna.gfx.setColor(1, 0.8, 0.2)
-    luna.gfx.print("Score: " .. score, W - 130, 4, 1.6)
+    lurek.gfx.setColor(0, 0, 0, 0.65)
+    lurek.gfx.rectangle("fill", 0, 0, W, 30)
+    lurek.gfx.setColor(0.6, 1, 0.3)
+    lurek.gfx.print("CANNON FODDER", 8, 4, 1.8)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Mission " .. mission .. "/5", W/2 - 50, 4, 1.7)
+    lurek.gfx.setColor(1, 0.8, 0.2)
+    lurek.gfx.print("Score: " .. score, W - 130, 4, 1.6)
 
     -- Controls hint
-    luna.gfx.setColor(0.6, 0.8, 0.6, 0.7)
-    luna.gfx.print("[WASD] Move squad  [Arrows] Pan view  Squad auto-fires!", 8, H - 20, 1.3)
+    lurek.gfx.setColor(0.6, 0.8, 0.6, 0.7)
+    lurek.gfx.print("[WASD] Move squad  [Arrows] Pan view  Squad auto-fires!", 8, H - 20, 1.3)
 
     -- Overlay
     local ov_text, ov_col = nil, nil
     if game_state == "gameover" then ov_text = "ALL MEN LOST"; ov_col = {1,0.2,0.2}
     elseif game_state == "win"  then ov_text = "MISSION ACCOMPLISHED"; ov_col = {0.3,1,0.5} end
     if ov_text then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(ov_col[1], ov_col[2], ov_col[3])
-        luna.gfx.print(ov_text, W/2 - #ov_text * 9, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(ov_col[1], ov_col[2], ov_col[3])
+        lurek.gfx.print(ov_text, W/2 - #ov_text * 9, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
 end
 
--- luna.process is called every frame; handle held-key target movement here
-function luna.process(dt)
-    if luna.input.isKeyDown("a") or luna.input.isKeyDown("left")  then mouse_target.x = math.max(20, mouse_target.x - 150 * dt) end
-    if luna.input.isKeyDown("d") or luna.input.isKeyDown("right") then mouse_target.x = math.min(W-20, mouse_target.x + 150 * dt) end
-    if luna.input.isKeyDown("w") or luna.input.isKeyDown("up")    then mouse_target.y = math.max(20, mouse_target.y - 150 * dt) end
-    if luna.input.isKeyDown("s") or luna.input.isKeyDown("down")  then mouse_target.y = math.min(H-60, mouse_target.y + 150 * dt) end
+-- lurek.process is called every frame; handle held-key target movement here
+function lurek.process(dt)
+    if lurek.input.isKeyDown("a") or lurek.input.isKeyDown("left")  then mouse_target.x = math.max(20, mouse_target.x - 150 * dt) end
+    if lurek.input.isKeyDown("d") or lurek.input.isKeyDown("right") then mouse_target.x = math.min(W-20, mouse_target.x + 150 * dt) end
+    if lurek.input.isKeyDown("w") or lurek.input.isKeyDown("up")    then mouse_target.y = math.max(20, mouse_target.y - 150 * dt) end
+    if lurek.input.isKeyDown("s") or lurek.input.isKeyDown("down")  then mouse_target.y = math.min(H-60, mouse_target.y + 150 * dt) end
 end

@@ -1,4 +1,4 @@
-//! Registers the `luna.debugbridge.*` TCP debug server API.
+//! Registers the `lurek.debugbridge.*` TCP debug server API.
 //!
 //! Embeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.
 //! External tools (VS Code extension, MCP server) connect to inspect and
@@ -17,7 +17,7 @@ use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingRes
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.debugbridge` namespace.
+/// Registers the `lurek.debugbridge` namespace.
 /// @param lua : &Lua
 /// @param luna : &LuaTable
 /// @return LuaResult<()>
@@ -109,14 +109,14 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     )?;
 
     /// Poll for pending Lua-dependent requests from TCP clients.
-    /// Must be called each frame from luna.update(). Automatically records
-    /// the current frame delta from `luna.time.getDelta()` into the performance
+    /// Must be called each frame from lurek.update(). Automatically records
+    /// the current frame delta from `lurek.time.getDelta()` into the performance
     /// buffer — no manual `recordFrame()` call is needed.
     let sh = shared.clone();
     db.set(
         "poll",
         lua.create_function(move |lua, ()| {
-            // Auto-record frame time from luna.time.getDelta — no manual call needed.
+            // Auto-record frame time from lurek.time.getDelta — no manual call needed.
             if let Ok(luna_tbl) = lua.globals().get::<_, LuaTable>("luna") {
                 if let Ok(time_tbl) = luna_tbl.get::<_, LuaTable>("time") {
                     if let Ok(get_delta) = time_tbl.get::<_, LuaFunction>("getDelta") {

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Baseline — always-on runtime substrate               |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | — (foundation module; no dedicated `luna.engine` namespace) |
+| **Lua API**    | — (foundation module; no dedicated `lurek.engine` namespace) |
 | **Source**     | `src/engine/`                                        |
 | **Rust Tests** | `tests/rust/unit/engine_tests.rs`                    |
 | **Lua Tests**  | —                                                    |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The engine module is the foundational layer of Luna2D — it owns the application
+The engine module is the foundational layer of Lurek2D — it owns the application
 lifecycle, the main game loop, configuration loading, shared mutable state, error
 handling, structured logging, and the typed resource keys that identify every GPU
 object in the engine.  It sits at the Baseline tier alongside `math`, meaning every
@@ -41,6 +41,6 @@ engine is the only upward-facing dependency root.
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/engine.md`](../../specs/engine.md)
+→ [`docs/specs/engine.md`](../../docs/specs/engine.md)
 
-_Update both this file **and** `specs/engine.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/engine.md` whenever source files, public types, or Lua bindings change._

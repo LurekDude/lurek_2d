@@ -1,9 +1,9 @@
-﻿//! Luna2D — a 2D game engine written in Rust that loads and executes Lua game scripts.
+﻿//! Lurek2D — a 2D game engine written in Rust that loads and executes Lua game scripts.
 //!
 //! This crate is the engine library. It re-exports every subsystem through public submodules so
-//! that the `luna2d` binary, integration tests, and tooling can all share the same code paths.
+//! that the `lurek2d` binary, integration tests, and tooling can all share the same code paths.
 //! Game developers do not interact with this crate directly; they write Lua scripts that call
-//! the `luna.*` API, which is registered by the Lua API layer on top of the types defined here.
+//! the `lurek.*` API, which is registered by the Lua API layer on top of the types defined here.
 //!
 //! # Architecture overview
 //!
@@ -11,8 +11,8 @@
 //! `engine` may depend on all modules; domain modules (`graphics`, `physics`, `audio`, `input`,
 //! `timer`, `filesystem`, `math`, `window`) must not depend on each other except through `math`.
 //!
-//! The main entry point is [`luna_run`], which is called by both the `luna` (console) and
-//! `lunec` (no-console) binaries. It installs the panic hook, parses CLI arguments, loads
+//! The main entry point is [`lurek_run`], which is called by both the `luna` (console) and
+//! `lurekc` (no-console) binaries. It installs the panic hook, parses CLI arguments, loads
 //! `conf.lua`, and enters the main engine loop via [`engine::App::run`].
 //!
 //! # Submodule map
@@ -24,7 +24,7 @@
 //! | [`battle`] | Turn-based battle engine: combatants, actions, statuses, turn order |
 //! | [`cardgame`] | Card game backend: cards, decks (stacks), zones, card pools, history |
 //! | [`combat`] | Vehicle combat: chassis, turrets, weapons, projectiles |
-//! | [`compute`] | N-dimensional numerical arrays (luna.compute) |
+//! | [`compute`] | N-dimensional numerical arrays (lurek.compute) |
 //! | [`crafting`] | Recipe-based crafting queues and upgrade trees |
 //! | [`data`] | LÖVE2D-compatible binary data: ByteData, compress, hash, encode, LÖVE2D pack format |
 //! | [`dataframe`] | In-memory column-major tabular data |
@@ -80,12 +80,12 @@ pub mod tween;
 // migration-state: pub mod battle; — now library/battle/init.lua
 // migration-state: pub mod cardgame; — now library/cardgame/init.lua
 // migration-state: pub mod combat; — now library/combat/init.lua
-/// Dense N-dimensional numerical arrays (luna.compute).
+/// Dense N-dimensional numerical arrays (lurek.compute).
 pub mod compute;
 // migration-state: pub mod crafting; — now library/crafting/init.lua
 /// LÖVE2D-compatible binary data API: ByteData, compress, hash, encode, and LÖVE2D pack format.
 pub mod data;
-/// In-memory column-major tabular data (luna.dataframe).
+/// In-memory column-major tabular data (lurek.dataframe).
 pub mod dataframe;
 /// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
 pub mod devtools;
@@ -93,9 +93,9 @@ pub mod devtools;
 pub mod serial;
 // migration-state: pub mod dialog; — now library/dialog/init.lua
 // migration-state: pub mod economy; — now library/economy/init.lua
-/// TCP debug bridge for connecting external tools to a running Luna2D game.
+/// TCP debug bridge for connecting external tools to a running Lurek2D game.
 pub mod debugbridge;
-/// API documentation catalog and quality reporting for the luna.* API surface.
+/// API documentation catalog and quality reporting for the lurek.* API surface.
 pub mod docs;
 /// Core engine lifecycle, configuration, and error types.
 pub mod engine;
@@ -160,7 +160,7 @@ pub mod scene;
 /// Skeletal animation: bone hierarchies, slots, and world-transform propagation.
 pub mod spine;
 // migration-state: pub mod stats; — now library/stats/init.lua
-/// Lua API registration layer: LuaJIT VM creation and `luna.*` module binding.
+/// Lua API registration layer: LuaJIT VM creation and `lurek.*` module binding.
 pub mod lua_api;
 /// Grid-based character-cell terminal emulator and widget toolkit.
 pub mod terminal;
@@ -173,15 +173,15 @@ pub mod timer;
 /// Window event loop placeholder.
 pub mod window;
 
-/// Entry-point shared by both `luna` (console) and `lunec` (no-console) binaries.
+/// Entry-point shared by both `luna` (console) and `lurekc` (no-console) binaries.
 ///
 /// Installs the panic hook, reads CLI arguments, loads the game config,
 /// and runs the main engine loop. Both binary crates call this function.
 ///
-/// When the first argument is a `.lunar` file (a zip archive containing a game),
+/// When the first argument is a `.lurek` file (a zip archive containing a game),
 /// the archive is extracted to a temporary directory and the engine runs from there.
 /// The temporary directory is cleaned up automatically when the engine exits.
-pub fn luna_run() {
+pub fn lurek_run() {
     use engine::{App, Config};
     use std::env;
 
@@ -199,7 +199,7 @@ pub fn luna_run() {
             .map(|l| format!(" at {}:{}:{}", l.file(), l.line(), l.column()))
             .unwrap_or_default();
 
-        let msg = format!("Luna2D panicked: {}{}", payload, location);
+        let msg = format!("Lurek2D panicked: {}{}", payload, location);
         log_msg!(
             error,
             crate::engine::log_messages::L060_LUA_CALLBACK_ERROR,
@@ -246,7 +246,7 @@ pub fn luna_run() {
 
     // Keep the temp dir alive for the entire engine session; it is dropped (and deleted)
     // after app.run() returns.
-    let mut _lunar_temp_dir: Option<tempfile::TempDir> = None;
+    let mut _lurek_temp_dir: Option<tempfile::TempDir> = None;
 
     let game_dir = if let Some(ref arg) = game_arg {
         let path = std::path::PathBuf::from(arg);
@@ -255,14 +255,14 @@ pub fn luna_run() {
             .map(|e| e.eq_ignore_ascii_case("lunar"))
             .unwrap_or(false)
         {
-            match extract_lunar_archive(&path) {
+            match extract_lurek_archive(&path) {
                 Ok(td) => {
                     let dir = td.path().to_path_buf();
-                    _lunar_temp_dir = Some(td);
+                    _lurek_temp_dir = Some(td);
                     dir
                 }
                 Err(e) => {
-                    let msg = format!("Failed to open .lunar archive '{}': {}", path.display(), e);
+                    let msg = format!("Failed to open .lurek archive '{}': {}", path.display(), e);
                     log_msg!(
                         error,
                         crate::engine::log_messages::L060_LUA_CALLBACK_ERROR,
@@ -305,7 +305,7 @@ fn show_windows_error_box(msg: &str) {
     }
 
     let text = to_wide(msg);
-    let caption = to_wide("Luna2D Crash");
+    let caption = to_wide("Lurek2D Crash");
 
     // SAFETY: Calling Win32 MessageBoxW with valid null-terminated wide strings.
     // MB_OK | MB_ICONERROR = 0x10
@@ -319,18 +319,18 @@ fn show_windows_error_box(msg: &str) {
     }
 }
 
-/// Extracts a `.lunar` zip archive into a fresh temporary directory and returns
+/// Extracts a `.lurek` zip archive into a fresh temporary directory and returns
 /// a handle to that directory.
 ///
 /// The caller must keep the returned [`tempfile::TempDir`] alive for as long as
 /// the extracted files are needed; dropping it deletes the directory.
 ///
 /// # Parameters
-/// - `archive_path` — `&std::path::Path`. Path to the `.lunar` file on disk.
+/// - `archive_path` — `&std::path::Path`. Path to the `.lurek` file on disk.
 ///
 /// # Returns
 /// `Result<tempfile::TempDir, Box<dyn std::error::Error>>`.
-fn extract_lunar_archive(
+fn extract_lurek_archive(
     archive_path: &std::path::Path,
 ) -> Result<tempfile::TempDir, Box<dyn std::error::Error>> {
     use std::fs;
@@ -351,7 +351,7 @@ fn extract_lunar_archive(
             match component {
                 std::path::Component::Normal(_) | std::path::Component::CurDir => {}
                 _ => {
-                    return Err(format!("Unsafe path in .lunar archive: '{entry_name}'").into());
+                    return Err(format!("Unsafe path in .lurek archive: '{entry_name}'").into());
                 }
             }
         }

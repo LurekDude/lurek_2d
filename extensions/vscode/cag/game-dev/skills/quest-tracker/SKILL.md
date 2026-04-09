@@ -125,27 +125,27 @@ end
 
 ```lua
 local function draw_journal()
-    luna.gfx.setColor(0, 0, 0, 0.9)
-    luna.gfx.rectangle("fill", 50, 30, 700, 540)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("QUEST JOURNAL", 60, 40)
+    lurek.gfx.setColor(0, 0, 0, 0.9)
+    lurek.gfx.rectangle("fill", 50, 30, 700, 540)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("QUEST JOURNAL", 60, 40)
 
     local y = 80
     for _, q in ipairs(active_quests) do
-        luna.gfx.setColor(1, 1, 0.5, 1)
-        luna.gfx.print(q.title, 70, y)
+        lurek.gfx.setColor(1, 1, 0.5, 1)
+        lurek.gfx.print(q.title, 70, y)
         y = y + 20
         for _, obj in ipairs(q.objectives) do
             local mark = obj.done and "[x] " or "[ ] "
             local progress = ""
             if obj.count then progress = " (" .. (obj.current or 0) .. "/" .. obj.count .. ")" end
-            luna.gfx.setColor(obj.done and {0.5,0.5,0.5} or {1,1,1})
-            luna.gfx.print("  " .. mark .. obj.label .. progress, 80, y)
+            lurek.gfx.setColor(obj.done and {0.5,0.5,0.5} or {1,1,1})
+            lurek.gfx.print("  " .. mark .. obj.label .. progress, 80, y)
             y = y + 18
         end
         y = y + 10
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

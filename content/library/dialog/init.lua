@@ -1,6 +1,6 @@
-﻿--- Luna2D dialog sequencer ÔÇö typewriter text, branching choices, events.
+﻿--- Lurek2D dialog sequencer ÔÇö typewriter text, branching choices, events.
 --
--- A pure-Lua replacement for the former `luna.dialog` Rust binding.
+-- A pure-Lua replacement for the former `lurek.dialog` Rust binding.
 -- No engine dependencies; works in headless test VMs.
 --
 -- Usage:

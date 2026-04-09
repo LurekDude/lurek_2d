@@ -1,4 +1,4 @@
-//! Shared state types for the Luna2D TCP debug bridge.
+//! Shared state types for the Lurek2D TCP debug bridge.
 //!
 //! These types are exchanged between the TCP server thread and the Lua main
 //! thread without any Lua dependency.  All fields are intentionally `pub` so
@@ -32,7 +32,7 @@ pub struct PendingResponse {
     pub client_idx: usize,
 }
 
-/// A single structured print log entry captured from `luna.print`.
+/// A single structured print log entry captured from `lurek.print`.
 #[derive(Clone, serde::Serialize)]
 pub struct PrintEntry {
     /// Seconds since bridge start when this entry was recorded.

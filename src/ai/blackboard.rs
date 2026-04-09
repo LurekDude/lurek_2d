@@ -1,7 +1,7 @@
 //! Typed key-value store with optional parent chain for hierarchical lookup.
 //!
 //! Blackboards are the primary mechanism for sharing named data between AI
-//! subsystems in Luna2D. Each [`Agent`](crate::ai::agent::Agent) has a local
+//! subsystems in Lurek2D. Each [`Agent`](crate::ai::agent::Agent) has a local
 //! blackboard; each [`Squad`](crate::ai::squad::Squad) has a squad-level
 //! blackboard; and the [`AIWorld`](crate::ai::world::AIWorld) has a global one.
 //!

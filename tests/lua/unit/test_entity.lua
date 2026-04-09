@@ -3,7 +3,7 @@
 
 describe("Spawn and lifecycle", function()
     it("spawns entities with sequential IDs", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local a = world:spawn()
         expect_equal(1, a)
         local b = world:spawn()
@@ -24,7 +24,7 @@ end)
 
 describe("Components", function()
     it("stores and retrieves component values", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local e = world:spawn()
 
         world:set(e, "hp", 100)
@@ -45,7 +45,7 @@ end)
 
 describe("Query", function()
     it("queries entities by components", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local p = world:spawn()
         world:set(p, "pos", {x=0, y=0})
         world:set(p, "vel", {x=1, y=0})
@@ -62,7 +62,7 @@ describe("Query", function()
     end)
 
     it("iterates matching entities with each()", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local p = world:spawn()
         world:set(p, "pos", {x=0, y=0})
         local q = world:spawn()
@@ -78,7 +78,7 @@ end)
 
 describe("String Tags", function()
     it("adds, queries, and removes string tags", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local p = world:spawn()
         local q = world:spawn()
 
@@ -103,7 +103,7 @@ end)
 
 describe("Bitmap Tags", function()
     it("defines and queries bitmap tags", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local p = world:spawn()
         local q = world:spawn()
 
@@ -132,7 +132,7 @@ end)
 
 describe("Layers", function()
     it("assigns layers and returns entities sorted by layer", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local p = world:spawn()
         local q = world:spawn()
 
@@ -160,7 +160,7 @@ end)
 
 describe("Blueprints", function()
     it("defines blueprints and spawns entities from them", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30, speed = 100 })
         expect_true(world:hasBlueprint("goblin"))
 
@@ -171,7 +171,7 @@ describe("Blueprints", function()
     end)
 
     it("blueprints provide deep-copy isolation", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30, speed = 100 })
 
         local g = world:spawnBlueprint("goblin")
@@ -181,7 +181,7 @@ describe("Blueprints", function()
     end)
 
     it("extends blueprints with overrides", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30, speed = 100 })
         world:extendBlueprint("boss_goblin", "goblin", { hp = 200, boss = true })
 
@@ -192,7 +192,7 @@ describe("Blueprints", function()
     end)
 
     it("spawnBlueprint accepts per-spawn field overrides", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30, speed = 100 })
 
         local g = world:spawnBlueprint("goblin", { hp = 50 })
@@ -201,7 +201,7 @@ describe("Blueprints", function()
     end)
 
     it("lists and removes blueprints", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30 })
         world:defineBlueprint("boss", { hp = 200 })
 
@@ -213,7 +213,7 @@ describe("Blueprints", function()
     end)
 
     it("getBlueprintComponents returns component table", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:defineBlueprint("goblin", { hp = 30 })
 
         local bp_comps = world:getBlueprintComponents("goblin")
@@ -224,7 +224,7 @@ end)
 
 describe("Systems", function()
     it("dispatches update and draw to registered systems", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local update_count = 0
         local draw_count = 0
 
@@ -243,7 +243,7 @@ describe("Systems", function()
     end)
 
     it("emits custom events to systems", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         local custom_count = 0
 
         local EventSys = {}
@@ -255,7 +255,7 @@ describe("Systems", function()
     end)
 
     it("removeSystem removes by reference", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
 
         local SysA = {}
         function SysA:update() end
@@ -273,7 +273,7 @@ end)
 
 describe("Clear and Release", function()
     it("clear() removes entities but preserves blueprints", function()
-        local world = luna.entity.newUniverse()
+        local world = lurek.entity.newUniverse()
         world:spawn()
         world:spawn()
         world:defineBlueprint("preserved", { val = 1 })

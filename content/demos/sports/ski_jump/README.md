@@ -5,8 +5,8 @@ the air, and nail the landing for maximum distance.
 
 ## What It Demonstrates
 
-- `luna.input.isKeyDown()` — crouching during the slide
-- `luna.keypressed()` — lean direction mid-air
+- `lurek.input.isKeyDown()` — crouching during the slide
+- `lurek.keypressed()` — lean direction mid-air
 - Physics simulation — parabolic trajectory, slope intersection detection
 - Geometric drawing — ramp profile, landing slope, distance markers
 - Multi-attempt scoring loop

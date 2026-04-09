@@ -1,6 +1,6 @@
--- Survival Crafting — Luna2D Demo
+-- Survival Crafting — Lurek2D Demo
 -- WASD to move, click to mine, C to craft, P to place wall
--- Run with: cargo run -- demos/rpg/survival_crafting
+-- Run with: cargo run -- content/demos/rpg/survival_crafting
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -67,13 +67,13 @@ local function spawnEnemy()
     end
 end
 
-function luna.init()
-    luna.window.setTitle("Survival Crafting")
-    luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Survival Crafting")
+    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.15)
     genMap()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- day cycle
     dayTime = dayTime + dt
     if dayTime >= dayLength then
@@ -92,10 +92,10 @@ function luna.process(dt)
     moveCD = moveCD - dt
     if not craftOpen and moveCD <= 0 then
         local dx, dy = 0, 0
-        if luna.keyboard.isDown("w") then dy = -1
-        elseif luna.keyboard.isDown("s") then dy = 1
-        elseif luna.keyboard.isDown("a") then dx = -1
-        elseif luna.keyboard.isDown("d") then dx = 1
+        if lurek.keyboard.isDown("w") then dy = -1
+        elseif lurek.keyboard.isDown("s") then dy = 1
+        elseif lurek.keyboard.isDown("a") then dx = -1
+        elseif lurek.keyboard.isDown("d") then dx = 1
         end
         if dx ~= 0 or dy ~= 0 then
             local nx, ny = player.gx + dx, player.gy + dy
@@ -149,7 +149,7 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- darkness overlay intensity
     local nightAlpha = 0
     if isNight() then
@@ -161,56 +161,56 @@ function luna.render()
         for x = 1, COLS do
             local t = map[y][x]
             local c = tileColors[t] or tileColors.grass
-            luna.gfx.setColor(c[1], c[2], c[3], 1)
-            luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- enemies
-    luna.gfx.setColor(0.9, 0.15, 0.15, 1)
+    lurek.gfx.setColor(0.9, 0.15, 0.15, 1)
     for _, e in ipairs(enemies) do
-        luna.gfx.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
+        lurek.gfx.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
     end
 
     -- player
-    luna.gfx.setColor(0.2, 0.5, 1, 1)
-    luna.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+    lurek.gfx.setColor(0.2, 0.5, 1, 1)
+    lurek.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
     -- mining bar
     if mining.active then
         local bx = (mining.gx - 1) * TILE
         local by = (mining.gy - 1) * TILE - 8
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", bx, by, TILE, 6)
-        luna.gfx.setColor(0, 1, 0.3, 1)
-        luna.gfx.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", bx, by, TILE, 6)
+        lurek.gfx.setColor(0, 1, 0.3, 1)
+        lurek.gfx.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
     end
 
     -- night overlay
     if nightAlpha > 0 then
-        luna.gfx.setColor(0, 0, 0.05, nightAlpha)
-        luna.gfx.rectangle("fill", 0, 0, 800, 600)
+        lurek.gfx.setColor(0, 0, 0.05, nightAlpha)
+        lurek.gfx.rectangle("fill", 0, 0, 800, 600)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
+    lurek.gfx.setColor(1, 1, 1, 1)
     local dayStr = isNight() and "NIGHT" or "Day"
-    luna.gfx.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
-    luna.gfx.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
+    lurek.gfx.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
+    lurek.gfx.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
 
     -- craft menu
     if craftOpen then
-        luna.gfx.setColor(0, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", 250, 150, 300, 200)
-        luna.gfx.setColor(1, 1, 0.6, 1)
-        luna.gfx.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
+        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", 250, 150, 300, 200)
+        lurek.gfx.setColor(1, 1, 0.6, 1)
+        lurek.gfx.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
         for i, r in ipairs(recipes) do
             local parts = {}
             for k, v in pairs(r.needs) do parts[#parts + 1] = k .. "x" .. v end
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
         end
     end
 end
@@ -225,8 +225,8 @@ local function tryCraft(idx)
     inventory[r.gives] = inventory[r.gives] + 1
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "c" then craftOpen = not craftOpen; return end
     if craftOpen then
         if key == "1" then tryCraft(1) end
@@ -243,7 +243,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if craftOpen then return end
     local gx = math.floor(x / TILE) + 1
     local gy = math.floor(y / TILE) + 1

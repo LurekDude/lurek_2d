@@ -1,12 +1,12 @@
 //! Universe — a self-contained ECS world. Entities are u32 IDs starting at 1.
 //!
-//! This module is part of Luna2D's `entity` subsystem and provides the implementation
+//! This module is part of Lurek2D's `entity` subsystem and provides the implementation
 //! details for universe-related operations and data management.
 //! Key types exported from this module: `Universe`.
 //! Primary functions: `new()`, `get_system_store()`, `spawn()`, `kill()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{EN01_UNIVERSE_INIT, EN02_ENTITY_SPAWN};
 use crate::log_msg;

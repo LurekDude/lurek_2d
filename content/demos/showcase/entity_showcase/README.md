@@ -1,11 +1,11 @@
 # Entity Showcase
 
-Interactive chapter-by-chapter tour of every `luna.entity.Universe` method — spawn,
+Interactive chapter-by-chapter tour of every `lurek.entity.Universe` method — spawn,
 components, string tags, bitmap tags, layers, hierarchy, blueprints, systems, and cleanup.
 
 ## What It Demonstrates
 
-- `luna.entity.newUniverse()` — create a Universe ECS container
+- `lurek.entity.newUniverse()` — create a Universe ECS container
 - `world:spawn()` / `world:kill()` / `world:isAlive()` — entity lifecycle
 - `world:getEntityCount()` / `world:getEntities()` — entity enumeration
 - `world:set()` / `world:get()` / `world:has()` / `world:remove()` — component CRUD
@@ -31,7 +31,7 @@ components, string tags, bitmap tags, layers, hierarchy, blueprints, systems, an
 ## How to Run
 
 ```bash
-cargo run -- demos/showcase/entity_showcase
+cargo run -- content/demos/showcase/entity_showcase
 ```
 
 ## Controls

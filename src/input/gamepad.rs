@@ -1,12 +1,12 @@
 //! Gamepad implementation for the `input` subsystem.
 //!
-//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! This module is part of Lurek2D's `input` subsystem and provides the implementation
 //! details for gamepad-related operations and data management.
 //! Key types exported from this module: `GamepadState`, `GamepadMappings`.
 //! Primary functions: `new()`, `update_button()`, `update_axis()`, `is_button_pressed()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use crate::engine::log_messages::{GD01, GD02, GD03};
 use crate::engine::EngineError;

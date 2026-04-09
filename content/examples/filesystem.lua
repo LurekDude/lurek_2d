@@ -1,49 +1,48 @@
 -- examples/filesystem.lua
--- Luna2D luna.fs API Reference
--- This file is documentation code, not a runnable game.
+-- Lurek2D lurek.fs API Reference
 -- Demonstrates the sandboxed GameFS, virtual FS, and file API.
 
 -- NOTE: All paths are relative to the game directory (game mount) or the
---       save directory (write mount). Absolute paths and ".." traversals
---       are blocked for security.
+save directory (write mount). Absolute paths and ".." traversals
+are blocked for security.
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Directory Information
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- The game's read-only source directory (where main.lua lives)
-local source = luna.fs.getSource()            -- → "C:/Games/my_game"
+local source = lurek.fs.getSource()            -- → "C:/Games/my_game"
 
 -- The writable save directory (platform-specific)
-local save_dir = luna.fs.getSaveDirectory()   -- → "C:/Users/.../AppData/Roaming/my_game"
+local save_dir = lurek.fs.getSaveDirectory()   -- → "C:/Users/.../AppData/Roaming/my_game"
 
 -- Current working directory
-local cwd = luna.fs.getWorkingDirectory()
+local cwd = lurek.fs.getWorkingDirectory()
 
 -- Platform user home directory
-local home = luna.fs.getUserDirectory()
+local home = lurek.fs.getUserDirectory()
 
 -- The identity (subdirectory name) used inside the save directory
-local identity = luna.fs.getIdentity()
+local identity = lurek.fs.getIdentity()
 
--- Change the save identity (call BEFORE any file writes, usually in luna.conf)
-luna.fs.setIdentity("my_game_v2")
+-- Change the save identity (call BEFORE any file writes, usually in lurek.conf)
+lurek.fs.setIdentity("my_game_v2")
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Read / Write Files
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Read entire file as a string (game dir first, then save dir)
-local content = luna.fs.read("levels/level1.txt")
+local content = lurek.fs.read("levels/level1.txt")
 
 -- Write a string to a file in the save directory (creates subdirs automatically)
-luna.fs.write("saves/slot1.sav", "level=5\nhp=100\n")
+lurek.fs.write("saves/slot1.sav", "level=5\nhp=100\n")
 
 -- Append to an existing file (creates it if missing)
-luna.fs.append("logs/session.log", "Session started\n")
+lurek.fs.append("logs/session.log", "Session started\n")
 
 -- Check existence
-if luna.fs.exists("config.toml") then
+if lurek.fs.exists("config.toml") then
     print("config found")
 end
 
@@ -53,36 +52,36 @@ end
 
 -- Returns a table: {type="file"|"directory", size=N, modtime=unix_timestamp}
 -- or nil if path does not exist
-local info = luna.fs.getInfo("saves/slot1.sav")
+local info = lurek.fs.getInfo("saves/slot1.sav")
 if info then
     print("size:", info.size, "modified:", info.modtime)
 end
 
-local is_file = luna.fs.isFile("config.toml")
-local is_dir  = luna.fs.isDirectory("levels/")
+local is_file = lurek.fs.isFile("config.toml")
+local is_dir  = lurek.fs.isDirectory("levels/")
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Directory Operations
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- List directory contents (returns a table of filenames, not full paths)
-local items = luna.fs.getDirectoryItems("levels/")
+local items = lurek.fs.getDirectoryItems("levels/")
 for _, name in ipairs(items) do
     print(name)  -- e.g. "level1.txt", "level2.txt", ...
 end
 
 -- Create a directory (and all parents) in the save directory
-luna.fs.createDirectory("screenshots/2024")
+lurek.fs.createDirectory("screenshots/2024")
 
 -- Remove a file or empty directory from the save directory
-luna.fs.remove("saves/old_slot.sav")
+lurek.fs.remove("saves/old_slot.sav")
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Iterate Lines
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Returns an iterator that yields one line at a time
-for line in luna.fs.lines("dialog/intro.txt") do
+for line in lurek.fs.lines("dialog/intro.txt") do
     print(line)
 end
 
@@ -91,7 +90,7 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Load and compile a Lua file from the game directory as a function
-local chunk = luna.fs.load("scripts/util.lua")
+local chunk = lurek.fs.load("scripts/util.lua")
 if chunk then
     chunk()  -- execute it
 end
@@ -101,7 +100,7 @@ end
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Open a file handle (mode: "r" | "w" | "a" | "rb" | "wb" | "ab")
-local fh = luna.fs.openFile("saves/slot1.sav", "r")
+local fh = lurek.fs.openFile("saves/slot1.sav", "r")
 
 -- Read N bytes (or all remaining if count omitted)
 local all  = fh:read()
@@ -123,7 +122,7 @@ fh:seek(0)   -- rewind to start
 if fh:isEOF() then print("done") end
 
 -- Write (only in "w" / "a" modes)
-local wfh = luna.fs.openFile("saves/slot2.sav", "w")
+local wfh = lurek.fs.openFile("saves/slot2.sav", "w")
 wfh:write("hp=100\n")
 wfh:write("level=3\n")
 wfh:flush()  -- flush OS write buffer
@@ -139,7 +138,7 @@ fh:close()
 
 -- Load a file fully into memory as a FileData object.
 -- Useful for passing to image/audio loaders without touching the file system again.
-local fd = luna.fs.newFileData("textures/player.png")
+local fd = lurek.fs.newFileData("textures/player.png")
 local size     = fd:getSize()        -- byte length
 local raw      = fd:getString()      -- byte content as a Lua string
 local filename = fd:getFilename()    -- → "textures/player.png"
@@ -149,12 +148,12 @@ local filename = fd:getFilename()    -- → "textures/player.png"
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Start an async read; returns an opaque handle immediately
-local handle = luna.fs.readAsync("levels/bigmap.bin")
+local handle = lurek.fs.readAsync("levels/bigmap.bin")
 
 -- Poll each frame until done (returns status + data when ready)
-function luna.process(dt)
+function lurek.process(dt)
     if handle then
-        local status, data = luna.fs.pollAsync(handle)
+        local status, data = lurek.fs.pollAsync(handle)
         if status == "done" then
             -- data is a string with the file contents
             handle = nil
@@ -174,11 +173,11 @@ end
 -- Mount a directory or ZIP archive at a virtual path.
 -- Files inside the mount shadow any same-named files at lower-priority mounts.
 -- Useful for mod support, DLC, or loading asset packs.
-luna.fs.mount("dlc/expansion.zip", "dlc")
-luna.fs.mount("mods/my_mod/",      "mods/my_mod")
+lurek.fs.mount("dlc/expansion.zip", "dlc")
+lurek.fs.mount("mods/my_mod/",      "mods/my_mod")
 
 -- Query a path under a mount as if it were part of the game FS
-local exists = luna.fs.exists("dlc/new_level.txt")
+local exists = lurek.fs.exists("dlc/new_level.txt")
 
 -- Unmount by the same source path used in mount()
-luna.fs.unmount("dlc/expansion.zip")
+lurek.fs.unmount("dlc/expansion.zip")

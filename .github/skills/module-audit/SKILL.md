@@ -1,6 +1,6 @@
 ---
 name: module-audit
-description: "Load this skill when performing end-to-end quality audits on Luna2D src/ modules: docstrings, AGENT.md sync, test coverage, architecture compliance, wiki pages, API docs, performance, and code quality. Skip it for implementing features, writing game scripts, or pure Lua work."
+description: "Load this skill when performing end-to-end quality audits on Lurek2D src/ modules: docstrings, AGENT.md sync, test coverage, architecture compliance, wiki pages, API docs, performance, and code quality. Skip it for implementing features, writing game scripts, or pure Lua work."
 ---
 
 # Module Audit Skill
@@ -24,7 +24,7 @@ description: "Load this skill when performing end-to-end quality audits on Luna2
 
 ## Purpose
 
-Perform a structured, reproducible end-to-end quality audit on one or more Luna2D `src/` modules. Every check produces a discrete PASS / WARNING / ERROR verdict. A module FAILS the audit with **1+ ERROR** or **3+ WARNING**.
+Perform a structured, reproducible end-to-end quality audit on one or more Lurek2D `src/` modules. Every check produces a discrete PASS / WARNING / ERROR verdict. A module FAILS the audit with **1+ ERROR** or **3+ WARNING**.
 
 ## Pre-requisites
 
@@ -46,14 +46,14 @@ The user specifies targets as module names, tier groups, or `all`:
 | `baseline` | `math`, `engine` |
 | `tier1` | `animation`, `audio`, `automation`, `camera`, `compute`, `data`, `entity`, `event`, `filesystem`, `graphics`, `image`, `input`, `physics`, `thread`, `timer`, `window` |
 | `tier2` | `ai`, `dataframe`, `graph`, `gui`, `minimap`, `modding`, `overlay`, `particle`, `pathfinding`, `postfx`, `savegame`, `scene`, `tilemap` |
-| `tier3` | Lua libraries in `library/` — different audit checks apply |
+| `tier3` | Lua libraries in `content/library/` — different audit checks apply |
 | `all` | All `src/` modules |
 
 Additional modules that exist in `src/` but may not be in the official tier table (e.g., `terminal`, `spine`, `serial`, `raycaster`, `procgen`, `pipeline`, `network`, `light`, `fx`, `postfx`) should be audited using the tier rules inferred from their imports and AGENT.md.
 
 ## AGENT.md Canonical Format (SHORT)
 
-**AGENT.md is a SHORT file.** All architecture, types, Lua API, and examples live in `specs/<module>.md`. See `.github/skills/agent-md/SKILL.md` for the full two-layer authoring rules.
+**AGENT.md is a SHORT file.** All architecture, types, Lua API, and examples live in `docs/specs/<module>.md`. See `.github/skills/agent-md/SKILL.md` for the full two-layer authoring rules.
 
 When checking A-02 (template structure), the canonical short AGENT.md format is:
 
@@ -64,7 +64,7 @@ When checking A-02 (template structure), the canonical short AGENT.md format is:
 |----------|-------|
 | **Tier** | Tier N — Description |
 | **Status** | Implemented — Full / Partial / Stub |
-| **Lua API** | `luna.<module>` (or `—` if none) |
+| **Lua API** | `lurek.<module>` (or `—` if none) |
 | **Source** | `src/<module>/` |
 | **Rust Tests** | `tests/rust/unit/<module>_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_<module>.lua` (or `—` if none) |
@@ -83,9 +83,9 @@ agent decide whether to enter this module or a different one.
 
 ## Full Specification
 
-→ [`specs/<module>.md`](../../specs/<module>.md)
+→ [`docs/specs/<module>.md`](../../docs/specs/<module>.md)
 
-_Update both this file and `specs/<module>.md` whenever source files,
+_Update both this file and `docs/specs/<module>.md` whenever source files,
 public types, or Lua bindings change._
 ```
 
@@ -94,16 +94,16 @@ public types, or Lua bindings change._
 - Metadata table with `**Tier**` row
 - `## Purpose`
 - `## Source Files`
-- `## Full Specification` with link to `specs/<module>.md`
+- `## Full Specification` with link to `docs/specs/<module>.md`
 
 ### What Does NOT Belong in AGENT.md
-- `## Summary` (500+ chars) → goes in `specs/<module>.md`
-- `## Architecture` / ASCII diagrams → goes in `specs/<module>.md`
-- `## Submodules` → goes in `specs/<module>.md`
-- `## Key Types` → goes in `specs/<module>.md`
-- `## Lua API` table → goes in `specs/<module>.md`
-- `## Lua Examples` → goes in `specs/<module>.md`
-- `## Item Summary` → goes in `specs/<module>.md`
+- `## Summary` (500+ chars) → goes in `docs/specs/<module>.md`
+- `## Architecture` / ASCII diagrams → goes in `docs/specs/<module>.md`
+- `## Submodules` → goes in `docs/specs/<module>.md`
+- `## Key Types` → goes in `docs/specs/<module>.md`
+- `## Lua API` table → goes in `docs/specs/<module>.md`
+- `## Lua Examples` → goes in `docs/specs/<module>.md`
+- `## Item Summary` → goes in `docs/specs/<module>.md`
 
 ## Check Procedures
 
@@ -231,10 +231,10 @@ Run time: ~0.12 s per module, under 5 s for all 46 modules.
 - [ ] B-02 — Registration-only:
        struct definitions (move to src/<m>/): LuaFoo
 - [ ] SP-04 — Lua API completeness:
-       Missing from spec: load, unload (+2 more) — add to ## Lua API in specs/<m>.md
+       Missing from spec: load, unload (+2 more) — add to ## Lua API in docs/specs/<m>.md
        Stale in spec (not in code): oldFn — remove from spec
 - [ ] W-02 — API surface coverage:
-       Missing in examples/<m>.lua: load, unload — add with use-case comment
+       Missing in content/content/examples/<m>.lua: load, unload — add with use-case comment
 - [ ] T-04 — Float comparisons:
        assert_eq! with floats at: foo_tests.rs:117, foo_tests.rs:119
 ...
@@ -290,17 +290,17 @@ The report names the function and LOC: `'load' (28 LOC, line 42)`.
 
 #### SP-04: Functions missing from spec / stale in spec
 The report names missing functions explicitly.
-1. For each missing: add a row to `## Lua API` in `specs/<module>.md` with
+1. For each missing: add a row to `## Lua API` in `docs/specs/<module>.md` with
    signature, parameters, return type, and one-line description
 2. For each stale: remove the row from `## Lua API`
 
 #### SP-05: Types missing/stale in Key Types
 Reports `Types not in spec: Clock, Scheduler`.
-1. Add a `### Clock` section to `## Key Types` in `specs/<module>.md`
+1. Add a `### Clock` section to `## Key Types` in `docs/specs/<module>.md`
 
-#### W-02: Missing from examples/<module>.lua
+#### W-02: Missing from content/content/examples/<module>.lua
 The report names the exact function names.
-1. Add `luna.<module>.<funcName>(...)` call to `examples/<module>.lua`
+1. Add `lurek.<module>.<funcName>(...)` call to `content/content/examples/<module>.lua`
 2. Prefix each call with a one-line realistic use-case comment
 
 #### W-04: Example–spec sync mismatch
@@ -316,7 +316,7 @@ The report lists the exact function names.
 Rename `fn test_foo_bar()` → `fn foo_bar_expected()` using search-replace.
 
 #### D-06: Missing //! on lua_api file
-First line of `src/lua_api/<module>_api.rs` must be: `//! <module> Lua API — registers luna.<module>.* bindings.`
+First line of `src/lua_api/<module>_api.rs` must be: `//! <module> Lua API — registers lurek.<module>.* bindings.`
 
 #### D-08: Rustdoc sections in lua_api
 Find `# Parameters` / `# Returns` in `src/lua_api/<module>_api.rs`.
@@ -356,7 +356,7 @@ The `stdout` report format (without `--docs-quality`) shows:
 
 ```
 ════════════════════════════════════════════════════════
-  LUNA2D MODULE AUDIT: <module> -- FAIL
+  LUREK2D MODULE AUDIT: <module> -- FAIL
 ════════════════════════════════════════════════════════
 
   Phase 1 - Structure & Registration

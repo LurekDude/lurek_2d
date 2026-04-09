@@ -1,4 +1,4 @@
-//! Registers the `luna.localization.*` internationalization and localization API.
+//! Registers the `lurek.localization.*` internationalization and localization API.
 //!
 //! Thin Lua bridge that delegates to the [`localization`][crate::localization] domain module.
 //! All translation tables, fallback logic, interpolation, and pluralization live
@@ -69,7 +69,7 @@ fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, Str
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `luna.localization.*`.
+/// Registers `lurek.localization.*`.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

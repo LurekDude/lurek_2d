@@ -4,17 +4,17 @@ A programming-puzzle game where you assemble a command sequence to guide a robot
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — drawing the grid, command slots, and UI panels
-- `luna.gfx.print()` — labelling commands, level names, and status messages
-- `luna.mouse.getPosition()` / `luna.mousepressed()` — palette selection and program slot clicking
-- `luna.keyboard.isDown()` — run, reset, and quit key handling
-- `luna.time.getTime()` — step execution timing and animation lerp
-- `luna.gfx.setColor()` — colour-coded command blocks and robot direction indicator
+- `lurek.gfx.rectangle()` — drawing the grid, command slots, and UI panels
+- `lurek.gfx.print()` — labelling commands, level names, and status messages
+- `lurek.mouse.getPosition()` / `lurek.mousepressed()` — palette selection and program slot clicking
+- `lurek.keyboard.isDown()` — run, reset, and quit key handling
+- `lurek.time.getTime()` — step execution timing and animation lerp
+- `lurek.gfx.setColor()` — colour-coded command blocks and robot direction indicator
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/logic_game
+cargo run -- content/demos/logic_game
 ```
 
 ## Controls

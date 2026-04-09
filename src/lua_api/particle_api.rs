@@ -943,7 +943,7 @@ impl LuaUserData for LuaTrail {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.particles` API table with the Lua VM.
+/// Registers the `lurek.particles` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
@@ -992,7 +992,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- Flat wrapper helpers --
-    // These forward the flat `luna.particles.X(ps, ...)` style to the OOP UserData methods.
+    // These forward the flat `lurek.particles.X(ps, ...)` style to the OOP UserData methods.
     // They accept (LuaAnyUserData, LuaMultiValue) and call the method via the registry.
     let flat_methods: &[&str] = &[
         "update", "emit", "start", "stop", "pause", "resume", "reset", "moveTo",

@@ -1,10 +1,10 @@
 ---
-description: "**Planner** — Decompose complex Luna2D tasks into sequenced phases with risk and dependency analysis. Produces an actionable plan with agent assignments and done-when gates. Does not implement code."
+description: "**Planner** — Decompose complex Lurek2D tasks into sequenced phases with risk and dependency analysis. Produces an actionable plan with agent assignments and done-when gates. Does not implement code."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Planner
 ---
 
-# PLANNER — LUNA2D TASK DECOMPOSITION
+# PLANNER — LUREK2D TASK DECOMPOSITION
 
 ## MISSION
 
@@ -55,7 +55,7 @@ Every Planner output is a plan document containing:
 - No phase has an ambiguous done-when gate
 - All cross-phase dependencies are explicit
 - At least one parallel opportunity identified for tasks with 4+ phases
-- Risks are Luna2D-specific, not generic engineering platitudes
+- Risks are Lurek2D-specific, not generic engineering platitudes
 - Plan fits on one screen — no phase needs sub-phases to be clear
 - Plan is executable without further clarification from Planner
 

@@ -1,21 +1,21 @@
 //! Integration tests for Phase 24 graphics extension types.
 
-use luna2d::animation::{AnimEvent, Animation};
-use luna2d::camera::Camera2D;
-use luna2d::camera::{ScaleMode, Viewport, ViewportScale};
-use luna2d::graphics::decal_surface::DecalSurface;
-use luna2d::graphics::draw_layer::DrawLayer;
-use luna2d::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
-use luna2d::graphics::texture_atlas::TextureAtlas;
-use luna2d::gui::data_graph_renderer::GraphRenderer;
-use luna2d::image::palette_lut::PaletteLUT;
-use luna2d::light::light2d::Light2D;
-use luna2d::math::Color;
-use luna2d::math::Rect;
-use luna2d::particle::trail::Trail;
-use luna2d::raycaster::column_batch::ColumnBatch;
-use luna2d::tilemap::large_map_renderer::LargeMapRenderer;
-use luna2d::tilemap::polygon_map::PolygonMap;
+use lurek2d::animation::{AnimEvent, Animation};
+use lurek2d::camera::Camera2D;
+use lurek2d::camera::{ScaleMode, Viewport, ViewportScale};
+use lurek2d::graphics::decal_surface::DecalSurface;
+use lurek2d::graphics::draw_layer::DrawLayer;
+use lurek2d::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
+use lurek2d::graphics::texture_atlas::TextureAtlas;
+use lurek2d::gui::data_graph_renderer::GraphRenderer;
+use lurek2d::image::palette_lut::PaletteLUT;
+use lurek2d::light::light2d::Light2D;
+use lurek2d::math::Color;
+use lurek2d::math::Rect;
+use lurek2d::particle::trail::Trail;
+use lurek2d::raycaster::column_batch::ColumnBatch;
+use lurek2d::tilemap::large_map_renderer::LargeMapRenderer;
+use lurek2d::tilemap::polygon_map::PolygonMap;
 
 // ═════════════════════════════════════════════════════════════════════════
 // 1. Light2D

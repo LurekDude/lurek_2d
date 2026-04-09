@@ -3,7 +3,7 @@
 /// Validates cellular automata, flood fill, Poisson disk, and Voronoi
 /// generation functions. All tests are headless with no GPU or audio
 /// requirements.
-use luna2d::procgen::{
+use lurek2d::procgen::{
     cellular_automata, flood_fill, perlin_noise_periodic, poisson_disk, voronoi_diagram,
     CellularOpts, VoronoiOpts,
 };

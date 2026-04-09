@@ -10,12 +10,12 @@ A turn-based dungeon crawler with procedural BSP room generation, fog-of-war, bu
 - Bump-to-attack combat: moving into an occupied cell triggers a melee exchange
 - Entity lists for enemies and pickups with dead-entity cleanup each turn
 - Message log: most recent 5 messages displayed as a scrolling list
-- `luna.input.keypressed` callback driving single-step movement
+- `lurek.input.keypressed` callback driving single-step movement
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/roguelike
+cargo run -- content/demos/roguelike
 ```
 
 ## Controls

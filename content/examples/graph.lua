@@ -1,14 +1,12 @@
 -- examples/graph.lua
--- luna.graph — Directed item-flow graph simulation: nodes, edges,
+-- lurek.graph — Directed item-flow graph simulation: nodes, edges,
 -- GraphItems travelling between nodes, conversion rules, events.
--- All luna.graph API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── Graph Creation ────────────────────────────────────────────────────────────
 
 -- newGraph() → Graph
 -- Models a resource-flow network: mines → smelters → warehouses.
-local graph = luna.graph.newGraph()
+local graph = lurek.graph.newGraph()
 
 -- ── Adding Nodes ──────────────────────────────────────────────────────────────
 
@@ -27,7 +25,7 @@ local nodes = graph:getNodes()
 local nc = graph:getNodeCount()
 
 -- removeNode(node) → boolean  — also removes connected edges
--- graph:removeNode(mine)
+graph:removeNode(mine)
 
 -- ── Node Configuration ────────────────────────────────────────────────────────
 
@@ -106,10 +104,10 @@ smelter:setProcessTime(2.0)   -- 2 seconds to smelt ore
 smelter:setConversion("ore", "ingot", 2, 1)   -- 2 ore → 1 ingot
 
 -- clearConversion(inType)
--- smelter:clearConversion("ore")
+smelter:clearConversion("ore")
 
 -- clearAllConversions()
--- smelter:clearAllConversions()
+smelter:clearAllConversions()
 
 -- ── Tags ─────────────────────────────────────────────────────────────────────
 
@@ -128,12 +126,12 @@ mine:addSupply("ore", 10)   -- supplies 10 ore per cycle
 smelter:addDemand("ore", 2, 10)   -- needs 2 ore, priority 10
 
 -- removeSupply(type) / clearSupplies()
--- mine:removeSupply("ore")
--- mine:clearSupplies()
+mine:removeSupply("ore")
+mine:clearSupplies()
 
 -- removeDemand(type) / clearDemands()
--- smelter:removeDemand("ore")
--- smelter:clearDemands()
+smelter:removeDemand("ore")
+smelter:clearDemands()
 
 -- ── Adding Edges ─────────────────────────────────────────────────────────────
 
@@ -154,7 +152,7 @@ local all_edges = graph:getEdges()
 local out_edges = mine:getEdges("out")
 
 -- removeEdge(edge) → boolean
--- graph:removeEdge(edge_mine_smelter)
+graph:removeEdge(edge_mine_smelter)
 
 -- hasEdge(from, to) → boolean
 local connected = graph:hasEdge(mine, smelter)  -- true
@@ -201,8 +199,8 @@ local transit = edge_mine_smelter:getItemsInTransit()
 -- Allowed item type filter
 edge_mine_smelter:addAllowedType("ore")
 local allowed = edge_mine_smelter:isItemTypeAllowed("ore")  -- true
--- edge_mine_smelter:removeAllowedType("ore")
--- edge_mine_smelter:clearAllowedTypes()
+edge_mine_smelter:removeAllowedType("ore")
+edge_mine_smelter:clearAllowedTypes()
 
 -- ── Items ────────────────────────────────────────────────────────────────────
 
@@ -211,7 +209,7 @@ local allowed = edge_mine_smelter:isItemTypeAllowed("ore")  -- true
 local ore = graph:addItem("ore", mine)
 
 -- removeItem(item)
--- graph:removeItem(ore)
+graph:removeItem(ore)
 
 -- getItems() → table  — all items in the graph
 local all_items = graph:getItems()
@@ -237,7 +235,7 @@ local life = ore:getRemainingLife()
 local alive = ore:isAlive()
 
 -- kill() — immediately remove the item from the graph
--- ore:kill()
+ore:kill()
 
 -- getPriority() / setPriority(n)
 ore:setPriority(5)
@@ -299,7 +297,7 @@ end)
 
 -- update(dt)  — advance all items, check conversions, fire events
 --[[
-function luna.process(dt)
+function lurek.process(dt)
     graph:update(dt)
 end
 ]]
@@ -307,7 +305,7 @@ end
 -- ── Simulation Query ─────────────────────────────────────────────────────────
 
 -- findPath(fromNode, toNode) → {node1, node2, ...}? — shortest path by weight
--- local path_nodes = graph:findPath(mine, warehouse)
+local path_nodes = graph:findPath(mine, warehouse)
 
 -- ─── Edge ──────────────────────────────────────────────────────────────────────
 

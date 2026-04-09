@@ -7,13 +7,13 @@ distribution archives, and installing the engine locally.
 
 | Script | Platform | Purpose |
 |---|---|---|
-| `dist.ps1` | Windows | Release build → `dist/luna2d-windows-x86_64/` + `.zip` |
-| `dist.sh` | Linux / macOS | Release build → `dist/luna2d-<os>-<arch>/` + `.tar.gz` |
-| `install.ps1` | Windows | Install `luna.exe` to user PATH |
-| `install.sh` | Linux / macOS | Install `luna2d` to `/usr/local/bin` |
-| `installer.nsi` | Windows | NSIS installer script → `dist/luna2d-*-setup.exe` |
-| `pack.ps1` | Windows | Pack a game folder into a `.lunar` archive (PowerShell) |
-| `pack.py` | Cross-platform | Pack a game folder into a `.lunar` archive (Python) |
+| `dist.ps1` | Windows | Release build → `dist/lurek2d-windows-x86_64/` + `.zip` |
+| `dist.sh` | Linux / macOS | Release build → `dist/lurek2d-<os>-<arch>/` + `.tar.gz` |
+| `install.ps1` | Windows | Install `lurek.exe` to user PATH |
+| `install.sh` | Linux / macOS | Install `lurek2d` to `/usr/local/bin` |
+| `installer.nsi` | Windows | NSIS installer script → `dist/lurek2d-*-setup.exe` |
+| `pack.ps1` | Windows | Pack a game folder into a `.lurek` archive (PowerShell) |
+| `pack.py` | Cross-platform | Pack a game folder into a `.lurek` archive (Python) |
 
 ## Common usage
 
@@ -36,6 +36,6 @@ powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1
 # Install locally (Linux / macOS)
 bash tools/dist/install.sh
 
-# Pack a game as .lunar archive
-python tools/dist/pack.py demos/hello_world/ hello_world.lunar
+# Pack a game as .lurek archive
+python tools/dist/pack.py content/demos/hello_world/ hello_world.lurek
 ```

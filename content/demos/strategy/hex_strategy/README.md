@@ -4,19 +4,19 @@ A turn-based hex-grid strategy game where you expand a civilisation across proce
 
 ## What It Demonstrates
 
-- `luna.math.simplex2d()` — two-octave noise layers that determine terrain type per hex
-- `luna.mouse.getPosition()` / `luna.mousepressed()` — pixel-to-hex coordinate conversion for tile selection
-- `luna.keyboard.wasPressed()` — `C` to place a city, `N` to end the turn
-- `luna.gfx.polygon()` — flat-top hexagon rendering for both fill and outline passes
-- `luna.gfx.setColor()` — per-terrain colour lookup and selection highlight
-- `luna.gfx.print()` — resource HUD panel and hex info tooltip
-- `luna.window.setTitle()` — window caption set at load time
+- `lurek.math.simplex2d()` — two-octave noise layers that determine terrain type per hex
+- `lurek.mouse.getPosition()` / `lurek.mousepressed()` — pixel-to-hex coordinate conversion for tile selection
+- `lurek.keyboard.wasPressed()` — `C` to place a city, `N` to end the turn
+- `lurek.gfx.polygon()` — flat-top hexagon rendering for both fill and outline passes
+- `lurek.gfx.setColor()` — per-terrain colour lookup and selection highlight
+- `lurek.gfx.print()` — resource HUD panel and hex info tooltip
+- `lurek.window.setTitle()` — window caption set at load time
 - Cube-coordinate hex math — `hexToPixel` / `pixelToHex` with proper cube rounding for accurate selection
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/hex_strategy
+cargo run -- content/demos/hex_strategy
 ```
 
 ## Controls
@@ -31,6 +31,6 @@ cargo run -- demos/hex_strategy
 ## Notes
 
 - The map uses flat-top axial coordinates with a radius of 5, producing 91 hexes
-- `luna.math.simplex2d()` is sampled at two frequencies: one for elevation (water/mountain) and one for biome (forest/desert)
+- `lurek.math.simplex2d()` is sampled at two frequencies: one for elevation (water/mountain) and one for biome (forest/desert)
 - Each city gathers resources from its own hex plus all six neighbours each turn
 - Cities cost gold and wood; placing one on a water tile is blocked by terrain type

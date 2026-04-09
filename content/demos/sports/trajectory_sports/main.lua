@@ -1,7 +1,7 @@
 -- Trajectory Sports (Golf / Artillery)
 -- Aim with mouse, hold Space to charge power, release to shoot.
 -- 3 holes of increasing difficulty with wind.
--- Run with: cargo run -- demos/sports/trajectory_sports
+-- Run with: cargo run -- content/demos/sports/trajectory_sports
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -76,7 +76,7 @@ local function new_hole(hole_num)
     skid_trails = {}
 end
 
-function luna.init()
+function lurek.init()
     state.current_hole = 1
     state.total_holes = 3
     state.strokes = 0
@@ -88,7 +88,7 @@ function luna.init()
     new_hole(1)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if state.game_over then return end
 
     if state.hole_complete then
@@ -108,7 +108,7 @@ function luna.process(dt)
     end
 
     -- charging power
-    if luna.keyboard.isDown("space") and not ball.moving then
+    if lurek.keyboard.isDown("space") and not ball.moving then
         state.charging = true
         state.power = clamp(state.power + dt * 400, 0, 500)
     end
@@ -161,15 +161,15 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
 end
 
-function luna.keyreleased(key)
+function lurek.keyreleased(key)
     if key == "space" and state.charging and not ball.moving then
         state.charging = false
-        local mx, my = luna.mouse.getPosition()
+        local mx, my = lurek.mouse.getPosition()
         local angle = math.atan2(my - ball.y, mx - ball.x)
         ball.vx = math.cos(angle) * state.power
         ball.vy = math.sin(angle) * state.power
@@ -180,102 +180,102 @@ function luna.keyreleased(key)
     end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.15, 0.2, 0.35)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- sky gradient bands
     for i = 0, 5 do
         local t = i / 5
-        luna.gfx.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
-        luna.gfx.rectangle("fill", 0, i * 60, W, 60)
+        lurek.gfx.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
+        lurek.gfx.rectangle("fill", 0, i * 60, W, 60)
     end
 
     -- terrain fill
-    luna.gfx.setColor(0.2, 0.5, 0.2, 1)
+    lurek.gfx.setColor(0.2, 0.5, 0.2, 1)
     for i = 1, #terrain - 1 do
         local a, b = terrain[i], terrain[i + 1]
-        luna.gfx.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
+        lurek.gfx.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
     end
 
     -- terrain outline
-    luna.gfx.setColor(0.3, 0.65, 0.3, 1)
-    luna.gfx.setLineWidth(2)
+    lurek.gfx.setColor(0.3, 0.65, 0.3, 1)
+    lurek.gfx.setLineWidth(2)
     for i = 1, #terrain - 1 do
-        luna.gfx.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
+        lurek.gfx.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
     end
 
     -- hole/target
     local hole = holes[state.current_hole]
     if hole then
-        luna.gfx.setColor(0.1, 0.1, 0.1, 1)
-        luna.gfx.circle("fill", hole.x, hole.y, hole.radius)
-        luna.gfx.setColor(1, 0.8, 0, 1)
-        luna.gfx.circle("line", hole.x, hole.y, hole.radius)
+        lurek.gfx.setColor(0.1, 0.1, 0.1, 1)
+        lurek.gfx.circle("fill", hole.x, hole.y, hole.radius)
+        lurek.gfx.setColor(1, 0.8, 0, 1)
+        lurek.gfx.circle("line", hole.x, hole.y, hole.radius)
         -- flag
-        luna.gfx.setColor(1, 0.2, 0.2, 1)
-        luna.gfx.line(hole.x, hole.y - 30, hole.x, hole.y)
-        luna.gfx.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
+        lurek.gfx.setColor(1, 0.2, 0.2, 1)
+        lurek.gfx.line(hole.x, hole.y - 30, hole.x, hole.y)
+        lurek.gfx.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
     end
 
     -- skid marks
-    luna.gfx.setColor(0.15, 0.35, 0.15, 0.6)
+    lurek.gfx.setColor(0.15, 0.35, 0.15, 0.6)
     for _, s in ipairs(skid_trails) do
-        luna.gfx.circle("fill", s.x, s.y, 2)
+        lurek.gfx.circle("fill", s.x, s.y, 2)
     end
 
     -- ball
     if not state.hole_complete then
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.circle("fill", ball.x, ball.y, ball.radius)
-        luna.gfx.setColor(0.8, 0.8, 0.8, 1)
-        luna.gfx.circle("line", ball.x, ball.y, ball.radius)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.circle("fill", ball.x, ball.y, ball.radius)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+        lurek.gfx.circle("line", ball.x, ball.y, ball.radius)
     end
 
     -- aim line
     if not ball.moving and not state.hole_complete and not state.game_over then
-        local mx, my = luna.mouse.getPosition()
-        luna.gfx.setColor(1, 1, 1, 0.4)
-        luna.gfx.setLineWidth(1)
-        luna.gfx.line(ball.x, ball.y, mx, my)
+        local mx, my = lurek.mouse.getPosition()
+        lurek.gfx.setColor(1, 1, 1, 0.4)
+        lurek.gfx.setLineWidth(1)
+        lurek.gfx.line(ball.x, ball.y, mx, my)
     end
 
     -- power bar
-    luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    luna.gfx.rectangle("fill", 20, 20, 160, 20)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.gfx.rectangle("fill", 20, 20, 160, 20)
     local pf = state.power / 500
     local pr = clamp(pf * 2, 0, 1)
     local pg = clamp(2 - pf * 2, 0, 1)
-    luna.gfx.setColor(pr, pg, 0, 1)
-    luna.gfx.rectangle("fill", 22, 22, 156 * pf, 16)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Power", 70, 22)
+    lurek.gfx.setColor(pr, pg, 0, 1)
+    lurek.gfx.rectangle("fill", 22, 22, 156 * pf, 16)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Power", 70, 22)
 
     -- wind arrow
     local wind_str = "Wind: "
     if state.wind > 0 then wind_str = wind_str .. ">>>" else wind_str = wind_str .. "<<<" end
-    luna.gfx.setColor(0.7, 0.9, 1, 1)
-    luna.gfx.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
+    lurek.gfx.setColor(0.7, 0.9, 1, 1)
+    lurek.gfx.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
-    luna.gfx.print("Strokes: " .. state.hole_strokes, 20, 95)
-    luna.gfx.print("Total: " .. state.strokes, 20, 115)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
+    lurek.gfx.print("Strokes: " .. state.hole_strokes, 20, 95)
+    lurek.gfx.print("Total: " .. state.strokes, 20, 115)
 
     -- distance to hole
     if hole and not state.hole_complete then
         local dist = math.floor(math.abs(ball.x - hole.x))
-        luna.gfx.print("Distance: " .. dist .. "px", 20, 135)
+        lurek.gfx.print("Distance: " .. dist .. "px", 20, 135)
     end
 
     -- message
     if state.message ~= "" and (state.hole_complete or state.game_over) then
-        luna.gfx.setColor(1, 1, 0.3, 1)
-        luna.gfx.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
+        lurek.gfx.setColor(1, 1, 0.3, 1)
+        lurek.gfx.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
     end
 
     -- controls
-    luna.gfx.setColor(0.6, 0.6, 0.6, 0.6)
-    luna.gfx.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 80, 10)
+    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.6)
+    lurek.gfx.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 80, 10)
 end

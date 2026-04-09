@@ -1,4 +1,4 @@
-//! YAML parsing and serialization for Luna2D.
+//! YAML parsing and serialization for Lurek2D.
 //!
 //! Converts between YAML strings and `SerialValue` using `serde_yml`.
 

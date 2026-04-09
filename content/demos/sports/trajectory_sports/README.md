@@ -10,12 +10,12 @@ A three-hole golf/artillery challenge on procedurally generated sine-wave terrai
 - Terrain-normal bounce: surface normal computed from adjacent terrain points to reflect the ball on impact
 - Three-hole progression with per-hole increasing wind magnitude
 - Shot trail rendered as a polyline of `trail` position samples
-- `luna.mouse.getPosition()` used to aim the launch direction vector
+- `lurek.mouse.getPosition()` used to aim the launch direction vector
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/trajectory_sports
+cargo run -- content/demos/trajectory_sports
 ```
 
 ## Controls

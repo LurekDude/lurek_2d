@@ -4,19 +4,19 @@ A top-down arcade racing game on a procedurally generated oval track. Compete ag
 
 ## What It Demonstrates
 
-- `luna.gfx.polygon()` — tessellated track outer edge and car body rendering
-- `luna.gfx.rectangle()` — boost zone highlight and HUD panels
-- `luna.gfx.setColor()` — per-car colour differentiation and skid-mark fade
-- `luna.gfx.print()` — lap counter, race time, best lap, and position HUD
-- `luna.keyboard.isDown()` — analogue-style throttle, brake, and steering input each frame
-- `luna.gfx.line()` — skid mark trail drawn as point history
-- `luna.gfx.circle()` — checkpoint and boost zone radius indicators
-- `luna.gfx.setBackgroundColor()` — dark asphalt track background
+- `lurek.gfx.polygon()` — tessellated track outer edge and car body rendering
+- `lurek.gfx.rectangle()` — boost zone highlight and HUD panels
+- `lurek.gfx.setColor()` — per-car colour differentiation and skid-mark fade
+- `lurek.gfx.print()` — lap counter, race time, best lap, and position HUD
+- `lurek.keyboard.isDown()` — analogue-style throttle, brake, and steering input each frame
+- `lurek.gfx.line()` — skid mark trail drawn as point history
+- `lurek.gfx.circle()` — checkpoint and boost zone radius indicators
+- `lurek.gfx.setBackgroundColor()` — dark asphalt track background
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/drift_racing
+cargo run -- content/demos/drift_racing
 ```
 
 ## Controls

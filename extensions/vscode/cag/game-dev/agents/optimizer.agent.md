@@ -1,6 +1,6 @@
 ---
 description: >
-  Profile and optimize Lua game code for Luna2D. Identifies LuaJIT hot-path issues,
+  Profile and optimize Lua game code for Lurek2D. Identifies LuaJIT hot-path issues,
   allocation patterns, and rendering bottlenecks. Produces optimization reports.
 model: claude-sonnet-4-5
 tools:

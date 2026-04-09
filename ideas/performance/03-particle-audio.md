@@ -124,7 +124,7 @@ Playback (rodio manages its own output thread)
 
 ### Bottleneck: Synchronous Audio Decoding
 
-When `luna.audio.newSource(path, "static")` is called:
+When `lurek.audio.newSource(path, "static")` is called:
 1. File is read from disk synchronously
 2. Entire file is decoded to PCM synchronously
 3. Result stored in `Arc<Vec<u8>>`
@@ -145,7 +145,7 @@ pub fn load_source_async(&mut self, path: &str) -> AudioLoadHandle {
 }
 
 // Polling from Lua:
-// local snd = luna.audio.newSourceAsync("music.ogg")
+// local snd = lurek.audio.newSourceAsync("music.ogg")
 // if snd:isReady() then snd:play() end
 ```
 
@@ -183,16 +183,16 @@ play("music.ogg")
                              ...
 ```
 
-rodio already supports `Decoder<BufReader<File>>` for streaming, but Luna2D
+rodio already supports `Decoder<BufReader<File>>` for streaming, but Lurek2D
 currently forces full decode for "static" sources.
 
 **Solution**: Add a "stream" source type that uses rodio's native streaming:
 ```lua
-local music = luna.audio.newSource("music.ogg", "stream")
+local music = lurek.audio.newSource("music.ogg", "stream")
 music:play()  -- Immediate, decodes incrementally
 ```
 
-Luna2D already has this concept (`SourceType::Stream`) but it re-opens the
+Lurek2D already has this concept (`SourceType::Stream`) but it re-opens the
 file on each play and decodes from the main thread's perspective.
 
 ### Opportunity 3: Audio Thread for Effect Processing (Effort: High)
@@ -221,15 +221,15 @@ sounds plus DSP effects. Most 2D games won't hit this.
 ### Opportunity 4: Pre-decode Audio Pool at Startup (Effort: Low)
 
 Instead of decoding on first play, decode all audio files during
-`luna.load()` using multiple threads:
+`lurek.load()` using multiple threads:
 
 ```lua
-function luna.init()
+function lurek.init()
   -- These all decode in parallel on background threads
   local futures = {
-    luna.audio.preloadAsync("sfx/hit.wav"),
-    luna.audio.preloadAsync("sfx/jump.wav"),
-    luna.audio.preloadAsync("music/theme.ogg"),
+    lurek.audio.preloadAsync("sfx/hit.wav"),
+    lurek.audio.preloadAsync("sfx/jump.wav"),
+    lurek.audio.preloadAsync("music/theme.ogg"),
   }
   -- Wait for all to complete
   for _, f in ipairs(futures) do f:wait() end

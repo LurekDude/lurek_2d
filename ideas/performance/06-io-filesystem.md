@@ -4,7 +4,7 @@
 
 ### AsyncLoader (src/filesystem/async_loader.rs)
 
-Luna2D already has a background file loading system:
+Lurek2D already has a background file loading system:
 
 ```
 Main Thread                     AsyncLoader Worker Thread
@@ -140,7 +140,7 @@ Most 2D games use textures ≤ 512×512 where full loading is fast.
 ## Opportunity 4: Write-Behind for Save Files (Effort: Low)
 
 ### Problem
-`luna.fs.write()` and `luna.savegame.save()` block the main thread
+`lurek.fs.write()` and `lurek.savegame.save()` block the main thread
 during disk I/O. Large save files (100KB+) can cause frame drops.
 
 ### Solution
@@ -166,8 +166,8 @@ pub fn write_async(&self, path: &str, data: Vec<u8>) -> WriteHandle {
 ## Opportunity 5: Directory Scanning Parallelism (Effort: Low)
 
 ### Problem
-`luna.fs.getDirectoryItems()` scans directories synchronously.
-`luna.modding.scan()` reads mod manifests from disk sequentially.
+`lurek.fs.getDirectoryItems()` scans directories synchronously.
+`lurek.modding.scan()` reads mod manifests from disk sequentially.
 
 ### Solution
 Use rayon to parallelize directory scanning:
@@ -207,11 +207,11 @@ Script loading must remain synchronous — Lua execution order matters.
 However, **asset preloading** triggered by scripts can be async:
 
 ```lua
-function luna.init()
+function lurek.init()
     -- These should return immediately, load in background
-    local img1 = luna.gfx.newImageAsync("player.png")
-    local img2 = luna.gfx.newImageAsync("enemy.png")
-    local snd1 = luna.audio.newSourceAsync("music.ogg")
+    local img1 = lurek.gfx.newImageAsync("player.png")
+    local img2 = lurek.gfx.newImageAsync("enemy.png")
+    local snd1 = lurek.audio.newSourceAsync("music.ogg")
 
     -- Game loop polls readiness
     -- Engine shows loading screen until all ready
@@ -226,10 +226,10 @@ end
 ```
 Startup:
   [conf.lua sync] → [create window sync] → [GPU init sync]
-  → [main.lua sync] → [luna.load() sync]
+  → [main.lua sync] → [lurek.load() sync]
   → event loop
 
-Asset Loading (during luna.load):
+Asset Loading (during lurek.load):
   [read file 1 sync] → [decode sync] → [GPU upload sync]
   → [read file 2 sync] → [decode sync] → [GPU upload sync]
   → ... (serial, one at a time)
@@ -239,10 +239,10 @@ Asset Loading (during luna.load):
 ```
 Startup:
   [conf.lua sync] → [create window sync] → [GPU init sync]
-  → [main.lua sync] → [luna.load() sync]
+  → [main.lua sync] → [lurek.load() sync]
   → event loop
 
-Asset Loading (during luna.load):
+Asset Loading (during lurek.load):
   [request file 1 async] ─→ Worker 1: [read + decode]
   [request file 2 async] ─→ Worker 2: [read + decode]
   [request file 3 async] ─→ Worker 1: [read + decode]

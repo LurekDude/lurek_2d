@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-validate_agent_md.py — Luna2D AGENT.md validation and scaffolding tool.
+validate_agent_md.py — Lurek2D AGENT.md validation and scaffolding tool.
 
 Validates that every src/<module>/AGENT.md has all required sections,
 meets content quality standards, and stays in sync with the source files
@@ -166,7 +166,7 @@ def _lua_api_path(module: str) -> Optional[Path]:
 
 def _lua_exposed_fns(module: str) -> List[str]:
     """
-    Scan the Lua API source for tbl.set("name", ...) or luna.set("name", ...)
+    Scan the Lua API source for tbl.set("name", ...) or lurek.set("name", ...)
     patterns to list exposed function names.
     """
     api = _lua_api_path(module)
@@ -362,7 +362,7 @@ def scaffold(module: str) -> str:
     module_dir = SRC / module
     tier       = _tier_label(module)
     api_path   = _lua_api_path(module)
-    lua_ns     = f"luna.{module}" if api_path else "—"
+    lua_ns     = f"lurek.{module}" if api_path else "—"
 
     # Collect source files
     rs_files = _rs_files(module_dir)
@@ -524,12 +524,12 @@ def scaffold(module: str) -> str:
             "",
             "```lua",
             f"-- Example: Basic {module} usage",
-            "function luna.load()",
+            "function lurek.load()",
             f"    -- TODO: replace with real {module} setup",
             f"    local obj = {lua_ns}.{first_fn}()",
             "end",
             "",
-            "function luna.update(dt)",
+            "function lurek.update(dt)",
             "    -- TODO: update logic",
             "end",
             "```",
@@ -643,7 +643,7 @@ def main() -> int:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     ap = argparse.ArgumentParser(
-        description="Validate and scaffold AGENT.md files for Luna2D src/ modules.",
+        description="Validate and scaffold AGENT.md files for Lurek2D src/ modules.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     ap.add_argument("--module", "-m", nargs="+", metavar="NAME",

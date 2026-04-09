@@ -1,12 +1,12 @@
 //! Cryptographic hash functions for data integrity verification.
 //!
-//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! This module is part of Lurek2D's `data` subsystem and provides the implementation
 //! details for hash-related operations and data management.
 //! Key types exported from this module: `HashAlgorithm`.
 //! Primary functions: `parse_str()`, `hash()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use md5::Digest;
 use sha1;

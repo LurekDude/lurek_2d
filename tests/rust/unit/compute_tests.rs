@@ -1,8 +1,8 @@
-//! Integration tests for `luna2d::compute` — N-dimensional array operations.
+//! Integration tests for `lurek2d::compute` — N-dimensional array operations.
 
-use luna2d::compute::ops;
-use luna2d::compute::spatial;
-use luna2d::compute::*;
+use lurek2d::compute::ops;
+use lurek2d::compute::spatial;
+use lurek2d::compute::*;
 
 // ===========================================================================
 // Helpers

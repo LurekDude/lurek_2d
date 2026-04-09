@@ -1,4 +1,4 @@
-//! `luna.physics` — Rigid-body physics simulation, collision detection, joints, and raycasting.
+//! `lurek.physics` — Rigid-body physics simulation, collision detection, joints, and raycasting.
 
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -1312,8 +1312,8 @@ struct LuaPhysicsShapeData {
 
 /// Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 ///
-/// Created via `luna.physics.newCircleShape`, `newRectangleShape`, etc.
-/// Attach to a body with `luna.physics.attachShape(body, shape)`.
+/// Created via `lurek.physics.newCircleShape`, `newRectangleShape`, etc.
+/// Attach to a body with `lurek.physics.attachShape(body, shape)`.
 #[derive(Clone)]
 pub struct LuaPhysicsShape {
     inner: Rc<RefCell<LuaPhysicsShapeData>>,
@@ -1441,7 +1441,7 @@ impl LuaUserData for LuaPhysicsShape {
 // Registration
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.physics` API namespace.
+/// Registers the `lurek.physics` API namespace.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

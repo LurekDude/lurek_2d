@@ -1,16 +1,16 @@
-//! Integration tests for the Luna2D audio system.
+//! Integration tests for the Lurek2D audio system.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::audio::Bus;
-use luna2d::audio::MidiPlayer;
-use luna2d::audio::Mixer;
-use luna2d::audio::PlayState;
-use luna2d::audio::SourceType;
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::audio::Bus;
+use lurek2d::audio::MidiPlayer;
+use lurek2d::audio::Mixer;
+use lurek2d::audio::PlayState;
+use lurek2d::audio::SourceType;
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_audio_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -51,7 +51,7 @@ fn phase01_released_audio_handle_reuse_reports_invalid_source() {
 
     assert_lua_error_contains(
         result,
-        "luna.audio.setVolume: invalid or already-released audio source handle",
+        "lurek.audio.setVolume: invalid or already-released audio source handle",
     );
 }
 
@@ -613,8 +613,8 @@ fn mixer_tell_after_stop_is_zero() {
 #[test]
 fn audio_seek_invalid_id_is_noop_via_lua() {
     // seek on a non-existent source should return a runtime error, not panic.
-    use luna2d::engine::config::Config;
-    use luna2d::lua_api::{create_lua_vm, SharedState};
+    use lurek2d::engine::config::Config;
+    use lurek2d::lua_api::{create_lua_vm, SharedState};
     use std::cell::RefCell;
     use std::path::PathBuf;
     use std::rc::Rc;
@@ -628,7 +628,7 @@ fn audio_seek_invalid_id_is_noop_via_lua() {
     let lua = create_lua_vm(state, &Config::default().modules).expect("Lua VM");
 
     // seek on handle 0 (invalid) should produce a runtime error, not a panic.
-    let _ = lua.load(r#"luna.audio.seek(0, 0.0)"#).exec();
+    let _ = lua.load(r#"lurek.audio.seek(0, 0.0)"#).exec();
 }
 
 // ===========================================================================
@@ -923,7 +923,7 @@ fn audio_set_source_orientation_round_trips() {
 
 #[test]
 fn decoder_loads_wav_fixture() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert_eq!(d.sample_rate, 44100);
     assert_eq!(d.channels, 1);
 }
@@ -931,7 +931,7 @@ fn decoder_loads_wav_fixture() {
 #[test]
 fn decoder_decode_returns_chunk() {
     let mut d =
-        luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 512).unwrap();
+        lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 512).unwrap();
     let chunk = d.decode();
     assert!(chunk.is_some());
     let c = chunk.unwrap();
@@ -941,7 +941,7 @@ fn decoder_decode_returns_chunk() {
 #[test]
 fn decoder_decode_returns_none_at_eof() {
     let mut d =
-        luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 100_000).unwrap();
+        lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 100_000).unwrap();
     let _ = d.decode(); // consume all
     let eof = d.decode();
     assert!(eof.is_none());
@@ -950,7 +950,7 @@ fn decoder_decode_returns_none_at_eof() {
 #[test]
 fn decoder_rewind_resets_position() {
     let mut d =
-        luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 100_000).unwrap();
+        lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 100_000).unwrap();
     let _ = d.decode();
     d.rewind();
     let after_rewind = d.decode();
@@ -959,52 +959,52 @@ fn decoder_rewind_resets_position() {
 
 #[test]
 fn decoder_get_duration_positive() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert!(d.get_duration() > 0.0);
 }
 
 #[test]
 fn decoder_channel_count_mono_is_1() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert_eq!(d.channels, 1);
 }
 
 #[test]
 fn decoder_sample_rate_returns_positive() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert!(d.sample_rate > 0);
 }
 
 #[test]
 fn decoder_bit_depth_returns_positive() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert!(d.bit_depth > 0);
 }
 
 #[test]
 fn decoder_tell_starts_at_zero() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert!((d.tell() - 0.0).abs() < 1e-6);
 }
 
 #[test]
 fn decoder_tell_advances_after_decode() {
     let mut d =
-        luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+        lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     let _ = d.decode();
     assert!(d.tell() > 0.0);
 }
 
 #[test]
 fn decoder_is_seekable_always_true() {
-    let d = luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+    let d = lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     assert!(d.is_seekable());
 }
 
 #[test]
 fn decoder_seek_then_tell_round_trips() {
     let mut d =
-        luna2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
+        lurek2d::audio::Decoder::from_file("tests/fixtures/sine_mono_44100.wav", 1024).unwrap();
     let target = 0.01;
     d.seek(target);
     assert!((d.tell() - target).abs() < 0.001);
@@ -1070,24 +1070,24 @@ fn queueable_source_stop_drains_buffers() {
 
 #[test]
 fn audio_get_playback_devices_returns_at_least_one() {
-    let devs = luna2d::audio::get_playback_devices();
+    let devs = lurek2d::audio::get_playback_devices();
     assert!(!devs.is_empty(), "must return at least one device");
 }
 
 #[test]
 fn audio_get_playback_device_returns_string() {
-    let name = luna2d::audio::get_playback_device();
+    let name = lurek2d::audio::get_playback_device();
     assert!(!name.is_empty(), "device name must not be empty");
 }
 
 #[test]
 fn audio_set_playback_device_default_ok() {
-    luna2d::audio::set_playback_device("Default").expect("setting Default device should succeed");
+    lurek2d::audio::set_playback_device("Default").expect("setting Default device should succeed");
 }
 
 #[test]
 fn audio_set_playback_device_unknown_errors() {
-    let result = luna2d::audio::set_playback_device("NonExistentDevice___XYZ");
+    let result = lurek2d::audio::set_playback_device("NonExistentDevice___XYZ");
     assert!(
         result.is_err(),
         "unknown device name should return an error"

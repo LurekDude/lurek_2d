@@ -1,4 +1,4 @@
-//! `luna.tilemap` — Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.
+//! `lurek.tilemap` — Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1440,7 +1440,7 @@ impl LuaUserData for LuaMapGen {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.tilemap` API table with the Lua VM.
+/// Registers the `lurek.tilemap` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

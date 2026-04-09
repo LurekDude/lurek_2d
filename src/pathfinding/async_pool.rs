@@ -3,13 +3,13 @@
 //! Pathfinding requests are submitted with an ID and processed on worker
 //! threads. Results are collected via non-blocking [`PathThreadPool::poll`].
 //!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `pathfinding` subsystem and provides the implementation
 //! details for async pool-related operations and data management.
 //! Key types exported from this module: `PathThreadPool`.
 //! Primary functions: `new()`, `submit()`, `poll()`, `cancel()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};

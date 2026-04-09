@@ -35,14 +35,14 @@ function BulletPool:update(dt)
 end
 
 function BulletPool:draw()
-    luna.gfx.setColor(1, 1, 0.3, 1)
+    lurek.gfx.setColor(1, 1, 0.3, 1)
     for i = 1, self.max do
         local b = self.pool[i]
         if b.active then
-            luna.gfx.rectangle("fill", b.x - 2, b.y - 4, 4, 8)
+            lurek.gfx.rectangle("fill", b.x - 2, b.y - 4, 4, 8)
         end
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 
 return BulletPool

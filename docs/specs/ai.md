@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.ai`                                            |
+| **Lua API**    | `lurek.ai`                                            |
 | **Source**      | `src/ai/`                                            |
 | **Rust Tests** | `tests/rust/unit/ai_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_ai.lua`                         |
@@ -20,7 +20,7 @@ The `Blackboard` is the shared-memory substrate: a hierarchical key-value store 
 
 All AI computation is **pure CPU math** — no GPU, audio, or window access required. This means every subsystem can run headlessly in tests without a graphics context. The module depends on `math`, `engine`, and Tier 1 `pathfinding` (for grid, flow-field, and influence-map re-exports). It must not import other Tier 2 modules. Lua callbacks are stored as `mlua::RegistryKey` references. No heap allocation happens per-frame in steady state; vectors are grown at agent/behavior creation time.
 
-Grid pathfinding (`PathGrid`, `Cell`) and flow-field (`FlowField`) types are re-exported from `crate::pathfinding` so that `luna.ai.*` has a unified AI namespace without separate wrapper files. `InfluenceMap` is also re-exported from `crate::pathfinding::InfluenceMap`.
+Grid pathfinding (`PathGrid`, `Cell`) and flow-field (`FlowField`) types are re-exported from `crate::pathfinding` so that `lurek.ai.*` has a unified AI namespace without separate wrapper files. `InfluenceMap` is also re-exported from `crate::pathfinding::InfluenceMap`.
 
 ## Architecture
 
@@ -283,9 +283,9 @@ Mathematical function shapes for response curves: `Linear` (p1×x+p2), `Quadrati
 
 ## Lua API
 
-The full Lua-facing surface is registered in `src/lua_api/ai_api.rs` under the `luna.ai` namespace. The API exposes 19 factory functions for creating AI objects and 10 UserData types with method APIs.
+The full Lua-facing surface is registered in `src/lua_api/ai_api.rs` under the `lurek.ai` namespace. The API exposes 19 factory functions for creating AI objects and 10 UserData types with method APIs.
 
-### Factory Functions (`luna.ai.*`)
+### Factory Functions (`lurek.ai.*`)
 
 | Function | Returns | Description |
 |----------|---------|-------------|
@@ -510,15 +510,15 @@ The full Lua-facing surface is registered in `src/lua_api/ai_api.rs` under the `
 ### FSM-based NPC patrol with steering
 
 ```lua
-function luna.init()
-    world = luna.ai.newWorld()
+function lurek.init()
+    world = lurek.ai.newWorld()
     local agent = world:addAgent("guard")
     agent:setPosition(100, 200)
     agent:setMaxSpeed(80)
     agent:setDecisionModel("fsm+steering")
 
     -- FSM: patrol ↔ chase
-    local fsm = luna.ai.newStateMachine()
+    local fsm = lurek.ai.newStateMachine()
     fsm:addState("patrol", {
         onEnter = function(a) print(a:getName() .. " now patrolling") end,
         onUpdate = function(a, dt) end
@@ -532,11 +532,11 @@ function luna.init()
     fsm:setInitialState("patrol")
 
     -- Steering: seek the patrol waypoint
-    steering = luna.ai.newSteeringManager()
+    steering = lurek.ai.newSteeringManager()
     steering:addSeek(400, 300, 1.0)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     world:update(dt)
 end
 ```
@@ -544,7 +544,7 @@ end
 ### GOAP planning for a woodcutter NPC
 
 ```lua
-local planner = luna.ai.newGOAPPlanner()
+local planner = lurek.ai.newGOAPPlanner()
 
 planner:addAction("chop_tree", 2.0)
 planner:setPrecondition("chop_tree", "has_axe", true)
@@ -570,7 +570,7 @@ end
 ### Q-learner training loop
 
 ```lua
-local ql = luna.ai.newQLearner(16, 4)  -- 16 states, 4 actions
+local ql = lurek.ai.newQLearner(16, 4)  -- 16 states, 4 actions
 ql:setLearningRate(0.2)
 ql:setExplorationRate(0.3)
 
@@ -589,7 +589,7 @@ end
 
 -- Save trained policy
 local json = ql:serialize()
-luna.fs.write("ai_policy.json", json)
+lurek.fs.write("ai_policy.json", json)
 ```
 
 ## Item Summary
@@ -626,4 +626,4 @@ luna.fs.write("ai_policy.json", json)
 - **Steering multi-agent behaviors** — `Pursue`, `Evade`, and `Flock` return `(0, 0)` from `SteeringBehaviorType::calculate()` because they need other agents' positions. These forces are computed at the `AIWorld` level during `update()`.
 - **FormationType strings** — Formations are serialized to/from lowercase Lua strings: `"none"`, `"line"`, `"wedge"`, `"circle"`, `"column"`.
 - **CommandQueue opts table** — `enqueue`, `pushFront`, and `replace` accept an optional table with `targetX`, `targetY`, `priority`, and `interruptible` fields.
-- **Breaking change surface** — Renaming any `luna.ai.new*` factory function or changing UserData method signatures will break Lua game scripts. The Q-learner's 1-based index convention is load-bearing.
+- **Breaking change surface** — Renaming any `lurek.ai.new*` factory function or changing UserData method signatures will break Lua game scripts. The Q-learner's 1-based index convention is load-bearing.

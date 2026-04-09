@@ -4,17 +4,17 @@ A courtroom drama simulation inspired by Ace Attorney. Work through three cases 
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — witness stand, evidence panel, jury progress bar
-- `luna.gfx.print()` — animated typewriter-style testimony text rendering
-- `luna.gfx.setColor()` — flash banners for successful objections and contradiction reveals
-- `luna.keyboard.isPressed()` — state-machine navigation across title, intro, testimony, and verdict screens
-- `luna.signal.quit()` — clean exit triggered from the title screen
-- `luna.gfx.setBackgroundColor()` — courtroom backdrop theming per state
+- `lurek.gfx.rectangle()` — witness stand, evidence panel, jury progress bar
+- `lurek.gfx.print()` — animated typewriter-style testimony text rendering
+- `lurek.gfx.setColor()` — flash banners for successful objections and contradiction reveals
+- `lurek.keyboard.isPressed()` — state-machine navigation across title, intro, testimony, and verdict screens
+- `lurek.signal.quit()` — clean exit triggered from the title screen
+- `lurek.gfx.setBackgroundColor()` — courtroom backdrop theming per state
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/courtroom
+cargo run -- content/demos/courtroom
 ```
 
 ## Controls

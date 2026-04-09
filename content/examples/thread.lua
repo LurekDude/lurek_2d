@@ -1,22 +1,21 @@
 -- examples/thread.lua
--- luna.thread — Background worker threads and inter-thread Channel communication.
--- All luna.thread API methods demonstrated with code and comments.
+-- lurek.thread — Background worker threads and inter-thread Channel communication.
 --
 -- Threading model:
---   The main thread runs the Lua game loop with the full luna.* API.
---   Worker threads get a separate, isolated Lua VM — they cannot share Lua state.
---   All communication goes through typed Channel objects (MPMC queues).
---   Channel values: nil, booleans, numbers, and strings only.
+The main thread runs the Lua game loop with the full lurek.* API.
+Worker threads get a separate, isolated Lua VM  -- they cannot share Lua state.
+All communication goes through typed Channel objects (MPMC queues).
+Channel values: nil, booleans, numbers, and strings only.
 
 -- ── Creating a Thread ─────────────────────────────────────────────────────────
 
 -- newThread(code) → Thread
 -- Creates a background thread from a Lua source string.
--- The worker VM has access to luna.math, luna.data, luna.thread, luna.fs,
--- luna.time, and luna.platform — but NOT luna.gfx, luna.audio, or luna.physics.
-local worker = luna.thread.newThread([[
-    local input_ch  = luna.thread.getChannel("work_in")
-    local output_ch = luna.thread.getChannel("work_out")
+-- The worker VM has access to lurek.math, lurek.data, lurek.thread, lurek.fs,
+-- lurek.time, and lurek.platform — but NOT lurek.gfx, lurek.audio, or lurek.physics.
+local worker = lurek.thread.newThread([[
+    local input_ch  = lurek.thread.getChannel("work_in")
+    local output_ch = lurek.thread.getChannel("work_out")
 
     while true do
         local job = input_ch:demand()  -- block until a job arrives
@@ -25,7 +24,7 @@ local worker = luna.thread.newThread([[
         -- Heavy computation (safe to do on a worker thread)
         local result = 0
         for i = 1, tonumber(job) do
-            result = result + luna.math.sin(i * 0.001)
+            result = result + lurek.math.sin(i * 0.001)
         end
 
         output_ch:push(result)
@@ -36,7 +35,7 @@ local worker = luna.thread.newThread([[
 
 -- start(...) — launch the thread; optional varargs become the worker's "..."
 worker:start()            -- no arguments
--- worker:start(1, 2, 3) — pass initial values accessible in worker as "..."
+worker:start(1, 2, 3)  -- pass initial values accessible in worker as "..."
 
 -- isRunning() → boolean
 local running = worker:isRunning()
@@ -55,8 +54,8 @@ end
 -- getChannel(name) → Channel
 -- Named channels are global across all threads; any thread with the same name
 -- accesses the same underlying queue.
-local work_in  = luna.thread.getChannel("work_in")
-local work_out = luna.thread.getChannel("work_out")
+local work_in  = lurek.thread.getChannel("work_in")
+local work_out = lurek.thread.getChannel("work_out")
 
 -- ── Unnamed (local) Channels ──────────────────────────────────────────────────
 
@@ -64,7 +63,7 @@ local work_out = luna.thread.getChannel("work_out")
 -- Creates a fresh unnamed MPMC channel.  Must be passed to workers manually
 -- (channels created after newThread('...') won't be visible to the worker).
 -- Prefer named channels (getChannel) for most use cases.
-local local_ch = luna.thread.newChannel()
+local local_ch = lurek.thread.newChannel()
 
 -- ── Channel Operations ────────────────────────────────────────────────────────
 
@@ -104,24 +103,24 @@ work_out:clear()
 local result_ch
 local compute_worker
 
-function luna.init()
-    result_ch = luna.thread.getChannel("results")
-    compute_worker = luna.thread.newThread([[
-        local jobs = luna.thread.getChannel("jobs")
-        local out  = luna.thread.getChannel("results")
+function lurek.init()
+    result_ch = lurek.thread.getChannel("results")
+    compute_worker = lurek.thread.newThread([[
+        local jobs = lurek.thread.getChannel("jobs")
+        local out  = lurek.thread.getChannel("results")
         while true do
             local n = jobs:demand()
             if n == -1 then break end
             -- Expensive work
             local sum = 0
-            for i = 1, n do sum = sum + luna.math.sqrt(i) end
+            for i = 1, n do sum = sum + lurek.math.sqrt(i) end
             out:push(sum)
         end
     ]])
     compute_worker:start()
 
     -- send the first batch of jobs
-    local jobs = luna.thread.getChannel("jobs")
+    local jobs = lurek.thread.getChannel("jobs")
     jobs:push(100000)
     jobs:push(200000)
     jobs:push(-1)  -- sentinel: tell worker to exit
@@ -129,15 +128,15 @@ end
 
 local result_text = "Computing..."
 
-function luna.process(dt)
+function lurek.process(dt)
     local r = result_ch:pop()
     if r then
         result_text = "Result: " .. tostring(r)
     end
 end
 
-function luna.render()
-    luna.gfx.print(result_text, 10, 10)
+function lurek.render()
+    lurek.gfx.print(result_text, 10, 10)
 end
 ]]
 

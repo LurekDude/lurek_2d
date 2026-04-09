@@ -1,23 +1,20 @@
 -- examples/image.lua
--- luna.img — CPU-side pixel buffer manipulation (ImageData and CompressedImageData).
--- All luna.img API methods demonstrated with code and comments.
--- Includes all 20 image-processing effects added in 0.6.0.
--- This file is documentation code, not a runnable game.
+-- lurek.img — CPU-side pixel buffer manipulation (ImageData and CompressedImageData).
 
 -- ── ImageData ────────────────────────────────────────────────────────────────
 
 -- newImageData(width, height) → ImageData
 -- Creates a new RGBA8 pixel buffer filled with transparent black.
-local img_data = luna.img.newImageData(64, 64)
+local img_data = lurek.img.newImageData(64, 64)
 
 -- newImageData(path) → ImageData
 -- Loads an image file from the game filesystem into a CPU pixel buffer.
-local loaded = luna.img.newImageData("textures/player.png")
+local loaded = lurek.img.newImageData("textures/player.png")
 
 -- newImageData(width, height, bytes) → ImageData
 -- Creates an ImageData from raw bytes (must be width*height*4 bytes, RGBA8 order).
 local raw_bytes = string.rep("\xFF\x00\x00\xFF", 4 * 4)  -- 4x4 solid red
-local from_bytes = luna.img.newImageData(4, 4, raw_bytes)
+local from_bytes = lurek.img.newImageData(4, 4, raw_bytes)
 
 -- ── ImageData : dimensions ────────────────────────────────────────────────────
 
@@ -51,7 +48,7 @@ end)
 
 -- paste(source_img_data, dest_x, dest_y)
 -- Copies all pixels from source into this buffer at (dest_x, dest_y).
-local stamp = luna.img.newImageData(8, 8)
+local stamp = lurek.img.newImageData(8, 8)
 stamp:mapPixel(function(_, _, _, _, _, _)
     return 255, 0, 0, 255  -- fill with red
 end)
@@ -67,45 +64,45 @@ local byte_count = #raw  -- 64 * 64 * 4 = 16384
 
 -- encode("png") → string  — PNG-compressed bytes, ready to write to a file.
 local png_bytes = img_data:encode("png")
-luna.fs.write("output.png", png_bytes)
+lurek.fs.write("output.png", png_bytes)
 
 -- ── Using ImageData to modify a GPU texture ───────────────────────────────────
 
--- Luna2D allows uploading an ImageData as a GPU texture:
---   local tex = luna.gfx.newImage(img_data)
---   luna.gfx.draw(tex, x, y)
+-- Lurek2D allows uploading an ImageData as a GPU texture:
+local tex = lurek.gfx.newImage(img_data)
+lurek.gfx.draw(tex, x, y)
 
 -- ── CompressedImageData ───────────────────────────────────────────────────────
 
 -- newCompressedData(path) → CompressedImageData
 -- Loads a DXT/BCn compressed texture from disk (e.g. a .dds file).
 -- The data stays GPU-compressed in CPU memory for fast upload.
--- local cdata = luna.img.newCompressedData("textures/rock_bc3.dds")
+local cdata = lurek.img.newCompressedData("textures/rock_bc3.dds")
 
 -- isCompressed(imagedata_value) → boolean
 -- Returns true if the value is a CompressedImageData (not a standard ImageData).
--- local is_compressed = luna.img.isCompressed(cdata)  -- true
--- local is_standard   = luna.img.isCompressed(img_data)  -- false
+local is_compressed = lurek.img.isCompressed(cdata)  -- true
+local is_standard   = lurek.img.isCompressed(img_data)  -- false
 
 -- CompressedImageData : dimensions
--- cdata:getWidth()   → integer
--- cdata:getHeight()  → integer
--- cdata:getDimensions() → w, h
+local width = cdata:getWidth()
+local height = cdata:getHeight()
+local w, h = cdata:getDimensions()
 
 -- CompressedImageData : format
--- cdata:getFormat() → string  e.g. "DXT1", "DXT5", "BC7"
+local string  e.g. "_d_x_t1", "_d_x_t5", "_b_c7" = cdata:getFormat()
 
 -- CompressedImageData : mip levels
--- cdata:getMipmapCount() → integer  (1 = no mipmaps)
--- cdata:getString(mip_level?) → raw bytes for a specific mip level (0-based)
--- cdata:getSize(mip_level?) → integer  byte count for that mip level
+local mipmap_count = cdata:getMipmapCount()
+local string = cdata:getString(mip_level?)
+local size = cdata:getSize(mip_level?)
 
 -- ── Image-processing effects ──────────────────────────────────────────────────
 -- All 20 effects operate on ImageData in CPU memory.
 -- Effects that work in-place take no return value; geometric operations that
 -- produce a new image return a new ImageData.
 
-local pixels = luna.img.newImageData(64, 64)
+local pixels = lurek.img.newImageData(64, 64)
 
 -- ── Color / Tone — in-place ───────────────────────────────────────────────────
 
@@ -175,7 +172,7 @@ local rotated = pixels:rotate90cw()
 -- crop(x, y, w, h)  — extract a sub-rectangle; returns nil if out of bounds
 local cropped = pixels:crop(10, 10, 32, 32)  -- 32×32 region from (10,10)
 if cropped then
-    luna.fs.write("crop.png", cropped:encode("png"))
+    lurek.fs.write("crop.png", cropped:encode("png"))
 end
 
 -- resizeNearest(new_w, new_h)  — nearest-neighbour scale to any size
@@ -192,24 +189,24 @@ local sharpened = pixels:sharpen()
 
 -- ── Common pipeline: load → edit → upload ────────────────────────────────────
 --[[
-function luna.init()
-    local pixels = luna.img.newImageData("textures/player.png")
+function lurek.init()
+    local pixels = lurek.img.newImageData("textures/player.png")
     pixels:brightness(1.2)     -- slightly brighter
     pixels:sharpen()           -- wrong: sharpen returns NEW image
     pixels = pixels:sharpen()  -- correct: assign the returned image
     pixels:sepia()             -- apply sepia in-place
-    player_tex = luna.gfx.newImage(pixels)
+    player_tex = lurek.gfx.newImage(pixels)
 end
 ]]
 
 -- ── Typical use — procedural texture ─────────────────────────────────────────
 
 --[[
-function luna.init()
-    local pixels = luna.img.newImageData(256, 256)
+function lurek.init()
+    local pixels = lurek.img.newImageData(256, 256)
     pixels:mapPixel(function(x, y)
         -- Simple noise-based terrain colour
-        local n = luna.math.noise(x / 50, y / 50)
+        local n = lurek.math.noise(x / 50, y / 50)
         if n > 0.3 then
             return 80, 140, 40, 255    -- grass
         elseif n > 0 then
@@ -219,11 +216,11 @@ function luna.init()
         end
     end)
     pixels:saturation(1.3)     -- boost saturation before uploading
-    terrain_tex = luna.gfx.newImage(pixels)
+    terrain_tex = lurek.gfx.newImage(pixels)
 end
 
-function luna.render()
-    luna.gfx.draw(terrain_tex, 0, 0)
+function lurek.render()
+    lurek.gfx.draw(terrain_tex, 0, 0)
 end
 ]]
 
@@ -231,17 +228,17 @@ end
 
 --[[
 -- Create a 128x128 layered canvas
-local stack = luna.img.newLayeredImage(128, 128)
+local stack = lurek.img.newLayeredImage(128, 128)
 
 -- Add a red background layer
 local bg_idx = stack:addLayer("background")
-local bg_px = luna.img.newImageData(128, 128)
+local bg_px = lurek.img.newImageData(128, 128)
 bg_px:fill(200, 60, 60, 255)
 stack:setLayer(bg_idx, bg_px)
 
 -- Add a semi-transparent blue overlay
 local fg_idx = stack:addLayer("overlay")
-local fg_px = luna.img.newImageData(128, 128)
+local fg_px = lurek.img.newImageData(128, 128)
 fg_px:fill(40, 80, 220, 128)       -- alpha = 128 → half transparent
 stack:setLayer(fg_idx, fg_px)
 
@@ -254,30 +251,30 @@ stack:swapLayers(1, 2)             -- swap bg and overlay in z-order
 
 -- Flatten all visible layers into one ImageData (Porter-Duff "over")
 local flat = stack:merge()
-local texture = luna.gfx.newImage(flat)
+local texture = lurek.gfx.newImage(flat)
 ]]
 
 -- ── LIMG binary save / load ─────────────────────────────────────────────────
 
 --[[
 -- Save a flat ImageData as a compressed .lim binary file
-local img = luna.img.newImageData(64, 64)
+local img = lurek.img.newImageData(64, 64)
 img:fill(180, 90, 30, 255)
-luna.img.saveImage(img, "my_image.lim")
+lurek.img.saveImage(img, "my_image.lim")
 
 -- Load it back
-local loaded = luna.img.loadImage("my_image.lim")
+local loaded = lurek.img.loadImage("my_image.lim")
 assert(loaded:getWidth() == 64)
 
 -- Save a full LayeredImage stack
-local stack = luna.img.newLayeredImage(64, 64)
+local stack = lurek.img.newLayeredImage(64, 64)
 stack:addLayer("base")
 stack:addLayer("decal")
 stack:setOpacity(2, 0.5)
 stack:save("my_layers.lim")         -- :save() method on LayeredImage
 
 -- Load it back
-local stack2 = luna.img.loadLayered("my_layers.lim")
+local stack2 = lurek.img.loadLayered("my_layers.lim")
 assert(stack2:layerCount() == 2)
 assert(stack2:getName(2) == "decal")
 ]]

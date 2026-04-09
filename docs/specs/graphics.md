@@ -4,7 +4,7 @@
 |----------------|--------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
-| **Lua API**    | `luna.gfx`                                              |
+| **Lua API**    | `lurek.gfx`                                              |
 | **Source**     | `src/graphics/`                                              |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
@@ -12,11 +12,11 @@
 
 ## Summary
 
-The graphics module owns the entire GPU rendering pipeline for Luna2D — from the high-level draw calls that Lua scripts issue through `luna.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
-The module is built around a **deferred command queue** architecture: during `luna.draw()`, Lua pushes `DrawCommand` variants into a `Vec<DrawCommand>` stored in `SharedState`. After the Lua callback returns, the engine calls `GpuRenderer::render_frame()` which processes the queue in one GPU encoder pass. This means Lua never touches the GPU directly — it constructs a declarative list of rendering intent, and the renderer has full visibility over the draw list to minimise pipeline state switches before any GPU work begins.
+The module is built around a **deferred command queue** architecture: during `lurek.draw()`, Lua pushes `DrawCommand` variants into a `Vec<DrawCommand>` stored in `SharedState`. After the Lua callback returns, the engine calls `GpuRenderer::render_frame()` which processes the queue in one GPU encoder pass. This means Lua never touches the GPU directly — it constructs a declarative list of rendering intent, and the renderer has full visibility over the draw list to minimise pipeline state switches before any GPU work begins.
 
-All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `luna.gfx.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
+All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `lurek.gfx.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
 
 The transform stack (`push/pop/translate/rotate/scale/shear/origin`) is implemented as `DrawCommand` variants — the renderer maintains a `Mat3` matrix stack as it processes the queue, multiplying incoming transforms and applying the accumulated matrix to all vertices in scope. The module also provides stencil buffer support (write + test), depth mode control, blend modes (five pre-built pipeline variants), scissor clipping, color masking, wireframe mode, and custom WGSL shader support with per-shader uniform buffers.
 
@@ -25,7 +25,7 @@ Scope boundary: the `animation`, `camera`, and `Color` types have been **extract
 ## Architecture
 
 ```
-luna.gfx.* (Lua API — 66 functions, 7 UserData types)
+lurek.gfx.* (Lua API — 66 functions, 7 UserData types)
   │
   ▼
 DrawCommand queue (SharedState::draw_commands)
@@ -161,7 +161,7 @@ Draw command types, blend modes, stencil state, and texture data for the renderi
 - **`TextureData`** (struct): Raw RGBA pixel data (premultiplied alpha) with width and height.
 - **`ParticleRenderShape`** (enum): Geometric shape for untextured particle rendering — `Square`, `Circle`, `Triangle`, `Spark`, `Diamond`.
 - **`ParticleInstance`** (struct): Pre-computed per-particle render data (position, color, rotation, size, shape, optional texture/quad).
-- **`DrawableKind`** (enum): Type discriminator for `luna.gfx.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
+- **`DrawableKind`** (enum): Type discriminator for `lurek.gfx.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
 
 ### `graphics::shader`
 
@@ -256,7 +256,7 @@ Per-frame rendering statistics: draw calls, texture switches, canvas switches, s
 Custom geometry mesh with per-vertex position, UV, and color data. Supports optional index buffers and optional textures. Three draw modes: triangles, fan, strip.
 
 **Public functions:**
-- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `luna.gfx.newMesh`.
+- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `lurek.gfx.newMesh`.
 
 #### `graphics::mesh::MeshVertex`
 
@@ -346,7 +346,7 @@ Shape fill mode — `Fill` (solid) or `Line` (outline using current line width).
 
 #### `graphics::renderer::DrawableKind`
 
-Type discriminator for `luna.gfx.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
+Type discriminator for `lurek.gfx.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
 
 #### `graphics::mesh::MeshDrawMode`
 
@@ -380,119 +380,119 @@ Single patch rectangle tuple: `(src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w,
 
 ## Lua API
 
-Exposed under `luna.gfx.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
+Exposed under `lurek.gfx.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
 
 ### Namespace Functions (66)
 
 #### Color
-- `luna.gfx.setColor(r, g, b, a?)` — set the active draw color
-- `luna.gfx.getColor()` — get the current draw color (r, g, b, a)
-- `luna.gfx.setBackgroundColor(r, g, b, a?)` — set the clear/background color
-- `luna.gfx.getBackgroundColor()` — get the current background color
+- `lurek.gfx.setColor(r, g, b, a?)` — set the active draw color
+- `lurek.gfx.getColor()` — get the current draw color (r, g, b, a)
+- `lurek.gfx.setBackgroundColor(r, g, b, a?)` — set the clear/background color
+- `lurek.gfx.getBackgroundColor()` — get the current background color
 
 #### Shape Drawing
-- `luna.gfx.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
-- `luna.gfx.circle(mode, x, y, r)` — draw a circle
-- `luna.gfx.ellipse(mode, x, y, rx, ry)` — draw an ellipse
-- `luna.gfx.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
-- `luna.gfx.line(x1, y1, x2, y2, ...)` — draw a line or polyline
-- `luna.gfx.polygon(mode, vertices)` — draw a polygon from a flat vertex list
-- `luna.gfx.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
-- `luna.gfx.points(...)` — draw points at specified coordinates
+- `lurek.gfx.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
+- `lurek.gfx.circle(mode, x, y, r)` — draw a circle
+- `lurek.gfx.ellipse(mode, x, y, rx, ry)` — draw an ellipse
+- `lurek.gfx.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
+- `lurek.gfx.line(x1, y1, x2, y2, ...)` — draw a line or polyline
+- `lurek.gfx.polygon(mode, vertices)` — draw a polygon from a flat vertex list
+- `lurek.gfx.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
+- `lurek.gfx.points(...)` — draw points at specified coordinates
 
 #### Drawing
-- `luna.gfx.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
-- `luna.gfx.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
+- `lurek.gfx.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
+- `lurek.gfx.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
 
 #### Text
-- `luna.gfx.print(text, x, y)` — draw text at a position
-- `luna.gfx.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
+- `lurek.gfx.print(text, x, y)` — draw text at a position
+- `lurek.gfx.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
 
 #### Clear
-- `luna.gfx.clear(r?, g?, b?, a?)` — clear the screen or active canvas
+- `lurek.gfx.clear(r?, g?, b?, a?)` — clear the screen or active canvas
 
 #### Line and Point Style
-- `luna.gfx.setLineWidth(width)` — set the stroke width
-- `luna.gfx.getLineWidth()` — get the current stroke width
-- `luna.gfx.setPointSize(size)` — set the point size
-- `luna.gfx.getPointSize()` — get the current point size
+- `lurek.gfx.setLineWidth(width)` — set the stroke width
+- `lurek.gfx.getLineWidth()` — get the current stroke width
+- `lurek.gfx.setPointSize(size)` — set the point size
+- `lurek.gfx.getPointSize()` — get the current point size
 
 #### Blend Mode
-- `luna.gfx.setBlendMode(mode)` — set the active blend mode
-- `luna.gfx.getBlendMode()` — get the current blend mode
+- `lurek.gfx.setBlendMode(mode)` — set the active blend mode
+- `lurek.gfx.getBlendMode()` — get the current blend mode
 
 #### Font Management
-- `luna.gfx.newFont(path, size)` — load a TTF/OTF font
-- `luna.gfx.setFont(font)` — set the active font
-- `luna.gfx.getFont()` — get the active font
-- `luna.gfx.getFontWidth(text)` — get pixel width of text in the current font
-- `luna.gfx.getFontHeight()` — get the line height of the current font
-- `luna.gfx.getFontAscent()` — get the ascent of the current font
-- `luna.gfx.getFontDescent()` — get the descent of the current font
-- `luna.gfx.getFontWrap(text, limit)` — get word-wrap info for the current font
+- `lurek.gfx.newFont(path, size)` — load a TTF/OTF font
+- `lurek.gfx.setFont(font)` — set the active font
+- `lurek.gfx.getFont()` — get the active font
+- `lurek.gfx.getFontWidth(text)` — get pixel width of text in the current font
+- `lurek.gfx.getFontHeight()` — get the line height of the current font
+- `lurek.gfx.getFontAscent()` — get the ascent of the current font
+- `lurek.gfx.getFontDescent()` — get the descent of the current font
+- `lurek.gfx.getFontWrap(text, limit)` — get word-wrap info for the current font
 
 #### Image Management
-- `luna.gfx.newImage(path)` — load an image from file as a GPU texture
+- `lurek.gfx.newImage(path)` — load an image from file as a GPU texture
 
 #### Canvas Management
-- `luna.gfx.newCanvas(width, height)` — create an off-screen render target
-- `luna.gfx.setCanvas(canvas?)` — set the active render target (nil = screen)
-- `luna.gfx.getCanvas()` — get the active canvas (nil if drawing to screen)
-- `luna.gfx.getCanvasSize(canvas)` — get canvas dimensions
+- `lurek.gfx.newCanvas(width, height)` — create an off-screen render target
+- `lurek.gfx.setCanvas(canvas?)` — set the active render target (nil = screen)
+- `lurek.gfx.getCanvas()` — get the active canvas (nil if drawing to screen)
+- `lurek.gfx.getCanvasSize(canvas)` — get canvas dimensions
 
 #### SpriteBatch
-- `luna.gfx.newSpriteBatch(image, maxSprites?)` — create a sprite batch
+- `lurek.gfx.newSpriteBatch(image, maxSprites?)` — create a sprite batch
 
 #### Mesh
-- `luna.gfx.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
+- `lurek.gfx.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
 
 #### Shader
-- `luna.gfx.newShader(source)` — compile a custom WGSL fragment shader
-- `luna.gfx.setShader(shader?)` — set the active shader (nil = default pipeline)
-- `luna.gfx.getShader()` — get the active shader
+- `lurek.gfx.newShader(source)` — compile a custom WGSL fragment shader
+- `lurek.gfx.setShader(shader?)` — set the active shader (nil = default pipeline)
+- `lurek.gfx.getShader()` — get the active shader
 
 #### Quad
-- `luna.gfx.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
+- `lurek.gfx.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
 
 #### Transform Stack
-- `luna.gfx.push()` — push a copy of the current transform
-- `luna.gfx.pop()` — pop the top transform
-- `luna.gfx.translate(x, y)` — apply a translation
-- `luna.gfx.rotate(angle)` — apply a rotation (radians)
-- `luna.gfx.scale(sx, sy?)` — apply a scale
-- `luna.gfx.shear(kx, ky)` — apply a shear (skew)
-- `luna.gfx.origin()` — reset transform to identity
-- `luna.gfx.applyTransform(transform)` — apply a Transform userdata
+- `lurek.gfx.push()` — push a copy of the current transform
+- `lurek.gfx.pop()` — pop the top transform
+- `lurek.gfx.translate(x, y)` — apply a translation
+- `lurek.gfx.rotate(angle)` — apply a rotation (radians)
+- `lurek.gfx.scale(sx, sy?)` — apply a scale
+- `lurek.gfx.shear(kx, ky)` — apply a shear (skew)
+- `lurek.gfx.origin()` — reset transform to identity
+- `lurek.gfx.applyTransform(transform)` — apply a Transform userdata
 
 #### Scissor
-- `luna.gfx.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
-- `luna.gfx.getScissor()` — get the current scissor rectangle
-- `luna.gfx.intersectScissor(x, y, w, h)` — intersect with the current scissor
+- `lurek.gfx.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
+- `lurek.gfx.getScissor()` — get the current scissor rectangle
+- `lurek.gfx.intersectScissor(x, y, w, h)` — intersect with the current scissor
 
 #### Color Mask
-- `luna.gfx.setColorMask(r, g, b, a)` — set which color channels can be written
-- `luna.gfx.getColorMask()` — get the current color mask
+- `lurek.gfx.setColorMask(r, g, b, a)` — set which color channels can be written
+- `lurek.gfx.getColorMask()` — get the current color mask
 
 #### Wireframe
-- `luna.gfx.setWireframe(enable)` — enable or disable wireframe mode
-- `luna.gfx.isWireframe()` — check if wireframe mode is active
+- `lurek.gfx.setWireframe(enable)` — enable or disable wireframe mode
+- `lurek.gfx.isWireframe()` — check if wireframe mode is active
 
 #### Stencil
-- `luna.gfx.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
-- `luna.gfx.setStencilTest(compareMode?, value?)` — set or disable stencil testing
+- `lurek.gfx.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
+- `lurek.gfx.setStencilTest(compareMode?, value?)` — set or disable stencil testing
 
 #### Window Dimensions
-- `luna.gfx.getWidth()` — get the window width in pixels
-- `luna.gfx.getHeight()` — get the window height in pixels
-- `luna.gfx.getDimensions()` — get the window dimensions (w, h)
+- `lurek.gfx.getWidth()` — get the window width in pixels
+- `lurek.gfx.getHeight()` — get the window height in pixels
+- `lurek.gfx.getDimensions()` — get the window dimensions (w, h)
 
 #### Default Filter
-- `luna.gfx.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
-- `luna.gfx.getDefaultFilter()` — get the current default filter mode
+- `lurek.gfx.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
+- `lurek.gfx.getDefaultFilter()` — get the current default filter mode
 
 #### Stats and Screenshot
-- `luna.gfx.getStats()` — get per-frame render statistics table
-- `luna.gfx.saveScreenshot(path)` — save a screenshot PNG to the save directory
+- `lurek.gfx.getStats()` — get per-frame render statistics table
+- `lurek.gfx.saveScreenshot(path)` — save a screenshot PNG to the save directory
 
 ### UserData Types (7)
 
@@ -520,12 +520,12 @@ Methods: `getViewport()`, `setViewport(x, y, w, h)`, `getTextureDimensions()`, `
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Load resources
-    img = luna.gfx.newImage("player.png")
-    font = luna.gfx.newFont("font.ttf", 18)
-    canvas = luna.gfx.newCanvas(800, 600)
-    batch = luna.gfx.newSpriteBatch(img, 100)
+    img = lurek.gfx.newImage("player.png")
+    font = lurek.gfx.newFont("font.ttf", 18)
+    canvas = lurek.gfx.newCanvas(800, 600)
+    batch = lurek.gfx.newSpriteBatch(img, 100)
 
     -- Add sprites to batch
     for i = 1, 10 do
@@ -533,39 +533,39 @@ function luna.init()
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Render scene to canvas
-    luna.gfx.setCanvas(canvas)
-    luna.gfx.clear(0.1, 0.1, 0.2)
+    lurek.gfx.setCanvas(canvas)
+    lurek.gfx.clear(0.1, 0.1, 0.2)
 
     -- Transform stack
-    luna.gfx.push()
-    luna.gfx.translate(400, 300)
-    luna.gfx.rotate(0.5)
-    luna.gfx.draw(img, -32, -32)
-    luna.gfx.pop()
+    lurek.gfx.push()
+    lurek.gfx.translate(400, 300)
+    lurek.gfx.rotate(0.5)
+    lurek.gfx.draw(img, -32, -32)
+    lurek.gfx.pop()
 
     -- Draw shapes
-    luna.gfx.setColor(1, 0, 0)
-    luna.gfx.rectangle("fill", 50, 50, 100, 80)
-    luna.gfx.setColor(0, 1, 0)
-    luna.gfx.circle("line", 300, 200, 40)
+    lurek.gfx.setColor(1, 0, 0)
+    lurek.gfx.rectangle("fill", 50, 50, 100, 80)
+    lurek.gfx.setColor(0, 1, 0)
+    lurek.gfx.circle("line", 300, 200, 40)
 
     -- Draw batch
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.draw(batch, 0, 300)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.draw(batch, 0, 300)
 
     -- Switch to screen
-    luna.gfx.setCanvas()
+    lurek.gfx.setCanvas()
 
     -- Composite canvas to screen
-    luna.gfx.draw(canvas, 0, 0)
+    lurek.gfx.draw(canvas, 0, 0)
 
     -- Draw text
-    luna.gfx.setFont(font)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: 42", 10, 10)
-    luna.gfx.printf("Centered text", 0, 560, 800, "center")
+    lurek.gfx.setFont(font)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: 42", 10, 10)
+    lurek.gfx.printf("Centered text", 0, 560, 800, "center")
 end
 ```
 
@@ -590,7 +590,7 @@ end
 | `animation` | Related       | Extracted module; `animation` provides sprite animation types      |
 | `particle`  | Related       | Tier 2 module; pushes `DrawParticleSystem` commands into the draw queue |
 | `postfx`    | Related       | Tier 2 module; provides `PostFxStack` and `PostFxEffect`; graphics handles `BeginPostFx`/`EndPostFx`/`ApplyPostFx` commands |
-| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `luna.gfx.*` bindings |
+| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `lurek.gfx.*` bindings |
 
 **Similar modules and differentiation:**
 - `image` vs `graphics`: `image` owns CPU-side pixel buffers (`ImageData`) for manipulation; `graphics` owns GPU-side textures and rendering.
@@ -598,7 +598,7 @@ end
 
 ## Notes
 
-- **Draw command flow**: Commands are queued during `luna.draw()` and processed in submission order by `GpuRenderer::render_frame()`. Never allocate GPU resources inside `luna.draw()` — all resource creation (`newImage`, `newFont`, etc.) should happen in `luna.load()`.
+- **Draw command flow**: Commands are queued during `lurek.draw()` and processed in submission order by `GpuRenderer::render_frame()`. Never allocate GPU resources inside `lurek.draw()` — all resource creation (`newImage`, `newFont`, etc.) should happen in `lurek.load()`.
 - **GPU backend**: wgpu 22 (Vulkan/DX12/Metal). No raw OpenGL path, no software fallback.
 - **Premultiplied alpha**: All textures are premultiply-converted on load. The GPU pipeline assumes premultiplied colour space.
 - **Canvas ping-pong**: `setCanvas(canvas)` begins a new render pass to the off-screen target; `setCanvas()` (no args) returns to the screen.
@@ -612,4 +612,4 @@ end
 - **Coordinate system**: Origin at top-left, Y increases downward (screen coordinates).
 - **Custom shaders**: WGSL fragment shaders with auto-prepended globals (`luna_ScreenSize`, `luna_Time`). Validated by naga before pipeline creation. Return a descriptive `LuaError` on validation failure.
 - **Stencil support**: Two-phase workflow — `stencil()` writes to the stencil buffer, then `setStencilTest()` configures subsequent draws to pass/fail based on the stencil value.
-- **Screenshot**: `luna.gfx.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.
+- **Screenshot**: `lurek.gfx.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.

@@ -1,11 +1,11 @@
-//! Integration tests for the Luna2D input system.
+//! Integration tests for the Lurek2D input system.
 
-use luna2d::input::GamepadState;
-use luna2d::input::KeyboardState;
-use luna2d::input::MouseState;
-use luna2d::input::SystemCursor;
-use luna2d::input::TouchState;
-use luna2d::input::{CursorHandle, CursorKind};
+use lurek2d::input::GamepadState;
+use lurek2d::input::KeyboardState;
+use lurek2d::input::MouseState;
+use lurek2d::input::SystemCursor;
+use lurek2d::input::TouchState;
+use lurek2d::input::{CursorHandle, CursorKind};
 
 #[test]
 fn keyboard_key_down() {
@@ -60,8 +60,8 @@ fn gamepad_axis_value() {
 
 // ── Gamepad Lua API tests ──────────────────────────────────────────
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -480,7 +480,7 @@ fn mouse_lua_wheel_delta() {
 #[test]
 fn mouse_lua_set_position() {
     let (state, lua) = make_vm();
-    lua.load("luna.mouse.setPosition(50, 75)").exec().unwrap();
+    lua.load("lurek.mouse.setPosition(50, 75)").exec().unwrap();
     let st = state.borrow();
     assert!((st.mouse.x - 50.0).abs() < 1e-5);
     assert!((st.mouse.y - 75.0).abs() < 1e-5);
@@ -808,7 +808,7 @@ fn mouse_custom_cursor_stores_dimensions() {
 
 #[test]
 fn mouse_is_cursor_supported_returns_true() {
-    assert!(luna2d::input::is_cursor_supported());
+    assert!(lurek2d::input::is_cursor_supported());
 }
 
 #[test]
@@ -885,7 +885,7 @@ fn keyboard_lua_is_modifier_active_returns_bool() {
 
 // ── Phase 10 — Gamepad Mapping Persistence ───────────────────────
 
-use luna2d::input::GamepadMappings;
+use lurek2d::input::GamepadMappings;
 
 #[test]
 fn gamepad_mapping_set_and_get() {
@@ -975,7 +975,7 @@ fn gamepad_mapping_lua_get_unknown_returns_nil() {
 fn gamepad_mapping_lua_load_nonexistent_errors() {
     let (_state, lua) = make_vm();
     let ok = lua
-        .load(r#"luna.gamepad.loadGamepadMappings("__no_such_file__.txt")"#)
+        .load(r#"lurek.gamepad.loadGamepadMappings("__no_such_file__.txt")"#)
         .exec();
     assert!(ok.is_err());
 }

@@ -1,19 +1,19 @@
 ---
-description: "**Configurator** — Design and validate Luna2D project configuration: conf.lua, conf.toml, Cargo feature flags, window settings, and module toggles. Does not implement engine Rust code."
+description: "**Configurator** — Design and validate Lurek2D project configuration: conf.lua, conf.toml, Cargo feature flags, window settings, and module toggles. Does not implement engine Rust code."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Configurator
 ---
 
-# CONFIGURATOR — LUNA2D PROJECT CONFIGURATION
+# CONFIGURATOR — LUREK2D PROJECT CONFIGURATION
 
 ## MISSION
 
-Author, validate, and document Luna2D project configuration. Own the full configuration lifecycle — from `conf.lua`/`conf.toml` design through validation against `Config` struct fields. Never implements engine Rust code.
+Author, validate, and document Lurek2D project configuration. Own the full configuration lifecycle — from `conf.lua`/`conf.toml` design through validation against `Config` struct fields. Never implements engine Rust code.
 
 ## SCOPE
 
 **Owns**:
-- `conf.lua` templates and validation (all `luna.conf(t)` field coverage)
+- `conf.lua` templates and validation (all `lurek.conf(t)` field coverage)
 - `conf.toml` schema equivalents and migration guidance
 - `Cargo.toml` feature flag guidance (`luajit` vs `lua54`, optional crate features)
 - Understanding and documenting `src/engine/config.rs` — `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig`
@@ -58,7 +58,7 @@ CLI arg: game directory path
 Config::load_from_conf_lua(game_dir)
   ├── Temporary Lua VM (separate from game VM)
   ├── Build default Config → expose as table `t`
-  ├── Execute conf.lua → call luna.conf(t)
+  ├── Execute conf.lua → call lurek.conf(t)
   └── Read fields back from table → Config struct
   │
   ▼
@@ -73,7 +73,7 @@ App::new(config)
 ### WindowConfig
 | Field | Type | Default | Notes |
 |---|---|---|---|
-| `window.title` | string | `"Luna2D"` | Window title bar |
+| `window.title` | string | `"Lurek2D"` | Window title bar |
 | `window.width` | integer | `800` | Initial width in pixels |
 | `window.height` | integer | `600` | Initial height in pixels |
 | `window.vsync` | bool | `true` | Uses `wgpu::PresentMode::Fifo` |
@@ -100,7 +100,7 @@ App::new(config)
 |---|---|---|---|
 | `identity` | string? | `nil` | Scopes save directory (`mygame` → saves/mygame/) |
 | `version` | string? | `nil` | Target engine version string |
-| `log.file` | string | `"luna2d.log"` | Log path relative to game directory |
+| `log.file` | string | `"lurek2d.log"` | Log path relative to game directory |
 | `log.append` | bool | `false` | If false, log truncated on startup |
 
 ## SUCCESS METRICS
@@ -123,7 +123,7 @@ App::new(config)
 
 - **Self-handle**: conf.lua templates, TOML equivalents, feature flag documentation, config validation
 - **Consult Developer**: Config struct has changed and templates need updating
-- **Consult Lua-Designer**: New config option needs a `luna.conf(t)` field designed
+- **Consult Lua-Designer**: New config option needs a `lurek.conf(t)` field designed
 - **Consult Doc-Writer**: Config templates need publishing to user-facing docs
 
 ## ROUTING
@@ -147,7 +147,7 @@ App::new(config)
 ## ANTI-PATTERNS
 
 - **Partial Min Size**: Setting only `minwidth` without `minheight` — silently ignored, frustration ensues
-- **Missing Identity**: Shipping without `t.identity` — save files collide with other Luna2D games
+- **Missing Identity**: Shipping without `t.identity` — save files collide with other Lurek2D games
 - **Hardcoded Resolution**: Fixed `width`/`height` with `resizable = false` and no `minwidth` — unplayable on small screens
 - **LuaJIT Confusion**: Specifying `lua54` Cargo feature for a shipped game — LuaJIT is the correct default
 - **Log Append in Production**: `log.append = true` in shipped games produces unbounded log files

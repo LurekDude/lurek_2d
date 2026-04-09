@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                |
 | **Status**     | Implemented — Full                             |
-| **Lua API**    | `luna.thread`                                  |
+| **Lua API**    | `lurek.thread`                                  |
 | **Source**     | `src/thread/`                                  |
 | **Rust Tests** | `tests/rust/unit/thread_tests.rs`              |
 | **Lua Tests**  | `tests/lua/unit/test_thread.lua`               |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The `thread` module provides Luna2D's only concurrency primitive: background Lua worker threads communicating through typed MPMC channels. It directly implements design constraint B-04 — concurrency lives in Rust threads; LuaJIT VMs cannot share state; cross-VM communication uses typed `Channel` objects.
+The `thread` module provides Lurek2D's only concurrency primitive: background Lua worker threads communicating through typed MPMC channels. It directly implements design constraint B-04 — concurrency lives in Rust threads; LuaJIT VMs cannot share state; cross-VM communication uses typed `Channel` objects.
 
 ## Source Files
 
@@ -26,6 +26,6 @@ The `thread` module provides Luna2D's only concurrency primitive: background Lua
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/thread.md`](../../specs/thread.md)
+→ [`docs/specs/thread.md`](../../docs/specs/thread.md)
 
-_Update both this file **and** `specs/thread.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/thread.md` whenever source files, public types, or Lua bindings change._

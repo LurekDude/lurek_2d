@@ -1,6 +1,6 @@
 //! Binary pack/unpack utilities compatible with LÖVE2D's `data.pack` API.
 //!
-//! Provides format-string based binary serialization for the `luna.data` module.
+//! Provides format-string based binary serialization for the `lurek.data` module.
 //! Supports little-endian and big-endian byte order via `<` and `>` prefixes.
 
 use crate::data::byte_data::ByteData;

@@ -4,18 +4,18 @@ A puzzle game where the player places static shapes to create a ramp that guides
 
 ## What It Demonstrates
 
-- `luna.physics.newWorld()` with gravity and full step/draw loop
-- `luna.physics.newCircleBody()` for the dynamic ball and static circle pieces
-- `luna.physics.newBody()` + `luna.physics.setBodySize()` for rectangular platforms and placed pieces
-- `luna.physics.setBodyRestitution()` for tunable bounciness on the ball
-- `luna.physics.getBody()` to read back simulated positions each frame
+- `lurek.physics.newWorld()` with gravity and full step/draw loop
+- `lurek.physics.newCircleBody()` for the dynamic ball and static circle pieces
+- `lurek.physics.newBody()` + `lurek.physics.setBodySize()` for rectangular platforms and placed pieces
+- `lurek.physics.setBodyRestitution()` for tunable bounciness on the ball
+- `lurek.physics.getBody()` to read back simulated positions each frame
 - Goal-zone AABB win detection independent of the physics engine
 - Level reset: destroys the entire physics world and recreates it via `loadLevel()`
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/physics_puzzle
+cargo run -- content/demos/physics_puzzle
 ```
 
 ## Controls

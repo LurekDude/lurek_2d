@@ -91,7 +91,7 @@ feat(blocksim): Phase 1 — flat kernel core (spec, compiler, tick, queue)
 
 | File | What to implement |
 |---|---|
-| `src/lua_api/blocksim_api.rs` | `pub fn register(lua, luna, state)` — registers `luna.sim.*` table; all lifecycle functions |
+| `src/lua_api/blocksim_api.rs` | `pub fn register(lua, luna, state)` — registers `lurek.sim.*` table; all lifecycle functions |
 | `tests/lua/unit/test_blocksim.lua` | BDD test file with `describe`/`it`; min 10 tests for basic lifecycle |
 
 ### Modified files
@@ -113,20 +113,20 @@ Follow `src/lua_api/timer_api.rs` as the gold standard:
 
 ### Key functions to implement this phase
 
-- `luna.sim.create(spec_table)` → SimHandle userdata
-- `luna.sim.destroy(sim)`
-- `luna.sim.step(sim, n)` → stats table
-- `luna.sim.run(sim)` → stats table
-- `luna.sim.reset(sim)`
-- `luna.sim.snapshot(sim)` → table
-- `luna.sim.tick(sim)` → int
-- `luna.sim.validate_spec(spec_table)` → ok, err_table
-- `luna.sim.load_toml(str)` → SimHandle, err
+- `lurek.sim.create(spec_table)` → SimHandle userdata
+- `lurek.sim.destroy(sim)`
+- `lurek.sim.step(sim, n)` → stats table
+- `lurek.sim.run(sim)` → stats table
+- `lurek.sim.reset(sim)`
+- `lurek.sim.snapshot(sim)` → table
+- `lurek.sim.tick(sim)` → int
+- `lurek.sim.validate_spec(spec_table)` → ok, err_table
+- `lurek.sim.load_toml(str)` → SimHandle, err
 
 ### Commit
 
 ```
-feat(blocksim): Phase 2 — Lua bridge + basic luna.sim API
+feat(blocksim): Phase 2 — Lua bridge + basic lurek.sim API
 ```
 
 ---
@@ -334,7 +334,7 @@ feat(blocksim): Phase 7 — advanced mechanics (batch, time window, warmup, ener
 | `library/blocksim/blueprints.lua` | saga, canary, bulkhead, watchdog, approval_flow, dlq_recovery patterns |
 | `library/blocksim/scenario.lua` | `scenario.load(path)`, `scenario.run_pair(base, variant)`, `scenario.multi_run(fn, n)` |
 | `library/blocksim/analytics.lua` | `analytics.compare(base, variant)`, `analytics.kpi(samples, rules)`, detection helpers |
-| `library/blocksim/reports.lua` | `reports.text(result)`, `reports.json(result)`, file export via `luna.fs` |
+| `library/blocksim/reports.lua` | `reports.text(result)`, `reports.json(result)`, file export via `lurek.fs` |
 | `tests/lua/library/test_blocksim_lib.lua` | BDD tests for all library helpers |
 
 ### Modified files
@@ -362,7 +362,7 @@ feat(library/blocksim): Phase 8 — Lua helper library: DSL, blueprints, analyti
 |---|---|
 | `examples/blocksim.lua` | Minimal single-file walkthrough: create, run, monitor, report |
 | `tests/lua/integration/test_blocksim_dataframe.lua` | Create sim → run → drain monitors → load into dataframe → compute KPIs |
-| `demos/block_sim_demo/main.lua` | Optional: text-mode dashboard using `luna.terminal` |
+| `demos/block_sim_demo/main.lua` | Optional: text-mode dashboard using `lurek.terminal` |
 | `demos/block_sim_demo/conf.lua` | Optional demo config |
 
 ### Modified files

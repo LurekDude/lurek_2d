@@ -1,20 +1,20 @@
 # Devtools Demo
 
-Demonstrates `luna.devtools`: runtime diagnostics including a performance profiler, memory tracker, variable watcher, and log viewer.
+Demonstrates `lurek.devtools`: runtime diagnostics including a performance profiler, memory tracker, variable watcher, and log viewer.
 
 ## What It Demonstrates
 
-- `luna.devtools.start()` — activate the diagnostics overlay
-- `luna.devtools.profile()` — begin / end named profiling regions
-- `luna.devtools.watch()` — register variables for live display
-- `luna.devtools.log()` — send messages to the devtools log viewer
-- `luna.devtools.getFrameStats()` — frame time, draw calls, physics steps
+- `lurek.devtools.start()` — activate the diagnostics overlay
+- `lurek.devtools.profile()` — begin / end named profiling regions
+- `lurek.devtools.watch()` — register variables for live display
+- `lurek.devtools.log()` — send messages to the devtools log viewer
+- `lurek.devtools.getFrameStats()` — frame time, draw calls, physics steps
 - Overlay rendering: toggling the HUD with a keypress
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/devtools_demo
+cargo run -- content/demos/devtools_demo
 ```
 
 ## Controls

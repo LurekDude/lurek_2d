@@ -1,4 +1,4 @@
-# Luna2D — Rust Integration Tests
+# Lurek2D — Rust Integration Tests
 
 All Rust test binaries live here. They are registered explicitly in `Cargo.toml` under `[[test]]` entries and run via `cargo test`.
 

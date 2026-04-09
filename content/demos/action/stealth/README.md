@@ -14,7 +14,7 @@ A top-down stealth game where the player must reach an exit zone without being s
 ## How to Run
 
 ```powershell
-cargo run -- demos/stealth
+cargo run -- content/demos/stealth
 ```
 
 ## Controls

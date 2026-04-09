@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-stress_report.py — Luna2D stress test runner and reporter.
+stress_report.py — Lurek2D stress test runner and reporter.
 
 Runs stress tests in tests/lua/stress/ and reports results including
 timing information for performance regression tracking.
@@ -80,7 +80,7 @@ def run_stress_test(lua_file: Path) -> dict:
 def generate_report(results: list) -> str:
     """Generate a Markdown stress test report."""
     lines = [
-        "# Luna2D Stress Test Report",
+        "# Lurek2D Stress Test Report",
         "",
         "## Test Files",
         "",
@@ -125,7 +125,7 @@ def generate_report(results: list) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D stress test runner and reporter",
+        description="Lurek2D stress test runner and reporter",
     )
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--output", metavar="FILE")

@@ -1,9 +1,9 @@
 ---
 name: testing-rust
-description: "Load this skill when writing or organizing tests for the Luna2D engine. It owns test patterns, float comparison strategies, test naming, and integration test architecture for both Rust and Lua BDD tests. Skip it for writing production code."
+description: "Load this skill when writing or organizing tests for the Lurek2D engine. It owns test patterns, float comparison strategies, test naming, and integration test architecture for both Rust and Lua BDD tests. Skip it for writing production code."
 ---
 
-# Testing — Luna2D Engine
+# Testing — Lurek2D Engine
 
 ## Load When
 
@@ -34,7 +34,7 @@ description: "Load this skill when writing or organizing tests for the Luna2D en
 
 ## 1. Test Architecture Overview
 
-Luna2D has a **two-layer test system** that runs entirely via `cargo test`:
+Lurek2D has a **two-layer test system** that runs entirely via `cargo test`:
 
 | Layer | Location | Runner |
 |---|---|---|
@@ -118,27 +118,27 @@ cargo test --test <module>_tests
 
 ### 3.1 Create the Lua file
 
-**Unit test** — tests one `luna.*` module in isolation:
+**Unit test** — tests one `lurek.*` module in isolation:
 
 ```lua
 -- tests/lua/unit/test_<module>.lua
--- Luna2D <Module> API Tests
+-- Lurek2D <Module> API Tests
 
-describe("luna.<module> module exists", function()
+describe("lurek.<module> module exists", function()
     it("is a table", function()
-        expect_type("table", luna.<module>)
+        expect_type("table", lurek.<module>)
     end)
 end)
 
-describe("luna.<module>.<function>", function()
+describe("lurek.<module>.<function>", function()
     it("returns expected type", function()
-        local result = luna.<module>.<function>(...)
+        local result = lurek.<module>.<function>(...)
         expect_not_nil(result)
         expect_type("number", result)
     end)
 
     it("numeric results match within tolerance", function()
-        expect_near(3.14159, luna.<module>.pi, 0.0001)
+        expect_near(3.14159, lurek.<module>.pi, 0.0001)
     end)
 end)
 
@@ -149,11 +149,11 @@ test_summary()  -- REQUIRED: must be last line in every Lua test file
 ```lua
 describe("<a> + <b> integration", function()
     it("uses <a> output as <b> input", function()
-        local world_id = luna.physics.newWorld(0, 100)
-        local body_id = luna.physics.newBody(world_id, 50, 50, "dynamic")
+        local world_id = lurek.physics.newWorld(0, 100)
+        local body_id = lurek.physics.newBody(world_id, 50, 50, "dynamic")
         local x, y = body_id:getPosition()
         expect_near(50, x, 0.1)
-        luna.physics.destroyWorld(world_id)
+        lurek.physics.destroyWorld(world_id)
     end)
 end)
 test_summary()
@@ -177,7 +177,7 @@ test_summary()
 describe("<name> contract", function()
     it("rejects invalid argument type", function()
         expect_error(function()
-            luna.<module>.<fn>("not_a_number")
+            lurek.<module>.<fn>("not_a_number")
         end)
     end)
 end)
@@ -263,20 +263,20 @@ test_summary()
 
 ## 5. Headless VM — What Is / Is Not Available
 
-`harness.rs` creates the VM via `create_test_vm()`, which is a full Luna2D VM but **without a window, GPU, or audio device**. All `luna.*` API tables are registered.
+`harness.rs` creates the VM via `create_test_vm()`, which is a full Lurek2D VM but **without a window, GPU, or audio device**. All `lurek.*` API tables are registered.
 
 | Available in Lua tests | Not available |
 |---|---|
-| `luna.math.*` | `luna.gfx.draw*` (no GPU) |
-| `luna.physics.*` | `luna.audio.newSource` (no audio device) |
-| `luna.time.*` | Any API that calls `winit` window methods |
-| `luna.input.*` (state, no events) | `luna.window.setSize` |
-| `luna.entity.*` | Rendering commands |
-| `luna.data.*`, `luna.savegame.*` | — |
-| `luna.tilemap.*`, `luna.ai.*` | — |
+| `lurek.math.*` | `lurek.gfx.draw*` (no GPU) |
+| `lurek.physics.*` | `lurek.audio.newSource` (no audio device) |
+| `lurek.time.*` | Any API that calls `winit` window methods |
+| `lurek.input.*` (state, no events) | `lurek.window.setSize` |
+| `lurek.entity.*` | Rendering commands |
+| `lurek.data.*`, `lurek.savegame.*` | — |
+| `lurek.tilemap.*`, `lurek.ai.*` | — |
 | Built-in Lua: `math.*`, `string.*`, `table.*` | — |
 
-**Important:** Use built-in `math.rad()` / `math.abs()` for pure math operations in tests — not `luna.math.*` — to avoid introducing test dependencies on the math binding.
+**Important:** Use built-in `math.rad()` / `math.abs()` for pure math operations in tests — not `lurek.math.*` — to avoid introducing test dependencies on the math binding.
 
 ---
 

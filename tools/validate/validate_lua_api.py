@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""validate_lua_api.py -- Validates a Luna2D lua_api file against the SKILL.md contract.
+"""validate_lua_api.py -- Validates a Lurek2D lua_api file against the SKILL.md contract.
 
 Usage:
     python tools/validate_lua_api.py src/lua_api/timer_api.rs
@@ -34,15 +34,15 @@ def _warn(line_no: int, msg: str) -> None:
 # ─── individual checks ────────────────────────────────────────────────────────
 
 def check_file_header(lines: list[str]) -> None:
-    """First line must be //! `luna.<module>` -- description."""
+    """First line must be //! `lurek.<module>` -- description."""
     for i, raw in enumerate(lines[:3]):
         line = raw.rstrip()
         if line.startswith("//!"):
             if not re.match(r'//! `luna\.\w+`', line):
                 _warn(i + 1,
-                      'File header exists but does not match `//! `luna.<module>` -- description`')
+                      'File header exists but does not match `//! `lurek.<module>` -- description`')
             return
-    _err(1, "Missing file header: first line must be `//! `luna.<module>` -- description`")
+    _err(1, "Missing file header: first line must be `//! `lurek.<module>` -- description`")
 
 
 def check_register_signature(lines: list[str]) -> None:
@@ -68,9 +68,9 @@ def check_register_signature(lines: list[str]) -> None:
 
 
 def check_module_registration(content: str) -> None:
-    """luna.set("module", var) must appear at the end of register()."""
+    """lurek.set("module", var) must appear at the end of register()."""
     if not re.search(r'luna\.set\s*\(\s*"[\w]+"\s*,\s*\w+\s*\)', content):
-        _err(0, 'No `luna.set("module", tbl)?;` found -- module is not registered in the luna global table')
+        _err(0, 'No `lurek.set("module", tbl)?;` found -- module is not registered in the luna global table')
 
 
 def check_no_rustdoc_sections(lines: list[str]) -> None:
@@ -154,8 +154,8 @@ def check_docstring_coverage(lines: list[str]) -> None:
             continue
         kind, name = m.group(1), m.group(2)
 
-        # Skip module registration calls (luna.set) and table-building .set()
-        if kind == "luna.set":
+        # Skip module registration calls (lurek.set) and table-building .set()
+        if kind == "lurek.set":
             continue
         if ".set" in kind and not _is_api_registration(lines, i):
             continue
@@ -199,8 +199,8 @@ def check_section_headers(lines: list[str]) -> None:
         kind = m.group(1)
         name = m.group(2)
 
-        # Skip module registration calls (luna.set) and table-building .set()
-        if kind == "luna.set":
+        # Skip module registration calls (lurek.set) and table-building .set()
+        if kind == "lurek.set":
             continue
         if ".set" in kind and not _is_api_registration(lines, i):
             continue

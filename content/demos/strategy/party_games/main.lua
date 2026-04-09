@@ -1,6 +1,6 @@
--- Party Games — Luna2D Demo
+-- Party Games — Lurek2D Demo
 -- Menu selects mini-game, M returns to menu
--- Run with: cargo run -- demos/strategy/party_games
+-- Run with: cargo run -- content/demos/strategy/party_games
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -38,18 +38,18 @@ local function dbReset()
     db = { px = 400, balls = {}, timer = 30, spawnCD = 0, alive = true, dodged = 0 }
 end
 
-function luna.init()
-    luna.window.setTitle("Party Games")
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Party Games")
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.15)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if state == "quickdraw" then
         if qd.phase == "wait" then
             qd.timer = qd.timer - dt
             if qd.timer <= 0 then
                 qd.phase = "go"
-                qd.startTime = luna.time.getTime()
+                qd.startTime = lurek.time.getTime()
             end
         elseif qd.phase == "done" then
             qd.timer = qd.timer - dt
@@ -82,8 +82,8 @@ function luna.process(dt)
     elseif state == "dodge" then
         if db.alive then
             db.timer = db.timer - dt
-            if luna.keyboard.isDown("left") then db.px = db.px - 400 * dt end
-            if luna.keyboard.isDown("right") then db.px = db.px + 400 * dt end
+            if lurek.keyboard.isDown("left") then db.px = db.px - 400 * dt end
+            if lurek.keyboard.isDown("right") then db.px = db.px + 400 * dt end
             db.px = clamp(db.px, 20, 780)
 
             db.spawnCD = db.spawnCD - dt
@@ -115,37 +115,37 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     if state == "menu" then
-        luna.gfx.setColor(1, 0.85, 0.3, 1)
-        luna.gfx.print("PARTY GAMES", 300, 60, 1.8)
+        lurek.gfx.setColor(1, 0.85, 0.3, 1)
+        lurek.gfx.print("PARTY GAMES", 300, 60, 1.8)
         for i, name in ipairs(gameNames) do
-            luna.gfx.setColor(0.4, 0.6, 1, 1)
-            luna.gfx.rectangle("fill", 280, 140 + i * 70, 240, 50)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(i .. ") " .. name, 310, 155 + i * 70, 1.2)
+            lurek.gfx.setColor(0.4, 0.6, 1, 1)
+            lurek.gfx.rectangle("fill", 280, 140 + i * 70, 240, 50)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(i .. ") " .. name, 310, 155 + i * 70, 1.2)
         end
-        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-        luna.gfx.print("Total Score: " .. totalScore, 310, 500)
+        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.gfx.print("Total Score: " .. totalScore, 310, 500)
 
     elseif state == "quickdraw" then
         if qd.phase == "wait" then
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("Wait for GREEN...", 290, 280, 1.3)
-            luna.gfx.setColor(0.8, 0.2, 0.2, 1)
-            luna.gfx.circle("fill", 400, 200, 60)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("Wait for GREEN...", 290, 280, 1.3)
+            lurek.gfx.setColor(0.8, 0.2, 0.2, 1)
+            lurek.gfx.circle("fill", 400, 200, 60)
         elseif qd.phase == "go" then
-            luna.gfx.setColor(0.1, 0.9, 0.1, 1)
-            luna.gfx.circle("fill", 400, 200, 60)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("PRESS SPACE NOW!", 280, 300, 1.5)
+            lurek.gfx.setColor(0.1, 0.9, 0.1, 1)
+            lurek.gfx.circle("fill", 400, 200, 60)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("PRESS SPACE NOW!", 280, 300, 1.5)
         elseif qd.phase == "done" then
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(qd.result, 260, 250, 1.2)
-            luna.gfx.print("Score: +" .. qd.roundScore, 330, 300)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(qd.result, 260, 250, 1.2)
+            lurek.gfx.print("Score: +" .. qd.roundScore, 330, 300)
         elseif qd.phase == "early" then
-            luna.gfx.setColor(1, 0.3, 0.3, 1)
-            luna.gfx.print("TOO EARLY! Press Space to retry", 230, 280, 1.1)
+            lurek.gfx.setColor(1, 0.3, 0.3, 1)
+            lurek.gfx.print("TOO EARLY! Press Space to retry", 230, 280, 1.1)
         end
 
     elseif state == "memory" then
@@ -154,61 +154,61 @@ function luna.render()
             local cx = ((i - 1) % cols) * 90 + 220
             local cy = math.floor((i - 1) / cols) * 90 + 100
             if c.matched then
-                luna.gfx.setColor(0.15, 0.15, 0.15, 1)
+                lurek.gfx.setColor(0.15, 0.15, 0.15, 1)
             elseif c.revealed then
-                luna.gfx.setColor(c.color[1], c.color[2], c.color[3], 1)
+                lurek.gfx.setColor(c.color[1], c.color[2], c.color[3], 1)
             else
-                luna.gfx.setColor(0.35, 0.35, 0.5, 1)
+                lurek.gfx.setColor(0.35, 0.35, 0.5, 1)
             end
-            luna.gfx.rectangle("fill", cx, cy, 75, 75)
+            lurek.gfx.rectangle("fill", cx, cy, 75, 75)
         end
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Moves: " .. mm.moves .. "  Pairs: " .. mm.pairs .. "/8", 10, 10)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Moves: " .. mm.moves .. "  Pairs: " .. mm.pairs .. "/8", 10, 10)
         if mm.done then
-            luna.gfx.setColor(0, 1, 0.4, 1)
-            luna.gfx.print("COMPLETE! Press M for menu", 260, 520)
+            lurek.gfx.setColor(0, 1, 0.4, 1)
+            lurek.gfx.print("COMPLETE! Press M for menu", 260, 520)
         end
 
     elseif state == "dodge" then
         -- player
-        luna.gfx.setColor(0.2, 0.7, 1, 1)
-        luna.gfx.circle("fill", db.px, 560, 14)
+        lurek.gfx.setColor(0.2, 0.7, 1, 1)
+        lurek.gfx.circle("fill", db.px, 560, 14)
         -- balls
-        luna.gfx.setColor(1, 0.3, 0.2, 1)
+        lurek.gfx.setColor(1, 0.3, 0.2, 1)
         for _, b in ipairs(db.balls) do
-            luna.gfx.circle("fill", b.x, b.y, b.r)
+            lurek.gfx.circle("fill", b.x, b.y, b.r)
         end
         -- HUD
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Time: " .. math.floor(db.timer) .. "  Dodged: " .. db.dodged, 10, 10)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Time: " .. math.floor(db.timer) .. "  Dodged: " .. db.dodged, 10, 10)
         if not db.alive then
-            luna.gfx.setColor(1, 0.3, 0.3, 1)
-            luna.gfx.print(db.timer <= 0 and "TIME UP!" or "HIT!", 360, 300, 1.5)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("Press M for menu", 320, 350)
+            lurek.gfx.setColor(1, 0.3, 0.3, 1)
+            lurek.gfx.print(db.timer <= 0 and "TIME UP!" or "HIT!", 360, 300, 1.5)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("Press M for menu", 320, 350)
         end
 
     elseif state == "scores" then
-        luna.gfx.setColor(1, 0.9, 0.3, 1)
-        luna.gfx.print("SCOREBOARD", 310, 80, 1.5)
+        lurek.gfx.setColor(1, 0.9, 0.3, 1)
+        lurek.gfx.print("SCOREBOARD", 310, 80, 1.5)
         for i, name in ipairs(gameNames) do
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(name .. ": " .. gameScores[i], 280, 140 + i * 40)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(name .. ": " .. gameScores[i], 280, 140 + i * 40)
         end
         totalScore = gameScores[1] + gameScores[2] + gameScores[3]
-        luna.gfx.setColor(0.3, 1, 0.5, 1)
-        luna.gfx.print("Total: " .. totalScore, 320, 360, 1.3)
-        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-        luna.gfx.print("Press M for menu", 310, 440)
+        lurek.gfx.setColor(0.3, 1, 0.5, 1)
+        lurek.gfx.print("Total: " .. totalScore, 320, 360, 1.3)
+        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.gfx.print("Press M for menu", 310, 440)
     end
 
     -- global nav
-    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
-    luna.gfx.print("M=Menu  ESC=Quit", 600, 580)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+    lurek.gfx.print("M=Menu  ESC=Quit", 600, 580)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "m" then state = "menu"; return end
 
     if state == "menu" then
@@ -220,7 +220,7 @@ function luna.keypressed(key)
             if qd.phase == "wait" then
                 qd.phase = "early"
             elseif qd.phase == "go" then
-                qd.reactionTime = luna.time.getTime() - qd.startTime
+                qd.reactionTime = lurek.time.getTime() - qd.startTime
                 local ms = math.floor(qd.reactionTime * 1000)
                 qd.roundScore = clamp(300 - ms, 10, 300)
                 qd.result = "Reaction: " .. ms .. "ms"
@@ -236,7 +236,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if state == "memory" and not mm.done and mm.checkTimer <= 0 then
         local cols = 4
         for i, c in ipairs(mm.cards) do

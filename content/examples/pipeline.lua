@@ -1,15 +1,14 @@
 -- examples/pipeline.lua
--- luna.pipeline — Dependency-aware task runner with retry, delay, and condition gates.
+-- lurek.pipeline — Dependency-aware task runner with retry, delay, and condition gates.
 -- Build DAGs of steps, run synchronously or spread across frames (async mode).
--- All luna.pipeline API methods demonstrated with code and comments.
 
 -- ── Creating Steps ────────────────────────────────────────────────────────────
 
 -- newStep(name) → PipelineStep  — each step is a named unit of work
-local load_config = luna.pipeline.newStep("load_config")
-local load_assets = luna.pipeline.newStep("load_assets")
-local init_world  = luna.pipeline.newStep("init_world")
-local spawn_npc   = luna.pipeline.newStep("spawn_npc")
+local load_config = lurek.pipeline.newStep("load_config")
+local load_assets = lurek.pipeline.newStep("load_assets")
+local init_world  = lurek.pipeline.newStep("init_world")
+local spawn_npc   = lurek.pipeline.newStep("spawn_npc")
 
 -- ── Step Configuration ────────────────────────────────────────────────────────
 
@@ -19,7 +18,7 @@ load_config:setCallback(function(ctx)
 end)
 
 load_assets:setCallback(function(ctx)
-    ctx.hero_img = luna.gfx.newImage("hero.png")
+    ctx.hero_img = lurek.gfx.newImage("hero.png")
 end)
 
 init_world:setCallback(function(ctx)
@@ -95,7 +94,7 @@ local ndeps = spawn_npc:getDependencyCount()
 -- ── Creating a Pipeline ───────────────────────────────────────────────────────
 
 -- newPipeline(name?) → Pipeline
-local pipeline = luna.pipeline.newPipeline("game_init")
+local pipeline = lurek.pipeline.newPipeline("game_init")
 
 -- addStep(step) → Pipeline  — returns self for chaining
 pipeline:addStep(load_config)
@@ -163,7 +162,7 @@ local mode = pipeline:getErrorMode()
 local async_ctx = {}
 pipeline:runAsync(async_ctx)
 
-function luna.process(dt)
+function lurek.process(dt)
     local done = pipeline:update(dt)
     if done then
         local res = pipeline:getResult()  -- full result table
@@ -227,5 +226,5 @@ local is_optional = step:isOptional()  -- Returns whether this step is marked as
 step:type()
 step:typeOf("myName")
 
--- ─── luna.pipeline ─────────────────────────────────────────────────────────────
-local from_table = luna.pipeline.fromTable({})  -- Deserialises a pipeline from a definition table
+-- ─── lurek.pipeline ─────────────────────────────────────────────────────────────
+local from_table = lurek.pipeline.fromTable({})  -- Deserialises a pipeline from a definition table

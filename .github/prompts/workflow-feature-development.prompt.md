@@ -4,7 +4,7 @@ description: "Full feature development workflow from design to merged code. Use 
 
 # Workflow: Feature Development
 
-**Purpose**: Orchestrate the full lifecycle of a non-trivial Luna2D feature: API design → Rust implementation → tests → documentation → code review.
+**Purpose**: Orchestrate the full lifecycle of a non-trivial Lurek2D feature: API design → Rust implementation → tests → documentation → code review.
 **Use When**: A feature requires changes in more than one module, needs API design decisions, or spans multiple specialist agent domains.
 **Do Not Use When**: The change is a single-file bug fix or a small addition clearly owned by one specialist agent.
 **Scope**: Full repository.
@@ -20,7 +20,7 @@ description: "Full feature development workflow from design to merged code. Use 
 ### Phase 1: Design (Lua-Designer + Architect)
 
 1. Load skill `lua-api-design/SKILL.md`
-2. Route to **Lua-Designer**: design the `luna.*` API surface
+2. Route to **Lua-Designer**: design the `lurek.*` API surface
    - Provide: feature description, affected namespace, reference engine equivalent if any
    - Get back: finalized function signatures, Lua usage example
 3. Route to **Architect** if the feature needs a new module or changes module boundaries
@@ -50,7 +50,7 @@ description: "Full feature development workflow from design to merged code. Use 
 ### Phase 4: Documentation (Doc-Writer)
 
 8. Route to **Doc-Writer** with:
-   - New `luna.*` functions added
+   - New `lurek.*` functions added
    - Any architecture changes
    - Updated module list
 

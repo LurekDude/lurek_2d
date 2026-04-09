@@ -1,6 +1,6 @@
 -- Atmospheric / Psychological Horror Demo
 -- Dark environment, flashlight, sanity meter, find keys and escape
--- Run with: cargo run -- demos/rpg/horror
+-- Run with: cargo run -- content/demos/rpg/horror
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -104,8 +104,8 @@ local function placeKeys()
     end
 end
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0, 0, 0)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0, 0, 0)
     initMap()
     -- Player start
     player.x = 1.5 * TILE
@@ -116,15 +116,15 @@ function luna.init()
     placeKeys()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameState ~= "playing" then return end
 
     -- Player movement
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then dy = -1 end
-    if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then dy = 1 end
-    if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then dx = -1 end
-    if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then dx = 1 end
+    if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then dy = -1 end
+    if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then dy = 1 end
+    if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then dx = -1 end
+    if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then dx = 1 end
     if dx ~= 0 and dy ~= 0 then dx = dx * 0.707; dy = dy * 0.707 end
 
     -- Resolve movement per-axis so the player slides along walls instead of getting stuck
@@ -135,7 +135,7 @@ function luna.process(dt)
     if not isWall(player.x, ny - r) and not isWall(player.x, ny + r) then player.y = ny end
 
     -- Flashlight direction follows mouse
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     player.angle = math.atan2(my - player.y, mx - player.x)
 
     -- Battery
@@ -255,8 +255,8 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "f" then flashlight.on = not flashlight.on end
     if key == "r" and gameState ~= "playing" then
         gameState = "playing"
@@ -302,7 +302,7 @@ local function visibility(px, py)
     return clamp(ambient + nearGlow + fl, 0, 1)
 end
 
-function luna.render()
+function lurek.render()
     local shx = screenShake > 0 and math.random(-3, 3) or 0
     local shy = screenShake > 0 and math.random(-3, 3) or 0
 
@@ -315,18 +315,18 @@ function luna.render()
             local cy = y + TILE / 2
             local vis = visibility(cx, cy)
             if map[r][c] == 0 then
-                luna.gfx.setColor(0.08 * vis, 0.08 * vis, 0.12 * vis, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(0.08 * vis, 0.08 * vis, 0.12 * vis, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             elseif map[r][c] == 2 then
-                luna.gfx.setColor(0.1 * vis, 0.4 * vis, 0.5 * vis, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(0.1 * vis, 0.4 * vis, 0.5 * vis, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             elseif map[r][c] == 3 then
                 local g = keysFound >= KEYS_NEEDED and 0.8 or 0.3
-                luna.gfx.setColor(g * vis, 0.2 * vis, 0.2 * vis, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(g * vis, 0.2 * vis, 0.2 * vis, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             else
-                luna.gfx.setColor(0.25 * vis, 0.22 * vis, 0.2 * vis, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(0.25 * vis, 0.22 * vis, 0.2 * vis, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             end
         end
     end
@@ -335,16 +335,16 @@ function luna.render()
     for _, f in ipairs(footsteps) do
         local a = f.life / f.maxLife * 0.3
         local r = (1 - f.life / f.maxLife) * 20
-        luna.gfx.setColor(0.5, 0.5, 0.5, a)
-        luna.gfx.circle("line", f.x + shx, f.y + shy, r)
+        lurek.gfx.setColor(0.5, 0.5, 0.5, a)
+        lurek.gfx.circle("line", f.x + shx, f.y + shy, r)
     end
 
     -- Keys
     for _, k in ipairs(keys) do
         if not k.found then
             local vis = visibility(k.x, k.y)
-            luna.gfx.setColor(1 * vis, 0.9 * vis, 0.2 * vis, 1)
-            luna.gfx.circle("fill", k.x + shx, k.y + shy, 5)
+            lurek.gfx.setColor(1 * vis, 0.9 * vis, 0.2 * vis, 1)
+            lurek.gfx.circle("fill", k.x + shx, k.y + shy, 5)
         end
     end
 
@@ -352,35 +352,35 @@ function luna.render()
     for _, n in ipairs(notes) do
         if not n.read then
             local vis = visibility(n.x, n.y)
-            luna.gfx.setColor(0.9 * vis, 0.9 * vis, 0.8 * vis, 1)
-            luna.gfx.rectangle("fill", n.x - 5 + shx, n.y - 5 + shy, 10, 10)
+            lurek.gfx.setColor(0.9 * vis, 0.9 * vis, 0.8 * vis, 1)
+            lurek.gfx.rectangle("fill", n.x - 5 + shx, n.y - 5 + shy, 10, 10)
         end
     end
 
     -- Scare events
     for _, ev in ipairs(events) do
         local vis = visibility(ev.x, ev.y)
-        luna.gfx.setColor(0.5 * vis, 0, 0, ev.life)
-        luna.gfx.circle("fill", ev.x + shx, ev.y + shy, 15)
+        lurek.gfx.setColor(0.5 * vis, 0, 0, ev.life)
+        lurek.gfx.circle("fill", ev.x + shx, ev.y + shy, 15)
     end
 
     -- Enemy
     local eVis = visibility(enemy.x, enemy.y)
     if eVis > 0.05 then
-        luna.gfx.setColor(0.8 * eVis, 0.1, 0.1, eVis)
-        luna.gfx.circle("fill", enemy.x + shx, enemy.y + shy, 12)
+        lurek.gfx.setColor(0.8 * eVis, 0.1, 0.1, eVis)
+        lurek.gfx.circle("fill", enemy.x + shx, enemy.y + shy, 12)
         -- Vision cone
-        luna.gfx.setColor(0.5, 0, 0, 0.15 * eVis)
+        lurek.gfx.setColor(0.5, 0, 0, 0.15 * eVis)
         local ex1 = enemy.x + math.cos(enemy.angle - 0.4) * 60
         local ey1 = enemy.y + math.sin(enemy.angle - 0.4) * 60
         local ex2 = enemy.x + math.cos(enemy.angle + 0.4) * 60
         local ey2 = enemy.y + math.sin(enemy.angle + 0.4) * 60
-        luna.gfx.polygon("fill", {enemy.x + shx, enemy.y + shy, ex1 + shx, ey1 + shy, ex2 + shx, ey2 + shy})
+        lurek.gfx.polygon("fill", {enemy.x + shx, enemy.y + shy, ex1 + shx, ey1 + shy, ex2 + shx, ey2 + shy})
     end
 
     -- Player
-    luna.gfx.setColor(0.9, 0.8, 0.6, 1)
-    luna.gfx.circle("fill", player.x + shx, player.y + shy, 8)
+    lurek.gfx.setColor(0.9, 0.8, 0.6, 1)
+    lurek.gfx.circle("fill", player.x + shx, player.y + shy, 8)
 
     -- Flashlight cone visualization
     if flashlight.on and flashlight.battery > 0 then
@@ -389,63 +389,63 @@ function luna.render()
         local fy1 = player.y + math.sin(player.angle - flashlight.cone) * flashlight.range
         local fx2 = player.x + math.cos(player.angle + flashlight.cone) * flashlight.range
         local fy2 = player.y + math.sin(player.angle + flashlight.cone) * flashlight.range
-        luna.gfx.setColor(1, 1, 0.8, intensity)
-        luna.gfx.polygon("fill", {player.x + shx, player.y + shy, fx1 + shx, fy1 + shy, fx2 + shx, fy2 + shy})
+        lurek.gfx.setColor(1, 1, 0.8, intensity)
+        lurek.gfx.polygon("fill", {player.x + shx, player.y + shy, fx1 + shx, fy1 + shy, fx2 + shx, fy2 + shy})
     end
 
     -- Distortion overlay (low sanity)
     if distortion > 0.3 then
         local a = (distortion - 0.3) * 0.5
-        local r = 0.3 + math.sin(luna.time.getTime() * 5) * 0.2
-        luna.gfx.setColor(r, 0, 0.1, a)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        local r = 0.3 + math.sin(lurek.time.getTime() * 5) * 0.2
+        lurek.gfx.setColor(r, 0, 0.1, a)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, 0, W, 30)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, 0, W, 30)
     -- Battery bar
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 10, 5, 100, 12)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 10, 5, 100, 12)
     local bc = flashlight.battery / flashlight.maxBattery
-    luna.gfx.setColor(bc, bc, 0.2, 1)
-    luna.gfx.rectangle("fill", 10, 5, bc * 100, 12)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Battery", 115, 4, 0.7)
+    lurek.gfx.setColor(bc, bc, 0.2, 1)
+    lurek.gfx.rectangle("fill", 10, 5, bc * 100, 12)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Battery", 115, 4, 0.7)
     -- Sanity bar
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 200, 5, 100, 12)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 200, 5, 100, 12)
     local sc = sanity.value / sanity.max
-    luna.gfx.setColor(0.2, sc * 0.8, sc, 1)
-    luna.gfx.rectangle("fill", 200, 5, sc * 100, 12)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Sanity", 305, 4, 0.7)
+    lurek.gfx.setColor(0.2, sc * 0.8, sc, 1)
+    lurek.gfx.rectangle("fill", 200, 5, sc * 100, 12)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Sanity", 305, 4, 0.7)
     -- Keys
-    luna.gfx.setColor(1, 0.9, 0.2, 1)
-    luna.gfx.print("Keys: " .. keysFound .. "/" .. KEYS_NEEDED, 400, 5, 0.9)
-    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-    luna.gfx.print("WASD move | F flashlight | Find 5 keys, reach exit", 520, 6, 0.65)
+    lurek.gfx.setColor(1, 0.9, 0.2, 1)
+    lurek.gfx.print("Keys: " .. keysFound .. "/" .. KEYS_NEEDED, 400, 5, 0.9)
+    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+    lurek.gfx.print("WASD move | F flashlight | Find 5 keys, reach exit", 520, 6, 0.65)
 
     -- Note display
     if noteDisplay and noteTimer > 0 then
-        luna.gfx.setColor(0, 0, 0, 0.85)
-        luna.gfx.rectangle("fill", W / 2 - 200, H / 2 - 40, 400, 80)
-        luna.gfx.setColor(0.9, 0.85, 0.7, 1)
-        luna.gfx.print(noteDisplay, W / 2 - 180, H / 2 - 20, 0.9)
+        lurek.gfx.setColor(0, 0, 0, 0.85)
+        lurek.gfx.rectangle("fill", W / 2 - 200, H / 2 - 40, 400, 80)
+        lurek.gfx.setColor(0.9, 0.85, 0.7, 1)
+        lurek.gfx.print(noteDisplay, W / 2 - 180, H / 2 - 20, 0.9)
     end
 
     -- Game over / win
     if gameState == "dead" then
-        luna.gfx.setColor(0.5, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("YOUR MIND IS LOST", W / 2 - 120, H / 2 - 20, 1.5)
-        luna.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
+        lurek.gfx.setColor(0.5, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("YOUR MIND IS LOST", W / 2 - 120, H / 2 - 20, 1.5)
+        lurek.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
     elseif gameState == "won" then
-        luna.gfx.setColor(0, 0.2, 0, 0.8)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("YOU ESCAPED!", W / 2 - 80, H / 2 - 20, 1.5)
-        luna.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 20, 0.9)
+        lurek.gfx.setColor(0, 0.2, 0, 0.8)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("YOU ESCAPED!", W / 2 - 80, H / 2 - 20, 1.5)
+        lurek.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 20, 0.9)
     end
 end

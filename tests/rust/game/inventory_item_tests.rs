@@ -1,9 +1,9 @@
-//! Integration tests for the `luna.item` + `luna.inventory` systems working together.
+//! Integration tests for the `lurek.item` + `lurek.inventory` systems working together.
 //!
 //! These tests verify the common game-dev workflow:
-//! 1. Define rich item archetypes with `luna.item.defineType` (stats, tags, category)
-//! 2. Use `luna.item` systems (Pool, StackBuilder, StackHistory) for loot generation
-//! 3. Bridge to `luna.inventory` via the item-type name string for slot-based storage
+//! 1. Define rich item archetypes with `lurek.item.defineType` (stats, tags, category)
+//! 2. Use `lurek.item` systems (Pool, StackBuilder, StackHistory) for loot generation
+//! 3. Bridge to `lurek.inventory` via the item-type name string for slot-based storage
 //!
 //! Scenarios covered:
 //! - RPG loot drop: pool draw → inventory container
@@ -13,7 +13,7 @@
 //! - Shop shelf: StackManager supplies→player inventory transfer
 //! - Best-stat picker: findNOfStat selects top items before equipping
 
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -44,7 +44,7 @@ const SETUP_ITEM_TYPES: &str = r#"
 // ── 1. Pool loot drop → inventory container ───────────────────────────────
 
 /// A monster drops random loot from a weighted pool; all drops land in the
-/// player's bag (luna.inventory Container).
+/// player's bag (lurek.inventory Container).
 #[test]
 fn pool_loot_drop_fills_inventory() {
     let lua = make_vm();
@@ -311,7 +311,7 @@ fn full_armor_set_activates_in_inventory() {
 
 // ── 8. Category grouping drives inventory container assignment ──────────
 
-/// Use luna.item group utilities to split a mixed loot pile into category
+/// Use lurek.item group utilities to split a mixed loot pile into category
 /// groups, then route each group to its own inventory container.
 #[test]
 fn group_by_category_routes_items_to_containers() {

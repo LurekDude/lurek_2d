@@ -1,18 +1,18 @@
--- Luna2D Integration Test: Compute + DataFrame
+-- Lurek2D Integration Test: Compute + DataFrame
 -- Tests NdArray statistical operations feeding into DataFrame reports
 
 describe("integration: compute statistics to dataframe", function()
     it("compute array stats populate dataframe", function()
         -- Create arrays with known distributions
         local datasets = {
-            luna.compute.range(1, 101, 1, "float32"),    -- 1-100
-            luna.compute.ones({100}, "float32"),          -- all ones
-            luna.compute.range(50, 150, 1, "float32"),    -- 50-149
+            lurek.compute.range(1, 101, 1, "float32"),    -- 1-100
+            lurek.compute.ones({100}, "float32"),          -- all ones
+            lurek.compute.range(50, 150, 1, "float32"),    -- 50-149
         }
         local names = {"linear", "uniform", "offset"}
 
         -- Create a DataFrame to hold statistics
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("dataset", "")
         df:addColumn("count", 0)
         df:addColumn("sum", 0)
@@ -51,7 +51,7 @@ describe("integration: image data to compute array", function()
     it("image pixel data can be analyzed with compute", function()
         -- Create a gradient image
         local width, height = 16, 16
-        local img = luna.img.newImageData(width, height)
+        local img = lurek.img.newImageData(width, height)
 
         -- Set pixels with gradient
         for y = 0, height - 1 do
@@ -70,7 +70,7 @@ describe("integration: image data to compute array", function()
         end
 
         -- Create compute array from red channel
-        local arr = luna.compute.fromTable(red_values, nil, "float32")
+        local arr = lurek.compute.fromTable(red_values, nil, "float32")
         expect_equal(256, arr:getSize(), "256 pixels")
 
         -- Analyze
@@ -81,30 +81,30 @@ end)
 
 describe("integration: data encoding pipeline", function()
     it("compress -> encode -> decode -> decompress roundtrip", function()
-        local original = "Luna2D integration test: compress then encode then decode then decompress."
+        local original = "Lurek2D integration test: compress then encode then decode then decompress."
 
         -- Step 1: Compress
-        local compressed = luna.data.compress("deflate", original, 6)
+        local compressed = lurek.data.compress("deflate", original, 6)
 
         -- Step 2: Base64 encode (for safe text transport)
-        local encoded = luna.data.encode("base64", compressed)
+        local encoded = lurek.data.encode("base64", compressed)
         expect_type("string", encoded, "encoded is string")
 
         -- Step 3: Base64 decode
-        local decoded_compressed = luna.data.decode("base64", encoded)
+        local decoded_compressed = lurek.data.decode("base64", encoded)
 
         -- Step 4: Decompress
-        local result = luna.data.decompress("deflate", decoded_compressed)
+        local result = lurek.data.decompress("deflate", decoded_compressed)
 
         expect_equal(original, result, "full pipeline preserves data")
     end)
 
     it("hash of compressed data is stable", function()
         local data = "Hash stability test vector"
-        local compressed = luna.data.compress("zlib", data, 6)
+        local compressed = lurek.data.compress("zlib", data, 6)
 
-        local hash1 = luna.data.hash("sha256", compressed)
-        local hash2 = luna.data.hash("sha256", compressed)
+        local hash1 = lurek.data.hash("sha256", compressed)
+        local hash2 = lurek.data.hash("sha256", compressed)
 
         expect_equal(hash1, hash2, "hash is deterministic")
         expect_equal(64, #hash1, "SHA-256 produces 64 hex chars")

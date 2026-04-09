@@ -1,6 +1,6 @@
-# specs/ — Luna2D Module Specifications
+# docs/specs/ — Lurek2D Module Specifications
 
-This folder contains the **full technical specification** for every `src/<module>/` module in the Luna2D engine.
+This folder contains the **full technical specification** for every `src/<module>/` module in the Lurek2D engine.
 
 Each file is named `<module>.md` and mirrors the module folder name. They are the canonical reference for architecture, public types, Lua API surface, examples, and cross-module relationships.
 
@@ -9,19 +9,19 @@ Each file is named `<module>.md` and mirrors the module folder name. They are th
 Whenever you:
 - Add or remove a `.rs` file in `src/<module>/`
 - Add, rename, or remove a public `struct` / `enum` / `fn`
-- Add, rename, or remove a `luna.*` Lua binding
+- Add, rename, or remove a `lurek.*` Lua binding
 - Change module dependencies
 
 You **must** update **all** of the following in the same commit:
 
 | File | What to update |
 |------|----------------|
-| `specs/<module>.md` | Full detail: architecture, types, Lua API, examples |
+| `docs/specs/<module>.md` | Full detail: architecture, types, Lua API, examples |
 | `src/<module>/AGENT.md` | Summary, source file table |
 | `src/lua_api/<module>_api.rs` | Binding annotations (`@param`, `@return`) |
 | `docs/API/lua_api_reference_generated.md` | Run `tools/gen_lua_api.py` |
-| `demos/` and `examples/` | Update affected demo/example scripts |
-| `library/` | Update Lunasome modules that depend on the changed API |
+| `content/demos/` and `content/examples/` | Update affected demo/example scripts |
+| `content/library/` | Update Lunasome modules that depend on the changed API |
 
 ## Modules
 

@@ -1,18 +1,18 @@
-# Luna2D Ecosystem Research � Are We Game Yet?
+# Lurek2D Ecosystem Research � Are We Game Yet?
 
 **Source**: [arewegameyet.rs/#ecosystem](https://arewegameyet.rs/#ecosystem)
 **Research date**: 2026-03-29
-**Purpose**: Survey the Rust game-dev ecosystem and identify what can realistically be reimplemented or integrated into Luna2D.
+**Purpose**: Survey the Rust game-dev ecosystem and identify what can realistically be reimplemented or integrated into Lurek2D.
 
-> Note: This document is a historical research snapshot. References below to `minifb`/`tiny-skia` as Luna2D's main runtime predate the current `winit` + `wgpu` primary stack. See `docs/architecture.md` for the current architecture.
+> Note: This document is a historical research snapshot. References below to `minifb`/`tiny-skia` as Lurek2D's main runtime predate the current `winit` + `wgpu` primary stack. See `docs/architecture.md` for the current architecture.
 
 ---
 
 ## Table of Contents
 
-- [Luna2D Ecosystem Research � Are We Game Yet?](#luna2d-ecosystem-research--are-we-game-yet)
+- [Lurek2D Ecosystem Research � Are We Game Yet?](#lurek2d-ecosystem-research--are-we-game-yet)
 	- [Table of Contents](#table-of-contents)
-	- [Current Luna2D State](#current-luna2d-state)
+	- [Current Lurek2D State](#current-lurek2d-state)
 		- [What Exists](#what-exists)
 		- [Key Gaps](#key-gaps)
 	- [Ecosystem Categories Overview](#ecosystem-categories-overview)
@@ -38,14 +38,14 @@
 		- [Priority 3 � Medium Impact, Medium Effort](#priority-3--medium-impact-medium-effort)
 		- [Priority 4 � Stretch Goals](#priority-4--stretch-goals)
 	- [Crates Worth Integrating Directly](#crates-worth-integrating-directly)
-	- [Features Luna2D Should Build Natively](#features-luna2d-should-build-natively)
-	- [Out of Scope for Luna2D](#out-of-scope-for-luna2d)
+	- [Features Lurek2D Should Build Natively](#features-lurek2d-should-build-natively)
+	- [Out of Scope for Lurek2D](#out-of-scope-for-lurek2d)
 
 ---
 
-## Current Luna2D State
+## Current Lurek2D State
 
-Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2D game engine with Lua 5.4 scripting (via mlua). Below is a condensed gap summary derived from codebase exploration.
+Lurek2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2D game engine with Lua 5.4 scripting (via mlua). Below is a condensed gap summary derived from codebase exploration.
 
 ### What Exists
 
@@ -78,7 +78,7 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 
 ## Ecosystem Categories Overview
 
-| Category | Crate Count | Luna2D Relevance |
+| Category | Crate Count | Lurek2D Relevance |
 |----------|------------|-----------------|
 | 2D Rendering | 30 | **High** � already uses tiny-skia; other crates offer upgrades |
 | Audio | 29 | **High** � already uses rodio; gaps in features |
@@ -113,17 +113,17 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 | `femtovg` 0.20.4 | 260K | 905 | Antialiased 2D vector drawing over OpenGL/Metal |
 | `lyon` 1.0.19 | 440K | 2,546 | GPU tessellation for vector paths |
 | `miniquad` 0.4.8 | 151K | 1,964 | Cross-platform context + rendering, WebAssembly-friendly |
-| `blit` 0.8.5 | 1,350 | 26 | Sprite blitting on raw pixel buffers � close to Luna2D model |
+| `blit` 0.8.5 | 1,350 | 26 | Sprite blitting on raw pixel buffers � close to Lurek2D model |
 | `rotsprite` 0.1.4 | 424 | 39 | Software sprite rotation algorithm � could improve rotating sprites |
 | `piston2d-graphics` 0.45.0 | 92K | 483 | Abstract 2D rendering backend |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
-1. **Sprite blending / draw modes** � `tiny-skia`'s `BlendMode` enum supports `SourceOver`, `Multiply`, `Screen`, `Overlay`, `Hardlight`, `ColorDodge`, `Difference`, `Exclusion`, `Hue`, `Saturation`, `Plus` etc. Luna2D currently only ever uses `SourceOver`. Exposing these through `DrawCommand::SetBlendMode` would unlock per-sprite blending from Lua.
+1. **Sprite blending / draw modes** � `tiny-skia`'s `BlendMode` enum supports `SourceOver`, `Multiply`, `Screen`, `Overlay`, `Hardlight`, `ColorDodge`, `Difference`, `Exclusion`, `Hue`, `Saturation`, `Plus` etc. Lurek2D currently only ever uses `SourceOver`. Exposing these through `DrawCommand::SetBlendMode` would unlock per-sprite blending from Lua.
 
 2. **Camera transform integration** � Camera struct already exists with a world-to-screen `Mat3`. The missing step is applying it in `Renderer::flush()` before drawing each `DrawImage` or shape. Implementation is straightforward: multiply sprite position through `camera.view_matrix()`.
 
-3. **Z-ordering / draw layers** � Luna2D draws in call order. A `DrawCommand::SetLayer(i32)` variant + stable-sort in `flush()` would support depth control from Lua without changing the API contract.
+3. **Z-ordering / draw layers** � Lurek2D draws in call order. A `DrawCommand::SetLayer(i32)` variant + stable-sort in `flush()` would support depth control from Lua without changing the API contract.
 
 4. **9-slice images** � Useful for UI panels. Can be implemented natively using 9 `DrawImage` calls with pre-split rects; no new crate needed.
 
@@ -131,7 +131,7 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 
 6. **Sprite batching** � Currently each `DrawImage` is an independent skia call. For performance with hundreds of sprites, caching a sprite sheet into a single Pixmap and UV-slicing would help. This is a custom implementation; no crate does it for the tiny-skia model.
 
-7. **Software pixel shaders** � Since we control the pixel buffer, Lua could define a per-pixel callback invoked on a region (like a `luna.gfx.effect(fn, x, y, w, h)`). This would be a Luna2D-specific innovation not available in hardware-accelerated engines.
+7. **Software pixel shaders** � Since we control the pixel buffer, Lua could define a per-pixel callback invoked on a region (like a `lurek.gfx.effect(fn, x, y, w, h)`). This would be a Lurek2D-specific innovation not available in hardware-accelerated engines.
 
 **Verdict on GPU upgrade:** Migrating to `wgpu` or `pixels` would deliver major framerate improvements (hardware acceleration vs. CPU painting) but would break the architecture fundamentally. This is a future major-version concern, not an incremental improvement. The current tiny-skia pipeline is coherent, testable, and cross-platform without native dependencies beyond a window.
 
@@ -147,7 +147,7 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 | `kira` 0.12.0 | 85K | 1,004 | Expressive game audio: tweens, sequences, spatial |
 | `cpal` 0.17.3 | 2.1M | 3,609 | Low-level cross-platform audio I/O (rodio's backend) |
 | `oddio` 0.7.4 | 7.7K | 161 | Lightweight game audio, good API design |
-| `fyrox-sound` 0.36.2 | 4.6K | 8,958 | Fyrox engine's sound system |
+| `Engine K-sound` 0.36.2 | 4.6K | 8,958 | Engine K engine's sound system |
 | `claxon` 0.4.3 | 467K | 321 | Pure Rust FLAC decoder |
 | `hound` 3.5.1 | 2.3M | 603 | WAV encoding/decoding |
 | `lewton` 0.10.2 | 920K | 286 | Pure Rust Vorbis decoder |
@@ -155,25 +155,25 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 | `sfxr` 0.1.4 | 195 | 54 | Procedural retro sound effects generator |
 | `usfx` 0.1.5 | 263 | 56 | Realtime procedural sound effects |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
-1. **Loop control** � `rodio 0.22` supports `Sink::repeat_infinite()` and `Source::repeat_infinite()`. The Luna2D `Mixer::play()` method just needs a `looping: bool` parameter. Estimated effort: trivial � change one `rodio` call.
+1. **Loop control** � `rodio 0.22` supports `Sink::repeat_infinite()` and `Source::repeat_infinite()`. The Lurek2D `Mixer::play()` method just needs a `looping: bool` parameter. Estimated effort: trivial � change one `rodio` call.
 
-2. **Pause/resume** � `rodio::Sink::pause()` and `Sink::play()` already exist. Luna2D stores a `Sink` per AudioSource; just expose these methods.
+2. **Pause/resume** � `rodio::Sink::pause()` and `Sink::play()` already exist. Lurek2D stores a `Sink` per AudioSource; just expose these methods.
 
-3. **Pitch/speed** � `rodio::Source::speed(ratio: f32)` is available. Expose as `luna.audio.setPitch(source, 1.5)`.
+3. **Pitch/speed** � `rodio::Source::speed(ratio: f32)` is available. Expose as `lurek.audio.setPitch(source, 1.5)`.
 
 4. **Master volume** � `rodio::OutputStreamHandle` doesn't expose global volume directly. A workaround is wrapping all sources with `.amplify(master_volume)` before `.append()`. Alternatively, kira provides this natively.
 
 5. **Fade in/out** � `rodio::Source::fade_in(duration)` exists. Custom fade-out requires time-tracking. `kira` has built-in tweening for this.
 
-6. **Tracking playing state** � `rodio::Sink::empty()` returns `true` when playback ends. This can be polled on `luna.update()` to fire completion events.
+6. **Tracking playing state** � `rodio::Sink::empty()` returns `true` when playback ends. This can be polled on `lurek.update()` to fire completion events.
 
 7. **Multiple concurrent sounds of same source** � Currently each AudioSource has one Sink. Multiple concurrent plays (e.g., firing many bullets) need a Sink pool per source.
 
 8. **Spatial audio** � `ambisonic` crate can 3D-position sounds. However, for a 2D engine, simple pan-left/pan-right based on screen X is usually sufficient and implementable with `rodio::Source::amplify()` on separate L/R channels.
 
-9. **Procedural sound effects** � `sfxr`/`usfx` generate retro sound effects programmatically. Could be exposed as `luna.audio.newEffect(descriptor)` � interesting for game jams.
+9. **Procedural sound effects** � `sfxr`/`usfx` generate retro sound effects programmatically. Could be exposed as `lurek.audio.newEffect(descriptor)` � interesting for game jams.
 
 **Consideration on switching to `kira`:** `kira 0.12` has significantly better game-audio ergonomics (sequences, tweens, track routing) than `rodio`. Migration would replace `src/audio/mixer.rs` entirely. `kira` uses rodio's `cpal` backend internally. Given rodio's limitations, this is worth evaluating for a future audio module rewrite.
 
@@ -186,13 +186,13 @@ Luna2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 2
 | Crate | Downloads/mo | Stars | Notes |
 |-------|-------------|-------|-------|
 | `rapier2d` 0.32.0 | 89.6K | 5,219 | Gold standard 2D physics � rigid bodies, joints, convex shapes |
-| `rapier3d` 0.32.0 | 183K | 5,219 | 3D counterpart (out of scope for Luna2D) |
+| `rapier3d` 0.32.0 | 183K | 5,219 | 3D counterpart (out of scope for Lurek2D) |
 | `collider` 0.3.1 | 479 | 95 | Continuous 2D collision detection only |
 | `wrapped2d` 0.4.2 | 883 | 65 | Rust binding for a physics simulation library |
 | `nphysics2d` 0.24.0 | 3K | 1,645 | Superseded by rapier2d |
 | `salva2d` 0.9.0 | 4.6K | 661 | 2D particle fluid simulation |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
 The current physics module is limited to AABB rectangle bodies. This is sufficient for simple platformers but breaks for any game needing circles, rotated shapes, or joints.
 
@@ -204,11 +204,11 @@ The current physics module is limited to AABB rectangle bodies. This is sufficie
 
 **Option B � Integrate `rapier2d`:**
 - Replace `src/physics/` entirely with a thin wrapper around `rapier2d`
-- Luna2D Lua API would remain identical (`luna.physics.*`) but backed by rapier
+- Lurek2D Lua API would remain identical (`lurek.physics.*`) but backed by rapier
 - Supports: circles, convex polygons, rotation, joints, sensors, raycasts, collision groups
 - `rapier2d` adds ~400KB to binary size
 - Removes the ability to keep physics "pure Rust, no C" � rapier is pure Rust ?
-- Main cost: API impedance; rapier uses `RigidBodyHandle`/`ColliderHandle` while Luna2D uses a flat integer body ID
+- Main cost: API impedance; rapier uses `RigidBodyHandle`/`ColliderHandle` while Lurek2D uses a flat integer body ID
 
 **Option B is strongly recommended** for any game beyond simplistic demos. The custom AABB engine duplicates work that rapier solves comprehensively.
 
@@ -216,16 +216,16 @@ The current physics module is limited to AABB rectangle bodies. This is sufficie
 
 ```lua
 -- Existing API would remain compatible:
-local world = luna.physics.newWorld(0, -9.8)
-local player = luna.physics.newBody(world, "dynamic", 10, 200, 32, 32)
-luna.physics.step(world, dt)
-local x, y = luna.physics.getBodyPosition(player)
+local world = lurek.physics.newWorld(0, -9.8)
+local player = lurek.physics.newBody(world, "dynamic", 10, 200, 32, 32)
+lurek.physics.step(world, dt)
+local x, y = lurek.physics.getBodyPosition(player)
 
 -- New capabilities enabled:
-local circle = luna.physics.newCircleBody(world, "dynamic", 100, 100, 16)  -- radius
-local sensor  = luna.physics.newSensor(world, 50, 50, 32, 32)              -- non-solid trigger
-local joint   = luna.physics.newJoint(world, bodyA, bodyB, "fixed")
-local hit     = luna.physics.raycast(world, x1, y1, x2, y2)               -- returns nil or table
+local circle = lurek.physics.newCircleBody(world, "dynamic", 100, 100, 16)  -- radius
+local sensor  = lurek.physics.newSensor(world, 50, 50, 32, 32)              -- non-solid trigger
+local joint   = lurek.physics.newJoint(world, bodyA, bodyB, "fixed")
+local hit     = lurek.physics.raycast(world, x1, y1, x2, y2)               -- returns nil or table
 ```
 
 ---
@@ -236,33 +236,33 @@ local hit     = luna.physics.raycast(world, x1, y1, x2, y2)               -- ret
 
 | Crate | Downloads/mo | Stars | Notes |
 |-------|-------------|-------|-------|
-| `bevy_ecs` 0.18.1 | 1.1M | 45,219 | Best-in-class; Bevy's core ECS |
+| `bevy_ecs` 0.18.1 | 1.1M | 45,219 | Best-in-class; Engine D's core ECS |
 | `hecs` 0.11.0 | 56K | 1,259 | Minimal, ergonomic, no magic |
-| `specs` 0.20.0 | 70K | 2,602 | Parallel ECS (Amethyst-era, still active) |
+| `specs` 0.20.0 | 70K | 2,602 | Parallel ECS (Engine J-era, still active) |
 | `shipyard` 0.11.2 | 13.6K | 840 | All-at-once view API |
 | `legion` 0.4.0 | 21K | 1,704 | High-performance, archetype-based |
 | `evenio` 0.6.0 | 575 | 149 | Event-driven ECS |
 | `flax` 0.7.1 | 211 | 92 | Ergonomic archetypical ECS |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D does not have an ECS. The engine uses a flat shared state model (`SharedState` via `Rc<RefCell<>>`). Whether to add ECS depends on what game developers need.
+Lurek2D does not have an ECS. The engine uses a flat shared state model (`SharedState` via `Rc<RefCell<>>`). Whether to add ECS depends on what game developers need.
 
 **Arguments for adding ECS:**
 
 - Game objects (enemies, bullets, tiles) become hard to manage as the game grows
 - ECS enables clean separation of data (components) from behavior (systems)
 - `hecs` is small, no macros, pure Rust, embeddable � 56K downloads/month signals real use
-- Could expose a minimal ECS from Lua: `luna.ecs.newEntity()`, `luna.ecs.addComponent(entity, "position", {x=0, y=0})`
+- Could expose a minimal ECS from Lua: `lurek.ecs.newEntity()`, `lurek.ecs.addComponent(entity, "position", {x=0, y=0})`
 
-**Arguments against native ECS in Luna2D:**
+**Arguments against native ECS in Lurek2D:**
 
 - Lua's table-based OOP already provides a lightweight entity model
 - A Lua-side ECS library (pure Lua tables + metatables) would be simpler than wrapping a Rust ECS through Lua bindings
-- Bevy ECS has significant integration cost given its ownership model
+- Engine D ECS has significant integration cost given its ownership model
 - `hecs` entities are `u64` handles � manageable from Lua with a lookup table
 
-**Recommendation:** Implement a lightweight Lua-side entity system first (just a `luna.ecs` module backed by Lua tables), documented as the canonical approach. Only add a Rust-backed ECS if performance benchmarking reveals the Lua approach as a bottleneck.
+**Recommendation:** Implement a lightweight Lua-side entity system first (just a `lurek.ecs` module backed by Lua tables), documented as the canonical approach. Only add a Rust-backed ECS if performance benchmarking reveals the Lua approach as a bottleneck.
 
 ---
 
@@ -273,16 +273,16 @@ Luna2D does not have an ECS. The engine uses a flat shared state model (`SharedS
 | Crate | Downloads/mo | Stars | Notes |
 |-------|-------------|-------|-------|
 | `gilrs` 0.11.1 | 945K | 86 | **Best gamepad library** � cross-platform, SDL-backed |
-| `leafwing-input-manager` 0.20.0 | 54K | 912 | Action-based input mapping (Bevy-only) |
+| `leafwing-input-manager` 0.20.0 | 54K | 912 | Action-based input mapping (Engine D-only) |
 | `stick` 0.13.0 | 1.3K | 82 | Async gamepad/joystick library |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
 1. **Gamepad support** � `gilrs` is the obvious choice. `GamepadState` struct exists in `src/input/` but isn't integrated into the minifb event loop. Adding gilrs:
    - Add `gilrs` to `Cargo.toml`
    - Poll `Gilrs::next_event()` in the game loop
    - Update `GamepadState` with button/axis values
-   - Expose as `luna.gamepad.*`
+   - Expose as `lurek.gamepad.*`
 
 2. **Mouse wheel** � `minifb` exposes `Window::get_scroll_xy()` which returns `(f64, f64)`. This already exists in the dependency; just needs to be read in the event loop and propagated to `MouseState`.
 
@@ -312,9 +312,9 @@ Luna2D does not have an ECS. The engine uses a flat shared state model (`SharedS
 | `splines` 5.0.0 | 65K | � | Spline interpolation (Catmull-Rom, Bezier) |
 | `noise` 0.9.0 | 253K | 1,056 | Procedural noise (Perlin, Simplex, Worley, Fbm) |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
-Luna2D has a hand-rolled `Vec2`, `Mat3`, and `Rect`. These are minimal but correct. The question is whether to replace them with `glam` or extend them.
+Lurek2D has a hand-rolled `Vec2`, `Mat3`, and `Rect`. These are minimal but correct. The question is whether to replace them with `glam` or extend them.
 
 **Case for keeping custom math:**
 - No external dependency for math
@@ -329,15 +329,15 @@ Luna2D has a hand-rolled `Vec2`, `Mat3`, and `Rect`. These are minimal but corre
 
 **Additions to implement natively (regardless of glam decision):**
 
-1. **Easing functions** � `ease_in_quad(t)`, `ease_out_cubic(t)`, `ease_in_out_sine(t)`, etc. These are pure Rust math, no crate needed. Expose as `luna.math.easeIn(t)`, `luna.math.easeOut(t)`, etc.
+1. **Easing functions** � `ease_in_quad(t)`, `ease_out_cubic(t)`, `ease_in_out_sine(t)`, etc. These are pure Rust math, no crate needed. Expose as `lurek.math.easeIn(t)`, `lurek.math.easeOut(t)`, etc.
 
-2. **Perlin/Simplex noise** � Via `noise` crate or implement a minimal Simplex noise (?80 lines of Rust). Expose as `luna.math.noise(x, y)` and `luna.math.noise(x, y, z)`. Critical for procedural generation.
+2. **Perlin/Simplex noise** � Via `noise` crate or implement a minimal Simplex noise (?80 lines of Rust). Expose as `lurek.math.noise(x, y)` and `lurek.math.noise(x, y, z)`. Critical for procedural generation.
 
 3. **Spline interpolation** � For smooth camera paths, Bezier curves for projectiles etc. `splines` crate handles Catmull-Rom and Bezier cleanly. Alternatively: 4-parameter cubic Bezier can be implemented in ~30 lines.
 
-4. **Color math** � `palette` provides perceptual color blending (LCh, HSLuv). For Luna2D, a simpler addition would be HSV-RGB conversion on the `Color` struct to enable `lerp_hue()`.
+4. **Color math** � `palette` provides perceptual color blending (LCh, HSLuv). For Lurek2D, a simpler addition would be HSV-RGB conversion on the `Color` struct to enable `lerp_hue()`.
 
-5. **Random number generation** � Current `luna.math.random()` defers to Lua's `math.random`. A seeded PRNG exposed as `luna.math.newRandom(seed)` would enable reproducible procedural content.
+5. **Random number generation** � Current `lurek.math.random()` defers to Lua's `math.random`. A seeded PRNG exposed as `lurek.math.newRandom(seed)` would enable reproducible procedural content.
 
 ---
 
@@ -357,17 +357,17 @@ Luna2D has a hand-rolled `Vec2`, `Mat3`, and `Rect`. These are minimal but corre
 |-------|-------------|-------|-------|
 | `keyframe` 1.1.1 | 65.6K | 138 | Easing functions + keyframe animation |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
-Luna2D has no animation system. The most impactful additions are:
+Lurek2D has no animation system. The most impactful additions are:
 
-1. **Sprite sheet animation** � Slice a texture into frames (`frames: Vec<Rect>`), advance frame index by `fps * dt`, draw current frame. This is ~50 lines of Lua or Rust, no crate needed. Implement as a `Sprite` extension or a `luna.animation.newAnim(image, frames, fps)` API.
+1. **Sprite sheet animation** � Slice a texture into frames (`frames: Vec<Rect>`), advance frame index by `fps * dt`, draw current frame. This is ~50 lines of Lua or Rust, no crate needed. Implement as a `Sprite` extension or a `lurek.animation.newAnim(image, frames, fps)` API.
 
-2. **Tweening** � Smoothly animate any numeric value over time: `luna.animation.to(target_table, {x=200, y=300}, 1.5, "easeInOut")`. The `keyframe` crate provides easing curves. A tween manager can be implemented entirely in Lua using `luna.time.getDelta()`.
+2. **Tweening** � Smoothly animate any numeric value over time: `lurek.animation.to(target_table, {x=200, y=300}, 1.5, "easeInOut")`. The `keyframe` crate provides easing curves. A tween manager can be implemented entirely in Lua using `lurek.time.getDelta()`.
 
 3. **Spring animations** � `natura`'s spring model (critically damped spring) creates natural-feeling motion without keyframe data. Very useful for UI bouncing, camera snapping. Pure Rust, ~60 lines.
 
-**Recommendation:** Implement sprite animation and easing functions natively in Luna2D (both in Rust for the core and Lua examples for usage). Use the `keyframe` crate's easing function definitions as a reference but implement the 12 standard easing curves (linear, quad, cubic, sine, expo, circ, bounce, back, elastic � in/out/inout variants) as pure Rust math in `src/math/`.
+**Recommendation:** Implement sprite animation and easing functions natively in Lurek2D (both in Rust for the core and Lua examples for usage). Use the `keyframe` crate's easing function definitions as a reference but implement the 12 standard easing curves (linear, quad, cubic, sine, expo, circ, bounce, back, elastic � in/out/inout variants) as pure Rust math in `src/math/`.
 
 ---
 
@@ -382,9 +382,9 @@ Luna2D has no animation system. The most impactful additions are:
 | `rusttype` 0.9.3 | 1.3M | � | Older TrueType rasterizer (still widely used) |
 | `bmfont` 0.3.3 | 417 | 9 | Bitmap font config parser (.fnt format) |
 
-**Luna2D current state:**
+**Lurek2D current state:**
 
-Luna2D uses a hardcoded embedded bitmap font for `luna.gfx.print()`. It renders ASCII characters only, at a fixed size, with no font choices. This is functional but limiting.
+Lurek2D uses a hardcoded embedded bitmap font for `lurek.gfx.print()`. It renders ASCII characters only, at a fixed size, with no font choices. This is functional but limiting.
 
 **What to implement:**
 
@@ -393,16 +393,16 @@ Luna2D uses a hardcoded embedded bitmap font for `luna.gfx.print()`. It renders 
    - Implement `FontAtlas` struct: loads font, rasterizes all printable ASCII at a given `px_size` into a tiny-skia `Pixmap` atlas
    - Store atlas as a `Texture` in the renderer
    - `DrawCommand::Print` variant gains a `font_id: u32` and `size: f32` field
-   - Expose via `luna.gfx.newFont(path, size)` � handle, `luna.gfx.print(text, x, y, font)`
+   - Expose via `lurek.gfx.newFont(path, size)` � handle, `lurek.gfx.print(text, x, y, font)`
 
-2. **Glyph metrics** � After adding fontdue, expose `luna.gfx.getTextWidth(text, font)` and `luna.gfx.getTextHeight(font)` for layout calculations.
+2. **Glyph metrics** � After adding fontdue, expose `lurek.gfx.getTextWidth(text, font)` and `lurek.gfx.getTextHeight(font)` for layout calculations.
 
 3. **Bitmap font parser (.fnt)** � `bmfont` crate parses Angelcode .fnt atlas format. This allows designers to use tools like Hiero or Littera to generate custom pixel-art fonts, which get loaded at runtime. Complements TTF for retro aesthetics.
 
 **`fontdue` vs `ab_glyph`:**
 - `fontdue` rasterizes entire glyphs to bitmaps � perfect for tiny-skia (we blit the bitmap into the Pixmap)
 - `ab_glyph` provides glyph outlines + rasterization � more flexible but more code
-- For Luna2D's software renderer, `fontdue` is the better fit
+- For Lurek2D's software renderer, `fontdue` is the better fit
 
 ---
 
@@ -418,13 +418,13 @@ Luna2D uses a hardcoded embedded bitmap font for `luna.gfx.print()`. It renders 
 | `gluon` 0.18.2 | 1K | 3,391 | Statically-typed ML-like embedded language |
 | `mun` � | 2,111 | Statically-typed hot-reload scripting |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D is specifically designed around Lua (inspired by a similar game engine). The `mlua` crate version `0.11.6` is current and well-maintained. The scripting language is not up for replacement.
+Lurek2D is specifically designed around Lua (inspired by a similar game engine). The `mlua` crate version `0.11.6` is current and well-maintained. The scripting language is not up for replacement.
 
 **Interesting alternatives (for documentation purposes):**
 
-- `rhai` would make sense if Luna2D wanted to drop the Lua dependency and use a Rust-native scripting language. Rhai has a similar API philosophy but Lua's ecosystem (Luarocks modules, prevalence in game tools, a similar game engine compatibility for comparison) makes it harder to justify.
+- `rhai` would make sense if Lurek2D wanted to drop the Lua dependency and use a Rust-native scripting language. Rhai has a similar API philosophy but Lua's ecosystem (Luarocks modules, prevalence in game tools, a similar game engine compatibility for comparison) makes it harder to justify.
 - `mun` uses ahead-of-time compilation with hot reload � could improve performance for scripting-heavy games, but requires a separate language and toolchain.
 
 **Recommendation:** Keep mlua. Consider documenting how to add Lua standard library extensions (e.g., fennel transpiler, teal type checker) as optional overlays.
@@ -442,22 +442,22 @@ Luna2D is specifically designed around Lua (inspired by a similar game engine). 
 | `ggrs` 0.11.1 | 12.3K | 637 | P2P rollback netcode (GGPO port) |
 | `matchbox_socket` 0.14.0 | 10.9K | 1,118 | WebRTC P2P (including WASM) |
 | `laminar` 0.5.0 | 22.7K | 867 | Semi-reliable UDP |
-| `lightyear` 0.26.4 | 8.1K | 953 | Bevy-specific server-client networking |
+| `lightyear` 0.26.4 | 8.1K | 953 | Engine D-specific server-client networking |
 | `message-io` 0.19.0 | 10K | 1,194 | Event-driven multi-transport networking |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D has no networking. This is intentional � single-player games are the primary target.
+Lurek2D has no networking. This is intentional � single-player games are the primary target.
 
 **Considerations for adding networking:**
 
-- A `luna.network` module with socket-level TCP/UDP would cover most use cases
+- A `lurek.network` module with socket-level TCP/UDP would cover most use cases
 - `message-io` provides a clean event-driven API over TCP/UDP/websocket � wrappable around Lua callbacks
 - `renet` provides higher-level game networking (auth, channels, reliability) but has dependencies
 - `ggrs` rollback netcode is the gold standard for fighting games and precise multiplayer � very complex to integrate
 - Recommendation: Add a minimal UDP socket via `std::net::UdpSocket` as a first pass before introducing crate dependencies
 
-**WASM note:** `matchbox_socket` enables WebRTC P2P that works in both native and WASM builds. If Luna2D ever targets browsers, this becomes the networking answer.
+**WASM note:** `matchbox_socket` enables WebRTC P2P that works in both native and WASM builds. If Lurek2D ever targets browsers, this becomes the networking answer.
 
 ---
 
@@ -473,23 +473,23 @@ Luna2D has no networking. This is intentional � single-player games are the pr
 | `yakui` 0.3.0 | 11.4K | 316 | UI library specifically for games |
 | `raui` 0.70.17 | 569 | 410 | Renderer-agnostic UI |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D has no UI library. In-game UI (health bars, buttons, menus) is built manually with shape drawing. A developer tooling/debug overlay is also absent.
+Lurek2D has no UI library. In-game UI (health bars, buttons, menus) is built manually with shape drawing. A developer tooling/debug overlay is also absent.
 
 **Two distinct use cases:**
 
 **A) In-game UI for game developers:**
 - Simple panel/button/text primitives
 - Should work with the existing DrawCommand queue
-- Best approach: implement a `luna.ui` Lua module built on top of existing `luna.gfx.*` primitives
+- Best approach: implement a `lurek.ui` Lua module built on top of existing `lurek.gfx.*` primitives
 - No Rust crate needed � pure Lua
 
 **B) Developer tools / debug overlay:**
 - Runtime inspection of game state, tweak variables
 - `egui` is the obvious choice: 3M downloads/month, integrates easily over any pixel buffer
 - `egui` can render to a `Pixmap` via `egui-skia` or by blitting egui's output texture onto the frame
-- Could power a `luna.debug` module: print variables on screen, tweak numbers live, visualize physics bodies
+- Could power a `lurek.debug` module: print variables on screen, tweak numbers live, visualize physics bodies
 - `inline_tweak` crate (8.4K downloads/month) is simpler � tweak numeric constants by changing source and hot-reloading; good for game feel tuning
 
 **Recommendation:** Add `egui` as an optional debug-mode feature (`--features debug-ui`). This won't affect release builds but gives developers live inspection tools.
@@ -504,23 +504,23 @@ Luna2D has no UI library. In-game UI (health bars, buttons, menus) is built manu
 |-------|-------------|-------|-------|
 | `pathfinding` 4.15.0 | 218K | 1,044 | A*, Dijkstra, BFS, DFS, Fringe |
 | `bonsai-bt` 0.11.0 | 6.9K | 439 | Behavior trees |
-| `big-brain` 0.22.0 | 1.9K | 1,291 | Utility AI (Bevy-specific) |
+| `big-brain` 0.22.0 | 1.9K | 1,291 | Utility AI (Engine D-specific) |
 | `navmesh` 0.12.1 | 1.1K | 53 | Nav meshes + path following |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
 No AI subsystem exists. Game AI logic is implemented in Lua scripts.
 
 **What to add:**
 
-1. **Pathfinding** � The `pathfinding` crate's `astar` is pure Rust, no external dependencies, framework-independent. Exposing it to Lua as `luna.pathfinding.astar(grid, start, goal)` would be high value for top-down RPGs, tower defense, etc.
+1. **Pathfinding** � The `pathfinding` crate's `astar` is pure Rust, no external dependencies, framework-independent. Exposing it to Lua as `lurek.pathfinding.astar(grid, start, goal)` would be high value for top-down RPGs, tower defense, etc.
    - Input: a Lua table as 2D grid, start/goal as {x, y} tables
    - Output: a Lua array of {x, y} waypoints
    - Estimated implementation: 80 lines of Rust binding code
 
-2. **Behavior trees** � `bonsai-bt` is general enough to work outside Bevy. Could be used from Rust, with Lua-defined action callbacks. High complexity to expose through Lua FFI.
+2. **Behavior trees** � `bonsai-bt` is general enough to work outside Engine D. Could be used from Rust, with Lua-defined action callbacks. High complexity to expose through Lua FFI.
 
-3. **Steering behaviors** � Seek, flee, arrive, wander, avoid � pure Rust math on `Vec2`. Simple to implement natively in ~200 lines without any crate. Expose as `luna.ai.seek(position, target, speed)` � `Vec2`.
+3. **Steering behaviors** � Seek, flee, arrive, wander, avoid � pure Rust math on `Vec2`. Simple to implement natively in ~200 lines without any crate. Expose as `lurek.ai.seek(position, target, speed)` � `Vec2`.
 
 **Recommendation:** Add pathfinding first via `pathfinding` crate (A*). Steering behaviors should be implemented natively. Behavior trees are optional tooling.
 
@@ -536,19 +536,19 @@ No AI subsystem exists. Game AI logic is implemented in Lua scripts.
 | `wgpu` 29.0.0 | 4.2M | 16,732 | WebGPU API (shader-capable) |
 | `shaderc` 0.10.1 | 181K | 285 | Vulkan shader compiler |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D is a software renderer � it does not use GPU shaders. All shading is done by tiny-skia's CPU-side paint operations.
+Lurek2D is a software renderer � it does not use GPU shaders. All shading is done by tiny-skia's CPU-side paint operations.
 
 **What is possible within the software model:**
 
-1. **Custom pixel effects (software shaders)** � Since Luna2D owns the raw u32 pixel buffer, it can apply per-pixel transformations post-rendering:
+1. **Custom pixel effects (software shaders)** � Since Lurek2D owns the raw u32 pixel buffer, it can apply per-pixel transformations post-rendering:
    - Grayscale: `for pixel in buffer { apply_grayscale(pixel) }`
    - Scanlines/CRT effect: darken every even row
    - Color grading: LUT-based color remapping
    - Vignette: darken edges by distance from center
    - Pixelate: downsample, upsample
-   These can be exposed as `luna.gfx.setPostProcess("grayscale")` or via a Lua-defined function invoked per-pixel.
+   These can be exposed as `lurek.gfx.setPostProcess("grayscale")` or via a Lua-defined function invoked per-pixel.
 
 2. **tiny-skia Paint operations** � `tiny-skia` supports `BlendMode` (multiple blend equations) and `FilterQuality`. No GPU needed; these are all CPU-side effects.
 
@@ -573,19 +573,19 @@ Luna2D is a software renderer � it does not use GPU shaders. All shading is do
 | `modio` 0.14.2 | 475 | 22 | mod.io modding platform integration |
 | `profiling` 1.0.17 | 8.7M | 390 | Thin profiler crate abstraction |
 
-**Luna2D gaps this addresses:**
+**Lurek2D gaps this addresses:**
 
-1. **Tiled map loading** � The `tiled` crate loads `.tmx` XML files from the Tiled Map Editor (industry-standard tilemap tool). This would enable `luna.tilemap.load("level1.tmx")` for instant level design workflows.
+1. **Tiled map loading** � The `tiled` crate loads `.tmx` XML files from the Tiled Map Editor (industry-standard tilemap tool). This would enable `lurek.tilemap.load("level1.tmx")` for instant level design workflows.
 
 2. **Asset hot reload** � `assets_manager` watches file changes and reloads assets automatically. Combined with a live Lua script reload, this would dramatically speed up game development iteration.
 
-3. **Procedural noise** � `noise` crate provides Perlin, Simplex, Worley, Value, and fractal combinations. Essential for terrain generation, texture variation, AI wandering. Expose as `luna.math.perlin(x, y, seed)`.
+3. **Procedural noise** � `noise` crate provides Perlin, Simplex, Worley, Value, and fractal combinations. Essential for terrain generation, texture variation, AI wandering. Expose as `lurek.math.perlin(x, y, seed)`.
 
 4. **Texture atlas packing** � `rectangle-pack` bins rectangles optimally. Useful for baking multiple sprites into a single texture and reducing draw calls.
 
 5. **Profiling** � `profiling` crate adds `profiling::scope!("name")` annotations that integrate with Superluminal, Tracy, or Chrome tracing. Valuable for performance debugging.
 
-6. **pixel art tools loading** � `aseprite` crate loads `.ase`/`.aseprite` files including animation frames, layers, and tags. Since many pixel artists use pixel art tools, this would be valuable: `luna.gfx.newAnimFrompixel art tools("hero.aseprite")`.
+6. **pixel art tools loading** � `aseprite` crate loads `.ase`/`.aseprite` files including animation frames, layers, and tags. Since many pixel artists use pixel art tools, this would be valuable: `lurek.gfx.newAnimFrompixel art tools("hero.aseprite")`.
 
 ---
 
@@ -602,9 +602,9 @@ Luna2D is a software renderer � it does not use GPU shaders. All shading is do
 | `softbuffer` 0.4.8 | 2.9M | 474 | Software buffer via winit |
 | `glutin` 0.32.3 | 3.8M | 2,078 | OpenGL context + window |
 
-**Luna2D relationship:**
+**Lurek2D relationship:**
 
-Luna2D uses `minifb 0.27`. `minifb 0.28.0` (latest) added improvements. The windowing layer is adequate for the current software-rendering model.
+Lurek2D uses `minifb 0.27`. `minifb 0.28.0` (latest) added improvements. The windowing layer is adequate for the current software-rendering model.
 
 **Migration considerations:**
 
@@ -618,7 +618,7 @@ Luna2D uses `minifb 0.27`. `minifb 0.28.0` (latest) added improvements. The wind
 
 ## Prioritized Implementation Roadmap
 
-The following is a prioritized backlog of features to add to Luna2D, ordered by impact � effort.
+The following is a prioritized backlog of features to add to Lurek2D, ordered by impact � effort.
 
 ### Priority 1 � High Impact, Low Effort
 
@@ -626,12 +626,12 @@ The following is a prioritized backlog of features to add to Luna2D, ordered by 
 |---------|--------|--------|--------|---------------|
 | Mouse wheel support | 1h | High | Input | `minifb::Window::get_scroll_xy()` already exists |
 | Audio loop + pause/resume | 2h | High | Audio | `rodio::Sink::pause()` / `Sink::repeat_infinite()` |
-| Gamepad exposure to Lua | 4h | High | Input + Lua | Expose existing `GamepadState` via `luna.gamepad.*` |
+| Gamepad exposure to Lua | 4h | High | Input + Lua | Expose existing `GamepadState` via `lurek.gamepad.*` |
 | Camera integration in renderer | 4h | High | Graphics | Apply `camera.view_matrix()` in `Renderer::flush()` |
 | Draw layer Z-ordering | 4h | High | Graphics | Add `DrawCommand::SetLayer(i32)`, sort in `flush()` |
 | gilrs gamepad polling | 8h | High | Input | Add `gilrs` crate, poll in game loop |
 | Audio pitch control | 2h | Medium | Audio | `rodio::Source::speed(ratio)` |
-| Easing functions | 4h | High | Math | Native Rust math, expose via `luna.math.*` |
+| Easing functions | 4h | High | Math | Native Rust math, expose via `lurek.math.*` |
 
 ### Priority 2 � High Impact, Medium Effort
 
@@ -642,7 +642,7 @@ The following is a prioritized backlog of features to add to Luna2D, ordered by 
 | Perlin/Simplex noise | 1 day | Medium | Math | `noise` crate or custom 80-line impl |
 | rapier2d physics | 1 week | High | Physics | Replace/wrap existing physics module |
 | Procedural sound fx | 1 day | Medium | Audio | `sfxr` or `usfx` crate integration |
-| Tiled map loading | 2 days | High | Lua API | `tiled` crate, new `luna.tilemap.*` |
+| Tiled map loading | 2 days | High | Lua API | `tiled` crate, new `lurek.tilemap.*` |
 | More blend modes | 1 day | Medium | Graphics | Expose `tiny-skia` BlendMode in Lua |
 
 ### Priority 3 � Medium Impact, Medium Effort
@@ -673,7 +673,7 @@ The following is a prioritized backlog of features to add to Luna2D, ordered by 
 
 These crates have clear integration paths and would meaningfully close current gaps:
 
-| Crate | Version | Purpose | Why Luna2D |
+| Crate | Version | Purpose | Why Lurek2D |
 |-------|---------|---------|-----------|
 | `gilrs` | 0.11 | Gamepad input | `GamepadState` exists, needs backend |
 | `fontdue` | 0.9 | TTF font rasterizer | Zero C deps, perfect for tiny-skia blit model |
@@ -688,35 +688,35 @@ These crates have clear integration paths and would meaningfully close current g
 
 ---
 
-## Features Luna2D Should Build Natively
+## Features Lurek2D Should Build Natively
 
-These features are well within Luna2D's own design space and should be implemented in-house rather than through external crates. They are small enough to control fully and important enough to design for the `luna.*` API specifically:
+These features are well within Lurek2D's own design space and should be implemented in-house rather than through external crates. They are small enough to control fully and important enough to design for the `lurek.*` API specifically:
 
 1. **Sprite shader callbacks** � A Lua-callable per-pixel hook on a region of the screen
 2. **Spring animation** � ~60-line port of `natura`'s spring model
 3. **Easing functions** � 12 standard curves, pure math
-4. **Scene management skeleton** � A `luna.scene` module that manages screen transitions
+4. **Scene management skeleton** � A `lurek.scene` module that manages screen transitions
 5. **In-game debug overlay** � Print variables on screen without a full UI framework
-6. **Tween manager** � Supported by Lua tables + `luna.time.getDelta()`
+6. **Tween manager** � Supported by Lua tables + `lurek.time.getDelta()`
 7. **Basic steering AI** � Seek/flee/arrive implemented as `Vec2`-returning functions
 8. **9-slice rendering** � 9 `DrawImage` calls, no new Drawcommand needed
-9. **`luna.math.clamp()`, `lerp()`, `map()` extensions** � Small but commonly needed
+9. **`lurek.math.clamp()`, `lerp()`, `map()` extensions** � Small but commonly needed
 10. **Simple particle system** � `ParticleEmitter` struct with position/velocity/lifetime table
 
 ---
 
-## Out of Scope for Luna2D
+## Out of Scope for Lurek2D
 
-These ecosystem areas are architecturally incompatible with Luna2D's design goals (2D, software-rendered, Lua-scripted) or require major rewrites:
+These ecosystem areas are architecturally incompatible with Lurek2D's design goals (2D, software-rendered, Lua-scripted) or require major rewrites:
 
 | Area | Reason |
 |------|--------|
-| 3D rendering (wgpu, three-d, rafx) | Luna2D is 2D-only by design |
+| 3D rendering (wgpu, three-d, rafx) | Lurek2D is 2D-only by design |
 | GPU shaders (naga, shaderc, rust-gpu) | No GPU pipeline; incompatible with tiny-skia model |
-| VR (openxr, godot-rust) | Out of 2D engine scope |
+| VR (openxr, Engine C-rust) | Out of 2D engine scope |
 | 3D physics (rapier3d, physx, nphysics3d) | 3D is out of scope |
-| Bevy ECS (bevy_ecs) | Bevy's ECS tightly couples to its entire framework |
-| Full game engines (bevy, fyrox, godot-rust) | Luna2D IS a game engine; these are competitors |
+| Engine D ECS (bevy_ecs) | Engine D's ECS tightly couples to its entire framework |
+| Full game engines (Engine D, Engine K, Engine C-rust) | Lurek2D IS a game engine; these are competitors |
 | 3D format loaders (gltf, obj) | No 3D mesh support in scope |
 | Skeletal animation (ozz-animation-rs) | Requires 3D/mesh pipeline |
 | HLSL/GLSL shader compilation | No GPU targets |
@@ -724,4 +724,4 @@ These ecosystem areas are architecturally incompatible with Luna2D's design goal
 
 ---
 
-*Generated by research from arewegameyet.rs (2026-03-23 snapshot) cross-referenced against Luna2D src/ module exploration. Crate versions and download numbers reflect March 2026 data.*
+*Generated by research from arewegameyet.rs (2026-03-23 snapshot) cross-referenced against Lurek2D src/ module exploration. Crate versions and download numbers reflect March 2026 data.*

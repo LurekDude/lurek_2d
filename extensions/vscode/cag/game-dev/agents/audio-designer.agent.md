@@ -1,6 +1,6 @@
 ---
 description: >
-  Design the audio architecture for a Luna2D game: channel layout, BGM transitions,
+  Design the audio architecture for a Lurek2D game: channel layout, BGM transitions,
   SFX trigger mapping, volume budget. Outputs audio design documents.
 model: claude-sonnet-4-5
 tools:

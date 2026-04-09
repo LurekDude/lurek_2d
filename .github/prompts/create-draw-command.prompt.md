@@ -27,7 +27,7 @@ Add a new DrawCommand variant to the rendering pipeline.
 
 - [ ] DrawCommand variant is data-only (no logic)
 - [ ] Renderer processes command correctly
-- [ ] Lua binding follows `luna.gfx.*` pattern
+- [ ] Lua binding follows `lurek.gfx.*` pattern
 - [ ] Tests pass, clippy clean
 
 ## References

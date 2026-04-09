@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 tools/fix/expand_examples.py
-Luna2D — Auto-expand example files to cover all missing API entries.
+Lurek2D — Auto-expand example files to cover all missing API entries.
 
-For every entry in the luna.* API docs that is NOT referenced in its
-corresponding examples/*.lua file, this script appends well-formatted
+For every entry in the lurek.* API docs that is NOT referenced in its
+corresponding content/examples/*.lua file, this script appends well-formatted
 documentation-style Lua stubs.
 
 Usage:
@@ -23,58 +23,58 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 API_DOC = ROOT / "docs" / "API" / "lua-api.md"
-EXAMPLES_DIR = ROOT / "examples"
+EXAMPLES_DIR = ROOT / "content" / "examples"
 
 # ──────────────────────────────────────────────────────────────────────────── #
 #  Namespace → example file mapping                                             #
 # ──────────────────────────────────────────────────────────────────────────── #
 NS_TO_FILE: dict[str, str] = {
-    "luna.graphics": "graphics.lua",
-    "luna.gfx": "graphics.lua",
-    "luna.window": "window.lua",
-    "luna.input": "input.lua",
-    "luna.time": "timer.lua",
-    "luna.math": "math.lua",
-    "luna.audio": "audio.lua",
-    "luna.physics": "physics.lua",
-    "luna.filesystem": "filesystem.lua",
-    "luna.fs": "filesystem.lua",
-    "luna.particle": "particle.lua",
-    "luna.signal": "event.lua",
-    "luna.system": "window.lua",
-    "luna.thread": "thread.lua",
-    "luna.ai": "ai.lua",
-    "luna.compute": "compute.lua",
-    "luna.dataframe": "dataframe.lua",
-    "luna.data": "data.lua",
-    "luna.image": "image.lua",
-    "luna.graph": "graph.lua",
-    "luna.tilemap": "tilemap.lua",
-    "luna.entity": "entity.lua",
-    "luna.scene": "scene.lua",
-    "luna.pathfinding": "pathfinding.lua",
-    "luna.minimap": "minimap.lua",
-    "luna.savegame": "savegame.lua",
-    "luna.modding": "modding.lua",
-    "luna.localization": "localization.lua",
-    "luna.log": "log.lua",
-    "luna.debugbridge": "debugbridge.lua",
-    "luna.docs": "docs.lua",
-    "luna.patterns": "patterns.lua",
-    "luna.animation": "animation.lua",
-    "luna.simulator": "automation.lua",
-    "luna.camera": "camera.lua",
-    "luna.devtools": "devtools.lua",
-    "luna.fx": "fx.lua",
-    "luna.gui": "gui.lua",
-    "luna.light": "light.lua",
-    "luna.network": "network.lua",
-    "luna.pipeline": "pipeline.lua",
-    "luna.procgen": "procgen.lua",
-    "luna.raycaster": "raycaster.lua",
-    "luna.serial": "serial.lua",
-    "luna.spine": "spine.lua",
-    "luna.terminal": "terminal.lua",
+    "lurek.graphics": "graphics.lua",
+    "lurek.gfx": "graphics.lua",
+    "lurek.window": "window.lua",
+    "lurek.input": "input.lua",
+    "lurek.time": "timer.lua",
+    "lurek.math": "math.lua",
+    "lurek.audio": "audio.lua",
+    "lurek.physics": "physics.lua",
+    "lurek.filesystem": "filesystem.lua",
+    "lurek.fs": "filesystem.lua",
+    "lurek.particle": "particle.lua",
+    "lurek.signal": "event.lua",
+    "lurek.system": "window.lua",
+    "lurek.thread": "thread.lua",
+    "lurek.ai": "ai.lua",
+    "lurek.compute": "compute.lua",
+    "lurek.dataframe": "dataframe.lua",
+    "lurek.data": "data.lua",
+    "lurek.image": "image.lua",
+    "lurek.graph": "graph.lua",
+    "lurek.tilemap": "tilemap.lua",
+    "lurek.entity": "entity.lua",
+    "lurek.scene": "scene.lua",
+    "lurek.pathfinding": "pathfinding.lua",
+    "lurek.minimap": "minimap.lua",
+    "lurek.savegame": "savegame.lua",
+    "lurek.modding": "modding.lua",
+    "lurek.localization": "localization.lua",
+    "lurek.log": "log.lua",
+    "lurek.debugbridge": "debugbridge.lua",
+    "lurek.docs": "docs.lua",
+    "lurek.patterns": "patterns.lua",
+    "lurek.animation": "animation.lua",
+    "lurek.simulator": "automation.lua",
+    "lurek.camera": "camera.lua",
+    "lurek.devtools": "devtools.lua",
+    "lurek.fx": "fx.lua",
+    "lurek.gui": "gui.lua",
+    "lurek.light": "light.lua",
+    "lurek.network": "network.lua",
+    "lurek.pipeline": "pipeline.lua",
+    "lurek.procgen": "procgen.lua",
+    "lurek.raycaster": "raycaster.lua",
+    "lurek.serial": "serial.lua",
+    "lurek.spine": "spine.lua",
+    "lurek.terminal": "terminal.lua",
 }
 
 # class → example file (inferred from which namespace the class belongs to)
@@ -281,11 +281,16 @@ def parse_api(path: Path) -> list[FnEntry]:
 # ──────────────────────────────────────────────────────────────────────────── #
 
 def is_covered(fn: FnEntry, text: str) -> bool:
+    # Only count non-commented lines — commented-out calls are NOT real coverage.
+    live_text = "\n".join(
+        line for line in text.splitlines()
+        if not line.lstrip().startswith("--")
+    )
     if fn.is_method:
-        return bool(re.search(rf':{re.escape(fn.name)}\s*\(', text))
+        return bool(re.search(rf':{re.escape(fn.name)}\s*\(', live_text))
     else:
         return bool(re.search(
-            rf'(?:luna\.\w+)\.{re.escape(fn.name)}\s*\(', text
+            rf'(?:luna\.\w+)\.{re.escape(fn.name)}\s*\(', live_text
         ))
 
 

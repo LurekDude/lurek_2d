@@ -4,7 +4,7 @@
 |----------------|------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems          |
 | **Status**     | Implemented — Full                       |
-| **Lua API**    | `luna.camera`                            |
+| **Lua API**    | `lurek.camera`                            |
 | **Source**      | `src/camera/`                            |
 | **Rust Tests** | `tests/rust/unit/camera_tests.rs`        |
 | **Lua Tests**  | `tests/lua/unit/test_camera.lua`         |
@@ -14,7 +14,7 @@
 
 The `camera` module provides camera and viewport types for 2D rendering. It is a Tier 1 engine module extracted from `src/graphics/` during the graphics-module-split session; it depends only on `crate::math` (Vec2, Mat3, Rect) and never imports wgpu, winit, or any other engine module. `SharedState` holds a `Camera` field accessed by the GPU renderer each frame to apply the view transform to all draw commands.
 
-Two camera types are provided. `Camera` is the original flat camera with position, zoom, and rotation that powers the `luna.gfx.setCamera()` API — it produces a `Mat3` view matrix combining translation, rotation, and uniform scale. `Camera2D` is the full-featured Phase 24 camera with smooth follow (configurable interpolation speed), dead-zone (the camera ignores target movement within a rectangle centred on the camera), look-ahead (velocity-based prediction), world-space bounds clamping (the visible area never extends beyond configured bounds), and screen-shake (deterministic sinusoidal offset that decays over time). `Camera2D` exposes its own `update(dt)` method to advance all simulation and a `view_matrix()` that incorporates shake offset.
+Two camera types are provided. `Camera` is the original flat camera with position, zoom, and rotation that powers the `lurek.gfx.setCamera()` API — it produces a `Mat3` view matrix combining translation, rotation, and uniform scale. `Camera2D` is the full-featured Phase 24 camera with smooth follow (configurable interpolation speed), dead-zone (the camera ignores target movement within a rectangle centred on the camera), look-ahead (velocity-based prediction), world-space bounds clamping (the visible area never extends beyond configured bounds), and screen-shake (deterministic sinusoidal offset that decays over time). `Camera2D` exposes its own `update(dt)` method to advance all simulation and a `view_matrix()` that incorporates shake offset.
 
 Two viewport types handle virtual-resolution mapping. `Viewport` maps a fixed game resolution onto an arbitrary window size using one of three `ScaleMode` strategies (Letterbox, Stretch, PixelPerfect) and provides coordinate conversion between screen and game space. `ViewportScale` extends `Viewport` by additionally tracking `scaled_width` and `scaled_height` — the game area in window pixels after scaling — for integration with the automatic graphics transform stack.
 
@@ -27,7 +27,7 @@ camera (Tier 1 — depends only on crate::math)
 │
 ├── types.rs
 │   ├── Camera          ← position / zoom / rotation → view_matrix() → Mat3
-│   │   └── Used by SharedState for luna.gfx.setCamera()
+│   │   └── Used by SharedState for lurek.gfx.setCamera()
 │   │
 │   └── Camera2D        ← full 2D camera with simulation
 │       ├── Follow system: target → dead zone → look-ahead → smooth lerp
@@ -58,7 +58,7 @@ camera (Tier 1 — depends only on crate::math)
 
 ### `camera::types`
 
-Camera types for 2D viewport control. Provides the original `Camera` (used by `SharedState` for the flat `luna.gfx.setCamera()` API) and the full-featured `Camera2D` with smooth follow, dead zone, bounds clamping, look-ahead, and screen-shake.
+Camera types for 2D viewport control. Provides the original `Camera` (used by `SharedState` for the flat `lurek.gfx.setCamera()` API) and the full-featured `Camera2D` with smooth follow, dead zone, bounds clamping, look-ahead, and screen-shake.
 
 - **`Camera`** (struct): Basic camera with position, zoom, and rotation; produces a `Mat3` view matrix.
 - **`Camera2D`** (struct): Full-featured 2D camera with follow system, shake, bounds clamping, and coordinate conversion.
@@ -82,7 +82,7 @@ Virtual-resolution viewport with automatic scaling and transform-stack integrati
 
 #### `camera::types::Camera`
 
-Basic camera with position, zoom, and rotation. Used by `SharedState` for the flat `luna.gfx.setCamera()` API. Exposes `view_matrix()` which combines translation (negate position), rotation, and scale (zoom) into a single `Mat3`. Default state is origin position, zoom 1.0, rotation 0.0.
+Basic camera with position, zoom, and rotation. Used by `SharedState` for the flat `lurek.gfx.setCamera()` API. Exposes `view_matrix()` which combines translation (negate position), rotation, and scale (zoom) into a single `Mat3`. Default state is origin position, zoom 1.0, rotation 0.0.
 
 Public methods: `new(position, zoom, rotation)`, `view_matrix()`, `set_position(pos)`, `set_zoom(zoom)`, `set_rotation(rotation)`.
 
@@ -118,17 +118,17 @@ Scale mode for virtual-resolution mapping.
 
 ## Lua API
 
-Exposed under `luna.camera.*` by `src/lua_api/camera_api.rs`.
+Exposed under `lurek.camera.*` by `src/lua_api/camera_api.rs`.
 
-The Lua API provides a `Camera2D` userdata object created via `luna.camera.new(viewport_w, viewport_h)`. The userdata wraps a `Camera2D` instance behind `Rc<RefCell<Camera2D>>` and exposes methods for position, zoom, rotation, viewport, bounds, follow system, shake, coordinate conversion, and per-frame update.
+The Lua API provides a `Camera2D` userdata object created via `lurek.camera.new(viewport_w, viewport_h)`. The userdata wraps a `Camera2D` instance behind `Rc<RefCell<Camera2D>>` and exposes methods for position, zoom, rotation, viewport, bounds, follow system, shake, coordinate conversion, and per-frame update.
 
-**Note**: The flat `Camera` struct is not directly exposed via `luna.camera`; it is used internally by `SharedState` and accessible through `luna.gfx.setCamera()` / `luna.gfx.getCamera()`.
+**Note**: The flat `Camera` struct is not directly exposed via `lurek.camera`; it is used internally by `SharedState` and accessible through `lurek.gfx.setCamera()` / `lurek.gfx.getCamera()`.
 
 ### Module-level functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.camera.new` | `(viewport_w, viewport_h) → Camera2D` | Creates a new Camera2D userdata |
+| `lurek.camera.new` | `(viewport_w, viewport_h) → Camera2D` | Creates a new Camera2D userdata |
 
 ### Camera2D methods
 
@@ -164,34 +164,34 @@ The Lua API provides a `Camera2D` userdata object created via `luna.camera.new(v
 local cam
 local player = { x = 400, y = 300 }
 
-function luna.init()
-    cam = luna.camera.new(800, 600)
+function lurek.init()
+    cam = lurek.camera.new(800, 600)
     cam:setFollowSmooth(5.0)
     cam:setDeadZone(50, 30)
     cam:setBounds(0, 0, 2000, 1500)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Move player with arrow keys
-    if luna.keyboard.isDown("right") then player.x = player.x + 200 * dt end
-    if luna.keyboard.isDown("left")  then player.x = player.x - 200 * dt end
-    if luna.keyboard.isDown("down")  then player.y = player.y + 200 * dt end
-    if luna.keyboard.isDown("up")    then player.y = player.y - 200 * dt end
+    if lurek.keyboard.isDown("right") then player.x = player.x + 200 * dt end
+    if lurek.keyboard.isDown("left")  then player.x = player.x - 200 * dt end
+    if lurek.keyboard.isDown("down")  then player.y = player.y + 200 * dt end
+    if lurek.keyboard.isDown("up")    then player.y = player.y - 200 * dt end
 
     cam:setTarget(player.x, player.y)
     cam:update(dt)
 end
 
-function luna.render()
+function lurek.render()
     -- Use camera transform for drawing
     local wx, wy = cam:toScreen(player.x, player.y)
-    luna.gfx.circle("fill", wx, wy, 16)
+    lurek.gfx.circle("fill", wx, wy, 16)
 end
 ```
 
 ```lua
 -- Screen shake on key press
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then
         cam:shake(8, 0.3)   -- 8 pixel intensity, 0.3 seconds
     end
@@ -200,7 +200,7 @@ end
 
 ```lua
 -- Coordinate conversion: screen click to world position
-function luna.mousepressed(x, y, btn)
+function lurek.mousepressed(x, y, btn)
     local world_x, world_y = cam:toWorld(x, y)
     print("Clicked world position:", world_x, world_y)
 end
@@ -222,7 +222,7 @@ end
 | `math`     | Imports from | `Vec2`, `Mat3`, `Rect` — sole dependency of this module |
 | `engine`   | Imported by  | `SharedState` holds a `Camera` field                    |
 | `graphics` | Related      | GPU renderer reads `Camera` from `SharedState` for view transforms; viewport types were extracted from graphics during module split |
-| `lua_api`  | Imported by  | `camera_api.rs` binds `Camera2D` to `luna.camera.*`     |
+| `lua_api`  | Imported by  | `camera_api.rs` binds `Camera2D` to `lurek.camera.*`     |
 
 **Similar modules**:
 - `camera` vs `graphics`: Camera owns the math (position, zoom, rotation → `Mat3`); graphics owns the GPU pipeline that consumes the matrix. No wgpu types appear in `camera`.
@@ -230,9 +230,9 @@ end
 ## Notes
 
 - **Pure math module**: `camera` has zero external crate dependencies. It uses only `crate::math` types (`Vec2`, `Mat3`, `Rect`). This makes it safe to use in headless tests without GPU or window initialization.
-- **`Camera` vs `Camera2D`**: `Camera` is the legacy flat struct stored in `SharedState`. `Camera2D` is the full-featured userdata exposed via `luna.camera.new()`. They are independent types — `Camera2D` does not wrap or inherit from `Camera`.
+- **`Camera` vs `Camera2D`**: `Camera` is the legacy flat struct stored in `SharedState`. `Camera2D` is the full-featured userdata exposed via `lurek.camera.new()`. They are independent types — `Camera2D` does not wrap or inherit from `Camera`.
 - **Shake determinism**: Screen-shake uses `sin(timer * constant)` for offset calculation, making it frame-rate dependent but deterministic for a given `dt` sequence. The shake decays linearly with remaining time.
 - **Dead zone convention**: `set_dead_zone(w, h)` takes full extents but stores half-extents internally. `get_dead_zone()` returns full extents.
 - **Bounds clamping edge case**: When the visible area is larger than the bounds (e.g., zoomed out too far), the camera centers on the bounds rather than clamping to corners.
-- **Viewport types are not exposed to Lua**: `Viewport` and `ViewportScale` are used internally by the engine. Only `Camera2D` is accessible from Lua via `luna.camera`.
-- **Breaking change surface**: Renaming or removing any `Camera2D` method in `camera_api.rs` will break Lua scripts that use `luna.camera.new()` and call methods on the result.
+- **Viewport types are not exposed to Lua**: `Viewport` and `ViewportScale` are used internally by the engine. Only `Camera2D` is accessible from Lua via `lurek.camera`.
+- **Breaking change surface**: Renaming or removing any `Camera2D` method in `camera_api.rs` will break Lua scripts that use `lurek.camera.new()` and call methods on the result.

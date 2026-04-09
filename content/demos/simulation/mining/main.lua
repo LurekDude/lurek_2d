@@ -1,6 +1,6 @@
 -- Mining Demo: Side-view destructible mining world
 -- WASD to move, click adjacent tiles to mine, L to place ladders
--- Run with: cargo run -- demos/simulation/mining
+-- Run with: cargo run -- content/demos/simulation/mining
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -47,7 +47,7 @@ local function is_solid(gx, gy)
     return t ~= EMPTY and t ~= LADDER and t ~= SKY
 end
 
-function luna.init()
+function lurek.init()
     for y = 1, GRID_H do
         grid[y] = {}
         for x = 1, GRID_W do
@@ -75,14 +75,14 @@ function luna.init()
     set_tile(player.x, SURFACE_Y + 1, EMPTY)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     local px, py = player.x, player.y
     local speed = 8 * dt
 
     -- Horizontal movement
     local dx = 0
-    if luna.keyboard.isDown("a") then dx = -speed end
-    if luna.keyboard.isDown("d") then dx = speed end
+    if lurek.keyboard.isDown("a") then dx = -speed end
+    if lurek.keyboard.isDown("d") then dx = speed end
 
     local new_x = px + dx
     local gx = math.floor(new_x) + 1
@@ -98,12 +98,12 @@ function luna.process(dt)
 
     if on_ladder then
         player.vy = 0
-        if luna.keyboard.isDown("w") then player.y = player.y - speed end
-        if luna.keyboard.isDown("s") then player.y = player.y + speed end
+        if lurek.keyboard.isDown("w") then player.y = player.y - speed end
+        if lurek.keyboard.isDown("s") then player.y = player.y + speed end
     else
         -- Gravity
         player.vy = player.vy + 20 * dt
-        if luna.keyboard.isDown("w") and player.on_ground then
+        if lurek.keyboard.isDown("w") and player.on_ground then
             player.vy = -8
         end
     end
@@ -149,7 +149,7 @@ function luna.process(dt)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if button == 1 then
         local gx = math.floor((mx) / TILE_SIZE) + 1
         local gy = math.floor((my + camera_y) / TILE_SIZE) + 1
@@ -170,7 +170,7 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "l" then
         local gx = math.floor(player.x) + 1
         local gy = math.floor(player.y + 1) + 1
@@ -178,11 +178,11 @@ function luna.keypressed(key)
             set_tile(gx, gy, LADDER)
         end
     end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
 
     local pgx = math.floor(player.x) + 1
     local pgy = math.floor(player.y) + 1
@@ -199,8 +199,8 @@ function luna.render()
                 local light = clamp(1.0 - dist / 12, 0.1, 1.0)
                 if t == SKY then light = 1.0 end
                 local c = tile_colors[t]
-                luna.gfx.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
-                luna.gfx.rectangle("fill",
+                lurek.gfx.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
+                lurek.gfx.rectangle("fill",
                     (x - 1) * TILE_SIZE,
                     (y - 1) * TILE_SIZE - camera_y,
                     TILE_SIZE, TILE_SIZE)
@@ -213,23 +213,23 @@ function luna.render()
         local mx = (mining.tx - 1) * TILE_SIZE
         local my = (mining.ty - 1) * TILE_SIZE - camera_y
         local pct = mining.progress / mining.required
-        luna.gfx.setColor(1, 1, 0, 0.8)
-        luna.gfx.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
+        lurek.gfx.setColor(1, 1, 0, 0.8)
+        lurek.gfx.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
     end
 
     -- Player
     local sx = player.x * TILE_SIZE
     local sy = player.y * TILE_SIZE - camera_y
-    luna.gfx.setColor(0.2, 0.9, 0.3, 1)
-    luna.gfx.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
+    lurek.gfx.setColor(0.2, 0.9, 0.3, 1)
+    lurek.gfx.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
     local depth = math.floor(player.y - SURFACE_Y)
     if depth < 0 then depth = 0 end
-    luna.gfx.print("Depth: " .. depth .. "m", 10, 10)
-    luna.gfx.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
+    lurek.gfx.print("Depth: " .. depth .. "m", 10, 10)
+    lurek.gfx.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
         " Ore:" .. inventory.ore .. " Gem:" .. inventory.gem, 10, 28)
-    luna.gfx.print("WASD:move  Click:mine  L:ladder", 10, 46)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 10)
+    lurek.gfx.print("WASD:move  Click:mine  L:ladder", 10, 46)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 10)
 end

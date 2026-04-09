@@ -1,6 +1,6 @@
--- Tycoon — Luna2D Demo
+-- Tycoon — Lurek2D Demo
 -- Build a restaurant, serve customers, earn profit
--- Run with: cargo run -- demos/simulation/tycoon
+-- Run with: cargo run -- content/demos/simulation/tycoon
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -58,13 +58,13 @@ local function spawnCustomer()
     table.insert(customers, { x = dx * TILE, y = (ROWS - 1) * TILE, state = "enter", wait = 0, served = false, patience = 12 + math.random(0, 8) })
 end
 
-function luna.init()
-    luna.window.setTitle("Restaurant Tycoon")
-    luna.gfx.setBackgroundColor(0.12, 0.1, 0.08)
+function lurek.init()
+    lurek.window.setTitle("Restaurant Tycoon")
+    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.08)
     initGrid()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     dayTimer = dayTimer + dt
 
     -- update facilities flags
@@ -157,84 +157,84 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- grid
     for y = 1, ROWS do
         for x = 1, COLS do
             local t = grid[y][x]
             if t == "wall" then
-                luna.gfx.setColor(0.3, 0.25, 0.2, 1)
+                lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
             elseif t == "door" then
-                luna.gfx.setColor(0.5, 0.4, 0.15, 1)
+                lurek.gfx.setColor(0.5, 0.4, 0.15, 1)
             elseif t == "counter" then
-                luna.gfx.setColor(0.7, 0.5, 0.2, 1)
+                lurek.gfx.setColor(0.7, 0.5, 0.2, 1)
             elseif t == "table" then
-                luna.gfx.setColor(0.5, 0.35, 0.2, 1)
+                lurek.gfx.setColor(0.5, 0.35, 0.2, 1)
             elseif t == "kitchen" then
-                luna.gfx.setColor(0.6, 0.2, 0.2, 1)
+                lurek.gfx.setColor(0.6, 0.2, 0.2, 1)
             else
-                luna.gfx.setColor(0.2, 0.18, 0.15, 1)
+                lurek.gfx.setColor(0.2, 0.18, 0.15, 1)
             end
-            luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- customers
     for _, c in ipairs(customers) do
         if c.state == "order" then
-            luna.gfx.setColor(1, 0.8, 0.2, 1)
+            lurek.gfx.setColor(1, 0.8, 0.2, 1)
         elseif c.state == "eat" then
-            luna.gfx.setColor(0.3, 0.9, 0.3, 1)
+            lurek.gfx.setColor(0.3, 0.9, 0.3, 1)
         else
-            luna.gfx.setColor(0.3, 0.6, 1, 1)
+            lurek.gfx.setColor(0.3, 0.6, 1, 1)
         end
-        luna.gfx.circle("fill", c.x, c.y, 10)
+        lurek.gfx.circle("fill", c.x, c.y, 10)
     end
 
     -- build cursor
     if buildMode then
-        local mx, my = luna.mouse.getPosition()
+        local mx, my = lurek.mouse.getPosition()
         local gx = math.floor(mx / TILE) + 1
         local gy = math.floor(my / TILE) + 1
         if gx >= 2 and gx <= COLS - 1 and gy >= 2 and gy <= ROWS - 1 then
             local b = buildings[buildType]
-            luna.gfx.setColor(b.color[1], b.color[2], b.color[3], 0.4)
-            luna.gfx.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.gfx.setColor(b.color[1], b.color[2], b.color[3], 0.4)
+            lurek.gfx.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- RIGHT PANEL
     local px = COLS * TILE + 10
-    luna.gfx.setColor(0, 0, 0, 0.5)
-    luna.gfx.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
+    lurek.gfx.setColor(0, 0, 0, 0.5)
+    lurek.gfx.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
 
-    luna.gfx.setColor(1, 0.85, 0.2, 1)
-    luna.gfx.print("$" .. money, px, 10, 1.3)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Day " .. day, px, 40)
-    luna.gfx.print("Served: " .. customersServed, px, 60)
-    luna.gfx.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
-    luna.gfx.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
-    luna.gfx.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
+    lurek.gfx.setColor(1, 0.85, 0.2, 1)
+    lurek.gfx.print("$" .. money, px, 10, 1.3)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Day " .. day, px, 40)
+    lurek.gfx.print("Served: " .. customersServed, px, 60)
+    lurek.gfx.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
+    lurek.gfx.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
+    lurek.gfx.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
 
     -- build panel
-    luna.gfx.setColor(0.6, 0.8, 1, 1)
-    luna.gfx.print("BUILD (B toggle):", px, 170)
+    lurek.gfx.setColor(0.6, 0.8, 1, 1)
+    lurek.gfx.print("BUILD (B toggle):", px, 170)
     for i, b in ipairs(buildings) do
         local sel = (buildMode and i == buildType) and "> " or "  "
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
     end
 
-    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-    luna.gfx.print("H=Hire Cook", px, 280)
-    luna.gfx.print("J=Hire Waiter", px, 298)
-    luna.gfx.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), px, 360)
+    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+    lurek.gfx.print("H=Hire Cook", px, 280)
+    lurek.gfx.print("J=Hire Waiter", px, 298)
+    lurek.gfx.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), px, 360)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "b" then buildMode = not buildMode end
     if buildMode then
         if key == "1" then buildType = 1 end
@@ -251,7 +251,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if not buildMode then return end
     local gx = math.floor(x / TILE) + 1
     local gy = math.floor(y / TILE) + 1

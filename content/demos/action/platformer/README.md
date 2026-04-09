@@ -4,18 +4,18 @@ A side-scrolling platformer with physics-based movement, jump mechanics, platfor
 
 ## What It Demonstrates
 
-- `luna.physics` — character controller using rigid bodies
-- `luna.keyboard.isDown()` — real-time movement and jump input
-- `luna.math.lerp()` / easing functions for camera smoothing
-- `luna.scene` — integrating the engine scene system
-- `luna.gfx.rectangle()` for world geometry rendering
+- `lurek.physics` — character controller using rigid bodies
+- `lurek.keyboard.isDown()` — real-time movement and jump input
+- `lurek.math.lerp()` / easing functions for camera smoothing
+- `lurek.scene` — integrating the engine scene system
+- `lurek.gfx.rectangle()` for world geometry rendering
 - Simple camera follow with offset easing
 - Game-over detection and restart flow
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/platformer
+cargo run -- content/demos/platformer
 ```
 
 ## Controls

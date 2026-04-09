@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.debugbridge`                                     |
+| **Lua API**      | `lurek.debugbridge`                                     |
 | **Source**       | `src/debugbridge/`                                     |
 | **Rust Tests**   | —                                                      |
 | **Lua Tests**    | `tests/lua/unit/test_debugbridge.lua`                  |
@@ -12,17 +12,17 @@
 
 ## Summary
 
-The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running Luna2D game. It serves **both audiences**: game developers debugging game logic via the VS Code extension, and engine developers inspecting engine internals via the MCP server. Neither audience requires any embed or plugin in the game script.
+The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running Lurek2D game. It serves **both audiences**: game developers debugging game logic via the VS Code extension, and engine developers inspecting engine internals via the MCP server. Neither audience requires any embed or plugin in the game script.
 
-The server accepts newline-delimited JSON messages from multiple concurrent TCP clients. Requests fall into two categories: **background-safe** (methods the server thread handles directly using cached data) and **main-thread** (methods that require Lua execution — `eval`, `getCallStack`, `getLocals`, `getGlobals`). Main-thread methods are placed in `BridgeShared::pending_requests` and dispatched by calling `luna.debugbridge.poll()` from the game's update loop each frame. Responses queue into `BridgeShared::pending_responses` and are written back to the originating client by the server thread.
+The server accepts newline-delimited JSON messages from multiple concurrent TCP clients. Requests fall into two categories: **background-safe** (methods the server thread handles directly using cached data) and **main-thread** (methods that require Lua execution — `eval`, `getCallStack`, `getLocals`, `getGlobals`). Main-thread methods are placed in `BridgeShared::pending_requests` and dispatched by calling `lurek.debugbridge.poll()` from the game's update loop each frame. Responses queue into `BridgeShared::pending_responses` and are written back to the originating client by the server thread.
 
 Key features:
 - **`eval`** — evaluate arbitrary Lua code in-process and return the result as JSON
 - **`getCallStack`** — walk the Lua debug call stack via `debug.getinfo`
 - **`getLocals`** — enumerate local variables at a specific stack level via `debug.getlocal`
 - **`getGlobals`** — capture up to 200 primitive global variables
-- **Print capture** — game scripts call `luna.debugbridge.capturePrint` to feed a circular history buffer; the server broadcasts each entry as a `"print"` event to all clients
-- **Performance sampling** — `poll()` automatically records the current frame delta from `luna.time.getDelta()` each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt for connected external tools
+- **Print capture** — game scripts call `lurek.debugbridge.capturePrint` to feed a circular history buffer; the server broadcasts each entry as a `"print"` event to all clients
+- **Performance sampling** — `poll()` automatically records the current frame delta from `lurek.time.getDelta()` each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt for connected external tools
 - **Screenshot request** — tools set `screenshot_requested` via `requestScreenshot(scale?)`; the render loop checks `isScreenshotRequested()` and clears the flag after capture
 - **Broadcast** — any game script can push a named JSON event to all connected clients with `broadcast(event, json_data)`
 
@@ -39,13 +39,13 @@ This module intentionally does **not** provide:
 
 | Channel | Owner | Purpose |
 |---|---|---|
-| `luna.debugbridge.print_history` | `debugbridge` | TCP delivery feed for external tools (VS Code extension, MCP server). Push via `capturePrint()`. |
-| `luna.log.*` | `log` | Engine-level operational log — routes through the Rust `log` crate to stdout/stderr. |
-| `luna.devtools.logger` | `devtools` | In-game structured diagnostic history for in-game UI panels. |
+| `lurek.debugbridge.print_history` | `debugbridge` | TCP delivery feed for external tools (VS Code extension, MCP server). Push via `capturePrint()`. |
+| `lurek.log.*` | `log` | Engine-level operational log — routes through the Rust `log` crate to stdout/stderr. |
+| `lurek.devtools.logger` | `devtools` | In-game structured diagnostic history for in-game UI panels. |
 
 These three channels are independent by design. Emitting to one does not affect the others.
 
-For frame timing: `debugbridge.getPerformance()` reads from an internal sample buffer populated automatically by `poll()`. For basic fps/delta in game scripts, use `luna.time.getDelta()` and `luna.time.getFps()` directly (zero setup — the engine auto-ticks the clock).
+For frame timing: `debugbridge.getPerformance()` reads from an internal sample buffer populated automatically by `poll()`. For basic fps/delta in game scripts, use `lurek.time.getDelta()` and `lurek.time.getFps()` directly (zero setup — the engine auto-ticks the clock).
 
 ## Architecture
 
@@ -61,7 +61,7 @@ src/debugbridge/
                   handle_client_message(line, idx, shared) — parse + dispatch one message
 
 src/lua_api/
-└── debugbridge_api.rs  Registers luna.debugbridge.*
+└── debugbridge_api.rs  Registers lurek.debugbridge.*
                         Owns: Arc<Mutex<BridgeShared>>, Arc<AtomicBool> running,
                               Arc<Mutex<Option<JoinHandle<()>>>> thread_handle
 
@@ -133,7 +133,7 @@ A request from a TCP client that requires main-thread Lua execution. Carries a J
 A response to send back to a TCP client after main-thread execution. Carries the matching JSON-RPC `id`, the JSON `result`, and the target `client_idx`.
 
 #### `debugbridge::bridge::PrintEntry`
-One structured `luna.print` log entry. `timestamp` is seconds since bridge start. Serialisable with `serde::Serialize` for JSON broadcast.
+One structured `lurek.print` log entry. `timestamp` is seconds since bridge start. Serialisable with `serde::Serialize` for JSON broadcast.
 
 ### Enums
 
@@ -141,65 +141,65 @@ No public enums.
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/debugbridge_api.rs` under `luna.debugbridge.*`. There are no UserData objects — all functions operate directly on the shared `Arc<Mutex<BridgeShared>>` state.
+The Lua API is registered in `src/lua_api/debugbridge_api.rs` under `lurek.debugbridge.*`. There are no UserData objects — all functions operate directly on the shared `Arc<Mutex<BridgeShared>>` state.
 
 ### Lifecycle
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.start(port?)` | `→ boolean` | Bind to `127.0.0.1:port` and start the server thread. Default port 19740. Returns `false` if already running. Errors if `port < 1024` or bind fails. |
-| `luna.debugbridge.stop()` | — | Set `running = false` and join the server thread. |
-| `luna.debugbridge.isRunning()` | `→ boolean` | True when the server thread is active. |
-| `luna.debugbridge.getPort()` | `→ integer` | Bound port, or 0 if not running. |
-| `luna.debugbridge.getClientCount()` | `→ integer` | Number of currently connected TCP clients. |
+| `lurek.debugbridge.start(port?)` | `→ boolean` | Bind to `127.0.0.1:port` and start the server thread. Default port 19740. Returns `false` if already running. Errors if `port < 1024` or bind fails. |
+| `lurek.debugbridge.stop()` | — | Set `running = false` and join the server thread. |
+| `lurek.debugbridge.isRunning()` | `→ boolean` | True when the server thread is active. |
+| `lurek.debugbridge.getPort()` | `→ integer` | Bound port, or 0 if not running. |
+| `lurek.debugbridge.getClientCount()` | `→ integer` | Number of currently connected TCP clients. |
 
 ### Main-Thread Dispatch
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.poll()` | — | Drain `pending_requests` and execute each on the Lua main thread. Must be called each frame. Also auto-records the current frame delta from `luna.time.getDelta()` into the performance buffer — no manual `recordFrame()` call is needed. Supported methods: `eval`, `getCallStack`, `getLocals`, `getGlobals`. |
+| `lurek.debugbridge.poll()` | — | Drain `pending_requests` and execute each on the Lua main thread. Must be called each frame. Also auto-records the current frame delta from `lurek.time.getDelta()` into the performance buffer — no manual `recordFrame()` call is needed. Supported methods: `eval`, `getCallStack`, `getLocals`, `getGlobals`. |
 
 ### Print Capture
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.capturePrint(msg, source?, line?)` | — | Append a print entry and broadcast a `"print"` event to all clients. |
-| `luna.debugbridge.getPrintHistory(count?)` | `→ table` | Return up to `count` most recent print entries as `{timestamp, message, source, line}` records. |
-| `luna.debugbridge.clearPrintHistory()` | — | Clear the print history buffer. |
-| `luna.debugbridge.setMaxPrintHistory(max)` | — | Set the print history capacity (clamped 1–100000). Truncates oldest entries immediately if needed. |
+| `lurek.debugbridge.capturePrint(msg, source?, line?)` | — | Append a print entry and broadcast a `"print"` event to all clients. |
+| `lurek.debugbridge.getPrintHistory(count?)` | `→ table` | Return up to `count` most recent print entries as `{timestamp, message, source, line}` records. |
+| `lurek.debugbridge.clearPrintHistory()` | — | Clear the print history buffer. |
+| `lurek.debugbridge.setMaxPrintHistory(max)` | — | Set the print history capacity (clamped 1–100000). Truncates oldest entries immediately if needed. |
 
 ### Performance
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.getPerformance()` | `→ table` | Returns `{fps, dt, avgDt, minDt, maxDt}` computed from frame samples that `poll()` records automatically each call. |
+| `lurek.debugbridge.getPerformance()` | `→ table` | Returns `{fps, dt, avgDt, minDt, maxDt}` computed from frame samples that `poll()` records automatically each call. |
 
 ### Screenshots
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.requestScreenshot(scale?)` | — | Set `screenshot_requested = true` and `screenshot_scale` (1–8, default 1). |
-| `luna.debugbridge.isScreenshotRequested()` | `→ boolean` | True when a screenshot has been requested. |
+| `lurek.debugbridge.requestScreenshot(scale?)` | — | Set `screenshot_requested = true` and `screenshot_scale` (1–8, default 1). |
+| `lurek.debugbridge.isScreenshotRequested()` | `→ boolean` | True when a screenshot has been requested. |
 
 ### Broadcast
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.debugbridge.broadcast(event, json_data)` | — | Push a named JSON event (`{event, data}`) to all connected clients. |
+| `lurek.debugbridge.broadcast(event, json_data)` | — | Push a named JSON event (`{event, data}`) to all connected clients. |
 
 ## Lua Examples
 
 ```lua
 -- Start the bridge at game init
-function luna.init()
-    if luna.debugbridge.start(19740) then
-        print("Debug bridge active on port", luna.debugbridge.getPort())
+function lurek.init()
+    if lurek.debugbridge.start(19740) then
+        print("Debug bridge active on port", lurek.debugbridge.getPort())
     end
 end
 
 -- Poll for debugger requests each frame (also auto-records frame time)
-function luna.process(dt)
-    luna.debugbridge.poll()
+function lurek.process(dt)
+    lurek.debugbridge.poll()
 end
 
 -- Forward print calls to connected tools
@@ -208,7 +208,7 @@ print = function(...)
     local msg = table.concat({...}, "\t")
     real_print(msg)
     local info = debug.getinfo(2, "Sl")
-    luna.debugbridge.capturePrint(
+    lurek.debugbridge.capturePrint(
         msg,
         info and info.short_src or "?",
         info and info.currentline or 0
@@ -217,12 +217,12 @@ end
 
 -- Broadcast a custom game event to the VS Code extension
 function on_player_died(cause)
-    luna.debugbridge.broadcast("player_died", require("json").encode({ cause = cause }))
+    lurek.debugbridge.broadcast("player_died", require("json").encode({ cause = cause }))
 end
 
 -- Graceful shutdown
-function luna.quit()
-    luna.debugbridge.stop()
+function lurek.quit()
+    lurek.debugbridge.stop()
 end
 ```
 
@@ -240,14 +240,14 @@ end
 | Module       | Relationship | Notes                                                              |
 |--------------|--------------|--------------------------------------------------------------------|
 | `engine`     | —            | `debugbridge_api.rs` receives no `SharedState`; uses only Lua context |
-| `lua_api`    | Imported by  | `debugbridge_api.rs` registers the `luna.debugbridge.*` surface    |
+| `lua_api`    | Imported by  | `debugbridge_api.rs` registers the `lurek.debugbridge.*` surface    |
 | `vscode-extension` | Consumer | Connects to the TCP bridge for runtime inspection features        |
-| `thread`     | Similar      | `luna.thread` uses `Channel` for Lua-to-Lua VM comms; `debugbridge` uses raw TCP for external tool comms |
+| `thread`     | Similar      | `lurek.thread` uses `Channel` for Lua-to-Lua VM comms; `debugbridge` uses raw TCP for external tool comms |
 | `graphics`   | Coordinates  | Screenshot capture requires the graphics module to export a frame |
 
 ## Notes
 
-- `poll()` must be called from the Lua main thread (typically in `luna.process`). Forgetting `poll()` means all `eval` / inspect requests from the VS Code extension will silently queue forever. `poll()` also auto-records the current frame delta from `luna.time.getDelta()` — so `getPerformance()` will always reflect the current frame rate as long as `poll()` is called each frame.
+- `poll()` must be called from the Lua main thread (typically in `lurek.process`). Forgetting `poll()` means all `eval` / inspect requests from the VS Code extension will silently queue forever. `poll()` also auto-records the current frame delta from `lurek.time.getDelta()` — so `getPerformance()` will always reflect the current frame rate as long as `poll()` is called each frame.
 - The bridge blocks on `running.store(false)` and then `handle.join()` during `stop()`. If the server thread is stuck on a blocking operation, `stop()` may hang briefly. This should not occur in practice because the listener is set non-blocking.
 - `requestScreenshot` only sets the flag — actually capturing and delivering the screenshot is the responsibility of the engine render loop or game code that checks `isScreenshotRequested()`.
 - Ports below 1024 are rejected with a `LuaError::RuntimeError`. On some systems, even ports above 1024 may require firewall adjustment; however, since the bridge binds to 127.0.0.1 only, external network access is never possible.

@@ -13,7 +13,7 @@ End-to-end delivery of a single roadmap phase: read the phase file, understand w
 Load these skills **before** starting any step. Do not proceed without reading them:
 
 1. `.github/skills/roadmap-planning/SKILL.md` — phase format, acceptance gates, status symbols
-2. `.github/skills/lua-api-design/SKILL.md` — `luna.*` naming, parameter conventions, API alignment
+2. `.github/skills/lua-api-design/SKILL.md` — `lurek.*` naming, parameter conventions, API alignment
 3. `.github/skills/rust-coding/SKILL.md` — Rust conventions, error handling, visibility
 4. `.github/skills/testing-rust/SKILL.md` — test patterns, float comparisons, headless safety
 5. Load domain skill matching the phase: `gpu-programming`, `physics-engine`, `audio-integration`, `input-handling`, `asset-pipeline` — whichever applies; for font/text consult `src/graphics/AGENT.md` (Font Rendering Patterns section)
@@ -65,7 +65,7 @@ For every phase listed in `Depends On`:
 
 ## Step 3 — Codebase Audit: What Already Exists
 
-Before writing a single line of new code, audit what Luna2D already has. This prevents re-implementing existing behaviour and exposes what can be extended rather than replaced.
+Before writing a single line of new code, audit what Lurek2D already has. This prevents re-implementing existing behaviour and exposes what can be extended rather than replaced.
 
 ### 3a — Source File Scan
 
@@ -92,11 +92,11 @@ For every API function the phase intends to add:
 3. Record:
    - The reference function name and signature
    - The reference parameter order and semantics
-   - Any notes on behaviour differences Luna2D is intentionally keeping
-4. Your `luna.*` equivalent MUST:
+   - Any notes on behaviour differences Lurek2D is intentionally keeping
+4. Your `lurek.*` equivalent MUST:
    - Use consistent parameter **order** where there is a direct mapping
    - Use the same **semantic types** (e.g., angles in radians, colors as 0–1 floats, not 0–255)
-    - Use `luna.<module>.<function>` naming — never external engine prefixes
+    - Use `lurek.<module>.<function>` naming — never external engine prefixes
    - Deviate from a similar game engine only when the system prompt explicitly allows it OR when the a similar game engine API has a known design flaw (document the reason in a code comment)
 
 ### 3d — External Library Audit
@@ -164,7 +164,7 @@ Every new Lua-facing function must:
 ```rust
 // Pattern: clone Rc before moving into closure
 let state_clone = Rc::clone(&state);
-luna.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
+lurek.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
     let s = state_clone.borrow();
     // ...
     Ok(result)
@@ -172,7 +172,7 @@ luna.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
 ```
 
 - Return type is always `LuaResult<T>`
-- Error messages must include the function name: `"luna.module.function: <reason>"`
+- Error messages must include the function name: `"lurek.module.function: <reason>"`
 - Key names lowercase: `"space"`, `"return"`, `"left"` — never virtual key codes
 - Colors as `(r, g, b, a)` in 0.0–1.0 range — never 0–255
 
@@ -181,7 +181,7 @@ luna.set("functionName", lua.create_function(move |_, args: (T1, T2)| {
 **Every** new or modified `pub` item requires a `///` doc comment:
 
 - `pub struct` — one-sentence summary + field descriptions
-- `pub fn` — one-sentence summary; mention the Lua binding name if one exists (`/// Called by \`luna.gfx.newCanvas()\``)
+- `pub fn` — one-sentence summary; mention the Lua binding name if one exists (`/// Called by \`lurek.gfx.newCanvas()\``)
 - `pub enum` — one-sentence summary + every variant documented
 - Modules (`mod.rs`, `lib.rs`) — `//!` module-level doc at top of file
 
@@ -195,13 +195,13 @@ Zero missing docs is required before proceeding to Step 6.
 ### 5d — Update `DrawCommand` Queue (graphics phases only)
 
 
-Never render inside a Lua closure — push to the queue, process after `luna.draw()` returns.
+Never render inside a Lua closure — push to the queue, process after `lurek.draw()` returns.
 
 ---
 
 ## Step 6 — Write Tests
 
-Tests are **not optional**. Every public Rust API function and every new `luna.*` Lua function requires at least one test.
+Tests are **not optional**. Every public Rust API function and every new `lurek.*` Lua function requires at least one test.
 
 ### 6a — Rust Integration Tests
 
@@ -225,7 +225,7 @@ File: Any `.lua` file under `tests/lua/` or a new `tests/lua/<module>_tests.lua`
 
 Rules:
 - Must be headless-safe: no window, no GPU, no audio device
-- Use `luna.<module>.*` calls only — never external engine prefixes
+- Use `lurek.<module>.*` calls only — never external engine prefixes
 - Assert return values explicitly: `assert(result == expected, "message")`
 - Cover: creation, mutation, query, destruction
 - If a function call is expected to error, wrap in `pcall` and assert the error
@@ -248,7 +248,7 @@ end
 
 -- Tests
 test("newThing creates valid handle", function()
-    local h = luna.<module>.newThing()
+    local h = lurek.<module>.newThing()
     assert(type(h) == "number" and h > 0, "expected positive integer handle")
 end)
 
@@ -299,7 +299,7 @@ Open `docs/architecture/engine-architecture.md`. If the phase:
 - **Changed SharedState fields**: update the SharedState section
 - **Added a `DrawCommand` variant**: update the draw pipeline section
 - **Added a new crate dependency**: update the "Dependencies" table
-- **Changed any public `luna.*` function signature**: note the change in the API surface section
+- **Changed any public `lurek.*` function signature**: note the change in the API surface section
 
 Only update sections that actually changed. Do not touch sections unrelated to the phase.
 
@@ -373,8 +373,8 @@ The phase is not done until every item below is checked:
 - [ ] `cargo fmt --check` produces zero diffs
 - [ ] `python tools/docs/collect_docs.py --report-missing` exits 0 (zero missing public docs)
 - [ ] `python tools/docs/collect_docs.py` completes and `docs/API/lua_api_reference_generated.md` is updated
-- [ ] Every new `luna.*` function appears in `docs/API/lua_api_reference_generated.md`
-- [ ] Every new `luna.*` function has a corresponding Lua test in `tests/lua/`
+- [ ] Every new `lurek.*` function appears in `docs/API/lua_api_reference_generated.md`
+- [ ] Every new `lurek.*` function has a corresponding Lua test in `tests/lua/`
 - [ ] Every new Rust public function has a corresponding Rust test in `tests/<module>_tests.rs`
 - [ ] API parity check passed: new functions use same parameter order and semantics as a similar game engine equivalents
 - [ ] No external library capability is hand-rolled (the crate audit table from Step 3d is satisfied)
@@ -404,7 +404,7 @@ The phase is not done until every item below is checked:
 
 - `docs/architecture/engine-architecture.md` — module map, dependency direction, SharedState layout
 - `.github/skills/roadmap-planning/SKILL.md` — phase format and acceptance gate rules
-- `.github/skills/lua-api-design/SKILL.md` — API naming, `luna.*` conventions, API alignment rules
+- `.github/skills/lua-api-design/SKILL.md` — API naming, `lurek.*` conventions, API alignment rules
 - `.github/skills/rust-coding/SKILL.md` — Rust code style and safety rules
 - `.github/skills/testing-rust/SKILL.md` — test writing patterns
 - `references/similar-engine-ref/` — a similar game engine source for direct API comparison

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.minimap`                                       |
+| **Lua API**    | `lurek.minimap`                                       |
 | **Source**     | `src/minimap/`                                       |
 | **Rust Tests** | `tests/rust/game/minimap_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_minimap.lua`                    |
@@ -25,6 +25,6 @@ The `minimap` module provides a self-contained, grid-based minimap data model fo
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/minimap.md`](../../specs/minimap.md)
+→ [`docs/specs/minimap.md`](../../docs/specs/minimap.md)
 
-_Update both this file **and** `specs/minimap.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/minimap.md` whenever source files, public types, or Lua bindings change._

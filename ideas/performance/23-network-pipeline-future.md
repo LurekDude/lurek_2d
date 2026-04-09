@@ -32,7 +32,7 @@ At 60Hz, 100ms stall = **6 dropped frames**. Unacceptable.
 ```
 ┌─────────────────────────────────┐
 │          Main Thread            │
-│   Lua: luna.network.poll()      │
+│   Lua: lurek.network.poll()      │
 │   Returns queued packets        │
 │                                 │
 │   ┌────────────────────────┐    │
@@ -83,8 +83,8 @@ impl NetworkRuntime {
 
 **Luna API**:
 ```lua
-local net = luna.network.connect("ws://localhost:8080")
-luna.update = function(dt)
+local net = lurek.network.connect("ws://localhost:8080")
+lurek.update = function(dt)
     local packets = net:poll()
     for _, pkt in ipairs(packets) do
         handle_packet(pkt)

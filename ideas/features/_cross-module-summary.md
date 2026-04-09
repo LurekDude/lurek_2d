@@ -1,4 +1,4 @@
-# Luna2D — Cross-Module Feature Analysis Summary
+# Lurek2D ï¿½ Cross-Module Feature Analysis Summary
 
 This file aggregates findings from all 38 module-level feature analyses in `ideas/features/`.
 It provides a high-level view of structural issues, merge/split candidates, feature gaps, and priorities.
@@ -15,7 +15,7 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 6. [Tier Corrections](#tier-corrections)
 7. [New Module Suggestions](#new-module-suggestions)
 8. [Engine-Wide Feature Gaps](#engine-wide-feature-gaps)
-9. [Luna2D Differentiators](#luna2d-differentiators)
+9. [Lurek2D Differentiators](#lurek2d-differentiators)
 10. [Top 20 Priority Features](#top-20-priority-features)
 11. [Modules to Consider Moving to Tier 3](#modules-to-consider-moving-to-tier-3)
 12. [Per-Module Priority Ranking](#per-module-priority-ranking)
@@ -71,25 +71,25 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 
 ## Merge Candidates
 
-### 1. `data` + `compute` › `buffer`
+### 1. `data` + `compute` ï¿½ `buffer`
 **Rationale**: `data` provides typed byte buffers. `compute` provides ndarray operations on those buffers. They're the same subsystem split into two modules. No other module depends on `compute` without also depending on `data`. Merged name: `buffer` or `data` (dropping `compute` as separate).
 **Impact**: Reduces module count, simplifies mental model.
 
-### 2. `graph` + `pathfinding` › `graph` (with pathfinding sub-namespace)
-**Rationale**: `pathfinding` operates on graphs and imports `graph`. They share data structures. `luna.graph.*` + `luna.pathfinding.*` › `luna.graph.*` + `luna.graph.findPath()`. However, pathfinding is complex enough (A*, HPA*, flow fields) to justify its own namespace. **Verdict**: Keep separate but document the relationship clearly.
+### 2. `graph` + `pathfinding` ï¿½ `graph` (with pathfinding sub-namespace)
+**Rationale**: `pathfinding` operates on graphs and imports `graph`. They share data structures. `lurek.graph.*` + `lurek.pathfinding.*` ï¿½ `lurek.graph.*` + `lurek.graph.findPath()`. However, pathfinding is complex enough (A*, HPA*, flow fields) to justify its own namespace. **Verdict**: Keep separate but document the relationship clearly.
 
-### 3. `spine` + `animation` › `animation` (with skeleton sub-system)
-**Rationale**: Both deal with animation but through different paradigms. A unified animation module with frame-based clips AND skeletal bones would be more discoverable. `luna.animation.newClip()` + `luna.animation.newSkeleton()`. The spine module is thin (11 functions) and would benefit from sharing timeline/keyframe infrastructure.
-**Impact**: Medium — requires API restructuring.
+### 3. `spine` + `animation` ï¿½ `animation` (with skeleton sub-system)
+**Rationale**: Both deal with animation but through different paradigms. A unified animation module with frame-based clips AND skeletal bones would be more discoverable. `lurek.animation.newClip()` + `lurek.animation.newSkeleton()`. The spine module is thin (11 functions) and would benefit from sharing timeline/keyframe infrastructure.
+**Impact**: Medium ï¿½ requires API restructuring.
 
-### 4. `sound` › already part of `audio`
+### 4. `sound` ï¿½ already part of `audio`
 **Status**: Already merged conceptually. SoundData is documented in the audio spec. No separate spec file exists.
 
 ---
 
 ## Split Candidates
 
-### 1. `graphics` › `graphics` + `sprite` + `text` + `shader`
+### 1. `graphics` ï¿½ `graphics` + `sprite` + `text` + `shader`
 **Rationale**: 18+ source files is too large for one module. Natural splits:
 - `graphics` core: Canvas, drawing primitives, color, blend modes
 - `sprite`: SpriteBatch, atlas, animation frames
@@ -97,8 +97,8 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 - `shader`: Custom WGSL shaders, material system
 **Impact**: Large but improves maintainability. Can be done incrementally.
 
-### 2. `audio` › `audio` + `dsp` (later)
-**Rationale**: If DSP/FFT features are added (equalization, spectrum analysis), they should be a separate module rather than bloating audio. Not urgent — audio is well-scoped currently.
+### 2. `audio` ï¿½ `audio` + `dsp` (later)
+**Rationale**: If DSP/FFT features are added (equalization, spectrum analysis), they should be a separate module rather than bloating audio. Not urgent ï¿½ audio is well-scoped currently.
 
 ---
 
@@ -120,9 +120,9 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 
 | Current | Suggested | Reason |
 |---|---|---|
-| `compute` | `ndarray` or merge into `data` | "compute" is too generic — suggests GPU compute shaders |
+| `compute` | `ndarray` or merge into `data` | "compute" is too generic ï¿½ suggests GPU compute shaders |
 | `spine` | `skeleton` | "spine" implies Spine SDK compatibility. It's a custom bone system |
-| `data` | `buffer` (if merging with compute) | "data" is extremely generic — could mean anything |
+| `data` | `buffer` (if merging with compute) | "data" is extremely generic ï¿½ could mean anything |
 | `sound` | N/A (merge into `audio`) | SoundData is just a sub-concept of audio |
 
 ---
@@ -132,7 +132,7 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 | Module | Current Tier | Correct Tier | Issue |
 |---|---|---|---|
 | `light` | Labeled Tier 1 in some docs | Tier 2 | Depends on Tier 1 graphics. Should be Tier 2. |
-| `math` › `SpatialHash` | Labeled "leaf" | Imports `engine::log_messages` | Breaks leaf module claim. Remove the log import or move SpatialHash. |
+| `math` ï¿½ `SpatialHash` | Labeled "leaf" | Imports `engine::log_messages` | Breaks leaf module claim. Remove the log import or move SpatialHash. |
 
 ---
 
@@ -140,27 +140,27 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 
 ### HIGH PRIORITY
 
-1. **`tween`** — Dedicated tweening module. Currently tween lives in animation and easing in math. A unified `luna.animation.to(target, props, duration, easing)` API (like LÖVE's Flux or Solar2D's transition) would be the most-used game API after drawing.
+1. **`tween`** ï¿½ Dedicated tweening module. Currently tween lives in animation and easing in math. A unified `lurek.animation.to(target, props, duration, easing)` API (like Lï¿½VE's Flux or Engine B's transition) would be the most-used game API after drawing.
 
-2. **`input_map`** — Action-based input mapping. Map physical keys to named game actions: `luna.input_map.bind("jump", "space", "gamepad_a")`. Every major engine has this. Luna2D forces raw key checks.
+2. **`input_map`** ï¿½ Action-based input mapping. Map physical keys to named game actions: `lurek.input_map.bind("jump", "space", "gamepad_a")`. Every major engine has this. Lurek2D forces raw key checks.
 
-3. **`collision`** — Lightweight collision detection without physics simulation. AABB, circle, polygon overlap tests + spatial hashing. Many games need collision without rigid bodies. Currently must use the full rapier2d physics module.
+3. **`collision`** ï¿½ Lightweight collision detection without physics simulation. AABB, circle, polygon overlap tests + spatial hashing. Many games need collision without rigid bodies. Currently must use the full rapier2d physics module.
 
 ### MEDIUM PRIORITY
 
-4. **`sprite`** — Extract from graphics. Own SpriteBatch, texture atlas, sprite animation, atlas JSON import. This is 90% of what game developers draw.
+4. **`sprite`** ï¿½ Extract from graphics. Own SpriteBatch, texture atlas, sprite animation, atlas JSON import. This is 90% of what game developers draw.
 
-5. **`text`** — Rich text rendering. Multi-color, multi-font, inline icons, text wrapping, text effects (wave, shake, typewriter). Currently text rendering is basic.
+5. **`text`** ï¿½ Rich text rendering. Multi-color, multi-font, inline icons, text wrapping, text effects (wave, shake, typewriter). Currently text rendering is basic.
 
-6. **`debug`** — Consolidate debug tools: FPS overlay, entity inspector, physics debug draw, memory stats, log viewer. Currently scattered across modules.
+6. **`debug`** ï¿½ Consolidate debug tools: FPS overlay, entity inspector, physics debug draw, memory stats, log viewer. Currently scattered across modules.
 
-7. **`localization`** — i18n/l10n support. String tables, plural forms, locale switching, right-to-left text, font fallback for CJK.
+7. **`localization`** ï¿½ i18n/l10n support. String tables, plural forms, locale switching, right-to-left text, font fallback for CJK.
 
 ### LOWER PRIORITY
 
-8. **`coroutine`** — Lua coroutine helpers. `luna.coroutine.wait(seconds)`, `luna.coroutine.waitFor(condition)`. Enables clean async game logic.
+8. **`coroutine`** ï¿½ Lua coroutine helpers. `lurek.coroutine.wait(seconds)`, `lurek.coroutine.waitFor(condition)`. Enables clean async game logic.
 
-9. **`distribution`** — `.luna` single-file game distribution format. ZIP-based archive containing all game assets. Run with `luna game.luna`.
+9. **`distribution`** ï¿½ `.luna` single-file game distribution format. ZIP-based archive containing all game assets. Run with `luna game.luna`.
 
 ---
 
@@ -168,19 +168,19 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 
 ### Critical (impacts core game development)
 
-1. **No hot reload** — Must restart the engine after any Lua script or asset change. This is the #1 developer productivity gap. Every modern engine has live-reload.
-2. **No `.luna` distribution format** — No way to package a game as a single file for distribution.
-3. **No Tiled/LDtk import** — The tilemap module can't load industry-standard level editor formats.
-4. **No texture atlas JSON/XML import** — Can't load TexturePacker, Aseprite, or ShoeBox atlas files.
-5. **No input action mapping** — Must check raw keys. No `isActionPressed("jump")` abstraction.
+1. **No hot reload** ï¿½ Must restart the engine after any Lua script or asset change. This is the #1 developer productivity gap. Every modern engine has live-reload.
+2. **No `.luna` distribution format** ï¿½ No way to package a game as a single file for distribution.
+3. **No Tiled/LDtk import** ï¿½ The tilemap module can't load industry-standard level editor formats.
+4. **No texture atlas JSON/XML import** ï¿½ Can't load TexturePacker, Aseprite, or ShoeBox atlas files.
+5. **No input action mapping** ï¿½ Must check raw keys. No `isActionPressed("jump")` abstraction.
 
 ### Important (impacts specific game genres)
 
-6. **No physics debug draw** — Can't visualize colliders, bodies, joints. Essential for physics game development.
-7. **Raycaster extension types not Lua-exposed** — Doors, height maps, lighting exist in Rust but not in Lua.
-8. **No skeletal animation timelines** — Spine module has bone hierarchy but no keyframe animation.
-9. **No HTTP client** — Can't communicate with web services for leaderboards, analytics, or content.
-10. **8-peer network limit** — Too restrictive for many multiplayer games.
+6. **No physics debug draw** ï¿½ Can't visualize colliders, bodies, joints. Essential for physics game development.
+7. **Raycaster extension types not Lua-exposed** ï¿½ Doors, height maps, lighting exist in Rust but not in Lua.
+8. **No skeletal animation timelines** ï¿½ Spine module has bone hierarchy but no keyframe animation.
+9. **No HTTP client** ï¿½ Can't communicate with web services for leaderboards, analytics, or content.
+10. **8-peer network limit** ï¿½ Too restrictive for many multiplayer games.
 
 ### Nice to Have
 
@@ -197,9 +197,9 @@ It provides a high-level view of structural issues, merge/split candidates, feat
 
 ---
 
-## Luna2D Differentiators
+## Lurek2D Differentiators
 
-These features set Luna2D apart from competing engines. Protect and promote them:
+These features set Lurek2D apart from competing engines. Protect and promote them:
 
 | Feature | Why It's Unique |
 |---|---|
@@ -221,7 +221,7 @@ These features set Luna2D apart from competing engines. Protect and promote them
 
 ## Top 20 Priority Features
 
-Ranked by impact × effort. Focuses on features that would make games better, not engine internals.
+Ranked by impact ï¿½ effort. Focuses on features that would make games better, not engine internals.
 
 | Rank | Feature | Module | Why |
 |---|---|---|---|
@@ -231,7 +231,7 @@ Ranked by impact × effort. Focuses on features that would make games better, not
 | 4 | **Tiled/LDtk import** | tilemap | Industry-standard level editors. Unlocks professional workflow. |
 | 5 | **Tween module** | NEW: tween | Most-used animation primitive. Currently awkward. |
 | 6 | **Texture atlas import** | graphics/sprite | TexturePacker, Aseprite. Standard asset workflow. |
-| 7 | **Physics debug draw** | physics | Essential for debugging physics games. Love2D has it. |
+| 7 | **Physics debug draw** | physics | Essential for debugging physics games. Engine A has it. |
 | 8 | **HTTP client** | network | Leaderboards, analytics, content delivery. Basic web access. |
 | 9 | **`.luna` distribution format** | NEW: distribution | Single-file game packaging. |
 | 10 | **Lightweight collision** | NEW: collision | Collision without physics sim. Many games need just overlap tests. |
@@ -276,11 +276,11 @@ Summary of improvement priority for each module (how urgently it needs work):
 
 ## Summary
 
-Luna2D has an impressive breadth of **38 modules** — far more than any comparable 2D Lua engine. The main strategic concerns are:
+Lurek2D has an impressive breadth of **38 modules** ï¿½ far more than any comparable 2D Lua engine. The main strategic concerns are:
 
 1. **Breadth over depth**: Some modules (spine, modding, pipeline) are thin. Focus on making existing modules production-ready before adding new ones.
 2. **Raycaster gap**: The raycaster has features in Rust that aren't Lua-exposed. This is the easiest, highest-ROI fix.
 3. **Developer workflow**: Hot reload and input action mapping are the two biggest quality-of-life gaps.
-4. **Professional asset pipeline**: Tiled import and texture atlas support would connect Luna2D to standard game development workflows.
-5. **Module consolidation**: Merging data+compute, considering spine›animation, and moving pipeline to Tier 3 would reduce complexity.
+4. **Professional asset pipeline**: Tiled import and texture atlas support would connect Lurek2D to standard game development workflows.
+5. **Module consolidation**: Merging data+compute, considering spineï¿½animation, and moving pipeline to Tier 3 would reduce complexity.
 6. **Protect differentiators**: AI, automation, modding, savegame, terminal, and raycaster are genuinely unique. Don't neglect them.

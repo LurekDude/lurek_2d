@@ -1,6 +1,6 @@
 //! Integration tests for the Overlay (screen-effect overlay) module.
 
-use luna2d::fx::{
+use lurek2d::fx::{
     AmbientState, CloudState, FadeState, FilmGrainState, FlashState, FogState, HeatHazeState,
     LightningState, Overlay, ShakeState, VignetteState, WeatherState, WeatherType,
 };
@@ -8,8 +8,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(

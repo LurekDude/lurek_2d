@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.keyboard`, `luna.mouse`, `luna.gamepad`, `luna.touch` |
+| **Lua API**    | `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, `lurek.touch` |
 | **Source**     | `src/input/`                                         |
 | **Rust Tests** | `tests/rust/unit/input_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_input.lua`                      |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The input module is Luna2D's Tier 1 device-state tracking layer. It converts raw OS events from winit (keyboard, mouse) and gilrs (gamepads) into clean, per-frame snapshot state that game scripts query through four Lua namespaces: `luna.keyboard`, `luna.mouse`, `luna.gamepad`, and `luna.touch`. Rather than exposing asynchronous event streams that can be missed if not polled in the right window, the module presents three stable views for every device: "just pressed this frame", "currently held", and "just released this frame". Transient per-frame state (pressed/released lists, scroll deltas, text input buffer) is cleared at the start of each frame by `begin_frame()`, so game scripts in `luna.update(dt)` always see a consistent snapshot.
+The input module is Lurek2D's Tier 1 device-state tracking layer. It converts raw OS events from winit (keyboard, mouse) and gilrs (gamepads) into clean, per-frame snapshot state that game scripts query through four Lua namespaces: `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch`. Rather than exposing asynchronous event streams that can be missed if not polled in the right window, the module presents three stable views for every device: "just pressed this frame", "currently held", and "just released this frame". Transient per-frame state (pressed/released lists, scroll deltas, text input buffer) is cleared at the start of each frame by `begin_frame()`, so game scripts in `lurek.update(dt)` always see a consistent snapshot.
 
 The keyboard subsystem maps winit logical `Key` values and physical `KeyCode` scancodes to lowercase Luna key-name strings (`"space"`, `"left"`, `"a"`, `"f1"`), making Lua condition checks human-readable. It tracks modifier state via a bitmask (`MOD_SHIFT`, `MOD_CTRL`, `MOD_ALT`, `MOD_META`) and supports key-repeat and text-input (IME) toggling. The mouse subsystem tracks window-space cursor position, five buttons (left, right, middle, back, forward), scroll wheel deltas, cursor visibility/grab/relative-mode, system cursor shape (11 variants), and custom RGBA cursors via the `CursorHandle`/`CursorKind` types. The gamepad subsystem supports up to 16 controllers via gilrs, with per-gamepad button/axis state, hat/d-pad direction queries, GUID metadata, and SDL2 GameControllerDB mapping persistence. The touch subsystem tracks active fingers by OS-assigned ID with position and pressure.
 
@@ -44,10 +44,10 @@ KeyboardState        MouseState        GamepadState [0..16]  TouchState
          |
          v
   src/lua_api/input_api.rs
-  |- luna.keyboard.*  (9 functions)
-  |- luna.mouse.*     (17 functions + LuaCursor userdata)
-  |- luna.gamepad.*   (20 functions)
-  +- luna.touch.*     (4 functions)
+  |- lurek.keyboard.*  (9 functions)
+  |- lurek.mouse.*     (17 functions + LuaCursor userdata)
+  |- lurek.gamepad.*   (20 functions)
+  +- lurek.touch.*     (4 functions)
 ```
 
 ## Source Files
@@ -145,7 +145,7 @@ The cursor type — either `System(SystemCursor)` for a named OS cursor, or `Cus
 
 Registered by `src/lua_api/input_api.rs` across four namespaces. The file also defines the `LuaCursor` UserData type for cursor objects.
 
-### `luna.keyboard`
+### `lurek.keyboard`
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -159,7 +159,7 @@ Registered by `src/lua_api/input_api.rs` across four namespaces. The file also d
 | `getKeyFromScancode` | `(scancode: string) -> string?` | Returns the key name for the given hardware scancode |
 | `isModifierActive` | `(modifier: string) -> boolean` | Returns whether a modifier key is held (`"shift"`, `"ctrl"`, `"alt"`, `"meta"`, `"super"`) |
 
-### `luna.mouse`
+### `lurek.mouse`
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -181,7 +181,7 @@ Registered by `src/lua_api/input_api.rs` across four namespaces. The file also d
 | `getCursor` | `() -> string` | Returns the name of the currently active system cursor |
 | `getWheelDelta` | `() -> number, number` | Returns scroll wheel delta (dx, dy) since last frame |
 
-### `luna.gamepad`
+### `lurek.gamepad`
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -206,7 +206,7 @@ Registered by `src/lua_api/input_api.rs` across four namespaces. The file also d
 | `loadGamepadMappings` | `(path: string) -> integer` | Loads mappings from a GameControllerDB file |
 | `saveGamepadMappings` | `(path: string) -> nil` | Saves all stored mappings to a file |
 
-### `luna.touch`
+### `lurek.touch`
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -217,7 +217,7 @@ Registered by `src/lua_api/input_api.rs` across four namespaces. The file also d
 
 ### UserData: `LuaCursor`
 
-Returned by `luna.mouse.newCursor()` and `luna.mouse.getSystemCursor()`.
+Returned by `lurek.mouse.newCursor()` and `lurek.mouse.getSystemCursor()`.
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
@@ -228,58 +228,58 @@ Returned by `luna.mouse.newCursor()` and `luna.mouse.getSystemCursor()`.
 
 ```lua
 -- Movement with keyboard + mouse aiming
-function luna.process(dt)
+function lurek.process(dt)
     -- Keyboard movement with modifier check
     local speed = 200
-    if luna.keyboard.isModifierActive("shift") then
+    if lurek.keyboard.isModifierActive("shift") then
         speed = 400
     end
-    if luna.keyboard.isDown("left", "a") then
+    if lurek.keyboard.isDown("left", "a") then
         player_x = player_x - speed * dt
     end
-    if luna.keyboard.isDown("right", "d") then
+    if lurek.keyboard.isDown("right", "d") then
         player_x = player_x + speed * dt
     end
 
     -- Mouse position and clicks
-    local mx, my = luna.mouse.getPosition()
-    if luna.mouse.isDown(1) then
+    local mx, my = lurek.mouse.getPosition()
+    if lurek.mouse.isDown(1) then
         shoot(mx, my)
     end
 
     -- Scroll wheel zoom
-    local _, sy = luna.mouse.getWheelDelta()
+    local _, sy = lurek.mouse.getWheelDelta()
     if sy ~= 0 then
         zoom = zoom + sy * 0.1
     end
 end
 
-function luna.keypressed(key, scancode, isrepeat)
+function lurek.keypressed(key, scancode, isrepeat)
     if key == "escape" then
-        luna.signal.push("quit")
+        lurek.signal.push("quit")
     end
     if key == "f" then
-        luna.mouse.setRelativeMode(not luna.mouse.getRelativeMode())
+        lurek.mouse.setRelativeMode(not lurek.mouse.getRelativeMode())
     end
 end
 
 -- Gamepad support
-function luna.gamepadpressed(id, button)
+function lurek.gamepadpressed(id, button)
     if button == "a" then
         player_jump()
     end
 end
 
-function luna.gamepadaxis(id, axis, value)
+function lurek.gamepadaxis(id, axis, value)
     if axis == "leftx" then
         player_vx = value * 200
     end
 end
 
 -- Custom cursor
-function luna.init()
-    local hand = luna.mouse.getSystemCursor("hand")
-    luna.mouse.setCursor(hand)
+function lurek.init()
+    local hand = lurek.mouse.getSystemCursor("hand")
+    lurek.mouse.setCursor(hand)
 end
 ```
 
@@ -303,7 +303,7 @@ end
 | `event`      | Related       | `input` delivers hardware events; `event` is a user-level queue |
 | `automation` | Related       | `automation` can record/replay the events delivered by `input` |
 | `window`     | Related       | Window focus/visibility state affects input delivery           |
-| `lua_api`    | Imported by   | `src/lua_api/input_api.rs` registers `luna.keyboard.*`, `luna.mouse.*`, `luna.gamepad.*`, `luna.touch.*` |
+| `lua_api`    | Imported by   | `src/lua_api/input_api.rs` registers `lurek.keyboard.*`, `lurek.mouse.*`, `lurek.gamepad.*`, `lurek.touch.*` |
 
 ## Notes
 
@@ -312,11 +312,11 @@ end
 - **Modifier bitmask** uses four constants (`MOD_SHIFT`, `MOD_CTRL`, `MOD_ALT`, `MOD_META`). Modifiers are set by `engine/app.rs` via `set_modifiers()` on each `KeyboardInput` event.
 - **Frame lifecycle**: `begin_frame()` must be called at the start of each frame on `KeyboardState` and `MouseState` to clear transient state (pressed/released lists, scroll deltas, text input buffer).
 - **Mouse button indices** in Lua are 1-based (1=left, 2=right, 3=middle, 4=back, 5=forward); Rust uses 0-based. The Lua binding applies `saturating_sub(1)`.
-- **Mouse position** is in logical pixels (DPI-unscaled). Multiply by `luna.window.getDPIScale()` for physical pixels.
+- **Mouse position** is in logical pixels (DPI-unscaled). Multiply by `lurek.window.getDPIScale()` for physical pixels.
 - **Gamepad IDs** start from 0 and may be sparse if controllers are disconnected mid-session. Up to 16 gamepads are tracked.
 - **Gamepad mapping persistence** uses SDL2 GameControllerDB format. `loadGamepadMappings()` reads a text file, `saveGamepadMappings()` writes one.
 - **Touch events** mirror mouse events for single-touch scenarios for cross-platform compatibility.
 - **Cursor support**: `is_cursor_supported()` always returns `true` on desktop. Custom cursors via `newCursor()` store RGBA pixel data but the actual winit cursor update is handled in `engine/app.rs`.
 - **Vibration**: `setVibration()` and `isVibrationSupported()` are stubs that always return `false` — gilrs does not expose rumble on all platforms.
 - **External crate versions**: winit 0.30 (keyboard/mouse/touch events), gilrs 0.11 (gamepad events).
-- **Breaking change surface**: Renaming key-name strings or changing button indices would break all Lua scripts that use string comparisons in `luna.keypressed` callbacks.
+- **Breaking change surface**: Renaming key-name strings or changing button indices would break all Lua scripts that use string comparisons in `lurek.keypressed` callbacks.

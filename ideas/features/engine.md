@@ -20,10 +20,10 @@ Engine backbone: application lifecycle, configuration, shared state container, t
 
 ## Feature Gaps
 
-1. **No hot reload**: No mechanism to reload Lua scripts or assets at runtime without restarting. This is the #1 missing feature cited across competitor engines (Love2D, Bevy, Solar2D all support some form of live reload).
-2. **No fixed timestep accumulator**: The original Luna2D C++ engine had delta time smoothing. The Rust engine exposes `timer.deltaTime()` but doesn't provide a built-in fixed-step accumulator for physics or simulation consistency.
-3. **No plugin/extension API**: No way for Rust-side plugins to register new `luna.*` namespaces without modifying `lua_api/mod.rs`. A trait-based plugin registry would allow optional modules.
-4. **No .luna distribution format**: Love2D has `.love` (renamed ZIP). Luna2D games are loose folders. A single-file distribution format would simplify sharing.
+1. **No hot reload**: No mechanism to reload Lua scripts or assets at runtime without restarting. This is the #1 missing feature cited across competitor engines (Engine A, Engine D, Engine B all support some form of live reload).
+2. **No fixed timestep accumulator**: The original Lurek2D C++ engine had delta time smoothing. The Rust engine exposes `timer.deltaTime()` but doesn't provide a built-in fixed-step accumulator for physics or simulation consistency.
+3. **No plugin/extension API**: No way for Rust-side plugins to register new `lurek.*` namespaces without modifying `lua_api/mod.rs`. A trait-based plugin registry would allow optional modules.
+4. **No .luna distribution format**: Engine A has `.love` (renamed ZIP). Lurek2D games are loose folders. A single-file distribution format would simplify sharing.
 5. **No frame budget / time quota**: No mechanism to cap frame time or warn when update/draw exceeds budget.
 6. **No graceful degradation**: No built-in FPS scaling or quality adjustment when frame rate drops.
 7. **No explicit game state serialization**: `SharedState` can't be snapshotted for save/load or networked state sync.
@@ -36,15 +36,15 @@ Engine backbone: application lifecycle, configuration, shared state container, t
 
 ## Suggestions
 
-1. **Add hot reload support**: File watcher → reload Lua scripts → re-invoke `luna.load()`. This is transformative for development workflow. Many 2D engine users cite this as the #1 productivity feature.
-2. **Add fixed timestep mode**: `conf.lua` option for fixed timestep (e.g., `t.fixedTimestep = 1/60`). Engine accumulates time and calls `luna.fixedUpdate(dt)` at fixed intervals, `luna.update(dt)` for rendering interpolation.
+1. **Add hot reload support**: File watcher → reload Lua scripts → re-invoke `lurek.load()`. This is transformative for development workflow. Many 2D engine users cite this as the #1 productivity feature.
+2. **Add fixed timestep mode**: `conf.lua` option for fixed timestep (e.g., `t.fixedTimestep = 1/60`). Engine accumulates time and calls `lurek.fixedUpdate(dt)` at fixed intervals, `lurek.update(dt)` for rendering interpolation.
 3. **Add .luna file format**: ZIP archive with `main.lua` at root + assets. Engine detects and mounts as GameFS root. Distribution story becomes: "zip your game folder, rename to .luna, double-click to play."
 4. **Extract DebugOverlay to Tier 2**: Make it a proper module with config flags, extensible panels, and Lua-accessible debug drawing.
 5. **Add frame budget warning**: `Config` option for target frame time; engine logs warning when exceeded. Helps developers catch performance regressions early.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Hot reload | ❌ | ✅ (manual) | ✅ (live) | ✅ (full) |
 | Distribution format | ❌ | ✅ (.love) | ✅ (.app) | ❌ |

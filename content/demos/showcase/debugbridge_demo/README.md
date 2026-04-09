@@ -1,20 +1,20 @@
 # Debug Bridge Demo
 
-Demonstrates `luna.debugbridge`: a TCP-based debug server that allows external tools (telnet, netcat, custom editors) to query and control a running game.
+Demonstrates `lurek.debugbridge`: a TCP-based debug server that allows external tools (telnet, netcat, custom editors) to query and control a running game.
 
 ## What It Demonstrates
 
-- `luna.debugbridge.start()` — start the TCP debug server on a port
-- `luna.debugbridge.stop()` — graceful shutdown
+- `lurek.debugbridge.start()` — start the TCP debug server on a port
+- `lurek.debugbridge.stop()` — graceful shutdown
 - JSON-RPC protocol: `{"id":1,"method":"ping"}` style requests
 - Built-in methods: `ping`, `get_state`, `get_fps`, `set_value`
-- Custom method registration: `luna.debugbridge.register("method", fn)`
+- Custom method registration: `lurek.debugbridge.register("method", fn)`
 - Handling disconnects and multiple simultaneous connections
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/debugbridge_demo
+cargo run -- content/demos/debugbridge_demo
 # Connect from another terminal:
 # telnet 127.0.0.1 19740
 # or: nc 127.0.0.1 19740

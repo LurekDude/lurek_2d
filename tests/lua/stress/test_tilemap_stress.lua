@@ -1,10 +1,10 @@
--- Luna2D Stress Test: Large Tilemap Operations
+-- Lurek2D Stress Test: Large Tilemap Operations
 -- Tests creating and manipulating large tilemaps at scale
 
 describe("tilemap stress: large map creation", function()
     it("creates a 500x500 tilemap and fills it", function()
-        local map = luna.tilemap.newTileMap(32, 32, 16)
-        local ts = luna.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
+        local map = lurek.tilemap.newTileMap(32, 32, 16)
+        local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
         map:addTileSet(ts)
         map:addLayer("ground", 500, 500)
 
@@ -22,8 +22,8 @@ describe("tilemap stress: large map creation", function()
     end)
 
     it("reads back all tiles from a 200x200 map", function()
-        local map = luna.tilemap.newTileMap(32, 32, 16)
-        local ts = luna.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
+        local map = lurek.tilemap.newTileMap(32, 32, 16)
+        local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
         map:addTileSet(ts)
         map:addLayer("ground", 200, 200)
 
@@ -49,8 +49,8 @@ describe("tilemap stress: large map creation", function()
     end)
 
     it("handles multiple layers on a 100x100 map", function()
-        local map = luna.tilemap.newTileMap(32, 32, 16)
-        local ts = luna.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
+        local map = lurek.tilemap.newTileMap(32, 32, 16)
+        local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
         map:addTileSet(ts)
 
         -- Create 5 layers (1-based indices)
@@ -76,8 +76,8 @@ end)
 
 describe("tilemap stress: fill operations", function()
     it("fills entire layer with one GID", function()
-        local map = luna.tilemap.newTileMap(32, 32, 16)
-        local ts = luna.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
+        local map = lurek.tilemap.newTileMap(32, 32, 16)
+        local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
         map:addTileSet(ts)
         map:addLayer("ground", 100, 100)
 
@@ -89,8 +89,8 @@ describe("tilemap stress: fill operations", function()
     end)
 
     it("setTile overwrites filled area", function()
-        local map = luna.tilemap.newTileMap(32, 32, 16)
-        local ts = luna.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
+        local map = lurek.tilemap.newTileMap(32, 32, 16)
+        local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
         map:addTileSet(ts)
         map:addLayer("ground", 100, 100)
 
@@ -102,7 +102,7 @@ describe("tilemap stress: fill operations", function()
 
     it("ChunkMap setTile/getTile roundtrip", function()
         -- ChunkMap: no layer param, 0-based coords
-        local cm = luna.tilemap.newChunkMap(16)
+        local cm = lurek.tilemap.newChunkMap(16)
         cm:setTile(5, 5, 42)
         expect_equal(42, cm:getTile(5, 5), "chunk tile preserved")
     end)

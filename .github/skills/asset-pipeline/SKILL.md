@@ -1,9 +1,9 @@
 ---
 name: asset-pipeline
-description: "Load this skill when working on Luna2D asset loading: textures, audio files, Lua scripts, or filesystem sandboxing. It owns the GameFS, image loading, and asset caching patterns. Skip it for rendering or audio playback."
+description: "Load this skill when working on Lurek2D asset loading: textures, audio files, Lua scripts, or filesystem sandboxing. It owns the GameFS, image loading, and asset caching patterns. Skip it for rendering or audio playback."
 ---
 
-# Asset Pipeline — Luna2D Engine
+# Asset Pipeline — Lurek2D Engine
 
 ## Load When
 

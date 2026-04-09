@@ -12,15 +12,15 @@ Time management: delta time, FPS tracking, time scaling, named scheduled events 
 
 - `Clock`: tracks delta time, total elapsed, FPS, frame count
 - `Scheduler`: named events with `after(delay, fn)` and `every(interval, fn)`
-- Time scale: `luna.time.setTimeScale(scale)` — slow-mo / fast-forward
-- Performance timing: `luna.time.performanceTiming(fn)` → microseconds
-- Sleep: `luna.time.sleep(seconds)` — blocking pause (development use)
+- Time scale: `lurek.time.setTimeScale(scale)` — slow-mo / fast-forward
+- Performance timing: `lurek.time.performanceTiming(fn)` → microseconds
+- Sleep: `lurek.time.sleep(seconds)` — blocking pause (development use)
 - Named event management: cancel, list, check existence
 
 ## Feature Gaps
 
 1. **No coroutine-based timing**: Can't write `wait(1.5)` inside a coroutine. Must use callbacks for all delayed operations. Coroutine-friendly timing is much more readable for sequential game logic.
-2. **No delta time smoothing**: Original Luna2D C++ engine had this. Raw delta time can spike on hitches. Smoothed delta (running average) prevents "teleporting" entities.
+2. **No delta time smoothing**: Original Lurek2D C++ engine had this. Raw delta time can spike on hitches. Smoothed delta (running average) prevents "teleporting" entities.
 3. **No fixed timestep**: No built-in accumulator for physics-rate updates. Must be implemented manually in Lua.
 4. **No cron-like patterns**: Can do `every(seconds, fn)` but can't schedule "every 5th call" or "at time 10.0".
 5. **No pause/resume for scheduled events**: Can cancel an event but can't pause/resume it.
@@ -34,15 +34,15 @@ Time management: delta time, FPS tracking, time scaling, named scheduled events 
 
 ## Suggestions
 
-1. **Add delta time smoothing**: `Config` option or `luna.time.setSmoothingFactor(n)` — running average over N frames. Prevents jitter.
-2. **Add coroutine wait support**: `luna.time.waitFrames(n)` / `luna.time.waitSeconds(t)` — yields current coroutine, resumes after time. Transforms game scripting ergonomics.
-3. **Add timer chains**: `luna.time.chain({1.0, fnA}, {2.0, fnB}, {0.5, fnC})` — sequential delayed execution without callback nesting.
-4. **Add pause/resume**: `luna.time.pause("name")` / `luna.time.resume("name")` for scheduled events.
-5. **Add unpauseable timers**: `luna.time.afterReal(t, fn)` — uses wall-clock time, ignores timeScale. For UI animations during game pause.
+1. **Add delta time smoothing**: `Config` option or `lurek.time.setSmoothingFactor(n)` — running average over N frames. Prevents jitter.
+2. **Add coroutine wait support**: `lurek.time.waitFrames(n)` / `lurek.time.waitSeconds(t)` — yields current coroutine, resumes after time. Transforms game scripting ergonomics.
+3. **Add timer chains**: `lurek.time.chain({1.0, fnA}, {2.0, fnB}, {0.5, fnC})` — sequential delayed execution without callback nesting.
+4. **Add pause/resume**: `lurek.time.pause("name")` / `lurek.time.resume("name")` for scheduled events.
+5. **Add unpauseable timers**: `lurek.time.afterReal(t, fn)` — uses wall-clock time, ignores timeScale. For UI animations during game pause.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Gideros |
+| Feature | Lurek2D | Engine A | Engine B | Engine I |
 |---|---|---|---|---|
 | Delta time | ✅ | ✅ | ✅ | ✅ |
 | Time scale | ✅ | ❌ (manual) | ❌ | ✅ |

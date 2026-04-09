@@ -1,12 +1,12 @@
 //! Tile set backed by a texture atlas with animation, solid flags, and autotile rules.
 //!
-//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! This module is part of Lurek2D's `tilemap` subsystem and provides the implementation
 //! details for tileset-related operations and data management.
 //! Key types exported from this module: `TileAnimFrame`, `TileSet`.
 //! Primary functions: `new()`, `get_first_gid()`, `get_tile_count()`, `get_columns()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

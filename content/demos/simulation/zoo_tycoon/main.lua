@@ -1,6 +1,6 @@
 -- Zoo Tycoon — Top-down zoo management
 -- Build enclosures, place animals, attract guests, earn revenue
--- Run with: cargo run -- demos/simulation/zoo_tycoon
+-- Run with: cargo run -- content/demos/simulation/zoo_tycoon
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -33,7 +33,7 @@ local tools = { "path", "fence", "water", "tree", "food_stand", "gift_shop", "re
 local tool_costs = { path = 5, fence = 8, water = 10, tree = 10, food_stand = 30, gift_shop = 40, remove = 0 }
 local TICKET_PRICE = 3
 
-function luna.init()
+function lurek.init()
     for y = 1, GRID_H do
         grid[y] = {}
         for x = 1, GRID_W do
@@ -108,7 +108,7 @@ function spawn_guests(n)
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if msg_timer > 0 then msg_timer = msg_timer - dt end
     if show_report then return end
 
@@ -167,7 +167,7 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if show_report then
         if key == "return" then show_report = false end
         return
@@ -187,11 +187,11 @@ function luna.keypressed(key)
         selected_animal = 0
         msg("Tool: " .. selected_tool)
     elseif key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if show_report then return end
     if btn ~= 1 then return end
     -- Grid click
@@ -241,35 +241,35 @@ local cell_colors = {
     gate = {0.8, 0.7, 0.3},
 }
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.1, 0.12, 0.08)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.1, 0.12, 0.08)
 
     -- UI header
-    luna.gfx.setColor(1, 0.9, 0.4, 1)
-    luna.gfx.print("Zoo Tycoon", 10, 5, 1.2)
-    luna.gfx.setColor(1, 1, 0.6, 1)
-    luna.gfx.print("Gold: " .. gold, 160, 8, 0.9)
-    luna.gfx.print("Day: " .. day, 300, 8, 0.9)
-    luna.gfx.print("Guests: " .. #guests, 400, 8, 0.9)
-    luna.gfx.print("Happy: " .. math.floor(happiness) .. "%", 520, 8, 0.9)
+    lurek.gfx.setColor(1, 0.9, 0.4, 1)
+    lurek.gfx.print("Zoo Tycoon", 10, 5, 1.2)
+    lurek.gfx.setColor(1, 1, 0.6, 1)
+    lurek.gfx.print("Gold: " .. gold, 160, 8, 0.9)
+    lurek.gfx.print("Day: " .. day, 300, 8, 0.9)
+    lurek.gfx.print("Guests: " .. #guests, 400, 8, 0.9)
+    lurek.gfx.print("Happy: " .. math.floor(happiness) .. "%", 520, 8, 0.9)
 
     -- Tool bar
-    luna.gfx.setColor(0.7, 0.7, 0.6, 1)
-    luna.gfx.print("Tool: " .. selected_tool, 10, 30, 0.75)
-    luna.gfx.print("Tab=cycle | 1-4=animals | Click=place", 150, 30, 0.65)
+    lurek.gfx.setColor(0.7, 0.7, 0.6, 1)
+    lurek.gfx.print("Tool: " .. selected_tool, 10, 30, 0.75)
+    lurek.gfx.print("Tab=cycle | 1-4=animals | Click=place", 150, 30, 0.65)
 
     -- Grid
     for y = 1, GRID_H do
         for x = 1, GRID_W do
             local c = cell_colors[grid[y][x]] or {0.3, 0.3, 0.3}
-            luna.gfx.setColor(c[1], c[2], c[3], 1)
-            luna.gfx.rectangle("fill", OX + (x - 1) * CELL, OY + (y - 1) * CELL, CELL - 1, CELL - 1)
+            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.gfx.rectangle("fill", OX + (x - 1) * CELL, OY + (y - 1) * CELL, CELL - 1, CELL - 1)
         end
     end
 
     -- Gate label
-    luna.gfx.setColor(0, 0, 0, 1)
-    luna.gfx.print("G", OX + 6, OY + (GRID_H - 1) * CELL + 6, 0.7)
+    lurek.gfx.setColor(0, 0, 0, 1)
+    lurek.gfx.print("G", OX + 6, OY + (GRID_H - 1) * CELL + 6, 0.7)
 
     -- Animals
     for _, a in ipairs(animals) do
@@ -278,65 +278,65 @@ function luna.render()
         local ay = OY + (a.gy - 1) * CELL + 2
         -- Happiness indicator
         if a.happy then
-            luna.gfx.setColor(0.2, 0.8, 0.2, 0.4)
+            lurek.gfx.setColor(0.2, 0.8, 0.2, 0.4)
         else
-            luna.gfx.setColor(0.8, 0.2, 0.2, 0.4)
+            lurek.gfx.setColor(0.8, 0.2, 0.2, 0.4)
         end
-        luna.gfx.rectangle("fill", ax, ay, CELL - 3, CELL - 3)
+        lurek.gfx.rectangle("fill", ax, ay, CELL - 3, CELL - 3)
         -- Icon
-        luna.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
-        luna.gfx.print(at.icon, ax + 6, ay + 4, 1)
+        lurek.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
+        lurek.gfx.print(at.icon, ax + 6, ay + 4, 1)
     end
 
     -- Guests
-    luna.gfx.setColor(1, 0.9, 0.7, 1)
+    lurek.gfx.setColor(1, 0.9, 0.7, 1)
     for _, g in ipairs(guests) do
-        luna.gfx.circle("fill", g.x, g.y, 4)
+        lurek.gfx.circle("fill", g.x, g.y, 4)
     end
 
     -- Day timer bar
-    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-    luna.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL, 8)
-    luna.gfx.setColor(0.4, 0.7, 1, 1)
-    luna.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL * (day_timer / DAY_LENGTH), 8)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+    lurek.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL, 8)
+    lurek.gfx.setColor(0.4, 0.7, 1, 1)
+    lurek.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL * (day_timer / DAY_LENGTH), 8)
 
     -- Legend
     local lx = OX + GRID_W * CELL + 10
-    luna.gfx.setColor(0.9, 0.85, 0.6, 1)
-    luna.gfx.print("Legend:", lx, OY, 0.8)
+    lurek.gfx.setColor(0.9, 0.85, 0.6, 1)
+    lurek.gfx.print("Legend:", lx, OY, 0.8)
     local legend = { {"Path",0.6,0.55,0.4}, {"Fence",0.5,0.35,0.15}, {"Water",0.2,0.4,0.8},
                      {"Tree",0.1,0.6,0.1}, {"Food",0.9,0.6,0.2}, {"Gift",0.8,0.3,0.7} }
     for i, l in ipairs(legend) do
-        luna.gfx.setColor(l[2], l[3], l[4], 1)
-        luna.gfx.rectangle("fill", lx, OY + 18 + (i - 1) * 20, 12, 12)
-        luna.gfx.setColor(0.8, 0.8, 0.8, 1)
-        luna.gfx.print(l[1], lx + 16, OY + 16 + (i - 1) * 20, 0.65)
+        lurek.gfx.setColor(l[2], l[3], l[4], 1)
+        lurek.gfx.rectangle("fill", lx, OY + 18 + (i - 1) * 20, 12, 12)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+        lurek.gfx.print(l[1], lx + 16, OY + 16 + (i - 1) * 20, 0.65)
     end
 
     -- Animal key
-    luna.gfx.setColor(0.9, 0.85, 0.6, 1)
-    luna.gfx.print("Animals:", lx, OY + 150, 0.8)
+    lurek.gfx.setColor(0.9, 0.85, 0.6, 1)
+    lurek.gfx.print("Animals:", lx, OY + 150, 0.8)
     for i, at in ipairs(animal_types) do
-        luna.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
-        luna.gfx.print(i .. "=" .. at.name, lx, OY + 170 + (i - 1) * 18, 0.65)
+        lurek.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
+        lurek.gfx.print(i .. "=" .. at.name, lx, OY + 170 + (i - 1) * 18, 0.65)
     end
 
     -- Message
     if msg_timer > 0 then
-        luna.gfx.setColor(1, 1, 0.7, clamp(msg_timer, 0, 1))
-        luna.gfx.print(message, OX, OY + GRID_H * CELL + 20, 0.85)
+        lurek.gfx.setColor(1, 1, 0.7, clamp(msg_timer, 0, 1))
+        lurek.gfx.print(message, OX, OY + GRID_H * CELL + 20, 0.85)
     end
 
     -- Day report overlay
     if show_report then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 100, 100, 400, 220)
-        luna.gfx.setColor(1, 0.9, 0.4, 1)
-        luna.gfx.print(last_report, 120, 120, 1)
-        luna.gfx.setColor(0.5, 1, 0.5, 1)
-        luna.gfx.print("Press ENTER to continue", 180, 290, 0.9)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 100, 100, 400, 220)
+        lurek.gfx.setColor(1, 0.9, 0.4, 1)
+        lurek.gfx.print(last_report, 120, 120, 1)
+        lurek.gfx.setColor(0.5, 1, 0.5, 1)
+        lurek.gfx.print("Press ENTER to continue", 180, 290, 0.9)
     end
 
-    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 5, 0.6)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 5, 0.6)
 end

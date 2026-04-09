@@ -1,4 +1,4 @@
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "Entity Showcase"
     t.window.width  = 800
     t.window.height = 600

@@ -1,15 +1,13 @@
 -- examples/minimap.lua
--- luna.minimap — Mini-map renderer: terrain colors, fog of war, tracked
+-- lurek.minimap — Mini-map renderer: terrain colors, fog of war, tracked
 -- objects, owner/faction tinting, zoom, and viewport indicator.
--- All luna.minimap API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── Minimap Creation ──────────────────────────────────────────────────────────
 
 -- newMinimap(gridW, gridH, displayW?, displayH?) → Minimap
 -- gridW/gridH: number of tiles in the logical grid (must match your tile map).
 -- displayW/displayH: pixel dimensions of the minimap image (defaults: 128×128).
-local minimap = luna.minimap.newMinimap(64, 64, 128, 128)
+local minimap = lurek.minimap.newMinimap(64, 64, 128, 128)
 
 -- ── Grid and Display Size ─────────────────────────────────────────────────────
 
@@ -107,7 +105,7 @@ minimap:removeObject(3)
 local nobj = minimap:getObjectCount()
 
 -- clearObjects() — remove all objects
--- minimap:clearObjects()
+minimap:clearObjects()
 
 -- ── Owner / Faction Colors ────────────────────────────────────────────────────
 
@@ -122,7 +120,7 @@ local or_, og, ob, oa = minimap:getOwnerColor(0)
 
 -- setColorMode("terrain" | "political") / getColorMode() → string
 minimap:setColorMode("terrain")   -- show terrain type colors
--- minimap:setColorMode("political")  -- show owner faction colors
+minimap:setColorMode("political")  -- show owner faction colors
 
 -- ── Zoom and Pan ─────────────────────────────────────────────────────────────
 
@@ -145,15 +143,15 @@ minimap:setViewportRect(28, 28, 8, 6)   -- camera shows 8×6 tiles around positi
 local vx, vy, vw, vh = minimap:getViewportRect()
 
 -- clearViewportRect()
--- minimap:clearViewportRect()
+minimap:clearViewportRect()
 
 -- ── Typical Update / Draw ─────────────────────────────────────────────────────
 
 --[[
 local mm, player_id
 
-function luna.init()
-    mm = luna.minimap.newMinimap(MAP_W, MAP_H, 200, 200)
+function lurek.init()
+    mm = lurek.minimap.newMinimap(MAP_W, MAP_H, 200, 200)
     mm:setFogEnabled(true)
     mm:setTerrainColor(0, 0.1, 0.5, 0.1)
     mm:setTerrainData(tilemap:getTerainFlat())
@@ -162,7 +160,7 @@ function luna.init()
     mm:setObject(player_id, player.x/TILE, player.y/TILE, 1)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- track player on minimap
     mm:setObject(player_id, player.x/TILE, player.y/TILE, 1)
     -- update viewport indicator
@@ -174,9 +172,9 @@ function luna.process(dt)
     end end
 end
 
-function luna.render()
+function lurek.render()
     -- draw minimap in top-right corner
-    luna.gfx.draw(mm:getImageData(), SCREEN_W - 210, 10)
+    lurek.gfx.draw(mm:getImageData(), SCREEN_W - 210, 10)
 end
 ]]
 

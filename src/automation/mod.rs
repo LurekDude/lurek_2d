@@ -3,7 +3,7 @@
 //! The `automation` module provides the [`Simulator`] engine for loading and
 //! playing back named [`Script`] objects. Each script contains an ordered
 //! sequence of timed [`Step`] records that inject synthetic input events
-//! (key presses, mouse movements, text input, etc.) into the Luna2D
+//! (key presses, mouse movements, text input, etc.) into the Lurek2D
 //! [`EventQueue`](crate::event::EventQueue) during game updates.
 //!
 //! Primary use-cases are headless integration tests, QA regression replay,
@@ -15,7 +15,7 @@
 //! |---|---|---|
 //! | `step` | [`Action`], [`Step`] | Enum of 8 action kinds; per-step record with 12 fields |
 //! | `script` | [`Script`] | Named, time-sorted, MAX_STEPS-capped step container |
-//! | `simulator` | [`Simulator`] | Playback engine driven by the `luna.simulator.*` Lua API |
+//! | `simulator` | [`Simulator`] | Playback engine driven by the `lurek.simulator.*` Lua API |
 //!
 //! ## Quick-start (Lua)
 //!
@@ -25,14 +25,14 @@
 //!     { time = 0.1, action = "keypress", key = "space" },
 //!     { time = 0.5, action = "mousepress", x = 100, y = 200 },
 //! }
-//! luna.simulator.load("demo", steps)
-//! luna.simulator.start("demo")
+//! lurek.simulator.load("demo", steps)
+//! lurek.simulator.start("demo")
 //!
 //! -- Advance playback each frame
-//! function luna.update(dt)
-//!     luna.simulator.update(dt)
-//!     if luna.simulator.isComplete() then
-//!         luna.simulator.stop()
+//! function lurek.update(dt)
+//!     lurek.simulator.update(dt)
+//!     if lurek.simulator.isComplete() then
+//!         lurek.simulator.stop()
 //!     end
 //! end
 //! ```

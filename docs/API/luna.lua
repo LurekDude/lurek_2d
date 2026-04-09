@@ -3,8 +3,8 @@
 
 luna = {}
 
----@class luna.ai
-luna.ai = {}
+---@class lurek.ai
+lurek.ai = {}
 
 --- Lua-side wrapper around an [`AIWorld`].
 ---@class AIWorld
@@ -627,92 +627,92 @@ function UtilityAI:typeOf(name) end
 --- Creates a BT action leaf with a Lua callback.
 ---@param callback any
 ---@return BTNode
-function luna.ai.newAction(callback) end
+function lurek.ai.newAction(callback) end
 
 --- Creates a new behavior tree.
 ---@return BehaviorTree
-function luna.ai.newBehaviorTree() end
+function lurek.ai.newBehaviorTree() end
 
 --- Creates a new standalone blackboard.
 ---@return Blackboard
-function luna.ai.newBlackboard() end
+function lurek.ai.newBlackboard() end
 
 --- Creates an RTS-style command queue.
 ---@return CommandQueue
-function luna.ai.newCommandQueue() end
+function lurek.ai.newCommandQueue() end
 
 --- Creates a BT condition leaf with a Lua predicate.
 ---@param callback any
 ---@return BTNode
-function luna.ai.newCondition(callback) end
+function lurek.ai.newCondition(callback) end
 
 --- Creates a new GOAP planning solver.
 ---@return GOAPPlanner
-function luna.ai.newGOAPPlanner() end
+function lurek.ai.newGOAPPlanner() end
 
 --- Creates a multi-layer influence map grid.
 ---@param w any
 ---@param h any
 ---@param cs any
 ---@return InfluenceMap
-function luna.ai.newInfluenceMap(w, h, cs) end
+function lurek.ai.newInfluenceMap(w, h, cs) end
 
 --- Creates a BT inverter decorator.
 ---@return BTNode
-function luna.ai.newInverter() end
+function lurek.ai.newInverter() end
 
 --- Creates a BT parallel node with optional policies.
 ---@param sp? any (optional)
 ---@param fp? any (optional)
 ---@return BTNode
-function luna.ai.newParallel(sp, fp) end
+function lurek.ai.newParallel(sp, fp) end
 
 --- Creates a tabular Q-learner.
 ---@param sc any
 ---@param ac any
 ---@return QLearner
-function luna.ai.newQLearner(sc, ac) end
+function lurek.ai.newQLearner(sc, ac) end
 
 --- Creates a BT repeater decorator.
 ---@param count? any (optional)
 ---@return BTNode
-function luna.ai.newRepeater(count) end
+function lurek.ai.newRepeater(count) end
 
 --- Creates a BT selector node.
 ---@return BTNode
-function luna.ai.newSelector() end
+function lurek.ai.newSelector() end
 
 --- Creates a BT sequence node.
 ---@return BTNode
-function luna.ai.newSequence() end
+function lurek.ai.newSequence() end
 
 --- Creates a named squad for formation positioning.
 ---@param name any
 ---@return Squad
-function luna.ai.newSquad(name) end
+function lurek.ai.newSquad(name) end
 
 --- Creates a new finite state machine.
 ---@return StateMachine
-function luna.ai.newStateMachine() end
+function lurek.ai.newStateMachine() end
 
 --- Creates a new steering behavior manager.
 ---@return SteeringManager
-function luna.ai.newSteeringManager() end
+function lurek.ai.newSteeringManager() end
 
 --- Creates a BT succeeder decorator.
 ---@return BTNode
-function luna.ai.newSucceeder() end
+function lurek.ai.newSucceeder() end
 
 --- Creates a new utility AI evaluator.
 ---@return UtilityAI
-function luna.ai.newUtilityAI() end
+function lurek.ai.newUtilityAI() end
 
 --- Creates a new AI world container.
 ---@return AIWorld
-function luna.ai.newWorld() end
+function lurek.ai.newWorld() end
 
----@class luna.animation
-luna.animation = {}
+---@class lurek.animation
+lurek.animation = {}
 
 --- Lua-side wrapper around an [`Animation`] controller.
 ---@class Animation
@@ -796,10 +796,10 @@ function Animation:update(dt) end
 
 --- Creates a new, empty Animation controller.
 ---@return Animation
-function luna.animation.new() end
+function lurek.animation.new() end
 
----@class luna.audio
-luna.audio = {}
+---@class lurek.audio
+lurek.audio = {}
 
 --- Lua-side wrapper for an audio bus resource.
 ---@class Bus
@@ -1227,182 +1227,182 @@ function Source:tell() end
 ---@param effect_type_str any
 ---@param params? any (optional)
 ---@return integer
-function luna.audio.add_effect(bus_name, effect_type_str, params) end
+function lurek.audio.add_effect(bus_name, effect_type_str, params) end
 
 --- Removes any active filter from a source.
 ---@param id_val any
 ---@return nil
-function luna.audio.clearFilter(id_val) end
+function lurek.audio.clearFilter(id_val) end
 
 --- Unloads the active SoundFont.
 ---@return nil
-function luna.audio.clearMidiSoundFont() end
+function lurek.audio.clearMidiSoundFont() end
 
 --- Creates an independent copy of a source.
 ---@param id_val any
 ---@return Source
-function luna.audio.clone(id_val) end
+function lurek.audio.clone(id_val) end
 
 --- Creates a bus by name (functional style).
 ---@param name any
 ---@param parent_name? any (optional)
 ---@return nil
-function luna.audio.create_bus(name, parent_name) end
+function lurek.audio.create_bus(name, parent_name) end
 
 --- Fades a source in from silence over the given duration.
 ---@param id_val any
 ---@param dur any
 ---@return nil
-function luna.audio.fadeIn(id_val, dur) end
+function lurek.audio.fadeIn(id_val, dur) end
 
 --- Returns the number of currently playing sources.
 ---@return integer
-function luna.audio.getActiveSourceCount() end
+function lurek.audio.getActiveSourceCount() end
 
 --- Returns the current distance model name.
 ---@return string
-function luna.audio.getDistanceModel() end
+function lurek.audio.getDistanceModel() end
 
 --- Returns the current Doppler scale.
 ---@return number
-function luna.audio.getDopplerScale() end
+function lurek.audio.getDopplerScale() end
 
 --- Returns the total duration of a source in seconds.
 ---@param id_val any
 ---@return number
-function luna.audio.getDuration(id_val) end
+function lurek.audio.getDuration(id_val) end
 
 --- Returns the fade-in duration of a source.
 ---@param id_val any
 ---@return number
-function luna.audio.getFadeIn(id_val) end
+function lurek.audio.getFadeIn(id_val) end
 
 --- Returns the free buffer slots in a queueable source.
 ---@param qsource_id any
 ---@return integer
-function luna.audio.getFreeBufferCount(qsource_id) end
+function lurek.audio.getFreeBufferCount(qsource_id) end
 
 --- Returns the high-pass filter cutoff of a source.
 ---@param id_val any
 ---@return number
-function luna.audio.getHighpass(id_val) end
+function lurek.audio.getHighpass(id_val) end
 
 --- Returns the 3D listener position (x, y, z).
 ---@return number
-function luna.audio.getListener() end
+function lurek.audio.getListener() end
 
 --- Returns the 2D listener position (x, y).
 ---@return number
-function luna.audio.getListener2D() end
+function lurek.audio.getListener2D() end
 
 --- Returns the low-pass filter cutoff of a source.
 ---@param id_val any
 ---@return number
-function luna.audio.getLowpass(id_val) end
+function lurek.audio.getLowpass(id_val) end
 
 --- Returns the global master volume.
 ---@return number
-function luna.audio.getMasterVolume() end
+function lurek.audio.getMasterVolume() end
 
 --- Returns the maximum number of simultaneous sources.
 ---@return integer
-function luna.audio.getMaxSources() end
+function lurek.audio.getMaxSources() end
 
 --- Returns the current peak level (stub).
 ---@return number
-function luna.audio.getMeter() end
+function lurek.audio.getMeter() end
 
 --- Returns the 6-component orientation of a source.
 ---@param id_val any
 ---@return number
-function luna.audio.getOrientation(id_val) end
+function lurek.audio.getOrientation(id_val) end
 
 --- Returns the source stereo panning.
 ---@param id_val any
 ---@return number
-function luna.audio.getPan(id_val) end
+function lurek.audio.getPan(id_val) end
 
 --- Returns the source pitch multiplier.
 ---@param id_val any
 ---@return number
-function luna.audio.getPitch(id_val) end
+function lurek.audio.getPitch(id_val) end
 
 --- Returns the current audio output device name.
 ---@return string
-function luna.audio.getPlaybackDevice() end
+function lurek.audio.getPlaybackDevice() end
 
 --- Returns a table of available audio output device names.
 ---@return table
-function luna.audio.getPlaybackDevices() end
+function lurek.audio.getPlaybackDevices() end
 
 --- Returns the 3D position of a source (x, y, z).
 ---@param id_val any
 ---@return number
-function luna.audio.getPosition(id_val) end
+function lurek.audio.getPosition(id_val) end
 
 --- Returns the bus a source is assigned to, or nil.
 ---@param id_val any
 ---@return Bus
-function luna.audio.getSourceBus(id_val) end
+function lurek.audio.getSourceBus(id_val) end
 
 --- Returns the total number of registered sources.
 ---@return integer
-function luna.audio.getSourceCount() end
+function lurek.audio.getSourceCount() end
 
 --- Returns the type string ("static" or "stream") of a source.
 ---@param id_val any
 ---@return string
-function luna.audio.getSourceType(id_val) end
+function lurek.audio.getSourceType(id_val) end
 
 --- Returns the velocity of a source (x, y, z).
 ---@param id_val any
 ---@return number
-function luna.audio.getVelocity(id_val) end
+function lurek.audio.getVelocity(id_val) end
 
 --- Returns the source volume.
 ---@param id_val any
 ---@return number
-function luna.audio.getVolume(id_val) end
+function lurek.audio.getVolume(id_val) end
 
 --- Returns true if a SoundFont is loaded.
 ---@return boolean
-function luna.audio.hasMidiSoundFont() end
+function lurek.audio.hasMidiSoundFont() end
 
 --- Returns true if looping is enabled.
 ---@param id_val any
 ---@return boolean
-function luna.audio.isLooping(id_val) end
+function lurek.audio.isLooping(id_val) end
 
 --- Returns true if the source is paused.
 ---@param id_val any
 ---@return boolean
-function luna.audio.isPaused(id_val) end
+function lurek.audio.isPaused(id_val) end
 
 --- Returns true if the source is playing.
 ---@param id_val any
 ---@return boolean
-function luna.audio.isPlaying(id_val) end
+function lurek.audio.isPlaying(id_val) end
 
 --- Returns true if the source is stopped.
 ---@param id_val any
 ---@return boolean
-function luna.audio.isStopped(id_val) end
+function lurek.audio.isStopped(id_val) end
 
 --- Creates a named audio bus for grouping sources.
 ---@param name any
 ---@return Bus
-function luna.audio.newBus(name) end
+function lurek.audio.newBus(name) end
 
 --- Creates a streaming audio decoder.
 ---@param source any
 ---@param buffersize? any (optional)
 ---@return Decoder
-function luna.audio.newDecoder(source, buffersize) end
+function lurek.audio.newDecoder(source, buffersize) end
 
 --- Creates a MIDI player, optionally loading a file.
 ---@param path? any (optional)
 ---@return MidiPlayer
-function luna.audio.newMidiPlayer(path) end
+function lurek.audio.newMidiPlayer(path) end
 
 --- Creates a queueable source for manual PCM buffering.
 ---@param sample_rate integer
@@ -1410,130 +1410,130 @@ function luna.audio.newMidiPlayer(path) end
 ---@param channels integer
 ---@param buffer_count integer
 ---@return integer
-function luna.audio.newQueueableSource(sample_rate, bit_depth, channels, buffer_count) end
+function lurek.audio.newQueueableSource(sample_rate, bit_depth, channels, buffer_count) end
 
 --- Creates a SoundData from a file or as a silent buffer.
 ---@param args any
 ---@return SoundData
-function luna.audio.newSoundData(args) end
+function lurek.audio.newSoundData(args) end
 
 --- Loads an audio file and returns a Source handle.
 ---@param args any
 ---@return Source
-function luna.audio.newSource(args) end
+function lurek.audio.newSource(args) end
 
 --- Pauses playback at the current position.
 ---@param id_val any
 ---@return nil
-function luna.audio.pause(id_val) end
+function lurek.audio.pause(id_val) end
 
 --- Pauses all currently playing sources.
 ---@return nil
-function luna.audio.pauseAll() end
+function lurek.audio.pauseAll() end
 
 --- Plays a source, with optional bus routing via options table.
 ---@param id_val any
 ---@param options? any (optional)
 ---@return integer
-function luna.audio.play(id_val, options) end
+function lurek.audio.play(id_val, options) end
 
 --- Plays the source in a continuous loop.
 ---@param id_val any
 ---@return nil
-function luna.audio.playLooping(id_val) end
+function lurek.audio.playLooping(id_val) end
 
 --- Starts playback of a queueable source.
 ---@param qsource_id any
 ---@return nil
-function luna.audio.playQueueable(qsource_id) end
+function lurek.audio.playQueueable(qsource_id) end
 
 --- Pushes a SoundData buffer into a queueable source.
 ---@param qsource_id any
 ---@param sd any
 ---@return nil
-function luna.audio.queueSource(qsource_id, sd) end
+function lurek.audio.queueSource(qsource_id, sd) end
 
 --- Releases a source and frees its memory.
 ---@param id_val any
 ---@return boolean
-function luna.audio.release(id_val) end
+function lurek.audio.release(id_val) end
 
 --- Removes a DSP effect from a bus.
 ---@param bus_name any
 ---@param effect_id any
 ---@return boolean
-function luna.audio.remove_effect(bus_name, effect_id) end
+function lurek.audio.remove_effect(bus_name, effect_id) end
 
 --- Resumes playback from pause.
 ---@param id_val any
 ---@return nil
-function luna.audio.resume(id_val) end
+function lurek.audio.resume(id_val) end
 
 --- Resumes all paused sources.
 ---@return nil
-function luna.audio.resumeAll() end
+function lurek.audio.resumeAll() end
 
 --- Seeks to a time position in seconds.
 ---@param id_val any
 ---@param pos any
 ---@return nil
-function luna.audio.seek(id_val, pos) end
+function lurek.audio.seek(id_val, pos) end
 
 --- Sets the distance attenuation model.
 ---@param model any
 ---@return nil
-function luna.audio.setDistanceModel(model) end
+function lurek.audio.setDistanceModel(model) end
 
 --- Sets the global Doppler effect scale.
 ---@param scale any
 ---@return nil
-function luna.audio.setDopplerScale(scale) end
+function lurek.audio.setDopplerScale(scale) end
 
 --- Applies a high-pass filter to a source.
 ---@param id_val any
 ---@param cutoff_hz any
 ---@return nil
-function luna.audio.setHighpass(id_val, cutoff_hz) end
+function lurek.audio.setHighpass(id_val, cutoff_hz) end
 
 --- Sets the 3D listener position.
 ---@param x any
 ---@param y any
 ---@param z? any (optional)
 ---@return nil
-function luna.audio.setListener(x, y, z) end
+function lurek.audio.setListener(x, y, z) end
 
 --- Sets the 2D listener position for spatial audio.
 ---@param x any
 ---@param y any
 ---@return nil
-function luna.audio.setListener2D(x, y) end
+function lurek.audio.setListener2D(x, y) end
 
 --- Enables or disables looping.
 ---@param id_val any
 ---@param looping any
 ---@return nil
-function luna.audio.setLooping(id_val, looping) end
+function lurek.audio.setLooping(id_val, looping) end
 
 --- Applies a low-pass filter to a source.
 ---@param id_val any
 ---@param cutoff_hz any
 ---@return nil
-function luna.audio.setLowpass(id_val, cutoff_hz) end
+function lurek.audio.setLowpass(id_val, cutoff_hz) end
 
 --- Sets the global master volume.
 ---@param vol any
 ---@return nil
-function luna.audio.setMasterVolume(vol) end
+function lurek.audio.setMasterVolume(vol) end
 
 --- Sets the metering scale (stub).
 ---@param scale any
 ---@return nil
-function luna.audio.setMeter(scale) end
+function lurek.audio.setMeter(scale) end
 
 --- Sets the global SoundFont for MIDI synthesis.
 ---@param path any
 ---@return nil
-function luna.audio.setMidiSoundFont(path) end
+function lurek.audio.setMidiSoundFont(path) end
 
 --- Sets the 6-component orientation of a source.
 ---@param source Source
@@ -1544,24 +1544,24 @@ function luna.audio.setMidiSoundFont(path) end
 ---@param uy number
 ---@param uz number
 ---@return nil
-function luna.audio.setOrientation(source, fx, fy, fz, ux, uy, uz) end
+function lurek.audio.setOrientation(source, fx, fy, fz, ux, uy, uz) end
 
 --- Sets stereo panning (-1.0 left to 1.0 right).
 ---@param id_val any
 ---@param pan any
 ---@return nil
-function luna.audio.setPan(id_val, pan) end
+function lurek.audio.setPan(id_val, pan) end
 
 --- Sets source pitch multiplier.
 ---@param id_val any
 ---@param pitch any
 ---@return nil
-function luna.audio.setPitch(id_val, pitch) end
+function lurek.audio.setPitch(id_val, pitch) end
 
 --- Selects an audio output device by name.
 ---@param name any
 ---@return nil
-function luna.audio.setPlaybackDevice(name) end
+function lurek.audio.setPlaybackDevice(name) end
 
 --- Sets the 3D position of a source.
 ---@param id_val any
@@ -1569,13 +1569,13 @@ function luna.audio.setPlaybackDevice(name) end
 ---@param y any
 ---@param z? any (optional)
 ---@return nil
-function luna.audio.setPosition(id_val, x, y, z) end
+function lurek.audio.setPosition(id_val, x, y, z) end
 
 --- Assigns a source to a bus.
 ---@param id_val any
 ---@param bus_val any
 ---@return nil
-function luna.audio.setSourceBus(id_val, bus_val) end
+function lurek.audio.setSourceBus(id_val, bus_val) end
 
 --- Sets the velocity of a source for Doppler.
 ---@param id_val any
@@ -1583,19 +1583,19 @@ function luna.audio.setSourceBus(id_val, bus_val) end
 ---@param y any
 ---@param z? any (optional)
 ---@return nil
-function luna.audio.setVelocity(id_val, x, y, z) end
+function lurek.audio.setVelocity(id_val, x, y, z) end
 
 --- Sets source playback volume.
 ---@param id_val any
 ---@param vol any
 ---@return nil
-function luna.audio.setVolume(id_val, vol) end
+function lurek.audio.setVolume(id_val, vol) end
 
 --- Sets a bus volume by name.
 ---@param name any
 ---@param volume any
 ---@return nil
-function luna.audio.set_bus_volume(name, volume) end
+function lurek.audio.set_bus_volume(name, volume) end
 
 --- Sets a parameter on a DSP effect.
 ---@param bus_name any
@@ -1603,108 +1603,108 @@ function luna.audio.set_bus_volume(name, volume) end
 ---@param param_name any
 ---@param value any
 ---@return boolean
-function luna.audio.set_effect_param(bus_name, effect_id, param_name, value) end
+function lurek.audio.set_effect_param(bus_name, effect_id, param_name, value) end
 
 --- Stops playback and resets seek position.
 ---@param id_val any
 ---@return nil
-function luna.audio.stop(id_val) end
+function lurek.audio.stop(id_val) end
 
 --- Stops all currently playing sources.
 ---@return nil
-function luna.audio.stopAll() end
+function lurek.audio.stopAll() end
 
 --- Stops a queueable source and drains its buffers.
 ---@param qsource_id any
 ---@return nil
-function luna.audio.stopQueueable(qsource_id) end
+function lurek.audio.stopQueueable(qsource_id) end
 
 --- Returns the current playback position in seconds.
 ---@param id_val any
 ---@return number
-function luna.audio.tell(id_val) end
+function lurek.audio.tell(id_val) end
 
----@class luna.simulator
-luna.simulator = {}
+---@class lurek.simulator
+lurek.simulator = {}
 
 --- Returns the name of the active script, or nil if idle.
 ---@return string?
-function luna.simulator.getCurrentScript() end
+function lurek.simulator.getCurrentScript() end
 
 --- Returns the index of the next step to be dispatched.
 ---@return integer
-function luna.simulator.getCurrentStep() end
+function lurek.simulator.getCurrentStep() end
 
 --- Returns seconds elapsed since playback started.
 ---@return number
-function luna.simulator.getElapsedTime() end
+function lurek.simulator.getElapsedTime() end
 
 --- Returns an array of all registered script names.
 ---@return table
-function luna.simulator.getScripts() end
+function lurek.simulator.getScripts() end
 
 --- Returns the total number of steps in the active script.
 ---@return integer
-function luna.simulator.getStepCount() end
+function lurek.simulator.getStepCount() end
 
 --- Returns true if a script with the given name is registered.
 ---@param name any
 ---@return boolean
-function luna.simulator.hasScript(name) end
+function lurek.simulator.hasScript(name) end
 
 --- Returns true if all steps in the active script have been dispatched.
 ---@return boolean
-function luna.simulator.isComplete() end
+function lurek.simulator.isComplete() end
 
 --- Returns true if playback is currently paused.
 ---@return boolean
-function luna.simulator.isPaused() end
+function lurek.simulator.isPaused() end
 
 --- Returns true if the simulator is actively playing a script.
 ---@return boolean
-function luna.simulator.isRunning() end
+function lurek.simulator.isRunning() end
 
 --- Loads a named script from a Lua data table containing a steps array.
 ---@param name any
 ---@param data any
 ---@return nil
-function luna.simulator.load(name, data) end
+function lurek.simulator.load(name, data) end
 
 --- Parses a TOML string and registers it as a named script.
 ---@param name any
 ---@param toml_str any
 ---@return nil
-function luna.simulator.loadFromToml(name, toml_str) end
+function lurek.simulator.loadFromToml(name, toml_str) end
 
 --- Pauses playback at the current step position.
 ---@return nil
-function luna.simulator.pause() end
+function lurek.simulator.pause() end
 
 --- Resumes playback from a paused position.
 ---@return nil
-function luna.simulator.resume() end
+function lurek.simulator.resume() end
 
 --- Starts playback of the named script from the beginning.
 ---@param name any
 ---@return nil
-function luna.simulator.start(name) end
+function lurek.simulator.start(name) end
 
 --- Stops playback and resets the simulator to idle.
 ---@return nil
-function luna.simulator.stop() end
+function lurek.simulator.stop() end
 
 --- Removes a loaded script by name, returning true if it existed.
 ---@param name any
 ---@return boolean
-function luna.simulator.unload(name) end
+function lurek.simulator.unload(name) end
 
 --- Advances the playback clock by dt seconds, dispatching due steps.
 ---@param dt any
 ---@return nil
-function luna.simulator.update(dt) end
+function lurek.simulator.update(dt) end
 
----@class luna.camera
-luna.camera = {}
+---@class lurek.camera
+lurek.camera = {}
 
 --- Lua-side wrapper around a [`Camera2D`] instance.
 ---@class Camera2D
@@ -1831,10 +1831,10 @@ function Camera2D:update(dt) end
 ---@param vw any
 ---@param vh any
 ---@return Camera2D
-function luna.camera.new(vw, vh) end
+function lurek.camera.new(vw, vh) end
 
----@class luna.compute
-luna.compute = {}
+---@class lurek.compute
+lurek.compute = {}
 
 --- Lua-side wrapper around [`NdArray`].
 ---@class Array
@@ -2024,19 +2024,19 @@ function Array:typeOf(name) end
 ---@param shape? any (optional)
 ---@param dtype? any (optional)
 ---@return Array
-function luna.compute.fromTable(data, shape, dtype) end
+function lurek.compute.fromTable(data, shape, dtype) end
 
 --- Creates a zero-initialized array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
 ---@return Array
-function luna.compute.newArray(shape, dtype) end
+function lurek.compute.newArray(shape, dtype) end
 
 --- Creates a one-filled array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
 ---@return Array
-function luna.compute.ones(shape, dtype) end
+function lurek.compute.ones(shape, dtype) end
 
 --- Creates a 1D array from start to stop with optional step and dtype.
 ---@param start any
@@ -2044,16 +2044,16 @@ function luna.compute.ones(shape, dtype) end
 ---@param step? any (optional)
 ---@param dtype? any (optional)
 ---@return Array
-function luna.compute.range(start, stop, step, dtype) end
+function lurek.compute.range(start, stop, step, dtype) end
 
 --- Creates a zero-filled array with the given shape and optional dtype.
 ---@param shape any
 ---@param dtype? any (optional)
 ---@return Array
-function luna.compute.zeros(shape, dtype) end
+function lurek.compute.zeros(shape, dtype) end
 
----@class luna.data
-luna.data = {}
+---@class lurek.data
+lurek.data = {}
 
 --- Lua-side wrapper around [`DataView`].
 ---@class DataView
@@ -2108,81 +2108,81 @@ function DataView:getUInt8(offset) end
 ---@param raw_data any
 ---@param level? any (optional)
 ---@return string
-function luna.data.compress(format_str, raw_data, level) end
+function lurek.data.compress(format_str, raw_data, level) end
 
 --- Decodes encoded text back to binary (base64, hex).
 ---@param format_str any
 ---@param encoded any
 ---@return string
-function luna.data.decode(format_str, encoded) end
+function lurek.data.decode(format_str, encoded) end
 
 --- Decompresses data using the given algorithm (deflate, gzip, lz4).
 ---@param format_str any
 ---@param compressed any
 ---@return string
-function luna.data.decompress(format_str, compressed) end
+function lurek.data.decompress(format_str, compressed) end
 
 --- Encodes binary data using the given format (base64, hex).
 ---@param format_str any
 ---@param raw_data any
 ---@return string
-function luna.data.encode(format_str, raw_data) end
+function lurek.data.encode(format_str, raw_data) end
 
 --- Returns the number of bytes the given format and values would occupy.
 ---@param fmt any
 ---@param vals any
 ---@return integer
-function luna.data.getPackedSize(fmt, vals) end
+function lurek.data.getPackedSize(fmt, vals) end
 
 --- Returns the cryptographic hash of the input (md5, sha1, sha256, sha512).
 ---@param algo_str any
 ---@param raw_data any
 ---@return string
-function luna.data.hash(algo_str, raw_data) end
+function lurek.data.hash(algo_str, raw_data) end
 
 --- Creates a new mutable byte buffer from a size or string.
 ---@param value any
 ---@return ByteData
-function luna.data.newByteData(value) end
+function lurek.data.newByteData(value) end
 
 --- Creates a read-only windowed view into a byte string.
 ---@param raw any
 ---@param offset? any (optional)
 ---@param size? any (optional)
 ---@return DataView
-function luna.data.newDataView(raw, offset, size) end
+function lurek.data.newDataView(raw, offset, size) end
 
 --- Packs values into a binary byte string using the format string.
 ---@param fmt any
 ---@param vals any
 ---@return string
-function luna.data.pack(fmt, vals) end
+function lurek.data.pack(fmt, vals) end
 
 --- Reads values using the Luna2D Binary Pack Format.
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
-function luna.data.read(fmt, raw, offset) end
+function lurek.data.read(fmt, raw, offset) end
 
 --- Returns the byte size of a Luna2D Binary Pack Format string.
 ---@param fmt any
 ---@return integer
-function luna.data.size(fmt) end
+function lurek.data.size(fmt) end
 
 --- Unpacks values from a binary byte string, returning values followed by next offset.
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
-function luna.data.unpack(fmt, raw, offset) end
+function lurek.data.unpack(fmt, raw, offset) end
 
 --- Writes values using the Luna2D Binary Pack Format.
 ---@param fmt any
 ---@param vals any
 ---@return string
-function luna.data.write(fmt, vals) end
+function lurek.data.write(fmt, vals) end
 
----@class luna.dataframe
-luna.dataframe = {}
+---@class lurek.dataframe
+lurek.dataframe = {}
 
 --- Lua-side wrapper around a shared [`DataFrame`].
 ---@class DataFrame
@@ -2434,238 +2434,238 @@ function Database:typeOf(name) end
 --- Deserializes a binary LVDF string into a DataFrame.
 ---@param s any
 ---@return DataFrame
-function luna.dataframe.fromBinary(s) end
+function lurek.dataframe.fromBinary(s) end
 
 --- Parses a CSV string into a DataFrame.
 ---@param s any
 ---@return DataFrame
-function luna.dataframe.fromCSV(s) end
+function lurek.dataframe.fromCSV(s) end
 
 --- Parses a JSON string into a DataFrame.
 ---@param s any
 ---@return DataFrame
-function luna.dataframe.fromJSON(s) end
+function lurek.dataframe.fromJSON(s) end
 
 --- Creates a DataFrame from an array of row tables.
 ---@param rows any
 ---@return DataFrame
-function luna.dataframe.fromTable(rows) end
+function lurek.dataframe.fromTable(rows) end
 
 --- Creates a new empty DataFrame.
 ---@return DataFrame
-function luna.dataframe.newDataFrame() end
+function lurek.dataframe.newDataFrame() end
 
 --- Creates a new empty Database.
 ---@return Database
-function luna.dataframe.newDatabase() end
+function lurek.dataframe.newDatabase() end
 
 --- Generates a DataFrame with random data from column definitions.
 ---@param defs_tbl any
 ---@param n any
 ---@param seed? any (optional)
 ---@return DataFrame
-function luna.dataframe.random(defs_tbl, n, seed) end
+function lurek.dataframe.random(defs_tbl, n, seed) end
 
----@class luna.debugbridge
-luna.debugbridge = {}
+---@class lurek.debugbridge
+lurek.debugbridge = {}
 
 --- Broadcasts a JSON event to all connected clients.
 ---@param event any
 ---@param json_data any
-function luna.debugbridge.broadcast(event, json_data) end
+function lurek.debugbridge.broadcast(event, json_data) end
 
 --- Captures a print message and broadcasts it to connected clients.
 ---@param msg any
 ---@param source? any (optional)
 ---@param line? any (optional)
-function luna.debugbridge.capturePrint(msg, source, line) end
+function lurek.debugbridge.capturePrint(msg, source, line) end
 
 --- Clears the print history.
-function luna.debugbridge.clearPrintHistory() end
+function lurek.debugbridge.clearPrintHistory() end
 
 --- Returns the number of connected TCP clients.
 ---@return integer
-function luna.debugbridge.getClientCount() end
+function lurek.debugbridge.getClientCount() end
 
 --- Returns performance statistics.
 ---@return table
-function luna.debugbridge.getPerformance() end
+function lurek.debugbridge.getPerformance() end
 
 --- Returns the server port (0 if not running).
 ---@return integer
-function luna.debugbridge.getPort() end
+function lurek.debugbridge.getPort() end
 
 --- Returns the print history.
 ---@param count? any (optional)
 ---@return table
-function luna.debugbridge.getPrintHistory(count) end
+function lurek.debugbridge.getPrintHistory(count) end
 
 --- Returns whether the server is currently running.
 ---@return bool
-function luna.debugbridge.isRunning() end
+function lurek.debugbridge.isRunning() end
 
 --- Returns whether a screenshot is currently requested.
 ---@return bool
-function luna.debugbridge.isScreenshotRequested() end
+function lurek.debugbridge.isScreenshotRequested() end
 
 --- Poll for pending Lua-dependent requests from TCP clients.
-function luna.debugbridge.poll() end
+function lurek.debugbridge.poll() end
 
 --- Flags a screenshot request for the next frame.
 ---@param scale? any (optional)
-function luna.debugbridge.requestScreenshot(scale) end
+function lurek.debugbridge.requestScreenshot(scale) end
 
 --- Sets the maximum print history size.
 ---@param max any
-function luna.debugbridge.setMaxPrintHistory(max) end
+function lurek.debugbridge.setMaxPrintHistory(max) end
 
 --- Start the TCP debug server on 127.0.0.1:port.
 ---@param port? any (optional)
 ---@return boolean
-function luna.debugbridge.start(port) end
+function lurek.debugbridge.start(port) end
 
 --- Stop the TCP debug server and close all connections.
-function luna.debugbridge.stop() end
+function lurek.debugbridge.stop() end
 
----@class luna.devtools
-luna.devtools = {}
+---@class lurek.devtools
+lurek.devtools = {}
 
 --- Clears all log history.
-function luna.devtools.clearLog() end
+function lurek.devtools.clearLog() end
 
 --- Clears all watched paths.
-function luna.devtools.clearWatches() end
+function lurek.devtools.clearWatches() end
 
 --- Evaluates a Lua string and returns (success, results...).
 ---@param code any
 ---@return any
-function luna.devtools.eval(code) end
+function lurek.devtools.eval(code) end
 
 --- Returns the Lua call stack as a table of frames.
 ---@param max_depth? any (optional)
 ---@return table
-function luna.devtools.getCallStack(max_depth) end
+function lurek.devtools.getCallStack(max_depth) end
 
 --- Returns the raw frame-time sample array.
 ---@return table
-function luna.devtools.getFrameHistory() end
+function lurek.devtools.getFrameHistory() end
 
 --- Returns the current frame-history buffer capacity.
 ---@return integer
-function luna.devtools.getFrameHistorySize() end
+function lurek.devtools.getFrameHistorySize() end
 
 --- Returns a table of computed frame statistics.
 ---@return table
-function luna.devtools.getFrameStats() end
+function lurek.devtools.getFrameStats() end
 
 --- Returns whether console log output is enabled.
 ---@return boolean
-function luna.devtools.getLogConsole() end
+function lurek.devtools.getLogConsole() end
 
 --- Returns the current log file path.
 ---@return string
-function luna.devtools.getLogFile() end
+function lurek.devtools.getLogFile() end
 
 --- Returns recent log entries as an array of tables.
 ---@param count? any (optional)
 ---@return table
-function luna.devtools.getLogHistory(count) end
+function lurek.devtools.getLogHistory(count) end
 
 --- Returns the current minimum log level.
 ---@return string
-function luna.devtools.getLogLevel() end
+function lurek.devtools.getLogLevel() end
 
 --- Returns zone data table for a specific frame (0 or nil = most recent).
 ---@param frame? any (optional)
 ---@return table
-function luna.devtools.getProfileData(frame) end
+function lurek.devtools.getProfileData(frame) end
 
 --- Returns the number of retained profile frames.
 ---@return integer
-function luna.devtools.getProfileFrameCount() end
+function lurek.devtools.getProfileFrameCount() end
 
 --- Returns the file watch poll interval in seconds.
 ---@return number
-function luna.devtools.getWatchInterval() end
+function lurek.devtools.getWatchInterval() end
 
 --- Returns an array of all watched paths.
 ---@return table
-function luna.devtools.getWatchedPaths() end
+function lurek.devtools.getWatchedPaths() end
 
 --- Returns whether the console is considered open.
 ---@return boolean
-function luna.devtools.isConsoleOpen() end
+function lurek.devtools.isConsoleOpen() end
 
 --- Returns whether the profiler is enabled.
 ---@return boolean
-function luna.devtools.isProfilingEnabled() end
+function lurek.devtools.isProfilingEnabled() end
 
 --- Logs a message at the given level.
 ---@param level any
 ---@param message any
-function luna.devtools.log(level, message) end
+function lurek.devtools.log(level, message) end
 
 --- Opens the console window (records state; returns true).
 ---@return boolean
-function luna.devtools.openConsole() end
+function lurek.devtools.openConsole() end
 
 --- Seals the current frame of profiling data.
-function luna.devtools.profileFrame() end
+function lurek.devtools.profileFrame() end
 
 --- Closes the most recent profiling zone.
-function luna.devtools.profilePop() end
+function lurek.devtools.profilePop() end
 
 --- Opens a named profiling zone on the stack.
 ---@param name any
-function luna.devtools.profilePush(name) end
+function lurek.devtools.profilePush(name) end
 
 --- Records a frame-time sample (call each frame with delta time in seconds).
 ---@param dt_val any
-function luna.devtools.recordFrameTime(dt_val) end
+function lurek.devtools.recordFrameTime(dt_val) end
 
 --- Clears all profiling data and resets the zone stack.
-function luna.devtools.resetProfile() end
+function lurek.devtools.resetProfile() end
 
 --- Polls all watched paths and returns paths whose mtime changed.
 ---@return table
-function luna.devtools.scan() end
+function lurek.devtools.scan() end
 
 --- Sets the frame-history buffer capacity (clamped 10-10000).
 ---@param size any
-function luna.devtools.setFrameHistorySize(size) end
+function lurek.devtools.setFrameHistorySize(size) end
 
 --- Enables or disables console log output.
 ---@param enabled any
-function luna.devtools.setLogConsole(enabled) end
+function lurek.devtools.setLogConsole(enabled) end
 
 --- Sets the log file path (empty string disables file output).
 ---@param path any
-function luna.devtools.setLogFile(path) end
+function lurek.devtools.setLogFile(path) end
 
 --- Sets the minimum log level.
 ---@param level any
-function luna.devtools.setLogLevel(level) end
+function lurek.devtools.setLogLevel(level) end
 
 --- Enables or disables the profiler.
 ---@param enabled any
-function luna.devtools.setProfilingEnabled(enabled) end
+function lurek.devtools.setProfilingEnabled(enabled) end
 
 --- Sets the file watch poll interval in seconds.
 ---@param interval any
-function luna.devtools.setWatchInterval(interval) end
+function lurek.devtools.setWatchInterval(interval) end
 
 --- Removes a file path from the watch list.
 ---@param path any
 ---@return boolean
-function luna.devtools.unwatch(path) end
+function lurek.devtools.unwatch(path) end
 
 --- Adds a file path to the watch list. Returns false if already watched.
 ---@param path any
 ---@return boolean
-function luna.devtools.watch(path) end
+function lurek.devtools.watch(path) end
 
----@class luna.docs
-luna.docs = {}
+---@class lurek.docs
+lurek.docs = {}
 
 ---@class ApiCatalog
 local ApiCatalog = {}
@@ -2874,114 +2874,114 @@ function ValidationReport:toTable() end
 ---@param catalog_ud any
 ---@param source_dir any
 ---@return table
-function luna.docs.checkStaleness(catalog_ud, source_dir) end
+function lurek.docs.checkStaleness(catalog_ud, source_dir) end
 
 --- Return (documented_count, total_live_count) coverage tuple.
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.coverage(catalog_ud) end
+function lurek.docs.coverage(catalog_ud) end
 
 --- Return (documented_count, total_live_count) for a single module.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.coverageModule(module_name, catalog_ud) end
+function lurek.docs.coverageModule(module_name, catalog_ud) end
 
 --- Inject or update a description for a named API entry.
 ---@param qualified_name any
 ---@param description any
-function luna.docs.describe(qualified_name, description) end
+function lurek.docs.describe(qualified_name, description) end
 
 --- Export completions.json, hover.json, and signatures.json to a directory.
 ---@param catalog_ud any
 ---@param output_dir any
-function luna.docs.exportAll(catalog_ud, output_dir) end
+function lurek.docs.exportAll(catalog_ud, output_dir) end
 
 --- Export a one-line-per-function plain-text cheatsheet.
 ---@param catalog_ud any
 ---@param path any
-function luna.docs.exportCheatsheet(catalog_ud, path) end
+function lurek.docs.exportCheatsheet(catalog_ud, path) end
 
 --- Export VS Code IntelliSense completions JSON to a file.
 ---@param catalog_ud any
 ---@param path any
-function luna.docs.exportCompletions(catalog_ud, path) end
+function lurek.docs.exportCompletions(catalog_ud, path) end
 
 --- Export VS Code hover JSON to a file.
 ---@param catalog_ud any
 ---@param path any
-function luna.docs.exportHover(catalog_ud, path) end
+function lurek.docs.exportHover(catalog_ud, path) end
 
 --- Export a Markdown API reference file.
 ---@param catalog_ud any
 ---@param path any
-function luna.docs.exportMarkdown(catalog_ud, path) end
+function lurek.docs.exportMarkdown(catalog_ud, path) end
 
 --- Export VS Code signature-help JSON to a file.
 ---@param catalog_ud any
 ---@param path any
-function luna.docs.exportSignatures(catalog_ud, path) end
+function lurek.docs.exportSignatures(catalog_ud, path) end
 
 --- Return the current internal catalog as an ApiCatalog userdata.
-function luna.docs.getCatalog() end
+function lurek.docs.getCatalog() end
 
 --- Load all .toml files in a directory and merge into a single ApiCatalog.
 ---@param directory any
 ---@return any
-function luna.docs.loadAll(directory) end
+function lurek.docs.loadAll(directory) end
 
 --- Load a TOML doc file into an ApiCatalog.
 ---@param path any
 ---@return any
-function luna.docs.loadToml(path) end
+function lurek.docs.loadToml(path) end
 
 --- Calculate quality metrics for a catalog or the internal catalog.
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.quality(catalog_ud) end
+function lurek.docs.quality(catalog_ud) end
 
 --- Calculate quality metrics for a single module.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.qualityModule(module_name, catalog_ud) end
+function lurek.docs.qualityModule(module_name, catalog_ud) end
 
 --- Clear all entries from the internal catalog.
-function luna.docs.resetCatalog() end
+function lurek.docs.resetCatalog() end
 
---- Scan the luna.* namespace to build an API catalog from live bindings.
+--- Scan the lurek.* namespace to build an API catalog from live bindings.
 ---@param opts? any (optional)
 ---@return any
-function luna.docs.scan(opts) end
+function lurek.docs.scan(opts) end
 
 --- Scan a single module's bindings.
 ---@param module_name any
 ---@return any
-function luna.docs.scanModule(module_name) end
+function lurek.docs.scanModule(module_name) end
 
 --- Set the parameter metadata for a catalog entry.
 ---@param qualified_name any
 ---@param params any
-function luna.docs.setParamInfo(qualified_name, params) end
+function lurek.docs.setParamInfo(qualified_name, params) end
 
 --- Set the return type metadata for a catalog entry.
 ---@param qualified_name any
 ---@param returns any
-function luna.docs.setReturnInfo(qualified_name, returns) end
+function lurek.docs.setReturnInfo(qualified_name, returns) end
 
---- Validate catalog completeness against the live luna.* bindings.
+--- Validate catalog completeness against the live lurek.* bindings.
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.validate(catalog_ud) end
+function lurek.docs.validate(catalog_ud) end
 
---- Validate a single module against the live luna.<module>.* bindings.
+--- Validate a single module against the live lurek.<module>.* bindings.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
 ---@return any
-function luna.docs.validateModule(module_name, catalog_ud) end
+function lurek.docs.validateModule(module_name, catalog_ud) end
 
----@class luna.entity
-luna.entity = {}
+---@class lurek.entity
+lurek.entity = {}
 
 --- Lua-side wrapper around a [`Universe`] ECS world.
 ---@class Universe
@@ -3213,10 +3213,10 @@ function Universe:update(dt) end
 
 --- Creates a new empty ECS universe.
 ---@return Universe
-function luna.entity.newUniverse() end
+function lurek.entity.newUniverse() end
 
----@class luna.signal
-luna.signal = {}
+---@class lurek.signal
+lurek.signal = {}
 
 --- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 ---@class Signal
@@ -3261,45 +3261,45 @@ function Signal:typeOf(name) end
 
 --- Discards all pending events in the queue.
 ---@return nil
-function luna.signal.clear() end
+function lurek.signal.clear() end
 
 --- Pushes an exit event, requesting the engine to stop.
 ---@param code? any (optional)
 ---@return nil
-function luna.signal.exit(code) end
+function lurek.signal.exit(code) end
 
 --- Creates a new pub-sub Signal dispatcher.
 ---@return Signal
-function luna.signal.newSignal() end
+function lurek.signal.newSignal() end
 
 --- Returns an iterator function that pops events from the queue.
 ---@return function
-function luna.signal.poll() end
+function lurek.signal.poll() end
 
 --- Syncs OS-level events into the queue (no-op in Luna2D push model).
 ---@return nil
-function luna.signal.pump() end
+function lurek.signal.pump() end
 
 --- Pushes a custom event onto the event queue.
 ---@param args any
 ---@return nil
-function luna.signal.push(args) end
+function lurek.signal.push(args) end
 
 --- Alias for `exit()` — requests the engine to stop at the end of the current frame.
 ---@return nil
-function luna.signal.quit() end
+function lurek.signal.quit() end
 
 --- Requests that the engine restart at the beginning of the next frame.
 ---@return nil
-function luna.signal.restart() end
+function lurek.signal.restart() end
 
 --- Blocks until the next event arrives or the optional timeout elapses.
 ---@param timeout? any (optional)
 ---@return string?
-function luna.signal.wait(timeout) end
+function lurek.signal.wait(timeout) end
 
----@class luna.filesystem
-luna.filesystem = {}
+---@class lurek.filesystem
+lurek.filesystem = {}
 
 --- Lua-side wrapper around a [`FileData`] buffer.
 ---@class FileData
@@ -3368,123 +3368,123 @@ function FileHandle:write(data) end
 ---@param path any
 ---@param data any
 ---@return nil
-function luna.filesystem.append(path, data) end
+function lurek.filesystem.append(path, data) end
 
 --- Creates a directory and any missing parent directories in the save area.
 ---@param path any
 ---@return nil
-function luna.filesystem.createDirectory(path) end
+function lurek.filesystem.createDirectory(path) end
 
 --- Returns whether the given file or directory exists.
 ---@param path any
 ---@return boolean
-function luna.filesystem.exists(path) end
+function lurek.filesystem.exists(path) end
 
 --- Returns a table containing the names of every file and subdirectory in the given path.
 ---@param path any
 ---@return table
-function luna.filesystem.getDirectoryItems(path) end
+function lurek.filesystem.getDirectoryItems(path) end
 
 --- Returns the identity string used to locate the game's save directory.
 ---@return string
-function luna.filesystem.getIdentity() end
+function lurek.filesystem.getIdentity() end
 
 --- Returns a table of metadata for a path, or nil if the path does not exist.
 ---@param path any
 ---@return table?
-function luna.filesystem.getInfo(path) end
+function lurek.filesystem.getInfo(path) end
 
 --- Returns the sandboxed save data directory path.
 ---@return string
-function luna.filesystem.getSaveDirectory() end
+function lurek.filesystem.getSaveDirectory() end
 
 --- Returns the absolute path of the directory the game was loaded from.
 ---@return string
-function luna.filesystem.getSource() end
+function lurek.filesystem.getSource() end
 
 --- Returns the current user's home directory path.
 ---@return string
-function luna.filesystem.getUserDirectory() end
+function lurek.filesystem.getUserDirectory() end
 
 --- Returns the current working directory path.
 ---@return string
-function luna.filesystem.getWorkingDirectory() end
+function lurek.filesystem.getWorkingDirectory() end
 
 --- Returns whether the given path is a directory.
 ---@param path any
 ---@return boolean
-function luna.filesystem.isDirectory(path) end
+function lurek.filesystem.isDirectory(path) end
 
 --- Returns whether the given path is a regular file.
 ---@param path any
 ---@return boolean
-function luna.filesystem.isFile(path) end
+function lurek.filesystem.isFile(path) end
 
 --- Returns an iterator function over the lines of a text file.
 ---@param path any
 ---@return function
-function luna.filesystem.lines(path) end
+function lurek.filesystem.lines(path) end
 
 --- Loads and compiles a Lua file from the VFS, returning it as a callable function.
 ---@param path any
 ---@return function
-function luna.filesystem.load(path) end
+function lurek.filesystem.load(path) end
 
 --- Mounts a directory at a virtual path inside the game filesystem.
 ---@param src any
 ---@param mp any
 ---@return boolean
-function luna.filesystem.mount(src, mp) end
+function lurek.filesystem.mount(src, mp) end
 
 --- Loads a file from the VFS into a FileData buffer.
 ---@param path any
 ---@return FileData
-function luna.filesystem.newFileData(path) end
+function lurek.filesystem.newFileData(path) end
 
 --- Opens a file and returns a readable/writable file handle.
 ---@param path any
 ---@param mode any
 ---@return FileHandle
-function luna.filesystem.openFile(path, mode) end
+function lurek.filesystem.openFile(path, mode) end
 
 --- Polls an async load handle, returning status and optional data.
 ---@param handle_id any
 ---@return string
-function luna.filesystem.pollAsync(handle_id) end
+function lurek.filesystem.pollAsync(handle_id) end
 
 --- Reads a text file and returns its contents as a string.
 ---@param path any
 ---@return string
-function luna.filesystem.read(path) end
+function lurek.filesystem.read(path) end
 
 --- Starts loading a file in the background and returns an opaque handle.
 ---@param path any
 ---@return integer
-function luna.filesystem.readAsync(path) end
+function lurek.filesystem.readAsync(path) end
 
 --- Permanently deletes a file or empty directory from the save directory.
 ---@param path any
 ---@return nil
-function luna.filesystem.remove(path) end
+function lurek.filesystem.remove(path) end
 
 --- Sets the identity string that names the game's sandboxed save-data directory.
 ---@param name any
 ---@return nil
-function luna.filesystem.setIdentity(name) end
+function lurek.filesystem.setIdentity(name) end
 
 --- Removes a virtual mount layer by mountpoint.
 ---@param mp any
 ---@return boolean
-function luna.filesystem.unmount(mp) end
+function lurek.filesystem.unmount(mp) end
 
 --- Writes a string to a file in the save directory.
 ---@param path any
 ---@param data any
 ---@return nil
-function luna.filesystem.write(path, data) end
+function lurek.filesystem.write(path, data) end
 
----@class luna.fx
-luna.fx = {}
+---@class lurek.fx
+lurek.fx = {}
 
 --- Lua-side wrapper around [`ImageEffect`].
 ---@class ImageEffect
@@ -3967,46 +3967,46 @@ function PostFxStack:typeOf(name) end
 
 --- Returns the list of all built-in effect type names.
 ---@return table
-function luna.fx.getEffectTypes() end
+function lurek.fx.getEffectTypes() end
 
 --- Creates a custom shader post-processing effect.
 ---@param shader_id any
 ---@return PostFxEffect
-function luna.fx.newCustomEffect(shader_id) end
+function lurek.fx.newCustomEffect(shader_id) end
 
 --- Creates a new built-in post-processing effect by type name.
 ---@param type_name any
 ---@return PostFxEffect
-function luna.fx.newEffect(type_name) end
+function lurek.fx.newEffect(type_name) end
 
 --- Creates a new per-image effect chain. Accepts:
 ---@param args any
 ---@return ImageEffect
-function luna.fx.newImageEffect(args) end
+function lurek.fx.newImageEffect(args) end
 
 --- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
 ---@param w any
 ---@param h any
 ---@return Overlay
-function luna.fx.newOverlay(w, h) end
+function lurek.fx.newOverlay(w, h) end
 
 --- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
 ---@param w? any (optional)
 ---@param h? any (optional)
 ---@return Overlay
-function luna.fx.newOverlay(w, h) end
+function lurek.fx.newOverlay(w, h) end
 
 --- Creates a custom-shader post-processing effect (alias for newCustomEffect).
 ---@param shader_id any
 ---@return PostFxEffect
-function luna.fx.newPass(shader_id) end
+function lurek.fx.newPass(shader_id) end
 
 ---@param w? any (optional)
 ---@param h? any (optional)
-function luna.fx.newStack(w, h) end
+function lurek.fx.newStack(w, h) end
 
----@class luna.graph
-luna.graph = {}
+---@class lurek.graph
+lurek.graph = {}
 
 --- Lua handle for an edge inside a `Graph`.
 ---@class Edge
@@ -4495,10 +4495,10 @@ function Node:typeOf(name) end
 
 --- Creates a new empty directed graph for item flow simulation.
 ---@return Graph
-function luna.graph.newGraph() end
+function lurek.graph.newGraph() end
 
----@class luna.graphics
-luna.graphics = {}
+---@class lurek.graphics
+lurek.graphics = {}
 
 --- Lua-side handle to an off-screen render target stored in SharedState.
 ---@class Canvas
@@ -4686,7 +4686,7 @@ function Mesh:typeOf() end
 ---@class NineSlice
 local NineSlice = {}
 
---- Compatibility stub: queuing handled by luna.gfx.drawNineSlice.
+--- Compatibility stub: queuing handled by lurek.gfx.drawNineSlice.
 ---@param x any
 ---@param y any
 ---@param w any
@@ -4818,7 +4818,7 @@ function SpriteBatch:typeOf() end
 
 --- Applies an affine transform matrix.
 ---@param mat any
-function luna.graphics.applyTransform(mat) end
+function lurek.graphics.applyTransform(mat) end
 
 --- Draws a partial circle arc at the given position with specified radius and angle range.
 ---@param mode string
@@ -4828,42 +4828,42 @@ function luna.graphics.applyTransform(mat) end
 ---@param angle1 number
 ---@param angle2 number
 ---@param segments? integer? (optional)
-function luna.graphics.arc(mode, x, y, radius, angle1, angle2, segments) end
+function lurek.graphics.arc(mode, x, y, radius, angle1, angle2, segments) end
 
 --- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
 ---@param callback any
 ---@return nil
-function luna.graphics.captureScreenshot(callback) end
+function lurek.graphics.captureScreenshot(callback) end
 
 --- Draws a circle.
 ---@param mode any
 ---@param x any
 ---@param y any
 ---@param radius any
-function luna.graphics.circle(mode, x, y, radius) end
+function lurek.graphics.circle(mode, x, y, radius) end
 
 --- Clears the draw command queue (resets the screen).
 ---@param r? any (optional)
 ---@param g? any (optional)
 ---@param b? any (optional)
-function luna.graphics.clear(r, g, b) end
+function lurek.graphics.clear(r, g, b) end
 
 --- Resets the stencil mode to the default (keep / always / 0).
 ---@return nil
-function luna.graphics.clearStencil() end
+function lurek.graphics.clearStencil() end
 
 --- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
 ---@param args any
-function luna.graphics.draw(args) end
+function lurek.graphics.draw(args) end
 
---- Queues a 9-slice draw call inside luna.render / luna.render_ui.
+--- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
 ---@param slice any
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
 ---@return nil
-function luna.graphics.drawNineSlice(slice, x, y, w, h) end
+function lurek.graphics.drawNineSlice(slice, x, y, w, h) end
 
 --- Draws a portion of an image defined by a Quad.
 ---@param image Image
@@ -4875,7 +4875,7 @@ function luna.graphics.drawNineSlice(slice, x, y, w, h) end
 ---@param sy? number? (optional)
 ---@param ox? number? (optional)
 ---@param oy? number? (optional)
-function luna.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
+function lurek.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 
 --- Draws an ellipse.
 ---@param mode any
@@ -4883,154 +4883,154 @@ function luna.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 ---@param y any
 ---@param rx any
 ---@param ry any
-function luna.graphics.ellipse(mode, x, y, rx, ry) end
+function lurek.graphics.ellipse(mode, x, y, rx, ry) end
 
 --- Returns the current background color.
 ---@return number
-function luna.graphics.getBackgroundColor() end
+function lurek.graphics.getBackgroundColor() end
 
 --- Returns the current blend mode as a string.
 ---@return string
-function luna.graphics.getBlendMode() end
+function lurek.graphics.getBlendMode() end
 
 --- Returns the current canvas, or nil if drawing to screen.
 ---@return Canvas?
-function luna.graphics.getCanvas() end
+function lurek.graphics.getCanvas() end
 
 --- Returns the dimensions of a canvas.
 ---@param ud any
 ---@return integer
-function luna.graphics.getCanvasSize(ud) end
+function lurek.graphics.getCanvasSize(ud) end
 
 --- Returns the current drawing color.
 ---@return number
-function luna.graphics.getColor() end
+function lurek.graphics.getColor() end
 
 --- Returns the current color mask.
 ---@return boolean
-function luna.graphics.getColorMask() end
+function lurek.graphics.getColorMask() end
 
 --- Returns the default texture filter mode.
 ---@return string
-function luna.graphics.getDefaultFilter() end
+function lurek.graphics.getDefaultFilter() end
 
 --- Returns the current depth mode as (mode, write).
 ---@return string
-function luna.graphics.getDepthMode() end
+function lurek.graphics.getDepthMode() end
 
 --- Returns window width and height.
 ---@return integer
-function luna.graphics.getDimensions() end
+function lurek.graphics.getDimensions() end
 
 --- Returns the currently active font, or nil.
 ---@return Font?
-function luna.graphics.getFont() end
+function lurek.graphics.getFont() end
 
 --- Returns the ascent of the given font.
 ---@param ud any
 ---@return number
-function luna.graphics.getFontAscent(ud) end
+function lurek.graphics.getFontAscent(ud) end
 
 --- Returns the descent of the given font.
 ---@param ud any
 ---@return number
-function luna.graphics.getFontDescent(ud) end
+function lurek.graphics.getFontDescent(ud) end
 
 --- Returns the line height of the given font.
 ---@param ud any
 ---@return number
-function luna.graphics.getFontHeight(ud) end
+function lurek.graphics.getFontHeight(ud) end
 
 --- Returns the line height of the given font (alias for getFontHeight).
 ---@param ud any
 ---@return number
-function luna.graphics.getFontLineHeight(ud) end
+function lurek.graphics.getFontLineHeight(ud) end
 
 --- Returns the pixel width of text in the given font.
 ---@param ud any
 ---@param text any
 ---@return number
-function luna.graphics.getFontWidth(ud, text) end
+function lurek.graphics.getFontWidth(ud, text) end
 
 --- Returns wrapped lines and the maximum line width.
 ---@param text any
 ---@param limit any
 ---@return table
-function luna.graphics.getFontWrap(text, limit) end
+function lurek.graphics.getFontWrap(text, limit) end
 
 --- Returns the window height in pixels.
 ---@return integer
-function luna.graphics.getHeight() end
+function lurek.graphics.getHeight() end
 
 --- Returns the current line width.
 ---@return number
-function luna.graphics.getLineWidth() end
+function lurek.graphics.getLineWidth() end
 
 --- Returns the current point size.
 ---@return number
-function luna.graphics.getPointSize() end
+function lurek.graphics.getPointSize() end
 
 --- Returns the active scissor rectangle, or nothing.
 ---@return number?
-function luna.graphics.getScissor() end
+function lurek.graphics.getScissor() end
 
 --- Returns the active shader, or nil.
 ---@return Shader?
-function luna.graphics.getShader() end
+function lurek.graphics.getShader() end
 
 --- Returns a table of renderer statistics.
 ---@return table
-function luna.graphics.getStats() end
+function lurek.graphics.getStats() end
 
 --- Returns the current stencil mode as (action, compare, value).
 ---@return string
-function luna.graphics.getStencilMode() end
+function lurek.graphics.getStencilMode() end
 
 --- Returns the window width in pixels.
 ---@return integer
-function luna.graphics.getWidth() end
+function lurek.graphics.getWidth() end
 
 --- Intersects the current scissor with a new rectangle.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
-function luna.graphics.intersectScissor(x, y, w, h) end
+function lurek.graphics.intersectScissor(x, y, w, h) end
 
 --- Returns whether wireframe mode is active.
 ---@return boolean
-function luna.graphics.isWireframe() end
+function lurek.graphics.isWireframe() end
 
 --- Draws a line between two points.
 ---@param args any
-function luna.graphics.line(args) end
+function lurek.graphics.line(args) end
 
 --- Creates an off-screen render canvas.
 ---@param width any
 ---@param height any
 ---@return Canvas
-function luna.graphics.newCanvas(width, height) end
+function lurek.graphics.newCanvas(width, height) end
 
 --- Creates a new z-ordered draw-call queue.
 ---@return DrawLayer
-function luna.graphics.newDrawLayer() end
+function lurek.graphics.newDrawLayer() end
 
 --- Loads a TTF/OTF font from a file.
 ---@param path any
 ---@param size? any (optional)
 ---@return Font
-function luna.graphics.newFont(path, size) end
+function lurek.graphics.newFont(path, size) end
 
 --- Loads an image from a file path or creates one from ImageData.
 ---@param arg any
 ---@return Image
-function luna.graphics.newImage(arg) end
+function lurek.graphics.newImage(arg) end
 
 --- Creates a custom mesh from vertex data.
 ---@param verts any
 ---@param mode? any (optional)
 ---@return Mesh
-function luna.graphics.newMesh(verts, mode) end
+function lurek.graphics.newMesh(verts, mode) end
 
 --- Creates a 9-slice descriptor from a texture and inset values.
 ---@param image any
@@ -5039,7 +5039,7 @@ function luna.graphics.newMesh(verts, mode) end
 ---@param bottom any
 ---@param left any
 ---@return NineSlice
-function luna.graphics.newNineSlice(image, top, right, bottom, left) end
+function lurek.graphics.newNineSlice(image, top, right, bottom, left) end
 
 --- Creates a new Quad viewport into a texture.
 ---@param x any
@@ -5049,43 +5049,43 @@ function luna.graphics.newNineSlice(image, top, right, bottom, left) end
 ---@param sw any
 ---@param sh any
 ---@return Quad
-function luna.graphics.newQuad(x, y, w, h, sw, sh) end
+function lurek.graphics.newQuad(x, y, w, h, sw, sh) end
 
 --- Compiles a custom WGSL shader and returns its handle.
 ---@param code any
 ---@return Shader
-function luna.graphics.newShader(code) end
+function lurek.graphics.newShader(code) end
 
 --- Creates a new empty [`CompoundShape`] stored in the resource pool.
 ---@return Shape
-function luna.graphics.newShape() end
+function lurek.graphics.newShape() end
 
 --- Creates a new sprite batch for the given image.
 ---@param ud any
 ---@param max? any (optional)
 ---@return SpriteBatch
-function luna.graphics.newSpriteBatch(ud, max) end
+function lurek.graphics.newSpriteBatch(ud, max) end
 
 --- Resets the transform to the identity.
-function luna.graphics.origin() end
+function lurek.graphics.origin() end
 
 --- Draws a list of points.
 ---@param args any
-function luna.graphics.points(args) end
+function lurek.graphics.points(args) end
 
 --- Draws a polygon from a list of vertices.
 ---@param args any
-function luna.graphics.polygon(args) end
+function lurek.graphics.polygon(args) end
 
 --- Pops the transform from the stack.
-function luna.graphics.pop() end
+function lurek.graphics.pop() end
 
 --- Draws text at the given position.
 ---@param text any
 ---@param x? any (optional)
 ---@param y? any (optional)
 ---@param scale? any (optional)
-function luna.graphics.print(text, x, y, scale) end
+function lurek.graphics.print(text, x, y, scale) end
 
 --- Draws word-wrapped text within a given width.
 ---@param text any
@@ -5093,10 +5093,10 @@ function luna.graphics.print(text, x, y, scale) end
 ---@param y any
 ---@param limit any
 ---@param align? any (optional)
-function luna.graphics.printf(text, x, y, limit, align) end
+function lurek.graphics.printf(text, x, y, limit, align) end
 
 --- Pushes the current transform onto the stack.
-function luna.graphics.push() end
+function lurek.graphics.push() end
 
 --- Draws a rectangle.
 ---@param mode string
@@ -5106,112 +5106,112 @@ function luna.graphics.push() end
 ---@param h number
 ---@param rx? number? (optional)
 ---@param ry? number? (optional)
-function luna.graphics.rectangle(mode, x, y, w, h, rx, ry) end
+function lurek.graphics.rectangle(mode, x, y, w, h, rx, ry) end
 
 --- Rotates the coordinate system.
 ---@param angle any
-function luna.graphics.rotate(angle) end
+function lurek.graphics.rotate(angle) end
 
 --- Queues a screenshot to be saved after the current frame.
 ---@param path any
-function luna.graphics.saveScreenshot(path) end
+function lurek.graphics.saveScreenshot(path) end
 
 --- Scales the coordinate system.
 ---@param sx any
 ---@param sy? any (optional)
-function luna.graphics.scale(sx, sy) end
+function lurek.graphics.scale(sx, sy) end
 
 --- Sets the background clear color.
 ---@param r any
 ---@param g any
 ---@param b any
-function luna.graphics.setBackgroundColor(r, g, b) end
+function lurek.graphics.setBackgroundColor(r, g, b) end
 
 --- Sets the blend mode for drawing.
 ---@param mode any
-function luna.graphics.setBlendMode(mode) end
+function lurek.graphics.setBlendMode(mode) end
 
 --- Sets the active render target to a Canvas, or back to the screen.
 ---@param ud? any (optional)
-function luna.graphics.setCanvas(ud) end
+function lurek.graphics.setCanvas(ud) end
 
 --- Sets the current drawing color.
 ---@param r any
 ---@param g any
 ---@param b any
 ---@param a? any (optional)
-function luna.graphics.setColor(r, g, b, a) end
+function lurek.graphics.setColor(r, g, b, a) end
 
 --- Sets which RGBA channels are written. Reset with no args.
 ---@param args any
-function luna.graphics.setColorMask(args) end
+function lurek.graphics.setColorMask(args) end
 
 --- Sets the default texture filter mode.
 ---@param min any
 ---@param mag any
 ---@param anisotropy? any (optional)
-function luna.graphics.setDefaultFilter(min, mag, anisotropy) end
+function lurek.graphics.setDefaultFilter(min, mag, anisotropy) end
 
 --- Sets the depth test comparison and write enable.
 ---@param mode any
 ---@param write? any (optional)
-function luna.graphics.setDepthMode(mode, write) end
+function lurek.graphics.setDepthMode(mode, write) end
 
 --- Sets the active font for print calls.
 ---@param ud any
-function luna.graphics.setFont(ud) end
+function lurek.graphics.setFont(ud) end
 
 --- Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
 ---@param font any
 ---@param lh any
 ---@return nil
-function luna.graphics.setFontLineHeight(font, lh) end
+function lurek.graphics.setFontLineHeight(font, lh) end
 
 --- Sets the line width for outline drawing.
 ---@param w any
-function luna.graphics.setLineWidth(w) end
+function lurek.graphics.setLineWidth(w) end
 
 --- Sets the point diameter in pixels.
 ---@param size any
-function luna.graphics.setPointSize(size) end
+function lurek.graphics.setPointSize(size) end
 
 --- Restricts drawing to a rectangle, or clears scissor if no args.
 ---@param args any
-function luna.graphics.setScissor(args) end
+function lurek.graphics.setScissor(args) end
 
 --- Sets the active shader, or clears it.
 ---@param ud? any (optional)
-function luna.graphics.setShader(ud) end
+function lurek.graphics.setShader(ud) end
 
 --- Sets the stencil buffer write/test mode.
 ---@param action any
 ---@param compare? any (optional)
 ---@param value? any (optional)
-function luna.graphics.setStencilMode(action, compare, value) end
+function lurek.graphics.setStencilMode(action, compare, value) end
 
 --- Sets the stencil comparison test, or disables stencil testing.
 ---@param compare? any (optional)
 ---@param value? any (optional)
-function luna.graphics.setStencilTest(compare, value) end
+function lurek.graphics.setStencilTest(compare, value) end
 
 --- Enables or disables wireframe rendering.
 ---@param enabled any
-function luna.graphics.setWireframe(enabled) end
+function lurek.graphics.setWireframe(enabled) end
 
 --- Shears the coordinate system.
 ---@param kx any
 ---@param ky any
-function luna.graphics.shear(kx, ky) end
+function lurek.graphics.shear(kx, ky) end
 
 --- Begins stencil writing with the given action and value.
 ---@param action? any (optional)
 ---@param value? any (optional)
-function luna.graphics.stencil(action, value) end
+function lurek.graphics.stencil(action, value) end
 
 --- Translates the coordinate system.
 ---@param x any
 ---@param y any
-function luna.graphics.translate(x, y) end
+function lurek.graphics.translate(x, y) end
 
 --- Draws a triangle.
 ---@param mode any
@@ -5221,10 +5221,10 @@ function luna.graphics.translate(x, y) end
 ---@param y2 any
 ---@param x3 any
 ---@param y3 any
-function luna.graphics.triangle(mode, x1, y1, x2, y2, x3, y3) end
+function lurek.graphics.triangle(mode, x1, y1, x2, y2, x3, y3) end
 
----@class luna.gui
-luna.gui = {}
+---@class lurek.gui
+lurek.gui = {}
 
 --- Adds Accordion-specific methods (1-based sections in Lua).
 ---@class Accordion
@@ -6597,87 +6597,87 @@ function Tree_View:toggleNode(index) end
 --- Adds a child widget to this container.
 ---@param child any
 ---@return nil
-function luna.gui.addChild(child) end
+function lurek.gui.addChild(child) end
 
 --- Removes all anchor constraints.
 ---@return nil
-function luna.gui.clearAnchor() end
+function lurek.gui.clearAnchor() end
 
 --- Returns whether (x, y) is inside this widget.
 ---@param x any
 ---@param y any
 ---@return boolean
-function luna.gui.containsPoint(x, y) end
+function lurek.gui.containsPoint(x, y) end
 
 --- Recursively searches for a widget by id starting from this widget.
 ---@param id any
 ---@return table
-function luna.gui.findById(id) end
+function lurek.gui.findById(id) end
 
 --- Returns the number of children in this container.
 ---@return number
-function luna.gui.getChildCount() end
+function lurek.gui.getChildCount() end
 
 --- Returns the flex-grow factor.
 ---@return number
-function luna.gui.getFlexGrow() end
+function lurek.gui.getFlexGrow() end
 
 --- Returns the flex-shrink factor.
 ---@return number
-function luna.gui.getFlexShrink() end
+function lurek.gui.getFlexShrink() end
 
 --- Returns the widget string identifier.
 ---@return string
-function luna.gui.getId() end
+function lurek.gui.getId() end
 
 --- Returns the widget margin (top, right, bottom, left).
 ---@return number
-function luna.gui.getMargin() end
+function lurek.gui.getMargin() end
 
 --- Returns the maximum widget size.
 ---@return number
-function luna.gui.getMaxSize() end
+function lurek.gui.getMaxSize() end
 
 --- Returns the minimum widget size.
 ---@return number
-function luna.gui.getMinSize() end
+function lurek.gui.getMinSize() end
 
 --- Returns the widget padding (top, right, bottom, left).
 ---@return number
-function luna.gui.getPadding() end
+function lurek.gui.getPadding() end
 
 --- Returns the widget position.
 ---@return number
-function luna.gui.getPosition() end
+function lurek.gui.getPosition() end
 
 --- Returns the widget size.
 ---@return number
-function luna.gui.getSize() end
+function lurek.gui.getSize() end
 
 --- Returns the widget interaction state name.
 ---@return string
-function luna.gui.getState() end
+function lurek.gui.getState() end
 
 --- Returns the widget tooltip text.
 ---@return string
-function luna.gui.getTooltip() end
+function lurek.gui.getTooltip() end
 
 --- Returns the widget z-order.
 ---@return number
-function luna.gui.getZOrder() end
+function lurek.gui.getZOrder() end
 
 --- Returns whether the widget is enabled.
 ---@return boolean
-function luna.gui.isEnabled() end
+function lurek.gui.isEnabled() end
 
 --- Returns whether the widget is visible.
 ---@return boolean
-function luna.gui.isVisible() end
+function lurek.gui.isVisible() end
 
 --- Removes a child widget from this container.
 ---@param child any
 ---@return nil
-function luna.gui.removeChild(child) end
+function lurek.gui.removeChild(child) end
 
 --- Sets anchor edges (left, top, right, bottom).
 ---@param left number
@@ -6685,33 +6685,33 @@ function luna.gui.removeChild(child) end
 ---@param right number
 ---@param bottom number
 ---@return nil
-function luna.gui.setAnchor(left, top, right, bottom) end
+function lurek.gui.setAnchor(left, top, right, bottom) end
 
 --- Sets center anchor offsets.
 ---@param cx? any (optional)
 ---@param cy? any (optional)
 ---@return nil
-function luna.gui.setAnchorCenter(cx, cy) end
+function lurek.gui.setAnchorCenter(cx, cy) end
 
 --- Sets whether the widget is enabled.
 ---@param v any
 ---@return nil
-function luna.gui.setEnabled(v) end
+function lurek.gui.setEnabled(v) end
 
 --- Sets the flex-grow factor.
 ---@param grow any
 ---@return nil
-function luna.gui.setFlexGrow(grow) end
+function lurek.gui.setFlexGrow(grow) end
 
 --- Sets the flex-shrink factor.
 ---@param shrink any
 ---@return nil
-function luna.gui.setFlexShrink(shrink) end
+function lurek.gui.setFlexShrink(shrink) end
 
 --- Sets the widget string identifier.
 ---@param id any
 ---@return nil
-function luna.gui.setId(id) end
+function lurek.gui.setId(id) end
 
 --- Sets widget margin (CSS-like: top, right?, bottom?, left?).
 ---@param top any
@@ -6719,34 +6719,34 @@ function luna.gui.setId(id) end
 ---@param bottom? any (optional)
 ---@param left? any (optional)
 ---@return nil
-function luna.gui.setMargin(top, right, bottom, left) end
+function lurek.gui.setMargin(top, right, bottom, left) end
 
 --- Sets the maximum widget size.
 ---@param w any
 ---@param h any
 ---@return nil
-function luna.gui.setMaxSize(w, h) end
+function lurek.gui.setMaxSize(w, h) end
 
 --- Sets the minimum widget size.
 ---@param w any
 ---@param h any
 ---@return nil
-function luna.gui.setMinSize(w, h) end
+function lurek.gui.setMinSize(w, h) end
 
 --- Registers a callback invoked when this widget's value changes.
 ---@param f any
 ---@return nil
-function luna.gui.setOnChange(f) end
+function lurek.gui.setOnChange(f) end
 
 --- Registers a callback invoked when this widget is clicked.
 ---@param f any
 ---@return nil
-function luna.gui.setOnClick(f) end
+function lurek.gui.setOnClick(f) end
 
 --- Stores a custom draw callback for later invocation.
 ---@param f any
 ---@return nil
-function luna.gui.setOnDraw(f) end
+function lurek.gui.setOnDraw(f) end
 
 --- Sets widget padding (CSS-like: top, right?, bottom?, left?).
 ---@param top any
@@ -6754,37 +6754,37 @@ function luna.gui.setOnDraw(f) end
 ---@param bottom? any (optional)
 ---@param left? any (optional)
 ---@return nil
-function luna.gui.setPadding(top, right, bottom, left) end
+function lurek.gui.setPadding(top, right, bottom, left) end
 
 --- Sets the widget position.
 ---@param x any
 ---@param y any
 ---@return nil
-function luna.gui.setPosition(x, y) end
+function lurek.gui.setPosition(x, y) end
 
 --- Sets the widget size.
 ---@param w any
 ---@param h any
 ---@return nil
-function luna.gui.setSize(w, h) end
+function lurek.gui.setSize(w, h) end
 
 --- Sets the widget tooltip text.
 ---@param text any
 ---@return nil
-function luna.gui.setTooltip(text) end
+function lurek.gui.setTooltip(text) end
 
 --- Sets widget visibility.
 ---@param v any
 ---@return nil
-function luna.gui.setVisible(v) end
+function lurek.gui.setVisible(v) end
 
 --- Sets the widget z-order for draw sorting.
 ---@param z any
 ---@return nil
-function luna.gui.setZOrder(z) end
+function lurek.gui.setZOrder(z) end
 
----@class luna.image
-luna.image = {}
+---@class lurek.image
+lurek.image = {}
 
 --- Lua-side wrapper around [`CompressedImageData`].
 ---@class CompressedImageData
@@ -6813,20 +6813,20 @@ function CompressedImageData:getWidth() end
 --- Returns true if the file at the given path is a DDS file.
 ---@param filename any
 ---@return boolean
-function luna.image.isCompressed(filename) end
+function lurek.image.isCompressed(filename) end
 
 --- Loads compressed texture data from a DDS file.
 ---@param filename any
 ---@return CompressedImageData
-function luna.image.newCompressedData(filename) end
+function lurek.image.newCompressedData(filename) end
 
 --- Creates a new blank ImageData or loads one from a file.
 ---@param args any
 ---@return ImageData
-function luna.image.newImageData(args) end
+function lurek.image.newImageData(args) end
 
----@class luna.input
-luna.input = {}
+---@class lurek.input
+lurek.input = {}
 
 --- Lua-side wrapper around a mouse cursor handle.
 ---@class Cursor
@@ -6844,177 +6844,177 @@ function Cursor:release() end
 ---@param id any
 ---@param axis any
 ---@return number
-function luna.input.getAxis(id, axis) end
+function lurek.input.getAxis(id, axis) end
 
 --- Returns the total number of analog axes on the gamepad.
 ---@param id any
 ---@return integer
-function luna.input.getAxisCount(id) end
+function lurek.input.getAxisCount(id) end
 
 --- Returns whether background gamepad events are enabled.
 ---@return boolean
-function luna.input.getBackgroundEvents() end
+function lurek.input.getBackgroundEvents() end
 
 --- Returns the total number of buttons on the gamepad.
 ---@param id any
 ---@return integer
-function luna.input.getButtonCount(id) end
+function lurek.input.getButtonCount(id) end
 
 --- Returns the number of connected gamepads.
 ---@return integer
-function luna.input.getCount() end
+function lurek.input.getCount() end
 
 --- Returns the name of the currently active system cursor.
 ---@return string
-function luna.input.getCursor() end
+function lurek.input.getCursor() end
 
 --- Returns the hardware GUID string of the gamepad.
 ---@param id any
 ---@return string
-function luna.input.getGUID(id) end
+function lurek.input.getGUID(id) end
 
 --- Returns the stored mapping string for the given GUID, or nil.
 ---@param guid any
 ---@return string?
-function luna.input.getGamepadMappingString(guid) end
+function lurek.input.getGamepadMappingString(guid) end
 
 --- Returns the direction string of a hat switch on the gamepad.
 ---@param id any
 ---@param hat any
 ---@return string
-function luna.input.getHat(id, hat) end
+function lurek.input.getHat(id, hat) end
 
 --- Returns the number of tracked gamepad slots.
 ---@return integer
-function luna.input.getJoystickCount() end
+function lurek.input.getJoystickCount() end
 
 --- Returns a list of connected gamepad IDs.
 ---@return table
-function luna.input.getJoysticks() end
+function lurek.input.getJoysticks() end
 
 --- Returns the key name for the given hardware scancode.
 ---@param scancode any
 ---@return string?
-function luna.input.getKeyFromScancode(scancode) end
+function lurek.input.getKeyFromScancode(scancode) end
 
 --- Returns the human-readable name of a gamepad.
 ---@param id any
 ---@return string
-function luna.input.getName(id) end
+function lurek.input.getName(id) end
 
 --- Returns the current cursor position as (x, y).
 ---@return number
-function luna.input.getPosition() end
+function lurek.input.getPosition() end
 
 --- Returns the position (x, y) of the touch with the given ID.
 ---@param id any
 ---@return number
-function luna.input.getPosition(id) end
+function lurek.input.getPosition(id) end
 
 --- Returns the pressure (0-1) of the touch with the given ID.
 ---@param id any
 ---@return number
-function luna.input.getPressure(id) end
+function lurek.input.getPressure(id) end
 
 --- Returns whether relative mouse mode is active.
 ---@return boolean
-function luna.input.getRelativeMode() end
+function lurek.input.getRelativeMode() end
 
 --- Returns the hardware scancode for the given key name.
 ---@param key any
 ---@return string?
-function luna.input.getScancodeFromKey(key) end
+function lurek.input.getScancodeFromKey(key) end
 
 --- Returns a system cursor object for the named cursor shape.
 ---@param name any
 ---@return Cursor
-function luna.input.getSystemCursor(name) end
+function lurek.input.getSystemCursor(name) end
 
 --- Returns the number of currently active touch points.
 ---@return integer
-function luna.input.getTouchCount() end
+function lurek.input.getTouchCount() end
 
 --- Returns a table of active touch points with id, x, y, and pressure fields.
 ---@return table
-function luna.input.getTouches() end
+function lurek.input.getTouches() end
 
 --- Returns the mouse scroll wheel delta (dx, dy) since last frame.
 ---@return number
-function luna.input.getWheelDelta() end
+function lurek.input.getWheelDelta() end
 
 --- Returns the current mouse X position in window coordinates.
 ---@return number
-function luna.input.getX() end
+function lurek.input.getX() end
 
 --- Returns the current mouse Y position in window coordinates.
 ---@return number
-function luna.input.getY() end
+function lurek.input.getY() end
 
 --- Returns whether key-repeat is currently enabled.
 ---@return boolean
-function luna.input.hasKeyRepeat() end
+function lurek.input.hasKeyRepeat() end
 
 --- Returns whether text input mode is currently active.
 ---@return boolean
-function luna.input.hasTextInput() end
+function lurek.input.hasTextInput() end
 
 --- Returns whether the gamepad with the given ID is connected.
 ---@param id any
 ---@return boolean
-function luna.input.isConnected(id) end
+function lurek.input.isConnected(id) end
 
 --- Returns whether cursor customisation is supported on this platform.
 ---@return boolean
-function luna.input.isCursorSupported() end
+function lurek.input.isCursorSupported() end
 
 --- Returns true if any of the given keys is currently held down.
 ---@param args any
 ---@return boolean
-function luna.input.isDown(args) end
+function lurek.input.isDown(args) end
 
 --- Returns whether the given mouse button is currently held down.
 ---@param button any
 ---@return boolean
-function luna.input.isDown(button) end
+function lurek.input.isDown(button) end
 
 --- Returns whether the given button on the gamepad is currently held.
 ---@param id any
 ---@param button any
 ---@return boolean
-function luna.input.isDown(id, button) end
+function lurek.input.isDown(id, button) end
 
 --- Returns whether the joystick at the given slot is a recognized gamepad.
 ---@param id any
 ---@return boolean
-function luna.input.isGamepad(id) end
+function lurek.input.isGamepad(id) end
 
 --- Returns whether the mouse cursor is locked to the window.
 ---@return boolean
-function luna.input.isGrabbed() end
+function lurek.input.isGrabbed() end
 
 --- Returns whether the named modifier key is currently held.
 ---@param modifier any
 ---@return boolean
-function luna.input.isModifierActive(modifier) end
+function lurek.input.isModifierActive(modifier) end
 
 --- Returns whether the key with the given scancode is held.
 ---@param scancode any
 ---@return boolean
-function luna.input.isScancodeDown(scancode) end
+function lurek.input.isScancodeDown(scancode) end
 
 --- Returns whether the gamepad supports haptic vibration.
 ---@param id any
 ---@return boolean
-function luna.input.isVibrationSupported(id) end
+function lurek.input.isVibrationSupported(id) end
 
 --- Returns whether the mouse cursor is currently visible.
 ---@return boolean
-function luna.input.isVisible() end
+function lurek.input.isVisible() end
 
 --- Loads SDL2 GameControllerDB-format mappings from a file.
 ---@param path any
 ---@return integer
-function luna.input.loadGamepadMappings(path) end
+function lurek.input.loadGamepadMappings(path) end
 
 --- Creates a custom mouse cursor from RGBA pixel data.
 ---@param pixels table
@@ -7023,67 +7023,67 @@ function luna.input.loadGamepadMappings(path) end
 ---@param hotx? integer? (optional)
 ---@param hoty? integer? (optional)
 ---@return Cursor
-function luna.input.newCursor(pixels, width, height, hotx, hoty) end
+function lurek.input.newCursor(pixels, width, height, hotx, hoty) end
 
 --- Saves all stored gamepad mappings to a plain-text file.
 ---@param path any
 ---@return nil
-function luna.input.saveGamepadMappings(path) end
+function lurek.input.saveGamepadMappings(path) end
 
 --- Enable or disable receiving gamepad events when the window is not focused.
 ---@param enable any
 ---@return nil
-function luna.input.setBackgroundEvents(enable) end
+function lurek.input.setBackgroundEvents(enable) end
 
 --- Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
 ---@param cursor_val any
 ---@return nil
-function luna.input.setCursor(cursor_val) end
+function lurek.input.setCursor(cursor_val) end
 
 --- Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
 ---@param guid any
 ---@param mapping any
 ---@return nil
-function luna.input.setGamepadMapping(guid, mapping) end
+function lurek.input.setGamepadMapping(guid, mapping) end
 
 --- Locks or unlocks the mouse cursor to the window.
 ---@param grabbed any
 ---@return nil
-function luna.input.setGrabbed(grabbed) end
+function lurek.input.setGrabbed(grabbed) end
 
 --- Enables or disables key-repeat events.
 ---@param enabled any
 ---@return nil
-function luna.input.setKeyRepeat(enabled) end
+function lurek.input.setKeyRepeat(enabled) end
 
 --- Moves the mouse cursor to the given window-space position.
 ---@param x any
 ---@param y any
 ---@return nil
-function luna.input.setPosition(x, y) end
+function lurek.input.setPosition(x, y) end
 
 --- Enables or disables raw relative mouse motion mode.
 ---@param relative any
 ---@return nil
-function luna.input.setRelativeMode(relative) end
+function lurek.input.setRelativeMode(relative) end
 
 --- Enables or disables Unicode text input mode.
 ---@param enabled any
 ---@return nil
-function luna.input.setTextInput(enabled) end
+function lurek.input.setTextInput(enabled) end
 
 --- Triggers haptic rumble (currently a no-op stub).
 ---@param args any
 ---@return boolean
-function luna.input.setVibration(args) end
+function lurek.input.setVibration(args) end
 
 --- Shows or hides the operating-system mouse cursor.
 ---@param visible any
 ---@return nil
-function luna.input.setVisible(visible) end
+function lurek.input.setVisible(visible) end
 
----@class luna.light
-luna.light = {}
+---@class lurek.light
+lurek.light = {}
 
 --- Lua-side handle to a light resource stored in [`LightWorld`].
 ---@class Light
@@ -7367,36 +7367,36 @@ function Occluder:setVertices(tbl) end
 --- Advances flicker phase for all lights with flicker enabled.
 ---@param dt any
 ---@return nil
-function luna.light.advanceFlickers(dt) end
+function lurek.light.advanceFlickers(dt) end
 
 --- Removes all lights and occluders, resets ambient to default.
 ---@return nil
-function luna.light.clear() end
+function lurek.light.clear() end
 
 --- Returns the global ambient light color as (r, g, b, a).
 ---@return number
-function luna.light.getAmbient() end
+function lurek.light.getAmbient() end
 
 --- Returns the number of lights in the given group.
 ---@param group_id any
 ---@return integer
-function luna.light.getGroupCount(group_id) end
+function lurek.light.getGroupCount(group_id) end
 
 --- Returns the number of lights in the world.
 ---@return integer
-function luna.light.getLightCount() end
+function lurek.light.getLightCount() end
 
 --- Returns the maximum number of lights processed per frame.
 ---@return integer
-function luna.light.getMaxLights() end
+function lurek.light.getMaxLights() end
 
 --- Returns the number of occluders in the world.
 ---@return integer
-function luna.light.getOccluderCount() end
+function lurek.light.getOccluderCount() end
 
 --- Returns whether the lighting system is active.
 ---@return boolean
-function luna.light.isEnabled() end
+function lurek.light.isEnabled() end
 
 --- Creates a new light at (x, y) with the given radius and optional settings.
 ---@param x any
@@ -7404,13 +7404,13 @@ function luna.light.isEnabled() end
 ---@param radius any
 ---@param opts? any (optional)
 ---@return Light
-function luna.light.newLight(x, y, radius, opts) end
+function lurek.light.newLight(x, y, radius, opts) end
 
 --- Creates a new shadow occluder from a vertex table and optional settings.
 ---@param vtbl any
 ---@param opts? any (optional)
 ---@return Occluder
-function luna.light.newOccluder(vtbl, opts) end
+function lurek.light.newOccluder(vtbl, opts) end
 
 --- Sets the global ambient light color.
 ---@param r any
@@ -7418,12 +7418,12 @@ function luna.light.newOccluder(vtbl, opts) end
 ---@param b any
 ---@param a? any (optional)
 ---@return nil
-function luna.light.setAmbient(r, g, b, a) end
+function lurek.light.setAmbient(r, g, b, a) end
 
 --- Sets whether the lighting system is active.
 ---@param enabled any
 ---@return nil
-function luna.light.setEnabled(enabled) end
+function lurek.light.setEnabled(enabled) end
 
 --- Sets the color for all lights in the given group.
 ---@param group_id any
@@ -7432,153 +7432,153 @@ function luna.light.setEnabled(enabled) end
 ---@param b any
 ---@param a? any (optional)
 ---@return nil
-function luna.light.setGroupColor(group_id, r, g, b, a) end
+function lurek.light.setGroupColor(group_id, r, g, b, a) end
 
 --- Sets the enabled state for all lights in the given group.
 ---@param group_id any
 ---@param enabled any
 ---@return nil
-function luna.light.setGroupEnabled(group_id, enabled) end
+function lurek.light.setGroupEnabled(group_id, enabled) end
 
 --- Sets the intensity for all lights in the given group.
 ---@param group_id any
 ---@param intensity any
 ---@return nil
-function luna.light.setGroupIntensity(group_id, intensity) end
+function lurek.light.setGroupIntensity(group_id, intensity) end
 
 --- Sets the maximum number of lights processed per frame (clamped 1–256).
 ---@param n any
 ---@return nil
-function luna.light.setMaxLights(n) end
+function lurek.light.setMaxLights(n) end
 
----@class luna.localization
-luna.localization = {}
+---@class lurek.localization
+lurek.localization = {}
 
 --- Returns all loaded locale codes (alias for getLanguages).
 ---@return table
-function luna.localization.getAvailableLanguages() end
+function lurek.localization.getAvailableLanguages() end
 
 --- Returns the base/fallback language.
 ---@return string
-function luna.localization.getBase() end
+function lurek.localization.getBase() end
 
 --- Returns the current fallback locale array.
 ---@return table
-function luna.localization.getFallbacks() end
+function lurek.localization.getFallbacks() end
 
 --- Returns all known keys for the active locale.
 ---@return table
-function luna.localization.getKeys() end
+function lurek.localization.getKeys() end
 
 --- Returns the currently active locale code, or nil if unset.
 ---@return string?
-function luna.localization.getLanguage() end
+function lurek.localization.getLanguage() end
 
 --- Returns all loaded locale codes.
 ---@return table
-function luna.localization.getLanguages() end
+function lurek.localization.getLanguages() end
 
 --- Returns whether a key exists in the active locale.
 ---@param key any
 ---@return boolean
-function luna.localization.hasKey(key) end
+function lurek.localization.hasKey(key) end
 
 --- Returns whether a locale has been loaded.
 ---@param locale any
 ---@return boolean
-function luna.localization.hasLanguage(locale) end
+function lurek.localization.hasLanguage(locale) end
 
 --- Interpolates {name} placeholders in a template string.
 ---@param template any
 ---@param vars any
 ---@return string
-function luna.localization.interpolate(template, vars) end
+function lurek.localization.interpolate(template, vars) end
 
 --- Loads a language table under the given locale code.
 ---@param locale any
 ---@param tbl any
-function luna.localization.loadTable(locale, tbl) end
+function lurek.localization.loadTable(locale, tbl) end
 
 --- Unregisters all onChange callbacks.
-function luna.localization.offChange() end
+function lurek.localization.offChange() end
 
 --- Registers a callback invoked when setLanguage() is called (alias: onChange).
 ---@param cb any
-function luna.localization.onChange(cb) end
+function lurek.localization.onChange(cb) end
 
 --- Registers a callback invoked when setLanguage() is called.
 ---@param cb any
-function luna.localization.onLanguageChange(cb) end
+function lurek.localization.onLanguageChange(cb) end
 
 --- Returns the CLDR plural category for a number ("one" or "other", etc.).
 ---@param n any
 ---@return string
-function luna.localization.pluralFor(n) end
+function lurek.localization.pluralFor(n) end
 
 --- Sets the base/fallback language (adds it as first fallback).
 ---@param locale any
-function luna.localization.setBase(locale) end
+function lurek.localization.setBase(locale) end
 
 --- Sets the ordered list of fallback locale codes tried when a key is missing.
 ---@param locales any
-function luna.localization.setFallbacks(locales) end
+function lurek.localization.setFallbacks(locales) end
 
 --- Inserts or overwrites a single key in the given locale.
 ---@param locale any
 ---@param key any
 ---@param value any
-function luna.localization.setKey(locale, key, value) end
+function lurek.localization.setKey(locale, key, value) end
 
 --- Sets the active translation language.
 ---@param locale any
-function luna.localization.setLanguage(locale) end
+function lurek.localization.setLanguage(locale) end
 
 --- Translates a key against the active locale with optional variable
 ---@param key any
 ---@param vars? any (optional)
 ---@param count? any (optional)
 ---@return string
-function luna.localization.t(key, vars, count) end
+function lurek.localization.t(key, vars, count) end
 
 --- Unloads a locale from the catalog.
 ---@param locale any
 ---@return boolean
-function luna.localization.unloadTable(locale) end
+function lurek.localization.unloadTable(locale) end
 
----@class luna.log
-luna.log = {}
+---@class lurek.log
+lurek.log = {}
 
 --- Emit a debug-severity log message from Lua.
 ---@param message any
-function luna.log.debug(message) end
+function lurek.log.debug(message) end
 
 --- Emit an error-severity log message from Lua.
 ---@param message any
-function luna.log.error(message) end
+function lurek.log.error(message) end
 
 --- Return the name of the currently active minimum log level.
 ---@return string
-function luna.log.getLevel() end
+function lurek.log.getLevel() end
 
 --- Emit an info-severity log message from Lua.
 ---@param message any
-function luna.log.info(message) end
+function lurek.log.info(message) end
 
 --- Emit a log message from Lua at the specified severity level.
 ---@param level any
 ---@param message any
-function luna.log.print(level, message) end
+function lurek.log.print(level, message) end
 
 --- Set the minimum severity level for runtime log messages.
 ---@param level any
-function luna.log.setLevel(level) end
+function lurek.log.setLevel(level) end
 
 --- Emit a warn-severity log message from Lua.
 ---@param message any
-function luna.log.warn(message) end
+function lurek.log.warn(message) end
 
----@class luna.math
-luna.math = {}
+---@class lurek.math
+lurek.math = {}
 
 --- Lua-side wrapper around a [`BezierCurve`].
 ---@class BezierCurve
@@ -7872,12 +7872,12 @@ function Tween:update(dt) end
 --- Returns the absolute value of x.
 ---@param x any
 ---@return number
-function luna.math.abs(x) end
+function lurek.math.abs(x) end
 
 --- Returns the arccosine of x, in radians.
 ---@param x any
 ---@return number
-function luna.math.acos(x) end
+function lurek.math.acos(x) end
 
 --- Returns the angle in radians from (x1, y1) to (x2, y2).
 ---@param x1 any
@@ -7885,30 +7885,30 @@ function luna.math.acos(x) end
 ---@param x2 any
 ---@param y2 any
 ---@return number
-function luna.math.angleBetween(x1, y1, x2, y2) end
+function lurek.math.angleBetween(x1, y1, x2, y2) end
 
 --- Applies a named easing function to progress value t.
 ---@param name any
 ---@param t any
 ---@return number
-function luna.math.applyEasing(name, t) end
+function lurek.math.applyEasing(name, t) end
 
 --- Returns the arcsine of x, in radians.
 ---@param x any
 ---@return number
-function luna.math.asin(x) end
+function lurek.math.asin(x) end
 
 --- Returns the arctangent of x (or atan2(y, x) when two args given).
 ---@param y any
 ---@param x? any (optional)
 ---@return number
-function luna.math.atan(y, x) end
+function lurek.math.atan(y, x) end
 
 --- Returns atan(y/x) using the signs of both args to determine the quadrant.
 ---@param y any
 ---@param x any
 ---@return number
-function luna.math.atan2(y, x) end
+function lurek.math.atan2(y, x) end
 
 --- Rasterizes a line from (x1,y1) to (x2,y2) using Bresenham's algorithm. Returns a table of {x,y} tables.
 ---@param x1 any
@@ -7916,12 +7916,12 @@ function luna.math.atan2(y, x) end
 ---@param x2 any
 ---@param y2 any
 ---@return table
-function luna.math.bresenham(x1, y1, x2, y2) end
+function lurek.math.bresenham(x1, y1, x2, y2) end
 
 --- Returns the smallest integer ≥ x.
 ---@param x any
 ---@return number
-function luna.math.ceil(x) end
+function lurek.math.ceil(x) end
 
 --- Returns true if the point (px, py) lies inside the circle.
 ---@param cx any
@@ -7930,7 +7930,7 @@ function luna.math.ceil(x) end
 ---@param px any
 ---@param py any
 ---@return boolean
-function luna.math.circleContainsPoint(cx, cy, r, px, py) end
+function lurek.math.circleContainsPoint(cx, cy, r, px, py) end
 
 --- Returns true if two circles overlap.
 ---@param x1 any
@@ -7940,7 +7940,7 @@ function luna.math.circleContainsPoint(cx, cy, r, px, py) end
 ---@param y2 any
 ---@param r2 any
 ---@return boolean
-function luna.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
+function lurek.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
 
 --- Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.
 ---@param cx any
@@ -7951,7 +7951,7 @@ function luna.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
 ---@param lx2 any
 ---@param ly2 any
 ---@return boolean
-function luna.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
+function lurek.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
 
 --- Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
 ---@param cx any
@@ -7962,14 +7962,14 @@ function luna.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
 ---@param sx2 any
 ---@param sy2 any
 ---@return boolean
-function luna.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
+function lurek.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
 
 --- Returns x clamped to [lo, hi].
 ---@param x any
 ---@param lo any
 ---@param hi any
 ---@return number
-function luna.math.clamp(x, lo, hi) end
+function lurek.math.clamp(x, lo, hi) end
 
 --- Returns the closest point on segment (x1,y1)-(x2,y2) to point (px,py).
 ---@param px any
@@ -7979,27 +7979,27 @@ function luna.math.clamp(x, lo, hi) end
 ---@param x2 any
 ---@param y2 any
 ---@return number
-function luna.math.closestPointOnSegment(px, py, x1, y1, x2, y2) end
+function lurek.math.closestPointOnSegment(px, py, x1, y1, x2, y2) end
 
 --- Computes the convex hull of a flat {x1,y1,...} point list. Returns a flat table.
 ---@param pts any
 ---@return table
-function luna.math.convexHull(pts) end
+function lurek.math.convexHull(pts) end
 
 --- Returns the cosine of x (radians).
 ---@param x any
 ---@return number
-function luna.math.cos(x) end
+function lurek.math.cos(x) end
 
 --- Converts radians to degrees.
 ---@param rad any
 ---@return number
-function luna.math.deg(rad) end
+function lurek.math.deg(rad) end
 
 --- Delaunay triangulation of a flat {x1,y1,...} point list. Returns a table of flat 6-number triangle tables.
 ---@param pts any
 ---@return table
-function luna.math.delaunayTriangulate(pts) end
+function lurek.math.delaunayTriangulate(pts) end
 
 --- Returns the Euclidean distance between (x1,y1) and (x2,y2).
 ---@param x1 any
@@ -8007,7 +8007,7 @@ function luna.math.delaunayTriangulate(pts) end
 ---@param x2 any
 ---@param y2 any
 ---@return number
-function luna.math.distance(x1, y1, x2, y2) end
+function lurek.math.distance(x1, y1, x2, y2) end
 
 --- Returns the squared Euclidean distance between (x1,y1) and (x2,y2) (avoids sqrt).
 ---@param x1 any
@@ -8015,12 +8015,12 @@ function luna.math.distance(x1, y1, x2, y2) end
 ---@param x2 any
 ---@param y2 any
 ---@return number
-function luna.math.distanceSq(x1, y1, x2, y2) end
+function lurek.math.distanceSq(x1, y1, x2, y2) end
 
 --- Returns e raised to the power x.
 ---@param x any
 ---@return number
-function luna.math.exp(x) end
+function lurek.math.exp(x) end
 
 --- Returns fractal Brownian motion noise at (x, y).
 ---@param x number
@@ -8030,100 +8030,100 @@ function luna.math.exp(x) end
 ---@param lacunarity? number? (optional)
 ---@param gain? number? (optional)
 ---@return number
-function luna.math.fbm(x, y, seed, octaves, lacunarity, gain) end
+function lurek.math.fbm(x, y, seed, octaves, lacunarity, gain) end
 
 --- Returns the largest integer ≤ x.
 ---@param x any
 ---@return number
-function luna.math.floor(x) end
+function lurek.math.floor(x) end
 
 --- Returns the remainder of x / y (fmod).
 ---@param x any
 ---@param y any
 ---@return number
-function luna.math.fmod(x, y) end
+function lurek.math.fmod(x, y) end
 
 --- Converts a gamma-encoded sRGB value to linear space.
 ---@param c any
 ---@return number
-function luna.math.gammaToLinear(c) end
+function lurek.math.gammaToLinear(c) end
 
 --- Back ease-in — overshoots slightly before settling at the target.
 ---@param t any
 ---@return number
-function luna.math.inBack(t) end
+function lurek.math.inBack(t) end
 
 --- Bounce ease-in.
 ---@param t any
 ---@return number
-function luna.math.inBounce(t) end
+function lurek.math.inBounce(t) end
 
 --- Cubic ease-in — acceleration starts slowly then increases sharply.
 ---@param t any
 ---@return number
-function luna.math.inCubic(t) end
+function lurek.math.inCubic(t) end
 
 --- Elastic ease-in.
 ---@param t any
 ---@return number
-function luna.math.inElastic(t) end
+function lurek.math.inElastic(t) end
 
 --- Exponential ease-in.
 ---@param t any
 ---@return number
-function luna.math.inExpo(t) end
+function lurek.math.inExpo(t) end
 
 --- Cubic ease-in-out.
 ---@param t any
 ---@return number
-function luna.math.inOutCubic(t) end
+function lurek.math.inOutCubic(t) end
 
 --- Exponential ease-in-out.
 ---@param t any
 ---@return number
-function luna.math.inOutExpo(t) end
+function lurek.math.inOutExpo(t) end
 
 --- Quadratic ease-in-out.
 ---@param t any
 ---@return number
-function luna.math.inOutQuad(t) end
+function lurek.math.inOutQuad(t) end
 
 --- Quartic ease-in-out.
 ---@param t any
 ---@return number
-function luna.math.inOutQuart(t) end
+function lurek.math.inOutQuart(t) end
 
 --- Sinusoidal ease-in-out.
 ---@param t any
 ---@return number
-function luna.math.inOutSine(t) end
+function lurek.math.inOutSine(t) end
 
 --- Quadratic ease-in.
 ---@param t any
 ---@return number
-function luna.math.inQuad(t) end
+function lurek.math.inQuad(t) end
 
 --- Quartic ease-in.
 ---@param t any
 ---@return number
-function luna.math.inQuart(t) end
+function lurek.math.inQuart(t) end
 
 --- Sinusoidal ease-in.
 ---@param t any
 ---@return number
-function luna.math.inSine(t) end
+function lurek.math.inSine(t) end
 
 --- Returns true if the polygon (flat table {x1,y1,...}) is convex.
 ---@param pts any
 ---@return boolean
-function luna.math.isConvex(pts) end
+function lurek.math.isConvex(pts) end
 
 --- Linear interpolation between a and b by fraction t.
 ---@param a any
 ---@param b any
 ---@param t any
 ---@return number
-function luna.math.lerp(a, b, t) end
+function lurek.math.lerp(a, b, t) end
 
 --- Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.
 ---@param x1 any
@@ -8135,51 +8135,51 @@ function luna.math.lerp(a, b, t) end
 ---@param x4 any
 ---@param y4 any
 ---@return number?
-function luna.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) end
+function lurek.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Linear easing (identity).
 ---@param t any
 ---@return number
-function luna.math.linear(t) end
+function lurek.math.linear(t) end
 
 --- Converts a linear-space value to gamma-encoded sRGB.
 ---@param c any
 ---@return number
-function luna.math.linearToGamma(c) end
+function lurek.math.linearToGamma(c) end
 
 --- Returns the natural log of x, or log base b if b is supplied.
 ---@param x any
 ---@param b? any (optional)
 ---@return number
-function luna.math.log(x, b) end
+function lurek.math.log(x, b) end
 
 --- Returns the largest of the supplied numbers.
 ---@return number
-function luna.math.max() end
+function lurek.math.max() end
 
 --- Returns the smallest of the supplied numbers.
 ---@return number
-function luna.math.min() end
+function lurek.math.min() end
 
 --- Creates a new BezierCurve from a flat table of coordinates {x1,y1, x2,y2, ...}.
 ---@param points any
 ---@return BezierCurve
-function luna.math.newBezierCurve(points) end
+function lurek.math.newBezierCurve(points) end
 
 --- Creates a new seeded noise generator.
 ---@param seed? any (optional)
 ---@return NoiseGenerator
-function luna.math.newNoiseGenerator(seed) end
+function lurek.math.newNoiseGenerator(seed) end
 
 --- Creates a new random number generator with an optional seed.
 ---@param seed? any (optional)
 ---@return RandomGenerator
-function luna.math.newRandomGenerator(seed) end
+function lurek.math.newRandomGenerator(seed) end
 
 --- Creates a new SpatialHash with the given cell size.
 ---@param cell_size any
 ---@return SpatialHash
-function luna.math.newSpatialHash(cell_size) end
+function lurek.math.newSpatialHash(cell_size) end
 
 --- Creates a new Transform, optionally initialised from full parameters.
 ---@param x? number? (optional)
@@ -8192,60 +8192,60 @@ function luna.math.newSpatialHash(cell_size) end
 ---@param kx? number? (optional)
 ---@param ky? number? (optional)
 ---@return Transform
-function luna.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
+function lurek.math.newTransform(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 --- Creates a new Tween with the given duration and easing name.
 ---@param duration any
 ---@param easing_name? any (optional)
 ---@return Tween
-function luna.math.newTween(duration, easing_name) end
+function lurek.math.newTween(duration, easing_name) end
 
 --- Back ease-out — overshoots the target then snaps back into place.
 ---@param t any
 ---@return number
-function luna.math.outBack(t) end
+function lurek.math.outBack(t) end
 
 --- Bounce ease-out.
 ---@param t any
 ---@return number
-function luna.math.outBounce(t) end
+function lurek.math.outBounce(t) end
 
 --- Cubic ease-out.
 ---@param t any
 ---@return number
-function luna.math.outCubic(t) end
+function lurek.math.outCubic(t) end
 
 --- Elastic ease-out.
 ---@param t any
 ---@return number
-function luna.math.outElastic(t) end
+function lurek.math.outElastic(t) end
 
 --- Exponential ease-out.
 ---@param t any
 ---@return number
-function luna.math.outExpo(t) end
+function lurek.math.outExpo(t) end
 
 --- Quadratic ease-out.
 ---@param t any
 ---@return number
-function luna.math.outQuad(t) end
+function lurek.math.outQuad(t) end
 
 --- Quartic ease-out.
 ---@param t any
 ---@return number
-function luna.math.outQuart(t) end
+function lurek.math.outQuart(t) end
 
 --- Sinusoidal ease-out.
 ---@param t any
 ---@return number
-function luna.math.outSine(t) end
+function lurek.math.outSine(t) end
 
 --- Returns 2D Perlin noise at (x, y) with the given seed.
 ---@param x any
 ---@param y any
 ---@param seed? any (optional)
 ---@return number
-function luna.math.perlin2d(x, y, seed) end
+function lurek.math.perlin2d(x, y, seed) end
 
 --- Returns 3D Perlin noise at (x, y, z) with the given seed.
 ---@param x any
@@ -8253,52 +8253,52 @@ function luna.math.perlin2d(x, y, seed) end
 ---@param z any
 ---@param seed? any (optional)
 ---@return number
-function luna.math.perlin3d(x, y, z, seed) end
+function lurek.math.perlin3d(x, y, z, seed) end
 
 --- Returns true if (px, py) is inside the polygon given as a flat {x1,y1,...} table.
 ---@param pts any
 ---@param px any
 ---@param py any
 ---@return boolean
-function luna.math.pointInPolygon(pts, px, py) end
+function lurek.math.pointInPolygon(pts, px, py) end
 
 --- Returns the signed area of a polygon given as a flat {x1,y1,...} table.
 ---@param pts any
 ---@return number
-function luna.math.polygonArea(pts) end
+function lurek.math.polygonArea(pts) end
 
 --- Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
 ---@param pts any
 ---@return number
-function luna.math.polygonCentroid(pts) end
+function lurek.math.polygonCentroid(pts) end
 
 --- Returns x raised to the power y.
 ---@param x any
 ---@param y any
 ---@return number
-function luna.math.pow(x, y) end
+function lurek.math.pow(x, y) end
 
 --- Converts degrees to radians.
 ---@param deg any
 ---@return number
-function luna.math.rad(deg) end
+function lurek.math.rad(deg) end
 
 --- Returns a pseudo-random number in [0,1) with no args,
 ---@param a? any (optional)
 ---@param b? any (optional)
 ---@return number
-function luna.math.random(a, b) end
+function lurek.math.random(a, b) end
 
 --- Returns a pseudo-random integer in [lo, hi] (inclusive).
 ---@param lo any
 ---@param hi any
 ---@return integer
-function luna.math.randomInt(lo, hi) end
+function lurek.math.randomInt(lo, hi) end
 
 --- Returns x rounded to the nearest integer (half-up).
 ---@param x any
 ---@return number
-function luna.math.round(x) end
+function lurek.math.round(x) end
 
 --- Tests if two line segments intersect. Returns (hit, ix?, iy?).
 ---@param x1 any
@@ -8310,49 +8310,49 @@ function luna.math.round(x) end
 ---@param x4 any
 ---@param y4 any
 ---@return boolean
-function luna.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
+function lurek.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Returns -1, 0, or 1 depending on the sign of x.
 ---@param x any
 ---@return number
-function luna.math.sign(x) end
+function lurek.math.sign(x) end
 
 --- Returns 2D Simplex noise at (x, y) with the given seed.
 ---@param x any
 ---@param y any
 ---@param seed? any (optional)
 ---@return number
-function luna.math.simplex2d(x, y, seed) end
+function lurek.math.simplex2d(x, y, seed) end
 
 --- Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
 ---@param x any
 ---@param y any
 ---@param z? any (optional)
 ---@return number
-function luna.math.simplexNoise(x, y, z) end
+function lurek.math.simplexNoise(x, y, z) end
 
 --- Returns the sine of x (radians).
 ---@param x any
 ---@return number
-function luna.math.sin(x) end
+function lurek.math.sin(x) end
 
 --- Returns the square root of x.
 ---@param x any
 ---@return number
-function luna.math.sqrt(x) end
+function lurek.math.sqrt(x) end
 
 --- Returns the tangent of x (radians).
 ---@param x any
 ---@return number
-function luna.math.tan(x) end
+function lurek.math.tan(x) end
 
 --- Triangulates a simple polygon given as a flat table {x1,y1, x2,y2, ...}.
 ---@param pts any
 ---@return table
-function luna.math.triangulate(pts) end
+function lurek.math.triangulate(pts) end
 
----@class luna.minimap
-luna.minimap = {}
+---@class lurek.minimap
+lurek.minimap = {}
 
 --- Lua-side wrapper around a [`Minimap`].
 ---@class Minimap
@@ -8585,10 +8585,10 @@ function Minimap:update(dt) end
 ---@param display_w? any (optional)
 ---@param display_h? any (optional)
 ---@return Minimap
-function luna.minimap.newMinimap(grid_w, grid_h, display_w, display_h) end
+function lurek.minimap.newMinimap(grid_w, grid_h, display_w, display_h) end
 
----@class luna.modding
-luna.modding = {}
+---@class lurek.modding
+lurek.modding = {}
 
 --- Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 ---@class Mod
@@ -8736,14 +8736,14 @@ function ModManager:validateDependencies() end
 --- Creates a new Mod from an info table with at least an `id` field.
 ---@param info any
 ---@return Mod
-function luna.modding.newMod(info) end
+function lurek.modding.newMod(info) end
 
 --- Creates a new empty ModManager.
 ---@return ModManager
-function luna.modding.newModManager() end
+function lurek.modding.newModManager() end
 
----@class luna.network
-luna.network = {}
+---@class lurek.network
+lurek.network = {}
 
 --- Lua-side wrapper around [`NetworkHost`].
 ---@class NetworkHost
@@ -8839,10 +8839,10 @@ function NetworkHost:setChannelLimit(limit) end
 --- Creates a new network host bound to the given address.
 ---@param opts any
 ---@return NetworkHost
-function luna.network.newHost(opts) end
+function lurek.network.newHost(opts) end
 
----@class luna.particle
-luna.particle = {}
+---@class lurek.particle
+lurek.particle = {}
 
 --- Lua-side handle to a particle system stored in SharedState.
 ---@class ParticleSystem
@@ -9188,16 +9188,16 @@ function Trail:update(dt) end
 --- Creates a new particle system and stores it in the engine pool.
 ---@param config? any (optional)
 ---@return ParticleSystem
-function luna.particle.newSystem(config) end
+function lurek.particle.newSystem(config) end
 
 --- Creates a new trail ribbon effect.
 ---@param lifetime any
 ---@param start_width any
 ---@return Trail
-function luna.particle.newTrail(lifetime, start_width) end
+function lurek.particle.newTrail(lifetime, start_width) end
 
----@class luna.pathfinding
-luna.pathfinding = {}
+---@class lurek.pathfinding
+lurek.pathfinding = {}
 
 --- Lua-side wrapper around a PathGrid-based [`AiFlowField`].
 ---@class AiFlowField
@@ -9471,50 +9471,50 @@ function UnitPathfinder:typeOf(name) end
 
 --- Returns the background pathfinding thread count (currently always 0).
 ---@return integer
-function luna.pathfinding.getThreadCount() end
+function lurek.pathfinding.getThreadCount() end
 
 --- Creates a new FlowField backed by a NavGrid.
 ---@param grid_ud any
 ---@return FlowField
-function luna.pathfinding.newFlowField(grid_ud) end
+function lurek.pathfinding.newFlowField(grid_ud) end
 
 --- Creates a new NavGrid with all cells walkable.
 ---@param width any
 ---@param height any
 ---@return NavGrid
-function luna.pathfinding.newNavGrid(width, height) end
+function lurek.pathfinding.newNavGrid(width, height) end
 
 --- Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable).
 ---@param tm_ud any
 ---@param layer_index any
 ---@param blocked_table any
 ---@return NavGrid
-function luna.pathfinding.newNavGridFromTileMap(tm_ud, layer_index, blocked_table) end
+function lurek.pathfinding.newNavGridFromTileMap(tm_ud, layer_index, blocked_table) end
 
 --- Creates a new BFS flow field from a PathGrid.
 ---@param grid_ud any
 ---@return AiFlowField
-function luna.pathfinding.newPathFlowField(grid_ud) end
+function lurek.pathfinding.newPathFlowField(grid_ud) end
 
 --- Creates a new PathGrid with per-cell cost and walkability.
 ---@param w any
 ---@param h any
 ---@param cell_size any
 ---@return PathGrid
-function luna.pathfinding.newPathGrid(w, h, cell_size) end
+function lurek.pathfinding.newPathGrid(w, h, cell_size) end
 
 --- Creates a new UnitPathfinder backed by a NavGrid.
 ---@param grid_ud any
 ---@return UnitPathfinder
-function luna.pathfinding.newPathfinder(grid_ud) end
+function lurek.pathfinding.newPathfinder(grid_ud) end
 
 --- Sets the background pathfinding thread count (currently a no-op).
 ---@param count any
 ---@return nil
-function luna.pathfinding.setThreadCount(count) end
+function lurek.pathfinding.setThreadCount(count) end
 
----@class luna.patterns
-luna.patterns = {}
+---@class lurek.patterns
+lurek.patterns = {}
 
 --- Lua wrapper for the CommandStack pattern.
 ---@class CommandStack
@@ -9721,31 +9721,31 @@ function SimpleState:update(dt) end
 --- Creates a new CommandStack instance.
 ---@param max_size? any (optional)
 ---@return any
-function luna.patterns.newCommandStack(max_size) end
+function lurek.patterns.newCommandStack(max_size) end
 
 --- Creates a new EventBus instance.
 ---@param name? any (optional)
 ---@return any
-function luna.patterns.newEventBus(name) end
+function lurek.patterns.newEventBus(name) end
 
 --- Creates a new Factory instance.
 ---@return any
-function luna.patterns.newFactory() end
+function lurek.patterns.newFactory() end
 
 --- Creates a new ObjectPool instance.
 ---@return any
-function luna.patterns.newObjectPool() end
+function lurek.patterns.newObjectPool() end
 
 --- Creates a new ServiceLocator instance.
 ---@return any
-function luna.patterns.newServiceLocator() end
+function lurek.patterns.newServiceLocator() end
 
 --- Creates a new SimpleState finite state machine instance.
 ---@return any
-function luna.patterns.newSimpleState() end
+function lurek.patterns.newSimpleState() end
 
----@class luna.physics
-luna.physics = {}
+---@class lurek.physics
+lurek.physics = {}
 
 --- Lua-side handle to a physics body accessed through its world.
 ---@class Body
@@ -10112,29 +10112,29 @@ function World:toPixels(m) end
 ---@param body_ud any
 ---@param shape_ud any
 ---@return nil
-function luna.physics.attachShape(body_ud, shape_ud) end
+function lurek.physics.attachShape(body_ud, shape_ud) end
 
 --- Marks a physics world for destruction. Subsequent operations on the world
 ---@param world_ud any
 ---@return nil
-function luna.physics.destroyWorld(world_ud) end
+function lurek.physics.destroyWorld(world_ud) end
 
 --- Returns the position and velocity of a body (x, y, vx, vy).
 ---@param world_ud any
 ---@param body_ud any
 ---@return number
-function luna.physics.getBody(world_ud, body_ud) end
+function lurek.physics.getBody(world_ud, body_ud) end
 
 --- Returns all collision events from the last simulation step.
 ---@param world_ud any
 ---@return table
-function luna.physics.getCollisions(world_ud) end
+function lurek.physics.getCollisions(world_ud) end
 
 --- Returns whether the body is allowed to sleep.
 ---@param world_ud any
 ---@param body_ud any
 ---@return boolean
-function luna.physics.isSleepingAllowed(world_ud, body_ud) end
+function lurek.physics.isSleepingAllowed(world_ud, body_ud) end
 
 --- Creates a new rectangular body in the given world.
 ---@param world_ud any
@@ -10142,18 +10142,18 @@ function luna.physics.isSleepingAllowed(world_ud, body_ud) end
 ---@param y any
 ---@param bt any
 ---@return Body
-function luna.physics.newBody(world_ud, x, y, bt) end
+function lurek.physics.newBody(world_ud, x, y, bt) end
 
 --- Creates a chain shape userdata from flat variadic vertex pairs.
 ---@param closed any
 ---@param coords any
 ---@return Shape
-function luna.physics.newChainShape(closed, coords) end
+function lurek.physics.newChainShape(closed, coords) end
 
 --- Creates a circle shape userdata.
 ---@param r any
 ---@return Shape
-function luna.physics.newCircleShape(r) end
+function lurek.physics.newCircleShape(r) end
 
 --- Creates an edge (line segment) shape userdata.
 ---@param x1 any
@@ -10161,23 +10161,23 @@ function luna.physics.newCircleShape(r) end
 ---@param x2 any
 ---@param y2 any
 ---@return Shape
-function luna.physics.newEdgeShape(x1, y1, x2, y2) end
+function lurek.physics.newEdgeShape(x1, y1, x2, y2) end
 
 --- Creates a convex polygon shape userdata from flat variadic vertex pairs.
 ---@return Shape
-function luna.physics.newPolygonShape() end
+function lurek.physics.newPolygonShape() end
 
 --- Creates a rectangle shape userdata.
 ---@param w any
 ---@param h any
 ---@return Shape
-function luna.physics.newRectangleShape(w, h) end
+function lurek.physics.newRectangleShape(w, h) end
 
 --- Creates a new physics world with the given gravity vector.
 ---@param gx any
 ---@param gy any
 ---@return World
-function luna.physics.newWorld(gx, gy) end
+function lurek.physics.newWorld(gx, gy) end
 
 --- Sets the velocity of a body.
 ---@param world_ud any
@@ -10185,23 +10185,23 @@ function luna.physics.newWorld(gx, gy) end
 ---@param vx any
 ---@param vy any
 ---@return nil
-function luna.physics.setBodyVelocity(world_ud, body_ud, vx, vy) end
+function lurek.physics.setBodyVelocity(world_ud, body_ud, vx, vy) end
 
 --- Sets whether the body is allowed to sleep.
 ---@param world_ud any
 ---@param body_ud any
 ---@param allowed any
 ---@return nil
-function luna.physics.setSleepingAllowed(world_ud, body_ud, allowed) end
+function lurek.physics.setSleepingAllowed(world_ud, body_ud, allowed) end
 
 --- Advances the physics world by dt seconds.
 ---@param world_ud any
 ---@param dt any
 ---@return nil
-function luna.physics.step(world_ud, dt) end
+function lurek.physics.step(world_ud, dt) end
 
----@class luna.pipeline
-luna.pipeline = {}
+---@class lurek.pipeline
+lurek.pipeline = {}
 
 --- Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
 ---@class Pipeline
@@ -10452,28 +10452,28 @@ function Step:typeOf(name) end
 --- Deserialises a pipeline from a definition table.
 ---@param def any
 ---@return Pipeline
-function luna.pipeline.fromTable(def) end
+function lurek.pipeline.fromTable(def) end
 
 --- Creates a new empty pipeline with the given name (defaults to "pipeline").
 ---@param name? any (optional)
 ---@return Pipeline
-function luna.pipeline.newPipeline(name) end
+function lurek.pipeline.newPipeline(name) end
 
 --- Creates a new pipeline step with the given name and optional callback.
 ---@param name any
 ---@param callback? any (optional)
 ---@return PipelineStep
-function luna.pipeline.newStep(name, callback) end
+function lurek.pipeline.newStep(name, callback) end
 
----@class luna.procgen
-luna.procgen = {}
+---@class lurek.procgen
+lurek.procgen = {}
 
 --- Generates a cave-like map using cellular automata.
 ---@param w any
 ---@param h any
 ---@param opts? any (optional)
 ---@return table
-function luna.procgen.cellularAutomata(w, h, opts) end
+function lurek.procgen.cellularAutomata(w, h, opts) end
 
 --- BFS flood fill on a flat grid of bytes.
 ---@param data table
@@ -10484,7 +10484,7 @@ function luna.procgen.cellularAutomata(w, h, opts) end
 ---@param threshold? integer? (optional)
 ---@param above? boolean? (optional)
 ---@return table
-function luna.procgen.floodFill(data, w, h, sx, sy, threshold, above) end
+function lurek.procgen.floodFill(data, w, h, sx, sy, threshold, above) end
 
 --- Evaluates periodic Perlin noise at a point.
 ---@param x any
@@ -10492,7 +10492,7 @@ function luna.procgen.floodFill(data, w, h, sx, sy, threshold, above) end
 ---@param px any
 ---@param py any
 ---@return number
-function luna.procgen.perlinNoise(x, y, px, py) end
+function lurek.procgen.perlinNoise(x, y, px, py) end
 
 --- Generates Poisson disk sample points using Bridson's algorithm.
 ---@param w any
@@ -10501,7 +10501,7 @@ function luna.procgen.perlinNoise(x, y, px, py) end
 ---@param max_attempts? any (optional)
 ---@param seed? any (optional)
 ---@return table
-function luna.procgen.poissonDisk(w, h, min_dist, max_attempts, seed) end
+function lurek.procgen.poissonDisk(w, h, min_dist, max_attempts, seed) end
 
 --- Generates a Voronoi diagram for a set of seed points.
 ---@param w any
@@ -10509,10 +10509,10 @@ function luna.procgen.poissonDisk(w, h, min_dist, max_attempts, seed) end
 ---@param pts_tbl any
 ---@param opts_tbl? any (optional)
 ---@return table
-function luna.procgen.voronoi(w, h, pts_tbl, opts_tbl) end
+function lurek.procgen.voronoi(w, h, pts_tbl, opts_tbl) end
 
----@class luna.raycaster
-luna.raycaster = {}
+---@class lurek.raycaster
+lurek.raycaster = {}
 
 --- Lua-side wrapper around a [`Raycaster2D`] grid.
 ---@class Raycaster
@@ -10554,23 +10554,23 @@ function Raycaster:width() end
 ---@param distance any
 ---@param max_distance any
 ---@return number
-function luna.raycaster.distanceShade(distance, max_distance) end
+function lurek.raycaster.distanceShade(distance, max_distance) end
 
 --- Creates a new raycaster grid of the given dimensions.
 ---@param w any
 ---@param h any
 ---@return Raycaster
-function luna.raycaster.new(w, h) end
+function lurek.raycaster.new(w, h) end
 
 --- Projects a wall distance to screen-space drawing parameters.
 ---@param distance any
 ---@param fov any
 ---@param screen_height any
 ---@return number
-function luna.raycaster.projectColumn(distance, fov, screen_height) end
+function lurek.raycaster.projectColumn(distance, fov, screen_height) end
 
----@class luna.savegame
-luna.savegame = {}
+---@class lurek.savegame
+lurek.savegame = {}
 
 --- Lua-side wrapper around [`SaveManager`] with per-module callback storage.
 ---@class SaveManager
@@ -10660,10 +10660,10 @@ function SaveManager:update(dt) end
 
 --- Creates a new SaveManager for slot-based save/load operations.
 ---@return SaveManager
-function luna.savegame.newSaveManager() end
+function lurek.savegame.newSaveManager() end
 
----@class luna.scene
-luna.scene = {}
+---@class lurek.scene
+lurek.scene = {}
 
 --- Lua-side wrapper around a [`DepthSorter`] with registry-stored callbacks.
 ---@class DepthSorter
@@ -10698,85 +10698,85 @@ function DepthSorter:sort() end
 
 --- Clears all scenes from the stack, calling leave on each.
 ---@return nil
-function luna.scene.clear() end
+function lurek.scene.clear() end
 
 --- Draws all scenes in the stack from bottom to top (legacy name; prefer `render`).
 ---@return nil
-function luna.scene.draw() end
+function lurek.scene.draw() end
 
 --- Returns the current top scene table, or nil if the stack is empty.
 ---@return table?
-function luna.scene.getCurrent() end
+function lurek.scene.getCurrent() end
 
 --- Returns a value from the inter-scene data store, or nil if not found.
 ---@param key any
 ---@return table?
-function luna.scene.getData(key) end
+function lurek.scene.getData(key) end
 
 --- Returns a registered scene table by name, or nil if not found.
 ---@param name any
 ---@return table?
-function luna.scene.getRegistered(name) end
+function lurek.scene.getRegistered(name) end
 
 --- Returns a list of all registered scene names.
 ---@return table
-function luna.scene.getRegisteredNames() end
+function lurek.scene.getRegisteredNames() end
 
 --- Returns the number of scenes on the stack.
 ---@return integer
-function luna.scene.getStackSize() end
+function lurek.scene.getStackSize() end
 
 --- Returns the transition progress from 0.0 to 1.0.
 ---@return number
-function luna.scene.getTransitionProgress() end
+function lurek.scene.getTransitionProgress() end
 
 --- Returns true if the given key exists in the data store.
 ---@param key any
 ---@return boolean
-function luna.scene.hasData(key) end
+function lurek.scene.hasData(key) end
 
 --- Returns true if a scene is registered under the given name.
 ---@param name any
 ---@return boolean
-function luna.scene.hasRegistered(name) end
+function lurek.scene.hasRegistered(name) end
 
 --- Returns true if the scene stack is empty.
 ---@return boolean
-function luna.scene.isEmpty() end
+function lurek.scene.isEmpty() end
 
 --- Returns true if a scene transition is currently active.
 ---@return boolean
-function luna.scene.isTransitioning() end
+function lurek.scene.isTransitioning() end
 
 --- Creates a new DepthSorter for z-ordered draw batching.
 ---@return DepthSorter
-function luna.scene.newDepthSorter() end
+function lurek.scene.newDepthSorter() end
 
 --- Pops the top scene from the stack with an optional transition.
 ---@param transition? any (optional)
 ---@param duration? any (optional)
 ---@return nil
-function luna.scene.pop(transition, duration) end
+function lurek.scene.pop(transition, duration) end
 
 --- Pops scenes until the named scene is on top, calling leave on each removed.
 ---@param name any
 ---@return boolean
-function luna.scene.popTo(name) end
+function lurek.scene.popTo(name) end
 
 --- Calls `scene:ready(self)` on the top scene if not yet fired, then `scene:process(dt)`.
 ---@param dt any
 ---@return nil
-function luna.scene.process(dt) end
+function lurek.scene.process(dt) end
 
 --- Calls `scene:process_late(dt)` on the topmost scene (after process, before render).
 ---@param dt any
 ---@return nil
-function luna.scene.processLate(dt) end
+function lurek.scene.processLate(dt) end
 
 --- Calls `scene:process_physics(dt)` on the topmost scene (fixed timestep).
 ---@param dt any
 ---@return nil
-function luna.scene.processPhysics(dt) end
+function lurek.scene.processPhysics(dt) end
 
 --- Pushes a scene table onto the stack with an optional transition.
 ---@param scene table
@@ -10784,32 +10784,32 @@ function luna.scene.processPhysics(dt) end
 ---@param duration? number? (optional)
 ---@param params? table? (optional)
 ---@return nil
-function luna.scene.push(scene, transition, duration, params) end
+function lurek.scene.push(scene, transition, duration, params) end
 
 --- Registers a scene table by name for later retrieval.
 ---@param name any
 ---@param scene any
 ---@return nil
-function luna.scene.registerScene(name, scene) end
+function lurek.scene.registerScene(name, scene) end
 
 --- Removes a value from the inter-scene data store by key.
 ---@param key any
 ---@return nil
-function luna.scene.removeData(key) end
+function lurek.scene.removeData(key) end
 
 --- Draws all scenes in the stack from bottom to top.
 ---@return nil
-function luna.scene.render() end
+function lurek.scene.render() end
 
 --- Draws UI overlay for all scenes in the stack from bottom to top.
 ---@return nil
-function luna.scene.renderUi() end
+function lurek.scene.renderUi() end
 
 --- Stores a value in the inter-scene data store under the given key.
 ---@param key any
 ---@param value any
 ---@return nil
-function luna.scene.setData(key, value) end
+function lurek.scene.setData(key, value) end
 
 --- Replaces the top scene with a new one, calling leave and enter callbacks.
 ---@param scene table
@@ -10817,58 +10817,58 @@ function luna.scene.setData(key, value) end
 ---@param duration? number? (optional)
 ---@param params? table? (optional)
 ---@return nil
-function luna.scene.switchTo(scene, transition, duration, params) end
+function lurek.scene.switchTo(scene, transition, duration, params) end
 
 --- Removes a scene from the registry by name.
 ---@param name any
 ---@return nil
-function luna.scene.unregisterScene(name) end
+function lurek.scene.unregisterScene(name) end
 
 --- Updates the top scene and any active transition (legacy name; prefer `process`).
 ---@param dt any
 ---@return nil
-function luna.scene.update(dt) end
+function lurek.scene.update(dt) end
 
----@class luna.serial
-luna.serial = {}
+---@class lurek.serial
+lurek.serial = {}
 
 --- Parses a CSV string and returns a sequence of row tables.
 ---@param s any
 ---@param delim? any (optional)
 ---@param headers? any (optional)
 ---@return table
-function luna.serial.fromCsv(s, delim, headers) end
+function lurek.serial.fromCsv(s, delim, headers) end
 
 --- Parses a JSON string and returns a Lua table.
 ---@param s any
 ---@return table
-function luna.serial.fromJson(s) end
+function lurek.serial.fromJson(s) end
 
 --- Parses a TOML string and returns a Lua table.
 ---@param s any
 ---@return table
-function luna.serial.fromToml(s) end
+function lurek.serial.fromToml(s) end
 
 --- Serializes a sequence of row tables to a CSV string.
 ---@param value any
 ---@param delim? any (optional)
 ---@param headers? any (optional)
 ---@return string
-function luna.serial.toCsv(value, delim, headers) end
+function lurek.serial.toCsv(value, delim, headers) end
 
 --- Serializes a Lua value to a JSON string.
 ---@param value any
 ---@param pretty? any (optional)
 ---@return string
-function luna.serial.toJson(value, pretty) end
+function lurek.serial.toJson(value, pretty) end
 
 --- Serializes a Lua table to a TOML string.
 ---@param value any
 ---@return string
-function luna.serial.toToml(value) end
+function lurek.serial.toToml(value) end
 
----@class luna.spine
-luna.spine = {}
+---@class lurek.spine
+lurek.spine = {}
 
 --- Lua-side wrapper around a [`Skeleton`].
 ---@class Skeleton
@@ -10916,106 +10916,106 @@ function Skeleton:updateWorldTransforms() end
 --- Creates a new empty skeleton with the given name.
 ---@param name any
 ---@return Skeleton
-function luna.spine.newSkeleton(name) end
+function lurek.spine.newSkeleton(name) end
 
----@class luna.system
-luna.system = {}
+---@class lurek.system
+lurek.system = {}
 
 --- Returns the CPU architecture string for the current machine.
 ---@return number
-function luna.system.getArch() end
+function lurek.system.getArch() end
 
 --- Returns the command-line arguments as a table.
 ---@return table
-function luna.system.getArgs() end
+function lurek.system.getArgs() end
 
 --- Returns the output table from the most recently completed runBatch call.
 ---@param handle number ÔÇö Batch handle returned by runBatch.
 ---@return string
-function luna.system.getBatchResults(handle) end
+function lurek.system.getBatchResults(handle) end
 
 --- Returns the current contents of the system clipboard.
 ---@return any
-function luna.system.getClipboardText() end
+function lurek.system.getClipboardText() end
 
 --- Returns whether the debug overlay is currently visible.
-function luna.system.getDebugOverlay() end
+function lurek.system.getDebugOverlay() end
 
 --- Returns the value of the named OS environment variable, or nil if not set.
 ---@param name number ÔÇö Environment variable name (case-sensitive on Linux/macOS).
 ---@return string
-function luna.system.getEnv(name) end
+function lurek.system.getEnv(name) end
 
 --- Returns a table of system information including OS name, CPU model, and installed RAM.
 ---@return table
-function luna.system.getInfo() end
+function lurek.system.getInfo() end
 
 --- Returns the last unhandled error message, or nil.
 ---@return any
-function luna.system.getLastError() end
+function lurek.system.getLastError() end
 
 --- Returns the name of the current minimum log level for runtime messages.
 ---@return any
-function luna.system.getLogLevel() end
+function lurek.system.getLogLevel() end
 
 --- Returns the total amount of installed system RAM in megabytes.
 ---@return number
-function luna.system.getMemorySize() end
+function lurek.system.getMemorySize() end
 
 --- Returns the host operating system name ('Windows', 'Linux', 'macOS').
 ---@return any
-function luna.system.getOS() end
+function lurek.system.getOS() end
 
 --- Returns battery state, percentage charged, and estimated time remaining.
 ---@return number
-function luna.system.getPowerInfo() end
+function lurek.system.getPowerInfo() end
 
 --- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
 ---@return string
-function luna.system.getPreferredLocales() end
+function lurek.system.getPreferredLocales() end
 
 --- Returns the number of logical CPU cores available.
 ---@return any
-function luna.system.getProcessorCount() end
+function lurek.system.getProcessorCount() end
 
 --- Returns the Luna2D engine version string.
 ---@return any
-function luna.system.getVersion() end
+function lurek.system.getVersion() end
 
 --- Emit a log message from Lua at the specified level.
 ---@param level any
 ---@param message any
-function luna.system.log(level, message) end
+function lurek.system.log(level, message) end
 
 --- Opens a URL in the system's default browser.
 ---@param url any
 ---@return any
-function luna.system.openURL(url) end
+function lurek.system.openURL(url) end
 
 --- Parses a command-line argument string and returns a structured key/value table.
 ---@param args string ÔÇö Argument string or table (e.g. '--flag=value --bool').
 ---@return boolean
-function luna.system.parseArgs(args) end
+function lurek.system.parseArgs(args) end
 
 --- Runs a list of shell commands in parallel and returns immediately without blocking.
 ---@param commands string ÔÇö Table of command strings to execute concurrently.
 ---@return number
-function luna.system.runBatch(commands) end
+function lurek.system.runBatch(commands) end
 
 --- Replaces the system clipboard contents with the given string.
 ---@param text any
-function luna.system.setClipboardText(text) end
+function lurek.system.setClipboardText(text) end
 
 --- Shows or hides the FPS/draw-call debug overlay.
 ---@param enabled any
-function luna.system.setDebugOverlay(enabled) end
+function lurek.system.setDebugOverlay(enabled) end
 
 --- Sets the minimum severity level for runtime log messages.
 ---@param level any ÔÇö One of 'debug', 'info', 'warn', or 'error'.
-function luna.system.setLogLevel(level) end
+function lurek.system.setLogLevel(level) end
 
----@class luna.terminal
-luna.terminal = {}
+---@class lurek.terminal
+lurek.terminal = {}
 
 --- Lua-side wrapper around a [`Terminal`] with widget binding management.
 ---@class Terminal
@@ -11254,7 +11254,7 @@ function Widget:setVisible(visible) end
 ---@param width any
 ---@param height any
 ---@return Widget
-function luna.terminal.newBorder(col, row, width, height) end
+function lurek.terminal.newBorder(col, row, width, height) end
 
 --- Creates a new button widget at 1-based coordinates.
 ---@param col integer
@@ -11263,14 +11263,14 @@ function luna.terminal.newBorder(col, row, width, height) end
 ---@param height? integer? (optional)
 ---@param text? string? (optional)
 ---@return Widget
-function luna.terminal.newButton(col, row, width, height, text) end
+function lurek.terminal.newButton(col, row, width, height, text) end
 
 --- Creates a new label widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param text? any (optional)
 ---@return Widget
-function luna.terminal.newLabel(col, row, text) end
+function lurek.terminal.newLabel(col, row, text) end
 
 --- Creates a new scrollable list widget at 1-based coordinates.
 ---@param col any
@@ -11278,7 +11278,7 @@ function luna.terminal.newLabel(col, row, text) end
 ---@param width any
 ---@param height any
 ---@return Widget
-function luna.terminal.newList(col, row, width, height) end
+function lurek.terminal.newList(col, row, width, height) end
 
 --- Creates a new container panel widget at 1-based coordinates.
 ---@param col any
@@ -11286,23 +11286,23 @@ function luna.terminal.newList(col, row, width, height) end
 ---@param width? any (optional)
 ---@param height? any (optional)
 ---@return Widget
-function luna.terminal.newPanel(col, row, width, height) end
+function lurek.terminal.newPanel(col, row, width, height) end
 
 --- Creates a new terminal grid with the given dimensions.
 ---@param cols? any (optional)
 ---@param rows? any (optional)
 ---@return Terminal
-function luna.terminal.newTerminal(cols, rows) end
+function lurek.terminal.newTerminal(cols, rows) end
 
 --- Creates a new single-line text box widget at 1-based coordinates.
 ---@param col any
 ---@param row any
 ---@param width any
 ---@return Widget
-function luna.terminal.newTextBox(col, row, width) end
+function lurek.terminal.newTextBox(col, row, width) end
 
----@class luna.thread
-luna.thread = {}
+---@class lurek.thread
+lurek.thread = {}
 
 --- Lua-side wrapper around a background [`LuaThread`].
 ---@class ThreadHandle
@@ -11337,19 +11337,19 @@ function ThreadHandle:wait() end
 --- Gets or creates a named global channel shared across threads.
 ---@param name any
 ---@return Channel
-function luna.thread.getChannel(name) end
+function lurek.thread.getChannel(name) end
 
 --- Creates an unnamed thread-safe channel for inter-thread communication.
 ---@return Channel
-function luna.thread.newChannel() end
+function lurek.thread.newChannel() end
 
 --- Creates a new background thread from a Lua code string.
 ---@param code any
 ---@return Thread
-function luna.thread.newThread(code) end
+function lurek.thread.newThread(code) end
 
----@class luna.tilemap
-luna.tilemap = {}
+---@class lurek.tilemap
+lurek.tilemap = {}
 
 --- Lua-side wrapper around an [`AutoTileSheet`].
 ---@class AutoTileSheet
@@ -11793,7 +11793,7 @@ function TileSet:setSolid(tile_id, solid) end
 ---@param sy any
 ---@param size any
 ---@return integer
-function luna.tilemap.fromScreenHex(sx, sy, size) end
+function lurek.tilemap.fromScreenHex(sx, sy, size) end
 
 --- Converts screen position back to tile coordinates for diamond isometric projection.
 ---@param sx any
@@ -11801,14 +11801,14 @@ function luna.tilemap.fromScreenHex(sx, sy, size) end
 ---@param tw any
 ---@param th any
 ---@return number
-function luna.tilemap.fromScreenIso(sx, sy, tw, th) end
+function lurek.tilemap.fromScreenIso(sx, sy, tw, th) end
 
 --- Returns all hex cells within radius distance (filled hex circle) as a table.
 ---@param q any
 ---@param r any
 ---@param radius any
 ---@return table
-function luna.tilemap.hexArea(q, r, radius) end
+function lurek.tilemap.hexArea(q, r, radius) end
 
 --- Returns the hex distance between two axial coordinates.
 ---@param q1 any
@@ -11816,7 +11816,7 @@ function luna.tilemap.hexArea(q, r, radius) end
 ---@param q2 any
 ---@param r2 any
 ---@return integer
-function luna.tilemap.hexDistance(q1, r1, q2, r2) end
+function lurek.tilemap.hexDistance(q1, r1, q2, r2) end
 
 --- Returns all hex cells along a line between two axial coordinates as a table.
 ---@param q1 any
@@ -11824,13 +11824,13 @@ function luna.tilemap.hexDistance(q1, r1, q2, r2) end
 ---@param q2 any
 ---@param r2 any
 ---@return table
-function luna.tilemap.hexLine(q1, r1, q2, r2) end
+function lurek.tilemap.hexLine(q1, r1, q2, r2) end
 
 --- Returns the six axial neighbor coordinates as a table of {q, r} pairs.
 ---@param q any
 ---@param r any
 ---@return table
-function luna.tilemap.hexNeighbors(q, r) end
+function lurek.tilemap.hexNeighbors(q, r) end
 
 --- Reflects hex coordinates across an axis through the center.
 ---@param q any
@@ -11839,14 +11839,14 @@ function luna.tilemap.hexNeighbors(q, r) end
 ---@param center_r any
 ---@param axis any
 ---@return integer
-function luna.tilemap.hexReflect(q, r, center_q, center_r, axis) end
+function lurek.tilemap.hexReflect(q, r, center_q, center_r, axis) end
 
 --- Returns all cells at exactly radius distance from (q, r) as a table.
 ---@param q any
 ---@param r any
 ---@param radius any
 ---@return table
-function luna.tilemap.hexRing(q, r, radius) end
+function lurek.tilemap.hexRing(q, r, radius) end
 
 --- Rotates hex coordinates around a center by steps x 60 degrees clockwise.
 ---@param q any
@@ -11855,53 +11855,53 @@ function luna.tilemap.hexRing(q, r, radius) end
 ---@param center_r any
 ---@param steps any
 ---@return integer
-function luna.tilemap.hexRotate(q, r, center_q, center_r, steps) end
+function lurek.tilemap.hexRotate(q, r, center_q, center_r, steps) end
 
 --- Rounds fractional axial coordinates to the nearest hex cell.
 ---@param q any
 ---@param r any
 ---@return integer
-function luna.tilemap.hexRound(q, r) end
+function lurek.tilemap.hexRound(q, r) end
 
 --- Returns all hex cells from center outward to radius, ring by ring, as a table.
 ---@param q any
 ---@param r any
 ---@param radius any
 ---@return table
-function luna.tilemap.hexSpiral(q, r, radius) end
+function lurek.tilemap.hexSpiral(q, r, radius) end
 
 --- Snaps an angle (in radians) to the nearest isometric direction (1-4).
 ---@param angle any
 ---@return integer
-function luna.tilemap.isoDirectionFromAngle(angle) end
+function lurek.tilemap.isoDirectionFromAngle(angle) end
 
 --- Returns the name of an isometric direction (1-4).
 ---@param direction any
 ---@return string
-function luna.tilemap.isoDirectionName(direction) end
+function lurek.tilemap.isoDirectionName(direction) end
 
 --- Rotates an isometric direction (1-4) clockwise by steps.
 ---@param direction any
 ---@param steps any
 ---@return integer
-function luna.tilemap.isoRotate(direction, steps) end
+function lurek.tilemap.isoRotate(direction, steps) end
 
 --- Parses a TMX XML string and returns a table with map metadata and layers.
 ---@param xml any
 ---@return table
-function luna.tilemap.loadTMX(xml) end
+function lurek.tilemap.loadTMX(xml) end
 
 --- Creates a new AutoTileSheet with the given tile dimensions and layout.
 ---@param tile_w any
 ---@param tile_h any
 ---@param layout_str any
 ---@return AutoTileSheet
-function luna.tilemap.newAutoTileSheet(tile_w, tile_h, layout_str) end
+function lurek.tilemap.newAutoTileSheet(tile_w, tile_h, layout_str) end
 
 --- Creates a new ChunkMap with the given chunk size.
 ---@param chunk_size? any (optional)
 ---@return ChunkMap
-function luna.tilemap.newChunkMap(chunk_size) end
+function lurek.tilemap.newChunkMap(chunk_size) end
 
 --- Creates a new IsoMap with no levels.
 ---@param width any
@@ -11910,7 +11910,7 @@ function luna.tilemap.newChunkMap(chunk_size) end
 ---@param tile_h any
 ---@param level_height any
 ---@return IsoMap
-function luna.tilemap.newIsoMap(width, height, tile_w, tile_h, level_height) end
+function lurek.tilemap.newIsoMap(width, height, tile_w, tile_h, level_height) end
 
 --- Creates a new MapBlock with the given dimensions.
 ---@param width any
@@ -11918,30 +11918,30 @@ function luna.tilemap.newIsoMap(width, height, tile_w, tile_h, level_height) end
 ---@param layers? any (optional)
 ---@param segment_size? any (optional)
 ---@return MapBlock
-function luna.tilemap.newMapBlock(width, height, layers, segment_size) end
+function lurek.tilemap.newMapBlock(width, height, layers, segment_size) end
 
 --- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
 ---@param group MapGroup
 ---@param preset string
 ---@param segmentSize integer
 ---@return MapGen
-function luna.tilemap.newMapGen(group, preset, segmentSize) end
+function lurek.tilemap.newMapGen(group, preset, segmentSize) end
 
 --- Creates a new empty MapGroup with the given name.
 ---@param name any
 ---@return MapGroup
-function luna.tilemap.newMapGroup(name) end
+function lurek.tilemap.newMapGroup(name) end
 
 --- Creates a new empty MapScript procedural generation script.
 ---@return MapScript
-function luna.tilemap.newMapScript() end
+function lurek.tilemap.newMapScript() end
 
 --- Creates a new TileMap with the given tile size and chunk size.
 ---@param tile_width any
 ---@param tile_height any
 ---@param chunk_size? any (optional)
 ---@return TileMap
-function luna.tilemap.newTileMap(tile_width, tile_height, chunk_size) end
+function lurek.tilemap.newTileMap(tile_width, tile_height, chunk_size) end
 
 --- Creates a new TileSet with the given atlas layout parameters.
 ---@param firstGid integer
@@ -11952,14 +11952,14 @@ function luna.tilemap.newTileMap(tile_width, tile_height, chunk_size) end
 ---@param spacing? integer? (optional)
 ---@param margin? integer? (optional)
 ---@return TileSet
-function luna.tilemap.newTileSet(firstGid, tileCount, columns, tileWidth, tileHeight, spacing, margin) end
+function lurek.tilemap.newTileSet(firstGid, tileCount, columns, tileWidth, tileHeight, spacing, margin) end
 
 --- Converts axial hex coordinates to screen position (pointy-top layout).
 ---@param q any
 ---@param r any
 ---@param size any
 ---@return number
-function luna.tilemap.toScreenHex(q, r, size) end
+function lurek.tilemap.toScreenHex(q, r, size) end
 
 --- Converts tile coordinates to screen position using diamond isometric projection.
 ---@param tx any
@@ -11967,10 +11967,10 @@ function luna.tilemap.toScreenHex(q, r, size) end
 ---@param tw any
 ---@param th any
 ---@return number
-function luna.tilemap.toScreenIso(tx, ty, tw, th) end
+function lurek.tilemap.toScreenIso(tx, ty, tw, th) end
 
----@class luna.time
-luna.time = {}
+---@class lurek.time
+lurek.time = {}
 
 --- Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
 ---@class Scheduler
@@ -12061,241 +12061,241 @@ function Scheduler:update(dt) end
 
 --- Returns the rolling-average frame delta time in seconds.
 ---@return number
-function luna.time.getAverageDelta() end
+function lurek.time.getAverageDelta() end
 
 --- Returns the delta time in seconds for the current frame.
 ---@return number
-function luna.time.getDelta() end
+function lurek.time.getDelta() end
 
 --- Returns the current frames-per-second measurement.
 ---@return number
-function luna.time.getFPS() end
+function lurek.time.getFPS() end
 
 --- Returns the high-resolution elapsed time since engine start in seconds.
 ---@return number
-function luna.time.getMicroTime() end
+function lurek.time.getMicroTime() end
 
 --- Returns the fixed timestep used by `process_physics` callbacks (seconds).
 ---@return number
-function luna.time.getPhysicsDelta() end
+function lurek.time.getPhysicsDelta() end
 
 --- Returns the total elapsed time since engine start in seconds.
 ---@return number
-function luna.time.getTime() end
+function lurek.time.getTime() end
 
 --- Creates a new independent Scheduler for managing timed callbacks.
 ---@return Scheduler
-function luna.time.newScheduler() end
+function lurek.time.newScheduler() end
 
 --- Sets the fixed timestep for `process_physics` callbacks (seconds).
 ---@param dt any
 ---@return nil
-function luna.time.setPhysicsDelta(dt) end
+function lurek.time.setPhysicsDelta(dt) end
 
 --- Suspends execution for the given number of seconds.
 ---@param seconds any
 ---@return nil
-function luna.time.sleep(seconds) end
+function lurek.time.sleep(seconds) end
 
 --- Advances the timer by one frame, returning the delta time.
 ---@return number
-function luna.time.step() end
+function lurek.time.step() end
 
----@class luna.window
-luna.window = {}
+---@class lurek.window
+lurek.window = {}
 
 --- Requests the window to close.
 ---@return nil
-function luna.window.close() end
+function lurek.window.close() end
 
 --- Requests the window manager to bring the window to the foreground.
 ---@return nil
-function luna.window.focus() end
+function lurek.window.focus() end
 
 --- Converts physical pixels to device-independent coordinates.
 ---@param value any
 ---@return number
-function luna.window.fromPixels(value) end
+function lurek.window.fromPixels(value) end
 
 --- Returns the DPI scaling factor for the window.
 ---@return number
-function luna.window.getDPIScale() end
+function lurek.window.getDPIScale() end
 
 --- Returns the desktop resolution as width, height.
 ---@return integer
-function luna.window.getDesktopDimensions() end
+function lurek.window.getDesktopDimensions() end
 
 --- Returns the window dimensions as width, height.
 ---@return integer
-function luna.window.getDimensions() end
+function lurek.window.getDimensions() end
 
 --- Returns the number of connected displays.
 ---@return integer
-function luna.window.getDisplayCount() end
+function lurek.window.getDisplayCount() end
 
 --- Returns the name of the current display.
 ---@param display? any (optional)
 ---@return string
-function luna.window.getDisplayName(display) end
+function lurek.window.getDisplayName(display) end
 
 --- Returns the current display orientation.
 ---@return string
-function luna.window.getDisplayOrientation() end
+function lurek.window.getDisplayOrientation() end
 
 --- Returns the fullscreen state and type string.
 ---@return boolean
-function luna.window.getFullscreen() end
+function lurek.window.getFullscreen() end
 
 --- Returns all available fullscreen video modes.
 ---@return table
-function luna.window.getFullscreenModes() end
+function lurek.window.getFullscreenModes() end
 
 --- Returns the logical game height in virtual pixels.
 ---@return number
-function luna.window.getGameHeight() end
+function lurek.window.getGameHeight() end
 
 --- Returns the logical game width in virtual pixels.
 ---@return number
-function luna.window.getGameWidth() end
+function lurek.window.getGameWidth() end
 
 --- Returns the window height in pixels.
 ---@return integer
-function luna.window.getHeight() end
+function lurek.window.getHeight() end
 
 --- Returns the window dimensions and mode flags as width, height, flags.
 ---@return integer
-function luna.window.getMode() end
+function lurek.window.getMode() end
 
 --- Returns the native DPI scale factor.
 ---@return number
-function luna.window.getNativeDPIScale() end
+function lurek.window.getNativeDPIScale() end
 
 --- Returns the window dimensions in physical pixels.
 ---@return integer
-function luna.window.getPixelDimensions() end
+function lurek.window.getPixelDimensions() end
 
 --- Returns the window position as x, y in screen coordinates.
 ---@return integer
-function luna.window.getPosition() end
+function lurek.window.getPosition() end
 
 --- Returns the safe display area as x, y, w, h.
 ---@return number
-function luna.window.getSafeArea() end
+function lurek.window.getSafeArea() end
 
 --- Returns viewport scale and offset information as a table.
 ---@return table
-function luna.window.getScaleInfo() end
+function lurek.window.getScaleInfo() end
 
 --- Returns the current viewport scale mode string.
 ---@return string
-function luna.window.getScaleMode() end
+function lurek.window.getScaleMode() end
 
 --- Returns the OS color theme preference.
 ---@return string
-function luna.window.getSystemTheme() end
+function lurek.window.getSystemTheme() end
 
 --- Returns the current window title.
 ---@return string
-function luna.window.getTitle() end
+function lurek.window.getTitle() end
 
 --- Returns the current VSync mode integer.
 ---@return integer
-function luna.window.getVSync() end
+function lurek.window.getVSync() end
 
 --- Returns the window width in pixels.
 ---@return integer
-function luna.window.getWidth() end
+function lurek.window.getWidth() end
 
 --- Returns whether the window has keyboard focus.
 ---@return boolean
-function luna.window.hasFocus() end
+function lurek.window.hasFocus() end
 
 --- Returns whether the mouse cursor is inside the window.
 ---@return boolean
-function luna.window.hasMouseFocus() end
+function lurek.window.hasMouseFocus() end
 
 --- Returns whether the window is in fullscreen mode.
 ---@return boolean
-function luna.window.isFullscreen() end
+function lurek.window.isFullscreen() end
 
 --- Returns whether high-DPI rendering is allowed.
 ---@return boolean
-function luna.window.isHighDPIAllowed() end
+function lurek.window.isHighDPIAllowed() end
 
 --- Returns whether the window is maximized.
 ---@return boolean
-function luna.window.isMaximized() end
+function lurek.window.isMaximized() end
 
 --- Returns whether the window is minimized.
 ---@return boolean
-function luna.window.isMinimized() end
+function lurek.window.isMinimized() end
 
 --- Returns whether the window is open.
 ---@return boolean
-function luna.window.isOpen() end
+function lurek.window.isOpen() end
 
 --- Returns whether the window can be resized by the user.
 ---@return boolean
-function luna.window.isResizable() end
+function lurek.window.isResizable() end
 
 --- Returns whether the window is visible.
 ---@return boolean
-function luna.window.isVisible() end
+function lurek.window.isVisible() end
 
 --- Maximizes the window to fill the desktop.
 ---@return nil
-function luna.window.maximize() end
+function lurek.window.maximize() end
 
 --- Minimizes the window to the taskbar.
 ---@return nil
-function luna.window.minimize() end
+function lurek.window.minimize() end
 
 --- Flashes the window in the taskbar to request user attention.
 ---@return nil
-function luna.window.requestAttention() end
+function lurek.window.requestAttention() end
 
 --- Restores the window from minimized or maximized state.
 ---@return nil
-function luna.window.restore() end
+function lurek.window.restore() end
 
 --- Enables or disables fullscreen mode.
 ---@param enabled any
 ---@param fstype? any (optional)
 ---@return nil
-function luna.window.setFullscreen(enabled, fstype) end
+function lurek.window.setFullscreen(enabled, fstype) end
 
 --- Sets the window icon from a file path.
 ---@param path any
 ---@return nil
-function luna.window.setIcon(path) end
+function lurek.window.setIcon(path) end
 
 --- Resizes the window and optionally changes fullscreen and vsync.
 ---@param w any
 ---@param h any
 ---@param flags? any (optional)
 ---@return nil
-function luna.window.setMode(w, h, flags) end
+function lurek.window.setMode(w, h, flags) end
 
 --- Moves the window to the given screen position.
 ---@param x any
 ---@param y any
 ---@return nil
-function luna.window.setPosition(x, y) end
+function lurek.window.setPosition(x, y) end
 
 --- Sets the viewport scale mode.
 ---@param mode any
 ---@return nil
-function luna.window.setScaleMode(mode) end
+function lurek.window.setScaleMode(mode) end
 
 --- Sets the window title bar text.
 ---@param title any
 ---@return nil
-function luna.window.setTitle(title) end
+function lurek.window.setTitle(title) end
 
 --- Sets the VSync mode (1=on, 0=off, -1=adaptive).
 ---@param mode any
 ---@return nil
-function luna.window.setVSync(mode) end
+function lurek.window.setVSync(mode) end
 
 --- Shows a platform-native message box dialog.
 ---@param title string
@@ -12303,9 +12303,9 @@ function luna.window.setVSync(mode) end
 ---@param boxType? string? (optional)
 ---@param btnType? string? (optional)
 ---@return string
-function luna.window.showMessageBox(title, message, boxType, btnType) end
+function lurek.window.showMessageBox(title, message, boxType, btnType) end
 
 --- Converts a device-independent coordinate to physical pixels.
 ---@param value any
 ---@return number
-function luna.window.toPixels(value) end
+function lurek.window.toPixels(value) end

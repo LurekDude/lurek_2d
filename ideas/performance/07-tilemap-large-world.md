@@ -2,7 +2,7 @@
 
 ## Current Architecture
 
-Luna2D has two tilemap systems:
+Lurek2D has two tilemap systems:
 
 ### 1. TileLayer / TileMap (src/tilemap/tilemap.rs)
 - Standard 2D grid of tile IDs
@@ -240,7 +240,7 @@ impl SpatialGrid {
 }
 ```
 
-**Integration with Luna2D**:
+**Integration with Lurek2D**:
 - Entities register their world position in the spatial grid
 - Each frame, query grid with camera viewport
 - Only visible entities generate draw commands

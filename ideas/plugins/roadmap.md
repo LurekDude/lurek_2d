@@ -5,11 +5,11 @@
 | Phase | Name | Effort | Risk | Deliverable |
 |-------|------|--------|------|-------------|
 | 0 | Preparation | 1 week | LOW | Interface crate, build system changes |
-| 1 | Cargo Workspace Split | 2–3 weeks | MEDIUM | `luna2d-core`, `luna2d-bin` crates; all tests pass |
+| 1 | Cargo Workspace Split | 2–3 weeks | MEDIUM | `lurek2d-core`, `lurek2d-bin` crates; all tests pass |
 | 2 | Plugin Loading | 1–2 weeks | MEDIUM | `libloading` integration; first `luna_gamedev.dll` |
 | 3 | Plugin Ecosystem | 2 weeks | LOW | `luna_business.dll`, template, docs, examples |
 | 4 | Host Vtable (Optional) | 3–4 weeks | HIGH | C-ABI host interface for GPU/audio access from plugins |
-| 5 | Embeddable Library | 2 weeks | MEDIUM | `luna2d-core` usable from Python/C# frontends |
+| 5 | Embeddable Library | 2 weeks | MEDIUM | `lurek2d-core` usable from Python/C# frontends |
 | 6 | Cross-Platform | 2–3 weeks | MEDIUM | macOS/Linux plugin loading; CI for all platforms |
 
 **Total estimated scope**: 12–16 weeks if done sequentially. Phases 3–6 can partially
@@ -26,9 +26,9 @@ module code. Zero risk of breaking anything.
 ### Tasks
 
 - [ ] **P0.1** Create `crates/` directory structure
-- [ ] **P0.2** Create `luna2d-plugin-api` crate:
+- [ ] **P0.2** Create `lurek2d-plugin-api` crate:
   ```rust
-  // crates/luna2d-plugin-api/src/lib.rs
+  // crates/lurek2d-plugin-api/src/lib.rs
   pub const API_VERSION: u32 = 1;
 
   /// Metadata embedded in every plugin DLL
@@ -72,10 +72,10 @@ boundaries before adding dynamic loading.
   ```toml
   [workspace]
   members = [
-      "crates/luna2d-core",
-      "crates/luna2d-plugin-api",
-      "crates/luna2d-gamedev",
-      "crates/luna2d-bin",
+      "crates/lurek2d-core",
+      "crates/lurek2d-plugin-api",
+      "crates/lurek2d-gamedev",
+      "crates/lurek2d-bin",
   ]
   resolver = "2"
 
@@ -85,32 +85,32 @@ boundaries before adding dynamic loading.
   # ... shared deps
   ```
 
-- [ ] **P1.2** Create `crates/luna2d-core/`:
+- [ ] **P1.2** Create `crates/lurek2d-core/`:
   - Move Baseline + Tier 1 modules: `engine/`, `math/`, `graphics/`, `audio/`,
     `physics/`, `input/`, `timer/`, `window/`, `camera/`, `filesystem/`, `event/`,
     `image/`, `data/`, `serial/`, `entity/`, `savegame/`, `light/`, `animation/`,
     `thread/`, `log/`, `localization/`, `system/`, `modding/`, `compute/`, `network/`,
     `sound/`, `devtools/`, `debugbridge/`, `automation/`, `docs/`
   - Move their corresponding `lua_api/*_api.rs` files
-  - Keep `create_lua_vm()` in `luna2d-core` but make it accept a plugin registrar
+  - Keep `create_lua_vm()` in `lurek2d-core` but make it accept a plugin registrar
   - Export `pub fn create_lua_vm()` and `pub struct SharedState`
 
-- [ ] **P1.3** Create `crates/luna2d-gamedev/` as a **lib crate** (not cdylib yet):
+- [ ] **P1.3** Create `crates/lurek2d-gamedev/` as a **lib crate** (not cdylib yet):
   - Move Tier 2 game modules: `particle/`, `tilemap/`, `scene/`, `gui/`, `fx/`,
     `minimap/`, `pathfinding/`, `ai/`, `graph/`, `pipeline/`, `patterns/`,
     `terminal/`, `raycaster/`, `spine/`, `procgen/`
   - Move their `lua_api/*_api.rs` files
-  - For now, this crate depends on `luna2d-core` and is linked statically
+  - For now, this crate depends on `lurek2d-core` and is linked statically
   - Export: `pub fn register_all(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`
 
-- [ ] **P1.4** Create `crates/luna2d-bin/`:
-  - Move `src/main.rs` → `crates/luna2d-bin/src/main.rs`
-  - Move `src/bin/` → `crates/luna2d-bin/src/bin/`
-  - Depends on `luna2d-core` and `luna2d-gamedev` (static link)
+- [ ] **P1.4** Create `crates/lurek2d-bin/`:
+  - Move `src/main.rs` → `crates/lurek2d-bin/src/main.rs`
+  - Move `src/bin/` → `crates/lurek2d-bin/src/bin/`
+  - Depends on `lurek2d-core` and `lurek2d-gamedev` (static link)
   - `main()` calls `luna2d_core::create_lua_vm()` then `luna2d_gamedev::register_all()`
 
 - [ ] **P1.5** Fix all `use crate::` paths in moved files
-  - Core modules: `use crate::` → still `use crate::` (within luna2d-core)
+  - Core modules: `use crate::` → still `use crate::` (within lurek2d-core)
   - Gamedev modules: `use crate::engine::SharedState` → `use luna2d_core::SharedState`
   - This is the bulk of the work — ~200 files need import updates
 
@@ -142,15 +142,15 @@ boundaries before adding dynamic loading.
 ## Phase 2 — Plugin Loading
 
 ### Goal
-Add `libloading`-based plugin discovery and loading. Convert `luna2d-gamedev` from a
+Add `libloading`-based plugin discovery and loading. Convert `lurek2d-gamedev` from a
 static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the same
-`luna.*` APIs.
+`lurek.*` APIs.
 
 ### Tasks
 
-- [ ] **P2.1** Implement `PluginLoader` in `luna2d-core`:
+- [ ] **P2.1** Implement `PluginLoader` in `lurek2d-core`:
   ```rust
-  // crates/luna2d-core/src/engine/plugin_loader.rs
+  // crates/lurek2d-core/src/engine/plugin_loader.rs
   pub struct PluginLoader {
       loaded: Vec<libloading::Library>,  // keep DLLs alive
   }
@@ -163,23 +163,23 @@ static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the s
   }
   ```
 
-- [ ] **P2.2** Convert `luna2d-gamedev` to dual output:
+- [ ] **P2.2** Convert `lurek2d-gamedev` to dual output:
   ```toml
   [lib]
   crate-type = ["rlib", "cdylib"]  # rlib for static linking, cdylib for plugin
   ```
 
-- [ ] **P2.3** Add `luaopen_luna_gamedev` entry point to `luna2d-gamedev/src/lib.rs`
+- [ ] **P2.3** Add `luaopen_luna_gamedev` entry point to `lurek2d-gamedev/src/lib.rs`
   - Use `std::panic::catch_unwind` at the boundary
-  - Register all Tier 2 modules into `luna.*` via raw `lua_State*`
+  - Register all Tier 2 modules into `lurek.*` via raw `lua_State*`
 
-- [ ] **P2.4** Refactor `luna2d-gamedev` modules to NOT require `SharedState`:
+- [ ] **P2.4** Refactor `lurek2d-gamedev` modules to NOT require `SharedState`:
   - Each module manages its own internal state
-  - Rendering goes through `luna.gfx.*` Lua calls (not direct DrawCommand enqueue)
-  - State queries use `luna.time.getDelta()`, `luna.window.getWidth()`, etc.
+  - Rendering goes through `lurek.gfx.*` Lua calls (not direct DrawCommand enqueue)
+  - State queries use `lurek.time.getDelta()`, `lurek.window.getWidth()`, etc.
   - **THIS IS THE HARDEST TASK** — see "SharedState Decoupling" below
 
-- [ ] **P2.5** Update boot sequence in `luna2d-bin/src/main.rs`:
+- [ ] **P2.5** Update boot sequence in `lurek2d-bin/src/main.rs`:
   ```rust
   let lua = luna2d_core::create_lua_vm(state.clone(), &config.modules)?;
 
@@ -198,11 +198,11 @@ static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the s
   - Test: discover finds `luna_gamedev.dll` in `plugins/`
   - Test: version mismatch is rejected
   - Test: missing `luaopen_*` symbol is handled gracefully
-  - Test: loaded plugin's `luna.tilemap` functions are callable
+  - Test: loaded plugin's `lurek.tilemap` functions are callable
 
 - [ ] **P2.7** Build pipeline:
-  - `cargo build -p luna2d-bin` → `luna2d.exe`
-  - `cargo build -p luna2d-gamedev` → `luna_gamedev.dll`
+  - `cargo build -p lurek2d-bin` → `lurek2d.exe`
+  - `cargo build -p lurek2d-gamedev` → `luna_gamedev.dll`
   - Copy DLL to `plugins/` folder
   - `dist.ps1` updated to include `plugins/` in distribution
 
@@ -214,10 +214,10 @@ static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the s
 The current Tier 2 modules receive `Rc<RefCell<SharedState>>` and use it for:
 
 1. **Reading frame state** (delta_time, window_size, mouse_pos) — replace with Lua calls
-2. **Enqueuing DrawCommands** — replace with Lua calls to `luna.gfx.drawQuad()` etc.
+2. **Enqueuing DrawCommands** — replace with Lua calls to `lurek.gfx.drawQuad()` etc.
 3. **Accessing resource pools** (texture keys, font keys) — keep resource IDs as Lua
    integers/strings, let core resolve them
-4. **Modifying shared state** (adding entities, events) — use `luna.entity.*`, `luna.signal.*`
+4. **Modifying shared state** (adding entities, events) — use `lurek.entity.*`, `lurek.signal.*`
 
 Modules that heavily depend on SharedState:
 - `particle/` — reads delta_time, enqueues draw commands → must use Lua bridge
@@ -230,7 +230,7 @@ Modules that heavily depend on SharedState:
 
 ### Acceptance Gate
 - `luna_gamedev.dll` loads successfully at runtime
-- All Tier 2 `luna.*` functions are available in Lua after plugin load
+- All Tier 2 `lurek.*` functions are available in Lua after plugin load
 - All existing demos work identically
 - Plugin loader handles errors gracefully (missing DLL, version mismatch, bad symbol)
 - No `unsafe` without `// SAFETY:` comments
@@ -244,14 +244,14 @@ Create the business plugin, a plugin template for third parties, and comprehensi
 
 ### Tasks
 
-- [ ] **P3.1** Create `luna2d-business` crate:
+- [ ] **P3.1** Create `lurek2d-business` crate:
   - `dataframe` (enhanced tabular processing)
   - `pipeline` (workflow automation)
   - `graph` (network analysis)
   - New: `reporting` module (generate documents)
   - New: `analytics` module (event tracking)
 
-- [ ] **P3.2** Create `crates/luna2d-plugin-template/`:
+- [ ] **P3.2** Create `crates/lurek2d-plugin-template/`:
   - Minimal boilerplate for third-party plugin authors
   - `Cargo.toml`, `src/lib.rs` with `luaopen_*` scaffold
   - README with instructions
@@ -259,12 +259,12 @@ Create the business plugin, a plugin template for third parties, and comprehensi
 - [ ] **P3.3** Create `tools/new_plugin.ps1` — scaffolding script:
   ```powershell
   # Usage: .\tools\new_plugin.ps1 -Name "my_extension"
-  # Creates: crates/luna2d-my-extension/ with boilerplate
+  # Creates: crates/lurek2d-my-extension/ with boilerplate
   ```
 
 - [ ] **P3.4** Write `docs/architecture/plugin-guide.md`:
   - How to create a plugin
-  - How to register `luna.*` functions
+  - How to register `lurek.*` functions
   - How to access host APIs via Lua
   - How to test plugins
   - How to distribute plugins
@@ -275,7 +275,7 @@ Create the business plugin, a plugin template for third parties, and comprehensi
 - [ ] **P3.8** Update `dist.ps1` and `dist.sh` — include `plugins/` in archives
 
 ### Acceptance Gate
-- `luna_business.dll` loads and provides `luna.dataframe`, `luna.pipeline`
+- `luna_business.dll` loads and provides `lurek.dataframe`, `lurek.pipeline`
 - Template creates a working plugin from scratch
 - Documentation reviewed and complete
 - Example demo runs with plugin loaded
@@ -297,8 +297,8 @@ commands), provide a C-ABI vtable of host capabilities.
   - `get_delta_time`, `get_frame_count` for state queries
   - Max ~50 function pointers — keep surface small
 
-- [ ] **P4.2** Update `luna2d-plugin-api` with vtable type
-- [ ] **P4.3** Implement vtable population in `luna2d-core`
+- [ ] **P4.2** Update `lurek2d-plugin-api` with vtable type
+- [ ] **P4.3** Implement vtable population in `lurek2d-core`
 - [ ] **P4.4** Update `PluginLoader` to pass vtable pointer alongside `lua_State*`
 - [ ] **P4.5** Create example: 3D raycasting plugin using vtable for custom draw commands
 - [ ] **P4.6** Add `abi_stable` or `stabby` for safe complex-type passing (if needed)
@@ -314,11 +314,11 @@ commands), provide a C-ABI vtable of host capabilities.
 ## Phase 5 — Embeddable Library Mode
 
 ### Goal
-Allow `luna2d-core` to be used as a library by external frontends (Python, C#, Electron).
+Allow `lurek2d-core` to be used as a library by external frontends (Python, C#, Electron).
 
 ### Tasks
 
-- [ ] **P5.1** Create C header (`luna2d.h`) via `cbindgen`
+- [ ] **P5.1** Create C header (`lurek2d.h`) via `cbindgen`
 - [ ] **P5.2** Expose core init/step/render functions as `extern "C"`:
   ```rust
   #[no_mangle]
@@ -330,13 +330,13 @@ Allow `luna2d-core` to be used as a library by external frontends (Python, C#, E
   #[no_mangle]
   pub extern "C" fn luna2d_shutdown(ctx: *mut LunaContext);
   ```
-- [ ] **P5.3** Build `luna2d-core` as both `rlib` and `cdylib`
+- [ ] **P5.3** Build `lurek2d-core` as both `rlib` and `cdylib`
 - [ ] **P5.4** Create Python bindings via `PyO3` or ctypes wrapper
-- [ ] **P5.5** Create example: Python script that embeds Luna2D for data visualization
-- [ ] **P5.6** Create example: C# (Unity/Godot) embedding Luna2D as a scripting layer
+- [ ] **P5.5** Create example: Python script that embeds Lurek2D for data visualization
+- [ ] **P5.6** Create example: C# (Engine G/Engine C) embedding Lurek2D as a scripting layer
 
 ### Acceptance Gate
-- Python can `import luna2d`, call `luna2d.init()`, execute Lua script, get results
+- Python can `import lurek2d`, call `lurek2d.init()`, execute Lua script, get results
 - C header is correct and compiles in a C project
 
 ---
@@ -365,13 +365,13 @@ Ensure plugin loading works on all desktop platforms. See [cross-platform.md](cr
 
 ### Phase 7 — Plugin Hot-Reload
 Unload and reload a plugin DLL without restarting the host. Requires:
-- Tracking which `luna.*` functions a plugin registered
+- Tracking which `lurek.*` functions a plugin registered
 - Unregistering them before unload
 - Reloading the new DLL and re-registering
 - High complexity, deferred until demand exists
 
 ### Phase 8 — Plugin Marketplace
-A registry (like crates.io) for Luna2D plugins:
+A registry (like crates.io) for Lurek2D plugins:
 - `luna plugin install tilemap-advanced`
 - Downloads pre-built DLLs to `plugins/`
 - Version pinning in `conf.toml`

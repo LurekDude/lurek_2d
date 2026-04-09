@@ -1,12 +1,12 @@
 //! Contiguous byte buffer accessible from Lua.
 //!
-//! This module is part of Luna2D's `data` subsystem and provides the implementation
+//! This module is part of Lurek2D's `data` subsystem and provides the implementation
 //! details for byte data-related operations and data management.
 //! Key types exported from this module: `ByteData`.
 //! Primary functions: `new()`, `from_bytes()`, `from_string()`, `len()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use mlua::prelude::*;
 

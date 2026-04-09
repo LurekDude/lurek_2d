@@ -1,9 +1,9 @@
-﻿-- Luna2D Stress Test: Particle System Burst Emission
+﻿-- Lurek2D Stress Test: Particle System Burst Emission
 -- Tests large particle counts and extended lifecycle simulation
 
 describe("particle stress: burst emission", function()
     it("emits 5000 particles", function()
-        local sys = luna.particles.newSystem({
+        local sys = lurek.particles.newSystem({
             maxParticles = 5000,
             emissionRate = 5000,
             lifetime = {2, 4},
@@ -19,7 +19,7 @@ describe("particle stress: burst emission", function()
     end)
 
     it("simulates 120 frames of particle lifecycle", function()
-        local sys = luna.particles.newSystem({
+        local sys = lurek.particles.newSystem({
             maxParticles = 2000,
             emissionRate = 100,
             lifetime = {0.5, 1.5},
@@ -36,11 +36,11 @@ describe("particle stress: burst emission", function()
         end
 
         -- System should still be active
-        expect_true(luna.particles.isActive(sys), "system still active")
+        expect_true(lurek.particles.isActive(sys), "system still active")
     end)
 
     it("stop and reset clears all particles", function()
-        local sys = luna.particles.newSystem({
+        local sys = lurek.particles.newSystem({
             maxParticles = 1000,
             emissionRate = 500,
             lifetime = {1, 2},

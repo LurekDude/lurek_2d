@@ -10,7 +10,7 @@
 //!
 //! A `Theme` maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records
 //! containing colours, font size, border width, and corner radius.  Input
-//! events are forwarded manually from `luna.mousepressed` / `luna.keypressed`
+//! events are forwarded manually from `lurek.mousepressed` / `lurek.keypressed`
 //! etc., giving scripts full control over which GUI instance is active.
 //!
 //! ## Sub-modules

@@ -15,7 +15,7 @@ A top-down survival game on a procedurally generated 25 × 18 tile world. Mine t
 ## How to Run
 
 ```powershell
-cargo run -- demos/survival_crafting
+cargo run -- content/demos/survival_crafting
 ```
 
 ## Controls

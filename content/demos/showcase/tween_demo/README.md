@@ -1,10 +1,10 @@
 # Tween Demo
 
-Demonstrates `luna.math.newTween()` with multiple easing curves. Rectangles animate across the screen each with a different interpolation style.
+Demonstrates `lurek.math.newTween()` with multiple easing curves. Rectangles animate across the screen each with a different interpolation style.
 
 ## What It Demonstrates
 
-- `luna.math.newTween()` — create a tween instance
+- `lurek.math.newTween()` — create a tween instance
 - Tween easing types: `linear`, `ease_in`, `ease_out`, `ease_in_out`, `bounce`, `elastic`, `back`
 - `tween:update(dt)` — advancing a tween each frame
 - `tween:isFinished()` — detecting tween completion
@@ -14,7 +14,7 @@ Demonstrates `luna.math.newTween()` with multiple easing curves. Rectangles anim
 ## How to Run
 
 ```powershell
-cargo run -- demos/tween_demo
+cargo run -- content/demos/tween_demo
 ```
 
 ## Controls

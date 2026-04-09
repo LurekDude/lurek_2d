@@ -1,9 +1,9 @@
 ---
 name: game-ai
-description: "Load this skill when designing or implementing AI behaviour for game actors in Luna2D using the luna.ai.* API: finite state machines, behaviour trees, GOAP planners, steering behaviours, utility AI, Q-learning, squad formations, command queues, influence maps, or the shared Blackboard. Use for: enemy patrol/chase/flee, NPC decision-making, group tactics, pathfinding integration, AI testing. Skip it for general Rust AI module internals (see src/ai/AGENT.md) or pathfinding algorithms (see src/pathfinding/AGENT.md)."
+description: "Load this skill when designing or implementing AI behaviour for game actors in Lurek2D using the lurek.ai.* API: finite state machines, behaviour trees, GOAP planners, steering behaviours, utility AI, Q-learning, squad formations, command queues, influence maps, or the shared Blackboard. Use for: enemy patrol/chase/flee, NPC decision-making, group tactics, pathfinding integration, AI testing. Skip it for general Rust AI module internals (see src/ai/AGENT.md) or pathfinding algorithms (see src/pathfinding/AGENT.md)."
 ---
 
-# Game AI Design — Luna2D
+# Game AI Design — Lurek2D
 
 ## Load When
 
@@ -18,7 +18,7 @@ description: "Load this skill when designing or implementing AI behaviour for ga
 ## Owns
 
 - Decision model selection guide (when to use FSM vs BTree vs GOAP vs utility AI)
-- `luna.ai.*` Lua API patterns for each model
+- `lurek.ai.*` Lua API patterns for each model
 - Blackboard usage as shared AI memory
 - Steering behaviour combinations
 - Q-learning setup for simple reinforcement learning
@@ -48,9 +48,9 @@ Choose the simplest model that satisfies the design requirement.
 All AI agents live inside an `AIWorld` registry. Create one world per scene.
 
 ```lua
-function luna.init()
-    world = luna.ai.newWorld()
-    grid  = luna.pathfinding.newGrid(40, 30, 16)   -- integration with pathfinding
+function lurek.init()
+    world = lurek.ai.newWorld()
+    grid  = lurek.pathfinding.newGrid(40, 30, 16)   -- integration with pathfinding
 end
 ```
 
@@ -77,7 +77,7 @@ fsm:addTransition("alert",  "patrol", 1, function() return lostSight(5) end)
 fsm:setState("patrol")
 
 -- Per-frame update
-function luna.process(dt)
+function lurek.process(dt)
     world:update(dt)   -- updates all agents
 end
 ```
@@ -159,7 +159,7 @@ bb:set("lastSeenX", nil)
 local px = bb:get("playerX")   -- reads from global blackboard
 
 -- Update global facts each frame
-function luna.process(dt)
+function lurek.process(dt)
     world:blackboard():set("playerX", player.x)
     world:blackboard():set("playerY", player.y)
     world:update(dt)
@@ -190,7 +190,7 @@ sm:setCombineMode("weighted")   -- sum all weighted forces (default)
 sm:setCombineMode("priority")   -- use first non-zero force (for override behaviour)
 
 -- Apply per-frame
-function luna.process(dt)
+function lurek.process(dt)
     world:update(dt)
     -- agent position updated automatically by SteeringManager
 end
@@ -281,7 +281,7 @@ squad:moveTo(targetX, targetY)   -- all members offset from leader
 ## Influence Map — Strategic Spatial Reasoning
 
 ```lua
-local imap = luna.pathfinding.newInfluenceMap(40, 30, 16)
+local imap = lurek.pathfinding.newInfluenceMap(40, 30, 16)
 
 -- Add named layers
 imap:addLayer("player_threat")
@@ -309,9 +309,9 @@ AI runs headlessly (no GPU, audio, or window needed):
 
 ```lua
 -- tests/lua/unit/test_ai.lua
-describe("luna.ai FSM", function()
+describe("lurek.ai FSM", function()
     it("transitions from patrol to alert when condition fires", function()
-        local w   = luna.ai.newWorld()
+        local w   = lurek.ai.newWorld()
         local a   = w:newAgent("guard", 0, 0)
         local fsm = a:useFsm()
         fsm:addState("patrol", nil, nil, nil)

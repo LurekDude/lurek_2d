@@ -1,6 +1,6 @@
 //! Integration tests for the sound data module.
 
-use luna2d::audio::SoundData;
+use lurek2d::audio::SoundData;
 
 #[test]
 fn sound_data_new_silent() {
@@ -48,7 +48,7 @@ fn sound_data_out_of_bounds() {
 
 // ── Phase 32 — MIDI SoundFont state ────────────────────────────────────
 
-use luna2d::audio::MidiState;
+use lurek2d::audio::MidiState;
 
 #[test]
 fn midi_state_default_empty() {
@@ -85,8 +85,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(

@@ -1,5 +1,5 @@
 ---
-description: "Add a new audio feature to the Luna2D engine. Use when implementing new audio API functions, new format support, or mixer improvements. Produces working Rust audio code with Lua bindings."
+description: "Add a new audio feature to the Lurek2D engine. Use when implementing new audio API functions, new format support, or mixer improvements. Produces working Rust audio code with Lua bindings."
 ---
 
 # Create Audio Feature
@@ -12,14 +12,14 @@ description: "Add a new audio feature to the Luna2D engine. Use when implementin
 ## Inputs
 
 - `FEATURE` — describe the audio capability (e.g., "loop a source", "fade volume over time", "query whether playing")
-- `API_NAME` — proposed `luna.audio.*` function name (e.g., `luna.audio.setLooping`)
+- `API_NAME` — proposed `lurek.audio.*` function name (e.g., `lurek.audio.setLooping`)
 - `RODIO_APPROACH` — any known rodio 0.17 API to use (optional; agent will research if blank)
 
 ## Steps
 
 1. Load skill `audio-integration/SKILL.md`
 2. Load skill `lua-api-design/SKILL.md`
-3. Design the `luna.audio.*` function signature following existing patterns:
+3. Design the `lurek.audio.*` function signature following existing patterns:
    - First arg: `source_id: usize` returned by `newSource()`
    - Subsequent args: feature-specific parameters
 4. Implement in `src/audio/mixer.rs`:
@@ -29,7 +29,7 @@ description: "Add a new audio feature to the Luna2D engine. Use when implementin
    - Follow the `state.clone()` → `move` closure pattern
    - Return `LuaResult<()>` or appropriate type
 6. Write integration test in `tests/rust/unit/audio_tests.rs`
-7. Update `docs/API/lua_api_reference_generated.md` under `## luna.audio`
+7. Update `docs/API/lua_api_reference_generated.md` under `## lurek.audio`
 8. Run `cargo build`, `cargo clippy`, `cargo test`
 
 ## Outputs
@@ -42,7 +42,7 @@ description: "Add a new audio feature to the Luna2D engine. Use when implementin
 
 ## Acceptance
 
-- [ ] `luna.audio.<function>` callable from Lua without panic
+- [ ] `lurek.audio.<function>` callable from Lua without panic
 - [ ] Graceful no-op when audio hardware is unavailable
 - [ ] Test in `tests/rust/unit/audio_tests.rs` covers the new function
 - [ ] `docs/API/lua_api_reference_generated.md` updated

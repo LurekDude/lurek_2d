@@ -1,17 +1,16 @@
 -- examples/dataframe.lua
 -- Columnar data tables with SQL-style operations
--- API: luna.dataframe
--- This file is documentation code, not a runnable game.
+-- API: lurek.dataframe
 
 --------------------------------------------------------------------------------
 -- Constructors
 --------------------------------------------------------------------------------
 
 -- Empty dataframe
-local df = luna.dataframe.newDataFrame()
+local df = lurek.dataframe.newDataFrame()
 
 -- From an array of row tables
-local df2 = luna.dataframe.fromTable({
+local df2 = lurek.dataframe.fromTable({
     { name = "Alice", age = 30, score = 95.5 },
     { name = "Bob",   age = 25, score = 78.0 },
     { name = "Carol", age = 35, score = 88.5 },
@@ -20,26 +19,26 @@ local df2 = luna.dataframe.fromTable({
 
 -- From CSV text
 local csv = "name,age,score\nAlice,30,95.5\nBob,25,78.0\n"
-local df3 = luna.dataframe.fromCSV(csv)
+local df3 = lurek.dataframe.fromCSV(csv)
 
 -- From JSON text
 local json = '[{"name":"Alice","age":30},{"name":"Bob","age":25}]'
-local df4 = luna.dataframe.fromJSON(json)
+local df4 = lurek.dataframe.fromJSON(json)
 
 -- From binary (toBinary round-trip)
 local bin = df2:toBinary()
-local df5 = luna.dataframe.fromBinary(bin)
+local df5 = lurek.dataframe.fromBinary(bin)
 
 -- Random data from column definitions
 -- Each def: {name, hint} where hint is "string"|"integer"|"float"|"bool"
-local dfRand = luna.dataframe.random(
+local dfRand = lurek.dataframe.random(
     { { "id", "integer" }, { "label", "string" }, { "value", "float" } },
     50,     -- row count
     42      -- optional seed
 )
 
 -- Empty database
-local db = luna.dataframe.newDatabase()
+local db = lurek.dataframe.newDatabase()
 
 --------------------------------------------------------------------------------
 -- DataFrame — dimensions and schema
@@ -133,7 +132,7 @@ local counts = df2:countBy("name")  -- returns DataFrame {value, count}
 -- Joining and merging
 --------------------------------------------------------------------------------
 
-local extra = luna.dataframe.fromTable({
+local extra = lurek.dataframe.fromTable({
     { name = "Alice", rank = "A" },
     { name = "Bob",   rank = "B" },
 })
@@ -142,7 +141,7 @@ local extra = luna.dataframe.fromTable({
 local joined = df2:join(extra, "name", "name", "inner")
 
 -- Merge: append rows from another DataFrame in-place
-local moreRows = luna.dataframe.fromTable({
+local moreRows = lurek.dataframe.fromTable({
     { name = "Frank", age = 40, points = 70.0 },
 })
 df2:merge(moreRows)
@@ -201,8 +200,8 @@ local result = db:query("SELECT name, points FROM players WHERE points > 80")
 print(result:toCSV())
 
 -- Merge another database in
-local db2 = luna.dataframe.newDatabase()
-db2:addTable("extra_data", luna.dataframe.newDataFrame())
+local db2 = lurek.dataframe.newDatabase()
+db2:addTable("extra_data", lurek.dataframe.newDataFrame())
 db:merge(db2)
 
 -- Export the whole database to JSON

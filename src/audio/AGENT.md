@@ -4,7 +4,7 @@
 |----------------|--------------------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                                          |
 | **Status**     | Implemented — Full                                                       |
-| **Lua API**    | `luna.audio`                                                             |
+| **Lua API**    | `lurek.audio`                                                             |
 | **Source**     | `src/audio/`                                                             |
 | **Rust Tests** | `tests/rust/unit/audio_tests.rs`, `tests/rust/unit/audio_sound_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_audio.lua`, `tests/lua/unit/test_audio_dsp.lua`, `tests/lua/unit/test_audio_bus.lua` |
@@ -32,6 +32,6 @@ The audio module wraps the `rodio` cross-platform audio library into a game-orie
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/audio.md`](../../specs/audio.md)
+→ [`docs/specs/audio.md`](../../docs/specs/audio.md)
 
-_Update both this file **and** `specs/audio.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/audio.md` whenever source files, public types, or Lua bindings change._

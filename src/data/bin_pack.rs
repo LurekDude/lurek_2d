@@ -1,6 +1,6 @@
-//! Luna2D Binary Pack Format — format-string based binary serialization.
+//! Lurek2D Binary Pack Format — format-string based binary serialization.
 //!
-//! Provides `write`, `read`, and `measure_size` for the `luna.data` module.
+//! Provides `write`, `read`, and `measure_size` for the `lurek.data` module.
 //! Format strings use space-separated named type tokens.
 //!
 //! # Format string tokens
@@ -26,7 +26,7 @@
 
 use crate::data::byte_data::ByteData;
 
-/// A Luna2D serializable binary value.
+/// A Lurek2D serializable binary value.
 ///
 /// # Variants
 /// - `U8` — Unsigned 8-bit integer.
@@ -72,7 +72,7 @@ pub enum BinValue {
     Bytes(Vec<u8>),
 }
 
-/// Format token parsed from a Luna2D binary format string.
+/// Format token parsed from a Lurek2D binary format string.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Token {
     U8,
@@ -98,7 +98,7 @@ enum Endian {
     Big,
 }
 
-/// Parse a Luna2D binary format string into an endianness and a token list.
+/// Parse a Lurek2D binary format string into an endianness and a token list.
 ///
 /// # Parameters
 /// - `fmt` — `&str`. Space-separated format token string.
@@ -126,13 +126,13 @@ fn parse_format(fmt: &str) -> Result<(Endian, Vec<Token>), String> {
             "str" => tokens.push(Token::Str),
             "cstr" => tokens.push(Token::CStr),
             "pad" => tokens.push(Token::Pad),
-            other => return Err(format!("luna.data: unknown format token '{other}'")),
+            other => return Err(format!("lurek.data: unknown format token '{other}'")),
         }
     }
     Ok((endian, tokens))
 }
 
-/// Write values into a binary buffer according to a Luna2D format string.
+/// Write values into a binary buffer according to a Lurek2D format string.
 ///
 /// # Parameters
 /// - `format` — `&str`. Space-separated format token string (e.g. `"u32 f32 str"`).
@@ -267,7 +267,7 @@ pub fn write(format: &str, values: &[BinValue]) -> Result<ByteData, String> {
     Ok(ByteData::from_bytes(buf))
 }
 
-/// Read values from a binary buffer according to a Luna2D format string.
+/// Read values from a binary buffer according to a Lurek2D format string.
 ///
 /// # Parameters
 /// - `format` — `&str`. Space-separated format token string.
@@ -411,7 +411,7 @@ pub fn read(format: &str, data: &[u8], offset: usize) -> Result<(Vec<BinValue>, 
                 }
                 if pos >= data.len() {
                     return Err(format!(
-                        "luna.data read 'cstr': null terminator not found starting at offset {start}"
+                        "lurek.data read 'cstr': null terminator not found starting at offset {start}"
                     ));
                 }
                 let s = String::from_utf8_lossy(&data[start..pos]).into_owned();
@@ -446,13 +446,13 @@ pub fn measure_size(format: &str) -> Result<usize, String> {
             Token::U64 | Token::I64 | Token::F64 => size += 8,
             Token::Str => {
                 return Err(
-                    "luna.data size: 'str' token has variable length; cannot compute static size"
+                    "lurek.data size: 'str' token has variable length; cannot compute static size"
                         .to_string(),
                 )
             }
             Token::CStr => {
                 return Err(
-                    "luna.data size: 'cstr' token has variable length; cannot compute static size"
+                    "lurek.data size: 'cstr' token has variable length; cannot compute static size"
                         .to_string(),
                 )
             }
@@ -468,7 +468,7 @@ pub fn measure_size(format: &str) -> Result<usize, String> {
 fn check_bounds(data: &[u8], pos: usize, count: usize, token: &str) -> Result<(), String> {
     if pos + count > data.len() {
         Err(format!(
-            "luna.data read '{token}': buffer underflow at offset {pos} (need {count}, have {})",
+            "lurek.data read '{token}': buffer underflow at offset {pos} (need {count}, have {})",
             data.len()
         ))
     } else {
@@ -505,10 +505,10 @@ fn coerce_u64(values: &[BinValue], idx: usize, token: &str) -> Result<u64, Strin
         Some(BinValue::F64(v)) => Ok(*v as u64),
         Some(BinValue::Bool(b)) => Ok(if *b { 1 } else { 0 }),
         Some(_) => Err(format!(
-            "luna.data write '{token}': expected integer at value index {idx}"
+            "lurek.data write '{token}': expected integer at value index {idx}"
         )),
         None => Err(format!(
-            "luna.data write '{token}': not enough values (expected index {idx})"
+            "lurek.data write '{token}': not enough values (expected index {idx})"
         )),
     }
 }
@@ -528,10 +528,10 @@ fn coerce_i64(values: &[BinValue], idx: usize, token: &str) -> Result<i64, Strin
         Some(BinValue::F64(v)) => Ok(*v as i64),
         Some(BinValue::Bool(b)) => Ok(if *b { 1 } else { 0 }),
         Some(_) => Err(format!(
-            "luna.data write '{token}': expected integer at value index {idx}"
+            "lurek.data write '{token}': expected integer at value index {idx}"
         )),
         None => Err(format!(
-            "luna.data write '{token}': not enough values (expected index {idx})"
+            "lurek.data write '{token}': not enough values (expected index {idx})"
         )),
     }
 }
@@ -551,10 +551,10 @@ fn coerce_f64(values: &[BinValue], idx: usize, token: &str) -> Result<f64, Strin
         Some(BinValue::F64(v)) => Ok(*v),
         Some(BinValue::Bool(b)) => Ok(if *b { 1.0 } else { 0.0 }),
         Some(_) => Err(format!(
-            "luna.data write '{token}': expected numeric at value index {idx}"
+            "lurek.data write '{token}': expected numeric at value index {idx}"
         )),
         None => Err(format!(
-            "luna.data write '{token}': not enough values (expected index {idx})"
+            "lurek.data write '{token}': not enough values (expected index {idx})"
         )),
     }
 }
@@ -566,10 +566,10 @@ fn coerce_bool(values: &[BinValue], idx: usize, token: &str) -> Result<bool, Str
         Some(BinValue::U8(v)) => Ok(*v != 0),
         Some(BinValue::I64(v)) => Ok(*v != 0),
         Some(_) => Err(format!(
-            "luna.data write '{token}': expected bool at value index {idx}"
+            "lurek.data write '{token}': expected bool at value index {idx}"
         )),
         None => Err(format!(
-            "luna.data write '{token}': not enough values (expected index {idx})"
+            "lurek.data write '{token}': not enough values (expected index {idx})"
         )),
     }
 }
@@ -579,13 +579,13 @@ fn coerce_str(values: &[BinValue], idx: usize, token: &str) -> Result<String, St
     match values.get(idx) {
         Some(BinValue::Str(s)) => Ok(s.clone()),
         Some(BinValue::Bytes(b)) => String::from_utf8(b.clone()).map_err(|e| {
-            format!("luna.data write '{token}': bytes at index {idx} are not valid UTF-8: {e}")
+            format!("lurek.data write '{token}': bytes at index {idx} are not valid UTF-8: {e}")
         }),
         Some(_) => Err(format!(
-            "luna.data write '{token}': expected string at value index {idx}"
+            "lurek.data write '{token}': expected string at value index {idx}"
         )),
         None => Err(format!(
-            "luna.data write '{token}': not enough values (expected index {idx})"
+            "lurek.data write '{token}': not enough values (expected index {idx})"
         )),
     }
 }

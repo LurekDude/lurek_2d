@@ -4,19 +4,19 @@ A top-down life and farming simulation with a full seasonal calendar and day/nig
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — tile map, soil plots, crop stems, and HUD panel rendering
-- `luna.gfx.circle()` — ripe crop icons and growth-stage seedling indicators
-- `luna.gfx.setColor()` — dynamic day/night factor applied to every colour each frame
-- `luna.gfx.setBackgroundColor()` — season-tinted background that updates in `luna.draw()`
-- `luna.gfx.print()` — day, season, money, seed inventory, and harvest count HUD
-- `luna.keyboard.isDown()` — WASD tile-grid farmer movement
-- `luna.keyboard.isPressed()` — N to advance day, B to buy, S to sell, 1–3 select crop
-- `luna.mouse.isPressed()` — left-click to plant selected crop on soil, right-click to harvest
+- `lurek.gfx.rectangle()` — tile map, soil plots, crop stems, and HUD panel rendering
+- `lurek.gfx.circle()` — ripe crop icons and growth-stage seedling indicators
+- `lurek.gfx.setColor()` — dynamic day/night factor applied to every colour each frame
+- `lurek.gfx.setBackgroundColor()` — season-tinted background that updates in `lurek.draw()`
+- `lurek.gfx.print()` — day, season, money, seed inventory, and harvest count HUD
+- `lurek.keyboard.isDown()` — WASD tile-grid farmer movement
+- `lurek.keyboard.isPressed()` — N to advance day, B to buy, S to sell, 1–3 select crop
+- `lurek.mouse.isPressed()` — left-click to plant selected crop on soil, right-click to harvest
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/farming_sim
+cargo run -- content/demos/farming_sim
 ```
 
 ## Controls

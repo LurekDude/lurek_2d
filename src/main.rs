@@ -1,12 +1,12 @@
-//! Luna2D engine binary entry point.
+//! Lurek2D engine binary entry point.
 //!
-//! This crate is a thin wrapper around the `luna2d` library crate. Its only job is to call
-//! [`luna2d::luna_run`], which installs the panic hook, parses the command-line game-directory
+//! This crate is a thin wrapper around the `lurek2d` library crate. Its only job is to call
+//! [`lurek2d::lurek_run`], which installs the panic hook, parses the command-line game-directory
 //! argument, loads `conf.lua`, and enters the main engine loop.
 //!
 //! Two binary crates share the same source via `Cargo.toml` feature flags:
 //!   - `luna`   — console-attached binary (default, used during development)
-//!   - `lunec`  — no-console binary (Windows release build, no terminal window)
+//!   - `lurekc`  — no-console binary (Windows release build, no terminal window)
 //!
 //! To run a game pass the path to the game directory as the first CLI argument:
 //!
@@ -17,5 +17,5 @@
 //! If no argument is given, the engine looks for `main.lua` in the current working directory
 //! and falls back to the splash screen if none is found.
 fn main() {
-    luna2d::luna_run();
+    lurek2d::lurek_run();
 }

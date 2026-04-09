@@ -1,4 +1,4 @@
-//! TOML parsing and serialization for Luna2D.
+//! TOML parsing and serialization for Lurek2D.
 //!
 //! Converts between TOML strings and `SerialValue` using the `toml` crate.
 //! Provides the functionality previously in `data::toml_convert`.

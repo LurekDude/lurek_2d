@@ -4084,7 +4084,7 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.ui` API table.
+/// Registers the `lurek.ui` API table.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

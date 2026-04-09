@@ -1,33 +1,33 @@
--- Luna2D Lua BDD tests for luna.raycaster
+-- Lurek2D Lua BDD tests for lurek.raycaster
 -- Headless: no GPU, no audio, no window.
 
-describe("luna.raycaster", function()
+describe("lurek.raycaster", function()
     describe("module interface", function()
         it("exposes new factory", function()
-            expect_type("function", luna.raycaster.new)
+            expect_type("function", lurek.raycaster.new)
         end)
     end)
 
     describe("new(w, h)", function()
         it("returns a userdata object", function()
-            local rc = luna.raycaster.new(16, 12)
+            local rc = lurek.raycaster.new(16, 12)
             expect_type("userdata", rc)
         end)
 
         it("width() returns the given width", function()
-            local rc = luna.raycaster.new(24, 18)
+            local rc = lurek.raycaster.new(24, 18)
             expect_equal(24, rc:width())
         end)
 
         it("height() returns the given height", function()
-            local rc = luna.raycaster.new(24, 18)
+            local rc = lurek.raycaster.new(24, 18)
             expect_equal(18, rc:height())
         end)
     end)
 
     describe("cell access", function()
         it("all cells start as 0", function()
-            local rc = luna.raycaster.new(4, 4)
+            local rc = lurek.raycaster.new(4, 4)
             for y = 0, 3 do
                 for x = 0, 3 do
                     expect_equal(0, rc:getCell(x, y))
@@ -36,13 +36,13 @@ describe("luna.raycaster", function()
         end)
 
         it("setCell / getCell round-trip", function()
-            local rc = luna.raycaster.new(8, 8)
+            local rc = lurek.raycaster.new(8, 8)
             rc:setCell(2, 5, 99)
             expect_equal(99, rc:getCell(2, 5))
         end)
 
         it("setCells fills the grid from a flat table", function()
-            local rc = luna.raycaster.new(2, 2)
+            local rc = lurek.raycaster.new(2, 2)
             rc:setCells({ 1, 2, 3, 4 })
             expect_equal(1, rc:getCell(0, 0))
             expect_equal(2, rc:getCell(1, 0))
@@ -53,12 +53,12 @@ describe("luna.raycaster", function()
 
     describe("isBlocked(x, y)", function()
         it("returns false for zero cell", function()
-            local rc = luna.raycaster.new(4, 4)
+            local rc = lurek.raycaster.new(4, 4)
             expect_equal(false, rc:isBlocked(1, 1))
         end)
 
         it("returns true for non-zero cell", function()
-            local rc = luna.raycaster.new(4, 4)
+            local rc = lurek.raycaster.new(4, 4)
             rc:setCell(2, 2, 1)
             expect_equal(true, rc:isBlocked(2, 2))
         end)
@@ -66,7 +66,7 @@ describe("luna.raycaster", function()
 
     describe("castRay(ox, oy, angle, max_dist)", function()
         it("returns nil in fully empty grid", function()
-            local rc = luna.raycaster.new(10, 10)
+            local rc = lurek.raycaster.new(10, 10)
             local hit = rc:castRay(5.0, 5.0, 0.0, 20.0)
             -- An empty grid may return nil or a boundary non-hit
             if hit ~= nil then
@@ -75,7 +75,7 @@ describe("luna.raycaster", function()
         end)
 
         it("hits a wall placed directly ahead", function()
-            local rc = luna.raycaster.new(10, 10)
+            local rc = lurek.raycaster.new(10, 10)
             rc:setCell(8, 4, 1)          -- wall at x=8, row 4
             -- cast from (1.5, 4.5) pointing east (angle=0)
             local hit = rc:castRay(1.5, 4.5, 0.0, 20.0)
@@ -85,7 +85,7 @@ describe("luna.raycaster", function()
         end)
 
         it("returned hit table has required fields", function()
-            local rc = luna.raycaster.new(10, 10)
+            local rc = lurek.raycaster.new(10, 10)
             rc:setCell(5, 5, 7)
             local hit = rc:castRay(0.5, 5.5, 0.0, 20.0)
             if hit and hit.hit then
@@ -102,13 +102,13 @@ describe("luna.raycaster", function()
 
     describe("castRays(ox, oy, angle, fov, count, max_dist)", function()
         it("returns exactly count entries", function()
-            local rc = luna.raycaster.new(20, 20)
+            local rc = lurek.raycaster.new(20, 20)
             local rays = rc:castRays(10.0, 10.0, 0.0, math.pi / 2, 64, 30.0)
             expect_equal(64, #rays)
         end)
 
         it("each entry is a table", function()
-            local rc = luna.raycaster.new(20, 20)
+            local rc = lurek.raycaster.new(20, 20)
             local rays = rc:castRays(10.0, 10.0, 0.0, math.pi / 3, 8, 20.0)
             for i, r in ipairs(rays) do
                 expect_type("table", r)

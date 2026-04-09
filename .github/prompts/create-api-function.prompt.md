@@ -1,16 +1,16 @@
 ---
-description: "Create a new Lua API function in the luna.* namespace. Guides through API design, Rust binding implementation, documentation, and testing."
+description: "Create a new Lua API function in the lurek.* namespace. Guides through API design, Rust binding implementation, documentation, and testing."
 ---
 
 # Create Lua API Function
 
 ## Purpose
 
-Step-by-step workflow for adding a new function to the `luna.*` Lua API.
+Step-by-step workflow for adding a new function to the `lurek.*` Lua API.
 
 ## Use When
 
-- Adding a new function to any `luna.<module>.*` namespace
+- Adding a new function to any `lurek.<module>.*` namespace
 - Exposing engine functionality to Lua scripts
 
 ## Do Not Use When
@@ -20,8 +20,8 @@ Step-by-step workflow for adding a new function to the `luna.*` Lua API.
 
 ## Inputs
 
-- **Module**: Which `luna.*` module (graphics, physics, audio, input, etc.)
-- **Function name**: Proposed name following `luna.<module>.<verb>()` pattern
+- **Module**: Which `lurek.*` module (graphics, physics, audio, input, etc.)
+- **Function name**: Proposed name following `lurek.<module>.<verb>()` pattern
 - **Parameters**: List of parameters with types
 - **Return value**: What the function returns to Lua
 - **Use case**: Why this function is needed
@@ -45,7 +45,7 @@ Step-by-step workflow for adding a new function to the `luna.*` Lua API.
 
 ## Acceptance
 
-- [ ] Function follows `luna.<module>.<verb>()` naming
+- [ ] Function follows `lurek.<module>.<verb>()` naming
 - [ ] Parameters match existing conventions (dt, x, y, key, etc.)
 - [ ] Returns `LuaResult<T>`
 - [ ] API reference updated

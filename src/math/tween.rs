@@ -2,11 +2,11 @@
 //!
 //! Provides `Tween` — a standalone multi-value interpolator that advances its own
 //! clock and applies an easing function to a set of start-to-target value pairs.
-//! Script code accesses this through `luna.math.newTween()`.
+//! Script code accesses this through `lurek.math.newTween()`.
 //!
 //! **Scope**: pure numeric interpolation; no Lua tables, no callbacks, no
 //! auto-registration. For frame-by-frame property animation of Lua table fields
-//! with callbacks, sequences, and parallels, use `luna.tween` (`src/tween/`).
+//! with callbacks, sequences, and parallels, use `lurek.tween` (`src/tween/`).
 //!
 //! Key types: `TweenValue`, `Tween`.
 //! Primary functions: `new()`, `add_value()`, `update()`, `get_value()`.

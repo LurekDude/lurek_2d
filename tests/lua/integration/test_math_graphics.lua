@@ -1,11 +1,11 @@
--- Luna2D Integration Test: Math + Graphics (headless-safe)
+-- Lurek2D Integration Test: Math + Graphics (headless-safe)
 -- Tests math operations used in graphics contexts without requiring GPU
 
 describe("math for graphics transformations", function()
     it("rotation matrix components", function()
         local angle = math.rad(90)
-        local cos_a = luna.math.cos(angle)
-        local sin_a = luna.math.sin(angle)
+        local cos_a = lurek.math.cos(angle)
+        local sin_a = lurek.math.sin(angle)
 
         -- 90-degree rotation matrix should be: [0, -1; 1, 0]
         expect_near(0, cos_a, 0.001, "cos(90)")
@@ -73,7 +73,7 @@ describe("math color operations", function()
         local h, s, v = 0, 1, 1
         local r, g, b
 
-        local i = luna.math.floor(h * 6)
+        local i = lurek.math.floor(h * 6)
         local f = h * 6 - i
         local p = v * (1 - s)
         local q = v * (1 - f * s)
@@ -122,7 +122,7 @@ describe("math geometry utilities", function()
         local x3, y3, x4, y4 = 5, 0, 5, 10  -- vertical
 
         local denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-        expect_true(luna.math.abs(denom) > 0.001, "lines are not parallel")
+        expect_true(lurek.math.abs(denom) > 0.001, "lines are not parallel")
 
         local t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom
         local ix = x1 + t * (x2 - x1)

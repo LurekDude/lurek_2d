@@ -1,8 +1,8 @@
 # Luna Toolkit
 
-> The official VS Code extension for Luna2D game engine development.
+> The official VS Code extension for Lurek2D game engine development.
 
-Luna Toolkit turns VS Code into a complete, AI-first IDE for Luna2D games — from live IntelliSense and diagnostics to visual designers, a debug bridge, module dependency analysis, an integrated test runner, and a full CAG AI layer.
+Luna Toolkit turns VS Code into a complete, AI-first IDE for Lurek2D games — from live IntelliSense and diagnostics to visual designers, a debug bridge, module dependency analysis, an integrated test runner, and a full CAG AI layer.
 
 ---
 
@@ -10,41 +10,41 @@ Luna Toolkit turns VS Code into a complete, AI-first IDE for Luna2D games — fr
 
 ### IntelliSense & Language Support
 
-Luna Toolkit provides deep Lua language intelligence tuned to the `luna.*` API:
+Luna Toolkit provides deep Lua language intelligence tuned to the `lurek.*` API:
 
-- **Code Completion** — 100+ `luna.*` function completions with typed parameter info, return-value awareness, and string enum suggestions (key names, blend modes, body types, font IDs)
+- **Code Completion** — 100+ `lurek.*` function completions with typed parameter info, return-value awareness, and string enum suggestions (key names, blend modes, body types, font IDs)
 - **Hover Documentation** — Inline API docs with function signatures, parameter descriptions, and usage examples pulled from `docs/lua_api_reference_generated.md`
-- **Signature Help** — Active parameter highlighting as you type any `luna.*` call
-- **Go to Definition** — Jump from a `require` or `luna.*` call to the implementing Lua file or API doc
+- **Signature Help** — Active parameter highlighting as you type any `lurek.*` call
+- **Go to Definition** — Jump from a `require` or `lurek.*` call to the implementing Lua file or API doc
 - **Find All References** — Cross-file reference search across the entire workspace
 - **Rename Symbol** — Safe rename across all files in the project
 - **Document & Workspace Symbols** — File outline (⌘/Ctrl+Shift+O) and global symbol search (⌘/Ctrl+T)
-- **Type Inference** — Infer return types of `luna.gfx.newImage`, `luna.physics.newBody`, etc. to provide follow-on completions on the result
+- **Type Inference** — Infer return types of `lurek.gfx.newImage`, `lurek.physics.newBody`, etc. to provide follow-on completions on the result
 - **LuaJIT Intelligence** — Completions and performance hints for `bit.*`, `jit.*`, and FFI patterns
 - **Require Graph** — On-save circular dependency detection across all `require` chains
-- **Inlay Hints** — Lightweight parameter name labels for `luna.*` call sites
-- **Color Provider** — Inline color swatches for `luna.gfx.setColor(r, g, b, a)` calls
+- **Inlay Hints** — Lightweight parameter name labels for `lurek.*` call sites
+- **Color Provider** — Inline color swatches for `lurek.gfx.setColor(r, g, b, a)` calls
 - **Asset Path Completion** — `newImage`, `newSource`, `loadFont`, etc. complete asset paths relative to the game directory with broken-path detection
 - **LuaCats / EmmyLua Types** — Full `.d.lua` annotation generation for use with any Lua LSP
-- **Code Lens** — Reference counts and callback labels on `luna.load`, `luna.update`, `luna.draw`, and event handlers
-- **Semantic Tokens** — Custom highlighting of `luna.*` namespaces, callbacks, and engine primitives
+- **Code Lens** — Reference counts and callback labels on `lurek.load`, `lurek.update`, `lurek.draw`, and event handlers
+- **Semantic Tokens** — Custom highlighting of `lurek.*` namespaces, callbacks, and engine primitives
 - **Snippets** — 26 auto-expanding snippets in 7 categories: graphics primitives, physics bodies, input handling, audio playback, UI elements, data structures, and general game patterns
 
 ### Live Diagnostics (12+ rules)
 
 | Rule | Description |
 |---|---|
-| Deprecated API | Flags removed or renamed `luna.*` functions |
+| Deprecated API | Flags removed or renamed `lurek.*` functions |
 | Common Mistakes | Wrong argument order, missing `self`, bad callback signatures |
 | Unused Requires | `require(...)` results never accessed |
 | Asset Validation | Image/sound/font paths that do not exist on disk |
 | Type Mismatch | Passing a number where a Color/Vec2 is expected |
-| Missing Callbacks | `luna.draw()` missing while `luna.update()` uses rendering |
-| Unclosed Resources | `luna.gfx.newCanvas()` that is never released |
+| Missing Callbacks | `lurek.draw()` missing while `lurek.update()` uses rendering |
+| Unclosed Resources | `lurek.gfx.newCanvas()` that is never released |
 | Circular Requires | Detected at save time across all Lua files |
 | Infinite Loop Risk | Tight loops without a `break` or `return` |
 | Non-local Function | Public function inside a module that should be `local` |
-| Bad Body Type | String arg to `luna.physics.newBody` not in `{"static","dynamic","kinematic"}` |
+| Bad Body Type | String arg to `lurek.physics.newBody` not in `{"static","dynamic","kinematic"}` |
 | Missing Return | Function branch with no return in a callback that expects one |
 
 ### Visual Editors (27 built-in)
@@ -74,7 +74,7 @@ Luna Toolkit provides deep Lua language intelligence tuned to the `luna.*` API:
 
 ### Debug Bridge
 
-Full two-way TCP bridge to a running Luna2D game (port 19740):
+Full two-way TCP bridge to a running Lurek2D game (port 19740):
 
 | Feature | Description |
 |---|---|
@@ -89,11 +89,11 @@ Full two-way TCP bridge to a running Luna2D game (port 19740):
 
 ### System Monitor
 
-Time-series charts for **CPU**, **RAM**, **Disk I/O**, **Network**, and **GPU** updated every second. Tracks the Luna2D process separately from the OS load. All charts are zoomable and exportable.
+Time-series charts for **CPU**, **RAM**, **Disk I/O**, **Network**, and **GPU** updated every second. Tracks the Lurek2D process separately from the OS load. All charts are zoomable and exportable.
 
 ### Dependency Analysis
 
-- **Dependency Graph** — Interactive force-directed graph of all Luna2D Rust modules. Reads actual `use crate::` imports from `src/*/mod.rs` to build real edges. Drag nodes, zoom, click for per-node edge summary.
+- **Dependency Graph** — Interactive force-directed graph of all Lurek2D Rust modules. Reads actual `use crate::` imports from `src/*/mod.rs` to build real edges. Drag nodes, zoom, click for per-node edge summary.
 - **Find Circular Dependencies** — Runs Tarjan SCC analysis on the module import graph; results in the **Luna Circular Deps** output channel.
 - **Find Orphan Modules** — Scans `src/` against `lib.rs` and cross-imports to identify unreferenced modules.
 
@@ -117,7 +117,7 @@ Time-series charts for **CPU**, **RAM**, **Disk I/O**, **Network**, and **GPU** 
 
 ### AI-First Workflow — Game-Dev CAG Layer
 
-Deploy a complete AI configuration layer into any Luna2D game project:
+Deploy a complete AI configuration layer into any Lurek2D game project:
 
 #### Agents (11)
 Game Architect, Lua Scripter, Level Designer, Gameplay Designer, UI Designer, Visual Artist, Audio Designer, Animator, Optimizer, Game Tester, Narrative Writer
@@ -143,7 +143,7 @@ Exposes 6 tools to Copilot agents via the Model Context Protocol:
 | Tool | Description |
 |---|---|
 | `runExample` | Build and run a named example, capture output |
-| `getApiDoc` | Return docs for a `luna.*` function or module |
+| `getApiDoc` | Return docs for a `lurek.*` function or module |
 | `listExamples` | List available example projects |
 | `runLuaTest` | Run a Lua test file on a debug build |
 | `checkBuild` | Run `cargo check` and return diagnostics |
@@ -161,17 +161,17 @@ The Luna Toolkit sidebar has 8 sections, each with actionable items:
 | **Testing** | Open Test Runner, Run All Tests, Run Lua Tests, Run Golden Tests, Generate Tests for File, per-module test commands |
 | **Editors** | All 27 visual editors grouped by category |
 | **Debug** | Connect bridge, disconnect, evaluate Lua, variable inspector, call stack, performance panel, screenshot, live stats |
-| **Reference** | Browse API docs, open wiki for symbol, quick-insert `luna.*`, dependency graph, API coverage report, view changelog |
+| **Reference** | Browse API docs, open wiki for symbol, quick-insert `lurek.*`, dependency graph, API coverage report, view changelog |
 | **Assets** | Generate splash, generate icon, open assets folder |
 | **Dependencies** | Lock file status, find circular deps, find orphan modules, check outdated crates |
-| **Performance** | Open performance dashboard, hot-reload history, system monitor, Luna2D process tracker |
+| **Performance** | Open performance dashboard, hot-reload history, system monitor, Lurek2D process tracker |
 
 ---
 
 ## Quick Start
 
 1. Install from VSIX or Marketplace
-2. Open a Luna2D project folder (must contain `main.lua`)
+2. Open a Lurek2D project folder (must contain `main.lua`)
 3. Press `Alt+L` to run
 4. Open the Luna Toolkit sidebar (`⌘/Ctrl+Shift+P` → "Luna: Focus on Luna Toolkit View")
 
@@ -180,7 +180,7 @@ The Luna Toolkit sidebar has 8 sections, each with actionable items:
 ## Requirements
 
 - VS Code 1.90+
-- Luna2D engine binary available (set path in `luna.lunaPath` if not on PATH)
+- Lurek2D engine binary available (set path in `lurek.lunaPath` if not on PATH)
 - Rust toolchain for test running and project builds
 
 ---
@@ -189,20 +189,20 @@ The Luna Toolkit sidebar has 8 sections, each with actionable items:
 
 | Setting | Default | Description |
 |---|---|---|
-| `luna.lunaPath` | `""` | Path to luna2d executable |
-| `luna.srcDir` | `""` | Game source subdirectory |
-| `luna.saveOnRun` | `true` | Save all files before running |
-| `luna.diagnostics.deprecationWarnings` | `true` | Show deprecated API warnings |
-| `luna.diagnostics.commonMistakes` | `true` | Detect common Luna2D mistakes |
-| `luna.diagnostics.unusedRequires` | `true` | Flag unused requires |
-| `luna.diagnostics.assetValidation` | `true` | Validate asset paths |
-| `luna.inlayHints.parameterNames` | `true` | Show parameter name hints |
-| `luna.test.testDir` | `"tests"` | Rust test directory |
-| `luna.test.luaTestDir` | `"tests/lua"` | Lua test directory |
-| `luna.cag.installOnScaffold` | `true` | Auto-deploy AI layer on new project |
-| `luna.package.outputDir` | `"dist"` | Build output directory |
-| `luna.debugBridge.port` | `19740` | Debug bridge TCP port |
-| `luna.debugBridge.autoConnect` | `true` | Auto-connect on game start |
+| `lurek.lunaPath` | `""` | Path to lurek2d executable |
+| `lurek.srcDir` | `""` | Game source subdirectory |
+| `lurek.saveOnRun` | `true` | Save all files before running |
+| `lurek.diagnostics.deprecationWarnings` | `true` | Show deprecated API warnings |
+| `lurek.diagnostics.commonMistakes` | `true` | Detect common Lurek2D mistakes |
+| `lurek.diagnostics.unusedRequires` | `true` | Flag unused requires |
+| `lurek.diagnostics.assetValidation` | `true` | Validate asset paths |
+| `lurek.inlayHints.parameterNames` | `true` | Show parameter name hints |
+| `lurek.test.testDir` | `"tests"` | Rust test directory |
+| `lurek.test.luaTestDir` | `"tests/lua"` | Lua test directory |
+| `lurek.cag.installOnScaffold` | `true` | Auto-deploy AI layer on new project |
+| `lurek.package.outputDir` | `"dist"` | Build output directory |
+| `lurek.debugBridge.port` | `19740` | Debug bridge TCP port |
+| `lurek.debugBridge.autoConnect` | `true` | Auto-connect on game start |
 
 ---
 
@@ -213,20 +213,20 @@ MIT
 
 ### IntelliSense
 
-- **Code Completion** — `luna.*` API completions with parameter info
+- **Code Completion** — `lurek.*` API completions with parameter info
 - **Hover Documentation** — Inline API docs with examples
 - **Signature Help** — Parameter hints as you type
 - **Go to Definition** — Navigate to function definitions
 - **Find References** — Find all usages across workspace
 - **Document & Workspace Symbols** — Outline and global symbol search
 - **LuaJIT Intelligence** — `bit.*`/`jit.*` completions and performance hints
-- **Type Inference** — Method completions on `luna.*` factory return values
+- **Type Inference** — Method completions on `lurek.*` factory return values
 - **Contextual Strings** — Key names, blend modes, body types in string arguments
 - **Require Graph** — Circular dependency detection
 - **Code Actions** — Extract function, convert to local, generate stubs, and more
 - **Diagnostics** — Deprecation warnings, common mistakes, unused requires, asset path validation
-- **Inlay Hints** — Parameter name hints for `luna.*` calls
-- **Color Provider** — Color swatches for `luna.gfx.setColor` calls
+- **Inlay Hints** — Parameter name hints for `lurek.*` calls
+- **Color Provider** — Color swatches for `lurek.gfx.setColor` calls
 - **Asset Path Completion** — Auto-complete file paths in `newImage`, `newSource`, etc.
 
 ### Visual Editors (27)
@@ -248,7 +248,7 @@ MIT
 | Tilemap Script | Lua tilemap script editor |
 | Voxel | Voxel model editor |
 | Test Runner | Test execution and results |
-| API Reference | Searchable `luna.*` API docs |
+| API Reference | Searchable `lurek.*` API docs |
 | Sprite Animation | Animation timeline and playback |
 | Tileset | Tileset atlas management |
 | Audio Mixer | Multi-channel mixing console |
@@ -290,7 +290,7 @@ Exposes engine capabilities to Copilot agents via the Model Context Protocol:
 | Tool | Description |
 |---|---|
 | `runExample` | Build and run a named example, capture output |
-| `getApiDoc` | Return docs for a `luna.*` function or module |
+| `getApiDoc` | Return docs for a `lurek.*` function or module |
 | `listExamples` | List available example projects |
 | `runLuaTest` | Run a Lua test file on a debug build |
 | `checkBuild` | Run `cargo check` and return diagnostics |
@@ -299,7 +299,7 @@ Exposes engine capabilities to Copilot agents via the Model Context Protocol:
 ## Quick Start
 
 1. Install the extension from VSIX or Marketplace
-2. Open a Luna2D game project folder (must contain `main.lua`)
+2. Open a Lurek2D game project folder (must contain `main.lua`)
 3. Press `Alt+L` to run your game
 4. Use the Command Palette (`Ctrl+Shift+P`) and type "Luna:" to see all commands
 
@@ -322,26 +322,26 @@ Search for "Luna Toolkit" in the VS Code Extensions panel (when published).
 ## Requirements
 
 - VS Code 1.90+
-- Luna2D engine binary on PATH (or set `luna.lunaPath`)
+- Lurek2D engine binary on PATH (or set `lurek.lunaPath`)
 
 ## Extension Settings
 
 | Setting | Default | Description |
 |---|---|---|
-| `luna.lunaPath` | `""` | Path to luna2d executable |
-| `luna.srcDir` | `""` | Game source subdirectory |
-| `luna.saveOnRun` | `true` | Save files before running |
-| `luna.diagnostics.deprecationWarnings` | `true` | Show deprecated API warnings |
-| `luna.diagnostics.commonMistakes` | `true` | Detect common Luna2D mistakes |
-| `luna.diagnostics.unusedRequires` | `true` | Flag unused require statements |
-| `luna.diagnostics.assetValidation` | `true` | Validate asset file paths |
-| `luna.inlayHints.parameterNames` | `true` | Show parameter name hints |
-| `luna.test.testDir` | `"tests"` | Test directory path |
-| `luna.test.luaTestDir` | `"tests/lua"` | Lua test directory |
-| `luna.cag.installOnScaffold` | `true` | Auto-install AI config on scaffold |
-| `luna.package.outputDir` | `"dist"` | Build output directory |
-| `luna.debugBridge.port` | `19740` | Debug bridge TCP port |
-| `luna.debugBridge.autoConnect` | `true` | Auto-connect on debug run |
+| `lurek.lunaPath` | `""` | Path to lurek2d executable |
+| `lurek.srcDir` | `""` | Game source subdirectory |
+| `lurek.saveOnRun` | `true` | Save files before running |
+| `lurek.diagnostics.deprecationWarnings` | `true` | Show deprecated API warnings |
+| `lurek.diagnostics.commonMistakes` | `true` | Detect common Lurek2D mistakes |
+| `lurek.diagnostics.unusedRequires` | `true` | Flag unused require statements |
+| `lurek.diagnostics.assetValidation` | `true` | Validate asset file paths |
+| `lurek.inlayHints.parameterNames` | `true` | Show parameter name hints |
+| `lurek.test.testDir` | `"tests"` | Test directory path |
+| `lurek.test.luaTestDir` | `"tests/lua"` | Lua test directory |
+| `lurek.cag.installOnScaffold` | `true` | Auto-install AI config on scaffold |
+| `lurek.package.outputDir` | `"dist"` | Build output directory |
+| `lurek.debugBridge.port` | `19740` | Debug bridge TCP port |
+| `lurek.debugBridge.autoConnect` | `true` | Auto-connect on debug run |
 
 ## Commands
 

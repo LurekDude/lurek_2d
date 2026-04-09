@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-docstring_audit.py -- Audit Luna2D Lua API docstrings for missing content.
+docstring_audit.py -- Audit Lurek2D Lua API docstrings for missing content.
 
 For every registered Lua function/method in src/lua_api/*.rs, checks whether
 the preceding /// docstring contains:
@@ -349,7 +349,7 @@ def _audit_file(rs_file: Path) -> List[dict]:
             display_owner = owner[3:] if owner.startswith("Lua") else owner
             check(i + 1, mm.group(1), "method", display_owner)
 
-        # luna.set("name", lua.create_function(...))  single line
+        # lurek.set("name", lua.create_function(...))  single line
         sm = set_inline_re.search(stripped)
         if sm:
             check(i + 1, sm.group(1), "function", "")
@@ -375,7 +375,7 @@ def _audit_file(rs_file: Path) -> List[dict]:
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Audit Luna2D Lua API docstrings for missing content.",
+        description="Audit Lurek2D Lua API docstrings for missing content.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--file", metavar="RUST_FILE",
@@ -428,7 +428,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     # ── Human-readable summary ────────────────────────────────────────────────
     total = len(all_violations)
-    print(f"\n=== Luna2D Docstring Audit ===")
+    print(f"\n=== Lurek2D Docstring Audit ===")
     print(f"Total violations: {total}")
     for vtype, count in sorted(by_type.items(), key=lambda x: -x[1]):
         label = {

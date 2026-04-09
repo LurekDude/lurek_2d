@@ -1,6 +1,6 @@
-﻿--- Luna2D quest system — objectives, stages, journal, and quest log.
+﻿--- Lurek2D quest system — objectives, stages, journal, and quest log.
 --
--- A pure-Lua replacement for the former `luna.quest` Rust binding.
+-- A pure-Lua replacement for the former `lurek.quest` Rust binding.
 -- No engine dependencies; works in headless test VMs.
 --
 -- Usage:

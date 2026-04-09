@@ -14,7 +14,7 @@ A top-down real-time strategy game with two factions. Build workers to harvest g
 ## How to Run
 
 ```powershell
-cargo run -- demos/rts
+cargo run -- content/demos/rts
 ```
 
 ## Controls

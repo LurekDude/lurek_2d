@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.physics`                                       |
+| **Lua API**    | `lurek.physics`                                       |
 | **Source**      | `src/physics/`                                       |
 | **Rust Tests** | `tests/unit/physics_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_physics.lua`                    |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Luna2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
+The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Lurek2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
 
 ## Source Files
 
@@ -27,6 +27,6 @@ The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/physics.md`](../../specs/physics.md)
+→ [`docs/specs/physics.md`](../../docs/specs/physics.md)
 
-_Update both this file **and** `specs/physics.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/physics.md` whenever source files, public types, or Lua bindings change._

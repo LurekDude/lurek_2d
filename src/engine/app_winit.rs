@@ -1,4 +1,4 @@
-﻿//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
+﻿//! Lurek2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
 //! # DEAD FILE
 //! This file is NOT declared in `src/engine/mod.rs` and is not compiled.
@@ -28,9 +28,9 @@ use crate::timer::Clock;
 
 use super::config::Config;
 
-// ─── Luna2D Application handler ──────────────────────────────────────────────
+// ─── Lurek2D Application handler ──────────────────────────────────────────────
 
-/// Luna2D application state managed by the winit event loop.
+/// Lurek2D application state managed by the winit event loop.
 struct LunaApp {
     config: Config,
     game_dir: PathBuf,
@@ -107,7 +107,7 @@ impl LunaApp {
 
         let (device, queue) = pollster::block_on(adapter.request_device(
             &wgpu::DeviceDescriptor {
-                label: Some("Luna2D Device"),
+                label: Some("Lurek2D Device"),
                 required_features: wgpu::Features::empty(),
                 required_limits: wgpu::Limits::downlevel_defaults(),
                 memory_hints: Default::default(),
@@ -413,7 +413,7 @@ impl ApplicationHandler for LunaApp {
             }
 
             WindowEvent::RedrawRequested => {
-                // Check quit flag from Lua (e.g., luna.signal.quit()).
+                // Check quit flag from Lua (e.g., lurek.signal.quit()).
                 if let Some(state) = &self.state {
                     if state.borrow().quit_requested {
                         event_loop.exit();
@@ -450,7 +450,7 @@ impl ApplicationHandler for LunaApp {
 
 // ─── App entry point (public API) ────────────────────────────────────────────
 
-/// Entry point for the Luna2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
+/// Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
 pub struct App {
     config: Config,
 }
@@ -473,7 +473,7 @@ impl App {
     /// - `game_dir` — `PathBuf`. Path to the game directory containing `main.lua`.
     pub fn run(self, game_dir: PathBuf) {
         env_logger::init();
-        log::info!("Luna2D Engine starting (wgpu GPU backend)…");
+        log::info!("Lurek2D Engine starting (wgpu GPU backend)…");
 
         let event_loop = EventLoop::new().expect("Failed to create event loop");
         event_loop.set_control_flow(ControlFlow::Poll);
@@ -481,7 +481,7 @@ impl App {
         let mut app = LunaApp::new(self.config, game_dir);
         event_loop.run_app(&mut app).expect("Event loop error");
 
-        log::info!("Luna2D Engine shut down.");
+        log::info!("Lurek2D Engine shut down.");
     }
 }
 
@@ -519,7 +519,7 @@ fn make_splash_commands(width: u32, height: u32, time: f64) -> Vec<DrawCommand> 
         },
         DrawCommand::SetColor(0.95, 0.90, 0.55, 1.0),
         DrawCommand::Print {
-            text: "LUNA2D".to_string(),
+            text: "LUREK2D".to_string(),
             x: cx - 54.0,
             y: cy + 50.0,
             scale: 3.0,

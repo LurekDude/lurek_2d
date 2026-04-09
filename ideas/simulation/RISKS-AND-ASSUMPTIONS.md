@@ -10,12 +10,12 @@ These statements must be true for the architecture described in the other files 
 
 | # | Assumption | Why it matters | How to verify |
 |---|---|---|---|
-| A-01 | Luna2D's tier DAG rules remain stable (Tier 2 cannot import other Tier 2) | If relaxed, `src/blocksim` could import `src/graph` and `src/dataframe` directly, changing the architecture significantly | Read `docs/architecture/philosophy.md` before starting implementation |
+| A-01 | Lurek2D's tier DAG rules remain stable (Tier 2 cannot import other Tier 2) | If relaxed, `src/blocksim` could import `src/graph` and `src/dataframe` directly, changing the architecture significantly | Read `docs/architecture/philosophy.md` before starting implementation |
 | A-02 | `src/data` exposes TOML parse/encode as public Rust types (not only through the Lua API) | The Rust kernel needs to call TOML conversion internally without going through Lua | Check `specs/data.md` and `src/data/mod.rs` for public Rust-level TOML API |
-| A-03 | `luna.thread` channel can transport enough data for monitor batch export | Worker threads need to receive monitor samples for background export | Confirm `src/thread/channel.rs` supports table/array serialization or at least JSON strings |
-| A-04 | `luna.dataframe` can handle the scale of monitor logs expected (1M+ samples for long runs) | If the dataframe hits memory limits, a file-export path is needed for analytics | Benchmark `luna.dataframe` with 500k rows before committing to in-memory analytics |
+| A-03 | `lurek.thread` channel can transport enough data for monitor batch export | Worker threads need to receive monitor samples for background export | Confirm `src/thread/channel.rs` supports table/array serialization or at least JSON strings |
+| A-04 | `lurek.dataframe` can handle the scale of monitor logs expected (1M+ samples for long runs) | If the dataframe hits memory limits, a file-export path is needed for analytics | Benchmark `lurek.dataframe` with 500k rows before committing to in-memory analytics |
 | A-05 | A headless `SimRuntime` can be tested by `cargo test` without linking GPU/audio subsystems | If blocksim accidentally gets a transitive dep on wgpu or rodio, the test build becomes complex | Check `Cargo.toml` feature flags and confirm `src/data` and `src/compute` are truly headless |
-| A-06 | The Lua bridge can hold `SimRuntime` as a `UserData` object in the Lua registry | Luna2D already does this for physics worlds, graph nodes, etc. | Confirm pattern in `src/lua_api/physics_api.rs` or `src/lua_api/graph_api.rs` |
+| A-06 | The Lua bridge can hold `SimRuntime` as a `UserData` object in the Lua registry | Lurek2D already does this for physics worlds, graph nodes, etc. | Confirm pattern in `src/lua_api/physics_api.rs` or `src/lua_api/graph_api.rs` |
 | A-07 | YAML-authored content from the source project can be faithfully converted to TOML without information loss | If the source has YAML features with no TOML equivalent (typed strings, multi-line blocks with anchors, merge keys), migration will require schema redesign | Audit a representative set of source YAML files before committing to TOML-first authoring |
 | A-08 | The domain examples in `DOMAIN-BLUEPRINTS.md` can be expressed with left-to-right flow semantics only | If some blueprints require bidirectional flow or cycles, the kernel's DAG assumption breaks | Review the saga and compensation flow examples; identify any backward edges |
 | A-09 | Approval workflows can model human-in-the-loop processes synchronously from Lua (poll-then-step) | If a use case requires interrupting a long run mid-tick to get approval, the synchronous step API may need iteration | Survey the approval examples to determine if polling is sufficient |
@@ -57,7 +57,7 @@ These statements must be true for the architecture described in the other files 
 
 **Impact:** Medium — Memory pressure; possible OOM in extreme cases.
 
-**Mitigation:** Design the monitor buffer as a configurable ring buffer from day one. Default cap: 10k samples. Offer a `luna.sim.export_monitors(sim, path)` flush-to-JSONL API so Lua can periodically drain samples to disk during a long run without waiting until the end.
+**Mitigation:** Design the monitor buffer as a configurable ring buffer from day one. Default cap: 10k samples. Offer a `lurek.sim.export_monitors(sim, path)` flush-to-JSONL API so Lua can periodically drain samples to disk during a long run without waiting until the end.
 
 ---
 
@@ -99,23 +99,23 @@ These statements must be true for the architecture described in the other files 
 
 ### R-07 — Approval workflow requires a non-blocking wait model
 
-**Risk:** If approval is required mid-tick, the entire simulation blocks waiting for Lua to call `luna.sim.approve()`. For long step counts (`luna.sim.run()`), this means the simulation stops invisibly until Lua polls.
+**Risk:** If approval is required mid-tick, the entire simulation blocks waiting for Lua to call `lurek.sim.approve()`. For long step counts (`lurek.sim.run()`), this means the simulation stops invisibly until Lua polls.
 
 **Likelihood:** High
 
 **Impact:** Medium — Not a correctness issue, but significantly complicates user experience.
 
-**Mitigation:** Design the pending approval as a tick-level hold. When `luna.sim.step(n)` encounters a pending approval, it stops that block and continues running other blocks. The step returns a `stats` table with `approvals_pending > 0`. The Lua script can then call `luna.sim.pending_approvals()` and resolve before calling `luna.sim.step()` again. This is the poll-step pattern. Document it prominently.
+**Mitigation:** Design the pending approval as a tick-level hold. When `lurek.sim.step(n)` encounters a pending approval, it stops that block and continues running other blocks. The step returns a `stats` table with `approvals_pending > 0`. The Lua script can then call `lurek.sim.pending_approvals()` and resolve before calling `lurek.sim.step()` again. This is the poll-step pattern. Document it prominently.
 
 ---
 
-### R-08 — Backend reuse outside Luna2D is harder than expected
+### R-08 — Backend reuse outside Lurek2D is harder than expected
 
-**Risk:** `src/blocksim` compiles fine as a library, but it has transitive dependencies on `src/engine`'s `EngineError` type and config struct, which embed Luna2D-specific assumptions. A caller outside Luna2D would need to stub those types.
+**Risk:** `src/blocksim` compiles fine as a library, but it has transitive dependencies on `src/engine`'s `EngineError` type and config struct, which embed Lurek2D-specific assumptions. A caller outside Lurek2D would need to stub those types.
 
 **Likelihood:** Medium
 
-**Impact:** Low for V1 (the user wants it inside Luna2D for now), but a future concern if the backend is later extracted as a standalone crate.
+**Impact:** Low for V1 (the user wants it inside Lurek2D for now), but a future concern if the backend is later extracted as a standalone crate.
 
 **Mitigation:** Keep `src/engine` dependency in `blocksim` minimal. Only use `EngineError` at the boundary in the Lua bridge (`blocksim_api.rs`), not inside the kernel itself. The kernel should use its own `SimError` type and only convert to `EngineError` at the bridge layer. This makes future extraction cleaner.
 
@@ -129,7 +129,7 @@ These statements must be true for the architecture described in the other files 
 
 **Impact:** Medium — Undertested anomaly code means silent failures in production scenarios.
 
-**Mitigation:** Build a `SimTestBuilder` helper in the Rust test utilities that lets tests construct minimal specs, inject anomalies, step to a specific tick, and assert on events/state in a few lines. The pattern already exists in Luna2D's `tests/rust/unit/` files. Make the anomaly test suite a first-class citizen, not an afterthought.
+**Mitigation:** Build a `SimTestBuilder` helper in the Rust test utilities that lets tests construct minimal specs, inject anomalies, step to a specific tick, and assert on events/state in a few lines. The pattern already exists in Lurek2D's `tests/rust/unit/` files. Make the anomaly test suite a first-class citizen, not an afterthought.
 
 ---
 
@@ -149,7 +149,7 @@ These statements must be true for the architecture described in the other files 
 
 ### R-11 — Scope expansion pulls in the dashboard layer too early
 
-If a reviewer or maintainer adds `luna.gui` references into the `src/blocksim` kernel (e.g., "just for a debug panel"), the headless guarantee breaks immediately.
+If a reviewer or maintainer adds `lurek.gui` references into the `src/blocksim` kernel (e.g., "just for a debug panel"), the headless guarantee breaks immediately.
 
 **Mitigation:** The `mod.rs` doc for `src/blocksim` must explicitly state "NO graphics, audio, or UI imports in this module." Add a CI lint or at minimum a clippy.toml deny rule for wgpu imports inside `src/blocksim/`.
 
@@ -157,6 +157,6 @@ If a reviewer or maintainer adds `luna.gui` references into the `src/blocksim` k
 
 ### R-12 — Analytics scope creep: DuckDB envy
 
-The source project's analytics layer uses DuckDB for cross-run queries. There may be pressure to bring DuckDB or an equivalent SQL engine into Luna2D rather than using `luna.dataframe`.
+The source project's analytics layer uses DuckDB for cross-run queries. There may be pressure to bring DuckDB or an equivalent SQL engine into Lurek2D rather than using `lurek.dataframe`.
 
-**Mitigation:** `luna.dataframe` is sufficient for V1 analytics. If it proves insufficient at scale, the correct path is improving `luna.dataframe`, not adding a new dependency. DuckDB would be an external tool, not part of the engine.
+**Mitigation:** `lurek.dataframe` is sufficient for V1 analytics. If it proves insufficient at scale, the correct path is improving `lurek.dataframe`, not adding a new dependency. DuckDB would be an external tool, not part of the engine.

@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.log`                                             |
+| **Lua API**      | `lurek.log`                                             |
 | **Source**       | `src/log/`                                             |
 | **Rust Tests**   | —                                                      |
 | **Lua Tests**    | `tests/lua/unit/test_log.lua`                          |
@@ -14,11 +14,11 @@
 
 The `log` module provides structured log level management and configurable output sinks for Lua game scripts. It exposes `set_level()`, `get_level()`, and `enabled_for()` on the Rust side, delegating to `crate::engine::log_messages`.
 
-The Lua API at `luna.log.*` allows scripts to emit messages at specific severity levels (`debug`, `info`, `warn`, `error`) with an optional _tag_ string (second argument). Every log function also dispatches to any registered `Sink` destinations beyond the default stderr channel. Game developers can add **file sinks** (append to disk, UTF-8) and **memory sinks** (bounded ring buffer) to route log output to custom destinations — similar to Python's `logging.Handler` model.
+The Lua API at `lurek.log.*` allows scripts to emit messages at specific severity levels (`debug`, `info`, `warn`, `error`) with an optional _tag_ string (second argument). Every log function also dispatches to any registered `Sink` destinations beyond the default stderr channel. Game developers can add **file sinks** (append to disk, UTF-8) and **memory sinks** (bounded ring buffer) to route log output to custom destinations — similar to Python's `logging.Handler` model.
 
 `src/lua_api/log_api.rs` maintains a `Rc<RefCell<SinkRegistry>>` that is captured by all log-function closures. `src/log/sinks.rs` provides the `SinkLevel`, `SinkKind`, `Sink`, and `SinkRegistry` types. All Rust `log` crate output still flows through `env_logger` and the `RUST_LOG` environment variable.
 
-**Separation from `devtools`**: `luna.log` routes to stderr via `env_logger` + optional sinks — it is the **operational engine log**. `luna.devtools.logger` is an **in-memory ring buffer** used for in-game diagnostic panels.
+**Separation from `devtools`**: `lurek.log` routes to stderr via `env_logger` + optional sinks — it is the **operational engine log**. `lurek.devtools.logger` is an **in-memory ring buffer** used for in-game diagnostic panels.
 
 ## Source Files
 
@@ -44,4 +44,4 @@ The Lua API at `luna.log.*` allows scripts to emit messages at specific severity
 
 ## Full Specification
 
-See [`specs/log.md`](../../../specs/log.md) for full architecture, type details, Lua API, examples, and notes.
+See [`docs/specs/log.md`](../../../docs/specs/log.md) for full architecture, type details, Lua API, examples, and notes.

@@ -45,12 +45,12 @@
 2. **Add collision callbacks**: `world:setBeginContact(fn)` / `world:setEndContact(fn)` — more ergonomic than polling. Keep polling as an alternative.
 3. **Add debug draw**: `world:debugDraw()` — renders all collider wireframes, joint lines, contact points. Use DrawCommand queue like everything else.
 4. **Add CCD flag**: `body:setCCD(enabled)` — prevent tunneling for bullets, fast projectiles.
-5. **Create lightweight collision module** (new): `luna.collision.testAABB(a, b)`, `luna.collision.testCircles(...)` — no physics world needed. Many game types (puzzle, RPG, visual novel with interactable regions) need overlap detection without simulation.
+5. **Create lightweight collision module** (new): `lurek.collision.testAABB(a, b)`, `lurek.collision.testCircles(...)` — no physics world needed. Many game types (puzzle, RPG, visual novel with interactable regions) need overlap detection without simulation.
 6. **Add breakable joints**: `joint:setBreakForce(max)` — enables destructible structures, a popular game mechanic.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Physics engine | rapier2d | Box2D | Box2D | rapier (same!) |
 | One-way platforms | ❌ | ✅ | ✅ | ❌ |

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-cag_validate.py — Luna2D CAG (Copilot Agent Guidance) layer validator.
+cag_validate.py — Lurek2D CAG (Copilot Agent Guidance) layer validator.
 
 Usage:
     python tools/cag_validate.py                              # Validate everything

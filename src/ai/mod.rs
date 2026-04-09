@@ -1,6 +1,6 @@
 //! # AI Module — Game AI Toolkit (Tier 2)
 //!
-//! Provides a comprehensive suite of decoupled game AI subsystems for Luna2D.
+//! Provides a comprehensive suite of decoupled game AI subsystems for Lurek2D.
 //! Each subsystem can be used independently or composed together through the
 //! [`Agent`] / [`AIWorld`] framework.
 //!
@@ -37,12 +37,12 @@
 //!
 //! The world ticks agents in descending priority order during `update(dt)`.
 //! FSM transitions, BT ticks, and steering force calculations all happen during
-//! this pass. The Lua API layer (`luna.ai.*`) wraps these Rust types.
+//! this pass. The Lua API layer (`lurek.ai.*`) wraps these Rust types.
 //!
 //! ## Dependencies
 //!
 //! - `FlowField`, `Cell`, and `PathGrid` are re-exported directly from
-//!   `crate::pathfinding` so `luna.ai.*` has a unified surface.
+//!   `crate::pathfinding` so `lurek.ai.*` has a unified surface.
 //! - All Lua callbacks are stored as `mlua::RegistryKey` references.
 //! - No heap allocation happens per-frame in steady state; vectors are grown at
 //!   agent/behavior creation time.

@@ -1,9 +1,9 @@
-; Luna2D NSIS Installer Script
+; Lurek2D NSIS Installer Script
 ; =============================================================================
 ;
 ; Requirements:
 ;   - NSIS 3.x (https://nsis.sourceforge.io/Download)
-;   - Built release binary at:  build\release\luna.exe
+;   - Built release binary at:  build\release\lurek.exe
 ;   - Icon at:                  assets\icon.ico
 ;   - Run from workspace root:  makensis tools\installer.nsi
 ;
@@ -11,18 +11,18 @@
 ;   makensis tools\installer.nsi
 ;
 ; Output:
-;   dist\luna2d-<Version>-setup.exe
+;   dist\lurek2d-<Version>-setup.exe
 ; =============================================================================
 
-!define APP_NAME     "Luna2D"
+!define APP_NAME     "Lurek2D"
 !define APP_VERSION  "0.5.0"
-!define APP_PUBLISHER "Luna2D Project"
-!define APP_URL      "https://github.com/yourname/luna2d"
-!define APP_EXE      "luna2d.exe"
+!define APP_PUBLISHER "Lurek2D Project"
+!define APP_URL      "https://github.com/yourname/lurek2d"
+!define APP_EXE      "lurek2d.exe"
 !define APP_ICON     "..\..\assets\icon.ico"
 
 ; Output installer filename
-!define OUT_FILE     "..\..\dist\luna2d-${APP_VERSION}-setup.exe"
+!define OUT_FILE     "..\..\dist\lurek2d-${APP_VERSION}-setup.exe"
 
 ; ── NSIS Settings ────────────────────────────────────────────────────────────
 Name                "${APP_NAME} ${APP_VERSION}"
@@ -71,7 +71,7 @@ Section "Engine (required)" SecEngine
     SetOutPath "$INSTDIR"
 
     ; Core binary
-    File "..\..\build\release\luna2d.exe"
+    File "..\..\build\release\lurek2d.exe"
 
     ; Engine assets
     SetOutPath "$INSTDIR\assets"
@@ -156,25 +156,25 @@ Section "Engine (required)" SecEngine
 SectionEnd
 
 ; ── .lua File Association ───────────────────────────────────────────────────
-; Registers .lua so double-clicking a Lua script runs it with Luna2D.
+; Registers .lua so double-clicking a Lua script runs it with Lurek2D.
 ; Note: only steals the association if no existing handler is registered,
 ; so it won't break a user's existing Lua installation (LuaRocks, etc.).
 Section ".lua File Association" SecFileAssoc
     ; Map .lua extension → ProgID
-    WriteRegStr HKCR ".lua"                           ""            "Luna2DScript"
+    WriteRegStr HKCR ".lua"                           ""            "Lurek2DScript"
     WriteRegStr HKCR ".lua"                           "Content Type" "text/x-lua"
 
     ; ProgID display name and icon
-    WriteRegStr HKCR "Luna2DScript"                  ""            "Luna2D Script"
-    WriteRegStr HKCR "Luna2DScript\DefaultIcon"      ""            "$INSTDIR\${APP_EXE},0"
+    WriteRegStr HKCR "Lurek2DScript"                  ""            "Lurek2D Script"
+    WriteRegStr HKCR "Lurek2DScript\DefaultIcon"      ""            "$INSTDIR\${APP_EXE},0"
 
-    ; Open verb: luna2d.exe treats a .lua file path as its game argument
-    WriteRegStr HKCR "Luna2DScript\shell\open"       ""            "Run with Luna2D"
-    WriteRegStr HKCR "Luna2DScript\shell\open\command" ""          '"$INSTDIR\${APP_EXE}" "%1"'
+    ; Open verb: lurek2d.exe treats a .lua file path as its game argument
+    WriteRegStr HKCR "Lurek2DScript\shell\open"       ""            "Run with Lurek2D"
+    WriteRegStr HKCR "Lurek2DScript\shell\open\command" ""          '"$INSTDIR\${APP_EXE}" "%1"'
 
     ; Edit verb: open the script in the default text editor
-    WriteRegStr HKCR "Luna2DScript\shell\edit"       ""            "Edit"
-    WriteRegStr HKCR "Luna2DScript\shell\edit\command" ""          'notepad.exe "%1"'
+    WriteRegStr HKCR "Lurek2DScript\shell\edit"       ""            "Edit"
+    WriteRegStr HKCR "Lurek2DScript\shell\edit\command" ""          'notepad.exe "%1"'
 
     ; Notify Windows that file associations have changed
     System::Call 'Shell32::SHChangeNotify(i 0x8000000, i 0, i 0, i 0)'
@@ -198,7 +198,7 @@ Section "Uninstall"
     nsExec::ExecToLog 'powershell -WindowStyle Hidden -Command "[Environment]::SetEnvironmentVariable(\"Path\",([Environment]::GetEnvironmentVariable(\"Path\",\"User\") -split \";\" | Where-Object {$$_ -ne \"$INSTDIR\"}) -join \";\",\"User\")"'
 
     ; Remove files
-    Delete "$INSTDIR\luna2d.exe"
+    Delete "$INSTDIR\lurek2d.exe"
     Delete "$INSTDIR\uninstall.exe"
     Delete "$INSTDIR\README.md"
     Delete "$INSTDIR\LICENSE"
@@ -217,7 +217,7 @@ Section "Uninstall"
 
     ; Remove .lua file association
     DeleteRegKey HKCR ".lua"
-    DeleteRegKey HKCR "Luna2DScript"
+    DeleteRegKey HKCR "Lurek2DScript"
 
     ; Remove registry keys
     DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"

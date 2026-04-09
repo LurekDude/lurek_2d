@@ -1,8 +1,8 @@
-//! Integration tests for the Luna2D configuration loading.
+//! Integration tests for the Lurek2D configuration loading.
 
 use std::fs;
 
-use luna2d::engine::Config;
+use lurek2d::engine::Config;
 use tempfile::TempDir;
 
 fn write_conf(temp_dir: &TempDir, contents: &str) {

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.keyboard`, `luna.mouse`, `luna.gamepad`, `luna.touch` |
+| **Lua API**    | `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, `lurek.touch` |
 | **Source**     | `src/input/`                                         |
 | **Rust Tests** | `tests/rust/unit/input_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_input.lua`                      |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The input module is Luna2D's Tier 1 device-state tracking layer. It converts raw OS events from winit (keyboard, mouse) and gilrs (gamepads) into clean, per-frame snapshot state that game scripts query through four Lua namespaces: `luna.keyboard`, `luna.mouse`, `luna.gamepad`, and `luna.touch`. Rather than exposing asynchronous event streams that can be missed if not polled in the right window, the module presents three stable views for every device: "just pressed this frame", "currently held", and "just released this frame". Transient per-frame state (pressed/released lists, scroll deltas, text input buffer) is cleared at the start of each frame by `begin_frame()`, so game scripts in `luna.update(dt)` always see a consistent snapshot.
+The input module is Lurek2D's Tier 1 device-state tracking layer. It converts raw OS events from winit (keyboard, mouse) and gilrs (gamepads) into clean, per-frame snapshot state that game scripts query through four Lua namespaces: `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch`. Rather than exposing asynchronous event streams that can be missed if not polled in the right window, the module presents three stable views for every device: "just pressed this frame", "currently held", and "just released this frame". Transient per-frame state (pressed/released lists, scroll deltas, text input buffer) is cleared at the start of each frame by `begin_frame()`, so game scripts in `lurek.update(dt)` always see a consistent snapshot.
 
 ## Source Files
 
@@ -27,6 +27,6 @@ The input module is Luna2D's Tier 1 device-state tracking layer. It converts raw
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/input.md`](../../specs/input.md)
+→ [`docs/specs/input.md`](../../docs/specs/input.md)
 
-_Update both this file **and** `specs/input.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/input.md` whenever source files, public types, or Lua bindings change._

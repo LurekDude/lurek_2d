@@ -4,19 +4,19 @@ A piano-roll DAW simulator with three independent tracks spanning two octaves (C
 
 ## What It Demonstrates
 
-- `luna.mousepressed()` — left-click to toggle single notes, right-click to stamp random-length notes
-- `luna.mouse.isDown()` — drag-to-paint note fills across columns
-- `luna.keyboard.wasPressed()` — track switching (1–3), BPM adjustment, loop, mute, clear, export
-- `luna.gfx.rectangle()` — piano-roll grid cells with per-track color and sharp-key shading
-- `luna.gfx.setColor()` — active/inactive note state and muted-track greying
-- `luna.gfx.print()` — note labels (C3, D#4 etc.), beat numbers, BPM counter, and track names
-- `luna.gfx.line()` — playback cursor scrolling across the grid
+- `lurek.mousepressed()` — left-click to toggle single notes, right-click to stamp random-length notes
+- `lurek.mouse.isDown()` — drag-to-paint note fills across columns
+- `lurek.keyboard.wasPressed()` — track switching (1–3), BPM adjustment, loop, mute, clear, export
+- `lurek.gfx.rectangle()` — piano-roll grid cells with per-track color and sharp-key shading
+- `lurek.gfx.setColor()` — active/inactive note state and muted-track greying
+- `lurek.gfx.print()` — note labels (C3, D#4 etc.), beat numbers, BPM counter, and track names
+- `lurek.gfx.line()` — playback cursor scrolling across the grid
 - Beat-to-time conversion — `beats_per_sec()` maps BPM to a `play_cursor` float updated each frame
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/music_composer
+cargo run -- content/demos/music_composer
 ```
 
 ## Controls

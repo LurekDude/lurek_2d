@@ -5,9 +5,9 @@ Amiga classic. Score more goals than the CPU in 3 minutes to win.
 
 ## What It Demonstrates
 
-- `luna.gfx.circle()` / `luna.gfx.rectangle()` — pitch markings, players, ball
-- `luna.input.isKeyDown()` — smooth player movement
-- `luna.keypressed()` — kicking, tackling, player switching
+- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` — pitch markings, players, ball
+- `lurek.input.isKeyDown()` — smooth player movement
+- `lurek.keypressed()` — kicking, tackling, player switching
 - Multi-agent CPU AI (chase ball, attack, support)
 - Basic ball physics with friction and pitch bounce
 

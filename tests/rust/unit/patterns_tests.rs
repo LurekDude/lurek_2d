@@ -1,7 +1,7 @@
-﻿//! Integration tests for `luna2d::patterns` — EventBus, ObjectPool, CommandStack,
+﻿//! Integration tests for `lurek2d::patterns` — EventBus, ObjectPool, CommandStack,
 //! ServiceLocator, Factory, StateMachine.
 
-use luna2d::patterns::*;
+use lurek2d::patterns::*;
 
 // ── EventBus ──────────────────────────────────────────────────────────────────
 

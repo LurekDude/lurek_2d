@@ -1,6 +1,6 @@
 -- Physics Puzzle Demo -- drop shapes to guide a ball to the goal
 -- Click to place shapes | 1/2: toggle circle/rect | R: reset | Escape: quit
--- Run with: cargo run -- demos/strategy/physics_puzzle
+-- Run with: cargo run -- content/demos/strategy/physics_puzzle
 
 local world = nil
 local ball = nil
@@ -45,7 +45,7 @@ local function loadLevel(idx)
     local lv = levels[level]
     goal.x, goal.y = lv.goalX, lv.goalY
 
-    world = luna.physics.newWorld(0, 400)
+    world = lurek.physics.newWorld(0, 400)
 
     -- ball
     ballBody = world:newCircleBody(lv.ballX, lv.ballY, 12, "dynamic")
@@ -62,9 +62,9 @@ local function loadLevel(idx)
     messageTimer = 3
 end
 
-function luna.init()
-    luna.window.setTitle("Physics Puzzle")
-    luna.gfx.setBackgroundColor(0.12, 0.12, 0.18)
+function lurek.init()
+    lurek.window.setTitle("Physics Puzzle")
+    lurek.gfx.setBackgroundColor(0.12, 0.12, 0.18)
     loadLevel(1)
 end
 
@@ -91,7 +91,7 @@ local function placePiece(mx, my)
     table.insert(placedPieces, piece)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if won then return end
 
     world:step(dt)
@@ -117,84 +117,84 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- goal zone
-    luna.gfx.setColor(0.2, 0.8, 0.2, 0.4)
-    luna.gfx.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
-    luna.gfx.setColor(0.2, 1, 0.2, 1)
-    luna.gfx.rectangle("line", goal.x, goal.y, goal.w, goal.h)
-    luna.gfx.print("GOAL", goal.x + 14, goal.y + 12)
+    lurek.gfx.setColor(0.2, 0.8, 0.2, 0.4)
+    lurek.gfx.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
+    lurek.gfx.setColor(0.2, 1, 0.2, 1)
+    lurek.gfx.rectangle("line", goal.x, goal.y, goal.w, goal.h)
+    lurek.gfx.print("GOAL", goal.x + 14, goal.y + 12)
 
     -- static platforms
     for _, s in ipairs(staticBodies) do
-        luna.gfx.setColor(0.5, 0.45, 0.4, 1)
-        luna.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
+        lurek.gfx.setColor(0.5, 0.45, 0.4, 1)
+        lurek.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
     end
 
     -- placed pieces
     for _, p in ipairs(placedPieces) do
-        luna.gfx.setColor(0.3, 0.5, 0.8, 0.9)
+        lurek.gfx.setColor(0.3, 0.5, 0.8, 0.9)
         if p.mode == "circle" then
-            luna.gfx.circle("fill", p.x, p.y, p.r)
-            luna.gfx.setColor(0.4, 0.6, 1, 1)
-            luna.gfx.circle("line", p.x, p.y, p.r)
+            lurek.gfx.circle("fill", p.x, p.y, p.r)
+            lurek.gfx.setColor(0.4, 0.6, 1, 1)
+            lurek.gfx.circle("line", p.x, p.y, p.r)
         else
-            luna.gfx.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
-            luna.gfx.setColor(0.4, 0.6, 1, 1)
-            luna.gfx.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            lurek.gfx.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            lurek.gfx.setColor(0.4, 0.6, 1, 1)
+            lurek.gfx.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
         end
     end
 
     -- ball
     local bx, by = ballBody:getPosition()
-    luna.gfx.setColor(1, 0.4, 0.2, 1)
-    luna.gfx.circle("fill", bx, by, 12)
-    luna.gfx.setColor(1, 0.6, 0.3, 1)
-    luna.gfx.circle("line", bx, by, 12)
+    lurek.gfx.setColor(1, 0.4, 0.2, 1)
+    lurek.gfx.circle("fill", bx, by, 12)
+    lurek.gfx.setColor(1, 0.6, 0.3, 1)
+    lurek.gfx.circle("line", bx, by, 12)
 
     -- cursor preview
     if not won then
-        local mx, my = luna.mouse.getPosition()
-        luna.gfx.setColor(0.3, 0.5, 0.8, 0.3)
+        local mx, my = lurek.mouse.getPosition()
+        lurek.gfx.setColor(0.3, 0.5, 0.8, 0.3)
         if placeMode == "circle" then
-            luna.gfx.circle("line", mx, my, placeRadius)
+            lurek.gfx.circle("line", mx, my, placeRadius)
         else
-            luna.gfx.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
+            lurek.gfx.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
         end
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Level: " .. level, 10, 10)
-    luna.gfx.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
-    luna.gfx.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
-    luna.gfx.print("Click to place | R: Reset | N: Next level", 10, 575)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Level: " .. level, 10, 10)
+    lurek.gfx.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
+    lurek.gfx.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
+    lurek.gfx.print("Click to place | R: Reset | N: Next level", 10, 575)
 
     -- message
     if messageTimer > 0 then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 200, 270, 400, 40)
-        luna.gfx.setColor(1, 1, 0.5, 1)
-        luna.gfx.print(message, 220, 280)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 200, 270, 400, 40)
+        lurek.gfx.setColor(1, 1, 0.5, 1)
+        lurek.gfx.print(message, 220, 280)
     end
 
     -- won overlay
     if won then
-        luna.gfx.setColor(0, 0, 0, 0.5)
-        luna.gfx.rectangle("fill", 250, 240, 300, 80)
-        luna.gfx.setColor(0.2, 1, 0.4, 1)
-        luna.gfx.print("LEVEL COMPLETE!", 310, 255, 1.3)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Press N for next level", 315, 290)
+        lurek.gfx.setColor(0, 0, 0, 0.5)
+        lurek.gfx.rectangle("fill", 250, 240, 300, 80)
+        lurek.gfx.setColor(0.2, 1, 0.4, 1)
+        lurek.gfx.print("LEVEL COMPLETE!", 310, 255, 1.3)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Press N for next level", 315, 290)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if button == 1 then placePiece(x, y) end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then loadLevel(level) end
     if key == "n" then loadLevel(level + 1) end
     if key == "1" then placeMode = "circle" end

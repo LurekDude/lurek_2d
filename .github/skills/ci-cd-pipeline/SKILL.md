@@ -1,9 +1,9 @@
 ---
 name: ci-cd-pipeline
-description: "Load this skill when setting up or maintaining CI/CD for Luna2D: GitHub Actions workflows, build automation, test pipelines, or release processes. Skip it for local development or code implementation."
+description: "Load this skill when setting up or maintaining CI/CD for Lurek2D: GitHub Actions workflows, build automation, test pipelines, or release processes. Skip it for local development or code implementation."
 ---
 
-# CI/CD Pipeline — Luna2D Engine
+# CI/CD Pipeline — Lurek2D Engine
 
 ## Load When
 

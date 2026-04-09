@@ -1,6 +1,6 @@
 -- Vehicle Builder — Physics-Based Construction & Test Track
 -- Build a vehicle from parts, then test it on a track with physics
--- Run with: cargo run -- demos/simulation/vehicle_builder
+-- Run with: cargo run -- content/demos/simulation/vehicle_builder
 
 local mode = "build"  -- "build" or "test"
 local GRID = 20
@@ -96,12 +96,12 @@ local function startTest()
     buildTrack()
 
     -- Use physics world
-    world = luna.physics.newWorld(0, 300)
+    world = lurek.physics.newWorld(0, 300)
 
     vehicleBodies = {}
     -- Ground
-    local ground = luna.physics.newBody(world, 2000, 290, "static")
-    luna.physics.setBodySize(world, ground, 8000, 20)
+    local ground = lurek.physics.newBody(world, 2000, 290, "static")
+    lurek.physics.setBodySize(world, ground, 8000, 20)
 
     -- Vehicle body as single physics entity
     local cx, cy = getCenterOfMass()
@@ -116,9 +116,9 @@ local function startTest()
     vw = (vw + 1) * GRID
     vh = (vh + 1) * GRID
 
-    local body = luna.physics.newBody(world, testX, testY, "dynamic")
-    luna.physics.setBodySize(world, body, vw, vh)
-    luna.physics.setBodyRestitution(world, body, 0.2)
+    local body = lurek.physics.newBody(world, testX, testY, "dynamic")
+    lurek.physics.setBodySize(world, body, vw, vh)
+    lurek.physics.setBodyRestitution(world, body, 0.2)
     vehicleBodies.main = body
     vehicleBodies.mass = totalMass
     vehicleBodies.hasEngine = hasEngine
@@ -131,43 +131,43 @@ local function startTest()
 
     -- Ramp and obstacle bodies
     for _, r in ipairs(ramps) do
-        local rb = luna.physics.newBody(world, r.x, 280 - r.h, "static")
-        luna.physics.setBodySize(world, rb, r.w, r.h)
+        local rb = lurek.physics.newBody(world, r.x, 280 - r.h, "static")
+        lurek.physics.setBodySize(world, rb, r.w, r.h)
     end
     for _, o in ipairs(obstacles) do
-        local ob = luna.physics.newBody(world, o.x, 290 - o.h, "static")
-        luna.physics.setBodySize(world, ob, o.w, o.h)
+        local ob = lurek.physics.newBody(world, o.x, 290 - o.h, "static")
+        lurek.physics.setBodySize(world, ob, o.w, o.h)
     end
 end
 
-function luna.init()
+function lurek.init()
     buildTrack()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if testMsgTimer > 0 then testMsgTimer = testMsgTimer - dt end
 
     if mode == "test" and testActive then
         -- Controls
         local accel = 0
-        if luna.keyboard.isDown("right") and vehicleBodies.hasEngine then
+        if lurek.keyboard.isDown("right") and vehicleBodies.hasEngine then
             accel = 150 / (vehicleBodies.mass * 0.3)
         end
-        if luna.keyboard.isDown("left") then
+        if lurek.keyboard.isDown("left") then
             accel = -80
         end
 
         -- Wing lift reduces effective gravity slightly
         local lift = vehicleBodies.wingCount * 20
 
-        local bx, by = luna.physics.getBody(world, vehicleBodies.main)
+        local bx, by = lurek.physics.getBody(world, vehicleBodies.main)
         testVx = testVx + accel * dt
         testVx = testVx * (1 - 0.3 * dt) -- friction
-        luna.physics.setBodyVelocity(world, vehicleBodies.main, testVx * 50, -lift)
+        lurek.physics.setBodyVelocity(world, vehicleBodies.main, testVx * 50, -lift)
 
-        luna.physics.step(world, dt)
+        lurek.physics.step(world, dt)
 
-        bx, by = luna.physics.getBody(world, vehicleBodies.main)
+        bx, by = lurek.physics.getBody(world, vehicleBodies.main)
         testX = bx
         testY = by
         trackScroll = bx - 200
@@ -190,11 +190,11 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "t" and mode == "build" then startTest() end
     if key == "r" and mode == "test" then mode = "build"; testActive = false end
     if key == "c" and mode == "build" then parts = {} end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
     if mode == "build" then
         if key == "1" then selectedPart = "chassis" end
         if key == "2" then selectedPart = "wheel" end
@@ -203,7 +203,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if mode ~= "build" then return end
     local gx = math.floor((mx - BUILD_OX) / GRID)
     local gy = math.floor((my - BUILD_OY) / GRID)
@@ -223,113 +223,113 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.render()
+function lurek.render()
     if mode == "build" then
-        luna.gfx.setBackgroundColor(0.12, 0.12, 0.15)
+        lurek.gfx.setBackgroundColor(0.12, 0.12, 0.15)
 
         -- Track preview (top half)
-        luna.gfx.setColor(0.2, 0.2, 0.25, 1)
-        luna.gfx.rectangle("fill", 0, 0, 800, 300)
-        luna.gfx.setColor(0.3, 0.5, 0.3, 1)
-        luna.gfx.rectangle("fill", 0, 280, 800, 20)
-        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-        luna.gfx.print("TRACK PREVIEW (press T to test)", 280, 140)
+        lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
+        lurek.gfx.rectangle("fill", 0, 0, 800, 300)
+        lurek.gfx.setColor(0.3, 0.5, 0.3, 1)
+        lurek.gfx.rectangle("fill", 0, 280, 800, 20)
+        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+        lurek.gfx.print("TRACK PREVIEW (press T to test)", 280, 140)
 
         -- Ramps in preview
-        luna.gfx.setColor(0.5, 0.4, 0.2, 1)
+        lurek.gfx.setColor(0.5, 0.4, 0.2, 1)
         for _, r in ipairs(ramps) do
             local rx = r.x * 0.2 + 50
             if rx < 800 then
-                luna.gfx.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
+                lurek.gfx.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
             end
         end
 
         -- Build grid
-        luna.gfx.setColor(0.2, 0.2, 0.25, 1)
+        lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
         for gy = 0, BUILD_H - 1 do
             for gx = 0, BUILD_W - 1 do
-                luna.gfx.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
+                lurek.gfx.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
             end
         end
 
         -- Parts
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.gfx.setColor(c[1], c[2], c[3], 1)
             if p.type == "wheel" then
-                luna.gfx.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
+                lurek.gfx.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
             else
-                luna.gfx.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
+                lurek.gfx.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
             end
             -- Label
-            luna.gfx.setColor(1, 1, 1, 0.7)
+            lurek.gfx.setColor(1, 1, 1, 0.7)
             local label = p.type:sub(1, 1):upper()
-            luna.gfx.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
+            lurek.gfx.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
         end
 
         -- Center of mass
         if #parts > 0 then
             local cx, cy = getCenterOfMass()
-            luna.gfx.setColor(1, 1, 0, 1)
-            luna.gfx.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
-            luna.gfx.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
+            lurek.gfx.setColor(1, 1, 0, 1)
+            lurek.gfx.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
+            lurek.gfx.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
         end
 
         -- HUD
-        luna.gfx.setColor(0, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", 0, 560, 800, 40)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
-        luna.gfx.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
-        luna.gfx.setColor(0.5, 1, 0.5, 1)
-        luna.gfx.print("Selected: " .. selectedPart, 10, 548)
-        luna.gfx.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
+        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", 0, 560, 800, 40)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
+        lurek.gfx.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
+        lurek.gfx.setColor(0.5, 1, 0.5, 1)
+        lurek.gfx.print("Selected: " .. selectedPart, 10, 548)
+        lurek.gfx.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
 
     else
         -- Test mode
-        luna.gfx.setBackgroundColor(0.3, 0.5, 0.8)
+        lurek.gfx.setBackgroundColor(0.3, 0.5, 0.8)
 
         local sx = -trackScroll
 
         -- Ground
-        luna.gfx.setColor(0.3, 0.5, 0.3, 1)
-        luna.gfx.rectangle("fill", sx, 280, 8000, 40)
+        lurek.gfx.setColor(0.3, 0.5, 0.3, 1)
+        lurek.gfx.rectangle("fill", sx, 280, 8000, 40)
 
         -- Ramps
-        luna.gfx.setColor(0.6, 0.5, 0.2, 1)
+        lurek.gfx.setColor(0.6, 0.5, 0.2, 1)
         for _, r in ipairs(ramps) do
-            luna.gfx.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
+            lurek.gfx.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
         end
 
         -- Obstacles
-        luna.gfx.setColor(0.5, 0.3, 0.3, 1)
+        lurek.gfx.setColor(0.5, 0.3, 0.3, 1)
         for _, o in ipairs(obstacles) do
-            luna.gfx.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
+            lurek.gfx.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
         end
 
         -- Vehicle
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            luna.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.gfx.setColor(c[1], c[2], c[3], 1)
             local px = testX + p.gx * GRID - 40 + sx
             local py = testY + p.gy * GRID - 60
             if p.type == "wheel" then
-                luna.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
+                lurek.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
             else
-                luna.gfx.rectangle("fill", px, py, GRID, GRID)
+                lurek.gfx.rectangle("fill", px, py, GRID, GRID)
             end
         end
 
         -- HUD
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, 800, 30)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, 800, 30)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
     end
 
     -- Messages
     if testMsgTimer > 0 then
-        luna.gfx.setColor(1, 1, 0.5, 1)
-        luna.gfx.print(testMsg, 250, 150, 1.3)
+        lurek.gfx.setColor(1, 1, 0.5, 1)
+        lurek.gfx.print(testMsg, 250, 150, 1.3)
     end
 end

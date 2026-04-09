@@ -1,15 +1,13 @@
 -- examples/tilemap.lua
--- luna.tilemap — Tile-based map authoring: TileMap, TileSet, AutoTileSheet,
+-- lurek.tilemap — Tile-based map authoring: TileMap, TileSet, AutoTileSheet,
 -- ChunkMap, IsoMap, MapBlock/MapGroup, and coordinate helper functions.
--- All luna.tilemap API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── TileSet ────────────────────────────────────────────────────────────────────
 
 -- newTileSet(firstGid, tileCount, columns, tileWidth, tileHeight, spacing?, margin?)
 -- Describes how to slice an atlas texture into individual tile quads.
 -- firstGid = 1 means GIDs 1..tileCount are mapped to this set.
-local ts = luna.tilemap.newTileSet(
+local ts = lurek.tilemap.newTileSet(
     1,     -- firstGid
     256,   -- tileCount
     16,    -- columns
@@ -52,7 +50,7 @@ local tile_id8 = ts:getAutoTileId8("grass", 0xFF)  -- 40
 
 -- newTileMap(tileWidth, tileHeight, chunkSize?)
 -- chunkSize default is 16; controls spatial partitioning resolution.
-local map = luna.tilemap.newTileMap(16, 16, 16)
+local map = lurek.tilemap.newTileMap(16, 16, 16)
 
 -- Attach one or more tilesets
 map:addTileSet(ts)
@@ -170,7 +168,7 @@ map:applyAutoTile8At(1, 5, 5, "grass")
 
 -- newAutoTileSheet(tileWidth, tileHeight, layout?)
 -- layout: "blob47" (default) | "composite48" | "minimal16"
-local sheet = luna.tilemap.newAutoTileSheet(16, 16, "blob47")
+local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "blob47")
 
 local layout    = sheet:getLayout()      -- "blob47"
 local stw       = sheet:getTileWidth()   -- 16
@@ -195,7 +193,7 @@ local sx, sy, sw2, sh2 = sheet:getQuad(0)
 -- newChunkMap(chunkSize?) → ChunkMap
 -- ChunkMap stores tiles in dynamically-allocated 2D chunks.
 -- All coordinates in ChunkMap are signed integers (no 1-based offset).
-local cmap = luna.tilemap.newChunkMap(16)  -- 16×16 chunks
+local cmap = lurek.tilemap.newChunkMap(16)  -- 16×16 chunks
 
 -- getTile(x, y) / setTile(x, y, gid) — unbounded world coordinates
 cmap:setTile(0, 0, 5)
@@ -225,7 +223,7 @@ local x0, y0, x1, y1 = cmap:chunkTileRange(0, 0)
 
 -- newIsoMap(width, height, tileW, tileH, levelHeight) → IsoMap
 -- tileW / tileH is the footprint diamond size in pixels.
-local iso_map = luna.tilemap.newIsoMap(32, 32, 64, 32, 16)
+local iso_map = lurek.tilemap.newIsoMap(32, 32, 64, 32, 16)
 
 -- Level management (Z layers)
 local z1 = iso_map:addLevel()          -- returns 1-based index
@@ -260,7 +258,7 @@ local itx, ity = iso_map:screenToTile(400, 200)
 -- ── MapBlock / MapGroup (procedural map assembly) ────────────────────────────
 
 -- newMapBlock(width, height, layers?, segmentSize?) → MapBlock
-local block = luna.tilemap.newMapBlock(8, 8, 2, 4)
+local block = lurek.tilemap.newMapBlock(8, 8, 2, 4)
 
 -- setTile(layer, x, y, gid) — 1-based layer, x, y
 block:setTile(1, 1, 1, 100)
@@ -278,7 +276,7 @@ block:setWeight(2.5)
 local wt = block:getWeight()           -- 2.5
 
 -- newMapGroup(name) → MapGroup
-local grp = luna.tilemap.newMapGroup("village")
+local grp = lurek.tilemap.newMapGroup("village")
 grp:addBlock(block)
 local gc = grp:getBlockCount()    -- 1
 grp:removeBlock(1)
@@ -290,41 +288,41 @@ local gname = grp:getName()       -- "village"
 -- ── Diamond Isometric ─────────────────────────────────────────────────────────
 
 -- toScreenIso(tx, ty, tileW, tileH) → sx, sy
-local isx, isy = luna.tilemap.toScreenIso(5, 3, 64, 32)
+local isx, isy = lurek.tilemap.toScreenIso(5, 3, 64, 32)
 
 -- fromScreenIso(sx, sy, tileW, tileH) → tx, ty
-local itx2, ity2 = luna.tilemap.fromScreenIso(isx, isy, 64, 32)
+local itx2, ity2 = lurek.tilemap.fromScreenIso(isx, isy, 64, 32)
 
 -- ── Hexagon (pointy-top, axial coordinates) ───────────────────────────────────
 
 -- toScreenHex(q, r, size) → sx, sy
-local hsx, hsy = luna.tilemap.toScreenHex(2, 1, 30)
+local hsx, hsy = lurek.tilemap.toScreenHex(2, 1, 30)
 
 -- fromScreenHex(sx, sy, size) → q, r
-local hq, hr = luna.tilemap.fromScreenHex(hsx, hsy, 30)
+local hq, hr = lurek.tilemap.fromScreenHex(hsx, hsy, 30)
 
 -- hexNeighbors(q, r) → {{q,r},...} — 6 axial neighbours
-local neighbors = luna.tilemap.hexNeighbors(2, 1)
+local neighbors = lurek.tilemap.hexNeighbors(2, 1)
 for _, n in ipairs(neighbors) do
     local nq, nr = n[1], n[2]
 end
 
 -- hexDistance(q1, r1, q2, r2) → integer
-local dist = luna.tilemap.hexDistance(0, 0, 3, -1)  -- 3
+local dist = lurek.tilemap.hexDistance(0, 0, 3, -1)  -- 3
 
 -- hexRound(q, r) → q, r  — snap fractional coords to nearest hex
-local rq, rr = luna.tilemap.hexRound(1.7, 0.2)  -- 2, 0
+local rq, rr = lurek.tilemap.hexRound(1.7, 0.2)  -- 2, 0
 
 -- hexLine(q1, r1, q2, r2) → {{q,r},...}
-local line = luna.tilemap.hexLine(0, 0, 3, -3)
+local line = lurek.tilemap.hexLine(0, 0, 3, -3)
 
 -- hexRing(q, r, radius) → {{q,r},...}
-local ring = luna.tilemap.hexRing(0, 0, 2)  -- 12 cells at distance 2
+local ring = lurek.tilemap.hexRing(0, 0, 2)  -- 12 cells at distance 2
 
 -- hexSpiral(q, r, radius) → {{q,r},...}
 -- Returns cells center outward, ring by ring.
 -- (Available if defined in your build.)
--- local spiral = luna.tilemap.hexSpiral(0, 0, 2)
+local spiral = lurek.tilemap.hexSpiral(0, 0, 2)
 
 -- ─── MapBlock ──────────────────────────────────────────────────────────────────
 
@@ -344,13 +342,13 @@ local step_count = mapscript:getStepCount()  -- Returns the number of steps in t
 
 local tile_set = tilemap:getTileSet(1)  -- Returns a tileset by 1-based index, or nil if out of range
 
--- ─── luna.tilemap ──────────────────────────────────────────────────────────────
-local hex_area = luna.tilemap.hexArea(1, 1, 1)  -- Returns all hex cells within radius distance (filled hex circle) as a table
-local hex_reflect = luna.tilemap.hexReflect(0, 0, 3, 2, "q")  -- Reflects hex coordinates across an axis through the center
-local hex_rotate = luna.tilemap.hexRotate(1, 1, 1, 1, 1)  -- Rotates hex coordinates around a center by steps x 60 degrees clockwise
-local iso_direction_from_angle = luna.tilemap.isoDirectionFromAngle(1.0)  -- Snaps an angle (in radians) to the nearest isometric direction (1-4)
-local iso_direction_name = luna.tilemap.isoDirectionName(1)  -- Returns the name of an isometric direction (1-4)
-local iso_rotate = luna.tilemap.isoRotate(1, 1)  -- Rotates an isometric direction (1-4) clockwise by steps
-local load_t_m_x = luna.tilemap.loadTMX(tmx_xml_string)  -- Parses a TMX XML string and returns a table with map metadata and layers
-local map_gen = luna.tilemap.newMapGen(mapgroup, "rooms", 1)  -- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size
-local map_script = luna.tilemap.newMapScript()  -- Creates a new empty MapScript procedural generation script
+-- ─── lurek.tilemap ──────────────────────────────────────────────────────────────
+local hex_area = lurek.tilemap.hexArea(1, 1, 1)  -- Returns all hex cells within radius distance (filled hex circle) as a table
+local hex_reflect = lurek.tilemap.hexReflect(0, 0, 3, 2, "q")  -- Reflects hex coordinates across an axis through the center
+local hex_rotate = lurek.tilemap.hexRotate(1, 1, 1, 1, 1)  -- Rotates hex coordinates around a center by steps x 60 degrees clockwise
+local iso_direction_from_angle = lurek.tilemap.isoDirectionFromAngle(1.0)  -- Snaps an angle (in radians) to the nearest isometric direction (1-4)
+local iso_direction_name = lurek.tilemap.isoDirectionName(1)  -- Returns the name of an isometric direction (1-4)
+local iso_rotate = lurek.tilemap.isoRotate(1, 1)  -- Rotates an isometric direction (1-4) clockwise by steps
+local load_t_m_x = lurek.tilemap.loadTMX(tmx_xml_string)  -- Parses a TMX XML string and returns a table with map metadata and layers
+local map_gen = lurek.tilemap.newMapGen(mapgroup, "rooms", 1)  -- Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size
+local map_script = lurek.tilemap.newMapScript()  -- Creates a new empty MapScript procedural generation script

@@ -1,6 +1,6 @@
 //! Integration tests for the DataFrame module (Phase 22).
 
-use luna2d::dataframe::{CellValue, ColRef, DataFrame, Database};
+use lurek2d::dataframe::{CellValue, ColRef, DataFrame, Database};
 
 // ============================================================================
 // Helper
@@ -749,7 +749,7 @@ fn test_describe_empty_no_numeric_returns_empty() {
 fn test_csv_roundtrip() {
     let df = sample_df();
     let csv = df.to_csv();
-    let restored = luna2d::dataframe::serial::from_csv(&csv).unwrap();
+    let restored = lurek2d::dataframe::serial::from_csv(&csv).unwrap();
     assert_eq!(restored.nrows(), df.nrows());
     assert_eq!(restored.ncols(), df.ncols());
     assert_eq!(restored.columns(), df.columns());
@@ -766,7 +766,7 @@ fn test_csv_roundtrip() {
 fn test_csv_numeric_roundtrip() {
     let df = numeric_df();
     let csv = df.to_csv();
-    let restored = luna2d::dataframe::serial::from_csv(&csv).unwrap();
+    let restored = lurek2d::dataframe::serial::from_csv(&csv).unwrap();
     let v = restored
         .get_value(0, ColRef::Name("val".to_string()))
         .unwrap()
@@ -778,7 +778,7 @@ fn test_csv_numeric_roundtrip() {
 #[test]
 fn test_csv_empty() {
     let csv = "";
-    let df = luna2d::dataframe::serial::from_csv(csv).unwrap();
+    let df = lurek2d::dataframe::serial::from_csv(csv).unwrap();
     assert_eq!(df.nrows(), 0);
 }
 
@@ -790,7 +790,7 @@ fn test_csv_empty() {
 fn test_json_roundtrip() {
     let df = sample_df();
     let json = df.to_json();
-    let restored = luna2d::dataframe::serial::from_json(&json).unwrap();
+    let restored = lurek2d::dataframe::serial::from_json(&json).unwrap();
     assert_eq!(restored.nrows(), df.nrows());
     assert_eq!(restored.ncols(), df.ncols());
     assert_eq!(
@@ -803,14 +803,14 @@ fn test_json_roundtrip() {
 
 #[test]
 fn test_json_empty_array() {
-    let df = luna2d::dataframe::serial::from_json("[]").unwrap();
+    let df = lurek2d::dataframe::serial::from_json("[]").unwrap();
     assert_eq!(df.nrows(), 0);
 }
 
 #[test]
 fn test_json_with_null_and_bool() {
     let json = r#"[{"a": 1, "b": null, "c": true}]"#;
-    let df = luna2d::dataframe::serial::from_json(json).unwrap();
+    let df = lurek2d::dataframe::serial::from_json(json).unwrap();
     assert_eq!(df.nrows(), 1);
     let b_val = df.get_value(0, ColRef::Name("b".to_string())).unwrap();
     assert!(b_val.is_nil());
@@ -826,7 +826,7 @@ fn test_json_with_null_and_bool() {
 fn test_binary_roundtrip() {
     let df = sample_df();
     let bytes = df.to_binary();
-    let restored = luna2d::dataframe::serial::from_binary(&bytes).unwrap();
+    let restored = lurek2d::dataframe::serial::from_binary(&bytes).unwrap();
     assert_eq!(restored.nrows(), df.nrows());
     assert_eq!(restored.ncols(), df.ncols());
     assert_eq!(restored.columns(), df.columns());
@@ -855,7 +855,7 @@ fn test_binary_roundtrip_all_types() {
         ],
     );
     let bytes = df.to_binary();
-    let restored = luna2d::dataframe::serial::from_binary(&bytes).unwrap();
+    let restored = lurek2d::dataframe::serial::from_binary(&bytes).unwrap();
     assert!(restored
         .get_value(0, ColRef::Name("a".to_string()))
         .unwrap()
@@ -883,13 +883,13 @@ fn test_binary_roundtrip_all_types() {
 #[test]
 fn test_binary_invalid_magic_errors() {
     let bad = b"BADXsomegarbagedata";
-    assert!(luna2d::dataframe::serial::from_binary(bad).is_err());
+    assert!(lurek2d::dataframe::serial::from_binary(bad).is_err());
 }
 
 #[test]
 fn test_binary_too_short_errors() {
     let bad = b"LVDF";
-    assert!(luna2d::dataframe::serial::from_binary(bad).is_err());
+    assert!(lurek2d::dataframe::serial::from_binary(bad).is_err());
 }
 
 // ============================================================================
@@ -899,7 +899,7 @@ fn test_binary_too_short_errors() {
 #[test]
 fn test_sql_select_star() {
     let df = sample_df();
-    let result = luna2d::dataframe::sql::query_sql(&df, "SELECT * FROM data").unwrap();
+    let result = lurek2d::dataframe::sql::query_sql(&df, "SELECT * FROM data").unwrap();
     assert_eq!(result.nrows(), 3);
     assert_eq!(result.ncols(), 2);
 }
@@ -907,7 +907,7 @@ fn test_sql_select_star() {
 #[test]
 fn test_sql_select_specific_column() {
     let df = sample_df();
-    let result = luna2d::dataframe::sql::query_sql(&df, "SELECT name FROM data").unwrap();
+    let result = lurek2d::dataframe::sql::query_sql(&df, "SELECT name FROM data").unwrap();
     assert_eq!(result.ncols(), 1);
     assert_eq!(result.columns(), &["name"]);
     assert_eq!(result.nrows(), 3);
@@ -917,7 +917,7 @@ fn test_sql_select_specific_column() {
 fn test_sql_where_clause() {
     let df = sample_df();
     let result =
-        luna2d::dataframe::sql::query_sql(&df, "SELECT * FROM data WHERE score > 80").unwrap();
+        lurek2d::dataframe::sql::query_sql(&df, "SELECT * FROM data WHERE score > 80").unwrap();
     assert_eq!(result.nrows(), 2); // Alice (90) and Charlie (85)
 }
 
@@ -925,7 +925,7 @@ fn test_sql_where_clause() {
 fn test_sql_order_by() {
     let df = sample_df();
     let result =
-        luna2d::dataframe::sql::query_sql(&df, "SELECT * FROM data ORDER BY score ASC").unwrap();
+        lurek2d::dataframe::sql::query_sql(&df, "SELECT * FROM data ORDER BY score ASC").unwrap();
     let first = result
         .get_value(0, ColRef::Name("score".to_string()))
         .unwrap()
@@ -951,7 +951,7 @@ fn test_sql_group_by_count() {
             ],
         ],
     );
-    let result = luna2d::dataframe::sql::query_sql(
+    let result = lurek2d::dataframe::sql::query_sql(
         &df,
         "SELECT dept, COUNT(salary) FROM data GROUP BY dept",
     )
@@ -977,7 +977,7 @@ fn test_sql_group_by_sum() {
         ],
     );
     let result =
-        luna2d::dataframe::sql::query_sql(&df, "SELECT dept, SUM(salary) FROM data GROUP BY dept")
+        lurek2d::dataframe::sql::query_sql(&df, "SELECT dept, SUM(salary) FROM data GROUP BY dept")
             .unwrap();
     assert_eq!(result.nrows(), 2);
 }
@@ -1154,13 +1154,13 @@ fn test_random_deterministic_with_seed() {
 fn test_sql_database_from_table() {
     let mut db = Database::new();
     db.add_table("users", sample_df());
-    let result = luna2d::dataframe::sql::query_sql_database(&db, "SELECT * FROM users").unwrap();
+    let result = lurek2d::dataframe::sql::query_sql_database(&db, "SELECT * FROM users").unwrap();
     assert_eq!(result.nrows(), 3);
 }
 
 #[test]
 fn test_sql_database_table_not_found_errors() {
     let db = Database::new();
-    let result = luna2d::dataframe::sql::query_sql_database(&db, "SELECT * FROM missing");
+    let result = lurek2d::dataframe::sql::query_sql_database(&db, "SELECT * FROM missing");
     assert!(result.is_err());
 }

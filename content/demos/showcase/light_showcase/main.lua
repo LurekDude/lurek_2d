@@ -1,7 +1,7 @@
--- Light Showcase — A multi-screen demo of Luna2D's 2D lighting system
+-- Light Showcase — A multi-screen demo of Lurek2D's 2D lighting system
 -- Press number keys 1-8 to switch screens.  WASD moves the player light.
 -- Each screen demonstrates a different lighting feature.
--- Run with: cargo run -- demos/showcase/light_showcase
+-- Run with: cargo run -- content/demos/showcase/light_showcase
 
 local W, H = 1024, 768
 local screen = 1        -- current screen index
@@ -30,8 +30,8 @@ local group1_on = true
 
 local function clear_all()
     -- Clear every registered light so each screen starts from a clean slate
-    -- luna.light.clear() is the idiomatic way to tear down the whole light list
-    luna.light.clear()
+    -- lurek.light.clear() is the idiomatic way to tear down the whole light list
+    lurek.light.clear()
     player_x, player_y = W / 2, H / 2
 end
 
@@ -39,44 +39,44 @@ end
 
 local function setup_point_lights()
     clear_all()
-    luna.light.setAmbient(0.08, 0.08, 0.12, 1.0)
+    lurek.light.setAmbient(0.08, 0.08, 0.12, 1.0)
     -- Warm orange
-    luna.light.newLight(200, 300, 180, {
+    lurek.light.newLight(200, 300, 180, {
         color = {1.0, 0.6, 0.2, 1.0}, intensity = 1.2
     })
     -- Cool blue
-    luna.light.newLight(500, 200, 200, {
+    lurek.light.newLight(500, 200, 200, {
         color = {0.3, 0.5, 1.0, 1.0}, intensity = 1.0
     })
     -- Green
-    luna.light.newLight(750, 500, 150, {
+    lurek.light.newLight(750, 500, 150, {
         color = {0.2, 1.0, 0.3, 1.0}, intensity = 0.9
     })
     -- Purple
-    luna.light.newLight(350, 550, 160, {
+    lurek.light.newLight(350, 550, 160, {
         color = {0.8, 0.2, 1.0, 1.0}, intensity = 1.1
     })
     -- White player light
-    luna.light.newLight(player_x, player_y, 120, {
+    lurek.light.newLight(player_x, player_y, 120, {
         color = {1.0, 1.0, 0.9, 1.0}, intensity = 0.8, groupId = 99
     })
 end
 
 local function setup_spot_lights()
     clear_all()
-    luna.light.setAmbient(0.05, 0.05, 0.08, 1.0)
+    lurek.light.setAmbient(0.05, 0.05, 0.08, 1.0)
     -- Spotlight 1: narrow cone pointing right
-    luna.light.newLight(150, 350, 300, {
+    lurek.light.newLight(150, 350, 300, {
         type = "spot", direction = 0, innerAngle = 0.15, outerAngle = 0.4,
         color = {1.0, 0.9, 0.5, 1.0}, intensity = 1.5
     })
     -- Spotlight 2: wide cone pointing down
-    luna.light.newLight(500, 100, 350, {
+    lurek.light.newLight(500, 100, 350, {
         type = "spot", direction = 1.57, innerAngle = 0.3, outerAngle = 0.8,
         color = {0.5, 0.8, 1.0, 1.0}, intensity = 1.2
     })
     -- Spotlight 3: tight cone pointing up-left
-    luna.light.newLight(800, 600, 250, {
+    lurek.light.newLight(800, 600, 250, {
         type = "spot", direction = -2.35, innerAngle = 0.1, outerAngle = 0.25,
         color = {1.0, 0.3, 0.3, 1.0}, intensity = 1.8
     })
@@ -84,45 +84,45 @@ end
 
 local function setup_directional_light()
     clear_all()
-    luna.light.setAmbient(0.15, 0.15, 0.2, 1.0)
+    lurek.light.setAmbient(0.15, 0.15, 0.2, 1.0)
     -- Sunlight from top-left
-    luna.light.newLight(W / 2, H / 2, 600, {
+    lurek.light.newLight(W / 2, H / 2, 600, {
         type = "directional", direction = 0.78,
         color = {1.0, 0.95, 0.8, 1.0}, intensity = 0.8
     })
     -- Moonlight from top-right (dimmer, blue)
-    luna.light.newLight(W / 2, H / 2, 500, {
+    lurek.light.newLight(W / 2, H / 2, 500, {
         type = "directional", direction = 2.36,
         color = {0.4, 0.5, 0.8, 1.0}, intensity = 0.4
     })
     -- Player lantern
-    luna.light.newLight(player_x, player_y, 100, {
+    lurek.light.newLight(player_x, player_y, 100, {
         color = {1.0, 0.8, 0.4, 1.0}, intensity = 0.6, groupId = 99
     })
 end
 
 local function setup_flicker()
     clear_all()
-    luna.light.setAmbient(0.04, 0.04, 0.06, 1.0)
+    lurek.light.setAmbient(0.04, 0.04, 0.06, 1.0)
     -- flickerSpeed controls oscillation frequency; flickerStrength controls amplitude
     -- Candle (slow, subtle) → Torch (medium) → Campfire (fast) → Strobe (very fast)
     -- Slow candle
-    luna.light.newLight(200, 350, 140, {
+    lurek.light.newLight(200, 350, 140, {
         color = {1.0, 0.7, 0.3, 1.0}, intensity = 1.0,
         flickerSpeed = 4.0, flickerStrength = 0.1
     })
     -- Medium torch
-    luna.light.newLight(450, 350, 170, {
+    lurek.light.newLight(450, 350, 170, {
         color = {1.0, 0.5, 0.15, 1.0}, intensity = 1.2,
         flickerSpeed = 8.0, flickerStrength = 0.2
     })
     -- Fast campfire
-    luna.light.newLight(700, 350, 200, {
+    lurek.light.newLight(700, 350, 200, {
         color = {1.0, 0.4, 0.1, 1.0}, intensity = 1.4,
         flickerSpeed = 15.0, flickerStrength = 0.35
     })
     -- Strobe (very fast, high strength)
-    luna.light.newLight(900, 200, 120, {
+    lurek.light.newLight(900, 200, 120, {
         color = {0.8, 0.8, 1.0, 1.0}, intensity = 1.0,
         flickerSpeed = 30.0, flickerStrength = 0.6
     })
@@ -130,23 +130,23 @@ end
 
 local function setup_attenuation()
     clear_all()
-    luna.light.setAmbient(0.06, 0.06, 0.1, 1.0)
+    lurek.light.setAmbient(0.06, 0.06, 0.1, 1.0)
     -- No custom attenuation (default: constant=1, linear=0, quadratic=0)
-    luna.light.newLight(200, 350, 200, {
+    lurek.light.newLight(200, 350, 200, {
         color = {1.0, 1.0, 1.0, 1.0}, intensity = 1.0
     })
     -- Linear attenuation
-    luna.light.newLight(450, 350, 200, {
+    lurek.light.newLight(450, 350, 200, {
         color = {0.5, 1.0, 0.5, 1.0}, intensity = 1.0,
         attConstant = 1.0, attLinear = 0.01, attQuadratic = 0.0
     })
     -- Quadratic attenuation (realistic)
-    luna.light.newLight(700, 350, 200, {
+    lurek.light.newLight(700, 350, 200, {
         color = {1.0, 0.5, 0.5, 1.0}, intensity = 1.0,
         attConstant = 1.0, attLinear = 0.0, attQuadratic = 0.005
     })
     -- Mixed
-    luna.light.newLight(950, 350, 200, {
+    lurek.light.newLight(950, 350, 200, {
         color = {0.5, 0.5, 1.0, 1.0}, intensity = 1.0,
         attConstant = 0.5, attLinear = 0.01, attQuadratic = 0.002
     })
@@ -154,18 +154,18 @@ end
 
 local function setup_groups()
     clear_all()
-    luna.light.setAmbient(0.05, 0.05, 0.08, 1.0)
+    lurek.light.setAmbient(0.05, 0.05, 0.08, 1.0)
     group1_on = true
     -- Group 1: torches (orange) — press G to toggle
     for i = 0, 3 do
-        luna.light.newLight(150 + i * 200, 250, 140, {
+        lurek.light.newLight(150 + i * 200, 250, 140, {
             color = {1.0, 0.6, 0.2, 1.0}, intensity = 1.0,
             groupId = 1, flickerSpeed = 6.0, flickerStrength = 0.12
         })
     end
     -- Group 2: overhead lights (white) — always on
     for i = 0, 2 do
-        luna.light.newLight(200 + i * 300, 550, 180, {
+        lurek.light.newLight(200 + i * 300, 550, 180, {
             color = {0.9, 0.9, 1.0, 1.0}, intensity = 0.7,
             groupId = 2
         })
@@ -174,41 +174,41 @@ end
 
 local function setup_shadows()
     clear_all()
-    luna.light.setAmbient(0.08, 0.08, 0.12, 1.0)
+    lurek.light.setAmbient(0.08, 0.08, 0.12, 1.0)
     -- Shadow filter: none
-    luna.light.newLight(200, 350, 200, {
+    lurek.light.newLight(200, 350, 200, {
         color = {1.0, 0.8, 0.5, 1.0}, intensity = 1.0,
         shadowEnabled = true, shadowFilter = "none"
     })
     -- Shadow filter: pcf5
-    luna.light.newLight(500, 350, 200, {
+    lurek.light.newLight(500, 350, 200, {
         color = {0.5, 0.8, 1.0, 1.0}, intensity = 1.0,
         shadowEnabled = true, shadowFilter = "pcf5"
     })
     -- Shadow filter: pcf13
-    luna.light.newLight(800, 350, 200, {
+    lurek.light.newLight(800, 350, 200, {
         color = {0.8, 1.0, 0.5, 1.0}, intensity = 1.0,
         shadowEnabled = true, shadowFilter = "pcf13"
     })
     -- Occluders (wall segments)
-    luna.light.newOccluder({280, 280, 320, 280, 320, 420, 280, 420})
-    luna.light.newOccluder({580, 280, 620, 280, 620, 420, 580, 420})
-    luna.light.newOccluder({880, 280, 920, 280, 920, 420, 880, 420})
+    lurek.light.newOccluder({280, 280, 320, 280, 320, 420, 280, 420})
+    lurek.light.newOccluder({580, 280, 620, 280, 620, 420, 580, 420})
+    lurek.light.newOccluder({880, 280, 920, 280, 920, 420, 880, 420})
 end
 
 local function setup_blend_modes()
     clear_all()
-    luna.light.setAmbient(0.1, 0.1, 0.15, 1.0)
+    lurek.light.setAmbient(0.1, 0.1, 0.15, 1.0)
     -- Add mode (brightens)
-    luna.light.newLight(200, 350, 180, {
+    lurek.light.newLight(200, 350, 180, {
         color = {1.0, 0.5, 0.2, 1.0}, intensity = 1.0, blend = "add"
     })
     -- Sub mode (darkens — creates shadows/holes)
-    luna.light.newLight(500, 350, 180, {
+    lurek.light.newLight(500, 350, 180, {
         color = {0.5, 0.3, 0.8, 1.0}, intensity = 1.0, blend = "sub"
     })
     -- Mix mode (tints without brightening)
-    luna.light.newLight(800, 350, 180, {
+    lurek.light.newLight(800, 350, 180, {
         color = {0.2, 0.8, 0.5, 1.0}, intensity = 1.0, blend = "mix"
     })
 end
@@ -228,19 +228,19 @@ local setup_fns = {
 
 -- ── Callbacks ────────────────────────────────────────────────────────────
 
-function luna.init()
+function lurek.init()
     setup_fns[screen]()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     time = time + dt
 
     -- WASD movement for the player light (group 99)
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") then dy = dy - 1 end
-    if luna.keyboard.isDown("s") then dy = dy + 1 end
-    if luna.keyboard.isDown("a") then dx = dx - 1 end
-    if luna.keyboard.isDown("d") then dx = dx + 1 end
+    if lurek.keyboard.isDown("w") then dy = dy - 1 end
+    if lurek.keyboard.isDown("s") then dy = dy + 1 end
+    if lurek.keyboard.isDown("a") then dx = dx - 1 end
+    if lurek.keyboard.isDown("d") then dx = dx + 1 end
     if dx ~= 0 or dy ~= 0 then
         local len = math.sqrt(dx * dx + dy * dy)
         player_x = player_x + (dx / len) * MOVE_SPEED * dt
@@ -252,94 +252,94 @@ function luna.process(dt)
 
     -- Advance flickers for screens that use them
     if screen == 4 or screen == 6 then
-        luna.light.advanceFlickers(dt)
+        lurek.light.advanceFlickers(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Background
-    luna.gfx.clear(0.02, 0.02, 0.04)
+    lurek.gfx.clear(0.02, 0.02, 0.04)
 
     -- Draw a simple grid floor
-    luna.gfx.setColor(0.15, 0.15, 0.2, 1.0)
+    lurek.gfx.setColor(0.15, 0.15, 0.2, 1.0)
     for x = 0, W, 64 do
-        luna.gfx.line(x, 0, x, H)
+        lurek.gfx.line(x, 0, x, H)
     end
     for y = 0, H, 64 do
-        luna.gfx.line(0, y, W, y)
+        lurek.gfx.line(0, y, W, y)
     end
 
     -- Draw occluder outlines (screen 7)
     if screen == 7 then
-        luna.gfx.setColor(0.4, 0.4, 0.5, 1.0)
-        luna.gfx.rectangle("fill", 280, 280, 40, 140)
-        luna.gfx.rectangle("fill", 580, 280, 40, 140)
-        luna.gfx.rectangle("fill", 880, 280, 40, 140)
+        lurek.gfx.setColor(0.4, 0.4, 0.5, 1.0)
+        lurek.gfx.rectangle("fill", 280, 280, 40, 140)
+        lurek.gfx.rectangle("fill", 580, 280, 40, 140)
+        lurek.gfx.rectangle("fill", 880, 280, 40, 140)
     end
 
     -- Draw player dot
-    luna.gfx.setColor(1.0, 1.0, 0.8, 0.8)
-    luna.gfx.circle("fill", player_x, player_y, 6)
+    lurek.gfx.setColor(1.0, 1.0, 0.8, 0.8)
+    lurek.gfx.circle("fill", player_x, player_y, 6)
 
     -- HUD — screen title and description
-    luna.gfx.setColor(1.0, 1.0, 1.0, 1.0)
+    lurek.gfx.setColor(1.0, 1.0, 1.0, 1.0)
     local s = screens[screen]
-    luna.gfx.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
-    luna.gfx.setColor(0.7, 0.7, 0.8, 1.0)
-    luna.gfx.print(s.desc, 20, 45)
+    lurek.gfx.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
+    lurek.gfx.setColor(0.7, 0.7, 0.8, 1.0)
+    lurek.gfx.print(s.desc, 20, 45)
 
     -- Controls
-    luna.gfx.setColor(0.5, 0.5, 0.6, 1.0)
-    luna.gfx.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
+    lurek.gfx.setColor(0.5, 0.5, 0.6, 1.0)
+    lurek.gfx.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
     if screen == 6 then
         local state_str = group1_on and "ON" or "OFF"
-        luna.gfx.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
+        lurek.gfx.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
     end
 
     -- Per-screen labels
     if screen == 1 then
         -- Labels for each light
-        luna.gfx.setColor(1.0, 0.6, 0.2, 0.7)
-        luna.gfx.print("Warm orange", 160, 230)
-        luna.gfx.setColor(0.3, 0.5, 1.0, 0.7)
-        luna.gfx.print("Cool blue", 460, 130)
-        luna.gfx.setColor(0.2, 1.0, 0.3, 0.7)
-        luna.gfx.print("Green", 720, 430)
-        luna.gfx.setColor(0.8, 0.2, 1.0, 0.7)
-        luna.gfx.print("Purple", 310, 480)
+        lurek.gfx.setColor(1.0, 0.6, 0.2, 0.7)
+        lurek.gfx.print("Warm orange", 160, 230)
+        lurek.gfx.setColor(0.3, 0.5, 1.0, 0.7)
+        lurek.gfx.print("Cool blue", 460, 130)
+        lurek.gfx.setColor(0.2, 1.0, 0.3, 0.7)
+        lurek.gfx.print("Green", 720, 430)
+        lurek.gfx.setColor(0.8, 0.2, 1.0, 0.7)
+        lurek.gfx.print("Purple", 310, 480)
     elseif screen == 2 then
-        luna.gfx.setColor(1.0, 0.9, 0.5, 0.7)
-        luna.gfx.print("Narrow cone ->", 50, 320)
-        luna.gfx.setColor(0.5, 0.8, 1.0, 0.7)
-        luna.gfx.print("Wide cone v", 450, 60)
-        luna.gfx.setColor(1.0, 0.3, 0.3, 0.7)
-        luna.gfx.print("Tight cone", 750, 560)
+        lurek.gfx.setColor(1.0, 0.9, 0.5, 0.7)
+        lurek.gfx.print("Narrow cone ->", 50, 320)
+        lurek.gfx.setColor(0.5, 0.8, 1.0, 0.7)
+        lurek.gfx.print("Wide cone v", 450, 60)
+        lurek.gfx.setColor(1.0, 0.3, 0.3, 0.7)
+        lurek.gfx.print("Tight cone", 750, 560)
     elseif screen == 4 then
-        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.gfx.print("Slow candle", 155, 270)
-        luna.gfx.print("Medium torch", 395, 270)
-        luna.gfx.print("Fast campfire", 640, 270)
-        luna.gfx.print("Strobe", 870, 140)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.gfx.print("Slow candle", 155, 270)
+        lurek.gfx.print("Medium torch", 395, 270)
+        lurek.gfx.print("Fast campfire", 640, 270)
+        lurek.gfx.print("Strobe", 870, 140)
     elseif screen == 5 then
-        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.gfx.print("Default (none)", 140, 270)
-        luna.gfx.print("Linear", 410, 270)
-        luna.gfx.print("Quadratic", 650, 270)
-        luna.gfx.print("Mixed", 910, 270)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.gfx.print("Default (none)", 140, 270)
+        lurek.gfx.print("Linear", 410, 270)
+        lurek.gfx.print("Quadratic", 650, 270)
+        lurek.gfx.print("Mixed", 910, 270)
     elseif screen == 7 then
-        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.gfx.print("No filter", 155, 230)
-        luna.gfx.print("PCF5", 470, 230)
-        luna.gfx.print("PCF13", 760, 230)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.gfx.print("No filter", 155, 230)
+        lurek.gfx.print("PCF5", 470, 230)
+        lurek.gfx.print("PCF13", 760, 230)
     elseif screen == 8 then
-        luna.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        luna.gfx.print("Add (brighten)", 140, 270)
-        luna.gfx.print("Sub (darken)", 445, 270)
-        luna.gfx.print("Mix (tint)", 750, 270)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.gfx.print("Add (brighten)", 140, 270)
+        lurek.gfx.print("Sub (darken)", 445, 270)
+        lurek.gfx.print("Mix (tint)", 750, 270)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     -- Number keys switch screens
     local num = tonumber(key)
     if num and num >= 1 and num <= NUM_SCREENS then
@@ -351,11 +351,11 @@ function luna.keypressed(key)
     -- G toggles group 1 on screen 6
     if key == "g" and screen == 6 then
         group1_on = not group1_on
-        luna.light.setGroupEnabled(1, group1_on)
+        lurek.light.setGroupEnabled(1, group1_on)
     end
 
     -- Escape quits
     if key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

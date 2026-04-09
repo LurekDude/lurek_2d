@@ -4,7 +4,7 @@
 
 ### Genre-Specific Plugin Packs
 
-Today, every Luna2D binary includes all Tier 2 modules even if the game doesn't need
+Today, every Lurek2D binary includes all Tier 2 modules even if the game doesn't need
 them. With plugins, developers load only what they need:
 
 | Genre | Plugins Needed | Plugins NOT Needed |
@@ -16,8 +16,8 @@ them. With plugins, developers load only what they need:
 | Roguelike | tilemap, pathfinding, ai, terminal | spine, minimap |
 | Puzzle | core only | tilemap, ai, pathfinding, spine |
 
-**Binary size reduction**: a puzzle game ships `luna2d.exe` (~15 MB) + no plugin DLLs,
-vs. today's ~20 MB monolith. An RPG ships `luna2d.exe` + `luna_gamedev.dll` (~3 MB).
+**Binary size reduction**: a puzzle game ships `lurek2d.exe` (~15 MB) + no plugin DLLs,
+vs. today's ~20 MB monolith. An RPG ships `lurek2d.exe` + `luna_gamedev.dll` (~3 MB).
 
 ### Third-Party Game Extensions
 
@@ -35,38 +35,38 @@ With the plugin boundary defined, advanced users can author game-specific plugin
 
 ### Data Dashboards
 
-Luna2D's 2D rendering, input handling, and Lua scripting make it viable for interactive
+Lurek2D's 2D rendering, input handling, and Lua scripting make it viable for interactive
 data visualization:
 
 ```lua
--- Business dashboard running on Luna2D
-luna.init(function()
-    local df = luna.dataframe.fromCSV("sales_2024.csv")
-    local chart = luna.dashboard.barChart(df, { x = "month", y = "revenue" })
+-- Business dashboard running on Lurek2D
+lurek.init(function()
+    local df = lurek.dataframe.fromCSV("sales_2024.csv")
+    local chart = lurek.dashboard.barChart(df, { x = "month", y = "revenue" })
     chart:setPosition(100, 100)
     chart:setSize(600, 400)
 end)
 
-luna.render(function()
-    luna.gfx.clear(0.95, 0.95, 0.97)
+lurek.render(function()
+    lurek.gfx.clear(0.95, 0.95, 0.97)
     chart:draw()
 end)
 ```
 
-**Plugin**: `luna_business.dll` provides `luna.dataframe`, `luna.dashboard`,
-`luna.report`, `luna.workflow`.
+**Plugin**: `luna_business.dll` provides `lurek.dataframe`, `lurek.dashboard`,
+`lurek.report`, `lurek.workflow`.
 
 ### Workflow Automation
 
-Enterprise teams can use Luna2D + Lua scripting to build internal tools:
+Enterprise teams can use Lurek2D + Lua scripting to build internal tools:
 
-- **ETL pipelines** — `luna.pipeline` for Extract-Transform-Load with visual DAG display
-- **Approval workflows** — GUI forms built with `luna.ui`, state machines via `luna.ai`
+- **ETL pipelines** — `lurek.pipeline` for Extract-Transform-Load with visual DAG display
+- **Approval workflows** — GUI forms built with `lurek.ui`, state machines via `lurek.ai`
 - **Report generation** — read data → process → render to canvas → export PNG/PDF
 
 ### Kiosk & Digital Signage
 
-A thin `luna2d.exe` + `luna_signage.dll` for:
+A thin `lurek2d.exe` + `luna_signage.dll` for:
 - Menu boards (restaurants, cafeterias)
 - Wayfinding displays (airports, hospitals)
 - Information kiosks (museums, visitor centers)
@@ -80,15 +80,15 @@ offline, starts instantly on boot.
 
 ### Interactive Textbooks
 
-Luna2D can power interactive STEM visualizations:
+Lurek2D can power interactive STEM visualizations:
 
 ```lua
 -- Physics simulation for an e-textbook
-luna.init(function()
+lurek.init(function()
     pendulum = { angle = math.pi/4, omega = 0, length = 200 }
 end)
 
-luna.process(function(dt)
+lurek.process(function(dt)
     local g = 9.81
     local alpha = -g / pendulum.length * math.sin(pendulum.angle)
     pendulum.omega = pendulum.omega + alpha * dt
@@ -96,17 +96,17 @@ luna.process(function(dt)
 end)
 ```
 
-**Plugin**: `luna_education.dll` provides `luna.simulation`, `luna.quiz`,
-`luna.annotation` modules.
+**Plugin**: `luna_education.dll` provides `lurek.simulation`, `lurek.quiz`,
+`lurek.annotation` modules.
 
 ### Code Learning Environments
 
-Embed Luna2D in a coding tutor app where students write Lua and see results immediately.
+Embed Lurek2D in a coding tutor app where students write Lua and see results immediately.
 The Lua sandbox ensures student code cannot access the filesystem or crash the host.
 
 ### Game Design Courses
 
-Students prototype games using `luna.*` API. Plugin architecture lets instructors
+Students prototype games using `lurek.*` API. Plugin architecture lets instructors
 distribute course-specific modules:
 - `luna_course_2024.dll` — assignment framework, auto-grading hooks, asset collections
 
@@ -120,20 +120,20 @@ For Raspberry Pi or embedded Linux devices with displays:
 
 ```lua
 -- Industrial sensor display
-luna.init(function()
-    luna.serial.open("COM3", 9600)
+lurek.init(function()
+    lurek.serial.open("COM3", 9600)
 end)
 
-luna.process(function(dt)
-    local data = luna.serial.read("COM3")
+lurek.process(function(dt)
+    local data = lurek.serial.read("COM3")
     if data then
         temperature = tonumber(data)
     end
 end)
 
-luna.render(function()
-    luna.gfx.clear(0.1, 0.1, 0.15)
-    luna.gfx.drawText("Temperature: " .. temperature .. "°C", 100, 100)
+lurek.render(function()
+    lurek.gfx.clear(0.1, 0.1, 0.15)
+    lurek.gfx.drawText("Temperature: " .. temperature .. "°C", 100, 100)
     drawGauge(temperature, 0, 100, 400, 300, 150)
 end)
 ```
@@ -144,7 +144,7 @@ Benefits: no browser, minimal memory footprint, direct serial port access,
 ### Machine HMI (Human-Machine Interface)
 
 Replace expensive industrial HMI software with a Lua-scripted alternative:
-- `luna_hmi.dll` — `luna.plc` (PLC communication), `luna.alarm`, `luna.trend`
+- `luna_hmi.dll` — `lurek.plc` (PLC communication), `lurek.alarm`, `lurek.trend`
 - Configurable via `conf.toml` or SCADA-like definition files
 - Runs on standard x86 hardware, not proprietary panels
 
@@ -154,7 +154,7 @@ Replace expensive industrial HMI software with a Lua-scripted alternative:
 
 ### Agent-Based Modeling
 
-Luna2D's particle system and entity framework naturally extend to agent-based
+Lurek2D's particle system and entity framework naturally extend to agent-based
 simulations:
 
 - **Epidemiology** — disease spread visualization (SIR models)
@@ -166,8 +166,8 @@ and spatial hashing.
 
 ### 2D CAD / Diagram Editors
 
-With `luna.gfx` for rendering, `luna.input` for interaction, and `luna.graph` for
-data structures, Luna2D can power:
+With `lurek.gfx` for rendering, `lurek.input` for interaction, and `lurek.graph` for
+data structures, Lurek2D can power:
 - Circuit diagram editors
 - Flowchart tools
 - Level editors for other game engines
@@ -178,23 +178,23 @@ data structures, Luna2D can power:
 
 ### Visual Regression Testing
 
-A headless-capable Luna2D can render scenes and compare screenshots:
+A headless-capable Lurek2D can render scenes and compare screenshots:
 
 ```lua
 -- Automated visual regression test
-luna.init(function()
+lurek.init(function()
     render_complex_scene()
-    luna.gfx.saveScreenshot("output/test_scene.png")
-    luna.window.close()
+    lurek.gfx.saveScreenshot("output/test_scene.png")
+    lurek.window.close()
 end)
 ```
 
-Plugins provide test-specific utilities: `luna_testing.dll` with `luna.compare`,
-`luna.benchmark`, `luna.fuzz` modules.
+Plugins provide test-specific utilities: `luna_testing.dll` with `lurek.compare`,
+`lurek.benchmark`, `lurek.fuzz` modules.
 
 ### UI Automation
 
-A plugin driving `luna.automation`:
+A plugin driving `lurek.automation`:
 - Record user interactions
 - Replay for regression testing
 - Stress test with randomized inputs
@@ -215,7 +215,7 @@ A plugin driving `luna.automation`:
 | Social/CM | `luna_social` | network-graph, timeline, feed |
 
 Each plugin is a standalone `.dll` / `.so` / `.dylib` that registers into the existing
-`luna.*` namespace. Game scripts and business scripts use the same API patterns.
+`lurek.*` namespace. Game scripts and business scripts use the same API patterns.
 
 ---
 
@@ -225,11 +225,11 @@ Plugins enable flexible licensing:
 
 | Component | License | Distribution |
 |-----------|---------|-------------|
-| `luna2d-core` + `luna2d-bin` | MIT (open source) | Free |
-| `luna2d-gamedev` | MIT (open source) | Free |
-| `luna2d-business` | MIT (open source) | Free |
+| `lurek2d-core` + `lurek2d-bin` | MIT (open source) | Free |
+| `lurek2d-gamedev` | MIT (open source) | Free |
+| `lurek2d-business` | MIT (open source) | Free |
 | Third-party plugins | Author's choice | Author distributes |
 | `luna_steam.dll` | Proprietary (requires Steam SDK license) | Separate download |
 
-The MIT core + plugin architecture means Luna2D can power both open-source and
+The MIT core + plugin architecture means Lurek2D can power both open-source and
 commercial products without license conflicts.

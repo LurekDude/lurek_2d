@@ -1,8 +1,8 @@
-# Luna2D Ecosystem � Crate Recommendations
+# Lurek2D Ecosystem � Crate Recommendations
 
-> **Purpose**: Definitive guide for which Rust crates Luna2D should use, consider, or avoid � per module, per tier.
-> Aligned with the three-tier distribution model: **Luna2D Light**, **Luna2D Standard**, **Luna2D Full**.
-> Updated: 2026-03-31 (v2). Based on architecture.md, design-assumptions.md, zen-of-luna.md, and Cargo.toml analysis.
+> **Purpose**: Definitive guide for which Rust crates Lurek2D should use, consider, or avoid � per module, per tier.
+> Aligned with the three-tier distribution model: **Lurek2D Light**, **Lurek2D Standard**, **Lurek2D Full**.
+> Updated: 2026-03-31 (v2). Based on architecture.md, design-assumptions.md, zen-of-lurek.md, and Cargo.toml analysis.
 
 ---
 
@@ -11,9 +11,9 @@
 - [Tier Model](#tier-model)
 - [Binary Size Budget](#binary-size-budget)
 - [Current Dependency Audit](#current-dependency-audit)
-- [Tier 1 � Luna2D Light (Core)](#tier-1--luna2d-light-core)
-- [Tier 2 � Luna2D Standard (Extended)](#tier-2--luna2d-standard-extended)
-- [Tier 3 � Luna2D Full (Heavy Optional)](#tier-3--luna2d-full-heavy-optional)
+- [Tier 1 � Lurek2D Light (Core)](#tier-1--lurek2d-light-core)
+- [Tier 2 � Lurek2D Standard (Extended)](#tier-2--lurek2d-standard-extended)
+- [Tier 3 � Lurek2D Full (Heavy Optional)](#tier-3--lurek2d-full-heavy-optional)
 - [Module-by-Module Recommendations](#module-by-module-recommendations)
   - [Graphics / Rendering](#1-graphics--rendering)
   - [Audio](#2-audio)
@@ -51,15 +51,15 @@
 
 ## Tier Model
 
-Luna2D ships in three tiers. Each tier adds binary size and capabilities:
+Lurek2D ships in three tiers. Each tier adds binary size and capabilities:
 
 | Tier | Name | Description | Binary Target |
 |---|---|---|---|
-| **1** | **Luna2D Light** | Core Love2D equivalent. Graphics, audio, input, physics, timer, filesystem, math, window, events, system, particles. | ? 10 MB |
-| **2** | **Luna2D Standard** | Extended game systems. Tilemap, scene, pathfinding, entity/ECS, AI, graph, data processing, compute, noise, tweening. Pure Rust or tiny crate additions only. | ? 15 MB |
-| **3** | **Luna2D Full** | Optional heavy features controlled by Cargo feature flags. Advanced physics (rapier2d), networking, advanced audio effects, Tiled import, Zstd compression. | ? 25 MB |
+| **1** | **Lurek2D Light** | Core Engine A equivalent. Graphics, audio, input, physics, timer, filesystem, math, window, events, system, particles. | ? 10 MB |
+| **2** | **Lurek2D Standard** | Extended game systems. Tilemap, scene, pathfinding, entity/ECS, AI, graph, data processing, compute, noise, tweening. Pure Rust or tiny crate additions only. | ? 15 MB |
+| **3** | **Lurek2D Full** | Optional heavy features controlled by Cargo feature flags. Advanced physics (rapier2d), networking, advanced audio effects, Tiled import, Zstd compression. | ? 25 MB |
 
-**The golden rule**: a game with 5 MB of assets should not ship with a 200 MB engine. Luna2D Light must be smaller than the game it runs.
+**The golden rule**: a game with 5 MB of assets should not ship with a 200 MB engine. Lurek2D Light must be smaller than the game it runs.
 
 ---
 
@@ -130,9 +130,9 @@ Review of every dependency in Cargo.toml with keep/drop/feature-gate/bump recomm
 
 ---
 
-## Tier 1 � Luna2D Light (Core)
+## Tier 1 � Lurek2D Light (Core)
 
-The Love2D equivalent. Every game needs these. Must be as lean as possible.
+The Engine A equivalent. Every game needs these. Must be as lean as possible.
 
 ### Modules Included
 
@@ -146,7 +146,7 @@ The Love2D equivalent. Every game needs these. Must be as lean as possible.
 | Timer | 85 | **Native** � trivial |
 | Filesystem (sandboxed I/O, VFS) | 685 | **Native** � security-critical sandboxing |
 | Engine (app loop, config, errors) | 2,144 | **Native** |
-| Particles | 624 | **Native** � Love2D parity |
+| Particles | 624 | **Native** � Engine A parity |
 | Data (ByteData, compress, hash, encode) | 249 | flate2 + lz4_flex + sha2/md-5 + base64/hex |
 | Image (CPU pixel buffer) | 188 | image 0.25 (PNG/JPEG/BMP features) |
 | Sound (PCM samples) | 97 | **Native** � trivial |
@@ -222,16 +222,16 @@ This is sufficient for platformers, top-down games, puzzle games, and simple act
 
 ---
 
-## Tier 2 � Luna2D Standard (Extended)
+## Tier 2 � Lurek2D Standard (Extended)
 
-Game systems that go beyond Love2D. Pure Rust implementations with optional tiny crate additions.
+Game systems that go beyond Engine A. Pure Rust implementations with optional tiny crate additions.
 
 ### Modules Included (on top of Tier 1)
 
 | Module | Current SLoC | Crate Strategy | Crate Binary Impact |
 |---|---|---|---|
 | Tilemap | 2,343 | **Native** � expanded built-in features | 0 |
-| Scene management | 250 | **Native** � expanded with Solar2D-style lifecycle | 0 |
+| Scene management | 250 | **Native** � expanded with Engine B-style lifecycle | 0 |
 | Pathfinding | 1,464 | **Native** � hand-rolled A*/flow fields work well | 0 |
 | Entity/ECS | 570 | **Native** � expanded with more features | 0 |
 | AI (FSM, BT, steering, GOAP) | 1,791 | **Native** � keep and expand | 0 |
@@ -330,7 +330,7 @@ The hand-rolled compute module (1,439 SLoC) provides N-dimensional arrays with a
 
 #### Noise Generation � KEEP NATIVE, expand features
 
-Luna2D already hand-rolls Perlin/Simplex/Worley/FBM noise with domain warping and bulk map generation.
+Lurek2D already hand-rolls Perlin/Simplex/Worley/FBM noise with domain warping and bulk map generation.
 
 **Expand with**:
 - **Value noise** � simpler interpolated grid noise, good for terrain.
@@ -361,7 +361,7 @@ sysinfo = { version = "0.38", default-features = false, features = ["system"] }
 
 ---
 
-## Tier 3 � Luna2D Full (Heavy Optional)
+## Tier 3 � Lurek2D Full (Heavy Optional)
 
 Features that require heavy external crates. Each is behind a Cargo feature flag. Users who don't need them don't pay the binary cost.
 
@@ -398,8 +398,8 @@ Currently rapier2d is unconditional. To feature-gate it:
 
 1. Move `src/physics/world.rs` rapier2d integration behind `#[cfg(feature = "physics-rapier")]`
 2. Keep the hand-rolled AABB physics as the always-available fallback
-3. When `physics-rapier` is enabled, the `luna.physics.newWorld()` creates a rapier2d-backed world
-4. When disabled, `luna.physics.newWorld()` creates the lightweight AABB world
+3. When `physics-rapier` is enabled, the `lurek.physics.newWorld()` creates a rapier2d-backed world
+4. When disabled, `lurek.physics.newWorld()` creates the lightweight AABB world
 5. The Lua API surface stays identical � only the backend changes
 
 ---
@@ -418,11 +418,11 @@ Currently rapier2d is unconditional. To feature-gate it:
 | wgpu init | pollster 0.3 | **BUMP to 0.4** |
 | SIMD Math | � | **ADD glam 0.30** � SIMD-optimized Vec2/Vec3/Mat3/Mat4 |
 
-**glam integration strategy**: The `glam` crate (0.30) is the industry-standard SIMD math library for Rust game engines (used by Bevy, wgpu internally). It provides `Vec2`, `Vec3`, `Vec4`, `Mat2`, `Mat3`, `Mat4`, `Quat` with optional SIMD acceleration.
+**glam integration strategy**: The `glam` crate (0.30) is the industry-standard SIMD math library for Rust game engines (used by Engine D, wgpu internally). It provides `Vec2`, `Vec3`, `Vec4`, `Mat2`, `Mat3`, `Mat4`, `Quat` with optional SIMD acceleration.
 
 **Integration plan**:
-- Use `glam::Vec2` and `glam::Mat3` as the internal representation in Luna2D's math types.
-- Keep the existing `luna.math.Vec2` Lua API surface unchanged � wrap glam types in UserData.
+- Use `glam::Vec2` and `glam::Mat3` as the internal representation in Lurek2D's math types.
+- Keep the existing `lurek.math.Vec2` Lua API surface unchanged � wrap glam types in UserData.
 - Benefit: SIMD-accelerated vector/matrix operations at near-zero binary cost (glam is mostly inlines).
 - Benefit: Compatibility with wgpu's internal math (reduces conversion overhead at GPU boundaries).
 - The 4,463 SLoC of math code stays, but hot-path operations delegate to glam.
@@ -439,7 +439,7 @@ Currently rapier2d is unconditional. To feature-gate it:
 
 **Audio effects � NATIVE EXPANSION using rodio 0.22**:
 
-rodio 0.22 ships with a rich Source trait and built-in audio processors. Luna2D should expand the native audio module to expose:
+rodio 0.22 ships with a rich Source trait and built-in audio processors. Lurek2D should expand the native audio module to expose:
 
 - **Lowpass filter** � already implemented (keep and improve with configurable cutoff frequency)
 - **Highpass filter** � already implemented (keep and improve)
@@ -456,9 +456,9 @@ rodio 0.22 ships with a rich Source trait and built-in audio processors. Luna2D 
 - **Panning** � stereo panning (already implemented)
 - **EQ (3-band)** � simple equalizer using cascaded biquad filters (native, ~150 SLoC)
 
-**Implementation strategy**: Build these as native Rust types that implement rodio's `Source` trait. Chain them together in a DSP pipeline. The Lua API exposes `luna.audio.newEffect("reverb", {params})` and `source:addEffect(effect)`.
+**Implementation strategy**: Build these as native Rust types that implement rodio's `Source` trait. Chain them together in a DSP pipeline. The Lua API exposes `lurek.audio.newEffect("reverb", {params})` and `source:addEffect(effect)`.
 
-**Why NOT kira**: kira (0.12) is an excellent game audio library but would add ~200-400 KB to the binary. The audio effects listed above can be implemented natively in ~500-700 SLoC total, using rodio's existing infrastructure. The native approach gives Luna2D full control over the DSP pipeline and the Lua API surface. **Verdict: Keep rodio, expand native effects.**
+**Why NOT kira**: kira (0.12) is an excellent game audio library but would add ~200-400 KB to the binary. The audio effects listed above can be implemented natively in ~500-700 SLoC total, using rodio's existing infrastructure. The native approach gives Lurek2D full control over the DSP pipeline and the Lua API surface. **Verdict: Keep rodio, expand native effects.**
 
 ### 3. Physics
 
@@ -489,7 +489,7 @@ No changes needed. Both are lightweight and well-suited.
 | Geometry | Hand-rolled (14 functions) | **KEEP NATIVE** |
 | Triangulation | Hand-rolled (ear-clipping) | **KEEP NATIVE** |
 
-**glam integration**: Use `glam::Vec2` as the backing type for Luna2D's `Vec2`. Keep the Lua API surface identical � `luna.math.newVec2(x, y)` still works. The change is internal: hot-path operations (add, sub, mul, dot, normalize, length, distance) use SIMD-accelerated glam implementations. Mat3 and transform operations similarly delegate.
+**glam integration**: Use `glam::Vec2` as the backing type for Lurek2D's `Vec2`. Keep the Lua API surface identical � `lurek.math.newVec2(x, y)` still works. The change is internal: hot-path operations (add, sub, mul, dot, normalize, length, distance) use SIMD-accelerated glam implementations. Mat3 and transform operations similarly delegate.
 
 **Easing expansion** � add these curves beyond the existing 22:
 - `ease_in_out_elastic` � complete the elastic family
@@ -522,7 +522,7 @@ No external dependencies beyond `std`. 685 SLoC. **KEEP NATIVE** � security-cr
 
 ### 9. Particles
 
-No external dependencies. 624 SLoC. **KEEP NATIVE** � perfect scope. Love2D parity.
+No external dependencies. 624 SLoC. **KEEP NATIVE** � perfect scope. Engine A parity.
 
 ### 10. Data / Compression / Hashing / Encoding
 
@@ -555,7 +555,7 @@ This is purely an encoding library � NOT a hex grid library. Hex grid function
 **PNG-focused expansion** � the user wants full PNG workflow:
 - **Load PNG** � already supported via `image` crate (keep)
 - **Save PNG** � add `ImageData:save(path)` using `image::save_buffer()` with PNG encoder
-- **Screenshot to PNG** � add `luna.gfx.captureScreenshot(path)` that reads the framebuffer and saves to PNG
+- **Screenshot to PNG** � add `lurek.gfx.captureScreenshot(path)` that reads the framebuffer and saves to PNG
 - **Pixel-by-pixel access** � already implemented (`get_pixel`, `set_pixel`), ensure it works for loaded PNGs
 - **Raw byte access** � already implemented (`as_bytes`), document for advanced users
 
@@ -596,7 +596,7 @@ The `tiled` crate (0.15, maintained by the Tiled editor team) enables importing 
 - Built-in zstd/zlib/gzip decompression of tile data
 - World file (.world) support for multi-map games
 
-**Integration plan**: Behind `#[cfg(feature = "tiled-import")]`. Add `luna.tilemap.loadTiled(path)` that returns a native Luna2D `TileMap` populated from the TMX data. Map TMX layers � TileLayer, TMX tilesets � TileSet, TMX objects � a Lua table of shapes/points.
+**Integration plan**: Behind `#[cfg(feature = "tiled-import")]`. Add `lurek.tilemap.loadTiled(path)` that returns a native Lurek2D `TileMap` populated from the TMX data. Map TMX layers � TileLayer, TMX tilesets � TileSet, TMX objects � a Lua table of shapes/points.
 
 **Native tilemap expansion** (independent of `tiled`):
 - **Hex grid support**: Cube/axial/offset coordinate systems, hex neighbors, hex distance, hex ring/spiral iteration, hex line drawing, hex-to-pixel and pixel-to-hex. Keep native � hex math is well-documented. Inspired by `hexx` crate algorithms but reimplemented.
@@ -610,12 +610,12 @@ The `tiled` crate (0.15, maintained by the Tiled editor team) enables importing 
 |---|---|---|
 | Scene stack | Hand-rolled (250 SLoC) | **KEEP NATIVE � EXPAND** |
 
-**Expansion inspired by Solar2D (Corona) Composer**:
+**Expansion inspired by Engine B (Corona) Composer**:
 
 The current scene system has: push, pop, register, enter/leave/pause/resume callbacks, transitions, inter-scene data, depth sorting. This is a solid foundation.
 
 **Add**:
-- **Two-phase event lifecycle**: `will_enter` / `did_enter` / `will_leave` / `did_leave` � gives scenes hooks before and after transitions complete. Solar2D's `will`/`did` phase pattern is proven.
+- **Two-phase event lifecycle**: `will_enter` / `did_enter` / `will_leave` / `did_leave` � gives scenes hooks before and after transitions complete. Engine B's `will`/`did` phase pattern is proven.
 - **Scene overlays**: `pushOverlay(sceneName, params)` � a modal scene that renders on top of the current scene without pausing it. For dialog boxes, HUD panels, inventory popups. `popOverlay()` dismisses.
 - **Scene preloading**: `preloadScene(sceneName)` � create the scene object and run its `create` callback without showing it. For loading screens.
 - **Scene recycling**: When a scene is hidden, its view can be destroyed (freeing GPU textures) while the scene object persists. `recycleOnLeave` flag per scene.
@@ -624,7 +624,7 @@ The current scene system has: push, pop, register, enter/leave/pause/resume call
   - `zoomIn` / `zoomOut` � scale transitions
   - `flipHorizontal` / `flipVertical` � card-flip style
   - `iris` / `irisOpen` � circular reveal/close (common in retro games)
-- **Inter-scene variables**: `luna.scene.setVariable(key, value)` / `getVariable(key)` � clean global state bridge between scenes (Solar2D pattern). Already partially implemented via inter-scene data � formalize the API.
+- **Inter-scene variables**: `lurek.scene.setVariable(key, value)` / `getVariable(key)` � clean global state bridge between scenes (Engine B pattern). Already partially implemented via inter-scene data � formalize the API.
 
 ### 16. Pathfinding
 
@@ -682,7 +682,7 @@ Total expansion: ~350-400 SLoC of additional graph algorithms.
 - **Normalize** to [0, 1] or [-1, 1] range.
 - **Dot product** for 1D arrays.
 
-**GPU compute acceleration**: For large arrays (>100K elements), wgpu compute shaders can parallelize matmul, convolution, and element-wise operations. This uses the existing wgpu dependency � zero additional binary cost. Expose via `luna.compute.gpuMatmul(a, b)`.
+**GPU compute acceleration**: For large arrays (>100K elements), wgpu compute shaders can parallelize matmul, convolution, and element-wise operations. This uses the existing wgpu dependency � zero additional binary cost. Expose via `lurek.compute.gpuMatmul(a, b)`.
 
 ### 21. Noise / Procedural Generation
 
@@ -739,24 +739,24 @@ Total expansion: ~650-850 SLoC of additional noise/procgen algorithms.
 |---|---|---|
 | JSON | serde_json 1 | **KEEP** � read and write JSON files |
 | TOML | � | **ADD `toml` 0.8** � preferred config format (Tier 1) |
-| Lua tables | mlua native | **KEEP** � `luna.fs.load()` for Lua data files |
+| Lua tables | mlua native | **KEEP** � `lurek.fs.load()` for Lua data files |
 | Binary dump | � | **ADD NATIVE** � simple binary serialization |
 
 **Serialization API surface**:
-- `luna.data.encodeJSON(table) � string` � Lua table to JSON string
-- `luna.data.decodeJSON(string) � table` � JSON string to Lua table
-- `luna.data.encodeToml(table) � string` � Lua table to TOML string
-- `luna.data.parseToml(string) � table` � TOML string to Lua table
-- `luna.data.encodeBinary(table) � ByteData` � simple binary dump (native, ~200 SLoC)
-- `luna.data.decodeBinary(ByteData) � table` � binary load
-- `luna.fs.load(path)` � load and execute Lua file, return its result table
+- `lurek.data.encodeJSON(table) � string` � Lua table to JSON string
+- `lurek.data.decodeJSON(string) � table` � JSON string to Lua table
+- `lurek.data.encodeToml(table) � string` � Lua table to TOML string
+- `lurek.data.parseToml(string) � table` � TOML string to Lua table
+- `lurek.data.encodeBinary(table) � ByteData` � simple binary dump (native, ~200 SLoC)
+- `lurek.data.decodeBinary(ByteData) � table` � binary load
+- `lurek.fs.load(path)` � load and execute Lua file, return its result table
 
 **Binary dump format** (native implementation):
 A simple tagged binary format for game save data. Type-length-value encoding:
 - `0x01` nil, `0x02` boolean, `0x03` integer (i64), `0x04` number (f64), `0x05` string (length-prefixed), `0x06` table (key-value pairs terminated by 0x00).
 - No external crate needed. ~200 SLoC.
 
-**Why NOT rmp-serde**: MessagePack would add a dependency for a format game developers rarely choose themselves. The native binary dump is simpler, Luna2D-specific, and sufficient for save data. If MessagePack is needed in the future, add it then.
+**Why NOT rmp-serde**: MessagePack would add a dependency for a format game developers rarely choose themselves. The native binary dump is simpler, Lurek2D-specific, and sufficient for save data. If MessagePack is needed in the future, add it then.
 
 ### 24. Networking
 
@@ -786,10 +786,10 @@ The user needs logging that serves two purposes:
 - **Structured log format**: Implement a custom `log` backend (or wrap `env_logger`) that outputs JSON-structured log lines when `LUNA_LOG_FORMAT=json` is set. Format: `{"ts":"ISO8601","level":"INFO","module":"physics","msg":"step complete","dt_ms":16.2}`.
 - **Log levels**: Use standard `log` crate levels (`error`, `warn`, `info`, `debug`, `trace`).
 - **Log categories/tags**: Add a `target` field to all engine log calls. Categories: `engine`, `graphics`, `audio`, `physics`, `input`, `lua`, `timer`, `filesystem`, `ai`, `scene`, `entity`, `tilemap`.
-- **Lua-side logging**: `luna.log.info(msg)`, `luna.log.warn(msg)`, `luna.log.error(msg)`, `luna.log.debug(msg)` � game scripts can write to the same log stream.
-- **Log file output**: `luna.log.setFile(path)` � redirect log output to a file for post-mortem analysis. Append mode, with session start marker.
-- **Performance logging**: `luna.log.perf(label, fn)` � time a function and log the duration. For profiling specific game operations.
-- **AI-friendly analytics**: `luna.log.event(category, data_table)` � structured event logging. Example: `luna.log.event("combat", {attacker="player", damage=25, target="goblin_3"})`. These entries are JSON-formatted for easy parsing by AI agents.
+- **Lua-side logging**: `lurek.log.info(msg)`, `lurek.log.warn(msg)`, `lurek.log.error(msg)`, `lurek.log.debug(msg)` � game scripts can write to the same log stream.
+- **Log file output**: `lurek.log.setFile(path)` � redirect log output to a file for post-mortem analysis. Append mode, with session start marker.
+- **Performance logging**: `lurek.log.perf(label, fn)` � time a function and log the duration. For profiling specific game operations.
+- **AI-friendly analytics**: `lurek.log.event(category, data_table)` � structured event logging. Example: `lurek.log.event("combat", {attacker="player", damage=25, target="goblin_3"})`. These entries are JSON-formatted for easy parsing by AI agents.
 
 **Why NOT tracing**: tracing (452 KiB) adds structured logging, async spans, and subscriber framework � all unnecessary for a synchronous game engine. The native JSON log format achieves the same AI-readable output with zero additional dependencies.
 
@@ -822,10 +822,10 @@ Simple clipboard (copy/paste text) via `arboard` is enough. No need for advanced
 - Disk I/O read/write bytes per process
 
 **Lua API surface**:
-- `luna.platform.getCpuUsage() � number` � overall CPU utilization % (0-100)
-- `luna.platform.getMemoryUsage() � number, number` � used MB, total MB
-- `luna.platform.getProcessMemory() � number` � engine process memory in MB
-- `luna.platform.getFrameTime() � number` � last frame duration in ms (already in timer)
+- `lurek.platform.getCpuUsage() � number` � overall CPU utilization % (0-100)
+- `lurek.platform.getMemoryUsage() � number, number` � used MB, total MB
+- `lurek.platform.getProcessMemory() � number` � engine process memory in MB
+- `lurek.platform.getFrameTime() � number` � last frame duration in ms (already in timer)
 
 **Why keep sysinfo**: Despite being ~200-400 KB, it's the only maintained crate for live CPU/memory utilization metrics on all three desktop platforms. The alternatives (`num_cpus`, `std::env`) provide only static info, not utilization.
 
@@ -932,7 +932,7 @@ Best-in-class for the use case. No changes needed.
 - **1 removed recommendation**: kira (replaced by native audio effects)
 - **1 removed recommendation**: rmp-serde (replaced by native binary dump)
 
-Luna2D's strategy is clear: **use crates for infrastructure** (GPU, windowing, audio playback, scripting) and **build game systems natively** (tilemap, scene, AI, physics, graph, compute, noise, animation, serialization). This gives full control over the Lua API surface while keeping binary size under 15 MB for Standard tier.
+Lurek2D's strategy is clear: **use crates for infrastructure** (GPU, windowing, audio playback, scripting) and **build game systems natively** (tilemap, scene, AI, physics, graph, compute, noise, animation, serialization). This gives full control over the Lua API surface while keeping binary size under 15 MB for Standard tier.
 
 ---
 

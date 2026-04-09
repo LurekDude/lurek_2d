@@ -1,12 +1,12 @@
 //! Named audio bus for grouping sources under shared volume, pitch, and pause controls.
 //!
-//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
 //! details for bus-related operations and data management.
 //! Key types exported from this module: `Bus`.
 //! Primary functions: `new()`, `name()`, `volume()`, `set_volume()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::engine::log_messages::{BU01, BU02, BU03};
 use crate::log_msg;

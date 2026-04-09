@@ -39,24 +39,24 @@ Two visual effects families in one module:
 
 ## Structural Issues
 
-- **Two families in one module is OK**: PostFx and Overlays are both "visual effects applied to the rendered frame." Combining them makes sense. But the Lua API naming could be clearer — `luna.postfx.postfx.*` vs `luna.postfx.overlay.*`.
+- **Two families in one module is OK**: PostFx and Overlays are both "visual effects applied to the rendered frame." Combining them makes sense. But the Lua API naming could be clearer — `lurek.postfx.postfx.*` vs `lurek.postfx.overlay.*`.
 - **Shake duplication**: `fx` module has screen shake via Overlay. `camera` module also has screen shake. Two independent shake systems is confusing. **Resolve: one canonical shake.**
 - **No separate overlay.md or postfx.md specs**: Both are in `fx.md`. This is correct — they're one module. But the system prompt's tier list mentions "overlay" and "postfx" as separate modules.
 - **CPU-only data**: Overlay subsystems are pure data. Rendering is done elsewhere. This is architecturally correct.
 
 ## Suggestions
 
-1. **Consolidate shake**: Remove camera shake. Keep shake in `fx` module only (or vice versa). One canonical `luna.postfx.shake(intensity, duration)`.
-2. **Add effect presets**: `luna.postfx.applyPreset("retro")` — pre-configured effect stacks. Reduces boilerplate for common styles.
-3. **Add palette swap**: `luna.postfx.postfx.addPaletteSwap(paletteImage)` — common in retro and narrative games (time of day, flashback).
+1. **Consolidate shake**: Remove camera shake. Keep shake in `fx` module only (or vice versa). One canonical `lurek.postfx.shake(intensity, duration)`.
+2. **Add effect presets**: `lurek.postfx.applyPreset("retro")` — pre-configured effect stacks. Reduces boilerplate for common styles.
+3. **Add palette swap**: `lurek.postfx.postfx.addPaletteSwap(paletteImage)` — common in retro and narrative games (time of day, flashback).
 4. **Bridge fx ↔ light**: Connect ambient time-of-day overlay with light module's LightWorld ambient color. Currently independent.
-5. **Add transition effects**: `luna.postfx.transition.wipe(duration, angle)`, `luna.postfx.transition.iris(x, y, duration)` — PostFx-based scene transitions.
-6. **Add shader error feedback**: `luna.postfx.postfx.addCustom(wgsl, onError)` — callback for shader compilation errors.
+5. **Add transition effects**: `lurek.postfx.transition.wipe(duration, angle)`, `lurek.postfx.transition.iris(x, y, duration)` — PostFx-based scene transitions.
+6. **Add shader error feedback**: `lurek.postfx.postfx.addCustom(wgsl, onError)` — callback for shader compilation errors.
 7. **Update tier list**: System prompt should list `fx` not "overlay" and "postfx" as separate modules.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Post-processing | ✅ (16 effects) | ✅ (shader-based) | ❌ | ✅ |
 | Weather effects | ✅ (8 types) | ❌ | ❌ | ❌ |
@@ -66,7 +66,7 @@ Two visual effects families in one module:
 | Effect presets | ❌ | ❌ | ❌ | ❌ |
 | Day/night ambient | ✅ | ❌ | ❌ | ❌ |
 
-Luna2D's fx module is very rich. The 16 built-in PostFx effects + 12 overlay subsystems is unmatched in 2D Lua engines.
+Lurek2D's fx module is very rich. The 16 built-in PostFx effects + 12 overlay subsystems is unmatched in 2D Lua engines.
 
 ## Priority
 

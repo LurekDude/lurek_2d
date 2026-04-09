@@ -1,9 +1,9 @@
 ---
 name: rust-coding
-description: "Load this skill when writing or reviewing Rust code in the Luna2D engine. It owns safe Rust conventions, error handling patterns, module structure, and idiomatic Rust for game engine development. Skip it for Lua scripting, CAG files, or documentation."
+description: "Load this skill when writing or reviewing Rust code in the Lurek2D engine. It owns safe Rust conventions, error handling patterns, module structure, and idiomatic Rust for game engine development. Skip it for Lua scripting, CAG files, or documentation."
 ---
 
-# Rust Coding — Luna2D Engine
+# Rust Coding — Lurek2D Engine
 
 ## Load When
 
@@ -14,7 +14,7 @@ description: "Load this skill when writing or reviewing Rust code in the Luna2D 
 
 ## Owns
 
-- Safe Rust coding conventions for Luna2D
+- Safe Rust coding conventions for Lurek2D
 - Error handling with `Result<T>` and `EngineError`
 - `Rc<RefCell<SharedState>>` usage patterns
 - Module visibility rules (`pub` vs `pub(crate)`)
@@ -48,14 +48,14 @@ description: "Load this skill when writing or reviewing Rust code in the Luna2D 
 
 ## Module Tier System
 
-Luna2D source is organized in a strict tier direction — no circular deps:
+Lurek2D source is organized in a strict tier direction — no circular deps:
 
 | Tier | Modules | May import |
 |------|---------|-----------|
 | Foundation — Baseline | `math`, `engine` | `math` has no deps; `engine` imports `math` |
 | Tier 1 — Core | `graphics`, `audio`, `physics`, `input`, `timer`, `filesystem`, `compute`, `data`, `image`, `sound`, `event`, `entity`, `window`, `thread` | Baseline only — no T1↔T1 cross-imports |
 | Tier 2 — Extensions | `particle`, `tilemap`, `scene`, `savegame`, `modding`, `graph`, `pathfinding`, `ai`, `dataframe`, `resource` | Baseline + Tier 1 — no T2↔T2 cross-imports |
-| Tier 3 — Lunasome | `library/` (pure Lua) | Public `luna.*` API only |
+| Tier 3 — Lunasome | `content/library/` (pure Lua) | Public `lurek.*` API only |
 | Bridge layer | `lua_api` | All tiers — domain modules never import `lua_api` |
 
 **Forbidden import patterns:**

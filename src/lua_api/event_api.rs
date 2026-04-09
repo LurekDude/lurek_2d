@@ -145,7 +145,7 @@ impl LuaUserData for LuaSignal {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.signal` API table with the Lua VM.
+/// Registers the `lurek.signal` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
@@ -244,7 +244,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- pump --
-    /// Syncs OS-level events into the queue (no-op in Luna2D push model).
+    /// Syncs OS-level events into the queue (no-op in Lurek2D push model).
     /// @return nil
     let s = state.clone();
     tbl.set(

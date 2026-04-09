@@ -1,4 +1,4 @@
-//! Structured error types and result alias for the Luna2D engine.
+//! Structured error types and result alias for the Lurek2D engine.
 //!
 //! All engine-level error conditions are expressed as variants of [`EngineError`], a
 //! `thiserror`-derived enum that carries a human-readable description and belongs to one
@@ -13,7 +13,7 @@
 //! Every error variant has a stable four-digit numeric code (e.g. `E1001`) that can be
 //! displayed in the error screen and referenced in documentation without changing across
 //! releases.  This makes it straightforward for users to search for a specific error online
-//! or in the Luna2D issue tracker.
+//! or in the Lurek2D issue tracker.
 //!
 //! Lua errors are wrapped as [`EngineError::LuaError`] so they can flow through the same
 //! result type and be presented by [`crate::engine::error_screen::ErrorScreen`].
@@ -58,7 +58,7 @@ impl ErrorCategory {
     }
 }
 
-/// All possible error conditions that can occur in the Luna2D engine.
+/// All possible error conditions that can occur in the Lurek2D engine.
 ///
 /// Each variant carries a stable error code (`E1001`–`E1012`) and belongs to an
 /// [`ErrorCategory`] for structured error reporting.

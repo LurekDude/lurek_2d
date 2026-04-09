@@ -14,7 +14,7 @@ description: "Create a new event type or signal pattern for decoupled game commu
 ## Steps
 
 1. **Choose the pattern**
-   - EventQueue: FIFO polling for deferred processing in `luna.update()`
+   - EventQueue: FIFO polling for deferred processing in `lurek.update()`
    - Signal: Pub-sub for immediate multi-listener broadcast
 
 2. **Define event schema**
@@ -24,8 +24,8 @@ description: "Create a new event type or signal pattern for decoupled game commu
 
 3. **Implement integration**
    - For engine events: push to EventQueue from `engine/app.rs`
-   - For game events: push from Lua via `luna.signal.push(name, ...args)`
-   - For signals: emit from Lua via `luna.signal.emit(name, ...args)`
+   - For game events: push from Lua via `lurek.signal.push(name, ...args)`
+   - For signals: emit from Lua via `lurek.signal.emit(name, ...args)`
 
 4. **Write tests**
    - Add to `tests/rust/unit/event_tests.rs`

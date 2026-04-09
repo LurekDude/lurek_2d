@@ -1,7 +1,7 @@
-//! Localization subsystem for Luna2D.
+//! Localization subsystem for Lurek2D.
 //!
 //! Provides translation catalog management and text formatting utilities
-//! exposed to Lua games via `luna.localization.*`.
+//! exposed to Lua games via `lurek.localization.*`.
 //!
 //! ## Architecture
 //!

@@ -10,12 +10,12 @@ A grid-based restaurant management simulation. Place counters, tables, and kitch
 - Satisfaction score that rises on fast service and drops on long waits
 - Day cycle timer (`DAY_LENGTH = 45 s`) ending the day and tallying revenue
 - Build mode toggle (`B`): separates placement input from the simulation update
-- `luna.gfx.drawRect` + `drawText` for the entire grid and HUD, no sprites needed
+- `lurek.gfx.drawRect` + `drawText` for the entire grid and HUD, no sprites needed
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/tycoon
+cargo run -- content/demos/tycoon
 ```
 
 ## Controls

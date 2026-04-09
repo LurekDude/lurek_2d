@@ -1,6 +1,6 @@
 //! Stress tests for the image module — large image buffers and operations.
 
-use luna2d::image::ImageData;
+use lurek2d::image::ImageData;
 
 #[test]
 fn stress_large_image_creation() {

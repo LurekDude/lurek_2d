@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.procgen`                                       |
+| **Lua API**    | `lurek.procgen`                                       |
 | **Source**     | `src/procgen/`                                       |
 | **Rust Tests** | `tests/rust/unit/procgen_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_procgen.lua`                    |
@@ -24,7 +24,7 @@ The five algorithms are:
 
 All algorithms share an internal `Lcg` (linear congruential generator) struct (`pub(crate)`) for fast deterministic randomness. The `Lcg` is not exposed to Lua or to other modules.
 
-The module depends only on Baseline (`engine` for log messages). It does **not** import from `math`, any Tier 1 module, or any other Tier 2 module. All five algorithms are exposed to Lua under `luna.procgen.*` by `src/lua_api/procgen_api.rs`.
+The module depends only on Baseline (`engine` for log messages). It does **not** import from `math`, any Tier 1 module, or any other Tier 2 module. All five algorithms are exposed to Lua under `lurek.procgen.*` by `src/lua_api/procgen_api.rs`.
 
 ## Architecture
 
@@ -53,7 +53,7 @@ src/procgen/
                         └── shared deterministic RNG
 
   src/lua_api/
-  └── procgen_api.rs ── registers luna.procgen.* table
+  └── procgen_api.rs ── registers lurek.procgen.* table
                          └── imports all 5 public functions + 2 opts structs
 ```
 
@@ -149,15 +149,15 @@ No public enums in this module.
 
 ## Lua API
 
-All functions are registered under `luna.procgen.*` by `src/lua_api/procgen_api.rs`. The table is added to the `luna` global as `luna.procgen`. The registration function signature is `pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()>`. The `_state` parameter is unused — all algorithms are stateless.
+All functions are registered under `lurek.procgen.*` by `src/lua_api/procgen_api.rs`. The table is added to the `luna` global as `lurek.procgen`. The registration function signature is `pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()>`. The `_state` parameter is unused — all algorithms are stateless.
 
 | Lua function | Parameters | Returns | Description |
 |---|---|---|---|
-| `luna.procgen.cellularAutomata(w, h, opts?)` | `w: integer`, `h: integer`, `opts: {fill, iterations, birth, survive, seed}?` | flat `{integer}` of size `w*h` (0=open, 1=wall) | Generate a cave/dungeon map via cellular automata |
-| `luna.procgen.floodFill(data, w, h, sx, sy, threshold?, above?)` | `data: {integer}`, `w, h, sx, sy: integer` (0-based), `threshold: integer` (default 128), `above: boolean` (default false) | flat `{integer}` mask of size `w*h` (0/1) | BFS flood fill from seed coordinate |
-| `luna.procgen.perlinNoise(x, y, px, py)` | `x, y, px, py: number` | `number` in approximately `[-1, 1]` | Evaluate periodic tileable Perlin noise |
-| `luna.procgen.poissonDisk(w, h, minDist, maxAttempts?, seed?)` | `w, h, minDist: number`, `maxAttempts: integer` (default 30), `seed: integer` (default 0) | `{{x=n, y=n}, ...}` table of point objects | Generate Poisson-disk distributed points |
-| `luna.procgen.voronoi(w, h, pts, opts?)` | `w, h: integer`, `pts: {{x=n, y=n}, ...}`, `opts: {warp_scale, warp_strength, seed}?` | `regions, distances, secondDistances` (three flat tables) | Generate Voronoi diagram; region indices are 1-based |
+| `lurek.procgen.cellularAutomata(w, h, opts?)` | `w: integer`, `h: integer`, `opts: {fill, iterations, birth, survive, seed}?` | flat `{integer}` of size `w*h` (0=open, 1=wall) | Generate a cave/dungeon map via cellular automata |
+| `lurek.procgen.floodFill(data, w, h, sx, sy, threshold?, above?)` | `data: {integer}`, `w, h, sx, sy: integer` (0-based), `threshold: integer` (default 128), `above: boolean` (default false) | flat `{integer}` mask of size `w*h` (0/1) | BFS flood fill from seed coordinate |
+| `lurek.procgen.perlinNoise(x, y, px, py)` | `x, y, px, py: number` | `number` in approximately `[-1, 1]` | Evaluate periodic tileable Perlin noise |
+| `lurek.procgen.poissonDisk(w, h, minDist, maxAttempts?, seed?)` | `w, h, minDist: number`, `maxAttempts: integer` (default 30), `seed: integer` (default 0) | `{{x=n, y=n}, ...}` table of point objects | Generate Poisson-disk distributed points |
+| `lurek.procgen.voronoi(w, h, pts, opts?)` | `w, h: integer`, `pts: {{x=n, y=n}, ...}`, `opts: {warp_scale, warp_strength, seed}?` | `regions, distances, secondDistances` (three flat tables) | Generate Voronoi diagram; region indices are 1-based |
 
 **Note on Voronoi regions**: The Lua binding adds 1 to the raw Rust region indices (`*r + 1`) so that region IDs are 1-based, matching Lua table conventions.
 
@@ -166,9 +166,9 @@ All functions are registered under `luna.procgen.*` by `src/lua_api/procgen_api.
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Generate a 40x30 cave map with cellular automata
-    local cave = luna.procgen.cellularAutomata(40, 30, {
+    local cave = lurek.procgen.cellularAutomata(40, 30, {
         fill = 0.45,
         iterations = 5,
         birth = 6,
@@ -177,11 +177,11 @@ function luna.init()
     })
 
     -- Find all open cells reachable from the center
-    local reachable = luna.procgen.floodFill(cave, 40, 30, 20, 15, 1, false)
+    local reachable = lurek.procgen.floodFill(cave, 40, 30, 20, 15, 1, false)
     -- reachable[i] == 1 means cell i is connected to (20,15) via open cells
 
     -- Sample points for object placement (trees, rocks, etc.)
-    local points = luna.procgen.poissonDisk(200, 200, 15, 30, 123)
+    local points = lurek.procgen.poissonDisk(200, 200, 15, 30, 123)
     for _, p in ipairs(points) do
         print(string.format("Object at %.1f, %.1f", p.x, p.y))
     end
@@ -192,18 +192,18 @@ function luna.init()
         { x = 75, y = 25 },
         { x = 50, y = 75 },
     }
-    local regions, dist, dist2 = luna.procgen.voronoi(100, 100, seeds)
+    local regions, dist, dist2 = lurek.procgen.voronoi(100, 100, seeds)
     -- regions[i] is 1, 2, or 3 (1-based seed index)
 end
 
-function luna.render()
+function lurek.render()
     -- Use periodic noise for a scrolling background
     for x = 0, 199 do
         for y = 0, 149 do
-            local n = luna.procgen.perlinNoise(x * 0.05, y * 0.05, 10.0, 7.5)
+            local n = lurek.procgen.perlinNoise(x * 0.05, y * 0.05, 10.0, 7.5)
             local brightness = (n + 1) * 0.5  -- map [-1,1] to [0,1]
-            luna.gfx.setColor(brightness, brightness, brightness)
-            luna.gfx.points(x, y)
+            lurek.gfx.setColor(brightness, brightness, brightness)
+            lurek.gfx.points(x, y)
         end
     end
 end
@@ -225,7 +225,7 @@ end
 | Module        | Relationship | Notes                                                    |
 |---------------|-------------|----------------------------------------------------------|
 | `engine`      | Imports from | Uses `log_messages` constants (`PG01_CELLULAR_START`, `PG02_CELLULAR_DONE`, `VR01`, `VR02`) and `log_msg!` macro |
-| `lua_api`     | Imported by  | `src/lua_api/procgen_api.rs` registers `luna.procgen.*`  |
+| `lua_api`     | Imported by  | `src/lua_api/procgen_api.rs` registers `lurek.procgen.*`  |
 | `tilemap`     | Related      | Generated cave/dungeon grids are typically stored as tilemap data |
 | `pathfinding` | Related      | Generated dungeon grids can feed into pathfinding navigation grids |
 | `math`        | Similar      | `math` provides `Noise` (simplex/Perlin/fBm) and `RandomGenerator`; `procgen` provides higher-level generation algorithms (cellular automata, Voronoi, Poisson disk) that use an internal `Lcg` instead of importing `math::random` |
@@ -243,4 +243,4 @@ end
 - `voronoi_diagram` uses brute-force nearest-point search (O(cells × seeds)). For large seed counts (>1000), performance may degrade. The `simple_hash_noise` private helper provides cheap deterministic noise for domain warping.
 - The module imports `crate::engine::log_messages` for structured debug logging in `cellular.rs` and `voronoi.rs`. Other submodules produce no log output.
 - No `unsafe` code anywhere in the module.
-- Breaking change surface: renaming or removing any of the five `luna.procgen.*` functions will break Lua game scripts that use procedural generation.
+- Breaking change surface: renaming or removing any of the five `lurek.procgen.*` functions will break Lua game scripts that use procedural generation.

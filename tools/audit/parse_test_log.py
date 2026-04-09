@@ -18,7 +18,7 @@ Output format:
     [then each failing test with its error block]
 
 The tool understands both Rust test output ("test foo ... ok/FAILED") and the
-Luna2D Lua BDD output ("FAIL [suite] test: message").
+Lurek2D Lua BDD output ("FAIL [suite] test: message").
 """
 
 from __future__ import annotations
@@ -191,7 +191,7 @@ def render(summary: ParseSummary, *, colour: bool = True, verbose: bool = False)
         # e.g. lua_test_math → "math", lua_integration_ai_physics → "integration/ai_physics"
         name = r.name
         if name.startswith("lua_test_library_"):
-            grp = "library/" + name[len("lua_test_library_"):]
+            grp = "content/library/" + name[len("lua_test_library_"):]
         elif name.startswith("lua_integration_"):
             grp = "integration/" + name[len("lua_integration_"):]
         elif name.startswith("lua_stress_"):

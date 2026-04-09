@@ -32,16 +32,16 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 
 ## Improvement Ideas
 
-### 1. Agent Specialization for Luna2D
+### 1. Agent Specialization for Lurek2D
 
-**Problem**: The 11 game-dev agents are generic. They don't know about Luna2D-specific APIs.
+**Problem**: The 11 game-dev agents are generic. They don't know about Lurek2D-specific APIs.
 
 **Improvement**:
-- Each agent should reference the luna.* APIs relevant to its domain
-- `lua-scripter` should know about luna.signal, luna.time, luna.entity
-- `level-designer` should know about luna.tilemap, luna.scene, luna.physics
-- `audio-designer` should know about luna.audio.* API
-- `visual-artist` should know about luna.gfx, luna.particles, luna.animation
+- Each agent should reference the lurek.* APIs relevant to its domain
+- `lua-scripter` should know about lurek.signal, lurek.time, lurek.entity
+- `level-designer` should know about lurek.tilemap, lurek.scene, lurek.physics
+- `audio-designer` should know about lurek.audio.* API
+- `visual-artist` should know about lurek.gfx, lurek.particles, lurek.animation
 - Include API examples in agent system prompts
 
 ### 2. Template Quality Assessment
@@ -52,18 +52,18 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 |---|---|---|
 | minimal | main.lua + conf.lua | Should be < 20 lines |
 | game-loop | update/draw loop | Should demonstrate delta time |
-| platformer | physics + input | Should use luna.physics |
-| rpg | entities + stats | Should use luna.entity + library/stats |
+| platformer | physics + input | Should use lurek.physics |
+| rpg | entities + stats | Should use lurek.entity + library/stats |
 | shooter | physics + spawn | Should demonstrate bullet pools |
 | puzzle | grid + input | Should demonstrate grid math |
-| roguelike | procedural gen | Should use luna.math.noise |
+| roguelike | procedural gen | Should use lurek.math.noise |
 | visual-novel | dialog + choices | Should use library/dialog |
-| arcade | high score + lives | Should demonstrate luna.data |
-| tower-defense | pathfinding + entities | Should use luna.pathfinding |
+| arcade | high score + lives | Should demonstrate lurek.data |
+| tower-defense | pathfinding + entities | Should use lurek.pathfinding |
 | game-jam | fast scaffold | Should be minimal + timer |
-| demo-scene | graphics showcase | Should use multiple luna.gfx calls |
+| demo-scene | graphics showcase | Should use multiple lurek.gfx calls |
 
-**Action**: Verify each template actually uses the relevant luna.* APIs and library/ modules.
+**Action**: Verify each template actually uses the relevant lurek.* APIs and library/ modules.
 
 ### 3. Skill-Agent Mapping
 
@@ -89,7 +89,7 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 
 **8 instruction files** should cover:
 1. Lua coding style (indentation, naming)
-2. Luna2D API conventions (callbacks, lifecycle)
+2. Lurek2D API conventions (callbacks, lifecycle)
 3. File organization (modules, require patterns)
 4. Testing patterns (describe/it/expect)
 5. Performance guidelines (avoid per-frame allocations)
@@ -115,7 +115,7 @@ The doc specifies a **game developer-facing CAG layer** (separate from the engin
 
 ### 6. CAG Deployment Workflow
 
-**Current**: `luna.cag.deploy` copies CAG files to the game project.
+**Current**: `lurek.cag.deploy` copies CAG files to the game project.
 
 **Improvements**:
 - Version the CAG files � track which version was deployed

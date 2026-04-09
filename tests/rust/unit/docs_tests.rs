@@ -1,7 +1,7 @@
-//! Integration tests for `luna2d::docs` — DocEntry, Catalog, quality_score, quality_grade,
+//! Integration tests for `lurek2d::docs` — DocEntry, Catalog, quality_score, quality_grade,
 //! ValidationReport, and QualityReport.
 
-use luna2d::docs::{
+use lurek2d::docs::{
     quality_grade, quality_score, Catalog, DocEntry, ParamInfo, QualityReport, ValidationReport,
 };
 
@@ -28,7 +28,7 @@ fn doc_entry_new_sets_kind() {
 #[test]
 fn doc_entry_new_builds_qualified_name() {
     let e = DocEntry::new("play", "audio", "function");
-    assert_eq!(e.qualified_name, "luna.audio.play");
+    assert_eq!(e.qualified_name, "lurek.audio.play");
 }
 
 // ── DocEntry::is_complete ─────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ fn doc_entry_is_complete_function_with_params_returns_true() {
 fn doc_entry_is_complete_function_with_returns_only_returns_true() {
     let mut e = DocEntry::new("getDt", "timer", "function");
     e.description = "Returns the last frame delta-time.".to_string();
-    e.returns.push(luna2d::docs::ReturnInfo {
+    e.returns.push(lurek2d::docs::ReturnInfo {
         type_name: "number".to_string(),
         description: "Delta-time in seconds.".to_string(),
     });
@@ -121,7 +121,7 @@ fn catalog_add_multiple_increases_count() {
 fn catalog_get_entry_finds_by_qualified_name() {
     let mut c = Catalog::new();
     c.add(DocEntry::new("play", "audio", "function"));
-    let entry = c.get_entry("luna.audio.play");
+    let entry = c.get_entry("lurek.audio.play");
     assert!(entry.is_some());
     assert_eq!(entry.unwrap().name, "play");
 }
@@ -129,7 +129,7 @@ fn catalog_get_entry_finds_by_qualified_name() {
 #[test]
 fn catalog_get_entry_unknown_returns_none() {
     let c = Catalog::new();
-    assert!(c.get_entry("luna.missing.fn").is_none());
+    assert!(c.get_entry("lurek.missing.fn").is_none());
 }
 
 #[test]
@@ -210,7 +210,7 @@ fn quality_score_fully_populated_returns_one() {
         type_name: "string".to_string(),
         ..Default::default()
     });
-    e.example = Some("luna.audio.play('hit.ogg')".to_string());
+    e.example = Some("lurek.audio.play('hit.ogg')".to_string());
     e.since = Some("0.4.0".to_string());
     let score = quality_score(&e);
     assert!((score - 1.0).abs() < 1e-5);
@@ -263,21 +263,21 @@ fn validation_report_is_clean_when_all_vecs_empty() {
 #[test]
 fn validation_report_not_clean_with_missing_entry() {
     let mut r = ValidationReport::new();
-    r.missing.push("luna.audio.play".to_string());
+    r.missing.push("lurek.audio.play".to_string());
     assert!(!r.is_clean());
 }
 
 #[test]
 fn validation_report_not_clean_with_phantom_entry() {
     let mut r = ValidationReport::new();
-    r.phantom.push("luna.old.fn".to_string());
+    r.phantom.push("lurek.old.fn".to_string());
     assert!(!r.is_clean());
 }
 
 #[test]
 fn validation_report_not_clean_with_incomplete_entry() {
     let mut r = ValidationReport::new();
-    r.incomplete.push("luna.audio.play".to_string());
+    r.incomplete.push("lurek.audio.play".to_string());
     assert!(!r.is_clean());
 }
 

@@ -1,4 +1,4 @@
-# compute — Feature Analysis
+# compute ï¿½ Feature Analysis
 
 **Tier**: 1 (Core)
 **Spec**: `specs/compute.md`
@@ -39,15 +39,15 @@ Dense N-dimensional numerical array operations: create, reshape, slice, element-
 
 ## Suggestions
 
-1. **Rename to `ndarray`**: `luna.ndarray.new(shape)` is clearer than `luna.compute.new(shape)`. The current name implies GPU compute which doesn't exist.
-2. **Consider merging with data**: Create a unified `luna.data` namespace: `luna.data.newBuffer(size)` for binary, `luna.data.newArray(shape)` for numerical. Reduces module count.
+1. **Rename to `ndarray`**: `lurek.ndarray.new(shape)` is clearer than `lurek.compute.new(shape)`. The current name implies GPU compute which doesn't exist.
+2. **Consider merging with data**: Create a unified `lurek.data` namespace: `lurek.data.newBuffer(size)` for binary, `lurek.data.newArray(shape)` for numerical. Reduces module count.
 3. **Move to Tier 2**: Unless game simulation commonly needs dense array math, this is more of an extension than core. Pathfinding flow fields and AI utility scoring might use it, but those are Tier 2 themselves.
-4. **Add ImageData interop**: `ndarray:fromImage(imageData)` / `ndarray:toImage()` — enables numerical image processing.
+4. **Add ImageData interop**: `ndarray:fromImage(imageData)` / `ndarray:toImage()` ï¿½ enables numerical image processing.
 5. **Add GPU compute path**: Long-term, use wgpu compute shaders for large arrays. Mark as future roadmap.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | NdArray | ? | ? | ? | ? |
 | Matrix math | ? | ? | ? | ? (glam) |
@@ -55,8 +55,8 @@ Dense N-dimensional numerical array operations: create, reshape, slice, element-
 | GPU compute | ? | ? | ? | ? |
 | Statistics | ? | ? | ? | ? |
 
-Luna2D is unique among 2D Lua engines in offering dense array compute. This is a differentiator — but the naming and positioning should reflect what it actually is.
+Lurek2D is unique among 2D Lua engines in offering dense array compute. This is a differentiator ï¿½ but the naming and positioning should reflect what it actually is.
 
 ## Priority
 
-**LOW** — Rename is important for clarity. Tier reassignment is an architectural decision. Merge with data is worth considering.
+**LOW** ï¿½ Rename is important for clarity. Tier reassignment is an architectural decision. Merge with data is worth considering.

@@ -3,13 +3,13 @@
 //! Stores a series of timestamped points that age out over a configurable
 //! lifetime, producing a tapered ribbon from head to tail.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for trail-related operations and data management.
 //! Key types exported from this module: `TrailPoint`, `Trail`.
 //! Primary functions: `new()`, `push_point()`, `update()`, `set_width()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::Color;
 

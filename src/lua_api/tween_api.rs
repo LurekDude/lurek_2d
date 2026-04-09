@@ -13,7 +13,7 @@
 //! `TweenEngine` is a module-local `Rc<RefCell<…>>` that tracks all active handle
 //! objects via `LuaRegistryKey` references. Lua scripts hold UserData handles and
 //! keep them alive for the duration of the animation. The engine never ticks tweens
-//! automatically — the script must call `luna.tween.update(dt)` from `luna.process`.
+//! automatically — the script must call `lurek.tween.update(dt)` from `lurek.process`.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -22,7 +22,7 @@ use std::rc::Rc;
 
 use crate::tween::{builtin_easing_names, LuaTween, LuaTweenParallel, LuaTweenSequence, TweenEngine};
 
-/// Registers the `luna.tween` property tweening API.
+/// Registers the `lurek.tween` property tweening API.
 ///
 /// Exposes factory functions (`tween`, `sequence`, `parallel`, `delay`), lifecycle
 /// utilities (`update`, `cancelAll`, `getActiveCount`), and easing introspection
@@ -43,7 +43,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── update ───────────────────────────────────────────────────────────
     /// Advances all active tweens, sequences, and parallels by `dt` seconds.
-    /// Call this once per frame from `luna.process(dt)`.
+    /// Call this once per frame from `lurek.process(dt)`.
     /// @param dt : number
     /// @return nil
     let s = engine.clone();

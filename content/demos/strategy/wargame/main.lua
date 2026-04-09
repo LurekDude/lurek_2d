@@ -1,6 +1,6 @@
 -- Wargame — Tactical Tabletop with Two Armies
 -- Turn-based combat on a grid with terrain, morale, and command points
--- Run with: cargo run -- demos/strategy/wargame
+-- Run with: cargo run -- content/demos/strategy/wargame
 
 local GRID = 40
 local MAP_W, MAP_H = 16, 12
@@ -208,7 +208,7 @@ local function endTurn()
     end
 end
 
-function luna.init()
+function lurek.init()
     -- Generate terrain
     for y = 1, MAP_H do
         terrain[y] = {}
@@ -240,11 +240,11 @@ function luna.init()
     addUnit("red", "infantry", MAP_W - 1, 12)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if messageTimer > 0 then messageTimer = messageTimer - dt end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" and turn == "blue" and not gameOver then endTurn() end
     if key == "escape" then
         if phase ~= "select" then
@@ -253,18 +253,18 @@ function luna.keypressed(key)
             moveRange = {}
             attackTargets = {}
         else
-            luna.signal.quit()
+            lurek.signal.quit()
         end
     end
     if gameOver and key == "r" then
         gameOver = false
         units = {}
         combatLog = {}
-        luna.signal.restart()
+        lurek.signal.restart()
     end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if gameOver or turn ~= "blue" then return end
 
     local gx = math.floor((mx - OX) / GRID) + 1
@@ -321,8 +321,8 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.12, 0.14, 0.1)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.12, 0.14, 0.1)
 
     -- Grid and terrain
     for y = 1, MAP_H do
@@ -331,33 +331,33 @@ function luna.render()
             local py = OY + (y - 1) * GRID
             local t = terrain[y][x]
             if t == 0 then
-                luna.gfx.setColor(0.25, 0.3, 0.2, 1)
+                lurek.gfx.setColor(0.25, 0.3, 0.2, 1)
             elseif t == 1 then
-                luna.gfx.setColor(0.15, 0.35, 0.15, 1)
+                lurek.gfx.setColor(0.15, 0.35, 0.15, 1)
             elseif t == 2 then
-                luna.gfx.setColor(0.35, 0.3, 0.2, 1)
+                lurek.gfx.setColor(0.35, 0.3, 0.2, 1)
             end
-            luna.gfx.rectangle("fill", px, py, GRID - 1, GRID - 1)
+            lurek.gfx.rectangle("fill", px, py, GRID - 1, GRID - 1)
             if t == 1 then
-                luna.gfx.setColor(0.1, 0.5, 0.1, 0.5)
-                luna.gfx.print("F", px + 14, py + 12)
+                lurek.gfx.setColor(0.1, 0.5, 0.1, 0.5)
+                lurek.gfx.print("F", px + 14, py + 12)
             elseif t == 2 then
-                luna.gfx.setColor(0.6, 0.5, 0.3, 0.5)
-                luna.gfx.print("H", px + 14, py + 12)
+                lurek.gfx.setColor(0.6, 0.5, 0.3, 0.5)
+                lurek.gfx.print("H", px + 14, py + 12)
             end
         end
     end
 
     -- Move range highlight
-    luna.gfx.setColor(0.3, 0.6, 1, 0.3)
+    lurek.gfx.setColor(0.3, 0.6, 1, 0.3)
     for _, m in ipairs(moveRange) do
-        luna.gfx.rectangle("fill", OX + (m[1]-1)*GRID, OY + (m[2]-1)*GRID, GRID-1, GRID-1)
+        lurek.gfx.rectangle("fill", OX + (m[1]-1)*GRID, OY + (m[2]-1)*GRID, GRID-1, GRID-1)
     end
 
     -- Attack target highlight
     for _, t in ipairs(attackTargets) do
-        luna.gfx.setColor(1, 0.3, 0.3, 0.4)
-        luna.gfx.rectangle("fill", OX + (t.gx-1)*GRID, OY + (t.gy-1)*GRID, GRID-1, GRID-1)
+        lurek.gfx.setColor(1, 0.3, 0.3, 0.4)
+        lurek.gfx.rectangle("fill", OX + (t.gx-1)*GRID, OY + (t.gy-1)*GRID, GRID-1, GRID-1)
     end
 
     -- Units
@@ -367,62 +367,62 @@ function luna.render()
             local py = OY + (u.gy - 1) * GRID
             -- Team color
             if u.team == "blue" then
-                luna.gfx.setColor(0.2, 0.4, 0.9, 1)
+                lurek.gfx.setColor(0.2, 0.4, 0.9, 1)
             else
-                luna.gfx.setColor(0.9, 0.25, 0.2, 1)
+                lurek.gfx.setColor(0.9, 0.25, 0.2, 1)
             end
-            luna.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2 - 4)
+            lurek.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2 - 4)
 
             -- Selected indicator
             if i == selected then
-                luna.gfx.setColor(1, 1, 0, 1)
-                luna.gfx.setLineWidth(2)
-                luna.gfx.circle("line", px + GRID/2, py + GRID/2, GRID/2 - 2)
-                luna.gfx.setLineWidth(1)
+                lurek.gfx.setColor(1, 1, 0, 1)
+                lurek.gfx.setLineWidth(2)
+                lurek.gfx.circle("line", px + GRID/2, py + GRID/2, GRID/2 - 2)
+                lurek.gfx.setLineWidth(1)
             end
 
             -- Icon
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(u.icon, px + GRID/2 - 4, py + GRID/2 - 6)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(u.icon, px + GRID/2 - 4, py + GRID/2 - 6)
 
             -- HP bar
-            luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-            luna.gfx.rectangle("fill", px + 4, py + GRID - 8, GRID - 8, 4)
-            luna.gfx.setColor(0.2, 0.9, 0.2, 1)
-            luna.gfx.rectangle("fill", px + 4, py + GRID - 8, (GRID - 8) * (u.hp / u.maxHp), 4)
+            lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+            lurek.gfx.rectangle("fill", px + 4, py + GRID - 8, GRID - 8, 4)
+            lurek.gfx.setColor(0.2, 0.9, 0.2, 1)
+            lurek.gfx.rectangle("fill", px + 4, py + GRID - 8, (GRID - 8) * (u.hp / u.maxHp), 4)
         end
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.85)
-    luna.gfx.rectangle("fill", 0, 0, 800, 46)
+    lurek.gfx.setColor(0, 0, 0, 0.85)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 46)
 
     local turnColor = turn == "blue" and {0.4, 0.6, 1} or {1, 0.4, 0.3}
-    luna.gfx.setColor(turnColor[1], turnColor[2], turnColor[3], 1)
-    luna.gfx.print(turn:upper() .. " TURN", 10, 5, 1.2)
+    lurek.gfx.setColor(turnColor[1], turnColor[2], turnColor[3], 1)
+    lurek.gfx.print(turn:upper() .. " TURN", 10, 5, 1.2)
 
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("CP: " .. cp .. "/" .. MAX_CP, 150, 8)
-    luna.gfx.print("Blue: " .. morale("blue") .. " units", 280, 8)
-    luna.gfx.print("Red: " .. morale("red") .. " units", 420, 8)
-    luna.gfx.print("[Space] End Turn  [Esc] Deselect", 10, 28)
-    luna.gfx.print("LClick=Move  RClick=Attack", 400, 28)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("CP: " .. cp .. "/" .. MAX_CP, 150, 8)
+    lurek.gfx.print("Blue: " .. morale("blue") .. " units", 280, 8)
+    lurek.gfx.print("Red: " .. morale("red") .. " units", 420, 8)
+    lurek.gfx.print("[Space] End Turn  [Esc] Deselect", 10, 28)
+    lurek.gfx.print("LClick=Move  RClick=Attack", 400, 28)
 
     -- Combat log
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, 530, 800, 70)
-    luna.gfx.setColor(0.8, 0.8, 0.6, 1)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, 530, 800, 70)
+    lurek.gfx.setColor(0.8, 0.8, 0.6, 1)
     for i, log in ipairs(combatLog) do
-        luna.gfx.print(log, 10, 530 + (i - 1) * 13)
+        lurek.gfx.print(log, 10, 530 + (i - 1) * 13)
     end
 
     -- Game over
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 200, 220, 400, 100)
-        luna.gfx.setColor(1, 1, 0.3, 1)
-        luna.gfx.print(winner .. " WINS!", 330, 240, 1.8)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Press R to restart", 330, 290)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 200, 220, 400, 100)
+        lurek.gfx.setColor(1, 1, 0.3, 1)
+        lurek.gfx.print(winner .. " WINS!", 330, 240, 1.8)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Press R to restart", 330, 290)
     end
 end

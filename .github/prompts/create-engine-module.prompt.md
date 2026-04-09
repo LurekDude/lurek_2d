@@ -6,7 +6,7 @@ description: "Create a new engine module in src/ with correct structure, depende
 
 ## Purpose
 
-Add a new module to the Luna2D engine with the correct file structure, dependency direction, and registration.
+Add a new module to the Lurek2D engine with the correct file structure, dependency direction, and registration.
 
 ## Use When
 

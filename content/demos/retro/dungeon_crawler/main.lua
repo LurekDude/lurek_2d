@@ -1,21 +1,21 @@
-﻿-- demos/retro/dungeon_crawler/main.lua
--- Dungeon Crawler — Eye of Beholder / Dungeon Master grid-step dungeon with
+-- demos/retro/dungeon_crawler/main.lua
+-- Dungeon Crawler � Eye of Beholder / Dungeon Master grid-step dungeon with
 --   procedurally textured walls (4 types), floor/ceiling, smooth lerp turns,
 --   flickering torches, weather modes, collectible orbs, minimap
--- Controls: W/S forward/back, Q/E turn left/right (90°), F1/F2/F3 weather
--- Run with: cargo run -- demos/retro/dungeon_crawler
+-- Controls: W/S forward/back, Q/E turn left/right (90�), F1/F2/F3 weather
+-- Run with: cargo run -- content/demos/retro/dungeon_crawler
 
--- ── constants ─────────────────────────────────────────────────
+-- �� constants �������������������������������������������������
 local SW, SH       = 800, 600
 local VW, VH       = 320, 240        -- 3D viewport (left panel)
-local FOV          = math.pi / 2     -- 90° classic dungeon FOV
+local FOV          = math.pi / 2     -- 90� classic dungeon FOV
 local MAX_DIST     = 8.0
 local LERP_SPEED   = 9.0
 local MAP_W, MAP_H = 12, 12
 local TEX_W, TEX_H = 64, 64
 local NBANDS       = 12              -- floor/ceiling bands
 
--- ── dungeon map ────────────────────────────────────────────────
+-- �� dungeon map ������������������������������������������������
 -- 0=open 1=stone 2=brick 3=mossy 4=magic
 local DMAP = {
     1,1,1,1,1,1,1,1,1,1,1,1,
@@ -36,34 +36,34 @@ local DMAP = {
 local TORCH_CELLS = { {2,2}, {10,2}, {2,6}, {10,6}, {5,9}, {8,9} }
 local ITEM_CELLS  = { {5,5}, {8,5}, {5,9}, {8,9} }
 
--- ── facing tables ─────────────────────────────────────────────
--- East=1 (angle 0), South=2 (angle π/2), West=3 (angle π), North=4 (angle 3π/2)
+-- �� facing tables ���������������������������������������������
+-- East=1 (angle 0), South=2 (angle ?/2), West=3 (angle ?), North=4 (angle 3?/2)
 local FACE_DX    = { 1,  0, -1,  0 }
 local FACE_DY    = { 0,  1,  0, -1 }
 local FACE_NAME  = { "East", "South", "West", "North" }
 
--- ── player state ──────────────────────────────────────────────
+-- �� player state ����������������������������������������������
 local gx, gy      = 2, 2
 local facing      = 1           -- 1=E 2=S 3=W 4=N
 local turn_acc    = 0           -- accumulated quarter-turns (never normalized)
-local target_angle = 0.0        -- turn_acc × π/2
+local target_angle = 0.0        -- turn_acc � ?/2
 local visual_angle = 0.0        -- lerped render angle
 local vis_x, vis_y = 2.5, 2.5  -- lerped world-space position
 
 -- Settled: both position and angle have converged
 local settled = true
 
--- ── world objects ──────────────────────────────────────────────
+-- �� world objects ����������������������������������������������
 local torches = {}              -- {x, y} world-space centers
 local items   = {}              -- {gx, gy, wx, wy, collected}
 local score   = 0
 
--- ── environment ───────────────────────────────────────────────
+-- �� environment �����������������������������������������������
 local env_mode     = "normal"   -- "normal", "wind", "rain"
 local flicker_t    = 0.0
 local FLICKER_RATE = 0.10
 
--- ── engine objects ─────────────────────────────────────────────
+-- �� engine objects ���������������������������������������������
 local rc
 local view_canvas
 
@@ -79,20 +79,20 @@ local WALL_TINT = {
     [4] = {0.42, 0.38, 0.80},   -- magic/blue
 }
 
--- ── HUD log ───────────────────────────────────────────────────
+-- �� HUD log ���������������������������������������������������
 local log_lines = {}
 local function logAdd(s)
     table.insert(log_lines, 1, s)
     if #log_lines > 7 then log_lines[8] = nil end
 end
 
--- ── texture generators ────────────────────────────────────────
+-- �� texture generators ����������������������������������������
 local function noise2(px_, py_)
     return ((px_ * 37 + py_ * 53 + px_ * py_ * 3) % 29) / 29
 end
 
 local function makeBrickTex(bH, bW)
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         local row = math.floor(py_ / bH)
         local off = (row % 2 == 0) and 0 or math.floor(bW / 2)
@@ -105,11 +105,11 @@ local function makeBrickTex(bH, bW)
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 local function makeStoneTex(bH, bW)
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         local row = math.floor(py_ / bH)
         local off = (row % 2 == 0) and 0 or math.floor(bW / 2)
@@ -125,11 +125,11 @@ local function makeStoneTex(bH, bW)
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 local function makeMossyTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_, py_)
@@ -141,11 +141,11 @@ local function makeMossyTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 local function makeMagicTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_, py_)
@@ -157,12 +157,12 @@ local function makeMagicTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 local function makeFloorTex()
     local TILE = 16
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local tx = px_ % TILE
@@ -173,11 +173,11 @@ local function makeFloorTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
 local function makeCeilTex()
-    local d = luna.img.newImageData(TEX_W, TEX_H)
+    local d = lurek.img.newImageData(TEX_W, TEX_H)
     for py_ = 0, TEX_H - 1 do
         for px_ = 0, TEX_W - 1 do
             local n1 = noise2(px_, py_)
@@ -187,10 +187,10 @@ local function makeCeilTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return luna.gfx.newImage(d)
+    return lurek.gfx.newImage(d)
 end
 
--- ── helpers ───────────────────────────────────────────────────
+-- �� helpers ���������������������������������������������������
 local function mapCell(cx, cy)
     if cx < 1 or cy < 1 or cx > MAP_W or cy > MAP_H then return 1 end
     return DMAP[(cy - 1) * MAP_W + cx]
@@ -202,12 +202,12 @@ local function lerp(a, b, t_)
     return a + (b - a) * t_
 end
 
--- ── settlement check ──────────────────────────────────────────
+-- �� settlement check ������������������������������������������
 local function isSettled()
     return settled
 end
 
--- ── movement actions (snapped to grid) ────────────────────────
+-- �� movement actions (snapped to grid) ������������������������
 local function tryMove(fwd)
     if not isSettled() then return end
     local dx = FACE_DX[facing] * (fwd and 1 or -1)
@@ -234,13 +234,13 @@ local function turnLeft()
     settled       = false
 end
 
--- ── load ──────────────────────────────────────────────────────
-function luna.init()
-    luna.window.setTitle("Dungeon Crawler")
-    luna.gfx.setBackgroundColor(0.02, 0.02, 0.04)
+-- �� load ������������������������������������������������������
+function lurek.init()
+    lurek.window.setTitle("Dungeon Crawler")
+    lurek.gfx.setBackgroundColor(0.02, 0.02, 0.04)
 
     -- Build raycaster
-    rc = luna.raycaster.new(MAP_W, MAP_H)
+    rc = lurek.raycaster.new(MAP_W, MAP_H)
     rc:setCells(DMAP)
 
     -- Spawn torches
@@ -267,10 +267,10 @@ function luna.init()
 
     -- Build shared quads
     for s = 0, TEX_W - 1 do
-        shared_quads[s] = luna.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
+        shared_quads[s] = lurek.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
     end
 
-    view_canvas = luna.gfx.newCanvas(VW, VH)
+    view_canvas = lurek.gfx.newCanvas(VW, VH)
     vis_x = gx + 0.5
     vis_y = gy + 0.5
     visual_angle = 0.0
@@ -279,8 +279,8 @@ function luna.init()
     logAdd("Find the four glowing orbs.")
 end
 
--- ── update ────────────────────────────────────────────────────
-function luna.process(dt)
+-- �� update ����������������������������������������������������
+function lurek.process(dt)
     -- Smooth lerp
     local t_ = math.min(1.0, LERP_SPEED * dt)
     local tgx = gx + 0.5
@@ -315,35 +315,35 @@ function luna.process(dt)
     end
 end
 
--- ── draw ──────────────────────────────────────────────────────
-function luna.render()
-    luna.gfx.setCanvas(view_canvas)
+-- �� draw ������������������������������������������������������
+function lurek.render()
+    lurek.gfx.setCanvas(view_canvas)
 
-    -- ── Ceiling bands ─────────────────────────────────────────
+    -- �� Ceiling bands �����������������������������������������
     local ceil_h  = math.floor(VH / 2)
     local band_px = math.max(1, math.ceil(ceil_h / NBANDS))
     for b = 0, NBANDS - 1 do
         local t_ = b / NBANDS        -- 0=top 1=horizon
         local br = 0.03 + t_ * 0.05
         local nv = noise2(b * 5, 0) * 0.015
-        luna.gfx.setColor(br + nv, br + nv, br * 1.1 + nv)
-        luna.gfx.rectangle("fill", 0, b * band_px, VW, band_px + 1)
+        lurek.gfx.setColor(br + nv, br + nv, br * 1.1 + nv)
+        lurek.gfx.rectangle("fill", 0, b * band_px, VW, band_px + 1)
     end
 
-    -- ── Floor bands ───────────────────────────────────────────
+    -- �� Floor bands �������������������������������������������
     for b = 0, NBANDS - 1 do
         local t_ = b / NBANDS        -- 0=horizon 1=bottom
         local br = 0.04 + t_ * 0.14
         local checker = (b % 2 == 0) and 1.0 or 0.88
-        luna.gfx.setColor(
+        lurek.gfx.setColor(
             br * 0.92 * checker,
             br * 0.82 * checker,
             br * 0.66 * checker
         )
-        luna.gfx.rectangle("fill", 0, ceil_h + b * band_px, VW, band_px + 1)
+        lurek.gfx.rectangle("fill", 0, ceil_h + b * band_px, VW, band_px + 1)
     end
 
-    -- ── Cast rays ─────────────────────────────────────────────
+    -- �� Cast rays ���������������������������������������������
     local rays  = rc:castRaysFlat(vis_x, vis_y, visual_angle, FOV, VW, MAX_DIST)
     local depth = {}
 
@@ -358,9 +358,9 @@ function luna.render()
 
         if dist < MAX_DIST and cv > 0 then
             local wall_h, draw_start =
-                luna.raycaster.projectColumn(dist, FOV, VH)
+                lurek.raycaster.projectColumn(dist, FOV, VH)
 
-            local bright = luna.raycaster.distanceShade(dist, MAX_DIST)
+            local bright = lurek.raycaster.distanceShade(dist, MAX_DIST)
             if side == 1 then bright = bright * 0.68 end
 
             -- Add torch light from nearby torches
@@ -382,7 +382,7 @@ function luna.render()
             torch_add = math.min(0.60, torch_add)
 
             local wt = WALL_TINT[cv] or {0.55, 0.55, 0.55}
-            luna.gfx.setColor(
+            lurek.gfx.setColor(
                 math.min(1.0, wt[1] * bright + torch_add * 0.90),
                 math.min(1.0, wt[2] * bright + torch_add * 0.48),
                 math.min(1.0, wt[3] * bright + torch_add * 0.08)
@@ -391,11 +391,11 @@ function luna.render()
             local strip = math.max(0, math.min(TEX_W-1, math.floor(tex_u * TEX_W)))
             local q     = shared_quads[strip]
             local tex   = wall_textures[cv] or wall_textures[1]
-            luna.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wall_h / TEX_H)
+            lurek.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wall_h / TEX_H)
         end
     end
 
-    -- ── Torch sprites ─────────────────────────────────────────
+    -- �� Torch sprites �����������������������������������������
     for _, torch in ipairs(torches) do
         local proj = rc:projectSprite(torch.x, torch.y, vis_x, vis_y,
                                        visual_angle, FOV, VW)
@@ -405,24 +405,24 @@ function luna.render()
                 local sz  = math.max(2, math.floor(proj.scale * VH * 0.12))
                 local sx  = col - math.floor(sz/2)
                 local sy  = math.floor(VH/2 - sz * 1.4)
-                local bd  = luna.raycaster.distanceShade(proj.distance, MAX_DIST)
+                local bd  = lurek.raycaster.distanceShade(proj.distance, MAX_DIST)
                 local flk = 1.0
                 if env_mode ~= "normal" then
                     local rate = (env_mode == "wind") and 38 or 24
                     flk = 0.68 + 0.32 * math.sin(flicker_t * rate + torch.x * 5.3)
                 end
-                luna.gfx.setColor(1.0*bd*flk, 0.52*bd*flk, 0.04*bd)
-                luna.gfx.rectangle("fill", sx, sy, sz, math.floor(sz * 1.6))
+                lurek.gfx.setColor(1.0*bd*flk, 0.52*bd*flk, 0.04*bd)
+                lurek.gfx.rectangle("fill", sx, sy, sz, math.floor(sz * 1.6))
                 -- Glow halo
-                luna.gfx.setColor(1.0*bd*flk, 0.40*bd*flk, 0.02, 0.35)
+                lurek.gfx.setColor(1.0*bd*flk, 0.40*bd*flk, 0.02, 0.35)
                 local halo = math.floor(sz * 2.2)
-                luna.gfx.rectangle("fill", col - math.floor(halo/2),
+                lurek.gfx.rectangle("fill", col - math.floor(halo/2),
                     sy - math.floor(sz*0.3), halo, math.floor(sz*2))
             end
         end
     end
 
-    -- ── Item orb sprites ──────────────────────────────────────
+    -- �� Item orb sprites ��������������������������������������
     for _, it in ipairs(items) do
         if not it.collected then
             local proj = rc:projectSprite(it.x, it.y, vis_x, vis_y,
@@ -433,55 +433,55 @@ function luna.render()
                     local sz = math.max(3, math.floor(proj.scale * VH * 0.30))
                     local sx = col - math.floor(sz/2)
                     local sy = math.floor(VH/2 - sz/2)
-                    local bd = luna.raycaster.distanceShade(proj.distance, MAX_DIST)
+                    local bd = lurek.raycaster.distanceShade(proj.distance, MAX_DIST)
                     -- Pulsing cyan orb
                     local pulse = 0.8 + 0.2 * math.sin(flicker_t * 3.5 + it.x)
-                    luna.gfx.setColor(0.5*bd*pulse, 0.92*bd*pulse, 1.0*bd*pulse)
-                    luna.gfx.rectangle("fill", sx, sy, sz, sz)
-                    luna.gfx.setColor(0.85*pulse, 1.0*pulse, 1.0*pulse, 0.75)
+                    lurek.gfx.setColor(0.5*bd*pulse, 0.92*bd*pulse, 1.0*bd*pulse)
+                    lurek.gfx.rectangle("fill", sx, sy, sz, sz)
+                    lurek.gfx.setColor(0.85*pulse, 1.0*pulse, 1.0*pulse, 0.75)
                     local hi = math.max(1, math.floor(sz*0.22))
-                    luna.gfx.rectangle("fill", sx+hi, sy+hi, hi*2, hi*2)
+                    lurek.gfx.rectangle("fill", sx+hi, sy+hi, hi*2, hi*2)
                 end
             end
         end
     end
 
-    -- ── Rain drips ────────────────────────────────────────────
+    -- �� Rain drips ��������������������������������������������
     if env_mode == "rain" then
-        luna.gfx.setColor(0.50, 0.62, 0.85, 0.30)
+        lurek.gfx.setColor(0.50, 0.62, 0.85, 0.30)
         for i = 1, 18 do
             local rx = (i * 19 + math.floor(flicker_t * 60)) % VW
             local ry = (i * 31 + math.floor(flicker_t * 90)) % VH
-            luna.gfx.rectangle("fill", rx, ry, 1, 5)
+            lurek.gfx.rectangle("fill", rx, ry, 1, 5)
         end
     end
 
-    -- ── Edge fog ──────────────────────────────────────────────
-    luna.gfx.setColor(0, 0, 0, 0.30)
-    luna.gfx.rectangle("fill", 0, 0,      VW, VH / 7)
-    luna.gfx.rectangle("fill", 0, VH*6/7, VW, VH / 7)
+    -- �� Edge fog ����������������������������������������������
+    lurek.gfx.setColor(0, 0, 0, 0.30)
+    lurek.gfx.rectangle("fill", 0, 0,      VW, VH / 7)
+    lurek.gfx.rectangle("fill", 0, VH*6/7, VW, VH / 7)
 
-    luna.gfx.setCanvas(nil)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setCanvas(nil)
+    lurek.gfx.setColor(1, 1, 1, 1)
 
     -- Blit 3D view to left 60% of screen
     local scx = (SW * 0.60) / VW
     local scy = SH / VH
-    luna.gfx.draw(view_canvas, 0, 0, 0, scx, scy)
+    lurek.gfx.draw(view_canvas, 0, 0, 0, scx, scy)
 
-    -- ── Right panel HUD ───────────────────────────────────────
+    -- �� Right panel HUD ���������������������������������������
     local hx = math.floor(SW * 0.61)
 
-    luna.gfx.setColor(0.10, 0.09, 0.12)
-    luna.gfx.rectangle("fill", hx, 0, SW - hx, SH)
+    lurek.gfx.setColor(0.10, 0.09, 0.12)
+    lurek.gfx.rectangle("fill", hx, 0, SW - hx, SH)
 
-    luna.gfx.setColor(0.85, 0.75, 0.48)
-    luna.gfx.print("=== DUNGEON ===", hx + 6, 14)
-    luna.gfx.setColor(0.80, 0.80, 0.80)
-    luna.gfx.print("Facing : " .. FACE_NAME[facing],  hx + 6, 40)
-    luna.gfx.print("Pos    : " .. gx .. ", " .. gy,   hx + 6, 58)
-    luna.gfx.print("Score  : " .. score,               hx + 6, 76)
-    luna.gfx.print("Env    : " .. env_mode,            hx + 6, 94)
+    lurek.gfx.setColor(0.85, 0.75, 0.48)
+    lurek.gfx.print("=== DUNGEON ===", hx + 6, 14)
+    lurek.gfx.setColor(0.80, 0.80, 0.80)
+    lurek.gfx.print("Facing : " .. FACE_NAME[facing],  hx + 6, 40)
+    lurek.gfx.print("Pos    : " .. gx .. ", " .. gy,   hx + 6, 58)
+    lurek.gfx.print("Score  : " .. score,               hx + 6, 76)
+    lurek.gfx.print("Env    : " .. env_mode,            hx + 6, 94)
 
     -- Minimap
     local mm_x  = hx + 6
@@ -491,37 +491,37 @@ function luna.render()
         for cx = 1, MAP_W do
             local v = mapCell(cx, cy)
             if v > 0 then
-                luna.gfx.setColor(0.38, 0.36, 0.34)
+                lurek.gfx.setColor(0.38, 0.36, 0.34)
             else
-                luna.gfx.setColor(0.13, 0.12, 0.14)
+                lurek.gfx.setColor(0.13, 0.12, 0.14)
             end
-            luna.gfx.rectangle("fill",
+            lurek.gfx.rectangle("fill",
                 mm_x + (cx-1)*mc, mm_y + (cy-1)*mc, mc-1, mc-1)
         end
     end
     -- Player marker
-    luna.gfx.setColor(0.95, 0.78, 0.20)
-    luna.gfx.rectangle("fill",
+    lurek.gfx.setColor(0.95, 0.78, 0.20)
+    lurek.gfx.rectangle("fill",
         mm_x + (gx-1)*mc + 3, mm_y + (gy-1)*mc + 3, mc-5, mc-5)
 
     -- Log
     local log_y = mm_y + MAP_H * mc + 10
-    luna.gfx.setColor(0.52, 0.72, 0.52)
-    luna.gfx.print("── Events ──", mm_x, log_y)
-    luna.gfx.setColor(0.70, 0.82, 0.70)
+    lurek.gfx.setColor(0.52, 0.72, 0.52)
+    lurek.gfx.print("�� Events ��", mm_x, log_y)
+    lurek.gfx.setColor(0.70, 0.82, 0.70)
     for i, line in ipairs(log_lines) do
-        luna.gfx.print(line, mm_x, log_y + i * 19)
+        lurek.gfx.print(line, mm_x, log_y + i * 19)
     end
 
     -- Controls
-    luna.gfx.setColor(0.42, 0.42, 0.42)
-    luna.gfx.print("W/S move  Q/E turn", mm_x, SH - 40)
-    luna.gfx.print("F1 clear F2 wind F3 rain", mm_x, SH - 22)
+    lurek.gfx.setColor(0.42, 0.42, 0.42)
+    lurek.gfx.print("W/S move  Q/E turn", mm_x, SH - 40)
+    lurek.gfx.print("F1 clear F2 wind F3 rain", mm_x, SH - 22)
 end
 
--- ── keypressed ────────────────────────────────────────────────
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+-- �� keypressed ������������������������������������������������
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "w" then tryMove(true)  end
     if key == "s" then tryMove(false) end
     if key == "q" then turnLeft()     end

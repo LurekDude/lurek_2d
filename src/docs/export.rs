@@ -1,4 +1,4 @@
-//! VS Code IntelliSense export helpers for the Luna2D docs catalog.
+//! VS Code IntelliSense export helpers for the Lurek2D docs catalog.
 //!
 //! Converts [`DocEntry`] slices into JSON files consumed by the VS Code
 //! extension for completions, hover documentation, and signature help.

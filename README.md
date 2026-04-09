@@ -1,246 +1,309 @@
-# Luna2D
+<p align="center">
+  <img src="assets/splash.png" alt="Lurek2D" width="720" />
+</p>
 
-**A ~20 MB 2D game engine.** Written in Rust. Scripted in Lua. GPU-rendered via wgpu. AI-first.
-
-Luna2D is the engine for people who think game engines have become too complicated. One binary, one scripting language, one afternoon to learn. Drop `luna2d` next to `main.lua` — your game runs.
+<p align="center">
+  <strong>A ~15 MB 2D game engine.</strong> Rust core · Lua scripting · wgpu GPU rendering · AI-first design.
+</p>
 
 ---
 
-## The Pitch
-
-The game engine market is dominated by multi-gigabyte toolchains with visual editors, plugin marketplaces, and months-long learning curves. Luna2D is the opposite:
-
-- **~20 MB** single binary — no installer, no DLLs, no runtime dependencies
-- **Lua scripting** — write `luna.load()`, `luna.update(dt)`, `luna.draw()`, your game runs
-- **Rust performance** — GPU rendering, physics, audio, and threading owned by the engine
-- **AI-augmented** — every API is designed so a Copilot agent can use it correctly on the first try
-
-This is David vs. Goliath: a 20 MB engine that, powered by AI, delivers features rivalling engines 100× its size.
+One binary. One scripting language. Drop `lurek2d` next to `main.lua` — your game runs. No installer, no DLLs, no months-long learning curve.
 
 ---
 
 ## Quick Start
 
 ```bash
-# Build and run
-cargo build                           # Debug build
-cargo run                             # Splash screen (no game)
-cargo run -- demos/hello_world     # Run an example
-cargo run -- demos/physics_demo    # Physics demo
-cargo build --release                 # Release build (~20 MB)
+cargo run                                # Splash screen (no game)
+cargo run -- content/demos/hello_world   # Run a demo
 ```
 
-With no game directory, the engine displays a built-in splash screen. **Drag and drop** a game folder onto the window to load it instantly.
-
-### Your First Game
-
-Create a folder with a `main.lua`:
+Create `main.lua` anywhere:
 
 ```lua
-function luna.init()
-    luna.gfx.setBackgroundColor(0.1, 0.1, 0.2)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.2)
 end
 
-function luna.render()
-    luna.gfx.print("Hello, Luna2D!", 100, 100)
+function lurek.render()
+    lurek.gfx.print("Hello, Lurek2D!", 100, 100)
 end
 ```
-
-Run it:
 
 ```bash
-cargo run -- path/to/your/game
+cargo run -- path/to/your/game   # No project files. No config required.
 ```
 
-That's it. No project files, no build steps, no configuration. An empty `main.lua` is valid — it produces a black window with no errors.
+An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen — drag-and-drop a folder onto the window to load it.
 
 ---
 
-## Features
+## Engine Subsystems
 
-### Engine Subsystems
+Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed first-party code.
 
-| Category | Capabilities |
+### Baseline
+
+| Module | Description |
 |---|---|
-| **Graphics** | GPU rendering (wgpu: Vulkan/DX12/Metal), sprites, sprite batches, meshes, canvases, custom WGSL shaders, blend modes, stencils, transform stack, camera system |
-| **Audio** | Sound loading and playback (WAV, OGG, MP3, FLAC), streaming, volume/pitch/panning, audio buses |
-| **Input** | Keyboard, mouse, gamepad (gilrs), touch — state queries and event callbacks |
-| **Physics** | Rigid bodies, shapes, joints (11 types), raycasting, collision events (rapier2d) |
-| **Particles** | Configurable emitter system with ~35 parameters, keyframed size/color |
-| **Tilemaps** | Tile layers, tilesets, procedural map generation, coordinate helpers |
-| **AI** | FSMs, behaviour trees, GOAP planning, steering behaviours |
-| **Pathfinding** | Navigation grids, A★, HPA★, flow fields |
-| **Scenes** | Scene stack management with transitions |
-| **Data** | Binary data buffers, compression (deflate/gzip/lz4/zlib), hashing (MD5/SHA), encoding (base64/hex) |
-| **Threading** | Background Rust workers, typed MPMC channels, per-thread Lua VMs |
-| **Filesystem** | Sandboxed game I/O, virtual FS with archive mounting, mod support |
-| **Math** | Vec2/Vec3/Mat3, noise (Perlin/simplex/fBm), easing (22 functions), Bezier curves, triangulation |
-| **ECS** | Lightweight entity primitives with bitmap tags and blueprints |
-| **Terminal** | In-game developer console/REPL with widget toolkit |
+| `engine` | App lifecycle, `Config`, `SharedState`, `EngineError`, typed resource pools (`SlotMap`) |
+| `math` | `Vec2` / `Mat3` / `Rect`, easing (22 functions), noise (Perlin/simplex/fBm), Bezier, triangulation |
+
+### Tier 1 — Core Subsystems
+
+| Module | Description |
+|---|---|
+| `graphics` | GPU rendering via wgpu (Vulkan / DX12 / Metal): sprites, batches, meshes, canvases, WGSL shaders, blend modes, stencils, transform stack |
+| `audio` | Sound loading and playback (WAV / OGG / MP3 / FLAC), streaming, buses, volume / pitch / pan |
+| `sound` | Audio source types and lifecycle management |
+| `physics` | 2D rigid-body simulation via rapier2d: bodies, shapes, 11 joint types, raycasting, collision events |
+| `input` | Keyboard, mouse, gamepad (gilrs), touch — state queries and event callbacks |
+| `camera` | 2D camera with viewport, zoom, screen↔world transforms |
+| `animation` | Keyframe animation, sprite-sheet playback |
+| `image` | Image loading, pixel manipulation, format conversion |
+| `timer` | Frame clock, delta-time, fixed-step ticker |
+| `window` | Display management, DPI scaling, multi-monitor info |
+| `filesystem` | Sandboxed game I/O, virtual FS, archive mounting |
+| `data` | Binary buffers, compression (deflate / gzip / lz4 / zlib), hashing (MD5 / SHA-1 / SHA-256), encoding (base64 / hex) |
+| `serial` | Serialization to TOML, JSON, and binary formats |
+| `event` | Typed event queue and signal bus |
+| `entity` | Lightweight ECS: bitmap-tag queries, blueprint instantiation |
+| `thread` | Background Rust workers, typed MPMC channels, isolated per-thread Lua VMs |
+| `compute` | GPU compute shaders via wgpu |
+| `automation` | Lua-scriptable task runners and build automation |
+| `log` | Structured engine logging facade |
+
+### Tier 2 — Engine Extensions
+
+| Module | Description |
+|---|---|
+| `particle` | Configurable emitter system: 35+ parameters, keyframed size / color |
+| `tilemap` | Tile layers, tilesets, procedural map generation, coordinate helpers |
+| `scene` | Scene stack with push / pop / replace and transition hooks |
+| `savegame` | Slot-based save / load with versioning |
+| `modding` | Mod loader with sandboxed per-mod Lua VMs |
+| `graph` | General graph data structures and traversal algorithms |
+| `pathfinding` | Navigation grids, A★, HPA★, flow fields |
+| `ai` | FSMs, behaviour trees, GOAP planner, steering behaviours, influence maps, shared blackboard |
+| `dataframe` | Tabular data structure, CSV I/O, column-oriented query API |
+| `gui` | Immediate-mode UI widget toolkit |
+| `minimap` | Minimap rendering from world state |
+| `overlay` | Screen-space HUD layer |
+| `fx` | Pre-built visual effects (trails, screen-shake, flash) |
+| `postfx` | Full-screen post-processing: bloom, blur, colour-grade, distortion, CRT |
+| `light` | Dynamic 2D lighting and shadow casting |
+| `pipeline` | Custom multi-pass render pipeline builder |
+| `raycaster` | Raycasting-based pseudo-3D renderer |
+| `spine` | Spine 2D skeletal animation runtime |
+| `network` | Networking via ENet: UDP sessions, channels, packet types |
+| `procgen` | Procedural content generation (dungeons, noise maps, L-systems) |
+| `patterns` | Reusable game-design pattern implementations |
+| `localization` | String-table i18n with plural rules and locale detection |
+| `tween` | Tween / timeline system: chained, parallel, and looping sequences |
+| `terminal` | In-game developer console / REPL with widget toolkit |
+| `devtools` | In-engine performance overlay and inspector |
+| `debugbridge` | Remote debug bridge for external tooling |
+| `docs` | In-engine interactive documentation viewer |
 
 ### Lua API
 
-All bindings live under `luna.*` — a single, consistent namespace:
+All bindings live under `lurek.*`:
 
 ```
-luna.gfx    luna.audio      luna.keyboard    luna.mouse
-luna.gamepad     luna.touch      luna.time       luna.math
-luna.physics     luna.fs luna.window      luna.signal
-luna.platform      luna.particles   luna.data        luna.img
-luna.sound       luna.thread     luna.terminal
+lurek.gfx       lurek.audio      lurek.sound     lurek.physics    lurek.input
+lurek.keyboard  lurek.mouse      lurek.gamepad   lurek.touch      lurek.camera
+lurek.anim      lurek.particle   lurek.tilemap   lurek.scene      lurek.ai
+lurek.path      lurek.entity     lurek.thread    lurek.event      lurek.signal
+lurek.fs        lurek.data       lurek.serial    lurek.img        lurek.compute
+lurek.math      lurek.time       lurek.window    lurek.tween      lurek.gui
+lurek.terminal  lurek.overlay    lurek.light     lurek.postfx     lurek.fx
+lurek.minimap   lurek.network    lurek.modding   lurek.savegame   lurek.procgen
+lurek.platform  lurek.locale     lurek.patterns  lurek.devtools   lurek.log
 ```
 
-Every callback is optional. Every function has sensible defaults. Every type has clear documentation.
-
-### Callbacks
+Every callback is optional. An empty `main.lua` is a valid Lurek2D program.
 
 ```lua
-luna.load()                              -- once at startup
-luna.update(dt)                          -- every frame
-luna.draw()                              -- every frame
-luna.keypressed(key, scancode, isrepeat) -- key down
-luna.mousepressed(x, y, button)          -- mouse down
-luna.gamepadpressed(id, button)          -- gamepad button
--- ... 22 total callbacks
+-- Core callbacks (all optional)
+function lurek.init()        end  -- once at startup
+function lurek.ready()       end  -- after first frame is ready
+function lurek.process(dt)   end  -- every frame (game logic)
+function lurek.render()      end  -- every frame (draw calls)
+function lurek.render_ui()   end  -- every frame (HUD layer)
+-- Input, physics, window, and error callbacks also available (22 total)
 ```
 
 ---
 
 ## Architecture
 
-Luna2D uses a layered module architecture:
-
 ```
 Lua game scripts
-    ▼
-library/  (Tier 3: Lunasome — pure Lua standard library)
-    ▼
-lua_api/  (bridge: registers luna.* namespace)
-    ▼
-Tier 2 extensions (particle, tilemap, scene, ai, pathfinding, ...)
-    ▼
-Tier 1 core (graphics, audio, physics, input, timer, ...)
-    ▼
-Baseline: math (leaf) + engine (lifecycle, SharedState)
+        ▼
+content/library/   ← Tier 3: Lunasome — pure-Lua game mechanics (no Rust internals)
+        ▼
+src/lua_api/       ← Bridge: registers the lurek.* namespace
+        ▼
+Tier 2 extensions  ← particle, tilemap, scene, ai, pathfinding, gui, …
+        ▼
+Tier 1 core        ← graphics, audio, physics, input, timer, filesystem, …
+        ▼
+Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 ```
 
-**Layer rules**: Tier 1 depends only on Baseline. Tier 2 depends on Baseline + Tier 1. No circular dependencies. No cross-tier imports within the same level.
+**Rules**: tiers only import downward. No cross-imports within the same tier. Domain modules never import `lua_api`. See [docs/architecture/engine-architecture.md](docs/architecture/engine-architecture.md) for the full spec.
 
-### Documentation
+**Rendering**: `DrawCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes — no GPU calls inside Lua closures.
 
-| Document | Contents |
+**State**: Resources (textures, fonts, meshes, canvases, …) live in typed `SlotMap` pools in `SharedState`. Keys are opaque typed handles — no string lookups at runtime.
+
+**Boot**: `conf.lua` → `Config` → winit window + wgpu device + rodio mixer → LuaJIT VM → `main.lua` → event loop.
+
+---
+
+## What Ships
+
+| Component | Location | Description |
+|---|---|---|
+| **Engine binary** | `src/` | The `lurek2d` executable — the entire runtime |
+| **Lua API reference** | `docs/API/lua-api.md` | Full `lurek.*` function signatures and descriptions |
+| **Rust API reference** | `docs/API/rust-api.md` | Engine internals for contributors |
+| **VS Code extension** | `extensions/vscode/` | IntelliSense, MCP server, CAG tooling, debug workflows |
+| **Demos** | `content/demos/` | Playable examples across 8 genres (action, arcade, RPG, strategy, …) |
+| **API examples** | `content/examples/` | Single-file scripts demonstrating one `lurek.*` module each |
+| **Lua libraries** | `content/library/` | Pure-Lua game-mechanics modules: inventory, quest, dialog, combat, economy, … |
+| **Plugins** | `content/plugins/` | In-progress third-party plugin layer (future) |
+| **CAG system** | `.github/` | 20 Copilot agents, 30 skills, and prompts for AI-assisted development |
+
+### VS Code Extension
+
+[`extensions/vscode/`](extensions/vscode/README.md) provides:
+- IntelliSense and hover docs for all `lurek.*` functions
+- One-click demo runner
+- MCP server exposing engine context to Copilot
+- CAG layer (agents, skills, prompts) for AI-first game development
+
+### Lua Libraries (Lunasome)
+
+`content/library/` ships production-ready pure-Lua modules — no Rust required:
+
+| Library | Description |
 |---|---|
-| [Engine Architecture](docs/architecture/engine-architecture.md) | Runtime modules, rendering pipeline, boot sequence, state management |
-| [Test Framework](docs/architecture/test-framework.md) | Test suite structure, BDD framework, naming conventions, quality gates |
-| [Philosophy & Design Assumptions](docs/architecture/philosophy.md) | The Zen of Luna, binding constraints, decision heuristics |
-| [Lua API Reference](docs/lua_api_reference_generated.md) | Complete `luna.*` API for game developers |
-| [Rust API Reference](docs/api_generated.md) | Engine internals for contributors |
+| `battle` | Turn-based battle system |
+| `cardgame` | Card game mechanics and deck management |
+| `combat` | Real-time combat: hit detection, damage, status effects |
+| `crafting` | Recipe-based crafting system |
+| `dialog` | Branching dialogue trees with conditions and triggers |
+| `doll` | Paper-doll character equipment and layered rendering |
+| `economy` | Market simulation, shop, pricing |
+| `inventory` | Inventory slots, stacks, drag-and-drop |
+| `item` | Item definitions, properties, and rarity |
+| `province_map` | Province-based strategy map |
+| `quest` | Quest tracker with objectives, stages, and rewards |
+| `stats` | Attribute and derived-stat system |
+
+### CAG — AI-First Development
+
+Lurek2D's `.github/` layer is a complete Copilot Agent Graph (CAG):
+
+- **20 agents** cover every role: Manager, Developer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Doc-Writer, Security, and more
+- **30+ skills** provide domain knowledge: GPU programming, Lua API design, physics, audio, threading, testing, …
+- **Prompts and instructions** ensure every agent uses the engine correctly without clarifying questions
+
+If you develop with GitHub Copilot, the CAG turns your AI assistant into a specialized Lurek2D co-developer.
 
 ---
 
 ## Tech Stack
 
-| Component | Technology | Purpose |
+| Component | Library | Version |
 |---|---|---|
-| Language | Rust stable ≥1.78 | Engine core |
-| Scripting | LuaJIT (mlua 0.9) | Game logic |
-| Rendering | wgpu 22 | GPU (Vulkan/DX12/Metal) |
-| Windowing | winit 0.30 | Cross-platform windows + input |
-| Physics | rapier2d 0.32 | 2D rigid-body simulation |
-| Audio | rodio 0.17 | Sound playback |
-| Fonts | fontdue 0.9 | TTF/OTF rasterization |
-| Gamepad | gilrs 0.11 | Controller support |
+| Language | Rust stable | ≥ 1.78 |
+| Scripting | LuaJIT via mlua | 0.9 |
+| Rendering | wgpu | 22 |
+| Windowing + input | winit | 0.30 |
+| Physics | rapier2d | 0.32 |
+| Audio | rodio | 0.17 |
+| Font rasterization | fontdue | 0.9 |
+| Gamepad | gilrs | 0.11 |
+| Networking | rusty_enet | 0.4 |
 
 ---
 
-## Examples
+## License
 
-27 example games and demos ship in `demos/`:
+Lurek2D is **MIT-licensed**. All first-party code, docs, demos, examples, and tools are covered by the root [LICENSE](LICENSE).
 
-| Example | Demonstrates |
+| Artifact | License |
 |---|---|
-| `hello_world` | Minimal game — text rendering |
-| `physics_demo` | Rigid bodies, shapes, collisions |
-| `sprites` | Image loading, sprite drawing |
-| `platformer` | Side-scrolling movement and collision |
-| `particles_demo` | Particle system configuration |
-| `scene_demo` | Scene stack and transitions |
-| `dialog_demo` | Dialogue system and branching |
-| `tilemap` | Tile-based map rendering |
-| `terminal_demo` | In-game developer console |
-| `tween_demo` | Easing and animation |
-| `light_demo` | Dynamic lighting effects |
-| `postfx_demo` | Post-processing effects |
-| ... | See `demos/` for all demos |
+| Engine (`src/`) | MIT |
+| Lua libraries (`content/library/`) | MIT |
+| Demos and examples (`content/demos/`, `content/examples/`) | MIT |
+| VS Code extension (`extensions/vscode/`) | MIT |
+| Tools and docs (`tools/`, `docs/`) | MIT |
 
-Run any example:
+### Cargo Dependency Licenses
 
-```bash
-cargo run -- demos/hello_world
-```
+All direct Cargo dependencies are permissive (MIT, Apache-2.0, Zlib, or Unlicense). No GPL, LGPL, or AGPL dependency is present.
 
----
+| Crate | Version | License |
+|---|---:|---|
+| winit | 0.30.13 | Apache-2.0 |
+| bytemuck | 1.25.0 | Zlib OR Apache-2.0 OR MIT |
+| pollster | 0.3.0 | Apache-2.0 OR MIT |
+| mlua | 0.9.9 | MIT |
+| image | 0.24.9 | MIT OR Apache-2.0 |
+| ddsfile | 0.5.2 | MIT |
+| rodio | 0.17.3 | MIT OR Apache-2.0 |
+| fontdue | 0.9.3 | MIT OR Apache-2.0 OR Zlib |
+| log | 0.4.29 | MIT OR Apache-2.0 |
+| env_logger | 0.10.2 | MIT OR Apache-2.0 |
+| thiserror | 1.0.69 | MIT OR Apache-2.0 |
+| fastrand | 2.3.0 | Apache-2.0 OR MIT |
+| rapier2d | 0.32.0 | Apache-2.0 |
+| gilrs | 0.11.1 | Apache-2.0 OR MIT |
+| rusty_enet | 0.4.0 | MIT |
+| slotmap | 1.1.1 | Zlib |
+| flate2 | 1.1.9 | MIT OR Apache-2.0 |
+| lz4_flex | 0.11.6 | MIT |
+| sha2 | 0.10.9 | MIT OR Apache-2.0 |
+| sha1 | 0.10.6 | MIT OR Apache-2.0 |
+| md-5 | 0.10.6 | MIT OR Apache-2.0 |
+| base64 | 0.22.1 | MIT OR Apache-2.0 |
+| hex | 0.4.3 | MIT OR Apache-2.0 |
+| roxmltree | 0.20.0 | MIT OR Apache-2.0 |
+| serde | 1.0.228 | MIT OR Apache-2.0 |
+| serde_json | 1.0.149 | MIT OR Apache-2.0 |
+| csv | 1.4.0 | Unlicense OR MIT |
+| indexmap | 2.13.0 | Apache-2.0 OR MIT |
+| toml | 0.8.23 | MIT OR Apache-2.0 |
+| directories | 5.0.1 | MIT OR Apache-2.0 |
+| sysinfo | 0.30.13 | MIT |
+| sys-locale | 0.3.2 | MIT OR Apache-2.0 |
+| arboard | 3.6.1 | MIT OR Apache-2.0 |
+| rfd | 0.14.1 | MIT |
+| zip | 2.4.2 | MIT |
+| tempfile | 3.27.0 | MIT OR Apache-2.0 |
+| wgpu | 22.1.0 | MIT OR Apache-2.0 |
+| windows-sys | 0.59.0 | MIT OR Apache-2.0 |
+| winresource | 0.1.31 | MIT |
+| @modelcontextprotocol/sdk | 1.29.0 | MIT |
 
-## Development
-
-### Build Commands
-
-```bash
-cargo check                            # Type-check only (~2-5s incremental)
-cargo test --test math_tests           # Test one module
-cargo test lua_test_math               # Test one Lua module
-cargo clippy --lib                     # Lint library only
-```
-
-### Quality Gates (before every commit)
-
-```bash
-cargo test && cargo clippy -- -D warnings
-cargo fmt --check
-```
-
-### Regenerate Assets
-
-```bash
-python tools/gen_splash.py             # Regenerate splash.png
-python tools/gen_icon.py               # Regenerate icon.ico + icon.png
-python tools/gen_branding.py           # Regenerate all SVG branding
-```
-
----
-
-## VS Code Extension
-
-The first-party VS Code extension lives in [`vscode-extension/`](vscode-extension/README.md). It provides:
-
-- API documentation and IntelliSense for `luna.*`
-- Example-running workflows
-- AI-oriented tooling (CAG layer, MCP server)
-
-The extension is a companion tool, not part of the engine runtime.
+> **Note**: `gilrs` bundles SDL_GameControllerDB internally. The crate license is permissive; confirm notice handling for release packaging.
 
 ---
 
 ## Project Identity
 
-Luna2D's visual identity tells a story:
+Lurek2D's visual identity tells a story:
 
 - **🌙 Moon** — Lua means "moon" in Portuguese. The crescent represents the scripting layer.
 - **⚙️ Gear** — The Rust engine core. Industrial-strength, memory-safe.
-- **🟡 Pacman** — The gear is shaped like Pacman — the engine that *eats* game scripts and runs them.
-- **🧊 Cube** — The industry giants (Unity, Unreal, Godot) orbit Luna2D, not the reverse.
+- **🟡 Pacman shape** — The gear eats game scripts and runs them.
+- **🧊 Cube** — The industry giants orbit Lurek2D, not the reverse.
 
 ---
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## Security
-
-See [SECURITY.md](SECURITY.md) for reporting instructions.
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+[Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [License](LICENSE)
 

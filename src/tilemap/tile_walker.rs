@@ -1,12 +1,12 @@
 //! Tile-based first-person movement controller with cardinal directions.
 //!
-//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! This module is part of Lurek2D's `tilemap` subsystem and provides the implementation
 //! details for tile walker-related operations and data management.
 //! Key types exported from this module: `Facing`, `TileWalker`.
 //! Primary functions: `parse()`, `to_str()`, `angle()`, `dx()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::f32::consts::PI;
 

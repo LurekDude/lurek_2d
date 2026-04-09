@@ -28,12 +28,12 @@ function M.update(dt)
 end
 
 function M.draw()
-    luna.gfx.print("Scene 1: Bouncing Sprites", 10, 10)
+    lurek.gfx.print("Scene 1: Bouncing Sprites", 10, 10)
     for _, s in ipairs(sprites) do
-        luna.gfx.setColor(s.r, s.g, s.b, 1)
-        luna.gfx.rectangle("fill", s.x, s.y, s.size, s.size)
+        lurek.gfx.setColor(s.r, s.g, s.b, 1)
+        lurek.gfx.rectangle("fill", s.x, s.y, s.size, s.size)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 
 return M

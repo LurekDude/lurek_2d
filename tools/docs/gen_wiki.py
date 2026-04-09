@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-gen_wiki.py — Regenerate ALL Luna2D wiki pages from source content.
+gen_wiki.py — Regenerate ALL Lurek2D wiki pages from source content.
 
 Two page types:
   SCRIPTED  — fully auto-generated; overwritten on every run.
   MANUAL    — created once with a scaffold; never overwritten if the file exists.
 
-Reads:  specs/*.md, examples/*.lua, library/, demos/, tools/, docs/architecture/,
-        .github/agents/, .github/skills/, vscode-extension/README.md,
+Reads:  docs/specs/*.md, content/examples/*.lua, content/library/, content/demos/, tools/, docs/architecture/,
+        .github/agents/, .github/skills/, extensions/vscode/README.md,
         CONTRIBUTING.md
-Writes: wiki/*.md  (61 pages total)
+Writes: docs/wiki/*.md  (61 pages total)
 
 Usage:
     python tools/docs/gen_wiki.py                # regenerate all pages
@@ -33,7 +33,7 @@ from textwrap import dedent
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 ROOT     = Path(__file__).resolve().parent.parent.parent
-SPECS    = ROOT / "specs"
+SPECS    = ROOT / "docs" / "specs"
 EXAMPLES = ROOT / "examples"
 LIBRARY  = ROOT / "library"
 DEMOS    = ROOT / "demos"
@@ -41,7 +41,7 @@ TOOLS    = ROOT / "tools"
 DOCS     = ROOT / "docs"
 GITHUB   = ROOT / ".github"
 VSEXT    = ROOT / "vscode-extension"
-WIKI     = ROOT / "wiki"
+WIKI     = ROOT / "docs" / "wiki"
 
 GITHUB_URL = "https://github.com/LurekDude/luna_2d"
 GEN_DATE   = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -77,7 +77,7 @@ def _prop(text: str, key: str) -> str:
 
 
 def _strip_source_refs(text: str) -> str:
-    """Remove references to source file paths (src/, tests/, library/ paths)."""
+    """Remove references to source file paths (src/, tests/, content/library/ paths)."""
     # Replace `src/module/` references with descriptive text
     text = re.sub(r'`src/([a-z_]+)/`', r'the \1 module', text)
     text = re.sub(r'`src/([a-z_]+)/([a-z_]+\.rs)`', r'the \1 module', text)
@@ -130,7 +130,7 @@ def read_example(module: str, max_lines: int = 120) -> str:
     lines = text.split("\n")
     cut = 0
     for i, ln in enumerate(lines[:8]):
-        if re.match(r"^-- (examples/|Luna2D\b)", ln):
+        if re.match(r"^-- (content/examples/|Lurek2D\b)", ln):
             cut = i + 1
     return "\n".join(lines[cut:max_lines]).strip()
 
@@ -145,11 +145,11 @@ def write_page(filename: str, content: str, dry_run: bool = False,
         print("  [... truncated ...]")
         return "dry-run"
     if is_manual and path.exists() and not force:
-        print(f"  skip   wiki/{filename} (manual page exists)")
+        print(f"  skip   docs/wiki/{filename} (manual page exists)")
         return "skipped"
     path.write_text(content, encoding="utf-8")
     tag = "wrote " if not is_manual else "scaffolded"
-    print(f"  {tag} wiki/{filename}")
+    print(f"  {tag} docs/wiki/{filename}")
     return "wrote"
 
 
@@ -217,7 +217,7 @@ def gen_module_page(
 
     tier     = spec.get("tier", "")
     status   = spec.get("status", "")
-    api_ns   = spec.get("api", f"luna.{module}")
+    api_ns   = spec.get("api", f"lurek.{module}")
     tier_short = re.sub(r" — .*", "", tier)
 
     overview = _spec_summary(module, n_summary_paras)
@@ -292,9 +292,9 @@ def gen_module_page(
 
 def gen_home() -> str:
     return GEN_BANNER + dedent(f"""\
-    # Luna2D — Wiki
+    # Lurek2D — Wiki
 
-    > **Luna2D** is a 2D game engine written in Rust that loads and executes Lua game scripts.
+    > **Lurek2D** is a 2D game engine written in Rust that loads and executes Lua game scripts.
     > Single binary · Desktop-first · LuaJIT · wgpu 22 · rapier2d 0.32 · rodio 0.17
 
     ---
@@ -305,24 +305,24 @@ def gen_home() -> str:
     git clone {GITHUB_URL}
     cd luna_2d
     cargo build --release
-    cargo run -- demos/showcase/hello_world
+    cargo run -- content/demos/showcase/hello_world
     ```
 
     Minimal `main.lua`:
 
     ```lua
-    function luna.load()
-        luna.window.setTitle("My Game")
-        luna.graphics.setBackgroundColor(0.1, 0.1, 0.2)
+    function lurek.load()
+        lurek.window.setTitle("My Game")
+        lurek.graphics.setBackgroundColor(0.1, 0.1, 0.2)
     end
 
-    function luna.update(dt)
+    function lurek.update(dt)
         -- game logic: move objects, run physics, etc.
     end
 
-    function luna.draw()
-        luna.graphics.setColor(1, 1, 1)
-        luna.graphics.print("Hello, Luna2D!", 300, 280, 3)
+    function lurek.draw()
+        lurek.graphics.setColor(1, 1, 1)
+        lurek.graphics.print("Hello, Lurek2D!", 300, 280, 3)
     end
     ```
 
@@ -337,7 +337,7 @@ def gen_home() -> str:
     | [[Your-First-Game]] | Step-by-step tutorial: from nothing to a moving sprite |
     | [[Project-Structure]] | `main.lua`, `conf.lua`, folder layout, assets |
     | [[Configuration]] | `conf.lua` / `conf.toml` — window and module settings |
-    | [[Callbacks]] | All engine callbacks (`luna.load`, `luna.update`, `luna.draw`, …) |
+    | [[Callbacks]] | All engine callbacks (`lurek.load`, `lurek.update`, `lurek.draw`, …) |
     | [[Examples]] | 38 single-file API usage scripts |
     | [[Demos]] | 111+ playable demos organised by genre |
 
@@ -352,55 +352,55 @@ def gen_home() -> str:
     ### Core API Reference
     | Page | What it covers |
     |------|----------------|
-    | [[API-Reference]] | Full Luna2D cheatsheet — every `luna.*` function on one page |
-    | [[Graphics-API]] | `luna.graphics` — drawing, images, fonts, shaders, canvas |
-    | [[Audio-API]] | `luna.audio` — sources, playback, mixer, buses, MIDI |
-    | [[Physics-API]] | `luna.physics` — worlds, bodies, shapes, joints, raycasting |
-    | [[Input-API]] | `luna.input` / keyboard / mouse / gamepad / touch |
-    | [[Math-API]] | `luna.math` — vectors, random, noise, transforms |
-    | [[Timer-API]] | `luna.timer` — delta time, FPS, sleep, scheduler |
-    | [[Filesystem-API]] | `luna.filesystem` — sandboxed I/O, virtual FS |
-    | [[Window-API]] | `luna.window` — fullscreen, DPI, clipboard |
+    | [[API-Reference]] | Full Lurek2D cheatsheet — every `lurek.*` function on one page |
+    | [[Graphics-API]] | `lurek.graphics` — drawing, images, fonts, shaders, canvas |
+    | [[Audio-API]] | `lurek.audio` — sources, playback, mixer, buses, MIDI |
+    | [[Physics-API]] | `lurek.physics` — worlds, bodies, shapes, joints, raycasting |
+    | [[Input-API]] | `lurek.input` / keyboard / mouse / gamepad / touch |
+    | [[Math-API]] | `lurek.math` — vectors, random, noise, transforms |
+    | [[Timer-API]] | `lurek.timer` — delta time, FPS, sleep, scheduler |
+    | [[Filesystem-API]] | `lurek.filesystem` — sandboxed I/O, virtual FS |
+    | [[Window-API]] | `lurek.window` — fullscreen, DPI, clipboard |
 
     ### Graphics & Rendering
     | Page | What it covers |
     |------|----------------|
-    | [[Camera-API]] | `luna.camera` — viewport transforms, zoom, shake |
-    | [[Animation-API]] | `luna.animation` — sprite-sheet frame animation |
-    | [[Particle-API]] | `luna.particle` — emitters, modifiers, keyframe |
-    | [[FX-API]] | `luna.fx` / `luna.pipeline` — post-processing, render pipeline |
-    | [[Shader-Patterns]] | Custom WGSL shaders with `luna.graphics.newShader` |
+    | [[Camera-API]] | `lurek.camera` — viewport transforms, zoom, shake |
+    | [[Animation-API]] | `lurek.animation` — sprite-sheet frame animation |
+    | [[Particle-API]] | `lurek.particle` — emitters, modifiers, keyframe |
+    | [[FX-API]] | `lurek.fx` / `lurek.pipeline` — post-processing, render pipeline |
+    | [[Shader-Patterns]] | Custom WGSL shaders with `lurek.graphics.newShader` |
 
     ### Game Systems
     | Page | What it covers |
     |------|----------------|
-    | [[Tilemap-API]] | `luna.tilemap` — tiles, layers, auto-tile, isometric/hex |
-    | [[Scene-API]] | `luna.scene` — scene stack, transitions, depth sorting |
-    | [[Entity-API]] | `luna.entity` — ECS, components, tags, systems |
-    | [[Pathfinding-API]] | `luna.pathfinding` — NavGrid, A\\*, flow fields |
-    | [[AI-API]] | `luna.ai` — FSM, behaviour trees, steering, GOAP, Q-learning |
-    | [[Savegame-API]] | `luna.savegame` — save/load slots, versioned tables |
+    | [[Tilemap-API]] | `lurek.tilemap` — tiles, layers, auto-tile, isometric/hex |
+    | [[Scene-API]] | `lurek.scene` — scene stack, transitions, depth sorting |
+    | [[Entity-API]] | `lurek.entity` — ECS, components, tags, systems |
+    | [[Pathfinding-API]] | `lurek.pathfinding` — NavGrid, A\\*, flow fields |
+    | [[AI-API]] | `lurek.ai` — FSM, behaviour trees, steering, GOAP, Q-learning |
+    | [[Savegame-API]] | `lurek.savegame` — save/load slots, versioned tables |
 
     ### UI & Terminal
     | Page | What it covers |
     |------|----------------|
-    | [[GUI-API]] | `luna.gui` — retained-mode widget system, 32 widget types |
-    | [[Terminal-API]] | `luna.terminal` — grid-based character terminal emulator |
+    | [[GUI-API]] | `lurek.gui` — retained-mode widget system, 32 widget types |
+    | [[Terminal-API]] | `lurek.terminal` — grid-based character terminal emulator |
 
     ### Data & Scripting
     | Page | What it covers |
     |------|----------------|
-    | [[Data-APIs]] | `luna.data` / compute / dataframe / graph / serial / image |
-    | [[Event-API]] | `luna.event` — event queue and pub/sub |
-    | [[Threading]] | `luna.thread` — worker threads, channels |
-    | [[Automation-API]] | `luna.automation` — scripted sequences and macros |
-    | [[Network-API]] | `luna.network` — TCP/UDP client-server, HTTP client |
+    | [[Data-APIs]] | `lurek.data` / compute / dataframe / graph / serial / image |
+    | [[Event-API]] | `lurek.event` — event queue and pub/sub |
+    | [[Threading]] | `lurek.thread` — worker threads, channels |
+    | [[Automation-API]] | `lurek.automation` — scripted sequences and macros |
+    | [[Network-API]] | `lurek.network` — TCP/UDP client-server, HTTP client |
 
     ### Effects & Extras
     | Page | What it covers |
     |------|----------------|
-    | [[Modding-API]] | `luna.modding` — mod loading, hot-reload |
-    | [[Procgen-API]] | `luna.procgen` — map generators, noise, cellular automata |
+    | [[Modding-API]] | `lurek.modding` — mod loading, hot-reload |
+    | [[Procgen-API]] | `lurek.procgen` — map generators, noise, cellular automata |
     | [[Advanced-APIs]] | Raycaster, Spine, Light, Minimap |
 
     ### Standard Library (Lunasome)
@@ -440,13 +440,13 @@ def gen_home() -> str:
     | **Baseline** | `math` |
     | **Tier 1** | `graphics` · `audio` · `physics` · `input` · `timer` · `window` · `filesystem` · `entity` · `event` · `image` · `data` · `thread` · `camera` · `animation` · `automation` · `compute` · `sound` |
     | **Tier 2** | `gui` · `scene` · `tilemap` · `particle` · `pathfinding` · `ai` · `fx` · `pipeline` · `terminal` · `minimap` · `modding` · `network` · `savegame` · `dataframe` · `graph` · `serial` · `spine` · `light` · `raycaster` · `procgen` |
-    | **Bridge** | `lua_api` — registers every `luna.*` binding |
+    | **Bridge** | `lua_api` — registers every `lurek.*` binding |
     | **Tier 3** | Lunasome — pure-Lua game libraries |
-    | **Games** | `demos/` · user `main.lua` |
+    | **Games** | `content/demos/` · user `main.lua` |
 
     ---
 
-    *[Luna2D on GitHub]({GITHUB_URL}) · MIT License · Rust 1.78+ · LuaJIT via mlua 0.9 · wgpu 22 · winit 0.30 · rapier2d 0.32 · rodio 0.17*
+    *[Lurek2D on GitHub]({GITHUB_URL}) · MIT License · Rust 1.78+ · LuaJIT via mlua 0.9 · wgpu 22 · winit 0.30 · rapier2d 0.32 · rodio 0.17*
     """)
 
 
@@ -468,9 +468,9 @@ def gen_getting_started() -> str:
     cargo build --release
     ```
 
-    The binary is at `build/release/luna2d` (or `luna2d.exe` on Windows).
+    The binary is at `build/release/lurek2d` (or `lurek2d.exe` on Windows).
 
-    > Luna2D overrides Cargo's default output directory — binaries go to `build/` instead of `target/`.
+    > Lurek2D overrides Cargo's default output directory — binaries go to `build/` instead of `target/`.
 
     ## Install Locally (optional)
 
@@ -485,7 +485,7 @@ def gen_getting_started() -> str:
     After installation, you can use `luna` from anywhere:
 
     ```bash
-    luna demos/showcase/hello_world
+    luna content/demos/showcase/hello_world
     luna path/to/my_game
     ```
 
@@ -501,18 +501,18 @@ def gen_getting_started() -> str:
     ```
 
     ```lua
-    function luna.load()
-        luna.window.setTitle("My First Game")
-        luna.graphics.setBackgroundColor(0.1, 0.1, 0.2)
+    function lurek.load()
+        lurek.window.setTitle("My First Game")
+        lurek.graphics.setBackgroundColor(0.1, 0.1, 0.2)
     end
 
-    function luna.update(dt)
+    function lurek.update(dt)
         -- game logic here
     end
 
-    function luna.draw()
-        luna.graphics.setColor(1, 1, 1)
-        luna.graphics.print("Hello, Luna2D!", 300, 280, 3)
+    function lurek.draw()
+        lurek.graphics.setColor(1, 1, 1)
+        lurek.graphics.print("Hello, Lurek2D!", 300, 280, 3)
     end
     ```
 
@@ -531,7 +531,7 @@ def gen_getting_started() -> str:
     Create `conf.lua` in your game folder to configure the window before it opens:
 
     ```lua
-    function luna.conf(t)
+    function lurek.conf(t)
         t.window.title  = "My Game"
         t.window.width  = 1280
         t.window.height = 720
@@ -546,12 +546,12 @@ def gen_getting_started() -> str:
 
     ## Running the Demos
 
-    Luna2D ships with 111+ playable demos:
+    Lurek2D ships with 111+ playable demos:
 
     ```bash
-    cargo run -- demos/arcade/pong
-    cargo run -- demos/showcase/hello_world
-    cargo run -- demos/simulation/physics_demo
+    cargo run -- content/demos/arcade/pong
+    cargo run -- content/demos/showcase/hello_world
+    cargo run -- content/demos/simulation/physics_demo
     ```
 
     See [[Demos]] for the full index.
@@ -563,8 +563,8 @@ def gen_getting_started() -> str:
     Single-file API usage scripts:
 
     ```bash
-    cargo run -- examples/physics.lua
-    cargo run -- examples/tilemap.lua
+    cargo run -- content/examples/physics.lua
+    cargo run -- content/examples/tilemap.lua
     ```
 
     See [[Examples]] for all 38 examples.
@@ -573,7 +573,7 @@ def gen_getting_started() -> str:
 
     ## VS Code Integration
 
-    Luna2D has a first-party VS Code extension with:
+    Lurek2D has a first-party VS Code extension with:
     - Lua API autocomplete
     - MCP server for AI-assisted development
     - Example runner
@@ -602,7 +602,7 @@ def gen_your_first_game() -> str:
     return MANUAL_BANNER + dedent("""\
     # Your First Game
 
-    This tutorial walks you through building a simple game from scratch using Luna2D.
+    This tutorial walks you through building a simple game from scratch using Lurek2D.
     By the end, you'll have a moving sprite that you can control with the keyboard.
 
     ---
@@ -617,10 +617,10 @@ def gen_your_first_game() -> str:
     ## Step 2: Set Up the Game Window
 
     ```lua
-    function luna.load()
-        luna.window.setTitle("My Platformer")
-        luna.window.setMode(800, 600)
-        luna.graphics.setBackgroundColor(0.2, 0.3, 0.4)
+    function lurek.load()
+        lurek.window.setTitle("My Platformer")
+        lurek.window.setMode(800, 600)
+        lurek.graphics.setBackgroundColor(0.2, 0.3, 0.4)
 
         -- Player state
         player = { x = 400, y = 300, speed = 200 }
@@ -630,17 +630,17 @@ def gen_your_first_game() -> str:
     ## Step 3: Add Player Movement
 
     ```lua
-    function luna.update(dt)
-        if luna.keyboard.isDown("left", "a") then
+    function lurek.update(dt)
+        if lurek.keyboard.isDown("left", "a") then
             player.x = player.x - player.speed * dt
         end
-        if luna.keyboard.isDown("right", "d") then
+        if lurek.keyboard.isDown("right", "d") then
             player.x = player.x + player.speed * dt
         end
-        if luna.keyboard.isDown("up", "w") then
+        if lurek.keyboard.isDown("up", "w") then
             player.y = player.y - player.speed * dt
         end
-        if luna.keyboard.isDown("down", "s") then
+        if lurek.keyboard.isDown("down", "s") then
             player.y = player.y + player.speed * dt
         end
     end
@@ -649,14 +649,14 @@ def gen_your_first_game() -> str:
     ## Step 4: Draw the Player
 
     ```lua
-    function luna.draw()
+    function lurek.draw()
         -- Draw a white rectangle as the player
-        luna.graphics.setColor(1, 1, 1)
-        luna.graphics.rectangle("fill", player.x - 16, player.y - 16, 32, 32)
+        lurek.graphics.setColor(1, 1, 1)
+        lurek.graphics.rectangle("fill", player.x - 16, player.y - 16, 32, 32)
 
         -- Draw position text
-        luna.graphics.setColor(0.8, 0.8, 0.8)
-        luna.graphics.print(string.format("x: %.0f  y: %.0f", player.x, player.y), 10, 10)
+        lurek.graphics.setColor(0.8, 0.8, 0.8)
+        lurek.graphics.print(string.format("x: %.0f  y: %.0f", player.x, player.y), 10, 10)
     end
     ```
 
@@ -675,15 +675,15 @@ def gen_your_first_game() -> str:
     Place an image file in your game folder and load it:
 
     ```lua
-    function luna.load()
-        luna.window.setTitle("Sprite Demo")
-        sprite = luna.graphics.newImage("player.png")
+    function lurek.load()
+        lurek.window.setTitle("Sprite Demo")
+        sprite = lurek.graphics.newImage("player.png")
         player = { x = 400, y = 300, speed = 200 }
     end
 
-    function luna.draw()
-        luna.graphics.setColor(1, 1, 1)
-        luna.graphics.draw(sprite, player.x, player.y)
+    function lurek.draw()
+        lurek.graphics.setColor(1, 1, 1)
+        lurek.graphics.draw(sprite, player.x, player.y)
     end
     ```
 
@@ -692,8 +692,8 @@ def gen_your_first_game() -> str:
     ## Step 7: Add Physics (optional)
 
     ```lua
-    function luna.load()
-        world = luna.physics.newWorld(0, 500)  -- gravity pulling down
+    function lurek.load()
+        world = lurek.physics.newWorld(0, 500)  -- gravity pulling down
 
         -- Ground
         ground = world:newBody("static", 400, 580, "rectangle", 800, 40)
@@ -703,20 +703,20 @@ def gen_your_first_game() -> str:
         ball:setRestitution(0.6)  -- bouncy
     end
 
-    function luna.update(dt)
+    function lurek.update(dt)
         world:step(dt)
     end
 
-    function luna.draw()
+    function lurek.draw()
         -- Draw ground
-        luna.graphics.setColor(0.3, 0.7, 0.3)
+        lurek.graphics.setColor(0.3, 0.7, 0.3)
         local gx, gy = ground:getPosition()
-        luna.graphics.rectangle("fill", gx - 400, gy - 20, 800, 40)
+        lurek.graphics.rectangle("fill", gx - 400, gy - 20, 800, 40)
 
         -- Draw ball
-        luna.graphics.setColor(1, 0.5, 0.2)
+        lurek.graphics.setColor(1, 0.5, 0.2)
         local bx, by = ball:getPosition()
-        luna.graphics.circle("fill", bx, by, 20)
+        lurek.graphics.circle("fill", bx, by, 20)
     end
     ```
 
@@ -740,7 +740,7 @@ def gen_project_structure() -> str:
     return MANUAL_BANNER + dedent("""\
     # Project Structure
 
-    A Luna2D game is a folder containing Lua scripts and assets.
+    A Lurek2D game is a folder containing Lua scripts and assets.
 
     ---
 
@@ -778,10 +778,10 @@ def gen_project_structure() -> str:
     The engine executes `main.lua` after booting. Define callbacks here:
 
     ```lua
-    function luna.load()       end  -- called once after init
-    function luna.update(dt)   end  -- called every frame
-    function luna.draw()       end  -- called every frame after update
-    function luna.quit()       end  -- called before exit
+    function lurek.load()       end  -- called once after init
+    function lurek.update(dt)   end  -- called every frame
+    function lurek.draw()       end  -- called every frame after update
+    function lurek.quit()       end  -- called before exit
     ```
 
     See [[Callbacks]] for the full callback reference.
@@ -790,10 +790,10 @@ def gen_project_structure() -> str:
 
     ## Configuration: conf.lua
 
-    If `conf.lua` exists, the engine calls `luna.conf(t)` before opening the window:
+    If `conf.lua` exists, the engine calls `lurek.conf(t)` before opening the window:
 
     ```lua
-    function luna.conf(t)
+    function lurek.conf(t)
         t.window.title  = "My Game"
         t.window.width  = 1280
         t.window.height = 720
@@ -810,9 +810,9 @@ def gen_project_structure() -> str:
     The engine sandboxes file access to your game folder. Load assets by relative path:
 
     ```lua
-    local img   = luna.graphics.newImage("assets/player.png")
-    local font  = luna.graphics.newFont("assets/font.ttf", 16)
-    local sound = luna.audio.newSource("assets/jump.ogg", "static")
+    local img   = lurek.graphics.newImage("assets/player.png")
+    local font  = lurek.graphics.newFont("assets/font.ttf", 16)
+    local sound = lurek.audio.newSource("assets/jump.ogg", "static")
     ```
 
     ---
@@ -823,8 +823,8 @@ def gen_project_structure() -> str:
     Use the `t.identity` setting in `conf.lua` or the filesystem API:
 
     ```lua
-    luna.filesystem.write("save/progress.json", data)
-    local data = luna.filesystem.read("save/progress.json")
+    lurek.filesystem.write("save/progress.json", data)
+    local data = lurek.filesystem.read("save/progress.json")
     ```
 
     See [[Filesystem-API]] for the full I/O API.
@@ -833,7 +833,7 @@ def gen_project_structure() -> str:
 
     ## Using Lunasome Libraries
 
-    Luna2D ships with pure-Lua game libraries that you can `require`:
+    Lurek2D ships with pure-Lua game libraries that you can `require`:
 
     ```lua
     local dialog    = require("library.dialog")
@@ -863,17 +863,17 @@ def gen_configuration() -> str:
     return GEN_BANNER + dedent("""\
     # Configuration
 
-    Luna2D reads configuration from two optional files before any game code runs.
+    Lurek2D reads configuration from two optional files before any game code runs.
 
     ---
 
     ## conf.lua
 
     Place `conf.lua` in your game folder alongside `main.lua`.
-    The `luna.conf(t)` callback is called during engine boot — before the window opens.
+    The `lurek.conf(t)` callback is called during engine boot — before the window opens.
 
     ```lua
-    function luna.conf(t)
+    function lurek.conf(t)
         -- Window
         t.window.title      = "My Game"
         t.window.width      = 1280
@@ -926,7 +926,7 @@ def gen_configuration() -> str:
 
     | Field | Type | Default | Description |
     |-------|------|---------|-------------|
-    | `window.title` | string | `"Luna2D"` | Window title bar text |
+    | `window.title` | string | `"Lurek2D"` | Window title bar text |
     | `window.width` | int | `1280` | Initial window width in pixels |
     | `window.height` | int | `720` | Initial window height in pixels |
     | `window.fullscreen` | bool | `false` | Start in fullscreen |
@@ -959,11 +959,11 @@ def gen_callbacks() -> str:
     ## Core Loop
 
     ```lua
-    function luna.conf(t)       end  -- called before window opens; configure in conf.lua
-    function luna.load()        end  -- called once after script and assets are loaded
-    function luna.update(dt)    end  -- dt: seconds; called every frame before draw
-    function luna.draw()        end  -- called every frame; push draw commands here
-    function luna.quit()        end  -- called before the engine exits; return true to cancel
+    function lurek.conf(t)       end  -- called before window opens; configure in conf.lua
+    function lurek.load()        end  -- called once after script and assets are loaded
+    function lurek.update(dt)    end  -- dt: seconds; called every frame before draw
+    function lurek.draw()        end  -- called every frame; push draw commands here
+    function lurek.quit()        end  -- called before the engine exits; return true to cancel
     ```
 
     ---
@@ -971,9 +971,9 @@ def gen_callbacks() -> str:
     ## Keyboard
 
     ```lua
-    function luna.keypressed(key, scancode, isrepeat)  end  -- key: string; isrepeat: bool
-    function luna.keyreleased(key, scancode)           end
-    function luna.textinput(text)                      end  -- Unicode character input
+    function lurek.keypressed(key, scancode, isrepeat)  end  -- key: string; isrepeat: bool
+    function lurek.keyreleased(key, scancode)           end
+    function lurek.textinput(text)                      end  -- Unicode character input
     ```
 
     ---
@@ -981,10 +981,10 @@ def gen_callbacks() -> str:
     ## Mouse
 
     ```lua
-    function luna.mousepressed(x, y, button)           end  -- button: 1=left 2=right 3=middle
-    function luna.mousereleased(x, y, button)          end
-    function luna.mousemoved(x, y, dx, dy)             end
-    function luna.wheelmoved(x, y)                     end  -- scroll delta
+    function lurek.mousepressed(x, y, button)           end  -- button: 1=left 2=right 3=middle
+    function lurek.mousereleased(x, y, button)          end
+    function lurek.mousemoved(x, y, dx, dy)             end
+    function lurek.wheelmoved(x, y)                     end  -- scroll delta
     ```
 
     ---
@@ -992,11 +992,11 @@ def gen_callbacks() -> str:
     ## Gamepad
 
     ```lua
-    function luna.gamepadpressed(id, button)           end  -- id: number; button: string
-    function luna.gamepadreleased(id, button)          end
-    function luna.gamepadaxis(id, axis, value)         end  -- value: -1.0..1.0
-    function luna.joystickadded(id)                    end  -- device connected
-    function luna.joystickremoved(id)                  end  -- device disconnected
+    function lurek.gamepadpressed(id, button)           end  -- id: number; button: string
+    function lurek.gamepadreleased(id, button)          end
+    function lurek.gamepadaxis(id, axis, value)         end  -- value: -1.0..1.0
+    function lurek.joystickadded(id)                    end  -- device connected
+    function lurek.joystickremoved(id)                  end  -- device disconnected
     ```
 
     ---
@@ -1004,9 +1004,9 @@ def gen_callbacks() -> str:
     ## Touch
 
     ```lua
-    function luna.touchpressed(id, x, y, dx, dy, pressure)   end
-    function luna.touchmoved(id, x, y, dx, dy, pressure)     end
-    function luna.touchreleased(id, x, y, dx, dy, pressure)  end
+    function lurek.touchpressed(id, x, y, dx, dy, pressure)   end
+    function lurek.touchmoved(id, x, y, dx, dy, pressure)     end
+    function lurek.touchreleased(id, x, y, dx, dy, pressure)  end
     ```
 
     ---
@@ -1014,9 +1014,9 @@ def gen_callbacks() -> str:
     ## Window
 
     ```lua
-    function luna.focus(focused)    end  -- focused: bool; window focus changed
-    function luna.visible(visible)  end  -- visible: bool; window hidden or shown
-    function luna.resize(w, h)      end  -- new window dimensions
+    function lurek.focus(focused)    end  -- focused: bool; window focus changed
+    function lurek.visible(visible)  end  -- visible: bool; window hidden or shown
+    function lurek.resize(w, h)      end  -- new window dimensions
     ```
 
     ---
@@ -1024,16 +1024,16 @@ def gen_callbacks() -> str:
     ## Callback Execution Order
 
     ```
-    luna.conf(t)          ← before window opens (from conf.lua)
+    lurek.conf(t)          ← before window opens (from conf.lua)
     window opens
-    luna.load()           ← once, after full init
+    lurek.load()           ← once, after full init
     ┌─ frame loop ──────────────────────────────
-    │  poll events → fire luna.key*/mouse*/etc.
-    │  luna.update(dt)
-    │  luna.draw()        ← push DrawCommands
+    │  poll events → fire lurek.key*/mouse*/etc.
+    │  lurek.update(dt)
+    │  lurek.draw()        ← push DrawCommands
     │  GPU renderer processes the command queue
     └────────────────────────────────────────────
-    luna.quit()           ← on window close
+    lurek.quit()           ← on window close
     ```
 
     ---
@@ -1049,7 +1049,7 @@ def gen_callbacks() -> str:
 def gen_architecture() -> str:
     arch_text = _read(DOCS / "architecture" / "engine-architecture.md")
     if not arch_text:
-        return GEN_BANNER + "# Luna2D Architecture\n\n> Architecture document not found.\n"
+        return GEN_BANNER + "# Lurek2D Architecture\n\n> Architecture document not found.\n"
 
     # Strip source file references for self-contained wiki
     arch_text = _strip_source_refs(arch_text)
@@ -1066,7 +1066,7 @@ def gen_architecture() -> str:
         arch_text,
     )
 
-    return GEN_BANNER + f"# Luna2D Architecture\n\n{arch_text.strip()}\n"
+    return GEN_BANNER + f"# Lurek2D Architecture\n\n{arch_text.strip()}\n"
 
 
 def gen_design_principles() -> str:
@@ -1113,7 +1113,7 @@ def gen_module_tiers() -> str:
     return GEN_BANNER + dedent(f"""\
     # Module Tiers
 
-    Luna2D uses a strictly layered architecture. Each module belongs to a tier that determines
+    Lurek2D uses a strictly layered architecture. Each module belongs to a tier that determines
     what it can depend on. No lower tier may import a higher tier.
 
     ---
@@ -1124,8 +1124,8 @@ def gen_module_tiers() -> str:
     Games / Demos
         ↓ uses
     Tier 3 — Lunasome (pure-Lua libraries)
-        ↓ uses (luna.* API only)
-    Bridge — lua_api (registers all luna.* bindings)
+        ↓ uses (lurek.* API only)
+    Bridge — lua_api (registers all lurek.* bindings)
         ↓ imports
     Tier 2 — Engine Extensions (may import Baseline + Tier 1)
         ↓ imports
@@ -1150,7 +1150,7 @@ def gen_module_tiers() -> str:
 
     ## Tier 3 — Lunasome (Pure-Lua Libraries)
 
-    These are pure-Lua modules that consume only the `luna.*` API. They are not compiled into
+    These are pure-Lua modules that consume only the `lurek.*` API. They are not compiled into
     the engine binary.
 
     | Module | Description |
@@ -1204,14 +1204,14 @@ def gen_shader_patterns() -> str:
     return MANUAL_BANNER + dedent("""\
     # Shader Patterns
 
-    Luna2D supports custom WGSL shaders via `luna.graphics.newShader`.
+    Lurek2D supports custom WGSL shaders via `lurek.graphics.newShader`.
 
     ---
 
     ## Creating a Shader
 
     ```lua
-    local shader = luna.graphics.newShader([[
+    local shader = lurek.graphics.newShader([[
         @group(0) @binding(0) var tex: texture_2d<f32>;
         @group(0) @binding(1) var samp: sampler;
 
@@ -1233,10 +1233,10 @@ def gen_shader_patterns() -> str:
     ## Applying a Shader
 
     ```lua
-    function luna.draw()
-        luna.graphics.setShader(shader)
-        luna.graphics.draw(image, 0, 0)
-        luna.graphics.setShader()  -- reset to default
+    function lurek.draw()
+        lurek.graphics.setShader(shader)
+        lurek.graphics.draw(image, 0, 0)
+        lurek.graphics.setShader()  -- reset to default
     end
     ```
 
@@ -1245,7 +1245,7 @@ def gen_shader_patterns() -> str:
     ## Shader Uniforms
 
     ```lua
-    shader:send("time", luna.timer.getTime())
+    shader:send("time", lurek.timer.getTime())
     shader:send("resolution", {1280, 720})
     ```
 
@@ -1253,19 +1253,19 @@ def gen_shader_patterns() -> str:
 
     ## Post-Processing Shaders
 
-    For screen-space effects, use `luna.fx` with a canvas:
+    For screen-space effects, use `lurek.fx` with a canvas:
 
     ```lua
-    local canvas = luna.graphics.newCanvas(1280, 720)
-    local blur   = luna.fx.newEffect("blur", { radius = 4 })
+    local canvas = lurek.graphics.newCanvas(1280, 720)
+    local blur   = lurek.fx.newEffect("blur", { radius = 4 })
 
-    function luna.draw()
-        luna.graphics.setCanvas(canvas)
+    function lurek.draw()
+        lurek.graphics.setCanvas(canvas)
         -- draw scene ...
-        luna.graphics.setCanvas()
+        lurek.graphics.setCanvas()
 
-        luna.fx.apply(blur, canvas)
-        luna.graphics.draw(canvas, 0, 0)
+        lurek.fx.apply(blur, canvas)
+        lurek.graphics.draw(canvas, 0, 0)
     end
     ```
 
@@ -1283,18 +1283,18 @@ def gen_data_apis() -> str:
     """Combined page for data, dataframe, compute, graph, serial, image."""
     sections = []
     for module, title in [
-        ("data",      "luna.data — Data Utilities"),
-        ("dataframe", "luna.dataframe — DataFrame"),
-        ("compute",   "luna.compute — NdArray Compute"),
-        ("graph",     "luna.graph — Graph"),
-        ("serial",    "luna.serial — Serialization"),
-        ("image",     "luna.image — CPU Image"),
+        ("data",      "lurek.data — Data Utilities"),
+        ("dataframe", "lurek.dataframe — DataFrame"),
+        ("compute",   "lurek.compute — NdArray Compute"),
+        ("graph",     "lurek.graph — Graph"),
+        ("serial",    "lurek.serial — Serialization"),
+        ("image",     "lurek.image — CPU Image"),
     ]:
         spec = read_spec(module)
         summary = _spec_summary(module, 2)
         example = read_example(module, 60)
         tier_short = re.sub(r" — .*", "", spec.get("tier", "")) if spec else ""
-        api_ns = spec.get("api", f"luna.{module}") if spec else f"luna.{module}"
+        api_ns = spec.get("api", f"lurek.{module}") if spec else f"lurek.{module}"
 
         section = [f"## {title}", ""]
         if tier_short:
@@ -1312,7 +1312,7 @@ def gen_data_apis() -> str:
     return GEN_BANNER + dedent(f"""\
     # Data APIs
 
-    Luna2D provides a comprehensive suite of data processing modules for games that need
+    Lurek2D provides a comprehensive suite of data processing modules for games that need
     structured data, numerical computation, graph algorithms, and serialisation.
 
     ---
@@ -1339,7 +1339,7 @@ def gen_fx_api() -> str:
 
     ---
 
-    ## luna.fx — Post-Processing Effects
+    ## lurek.fx — Post-Processing Effects
 
     {fx_overview}
 
@@ -1349,7 +1349,7 @@ def gen_fx_api() -> str:
 
     ---
 
-    ## luna.pipeline — Render Pipeline Control
+    ## lurek.pipeline — Render Pipeline Control
 
     {pip_overview}
 
@@ -1367,15 +1367,15 @@ def gen_advanced_apis() -> str:
     """Page for raycaster, spine, light, minimap."""
     sections = []
     for module, title in [
-        ("raycaster", "luna.raycaster — 3D-style Raycasting"),
-        ("light",     "luna.light — Dynamic 2D Lighting"),
-        ("minimap",   "luna.minimap — Minimap Renderer"),
-        ("spine",     "luna.spine — Spine Skeletal Animation"),
+        ("raycaster", "lurek.raycaster — 3D-style Raycasting"),
+        ("light",     "lurek.light — Dynamic 2D Lighting"),
+        ("minimap",   "lurek.minimap — Minimap Renderer"),
+        ("spine",     "lurek.spine — Spine Skeletal Animation"),
     ]:
         summary = _strip_source_refs(_spec_summary(module, 2))
         example = read_example(module, 60)
         spec = read_spec(module)
-        api_ns = spec.get("api", f"luna.{module}") if spec else f"luna.{module}"
+        api_ns = spec.get("api", f"lurek.{module}") if spec else f"lurek.{module}"
         section = [f"## {title}", "", f"> *`{api_ns}`*", ""]
         if summary:
             section += [summary, ""]
@@ -1427,8 +1427,8 @@ def gen_lunasome() -> str:
     return GEN_BANNER + dedent(f"""\
     # Lunasome — Standard Library
 
-    Tier 3 pure-Lua gameplay libraries that ship alongside Luna2D but are not embedded in the binary.
-    They consume only the public `luna.*` API — no engine internals.
+    Tier 3 pure-Lua gameplay libraries that ship alongside Lurek2D but are not embedded in the binary.
+    They consume only the public `lurek.*` API — no engine internals.
 
     ## Using Lunasome
 
@@ -1439,7 +1439,7 @@ def gen_lunasome() -> str:
     local battle    = require("library.battle")
     ```
 
-    The engine automatically adds the `library/` search path when a game is loaded.
+    The engine automatically adds the `content/library/` search path when a game is loaded.
 
     ---
 
@@ -1453,7 +1453,7 @@ def gen_lunasome() -> str:
 
     ## Layer Contract
 
-    - Lunasome modules **only** import from `luna.*` and other `library.*` modules
+    - Lunasome modules **only** import from `lurek.*` and other `library.*` modules
     - The Rust engine never depends on Lunasome
     - Lunasome is versioned alongside the engine
 
@@ -1479,7 +1479,7 @@ def gen_lunasome() -> str:
 
 
 def gen_lunasome_modules() -> str:
-    """Per-module detail page generated from library/*/AGENT.md."""
+    """Per-module detail page generated from content/library/*/AGENT.md."""
     sections = []
     for subdir in sorted(LIBRARY.iterdir()):
         if not subdir.is_dir():
@@ -1529,29 +1529,29 @@ def gen_examples() -> str:
         desc = ""
         for ln in lines[:6]:
             ln = ln.strip()
-            if ln.startswith("-- ") and not ln.startswith("-- examples/") and not ln.startswith("-- Luna2D "):
+            if ln.startswith("-- ") and not ln.startswith("-- content/examples/") and not ln.startswith("-- Lurek2D "):
                 desc = ln[3:].strip()
                 break
         if not desc:
-            desc = f"Usage examples for `luna.{name}`"
+            desc = f"Usage examples for `lurek.{name}`"
         rows.append(f"| `{name}.lua` | {desc} |")
 
     table = "\n".join(rows)
     return GEN_BANNER + dedent(f"""\
     # Examples
 
-    Single-file API usage scripts — each demonstrates one `luna.*` namespace.
+    Single-file API usage scripts — each demonstrates one `lurek.*` namespace.
 
     ## Running an Example
 
     ```bash
-    cargo run -- examples/timer.lua
-    cargo run -- examples/physics.lua
+    cargo run -- content/examples/timer.lua
+    cargo run -- content/examples/physics.lua
     ```
 
     Or with the installed binary:
     ```bash
-    luna examples/timer.lua
+    luna content/examples/timer.lua
     ```
 
     ---
@@ -1570,7 +1570,7 @@ def gen_examples() -> str:
 
 
 def gen_demos() -> str:
-    """Generate Demos.md from demos/README.md."""
+    """Generate Demos.md from content/demos/README.md."""
     demos_readme = _read(DEMOS / "README.md")
     if demos_readme:
         # Strip source references
@@ -1593,13 +1593,13 @@ def gen_demos() -> str:
     return GEN_BANNER + dedent(f"""\
     # Demos
 
-    Luna2D ships with 111+ fully playable demo games, organised by genre.
+    Lurek2D ships with 111+ fully playable demo games, organised by genre.
 
     ## Running a Demo
 
     ```bash
-    cargo run -- demos/<category>/<name>
-    luna demos/<category>/<name>
+    cargo run -- content/demos/<category>/<name>
+    luna content/demos/<category>/<name>
     ```
 
     ---
@@ -1621,7 +1621,7 @@ def gen_demo_showcase() -> str:
     return MANUAL_BANNER + dedent("""\
     # Demo Showcase
 
-    Hand-picked demos that showcase Luna2D's capabilities.
+    Hand-picked demos that showcase Lurek2D's capabilities.
 
     ---
 
@@ -1630,13 +1630,13 @@ def gen_demo_showcase() -> str:
     ### Pong
     Two-player paddle game with physics-based ball bouncing.
     ```bash
-    cargo run -- demos/arcade/pong
+    cargo run -- content/demos/arcade/pong
     ```
 
     ### Tetris
     Classic block-stacking puzzle with rotation and line clearing.
     ```bash
-    cargo run -- demos/arcade/tetris
+    cargo run -- content/demos/arcade/tetris
     ```
 
     ---
@@ -1646,13 +1646,13 @@ def gen_demo_showcase() -> str:
     ### Platformer
     Side-scrolling platformer with physics-based movement, jumping, and collectibles.
     ```bash
-    cargo run -- demos/action/platformer
+    cargo run -- content/demos/action/platformer
     ```
 
     ### Bullet Hell
     Intense dodging game with patterned enemy fire and score tracking.
     ```bash
-    cargo run -- demos/action/bullet_hell
+    cargo run -- content/demos/action/bullet_hell
     ```
 
     ---
@@ -1662,13 +1662,13 @@ def gen_demo_showcase() -> str:
     ### Physics Demo
     Interactive physics sandbox — drag and throw objects, see collisions and joints in action.
     ```bash
-    cargo run -- demos/simulation/physics_demo
+    cargo run -- content/demos/simulation/physics_demo
     ```
 
     ### Farming Sim
     Plant crops, manage resources, and build a farm using the economy and inventory systems.
     ```bash
-    cargo run -- demos/simulation/farming_sim
+    cargo run -- content/demos/simulation/farming_sim
     ```
 
     ---
@@ -1678,7 +1678,7 @@ def gen_demo_showcase() -> str:
     ### Tower Defense
     Place towers, upgrade them, and defend against waves of enemies using the AI pathfinding system.
     ```bash
-    cargo run -- demos/strategy/tower_defense
+    cargo run -- content/demos/strategy/tower_defense
     ```
 
     ---
@@ -1693,9 +1693,9 @@ def gen_demo_showcase() -> str:
 
 def gen_contributing() -> str:
     return MANUAL_BANNER + dedent(f"""\
-    # Contributing to Luna2D
+    # Contributing to Lurek2D
 
-    Luna2D welcomes contributions from many different audiences. Whether you want to fix a bug in
+    Lurek2D welcomes contributions from many different audiences. Whether you want to fix a bug in
     the Rust engine, add a new demo, write a Lunasome library module, improve the VS Code extension,
     or enhance the AI agent system — there's a place for you.
 
@@ -1707,7 +1707,7 @@ def gen_contributing() -> str:
     git clone {GITHUB_URL}
     cd luna_2d
     cargo build
-    cargo run -- demos/showcase/hello_world
+    cargo run -- content/demos/showcase/hello_world
     ```
 
     ---
@@ -1766,13 +1766,13 @@ def gen_contributing_engine() -> str:
     return MANUAL_BANNER + dedent("""\
     # Contributing to the Engine (Rust)
 
-    This guide covers contributing Rust code to the Luna2D engine.
+    This guide covers contributing Rust code to the Lurek2D engine.
 
     ---
 
     ## Module Architecture
 
-    Luna2D enforces a strict tier system:
+    Lurek2D enforces a strict tier system:
 
     - **Baseline** (`math`) — leaf module, no internal deps
     - **Tier 1** — core subsystems; may import Baseline only
@@ -1859,14 +1859,14 @@ def gen_contributing_demos() -> str:
     return MANUAL_BANNER + dedent("""\
     # Contributing Demos
 
-    Demos are fully playable game showcases that demonstrate Luna2D's capabilities.
+    Demos are fully playable game showcases that demonstrate Lurek2D's capabilities.
 
     ---
 
     ## Demo Folder Structure
 
     ```
-    demos/<category>/<name>/
+    content/demos/<category>/<name>/
     ├── main.lua           -- entry point (required)
     ├── conf.lua           -- window config (optional)
     ├── README.md          -- description, controls, screenshot (required)
@@ -1904,7 +1904,7 @@ def gen_contributing_demos() -> str:
     Create a test file and register it in the test harness:
 
     ```lua
-    -- tests/lua/demos/test_demo_my_game.lua
+    -- tests/lua/content/demos/test_demo_my_game.lua
     describe("demo: my_game", function()
         it("loads without error", function()
             -- test game initialization
@@ -1918,7 +1918,7 @@ def gen_contributing_demos() -> str:
     ## Running a Demo
 
     ```bash
-    cargo run -- demos/<category>/<name>
+    cargo run -- content/demos/<category>/<name>
     ```
 
     ---
@@ -1931,14 +1931,14 @@ def gen_contributing_libraries() -> str:
     return MANUAL_BANNER + dedent("""\
     # Contributing Lunasome Libraries
 
-    Lunasome is Luna2D's standard library — pure-Lua gameplay modules.
+    Lunasome is Lurek2D's standard library — pure-Lua gameplay modules.
 
     ---
 
     ## Module Structure
 
     ```
-    library/<name>/
+    content/library/<name>/
     ├── init.lua           -- module entry, returns the API table
     ├── AGENT.md           -- module documentation
     └── (additional .lua)  -- internal files if needed
@@ -1948,7 +1948,7 @@ def gen_contributing_libraries() -> str:
 
     ## Layer Rules
 
-    - **Only** import from `luna.*` API and other `library.*` modules
+    - **Only** import from `lurek.*` API and other `library.*` modules
     - Never access engine internals or Rust-specific features
     - Must be testable headless (no graphics, audio, or window APIs)
 
@@ -1980,7 +1980,7 @@ def gen_contributing_libraries() -> str:
     Every module must have a Lua BDD test:
 
     ```lua
-    -- tests/lua/library/test_library_<name>.lua
+    -- tests/lua/content/library/test_library_<name>.lua
     local M = require("library.<name>")
 
     describe("<name>", function()
@@ -2015,7 +2015,7 @@ def gen_contributing_extension() -> str:
     return MANUAL_BANNER + dedent("""\
     # Contributing to the VS Code Extension
 
-    The Luna2D VS Code extension provides Lua API completions, an MCP server for AI workflows,
+    The Lurek2D VS Code extension provides Lua API completions, an MCP server for AI workflows,
     a Lua debugger, and example runner integration.
 
     ---
@@ -2024,7 +2024,7 @@ def gen_contributing_extension() -> str:
 
     - Node.js 18+
     - VS Code 1.90.0+ for testing
-    - The Luna2D engine built and accessible
+    - The Lurek2D engine built and accessible
 
     ---
 
@@ -2061,12 +2061,12 @@ def gen_contributing_extension() -> str:
 
     | Tool | Purpose |
     |------|---------|
-    | `luna2d.runExample` | Build and run a named demo |
-    | `luna2d.getApiDoc` | Search the API reference |
-    | `luna2d.listExamples` | List all available demos |
-    | `luna2d.runLuaTest` | Run a Lua test file |
-    | `luna2d.checkBuild` | Run `cargo check` |
-    | `luna2d.getLogs` | Get recent engine log output |
+    | `lurek2d.runExample` | Build and run a named demo |
+    | `lurek2d.getApiDoc` | Search the API reference |
+    | `lurek2d.listExamples` | List all available demos |
+    | `lurek2d.runLuaTest` | Run a Lua test file |
+    | `lurek2d.checkBuild` | Run `cargo check` |
+    | `lurek2d.getLogs` | Get recent engine log output |
 
     See [[Extension-MCP-Server]] for full tool documentation.
 
@@ -2089,7 +2089,7 @@ def gen_contributing_cag() -> str:
     return MANUAL_BANNER + dedent("""\
     # Contributing to the CAG System
 
-    The CAG (Copilot Agent Customization) system configures GitHub Copilot for Luna2D development.
+    The CAG (Copilot Agent Customization) system configures GitHub Copilot for Lurek2D development.
 
     ---
 
@@ -2207,7 +2207,7 @@ def gen_coding_conventions() -> str:
     ### Logging
     - Use `log::info!` / `log::warn!` / `log::error!` / `log::debug!`
     - Never use `println!` in engine code
-    - Control output: `RUST_LOG=luna2d=debug cargo run`
+    - Control output: `RUST_LOG=lurek2d=debug cargo run`
 
     ### Docstrings
     - Every `pub` item needs `///`
@@ -2219,7 +2219,7 @@ def gen_coding_conventions() -> str:
     ## Lua API Conventions
 
     ### Namespace
-    - All bindings under `luna.*` — never bare globals
+    - All bindings under `lurek.*` — never bare globals
     - Use inline `@param` and `@return` annotations (not `# Parameters` sections)
 
     ### Registration Pattern
@@ -2246,15 +2246,15 @@ def gen_coding_conventions() -> str:
     local player = {}
     local enemies = {}
 
-    function luna.load()
+    function lurek.load()
         -- initialization
     end
 
-    function luna.update(dt)
+    function lurek.update(dt)
         -- game logic
     end
 
-    function luna.draw()
+    function lurek.draw()
         -- rendering
     end
     ```
@@ -2289,7 +2289,7 @@ def gen_vscode_ext() -> str:
     return GEN_BANNER + dedent("""\
     # VS Code Extension
 
-    Luna2D has a first-party VS Code extension that provides IDE integration for game development.
+    Lurek2D has a first-party VS Code extension that provides IDE integration for game development.
 
     ---
 
@@ -2298,13 +2298,13 @@ def gen_vscode_ext() -> str:
     | Feature | Description |
     |---------|-------------|
     | **MCP Server** | 6 AI-accessible tools for building, running, testing, and querying the API |
-    | **Lua API Completions** | Autocomplete for all `luna.*` functions with parameter info |
+    | **Lua API Completions** | Autocomplete for all `lurek.*` functions with parameter info |
     | **LuaCATS Support** | Parses `---@class`, `---@param`, `---@return` tags for user-defined types |
     | **Lua Debugger** | Set breakpoints, step through, inspect variables in Lua scripts |
-    | **Example Runner** | Browse and run Luna2D demos directly from the command palette |
-    | **API Documentation** | Search the `luna.*` API reference without leaving the editor |
+    | **Example Runner** | Browse and run Lurek2D demos directly from the command palette |
+    | **API Documentation** | Search the `lurek.*` API reference without leaving the editor |
     | **Symbol Indexing** | Navigate to Lua function definitions across your project |
-    | **Status Bar** | Shows Luna2D build status and active project info |
+    | **Status Bar** | Shows Lurek2D build status and active project info |
 
     ---
 
@@ -2326,7 +2326,7 @@ def gen_vscode_ext() -> str:
 
     The extension activates automatically when:
     - A folder containing `main.lua` is opened
-    - A `.lua` file is opened in a Luna2D project
+    - A `.lua` file is opened in a Lurek2D project
 
     ---
 
@@ -2336,12 +2336,12 @@ def gen_vscode_ext() -> str:
 
     | Tool | Input | What it does |
     |------|-------|-------------|
-    | `luna2d.runExample` | `name: string` | Build and run a named demo |
-    | `luna2d.getApiDoc` | `query: string` | Search the API reference docs |
-    | `luna2d.listExamples` | *(none)* | List all available demos |
-    | `luna2d.runLuaTest` | `file: string` | Run a specific Lua test file |
-    | `luna2d.checkBuild` | *(none)* | Run `cargo check` and return diagnostics |
-    | `luna2d.getLogs` | `lines?: number` | Get last N lines of engine log output |
+    | `lurek2d.runExample` | `name: string` | Build and run a named demo |
+    | `lurek2d.getApiDoc` | `query: string` | Search the API reference docs |
+    | `lurek2d.listExamples` | *(none)* | List all available demos |
+    | `lurek2d.runLuaTest` | `file: string` | Run a specific Lua test file |
+    | `lurek2d.checkBuild` | *(none)* | Run `cargo check` and return diagnostics |
+    | `lurek2d.getLogs` | `lines?: number` | Get last N lines of engine log output |
 
     See [[Extension-MCP-Server]] for detailed documentation.
 
@@ -2350,18 +2350,18 @@ def gen_vscode_ext() -> str:
     ## Requirements
 
     - VS Code 1.90.0+
-    - Rust toolchain (for building Luna2D)
-    - Luna2D source in the workspace
+    - Rust toolchain (for building Lurek2D)
+    - Lurek2D source in the workspace
 
     ---
 
     ## AI-First Workflow
 
     The extension is designed for AI-assisted development. GitHub Copilot agents can:
-    - Build the project via `luna2d.checkBuild`
-    - Run demos via `luna2d.runExample`
-    - Look up API docs via `luna2d.getApiDoc`
-    - Run tests via `luna2d.runLuaTest`
+    - Build the project via `lurek2d.checkBuild`
+    - Run demos via `lurek2d.runExample`
+    - Look up API docs via `lurek2d.getApiDoc`
+    - Run tests via `lurek2d.runLuaTest`
 
     The CAG layer (agents, skills, prompts) ships with the extension for immediate Copilot integration.
 
@@ -2376,46 +2376,46 @@ def gen_extension_mcp() -> str:
     return MANUAL_BANNER + dedent("""\
     # Extension MCP Server
 
-    The Luna2D VS Code extension includes a Model Context Protocol (MCP) server
+    The Lurek2D VS Code extension includes a Model Context Protocol (MCP) server
     that exposes 6 tools for AI-assisted development.
 
     ---
 
-    ## luna2d.runExample
+    ## lurek2d.runExample
 
     Build and run a named demo.
 
     **Input**: `{ name: string }` — e.g. `"hello_world"`, `"pong"`
 
-    **Behaviour**: Runs `cargo run -- demos/<name>` with a 120-second timeout.
+    **Behaviour**: Runs `cargo run -- content/demos/<name>` with a 120-second timeout.
     Returns combined stdout + stderr output.
 
-    **Example**: `luna2d.runExample({ name: "showcase/hello_world" })`
+    **Example**: `lurek2d.runExample({ name: "showcase/hello_world" })`
 
     ---
 
-    ## luna2d.getApiDoc
+    ## lurek2d.getApiDoc
 
     Search the generated API reference for a query string.
 
-    **Input**: `{ query: string }` — e.g. `"luna.graphics.draw"`, `"physics"`
+    **Input**: `{ query: string }` — e.g. `"lurek.graphics.draw"`, `"physics"`
 
     **Behaviour**: Searches the generated API markdown file case-insensitively.
     Returns matching sections with context.
 
     ---
 
-    ## luna2d.listExamples
+    ## lurek2d.listExamples
 
     List all available demo directory names.
 
     **Input**: *(none)*
 
-    **Behaviour**: Reads the `demos/` folder and returns a newline-separated list.
+    **Behaviour**: Reads the `content/demos/` folder and returns a newline-separated list.
 
     ---
 
-    ## luna2d.runLuaTest
+    ## lurek2d.runLuaTest
 
     Run a specific Lua test file.
 
@@ -2425,7 +2425,7 @@ def gen_extension_mcp() -> str:
 
     ---
 
-    ## luna2d.checkBuild
+    ## lurek2d.checkBuild
 
     Run `cargo check` and return compiler diagnostics.
 
@@ -2435,13 +2435,13 @@ def gen_extension_mcp() -> str:
 
     ---
 
-    ## luna2d.getLogs
+    ## lurek2d.getLogs
 
     Get recent engine log output.
 
     **Input**: `{ lines?: number }` — default 50
 
-    **Behaviour**: Returns last N lines of Luna2D engine log output (max 1MB buffer).
+    **Behaviour**: Returns last N lines of Lurek2D engine log output (max 1MB buffer).
 
     ---
 
@@ -2461,7 +2461,7 @@ def gen_extension_dev() -> str:
     return MANUAL_BANNER + dedent("""\
     # Extension Development
 
-    How to develop and extend the Luna2D VS Code extension.
+    How to develop and extend the Lurek2D VS Code extension.
 
     ---
 
@@ -2469,7 +2469,7 @@ def gen_extension_dev() -> str:
 
     - Node.js 18+
     - VS Code 1.90.0+
-    - Luna2D engine built in the workspace
+    - Lurek2D engine built in the workspace
 
     ---
 
@@ -2485,7 +2485,7 @@ def gen_extension_dev() -> str:
 
     ## Development Workflow
 
-    1. Open the `vscode-extension/` folder in VS Code
+    1. Open the `extensions/vscode/` folder in VS Code
     2. Press **F5** to launch an Extension Development Host
     3. Make changes to TypeScript source files
     4. Reload the Extension Development Host to test
@@ -2506,7 +2506,7 @@ def gen_extension_dev() -> str:
     | `services/apiData.ts` | API data loading and search |
     | `services/symbolIndex.ts` | Lua symbol indexing |
     | `services/statusBar.ts` | Status bar integration |
-    | `services/lunaProcess.ts` | Luna2D process management |
+    | `services/lunaProcess.ts` | Lurek2D process management |
 
     ---
 
@@ -2555,7 +2555,7 @@ def gen_tools() -> str:
     return GEN_BANNER + dedent(f"""\
     # Tools
 
-    Permanent CLI scripts for the Luna2D engine pipeline.
+    Permanent CLI scripts for the Lurek2D engine pipeline.
 
     ---
 
@@ -2619,7 +2619,7 @@ def gen_build_system() -> str:
     return MANUAL_BANNER + dedent(f"""\
     # Build System
 
-    Luna2D uses Cargo as its build system with a custom output directory.
+    Lurek2D uses Cargo as its build system with a custom output directory.
 
     ---
 
@@ -2630,7 +2630,7 @@ def gen_build_system() -> str:
     cargo build --release    # release build (optimised)
     ```
 
-    > **Output directory**: Luna2D overrides Cargo's default `target/` and writes
+    > **Output directory**: Lurek2D overrides Cargo's default `target/` and writes
     > build artifacts to `build/` instead. Debug binaries go to `build/debug/`,
     > release binaries to `build/release/`.
 
@@ -2653,9 +2653,9 @@ def gen_build_system() -> str:
     ## Running
 
     ```bash
-    cargo run -- demos/showcase/hello_world  # run a demo
+    cargo run -- content/demos/showcase/hello_world  # run a demo
     cargo run -- path/to/my_game             # run a game folder
-    cargo run -- examples/physics.lua        # run an example
+    cargo run -- content/examples/physics.lua        # run an example
     cargo run                                # splash screen (no game)
     ```
 
@@ -2675,7 +2675,7 @@ def gen_build_system() -> str:
 
     After installation, use `luna` from anywhere:
     ```bash
-    luna demos/showcase/hello_world
+    luna content/demos/showcase/hello_world
     luna path/to/my_game
     ```
 
@@ -2686,10 +2686,10 @@ def gen_build_system() -> str:
     Package for distribution:
 
     ```bash
-    # Windows — creates dist/luna2d-windows-x86_64/
+    # Windows — creates dist/lurek2d-windows-x86_64/
     powershell tools/dist/dist.ps1
 
-    # Linux/macOS — creates dist/luna2d-<os>-<arch>/
+    # Linux/macOS — creates dist/lurek2d-<os>-<arch>/
     bash tools/dist/dist.sh
 
     # Windows installer (requires NSIS 3.x)
@@ -2720,7 +2720,7 @@ def gen_build_system() -> str:
     ## Debug Logging
 
     ```bash
-    RUST_LOG=luna2d=debug cargo run -- demos/showcase/hello_world
+    RUST_LOG=lurek2d=debug cargo run -- content/demos/showcase/hello_world
     ```
 
     | Level | Shows |
@@ -2785,7 +2785,7 @@ def gen_cag_system() -> str:
     # CAG System — Copilot Agent Customization
 
     The CAG (Copilot Agent Customization) layer configures GitHub Copilot for
-    AI-first Luna2D development. It provides specialist agents, domain skills,
+    AI-first Lurek2D development. It provides specialist agents, domain skills,
     and reusable prompts.
 
     ---
@@ -2881,7 +2881,7 @@ def gen_cag_workflow() -> str:
     ├── handovers/       -- inter-agent context
     ├── reports/         -- analysis output
     ├── data/            -- working data
-    ├── demos/           -- session demos
+    ├── content/demos/           -- session demos
     ├── other/           -- uncategorised
     ├── temp/            -- temporary files
     └── logs/
@@ -2921,7 +2921,7 @@ def gen_cag_workflow() -> str:
 
 def gen_sidebar() -> str:
     return dedent("""\
-    ## Luna2D Wiki
+    ## Lurek2D Wiki
 
     ### Getting Started
     * [[Home]]
@@ -3008,7 +3008,7 @@ def gen_sidebar() -> str:
 
 
 def gen_footer() -> str:
-    return f"---\n[Luna2D]({GITHUB_URL}) · MIT License · Built with Rust + LuaJIT\n"
+    return f"---\n[Lurek2D]({GITHUB_URL}) · MIT License · Built with Rust + LuaJIT\n"
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -3142,7 +3142,7 @@ PAGES: dict[str, tuple[str, callable, bool]] = {
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Regenerate all Luna2D wiki pages from source.",
+        description="Regenerate all Lurek2D wiki pages from source.",
     )
     parser.add_argument(
         "--page", metavar="SLUG",
@@ -3167,7 +3167,7 @@ def main() -> int:
         manual = 0
         for slug, (filename, _, is_manual) in sorted(PAGES.items()):
             tag = "MANUAL" if is_manual else "SCRIPTED"
-            print(f"  {slug:30s}  →  wiki/{filename:35s}  [{tag}]")
+            print(f"  {slug:30s}  →  docs/wiki/{filename:35s}  [{tag}]")
             if is_manual:
                 manual += 1
             else:

@@ -1,4 +1,4 @@
-//! `luna.ai` — Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.
+//! `lurek.ai` — Game AI toolkit: worlds, agents, FSM, behavior trees, steering, Q-learning, utility AI, GOAP, squads, and command queues.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1915,7 +1915,7 @@ impl LuaUserData for LuaCommandQueue {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.ai` API table with the Lua VM.
+/// Registers the `lurek.ai` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

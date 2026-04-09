@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 """
-gen_demo_screenshots.py — Capture a screen.png for every Luna2D demo.
+gen_demo_screenshots.py — Capture a screen.png for every Lurek2D demo.
 
 Usage:
     python tools/screenshots/gen_demo_screenshots.py [options]
 
 Options:
-    --binary PATH          Path to the luna2d binary (default: auto-detect build/release / build/debug)
+    --binary PATH          Path to the lurek2d binary (default: auto-detect build/release / build/debug)
     --frames N             Rendered game frames to wait before capturing (default: 3, fastest)
     --demo NAME            Only run the named demo (can be repeated)
     --overwrite            Overwrite existing screen.png files (default: skip)
     --timeout SECS         Kill the process after this many seconds if it hasn't quit (default: 20)
-    --demos-dir PATH       Path to the demos directory (default: demos/)
+    --demos-dir PATH       Path to the demos directory (default: content/demos/)
     --rebuild              Run 'cargo build --release' before capturing
     --dry-run              Print what would run without executing
     --log PATH             Write per-demo logs to this folder (default: work/demo-screenshots/logs/)
     --no-log               Disable per-demo log files
 
 Each demo that has a main.lua will be launched with:
-    luna2d <demo_dir> --screenshot=<abs_path> --screenshot-frames=<n>
+    lurek2d <demo_dir> --screenshot=<abs_path> --screenshot-frames=<n>
 
 The engine renders N frames of the game, saves screen.png, and exits automatically.
-RUST_LOG=luna2d=debug is set so errors surface in the log.
+RUST_LOG=lurek2d=debug is set so errors surface in the log.
 """
 
 import argparse
@@ -39,14 +39,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 def find_binary(repo_root: Path) -> Path:
     candidates = [
-        repo_root / "build" / "release" / ("luna2d.exe" if platform.system() == "Windows" else "luna2d"),
-        repo_root / "build" / "debug"   / ("luna2d.exe" if platform.system() == "Windows" else "luna2d"),
+        repo_root / "build" / "release" / ("lurek2d.exe" if platform.system() == "Windows" else "lurek2d"),
+        repo_root / "build" / "debug"   / ("lurek2d.exe" if platform.system() == "Windows" else "lurek2d"),
     ]
     for c in candidates:
         if c.exists():
             return c
     raise FileNotFoundError(
-        "Could not find luna2d binary. Build first with:\n"
+        "Could not find lurek2d binary. Build first with:\n"
         "  cargo build --release\n"
         "or pass --binary <path>."
     )
@@ -89,7 +89,7 @@ def capture_demo(
         print(f"[dry-run] {' '.join(cmd)}")
         return "ok", ""
 
-    env = {**os.environ, "RUST_LOG": "luna2d=debug"}
+    env = {**os.environ, "RUST_LOG": "lurek2d=debug"}
 
     try:
         result = subprocess.run(
@@ -128,7 +128,7 @@ def capture_demo(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Capture screen.png for every Luna2D demo.")
+    parser = argparse.ArgumentParser(description="Capture screen.png for every Lurek2D demo.")
     parser.add_argument("--binary",    default=None)
     parser.add_argument("--frames",    type=int, default=3,
                         help="Rendered frames before screenshot (default: 3)")

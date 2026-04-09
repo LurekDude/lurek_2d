@@ -15,7 +15,7 @@ An Among Us-inspired game with AI crew members and one hidden traitor. The game 
 ## How to Run
 
 ```powershell
-cargo run -- demos/social_deduction
+cargo run -- content/demos/social_deduction
 ```
 
 ## Controls

@@ -2,7 +2,7 @@
 
 use crate::docs::entry::DocEntry;
 
-/// In-memory registry of all documented Luna2D API entries.
+/// In-memory registry of all documented Lurek2D API entries.
 pub struct Catalog {
     entries: Vec<DocEntry>,
 }
@@ -53,7 +53,7 @@ impl Catalog {
         self.entries.iter().filter(|e| e.module == module).collect()
     }
 
-    /// Looks up an entry by its fully qualified name (e.g. `"luna.audio.play"`).
+    /// Looks up an entry by its fully qualified name (e.g. `"lurek.audio.play"`).
     pub fn get_entry(&self, qualified_name: &str) -> Option<&DocEntry> {
         self.entries.iter().find(|e| e.qualified_name == qualified_name)
     }

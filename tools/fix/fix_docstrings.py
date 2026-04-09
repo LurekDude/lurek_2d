@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 fix_docstrings.py — Auto-fill missing # Parameters / # Returns / # Fields /
-# Variants sections in existing Luna2D Rust doc comments.
+# Variants sections in existing Lurek2D Rust doc comments.
 
 For items that have NO documentation at all, a minimal starter /// comment is
 injected.  For items that have a description but are missing structural sections

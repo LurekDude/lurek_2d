@@ -1,4 +1,4 @@
-# Luna2D Ecosystem Implementation Plan
+# Lurek2D Ecosystem Implementation Plan
 
 > **Purpose**: Detailed, task-level implementation plan for all ecosystem changes described in `docs/ecosystem-recommendations.md` (v2, 2026-03-31).
 > Each task has: scope, affected files, acceptance criteria, estimated SLoC, dependencies, and priority.
@@ -77,16 +77,16 @@ Remove dead dependencies and apply non-breaking version bumps. No API changes. L
 | **SLoC change** | +50-80 (Lua bindings for TOML encode/decode) |
 | **Dependencies** | None |
 | **Agent** | Developer |
-| **Status** | **COMPLETE** � canonical `luna.data.parseToml()` / `luna.data.encodeToml()` shipped with targeted Rust and Lua coverage, prefixed Lua-facing errors, and synchronized docs. |
+| **Status** | **COMPLETE** � canonical `lurek.data.parseToml()` / `lurek.data.encodeToml()` shipped with targeted Rust and Lua coverage, prefixed Lua-facing errors, and synchronized docs. |
 
 **Steps**:
 1. Add `toml = "0.8"` to `Cargo.toml` `[dependencies]`.
-2. Implement `luna.data.encodeToml(table) � string` and `luna.data.parseToml(string) � table` in the Lua API.
+2. Implement `lurek.data.encodeToml(table) � string` and `lurek.data.parseToml(string) � table` in the Lua API.
 3. Reuse the existing `serde` + Lua table - serde_json::Value conversion pattern.
 4. Write integration tests in `tests/data_tests.rs`.
 5. Run quality gate.
 
-**Acceptance gate**: `luna.data.encodeToml({key = "value"})` returns TOML string. `luna.data.parseToml(toml_str)` returns Lua table. Tests pass.
+**Acceptance gate**: `lurek.data.encodeToml({key = "value"})` returns TOML string. `lurek.data.parseToml(toml_str)` returns Lua table. Tests pass.
 
 ---
 
@@ -131,7 +131,7 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 3. Update feature flags: `luajit`, `vendored` may have moved.
 4. Fix all compilation errors � the `send`, `serialize`, `module` features changed.
 5. Test `UserData` registration patterns � mlua 0.10+ changed `UserData` method registration.
-6. Test all Lua callbacks (`luna.load`, `luna.update`, `luna.draw`, etc.).
+6. Test all Lua callbacks (`lurek.load`, `lurek.update`, `lurek.draw`, etc.).
 7. Run full test suite: `cargo test`.
 8. Run all examples: `cargo run -- demos/hello_world`, etc.
 
@@ -257,11 +257,11 @@ Breaking version bumps that require code changes. Each is a dedicated migration 
 1. Update `sysinfo` version to `"0.38"` with `default-features = false, features = ["system"]`.
 2. Rewrite CPU/memory queries to use new API.
 3. Add CPU utilization % and memory utilization % queries (replacing static CPU count / memory size).
-4. Add Lua bindings: `luna.platform.getCpuUsage()`, `luna.platform.getMemoryUsage()`, `luna.platform.getProcessMemory()`.
-5. Keep backwards-compatible: `luna.platform.getProcessorCount()` and `luna.platform.getMemorySize()` still work.
+4. Add Lua bindings: `lurek.platform.getCpuUsage()`, `lurek.platform.getMemoryUsage()`, `lurek.platform.getProcessMemory()`.
+5. Keep backwards-compatible: `lurek.platform.getProcessorCount()` and `lurek.platform.getMemorySize()` still work.
 6. Run `cargo test system`.
 
-**Acceptance gate**: `luna.platform.getCpuUsage()` returns a percentage. `luna.platform.getMemoryUsage()` returns used/total. Tests pass.
+**Acceptance gate**: `lurek.platform.getCpuUsage()` returns a percentage. `lurek.platform.getMemoryUsage()` returns used/total. Tests pass.
 
 ---
 
@@ -339,7 +339,7 @@ Expand the audio system with native effects. Uses rodio 0.22's Source trait.
    - **3-Band EQ**: Low/mid/high shelf biquad filters. Params: `low_gain`, `mid_gain`, `high_gain`, `low_freq`, `high_freq`. ~150 SLoC.
    - **Bandpass filter**: Combine existing lowpass + highpass. Params: `low_cutoff`, `high_cutoff`. ~30 SLoC.
 2. Register effects in Lua API:
-   - `luna.audio.newEffect(type, params) � Effect`
+   - `lurek.audio.newEffect(type, params) � Effect`
    - `source:addEffect(effect)`
    - `effect:setParam(name, value)`
 3. Write tests for each effect type (at least: silence in � silence out, impulse response sanity check).
@@ -366,7 +366,7 @@ Integrate glam as the backing math library for hot-path operations.
 **Steps**:
 1. Change `Vec2` internal fields to wrap a `glam::Vec2`.
 2. Delegate hot-path operations: `add`, `sub`, `mul`, `dot`, `normalize`, `length`, `distance`, `lerp` to glam.
-3. Keep the Lua API surface unchanged � `luna.math.newVec2(x, y)` still works.
+3. Keep the Lua API surface unchanged � `lurek.math.newVec2(x, y)` still works.
 4. Change `Mat3` internal representation to wrap `glam::Mat3`.
 5. Delegate transform operations to glam.
 6. Run math tests � verify no precision regression.
@@ -399,7 +399,7 @@ Integrate glam as the backing math library for hot-path operations.
 3. Write tests for each new function.
 4. Update Lua bindings if needed.
 
-**Acceptance gate**: All new easing functions accessible via `luna.math.ease(name, t)`. Tests pass for each curve.
+**Acceptance gate**: All new easing functions accessible via `lurek.math.ease(name, t)`. Tests pass for each curve.
 
 ---
 
@@ -450,7 +450,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 3. Add **scene preloading**: `preloadScene(name)`. ~30 SLoC.
 4. Add **scene recycling**: `recycleOnLeave` flag, destroy view but keep scene object. ~40 SLoC.
 5. Add **more transition effects**: `crossFade`, `zoomIn`, `zoomOut`, `iris`, `irisOpen`. ~80 SLoC.
-6. Formalize **inter-scene variables**: `luna.scene.setVariable(key, value)` / `getVariable(key)`. ~20 SLoC.
+6. Formalize **inter-scene variables**: `lurek.scene.setVariable(key, value)` / `getVariable(key)`. ~20 SLoC.
 7. Register all in Lua API.
 8. Write tests for lifecycle order, overlays, transitions.
 
@@ -607,8 +607,8 @@ Expand game system modules with more features. All native Rust, no new crates.
    - Decode: reverse process.
    - ~200 SLoC.
 2. Register in Lua API:
-   - `luna.data.encodeBinary(table) � ByteData`
-   - `luna.data.decodeBinary(ByteData) � table`
+   - `lurek.data.encodeBinary(table) � ByteData`
+   - `lurek.data.decodeBinary(ByteData) � table`
 3. Write round-trip tests (encode � decode � compare).
 
 **Acceptance gate**: Round-trip serialization preserves all Lua value types. Nested tables work. Tests pass.
@@ -629,7 +629,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 **Steps**:
 1. Add **PNG saving**: `ImageData:save(path)` using `image::save_buffer()`. ~20 SLoC.
 2. Add **PNG encoding to memory**: `ImageData:encode("png") � ByteData`. ~30 SLoC.
-3. Add **screenshot capture**: `luna.gfx.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
+3. Add **screenshot capture**: `lurek.gfx.captureScreenshot(path)` that reads the GPU framebuffer and saves to PNG. ~50 SLoC.
 4. Add **sub-image extraction**: `ImageData:getSubImage(x, y, w, h)`. ~20 SLoC.
 5. Add **image paste/blit**: `ImageData:paste(source, x, y)`. ~20 SLoC.
 6. Add **clone**: `ImageData:clone()`. ~10 SLoC.
@@ -681,7 +681,7 @@ Expand game system modules with more features. All native Rust, no new crates.
 3. Implement `src/tilemap/tiled_import.rs` behind `#[cfg(feature = "tiled-import")]`:
    - `load_tmx(path) � TileMap` � parse TMX and populate native TileMap.
    - Map TMX layers � TileLayer, TMX tilesets � TileSet.
-4. Register `luna.tilemap.loadTiled(path)` in Lua API (behind cfg).
+4. Register `lurek.tilemap.loadTiled(path)` in Lua API (behind cfg).
 5. Write test with a sample TMX file.
 
 **Acceptance gate**: A TMX file loads into a native TileMap. Feature-gated build works both ways. Tests pass.
@@ -705,13 +705,13 @@ Expand game system modules with more features. All native Rust, no new crates.
    - Format: `{"ts":"ISO8601","level":"INFO","module":"physics","msg":"..."}`.
    - File output: `set_log_file(path)` for persistent logging. ~100 SLoC.
 2. Add Lua-side logging API:
-   - `luna.log.info(msg)`, `luna.log.warn(msg)`, `luna.log.error(msg)`, `luna.log.debug(msg)`. ~30 SLoC.
-   - `luna.log.setFile(path)` � redirect to file. ~20 SLoC.
-   - `luna.log.perf(label, fn)` � timed execution logging. ~30 SLoC.
-   - `luna.log.event(category, data_table)` � structured analytics event for AI consumption. ~50 SLoC.
+   - `lurek.log.info(msg)`, `lurek.log.warn(msg)`, `lurek.log.error(msg)`, `lurek.log.debug(msg)`. ~30 SLoC.
+   - `lurek.log.setFile(path)` � redirect to file. ~20 SLoC.
+   - `lurek.log.perf(label, fn)` � timed execution logging. ~30 SLoC.
+   - `lurek.log.event(category, data_table)` � structured analytics event for AI consumption. ~50 SLoC.
 3. Write tests for JSON format, file output, Lua integration.
 
-**Acceptance gate**: JSON-formatted log lines parse correctly. File output writes. Lua `luna.log.info("test")` appears in log stream. `luna.log.event("combat", {damage=25})` produces structured JSON. Tests pass.
+**Acceptance gate**: JSON-formatted log lines parse correctly. File output writes. Lua `lurek.log.info("test")` appears in log stream. `lurek.log.event("combat", {damage=25})` produces structured JSON. Tests pass.
 
 ---
 
@@ -731,7 +731,7 @@ Expand game system modules with more features. All native Rust, no new crates.
    - GPU buffer management for NdArray data.
    - Compute shader for parallel matmul.
    - Compute shader for parallel element-wise operations.
-2. Register `luna.compute.gpuMatmul(a, b)` in Lua API.
+2. Register `lurek.compute.gpuMatmul(a, b)` in Lua API.
 3. Implement fallback to CPU when GPU compute is unavailable.
 4. Benchmark: measure speedup for large arrays (>100K elements).
 

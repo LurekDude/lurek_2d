@@ -1,13 +1,13 @@
 ---
 name: lua-rust-bridge
-description: "Load this skill when designing or implementing the bridge between Rust engine modules and the luna.* Lua API: creating UserData types, registration functions, binding domain types to Lua, or keeping src/lua_api/ thin. Use for: new Lua API modules, Lua↔Rust data conversion, AGENT.md↔lua_api sync. Skip it for domain Rust logic, game scripting, or GPU code."
+description: "Load this skill when designing or implementing the bridge between Rust engine modules and the lurek.* Lua API: creating UserData types, registration functions, binding domain types to Lua, or keeping src/lua_api/ thin. Use for: new Lua API modules, Lua↔Rust data conversion, AGENT.md↔lua_api sync. Skip it for domain Rust logic, game scripting, or GPU code."
 ---
 
-# Lua↔Rust Bridge — Luna2D
+# Lua↔Rust Bridge — Lurek2D
 
 ## Load When
 
-- Creating a new `luna.*` API module (`.rs` file in `src/lua_api/`)
+- Creating a new `lurek.*` API module (`.rs` file in `src/lua_api/`)
 - Wrapping a Rust domain type as a Lua `UserData` object
 - Designing Lua-callable functions for a new subsystem
 - Syncing `src/<module>/AGENT.md` ↔ `src/lua_api/<module>_api.rs`
@@ -27,7 +27,7 @@ description: "Load this skill when designing or implementing the bridge between 
 
 ```
 Game Script (Lua)
-  └── luna.<module>.<func>(args)
+  └── lurek.<module>.<func>(args)
         ↓ mlua dispatch
   src/lua_api/<module>_api.rs
         ↓ Rc<RefCell<SharedState>>
@@ -59,7 +59,7 @@ pub fn register(
         Ok(s.borrow().method(arg))
     })?)?;
 
-    luna.set("module", tbl)?;
+    lurek.set("module", tbl)?;
     Ok(())
 }
 ```
@@ -118,7 +118,7 @@ let texture = state.borrow().load_texture(path)
 // Validate Lua input with a descriptive message:
 if width == 0 {
     return Err(LuaError::RuntimeError(
-        "luna.gfx.newCanvas: width must be > 0".into()
+        "lurek.gfx.newCanvas: width must be > 0".into()
     ));
 }
 ```
@@ -136,7 +136,7 @@ Every `src/lua_api/<module>_api.rs` must stay aligned with the module's AGENT.md
 | AGENT.md | lua_api |
 |----------|---------|
 | Public Rust API in `## Key Types` | Should have a Lua wrapper if user-facing |
-| `## Lua API` section describes `luna.<module>.*` | All listed functions must exist in the api file |
+| `## Lua API` section describes `lurek.<module>.*` | All listed functions must exist in the api file |
 | `## Notes` on constraints | Enforced as `LuaError` at the binding boundary |
 
 To check alignment: `python tools/docs/gen_lua_api_data.py`
@@ -164,9 +164,9 @@ Before implementing the Lua bridge, verify the domain module provides:
 
 **Never render inside a Lua closure.** Lua callbacks must not call any GPU commands directly. Instead:
 
-1. During `luna.draw()`, push `DrawCommand` variants to `state.borrow_mut().draw_commands`
+1. During `lurek.draw()`, push `DrawCommand` variants to `state.borrow_mut().draw_commands`
 2. Return from the Lua callback
-3. The engine processes draw commands after `luna.draw()` returns and renders the frame
+3. The engine processes draw commands after `lurek.draw()` returns and renders the frame
 
 ```rust
 // CORRECT — queue a draw command

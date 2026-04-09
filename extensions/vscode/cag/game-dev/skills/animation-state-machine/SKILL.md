@@ -77,11 +77,11 @@ end
 ## Drawing
 
 ```lua
-function luna.render()
+function lurek.render()
     local def = anims[anim.state]
     local quad_index = def.frames[anim.frame]
-    -- Use luna.gfx.draw with quad from sprite sheet
-    luna.gfx.draw(spritesheet, quads[quad_index], player.x, player.y)
+    -- Use lurek.gfx.draw with quad from sprite sheet
+    lurek.gfx.draw(spritesheet, quads[quad_index], player.x, player.y)
 end
 ```
 

@@ -1,6 +1,6 @@
 -- 2D Souls-like Precision Combat
 -- WASD move, J=light attack, K=heavy attack, L=dodge, Space=block
--- Run with: cargo run -- demos/action/soulslike
+-- Run with: cargo run -- content/demos/action/soulslike
 
 local W, H = 800, 600
 local player, boss, particles, shake
@@ -23,9 +23,9 @@ local function spawn_hit_particles(x, y, r, g, b)
     end
 end
 
-function luna.init()
-    luna.window.setTitle("Soulslike Combat")
-    luna.gfx.setBackgroundColor(0.08, 0.06, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Soulslike Combat")
+    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.1)
 
     local ground = H - 100
     player = {
@@ -103,7 +103,7 @@ local function boss_try_hit_player()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if state ~= "play" then return end
 
     -- particles
@@ -155,14 +155,14 @@ function luna.process(dt)
     -- player movement (not during attack/dodge)
     if not player.attacking and not player.dodging then
         local dx = 0
-        if luna.keyboard.isDown("a") then dx = -1 end
-        if luna.keyboard.isDown("d") then dx = 1 end
+        if lurek.keyboard.isDown("a") then dx = -1 end
+        if lurek.keyboard.isDown("d") then dx = 1 end
         if dx ~= 0 then
             player.x = clamp(player.x + dx * player.speed * dt, 30, W - 30)
             player.facing = dx
         end
         -- block
-        player.blocking = luna.keyboard.isDown("space") and player.stamina > 0
+        player.blocking = lurek.keyboard.isDown("space") and player.stamina > 0
         if player.blocking then
             player.stamina = clamp(player.stamina - player.block_cost_per_sec * dt, 0, player.max_stamina)
         end
@@ -217,15 +217,15 @@ function luna.process(dt)
 end
 
 local function draw_bar(x, y, w, h, val, max, r, g, b)
-    luna.gfx.setColor(0.15, 0.15, 0.15, 0.9)
-    luna.gfx.rectangle("fill", x, y, w, h)
-    luna.gfx.setColor(r, g, b, 1)
-    luna.gfx.rectangle("fill", x, y, w * clamp(val / max, 0, 1), h)
-    luna.gfx.setColor(1, 1, 1, 0.3)
-    luna.gfx.rectangle("line", x, y, w, h)
+    lurek.gfx.setColor(0.15, 0.15, 0.15, 0.9)
+    lurek.gfx.rectangle("fill", x, y, w, h)
+    lurek.gfx.setColor(r, g, b, 1)
+    lurek.gfx.rectangle("fill", x, y, w * clamp(val / max, 0, 1), h)
+    lurek.gfx.setColor(1, 1, 1, 0.3)
+    lurek.gfx.rectangle("line", x, y, w, h)
 end
 
-function luna.render()
+function lurek.render()
     local sx, sy = 0, 0
     if shake.timer > 0 then
         sx = (math.random() - 0.5) * shake.intensity * 2
@@ -234,21 +234,21 @@ function luna.render()
 
     -- ground
     local ground = player.y
-    luna.gfx.setColor(0.15, 0.12, 0.18, 1)
-    luna.gfx.rectangle("fill", sx, ground + sy, W, H - ground)
-    luna.gfx.setColor(0.3, 0.25, 0.35, 1)
-    luna.gfx.line(0 + sx, ground + sy, W + sx, ground + sy)
+    lurek.gfx.setColor(0.15, 0.12, 0.18, 1)
+    lurek.gfx.rectangle("fill", sx, ground + sy, W, H - ground)
+    lurek.gfx.setColor(0.3, 0.25, 0.35, 1)
+    lurek.gfx.line(0 + sx, ground + sy, W + sx, ground + sy)
 
     -- arena pillars
-    luna.gfx.setColor(0.2, 0.18, 0.25, 0.6)
-    luna.gfx.rectangle("fill", 60 + sx, ground - 120 + sy, 16, 120)
-    luna.gfx.rectangle("fill", W - 76 + sx, ground - 120 + sy, 16, 120)
+    lurek.gfx.setColor(0.2, 0.18, 0.25, 0.6)
+    lurek.gfx.rectangle("fill", 60 + sx, ground - 120 + sy, 16, 120)
+    lurek.gfx.rectangle("fill", W - 76 + sx, ground - 120 + sy, 16, 120)
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life / 0.3, 0, 1)
-        luna.gfx.setColor(p.r, p.g, p.b, a)
-        luna.gfx.circle("fill", p.x + sx, p.y + sy, 3)
+        lurek.gfx.setColor(p.r, p.g, p.b, a)
+        lurek.gfx.circle("fill", p.x + sx, p.y + sy, 3)
     end
 
     -- boss
@@ -256,70 +256,70 @@ function luna.render()
     if boss.hurt_flash > 0 then br, bg, bb = 1, 1, 1 end
     if boss.tele_flash > 0.3 then br, bg, bb = 1, 0.5, 0.1 end
     if boss.state == "recovery" then br, bg, bb = 0.4, 0.15, 0.15 end
-    luna.gfx.setColor(br, bg, bb, 1)
-    luna.gfx.rectangle("fill", boss.x - boss.w / 2 + sx, boss.y - boss.h + sy, boss.w, boss.h)
+    lurek.gfx.setColor(br, bg, bb, 1)
+    lurek.gfx.rectangle("fill", boss.x - boss.w / 2 + sx, boss.y - boss.h + sy, boss.w, boss.h)
     -- boss eyes
-    luna.gfx.setColor(1, 0.3, 0.1, 1)
+    lurek.gfx.setColor(1, 0.3, 0.1, 1)
     local eye_x = boss.x + boss.facing * 8
-    luna.gfx.circle("fill", eye_x + sx, boss.y - boss.h + 16 + sy, 4)
+    lurek.gfx.circle("fill", eye_x + sx, boss.y - boss.h + 16 + sy, 4)
 
     -- player
     local pr, pg, pb = 0.3, 0.6, 0.9
     if player.hurt_flash > 0 then pr, pg, pb = 1, 0.3, 0.3 end
     if player.iframe then pr, pg, pb = 0.7, 0.7, 1 end
     if player.blocking then pr, pg, pb = 0.4, 0.8, 0.4 end
-    luna.gfx.setColor(pr, pg, pb, player.iframe and 0.5 or 1)
-    luna.gfx.rectangle("fill", player.x - player.w / 2 + sx, player.y - player.h + sy, player.w, player.h)
+    lurek.gfx.setColor(pr, pg, pb, player.iframe and 0.5 or 1)
+    lurek.gfx.rectangle("fill", player.x - player.w / 2 + sx, player.y - player.h + sy, player.w, player.h)
 
     -- attack slash visual
     if player.attacking and player.atk_timer < player.atk_dur * 0.7 then
         local range = player.atk_type == "light" and player.light_range or player.heavy_range
         local alpha = 1 - player.atk_timer / player.atk_dur
-        luna.gfx.setColor(1, 0.9, 0.5, alpha * 0.6)
+        lurek.gfx.setColor(1, 0.9, 0.5, alpha * 0.6)
         local ax = player.x + player.facing * range / 2
-        luna.gfx.rectangle("fill", ax - range / 2 + sx, player.y - player.h + 10 + sy, range, 30)
+        lurek.gfx.rectangle("fill", ax - range / 2 + sx, player.y - player.h + 10 + sy, range, 30)
     end
 
     -- HUD — player bars
     draw_bar(20, 20, 200, 16, player.hp, player.max_hp, 0.8, 0.2, 0.2)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("HP", 24, 21, 0.8)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("HP", 24, 21, 0.8)
 
     draw_bar(20, 42, 200, 12, player.stamina, player.max_stamina, 0.2, 0.7, 0.3)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("ST", 24, 42, 0.7)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("ST", 24, 42, 0.7)
 
     -- HUD — boss bar
     draw_bar(W / 2 - 150, H - 50, 300, 20, boss.hp, boss.max_hp, 0.7, 0.15, 0.15)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
     local boss_name = boss.phase == 2 and "WARDEN (Enraged)" or "WARDEN"
-    luna.gfx.print(boss_name, W / 2 - 60, H - 48, 0.9)
+    lurek.gfx.print(boss_name, W / 2 - 60, H - 48, 0.9)
 
     -- controls hint
-    luna.gfx.setColor(1, 1, 1, 0.4)
-    luna.gfx.print("A/D: Move  J: Light  K: Heavy  L: Dodge  Space: Block", 150, H - 20, 0.7)
+    lurek.gfx.setColor(1, 1, 1, 0.4)
+    lurek.gfx.print("A/D: Move  J: Light  K: Heavy  L: Dodge  Space: Block", 150, H - 20, 0.7)
 
     -- death / victory overlay
     if state == "dead" then
-        luna.gfx.setColor(0, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(0.8, 0.1, 0.1, 1)
-        luna.gfx.print("YOU DIED", W / 2 - 120, H / 2 - 40, 3)
-        luna.gfx.setColor(1, 1, 1, 0.8)
-        luna.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 30)
+        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0.8, 0.1, 0.1, 1)
+        lurek.gfx.print("YOU DIED", W / 2 - 120, H / 2 - 40, 3)
+        lurek.gfx.setColor(1, 1, 1, 0.8)
+        lurek.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 30)
     elseif state == "victory" then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.85, 0.2, 1)
-        luna.gfx.print("WARDEN DEFEATED", W / 2 - 160, H / 2 - 40, 2.5)
-        luna.gfx.setColor(1, 1, 1, 0.8)
-        luna.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 30)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.85, 0.2, 1)
+        lurek.gfx.print("WARDEN DEFEATED", W / 2 - 160, H / 2 - 40, 2.5)
+        lurek.gfx.setColor(1, 1, 1, 0.8)
+        lurek.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 30)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart(); return end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart(); return end
     if state ~= "play" then return end
     if player.dodging or player.attacking then return end
 

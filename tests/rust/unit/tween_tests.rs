@@ -1,4 +1,4 @@
-use luna2d::tween::{builtin_easing_names, resolve_easing, TweenState};
+use lurek2d::tween::{builtin_easing_names, resolve_easing, TweenState};
 
 // ─── TweenState ──────────────────────────────────────────────────────────────
 

@@ -4,10 +4,10 @@ local state = {
     draw   = function() end,
 }
 
-function luna.init()     state.load()     end
-function luna.process(dt) state.update(dt) end
-function luna.render()     state.draw()     end
+function lurek.init()     state.load()     end
+function lurek.process(dt) state.update(dt) end
+function lurek.render()     state.draw()     end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 end

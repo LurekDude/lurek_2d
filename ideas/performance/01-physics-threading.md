@@ -2,7 +2,7 @@
 
 ## Current State
 
-Luna2D uses rapier2d 0.32 for rigid-body physics simulation. The physics
+Lurek2D uses rapier2d 0.32 for rigid-body physics simulation. The physics
 pipeline runs **entirely on the main thread** in `src/physics/world.rs`:
 
 ```rust
@@ -62,7 +62,7 @@ thread and interpolate positions on the main thread.
 ```
 Main Thread                    Physics Thread
 ─────────────                  ──────────────
-luna.update(dt)
+lurek.update(dt)
   ├─ snapshot body positions
   ├─ send dt to physics thread ─→ receive dt
   ├─ interpolate visuals            step(dt)
@@ -109,11 +109,11 @@ the cost of additional CPU work distributed across threads.
 
 | Engine | Physics Threading |
 |--------|-------------------|
-| Love2D | Box2D on main thread (no parallel) |
-| Godot 4 | Jolt Physics on background thread |
-| Unity | PhysX on worker threads (job system) |
-| Bevy | rapier2d with `parallel` + ECS schedule |
-| macroquad | No built-in physics |
+| Engine A | Box2D on main thread (no parallel) |
+| Engine C 4 | Jolt Physics on background thread |
+| Engine G | PhysX on worker threads (job system) |
+| Engine D | rapier2d with `parallel` + ECS schedule |
+| Engine F | No built-in physics |
 
-Luna2D's opportunity to enable rapier2d `parallel` puts it ahead of Love2D
+Lurek2D's opportunity to enable rapier2d `parallel` puts it ahead of Engine A
 with almost zero effort.

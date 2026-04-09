@@ -3,13 +3,13 @@
 //! Provides `MidiState` for tracking whether a SoundFont (SF2) file has
 //! been loaded for MIDI instrument rendering.
 //!
-//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
 //! details for midi-related operations and data management.
 //! Key types exported from this module: `MidiState`.
 //! Primary functions: `new()`, `set_soundfont()`, `has_soundfont()`, `clear_soundfont()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// MIDI SoundFont state. Consult the module-level documentation for the broader usage context and preconditions.
 ///

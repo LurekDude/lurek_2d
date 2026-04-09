@@ -1,9 +1,9 @@
 ---
 name: lua-runtime
-description: "Load this skill when working with the Lua scripting runtime in Luna2D: LuaJIT vs Lua 5.4 behavioral differences, the lua-jit and lua54 Cargo feature flags, mlua 0.9 specifics, garbage collector tuning, LuaJIT bitwise ops, upvalue and stack limits, string interning, or Lua performance patterns. Use for: LuaJIT FFI, GC pressure, per-frame Lua optimisation, Lua 5.4 compat testing. Skip it for the Rust binding layer (use lua-rust-bridge), general Lua game scripting (use lua-scripting), or Lua API design (use lua-api-design)."
+description: "Load this skill when working with the Lua scripting runtime in Lurek2D: LuaJIT vs Lua 5.4 behavioral differences, the lua-jit and lua54 Cargo feature flags, mlua 0.9 specifics, garbage collector tuning, LuaJIT bitwise ops, upvalue and stack limits, string interning, or Lua performance patterns. Use for: LuaJIT FFI, GC pressure, per-frame Lua optimisation, Lua 5.4 compat testing. Skip it for the Rust binding layer (use lua-rust-bridge), general Lua game scripting (use lua-scripting), or Lua API design (use lua-api-design)."
 ---
 
-# Lua Runtime — Luna2D
+# Lua Runtime — Lurek2D
 
 ## Load When
 
@@ -103,7 +103,7 @@ collectgarbage("collect")
 local kb = collectgarbage("count")
 ```
 
-**Per-frame rule**: Never call `collectgarbage("collect")` in `luna.update()` or `luna.draw()` — it stalls the frame. Schedule it during loading screens only.
+**Per-frame rule**: Never call `collectgarbage("collect")` in `lurek.update()` or `lurek.draw()` — it stalls the frame. Schedule it during loading screens only.
 
 ### Lua 5.4 GC
 
@@ -118,14 +118,14 @@ collectgarbage("incremental")  -- revert to incremental
 
 ```lua
 -- BAD: creates a new table every frame (200+ KB/s GC pressure)
-function luna.process(dt)
+function lurek.process(dt)
     local args = { x = player.x, y = player.y }  -- heap allocation
     processArgs(args)
 end
 
 -- GOOD: pre-allocate and reuse
 local _args = {}
-function luna.process(dt)
+function lurek.process(dt)
     _args.x = player.x
     _args.y = player.y
     processArgs(_args)
@@ -181,10 +181,10 @@ local buf = ffi.new("uint8_t[?]", 1024)
 ffi.C.memset(buf, 0, 1024)
 ```
 
-**Rules for Luna2D:**
+**Rules for Lurek2D:**
 - FFI is only available with the `lua-jit` feature
 - Guard FFI code with a backend check: `if type(require) == 'function' then pcall(require, 'ffi') end`
-- **Do not expose raw FFI pointers through a `luna.*` API** — safety boundary violation
+- **Do not expose raw FFI pointers through a `lurek.*` API** — safety boundary violation
 - FFI is appropriate for compute-heavy Lua scripts; use Rust side for engine internals
 
 ---
@@ -240,8 +240,8 @@ local key = KEYS[id]   -- no allocation
 `mlua = { version = "0.9", default-features = false }` — key behaviors:
 
 - `Lua::new()` creates a VM with no stdlib. Use `Lua::new_with(StdLib::...)` to load specific libs.
-- Luna2D creates the VM in `src/lua_api/mod.rs` with a safe stdlib subset.
+- Lurek2D creates the VM in `src/lua_api/mod.rs` with a safe stdlib subset.
 - `LuaError::external(e)` wraps any `std::error::Error` as a Lua error — standard pattern at boundary.
 - `lua.load(chunk).exec()` for executing a string; `.call::<T>(args)` for calling result.
 - Thread safety: `mlua::Lua` is **not** `Send` by default. Workers use separate `Lua` instances.
-- The `send` feature enables `Lua: Send` for use in `std::thread::spawn` — Luna2D uses this for worker threads.
+- The `send` feature enables `Lua: Send` for use in `std::thread::spawn` — Lurek2D uses this for worker threads.

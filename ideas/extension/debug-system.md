@@ -68,7 +68,7 @@ But they use different ports, different protocols, and different UI paradigms.
 
 ### 2. Engine-Side Debug Server
 
-**Prerequisite**: The Luna2D engine needs a server-side component to accept debug connections.
+**Prerequisite**: The Lurek2D engine needs a server-side component to accept debug connections.
 
 **Current engine state**: No TCP debug server in `src/`. The Debug Bridge requires an engine counterpart.
 
@@ -159,7 +159,7 @@ But they use different ports, different protocols, and different UI paradigms.
 
 ### 10. Multi-VM Debugging
 
-**Luna2D supports worker threads** (B-04), each with its own Lua VM.
+**Lurek2D supports worker threads** (B-04), each with its own Lua VM.
 
 **Improvement**:
 - Show all active Lua VMs in debug panel

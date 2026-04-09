@@ -1,4 +1,4 @@
-//! `luna.spine` — Skeletal animation: bone hierarchies, slots, and world-transform propagation.
+//! `lurek.spine` — Skeletal animation: bone hierarchies, slots, and world-transform propagation.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -147,7 +147,7 @@ impl LuaUserData for LuaSkeleton {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.spine` API table with the Lua VM.
+/// Registers the `lurek.spine` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

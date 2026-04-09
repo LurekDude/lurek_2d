@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Baseline — always-on runtime substrate               |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | — (foundation module; no dedicated `luna.engine` namespace) |
+| **Lua API**    | — (foundation module; no dedicated `lurek.engine` namespace) |
 | **Source**     | `src/engine/`                                        |
 | **Rust Tests** | `tests/rust/unit/engine_tests.rs`                    |
 | **Lua Tests**  | —                                                    |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The engine module is the foundational layer of Luna2D — it owns the application
+The engine module is the foundational layer of Lurek2D — it owns the application
 lifecycle, the main game loop, configuration loading, shared mutable state, error
 handling, structured logging, and the typed resource keys that identify every GPU
 object in the engine.  It sits at the Baseline tier alongside `math`, meaning every
@@ -25,7 +25,7 @@ gilrs, and the `RunState` machine (`Running → Error → Restarting`).  `resume
 initialises the GPU adapter/device/surface, applies the correct startup window
 title for either game mode or the no-game splash, and fires the first redraw;
 `window_event()` routes OS input events to `KeyboardState`, `MouseState`,
-`GamepadState`, and `TouchState` and fires the corresponding `luna.*` callbacks;
+`GamepadState`, and `TouchState` and fires the corresponding `lurek.*` callbacks;
 `about_to_wait()` calls `tick_frame()` which runs the full update/draw cycle and
 presents the rendered frame.  This event-driven architecture is required for correct
 behaviour on macOS and ensures tight integration with the OS event queue on all
@@ -69,7 +69,7 @@ from `src/engine/cfg/messages.toml`.  Resource keys are 14 typed SlotMap newtype
 providing compile-time safety: a `TextureKey` cannot be passed where a `FontKey` is
 expected.
 
-The engine module intentionally does NOT expose a `luna.engine` Lua namespace.  It
+The engine module intentionally does NOT expose a `lurek.engine` Lua namespace.  It
 is a pure foundation layer consumed by all other modules and by `lua_api` for
 lifecycle orchestration.
 
@@ -89,28 +89,28 @@ App::run(game_dir)
         │     └── first RedrawRequested triggers init_lua()
         │           ├── create_lua_vm(SharedState, ModulesConfig)
         │           ├── load and exec main.lua (or show cached PNG splash)
-        │           └── call luna.load()
+        │           └── call lurek.load()
         │
         ├── window_event()
-        │     ├── KeyEvent → KeyboardState → luna.keypressed / keyreleased
-        │     ├── Ime(Commit) → luna.textinput
-        │     ├── CursorMoved → MouseState → luna.mousemoved
-        │     ├── MouseInput → luna.mousepressed / mousereleased
-        │     ├── MouseWheel → luna.wheelmoved
-        │     ├── Touch → TouchState → luna.touchpressed / moved / released
-        │     ├── Focused → luna.focus
-        │     ├── Occluded → luna.visible
-        │     ├── Resized → reconfigure surface → luna.resize
+        │     ├── KeyEvent → KeyboardState → lurek.keypressed / keyreleased
+        │     ├── Ime(Commit) → lurek.textinput
+        │     ├── CursorMoved → MouseState → lurek.mousemoved
+        │     ├── MouseInput → lurek.mousepressed / mousereleased
+        │     ├── MouseWheel → lurek.wheelmoved
+        │     ├── Touch → TouchState → lurek.touchpressed / moved / released
+        │     ├── Focused → lurek.focus
+        │     ├── Occluded → lurek.visible
+        │     ├── Resized → reconfigure surface → lurek.resize
         │     ├── DroppedFile → load game folder (drag-and-drop)
-        │     └── CloseRequested → luna.quit() → RunState
+        │     └── CloseRequested → lurek.quit() → RunState
         │
         ├── about_to_wait() → tick_frame()
-        │     ├── gilrs gamepad polling → luna.gamepadpressed / axis / etc.
+        │     ├── gilrs gamepad polling → lurek.gamepadpressed / axis / etc.
         │     ├── apply pending WindowState operations
         │     ├── Clock::tick() → dt
-        │     ├── luna.update(dt)
+        │     ├── lurek.update(dt)
         │     ├── clear draw_commands
-        │     ├── luna.draw() → game pushes DrawCommands
+        │     ├── lurek.draw() → game pushes DrawCommands
         │     ├── DebugOverlay → append overlay DrawCommands
         │     ├── GpuRenderer::render_frame(commands) → present
         │     └── reset per-frame state
@@ -269,7 +269,7 @@ Central shared runtime state.
 
 #### `engine::app::App`
 
-Public entry point for the Luna2D engine. Accepts a `Config` and an optional conf.lua error message. `App::run(game_dir, explicit_game_dir)` launches the winit event loop and does not return until the window is closed.
+Public entry point for the Lurek2D engine. Accepts a `Config` and an optional conf.lua error message. `App::run(game_dir, explicit_game_dir)` launches the winit event loop and does not return until the window is closed.
 
 #### `engine::config::Config`
 
@@ -335,11 +335,11 @@ Five error categories: `Init`, `Runtime`, `Resource`, `Script`, `System`. Used b
 
 ## Lua API
 
-No Lua API — foundation module. The engine module does not expose a `luna.engine`
+No Lua API — foundation module. The engine module does not expose a `lurek.engine`
 namespace. It provides the infrastructure consumed by all other modules and by
 `src/lua_api/` for lifecycle orchestration. Lua interacts with engine functionality
-indirectly through `luna.platform` (log level, system info), `luna.window` (window
-state), `luna.signal` (quit, restart), and `luna.gfx` (draw commands, screenshot).
+indirectly through `lurek.platform` (log level, system info), `lurek.window` (window
+state), `lurek.signal` (quit, restart), and `lurek.gfx` (draw commands, screenshot).
 
 ## Lua Examples
 
@@ -348,7 +348,7 @@ interact with engine functionality through higher-level namespaces:
 
 ```lua
 -- conf.lua — engine configuration (read by engine::config)
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "My Game"
     t.window.width  = 1280
     t.window.height = 720
@@ -360,19 +360,19 @@ end
 
 ```lua
 -- main.lua — engine callbacks (dispatched by engine::app)
-function luna.init()
+function lurek.init()
     -- called once after main.lua executes
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- called every frame with delta time
 end
 
-function luna.render()
+function lurek.render()
     -- called every frame; push DrawCommands here
 end
 
-function luna.errorhandler(msg)
+function lurek.errorhandler(msg)
     -- optional: custom error handling before error screen
     return msg
 end
@@ -409,7 +409,7 @@ end
 | All Tier 1/2    | Imported by  | Every module uses `EngineError`, `EngineResult`, resource keys |
 | `main.rs`       | Imported by  | Constructs `App` and calls `App::run()` |
 
-**Similar modules**: `engine` is unique — no other module serves the same role. The closest relationship is with `lua_api`, which is the bridge layer that registers the `luna.*` namespace using types from `engine`.
+**Similar modules**: `engine` is unique — no other module serves the same role. The closest relationship is with `lua_api`, which is the bridge layer that registers the `lurek.*` namespace using types from `engine`.
 
 ## Notes
 

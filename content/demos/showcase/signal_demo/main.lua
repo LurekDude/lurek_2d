@@ -1,8 +1,8 @@
--- Signal Demo — Luna2D example
+-- Signal Demo — Lurek2D example
 -- Demonstrates the pub-sub Signal system for decoupled event handling.
--- Run with: cargo run -- demos/showcase/signal_demo
+-- Run with: cargo run -- content/demos/showcase/signal_demo
 
-local events = luna.signal.newSignal()
+local events = lurek.signal.newSignal()
 local log = {}
 local score = 0
 local combo = 0
@@ -31,8 +31,8 @@ events:register("hit", function(target)
     events:emit("score", 10)
 end)
 
-function luna.init()
-    luna.window.setTitle("Signal Demo")
+function lurek.init()
+    lurek.window.setTitle("Signal Demo")
 
     -- Simulate some game events
     events:emit("hit", "enemy_A")
@@ -41,32 +41,32 @@ function luna.init()
     events:emit("score", 50)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Keep log from growing too large
     while #log > 20 do
         table.remove(log, 1)
     end
 end
 
-function luna.render()
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
-    luna.gfx.print("Score: " .. score, 20, 50)
-    luna.gfx.print("Combo: " .. combo, 20, 70)
-    luna.gfx.print("Listeners: " .. events:getTotalCount(), 20, 90)
+function lurek.render()
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
+    lurek.gfx.print("Score: " .. score, 20, 50)
+    lurek.gfx.print("Combo: " .. combo, 20, 70)
+    lurek.gfx.print("Listeners: " .. events:getTotalCount(), 20, 90)
 
-    luna.gfx.setColor(0.7, 0.9, 0.7)
+    lurek.gfx.setColor(0.7, 0.9, 0.7)
     for i, msg in ipairs(log) do
-        luna.gfx.print(msg, 30, 110 + (i - 1) * 18)
+        lurek.gfx.print(msg, 30, 110 + (i - 1) * 18)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then
         events:emit("hit", "target_" .. math.random(1, 9))
     elseif key == "r" then
         events:emit("reset")
     elseif key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

@@ -1,6 +1,6 @@
 ---
 description: >
-  Advise on visual design for a Luna2D game: colour palettes, sprite sizing,
+  Advise on visual design for a Lurek2D game: colour palettes, sprite sizing,
   tileset layout, animation frame budget. Not a code agent.
 model: claude-sonnet-4-5
 tools:

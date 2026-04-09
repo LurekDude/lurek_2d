@@ -4,7 +4,7 @@
 |----------------|--------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
-| **Lua API**    | `luna.gfx`                                              |
+| **Lua API**    | `lurek.gfx`                                              |
 | **Source**     | `src/graphics/`                                              |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The graphics module owns the entire GPU rendering pipeline for Luna2D — from the high-level draw calls that Lua scripts issue through `luna.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
 ## Source Files
 
@@ -40,6 +40,6 @@ The graphics module owns the entire GPU rendering pipeline for Luna2D — from t
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/graphics.md`](../../specs/graphics.md)
+→ [`docs/specs/graphics.md`](../../docs/specs/graphics.md)
 
-_Update both this file **and** `specs/graphics.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/graphics.md` whenever source files, public types, or Lua bindings change._

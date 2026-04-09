@@ -33,13 +33,13 @@ function M.update(dt)
 end
 
 function M.draw()
-    luna.gfx.print("Scene 3: Particles", 10, 10)
+    lurek.gfx.print("Scene 3: Particles", 10, 10)
     for _, p in ipairs(particles) do
         local alpha = 1 - (p.age / p.life)
-        luna.gfx.setColor(1, 0.5 + alpha * 0.5, 0.1, alpha)
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.setColor(1, 0.5 + alpha * 0.5, 0.1, alpha)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 
 return M

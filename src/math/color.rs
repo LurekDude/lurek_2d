@@ -1,16 +1,16 @@
-//! RGBA color value type for the Luna2D math layer.
+//! RGBA color value type for the Lurek2D math layer.
 //!
-//! This module is part of Luna2D's `math` subsystem (Baseline layer).
+//! This module is part of Lurek2D's `math` subsystem (Baseline layer).
 //! `Color` is a pure value type with no engine dependencies.
 //! Key types exported from this module: `Color`.
 //! Primary functions: `from_u8()`, `to_u8()`, `to_rgb_u32()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
-/// Used everywhere the API accepts a color: `luna.gfx.setColor`, sprite tints,
+/// Used everywhere the API accepts a color: `lurek.gfx.setColor`, sprite tints,
 /// background color, etc.
 ///
 /// # Fields
@@ -62,14 +62,14 @@ impl Color {
         b: 1.0,
         a: 1.0,
     };
-    /// Luna2D default background color — dark purple `(0.15, 0.12, 0.25, 1.0)`.
+    /// Lurek2D default background color — dark purple `(0.15, 0.12, 0.25, 1.0)`.
     pub const LUNA_BG: Color = Color {
         r: 0.15,
         g: 0.12,
         b: 0.25,
         a: 1.0,
     };
-    /// Luna2D accent color — warm gold `(0.85, 0.75, 0.45, 1.0)`.
+    /// Lurek2D accent color — warm gold `(0.85, 0.75, 0.45, 1.0)`.
     pub const LUNA_ACCENT: Color = Color {
         r: 0.85,
         g: 0.75,

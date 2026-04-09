@@ -1,6 +1,6 @@
-﻿//! Integration tests for the Luna2D engine core.
+﻿//! Integration tests for the Lurek2D engine core.
 
-use luna2d::lua_api::system_api;
+use lurek2d::lua_api::system_api;
 
 // ── Processor Count ──────────────────────────────────────────────
 
@@ -141,8 +141,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -189,7 +189,7 @@ fn test_lua_get_env_missing() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local val = luna.platform.getEnv("LUNA2D_NONEXISTENT_VAR_12345")
+        local val = luna.platform.getEnv("LUREK2D_NONEXISTENT_VAR_12345")
         assert(val == nil)
         "#,
     )

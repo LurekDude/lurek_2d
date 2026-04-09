@@ -4,7 +4,7 @@
 |----------|-------|
 | **Tier** | Tier 1 — Core Engine Subsystems |
 | **Status** | Implemented — Full |
-| **Lua API** | `luna.data` |
+| **Lua API** | `lurek.data` |
 | **Source** | `src/data/` |
 | **Rust Tests** | `tests/rust/unit/data_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_data.lua` |
@@ -12,15 +12,15 @@
 
 ## Purpose
 
-The `data` module is Luna2D's pure-CPU data processing layer. It provides binary data
+The `data` module is Lurek2D's pure-CPU data processing layer. It provides binary data
 manipulation, compression, hashing, encoding, TOML conversion, and two independent binary
-pack/unpack systems — all exposed to Lua scripts through the `luna.data` namespace.
+pack/unpack systems — all exposed to Lua scripts through the `lurek.data` namespace.
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| `bin_pack.rs` | Luna2D Binary Pack Format — space-separated named-token binary serialization (`write`, `read`, `measure_size`). Tokens: `u8`–`u64`, `i8`–`i64`, `f32`, `f64`, `bool`, `str`, `cstr`, `pad`, `le`/`be` endian modifiers. |
+| `bin_pack.rs` | Lurek2D Binary Pack Format — space-separated named-token binary serialization (`write`, `read`, `measure_size`). Tokens: `u8`–`u64`, `i8`–`i64`, `f32`, `f64`, `bool`, `str`, `cstr`, `pad`, `le`/`be` endian modifiers. |
 | `byte_data.rs` | Contiguous byte buffer (`ByteData`) wrapping `Vec<u8>` with indexed get/set, string conversion, and mlua `UserData` implementation. |
 | `compress.rs` | Data compression and decompression using deflate, gzip, zlib (flate2) and LZ4 (lz4_flex). Configurable compression level 0–9. |
 | `dataview.rs` | Read-only windowed view (`DataView`) into a shared `Arc<Vec<u8>>` buffer. Typed little-endian accessors for u8 through f64 with bounds checking. |
@@ -34,6 +34,6 @@ pack/unpack systems — all exposed to Lua scripts through the `luna.data` names
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/data.md`](../../specs/data.md)
+→ [`docs/specs/data.md`](../../docs/specs/data.md)
 
-_Update both this file **and** `specs/data.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/data.md` whenever source files, public types, or Lua bindings change._

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.dataframe`                                     |
+| **Lua API**    | `lurek.dataframe`                                     |
 | **Source**      | `src/dataframe/`                                     |
 | **Rust Tests** | `tests/rust/unit/dataframe_tests.rs`                 |
 | **Lua Tests**  | `tests/lua/unit/test_dataframe.lua`                  |
@@ -27,7 +27,7 @@ This module is **not** for real-time per-frame simulation arrays — use `comput
 ## Architecture
 
 ```
-luna.dataframe.*  (Lua API — src/lua_api/dataframe_api.rs)
+lurek.dataframe.*  (Lua API — src/lua_api/dataframe_api.rs)
         |
         v
   +-----------------------------------------------------+
@@ -148,9 +148,9 @@ Column reference: string name or 1-based integer index.
 
 ## Lua API
 
-Exposed under `luna.dataframe.*` by `src/lua_api/dataframe_api.rs`. Two UserData types are registered: `LuaDataFrame` (wrapping `Rc<RefCell<DataFrame>>`) and `LuaDatabase` (wrapping `Rc<RefCell<Database>>`). Row indices in the Lua API are **1-based**.
+Exposed under `lurek.dataframe.*` by `src/lua_api/dataframe_api.rs`. Two UserData types are registered: `LuaDataFrame` (wrapping `Rc<RefCell<DataFrame>>`) and `LuaDatabase` (wrapping `Rc<RefCell<Database>>`). Row indices in the Lua API are **1-based**.
 
-### Module Functions (`luna.dataframe.*`)
+### Module Functions (`lurek.dataframe.*`)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -228,9 +228,9 @@ Exposed under `luna.dataframe.*` by `src/lua_api/dataframe_api.rs`. Two UserData
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create from inline data
-    local df = luna.dataframe.fromTable({
+    local df = lurek.dataframe.fromTable({
         { name = "Alice", score = 95, active = true },
         { name = "Bob",   score = 82, active = false },
         { name = "Carol", score = 91, active = true },
@@ -252,10 +252,10 @@ function luna.init()
 
     -- CSV round-trip
     local csv = df:toCSV()
-    local reloaded = luna.dataframe.fromCSV(csv)
+    local reloaded = lurek.dataframe.fromCSV(csv)
 
     -- Random data generation
-    local rng_df = luna.dataframe.random({
+    local rng_df = lurek.dataframe.random({
         { "id",    "id" },
         { "name",  "name" },
         { "email", "email" },
@@ -263,12 +263,12 @@ function luna.init()
     }, 100, 42)
 
     -- Database with SQL JOIN
-    local db = luna.dataframe.newDatabase()
-    db:addTable("users", luna.dataframe.fromTable({
+    local db = lurek.dataframe.newDatabase()
+    db:addTable("users", lurek.dataframe.fromTable({
         { id = 1, name = "Alice" },
         { id = 2, name = "Bob" },
     }))
-    db:addTable("scores", luna.dataframe.fromTable({
+    db:addTable("scores", lurek.dataframe.fromTable({
         { user_id = 1, points = 95 },
         { user_id = 2, points = 82 },
     }))
@@ -294,7 +294,7 @@ end
 | `math`      | Imports from | Leaf dependency (no direct type usage, but available per tier rules)   |
 | `compute`   | Related      | `compute` stores flat `NdArray` for per-frame math; `dataframe` stores named column tables for structured data |
 | `data`      | Related      | `data` handles raw binary buffers (ByteData); `dataframe` handles typed tabular data |
-| `lua_api`   | Imported by  | `src/lua_api/dataframe_api.rs` registers `luna.dataframe.*` with `LuaDataFrame` and `LuaDatabase` UserData |
+| `lua_api`   | Imported by  | `src/lua_api/dataframe_api.rs` registers `lurek.dataframe.*` with `LuaDataFrame` and `LuaDatabase` UserData |
 
 ## Notes
 
@@ -307,4 +307,4 @@ end
 - **No external dependencies**: All CSV/JSON/SQL parsing is hand-rolled — no `csv`, `serde_json`, or `sqlparser` crate dependencies.
 - **Thread safety**: `LuaDataFrame` and `LuaDatabase` use `Rc<RefCell<_>>` — not thread-safe. Each Lua VM gets its own instances.
 - **Performance**: `unique` and `group_by` use O(n^2) dedup (linear scan for membership). Adequate for game-scale data (thousands of rows); not suitable for millions of rows.
-- **Breaking change surface**: Renaming any `luna.dataframe.*` function or changing `CellValue` variants will break Lua game scripts. The `toTable`/`fromTable` round-trip is the most commonly used pattern.
+- **Breaking change surface**: Renaming any `lurek.dataframe.*` function or changing `CellValue` variants will break Lua game scripts. The `toTable`/`fromTable` round-trip is the most commonly used pattern.

@@ -1,13 +1,13 @@
 //! Save/load slot system with collectors, schema versioning, dirty tracking,
 //! and auto-save.
 //!
-//! This module is part of Luna2D's `savegame` subsystem and provides the implementation
+//! This module is part of Lurek2D's `savegame` subsystem and provides the implementation
 //! details for save data-related operations and data management.
 //! Key types exported from this module: `SlotMeta`, `SaveManager`, `SaveValue`.
 //! Primary functions: `new()`, `register()`, `unregister()`, `registered_names()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 use crate::engine::log_messages::{SV01_SAVE_INIT};

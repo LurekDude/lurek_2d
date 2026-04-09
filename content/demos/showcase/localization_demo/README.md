@@ -1,20 +1,20 @@
 # Localization Demo
 
-Demonstrates `luna.localization`: multi-language strings, interpolation, pluralization, and on-the-fly language switching.
+Demonstrates `lurek.localization`: multi-language strings, interpolation, pluralization, and on-the-fly language switching.
 
 ## What It Demonstrates
 
-- `luna.localization.load()` — register translation tables
-- `luna.localization.t()` — translate a key to the current language
+- `lurek.localization.load()` — register translation tables
+- `lurek.localization.t()` — translate a key to the current language
 - Interpolation: `t("greeting", {name = "Alice"})` → `"Hello, Alice!"`
 - Pluralization: select form based on count
-- `luna.localization.setLanguage()` — switch language at runtime
+- `lurek.localization.setLanguage()` — switch language at runtime
 - Fallback: default to a base language when a key is missing
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/localization_demo
+cargo run -- content/demos/localization_demo
 ```
 
 ## Controls

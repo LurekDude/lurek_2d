@@ -3,7 +3,7 @@
 //! Covers: `TCell`, `Terminal`, `WidgetBase`, `WidgetKind`, `Widget`,
 //! and `BorderStyle`. All tests are purely in-memory — no GPU, no window.
 
-use luna2d::terminal::{BorderStyle, TCell, Terminal, Widget, WidgetBase, WidgetKind};
+use lurek2d::terminal::{BorderStyle, TCell, Terminal, Widget, WidgetBase, WidgetKind};
 
 fn assert_color_near(actual: [f32; 4], expected: [f32; 4]) {
     for (index, (actual, expected)) in actual.iter().zip(expected.iter()).enumerate() {

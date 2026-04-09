@@ -1,9 +1,9 @@
 ---
 name: dev-debugging
-description: "Load this skill when diagnosing runtime bugs, crashes, or unexpected behavior in Luna2D. It owns diagnostic techniques, error tracing, and root cause analysis patterns. Skip it for feature implementation or test writing."
+description: "Load this skill when diagnosing runtime bugs, crashes, or unexpected behavior in Lurek2D. It owns diagnostic techniques, error tracing, and root cause analysis patterns. Skip it for feature implementation or test writing."
 ---
 
-# Development Debugging — Luna2D Engine
+# Development Debugging — Lurek2D Engine
 
 ## Load When
 
@@ -40,7 +40,7 @@ description: "Load this skill when diagnosing runtime bugs, crashes, or unexpect
 - **Data flow trace**: Follow the value from Lua callback → SharedState → processing → output
 - **Minimal reproduction**: Reduce to the smallest script/state that triggers the bug
 - **Log strategically**: Use `log::debug!` or `log::trace!` for temporary diagnostic output
-- **Check callback order**: Bugs often come from state mutation during `luna.draw()` (should be read-only)
+- **Check callback order**: Bugs often come from state mutation during `lurek.draw()` (should be read-only)
 - **Type boundary**: Most bugs occur at Lua↔Rust type conversion boundaries
 - **Never guess**: Follow the code path, don't assume the cause
 
@@ -51,15 +51,15 @@ description: "Load this skill when diagnosing runtime bugs, crashes, or unexpect
 Set these before launching to get more diagnostic output:
 
 ```powershell
-# Show all Luna2D log output (info + debug + trace)
-$env:RUST_LOG = "luna2d=debug"
-cargo run -- demos/hello_world
+# Show all Lurek2D log output (info + debug + trace)
+$env:RUST_LOG = "lurek2d=debug"
+cargo run -- content/demos/hello_world
 
 # Show only engine startup/shutdown lifecycle events
-$env:RUST_LOG = "luna2d=info"
+$env:RUST_LOG = "lurek2d=info"
 
 # Show wgpu validation errors (GPU-related crashes)
-$env:RUST_LOG = "wgpu_core=warn,wgpu_hal=warn,luna2d=debug"
+$env:RUST_LOG = "wgpu_core=warn,wgpu_hal=warn,lurek2d=debug"
 
 # Full panic backtrace (file + line for every frame)
 $env:RUST_BACKTRACE = "1"
@@ -83,12 +83,12 @@ $env:WGPU_ADAPTER_NAME = "Intel"   # prefer Intel iGPU when multiple adapters pr
 |---------|-----------|-----|
 | `already borrowed: BorrowMutError` | Two closures both `borrow_mut()` SharedState simultaneously | Restructure: do not hold a borrow across a Lua callback |
 | `already borrowed: BorrowError` during borrow_mut | SharedState is borrowed immutably when mutable borrow requested | End the immutable borrow before the mutable one begins |
-| `LuaError: expected table, got nil` | `luna.someModule` is nil — module not registered | Check `lua_api/mod.rs` — module may not be in the `register()` call chain |
+| `LuaError: expected table, got nil` | `lurek.someModule` is nil — module not registered | Check `lua_api/mod.rs` — module may not be in the `register()` call chain |
 | `LuaError: attempt to index a nil value` | Lua variable not initialised before use | Trace back where the variable should have been set |
 | `SlotMap: key used after removal` | Stale `TextureKey`/`FontKey`/etc. used after `release()` | Check resource lifecycle; never cache keys beyond the resource's lifetime |
 | `wgpu ERROR: validation error` | Invalid GPU state (bind group mismatch, incorrect buffer size) | Set `RUST_LOG=wgpu_core=warn` and read the full validation message |
 | `C stack overflow` | LuaJIT stack depth exceeded ~800 frames | Flatten recursive algorithms or increase stack size via `jit.opt.start` |
-| Blank window, no errors | `luna.draw()` never called or all draw calls outside canvas scope | Add `print("draw called")` to confirm callback fires |
+| Blank window, no errors | `lurek.draw()` never called or all draw calls outside canvas scope | Add `print("draw called")` to confirm callback fires |
 | Audio device not found | No audio hardware or wrong device selected | Engine falls back to headless audio; check `log::warn` output |
 
 ---
@@ -99,10 +99,10 @@ $env:WGPU_ADAPTER_NAME = "Intel"   # prefer Intel iGPU when multiple adapters pr
 
 ```lua
 -- main.lua: catch all unhandled errors before the engine error screen
-function luna.errorhandler(msg)
+function lurek.errorhandler(msg)
     -- Log to file + console before showing error screen
     print("UNHANDLED ERROR: " .. tostring(msg))
-    luna.fs.append("errors.log", msg .. "\n")
+    lurek.fs.append("errors.log", msg .. "\n")
     return msg   -- return the message to display on error screen
 end
 ```
@@ -112,7 +112,7 @@ end
 ```lua
 -- Wrap risky code in pcall to handle errors without crashing
 local ok, err = pcall(function()
-    luna.gfx.newImage("missing.png")
+    lurek.gfx.newImage("missing.png")
 end)
 if not ok then
     print("Failed to load image: " .. tostring(err))
@@ -172,7 +172,7 @@ lua.call_function("callback", val)?;   // safe — no active borrow
 // Temporary diagnostic: add to a hot path to trace data flow
 log::debug!("[DEBUG] value at {} = {:?}", line!(), my_value);
 
-// Remove before commit. Use RUST_LOG=luna2d=debug to see debug! output.
+// Remove before commit. Use RUST_LOG=lurek2d=debug to see debug! output.
 // Never leave log::debug! in production hot paths (per-frame).
 ```
 

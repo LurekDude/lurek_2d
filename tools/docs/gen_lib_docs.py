@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""gen_lib_docs.py — Generate Markdown API documentation from Luna2D library Lua files.
+"""gen_lib_docs.py — Generate Markdown API documentation from Lurek2D library Lua files.
 
-Scans library/**/*.lua for LDoc-style docstrings and produces one Markdown
+Scans content/library/**/*.lua for LDoc-style docstrings and produces one Markdown
 file per library module under docs/API/libs/.
 
 LDoc tags recognised:
@@ -32,7 +32,7 @@ from typing import Optional
 REPO_ROOT   = Path(__file__).resolve().parent.parent.parent
 LIB_DIR     = REPO_ROOT / "library"
 OUT_DIR     = REPO_ROOT / "docs" / "API" / "libs"
-WIKI_DIR    = REPO_ROOT / "wiki"
+WIKI_DIR    = REPO_ROOT / "docs" / "wiki"
 
 # ── LDoc parser ───────────────────────────────────────────────────────────────
 
@@ -201,7 +201,7 @@ def render_module_md(module_name: str, info: dict) -> str:
 # ── Module scanner ────────────────────────────────────────────────────────────
 
 def scan_library() -> dict:
-    """Walk library/ and return { module_name: (path, parsed_info) }."""
+    """Walk content/library/ and return { module_name: (path, parsed_info) }."""
     results = {}
     if not LIB_DIR.exists():
         return results
@@ -226,10 +226,10 @@ def generate_all(modules: dict, check_only: bool = False) -> int:
         fn_count = len(info["functions"])
         if check_only:
             if fn_count == 0:
-                print(f"MISSING  library/{module_name}/init.lua — no documented functions")
+                print(f"MISSING  content/library/{module_name}/init.lua — no documented functions")
                 errors += 1
             else:
-                print(f"OK       library/{module_name}  ({fn_count} functions)")
+                print(f"OK       content/library/{module_name}  ({fn_count} functions)")
             continue
 
         md = render_module_md(module_name, info)
@@ -264,7 +264,7 @@ def main() -> int:
 
     if args.module:
         if args.module not in modules:
-            print(f"Module '{args.module}' not found in library/", file=sys.stderr)
+            print(f"Module '{args.module}' not found in content/library/", file=sys.stderr)
             return 1
         modules = {args.module: modules[args.module]}
 

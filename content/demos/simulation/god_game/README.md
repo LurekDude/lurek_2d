@@ -4,19 +4,19 @@ An ecosystem god-game where you watch over tribes, predators, and prey on a proc
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — tile world rendering with terrain-color lookup table
-- `luna.mouse.getPosition()` / `luna.mousepressed()` — miracle targeting and temple placement
-- `luna.keyboard.wasPressed()` — miracle selection cycling
-- `luna.gfx.setColor()` — day/night ambient blending and entity coloring
-- `luna.gfx.print()` — faith counter, day count, and population HUD
-- `luna.gfx.setBackgroundColor()` — base sky color
+- `lurek.gfx.rectangle()` — tile world rendering with terrain-color lookup table
+- `lurek.mouse.getPosition()` / `lurek.mousepressed()` — miracle targeting and temple placement
+- `lurek.keyboard.wasPressed()` — miracle selection cycling
+- `lurek.gfx.setColor()` — day/night ambient blending and entity coloring
+- `lurek.gfx.print()` — faith counter, day count, and population HUD
+- `lurek.gfx.setBackgroundColor()` — base sky color
 - Entity AI — tribe hunger/HP state machine, predator hunt-nearest logic, prey reproduce/wander
 - Day/night cycle — 30-second oscillation gate that modifies entity movement speeds
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/god_game
+cargo run -- content/demos/god_game
 ```
 
 ## Controls

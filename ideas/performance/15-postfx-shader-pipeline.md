@@ -130,7 +130,7 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
 
 **Luna API**:
 ```lua
-luna.postfx.apply({
+lurek.postfx.apply({
     bloom = { threshold = 0.8, intensity = 1.5, radius = 4 },
     color_lut = "grading/cinematic_warm.png",
     vignette = { strength = 0.5, radius = 0.8 },

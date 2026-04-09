@@ -14,7 +14,7 @@ A classic fixed-path tower defense. Place towers beside a winding waypoint path 
 ## How to Run
 
 ```powershell
-cargo run -- demos/tower_defense
+cargo run -- content/demos/tower_defense
 ```
 
 ## Controls

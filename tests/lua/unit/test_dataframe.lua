@@ -1,46 +1,46 @@
--- Luna2D DataFrame Tests
--- Tests for luna.dataframe tabular data API
+-- Lurek2D DataFrame Tests
+-- Tests for lurek.dataframe tabular data API
 
 -- Helper to build a simple test DataFrame
 local function make_test_df()
     local csv = "name,age,score\nAlice,30,90\nBob,25,85\nCharlie,35,92"
-    return luna.dataframe.fromCSV(csv)
+    return lurek.dataframe.fromCSV(csv)
 end
 
 -- =========================================================================
 -- 1. Module existence
 -- =========================================================================
-describe("luna.dataframe module exists", function()
-    it("luna.dataframe is a table", function()
-        expect_type("table", luna.dataframe)
+describe("lurek.dataframe module exists", function()
+    it("lurek.dataframe is a table", function()
+        expect_type("table", lurek.dataframe)
     end)
 
     it("has newDataFrame factory", function()
-        expect_type("function", luna.dataframe.newDataFrame)
+        expect_type("function", lurek.dataframe.newDataFrame)
     end)
 
     it("has newDatabase factory", function()
-        expect_type("function", luna.dataframe.newDatabase)
+        expect_type("function", lurek.dataframe.newDatabase)
     end)
 
     it("has fromTable factory", function()
-        expect_type("function", luna.dataframe.fromTable)
+        expect_type("function", lurek.dataframe.fromTable)
     end)
 
     it("has fromCSV factory", function()
-        expect_type("function", luna.dataframe.fromCSV)
+        expect_type("function", lurek.dataframe.fromCSV)
     end)
 
     it("has fromJSON factory", function()
-        expect_type("function", luna.dataframe.fromJSON)
+        expect_type("function", lurek.dataframe.fromJSON)
     end)
 
     it("has fromBinary factory", function()
-        expect_type("function", luna.dataframe.fromBinary)
+        expect_type("function", lurek.dataframe.fromBinary)
     end)
 
     it("has random factory", function()
-        expect_type("function", luna.dataframe.random)
+        expect_type("function", lurek.dataframe.random)
     end)
 end)
 
@@ -49,7 +49,7 @@ end)
 -- =========================================================================
 describe("construction", function()
     it("newDataFrame creates empty DataFrame", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         expect_equal(0, df:nrows())
         expect_equal(0, df:ncols())
     end)
@@ -81,7 +81,7 @@ describe("construction", function()
     end)
 
     it("fromTable creates DataFrame from row tables", function()
-        local df = luna.dataframe.fromTable({
+        local df = lurek.dataframe.fromTable({
             { x = 1, y = 2 },
             { x = 3, y = 4 },
         })
@@ -91,28 +91,28 @@ describe("construction", function()
 
     it("fromJSON creates DataFrame", function()
         local json = '[{"a":1,"b":"hello"},{"a":2,"b":"world"}]'
-        local df = luna.dataframe.fromJSON(json)
+        local df = lurek.dataframe.fromJSON(json)
         expect_equal(2, df:nrows())
     end)
 
     it("random creates DataFrame with specified rows", function()
         local defs = { {"x", "float"}, {"y", "float"} }
-        local df = luna.dataframe.random(defs, 10, 42)
+        local df = lurek.dataframe.random(defs, 10, 42)
         expect_equal(10, df:nrows())
         expect_equal(2, df:ncols())
     end)
 
     it("random with seed is deterministic", function()
         local defs = { {"val", "float"} }
-        local df1 = luna.dataframe.random(defs, 5, 123)
-        local df2 = luna.dataframe.random(defs, 5, 123)
+        local df1 = lurek.dataframe.random(defs, 5, 123)
+        local df2 = lurek.dataframe.random(defs, 5, 123)
         for i = 1, 5 do
             expect_near(df1:getValue(i, "val"), df2:getValue(i, "val"), 1e-5)
         end
     end)
 
     it("fromCSV with empty body creates empty DataFrame", function()
-        local df = luna.dataframe.fromCSV("x,y")
+        local df = lurek.dataframe.fromCSV("x,y")
         expect_equal(0, df:nrows())
         expect_equal(2, df:ncols())
     end)
@@ -452,14 +452,14 @@ end)
 describe("unique", function()
     it("unique returns distinct values", function()
         local csv = "color\nred\nblue\nred\ngreen\nblue"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local u = df:unique("color")
         expect_equal(3, #u)
     end)
 
     it("unique on numeric column", function()
         local csv = "x\n1\n2\n1\n3\n2"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local u = df:unique("x")
         expect_equal(3, #u)
     end)
@@ -471,14 +471,14 @@ end)
 describe("groupBy", function()
     it("groupBy returns table of DataFrames", function()
         local csv = "dept,name\nHR,Alice\nIT,Bob\nHR,Charlie\nIT,Dave"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local groups = df:groupBy("dept")
         expect_type("table", groups)
     end)
 
     it("groupBy subsets have correct row counts", function()
         local csv = "dept,name\nHR,Alice\nIT,Bob\nHR,Charlie\nIT,Dave"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local groups = df:groupBy("dept")
         local count = 0
         for _, sub in pairs(groups) do
@@ -489,7 +489,7 @@ describe("groupBy", function()
 
     it("groupBy preserves column structure", function()
         local csv = "dept,name\nHR,Alice\nIT,Bob"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local groups = df:groupBy("dept")
         for _, sub in pairs(groups) do
             expect_equal(2, sub:ncols())
@@ -504,8 +504,8 @@ describe("join", function()
     it("inner join matches on shared column values", function()
         local csv1 = "id,name\n1,Alice\n2,Bob\n3,Charlie"
         local csv2 = "id,dept\n1,HR\n2,IT\n4,Finance"
-        local df1 = luna.dataframe.fromCSV(csv1)
-        local df2 = luna.dataframe.fromCSV(csv2)
+        local df1 = lurek.dataframe.fromCSV(csv1)
+        local df2 = lurek.dataframe.fromCSV(csv2)
         local result = df1:join(df2, "id", "id", "inner")
         expect_equal(2, result:nrows()) -- only ids 1 and 2 match
     end)
@@ -513,8 +513,8 @@ describe("join", function()
     it("left join keeps all left rows", function()
         local csv1 = "id,name\n1,Alice\n2,Bob\n3,Charlie"
         local csv2 = "id,dept\n1,HR\n2,IT\n4,Finance"
-        local df1 = luna.dataframe.fromCSV(csv1)
-        local df2 = luna.dataframe.fromCSV(csv2)
+        local df1 = lurek.dataframe.fromCSV(csv1)
+        local df2 = lurek.dataframe.fromCSV(csv2)
         local result = df1:join(df2, "id", "id", "left")
         expect_equal(3, result:nrows()) -- all 3 left rows
     end)
@@ -522,8 +522,8 @@ describe("join", function()
     it("join defaults to inner", function()
         local csv1 = "id,name\n1,Alice\n2,Bob"
         local csv2 = "id,dept\n1,HR\n3,Finance"
-        local df1 = luna.dataframe.fromCSV(csv1)
-        local df2 = luna.dataframe.fromCSV(csv2)
+        local df1 = lurek.dataframe.fromCSV(csv1)
+        local df2 = lurek.dataframe.fromCSV(csv2)
         local result = df1:join(df2, "id", "id")
         expect_equal(1, result:nrows()) -- only id 1 matches
     end)
@@ -534,15 +534,15 @@ end)
 -- =========================================================================
 describe("merge", function()
     it("merge appends rows in-place", function()
-        local df1 = luna.dataframe.fromCSV("x\n1\n2")
-        local df2 = luna.dataframe.fromCSV("x\n3\n4")
+        local df1 = lurek.dataframe.fromCSV("x\n1\n2")
+        local df2 = lurek.dataframe.fromCSV("x\n3\n4")
         df1:merge(df2)
         expect_equal(4, df1:nrows())
     end)
 
     it("merge preserves original data", function()
-        local df1 = luna.dataframe.fromCSV("x\n1\n2")
-        local df2 = luna.dataframe.fromCSV("x\n3\n4")
+        local df1 = lurek.dataframe.fromCSV("x\n1\n2")
+        local df2 = lurek.dataframe.fromCSV("x\n3\n4")
         df1:merge(df2)
         expect_near(1, df1:getValue(1, "x"), 1e-5)
         expect_near(2, df1:getValue(2, "x"), 1e-5)
@@ -557,7 +557,7 @@ end)
 describe("countBy", function()
     it("countBy returns DataFrame with value and count", function()
         local csv = "color\nred\nblue\nred\ngreen\nblue"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local result = df:countBy("color")
         expect_equal(3, result:nrows()) -- 3 unique colors
         expect_equal(2, result:ncols()) -- value + count
@@ -565,7 +565,7 @@ describe("countBy", function()
 
     it("countBy counts are correct", function()
         local csv = "color\nred\nblue\nred\nred\nblue"
-        local df = luna.dataframe.fromCSV(csv)
+        local df = lurek.dataframe.fromCSV(csv)
         local result = df:countBy("color")
         -- Sum of all counts should equal total rows
         local total = 0
@@ -581,7 +581,7 @@ end)
 -- =========================================================================
 describe("dropNil", function()
     it("dropNil removes rows with nil in column", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("x")
         df:addRow({ x = 1 })
         df:addRow() -- nil
@@ -591,7 +591,7 @@ describe("dropNil", function()
     end)
 
     it("dropNil preserves non-nil rows", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("x")
         df:addRow({ x = 10 })
         df:addRow({ x = 20 })
@@ -706,7 +706,7 @@ end)
 -- =========================================================================
 describe("fillNil", function()
     it("fillNil replaces nil values", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("x")
         df:addRow({ x = 1 })
         df:addRow() -- nil
@@ -716,7 +716,7 @@ describe("fillNil", function()
     end)
 
     it("fillNil does not change non-nil values", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("x")
         df:addRow({ x = 5 })
         df:addRow() -- nil
@@ -725,7 +725,7 @@ describe("fillNil", function()
     end)
 
     it("fillNil with string value", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("name")
         df:addRow() -- nil
         df:fillNil("name", "unknown")
@@ -738,7 +738,7 @@ end)
 -- =========================================================================
 describe("apply", function()
     it("apply transforms column values", function()
-        local df = luna.dataframe.fromCSV("x\n1\n2\n3")
+        local df = lurek.dataframe.fromCSV("x\n1\n2\n3")
         df:apply("x", function(v) return v * 2 end)
         expect_near(2, df:getValue(1, "x"), 1e-5)
         expect_near(4, df:getValue(2, "x"), 1e-5)
@@ -746,14 +746,14 @@ describe("apply", function()
     end)
 
     it("apply can change type", function()
-        local df = luna.dataframe.fromCSV("x\n1\n2\n3")
+        local df = lurek.dataframe.fromCSV("x\n1\n2\n3")
         df:apply("x", function(v) return "val_" .. tostring(v) end)
         -- tostring of a number may vary; just check it's now a string
         expect_type("string", df:getValue(1, "x"))
     end)
 
     it("apply with identity preserves values", function()
-        local df = luna.dataframe.fromCSV("x\n10\n20")
+        local df = lurek.dataframe.fromCSV("x\n10\n20")
         df:apply("x", function(v) return v end)
         expect_near(10, df:getValue(1, "x"), 1e-5)
         expect_near(20, df:getValue(2, "x"), 1e-5)
@@ -774,7 +774,7 @@ describe("serialization", function()
     it("toCSV roundtrip preserves data", function()
         local df = make_test_df()
         local csv = df:toCSV()
-        local df2 = luna.dataframe.fromCSV(csv)
+        local df2 = lurek.dataframe.fromCSV(csv)
         expect_equal(df:nrows(), df2:nrows())
         expect_equal(df:ncols(), df2:ncols())
     end)
@@ -789,7 +789,7 @@ describe("serialization", function()
     it("toJSON roundtrip preserves row count", function()
         local df = make_test_df()
         local json = df:toJSON()
-        local df2 = luna.dataframe.fromJSON(json)
+        local df2 = lurek.dataframe.fromJSON(json)
         expect_equal(df:nrows(), df2:nrows())
     end)
 
@@ -797,7 +797,7 @@ describe("serialization", function()
         local df = make_test_df()
         local bin = df:toBinary()
         expect_type("string", bin)
-        local df2 = luna.dataframe.fromBinary(bin)
+        local df2 = lurek.dataframe.fromBinary(bin)
         expect_equal(df:nrows(), df2:nrows())
         expect_equal(df:ncols(), df2:ncols())
         -- Verify data integrity
@@ -915,12 +915,12 @@ end)
 -- =========================================================================
 describe("Database", function()
     it("newDatabase creates empty database", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_equal(0, db:tableCount())
     end)
 
     it("addTable and getTable work", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         local df = make_test_df()
         db:addTable("users", df)
         local retrieved = db:getTable("users")
@@ -929,30 +929,30 @@ describe("Database", function()
     end)
 
     it("getTable returns nil for missing table", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_nil(db:getTable("nonexistent"))
     end)
 
     it("hasTable returns true for existing table", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("data", make_test_df())
         expect_true(db:hasTable("data"))
     end)
 
     it("hasTable returns false for missing table", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_false(db:hasTable("nope"))
     end)
 
     it("removeTable removes the table", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("data", make_test_df())
         db:removeTable("data")
         expect_false(db:hasTable("data"))
     end)
 
     it("listTables returns table names", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("alpha", make_test_df())
         db:addTable("beta", make_test_df())
         local names = db:listTables()
@@ -960,7 +960,7 @@ describe("Database", function()
     end)
 
     it("tableCount reflects additions", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_equal(0, db:tableCount())
         db:addTable("t1", make_test_df())
         expect_equal(1, db:tableCount())
@@ -969,7 +969,7 @@ describe("Database", function()
     end)
 
     it("clear removes all tables", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("t1", make_test_df())
         db:addTable("t2", make_test_df())
         db:clear()
@@ -977,9 +977,9 @@ describe("Database", function()
     end)
 
     it("merge combines databases", function()
-        local db1 = luna.dataframe.newDatabase()
+        local db1 = lurek.dataframe.newDatabase()
         db1:addTable("a", make_test_df())
-        local db2 = luna.dataframe.newDatabase()
+        local db2 = lurek.dataframe.newDatabase()
         db2:addTable("b", make_test_df())
         db1:merge(db2)
         expect_true(db1:hasTable("a"))
@@ -987,7 +987,7 @@ describe("Database", function()
     end)
 
     it("toJSON returns non-empty string", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("t1", make_test_df())
         local json = db:toJSON()
         expect_type("string", json)
@@ -995,17 +995,17 @@ describe("Database", function()
     end)
 
     it("Database type() returns Database", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_equal("Database", db:type())
     end)
 
     it("Database typeOf Database is true", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_true(db:typeOf("Database"))
     end)
 
     it("Database typeOf wrong type is false", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         expect_false(db:typeOf("DataFrame"))
     end)
 end)
@@ -1015,21 +1015,21 @@ end)
 -- =========================================================================
 describe("Database SQL", function()
     it("query on single table", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("users", make_test_df())
         local result = db:query("SELECT * FROM users")
         expect_equal(3, result:nrows())
     end)
 
     it("query with WHERE clause", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("users", make_test_df())
         local result = db:query("SELECT * FROM users WHERE age > 28")
         expect_true(result:nrows() > 0)
     end)
 
     it("query selecting specific columns", function()
-        local db = luna.dataframe.newDatabase()
+        local db = lurek.dataframe.newDatabase()
         db:addTable("users", make_test_df())
         local result = db:query("SELECT name FROM users")
         expect_equal(1, result:ncols())

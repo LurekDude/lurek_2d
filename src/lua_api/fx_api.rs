@@ -104,7 +104,7 @@ impl LuaUserData for LuaPostFxEffect {
             Ok(this.inner.borrow().get_type_name())
         });
 
-        // -- type -- (Luna2D typeOf protocol)
+        // -- type -- (Lurek2D typeOf protocol)
         methods.add_method("type", |_, _, ()| Ok("PostFxEffect"));
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "PostFxEffect" || name == "Object"));
 
@@ -1076,7 +1076,7 @@ impl LuaUserData for LuaOverlay {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.postfx` API table with the Lua VM.
+/// Registers the `lurek.postfx` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -1244,7 +1244,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     luna.set("postfx", tbl)?;
 
-    // Also expose luna.overlay as a dedicated namespace for the Overlay constructor.
+    // Also expose lurek.overlay as a dedicated namespace for the Overlay constructor.
     let overlay_tbl = lua.create_table()?;
     // -- newOverlay --
     /// Creates a new screen overlay controller for weather, flash, shake, and fade effects.

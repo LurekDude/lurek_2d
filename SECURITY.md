@@ -23,9 +23,9 @@ Please include as much of the following as practical:
 
 ## Supported Scope
 
-This policy applies to the Luna2D source repository and release artifacts produced from it.
+This policy applies to the Lurek2D source repository and release artifacts produced from it.
 
-Luna2D is a desktop-only 2D engine. Security support is handled on a best-effort basis for:
+Lurek2D is a desktop-only 2D engine. Security support is handled on a best-effort basis for:
 
 - The current `main` branch
 - The latest published release
@@ -45,8 +45,8 @@ In-scope areas include:
 The following are generally out of scope for this repository's security process:
 
 - iOS, Android, WASM, browser, or other unsupported targets
-- Hosted service, cloud backend, telemetry, or server-side issues because Luna2D does not provide those services
-- Vulnerabilities in third-party games, scripts, assets, or mods that are not reproducible in Luna2D itself
+- Hosted service, cloud backend, telemetry, or server-side issues because Lurek2D does not provide those services
+- Vulnerabilities in third-party games, scripts, assets, or mods that are not reproducible in Lurek2D itself
 - Bugs that only let a local script hang or crash its own process without escaping the Lua sandbox or accessing data outside allowed boundaries
 - Feature requests, hardening ideas without a concrete vulnerability, or purely theoretical reports without a plausible attack path
 

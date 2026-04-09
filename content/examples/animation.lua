@@ -1,13 +1,11 @@
 -- examples/animation.lua
--- luna.animation � Sprite animation: frame pools, named clips, speed control, events.
--- All luna.animation API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.animation � Sprite animation: frame pools, named clips, speed control, events.
 
 -- �� Construction �������������������������������������������������������������
 
 -- Create a new, empty animation controller. Clips and frames are added
 -- manually before playback begins.
-local anim = luna.animation.new()
+local anim = lurek.animation.new()
 
 -- �� Frame Pools ���������������������������������������������������������������
 
@@ -41,7 +39,7 @@ anim:addClip("jump", {8, 9, 10}, 10, false)    -- plays once
 
 -- addClipFromGrid(name, tex_w, tex_h, frame_w, frame_h, start, count, fps, looping)
 -- Convenience form that slices and registers in one call.
-local anim2 = luna.animation.new()
+local anim2 = lurek.animation.new()
 anim2:addClipFromGrid("run", 512, 64, 64, 64, 0, 8, 12, true)
 
 -- getClipCount() � integer
@@ -60,7 +58,7 @@ anim:resume()
 anim:stop()
 
 -- update(dt) � call every frame to advance animation time.
--- Typically called in luna.process(dt).
+-- Typically called in lurek.process(dt).
 anim:update(1/60)
 
 -- �� State Queries �������������������������������������������������������������
@@ -94,11 +92,11 @@ anim:setSpeed(1.0)   -- restore normal
 
 -- getQuad() � {x, y, w, h} or nil
 -- Returns the source rectangle for the current animation frame.
--- Use this to pass the correct UV region to luna.gfx.draw().
+-- Use this to pass the correct UV region to lurek.gfx.draw().
 local quad = anim:getQuad()
 if quad then
     -- quad.x, quad.y, quad.w, quad.h define the source crop on the sprite sheet
-    -- luna.gfx.drawRegion(img, quad.x, quad.y, quad.w, quad.h, dest_x, dest_y)
+lurek.gfx.drawRegion(img, quad.x, quad.y, quad.w, quad.h, dest_x, dest_y)
 end
 
 -- �� Poll Events ���������������������������������������������������������������
@@ -106,8 +104,8 @@ end
 -- pollEvents() � table of event tables
 -- Drains all pending animation events accumulated since the last poll.
 -- Event types:
---   "clip_end"  � the current clip reached its last frame (non-looping)
---   "loop_end"  � a looping clip completed one full cycle
+"clip_end"  � the current clip reached its last frame (non-looping)
+"loop_end"  � a looping clip completed one full cycle
 -- Each event table may also contain a "frame" field with the 0-based index.
 local events = anim:pollEvents()
 for _, ev in ipairs(events) do
@@ -119,12 +117,12 @@ for _, ev in ipairs(events) do
     end
 end
 
--- �� Sprite Sheet Pattern (typical luna.process/luna.render usage) ����������������
+-- �� Sprite Sheet Pattern (typical lurek.process/lurek.render usage) ����������������
 
 --[[
-function luna.init()
-    img = luna.gfx.newImage("character.png")
-    anim = luna.animation.new()
+function lurek.init()
+    img = lurek.gfx.newImage("character.png")
+    anim = lurek.animation.new()
     anim:addClipFromGrid("idle", 512, 64, 64, 64,  0, 4, 6, true)
     anim:addClipFromGrid("run",  512, 64, 64, 64,  4, 6, 12, true)
     anim:addClipFromGrid("jump", 512, 64, 64, 64, 10, 4, 10, false)
@@ -132,7 +130,7 @@ function luna.init()
     x, y = 100, 100
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     anim:update(dt)
 
     local events = anim:pollEvents()
@@ -143,7 +141,7 @@ function luna.process(dt)
     end
 
     -- Transition based on input
-    if luna.keyboard.isDown("right") then
+    if lurek.keyboard.isDown("right") then
         if anim:getClip() ~= "run" then anim:play("run") end
     else
         if anim:getClip() ~= "idle" and anim:getClip() ~= "jump" then
@@ -152,10 +150,10 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     local q = anim:getQuad()
     if q then
-        luna.gfx.drawRegion(img, q.x, q.y, q.w, q.h, x, y)
+        lurek.gfx.drawRegion(img, q.x, q.y, q.w, q.h, x, y)
     end
 end
 ]]

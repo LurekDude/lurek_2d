@@ -1,6 +1,6 @@
 -- Maze Defense — Tower Defense with Player-Built Mazing
 -- Place walls to redirect enemies, build towers to shoot them
--- Run with: cargo run -- demos/strategy/maze_defense
+-- Run with: cargo run -- content/demos/strategy/maze_defense
 
 local GRID_W, GRID_H = 20, 15
 local CELL = 38
@@ -99,7 +99,7 @@ local function startWave()
     waveActive = true
 end
 
-function luna.init()
+function lurek.init()
     for y = 1, GRID_H do
         grid[y] = {}
         for x = 1, GRID_W do
@@ -110,7 +110,7 @@ function luna.init()
     startWave()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
 
     -- Spawn enemies
@@ -168,7 +168,7 @@ function luna.process(dt)
                 if closest then
                     local fireKey = x .. "_" .. y
                     if not grid.lastFire then grid.lastFire = {} end
-                    local now = luna.time.getTime()
+                    local now = lurek.time.getTime()
                     if not grid.lastFire[fireKey] or now - grid.lastFire[fireKey] > 0.8 then
                         grid.lastFire[fireKey] = now
                         local dx = closest.x - tx
@@ -220,10 +220,10 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "1" then buildMode = "wall" end
     if key == "2" then buildMode = "tower" end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
     if gameOver and key == "r" then
         gameOver = false
         lives = 20
@@ -232,11 +232,11 @@ function luna.keypressed(key)
         wave = 1
         enemies = {}
         bullets = {}
-        luna.signal.restart()
+        lurek.signal.restart()
     end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if gameOver then return end
     local gx = math.floor((mx - OX) / CELL) + 1
     local gy = math.floor((my - OY) / CELL) + 1
@@ -279,8 +279,8 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.08, 0.1, 0.08)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.08, 0.1, 0.08)
 
     -- Grid
     for y = 1, GRID_H do
@@ -288,38 +288,38 @@ function luna.render()
             local px = OX + (x - 1) * CELL
             local py = OY + (y - 1) * CELL
             if grid[y][x] == 0 then
-                luna.gfx.setColor(0.15, 0.18, 0.15, 1)
+                lurek.gfx.setColor(0.15, 0.18, 0.15, 1)
             elseif grid[y][x] == 1 then
-                luna.gfx.setColor(0.4, 0.35, 0.25, 1)
+                lurek.gfx.setColor(0.4, 0.35, 0.25, 1)
             elseif grid[y][x] == 2 then
-                luna.gfx.setColor(0.2, 0.3, 0.6, 1)
+                lurek.gfx.setColor(0.2, 0.3, 0.6, 1)
             end
-            luna.gfx.rectangle("fill", px, py, CELL - 1, CELL - 1)
+            lurek.gfx.rectangle("fill", px, py, CELL - 1, CELL - 1)
         end
     end
 
     -- Spawn and exit markers
-    luna.gfx.setColor(0, 1, 0, 1)
-    luna.gfx.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
-    luna.gfx.setColor(1, 0, 0, 1)
-    luna.gfx.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
+    lurek.gfx.setColor(0, 1, 0, 1)
+    lurek.gfx.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
+    lurek.gfx.setColor(1, 0, 0, 1)
+    lurek.gfx.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
 
     -- Path visualization
-    luna.gfx.setColor(0.3, 0.8, 0.3, 0.3)
+    lurek.gfx.setColor(0.3, 0.8, 0.3, 0.3)
     for _, p in ipairs(path) do
         if grid[p[2]][p[1]] == 0 then
-            luna.gfx.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
+            lurek.gfx.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
         end
     end
 
     -- Tower range indicators
-    luna.gfx.setColor(0.3, 0.4, 0.8, 0.15)
+    lurek.gfx.setColor(0.3, 0.4, 0.8, 0.15)
     for y = 1, GRID_H do
         for x = 1, GRID_W do
             if grid[y][x] == 2 then
                 local tx = (x - 0.5) * CELL + OX
                 local ty = (y - 0.5) * CELL + OY
-                luna.gfx.circle("fill", tx, ty, CELL * 3)
+                lurek.gfx.circle("fill", tx, ty, CELL * 3)
             end
         end
     end
@@ -327,38 +327,38 @@ function luna.render()
     -- Enemies
     for _, e in ipairs(enemies) do
         -- HP bar
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
-        luna.gfx.setColor(1, 0.2, 0.2, 1)
-        luna.gfx.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
+        lurek.gfx.setColor(1, 0.2, 0.2, 1)
+        lurek.gfx.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
         -- Body
-        luna.gfx.setColor(0.9, 0.3, 0.3, 1)
-        luna.gfx.circle("fill", e.x, e.y, 6)
+        lurek.gfx.setColor(0.9, 0.3, 0.3, 1)
+        lurek.gfx.circle("fill", e.x, e.y, 6)
     end
 
     -- Bullets
-    luna.gfx.setColor(1, 1, 0.4, 1)
+    lurek.gfx.setColor(1, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        luna.gfx.circle("fill", b.x, b.y, 3)
+        lurek.gfx.circle("fill", b.x, b.y, 3)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.8)
-    luna.gfx.rectangle("fill", 0, 0, 800, 18)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
+    lurek.gfx.setColor(0, 0, 0, 0.8)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 18)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
     local modeText = buildMode == "wall" and "[1]>WALL($5)" or "  [1] Wall($5)"
     local modeText2 = buildMode == "tower" and " [2]>TOWER($20)" or " [2] Tower($20)"
-    luna.gfx.setColor(0.8, 0.8, 0.5, 1)
-    luna.gfx.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
+    lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
+    lurek.gfx.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
 
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 250, 250, 300, 80)
-        luna.gfx.setColor(1, 0.3, 0.3, 1)
-        luna.gfx.print("GAME OVER", 330, 265, 1.5)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
-        luna.gfx.print("Press R to restart", 320, 318)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
+        lurek.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.gfx.print("GAME OVER", 330, 265, 1.5)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
+        lurek.gfx.print("Press R to restart", 320, 318)
     end
 end

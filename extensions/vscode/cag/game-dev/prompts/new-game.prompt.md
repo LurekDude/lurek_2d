@@ -1,7 +1,7 @@
 ---
-name: New Luna2D Game
+name: New Lurek2D Game
 description: >
-  Start a new Luna2D game project from scratch. Interviews the developer,
+  Start a new Lurek2D game project from scratch. Interviews the developer,
   selects a template, and wires up the first scene with correct architecture.
 mode: ask
 ---

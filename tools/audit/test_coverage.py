@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-test_coverage.py — Luna2D test coverage analysis.
+test_coverage.py — Lurek2D test coverage analysis.
 
 Cross-references public Rust items and Lua API functions against test files
 to determine which items have test coverage. Uses heuristic name matching.
@@ -217,7 +217,7 @@ def generate_report(
     module_filter=None,
 ) -> str:
     """Generate a Markdown coverage report."""
-    lines = ["# Luna2D Test Coverage Report", ""]
+    lines = ["# Lurek2D Test Coverage Report", ""]
 
     if module_filter:
         lines.append(f"*Filtered to module: `{module_filter}`*")
@@ -338,11 +338,11 @@ def generate_suggestions(rust_uncovered, lua_uncovered) -> str:
             lines.append(f"### {mod_name}")
             lines.append("")
             lines.append("```lua")
-            lines.append(f'describe("luna.{mod_name}", function()')
+            lines.append(f'describe("lurek.{mod_name}", function()')
             for fn in fns[:10]:
                 lines.append(f'  it("{fn["name"]} should work", function()')
                 if fn["kind"] == "function":
-                    lines.append(f'    local result = luna.{mod_name}.{fn["name"]}()')
+                    lines.append(f'    local result = lurek.{mod_name}.{fn["name"]}()')
                     lines.append(f'    expect_not_nil(result)')
                 else:
                     lines.append(f'    -- Test {fn["lua_name"]}()')
@@ -356,7 +356,7 @@ def generate_suggestions(rust_uncovered, lua_uncovered) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D test coverage analysis",
+        description="Lurek2D test coverage analysis",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

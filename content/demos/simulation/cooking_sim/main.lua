@@ -1,6 +1,6 @@
 -- Culinary / Cooking Simulation Demo
 -- Pick up ingredients, chop/cook them, assemble orders for customers
--- Run with: cargo run -- demos/simulation/cooking_sim
+-- Run with: cargo run -- content/demos/simulation/cooking_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -139,19 +139,19 @@ local function interact()
     end
 end
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.2, 0.18, 0.15)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.2, 0.18, 0.15)
     newOrder()
     newOrder()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Chef movement
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then dy = -1 end
-    if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then dy = 1 end
-    if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then dx = -1 end
-    if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then dx = 1 end
+    if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then dy = -1 end
+    if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then dy = 1 end
+    if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then dx = -1 end
+    if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then dx = 1 end
     if dx ~= 0 and dy ~= 0 then
         dx = dx * 0.707; dy = dy * 0.707
     end
@@ -187,8 +187,8 @@ function luna.process(dt)
     if msgTimer > 0 then msgTimer = msgTimer - dt end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "space" then interact() end
     if key == "e" then interact() end
     -- Shelf ingredient selection
@@ -197,7 +197,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if button == 1 then interact() end
 end
 
@@ -210,28 +210,28 @@ local function drawStation(s)
         serve = {0.2, 0.7, 0.3},
     }
     local c = colors[s.type]
-    luna.gfx.setColor(c[1], c[2], c[3], 1)
-    luna.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.rectangle("line", s.x, s.y, s.w, s.h)
-    luna.gfx.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
+    lurek.gfx.setColor(c[1], c[2], c[3], 1)
+    lurek.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.rectangle("line", s.x, s.y, s.w, s.h)
+    lurek.gfx.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
 end
 
-function luna.render()
+function lurek.render()
     -- Draw stations
     for _, s in ipairs(stations) do drawStation(s) end
 
     -- Shelf ingredient list
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
     for i, name in ipairs(INGREDIENTS) do
         local c = INGR_COLORS[name]
         if i == shelfSelect then
-            luna.gfx.setColor(1, 1, 0, 1)
-            luna.gfx.print("> ", 10, 240 + (i - 1) * 18, 0.8)
+            lurek.gfx.setColor(1, 1, 0, 1)
+            lurek.gfx.print("> ", 10, 240 + (i - 1) * 18, 0.8)
         end
-        luna.gfx.setColor(c[1], c[2], c[3], 1)
-        luna.gfx.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
+        lurek.gfx.setColor(c[1], c[2], c[3], 1)
+        lurek.gfx.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
     end
 
     -- Stove item
@@ -239,75 +239,75 @@ function luna.render()
         local sx = stations[3].x + 10
         local sy = stations[3].y + 10
         local c = INGR_COLORS[stoveItem.name] or {1, 1, 1}
-        luna.gfx.setColor(c[1], c[2], c[3], 1)
-        luna.gfx.circle("fill", sx + 20, sy + 15, 12)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(c[1], c[2], c[3], 1)
+        lurek.gfx.circle("fill", sx + 20, sy + 15, 12)
+        lurek.gfx.setColor(1, 1, 1, 1)
         local pct = clamp(stoveTimer / COOK_TIME, 0, 1)
-        luna.gfx.rectangle("fill", sx, sy + 35, pct * 60, 6)
+        lurek.gfx.rectangle("fill", sx, sy + 35, pct * 60, 6)
         if stoveItem.state == "burnt" then
-            luna.gfx.setColor(1, 0, 0, 1)
-            luna.gfx.print("BURNT!", sx, sy + 44, 0.7)
+            lurek.gfx.setColor(1, 0, 0, 1)
+            lurek.gfx.print("BURNT!", sx, sy + 44, 0.7)
         elseif stoveItem.state == "cooked" then
-            luna.gfx.setColor(0, 1, 0, 1)
-            luna.gfx.print("DONE!", sx, sy + 44, 0.7)
+            lurek.gfx.setColor(0, 1, 0, 1)
+            lurek.gfx.print("DONE!", sx, sy + 44, 0.7)
         end
     end
 
     -- Chop progress
     if chopProgress > 0 then
         local cx = stations[2].x
-        luna.gfx.setColor(0, 1, 0, 1)
-        luna.gfx.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
+        lurek.gfx.setColor(0, 1, 0, 1)
+        lurek.gfx.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
     end
 
     -- Plate contents
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
     for i, item in ipairs(plate) do
-        luna.gfx.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
+        lurek.gfx.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
     end
 
     -- Chef
-    luna.gfx.setColor(1, 0.9, 0.7, 1)
-    luna.gfx.circle("fill", chef.x, chef.y, chef.size)
-    luna.gfx.setColor(0.3, 0.3, 0.8, 1)
-    luna.gfx.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
+    lurek.gfx.setColor(1, 0.9, 0.7, 1)
+    lurek.gfx.circle("fill", chef.x, chef.y, chef.size)
+    lurek.gfx.setColor(0.3, 0.3, 0.8, 1)
+    lurek.gfx.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
     -- Holding indicator
     if chef.holding then
         local c = INGR_COLORS[chef.holding.name] or {1, 1, 1}
-        luna.gfx.setColor(c[1], c[2], c[3], 1)
-        luna.gfx.circle("fill", chef.x, chef.y - 30, 8)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
+        lurek.gfx.setColor(c[1], c[2], c[3], 1)
+        lurek.gfx.circle("fill", chef.x, chef.y - 30, 8)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
     end
 
     -- Orders
-    luna.gfx.setColor(0, 0, 0, 0.8)
-    luna.gfx.rectangle("fill", 0, 0, W, 70)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("ORDERS:", 10, 5, 1)
+    lurek.gfx.setColor(0, 0, 0, 0.8)
+    lurek.gfx.rectangle("fill", 0, 0, W, 70)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("ORDERS:", 10, 5, 1)
     for i, order in ipairs(orders) do
         local ox = 10 + (i - 1) * 195
         local urgency = order.timer < 10 and {1, 0.3, 0.3} or {1, 1, 1}
-        luna.gfx.setColor(urgency[1], urgency[2], urgency[3], 1)
-        luna.gfx.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
-        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.gfx.setColor(urgency[1], urgency[2], urgency[3], 1)
+        lurek.gfx.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
+        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
         local ingStr = table.concat(order.recipe.ingredients, ", ")
-        luna.gfx.print(ingStr, ox, 40, 0.55)
-        luna.gfx.setColor(1, 0.8, 0, 1)
-        luna.gfx.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
+        lurek.gfx.print(ingStr, ox, 40, 0.55)
+        lurek.gfx.setColor(1, 0.8, 0, 1)
+        lurek.gfx.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, H - 30, W, 30)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, H - 30, W, 30)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
 
     -- Message
     if msgTimer > 0 then
-        luna.gfx.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
-        luna.gfx.print(message, W / 2 - 80, H / 2, 1.2)
+        lurek.gfx.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
+        lurek.gfx.print(message, W / 2 - 80, H / 2, 1.2)
     end
 end
 

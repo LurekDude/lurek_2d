@@ -19,7 +19,7 @@ local spawn_timer = 0
 local spawn_count = 0
 local TOWER_COST = 25
 
-function luna.init()
+function lurek.init()
     spawnWave()
 end
 
@@ -28,7 +28,7 @@ function spawnWave()
     spawn_timer = 0
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Spawn enemies
     if spawn_count > 0 then
         spawn_timer = spawn_timer - dt
@@ -95,40 +95,40 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
-    luna.gfx.clear(0.1, 0.15, 0.1)
+function lurek.render()
+    lurek.gfx.clear(0.1, 0.15, 0.1)
 
     -- Draw path
-    luna.gfx.setColor(0.3, 0.3, 0.25, 1)
+    lurek.gfx.setColor(0.3, 0.3, 0.25, 1)
     for i = 1, #path - 1 do
-        luna.gfx.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
+        lurek.gfx.line(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y)
     end
 
     -- Draw towers
     for _, t in ipairs(towers) do
-        luna.gfx.setColor(0.2, 0.6, 1, 1)
-        luna.gfx.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
+        lurek.gfx.setColor(0.2, 0.6, 1, 1)
+        lurek.gfx.rectangle("fill", t.x - 12, t.y - 12, 24, 24)
     end
 
     -- Draw enemies
     for _, e in ipairs(enemies) do
-        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
-        luna.gfx.circle("fill", e.x, e.y, 8)
+        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
+        lurek.gfx.circle("fill", e.x, e.y, 8)
     end
 
     -- UI
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
-    luna.gfx.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives, 10, 10)
+    lurek.gfx.print("Click to place tower (" .. TOWER_COST .. "g)", 10, 580)
 end
 
-function luna.mousepressed(x, y, btn)
+function lurek.mousepressed(x, y, btn)
     if btn == 1 and gold >= TOWER_COST then
         towers[#towers + 1] = { x = x, y = y, cooldown = 0 }
         gold = gold - TOWER_COST
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 end

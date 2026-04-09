@@ -15,7 +15,7 @@ An open-world nature reserve where the player explores a 1600 × 1200 biome map 
 ## How to Run
 
 ```powershell
-cargo run -- demos/wildlife_photo
+cargo run -- content/demos/wildlife_photo
 ```
 
 ## Controls

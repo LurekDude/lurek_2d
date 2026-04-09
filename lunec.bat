@@ -1,13 +1,13 @@
 @echo off
-:: lunec.bat — Launch a Luna2D game without a console window.
+:: lurekc.bat — Launch a Lurek2D game without a console window.
 ::
 :: Usage:
-::   lunec                        -- show Luna2D splash screen
-::   lunec path\to\my_game        -- run my_game
-::   lunec examples\hello_world   -- run bundled example
+::   lurekc                        -- show Lurek2D splash screen
+::   lurekc path\to\my_game        -- run my_game
+::   lurekc examples\hello_world   -- run bundled example
 ::
 :: How it works:
-::   `start "" /B` launches luna2d.exe as a background process.
+::   `start "" /B` launches lurek2d.exe as a background process.
 ::   When this batch file exits, the temporary console window disappears
 ::   and only the game window remains visible.
 ::

@@ -4,18 +4,18 @@ An Eye of Beholder / Dungeon Master style grid-stepping first-person dungeon cra
 
 ## What It Demonstrates
 
-- `luna.raycaster.new()` / `rc:setCells()` — grid-based dungeon world
+- `lurek.raycaster.new()` / `rc:setCells()` — grid-based dungeon world
 - `rc:castRaysFlat()` — full-viewport column casting at 90° FOV
-- `luna.raycaster.projectColumn()` — wall segment projection
-- `luna.raycaster.distanceShade()` — distance fog
+- `lurek.raycaster.projectColumn()` — wall segment projection
+- `lurek.raycaster.distanceShade()` — distance fog
 - `rc:projectSprite()` — billboard torches and collectible orbs with depth occlusion
-- `luna.gfx.newCanvas()` / `luna.gfx.setCanvas()` — 3D view in left panel, HUD in right panel
-- `luna.gfx.rectangle()` — all rendering: walls, sprites, minimap tiles, weather drips
+- `lurek.gfx.newCanvas()` / `lurek.gfx.setCanvas()` — 3D view in left panel, HUD in right panel
+- `lurek.gfx.rectangle()` — all rendering: walls, sprites, minimap tiles, weather drips
 
 ## How to Run
 
 ```bash
-cargo run -- demos/retro/dungeon_crawler
+cargo run -- content/demos/retro/dungeon_crawler
 ```
 
 ## Controls

@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python3
 """
-gen_lua_api.py — Luna2D Lua API parser library.
+gen_lua_api.py — Lurek2D Lua API parser library.
 
 Parses src/lua_api/*.rs files and extracts all registered Lua functions and
 userdata methods by scanning for .set() and add_method() patterns, associating
@@ -61,10 +61,10 @@ def _collect_docstring_above(lines: List[str], line_idx: int) -> str:
         elif stripped.startswith("#[") or stripped == "":
             pass
         elif re.match(r"^let\s+\w+\s*=\s*\w+\.clone\(\)\s*;$", stripped):
-            # Skip the `let s = state.clone();` bridge lines common in luna2d API files
+            # Skip the `let s = state.clone();` bridge lines common in lurek2d API files
             pass
         elif stripped.startswith("//") and not stripped.startswith("///"):
-            # Skip plain // comments (e.g. // luna.graphics.X(…) inline signature notes)
+            # Skip plain // comments (e.g. // lurek.graphics.X(…) inline signature notes)
             pass
         else:
             break
@@ -447,7 +447,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     docstring = _collect_docstring_above(lines, i)
                     owner = current_widget_type if current_widget_type else ""
                     kind = "method" if owner else "function"
-                    lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
+                    lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
 
                     if not docstring and owner:
                         docstring = f"/// Returns a value for {func_name} (auto-generated)."
@@ -475,7 +475,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             docstring = _collect_docstring_above(lines, i)
             owner = current_widget_type if current_widget_type else ""
             kind = "method" if owner else "function"
-            lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
+            lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
 
             if not docstring and owner:
                 docstring = f"/// Returns a value for {func_name} (auto-generated)."
@@ -551,7 +551,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if not set_inline_re.search(stripped) or rust_fn:
                 owner = current_widget_type if current_widget_type else ""
                 kind = "method" if owner else "function"
-                lua_name = f"{owner}:{func_name}" if owner else f"luna.{module}.{func_name}"
+                lua_name = f"{owner}:{func_name}" if owner else f"lurek.{module}.{func_name}"
                 # Look up docstring from the named pub fn declaration
                 docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
                 desc = _first_desc_line(docstring)

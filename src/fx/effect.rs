@@ -147,7 +147,7 @@ impl PostFxEffect {
     ///
     /// Delegates to `PostFxEffectType::name()`. The returned string matches
     /// the name accepted by `PostFxEffectType::from_name` and by
-    /// `luna.postfx.newEffect` in Lua, making it suitable for serialisation.
+    /// `lurek.postfx.newEffect` in Lua, making it suitable for serialisation.
     ///
     /// # Returns
     /// `&'static str` — One of the built-in effect type names, or `"custom"`.
@@ -159,7 +159,7 @@ impl PostFxEffect {
     ///
     /// Built-in effects have well-known parameter maps and are dispatched by
     /// name in the GPU layer. Custom effects (created via `new_custom` or
-    /// `luna.postfx.newPass`) return `false` and must carry a valid
+    /// `lurek.postfx.newPass`) return `false` and must carry a valid
     /// `shader_id` for the GPU layer to dispatch the correct shader.
     ///
     /// # Returns

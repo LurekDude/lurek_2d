@@ -4,11 +4,11 @@ A Vampire Survivors–style bullet heaven where orbiting projectiles automatical
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — eight-directional player movement with normalised diagonal speed
-- `luna.gfx.circle()` — player, enemies, projectiles, XP gems, and death particles
-- `luna.gfx.rectangle()` — health bar, XP bar, and upgrade-choice panels
-- `luna.gfx.print()` — score, kill counter, timer, and upgrade option labels
-- `luna.gfx.setBackgroundColor()` — dark space-themed background
+- `lurek.keyboard.isDown()` — eight-directional player movement with normalised diagonal speed
+- `lurek.gfx.circle()` — player, enemies, projectiles, XP gems, and death particles
+- `lurek.gfx.rectangle()` — health bar, XP bar, and upgrade-choice panels
+- `lurek.gfx.print()` — score, kill counter, timer, and upgrade option labels
+- `lurek.gfx.setBackgroundColor()` — dark space-themed background
 - Camera follow — world-space entities are offset by `cam.x / cam.y` each draw frame
 - Orbiting weapon system — projectile positions calculated from `player.angle` each update tick
 - Upgrade system — stat table driven by a random pool draw, applied immediately to player stats
@@ -16,7 +16,7 @@ A Vampire Survivors–style bullet heaven where orbiting projectiles automatical
 ## How to Run
 
 ```powershell
-cargo run -- demos/horde_survivor
+cargo run -- content/demos/horde_survivor
 ```
 
 ## Controls

@@ -1,23 +1,23 @@
-//! Integration tests for `luna2d::province` — province-based map system.
+//! Integration tests for `lurek2d::province` — province-based map system.
 
 use std::collections::HashMap;
 
-use luna2d::math::Vec2;
-use luna2d::province::adjacency::detect_adjacency;
-use luna2d::province::borders::extract_all_borders;
-use luna2d::province::core::{Province, ProvinceMap};
-use luna2d::province::events::ProvinceEventBus;
-use luna2d::province::fog::{FogOfWar, FogState};
-use luna2d::province::map_mode::{resolve_colors, MapMode, MapModeColorFn};
-use luna2d::province::minimap::ProvinceMinimap;
-use luna2d::province::movement::MovementManager;
-use luna2d::province::objects::ObjectManager;
-use luna2d::province::organization::OrganizationManager;
-use luna2d::province::pathfinding::{ProvinceCostFn, ProvincePath};
-use luna2d::province::positions::calculate_all_positions;
-use luna2d::province::properties::{ProvinceData, ProvinceProperties, ProvinceState, ProvinceValue};
-use luna2d::province::relations::RelationManager;
-use luna2d::province::worldgen::{generate_world, WorldGenConfig};
+use lurek2d::math::Vec2;
+use lurek2d::province::adjacency::detect_adjacency;
+use lurek2d::province::borders::extract_all_borders;
+use lurek2d::province::core::{Province, ProvinceMap};
+use lurek2d::province::events::ProvinceEventBus;
+use lurek2d::province::fog::{FogOfWar, FogState};
+use lurek2d::province::map_mode::{resolve_colors, MapMode, MapModeColorFn};
+use lurek2d::province::minimap::ProvinceMinimap;
+use lurek2d::province::movement::MovementManager;
+use lurek2d::province::objects::ObjectManager;
+use lurek2d::province::organization::OrganizationManager;
+use lurek2d::province::pathfinding::{ProvinceCostFn, ProvincePath};
+use lurek2d::province::positions::calculate_all_positions;
+use lurek2d::province::properties::{ProvinceData, ProvinceProperties, ProvinceState, ProvinceValue};
+use lurek2d::province::relations::RelationManager;
+use lurek2d::province::worldgen::{generate_world, WorldGenConfig};
 
 // ============================================================
 // 1. Province and ProvinceMap basics
@@ -905,14 +905,14 @@ fn test_event_org_assigned() {
     let ev = bus.poll().unwrap();
     assert_eq!(ev.name, "org_assigned");
     // Args: province_id, org_id
-    use luna2d::event::EventArg;
+    use lurek2d::event::EventArg;
     assert!(matches!(&ev.args[0], EventArg::Num(n) if (*n as u32) == 7));
     assert!(matches!(&ev.args[1], EventArg::Num(n) if (*n as u64) == 42));
 }
 
 #[test]
 fn test_event_custom_emit() {
-    use luna2d::event::EventArg;
+    use lurek2d::event::EventArg;
     let mut bus = ProvinceEventBus::new();
     bus.emit_custom("my_event", vec![EventArg::Str("hello".into()), EventArg::Num(3.0)]);
     let ev = bus.poll().unwrap();

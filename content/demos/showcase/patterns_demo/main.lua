@@ -1,26 +1,26 @@
 -- Module availability guard (added by fix_nil_module_demos.py)
--- Run with: cargo run -- demos/showcase/patterns_demo
-if not luna.patterns then
-    function luna.init()
-        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.gfx.print("luna.patterns is not available in this build", 180, 270)
+-- Run with: cargo run -- content/demos/showcase/patterns_demo
+if not lurek.patterns then
+    function lurek.init()
+        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.gfx.print("lurek.patterns is not available in this build", 180, 270)
     end
     return
 end
 
--- Patterns Demo — Luna2D example
+-- Patterns Demo — Lurek2D example
 -- Demonstrates the 6 design patterns: EventBus, ObjectPool, CommandStack,
 -- ServiceLocator, Factory, SimpleState (FSM).
 
 -- ===================================================================
 -- Setup
 -- ===================================================================
-local bus   = luna.patterns.newEventBus()
-local pool  = luna.patterns.newObjectPool()
-local cmds  = luna.patterns.newCommandStack()
-local loc   = luna.patterns.newServiceLocator()
-local fac   = luna.patterns.newFactory()
-local fsm   = luna.patterns.newSimpleState()
+local bus   = lurek.patterns.newEventBus()
+local pool  = lurek.patterns.newObjectPool()
+local cmds  = lurek.patterns.newCommandStack()
+local loc   = lurek.patterns.newServiceLocator()
+local fac   = lurek.patterns.newFactory()
+local fsm   = lurek.patterns.newSimpleState()
 
 local log = {}
 local function add_log(msg)
@@ -73,35 +73,35 @@ fsm:addState("gameover", {
 -- ===================================================================
 local x = 100
 
-function luna.init()
-    luna.window.setTitle("Patterns Demo")
+function lurek.init()
+    lurek.window.setTitle("Patterns Demo")
     fsm:transitionTo("menu")
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     fsm:update(dt)
 end
 
-function luna.render()
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Patterns Demo", 20, 20)
-    luna.gfx.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
-    luna.gfx.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
-    luna.gfx.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
+function lurek.render()
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Patterns Demo", 20, 20)
+    lurek.gfx.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
+    lurek.gfx.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
+    lurek.gfx.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
 
     local score = loc:locate("score")
-    luna.gfx.print("Score: " .. (score and score.value or 0), 20, 100)
-    luna.gfx.print("x = " .. x, 200, 100)
-    luna.gfx.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
-    luna.gfx.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
+    lurek.gfx.print("Score: " .. (score and score.value or 0), 20, 100)
+    lurek.gfx.print("x = " .. x, 200, 100)
+    lurek.gfx.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
+    lurek.gfx.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
 
-    luna.gfx.setColor(0.7, 0.85, 1)
+    lurek.gfx.setColor(0.7, 0.85, 1)
     for i, msg in ipairs(log) do
-        luna.gfx.print(msg, 30, 140 + (i - 1) * 18)
+        lurek.gfx.print(msg, 30, 140 + (i - 1) * 18)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "1" then
         local e = fac:create("enemy", 25)
         bus:emit("spawn", e.kind)
@@ -149,6 +149,6 @@ function luna.keypressed(key)
         fsm:transitionTo("gameover")
 
     elseif key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

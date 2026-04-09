@@ -7,7 +7,7 @@
 use indexmap::IndexMap;
 use mlua::prelude::{Lua, LuaResult, LuaValue};
 
-/// A Luna2D serializable value — the common intermediate representation
+/// A Lurek2D serializable value — the common intermediate representation
 /// shared by all serial format modules.
 ///
 /// # Variants

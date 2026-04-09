@@ -5,7 +5,7 @@ local map
 local player = { gx = 5, gy = 5 }
 local turn = 0
 
-function luna.init()
+function lurek.init()
     map = Dungeon.generate(50, 38)
     -- Place player in first open cell
     for y = 1, #map do
@@ -18,31 +18,31 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Turn-based: logic runs in keypressed
 end
 
-function luna.render()
-    luna.gfx.clear(0.05, 0.05, 0.08)
+function lurek.render()
+    lurek.gfx.clear(0.05, 0.05, 0.08)
     -- Draw map
     for y = 1, #map do
         for x = 1, #map[1] do
             if map[y][x] == 1 then
-                luna.gfx.setColor(0.3, 0.3, 0.35, 1)
-                luna.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
+                lurek.gfx.setColor(0.3, 0.3, 0.35, 1)
+                lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE, TILE)
             end
         end
     end
     -- Draw player
-    luna.gfx.setColor(0.2, 0.8, 0.4, 1)
-    luna.gfx.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
+    lurek.gfx.setColor(0.2, 0.8, 0.4, 1)
+    lurek.gfx.rectangle("fill", (player.gx - 1) * TILE, (player.gy - 1) * TILE, TILE, TILE)
     -- UI
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Turn: " .. turn, 10, 580)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Turn: " .. turn, 10, 580)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     local dx, dy = 0, 0
     if key == "left"  or key == "a" then dx = -1 end
     if key == "right" or key == "d" then dx =  1 end

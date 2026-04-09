@@ -53,7 +53,7 @@
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | 2D lights | ✅ | ❌ (libs) | ❌ | ✅ |
 | Shadow casting | ✅ | ❌ | ❌ | ✅ |
@@ -64,7 +64,7 @@
 | Soft shadows | ❌ | N/A | N/A | ✅ |
 | Light cookies | ❌ | N/A | N/A | ❌ |
 
-Luna2D has a strong built-in lighting system — uncommon for 2D Lua engines.
+Lurek2D has a strong built-in lighting system — uncommon for 2D Lua engines.
 
 ## Priority
 

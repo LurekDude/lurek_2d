@@ -1,18 +1,18 @@
-# Luna2D Performance & Threading — Executive Summary
+# Lurek2D Performance & Threading — Executive Summary
 
 > Research date: 2026-04-03 | Branch: `root`
 > Session: `perf-threading-research`
 
 ## Purpose
 
-This report analyzes every Luna2D module for multithreading and GPU performance
-improvement opportunities. It compares current implementation against Love2D,
-Corona/Solar2D, macroquad, and ggez reference architectures found in
+This report analyzes every Lurek2D module for multithreading and GPU performance
+improvement opportunities. It compares current implementation against Engine A,
+Corona/Engine B, Engine F, and Engine E reference architectures found in
 `docs/competition/` and `docs/future/`.
 
 ## Current State
 
-Luna2D follows a **synchronous-by-default, opt-in background threading** model:
+Lurek2D follows a **synchronous-by-default, opt-in background threading** model:
 
 | Layer | Threading Today |
 |-------|----------------|
@@ -76,5 +76,5 @@ Any threading work that touches game state must either:
 | `05-ai-pathfinding.md` | AI planning, influence maps, pathfinding |
 | `06-io-filesystem.md` | File I/O, async loading, texture streaming |
 | `07-tilemap-large-world.md` | Tilemap culling, chunk streaming, large map optimization |
-| `08-reference-engine-comparison.md` | How Love2D, Corona, macroquad, ggez handle these problems |
+| `08-reference-engine-comparison.md` | How Engine A, Corona, Engine F, Engine E handle these problems |
 | `09-implementation-plan.md` | Phased implementation plan with priorities |

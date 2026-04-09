@@ -4,7 +4,7 @@
 |----------|-------|
 | **Tier** | Tier 2 — Reusable Engine Extensions |
 | **Status** | Implemented — Full |
-| **Lua API** | `luna.ui` |
+| **Lua API** | `lurek.ui` |
 | **Source** | `src/gui/` |
 | **Rust Tests** | `tests/rust/unit/gui_tests.rs` |
 | **Lua Tests** | `tests/lua/unit/test_gui.lua` |
@@ -36,13 +36,13 @@ A `Theme` maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records contai
 colour, foreground colour, border colour, border width, corner radius, and font size. Style
 lookup falls back from the exact state to `Normal`, then to a hard-coded default.
 
-Input events are forwarded manually from `luna.mousepressed` / `luna.keypressed` etc., giving
+Input events are forwarded manually from `lurek.mousepressed` / `lurek.keypressed` etc., giving
 scripts full control over which GUI instance is active. `GuiContext` manages focus cycling
 (`focus_next`, `focus_prev`), a toast notification queue with timer-based expiration, and
 mouse/keyboard hit-testing against widget bounds.
 
 **Scope boundary**: The `gui` module holds layout and state as CPU data only. Actual rendering
-is done via `luna.gfx` draw calls issued by `lua_api/gui_api.rs`. No GPU resources live here.
+is done via `lurek.gfx` draw calls issued by `lua_api/gui_api.rs`. No GPU resources live here.
 
 ## Architecture
 
@@ -62,11 +62,11 @@ gui (module root)
 ```
 Lua script                     gui module (CPU data)                  lua_api/gui_api.rs
 ───────────                    ────────────────────                   ──────────────────
-luna.ui.newButton("OK")  →    GuiContext.add_button() → pool[idx]   → create_widget_table()
+lurek.ui.newButton("OK")  →    GuiContext.add_button() → pool[idx]   → create_widget_table()
 btn:setPosition(10, 20)   →    pool[idx].base.x/y = 10/20           → borrow_mut GuiContext
-luna.ui.mousepressed(…)  →    GuiContext.mouse_pressed() → hit test → returns bool (consumed)
-luna.ui.update(dt)       →    GuiContext.update(dt) → expire toasts
-                                                                      → luna.gfx.* draws
+lurek.ui.mousepressed(…)  →    GuiContext.mouse_pressed() → hit test → returns bool (consumed)
+lurek.ui.update(dt)       →    GuiContext.update(dt) → expire toasts
+                                                                      → lurek.gfx.* draws
 ```
 
 ## Source Files
@@ -94,7 +94,7 @@ Shared widget base fields, state enum, and type tag. Every concrete widget embed
 
 ### `gui::theme`
 
-Per-widget-type, per-state styling system. A `Theme` maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records. Style lookup falls back: exact → Normal state → hard-coded default. The Lua API exposes `luna.ui.newTheme()`, `theme:setStyle()`, and `luna.ui.setTheme()`.
+Per-widget-type, per-state styling system. A `Theme` maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records. Style lookup falls back: exact → Normal state → hard-coded default. The Lua API exposes `lurek.ui.newTheme()`, `theme:setStyle()`, and `lurek.ui.setTheme()`.
 
 - **`WidgetStyle`** (struct): Visual style record with `bg_color`, `fg_color`, `border_color` (all `[f32;4]`), `border_width`, `corner_radius`, and `font_size`.
 - **`Theme`** (struct): Style map with `set_style(type, state, style)` and `get_style(type, state)` with fallback chain.
@@ -358,7 +358,7 @@ Type-erased widget storage with 32 variants wrapping all concrete widget types. 
 
 ## Lua API
 
-### `luna.ui` — Retained-mode widget UI system
+### `lurek.ui` — Retained-mode widget UI system
 
 Registered in `src/lua_api/gui_api.rs`.
 
@@ -366,39 +366,39 @@ Registered in `src/lua_api/gui_api.rs`.
 
 | Function | Description |
 |----------|-------------|
-| `luna.ui.newButton(text?)` | Creates a button widget with optional text label |
-| `luna.ui.newLabel(text?)` | Creates a label widget with optional text |
-| `luna.ui.newTextInput()` | Creates a text input field |
-| `luna.ui.newCheckbox(text?)` | Creates a checkbox with optional label |
-| `luna.ui.newSlider(min?, max?)` | Creates a slider with optional range (default 0–1) |
-| `luna.ui.newProgressBar(min?, max?)` | Creates a progress bar with optional range (default 0–1) |
-| `luna.ui.newComboBox()` | Creates a combo box (drop-down selector) |
-| `luna.ui.newList()` | Creates a list box |
-| `luna.ui.newPanel()` | Creates a panel container |
-| `luna.ui.newLayout(direction?)` | Creates a layout container (default `"vertical"`) |
-| `luna.ui.newScrollPanel()` | Creates a scrollable panel |
-| `luna.ui.newNinePatch()` | Creates a nine-patch (nine-slice) widget |
-| `luna.ui.newTabBar()` | Creates a tab bar |
-| `luna.ui.newSeparator(vertical?)` | Creates a separator (default horizontal) |
-| `luna.ui.newSpacer(w?, h?)` | Creates a spacer with optional size |
-| `luna.ui.newToast(message?, duration?)` | Creates a toast notification (default 3s) |
-| `luna.ui.newTreeView()` | Creates a tree view |
-| `luna.ui.newRadioButton(text?, group?)` | Creates a radio button with optional group |
-| `luna.ui.newScrollBar(vertical?)` | Creates a scroll bar |
-| `luna.ui.newWindow(title?)` | Creates a GUI window container |
-| `luna.ui.newSplitPanel(orientation?)` | Creates a split panel |
-| `luna.ui.newDockPanel()` | Creates a dock panel |
-| `luna.ui.newToolbar(orientation?)` | Creates a toolbar |
-| `luna.ui.newMenuBar()` | Creates a menu bar |
-| `luna.ui.newMenuItem(text?)` | Creates a menu item |
-| `luna.ui.newDialog(title?)` | Creates a dialog |
-| `luna.ui.newStatusBar()` | Creates a status bar |
-| `luna.ui.newAccordion()` | Creates an accordion |
-| `luna.ui.newTooltipPanel(text?)` | Creates a tooltip panel |
-| `luna.ui.newColorPicker()` | Creates a color picker |
-| `luna.ui.newTable()` | Creates a data table |
-| `luna.ui.newImageWidget()` | Creates an image display widget |
-| `luna.ui.newTheme()` | Creates a new Theme userdata |
+| `lurek.ui.newButton(text?)` | Creates a button widget with optional text label |
+| `lurek.ui.newLabel(text?)` | Creates a label widget with optional text |
+| `lurek.ui.newTextInput()` | Creates a text input field |
+| `lurek.ui.newCheckbox(text?)` | Creates a checkbox with optional label |
+| `lurek.ui.newSlider(min?, max?)` | Creates a slider with optional range (default 0–1) |
+| `lurek.ui.newProgressBar(min?, max?)` | Creates a progress bar with optional range (default 0–1) |
+| `lurek.ui.newComboBox()` | Creates a combo box (drop-down selector) |
+| `lurek.ui.newList()` | Creates a list box |
+| `lurek.ui.newPanel()` | Creates a panel container |
+| `lurek.ui.newLayout(direction?)` | Creates a layout container (default `"vertical"`) |
+| `lurek.ui.newScrollPanel()` | Creates a scrollable panel |
+| `lurek.ui.newNinePatch()` | Creates a nine-patch (nine-slice) widget |
+| `lurek.ui.newTabBar()` | Creates a tab bar |
+| `lurek.ui.newSeparator(vertical?)` | Creates a separator (default horizontal) |
+| `lurek.ui.newSpacer(w?, h?)` | Creates a spacer with optional size |
+| `lurek.ui.newToast(message?, duration?)` | Creates a toast notification (default 3s) |
+| `lurek.ui.newTreeView()` | Creates a tree view |
+| `lurek.ui.newRadioButton(text?, group?)` | Creates a radio button with optional group |
+| `lurek.ui.newScrollBar(vertical?)` | Creates a scroll bar |
+| `lurek.ui.newWindow(title?)` | Creates a GUI window container |
+| `lurek.ui.newSplitPanel(orientation?)` | Creates a split panel |
+| `lurek.ui.newDockPanel()` | Creates a dock panel |
+| `lurek.ui.newToolbar(orientation?)` | Creates a toolbar |
+| `lurek.ui.newMenuBar()` | Creates a menu bar |
+| `lurek.ui.newMenuItem(text?)` | Creates a menu item |
+| `lurek.ui.newDialog(title?)` | Creates a dialog |
+| `lurek.ui.newStatusBar()` | Creates a status bar |
+| `lurek.ui.newAccordion()` | Creates an accordion |
+| `lurek.ui.newTooltipPanel(text?)` | Creates a tooltip panel |
+| `lurek.ui.newColorPicker()` | Creates a color picker |
+| `lurek.ui.newTable()` | Creates a data table |
+| `lurek.ui.newImageWidget()` | Creates an image display widget |
+| `lurek.ui.newTheme()` | Creates a new Theme userdata |
 
 #### Base Widget Methods (all widgets)
 
@@ -447,55 +447,55 @@ Registered in `src/lua_api/gui_api.rs`.
 
 | Function | Description |
 |----------|-------------|
-| `luna.ui.getRoot()` | Returns the root panel widget |
-| `luna.ui.setFocus(widget?)` | Sets or clears keyboard focus |
-| `luna.ui.getFocus()` | Returns focused widget index or nil |
-| `luna.ui.focusNext()` | Moves focus to next focusable widget |
-| `luna.ui.focusPrev()` | Moves focus to previous focusable widget |
-| `luna.ui.clearFocus()` | Clears keyboard focus |
-| `luna.ui.getWidgetCount()` | Returns total widget count |
-| `luna.ui.setTheme(theme)` | Sets the active GUI theme |
-| `luna.ui.getTheme()` | Returns whether a theme is set |
+| `lurek.ui.getRoot()` | Returns the root panel widget |
+| `lurek.ui.setFocus(widget?)` | Sets or clears keyboard focus |
+| `lurek.ui.getFocus()` | Returns focused widget index or nil |
+| `lurek.ui.focusNext()` | Moves focus to next focusable widget |
+| `lurek.ui.focusPrev()` | Moves focus to previous focusable widget |
+| `lurek.ui.clearFocus()` | Clears keyboard focus |
+| `lurek.ui.getWidgetCount()` | Returns total widget count |
+| `lurek.ui.setTheme(theme)` | Sets the active GUI theme |
+| `lurek.ui.getTheme()` | Returns whether a theme is set |
 
 #### Toast Management
 
 | Function | Description |
 |----------|-------------|
-| `luna.ui.addToast(tbl)` | Queues a toast `{message=, duration=}` |
-| `luna.ui.getToastCount()` | Returns active toast count |
+| `lurek.ui.addToast(tbl)` | Queues a toast `{message=, duration=}` |
+| `lurek.ui.getToastCount()` | Returns active toast count |
 
 #### Input Forwarding
 
 | Function | Description |
 |----------|-------------|
-| `luna.ui.mousepressed(x, y, btn?)` | Forwards mouse press, returns consumed |
-| `luna.ui.mousereleased(x, y, btn?)` | Forwards mouse release, returns consumed |
-| `luna.ui.mousemoved(x, y)` | Forwards mouse move, returns consumed |
-| `luna.ui.keypressed(key)` | Forwards key press, returns consumed |
-| `luna.ui.textinput(text)` | Forwards text input, returns consumed |
-| `luna.ui.wheelmoved(x, y)` | Forwards mouse wheel, returns consumed |
-| `luna.ui.update(dt)` | Advances toast timers and cleans expired |
+| `lurek.ui.mousepressed(x, y, btn?)` | Forwards mouse press, returns consumed |
+| `lurek.ui.mousereleased(x, y, btn?)` | Forwards mouse release, returns consumed |
+| `lurek.ui.mousemoved(x, y)` | Forwards mouse move, returns consumed |
+| `lurek.ui.keypressed(key)` | Forwards key press, returns consumed |
+| `lurek.ui.textinput(text)` | Forwards text input, returns consumed |
+| `lurek.ui.wheelmoved(x, y)` | Forwards mouse wheel, returns consumed |
+| `lurek.ui.update(dt)` | Advances toast timers and cleans expired |
 
 ## Lua Examples
 
 ```lua
 -- Create a simple button
-local btn = luna.ui.newButton("Click Me")
+local btn = lurek.ui.newButton("Click Me")
 btn:setPosition(100, 50)
 btn:setSize(120, 40)
 btn:setOnClick(function() print("clicked!") end)
 
 -- Add to root panel
-local root = luna.ui.getRoot()
+local root = lurek.ui.getRoot()
 root:addChild(btn)
 
 -- Create a vertical layout with controls
-local layout = luna.ui.newLayout("vertical")
+local layout = lurek.ui.newLayout("vertical")
 layout:setPosition(10, 10)
 layout:setSpacing(8)
 
-local label = luna.ui.newLabel("Volume:")
-local slider = luna.ui.newSlider(0, 100)
+local label = lurek.ui.newLabel("Volume:")
+local slider = lurek.ui.newSlider(0, 100)
 slider:setValue(75)
 
 layout:addChild(label)
@@ -503,16 +503,16 @@ layout:addChild(slider)
 root:addChild(layout)
 
 -- Forward input events
-function luna.mousepressed(x, y, btn)
-    luna.ui.mousepressed(x, y, btn)
+function lurek.mousepressed(x, y, btn)
+    lurek.ui.mousepressed(x, y, btn)
 end
 
-function luna.keypressed(key)
-    luna.ui.keypressed(key)
+function lurek.keypressed(key)
+    lurek.ui.keypressed(key)
 end
 
-function luna.process(dt)
-    luna.ui.update(dt)
+function lurek.process(dt)
+    lurek.ui.update(dt)
 end
 ```
 
@@ -531,16 +531,16 @@ end
 
 - **Lua API binding**: `src/lua_api/gui_api.rs` — registration and per-widget-type method helpers
 - **Rust tests**: `tests/rust/unit/gui_tests.rs` — unit tests for widgets, layout, theme, context
-- **Lua tests**: `tests/lua/unit/test_gui.lua` — BDD tests for `luna.ui.*` API surface
+- **Lua tests**: `tests/lua/unit/test_gui.lua` — BDD tests for `lurek.ui.*` API surface
 - **GUI demo**: `demos/devtools_demo/` — developer tools panel demonstrating the GUI system
 - **Architecture doc**: `docs/architecture/engine-architecture.md` § Tier 2
 - **`terminal`**: The `terminal` module also has widget types named `Button`, `Label`, `TextBox`, `Panel`. The shared names are **intentional design** — `gui` renders them as pixel-space graphics; `terminal` renders them as character-cell text. Same conceptual interface, different renderers. They share no types.
 
 ## Notes
 
-- **No GPU dependency**: The gui module is pure CPU data. Rendering is delegated to `luna.gfx` calls in `gui_api.rs`.
+- **No GPU dependency**: The gui module is pure CPU data. Rendering is delegated to `lurek.gfx` calls in `gui_api.rs`.
 - **Flat pool indexing**: All widgets are stored in a single `Vec<WidgetKind>` and referenced by `usize` index. Index 0 is always the root panel. This avoids lifetime complexity but means widget indices are invalidated if widgets are removed (currently removal is not supported — widgets are added only).
-- **Input forwarding pattern**: Unlike auto-dispatched input, GUI input must be explicitly forwarded from `luna.mousepressed`/`luna.keypressed` callbacks. This lets scripts control which GUI instance receives events — useful for multiple GUI panels, pause menus, etc.
+- **Input forwarding pattern**: Unlike auto-dispatched input, GUI input must be explicitly forwarded from `lurek.mousepressed`/`lurek.keypressed` callbacks. This lets scripts control which GUI instance receives events — useful for multiple GUI panels, pause menus, etc.
 - **1-based Lua indices**: List/combo/tab/tree methods use 1-based indices on the Lua side, converting to 0-based internally.
 - **Callbacks are stubs**: `setOnClick`, `setOnChange`, and `setOnDraw` currently accept callbacks but do not invoke them — they are placeholders for future event dispatch.
 - **GraphRenderer**: The chart/graph system stores data only. Actual rendering of lines, bars, and axes is done by draw functions in `graphics_api.rs`, not in this module.

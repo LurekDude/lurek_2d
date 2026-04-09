@@ -4,19 +4,19 @@ A classic incremental clicker with passive generators, one-time upgrades, and a 
 
 ## What It Demonstrates
 
-- `luna.mousepressed()` — big-button click detection and shop-panel interaction
-- `luna.keyboard.wasPressed()` — escape to quit
-- `luna.gfx.circle()` — animated pulsing coin button with `math.sin()` scale oscillation
-- `luna.gfx.rectangle()` — generator and upgrade purchase panels with cost and count labels
-- `luna.gfx.print()` — large coin counter, CPS display, and floating click-particle text
-- `luna.gfx.setColor()` — affordability tinting (grey = can't afford, gold = available)
-- `luna.gfx.setBackgroundColor()` — dark purple background set each draw frame
+- `lurek.mousepressed()` — big-button click detection and shop-panel interaction
+- `lurek.keyboard.wasPressed()` — escape to quit
+- `lurek.gfx.circle()` — animated pulsing coin button with `math.sin()` scale oscillation
+- `lurek.gfx.rectangle()` — generator and upgrade purchase panels with cost and count labels
+- `lurek.gfx.print()` — large coin counter, CPS display, and floating click-particle text
+- `lurek.gfx.setColor()` — affordability tinting (grey = can't afford, gold = available)
+- `lurek.gfx.setBackgroundColor()` — dark purple background set each draw frame
 - Number formatter — `format_num()` abbreviates large values to K / M / B suffixes
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/idle_game
+cargo run -- content/demos/idle_game
 ```
 
 ## Controls

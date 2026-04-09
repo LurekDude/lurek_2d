@@ -1,15 +1,13 @@
 -- examples/modding.lua
--- luna.modding — Mod metadata containers and managers for game modding support.
+-- lurek.modding — Mod metadata containers and managers for game modding support.
 -- Discover, validate, hot-reload, and hook into game logic from external mods.
--- All luna.modding API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── Mod Object ────────────────────────────────────────────────────────────────
 
 -- newMod(info) → Mod
 -- info must have at least `id`.  Optional: name, version, author, description,
 -- deps (array of id strings), priority (lower = load first).
-local my_mod = luna.modding.newMod({
+local my_mod = lurek.modding.newMod({
     id          = "example_mod",
     name        = "Example Mod",
     version     = "1.0.0",
@@ -66,12 +64,12 @@ local cfg = my_mod:getConfig()  -- { damage_bonus=5, new_enemy_hp_scale=0.9 }
 -- ── Cleanup ───────────────────────────────────────────────────────────────────
 
 -- releaseRefs() — drop all Lua function references (call before unloading mod)
--- my_mod:releaseRefs()
+my_mod:releaseRefs()
 
 -- ── ModManager ────────────────────────────────────────────────────────────────
 
 -- newModManager() → ModManager
-local manager = luna.modding.newModManager()
+local manager = lurek.modding.newModManager()
 
 -- ── Registering Mods ─────────────────────────────────────────────────────────
 
@@ -79,7 +77,7 @@ local manager = luna.modding.newModManager()
 manager:registerMod(my_mod)
 
 -- create and register more mods
-local weapon_mod = luna.modding.newMod({ id="weapon_pack", name="Weapon Pack", version="2.1", priority=5 })
+local weapon_mod = lurek.modding.newMod({ id="weapon_pack", name="Weapon Pack", version="2.1", priority=5 })
 manager:registerMod(weapon_mod)
 
 -- ── Querying ─────────────────────────────────────────────────────────────────
@@ -144,15 +142,15 @@ manager:clearReloadQueue()
 -- ── Unregister ───────────────────────────────────────────────────────────────
 
 -- unregisterMod(id) — remove a mod from the manager (does not unload Lua state)
--- manager:unregisterMod("example_mod")
+manager:unregisterMod("example_mod")
 
 -- ── Typical Workflow ─────────────────────────────────────────────────────────
 
 --[[
 local mod_manager
 
-function luna.init()
-    mod_manager = luna.modding.newModManager()
+function lurek.init()
+    mod_manager = lurek.modding.newModManager()
     local mods = mod_manager:scanFolder("mods/")
     -- mods auto-registered from mod.toml files
 
@@ -166,7 +164,7 @@ function luna.init()
 
     for _, info in ipairs(mod_manager:getLoadOrder()) do
         -- load each mod's main.lua in order
-        luna.fs.load("mods/" .. info.id .. "/main.lua")
+        lurek.fs.load("mods/" .. info.id .. "/main.lua")
     end
 end
 ]]

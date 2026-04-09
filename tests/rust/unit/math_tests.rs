@@ -1,6 +1,6 @@
-//! Integration tests for the Luna2D math module.
+//! Integration tests for the Lurek2D math module.
 
-use luna2d::math::{
+use lurek2d::math::{
     bezier::BezierCurve, color, easing, noise_functions, polygon, random::RandomGenerator,
     transform::Transform, Mat3, Rect, Vec2,
 };
@@ -934,21 +934,21 @@ fn easing_in_out_curves_are_symmetric() {
 
 #[test]
 fn math_simplex_noise_2d_in_range() {
-    use luna2d::math::noise_functions::simplex_noise_2d;
+    use lurek2d::math::noise_functions::simplex_noise_2d;
     let v = simplex_noise_2d(0.5, 0.5);
     assert!(v > -1.1 && v < 1.1, "simplex2d out of range: {v}");
 }
 
 #[test]
 fn math_simplex_noise_3d_in_range() {
-    use luna2d::math::noise_functions::simplex_noise_3d;
+    use lurek2d::math::noise_functions::simplex_noise_3d;
     let v = simplex_noise_3d(0.5, 0.5, 0.5);
     assert!(v > -1.1 && v < 1.1, "simplex3d out of range: {v}");
 }
 
 #[test]
 fn math_simplex_noise_deterministic() {
-    use luna2d::math::noise_functions::simplex_noise_2d;
+    use lurek2d::math::noise_functions::simplex_noise_2d;
     let v1 = simplex_noise_2d(1.23, 4.56);
     let v2 = simplex_noise_2d(1.23, 4.56);
     assert!((v1 - v2).abs() < 1e-6, "simplex_noise_2d not deterministic");

@@ -1,10 +1,10 @@
 ---
-description: "Debug and fix Lua script errors in Luna2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlua error messages. Produces a root-cause diagnosis and fix."
+description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlua error messages. Produces a root-cause diagnosis and fix."
 ---
 
 # Fix Lua Error
 
-**Purpose**: Diagnose and fix Lua errors thrown inside the Luna2D engine at runtime.
+**Purpose**: Diagnose and fix Lua errors thrown inside the Lurek2D engine at runtime.
 **Use When**: A `main.lua` script exits with an `mlua` error, `attempt to index a nil value`, `bad argument`, stack overflow, or similar Lua-side failure.
 **Do Not Use When**: The crash is a Rust panic (not an mlua `LuaError`) — use `fix-engine-bug.prompt.md` instead.
 **Scope**: `src/lua_api/`, `src/engine/app.rs`, and the affected Lua script.
@@ -13,7 +13,7 @@ description: "Debug and fix Lua script errors in Luna2D. Use when a Lua game scr
 
 - `ERROR_MSG` — the full error message (including Lua traceback if available)
 - `SCRIPT_PATH` — path to the `main.lua` file or example directory
-- `REPRODUCTION` — minimal steps to reproduce (e.g., `cargo run -- examples/my_game`)
+- `REPRODUCTION` — minimal steps to reproduce (e.g., `cargo run -- content/examples/my_game`)
 
 ## Steps
 
@@ -27,7 +27,7 @@ description: "Debug and fix Lua script errors in Luna2D. Use when a Lua game scr
 4. Compare the Lua call signature against the Rust `create_function` argument types
 5. Check that the function is registered:
    - `src/lua_api/mod.rs` — `<module>_api::register(&lua, &luna, state.clone())?`
-   - `luna.set("<name>", ...)` in the corresponding `register()` function
+   - `lurek.set("<name>", ...)` in the corresponding `register()` function
 6. Fix the mismatch (either the Lua script or the binding — prefer fixing the binding if the API is ambiguous)
 7. Add a guard or descriptive error via `lua.create_error_from_string()` where possible
 8. Verify: `cargo run -- <SCRIPT_PATH>`
@@ -41,7 +41,7 @@ description: "Debug and fix Lua script errors in Luna2D. Use when a Lua game scr
 ## Acceptance
 
 - [ ] The specific error no longer occurs
-- [ ] Fix does not break other examples (`cargo run -- demos/hello_world`)
+- [ ] Fix does not break other examples (`cargo run -- content/demos/hello_world`)
 - [ ] If binding was incorrect, a regression test is added
 
 ## References
@@ -52,6 +52,6 @@ description: "Debug and fix Lua script errors in Luna2D. Use when a Lua game scr
 **Commands**:
 ```powershell
 cargo run -- <SCRIPT_PATH>
-cargo run -- demos/hello_world
+cargo run -- content/demos/hello_world
 ```
 **Docs**: `docs/API/lua_api_reference_generated.md`, `src/lua_api/mod.rs`

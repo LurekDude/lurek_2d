@@ -47,7 +47,7 @@ end
 
 ```lua
 register_command("fps", function()
-    console_print("FPS: " .. tostring(luna.time.getFPS()))
+    console_print("FPS: " .. tostring(lurek.time.getFPS()))
 end, "Show current FPS")
 
 register_command("reload", function()
@@ -121,7 +121,7 @@ end
 ## Input Handling
 
 ```lua
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "`" or key == "f1" then
         toggle_console()
         return
@@ -137,7 +137,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.textinput(text)
+function lurek.textinput(text)
     if not console.visible then return end
     if text == "`" then return end  -- ignore toggle key
     console.input = console.input .. text
@@ -153,24 +153,24 @@ local function draw_console()
     local ch = 250  -- console height
 
     -- Background
-    luna.gfx.setColor(0, 0, 0, 0.85)
-    luna.gfx.rectangle("fill", 0, 0, sw, ch)
+    lurek.gfx.setColor(0, 0, 0, 0.85)
+    lurek.gfx.rectangle("fill", 0, 0, sw, ch)
 
     -- Log lines
-    luna.gfx.setColor(0.8, 0.8, 0.8, 1)
+    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
     local start = math.max(1, #console.log - 12)
     for i = start, #console.log do
         local y = (i - start) * 16 + 4
-        luna.gfx.print(console.log[i], 8, y)
+        lurek.gfx.print(console.log[i], 8, y)
     end
 
     -- Input line
-    luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-    luna.gfx.rectangle("fill", 0, ch - 22, sw, 22)
-    luna.gfx.setColor(0, 1, 0, 1)
-    luna.gfx.print("> " .. console.input .. "_", 8, ch - 20)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+    lurek.gfx.rectangle("fill", 0, ch - 22, sw, 22)
+    lurek.gfx.setColor(0, 1, 0, 1)
+    lurek.gfx.print("> " .. console.input .. "_", 8, ch - 20)
 
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

@@ -10,9 +10,9 @@ Format-neutral serialization to/from Lua tables: JSON, TOML, CSV. Operates purel
 
 ## Current Feature Summary
 
-- `luna.codec.encodeJson(tbl, pretty?)` / `luna.codec.decodeJson(str)` — JSON round-trip
-- `luna.codec.encodeToml(tbl, pretty?)` / `luna.codec.decodeToml(str)` — TOML round-trip
-- `luna.codec.encodeCsv(rows, headers?)` / `luna.codec.decodeCsv(str, headers?)` — CSV with optional headers
+- `lurek.codec.encodeJson(tbl, pretty?)` / `lurek.codec.decodeJson(str)` — JSON round-trip
+- `lurek.codec.encodeToml(tbl, pretty?)` / `lurek.codec.decodeToml(str)` — TOML round-trip
+- `lurek.codec.encodeCsv(rows, headers?)` / `lurek.codec.decodeCsv(str, headers?)` — CSV with optional headers
 - Pretty-printing for JSON and TOML (human-readable output)
 - All functions are pure: string in → table out, table in → string out
 - TOML is the primary human-authored format (per B-05 constraint)
@@ -36,14 +36,14 @@ Format-neutral serialization to/from Lua tables: JSON, TOML, CSV. Operates purel
 
 ## Suggestions
 
-1. **Add MessagePack**: `luna.codec.encodeMsgPack(tbl)` / `luna.codec.decodeMsgPack(str)` — binary-compact serialization. High value for network payloads and save data.
-2. **Add XML decode (read-only)**: `luna.codec.decodeXml(str)` — parse XML into Lua tables. Needed for Tiled TMX import and third-party data. Encoding XML is less important.
-3. **Add schema validation**: `luna.codec.validate(tbl, schema)` — check that a decoded table matches expected structure. Useful for save file migration and network protocol validation.
-4. **Consider `encode`/`decode` with format parameter**: Instead of format-specific functions, offer `luna.codec.encode(tbl, "json")` / `luna.codec.decode(str, "json")`. Makes it easy to switch formats.
+1. **Add MessagePack**: `lurek.codec.encodeMsgPack(tbl)` / `lurek.codec.decodeMsgPack(str)` — binary-compact serialization. High value for network payloads and save data.
+2. **Add XML decode (read-only)**: `lurek.codec.decodeXml(str)` — parse XML into Lua tables. Needed for Tiled TMX import and third-party data. Encoding XML is less important.
+3. **Add schema validation**: `lurek.codec.validate(tbl, schema)` — check that a decoded table matches expected structure. Useful for save file migration and network protocol validation.
+4. **Consider `encode`/`decode` with format parameter**: Instead of format-specific functions, offer `lurek.codec.encode(tbl, "json")` / `lurek.codec.decode(str, "json")`. Makes it easy to switch formats.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | JSON | ✅ | ❌ (plugin) | ✅ | ✅ (serde) |
 | TOML | ✅ | ❌ | ❌ | ✅ (serde) |
@@ -52,7 +52,7 @@ Format-neutral serialization to/from Lua tables: JSON, TOML, CSV. Operates purel
 | XML | ❌ | ❌ | ✅ | ✅ (serde) |
 | Schema validation | ❌ | ❌ | ❌ | ✅ (reflect) |
 
-Luna2D's built-in serial module with 3 formats is good. Adding MessagePack and XML read would cover nearly all game development serialization needs.
+Lurek2D's built-in serial module with 3 formats is good. Adding MessagePack and XML read would cover nearly all game development serialization needs.
 
 ## Priority
 

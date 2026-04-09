@@ -2,7 +2,7 @@
 -- Top-down farming with crops, seasons, day/night cycle, and economy
 -- Controls: WASD to move, Click soil to plant/harvest, N to advance day
 -- Number keys 1-3 to select crop, B to buy seeds, S to sell harvest
--- Run with: cargo run -- demos/simulation/farming_sim
+-- Run with: cargo run -- content/demos/simulation/farming_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -84,19 +84,19 @@ local function advanceDay()
     end
 end
 
-function luna.init()
-    luna.window.setTitle("Farming Simulator")
-    luna.gfx.setBackgroundColor(0.2, 0.45, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Farming Simulator")
+    lurek.gfx.setBackgroundColor(0.2, 0.45, 0.15)
     initTiles()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Farmer movement
     local fx, fy = 0, 0
-    if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then fy = -1 end
-    if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then fy = 1 end
-    if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then fx = -1 end
-    if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then fx = 1 end
+    if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then fy = -1 end
+    if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then fy = 1 end
+    if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then fx = -1 end
+    if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then fx = 1 end
     farmer.x = clamp(farmer.x + fx * farmer.speed * dt, 1, MAP_W)
     farmer.y = clamp(farmer.y + fy * farmer.speed * dt, 1, MAP_H)
     -- Day timer
@@ -106,106 +106,106 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     local dnf = getDayNightFactor()
     local sr, sg, sb = getSeasonColor()
     -- Update background for day/night
-    luna.gfx.setBackgroundColor(sr * dnf * 0.5, sg * dnf * 0.5, sb * dnf * 0.5)
+    lurek.gfx.setBackgroundColor(sr * dnf * 0.5, sg * dnf * 0.5, sb * dnf * 0.5)
     -- Draw ground
     for y = 1, MAP_H do
         for x = 1, MAP_W do
             local t = tiles[y][x]
             local px, py = (x - 1) * TILE, (y - 1) * TILE
             if t.soil then
-                luna.gfx.setColor(0.35 * dnf, 0.22 * dnf, 0.1 * dnf)
-                luna.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
+                lurek.gfx.setColor(0.35 * dnf, 0.22 * dnf, 0.1 * dnf)
+                lurek.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
                 -- Crops
                 if t.crop then
                     local c = crops[t.crop.type]
                     if t.crop.grown then
-                        luna.gfx.setColor(c.color[1] * dnf, c.color[2] * dnf, c.color[3] * dnf)
-                        luna.gfx.circle("fill", px + TILE / 2, py + TILE / 2, 10)
-                        luna.gfx.setColor(0, 0.4 * dnf, 0)
-                        luna.gfx.rectangle("fill", px + TILE / 2 - 1, py + 4, 2, TILE / 2 - 4)
+                        lurek.gfx.setColor(c.color[1] * dnf, c.color[2] * dnf, c.color[3] * dnf)
+                        lurek.gfx.circle("fill", px + TILE / 2, py + TILE / 2, 10)
+                        lurek.gfx.setColor(0, 0.4 * dnf, 0)
+                        lurek.gfx.rectangle("fill", px + TILE / 2 - 1, py + 4, 2, TILE / 2 - 4)
                     else
                         local progress = (day - t.crop.plantDay) / c.growTime
                         local sz = lerp(3, 10, clamp(progress, 0, 1))
-                        luna.gfx.setColor(0.2 * dnf, 0.6 * dnf, 0.15 * dnf)
-                        luna.gfx.circle("fill", px + TILE / 2, py + TILE / 2, sz)
-                        luna.gfx.setColor(0.3 * dnf, 0.4 * dnf, 0.1 * dnf)
-                        luna.gfx.rectangle("fill", px + TILE / 2 - 1, py + TILE / 2, 2, TILE / 2 - 2)
+                        lurek.gfx.setColor(0.2 * dnf, 0.6 * dnf, 0.15 * dnf)
+                        lurek.gfx.circle("fill", px + TILE / 2, py + TILE / 2, sz)
+                        lurek.gfx.setColor(0.3 * dnf, 0.4 * dnf, 0.1 * dnf)
+                        lurek.gfx.rectangle("fill", px + TILE / 2 - 1, py + TILE / 2, 2, TILE / 2 - 2)
                     end
                 end
             else
-                luna.gfx.setColor(sr * dnf, sg * dnf, sb * dnf)
-                luna.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
+                lurek.gfx.setColor(sr * dnf, sg * dnf, sb * dnf)
+                lurek.gfx.rectangle("fill", px, py, TILE - 1, TILE - 1)
             end
         end
     end
     -- Farm border
-    luna.gfx.setColor(0.6 * dnf, 0.4 * dnf, 0.2 * dnf)
-    luna.gfx.rectangle("line", (FARM_X - 1) * TILE - 2, (FARM_Y - 1) * TILE - 2, FARM_W * TILE + 4, FARM_H * TILE + 4)
+    lurek.gfx.setColor(0.6 * dnf, 0.4 * dnf, 0.2 * dnf)
+    lurek.gfx.rectangle("line", (FARM_X - 1) * TILE - 2, (FARM_Y - 1) * TILE - 2, FARM_W * TILE + 4, FARM_H * TILE + 4)
     -- Farmer
-    luna.gfx.setColor(0.2 * dnf, 0.5 * dnf, 0.9 * dnf)
+    lurek.gfx.setColor(0.2 * dnf, 0.5 * dnf, 0.9 * dnf)
     local fpx = (farmer.x - 1) * TILE
     local fpy = (farmer.y - 1) * TILE
-    luna.gfx.rectangle("fill", fpx + 4, fpy + 4, TILE - 8, TILE - 8)
+    lurek.gfx.rectangle("fill", fpx + 4, fpy + 4, TILE - 8, TILE - 8)
     -- Head
-    luna.gfx.setColor(0.9 * dnf, 0.75 * dnf, 0.55 * dnf)
-    luna.gfx.circle("fill", fpx + TILE / 2, fpy + 6, 6)
+    lurek.gfx.setColor(0.9 * dnf, 0.75 * dnf, 0.55 * dnf)
+    lurek.gfx.circle("fill", fpx + TILE / 2, fpy + 6, 6)
     -- Hat
-    luna.gfx.setColor(0.6 * dnf, 0.3 * dnf, 0.1 * dnf)
-    luna.gfx.rectangle("fill", fpx + 6, fpy, TILE - 12, 5)
+    lurek.gfx.setColor(0.6 * dnf, 0.3 * dnf, 0.1 * dnf)
+    lurek.gfx.rectangle("fill", fpx + 6, fpy, TILE - 12, 5)
     -- HUD Panel
-    luna.gfx.setColor(0, 0, 0, 0.75)
-    luna.gfx.rectangle("fill", 0, MAP_H * TILE, 800, 600 - MAP_H * TILE)
+    lurek.gfx.setColor(0, 0, 0, 0.75)
+    lurek.gfx.rectangle("fill", 0, MAP_H * TILE, 800, 600 - MAP_H * TILE)
     -- Day/Season info
-    luna.gfx.setColor(1, 1, 0.8)
-    luna.gfx.print("Day " .. day .. " | " .. seasonNames[season] .. " (Day " .. (((day - 1) % seasonLen) + 1) .. "/" .. seasonLen .. ")", 10, MAP_H * TILE + 6)
-    luna.gfx.print("Money: $" .. money, 10, MAP_H * TILE + 24)
+    lurek.gfx.setColor(1, 1, 0.8)
+    lurek.gfx.print("Day " .. day .. " | " .. seasonNames[season] .. " (Day " .. (((day - 1) % seasonLen) + 1) .. "/" .. seasonLen .. ")", 10, MAP_H * TILE + 6)
+    lurek.gfx.print("Money: $" .. money, 10, MAP_H * TILE + 24)
     -- Time bar
     local tbx, tby = 350, MAP_H * TILE + 6
-    luna.gfx.setColor(0.2, 0.2, 0.3); luna.gfx.rectangle("fill", tbx, tby, 120, 12)
-    luna.gfx.setColor(1, 0.8, 0.2); luna.gfx.rectangle("fill", tbx, tby, 120 * (dayTimer / dayDuration), 12)
-    luna.gfx.setColor(1, 1, 1); luna.gfx.print(autoTime and "Auto" or "Manual (N)", tbx + 130, tby)
+    lurek.gfx.setColor(0.2, 0.2, 0.3); lurek.gfx.rectangle("fill", tbx, tby, 120, 12)
+    lurek.gfx.setColor(1, 0.8, 0.2); lurek.gfx.rectangle("fill", tbx, tby, 120 * (dayTimer / dayDuration), 12)
+    lurek.gfx.setColor(1, 1, 1); lurek.gfx.print(autoTime and "Auto" or "Manual (N)", tbx + 130, tby)
     -- Inventory
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Seeds:", 10, MAP_H * TILE + 44)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Seeds:", 10, MAP_H * TILE + 44)
     for i, c in ipairs(crops) do
         local sel = (i == selectedCrop)
-        if sel then luna.gfx.setColor(1, 1, 0.3) else luna.gfx.setColor(0.7, 0.7, 0.7) end
-        luna.gfx.print("[" .. i .. "] " .. c.name .. ": " .. inventory.seeds[i], 10 + (i - 1) * 160, MAP_H * TILE + 60)
+        if sel then lurek.gfx.setColor(1, 1, 0.3) else lurek.gfx.setColor(0.7, 0.7, 0.7) end
+        lurek.gfx.print("[" .. i .. "] " .. c.name .. ": " .. inventory.seeds[i], 10 + (i - 1) * 160, MAP_H * TILE + 60)
     end
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Harvest:", 10, MAP_H * TILE + 78)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Harvest:", 10, MAP_H * TILE + 78)
     for i, c in ipairs(crops) do
-        luna.gfx.setColor(c.color[1], c.color[2], c.color[3])
-        luna.gfx.print(c.name .. ": " .. inventory.harvest[i], 80 + (i - 1) * 160, MAP_H * TILE + 78)
+        lurek.gfx.setColor(c.color[1], c.color[2], c.color[3])
+        lurek.gfx.print(c.name .. ": " .. inventory.harvest[i], 80 + (i - 1) * 160, MAP_H * TILE + 78)
     end
     -- Controls hint
-    luna.gfx.setColor(0.5, 0.5, 0.6)
-    luna.gfx.print("B=Buy seeds  S=Sell harvest  T=Toggle auto-time  1/2/3=Select crop  Click=Plant/Harvest", 10, MAP_H * TILE + 98)
+    lurek.gfx.setColor(0.5, 0.5, 0.6)
+    lurek.gfx.print("B=Buy seeds  S=Sell harvest  T=Toggle auto-time  1/2/3=Select crop  Click=Plant/Harvest", 10, MAP_H * TILE + 98)
     -- Shop overlay
     if shopOpen then
-        luna.gfx.setColor(0, 0, 0, 0.85); luna.gfx.rectangle("fill", 200, 150, 400, 250)
-        luna.gfx.setColor(0.8, 0.7, 0.3); luna.gfx.print("SEED SHOP", 340, 160, 1.3)
-        luna.gfx.setColor(1, 1, 1); luna.gfx.print("Money: $" .. money, 340, 185)
+        lurek.gfx.setColor(0, 0, 0, 0.85); lurek.gfx.rectangle("fill", 200, 150, 400, 250)
+        lurek.gfx.setColor(0.8, 0.7, 0.3); lurek.gfx.print("SEED SHOP", 340, 160, 1.3)
+        lurek.gfx.setColor(1, 1, 1); lurek.gfx.print("Money: $" .. money, 340, 185)
         for i, c in ipairs(crops) do
             local by = 210 + (i - 1) * 55
-            luna.gfx.setColor(0.15, 0.15, 0.2); luna.gfx.rectangle("fill", 220, by, 360, 45)
-            luna.gfx.setColor(c.color[1], c.color[2], c.color[3])
-            luna.gfx.print(c.name .. " Seeds", 235, by + 5, 1.1)
-            luna.gfx.setColor(0.7, 0.7, 0.7)
-            luna.gfx.print("Cost: $" .. c.seedCost .. "/seed  |  Grow: " .. c.growTime .. " days  |  Sells: $" .. c.sellPrice, 235, by + 24)
-            luna.gfx.setColor(0.3, 0.8, 0.3)
-            luna.gfx.print("[" .. i .. "] Buy", 520, by + 10)
+            lurek.gfx.setColor(0.15, 0.15, 0.2); lurek.gfx.rectangle("fill", 220, by, 360, 45)
+            lurek.gfx.setColor(c.color[1], c.color[2], c.color[3])
+            lurek.gfx.print(c.name .. " Seeds", 235, by + 5, 1.1)
+            lurek.gfx.setColor(0.7, 0.7, 0.7)
+            lurek.gfx.print("Cost: $" .. c.seedCost .. "/seed  |  Grow: " .. c.growTime .. " days  |  Sells: $" .. c.sellPrice, 235, by + 24)
+            lurek.gfx.setColor(0.3, 0.8, 0.3)
+            lurek.gfx.print("[" .. i .. "] Buy", 520, by + 10)
         end
-        luna.gfx.setColor(0.6, 0.6, 0.6); luna.gfx.print("Press B to close shop", 320, 380)
+        lurek.gfx.setColor(0.6, 0.6, 0.6); lurek.gfx.print("Press B to close shop", 320, 380)
     end
-    luna.gfx.setColor(0.5, 0.5, 0.5); luna.gfx.print("FPS: " .. luna.time.getFPS(), 730, 580)
+    lurek.gfx.setColor(0.5, 0.5, 0.5); lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 730, 580)
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if shopOpen or button ~= 1 then return end
     local tx = math.floor(mx / TILE) + 1
     local ty = math.floor(my / TILE) + 1
@@ -225,8 +225,8 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "n" and not autoTime then advanceDay() end
     if key == "t" then autoTime = not autoTime end
     if key == "1" then selectedCrop = 1 end

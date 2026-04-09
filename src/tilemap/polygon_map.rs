@@ -3,13 +3,13 @@
 //! Manages a collection of named polygon regions with colors, labels,
 //! highlighting, and point-in-polygon queries.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for polygon map-related operations and data management.
 //! Key types exported from this module: `PolygonRegion`, `PolygonMap`.
 //! Primary functions: `new()`, `add_region()`, `remove_region()`, `set_region_color()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

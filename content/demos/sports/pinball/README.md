@@ -4,7 +4,7 @@ A physics-driven pinball table with flippers, circular bumpers, score targets, a
 
 ## What It Demonstrates
 
-- Physics bodies as a complete game mechanic: every table element is a static `luna.physics` body
+- Physics bodies as a complete game mechanic: every table element is a static `lurek.physics` body
 - Flipper simulation using angle-driven kinematic body repositioning per frame
 - Circular bumpers with `setBodyRestitution(1.8)` to create repulsion above normal elasticity
 - Angled gutter walls built from `newBody` + `setBodySize` positioned along a diagonal
@@ -15,7 +15,7 @@ A physics-driven pinball table with flippers, circular bumpers, score targets, a
 ## How to Run
 
 ```powershell
-cargo run -- demos/pinball
+cargo run -- content/demos/pinball
 ```
 
 ## Controls

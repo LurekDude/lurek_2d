@@ -3,6 +3,9 @@
 /target/
 /dist/
 
+# Runtime save data written by the engine during test runs
+/save/
+
 # Session and planning artifacts
 /work/
 

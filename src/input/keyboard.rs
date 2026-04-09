@@ -1,12 +1,12 @@
 //! Keyboard implementation for the `input` subsystem.
 //!
-//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! This module is part of Lurek2D's `input` subsystem and provides the implementation
 //! details for keyboard-related operations and data management.
 //! Key types exported from this module: `KeyboardState`.
 //! Primary functions: `new()`, `begin_frame()`, `press_scancode()`, `release_scancode()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use std::collections::HashSet;
 
@@ -347,7 +347,7 @@ pub(crate) fn get_key_from_scancode(scancode: &str) -> Option<String> {
     }
 }
 
-/// Converts a `winit 0.30` logical `Key` to the lowercase string name used by the `luna.*` API.
+/// Converts a `winit 0.30` logical `Key` to the lowercase string name used by the `lurek.*` API.
 ///
 /// Returns `Some(name)` for recognised keys, `None` for keys without a mapping
 /// (which the engine skips silently).

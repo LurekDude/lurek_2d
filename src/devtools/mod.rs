@@ -1,7 +1,7 @@
-//! Developer-tools subsystem for Luna2D.
+//! Developer-tools subsystem for Lurek2D.
 //!
 //! Provides four collaborating facilities exposed to Lua games via
-//! `luna.devtools.*`:
+//! `lurek.devtools.*`:
 //!
 //! | Facility | Type | Purpose |
 //! |---|---|---|

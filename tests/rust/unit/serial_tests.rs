@@ -1,19 +1,19 @@
 ﻿//! Integration tests for the serial module.
 
-use luna2d::serial::{from_csv, from_json, from_toml, to_csv, to_json, to_toml};
-use luna2d::serial::{CsvOptions, SerialValue};
+use lurek2d::serial::{from_csv, from_json, from_toml, to_csv, to_json, to_toml};
+use lurek2d::serial::{CsvOptions, SerialValue};
 
 // ── JSON ─────────────────────────────────────────────────────────────────────
 
 #[test]
 fn serial_json_roundtrip_basic_types() {
-    let json = r#"{"name":"Luna2D","version":4,"pi":3.14,"enabled":true}"#;
+    let json = r#"{"name":"Lurek2D","version":4,"pi":3.14,"enabled":true}"#;
     let val = from_json(json).unwrap();
     let out = to_json(&val, false).unwrap();
     let val2 = from_json(&out).unwrap();
     if let SerialValue::Map(map) = &val2 {
         if let Some(SerialValue::Str(s)) = map.get("name") {
-            assert_eq!(s, "Luna2D");
+            assert_eq!(s, "Lurek2D");
         }
         if let Some(SerialValue::Int(n)) = map.get("version") {
             assert_eq!(*n, 4);
@@ -61,7 +61,7 @@ fn serial_json_pretty() {
 #[test]
 fn serial_toml_basic_types() {
     let input = r#"
-name = "Luna2D"
+name = "Lurek2D"
 version = 4
 pi = 3.14
 enabled = true
@@ -69,7 +69,7 @@ enabled = true
     let val = from_toml(input).unwrap();
     if let SerialValue::Map(map) = &val {
         if let Some(SerialValue::Str(s)) = map.get("name") {
-            assert_eq!(s, "Luna2D");
+            assert_eq!(s, "Lurek2D");
         }
         if let Some(SerialValue::Int(n)) = map.get("version") {
             assert_eq!(*n, 4);
@@ -164,8 +164,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -239,6 +239,6 @@ fn test_lua_serial_totoml_basic() {
 #[test]
 fn test_lua_serial_fromjson_error() {
     let (_state, lua) = make_vm();
-    let result = lua.load(r#"luna.codec.fromJson("{bad json}")"#).exec();
+    let result = lua.load(r#"lurek.codec.fromJson("{bad json}")"#).exec();
     assert!(result.is_err());
 }

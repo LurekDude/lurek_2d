@@ -3,13 +3,13 @@
 //! Cells are addressed with 0-based `(x, y)` coordinates. The Lua layer
 //! converts to/from 1-based indices.
 //!
-//! This module is part of Luna2D's `pathfinding` subsystem and provides the implementation
+//! This module is part of Lurek2D's `pathfinding` subsystem and provides the implementation
 //! details for grid-related operations and data management.
 //! Key types exported from this module: `Grid`.
 //! Primary functions: `new()`, `width()`, `height()`, `set_walkable()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{PF01_GRID_INIT, PF03_NO_PATH};
 use crate::log_msg;

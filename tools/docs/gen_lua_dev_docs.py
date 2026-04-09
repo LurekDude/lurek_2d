@@ -2,9 +2,9 @@
 """
 gen_lua_dev_docs.py — Generate Lua developer documentation from lua_api *.rs files.
 
-Parses the luna2d lua_api docstring format (defined in .github/skills/lua-api-design/SKILL.md):
+Parses the lurek2d lua_api docstring format (defined in .github/skills/lua-api-design/SKILL.md):
 
-    //! `luna.<module>` — description          module header
+    //! `lurek.<module>` — description          module header
     pub struct LuaFoo { ... }                  UserData type definition
     // -- methodName --                         section header
     /// One-sentence description.               description
@@ -16,7 +16,7 @@ Parses the luna2d lua_api docstring format (defined in .github/skills/lua-api-de
     methods.add_meta_method(LuaMetaMethod::X)  metamethod (__tostring, __index, etc.)
     tbl.set("name", ...)                       module-level function
 
-Outputs one Markdown file per luna.* module to docs/API/lua/.
+Outputs one Markdown file per lurek.* module to docs/API/lua/.
 Target audience: Lua game developers (not Rust engine contributors).
 
 Usage:
@@ -75,7 +75,7 @@ _STRUCT_RE = re.compile(r"^\s*pub\s+struct\s+(Lua\w+)")
 # impl LuaUserData for LuaFoo   (opens a UserData method block)
 _IMPL_RE = re.compile(r"^\s*impl(?:<[^>]+>)?\s+LuaUserData\s+for\s+(Lua\w+)")
 
-# //! `luna.timer` — description   (module header)
+# //! `lurek.timer` — description   (module header)
 _MOD_HEADER_RE = re.compile(r"^//!\s*`luna\.(\w+)`\s*[-\u2013\u2014]\s*(.+)", re.UNICODE)
 
 # /// @param name : type
@@ -388,8 +388,8 @@ def _lua_signature(
     elif kind == "meta":
         sig = name  # __tostring__, etc.
     else:
-        # module_fn: luna.timer.getDelta() → type
-        sig = f"luna.{module_name}.{name}({param_str})"
+        # module_fn: lurek.timer.getDelta() → type
+        sig = f"lurek.{module_name}.{name}({param_str})"
 
     if returns and returns not in ("nil", ""):
         sig += f" → {returns}"
@@ -410,7 +410,7 @@ def render_module(mod: LuaModule) -> str:
     """Render a LuaModule to Markdown."""
     out: List[str] = []
 
-    out.append(f"# luna.{mod.name}\n")
+    out.append(f"# lurek.{mod.name}\n")
     if mod.desc:
         out.append(f"{mod.desc}\n")
     out.append("")
@@ -534,7 +534,7 @@ def main(argv=None) -> int:
         if args.dry_run:
             print(f"\n{'=' * 64}")
             print(f"  SOURCE : {path}")
-            print(f"  MODULE : luna.{mod.name}")
+            print(f"  MODULE : lurek.{mod.name}")
             print("=" * 64)
             print(md)
         else:

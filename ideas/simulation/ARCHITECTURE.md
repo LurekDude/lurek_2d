@@ -6,7 +6,7 @@
 
 ## 1. Layer Overview
 
-The simulation library occupies four distinct layers inside the Luna2D stack. Each layer has a strict ownership boundary and a clear direction of dependency.
+The simulation library occupies four distinct layers inside the Lurek2D stack. Each layer has a strict ownership boundary and a clear direction of dependency.
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -19,13 +19,13 @@ The simulation library occupies four distinct layers inside the Luna2D stack. Ea
 │  Tier 3 — library/blocksim/                          │
 │  Pure Lua. Reusable scenario DSL, blueprint loader,  │
 │  multi-run orchestration, monitor/report helpers,    │
-│  optional ui glue (luna.ui, luna.terminal).          │
-│  Composes across all public luna.* APIs.             │
+│  optional ui glue (lurek.ui, lurek.terminal).          │
+│  Composes across all public lurek.* APIs.             │
 └────────────────────┬────────────────────────────────┘
-                     │ calls luna.sim.*
+                     │ calls lurek.sim.*
 ┌────────────────────▼────────────────────────────────┐
 │  Bridge — src/lua_api/blocksim_api.rs                │
-│  Thin. Exposes luna.sim.create / step / run /        │
+│  Thin. Exposes lurek.sim.create / step / run /        │
 │  inject / approve / snapshot / drain_monitors.       │
 │  All calls are synchronous from Lua's perspective.   │
 └────────────────────┬────────────────────────────────┘
@@ -46,15 +46,15 @@ The simulation library occupies four distinct layers inside the Luna2D stack. Ea
 
 ---
 
-## 2. Luna2D Tier Placement
+## 2. Lurek2D Tier Placement
 
-| Component | Luna2D location | Tier | Depends on |
+| Component | Lurek2D location | Tier | Depends on |
 |---|---|---|---|
 | Simulation kernel | `src/blocksim/` | Tier 2 | Baseline + Tier 1 (`data`, `compute`) |
 | Lua bridge | `src/lua_api/blocksim_api.rs` | Bridge | `src/blocksim/` + engine |
-| Lua helper library | `library/blocksim/` | Tier 3 (Lunasome) | Public `luna.*` only |
+| Lua helper library | `library/blocksim/` | Tier 3 (Lunasome) | Public `lurek.*` only |
 | Tests (Rust) | `tests/rust/unit/blocksim_tests.rs` | Test | `src/blocksim/` |
-| Tests (Lua) | `tests/lua/unit/test_blocksim.lua` | Test | `luna.sim.*` |
+| Tests (Lua) | `tests/lua/unit/test_blocksim.lua` | Test | `lurek.sim.*` |
 | Tests (library) | `tests/lua/library/test_blocksim_lib.lua` | Test | `library/blocksim/` |
 
 ### Why Tier 2 and not Tier 1
@@ -156,12 +156,12 @@ src/lua_api/blocksim_api.rs may import:
 ### 5.3 Lua helper library owns
 
 - Ergonomic graph DSL (chain, branch, composite builders)
-- TOML scenario file loading via `luna.data.parseToml`
+- TOML scenario file loading via `lurek.data.parseToml`
 - Blueprint pattern implementations (saga, watchdog, canary, bulkhead)
-- Multi-run orchestration (base + variant, parallel runs via `luna.thread`)
-- Monitor log export to files via `luna.fs`
-- Post-run report generation via `luna.dataframe`
-- Optional live dashboard via `luna.ui` or `luna.terminal`
+- Multi-run orchestration (base + variant, parallel runs via `lurek.thread`)
+- Monitor log export to files via `lurek.fs`
+- Post-run report generation via `lurek.dataframe`
+- Optional live dashboard via `lurek.ui` or `lurek.terminal`
 
 ### 5.4 Analytics (post-run, outside kernel)
 
@@ -171,7 +171,7 @@ src/lua_api/blocksim_api.rs may import:
 - Detection correlation with anomaly activation windows
 - Structured report export as JSON/CSV
 
-This must not happen inside the tick loop. It runs after `luna.sim.run()` completes and reads the final monitor stream buffer or a written JSONL/CSV file.
+This must not happen inside the tick loop. It runs after `lurek.sim.run()` completes and reads the final monitor stream buffer or a written JSONL/CSV file.
 
 ### 5.5 Visualization (separate consumer)
 
@@ -181,7 +181,7 @@ This must not happen inside the tick loop. It runs after `luna.sim.run()` comple
 - Composite drill-in UX
 - Dashboard panel layout
 
-This is always a separate concern. A Luna2D frontend can use `luna.gfx`, `luna.ui`, or `luna.scene`. An external frontend can consume exported JSON. Neither is part of the simulation kernel.
+This is always a separate concern. A Lurek2D frontend can use `lurek.gfx`, `lurek.ui`, or `lurek.scene`. An external frontend can consume exported JSON. Neither is part of the simulation kernel.
 
 ---
 
@@ -219,12 +219,12 @@ Lua table ──build──▶      │  (model.rs) │
                                         drain after run or per-tick
                                                         │
                                ┌────────────────────────▼──────┐
-                               │  Lua: luna.sim.drain_monitors()│
+                               │  Lua: lurek.sim.drain_monitors()│
                                │  → Lua table of samples        │
                                └──────────────┬─────────────────┘
                                               │
                                   ┌───────────▼─────────┐
-                                  │ luna.dataframe      │
+                                  │ lurek.dataframe      │
                                   │ analytics + reports │
                                   └─────────────────────┘
 ```
@@ -238,7 +238,7 @@ The module will be guarded by a `modules.blocksim` flag in `src/engine/config.rs
 ```toml
 # conf.toml
 [modules]
-blocksim = true   # enables luna.sim.* namespace
+blocksim = true   # enables lurek.sim.* namespace
 gui      = true   # optional: enables dashboard surface
 terminal = true   # optional: enables text mode inspector
 ```

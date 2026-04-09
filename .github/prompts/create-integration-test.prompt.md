@@ -1,10 +1,10 @@
 ---
-description: "Write a new integration test suite for a Luna2D module. Use when a module lacks test coverage or new public API needs validation. Produces tests/<module>_tests.rs."
+description: "Write a new integration test suite for a Lurek2D module. Use when a module lacks test coverage or new public API needs validation. Produces tests/<module>_tests.rs."
 ---
 
 # Create Integration Test
 
-**Purpose**: Write a complete integration test suite for a Luna2D engine module.
+**Purpose**: Write a complete integration test suite for a Lurek2D engine module.
 **Use When**: A module has no tests, new public functions were added without tests, or a bug was fixed and needs a regression test.
 **Do Not Use When**: Writing unit tests for private functions (those go in `#[cfg(test)]` inside `src/`).
 **Scope**: `tests/<module>_tests.rs`.

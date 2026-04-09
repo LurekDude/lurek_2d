@@ -1,26 +1,25 @@
 -- examples/timer.lua
--- Luna2D luna.time API Reference
--- This file is documentation code, not a runnable game.
--- Every luna.time function is demonstrated with inline comments.
+-- Lurek2D lurek.time API Reference
+-- Every lurek.time function is demonstrated with inline comments.
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- Frame Timing (call from luna.process / luna.render)
+-- Frame Timing (call from lurek.process / lurek.render)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Seconds since last frame (kept below 0.1 to avoid physics tunnelling)
-local dt = luna.time.getDelta()
+local dt = lurek.time.getDelta()
 
 -- Total seconds elapsed since the game started
-local elapsed = luna.time.getTime()
+local elapsed = lurek.time.getTime()
 
 -- Current frames-per-second (averaged over recent frames)
-local fps = luna.time.getFPS()
+local fps = lurek.time.getFPS()
 
 -- Smoothed mean frame delta (less noisy than getDelta() for display)
-local avg_dt = luna.time.getAverageDelta()
+local avg_dt = lurek.time.getAverageDelta()
 
 -- Block the current thread for a fixed duration (use sparingly — pauses the game loop)
--- luna.time.sleep(0.001)  -- sleep 1 ms
+lurek.time.sleep(0.001)  -- sleep 1 ms
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Scheduler
@@ -28,7 +27,7 @@ local avg_dt = luna.time.getAverageDelta()
 -- Call scheduler:update(dt) each frame to drive it.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local sched = luna.time.newScheduler()
+local sched = lurek.time.newScheduler()
 
 -- ── One-shot callbacks ────────────────────────────────────────────────────────
 
@@ -111,14 +110,14 @@ local scale = sched:getTimeScale()
 
 -- ── Drive the scheduler each frame ───────────────────────────────────────────
 
--- This is mandatory — put it inside luna.process:
-function luna.process(dt)
+-- This is mandatory — put it inside lurek.process:
+function lurek.process(dt)
     sched:update(dt)
 end
 
 
--- ─── luna.time ─────────────────────────────────────────────────────────────────
-local micro_time = luna.time.getMicroTime()  -- Returns the high-resolution elapsed time since engine start in seconds
-local physics_delta = luna.time.getPhysicsDelta()  -- Returns the fixed timestep used by `process_physics` callbacks (seconds)
-luna.time.setPhysicsDelta(1.0)  -- Sets the fixed timestep for `process_physics` callbacks (seconds)
-local step = luna.time.step()  -- Advances the timer by one frame, returning the delta time
+-- ─── lurek.time ─────────────────────────────────────────────────────────────────
+local micro_time = lurek.time.getMicroTime()  -- Returns the high-resolution elapsed time since engine start in seconds
+local physics_delta = lurek.time.getPhysicsDelta()  -- Returns the fixed timestep used by `process_physics` callbacks (seconds)
+lurek.time.setPhysicsDelta(1.0)  -- Sets the fixed timestep for `process_physics` callbacks (seconds)
+local step = lurek.time.step()  -- Advances the timer by one frame, returning the delta time

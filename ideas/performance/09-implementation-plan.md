@@ -123,7 +123,7 @@
 - **What**: Decode audio on background thread, poll from main
 - **Impact**: Eliminates main-thread stalls during sound loading
 - **Files**: `src/audio/mixer.rs`, `src/audio/decoder.rs`
-- **Lua API**: `luna.audio.newSourceAsync(path)` returns handle
+- **Lua API**: `lurek.audio.newSourceAsync(path)` returns handle
 - **Test**: Load 10 large audio files, measure frame drops
 
 ### 3.3 Write-behind for save files
@@ -135,7 +135,7 @@
 
 ### 3.4 Async asset Lua API
 - **Priority**: P2
-- **What**: `luna.gfx.newImageAsync()`, `luna.audio.newSourceAsync()`
+- **What**: `lurek.gfx.newImageAsync()`, `lurek.audio.newSourceAsync()`
 - **Impact**: Non-blocking asset loading from game scripts
 - **Files**: `src/lua_api/graphics_api.rs`, `src/lua_api/audio_api.rs`
 - **Test**: Loading screen example that polls asset readiness
@@ -149,7 +149,7 @@
 - **What**: Instance buffer for repeated sprites (same texture, different transforms)
 - **Impact**: 100�1000� draw call reduction for particle-like effects
 - **Files**: `src/graphics/gpu_renderer/`, shader changes
-- **Lua API**: Automatic when using SpriteBatch, manual via `luna.gfx.newInstanceBatch()`
+- **Lua API**: Automatic when using SpriteBatch, manual via `lurek.gfx.newInstanceBatch()`
 - **Test**: 10k sprites benchmark, draw call counter
 
 ### 4.2 Texture atlas auto-packing
@@ -164,7 +164,7 @@
 - **What**: wgpu compute shaders for element-wise ops and convolution
 - **Impact**: 10�100� for 100k+ elements
 - **Files**: New compute pipeline in `src/graphics/gpu_renderer/`
-- **Lua API**: `luna.compute.gpuAdd(a, b)` or automatic offload
+- **Lua API**: `lurek.compute.gpuAdd(a, b)` or automatic offload
 - **Test**: GPU vs CPU benchmark for 1M element add
 
 ### 4.4 GPU tilemap rendering
@@ -198,7 +198,7 @@
 - **What**: Cache tessellated vertex data for non-moving draw commands
 - **Impact**: Eliminate re-tessellation for backgrounds, UI
 - **Files**: `src/graphics/gpu_renderer/render_pass.rs`, new cache layer
-- **Lua API**: `luna.gfx.newGeometryCache()`
+- **Lua API**: `lurek.gfx.newGeometryCache()`
 
 ### 5.4 Render thread separation
 - **Priority**: P4

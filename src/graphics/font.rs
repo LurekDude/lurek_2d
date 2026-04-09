@@ -1,12 +1,12 @@
 //! TTF/OTF font loading, glyph rasterization, and atlas packing for GPU text rendering.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for font-related operations and data management.
 //! Key types exported from this module: `Font`, `GlyphInfo`.
 //! Primary functions: `from_bytes()`, `ensure_glyph()`, `text_width()`, `line_height()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::error::{EngineError, EngineResult};
 use crate::engine::log_messages::G006_ATLAS_MAX_SIZE;

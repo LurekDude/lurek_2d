@@ -1,9 +1,9 @@
 ---
 name: visual-effects
-description: "Load this skill when implementing visual post-processing effects, image filters, or shader-based rendering techniques in Luna2D: full-screen passes using canvas render-to-texture, custom WGSL fragment shaders for blur/bloom/distortion/colour grading, screen-space overlays, or multi-pass render pipelines. Use for: CRT scanlines, vignette, colour correction, bloom, distortion, pixelation, palette swap. Skip it for basic sprite/image drawing (use gpu-programming), or 3D-style rendering (out of scope for Luna2D)."
+description: "Load this skill when implementing visual post-processing effects, image filters, or shader-based rendering techniques in Lurek2D: full-screen passes using canvas render-to-texture, custom WGSL fragment shaders for blur/bloom/distortion/colour grading, screen-space overlays, or multi-pass render pipelines. Use for: CRT scanlines, vignette, colour correction, bloom, distortion, pixelation, palette swap. Skip it for basic sprite/image drawing (use gpu-programming), or 3D-style rendering (out of scope for Lurek2D)."
 ---
 
-# Visual Effects — Luna2D
+# Visual Effects — Lurek2D
 
 ## Load When
 
@@ -22,13 +22,13 @@ description: "Load this skill when implementing visual post-processing effects, 
 - Built-in shader auto-uniforms (`luna_Time`, `luna_ScreenSize`)
 - Common effect recipes (blur, bloom, vignette, CRT, distortion)
 - Performance budget for full-screen passes on integrated GPU
-- CPU-side image filter via `luna.img` (offline/load-time effects)
+- CPU-side image filter via `lurek.img` (offline/load-time effects)
 
 ---
 
-## How Post-Processing Works in Luna2D
+## How Post-Processing Works in Lurek2D
 
-Luna2D has no dedicated post-processing pipeline. Effects are implemented using the **canvas + custom shader** pattern:
+Lurek2D has no dedicated post-processing pipeline. Effects are implemented using the **canvas + custom shader** pattern:
 
 ```
 1. Render the scene to a Canvas (off-screen texture)
@@ -46,11 +46,11 @@ This single pattern covers every post-processing effect. Multi-pass effects chai
 local sceneCanvas   -- off-screen render target
 local effectShader  -- WGSL shader that reads from the canvas
 
-function luna.init()
-    local w, h = luna.window.getWidth(), luna.window.getHeight()
-    sceneCanvas = luna.gfx.newCanvas(w, h)
+function lurek.init()
+    local w, h = lurek.window.getWidth(), lurek.window.getHeight()
+    sceneCanvas = lurek.gfx.newCanvas(w, h)
 
-    effectShader = luna.gfx.newShader([[
+    effectShader = lurek.gfx.newShader([[
         @group(0) @binding(0) var tex: texture_2d<f32>;
         @group(0) @binding(1) var smp: sampler;
 
@@ -68,17 +68,17 @@ function luna.init()
     ]])
 end
 
-function luna.render()
+function lurek.render()
     -- Phase 1: render scene to canvas
-    luna.gfx.setCanvas(sceneCanvas)
-    luna.gfx.clear()
+    lurek.gfx.setCanvas(sceneCanvas)
+    lurek.gfx.clear()
     drawScene()           -- all normal draw calls go here
-    luna.gfx.setCanvas(nil)
+    lurek.gfx.setCanvas(nil)
 
     -- Phase 2: draw canvas through effect shader
-    luna.gfx.setShader(effectShader)
-    luna.gfx.draw(sceneCanvas, 0, 0)
-    luna.gfx.setShader(nil)
+    lurek.gfx.setShader(effectShader)
+    lurek.gfx.draw(sceneCanvas, 0, 0)
+    lurek.gfx.setShader(nil)
 end
 ```
 
@@ -179,29 +179,29 @@ Chain effects by using multiple canvases as intermediate render targets:
 ```lua
 local sceneCanvas, blurH, blurV  -- three render targets
 
-function luna.init()
-    local w, h = luna.window.getWidth(), luna.window.getHeight()
-    sceneCanvas = luna.gfx.newCanvas(w, h)
-    blurH       = luna.gfx.newCanvas(w, h)
-    blurV       = luna.gfx.newCanvas(w, h)
-    blurHShader = luna.gfx.newShader(BLUR_H_WGSL)
-    blurVShader = luna.gfx.newShader(BLUR_V_WGSL)
+function lurek.init()
+    local w, h = lurek.window.getWidth(), lurek.window.getHeight()
+    sceneCanvas = lurek.gfx.newCanvas(w, h)
+    blurH       = lurek.gfx.newCanvas(w, h)
+    blurV       = lurek.gfx.newCanvas(w, h)
+    blurHShader = lurek.gfx.newShader(BLUR_H_WGSL)
+    blurVShader = lurek.gfx.newShader(BLUR_V_WGSL)
 end
 
-function luna.render()
+function lurek.render()
     -- Pass 1: scene → sceneCanvas
-    luna.gfx.setCanvas(sceneCanvas) ; drawScene() ; luna.gfx.setCanvas(nil)
+    lurek.gfx.setCanvas(sceneCanvas) ; drawScene() ; lurek.gfx.setCanvas(nil)
 
     -- Pass 2: horizontal blur
-    luna.gfx.setCanvas(blurH)
-    luna.gfx.setShader(blurHShader)
-    luna.gfx.draw(sceneCanvas, 0, 0)
-    luna.gfx.setCanvas(nil) ; luna.gfx.setShader(nil)
+    lurek.gfx.setCanvas(blurH)
+    lurek.gfx.setShader(blurHShader)
+    lurek.gfx.draw(sceneCanvas, 0, 0)
+    lurek.gfx.setCanvas(nil) ; lurek.gfx.setShader(nil)
 
     -- Pass 3: vertical blur → screen
-    luna.gfx.setShader(blurVShader)
-    luna.gfx.draw(blurH, 0, 0)
-    luna.gfx.setShader(nil)
+    lurek.gfx.setShader(blurVShader)
+    lurek.gfx.draw(blurH, 0, 0)
+    lurek.gfx.setShader(nil)
 end
 ```
 
@@ -213,7 +213,7 @@ For effects that only need to run once (level load, asset generation):
 
 ```lua
 -- Load image into CPU buffer
-local imgData = luna.img.newImageData("tiles.png")
+local imgData = lurek.img.newImageData("tiles.png")
 
 -- Apply pixel-level filter
 imgData:mapPixel(function(x, y, r, g, b, a)
@@ -225,7 +225,7 @@ imgData:mapPixel(function(x, y, r, g, b, a)
 end)
 
 -- Upload to GPU
-local img = luna.gfx.newImage(imgData)
+local img = lurek.gfx.newImage(imgData)
 ```
 
 ---
@@ -246,5 +246,5 @@ Full-screen shader passes are expensive on integrated GPUs. Target: **≤ 2ms to
 
 ```lua
 -- Half-resolution bloom canvas
-local bloomCanvas = luna.gfx.newCanvas(w // 2, h // 2)
+local bloomCanvas = lurek.gfx.newCanvas(w // 2, h // 2)
 ```

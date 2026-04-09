@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                           |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.savegame`                                      |
+| **Lua API**    | `lurek.savegame`                                      |
 | **Source**     | `src/savegame/`                                      |
 | **Rust Tests** | `tests/rust/unit/savegame_tests.rs`                  |
 | **Lua Tests**  | `tests/lua/unit/test_savegame.lua`                   |
@@ -33,7 +33,7 @@ version number; when a save from version N is loaded against schema version M > 
 all registered migrations in [N, M) are applied in ascending order.
 
 The Lua API exposes `SaveManager` as a UserData object created via
-`luna.savegame.newSaveManager()`.  Games register per-module collector/restorer
+`lurek.savegame.newSaveManager()`.  Games register per-module collector/restorer
 callback pairs, then call `save(slot)` and `load(slot)` for full round-trip
 persistence.  The auto-save timer is advanced by calling `update(dt)` each frame;
 it returns the slot name when a save should trigger, but only if data is dirty.
@@ -45,7 +45,7 @@ pure-Lua-literal persistence layer with schema migration support.
 ## Architecture
 
 ```
-luna.savegame.newSaveManager()
+lurek.savegame.newSaveManager()
           │
           ▼
    LuaSaveManager (UserData)
@@ -165,16 +165,16 @@ Implements `Debug`, `Clone`.
 
 ## Lua API
 
-Exposed under `luna.savegame.*` by `src/lua_api/savegame_api.rs`.
+Exposed under `lurek.savegame.*` by `src/lua_api/savegame_api.rs`.
 
-The module registers a single factory function on the `luna.savegame` table.
+The module registers a single factory function on the `lurek.savegame` table.
 All save operations are methods on the `SaveManager` UserData object.
 
 ### Factory Function
 
 | Function                      | Returns         | Description                                     |
 |-------------------------------|-----------------|-------------------------------------------------|
-| `luna.savegame.newSaveManager()` | `SaveManager` | Creates a new empty save manager UserData object |
+| `lurek.savegame.newSaveManager()` | `SaveManager` | Creates a new empty save manager UserData object |
 
 ### SaveManager Methods
 
@@ -218,8 +218,8 @@ All save operations are methods on the `SaveManager` UserData object.
 
 local sm
 
-function luna.init()
-    sm = luna.savegame.newSaveManager()
+function lurek.init()
+    sm = lurek.savegame.newSaveManager()
     sm:setSchemaVersion(2)
 
     -- Register a collector/restorer pair for the "player" system
@@ -261,7 +261,7 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Advance auto-save timer (fires only when dirty)
     local slot = sm:update(dt)
     if slot then
@@ -275,7 +275,7 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "f5" then
         sm:setSummary("Level " .. player_level)
         sm:save("slot1")
@@ -289,7 +289,7 @@ end
 -- Listing and inspecting save slots
 
 function show_save_menu()
-    local sm = luna.savegame.newSaveManager()
+    local sm = lurek.savegame.newSaveManager()
     local slots = sm:getSlots()
 
     for i, info in ipairs(slots) do
@@ -326,7 +326,7 @@ end
 | `engine`     | Imports from  | Uses `SharedState`, log message constants (`SV01`–`SV04`)         |
 | `filesystem` | Imports from  | `GameFS` for sandboxed `read_string`/`write_string`/`remove`/`list`/`exists` |
 | `data`       | Related       | `data` handles binary serialisation (ByteData, compression, hashing); `savegame` provides Lua-literal text serialisation with schema versioning |
-| `lua_api`    | Imported by   | `src/lua_api/savegame_api.rs` registers `luna.savegame.*` and defines `LuaSaveManager` UserData |
+| `lua_api`    | Imported by   | `src/lua_api/savegame_api.rs` registers `lurek.savegame.*` and defines `LuaSaveManager` UserData |
 | `math`       | Not imported  | No direct dependency on math types                                |
 
 ## Notes

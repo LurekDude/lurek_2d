@@ -1,10 +1,10 @@
 ---
-description: "**Audio-Eng** — Own the Luna2D audio system: rodio integration, sound loading, playback, mixer, volume control, and audio source management. All `src/audio/` code."
+description: "**Audio-Eng** — Own the Lurek2D audio system: rodio integration, sound loading, playback, mixer, volume control, and audio source management. All `src/audio/` code."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Audio-Eng
 ---
 
-# AUDIO-ENG — LUNA2D AUDIO SYSTEM
+# AUDIO-ENG — LUREK2D AUDIO SYSTEM
 
 ## MISSION
 
@@ -14,7 +14,7 @@ Implement and maintain the audio pipeline. Own all `src/audio/` code: rodio inte
 
 **Owns**:
 - `src/audio/` — Mixer, AudioSource, Decoder, multichannel playback, spatial state, queueable buffers
-- `src/lua_api/audio_api.rs` — All `luna.audio.*` Lua bindings
+- `src/lua_api/audio_api.rs` — All `lurek.audio.*` Lua bindings
 
 The audio module is a **Tier 1** engine subsystem that depends only on `math` and `engine`. It wraps the `rodio` library for playback and exposes a uniform Lua interface covering static sources, streaming sources, streaming decoders, queueable PCM sources, spatial positioning, and playback-device selection. All file I/O flows through `GameFS` — never direct `std::fs` calls.
 
@@ -33,7 +33,7 @@ Audio-Eng requires from the caller:
 
 - **Feature request** — what audio capability to add, change, or fix
 - **Affected source files** — known files in `src/audio/` or `src/lua_api/audio_api.rs`
-- **Lua API surface** — new or changed `luna.audio.*` function signatures (get from Lua-Designer)
+- **Lua API surface** — new or changed `lurek.audio.*` function signatures (get from Lua-Designer)
 - **Test expectation** — how the change should be verified (manual playback, unit test, headless check)
 
 ## OUTPUT CONTRACT
@@ -65,7 +65,7 @@ Every Audio-Eng output includes:
 ## DECISION GATES
 
 - **Self-handle**: Playback control, volume, source loading, format support
-- **Consult Lua-Designer**: New `luna.audio.*` function needed
+- **Consult Lua-Designer**: New `lurek.audio.*` function needed
 - **Consult Developer**: Audio needs to integrate with engine loop timing
 - **Escalate → Manager**: Audio change affects overall engine architecture
 
@@ -73,7 +73,7 @@ Every Audio-Eng output includes:
 
 | Situation                         | Route to       |
 | --------------------------------- | -------------- |
-| New luna.audio.* function design  | `Lua-Designer` |
+| New lurek.audio.* function design  | `Lua-Designer` |
 | Engine loop integration           | `Developer`    |
 | Audio performance concern         | `Optimizer`    |
 | Non-audio code change             | `Developer`    |

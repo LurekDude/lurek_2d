@@ -385,7 +385,7 @@ def generate_userdata_impl(type_name: str, methods: List[FoundFn]) -> str:
 def generate_register_fn(module_name: str, module_fns: List[FoundFn]) -> str:
     """Generate the pub fn register(...) block."""
     lines: List[str] = []
-    lines.append("/// Registers the `luna.{module_name}` API table.".replace("{module_name}", module_name))
+    lines.append("/// Registers the `lurek.{module_name}` API table.".replace("{module_name}", module_name))
     lines.append("///")
     lines.append("/// @param lua : &Lua")
     lines.append("/// @param luna : &LuaTable")
@@ -402,7 +402,7 @@ def generate_register_fn(module_name: str, module_fns: List[FoundFn]) -> str:
             lines.append(
                 f'    tbl.set("{fn_item.lua_name}", lua.create_function({fn_item.rust_name})?)?;'
             )
-    lines.append(f'    luna.set("{module_name}", tbl)?;')
+    lines.append(f'    lurek.set("{module_name}", tbl)?;')
     lines.append("    Ok(())")
     lines.append("}")
     lines.append("")
@@ -413,7 +413,7 @@ def generate_register_fn(module_name: str, module_fns: List[FoundFn]) -> str:
 def generate_api_file(module_name: str, fns: List[FoundFn]) -> str:
     """Generate the full content of a _api.rs skeleton file."""
     header_lines: List[str] = [
-        f"//! `luna.{module_name}` Lua API bindings.",
+        f"//! `lurek.{module_name}` Lua API bindings.",
         "//!",
         f"//! Auto-generated skeleton from `src/{module_name}/` Rust docstrings.",
         "//! Fill in the `todo!()` bodies with actual implementation.",
@@ -452,7 +452,7 @@ def generate_api_file(module_name: str, fns: List[FoundFn]) -> str:
     for type_name, methods in sorted(methods_by_type.items()):
         struct_name = f"Lua{type_name}"
         sections.append(f"// ── {struct_name} ────────────────────────────────────────────────────────────\n")
-        sections.append(f"/// `{struct_name}` Lua userdata wrapper for `luna.{module_name}.{type_name}`.")
+        sections.append(f"/// `{struct_name}` Lua userdata wrapper for `lurek.{module_name}.{type_name}`.")
         sections.append("///")
         sections.append(f"/// Holds the Rust-side {type_name} state exposed to Lua scripts.")
         sections.append(f"pub struct {struct_name}(/* TODO: add key + state fields */);\n")
@@ -467,7 +467,7 @@ def generate_api_file(module_name: str, fns: List[FoundFn]) -> str:
 
     # Emit standalone module functions
     if module_fns:
-        sections.append(f"// ── luna.{module_name}.* functions ──────────────────────────────────────────\n")
+        sections.append(f"// ── lurek.{module_name}.* functions ──────────────────────────────────────────\n")
         for fn_item in module_fns:
             sections.append(generate_fn_block(fn_item, module_name))
 

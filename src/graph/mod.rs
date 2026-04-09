@@ -1,4 +1,4 @@
-//! Directed graph with item flow simulation for Luna2D.
+//! Directed graph with item flow simulation for Lurek2D.
 //!
 //! Provides nodes, edges, typed items, simulation (decay, transit, push/pull flow,
 //! conversions, queues), Dijkstra pathfinding, graph algorithms (components, cycles,

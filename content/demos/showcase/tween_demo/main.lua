@@ -1,7 +1,7 @@
 -- examples/tween_demo/main.lua
--- Demonstrates luna.math.newTween() with multiple easing curves.
+-- Demonstrates lurek.math.newTween() with multiple easing curves.
 -- Press R to reset all tweens. Press SPACE to pause/resume.
--- Run with: cargo run -- demos/showcase/tween_demo
+-- Run with: cargo run -- content/demos/showcase/tween_demo
 
 local tweens = {}
 local paused = false
@@ -22,30 +22,30 @@ local duration = 3.0
 local start_x  = 150
 local end_x    = 700
 
-function luna.init()
+function lurek.init()
     reset_tweens()
 end
 
 function reset_tweens()
     tweens = {}
     for _, name in ipairs(easings) do
-        local tw = luna.math.newTween(duration, name)
+        local tw = lurek.math.newTween(duration, name)
         tw:addValue(start_x, end_x) -- x position
         table.insert(tweens, { tween = tw, easing = name })
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if paused then return end
     for _, entry in ipairs(tweens) do
         entry.tween:update(dt)
     end
 end
 
-function luna.render()
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Tween Demo — Easing Curves", 20, 15)
-    luna.gfx.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
+function lurek.render()
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Tween Demo — Easing Curves", 20, 15)
+    lurek.gfx.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
 
     local y = 80
     local row_h = 48
@@ -55,33 +55,33 @@ function luna.render()
         local x = entry.tween:getValue(1)
 
         -- Label
-        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-        luna.gfx.print(entry.easing, 10, y + 2)
+        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.gfx.print(entry.easing, 10, y + 2)
 
         -- Track line
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
 
         -- Ball
         local complete = entry.tween:isComplete()
         if complete then
-            luna.gfx.setColor(0.2, 0.9, 0.2, 1)
+            lurek.gfx.setColor(0.2, 0.9, 0.2, 1)
         else
-            luna.gfx.setColor(1, 0.5, 0.1, 1)
+            lurek.gfx.setColor(1, 0.5, 0.1, 1)
         end
-        luna.gfx.circle("fill", x, y + ball_r, ball_r)
+        lurek.gfx.circle("fill", x, y + ball_r, ball_r)
 
         y = y + row_h
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "r" then
         reset_tweens()
         paused = false
     elseif key == "space" then
         paused = not paused
     elseif key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

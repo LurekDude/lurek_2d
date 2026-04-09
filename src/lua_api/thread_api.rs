@@ -1,4 +1,4 @@
-//! `luna.thread` — Background threads and inter-thread channel communication.
+//! `lurek.thread` — Background threads and inter-thread channel communication.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -81,7 +81,7 @@ impl LuaUserData for LuaThreadHandle {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.thread` API table with the Lua VM.
+/// Registers the `lurek.thread` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

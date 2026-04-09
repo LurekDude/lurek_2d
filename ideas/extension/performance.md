@@ -15,7 +15,7 @@ No performance profiling has been documented.
 
 **Current activation events** (from package2.json):
 - `workspaceContains:**/main.lua` — may trigger on any workspace with a `main.lua`
-- `workspaceContains:Cargo.toml` — triggers on ANY Rust project, not just Luna2D
+- `workspaceContains:Cargo.toml` — triggers on ANY Rust project, not just Lurek2D
 - `onLanguage:lua` — triggers when any Lua file is opened
 
 **Issues**:
@@ -23,8 +23,8 @@ No performance profiling has been documented.
 - All imports are top-level static imports in extension2.ts — no lazy loading
 
 **Improvements**:
-- Change activation to `workspaceContains:conf.lua` (specific to Luna2D games)
-- Keep `workspaceContains:Cargo.toml` but check for `luna2d` in dependencies before full activation
+- Change activation to `workspaceContains:conf.lua` (specific to Lurek2D games)
+- Keep `workspaceContains:Cargo.toml` but check for `lurek2d` in dependencies before full activation
 - Dynamic import for editor modules (load only when editor command is invoked)
 - Measure activation time with `vscode.window.withProgress`
 
@@ -137,5 +137,5 @@ No performance profiling has been documented.
 - Profile which component uses the most memory
 
 ### 4. Startup Profiling Command
-- `luna.perf.profileStartup` — restart extension with timing enabled
+- `lurek.perf.profileStartup` — restart extension with timing enabled
 - Show waterfall chart of component initialization

@@ -1,9 +1,9 @@
 ---
 name: module-architecture
-description: "Load this skill when designing module boundaries, dependency direction, or crate organization for Luna2D. It owns the dependency graph, module responsibility rules, and visibility patterns. Skip it for code implementation or API naming."
+description: "Load this skill when designing module boundaries, dependency direction, or crate organization for Lurek2D. It owns the dependency graph, module responsibility rules, and visibility patterns. Skip it for code implementation or API naming."
 ---
 
-# Module Architecture — Luna2D Engine
+# Module Architecture — Lurek2D Engine
 
 ## Load When
 
@@ -38,8 +38,8 @@ description: "Load this skill when designing module boundaries, dependency direc
   - `engine` → Baseline runtime lifecycle and shared state
   - Tier 1 Rust modules → depend only on `math` and `engine`
   - Tier 2 Rust modules → depend on Baseline + Tier 1, never other Tier 2 modules
-  - `lua_api` → bridge layer that imports engine modules to expose `luna.*`
-  - `library/` → Tier 3 Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust gameplay module
+  - `lua_api` → bridge layer that imports engine modules to expose `lurek.*`
+  - `content/library/` → Tier 3 Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust gameplay module
   - Gameplay-oriented Rust modules still under `src/` are migration-state code, not the target Tier 3 architecture for new work
 - **No same-tier cross-imports**: Tier 1 modules must not import other Tier 1 modules; Tier 2 modules must not import other Tier 2 modules
 - **One responsibility**: Each module owns one subsystem — no shared kitchen-sink modules

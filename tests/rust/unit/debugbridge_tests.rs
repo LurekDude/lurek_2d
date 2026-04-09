@@ -1,7 +1,7 @@
-//! Integration tests for `luna2d::debugbridge` — BridgeShared, PendingRequest,
+//! Integration tests for `lurek2d::debugbridge` — BridgeShared, PendingRequest,
 //! PendingResponse, PrintEntry, and SharedBridge.
 
-use luna2d::debugbridge::{BridgeShared, PendingRequest, PendingResponse, PrintEntry};
+use lurek2d::debugbridge::{BridgeShared, PendingRequest, PendingResponse, PrintEntry};
 
 // ── BridgeShared::new ─────────────────────────────────────────────────────────
 

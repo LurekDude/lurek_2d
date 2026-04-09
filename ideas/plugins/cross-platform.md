@@ -100,7 +100,7 @@ rustflags = ["-C", "link-arg=-Wl,-rpath,@loader_path/plugins"]
 
 **Linux-specific considerations**:
 - Distro packaging: `.deb`/`.rpm` packages should install plugins to
-  `/usr/lib/luna2d/plugins/`
+  `/usr/lib/lurek2d/plugins/`
 - Flatpak/AppImage: bundle plugins inside the container
 - SELinux: some distros restrict `dlopen` on home-directory files — install to
   `/usr/lib/` or adjust SELinux policy
@@ -112,9 +112,9 @@ rustflags = ["-C", "link-arg=-Wl,-rpath,@loader_path/plugins"]
 ```
 Platform    | File Name                | Cargo crate name
 ------------|--------------------------|------------------
-Windows     | luna_gamedev.dll         | luna2d-gamedev
-macOS       | libluna_gamedev.dylib    | luna2d-gamedev
-Linux       | libluna_gamedev.so       | luna2d-gamedev
+Windows     | luna_gamedev.dll         | lurek2d-gamedev
+macOS       | libluna_gamedev.dylib    | lurek2d-gamedev
+Linux       | libluna_gamedev.so       | lurek2d-gamedev
 ```
 
 The `PluginLoader` maps plugin names to platform-specific filenames:
@@ -186,7 +186,7 @@ WASM has no equivalent of `dlopen`. Possible alternatives:
 
 ## Cross-Compilation Matrix
 
-Building Luna2D plugins for different platforms from a single development machine:
+Building Lurek2D plugins for different platforms from a single development machine:
 
 | Build From → | Windows Target | macOS Target | Linux Target |
 |-------------|---------------|-------------|-------------|
@@ -201,7 +201,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        plugin: [luna2d-gamedev, luna2d-business]
+        plugin: [lurek2d-gamedev, lurek2d-business]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -234,8 +234,8 @@ jobs:
 
 ### Windows — `.zip` + Optional NSIS Installer
 ```
-luna2d-windows-x86_64/
-├── luna2d.exe
+lurek2d-windows-x86_64/
+├── lurek2d.exe
 ├── plugins/
 │   ├── luna_gamedev.dll
 │   └── luna_business.dll
@@ -246,10 +246,10 @@ luna2d-windows-x86_64/
 
 ### macOS — `.dmg` or `.app` Bundle
 ```
-Luna2D.app/
+Lurek2D.app/
 └── Contents/
     ├── MacOS/
-    │   └── luna2d              ← executable
+    │   └── lurek2d              ← executable
     ├── Frameworks/
     │   ├── libluna_gamedev.dylib
     │   └── libluna_business.dylib
@@ -261,16 +261,16 @@ Luna2D.app/
 
 ### Linux — `.tar.gz` + Optional AppImage
 ```
-luna2d-linux-x86_64/
+lurek2d-linux-x86_64/
 ├── bin/
-│   └── luna2d
+│   └── lurek2d
 ├── lib/
-│   └── luna2d/
+│   └── lurek2d/
 │       └── plugins/
 │           ├── libluna_gamedev.so
 │           └── libluna_business.so
 ├── share/
-│   └── luna2d/
+│   └── lurek2d/
 │       ├── library/
 │       └── demos/
 └── README.md
@@ -278,8 +278,8 @@ luna2d-linux-x86_64/
 
 FHS-compatible for `/usr/local/` installation:
 ```
-/usr/local/bin/luna2d
-/usr/local/lib/luna2d/plugins/libluna_gamedev.so
-/usr/local/share/luna2d/library/
-/usr/local/share/luna2d/demos/
+/usr/local/bin/lurek2d
+/usr/local/lib/lurek2d/plugins/libluna_gamedev.so
+/usr/local/share/lurek2d/library/
+/usr/local/share/lurek2d/demos/
 ```

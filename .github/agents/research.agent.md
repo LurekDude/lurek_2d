@@ -15,7 +15,7 @@ Find accurate, cited information from external sources (web, docs, GitHub) and i
 **Owns**:
 - Web searches for library docs, crate APIs, known issues, and best practices
 - Fetching official documentation pages and summarizing relevant content
-- Searching the Luna2D repository for existing patterns, similar code, or prior decisions
+- Searching the Lurek2D repository for existing patterns, similar code, or prior decisions
 - Producing a structured findings report with citations
 
 **Must not become**:
@@ -85,7 +85,7 @@ Every Research output is a **research report** containing:
 
 - Prefer official sources: docs.rs, crates.io, official GitHub repos, Mozilla MDN, Lua.org
 - When searching for Rust crate APIs, always check the specific version used in `Cargo.toml`
-- For Luna2D internal questions, check `docs/` and `src/` before going to the web
+- For Lurek2D internal questions, check `docs/` and `src/` before going to the web
 - Cite exact file paths and line numbers for internal codebase findings
 - Keep research reports under 200 lines — link to sources rather than quoting large blocks
 

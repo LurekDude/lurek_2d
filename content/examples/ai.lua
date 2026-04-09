@@ -1,14 +1,12 @@
 -- examples/ai.lua
--- luna.ai — Game AI subsystems: AIWorld, FSM, Behavior Trees, Steering,
+-- lurek.ai — Game AI subsystems: AIWorld, FSM, Behavior Trees, Steering,
 -- Q-Learning, Utility AI, GOAP, Influence Maps, Squads, and Command Queues.
--- All luna.ai API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── AIWorld ───────────────────────────────────────────────────────────────────
 
 -- newWorld() → AIWorld
 -- Container that manages AI agents and a shared global blackboard.
-local world = luna.ai.newWorld()
+local world = lurek.ai.newWorld()
 
 -- addAgent(name, x, y) → Agent
 local agent = world:addAgent("soldier_01", 100, 200)
@@ -54,8 +52,8 @@ local pri = a:getPriority()
 
 -- Decision model (set at construction or update)
 -- "fsm" | "bt" | "utility" | "goap" — actual model object set via setDecisionModel
--- a:setDecisionModel(fsm_object)
--- a:getDecisionModel() → model object
+a:setDecisionModel(fsm_object)
+local decision_model = a:getDecisionModel()
 
 -- Tags for group classification
 a:addTag("ally")
@@ -69,7 +67,7 @@ local bb = a:getBlackboard()
 -- ── Blackboard ────────────────────────────────────────────────────────────────
 
 -- newBlackboard() → Blackboard (standalone, or use agent/world getBlackboard())
-local bb2 = luna.ai.newBlackboard()
+local bb2 = lurek.ai.newBlackboard()
 
 -- setNumber / getNumber
 global_bb:setNumber("player_x", 320)
@@ -92,7 +90,7 @@ global_bb:remove("state")
 -- ── Finite State Machine ──────────────────────────────────────────────────────
 
 -- newStateMachine() → StateMachine
-local fsm = luna.ai.newStateMachine()
+local fsm = lurek.ai.newStateMachine()
 
 -- addState(name, onEnter, onExit, onUpdate)
 -- onEnter/onExit/onUpdate are Lua callbacks: function(agent, dt)
@@ -133,23 +131,23 @@ local cur = fsm:getCurrentState(a)  -- "patrol"
 -- ── Behavior Tree ─────────────────────────────────────────────────────────────
 
 -- newBehaviorTree() → BehaviorTree
-local bt = luna.ai.newBehaviorTree()
+local bt = lurek.ai.newBehaviorTree()
 
 -- BT node constructors (return BTNode objects)
-local root_seq = luna.ai.newSequence()         -- runs children left-to-right until one fails
-local selector  = luna.ai.newSelector()        -- tries children until one succeeds
-local parallel  = luna.ai.newParallel("requireAll", "requireOne")  -- run all children concurrently
-local inverter  = luna.ai.newInverter()        -- inverts child result (success↔failure)
-local repeater  = luna.ai.newRepeater(5)       -- repeat child N times (0 = infinite)
-local succeeder = luna.ai.newSucceeder()        -- always succeeds
+local root_seq = lurek.ai.newSequence()         -- runs children left-to-right until one fails
+local selector  = lurek.ai.newSelector()        -- tries children until one succeeds
+local parallel  = lurek.ai.newParallel("requireAll", "requireOne")  -- run all children concurrently
+local inverter  = lurek.ai.newInverter()        -- inverts child result (success↔failure)
+local repeater  = lurek.ai.newRepeater(5)       -- repeat child N times (0 = infinite)
+local succeeder = lurek.ai.newSucceeder()        -- always succeeds
 
-local action = luna.ai.newAction(function(agent, dt)
+local action = lurek.ai.newAction(function(agent, dt)
     -- perform an action; return "success" | "failure" | "running"
     agent:setPosition(agent:getPosition())   -- example: stay in place
     return "success"
 end)
 
-local condition = luna.ai.newCondition(function(agent, dt)
+local condition = lurek.ai.newCondition(function(agent, dt)
     return agent:getBlackboard():getBool("alerted")  -- true = success
 end)
 
@@ -166,12 +164,12 @@ local result = bt:update(a, 0.016)
 -- ── Steering Behaviors ────────────────────────────────────────────────────────
 
 -- newSteeringManager() → SteeringManager
-local steering = luna.ai.newSteeringManager()
+local steering = lurek.ai.newSteeringManager()
 
 -- addBehavior(type, weight, opts?) — types include:
---   "seek", "flee", "pursue", "evade", "arrive", "wander",
---   "cohesion", "separation", "alignment", "obstacleAvoidance",
---   "pathFollow", "interpose", "hide"
+"seek", "flee", "pursue", "evade", "arrive", "wander",
+"cohesion", "separation", "alignment", "obstacleAvoidance",
+"pathFollow", "interpose", "hide"
 steering:addBehavior("seek",     1.0)
 steering:addBehavior("arrive",   1.0, { slowRadius = 80, stopRadius = 10 })
 steering:addBehavior("wander",   0.3, { wanderRadius = 50, wanderDist = 100 })
@@ -189,7 +187,7 @@ steering:applyForce(a)
 -- ── Q-Learning ────────────────────────────────────────────────────────────────
 
 -- newQLearner(stateCount, actionCount) → QLearner
-local q = luna.ai.newQLearner(16, 4)   -- 16 states, 4 actions
+local q = lurek.ai.newQLearner(16, 4)   -- 16 states, 4 actions
 
 -- setLearningRate(v) / getLearningRate() → number
 q:setLearningRate(0.1)
@@ -212,7 +210,7 @@ local best = q:getBestAction(2)
 -- ── Utility AI ────────────────────────────────────────────────────────────────
 
 -- newUtilityAI() → UtilityAI
-local util_ai = luna.ai.newUtilityAI()
+local util_ai = lurek.ai.newUtilityAI()
 
 -- addAction(name, scorer_fn, executor_fn)
 -- scorer_fn(agent, blackboard) → number (0..1 how useful this action is right now)
@@ -238,7 +236,7 @@ local best_action = util_ai:getBestAction(a)
 -- ── GOAP (Goal-Oriented Action Planning) ──────────────────────────────────────
 
 -- newGOAPPlanner() → GOAPPlanner
-local goap = luna.ai.newGOAPPlanner()
+local goap = lurek.ai.newGOAPPlanner()
 
 -- addAction(name, preconditions, effects, cost, executor_fn)
 goap:addAction("getAmmo",
@@ -273,7 +271,7 @@ local done = goap:getDone()
 -- ── Influence Map ─────────────────────────────────────────────────────────────
 
 -- newInfluenceMap(width, height, cellSize) → InfluenceMap
-local imap = luna.ai.newInfluenceMap(50, 40, 20)
+local imap = lurek.ai.newInfluenceMap(50, 40, 20)
 
 -- addLayer(name) → integer (layer id)
 local threat_layer = imap:addLayer("threat")
@@ -291,7 +289,7 @@ imap:update(0.95)
 -- ── Squad (Formation) ─────────────────────────────────────────────────────────
 
 -- newSquad(name) → Squad
-local squad = luna.ai.newSquad("alpha_squad")
+local squad = lurek.ai.newSquad("alpha_squad")
 
 -- addMember(agent) / removeMember(agent)
 squad:addMember(a)
@@ -308,7 +306,7 @@ squad:update(400, 300, 0, 0.016)
 -- ── Command Queue (RTS) ───────────────────────────────────────────────────────
 
 -- newCommandQueue() → CommandQueue
-local cmdq = luna.ai.newCommandQueue()
+local cmdq = lurek.ai.newCommandQueue()
 
 -- push(command) — command is a table with a "type" field
 cmdq:push({ type = "moveTo", x = 500, y = 300, speed = 150 })
@@ -360,9 +358,9 @@ btnode:setCount(3)           -- repeat up to 3 times, then propagate failure
 
 -- Parallel policy — set BOTH axes explicitly; they are independent of each other.
 -- setFailurePolicy: "any" → abort as soon as one child fails
---                  "all" → only fail once ALL children have failed
+"all" → only fail once ALL children have failed
 -- setSuccessPolicy: "all" → require every child to succeed before succeeding
---                  "any" → succeed the moment any one child succeeds
+"any" → succeed the moment any one child succeeds
 btnode:setFailurePolicy("any")    -- early abort on first child failure
 btnode:setSuccessPolicy("all")    -- unanimous success required
 
@@ -486,7 +484,7 @@ qlearner:endEpisode()
 local episodes = qlearner:getEpisodeCount()  -- integer: completed episodes to date
 
 -- Serialize the full Q-table to JSON and restore it from a saved string —
--- integrate with luna.savegame to persist learned behaviour across play sessions.
+-- integrate with lurek.savegame to persist learned behaviour across play sessions.
 local saved_json = qlearner:serialize()      -- JSON string
 qlearner:deserialize(saved_json)             -- restore Q-table from a prior save
 
@@ -539,9 +537,9 @@ local last_fx, last_fy = steeringmanager:getLastSteering()    -- (vx, vy) last o
 local mode = steeringmanager:getCombineMode()  -- "weighted" | "priority" | "blended"
 
 -- setCombineMode(strategy) — three strategies:
---   "weighted"  → weighted sum of all forces (smooth; all behaviors contribute)
---   "priority"  → highest-weight behavior wins outright (decisive switching)
---   "blended"   → forces are normalised then averaged (equal-magnitude blend)
+"weighted"  → weighted sum of all forces (smooth; all behaviors contribute)
+"priority"  → highest-weight behavior wins outright (decisive switching)
+"blended"   → forces are normalised then averaged (equal-magnitude blend)
 steeringmanager:setCombineMode("priority")  -- one winner per frame
 
 local stm_type = steeringmanager:type()                      -- "SteeringManager"
@@ -564,10 +562,10 @@ local uai_is   = utilityai:typeOf("UtilityAI")  -- true
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Blackboard
 -- A shared key-value store for AI agents to communicate decisions and state.
--- Use with luna.ai.newWorld() and agent:setBlackboard().
+-- Use with lurek.ai.newWorld() and agent:setBlackboard().
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local bb = luna.ai.newBlackboard("shared")
+local bb = lurek.ai.newBlackboard("shared")
 
 -- Write facts (boolean, number, or string values)
 bb:set("enemy_visible", true)
@@ -589,12 +587,12 @@ local rev = bb:getRevision()   -- 3 (one per set() call above)
 
 -- Watch a specific key for changes (returns a subscription id)
 local id1 = bb:watch("enemy_visible", function(key, val, old)
-    luna.log.info(string.format("[BB] %s changed: %s -> %s", key, tostring(old), tostring(val)))
+    lurek.log.info(string.format("[BB] %s changed: %s -> %s", key, tostring(old), tostring(val)))
 end)
 
 -- Watch ALL keys with the wildcard "*"
 local id2 = bb:watch("*", function(key, val, old)
-    luna.log.debug(string.format("[BB] any write: %s = %s", key, tostring(val)))
+    lurek.log.debug(string.format("[BB] any write: %s = %s", key, tostring(val)))
 end)
 
 -- Trigger callbacks
@@ -604,4 +602,4 @@ bb:set("enemy_visible", false)
 bb:unwatch(id1)
 bb:unwatch(id2)
 
-luna.log.info("[ai.lua] Blackboard example complete")
+lurek.log.info("[ai.lua] Blackboard example complete")

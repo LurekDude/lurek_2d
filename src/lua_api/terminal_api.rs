@@ -1,4 +1,4 @@
-//! `luna.terminal` — Grid-based character-cell terminal emulator and widget toolkit.
+//! `lurek.terminal` — Grid-based character-cell terminal emulator and widget toolkit.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1177,7 +1177,7 @@ impl LuaUserData for LuaWidget {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.terminal` API table with the Lua VM.
+/// Registers the `lurek.terminal` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

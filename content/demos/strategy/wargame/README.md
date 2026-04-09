@@ -15,7 +15,7 @@ A hex-adjacent grid wargame with three unit types, terrain modifiers, and comman
 ## How to Run
 
 ```powershell
-cargo run -- demos/wargame
+cargo run -- content/demos/wargame
 ```
 
 ## Controls

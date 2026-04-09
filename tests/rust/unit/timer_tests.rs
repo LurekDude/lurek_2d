@@ -1,6 +1,6 @@
-﻿//! Integration tests for the Luna2D timer module.
+﻿//! Integration tests for the Lurek2D timer module.
 
-use luna2d::timer::Clock;
+use lurek2d::timer::Clock;
 
 #[test]
 fn clock_new_has_zero_delta() {
@@ -108,7 +108,7 @@ fn clock_frame_count_increments_every_tick() {
 
 // ── Phase 34 — Scheduler ───────────────────────────────────────────────
 
-use luna2d::timer::Scheduler;
+use lurek2d::timer::Scheduler;
 
 #[test]
 fn scheduler_after_fires_once() {
@@ -163,8 +163,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -264,7 +264,7 @@ fn test_lua_scheduler_cancel_all() {
 
 #[test]
 fn scheduler_pause_and_resume() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     let id = sched.after(1.0);
     assert!(sched.pause(id));
@@ -275,14 +275,14 @@ fn scheduler_pause_and_resume() {
 
 #[test]
 fn scheduler_pause_nonexistent_returns_false() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     assert!(!sched.pause(9999));
 }
 
 #[test]
 fn scheduler_get_remaining_after_zero_time() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     let id = sched.after(5.0);
     let remaining = sched.get_remaining(id).unwrap();
@@ -291,7 +291,7 @@ fn scheduler_get_remaining_after_zero_time() {
 
 #[test]
 fn scheduler_get_remaining_decreases_after_update() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     let id = sched.after(3.0);
     sched.update(1.0);
@@ -301,14 +301,14 @@ fn scheduler_get_remaining_decreases_after_update() {
 
 #[test]
 fn scheduler_get_remaining_nonexistent_returns_none() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let sched = Scheduler::new();
     assert!(sched.get_remaining(42).is_none());
 }
 
 #[test]
 fn scheduler_time_scale_slows_update() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     sched.set_time_scale(0.5);
     assert!((sched.get_time_scale() - 0.5).abs() < 1e-9);
@@ -321,7 +321,7 @@ fn scheduler_time_scale_slows_update() {
 
 #[test]
 fn scheduler_every_count_limited() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     sched.every(0.5, 2); // fires at most 2 times
     let fired1 = sched.update(0.6);
@@ -336,7 +336,7 @@ fn scheduler_every_count_limited() {
 
 #[test]
 fn scheduler_every_unlimited_does_not_expire() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     sched.every(0.1, -1); // -1 = infinite
     assert_eq!(sched.count(), 1);
@@ -348,7 +348,7 @@ fn scheduler_every_unlimited_does_not_expire() {
 
 #[test]
 fn scheduler_after_named_and_cancel_by_name() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     sched.after_named("my_timer", 5.0);
     let cancelled = sched.cancel_named("my_timer");
@@ -358,14 +358,14 @@ fn scheduler_after_named_and_cancel_by_name() {
 
 #[test]
 fn scheduler_cancel_named_nonexistent_returns_none() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     assert!(sched.cancel_named("no_such_timer").is_none());
 }
 
 #[test]
 fn scheduler_set_interval_changes_fire_timing() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     let id = sched.every(2.0, -1);
     assert!(sched.set_interval(id, 0.5));
@@ -375,7 +375,7 @@ fn scheduler_set_interval_changes_fire_timing() {
 
 #[test]
 fn scheduler_reset_event_restarts_countdown() {
-    use luna2d::timer::Scheduler;
+    use lurek2d::timer::Scheduler;
     let mut sched = Scheduler::new();
     let id = sched.after(1.0);
     sched.update(0.8); // almost elapsed
@@ -387,7 +387,7 @@ fn scheduler_reset_event_restarts_countdown() {
 
 #[test]
 fn clock_total_time_is_sum_of_deltas() {
-    use luna2d::timer::Clock;
+    use lurek2d::timer::Clock;
     let mut clock = Clock::new();
     // tick a few times; we can't control real time but total >= 0
     clock.tick();

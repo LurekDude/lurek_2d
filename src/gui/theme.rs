@@ -6,8 +6,8 @@
 //! style if no state-specific entry exists, and finally to a hard-coded
 //! default if the type has no theme entry at all.
 //!
-//! The Lua API exposes `luna.ui.newTheme()`, `theme:setStyle()`, and
-//! `luna.ui.setTheme()` so game scripts can fully customise appearance
+//! The Lua API exposes `lurek.ui.newTheme()`, `theme:setStyle()`, and
+//! `lurek.ui.setTheme()` so game scripts can fully customise appearance
 //! without touching Rust.
 
 use std::collections::HashMap;

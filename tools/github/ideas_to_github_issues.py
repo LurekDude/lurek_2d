@@ -98,7 +98,7 @@ def call_github_api(url, token, data=None, method="GET"):
     headers = {
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "luna2d-ideas-to-issues-script"
+        "User-Agent": "lurek2d-ideas-to-issues-script"
     }
     if data is not None:
         body = json.dumps(data).encode("utf-8")

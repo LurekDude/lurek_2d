@@ -277,7 +277,7 @@ impl LuaUserData for LuaScheduler {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.time` API table with the Lua VM.
+/// Registers the `lurek.time` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

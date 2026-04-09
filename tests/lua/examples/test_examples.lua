@@ -1,5 +1,5 @@
 -- tests/lua/examples/test_examples.lua
--- Validation tests for Luna2D example games.
+-- Validation tests for Lurek2D example games.
 --
 -- These tests verify that each example's main.lua is syntactically valid
 -- (loadable as a Lua chunk), declares the expected callback structure,

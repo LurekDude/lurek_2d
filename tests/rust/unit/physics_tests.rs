@@ -1,8 +1,8 @@
-//! Integration tests for the Luna2D physics engine.
+//! Integration tests for the Lurek2D physics engine.
 
-use luna2d::math::Vec2;
-use luna2d::physics::shape::{Shape, StandaloneShape};
-use luna2d::physics::{Body, BodyShape, BodyType, World};
+use lurek2d::math::Vec2;
+use lurek2d::physics::shape::{Shape, StandaloneShape};
+use lurek2d::physics::{Body, BodyShape, BodyType, World};
 
 #[test]
 fn body_creation() {

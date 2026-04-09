@@ -1,6 +1,6 @@
 # tools/scripts/
 
-Session scripts and agent automation utilities for Luna2D development workflows.
+Session scripts and agent automation utilities for Lurek2D development workflows.
 
 These scripts are NOT permanent tools (which live in `tools/audit/`, etc.) — they are
 workflow helpers intended to be used interactively by developers and AI agents.

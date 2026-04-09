@@ -1,6 +1,6 @@
 -- Social Deduction — Among Us style with AI players
 -- Complete tasks or vote out the traitor to win
--- Run with: cargo run -- demos/rpg/social_deduction
+-- Run with: cargo run -- content/demos/rpg/social_deduction
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -70,9 +70,9 @@ local function init_game()
     end
 end
 
-function luna.init()
-    luna.window.setTitle("Social Deduction")
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Social Deduction")
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     init_game()
 end
 
@@ -144,7 +144,7 @@ local function update_ai(p, i, dt)
     p.y = clamp(p.y, 10, H - 10)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_over then return end
     msg_timer = msg_timer - dt
     if msg_timer < 0 then message = nil end
@@ -154,10 +154,10 @@ function luna.process(dt)
         local me = players[player_id]
         if me.alive then
             local spd = 120
-            if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then me.y = me.y - spd * dt end
-            if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then me.y = me.y + spd * dt end
-            if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then me.x = me.x - spd * dt end
-            if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then me.x = me.x + spd * dt end
+            if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then me.y = me.y - spd * dt end
+            if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then me.y = me.y + spd * dt end
+            if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then me.x = me.x - spd * dt end
+            if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then me.x = me.x + spd * dt end
             me.x = clamp(me.x, 10, W - 10)
             me.y = clamp(me.y, 10, H - 10)
         end
@@ -227,14 +227,14 @@ local function draw_task_phase()
         if not t.done then
             local visible = dist(me, t) < VISION_RADIUS
             if visible then
-                luna.gfx.setColor(1, 1, 0.3, 0.8)
-                luna.gfx.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
-                luna.gfx.setColor(0, 0, 0, 1)
-                luna.gfx.print("!", t.x - 3, t.y - 8, 1)
+                lurek.gfx.setColor(1, 1, 0.3, 0.8)
+                lurek.gfx.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
+                lurek.gfx.setColor(0, 0, 0, 1)
+                lurek.gfx.print("!", t.x - 3, t.y - 8, 1)
             end
         else
-            luna.gfx.setColor(0.2, 0.5, 0.2, 0.5)
-            luna.gfx.rectangle("line", t.x - 10, t.y - 10, 20, 20)
+            lurek.gfx.setColor(0.2, 0.5, 0.2, 0.5)
+            lurek.gfx.rectangle("line", t.x - 10, t.y - 10, 20, 20)
         end
     end
 
@@ -245,73 +245,73 @@ local function draw_task_phase()
             local visible = (i == player_id) or (dist(me, p) < VISION_RADIUS)
             if visible then
                 local c = COLORS[i]
-                luna.gfx.setColor(c[1], c[2], c[3], 1)
-                luna.gfx.circle("fill", p.x, p.y, 14)
-                luna.gfx.setColor(1, 1, 1, 0.9)
-                luna.gfx.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
+                lurek.gfx.setColor(c[1], c[2], c[3], 1)
+                lurek.gfx.circle("fill", p.x, p.y, 14)
+                lurek.gfx.setColor(1, 1, 1, 0.9)
+                lurek.gfx.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
             end
         end
     end
 
     -- vision circle
-    luna.gfx.setColor(1, 1, 1, 0.08)
-    luna.gfx.circle("line", me.x, me.y, VISION_RADIUS)
+    lurek.gfx.setColor(1, 1, 1, 0.08)
+    lurek.gfx.circle("line", me.x, me.y, VISION_RADIUS)
 
     -- HUD
-    luna.gfx.setColor(0.2, 0.2, 0.3, 0.8)
-    luna.gfx.rectangle("fill", 0, 0, W, 36)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
+    lurek.gfx.setColor(0.2, 0.2, 0.3, 0.8)
+    lurek.gfx.rectangle("fill", 0, 0, W, 36)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
     -- progress bar
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 200, 10, 200, 16)
-    luna.gfx.setColor(0.2, 0.9, 0.3, 1)
-    luna.gfx.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 200, 10, 200, 16)
+    lurek.gfx.setColor(0.2, 0.9, 0.3, 1)
+    lurek.gfx.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
 
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
     local role = (player_id == traitor_id) and "TRAITOR" or "CREW"
-    luna.gfx.print("Role: " .. role, 500, 8, 1)
-    luna.gfx.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
+    lurek.gfx.print("Role: " .. role, 500, 8, 1)
+    lurek.gfx.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
     if player_id == traitor_id then
-        luna.gfx.setColor(1, 0.3, 0.3, 1)
-        luna.gfx.print("S=Sabotage", 680, 8, 1)
+        lurek.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.gfx.print("S=Sabotage", 680, 8, 1)
     end
 end
 
 local function draw_meeting()
-    luna.gfx.setColor(0.15, 0.15, 0.25, 1)
-    luna.gfx.rectangle("fill", 50, 50, W - 100, H - 100)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
-    luna.gfx.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
-    luna.gfx.print("Click a name to vote", W / 2 - 65, 120, 0.9)
+    lurek.gfx.setColor(0.15, 0.15, 0.25, 1)
+    lurek.gfx.rectangle("fill", 50, 50, W - 100, H - 100)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
+    lurek.gfx.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
+    lurek.gfx.print("Click a name to vote", W / 2 - 65, 120, 0.9)
 
     local y = 160
     for i = 1, 6 do
         local p = players[i]
         local c = COLORS[i]
         if p.alive then
-            luna.gfx.setColor(c[1], c[2], c[3], 1)
-            luna.gfx.circle("fill", 120, y + 10, 12)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print(NAMES[i], 145, y, 1.2)
+            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.gfx.circle("fill", 120, y + 10, 12)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print(NAMES[i], 145, y, 1.2)
             if meeting_votes[player_id] == i then
-                luna.gfx.setColor(1, 1, 0, 1)
-                luna.gfx.print(" <-- YOUR VOTE", 260, y, 1)
+                lurek.gfx.setColor(1, 1, 0, 1)
+                lurek.gfx.print(" <-- YOUR VOTE", 260, y, 1)
             end
         else
-            luna.gfx.setColor(0.4, 0.4, 0.4, 1)
-            luna.gfx.print(NAMES[i] .. " (eliminated)", 145, y, 1)
+            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+            lurek.gfx.print(NAMES[i] .. " (eliminated)", 145, y, 1)
         end
         y = y + 45
     end
 end
 
-function luna.render()
+function lurek.render()
     if game_over then
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
-        luna.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
+        lurek.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
         return
     end
     if phase == "task" then
@@ -320,13 +320,13 @@ function luna.render()
         draw_meeting()
     end
     if message and msg_timer > 0 then
-        luna.gfx.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
-        luna.gfx.print(message, W / 2 - 120, H / 2, 1)
+        lurek.gfx.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
+        lurek.gfx.print(message, W / 2 - 120, H / 2, 1)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" and game_over then init_game(); return end
     if game_over then return end
 
@@ -347,7 +347,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if game_over then return end
     if phase == "task" then
         -- click on task to complete it

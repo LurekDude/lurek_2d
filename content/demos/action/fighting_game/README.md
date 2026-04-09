@@ -4,19 +4,19 @@ A two-character 2D fighting game featuring a local player versus a reactive AI o
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — per-frame directional movement and attack input polling
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — fighter body, health bar, and super-meter rendering
-- `luna.gfx.setColor()` — dynamic color shifts for damage flash and super-charge state
-- `luna.gfx.print()` — combo counter pop-up text and round HUD
-- `luna.window.setTitle()` — setting the window caption at load time
-- `luna.gfx.setBackgroundColor()` — dark purple stage background
+- `lurek.keyboard.isDown()` — per-frame directional movement and attack input polling
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — fighter body, health bar, and super-meter rendering
+- `lurek.gfx.setColor()` — dynamic color shifts for damage flash and super-charge state
+- `lurek.gfx.print()` — combo counter pop-up text and round HUD
+- `lurek.window.setTitle()` — setting the window caption at load time
+- `lurek.gfx.setBackgroundColor()` — dark purple stage background
 - Manual AABB collision — attack hitboxes computed each frame without a physics engine
 - Simple probability-based AI — randomised punch/kick/block decisions with range gating
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/fighting_game
+cargo run -- content/demos/fighting_game
 ```
 
 ## Controls

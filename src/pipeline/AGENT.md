@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.pipeline`                                      |
+| **Lua API**    | `lurek.pipeline`                                      |
 | **Source**      | `src/pipeline/`                                      |
 | **Rust Tests** | `tests/rust/unit/pipeline_tests.rs`                  |
 | **Lua Tests**  | `tests/lua/unit/test_pipeline.lua`                   |
@@ -31,6 +31,6 @@ import `crate::math`, `mlua`, or any other Tier 1/Tier 2 module.
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/pipeline.md`](../../specs/pipeline.md)
+→ [`docs/specs/pipeline.md`](../../docs/specs/pipeline.md)
 
-_Update both this file **and** `specs/pipeline.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/pipeline.md` whenever source files, public types, or Lua bindings change._

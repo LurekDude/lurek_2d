@@ -1,4 +1,4 @@
-//! `luna.procgen` — Stateless procedural generation utilities.
+//! `lurek.procgen` — Stateless procedural generation utilities.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -14,7 +14,7 @@ use crate::procgen::{
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.procgen` API table with the Lua VM.
+/// Registers the `lurek.procgen` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

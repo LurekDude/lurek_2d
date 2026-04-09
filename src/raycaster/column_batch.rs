@@ -3,13 +3,13 @@
 //! Stores per-column wall data produced by a raycaster and provides
 //! helpers for updating columns from raw ray data and querying depth.
 //!
-//! This module is part of Luna2D's `raycaster` subsystem and provides the implementation
+//! This module is part of Lurek2D's `raycaster` subsystem and provides the implementation
 //! details for column batch-related operations and data management.
 //! Key types exported from this module: `ColumnData`, `ColumnBatch`.
 //! Primary functions: `new()`, `set_column()`, `get_column()`, `update_from_ray_data()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{CB01, CB02};
 use crate::log_msg;

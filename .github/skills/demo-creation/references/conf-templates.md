@@ -1,11 +1,11 @@
 # conf.lua Templates
 
-Reference for the `conf.lua` file used in `demos/<name>/conf.lua`.
+Reference for the `conf.lua` file used in `content/demos/<name>/conf.lua`.
 
 ## Standard (800×600) — Use for Most Demos
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 800
     t.window.height = 600
@@ -20,7 +20,7 @@ Use for: puzzle, card game, idle, roguelike, RPG, strategy (small), shooter, sur
 ## Widescreen (960×540) — Use for Platformers / Side-Scrollers
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 960
     t.window.height = 540
@@ -36,7 +36,7 @@ Comment required in conf.lua: `-- 16:9 for wide level view`
 ## Taller (800×640) — Use for Message Logs / Status Strips
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 800
     t.window.height = 640
@@ -52,7 +52,7 @@ Comment required in conf.lua: `-- taller for message log strip`
 ## Strategy (1024×768) — Use for Maps / Tactical Overviews
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 1024
     t.window.height = 768
@@ -71,7 +71,7 @@ Add module flags only when the demo actually requires them. Flags that are `true
 do not need to be repeated; only include overrides.
 
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 800
     t.window.height = 600

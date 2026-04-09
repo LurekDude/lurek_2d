@@ -1,4 +1,4 @@
-//! Doc entry types for the Luna2D API catalog.
+//! Doc entry types for the Lurek2D API catalog.
 
 use std::collections::HashMap;
 
@@ -31,7 +31,7 @@ pub struct ReturnInfo {
 pub struct DocEntry {
     /// Short unqualified name (e.g. `"play"`).
     pub name: String,
-    /// Fully qualified name (e.g. `"luna.audio.play"`).
+    /// Fully qualified name (e.g. `"lurek.audio.play"`).
     pub qualified_name: String,
     /// Module that owns this entry (e.g. `"audio"`).
     pub module: String,
@@ -58,7 +58,7 @@ pub struct DocEntry {
 impl DocEntry {
     /// Creates a minimal entry with the given name, module, and kind.
     pub fn new(name: &str, module: &str, kind: &str) -> Self {
-        let qualified_name = format!("luna.{}.{}", module, name);
+        let qualified_name = format!("lurek.{}.{}", module, name);
         Self {
             name: name.to_string(),
             qualified_name,

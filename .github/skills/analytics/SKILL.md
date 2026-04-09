@@ -1,9 +1,9 @@
 ---
 name: analytics
-description: "Load this skill when collecting, parsing, or acting on diagnostic data from Luna2D log files, performance counters, telemetry events, or game session records: structuring game events for analysis, extracting performance metrics from RUST_LOG output, finding crash patterns, using data to drive game balance or design decisions, or building an in-game telemetry pipeline. Use for: log parsing, session event recording, crash frequency analysis, performance histogram analysis, data-driven game balance. Skip it for live runtime debugging (use dev-debugging skill) or setting up log output (use logging skill)."
+description: "Load this skill when collecting, parsing, or acting on diagnostic data from Lurek2D log files, performance counters, telemetry events, or game session records: structuring game events for analysis, extracting performance metrics from RUST_LOG output, finding crash patterns, using data to drive game balance or design decisions, or building an in-game telemetry pipeline. Use for: log parsing, session event recording, crash frequency analysis, performance histogram analysis, data-driven game balance. Skip it for live runtime debugging (use dev-debugging skill) or setting up log output (use logging skill)."
 ---
 
-# Analytics — Luna2D
+# Analytics — Lurek2D
 
 ## Load When
 
@@ -40,8 +40,8 @@ description: "Load this skill when collecting, parsing, or acting on diagnostic 
 
 ```powershell
 # Record a full session with debug output
-$env:RUST_LOG = "luna2d=debug,wgpu_core=warn"
-cargo run -- demos/my_game 2>&1 | Tee-Object logs/session.log
+$env:RUST_LOG = "lurek2d=debug,wgpu_core=warn"
+cargo run -- content/demos/my_game 2>&1 | Tee-Object logs/session.log
 ```
 
 ### Extracting frame times
@@ -104,14 +104,14 @@ Define events as TOML structures recorded per-session. Keep it flat and human-re
 -- lib/telemetry.lua: include in game scripts
 local Telemetry = {}
 local _file = "game.log"
-local _start = luna.time.getTime()
+local _start = lurek.time.getTime()
 
 function Telemetry.init()
-    luna.fs.write(_file, "")  -- clear on session start
+    lurek.fs.write(_file, "")  -- clear on session start
 end
 
 function Telemetry.event(name, data)
-    local ts = luna.time.getTime() - _start
+    local ts = lurek.time.getTime() - _start
     local parts = { string.format('timestamp=%.3f event="%s"', ts, name) }
     for k, v in pairs(data or {}) do
         if type(v) == "string" then
@@ -120,7 +120,7 @@ function Telemetry.event(name, data)
             parts[#parts+1] = string.format('%s=%s', k, tostring(v))
         end
     end
-    luna.fs.append(_file, table.concat(parts, " ") .. "\n")
+    lurek.fs.append(_file, table.concat(parts, " ") .. "\n")
 end
 
 return Telemetry
@@ -166,7 +166,7 @@ T.event("boss_killed",   { boss = name, hp_remaining = boss.hp, time = elapsed }
 ```lua
 local _frameTimes = {}
 
-function luna.process(dt)
+function lurek.process(dt)
     _frameTimes[#_frameTimes+1] = dt * 1000  -- ms
     if #_frameTimes >= 600 then              -- every 10s at 60fps
         local avg = 0
@@ -235,4 +235,4 @@ foreach ($lvl in $levels) {
 
 ## Privacy Rule
 
-**Never record personal or identifying information in telemetry.** Luna2D is a desktop runtime with no network layer. All logs stay on the local machine unless the game explicitly uploads them. Record only gameplay events, positions, and performance data.
+**Never record personal or identifying information in telemetry.** Lurek2D is a desktop runtime with no network layer. All logs stay on the local machine unless the game explicitly uploads them. Record only gameplay events, positions, and performance data.

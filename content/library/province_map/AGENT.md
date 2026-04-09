@@ -5,7 +5,7 @@
 | **Tier** | Tier 3 — Lunasome (pure Lua, no Rust dependencies) |
 | **Source** | `library/province_map/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_province_map.lua` |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 | **Test count** | 85 (all passing) |
 
 ## Summary

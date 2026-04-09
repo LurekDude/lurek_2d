@@ -1,11 +1,11 @@
 //! DataFrame query, filter, sort, join, analytics, and mutation.
 //!
-//! This module is part of Luna2D's `dataframe` subsystem and provides the implementation
+//! This module is part of Lurek2D's `dataframe` subsystem and provides the implementation
 //! details for query-related operations and data management.
 //! Primary functions: `filter()`, `sort()`, `head()`, `tail()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 use crate::engine::log_messages::DF01_RIGHT_JOIN_UNIMPL;

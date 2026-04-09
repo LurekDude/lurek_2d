@@ -26,12 +26,12 @@ local function is_action_down(action)
     local b = bindings[action]
     if b.keys then
         for _, k in ipairs(b.keys) do
-            if luna.keyboard.isDown(k) then return true end
+            if lurek.keyboard.isDown(k) then return true end
         end
     end
     if b.axes then
         for _, a in ipairs(b.axes) do
-            local val = luna.gamepad.getAxis(1, a[1]) or 0
+            local val = lurek.gamepad.getAxis(1, a[1]) or 0
             if a[2] > 0 and val > DEADZONE then return true end
             if a[2] < 0 and val < -DEADZONE then return true end
         end
@@ -45,7 +45,7 @@ end
 ```lua
 local pressed_actions = {}
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     for action, b in pairs(bindings) do
         for _, k in ipairs(b.keys or {}) do
             if k == key then pressed_actions[action] = true end
@@ -73,13 +73,13 @@ end
 local BUFFER_FRAMES = 8
 local input_buffer = {}
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then
         input_buffer.jump = BUFFER_FRAMES
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Decrement buffer timers
     for action, frames in pairs(input_buffer) do
         input_buffer[action] = frames - 1
@@ -100,7 +100,7 @@ end
 local DEADZONE = 0.25
 
 local function get_stick(pad_id, axis)
-    local val = luna.gamepad.getAxis(pad_id, axis) or 0
+    local val = lurek.gamepad.getAxis(pad_id, axis) or 0
     if math.abs(val) < DEADZONE then return 0 end
     -- Rescale to 0–1 range past deadzone
     local sign = val > 0 and 1 or -1

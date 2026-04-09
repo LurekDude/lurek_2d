@@ -1,9 +1,9 @@
-# `src/` — Luna2D Engine Source Tree
+# `src/` — Lurek2D Engine Source Tree
 
 ## Overview
 
-This directory contains all Rust source code for the Luna2D 2D game engine.
-Luna2D loads and executes Lua game scripts, providing a complete `luna.*` API
+This directory contains all Rust source code for the Lurek2D 2D game engine.
+Lurek2D loads and executes Lua game scripts, providing a complete `lurek.*` API
 for graphics, audio, input, physics, math, data, particles, tilemaps, scenes,
 entities, and more.
 
@@ -19,12 +19,12 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
    flat `src/<module>/` directories rather than `src/tier1/<module>/`,
    `src/tier2/<module>/`, and `src/tier3/<module>/`. The dependency rules carry
    the architecture; the filesystem does not encode the tiers directly.
-3. **`math/` is the leaf** — it has no Luna2D dependencies and may be imported
+3. **`math/` is the leaf** — it has no Lurek2D dependencies and may be imported
    by all modules at all tiers.
 4. **`engine/` is the orchestrator** — it may import all domain modules. It owns
    the game loop, window, and app lifecycle.
 5. **`lua_api/` is the bridge** — it depends on every domain module to expose
-   their functionality through a consistent `luna.*` Lua namespace.
+   their functionality through a consistent `lurek.*` Lua namespace.
 6. **No upward dependencies** — domain modules never import from `lua_api/`.
    Tier N modules never import Tier N+1 modules.
 
@@ -43,7 +43,7 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
               │          │          │
          ┌────▼───┐ ┌───▼────┐ ┌──▼──────┐
          │ engine │ │lua_api │ │  bin/   │
-         └───┬────┘ └───┬────┘ │ lunec   │
+         └───┬────┘ └───┬────┘ │ lurekc   │
              │          │      └─────────┘
              │   imports any tier
              ▼
@@ -76,7 +76,7 @@ For full architecture detail and tier rules, see [`docs/architecture.md`](../doc
 |--------|------|------|-----------|
 | `math/` | Foundation | Vec2, Mat3, Rect, noise, easing | Nothing (leaf) |
 | `engine/` | Foundation | App, Config, EngineError, game loop | All modules |
-| `lua_api/` | Bridge | Lua VM, SharedState, `luna.*` bindings | ALL modules |
+| `lua_api/` | Bridge | Lua VM, SharedState, `lurek.*` bindings | ALL modules |
 
 ### Tier 1 — Basic Core
 
@@ -155,6 +155,6 @@ until they are wired into `src/lib.rs`.
 ## Key Patterns
 
 - **SharedState**: `Rc<RefCell<SharedState>>` shared between Lua closures and engine loop.
-- **DrawCommand queue**: Lua `luna.draw()` pushes commands; GPU renderer processes them after callback.
+- **DrawCommand queue**: Lua `lurek.draw()` pushes commands; GPU renderer processes them after callback.
 - **SlotMap resource pools**: Generational IDs prevent use-after-free for textures, fonts, etc.
 - **register() pattern**: Each lua_api sub-module has `pub fn register(lua, table, state)`.

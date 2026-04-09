@@ -1,6 +1,6 @@
 -- Railroad / Transport Logistics Demo
 -- Place tracks, route trains between stations, earn revenue from deliveries
--- Run with: cargo run -- demos/simulation/railroad
+-- Run with: cargo run -- content/demos/simulation/railroad
 
 local TILE = 32
 local COLS, ROWS = 25, 19
@@ -107,8 +107,8 @@ local function spawnTrain(stationIdx)
     end
 end
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.15, 0.2, 0.15)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.15, 0.2, 0.15)
     initGrid()
     addStation(3, 4, "Lumber", "wood", "food")
     addStation(22, 4, "Forge", "iron", "wood")
@@ -123,7 +123,7 @@ function luna.init()
     revenueHistory = {0}
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Day cycle
     dayTimer = dayTimer + dt
     if dayTimer >= DAY_LENGTH then
@@ -192,15 +192,15 @@ function luna.process(dt)
     if msgTimer > 0 then msgTimer = msgTimer - dt end
 
     -- Cycle track type with scroll or keys
-    if luna.keyboard.isDown("1") then selectedTrack = 1 end
-    if luna.keyboard.isDown("2") then selectedTrack = 2 end
-    if luna.keyboard.isDown("3") then selectedTrack = 3 end
-    if luna.keyboard.isDown("4") then selectedTrack = 4 end
-    if luna.keyboard.isDown("5") then selectedTrack = 5 end
-    if luna.keyboard.isDown("6") then selectedTrack = 6 end
+    if lurek.keyboard.isDown("1") then selectedTrack = 1 end
+    if lurek.keyboard.isDown("2") then selectedTrack = 2 end
+    if lurek.keyboard.isDown("3") then selectedTrack = 3 end
+    if lurek.keyboard.isDown("4") then selectedTrack = 4 end
+    if lurek.keyboard.isDown("5") then selectedTrack = 5 end
+    if lurek.keyboard.isDown("6") then selectedTrack = 6 end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     local col = math.floor(mx / TILE) + 1
     local row = math.floor(my / TILE) + 1
     if col < 1 or col > COLS or row < 1 or row > ROWS then return end
@@ -219,8 +219,8 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "tab" then
         selectedTrack = (selectedTrack % 6) + 1
     end
@@ -229,34 +229,34 @@ end
 local function drawTrack(col, row, t)
     local x, y = (col - 1) * TILE, (row - 1) * TILE
     local cx, cy = x + TILE / 2, y + TILE / 2
-    luna.gfx.setColor(0.6, 0.6, 0.5, 1)
-    luna.gfx.setLineWidth(3)
+    lurek.gfx.setColor(0.6, 0.6, 0.5, 1)
+    lurek.gfx.setLineWidth(3)
     if t == 1 then
-        luna.gfx.line(x, cy, x + TILE, cy)
+        lurek.gfx.line(x, cy, x + TILE, cy)
     elseif t == 2 then
-        luna.gfx.line(cx, y, cx, y + TILE)
+        lurek.gfx.line(cx, y, cx, y + TILE)
     elseif t == 3 then
-        luna.gfx.line(cx, cy, x + TILE, cy)
-        luna.gfx.line(cx, cy, cx, y)
+        lurek.gfx.line(cx, cy, x + TILE, cy)
+        lurek.gfx.line(cx, cy, cx, y)
     elseif t == 4 then
-        luna.gfx.line(cx, cy, x + TILE, cy)
-        luna.gfx.line(cx, cy, cx, y + TILE)
+        lurek.gfx.line(cx, cy, x + TILE, cy)
+        lurek.gfx.line(cx, cy, cx, y + TILE)
     elseif t == 5 then
-        luna.gfx.line(cx, cy, x, cy)
-        luna.gfx.line(cx, cy, cx, y + TILE)
+        lurek.gfx.line(cx, cy, x, cy)
+        lurek.gfx.line(cx, cy, cx, y + TILE)
     elseif t == 6 then
-        luna.gfx.line(cx, cy, x, cy)
-        luna.gfx.line(cx, cy, cx, y)
+        lurek.gfx.line(cx, cy, x, cy)
+        lurek.gfx.line(cx, cy, cx, y)
     end
-    luna.gfx.setLineWidth(1)
+    lurek.gfx.setLineWidth(1)
 end
 
-function luna.render()
+function lurek.render()
     -- Grid
-    luna.gfx.setColor(0.2, 0.25, 0.2, 1)
+    lurek.gfx.setColor(0.2, 0.25, 0.2, 1)
     for r = 1, ROWS do
         for c = 1, COLS do
-            luna.gfx.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
+            lurek.gfx.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
         end
     end
 
@@ -271,32 +271,32 @@ function luna.render()
     for _, st in ipairs(stations) do
         local x, y = (st.col - 1) * TILE, (st.row - 1) * TILE
         local clr = CARGO_COLORS[st.produces]
-        luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
-        luna.gfx.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(st.name, x, y - 14, 0.8)
-        luna.gfx.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
+        lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
+        lurek.gfx.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(st.name, x, y - 14, 0.8)
+        lurek.gfx.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
     end
 
     -- Trains
     for _, tr in ipairs(trains) do
         local clr = CARGO_COLORS[tr.cargo] or {1, 1, 0}
-        luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
-        luna.gfx.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
-        luna.gfx.setColor(0, 0, 0, 1)
-        luna.gfx.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
+        lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
+        lurek.gfx.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
+        lurek.gfx.setColor(0, 0, 0, 1)
+        lurek.gfx.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, H - 60, W, 60)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
-    luna.gfx.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, H - 60, W, 60)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
+    lurek.gfx.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
 
     -- Revenue mini-graph
     if #revenueHistory > 1 then
-        luna.gfx.setColor(0.2, 0.8, 0.2, 1)
+        lurek.gfx.setColor(0.2, 0.8, 0.2, 1)
         local gx, gy, gw, gh = W - 160, H - 55, 150, 45
         local maxR = 1
         for _, v in ipairs(revenueHistory) do if v > maxR then maxR = v end end
@@ -305,22 +305,22 @@ function luna.render()
             local x2 = gx + (i - 1) / (#revenueHistory - 1) * gw
             local y1 = gy + gh - (revenueHistory[i - 1] / maxR) * gh
             local y2 = gy + gh - (revenueHistory[i] / maxR) * gh
-            luna.gfx.line(x1, y1, x2, y2)
+            lurek.gfx.line(x1, y1, x2, y2)
         end
     end
 
     -- Message
     if msgTimer > 0 then
-        luna.gfx.setColor(0, 1, 0.5, msgTimer / 2)
-        luna.gfx.print(message, W / 2 - 100, 20, 1)
+        lurek.gfx.setColor(0, 1, 0.5, msgTimer / 2)
+        lurek.gfx.print(message, W / 2 - 100, 20, 1)
     end
 
     -- Mouse hover preview
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     local hc = math.floor(mx / TILE) + 1
     local hr = math.floor(my / TILE) + 1
     if hc >= 1 and hc <= COLS and hr >= 1 and hr <= ROWS and grid[hr] and grid[hr][hc] == 0 then
-        luna.gfx.setColor(1, 1, 0, 0.3)
-        luna.gfx.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
+        lurek.gfx.setColor(1, 1, 0, 0.3)
+        lurek.gfx.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
     end
 end

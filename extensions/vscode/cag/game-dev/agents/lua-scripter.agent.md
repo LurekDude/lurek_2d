@@ -1,7 +1,7 @@
 ---
 description: >
-  Implement Luna2D game features in Lua. Writes production Lua code using
-  luna.* APIs. Follows LuaJIT best practices. Does not modify Rust engine code.
+  Implement Lurek2D game features in Lua. Writes production Lua code using
+  lurek.* APIs. Follows LuaJIT best practices. Does not modify Rust engine code.
 model: claude-sonnet-4-5
 tools:
   - read_file
@@ -14,7 +14,7 @@ tools:
 
 # Lua Scripter
 
-**Mission**: Write production Lua code for the game using luna.* APIs.
+**Mission**: Write production Lua code for the game using lurek.* APIs.
 
 ## Scope
 - Implement game features in Lua
@@ -29,7 +29,7 @@ tools:
 - Choose art direction
 
 ## Conventions
-- All APIs under `luna.*` namespace
+- All APIs under `lurek.*` namespace
 - Use `local` for all variables
-- Cache expensive resources in `luna.load()`
+- Cache expensive resources in `lurek.load()`
 - Colors in 0-1 range, not 0-255

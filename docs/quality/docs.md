@@ -11,7 +11,7 @@
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSchema, DocEntry, ApiCatalog, ValidationReport, QualityReport from lua_api/docs_api.rs → src/docs/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 134, line 263
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 232, line 237, line 242, line 247, line 252
-- [ ] **W-02** — API surface coverage: Functions absent from examples/docs.lua: overallScore, moduleScores
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/docs.lua: overallScore, moduleScores
 
 ### 🟡 Warnings — Should Fix
 
@@ -21,7 +21,7 @@
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, stale, current, missing
 - [ ] **B-04** — No business logic in closures: '<closure@790>' (27 LOC, line 790) — extract body to src/docs/ | '<closure@825>' (40 LOC, line 825) — extract body to src/docs/ | '<closure@874>' (27 LOC, line 874) — extract body to src/docs/ | '<closure@910>' (22 LOC, line 910) — extract body to src/docs/ | '<closure@1122>' has if/match/for — extract to src/docs/ | '<closure@1139>' has if/match/for — extract to src/docs/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
-- [ ] **W-04** — Example–spec sync: In spec but not example: moduleScores, overallScore — add to examples/docs.lua
+- [ ] **W-04** — Example–spec sync: In spec but not example: moduleScores, overallScore — add to content/examples/docs.lua
 
 ## Full Check Results
 
@@ -110,10 +110,10 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/docs.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/docs.lua: overallScore, moduleScores |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/docs.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ⚠️ WARNING | In spec but not example: moduleScores, overallScore — add to examples/docs.lua |
+| **W-01** Example file exists | ✅ PASS | content/examples/docs.lua present |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/docs.lua: overallScore, moduleScores |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/docs.lua has realistic one-line comments per call |
+| **W-04** Example–spec sync | ⚠️ WARNING | In spec but not example: moduleScores, overallScore — add to content/examples/docs.lua |
 | **W-05** Wiki page | ✅ PASS | wiki\Docs-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -141,7 +141,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
 

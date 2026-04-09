@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Luna2D VS Code extension.
+gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Lurek2D VS Code extension.
 
-Reads docs/logs/lua_api_data.json and emits docs/API/luna.lua — a LuaCATS
+Reads docs/logs/lua_api_data.json and emits docs/API/lurek.lua — a LuaCATS
 stub file that gives the VS Code Lua language server full type information
-for the luna.* API. Consumed by the vscode-extension IntelliSense provider.
+for the lurek.* API. Consumed by the vscode-extension IntelliSense provider.
 
 Usage:
-    python tools/docs/gen_luadoc.py                 # -> docs/API/luna.lua
+    python tools/docs/gen_luadoc.py                 # -> docs/API/lurek.lua
 """
 import json
 import os
@@ -15,7 +15,7 @@ import re
 
 WORKSPACE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 INPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "logs", "lua_api_data.json")
-OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "API", "luna.lua")
+OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "API", "lurek.lua")
 
 def guess_type(text, is_return=False):
     t = text.lower()
@@ -214,7 +214,7 @@ def main():
 
     out = []
     out.append("---@meta")
-    out.append("--- Auto-generated Luna2D API documentation for LuaCATS.")
+    out.append("--- Auto-generated Lurek2D API documentation for LuaCATS.")
     out.append("")
     out.append("luna = {}")
     out.append("")
@@ -222,8 +222,8 @@ def main():
     for mod_name in sorted(lua_api.keys()):
         lua_ns = _LUA_NAMESPACE.get(mod_name, mod_name)
         mod_data = lua_api[mod_name]
-        out.append(f"---@class luna.{lua_ns}")
-        out.append(f"luna.{lua_ns} = {{}}")
+        out.append(f"---@class lurek.{lua_ns}")
+        out.append(f"lurek.{lua_ns} = {{}}")
         out.append("")
 
         classes = mod_data.get("classes", {})
@@ -251,12 +251,12 @@ def main():
         functions.sort(key=lambda x: (x.get("kind", "function"), x.get("name", "")))
 
         for func in functions:
-            name = func.get("lua_name", f"luna.{lua_ns}.{func['name']}")
+            name = func.get("lua_name", f"lurek.{lua_ns}.{func['name']}")
             if ":" in name:
                 continue
             # Remap stored lua_name if it uses the old module-folder namespace
-            if name.startswith(f"luna.{mod_name}."):
-                name = f"luna.{lua_ns}.{func['name']}"
+            if name.startswith(f"lurek.{mod_name}."):
+                name = f"lurek.{lua_ns}.{func['name']}"
             write_function_doc(out, func, name)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:

@@ -1,4 +1,4 @@
-//! `luna.dataframe` — Column-major tabular data with query, analytics, and SQL.
+//! `lurek.dataframe` — Column-major tabular data with query, analytics, and SQL.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -768,7 +768,7 @@ impl LuaUserData for LuaDatabase {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.dataframe` API table with the Lua VM.
+/// Registers the `lurek.dataframe` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

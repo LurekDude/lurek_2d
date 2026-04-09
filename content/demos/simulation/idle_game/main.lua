@@ -1,6 +1,6 @@
 -- Idle Game: Incremental clicker with generators, upgrades, and prestige
 -- Click to earn, buy generators, prestige for multipliers
--- Run with: cargo run -- demos/simulation/idle_game
+-- Run with: cargo run -- content/demos/simulation/idle_game
 
 local SCREEN_W, SCREEN_H = 800, 600
 
@@ -51,9 +51,9 @@ local function get_cps()
     return cps * prestige_mult
 end
 
-function luna.init() end
+function lurek.init() end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Auto-generation
     local earned = get_cps() * dt
     coins = coins + earned
@@ -70,7 +70,7 @@ function luna.process(dt)
     click_particles = new_parts
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if button == 1 then
         -- Big button click
         if mx >= big_button.x and mx <= big_button.x + big_button.w and
@@ -132,19 +132,19 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.1, 0.08, 0.15)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.1, 0.08, 0.15)
 
     -- Coins display
-    luna.gfx.setColor(1, 0.85, 0.1, 1)
-    luna.gfx.print(format_num(coins) .. " coins", 60, 20, 2.5)
-    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-    luna.gfx.print(format_num(get_cps()) .. " per second", 60, 65)
-    luna.gfx.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
+    lurek.gfx.setColor(1, 0.85, 0.1, 1)
+    lurek.gfx.print(format_num(coins) .. " coins", 60, 20, 2.5)
+    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+    lurek.gfx.print(format_num(get_cps()) .. " per second", 60, 65)
+    lurek.gfx.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
 
     -- Big button
     local s = 1.0 + math.sin(pulse) * 0.03
@@ -152,75 +152,75 @@ function luna.render()
     local by = big_button.y + big_button.h / 2
     local hw = big_button.w / 2 * s
     local hh = big_button.h / 2 * s
-    luna.gfx.setColor(0.9, 0.7, 0.1, 1)
-    luna.gfx.circle("fill", bx, by, hw)
-    luna.gfx.setColor(1, 0.85, 0.2, 1)
-    luna.gfx.circle("fill", bx, by, hw - 6)
-    luna.gfx.setColor(0.3, 0.2, 0, 1)
-    luna.gfx.print("CLICK", bx - 30, by - 10, 1.5)
+    lurek.gfx.setColor(0.9, 0.7, 0.1, 1)
+    lurek.gfx.circle("fill", bx, by, hw)
+    lurek.gfx.setColor(1, 0.85, 0.2, 1)
+    lurek.gfx.circle("fill", bx, by, hw - 6)
+    lurek.gfx.setColor(0.3, 0.2, 0, 1)
+    lurek.gfx.print("CLICK", bx - 30, by - 10, 1.5)
 
     -- Click particles
     for _, p in ipairs(click_particles) do
-        luna.gfx.setColor(1, 1, 0.3, p.life)
-        luna.gfx.print(p.text, p.x, p.y, 1.2)
+        lurek.gfx.setColor(1, 1, 0.3, p.life)
+        lurek.gfx.print(p.text, p.x, p.y, 1.2)
     end
 
     -- Generator panel
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("GENERATORS", 350, 95, 1.2)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("GENERATORS", 350, 95, 1.2)
     for i, g in ipairs(generators) do
         local by = 120 + (i - 1) * 52
         local affordable = coins >= g.cost
         if affordable then
-            luna.gfx.setColor(0.15, 0.3, 0.15, 1)
+            lurek.gfx.setColor(0.15, 0.3, 0.15, 1)
         else
-            luna.gfx.setColor(0.2, 0.15, 0.15, 1)
+            lurek.gfx.setColor(0.2, 0.15, 0.15, 1)
         end
-        luna.gfx.rectangle("fill", 320, by, 240, 44)
-        luna.gfx.setColor(0.4, 0.4, 0.4, 1)
-        luna.gfx.rectangle("line", 320, by, 240, 44)
-        luna.gfx.setColor(1, 1, 1, affordable and 1 or 0.4)
-        luna.gfx.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
-        luna.gfx.setColor(0.7, 0.7, 0.5, 1)
-        luna.gfx.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
+        lurek.gfx.rectangle("fill", 320, by, 240, 44)
+        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+        lurek.gfx.rectangle("line", 320, by, 240, 44)
+        lurek.gfx.setColor(1, 1, 1, affordable and 1 or 0.4)
+        lurek.gfx.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
+        lurek.gfx.setColor(0.7, 0.7, 0.5, 1)
+        lurek.gfx.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
     end
 
     -- Upgrades panel
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("UPGRADES", 640, 95, 1.2)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("UPGRADES", 640, 95, 1.2)
     for i, u in ipairs(upgrades) do
         local by = 120 + (i - 1) * 42
         if u.bought then
-            luna.gfx.setColor(0.15, 0.15, 0.25, 1)
+            lurek.gfx.setColor(0.15, 0.15, 0.25, 1)
         elseif coins >= u.cost then
-            luna.gfx.setColor(0.15, 0.25, 0.35, 1)
+            lurek.gfx.setColor(0.15, 0.25, 0.35, 1)
         else
-            luna.gfx.setColor(0.15, 0.12, 0.12, 1)
+            lurek.gfx.setColor(0.15, 0.12, 0.12, 1)
         end
-        luna.gfx.rectangle("fill", 590, by, 200, 34)
-        luna.gfx.setColor(0.4, 0.4, 0.4, 1)
-        luna.gfx.rectangle("line", 590, by, 200, 34)
+        lurek.gfx.rectangle("fill", 590, by, 200, 34)
+        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+        lurek.gfx.rectangle("line", 590, by, 200, 34)
         if u.bought then
-            luna.gfx.setColor(0.4, 0.7, 0.4, 1)
-            luna.gfx.print(u.name .. " [OWNED]", 598, by + 4)
+            lurek.gfx.setColor(0.4, 0.7, 0.4, 1)
+            lurek.gfx.print(u.name .. " [OWNED]", 598, by + 4)
         else
-            luna.gfx.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
-            luna.gfx.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
+            lurek.gfx.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
+            lurek.gfx.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
         end
-        luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-        luna.gfx.print(u.desc, 598, by + 18)
+        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+        lurek.gfx.print(u.desc, 598, by + 18)
     end
 
     -- Prestige button
-    luna.gfx.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
-    luna.gfx.rectangle("fill", 60, 500, 200, 40)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("PRESTIGE (10K req)", 75, 508)
+    lurek.gfx.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
+    lurek.gfx.rectangle("fill", 60, 500, 200, 40)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("PRESTIGE (10K req)", 75, 508)
 
     -- Stats
-    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-    luna.gfx.print("Total earned: " .. format_num(total_earned), 60, 400)
-    luna.gfx.print("Total clicks: " .. total_clicked, 60, 418)
-    luna.gfx.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 60, 460)
+    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+    lurek.gfx.print("Total earned: " .. format_num(total_earned), 60, 400)
+    lurek.gfx.print("Total clicks: " .. total_clicked, 60, 418)
+    lurek.gfx.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 60, 460)
 end

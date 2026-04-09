@@ -5,9 +5,9 @@ First to 6 games wins the set.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — court, players, ball
-- `luna.input.isKeyDown()` — smooth player movement in four directions
-- `luna.keypressed()` — serving
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — court, players, ball
+- `lurek.input.isKeyDown()` — smooth player movement in four directions
+- `lurek.keypressed()` — serving
 - Tennis scoring (0/15/30/40/Deuce/Adv)
 - CPU AI that tracks the ball and returns shots
 

@@ -147,7 +147,7 @@ impl LuaSaveManager {
         let game_dir = self.state.borrow().game_dir.clone();
         GameFS::new(game_dir)
             .write_string(&path, &content)
-            .map_err(|e| LuaError::RuntimeError(format!("luna.savegame:save: {}", e)))?;
+            .map_err(|e| LuaError::RuntimeError(format!("lurek.savegame:save: {}", e)))?;
         self.manager.clear_dirty();
         Ok(())
     }
@@ -159,7 +159,7 @@ impl LuaSaveManager {
             let game_dir = self.state.borrow().game_dir.clone();
             match GameFS::new(game_dir).read_string(&path) {
                 Ok(c) => c,
-                Err(e) => return Ok((false, Some(format!("luna.savegame:load: {}", e)))),
+                Err(e) => return Ok((false, Some(format!("lurek.savegame:load: {}", e)))),
             }
         };
         let data: LuaTable = match eval_save_content(lua, &content) {
@@ -167,7 +167,7 @@ impl LuaSaveManager {
             Err(e) => {
                 return Ok((
                     false,
-                    Some(format!("luna.savegame:load: corrupt save: {}", e)),
+                    Some(format!("lurek.savegame:load: corrupt save: {}", e)),
                 ))
             }
         };
@@ -181,7 +181,7 @@ impl LuaSaveManager {
         let game_dir = self.state.borrow().game_dir.clone();
         GameFS::new(game_dir)
             .remove(&path)
-            .map_err(|e| LuaError::RuntimeError(format!("luna.savegame:delete: {}", e)))?;
+            .map_err(|e| LuaError::RuntimeError(format!("lurek.savegame:delete: {}", e)))?;
         Ok(())
     }
 
@@ -464,7 +464,7 @@ impl LuaUserData for LuaSaveManager {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.savegame` API table with the Lua VM.
+/// Registers the `lurek.savegame` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` - `&Lua`. The Lua VM.

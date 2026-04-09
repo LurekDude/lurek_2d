@@ -4,8 +4,8 @@ description: "Analyze physics engine performance: collision detection scaling, w
 
 # Analyze Physics Performance
 
-**Purpose**: Profile the Luna2D physics engine to find bottlenecks in collision detection, force accumulation, and world step cost.
-**Use When**: Frame rate degrades as body count increases, or `luna.physics` step time exceeds 4 ms.
+**Purpose**: Profile the Lurek2D physics engine to find bottlenecks in collision detection, force accumulation, and world step cost.
+**Use When**: Frame rate degrades as body count increases, or `lurek.physics` step time exceeds 4 ms.
 **Do Not Use When**: The issue is rendering performance — use `analyze-render-performance.prompt.md`.
 **Scope**: `src/physics/world.rs`, `src/physics/collision.rs`.
 

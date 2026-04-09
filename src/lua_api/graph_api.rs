@@ -1,4 +1,4 @@
-//! `luna.graph` — directed graph with item flow simulation.
+//! `lurek.graph` — directed graph with item flow simulation.
 
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -1752,7 +1752,7 @@ fn dispatch_events(
 
 // ── Registration ────────────────────────────────────────────────────────
 
-/// Registers the `luna.graph` API namespace.
+/// Registers the `lurek.graph` API namespace.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

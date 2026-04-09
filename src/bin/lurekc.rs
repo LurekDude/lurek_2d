@@ -1,20 +1,20 @@
-//! # lunec — Console-less Luna2D Launcher
+//! # lurekc — Console-less Lurek2D Launcher
 //!
-//! This is an alternative binary entry point for Luna2D that suppresses the
+//! This is an alternative binary entry point for Lurek2D that suppresses the
 //! console window on Windows by setting the `windows_subsystem = "windows"`
-//! attribute. Behavior is otherwise identical to the main `luna2d` binary.
+//! attribute. Behavior is otherwise identical to the main `lurek2d` binary.
 //!
 //! ## Purpose
 //!
-//! When distributing a game to end users on Windows, running via `lunec.exe`
+//! When distributing a game to end users on Windows, running via `lurekc.exe`
 //! prevents the black terminal window from appearing alongside the game window.
 //! This provides a polished, professional feel for released games.
 //!
 //! ## Usage
 //!
 //! ```sh
-//! lunec path/to/my_game     # Launch game without console window
-//! lunec                     # Splash screen, no console
+//! lurekc path/to/my_game     # Launch game without console window
+//! lurekc                     # Splash screen, no console
 //! ```
 //!
 //! ## Platform Notes
@@ -26,5 +26,5 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
 
 fn main() {
-    luna2d::luna_run();
+    lurek2d::lurek_run();
 }

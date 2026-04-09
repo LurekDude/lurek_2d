@@ -1,10 +1,10 @@
 ---
-description: "Analyze and reduce memory usage in the Luna2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or Lua GC pressure is suspected."
+description: "Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or Lua GC pressure is suspected."
 ---
 
 # Analyze Memory Usage
 
-**Purpose**: Profile and reduce per-frame memory allocations in the Luna2D game loop.
+**Purpose**: Profile and reduce per-frame memory allocations in the Lurek2D game loop.
 **Use When**: Frame times are inconsistent (GC pauses), heap allocations appear in profiles, or `Vec` growth is suspected.
 **Do Not Use When**: The issue is CPU-bound rendering time — use `analyze-render-performance.prompt.md` instead.
 **Scope**: `src/engine/app.rs`, `src/graphics/renderer.rs`, `src/lua_api/`.

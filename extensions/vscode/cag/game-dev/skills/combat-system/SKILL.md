@@ -86,7 +86,7 @@ local function trigger_hitstop(frames)
     hitstop.timer = frames / 60
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if hitstop.timer > 0 then
         hitstop.timer = hitstop.timer - dt
         return  -- freeze game logic

@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.modding`                                       |
+| **Lua API**    | `lurek.modding`                                       |
 | **Source**     | `src/modding/`                                       |
 | **Rust Tests** | `tests/rust/unit/modding_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_modding.lua`                    |
@@ -43,7 +43,7 @@ are not registered, enabling pre-load validation.
 
 The Lua API is exposed via two UserData types: `LuaMod` (wrapping `ModInfo`
 with hook and config storage) and `LuaModManager` (wrapping `ModManager`).
-Factory functions `luna.modding.newMod(info)` and `luna.modding.newModManager()`
+Factory functions `lurek.modding.newMod(info)` and `lurek.modding.newModManager()`
 create these objects. `LuaMod` supports per-mod named hook callbacks stored in
 the Lua registry and an arbitrary config value, both releasable via
 `releaseRefs()`.
@@ -51,13 +51,13 @@ the Lua registry and an arbitrary config value, both releasable via
 Scope boundary: this module handles mod discovery, metadata, ordering, and
 dependency validation. It does **not** execute mod Lua scripts, mount mod
 assets into `GameFS` / `VirtualFS`, or provide a mod sandboxing layer — those
-responsibilities belong to the game's `luna.load()` orchestration and the
+responsibilities belong to the game's `lurek.load()` orchestration and the
 `filesystem` module.
 
 ## Architecture
 
 ```
-luna.modding.newMod(info)         luna.modding.newModManager()
+lurek.modding.newMod(info)         lurek.modding.newModManager()
         │                                    │
         ▼                                    ▼
    ┌──────────┐                      ┌───────────────┐
@@ -130,7 +130,7 @@ Defaults: `version` = `"1.0.0"`, `priority` = `0`, `enabled` = `true`, `loaded` 
 
 **Public functions:**
 - `new(id: impl Into<String>) -> Self` — Creates a `ModInfo` with sensible defaults.
-- `from_parts(id, name, version, author, description, priority, dependencies) -> Self` — Creates a fully-populated `ModInfo` in one call; used by `luna.modding.register` Lua API binding.
+- `from_parts(id, name, version, author, description, priority, dependencies) -> Self` — Creates a fully-populated `ModInfo` in one call; used by `lurek.modding.register` Lua API binding.
 
 #### `modding::mod_manager::ModManager`
 
@@ -164,14 +164,14 @@ No public enums in this module.
 
 ## Lua API
 
-Exposed under `luna.modding.*` by `src/lua_api/modding_api.rs`. The API surface consists of two factory functions and two UserData types.
+Exposed under `lurek.modding.*` by `src/lua_api/modding_api.rs`. The API surface consists of two factory functions and two UserData types.
 
 ### Factory Functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.modding.newMod` | `(info: table) -> Mod` | Creates a `Mod` from an info table. Requires an `id` field; optional: `name`, `version`, `author`, `description`, `priority`, `dependencies`. |
-| `luna.modding.newModManager` | `() -> ModManager` | Creates a new empty `ModManager`. |
+| `lurek.modding.newMod` | `(info: table) -> Mod` | Creates a `Mod` from an info table. Requires an `id` field; optional: `name`, `version`, `author`, `description`, `priority`, `dependencies`. |
+| `lurek.modding.newModManager` | `() -> ModManager` | Creates a new empty `ModManager`. |
 
 ### Mod UserData Methods
 
@@ -218,9 +218,9 @@ Exposed under `luna.modding.*` by `src/lua_api/modding_api.rs`. The API surface 
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create a mod manager
-    local mgr = luna.modding.newModManager()
+    local mgr = lurek.modding.newModManager()
 
     -- Scan the mods/ directory for mod.toml files
     local found = mgr:scanFolder("mods/")
@@ -249,7 +249,7 @@ end
 
 ```lua
 -- Creating mods programmatically with hooks
-local m = luna.modding.newMod({
+local m = lurek.modding.newMod({
     id       = "weather-fx",
     name     = "Weather Effects",
     version  = "1.0.0",
@@ -292,7 +292,7 @@ print("Rain intensity: " .. cfg.rain_intensity)
 | `engine`     | Imports from  | Uses `log_messages` constants (`MD01_MGR_INIT`, `MD02_MOD_REG`, `MD04_ORDER_OK`) via `log_msg!` macro |
 | `math`       | —             | Not imported (no geometry or colour needed)                 |
 | `filesystem` | Related       | Mods may declare asset overrides that `GameFS`/`VirtualFS` resolves; modding itself does not import filesystem |
-| `lua_api`    | Imported by   | `src/lua_api/modding_api.rs` registers `luna.modding.*`, wraps `ModInfo` as `LuaMod` and `ModManager` as `LuaModManager` |
+| `lua_api`    | Imported by   | `src/lua_api/modding_api.rs` registers `lurek.modding.*`, wraps `ModInfo` as `LuaMod` and `ModManager` as `LuaModManager` |
 
 **Similar modules:**
 - `savegame` — Also Tier 2, also manages user-side data. Modding handles content discovery and ordering; savegame handles persistence and schema versioning.

@@ -4,17 +4,17 @@ A classic match-three gem-swapping puzzle on an 8×8 grid. Click two adjacent ge
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — drawing the grid cells, UI panels, and gem backgrounds
-- `luna.gfx.circle()` — rendering circular gem shapes with highlight rings
-- `luna.gfx.print()` — score, combo counter, and move display
-- `luna.mousepressed()` — selecting and swapping adjacent gems
-- `luna.gfx.setColor()` — six distinct gem colours plus special-gem overlays
-- `luna.time.getTime()` — swap and fall animation timing
+- `lurek.gfx.rectangle()` — drawing the grid cells, UI panels, and gem backgrounds
+- `lurek.gfx.circle()` — rendering circular gem shapes with highlight rings
+- `lurek.gfx.print()` — score, combo counter, and move display
+- `lurek.mousepressed()` — selecting and swapping adjacent gems
+- `lurek.gfx.setColor()` — six distinct gem colours plus special-gem overlays
+- `lurek.time.getTime()` — swap and fall animation timing
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/match3
+cargo run -- content/demos/match3
 ```
 
 ## Controls

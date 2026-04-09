@@ -1,7 +1,7 @@
 //! Network-specific error types.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use thiserror::Error;
 

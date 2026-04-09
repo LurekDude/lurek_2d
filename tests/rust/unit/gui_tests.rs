@@ -1,7 +1,7 @@
 //! Integration tests for the gui module: WidgetState, WidgetType, WidgetBase,
 //! controls, containers, extras, theme, and context.
 
-use luna2d::gui::{
+use lurek2d::gui::{
     Accordion, AccordionSection, Button, CheckBox, ColorPicker, ComboBox, Dialog, DockPanel,
     GUITable, GUIWindow, GuiContext, ImageWidget, Label, Layout, LayoutDirection, ListBox, MenuBar,
     MenuItem, NinePatch, Panel, ProgressBar, RadioButton, ScrollBar, ScrollPanel, Separator,

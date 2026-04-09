@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.light`                                         |
+| **Lua API**    | `lurek.light`                                         |
 | **Source**      | `src/light/`                                         |
 | **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `light` module provides a CPU-side 2D dynamic lighting data model for Luna2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
+The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
 
 The module is purely a data container layer. It holds no GPU resources, performs no rendering, and issues no draw commands. The renderer reads `LightWorld` state each frame and produces the actual lighting pass via `DrawCommand` variants in the graphics pipeline. This separation means the light module can be tested headlessly without a GPU context.
 
@@ -52,7 +52,7 @@ LightWorld (resource pool)
 └── max_lights: u16
 
 Data flow:
-  Lua scripts → luna.light.* (light_api.rs)
+  Lua scripts → lurek.light.* (light_api.rs)
     → mutates LightWorld in SharedState
       → renderer reads LightWorld during render_frame()
         → produces lighting pass via DrawCommand queue
@@ -173,28 +173,28 @@ Edge quality for shadow boundaries. Variants: `None` (default — hard edges), `
 
 ## Lua API
 
-Exposed under `luna.light.*` by `src/lua_api/light_api.rs`. The API provides two UserData types (`Light` and `Occluder`) and module-level functions for world management.
+Exposed under `lurek.light.*` by `src/lua_api/light_api.rs`. The API provides two UserData types (`Light` and `Occluder`) and module-level functions for world management.
 
 ### Module-level functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.light.newLight` | `(x, y, radius [, opts])` → Light | Creates a point light; opts table overrides defaults |
-| `luna.light.newOccluder` | `(vertices [, opts])` → Occluder | Creates a shadow polygon from flat `{x1,y1,...}` table |
-| `luna.light.setAmbient` | `(r, g, b [, a])` | Sets global ambient light color |
-| `luna.light.getAmbient` | `()` → r, g, b, a | Returns global ambient color |
-| `luna.light.setEnabled` | `(enabled)` | Enables/disables the lighting system |
-| `luna.light.isEnabled` | `()` → bool | Returns lighting system state |
-| `luna.light.getLightCount` | `()` → int | Number of lights in the world |
-| `luna.light.getOccluderCount` | `()` → int | Number of occluders in the world |
-| `luna.light.getMaxLights` | `()` → int | Max lights processed per frame |
-| `luna.light.setMaxLights` | `(n)` | Sets max lights (clamped 1–256) |
-| `luna.light.clear` | `()` | Removes all lights and occluders |
-| `luna.light.setGroupEnabled` | `(groupId, enabled)` | Enables/disables all lights in a group |
-| `luna.light.setGroupIntensity` | `(groupId, intensity)` | Sets intensity for a group |
-| `luna.light.setGroupColor` | `(groupId, r, g, b [, a])` | Sets color for a group |
-| `luna.light.getGroupCount` | `(groupId)` → int | Number of lights in a group |
-| `luna.light.advanceFlickers` | `(dt)` | Advances flicker phase for all lights |
+| `lurek.light.newLight` | `(x, y, radius [, opts])` → Light | Creates a point light; opts table overrides defaults |
+| `lurek.light.newOccluder` | `(vertices [, opts])` → Occluder | Creates a shadow polygon from flat `{x1,y1,...}` table |
+| `lurek.light.setAmbient` | `(r, g, b [, a])` | Sets global ambient light color |
+| `lurek.light.getAmbient` | `()` → r, g, b, a | Returns global ambient color |
+| `lurek.light.setEnabled` | `(enabled)` | Enables/disables the lighting system |
+| `lurek.light.isEnabled` | `()` → bool | Returns lighting system state |
+| `lurek.light.getLightCount` | `()` → int | Number of lights in the world |
+| `lurek.light.getOccluderCount` | `()` → int | Number of occluders in the world |
+| `lurek.light.getMaxLights` | `()` → int | Max lights processed per frame |
+| `lurek.light.setMaxLights` | `(n)` | Sets max lights (clamped 1–256) |
+| `lurek.light.clear` | `()` | Removes all lights and occluders |
+| `lurek.light.setGroupEnabled` | `(groupId, enabled)` | Enables/disables all lights in a group |
+| `lurek.light.setGroupIntensity` | `(groupId, intensity)` | Sets intensity for a group |
+| `lurek.light.setGroupColor` | `(groupId, r, g, b [, a])` | Sets color for a group |
+| `lurek.light.getGroupCount` | `(groupId)` → int | Number of lights in a group |
+| `lurek.light.advanceFlickers` | `(dt)` | Advances flicker phase for all lights |
 
 ### Light UserData methods
 
@@ -214,9 +214,9 @@ Exposed under `luna.light.*` by `src/lua_api/light_api.rs`. The API provides two
 -- Basic point light with flicker and an occluder casting shadows
 local torch, wall
 
-function luna.init()
+function lurek.init()
     -- Create a warm torch light with flicker
-    torch = luna.light.newLight(400, 300, 200, {
+    torch = lurek.light.newLight(400, 300, 200, {
         color = {1.0, 0.8, 0.4},
         intensity = 1.2,
         falloff = "smooth",
@@ -226,7 +226,7 @@ function luna.init()
     })
 
     -- Create a rectangular occluder (wall)
-    wall = luna.light.newOccluder({
+    wall = lurek.light.newOccluder({
         100, 200,   -- top-left
         200, 200,   -- top-right
         200, 400,   -- bottom-right
@@ -234,30 +234,30 @@ function luna.init()
     })
 
     -- Set dim ambient so unlit areas are not pitch black
-    luna.light.setAmbient(0.05, 0.05, 0.1)
+    lurek.light.setAmbient(0.05, 0.05, 0.1)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Move the torch to follow the mouse
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     torch:setPosition(mx, my)
 
     -- Advance all flicker effects
-    luna.light.advanceFlickers(dt)
+    lurek.light.advanceFlickers(dt)
 end
 
-function luna.render()
+function lurek.render()
     -- Draw your scene; the lighting system composites automatically
-    luna.gfx.print("Move the mouse to move the torch", 10, 10)
+    lurek.gfx.print("Move the mouse to move the torch", 10, 10)
 end
 ```
 
 ```lua
 -- Spot light with group management
-function luna.init()
+function lurek.init()
     -- Create three spot lights in group 1
     for i = 1, 3 do
-        luna.light.newLight(200 * i, 300, 150, {
+        lurek.light.newLight(200 * i, 300, 150, {
             type = "spot",
             direction = math.pi / 2,
             innerAngle = math.pi / 8,
@@ -267,7 +267,7 @@ function luna.init()
     end
 
     -- Dim the entire group at once
-    luna.light.setGroupIntensity(1, 0.5)
+    lurek.light.setGroupIntensity(1, 0.5)
 end
 ```
 
@@ -286,14 +286,14 @@ end
 |-------------|--------------|----------------------------------------------------------|
 | `math`      | Imports from | Uses `Vec2` (occluder vertices/position) and `Color` (light tint, ambient, shadow color) |
 | `engine`    | Imports from | Uses `LightKey`, `OccluderKey` (SlotMap keys from `resource_keys.rs`), log message constants |
-| `lua_api`   | Imported by  | `light_api.rs` exposes `luna.light.*` — provides `LuaLight` and `LuaOccluder` UserData types |
+| `lua_api`   | Imported by  | `light_api.rs` exposes `lurek.light.*` — provides `LuaLight` and `LuaOccluder` UserData types |
 | `graphics`  | Related      | Renderer reads `LightWorld` from `SharedState` to produce the lighting pass; light module does not import graphics |
 | `particle`  | Similar      | Both are Tier 2 modules with SlotMap resource pools; particle owns visual emission, light owns illumination data |
 
 ## Notes
 
 - **CPU-only data model**: The `light` module holds zero GPU resources. All rendering is performed by the graphics pipeline reading `LightWorld` from `SharedState`. This makes the module fully testable without a GPU context.
-- **Auto-enable behaviour**: `LightWorld::add_light()` sets `enabled = true` automatically when the first light is inserted. Scripts do not need to call `luna.light.setEnabled(true)` explicitly.
+- **Auto-enable behaviour**: `LightWorld::add_light()` sets `enabled = true` automatically when the first light is inserted. Scripts do not need to call `lurek.light.setEnabled(true)` explicitly.
 - **Occluder vertex limits**: `Occluder::new()` panics (Rust-side assert) if the vertex count is outside 3..=256. The Lua API (`parse_vertex_table`) validates 6..=512 flat elements (i.e., 3..=256 vertices) before reaching the Rust constructor.
 - **Bitmask filtering**: `light_mask` and `shadow_mask` on both `Light2D` and `Occluder` default to `0xFFFF` (all bits set), meaning all lights interact with all occluders by default. Custom masks allow selective light-occluder filtering without removing objects.
 - **Flicker phase wrapping**: `FlickerConfig::advance()` wraps `phase` at `2π` to prevent float overflow during long-running sessions.

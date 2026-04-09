@@ -1,21 +1,21 @@
 # Hello World
 
-The minimum viable Luna2D game. Draws coloured shapes and text, shows FPS, and demonstrates the basic `luna.load / update / draw / keypressed` callback structure.
+The minimum viable Lurek2D game. Draws coloured shapes and text, shows FPS, and demonstrates the basic `lurek.load / update / draw / keypressed` callback structure.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — filled rectangle
-- `luna.gfx.circle()` — filled circle
-- `luna.gfx.line()` — line primitive
-- `luna.gfx.print()` — text rendering with scale
-- `luna.gfx.setColor()` / `setBackgroundColor()`
-- `luna.time.getFPS()` — frame rate query
-- `luna.keypressed` callback — reacting to input
+- `lurek.gfx.rectangle()` — filled rectangle
+- `lurek.gfx.circle()` — filled circle
+- `lurek.gfx.line()` — line primitive
+- `lurek.gfx.print()` — text rendering with scale
+- `lurek.gfx.setColor()` / `setBackgroundColor()`
+- `lurek.time.getFPS()` — frame rate query
+- `lurek.keypressed` callback — reacting to input
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/hello_world
+cargo run -- content/demos/hello_world
 ```
 
 ## Controls
@@ -27,4 +27,4 @@ cargo run -- demos/hello_world
 ## Notes
 
 - Uses `conf.lua` to set a fixed 800×600 window
-- Good starting point for new Luna2D projects
+- Good starting point for new Lurek2D projects

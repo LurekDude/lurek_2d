@@ -1,5 +1,5 @@
 //! Dijkstra-based flow field for crowd pathfinding.
-//! Moved from `ai/flowfield`; used by the Lua `luna.ai.newFlowField` API.
+//! Moved from `ai/flowfield`; used by the Lua `lurek.ai.newFlowField` API.
 //!
 //! Note: this type operates on [`SimpleGrid`].  The higher-level
 //! [`crate::pathfinding::FlowField`] operates on [`NavGrid`] instead.

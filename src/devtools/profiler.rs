@@ -1,7 +1,7 @@
 //! Hierarchical frame profiler with zone push/pop and rolling frame storage.
 //!
-//! The profiler tracks nested timing zones — each [`profilePush`][luna.devtools.profilePush]
-//! opens a zone and each [`profilePop`][luna.devtools.profilePop] closes it.
+//! The profiler tracks nested timing zones — each [`profilePush`][lurek.devtools.profilePush]
+//! opens a zone and each [`profilePop`][lurek.devtools.profilePop] closes it.
 //! Completed frames are stored in a capped ring and can be queried for the
 //! flame-graph data needed by an overlay panel.
 

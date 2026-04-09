@@ -1,10 +1,10 @@
 //! Mod implementation for the `timer` subsystem.
 //!
-//! This module is part of Luna2D's `timer` subsystem and provides the implementation
+//! This module is part of Lurek2D's `timer` subsystem and provides the implementation
 //! details for mod-related operations and data management.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 /// Frame-based clock providing delta time, total time, and FPS.
 pub mod clock;

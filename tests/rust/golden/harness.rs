@@ -11,15 +11,15 @@
 //! as visual evidence of what the engine's pixel-level rendering produces.
 //! They are not compared automatically — regenerate by re-running the tests.
 
-use luna2d::data::compress::{compress, decompress, CompressFormat};
-use luna2d::data::encode::{decode, encode, EncodeFormat};
-use luna2d::data::hash::{hash, HashAlgorithm};
-use luna2d::data::toml_convert::{encode_toml, parse_toml};
-use luna2d::fx::PostFxStack;
-use luna2d::fx::atmosphere::{CloudState, FogState, HeatHazeState, VignetteState};
-use luna2d::fx::{FadeState, FlashState, ShakeState, WeatherState};
-use luna2d::image::ImageData;
-use luna2d::raycaster::Raycaster2D;
+use lurek2d::data::compress::{compress, decompress, CompressFormat};
+use lurek2d::data::encode::{decode, encode, EncodeFormat};
+use lurek2d::data::hash::{hash, HashAlgorithm};
+use lurek2d::data::toml_convert::{encode_toml, parse_toml};
+use lurek2d::fx::PostFxStack;
+use lurek2d::fx::atmosphere::{CloudState, FogState, HeatHazeState, VignetteState};
+use lurek2d::fx::{FadeState, FlashState, ShakeState, WeatherState};
+use lurek2d::image::ImageData;
+use lurek2d::raycaster::Raycaster2D;
 use std::fs;
 use std::path::Path;
 
@@ -127,8 +127,8 @@ fn golden_png_encode_checkerboard() {
 
 #[test]
 fn golden_hash_sha256_known_digest() {
-    // SHA-256 of "Hello, Luna2D!" is deterministic
-    let digest = hash(HashAlgorithm::Sha256, b"Hello, Luna2D!");
+    // SHA-256 of "Hello, Lurek2D!" is deterministic
+    let digest = hash(HashAlgorithm::Sha256, b"Hello, Lurek2D!");
     assert_golden_text("hash/sha256_hello.txt", &digest);
     // Cross-check with known value
     assert_eq!(digest.len(), 64, "SHA-256 hex digest must be 64 chars");
@@ -136,21 +136,21 @@ fn golden_hash_sha256_known_digest() {
 
 #[test]
 fn golden_hash_md5_known_digest() {
-    let digest = hash(HashAlgorithm::Md5, b"Hello, Luna2D!");
+    let digest = hash(HashAlgorithm::Md5, b"Hello, Lurek2D!");
     assert_golden_text("hash/md5_hello.txt", &digest);
     assert_eq!(digest.len(), 32, "MD5 hex digest must be 32 chars");
 }
 
 #[test]
 fn golden_hash_sha512_known_digest() {
-    let digest = hash(HashAlgorithm::Sha512, b"Luna2D engine test vector");
+    let digest = hash(HashAlgorithm::Sha512, b"Lurek2D engine test vector");
     assert_golden_text("hash/sha512_engine.txt", &digest);
     assert_eq!(digest.len(), 128, "SHA-512 hex digest must be 128 chars");
 }
 
 #[test]
 fn golden_hash_sha1_known_digest() {
-    let digest = hash(HashAlgorithm::Sha1, b"Luna2D engine test vector");
+    let digest = hash(HashAlgorithm::Sha1, b"Lurek2D engine test vector");
     assert_golden_text("hash/sha1_engine.txt", &digest);
     assert_eq!(digest.len(), 40, "SHA-1 hex digest must be 40 chars");
 }
@@ -161,13 +161,13 @@ fn golden_hash_sha1_known_digest() {
 
 #[test]
 fn golden_base64_encode() {
-    let encoded = encode(EncodeFormat::Base64, b"Luna2D rocks!");
+    let encoded = encode(EncodeFormat::Base64, b"Lurek2D rocks!");
     assert_golden_text("encode/base64_encode.txt", &encoded);
 }
 
 #[test]
 fn golden_hex_encode() {
-    let encoded = encode(EncodeFormat::Hex, b"Luna2D rocks!");
+    let encoded = encode(EncodeFormat::Hex, b"Lurek2D rocks!");
     assert_golden_text("encode/hex_encode.txt", &encoded);
 }
 
@@ -185,7 +185,7 @@ fn golden_base64_roundtrip() {
 
 #[test]
 fn golden_compress_deflate_roundtrip() {
-    let original = b"Luna2D compression test vector. Repeated pattern: ABCABCABC.";
+    let original = b"Lurek2D compression test vector. Repeated pattern: ABCABCABC.";
     let compressed = compress(original, CompressFormat::Deflate, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Deflate).unwrap();
     assert_eq!(&decompressed[..], &original[..]);
@@ -194,7 +194,7 @@ fn golden_compress_deflate_roundtrip() {
 
 #[test]
 fn golden_compress_gzip_roundtrip() {
-    let original = b"Luna2D gzip test vector. Repeated: XYZXYZXYZ.";
+    let original = b"Lurek2D gzip test vector. Repeated: XYZXYZXYZ.";
     let compressed = compress(original, CompressFormat::Gzip, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Gzip).unwrap();
     assert_eq!(&decompressed[..], &original[..]);
@@ -203,7 +203,7 @@ fn golden_compress_gzip_roundtrip() {
 
 #[test]
 fn golden_compress_zlib_roundtrip() {
-    let original = b"Luna2D zlib test vector. Repeated: 123123123.";
+    let original = b"Lurek2D zlib test vector. Repeated: 123123123.";
     let compressed = compress(original, CompressFormat::Zlib, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Zlib).unwrap();
     assert_eq!(&decompressed[..], &original[..]);
@@ -212,7 +212,7 @@ fn golden_compress_zlib_roundtrip() {
 
 #[test]
 fn golden_compress_lz4_roundtrip() {
-    let original = b"Luna2D lz4 test vector. Repeated: QWERTY QWERTY QWERTY.";
+    let original = b"Lurek2D lz4 test vector. Repeated: QWERTY QWERTY QWERTY.";
     let compressed = compress(original, CompressFormat::Lz4, 6).unwrap();
     let decompressed = decompress(&compressed, CompressFormat::Lz4).unwrap();
     assert_eq!(&decompressed[..], &original[..]);

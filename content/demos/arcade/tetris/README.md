@@ -5,10 +5,10 @@ clear horizontal lines and rack up points.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — board grid, tetromino cells, ghost preview
-- `luna.keypressed()` — rotation with wall-kick, hard drop
-- `luna.input.isKeyDown()` — soft drop for continuous downward pressure
-- `luna.gfx.print()` — score, level, and lines counter sidebar
+- `lurek.gfx.rectangle()` — board grid, tetromino cells, ghost preview
+- `lurek.keypressed()` — rotation with wall-kick, hard drop
+- `lurek.input.isKeyDown()` — soft drop for continuous downward pressure
+- `lurek.gfx.print()` — score, level, and lines counter sidebar
 
 ## Controls
 

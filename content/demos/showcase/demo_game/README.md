@@ -1,21 +1,21 @@
 # Demo Game — Shooting Gallery
 
-A complete mini-game: physics-based shooting gallery where you aim with the mouse, fire balls at targets, and score points. Demonstrates how multiple Luna2D systems integrate in a playable loop.
+A complete mini-game: physics-based shooting gallery where you aim with the mouse, fire balls at targets, and score points. Demonstrates how multiple Lurek2D systems integrate in a playable loop.
 
 ## What It Demonstrates
 
-- `luna.physics` — cannon ball projectiles, target rect bodies, raycasting for aiming
-- `luna.physics.getCollisionEvents()` — detecting ball-target hits
-- `luna.mouse.getPosition()` — aim direction from cursor
-- `luna.mousepressed` callback — fire on click
-- `luna.gfx` — rendering cannon, trajectory line, targets, score
-- `luna.time.getTime()` — countdown timer
+- `lurek.physics` — cannon ball projectiles, target rect bodies, raycasting for aiming
+- `lurek.physics.getCollisionEvents()` — detecting ball-target hits
+- `lurek.mouse.getPosition()` — aim direction from cursor
+- `lurek.mousepressed` callback — fire on click
+- `lurek.gfx` — rendering cannon, trajectory line, targets, score
+- `lurek.time.getTime()` — countdown timer
 - Score and combo system with on-screen feedback
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/demo_game
+cargo run -- content/demos/demo_game
 ```
 
 ## Controls

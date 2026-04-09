@@ -1,7 +1,7 @@
--- Frogger — Classic Arcade (Luna2D demo)
+-- Frogger — Classic Arcade (Lurek2D demo)
 -- Guide the frog across a busy road and floating river logs to reach the lily pads.
 -- WASD or Arrow keys to hop. One hit = one life lost.
--- Run with: cargo run -- demos/arcade/frogger
+-- Run with: cargo run -- content/demos/arcade/frogger
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -73,15 +73,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.05, 0.1, 0.05)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.05, 0.1, 0.05)
     score = 0; lives = NUM_LIVES; level = 1
     init()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     hop_cd = math.max(0, hop_cd - dt)
 
@@ -179,27 +179,27 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Draw lane backgrounds
     for _, lane in ipairs(LANES) do
         local ly = lane.row * CELL
         if lane.type == "safe" then
-            luna.gfx.setColor(0.15, 0.3, 0.1)
+            lurek.gfx.setColor(0.15, 0.3, 0.1)
         elseif lane.type == "road" then
-            luna.gfx.setColor(0.2, 0.2, 0.2)
+            lurek.gfx.setColor(0.2, 0.2, 0.2)
         else -- water
-            luna.gfx.setColor(0.05, 0.15, 0.45)
+            lurek.gfx.setColor(0.05, 0.15, 0.45)
         end
-        luna.gfx.rectangle("fill", 0, ly, W, CELL)
+        lurek.gfx.rectangle("fill", 0, ly, W, CELL)
     end
 
     -- Lane dividers (road)
-    luna.gfx.setColor(0.5, 0.5, 0.1, 0.4)
+    lurek.gfx.setColor(0.5, 0.5, 0.1, 0.4)
     for _, lane in ipairs(LANES) do
         if lane.type == "road" then
             local ly = lane.row * CELL + CELL/2
             for x = 0, W, 30 do
-                luna.gfx.rectangle("fill", x, ly - 2, 16, 4)
+                lurek.gfx.rectangle("fill", x, ly - 2, 16, 4)
             end
         end
     end
@@ -210,11 +210,11 @@ function luna.render()
         local hx = (i - 1) * slot_w + slot_w/2 - 20
         local hy = 4
         if homes[i] then
-            luna.gfx.setColor(0.1, 0.8, 0.2)
+            lurek.gfx.setColor(0.1, 0.8, 0.2)
         else
-            luna.gfx.setColor(0.1, 0.4, 0.15)
+            lurek.gfx.setColor(0.1, 0.4, 0.15)
         end
-        luna.gfx.circle("fill", (i - 1) * slot_w + slot_w/2, CELL/2, 20)
+        lurek.gfx.circle("fill", (i - 1) * slot_w + slot_w/2, CELL/2, 20)
     end
 
     -- Lane objects (cars / logs)
@@ -224,13 +224,13 @@ function luna.render()
             if objs then
                 for _, obj in ipairs(objs) do
                     local ly = lane.row * CELL + 4
-                    luna.gfx.setColor(lane.color[1], lane.color[2], lane.color[3])
-                    luna.gfx.rectangle("fill", obj.x, ly, obj.w, CELL - 8)
+                    lurek.gfx.setColor(lane.color[1], lane.color[2], lane.color[3])
+                    lurek.gfx.rectangle("fill", obj.x, ly, obj.w, CELL - 8)
                     -- Highlight
                     if lane.type == "road" then
-                        luna.gfx.setColor(1, 1, 0.5, 0.4)
-                        luna.gfx.circle("fill", obj.x + 12, ly + 8, 6)
-                        luna.gfx.circle("fill", obj.x + obj.w - 12, ly + 8, 6)
+                        lurek.gfx.setColor(1, 1, 0.5, 0.4)
+                        lurek.gfx.circle("fill", obj.x + 12, ly + 8, 6)
+                        lurek.gfx.circle("fill", obj.x + obj.w - 12, ly + 8, 6)
                     end
                 end
             end
@@ -242,41 +242,41 @@ function luna.render()
     local fy = frog.y + 2
     local fw = frog.w - 4
     local fh = frog.h - 4
-    luna.gfx.setColor(0.2, 0.8, 0.2)
-    luna.gfx.rectangle("fill", fx + fw/4, fy, fw/2, fh)
-    luna.gfx.rectangle("fill", fx, fy + fh/3, fw, fh/3)
+    lurek.gfx.setColor(0.2, 0.8, 0.2)
+    lurek.gfx.rectangle("fill", fx + fw/4, fy, fw/2, fh)
+    lurek.gfx.rectangle("fill", fx, fy + fh/3, fw, fh/3)
     -- Eyes
-    luna.gfx.setColor(1, 1, 0)
-    luna.gfx.circle("fill", fx + fw/4, fy + 5, 4)
-    luna.gfx.circle("fill", fx + fw*3/4, fy + 5, 4)
+    lurek.gfx.setColor(1, 1, 0)
+    lurek.gfx.circle("fill", fx + fw/4, fy + 5, 4)
+    lurek.gfx.circle("fill", fx + fw*3/4, fy + 5, 4)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. score, 8, H - 20, 1.5)
-    luna.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. score, 8, H - 20, 1.5)
+    lurek.gfx.setColor(1, 0.4, 0.4)
     local life_str = ""
     for i = 1, lives do life_str = life_str .. "🐸" end
-    luna.gfx.print("Lives: " .. lives, W/2 - 50, H - 20, 1.5)
-    luna.gfx.setColor(0.5, 0.8, 0.5)
-    luna.gfx.print("Level " .. level, W - 90, H - 20, 1.5)
+    lurek.gfx.print("Lives: " .. lives, W/2 - 50, H - 20, 1.5)
+    lurek.gfx.setColor(0.5, 0.8, 0.5)
+    lurek.gfx.print("Level " .. level, W - 90, H - 20, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.3, 0.3)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.3, 0.3)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then score = 0; lives = NUM_LIVES; level = 1; init() end
     if game_state ~= "playing" then return end
     if hop_cd > 0 then return end

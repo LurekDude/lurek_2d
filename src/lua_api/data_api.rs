@@ -1,4 +1,4 @@
-//! `luna.data` — Binary data manipulation, compression, hashing, and encoding.
+//! `lurek.data` — Binary data manipulation, compression, hashing, and encoding.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -45,7 +45,7 @@ fn pack_values_to_lua(lua: &Lua, vals: Vec<PackValue>) -> LuaResult<Vec<LuaValue
 // Bin conversion helpers
 // -------------------------------------------------------------------------------
 
-/// Converts a `LuaMultiValue` to `Vec<BinValue>` for the Luna2D bin pack write API.
+/// Converts a `LuaMultiValue` to `Vec<BinValue>` for the Lurek2D bin pack write API.
 fn lua_values_to_bin(vals: LuaMultiValue) -> Vec<BinValue> {
     vals.into_iter()
         .map(|v| match v {
@@ -83,7 +83,7 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.data` API table with the Lua VM.
+/// Registers the `lurek.data` API table with the Lua VM.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -258,7 +258,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- write --
-    /// Writes values using the Luna2D Binary Pack Format.
+    /// Writes values using the Lurek2D Binary Pack Format.
     /// @param format : string
     /// @return string
     tbl.set(
@@ -271,7 +271,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- read --
-    /// Reads values using the Luna2D Binary Pack Format.
+    /// Reads values using the Lurek2D Binary Pack Format.
     /// @param format : string
     /// @param data : string
     /// @param offset : integer?
@@ -287,7 +287,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- size --
-    /// Returns the byte size of a Luna2D Binary Pack Format string.
+    /// Returns the byte size of a Lurek2D Binary Pack Format string.
     /// @param format : string
     /// @return integer
     tbl.set(

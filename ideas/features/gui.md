@@ -35,13 +35,13 @@ GUI system: retained-mode widget tree with layout, styling, and event handling. 
 
 ## Structural Issues
 
-- **Retained mode vs immediate mode**: Luna2D chose retained mode (widget tree). Good for complex UIs but more complex to implement. Most Lua game engines have minimal UI — Luna2D is ahead here.
+- **Retained mode vs immediate mode**: Lurek2D chose retained mode (widget tree). Good for complex UIs but more complex to implement. Most Lua game engines have minimal UI — Lurek2D is ahead here.
 - **No integration with entity/scene**: Widgets exist in a separate tree from game entities. Can't attach UI to world-space positions (health bars over entities) easily.
 - **Layout is basic**: V/H/Grid/Abs covers 80% of cases but the remaining 20% (responsive, flex) require workarounds.
 
 ## Suggestions
 
-1. **Add theming system**: `luna.ui.setTheme({primary="#2196F3", font="default", spacing=8})` — global style application. Huge productivity boost for consistent UI.
+1. **Add theming system**: `lurek.ui.setTheme({primary="#2196F3", font="default", spacing=8})` — global style application. Huge productivity boost for consistent UI.
 2. **Add drag-and-drop**: `widget:setDraggable(true)` / `container:setDropTarget(true, onDrop)` — enables inventory, card games, editor tools.
 3. **Add tooltips**: `widget:setTooltip(text)` or `widget:setTooltip(widgetTree)` — hover tooltip with configurable delay.
 4. **Add data binding**: `label:bind("text", gameState, "playerHealth")` — auto-update when value changes. Reactive UI pattern.
@@ -51,7 +51,7 @@ GUI system: retained-mode widget tree with layout, styling, and event handling. 
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Widget toolkit | ✅ (retained) | ❌ (libs only) | ✅ (widget lib) | ✅ (full UI) |
 | Layout engine | ✅ (basic) | N/A | ❌ | ✅ (flexbox) |

@@ -1,6 +1,6 @@
-# Luna2D Tools Directory
+# Lurek2D Tools Directory
 
-Permanent CLI scripts for the Luna2D engine pipeline, organised by category.
+Permanent CLI scripts for the Lurek2D engine pipeline, organised by category.
 Every subfolder has its own `README.md` with the full script list and usage examples.
 
 ## Policy: Permanent vs Temporary Scripts
@@ -19,7 +19,7 @@ go under `work/{session}/scripts/` and are archived at session end.
 
 | Folder | Purpose |
 |---|---|
-| [`tools/docs/`](docs/README.md) | Documentation generators — produce `docs/API/`, `docs/logs/`, `wiki/` |
+| [`tools/docs/`](docs/README.md) | Documentation generators — produce `docs/API/`, `docs/logs/`, `docs/wiki/` |
 | [`tools/audit/`](audit/README.md) | Quality auditing, coverage analytics, gap reports |
 | [`tools/fix/`](fix/README.md) | Code fixers and docstring improvers |
 | [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure) |

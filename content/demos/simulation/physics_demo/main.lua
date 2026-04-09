@@ -1,6 +1,6 @@
--- Physics demo for Luna2D
+-- Physics demo for Lurek2D
 -- Demonstrates: circle bodies, rect bodies, sensors, collision events, layer filtering
--- Run with: cargo run -- demos/simulation/physics_demo
+-- Run with: cargo run -- content/demos/simulation/physics_demo
 
 local world_id
 local ground_id
@@ -20,14 +20,14 @@ local collision_count = 0
 local sensor_triggered = false
 
 -- Shape descriptor: newCircleShape returns a raw (type, radius) tuple
-local _shape_type, _shape_r = luna.physics.newCircleShape(25)
+local _shape_type, _shape_r = lurek.physics.newCircleShape(25)
 print("[physics_demo] shape type:", _shape_type, "radius:", _shape_r)
 
-function luna.init()
-    luna.window.setTitle("Physics Demo -- Luna2D (Circles + Sensors + Layers)")
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Physics Demo -- Lurek2D (Circles + Sensors + Layers)")
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.15)
 
-    world_id = luna.physics.newWorld(0, 400)
+    world_id = lurek.physics.newWorld(0, 400)
 
     -- Ground (static rect)
     ground_id = world_id:newBody(W/2, GROUND_Y, "static")
@@ -67,7 +67,7 @@ function luna.init()
     layer_ball_id:setLayer(4); layer_ball_id:setMask(4)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     world_id:step(dt)
 
     -- Read collision events
@@ -88,7 +88,7 @@ function luna.process(dt)
     end
 
     -- Reset with SPACE
-    if luna.keyboard.isDown("space") then
+    if lurek.keyboard.isDown("space") then
         ball_id:setVelocity(0, 0)
         box_id:setVelocity(0, 0)
         layer_ball_id:setVelocity(0, 0)
@@ -97,77 +97,77 @@ function luna.process(dt)
     end
 
     -- Apply random impulse with R
-    if luna.keyboard.isDown("r") then
+    if lurek.keyboard.isDown("r") then
         ball_id:setVelocity(math.random(-300, 300), -300)
         box_id:setVelocity(math.random(-200, 200), -200)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Ground
     local gx, gy = ground_id:getPosition()
-    luna.gfx.setColor(0.25, 0.6, 0.25)
-    luna.gfx.rectangle("fill", gx - W/2, gy - 25, W, 50)
+    lurek.gfx.setColor(0.25, 0.6, 0.25)
+    lurek.gfx.rectangle("fill", gx - W/2, gy - 25, W, 50)
 
     -- Walls
-    luna.gfx.setColor(0.3, 0.3, 0.5)
+    lurek.gfx.setColor(0.3, 0.3, 0.5)
     local lx, ly = wall_left_id:getPosition()
-    luna.gfx.rectangle("fill", lx - 25, ly - H/2, 50, H)
+    lurek.gfx.rectangle("fill", lx - 25, ly - H/2, 50, H)
     local rx, ry = wall_right_id:getPosition()
-    luna.gfx.rectangle("fill", rx - 25, ry - H/2, 50, H)
+    lurek.gfx.rectangle("fill", rx - 25, ry - H/2, 50, H)
 
     -- Sensor zone
     local sx, sy = sensor_id:getPosition()
     if sensor_triggered then
-        luna.gfx.setColor(1.0, 1.0, 0.0, 0.35)
+        lurek.gfx.setColor(1.0, 1.0, 0.0, 0.35)
     else
-        luna.gfx.setColor(0.8, 0.8, 0.0, 0.18)
+        lurek.gfx.setColor(0.8, 0.8, 0.0, 0.18)
     end
-    luna.gfx.rectangle("fill", sx - (W-100)/2, sy - 10, W-100, 20)
-    luna.gfx.setColor(0.8, 0.8, 0.0)
-    luna.gfx.rectangle("line", sx - (W-100)/2, sy - 10, W-100, 20)
+    lurek.gfx.rectangle("fill", sx - (W-100)/2, sy - 10, W-100, 20)
+    lurek.gfx.setColor(0.8, 0.8, 0.0)
+    lurek.gfx.rectangle("line", sx - (W-100)/2, sy - 10, W-100, 20)
 
     -- Ghost ball (layer 4 -- falls through without colliding with others)
     local px, py = layer_ball_id:getPosition()
-    luna.gfx.setColor(0.5, 0.5, 1.0, 0.6)
-    luna.gfx.circle("fill", px, py, 18)
-    luna.gfx.setColor(0.7, 0.7, 1.0)
-    luna.gfx.circle("line", px, py, 18)
+    lurek.gfx.setColor(0.5, 0.5, 1.0, 0.6)
+    lurek.gfx.circle("fill", px, py, 18)
+    lurek.gfx.setColor(0.7, 0.7, 1.0)
+    lurek.gfx.circle("line", px, py, 18)
 
     -- Dynamic box
     local bx2, by2 = box_id:getPosition()
     if collision_flash > 0 then
-        luna.gfx.setColor(1.0, 0.8, 0.2)
+        lurek.gfx.setColor(1.0, 0.8, 0.2)
     else
-        luna.gfx.setColor(0.8, 0.5, 0.2)
+        lurek.gfx.setColor(0.8, 0.5, 0.2)
     end
-    luna.gfx.rectangle("fill", bx2 - 20, by2 - 20, 40, 40)
+    lurek.gfx.rectangle("fill", bx2 - 20, by2 - 20, 40, 40)
 
     -- Dynamic circle ball
     local bx, by = ball_id:getPosition()
     if collision_flash > 0 then
-        luna.gfx.setColor(1.0, 0.5, 0.5)
+        lurek.gfx.setColor(1.0, 0.5, 0.5)
     else
-        luna.gfx.setColor(1.0, 0.3, 0.2)
+        lurek.gfx.setColor(1.0, 0.3, 0.2)
     end
-    luna.gfx.circle("fill", bx, by, 22)
+    lurek.gfx.circle("fill", bx, by, 22)
 
     -- HUD
-    luna.gfx.setColor(0.9, 0.9, 0.9)
-    luna.gfx.print("Physics Demo -- Circles + Sensors + Layers", 60, 10, 2)
-    luna.gfx.setColor(0.7, 0.7, 0.7)
-    luna.gfx.print("SPACE: reset  |  R: random impulse", 60, 35, 2)
-    luna.gfx.print("Red circle (layer 1) + Orange box (layer 2) collide with each other", 60, 55, 2)
-    luna.gfx.print("Blue ghost ball (layer 4) passes through everything", 60, 73, 2)
-    luna.gfx.print("Yellow band = sensor zone (detects but does not block)", 60, 91, 2)
+    lurek.gfx.setColor(0.9, 0.9, 0.9)
+    lurek.gfx.print("Physics Demo -- Circles + Sensors + Layers", 60, 10, 2)
+    lurek.gfx.setColor(0.7, 0.7, 0.7)
+    lurek.gfx.print("SPACE: reset  |  R: random impulse", 60, 35, 2)
+    lurek.gfx.print("Red circle (layer 1) + Orange box (layer 2) collide with each other", 60, 55, 2)
+    lurek.gfx.print("Blue ghost ball (layer 4) passes through everything", 60, 73, 2)
+    lurek.gfx.print("Yellow band = sensor zone (detects but does not block)", 60, 91, 2)
 
     -- Collision counter
     local cc_color = collision_flash > 0 and {1.0, 1.0, 0.2} or {0.5, 0.9, 0.5}
-    luna.gfx.setColor(cc_color[1], cc_color[2], cc_color[3])
-    luna.gfx.print("Total collisions: " .. tostring(collision_count), 60, 115, 2)
+    lurek.gfx.setColor(cc_color[1], cc_color[2], cc_color[3])
+    lurek.gfx.print("Total collisions: " .. tostring(collision_count), 60, 115, 2)
 
     if sensor_triggered then
-        luna.gfx.setColor(1.0, 1.0, 0.0)
-        luna.gfx.print("SENSOR TRIGGERED!", 60, 135, 2)
+        lurek.gfx.setColor(1.0, 1.0, 0.0)
+        lurek.gfx.print("SENSOR TRIGGERED!", 60, 135, 2)
     end
 end

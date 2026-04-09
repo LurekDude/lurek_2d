@@ -4,19 +4,19 @@ A top-down colony builder where you place farms, beds, and recreation halls to k
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — tile grid, building footprints, and stat bar rendering
-- `luna.gfx.setColor()` — per-colonist colour coding by current state
-- `luna.gfx.print()` — HUD overlays showing food, materials, day count, and colonist stats
-- `luna.mouse.getPosition()` — placement cursor tracking across the tile grid
-- `luna.mouse.isPressed()` — left-click place / right-click assign workflow
-- `luna.keyboard.isPressed()` — number keys to switch placement type
-- `luna.gfx.setBackgroundColor()` — earthy dark-green world background
-- `luna.window.setTitle()` — runtime window title update on load
+- `lurek.gfx.rectangle()` — tile grid, building footprints, and stat bar rendering
+- `lurek.gfx.setColor()` — per-colonist colour coding by current state
+- `lurek.gfx.print()` — HUD overlays showing food, materials, day count, and colonist stats
+- `lurek.mouse.getPosition()` — placement cursor tracking across the tile grid
+- `lurek.mouse.isPressed()` — left-click place / right-click assign workflow
+- `lurek.keyboard.isPressed()` — number keys to switch placement type
+- `lurek.gfx.setBackgroundColor()` — earthy dark-green world background
+- `lurek.window.setTitle()` — runtime window title update on load
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/colony_sim
+cargo run -- content/demos/colony_sim
 ```
 
 ## Controls

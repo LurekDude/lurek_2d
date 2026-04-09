@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.dataframe`                                     |
+| **Lua API**    | `lurek.dataframe`                                     |
 | **Source**      | `src/dataframe/`                                     |
 | **Rust Tests** | `tests/rust/unit/dataframe_tests.rs`                 |
 | **Lua Tests**  | `tests/lua/unit/test_dataframe.lua`                  |
@@ -28,6 +28,6 @@ The `dataframe` module provides an in-memory, column-major tabular data engine w
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/dataframe.md`](../../specs/dataframe.md)
+→ [`docs/specs/dataframe.md`](../../docs/specs/dataframe.md)
 
-_Update both this file **and** `specs/dataframe.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/dataframe.md` whenever source files, public types, or Lua bindings change._

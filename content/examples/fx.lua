@@ -1,25 +1,23 @@
 -- examples/fx.lua
--- luna.postfx — Post-processing effects: stacking, per-image chains, screen overlays.
--- All luna.postfx API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.postfx — Post-processing effects: stacking, per-image chains, screen overlays.
 
 -- ── Effect Types ──────────────────────────────────────────────────────────────
--- Use one of these string names with luna.postfx.newEffect(type_name):
---   "blur", "bloom", "chromatic_aberration", "color_grading", "crt",
---   "fisheye", "grain", "scanlines", "sepia", "vignette"
+-- Use one of these string names with lurek.postfx.newEffect(type_name):
+"blur", "bloom", "chromatic_aberration", "color_grading", "crt",
+"fisheye", "grain", "scanlines", "sepia", "vignette"
 
 -- ── Creating Effects ──────────────────────────────────────────────────────────
 
 -- newEffect(type_name) → PostFxEffect  — built-in effect by name
-local blur   = luna.postfx.newEffect("blur")
-local vign   = luna.postfx.newEffect("vignette")
-local grain  = luna.postfx.newEffect("grain")
-local sepia  = luna.postfx.newEffect("sepia")
+local blur   = lurek.postfx.newEffect("blur")
+local vign   = lurek.postfx.newEffect("vignette")
+local grain  = lurek.postfx.newEffect("grain")
+local sepia  = lurek.postfx.newEffect("sepia")
 
 -- newCustomEffect(shader_id) → PostFxEffect  — custom WGSL shader effect
--- shader_id is the id returned by luna.gfx.newShader(...)
--- local my_shader = luna.gfx.newShader(nil, frag_src)
--- local custom_fx = luna.postfx.newCustomEffect(my_shader:getId())
+-- shader_id is the id returned by lurek.gfx.newShader(...)
+local my_shader = lurek.gfx.newShader(nil, frag_src)
+local custom_fx = lurek.postfx.newCustomEffect(my_shader:getId())
 
 -- ── Configuring Effects ───────────────────────────────────────────────────────
 
@@ -58,7 +56,7 @@ local en = blur:isEnabled()
 
 -- newStack(w, h) → PostFxStack  — w/h should match screen or canvas dimensions
 local W, H = 1280, 720
-local fx_stack = luna.postfx.newStack(W, H)
+local fx_stack = lurek.postfx.newStack(W, H)
 
 -- add(effect_index) — add a slot by integer index (arbitrary allocation)
 -- Internally the stack manages effect positions; use the effect's own add_method index.
@@ -102,12 +100,12 @@ local sw, sh = fx_stack:getDimensions()
 fx_stack:resize(640, 360)
 
 -- clear()  — remove all effects
--- fx_stack:clear()
+fx_stack:clear()
 
 -- ── ImageEffect (per-image effect chain) ─────────────────────────────────────
 
 -- newImageEffect(name) → ImageEffect  — named per-image chain
-local img_fx = luna.postfx.newImageEffect("hero_glow")
+local img_fx = lurek.postfx.newImageEffect("hero_glow")
 
 -- addEffect(effect) — append a PostFxEffect to this chain
 img_fx:addEffect(blur)
@@ -123,12 +121,12 @@ img_fx:removeByIndex(2)
 img_fx:removeByName("blur")
 
 -- clear()
--- img_fx:clear()
+img_fx:clear()
 
 -- ── Overlay (screen-wide transient effects) ───────────────────────────────────
 
 -- newOverlay(w, h) → Overlay
-local overlay = luna.postfx.newOverlay(W, H)
+local overlay = lurek.postfx.newOverlay(W, H)
 
 -- triggerFlash(r, g, b, a, duration)  — brief colour flash (e.g. hit, explosion)
 overlay:triggerFlash(1.0, 0.0, 0.0, 0.8, 0.15)   -- fast red flash
@@ -161,18 +159,18 @@ overlay:update(0.016)
 overlay:resize(1280, 720)
 
 -- clear()  — cancel all active animations
--- overlay:clear()
+overlay:clear()
 
 -- ── Typical Game Usage ───────────────────────────────────────────────────────
 
 --[[
 local fx_overlay, shake_x, shake_y
 
-function luna.init()
-    fx_overlay = luna.postfx.newOverlay(luna.window.getWidth(), luna.window.getHeight())
+function lurek.init()
+    fx_overlay = lurek.postfx.newOverlay(lurek.window.getWidth(), lurek.window.getHeight())
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- react to hit
     if player_was_hit then
         fx_overlay:triggerFlash(1, 0, 0, 0.6, 0.12)
@@ -182,17 +180,17 @@ function luna.process(dt)
     shake_x, shake_y = fx_overlay:getShakeOffset()
 end
 
-function luna.render()
-    luna.gfx.push()
-    luna.gfx.translate(shake_x, shake_y)
+function lurek.render()
+    lurek.gfx.push()
+    lurek.gfx.translate(shake_x, shake_y)
     -- ... draw world ...
-    luna.gfx.pop()
+    lurek.gfx.pop()
 
     -- draw flash overlay on top
     if fx_overlay:getFlashAlpha() > 0 then
-        luna.gfx.setColor(1, 0, 0, fx_overlay:getFlashAlpha())
-        luna.gfx.rectangle("fill", 0, 0, luna.window.getWidth(), luna.window.getHeight())
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(1, 0, 0, fx_overlay:getFlashAlpha())
+        lurek.gfx.rectangle("fill", 0, 0, lurek.window.getWidth(), lurek.window.getHeight())
+        lurek.gfx.setColor(1, 1, 1, 1)
     end
 end
 ]]
@@ -281,6 +279,6 @@ local is_capturing = postfxstack:isCapturing()  -- Returns whether the stack is 
 postfxstack:type()
 postfxstack:typeOf("myName")
 
--- ─── luna.fx ───────────────────────────────────────────────────────────────────
-local effect_types = luna.fx.getEffectTypes()  -- Returns the list of all built-in effect type names
-local pass = luna.fx.newPass(1)  -- Creates a custom-shader post-processing effect (alias for newCustomEffect)
+-- ─── lurek.fx ───────────────────────────────────────────────────────────────────
+local effect_types = lurek.fx.getEffectTypes()  -- Returns the list of all built-in effect type names
+local pass = lurek.fx.newPass(1)  -- Creates a custom-shader post-processing effect (alias for newCustomEffect)

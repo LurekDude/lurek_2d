@@ -1,12 +1,12 @@
-//! Lua API binding bridge for the Luna2D engine.
+//! Lua API binding bridge for the Lurek2D engine.
 //!
-//! This is the integration layer that registers all `luna.*` API sub-modules
+//! This is the integration layer that registers all `lurek.*` API sub-modules
 //! on top of the types defined in `engine`. `SharedState`, `WindowState`,
 //! `FullscreenType`, and `ErrorInfo` are defined in `engine::shared_state`
 //! and re-exported here for sub-module convenience.
 //!
 //! The primary entry point is `create_lua_vm()` which constructs a configured
-//! LuaJIT VM with every `luna.*` namespace bound.
+//! LuaJIT VM with every `lurek.*` namespace bound.
 
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -16,143 +16,143 @@ use mlua::prelude::*;
 use crate::engine::config::ModulesConfig;
 pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
-/// Registers the `luna.signal.*` event queue and signal API.
+/// Registers the `lurek.signal.*` event queue and signal API.
 pub mod event_api;
 
-/// Registers the `luna.time.*` frame-timing API.
+/// Registers the `lurek.time.*` frame-timing API.
 pub mod timer_api;
 
-/// Registers the `luna.img.*` pixel-level image manipulation API.
+/// Registers the `lurek.img.*` pixel-level image manipulation API.
 pub mod image_api;
 
-/// Registers the `luna.camera.*` Camera2D API.
+/// Registers the `lurek.camera.*` Camera2D API.
 pub mod camera_api;
 
-/// Registers the `luna.tween.*` API.
+/// Registers the `lurek.tween.*` API.
 pub mod animation_api;
 
-/// Registers the `luna.thread.*` background threading API.
+/// Registers the `lurek.thread.*` background threading API.
 pub mod thread_api;
 pub mod tween_api;
 
-/// Registers the `luna.simulator.*` automated input simulation API.
+/// Registers the `lurek.simulator.*` automated input simulation API.
 pub mod automation_api;
 
-/// Registers the `luna.keyboard` / `luna.mouse` / `luna.gamepad` / `luna.touch` input API.
+/// Registers the `lurek.keyboard` / `lurek.mouse` / `lurek.gamepad` / `lurek.touch` input API.
 pub mod input_api;
 
-/// Registers the `luna.savegame.*` slot-based save/load API.
+/// Registers the `lurek.savegame.*` slot-based save/load API.
 pub mod savegame_api;
 
-/// Registers the `luna.data.*` binary data, compression, hashing, and encoding API.
+/// Registers the `lurek.data.*` binary data, compression, hashing, and encoding API.
 pub mod data_api;
 
-/// Registers the `luna.entity.*` lightweight ECS API.
+/// Registers the `lurek.entity.*` lightweight ECS API.
 pub mod entity_api;
 
-/// Registers the `luna.scene.*` scene stack and depth-sorter API.
+/// Registers the `lurek.scene.*` scene stack and depth-sorter API.
 pub mod scene_api;
 
-/// Registers the `luna.gpu.*` array computation API.
+/// Registers the `lurek.gpu.*` array computation API.
 pub mod compute_api;
 
-/// Registers the `luna.window.*` window management API.
+/// Registers the `lurek.window.*` window management API.
 pub mod window_api;
 
-/// Registers the `luna.modding.*` mod management API.
+/// Registers the `lurek.modding.*` mod management API.
 pub mod modding_api;
 
-/// Registers the `luna.fs.*` sandboxed file I/O API.
+/// Registers the `lurek.fs.*` sandboxed file I/O API.
 pub mod filesystem_api;
 
-/// Registers the `luna.codec.*` format serialization API.
+/// Registers the `lurek.codec.*` format serialization API.
 pub mod serial_api;
 
-/// Registers the `luna.raycaster.*` DDA grid raycasting API.
+/// Registers the `lurek.raycaster.*` DDA grid raycasting API.
 pub mod raycaster_api;
 
-/// Registers the `luna.spine.*` skeletal animation API.
+/// Registers the `lurek.spine.*` skeletal animation API.
 pub mod spine_api;
 
-/// Registers the `luna.procgen.*` procedural generation API.
+/// Registers the `lurek.procgen.*` procedural generation API.
 pub mod procgen_api;
 
-/// Registers the `luna.network.*` UDP networking API.
+/// Registers the `lurek.network.*` UDP networking API.
 pub mod network_api;
 
-/// Registers the `luna.minimap.*` grid-based minimap API.
+/// Registers the `lurek.minimap.*` grid-based minimap API.
 pub mod minimap_api;
 
-/// Registers the `luna.pathfinding.*` grid-based pathfinding API.
+/// Registers the `lurek.pathfinding.*` grid-based pathfinding API.
 pub mod pathfinding_api;
 
-/// Registers the `luna.dataframe.*` tabular data API.
+/// Registers the `lurek.dataframe.*` tabular data API.
 pub mod dataframe_api;
 
-/// Registers the `luna.light.*` 2D lighting API.
+/// Registers the `lurek.light.*` 2D lighting API.
 pub mod light_api;
 
-/// Registers the `luna.terminal.*` text-mode terminal emulator API.
+/// Registers the `lurek.terminal.*` text-mode terminal emulator API.
 pub mod terminal_api;
 
-/// Registers the `luna.pipeline.*` DAG pipeline orchestrator API.
+/// Registers the `lurek.pipeline.*` DAG pipeline orchestrator API.
 pub mod pipeline_api;
 
-/// Registers the `luna.graph.*` directed-graph and item-flow simulation API.
+/// Registers the `lurek.graph.*` directed-graph and item-flow simulation API.
 pub mod graph_api;
 
-/// Registers the `luna.ai.*` game AI toolkit API.
+/// Registers the `lurek.ai.*` game AI toolkit API.
 pub mod ai_api;
 
-/// Registers the `luna.audio.*` audio playback, mixing, and MIDI API.
+/// Registers the `lurek.audio.*` audio playback, mixing, and MIDI API.
 pub mod audio_api;
 
-/// Registers the `luna.postfx.*` post-processing and screen overlay API.
+/// Registers the `lurek.postfx.*` post-processing and screen overlay API.
 pub mod fx_api;
 
-/// Registers the `luna.particles.*` particle system and trail API.
+/// Registers the `lurek.particles.*` particle system and trail API.
 pub mod particle_api;
 
-/// Registers the `luna.ui.*` retained-mode widget UI API.
+/// Registers the `lurek.ui.*` retained-mode widget UI API.
 pub mod gui_api;
 
-/// Registers the `luna.tilemap.*` tile-based map authoring and coordinate helpers API.
+/// Registers the `lurek.tilemap.*` tile-based map authoring and coordinate helpers API.
 pub mod tilemap_api;
 
-/// Registers the `luna.math.*` math utilities API.
+/// Registers the `lurek.math.*` math utilities API.
 pub mod math_api;
 
-/// Registers the `luna.physics.*` rigid-body physics API.
+/// Registers the `lurek.physics.*` rigid-body physics API.
 pub mod physics_api;
 
-/// Registers the `luna.gfx.*` rendering and drawing API.
+/// Registers the `lurek.gfx.*` rendering and drawing API.
 pub mod graphics_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
 pub mod system_api;
 
-/// Registers the `luna.devtools.*` developer diagnostics API.
+/// Registers the `lurek.devtools.*` developer diagnostics API.
 pub mod devtools_api;
 
-/// Registers the `luna.debugbridge.*` TCP debug server API.
+/// Registers the `lurek.debugbridge.*` TCP debug server API.
 pub mod debugbridge_api;
 
-/// Registers the `luna.localization.*` multi-locale string catalog API.
+/// Registers the `lurek.localization.*` multi-locale string catalog API.
 pub mod localization_api;
 
-/// Registers the `luna.log.*` structured log level API.
+/// Registers the `lurek.log.*` structured log level API.
 pub mod log_api;
 
-/// Registers the `luna.docs.*` documentation management API.
+/// Registers the `lurek.docs.*` documentation management API.
 pub mod docs_api;
 
-/// Registers the `luna.patterns.*` game programming patterns API.
+/// Registers the `lurek.patterns.*` game programming patterns API.
 pub mod patterns_api;
 
 /// Shared `LunaType` trait and `add_type_methods` helper for typed UserData objects.
 pub mod lua_types;
 
-/// Creates and configures the Lua VM, registers `luna.*` sub-APIs according to the
+/// Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the
 /// provided module flags, and returns the ready `Lua` instance.
 ///
 /// # Parameters
@@ -161,227 +161,227 @@ pub mod lua_types;
 ///   (`math`, `log`, `event`) are always registered regardless of flags.
 ///
 /// # Returns
-/// `LuaResult<Lua>` — A configured Lua VM with `luna.*` as a global, or a Lua error if
+/// `LuaResult<Lua>` — A configured Lua VM with `lurek.*` as a global, or a Lua error if
 /// any sub-API fails to register.
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
 
     // Create the luna namespace table and expose it as the `luna` global immediately.
     // This must happen before any register() call so that inline Lua snippets (e.g.
-    // scene_api.rs) can reference `luna.*` during module registration.
+    // scene_api.rs) can reference `lurek.*` during module registration.
     let luna = lua.create_table()?;
-    lua.globals().set("luna", luna.clone())?;
+    lua.globals().set("lurek", luna.clone())?;
 
-    // event: luna.signal (always registered — mandatory API)
+    // event: lurek.signal (always registered — mandatory API)
     event_api::register(&lua, &luna, state.clone())?;
 
-    // timer: luna.time
+    // timer: lurek.time
     if modules.timer {
         timer_api::register(&lua, &luna, state.clone())?;
     }
 
-    // image: luna.img
+    // image: lurek.img
     if modules.image {
         image_api::register(&lua, &luna, state.clone())?;
     }
 
-    // camera: luna.camera
+    // camera: lurek.camera
     if modules.camera {
         camera_api::register(&lua, &luna, state.clone())?;
     }
 
-    // animation: luna.animation
+    // animation: lurek.animation
     if modules.animation {
         animation_api::register(&lua, &luna, state.clone())?;
     }
 
-    // tween: luna.tween
+    // tween: lurek.tween
     if modules.tween {
         tween_api::register(&lua, &luna, state.clone())?;
     }
 
-    // thread: luna.thread
+    // thread: lurek.thread
     if modules.thread {
         thread_api::register(&lua, &luna, state.clone())?;
     }
 
-    // automation: luna.simulator
+    // automation: lurek.simulator
     if modules.debug {
         automation_api::register(&lua, &luna, state.clone())?;
     }
 
-    // devtools: luna.devtools
+    // devtools: lurek.devtools
     if modules.debug {
         devtools_api::register(&lua, &luna, state.clone())?;
     }
 
-    // debugbridge: luna.debugbridge
+    // debugbridge: lurek.debugbridge
     if modules.debug {
         debugbridge_api::register(&lua, &luna)?;
     }
 
-    // localization: luna.localization
+    // localization: lurek.localization
     if modules.localization {
         localization_api::register(&lua, &luna, state.clone())?;
     }
 
-    // input: luna.keyboard / luna.mouse / luna.gamepad / luna.touch
+    // input: lurek.keyboard / lurek.mouse / lurek.gamepad / lurek.touch
     if modules.input {
         input_api::register(&lua, &luna, state.clone())?;
     }
 
-    // savegame: luna.savegame (always registered — no config flag)
+    // savegame: lurek.savegame (always registered — no config flag)
     savegame_api::register(&lua, &luna, state.clone())?;
 
-    // docs: luna.docs (always registered — no config flag)
+    // docs: lurek.docs (always registered — no config flag)
     docs_api::register(&lua, &luna)?;
 
-    // log: luna.log (always registered — no config flag)
+    // log: lurek.log (always registered — no config flag)
     log_api::register(&lua, &luna)?;
 
-    // data: luna.data (always registered — no config flag)
+    // data: lurek.data (always registered — no config flag)
     data_api::register(&lua, &luna, state.clone())?;
 
-    // modding: luna.modding (always registered — no config flag)
+    // modding: lurek.modding (always registered — no config flag)
     modding_api::register(&lua, &luna, state.clone())?;
 
-    // serial: luna.codec (always registered — no config flag)
+    // serial: lurek.codec (always registered — no config flag)
     serial_api::register(&lua, &luna, state.clone())?;
 
-    // dataframe: luna.dataframe (always registered — no config flag)
+    // dataframe: lurek.dataframe (always registered — no config flag)
     dataframe_api::register(&lua, &luna, state.clone())?;
 
-    // light: luna.light (always registered — no config flag)
+    // light: lurek.light (always registered — no config flag)
     light_api::register(&lua, &luna, state.clone())?;
 
-    // filesystem: luna.fs
+    // filesystem: lurek.fs
     if modules.filesystem {
         filesystem_api::register(&lua, &luna, state.clone())?;
     }
 
-    // entity: luna.entity
+    // entity: lurek.entity
     if modules.entity {
         entity_api::register(&lua, &luna, state.clone())?;
     }
 
-    // window: luna.window
+    // window: lurek.window
     if modules.window {
         window_api::register(&lua, &luna, state.clone())?;
     }
 
-    // scene: luna.scene
+    // scene: lurek.scene
     if modules.scene {
         scene_api::register(&lua, &luna, state.clone())?;
     }
 
-    // compute: luna.gpu
+    // compute: lurek.gpu
     if modules.compute {
         compute_api::register(&lua, &luna, state.clone())?;
     }
 
-    // raycaster: luna.raycaster
+    // raycaster: lurek.raycaster
     if modules.raycaster {
         raycaster_api::register(&lua, &luna, state.clone())?;
     }
 
-    // spine: luna.spine
+    // spine: lurek.spine
     if modules.spine {
         spine_api::register(&lua, &luna, state.clone())?;
     }
 
-    // procgen: luna.procgen
+    // procgen: lurek.procgen
     if modules.procgen {
         procgen_api::register(&lua, &luna, state.clone())?;
     }
 
-    // network: luna.network
+    // network: lurek.network
     if modules.network {
         network_api::register(&lua, &luna, state.clone())?;
     }
 
-    // minimap: luna.minimap
+    // minimap: lurek.minimap
     if modules.minimap {
         minimap_api::register(&lua, &luna, state.clone())?;
     }
 
-    // pathfinding: luna.pathfinding
+    // pathfinding: lurek.pathfinding
     if modules.pathfinding {
         pathfinding_api::register(&lua, &luna, state.clone())?;
     }
 
-    // terminal: luna.terminal
+    // terminal: lurek.terminal
     if modules.terminal {
         terminal_api::register(&lua, &luna, state.clone())?;
     }
 
-    // pipeline: luna.pipeline
+    // pipeline: lurek.pipeline
     if modules.pipeline {
         pipeline_api::register(&lua, &luna, state.clone())?;
     }
 
-    // patterns: luna.patterns
+    // patterns: lurek.patterns
     if modules.pipeline {
         patterns_api::register(&lua, &luna, state.clone())?;
     }
 
-    // graph: luna.graph
+    // graph: lurek.graph
     if modules.graph {
         graph_api::register(&lua, &luna, state.clone())?;
     }
 
-    // ai: luna.ai
+    // ai: lurek.ai
     if modules.ai {
         ai_api::register(&lua, &luna, state.clone())?;
     }
 
-    // audio: luna.audio
+    // audio: lurek.audio
     if modules.audio {
         audio_api::register(&lua, &luna, state.clone())?;
     }
 
-    // fx: luna.postfx
+    // fx: lurek.postfx
     if modules.overlay {
         fx_api::register(&lua, &luna, state.clone())?;
     }
 
-    // particle: luna.particles
+    // particle: lurek.particles
     if modules.particle {
         particle_api::register(&lua, &luna, state.clone())?;
     }
 
-    // gui: luna.ui
+    // gui: lurek.ui
     if modules.gui {
         gui_api::register(&lua, &luna, state.clone())?;
     }
 
-    // tilemap: luna.tilemap
+    // tilemap: lurek.tilemap
     if modules.tilemap {
         tilemap_api::register(&lua, &luna, state.clone())?;
     }
 
-    // math: luna.math (always registered — mandatory)
+    // math: lurek.math (always registered — mandatory)
     math_api::register(&lua, &luna, state.clone())?;
 
-    // system: luna.platform (always registered — OS info, openURL, locales)
+    // system: lurek.platform (always registered — OS info, openURL, locales)
     system_api::register(&lua, &luna, state.clone())?;
 
-    // physics: luna.physics
+    // physics: lurek.physics
     if modules.physics {
         physics_api::register(&lua, &luna, state.clone())?;
     }
 
-    // graphics: luna.gfx
+    // graphics: lurek.gfx
     if modules.graphics {
         graphics_api::register(&lua, &luna, state.clone())?;
     }
 
-    // Register luna.conf as a no-op runtime callback.
+    // Register lurek.conf as a no-op runtime callback.
     // During engine boot the real conf.lua is executed in a temporary Lua VM
-    // before this VM is created. At runtime, luna.conf() is a safe no-op so
+    // before this VM is created. At runtime, lurek.conf() is a safe no-op so
     // that test scripts and any post-boot calls don't error.
     luna.set("conf", lua.create_function(|_, _: mlua::Value| Ok(()))?)?;
 
-    lua.globals().set("luna", luna)?;
+    lua.globals().set("lurek", luna)?;
 
     // Add `library/` to the Lua package path so games can use
     // `require("library.dialog")`, `require("library.item")`, etc.

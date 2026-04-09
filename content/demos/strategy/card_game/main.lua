@@ -1,7 +1,7 @@
 -- Card Game (CCG)
 -- Controls: Click card in hand to play it, Enter to end turn, Escape to quit
 -- Defeat the AI opponent by reducing their HP to 0!
--- Run with: cargo run -- demos/strategy/card_game
+-- Run with: cargo run -- content/demos/strategy/card_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -60,9 +60,9 @@ local function addLog(msg)
     if #log > 6 then table.remove(log) end
 end
 
-function luna.init()
-    luna.window.setTitle("Card Game")
-    luna.gfx.setBackgroundColor(0.1, 0.08, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Card Game")
+    lurek.gfx.setBackgroundColor(0.1, 0.08, 0.15)
     player = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     enemy  = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     turnNum = 0
@@ -128,7 +128,7 @@ local function aiPlay()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
     if phase == "wait" then
         waitTimer = waitTimer - dt
@@ -143,71 +143,71 @@ local function drawCard(c, x, y, hovered)
     local cr, cg, cb = c.color[1], c.color[2], c.color[3]
     -- Card bg
     if hovered then
-        luna.gfx.setColor(cr, cg, cb, 1)
+        lurek.gfx.setColor(cr, cg, cb, 1)
     else
-        luna.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+        lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
     end
-    luna.gfx.rectangle("fill", x, y, CARD_W, CARD_H)
-    luna.gfx.setColor(0.9, 0.9, 0.8, 1)
-    luna.gfx.rectangle("line", x, y, CARD_W, CARD_H)
+    lurek.gfx.rectangle("fill", x, y, CARD_W, CARD_H)
+    lurek.gfx.setColor(0.9, 0.9, 0.8, 1)
+    lurek.gfx.rectangle("line", x, y, CARD_W, CARD_H)
     -- Name
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print(c.name, x + 4, y + 6)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print(c.name, x + 4, y + 6)
     -- Cost
-    luna.gfx.setColor(0.3, 0.5, 1, 1)
-    luna.gfx.circle("fill", x + CARD_W - 14, y + 14, 12)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print(c.cost, x + CARD_W - 18, y + 7)
+    lurek.gfx.setColor(0.3, 0.5, 1, 1)
+    lurek.gfx.circle("fill", x + CARD_W - 14, y + 14, 12)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print(c.cost, x + CARD_W - 18, y + 7)
     -- Stats
-    luna.gfx.setColor(1, 0.9, 0.7, 1)
+    lurek.gfx.setColor(1, 0.9, 0.7, 1)
     if c.kind == "attack" or c.kind == "drain" then
-        luna.gfx.print("ATK:" .. c.atk, x + 6, y + 50)
+        lurek.gfx.print("ATK:" .. c.atk, x + 6, y + 50)
     end
-    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-    luna.gfx.print(c.kind, x + 6, y + 80)
+    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+    lurek.gfx.print(c.kind, x + 6, y + 80)
 end
 
-function luna.render()
-    local mx, my = luna.mouse.getPosition()
+function lurek.render()
+    local mx, my = lurek.mouse.getPosition()
 
     -- Enemy area
-    luna.gfx.setColor(0.15, 0.1, 0.1, 1)
-    luna.gfx.rectangle("fill", 50, 20, 700, 80)
-    luna.gfx.setColor(0.9, 0.3, 0.3, 1)
-    luna.gfx.print("ENEMY", 60, 26)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
-    luna.gfx.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
-    luna.gfx.print("Shield: " .. enemy.shield, 200, 46)
-    luna.gfx.print("Cards: " .. #enemy.hand, 200, 66)
+    lurek.gfx.setColor(0.15, 0.1, 0.1, 1)
+    lurek.gfx.rectangle("fill", 50, 20, 700, 80)
+    lurek.gfx.setColor(0.9, 0.3, 0.3, 1)
+    lurek.gfx.print("ENEMY", 60, 26)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
+    lurek.gfx.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
+    lurek.gfx.print("Shield: " .. enemy.shield, 200, 46)
+    lurek.gfx.print("Cards: " .. #enemy.hand, 200, 66)
     -- Enemy HP bar
-    luna.gfx.setColor(0.3, 0.1, 0.1, 1)
-    luna.gfx.rectangle("fill", 340, 40, 200, 16)
-    luna.gfx.setColor(0.9, 0.2, 0.2, 1)
-    luna.gfx.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
+    lurek.gfx.setColor(0.3, 0.1, 0.1, 1)
+    lurek.gfx.rectangle("fill", 340, 40, 200, 16)
+    lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
+    lurek.gfx.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
 
     -- Player area
-    luna.gfx.setColor(0.1, 0.1, 0.15, 1)
-    luna.gfx.rectangle("fill", 50, 110, 700, 80)
-    luna.gfx.setColor(0.3, 0.5, 1, 1)
-    luna.gfx.print("YOU", 60, 116)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
-    luna.gfx.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
-    luna.gfx.print("Shield: " .. player.shield, 200, 136)
-    luna.gfx.print("Deck: " .. #player.deck, 200, 156)
+    lurek.gfx.setColor(0.1, 0.1, 0.15, 1)
+    lurek.gfx.rectangle("fill", 50, 110, 700, 80)
+    lurek.gfx.setColor(0.3, 0.5, 1, 1)
+    lurek.gfx.print("YOU", 60, 116)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
+    lurek.gfx.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
+    lurek.gfx.print("Shield: " .. player.shield, 200, 136)
+    lurek.gfx.print("Deck: " .. #player.deck, 200, 156)
     -- Player HP bar
-    luna.gfx.setColor(0.1, 0.1, 0.3, 1)
-    luna.gfx.rectangle("fill", 340, 130, 200, 16)
-    luna.gfx.setColor(0.2, 0.5, 1, 1)
-    luna.gfx.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
+    lurek.gfx.setColor(0.1, 0.1, 0.3, 1)
+    lurek.gfx.rectangle("fill", 340, 130, 200, 16)
+    lurek.gfx.setColor(0.2, 0.5, 1, 1)
+    lurek.gfx.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
 
     -- Log
-    luna.gfx.setColor(0, 0, 0, 0.5)
-    luna.gfx.rectangle("fill", 50, 200, 300, 120)
+    lurek.gfx.setColor(0, 0, 0, 0.5)
+    lurek.gfx.rectangle("fill", 50, 200, 300, 120)
     for i, msg in ipairs(log) do
-        luna.gfx.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
-        luna.gfx.print(msg, 58, 200 + (i - 1) * 18)
+        lurek.gfx.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
+        lurek.gfx.print(msg, 58, 200 + (i - 1) * 18)
     end
 
     -- Player hand
@@ -220,7 +220,7 @@ function luna.render()
         if hovered then cy = cy - 12 end
         local canPlay = c.cost <= player.mana and phase == "play" and turn == "player"
         if not canPlay then
-            luna.gfx.setColor(0.4, 0.4, 0.4, 0.4)
+            lurek.gfx.setColor(0.4, 0.4, 0.4, 0.4)
             drawCard(c, cx, cy, false)
         else
             drawCard(c, cx, cy, hovered)
@@ -228,19 +228,19 @@ function luna.render()
     end
 
     -- Phase info
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
 
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 200, 250, 400, 80)
-        luna.gfx.setColor(1, 1, 0.3, 1)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 200, 250, 400, 80)
+        lurek.gfx.setColor(1, 1, 0.3, 1)
         local msg = enemy.hp <= 0 and "YOU WIN!" or "YOU LOSE!"
-        luna.gfx.print(msg, 330, 270, 2)
+        lurek.gfx.print(msg, 330, 270, 2)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if gameOver or turn ~= "player" or phase ~= "play" then return end
     local handY = 440
     local handStartX = W / 2 - (#player.hand * (CARD_W + 8)) / 2
@@ -261,8 +261,8 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "return" and turn == "player" and phase == "play" and not gameOver then
         phase = "wait"
         waitTimer = 0.6

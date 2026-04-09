@@ -22,7 +22,7 @@ fn parse_delimiter(delim: Option<String>) -> u8 {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.codec` API table with the Lua VM.
+/// Registers the `lurek.codec` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

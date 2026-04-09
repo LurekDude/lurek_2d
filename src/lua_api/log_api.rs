@@ -1,4 +1,4 @@
-//! Structured game-level logging API (`luna.log.*`).
+//! Structured game-level logging API (`lurek.log.*`).
 //!
 //! Exposes convenience logging functions so Lua scripts can emit messages at
 //! specific severity levels and query or change the active log level at
@@ -19,7 +19,7 @@ fn dispatch(sinks: &Rc<RefCell<SinkRegistry>>, level: SinkLevel, tag: &str, mess
     sinks.borrow().dispatch(level, tag, message);
 }
 
-/// Registers the `luna.log.*` namespace into the shared `luna` table.
+/// Registers the `lurek.log.*` namespace into the shared `luna` table.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

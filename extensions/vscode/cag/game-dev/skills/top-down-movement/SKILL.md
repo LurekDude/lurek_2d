@@ -22,12 +22,12 @@ local GRID_SPEED  = 80   -- pixels/sec for grid movement
 ```lua
 local player = { x = 100, y = 100, facing = "down" }
 
-function luna.process(dt)
+function lurek.process(dt)
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("left")  then dx = dx - 1 end
-    if luna.keyboard.isDown("right") then dx = dx + 1 end
-    if luna.keyboard.isDown("up")    then dy = dy - 1 end
-    if luna.keyboard.isDown("down")  then dy = dy + 1 end
+    if lurek.keyboard.isDown("left")  then dx = dx - 1 end
+    if lurek.keyboard.isDown("right") then dx = dx + 1 end
+    if lurek.keyboard.isDown("up")    then dy = dy - 1 end
+    if lurek.keyboard.isDown("down")  then dy = dy + 1 end
 
     -- Normalize diagonal
     local len = math.sqrt(dx * dx + dy * dy)
@@ -51,7 +51,7 @@ end
 ```lua
 local player = { gx = 3, gy = 3, tx = nil, ty = nil, progress = 0, facing = "down" }
 
-function luna.process(dt)
+function lurek.process(dt)
     if player.tx then
         -- Animate toward target tile
         player.progress = player.progress + GRID_SPEED * dt / TILE_SIZE
@@ -63,10 +63,10 @@ function luna.process(dt)
     else
         -- Accept new input
         local dx, dy = 0, 0
-        if     luna.keyboard.isDown("up")    then dy = -1; player.facing = "up"
-        elseif luna.keyboard.isDown("down")  then dy =  1; player.facing = "down"
-        elseif luna.keyboard.isDown("left")  then dx = -1; player.facing = "left"
-        elseif luna.keyboard.isDown("right") then dx =  1; player.facing = "right"
+        if     lurek.keyboard.isDown("up")    then dy = -1; player.facing = "up"
+        elseif lurek.keyboard.isDown("down")  then dy =  1; player.facing = "down"
+        elseif lurek.keyboard.isDown("left")  then dx = -1; player.facing = "left"
+        elseif lurek.keyboard.isDown("right") then dx =  1; player.facing = "right"
         end
         if dx ~= 0 or dy ~= 0 then
             local nx, ny = player.gx + dx, player.gy + dy
@@ -78,10 +78,10 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     local px = (player.gx + (player.tx and (player.tx - player.gx) * player.progress or 0)) * TILE_SIZE
     local py = (player.gy + (player.ty and (player.ty - player.gy) * player.progress or 0)) * TILE_SIZE
-    luna.gfx.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
+    lurek.gfx.rectangle("fill", px, py, TILE_SIZE, TILE_SIZE)
 end
 ```
 

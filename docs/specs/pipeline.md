@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.pipeline`                                      |
+| **Lua API**    | `lurek.pipeline`                                      |
 | **Source**      | `src/pipeline/`                                      |
 | **Rust Tests** | `tests/rust/unit/pipeline_tests.rs`                  |
 | **Lua Tests**  | `tests/lua/unit/test_pipeline.lua`                   |
@@ -34,7 +34,7 @@ steps whose delays have elapsed and whose dependencies are satisfied.
 tracking which steps completed, failed, were skipped, or were cancelled, plus wall-clock
 duration and per-step error messages.
 
-The Lua API (`luna.pipeline.*`) provides two execution modes: **synchronous** (`run()`)
+The Lua API (`lurek.pipeline.*`) provides two execution modes: **synchronous** (`run()`)
 which executes the full DAG in topological order within a single frame, and **asynchronous**
 (`runAsync()` + `update(dt)`) which runs one ready step per tick, suitable for spreading
 work across frames. Both modes support a shared context table whose `results` sub-table
@@ -52,7 +52,7 @@ module has no GPU, window, or audio device requirements and runs fully headless 
 ## Architecture
 
 ```
-luna.pipeline (Lua API)
+lurek.pipeline (Lua API)
   │
   │  newStep(name, fn?)        → LuaStep  (UserData wrapper)
   │  newPipeline(name?)        → LuaPipeline (UserData wrapper)
@@ -202,18 +202,18 @@ Overall pipeline state: `Pending`, `Running`, `Completed`, `Failed`, `Cancelled`
 
 ## Lua API
 
-Exposed under `luna.pipeline.*` by `src/lua_api/pipeline_api.rs`.
+Exposed under `lurek.pipeline.*` by `src/lua_api/pipeline_api.rs`.
 
 The API provides two UserData types — `PipelineStep` and `Pipeline` — plus three
-factory functions on the `luna.pipeline` table.
+factory functions on the `lurek.pipeline` table.
 
 ### Factory Functions
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.pipeline.newStep` | `(name: string, fn?: function) → PipelineStep` | Creates a new step; optional callback set immediately |
-| `luna.pipeline.newPipeline` | `(name?: string) → Pipeline` | Creates an empty pipeline (defaults to `"pipeline"`) |
-| `luna.pipeline.fromTable` | `(def: table) → Pipeline` | Deserialises a pipeline from a declarative definition table |
+| `lurek.pipeline.newStep` | `(name: string, fn?: function) → PipelineStep` | Creates a new step; optional callback set immediately |
+| `lurek.pipeline.newPipeline` | `(name?: string) → Pipeline` | Creates an empty pipeline (defaults to `"pipeline"`) |
+| `lurek.pipeline.fromTable` | `(def: table) → Pipeline` | Deserialises a pipeline from a declarative definition table |
 
 ### PipelineStep Methods
 
@@ -294,22 +294,22 @@ factory functions on the `luna.pipeline` table.
 
 ```lua
 -- Synchronous pipeline: multi-stage world generation
-function luna.init()
-    local terrain = luna.pipeline.newStep("terrain", function(ctx)
+function lurek.init()
+    local terrain = lurek.pipeline.newStep("terrain", function(ctx)
         return { heightmap = generate_heightmap(ctx.seed) }
     end)
 
-    local rivers = luna.pipeline.newStep("rivers", function(ctx)
+    local rivers = lurek.pipeline.newStep("rivers", function(ctx)
         return place_rivers(ctx.results.terrain.heightmap)
     end)
     rivers:dependsOn(terrain)
 
-    local cities = luna.pipeline.newStep("cities", function(ctx)
+    local cities = lurek.pipeline.newStep("cities", function(ctx)
         return place_cities(ctx.results.terrain.heightmap, ctx.results.rivers)
     end)
     cities:dependsOn(terrain):dependsOn(rivers)
 
-    local pipe = luna.pipeline.newPipeline("worldgen")
+    local pipe = lurek.pipeline.newPipeline("worldgen")
     pipe:addStep(terrain):addStep(rivers):addStep(cities)
 
     local result = pipe:run({ seed = 42 })
@@ -327,8 +327,8 @@ end
 -- Async pipeline: spread loading across frames
 local loader
 
-function luna.init()
-    loader = luna.pipeline.fromTable({
+function lurek.init()
+    loader = lurek.pipeline.fromTable({
         name = "asset_loader",
         steps = {
             { name = "textures",  fn = function(ctx) return load_textures()  end },
@@ -343,7 +343,7 @@ function luna.init()
     loader:runAsync()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if loader:isRunning() then
         loader:update(dt)
     end
@@ -352,17 +352,17 @@ end
 
 ```lua
 -- Declarative pipeline with error handling and retries
-local pipe = luna.pipeline.newPipeline("robust")
+local pipe = lurek.pipeline.newPipeline("robust")
 pipe:setErrorMode("continue")
 
-local fetch = luna.pipeline.newStep("fetch", function(ctx)
+local fetch = lurek.pipeline.newStep("fetch", function(ctx)
     return download_data(ctx.url)
 end)
 fetch:setRetryCount(3)
 fetch:setRetryDelay(1.0)
 fetch:setTimeout(10)
 
-local parse = luna.pipeline.newStep("parse", function(ctx)
+local parse = lurek.pipeline.newStep("parse", function(ctx)
     return parse_data(ctx.results.fetch)
 end)
 parse:dependsOn(fetch)
@@ -399,4 +399,4 @@ local r = pipe:run({ url = "https://example.com/data" })
 - **Retry semantics**: When a step has `retry_count > 0`, the callback is re-invoked up to `retry_count + 1` total times. The retry delay field exists on `PipelineStep` but is not currently enforced as a wall-clock wait in `execute_step_sync` — retries happen immediately in sequence.
 - **Condition gates**: A step with a condition function that returns `false` is set to `Skipped` status. If the step is marked `optional`, downstream dependencies proceed normally.
 - **Headless safe**: All pipeline types and the Lua API work without a window, GPU, or audio device. Tests run fully headless.
-- **Breaking change surface**: Renaming step method names on `LuaPipeline` or `LuaStep` will break any Lua script using `luna.pipeline.*`. The `fromTable()` schema (`name`, `deps`, `fn`, `delay`, `optional`, `retryCount`, `retryDelay`, `tag`, `errorMode`) is a serialisation contract.
+- **Breaking change surface**: Renaming step method names on `LuaPipeline` or `LuaStep` will break any Lua script using `lurek.pipeline.*`. The `fromTable()` schema (`name`, `deps`, `fn`, `delay`, `optional`, `retryCount`, `retryDelay`, `tag`, `errorMode`) is a serialisation contract.

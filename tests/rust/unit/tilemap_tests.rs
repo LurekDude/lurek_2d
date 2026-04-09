@@ -1,9 +1,9 @@
-//! Integration tests for `luna2d::tilemap` module.
+//! Integration tests for `lurek2d::tilemap` module.
 
 use std::f32::consts::PI;
 
-use luna2d::math::Rect;
-use luna2d::tilemap::*;
+use lurek2d::math::Rect;
+use lurek2d::tilemap::*;
 
 // ===================================================================
 // Helper factories

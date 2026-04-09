@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-quality_report.py — Luna2D master quality report.
+quality_report.py — Lurek2D master quality report.
 
 Aggregates documentation audit, test coverage, API validation, and module
 audit into a single quality dashboard. This is the one-stop script for
@@ -58,7 +58,7 @@ def generate_report(
 ) -> str:
     """Generate the master quality Markdown report."""
     lines = [
-        "# Luna2D Quality Report",
+        "# Lurek2D Quality Report",
         "",
         "## Dashboard",
         "",
@@ -94,7 +94,7 @@ def generate_report(
 
     # Module count
     luna_count = len(module_data.get("luna_modules", {}))
-    lines.append(f"| Luna2D modules | {luna_count} | — |")
+    lines.append(f"| Lurek2D modules | {luna_count} | — |")
 
     # Total items
     rust_items = rust_doc.get("total_items", 0)
@@ -161,7 +161,7 @@ def generate_report(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D master quality report",
+        description="Lurek2D master quality report",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

@@ -1,7 +1,7 @@
-//! Integration tests for luna2d::light.
+//! Integration tests for lurek2d::light.
 
-use luna2d::light::*;
-use luna2d::math::{Color, Vec2};
+use lurek2d::light::*;
+use lurek2d::math::{Color, Vec2};
 
 // ── Enum Defaults ─────────────────────────────────────────────────────────────
 

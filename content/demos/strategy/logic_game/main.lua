@@ -1,5 +1,5 @@
 -- Logic / Programming Puzzle — Program a robot to reach the flag
--- Run with: cargo run -- demos/strategy/logic_game
+-- Run with: cargo run -- content/demos/strategy/logic_game
 
 local function lerp(a, b, t) return a + (b - a) * t end
 
@@ -99,9 +99,9 @@ local function load_level(n)
     loop_count = 0
 end
 
-function luna.init()
-    luna.window.setTitle("Logic Puzzle")
-    luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Logic Puzzle")
+    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.15)
     build_levels()
     load_level(1)
 end
@@ -157,7 +157,7 @@ local function execute_step()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if not executing then return end
     exec_timer = exec_timer + dt
     if exec_timer >= EXEC_SPEED then
@@ -178,24 +178,24 @@ local function draw_grid()
             local x = GRID_X + (c - 1) * TILE
             local y = GRID_Y + (r - 1) * TILE
             if grid[r][c] == 1 then
-                luna.gfx.setColor(0.3, 0.3, 0.35, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(0.3, 0.3, 0.35, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             else
-                luna.gfx.setColor(0.18, 0.18, 0.22, 1)
-                luna.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.gfx.setColor(0.18, 0.18, 0.22, 1)
+                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
             end
-            luna.gfx.setColor(0.25, 0.25, 0.3, 1)
-            luna.gfx.rectangle("line", x, y, TILE, TILE)
+            lurek.gfx.setColor(0.25, 0.25, 0.3, 1)
+            lurek.gfx.rectangle("line", x, y, TILE, TILE)
         end
     end
 
     -- flag
     local fx = GRID_X + (goal.col - 1) * TILE + TILE / 2
     local fy = GRID_Y + (goal.row - 1) * TILE + TILE / 2
-    luna.gfx.setColor(1, 0.85, 0.1, 1)
-    luna.gfx.circle("fill", fx, fy, 10)
-    luna.gfx.setColor(0, 0, 0, 1)
-    luna.gfx.print("F", fx - 4, fy - 7, 0.9)
+    lurek.gfx.setColor(1, 0.85, 0.1, 1)
+    lurek.gfx.circle("fill", fx, fy, 10)
+    lurek.gfx.setColor(0, 0, 0, 1)
+    lurek.gfx.print("F", fx - 4, fy - 7, 0.9)
 end
 
 local function draw_robot()
@@ -211,92 +211,92 @@ local function draw_robot()
     end
 
     -- body
-    luna.gfx.setColor(0.2, 0.8, 0.9, 1)
-    luna.gfx.circle("fill", rx, ry, 14)
+    lurek.gfx.setColor(0.2, 0.8, 0.9, 1)
+    lurek.gfx.circle("fill", rx, ry, 14)
 
     -- direction indicator
     local d = DIR[robot.dir]
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.circle("fill", rx + d[1] * 10, ry + d[2] * 10, 4)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.circle("fill", rx + d[1] * 10, ry + d[2] * 10, 4)
 end
 
 local PANEL_X = 480
 local PANEL_W = 300
 
 local function draw_command_panel()
-    luna.gfx.setColor(0.12, 0.12, 0.18, 1)
-    luna.gfx.rectangle("fill", PANEL_X, 50, PANEL_W, H - 100)
-    luna.gfx.setColor(0.3, 0.3, 0.4, 1)
-    luna.gfx.rectangle("line", PANEL_X, 50, PANEL_W, H - 100)
+    lurek.gfx.setColor(0.12, 0.12, 0.18, 1)
+    lurek.gfx.rectangle("fill", PANEL_X, 50, PANEL_W, H - 100)
+    lurek.gfx.setColor(0.3, 0.3, 0.4, 1)
+    lurek.gfx.rectangle("line", PANEL_X, 50, PANEL_W, H - 100)
 
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("COMMANDS", PANEL_X + 10, 58, 1.1)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("COMMANDS", PANEL_X + 10, 58, 1.1)
 
     -- command buttons
     for i, cmd in ipairs(CMD_LIST) do
         local bx = PANEL_X + 10 + (i - 1) * 70
         local by = 90
         local c = CMD_COLORS[cmd]
-        luna.gfx.setColor(c[1], c[2], c[3], 0.8)
-        luna.gfx.rectangle("fill", bx, by, 62, 28)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(cmd, bx + 5, by + 5, 0.85)
+        lurek.gfx.setColor(c[1], c[2], c[3], 0.8)
+        lurek.gfx.rectangle("fill", bx, by, 62, 28)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(cmd, bx + 5, by + 5, 0.85)
     end
 
     -- program list
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("PROGRAM (" .. #program .. "/" .. MAX_PROGRAM .. ")", PANEL_X + 10, 135, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("PROGRAM (" .. #program .. "/" .. MAX_PROGRAM .. ")", PANEL_X + 10, 135, 1)
 
     for i, cmd in ipairs(program) do
         local py = 160 + (i - 1) * 28
         local c = CMD_COLORS[cmd]
         -- highlight current execution
         if executing and i == exec_index then
-            luna.gfx.setColor(1, 1, 0, 0.3)
-            luna.gfx.rectangle("fill", PANEL_X + 8, py - 2, PANEL_W - 16, 26)
+            lurek.gfx.setColor(1, 1, 0, 0.3)
+            lurek.gfx.rectangle("fill", PANEL_X + 8, py - 2, PANEL_W - 16, 26)
         end
-        luna.gfx.setColor(c[1], c[2], c[3], 1)
-        luna.gfx.rectangle("fill", PANEL_X + 12, py, 18, 18)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(c[1], c[2], c[3], 1)
+        lurek.gfx.rectangle("fill", PANEL_X + 12, py, 18, 18)
+        lurek.gfx.setColor(1, 1, 1, 1)
         local pointer = (executing and i == exec_index) and " >> " or ("  " .. i .. ". ")
-        luna.gfx.print(pointer .. cmd, PANEL_X + 35, py, 0.9)
+        lurek.gfx.print(pointer .. cmd, PANEL_X + 35, py, 0.9)
     end
 
     -- controls
-    luna.gfx.setColor(0.6, 0.6, 0.6, 0.8)
-    luna.gfx.print("ENTER = Run", PANEL_X + 10, H - 90, 0.85)
-    luna.gfx.print("C = Clear   R = Reset", PANEL_X + 10, H - 70, 0.85)
+    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.8)
+    lurek.gfx.print("ENTER = Run", PANEL_X + 10, H - 90, 0.85)
+    lurek.gfx.print("C = Clear   R = Reset", PANEL_X + 10, H - 70, 0.85)
 end
 
-function luna.render()
+function lurek.render()
     if all_done then
-        luna.gfx.setColor(1, 1, 0.5, 1)
-        luna.gfx.print("ALL LEVELS COMPLETE!", W / 2 - 100, H / 2 - 20, 1.5)
-        luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-        luna.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
+        lurek.gfx.setColor(1, 1, 0.5, 1)
+        lurek.gfx.print("ALL LEVELS COMPLETE!", W / 2 - 100, H / 2 - 20, 1.5)
+        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
         return
     end
 
     -- level name
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print(levels[current_level].name, 10, 10, 1.2)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print(levels[current_level].name, 10, 10, 1.2)
 
     draw_grid()
     draw_robot()
     draw_command_panel()
 
     if level_complete then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", W / 2 - 150, H / 2 - 30, 300, 60)
-        luna.gfx.setColor(0.2, 1, 0.3, 1)
-        luna.gfx.print("LEVEL COMPLETE!", W / 2 - 70, H / 2 - 20, 1.4)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Press N for next level", W / 2 - 65, H / 2 + 10, 0.9)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", W / 2 - 150, H / 2 - 30, 300, 60)
+        lurek.gfx.setColor(0.2, 1, 0.3, 1)
+        lurek.gfx.print("LEVEL COMPLETE!", W / 2 - 70, H / 2 - 20, 1.4)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Press N for next level", W / 2 - 65, H / 2 + 10, 0.9)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then
         if all_done then load_level(1) else load_level(current_level) end
         return
@@ -335,7 +335,7 @@ function luna.keypressed(key)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if all_done or executing or level_complete then return end
 
     -- check command buttons

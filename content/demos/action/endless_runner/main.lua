@@ -1,6 +1,6 @@
--- Endless Runner — Luna2D Demo
+-- Endless Runner — Lurek2D Demo
 -- Space to jump, Down to slide, dodge obstacles, collect coins
--- Run with: cargo run -- demos/action/endless_runner
+-- Run with: cargo run -- content/demos/action/endless_runner
 
 local player, obstacles, coins, particles
 local speed, score, highScore, distance
@@ -54,14 +54,14 @@ end
 local spawnTimer = 0
 local coinTimer = 0
 
-function luna.init()
-    luna.window.setTitle("Endless Runner")
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Endless Runner")
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.12)
     highScore = 0
     resetGame()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameState == "dead" then return end
 
     -- speed ramp: world accelerates continuously — eventual death is by design
@@ -70,11 +70,11 @@ function luna.process(dt)
     score = math.floor(distance / 10)
 
     -- player input
-    if luna.keyboard.isDown("space") and player.grounded then
+    if lurek.keyboard.isDown("space") and player.grounded then
         player.vy = -620
         player.grounded = false
     end
-    player.sliding = luna.keyboard.isDown("down") and player.grounded
+    player.sliding = lurek.keyboard.isDown("down") and player.grounded
 
     -- player physics
     player.vy = player.vy + gravity * dt
@@ -150,68 +150,68 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- parallax bg
     for _, l in ipairs(bgLayers) do
-        luna.gfx.setColor(l.color[1], l.color[2], l.color[3], 1)
+        lurek.gfx.setColor(l.color[1], l.color[2], l.color[3], 1)
         for ox = 0, 1 do
-            luna.gfx.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
+            lurek.gfx.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
         end
     end
 
     -- ground
-    luna.gfx.setColor(0.25, 0.55, 0.2, 1)
-    luna.gfx.rectangle("fill", 0, groundY, 800, 100)
+    lurek.gfx.setColor(0.25, 0.55, 0.2, 1)
+    lurek.gfx.rectangle("fill", 0, groundY, 800, 100)
 
     -- obstacles
     for _, o in ipairs(obstacles) do
         if o.kind == "tall" then
-            luna.gfx.setColor(0.7, 0.2, 0.2, 1)
+            lurek.gfx.setColor(0.7, 0.2, 0.2, 1)
         else
-            luna.gfx.setColor(0.6, 0.4, 0.1, 1)
+            lurek.gfx.setColor(0.6, 0.4, 0.1, 1)
         end
-        luna.gfx.rectangle("fill", o.x, o.y, o.w, o.h)
+        lurek.gfx.rectangle("fill", o.x, o.y, o.w, o.h)
     end
 
     -- coins
-    luna.gfx.setColor(1, 0.85, 0.1, 1)
+    lurek.gfx.setColor(1, 0.85, 0.1, 1)
     for _, c in ipairs(coins) do
-        luna.gfx.circle("fill", c.x, c.y, c.r)
+        lurek.gfx.circle("fill", c.x, c.y, c.r)
     end
 
     -- player
     local ph = player.sliding and 25 or 50
     local py = player.sliding and (groundY - 25) or (groundY - 50)
-    luna.gfx.setColor(0.2, 0.6, 1, 1)
-    luna.gfx.rectangle("fill", player.x, py, player.w, ph)
+    lurek.gfx.setColor(0.2, 0.6, 1, 1)
+    lurek.gfx.rectangle("fill", player.x, py, player.w, ph)
     -- eye
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.circle("fill", player.x + 22, py + 10, 4)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.circle("fill", player.x + 22, py + 10, 4)
 
     -- particles
     for _, p in ipairs(particles) do
-        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2)
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Score: " .. score, 10, 10)
-    luna.gfx.print("High: " .. highScore, 10, 30)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Score: " .. score, 10, 10)
+    lurek.gfx.print("High: " .. highScore, 10, 30)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 10)
 
     if gameState == "dead" then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 200, 220, 400, 120)
-        luna.gfx.setColor(1, 0.3, 0.3, 1)
-        luna.gfx.print("GAME OVER", 310, 240, 1.5)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Score: " .. score, 340, 280)
-        luna.gfx.print("Press SPACE to restart", 290, 310)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 200, 220, 400, 120)
+        lurek.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.gfx.print("GAME OVER", 310, 240, 1.5)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Score: " .. score, 340, 280)
+        lurek.gfx.print("Press SPACE to restart", 290, 310)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "space" and gameState == "dead" then resetGame() end
 end

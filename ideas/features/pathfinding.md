@@ -37,7 +37,7 @@ Grid-based pathfinding: A* search, hierarchical A* (HPA*), flow field computatio
 
 ## Suggestions
 
-1. **Add tilemap → NavGrid bridge**: `luna.pathfinding.fromTilemap(tilemap, walkableCallback)` — auto-generate NavGrid from tilemap.
+1. **Add tilemap → NavGrid bridge**: `lurek.pathfinding.fromTilemap(tilemap, walkableCallback)` — auto-generate NavGrid from tilemap.
 2. **Add JPS**: Jump Point Search for uniform grids — much faster than A* with no quality loss.
 3. **Add reachability query**: `navGrid:isReachable(x1, y1, x2, y2)` — boolean check without full path.
 4. **Add Theta* or any-angle**: `navGrid:findPathSmooth(x1, y1, x2, y2)` — produce any-angle paths.
@@ -46,7 +46,7 @@ Grid-based pathfinding: A* search, hierarchical A* (HPA*), flow field computatio
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Grid pathfinding | ✅ | ❌ (libs) | ❌ | ❌ |
 | A* | ✅ | ❌ | ❌ | ❌ |
@@ -56,7 +56,7 @@ Grid-based pathfinding: A* search, hierarchical A* (HPA*), flow field computatio
 | JPS | ❌ | ❌ | ❌ | ❌ |
 | Dynamic costs | ✅ | N/A | N/A | N/A |
 
-Luna2D has the strongest built-in pathfinding of any 2D Lua engine. HPA* and flow fields are rare features.
+Lurek2D has the strongest built-in pathfinding of any 2D Lua engine. HPA* and flow fields are rare features.
 
 ## Priority
 

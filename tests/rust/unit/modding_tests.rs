@@ -1,6 +1,6 @@
 //! Integration tests for the modding module.
 
-use luna2d::modding::{ModInfo, ModManager};
+use lurek2d::modding::{ModInfo, ModManager};
 
 // ─── Rust unit-level integration tests ───
 
@@ -74,8 +74,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -315,7 +315,7 @@ fn test_lua_mod_manager_get_all_mods() {
 fn test_lua_new_mod_requires_id() {
     let (_state, lua) = make_vm();
     let result = lua
-        .load(r#"luna.modding.newMod({ name = "no-id" })"#)
+        .load(r#"lurek.modding.newMod({ name = "no-id" })"#)
         .exec();
     assert!(result.is_err());
 }

@@ -1,11 +1,11 @@
 ---
-description: "End-to-end quality audit of one or more Luna2D src/ modules. Validates spec, AGENT.md, Lua bridge separation, docstrings, example completeness, lib.rs/build.rs registration, tests, wiki, architecture, performance, and more. Each check produces PASS/WARNING/ERROR. After the audit report is complete, ALL findings are fixed automatically without requiring a separate request."
+description: "End-to-end quality audit of one or more Lurek2D src/ modules. Validates spec, AGENT.md, Lua bridge separation, docstrings, example completeness, lib.rs/build.rs registration, tests, wiki, architecture, performance, and more. Each check produces PASS/WARNING/ERROR. After the audit report is complete, ALL findings are fixed automatically without requiring a separate request."
 argument-hint: "Module name(s): physics, audio, all, tier1, ..."
 ---
 
-# Luna2D Module Audit
+# Lurek2D Module Audit
 
-Perform a comprehensive end-to-end quality audit on Luna2D engine module(s).
+Perform a comprehensive end-to-end quality audit on Lurek2D engine module(s).
 
 ## Skills
 
@@ -23,7 +23,7 @@ Load before checking any module:
 2. `docs/architecture/philosophy.md` — binding constraints (A-01 … B-05)
 3. `src/lib.rs` — module registrations
 4. `src/lua_api/mod.rs` — Lua API registrations and `create_lua_vm()`
-5. `specs/README.md` — spec sync contract
+5. `docs/specs/README.md` — spec sync contract
 
 ## Target Modules
 
@@ -62,12 +62,12 @@ A module **FAILS** the audit if it has:
 | S-03 | **mod.rs simplicity** | `src/<module>/mod.rs` is a thin barrel file: re-exports (`pub mod`, `pub use`) and module-level `//!` doc comment only. No business logic (>30 lines of non-doc, non-reexport code = WARNING; >100 = ERROR). |
 | S-04 | **File size limits** | No `.rs` file exceeds 2000 LOC unless there is a documented justification in AGENT.md. Files >1500 LOC = WARNING. Files >2000 LOC without justification = ERROR. |
 | S-05 | **File naming** | File names use standard game-engine terminology (e.g., `body.rs`, `world.rs`, `mixer.rs`) not obscure or misleading names. Names should be recognisable to developers from other engines. |
-| S-06 | **Module necessity** | Confirm the module genuinely needs Rust. If the entire module (or a significant part) could be implemented as a pure-Lua library in `library/`, flag WARNING with a recommendation. |
+| S-06 | **Module necessity** | Confirm the module genuinely needs Rust. If the entire module (or a significant part) could be implemented as a pure-Lua library in `content/library/`, flag WARNING with a recommendation. |
 | S-07 | **Large crate dependencies** | Check if the module pulls in heavy external crates. If a lighter alternative exists or the dependency could be feature-gated, flag WARNING. |
 
 ### Phase 2 — AGENT.md Quality
 
-**AGENT.md is a SHORT file** — its only job is to orient an AI agent entering the module. It contains a metadata table, a one-paragraph Purpose, a Source Files table, and a pointer to `specs/<module>.md`. Do NOT check AGENT.md for Architecture diagrams, Key Types, Lua API tables, or Lua Examples — those belong in `specs/<module>.md` (Phase 3).
+**AGENT.md is a SHORT file** — its only job is to orient an AI agent entering the module. It contains a metadata table, a one-paragraph Purpose, a Source Files table, and a pointer to `docs/specs/<module>.md`. Do NOT check AGENT.md for Architecture diagrams, Key Types, Lua API tables, or Lua Examples — those belong in `docs/specs/<module>.md` (Phase 3).
 
 Canonical short format (from `.github/skills/agent-md/SKILL.md`):
 `# \`<module>\` — Agent Reference` → metadata table → `## Purpose` → `## Source Files` → `## Full Specification`
@@ -78,19 +78,19 @@ Canonical short format (from `.github/skills/agent-md/SKILL.md`):
 | A-02 | **Template structure** | AGENT.md follows the short format: H1 heading → metadata table → `## Purpose` → `## Source Files` → `## Full Specification`. Missing any of these five elements = ERROR. |
 | A-03 | **Purpose quality** | `## Purpose` is 2–5 sentences that let an agent decide in seconds whether to open this module or a different one. Missing or single-word stub = ERROR. Overly vague = WARNING. |
 | A-04 | **Source Files sync** | Every `.rs` file in `src/<module>/` is listed in the `## Source Files` table with a one-line description. Missing or stale file entries = ERROR. |
-| A-05 | **Spec pointer** | `## Full Specification` section exists and contains a link to `specs/<module>.md`. Missing or broken pointer = ERROR. |
-| A-06 | **No over-stuffing** | AGENT.md does NOT contain full Architecture diagrams, Key Types tables, full Lua API tables, or Lua Examples sections — those belong in `specs/<module>.md`. If present in AGENT.md = WARNING (content is in the wrong file). |
+| A-05 | **Spec pointer** | `## Full Specification` section exists and contains a link to `docs/specs/<module>.md`. Missing or broken pointer = ERROR. |
+| A-06 | **No over-stuffing** | AGENT.md does NOT contain full Architecture diagrams, Key Types tables, full Lua API tables, or Lua Examples sections — those belong in `docs/specs/<module>.md`. If present in AGENT.md = WARNING (content is in the wrong file). |
 | A-07 | **Tier label** | The metadata table includes a `**Tier**` row with the correct tier assignment matching `docs/architecture/engine-architecture.md`. Wrong or missing = ERROR. |
 
-### Phase 3 — Technical Specification (`specs/<module>.md`)
+### Phase 3 — Technical Specification (`docs/specs/<module>.md`)
 
-`specs/<module>.md` is the **canonical full technical reference**. AGENT.md is intentionally a short overview — all architecture detail, type documentation, Lua API tables, examples, and cross-module references live here.
+`docs/specs/<module>.md` is the **canonical full technical reference**. AGENT.md is intentionally a short overview — all architecture detail, type documentation, Lua API tables, examples, and cross-module references live here.
 
 Required spec sections (from `.github/skills/agent-md/SKILL.md`): `## Summary` · `## Architecture` · `## Source Files` · `## Submodules` · `## Key Types` (Structs + Enums) · `## Lua API` · `## Lua Examples`.
 
 | # | Check | What to verify |
 |---|-------|----------------|
-| SP-01 | **Spec file exists** | `specs/<module>.md` is present. Missing = ERROR. |
+| SP-01 | **Spec file exists** | `docs/specs/<module>.md` is present. Missing = ERROR. |
 | SP-02 | **Required sections** | Spec contains: `## Summary`, `## Architecture` (ASCII diagram or equivalent), `## Source Files`, `## Submodules`, `## Key Types`, `## Lua API` (if module has Lua API), `## Lua Examples`. Any required section absent = ERROR. |
 | SP-03 | **Summary quality** | `## Summary` is 500–1000 characters covering: what the module does, how it works, key design decisions, and scope boundaries. Too short (<300 chars) = ERROR. |
 | SP-04 | **Lua API completeness** | Every `tbl.set("funcName", ...)` entry in `src/lua_api/<module>_api.rs` appears in the spec's `## Lua API` section with correct parameter signature and return type. Grep `tbl.set(` to enumerate live bindings, then diff against spec. Missing entries = ERROR. Stale entries (in spec but not in code) = ERROR. |
@@ -161,16 +161,16 @@ The Lua API file (`src/lua_api/<module>_api.rs`) is a **registration-only wrappe
 
 | # | Check | What to verify |
 |---|-------|----------------|
-| W-01 | **Example file exists** | `examples/<module>.lua` is present. Missing = ERROR. |
-| W-02 | **API surface coverage** | Every function exposed via `tbl.set("funcName", ...)` in `src/lua_api/<module>_api.rs` appears in `examples/<module>.lua`. **Tool steps**: (1) `grep -n 'tbl\.set(' src/lua_api/<module>_api.rs` to enumerate all bound names; (2) for each name, `grep -c '"funcName"' examples/<module>.lua`; (3) flag any function with zero hits as missing. Missing functions = ERROR. |
-| W-03 | **Use-case comments** | Each function call in `examples/<module>.lua` has a one-line comment explaining the real use case, not just a parameter recap. Comments like `-- call foo` or `-- example` = WARNING. Each call should read like documentation (`-- start a slow-motion timer that fires after 3 in-game seconds`). Missing or trivial comments = WARNING. |
-| W-04 | **Example–spec sync** | The function list in `examples/<module>.lua` and in `specs/<module>.md`'s Lua API table refer to the same set of public functions. Any function present in one but absent from the other = WARNING. |
+| W-01 | **Example file exists** | `content/content/examples/<module>.lua` is present. Missing = ERROR. |
+| W-02 | **API surface coverage** | Every function exposed via `tbl.set("funcName", ...)` in `src/lua_api/<module>_api.rs` appears in `content/content/examples/<module>.lua`. **Tool steps**: (1) `grep -n 'tbl\.set(' src/lua_api/<module>_api.rs` to enumerate all bound names; (2) for each name, `grep -c '"funcName"' content/content/examples/<module>.lua`; (3) flag any function with zero hits as missing. Missing functions = ERROR. |
+| W-03 | **Use-case comments** | Each function call in `content/content/examples/<module>.lua` has a one-line comment explaining the real use case, not just a parameter recap. Comments like `-- call foo` or `-- example` = WARNING. Each call should read like documentation (`-- start a slow-motion timer that fires after 3 in-game seconds`). Missing or trivial comments = WARNING. |
+| W-04 | **Example–spec sync** | The function list in `content/content/examples/<module>.lua` and in `docs/specs/<module>.md`'s Lua API table refer to the same set of public functions. Any function present in one but absent from the other = WARNING. |
 
 #### Wiki & supplementary docs
 
 | # | Check | What to verify |
 |---|-------|----------------|
-| W-05 | **Wiki page** | `wiki/<Module>-API.md` exists with examples, function reference, and getting-started guidance. Quality should match love2D wiki standard: clear examples, parameter tables, return values. Missing = WARNING; exists but low quality = WARNING. |
+| W-05 | **Wiki page** | `docs/wiki/<Module>-API.md` exists with examples, function reference, and getting-started guidance. Quality should match Engine A wiki standard: clear examples, parameter tables, return values. Missing = WARNING; exists but low quality = WARNING. |
 | W-06 | **Changelog entry** | Any recent change to this module's public API or behaviour has a corresponding entry in `docs/CHANGELOG.md`. Missing = WARNING. |
 
 ### Phase 9 — Code Quality
@@ -196,7 +196,7 @@ The Lua API file (`src/lua_api/<module>_api.rs`) is a **registration-only wrappe
 
 | # | Check | What to verify |
 |---|-------|----------------|
-| I-01 | **Lua API usability** | Module's Lua API follows `luna.*` conventions: sensible defaults, optional parameters, lowercase key names. Violations = WARNING. |
+| I-01 | **Lua API usability** | Module's Lua API follows `lurek.*` conventions: sensible defaults, optional parameters, lowercase key names. Violations = WARNING. |
 | I-02 | **Extension panel** | If module has or could have a VS Code extension panel (world editor, particle editor, etc.), verify it exposes structured data (TOML/JSON) for tool integration. No structured I/O where expected = WARNING. |
 | I-03 | **Config integration** | If module has configurable settings, they are exposed via `conf.lua` / `ModulesConfig` and documented. Missing config integration = WARNING. |
 
@@ -226,7 +226,7 @@ python tools/audit/test_coverage.py
 # 4. Full module audit runner (PASS/WARN/ERROR per check)
 python tools/audit/audit_module.py <name>
 
-# 5. Lua API surface enumeration (compare against examples/<module>.lua)
+# 5. Lua API surface enumeration (compare against content/content/examples/<module>.lua)
 grep -n "tbl\.set(" src/lua_api/<module>_api.rs
 ```
 
@@ -245,17 +245,17 @@ For each module audited, produce a report in this exact format:
 |---|-------|---------|---------|
 | S-01 | lib.rs registration | PASS | Registered as `pub mod <name>`; api registered in create_lua_vm() |
 | S-02 | build.rs watch | PASS | No asset dependencies |
-| SP-01 | Spec file exists | ERROR | specs/<name>.md is missing — must create |
+| SP-01 | Spec file exists | ERROR | docs/specs/<name>.md is missing — must create |
 | B-02 | Registration-only | WARNING | lua_api file contains 35-line closure with embedded sort logic |
-| W-02 | API surface coverage | ERROR | luna.<name>.newFoo, luna.<name>.destroyFoo missing from examples/<name>.lua |
+| W-02 | API surface coverage | ERROR | lurek.<name>.newFoo, lurek.<name>.destroyFoo missing from content/content/examples/<name>.lua |
 | ... | ... | ... | ... |
 
 ### Score: X PASS / Y WARNING / Z ERROR → **PASS** or **FAIL**
 
 ### Required Actions (ERRORs)
-1. Create `specs/<name>.md` with all required sections (SP-01)
+1. Create `docs/specs/<name>.md` with all required sections (SP-01)
 2. Move sort logic from lua_api closure to `src/<name>/` domain method (B-02)
-3. Add luna.<name>.newFoo and luna.<name>.destroyFoo to examples/<name>.lua with use-case comments (W-02)
+3. Add lurek.<name>.newFoo and lurek.<name>.destroyFoo to content/content/examples/<name>.lua with use-case comments (W-02)
 
 ### Recommended Improvements (WARNINGs)
 1. ...
@@ -270,8 +270,8 @@ For each module audited, produce a report in this exact format:
 Fix order:
 
 1. **Fix all ERRORs first**, phase by phase (Phase 1 → Phase 12)
-2. For missing `specs/<module>.md`: create from the canonical template — do not copy AGENT.md verbatim; the spec must add full type tables, Lua API tables with signatures, and architecture detail not in AGENT.md
-3. For missing example coverage (W-02): grep `tbl.set(` to get the authoritative function list, then add each missing function to `examples/<module>.lua` with a realistic multi-line use-case comment written in the voice of a game developer
+2. For missing `docs/specs/<module>.md`: create from the canonical template — do not copy AGENT.md verbatim; the spec must add full type tables, Lua API tables with signatures, and architecture detail not in AGENT.md
+3. For missing example coverage (W-02): grep `tbl.set(` to get the authoritative function list, then add each missing function to `content/content/examples/<module>.lua` with a realistic multi-line use-case comment written in the voice of a game developer
 4. For bridge violations (B-02 … B-06): extract logic to domain module first, then thin the closure to a single delegation call
 5. For docstring gaps: run `python tools/docs/collect_docs.py --report-missing` after each fix to confirm zero findings before moving on
 6. **Address WARNINGs by priority** after all ERRORs are resolved

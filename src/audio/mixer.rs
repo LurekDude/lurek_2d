@@ -1,6 +1,6 @@
 //! Core audio mixer that owns every loaded sound and drives playback through rodio.
 //!
-//! [`Mixer`] is the single point of entry for all audio operations in Luna2D.  It opens the
+//! [`Mixer`] is the single point of entry for all audio operations in Lurek2D.  It opens the
 //! system's default output stream on construction (via rodio) and maintains a slot-map of
 //! [`AudioEntry`] records — one per loaded sound.  Each entry embeds a `rodio::Sink` for
 //! playback control and cached metadata (duration, fade parameters, loop flag, filters).
@@ -28,7 +28,7 @@
 //! # Time tracking
 //!
 //! Because rodio `Sink` does not expose a playback position, the mixer tracks play-start
-//! instants and accumulated pre-pause seconds manually so `luna.audio.getTime` can return
+//! instants and accumulated pre-pause seconds manually so `lurek.audio.getTime` can return
 //! the current position in the stream.
 
 use std::collections::VecDeque;
@@ -188,7 +188,7 @@ impl QueueableSource {
 
 ///
 /// The `Mixer` is the single point of entry for all audio operations in
-/// Luna2D. It owns a `SlotMap<SoundKey, AudioEntry>` for O(1) lookup and safe
+/// Lurek2D. It owns a `SlotMap<SoundKey, AudioEntry>` for O(1) lookup and safe
 /// handle invalidation, a `SlotMap<BusKey, Bus>` for named routing groups, and
 /// a master volume applied on top of all per-source and per-bus values. Uses
 /// `rodio::Sink` per source for independent playback control.

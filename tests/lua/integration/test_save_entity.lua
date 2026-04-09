@@ -1,9 +1,9 @@
--- Luna2D Integration Test: Save + Entity
+-- Lurek2D Integration Test: Save + Entity
 -- Tests saving and restoring entity state
 
 describe("integration: save entity world state", function()
     it("collects entity data for save", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         -- Create game entities
         local player = universe:spawn()
@@ -38,8 +38,8 @@ describe("integration: save entity world state", function()
     end)
 
     it("save manager tracks entity dirty state", function()
-        local mgr = luna.savegame.newSaveManager()
-        local universe = luna.entity.newUniverse()
+        local mgr = lurek.savegame.newSaveManager()
+        local universe = lurek.entity.newUniverse()
 
         mgr:register("entities", function() return {} end, function(_data) end)
         expect_false(mgr:isDirty(), "initially clean")
@@ -72,9 +72,9 @@ describe("integration: TOML config for entities", function()
             name = "Dragon"
         ]]
 
-        local config = luna.data.parseToml(toml_str)
+        local config = lurek.data.parseToml(toml_str)
 
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         -- Create entities from TOML config
         local entities = {}

@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.devtools`                                        |
+| **Lua API**      | `lurek.devtools`                                        |
 | **Source**       | `src/devtools/`                                        |
 | **Rust Tests**   | `tests/rust/unit/devtools_tests.rs`                    |
 | **Lua Tests**    | `tests/lua/unit/test_devtools.lua`                     |
@@ -18,7 +18,7 @@ This module is gated by `modules.debug = true` in `conf.lua` and is NOT availabl
 
 The module contains four orthogonal components:
 
-> **Ownership Rule — frame statistics**: Use `luna.time.getDelta()`, `luna.time.getFps()`, and `luna.time.getAverageDelta()` for basic per-frame timing (zero setup — `timer::Clock` is auto-ticked by the engine). Use `luna.devtools.frameStats:record(dt)` + `frameStats:snapshot()` only when p50/p95/p99 **percentile analysis** is needed.
+> **Ownership Rule — frame statistics**: Use `lurek.time.getDelta()`, `lurek.time.getFps()`, and `lurek.time.getAverageDelta()` for basic per-frame timing (zero setup — `timer::Clock` is auto-ticked by the engine). Use `lurek.devtools.frameStats:record(dt)` + `frameStats:snapshot()` only when p50/p95/p99 **percentile analysis** is needed.
 
 1. **Logger** — A ring-buffer log history with `LogLevel` (Trace/Debug/Info/Warn/Error/Fatal) filtering, optional per-entry category tags, and source file/line capture. Entries are stored in memory for in-game display panels and can be filtered or cleared at runtime. The logger does NOT write to files itself; it delegates physical output to the Rust `log` facade.
 
@@ -32,10 +32,10 @@ All four types are **pure Rust** with no mlua dependency. All Lua plumbing lives
 
 This module intentionally does **not** provide:
 - Physical file logging (use the `log` crate with `env_logger`)
-- Visual profiler rendering (render the data with `luna.gfx` in game code)
+- Visual profiler rendering (render the data with `lurek.gfx` in game code)
 - Filesystem events (OS-level inotify/FSEvents — polling only)
 - Network inspection or memory allocation tracking
-- Frame-timing basics — those come from `timer::Clock` via `luna.time` (auto-ticked, no setup)
+- Frame-timing basics — those come from `timer::Clock` via `lurek.time` (auto-ticked, no setup)
 
 ## Architecture
 
@@ -53,22 +53,22 @@ src/lua_api/
 
 Data flow:
 ```
-Lua: luna.devtools.logger:push(level, msg)
+Lua: lurek.devtools.logger:push(level, msg)
   → DevtoolsShared.logger.push()
   → Logger.history Vec<LogEntry>
 
-Lua: luna.devtools.profiler:push("zone_name")
+Lua: lurek.devtools.profiler:push("zone_name")
   → DevtoolsShared.profiler.push()
   → Profiler.current_stack Vec<ProfileZone>
 
-Lua: luna.devtools.profiler:endFrame()
+Lua: lurek.devtools.profiler:endFrame()
   → profiler.end_frame()
   → stores Vec<ProfileZone> in profiler.frames ring buffer
 
-Lua: luna.devtools.frameStats:record(dt)
+Lua: lurek.devtools.frameStats:record(dt)
   → FrameStats.samples VecDeque<f64>
 
-Lua: luna.devtools.watcher:poll()
+Lua: lurek.devtools.watcher:poll()
   → FileWatcher iterates HashMap<PathBuf, Option<SystemTime>>
   → returns changed paths as Lua array
 ```
@@ -143,31 +143,31 @@ Polling file-change detector. `watch(path)` adds a path. `unwatch(path)` removes
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/devtools_api.rs` under `luna.devtools.*`.
+The Lua API is registered in `src/lua_api/devtools_api.rs` under `lurek.devtools.*`.
 
 A `DevtoolsShared` bridge struct holds Arc-cloned domain types so all Lua closures share the same instances. A separate `zone_to_table` helper recursively converts `ProfileZone` trees to Lua tables.
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.devtools.logger` | UserData | Shared `Logger` instance |
+| `lurek.devtools.logger` | UserData | Shared `Logger` instance |
 | `logger:push(level, msg, src?, line?, cat?)` | — | Append a log entry |
 | `logger:tail(n)` | `→ table` | Last N entries as array of tables |
 | `logger:filterCategory(cat)` | `→ table` | Entries matching category |
 | `logger:clear()` | — | Empty the log history |
 | `logger:setMinLevel(level)` | — | Set minimum level string |
 | `logger:getMinLevel()` | `→ string` | Current minimum level |
-| `luna.devtools.profiler` | UserData | Shared `Profiler` instance |
+| `lurek.devtools.profiler` | UserData | Shared `Profiler` instance |
 | `profiler:push(name)` | — | Begin a named zone |
 | `profiler:pop()` | — | End the innermost zone |
 | `profiler:endFrame()` | — | Commit current frame |
 | `profiler:getFrame(idx)` | `→ table` | Frame zones as nested table |
 | `profiler:frameCount()` | `→ int` | Number of retained frames |
 | `profiler:reset()` | — | Clear all retained frames |
-| `luna.devtools.frameStats` | UserData | Shared `FrameStats` instance |
+| `lurek.devtools.frameStats` | UserData | Shared `FrameStats` instance |
 | `frameStats:record(dt)` | — | Append a frame delta time |
 | `frameStats:snapshot()` | `→ table` | Compute stats snapshot |
 | `frameStats:setCapacity(n)` | — | Resize sample window |
-| `luna.devtools.watcher` | UserData | Shared `FileWatcher` instance |
+| `lurek.devtools.watcher` | UserData | Shared `FileWatcher` instance |
 | `watcher:watch(path)` | — | Start watching a path |
 | `watcher:unwatch(path)` | — | Stop watching a path |
 | `watcher:poll()` | `→ table` | Array of changed paths |
@@ -178,7 +178,7 @@ A `DevtoolsShared` bridge struct holds Arc-cloned domain types so all Lua closur
 
 ```lua
 -- === Logger ===
-local log = luna.devtools.logger
+local log = lurek.devtools.logger
 log:setMinLevel("debug")
 log:push("info", "Game loaded", "main.lua", 1, "boot")
 log:push("warn", "Missing sprite atlas", "sprites.lua", 42)
@@ -189,9 +189,9 @@ for _, entry in ipairs(recent) do
 end
 
 -- === Profiler ===
-local prof = luna.devtools.profiler
+local prof = lurek.devtools.profiler
 
-luna.process = function(dt)
+lurek.process = function(dt)
     prof:push("update")
         prof:push("physics")
         prof:pop()
@@ -201,7 +201,7 @@ luna.process = function(dt)
     prof:endFrame()
 end
 
-luna.render = function()
+lurek.render = function()
     local frame = prof:getFrame(-1) -- last frame
     if frame then
         for _, zone in ipairs(frame) do
@@ -211,24 +211,24 @@ luna.render = function()
 end
 
 -- === FrameStats ===
-local stats = luna.devtools.frameStats
+local stats = lurek.devtools.frameStats
 stats:setCapacity(120)
 
-luna.process = function(dt)
+lurek.process = function(dt)
     stats:record(dt)
 end
 
-luna.render = function()
+lurek.render = function()
     local snap = stats:snapshot()
     print(string.format("FPS: %.1f  p95: %.2fms", snap.fps, snap.p95 * 1000))
 end
 
 -- === FileWatcher (hot-reload) ===
-local watcher = luna.devtools.watcher
+local watcher = lurek.devtools.watcher
 watcher:watch("scripts/game.lua")
 watcher:watch("data/weapons.json")
 
-luna.process = function(dt)
+lurek.process = function(dt)
     local changed = watcher:poll()
     for _, path in ipairs(changed) do
         print("Reloading:", path)
@@ -279,11 +279,11 @@ Stored as `Vec<WatchEntry>` in `DevtoolsShared`. The `next_watch_id: u64` field 
 | `log` | `{level, message, source}[]` | Last 10 devtools log entries |
 | `watchCount` | integer | Total registered watch count |
 
-The snapshot table is a plain Lua value — easily serialised with `luna.data.encode("json", snap)` for crash reports or external tools.
+The snapshot table is a plain Lua value — easily serialised with `lurek.data.encode("json", snap)` for crash reports or external tools.
 
 ```lua
-local snap = luna.devtools.snapshot()
-luna.log.info(string.format("snapshot: %d watches, fps=%.1f", snap.watchCount, snap.frameStats.fps))
+local snap = lurek.devtools.snapshot()
+lurek.log.info(string.format("snapshot: %d watches, fps=%.1f", snap.watchCount, snap.frameStats.fps))
 ```
 
 ## References

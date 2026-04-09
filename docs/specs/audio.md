@@ -4,7 +4,7 @@
 |----------------|--------------------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                                          |
 | **Status**     | Implemented — Full                                                       |
-| **Lua API**    | `luna.audio`                                                             |
+| **Lua API**    | `lurek.audio`                                                             |
 | **Source**     | `src/audio/`                                                             |
 | **Rust Tests** | `tests/rust/unit/audio_tests.rs`, `tests/rust/unit/audio_sound_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_audio.lua`, `tests/lua/unit/test_audio_dsp.lua`, `tests/lua/unit/test_audio_bus.lua` |
@@ -221,88 +221,88 @@ Playback state of an audio source. Variants: `Stopped` (not playing, at beginnin
 
 ## Lua API
 
-Exposed under `luna.audio.*` by `src/lua_api/audio_api.rs`. The API surface includes source lifecycle, playback control, bus management, spatial audio, DSP effects, MIDI synthesis, streaming decoders, queueable sources, and device enumeration.
+Exposed under `lurek.audio.*` by `src/lua_api/audio_api.rs`. The API surface includes source lifecycle, playback control, bus management, spatial audio, DSP effects, MIDI synthesis, streaming decoders, queueable sources, and device enumeration.
 
 ### Module Functions
 
 | Function | Description |
 |----------|-------------|
-| `luna.audio.newSource(path, type)` | Loads an audio file; type is `"static"` or `"stream"` (default) |
-| `luna.audio.play(source, options)` | Plays a source; optional `{bus="name"}` table for bus routing |
-| `luna.audio.stop(source)` | Stops playback and resets position |
-| `luna.audio.pause(source)` | Pauses playback at current position |
-| `luna.audio.resume(source)` | Resumes playback from pause |
-| `luna.audio.setVolume(source, vol)` | Sets per-source volume |
-| `luna.audio.getVolume(source)` | Returns per-source volume |
-| `luna.audio.setPitch(source, pitch)` | Sets pitch multiplier |
-| `luna.audio.getPitch(source)` | Returns pitch multiplier |
-| `luna.audio.isPlaying(source)` | Returns true if playing |
-| `luna.audio.isPaused(source)` | Returns true if paused |
-| `luna.audio.isStopped(source)` | Returns true if stopped |
-| `luna.audio.setLooping(source, bool)` | Enables/disables looping |
-| `luna.audio.isLooping(source)` | Returns looping state |
-| `luna.audio.playLooping(source)` | Plays in continuous loop |
-| `luna.audio.setPan(source, pan)` | Sets stereo panning (-1.0 to 1.0) |
-| `luna.audio.getPan(source)` | Returns stereo panning value |
-| `luna.audio.setMasterVolume(vol)` | Sets global master volume |
-| `luna.audio.getMasterVolume()` | Returns global master volume |
-| `luna.audio.getActiveSourceCount()` | Returns number of playing sources |
-| `luna.audio.getSourceCount()` | Returns total loaded source count |
-| `luna.audio.getSourceType(source)` | Returns `"static"` or `"stream"` |
-| `luna.audio.clone(source)` | Creates independent copy of a source |
-| `luna.audio.pauseAll()` | Pauses all playing sources |
-| `luna.audio.stopAll()` | Stops all sources |
-| `luna.audio.resumeAll()` | Resumes all paused sources |
-| `luna.audio.release(source)` | Releases source and frees memory |
-| `luna.audio.getDuration(source)` | Returns total duration in seconds |
-| `luna.audio.tell(source)` | Returns current playback position |
-| `luna.audio.seek(source, pos)` | Seeks to time position in seconds |
-| `luna.audio.setLowpass(source, hz)` | Applies lowpass filter at cutoff |
-| `luna.audio.setHighpass(source, hz)` | Applies highpass filter at cutoff |
-| `luna.audio.getLowpass(source)` | Returns lowpass cutoff frequency |
-| `luna.audio.getHighpass(source)` | Returns highpass cutoff frequency |
-| `luna.audio.clearFilter(source)` | Removes all filters from source |
-| `luna.audio.fadeIn(source, dur)` | Fades in from silence over duration |
-| `luna.audio.getFadeIn(source)` | Returns fade-in duration |
-| `luna.audio.getMaxSources()` | Returns max simultaneous sources (64) |
-| `luna.audio.newBus(name)` | Creates a named audio bus |
-| `luna.audio.setSourceBus(source, bus)` | Assigns source to a bus |
-| `luna.audio.getSourceBus(source)` | Returns assigned bus or nil |
-| `luna.audio.create_bus(name, parent)` | Creates bus by name (functional style) |
-| `luna.audio.set_bus_volume(name, vol)` | Sets bus volume by name |
-| `luna.audio.add_effect(bus, type, params)` | Adds DSP effect to a bus |
-| `luna.audio.remove_effect(bus, id)` | Removes DSP effect from a bus |
-| `luna.audio.set_effect_param(bus, id, param, val)` | Sets DSP effect parameter |
-| `luna.audio.setListener2D(x, y)` | Sets 2D listener position |
-| `luna.audio.getListener2D()` | Returns 2D listener position |
-| `luna.audio.setListener(x, y, z)` | Sets 3D listener position |
-| `luna.audio.getListener()` | Returns 3D listener position |
-| `luna.audio.setPosition(source, x, y, z)` | Sets source 3D position |
-| `luna.audio.getPosition(source)` | Returns source 3D position |
-| `luna.audio.setVelocity(source, x, y, z)` | Sets source velocity (Doppler) |
-| `luna.audio.getVelocity(source)` | Returns source velocity |
-| `luna.audio.setOrientation(source, fx, fy, fz, ux, uy, uz)` | Sets source orientation |
-| `luna.audio.getOrientation(source)` | Returns source orientation |
-| `luna.audio.setDopplerScale(scale)` | Sets global Doppler scale factor |
-| `luna.audio.getDopplerScale()` | Returns Doppler scale factor |
-| `luna.audio.setDistanceModel(model)` | Sets distance attenuation model |
-| `luna.audio.getDistanceModel()` | Returns distance model name |
-| `luna.audio.setMeter(scale)` | Sets metering scale (stub) |
-| `luna.audio.getMeter()` | Returns peak level (stub) |
-| `luna.audio.newMidiPlayer(path)` | Creates MIDI player, optionally loading a file |
-| `luna.audio.newSoundData(args)` | Creates SoundData from file or silent buffer |
-| `luna.audio.setMidiSoundFont(path)` | Sets global SoundFont for MIDI |
-| `luna.audio.hasMidiSoundFont()` | Returns true if SoundFont loaded |
-| `luna.audio.clearMidiSoundFont()` | Unloads active SoundFont |
-| `luna.audio.newDecoder(path, bufsize)` | Creates a streaming decoder |
-| `luna.audio.newQueueableSource(rate, bits, ch, bufs)` | Creates queueable PCM source |
-| `luna.audio.queueSource(id, sounddata)` | Pushes PCM buffer into queue |
-| `luna.audio.getFreeBufferCount(id)` | Returns free queue buffer slots |
-| `luna.audio.playQueueable(id)` | Starts queueable source playback |
-| `luna.audio.stopQueueable(id)` | Stops queueable source |
-| `luna.audio.getPlaybackDevices()` | Returns table of output device names |
-| `luna.audio.getPlaybackDevice()` | Returns current output device name |
-| `luna.audio.setPlaybackDevice(name)` | Selects output device by name |
+| `lurek.audio.newSource(path, type)` | Loads an audio file; type is `"static"` or `"stream"` (default) |
+| `lurek.audio.play(source, options)` | Plays a source; optional `{bus="name"}` table for bus routing |
+| `lurek.audio.stop(source)` | Stops playback and resets position |
+| `lurek.audio.pause(source)` | Pauses playback at current position |
+| `lurek.audio.resume(source)` | Resumes playback from pause |
+| `lurek.audio.setVolume(source, vol)` | Sets per-source volume |
+| `lurek.audio.getVolume(source)` | Returns per-source volume |
+| `lurek.audio.setPitch(source, pitch)` | Sets pitch multiplier |
+| `lurek.audio.getPitch(source)` | Returns pitch multiplier |
+| `lurek.audio.isPlaying(source)` | Returns true if playing |
+| `lurek.audio.isPaused(source)` | Returns true if paused |
+| `lurek.audio.isStopped(source)` | Returns true if stopped |
+| `lurek.audio.setLooping(source, bool)` | Enables/disables looping |
+| `lurek.audio.isLooping(source)` | Returns looping state |
+| `lurek.audio.playLooping(source)` | Plays in continuous loop |
+| `lurek.audio.setPan(source, pan)` | Sets stereo panning (-1.0 to 1.0) |
+| `lurek.audio.getPan(source)` | Returns stereo panning value |
+| `lurek.audio.setMasterVolume(vol)` | Sets global master volume |
+| `lurek.audio.getMasterVolume()` | Returns global master volume |
+| `lurek.audio.getActiveSourceCount()` | Returns number of playing sources |
+| `lurek.audio.getSourceCount()` | Returns total loaded source count |
+| `lurek.audio.getSourceType(source)` | Returns `"static"` or `"stream"` |
+| `lurek.audio.clone(source)` | Creates independent copy of a source |
+| `lurek.audio.pauseAll()` | Pauses all playing sources |
+| `lurek.audio.stopAll()` | Stops all sources |
+| `lurek.audio.resumeAll()` | Resumes all paused sources |
+| `lurek.audio.release(source)` | Releases source and frees memory |
+| `lurek.audio.getDuration(source)` | Returns total duration in seconds |
+| `lurek.audio.tell(source)` | Returns current playback position |
+| `lurek.audio.seek(source, pos)` | Seeks to time position in seconds |
+| `lurek.audio.setLowpass(source, hz)` | Applies lowpass filter at cutoff |
+| `lurek.audio.setHighpass(source, hz)` | Applies highpass filter at cutoff |
+| `lurek.audio.getLowpass(source)` | Returns lowpass cutoff frequency |
+| `lurek.audio.getHighpass(source)` | Returns highpass cutoff frequency |
+| `lurek.audio.clearFilter(source)` | Removes all filters from source |
+| `lurek.audio.fadeIn(source, dur)` | Fades in from silence over duration |
+| `lurek.audio.getFadeIn(source)` | Returns fade-in duration |
+| `lurek.audio.getMaxSources()` | Returns max simultaneous sources (64) |
+| `lurek.audio.newBus(name)` | Creates a named audio bus |
+| `lurek.audio.setSourceBus(source, bus)` | Assigns source to a bus |
+| `lurek.audio.getSourceBus(source)` | Returns assigned bus or nil |
+| `lurek.audio.create_bus(name, parent)` | Creates bus by name (functional style) |
+| `lurek.audio.set_bus_volume(name, vol)` | Sets bus volume by name |
+| `lurek.audio.add_effect(bus, type, params)` | Adds DSP effect to a bus |
+| `lurek.audio.remove_effect(bus, id)` | Removes DSP effect from a bus |
+| `lurek.audio.set_effect_param(bus, id, param, val)` | Sets DSP effect parameter |
+| `lurek.audio.setListener2D(x, y)` | Sets 2D listener position |
+| `lurek.audio.getListener2D()` | Returns 2D listener position |
+| `lurek.audio.setListener(x, y, z)` | Sets 3D listener position |
+| `lurek.audio.getListener()` | Returns 3D listener position |
+| `lurek.audio.setPosition(source, x, y, z)` | Sets source 3D position |
+| `lurek.audio.getPosition(source)` | Returns source 3D position |
+| `lurek.audio.setVelocity(source, x, y, z)` | Sets source velocity (Doppler) |
+| `lurek.audio.getVelocity(source)` | Returns source velocity |
+| `lurek.audio.setOrientation(source, fx, fy, fz, ux, uy, uz)` | Sets source orientation |
+| `lurek.audio.getOrientation(source)` | Returns source orientation |
+| `lurek.audio.setDopplerScale(scale)` | Sets global Doppler scale factor |
+| `lurek.audio.getDopplerScale()` | Returns Doppler scale factor |
+| `lurek.audio.setDistanceModel(model)` | Sets distance attenuation model |
+| `lurek.audio.getDistanceModel()` | Returns distance model name |
+| `lurek.audio.setMeter(scale)` | Sets metering scale (stub) |
+| `lurek.audio.getMeter()` | Returns peak level (stub) |
+| `lurek.audio.newMidiPlayer(path)` | Creates MIDI player, optionally loading a file |
+| `lurek.audio.newSoundData(args)` | Creates SoundData from file or silent buffer |
+| `lurek.audio.setMidiSoundFont(path)` | Sets global SoundFont for MIDI |
+| `lurek.audio.hasMidiSoundFont()` | Returns true if SoundFont loaded |
+| `lurek.audio.clearMidiSoundFont()` | Unloads active SoundFont |
+| `lurek.audio.newDecoder(path, bufsize)` | Creates a streaming decoder |
+| `lurek.audio.newQueueableSource(rate, bits, ch, bufs)` | Creates queueable PCM source |
+| `lurek.audio.queueSource(id, sounddata)` | Pushes PCM buffer into queue |
+| `lurek.audio.getFreeBufferCount(id)` | Returns free queue buffer slots |
+| `lurek.audio.playQueueable(id)` | Starts queueable source playback |
+| `lurek.audio.stopQueueable(id)` | Stops queueable source |
+| `lurek.audio.getPlaybackDevices()` | Returns table of output device names |
+| `lurek.audio.getPlaybackDevice()` | Returns current output device name |
+| `lurek.audio.setPlaybackDevice(name)` | Selects output device by name |
 
 ### Source Methods
 
@@ -328,25 +328,25 @@ Exposed under `luna.audio.*` by `src/lua_api/audio_api.rs`. The API surface incl
 
 ```lua
 -- Basic audio playback with bus routing
-function luna.init()
+function lurek.init()
     -- Create audio buses
-    music_bus = luna.audio.newBus("music")
-    sfx_bus = luna.audio.newBus("sfx")
+    music_bus = lurek.audio.newBus("music")
+    sfx_bus = lurek.audio.newBus("sfx")
     music_bus:setVolume(0.7)
 
     -- Load a streaming music source and assign to bus
-    music = luna.audio.newSource("music.ogg", "stream")
+    music = lurek.audio.newSource("music.ogg", "stream")
     music:setLooping(true)
     music:setVolume(0.8)
-    luna.audio.setSourceBus(music, music_bus)
+    lurek.audio.setSourceBus(music, music_bus)
     music:play()
 
     -- Load a static SFX source
-    sfx = luna.audio.newSource("jump.wav", "static")
-    luna.audio.setSourceBus(sfx, sfx_bus)
+    sfx = lurek.audio.newSource("jump.wav", "static")
+    lurek.audio.setSourceBus(sfx, sfx_bus)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then
         -- Clone so multiple overlapping plays work
         local s = sfx:clone()
@@ -364,33 +364,33 @@ end
 
 ```lua
 -- DSP effects on a bus
-function luna.init()
-    local bus = luna.audio.newBus("fx")
-    local id = luna.audio.add_effect("fx", "lowpass", { value = 2000 })
-    luna.audio.set_effect_param("fx", id, "cutoff", 1500)
+function lurek.init()
+    local bus = lurek.audio.newBus("fx")
+    local id = lurek.audio.add_effect("fx", "lowpass", { value = 2000 })
+    lurek.audio.set_effect_param("fx", id, "cutoff", 1500)
 end
 ```
 
 ```lua
 -- Spatial audio with 2D listener
-function luna.init()
-    luna.audio.setListener2D(400, 300)
-    local src = luna.audio.newSource("footsteps.ogg", "static")
-    luna.audio.setPosition(src, 200, 300, 0)
+function lurek.init()
+    lurek.audio.setListener2D(400, 300)
+    local src = lurek.audio.newSource("footsteps.ogg", "static")
+    lurek.audio.setPosition(src, 200, 300, 0)
     src:play()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Move listener with player position
     local px, py = player.x, player.y
-    luna.audio.setListener2D(px, py)
+    lurek.audio.setListener2D(px, py)
 end
 ```
 
 ```lua
 -- Procedural audio with SoundData
-function luna.init()
-    local sd = luna.audio.newSoundData(44100, 44100, 1)  -- 1 second mono
+function lurek.init()
+    local sd = lurek.audio.newSoundData(44100, 44100, 1)  -- 1 second mono
     for i = 0, sd:getSampleCount() - 1 do
         local t = i / sd:getSampleRate()
         sd:setSample(i, math.sin(2 * math.pi * 440 * t) * 0.5)
@@ -414,7 +414,7 @@ end
 | `engine`     | Imports from | Uses `SharedState`, `EngineError`, `SoundKey`, `BusKey`, `QueueableKey` resource keys |
 | `math`       | Imports from | No direct import, but spatial audio uses float vectors       |
 | `sound`      | Similar to   | `sound` module owns `SoundData` type; `audio` owns playback. `SoundData` is defined in `audio::sound_data` but also re-exported from `sound` |
-| `lua_api`    | Imported by  | `audio_api.rs` binds all public types to `luna.audio.*` namespace |
+| `lua_api`    | Imported by  | `audio_api.rs` binds all public types to `lurek.audio.*` namespace |
 
 ## Notes
 
@@ -427,4 +427,4 @@ end
 - **Bus effect chain**: Bus effects are stored in `Arc<RwLock<Vec<Arc<EffectParams>>>>` on the `Bus` struct. When a source assigned to a bus is played, the mixer wraps the audio stream in a `DynamicEffectSource` that references the bus's effect list.
 - **Panning law**: Spatial panning uses a simple linear law: `pan = (source_x - listener_x) / 200.0`, clamped to [-1.0, 1.0]. Applied via `rodio::source::ChannelVolume`.
 - **QueueableSource**: Game code pushes raw f32 PCM buffers into a FIFO queue. The `playQueueable` and `stopQueueable` calls manage state bookkeeping only; actual audio flow is driven by the queued buffers.
-- **Breaking change surface**: Renaming or removing any `luna.audio.*` function or Source/Bus/MidiPlayer method will break existing game scripts. The Source UserData methods (play, stop, setVolume, etc.) are the most commonly used API surface.
+- **Breaking change surface**: Renaming or removing any `lurek.audio.*` function or Source/Bus/MidiPlayer method will break existing game scripts. The Source UserData methods (play, stop, setVolume, etc.) are the most commonly used API surface.

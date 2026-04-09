@@ -129,4 +129,4 @@ end
 - **Overlapping tweens on same field** — two tweens fighting over `obj.x` causes jitter. Cancel the old one first.
 - **Duration zero** — causes division by zero or instant snap. Guard with `math.max(0.001, duration)`.
 - **Easing overshoot** — `outBack` and `outElastic` exceed the target value temporarily. Make sure visuals handle values > target.
-- **Not updating tweens** — call `update_tweens(dt)` every frame in `luna.update`.
+- **Not updating tweens** — call `update_tweens(dt)` every frame in `lurek.update`.

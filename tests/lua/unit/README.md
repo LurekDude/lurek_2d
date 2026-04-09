@@ -1,6 +1,6 @@
 # tests/lua/unit — Lua Unit Tests
 
-One test file per `luna.*` engine module and per `library/` Lunasome module.
+One test file per `lurek.*` engine module and per `library/` Lunasome module.
 
 ## Naming
 
@@ -14,7 +14,7 @@ and **must** end with `test_summary()`.
 ## Constraints
 
 - No GPU, audio device, or window API calls — headless only
-- Minimum 1 test per public `luna.*` function before merge
+- Minimum 1 test per public `lurek.*` function before merge
 
 ## Harness
 

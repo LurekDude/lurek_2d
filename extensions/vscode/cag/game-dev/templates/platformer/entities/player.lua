@@ -18,8 +18,8 @@ end
 function Player:update(dt)
     -- Horizontal
     self.vx = 0
-    if luna.input.isDown("left") or luna.input.isDown("a") then self.vx = -SPEED end
-    if luna.input.isDown("right") or luna.input.isDown("d") then self.vx = SPEED end
+    if lurek.input.isDown("left") or lurek.input.isDown("a") then self.vx = -SPEED end
+    if lurek.input.isDown("right") or lurek.input.isDown("d") then self.vx = SPEED end
     self.x = self.x + self.vx * dt
 
     -- Gravity
@@ -42,9 +42,9 @@ function Player:keypressed(key)
 end
 
 function Player:draw()
-    luna.gfx.setColor(0.2, 0.8, 0.3, 1)
-    luna.gfx.rectangle("fill", self.x, self.y - self.height, self.width, self.height)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(0.2, 0.8, 0.3, 1)
+    lurek.gfx.rectangle("fill", self.x, self.y - self.height, self.width, self.height)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 
 return Player

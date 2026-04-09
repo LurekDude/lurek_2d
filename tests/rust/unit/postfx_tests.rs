@@ -1,12 +1,12 @@
 //! Integration tests for the PostFX (post-processing effects) module.
 
-use luna2d::fx::{PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::fx::{PostFxEffect, PostFxEffectType, PostFxStack};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -297,7 +297,7 @@ fn test_lua_postfx_new_effect() {
 fn test_lua_postfx_invalid_effect_type() {
     let lua = make_vm();
     let result: Result<mlua::Value, _> =
-        lua.load(r#"luna.postfx.newEffect("invalid_type")"#).eval();
+        lua.load(r#"lurek.postfx.newEffect("invalid_type")"#).eval();
     assert!(result.is_err());
 }
 

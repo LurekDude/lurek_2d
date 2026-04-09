@@ -5,7 +5,7 @@ Persist game state with versioned TOML saves, migration, autosave, multiple slot
 ## Key Concepts
 
 - **Save structure**: A plain Lua table with a `save_version` field for forward compatibility.
-- **TOML encoding**: Use `luna.data.encodeToml` / `luna.data.decodeToml` for human-readable saves.
+- **TOML encoding**: Use `lurek.data.encodeToml` / `lurek.data.decodeToml` for human-readable saves.
 - **Migration**: On load, check `save_version` and apply transforms to upgrade old saves.
 - **Autosave**: Trigger on key events (room change, quest complete) — not every frame.
 - **Validation**: After decoding, verify required fields exist before using the data.
@@ -38,9 +38,9 @@ end
 ```lua
 local function save_game(slot)
     local data = build_save()
-    local toml_str = luna.data.encodeToml(data)
+    local toml_str = lurek.data.encodeToml(data)
     local path = "saves/slot" .. slot .. ".toml"
-    luna.fs.write(path, toml_str)
+    lurek.fs.write(path, toml_str)
 end
 ```
 
@@ -49,9 +49,9 @@ end
 ```lua
 local function load_game(slot)
     local path = "saves/slot" .. slot .. ".toml"
-    if not luna.fs.exists(path) then return nil, "no save" end
-    local content = luna.fs.read(path)
-    local data = luna.data.decodeToml(content)
+    if not lurek.fs.exists(path) then return nil, "no save" end
+    local content = lurek.fs.read(path)
+    local data = lurek.data.decodeToml(content)
     if not data or not data.save_version then return nil, "corrupt" end
     data = migrate(data)
     return data
@@ -95,9 +95,9 @@ local function get_slot_info()
     local slots = {}
     for i = 1, 3 do
         local path = "saves/slot" .. i .. ".toml"
-        if luna.fs.exists(path) then
-            local content = luna.fs.read(path)
-            local data = luna.data.decodeToml(content)
+        if lurek.fs.exists(path) then
+            local content = lurek.fs.read(path)
+            local data = lurek.data.decodeToml(content)
             slots[i] = {
                 time_played = data.world.time_played,
                 map = data.world.current_map,
@@ -115,4 +115,4 @@ end
 - **Overwriting without backup** — write to a temp file first, then rename. Prevents corruption on crash.
 - **Loading without validation** — a corrupt or hand-edited file can crash the game. Check required fields.
 - **Autosave too often** — saving every frame is wasteful. Trigger on meaningful events only.
-- **Forgetting luna.fs sandbox** — saves go to the game's sandboxed directory, not an absolute path.
+- **Forgetting lurek.fs sandbox** — saves go to the game's sandboxed directory, not an absolute path.

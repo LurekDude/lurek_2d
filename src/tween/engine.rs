@@ -9,9 +9,9 @@
 //!
 //! # Architecture note
 //!
-//! `TweenEngine` is instantiated once per Lua VM inside `luna.tween`'s `register()`
+//! `TweenEngine` is instantiated once per Lua VM inside `lurek.tween`'s `register()`
 //! call and held in an `Rc<RefCell<TweenEngine>>` shared among all closures in the
-//! `luna.tween.*` namespace. Domain types (`LuaTween`, `LuaTweenSequence`,
+//! `lurek.tween.*` namespace. Domain types (`LuaTween`, `LuaTweenSequence`,
 //! `LuaTweenParallel`) and the thin Lua wrapper live in sibling modules.
 //!
 //! # Relationship to mlua
@@ -26,7 +26,7 @@ use std::rc::Rc;
 
 use crate::tween::handle::{LuaTween, LuaTweenParallel, LuaTweenSequence};
 
-/// Active-object pool and frame-tick driver for the `luna.tween` system.
+/// Active-object pool and frame-tick driver for the `lurek.tween` system.
 ///
 /// Tracks all live `LuaTween`, `LuaTweenSequence`, and `LuaTweenParallel` objects
 /// via `LuaRegistryKey` handles, preventing premature garbage collection. Each frame,

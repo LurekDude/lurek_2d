@@ -14,7 +14,7 @@ A branching narrative engine with a typewriter text effect, multiple character r
 ## How to Run
 
 ```powershell
-cargo run -- demos/visual_novel
+cargo run -- content/demos/visual_novel
 ```
 
 ## Controls

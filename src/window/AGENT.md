@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.window`                                        |
+| **Lua API**    | `lurek.window`                                        |
 | **Source**     | `src/window/`                                        |
 | **Rust Tests** | `tests/rust/unit/window_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_window.lua`                     |
@@ -27,6 +27,6 @@ The `window` module is a Tier 1 core engine subsystem that manages all window li
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/window.md`](../../specs/window.md)
+→ [`docs/specs/window.md`](../../docs/specs/window.md)
 
-_Update both this file **and** `specs/window.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/window.md` whenever source files, public types, or Lua bindings change._

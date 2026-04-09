@@ -32,19 +32,19 @@ OS window management via winit: creation, sizing, fullscreen, display enumeratio
 ## Structural Issues
 
 - **Viewport overlap with camera**: Window module manages viewport scaling modes, camera module manages viewport/world coordinate mapping. These are related but distinct — window = screen mapping, camera = world mapping. Current separation is correct but could cause confusion.
-- **39 functions is large**: Consider grouping into sub-tables: `luna.window.display.*`, `luna.window.cursor.*`, `luna.window.clipboard.*`.
+- **39 functions is large**: Consider grouping into sub-tables: `lurek.window.display.*`, `lurek.window.cursor.*`, `lurek.window.clipboard.*`.
 
 ## Suggestions
 
-1. **Add DPI change callback**: `luna.window.setDpiChangeCallback(fn)` — notifies when DPI scale changes (monitor switch).
-2. **Add window icon from Lua**: Currently set via build-time embedded icon. Allow `luna.window.setIcon(imageData)` at runtime.
-3. **Add native file dialog**: `luna.window.openFileDialog(filters)` → path. Very useful for tools, level editors, mod loaders. Common in desktop engines.
-4. **Reorganize API into sub-tables**: Group related functions under `luna.window.display.*`, `luna.window.cursor.*` etc. Reduces flat namespace sprawl.
-5. **Add window position**: `luna.window.setPosition(x, y)` — dock window to specific screen coordinates.
+1. **Add DPI change callback**: `lurek.window.setDpiChangeCallback(fn)` — notifies when DPI scale changes (monitor switch).
+2. **Add window icon from Lua**: Currently set via build-time embedded icon. Allow `lurek.window.setIcon(imageData)` at runtime.
+3. **Add native file dialog**: `lurek.window.openFileDialog(filters)` → path. Very useful for tools, level editors, mod loaders. Common in desktop engines.
+4. **Reorganize API into sub-tables**: Group related functions under `lurek.window.display.*`, `lurek.window.cursor.*` etc. Reduces flat namespace sprawl.
+5. **Add window position**: `lurek.window.setPosition(x, y)` — dock window to specific screen coordinates.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Fullscreen | ✅ | ✅ | ✅ | ✅ |
 | Viewport scaling | ✅ (5 modes) | ❌ (manual) | ✅ (letterbox) | ✅ |

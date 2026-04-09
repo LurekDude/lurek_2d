@@ -1,63 +1,62 @@
 -- examples/gui.lua
--- Retained-mode widget GUI system for Luna2D
--- API: luna.ui
+-- Retained-mode widget GUI system for Lurek2D
+-- API: lurek.ui
 -- Constructors return widget tables; all forward events from game callbacks.
--- This file is documentation code, not a runnable game.
 
 --------------------------------------------------------------------------------
 -- Module-level setup and themes
 --------------------------------------------------------------------------------
 
 -- Create and apply a custom theme
-local theme = luna.ui.newTheme()
-luna.ui.setTheme(theme)
-local t = luna.ui.getTheme()   -- returns theme table or nil
+local theme = lurek.ui.newTheme()
+lurek.ui.setTheme(theme)
+local t = lurek.ui.getTheme()   -- returns theme table or nil
 
 -- Access root context widget count
-local n = luna.ui.getWidgetCount()  -- number
+local n = lurek.ui.getWidgetCount()  -- number
 
 -- Toast notifications
-luna.ui.addToast({ message = "Hello!", duration = 3.0 })
-local tc = luna.ui.getToastCount()  -- number
+lurek.ui.addToast({ message = "Hello!", duration = 3.0 })
+local tc = lurek.ui.getToastCount()  -- number
 
 -- Focus management
-luna.ui.setFocus(nil)              -- clear focus
-local focused = luna.ui.getFocus() -- number or nil
-luna.ui.focusNext()
-luna.ui.focusPrev()
-luna.ui.clearFocus()
+lurek.ui.setFocus(nil)              -- clear focus
+local focused = lurek.ui.getFocus() -- number or nil
+lurek.ui.focusNext()
+lurek.ui.focusPrev()
+lurek.ui.clearFocus()
 
 --------------------------------------------------------------------------------
 -- Event forwarding (call from game callbacks)
 --------------------------------------------------------------------------------
 
-luna.mousepressed = function(x, y, btn)
-    luna.ui.mousepressed(x, y, btn)
+lurek.mousepressed = function(x, y, btn)
+    lurek.ui.mousepressed(x, y, btn)
 end
 
-luna.mousereleased = function(x, y, btn)
-    luna.ui.mousereleased(x, y, btn)
+lurek.mousereleased = function(x, y, btn)
+    lurek.ui.mousereleased(x, y, btn)
 end
 
-luna.mousemoved = function(x, y)
-    local consumed = luna.ui.mousemoved(x, y)  -- returns boolean
+lurek.mousemoved = function(x, y)
+    local consumed = lurek.ui.mousemoved(x, y)  -- returns boolean
 end
 
-luna.keypressed = function(key)
-    local consumed = luna.ui.keypressed(key)   -- returns boolean
+lurek.keypressed = function(key)
+    local consumed = lurek.ui.keypressed(key)   -- returns boolean
 end
 
-luna.textinput = function(text)
-    luna.ui.textinput(text)
+lurek.textinput = function(text)
+    lurek.ui.textinput(text)
 end
 
-luna.wheelmoved = function(x, y)
-    luna.ui.wheelmoved(x, y)
+lurek.wheelmoved = function(x, y)
+    lurek.ui.wheelmoved(x, y)
 end
 
--- luna.process is called every frame; forward dt to the widget system
-luna.process = function(dt)
-    luna.ui.update(dt)
+-- lurek.process is called every frame; forward dt to the widget system
+lurek.process = function(dt)
+    lurek.ui.update(dt)
 end
 
 --------------------------------------------------------------------------------
@@ -91,7 +90,7 @@ end
 -- Button
 --------------------------------------------------------------------------------
 
-local btn = luna.ui.newButton("Click me")
+local btn = lurek.ui.newButton("Click me")
 btn:setText("Submit")
 local txt = btn:getText()    -- "Submit"
 btn:setOnClick(function() print("clicked!") end)
@@ -102,7 +101,7 @@ btn:setSize(100, 30)
 -- Label
 --------------------------------------------------------------------------------
 
-local lbl = luna.ui.newLabel("Hello, World!")
+local lbl = lurek.ui.newLabel("Hello, World!")
 lbl:setText("Updated text")
 local s = lbl:getText()    -- "Updated text"
 lbl:setPosition(10, 50)
@@ -111,7 +110,7 @@ lbl:setPosition(10, 50)
 -- TextInput
 --------------------------------------------------------------------------------
 
-local ti = luna.ui.newTextInput()
+local ti = lurek.ui.newTextInput()
 ti:setText("initial value")
 ti:setPlaceholder("Type here...")
 local ph = ti:getPlaceholder()    -- "Type here..."
@@ -124,7 +123,7 @@ ti:setOnChange(function() print("changed:", ti:getText()) end)
 -- CheckBox
 --------------------------------------------------------------------------------
 
-local cb = luna.ui.newCheckbox("Enable feature")
+local cb = lurek.ui.newCheckbox("Enable feature")
 cb:setChecked(true)
 local checked = cb:isChecked()   -- boolean
 cb:setOnChange(function() print("checked:", cb:isChecked()) end)
@@ -133,7 +132,7 @@ cb:setOnChange(function() print("checked:", cb:isChecked()) end)
 -- Slider
 --------------------------------------------------------------------------------
 
-local sl = luna.ui.newSlider(0, 100)
+local sl = lurek.ui.newSlider(0, 100)
 sl:setValue(50)
 local v = sl:getValue()   -- 50
 sl:setRange(0, 200)
@@ -146,7 +145,7 @@ sl:setOnChange(function() print("slider:", sl:getValue()) end)
 -- ProgressBar
 --------------------------------------------------------------------------------
 
-local pb = luna.ui.newProgressBar(0, 100)
+local pb = lurek.ui.newProgressBar(0, 100)
 pb:setValue(75)
 local pv = pb:getValue()      -- 75
 local pp = pb:getProgress()   -- 0.75 (normalized)
@@ -158,7 +157,7 @@ local pmx = pb:getMax()       -- 200
 -- ComboBox (dropdown)
 --------------------------------------------------------------------------------
 
-local combo = luna.ui.newComboBox()
+local combo = lurek.ui.newComboBox()
 combo:addItem("Option A")
 combo:addItem("Option B")
 combo:addItem("Option C")
@@ -175,7 +174,7 @@ combo:clearItems()
 -- ListBox
 --------------------------------------------------------------------------------
 
-local lb = luna.ui.newList()
+local lb = lurek.ui.newList()
 lb:addItem("Row 1")
 lb:addItem("Row 2")
 lb:addItem("Row 3")
@@ -191,7 +190,7 @@ lb:clearItems()
 -- TabBar
 --------------------------------------------------------------------------------
 
-local tabs = luna.ui.newTabBar()
+local tabs = lurek.ui.newTabBar()
 tabs:addTab("General")
 tabs:addTab("Advanced")
 tabs:addTab("Help")
@@ -205,7 +204,7 @@ local active = tabs:getActiveTab()  -- integer (1-based)
 -- Panel (container with optional title)
 --------------------------------------------------------------------------------
 
-local panel = luna.ui.newPanel()
+local panel = lurek.ui.newPanel()
 panel:setTitle("Settings")
 local pt = panel:getTitle()     -- "Settings"
 panel:setScrollable(true)
@@ -216,7 +215,7 @@ panel:addChild(lbl)
 -- Layout (flex-style auto-layout container)
 --------------------------------------------------------------------------------
 
-local layout = luna.ui.newLayout("horizontal")  -- or "vertical" (default)
+local layout = lurek.ui.newLayout("horizontal")  -- or "vertical" (default)
 layout:setDirection("vertical")
 local dir = layout:getDirection()   -- "vertical"
 layout:setSpacing(5)
@@ -235,7 +234,7 @@ layout:addChild(lbl)
 -- ScrollPanel
 --------------------------------------------------------------------------------
 
-local sp2 = luna.ui.newScrollPanel()
+local sp2 = lurek.ui.newScrollPanel()
 sp2:setContentSize(400, 800)
 local cw, ch = sp2:getContentSize()  -- content dimensions
 sp2:setScrollPosition(0, 100)
@@ -248,20 +247,20 @@ local speed = sp2:getScrollSpeed()  -- number
 -- Separator and Spacer
 --------------------------------------------------------------------------------
 
-local sep = luna.ui.newSeparator(false)  -- false = horizontal (default)
+local sep = lurek.ui.newSeparator(false)  -- false = horizontal (default)
 sep:setVertical(true)
 local vert = sep:isVertical()   -- boolean
 sep:setThickness(2)
 local thick = sep:getThickness()   -- number
 
-local spacer = luna.ui.newSpacer(10, 20)   -- fixed w, h
+local spacer = lurek.ui.newSpacer(10, 20)   -- fixed w, h
 spacer:setSize(30, 30)
 
 --------------------------------------------------------------------------------
 -- TreeView
 --------------------------------------------------------------------------------
 
-local tree = luna.ui.newTreeView()
+local tree = lurek.ui.newTreeView()
 tree:addNode("Root")                 -- returns node index (1-based)
 tree:addNode("Child A", 1)           -- add child of node 1
 tree:addNode("Child B", 1)
@@ -288,7 +287,7 @@ tree:clearNodes()
 -- RadioButton
 --------------------------------------------------------------------------------
 
-local rb = luna.ui.newRadioButton("Option 1", "group_a")
+local rb = lurek.ui.newRadioButton("Option 1", "group_a")
 rb:setGroup("group_a")
 local g = rb:getGroup()      -- "group_a"
 rb:setSelected(true)
@@ -299,7 +298,7 @@ rb:setOnChange(function() print("radio changed:", rb:isSelected()) end)
 -- ScrollBar
 --------------------------------------------------------------------------------
 
-local sb = luna.ui.newScrollBar(false)  -- false = horizontal
+local sb = lurek.ui.newScrollBar(false)  -- false = horizontal
 sb:setScrollPosition(50)
 local spos = sb:getScrollPosition()   -- number
 sb:setContentSize(500)
@@ -313,7 +312,7 @@ sb:setOnChange(function() print("scroll:", sb:getScrollPosition()) end)
 -- GUIWindow (floating dialog-style window)
 --------------------------------------------------------------------------------
 
-local win = luna.ui.newWindow("My Window")
+local win = lurek.ui.newWindow("My Window")
 win:setTitle("Updated Title")
 local wt = win:getTitle()       -- string
 win:setCloseable(true)
@@ -329,7 +328,7 @@ win:addChild(lbl)
 -- SplitPanel (resizable two-pane split)
 --------------------------------------------------------------------------------
 
-local split = luna.ui.newSplitPanel("horizontal")  -- or "vertical"
+local split = lurek.ui.newSplitPanel("horizontal")  -- or "vertical"
 split:setOrientation("vertical")
 local orient = split:getOrientation()  -- "vertical"
 split:setSplitPosition(0.5)
@@ -345,7 +344,7 @@ local sc = split:getSecondChild()  -- widget table
 -- DockPanel (dockable child panels)
 --------------------------------------------------------------------------------
 
-local dock = luna.ui.newDockPanel()
+local dock = lurek.ui.newDockPanel()
 dock:dock(panel, "left")      -- sides: "left", "right", "top", "bottom"
 dock:dock(layout, "bottom")
 dock:undock(panel)
@@ -357,7 +356,7 @@ local ds = dock:getSplitSize()    -- number
 -- Toolbar
 --------------------------------------------------------------------------------
 
-local toolbar = luna.ui.newToolbar("horizontal")
+local toolbar = lurek.ui.newToolbar("horizontal")
 toolbar:setOrientation("vertical")
 local to = toolbar:getOrientation()   -- "vertical"
 toolbar:addButton("save", "Save file")
@@ -371,9 +370,9 @@ local toggled = toolbar:isButtonToggled("save")  -- boolean
 -- MenuBar
 --------------------------------------------------------------------------------
 
-local menu = luna.ui.newMenuBar()
-local fileMenu = luna.ui.newMenuItem("File")
-local editMenu = luna.ui.newMenuItem("Edit")
+local menu = lurek.ui.newMenuBar()
+local fileMenu = lurek.ui.newMenuItem("File")
+local editMenu = lurek.ui.newMenuItem("Edit")
 menu:addChild(fileMenu)
 menu:addChild(editMenu)
 
@@ -382,25 +381,25 @@ menu:addChild(editMenu)
 --------------------------------------------------------------------------------
 
 -- Dialog (modal workflow)
-local dlg = luna.ui.newDialog("Confirm?")
+local dlg = lurek.ui.newDialog("Confirm?")
 dlg:setTitle("Are you sure?")
-dlg:addChild(luna.ui.newLabel("This cannot be undone."))
-dlg:addChild(luna.ui.newButton("OK"))
-dlg:addChild(luna.ui.newButton("Cancel"))
+dlg:addChild(lurek.ui.newLabel("This cannot be undone."))
+dlg:addChild(lurek.ui.newButton("OK"))
+dlg:addChild(lurek.ui.newButton("Cancel"))
 
 -- StatusBar
-local status = luna.ui.newStatusBar()
-status:addChild(luna.ui.newLabel("Ready"))
+local status = lurek.ui.newStatusBar()
+status:addChild(lurek.ui.newLabel("Ready"))
 
 -- Accordion (collapsing sections)
-local accord = luna.ui.newAccordion()
-accord:addChild(luna.ui.newPanel())
+local accord = lurek.ui.newAccordion()
+accord:addChild(lurek.ui.newPanel())
 
 -- TooltipPanel
-local tip = luna.ui.newTooltipPanel("Helpful hint here")
+local tip = lurek.ui.newTooltipPanel("Helpful hint here")
 
 -- NinePatch (scalable 9-slice image)
-local nine = luna.ui.newNinePatch()
+local nine = lurek.ui.newNinePatch()
 nine:setInsets(10, 10, 10, 10)    -- top, right, bottom, left
 local t2, r2, b2, l2 = nine:getInsets()
 nine:setImageDimensions(64, 64)
@@ -408,7 +407,7 @@ local nw, nh = nine:getImageDimensions()
 local slices = nine:getSlices()   -- table of patch rects
 
 -- Toast (auto-dismissing notification)
-local toast = luna.ui.newToast("Saved!", 2.0)
+local toast = lurek.ui.newToast("Saved!", 2.0)
 toast:setMessage("File saved.")
 local msg = toast:getMessage()    -- string
 toast:setDuration(3)
@@ -417,27 +416,27 @@ local prog = toast:getProgress()  -- 0.0–1.0 elapsed
 local exp = toast:isExpired()     -- boolean
 
 -- ColorPicker
-local picker = luna.ui.newColorPicker()
+local picker = lurek.ui.newColorPicker()
 picker:setOnChange(function() print("color changed") end)
 
 -- Table widget (grid data view)
-local tblWidget = luna.ui.newTable()
-tblWidget:addChild(luna.ui.newLabel("Header"))
+local tblWidget = lurek.ui.newTable()
+tblWidget:addChild(lurek.ui.newLabel("Header"))
 
 -- ImageWidget
-local imgW = luna.ui.newImageWidget()
+local imgW = lurek.ui.newImageWidget()
 imgW:setSize(128, 128)
 
 --------------------------------------------------------------------------------
 -- Root container usage pattern
 --------------------------------------------------------------------------------
 
-local root = luna.ui.getRoot()   -- main root panel widget
+local root = lurek.ui.getRoot()   -- main root panel widget
 root:addChild(panel)
 root:addChild(toolbar)
 
--- luna.render_ui draws widgets on top of the game scene each frame
-luna.render_ui = function()
+-- lurek.render_ui draws widgets on top of the game scene each frame
+lurek.render_ui = function()
     -- GUI is rendered automatically via the engine — no explicit draw call needed
 end
 
@@ -448,7 +447,7 @@ end
 -- sections are collapsed; click the header or call toggleSection() to open one.
 -- setExclusive(true) gives classic "accordion" behaviour — only one open panel.
 
-local acc = luna.ui.newAccordion()
+local acc = lurek.ui.newAccordion()
 acc:addSection("Gameplay")               -- bare section, toggle to reveal content
 acc:addSection("Graphics", gfx_pnl)     -- section pre-populated with a widget
 acc:addSection("Controls")
@@ -465,7 +464,7 @@ acc:toggleSection(1)                     -- expand/collapse "Gameplay"
 -- Lets the player pick a colour in RGB, RGBA, or HSV mode. setShowAlpha(false)
 -- hides the alpha slider for games that don't need transparency control.
 
-local pal      = luna.ui.newColorPicker()
+local pal      = lurek.ui.newColorPicker()
 local pal_col  = pal:getColor()          -- {r, g, b, a} current colour
 local pal_mode = pal:getColorMode()      -- "rgba" | "rgb" | "hsv"
 local pal_show = pal:getShowAlpha()      -- boolean
@@ -483,8 +482,8 @@ end)
 -- Wrap confirmations in a Dialog. setModal(true) blocks all input for other
 -- widgets while visible. Call open()/close() to show/hide it.
 
-local confirm  = luna.ui.newDialog("Confirm Exit?")
-local dlg_body = luna.ui.newLabel("All unsaved progress will be lost.")
+local confirm  = lurek.ui.newDialog("Confirm Exit?")
+local dlg_body = lurek.ui.newLabel("All unsaved progress will be lost.")
 confirm:setContent(dlg_body)
 confirm:setModal(true)
 confirm:open()                           -- show modal overlay
@@ -500,7 +499,7 @@ confirm:close()                          -- remove from scene
 -- setSortable lets users click headers to sort. Use getSelectedRow() in
 -- setOnSelect callback to react to row selection.
 
-local gtbl     = luna.ui.newTable()
+local gtbl     = lurek.ui.newTable()
 gtbl:addColumn("Name")
 gtbl:addColumn("Score")
 gtbl:addRow({"Alice", "1500"})
@@ -526,7 +525,7 @@ end)
 -- so child widgets can be created relative to this viewport — useful for HUD
 -- panels, in-game screens, or sub-interfaces inside modal dialogs.
 
-local imgCtx = luna.ui.newImageWidget()
+local imgCtx = lurek.ui.newImageWidget()
 imgCtx:setSize(256, 256)
 local img_scl   = imgCtx:getScaleMode()   -- "fit" | "fill" | "stretch" | "none"
 local img_tint  = imgCtx:getTint()        -- {r, g, b, a} colour multiplier
@@ -568,46 +567,46 @@ imgCtx:focusPrev()
 local iw_theme   = imgCtx:getTheme()
 
 --------------------------------------------------------------------------------
--- Widget base API  (generic methods on all widgets — luna.gui namespace)
+-- Widget base API  (generic methods on all widgets — lurek.gui namespace)
 --------------------------------------------------------------------------------
 -- These methods exist on every widget instance. They are also registered under
--- luna.gui.* for direct access to the "current widget" context pattern.
+-- lurek.gui.* for direct access to the "current widget" context pattern.
 
-local wg_anchor   = luna.gui.getAnchor()
-local wg_nchild   = luna.gui.getChildCount()
-local wg_fgrow    = luna.gui.getFlexGrow()
-local wg_fshrink  = luna.gui.getFlexShrink()
-local wg_id       = luna.gui.getId()
-local wg_margin   = luna.gui.getMargin()          -- top, right, bottom, left
-local wg_maxsz    = luna.gui.getMaxSize()
-local wg_minsz    = luna.gui.getMinSize()
-local wg_padding  = luna.gui.getPadding()
-local wg_pos      = luna.gui.getPosition()        -- x, y
-local wg_sz       = luna.gui.getSize()            -- w, h
-local wg_state    = luna.gui.getState()           -- "normal"|"hover"|"pressed"|"disabled"
-local wg_tip      = luna.gui.getTooltip()
-local wg_z        = luna.gui.getZOrder()
-local wg_enabled  = luna.gui.isEnabled()
-local wg_visible  = luna.gui.isVisible()
-luna.gui.removeChild(iw_lbl)
-luna.gui.setAnchor(0.0, 0.0, 1.0, 1.0)           -- stretch-fill parent edges
-luna.gui.setAnchorCenter(0.5, 0.5)                -- offset from parent center
-luna.gui.setEnabled(false)
-luna.gui.setFlexGrow(1.0)
-luna.gui.setFlexShrink(0.0)
-luna.gui.setId("main_hud")
-luna.gui.setMargin(4, 4, 4, 4)                    -- CSS-like t, r, b, l (px)
-luna.gui.setMaxSize(800, 600)
-luna.gui.setMinSize(100, 30)
-luna.gui.setOnChange(function() end)
-luna.gui.setOnClick(function() print("widget clicked") end)
-luna.gui.setOnDraw(function() end)
-luna.gui.setPadding(8, 12, 8, 12)
-luna.gui.setPosition(20, 20)
-luna.gui.setSize(200, 40)
-luna.gui.setTooltip("Click to confirm action")
-luna.gui.setVisible(true)
-luna.gui.setZOrder(10)
+local wg_anchor   = lurek.gui.getAnchor()
+local wg_nchild   = lurek.gui.getChildCount()
+local wg_fgrow    = lurek.gui.getFlexGrow()
+local wg_fshrink  = lurek.gui.getFlexShrink()
+local wg_id       = lurek.gui.getId()
+local wg_margin   = lurek.gui.getMargin()          -- top, right, bottom, left
+local wg_maxsz    = lurek.gui.getMaxSize()
+local wg_minsz    = lurek.gui.getMinSize()
+local wg_padding  = lurek.gui.getPadding()
+local wg_pos      = lurek.gui.getPosition()        -- x, y
+local wg_sz       = lurek.gui.getSize()            -- w, h
+local wg_state    = lurek.gui.getState()           -- "normal"|"hover"|"pressed"|"disabled"
+local wg_tip      = lurek.gui.getTooltip()
+local wg_z        = lurek.gui.getZOrder()
+local wg_enabled  = lurek.gui.isEnabled()
+local wg_visible  = lurek.gui.isVisible()
+lurek.gui.removeChild(iw_lbl)
+lurek.gui.setAnchor(0.0, 0.0, 1.0, 1.0)           -- stretch-fill parent edges
+lurek.gui.setAnchorCenter(0.5, 0.5)                -- offset from parent center
+lurek.gui.setEnabled(false)
+lurek.gui.setFlexGrow(1.0)
+lurek.gui.setFlexShrink(0.0)
+lurek.gui.setId("main_hud")
+lurek.gui.setMargin(4, 4, 4, 4)                    -- CSS-like t, r, b, l (px)
+lurek.gui.setMaxSize(800, 600)
+lurek.gui.setMinSize(100, 30)
+lurek.gui.setOnChange(function() end)
+lurek.gui.setOnClick(function() print("widget clicked") end)
+lurek.gui.setOnDraw(function() end)
+lurek.gui.setPadding(8, 12, 8, 12)
+lurek.gui.setPosition(20, 20)
+lurek.gui.setSize(200, 40)
+lurek.gui.setTooltip("Click to confirm action")
+lurek.gui.setVisible(true)
+lurek.gui.setZOrder(10)
 
 
 --------------------------------------------------------------------------------
@@ -618,15 +617,15 @@ luna.gui.setZOrder(10)
 -- "stretch" distorts to fill exactly. "none" draws at native pixel size.
 
 imgCtx:setScaleMode("fit")   -- keeps aspect ratio; letterboxes excess space
--- imgCtx:setScaleMode("fill")    -- crops to fill; no letterbox
--- imgCtx:setScaleMode("stretch") -- distorts to fill exactly
--- imgCtx:setScaleMode("none")    -- native pixel size, may clip
+imgCtx:setScaleMode("fill")  -- crops to fill; no letterbox
+imgCtx:setScaleMode("stretch")  -- distorts to fill exactly
+imgCtx:setScaleMode("none")  -- native pixel size, may clip
 
 -- setTint multiplies every pixel colour by (r, g, b, a). Default is (1,1,1,1)
 -- (no tint). Use it for damage flash, night-vision overlay, or greyscale.
 imgCtx:setTint(0.9, 0.9, 0.9, 1.0)          -- slight de-saturating grey wash
--- imgCtx:setTint(1.0, 0.3, 0.3, 1.0)        -- red flash (damage feedback)
--- imgCtx:setTint(1.0, 1.0, 1.0, 0.5)        -- 50 % transparent ghost panel
+imgCtx:setTint(1.0, 0.3, 0.3, 1.0)  -- red flash (damage feedback)
+imgCtx:setTint(1.0, 1.0, 1.0, 0.5)  -- 50 % transparent ghost panel
 
 --------------------------------------------------------------------------------
 -- Image_Widget — child-widget factory methods
@@ -715,15 +714,15 @@ imgCtx:setFocus(iw_ti)      -- iw_ti receives keyboard events immediately
 --------------------------------------------------------------------------------
 -- When an Image_Widget is embedded inside a game scene (not a native window),
 -- you must forward OS input events to it manually so its child widgets respond.
--- Call these from the matching luna.* event callbacks.
+-- Call these from the matching lurek.* event callbacks.
 
--- luna.textinput (text entry): forward typed characters to focused child
+-- lurek.textinput (text entry): forward typed characters to focused child
 imgCtx:textinput("a")           -- as if user typed "a" with iw_ti focused
 
--- luna.wheelmoved: forward scroll wheel to the hovered scroll panel / list
+-- lurek.wheelmoved: forward scroll wheel to the hovered scroll panel / list
 imgCtx:wheelmoved(0, -3)        -- scroll down 3 units
 
--- luna.process(dt): advance any animated widgets (e.g. progress bars, toasts)
+-- lurek.process(dt): advance any animated widgets (e.g. progress bars, toasts)
 imgCtx:update(0.016)            -- call every frame with delta-time
 
 --------------------------------------------------------------------------------
@@ -733,7 +732,7 @@ imgCtx:update(0.016)            -- call every frame with delta-time
 -- Each menu is created with addMenu(title) which returns a Menu object you can
 -- populate with MenuItem instances. removeMenu() removes a menu by its title.
 
-local menubar2  = luna.ui.newMenuBar()
+local menubar2  = lurek.ui.newMenuBar()
 local file_menu = menubar2:addMenu("File")   -- → Menu object
 local edit_menu = menubar2:addMenu("Edit")   -- → Menu object
 local view_menu = menubar2:addMenu("View")
@@ -752,7 +751,7 @@ local menu_cnt  = menubar2:getMenuCount()     -- → 2
 -- setShortcut sets the keyboard accelerator shown at the right of the entry.
 -- addSubItem builds a cascading sub-menu; getSubItems returns the sub-list.
 
-local run_item  = luna.ui.newMenuItem("Run")
+local run_item  = lurek.ui.newMenuItem("Run")
 run_item:setText("Run Script")               -- rename label after creation
 local cur_label = run_item:getText()         -- → "Run Script"
 
@@ -760,9 +759,9 @@ local cur_key   = run_item:getShortcut()     -- → "" (no shortcut yet)
 run_item:setShortcut("Ctrl+R")               -- show "Ctrl+R" at entry right
 
 -- Cascading sub-menu: "Run ▶  Step Into / Step Over / Continue"
-local sub_into  = luna.ui.newMenuItem("Step Into")
-local sub_over  = luna.ui.newMenuItem("Step Over")
-local sub_cont  = luna.ui.newMenuItem("Continue")
+local sub_into  = lurek.ui.newMenuItem("Step Into")
+local sub_over  = lurek.ui.newMenuItem("Step Over")
+local sub_cont  = lurek.ui.newMenuItem("Continue")
 sub_cont:setShortcut("F5")
 
 run_item:addSubItem(sub_into)
@@ -773,7 +772,7 @@ local sub_list  = run_item:getSubItems()     -- {sub_into, sub_over, sub_cont}
 
 -- Attach a click handler — fires when the user selects the item
 run_item:setOnClick(function()
-    luna.log.info("Running script…")
+    lurek.log.info("Running script…")
 end)
 
 -- Add the item to the File menu
@@ -787,12 +786,12 @@ file_menu:addItem(run_item)
 -- a slot at runtime (1-based index). Use it for mode indicators, coordinates,
 -- error summaries, or FPS counters.
 
-local sbar = luna.ui.newStatusBar()
+local sbar = lurek.ui.newStatusBar()
 sbar:addSection("Mode")         -- section 1
 sbar:addSection("Position")     -- section 2
 sbar:addSection("")             -- section 3  (right-aligned, initially blank)
 
--- Update sections at runtime (e.g. inside luna.process)
+-- Update sections at runtime (e.g. inside lurek.process)
 sbar:setSectionText(1, "Normal")              -- "Mode: Normal"
 sbar:setSectionText(2, "x=320  y=240")        -- live cursor position
 sbar:setSectionText(3, "FPS: 60")             -- right-aligned perf counter
@@ -807,7 +806,7 @@ local st_n    = sbar:getSectionCount()        -- → 3
 -- setTarget. When the pointer hovers over the target widget for longer than the
 -- delay, the tooltip appears automatically. setTarget(nil) detaches it.
 
-local ttp2       = luna.ui.newTooltipPanel()
+local ttp2       = lurek.ui.newTooltipPanel()
 
 -- How long the pointer must dwell before the tooltip appears (seconds)
 local ttp_delay  = ttp2:getDelay()            -- → 0.5 (default)
@@ -822,7 +821,7 @@ local ttp_txt    = ttp2:getText()             -- → "" (empty until set)
 ttp2:setText("Run the current script (Ctrl+R)")
 
 -- Detach from current target without destroying the tooltip
--- ttp2:setTarget(nil)
+ttp2:setTarget(nil)
 
 --------------------------------------------------------------------------------
 -- Widget base API  (supplemental methods — all apply to every widget type)
@@ -833,8 +832,8 @@ ttp2:setText("Run the current script (Ctrl+R)")
 -- hit-testing. clearAnchor() removes a stretch anchor previously set via
 -- setAnchor() so the widget reverts to manual position/size.
 
-luna.gui.addChild(iw_lbl)                     -- re-attach a previously removed child
-local found_wg  = luna.gui.findById("main_hud")    -- nil if no match
-local in_bounds = luna.gui.containsPoint(150, 80)  -- true when (150,80) inside widget
-luna.gui.clearAnchor()                        -- stop stretching, return to manual size
+lurek.gui.addChild(iw_lbl)                     -- re-attach a previously removed child
+local found_wg  = lurek.gui.findById("main_hud")    -- nil if no match
+local in_bounds = lurek.gui.containsPoint(150, 80)  -- true when (150,80) inside widget
+lurek.gui.clearAnchor()                        -- stop stretching, return to manual size
 

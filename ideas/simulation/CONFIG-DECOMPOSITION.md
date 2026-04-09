@@ -1,12 +1,12 @@
 # Configuration Decomposition
 
-> Shows how every configuration concern from the source project maps to TOML, Lua, or Rust defaults in the Luna2D target stack.
+> Shows how every configuration concern from the source project maps to TOML, Lua, or Rust defaults in the Lurek2D target stack.
 
 ---
 
 ## Principle
 
-The source project uses YAML as a single flat file for everything: block topology, behavioral params, anomaly profiles, monitor declarations, resource tables, and system-level config. In Luna2D, these concerns are split across three layers with well-defined ownership:
+The source project uses YAML as a single flat file for everything: block topology, behavioral params, anomaly profiles, monitor declarations, resource tables, and system-level config. In Lurek2D, these concerns are split across three layers with well-defined ownership:
 
 | Layer | Format | Owned by | Role |
 |---|---|---|---|
@@ -44,8 +44,8 @@ fast_forward = false
 ### Lua assembly
 
 ```lua
-local cfg = luna.data.parseToml(luna.fs.read("scenarios/config.toml"))
-local sim = luna.sim.create({ config = cfg.config, blocks = ..., edges = ... })
+local cfg = lurek.data.parseToml(lurek.fs.read("scenarios/config.toml"))
+local sim = lurek.sim.create({ config = cfg.config, blocks = ..., edges = ... })
 ```
 
 ### Rust default
@@ -105,11 +105,11 @@ recovery_timeout  = 20
 Scenario scripts load the catalog and instantiate blocks by reference, overriding per-instance params:
 
 ```lua
-local catalog = luna.data.parseToml(luna.fs.read("catalogs/machines.toml"))
+local catalog = lurek.data.parseToml(lurek.fs.read("catalogs/machines.toml"))
 
 local function machine(id, overrides)
-    local spec = luna.table.deepcopy(catalog.blocks_by_id[id])
-    return luna.table.merge(spec, overrides or {})
+    local spec = lurek.table.deepcopy(catalog.blocks_by_id[id])
+    return lurek.table.merge(spec, overrides or {})
 end
 
 local blocks = {
@@ -241,8 +241,8 @@ severity  = "warn"
 ### Lua assembly
 
 ```lua
-local monitors = luna.data.parseToml(luna.fs.read("scenarios/monitors.toml"))
-local sim = luna.sim.create({
+local monitors = lurek.data.parseToml(lurek.fs.read("scenarios/monitors.toml"))
+local sim = lurek.sim.create({
     blocks = ..., edges = ...,
     monitors = monitors.monitors,
 })
@@ -251,7 +251,7 @@ local sim = luna.sim.create({
 ### Rule
 
 Monitor instrument definitions are static per scenario → **TOML**.
-Dynamic monitor enabling (turning on/off monitors at runtime) → **Lua** via `luna.sim` API (TBD in V2).
+Dynamic monitor enabling (turning on/off monitors at runtime) → **Lua** via `lurek.sim` API (TBD in V2).
 
 ---
 
@@ -298,13 +298,13 @@ value = 50
 ### Lua: scenario selection
 
 ```lua
-local profiles = luna.data.parseToml(luna.fs.read("catalogs/anomalies.toml"))
+local profiles = lurek.data.parseToml(lurek.fs.read("catalogs/anomalies.toml"))
 
 -- Baseline: no anomalies
-local base_sim = luna.sim.create({ blocks = blocks, edges = edges, monitors = monitors })
+local base_sim = lurek.sim.create({ blocks = blocks, edges = edges, monitors = monitors })
 
 -- Anomaly scenario: select named profiles
-local anomaly_sim = luna.sim.create({
+local anomaly_sim = lurek.sim.create({
     blocks   = blocks,
     edges    = edges,
     monitors = monitors,
@@ -317,7 +317,7 @@ local anomaly_sim = luna.sim.create({
 For testing without pre-declaring an anomaly in the spec, inject at runtime:
 
 ```lua
-luna.sim.inject_anomaly(sim, "machine_jam")   -- force-activate a declared anomaly
+lurek.sim.inject_anomaly(sim, "machine_jam")   -- force-activate a declared anomaly
 ```
 
 Note: `inject_anomaly` only works for anomalies declared in the spec. Ad-hoc injection of anomalies not in the spec is not supported in V1.
@@ -328,7 +328,7 @@ Note: `inject_anomaly` only works for anomalies declared in the spec. Ad-hoc inj
 
 Analytics selection lives entirely in **Lua**, not TOML, because:
 - KPI relationships (which monitors to compare, which filter rules to apply) are scenario-specific query logic.
-- `luna.dataframe` already accepts Lua tables and method chaining natively.
+- `lurek.dataframe` already accepts Lua tables and method chaining natively.
 
 ```lua
 local function kpi_throughput(samples_df, block_id)
@@ -361,7 +361,7 @@ blocksim = true
 
 Default: `false` (module is opt-in, consistent with `gui`, `terminal`, etc.).
 
-When `false`: `luna.sim` is nil; scripts using it get a clear nil-check error message from the bridge.
+When `false`: `lurek.sim` is nil; scripts using it get a clear nil-check error message from the bridge.
 
 ---
 

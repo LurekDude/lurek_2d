@@ -1,4 +1,4 @@
-# Luna2D — Philosophy and Design Assumptions
+# Lurek2D — Philosophy and Design Assumptions
 
 > **Source of truth** for first principles, binding architectural decisions, and project identity.
 > Companion documents: [engine-architecture.md](engine-architecture.md) (runtime module structure) · [test-framework.md](test-framework.md) (test architecture).
@@ -27,7 +27,7 @@ These ten principles are the soul of the project. They are not aspirational guid
 
 ### 1. One Executable, One Install
 
-The engine ships as a single binary. No installer, no runtime dependencies, no DLL side-loading, no "install SDK A, then framework B, then plugin C." A user downloads `luna2d` (or `luna2d.exe`), drops it next to `main.lua`, and runs. **~20 MB** target file size, forever.
+The engine ships as a single binary. No installer, no runtime dependencies, no DLL side-loading, no "install SDK A, then framework B, then plugin C." A user downloads `lurek2d` (or `lurek2d.exe`), drops it next to `main.lua`, and runs. **~20 MB** target file size, forever.
 
 This is the David vs. Goliath promise: a 20 MB engine competing with multi-gigabyte toolchains. If a feature would require the user to install a separate component, it either gets statically linked or it doesn't ship.
 
@@ -37,7 +37,7 @@ This is the David vs. Goliath promise: a 20 MB engine competing with multi-gigab
 
 The engine is a runtime. The game is Lua. Everything the game creator touches is `.lua` — logic, configuration, scene definitions, dialogue trees, UI layouts. Rust owns the GPU, the physics solver, and the OS layer. Lua owns everything the player experiences.
 
-The `conf.lua` → `main.lua` → `luna.init()` → `luna.ready()` → main-loop pipeline is the only contract between engine and game. The pipeline ( `luna.process_physics` → `luna.process` → `luna.process_late` → `luna.render` → `luna.render_ui` ) is deliberately structured so that someone — human or AI — can look at it for ten seconds and know where to start.
+The `conf.lua` → `main.lua` → `lurek.init()` → `lurek.ready()` → main-loop pipeline is the only contract between engine and game. The pipeline ( `lurek.process_physics` → `lurek.process` → `lurek.process_late` → `lurek.render` → `lurek.render_ui` ) is deliberately structured so that someone — human or AI — can look at it for ten seconds and know where to start.
 
 → See [engine-architecture.md](engine-architecture.md) § Callback Contract.
 
@@ -56,7 +56,7 @@ The Baseline → Tier 1 → Tier 2 → Tier 3 (Lunasome) layered architecture is
 - Tier 1 depends on Baseline only — no Tier 1 ↔ Tier 1 cross-imports.
 - Tier 2 depends on Baseline + Tier 1 — no Tier 2 ↔ Tier 2 cross-imports.
 - `lua_api` bridges everything — no domain module imports `lua_api`.
-- `library/` (Tier 3) consumes public `luna.*` APIs — no Rust internals.
+- `content/library/` (Tier 3) consumes public `lurek.*` APIs — no Rust internals.
 
 This is a DAG (directed acyclic graph). Circular dependencies are forbidden. Every proposed module must declare its tier before implementation starts.
 
@@ -95,7 +95,7 @@ This means:
 
 ### 8. Blank main.lua Is Valid
 
-An empty `main.lua` produces a black window. No crash, no error, no complaint. Every `luna.*` callback is optional. This is the entry point for beginners: start with nothing, add one thing, see it work.
+An empty `main.lua` produces a black window. No crash, no error, no complaint. Every `lurek.*` callback is optional. This is the entry point for beginners: start with nothing, add one thing, see it work.
 
 This principle constrains API design: every function must have sensible defaults. If a beginner would always pass the same value for a parameter, that value is the default and the parameter is optional.
 
@@ -111,7 +111,7 @@ Trying to support mobile and web would inject conditional compilation, touch-fir
 
 ### 10. Lua Is Synchronous; Rust Is Parallel
 
-From the script author's perspective, every `luna.*` call completes immediately and returns a result. There are no promises, no callbacks-after-callbacks, no async/await. The script is a linear, readable sequence of operations.
+From the script author's perspective, every `lurek.*` call completes immediately and returns a result. There are no promises, no callbacks-after-callbacks, no async/await. The script is a linear, readable sequence of operations.
 
 Behind the scenes, Rust runs background threads for audio decoding, physics stepping, and worker tasks. But the Lua VM never sees them. Cross-thread communication happens through `Channel` objects — a typed, thread-safe MPMC queue with `push`, `pop`, and `demand` (blocking pop).
 
@@ -123,28 +123,28 @@ Each worker thread gets its own Lua VM. Lua VMs cannot share state. This elimina
 
 ## Core Idea
 
-Luna2D is the engine for people who think game engines have become too complicated.
+Lurek2D is the engine for people who think game engines have become too complicated.
 
-A game is a `main.lua` file. The engine runs it. You write Lua; the engine owns the GPU, the physics solver, the audio mixer, and the threading model. You never see a `.dll`, a `.framework`, or a build system. You see `luna.process(dt)` and `luna.render()`.
+A game is a `main.lua` file. The engine runs it. You write Lua; the engine owns the GPU, the physics solver, the audio mixer, and the threading model. You never see a `.dll`, a `.framework`, or a build system. You see `lurek.process(dt)` and `lurek.render()`.
 
-The competitive landscape is dominated by multi-gigabyte engines with visual editors, plugin marketplaces, and months-long learning curves. Luna2D is the opposite: one binary, one scripting language, one afternoon to learn.
+The competitive landscape is dominated by multi-gigabyte engines with visual editors, plugin marketplaces, and months-long learning curves. Lurek2D is the opposite: one binary, one scripting language, one afternoon to learn.
 
-**The AI angle**: Luna2D is the first game engine designed with AI copilots as first-class users. Every API is shaped so an AI agent can use it correctly from the docs alone. The CAG layer, the VS Code extension, and the documentation pipeline are all optimized for AI-assisted workflow. When an AI writes `luna.gfx.draw(img, x, y)`, it should work on the first try, every time.
+**The AI angle**: Lurek2D is the first game engine designed with AI copilots as first-class users. Every API is shaped so an AI agent can use it correctly from the docs alone. The CAG layer, the VS Code extension, and the documentation pipeline are all optimized for AI-assisted workflow. When an AI writes `lurek.gfx.draw(img, x, y)`, it should work on the first try, every time.
 
 ---
 
 ## Project Identity
 
-Luna2D's visual identity is built on a set of symbols that tell the David vs. Goliath story:
+Lurek2D's visual identity is built on a set of symbols that tell the David vs. Goliath story:
 
 | Symbol | Meaning | Where It Appears |
 |---|---|---|
 | 🌙 Crescent Moon | Lua (Portuguese for "moon") — the scripting surface | Logo, splash screen |
 | ⚙️ Gear / Pacman shape | Rust engine core — industrial-strength, consuming scripts | Logo (primary shape) |
-| 🧊 Small Cube | The industry giants (Unity, Unreal, Godot) — orbiting Luna2D | Logo (accent) |
+| 🧊 Small Cube | The industry giants (Engine G, Engine H, Engine C) — orbiting Lurek2D | Logo (accent) |
 | Deep blue + orange palette | Night sky + warm engine glow | All branding materials |
 
-**Naming convention**: "Luna" (engine) + "2D" (scope constraint). Short form: `luna2d`. Binary name: `luna2d` (Unix), `luna2d.exe` (Windows). Lua API prefix: `luna.*`.
+**Naming convention**: "Luna" (engine) + "2D" (scope constraint). Short form: `lurek2d`. Binary name: `lurek2d` (Unix), `lurek2d.exe` (Windows). Lua API prefix: `lurek.*`.
 
 ---
 
@@ -170,7 +170,7 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 
 | ID | Status | Constraint |
 |---|---|---|
-| **A-01** | Active | Luna2D is a **runtime only** — no embedded visual editor or IDE. The VS Code extension is an opt-in developer experience layer, not part of the engine binary. |
+| **A-01** | Active | Lurek2D is a **runtime only** — no embedded visual editor or IDE. The VS Code extension is an opt-in developer experience layer, not part of the engine binary. |
 | **A-02** | Active | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope. |
 | **A-03** | Active | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls. |
 | **A-04** | Active | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the Baseline → Tier 1 → Tier 2 → Tier 3 stack. |
@@ -195,11 +195,11 @@ These constraints formalize the [layer model](engine-architecture.md#active-laye
 
 | ID | Status | Constraint |
 |---|---|---|
-| **T-01** | Active | The active module stack is **Baseline + Tier 1 + Tier 2 + Tier 3**. Baseline is the always-on runtime substrate (`src/math/`, `src/engine/`). Tier 3 is **Lunasome**, the pure-Lua standard library (`library/`). |
-| **T-02** | Active | `lua_api` is the **bridge layer** that registers `luna.*`. It is not a numbered tier. It may import all Rust tiers. |
+| **T-01** | Active | The active module stack is **Baseline + Tier 1 + Tier 2 + Tier 3**. Baseline is the always-on runtime substrate (`src/math/`, `src/engine/`). Tier 3 is **Lunasome**, the pure-Lua standard library (`content/library/`). |
+| **T-02** | Active | `lua_api` is the **bridge layer** that registers `lurek.*`. It is not a numbered tier. It may import all Rust tiers. |
 | **T-03** | Active | **Tier 1** Rust modules may only import `math` and `engine`. No Tier 1 ↔ Tier 1 cross-imports. |
 | **T-04** | Active | **Tier 2** Rust modules may import `math`, `engine`, and any Tier 1 module. No Tier 2 ↔ Tier 2 cross-imports. |
-| **T-05** | Active | **Tier 3** consists of pure-Lua libraries under `library/`. They consume public `luna.*` APIs and must not depend on Rust engine internals. |
+| **T-05** | Active | **Tier 3** consists of pure-Lua libraries under `content/library/`. They consume public `lurek.*` APIs and must not depend on Rust engine internals. |
 | **T-06** | Active | No Rust domain module may import `lua_api`. The `lua_api` crate is the integration endpoint, not a dependency. |
 | **T-07** | Active | Legacy gameplay-oriented Rust modules still under `src/` are **migration-state**. Keep them buildable but do not document them as the current Tier 3 layer. Do not add features to them. |
 | **T-08** | Proposed | Future Cargo feature flags may expose Baseline / Core / Extended / Lunasome build variants corresponding to the active layer model. Not yet implemented. |
@@ -210,10 +210,10 @@ These constraints formalize the [layer model](engine-architecture.md#active-laye
 
 | ID | Status | Constraint |
 |---|---|---|
-| **C-01** | Active | All Lua-facing APIs live under the `luna.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables. |
+| **C-01** | Active | All Lua-facing APIs live under the `lurek.*` namespace. No bare globals, no engine-prefixed names, no alternative top-level tables. |
 | **C-02** | Active | Every `lua_api` sub-module exposes exactly one `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`. |
 | **C-03** | Active | API functions must have **sensible defaults** — never require parameters a beginner would always pass as the same value. Overloaded param counts are preferred over config tables for simple APIs. |
-| **C-04** | Active | Every callback (`luna.init`, `luna.ready`, `luna.process`, `luna.process_physics`, `luna.process_late`, `luna.render`, `luna.render_ui`, `luna.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
+| **C-04** | Active | Every callback (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.render`, `lurek.render_ui`, `lurek.keypressed`, etc.) is **optional**. An empty `main.lua` is a valid game. |
 | **C-05** | Active | Lua API is **synchronous from the script's perspective**. Any asynchronous work happens in Rust threads and communicates results via `Channel`. The Lua VM never blocks on I/O or network. |
 
 ---
@@ -225,7 +225,7 @@ These constraints formalize the [layer model](engine-architecture.md#active-laye
 | **Q-01** | Active | `cargo test` must exit 0 before any merge. All Rust and Lua tests must pass. |
 | **Q-02** | Active | `cargo clippy -- -D warnings` must exit 0 before any merge. No suppressed warnings, no `#[allow(clippy::...)]` without a comment explaining why. |
 | **Q-03** | Active | Every new public Rust API item (`pub fn`, `pub struct`, `pub enum`, `pub trait`) requires at least **one integration test** before merge. |
-| **Q-04** | Active | Every new `luna.*` Lua API function requires at least **one Lua BDD test** before merge. |
+| **Q-04** | Active | Every new `lurek.*` Lua API function requires at least **one Lua BDD test** before merge. |
 | **Q-05** | Active | `python tools/collect_docs.py --report-missing` must exit 0 — no undocumented public items. Every `pub fn`, `pub struct`, `pub enum`, `pub trait`, and `pub type` must have a `///` doc comment. |
 
 → See [test-framework.md](test-framework.md) § Quality Gates for the complete test gate details.

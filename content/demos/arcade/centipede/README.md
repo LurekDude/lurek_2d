@@ -5,10 +5,10 @@ Mushrooms block bullets and redirect the worm. Watch for bonus spiders!
 
 ## What It Demonstrates
 
-- `luna.gfx.circle()` / `luna.gfx.rectangle()` — mushrooms, centipede segments, player
-- `luna.input.isKeyDown()` — 4-directional player movement in player zone
-- `luna.keypressed()` — rapid-fire shooting with cooldown
-- `luna.gfx.print()` — HUD with score, lives, and wave
+- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` — mushrooms, centipede segments, player
+- `lurek.input.isKeyDown()` — 4-directional player movement in player zone
+- `lurek.keypressed()` — rapid-fire shooting with cooldown
+- `lurek.gfx.print()` — HUD with score, lives, and wave
 - Grid-based centipede pathfinding that reverses and descends on obstacles
 
 ## Controls

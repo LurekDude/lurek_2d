@@ -1,7 +1,7 @@
--- Sensible Soccer — Amiga 500 Classic (Luna2D demo)
+-- Sensible Soccer — Amiga 500 Classic (Lurek2D demo)
 -- Fast-paced top-down football inspired by Sensible Software's 1992 Amiga classic.
 -- Score more goals than the CPU in 3 minutes to win.
--- Run with: cargo run -- demos/retro/sensible_soccer
+-- Run with: cargo run -- content/demos/retro/sensible_soccer
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -99,14 +99,14 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.2, 0.55, 0.15)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.2, 0.55, 0.15)
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
     time_left = time_left - dt
@@ -116,10 +116,10 @@ function luna.process(dt)
     -- Controlled player movement
     local p = team[controlled]
     local pvx, pvy = 0, 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a")  then pvx = -PLAYER_SPD end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then pvx =  PLAYER_SPD end
-    if luna.input.isKeyDown("up") or luna.input.isKeyDown("w")    then pvy = -PLAYER_SPD end
-    if luna.input.isKeyDown("down") or luna.input.isKeyDown("s")  then pvy =  PLAYER_SPD end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a")  then pvx = -PLAYER_SPD end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then pvx =  PLAYER_SPD end
+    if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w")    then pvy = -PLAYER_SPD end
+    if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s")  then pvy =  PLAYER_SPD end
 
     if pvx ~= 0 and pvy ~= 0 then pvx = pvx * 0.707; pvy = pvy * 0.707 end
     p.x = clamp(p.x + pvx * dt, PX + 8, PX + PW - 8)
@@ -203,105 +203,105 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Pitch
-    luna.gfx.setColor(0.16, 0.52, 0.12)
-    luna.gfx.rectangle("fill", PX, PY, PW, PH)
+    lurek.gfx.setColor(0.16, 0.52, 0.12)
+    lurek.gfx.rectangle("fill", PX, PY, PW, PH)
     -- Striped grass
     for i = 0, 9 do
         if i % 2 == 0 then
-            luna.gfx.setColor(0.2, 0.56, 0.15, 0.4)
-            luna.gfx.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
+            lurek.gfx.setColor(0.2, 0.56, 0.15, 0.4)
+            lurek.gfx.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
         end
     end
     -- Lines
-    luna.gfx.setColor(1, 1, 1, 0.8)
-    luna.gfx.rectangle("line", PX, PY, PW, PH)
-    luna.gfx.line(PX + PW/2, PY, PX + PW/2, PY + PH)
-    luna.gfx.circle("line", PX + PW/2, PY + PH/2, 50)
+    lurek.gfx.setColor(1, 1, 1, 0.8)
+    lurek.gfx.rectangle("line", PX, PY, PW, PH)
+    lurek.gfx.line(PX + PW/2, PY, PX + PW/2, PY + PH)
+    lurek.gfx.circle("line", PX + PW/2, PY + PH/2, 50)
     -- Goals
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
-    luna.gfx.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    lurek.gfx.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
     -- Penalty areas
-    luna.gfx.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
-    luna.gfx.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
+    lurek.gfx.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
+    lurek.gfx.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
 
     -- CPU team (red)
     for i, cp in ipairs(cpu) do
-        luna.gfx.setColor(0.85, 0.15, 0.15)
-        luna.gfx.circle("fill", cp.x, cp.y, 9)
-        luna.gfx.setColor(0, 0, 0)
-        luna.gfx.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
+        lurek.gfx.setColor(0.85, 0.15, 0.15)
+        lurek.gfx.circle("fill", cp.x, cp.y, 9)
+        lurek.gfx.setColor(0, 0, 0)
+        lurek.gfx.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
     end
 
     -- Player team (blue)
     for i, p in ipairs(team) do
         local sel = i == controlled
-        luna.gfx.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
-        luna.gfx.circle("fill", p.x, p.y, 9)
+        lurek.gfx.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
+        lurek.gfx.circle("fill", p.x, p.y, 9)
         if sel then
-            luna.gfx.setColor(1, 1, 0)
-            luna.gfx.circle("line", p.x, p.y, 12)
+            lurek.gfx.setColor(1, 1, 0)
+            lurek.gfx.circle("line", p.x, p.y, 12)
         end
-        luna.gfx.setColor(0, 0, 0)
-        luna.gfx.print(tostring(i), p.x - 4, p.y - 6, 1.1)
+        lurek.gfx.setColor(0, 0, 0)
+        lurek.gfx.print(tostring(i), p.x - 4, p.y - 6, 1.1)
     end
 
     -- Ball
     local bs = 0.6 + 0.4 * math.sin(anim * 10)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.circle("fill", ball.x, ball.y, 7)
-    luna.gfx.setColor(0, 0, 0)
-    luna.gfx.circle("line", ball.x, ball.y, 7)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.circle("fill", ball.x, ball.y, 7)
+    lurek.gfx.setColor(0, 0, 0)
+    lurek.gfx.circle("line", ball.x, ball.y, 7)
     -- Spinning pattern
-    luna.gfx.setColor(0.2, 0.2, 0.2)
-    luna.gfx.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
+    lurek.gfx.setColor(0.2, 0.2, 0.2)
+    lurek.gfx.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, 0, W, 42)
-    luna.gfx.setColor(0.4, 0.6, 1)
-    luna.gfx.print("YOU", 20, 5, 2)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
-    luna.gfx.setColor(1, 0.4, 0.4)
-    luna.gfx.print("CPU", W - 70, 5, 2)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, 0, W, 42)
+    lurek.gfx.setColor(0.4, 0.6, 1)
+    lurek.gfx.print("YOU", 20, 5, 2)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
+    lurek.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.print("CPU", W - 70, 5, 2)
     local mins = math.floor(time_left / 60)
     local secs = math.floor(time_left % 60)
-    luna.gfx.setColor(1, 0.9, 0.3)
-    luna.gfx.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
+    lurek.gfx.setColor(1, 0.9, 0.3)
+    lurek.gfx.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
 
-    luna.gfx.setColor(0.6, 0.8, 0.6, 0.6)
-    luna.gfx.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
+    lurek.gfx.setColor(0.6, 0.8, 0.6, 0.6)
+    lurek.gfx.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
 
     -- Kickoff flash
     if kickoff_timer > 0 then
-        luna.gfx.setColor(1, 1, 0.3, kickoff_timer)
-        luna.gfx.print("GOAL!", W/2 - 35, H/2 - 15, 4)
+        lurek.gfx.setColor(1, 1, 0.3, kickoff_timer)
+        lurek.gfx.print("GOAL!", W/2 - 35, H/2 - 15, 4)
     end
 
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
         local msg = scores.player > scores.cpu and "YOU WIN!" or
                     scores.player < scores.cpu and "CPU WINS" or "DRAW!"
         local col = scores.player > scores.cpu and {0.3,1,0.4} or
                     scores.player < scores.cpu and {1,0.3,0.3} or {1,1,0.4}
-        luna.gfx.setColor(col[1], col[2], col[3])
-        luna.gfx.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
+        lurek.gfx.setColor(col[1], col[2], col[3])
+        lurek.gfx.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if game_state ~= "playing" or kickoff_timer > 0 then return end
     local p = team[controlled]
     if key == "space" then

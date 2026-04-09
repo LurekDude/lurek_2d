@@ -1,6 +1,6 @@
-//! Integration tests for `luna2d::localization` — catalog, interpolation, plural forms.
+//! Integration tests for `lurek2d::localization` — catalog, interpolation, plural forms.
 
-use luna2d::localization::*;
+use lurek2d::localization::*;
 use std::collections::HashMap;
 
 // ── Catalog ───────────────────────────────────────────────────────────────────

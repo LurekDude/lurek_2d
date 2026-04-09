@@ -1,4 +1,4 @@
-//! `luna.audio` -- Audio playback, mixing, MIDI synthesis, and DSP effects.
+//! `lurek.audio` -- Audio playback, mixing, MIDI synthesis, and DSP effects.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1053,7 +1053,7 @@ impl LuaUserData for LuaDecoder {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.audio` API table with the Lua VM.
+/// Registers the `lurek.audio` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
@@ -1081,7 +1081,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     _ => None,
                 })
                 .ok_or_else(|| {
-                    LuaError::RuntimeError("luna.audio.newSource: path required".into())
+                    LuaError::RuntimeError("lurek.audio.newSource: path required".into())
                 })?;
             let source_type = args
                 .get(1)
@@ -1114,7 +1114,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (id_val, options): (LuaValue, Option<mlua::Table>)| {
                 let mut st = s.borrow_mut();
-                let key = require_sound_key(&st, &id_val, "luna.audio.play")?;
+                let key = require_sound_key(&st, &id_val, "lurek.audio.play")?;
                 if let Some(opts) = options {
                     if let Ok(bus_name) = opts.get::<_, String>("bus") {
                         if let Some(bus) = st.mixer.get_bus_by_name(&bus_name) {
@@ -1140,7 +1140,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "stop",
         lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.stop")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.stop")?;
             st.mixer.stop(key);
             Ok(())
         })?,
@@ -1156,7 +1156,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setVolume",
         lua.create_function(move |_, (id_val, vol): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setVolume")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setVolume")?;
             st.mixer.set_volume(key, vol);
             Ok(())
         })?,
@@ -1171,7 +1171,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getVolume",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getVolume")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getVolume")?;
             Ok(st.mixer.get_volume(key))
         })?,
     )?;
@@ -1185,7 +1185,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "pause",
         lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.pause")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.pause")?;
             st.mixer.pause(key);
             Ok(())
         })?,
@@ -1200,7 +1200,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "resume",
         lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.resume")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.resume")?;
             st.mixer.resume(key);
             Ok(())
         })?,
@@ -1216,7 +1216,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setPitch",
         lua.create_function(move |_, (id_val, pitch): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setPitch")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setPitch")?;
             st.mixer.set_pitch(key, pitch);
             Ok(())
         })?,
@@ -1231,7 +1231,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getPitch",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getPitch")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getPitch")?;
             Ok(st.mixer.get_pitch(key))
         })?,
     )?;
@@ -1245,7 +1245,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "isPlaying",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.isPlaying")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.isPlaying")?;
             Ok(st.mixer.is_playing(key))
         })?,
     )?;
@@ -1259,7 +1259,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "isPaused",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.isPaused")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.isPaused")?;
             Ok(st.mixer.is_paused(key))
         })?,
     )?;
@@ -1273,7 +1273,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "isStopped",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.isStopped")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.isStopped")?;
             Ok(st.mixer.is_stopped(key))
         })?,
     )?;
@@ -1288,7 +1288,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setLooping",
         lua.create_function(move |_, (id_val, looping): (LuaValue, bool)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setLooping")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setLooping")?;
             st.mixer.set_looping(key, looping);
             Ok(())
         })?,
@@ -1303,7 +1303,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "isLooping",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.isLooping")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.isLooping")?;
             Ok(st.mixer.is_looping(key))
         })?,
     )?;
@@ -1317,7 +1317,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "playLooping",
         lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.playLooping")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.playLooping")?;
             let game_dir = st.game_dir.clone();
             st.mixer.play_looping(key, &game_dir);
             Ok(())
@@ -1334,7 +1334,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setPan",
         lua.create_function(move |_, (id_val, pan): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setPan")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setPan")?;
             st.mixer.set_pan(key, pan);
             Ok(())
         })?,
@@ -1349,7 +1349,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getPan",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getPan")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getPan")?;
             Ok(st.mixer.get_pan(key))
         })?,
     )?;
@@ -1408,7 +1408,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Some(SourceType::Static) => Ok("static".to_string()),
                 Some(SourceType::Stream) => Ok("stream".to_string()),
                 None => Err(LuaError::RuntimeError(
-                    "luna.audio.getSourceType: invalid source handle".into(),
+                    "lurek.audio.getSourceType: invalid source handle".into(),
                 )),
             }
         })?,
@@ -1430,7 +1430,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     key: new_key,
                 }),
                 None => Err(LuaError::RuntimeError(
-                    "luna.audio.clone: invalid source handle".into(),
+                    "lurek.audio.clone: invalid source handle".into(),
                 )),
             }
         })?,
@@ -1486,7 +1486,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Ok(true)
             } else {
                 Err(LuaError::RuntimeError(
-                    "luna.audio.release: invalid or already-released audio source handle".into(),
+                    "lurek.audio.release: invalid or already-released audio source handle".into(),
                 ))
             }
         })?,
@@ -1526,7 +1526,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 }
                 _ => {
                     return Err(LuaError::RuntimeError(
-                        "luna.audio.setSourceBus: expected Bus userdata".into(),
+                        "lurek.audio.setSourceBus: expected Bus userdata".into(),
                     ));
                 }
             };
@@ -1572,7 +1572,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getDuration",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getDuration")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getDuration")?;
             Ok(st.mixer.get_duration(key))
         })?,
     )?;
@@ -1586,7 +1586,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "tell",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.tell")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.tell")?;
             Ok(st.mixer.get_tell(key))
         })?,
     )?;
@@ -1601,7 +1601,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "seek",
         lua.create_function(move |_, (id_val, pos): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.seek")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.seek")?;
             let game_dir = st.game_dir.clone();
             st.mixer.seek(key, pos, &game_dir);
             Ok(())
@@ -1618,7 +1618,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setLowpass",
         lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setLowpass")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setLowpass")?;
             st.mixer.set_lowpass(key, cutoff_hz);
             Ok(())
         })?,
@@ -1634,7 +1634,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "setHighpass",
         lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.setHighpass")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.setHighpass")?;
             st.mixer.set_highpass(key, cutoff_hz);
             Ok(())
         })?,
@@ -1649,7 +1649,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getLowpass",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getLowpass")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getLowpass")?;
             Ok(st.mixer.get_lowpass(key))
         })?,
     )?;
@@ -1663,7 +1663,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getHighpass",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getHighpass")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getHighpass")?;
             Ok(st.mixer.get_highpass(key))
         })?,
     )?;
@@ -1677,7 +1677,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "clearFilter",
         lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.clearFilter")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.clearFilter")?;
             st.mixer.clear_filter(key);
             Ok(())
         })?,
@@ -1693,7 +1693,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "fadeIn",
         lua.create_function(move |_, (id_val, dur): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
-            let key = require_sound_key(&st, &id_val, "luna.audio.fadeIn")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.fadeIn")?;
             st.mixer.set_fade_in(key, dur);
             Ok(())
         })?,
@@ -1708,7 +1708,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getFadeIn",
         lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
-            let key = require_sound_key(&st, &id_val, "luna.audio.getFadeIn")?;
+            let key = require_sound_key(&st, &id_val, "lurek.audio.getFadeIn")?;
             Ok(st.mixer.get_fade_in(key))
         })?,
     )?;
@@ -1938,7 +1938,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "setMeter",
         lua.create_function(|_, _scale: f32| {
-            log_msg!(debug, LA01_API_STUB, "luna.audio.setMeter");
+            log_msg!(debug, LA01_API_STUB, "lurek.audio.setMeter");
             Ok(())
         })?,
     )?;
@@ -1949,7 +1949,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "getMeter",
         lua.create_function(|_, ()| {
-            log_msg!(debug, LA01_API_STUB, "luna.audio.getMeter");
+            log_msg!(debug, LA01_API_STUB, "lurek.audio.getMeter");
             Ok(1.0_f32)
         })?,
     )?;

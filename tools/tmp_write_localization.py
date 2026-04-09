@@ -1,7 +1,7 @@
 import os
 
-path = r'c:\Users\tombl\Documents\luna2d\src\lua_api\localization_api.rs'
-content = r'''//! Registers the `luna.localization.*` internationalization and localization API.
+path = r'c:\Users\tombl\Documents\lurek2d\src\lua_api\localization_api.rs'
+content = r'''//! Registers the `lurek.localization.*` internationalization and localization API.
 //!
 //! Thin Lua bridge that delegates to the [`localization`][crate::localization] domain module.
 //! All translation tables, fallback logic, interpolation, and pluralization live
@@ -69,7 +69,7 @@ fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, Str
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `luna.localization.*`.
+/// Registers `lurek.localization.*`.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -274,7 +274,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(())
     })?)?;
 
-    luna.set("localization", loc)?;
+    lurek.set("localization", loc)?;
     Ok(())
 }
 '''

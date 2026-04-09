@@ -1,10 +1,10 @@
-# Luna2D Game Developer CAG Layer
+# Lurek2D Game Developer CAG Layer
 
-AI-first workflow layer for game developers using Luna2D.
+AI-first workflow layer for game developers using Lurek2D.
 
 ## Purpose
 This is NOT for engine developers. These agents, skills, prompts, and
-instructions help people MAKING GAMES with Luna2D.
+instructions help people MAKING GAMES with Lurek2D.
 
 ## Components
 - **11 Agents**: Specialized roles for game development tasks

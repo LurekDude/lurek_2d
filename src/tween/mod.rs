@@ -2,7 +2,7 @@
 //!
 //! # Purpose
 //!
-//! This module provides the pure-Rust numeric layer for the Luna2D tween system.
+//! This module provides the pure-Rust numeric layer for the Lurek2D tween system.
 //! It is a Tier 1 Engine Subsystem — it depends only on `crate::math` (specifically
 //! `crate::math::easing`) and has no Lua or engine lifecycle dependencies.
 //!
@@ -12,7 +12,7 @@
 //!   the eased interpolation factor `t` for a given playback position.
 //! - `resolve_easing` — maps human-readable easing names to `fn(f32) -> f32` pointers.
 //! - `builtin_easing_names` — returns the full list of built-in easing names for Lua
-//!   introspection via `luna.tween.getEasingNames()`.
+//!   introspection via `lurek.tween.getEasingNames()`.
 //!
 //! # Architecture note
 //!

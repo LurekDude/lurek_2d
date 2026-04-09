@@ -3,7 +3,7 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use luna2d::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
+use lurek2d::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
 
 // ============================================================
 // NavGrid

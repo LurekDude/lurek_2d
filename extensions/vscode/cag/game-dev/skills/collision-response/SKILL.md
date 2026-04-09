@@ -1,10 +1,10 @@
 # Collision Response
 
-Physics body callbacks, bounce, slide, one-way platforms, slopes, damage zones, and triggers using luna.physics.
+Physics body callbacks, bounce, slide, one-way platforms, slopes, damage zones, and triggers using lurek.physics.
 
 ## Key Concepts
 
-- **Contact callbacks**: Use `luna.physics.setCallbacks` to react to collision begin/end events.
+- **Contact callbacks**: Use `lurek.physics.setCallbacks` to react to collision begin/end events.
 - **Bounce**: Reflect velocity on contact normal. Scale by restitution coefficient.
 - **Slide**: Zero out the velocity component along the collision normal, preserve the tangential component.
 - **One-way platforms**: In collision callback, ignore contacts where player is moving upward or below the platform.
@@ -13,10 +13,10 @@ Physics body callbacks, bounce, slide, one-way platforms, slopes, damage zones, 
 ## Contact Callbacks
 
 ```lua
-luna.physics.setCallbacks(
+lurek.physics.setCallbacks(
     function(a, b, contact)  -- beginContact
-        local data_a = luna.physics.getUserData(a)
-        local data_b = luna.physics.getUserData(b)
+        local data_a = lurek.physics.getUserData(a)
+        local data_b = lurek.physics.getUserData(b)
         if data_a == "player" and data_b == "spike" then
             take_damage(1)
         end
@@ -31,14 +31,14 @@ luna.physics.setCallbacks(
 
 ```lua
 -- In preSolve callback: disable contact if player is below platform
-luna.physics.setPreSolve(function(a, b, contact)
-    local da = luna.physics.getUserData(a)
-    local db = luna.physics.getUserData(b)
+lurek.physics.setPreSolve(function(a, b, contact)
+    local da = lurek.physics.getUserData(a)
+    local db = lurek.physics.getUserData(b)
     if db == "oneway" then
-        local _, py = luna.physics.getPosition(a)
-        local _, platy = luna.physics.getPosition(b)
+        local _, py = lurek.physics.getPosition(a)
+        local _, platy = lurek.physics.getPosition(b)
         if py > platy then
-            luna.physics.setContactEnabled(contact, false)
+            lurek.physics.setContactEnabled(contact, false)
         end
     end
 end)
@@ -48,22 +48,22 @@ end)
 
 ```lua
 local function bounce(body, nx, ny, restitution)
-    local vx, vy = luna.physics.getLinearVelocity(body)
+    local vx, vy = lurek.physics.getLinearVelocity(body)
     local dot = vx * nx + vy * ny
     vx = vx - 2 * dot * nx * restitution
     vy = vy - 2 * dot * ny * restitution
-    luna.physics.setLinearVelocity(body, vx, vy)
+    lurek.physics.setLinearVelocity(body, vx, vy)
 end
 ```
 
 ## Damage Zone (Sensor)
 
 ```lua
-local zone = luna.physics.newBody(world, 200, 300, "static")
-local shape = luna.physics.newRectangleShape(32, 32)
-local fixture = luna.physics.newFixture(zone, shape)
-luna.physics.setSensor(fixture, true)
-luna.physics.setUserData(zone, "lava")
+local zone = lurek.physics.newBody(world, 200, 300, "static")
+local shape = lurek.physics.newRectangleShape(32, 32)
+local fixture = lurek.physics.newFixture(zone, shape)
+lurek.physics.setSensor(fixture, true)
+lurek.physics.setUserData(zone, "lava")
 ```
 
 ## Ladder Trigger

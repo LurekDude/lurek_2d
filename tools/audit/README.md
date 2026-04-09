@@ -8,7 +8,7 @@ coverage — producing reports that tell you what still needs work.
 | Script | Purpose | Output |
 |---|---|---|
 | `audit_module.py` | End-to-end quality audit for a module (PASS/WARN/ERROR) | stdout / JSON |
-| `count_gaps.py` | Count missing-doc items per `luna.*` module | stdout |
+| `count_gaps.py` | Count missing-doc items per `lurek.*` module | stdout |
 | `doc_audit.py` | Audit Rust `///` doc comment quality | stdout / JSON |
 | `doc_coverage.py` | Rust + Lua docstring coverage analytics | `docs/logs/doc_coverage.json` |
 | `docstring_audit.py` | Detailed per-file docstring audit | `docs/logs/docstring_audit.json` |

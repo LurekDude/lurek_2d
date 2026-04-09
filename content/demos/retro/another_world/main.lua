@@ -1,7 +1,7 @@
--- Another World — Amiga 500 Classic (Luna2D demo)
+-- Another World — Amiga 500 Classic (Lurek2D demo)
 -- Cinematic puzzle-platformer inspired by Eric Chahi's 1991 masterpiece.
 -- Survive an alien planet using your energy gun: fire, shield, and super-shot.
--- Run with: cargo run -- demos/retro/another_world
+-- Run with: cargo run -- content/demos/retro/another_world
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -97,15 +97,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.28)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.28)
     score = 0
     load_scene(1)
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
     caption_timer = math.max(0, caption_timer - dt)
@@ -113,13 +113,13 @@ function luna.process(dt)
 
     -- ── Player movement ───────────────────────────────────────────────────
     local mv = 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a")  then mv = -1 end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then mv =  1 end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a")  then mv = -1 end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then mv =  1 end
     if mv ~= 0 then player.facing = mv end
     player.vx = mv * WALK_SPD
 
     -- Shield active
-    player.shield_active = luna.input.isKeyDown("z") and player.shield_count > 0
+    player.shield_active = lurek.input.isKeyDown("z") and player.shield_count > 0
     if player.shield_active then
         player.shield_timer = player.shield_timer + dt
         if player.shield_timer >= SHIELD_TIME then
@@ -204,37 +204,37 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     local sc = SCENES[current_scene]
 
     -- Sky gradient blocks (simplified)
-    luna.gfx.setColor(COLORS.sky_top[1], COLORS.sky_top[2], COLORS.sky_top[3])
-    luna.gfx.rectangle("fill", 0, 0, W, H / 2)
-    luna.gfx.setColor(COLORS.sky_bottom[1], COLORS.sky_bottom[2], COLORS.sky_bottom[3])
-    luna.gfx.rectangle("fill", 0, H/2, W, H/2)
+    lurek.gfx.setColor(COLORS.sky_top[1], COLORS.sky_top[2], COLORS.sky_top[3])
+    lurek.gfx.rectangle("fill", 0, 0, W, H / 2)
+    lurek.gfx.setColor(COLORS.sky_bottom[1], COLORS.sky_bottom[2], COLORS.sky_bottom[3])
+    lurek.gfx.rectangle("fill", 0, H/2, W, H/2)
 
     -- Background silhouette shapes
-    luna.gfx.setColor(0.12, 0.07, 0.22)
-    luna.gfx.rectangle("fill", 0, H/2 - 40, W, 80)
+    lurek.gfx.setColor(0.12, 0.07, 0.22)
+    lurek.gfx.rectangle("fill", 0, H/2 - 40, W, 80)
     for i = 0, 6 do
         local h2 = 60 + math.sin(i * 2.7) * 30
-        luna.gfx.rectangle("fill", i * 120 - 20, H/2 - 40 - h2, 90, h2)
+        lurek.gfx.rectangle("fill", i * 120 - 20, H/2 - 40 - h2, 90, h2)
     end
 
     -- Platforms
     for _, p in ipairs(sc.platforms) do
-        luna.gfx.setColor(COLORS.ground[1], COLORS.ground[2], COLORS.ground[3])
-        luna.gfx.rectangle("fill", p[1], p[2], p[3], p[4])
-        luna.gfx.setColor(COLORS.ground_hi[1], COLORS.ground_hi[2], COLORS.ground_hi[3])
-        luna.gfx.rectangle("fill", p[1], p[2], p[3], 4)
+        lurek.gfx.setColor(COLORS.ground[1], COLORS.ground[2], COLORS.ground[3])
+        lurek.gfx.rectangle("fill", p[1], p[2], p[3], p[4])
+        lurek.gfx.setColor(COLORS.ground_hi[1], COLORS.ground_hi[2], COLORS.ground_hi[3])
+        lurek.gfx.rectangle("fill", p[1], p[2], p[3], 4)
     end
 
     -- Exits (glow)
     for _, ex in ipairs(sc.exits) do
         local show = not enemy.alive
         if show then
-            luna.gfx.setColor(0.1, 0.8, 0.9, 0.5 + 0.5 * math.sin(anim * 3))
-            luna.gfx.rectangle("fill", ex.x, ex.y, ex.w, ex.h)
+            lurek.gfx.setColor(0.1, 0.8, 0.9, 0.5 + 0.5 * math.sin(anim * 3))
+            lurek.gfx.rectangle("fill", ex.x, ex.y, ex.w, ex.h)
         end
     end
 
@@ -242,91 +242,91 @@ function luna.render()
     if enemy.alive then
         -- Shield glow
         if enemy.shield_active then
-            luna.gfx.setColor(0.8, 0.3, 0.1, 0.4)
-            luna.gfx.circle("fill", enemy.x + enemy.w/2, enemy.y + enemy.h/2, 30)
+            lurek.gfx.setColor(0.8, 0.3, 0.1, 0.4)
+            lurek.gfx.circle("fill", enemy.x + enemy.w/2, enemy.y + enemy.h/2, 30)
         end
-        luna.gfx.setColor(0.3, 0.6, 0.35)
-        luna.gfx.rectangle("fill", enemy.x + 4, enemy.y + 14, enemy.w - 8, enemy.h - 14)
-        luna.gfx.setColor(0.2, 0.45, 0.25)
-        luna.gfx.circle("fill", enemy.x + enemy.w/2, enemy.y + 12, 14)
+        lurek.gfx.setColor(0.3, 0.6, 0.35)
+        lurek.gfx.rectangle("fill", enemy.x + 4, enemy.y + 14, enemy.w - 8, enemy.h - 14)
+        lurek.gfx.setColor(0.2, 0.45, 0.25)
+        lurek.gfx.circle("fill", enemy.x + enemy.w/2, enemy.y + 12, 14)
         -- Eyes
         local ex2 = enemy.facing > 0 and enemy.x + enemy.w - 10 or enemy.x + 6
-        luna.gfx.setColor(1, 0.3, 0)
-        luna.gfx.circle("fill", ex2, enemy.y + 10, 4)
+        lurek.gfx.setColor(1, 0.3, 0)
+        lurek.gfx.circle("fill", ex2, enemy.y + 10, 4)
         -- HP
-        luna.gfx.setColor(0.8, 0.2, 0.2)
-        luna.gfx.rectangle("fill", enemy.x, enemy.y - 8, enemy.w, 5)
-        luna.gfx.setColor(0.1, 0.9, 0.2)
-        luna.gfx.rectangle("fill", enemy.x, enemy.y - 8, enemy.w * (enemy.hp / 3), 5)
+        lurek.gfx.setColor(0.8, 0.2, 0.2)
+        lurek.gfx.rectangle("fill", enemy.x, enemy.y - 8, enemy.w, 5)
+        lurek.gfx.setColor(0.1, 0.9, 0.2)
+        lurek.gfx.rectangle("fill", enemy.x, enemy.y - 8, enemy.w * (enemy.hp / 3), 5)
     end
 
     -- Bullets
     for _, b in ipairs(bullets) do
         if b.owner == "player" then
-            luna.gfx.setColor(0.3, 0.9, 1)
+            lurek.gfx.setColor(0.3, 0.9, 1)
         else
-            luna.gfx.setColor(0.9, 0.4, 0.1)
+            lurek.gfx.setColor(0.9, 0.4, 0.1)
         end
-        luna.gfx.circle("fill", b.x, b.y, b.r)
+        lurek.gfx.circle("fill", b.x, b.y, b.r)
     end
 
     -- Player
     -- Shield
     if player.shield_active then
-        luna.gfx.setColor(0.3, 0.7, 1, 0.35)
-        luna.gfx.circle("fill", player.x + player.w/2, player.y + player.h/2, 28)
+        lurek.gfx.setColor(0.3, 0.7, 1, 0.35)
+        lurek.gfx.circle("fill", player.x + player.w/2, player.y + player.h/2, 28)
     end
-    luna.gfx.setColor(0.7, 0.6, 0.4)
-    luna.gfx.rectangle("fill", player.x + 3, player.y + 16, player.w - 6, player.h - 16)
-    luna.gfx.setColor(0.8, 0.7, 0.55)
-    luna.gfx.circle("fill", player.x + player.w/2, player.y + 14, 13)
+    lurek.gfx.setColor(0.7, 0.6, 0.4)
+    lurek.gfx.rectangle("fill", player.x + 3, player.y + 16, player.w - 6, player.h - 16)
+    lurek.gfx.setColor(0.8, 0.7, 0.55)
+    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 14, 13)
     -- Gun arm
     local garm_x = player.x + (player.facing > 0 and player.w or 0)
-    luna.gfx.setColor(0.6, 0.5, 0.3)
-    luna.gfx.rectangle("fill", garm_x - 3, player.y + 18, 12, 6)
+    lurek.gfx.setColor(0.6, 0.5, 0.3)
+    lurek.gfx.rectangle("fill", garm_x - 3, player.y + 18, 12, 6)
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, 0, W, 28)
-    luna.gfx.setColor(0.4, 0.8, 1)
-    luna.gfx.print("ANOTHER WORLD", 8, 4, 1.8)
-    luna.gfx.setColor(1, 0.8, 0.3)
-    luna.gfx.print("Score: " .. score, W/2 - 50, 4, 1.6)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, 0, W, 28)
+    lurek.gfx.setColor(0.4, 0.8, 1)
+    lurek.gfx.print("ANOTHER WORLD", 8, 4, 1.8)
+    lurek.gfx.setColor(1, 0.8, 0.3)
+    lurek.gfx.print("Score: " .. score, W/2 - 50, 4, 1.6)
     -- Shield charges
     for i = 1, MAX_SHIELD do
         local sx = W - 28 * i - 6
-        luna.gfx.setColor(i <= player.shield_count and 0.3 or 0.25, i <= player.shield_count and 0.7 or 0.25, i <= player.shield_count and 1 or 0.25)
-        luna.gfx.rectangle("fill", sx, 4, 22, 20)
+        lurek.gfx.setColor(i <= player.shield_count and 0.3 or 0.25, i <= player.shield_count and 0.7 or 0.25, i <= player.shield_count and 1 or 0.25)
+        lurek.gfx.rectangle("fill", sx, 4, 22, 20)
     end
 
     -- Scene caption
     if caption_timer > 0 then
         local alpha = math.min(1, caption_timer)
-        luna.gfx.setColor(1, 1, 0.8, alpha)
-        luna.gfx.print(sc.caption, W/2 - #sc.caption * 6, H - 45, 1.6)
+        lurek.gfx.setColor(1, 1, 0.8, alpha)
+        lurek.gfx.print(sc.caption, W/2 - #sc.caption * 6, H - 45, 1.6)
     end
 
-    luna.gfx.setColor(0.5, 0.6, 0.7, 0.65)
-    luna.gfx.print("[A/D] Walk  [Space/W] Jump  [X] Shoot  [Z] Shield  Defeat enemy→reach exit", 8, H - 20, 1.2)
+    lurek.gfx.setColor(0.5, 0.6, 0.7, 0.65)
+    lurek.gfx.print("[A/D] Walk  [Space/W] Jump  [X] Shoot  [Z] Shield  Defeat enemy→reach exit", 8, H - 20, 1.2)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.85)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(0.4, 0.8, 1)
-        luna.gfx.print("YOU ARE DEAD", W/2 - 92, H/2 - 25, 3)
-        luna.gfx.setColor(1, 0.9, 0.5)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.85)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0.4, 0.8, 1)
+        lurek.gfx.print("YOU ARE DEAD", W/2 - 92, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 0.9, 0.5)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 55, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if game_state ~= "playing" then return end
     if (key == "space" or key == "up" or key == "w") and player.on_ground then
         player.vy = JUMP_VEL

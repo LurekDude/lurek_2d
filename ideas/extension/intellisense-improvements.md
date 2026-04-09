@@ -53,7 +53,7 @@ This significantly exceeds the 12 providers documented in `02-intellisense-desig
 **Current**: `typeInference.ts` tracks return types from 4 factory functions (Image, Canvas, Font, Shader).
 
 **Improvement ideas**:
-- Track all luna.* factory returns (Body, Shape, Source, Timer, Entity, ParticleSystem, etc.)
+- Track all lurek.* factory returns (Body, Shape, Source, Timer, Entity, ParticleSystem, etc.)
 - Infer types from method calls (e.g. `body:getPosition()` returns Vec2)
 - Track local variable types through assignments
 - Support table field typing (`player = { x = 0, y = 0, speed = 200 }` → knows fields)
@@ -64,27 +64,27 @@ This significantly exceeds the 12 providers documented in `02-intellisense-desig
 **Current 9 rules**: deprecated, colorRange, unusedRequire, assetNotFound, threadSafety, callbacks, enumValues, unknownLunaFunction, confLua.
 
 **New diagnostic ideas**:
-- **Missing `luna.load()` callback** — warn if `main.lua` uses luna.* but has no `luna.load` callback
-- **Per-frame allocation warning** — flag `luna.gfx.newImage()` or `luna.audio.newSource()` inside `luna.draw`/`luna.update` callbacks
-- **Invalid key name** — flag `luna.keypressed` using key strings not in the valid set
+- **Missing `lurek.load()` callback** — warn if `main.lua` uses lurek.* but has no `lurek.load` callback
+- **Per-frame allocation warning** — flag `lurek.gfx.newImage()` or `lurek.audio.newSource()` inside `lurek.draw`/`lurek.update` callbacks
+- **Invalid key name** — flag `lurek.keypressed` using key strings not in the valid set
 - **Body type mismatch** — flag methods called on wrong body type (e.g. `setLinearVelocity` on static body)
 - **Missing `test_summary()`** — flag Lua test files that don't end with `test_summary()`
 - **Double borrow potential** — flag patterns that might cause Rc<RefCell> panics
-- **Entity nil check** — flag entity access without nil check after `luna.entity.find()`
-- **Coord system warning** — flag negative Y assumptions (Luna2D Y-axis goes down)
+- **Entity nil check** — flag entity access without nil check after `lurek.entity.find()`
+- **Coord system warning** — flag negative Y assumptions (Lurek2D Y-axis goes down)
 
 ### 4. Contextual String Completion Enhancement
 
-**Current**: Key names are completed when typing inside `luna.keypressed` etc.
+**Current**: Key names are completed when typing inside `lurek.keypressed` etc.
 
 **New contextual completions**:
-- **Easing function names** when typing `luna.time.tween(_, _, _, "` → show all easing names with preview
-- **Blend mode names** when typing `luna.gfx.setBlendMode("` → show modes with visual description
-- **Physics body types** when typing `luna.physics.newBody(_, _, _, "` → "static", "dynamic", "kinematic"
-- **Audio source types** when typing `luna.audio.newSource(_, "` → "static", "stream"
+- **Easing function names** when typing `lurek.time.tween(_, _, _, "` → show all easing names with preview
+- **Blend mode names** when typing `lurek.gfx.setBlendMode("` → show modes with visual description
+- **Physics body types** when typing `lurek.physics.newBody(_, _, _, "` → "static", "dynamic", "kinematic"
+- **Audio source types** when typing `lurek.audio.newSource(_, "` → "static", "stream"
 - **Filter modes** when typing `setFilter("` → "nearest", "linear" with explanation
-- **Draw modes** when typing `luna.gfx.circle("` → "fill", "line" with explanation
-- **Event names** when typing `luna.signal.on("` → list all engine event names
+- **Draw modes** when typing `lurek.gfx.circle("` → "fill", "line" with explanation
+- **Event names** when typing `lurek.signal.on("` → list all engine event names
 
 ### 5. Easing Curve Visualization
 
@@ -120,7 +120,7 @@ Implementation: Generate a small embedded SVG or canvas in the hover markdown.
 - Workspace-wide `require()` resolution → jump to definition across files
 - Auto-import suggestions: typing a function name from another module → suggest `require()`
 - Show all references across the entire workspace, not just current file
-- Support `luna.fs.load()` as a module import path
+- Support `lurek.fs.load()` as a module import path
 
 ### 8. Snippet Library Expansion
 
@@ -151,7 +151,7 @@ Implementation: Generate a small embedded SVG or canvas in the hover markdown.
 - Flag string concatenation in loops (suggest `table.concat`)
 - Flag `pairs()`/`ipairs()` on large tables inside `update()`
 - Flag creating closures inside hot loops
-- Flag `luna.gfx.newImage()` called every frame
+- Flag `lurek.gfx.newImage()` called every frame
 - Suggest `local` for frequently accessed globals
 - Flag deep table nesting in tight loops
 

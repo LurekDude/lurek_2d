@@ -5,8 +5,8 @@ or knock out the CPU opponent to take the title.
 
 ## What It Demonstrates
 
-- `luna.keypressed()` — punch actions with cooldown
-- `luna.input.isKeyDown()` — hold to block
+- `lurek.keypressed()` — punch actions with cooldown
+- `lurek.input.isKeyDown()` — hold to block
 - CPU AI with attack/block/approach decisions
 - Hit detection with range checks
 - Per-round timer and round-win scoring

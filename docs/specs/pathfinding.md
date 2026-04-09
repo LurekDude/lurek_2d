@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.pathfinding`                                   |
+| **Lua API**    | `lurek.pathfinding`                                   |
 | **Source**      | `src/pathfinding/`                                   |
 | **Rust Tests** | `tests/rust/unit/pathfinding_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_pathfinding.lua`                |
@@ -17,7 +17,7 @@ The pathfinding module provides a comprehensive multi-layer grid pathfinding sta
 ## Architecture
 
 ```
-luna.pathfinding (Lua API — pathfinding_api.rs)
+lurek.pathfinding (Lua API — pathfinding_api.rs)
   │
   ├── LuaNavGrid ─────────────────────────────────────────────────────
   │     └── NavGrid (nav_grid.rs)
@@ -104,7 +104,7 @@ luna.pathfinding (Lua API — pathfinding_api.rs)
 
 ### `pathfinding::ai_flow_field`
 
-BFS-based flow field for simple walkability grids. Operates on a flat `Vec<bool>` walkability array rather than a cost grid. Moved from `ai/flowfield`; used by `luna.pathfinding.newPathFlowField`.
+BFS-based flow field for simple walkability grids. Operates on a flat `Vec<bool>` walkability array rather than a cost grid. Moved from `ai/flowfield`; used by `lurek.pathfinding.newPathFlowField`.
 
 - **`FlowField`** (struct) — BFS flow field storing normalised direction vectors and BFS distances toward a goal cell. Supports 8-directional expansion with √2 diagonal cost.
 
@@ -268,19 +268,19 @@ Controls how diagonal movement is handled. Variants:
 
 ## Lua API
 
-Exposed under `luna.pathfinding.*` by `src/lua_api/pathfinding_api.rs`. All grid coordinates in the Lua API are **1-based**; the binding layer converts to/from 0-based internally.
+Exposed under `lurek.pathfinding.*` by `src/lua_api/pathfinding_api.rs`. All grid coordinates in the Lua API are **1-based**; the binding layer converts to/from 0-based internally.
 
 ### Constructor Functions
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `luna.pathfinding.newNavGrid(w, h)` | `NavGrid` | Create a NavGrid with all cells walkable (cost 1) |
-| `luna.pathfinding.newPathfinder(grid)` | `UnitPathfinder` | Create a UnitPathfinder backed by a NavGrid |
-| `luna.pathfinding.newFlowField(grid)` | `FlowField` | Create a FlowField backed by a NavGrid |
-| `luna.pathfinding.newPathGrid(w, h, cellSize)` | `PathGrid` | Create a PathGrid with per-cell cost and walkability |
-| `luna.pathfinding.newPathFlowField(grid)` | `AiFlowField` | Create a BFS flow field from a PathGrid |
-| `luna.pathfinding.setThreadCount(n)` | `nil` | Set background thread count (currently no-op) |
-| `luna.pathfinding.getThreadCount()` | `integer` | Get background thread count (currently always 0) |
+| `lurek.pathfinding.newNavGrid(w, h)` | `NavGrid` | Create a NavGrid with all cells walkable (cost 1) |
+| `lurek.pathfinding.newPathfinder(grid)` | `UnitPathfinder` | Create a UnitPathfinder backed by a NavGrid |
+| `lurek.pathfinding.newFlowField(grid)` | `FlowField` | Create a FlowField backed by a NavGrid |
+| `lurek.pathfinding.newPathGrid(w, h, cellSize)` | `PathGrid` | Create a PathGrid with per-cell cost and walkability |
+| `lurek.pathfinding.newPathFlowField(grid)` | `AiFlowField` | Create a BFS flow field from a PathGrid |
+| `lurek.pathfinding.setThreadCount(n)` | `nil` | Set background thread count (currently no-op) |
+| `lurek.pathfinding.getThreadCount()` | `integer` | Get background thread count (currently always 0) |
 
 ### NavGrid Methods
 
@@ -368,9 +368,9 @@ Exposed under `luna.pathfinding.*` by `src/lua_api/pathfinding_api.rs`. All grid
 
 ```lua
 -- Basic A★ pathfinding with NavGrid + UnitPathfinder
-function luna.init()
+function lurek.init()
     -- Create a 40x30 navigation grid (1-based in Lua)
-    grid = luna.pathfinding.newNavGrid(40, 30)
+    grid = lurek.pathfinding.newNavGrid(40, 30)
 
     -- Block a wall of cells
     for x = 10, 20 do
@@ -381,7 +381,7 @@ function luna.init()
     grid:setDiagonalMode("nocornercut")
 
     -- Create a unit pathfinder backed by the grid
-    pathfinder = luna.pathfinding.newPathfinder(grid)
+    pathfinder = lurek.pathfinding.newPathfinder(grid)
 
     -- Find a path from (1,1) to (38,28)
     path = pathfinder:findPath(1, 1, 38, 28)
@@ -403,15 +403,15 @@ end
 
 ```lua
 -- Flow field for crowd steering
-function luna.init()
-    grid = luna.pathfinding.newNavGrid(50, 50)
-    flow = luna.pathfinding.newFlowField(grid)
+function lurek.init()
+    grid = lurek.pathfinding.newNavGrid(50, 50)
+    flow = lurek.pathfinding.newFlowField(grid)
 
     -- Compute flow toward cell (25, 25)
     flow:calculate(25, 25)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if flow:isCalculated() then
         -- Steer a unit at world position toward the target
         local vx, vy = flow:steer(unit_x, unit_y, 100, 32, 32)
@@ -423,8 +423,8 @@ end
 
 ```lua
 -- PathGrid with per-cell costs and path smoothing
-function luna.init()
-    local pg = luna.pathfinding.newPathGrid(20, 20, 32)
+function lurek.init()
+    local pg = lurek.pathfinding.newPathGrid(20, 20, 32)
 
     -- Create a swamp region with higher cost
     for x = 5, 10 do
@@ -465,8 +465,8 @@ end
 | `math`      | Imports from | `Vec2`, `Rect` for grid coordinates (indirect usage)           |
 | `ai`        | Related      | `InfluenceMap` moved from `ai/`; re-exported for backward compatibility. `ai` module uses pathfinding for movement. |
 | `tilemap`   | Related      | Tilemaps commonly provide the walkability grid for pathfinding  |
-| `lua_api`   | Imported by  | `src/lua_api/pathfinding_api.rs` registers `luna.pathfinding.*` |
-| `thread`    | Related      | `PathThreadPool` uses `std::thread` directly (not `thread` module); background pathfinding concept aligns with `luna.thread` |
+| `lua_api`   | Imported by  | `src/lua_api/pathfinding_api.rs` registers `lurek.pathfinding.*` |
+| `thread`    | Related      | `PathThreadPool` uses `std::thread` directly (not `thread` module); background pathfinding concept aligns with `lurek.thread` |
 | `graph`     | Similar      | `graph` module provides generic directed graphs; `graph_path.rs` provides A★/Dijkstra over adjacency maps specifically for navigation |
 
 ## Notes
@@ -479,4 +479,4 @@ end
 - **Cache invalidation**: `UnitPathfinder` caches path results keyed by `(start, goal, unit_size)`. If the grid changes, call `pf:clearCache()` to avoid stale paths.
 - **InfluenceMap provenance**: Moved from `src/ai/influence_map.rs` to `src/pathfinding/influence_map.rs`. A re-export `crate::ai::InfluenceMap` exists for backward compatibility.
 - **setThreadCount/getThreadCount**: Currently no-ops in the Lua API. The `PathThreadPool` Rust type is functional but not yet exposed to Lua beyond these stubs.
-- **Breaking change surface**: Renaming NavGrid methods, changing coordinate conventions (0-based vs 1-based), or altering the `DiagonalMode` enum variants would break existing Lua scripts using `luna.pathfinding.*`.
+- **Breaking change surface**: Renaming NavGrid methods, changing coordinate conventions (0-based vs 1-based), or altering the `DiagonalMode` enum variants would break existing Lua scripts using `lurek.pathfinding.*`.

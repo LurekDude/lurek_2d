@@ -1,7 +1,7 @@
 import os
 
-path = r'c:\Users\tombl\Documents\luna2d\src\lua_api\devtools_api.rs'
-content = r'''//! Registers the `luna.devtools.*` runtime diagnostics and developer-tools API.
+path = r'c:\Users\tombl\Documents\lurek2d\src\lua_api\devtools_api.rs'
+content = r'''//! Registers the `lurek.devtools.*` runtime diagnostics and developer-tools API.
 //!
 //! Thin Lua bridge that delegates to the [`devtools`][crate::devtools] domain module.
 //! All state management happens in [`crate::devtools`]; this file only converts
@@ -62,7 +62,7 @@ fn zone_to_table(lua: &Lua, zone: &ProfileZone) -> LuaResult<LuaTable> {
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers `luna.devtools.*`.
+/// Registers `lurek.devtools.*`.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -415,7 +415,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         Ok(s.borrow().console_open)
     })?)?;
 
-    luna.set("devtools", dt)?;
+    lurek.set("devtools", dt)?;
     Ok(())
 }
 '''

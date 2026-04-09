@@ -6,10 +6,10 @@ to break the ancient curse.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — silhouette art style
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — silhouette art style
 - Multi-layer parallax scrolling using different scroll speed factors
-- `luna.input.isKeyDown()` — smooth player movement and scrolling
-- `luna.keypressed()` — jump and attack
+- `lurek.input.isKeyDown()` — smooth player movement and scrolling
+- `lurek.keypressed()` — jump and attack
 - Boss enemies with HP bars, stage-based difficulty scaling
 
 ## Controls

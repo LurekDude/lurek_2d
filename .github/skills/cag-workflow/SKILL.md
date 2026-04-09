@@ -1,9 +1,9 @@
 ---
 name: cag-workflow
-description: "Load this skill when working with the Luna2D CAG (Copilot Agent Customization) layer: building or editing agents, skills, or prompts under .github/; choosing the right CAG artifact type; running cag_validate.py; or designing the AI-first workflow for a new task type. Skip it for general code implementation, game scripting, or roadmap planning."
+description: "Load this skill when working with the Lurek2D CAG (Copilot Agent Customization) layer: building or editing agents, skills, or prompts under .github/; choosing the right CAG artifact type; running cag_validate.py; or designing the AI-first workflow for a new task type. Skip it for general code implementation, game scripting, or roadmap planning."
 ---
 
-# CAG Workflow — Luna2D
+# CAG Workflow — Lurek2D
 
 ## Load When
 
@@ -64,7 +64,7 @@ name: my-skill
 description: "Load this skill when ... Use for: A, B, C. Skip it for: X, Y."
 ---
 
-# Skill Title — Luna2D
+# Skill Title — Lurek2D
 
 ## Load When
 (first section — one sentence per bullet)
@@ -76,7 +76,7 @@ description: "Load this skill when ... Use for: A, B, C. Skip it for: X, Y."
 **Rules:**
 - First H2 must be `## Load When`
 - Description frontmatter must include "Load this skill when", "Use for:", and "Skip it for:" clauses
-- Content must be actionable and Luna2D-specific — no generic advice that is not tied to this codebase
+- Content must be actionable and Lurek2D-specific — no generic advice that is not tied to this codebase
 - Update `copilot-instructions.md` skills list whenever a skill is added/removed
 
 ## Agent File Format
@@ -88,7 +88,7 @@ description: "**AgentName** — One sentence mission. Scope declaration. What it
 tools: [<tool list>]
 ---
 
-# AgentName — Luna2D
+# AgentName — Lurek2D
 
 ## MISSION
 ...
@@ -141,7 +141,7 @@ The `Manager` agent owns the session start and routes work to specialist agents:
 | Signal | Agent |
 |--------|-------|
 | Write Rust code | Developer |
-| Design Lua `luna.*` API | Lua-Designer |
+| Design Lua `lurek.*` API | Lua-Designer |
 | GPU/rendering work | Renderer |
 | Physics work | Physicist |
 | Write tests | Tester |
@@ -188,7 +188,7 @@ When adding or removing an agent, update the README and `copilot-instructions.md
 
 - **Skills not loaded before use**: Loading a skill AFTER starting the task — always load first
 - **Business logic in AGENT.md**: AGENT.md holds architectural facts, not task procedures — procedures belong in skills or prompts
-- **Skills that duplicate the system prompt**: If a rule applies universally to all Luna2D work, it belongs in `copilot-instructions.md`, not a skill
+- **Skills that duplicate the system prompt**: If a rule applies universally to all Lurek2D work, it belongs in `copilot-instructions.md`, not a skill
 - **Giant skills**: A skill > 200 lines is trying to be two skills — split by concern
 - **Stale copilot-instructions.md**: Adding a skill without updating the system prompt skills list — it becomes undiscoverable
 - **Unapproved frontmatter keys**: Inventing new frontmatter keys breaks `cag_validate.py` — only use the approved set above

@@ -6,10 +6,10 @@ of high-rated robots and boost your capabilities.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.line()` — grid floor and droid sprites
-- `luna.gfx.circle()` — transfer range indicator
-- `luna.input.isKeyDown()` — 8-directional movement
-- `luna.keypressed()` — shooting and initiating transfer
+- `lurek.gfx.rectangle()` / `lurek.gfx.line()` — grid floor and droid sprites
+- `lurek.gfx.circle()` — transfer range indicator
+- `lurek.input.isKeyDown()` — 8-directional movement
+- `lurek.keypressed()` — shooting and initiating transfer
 - Procedural room generation with wall collision
 - Simple enemy AI chasing the player
 

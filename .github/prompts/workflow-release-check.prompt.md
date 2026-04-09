@@ -1,10 +1,10 @@
 ---
-description: "Full release readiness check for Luna2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go verdict."
+description: "Full release readiness check for Lurek2D. Use before tagging a release or merging to main. Runs all quality gates and produces a go/no-go verdict."
 ---
 
 # Workflow: Release Check
 
-**Purpose**: Run all quality gates and produce a binary go/no-go verdict for a Luna2D release.
+**Purpose**: Run all quality gates and produce a binary go/no-go verdict for a Lurek2D release.
 **Use When**: Before tagging a version, cutting a release binary, or merging a feature branch to `main`.
 **Do Not Use When**: During active development — use individual gate prompts instead.
 **Scope**: Full repository.
@@ -49,13 +49,13 @@ python tools/validate/cag_validate.py
 
 ### Gate 6: Example Smoke Test
 ```powershell
-cargo run -- demos/hello_world
+cargo run -- content/demos/hello_world
 ```
 - Window must open and display without panic
 - Close manually; verify no stderr errors
 
 ### Gate 7: Documentation Check
-- `docs/API/lua_api_reference_generated.md` — every `luna.*` function in the code has an entry
+- `docs/API/lua_api_reference_generated.md` — every `lurek.*` function in the code has an entry
 - `README.md` — version badge and feature list current
 
 ### Gate 8: Security Audit

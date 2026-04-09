@@ -2,17 +2,17 @@
 """
 add_lua_docstrings.py - Auto-generate /// docstrings from inline comments.
 
-This script finds Lua function registrations (luna.module.function( ... ))
+This script finds Lua function registrations (lurek.module.function( ... ))
 in inline comments and converts them to proper /// docstrings.
 
 Transformations:
-  // luna.graphics.setColor(r, g, b, a?)
+  // lurek.graphics.setColor(r, g, b, a?)
   ->
   /// Sets the drawing color for subsequent draw commands.
   ///
   /// Parameters: r, g, b, a (float 0.0-1.0, alpha optional)
   ///
-  /// Lua API: luna.graphics.setColor(r, g, b [, a])
+  /// Lua API: lurek.graphics.setColor(r, g, b [, a])
 """
 
 import re
@@ -162,7 +162,7 @@ def extract_lua_signature(comment: str) -> tuple[str, str, str]:
     Extract module, function name, and signature from a comment.
 
     Example:
-      "luna.physics.setBodySize(world_id, body_id, w, h)"
+      "lurek.physics.setBodySize(world_id, body_id, w, h)"
       → ("physics", "setBodySize", "(world_id, body_id, w, h)")
     """
     m = re.search(r"luna\.(\w+)\.(\w+)(\([^)]*\))?", comment)
@@ -195,8 +195,8 @@ def add_docstring_to_file(file_path: Path) -> int:
         line = lines[i]
         stripped = line.strip()
 
-        # Detect: // luna.module.function(...)
-        if stripped.startswith("// luna."):
+        # Detect: // lurek.module.function(...)
+        if stripped.startswith("// lurek."):
             module, func_name, sig = extract_lua_signature(stripped)
 
             # Skip if docstring already exists (next non-empty line is ///)
@@ -209,7 +209,7 @@ def add_docstring_to_file(file_path: Path) -> int:
                     f"#[allow(unused_doc_comments)]\n",
                     f"/// {desc}\n",
                     f"/// \n",
-                    f"/// Lua API: luna.{module}.{func_name}{sig}\n",
+                    f"/// Lua API: lurek.{module}.{func_name}{sig}\n",
                 ]
                 result.extend(docstring_lines)
                 added += 1

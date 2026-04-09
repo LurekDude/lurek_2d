@@ -1,14 +1,14 @@
-//! Foundational math and value types for the Luna2D Baseline layer.
+//! Foundational math and value types for the Lurek2D Baseline layer.
 //!
-//! This module is part of Luna2D's Baseline (`math` subsystem) — the leaf of the
-//! dependency graph with no Luna2D dependencies of its own.
+//! This module is part of Lurek2D's Baseline (`math` subsystem) — the leaf of the
+//! dependency graph with no Lurek2D dependencies of its own.
 //!
 //! [`Color`] (`sRGB [f32; 4]`) lives here as a pure value type. It was moved from
 //! `src/graphics/srgb.rs` during the graphics-module-split session and is now the
 //! canonical color type for the entire engine.
 //!
 //! All public items are documented. See `docs/architecture.md` for tier context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 /// Bezier curve evaluation using De Casteljau's algorithm.
 pub mod bezier;

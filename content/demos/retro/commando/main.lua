@@ -1,7 +1,7 @@
--- Commando — C-64 Classic (Luna2D demo)
+-- Commando — C-64 Classic (Lurek2D demo)
 -- Vertical-scrolling top-down shooter inspired by Capcom's 1985 arcade classic.
 -- Shoot enemies, rescue POWs, and advance through the jungle level.
--- Run with: cargo run -- demos/retro/commando
+-- Run with: cargo run -- content/demos/retro/commando
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -56,15 +56,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.08, 0.18, 0.05)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.08, 0.18, 0.05)
     score = 0; lives = 3; grenades_left = 3
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
 
     anim_timer = anim_timer + dt
@@ -73,16 +73,16 @@ function luna.process(dt)
     world_y = world_y + SCROLL_SPEED * dt
 
     -- Player movement
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a") then
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a") then
         player.x = math.max(10, player.x - PLAYER_SPEED * dt)
     end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then
         player.x = math.min(W - player.w - 10, player.x + PLAYER_SPEED * dt)
     end
-    if luna.input.isKeyDown("up") or luna.input.isKeyDown("w") then
+    if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w") then
         player.y = math.max(H * 0.3, player.y - PLAYER_SPEED * dt)
     end
-    if luna.input.isKeyDown("down") or luna.input.isKeyDown("s") then
+    if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s") then
         player.y = math.min(H - player.h - 10, player.y + PLAYER_SPEED * dt)
     end
 
@@ -228,104 +228,104 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Background jungle tiles (scroll with world)
     for _, t in ipairs(tiles) do
         local sy = (t.y + world_y) % (H + 200) - 50
-        luna.gfx.setColor(t.c[1], t.c[2], t.c[3])
-        luna.gfx.rectangle("fill", t.x, sy, t.w, t.h)
+        lurek.gfx.setColor(t.c[1], t.c[2], t.c[3])
+        lurek.gfx.rectangle("fill", t.x, sy, t.w, t.h)
     end
 
     -- Road stripe
-    luna.gfx.setColor(0.4, 0.35, 0.2, 0.3)
+    lurek.gfx.setColor(0.4, 0.35, 0.2, 0.3)
     local roffset = world_y % 60
     for ry = -roffset, H, 60 do
-        luna.gfx.rectangle("fill", W/2 - 20, ry, 40, 30)
+        lurek.gfx.rectangle("fill", W/2 - 20, ry, 40, 30)
     end
 
     -- POWs
     for _, p in ipairs(pows) do
         if p.alive then
-            luna.gfx.setColor(1, 0.8, 0.1)
-            luna.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
-            luna.gfx.setColor(0, 0, 0)
-            luna.gfx.print("POW", p.x + 1, p.y + 6, 1.1)
+            lurek.gfx.setColor(1, 0.8, 0.1)
+            lurek.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
+            lurek.gfx.setColor(0, 0, 0)
+            lurek.gfx.print("POW", p.x + 1, p.y + 6, 1.1)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        luna.gfx.setColor(0.6, 0.2, 0.1)
-        luna.gfx.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
-        luna.gfx.setColor(0.75, 0.55, 0.35)
-        luna.gfx.circle("fill", e.x + e.w/2, e.y + 8, 9)
-        luna.gfx.setColor(0.4, 0.2, 0)
-        luna.gfx.rectangle("fill", e.x, e.y, e.w, 7)
+        lurek.gfx.setColor(0.6, 0.2, 0.1)
+        lurek.gfx.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
+        lurek.gfx.setColor(0.75, 0.55, 0.35)
+        lurek.gfx.circle("fill", e.x + e.w/2, e.y + 8, 9)
+        lurek.gfx.setColor(0.4, 0.2, 0)
+        lurek.gfx.rectangle("fill", e.x, e.y, e.w, 7)
     end
 
     -- Enemy bullets
-    luna.gfx.setColor(1, 0.4, 0.1)
+    lurek.gfx.setColor(1, 0.4, 0.1)
     for _, b in ipairs(bullets) do
         if b.enemy then
-            luna.gfx.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
+            lurek.gfx.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
         end
     end
 
     -- Player
-    luna.gfx.setColor(0.2, 0.35, 0.7)
-    luna.gfx.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
-    luna.gfx.setColor(0.85, 0.65, 0.4)
-    luna.gfx.circle("fill", player.x + player.w/2, player.y + 10, 11)
-    luna.gfx.setColor(0.3, 0.3, 0.1)
-    luna.gfx.rectangle("fill", player.x, player.y, player.w, 8)
+    lurek.gfx.setColor(0.2, 0.35, 0.7)
+    lurek.gfx.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
+    lurek.gfx.setColor(0.85, 0.65, 0.4)
+    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 10, 11)
+    lurek.gfx.setColor(0.3, 0.3, 0.1)
+    lurek.gfx.rectangle("fill", player.x, player.y, player.w, 8)
     -- Gun
-    luna.gfx.setColor(0.4, 0.4, 0.4)
-    luna.gfx.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
+    lurek.gfx.setColor(0.4, 0.4, 0.4)
+    lurek.gfx.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
 
     -- Player bullets
-    luna.gfx.setColor(1, 1, 0.4)
+    lurek.gfx.setColor(1, 1, 0.4)
     for _, b in ipairs(bullets) do
         if not b.enemy then
-            luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
+            lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
         end
     end
 
     -- Grenades
-    luna.gfx.setColor(0, 0.8, 0.1)
+    lurek.gfx.setColor(0, 0.8, 0.1)
     for _, g in ipairs(grenades) do
-        luna.gfx.circle("fill", g.x, g.y, 8)
+        lurek.gfx.circle("fill", g.x, g.y, 8)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.55)
-    luna.gfx.rectangle("fill", 0, 0, W, 28)
-    luna.gfx.setColor(0.9, 0.8, 0.2)
-    luna.gfx.print("COMMANDO", 8, 5, 1.8)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
-    luna.gfx.setColor(1, 0.4, 0.4)
-    luna.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
-    luna.gfx.setColor(0.4, 1, 0.4)
-    luna.gfx.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
+    lurek.gfx.setColor(0, 0, 0, 0.55)
+    lurek.gfx.rectangle("fill", 0, 0, W, 28)
+    lurek.gfx.setColor(0.9, 0.8, 0.2)
+    lurek.gfx.print("COMMANDO", 8, 5, 1.8)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
+    lurek.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
+    lurek.gfx.setColor(0.4, 1, 0.4)
+    lurek.gfx.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.72)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.72)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if game_state ~= "playing" then return end
     if key == "space" and shoot_cd <= 0 then
         bullets[#bullets+1] = { x = player.x + player.w/2, y = player.y - 10, enemy = false }

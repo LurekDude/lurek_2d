@@ -1,6 +1,6 @@
 ---
 description: >
-  Design UI screens, HUD elements, menus, and accessibility for a Luna2D game.
+  Design UI screens, HUD elements, menus, and accessibility for a Lurek2D game.
   Produces wireframes and flow diagrams, not Lua code.
 model: claude-sonnet-4-5
 tools:

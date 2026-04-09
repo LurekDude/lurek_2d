@@ -1,4 +1,4 @@
-//! TCP debug bridge for connecting external tools to a running Luna2D game.
+//! TCP debug bridge for connecting external tools to a running Lurek2D game.
 //!
 //! Exposes a JSON-over-TCP server (127.0.0.1 only) that external tools such as
 //! the VS Code extension and MCP server can connect to for runtime inspection

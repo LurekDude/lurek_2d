@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-golden_test.py — Luna2D golden file comparison tests.
+golden_test.py — Lurek2D golden file comparison tests.
 
 Compares output files (text, data, serialized state) against known-good
 reference files stored in tests/golden/. Used for regression testing
@@ -152,7 +152,7 @@ def update_golden_files(tests: List[dict]) -> int:
 def generate_report(results: List[dict]) -> str:
     """Generate a Markdown golden test report."""
     lines = [
-        "# Luna2D Golden File Test Report",
+        "# Lurek2D Golden File Test Report",
         "",
     ]
 
@@ -222,7 +222,7 @@ def ensure_dirs():
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D golden file comparison tests",
+        description="Lurek2D golden file comparison tests",
     )
     parser.add_argument("--update", action="store_true",
                         help="Update expected files from actual")

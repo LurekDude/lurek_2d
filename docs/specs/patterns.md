@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.patterns`                                        |
+| **Lua API**      | `lurek.patterns`                                        |
 | **Source**       | `src/patterns/`                                        |
 | **Rust Tests**   | `tests/rust/unit/patterns_tests.rs`                    |
 | **Lua Tests**    | `tests/lua/unit/test_patterns.lua`                     |
@@ -12,13 +12,13 @@
 
 ## Summary
 
-The `patterns` module provides pure-Rust implementations of six classic game-programming design patterns. These patterns are exposed to Lua games via `luna.patterns.*` factory functions. Each factory returns a Lua UserData object that wraps the corresponding domain type.
+The `patterns` module provides pure-Rust implementations of six classic game-programming design patterns. These patterns are exposed to Lua games via `lurek.patterns.*` factory functions. Each factory returns a Lua UserData object that wraps the corresponding domain type.
 
 The six patterns are:
 
 1. **EventBus** — A publish/subscribe event bus. Listeners can be registered with a numeric priority (higher fires first) and optionally as one-shot (`once`). `emit(event)` fires all listeners sorted by priority. One-shot listeners are automatically removed after firing. Useful for decoupled game systems (UI reacting to player events, sound reacting to physics events).
 
-   > **When to use**: Prefer `luna.signal.newSignal()` for simple event wiring with no ordering requirement. Use `EventBus` when you need **priority-ordered firing** or **automatic one-shot removal** after the first call.
+   > **When to use**: Prefer `lurek.signal.newSignal()` for simple event wiring with no ordering requirement. Use `EventBus` when you need **priority-ordered firing** or **automatic one-shot removal** after the first call.
 
 2. **ObjectPool** — A capacity-bounded ID-pool that tracks idle and active objects as integers. `acquire()` moves an ID from idle to active (or creates a new one if below capacity). `release(id)` returns an ID to the idle pool. `prewarm(n)` pre-populates the idle pool. Useful for bullets, particles, and other short-lived game objects.
 
@@ -30,16 +30,16 @@ The six patterns are:
 
 5. **Factory** — A named constructor registry. `register(typeName, fn)` stores a constructor function. `create(typeName, ...)` calls it with additional arguments. Useful for entity templates, projectile factories, and action creators.
 
-6. **SimpleState** — A simple named-state tracker with enter/exit/update callbacks per state. `addState(name, {enter?,exit?,update?})` registers a state with optional callbacks. `transitionTo(name)` fires exit on the current state then enter on the new one. `update(dt)` delegates to the current state's update callback. No guard-validated transition rules — any registered state can be entered at any time. Exposed in Lua as `luna.patterns.newSimpleState()`.
+6. **SimpleState** — A simple named-state tracker with enter/exit/update callbacks per state. `addState(name, {enter?,exit?,update?})` registers a state with optional callbacks. `transitionTo(name)` fires exit on the current state then enter on the new one. `update(dt)` delegates to the current state's update callback. No guard-validated transition rules — any registered state can be entered at any time. Exposed in Lua as `lurek.patterns.newSimpleState()`.
 
-   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `luna.patterns.newSimpleState()`.
+   > **See also**: `automation.Simulator` has an internal 4-state playback FSM (Idle/Running/Paused/Complete). That FSM is private and controls input replay — it is not a general-purpose game state machine. For game-level state sequencing (menus, combat phases, NPC behaviour) use `lurek.patterns.newSimpleState()`.
 
    > **Note**: The domain `StateMachine` type in `src/patterns/state_machine.rs` provides guard-validated transitions and a history ring accessible from Rust. It is not currently wired to the Lua API.
 
 All six domain types are **pure Rust** with no mlua dependency. All Lua plumbing (registry keys for callbacks, Lua UserData implementations) lives in `src/lua_api/patterns_api.rs`. The patterns API is gated by `modules.pipeline = true` in `conf.lua`.
 
 This module intentionally does **not** provide:
-- Networked event busses (use `luna.thread.Channel`)
+- Networked event busses (use `lurek.thread.Channel`)
 - Persistent undo across sessions (serialize command data in game code)
 - Hierarchical state machines (HSM) — use nested `SimpleState` objects in Lua
 
@@ -143,13 +143,13 @@ No public enums. `PluralForm` belongs to the `localization` module.
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/patterns_api.rs` under `luna.patterns.*`.
+The Lua API is registered in `src/lua_api/patterns_api.rs` under `lurek.patterns.*`.
 
 Each factory function returns a new Lua UserData object. All callback-holding inner types in `patterns_api.rs` use `LuaRegistryKey` to hold Lua function references.
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.patterns.newEventBus()` | `→ EventBus` | Create a new publish/subscribe bus |
+| `lurek.patterns.newEventBus()` | `→ EventBus` | Create a new publish/subscribe bus |
 | `bus:on(event, cb, priority?)` | `→ id` | Subscribe; returns subscription ID |
 | `bus:off(id)` | — | Unsubscribe by subscription ID |
 | `bus:emit(event, ...)` | — | Fire all listeners for an event |
@@ -157,7 +157,7 @@ Each factory function returns a new Lua UserData object. All callback-holding in
 | `bus:clearAll()` | — | Remove all listeners on all events |
 | `bus:getListenerCount(event)` | `→ int` | Count subscribers for an event |
 | `bus:getEvents()` | `→ table` | Array of registered event names |
-| `luna.patterns.newObjectPool()` | `→ ObjectPool` | Create a new object pool |
+| `lurek.patterns.newObjectPool()` | `→ ObjectPool` | Create a new object pool |
 | `pool:add(value)` | — | Add a pre-built Lua value to the pool |
 | `pool:acquire()` | `→ any\|nil` | Borrow an available value (nil if empty) |
 | `pool:release(value)` | — | Return a borrowed value to the pool |
@@ -165,7 +165,7 @@ Each factory function returns a new Lua UserData object. All callback-holding in
 | `pool:getAvailableCount()` | `→ int` | Number of idle (available) values |
 | `pool:getTotalCount()` | `→ int` | Total tracked values (active + available) |
 | `pool:clearAll()` | — | Empty the pool and release all registry values |
-| `luna.patterns.newCommandStack(maxSize?)` | `→ CommandStack` | Create a new undo/redo stack |
+| `lurek.patterns.newCommandStack(maxSize?)` | `→ CommandStack` | Create a new undo/redo stack |
 | `stack:execute(name, exec_fn, undo_fn?)` | — | Call exec_fn immediately and push to history |
 | `stack:undo()` | `→ boolean` | Execute undo on top command |
 | `stack:redo()` | `→ boolean` | Re-execute last undone command |
@@ -174,21 +174,21 @@ Each factory function returns a new Lua UserData object. All callback-holding in
 | `stack:getHistorySize()` | `→ int` | Number of commands |
 | `stack:getCurrentName()` | `→ string\|nil` | Name of the last executed command |
 | `stack:clearAll()` | — | Clear history and free callbacks |
-| `luna.patterns.newServiceLocator()` | `→ ServiceLocator` | Create a new service registry |
+| `lurek.patterns.newServiceLocator()` | `→ ServiceLocator` | Create a new service registry |
 | `sl:provide(name, value)` | — | Register a value under a name |
 | `sl:locate(name)` | `→ any\|nil` | Retrieve a registered value |
 | `sl:has(name)` | `→ boolean` | Check if a name is registered |
 | `sl:remove(name)` | — | Unregister a service |
 | `sl:getServices()` | `→ table` | Array of registered service names |
 | `sl:clearAll()` | — | Remove all services |
-| `luna.patterns.newFactory()` | `→ Factory` | Create a new constructor registry |
+| `lurek.patterns.newFactory()` | `→ Factory` | Create a new constructor registry |
 | `factory:register(type, fn)` | — | Register a constructor function |
 | `factory:create(type, ...)` | `→ any` | Call the constructor with args |
 | `factory:has(type)` | `→ boolean` | Check if a type is registered |
 | `factory:getTypes()` | `→ table` | Array of registered type names |
 | `factory:remove(type)` | — | Unregister a type |
 | `factory:clearAll()` | — | Remove all registrations |
-| `luna.patterns.newSimpleState()` | `→ SimpleState` | Create a new FSM |
+| `lurek.patterns.newSimpleState()` | `→ SimpleState` | Create a new FSM |
 | `fsm:addState(name, {enter?,exit?,update?})` | — | Register a state with callbacks |
 | `fsm:transitionTo(name)` | `→ boolean` | Move to a new state |
 | `fsm:update(dt)` | — | Call current state's update |
@@ -201,7 +201,7 @@ Each factory function returns a new Lua UserData object. All callback-holding in
 
 ```lua
 -- === EventBus ===
-local bus = luna.patterns.newEventBus()
+local bus = lurek.patterns.newEventBus()
 
 bus:on("player_died", function(cause)
     print("Player died:", cause)
@@ -214,7 +214,7 @@ end, 5)
 bus:emit("player_died", "lava")  -- fires both listeners
 
 -- === ObjectPool (bullet pool) ===
-local pool = luna.patterns.newObjectPool()
+local pool = lurek.patterns.newObjectPool()
 pool:setCapacity(100)
 pool:prewarm(20)
 
@@ -232,7 +232,7 @@ local function destroy_bullet(id)
 end
 
 -- === CommandStack (editor undo-redo) ===
-local cmds = luna.patterns.newCommandStack()
+local cmds = lurek.patterns.newCommandStack()
 local placed = {}
 
 local function place_tile(x, y, tile)
@@ -243,21 +243,21 @@ local function place_tile(x, y, tile)
     )
 end
 
--- luna.input.onKeyDown("z") → cmds:undo()
--- luna.input.onKeyDown("y") → cmds:redo()
+-- lurek.input.onKeyDown("z") → cmds:undo()
+-- lurek.input.onKeyDown("y") → cmds:redo()
 
 -- === ServiceLocator ===
-local services = luna.patterns.newServiceLocator()
+local services = lurek.patterns.newServiceLocator()
 
 -- Register at boot
-services:provide("audio", { play = function(snd) luna.audio.play(snd) end })
+services:provide("audio", { play = function(snd) lurek.audio.play(snd) end })
 services:provide("ui", require("ui_manager"))
 
 -- Access anywhere
 services:locate("audio").play("explosion.ogg")
 
 -- === Factory ===
-local factory = luna.patterns.newFactory()
+local factory = lurek.patterns.newFactory()
 
 factory:register("goblin", function(x, y)
     return { type="goblin", x=x, y=y, hp=10 }
@@ -269,7 +269,7 @@ end)
 local enemy = factory:create("goblin", 100, 200)
 
 -- === SimpleState (game state machine) ===
-local game_fsm = luna.patterns.newSimpleState()
+local game_fsm = lurek.patterns.newSimpleState()
 
 game_fsm:addState("menu", {
     enter = function() print("Entering menu") end,
@@ -286,7 +286,7 @@ game_fsm:addState("paused", {
 
 game_fsm:transitionTo("menu")  -- fires enter
 
-luna.process = function(dt)
+lurek.process = function(dt)
     game_fsm:update(dt)
 end
 ```
@@ -307,7 +307,7 @@ end
 | `engine`     | Imports from | `SharedState` used in `patterns_api.rs` only (`_state`)     |
 | `lua_api`    | Imported by  | `patterns_api.rs` registers the Lua surface                 |
 | `pipeline`   | —            | Patterns are logic utilities; pipeline composes task graphs |
-| `event`      | Similar      | `luna.signal` is the engine event bus; `EventBus` is per-game-system |
+| `event`      | Similar      | `lurek.signal` is the engine event bus; `EventBus` is per-game-system |
 | `ai`         | Could use    | FSM in `ai` is behaviour-tree driven; `SimpleState` is lighter-weight |
 
 ## Notes

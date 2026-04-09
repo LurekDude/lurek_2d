@@ -1,6 +1,6 @@
 -- Marine / Fishing Simulation Demo
 -- Cast line, catch fish with tension mini-game, sell at end of day
--- Run with: cargo run -- demos/sports/fishing
+-- Run with: cargo run -- content/demos/sports/fishing
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -79,12 +79,12 @@ local function spawnFish()
     })
 end
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.4, 0.7, 1)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.4, 0.7, 1)
     for _ = 1, MAX_FISH do spawnFish() end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     waveOffset = waveOffset + dt * 2
 
     if msgTimer > 0 then msgTimer = msgTimer - dt end
@@ -106,10 +106,10 @@ function luna.process(dt)
 
     -- Player movement
     if state == "idle" or state == "waiting" then
-        if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+        if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
             playerX = clamp(playerX - playerSpeed * dt, 50, W - 50)
         end
-        if luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+        if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
             playerX = clamp(playerX + playerSpeed * dt, 50, W - 50)
         end
     end
@@ -149,13 +149,13 @@ function luna.process(dt)
         -- Fish pulls tension up in a sinusoidal pattern — heavier fish have higher pull values
         local pull = hookedFish.type.pull
         -- Oscillate tension speed between 0 and pull using a sine wave for realistic struggle
-        tensionSpeed = pull * (math.sin(luna.time.getTime() * 3) * 0.5 + 0.5)
+        tensionSpeed = pull * (math.sin(lurek.time.getTime() * 3) * 0.5 + 0.5)
 
-        if luna.keyboard.isDown("up") then
+        if lurek.keyboard.isDown("up") then
             tension = tension + dt * 40
             reelProgress = reelProgress + dt * 15
         end
-        if luna.keyboard.isDown("down") then
+        if lurek.keyboard.isDown("down") then
             tension = tension - dt * 30
         end
         tension = tension + tensionSpeed * dt
@@ -230,8 +230,8 @@ function luna.process(dt)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
 
     if key == "space" and state == "idle" and not casting then
         casting = true
@@ -259,64 +259,64 @@ function luna.keypressed(key)
     if key == "3" then currentBait = 3 end
 end
 
-function luna.render()
+function lurek.render()
     -- Sky gradient (simple bands)
-    luna.gfx.setColor(0.3, 0.55, 0.9, 1)
-    luna.gfx.rectangle("fill", 0, 0, W, WATER_Y / 2)
-    luna.gfx.setColor(0.5, 0.7, 1, 1)
-    luna.gfx.rectangle("fill", 0, WATER_Y / 2, W, WATER_Y / 2)
+    lurek.gfx.setColor(0.3, 0.55, 0.9, 1)
+    lurek.gfx.rectangle("fill", 0, 0, W, WATER_Y / 2)
+    lurek.gfx.setColor(0.5, 0.7, 1, 1)
+    lurek.gfx.rectangle("fill", 0, WATER_Y / 2, W, WATER_Y / 2)
 
     -- Sun
-    luna.gfx.setColor(1, 0.9, 0.3, 1)
-    luna.gfx.circle("fill", 650, 60, 35)
+    lurek.gfx.setColor(1, 0.9, 0.3, 1)
+    lurek.gfx.circle("fill", 650, 60, 35)
 
     -- Dock
-    luna.gfx.setColor(0.5, 0.35, 0.15, 1)
-    luna.gfx.rectangle("fill", playerX - 60, DOCK_Y, 120, 15)
-    luna.gfx.rectangle("fill", playerX - 40, DOCK_Y + 15, 8, 30)
-    luna.gfx.rectangle("fill", playerX + 32, DOCK_Y + 15, 8, 30)
+    lurek.gfx.setColor(0.5, 0.35, 0.15, 1)
+    lurek.gfx.rectangle("fill", playerX - 60, DOCK_Y, 120, 15)
+    lurek.gfx.rectangle("fill", playerX - 40, DOCK_Y + 15, 8, 30)
+    lurek.gfx.rectangle("fill", playerX + 32, DOCK_Y + 15, 8, 30)
 
     -- Player (stick figure on dock)
-    luna.gfx.setColor(0.9, 0.8, 0.6, 1)
-    luna.gfx.circle("fill", playerX, DOCK_Y - 20, 10)
-    luna.gfx.setColor(0.2, 0.3, 0.6, 1)
-    luna.gfx.rectangle("fill", playerX - 6, DOCK_Y - 10, 12, 20)
+    lurek.gfx.setColor(0.9, 0.8, 0.6, 1)
+    lurek.gfx.circle("fill", playerX, DOCK_Y - 20, 10)
+    lurek.gfx.setColor(0.2, 0.3, 0.6, 1)
+    lurek.gfx.rectangle("fill", playerX - 6, DOCK_Y - 10, 12, 20)
 
     -- Rod
-    luna.gfx.setColor(0.5, 0.3, 0.1, 1)
-    luna.gfx.setLineWidth(2)
-    luna.gfx.line(playerX + 5, DOCK_Y - 15, playerX + 30, DOCK_Y - 45)
+    lurek.gfx.setColor(0.5, 0.3, 0.1, 1)
+    lurek.gfx.setLineWidth(2)
+    lurek.gfx.line(playerX + 5, DOCK_Y - 15, playerX + 30, DOCK_Y - 45)
 
     -- Fishing line
     if lineOut then
-        luna.gfx.setColor(0.8, 0.8, 0.8, 0.7)
-        luna.gfx.setLineWidth(1)
-        luna.gfx.line(playerX + 30, DOCK_Y - 45, lineX, lineY)
+        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.7)
+        lurek.gfx.setLineWidth(1)
+        lurek.gfx.line(playerX + 30, DOCK_Y - 45, lineX, lineY)
         -- Bobber
-        luna.gfx.setColor(1, 0.2, 0, 1)
-        luna.gfx.circle("fill", lineX, WATER_Y + math.sin(waveOffset + lineX * 0.1) * 3, 4)
+        lurek.gfx.setColor(1, 0.2, 0, 1)
+        lurek.gfx.circle("fill", lineX, WATER_Y + math.sin(waveOffset + lineX * 0.1) * 3, 4)
     end
 
     -- Water surface with waves
-    luna.gfx.setColor(0.1, 0.3, 0.7, 0.9)
-    luna.gfx.rectangle("fill", 0, WATER_Y, W, H - WATER_Y)
+    lurek.gfx.setColor(0.1, 0.3, 0.7, 0.9)
+    lurek.gfx.rectangle("fill", 0, WATER_Y, W, H - WATER_Y)
     -- Wave lines
-    luna.gfx.setColor(0.2, 0.4, 0.8, 0.4)
-    luna.gfx.setLineWidth(1)
+    lurek.gfx.setColor(0.2, 0.4, 0.8, 0.4)
+    lurek.gfx.setLineWidth(1)
     for wy = WATER_Y, WATER_Y + 30, 8 do
         for wx = 0, W - 20, 20 do
             local yo = math.sin(waveOffset + wx * 0.08 + wy * 0.2) * 3
-            luna.gfx.line(wx, wy + yo, wx + 15, wy + yo + 1)
+            lurek.gfx.line(wx, wy + yo, wx + 15, wy + yo + 1)
         end
     end
 
     -- Depth markers
-    luna.gfx.setColor(0.5, 0.6, 0.8, 0.3)
+    lurek.gfx.setColor(0.5, 0.6, 0.8, 0.3)
     for d = 50, maxDepth, 50 do
         local dy = WATER_Y + d
         if dy < H then
-            luna.gfx.line(0, dy, W, dy)
-            luna.gfx.print(d .. "m", 5, dy - 12, 0.6)
+            lurek.gfx.line(0, dy, W, dy)
+            lurek.gfx.print(d .. "m", 5, dy - 12, 0.6)
         end
     end
 
@@ -325,17 +325,17 @@ function luna.render()
         if f.y < H + 20 then
             local c = f.type.color
             local depth_fade = clamp(1 - (f.y - WATER_Y) / (maxDepth * 1.2), 0.2, 1)
-            luna.gfx.setColor(c[1] * depth_fade, c[2] * depth_fade, c[3] * depth_fade, 0.8)
+            lurek.gfx.setColor(c[1] * depth_fade, c[2] * depth_fade, c[3] * depth_fade, 0.8)
             -- Fish body (triangle-ish)
             local dir = f.vx >= 0 and 1 or -1
             local s = f.size
-            luna.gfx.polygon("fill", {
+            lurek.gfx.polygon("fill", {
                 f.x + dir * s, f.y,
                 f.x - dir * s, f.y - s * 0.5,
                 f.x - dir * s, f.y + s * 0.5,
             })
             -- Tail
-            luna.gfx.polygon("fill", {
+            lurek.gfx.polygon("fill", {
                 f.x - dir * s, f.y,
                 f.x - dir * (s + 4), f.y - s * 0.4,
                 f.x - dir * (s + 4), f.y + s * 0.4,
@@ -345,85 +345,85 @@ function luna.render()
 
     -- Cast power bar
     if casting then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, 50, 10)
-        luna.gfx.setColor(1, 1 - castPower / 100, 0, 1)
-        luna.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, castPower / 2, 10)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, 50, 10)
+        lurek.gfx.setColor(1, 1 - castPower / 100, 0, 1)
+        lurek.gfx.rectangle("fill", playerX - 25, DOCK_Y - 70, castPower / 2, 10)
     end
 
     -- Tension meter (when hooked)
     if state == "hooked" then
-        luna.gfx.setColor(0, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", W / 2 - 110, 50, 220, 70)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("TENSION", W / 2 - 30, 55, 0.9)
+        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", W / 2 - 110, 50, 220, 70)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("TENSION", W / 2 - 30, 55, 0.9)
 
         -- Tension bar
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", W / 2 - 95, 75, 190, 16)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", W / 2 - 95, 75, 190, 16)
         -- Sweet spot zone
-        luna.gfx.setColor(0, 0.6, 0, 0.4)
+        lurek.gfx.setColor(0, 0.6, 0, 0.4)
         local zoneX = W / 2 - 95 + tensionMin / 100 * 190
         local zoneW = (tensionMax - tensionMin) / 100 * 190
-        luna.gfx.rectangle("fill", zoneX, 75, zoneW, 16)
+        lurek.gfx.rectangle("fill", zoneX, 75, zoneW, 16)
         -- Current tension
         local tColor = (tension > tensionMax or tension < tensionMin) and {1, 0, 0} or {0, 1, 0}
-        luna.gfx.setColor(tColor[1], tColor[2], tColor[3], 1)
+        lurek.gfx.setColor(tColor[1], tColor[2], tColor[3], 1)
         local tx = W / 2 - 95 + tension / 100 * 190
-        luna.gfx.rectangle("fill", tx - 3, 73, 6, 20)
+        lurek.gfx.rectangle("fill", tx - 3, 73, 6, 20)
 
         -- Reel progress
-        luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-        luna.gfx.rectangle("fill", W / 2 - 95, 97, 190, 10)
-        luna.gfx.setColor(0, 0.7, 1, 1)
-        luna.gfx.rectangle("fill", W / 2 - 95, 97, reelProgress / 100 * 190, 10)
-        luna.gfx.setColor(1, 1, 1, 0.7)
-        luna.gfx.print("Up/Down keys", W / 2 - 45, 110, 0.6)
+        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+        lurek.gfx.rectangle("fill", W / 2 - 95, 97, 190, 10)
+        lurek.gfx.setColor(0, 0.7, 1, 1)
+        lurek.gfx.rectangle("fill", W / 2 - 95, 97, reelProgress / 100 * 190, 10)
+        lurek.gfx.setColor(1, 1, 1, 0.7)
+        lurek.gfx.print("Up/Down keys", W / 2 - 45, 110, 0.6)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.75)
-    luna.gfx.rectangle("fill", 0, 0, W, 40)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Day " .. day, 10, 5, 1)
+    lurek.gfx.setColor(0, 0, 0, 0.75)
+    lurek.gfx.rectangle("fill", 0, 0, W, 40)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Day " .. day, 10, 5, 1)
     local mins = math.floor(dayTimer / 60)
     local secs = math.floor(dayTimer % 60)
-    luna.gfx.print("Time: " .. mins .. ":" .. (secs < 10 and "0" or "") .. secs, 80, 8, 0.8)
-    luna.gfx.print("Money: $" .. money, 200, 8, 0.8)
+    lurek.gfx.print("Time: " .. mins .. ":" .. (secs < 10 and "0" or "") .. secs, 80, 8, 0.8)
+    lurek.gfx.print("Money: $" .. money, 200, 8, 0.8)
 
     -- Bait selector
     for i, b in ipairs(BAITS) do
         local sel = i == currentBait
-        luna.gfx.setColor(b.color[1], b.color[2], b.color[3], sel and 1 or 0.4)
-        luna.gfx.rectangle("fill", 320 + (i - 1) * 80, 5, 70, 20)
-        luna.gfx.setColor(1, 1, 1, sel and 1 or 0.5)
-        luna.gfx.print(i .. ":" .. b.name, 325 + (i - 1) * 80, 8, 0.7)
+        lurek.gfx.setColor(b.color[1], b.color[2], b.color[3], sel and 1 or 0.4)
+        lurek.gfx.rectangle("fill", 320 + (i - 1) * 80, 5, 70, 20)
+        lurek.gfx.setColor(1, 1, 1, sel and 1 or 0.5)
+        lurek.gfx.print(i .. ":" .. b.name, 325 + (i - 1) * 80, 8, 0.7)
     end
 
     -- Catch log
-    luna.gfx.setColor(0.6, 0.6, 0.6, 1)
-    luna.gfx.print("Catches: " .. #catches, 600, 8, 0.75)
+    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+    lurek.gfx.print("Catches: " .. #catches, 600, 8, 0.75)
     if #catches > 0 then
         local logY = 45
-        luna.gfx.setColor(0, 0, 0, 0.5)
+        lurek.gfx.setColor(0, 0, 0, 0.5)
         local logH = clamp(#catches, 1, 8) * 14 + 5
-        luna.gfx.rectangle("fill", W - 160, logY, 155, logH)
+        lurek.gfx.rectangle("fill", W - 160, logY, 155, logH)
         for i = clamp(#catches - 7, 1, #catches), #catches do
             local c = catches[i]
-            luna.gfx.setColor(0.8, 0.9, 1, 1)
-            luna.gfx.print(c.name .. " (" .. c.size .. ") $" .. c.value, W - 155, logY + (i - clamp(#catches - 7, 1, #catches)) * 14, 0.6)
+            lurek.gfx.setColor(0.8, 0.9, 1, 1)
+            lurek.gfx.print(c.name .. " (" .. c.size .. ") $" .. c.value, W - 155, logY + (i - clamp(#catches - 7, 1, #catches)) * 14, 0.6)
         end
     end
 
     -- Bottom controls
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, H - 22, W, 22)
-    luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-    luna.gfx.print("A/D move | Space hold+release to cast | Up/Down reel tension | 1/2/3 bait", 10, H - 19, 0.7)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, H - 22, W, 22)
+    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+    lurek.gfx.print("A/D move | Space hold+release to cast | Up/Down reel tension | 1/2/3 bait", 10, H - 19, 0.7)
 
     -- Message
     if msgTimer > 0 then
-        luna.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
-        luna.gfx.print(message, W / 2 - 80, H / 2 - 50, 1.1)
+        lurek.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
+        lurek.gfx.print(message, W / 2 - 80, H / 2 - 50, 1.1)
     end
 end

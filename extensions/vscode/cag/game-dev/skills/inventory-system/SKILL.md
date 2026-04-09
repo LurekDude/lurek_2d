@@ -8,7 +8,7 @@ Item storage, stacking, transfer, equipped state, and serialization for RPG/adve
 - **Stacking**: Group identical items up to `max_stack`. Overflow creates a new slot.
 - **Transfer**: Move items between inventories (player ↔ chest) with slot-level operations.
 - **Equipped slots**: Named slots (weapon, armor, accessory) with type restrictions.
-- **Serialization**: Convert inventory to a plain table for saving via `luna.data.encodeToml`.
+- **Serialization**: Convert inventory to a plain table for saving via `lurek.data.encodeToml`.
 
 ## Item Database
 

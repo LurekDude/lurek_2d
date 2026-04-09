@@ -1,10 +1,10 @@
 ---
-description: "**CAG-Architect** — Maintain the Luna2D CAG layer: agents, skills, prompts, and system prompt. Own `.github/` structure. Validate with `tools/validate/cag_validate.py`."
+description: "**CAG-Architect** — Maintain the Lurek2D CAG layer: agents, skills, prompts, and system prompt. Own `.github/` structure. Validate with `tools/validate/cag_validate.py`."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: CAG-Architect
 ---
 
-# CAG-ARCHITECT — LUNA2D CONTEXT AUGMENTED GUIDANCE LAYER
+# CAG-ARCHITECT — LUREK2D CONTEXT AUGMENTED GUIDANCE LAYER
 
 ## MISSION
 

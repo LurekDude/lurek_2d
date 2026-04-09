@@ -1,4 +1,4 @@
-//! `luna.simulator` — Automated input simulation via timed step scripts.
+//! `lurek.simulator` — Automated input simulation via timed step scripts.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -12,7 +12,7 @@ use crate::automation::{Script, Simulator, Step};
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.simulator` API table with the Lua VM.
+/// Registers the `lurek.simulator` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

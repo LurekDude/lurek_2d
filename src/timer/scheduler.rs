@@ -5,7 +5,7 @@
 //!
 //! ## Usage
 //! ```rust,no_run
-//! # use luna2d::timer::Scheduler;
+//! # use lurek2d::timer::Scheduler;
 //! let mut sched = Scheduler::new();
 //! let id = sched.after(2.0);          // fires once after 2 seconds
 //! let rid = sched.every(0.5, -1);     // fires every 0.5 s indefinitely

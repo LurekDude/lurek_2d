@@ -4,15 +4,15 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.img`                                         |
+| **Lua API**    | `lurek.img`                                         |
 | **Source**     | `src/image/`                                         |
 | **Rust Tests** | `tests/rust/unit/image_tests.rs` (62 tests)          |
 | **Lua Tests**  | `tests/lua/unit/test_image.lua`                      |
-| **Architecture** | See `specs/image.md` — 6 source files, 20 CPU effects, layer compositor, LIMG binary format |
+| **Architecture** | See `docs/specs/image.md` — 6 source files, 20 CPU effects, layer compositor, LIMG binary format |
 
 ## Purpose
 
-The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`luna.gfx.newImage(imgdata)`). The module covers four distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), a compositing layer stack (`LayeredImage`), LIMG binary serialization (`serial`), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
+The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`lurek.gfx.newImage(imgdata)`). The module covers four distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), a compositing layer stack (`LayeredImage`), LIMG binary serialization (`serial`), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
 
 ## Source Files
 
@@ -40,14 +40,14 @@ The `image` module provides CPU-side pixel-level access to RGBA image data. It i
 
 | Namespace / Method                       | Description                                               |
 |------------------------------------------|-----------------------------------------------------------|
-| `luna.img.newImageData(w,h)`             | Create blank RGBA8 buffer                                 |
-| `luna.img.newImageData(fn)`              | Load PNG/JPEG from game directory                         |
-| `luna.img.newCompressedData`             | Load DDS file as CompressedImageData                      |
-| `luna.img.isCompressed`                  | Check if path is a DDS file                               |
-| `luna.img.newLayeredImage(w, h)`         | Create empty LayeredImage canvas                          |
-| `luna.img.saveImage(imgdata, path)`      | Save ImageData to LIMG binary file                        |
-| `luna.img.loadImage(path)`               | Load ImageData from LIMG binary file                      |
-| `luna.img.loadLayered(path)`             | Load LayeredImage from LIMG binary file                   |
+| `lurek.img.newImageData(w,h)`             | Create blank RGBA8 buffer                                 |
+| `lurek.img.newImageData(fn)`              | Load PNG/JPEG from game directory                         |
+| `lurek.img.newCompressedData`             | Load DDS file as CompressedImageData                      |
+| `lurek.img.isCompressed`                  | Check if path is a DDS file                               |
+| `lurek.img.newLayeredImage(w, h)`         | Create empty LayeredImage canvas                          |
+| `lurek.img.saveImage(imgdata, path)`      | Save ImageData to LIMG binary file                        |
+| `lurek.img.loadImage(path)`               | Load ImageData from LIMG binary file                      |
+| `lurek.img.loadLayered(path)`             | Load LayeredImage from LIMG binary file                   |
 | **ImageData core**                       | `getWidth`, `getHeight`, `getDimensions`, `getPixel`, `setPixel`, `mapPixel`, `encode`, `getString`, `paste` |
 | **Color/Tone (in-place)**                | `brightness`, `contrast`, `saturation`, `gamma`, `tint`  |
 | **Filters (in-place)**                   | `grayscale`, `sepia`, `invert`, `threshold`, `posterize`, `fill`, `noise`, `alphaMask` |
@@ -60,6 +60,6 @@ The `image` module provides CPU-side pixel-level access to RGBA image data. It i
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/image.md`](../../specs/image.md)
+→ [`docs/specs/image.md`](../../docs/specs/image.md)
 
-_Update both this file **and** `specs/image.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/image.md` whenever source files, public types, or Lua bindings change._

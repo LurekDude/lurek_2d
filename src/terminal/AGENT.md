@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.terminal`                                      |
+| **Lua API**    | `lurek.terminal`                                      |
 | **Source**      | `src/terminal/`                                      |
 | **Rust Tests** | `tests/unit/terminal_tests.rs`                       |
 | **Lua Tests**  | `tests/lua/unit/test_terminal.lua`                   |
@@ -26,6 +26,6 @@ The `terminal` module provides a grid-based character-cell terminal emulator wit
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/terminal.md`](../../specs/terminal.md)
+→ [`docs/specs/terminal.md`](../../docs/specs/terminal.md)
 
-_Update both this file **and** `specs/terminal.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/terminal.md` whenever source files, public types, or Lua bindings change._

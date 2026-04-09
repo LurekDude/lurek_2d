@@ -141,7 +141,7 @@ function execCommand(
 /**
  * Creates the handler for `luna2d.runExample`.
  *
- * Builds and runs the specified demo via `cargo run -- demos/<name>`.
+ * Builds and runs the specified demo via `cargo run -- content/demos/<name>`.
  */
 export function handleRunExample(
   workspaceRoot: string
@@ -160,7 +160,7 @@ export function handleRunExample(
     }
 
     return execCommand(
-      `cargo run -- demos/${name}`,
+      `cargo run -- content/content/demos/${name}`,
       workspaceRoot,
       120_000
     );
@@ -238,7 +238,7 @@ export function handleListExamples(
   return async () => {
     const examples = listExampleDirs(workspaceRoot);
     if (examples.length === 0) {
-      return "No demos found in demos/ directory.";
+      return "No demos found in content/content/demos/ directory.";
     }
     return examples.join("\n");
   };
@@ -317,7 +317,7 @@ export function handleGetLogs(
 }
 
 /**
- * Lists demo directory names from the workspace demos/ folder.
+ * Lists demo directory names from the workspace content/demos/ folder.
  */
 function listExampleDirs(workspaceRoot: string): string[] {
   const examplesDir = path.join(workspaceRoot, "demos");

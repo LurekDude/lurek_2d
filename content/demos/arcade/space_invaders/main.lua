@@ -1,7 +1,7 @@
--- Space Invaders — Classic Arcade (Luna2D demo)
+-- Space Invaders — Classic Arcade (Lurek2D demo)
 -- Defend Earth! Shoot the alien invasion fleet before they reach the ground.
 -- Arrow/AD to move, Space to fire. Barriers absorb shots.
--- Run with: cargo run -- demos/arcade/space_invaders
+-- Run with: cargo run -- content/demos/arcade/space_invaders
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -84,8 +84,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0, 0, 0)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0, 0, 0)
     score = 0; lives = 3; wave = 1
     init()
 end
@@ -94,17 +94,17 @@ end
 
 local anim_timer = 0
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
 
     anim_timer = anim_timer + dt
     shoot_cooldown = math.max(0, shoot_cooldown - dt)
 
     -- Player movement
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a") then
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a") then
         player.x = math.max(0, player.x - PLAYER_SPEED * dt)
     end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then
         player.x = math.min(W - player.w, player.x + PLAYER_SPEED * dt)
     end
 
@@ -229,97 +229,97 @@ end
 
 local ANIM_PERIOD = 0.5
 
-function luna.render()
+function lurek.render()
     -- Stars background
     math.randomseed(42)
-    luna.gfx.setColor(0.9, 0.9, 0.9, 0.4)
+    lurek.gfx.setColor(0.9, 0.9, 0.9, 0.4)
     for i = 1, 80 do
         local sx = math.random(W)
         local sy = math.random(H)
-        luna.gfx.circle("fill", sx, sy, 1)
+        lurek.gfx.circle("fill", sx, sy, 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    luna.gfx.setColor(0.8, 1, 0.8)
-    luna.gfx.print("SCORE: " .. score, 10, 8, 1.5)
-    luna.gfx.print("WAVE: " .. wave, W/2 - 40, 8, 1.5)
-    luna.gfx.setColor(1, 0.3, 0.3)
-    luna.gfx.print("LIVES: " .. lives, W - 100, 8, 1.5)
+    lurek.gfx.setColor(0.8, 1, 0.8)
+    lurek.gfx.print("SCORE: " .. score, 10, 8, 1.5)
+    lurek.gfx.print("WAVE: " .. wave, W/2 - 40, 8, 1.5)
+    lurek.gfx.setColor(1, 0.3, 0.3)
+    lurek.gfx.print("LIVES: " .. lives, W - 100, 8, 1.5)
 
     -- Ground line
-    luna.gfx.setColor(0.4, 0.8, 0.4)
-    luna.gfx.line(0, H - 30, W, H - 30)
+    lurek.gfx.setColor(0.4, 0.8, 0.4)
+    lurek.gfx.line(0, H - 30, W, H - 30)
 
     -- Barriers
     for _, blk in ipairs(barriers) do
         if blk.hp > 0 then
             local alpha = blk.hp / 3
-            luna.gfx.setColor(0.2, 0.9, 0.2, alpha)
-            luna.gfx.rectangle("fill", blk.x, blk.y, BARRIER_CELL, BARRIER_CELL)
+            lurek.gfx.setColor(0.2, 0.9, 0.2, alpha)
+            lurek.gfx.rectangle("fill", blk.x, blk.y, BARRIER_CELL, BARRIER_CELL)
         end
     end
 
     -- Player ship (simple polygon)
-    luna.gfx.setColor(0.4, 0.8, 1.0)
-    luna.gfx.rectangle("fill", player.x + player.w/2 - 4, player.y - 10, 8, 10)
-    luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+    lurek.gfx.setColor(0.4, 0.8, 1.0)
+    lurek.gfx.rectangle("fill", player.x + player.w/2 - 4, player.y - 10, 8, 10)
+    lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
 
     -- Invaders
     local frame = math.floor(anim_timer / ANIM_PERIOD) % 2
     for _, inv in ipairs(invaders) do
         if inv.alive then
             local row_hue = (inv.row - 1) / (INVADER_ROWS - 1)
-            luna.gfx.setColor(0.2 + row_hue * 0.8, 1.0 - row_hue * 0.5, 0.2)
+            lurek.gfx.setColor(0.2 + row_hue * 0.8, 1.0 - row_hue * 0.5, 0.2)
             local ix = inv.x + (frame == 1 and 3 or 0)
             -- Body
-            luna.gfx.rectangle("fill", ix + 5, inv.y + 4, INVADER_W - 10, INVADER_H - 10)
+            lurek.gfx.rectangle("fill", ix + 5, inv.y + 4, INVADER_W - 10, INVADER_H - 10)
             -- Head bumps
-            luna.gfx.rectangle("fill", ix + 8, inv.y, INVADER_W - 16, 8)
+            lurek.gfx.rectangle("fill", ix + 8, inv.y, INVADER_W - 16, 8)
             -- Legs (alternate frame)
             if frame == 0 then
-                luna.gfx.rectangle("fill", ix + 2, inv.y + INVADER_H - 8, 6, 8)
-                luna.gfx.rectangle("fill", ix + INVADER_W - 8, inv.y + INVADER_H - 8, 6, 8)
+                lurek.gfx.rectangle("fill", ix + 2, inv.y + INVADER_H - 8, 6, 8)
+                lurek.gfx.rectangle("fill", ix + INVADER_W - 8, inv.y + INVADER_H - 8, 6, 8)
             else
-                luna.gfx.rectangle("fill", ix + 6, inv.y + INVADER_H - 8, 6, 8)
-                luna.gfx.rectangle("fill", ix + INVADER_W - 12, inv.y + INVADER_H - 8, 6, 8)
+                lurek.gfx.rectangle("fill", ix + 6, inv.y + INVADER_H - 8, 6, 8)
+                lurek.gfx.rectangle("fill", ix + INVADER_W - 12, inv.y + INVADER_H - 8, 6, 8)
             end
             -- Eyes
-            luna.gfx.setColor(0, 0, 0)
-            luna.gfx.circle("fill", ix + INVADER_W/2 - 5, inv.y + 8, 3)
-            luna.gfx.circle("fill", ix + INVADER_W/2 + 5, inv.y + 8, 3)
+            lurek.gfx.setColor(0, 0, 0)
+            lurek.gfx.circle("fill", ix + INVADER_W/2 - 5, inv.y + 8, 3)
+            lurek.gfx.circle("fill", ix + INVADER_W/2 + 5, inv.y + 8, 3)
         end
     end
 
     -- Player bullets
-    luna.gfx.setColor(1, 1, 0.5)
+    lurek.gfx.setColor(1, 1, 0.5)
     for _, b in ipairs(bullets) do
-        luna.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
+        lurek.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
     end
 
     -- Invader bullets
-    luna.gfx.setColor(1, 0.3, 0.3)
+    lurek.gfx.setColor(1, 0.3, 0.3)
     for _, b in ipairs(inv_bullets) do
-        luna.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
+        lurek.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
     end
 
     -- Overlays
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then score = 0; lives = 3; wave = 1; init() end
     if game_state ~= "playing" then return end
     if key == "space" and shoot_cooldown <= 0 and #bullets < 3 then

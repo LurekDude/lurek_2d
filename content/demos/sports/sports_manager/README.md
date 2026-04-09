@@ -15,7 +15,7 @@ A data-driven football management simulation. Build and train an 11-player roste
 ## How to Run
 
 ```powershell
-cargo run -- demos/sports_manager
+cargo run -- content/demos/sports_manager
 ```
 
 ## Controls

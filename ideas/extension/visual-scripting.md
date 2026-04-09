@@ -26,7 +26,7 @@ The spec describes a full visual scripting system:
 
 ## Current Implementation: None
 
-No visual scripting files exist in vscode-extension/. No `luna.scripting.*` API in the engine.
+No visual scripting files exist in vscode-extension/. No `lurek.scripting.*` API in the engine.
 
 ---
 
@@ -37,7 +37,7 @@ No visual scripting files exist in vscode-extension/. No `luna.scripting.*` API 
 **Arguments for**:
 - Unlocks non-programmer game designers
 - Visual debugging is easier than text debugging
-- Popular in competitor engines (Godot VisualScript, Unity Visual Scripting, Unreal Blueprints)
+- Popular in competitor engines (Engine C VisualScript, Engine G Visual Scripting, Engine H Blueprints)
 - Already fully specified in documentation
 
 **Arguments against**:
@@ -63,10 +63,10 @@ No visual scripting files exist in vscode-extension/. No `luna.scripting.*` API 
 
 ### Phase 2: Engine API Blocks
 
-6. Add blocks for luna.gfx.* (rectangle, circle, image, text)
-7. Add blocks for luna.input.* (keypressed, mousepressed)
-8. Add blocks for luna.time.* (after, every)
-9. Add blocks for luna.entity.* (create, find, destroy)
+6. Add blocks for lurek.gfx.* (rectangle, circle, image, text)
+7. Add blocks for lurek.input.* (keypressed, mousepressed)
+8. Add blocks for lurek.time.* (after, every)
+9. Add blocks for lurek.entity.* (create, find, destroy)
 10. Auto-generate blocks from api_data.json
 
 ### Phase 3: Debugging & Polish
@@ -80,7 +80,7 @@ No visual scripting files exist in vscode-extension/. No `luna.scripting.*` API 
 
 ### Phase 4: Pure Lua Runtime (per spec recommendation)
 
-17. Implement `luna.scripting.*` as a pure-Lua library/ module
+17. Implement `lurek.scripting.*` as a pure-Lua library/ module
 18. Load compiled Lua from visual scripts at runtime
 19. Hot-reload visual script changes
 20. No Rust engine changes needed

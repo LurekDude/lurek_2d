@@ -1,7 +1,7 @@
 //! Integration tests for the image data module.
 
-use luna2d::image::{CompressedImageData, ImageData, LayeredImage, PaletteLUT};
-use luna2d::math::Color;
+use lurek2d::image::{CompressedImageData, ImageData, LayeredImage, PaletteLUT};
+use lurek2d::math::Color;
 
 #[test]
 fn image_data_new_blank() {
@@ -621,7 +621,7 @@ fn layered_image_merge_empty_stack_is_transparent() {
 // LIMG binary serialization tests
 // -----------------------------------------------------------------------
 
-use luna2d::image::serial;
+use lurek2d::image::serial;
 
 #[test]
 fn serial_flat_roundtrip() {

@@ -5,10 +5,10 @@ Shoot them before they march all the way down to the ground.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — invader bodies, player ship, barriers
-- `luna.input.isKeyDown()` — smooth horizontal player movement
-- `luna.keypressed()` — firing with cooldown
-- `luna.gfx.print()` — HUD with score, lives, and wave counter
+- `lurek.gfx.rectangle()` — invader bodies, player ship, barriers
+- `lurek.input.isKeyDown()` — smooth horizontal player movement
+- `lurek.keypressed()` — firing with cooldown
+- `lurek.gfx.print()` — HUD with score, lives, and wave counter
 - Barrier erosion: blocks lose HP and fade as bullets pass through
 
 ## Controls

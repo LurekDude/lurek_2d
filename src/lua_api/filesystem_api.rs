@@ -135,7 +135,7 @@ impl LuaUserData for LuaFileHandle {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.fs` API table with the Lua VM.
+/// Registers the `lurek.fs` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

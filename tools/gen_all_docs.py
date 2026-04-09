@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Convenience runner: regenerate the full Luna2D documentation pipeline in one command.
+"""Convenience runner: regenerate the full Lurek2D documentation pipeline in one command.
 
 Steps:
     1. gen_rust_api_data.py     -> docs/logs/rust_api_data.json    (Rust master JSON)
     2. gen_lua_api_data.py      -> docs/logs/lua_api_data.json     (Lua master JSON)
-    3. gen_luadoc.py            -> docs/API/luna.lua              (LuaCATS stubs)
+    3. gen_luadoc.py            -> docs/API/lurek.lua              (LuaCATS stubs)
     4. gen_docs_lua.py          -> docs/API/lua-api.md            (compact Lua API reference)
     5. gen_docs_rust.py         -> docs/API/rust-api.md           (compact Rust API reference)
-    6. gen_wiki_api.py          -> wiki/API-Reference.md          (game-developer cheatsheet)
+    6. gen_wiki_api.py          -> docs/wiki/API-Reference.md          (game-developer cheatsheet)
     7. doc_coverage.py          -> docs/logs/doc_coverage.json    (docstring coverage analytics)
     8. test_coverage.py         -> docs/logs/test_coverage.json   (test coverage analytics)
     9. gen_test_docs.py --mode rust  -> docs/tests/test_docs_rust.md
@@ -31,10 +31,10 @@ if hasattr(sys.stdout, "reconfigure"):
 SCRIPTS = [
     ("docs/gen_rust_api_data.py", "Rust JSON (docs/logs/rust_api_data.json)"),
     ("docs/gen_lua_api_data.py",  "Lua JSON (docs/logs/lua_api_data.json)"),
-    ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/API/luna.lua)"),
+    ("docs/gen_luadoc.py",        "LuaCATS Stubs (docs/API/lurek.lua)"),
     ("docs/gen_docs_lua.py",      "Lua API reference (docs/API/lua-api.md)"),
     ("docs/gen_docs_rust.py",     "Rust API reference (docs/API/rust-api.md)"),
-    ("docs/gen_wiki_api.py",      "Wiki cheatsheet (wiki/API-Reference.md)"),
+    ("docs/gen_wiki_api.py",      "Wiki cheatsheet (docs/wiki/API-Reference.md)"),
     ("audit/doc_coverage.py",      "Doc coverage analytics (docs/logs/doc_coverage.json)"),
     ("audit/test_coverage.py",     "Test coverage analytics (docs/logs/test_coverage.json)"),
 ]
@@ -81,7 +81,7 @@ def run_script(script_name: str, extra_args: list, label: str) -> bool:
 
 
 def main() -> None:
-    print("Luna2D doc pipeline")
+    print("Lurek2D doc pipeline")
     print("=" * 60)
 
     failed = []

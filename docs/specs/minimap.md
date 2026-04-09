@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.minimap`                                       |
+| **Lua API**    | `lurek.minimap`                                       |
 | **Source**     | `src/minimap/`                                       |
 | **Rust Tests** | `tests/rust/unit/minimap_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_minimap.lua`                    |
@@ -18,12 +18,12 @@ The core `Minimap` struct holds a fixed-size terrain colour grid (integer terrai
 
 The module supports two colour modes: `Terrain` (cells coloured by terrain type) and `Political` (cells coloured by owner/faction). Object types are registered with names and colours, then individual objects reference a type index and optional owner ID. Tile descriptions provide hover tooltip text keyed by terrain type. Anti-aliasing and clickability are toggleable rendering hints.
 
-**Scope boundary**: The `minimap` module owns only the data model and coordinate math. It never imports `wgpu`, `graphics`, or any rendering code. The `lua_api/minimap_api.rs` bridge wraps `Minimap` in a `LuaMinimap` UserData and exposes the full API under `luna.minimap.*`. All GPU upload, texture creation, and draw-call submission is the responsibility of code outside this module. The module also does not handle input events — click detection and hover queries require the caller to pass screen coordinates into the conversion functions.
+**Scope boundary**: The `minimap` module owns only the data model and coordinate math. It never imports `wgpu`, `graphics`, or any rendering code. The `lua_api/minimap_api.rs` bridge wraps `Minimap` in a `LuaMinimap` UserData and exposes the full API under `lurek.minimap.*`. All GPU upload, texture creation, and draw-call submission is the responsibility of code outside this module. The module also does not handle input events — click detection and hover queries require the caller to pass screen coordinates into the conversion functions.
 
 ## Architecture
 
 ```
-luna.minimap.newMinimap(gw, gh, dw, dh)
+lurek.minimap.newMinimap(gw, gh, dw, dh)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -134,7 +134,7 @@ Fog-of-war visibility level for a cell. Three variants represented as `#[repr(u8
 
 ## Lua API
 
-Exposed under `luna.minimap.*` by `src/lua_api/minimap_api.rs`. The module registers one factory function on the `luna.minimap` table and wraps `Minimap` as a `LuaMinimap` UserData with 61 methods plus `type()` and `typeOf()` from the `LunaType` trait.
+Exposed under `lurek.minimap.*` by `src/lua_api/minimap_api.rs`. The module registers one factory function on the `lurek.minimap` table and wraps `Minimap` as a `LuaMinimap` UserData with 61 methods plus `type()` and `typeOf()` from the `LunaType` trait.
 
 **Index convention**: All grid coordinates in the Lua API are **1-based** (Lua convention). The bridge layer subtracts 1 before passing to the 0-based Rust model. Object type indices returned by `addObjectType` are also 1-based.
 
@@ -142,7 +142,7 @@ Exposed under `luna.minimap.*` by `src/lua_api/minimap_api.rs`. The module regis
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
-| `luna.minimap.newMinimap` | `(grid_w, grid_h [, display_w, display_h]) → Minimap` | Creates a new grid-based minimap. Display size defaults to 200×200 if omitted. |
+| `lurek.minimap.newMinimap` | `(grid_w, grid_h [, display_w, display_h]) → Minimap` | Creates a new grid-based minimap. Display size defaults to 200×200 if omitted. |
 
 ### Minimap Methods — Grid Queries
 
@@ -283,9 +283,9 @@ Exposed under `luna.minimap.*` by `src/lua_api/minimap_api.rs`. The module regis
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create a 64x48 minimap displayed at 200x160 pixels
-    minimap = luna.minimap.newMinimap(64, 48, 200, 160)
+    minimap = lurek.minimap.newMinimap(64, 48, 200, 160)
 
     -- Define terrain colours
     minimap:setTerrainColor(0, 0.0, 0.5, 0.0)  -- grass (green)
@@ -337,11 +337,11 @@ function luna.init()
     minimap:setCenter(32, 24)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     minimap:update(dt) -- expire pings
 
     -- Example: add a ping on key press
-    if luna.keyboard.isDown("p") then
+    if lurek.keyboard.isDown("p") then
         minimap:addPing(32, 24, 2.0, 1, 0, 0, 1) -- red ping, 2 seconds
     end
 
@@ -350,9 +350,9 @@ function luna.process(dt)
     minimap:setViewportRect(cx - 8, cy - 6, 16, 12)
 end
 
-function luna.render()
+function lurek.render()
     -- Draw the minimap at screen position (580, 10)
-    -- (actual rendering is done by luna.gfx using the minimap data)
+    -- (actual rendering is done by lurek.gfx using the minimap data)
 end
 ```
 
@@ -378,7 +378,7 @@ end
 
 ## Notes
 
-- **Pure data model**: The minimap module has zero external crate dependencies beyond `std`. It does not import `wgpu`, `image`, `rapier2d`, or any other Luna2D tier module except `engine` (for log message constants). This makes it safe to use in headless/test environments without GPU or window.
+- **Pure data model**: The minimap module has zero external crate dependencies beyond `std`. It does not import `wgpu`, `image`, `rapier2d`, or any other Lurek2D tier module except `engine` (for log message constants). This makes it safe to use in headless/test environments without GPU or window.
 - **0-based vs 1-based indexing**: The Rust `Minimap` struct uses 0-based grid coordinates and 0-based object type indices internally. The `LuaMinimap` bridge in `minimap_api.rs` converts to/from 1-based Lua conventions by subtracting/adding 1. Passing 0 for coordinates or type indices from Lua triggers a descriptive `LuaError`.
 - **Flat array storage**: Terrain (`Vec<u32>`) and fog (`Vec<u8>`) grids are stored as flat row-major arrays of `grid_width × grid_height` elements. Bulk-set operations (`setTerrainData`, `setFogData`) accept flat Lua tables and clamp to the grid size, silently ignoring excess values.
 - **Ping expiration**: Pings are time-decayed — `Minimap::update(dt)` decrements each ping's `remaining` field and removes expired pings via `Vec::retain_mut`. The caller must call `update(dt)` every frame for pings to expire, or they persist indefinitely.
@@ -386,4 +386,4 @@ end
 - **Coordinate conversion**: `screen_to_grid` and `grid_to_screen` account for zoom and centre offset. They require the screen position of the minimap widget (`minimap_x`, `minimap_y`) as parameters because the module has no knowledge of where it is drawn on screen.
 - **Colour defaults**: Unset terrain colours default to grey `[0.5, 0.5, 0.5, 1.0]`. Unset owner colours default to light grey `[0.8, 0.8, 0.8, 1.0]`. Fog colour defaults to semi-transparent black `[0.0, 0.0, 0.0, 0.8]`. Viewport colour defaults to semi-transparent white `[1.0, 1.0, 1.0, 0.8]`. Ping colour defaults to yellow `[1.0, 1.0, 0.0, 1.0]` when omitted in Lua. Marker colour defaults to red `[1.0, 0.0, 0.0, 1.0]` when omitted in Lua.
 - **No SharedState interaction**: Unlike most Lua API modules, `minimap_api.rs` does not borrow `SharedState` at all — it receives the `_state` parameter but ignores it. The `LuaMinimap` UserData owns its `Minimap` instance directly, avoiding borrow contention.
-- **Breaking change surface**: Renaming or removing any `LuaMinimap` method breaks Lua game scripts that call `luna.minimap.newMinimap()` and use the returned object. The 1-based coordinate convention is load-bearing — changing it would silently corrupt terrain and fog data in existing games.
+- **Breaking change surface**: Renaming or removing any `LuaMinimap` method breaks Lua game scripts that call `lurek.minimap.newMinimap()` and use the returned object. The 1-based coordinate convention is load-bearing — changing it would silently corrupt terrain and fog data in existing games.

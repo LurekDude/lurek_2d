@@ -1,9 +1,9 @@
 ---
 name: build-system
-description: "Load this skill when working with the Luna2D build system: Cargo profiles, debug vs release builds, binary size and speed optimisation, the build/ output directory override, feature flags (lua-jit / lua54), or packaging for distribution via installer scripts. Use for: cargo build, cargo check, cargo run, profile tuning, dist.ps1/dist.sh, NSIS installer. Skip it for CI/CD pipeline setup (use ci-cd-pipeline skill) or writing Rust code."
+description: "Load this skill when working with the Lurek2D build system: Cargo profiles, debug vs release builds, binary size and speed optimisation, the build/ output directory override, feature flags (lua-jit / lua54), or packaging for distribution via installer scripts. Use for: cargo build, cargo check, cargo run, profile tuning, dist.ps1/dist.sh, NSIS installer. Skip it for CI/CD pipeline setup (use ci-cd-pipeline skill) or writing Rust code."
 ---
 
-# Build System — Luna2D
+# Build System — Lurek2D
 
 ## Load When
 
@@ -28,7 +28,7 @@ description: "Load this skill when working with the Luna2D build system: Cargo p
 
 ## Output Directory Override
 
-Luna2D redirects Cargo output from the default `target/` to **`build/`** via `.cargo/config.toml`:
+Lurek2D redirects Cargo output from the default `target/` to **`build/`** via `.cargo/config.toml`:
 
 ```toml
 # .cargo/config.toml
@@ -38,9 +38,9 @@ target-dir = "build"
 
 | Binary | Path |
 |--------|------|
-| Debug | `build/debug/luna2d.exe` (Windows) / `build/debug/luna2d` (Unix) |
-| Release | `build/release/luna2d.exe` / `build/release/luna2d` |
-| Dist | `build/dist/luna2d.exe` / `build/dist/luna2d` |
+| Debug | `build/debug/lurek2d.exe` (Windows) / `build/debug/lurek2d` (Unix) |
+| Release | `build/release/lurek2d.exe` / `build/release/lurek2d` |
+| Dist | `build/dist/lurek2d.exe` / `build/dist/lurek2d` |
 
 **Never reference `target/`** — the binaries are not there.
 
@@ -99,7 +99,7 @@ lto = true        # fat LTO: full cross-crate analysis (better than thin for bin
 
 ## Feature Flags — Lua Backend
 
-Luna2D ships two Lua runtime backends. Select at build time with a Cargo feature flag.
+Lurek2D ships two Lua runtime backends. Select at build time with a Cargo feature flag.
 
 | Feature | Command | Backend | Platform |
 |---------|---------|---------|----------|
@@ -127,13 +127,13 @@ cargo check
 cargo build
 
 # Run a demo directly (builds if needed)
-cargo run -- demos/hello_world
+cargo run -- content/demos/hello_world
 
 # Build release binary (full optimisation, ~60-120s first build)
 cargo build --release
 
 # Run release binary
-cargo run --release -- demos/hello_world
+cargo run --release -- content/demos/hello_world
 
 # Build distribution binary (fat LTO, ~90-180s)
 cargo build --profile dist
@@ -148,14 +148,14 @@ cargo build --profile dist
 ### Windows — ZIP + Folder
 
 ```powershell
-# Full release build + package → dist/luna2d-windows-x86_64/
+# Full release build + package → dist/lurek2d-windows-x86_64/
 powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1
 
 # Skip cargo build (repackage already-built binary)
 powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild
 ```
 
-Output: `dist/luna2d-windows-x86_64/luna2d.exe` + demos + `dist/luna2d-windows-x86_64.zip`
+Output: `dist/lurek2d-windows-x86_64/lurek2d.exe` + demos + `dist/lurek2d-windows-x86_64.zip`
 
 ### Linux / macOS — TAR.GZ
 
@@ -163,7 +163,7 @@ Output: `dist/luna2d-windows-x86_64/luna2d.exe` + demos + `dist/luna2d-windows-x
 bash tools/dist/dist.sh
 ```
 
-Output: `dist/luna2d-<os>-<arch>/` + `.tar.gz`
+Output: `dist/lurek2d-<os>-<arch>/` + `.tar.gz`
 
 ### Windows Installer (NSIS)
 
@@ -172,14 +172,14 @@ Output: `dist/luna2d-<os>-<arch>/` + `.tar.gz`
 makensis tools/dist/installer.nsi
 ```
 
-Output: `dist/luna2d-<version>-setup.exe`
+Output: `dist/lurek2d-<version>-setup.exe`
 
 ---
 
 ## Local Install / Uninstall
 
 ```powershell
-# Install luna2d.exe to PATH (Windows)
+# Install lurek2d.exe to PATH (Windows)
 powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1
 
 # Uninstall
@@ -191,7 +191,7 @@ powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1 --uninstall
 bash tools/dist/install.sh
 ```
 
-After install: `luna demos/hello_world` works from any directory.
+After install: `luna content/demos/hello_world` works from any directory.
 
 ---
 
@@ -204,8 +204,8 @@ These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
 | `Build: Debug` | `cargo build` |
 | `Build: Release` | `cargo build --release` |
 | `Build: Check (fast)` | `cargo check` |
-| `Run Debug: Pick Example` | `cargo run -- demos/<pick>` |
-| `Run Release: Pick Example` | `cargo run --release -- demos/<pick>` |
+| `Run Debug: Pick Example` | `cargo run -- content/demos/<pick>` |
+| `Run Release: Pick Example` | `cargo run --release -- content/demos/<pick>` |
 | `Dist: Package Windows` | `tools/dist/dist.ps1` |
 | `Dist: Package Windows (skip build)` | `tools/dist/dist.ps1 -SkipBuild` |
 | `Dist: NSIS Installer (Windows)` | `makensis tools/dist/installer.nsi` |
@@ -220,7 +220,7 @@ These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
 | `LINK : fatal error LNK1181` | Incremental build artifact corruption | `Remove-Item build/debug -Recurse; cargo build` |
 | Binary at `target/` instead of `build/` | `.cargo/config.toml` not present | Verify `.cargo/config.toml` has `target-dir = "build"` |
 | Huge binary in dev (>200MB) | `debug = true` with full DWARF | Use `debug = "line-tables-only"` in `[profile.dev]` |
-| `wgpu` validation spew on first run | Missing env filter | Set `RUST_LOG=luna2d=info` to silence wgpu noise |
+| `wgpu` validation spew on first run | Missing env filter | Set `RUST_LOG=lurek2d=info` to silence wgpu noise |
 
 ---
 
@@ -240,8 +240,8 @@ These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
 
 ### Cargo.toml Invariants
 
-- `[[bin]] name = "luna2d"` — binary name must stay `luna2d`
-- `[lib] name = "luna2d"` — library name must stay `luna2d` (integration tests import it)
+- `[[bin]] name = "lurek2d"` — binary name must stay `lurek2d`
+- `[lib] name = "lurek2d"` — library name must stay `lurek2d` (integration tests import it)
 - `edition = "2021"` — do not downgrade to 2018
 
 ### Semver Pinning

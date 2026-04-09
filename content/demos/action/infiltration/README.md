@@ -4,19 +4,19 @@ A stealth puzzle game where you navigate a multi-room facility, avoid sweeping s
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — WASD and arrow-key movement with per-axis wall-slide collision
-- `luna.keyboard.wasPressed()` — gadget use (E to interact, Q to cycle gadget)
-- `luna.mouse.getPosition()` / `luna.mousepressed()` — clicking wire targets in the hack mini-puzzle
-- `luna.gfx.polygon()` — camera vision-cone rendered as a filled triangle fan
-- `luna.gfx.rectangle()` — tile map, door overlays, alert bar, gadget HUD
-- `luna.gfx.setColor()` — alert-level colour interpolation from green → yellow → red
-- `luna.gfx.print()` — mission timer countdown, door labels, and win/caught overlays
+- `lurek.keyboard.isDown()` — WASD and arrow-key movement with per-axis wall-slide collision
+- `lurek.keyboard.wasPressed()` — gadget use (E to interact, Q to cycle gadget)
+- `lurek.mouse.getPosition()` / `lurek.mousepressed()` — clicking wire targets in the hack mini-puzzle
+- `lurek.gfx.polygon()` — camera vision-cone rendered as a filled triangle fan
+- `lurek.gfx.rectangle()` — tile map, door overlays, alert bar, gadget HUD
+- `lurek.gfx.setColor()` — alert-level colour interpolation from green → yellow → red
+- `lurek.gfx.print()` — mission timer countdown, door labels, and win/caught overlays
 - Sweep-camera logic — `angle` oscillates between `startAngle ± sweepRange/2`; player detection uses dot-product cone test
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/infiltration
+cargo run -- content/demos/infiltration
 ```
 
 ## Controls

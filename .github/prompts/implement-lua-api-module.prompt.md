@@ -1,8 +1,8 @@
 ---
-description: "Build or rebuild a luna.* Lua API module from domain module source. Reads domain pub fn signatures, designs the Lua surface, then writes a thin wrapper following the lua-api-design SKILL."
+description: "Build or rebuild a lurek.* Lua API module from domain module source. Reads domain pub fn signatures, designs the Lua surface, then writes a thin wrapper following the lua-api-design SKILL."
 ---
 
-# Implement a Luna2D Lua API Module
+# Implement a Lurek2D Lua API Module
 
 **Arguments**: `module=<module_name>` (e.g. `module=timer`, `module=audio`, `module=ai`)
 
@@ -123,7 +123,7 @@ move it to the domain module FIRST:
 Write `src/lua_api/<module>_api.rs` following the **File Anatomy** in the `lua-api-design` skill **exactly**.
 Also apply the **mlua Best Practices** table from the skill before writing any code:
 
-1. `//! \`luna.<module>\` — one-sentence description.` (first line, no BOM)
+1. `//! \`lurek.<module>\` — one-sentence description.` (first line, no BOM)
 2. Imports in exact order (`use mlua::prelude::*` — always via prelude)
 3. For each `pub struct` that needs Lua access: `LuaFoo` UserData wrapper struct
 4. `impl LuaUserData for LuaFoo` with every method from the Step 3 table:
@@ -133,7 +133,7 @@ Also apply the **mlua Best Practices** table from the skill before writing any c
    - Store Lua callbacks via `lua.create_registry_value(func)? → LuaRegistryKey`
    - Each method has `// -- name --` header, docstring, then the `methods.add_method*(` call
 5. `pub fn register(…)` block with `let tbl = lua.create_table()?;`, factory functions,
-   table functions, `luna.set("<module>", tbl)?;`, `Ok(())`
+   table functions, `lurek.set("<module>", tbl)?;`, `Ok(())`
 
 **Each closure body must have exactly ONE domain call.** No loops, no conditionals, no inline math, no struct construction with 3+ fields.
 

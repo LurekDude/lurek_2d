@@ -5,10 +5,10 @@ First player to reach 7 points wins.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — drawing paddles, ball, and score dividers
-- `luna.input.isKeyDown()` — real-time two-player simultaneous input
-- `luna.gfx.print()` — scoreboard display
-- `luna.signal.quit()` — clean exit
+- `lurek.gfx.rectangle()` — drawing paddles, ball, and score dividers
+- `lurek.input.isKeyDown()` — real-time two-player simultaneous input
+- `lurek.gfx.print()` — scoreboard display
+- `lurek.signal.quit()` — clean exit
 
 ## Controls
 

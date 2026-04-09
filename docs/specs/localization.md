@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.localization`                                    |
+| **Lua API**      | `lurek.localization`                                    |
 | **Source**       | `src/localization/`                                    |
 | **Rust Tests**   | `tests/rust/unit/localization_tests.rs`                |
 | **Lua Tests**    | `tests/lua/unit/test_localization.lua`                 |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `localization` module provides the internationalization (i18n) backend for Luna2D games. It is a **Tier 1 Core Engine Subsystem** that handles all string translation, variable substitution, and plural form selection without external file format dependencies.
+The `localization` module provides the internationalization (i18n) backend for Lurek2D games. It is a **Tier 1 Core Engine Subsystem** that handles all string translation, variable substitution, and plural form selection without external file format dependencies.
 
 The module contains three orthogonal components:
 
@@ -28,7 +28,7 @@ This module intentionally does **not** provide:
 - XLIFF, PO, or JSON file parsers (load translated tables from Lua)
 - Date/time or number formatting
 - BiDi text layout
-- Runtime locale detection (use `luna.platform.locale()` for OS locale then call `setLanguage()`)
+- Runtime locale detection (use `lurek.platform.locale()` for OS locale then call `setLanguage()`)
 
 ## Architecture
 
@@ -48,16 +48,16 @@ src/lua_api/
 
 Data flow:
 ```
-Lua: luna.localization.loadTable("en", tbl)
+Lua: lurek.localization.loadTable("en", tbl)
   → flatten_lua_table(tbl)         converts {menu={play="Play"}} → {"menu.play":"Play"}
   → Catalog::load("en", flat_map)  stores in catalog.tables["en"]
 
-Lua: luna.localization.t("menu.play")
+Lua: lurek.localization.t("menu.play")
   → Catalog::translate("menu.play")  walks locale + fallback chain
   → interpolate(raw, vars)           substitutes {name} placeholders
   → returns localized string
 
-Lua: luna.localization.t("item.count", nil, 3)
+Lua: lurek.localization.t("item.count", nil, 3)
   → PluralForm::english(3).key()    → "other"
   → lookup "item.count.other" first, fallback to "item.count"
 ```
@@ -122,7 +122,7 @@ Six CLDR plural categories. `key()` returns the lowercase string form. `english(
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/localization_api.rs` under `luna.localization.*`.
+The Lua API is registered in `src/lua_api/localization_api.rs` under `lurek.localization.*`.
 
 `flatten_lua_table(tbl)` converts nested Lua tables to a flat `HashMap<String,String>` using dot-joined paths. This happens at `loadTable` time so the catalog always stores flat maps internally.
 
@@ -149,39 +149,39 @@ The Lua API is registered in `src/lua_api/localization_api.rs` under `luna.local
 
 ```lua
 -- Load English and Spanish tables
-luna.localization.loadTable("en", {
+lurek.localization.loadTable("en", {
     menu = { play = "Play", quit = "Quit" },
     item = {
         sword = { name = "Sword", description = "A sharp blade." },
         count = { one = "1 item", other = "{n} items" }
     }
 })
-luna.localization.loadTable("es", {
+lurek.localization.loadTable("es", {
     menu = { play = "Jugar", quit = "Salir" }
 })
 
 -- Set fallback: ES falls back to EN for missing keys
-luna.localization.setFallbacks({ "en" })
-luna.localization.setLanguage("es")
+lurek.localization.setFallbacks({ "en" })
+lurek.localization.setLanguage("es")
 
 -- Basic translation
-print(luna.localization.t("menu.play"))          -- "Jugar"
-print(luna.localization.t("item.sword.name"))    -- "Sword" (fallback)
+print(lurek.localization.t("menu.play"))          -- "Jugar"
+print(lurek.localization.t("item.sword.name"))    -- "Sword" (fallback)
 
 -- With variable substitution
-print(luna.localization.t("item.count", { n = "5" }, 5))  -- "5 items"
-print(luna.localization.t("item.count", { n = "1" }, 1))  -- "1 item"
+print(lurek.localization.t("item.count", { n = "5" }, 5))  -- "5 items"
+print(lurek.localization.t("item.count", { n = "1" }, 1))  -- "1 item"
 
 -- Standalone interpolation
-local msg = luna.localization.interpolate("Hello, {name}!", { name = "Player" })
+local msg = lurek.localization.interpolate("Hello, {name}!", { name = "Player" })
 print(msg)  -- "Hello, Player!"
 
 -- Plural form query
-print(luna.localization.pluralFor(1))   -- "one"
-print(luna.localization.pluralFor(5))   -- "other"
+print(lurek.localization.pluralFor(1))   -- "one"
+print(lurek.localization.pluralFor(5))   -- "other"
 
 -- Language change callback
-luna.localization.onLanguageChange(function(new_locale, old_locale)
+lurek.localization.onLanguageChange(function(new_locale, old_locale)
     print("Language changed:", old_locale, "→", new_locale)
 end)
 ```

@@ -5,10 +5,10 @@ Based on Nintendo's 1981 arcade classic.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — platforms, barrels, characters
-- `luna.input.isKeyDown()` — walk and climb
-- `luna.keypressed()` — jumping
-- `luna.gfx.print()` — score, lives, level HUD
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — platforms, barrels, characters
+- `lurek.input.isKeyDown()` — walk and climb
+- `lurek.keypressed()` — jumping
+- `lurek.gfx.print()` — score, lives, level HUD
 - Sloped platform physics with ladder entry/exit detection
 
 ## Controls

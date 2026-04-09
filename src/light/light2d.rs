@@ -1,12 +1,12 @@
 //! 2D point light data container for lighting systems.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for light2d-related operations and data management.
 //! Key types exported from this module: `Light2D`.
 //! Primary functions: `new()`, `set_position()`, `get_position()`, `set_radius()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{LT01, LT02, LT03};
 use crate::light::attenuation::Attenuation;

@@ -1,20 +1,18 @@
 -- examples/terminal.lua
--- luna.terminal — Grid-based character-cell terminal emulator with widget toolkit.
+-- lurek.terminal — Grid-based character-cell terminal emulator with widget toolkit.
 -- Draw text in a fixed-size cell grid, place interactive widgets (labels, buttons,
 -- text boxes, lists, borders, panels), and forward OS input events to focused widgets.
--- All luna.terminal API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- ── Creating a Terminal ───────────────────────────────────────────────────────
 
--- luna.terminal.newTerminal(cols?, rows?) → Terminal
+local terminal = lurek.terminal.newTerminal(cols?, rows?)
 -- cols/rows: grid dimensions in cells (default 80×40)
 -- Each cell is 8×14 pixels when drawn with draw().
-local term = luna.terminal.newTerminal(80, 40)
+local term = lurek.terminal.newTerminal(80, 40)
 
 -- ── Direct Cell Manipulation ──────────────────────────────────────────────────
 
--- term:set(col, row, ch, fr, fg, fb, fa, br, bg, bb, ba)
+term:set(col, row, ch, fr, fg, fb, fa, br, bg, bb, ba)
 -- col, row: 1-based cell position
 -- ch: single character string
 -- fr,fg,fb,fa: foreground RGBA (0–255), optional
@@ -23,7 +21,7 @@ term:set(1, 1, "H", 255, 255, 255, 255, 0, 0, 0, 255)  -- white "H" on black
 term:set(2, 1, "i", 200, 200, 0,   255)                 -- yellow "i", no bg
 term:set(3, 1, "!")
 
--- term:get(col, row) → ch, fr, fg, fb, fa, br, bg, bb, ba
+local ch, fr, fg, fb, fa, br, bg, bb, ba = term:get(col, row)
 local ch, fr, fg, fb, fa, br, bg, bb, ba = term:get(1, 1)
 print(ch, fr, fg, fb)   -- H  255  255  255
 
@@ -36,20 +34,20 @@ local function term_print(t, col, row, text, r, g, b, a)
 end
 term_print(term, 1, 2, "Hello, Terminal!", 0, 255, 100, 255)
 
--- term:getDimensions() → cols, rows
+local cols, rows = term:getDimensions()
 local cols, rows = term:getDimensions()
 
--- term:getCellSize() → width, height   (always 8, 14)
+local width, height   (always 8, 14) = term:getCellSize()
 local cw, ch_size = term:getCellSize()
 
--- term:clear()  — fill all cells with spaces
+term:clear()  -- fill all cells with spaces
 term:clear()
 
 -- ── Drawing the Terminal ──────────────────────────────────────────────────────
 
 -- term:draw(x?, y?)  — render the grid at screen coordinate (x, y), default (0, 0)
--- Call inside luna.draw():
---   term:draw(0, 0)
+-- Call inside lurek.draw():
+term:draw(0, 0)
 
 -- ── Forwarding Input ─────────────────────────────────────────────────────────
 
@@ -61,22 +59,22 @@ term:clear()
 -- All constructors take 1-based column/row grid coordinates.
 
 -- newLabel(col, row, text?) → Widget
-local lbl = luna.terminal.newLabel(2, 2, "Name:")
+local lbl = lurek.terminal.newLabel(2, 2, "Name:")
 
 -- newButton(col, row, width, height?, text?) → Widget
-local btn = luna.terminal.newButton(2, 8, 10, 1, "[ OK ]")
+local btn = lurek.terminal.newButton(2, 8, 10, 1, "[ OK ]")
 
 -- newTextBox(col, row, width) → Widget
-local txt = luna.terminal.newTextBox(8, 2, 20)
+local txt = lurek.terminal.newTextBox(8, 2, 20)
 
 -- newList(col, row, width, height) → Widget
-local lst = luna.terminal.newList(2, 10, 20, 8)
+local lst = lurek.terminal.newList(2, 10, 20, 8)
 
 -- newBorder(col, row, width, height) → Widget
-local brd = luna.terminal.newBorder(1, 1, 40, 20)
+local brd = lurek.terminal.newBorder(1, 1, 40, 20)
 
 -- newPanel(col, row, width?, height?) → Widget
-local panel = luna.terminal.newPanel(1, 1, 60, 30)
+local panel = lurek.terminal.newPanel(1, 1, 60, 30)
 
 -- ── Common Widget Methods ─────────────────────────────────────────────────────
 
@@ -135,10 +133,10 @@ lst:addItem("Shield")
 lst:addItem("Potion")
 
 -- removeItem(index)   — remove by 1-based index
--- lst:removeItem(2)
+lst:removeItem(2)
 
 -- clearItems()
--- lst:clearItems()
+lst:clearItems()
 
 -- getItemCount() → int
 local n_items = lst:getItemCount()
@@ -174,10 +172,10 @@ panel:addChild(txt)
 panel:addChild(btn)
 
 -- removeChild(widget)
--- panel:removeChild(btn)
+panel:removeChild(btn)
 
 -- clearChildren()
--- panel:clearChildren()
+panel:clearChildren()
 
 -- getChildCount() → int
 local cn = panel:getChildCount()
@@ -187,44 +185,44 @@ local first_child = panel:getChild(1)
 
 -- ── Adding Widgets to Terminal ────────────────────────────────────────────────
 
--- term:addWidget(widget)
+term:addWidget(widget)
 term:addWidget(brd)
 term:addWidget(lbl)
 term:addWidget(txt)
 term:addWidget(btn)
 term:addWidget(lst)
 
--- term:getWidgetCount() → int
+local widget_count = term:getWidgetCount()
 local wn = term:getWidgetCount()
 
--- term:setFocus(widget?) / term:getFocused() → Widget?
+local set_focus = term:setFocus(widget?)  / term:getFocused()
 term:setFocus(txt)
 local focused = term:getFocused()
 
--- term:removeWidget(widget)
--- term:clearWidgets()
+term:removeWidget(widget)
+term:clearWidgets()
 
 -- ── Full Integration Example ─────────────────────────────────────────────────
 
 --[[
 local my_term
 
-function luna.init()
-    my_term = luna.terminal.newTerminal(80, 30)
+function lurek.init()
+    my_term = lurek.terminal.newTerminal(80, 30)
 
-    local brd = luna.terminal.newBorder(1, 1, 40, 12)
+    local brd = lurek.terminal.newBorder(1, 1, 40, 12)
     brd:setStyle("double")
     brd:setTitle("[ Login ]")
     my_term:addWidget(brd)
 
-    local lbl_user = luna.terminal.newLabel(3, 3, "Username:")
+    local lbl_user = lurek.terminal.newLabel(3, 3, "Username:")
     my_term:addWidget(lbl_user)
 
-    local txt_user = luna.terminal.newTextBox(13, 3, 20)
+    local txt_user = lurek.terminal.newTextBox(13, 3, 20)
     txt_user:setMaxLength(20)
     my_term:addWidget(txt_user)
 
-    local btn_ok = luna.terminal.newButton(3, 10, 12, 1, "[ Connect ]")
+    local btn_ok = lurek.terminal.newButton(3, 10, 12, 1, "[ Connect ]")
     btn_ok:setOnClick(function()
         print("Connecting as:", txt_user:getText())
     end)
@@ -233,15 +231,15 @@ function luna.init()
     my_term:setFocus(txt_user)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     my_term:keypressed(key)
 end
 
-function luna.textinput(text)
+function lurek.textinput(text)
     my_term:textinput(text)
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     local cw, ch = my_term:getCellSize()
     -- convert pixel coords to cell coords for mousepressed
     my_term:mousepressed(
@@ -251,7 +249,7 @@ function luna.mousepressed(x, y, button)
     )
 end
 
-function luna.render()
+function lurek.render()
     my_term:draw(0, 0)
 end
 ]]

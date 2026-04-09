@@ -1,4 +1,4 @@
-//! `luna.entity` - Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
+//! `lurek.entity` - Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -506,7 +506,7 @@ impl LuaUserData for LuaUniverse {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.entity` API table with the Lua VM.
+/// Registers the `lurek.entity` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

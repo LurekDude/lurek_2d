@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-audit_module.py — Luna2D module quality audit tool.
+audit_module.py — Lurek2D module quality audit tool.
 
 Runs automated structural, docstring, architecture, and code-quality checks
 on one or more src/ modules and produces a PASS/WARNING/ERROR verdict per
@@ -37,7 +37,7 @@ LUA_API = SRC / "lua_api"
 TESTS_RUST = WORKSPACE / "tests" / "rust"
 TESTS_LUA = WORKSPACE / "tests" / "lua"
 DOCS_API = WORKSPACE / "docs" / "API"
-WIKI = WORKSPACE / "wiki"
+WIKI = WORKSPACE / "docs" / "wiki"
 
 # ── Tier assignments (keep in sync with docs/architecture/architecture.md) ──
 
@@ -402,22 +402,22 @@ def check_agent_md(module: str) -> List[Check]:
     else:
         results.append(Check("A-04", "Content sync", PASS, "All .rs files listed"))
 
-    # A-05: Spec pointer — AGENT.md must point to specs/<module>.md
-    # Lua examples belong in specs/, NOT in AGENT.md (per agent-md skill).
-    # We check that a specs/<module>.md companion file exists.
-    spec_path = WORKSPACE / "specs" / f"{module}.md"
+    # A-05: Spec pointer — AGENT.md must point to docs/specs/<module>.md
+    # Lua examples belong in docs/specs/, NOT in AGENT.md (per agent-md skill).
+    # We check that a docs/specs/<module>.md companion file exists.
+    spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
     api_file = LUA_API / f"{module}_api.rs"
     api_dir = LUA_API / f"{module}_api"
     has_lua_api = api_file.exists() or api_dir.is_dir()
 
     if spec_path.exists():
-        results.append(Check("A-05", "Spec pointer", PASS, f"specs/{module}.md exists"))
+        results.append(Check("A-05", "Spec pointer", PASS, f"docs/specs/{module}.md exists"))
     elif has_lua_api:
         results.append(Check("A-05", "Spec pointer", ERROR,
-                              f"Module has Lua API but no specs/{module}.md companion file"))
+                              f"Module has Lua API but no docs/specs/{module}.md companion file"))
     else:
         results.append(Check("A-05", "Spec pointer", WARN,
-                              f"No specs/{module}.md companion file — create one for the full spec"))
+                              f"No docs/specs/{module}.md companion file — create one for the full spec"))
 
     # A-06: Tier label
     tier = get_tier(module)
@@ -499,9 +499,9 @@ def check_no_lua_api_import(module: str, analysis: ModuleFileAnalysis) -> Check:
 
 
 def check_spec_file(module: str) -> List[Check]:
-    """SP-01 through SP-05: specs/<module>.md content checks."""
+    """SP-01 through SP-05: docs/specs/<module>.md content checks."""
     results: List[Check] = []
-    spec_path = WORKSPACE / "specs" / f"{module}.md"
+    spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
     api_file = LUA_API / f"{module}_api.rs"
     api_dir = LUA_API / f"{module}_api"
     has_lua_api = api_file.exists() or api_dir.is_dir()
@@ -509,7 +509,7 @@ def check_spec_file(module: str) -> List[Check]:
     # SP-01: spec file exists
     if not spec_path.exists():
         results.append(Check("SP-01", "Spec file exists", ERROR,
-                              f"specs/{module}.md is missing — create from template"))
+                              f"docs/specs/{module}.md is missing — create from template"))
         for code, name in [("SP-02", "Required spec sections"),
                             ("SP-03", "Summary quality"),
                             ("SP-04", "Lua API completeness"),
@@ -517,7 +517,7 @@ def check_spec_file(module: str) -> List[Check]:
             results.append(Check(code, name, ERROR, "Skipped — no spec file"))
         return results
 
-    results.append(Check("SP-01", "Spec file exists", PASS, f"specs/{module}.md exists"))
+    results.append(Check("SP-01", "Spec file exists", PASS, f"docs/specs/{module}.md exists"))
     content = read_text(spec_path)
 
     # SP-02: required sections
@@ -558,7 +558,7 @@ def check_spec_file(module: str) -> List[Check]:
         stale_fns: List[str] = []
         if lua_api_section and bound_fns:
             spec_api_text = lua_api_section.group(1)
-            # Look for function name patterns in the spec: `luna.module.funcName`
+            # Look for function name patterns in the spec: `lurek.module.funcName`
             spec_fn_names = set(re.findall(r"`luna\.\w+\.(\w+)\s*\(", spec_api_text))
             if spec_fn_names:
                 code_fn_set = set(bound_fns)
@@ -568,7 +568,7 @@ def check_spec_file(module: str) -> List[Check]:
         if missing_fns:
             shown = missing_fns[:5]
             extra = f" (+{len(missing_fns)-5} more)" if len(missing_fns) > 5 else ""
-            details.append(f"Missing from spec: {', '.join(shown)}{extra} — add to ## Lua API in specs/{module}.md")
+            details.append(f"Missing from spec: {', '.join(shown)}{extra} — add to ## Lua API in docs/specs/{module}.md")
         if stale_fns:
             details.append(f"Stale in spec (not in code): {', '.join(stale_fns[:4])} — remove from spec")
         if details:
@@ -972,19 +972,19 @@ def check_float_comparisons(module: str) -> Check:
 
 
 def check_example_file(module: str) -> List[Check]:
-    """W-01 / W-02: examples/<module>.lua exists and covers the full API surface."""
+    """W-01 / W-02: content/examples/<module>.lua exists and covers the full API surface."""
     results: List[Check] = []
     example_file = WORKSPACE / "examples" / f"{module}.lua"
 
     if not example_file.exists():
         results.append(Check("W-01", "Example file exists", ERROR,
-                              f"examples/{module}.lua not found \u2014 create it"))
+                              f"content/examples/{module}.lua not found \u2014 create it"))
         results.append(Check("W-02", "API surface coverage", ERROR,
                               "Skipped \u2014 no example file"))
         return results
 
     results.append(Check("W-01", "Example file exists", PASS,
-                          f"examples/{module}.lua present"))
+                          f"content/examples/{module}.lua present"))
 
     api_file = LUA_API / f"{module}_api.rs"
     if not api_file.exists():
@@ -1000,7 +1000,7 @@ def check_example_file(module: str) -> List[Check]:
         shown = missing[:6]
         extra = f" (+{len(missing)-6} more)" if len(missing) > 6 else ""
         results.append(Check("W-02", "API surface coverage", ERROR,
-                              f"Functions absent from examples/{module}.lua: "
+                              f"Functions absent from content/examples/{module}.lua: "
                               + ", ".join(shown) + extra))
     else:
         results.append(Check("W-02", "API surface coverage", PASS,
@@ -1136,14 +1136,14 @@ def check_wiki_page(module: str) -> Check:
             return Check("W-05", "Wiki page", PASS, str(c.relative_to(WORKSPACE)))
 
     return Check("W-05", "Wiki page", WARN,
-                  f"No wiki page found (expected wiki/{module.title()}-API.md)")
+                  f"No wiki page found (expected docs/wiki/{module.title()}-API.md)")
 
 
 def check_example_exists(module: str) -> Check:
     """W-03: Example game or test game demonstrates the module."""
     examples_dir = WORKSPACE / "examples"
     if not examples_dir.is_dir():
-        return Check("W-03", "Example game", WARN, "demos/ directory not found")
+        return Check("W-03", "Example game", WARN, "content/demos/ directory not found")
 
     # Check for module-named example or demo
     candidates = [
@@ -1161,7 +1161,7 @@ def check_example_exists(module: str) -> Check:
             main_lua = d / "main.lua"
             if main_lua.exists():
                 content = read_text(main_lua)
-                if f"luna.{module}" in content:
+                if f"lurek.{module}" in content:
                     return Check("W-03", "Example game", PASS,
                                   f"Referenced in {d.relative_to(WORKSPACE)}/main.lua")
 
@@ -1220,8 +1220,8 @@ def check_log_prefix(module: str, analysis: ModuleFileAnalysis) -> Check:
 
 
 def check_example_spec_sync(module: str) -> Check:
-    """W-04: Functions in spec Lua API table match functions in examples/<module>.lua."""
-    spec_path = WORKSPACE / "specs" / f"{module}.md"
+    """W-04: Functions in docs/specs/<module>.md Lua API table match functions in content/examples/<module>.lua."""
+    spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
     example_file = WORKSPACE / "examples" / f"{module}.lua"
     api_file = LUA_API / f"{module}_api.rs"
     if not api_file.exists():
@@ -1244,9 +1244,9 @@ def check_example_spec_sync(module: str) -> Check:
 
     issues: List[str] = []
     if only_in_example:
-        issues.append(f"In example but not spec: {', '.join(sorted(only_in_example)[:4])} — add to ## Lua API in specs/{module}.md")
+        issues.append(f"In example but not spec: {', '.join(sorted(only_in_example)[:4])} — add to ## Lua API in docs/specs/{module}.md")
     if only_in_spec:
-        issues.append(f"In spec but not example: {', '.join(sorted(only_in_spec)[:4])} — add to examples/{module}.lua")
+        issues.append(f"In spec but not example: {', '.join(sorted(only_in_spec)[:4])} — add to content/examples/{module}.lua")
     if issues:
         return Check("W-04", "Example–spec sync", WARN, " | ".join(issues))
     return Check("W-04", "Example–spec sync", PASS,
@@ -1297,7 +1297,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
     checks.extend(check_agent_md(module))
     checks.append(check_agent_source_files_complete(module))
 
-    # Phase 3: Technical Specification (specs/<module>.md)
+    # Phase 3: Technical Specification (docs/specs/<module>.md)
     checks.extend(check_spec_file(module))
 
     # Phase 4: Docstrings — domain module files
@@ -1337,7 +1337,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
     # Phase 8: Documentation, Examples & Wiki
     checks.extend(check_example_file(module))
     checks.append(Check("W-03", "Example comments", MANUAL,
-                          f"Verify examples/{module}.lua has realistic one-line comments per call"))
+                          f"Verify content/examples/{module}.lua has realistic one-line comments per call"))
     checks.append(check_example_spec_sync(module))
     checks.append(check_wiki_page(module))
     checks.append(Check("W-06", "Changelog entry", MANUAL,
@@ -1365,7 +1365,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
 
     # Phase 11: Integration & Extension
     checks.append(Check("I-01", "Lua API usability", MANUAL,
-                          "Review luna.* conventions compliance"))
+                          "Review lurek.* conventions compliance"))
     checks.append(Check("I-02", "Extension panel", MANUAL,
                           "Check for structured data I/O for vscode-extension"))
     checks.append(check_config_integration(module))
@@ -1491,7 +1491,7 @@ def resolve_modules(args: argparse.Namespace) -> List[str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D module quality audit",
+        description="Lurek2D module quality audit",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

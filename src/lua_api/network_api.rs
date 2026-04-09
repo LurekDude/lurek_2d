@@ -1,4 +1,4 @@
-//! `luna.network` - UDP networking via ENet for multiplayer games.
+//! `lurek.network` - UDP networking via ENet for multiplayer games.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -361,7 +361,7 @@ impl LuaUserData for LuaNetworkHost {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.network` API table with the Lua VM.
+/// Registers the `lurek.network` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

@@ -1,6 +1,6 @@
 -- Horde Survivor — Vampire Survivors style bullet heaven
 -- WASD to move, auto-attack orbiting projectiles, collect XP, level up
--- Run with: cargo run -- demos/action/horde_survivor
+-- Run with: cargo run -- content/demos/action/horde_survivor
 
 local player, enemies, projectiles, xp_gems, particles
 local spawn_timer, spawn_rate, game_time, kills, score
@@ -71,9 +71,9 @@ local function apply_upgrade(u)
     upgrade_choices = nil
 end
 
-function luna.init()
-    luna.window.setTitle("Horde Survivor")
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Horde Survivor")
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     player = { x = ARENA.w / 2, y = ARENA.h / 2, r = 12, speed = 160, hp = 100, max_hp = 100,
                proj_count = 3, proj_dmg = 5, orbit_r = 50, orbit_speed = 3, proj_pierce = 1, angle = 0 }
     enemies = {}; projectiles = {}; xp_gems = {}; particles = {}
@@ -81,16 +81,16 @@ function luna.init()
     level = 1; xp = 0; xp_next = 10; paused = false; upgrade_choices = nil
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if paused then return end
     game_time = game_time + dt
 
     -- player movement
     local dx, dy = 0, 0
-    if luna.keyboard.isDown("w") then dy = -1 end
-    if luna.keyboard.isDown("s") then dy = 1 end
-    if luna.keyboard.isDown("a") then dx = -1 end
-    if luna.keyboard.isDown("d") then dx = 1 end
+    if lurek.keyboard.isDown("w") then dy = -1 end
+    if lurek.keyboard.isDown("s") then dy = 1 end
+    if lurek.keyboard.isDown("a") then dx = -1 end
+    if lurek.keyboard.isDown("d") then dx = 1 end
     if dx ~= 0 or dy ~= 0 then
         local len = math.sqrt(dx * dx + dy * dy)
         player.x = clamp(player.x + dx / len * player.speed * dt, player.r, ARENA.w - player.r)
@@ -185,100 +185,100 @@ function luna.process(dt)
     if player.hp <= 0 then player.hp = 0; paused = true end
 end
 
-function luna.render()
+function lurek.render()
     local ox, oy = -cam.x, -cam.y
 
     -- arena border
-    luna.gfx.setColor(0.2, 0.2, 0.3, 1)
-    luna.gfx.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
+    lurek.gfx.setColor(0.2, 0.2, 0.3, 1)
+    lurek.gfx.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
 
     -- xp gems
-    luna.gfx.setColor(0.2, 1, 0.4, 1)
+    lurek.gfx.setColor(0.2, 1, 0.4, 1)
     for _, g in ipairs(xp_gems) do
-        luna.gfx.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
+        lurek.gfx.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life / 0.4, 0, 1)
-        luna.gfx.setColor(1, 0.6, 0.1, a)
-        luna.gfx.circle("fill", p.x + ox, p.y + oy, 3)
+        lurek.gfx.setColor(1, 0.6, 0.1, a)
+        lurek.gfx.circle("fill", p.x + ox, p.y + oy, 3)
     end
 
     -- enemies
     for _, e in ipairs(enemies) do
-        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
-        luna.gfx.circle("fill", e.x + ox, e.y + oy, e.r)
+        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
+        lurek.gfx.circle("fill", e.x + ox, e.y + oy, e.r)
         -- hp bar
-        luna.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-        luna.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
-        luna.gfx.setColor(0, 1, 0, 0.8)
-        luna.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
+        lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
+        lurek.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
+        lurek.gfx.setColor(0, 1, 0, 0.8)
+        lurek.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
     end
 
     -- projectiles
-    luna.gfx.setColor(0.4, 0.8, 1, 1)
+    lurek.gfx.setColor(0.4, 0.8, 1, 1)
     for _, p in ipairs(projectiles) do
-        luna.gfx.circle("fill", p.x + ox, p.y + oy, p.r)
+        lurek.gfx.circle("fill", p.x + ox, p.y + oy, p.r)
     end
 
     -- player
-    luna.gfx.setColor(0.3, 0.9, 0.3, 1)
-    luna.gfx.circle("fill", player.x + ox, player.y + oy, player.r)
+    lurek.gfx.setColor(0.3, 0.9, 0.3, 1)
+    lurek.gfx.circle("fill", player.x + ox, player.y + oy, player.r)
 
     -- HUD
-    luna.gfx.setColor(0.2, 0.2, 0.2, 0.7)
-    luna.gfx.rectangle("fill", 0, 0, W, 36)
+    lurek.gfx.setColor(0.2, 0.2, 0.2, 0.7)
+    lurek.gfx.rectangle("fill", 0, 0, W, 36)
 
     -- HP bar
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 10, 8, 150, 14)
-    luna.gfx.setColor(0.9, 0.2, 0.2, 1)
-    luna.gfx.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 10, 8, 150, 14)
+    lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
+    lurek.gfx.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
 
     -- XP bar
-    luna.gfx.setColor(0.3, 0.3, 0.3, 1)
-    luna.gfx.rectangle("fill", 170, 8, 100, 14)
-    luna.gfx.setColor(0.2, 0.8, 1, 1)
-    luna.gfx.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
+    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.gfx.rectangle("fill", 170, 8, 100, 14)
+    lurek.gfx.setColor(0.2, 0.8, 1, 1)
+    lurek.gfx.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
 
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Lv " .. level, 280, 8)
-    luna.gfx.print("Kills: " .. kills, 340, 8)
-    luna.gfx.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 600, 8)
-    luna.gfx.print("Enemies: " .. #enemies, 680, 8)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Lv " .. level, 280, 8)
+    lurek.gfx.print("Kills: " .. kills, 340, 8)
+    lurek.gfx.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 600, 8)
+    lurek.gfx.print("Enemies: " .. #enemies, 680, 8)
 
     -- upgrade menu
     if paused and upgrade_choices then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 1, 0.3, 1)
-        luna.gfx.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 1, 0.3, 1)
+        lurek.gfx.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
         for i, u in ipairs(upgrade_choices) do
-            luna.gfx.setColor(0.15, 0.15, 0.25, 0.9)
-            luna.gfx.rectangle("fill", 200, 220 + i * 60, 400, 45)
-            luna.gfx.setColor(1, 1, 1, 1)
-            luna.gfx.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
+            lurek.gfx.setColor(0.15, 0.15, 0.25, 0.9)
+            lurek.gfx.rectangle("fill", 200, 220 + i * 60, 400, 45)
+            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
         end
     elseif paused then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(0.9, 0.15, 0.15, 1)
-        luna.gfx.print("YOU DIED", 280, 240, 3)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
-        luna.gfx.print("Press R to restart", 300, 370)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0.9, 0.15, 0.15, 1)
+        lurek.gfx.print("YOU DIED", 280, 240, 3)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
+        lurek.gfx.print("Press R to restart", 300, 370)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if paused and upgrade_choices then
         local n = tonumber(key)
         if n and n >= 1 and n <= 3 and upgrade_choices[n] then
             apply_upgrade(upgrade_choices[n])
         end
     end
-    if paused and not upgrade_choices and key == "r" then luna.signal.restart() end
+    if paused and not upgrade_choices and key == "r" then lurek.signal.restart() end
 end

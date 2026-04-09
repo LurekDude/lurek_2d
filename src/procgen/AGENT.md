@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.procgen`                                       |
+| **Lua API**    | `lurek.procgen`                                       |
 | **Source**     | `src/procgen/`                                       |
 | **Rust Tests** | `tests/rust/unit/procgen_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_procgen.lua`                    |
@@ -30,6 +30,6 @@ The `procgen` module provides five stateless procedural-generation algorithms fo
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/procgen.md`](../../specs/procgen.md)
+→ [`docs/specs/procgen.md`](../../docs/specs/procgen.md)
 
-_Update both this file **and** `specs/procgen.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/procgen.md` whenever source files, public types, or Lua bindings change._

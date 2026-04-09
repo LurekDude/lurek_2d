@@ -13,10 +13,10 @@ function Player.new(x, y)
 end
 
 function Player:update(dt, bullets)
-    if luna.input.isDown("left")  or luna.input.isDown("a") then self.x = self.x - SPEED * dt end
-    if luna.input.isDown("right") or luna.input.isDown("d") then self.x = self.x + SPEED * dt end
-    if luna.input.isDown("up")    or luna.input.isDown("w") then self.y = self.y - SPEED * dt end
-    if luna.input.isDown("down")  or luna.input.isDown("s") then self.y = self.y + SPEED * dt end
+    if lurek.input.isDown("left")  or lurek.input.isDown("a") then self.x = self.x - SPEED * dt end
+    if lurek.input.isDown("right") or lurek.input.isDown("d") then self.x = self.x + SPEED * dt end
+    if lurek.input.isDown("up")    or lurek.input.isDown("w") then self.y = self.y - SPEED * dt end
+    if lurek.input.isDown("down")  or lurek.input.isDown("s") then self.y = self.y + SPEED * dt end
 
     -- Clamp to screen
     self.x = math.max(0, math.min(480 - self.width, self.x))
@@ -24,16 +24,16 @@ function Player:update(dt, bullets)
 
     -- Auto-fire
     self.fire_timer = self.fire_timer - dt
-    if luna.input.isDown("space") and self.fire_timer <= 0 then
+    if lurek.input.isDown("space") and self.fire_timer <= 0 then
         bullets:fire(self.x + self.width / 2, self.y, 0, -600)
         self.fire_timer = FIRE_RATE
     end
 end
 
 function Player:draw()
-    luna.gfx.setColor(0.2, 0.8, 1, 1)
-    luna.gfx.rectangle("fill", self.x, self.y, self.width, self.height)
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(0.2, 0.8, 1, 1)
+    lurek.gfx.rectangle("fill", self.x, self.y, self.width, self.height)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 
 return Player

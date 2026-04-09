@@ -1,4 +1,4 @@
-//! Registers the `luna.docs.*` documentation management API.
+//! Registers the `lurek.docs.*` documentation management API.
 //!
 //! Provides engine-integrated documentation management: scanning runtime bindings,
 //! loading TOML doc catalogs, validating completeness, computing quality metrics,
@@ -678,7 +678,7 @@ impl LuaUserData for QualityReport {
 // Internal state
 // ---------------------------------------------------------------------------
 
-/// State shared between all luna.docs closures via Rc<RefCell>.
+/// State shared between all lurek.docs closures via Rc<RefCell>.
 struct DocsState {
     entries: Vec<docs::DocEntry>,
 }
@@ -742,7 +742,7 @@ fn scan_table(
 // Registration
 // ---------------------------------------------------------------------------
 
-/// Registers the `luna.docs` namespace.
+/// Registers the `lurek.docs` namespace.
 pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let docs_tbl = lua.create_table()?;
     let state = Rc::new(RefCell::new(DocsState::new()));
@@ -750,14 +750,14 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // ===== Catalog Management =====
 
     // -- scan --------------------------------------------------------------
-    /// Scan the luna.* namespace to build an API catalog from live bindings.
+    /// Scan the lurek.* namespace to build an API catalog from live bindings.
     /// @param opts : table?
     /// @return any
     docs_tbl.set(
         "scan",
         lua.create_function(|lua, _opts: Option<LuaTable>| {
             let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
+            let luna_tbl: LuaTable = globals.get("lurek")?;
             let mut entries = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut entries, 0)?;
             Ok(ApiCatalog(entries))
@@ -772,9 +772,9 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "scanModule",
         lua.create_function(|lua, module_name: String| {
             let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
+            let luna_tbl: LuaTable = globals.get("lurek")?;
             let sub: LuaTable = luna_tbl.get(module_name.clone())?;
-            let prefix = format!("luna.{}", module_name);
+            let prefix = format!("lurek.{}", module_name);
             let mut entries = Vec::new();
             scan_table(lua, &sub, &prefix, &module_name, &mut entries, 0)?;
             Ok(ApiCatalog(entries))
@@ -792,7 +792,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 LuaError::RuntimeError(format!("failed to read {}: {}", path, e))
             })?;
             let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
+            let luna_tbl: LuaTable = globals.get("lurek")?;
             let data_tbl: LuaTable = luna_tbl.get("data")?;
             let parse_fn: LuaFunction = data_tbl.get("parseToml")?;
             let parsed: LuaTable = parse_fn.call(content)?;
@@ -830,7 +830,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                     if path.extension().is_some_and(|e| e == "toml") {
                         if let Ok(content) = std::fs::read_to_string(&path) {
                             let globals = lua.globals();
-                            let luna_tbl: LuaTable = globals.get("luna")?;
+                            let luna_tbl: LuaTable = globals.get("lurek")?;
                             let data_tbl: LuaTable = luna_tbl.get("data")?;
                             let parse_fn: LuaFunction = data_tbl.get("parseToml")?;
                             if let Ok(parsed) = parse_fn.call::<_, LuaTable>(content) {
@@ -983,7 +983,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // ===== Validation =====
 
     // -- validate ----------------------------------------------------------
-    /// Validate catalog completeness against the live luna.* bindings.
+    /// Validate catalog completeness against the live lurek.* bindings.
     /// @param catalog_ud : userdata?
     /// @return any
     docs_tbl.set(
@@ -994,7 +994,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                 .transpose()?
                 .unwrap_or_default();
             let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
+            let luna_tbl: LuaTable = globals.get("lurek")?;
             let mut live_entries = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut live_entries, 0)?;
             let live_names: std::collections::HashSet<String> =
@@ -1027,7 +1027,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     )?;
 
     // -- validateModule ----------------------------------------------------
-    /// Validate a single module against the live luna.<module>.* bindings.
+    /// Validate a single module against the live lurek.<module>.* bindings.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
     /// @return any
@@ -1040,9 +1040,9 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
                     .transpose()?
                     .unwrap_or_default();
                 let globals = lua.globals();
-                let luna_tbl: LuaTable = globals.get("luna")?;
+                let luna_tbl: LuaTable = globals.get("lurek")?;
                 let sub: LuaTable = luna_tbl.get(module_name.clone())?;
-                let prefix = format!("luna.{}", module_name);
+                let prefix = format!("lurek.{}", module_name);
                 let mut live_entries = Vec::new();
                 scan_table(lua, &sub, &prefix, &module_name, &mut live_entries, 0)?;
                 let live_names: std::collections::HashSet<String> =
@@ -1157,7 +1157,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         "coverage",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
             let globals = lua.globals();
-            let luna_tbl: LuaTable = globals.get("luna")?;
+            let luna_tbl: LuaTable = globals.get("lurek")?;
             let mut live = Vec::new();
             scan_table(lua, &luna_tbl, "luna", "luna", &mut live, 0)?;
             let total = live.len();
@@ -1179,9 +1179,9 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
         lua.create_function(
             |lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
                 let globals = lua.globals();
-                let luna_tbl: LuaTable = globals.get("luna")?;
+                let luna_tbl: LuaTable = globals.get("lurek")?;
                 let sub: LuaTable = luna_tbl.get(module_name.clone())?;
-                let prefix = format!("luna.{}", module_name);
+                let prefix = format!("lurek.{}", module_name);
                 let mut live = Vec::new();
                 scan_table(lua, &sub, &prefix, &module_name, &mut live, 0)?;
                 let total = live.len();
@@ -1383,16 +1383,16 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     })?)?;
 
     // ── reflectLive ───────────────────────────────────────────────────────
-    /// Walks the live luna.* Lua table and returns a structured reflection of all
+    /// Walks the live lurek.* Lua table and returns a structured reflection of all
     /// registered namespaces, function names, arity, and value types.
     ///
     /// Returns a table: { [ns]: { name, type, arity? }[] }
     ///
-    /// @param ns : string?  (if provided, reflects only luna.<ns>)
+    /// @param ns : string?  (if provided, reflects only lurek.<ns>)
     /// @return table
     docs_tbl.set("reflectLive", lua.create_function(|lua, ns: Option<String>| {
         let globals = lua.globals();
-        let luna_tbl: LuaTable = globals.get("luna")?;
+        let luna_tbl: LuaTable = globals.get("lurek")?;
         let result = lua.create_table()?;
 
         // Helper: build an items table from a sub-table.

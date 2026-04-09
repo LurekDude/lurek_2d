@@ -90,9 +90,9 @@ Every Solver output is a **solution report** containing:
 ## BEST PRACTICES
 
 - Always consider the *minimum viable change* — prefer small, safe solutions over complete rewrites
-- Cross-check the recommended solution against Luna2D's module dependency direction rules
-- Never recommend breaking the `luna.*` API namespace backward compatibility without explicit user sign-off
-- Use the Luna2D test suite as a verification base — the acceptance gate should name specific test commands
+- Cross-check the recommended solution against Lurek2D's module dependency direction rules
+- Never recommend breaking the `lurek.*` API namespace backward compatibility without explicit user sign-off
+- Use the Lurek2D test suite as a verification base — the acceptance gate should name specific test commands
 - For physics or graphics problems, prefer composable solutions that don't mix concerns across modules
 
 ## ANTI-PATTERNS
@@ -100,5 +100,5 @@ Every Solver output is a **solution report** containing:
 - **Single-option report**: presenting only one solution without alternatives — removes human decision authority
 - **Vague root cause**: "the module has issues" is a symptom, not a root cause
 - **Implementation creep**: writing Rust or Lua code instead of producing a decision-ready document
-- **Constraint blindness**: recommending a solution that violates an unstated but obvious invariant (e.g., `unsafe` without justification, or changing `luna.*` key names)
+- **Constraint blindness**: recommending a solution that violates an unstated but obvious invariant (e.g., `unsafe` without justification, or changing `lurek.*` key names)
 - **Scope inflation**: expanding the solution to fix tangentially related issues that weren't in the problem statement

@@ -112,9 +112,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/engine.lua present |
+| **W-01** Example file exists | ✅ PASS | content/examples/engine.lua present |
 | **W-02** API surface coverage | ✅ PASS | No Lua API binding file — skip |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/engine.lua has realistic one-line comments per call |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/engine.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | No Lua API — skip |
 | **W-05** Wiki page | ✅ PASS | Module has no Lua API — skip |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
@@ -143,7 +143,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | No Lua API — config flag not expected |
 

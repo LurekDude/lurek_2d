@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_engine_docs.py — Generate per-module documentation for Luna2D Rust engine source.
+gen_engine_docs.py — Generate per-module documentation for Lurek2D Rust engine source.
 
 Reads all src/**/*.rs EXCEPT src/lua_api/ and produces one Markdown file per
 top-level module (e.g. src/timer/*.rs → docs/API/engine/timer.md).
@@ -25,7 +25,7 @@ Parses standard Rust docstring conventions as used in this codebase:
     pub struct / pub enum / pub fn / pub trait / pub type
 
 Output goes to docs/API/engine/<module>.md.
-Intended audience: Luna2D engine contributors (Rust developers).
+Intended audience: Lurek2D engine contributors (Rust developers).
 
 Usage:
     python tools/gen_engine_docs.py                     # all modules → docs/API/engine/
@@ -131,7 +131,7 @@ class RustItem:
 
 @dataclass
 class RustModule:
-    """One Luna2D module (top-level src/<module>/ directory)."""
+    """One Lurek2D module (top-level src/<module>/ directory)."""
     name: str
     module_doc: Optional[ParsedDoc]
     items: List[RustItem] = field(default_factory=list)

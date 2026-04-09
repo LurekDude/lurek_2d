@@ -8,14 +8,14 @@ A four-lane note highway where coloured notes scroll downward and the player tap
 - Scroll-speed-based timing: `note.y = (gameTime - note.spawnTime) * scrollSpeed − noteHeight`
 - Three-tier timing windows: Perfect (< 30 ms), Good (< 80 ms), Miss (anything later)
 - Combo multiplier accumulation that resets on a miss
-- `luna.keyboard.isDown()` polled per frame to detect fresh key presses with a "just pressed" tracker
+- `lurek.keyboard.isDown()` polled per frame to detect fresh key presses with a "just pressed" tracker
 - Lane flash and floating feedback text spawned on each hit/miss event
 - Summary screen showing Perfect / Good / Miss counts, max combo, and accuracy percentage
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/rhythm_game
+cargo run -- content/demos/rhythm_game
 ```
 
 ## Controls

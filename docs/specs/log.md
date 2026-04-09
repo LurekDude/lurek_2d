@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.log`                                             |
+| **Lua API**      | `lurek.log`                                             |
 | **Source**       | `src/log/`                                             |
 | **Rust Tests**   | —                                                      |
 | **Lua Tests**    | `tests/lua/unit/test_log.lua`                          |
@@ -14,11 +14,11 @@
 
 The `log` module is the **game developer's logging tool** for Lua scripts. It lets Lua game code emit structured messages at configurable severity levels, so developers can trace game logic, fire debug output, and monitor runtime state without touching Rust code or engine internals.
 
-Internally, `log` is a thin adapter over `crate::engine::log_messages` that exposes `set_level()`, `get_level()`, and `enabled_for()` as Rust functions, and binds them — along with per-severity emit functions — to the `luna.log.*` Lua namespace.
+Internally, `log` is a thin adapter over `crate::engine::log_messages` that exposes `set_level()`, `get_level()`, and `enabled_for()` as Rust functions, and binds them — along with per-severity emit functions — to the `lurek.log.*` Lua namespace.
 
-The Lua API exposes five severity levels: `debug`, `info`, `warn`, `error`, and `trace`. Game scripts can emit at a fixed level (`luna.log.debug`, `luna.log.info`, etc.) or at a caller-specified level (`luna.log.print(level, message)`). The active minimum level can be read and changed at runtime with `luna.log.getLevel()` and `luna.log.setLevel(level)`.
+The Lua API exposes five severity levels: `debug`, `info`, `warn`, `error`, and `trace`. Game scripts can emit at a fixed level (`lurek.log.debug`, `lurek.log.info`, etc.) or at a caller-specified level (`lurek.log.print(level, message)`). The active minimum level can be read and changed at runtime with `lurek.log.getLevel()` and `lurek.log.setLevel(level)`.
 
-All messages are routed through the Rust `log` crate and appear in the engine's standard output alongside engine-originated log lines. Lua-originated messages are prefixed with `[Lua]` to distinguish them. Runtime filtering is controlled by the `RUST_LOG` environment variable (e.g., `RUST_LOG=luna2d=debug`).
+All messages are routed through the Rust `log` crate and appear in the engine's standard output alongside engine-originated log lines. Lua-originated messages are prefixed with `[Lua]` to distinguish them. Runtime filtering is controlled by the `RUST_LOG` environment variable (e.g., `RUST_LOG=lurek2d=debug`).
 
 This module intentionally does **not** provide:
 - Structured JSON log output — messages are strings only
@@ -35,7 +35,7 @@ src/engine/
 └── log_messages.rs    set_log_level(level), get_log_level() → &'static str
 
 src/lua_api/
-└── log_api.rs    Registers luna.log.* functions:
+└── log_api.rs    Registers lurek.log.* functions:
                   debug, info, warn, error, trace, print → emit via log crate macros
                   setLevel → crate::log::set_level()
                   getLevel → crate::log::get_level()
@@ -92,62 +92,62 @@ src/lua_api/
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/log_api.rs` under `luna.log.*`. All emit functions accept an optional second string argument `tag` (defaults to `"Lua"`).
+The Lua API is registered in `src/lua_api/log_api.rs` under `lurek.log.*`. All emit functions accept an optional second string argument `tag` (defaults to `"Lua"`).
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.log.debug(message, tag?)` | `(string, string?)` | Emit a `debug`-severity message. |
-| `luna.log.info(message, tag?)` | `(string, string?)` | Emit an `info`-severity message. |
-| `luna.log.warn(message, tag?)` | `(string, string?)` | Emit a `warn`-severity message. |
-| `luna.log.error(message, tag?)` | `(string, string?)` | Emit an `error`-severity message. |
-| `luna.log.print(level, message)` | `(string, string)` | Emit at a named level. |
-| `luna.log.setLevel(level)` | `(string)` | Set minimum runtime log level. |
-| `luna.log.getLevel()` | `→ string` | Return current level name. |
-| `luna.log.addSink(cfg) → id` | `(table) → integer` | Add a file or memory sink. `cfg.type = "file"` requires `cfg.path`; `"memory"` accepts `cfg.capacity` (default 200). `cfg.level` sets `SinkLevel` (default `"debug"`). |
-| `luna.log.removeSink(id) → bool` | `(integer) → boolean` | Remove a sink by id. |
-| `luna.log.clearSinks()` | `()` | Remove all sinks. |
-| `luna.log.listSinks() → table` | `() → table` | Returns `{id, type, level, path?}[]`. |
-| `luna.log.readMemory(id, drain?) → table?` | `(integer, boolean?) → table?` | Read memory sink entries. `drain = true` clears after reading. Returns `nil` if not a memory sink. |
-| `luna.log.flushFile(id)` | `(integer)` | Flush OS write buffers for a file sink. No-op if not a file sink. |
+| `lurek.log.debug(message, tag?)` | `(string, string?)` | Emit a `debug`-severity message. |
+| `lurek.log.info(message, tag?)` | `(string, string?)` | Emit an `info`-severity message. |
+| `lurek.log.warn(message, tag?)` | `(string, string?)` | Emit a `warn`-severity message. |
+| `lurek.log.error(message, tag?)` | `(string, string?)` | Emit an `error`-severity message. |
+| `lurek.log.print(level, message)` | `(string, string)` | Emit at a named level. |
+| `lurek.log.setLevel(level)` | `(string)` | Set minimum runtime log level. |
+| `lurek.log.getLevel()` | `→ string` | Return current level name. |
+| `lurek.log.addSink(cfg) → id` | `(table) → integer` | Add a file or memory sink. `cfg.type = "file"` requires `cfg.path`; `"memory"` accepts `cfg.capacity` (default 200). `cfg.level` sets `SinkLevel` (default `"debug"`). |
+| `lurek.log.removeSink(id) → bool` | `(integer) → boolean` | Remove a sink by id. |
+| `lurek.log.clearSinks()` | `()` | Remove all sinks. |
+| `lurek.log.listSinks() → table` | `() → table` | Returns `{id, type, level, path?}[]`. |
+| `lurek.log.readMemory(id, drain?) → table?` | `(integer, boolean?) → table?` | Read memory sink entries. `drain = true` clears after reading. Returns `nil` if not a memory sink. |
+| `lurek.log.flushFile(id)` | `(integer)` | Flush OS write buffers for a file sink. No-op if not a file sink. |
 
 ## Lua Examples
 
 ```lua
 -- Basic level-specific logging with optional tag
-luna.log.info("Game initialised")
-luna.log.debug("Player position: x=" .. x, "PlayerSys")  -- tagged
-luna.log.warn("Texture not found, using fallback")
+lurek.log.info("Game initialised")
+lurek.log.debug("Player position: x=" .. x, "PlayerSys")  -- tagged
+lurek.log.warn("Texture not found, using fallback")
 
 -- Dynamic level selection
-luna.log.print("warn", "fallback asset activated")
+lurek.log.print("warn", "fallback asset activated")
 
 -- Runtime level control
-luna.log.setLevel("debug")
-luna.log.setLevel("warn")
-print("Active log level:", luna.log.getLevel())
+lurek.log.setLevel("debug")
+lurek.log.setLevel("warn")
+print("Active log level:", lurek.log.getLevel())
 
 -- Add a memory sink (ring buffer, capacity 100)
-local mem_id = luna.log.addSink({ type = "memory", capacity = 100 })
+local mem_id = lurek.log.addSink({ type = "memory", capacity = 100 })
 
 -- Read entries from the memory sink
-local entries = luna.log.readMemory(mem_id)      -- non-destructive
-local drained = luna.log.readMemory(mem_id, true) -- clears after read
+local entries = lurek.log.readMemory(mem_id)      -- non-destructive
+local drained = lurek.log.readMemory(mem_id, true) -- clears after read
 
 -- Add a file sink (UTF-8 append)
 local ok, file_id = pcall(function()
-    return luna.log.addSink({ type = "file", path = "save/game.log", level = "info" })
+    return lurek.log.addSink({ type = "file", path = "save/game.log", level = "info" })
 end)
 if ok then
-    luna.log.flushFile(file_id)
+    lurek.log.flushFile(file_id)
 end
 
 -- Inspect active sinks
-for _, s in ipairs(luna.log.listSinks()) do
+for _, s in ipairs(lurek.log.listSinks()) do
     print(s.id, s.type, s.level, s.path or "")
 end
 
 -- Clean up
-luna.log.clearSinks()
+lurek.log.clearSinks()
 ```
 
 ## Item Summary
@@ -164,14 +164,14 @@ luna.log.clearSinks()
 | Module          | Relationship | Notes                                                                    |
 |-----------------|--------------|--------------------------------------------------------------------------|
 | `engine`        | Imports from | `set_level` and `get_level` delegate to `engine::log_messages`           |
-| `lua_api`       | Imported by  | `log_api.rs` registers the `luna.log.*` surface and owns the `SinkRegistry` |
-| `debugbridge`   | Related      | `debugbridge.capturePrint` captures Lua `print()` output; `luna.log` emits via `log` crate — two separate channels |
-| `devtools`      | Related      | `devtools.Logger` is a structured in-game history buffer; `luna.log` is the engine-level operational log. **Boundary**: three separate channels by design. |
+| `lua_api`       | Imported by  | `log_api.rs` registers the `lurek.log.*` surface and owns the `SinkRegistry` |
+| `debugbridge`   | Related      | `debugbridge.capturePrint` captures Lua `print()` output; `lurek.log` emits via `log` crate — two separate channels |
+| `devtools`      | Related      | `devtools.Logger` is a structured in-game history buffer; `lurek.log` is the engine-level operational log. **Boundary**: three separate channels by design. |
 
 ## Notes
 
 - All Lua log messages are prefixed with `[Lua]` in the stdlib `log` crate output.
-- `luna.log.print` with an unknown `level` string falls back to `info`.
+- `lurek.log.print` with an unknown `level` string falls back to `info`.
 - Sinks are dispatched **after** the `log!` macro, so `RUST_LOG` filtering does not suppress sink output.
 - `SinkKind::File` uses `Mutex<File>` internally; creating a file sink will fail with a Lua error if the path is not writable — always wrap `addSink` in `pcall`.
 - There are no Rust unit tests for this module because all behaviour is a pass-through to `engine::log_messages`; the Lua test in `tests/lua/unit/test_log.lua` validates the Lua API surface.

@@ -4,19 +4,19 @@ A terminal-based hacking game where you breach three networked servers, navigate
 
 ## What It Demonstrates
 
-- `luna.keyboard.wasPressed()` — character-by-character terminal input capture
-- `luna.gfx.print()` — scrolling terminal output and blinking cursor rendering
-- `luna.gfx.rectangle()` — password-crack word grid and trace-bar HUD
-- `luna.gfx.setColor()` — colour-coded output lines (green success, red alert, white normal)
-- `luna.mousepressed()` — clicking words in the crack mini-game to match the target password
-- `luna.time.getTime()` — cursor blink animation
+- `lurek.keyboard.wasPressed()` — character-by-character terminal input capture
+- `lurek.gfx.print()` — scrolling terminal output and blinking cursor rendering
+- `lurek.gfx.rectangle()` — password-crack word grid and trace-bar HUD
+- `lurek.gfx.setColor()` — colour-coded output lines (green success, red alert, white normal)
+- `lurek.mousepressed()` — clicking words in the crack mini-game to match the target password
+- `lurek.time.getTime()` — cursor blink animation
 - In-memory virtual filesystem — `make_fs()` builds a directory-tree table parsed by `ls`, `cd`, and `cat`
 - State machine — `gameState` transitions between `playing`, `cracking`, `won`, and `gameover`
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/hacking_game
+cargo run -- content/demos/hacking_game
 ```
 
 ## Controls

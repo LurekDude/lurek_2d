@@ -36,13 +36,13 @@ Scene management: push-down automaton for game states (menu, gameplay, pause). S
 
 1. **Move DepthSorter to graphics**: It's a rendering primitive, not a scene management concept.
 2. **Add parallel scene mode**: `sceneStack:pushOverlay(scene)` — pushed scene receives update, underlying scenes also update but don't draw (or draw underneath).
-3. **Add built-in transition library**: `luna.scene.transitions.fade`, `.slide`, `.wipe`, `.iris` — pre-built transition effects. Most 2D engines provide these.
+3. **Add built-in transition library**: `lurek.scene.transitions.fade`, `.slide`, `.wipe`, `.iris` — pre-built transition effects. Most 2D engines provide these.
 4. **Add scene preloading**: `sceneStack:preload(sceneName, fn)` — load resources before entering. Critical for smooth transitions.
 5. **Unify transitions with fx**: Use `fx` module's fade/effects for scene transitions rather than duplicating visual effects.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Gideros |
+| Feature | Lurek2D | Engine A | Engine B | Engine I |
 |---|---|---|---|---|
 | Scene stack | ✅ | ❌ (manual) | ❌ (composer) | ✅ (SceneManager) |
 | Transitions | ✅ (basic) | ❌ | ✅ (rich library) | ✅ |

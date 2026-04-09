@@ -1,6 +1,6 @@
-﻿--- Luna2D inventory system — containers, weighted bags, slots, item stacks, equip slots, and item sets.
+﻿--- Lurek2D inventory system — containers, weighted bags, slots, item stacks, equip slots, and item sets.
 --
--- A pure-Lua replacement for the former `luna.inventory` Rust binding.
+-- A pure-Lua replacement for the former `lurek.inventory` Rust binding.
 -- Provides ItemStack, Container (fixed/unlimited/expandable), InvItem with tags,
 -- Slot and SlotState, ItemSet, and a full Inventory with equip slots and subsystem flags.
 --

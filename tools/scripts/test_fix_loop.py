@@ -141,7 +141,7 @@ def show_top_failures(summary: "ptl.ParseSummary", max_tests: int = 10, max_deta
     if nil_counts:
         print(clr(YELLOW, "\n  Most common nil-access errors (root causes to fix first):"))
         for name, count in sorted(nil_counts.items(), key=lambda x: -x[1])[:8]:
-            print(f"    {clr(RED, f'{count:3d}×')}  luna.*.{name}  is nil → add to Rust API or fix test")
+            print(f"    {clr(RED, f'{count:3d}×')}  lurek.*.{name}  is nil → add to Rust API or fix test")
 
     print()
     for r in failing:
@@ -192,12 +192,12 @@ def show_agent_hints(summary: "ptl.ParseSummary") -> None:
         elif kind == "require_missing":
             print(f"\n  [{clr(RED, f'{len(tests):d}×')}] require missing: '{clr(YELLOW, name)}'")
             print(f"       Affects: {clr(DIM, tests_str)}")
-            print(f"       Fix: check library/{name.replace('.','/')} or use correct path")
+            print(f"       Fix: check content/library/{name.replace('.','/')} or use correct path")
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Luna2D test-run / fix loop — run tests, show top failures, iterate.",
+        description="Lurek2D test-run / fix loop — run tests, show top failures, iterate.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )

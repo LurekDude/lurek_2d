@@ -1,8 +1,8 @@
--- Scene Management Demo for Luna2D
+-- Scene Management Demo for Lurek2D
 -- Demonstrates a Lua-side scene state machine:
 --   Title Screen -> Gameplay -> Game Over
 -- Press ENTER to advance scenes, ESC to go back.
--- Run with: cargo run -- demos/showcase/scene_demo
+-- Run with: cargo run -- content/demos/showcase/scene_demo
 
 -- ── Scene system ──────────────────────────────────────────────────────────
 
@@ -28,7 +28,7 @@ end
 local title = {}
 
 function title.enter()
-    luna.gfx.setBackgroundColor(0.08, 0.05, 0.18)
+    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.18)
 end
 
 function title.update(dt)
@@ -37,20 +37,20 @@ function title.update(dt)
 end
 
 function title.draw()
-    local w = luna.gfx.getWidth()
-    local h = luna.gfx.getHeight()
+    local w = lurek.gfx.getWidth()
+    local h = lurek.gfx.getHeight()
 
     -- Title text
     local pulse = math.sin((title.pulse or 0) * 2) * 0.15 + 0.85
-    luna.gfx.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
-    luna.gfx.print("LUNA2D", w / 2 - 100, h / 3, 5)
+    lurek.gfx.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
+    lurek.gfx.print("LUREK2D", w / 2 - 100, h / 3, 5)
 
-    luna.gfx.setColor(0.7, 0.7, 0.7)
-    luna.gfx.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
+    lurek.gfx.setColor(0.7, 0.7, 0.7)
+    lurek.gfx.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
 
     -- Instructions
-    luna.gfx.setColor(0.5, 0.5, 0.5)
-    luna.gfx.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
+    lurek.gfx.setColor(0.5, 0.5, 0.5)
+    lurek.gfx.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
 end
 
 function title.keypressed(key)
@@ -66,7 +66,7 @@ local player = { x = 400, y = 300, speed = 200, score = 0 }
 local coins = {}
 
 function gameplay.enter()
-    luna.gfx.setBackgroundColor(0.05, 0.1, 0.05)
+    lurek.gfx.setBackgroundColor(0.05, 0.1, 0.05)
     player.x = 400
     player.y = 300
     player.score = 0
@@ -82,16 +82,16 @@ end
 
 function gameplay.update(dt)
     -- Player movement
-    if luna.keyboard.isDown("up") or luna.keyboard.isDown("w") then
+    if lurek.keyboard.isDown("up") or lurek.keyboard.isDown("w") then
         player.y = player.y - player.speed * dt
     end
-    if luna.keyboard.isDown("down") or luna.keyboard.isDown("s") then
+    if lurek.keyboard.isDown("down") or lurek.keyboard.isDown("s") then
         player.y = player.y + player.speed * dt
     end
-    if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+    if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
         player.x = player.x - player.speed * dt
     end
-    if luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+    if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
         player.x = player.x + player.speed * dt
     end
 
@@ -120,22 +120,22 @@ function gameplay.draw()
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
-            luna.gfx.setColor(1.0, 0.85, 0.0)
-            luna.gfx.circle("fill", coin.x, coin.y, 10)
-            luna.gfx.setColor(0.8, 0.65, 0.0)
-            luna.gfx.circle("line", coin.x, coin.y, 10)
+            lurek.gfx.setColor(1.0, 0.85, 0.0)
+            lurek.gfx.circle("fill", coin.x, coin.y, 10)
+            lurek.gfx.setColor(0.8, 0.65, 0.0)
+            lurek.gfx.circle("line", coin.x, coin.y, 10)
         end
     end
 
     -- Draw player
-    luna.gfx.setColor(0.3, 0.8, 1.0)
-    luna.gfx.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
+    lurek.gfx.setColor(0.3, 0.8, 1.0)
+    lurek.gfx.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
-    luna.gfx.setColor(0.5, 0.5, 0.5)
-    luna.gfx.print("WASD to move | ESC for title", 10, 570, 1.5)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
+    lurek.gfx.setColor(0.5, 0.5, 0.5)
+    lurek.gfx.print("WASD to move | ESC for title", 10, 570, 1.5)
 end
 
 function gameplay.keypressed(key)
@@ -149,7 +149,7 @@ end
 local gameover = {}
 
 function gameover.enter()
-    luna.gfx.setBackgroundColor(0.15, 0.05, 0.05)
+    lurek.gfx.setBackgroundColor(0.15, 0.05, 0.05)
     gameover.timer = 0
 end
 
@@ -158,18 +158,18 @@ function gameover.update(dt)
 end
 
 function gameover.draw()
-    local w = luna.gfx.getWidth()
-    local h = luna.gfx.getHeight()
+    local w = lurek.gfx.getWidth()
+    local h = lurek.gfx.getHeight()
 
-    luna.gfx.setColor(0.2, 1.0, 0.3)
-    luna.gfx.print("YOU WIN!", w / 2 - 80, h / 3, 4)
+    lurek.gfx.setColor(0.2, 1.0, 0.3)
+    lurek.gfx.print("YOU WIN!", w / 2 - 80, h / 3, 4)
 
-    luna.gfx.setColor(0.7, 0.7, 0.7)
-    luna.gfx.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
+    lurek.gfx.setColor(0.7, 0.7, 0.7)
+    lurek.gfx.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
 
-    luna.gfx.setColor(0.5, 0.5, 0.5)
-    luna.gfx.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
-    luna.gfx.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
+    lurek.gfx.setColor(0.5, 0.5, 0.5)
+    lurek.gfx.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
+    lurek.gfx.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
 end
 
 function gameover.keypressed(key)
@@ -186,26 +186,26 @@ scenes.title = title
 scenes.gameplay = gameplay
 scenes.gameover = gameover
 
--- ── Luna2D callbacks ─────────────────────────────────────────────────────
+-- ── Lurek2D callbacks ─────────────────────────────────────────────────────
 
-function luna.init()
-    luna.window.setTitle("Scene Demo - Luna2D")
+function lurek.init()
+    lurek.window.setTitle("Scene Demo - Lurek2D")
     switch_scene(scenes.title)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if current_scene and current_scene.update then
         current_scene.update(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     if current_scene and current_scene.draw then
         current_scene.draw()
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if current_scene and current_scene.keypressed then
         current_scene.keypressed(key)
     end

@@ -1,13 +1,13 @@
 ---
 name: github-workflow
-description: "Load this skill when working with Luna2D's GitHub project: creating or triaging issues, opening PRs, managing labels and milestones, using mcp_github_* tools for automation, or mapping roadmap phases to GitHub milestones. Skip it for CI/CD pipeline configuration (use ci-cd-pipeline skill) or code review (use Reviewer agent)."
+description: "Load this skill when working with Lurek2D's GitHub project: creating or triaging issues, opening PRs, managing labels and milestones, using mcp_github_* tools for automation, or mapping roadmap phases to GitHub milestones. Skip it for CI/CD pipeline configuration (use ci-cd-pipeline skill) or code review (use Reviewer agent)."
 ---
 
-# GitHub Workflow — Luna2D
+# GitHub Workflow — Lurek2D
 
 ## Load When
 
-- Creating, triaging, or closing GitHub issues for Luna2D
+- Creating, triaging, or closing GitHub issues for Lurek2D
 - Opening or merging pull requests
 - Using `mcp_github_*` tools to search, read, or update issues/PRs
 - Mapping roadmap phases to GitHub milestones
@@ -19,7 +19,7 @@ description: "Load this skill when working with Luna2D's GitHub project: creatin
 - GitHub label taxonomy and issue type conventions
 - Branch naming patterns and PR process rules
 - Roadmap phase ↔ GitHub milestone mapping
-- `mcp_github_*` tool usage patterns for Luna2D
+- `mcp_github_*` tool usage patterns for Lurek2D
 - Git commit message format (`type(scope): description`)
 - Release tagging and packaging process
 
@@ -75,11 +75,11 @@ Map roadmap acceptance gates to GitHub issue completion to track phase progress 
 
 ## Using mcp_github_* Tools
 
-Key tool patterns for Luna2D work:
+Key tool patterns for Lurek2D work:
 
 ```
 # Search for existing issues before creating
-mcp_github_search_issues: query="luna2d shadow physics", owner="...", repo="luna2d"
+mcp_github_search_issues: query="lurek2d shadow physics", owner="...", repo="lurek2d"
 
 # Create an issue with labels
 mcp_github_issue_write: title, body, labels=["type:feature","module:graphics"], milestone=4

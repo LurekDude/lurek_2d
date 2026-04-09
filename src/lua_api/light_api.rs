@@ -1,4 +1,4 @@
-//! `luna.light` — 2D lighting, shadow occluders, and ambient control.
+//! `lurek.light` — 2D lighting, shadow occluders, and ambient control.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -873,7 +873,7 @@ impl LuaUserData for LuaOccluder {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.light` API table with the Lua VM.
+/// Registers the `lurek.light` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

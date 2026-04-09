@@ -1,5 +1,5 @@
 //! Shared trait and helper for consistent `type()`, `typeOf()`, and `__tostring`
-//! across all Luna2D UserData types exposed to Lua.
+//! across all Lurek2D UserData types exposed to Lua.
 
 use mlua::prelude::*;
 
@@ -7,7 +7,7 @@ use mlua::prelude::*;
 // LunaType trait
 // ============================================================
 
-/// Marker trait that every Lua UserData type in Luna2D must implement.
+/// Marker trait that every Lua UserData type in Lurek2D must implement.
 ///
 /// Provides the canonical `TYPE_NAME` string and `TYPE_HIERARCHY` slice used
 /// by the `type()`, `typeOf()`, and `__tostring` Lua methods added by

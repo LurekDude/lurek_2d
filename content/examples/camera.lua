@@ -1,13 +1,11 @@
 -- examples/camera.lua
--- luna.camera — Camera2D: viewport, position, zoom, follow, shake, coordinate transforms.
--- All luna.camera API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.camera — Camera2D: viewport, position, zoom, follow, shake, coordinate transforms.
 
 -- ── Construction ─────────────────────────────────────────────────────────────
 
 -- new(viewport_w, viewport_h) → Camera2D
 -- Creates a new Camera2D whose viewport covers `viewport_w` × `viewport_h` pixels.
-local cam = luna.camera.new(800, 600)
+local cam = lurek.camera.new(800, 600)
 
 -- ── Position ──────────────────────────────────────────────────────────────────
 
@@ -99,36 +97,36 @@ local sx, sy = cam:toScreen(wx2, wy2)  -- round-trip
 -- ── Typical Usage Pattern ─────────────────────────────────────────────────────
 
 --[[
-function luna.init()
-    camera = luna.camera.new(800, 600)
+function lurek.init()
+    camera = lurek.camera.new(800, 600)
     camera:setBounds(0, 0, 3200, 1800)
     camera:setFollowSmooth(6.0)
     camera:setDeadZone(80, 60)
     player = { x = 400, y = 300 }
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Move player with arrow keys
     local spd = 150 * dt
-    if luna.keyboard.isDown("right") then player.x = player.x + spd end
-    if luna.keyboard.isDown("left")  then player.x = player.x - spd end
-    if luna.keyboard.isDown("down")  then player.y = player.y + spd end
-    if luna.keyboard.isDown("up")    then player.y = player.y - spd end
+    if lurek.keyboard.isDown("right") then player.x = player.x + spd end
+    if lurek.keyboard.isDown("left")  then player.x = player.x - spd end
+    if lurek.keyboard.isDown("down")  then player.y = player.y + spd end
+    if lurek.keyboard.isDown("up")    then player.y = player.y - spd end
 
     -- Keep camera on player
     camera:setTarget(player.x, player.y)
     camera:update(dt)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" then
         camera:shake(10, 0.3)
     end
 end
 
-function luna.render()
-    -- luna.gfx.setCamera(camera) would apply the transform for all draws
-    -- (actual graphics-integration call depends on luna.gfx API)
-    luna.gfx.drawCircle("fill", player.x, player.y, 16)
+function lurek.render()
+lurek.gfx.setCamera(camera)  would apply the transform for all draws
+    -- (actual graphics-integration call depends on lurek.gfx API)
+    lurek.gfx.drawCircle("fill", player.x, player.y, 16)
 end
 ]]

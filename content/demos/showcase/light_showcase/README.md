@@ -1,22 +1,22 @@
 # Light Showcase
 
-An interactive eight-screen tour of Luna2D's 2D dynamic lighting system. Each screen isolates a distinct lighting feature — point lights, spot lights, directional light, flicker effects, attenuation curves, light groups, shadow filter quality, and blend modes — with a movable player-controlled light so you can explore how each parameter changes the result.
+An interactive eight-screen tour of Lurek2D's 2D dynamic lighting system. Each screen isolates a distinct lighting feature — point lights, spot lights, directional light, flicker effects, attenuation curves, light groups, shadow filter quality, and blend modes — with a movable player-controlled light so you can explore how each parameter changes the result.
 
 ## What It Demonstrates
 
-- `luna.light.newLight()` — creating point, spot, and directional light sources with color, intensity, and radius
-- `luna.light.setAmbient()` — controlling the base ambient level that fills unlit areas
-- `luna.light.clear()` — clearing all lights when switching between showcase screens
-- `luna.light.setGroupEnabled()` — batch-toggling lights by `groupId` with a single call
-- `luna.light.newLight()` flicker parameters — `flickerSpeed` and `flickerStrength` for torch/fire effects
-- `luna.light.newLight()` attenuation parameters — `attConstant`, `attLinear`, `attQuadratic` decay curves
-- `luna.keyboard.isDown()` — WASD movement of the player-controlled demonstration light
-- `luna.keyboard.wasPressed()` — number keys 1–8 to jump directly to a screen, G to toggle light groups
+- `lurek.light.newLight()` — creating point, spot, and directional light sources with color, intensity, and radius
+- `lurek.light.setAmbient()` — controlling the base ambient level that fills unlit areas
+- `lurek.light.clear()` — clearing all lights when switching between showcase screens
+- `lurek.light.setGroupEnabled()` — batch-toggling lights by `groupId` with a single call
+- `lurek.light.newLight()` flicker parameters — `flickerSpeed` and `flickerStrength` for torch/fire effects
+- `lurek.light.newLight()` attenuation parameters — `attConstant`, `attLinear`, `attQuadratic` decay curves
+- `lurek.keyboard.isDown()` — WASD movement of the player-controlled demonstration light
+- `lurek.keyboard.wasPressed()` — number keys 1–8 to jump directly to a screen, G to toggle light groups
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/light_showcase
+cargo run -- content/demos/light_showcase
 ```
 
 ## Controls

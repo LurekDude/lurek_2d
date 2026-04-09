@@ -1,3 +1,3 @@
 # Config
 
-Tests for conf.lua / luna.conf() API
+Tests for conf.lua / lurek.conf() API

@@ -30,7 +30,7 @@ Two event systems: `EventQueue` for FIFO event posting/polling, and `Signal` for
 ## Structural Issues
 
 - **Two event systems in one module**: EventQueue (queue-based) and Signal (pub-sub) are conceptually different. Having both in one module is fine for size, but the user must know which to use when.
-- **Signal vs event callbacks**: Luna2D has `luna.load`, `luna.update`, `luna.draw` as engine callbacks, plus `Signal` for user events. The conceptual distinction could be clearer.
+- **Signal vs event callbacks**: Lurek2D has `lurek.load`, `lurek.update`, `lurek.draw` as engine callbacks, plus `Signal` for user events. The conceptual distinction could be clearer.
 
 ## Suggestions
 
@@ -42,7 +42,7 @@ Two event systems: `EventQueue` for FIFO event posting/polling, and `Signal` for
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Event queue | ✅ | ❌ | ✅ (Runtime) | ✅ (Events) |
 | Pub-sub | ✅ (Signal) | ❌ | ✅ (listeners) | ✅ (EventReader) |

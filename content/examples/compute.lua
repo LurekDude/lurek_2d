@@ -1,31 +1,29 @@
 -- examples/compute.lua
--- luna.compute � Multi-dimensional numerical arrays for batch math operations.
+-- lurek.compute � Multi-dimensional numerical arrays for batch math operations.
 -- Dense NdArray containers backed by typed f32/f64/i32/i64/u8 storage.
--- All luna.compute API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
 
 -- �� Array Creation ������������������������������������������������������������
 
 -- newArray(shape, dtype?) � Array
 -- shape is a table {rows, cols, ...} for N-dimensional arrays.
 -- dtype: "f32" (default) | "f64" | "i32" | "i64" | "u8"
-local mat2d  = luna.compute.newArray({4, 4}, "f32")     -- 4�4 float matrix
-local vec1d  = luna.compute.newArray({100}, "f64")       -- 100-element double vector
-local vol3d  = luna.compute.newArray({8, 8, 8}, "i32")  -- 8�8�8 integer volume
+local mat2d  = lurek.compute.newArray({4, 4}, "f32")     -- 4�4 float matrix
+local vec1d  = lurek.compute.newArray({100}, "f64")       -- 100-element double vector
+local vol3d  = lurek.compute.newArray({8, 8, 8}, "i32")  -- 8�8�8 integer volume
 
 -- zeros(shape, dtype?) � Array  � all elements initialised to 0
-local zero_mat = luna.compute.zeros({3, 3})       -- 3�3 zero matrix
+local zero_mat = lurek.compute.zeros({3, 3})       -- 3�3 zero matrix
 
 -- ones(shape, dtype?) � Array  � all elements initialised to 1
-local ones_vec = luna.compute.ones({16}, "f32")   -- 16-element vector of ones
+local ones_vec = lurek.compute.ones({16}, "f32")   -- 16-element vector of ones
 
 -- range(start, stop, step?, dtype?) � Array  � linspace/arange style 1D array
-local seq = luna.compute.range(0, 10, 1)          -- {0,1,2,3,4,5,6,7,8,9}
-local lin = luna.compute.range(0.0, 1.0, 0.1)     -- 10 evenly spaced floats
+local seq = lurek.compute.range(0, 10, 1)          -- {0,1,2,3,4,5,6,7,8,9}
+local lin = lurek.compute.range(0.0, 1.0, 0.1)     -- 10 evenly spaced floats
 
 -- fromTable(data, shape?, dtype?) � Array  � create from a flat or nested Lua table
-local a = luna.compute.fromTable({1,2,3,4,5,6}, {2,3})   -- 2�3 matrix
-local b = luna.compute.fromTable({1.5, 2.5, 3.5})         -- flat 1D array
+local a = lurek.compute.fromTable({1,2,3,4,5,6}, {2,3})   -- 2�3 matrix
+local b = lurek.compute.fromTable({1.5, 2.5, 3.5})         -- flat 1D array
 
 -- �� Shape and Metadata ��������������������������������������������������������
 
@@ -112,19 +110,19 @@ local mask = mat2d:threshold(0.5)
 -- �� Typical Use Cases ���������������������������������������������������������
 
 -- Heatmap / probability grid
-local heatmap = luna.compute.zeros({64, 64})
+local heatmap = lurek.compute.zeros({64, 64})
 heatmap:set(32, 32, 1.0)   -- set centre to max
 
 -- Normalised float buffer for custom shader upload
-local weights = luna.compute.fromTable({0.25, 0.5, 1.0, 0.75})
+local weights = lurek.compute.fromTable({0.25, 0.5, 1.0, 0.75})
 local norm = weights:div(weights:getSize())  -- normalise
 
 -- Batch distance calculation
-local xs = luna.compute.range(0, 10)
+local xs = lurek.compute.range(0, 10)
 local ds = xs:mul(xs)   -- squared distances from origin
 
 -- Intensity array for a 3�3 blur kernel
-local kernel = luna.compute.fromTable({
+local kernel = lurek.compute.fromTable({
     1, 2, 1,
     2, 4, 2,
     1, 2, 1,

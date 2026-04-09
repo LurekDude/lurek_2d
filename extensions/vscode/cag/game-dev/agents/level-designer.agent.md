@@ -1,6 +1,6 @@
 ---
 description: >
-  Design levels, puzzles, encounter tables and progression curves for a Luna2D game.
+  Design levels, puzzles, encounter tables and progression curves for a Lurek2D game.
   Outputs design documents and tilemap layout specs, not Lua code.
 model: claude-sonnet-4-5
 tools:

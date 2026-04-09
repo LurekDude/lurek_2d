@@ -13,7 +13,7 @@
 //!
 //! ## Update Loop
 //!
-//! During `update(dt)` (called from the Lua `luna.update` callback), the world
+//! During `update(dt)` (called from the Lua `lurek.update` callback), the world
 //! ticks all agents in descending `priority` order. For each agent, it checks
 //! the agent's [`DecisionModel`](crate::ai::agent::DecisionModel) and ticks the
 //! appropriate subsystems (FSM, BehaviorTree, SteeringManager).

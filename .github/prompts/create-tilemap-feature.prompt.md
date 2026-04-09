@@ -26,7 +26,7 @@ description: "Create a new tilemap feature (layer type, autotile rule, collision
 
 3. **Add Lua bindings** (if user-facing)
    - Add to `src/lua_api/tilemap_api.rs` following the `register()` pattern
-   - Namespace: `luna.tilemap.*`
+   - Namespace: `lurek.tilemap.*`
    - Closures capture `Rc<RefCell<SharedState>>` — clone Rc before moving into closure
    - Return `LuaResult<T>` from all Lua-callable functions
 
@@ -44,6 +44,6 @@ description: "Create a new tilemap feature (layer type, autotile rule, collision
 
 - [ ] Feature compiles with 0 clippy warnings
 - [ ] Integration tests pass
-- [ ] Lua bindings follow `luna.tilemap.*` naming
+- [ ] Lua bindings follow `lurek.tilemap.*` naming
 - [ ] Public types have `///` doc comments
 - [ ] No dependency direction violations

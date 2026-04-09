@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.ai`                                            |
+| **Lua API**    | `lurek.ai`                                            |
 | **Source**      | `src/ai/`                                            |
 | **Rust Tests** | `tests/rust/unit/ai_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_ai.lua`                         |
@@ -35,6 +35,6 @@ The AI module provides a comprehensive, modular game-intelligence toolkit that L
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/ai.md`](../../specs/ai.md)
+→ [`docs/specs/ai.md`](../../docs/specs/ai.md)
 
-_Update both this file **and** `specs/ai.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/ai.md` whenever source files, public types, or Lua bindings change._

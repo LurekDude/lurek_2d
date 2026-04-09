@@ -103,15 +103,15 @@ impl EventQueue {
         self.events.len()
     }
 
-    /// Drains pending OS-level events into the queue (no-op in Luna2D; documents as a sync point).
+    /// Drains pending OS-level events into the queue (no-op in Lurek2D; documents as a sync point).
     ///
-    /// Luna2D uses a push model — OS events are already in the queue when callbacks fire.
+    /// Lurek2D uses a push model — OS events are already in the queue when callbacks fire.
     /// This function exists for API parity and does nothing.
     ///
     /// # Returns
     /// `()`.
     pub fn pump(&self) {
-        // Luna2D uses a push model; OS events are already in queue when this is called.
+        // Lurek2D uses a push model; OS events are already in queue when this is called.
     }
 
     /// Blocks until an event is available or `timeout_ms` milliseconds elapse.

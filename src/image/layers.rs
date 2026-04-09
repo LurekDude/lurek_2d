@@ -12,7 +12,7 @@
 //! Use [`LayeredImage::swap_layers`] or [`LayeredImage::move_layer`] to reorder.
 //!
 //! All public items are documented.  See the parent module for architectural
-//! context and the `luna.*` Lua API for the scripting interface.
+//! context and the `lurek.*` Lua API for the scripting interface.
 
 use super::image_data::ImageData;
 

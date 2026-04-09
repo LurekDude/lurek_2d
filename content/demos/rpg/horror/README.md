@@ -4,19 +4,19 @@ An atmospheric psychological horror game set in a hand-crafted tile maze. You ca
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — WASD and arrow-key movement with wall-slide collision
-- `luna.mouse.getPosition()` — flashlight cone direction follows the cursor in world space
-- `luna.gfx.rectangle()` — tile map, sanity bar, battery bar, and key HUD
-- `luna.gfx.setColor()` — darkness overlay tinted by sanity level; distortion tint when sanity is low
-- `luna.gfx.polygon()` — flashlight cone rendered as a triangle fan in world space
-- `luna.gfx.print()` — key counter, note text pop-ups, win/lose overlays
-- `luna.gfx.setBackgroundColor()` — full black to simulate total darkness
+- `lurek.keyboard.isDown()` — WASD and arrow-key movement with wall-slide collision
+- `lurek.mouse.getPosition()` — flashlight cone direction follows the cursor in world space
+- `lurek.gfx.rectangle()` — tile map, sanity bar, battery bar, and key HUD
+- `lurek.gfx.setColor()` — darkness overlay tinted by sanity level; distortion tint when sanity is low
+- `lurek.gfx.polygon()` — flashlight cone rendered as a triangle fan in world space
+- `lurek.gfx.print()` — key counter, note text pop-ups, win/lose overlays
+- `lurek.gfx.setBackgroundColor()` — full black to simulate total darkness
 - Tile-based collision — `isWall()` maps world coordinates to LEVEL grid characters for per-axis resolution
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/horror
+cargo run -- content/demos/horror
 ```
 
 ## Controls

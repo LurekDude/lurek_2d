@@ -1,6 +1,6 @@
 # Genre → API Patterns
 
-Pre-mapped table of common game genres with recommended `luna.*` API namespaces,
+Pre-mapped table of common game genres with recommended `lurek.*` API namespaces,
 library modules, conf.lua resolution, and structural notes.
 
 Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
@@ -9,7 +9,7 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 
 ## Quick Reference Table
 
-| Genre | Resolution | Key `luna.*` APIs | Library Modules | Complexity |
+| Genre | Resolution | Key `lurek.*` APIs | Library Modules | Complexity |
 |-------|-----------|-------------------|-----------------|------------|
 | Action / Shooter | 960×540 | graphics, physics, input, timer, audio | — | Medium |
 | AI / Pathfinding | 800×600 | graphics, ai, pathfinding, entity, timer | — | Medium–High |
@@ -46,53 +46,53 @@ Use this to bootstrap `main.lua` and `conf.lua` choices for a given genre.
 ## Detailed Genre Notes
 
 ### Platformer
-- Use `luna.physics` for bodies or manual AABB (both patterns are acceptable)
-- Camera follows player with easing via `luna.math.applyEasing("outCubic", ...)`
+- Use `lurek.physics` for bodies or manual AABB (both patterns are acceptable)
+- Camera follows player with easing via `lurek.math.applyEasing("outCubic", ...)`
 - Audio for footsteps/jumps should be guarded with `pcall` (graceful no-audio fallback)
 - Resolution: 960×540 for wide level view
 
 ### Roguelike
-- Turn-based: `luna.update` may be empty (logic fires in `luna.keypressed`)
-- Fog of war / FOV can be pure Lua arrays — no `luna.physics` needed
+- Turn-based: `lurek.update` may be empty (logic fires in `lurek.keypressed`)
+- Fog of war / FOV can be pure Lua arrays — no `lurek.physics` needed
 - Resolution: 800×640 to fit message log at bottom (6–8 line history strip)
-- `luna.gfx.print()` with a small monospaced font for dungeon grid
+- `lurek.gfx.print()` with a small monospaced font for dungeon grid
 
 ### Card Game / Deck Builder
 - State machine: `MENU → DRAW → PLAY → RESOLVE → END`
-- Drag-and-drop: `luna.mouse.getPosition()` + hit-test rectangle helpers
+- Drag-and-drop: `lurek.mouse.getPosition()` + hit-test rectangle helpers
 - Card data as Lua tables with `id`, `name`, `cost`, `effect` fields
 - `library.item` + `library.inventory` replace hand-rolled card tracking in richer demos
 
 ### Dialog / Visual Novel
 - Always use `library.dialog` — **do not reimplement** the sequencer
-- Dialog assets (portraits, backgrounds) go in `demos/<name>/assets/`
-- Text rendering uses `luna.gfx.print()` inside a letterbox at bottom 25% of screen
+- Dialog assets (portraits, backgrounds) go in `content/demos/<name>/assets/`
+- Text rendering uses `lurek.gfx.print()` inside a letterbox at bottom 25% of screen
 - Keyboard `space`/`enter` advance; `up`/`down` select choice
 
 ### Horror / Stealth
-- `luna.light.*` for dynamic lighting / shadow cones
-- `luna.audio.*` ambient loop started in `luna.load()` and stopped in `luna.keypressed("escape")`
-- Guard vision cone can use `luna.physics.raycast()` against walls
+- `lurek.light.*` for dynamic lighting / shadow cones
+- `lurek.audio.*` ambient loop started in `lurek.load()` and stopped in `lurek.keypressed("escape")`
+- Guard vision cone can use `lurek.physics.raycast()` against walls
 
 ### AI / Pathfinding
-- `luna.ai.*` for FSM / behavior trees
-- `luna.pathfinding.*` for A* grid navigation
-- `luna.entity.*` for actor lifecycle management
+- `lurek.ai.*` for FSM / behavior trees
+- `lurek.pathfinding.*` for A* grid navigation
+- `lurek.entity.*` for actor lifecycle management
 - Show debug overlay drawing: paths, FSM state labels
 
 ### Automation / Factory
-- `luna.tilemap.*` for the grid world
-- `luna.signal.*` for producer-consumer item queue across belts
+- `lurek.tilemap.*` for the grid world
+- `lurek.signal.*` for producer-consumer item queue across belts
 - Keep entity count < 500 for 60 FPS on integrated GPU (design constraint B-03)
 
 ### RTS / Strategy
-- `luna.camera.*` for pan/zoom; bind scroll to middle-mouse-drag
-- `luna.pathfinding.*` for unit movement
-- Selection box: track drag start/end in `luna.mousepressed`/`luna.mousereleased`
+- `lurek.camera.*` for pan/zoom; bind scroll to middle-mouse-drag
+- `lurek.pathfinding.*` for unit movement
+- Selection box: track drag start/end in `lurek.mousepressed`/`lurek.mousereleased`
 
 ---
 
-## luna.* Namespace Quick Reference
+## lurek.* Namespace Quick Reference
 
 For the full API surface run:
 ```powershell

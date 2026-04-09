@@ -4,18 +4,18 @@ A point-and-click adventure game spanning three rooms. Click objects to examine 
 
 ## What It Demonstrates
 
-- `luna.mouse.getPosition()` — per-frame cursor position for hover detection
-- `luna.mousepressed` callback — left-click interaction dispatch
+- `lurek.mouse.getPosition()` — per-frame cursor position for hover detection
+- `lurek.mousepressed` callback — left-click interaction dispatch
 - AABB hit-testing against rectangular hotspots entirely in Lua
 - Typewriter text reveal using a character-per-second accumulator
 - Inventory system: item presence checked before allowing state transitions
 - Room-graph navigation: each door object carries an `exit` key that drives the room switch
-- `luna.window.setTitle()` — changing the window title at runtime
+- `lurek.window.setTitle()` — changing the window title at runtime
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/adventure
+cargo run -- content/demos/adventure
 ```
 
 ## Controls

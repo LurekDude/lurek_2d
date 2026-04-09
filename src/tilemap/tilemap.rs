@@ -1,12 +1,12 @@
 //! Main tile map container with layers, tiles, viewport, collision, and autotile support.
 //!
-//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! This module is part of Lurek2D's `tilemap` subsystem and provides the implementation
 //! details for tilemap-related operations and data management.
 //! Key types exported from this module: `TileLayer`, `SweepResult`, `TileMap`.
 //! Primary functions: `new()`, `add_tileset()`, `get_tileset()`, `get_tileset_count()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

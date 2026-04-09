@@ -1,4 +1,4 @@
--- Luna2D Lua Test Framework v2
+-- Lurek2D Lua Test Framework v2
 -- BDD-style test framework with nested describe, skip/pending, hooks, and rich output.
 --
 -- Usage:

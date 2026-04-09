@@ -1,11 +1,11 @@
-//! GPU-accelerated 2D renderer for Luna2D, backed by wgpu.
+//! GPU-accelerated 2D renderer for Lurek2D, backed by wgpu.
 //!
 //! Processes a `DrawCommand` queue each frame, tessellates geometry on the CPU,
 //! uploads vertex / index data to GPU buffers, and issues a single render pass.
 //!
 //! # Design
 //! - Two render pipelines: *color* (solid + gradient shapes) and *texture* (images, sprites).
-//! - Transform stack maintained during command processing — identical to Love2D `push/pop`.
+//! - Transform stack maintained during command processing — standard `push/pop` transform stack semantics.
 //! - Colored geometry is batched in one draw call; each distinct texture source is one draw call.
 //! - Draw order: colored shapes first (in submission order), textured images second.
 

@@ -6,10 +6,10 @@ being crushed by falling boulders.
 
 ## What It Demonstrates
 
-- `luna.gfx.circle()` / `luna.gfx.rectangle()` — map cells, boulders, diamonds
-- `luna.input.isKeyDown()` — tile-based movement with cooldown
+- `lurek.gfx.circle()` / `lurek.gfx.rectangle()` — map cells, boulders, diamonds
+- `lurek.input.isKeyDown()` — tile-based movement with cooldown
 - Falling physics simulation at a fixed step rate
-- `luna.gfx.print()` — diamond counter, timer, and score HUD
+- `lurek.gfx.print()` — diamond counter, timer, and score HUD
 
 ## Controls
 

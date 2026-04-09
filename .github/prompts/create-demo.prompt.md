@@ -1,11 +1,11 @@
 ---
-description: "Create one or more new Luna2D demo projects in demos/. Generates conf.lua, main.lua, README.md, and screen.png for each demo. Use when: scaffolding demos from genre descriptions; creating batch demos from a list; adding demos that use library/ modules. Inputs: genre, count, specific luna.* features, library modules, resolution, complexity."
+description: "Create one or more new Lurek2D demo projects in content/demos/. Generates conf.lua, main.lua, README.md, and screen.png for each demo. Use when: scaffolding demos from genre descriptions; creating batch demos from a list; adding demos that use content/library/ modules. Inputs: genre, count, specific lurek.* features, library modules, resolution, complexity."
 name: "Create Demo"
 argument-hint: "genre(s), count, features, library modules, resolution, complexity"
 agent: agent
 ---
 
-# Create Luna2D Demo Project(s)
+# Create Lurek2D Demo Project(s)
 
 ## Instructions for the Agent
 
@@ -22,8 +22,8 @@ Collect the following from the user's request. All inputs except `GENRE` are opt
 |-------|-------------|---------|
 | `GENRE` | Game genre(s) — e.g. "platformer", "roguelike", "card game and deck builder" | Required |
 | `COUNT` | Number of demos to create | 1 |
-| `FEATURES` | Specific `luna.*` API calls or game mechanics to showcase — e.g. "physics stacking, camera shake" | Infer from genre |
-| `LIBRARY_MODULES` | `library/` modules to use — e.g. "dialog", "item + inventory" | None |
+| `FEATURES` | Specific `lurek.*` API calls or game mechanics to showcase — e.g. "physics stacking, camera shake" | Infer from genre |
+| `LIBRARY_MODULES` | `content/library/` modules to use — e.g. "dialog", "item + inventory" | None |
 | `RESOLUTION` | Window size — e.g. "960×540", "widescreen", "tall for log" | Infer from genre using [genre-patterns](../skills/demo-creation/references/genre-patterns.md) |
 | `COMPLEXITY` | `minimal` / `standard` / `complex` | `standard` |
 | `EXTRA_NOTES` | Any specific needs, mechanics, themes, or constraints stated by the user | — |
@@ -34,13 +34,13 @@ Collect the following from the user's request. All inputs except `GENRE` are opt
 
 For each demo requested, produce the **complete 4-file bundle**:
 
-1. `demos/<name>/conf.lua`
-2. `demos/<name>/main.lua`
-3. `demos/<name>/README.md`
-4. `demos/<name>/screen.png` — via screenshot tool (see Step 6 in skill)
+1. `content/demos/<name>/conf.lua`
+2. `content/demos/<name>/main.lua`
+3. `content/demos/<name>/README.md`
+4. `content/demos/<name>/screen.png` — via screenshot tool (see Step 6 in skill)
 
 Then for **all demos in this run**, update:
-5. `demos/README.md` — add table entry + detail block for each new demo
+5. `content/demos/README.md` — add table entry + detail block for each new demo
 
 ---
 
@@ -49,11 +49,11 @@ Then for **all demos in this run**, update:
 ### 1. Derive Demo Name(s)
 - Format: `lowercase_underscore` (e.g. `tile_puzzle`, `rogue_shooter`)
 - If `COUNT` > 1, derive `COUNT` distinct name variants from the provided genre(s)
-- Confirm no name already exists: check `demos/` folder listing
+- Confirm no name already exists: check `content/demos/` folder listing
 
 ### 2. Choose API Surface
 - Consult [genre-patterns](../skills/demo-creation/references/genre-patterns.md)
-  for the recommended `luna.*` namespaces and library modules per genre
+  for the recommended `lurek.*` namespaces and library modules per genre
 - If `FEATURES` explicitly specifies APIs, those take priority over the genre default
 - If `LIBRARY_MODULES` is requested, verify each is ✅ Full status in
   [library-integration](../skills/demo-creation/references/library-integration.md)
@@ -66,7 +66,7 @@ Then for **all demos in this run**, update:
 
 ### 4. Write `main.lua`
 - Follow the canonical section order from the `demo-creation` skill exactly:
-  header comment → state locals → helpers → `luna.load` → `luna.update` → `luna.draw` → `luna.keypressed`
+  header comment → state locals → helpers → `lurek.load` → `lurek.update` → `lurek.draw` → `lurek.keypressed`
 - Complexity sizing:
   - `minimal` → 50–100 lines
   - `standard` → 100–300 lines
@@ -74,12 +74,12 @@ Then for **all demos in this run**, update:
 - Library modules: add `require()` calls immediately after the header comment block
 - Implement at least the core mechanic loop and one win/fail/progress state
 - Controls: `escape` always quits, plus at least 2 meaningful interactions
-- No `print()` statements — use `luna.gfx.print()` for on-screen text
+- No `print()` statements — use `lurek.gfx.print()` for on-screen text
 
 ### 5. Write `README.md`
 - Template from `demo-creation` skill: 4 required sections + optional `## Notes`
-- `## What It Demonstrates` must match the `luna.*` calls actually in `main.lua`
-- Controls table must match the `luna.keypressed` handler exactly
+- `## What It Demonstrates` must match the `lurek.*` calls actually in `main.lua`
+- Controls table must match the `lurek.keypressed` handler exactly
 
 ### 6. Generate `screen.png`
 Run the following after Lua files are written:
@@ -92,7 +92,7 @@ python tools/screenshots/gen_demo_screenshots.py --demo <n1> --demo <n2> --overw
 ```
 If the binary is missing, add `--rebuild` to trigger a release build first.
 
-### 7. Register in `demos/README.md`
+### 7. Register in `content/demos/README.md`
 - Append table row to the `## Demo Index` table (preserve alphabetical order within genre group)
 - Append full detail block at end of the per-demo sections
 
@@ -102,12 +102,12 @@ If the binary is missing, add `--rebuild` to trigger a release build first.
 
 Each demo is complete when:
 
-- [ ] `cargo run -- demos/<name>` runs without errors
+- [ ] `cargo run -- content/demos/<name>` runs without errors
 - [ ] All 4 callbacks are defined in `main.lua`
-- [ ] `escape` quits via `luna.signal.quit()`
+- [ ] `escape` quits via `lurek.signal.quit()`
 - [ ] No undeclared globals, no bare `print()` calls
 - [ ] `screen.png` exists and is non-empty
-- [ ] `demos/README.md` table row and detail block both added
+- [ ] `content/demos/README.md` table row and detail block both added
 - [ ] Only ✅ Full library modules are required (if any)
 - [ ] `cargo check` passes with no new errors
 
@@ -132,15 +132,15 @@ Each demo is complete when:
 - [lua-scripting skill](../skills/lua-scripting/SKILL.md) — API and Lua patterns
 
 **API reference**:
-- [docs/API/lua-api.md](../../docs/API/lua-api.md) — full `luna.*` reference
-- [examples/](../../examples/) — single-file API illustrations for any namespace
+- [docs/API/lua-api.md](../../docs/API/lua-api.md) — full `lurek.*` reference
+- [content/examples/](../../content/examples/) — single-file API illustrations for any namespace
 
 **Existing demos**:
-- [demos/hello_world/main.lua](../../demos/hello_world/main.lua) — minimal pattern
-- [demos/platformer/main.lua](../../demos/platformer/main.lua) — physics + camera pattern
-- [demos/roguelike/main.lua](../../demos/roguelike/main.lua) — turn-based + procedural pattern
-- [demos/dialog_demo/main.lua](../../demos/dialog_demo/main.lua) — library.dialog pattern
-- [demos/loot_rpg_demo/main.lua](../../demos/loot_rpg_demo/main.lua) — library.item + inventory pattern
+- [content/demos/hello_world/main.lua](../../content/demos/hello_world/main.lua) — minimal pattern
+- [content/demos/platformer/main.lua](../../content/demos/platformer/main.lua) — physics + camera pattern
+- [content/demos/roguelike/main.lua](../../content/demos/roguelike/main.lua) — turn-based + procedural pattern
+- [content/demos/dialog_demo/main.lua](../../content/demos/dialog_demo/main.lua) — library.dialog pattern
+- [content/demos/loot_rpg_demo/main.lua](../../content/demos/loot_rpg_demo/main.lua) — library.item + inventory pattern
 
 **Screenshot tool**:
 ```powershell

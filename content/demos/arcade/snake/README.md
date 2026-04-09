@@ -5,9 +5,9 @@ or run into a wall. Game wraps horizontally and vertically.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — drawing snake segments and food
-- `luna.keypressed()` — direction changes with 180° reversal prevention
-- `luna.gfx.print()` — live score and high-score tracking
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — drawing snake segments and food
+- `lurek.keypressed()` — direction changes with 180° reversal prevention
+- `lurek.gfx.print()` — live score and high-score tracking
 - Timer-based grid movement with speed scaling by score
 
 ## Controls

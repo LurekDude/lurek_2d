@@ -1,4 +1,4 @@
-# Luna2D Engine Message Catalog
+# Lurek2D Engine Message Catalog
 #
 # Format: ID = "human-readable message text"
 # IDs are stable across versions — never reuse a retired ID.
@@ -18,8 +18,8 @@
 # =============================================================================
 
 [baseline.lifecycle]
-L001 = "Luna2D Engine starting"
-L002 = "Luna2D Engine stopped"
+L001 = "Lurek2D Engine starting"
+L002 = "Lurek2D Engine stopped"
 L003 = "Game loaded"
 L004 = "Game restarted"
 L005 = "conf.lua loaded"
@@ -50,7 +50,7 @@ L024 = "Surface lost — reconfiguring"
 L050 = "Module dependency disabled"
 L051 = "Failed to read conf.lua"
 L052 = "Error in conf.lua"
-L053 = "Error calling luna.conf()"
+L053 = "Error calling lurek.conf()"
 
 [baseline.subsystems]
 L036 = "Gamepad connected"

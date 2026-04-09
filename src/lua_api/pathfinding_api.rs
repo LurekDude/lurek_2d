@@ -1,4 +1,4 @@
-//! `luna.pathfinding` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
+//! `lurek.pathfinding` — Grid-based A★, HPA★, flow field, and unit-aware navigation.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -880,7 +880,7 @@ impl LuaUserData for LuaAiFlowField {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.pathfinding` API table with the Lua VM.
+/// Registers the `lurek.pathfinding` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

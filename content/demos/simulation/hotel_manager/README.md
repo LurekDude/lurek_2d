@@ -4,19 +4,19 @@ A skyscraper hotel management simulation where you construct floors, assign room
 
 ## What It Demonstrates
 
-- `luna.mouse.getPosition()` / `luna.mousepressed()` — room-type assignment and floor construction clicks
-- `luna.keyboard.wasPressed()` — scroll the building view up and down, cycle selected room type
-- `luna.gfx.rectangle()` — floor grid, room panels with type-colour fill, elevator shaft
-- `luna.gfx.setColor()` — room-type palette lookup and occupancy tint overlay
-- `luna.gfx.print()` — floor labels, room icons, money HUD, and daily revenue summary
-- `luna.gfx.setBackgroundColor()` — sky gradient behind the tower
+- `lurek.mouse.getPosition()` / `lurek.mousepressed()` — room-type assignment and floor construction clicks
+- `lurek.keyboard.wasPressed()` — scroll the building view up and down, cycle selected room type
+- `lurek.gfx.rectangle()` — floor grid, room panels with type-colour fill, elevator shaft
+- `lurek.gfx.setColor()` — room-type palette lookup and occupancy tint overlay
+- `lurek.gfx.print()` — floor labels, room icons, money HUD, and daily revenue summary
+- `lurek.gfx.setBackgroundColor()` — sky gradient behind the tower
 - Scrollable viewport — `scrollY` offset allows viewing a building taller than the window
 - Stochastic occupancy — guest turnover is driven by daily `math.random()` rolls gated by satisfaction
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/hotel_manager
+cargo run -- content/demos/hotel_manager
 ```
 
 ## Controls

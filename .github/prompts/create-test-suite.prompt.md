@@ -1,12 +1,12 @@
 ---
-description: "Create integration or unit tests for a Luna2D module with proper patterns and coverage."
+description: "Create integration or unit tests for a Lurek2D module with proper patterns and coverage."
 ---
 
 # Create Test Suite
 
 ## Purpose
 
-Write tests for a Luna2D module following proper test conventions.
+Write tests for a Lurek2D module following proper test conventions.
 
 ## Inputs
 

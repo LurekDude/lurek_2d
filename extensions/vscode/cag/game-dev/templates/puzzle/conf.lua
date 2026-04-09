@@ -1,4 +1,4 @@
-function luna.conf(cfg)
+function lurek.conf(cfg)
     cfg.window.title  = "Puzzle Game"
     cfg.window.width  = 600
     cfg.window.height = 600

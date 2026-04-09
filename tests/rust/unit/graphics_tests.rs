@@ -1,22 +1,22 @@
-//! Integration tests for the Luna2D graphics module.
+//! Integration tests for the Lurek2D graphics module.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::animation::Animation;
-use luna2d::engine::config::Config;
-use luna2d::engine::resource_keys::TextureKey;
-use luna2d::graphics::renderer::{
+use lurek2d::animation::Animation;
+use lurek2d::engine::config::Config;
+use lurek2d::engine::resource_keys::TextureKey;
+use lurek2d::graphics::renderer::{
     CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, TextAlign, TextureData,
 };
-use luna2d::graphics::sprite_batch::BatchEntry;
-use luna2d::graphics::BlendMode;
-use luna2d::graphics::Font;
-use luna2d::graphics::NineSlice;
-use luna2d::graphics::SpriteBatch;
-use luna2d::lua_api::{create_lua_vm, SharedState};
-use luna2d::math::Color;
+use lurek2d::graphics::sprite_batch::BatchEntry;
+use lurek2d::graphics::BlendMode;
+use lurek2d::graphics::Font;
+use lurek2d::graphics::NineSlice;
+use lurek2d::graphics::SpriteBatch;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::math::Color;
 use slotmap::{Key, SlotMap};
 
 #[test]
@@ -62,9 +62,9 @@ fn make_graphics_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     (state, lua)
 }
 
-/// Execute `code` as the body of `luna.draw()` so it runs exactly as the engine would.
+/// Execute `code` as the body of `lurek.draw()` so it runs exactly as the engine would.
 fn run_draw(lua: &mlua::Lua, code: &str) {
-    let script = format!("luna.draw = function()\n{}\nend\nluna.draw()", code);
+    let script = format!("lurek.draw = function()\n{}\nend\nluna.draw()", code);
     lua.load(&script)
         .exec()
         .expect("Lua error in draw callback");
@@ -110,7 +110,7 @@ fn test_phase01_released_texture_handle_reuse_reports_invalid_texture() {
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.draw: invalid or already-released texture handle",
+        "lurek.gfx.draw: invalid or already-released texture handle",
     );
 }
 
@@ -152,7 +152,7 @@ fn test_phase01_released_numeric_texture_handle_reports_invalid_texture() {
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.draw: invalid or already-released texture handle",
+        "lurek.gfx.draw: invalid or already-released texture handle",
     );
 }
 
@@ -177,7 +177,7 @@ fn test_phase01_released_font_handle_reuse_reports_invalid_font() {
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.setFont: font handle is not valid or was released",
+        "lurek.gfx.setFont: font handle is not valid or was released",
     );
 }
 
@@ -203,7 +203,7 @@ fn test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch() {
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.spriteBatchAdd: batch handle is not valid or was released",
+        "lurek.gfx.spriteBatchAdd: batch handle is not valid or was released",
     );
 }
 
@@ -214,7 +214,7 @@ fn test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch() {
 #[test]
 fn test_transform_push_queues_push_transform() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.push()");
+    run_draw(&lua, "lurek.gfx.push()");
     assert!(matches!(
         state.borrow().draw_commands.last(),
         Some(DrawCommand::PushTransform)
@@ -224,7 +224,7 @@ fn test_transform_push_queues_push_transform() {
 #[test]
 fn test_transform_pop_queues_pop_transform() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.pop()");
+    run_draw(&lua, "lurek.gfx.pop()");
     assert!(matches!(
         state.borrow().draw_commands.last(),
         Some(DrawCommand::PopTransform)
@@ -234,7 +234,7 @@ fn test_transform_pop_queues_pop_transform() {
 #[test]
 fn test_transform_translate_queues_correct_values() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.translate(30, 45)");
+    run_draw(&lua, "lurek.gfx.translate(30, 45)");
     let st = state.borrow();
     if let Some(DrawCommand::Translate { x, y }) = st.draw_commands.last() {
         assert!((x - 30.0).abs() < 1e-5);
@@ -247,7 +247,7 @@ fn test_transform_translate_queues_correct_values() {
 #[test]
 fn test_transform_rotate_queues_angle() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.rotate(1.5707963)");
+    run_draw(&lua, "lurek.gfx.rotate(1.5707963)");
     let st = state.borrow();
     if let Some(DrawCommand::Rotate { angle }) = st.draw_commands.last() {
         assert!((angle - std::f32::consts::FRAC_PI_2).abs() < 1e-5);
@@ -259,7 +259,7 @@ fn test_transform_rotate_queues_angle() {
 #[test]
 fn test_transform_scale_uniform_defaults_sy_to_sx() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.scale(2)");
+    run_draw(&lua, "lurek.gfx.scale(2)");
     let st = state.borrow();
     if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
         assert!((sx - 2.0).abs() < 1e-5);
@@ -272,7 +272,7 @@ fn test_transform_scale_uniform_defaults_sy_to_sx() {
 #[test]
 fn test_transform_scale_nonuniform_queues_distinct_sx_sy() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.scale(3, 0.5)");
+    run_draw(&lua, "lurek.gfx.scale(3, 0.5)");
     let st = state.borrow();
     if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
         assert!((sx - 3.0).abs() < 1e-5);
@@ -291,7 +291,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
-        r#"luna.gfx.arc("fill", 100, 200, 50, 0, 3.14159265)"#,
+        r#"lurek.gfx.arc("fill", 100, 200, 50, 0, 3.14159265)"#,
     );
     let st = state.borrow();
     if let Some(DrawCommand::Arc {
@@ -319,7 +319,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
 #[test]
 fn test_arc_line_mode_queues_line_draw_mode() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, r#"luna.gfx.arc("line", 0, 0, 10, 0, 1)"#);
+    run_draw(&lua, r#"lurek.gfx.arc("line", 0, 0, 10, 0, 1)"#);
     let st = state.borrow();
     if let Some(DrawCommand::Arc { mode, .. }) = st.draw_commands.last() {
         assert!(matches!(mode, DrawMode::Line));
@@ -331,7 +331,7 @@ fn test_arc_line_mode_queues_line_draw_mode() {
 #[test]
 fn test_arc_explicit_segments_overrides_default() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, r#"luna.gfx.arc("fill", 0, 0, 20, 0, 6.28, 16)"#);
+    run_draw(&lua, r#"lurek.gfx.arc("fill", 0, 0, 20, 0, 6.28, 16)"#);
     let st = state.borrow();
     if let Some(DrawCommand::Arc { segments, .. }) = st.draw_commands.last() {
         assert_eq!(*segments, 16);
@@ -347,7 +347,7 @@ fn test_arc_explicit_segments_overrides_default() {
 #[test]
 fn test_drawex_defaults_rotation_scale_origin_to_identity() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.drawEx(0, 100, 200)");
+    run_draw(&lua, "lurek.gfx.drawEx(0, 100, 200)");
     let st = state.borrow();
     if let Some(DrawCommand::DrawImageEx {
         texture_key,
@@ -379,7 +379,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
-        "luna.gfx.drawEx(1, 50, 60, 0.785, 2.0, 1.5, 10, 20)",
+        "lurek.gfx.drawEx(1, 50, 60, 0.785, 2.0, 1.5, 10, 20)",
     );
     let st = state.borrow();
     if let Some(DrawCommand::DrawImageEx {
@@ -503,7 +503,7 @@ fn test_get_color_default_is_white() {
 #[test]
 fn test_polyline_two_points_queues_polyline_command() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.polyline(10, 20, 30, 40)");
+    run_draw(&lua, "lurek.gfx.polyline(10, 20, 30, 40)");
     let st = state.borrow();
     if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
         assert_eq!(points.len(), 4);
@@ -519,7 +519,7 @@ fn test_polyline_two_points_queues_polyline_command() {
 #[test]
 fn test_polyline_three_points_queues_six_coordinates() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.polyline(0, 0, 50, 100, 100, 0)");
+    run_draw(&lua, "lurek.gfx.polyline(0, 0, 50, 100, 100, 0)");
     let st = state.borrow();
     if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
         assert_eq!(points.len(), 6);
@@ -805,7 +805,7 @@ fn test_set_blend_mode_lua() {
 #[test]
 fn test_set_blend_mode_invalid() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load(r#"luna.gfx.setBlendMode("invalid")"#).exec();
+    let result = lua.load(r#"lurek.gfx.setBlendMode("invalid")"#).exec();
     assert!(result.is_err(), "Invalid blend mode should error");
 }
 
@@ -842,7 +842,7 @@ fn test_get_blend_mode_default_is_alpha() {
 #[test]
 fn test_set_blend_mode_additive_alias() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.gfx.setBlendMode("additive")"#)
+    lua.load(r#"lurek.gfx.setBlendMode("additive")"#)
         .exec()
         .unwrap();
     let st = state.borrow();
@@ -948,7 +948,7 @@ fn test_animation_lua_update_and_draw() {
     // Create a small fake texture entry so drawAnimation has a valid texture
     {
         let mut st = state.borrow_mut();
-        st.textures.insert(luna2d::graphics::renderer::TextureData {
+        st.textures.insert(lurek2d::graphics::renderer::TextureData {
             pixels: vec![255; 64 * 64 * 4],
             width: 64,
             height: 64,
@@ -1148,7 +1148,7 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.drawCanvas: invalid or already-released canvas handle",
+        "lurek.gfx.drawCanvas: invalid or already-released canvas handle",
     );
 
     let st = state.borrow();
@@ -1177,7 +1177,7 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
 #[test]
 fn test_phase02_shear_queues_command_with_expected_factors() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.shear(0.5, -0.25)");
+    run_draw(&lua, "lurek.gfx.shear(0.5, -0.25)");
 
     let st = state.borrow();
     if let Some(DrawCommand::Shear { kx, ky }) = st.draw_commands.last() {
@@ -1191,7 +1191,7 @@ fn test_phase02_shear_queues_command_with_expected_factors() {
 #[test]
 fn test_phase02_origin_queues_origin_command() {
     let (state, lua) = make_graphics_vm();
-    run_draw(&lua, "luna.gfx.origin()");
+    run_draw(&lua, "lurek.gfx.origin()");
 
     assert!(matches!(
         state.borrow().draw_commands.last(),
@@ -1429,7 +1429,7 @@ fn test_phase02_shader_round_trips_active_shader_and_uniforms() {
 fn test_phase02_shader_compile_rejects_invalid_wgsl() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.gfx.newShader("not valid wgsl")"#)
+        .load(r#"lurek.gfx.newShader("not valid wgsl")"#)
         .exec();
 
     assert!(result.is_err(), "invalid WGSL should fail to compile");
@@ -1462,7 +1462,7 @@ fn test_phase02_released_mesh_handle_reports_invalid_mesh_and_skips_queueing_dra
 
     assert_lua_error_contains(
         result,
-        "luna.gfx.drawMesh: invalid or already-released mesh handle",
+        "lurek.gfx.drawMesh: invalid or already-released mesh handle",
     );
 
     let st = state.borrow();
@@ -2073,14 +2073,14 @@ fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
 #[test]
 fn graphics_draw_dispatch_nil_returns_error() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load("luna.gfx.draw(nil, 0, 0)").exec();
+    let result = lua.load("lurek.gfx.draw(nil, 0, 0)").exec();
     assert_lua_error_contains(result, "nil");
 }
 
 #[test]
 fn graphics_draw_dispatch_string_returns_error() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load("luna.gfx.draw('not_drawable', 0, 0)").exec();
+    let result = lua.load("lurek.gfx.draw('not_drawable', 0, 0)").exec();
     assert_lua_error_contains(result, "drawable");
 }
 
@@ -2245,7 +2245,7 @@ fn graphics_screenshot_request_queued_without_panic() {
 #[test]
 fn graphics_save_screenshot_queues_save_path() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.gfx.saveScreenshot('save/test_frame.png')"#)
+    lua.load(r#"lurek.gfx.saveScreenshot('save/test_frame.png')"#)
         .exec()
         .expect("saveScreenshot should queue a request");
 
@@ -2261,7 +2261,7 @@ fn graphics_save_screenshot_queues_save_path() {
 fn graphics_save_screenshot_rejects_non_save_path() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.gfx.saveScreenshot('frame.png')"#)
+        .load(r#"lurek.gfx.saveScreenshot('frame.png')"#)
         .exec();
     assert!(
         result.is_err(),
@@ -2304,7 +2304,7 @@ fn graphics_depth_default_is_always() {
 #[test]
 fn graphics_stencil_mode_round_trip() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.gfx.setStencilMode("replace", "always", 1)"#)
+    lua.load(r#"lurek.gfx.setStencilMode("replace", "always", 1)"#)
         .exec()
         .expect("setStencilMode failed");
     let st = state.borrow();
@@ -2316,7 +2316,7 @@ fn graphics_stencil_mode_round_trip() {
 #[test]
 fn graphics_depth_mode_round_trip() {
     let (state, lua) = make_graphics_vm();
-    lua.load(r#"luna.gfx.setDepthMode("less", true)"#)
+    lua.load(r#"lurek.gfx.setDepthMode("less", true)"#)
         .exec()
         .expect("setDepthMode failed");
     let st = state.borrow();
@@ -2367,7 +2367,7 @@ fn graphics_clear_stencil_resets_to_default() {
 fn graphics_stencil_mode_unknown_action_errors() {
     let (_state, lua) = make_graphics_vm();
     let result = lua
-        .load(r#"luna.gfx.setStencilMode("explode")"#)
+        .load(r#"lurek.gfx.setStencilMode("explode")"#)
         .exec();
     assert!(result.is_err(), "expected error for unknown stencil action");
 }
@@ -2375,6 +2375,6 @@ fn graphics_stencil_mode_unknown_action_errors() {
 #[test]
 fn graphics_depth_mode_unknown_mode_errors() {
     let (_state, lua) = make_graphics_vm();
-    let result = lua.load(r#"luna.gfx.setDepthMode("turbo")"#).exec();
+    let result = lua.load(r#"lurek.gfx.setDepthMode("turbo")"#).exec();
     assert!(result.is_err(), "expected error for unknown depth mode");
 }

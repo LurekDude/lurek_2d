@@ -1,7 +1,7 @@
--- Centipede — Classic Arcade (Luna2D demo)
+-- Centipede — Classic Arcade (Lurek2D demo)
 -- Shoot the descending centipede. Mushrooms block bullets and redirect the worm.
 -- Mouse/WASD to move, Space to shoot. Centipede splits when hit.
--- Run with: cargo run -- demos/arcade/centipede
+-- Run with: cargo run -- content/demos/arcade/centipede
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -69,15 +69,15 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0, 0, 0.04)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0, 0, 0.04)
     score = 0; lives = 3; wave = 1
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     shoot_cd = math.max(0, shoot_cd - dt)
 
@@ -86,16 +86,16 @@ function luna.process(dt)
     local px_max = W - player.w
     local py_min = PLAYER_ZONE_TOP * CELL
     local py_max = H - player.h
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a") then
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a") then
         player.x = math.max(px_min, player.x - player.speed * dt)
     end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then
         player.x = math.min(px_max, player.x + player.speed * dt)
     end
-    if luna.input.isKeyDown("up") or luna.input.isKeyDown("w") then
+    if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w") then
         player.y = math.max(py_min, player.y - player.speed * dt)
     end
-    if luna.input.isKeyDown("down") or luna.input.isKeyDown("s") then
+    if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s") then
         player.y = math.min(py_max, player.y + player.speed * dt)
     end
 
@@ -224,14 +224,14 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Mushrooms
     for col = 0, COLS - 1 do
         if mushrooms[col] then
             for row, hp in pairs(mushrooms[col]) do
                 local t = hp / MUSHROOM_HP
-                luna.gfx.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
-                luna.gfx.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
+                lurek.gfx.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
+                lurek.gfx.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
             end
         end
     end
@@ -239,71 +239,71 @@ function luna.render()
     -- Centipede
     for _, seg in ipairs(segments) do
         if seg.head then
-            luna.gfx.setColor(0.9, 0.3, 0.8)
+            lurek.gfx.setColor(0.9, 0.3, 0.8)
         else
-            luna.gfx.setColor(0.2, 0.8, 0.3)
+            lurek.gfx.setColor(0.2, 0.8, 0.3)
         end
-        luna.gfx.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
+        lurek.gfx.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
         -- Eyes on head
         if seg.head then
-            luna.gfx.setColor(1, 1, 0)
-            luna.gfx.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
-            luna.gfx.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
+            lurek.gfx.setColor(1, 1, 0)
+            lurek.gfx.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
+            lurek.gfx.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
         end
     end
 
     -- Spiders
-    luna.gfx.setColor(1, 0.6, 0.1)
+    lurek.gfx.setColor(1, 0.6, 0.1)
     for _, sp in ipairs(spiders) do
-        luna.gfx.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
+        lurek.gfx.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
         -- Legs
         for li = 0, 3 do
             local ang = li * math.pi / 2
-            luna.gfx.line(sp.x + CELL/2, sp.y + CELL/2,
+            lurek.gfx.line(sp.x + CELL/2, sp.y + CELL/2,
                 sp.x + CELL/2 + math.cos(ang) * CELL, sp.y + CELL/2 + math.sin(ang) * CELL)
         end
     end
 
     -- Player
-    luna.gfx.setColor(0.4, 0.7, 1.0)
-    luna.gfx.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
-    luna.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
+    lurek.gfx.setColor(0.4, 0.7, 1.0)
+    lurek.gfx.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
+    lurek.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
 
     -- Bullets
-    luna.gfx.setColor(1, 1, 0.5)
+    lurek.gfx.setColor(1, 1, 0.5)
     for _, b in ipairs(bullets) do
-        luna.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
+        lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
     end
 
     -- Player zone separator line
-    luna.gfx.setColor(0.2, 0.2, 0.4)
-    luna.gfx.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
+    lurek.gfx.setColor(0.2, 0.2, 0.4)
+    lurek.gfx.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. score, 8, 4, 1.5)
-    luna.gfx.setColor(1, 0.4, 0.4)
-    luna.gfx.print("Lives: " .. lives, W - 95, 4, 1.5)
-    luna.gfx.setColor(0.5, 0.7, 0.5)
-    luna.gfx.print("Wave " .. wave, W/2 - 30, 4, 1.5)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. score, 8, 4, 1.5)
+    lurek.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.print("Lives: " .. lives, W - 95, 4, 1.5)
+    lurek.gfx.setColor(0.5, 0.7, 0.5)
+    lurek.gfx.print("Wave " .. wave, W/2 - 30, 4, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" then score = 0; lives = 3; wave = 1; reset() end
     if game_state ~= "playing" then return end
     if key == "space" and shoot_cd <= 0 and #bullets < 4 then

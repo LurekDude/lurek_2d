@@ -42,14 +42,14 @@ Foundational math primitives shared by the entire engine: `Vec2`, `Mat3`, `Rect`
 ## Suggestions
 
 1. **Complete Vec3**: Even a minimal Vec3 (x, y, z + basic ops) would unlock pseudo-3D math for raycasters and isometric.
-2. **Add Catmull-Rom spline**: Very common for smooth path generation and animation curves. Love2D has this via BézierCurve but Catmull-Rom is more intuitive for point-following paths.
+2. **Add Catmull-Rom spline**: Very common for smooth path generation and animation curves. Engine A has this via BézierCurve but Catmull-Rom is more intuitive for point-following paths.
 3. **Add polygon utilities**: Point-in-polygon (currently exists?), polygon area, centroid, convex hull. These pair well with physics and tilemap feature.
 4. **Consider `math.lerp(a, b, t)`**: A simple scalar lerp exposed to Lua — trivial but eliminates `a + (b - a) * t` boilerplate in every game script.
 5. **Remove SpatialHash → engine dependency**: Use a callback or feature-flag the logging to maintain true leaf status.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Vec2 | ✅ | ❌ (no type) | ❌ | ✅ (Vec2/Vec3/Vec4) |
 | Matrix | ✅ (3×3) | ✅ (4×4) | ❌ | ✅ (Mat2/3/4) |

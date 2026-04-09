@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 � Core Engine Subsystems                      |
 | **Status**     | Implemented � Full                                   |
-| **Lua API**    | `luna.animation`                                     |
+| **Lua API**    | `lurek.animation`                                     |
 | **Source**     | `src/animation/`                                     |
 | **Rust Tests** | `tests/rust/unit/animation_tests.rs`                 |
 | **Lua Tests**  | `tests/lua/unit/test_animation.lua`                  |
@@ -20,14 +20,14 @@ The module is built around four data types working together: `AnimFrame` stores 
 
 The typical workflow is: (1) create an `Animation`, (2) add frames individually or by slicing a sprite-sheet grid, (3) register named clips referencing those frames, (4) call `play("clipName")` to start, (5) call `update(dt)` each tick, (6) read `current_quad()` for the source rectangle to draw. Frame timing uses per-frame `duration` if set (> 0.0), otherwise falls back to `1.0 / clip.fps`. The speed multiplier scales delta time globally.
 
-Scripts interact via `luna.animation.*` � the Lua API wraps `Animation` as a `LuaAnimation` UserData with 20 methods plus a constructor `luna.animation.new()`. There is no resource key or SlotMap � each `LuaAnimation` owns its `Animation` value directly.
+Scripts interact via `lurek.animation.*` � the Lua API wraps `Animation` as a `LuaAnimation` UserData with 20 methods plus a constructor `lurek.animation.new()`. There is no resource key or SlotMap � each `LuaAnimation` owns its `Animation` value directly.
 
-**Scope boundary**: This module contains no GPU code. It produces source rectangles (`Rect`) that the game script passes to `luna.gfx.draw()` or `luna.gfx.drawq()`. Sound or physics triggered by animation events must be wired by user scripts. The module does not depend on `graphics`, `audio`, `physics`, or any other Tier 1 module. It is **not related** to the `spine` module — `animation` advances frame indices in a sprite-sheet; `spine` propagates transforms through a bone hierarchy. Use one, the other, or both independently.
+**Scope boundary**: This module contains no GPU code. It produces source rectangles (`Rect`) that the game script passes to `lurek.gfx.draw()` or `lurek.gfx.drawq()`. Sound or physics triggered by animation events must be wired by user scripts. The module does not depend on `graphics`, `audio`, `physics`, or any other Tier 1 module. It is **not related** to the `spine` module — `animation` advances frame indices in a sprite-sheet; `spine` propagates transforms through a bone hierarchy. Use one, the other, or both independently.
 
 ## Architecture
 
 ```
-luna.animation.new()
+lurek.animation.new()
         -
         �
 -����������������������������������������������������������
@@ -143,7 +143,7 @@ Public methods:
 
 ## Lua API
 
-Exposed under `luna.animation.*` by `src/lua_api/animation_api.rs`.
+Exposed under `lurek.animation.*` by `src/lua_api/animation_api.rs`.
 
 The Lua API provides a single constructor on the module table and 20 methods on the returned `Animation` UserData object. The `LuaAnimation` wrapper owns its `Animation` directly (no SlotMap key).
 
@@ -151,7 +151,7 @@ The Lua API provides a single constructor on the module table and 20 methods on 
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `luna.animation.new()` | `Animation` | Creates a new, empty Animation controller. |
+| `lurek.animation.new()` | `Animation` | Creates a new, empty Animation controller. |
 
 ### Animation UserData methods
 
@@ -201,8 +201,8 @@ The Lua API provides a single constructor on the module table and 20 methods on 
 -- Sprite-sheet animation: walk cycle from a 4-frame grid
 local anim
 
-function luna.init()
-    anim = luna.animation.new()
+function lurek.init()
+    anim = lurek.animation.new()
 
     -- Slice a 128�32 sprite-sheet into 4 cells of 32�32
     anim:addClipFromGrid("walk", 128, 32, 32, 32, 0, 4, 10, true)
@@ -215,7 +215,7 @@ function luna.init()
     anim:play("walk")
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     anim:update(dt)
 
     -- Check for playback events
@@ -227,16 +227,16 @@ function luna.process(dt)
     end
 
     -- Switch clip on keypress
-    if luna.keyboard.isDown("space") then
+    if lurek.keyboard.isDown("space") then
         anim:play("idle")
     end
 end
 
-function luna.render()
+function lurek.render()
     local q = anim:getQuad()
     if q then
-        -- Use the source quad with luna.gfx.drawq()
-        -- luna.gfx.drawq(spriteSheet, q.x, q.y, q.w, q.h, drawX, drawY)
+        -- Use the source quad with lurek.gfx.drawq()
+        -- lurek.gfx.drawq(spriteSheet, q.x, q.y, q.w, q.h, drawX, drawY)
     end
 end
 ```
@@ -257,7 +257,7 @@ end
 | `math`     | Imports from | Uses `Rect` for frame source quads.                                  |
 | `engine`   | Imports from | Uses `log_messages` for structured debug/warn log entries.            |
 | `lua_api`  | Imported by  | `animation_api.rs` wraps `Animation` as `LuaAnimation` UserData.     |
-| `graphics` | Related      | Not a code dependency. Scripts use animation quads with `luna.gfx.draw()` / `drawq()`. |
+| `graphics` | Related      | Not a code dependency. Scripts use animation quads with `lurek.gfx.draw()` / `drawq()`. |
 
 **Similar modules**: `animation` handles frame-based sprite animation (sequences of source-rect quads). For skeletal/bone-hierarchy animation — where joints are driven by transforms rather than discrete sprite frames — use `spine` instead. `animation` is also distinct from `particle` (emitter-based particle effects) and from `graphics::sprite` (sprite draw state without timeline or clip logic).
 

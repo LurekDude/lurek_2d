@@ -2,8 +2,8 @@
 applyTo: "**/physics/*.lua"
 ---
 # Physics Module Rules
-- Create physics world in luna.load()
-- Step the world in luna.update(dt), never in draw
+- Create physics world in lurek.load()
+- Step the world in lurek.update(dt), never in draw
 - Body types: "static" (walls), "dynamic" (moving), "kinematic" (scripted)
 - Use sensors for triggers, not solid bodies
 - Physics units are pixels — document scale in comments

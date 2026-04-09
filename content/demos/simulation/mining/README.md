@@ -14,7 +14,7 @@ A side-view mining game set inside a procedurally generated 50 × 80 tile world.
 ## How to Run
 
 ```powershell
-cargo run -- demos/mining
+cargo run -- content/demos/mining
 ```
 
 ## Controls

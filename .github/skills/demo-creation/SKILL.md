@@ -1,37 +1,37 @@
 ---
 name: demo-creation
-description: "Load this skill when creating one or more new demo projects in demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in demos/README.md; using library/ modules alongside luna.* API; creating batches of demos from a list of genres or specific needs. Skip it for examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
+description: "Load this skill when creating one or more new demo projects in content/demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/demos/README.md; using content/library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
 argument-hint: "genre, count, features, library modules, resolution, complexity"
 ---
 
-# Demo Creation — Luna2D
+# Demo Creation — Lurek2D
 
 ## Load When
 
-- Generating a new `demos/<name>/` project from scratch
+- Generating a new `content/demos/<name>/` project from scratch
 - Scaffolding multiple demos in one pass (batch creation)
-- A demo uses `library/` modules alongside `luna.*`
+- A demo uses `content/library/` modules alongside `lurek.*`
 - You need the full 4-file bundle: `conf.lua`, `main.lua`, `README.md`, `screen.png`
-- Registering a newly created demo in `demos/README.md`
+- Registering a newly created demo in `content/demos/README.md`
 
 ## Owns
 
-- `demos/<name>/` folder scaffold and 4-file bundle
+- `content/demos/<name>/` folder scaffold and 4-file bundle
 - `conf.lua` resolution variants and module flag conventions
 - `main.lua` canonical section order and mandatory invariants
 - `README.md` 5-section template and accuracy rules
 - `screen.png` generation via `tools/screenshots/gen_demo_screenshots.py`
-- `demos/README.md` table entry and detail block registration
-- `library/` module integration patterns (`dialog`, `item`, `inventory`)
+- `content/demos/README.md` table entry and detail block registration
+- `content/library/` module integration patterns (`dialog`, `item`, `inventory`)
 - Genre-to-API mapping guidance
 - Batch demo creation workflow
 
 ## Does Not Cover
 
-- `examples/` single-file scripts → use `examples-management` skill
+- `content/content/examples/` single-file scripts → use `examples-management` skill
 - Engine Rust changes needed by a demo → use `rust-coding` + `lua-rust-bridge` skills
 - Physics simulation internals → use `lua-scripting` skill alongside this one
-- Stubs and incomplete `library/` modules (check [library-integration](./references/library-integration.md) before picking a module)
+- Stubs and incomplete `content/library/` modules (check [library-integration](./references/library-integration.md) before picking a module)
 
 ## Required Output — 4-File Bundle
 
@@ -39,14 +39,14 @@ Every demo **must** produce exactly these four artifacts (no more, no fewer unle
 
 | File | Required | Notes |
 |------|----------|-------|
-| `demos/<name>/conf.lua` | Yes | Window config, title, resolution, modules |
-| `demos/<name>/main.lua` | Yes | Game entry point — canonical structure below |
-| `demos/<name>/README.md` | Yes | 5-section doc, see template |
-| `demos/<name>/screen.png` | Yes | Auto-generated via screenshot tool |
+| `content/demos/<name>/conf.lua` | Yes | Window config, title, resolution, modules |
+| `content/demos/<name>/main.lua` | Yes | Game entry point — canonical structure below |
+| `content/demos/<name>/README.md` | Yes | 5-section doc, see template |
+| `content/demos/<name>/screen.png` | Yes | Auto-generated via screenshot tool |
 
 Optional additions:
-- `demos/<name>/assets/` — sprites, sounds, tilemaps (commit only what the demo runs)
-- `demos/<name>/save/` — auto-created at runtime by smoke tests; never scaffold this manually
+- `content/demos/<name>/assets/` — sprites, sounds, tilemaps (commit only what the demo runs)
+- `content/demos/<name>/save/` — auto-created at runtime by smoke tests; never scaffold this manually
 
 ---
 
@@ -56,7 +56,7 @@ Optional additions:
 
 - Format: `lowercase_underscore` (e.g., `tower_defense`, `bullet_hell`)
 - No spaces, no hyphens, no version numbers
-- Must not duplicate an existing `demos/` folder — check with `Get-ChildItem demos/`
+- Must not duplicate an existing `content/demos/` folder — check with `Get-ChildItem content/demos/`
 
 ### Step 2 — Write `conf.lua`
 
@@ -64,7 +64,7 @@ See [conf-templates](./references/conf-templates.md) for resolution variants and
 
 **Minimal template** (use this unless the demo needs a non-standard size):
 ```lua
-function luna.conf(t)
+function lurek.conf(t)
     t.window.title  = "<Demo Title>"
     t.window.width  = 800
     t.window.height = 600
@@ -79,7 +79,7 @@ Acceptable non-standard resolutions (must leave a comment explaining why):
 
 Add module flags only when the demo actually needs them:
 ```lua
-    t.modules.physics  = true   -- only if luna.physics.* is used
+    t.modules.physics  = true   -- only if lurek.physics.* is used
     t.modules.audio    = false  -- suppress audio init if demo is silent
 ```
 
@@ -87,10 +87,10 @@ Add module flags only when the demo actually needs them:
 
 **Canonical section order — never rearrange:**
 ```lua
--- demos/<name>/main.lua
+-- content/demos/<name>/main.lua
 -- <Demo Title> — <one-sentence description of what it demonstrates>
 -- Controls: <brief key list>
--- Run with: cargo run -- demos/<name>
+-- Run with: cargo run -- content/demos/<name>
 
 -- ── state ─────────────────────────────────────────────────────
 -- (module-level locals: tables, IDs, constants)
@@ -99,38 +99,38 @@ Add module flags only when the demo actually needs them:
 -- (utility functions: generators, collision, math helpers)
 
 -- ── load ──────────────────────────────────────────────────────
-function luna.init()
-    luna.window.setTitle("<Demo Title>")
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+function lurek.init()
+    lurek.window.setTitle("<Demo Title>")
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     -- resource creation, world setup, initial state
 end
 
 -- ── update ────────────────────────────────────────────────────
-function luna.process(dt)
+function lurek.process(dt)
     -- input polling, simulation step, game logic
     -- always present, even if body is empty
 end
 
 -- ── draw ──────────────────────────────────────────────────────
-function luna.render()
+function lurek.render()
     -- all rendering; HUD drawn last, unaffected by camera transforms
 end
 
 -- ── keypressed ────────────────────────────────────────────────
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     -- discrete events: jump, restart, action
 end
 ```
 
 **Mandatory invariants:**
 - All state in module-level `local` variables — no globals except callbacks
-- `luna.window.setTitle()` called first in `luna.load()`
-- `luna.gfx.setBackgroundColor()` called in `luna.load()`
+- `lurek.window.setTitle()` called first in `lurek.load()`
+- `lurek.gfx.setBackgroundColor()` called in `lurek.load()`
 - Movement multiplied by `dt` for frame-rate independence
-- `escape` → `luna.signal.quit()` always present in `luna.keypressed`
+- `escape` → `lurek.signal.quit()` always present in `lurek.keypressed`
 - All 4 callbacks defined, even if `update` is empty
-- No `print()` — use `luna.gfx.print()` for on-screen text, `luna.log.debug()` for diagnostics
+- No `print()` — use `lurek.gfx.print()` for on-screen text, `lurek.log.debug()` for diagnostics
 
 **Size guidelines:**
 
@@ -145,7 +145,7 @@ Never exceed 400 lines — if logic grows larger, extract helpers or split into 
 
 ### Step 4 — Library Modules
 
-When the prompt requests `library/` modules, see [library-integration](./references/library-integration.md) for full patterns. Quick reference:
+When the prompt requests `content/library/` modules, see [library-integration](./references/library-integration.md) for full patterns. Quick reference:
 
 **Import pattern** (always at top of file, after header comment):
 ```lua
@@ -161,19 +161,19 @@ local inventory = require("library.inventory")
 | `library.dialog` | ✅ Full | Typewriter sequencer, branching choices, event callbacks |
 | `library.item` | ✅ Full | Item type definitions, instance creation, stat lookup |
 | `library.inventory` | ✅ Full | Slot-based inventory management |
-| `library.province_map` | ✅ Proxy | Province/region map (wraps `luna.province`) |
+| `library.province_map` | ✅ Proxy | Province/region map (wraps `lurek.province`) |
 | `library.battle`, `.stats`, `.economy`, `.crafting`, `.cardgame`, `.combat`, `.quest` | 🔧 Stub | Do NOT use — causes runtime errors |
 
-Call library functions at the top of `luna.load()` before any `luna.*` drawing setup:
+Call library functions at the top of `lurek.load()` before any `lurek.*` drawing setup:
 ```lua
-function luna.init()
+function lurek.init()
     -- library init first
     item.clearTypes()
     item.defineType("sword", { category = "weapon", base_stats = { attack = 10 } })
     inv = inventory.new(20)
     -- then window + graphics setup
-    luna.window.setTitle("Loot Demo")
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.window.setTitle("Loot Demo")
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
 end
 ```
 
@@ -186,14 +186,14 @@ end
 
 ## What It Demonstrates
 
-- `luna.<namespace>.<function>()` — brief note on how it's used
-- `luna.<namespace>.<function>()` — brief note
+- `lurek.<namespace>.<function>()` — brief note on how it's used
+- `lurek.<namespace>.<function>()` — brief note
 - `library.<module>` — if applicable
 
 ## How to Run
 
 ```bash
-cargo run -- demos/<name>
+cargo run -- content/demos/<name>
 ```
 
 ## Controls
@@ -209,8 +209,8 @@ cargo run -- demos/<name>
 ```
 
 **Rules:**
-- `## What It Demonstrates` must list `luna.*` calls actually present in `main.lua`
-- Controls table must match `luna.keypressed` handler exactly
+- `## What It Demonstrates` must list `lurek.*` calls actually present in `main.lua`
+- Controls table must match `lurek.keypressed` handler exactly
 - `## Notes` section is optional — omit if nothing non-obvious to say
 
 ### Step 6 — Generate `screen.png`
@@ -235,7 +235,7 @@ If the binary is fresh:
 python tools/screenshots/gen_demo_screenshots.py --demo <name> --overwrite --frames 3 --rebuild
 ```
 
-### Step 7 — Register in `demos/README.md`
+### Step 7 — Register in `content/demos/README.md`
 
 Append to the `## Demo Index` table:
 ```markdown
@@ -248,14 +248,14 @@ Then append a detail block at the end of the per-demo sections:
 
 <One paragraph (2–3 sentences) describing what the demo shows and why it's interesting.>
 
-**Key APIs**: `luna.<ns>.<fn>`, `luna.<ns>.<fn>`, optionally `library.<module>`
+**Key APIs**: `lurek.<ns>.<fn>`, `lurek.<ns>.<fn>`, optionally `library.<module>`
 
 | Key | Action |
 |-----|--------|
 | Escape | Quit |
 
 ```bash
-cargo run -- demos/<name>
+cargo run -- content/demos/<name>
 ```
 
 ---
@@ -274,13 +274,13 @@ When generating N > 1 demos from a list of genres:
    ```powershell
    python tools/screenshots/gen_demo_screenshots.py --demo <n1> --demo <n2> ... --overwrite --frames 3
    ```
-5. Register all demos in `demos/README.md` in one edit (alphabetical order)
+5. Register all demos in `content/demos/README.md` in one edit (alphabetical order)
 
 ---
 
 ## Genre → API Mapping Reference
 
-See [genre-patterns](./references/genre-patterns.md) for a pre-mapped table of common genres and their recommended `luna.*` API namespaces, library modules, and structural patterns.
+See [genre-patterns](./references/genre-patterns.md) for a pre-mapped table of common genres and their recommended `lurek.*` API namespaces, library modules, and structural patterns.
 
 ---
 
@@ -290,10 +290,10 @@ Before marking a demo complete:
 
 - [ ] `conf.lua` — title matches demo name, valid resolution, target_fps = 60
 - [ ] `main.lua` — all 4 callbacks present; `escape` quits; no globals; dt used for movement
-- [ ] `main.lua` — only `luna.*` API calls and optionally approved `library.*` requires
-- [ ] `main.lua` — no `print()` statements; debug output via `luna.log.debug()`
+- [ ] `main.lua` — only `lurek.*` API calls and optionally approved `library.*` requires
+- [ ] `main.lua` — no `print()` statements; debug output via `lurek.log.debug()`
 - [ ] `README.md` — 4 required sections present; `What It Demonstrates` matches actual code
 - [ ] `screen.png` — generated and present (non-zero file size)
-- [ ] `demos/README.md` — table entry added; detail block added
-- [ ] `cargo run -- demos/<name>` — runs without errors or unhandled exceptions
+- [ ] `content/demos/README.md` — table entry added; detail block added
+- [ ] `cargo run -- content/demos/<name>` — runs without errors or unhandled exceptions
 - [ ] `cargo check` — no type errors introduced

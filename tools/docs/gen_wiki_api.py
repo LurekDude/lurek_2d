@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-gen_wiki_api.py — Generate wiki/API-Reference.md from docs/logs/lua_api_data.json.
+gen_wiki_api.py — Generate docs/wiki/API-Reference.md from docs/logs/lua_api_data.json.
 
 Produces the game-developer-facing API Reference in the cheatsheet format
-shown in the Luna2D wiki. Every function appears as a one-liner with its
+shown in the Lurek2D wiki. Every function appears as a one-liner with its
 call expression, return type, and description. All content is auto-generated
-from the master lua_api_data.json — do not edit wiki/API-Reference.md by hand.
+from the master lua_api_data.json — do not edit docs/wiki/API-Reference.md by hand.
 
 Format per function:
-    luna.module.fn( params )  -> ReturnType  -- description
+    lurek.module.fn( params )  -> ReturnType  -- description
 
 Format per method:
     ClassName:method( params )  -> ReturnType  -- description
 
 Usage:
-    python tools/gen_wiki_api.py                # -> wiki/API-Reference.md
+    python tools/gen_wiki_api.py                # -> docs/wiki/API-Reference.md
     python tools/gen_wiki_api.py --output FILE  # custom output path
     python tools/gen_wiki_api.py --input FILE   # custom input path
 
@@ -31,7 +31,7 @@ from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 INPUT_FILE = WORKSPACE_ROOT / "docs" / "logs" / "lua_api_data.json"
-OUTPUT_FILE = WORKSPACE_ROOT / "wiki" / "API-Reference.md"
+OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "wiki" / "API-Reference.md"
 
 # Canonical module display order
 _MODULE_ORDER = [
@@ -60,7 +60,7 @@ _MODULE_FALLBACK_DESC: dict = {
     "filesystem": "Game filesystem: read/write files, directory listing, save paths, sandboxed I/O.",
     "window": "Window management: size, title, fullscreen, cursor, display info.",
     "event": "Event queue: push/poll custom events between systems.",
-    "system": "System info: OS, clipboard, locale, memory, Luna2D version.",
+    "system": "System info: OS, clipboard, locale, memory, Lurek2D version.",
     "thread": "Background threads and inter-thread channels for Lua coroutines.",
     "particle": "CPU particle system: emitters, modifiers, rendering.",
     "tilemap": "Tile maps: chunk loading, tile queries, navigation grid.",
@@ -182,7 +182,7 @@ def _render_module_section(mod_name: str, mod_data: dict) -> list:
     """Render one complete module section for the wiki."""
     out = []
     anchor = mod_name.replace("_", "-")
-    out.append(f"## luna.{mod_name} {{#{anchor}}}")
+    out.append(f"## lurek.{mod_name} {{#{anchor}}}")
     out.append("")
 
     # Module description — prefer hand-written fallback when available (richer for wiki)
@@ -200,7 +200,7 @@ def _render_module_section(mod_name: str, mod_data: dict) -> list:
     if fn_list:
         out.append("```lua")
         for fn in sorted(fn_list, key=lambda f: f["name"]):
-            call = f"luna.{mod_name}.{fn['name']}{_fmt_sig(fn)}"
+            call = f"lurek.{mod_name}.{fn['name']}{_fmt_sig(fn)}"
             ret = _extract_return_type(fn.get("returns_doc", ""), fn.get("description", ""), fn["name"])
             fdesc = fn.get("description", "")
             out.append(_cheatsheet_line(call, ret, fdesc))
@@ -236,28 +236,28 @@ def _render_module_section(mod_name: str, mod_data: dict) -> list:
 # ── Callbacks section ──────────────────────────────────────────────────────────
 
 _CALLBACKS = [
-    ("luna.load()", "", "called once after script loads"),
-    ("luna.update(dt)", "", "dt: number; called every frame before draw"),
-    ("luna.draw()", "", "called every frame; push draw commands here"),
-    ("luna.keypressed(key, scancode, isrepeat)", "", "key: string; isrepeat: bool"),
-    ("luna.keyreleased(key, scancode)", "", "key: string; scancode: string"),
-    ("luna.textinput(text)", "", "text: string; Unicode character input"),
-    ("luna.mousepressed(x, y, button)", "", "button: 1=left 2=right 3=middle"),
-    ("luna.mousereleased(x, y, button)", "", "button: number"),
-    ("luna.wheelmoved(x, y)", "", "x,y: scroll delta this frame"),
-    ("luna.gamepadpressed(id, button)", "", "id: number; button: string"),
-    ("luna.gamepadreleased(id, button)", "", "id: number; button: string"),
-    ("luna.gamepadaxis(id, axis, value)", "", "value: -1.0 to 1.0"),
-    ("luna.joystickadded(id)", "", "gamepad connected"),
-    ("luna.joystickremoved(id)", "", "gamepad disconnected"),
-    ("luna.touchpressed(id, x, y, dx, dy, pressure)", "", "touch start"),
-    ("luna.touchmoved(id, x, y, dx, dy, pressure)", "", "touch move"),
-    ("luna.touchreleased(id, x, y, dx, dy, pressure)", "", "touch end"),
-    ("luna.focus(focused)", "", "focused: bool; window focus changed"),
-    ("luna.visible(visible)", "", "visible: bool; window hidden or shown"),
-    ("luna.resize(w, h)", "", "w, h: new window dimensions"),
-    ("luna.quit()", "", "return true to cancel shutdown"),
-    ("luna.errorhandler(msg)", "", "return replacement string or nil"),
+    ("lurek.load()", "", "called once after script loads"),
+    ("lurek.update(dt)", "", "dt: number; called every frame before draw"),
+    ("lurek.draw()", "", "called every frame; push draw commands here"),
+    ("lurek.keypressed(key, scancode, isrepeat)", "", "key: string; isrepeat: bool"),
+    ("lurek.keyreleased(key, scancode)", "", "key: string; scancode: string"),
+    ("lurek.textinput(text)", "", "text: string; Unicode character input"),
+    ("lurek.mousepressed(x, y, button)", "", "button: 1=left 2=right 3=middle"),
+    ("lurek.mousereleased(x, y, button)", "", "button: number"),
+    ("lurek.wheelmoved(x, y)", "", "x,y: scroll delta this frame"),
+    ("lurek.gamepadpressed(id, button)", "", "id: number; button: string"),
+    ("lurek.gamepadreleased(id, button)", "", "id: number; button: string"),
+    ("lurek.gamepadaxis(id, axis, value)", "", "value: -1.0 to 1.0"),
+    ("lurek.joystickadded(id)", "", "gamepad connected"),
+    ("lurek.joystickremoved(id)", "", "gamepad disconnected"),
+    ("lurek.touchpressed(id, x, y, dx, dy, pressure)", "", "touch start"),
+    ("lurek.touchmoved(id, x, y, dx, dy, pressure)", "", "touch move"),
+    ("lurek.touchreleased(id, x, y, dx, dy, pressure)", "", "touch end"),
+    ("lurek.focus(focused)", "", "focused: bool; window focus changed"),
+    ("lurek.visible(visible)", "", "visible: bool; window hidden or shown"),
+    ("lurek.resize(w, h)", "", "w, h: new window dimensions"),
+    ("lurek.quit()", "", "return true to cancel shutdown"),
+    ("lurek.errorhandler(msg)", "", "return replacement string or nil"),
 ]
 
 
@@ -271,7 +271,7 @@ def generate_wiki(data: dict) -> str:
     out = []
     out.append("# API Reference")
     out.append("")
-    out.append("> One method per line in valid Lua. Full `luna.*` path for module functions; `obj:method()` for instance methods.")
+    out.append("> One method per line in valid Lua. Full `lurek.*` path for module functions; `obj:method()` for instance methods.")
     out.append("> Inline comment: return type and description.")
     out.append(">")
     out.append(f"> Auto-generated by `tools/gen_wiki_api.py` from `docs/logs/lua_api_data.json`.")
@@ -299,7 +299,7 @@ def generate_wiki(data: dict) -> str:
     toc_items = ["[Callbacks](#callbacks)"]
     for mod in ordered:
         anchor = mod.replace("_", "-")
-        toc_items.append(f"[luna.{mod}](#{anchor})")
+        toc_items.append(f"[lurek.{mod}](#{anchor})")
     for i, item in enumerate(toc_items):
         out.append(f"- {item}")
     out.append("")
@@ -339,7 +339,7 @@ def generate_wiki(data: dict) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate Luna2D wiki API Reference.")
+    parser = argparse.ArgumentParser(description="Generate Lurek2D wiki API Reference.")
     parser.add_argument("--input", default=str(INPUT_FILE))
     parser.add_argument("--output", default=str(OUTPUT_FILE))
     args = parser.parse_args()

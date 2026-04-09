@@ -1,4 +1,4 @@
-//! `luna.gfx` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
+//! `lurek.gfx` — 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -79,7 +79,7 @@ impl LuaUserData for LuaNineSlice {
         /// @return integer, integer
         methods.add_method("getTextureSize", |_, this, ()| Ok((this.tex_w, this.tex_h)));
         // -- draw --
-        /// Compatibility stub: queuing handled by luna.gfx.drawNineSlice.
+        /// Compatibility stub: queuing handled by lurek.gfx.drawNineSlice.
         /// @return nil
         methods.add_method(
             "draw",
@@ -791,7 +791,7 @@ fn parse_draw_mode(mode: &str) -> DrawMode {
 
 /// Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
 ///
-/// Created via `luna.gfx.newShape()`. Builder methods accumulate draw commands
+/// Created via `lurek.gfx.newShape()`. Builder methods accumulate draw commands
 /// in the backing slot; `shape:draw(x, y)` queues a `DrawShape` command each frame.
 #[derive(Clone)]
 pub struct LuaShape {
@@ -1100,7 +1100,7 @@ impl LuaUserData for LuaShape {
         // -- draw --
         /// Queues a draw command for this shape at the given position.
         ///
-        /// Must be called from a `luna.render` or `luna.render_ui` callback.
+        /// Must be called from a `lurek.render` or `lurek.render_ui` callback.
         /// @param x        : number   world X
         /// @param y        : number   world Y
         /// @param rotation : number?  radians, default 0
@@ -1216,7 +1216,7 @@ impl LuaUserData for LuaDrawLayer {
 // Registration
 // ===============================================================================
 
-/// Registers the `luna.gfx` namespace on the given Lua table.
+/// Registers the `lurek.gfx` namespace on the given Lua table.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.
@@ -1616,7 +1616,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(img);
                         if !st.textures.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.gfx.draw: image handle is not valid".into(),
+                                "lurek.gfx.draw: image handle is not valid".into(),
                             ));
                         }
                         if has_transform {
@@ -1646,7 +1646,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(canvas);
                         if !st.canvases.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.gfx.draw: canvas handle is not valid".into(),
+                                "lurek.gfx.draw: canvas handle is not valid".into(),
                             ));
                         }
                         st.draw_commands.push(DrawCommand::DrawCanvas {
@@ -1666,7 +1666,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(batch);
                         if !st.sprite_batches.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.gfx.draw: sprite batch handle is not valid".into(),
+                                "lurek.gfx.draw: sprite batch handle is not valid".into(),
                             ));
                         }
                         st.draw_commands
@@ -1678,7 +1678,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         drop(mesh);
                         if !st.meshes.contains_key(key) {
                             return Err(LuaError::RuntimeError(
-                                "luna.gfx.draw: mesh handle is not valid".into(),
+                                "lurek.gfx.draw: mesh handle is not valid".into(),
                             ));
                         }
                         st.draw_commands.push(DrawCommand::DrawMesh {
@@ -1694,14 +1694,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         return Ok(());
                     }
                     Err(LuaError::RuntimeError(
-                        "luna.gfx.draw: expected Image, Canvas, SpriteBatch, or Mesh".into(),
+                        "lurek.gfx.draw: expected Image, Canvas, SpriteBatch, or Mesh".into(),
                     ))
                 }
                 LuaValue::Nil => Err(LuaError::RuntimeError(
-                    "luna.gfx.draw: drawable cannot be nil".into(),
+                    "lurek.gfx.draw: drawable cannot be nil".into(),
                 )),
                 _ => Err(LuaError::RuntimeError(
-                    "luna.gfx.draw: unsupported drawable type".into(),
+                    "lurek.gfx.draw: unsupported drawable type".into(),
                 )),
             }
         })?,
@@ -1980,12 +1980,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let full_path = st.game_dir.join(&path);
             let data = std::fs::read(&full_path).map_err(|e| {
                 LuaError::RuntimeError(format!(
-                    "luna.gfx.newFont: failed to read '{}': {}",
+                    "lurek.gfx.newFont: failed to read '{}': {}",
                     path, e
                 ))
             })?;
             let font = Font::from_bytes(&data, size)
-                .map_err(|e| LuaError::RuntimeError(format!("luna.gfx.newFont: {}", e)))?;
+                .map_err(|e| LuaError::RuntimeError(format!("lurek.gfx.newFont: {}", e)))?;
             let key = st.fonts.insert(font);
             Ok(LuaFont {
                 state: s.clone(),
@@ -2007,7 +2007,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut st = s.borrow_mut();
             if !st.fonts.contains_key(key) {
                 return Err(LuaError::RuntimeError(
-                    "luna.gfx.setFont: font handle is not valid or was released".into(),
+                    "lurek.gfx.setFont: font handle is not valid or was released".into(),
                 ));
             }
             st.active_font = Some(key);
@@ -2047,7 +2047,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             drop(font);
             let mut st = s.borrow_mut();
             let f = st.fonts.get_mut(key).ok_or_else(|| {
-                LuaError::RuntimeError("luna.gfx.getFontWidth: font handle is not valid".into())
+                LuaError::RuntimeError("lurek.gfx.getFontWidth: font handle is not valid".into())
             })?;
             Ok(f.text_width(&text))
         })?,
@@ -2066,7 +2066,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             drop(font);
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
-                LuaError::RuntimeError("luna.gfx.getFontHeight: font handle is not valid".into())
+                LuaError::RuntimeError("lurek.gfx.getFontHeight: font handle is not valid".into())
             })?;
             Ok(f.line_height())
         })?,
@@ -2086,7 +2086,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
                 LuaError::RuntimeError(
-                    "luna.gfx.getFontLineHeight: font handle is not valid".into(),
+                    "lurek.gfx.getFontLineHeight: font handle is not valid".into(),
                 )
             })?;
             Ok(f.line_height())
@@ -2116,7 +2116,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             drop(font);
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
-                LuaError::RuntimeError("luna.gfx.getFontAscent: font handle is not valid".into())
+                LuaError::RuntimeError("lurek.gfx.getFontAscent: font handle is not valid".into())
             })?;
             Ok(f.ascent())
         })?,
@@ -2135,7 +2135,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             drop(font);
             let st = s.borrow();
             let f = st.fonts.get(key).ok_or_else(|| {
-                LuaError::RuntimeError("luna.gfx.getFontDescent: font handle is not valid".into())
+                LuaError::RuntimeError("lurek.gfx.getFontDescent: font handle is not valid".into())
             })?;
             Ok(f.descent())
         })?,
@@ -2184,7 +2184,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, arg: LuaValue| match arg {
             LuaValue::String(path_str) => {
                 let path = path_str.to_str().map_err(|e| {
-                    LuaError::RuntimeError(format!("luna.gfx.newImage: invalid path: {}", e))
+                    LuaError::RuntimeError(format!("lurek.gfx.newImage: invalid path: {}", e))
                 })?;
                 let mut st = s.borrow_mut();
                 let full_path = st.game_dir.join(path);
@@ -2197,7 +2197,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         })
                     }
                     Err(e) => Err(LuaError::RuntimeError(format!(
-                        "luna.gfx.newImage: failed to load '{}': {}",
+                        "lurek.gfx.newImage: failed to load '{}': {}",
                         path, e
                     ))),
                 }
@@ -2216,13 +2216,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         })
                     }
                     Err(e) => Err(LuaError::RuntimeError(format!(
-                        "luna.gfx.newImage: failed to create from ImageData: {}",
+                        "lurek.gfx.newImage: failed to create from ImageData: {}",
                         e
                     ))),
                 }
             }
             _ => Err(LuaError::RuntimeError(
-                "luna.gfx.newImage: expected a file path string or ImageData".into(),
+                "lurek.gfx.newImage: expected a file path string or ImageData".into(),
             )),
         })?,
     )?;
@@ -2240,7 +2240,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, (width, height): (u32, u32)| {
             if width == 0 || height == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.gfx.newCanvas: width and height must be greater than zero".into(),
+                    "lurek.gfx.newCanvas: width and height must be greater than zero".into(),
                 ));
             }
             let mut st = s.borrow_mut();
@@ -2272,7 +2272,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     drop(c);
                     if !st.canvases.contains_key(key) {
                         return Err(LuaError::RuntimeError(
-                            "luna.gfx.setCanvas: canvas handle is not valid".into(),
+                            "lurek.gfx.setCanvas: canvas handle is not valid".into(),
                         ));
                     }
                     st.active_canvas = Some(key);
@@ -2318,7 +2318,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             drop(canvas);
             let st = s.borrow();
             let c = st.canvases.get(key).ok_or_else(|| {
-                LuaError::RuntimeError("luna.gfx.getCanvasSize: canvas handle is not valid".into())
+                LuaError::RuntimeError("lurek.gfx.getCanvasSize: canvas handle is not valid".into())
             })?;
             Ok((c.width, c.height))
         })?,
@@ -2342,7 +2342,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut st = s.borrow_mut();
             if !st.textures.contains_key(img_key) {
                 return Err(LuaError::RuntimeError(
-                    "luna.gfx.newSpriteBatch: image handle is not valid".into(),
+                    "lurek.gfx.newSpriteBatch: image handle is not valid".into(),
                 ));
             }
             let batch = SpriteBatch::new(img_key, max_entries);
@@ -2412,7 +2412,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "newShader",
         lua.create_function(move |_, code: String| {
             let shader = Shader::new(code)
-                .map_err(|err| LuaError::RuntimeError(format!("luna.gfx.newShader: {}", err)))?;
+                .map_err(|err| LuaError::RuntimeError(format!("lurek.gfx.newShader: {}", err)))?;
             let key = s.borrow_mut().shaders.insert(shader);
             Ok(LuaShader {
                 state: s.clone(),
@@ -2436,7 +2436,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     drop(sh);
                     if !st.shaders.contains_key(key) {
                         return Err(LuaError::RuntimeError(
-                            "luna.gfx.setShader: shader handle is not valid".into(),
+                            "lurek.gfx.setShader: shader handle is not valid".into(),
                         ));
                     }
                     st.active_shader = Some(key);
@@ -3118,7 +3118,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- drawNineSlice --
-    /// Queues a 9-slice draw call inside luna.render / luna.render_ui.
+    /// Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
     /// @param slice : NineSlice
     /// @param x : number
     /// @param y : number
@@ -3162,7 +3162,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Creates a new empty [`CompoundShape`] stored in the resource pool.
     ///
     /// Build up primitives with `shape:rectangle()`, `shape:circle()`, etc.
-    /// Call `shape:draw(x, y)` inside `luna.render` or `luna.render_ui` to
+    /// Call `shape:draw(x, y)` inside `lurek.render` or `lurek.render_ui` to
     /// replay all commands with a unified affine transform each frame.
     ///
     /// @return Shape

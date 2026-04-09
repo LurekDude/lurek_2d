@@ -409,7 +409,7 @@ impl LuaUserData for LuaModManager {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.modding` API table with the Lua VM.
+/// Registers the `lurek.modding` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` - `&Lua`.

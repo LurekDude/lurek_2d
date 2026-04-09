@@ -1,6 +1,6 @@
 ---
 description: >
-  Design sprite animation state machines and frame sequences for a Luna2D game.
+  Design sprite animation state machines and frame sequences for a Lurek2D game.
   Outputs animation design specs compatible with the Sprite Sheet Editor.
 model: claude-sonnet-4-5
 tools:

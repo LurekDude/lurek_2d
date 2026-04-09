@@ -3,7 +3,7 @@ name: roadmap-planning
 description: Load this skill when creating or maintaining roadmap phase documentation, updating phase files, or auditing roadmap consistency. Owns phase file format, dependency graph rules, acceptance gate authoring, and roadmap consistency. Skip it for code implementation or API design.
 ---
 
-# Roadmap Planning — Luna2D Engine
+# Roadmap Planning — Lurek2D Engine
 
 ## Load When
 
@@ -66,7 +66,7 @@ description: Load this skill when creating or maintaining roadmap phase document
 
 - Every gate must be a **binary test** — pass or fail, no "mostly works"
 - At least one gate must be a `cargo test` or `cargo build` command
-- Feature phases touching `luna.*` API must include a Lua test gate
+- Feature phases touching `lurek.*` API must include a Lua test gate
 - Documentation phases must name the specific file updated
 - Never use vague gates like "the feature works" or "code quality is good"
 

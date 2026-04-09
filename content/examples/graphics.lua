@@ -1,125 +1,124 @@
 -- examples/graphics.lua
 -- 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches
--- API: luna.gfx
--- This file is documentation code, not a runnable game.
+-- API: lurek.gfx
 
 --------------------------------------------------------------------------------
 -- Drawing mode values
---   "fill"  — solid filled shape
---   "line"  — outline only
+"fill"  -- solid filled shape
+"line"  -- outline only
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 -- Color and background
 --------------------------------------------------------------------------------
 
-luna.gfx.setColor(1, 0.5, 0, 1)             -- r, g, b, a
-local r, g, b, a = luna.gfx.getColor()      -- → r, g, b, a
+lurek.gfx.setColor(1, 0.5, 0, 1)             -- r, g, b, a
+local r, g, b, a = lurek.gfx.getColor()      -- → r, g, b, a
 
-luna.gfx.setBackgroundColor(0.1, 0.1, 0.15)
-local br, bg, bb, ba = luna.gfx.getBackgroundColor()
+lurek.gfx.setBackgroundColor(0.1, 0.1, 0.15)
+local br, bg, bb, ba = lurek.gfx.getBackgroundColor()
 
 --------------------------------------------------------------------------------
 -- Primitive shapes
 --------------------------------------------------------------------------------
 
 -- Rectangle (last two args are optional corner rx/ry for rounding)
-luna.gfx.rectangle("fill", 10, 10, 200, 100)
-luna.gfx.rectangle("line", 220, 10, 200, 100, 8, 8)  -- rounded corners
+lurek.gfx.rectangle("fill", 10, 10, 200, 100)
+lurek.gfx.rectangle("line", 220, 10, 200, 100, 8, 8)  -- rounded corners
 
 -- Circle
-luna.gfx.circle("fill", 100, 100, 50)
-luna.gfx.circle("line", 250, 100, 50)
+lurek.gfx.circle("fill", 100, 100, 50)
+lurek.gfx.circle("line", 250, 100, 50)
 
 -- Ellipse
-luna.gfx.ellipse("fill", 100, 200, 80, 40)
-luna.gfx.ellipse("line", 280, 200, 80, 40)
+lurek.gfx.ellipse("fill", 100, 200, 80, 40)
+lurek.gfx.ellipse("line", 280, 200, 80, 40)
 
 -- Triangle
-luna.gfx.triangle("fill", 100, 250, 150, 320, 50, 320)
-luna.gfx.triangle("line", 250, 250, 300, 320, 200, 320)
+lurek.gfx.triangle("fill", 100, 250, 150, 320, 50, 320)
+lurek.gfx.triangle("line", 250, 250, 300, 320, 200, 320)
 
 -- Line / polyline
-luna.gfx.line(0, 0, 100, 100)
-luna.gfx.line(100, 100, 200, 50, 300, 100, 400, 50)  -- multi-segment polyline
+lurek.gfx.line(0, 0, 100, 100)
+lurek.gfx.line(100, 100, 200, 50, 300, 100, 400, 50)  -- multi-segment polyline
 
 -- Polygon (flat list or table)
-luna.gfx.polygon("fill", 100, 100, 150, 80, 200, 100, 180, 150, 120, 150)
-luna.gfx.polygon("fill", { 300, 100, 350, 80, 400, 100, 380, 150, 320, 150 })
+lurek.gfx.polygon("fill", 100, 100, 150, 80, 200, 100, 180, 150, 120, 150)
+lurek.gfx.polygon("fill", { 300, 100, 350, 80, 400, 100, 380, 150, 320, 150 })
 
 -- Arc
-luna.gfx.arc("fill", 200, 200, 80, 0, math.pi, 32)  -- angle in radians, segments
-luna.gfx.arc("line", 400, 200, 80, -math.pi/2, math.pi)
+lurek.gfx.arc("fill", 200, 200, 80, 0, math.pi, 32)  -- angle in radians, segments
+lurek.gfx.arc("line", 400, 200, 80, -math.pi/2, math.pi)
 
 -- Points
-luna.gfx.points(10, 10, 20, 20, 30, 30)
-luna.gfx.points({ {10, 40}, {20, 40}, {30, 40} })  -- table form
+lurek.gfx.points(10, 10, 20, 20, 30, 30)
+lurek.gfx.points({ {10, 40}, {20, 40}, {30, 40} })  -- table form
 
 --------------------------------------------------------------------------------
 -- Line and point style
 --------------------------------------------------------------------------------
 
-luna.gfx.setLineWidth(2)
-local lw = luna.gfx.getLineWidth()  -- 2.0
+lurek.gfx.setLineWidth(2)
+local lw = lurek.gfx.getLineWidth()  -- 2.0
 
-luna.gfx.setPointSize(4)
-local ps = luna.gfx.getPointSize()  -- 4.0
+lurek.gfx.setPointSize(4)
+local ps = lurek.gfx.getPointSize()  -- 4.0
 
 --------------------------------------------------------------------------------
 -- Blend modes
 --------------------------------------------------------------------------------
 
-luna.gfx.setBlendMode("alpha")        -- default (alpha blending)
-luna.gfx.setBlendMode("add")          -- additive (glow, particles)
-luna.gfx.setBlendMode("multiply")     -- multiply (shadows)
-luna.gfx.setBlendMode("replace")      -- overwrite
-luna.gfx.setBlendMode("screen")       -- screen (lightening)
-local bm = luna.gfx.getBlendMode()   -- "alpha"
+lurek.gfx.setBlendMode("alpha")        -- default (alpha blending)
+lurek.gfx.setBlendMode("add")          -- additive (glow, particles)
+lurek.gfx.setBlendMode("multiply")     -- multiply (shadows)
+lurek.gfx.setBlendMode("replace")      -- overwrite
+lurek.gfx.setBlendMode("screen")       -- screen (lightening)
+local bm = lurek.gfx.getBlendMode()   -- "alpha"
 
 --------------------------------------------------------------------------------
 -- Clear the draw buffer
 --------------------------------------------------------------------------------
 
-luna.gfx.clear()             -- clear to background color
-luna.gfx.clear(0, 0, 0)     -- explicit r, g, b
+lurek.gfx.clear()             -- clear to background color
+lurek.gfx.clear(0, 0, 0)     -- explicit r, g, b
 
 --------------------------------------------------------------------------------
 -- Images
 --------------------------------------------------------------------------------
 
 -- Load from file
-local img = luna.gfx.newImage("player.png")
+local img = lurek.gfx.newImage("player.png")
 local iw = img:getWidth()           -- pixel width
 local ih = img:getHeight()          -- pixel height
 local idw, idh = img:getDimensions()
 
 -- Draw an image
-luna.gfx.draw(img, 100, 100)
+lurek.gfx.draw(img, 100, 100)
 -- draw(img, x, y, rotation, scaleX, scaleY, offsetX, offsetY)
-luna.gfx.draw(img, 200, 100, 0, 2, 2, iw/2, ih/2)  -- centered, scaled
+lurek.gfx.draw(img, 200, 100, 0, 2, 2, iw/2, ih/2)  -- centered, scaled
 
 -- Release GPU memory
 img:release()
 
 -- Load from ImageData (CPU pixel buffer)
-local id = luna.img.newImageData(64, 64)
-local imgFromData = luna.gfx.newImage(id)
+local id = lurek.img.newImageData(64, 64)
+local imgFromData = lurek.gfx.newImage(id)
 
 --------------------------------------------------------------------------------
 -- Quads (sub-image crop)
 --------------------------------------------------------------------------------
 
-local spriteSheet = luna.gfx.newImage("spritesheet.png")
+local spriteSheet = lurek.gfx.newImage("spritesheet.png")
 local sw, sh = spriteSheet:getDimensions()
 
 -- newQuad(x, y, w, h, sourceW, sourceH)
-local q1 = luna.gfx.newQuad(0,   0, 32, 32, sw, sh)   -- frame 1
-local q2 = luna.gfx.newQuad(32,  0, 32, 32, sw, sh)   -- frame 2
-local q3 = luna.gfx.newQuad(64,  0, 32, 32, sw, sh)   -- frame 3
+local q1 = lurek.gfx.newQuad(0,   0, 32, 32, sw, sh)   -- frame 1
+local q2 = lurek.gfx.newQuad(32,  0, 32, 32, sw, sh)   -- frame 2
+local q3 = lurek.gfx.newQuad(64,  0, 32, 32, sw, sh)   -- frame 3
 
 -- Draw with quad
-luna.gfx.drawq(spriteSheet, q1, 300, 100)
-luna.gfx.drawq(spriteSheet, q2, 340, 100)
+lurek.gfx.drawq(spriteSheet, q1, 300, 100)
+lurek.gfx.drawq(spriteSheet, q2, 340, 100)
 
 -- Quad inspection
 local qx, qy, qw, qh = q1:getViewport()       -- → x, y, w, h
@@ -132,9 +131,9 @@ local qt = q1:typeOf()                          -- "Quad"
 --------------------------------------------------------------------------------
 
 -- Load a font, specify size in pixels
-local font = luna.gfx.newFont("font.ttf", 16)
-luna.gfx.setFont(font)
-local activeFont = luna.gfx.getFont()     -- the LuaFont or nil
+local font = lurek.gfx.newFont("font.ttf", 16)
+lurek.gfx.setFont(font)
+local activeFont = lurek.gfx.getFont()     -- the LuaFont or nil
 
 -- Font metrics
 local fw = font:getWidth("Hello!")             -- rendered text width
@@ -148,43 +147,43 @@ local lines, maxW = font:getWrap("Long text", 100)  -- word-wrapped lines
 font:release()
 
 -- Module-level text metrics using the active font
-local textW = luna.gfx.getFontWidth(font, "Hello!")
-local textH = luna.gfx.getFontHeight(font)
-local textA = luna.gfx.getFontAscent(font)
-local textD = luna.gfx.getFontDescent(font)
-local wrappedLines, w2 = luna.gfx.getFontWrap("Long text", 100)
+local textW = lurek.gfx.getFontWidth(font, "Hello!")
+local textH = lurek.gfx.getFontHeight(font)
+local textA = lurek.gfx.getFontAscent(font)
+local textD = lurek.gfx.getFontDescent(font)
+local wrappedLines, w2 = lurek.gfx.getFontWrap("Long text", 100)
 
 -- Draw text
-luna.gfx.print("Hello, World!")
-luna.gfx.print("At position", 100, 200)
-luna.gfx.print("Scaled", 100, 230, 1.5)  -- scale factor
+lurek.gfx.print("Hello, World!")
+lurek.gfx.print("At position", 100, 200)
+lurek.gfx.print("Scaled", 100, 230, 1.5)  -- scale factor
 
 -- Wrapped / aligned text
-luna.gfx.printf("Left aligned text", 50, 100, 300, "left")
-luna.gfx.printf("Centered heading", 50, 140, 300, "center")
-luna.gfx.printf("Right aligned", 50, 180, 300, "right")
-luna.gfx.printf("Justified paragraph text here", 50, 220, 300, "justify")
+lurek.gfx.printf("Left aligned text", 50, 100, 300, "left")
+lurek.gfx.printf("Centered heading", 50, 140, 300, "center")
+lurek.gfx.printf("Right aligned", 50, 180, 300, "right")
+lurek.gfx.printf("Justified paragraph text here", 50, 220, 300, "justify")
 
 --------------------------------------------------------------------------------
 -- Canvases (render-to-texture)
 --------------------------------------------------------------------------------
 
-local canvas = luna.gfx.newCanvas(800, 600)
+local canvas = lurek.gfx.newCanvas(800, 600)
 local cw = canvas:getWidth()     -- 800
 local ch = canvas:getHeight()    -- 600
 local cdw, cdh = canvas:getDimensions()
 
 -- Render into canvas
-luna.gfx.setCanvas(canvas)
-    luna.gfx.clear(0, 0, 0)
-    luna.gfx.rectangle("fill", 10, 10, 100, 100)
-    luna.gfx.print("Inside canvas", 10, 120)
-luna.gfx.setCanvas()       -- pass nothing to restore screen
+lurek.gfx.setCanvas(canvas)
+    lurek.gfx.clear(0, 0, 0)
+    lurek.gfx.rectangle("fill", 10, 10, 100, 100)
+    lurek.gfx.print("Inside canvas", 10, 120)
+lurek.gfx.setCanvas()       -- pass nothing to restore screen
 
-local active = luna.gfx.getCanvas()  -- returns Canvas or nil
+local active = lurek.gfx.getCanvas()  -- returns Canvas or nil
 
 -- Draw canvas to screen like an image
-luna.gfx.draw(canvas, 0, 0)
+lurek.gfx.draw(canvas, 0, 0)
 
 canvas:release()
 
@@ -192,8 +191,8 @@ canvas:release()
 -- Sprite batches (batch-draw many instances of one texture)
 --------------------------------------------------------------------------------
 
-local batchtex = luna.gfx.newImage("coin.png")
-local batch = luna.gfx.newSpriteBatch(batchtex, 500)   -- max 500 sprites
+local batchtex = lurek.gfx.newImage("coin.png")
+local batch = lurek.gfx.newSpriteBatch(batchtex, 500)   -- max 500 sprites
 
 -- Add sprites: add(x, y, r?, sx?, sy?, ox?, oy?) → integer id
 batch:add(100, 100)
@@ -204,7 +203,7 @@ local count = batch:getCount()          -- 3
 local capacity = batch:getBufferSize()  -- 500
 
 -- Draw all sprites
-luna.gfx.draw(batch, 0, 0)
+lurek.gfx.draw(batch, 0, 0)
 
 -- Clear all added sprites
 batch:clear()
@@ -220,7 +219,7 @@ local vertices = {
     {  50,  50, 1.0, 1.0, 0, 1, 0, 1 },  -- bottom-right, green
     { -50,  50, 0.0, 1.0, 0, 0, 1, 1 },  -- bottom-left, blue
 }
-local mesh = luna.gfx.newMesh(vertices, "triangles")  -- or "fan", "strip"
+local mesh = lurek.gfx.newMesh(vertices, "triangles")  -- or "fan", "strip"
 
 -- Assign a texture to mesh UV coordinates
 mesh:setTexture(batchtex)
@@ -231,7 +230,7 @@ local vx, vy, vu, vv, vr, vg, vb, va = mesh:getVertex(1)   -- first vertex (1-ba
 mesh:setVertex(1, { 0, -60, 0.5, 0.0, 1, 1, 0, 1 })
 
 -- Draw mesh at a position
-luna.gfx.draw(mesh, 300, 200)
+lurek.gfx.draw(mesh, 300, 200)
 
 mesh:release()
 
@@ -248,7 +247,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 }
 ]]
 
-local shader = luna.gfx.newShader(shaderCode)
+local shader = lurek.gfx.newShader(shaderCode)
 
 -- Check / send uniforms
 local has = shader:hasUniform("myParam")
@@ -260,11 +259,11 @@ shader:send("myBool", true)              -- bool
 shader:send("myInt", 42)                 -- int
 
 -- Activate shader for subsequent draw calls
-luna.gfx.setShader(shader)
-luna.gfx.rectangle("fill", 100, 100, 200, 200)
-luna.gfx.setShader()       -- restore default shader
+lurek.gfx.setShader(shader)
+lurek.gfx.rectangle("fill", 100, 100, 200, 200)
+lurek.gfx.setShader()       -- restore default shader
 
-local activeShader = luna.gfx.getShader()  -- returns Shader or nil
+local activeShader = lurek.gfx.getShader()  -- returns Shader or nil
 
 shader:release()
 
@@ -273,89 +272,89 @@ shader:release()
 --------------------------------------------------------------------------------
 
 -- Push/pop preserve current transform state
-luna.gfx.push()
-    luna.gfx.translate(100, 100)
-    luna.gfx.rotate(math.pi / 4)
-    luna.gfx.scale(2, 2)
-    luna.gfx.shear(0.1, 0)
-    luna.gfx.rectangle("fill", -25, -25, 50, 50)   -- drawn at (100,100), rotated+scaled
-luna.gfx.pop()
+lurek.gfx.push()
+    lurek.gfx.translate(100, 100)
+    lurek.gfx.rotate(math.pi / 4)
+    lurek.gfx.scale(2, 2)
+    lurek.gfx.shear(0.1, 0)
+    lurek.gfx.rectangle("fill", -25, -25, 50, 50)   -- drawn at (100,100), rotated+scaled
+lurek.gfx.pop()
 
 -- Reset to identity
-luna.gfx.origin()
+lurek.gfx.origin()
 
 -- Apply raw matrix (9 elements, column-major mat3)
 local mat = { 1, 0, 0,   0, 1, 0,   50, 50, 1 }  -- translate(50,50)
-luna.gfx.applyTransform(mat)
+lurek.gfx.applyTransform(mat)
 
 --------------------------------------------------------------------------------
 -- Scissor (clipping rectangle)
 --------------------------------------------------------------------------------
 
-luna.gfx.setScissor(50, 50, 300, 200)
-luna.gfx.rectangle("fill", 0, 0, 400, 300)    -- clipped to scissor rect
-luna.gfx.setScissor()                           -- clear scissor
+lurek.gfx.setScissor(50, 50, 300, 200)
+lurek.gfx.rectangle("fill", 0, 0, 400, 300)    -- clipped to scissor rect
+lurek.gfx.setScissor()                           -- clear scissor
 
-local sx, sy, sw, sh = luna.gfx.getScissor()  -- may return nothing if not set
-luna.gfx.intersectScissor(100, 100, 100, 100)  -- intersect with current
+local sx, sy, sw, sh = lurek.gfx.getScissor()  -- may return nothing if not set
+lurek.gfx.intersectScissor(100, 100, 100, 100)  -- intersect with current
 
 --------------------------------------------------------------------------------
 -- Color mask (control which channels are written)
 --------------------------------------------------------------------------------
 
-luna.gfx.setColorMask(true, true, true, false)   -- no alpha writes
-local rm, gm, bm2, am = luna.gfx.getColorMask()
-luna.gfx.setColorMask()                           -- restore all channels
+lurek.gfx.setColorMask(true, true, true, false)   -- no alpha writes
+local rm, gm, bm2, am = lurek.gfx.getColorMask()
+lurek.gfx.setColorMask()                           -- restore all channels
 
 --------------------------------------------------------------------------------
 -- Wireframe
 --------------------------------------------------------------------------------
 
-luna.gfx.setWireframe(true)
-luna.gfx.circle("fill", 200, 200, 50)    -- drawn as wireframe outline
-luna.gfx.setWireframe(false)
-local wf = luna.gfx.isWireframe()        -- false
+lurek.gfx.setWireframe(true)
+lurek.gfx.circle("fill", 200, 200, 50)    -- drawn as wireframe outline
+lurek.gfx.setWireframe(false)
+local wf = lurek.gfx.isWireframe()        -- false
 
 --------------------------------------------------------------------------------
 -- Stencil buffer
 --------------------------------------------------------------------------------
 
 -- Write stencil value 1 where shape is drawn
-luna.gfx.stencil("replace", 1)
-    luna.gfx.circle("fill", 200, 200, 80)
-luna.gfx.stencil()    -- end stencil write (restores to color pass)
+lurek.gfx.stencil("replace", 1)
+    lurek.gfx.circle("fill", 200, 200, 80)
+lurek.gfx.stencil()    -- end stencil write (restores to color pass)
 
 -- Only render where stencil == 1
-luna.gfx.setStencilTest("equal", 1)
-luna.gfx.rectangle("fill", 0, 0, 400, 400)  -- masked to circle area
-luna.gfx.setStencilTest()                     -- disable stencil test
+lurek.gfx.setStencilTest("equal", 1)
+lurek.gfx.rectangle("fill", 0, 0, 400, 400)  -- masked to circle area
+lurek.gfx.setStencilTest()                     -- disable stencil test
 
 -- Stencil actions:  "replace" | "keep" | "zero" | "increment" | "decrement"
---                   "incrementwrap" | "decrementwrap" | "invert"
+"incrementwrap" | "decrementwrap" | "invert"
 -- Stencil compare:  "equal" | "notequal" | "less" | "lequal"
---                   "greater" | "gequal" | "always" | "never"
+"greater" | "gequal" | "always" | "never"
 
 --------------------------------------------------------------------------------
 -- Window dimensions
 --------------------------------------------------------------------------------
 
-local winW = luna.gfx.getWidth()             -- window width in pixels
-local winH = luna.gfx.getHeight()            -- window height in pixels
-local ww, wh = luna.gfx.getDimensions()
+local winW = lurek.gfx.getWidth()             -- window width in pixels
+local winH = lurek.gfx.getHeight()            -- window height in pixels
+local ww, wh = lurek.gfx.getDimensions()
 
 --------------------------------------------------------------------------------
 -- Texture filter mode
 --------------------------------------------------------------------------------
 
-luna.gfx.setDefaultFilter("nearest", "nearest")   -- for pixel art
-luna.gfx.setDefaultFilter("linear",  "linear", 1) -- for smooth scaling
-local minF, magF, ani = luna.gfx.getDefaultFilter()
+lurek.gfx.setDefaultFilter("nearest", "nearest")   -- for pixel art
+lurek.gfx.setDefaultFilter("linear",  "linear", 1) -- for smooth scaling
+local minF, magF, ani = lurek.gfx.getDefaultFilter()
 
 --------------------------------------------------------------------------------
 -- Renderer statistics
 --------------------------------------------------------------------------------
 
-local stats = luna.gfx.getStats()
+local stats = lurek.gfx.getStats()
 -- stats.drawcalls    — draw commands queued this frame
 -- stats.textures     — loaded texture count
 -- stats.fonts        — loaded font count
@@ -367,32 +366,32 @@ local stats = luna.gfx.getStats()
 --------------------------------------------------------------------------------
 
 -- Queue a PNG save after the current frame completes
-luna.gfx.saveScreenshot("save/screenshot.png")
+lurek.gfx.saveScreenshot("save/screenshot.png")
 
 --------------------------------------------------------------------------------
 -- Typical game loop pattern
 --------------------------------------------------------------------------------
 
-local playerImg  -- assumed loaded in luna.init()
+local playerImg  -- assumed loaded in lurek.init()
 
--- luna.render is called every frame to issue draw commands.
+-- lurek.render is called every frame to issue draw commands.
 -- The engine processes the queued DrawCommands after this returns.
-luna.render = function()
-    luna.gfx.clear()
+lurek.render = function()
+    lurek.gfx.clear()
 
     -- Background
-    luna.gfx.setColor(0.2, 0.2, 0.4)
-    luna.gfx.rectangle("fill", 0, 0, luna.gfx.getDimensions())
+    lurek.gfx.setColor(0.2, 0.2, 0.4)
+    lurek.gfx.rectangle("fill", 0, 0, lurek.gfx.getDimensions())
 
     -- Entities
-    luna.gfx.setColor(1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1)
     if playerImg then
-        luna.gfx.draw(playerImg, 100, 100)
+        lurek.gfx.draw(playerImg, 100, 100)
     end
 
     -- UI text
-    luna.gfx.setColor(1, 1, 0)
-    luna.gfx.print("Press ESC to quit", 10, 10)
+    lurek.gfx.setColor(1, 1, 0)
+    lurek.gfx.print("Press ESC to quit", 10, 10)
 end
 
 -- ─── Canvas ────────────────────────────────────────────────────────────────────
@@ -403,7 +402,7 @@ local isImg2 = canvas:typeOf("Image")      -- false
 
 -- ─── DrawLayer ─────────────────────────────────────────────────────────────────
 -- DrawLayer accumulates z-sorted callbacks; inspect or discard them between frames.
-drawlayer:queue(10, function() luna.gfx.print("HUD", 0, 0) end)  -- enqueue at depth 10
+drawlayer:queue(10, function() lurek.gfx.print("HUD", 0, 0) end)  -- enqueue at depth 10
 local dlCount = drawlayer:getCount()            -- 1  (number of queued callbacks)
 drawlayer:flush()                               -- sort, execute, then empty the queue
 drawlayer:clear()                               -- discard all pending callbacks without executing
@@ -465,21 +464,21 @@ local isShape = shape:typeOf("Shape")    -- true
 local sbType = spritebatch:type()              -- "SpriteBatch"
 local isSB   = spritebatch:typeOf("SpriteBatch")  -- true
 
--- ─── luna.graphics ─────────────────────────────────────────────────────────────
+-- ─── lurek.graphics ─────────────────────────────────────────────────────────────
 -- captureScreenshot delivers its ImageData asynchronously after the frame completes.
-luna.graphics.captureScreenshot(function(imgdata) end)
+lurek.graphics.captureScreenshot(function(imgdata) end)
 -- clearStencil resets the stencil buffer to defaults — call before overwriting an old mask.
-luna.graphics.clearStencil()
--- drawNineSlice must be called inside luna.render or luna.render_ui.
-luna.graphics.drawNineSlice(nineslice, 50, 50, 320, 240)  -- x, y, w, h
-local cw2, ch2 = luna.graphics.getCanvasSize(canvas)          -- canvas dimensions in pixels
-local depthMode, depthWrite = luna.graphics.getDepthMode()    -- e.g. "lequal", true
-local lh = luna.graphics.getFontLineHeight(font)              -- current line height multiplier
-local stAction, stCompare, stValue = luna.graphics.getStencilMode()  -- active stencil state
-local dl2  = luna.graphics.newDrawLayer()                     -- new z-ordered draw-call queue
-local ns2  = luna.graphics.newNineSlice(image, 8, 8, 8, 8)  -- 8 px uniform insets
+lurek.graphics.clearStencil()
+-- drawNineSlice must be called inside lurek.render or lurek.render_ui.
+lurek.graphics.drawNineSlice(nineslice, 50, 50, 320, 240)  -- x, y, w, h
+local cw2, ch2 = lurek.graphics.getCanvasSize(canvas)          -- canvas dimensions in pixels
+local depthMode, depthWrite = lurek.graphics.getDepthMode()    -- e.g. "lequal", true
+local lh = lurek.graphics.getFontLineHeight(font)              -- current line height multiplier
+local stAction, stCompare, stValue = lurek.graphics.getStencilMode()  -- active stencil state
+local dl2  = lurek.graphics.newDrawLayer()                     -- new z-ordered draw-call queue
+local ns2  = lurek.graphics.newNineSlice(image, 8, 8, 8, 8)  -- 8 px uniform insets
 local isNS2 = ns2:typeOf("NineSlice")                        -- true
-local shape2 = luna.graphics.newShape()                       -- new empty CompoundShape
-luna.graphics.setDepthMode("lequal")         -- "lequal", "less", "greater", "always", "never"
-luna.graphics.setFontLineHeight(font, 1.2)   -- line spacing multiplier
-luna.graphics.setStencilMode("none")         -- "none", "write", "test"
+local shape2 = lurek.graphics.newShape()                       -- new empty CompoundShape
+lurek.graphics.setDepthMode("lequal")         -- "lequal", "less", "greater", "always", "never"
+lurek.graphics.setFontLineHeight(font, 1.2)   -- line spacing multiplier
+lurek.graphics.setStencilMode("none")         -- "none", "write", "test"

@@ -1,4 +1,4 @@
-# Compute, DataFrame & GPU Compute — Threading Opportunities
+# Compute, DataFrame & GPU Compute ï¿½ Threading Opportunities
 
 ## Part 1: NdArray (src/compute/)
 
@@ -11,29 +11,29 @@
 
 | Category | Functions | Parallelizable? |
 |----------|-----------|-----------------|
-| Element-wise | add, sub, mul, div, pow, sqrt, abs, neg, clamp | ? Yes — trivial |
-| Reductions | sum, mean, min, max (along axis) | ? Yes — parallel reduce |
-| Comparisons | eq, ne, lt, le, gt, ge, where | ? Yes — trivial |
-| Spatial | convolve2d, dilate, erode | ? Yes — row-parallel |
-| Spatial | flood_fill | ? No — BFS frontier |
-| Shape | reshape, transpose, squeeze, flatten | N/A — zero-copy views |
-| Creation | zeros, ones, full, rand, arange | ? Yes — trivial |
+| Element-wise | add, sub, mul, div, pow, sqrt, abs, neg, clamp | ? Yes ï¿½ trivial |
+| Reductions | sum, mean, min, max (along axis) | ? Yes ï¿½ parallel reduce |
+| Comparisons | eq, ne, lt, le, gt, ge, where | ? Yes ï¿½ trivial |
+| Spatial | convolve2d, dilate, erode | ? Yes ï¿½ row-parallel |
+| Spatial | flood_fill | ? No ï¿½ BFS frontier |
+| Shape | reshape, transpose, squeeze, flatten | N/A ï¿½ zero-copy views |
+| Creation | zeros, ones, full, rand, arange | ? Yes ï¿½ trivial |
 
 ### Hot Path: Element-wise Operations
 
-Current implementation in `src/compute/ops.rs` (lines 56–140):
+Current implementation in `src/compute/ops.rs` (lines 56ï¿½140):
 ```rust
 for i in 0..a.size() {
     out.set_f64(i, op(a.get_f64(i), b.get_f64(i)));
 }
 ```
 
-**Cost**: O(n) with per-element f64 conversion overhead. For a 1000×1000
+**Cost**: O(n) with per-element f64 conversion overhead. For a 1000ï¿½1000
 array, that's 1M iterations per operation.
 
 ### Hot Path: Convolution
 
-Current implementation in `src/compute/spatial.rs` (lines 23–44):
+Current implementation in `src/compute/spatial.rs` (lines 23ï¿½44):
 ```rust
 for r in 0..in_rows {
     for c in 0..in_cols {
@@ -47,13 +47,13 @@ for r in 0..in_rows {
 }
 ```
 
-**Cost**: O(rows × cols × kernel_rows × kernel_cols)
-- 512×512 input, 5×5 kernel = **6.5M multiply-accumulate operations**
-- 1024×1024 input, 9×9 kernel = **85M operations**
+**Cost**: O(rows ï¿½ cols ï¿½ kernel_rows ï¿½ kernel_cols)
+- 512ï¿½512 input, 5ï¿½5 kernel = **6.5M multiply-accumulate operations**
+- 1024ï¿½1024 input, 9ï¿½9 kernel = **85M operations**
 
 ### Hot Path: Dilation/Erosion
 
-`src/compute/spatial.rs` (lines 58–90):
+`src/compute/spatial.rs` (lines 58ï¿½90):
 ```rust
 for r in 0..rows {
     for c in 0..cols {
@@ -67,7 +67,7 @@ for r in 0..rows {
 }
 ```
 
-**Cost**: O(rows × cols × radius2)
+**Cost**: O(rows ï¿½ cols ï¿½ radius2)
 
 ---
 
@@ -94,8 +94,8 @@ pub fn par_element_wise(a: &NdArray, b: &NdArray, op: fn(f64, f64) -> f64) -> Nd
 serial is faster due to thread dispatch overhead).
 
 **Expected Speedup**:
-- 4-core: 3–3.5× for 100k+ elements
-- 8-core: 5–7× for 100k+ elements
+- 4-core: 3ï¿½3.5ï¿½ for 100k+ elements
+- 8-core: 5ï¿½7ï¿½ for 100k+ elements
 
 ### Opportunity 2: Row-Parallel Convolution (Effort: LOW)
 
@@ -115,7 +115,7 @@ Parallelize the outer loop of convolution by rows:
 });
 ```
 
-**Expected Speedup**: 4–8× for 256×256+ inputs (sufficient rows to fill threads)
+**Expected Speedup**: 4ï¿½8ï¿½ for 256ï¿½256+ inputs (sufficient rows to fill threads)
 
 ### Opportunity 3: SIMD Vectorization (Effort: Medium)
 
@@ -133,7 +133,7 @@ for chunk in data.chunks_exact(4) {
 }
 ```
 
-**Impact**: 2–4× for f32 ops, less for f64 (wider SIMD lanes)
+**Impact**: 2ï¿½4ï¿½ for f32 ops, less for f64 (wider SIMD lanes)
 
 ### Opportunity 4: GPU Compute Shaders (Effort: HIGH)
 
@@ -154,17 +154,17 @@ fn add(@builtin(global_invocation_id) id: vec3<u32>) {
 }
 ```
 
-**Luna2D Implementation**:
+**Lurek2D Implementation**:
 1. Add compute pipeline to `GpuRenderer` (alongside existing render pipelines)
 2. Create storage buffers for input/output arrays
 3. Dispatch compute shader, read back results
-4. Expose via `luna.compute.gpu_add(a, b)` or automatic GPU offload for large arrays
+4. Expose via `lurek.compute.gpu_add(a, b)` or automatic GPU offload for large arrays
 
-**Expected Speedup**: 10–100× for 100k+ elements (GPU has hundreds of ALUs)
+**Expected Speedup**: 10ï¿½100ï¿½ for 100k+ elements (GPU has hundreds of ALUs)
 
 **When Worth It**: Arrays with 100k+ elements AND operations that are
 compute-bound (convolution, matmul). Not worth it for small arrays due to
-CPU-GPU transfer overhead (~0.1–1ms per transfer).
+CPU-GPU transfer overhead (~0.1ï¿½1ms per transfer).
 
 **Candidate Operations for GPU**:
 | Operation | GPU Benefit | Transfer Cost |
@@ -183,10 +183,10 @@ CPU-GPU transfer overhead (~0.1–1ms per transfer).
 ### Current Architecture
 
 Column-major tabular data with SQL-style query support. Operations:
-- `filter()` — linear scan, O(n)
-- `sort()` — TimSort, O(n log n)
-- `select_columns()` — projection, O(columns)
-- SQL parsing — recursive descent, O(query_length)
+- `filter()` ï¿½ linear scan, O(n)
+- `sort()` ï¿½ TimSort, O(n log n)
+- `select_columns()` ï¿½ projection, O(columns)
+- SQL parsing ï¿½ recursive descent, O(query_length)
 
 ### Opportunity 1: Parallel Sort (Effort: Low)
 
@@ -200,7 +200,7 @@ indices.par_sort_by(|a, b| compare_fn(a, b));
 ```
 
 **Threshold**: Only beneficial for 100k+ rows.
-**Expected Speedup**: 2–3× on 4 cores for 1M rows.
+**Expected Speedup**: 2ï¿½3ï¿½ on 4 cores for 1M rows.
 
 ### Opportunity 2: Parallel Filter (Effort: Low)
 
@@ -239,17 +239,17 @@ rayon = "1.10"
 ```
 
 **Modules that benefit**:
-- `compute/ops.rs` — element-wise operations
-- `compute/spatial.rs` — convolution, dilation, erosion
-- `dataframe/query.rs` — sort, filter
-- `particle/system.rs` — particle updates
-- `ai/influence_map.rs` — map propagation
+- `compute/ops.rs` ï¿½ element-wise operations
+- `compute/spatial.rs` ï¿½ convolution, dilation, erosion
+- `dataframe/query.rs` ï¿½ sort, filter
+- `particle/system.rs` ï¿½ particle updates
+- `ai/influence_map.rs` ï¿½ map propagation
 
 **Binary cost**: rayon is already linked (transitive). Explicit dependency adds zero bytes.
 
 ### Threshold Strategy
 
-Never parallelize unconditionally — always check data size:
+Never parallelize unconditionally ï¿½ always check data size:
 
 ```rust
 const RAYON_THRESHOLD: usize = 10_000;
@@ -270,8 +270,8 @@ fn element_wise_op(a: &NdArray, b: &NdArray, op: fn(f64, f64) -> f64) -> NdArray
 | 1 | Add wgpu compute pipeline infrastructure | Medium |
 | 2 | Implement element-wise GPU ops (add, mul) | Medium |
 | 3 | Implement GPU convolution 2D | High |
-| 4 | Automatic CPU›GPU offload for large arrays | High |
-| 5 | Expose via `luna.compute.gpuAdd()` Lua API | Low |
+| 4 | Automatic CPUï¿½GPU offload for large arrays | High |
+| 5 | Expose via `lurek.compute.gpuAdd()` Lua API | Low |
 
 ---
 
@@ -279,11 +279,11 @@ fn element_wise_op(a: &NdArray, b: &NdArray, op: fn(f64, f64) -> f64) -> NdArray
 
 | Opportunity | Module | Data Size Threshold | Effort | Speedup |
 |-------------|--------|---------------------|--------|---------|
-| Rayon element-wise | compute | 10k+ elements | Low | 4–8× |
-| Rayon convolution | compute | 256×256+ | Low | 4–8× |
-| Rayon dilation/erosion | compute | 256×256+ | Low | 4–8× |
-| SIMD vectorization | compute | Always (f32) | Medium | 2–4× |
-| Rayon parallel sort | dataframe | 100k+ rows | Low | 2–3× |
-| Rayon parallel filter | dataframe | 100k+ rows | Low | 2–3× |
-| GPU compute element-wise | compute | 100k+ elements | High | 10–100× |
-| GPU convolution 2D | compute | 512×512+ | High | 50–200× |
+| Rayon element-wise | compute | 10k+ elements | Low | 4ï¿½8ï¿½ |
+| Rayon convolution | compute | 256ï¿½256+ | Low | 4ï¿½8ï¿½ |
+| Rayon dilation/erosion | compute | 256ï¿½256+ | Low | 4ï¿½8ï¿½ |
+| SIMD vectorization | compute | Always (f32) | Medium | 2ï¿½4ï¿½ |
+| Rayon parallel sort | dataframe | 100k+ rows | Low | 2ï¿½3ï¿½ |
+| Rayon parallel filter | dataframe | 100k+ rows | Low | 2ï¿½3ï¿½ |
+| GPU compute element-wise | compute | 100k+ elements | High | 10ï¿½100ï¿½ |
+| GPU convolution 2D | compute | 512ï¿½512+ | High | 50ï¿½200ï¿½ |

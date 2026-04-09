@@ -2,7 +2,7 @@
 
 ## Current Monolith
 
-Today Luna2D is a single Cargo binary crate:
+Today Lurek2D is a single Cargo binary crate:
 
 ```
 src/
@@ -38,10 +38,10 @@ Binary size: ~20 MB (release, stripped).
 ### Layer 1 — Cargo Workspace (compile-time crate boundaries)
 
 ```
-luna2d/                       ← Cargo workspace root
+lurek2d/                       ← Cargo workspace root
 ├── Cargo.toml                ← [workspace] members
 ├── crates/
-│   ├── luna2d-core/          ← lib crate: Baseline + Tier 1 + bridge
+│   ├── lurek2d-core/          ← lib crate: Baseline + Tier 1 + bridge
 │   │   ├── Cargo.toml
 │   │   └── src/
 │   │       ├── lib.rs
@@ -55,12 +55,12 @@ luna2d/                       ← Cargo workspace root
 │   │       ├── ... (all Tier 1 modules)
 │   │       └── lua_api/      ← Core bindings only
 │   │
-│   ├── luna2d-plugin-api/    ← Tiny interface crate (C-ABI types + version)
+│   ├── lurek2d-plugin-api/    ← Tiny interface crate (C-ABI types + version)
 │   │   ├── Cargo.toml
 │   │   └── src/lib.rs        ← PluginDecl, PLUGIN_API_VERSION, PluginRegistrar trait
 │   │
-│   ├── luna2d-gamedev/       ← cdylib: Tier 2 game modules
-│   │   ├── Cargo.toml        ← depends on luna2d-plugin-api + mlua/module
+│   ├── lurek2d-gamedev/       ← cdylib: Tier 2 game modules
+│   │   ├── Cargo.toml        ← depends on lurek2d-plugin-api + mlua/module
 │   │   └── src/
 │   │       ├── lib.rs        ← exports luaopen_luna_gamedev
 │   │       ├── particle/
@@ -71,7 +71,7 @@ luna2d/                       ← Cargo workspace root
 │   │       ├── gui/
 │   │       └── ... (all Tier 2 game modules + their *_api.rs bindings)
 │   │
-│   ├── luna2d-business/      ← cdylib: business/data domain
+│   ├── lurek2d-business/      ← cdylib: business/data domain
 │   │   ├── Cargo.toml
 │   │   └── src/
 │   │       ├── lib.rs        ← exports luaopen_luna_business
@@ -80,13 +80,13 @@ luna2d/                       ← Cargo workspace root
 │   │       ├── graph/
 │   │       └── ...
 │   │
-│   └── luna2d-bin/           ← binary crate: thin main.rs
-│       ├── Cargo.toml        ← depends on luna2d-core
+│   └── lurek2d-bin/           ← binary crate: thin main.rs
+│       ├── Cargo.toml        ← depends on lurek2d-core
 │       └── src/main.rs       ← CLI parse, plugin discovery, event loop
 │
 ├── plugins/                  ← Runtime plugin drop folder
-│   ├── luna_gamedev.dll      ← built from luna2d-gamedev
-│   ├── luna_business.dll     ← built from luna2d-business
+│   ├── luna_gamedev.dll      ← built from lurek2d-gamedev
+│   ├── luna_business.dll     ← built from lurek2d-business
 │   └── ...                   ← third-party plugins
 │
 └── library/                  ← Tier 3 pure-Lua (unchanged)
@@ -96,11 +96,11 @@ luna2d/                       ← Cargo workspace root
 
 | Crate | Modules | Output | Size Est. |
 |-------|---------|--------|-----------|
-| `luna2d-core` | engine, math, graphics, audio, physics, input, timer, filesystem, window, camera, animation, event, image, thread, data, serial, entity, compute, sound, light, savegame, modding, localization, log, devtools, debugbridge, automation, system, docs, network, procgen, raycaster, spine | `libluna2d_core.rlib` (static, linked into bin) | ~15 MB |
-| `luna2d-gamedev` | particle, tilemap, scene, gui, overlay/fx, minimap, pathfinding, ai, graph, pipeline, patterns, terminal | `luna_gamedev.dll` | ~3 MB |
-| `luna2d-business` | dataframe (extended), pipeline (extended), graph (extended), reporting, analytics | `luna_business.dll` | ~2 MB |
-| `luna2d-bin` | main.rs only | `luna2d.exe` | ~15 MB (links core statically) |
-| `luna2d-plugin-api` | C-ABI interface types | header-only-equivalent | ~10 KB |
+| `lurek2d-core` | engine, math, graphics, audio, physics, input, timer, filesystem, window, camera, animation, event, image, thread, data, serial, entity, compute, sound, light, savegame, modding, localization, log, devtools, debugbridge, automation, system, docs, network, procgen, raycaster, spine | `libluna2d_core.rlib` (static, linked into bin) | ~15 MB |
+| `lurek2d-gamedev` | particle, tilemap, scene, gui, overlay/fx, minimap, pathfinding, ai, graph, pipeline, patterns, terminal | `luna_gamedev.dll` | ~3 MB |
+| `lurek2d-business` | dataframe (extended), pipeline (extended), graph (extended), reporting, analytics | `luna_business.dll` | ~2 MB |
+| `lurek2d-bin` | main.rs only | `lurek2d.exe` | ~15 MB (links core statically) |
+| `lurek2d-plugin-api` | C-ABI interface types | header-only-equivalent | ~10 KB |
 
 ---
 
@@ -114,10 +114,10 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│                    luna2d.exe                         │
+│                    lurek2d.exe                         │
 │                                                      │
 │  ┌──────────┐  ┌──────────────────────────────────┐  │
-│  │ main.rs  │  │ luna2d-core (static)             │  │
+│  │ main.rs  │  │ lurek2d-core (static)             │  │
 │  │          │→ │  engine, math, graphics, audio,  │  │
 │  │ CLI args │  │  physics, input, timer, ...      │  │
 │  │ conf.lua │  │  lua_api (core bindings)         │  │
@@ -136,10 +136,10 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
 │  │   gamedev(L)     │  │   business(L)       │       │
 │  │                  │  │                     │       │
 │  │ Registers:       │  │ Registers:          │       │
-│  │  luna.tilemap    │  │  luna.report        │       │
-│  │  luna.scene      │  │  luna.analytics     │       │
-│  │  luna.ai         │  │  luna.workflow      │       │
-│  │  luna.particles  │  │  ...                │       │
+│  │  lurek.tilemap    │  │  lurek.report        │       │
+│  │  lurek.scene      │  │  lurek.analytics     │       │
+│  │  lurek.ai         │  │  lurek.workflow      │       │
+│  │  lurek.particles  │  │  ...                │       │
 │  │  ...             │  │                     │       │
 │  └─────────────────┘  └─────────────────────┘       │
 └──────────────────────────────────────────────────────┘
@@ -151,7 +151,7 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
 1. CLI args parsed             → game_path, extra flags
 2. Config loaded               → conf.toml or conf.lua (temp VM)
 3. App::new()                  → winit, wgpu, rodio, GameFS initialized
-4. create_lua_vm()             → LuaJIT VM with core luna.* registered
+4. create_lua_vm()             → LuaJIT VM with core lurek.* registered
 5. Plugin discovery:
    a. Read conf.toml [plugins] → ordered list of plugin names
    b. Scan plugins/ folder     → match names to .dll/.so/.dylib files
@@ -162,8 +162,8 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
       iv.  Call entry:        entry(lua.as_raw_state())
       v.   Log success/failure
 6. Load main.lua               → user game code
-7. luna.init() callback
-8. luna.ready() callback
+7. lurek.init() callback
+8. lurek.ready() callback
 9. Event loop                  → process → render → repeat
 ```
 
@@ -177,7 +177,7 @@ loads each plugin DLL, finds the `luaopen_<name>` symbol, and passes in _its own
 load = ["gamedev", "business"]
 
 # Optional: custom plugin search paths (in addition to ./plugins/)
-search_paths = ["C:/luna2d/plugins", "/usr/local/lib/luna2d/plugins"]
+search_paths = ["C:/lurek2d/plugins", "/usr/local/lib/lurek2d/plugins"]
 
 # Per-plugin configuration (forwarded to the plugin's init function)
 [plugins.gamedev]
@@ -234,7 +234,7 @@ The host checks `LUNA_PLUGIN_API_VERSION` at load time. Mismatch → skip + log 
 
 ```toml
 [package]
-name = "luna2d-gamedev"
+name = "lurek2d-gamedev"
 version = "0.1.0"
 edition = "2021"
 
@@ -243,7 +243,7 @@ crate-type = ["cdylib"]  # produces .dll / .so / .dylib
 
 [dependencies]
 mlua = { version = "0.9", features = ["luajit", "module"] }
-luna2d-plugin-api = { path = "../luna2d-plugin-api" }
+lurek2d-plugin-api = { path = "../lurek2d-plugin-api" }
 ```
 
 ### src/lib.rs
@@ -255,8 +255,8 @@ use mlua::prelude::*;
 #[no_mangle]
 pub static LUNA_PLUGIN_API_VERSION: u32 = luna2d_plugin_api::API_VERSION;
 
-/// Entry point called by the Luna2D host.
-/// Receives the host's lua_State* and registers luna.tilemap, luna.scene, etc.
+/// Entry point called by the Lurek2D host.
+/// Receives the host's lua_State* and registers lurek.tilemap, lurek.scene, etc.
 #[no_mangle]
 pub unsafe extern "C" fn luaopen_luna_gamedev(L: *mut mlua::lua_State) -> i32 {
     // Safety: L is a valid lua_State* owned by the host. We borrow it.
@@ -271,9 +271,9 @@ pub unsafe extern "C" fn luaopen_luna_gamedev(L: *mut mlua::lua_State) -> i32 {
 }
 
 fn register_all(lua: &Lua) -> LuaResult<()> {
-    let luna: LuaTable = lua.globals().get("luna")?;
+    let luna: LuaTable = lua.globals().get("lurek")?;
 
-    // Each sub-module registers into the existing luna.* namespace
+    // Each sub-module registers into the existing lurek.* namespace
     tilemap::register(lua, &luna)?;
     scene::register(lua, &luna)?;
     ai::register(lua, &luna)?;
@@ -306,20 +306,20 @@ Core `lua_api` modules receive `Rc<RefCell<SharedState>>`. Plugins loaded as DLL
 
 Plugin does not access `SharedState`. It only uses `lua_State*` to:
 - Create tables and functions
-- Read/write Lua globals and `luna.*` subtables
-- Call existing `luna.*` functions from within Rust (via `luna.gfx.draw(...)`)
+- Read/write Lua globals and `lurek.*` subtables
+- Call existing `lurek.*` functions from within Rust (via `lurek.gfx.draw(...)`)
 
 This covers 90% of use cases. A tilemap plugin doesn't need `SharedState` directly —
-it manages its own grid data and calls `luna.gfx.drawQuad()` to render tiles.
+it manages its own grid data and calls `lurek.gfx.drawQuad()` to render tiles.
 
 #### Solution 2 — Serialized State Snapshot (Phase 3)
 
-Host serializes key state slices into a Lua table (`luna._host_state`) that plugins can
+Host serializes key state slices into a Lua table (`lurek._host_state`) that plugins can
 read. Read-only, refreshed per frame:
 
 ```lua
 -- Available to plugins (set by host before plugin functions execute)
-luna._host_state = {
+lurek._host_state = {
     delta_time = 0.016,
     window_width = 1280,
     window_height = 720,
@@ -352,67 +352,67 @@ GPU queueing and resource management from plugins.
 
 ## Module Classification for Split
 
-### Always in `luna2d-core` (Baseline + Tier 1)
+### Always in `lurek2d-core` (Baseline + Tier 1)
 
 These form the minimal runtime. A script with just these is a complete app:
 
-| Module | luna.* namespace | Justification |
+| Module | lurek.* namespace | Justification |
 |--------|-----------------|---------------|
 | engine | (internal) | SharedState, Config, App — cannot be external |
-| math | luna.math | Leaf dependency, used everywhere |
-| graphics | luna.gfx | Core renderer — plugins draw via it |
-| audio | luna.audio | Core audio — plugins play via it |
-| physics | luna.physics | Core physics — fundamental subsystem |
-| input | luna.keyboard/mouse/gamepad | Core input — cannot be deferred |
-| timer | luna.time | Frame timing — fundamental |
-| window | luna.window | Window state — fundamental |
-| camera | luna.camera | View transform — needed by renderer |
-| filesystem | luna.fs | Sandboxed I/O — needed before plugins load |
-| event | luna.signal | Event bus — inter-module communication |
-| image | luna.img | CPU image ops — used by texture loading |
-| data | luna.data | Binary data — used by serialization |
-| serial | luna.codec | Format I/O — used by config loading |
-| entity | luna.entity | ECS — used by many higher modules |
-| savegame | luna.savegame | Save/load — core lifecycle |
-| log | luna.log | Logging — must be available immediately |
-| system | luna.platform | OS queries — boot-time |
-| modding | luna.modding | Mod discovery — affects asset search |
-| localization | luna.localization | L10n — needed early |
-| thread | luna.thread | Workers — core concurrency |
-| animation | luna.tween | Sprite animation — tight gfx coupling |
-| light | luna.light | 2D lighting — tight gfx coupling |
+| math | lurek.math | Leaf dependency, used everywhere |
+| graphics | lurek.gfx | Core renderer — plugins draw via it |
+| audio | lurek.audio | Core audio — plugins play via it |
+| physics | lurek.physics | Core physics — fundamental subsystem |
+| input | lurek.keyboard/mouse/gamepad | Core input — cannot be deferred |
+| timer | lurek.time | Frame timing — fundamental |
+| window | lurek.window | Window state — fundamental |
+| camera | lurek.camera | View transform — needed by renderer |
+| filesystem | lurek.fs | Sandboxed I/O — needed before plugins load |
+| event | lurek.signal | Event bus — inter-module communication |
+| image | lurek.img | CPU image ops — used by texture loading |
+| data | lurek.data | Binary data — used by serialization |
+| serial | lurek.codec | Format I/O — used by config loading |
+| entity | lurek.entity | ECS — used by many higher modules |
+| savegame | lurek.savegame | Save/load — core lifecycle |
+| log | lurek.log | Logging — must be available immediately |
+| system | lurek.platform | OS queries — boot-time |
+| modding | lurek.modding | Mod discovery — affects asset search |
+| localization | lurek.localization | L10n — needed early |
+| thread | lurek.thread | Workers — core concurrency |
+| animation | lurek.tween | Sprite animation — tight gfx coupling |
+| light | lurek.light | 2D lighting — tight gfx coupling |
 
-### `luna2d-gamedev` Plugin (Tier 2 Game)
+### `lurek2d-gamedev` Plugin (Tier 2 Game)
 
-| Module | luna.* namespace | Justification |
+| Module | lurek.* namespace | Justification |
 |--------|-----------------|---------------|
-| particle | luna.particles | Visual effect — not required for all apps |
-| tilemap | luna.tilemap | Genre-specific (RPG, strategy) |
-| scene | luna.scene | Scene management — optional pattern |
-| gui | luna.ui | Retained UI — many games use immediate |
-| overlay/fx | luna.postfx | Post-processing — optional visual layer |
-| minimap | luna.minimap | Genre-specific |
-| pathfinding | luna.pathfinding | Genre-specific (RPG, RTS) |
-| ai | luna.ai | Genre-specific |
-| graph | luna.graph | Specialized data structure |
-| pipeline | luna.pipeline | DAG orchestration |
-| patterns | luna.patterns | Design pattern helpers |
-| terminal | luna.terminal | Text-mode emulator |
-| raycaster | luna.raycaster | Retro rendering technique |
-| spine | luna.spine | Skeletal animation format |
-| procgen | luna.procgen | Procedural generation |
+| particle | lurek.particles | Visual effect — not required for all apps |
+| tilemap | lurek.tilemap | Genre-specific (RPG, strategy) |
+| scene | lurek.scene | Scene management — optional pattern |
+| gui | lurek.ui | Retained UI — many games use immediate |
+| overlay/fx | lurek.postfx | Post-processing — optional visual layer |
+| minimap | lurek.minimap | Genre-specific |
+| pathfinding | lurek.pathfinding | Genre-specific (RPG, RTS) |
+| ai | lurek.ai | Genre-specific |
+| graph | lurek.graph | Specialized data structure |
+| pipeline | lurek.pipeline | DAG orchestration |
+| patterns | lurek.patterns | Design pattern helpers |
+| terminal | lurek.terminal | Text-mode emulator |
+| raycaster | lurek.raycaster | Retro rendering technique |
+| spine | lurek.spine | Skeletal animation format |
+| procgen | lurek.procgen | Procedural generation |
 
-### `luna2d-business` Plugin (Tier 2 Business)
+### `lurek2d-business` Plugin (Tier 2 Business)
 
-| Module | luna.* namespace | Justification |
+| Module | lurek.* namespace | Justification |
 |--------|-----------------|---------------|
-| dataframe | luna.dataframe | Tabular data processing |
-| pipeline | luna.pipeline | Workflow automation |
-| graph | luna.graph | Network/dependency analysis |
-| (new) reporting | luna.report | Report generation |
-| (new) analytics | luna.analytics | Event tracking and metrics |
-| (new) workflow | luna.workflow | Business process automation |
-| (new) dashboard | luna.dashboard | Data visualization widgets |
+| dataframe | lurek.dataframe | Tabular data processing |
+| pipeline | lurek.pipeline | Workflow automation |
+| graph | lurek.graph | Network/dependency analysis |
+| (new) reporting | lurek.report | Report generation |
+| (new) analytics | lurek.analytics | Event tracking and metrics |
+| (new) workflow | lurek.workflow | Business process automation |
+| (new) dashboard | lurek.dashboard | Data visualization widgets |
 
 ### Pure Lua Libraries (Tier 3, unchanged)
 
@@ -453,17 +453,17 @@ function discover_plugins(conf: Config) -> Vec<PluginInfo>:
 ## Dependency Graph After Split
 
 ```
-luna2d-plugin-api          (no deps — pure types)
+lurek2d-plugin-api          (no deps — pure types)
         ↑
         │
-luna2d-core                (mlua/luajit/vendored, wgpu, winit, rodio, ...)
+lurek2d-core                (mlua/luajit/vendored, wgpu, winit, rodio, ...)
         ↑                  ↑ (interface only)
         │                  │
-luna2d-bin ─────────────── │ ──→ libloading (runtime DLL loading)
+lurek2d-bin ─────────────── │ ──→ libloading (runtime DLL loading)
                            │
-luna2d-gamedev ────────────┘ (mlua/module, cdylib)
-luna2d-business ───────────┘ (mlua/module, cdylib)
+lurek2d-gamedev ────────────┘ (mlua/module, cdylib)
+lurek2d-business ───────────┘ (mlua/module, cdylib)
 ```
 
-**Key rule**: Plugin crates depend on `luna2d-plugin-api` only, never on `luna2d-core`.
+**Key rule**: Plugin crates depend on `lurek2d-plugin-api` only, never on `lurek2d-core`.
 They get their Lua handle from the raw `lua_State*` pointer.

@@ -1,6 +1,6 @@
 -- Rhythm Game Demo — 4-lane note highway with timing windows
 -- Keys: D, F, J, K to hit notes | Space to start/restart | Escape to quit
--- Run with: cargo run -- demos/sports/rhythm_game
+-- Run with: cargo run -- content/demos/sports/rhythm_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -76,9 +76,9 @@ local function addFeedback(x, text, r, g, b)
     table.insert(feedbacks, { x = x, y = hitY - 40, text = text, alpha = 1.5, r = r, g = g, b = b })
 end
 
-function luna.init()
-    luna.window.setTitle("Rhythm Game")
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Rhythm Game")
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
     local screenW = 800
     local totalWidth = #lanes * laneWidth
     local startX = (screenW - totalWidth) / 2
@@ -88,7 +88,7 @@ function luna.init()
     hitY = 520
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if not started then return end
     gameTime = gameTime + dt
 
@@ -183,26 +183,26 @@ local function tryHit(laneIdx)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- draw lanes
     for i, lane in ipairs(lanes) do
-        luna.gfx.setColor(0.15, 0.15, 0.2, 1)
-        luna.gfx.rectangle("fill", lane.x, 0, laneWidth, 600)
-        luna.gfx.setColor(0.25, 0.25, 0.35, 1)
-        luna.gfx.rectangle("line", lane.x, 0, laneWidth, 600)
+        lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
+        lurek.gfx.rectangle("fill", lane.x, 0, laneWidth, 600)
+        lurek.gfx.setColor(0.25, 0.25, 0.35, 1)
+        lurek.gfx.rectangle("line", lane.x, 0, laneWidth, 600)
     end
 
     -- hit zone
-    luna.gfx.setColor(1, 1, 1, 0.3)
+    lurek.gfx.setColor(1, 1, 1, 0.3)
     for _, lane in ipairs(lanes) do
-        luna.gfx.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
+        lurek.gfx.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
     end
 
     -- draw flashes
     for _, fl in ipairs(flashes) do
         local a = clamp(fl.alpha, 0, 1)
-        luna.gfx.setColor(fl.r, fl.g, fl.b, a * 0.5)
-        luna.gfx.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
+        lurek.gfx.setColor(fl.r, fl.g, fl.b, a * 0.5)
+        lurek.gfx.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
     end
 
     -- draw notes
@@ -210,57 +210,57 @@ function luna.render()
         if not n.hit then
             local c = lanes[n.lane].color
             if n.missed then
-                luna.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+                lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
             else
-                luna.gfx.setColor(c[1], c[2], c[3], 1)
+                lurek.gfx.setColor(c[1], c[2], c[3], 1)
             end
-            luna.gfx.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
+            lurek.gfx.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
         end
     end
 
     -- key labels
-    luna.gfx.setColor(1, 1, 1, 0.8)
+    lurek.gfx.setColor(1, 1, 1, 0.8)
     for i, lane in ipairs(lanes) do
-        luna.gfx.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
+        lurek.gfx.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
     end
 
     -- feedbacks
     for _, fb in ipairs(feedbacks) do
         local a = clamp(fb.alpha, 0, 1)
-        luna.gfx.setColor(fb.r, fb.g, fb.b, a)
-        luna.gfx.print(fb.text, fb.x - 20, fb.y)
+        lurek.gfx.setColor(fb.r, fb.g, fb.b, a)
+        lurek.gfx.print(fb.text, fb.x - 20, fb.y)
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("SCORE: " .. score, 10, 10)
-    luna.gfx.print("COMBO: " .. combo, 10, 30)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("SCORE: " .. score, 10, 10)
+    lurek.gfx.print("COMBO: " .. combo, 10, 30)
     local mult = clamp(math.floor(combo / 10) + 1, 1, 4)
-    luna.gfx.print("x" .. mult, 10, 50)
-    luna.gfx.print("BPM: " .. bpm, 680, 10)
+    lurek.gfx.print("x" .. mult, 10, 50)
+    lurek.gfx.print("BPM: " .. bpm, 680, 10)
     local accuracy = 0
     if totalNotes > 0 then
         accuracy = math.floor((hitNotes / totalNotes) * 100)
     end
-    luna.gfx.print("ACC: " .. accuracy .. "%", 680, 30)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 680, 50)
+    lurek.gfx.print("ACC: " .. accuracy .. "%", 680, 30)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 680, 50)
 
     if not started then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 200, 220, 400, 180)
-        luna.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 200, 220, 400, 180)
+        lurek.gfx.setColor(1, 1, 1, 1)
         if gameTime > 0 then
-            luna.gfx.print("SONG COMPLETE!", 310, 240, 1.5)
-            luna.gfx.print("Score: " .. score, 320, 280)
-            luna.gfx.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
-            luna.gfx.print("Max Combo: " .. maxCombo, 320, 340)
+            lurek.gfx.print("SONG COMPLETE!", 310, 240, 1.5)
+            lurek.gfx.print("Score: " .. score, 320, 280)
+            lurek.gfx.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
+            lurek.gfx.print("Max Combo: " .. maxCombo, 320, 340)
         end
-        luna.gfx.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
+        lurek.gfx.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "space" then resetGame() return end
     for i, lane in ipairs(lanes) do
         if key == lane.key then tryHit(i) end

@@ -5,7 +5,7 @@ Aim with A/D, build power with the oscillating bar, and release at the right mom
 
 ## What It Demonstrates
 
-- `luna.keypressed()` — aim adjustment and shot release
+- `lurek.keypressed()` — aim adjustment and shot release
 - Oscillating power bar mechanic
 - Rolling physics with wind drift and friction
 - Obstacle types: trees (bounce), water (penalty), bunkers (slow)

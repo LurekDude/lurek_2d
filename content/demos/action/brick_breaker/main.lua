@@ -1,7 +1,7 @@
 -- Brick Breaker (Arkanoid)
 -- Mouse to move paddle. Ball bounces off bricks, walls, paddle.
 -- Power-ups: wider paddle, multi-ball, slow ball. 3 lives.
--- Run with: cargo run -- demos/action/brick_breaker
+-- Run with: cargo run -- content/demos/action/brick_breaker
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -67,7 +67,7 @@ local function spawn_particles(x, y, r, g, b, count)
     end
 end
 
-function luna.init()
+function lurek.init()
     paddle = { x = W / 2 - 50, y = H - 40, w = 100, h = 12 }
     balls = { make_ball(W / 2, H - 60, 180, -220) }
     powerups = {}
@@ -83,11 +83,11 @@ function luna.init()
     make_bricks(1)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if state.game_over then return end
 
     -- paddle follows mouse
-    local mx = luna.mouse.getPosition()
+    local mx = lurek.mouse.getPosition()
     paddle.x = clamp(mx - paddle.w / 2, 0, W - paddle.w)
 
     -- wide paddle timer
@@ -240,15 +240,15 @@ function luna.process(dt)
     for i = #dead_p, 1, -1 do table.remove(particles, dead_p[i]) end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if state.serving and not state.game_over then
         state.serving = false
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if key == "space" and state.serving then state.serving = false end
 end
 
@@ -258,94 +258,94 @@ local function brick_color(hp)
     return 0.3, 0.9, 0.3
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.08, 0.08, 0.14)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.14)
 
     -- bricks
     for _, brick in ipairs(bricks) do
         if brick.alive then
             local r, g, b = brick_color(brick.hp)
-            luna.gfx.setColor(r, g, b, 1)
-            luna.gfx.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
-            luna.gfx.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
-            luna.gfx.rectangle("line", brick.x, brick.y, brick.w, brick.h)
+            lurek.gfx.setColor(r, g, b, 1)
+            lurek.gfx.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
+            lurek.gfx.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
+            lurek.gfx.rectangle("line", brick.x, brick.y, brick.w, brick.h)
         end
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life * 3, 0, 1)
-        luna.gfx.setColor(p.r, p.g, p.b, a)
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.setColor(p.r, p.g, p.b, a)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- powerups
     for _, pu in ipairs(powerups) do
-        if pu.type == "wide" then luna.gfx.setColor(0.2, 0.6, 1, 1)
-        elseif pu.type == "multi" then luna.gfx.setColor(1, 0.4, 1, 1)
-        else luna.gfx.setColor(0.4, 1, 0.4, 1) end
-        luna.gfx.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
-        luna.gfx.setColor(1, 1, 1, 0.8)
+        if pu.type == "wide" then lurek.gfx.setColor(0.2, 0.6, 1, 1)
+        elseif pu.type == "multi" then lurek.gfx.setColor(1, 0.4, 1, 1)
+        else lurek.gfx.setColor(0.4, 1, 0.4, 1) end
+        lurek.gfx.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
+        lurek.gfx.setColor(1, 1, 1, 0.8)
         local label = pu.type:sub(1, 1):upper()
-        luna.gfx.print(label, pu.x - 3, pu.y)
+        lurek.gfx.print(label, pu.x - 3, pu.y)
     end
 
     -- paddle
-    luna.gfx.setColor(0.3, 0.5, 1, 1)
-    luna.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
+    lurek.gfx.setColor(0.3, 0.5, 1, 1)
+    lurek.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
     if state.wide_timer > 0 then
-        luna.gfx.setColor(0.5, 0.8, 1, 0.4)
-        luna.gfx.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
+        lurek.gfx.setColor(0.5, 0.8, 1, 0.4)
+        lurek.gfx.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
     end
 
     -- balls
     for _, ball in ipairs(balls) do
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.circle("fill", ball.x, ball.y, ball.radius)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.circle("fill", ball.x, ball.y, ball.radius)
         if state.slow_timer > 0 then
-            luna.gfx.setColor(0.4, 1, 0.4, 0.3)
-            luna.gfx.circle("fill", ball.x, ball.y, ball.radius + 3)
+            lurek.gfx.setColor(0.4, 1, 0.4, 0.3)
+            lurek.gfx.circle("fill", ball.x, ball.y, ball.radius + 3)
         end
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Score: " .. state.score, 10, 10)
-    luna.gfx.print("Level: " .. state.level, 10, 30)
-    luna.gfx.print("Combo: x" .. state.combo, W / 2 - 30, 10)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Score: " .. state.score, 10, 10)
+    lurek.gfx.print("Level: " .. state.level, 10, 30)
+    lurek.gfx.print("Combo: x" .. state.combo, W / 2 - 30, 10)
 
     -- lives
-    luna.gfx.setColor(1, 0.3, 0.3, 1)
+    lurek.gfx.setColor(1, 0.3, 0.3, 1)
     for i = 1, state.lives do
-        luna.gfx.circle("fill", W - 20 * i, 20, 7)
+        lurek.gfx.circle("fill", W - 20 * i, 20, 7)
     end
 
     -- serving prompt
     if state.serving and not state.game_over then
-        luna.gfx.setColor(1, 1, 0.5, 0.7 + math.sin(luna.time.getTime() * 5) * 0.3)
-        luna.gfx.print("Click or press Space to launch!", W / 2 - 100, H / 2)
+        lurek.gfx.setColor(1, 1, 0.5, 0.7 + math.sin(lurek.time.getTime() * 5) * 0.3)
+        lurek.gfx.print("Click or press Space to launch!", W / 2 - 100, H / 2)
     end
 
     -- active effects
     if state.wide_timer > 0 then
-        luna.gfx.setColor(0.2, 0.6, 1, 0.8)
-        luna.gfx.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
+        lurek.gfx.setColor(0.2, 0.6, 1, 0.8)
+        lurek.gfx.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
     end
     if state.slow_timer > 0 then
-        luna.gfx.setColor(0.4, 1, 0.4, 0.8)
-        luna.gfx.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
+        lurek.gfx.setColor(0.4, 1, 0.4, 0.8)
+        lurek.gfx.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
     end
 
     -- game over
     if state.game_over then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
-        luna.gfx.setColor(1, 0.3, 0.3, 1)
-        luna.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
+        lurek.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
     end
 
-    luna.gfx.setColor(0.5, 0.5, 0.5, 0.5)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 70, H - 20)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.5)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 70, H - 20)
 end

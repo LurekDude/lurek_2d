@@ -1,6 +1,6 @@
 ---
 name: create-roadmap-phase
-description: Create a new Luna2D roadmap phase file with all required metadata, tasks, and acceptance gates.
+description: Create a new Lurek2D roadmap phase file with all required metadata, tasks, and acceptance gates.
 ---
 
 # Create Roadmap Phase

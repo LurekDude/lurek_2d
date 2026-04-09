@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.network`                                       |
+| **Lua API**    | `lurek.network`                                       |
 | **Source**      | `src/network/`                                       |
 | **Rust Tests** | `tests/rust/unit/network_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_network.lua`                    |
@@ -12,14 +12,14 @@
 
 ## Summary
 
-The `network` module provides UDP networking for peer-to-peer and client-server multiplayer games via the ENet protocol. It wraps the `rusty_enet` crate behind a safe Rust API (`NetworkHost`) that the Lua binding layer consumes. A `NetworkHost` binds to a local UDP socket and acts simultaneously as server (accepting incoming connections) and client (initiating outgoing connections). All I/O is driven by a single `service()` event pump that returns typed `NetworkEvent` values (`Connect`, `Disconnect`, `Receive`). Packets are delivered over numbered channels with configurable reliability (reliable ordered or unreliable sequenced). The module enforces a hard ceiling of 8 simultaneous peers (`MAX_PEERS`) targeting small-scale multiplayer (LAN co-op, local tournaments). Constants for peer limits, channel counts, and their defaults live in `constants.rs`. Error handling uses a dedicated `NetworkError` enum with six variants covering peer limits, I/O failures, ENet internals, destroyed hosts, invalid peers, and address parsing. The Lua API is exposed under `luna.network` with a single factory function `newHost` that accepts an options table and returns a `NetworkHost` UserData object with 22 methods. The Lua tests also verify a `luna.net` / `enet` compatibility surface that mirrors raw ENet function signatures for LÖVE portability.
+The `network` module provides UDP networking for peer-to-peer and client-server multiplayer games via the ENet protocol. It wraps the `rusty_enet` crate behind a safe Rust API (`NetworkHost`) that the Lua binding layer consumes. A `NetworkHost` binds to a local UDP socket and acts simultaneously as server (accepting incoming connections) and client (initiating outgoing connections). All I/O is driven by a single `service()` event pump that returns typed `NetworkEvent` values (`Connect`, `Disconnect`, `Receive`). Packets are delivered over numbered channels with configurable reliability (reliable ordered or unreliable sequenced). The module enforces a hard ceiling of 8 simultaneous peers (`MAX_PEERS`) targeting small-scale multiplayer (LAN co-op, local tournaments). Constants for peer limits, channel counts, and their defaults live in `constants.rs`. Error handling uses a dedicated `NetworkError` enum with six variants covering peer limits, I/O failures, ENet internals, destroyed hosts, invalid peers, and address parsing. The Lua API is exposed under `lurek.network` with a single factory function `newHost` that accepts an options table and returns a `NetworkHost` UserData object with 22 methods. The Lua tests also verify a `lurek.net` / `enet` compatibility surface that mirrors raw ENet function signatures for LÖVE portability.
 
 **Scope boundary**: This module handles transport only — UDP packet delivery, connection lifecycle, and bandwidth control. It does not provide encryption, matchmaking, game protocol serialization, or NAT traversal. Higher-level networking logic is implemented in Lua game scripts.
 
 ## Architecture
 
 ```
-luna.network.newHost(opts)                    luna.net.host_create(addr, peers, channels, in, out)
+lurek.network.newHost(opts)                    lurek.net.host_create(addr, peers, channels, in, out)
         │                                              │
         ▼                                              ▼
 ┌──────────────────── network_api.rs ──────────────────────────┐
@@ -89,7 +89,7 @@ ENet host wrapper providing the safe Rust API consumed by Lua bindings.
 
 #### `network::host::NetworkHost`
 
-Wraps a `rusty_enet::Host<UdpSocket>` with Luna2D-specific defaults and limit enforcement. Created once per logical network endpoint (server or client). The caller must pump `service()` every frame to process I/O. Fields: `inner: Option<Host<UdpSocket>>` (becomes `None` after `destroy()`), `local_addr: SocketAddr`. Key methods: `new()`, `service()`, `connect()`, `send()`, `send_bytes()`, `broadcast()`, `broadcast_bytes()`, `flush()`, `disconnect()`, `disconnect_now()`, `disconnect_later()`, `reset_peer()`, `ping()`, `round_trip_time()`, `peer_state()`, `peer_address()`, `local_address()`, `peer_limit()`, `channel_limit()`, `set_channel_limit()`, `bandwidth_limit()`, `set_bandwidth_limit()`, `connected_peer_count()`, `destroy()`, `is_destroyed()`, `connected_peer_ids()`, `peer_stats()`.
+Wraps a `rusty_enet::Host<UdpSocket>` with Lurek2D-specific defaults and limit enforcement. Created once per logical network endpoint (server or client). The caller must pump `service()` every frame to process I/O. Fields: `inner: Option<Host<UdpSocket>>` (becomes `None` after `destroy()`), `local_addr: SocketAddr`. Key methods: `new()`, `service()`, `connect()`, `send()`, `send_bytes()`, `broadcast()`, `broadcast_bytes()`, `flush()`, `disconnect()`, `disconnect_now()`, `disconnect_later()`, `reset_peer()`, `ping()`, `round_trip_time()`, `peer_state()`, `peer_address()`, `local_address()`, `peer_limit()`, `channel_limit()`, `set_channel_limit()`, `bandwidth_limit()`, `set_bandwidth_limit()`, `connected_peer_count()`, `destroy()`, `is_destroyed()`, `connected_peer_ids()`, `peer_stats()`.
 
 #### `network::host::PeerStats`
 
@@ -118,9 +118,9 @@ Result of a single `NetworkHost::service()` call. Three variants:
 
 ## Lua API
 
-Exposed under `luna.network.*` by `src/lua_api/network_api.rs`. The module is gated by the `modules.network` config flag. The Lua tests also verify a `luna.net` / `enet` compatibility surface with raw ENet function signatures for LÖVE portability.
+Exposed under `lurek.network.*` by `src/lua_api/network_api.rs`. The module is gated by the `modules.network` config flag. The Lua tests also verify a `lurek.net` / `enet` compatibility surface with raw ENet function signatures for LÖVE portability.
 
-### Factory Functions (on `luna.network` table)
+### Factory Functions (on `lurek.network` table)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -172,11 +172,11 @@ Returned by `service()`:
 -- Server: host a game on port 12345 with up to 4 peers
 local server
 
-function luna.init()
-    server = luna.network.newHost({ addr = "0.0.0.0:12345", peers = 4, channels = 2 })
+function lurek.init()
+    server = lurek.network.newHost({ addr = "0.0.0.0:12345", peers = 4, channels = 2 })
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     local event = server:service()
     while event do
         if event.type == "connect" then
@@ -198,12 +198,12 @@ end
 local client
 local peer_id
 
-function luna.init()
-    client = luna.network.newHost()
+function lurek.init()
+    client = lurek.network.newHost()
     peer_id = client:connect("127.0.0.1:12345", 2, 0)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     local event = client:service()
     while event do
         if event.type == "connect" then
@@ -231,17 +231,17 @@ end
 | Module     | Relationship | Notes                                            |
 |------------|--------------|--------------------------------------------------|
 | `engine`   | Imports from | Uses `log_messages` constants and `log_msg!` macro |
-| `lua_api`  | Imported by  | `network_api.rs` binds `NetworkHost` to `luna.network`, also exposes `luna.net` / `enet` compat layer |
+| `lua_api`  | Imported by  | `network_api.rs` binds `NetworkHost` to `lurek.network`, also exposes `lurek.net` / `enet` compat layer |
 | `thread`   | Related      | Worker threads use separate Lua VMs; `NetworkHost` is not `Send` — networking runs on the main thread only |
-| `data`     | Related      | Game protocols may use `luna.data` for binary serialization alongside `luna.network` for transport |
+| `data`     | Related      | Game protocols may use `lurek.data` for binary serialization alongside `lurek.network` for transport |
 
 ## Notes
 
 - **External crate**: `rusty_enet` — a pure-Rust ENet implementation. The host is `!Send` because it wraps a `UdpSocket` bound to the calling thread. All networking must run on the main thread.
-- **Peer limit**: Hard-capped at 8 (`MAX_PEERS`). This is intentional — Luna2D targets LAN/co-op multiplayer, not MMO-scale. Requesting more than 8 peers returns `NetworkError::PeerLimitExceeded`.
+- **Peer limit**: Hard-capped at 8 (`MAX_PEERS`). This is intentional — Lurek2D targets LAN/co-op multiplayer, not MMO-scale. Requesting more than 8 peers returns `NetworkError::PeerLimitExceeded`.
 - **Non-blocking I/O**: The `UdpSocket` is set to non-blocking mode immediately after bind. `service()` never blocks the game loop — it returns `None` when no events are pending.
 - **Destroyed host guard**: After `destroy()` is called, every method that accesses the inner host returns `NetworkError::HostDestroyed` via the private `host()` / `host_mut()` helpers. Double-destroy is safe and idempotent.
-- **Lua compatibility layer**: The Lua tests verify a `luna.net` / `_G.enet` surface with underscore-style naming (`host_create`, `linked_version`, `get_socket_address`, etc.) for developers porting code from LÖVE's `lua-enet` binding.
+- **Lua compatibility layer**: The Lua tests verify a `lurek.net` / `_G.enet` surface with underscore-style naming (`host_create`, `linked_version`, `get_socket_address`, etc.) for developers porting code from LÖVE's `lua-enet` binding.
 - **No encryption**: Packets are plain UDP datagrams. Applications requiring security must implement encryption at the Lua level or use a VPN/tunnel.
-- **Config gating**: The module is behind `modules.network` in `conf.lua`. When disabled, `luna.network` is not registered and the `rusty_enet` host is never created.
+- **Config gating**: The module is behind `modules.network` in `conf.lua`. When disabled, `lurek.network` is not registered and the `rusty_enet` host is never created.
 - **Breaking change surface**: Renaming UserData methods (e.g. `service`, `send`, `broadcast`) or changing the event table field names would break all multiplayer game scripts.

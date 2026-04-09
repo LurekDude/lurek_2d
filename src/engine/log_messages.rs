@@ -1,4 +1,4 @@
-﻿//! Structured logging with stable message IDs for the Luna2D engine.
+﻿//! Structured logging with stable message IDs for the Lurek2D engine.
 //!
 //! Every engine log message has a stable ID (`L001`..`L099`) so that external
 //! tools and Lua scripts can filter or match on them.  Use the [`log_msg!`]
@@ -14,7 +14,7 @@ use std::sync::atomic::{AtomicU8, Ordering};
 /// 0 = Off, 1 = Error, 2 = Warn, 3 = Info, 4 = Debug, 5 = Trace.
 static LOG_LEVEL_OVERRIDE: AtomicU8 = AtomicU8::new(0); // 0 = not overridden
 
-/// Sets the global log level at runtime (called from `luna.platform.setLogLevel`).
+/// Sets the global log level at runtime (called from `lurek.platform.setLogLevel`).
 ///
 /// # Parameters
 /// - `level` — `&str`.
@@ -125,7 +125,7 @@ pub const L050_MODULE_DEP_DISABLED: &str = "L050";
 pub const L051_CONF_READ_ERR: &str = "L051";
 /// Log message: Lua parse error in conf.lua.
 pub const L052_CONF_PARSE_ERR: &str = "L052";
-/// Log message: error returned from `luna.conf()` callback.
+/// Log message: error returned from `lurek.conf()` callback.
 pub const L053_CONF_CALLBACK_ERR: &str = "L053";
 
 // ---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ pub const L032_BATCH_STATS: &str = "L032";
 /// ```ignore
 /// // Simple — catalog text only (no dynamic args):
 /// log_msg!(info, L001_ENGINE_START);
-/// // → "[L001] Luna2D Engine starting"
+/// // → "[L001] Lurek2D Engine starting"
 ///
 /// // With dynamic detail appended after the catalog text:
 /// log_msg!(info, L003_GAME_LOADED, "path: {}", main_lua.display());

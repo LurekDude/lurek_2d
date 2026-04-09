@@ -1,20 +1,20 @@
 # Docs Demo
 
-Demonstrates `luna.docs`: the self-documenting API introspection module. Scan the `luna` namespace at runtime, list modules, query function signatures, and display available APIs in-game.
+Demonstrates `lurek.docs`: the self-documenting API introspection module. Scan the `luna` namespace at runtime, list modules, query function signatures, and display available APIs in-game.
 
 ## What It Demonstrates
 
-- `luna.docs.scan()` — build a catalog of the entire `luna.*` namespace
+- `lurek.docs.scan()` — build a catalog of the entire `lurek.*` namespace
 - `catalog:getModules()` — list all registered API modules
 - `catalog:getFunctions(module)` — list all functions in a module
 - `catalog:getSignature(module, fn)` — retrieve a function's signature string
 - `catalog:search(query)` — fuzzy-search across all function names and descriptions
-- Rendering scrollable lists of API entries using `luna.gfx.print()`
+- Rendering scrollable lists of API entries using `lurek.gfx.print()`
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/docs_demo
+cargo run -- content/demos/docs_demo
 ```
 
 ## Controls

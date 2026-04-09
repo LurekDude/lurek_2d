@@ -21,7 +21,7 @@ Load these **before starting any step**:
 1. `.github/skills/roadmap-planning/SKILL.md` — phase format, acceptance gates, status symbols
 2. `.github/skills/rust-coding/SKILL.md` — Rust conventions, visibility, public API patterns
 3. `.github/skills/testing-rust/SKILL.md` — test patterns, what counts as coverage
-4. `.github/skills/lua-api-design/SKILL.md` — `luna.*` naming, parameter conventions
+4. `.github/skills/lua-api-design/SKILL.md` — `lurek.*` naming, parameter conventions
 5. **Domain skill** — match to the phase topic:
    - Graphics / rendering → `gpu-programming`
    - Physics → `physics-engine`
@@ -71,7 +71,7 @@ git status                             # review working tree
 ```
 
 Choose a session name from `PHASE_FILE` stem, e.g. `phase-04-audit`.
-Create session folder `work/{session}/` with subfolders: `scripts/ handovers/ reports/ data/ examples/ other/ temp/ logs/`
+Create session folder `work/{session}/` with subfolders: `scripts/ handovers/ reports/ data/ content/examples/ other/ temp/ logs/`
 Create `work/{session}/logs/agent_log.jsonl` (empty).
 
 ---
@@ -127,7 +127,7 @@ For every MDL row, search `src/` for implementation evidence.
 - Check visibility (`pub` / `pub(crate)`) and presence of `///` docstring
 - Record: file found, symbol found (line number), visibility, docstring
 
-**5b — Lua Binding Check**: For each `luna.*` function:
+**5b — Lua Binding Check**: For each `lurek.*` function:
 - Locate `src/lua_api/<module>_api.rs`
 - Search for registration — `.set("name", lua.create_function(...))` or equivalent
 - Verify name matches spec exactly (lowercase, correct namespace)
@@ -148,12 +148,12 @@ For every MDL row, search `tests/` for coverage evidence.
 - Record: test name, what it asserts, present / missing / partial
 
 **6b — Lua Tests**:
-- Check `tests/lua/` for `.lua` files calling the `luna.*` functions from this phase
+- Check `tests/lua/` for `.lua` files calling the `lurek.*` functions from this phase
 - Record: filename, which functions are called, present / missing / N/A (Rust-internal)
 
 **6c — Test Quality Flags** (do not block on these):
 - Assertions without meaningful check
-- `assert_eq!` on `f32` without epsilon (violates Luna2D convention)
+- `assert_eq!` on `f32` without epsilon (violates Lurek2D convention)
 - `#[ignore]` without explanation
 
 ---
@@ -166,8 +166,8 @@ For each gate from Stage 3c:
 |---|---|
 | `cargo build` succeeds | Run `cargo build` and capture result |
 | `cargo test` passes | Run `cargo test <module>_tests` and capture result |
-| Named Lua test present | Check file exists; no missing `luna.*` calls |
-| API docs updated | `docs/API/lua_api_reference_generated.md` contains each `luna.*` function from MDL |
+| Named Lua test present | Check file exists; no missing `lurek.*` calls |
+| API docs updated | `docs/API/lua_api_reference_generated.md` contains each `lurek.*` function from MDL |
 | `cargo clippy -- -D warnings` passes | Run and capture result |
 
 Verdict per gate: **PASS** (with evidence) / **FAIL** (with reason) / **UNVERIFIED** (note what would confirm it).
@@ -197,7 +197,7 @@ Every ❌ and ⚠️ from the matrix becomes one gap row:
 ```markdown
 | Gap # | Item | Gap Type | Severity | File to Fix | Recommendation |
 |---|---|---|---|---|---|
-| G-01 | luna.audio.seek() | Missing Lua binding | BLOCKER | src/lua_api/audio_api.rs | Register in register() |
+| G-01 | lurek.audio.seek() | Missing Lua binding | BLOCKER | src/lua_api/audio_api.rs | Register in register() |
 | G-02 | AudioSource.seek() | Missing docstring | WARNING | src/audio/mixer.rs | Add /// comment |
 | G-03 | test_seek_position | Missing Rust test | WARNING | tests/rust/unit/audio_tests.rs | Add #[test] for seek round-trip |
 ```
@@ -234,7 +234,7 @@ Manager decomposes the Gap Report into agent-sized tasks. One task per gap clust
 
 | Fix # | Gaps | Agent | Files | Acceptance Gate |
 |---|---|---|---|---|
-| F-01 | G-01 | Developer | src/lua_api/audio_api.rs | luna.audio.seek() callable from Lua; returns correct value |
+| F-01 | G-01 | Developer | src/lua_api/audio_api.rs | lurek.audio.seek() callable from Lua; returns correct value |
 | F-02 | G-02 | Developer | src/audio/mixer.rs | /// docstring present on AudioSource::seek |
 | F-03 | G-03 | Tester | tests/rust/unit/audio_tests.rs | test_seek_position passes in cargo test |
 ```
@@ -255,7 +255,7 @@ Manager routes each Fix task to the appropriate specialist agent with a **five-b
 ```
 1. Task: what to implement (exact function names, file paths, line numbers from audit)
 2. Context: relevant MDL items, current gap IDs
-3. Constraints: Luna2D conventions — luna.* namespace, pub fn register() pattern, no unsafe
+3. Constraints: Lurek2D conventions — lurek.* namespace, pub fn register() pattern, no unsafe
 4. Files: exact file paths to edit
 5. Done-when: binary acceptance gate for this fix task
 ```
@@ -336,7 +336,7 @@ Route to **Reviewer** with the following handoff:
 ```
 1. Task: quality gate review of all files touched during this phase completion run
 2. Context: list of all files modified (from the Fix Plan); Evidence Matrix (post re-audit)
-3. Constraints: cargo build, cargo test, cargo clippy -- -D warnings must all pass; luna.* namespace; no unsafe without SAFETY comment
+3. Constraints: cargo build, cargo test, cargo clippy -- -D warnings must all pass; lurek.* namespace; no unsafe without SAFETY comment
 4. Files: all files modified in Phases 4–6
 5. Done-when: Reviewer sign-off with 0 BLOCKER findings; WARN/NOTE findings documented but do not block
 ```

@@ -1,6 +1,6 @@
 -- Tower Sim — Idle Stacking Tower
 -- Time your clicks to stack blocks; misaligned blocks get trimmed
--- Run with: cargo run -- demos/simulation/tower_sim
+-- Run with: cargo run -- content/demos/simulation/tower_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -126,21 +126,21 @@ end
 
 local function drawStars()
     if score < 20 then return end
-    local t = luna.time.getTime()
+    local t = lurek.time.getTime()
     for i = 1, 40 do
         local sx = (i * 137 + math.floor(t * 10)) % 800
         local sy = (i * 91) % 300
         local brightness = 0.3 + 0.3 * math.sin(t * 2 + i)
-        luna.gfx.setColor(1, 1, 1, brightness)
-        luna.gfx.circle("fill", sx, sy, 1)
+        lurek.gfx.setColor(1, 1, 1, brightness)
+        lurek.gfx.circle("fill", sx, sy, 1)
     end
 end
 
-function luna.init()
+function lurek.init()
     spawnPending()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
     if not pendingBlock then return end
 
@@ -154,7 +154,7 @@ function luna.process(dt)
     scrollY = lerp(scrollY, targetScroll, dt * 3)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" or key == "return" then
         if gameOver then
             -- Restart
@@ -168,10 +168,10 @@ function luna.keypressed(key)
             placeBlock()
         end
     end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if btn == 1 then
         if gameOver then
             blocks = {}
@@ -186,47 +186,47 @@ function luna.mousepressed(mx, my, btn)
     end
 end
 
-function luna.render()
+function lurek.render()
     local sky = getSkyColor()
-    luna.gfx.setBackgroundColor(sky[1], sky[2], sky[3])
+    lurek.gfx.setBackgroundColor(sky[1], sky[2], sky[3])
 
     drawStars()
 
     -- Draw ground
     local groundY = BASE_Y + BLOCK_H - scrollY
-    luna.gfx.setColor(0.3, 0.25, 0.2, 1)
-    luna.gfx.rectangle("fill", 0, groundY, 800, 200)
+    lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
+    lurek.gfx.rectangle("fill", 0, groundY, 800, 200)
 
     -- Foundation
-    luna.gfx.setColor(0.5, 0.5, 0.55, 1)
-    luna.gfx.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
+    lurek.gfx.setColor(0.5, 0.5, 0.55, 1)
+    lurek.gfx.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
 
     -- Placed blocks
     for i, b in ipairs(blocks) do
         local r, g, bl = getBlockColor(i)
-        luna.gfx.setColor(r, g, bl, 1)
+        lurek.gfx.setColor(r, g, bl, 1)
         local by = groundY - (i + 1) * BLOCK_H
-        luna.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+        lurek.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
 
         -- Perfect indicator
         if b.perfect then
-            luna.gfx.setColor(1, 1, 1, 0.4)
-            luna.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+            lurek.gfx.setColor(1, 1, 1, 0.4)
+            lurek.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
         end
 
         -- Edge outlines
-        luna.gfx.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
-        luna.gfx.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
+        lurek.gfx.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
+        lurek.gfx.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
     end
 
     -- Pending block (swinging)
     if pendingBlock and not gameOver then
         local pendingIdx = #blocks + 1
         local r, g, bl = getBlockColor(pendingIdx)
-        luna.gfx.setColor(r, g, bl, 0.85)
+        lurek.gfx.setColor(r, g, bl, 0.85)
         local px = swingX + 400 - pendingBlock.w / 2
         local py = groundY - (pendingIdx + 1) * BLOCK_H
-        luna.gfx.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
+        lurek.gfx.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
 
         -- Guide line from previous block
         local prevX, prevW
@@ -235,61 +235,61 @@ function luna.render()
         else
             prevX, prevW = blocks[#blocks].x, blocks[#blocks].w
         end
-        luna.gfx.setColor(1, 1, 1, 0.15)
-        luna.gfx.setLineWidth(1)
-        luna.gfx.line(prevX, py, prevX, py + BLOCK_H)
-        luna.gfx.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
+        lurek.gfx.setColor(1, 1, 1, 0.15)
+        lurek.gfx.setLineWidth(1)
+        lurek.gfx.line(prevX, py, prevX, py + BLOCK_H)
+        lurek.gfx.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, 0, 800, 50)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 50)
 
     -- Score
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Height: " .. score, 20, 5, 1.5)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Height: " .. score, 20, 5, 1.5)
 
     -- High score
-    luna.gfx.setColor(0.8, 0.8, 0.5, 1)
-    luna.gfx.print("Best: " .. highScore, 200, 10)
+    lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
+    lurek.gfx.print("Best: " .. highScore, 200, 10)
 
     -- Combo
     if combo > 0 then
         local comboAlpha = clamp(1, 0.5, 1)
-        luna.gfx.setColor(1, 0.8, 0.2, comboAlpha)
-        luna.gfx.print("COMBO x" .. combo, 350, 8, 1.3)
+        lurek.gfx.setColor(1, 0.8, 0.2, comboAlpha)
+        lurek.gfx.print("COMBO x" .. combo, 350, 8, 1.3)
     end
 
     -- Floor indicator
     local floor = math.floor(score / 10)
     local floorNames = {"Sky", "Clouds", "Twilight", "Night", "Space"}
     local fi = clamp(floor + 1, 1, #floorNames)
-    luna.gfx.setColor(0.6, 0.6, 0.8, 1)
-    luna.gfx.print("Zone: " .. floorNames[fi], 600, 10)
-    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
-    luna.gfx.print("Best combo: " .. bestCombo, 600, 30)
+    lurek.gfx.setColor(0.6, 0.6, 0.8, 1)
+    lurek.gfx.print("Zone: " .. floorNames[fi], 600, 10)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+    lurek.gfx.print("Best combo: " .. bestCombo, 600, 30)
 
     -- Controls hint
-    luna.gfx.setColor(0.5, 0.5, 0.5, 0.8)
-    luna.gfx.print("Click or Space to place block", 250, 35)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.8)
+    lurek.gfx.print("Click or Space to place block", 250, 35)
 
     -- Game over overlay
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.7)
-        luna.gfx.rectangle("fill", 200, 200, 400, 160)
+        lurek.gfx.setColor(0, 0, 0, 0.7)
+        lurek.gfx.rectangle("fill", 200, 200, 400, 160)
 
-        luna.gfx.setColor(1, 0.4, 0.3, 1)
-        luna.gfx.print("GAME OVER", 310, 215, 1.8)
+        lurek.gfx.setColor(1, 0.4, 0.3, 1)
+        lurek.gfx.print("GAME OVER", 310, 215, 1.8)
 
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print("Final Height: " .. score, 310, 270)
-        luna.gfx.print("Best Combo: " .. bestCombo, 310, 295)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print("Final Height: " .. score, 310, 270)
+        lurek.gfx.print("Best Combo: " .. bestCombo, 310, 295)
         if score >= highScore and score > 0 then
-            luna.gfx.setColor(1, 1, 0, 1)
-            luna.gfx.print("NEW HIGH SCORE!", 310, 320)
+            lurek.gfx.setColor(1, 1, 0, 1)
+            lurek.gfx.print("NEW HIGH SCORE!", 310, 320)
         else
-            luna.gfx.setColor(0.7, 0.7, 0.7, 1)
-            luna.gfx.print("Click or Space to retry", 310, 320)
+            lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+            lurek.gfx.print("Click or Space to retry", 310, 320)
         end
     end
 end

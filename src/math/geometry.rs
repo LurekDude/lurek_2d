@@ -3,12 +3,12 @@
 //! Free functions for common geometric computations: intersections, containment,
 //! polygon operations, and rasterization.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! This module is part of Lurek2D's `math` subsystem and provides the implementation
 //! details for geometry-related operations and data management.
 //! Primary functions: `angle_between()`, `circle_contains_point()`, `circle_intersects_circle()`, `circle_intersects_line()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// Returns the angle in radians from (x1, y1) to (x2, y2).
 ///

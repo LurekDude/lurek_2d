@@ -1,6 +1,6 @@
 # tests/fixtures — Canonical Test Assets
 
-This is the **single source of truth** for all binary and code fixtures shared across the Luna2D test suite.
+This is the **single source of truth** for all binary and code fixtures shared across the Lurek2D test suite.
 
 ## Contents
 
@@ -16,7 +16,7 @@ This is the **single source of truth** for all binary and code fixtures shared a
 ## Usage
 
 Rust tests: `std::fs::read("tests/fixtures/file.ext")`
-Lua tests: `luna.audio.newDecoder("tests/fixtures/file.wav")`
+Lua tests: `lurek.audio.newDecoder("tests/fixtures/file.wav")`
 
 ## Policy
 

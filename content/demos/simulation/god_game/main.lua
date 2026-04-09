@@ -1,6 +1,6 @@
--- God Game / Ecosystem Simulator — Luna2D Demo
+-- God Game / Ecosystem Simulator — Lurek2D Demo
 -- Top-down world: guide tribes, perform miracles, balance ecosystem
--- Run with: cargo run -- demos/simulation/god_game
+-- Run with: cargo run -- content/demos/simulation/god_game
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -45,7 +45,7 @@ local function spawn_entity(list, count)
     end
 end
 
-function luna.init()
+function lurek.init()
     gen_world()
     tribes = {}
     predators = {}
@@ -85,7 +85,7 @@ local function dist(a, b)
     return math.sqrt(dx*dx + dy*dy)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     game_time = game_time + dt
     if msg_timer > 0 then msg_timer = msg_timer - dt end
 
@@ -209,7 +209,7 @@ local function do_miracle(mx, my)
     end
 end
 
-function luna.mousepressed(mx, my, btn)
+function lurek.mousepressed(mx, my, btn)
     if btn ~= 1 then return end
     -- miracle buttons
     for i, m in ipairs(MIRACLES) do
@@ -219,7 +219,7 @@ function luna.mousepressed(mx, my, btn)
         end
     end
     -- build temple
-    if btn == 1 and luna.keyboard.isDown("t") then
+    if btn == 1 and lurek.keyboard.isDown("t") then
         if faith >= 30 then
             faith = faith - 30
             temples[#temples+1] = {x=mx, y=my}
@@ -230,91 +230,91 @@ function luna.mousepressed(mx, my, btn)
     do_miracle(mx, my)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     if key == "1" then selected_miracle = 1 end
     if key == "2" then selected_miracle = 2 end
     if key == "3" then selected_miracle = 3 end
     if key == "4" then selected_miracle = 4 end
 end
 
-function luna.render()
+function lurek.render()
     -- terrain
     for y = 1, ROWS do
         for x = 1, COLS do
             local c = TERRAIN_COLORS[world[y][x]]
             local bright = is_night and 0.4 or 1
-            luna.gfx.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
-            luna.gfx.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
+            lurek.gfx.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
+            lurek.gfx.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
         end
     end
 
     -- temples
     for _, tp in ipairs(temples) do
-        luna.gfx.setColor(1,0.85,0.3,1)
+        lurek.gfx.setColor(1,0.85,0.3,1)
         local verts = {tp.x, tp.y-12, tp.x-8, tp.y+6, tp.x+8, tp.y+6}
-        luna.gfx.polygon("fill", verts)
+        lurek.gfx.polygon("fill", verts)
     end
 
     -- prey (deer)
-    luna.gfx.setColor(0.6,0.45,0.2,1)
-    for _, pr in ipairs(prey) do luna.gfx.circle("fill", pr.x, pr.y, 4) end
+    lurek.gfx.setColor(0.6,0.45,0.2,1)
+    for _, pr in ipairs(prey) do lurek.gfx.circle("fill", pr.x, pr.y, 4) end
 
     -- predators (wolves)
-    luna.gfx.setColor(0.5,0.1,0.1,1)
-    for _, p in ipairs(predators) do luna.gfx.circle("fill", p.x, p.y, 5) end
+    lurek.gfx.setColor(0.5,0.1,0.1,1)
+    for _, p in ipairs(predators) do lurek.gfx.circle("fill", p.x, p.y, 5) end
 
     -- tribes
     for _, t in ipairs(tribes) do
         local g = t.hp / 100
-        luna.gfx.setColor(0.2, 0.2 + g * 0.6, 1, 1)
-        luna.gfx.circle("fill", t.x, t.y, 5)
+        lurek.gfx.setColor(0.2, 0.2 + g * 0.6, 1, 1)
+        lurek.gfx.circle("fill", t.x, t.y, 5)
     end
 
     -- storms
     for _, s in ipairs(storms) do
-        luna.gfx.setColor(0.7,0.7,1, 0.3)
-        luna.gfx.circle("fill", s.x, s.y, s.r)
-        luna.gfx.setColor(1,1,0.5,0.8)
-        luna.gfx.line(s.x, s.y - 20, s.x + 5, s.y + 10)
+        lurek.gfx.setColor(0.7,0.7,1, 0.3)
+        lurek.gfx.circle("fill", s.x, s.y, s.r)
+        lurek.gfx.setColor(1,1,0.5,0.8)
+        lurek.gfx.line(s.x, s.y - 20, s.x + 5, s.y + 10)
     end
 
     -- night overlay
     if is_night then
-        luna.gfx.setColor(0, 0, 0.1, 0.35)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0, 0, 0.1, 0.35)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 0, 0, W, 30)
-    luna.gfx.setColor(1,1,1,1)
-    luna.gfx.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
-    luna.gfx.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
-    luna.gfx.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
-    luna.gfx.print("Pop: " .. #tribes, 400, 5, 0.9)
-    luna.gfx.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), 720, 5, 0.8)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 0, 0, W, 30)
+    lurek.gfx.setColor(1,1,1,1)
+    lurek.gfx.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
+    lurek.gfx.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
+    lurek.gfx.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
+    lurek.gfx.print("Pop: " .. #tribes, 400, 5, 0.9)
+    lurek.gfx.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 720, 5, 0.8)
 
     -- miracle bar
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, H - 40, W, 40)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, H - 40, W, 40)
     for i, m in ipairs(MIRACLES) do
         local bx = 10 + (i-1) * 100
         if i == selected_miracle then
-            luna.gfx.setColor(1,1,0.3,0.4)
-            luna.gfx.rectangle("fill", bx, H-35, 90, 30)
+            lurek.gfx.setColor(1,1,0.3,0.4)
+            lurek.gfx.rectangle("fill", bx, H-35, 90, 30)
         end
-        luna.gfx.setColor(1,1,1,1)
-        luna.gfx.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
+        lurek.gfx.setColor(1,1,1,1)
+        lurek.gfx.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
     end
-    luna.gfx.setColor(0.7,0.7,0.7,1)
-    luna.gfx.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
+    lurek.gfx.setColor(0.7,0.7,0.7,1)
+    lurek.gfx.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
 
     -- message
     if message and msg_timer > 0 then
-        luna.gfx.setColor(1,1,0.5,1)
-        luna.gfx.print(message, 300, 50, 1.1)
+        lurek.gfx.setColor(1,1,0.5,1)
+        lurek.gfx.print(message, 300, 50, 1.1)
     end
 end

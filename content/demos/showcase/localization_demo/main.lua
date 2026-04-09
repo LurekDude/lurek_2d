@@ -1,15 +1,15 @@
 -- Module availability guard (added by fix_nil_module_demos.py)
--- Run with: cargo run -- demos/showcase/localization_demo
-if not luna.localization then
-    function luna.init()
-        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.gfx.print("luna.localization is not available in this build", 180, 270)
+-- Run with: cargo run -- content/demos/showcase/localization_demo
+if not lurek.localization then
+    function lurek.init()
+        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.gfx.print("lurek.localization is not available in this build", 180, 270)
     end
     return
 end
 
 -- examples/localization_demo/main.lua
--- Demonstrates the luna.localization module: multi-language text, interpolation,
+-- Demonstrates the lurek.localization module: multi-language text, interpolation,
 -- pluralization, and on-the-fly language switching.
 
 -- ===================================================================
@@ -57,13 +57,13 @@ local translations = {
     },
 }
 
-local L = luna.localization
+local L = lurek.localization
 local points = 0
 local flash_timer = 0
 local lang_changed_msg = ""
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.12, 0.12, 0.18)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.12, 0.12, 0.18)
 
     -- Load all three languages
     for code, tbl in pairs(translations) do
@@ -79,48 +79,48 @@ function luna.init()
     end)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if flash_timer > 0 then
         flash_timer = flash_timer - dt
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Title
-    luna.gfx.setColor(0.9, 0.8, 0.3)
-    luna.gfx.print(L.t("title"), 40, 30)
+    lurek.gfx.setColor(0.9, 0.8, 0.3)
+    lurek.gfx.print(L.t("title"), 40, 30)
 
     -- Greeting with interpolation
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print(L.t("greeting", { name = "Luna" }), 40, 80)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print(L.t("greeting", { name = "Luna" }), 40, 80)
 
     -- Pluralization demo
-    luna.gfx.setColor(0.6, 0.9, 0.6)
-    luna.gfx.print(L.t("score", { count = points }), 40, 130)
+    lurek.gfx.setColor(0.6, 0.9, 0.6)
+    lurek.gfx.print(L.t("score", { count = points }), 40, 130)
 
     -- Nested key demo
-    luna.gfx.setColor(0.6, 0.7, 1.0)
-    luna.gfx.print("Menu: " .. L.t("menu.play") .. " | " .. L.t("menu.quit"), 40, 180)
+    lurek.gfx.setColor(0.6, 0.7, 1.0)
+    lurek.gfx.print("Menu: " .. L.t("menu.play") .. " | " .. L.t("menu.quit"), 40, 180)
 
     -- Available languages
     local langs = L.getAvailableLanguages()
-    luna.gfx.setColor(0.5, 0.5, 0.5)
-    luna.gfx.print("Available: " .. table.concat(langs, ", "), 40, 230)
+    lurek.gfx.setColor(0.5, 0.5, 0.5)
+    lurek.gfx.print("Available: " .. table.concat(langs, ", "), 40, 230)
 
     -- Key prompt
-    luna.gfx.setColor(0.8, 0.8, 0.8)
-    luna.gfx.print(L.t("prompt"), 40, 290)
-    luna.gfx.print("Press [UP/DOWN] to change score", 40, 320)
+    lurek.gfx.setColor(0.8, 0.8, 0.8)
+    lurek.gfx.print(L.t("prompt"), 40, 290)
+    lurek.gfx.print("Press [UP/DOWN] to change score", 40, 320)
 
     -- Language-change flash
     if flash_timer > 0 then
         local alpha = math.min(flash_timer, 1.0)
-        luna.gfx.setColor(1, 1, 0.2, alpha)
-        luna.gfx.print(lang_changed_msg, 40, 380)
+        lurek.gfx.setColor(1, 1, 0.2, alpha)
+        lurek.gfx.print(lang_changed_msg, 40, 380)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "1" then
         L.setLanguage("en")
     elseif key == "2" then
@@ -132,6 +132,6 @@ function luna.keypressed(key)
     elseif key == "down" then
         points = math.max(0, points - 1)
     elseif key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

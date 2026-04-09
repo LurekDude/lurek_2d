@@ -1,4 +1,4 @@
-//! `luna.window` - Window management, fullscreen, DPI, display queries, and viewport scaling.
+//! `lurek.window` - Window management, fullscreen, DPI, display queries, and viewport scaling.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -11,7 +11,7 @@ use crate::window;
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.window` API table with the Lua VM.
+/// Registers the `lurek.window` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

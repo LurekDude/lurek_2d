@@ -21,14 +21,14 @@ Sandboxed filesystem access via GameFS: read/write files within game directory a
 
 ## Feature Gaps
 
-1. **No ZIP archive mounting**: Can't treat a ZIP file as a virtual directory. Love2D has this (`.love` is a ZIP). Essential for distribution and mod support.
+1. **No ZIP archive mounting**: Can't treat a ZIP file as a virtual directory. Engine A has this (`.love` is a ZIP). Essential for distribution and mod support.
 2. **No file watcher/notify**: Can't detect when files change on disk. Critical for hot reload workflows.
 3. **No glob/pattern matching**: `listFiles()` returns all files; can't filter with `*.lua` or `**/*.png`.
 4. **No recursive directory deletion**: Must manually walk and delete. Common need for cleanup.
 5. **No temp files**: No `createTempFile()` for intermediate processing.
 6. **No symlink support**: Symlinks are resolved but can't be created. Low priority.
 7. **No file locking**: Can't lock files for exclusive access. Relevant for save files with multiple processes.
-8. **No file copy/move**: Must read+write to copy a file. `luna.fs.copy(src, dst)` would be convenient.
+8. **No file copy/move**: Must read+write to copy a file. `lurek.fs.copy(src, dst)` would be convenient.
 
 ## Structural Issues
 
@@ -38,15 +38,15 @@ Sandboxed filesystem access via GameFS: read/write files within game directory a
 
 ## Suggestions
 
-1. **Add ZIP mounting** (high priority): `luna.fs.mountZip(path, mountPoint)` — unlocks `.luna` distribution format and mod archives.
-2. **Add file watcher**: `luna.fs.watch(path, fn)` — callback when file changes. Enables hot reload — the most requested missing feature.
-3. **Add glob listing**: `luna.fs.glob("assets/**/*.png")` → filtered file list. Quality-of-life.
-4. **Add file copy**: `luna.fs.copy(src, dst)` and `luna.fs.move(src, dst)`.
-5. **Add recursive rmdir**: `luna.fs.removeDir(path, recursive)`.
+1. **Add ZIP mounting** (high priority): `lurek.fs.mountZip(path, mountPoint)` — unlocks `.luna` distribution format and mod archives.
+2. **Add file watcher**: `lurek.fs.watch(path, fn)` — callback when file changes. Enables hot reload — the most requested missing feature.
+3. **Add glob listing**: `lurek.fs.glob("assets/**/*.png")` → filtered file list. Quality-of-life.
+4. **Add file copy**: `lurek.fs.copy(src, dst)` and `lurek.fs.move(src, dst)`.
+5. **Add recursive rmdir**: `lurek.fs.removeDir(path, recursive)`.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Sandboxed FS | ✅ | ✅ | ✅ | ❌ (raw) |
 | ZIP mounting | ❌ | ✅ (.love) | ❌ | ❌ |

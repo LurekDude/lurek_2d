@@ -2,7 +2,7 @@
 //!
 //! [`GraphRenderer`] manages multiple named data series (line, scatter, bar)
 //! and provides viewport ↔ world coordinate mapping for rendering charts in
-//! a Luna2D game. The renderer stores pure data — actual draw calls are
+//! a Lurek2D game. The renderer stores pure data — actual draw calls are
 //! issued by the Lua wrapper in `graphics_api.rs`.
 
 use std::collections::HashMap;

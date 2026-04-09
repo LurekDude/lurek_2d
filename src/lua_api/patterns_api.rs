@@ -757,7 +757,7 @@ impl LuaUserData for LuaSimpleState {
 // Registration
 // ===========================================================================
 
-/// Registers `luna.patterns.*` factory functions.
+/// Registers `lurek.patterns.*` factory functions.
 // ===========================================================================
 // Blackboard
 // ===========================================================================
@@ -1436,7 +1436,7 @@ impl LuaFunnel {
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let patterns = lua.create_table()?;
 
-    // luna.patterns.newEventBus(name?) -> EventBus
+    // lurek.patterns.newEventBus(name?) -> EventBus
     /// Creates a new EventBus instance.
     /// @param name : string?
     /// @return any
@@ -1452,7 +1452,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newObjectPool() -> ObjectPool
+    // lurek.patterns.newObjectPool() -> ObjectPool
     /// Creates a new ObjectPool instance.
     /// @return any
     patterns.set(
@@ -1466,7 +1466,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newCommandStack(maxSize?) -> CommandStack
+    // lurek.patterns.newCommandStack(maxSize?) -> CommandStack
     /// Creates a new CommandStack instance.
     /// @param max_size : integer?
     /// @return any
@@ -1482,7 +1482,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newServiceLocator() -> ServiceLocator
+    // lurek.patterns.newServiceLocator() -> ServiceLocator
     /// Creates a new ServiceLocator instance.
     /// @return any
     patterns.set(
@@ -1495,7 +1495,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newFactory() -> Factory
+    // lurek.patterns.newFactory() -> Factory
     /// Creates a new Factory instance.
     /// @return any
     patterns.set(
@@ -1508,7 +1508,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newSimpleState() -> SimpleState
+    // lurek.patterns.newSimpleState() -> SimpleState
     /// Creates a new SimpleState finite state machine instance.
     /// @return any
     patterns.set(
@@ -1523,7 +1523,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newBlackboard(name?) -> Blackboard
+    // lurek.patterns.newBlackboard(name?) -> Blackboard
     /// Creates a new Blackboard shared key-value store.
     /// @param name : string?
     /// @return any
@@ -1541,7 +1541,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newObserver(name?) -> Observer
+    // lurek.patterns.newObserver(name?) -> Observer
     /// Creates a new reactive property Observer.
     /// @param name : string?
     /// @return any
@@ -1558,7 +1558,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newThrottle(interval) -> Throttle
+    // lurek.patterns.newThrottle(interval) -> Throttle
     /// Creates a leading-edge rate limiter that fires at most once per interval seconds.
     /// @param interval : number
     /// @return any
@@ -1572,7 +1572,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newDebounce(wait) -> Debounce
+    // lurek.patterns.newDebounce(wait) -> Debounce
     /// Creates a trailing-edge debounce that fires after the input stream is idle for wait seconds.
     /// @param wait : number
     /// @return any
@@ -1586,7 +1586,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newPriorityQueue(name?) -> PriorityQueue
+    // lurek.patterns.newPriorityQueue(name?) -> PriorityQueue
     /// Creates a stable priority-ordered task queue.
     /// @param name : string?
     /// @return any
@@ -1602,7 +1602,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newRing(capacity, name?) -> Ring
+    // lurek.patterns.newRing(capacity, name?) -> Ring
     /// Creates a fixed-capacity circular history buffer.
     /// @param capacity : integer
     /// @param name : string?
@@ -1619,7 +1619,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // luna.patterns.newFunnel(window, maxEntries?, name?) -> Funnel
+    // lurek.patterns.newFunnel(window, maxEntries?, name?) -> Funnel
     /// Creates a time-windowed event aggregator. window=0 means flush on every push.
     /// @param window : number
     /// @param max_entries : integer?

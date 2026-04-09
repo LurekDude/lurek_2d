@@ -2,7 +2,7 @@
 -- Turn-based dungeon crawler with fog of war, combat, and permadeath
 -- Controls: Arrow keys to move (one step per press), R to restart on death
 -- Bump into enemies to attack. Find stairs (>) to descend.
--- Run with: cargo run -- demos/rpg/roguelike
+-- Run with: cargo run -- content/demos/rpg/roguelike
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -183,17 +183,17 @@ local function tryMove(dx, dy)
     updateFOV()
 end
 
-function luna.init()
-    luna.window.setTitle("Roguelike Dungeon")
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+function lurek.init()
+    lurek.window.setTitle("Roguelike Dungeon")
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
     generateDungeon()
     updateFOV()
     addMsg("Find the stairs (>) to descend. Arrow keys to move.")
 end
 
-function luna.process(dt) end
+function lurek.process(dt) end
 
-function luna.render()
+function lurek.render()
     local offsetX = 400 - player.x * TILE_SIZE
     local offsetY = 300 - player.y * TILE_SIZE
     -- Draw map
@@ -206,23 +206,23 @@ function luna.render()
                 local bright = visible and 1.0 or 0.35
                 local t = map[y][x]
                 if t == WALL then
-                    luna.gfx.setColor(0.25 * bright, 0.22 * bright, 0.3 * bright)
-                    luna.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.gfx.setColor(0.25 * bright, 0.22 * bright, 0.3 * bright)
+                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
                 elseif t == FLOOR then
-                    luna.gfx.setColor(0.12 * bright, 0.12 * bright, 0.15 * bright)
-                    luna.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.gfx.setColor(0.12 * bright, 0.12 * bright, 0.15 * bright)
+                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
                 elseif t == STAIRS and visible then
-                    luna.gfx.setColor(0.1, 0.1, 0.15)
-                    luna.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
-                    luna.gfx.setColor(1, 0.9, 0.3)
-                    luna.gfx.print(">", offsetX + (x - 1) * TILE_SIZE + 6, offsetY + (y - 1) * TILE_SIZE + 4)
+                    lurek.gfx.setColor(0.1, 0.1, 0.15)
+                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.gfx.setColor(1, 0.9, 0.3)
+                    lurek.gfx.print(">", offsetX + (x - 1) * TILE_SIZE + 6, offsetY + (y - 1) * TILE_SIZE + 4)
                 end
                 -- Pickups
                 if visible then
                     for _, p in ipairs(pickups) do
                         if p.x == x and p.y == y then
-                            luna.gfx.setColor(0.2, 0.9, 0.3)
-                            luna.gfx.circle("fill", offsetX + (x - 1) * TILE_SIZE + TILE_SIZE / 2, offsetY + (y - 1) * TILE_SIZE + TILE_SIZE / 2, 5)
+                            lurek.gfx.setColor(0.2, 0.9, 0.3)
+                            lurek.gfx.circle("fill", offsetX + (x - 1) * TILE_SIZE + TILE_SIZE / 2, offsetY + (y - 1) * TILE_SIZE + TILE_SIZE / 2, 5)
                         end
                     end
                 end
@@ -233,39 +233,39 @@ function luna.render()
     for _, e in ipairs(enemies) do
         local dx = e.x - player.x; local dy = e.y - player.y
         if math.sqrt(dx * dx + dy * dy) <= VIEW_RADIUS then
-            luna.gfx.setColor(0.9, 0.2, 0.2)
-            luna.gfx.rectangle("fill", offsetX + (e.x - 1) * TILE_SIZE + 3, offsetY + (e.y - 1) * TILE_SIZE + 3, TILE_SIZE - 7, TILE_SIZE - 7)
-            luna.gfx.setColor(1, 1, 1)
-            luna.gfx.print("E", offsetX + (e.x - 1) * TILE_SIZE + 6, offsetY + (e.y - 1) * TILE_SIZE + 4)
+            lurek.gfx.setColor(0.9, 0.2, 0.2)
+            lurek.gfx.rectangle("fill", offsetX + (e.x - 1) * TILE_SIZE + 3, offsetY + (e.y - 1) * TILE_SIZE + 3, TILE_SIZE - 7, TILE_SIZE - 7)
+            lurek.gfx.setColor(1, 1, 1)
+            lurek.gfx.print("E", offsetX + (e.x - 1) * TILE_SIZE + 6, offsetY + (e.y - 1) * TILE_SIZE + 4)
         end
     end
     -- Draw player
-    luna.gfx.setColor(0.3, 0.7, 1)
-    luna.gfx.rectangle("fill", offsetX + (player.x - 1) * TILE_SIZE + 2, offsetY + (player.y - 1) * TILE_SIZE + 2, TILE_SIZE - 5, TILE_SIZE - 5)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("@", offsetX + (player.x - 1) * TILE_SIZE + 6, offsetY + (player.y - 1) * TILE_SIZE + 4)
+    lurek.gfx.setColor(0.3, 0.7, 1)
+    lurek.gfx.rectangle("fill", offsetX + (player.x - 1) * TILE_SIZE + 2, offsetY + (player.y - 1) * TILE_SIZE + 2, TILE_SIZE - 5, TILE_SIZE - 5)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("@", offsetX + (player.x - 1) * TILE_SIZE + 6, offsetY + (player.y - 1) * TILE_SIZE + 4)
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7); luna.gfx.rectangle("fill", 0, 0, 800, 30)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp .. "  Floor: " .. floor_num .. "  Kills: " .. player.kills .. "  Turn: " .. turnCount, 10, 8)
+    lurek.gfx.setColor(0, 0, 0, 0.7); lurek.gfx.rectangle("fill", 0, 0, 800, 30)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp .. "  Floor: " .. floor_num .. "  Kills: " .. player.kills .. "  Turn: " .. turnCount, 10, 8)
     -- HP bar
-    luna.gfx.setColor(0.3, 0.3, 0.3); luna.gfx.rectangle("fill", 600, 8, 120, 14)
-    luna.gfx.setColor(0.8, 0.2, 0.2); luna.gfx.rectangle("fill", 600, 8, 120 * (player.hp / player.maxHp), 14)
+    lurek.gfx.setColor(0.3, 0.3, 0.3); lurek.gfx.rectangle("fill", 600, 8, 120, 14)
+    lurek.gfx.setColor(0.8, 0.2, 0.2); lurek.gfx.rectangle("fill", 600, 8, 120 * (player.hp / player.maxHp), 14)
     -- Messages
     for i, msg in ipairs(messages) do
-        luna.gfx.setColor(1, 1, 0.8, 1.0 - (i - 1) * 0.2)
-        luna.gfx.print(msg, 10, 560 - (i - 1) * 16)
+        lurek.gfx.setColor(1, 1, 0.8, 1.0 - (i - 1) * 0.2)
+        lurek.gfx.print(msg, 10, 560 - (i - 1) * 16)
     end
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.75); luna.gfx.rectangle("fill", 200, 220, 400, 120)
-        luna.gfx.setColor(1, 0.2, 0.2); luna.gfx.print("YOU DIED", 330, 240, 2)
-        luna.gfx.setColor(1, 1, 1); luna.gfx.print("Floor " .. floor_num .. " | Kills: " .. player.kills .. " | Turns: " .. turnCount, 280, 290)
-        luna.gfx.print("Press R to restart", 330, 315)
+        lurek.gfx.setColor(0, 0, 0, 0.75); lurek.gfx.rectangle("fill", 200, 220, 400, 120)
+        lurek.gfx.setColor(1, 0.2, 0.2); lurek.gfx.print("YOU DIED", 330, 240, 2)
+        lurek.gfx.setColor(1, 1, 1); lurek.gfx.print("Floor " .. floor_num .. " | Kills: " .. player.kills .. " | Turns: " .. turnCount, 280, 290)
+        lurek.gfx.print("Press R to restart", 330, 315)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if gameOver then
         if key == "r" then
             floor_num = 1; turnCount = 0; gameOver = false; messages = {}

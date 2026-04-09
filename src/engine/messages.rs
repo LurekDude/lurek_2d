@@ -199,7 +199,7 @@ mod tests {
     #[test]
     fn l001_has_correct_text() {
         let c = built_catalog();
-        assert_eq!(c.get("L001"), Some("Luna2D Engine starting"));
+        assert_eq!(c.get("L001"), Some("Lurek2D Engine starting"));
     }
 
     #[test]
@@ -216,7 +216,7 @@ mod tests {
         // The contract: returns either the text or the raw id.
         let result = get_message("L001");
         assert!(
-            result == "Luna2D Engine starting" || result == "L001",
+            result == "Lurek2D Engine starting" || result == "L001",
             "unexpected result: {result}"
         );
     }
@@ -224,7 +224,7 @@ mod tests {
     #[test]
     fn get_message_after_init_returns_text() {
         init();
-        assert_eq!(get_message("L001"), "Luna2D Engine starting");
+        assert_eq!(get_message("L001"), "Lurek2D Engine starting");
         assert_eq!(get_message("L003"), "Game loaded");
     }
 }

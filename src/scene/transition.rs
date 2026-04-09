@@ -1,12 +1,12 @@
 //! Visual transition types and active transition state for scene changes.
 //!
-//! This module is part of Luna2D's `scene` subsystem and provides the implementation
+//! This module is part of Lurek2D's `scene` subsystem and provides the implementation
 //! details for transition-related operations and data management.
 //! Key types exported from this module: `TransitionType`, `ActiveTransition`.
 //! Primary functions: `from_lua_str()`, `new()`, `progress()`, `is_complete()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 use crate::engine::log_messages::{TR01, TR02};
 use crate::log_msg;
 

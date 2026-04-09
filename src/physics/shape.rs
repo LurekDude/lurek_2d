@@ -2,13 +2,13 @@
 //!
 //! Provides polygon, edge, and chain shapes beyond the basic rect/circle.
 //!
-//! This module is part of Luna2D's `physics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `physics` subsystem and provides the implementation
 //! details for shape-related operations and data management.
 //! Key types exported from this module: `Shape`.
 //! Primary functions: `to_rapier_collider()`, `regular_polygon()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::Vec2;
 use rapier2d::prelude::*;
@@ -170,8 +170,8 @@ impl Shape {
 
 /// A standalone shape value holding geometry and default fixture parameters.
 ///
-/// Created via `luna.physics.newCircleShape` et al. and attached to bodies
-/// with `luna.physics.attachShape`. Can be reused across multiple bodies.
+/// Created via `lurek.physics.newCircleShape` et al. and attached to bodies
+/// with `lurek.physics.attachShape`. Can be reused across multiple bodies.
 ///
 /// # Fields
 /// - `shape` — `Shape`. The underlying collision geometry.

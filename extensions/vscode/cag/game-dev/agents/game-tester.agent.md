@@ -1,6 +1,6 @@
 ---
 description: >
-  Design test plans, edge case lists, and balance spreadsheets for a Luna2D game.
+  Design test plans, edge case lists, and balance spreadsheets for a Lurek2D game.
   Does not write code — produces structured testing documents and QA plans.
 model: claude-sonnet-4-5
 tools:

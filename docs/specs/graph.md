@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.graph`                                         |
+| **Lua API**    | `lurek.graph`                                         |
 | **Source**      | `src/graph/`                                         |
 | **Rust Tests** | `tests/rust/unit/graph_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_graph.lua`                      |
@@ -199,13 +199,13 @@ What happens when items arrive at a full node. Variants: `Reject` (item stays pu
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/graph_api.rs` under the `luna.graph` namespace. The single factory function `luna.graph.newGraph()` creates a `Graph` userdata. All other operations are methods on the returned Graph, Node, Edge, and GraphItem userdata handles.
+The Lua API is registered in `src/lua_api/graph_api.rs` under the `lurek.graph` namespace. The single factory function `lurek.graph.newGraph()` creates a `Graph` userdata. All other operations are methods on the returned Graph, Node, Edge, and GraphItem userdata handles.
 
-### `luna.graph` namespace
+### `lurek.graph` namespace
 
 | Function             | Returns    | Description                                |
 |----------------------|------------|--------------------------------------------|
-| `luna.graph.newGraph()` | `Graph` | Creates a new empty directed graph         |
+| `lurek.graph.newGraph()` | `Graph` | Creates a new empty directed graph         |
 
 ### Graph methods
 
@@ -333,8 +333,8 @@ The Lua API is registered in `src/lua_api/graph_api.rs` under the `luna.graph` n
 
 ```lua
 -- Build a simple resource pipeline: mine → smelter → warehouse
-function luna.init()
-    graph = luna.graph.newGraph()
+function lurek.init()
+    graph = lurek.graph.newGraph()
 
     -- Create nodes with types and capacities
     mine      = graph:addNode("mine", -1)
@@ -373,7 +373,7 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     graph:update(dt)
 
     -- Check stats
@@ -390,8 +390,8 @@ end
 
 ```lua
 -- Supply/demand example: village demands food from farm
-function luna.init()
-    g = luna.graph.newGraph()
+function lurek.init()
+    g = lurek.graph.newGraph()
 
     local farm    = g:addNode("farm", -1)
     local village = g:addNode("village", 10)
@@ -426,15 +426,15 @@ end
 |---------------|--------------|----------------------------------------------------------------|
 | `engine`      | Imports from | Uses `log_messages` constants and `SharedState` (via lua_api)  |
 | `math`        | Imports from | Baseline dependency (not directly used, but available)         |
-| `lua_api`     | Imported by  | `graph_api.rs` binds the full API to `luna.graph`              |
+| `lua_api`     | Imported by  | `graph_api.rs` binds the full API to `lurek.graph`              |
 | `pathfinding` | Similar      | `src/pathfinding/` provides grid-based A★/HPA★/flow fields for spatial navigation; `graph` provides abstract node-based Dijkstra on relational graphs |
 
 ## Notes
 
 - **Dead files**: `graph.rs` and `traversal.rs` exist in `src/graph/` but are NOT declared in `mod.rs`. They are legacy duplicates of `core.rs` and `pathfinding.rs` respectively. Do not edit them — they are dead code.
 - **All algorithms are `impl Graph`**: The `algorithms.rs`, `pathfinding.rs`, `simulation.rs`, and `supply_demand.rs` files add methods to `Graph` via `impl Graph` blocks rather than introducing new types. This keeps the API surface on a single type.
-- **HashMap-based, not SlotMap**: Unlike most Luna2D resource pools, the graph uses `HashMap<u64, T>` with auto-incrementing IDs rather than `SlotMap`. This is intentional — graphs are self-contained userdata objects that do not participate in the engine's shared resource pool system.
+- **HashMap-based, not SlotMap**: Unlike most Lurek2D resource pools, the graph uses `HashMap<u64, T>` with auto-incrementing IDs rather than `SlotMap`. This is intentional — graphs are self-contained userdata objects that do not participate in the engine's shared resource pool system.
 - **Rc<RefCell<Graph>> in Lua**: The Lua wrapper (`LuaGraph`) holds `Rc<RefCell<Graph>>` internally. Node, Edge, and GraphItem handles all share the same `Rc`, meaning they are lightweight views into the same graph. Removing a node invalidates all handles to that node — methods will return "node not found" errors.
 - **Event dispatch is synchronous**: `g:update(dt)` and `g:processDemand()` collect events first, then dispatch all callbacks after the simulation pass completes. Callbacks may safely read graph state but should avoid mutating the graph during dispatch to prevent borrow conflicts.
-- **No rendering integration**: The graph module is entirely abstract. It does not produce `DrawCommand`s or interact with the graphics pipeline. Games must implement their own visual representation of graph state in `luna.draw()`.
+- **No rendering integration**: The graph module is entirely abstract. It does not produce `DrawCommand`s or interact with the graphics pipeline. Games must implement their own visual representation of graph state in `lurek.draw()`.
 - **Thread safety**: The graph is not thread-safe (`Rc<RefCell<>>` not `Arc<Mutex<>>`). It must be used from the main Lua VM only.

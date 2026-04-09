@@ -1,15 +1,15 @@
 -- examples/patterns.lua
--- Demonstrates luna.patterns — six reusable design-pattern primitives for game
+-- Demonstrates lurek.patterns — six reusable design-pattern primitives for game
 -- architecture.  All objects are pure Lua-side; there is no rendering or physics
 -- involved.  Run with: cargo run -- examples/patterns
 --
 -- Patterns provided:
---   EventBus      — priority-ordered pub/sub with one-shot callbacks
---   ObjectPool    — pre-allocated object recycling
---   CommandStack  — execute/undo/redo for editor or replay systems
---   ServiceLocator— runtime dependency injection (replaces global tables)
---   Factory       — registered type constructors with alias support
---   SimpleState   — simple current-state tracker with enter/exit callbacks
+EventBus  -- priority-ordered pub/sub with one-shot callbacks
+ObjectPool  -- pre-allocated object recycling
+CommandStack  -- execute/undo/redo for editor or replay systems
+ServiceLocator  -- runtime dependency injection (replaces global tables)
+Factory  -- registered type constructors with alias support
+SimpleState  -- simple current-state tracker with enter/exit callbacks
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- EVENT BUS
@@ -19,26 +19,26 @@
 
 -- Create a named bus (name is for debugging; two buses with the same name are
 -- independent objects)
-local events = luna.patterns.newEventBus("main")
+local events = lurek.patterns.newEventBus("main")
 
 -- Subscribe: on(event, callback, priority?) → subscription id
 -- Save the returned id if you need to unsubscribe later.
 local id_damage_log = events:on("damage", function(data)
     -- data is whatever was passed to emit()
-    luna.log.debug(string.format("[EventBus] entity %d took %d damage",
+    lurek.log.debug(string.format("[EventBus] entity %d took %d damage",
         data.entity, data.amount))
 end)
 
 -- Subscribe with an explicit priority — higher number fires first.
 -- The returned id is stored so we can remove this handler later.
 local id_damage_stats = events:on("damage", function(data)
-    luna.log.debug("[EventBus] priority 10: record damage in stats")
+    lurek.log.debug("[EventBus] priority 10: record damage in stats")
     _ = data
 end, 10)   -- called BEFORE the priority-0 handler above
 
 -- An additional level-up listener
 local id_level_up = events:on("levelUp", function(data)
-    luna.log.info("[EventBus] level-up detected! level=" .. data.level)
+    lurek.log.info("[EventBus] level-up detected! level=" .. data.level)
 end)
 
 -- Emit an event — ALL listeners on this bus for this event are called in order
@@ -50,12 +50,12 @@ events:emit("levelUp", { level = 3 })
 
 -- Inspect listener count per event
 local damage_count = events:getListenerCount("damage")   -- 2
-luna.log.debug("[EventBus] damage listeners: " .. damage_count)
+lurek.log.debug("[EventBus] damage listeners: " .. damage_count)
 
 -- List registered event names
 local event_list = events:getEvents()   -- { "damage", "levelUp" }
 for _, name in ipairs(event_list) do
-    luna.log.debug("[EventBus] registered event: " .. name)
+    lurek.log.debug("[EventBus] registered event: " .. name)
 end
 
 -- Remove a specific listener by its subscription id
@@ -75,7 +75,7 @@ events:clearAll()
 -- (bullets, particles, explosion fragments).
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local pool = luna.patterns.newObjectPool()
+local pool = lurek.patterns.newObjectPool()
 
 -- Seed the pool with pre-built objects
 local function makeBullet()
@@ -87,7 +87,7 @@ for _ = 1, 20 do
 end
 
 -- Query pool state
-luna.log.info(string.format("[Pool] total=%d  available=%d  active=%d",
+lurek.log.info(string.format("[Pool] total=%d  available=%d  active=%d",
     pool:getTotalCount(), pool:getAvailableCount(), pool:getActiveCount()))
 
 -- Acquire an object — removes it from the free list and marks it active.
@@ -99,7 +99,7 @@ if bullet then
     bullet.vx = 0  ; bullet.vy = -5
     bullet.active = true
 
-    luna.log.debug(string.format("[Pool] fired bullet at (%d, %d)", bullet.x, bullet.y))
+    lurek.log.debug(string.format("[Pool] fired bullet at (%d, %d)", bullet.x, bullet.y))
 end
 
 -- Acquire several more
@@ -109,7 +109,7 @@ for _ = 1, 5 do
     if b then table.insert(bullets, b) end
 end
 
-luna.log.info(string.format("[Pool] after 6 acquires — active=%d  available=%d",
+lurek.log.info(string.format("[Pool] after 6 acquires — active=%d  available=%d",
     pool:getActiveCount(), pool:getAvailableCount()))
 
 -- Release back to the pool (does NOT clear the object; caller should reset it)
@@ -122,7 +122,7 @@ for _, b in ipairs(bullets) do
     pool:release(b)
 end
 
-luna.log.info(string.format("[Pool] after release — active=%d  available=%d",
+lurek.log.info(string.format("[Pool] after release — active=%d  available=%d",
     pool:getActiveCount(), pool:getAvailableCount()))
 
 -- Destroy everything and start over
@@ -135,7 +135,7 @@ pool:clearAll()
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Optional maxSize limits history depth (oldest entries discarded when exceeded)
-local commands = luna.patterns.newCommandStack(50)
+local commands = lurek.patterns.newCommandStack(50)
 
 -- execute(name, exec_fn, undo_fn?) — exec_fn is called IMMEDIATELY; undo_fn is
 -- stored for later and called by undo().
@@ -149,12 +149,12 @@ local function move(dx, dy)
         function()   -- do
             player.x = player.x + dx
             player.y = player.y + dy
-            luna.log.debug(string.format("[Command] moved to (%d, %d)", player.x, player.y))
+            lurek.log.debug(string.format("[Command] moved to (%d, %d)", player.x, player.y))
         end,
         function()   -- undo
             player.x = player.x - dx
             player.y = player.y - dy
-            luna.log.debug(string.format("[Command] reverted to (%d, %d)", player.x, player.y))
+            lurek.log.debug(string.format("[Command] reverted to (%d, %d)", player.x, player.y))
         end
     )
 end
@@ -163,12 +163,12 @@ move(10, 0)   -- exec called immediately: player: (10, 0)
 move( 0, 5)   -- player: (10, 5)
 move( 3, 0)   -- player: (13, 5)
 
-luna.log.info(string.format("[Command] position: (%d, %d)", player.x, player.y))  -- (13, 5)
+lurek.log.info(string.format("[Command] position: (%d, %d)", player.x, player.y))  -- (13, 5)
 
 -- canUndo / canRedo are safe to call at any time
 if commands:canUndo() then
     local last_name = commands:getCurrentName()   -- "Move(3, 0)"
-    luna.log.debug("[Command] undoing: " .. last_name)
+    lurek.log.debug("[Command] undoing: " .. last_name)
     commands:undo()   -- player: (10, 5)
 end
 
@@ -181,11 +181,11 @@ if commands:canRedo() then
     commands:redo()   -- player: (10, 5)
 end
 
-luna.log.info(string.format("[Command] history size: %d", commands:getHistorySize()))
+lurek.log.info(string.format("[Command] history size: %d", commands:getHistorySize()))
 
 -- Clear the full undo/redo history
 commands:clearAll()
-luna.log.debug(string.format("[Command] after clearAll — canUndo=%s canRedo=%s",
+lurek.log.debug(string.format("[Command] after clearAll — canUndo=%s canRedo=%s",
     tostring(commands:canUndo()), tostring(commands:canRedo())))
 
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -194,10 +194,10 @@ luna.log.debug(string.format("[Command] after clearAll — canUndo=%s canRedo=%s
 -- variables while keeping services accessible across game modules.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local services = luna.patterns.newServiceLocator()
+local services = lurek.patterns.newServiceLocator()
 
 -- Provide (register) a service by name
-local FakeAudio = { play = function(self, clip) luna.log.debug("[Service] play: " .. clip) end }
+local FakeAudio = { play = function(self, clip) lurek.log.debug("[Service] play: " .. clip) end }
 local FakeInput = { isDown = function(self, k) return k == "space" end }
 
 services:provide("audio", FakeAudio)
@@ -212,16 +212,16 @@ end
 -- locate() raises a LuaError if the service is not found — so always guard with has()
 local ok, err = pcall(function() return services:locate("network") end)
 if not ok then
-    luna.log.warn("[Service] expected error: " .. tostring(err))
+    lurek.log.warn("[Service] expected error: " .. tostring(err))
 end
 
 -- List all registered service names
 local all_services = services:getServices()   -- { "audio", "input" }
-luna.log.info("[Service] registered: " .. table.concat(all_services, ", "))
+lurek.log.info("[Service] registered: " .. table.concat(all_services, ", "))
 
 -- Remove a service by name
 services:remove("input")
-luna.log.debug("[Service] has input: " .. tostring(services:has("input")))   -- false
+lurek.log.debug("[Service] has input: " .. tostring(services:has("input")))   -- false
 
 -- Clear all registrations
 services:clearAll()
@@ -232,7 +232,7 @@ services:clearAll()
 -- runtime registration (e.g. load from mods).
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local factory = luna.patterns.newFactory()
+local factory = lurek.patterns.newFactory()
 
 -- Register constructors — receives an optional config table
 factory:register("enemy.goblin", function(config)
@@ -263,27 +263,27 @@ local goblin = factory:create("enemy.goblin")
 local troll  = factory:create("enemy.troll", { hp = 200, atk = 25 })   -- custom stats
 local sword  = factory:create("item.sword")
 
-luna.log.info(string.format("[Factory] goblin hp=%d  troll hp=%d  sword dmg=%d",
+lurek.log.info(string.format("[Factory] goblin hp=%d  troll hp=%d  sword dmg=%d",
     goblin.hp, troll.hp, sword.damage))
 
 -- Aliases let you create canonical names for variants
 factory:alias("enemy.bigTroll", "enemy.troll")   -- bigTroll → troll constructor
 local big = factory:create("enemy.bigTroll", { hp = 500 })
-luna.log.debug("[Factory] bigTroll hp=" .. big.hp)
+lurek.log.debug("[Factory] bigTroll hp=" .. big.hp)
 
 -- Inspect registered type names (aliases included)
 local types = factory:getTypes()   -- { "enemy.goblin", "enemy.troll", "item.sword", "enemy.bigTroll" }
-luna.log.info("[Factory] types: " .. table.concat(types, ", "))
+lurek.log.info("[Factory] types: " .. table.concat(types, ", "))
 
 -- Check if a type (or alias) is registered before creating
 if factory:has("enemy.goblin") then
     local g2 = factory:create("enemy.goblin")
-    luna.log.debug("[Factory] second goblin created, type=" .. g2.type)
+    lurek.log.debug("[Factory] second goblin created, type=" .. g2.type)
 end
 
 -- Remove a type (by exact name, NOT aliases)
 factory:remove("item.sword")
-luna.log.debug("[Factory] has sword: " .. tostring(factory:has("item.sword")))   -- false
+lurek.log.debug("[Factory] has sword: " .. tostring(factory:has("item.sword")))   -- false
 
 -- Clear all types and aliases
 factory:clearAll()
@@ -295,15 +295,15 @@ factory:clearAll()
 -- For full hierarchical FSMs see ideas/features/state_machine.md.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local game_fsm = luna.patterns.newSimpleState()
+local game_fsm = lurek.patterns.newSimpleState()
 
 -- addState(name, callbacks) — callbacks table is optional
 game_fsm:addState("menu", {
     enter = function(prev)
-        luna.log.info(string.format("[FSM] entering 'menu'  (from '%s')", tostring(prev)))
+        lurek.log.info(string.format("[FSM] entering 'menu'  (from '%s')", tostring(prev)))
     end,
     exit = function(next)
-        luna.log.info(string.format("[FSM] leaving 'menu'  (to '%s')", tostring(next)))
+        lurek.log.info(string.format("[FSM] leaving 'menu'  (to '%s')", tostring(next)))
     end,
     update = function(dt)
         -- Called every frame from your process() via game_fsm:update(dt)
@@ -313,10 +313,10 @@ game_fsm:addState("menu", {
 
 game_fsm:addState("playing", {
     enter = function(prev)
-        luna.log.info(string.format("[FSM] entering 'playing'  (from '%s')", tostring(prev)))
+        lurek.log.info(string.format("[FSM] entering 'playing'  (from '%s')", tostring(prev)))
     end,
     exit  = function(next)
-        luna.log.info(string.format("[FSM] leaving 'playing'  (to '%s')", tostring(next)))
+        lurek.log.info(string.format("[FSM] leaving 'playing'  (to '%s')", tostring(next)))
     end,
     update = function(dt)
         -- per-frame game logic delegated here
@@ -325,17 +325,17 @@ game_fsm:addState("playing", {
 })
 
 game_fsm:addState("paused", {
-    enter = function(prev) luna.log.info("[FSM] game paused") _ = prev end,
-    exit  = function(next) luna.log.info("[FSM] game resumed") _ = next end,
+    enter = function(prev) lurek.log.info("[FSM] game paused") _ = prev end,
+    exit  = function(next) lurek.log.info("[FSM] game resumed") _ = next end,
 })
 
 game_fsm:addState("game_over", {
-    enter = function(prev) luna.log.info("[FSM] GAME OVER") _ = prev end,
+    enter = function(prev) lurek.log.info("[FSM] GAME OVER") _ = prev end,
 })
 
 -- Initial state — fires the 'menu' enter callback (prev = nil)
 game_fsm:transitionTo("menu")
-luna.log.debug("[FSM] current: " .. game_fsm:getCurrent())   -- "menu"
+lurek.log.debug("[FSM] current: " .. game_fsm:getCurrent())   -- "menu"
 
 -- Transition — fires exit("playing") on "menu", then enter("menu") on "playing"
 game_fsm:transitionTo("playing")
@@ -344,22 +344,22 @@ game_fsm:transitionTo("playing")
 game_fsm:transitionTo("game_over")
 
 -- dispatch per-frame update to the active state's update function
--- In a real game: inside luna.process(dt) — game_fsm:update(dt)
+-- In a real game: inside lurek.process(dt) — game_fsm:update(dt)
 game_fsm:update(0.016)   -- no-op: game_over has no update handler
 
 -- Check if a state is registered
-luna.log.debug("[FSM] has 'menu': "    .. tostring(game_fsm:hasState("menu")))    -- true
-luna.log.debug("[FSM] has 'flying': "  .. tostring(game_fsm:hasState("flying")))  -- false
+lurek.log.debug("[FSM] has 'menu': "    .. tostring(game_fsm:hasState("menu")))    -- true
+lurek.log.debug("[FSM] has 'flying': "  .. tostring(game_fsm:hasState("flying")))  -- false
 
 -- List all registered state names
 local states = game_fsm:getStates()   -- { "menu", "playing", "paused", "game_over" }
-luna.log.info("[FSM] registered states: " .. table.concat(states, ", "))
+lurek.log.info("[FSM] registered states: " .. table.concat(states, ", "))
 
 -- Remove all state registrations and reset current state
 game_fsm:clearAll()
-luna.log.debug("[FSM] after clearAll, current: " .. tostring(game_fsm:getCurrent()))  -- nil
+lurek.log.debug("[FSM] after clearAll, current: " .. tostring(game_fsm:getCurrent()))  -- nil
 
-luna.log.info("[patterns.lua] example complete")
+lurek.log.info("[patterns.lua] example complete")
 
 
 -- REACTIVE & DATA-STRUCTURE PATTERNS
@@ -369,7 +369,7 @@ luna.log.info("[patterns.lua] example complete")
 -- A shared key-value store for data-driven communication between subsystems.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local board = luna.patterns.newBlackboard("game_state")
+local board = lurek.patterns.newBlackboard("game_state")
 
 board:set("paused", false)
 board:set("score",  0)
@@ -381,7 +381,7 @@ local snap     = board:snapshot()       -- { paused=false, score=0, player="Hero
 local rev      = board:getRevision()    -- 3
 
 local watch_id = board:watch("score", function(key, val, old)
-    luna.log.info(string.format("[Board] score: %d -> %d", old or 0, val))
+    lurek.log.info(string.format("[Board] score: %d -> %d", old or 0, val))
 end)
 
 board:set("score", 100)   -- fires watcher
@@ -392,10 +392,10 @@ board:unwatch(watch_id)
 -- Reactive properties: subscribe to individual property changes.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local obs = luna.patterns.newObserver("player_props")
+local obs = lurek.patterns.newObserver("player_props")
 
 local sub_id = obs:subscribe("health", function(key, val)
-    luna.log.info(string.format("[Observer] %s = %d", key, val))
+    lurek.log.info(string.format("[Observer] %s = %d", key, val))
 end)
 
 obs:set("health", 100)   -- fires subscriber
@@ -408,7 +408,7 @@ obs:unsubscribe(sub_id)              -- remove listener
 
 -- "once" subscription: fires once, then auto-removes
 obs:subscribe("level", function(key, val)
-    luna.log.info("[Observer] level up: " .. tostring(val))
+    lurek.log.info("[Observer] level up: " .. tostring(val))
 end, true)   -- once=true
 obs:set("level", 2)    -- fires and unsubscribes
 obs:set("level", 3)    -- no output
@@ -419,10 +419,10 @@ obs:set("level", 3)    -- no output
 -- Useful for search boxes, auto-save, or resize handlers.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local debounce = luna.patterns.newDebounce(0.3)   -- idle for 0.3 s before firing
+local debounce = lurek.patterns.newDebounce(0.3)   -- idle for 0.3 s before firing
 
 debounce:onFire(function()
-    luna.log.info("[Debounce] input stream settled — commit changes")
+    lurek.log.info("[Debounce] input stream settled — commit changes")
 end)
 
 debounce:trigger()   -- resets the idle timer
@@ -440,10 +440,10 @@ local pending2  = debounce:isPending()    -- false
 -- Leading-edge rate limiter: fires at most once per interval.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local throttle = luna.patterns.newThrottle(0.5)   -- at most once per 0.5 s
+local throttle = lurek.patterns.newThrottle(0.5)   -- at most once per 0.5 s
 
 throttle:onFire(function()
-    luna.log.info("[Throttle] fired!")
+    lurek.log.info("[Throttle] fired!")
 end)
 
 -- Check progress through the current interval (0.0 = just fired, 1.0 = ready)
@@ -464,13 +464,13 @@ throttle:reset()
 -- Time-windowed event aggregator: buffers events and flushes as a batch.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local funnel = luna.patterns.newFunnel(0.1, 20, "damage_funnel")
+local funnel = lurek.patterns.newFunnel(0.1, 20, "damage_funnel")
 -- window=0.1 s, max_entries=20 (auto-flush at capacity)
 
 funnel:onFlush(function(entries)
-    luna.log.info("[Funnel] batch: " .. #entries .. " events")
+    lurek.log.info("[Funnel] batch: " .. #entries .. " events")
     for _, e in ipairs(entries) do
-        luna.log.debug(string.format("  tag=%s val=%s", e.tag, tostring(e.value)))
+        lurek.log.debug(string.format("  tag=%s val=%s", e.tag, tostring(e.value)))
     end
 end)
 
@@ -494,7 +494,7 @@ funnel:discard()                            -- silently clears the buffer
 -- Useful for frame-time histories, damage logs, rolling averages.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local ring = luna.patterns.newRing(8, "frame_times")
+local ring = lurek.patterns.newRing(8, "frame_times")
 
 ring:push(16.0)
 ring:push(17.5)
@@ -513,7 +513,7 @@ local arr    = ring:toArray()      -- { {id,tag,value=16.0}, ... } oldest first
 -- Stable max-priority task queue. Items with higher priority dequeue first.
 -- ─────────────────────────────────────────────────────────────────────────────
 
-local pq = luna.patterns.newPriorityQueue("task_queue")
+local pq = lurek.patterns.newPriorityQueue("task_queue")
 
 pq:push(10, { task="render_shadows" }, "render_shadows")
 pq:push(50, { task="handle_input"   }, "handle_input")
@@ -531,4 +531,4 @@ local second = pq:pop()     -- { task="update_ai"      }
 local third  = pq:pop()     -- { task="render_shadows" }
 local none   = pq:pop()     -- nil (queue is empty)
 
-luna.log.info("[patterns.lua] reactive/data-structure patterns example complete")
+lurek.log.info("[patterns.lua] reactive/data-structure patterns example complete")

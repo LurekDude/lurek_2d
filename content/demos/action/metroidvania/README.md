@@ -14,7 +14,7 @@ A side-scrolling platformer spread across multiple interconnected rooms. The pla
 ## How to Run
 
 ```powershell
-cargo run -- demos/metroidvania
+cargo run -- content/demos/metroidvania
 ```
 
 ## Controls

@@ -1,4 +1,4 @@
-//! Integration tests for `luna2d::province_map`.
+//! Integration tests for `lurek2d::province_map`.
 //!
 //! Covers: map construction, pixel loading, province queries, adjacency
 //! detection, border extraction, map modes, position calculation, events,
@@ -6,7 +6,7 @@
 
 use std::collections::HashMap;
 
-use luna2d::province_map::{
+use lurek2d::province_map::{
     adjacency::{detect_adjacency, detect_adjacency_with_tags},
     borders::{extract_all_borders, extract_borders_with_tag, extract_borders_by_property},
     core::ProvinceMap,
@@ -481,7 +481,7 @@ fn emit_province_added_carries_id() {
     let e = bus.poll().unwrap();
     assert_eq!(e.name, "province_added");
     assert_eq!(e.args.len(), 1);
-    if let luna2d::event::EventArg::Num(n) = &e.args[0] {
+    if let lurek2d::event::EventArg::Num(n) = &e.args[0] {
         assert!((*n - 7.0).abs() < 1e-5);
     } else {
         panic!("Expected Num argument");
@@ -502,7 +502,7 @@ fn emit_adjacency_detected_carries_edge_count() {
     bus.emit_adjacency_detected(15);
     let e = bus.poll().unwrap();
     assert_eq!(e.name, "adjacency_detected");
-    if let luna2d::event::EventArg::Num(n) = &e.args[0] {
+    if let lurek2d::event::EventArg::Num(n) = &e.args[0] {
         assert!((*n - 15.0).abs() < 1e-5);
     } else {
         panic!("Expected Num argument");
@@ -540,7 +540,7 @@ fn emit_map_mode_applied_carries_name() {
     bus.emit_map_mode_applied("Political");
     let e = bus.poll().unwrap();
     assert_eq!(e.name, "map_mode_applied");
-    if let luna2d::event::EventArg::Str(s) = &e.args[0] {
+    if let lurek2d::event::EventArg::Str(s) = &e.args[0] {
         assert_eq!(s, "Political");
     } else {
         panic!("Expected Str argument");

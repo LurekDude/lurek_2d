@@ -10,11 +10,11 @@ Stateless procedural content generation: cellular automata, flood fill, periodic
 
 ## Current Feature Summary
 
-- `luna.procgen.cellular(w, h, opts)` — binary map via cellular automata (cave generation)
-- `luna.procgen.floodFill(grid, startX, startY, fill, match, w)` — 4-connected region fill
-- `luna.procgen.perlin(w, h, sx, sy, ox, oy, px, py, seed)` — tileable Perlin noise
-- `luna.procgen.poissonDisk(w, h, minDist, maxAttempts, seed)` — point distributions
-- `luna.procgen.voronoi(w, h, pts, opts)` — Voronoi diagram with optional warp
+- `lurek.procgen.cellular(w, h, opts)` — binary map via cellular automata (cave generation)
+- `lurek.procgen.floodFill(grid, startX, startY, fill, match, w)` — 4-connected region fill
+- `lurek.procgen.perlin(w, h, sx, sy, ox, oy, px, py, seed)` — tileable Perlin noise
+- `lurek.procgen.poissonDisk(w, h, minDist, maxAttempts, seed)` — point distributions
+- `lurek.procgen.voronoi(w, h, pts, opts)` — Voronoi diagram with optional warp
 - All functions are pure and deterministic (same seed = same output)
 - Internal Lcg RNG (Knuth MMIX constants)
 - Returns plain data tables (grids, point lists)
@@ -38,17 +38,17 @@ Stateless procedural content generation: cellular automata, flood fill, periodic
 
 ## Suggestions
 
-1. **Add BSP dungeon gen**: `luna.procgen.bspDungeon(w, h, opts)` — binary space partitioning with configurable min room size, corridor width, room padding. This is the most requested proc-gen algorithm.
-2. **Add room-and-corridor**: `luna.procgen.roomsAndCorridors(w, h, opts)` — random room placement + L-shaped corridor connection with overlap checks.
-3. **Add WFC (simplified)**: `luna.procgen.wfc(w, h, tileRules, seed)` — simplified Wave Function Collapse for tile pattern generation. Complex but extremely valuable.
-4. **Add L-systems**: `luna.procgen.lsystem(axiom, rules, iterations)` → returns string or point sequence for rendering as branching shapes.
-5. **Add name generation**: `luna.procgen.generateName(minLength, maxLength, seed)` — syllable-based or Markov chain name generation. Very useful for RPGs.
-6. **Remove cellular automata from tilemap**: Keep one implementation in procgen. Tilemap should call `luna.procgen.cellular()` if it needs map gen.
-7. **Add connected room graph**: `luna.procgen.roomGraph(numRooms, connections, seed)` — generate connected topology before spatial layout.
+1. **Add BSP dungeon gen**: `lurek.procgen.bspDungeon(w, h, opts)` — binary space partitioning with configurable min room size, corridor width, room padding. This is the most requested proc-gen algorithm.
+2. **Add room-and-corridor**: `lurek.procgen.roomsAndCorridors(w, h, opts)` — random room placement + L-shaped corridor connection with overlap checks.
+3. **Add WFC (simplified)**: `lurek.procgen.wfc(w, h, tileRules, seed)` — simplified Wave Function Collapse for tile pattern generation. Complex but extremely valuable.
+4. **Add L-systems**: `lurek.procgen.lsystem(axiom, rules, iterations)` → returns string or point sequence for rendering as branching shapes.
+5. **Add name generation**: `lurek.procgen.generateName(minLength, maxLength, seed)` — syllable-based or Markov chain name generation. Very useful for RPGs.
+6. **Remove cellular automata from tilemap**: Keep one implementation in procgen. Tilemap should call `lurek.procgen.cellular()` if it needs map gen.
+7. **Add connected room graph**: `lurek.procgen.roomGraph(numRooms, connections, seed)` — generate connected topology before spatial layout.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy | Roguelike libs |
+| Feature | Lurek2D | Engine A | Engine B | Engine D | Roguelike libs |
 |---|---|---|---|---|---|
 | Cellular automata | ✅ | ❌ | ❌ | ❌ | ✅ |
 | Perlin noise | ✅ | ✅ (basic) | ❌ | ✅ | ✅ |
@@ -59,7 +59,7 @@ Stateless procedural content generation: cellular automata, flood fill, periodic
 | L-systems | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Name gen | ❌ | ❌ | ❌ | ❌ | ✅ |
 
-Luna2D has a head start on built-in proc-gen. BSP and room-and-corridor would make it competitive with dedicated roguelike toolkits.
+Lurek2D has a head start on built-in proc-gen. BSP and room-and-corridor would make it competitive with dedicated roguelike toolkits.
 
 ## Priority
 

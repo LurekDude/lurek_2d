@@ -15,7 +15,7 @@
 - [ ] **D-01** — Module-level docs: Missing //! doc in: lua_api/event_api.rs, lua_api/filesystem_api.rs, lua_api/fx_api.rs, lua_api/gui_api.rs, lua_api/image_api.rs (+5 more)
 - [ ] **D-02** — Public item docs: Undocumented pub items: patterns_api::register
 - [ ] **T-01** — Rust test file: No test file found for module 'lua_api'
-- [ ] **W-01** — Example file exists: examples/lua_api.lua not found — create it
+- [ ] **W-01** — Example file exists: content/examples/lua_api.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
@@ -114,9 +114,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ❌ ERROR | examples/lua_api.lua not found — create it |
+| **W-01** Example file exists | ❌ ERROR | content/examples/lua_api.lua not found — create it |
 | **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/lua_api.lua has realistic one-line comments per call |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/lua_api.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | No Lua API — skip |
 | **W-05** Wiki page | ✅ PASS | Module has no Lua API — skip |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
@@ -145,7 +145,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | No Lua API — config flag not expected |
 

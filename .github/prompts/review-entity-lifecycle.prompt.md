@@ -20,8 +20,8 @@ description: "Review entity lifecycle patterns for correctness: spawn, alive che
    - Confirm no stale ID references after kill
 
 2. **Check lifecycle ordering**
-   - Entities spawned during `luna.update()` only — never during `luna.draw()`
-   - Entities killed during `luna.update()` only — never during `luna.draw()`
+   - Entities spawned during `lurek.update()` only — never during `lurek.draw()`
+   - Entities killed during `lurek.update()` only — never during `lurek.draw()`
    - Blueprint application happens at spawn time
 
 3. **Check tag/layer usage**
@@ -44,7 +44,7 @@ description: "Review entity lifecycle patterns for correctness: spawn, alive che
 ## Acceptance Criteria
 
 - [ ] No stale ID references in game logic
-- [ ] All mutations happen in `luna.update()`, not `luna.draw()`
+- [ ] All mutations happen in `lurek.update()`, not `lurek.draw()`
 - [ ] ID recycling follows LIFO order
 - [ ] Blueprint patterns are copy-on-spawn
 - [ ] Tests cover the full lifecycle

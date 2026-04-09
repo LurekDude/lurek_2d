@@ -1,16 +1,16 @@
 ---
-description: "Write or update API reference documentation for luna.* functions. Use when new Lua bindings are added or existing ones change. Produces updated docs/API/lua_api_reference_generated.md."
+description: "Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces updated docs/API/lua_api_reference_generated.md."
 ---
 
 # Doc: API Reference
 
-**Purpose**: Write accurate, complete API reference documentation for `luna.*` Lua functions.
-**Use When**: New `luna.*` functions are implemented, existing signatures change, or documentation is found to be stale.
+**Purpose**: Write accurate, complete API reference documentation for `lurek.*` Lua functions.
+**Use When**: New `lurek.*` functions are implemented, existing signatures change, or documentation is found to be stale.
 **Scope**: `docs/API/lua_api_reference_generated.md` only.
 
 ## Inputs
 
-- `FUNCTIONS` — list of `luna.*` functions to document (e.g., `luna.gfx.setColor`, `luna.audio.setLooping`)
+- `FUNCTIONS` — list of `lurek.*` functions to document (e.g., `lurek.gfx.setColor`, `lurek.audio.setLooping`)
 - `SOURCE_FILES` — corresponding Rust source files in `src/lua_api/` to read for accurate signatures
 
 ## Steps
@@ -22,10 +22,10 @@ description: "Write or update API reference documentation for luna.* functions. 
    c. Identify return value (what Lua receives back)
    d. Note any optional parameters (those with defaults or guarded by `if` in the closure)
 3. Open `docs/API/lua_api_reference_generated.md`
-4. Find the correct sub-section (e.g., `## luna.gfx`)
+4. Find the correct sub-section (e.g., `## lurek.gfx`)
 5. Write the entry following this format:
    ```
-   ### luna.<module>.<function>([params])
+   ### lurek.<module>.<function>([params])
    Description in one sentence.
    - `param` — type, range or valid values
    - Returns: what Lua gets back (or nothing)

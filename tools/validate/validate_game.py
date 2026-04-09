@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-validate_game.py — Validate Lua game scripts against the Luna2D API surface.
+validate_game.py — Validate Lua game scripts against the Lurek2D API surface.
 
-Static analysis: checks that all luna.* calls in a game script match functions
+Static analysis: checks that all lurek.* calls in a game script match functions
 known to the engine. Reports unknown API calls, deprecated patterns, and
 common mistakes.
 
 Usage:
     python tools/validate_game.py path/to/game/          # validate a game folder
-    python tools/validate_game.py demos/hello_world/   # validate an example
+    python tools/validate_game.py content/demos/hello_world/   # validate an example
     python tools/validate_game.py --all-examples          # validate all examples
     python tools/validate_game.py --json                  # JSON output
     python tools/validate_game.py --help
@@ -31,7 +31,7 @@ EXAMPLES_DIR = WORKSPACE_ROOT / "examples"
 
 
 def _build_api_manifest() -> Dict[str, Set[str]]:
-    """Build a manifest of known luna.* API functions from gen_lua_api.py."""
+    """Build a manifest of known lurek.* API functions from gen_lua_api.py."""
     sys.path.insert(0, str(WORKSPACE_ROOT / "tools"))
     import gen_lua_api
 
@@ -54,26 +54,26 @@ def _build_api_manifest() -> Dict[str, Set[str]]:
 
 # Known callbacks that are set, not called
 KNOWN_CALLBACKS = {
-    "luna.load", "luna.update", "luna.draw",
-    "luna.keypressed", "luna.keyreleased",
-    "luna.mousepressed", "luna.mousereleased",
-    "luna.mousemoved", "luna.wheelmoved",
-    "luna.touchpressed", "luna.touchmoved", "luna.touchreleased",
-    "luna.gamepadpressed", "luna.gamepadreleased",
-    "luna.gamepadaxis", "luna.textinput",
-    "luna.focus", "luna.visible", "luna.resize",
-    "luna.quit", "luna.errhand",
+    "lurek.load", "lurek.update", "lurek.draw",
+    "lurek.keypressed", "lurek.keyreleased",
+    "lurek.mousepressed", "lurek.mousereleased",
+    "lurek.mousemoved", "lurek.wheelmoved",
+    "lurek.touchpressed", "lurek.touchmoved", "lurek.touchreleased",
+    "lurek.gamepadpressed", "lurek.gamepadreleased",
+    "lurek.gamepadaxis", "lurek.textinput",
+    "lurek.focus", "lurek.visible", "lurek.resize",
+    "lurek.quit", "lurek.errhand",
 }
 
 # Known top-level luna properties (not functions)
 KNOWN_PROPERTIES = {
-    "luna.graphics", "luna.audio", "luna.physics", "luna.input",
-    "luna.timer", "luna.filesystem", "luna.math", "luna.window",
-    "luna.system", "luna.event", "luna.keyboard", "luna.mouse",
-    "luna.joystick", "luna.gamepad", "luna.touch", "luna.sound",
-    "luna.data", "luna.image", "luna.thread", "luna.compute",
-    "luna.dataframe", "luna.ai", "luna.graph", "luna.particle",
-    "luna.tilemap",
+    "lurek.graphics", "lurek.audio", "lurek.physics", "lurek.input",
+    "lurek.timer", "lurek.filesystem", "lurek.math", "lurek.window",
+    "lurek.system", "lurek.event", "lurek.keyboard", "lurek.mouse",
+    "lurek.joystick", "lurek.gamepad", "lurek.touch", "lurek.sound",
+    "lurek.data", "lurek.image", "lurek.thread", "lurek.compute",
+    "lurek.dataframe", "lurek.ai", "lurek.graph", "lurek.particle",
+    "lurek.tilemap",
 }
 
 
@@ -90,9 +90,9 @@ def validate_lua_file(
     lines = content.splitlines()
     issues = []
 
-    # Pattern: luna.module.function( or luna.module:method(
+    # Pattern: lurek.module.function( or lurek.module:method(
     call_re = re.compile(r'(luna\.\w+(?:\.\w+)*)\s*[(:=]')
-    # Pattern for function assignment: luna.callback = function
+    # Pattern for function assignment: lurek.callback = function
     assign_re = re.compile(r'(luna\.\w+)\s*=\s*function')
 
     full_names = manifest.get("_full", set())
@@ -134,13 +134,13 @@ def validate_lua_file(
             # Check partial match (module.func pattern)
             parts = name.split(".")
             if len(parts) >= 3:
-                # luna.module.func -> check module has func
+                # lurek.module.func -> check module has func
                 ns = parts[1]
                 fn_name = parts[-1]
                 if ns in manifest and fn_name in manifest[ns]:
                     continue
 
-            # Also handle luna.module.submodule.func
+            # Also handle lurek.module.submodule.func
             if len(parts) >= 2:
                 ns = parts[-2]
                 fn_name = parts[-1]
@@ -172,7 +172,7 @@ def validate_game_folder(
 
 def generate_report(all_results: Dict[str, Dict[str, List[dict]]]) -> str:
     """Generate a Markdown validation report."""
-    lines = ["# Luna2D Game Validation Report", ""]
+    lines = ["# Lurek2D Game Validation Report", ""]
 
     total_files = 0
     total_issues = 0
@@ -211,14 +211,14 @@ def generate_report(all_results: Dict[str, Dict[str, List[dict]]]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Validate Lua game scripts against Luna2D API",
+        description="Validate Lua game scripts against Lurek2D API",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
     parser.add_argument("game_dir", nargs="?",
                         help="Path to game folder to validate")
     parser.add_argument("--all-examples", action="store_true",
-                        help="Validate all demos/ games")
+                        help="Validate all content/demos/ games")
     parser.add_argument("--json", action="store_true",
                         help="Output structured JSON")
     parser.add_argument("--output", metavar="FILE",

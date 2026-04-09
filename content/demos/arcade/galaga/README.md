@@ -5,9 +5,9 @@ in diving attack runs. Every cleared wave speeds up the assault.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` / `luna.gfx.line()` — enemy and ship shapes
-- `luna.input.isKeyDown()` — smooth ship movement
-- `luna.keypressed()` — firing with bullet-count cap
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` / `lurek.gfx.line()` — enemy and ship shapes
+- `lurek.input.isKeyDown()` — smooth ship movement
+- `lurek.keypressed()` — firing with bullet-count cap
 - Sine-wave diving path with formation return
 - Star field rendered with seeded `math.random` for consistent background
 

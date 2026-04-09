@@ -1,4 +1,4 @@
-//! `luna.scene` — Scene stack management, transitions, registry, and depth-sorted rendering.
+//! `lurek.scene` — Scene stack management, transitions, registry, and depth-sorted rendering.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -148,7 +148,7 @@ impl LuaUserData for LuaDepthSorter {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.scene` API table with the Lua VM.
+/// Registers the `lurek.scene` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -701,13 +701,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── Scene helpers ─────────────────────────────────────────────────────
 
-    // Expose `luna.scene` in the global namespace BEFORE running inline Lua so
-    // that `luna.scene` is resolvable when the snippet executes.
+    // Expose `lurek.scene` in the global namespace BEFORE running inline Lua so
+    // that `lurek.scene` is resolvable when the snippet executes.
     luna.set("scene", tbl.clone())?;
 
     // Inline Lua helpers registered directly so they have zero Rust overhead.
-    // `luna.scene.new(def)` — creates a scene instance from a methods table.
-    // `luna.scene.define(def)` — creates a reusable scene class (callable constructor).
+    // `lurek.scene.new(def)` — creates a scene instance from a methods table.
+    // `lurek.scene.define(def)` — creates a reusable scene class (callable constructor).
     lua.load(
         r#"
 local _tbl = luna.scene

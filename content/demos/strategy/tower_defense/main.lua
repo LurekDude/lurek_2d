@@ -1,7 +1,7 @@
 -- Tower Defense
 -- Controls: Click grid to place tower, 1 for basic tower, 2 for cannon tower, N for next wave, Escape to quit
 -- Stop enemies from reaching the right side!
--- Run with: cargo run -- demos/strategy/tower_defense
+-- Run with: cargo run -- content/demos/strategy/tower_defense
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 local function lerp(a, b, t) return a + (b - a) * t end
@@ -73,9 +73,9 @@ local function isPathTile(gx, gy)
     return false
 end
 
-function luna.init()
-    luna.window.setTitle("Tower Defense")
-    luna.gfx.setBackgroundColor(0.12, 0.15, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Tower Defense")
+    lurek.gfx.setBackgroundColor(0.12, 0.15, 0.1)
     -- Mark path tiles
     for gx = 0, COLS - 1 do
         for gy = 0, ROWS - 1 do
@@ -112,7 +112,7 @@ local function addParticles(x, y, r, g, b, n)
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
 
     -- Spawn enemies
@@ -205,7 +205,7 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Grid
     for gx = 0, COLS - 1 do
         for gy = 0, ROWS - 1 do
@@ -213,79 +213,79 @@ function luna.render()
             local cell = grid[key]
             local px, py = gx * TILE, gy * TILE
             if cell and cell.path then
-                luna.gfx.setColor(0.3, 0.28, 0.2, 1)
+                lurek.gfx.setColor(0.3, 0.28, 0.2, 1)
             else
-                luna.gfx.setColor(0.18, 0.22, 0.14, 1)
+                lurek.gfx.setColor(0.18, 0.22, 0.14, 1)
             end
-            luna.gfx.rectangle("fill", px, py, TILE, TILE)
-            luna.gfx.setColor(0.1, 0.12, 0.08, 0.3)
-            luna.gfx.rectangle("line", px, py, TILE, TILE)
+            lurek.gfx.rectangle("fill", px, py, TILE, TILE)
+            lurek.gfx.setColor(0.1, 0.12, 0.08, 0.3)
+            lurek.gfx.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Towers
     for _, tw in ipairs(towers) do
         if tw.kind == "basic" then
-            luna.gfx.setColor(0.3, 0.7, 0.9, 1)
+            lurek.gfx.setColor(0.3, 0.7, 0.9, 1)
         else
-            luna.gfx.setColor(0.8, 0.4, 0.2, 1)
+            lurek.gfx.setColor(0.8, 0.4, 0.2, 1)
         end
-        luna.gfx.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
-        luna.gfx.setColor(0.1, 0.1, 0.1, 1)
-        luna.gfx.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
+        lurek.gfx.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
+        lurek.gfx.setColor(0.1, 0.1, 0.1, 1)
+        lurek.gfx.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
         -- Range indicator on hover
-        local mx, my = luna.mouse.getPosition()
+        local mx, my = lurek.mouse.getPosition()
         if distXY(mx, my, tw.x, tw.y) < 18 then
-            luna.gfx.setColor(1, 1, 1, 0.1)
-            luna.gfx.circle("line", tw.x, tw.y, tw.range)
+            lurek.gfx.setColor(1, 1, 1, 0.1)
+            lurek.gfx.circle("line", tw.x, tw.y, tw.range)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        luna.gfx.setColor(0.9, 0.2, 0.2, 1)
-        luna.gfx.circle("fill", e.x, e.y, 8)
+        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
+        lurek.gfx.circle("fill", e.x, e.y, 8)
         -- HP bar
-        luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-        luna.gfx.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
-        luna.gfx.setColor(0.1, 0.9, 0.1, 1)
-        luna.gfx.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
+        lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+        lurek.gfx.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
+        lurek.gfx.setColor(0.1, 0.9, 0.1, 1)
+        lurek.gfx.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
     end
 
     -- Projectiles
-    luna.gfx.setColor(1, 1, 0.6, 1)
+    lurek.gfx.setColor(1, 1, 0.6, 1)
     for _, p in ipairs(projectiles) do
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        luna.gfx.setColor(p.r, p.g, p.b, p.life * 2.5)
-        luna.gfx.circle("fill", p.x, p.y, 3)
+        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2.5)
+        lurek.gfx.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.7)
-    luna.gfx.rectangle("fill", 0, H - 30, W, 30)
-    luna.gfx.setColor(1, 0.85, 0.2, 1)
-    luna.gfx.print("Gold: " .. cash, 10, H - 24)
-    luna.gfx.setColor(1, 0.3, 0.3, 1)
-    luna.gfx.print("Lives: " .. lives, 120, H - 24)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Wave: " .. wave, 230, H - 24)
+    lurek.gfx.setColor(0, 0, 0, 0.7)
+    lurek.gfx.rectangle("fill", 0, H - 30, W, 30)
+    lurek.gfx.setColor(1, 0.85, 0.2, 1)
+    lurek.gfx.print("Gold: " .. cash, 10, H - 24)
+    lurek.gfx.setColor(1, 0.3, 0.3, 1)
+    lurek.gfx.print("Lives: " .. lives, 120, H - 24)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Wave: " .. wave, 230, H - 24)
     local tInfo = towerType == "basic" and "[1]Basic(20g)" or "[2]Cannon(40g)"
-    luna.gfx.print(tInfo .. "  [N]NextWave", 340, H - 24)
-    luna.gfx.print("FPS:" .. luna.time.getFPS(), W - 70, H - 24)
+    lurek.gfx.print(tInfo .. "  [N]NextWave", 340, H - 24)
+    lurek.gfx.print("FPS:" .. lurek.time.getFPS(), W - 70, H - 24)
 
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 250, 260, 300, 60)
-        luna.gfx.setColor(1, 0.2, 0.2, 1)
-        luna.gfx.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 250, 260, 300, 60)
+        lurek.gfx.setColor(1, 0.2, 0.2, 1)
+        lurek.gfx.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if gameOver then return end
     local gx = math.floor(x / TILE)
     local gy = math.floor(y / TILE)
@@ -313,8 +313,8 @@ function luna.mousepressed(x, y, button)
     table.insert(towers, tw)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "1" then towerType = "basic" end
     if key == "2" then towerType = "cannon" end
     if key == "n" and not waveActive and not gameOver then startWave() end

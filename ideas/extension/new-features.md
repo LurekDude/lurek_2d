@@ -21,7 +21,7 @@
 
 **Features**:
 - Type Lua expressions, see results immediately
-- Auto-complete luna.* APIs in the console
+- Auto-complete lurek.* APIs in the console
 - Show print() output in real-time
 - Execute multi-line scripts
 - History with up/down arrow navigation
@@ -57,7 +57,7 @@
 **Concept**: Visual flame chart for per-function Lua timing.
 
 **Features**:
-- Instrument luna.update and luna.draw callbacks
+- Instrument lurek.update and lurek.draw callbacks
 - Show per-function call duration
 - Identify hotspots visually
 - Compare frames (fast frame vs slow frame)
@@ -106,7 +106,7 @@
 **Features**:
 - Parse require() graph to find dependents
 - Show list of files that depend on the changed file
-- Highlight potentially affected luna.* API calls
+- Highlight potentially affected lurek.* API calls
 - Estimate blast radius of the change
 - Suggest relevant tests to run
 
@@ -125,12 +125,12 @@
 
 ### 11. Code Playground / Sandbox
 
-**Concept**: Lightweight Lua scratchpad tied to the luna.* API.
+**Concept**: Lightweight Lua scratchpad tied to the lurek.* API.
 
 **Features**:
 - Split view: code on left, output on right
 - Auto-run on save (or keystroke with debounce)
-- Pre-loaded with luna.* API
+- Pre-loaded with lurek.* API
 - Good for experimenting with API features
 - Share snippets as gists
 
@@ -139,7 +139,7 @@
 **Concept**: Collect and visualize game session data from test runs.
 
 **Features**:
-- Track events from luna.signal.emit() during play sessions
+- Track events from lurek.signal.emit() during play sessions
 - Show event frequency, timing, and distribution
 - Player path visualization (death map, progression funnel)
 - Auto-detect difficulty spikes
@@ -172,7 +172,7 @@
 **Concept**: Auto-generate game documentation from code.
 
 **Features**:
-- Extract luna.load/update/draw structure into a game overview doc
+- Extract lurek.load/update/draw structure into a game overview doc
 - Document all entities and their components
 - Document all scenes and transitions
 - Document all input bindings

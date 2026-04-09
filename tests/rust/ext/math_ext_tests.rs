@@ -1,17 +1,17 @@
 //! Integration tests for Phase 25 math extension modules.
 //!
 //! Covers: NoiseGenerator, Grid, SpatialHash, Raycaster2D, TileWalker,
-//!         Tween, geometry, procgen. Raycasting types live in luna2d::raycaster.
+//!         Tween, geometry, procgen. Raycasting types live in lurek2d::raycaster.
 
-use luna2d::math::geometry;
-use luna2d::math::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
-use luna2d::math::spatial_hash::SpatialHash;
-use luna2d::math::tween::Tween;
-use luna2d::pathfinding::grid::Grid;
-use luna2d::procgen::{self, CellularOpts, VoronoiOpts};
-use luna2d::raycaster::Raycaster2D;
-use luna2d::raycaster::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
-use luna2d::tilemap::tile_walker::{Facing, TileWalker};
+use lurek2d::math::geometry;
+use lurek2d::math::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
+use lurek2d::math::spatial_hash::SpatialHash;
+use lurek2d::math::tween::Tween;
+use lurek2d::pathfinding::grid::Grid;
+use lurek2d::procgen::{self, CellularOpts, VoronoiOpts};
+use lurek2d::raycaster::Raycaster2D;
+use lurek2d::raycaster::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
+use lurek2d::tilemap::tile_walker::{Facing, TileWalker};
 
 // ═════════════════════════════════════════════════════════════════════════
 // 1. NoiseGenerator

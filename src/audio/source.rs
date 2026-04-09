@@ -3,13 +3,13 @@
 //! The primary audio logic lives in `mixer::Mixer`. This module re-exports
 //! the public enum types used by the Lua API and engine code.
 //!
-//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
 //! details for source-related operations and data management.
 //! Key types exported from this module: `AudioSource`.
 //! Primary functions: `new()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::AS01;
 use crate::log_msg;
@@ -17,7 +17,7 @@ use crate::log_msg;
 /// 3D spatial audio state for an audio source.
 ///
 /// Used to compute panning relative to the listener position.
-/// Luna2D uses 2D x/y primarily; z is accepted but ignored for panning calculation.
+/// Lurek2D uses 2D x/y primarily; z is accepted but ignored for panning calculation.
 ///
 /// # Fields
 /// - `position` — `[f32; 3]`. World-space position `[x, y, z]`.

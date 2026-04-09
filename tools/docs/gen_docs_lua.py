@@ -30,9 +30,9 @@ _MODULE_ORDER = [
 # Maps the internal json/module key → actual registered Lua namespace.
 # These modules register under a different name than their source folder.
 _LUA_NAMESPACE = {
-    "timer":      "time",       # luna.time.* (registered as "time" in timer_api.rs)
-    "event":      "signal",     # luna.signal.* (registered as "signal" in event_api.rs)
-    "automation": "simulator",  # luna.simulator.* (registered as "simulator" in automation_api.rs)
+    "timer":      "time",       # lurek.time.* (registered as "time" in timer_api.rs)
+    "event":      "signal",     # lurek.signal.* (registered as "signal" in event_api.rs)
+    "automation": "simulator",  # lurek.simulator.* (registered as "simulator" in automation_api.rs)
 }
 
 
@@ -140,28 +140,28 @@ def _code_block(entries):
 
 def _callbacks():
     CB = [
-        ("function luna.load()",                                                   "Called once after the script is loaded."),
-        ("function luna.update( dt : number )",                                    "Called every frame; dt = elapsed seconds."),
-        ("function luna.draw()",                                                   "Called every frame for rendering."),
-        ("function luna.keypressed( key : string, scancode : string, isrepeat : boolean )", "Key press event."),
-        ("function luna.keyreleased( key : string, scancode : string )",           "Key release event."),
-        ("function luna.textinput( text : string )",                               "Unicode character typed."),
-        ("function luna.mousepressed( x : number, y : number, button : number )", "Mouse button press."),
-        ("function luna.mousereleased( x : number, y : number, button : number )","Mouse button release."),
-        ("function luna.wheelmoved( x : number, y : number )",                    "Mouse wheel scroll."),
-        ("function luna.gamepadpressed( id : number, button : string )",          "Gamepad button press."),
-        ("function luna.gamepadreleased( id : number, button : string )",         "Gamepad button release."),
-        ("function luna.gamepadaxis( id : number, axis : string, value : number )","Gamepad axis; value in -1..1."),
-        ("function luna.joystickadded( id : number )",                            "Gamepad connected."),
-        ("function luna.joystickremoved( id : number )",                          "Gamepad disconnected."),
-        ("function luna.touchpressed( id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch begin."),
-        ("function luna.touchmoved(  id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch move."),
-        ("function luna.touchreleased(id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch end."),
-        ("function luna.focus( focused : boolean )",                              "Window focus change."),
-        ("function luna.visible( visible : boolean )",                            "Window show/hide."),
-        ("function luna.resize( w : number, h : number )",                        "Window resized."),
-        ("function luna.quit()",                                                   "Return true to cancel quit."),
-        ("function luna.errorhandler( msg : string )",                            "Unhandled Lua error."),
+        ("function lurek.load()",                                                   "Called once after the script is loaded."),
+        ("function lurek.update( dt : number )",                                    "Called every frame; dt = elapsed seconds."),
+        ("function lurek.draw()",                                                   "Called every frame for rendering."),
+        ("function lurek.keypressed( key : string, scancode : string, isrepeat : boolean )", "Key press event."),
+        ("function lurek.keyreleased( key : string, scancode : string )",           "Key release event."),
+        ("function lurek.textinput( text : string )",                               "Unicode character typed."),
+        ("function lurek.mousepressed( x : number, y : number, button : number )", "Mouse button press."),
+        ("function lurek.mousereleased( x : number, y : number, button : number )","Mouse button release."),
+        ("function lurek.wheelmoved( x : number, y : number )",                    "Mouse wheel scroll."),
+        ("function lurek.gamepadpressed( id : number, button : string )",          "Gamepad button press."),
+        ("function lurek.gamepadreleased( id : number, button : string )",         "Gamepad button release."),
+        ("function lurek.gamepadaxis( id : number, axis : string, value : number )","Gamepad axis; value in -1..1."),
+        ("function lurek.joystickadded( id : number )",                            "Gamepad connected."),
+        ("function lurek.joystickremoved( id : number )",                          "Gamepad disconnected."),
+        ("function lurek.touchpressed( id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch begin."),
+        ("function lurek.touchmoved(  id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch move."),
+        ("function lurek.touchreleased(id, x : number, y : number, dx : number, dy : number, pressure : number )", "Touch end."),
+        ("function lurek.focus( focused : boolean )",                              "Window focus change."),
+        ("function lurek.visible( visible : boolean )",                            "Window show/hide."),
+        ("function lurek.resize( w : number, h : number )",                        "Window resized."),
+        ("function lurek.quit()",                                                   "Return true to cancel quit."),
+        ("function lurek.errorhandler( msg : string )",                            "Unhandled Lua error."),
     ]
     out = ["## Callbacks","",
            "All callbacks are optional. Define any in `main.lua` and the engine calls them automatically.",
@@ -173,7 +173,7 @@ def _render_module(mod_name, mod_data):
     lua_ns = _LUA_NAMESPACE.get(mod_name, mod_name)
     out = []
     anchor = mod_name.replace("_","-")
-    out.append(f"## `luna.{lua_ns}` {{#{anchor}}}")
+    out.append(f"## `lurek.{lua_ns}` {{#{anchor}}}")
     out.append("")
     desc = (mod_data.get("description","") or "").strip()
     if desc:
@@ -198,7 +198,7 @@ def _render_module(mod_name, mod_data):
         out.append("")
 
     if fns:
-        entries = [_build_call(fn, f"luna.{lua_ns}.{fn['name']}") for fn in sorted(fns, key=lambda f:f["name"])]
+        entries = [_build_call(fn, f"lurek.{lua_ns}.{fn['name']}") for fn in sorted(fns, key=lambda f:f["name"])]
         out += _code_block(entries)
         out.append("")
 
@@ -239,7 +239,7 @@ def generate(data):
         if m not in seen: ordered.append(m)
 
     out = []
-    out += ["# Luna2D Lua API Reference","",
+    out += ["# Lurek2D Lua API Reference","",
             f"*Auto-generated by `tools/gen_docs_lua.py`. Version: `{ver}` | Generated: {gen}*",
             f"*Coverage: {s['documented']}/{s['total_functions']} functions documented ({s['coverage_pct']}%)*",
             "","---","","## Contents",""]
@@ -251,7 +251,7 @@ def generate(data):
         n_cls = len(mods[m].get("classes",{}))
         parts = ([f"{n_fns} fn"] if n_fns else []) + ([f"{n_cls} class{'es' if n_cls!=1 else ''}"] if n_cls else [])
         suffix = " \u2014 " + ", ".join(parts) if parts else ""
-        out.append(f"- [`luna.{lua_ns}`](#{anchor}){suffix}")
+        out.append(f"- [`lurek.{lua_ns}`](#{anchor}){suffix}")
 
     out += ["","---",""]
     out += _callbacks()

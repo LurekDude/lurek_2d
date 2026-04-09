@@ -15,7 +15,7 @@ A chess-inspired turn-based strategy game on an 8 × 8 grid. Click a unit to sel
 ## How to Run
 
 ```powershell
-cargo run -- demos/tactical_battle
+cargo run -- content/demos/tactical_battle
 ```
 
 ## Controls

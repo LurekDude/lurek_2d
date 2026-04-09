@@ -3,13 +3,13 @@
 //! Stores symmetric numeric relations and named-state levels between entity pairs.
 //! Entity IDs are `u32` to match [`Universe`](super::Universe).
 //!
-//! This module is part of Luna2D's `entity` subsystem and provides the implementation
+//! This module is part of Lurek2D's `entity` subsystem and provides the implementation
 //! details for relationships-related operations and data management.
 //! Key types exported from this module: `RelationType`, `Relationship`, `RelationshipManager`.
 //! Primary functions: `new()`, `has_level()`, `new()`, `define_type()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

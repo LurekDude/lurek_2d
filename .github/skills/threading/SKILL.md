@@ -1,22 +1,22 @@
 ---
 name: threading
-description: "Load this skill when designing or implementing multi-threaded Lua behaviour in Luna2D using the luna.thread API: spawning worker threads, using Channel for inter-VM communication, handling errors in background threads, or understanding which luna.* modules are safe to use in worker VMs. Use for: background computation, async file I/O in workers, producer-consumer patterns, parallel data processing. Skip it for Rust-side thread management internals (see src/thread/AGENT.md), or for general game scripting (use lua-scripting)."
+description: "Load this skill when designing or implementing multi-threaded Lua behaviour in Lurek2D using the lurek.thread API: spawning worker threads, using Channel for inter-VM communication, handling errors in background threads, or understanding which lurek.* modules are safe to use in worker VMs. Use for: background computation, async file I/O in workers, producer-consumer patterns, parallel data processing. Skip it for Rust-side thread management internals (see src/thread/AGENT.md), or for general game scripting (use lua-scripting)."
 ---
 
-# Threading — Luna2D
+# Threading — Lurek2D
 
 ## Load When
 
-- Adding background computation or I/O to a game via `luna.thread.newThread()`
+- Adding background computation or I/O to a game via `lurek.thread.newThread()`
 - Designing a producer-consumer or work-queue pattern with `Channel`
-- Working out which `luna.*` API is safe to call from a worker thread Lua VM
+- Working out which `lurek.*` API is safe to call from a worker thread Lua VM
 - Handling errors thrown in a background thread
 - Explaining the threading model to a new contributor
 
 ## Owns
 
-- Luna2D threading model: one Lua VM per thread, no shared state
-- `luna.thread.*` Lua API patterns
+- Lurek2D threading model: one Lua VM per thread, no shared state
+- `lurek.thread.*` Lua API patterns
 - `Channel` communication patterns (push / pop / demand)
 - Worker VM module restrictions
 - Error reporting from worker VMs back to the main VM
@@ -26,14 +26,14 @@ description: "Load this skill when designing or implementing multi-threaded Lua 
 
 ## Threading Model
 
-Luna2D uses **one Lua VM per thread**. Worker threads cannot share `SharedState` with the main game thread. This eliminates data races at the cost of requiring explicit message passing for all cross-thread communication.
+Lurek2D uses **one Lua VM per thread**. Worker threads cannot share `SharedState` with the main game thread. This eliminates data races at the cost of requiring explicit message passing for all cross-thread communication.
 
 ```
 Main Game Thread
-├── Lua VM (full luna.* API)
+├── Lua VM (full lurek.* API)
 ├── SharedState (Rc<RefCell<>>)
 ├── GpuRenderer, Mixer, Physics
-└── luna.update() / luna.draw()
+└── lurek.update() / lurek.draw()
 
 Worker Thread N
 ├── Separate Lua VM (restricted API)
@@ -41,7 +41,7 @@ Worker Thread N
 └── Channel ◄────────► Main Thread Channel
 ```
 
-**Key consequence**: The main thread is the only thread that can call `luna.gfx.*`, `luna.audio.*`, `luna.physics.*`, and `luna.input.*`. Workers send results back via `Channel` and the main thread applies them.
+**Key consequence**: The main thread is the only thread that can call `lurek.gfx.*`, `lurek.audio.*`, `lurek.physics.*`, and `lurek.input.*`. Workers send results back via `Channel` and the main thread applies them.
 
 ---
 
@@ -50,9 +50,9 @@ Worker Thread N
 ### Spawning a thread
 
 ```lua
--- luna.thread.newThread(code: string) -> Thread
+-- lurek.thread.newThread(code: string) -> Thread
 -- code is a complete Lua script string; it runs in an isolated VM
-local worker = luna.thread.newThread([[
+local worker = lurek.thread.newThread([[
     local inbox  = ...   -- first argument via thread:start()
     local outbox = ...   -- second argument
 
@@ -69,10 +69,10 @@ local worker = luna.thread.newThread([[
 ### Creating a channel
 
 ```lua
--- luna.thread.newChannel() -> Channel
+-- lurek.thread.newChannel() -> Channel
 -- Channels are MPMC (many producer, many consumer), thread-safe
-local inbox  = luna.thread.newChannel()
-local outbox = luna.thread.newChannel()
+local inbox  = lurek.thread.newChannel()
+local outbox = lurek.thread.newChannel()
 ```
 
 ### Starting a thread
@@ -87,7 +87,7 @@ worker:start(inbox, outbox)
 ```lua
 ch:push(value)        -- non-blocking send; value: nil|bool|number|string
 ch:pop()              -- non-blocking receive; returns nil if empty
-ch:demand()           -- BLOCKING receive; use in workers, NOT in luna.update()
+ch:demand()           -- BLOCKING receive; use in workers, NOT in lurek.update()
 ch:peek()             -- non-destructive peek at front; returns nil if empty
 ch:getCount()         -- number of items waiting
 ch:clear()            -- drain all items
@@ -111,32 +111,32 @@ ch:clear()            -- drain all items
 To pass structured data:
 ```lua
 -- Serialize a table: JSON or comma-separated string
-local data = luna.data.toJSON({ x = 10, y = 20 })
+local data = lurek.data.toJSON({ x = 10, y = 20 })
 channel:push(data)
 
 -- On the other side:
-local result = luna.data.fromJSON(channel:pop())
+local result = lurek.data.fromJSON(channel:pop())
 ```
 
 ---
 
 ## Worker VM — Safe Modules
 
-Worker threads get an isolated VM with only these `luna.*` modules available:
+Worker threads get an isolated VM with only these `lurek.*` modules available:
 
 | Module | Available in worker? | Notes |
 |--------|---------------------|-------|
-| `luna.math` | ✅ Full | Safe (pure computation) |
-| `luna.thread` | ✅ Full | Channels, thread control |
-| `luna.time` | ✅ Read-only | `luna.time.getTime()`, `luna.time.getDelta()` |
-| `luna.fs` | ✅ Read-only | File reads only; no write |
-| `luna.platform` | ✅ Read-only | OS info, `getProcessorCount()` |
-| `luna.gfx` | ❌ | GPU resources are main-thread only |
-| `luna.audio` | ❌ | Audio is main-thread only |
-| `luna.physics` | ❌ | Physics world is main-thread only |
-| `luna.input` | ❌ | Input state is main-thread only |
-| `luna.data` | ✅ Full | Compression, hashing, encoding |
-| `luna.img` | ✅ Full | CPU-side pixel data only |
+| `lurek.math` | ✅ Full | Safe (pure computation) |
+| `lurek.thread` | ✅ Full | Channels, thread control |
+| `lurek.time` | ✅ Read-only | `lurek.time.getTime()`, `lurek.time.getDelta()` |
+| `lurek.fs` | ✅ Read-only | File reads only; no write |
+| `lurek.platform` | ✅ Read-only | OS info, `getProcessorCount()` |
+| `lurek.gfx` | ❌ | GPU resources are main-thread only |
+| `lurek.audio` | ❌ | Audio is main-thread only |
+| `lurek.physics` | ❌ | Physics world is main-thread only |
+| `lurek.input` | ❌ | Input state is main-thread only |
+| `lurek.data` | ✅ Full | Compression, hashing, encoding |
+| `lurek.img` | ✅ Full | CPU-side pixel data only |
 | Standard libs | Subset | No `os`, `io`, `loadfile`, `dofile` |
 
 ---
@@ -169,7 +169,7 @@ end
 
 ```lua
 -- Main thread checks error channel each frame:
-function luna.process(dt)
+function lurek.process(dt)
     local err = errors:pop()
     if err then
         print("Background error: " .. err)
@@ -185,10 +185,10 @@ end
 ### Work Queue
 
 ```lua
-local queue   = luna.thread.newChannel()
-local results = luna.thread.newChannel()
+local queue   = lurek.thread.newChannel()
+local results = lurek.thread.newChannel()
 
-local worker  = luna.thread.newThread([[
+local worker  = lurek.thread.newThread([[
     local q, r = ...
     while true do
         local item = q:demand()
@@ -202,7 +202,7 @@ worker:start(queue, results)
 queue:push(42)
 
 -- Main thread: collect results each frame (non-blocking)
-function luna.process(dt)
+function lurek.process(dt)
     local result = results:pop()
     if result then applyResult(result) end
 end
@@ -211,28 +211,28 @@ end
 ### Background Save
 
 ```lua
-local saveChannel = luna.thread.newChannel()
+local saveChannel = lurek.thread.newChannel()
 
-local saver = luna.thread.newThread([[
+local saver = lurek.thread.newThread([[
     local ch = ...
     while true do
         local json = ch:demand()
         if json == nil then break end
-        luna.fs.write("save.json", json)
+        lurek.fs.write("save.json", json)
     end
 ]])
 saver:start(saveChannel)
 
 -- Trigger save from main thread (non-blocking):
-saveChannel:push(luna.data.toJSON(gameState))
+saveChannel:push(lurek.data.toJSON(gameState))
 ```
 
 ---
 
 ## Rules
 
-- **Never call `channel:demand()` in `luna.update()`.** It blocks the game loop. Use `channel:pop()` (non-blocking) in `luna.update()` and `channel:demand()` in workers.
+- **Never call `channel:demand()` in `lurek.update()`.** It blocks the game loop. Use `channel:pop()` (non-blocking) in `lurek.update()` and `channel:demand()` in workers.
 - **Threads do not auto-stop** when the main thread exits a scope. Send a `"quit"` message as the shutdown signal.
 - **No shared mutable state.** If two pieces of code need to share a Lua value, use a Channel.
-- **Each `luna.thread.newThread()` call creates a new Lua VM.** Startup cost is small but non-zero — create workers at load time, not inside `luna.update()`.
+- **Each `lurek.thread.newThread()` call creates a new Lua VM.** Startup cost is small but non-zero — create workers at load time, not inside `lurek.update()`.
 - **Resource keys (TextureKey, etc.) cannot cross threads** — they are opaque IDs for main-thread resources.

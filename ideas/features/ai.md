@@ -41,16 +41,16 @@ Game AI toolkit: multiple AI paradigms including FSM, behavior trees, GOAP, stee
 
 ## Suggestions
 
-1. **Add AI sensing system**: `luna.ai.newSensor(entity, {sightRange=200, sightAngle=120, hearingRange=100})` — percept system that feeds into FSM/BT decisions. Common need for stealth and action games.
+1. **Add AI sensing system**: `lurek.ai.newSensor(entity, {sightRange=200, sightAngle=120, hearingRange=100})` — percept system that feeds into FSM/BT decisions. Common need for stealth and action games.
 2. **Add steering-pathfinding bridge**: `steeringAgent:setPath(navGrid:findPath(start, end))` — seamless integration.
-3. **Add MCTS for turn-based**: `luna.ai.mcts(rootState, simulateFn, maxIterations)` — enables competent AI for card games, board games, strategy.
-4. **Sub-modularize**: Group into `luna.ai.fsm.*`, `luna.ai.bt.*`, `luna.ai.goap.*` etc. Current flat namespace with 50+ functions is overwhelming.
+3. **Add MCTS for turn-based**: `lurek.ai.mcts(rootState, simulateFn, maxIterations)` — enables competent AI for card games, board games, strategy.
+4. **Sub-modularize**: Group into `lurek.ai.fsm.*`, `lurek.ai.bt.*`, `lurek.ai.goap.*` etc. Current flat namespace with 50+ functions is overwhelming.
 5. **Add BT debugger data**: `bt:getDebugState()` → returns tree with active/success/fail per node for visualization.
 6. **Consider making Q-Learning optional**: It's the most niche AI paradigm. Config-gate it or move to Tier 3 library.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy | Game AI libs |
+| Feature | Lurek2D | Engine A | Engine B | Engine D | Game AI libs |
 |---|---|---|---|---|---|
 | FSM | ✅ | ❌ | ❌ | ❌ | ✅ |
 | Behavior Trees | ✅ | ❌ | ❌ | ❌ | ✅ |
@@ -61,7 +61,7 @@ Game AI toolkit: multiple AI paradigms including FSM, behavior trees, GOAP, stee
 | Influence Maps | ✅ | ❌ | ❌ | ❌ | ✅ |
 | Formations | ✅ | ❌ | ❌ | ❌ | ❌ |
 
-Luna2D has the most comprehensive built-in AI system of any 2D game engine. This is a major differentiator.
+Lurek2D has the most comprehensive built-in AI system of any 2D game engine. This is a major differentiator.
 
 ## Priority
 

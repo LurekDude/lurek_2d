@@ -1,12 +1,12 @@
 //! Mat3 implementation for the `math` subsystem.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! This module is part of Lurek2D's `math` subsystem and provides the implementation
 //! details for mat3-related operations and data management.
 //! Key types exported from this module: `Mat3`.
 //! Primary functions: `identity()`, `from_row_major()`, `from_translation()`, `from_rotation()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use super::vec2::Vec2;
 

@@ -1,4 +1,4 @@
-function luna.conf(cfg)
+function lurek.conf(cfg)
     cfg.window.title  = "Roguelike"
     cfg.window.width  = 800
     cfg.window.height = 600

@@ -1,7 +1,7 @@
--- Platformer Demo for Luna2D
+-- Platformer Demo for Lurek2D
 -- A simple platformer showcasing physics, input, easing, and scene management.
 -- Arrow keys / WASD to move, SPACE to jump.
--- Run with: cargo run -- demos/action/platformer
+-- Run with: cargo run -- content/demos/action/platformer
 
 -- ── Game state ───────────────────────────────────────────────────────────
 
@@ -90,32 +90,32 @@ local function aabb_overlap(ax, ay, aw, ah, bx, by, bw, bh)
     return ax < bx + bw and ax + aw > bx and ay < by + bh and ay + ah > by
 end
 
--- ── Luna2D callbacks ─────────────────────────────────────────────────────
+-- ── Lurek2D callbacks ─────────────────────────────────────────────────────
 
-function luna.init()
-    luna.window.setTitle("Platformer Demo - Luna2D")
-    luna.gfx.setBackgroundColor(0.05, 0.07, 0.15)
+function lurek.init()
+    lurek.window.setTitle("Platformer Demo - Lurek2D")
+    lurek.gfx.setBackgroundColor(0.05, 0.07, 0.15)
     generate_level()
 
     -- Phase 4: load optional footstep sound for spatial audio demo
-    local ok, src = pcall(luna.audio.newSource, "footstep.wav", "static")
+    local ok, src = pcall(lurek.audio.newSource, "footstep.wav", "static")
     if ok then
         footstep_source = src
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if not player.alive then
         return
     end
 
     -- Horizontal input
     player.vx = 0
-    if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+    if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
         player.vx = -player.speed
         player.facing = -1
     end
-    if luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+    if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
         player.vx = player.speed
         player.facing = 1
     end
@@ -177,7 +177,7 @@ function luna.process(dt)
     -- Camera follow with easing
     camera_target_x = player.x - 350
     if camera_target_x < 0 then camera_target_x = 0 end
-    local ease_t = luna.math.applyEasing("outCubic", clamp(dt * 5, 0, 1))
+    local ease_t = lurek.math.applyEasing("outCubic", clamp(dt * 5, 0, 1))
     camera_x = lerp(camera_x, camera_target_x, ease_t)
 
     -- Update particles
@@ -194,87 +194,87 @@ function luna.process(dt)
 
     -- Phase 4: update spatial audio listener position to match player
     if footstep_source then
-        luna.audio.setPosition(footstep_source, player.x, player.y, 0)
+        lurek.audio.setPosition(footstep_source, player.x, player.y, 0)
         footstep_cooldown = footstep_cooldown - dt
         if player.on_ground and math.abs(player.vx) > 10 and footstep_cooldown <= 0 then
-            luna.audio.stop(footstep_source)
-            luna.audio.play(footstep_source)
+            lurek.audio.stop(footstep_source)
+            lurek.audio.play(footstep_source)
             footstep_cooldown = 0.35
         end
     end
 end
 
-function luna.render()
-    luna.gfx.push()
-    luna.gfx.translate(-camera_x, 0)
+function lurek.render()
+    lurek.gfx.push()
+    lurek.gfx.translate(-camera_x, 0)
 
     -- Draw sky gradient (simple horizontal bands)
     for i = 0, 5 do
         local shade = 0.05 + i * 0.02
-        luna.gfx.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
-        luna.gfx.rectangle("fill", camera_x, i * 100, 800, 100)
+        lurek.gfx.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
+        lurek.gfx.rectangle("fill", camera_x, i * 100, 800, 100)
     end
 
     -- Draw platforms
     for _, p in ipairs(platforms) do
-        luna.gfx.setColor(p.color[1], p.color[2], p.color[3])
-        luna.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
+        lurek.gfx.setColor(p.color[1], p.color[2], p.color[3])
+        lurek.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
         -- Platform top highlight
-        luna.gfx.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
-        luna.gfx.rectangle("fill", p.x, p.y, p.w, 3)
+        lurek.gfx.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
+        lurek.gfx.rectangle("fill", p.x, p.y, p.w, 3)
     end
 
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
             local bob_y = math.sin(coin.bob * 3) * 5
-            luna.gfx.setColor(1.0, 0.85, 0.0)
-            luna.gfx.circle("fill", coin.x, coin.y + bob_y, 8)
-            luna.gfx.setColor(1.0, 0.95, 0.5)
-            luna.gfx.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
+            lurek.gfx.setColor(1.0, 0.85, 0.0)
+            lurek.gfx.circle("fill", coin.x, coin.y + bob_y, 8)
+            lurek.gfx.setColor(1.0, 0.95, 0.5)
+            lurek.gfx.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
         end
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        luna.gfx.setColor(p.r, p.g, p.b, alpha)
-        luna.gfx.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.gfx.setColor(p.r, p.g, p.b, alpha)
+        lurek.gfx.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     -- Draw player
     if player.alive then
         -- Body
-        luna.gfx.setColor(0.3, 0.6, 1.0)
-        luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+        lurek.gfx.setColor(0.3, 0.6, 1.0)
+        lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
         local eye_x = player.x + (player.facing > 0 and 16 or 4)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.rectangle("fill", eye_x, player.y + 8, 6, 6)
-        luna.gfx.setColor(0, 0, 0)
-        luna.gfx.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.rectangle("fill", eye_x, player.y + 8, 6, 6)
+        lurek.gfx.setColor(0, 0, 0)
+        lurek.gfx.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
     end
 
-    luna.gfx.pop()
+    lurek.gfx.pop()
 
     -- HUD (not affected by camera)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Coins: " .. tostring(player.score), 10, 10, 2)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Coins: " .. tostring(player.score), 10, 10, 2)
 
-    local fps = math.floor(luna.time.getFPS())
-    luna.gfx.setColor(0.5, 0.5, 0.5)
-    luna.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
+    local fps = math.floor(lurek.time.getFPS())
+    lurek.gfx.setColor(0.5, 0.5, 0.5)
+    lurek.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     if not player.alive then
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("GAME OVER - Press R to restart", 200, 280, 2.5)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("GAME OVER - Press R to restart", 200, 280, 2.5)
     end
 
-    luna.gfx.setColor(0.4, 0.4, 0.4)
-    luna.gfx.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
+    lurek.gfx.setColor(0.4, 0.4, 0.4)
+    lurek.gfx.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "space" and player.on_ground and player.alive then
         player.vy = player.jump_force
         player.on_ground = false
@@ -294,6 +294,6 @@ function luna.keypressed(key)
     end
 
     if key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end

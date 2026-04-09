@@ -3,7 +3,7 @@
 //! Tests cover catalog parsing, ID resolution, global `get_message`, and the
 //! uniqueness contract for all registered stable IDs.
 
-use luna2d::engine::messages::{catalog, get_message, init, MessageCatalog};
+use lurek2d::engine::messages::{catalog, get_message, init, MessageCatalog};
 
 // ---------------------------------------------------------------------------
 // Parsing
@@ -29,7 +29,7 @@ fn catalog_has_expected_entry_count() {
 #[test]
 fn l001_resolves_to_human_text() {
     let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
-    assert_eq!(c.get("L001"), Some("Luna2D Engine starting"));
+    assert_eq!(c.get("L001"), Some("Lurek2D Engine starting"));
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn unknown_id_returns_none() {
 #[test]
 fn get_message_returns_text_after_init() {
     init();
-    assert_eq!(get_message("L001"), "Luna2D Engine starting");
+    assert_eq!(get_message("L001"), "Lurek2D Engine starting");
     assert_eq!(get_message("L003"), "Game loaded");
     assert_eq!(get_message("L011"), "Lua error");
 }
@@ -84,7 +84,7 @@ fn init_is_idempotent() {
     init();
     init();
     init();
-    assert_eq!(get_message("L001"), "Luna2D Engine starting");
+    assert_eq!(get_message("L001"), "Lurek2D Engine starting");
 }
 
 // ---------------------------------------------------------------------------

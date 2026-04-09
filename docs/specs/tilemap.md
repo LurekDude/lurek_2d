@@ -7,7 +7,7 @@
 | **Tier** | Tier 2 — Engine Extension |
 | **Imports** | `math` (Vec2, Rect, Color), `engine` (log_messages) |
 | **Peer deps** | None (no Tier 2 ↔ Tier 2 cross-imports) |
-| **Lua namespace** | `luna.tilemap` |
+| **Lua namespace** | `lurek.tilemap` |
 | **API file** | `src/lua_api/tilemap_api.rs` |
 | **Test files** | `tests/rust/unit/tilemap_tests.rs` (159 tests), `tests/lua/unit/test_tilemap.lua` (151 tests), `tests/lua/integration/test_tilemap_physics.lua`, `tests/lua/integration/test_tilemap_physics2.lua`, `tests/lua/stress/test_tilemap_stress.lua`, `tests/lua/stress/test_tilemap_stress2.lua` |
 
@@ -22,7 +22,7 @@ The `tilemap` module provides a comprehensive tilemap toolkit for 2D game develo
 ## Architecture
 
 ```
-                  luna.tilemap (Lua namespace)
+                  lurek.tilemap (Lua namespace)
                          |
                          v
             +--- tilemap_api.rs -----------------------------------+
@@ -209,40 +209,40 @@ First-person tile-based movement controller for dungeon crawlers and grid-based 
 
 ## Lua API
 
-Registered by `src/lua_api/tilemap_api.rs` under `luna.tilemap`.
+Registered by `src/lua_api/tilemap_api.rs` under `lurek.tilemap`.
 
 ### Factory Functions
 
 | Lua Function | Returns | Description |
 |---|---|---|
-| `luna.tilemap.newTileSet(firstGid, tileCount, columns, tileW, tileH, spacing?, margin?)` | `TileSet` | Create a tileset with atlas layout |
-| `luna.tilemap.newTileMap(tileW, tileH, chunkSize?)` | `TileMap` | Create a tilemap (default chunk 16) |
-| `luna.tilemap.newAutoTileSheet(tileW, tileH, layout?)` | `AutoTileSheet` | Create autotile sheet ("blob47", "composite48", "minimal16") |
-| `luna.tilemap.newChunkMap(chunkSize?)` | `ChunkMap` | Create sparse chunk storage |
-| `luna.tilemap.newIsoMap(w, h, tileW, tileH, levelH)` | `IsoMap` | Create empty isometric map |
-| `luna.tilemap.newMapBlock(w, h, layers?, segmentSize?)` | `MapBlock` | Create tile prefab |
-| `luna.tilemap.newMapGroup(name)` | `MapGroup` | Create block group |
+| `lurek.tilemap.newTileSet(firstGid, tileCount, columns, tileW, tileH, spacing?, margin?)` | `TileSet` | Create a tileset with atlas layout |
+| `lurek.tilemap.newTileMap(tileW, tileH, chunkSize?)` | `TileMap` | Create a tilemap (default chunk 16) |
+| `lurek.tilemap.newAutoTileSheet(tileW, tileH, layout?)` | `AutoTileSheet` | Create autotile sheet ("blob47", "composite48", "minimal16") |
+| `lurek.tilemap.newChunkMap(chunkSize?)` | `ChunkMap` | Create sparse chunk storage |
+| `lurek.tilemap.newIsoMap(w, h, tileW, tileH, levelH)` | `IsoMap` | Create empty isometric map |
+| `lurek.tilemap.newMapBlock(w, h, layers?, segmentSize?)` | `MapBlock` | Create tile prefab |
+| `lurek.tilemap.newMapGroup(name)` | `MapGroup` | Create block group |
 
 ### Coordinate Helpers (standalone)
 
 | Lua Function | Returns | Description |
 |---|---|---|
-| `luna.tilemap.toScreenIso(tx, ty, tileW, tileH)` | `sx, sy` | Diamond iso projection |
-| `luna.tilemap.fromScreenIso(sx, sy, tileW, tileH)` | `tx, ty` | Reverse iso projection |
-| `luna.tilemap.toScreenHex(q, r, size)` | `sx, sy` | Axial hex → screen |
-| `luna.tilemap.fromScreenHex(sx, sy, size)` | `q, r` | Screen → axial hex |
-| `luna.tilemap.hexNeighbors(q, r)` | `table` | Six neighbor coords |
-| `luna.tilemap.hexDistance(q1, r1, q2, r2)` | `integer` | Hex Manhattan distance |
-| `luna.tilemap.hexRound(q, r)` | `q, r` | Snap to nearest hex |
-| `luna.tilemap.hexLine(q1, r1, q2, r2)` | `table` | Hex line cells |
-| `luna.tilemap.hexRing(q, r, radius)` | `table` | Ring at distance |
-| `luna.tilemap.hexSpiral(q, r, radius)` | `table` | Concentric spiral |
-| `luna.tilemap.hexArea(q, r, radius)` | `table` | Filled hex disk |
-| `luna.tilemap.hexRotate(q, r, cq, cr, steps)` | `q, r` | Cube rotation |
-| `luna.tilemap.hexReflect(q, r, cq, cr, axis)` | `q, r` | Cube reflection |
-| `luna.tilemap.isoRotate(direction, steps)` | `integer` | Rotate iso direction |
-| `luna.tilemap.isoDirectionName(direction)` | `string` | Direction to name |
-| `luna.tilemap.isoDirectionFromAngle(angle)` | `integer` | Angle to direction |
+| `lurek.tilemap.toScreenIso(tx, ty, tileW, tileH)` | `sx, sy` | Diamond iso projection |
+| `lurek.tilemap.fromScreenIso(sx, sy, tileW, tileH)` | `tx, ty` | Reverse iso projection |
+| `lurek.tilemap.toScreenHex(q, r, size)` | `sx, sy` | Axial hex → screen |
+| `lurek.tilemap.fromScreenHex(sx, sy, size)` | `q, r` | Screen → axial hex |
+| `lurek.tilemap.hexNeighbors(q, r)` | `table` | Six neighbor coords |
+| `lurek.tilemap.hexDistance(q1, r1, q2, r2)` | `integer` | Hex Manhattan distance |
+| `lurek.tilemap.hexRound(q, r)` | `q, r` | Snap to nearest hex |
+| `lurek.tilemap.hexLine(q1, r1, q2, r2)` | `table` | Hex line cells |
+| `lurek.tilemap.hexRing(q, r, radius)` | `table` | Ring at distance |
+| `lurek.tilemap.hexSpiral(q, r, radius)` | `table` | Concentric spiral |
+| `lurek.tilemap.hexArea(q, r, radius)` | `table` | Filled hex disk |
+| `lurek.tilemap.hexRotate(q, r, cq, cr, steps)` | `q, r` | Cube rotation |
+| `lurek.tilemap.hexReflect(q, r, cq, cr, axis)` | `q, r` | Cube reflection |
+| `lurek.tilemap.isoRotate(direction, steps)` | `integer` | Rotate iso direction |
+| `lurek.tilemap.isoDirectionName(direction)` | `string` | Direction to name |
+| `lurek.tilemap.isoDirectionFromAngle(angle)` | `integer` | Angle to direction |
 
 ### TileSet Methods
 
@@ -391,10 +391,10 @@ Registered by `src/lua_api/tilemap_api.rs` under `luna.tilemap`.
 ### Basic orthogonal tilemap
 ```lua
 -- Create tileset and map
-local ts = luna.tilemap.newTileSet(1, 64, 8, 32, 32)
+local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 32)
 ts:setSolid(5, true)  -- mark tile 5 as solid
 
-local map = luna.tilemap.newTileMap(32, 32)
+local map = lurek.tilemap.newTileMap(32, 32)
 map:addTileSet(ts)
 map:addLayer("ground", 20, 15)
 map:fill(1, 1)          -- fill layer 1 with GID 1
@@ -408,11 +408,11 @@ map:update(dt)
 
 ### 4-bit autotile
 ```lua
-local ts = luna.tilemap.newTileSet(1, 64, 8, 32, 32)
+local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 32)
 for mask = 0, 15 do
     ts:setAutoTileRule("grass", mask, mask + 1)
 end
-local map = luna.tilemap.newTileMap(32, 32)
+local map = lurek.tilemap.newTileMap(32, 32)
 map:addTileSet(ts)
 map:addLayer("terrain", 20, 15)
 map:fill(1, 1)
@@ -423,17 +423,17 @@ map:applyAutoTileAt(1, 3, 3, "grass") -- localized update
 
 ### Hex grid coordinate helpers
 ```lua
-local sx, sy = luna.tilemap.toScreenHex(3, 2, 32)
-local q, r = luna.tilemap.fromScreenHex(sx, sy, 32)
-local neighbors = luna.tilemap.hexNeighbors(q, r)
-local dist = luna.tilemap.hexDistance(0, 0, 3, 2)
-local ring = luna.tilemap.hexRing(0, 0, 2)
-local line = luna.tilemap.hexLine(0, 0, 5, 3)
+local sx, sy = lurek.tilemap.toScreenHex(3, 2, 32)
+local q, r = lurek.tilemap.fromScreenHex(sx, sy, 32)
+local neighbors = lurek.tilemap.hexNeighbors(q, r)
+local dist = lurek.tilemap.hexDistance(0, 0, 3, 2)
+local ring = lurek.tilemap.hexRing(0, 0, 2)
+local line = lurek.tilemap.hexLine(0, 0, 5, 3)
 ```
 
 ### Sparse chunk map
 ```lua
-local chunks = luna.tilemap.newChunkMap(16)
+local chunks = lurek.tilemap.newChunkMap(16)
 chunks:setTile(100, 200, 5)
 chunks:loadChunk(0, 0)
 local visible = chunks:getChunksInView(0, 0, 800, 600, 32, 32)
@@ -442,7 +442,7 @@ local x0, y0, x1, y1 = chunks:chunkTileRange(0, 0)
 
 ### Isometric map
 ```lua
-local iso = luna.tilemap.newIsoMap(10, 10, 64, 32, 24)
+local iso = lurek.tilemap.newIsoMap(10, 10, 64, 32, 24)
 iso:addLevel()
 iso:setTilePart(1, 1, 1, 0, 5)  -- Floor of tile (1,1) on level 1
 iso:setOrigin(400, 100)

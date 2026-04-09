@@ -3,12 +3,12 @@
 organize_demos.py — Three-in-one demos maintenance tool.
 
 Does:
-  1. Moves each demo into demos/<category>/<name>/
+  1. Moves each demo into content/demos/<category>/<name>/
   2. Generates a placeholder 800×600 screen.png for demos that don't have one
-  3. Rewrites demos/README.md as a single table with per-row thumbnails
+  3. Rewrites content/demos/README.md as a single table with per-row thumbnails
 
 Usage:
-    python tools/demos/organize_demos.py [--no-move] [--no-png] [--no-readme] [--dry-run]
+    python tools/content/demos/organize_demos.py [--no-move] [--no-png] [--no-readme] [--dry-run]
 """
 
 import argparse
@@ -346,7 +346,7 @@ def make_placeholder(dest: Path, category: str, demo_name: str, dry_run: bool) -
     _text_center(draw, dname, w // 2, h // 2 - 20, font_big, fg)
 
     # Subtitle
-    _text_center(draw, "Luna2D Demo", w // 2, h // 2 + 55, font_med,
+    _text_center(draw, "Lurek2D Demo", w // 2, h // 2 + 55, font_med,
                  tuple(min(255, c + 40) for c in fg))
 
     # "No screenshot yet" notice
@@ -372,7 +372,7 @@ def _text_center(draw, text: str, cx: int, cy: int, font, color) -> None:
 
 def reorganize(demos_dir: Path, dry_run: bool) -> dict:
     """
-    Move demos/<name>/ → demos/<category>/<name>/
+    Move content/demos/<name>/ → content/demos/<category>/<name>/
     Returns mapping {name: new_relative_path} for use by README writer.
     """
     moved = {}
@@ -410,21 +410,21 @@ def gen_placeholders(demos_dir: Path, moved: dict, dry_run: bool) -> None:
 # ── Step 3 : Rewrite README ────────────────────────────────────────────────────
 
 README_HEADER = """\
-# Luna2D Demos
+# Lurek2D Demos
 
 {total} fully playable demo games, organized by category.
-Every demo is self-contained: run with `cargo run -- demos/<category>/<name>`.
+Every demo is self-contained: run with `cargo run -- content/demos/<category>/<name>`.
 
-For API reference code (not runnable games), see [`examples/`](../examples/).
+For API reference code (not runnable games), see [`content/examples/`](../content/examples/).
 
 ---
 
 ## Running a Demo
 
 ```bash
-cargo run -- demos/<category>/<name>          # debug build
-cargo run --release -- demos/<category>/<name>  # release build
-luna demos/<category>/<name>                  # installed binary
+cargo run -- content/demos/<category>/<name>          # debug build
+cargo run --release -- content/demos/<category>/<name>  # release build
+luna content/demos/<category>/<name>                  # installed binary
 ```
 
 ---
@@ -447,9 +447,9 @@ FOOTER = """\
 
 ## See Also
 
-- [`examples/`](../examples/) — API reference code (one `.lua` file per module)
-- [`library/`](../library/) — Reusable pure-Lua gameplay libraries
-- [Getting Started](../docs/getting_started.md) — Build your first game with Luna2D
+- [`content/examples/`](../content/examples/) — API reference code (one `.lua` file per module)
+- [`content/library/`](../content/library/) — Reusable pure-Lua gameplay libraries
+- [Getting Started](../docs/getting_started.md) — Build your first game with Lurek2D
 """
 
 
@@ -510,7 +510,7 @@ def main():
     demos_dir = repo_root / "demos"
 
     if not demos_dir.is_dir():
-        print(f"ERROR: demos/ not found at {demos_dir}", file=sys.stderr)
+        print(f"ERROR: content/demos/ not found at {demos_dir}", file=sys.stderr)
         sys.exit(1)
 
     # Step 1 — Reorganize
@@ -539,7 +539,7 @@ def main():
 
     # Step 3 — README
     if not args.no_readme:
-        print("\n[3/3] Rewriting demos/README.md...")
+        print("\n[3/3] Rewriting content/demos/README.md...")
         write_readme(demos_dir, moved, args.dry_run)
     else:
         print("\n[3/3] Skipping README (--no-readme).")

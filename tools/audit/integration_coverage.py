@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-integration_coverage.py — Luna2D integration test coverage analysis.
+integration_coverage.py — Lurek2D integration test coverage analysis.
 
 Analyzes integration tests in tests/lua/integration/ to determine which
 module-pair combinations have test coverage. Produces a heat map.
@@ -103,7 +103,7 @@ def generate_report(
 ) -> str:
     """Generate a Markdown integration coverage report."""
     lines = [
-        "# Luna2D Integration Test Coverage",
+        "# Lurek2D Integration Test Coverage",
         "",
         "## Test Files",
         "",
@@ -162,7 +162,7 @@ def generate_report(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Luna2D integration test coverage analysis",
+        description="Lurek2D integration test coverage analysis",
     )
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--output", metavar="FILE")

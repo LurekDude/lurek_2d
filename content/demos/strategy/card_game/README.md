@@ -4,19 +4,19 @@ A collectible card game (CCG) demo featuring turn-based combat between you and a
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` — card rendering with fill and outline passes
-- `luna.gfx.circle()` — mana cost badges drawn on each card
-- `luna.gfx.print()` — multi-field HUD text: HP, mana, shield, log lines
-- `luna.gfx.setColor()` — per-card tint, hover highlight, and status-bar colouring
-- `luna.mouse.getPosition()` — hover detection and click-to-play input
-- `luna.mouse.isPressed()` — single-frame click detection for card selection
-- `luna.keyboard.isPressed()` — End Turn (Enter) and Quit (Escape) hotkeys
-- `luna.gfx.setBackgroundColor()` — dark purple arena atmosphere
+- `lurek.gfx.rectangle()` — card rendering with fill and outline passes
+- `lurek.gfx.circle()` — mana cost badges drawn on each card
+- `lurek.gfx.print()` — multi-field HUD text: HP, mana, shield, log lines
+- `lurek.gfx.setColor()` — per-card tint, hover highlight, and status-bar colouring
+- `lurek.mouse.getPosition()` — hover detection and click-to-play input
+- `lurek.mouse.isPressed()` — single-frame click detection for card selection
+- `lurek.keyboard.isPressed()` — End Turn (Enter) and Quit (Escape) hotkeys
+- `lurek.gfx.setBackgroundColor()` — dark purple arena atmosphere
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/card_game
+cargo run -- content/demos/card_game
 ```
 
 ## Controls

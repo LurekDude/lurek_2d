@@ -1,6 +1,6 @@
 /// RGBA color stored as `f32` components in the range `[0.0, 1.0]`.
 ///
-/// Used everywhere the API accepts a color: `luna.gfx.setColor`, sprite tints,
+/// Used everywhere the API accepts a color: `lurek.gfx.setColor`, sprite tints,
 /// background color, etc.
 ///
 /// # Fields
@@ -52,14 +52,14 @@ impl Color {
         b: 1.0,
         a: 1.0,
     };
-    /// Luna2D default background color — dark purple `(0.15, 0.12, 0.25, 1.0)`.
+    /// Lurek2D default background color — dark purple `(0.15, 0.12, 0.25, 1.0)`.
     pub const LUNA_BG: Color = Color {
         r: 0.15,
         g: 0.12,
         b: 0.25,
         a: 1.0,
     };
-    /// Luna2D accent color — warm gold `(0.85, 0.75, 0.45, 1.0)`.
+    /// Lurek2D accent color — warm gold `(0.85, 0.75, 0.45, 1.0)`.
     pub const LUNA_ACCENT: Color = Color {
         r: 0.85,
         g: 0.75,

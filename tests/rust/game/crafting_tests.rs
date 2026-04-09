@@ -1,8 +1,8 @@
-//! Integration tests for `luna.crafting.*`.
+//! Integration tests for `lurek.crafting.*`.
 
-use luna2d::crafting::{CraftSkill, ModifierPool, Quality, Recipe};
-use luna2d::lua_api::{create_lua_vm, SharedState};
-use luna2d::engine::config::Config;
+use lurek2d::crafting::{CraftSkill, ModifierPool, Quality, Recipe};
+use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::path::PathBuf;

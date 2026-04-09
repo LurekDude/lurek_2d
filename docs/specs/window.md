@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.window`                                        |
+| **Lua API**    | `lurek.window`                                        |
 | **Source**     | `src/window/`                                        |
 | **Rust Tests** | `tests/rust/unit/window_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_window.lua`                     |
@@ -16,7 +16,7 @@ The `window` module is a Tier 1 core engine subsystem that manages all window li
 
 The module is split into three submodules. `management` owns all window-chrome operations: title, fullscreen mode (desktop or exclusive), VSync, screen position, size, minimize, maximize, restore, close, icon, focus query, visibility, mouse-focus, DPI scale, and a platform-native message box dialog via the `rfd` crate. `viewport` owns the logical game-space coordinate system: game width/height, four scale modes (`none`, `letterbox`, `stretch`, `pixel`), and bidirectional pixel ↔ game-space conversion using pre-computed scale/offset values that `engine::app` recalculates on every resize. `event_loop` is a reserved placeholder for future platform-specific event-loop integration — it currently contains no code.
 
-The Lua surface (`luna.window.*`, 39 functions) exposes the full management and viewport API plus several display-query conveniences (`getDesktopDimensions`, `getDisplayCount`, `getDisplayName`, `getFullscreenModes`, `getDisplayOrientation`, `getSafeArea`, `getSystemTheme`, `isHighDPIAllowed`, `isResizable`) that read directly from the winit `Window` handle stored in `SharedState`.
+The Lua surface (`lurek.window.*`, 39 functions) exposes the full management and viewport API plus several display-query conveniences (`getDesktopDimensions`, `getDisplayCount`, `getDisplayName`, `getFullscreenModes`, `getDisplayOrientation`, `getSafeArea`, `getSystemTheme`, `isHighDPIAllowed`, `isResizable`) that read directly from the winit `Window` handle stored in `SharedState`.
 
 **Scope boundary**: The actual winit `Window` handle, the wgpu `Surface`, and all OS-level window manipulation live in `engine::app`. This module only reads and writes the `WindowState` shadow record and provides coordinate-conversion math.
 
@@ -114,7 +114,7 @@ No public enums in this module. The `FullscreenType` enum (`Desktop` | `Exclusiv
 
 ## Lua API
 
-Exposed under `luna.window.*` by `src/lua_api/window_api.rs`. The API provides 39 functions organized into five categories:
+Exposed under `lurek.window.*` by `src/lua_api/window_api.rs`. The API provides 39 functions organized into five categories:
 
 **Window dimensions and mode** — `getWidth`, `getHeight`, `getDimensions`, `setMode`, `getMode`, `getPixelDimensions`, `getGameWidth`, `getGameHeight`.
 
@@ -132,22 +132,22 @@ Exposed under `luna.window.*` by `src/lua_api/window_api.rs`. The API provides 3
 
 ```lua
 -- Query window dimensions and set title
-function luna.init()
-    local w, h = luna.window.getDimensions()
-    luna.window.setTitle("My Game — " .. w .. "×" .. h)
+function lurek.init()
+    local w, h = lurek.window.getDimensions()
+    lurek.window.setTitle("My Game — " .. w .. "×" .. h)
 end
 
 -- Toggle fullscreen on F11, show VSync mode
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "f11" then
-        local fs = luna.window.isFullscreen()
-        luna.window.setFullscreen(not fs)
+        local fs = lurek.window.isFullscreen()
+        lurek.window.setFullscreen(not fs)
     end
 end
 
 -- Set a combined window mode with flags
-function luna.init()
-    luna.window.setMode(1280, 720, {
+function lurek.init()
+    lurek.window.setMode(1280, 720, {
         fullscreen = false,
         fullscreentype = "desktop",
         vsync = 1,
@@ -155,23 +155,23 @@ function luna.init()
 end
 
 -- Viewport scaling: letterbox with fixed game resolution
-function luna.init()
-    luna.window.setScaleMode("letterbox")
-    local gw = luna.window.getGameWidth()
-    local gh = luna.window.getGameHeight()
+function lurek.init()
+    lurek.window.setScaleMode("letterbox")
+    local gw = lurek.window.getGameWidth()
+    local gh = lurek.window.getGameHeight()
     print("Game space: " .. gw .. "×" .. gh)
 end
 
 -- DPI-aware coordinate conversion
-function luna.render()
-    local px = luna.window.toPixels(100)
-    local dp = luna.window.fromPixels(px)
+function lurek.render()
+    local px = lurek.window.toPixels(100)
+    local dp = lurek.window.fromPixels(px)
     -- px == 200 on a 2× HiDPI display, dp == 100
 end
 
 -- Platform-native message box
-function luna.exit()
-    local btn = luna.window.showMessageBox(
+function lurek.exit()
+    local btn = lurek.window.showMessageBox(
         "Quit?", "Save before exiting?", "warning", "yesno"
     )
     if btn == "no" then return false end
@@ -193,7 +193,7 @@ end
 | Module          | Relationship | Notes                                                    |
 |-----------------|--------------|----------------------------------------------------------|
 | `engine`        | Imports from | Uses `SharedState`, `WindowState`, `FullscreenType`      |
-| `lua_api`       | Imported by  | `window_api.rs` binds all public functions to `luna.window.*` |
+| `lua_api`       | Imported by  | `window_api.rs` binds all public functions to `lurek.window.*` |
 | `input`         | Related      | Input module reads `WindowState` for cursor position transforms; both are Tier 1 siblings with no direct imports between them |
 | `graphics`      | Related      | Renderer reads `WindowState` for surface size and viewport; no direct import from `window` |
 | `camera`        | Related      | Camera uses window dimensions for view transforms; reads `SharedState` independently |
@@ -202,11 +202,11 @@ end
 
 ## Notes
 
-- **Desktop-only (A-02)**: Luna2D targets Windows, Linux, and macOS only. Functions like `getSafeArea` return the full window area and `getDisplayOrientation` returns `"landscape"` or `"portrait"` based on width vs height — no mobile notch/inset handling.
+- **Desktop-only (A-02)**: Lurek2D targets Windows, Linux, and macOS only. Functions like `getSafeArea` return the full window area and `getDisplayOrientation` returns `"landscape"` or `"portrait"` based on width vs height — no mobile notch/inset handling.
 - **Deferred-write pattern**: All mutating functions (`set_title`, `set_fullscreen`, `set_size`, etc.) write to `pending_*` fields and take effect on the **next frame**. Lua scripts must not assume the change is visible immediately after calling the setter.
-- **`rfd` crate dependency**: `show_message_box` uses the `rfd` crate for native dialogs. This is the only function in the module that performs a blocking OS call. It should not be called from inside `luna.update` or `luna.draw` in performance-sensitive code.
+- **`rfd` crate dependency**: `show_message_box` uses the `rfd` crate for native dialogs. This is the only function in the module that performs a blocking OS call. It should not be called from inside `lurek.update` or `lurek.draw` in performance-sensitive code.
 - **Viewport scale/offset are read-only here**: `viewport_scale_x/y` and `viewport_offset_x/y` are computed by `engine::app` during resize events. Functions in `viewport.rs` treat them as read-only. Only `set_scale_mode` / `set_scale_mode_validated` trigger a recalculation (deferred via `pending_scale_mode`).
-- **Headless testing**: Because no winit or wgpu calls exist in this module, all Rust and Lua tests run fully headless. The Lua test file has 50+ assertions covering every `luna.window.*` function. Rust tests verify `WindowState` defaults and config propagation.
+- **Headless testing**: Because no winit or wgpu calls exist in this module, all Rust and Lua tests run fully headless. The Lua test file has 50+ assertions covering every `lurek.window.*` function. Rust tests verify `WindowState` defaults and config propagation.
 - **Scale modes**: Four viewport scale modes are supported — `"none"` (1:1 pixel mapping, default), `"letterbox"` (uniform scale with black bars), `"stretch"` (non-uniform scale, fills window), and `"pixel"` (integer scaling for pixel art). `set_scale_mode_validated` logs a warning and returns `false` for unrecognized modes.
 - **winit 0.30**: The `Window` handle stored in `SharedState` is from winit 0.30. Functions in `window_api.rs` that directly query the handle (e.g., `getDisplayCount`, `isResizable`) access `st.window.as_ref()` and fall back gracefully when the handle is `None` (headless mode).
-- **Breaking change surface**: Renaming or removing any `luna.window.*` function will break existing game scripts. The `setMode`/`getMode` flags table keys (`fullscreen`, `fullscreentype`, `vsync`) are part of the public API contract.
+- **Breaking change surface**: Renaming or removing any `lurek.window.*` function will break existing game scripts. The `setMode`/`getMode` flags table keys (`fullscreen`, `fullscreentype`, `vsync`) are part of the public API contract.

@@ -1,9 +1,9 @@
--- Luna2D Stress Test: Entity Mass Spawn
+-- Lurek2D Stress Test: Entity Mass Spawn
 -- Tests entity creation, tag assignment, and component operations at scale
 
 describe("entity stress: mass spawn", function()
     it("spawns 10000 entities", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         for i = 1, 10000 do
             universe:spawn()
@@ -13,7 +13,7 @@ describe("entity stress: mass spawn", function()
     end)
 
     it("spawns and kills 5000 entities", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
         local ids = {}
 
         -- Spawn
@@ -30,7 +30,7 @@ describe("entity stress: mass spawn", function()
     end)
 
     it("adds components to 5000 entities", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         for i = 1, 5000 do
             local id = universe:spawn()
@@ -43,7 +43,7 @@ describe("entity stress: mass spawn", function()
     end)
 
     it("ID recycling works after mass kill", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
         local old_ids = {}
 
         -- Spawn and kill 1000
@@ -63,7 +63,7 @@ describe("entity stress: mass spawn", function()
     end)
 
     it("tag operations at scale", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         for i = 1, 2000 do
             local id = universe:spawn()

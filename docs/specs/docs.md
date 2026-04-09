@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.docs`                                            |
+| **Lua API**      | `lurek.docs`                                            |
 | **Source**       | `src/docs/`                                            |
 | **Rust Tests**   | —                                                      |
 | **Lua Tests**    | `tests/lua/unit/test_docs.lua`                         |
@@ -12,16 +12,16 @@
 
 ## Summary
 
-The `docs` module provides a structured API documentation catalog for the `luna.*` Lua API surface. It is the data layer that backs the VS Code extension IntelliSense, the MCP server tool descriptions, and the `tools/docs/` generators.
+The `docs` module provides a structured API documentation catalog for the `lurek.*` Lua API surface. It is the data layer that backs the VS Code extension IntelliSense, the MCP server tool descriptions, and the `tools/docs/` generators.
 
-The module defines three pure-Rust data types: `DocEntry` (one entry per API function, method, value, or type), `ParamInfo` (one record per parameter), and `ReturnInfo` (one record per return value). An in-memory `Catalog` aggregates `DocEntry` values and provides sorted module listing, qualified-name lookup, keyword search, and kind filtering. `ValidationReport` compares a catalog against the live `luna.*` bindings discovered at runtime to surface missing entries, phantom entries (in catalog but not live), and incomplete entries. `QualityReport` scores every entry against five criteria (description, qualified name, params/returns, example, since version) and reports per-module averages.
+The module defines three pure-Rust data types: `DocEntry` (one entry per API function, method, value, or type), `ParamInfo` (one record per parameter), and `ReturnInfo` (one record per return value). An in-memory `Catalog` aggregates `DocEntry` values and provides sorted module listing, qualified-name lookup, keyword search, and kind filtering. `ValidationReport` compares a catalog against the live `lurek.*` bindings discovered at runtime to surface missing entries, phantom entries (in catalog but not live), and incomplete entries. `QualityReport` scores every entry against five criteria (description, qualified name, params/returns, example, since version) and reports per-module averages.
 
-The Lua API at `luna.docs.*` is the primary consumption point. It can scan live bindings via reflection (`scan`, `scanModule`), load entries from TOML doc files (`loadToml`, `loadAll`), mutate an internal catalog (`describe`, `setParamInfo`, `setReturnInfo`), run validation (`validate`, `validateModule`), compute coverage ratios and quality metrics, and export editor-ready JSON files for VS Code IntelliSense (`exportCompletions`, `exportHover`, `exportSignatures`, `exportAll`) or Markdown/text formats (`exportMarkdown`, `exportCheatsheet`).
+The Lua API at `lurek.docs.*` is the primary consumption point. It can scan live bindings via reflection (`scan`, `scanModule`), load entries from TOML doc files (`loadToml`, `loadAll`), mutate an internal catalog (`describe`, `setParamInfo`, `setReturnInfo`), run validation (`validate`, `validateModule`), compute coverage ratios and quality metrics, and export editor-ready JSON files for VS Code IntelliSense (`exportCompletions`, `exportHover`, `exportSignatures`, `exportAll`) or Markdown/text formats (`exportMarkdown`, `exportCheatsheet`).
 
 This module intentionally does **not** provide:
 - Persistent doc storage — entries exist only in-memory until exported
 - Source parsing of Rust `///` comments — that is a Python tool responsibility
-- A registry of live entry counts — `scan()` counts at call time by traversing `luna.*`
+- A registry of live entry counts — `scan()` counts at call time by traversing `lurek.*`
 
 ## Architecture
 
@@ -42,11 +42,11 @@ src/lua_api/
                    exportSignatures, exportAll, exportMarkdown, exportCheatsheet
 
 Data flow:
-  Lua script → luna.docs.scan()      → ApiCatalog userdata
-  Lua script → luna.docs.loadToml()  → ApiCatalog userdata
-  ApiCatalog → luna.docs.validate()  → ValidationReport userdata
-  ApiCatalog → luna.docs.quality()   → QualityReport userdata
-  ApiCatalog → luna.docs.exportAll() → completions.json + hover.json + signatures.json
+  Lua script → lurek.docs.scan()      → ApiCatalog userdata
+  Lua script → lurek.docs.loadToml()  → ApiCatalog userdata
+  ApiCatalog → lurek.docs.validate()  → ValidationReport userdata
+  ApiCatalog → lurek.docs.quality()   → QualityReport userdata
+  ApiCatalog → lurek.docs.exportAll() → completions.json + hover.json + signatures.json
 ```
 
 ## Source Files
@@ -84,7 +84,7 @@ Data flow:
 #### `docs::entry::DocEntry`
 A single documented API entry. Fields:
 - `name: String` — short unqualified name (e.g., `"play"`)
-- `qualified_name: String` — fully qualified (e.g., `"luna.audio.play"`)
+- `qualified_name: String` — fully qualified (e.g., `"lurek.audio.play"`)
 - `module: String` — owning module (e.g., `"audio"`)
 - `kind: String` — one of `"function"`, `"method"`, `"value"`, `"type"`
 - `description: String` — one-sentence or short-paragraph description
@@ -120,34 +120,34 @@ No public enums.
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/docs_api.rs` under `luna.docs.*`. All catalog and report values cross the Lua boundary as opaque UserData objects with named methods.
+The Lua API is registered in `src/lua_api/docs_api.rs` under `lurek.docs.*`. All catalog and report values cross the Lua boundary as opaque UserData objects with named methods.
 
 ### Top-Level Functions
 
 | Function | Signature | Description |
 |---|---|---|
-| `luna.docs.scan(opts?)` | `→ ApiCatalog` | Scan all live `luna.*` bindings by table reflection |
-| `luna.docs.scanModule(module_name)` | `→ ApiCatalog` | Scan one module's bindings |
-| `luna.docs.loadToml(path)` | `→ ApiCatalog` | Load a TOML doc file via `luna.codec.fromToml` |
-| `luna.docs.loadAll(directory)` | `→ ApiCatalog` | Load all `.toml` files in a directory and merge |
-| `luna.docs.describe(qualified_name, description)` | — | Inject or update a description in the internal catalog |
-| `luna.docs.setParamInfo(qualified_name, params)` | — | Set parameter metadata for an entry (`{name,type,description,optional,default?}[]`) |
-| `luna.docs.setReturnInfo(qualified_name, returns)` | — | Set return metadata for an entry (`{type,description}[]`) |
-| `luna.docs.getCatalog()` | `→ ApiCatalog` | Return the internal catalog as an `ApiCatalog` |
-| `luna.docs.resetCatalog()` | — | Clear all entries from the internal catalog |
-| `luna.docs.validate(catalog?)` | `→ ValidationReport` | Validate catalog against live `luna.*` bindings |
-| `luna.docs.validateModule(module_name, catalog?)` | `→ ValidationReport` | Validate one module |
-| `luna.docs.checkStaleness(catalog, source_dir)` | `→ table` | Check file-level staleness; returns `{stale, current, missing}` |
-| `luna.docs.quality(catalog?)` | `→ QualityReport` | Compute quality metrics for the catalog |
-| `luna.docs.qualityModule(module_name, catalog?)` | `→ QualityReport` | Quality metrics for one module |
-| `luna.docs.coverage(catalog?)` | `→ (integer, integer)` | `(documented_count, total_live_count)` |
-| `luna.docs.coverageModule(module_name, catalog?)` | `→ (integer, integer)` | Coverage for one module |
-| `luna.docs.exportCompletions(catalog, path)` | — | Write VS Code completion items JSON |
-| `luna.docs.exportHover(catalog, path)` | — | Write VS Code hover JSON keyed by qualified name |
-| `luna.docs.exportSignatures(catalog, path)` | — | Write VS Code signature-help JSON |
-| `luna.docs.exportAll(catalog, output_dir)` | — | Write `completions.json`, `hover.json`, `signatures.json` |
-| `luna.docs.exportMarkdown(catalog, path)` | — | Write a Markdown API reference file |
-| `luna.docs.exportCheatsheet(catalog, path)` | — | Write a one-line-per-function plain-text cheatsheet |
+| `lurek.docs.scan(opts?)` | `→ ApiCatalog` | Scan all live `lurek.*` bindings by table reflection |
+| `lurek.docs.scanModule(module_name)` | `→ ApiCatalog` | Scan one module's bindings |
+| `lurek.docs.loadToml(path)` | `→ ApiCatalog` | Load a TOML doc file via `lurek.codec.fromToml` |
+| `lurek.docs.loadAll(directory)` | `→ ApiCatalog` | Load all `.toml` files in a directory and merge |
+| `lurek.docs.describe(qualified_name, description)` | — | Inject or update a description in the internal catalog |
+| `lurek.docs.setParamInfo(qualified_name, params)` | — | Set parameter metadata for an entry (`{name,type,description,optional,default?}[]`) |
+| `lurek.docs.setReturnInfo(qualified_name, returns)` | — | Set return metadata for an entry (`{type,description}[]`) |
+| `lurek.docs.getCatalog()` | `→ ApiCatalog` | Return the internal catalog as an `ApiCatalog` |
+| `lurek.docs.resetCatalog()` | — | Clear all entries from the internal catalog |
+| `lurek.docs.validate(catalog?)` | `→ ValidationReport` | Validate catalog against live `lurek.*` bindings |
+| `lurek.docs.validateModule(module_name, catalog?)` | `→ ValidationReport` | Validate one module |
+| `lurek.docs.checkStaleness(catalog, source_dir)` | `→ table` | Check file-level staleness; returns `{stale, current, missing}` |
+| `lurek.docs.quality(catalog?)` | `→ QualityReport` | Compute quality metrics for the catalog |
+| `lurek.docs.qualityModule(module_name, catalog?)` | `→ QualityReport` | Quality metrics for one module |
+| `lurek.docs.coverage(catalog?)` | `→ (integer, integer)` | `(documented_count, total_live_count)` |
+| `lurek.docs.coverageModule(module_name, catalog?)` | `→ (integer, integer)` | Coverage for one module |
+| `lurek.docs.exportCompletions(catalog, path)` | — | Write VS Code completion items JSON |
+| `lurek.docs.exportHover(catalog, path)` | — | Write VS Code hover JSON keyed by qualified name |
+| `lurek.docs.exportSignatures(catalog, path)` | — | Write VS Code signature-help JSON |
+| `lurek.docs.exportAll(catalog, output_dir)` | — | Write `completions.json`, `hover.json`, `signatures.json` |
+| `lurek.docs.exportMarkdown(catalog, path)` | — | Write a Markdown API reference file |
+| `lurek.docs.exportCheatsheet(catalog, path)` | — | Write a one-line-per-function plain-text cheatsheet |
 
 ### `ApiCatalog` Methods
 
@@ -218,13 +218,13 @@ The Lua API is registered in `src/lua_api/docs_api.rs` under `luna.docs.*`. All 
 
 ```lua
 -- === Scan live bindings and check coverage ===
-local catalog = luna.docs.scan()
-local documented, total = luna.docs.coverage(catalog)
+local catalog = lurek.docs.scan()
+local documented, total = lurek.docs.coverage(catalog)
 print(string.format("Coverage: %d / %d (%.0f%%)", documented, total, documented/total*100))
 
 -- === Load TOML docs and validate ===
-local toml_cat = luna.docs.loadAll("docs/api_catalog/")
-local report = luna.docs.validate(toml_cat)
+local toml_cat = lurek.docs.loadAll("docs/api_catalog/")
+local report = lurek.docs.validate(toml_cat)
 if not report:isValid() then
     print("Missing:", report:missingCount())
     for _, name in ipairs(report:getMissing()) do
@@ -233,24 +233,24 @@ if not report:isValid() then
 end
 
 -- === Quality check ===
-local quality = luna.docs.quality(toml_cat)
+local quality = lurek.docs.quality(toml_cat)
 print("Overall grade:", quality:getGrade())
 print(quality:getSummary())
 
 -- === Export VS Code IntelliSense JSON ===
-local cat = luna.docs.scan()
-luna.docs.exportAll(cat, "vscode-extension/data/")
+local cat = lurek.docs.scan()
+lurek.docs.exportAll(cat, "vscode-extension/data/")
 
 -- === Manually describe an entry ===
-luna.docs.describe("luna.audio.play", "Play a loaded audio source by key.")
-luna.docs.setParamInfo("luna.audio.play", {
+lurek.docs.describe("lurek.audio.play", "Play a loaded audio source by key.")
+lurek.docs.setParamInfo("lurek.audio.play", {
     { name = "key",    type = "string",  description = "Audio source key." },
     { name = "volume", type = "number?", description = "Volume 0–1.", optional = true },
 })
 
 -- === Inspect one entry ===
-local cat = luna.docs.scan()
-local entry = cat:getEntry("luna.timer.after")
+local cat = lurek.docs.scan()
+local entry = cat:getEntry("lurek.timer.after")
 if entry then
     print(entry:getQualifiedName(), entry:getScore())
 end
@@ -265,7 +265,7 @@ end
 | `fn`      | 28+   |
 | **Total** | **37+** |
 
-## Schema Validation — `luna.docs.schema()`
+## Schema Validation — `lurek.docs.schema()`
 
 `src/docs/schema.rs` provides a lightweight data-validator for game save files, mod manifests, and configuration tables. It is intentionally simpler than a JSON-Schema library — no cross-references, no `$ref`, no recursive schemas — while covering the common cases a game dev needs.
 
@@ -307,7 +307,7 @@ Set `__strict = true` on the rules table to fail on any extra field not declared
 ### Example
 
 ```lua
-local schema = luna.docs.schema({
+local schema = lurek.docs.schema({
     name  = { type = "string", required = true, minLen = 1, maxLen = 64 },
     level = { type = "integer", required = true, min = 1, max = 100 },
     class = { type = "string", enum = { "warrior", "mage", "rogue" } },
@@ -316,41 +316,41 @@ local schema = luna.docs.schema({
 local ok, errors = schema:validate(save_data)
 if not ok then
     for _, e in ipairs(errors) do
-        luna.log.warn(e.field .. ": " .. e.message)
+        lurek.log.warn(e.field .. ": " .. e.message)
     end
 end
 ```
 
 ## Live Reflection — `reflectLive()` and `reflectTable()`
 
-`reflectLive(ns?)` walks the live `luna.*` Lua table and returns a map from namespace name to an array of `{name: string, type: string}` entries. Useful for runtime IntelliSense, debug overlays, and verifying that expected modules are loaded.
+`reflectLive(ns?)` walks the live `lurek.*` Lua table and returns a map from namespace name to an array of `{name: string, type: string}` entries. Useful for runtime IntelliSense, debug overlays, and verifying that expected modules are loaded.
 
-`reflectTable(tbl, name?)` reflects any arbitrary Lua table — not just `luna.*`. Returns an array of `{name, qualifiedName, type}` items. Useful for inspecting mod API surfaces or unknown data blobs.
+`reflectTable(tbl, name?)` reflects any arbitrary Lua table — not just `lurek.*`. Returns an array of `{name, qualifiedName, type}` items. Useful for inspecting mod API surfaces or unknown data blobs.
 
 ### Signatures
 
 | Function | Signature | Description |
 |---|---|---|
-| `reflectLive(ns?)` | `(string?) → table` | Walk `luna.*`; returns `{[ns]: [{name,type}]}`. If `ns` given, returns only that namespace. |
+| `reflectLive(ns?)` | `(string?) → table` | Walk `lurek.*`; returns `{[ns]: [{name,type}]}`. If `ns` given, returns only that namespace. |
 | `reflectTable(tbl, name?)` | `(table, string?) → table` | Reflect any table. `name` sets the `qualifiedName` prefix. |
 
 ### Example
 
 ```lua
 -- All namespaces
-local all = luna.docs.reflectLive()
+local all = lurek.docs.reflectLive()
 for ns, items in pairs(all) do
     print(ns .. " has " .. #items .. " members")
 end
 
 -- One namespace
-local log_reflection = luna.docs.reflectLive("log")
+local log_reflection = lurek.docs.reflectLive("log")
 for _, item in ipairs(log_reflection.log or {}) do
     print(item.name, item.type)   -- e.g. "info", "function"
 end
 
 -- Reflect any table
-local items = luna.docs.reflectTable(my_mod_api, "my_mod")
+local items = lurek.docs.reflectTable(my_mod_api, "my_mod")
 for _, item in ipairs(items) do
     print(item.qualifiedName, item.type)
 end
@@ -361,14 +361,14 @@ end
 | Module       | Relationship | Notes                                                           |
 |--------------|--------------|-----------------------------------------------------------------|
 | `engine`     | —            | `docs_api.rs` receives no `SharedState`; uses only Lua globals  |
-| `serial`     | Uses (Lua)   | `loadToml` delegates to `luna.codec.fromToml` at runtime        |
-| `lua_api`    | Imported by  | `docs_api.rs` registers the `luna.docs.*` surface               |
+| `serial`     | Uses (Lua)   | `loadToml` delegates to `lurek.codec.fromToml` at runtime        |
+| `lua_api`    | Imported by  | `docs_api.rs` registers the `lurek.docs.*` surface               |
 | `vscode-extension` | Consumer | Consumes `exportAll` JSON for completions, hover, and signatures |
 
 ## Notes
 
-- `scan()` and `validate()` work by traversing the `luna.*` Lua table at call time — they reflect the current registered bindings, not a compile-time list.
-- `loadToml` requires `luna.codec` (`serial` module) to be registered (it calls `luna.codec.fromToml` internally). Do not call it before the Lua VM is fully initialised.
+- `scan()` and `validate()` work by traversing the `lurek.*` Lua table at call time — they reflect the current registered bindings, not a compile-time list.
+- `loadToml` requires `lurek.codec` (`serial` module) to be registered (it calls `lurek.codec.fromToml` internally). Do not call it before the Lua VM is fully initialised.
 - The internal catalog (used by `describe`, `setParamInfo`, `setReturnInfo`, `getCatalog`, `resetCatalog`) is per-VM state stored in a `Rc<RefCell<DocsState>>`. It is independent of exported `ApiCatalog` userdata objects.
 - `quality_score` checks five conditions. A `"value"` kind skips the params/returns check (only 4 conditions apply), so a fully described value entry scores 4/4 = 1.0 even without parameters.
 - `exportAll` creates the output directory with `fs::create_dir_all` — it is safe to target a non-existent path.

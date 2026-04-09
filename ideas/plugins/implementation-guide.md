@@ -17,32 +17,32 @@ Before starting, ensure:
 
 ```powershell
 mkdir crates
-mkdir crates\luna2d-plugin-api\src
-mkdir crates\luna2d-core\src
-mkdir crates\luna2d-gamedev\src
-mkdir crates\luna2d-bin\src
+mkdir crates\lurek2d-plugin-api\src
+mkdir crates\lurek2d-core\src
+mkdir crates\lurek2d-gamedev\src
+mkdir crates\lurek2d-bin\src
 ```
 
 ### 1.2 Create Plugin API Crate
 
 This is the smallest possible crate — interface types only.
 
-**File: `crates/luna2d-plugin-api/Cargo.toml`**
+**File: `crates/lurek2d-plugin-api/Cargo.toml`**
 ```toml
 [package]
-name = "luna2d-plugin-api"
+name = "lurek2d-plugin-api"
 version = "0.1.0"
 edition = "2021"
-description = "Plugin interface types for Luna2D"
+description = "Plugin interface types for Lurek2D"
 
 # No dependencies — this crate is pure types
 ```
 
-**File: `crates/luna2d-plugin-api/src/lib.rs`**
+**File: `crates/lurek2d-plugin-api/src/lib.rs`**
 ```rust
-//! Plugin interface types for Luna2D.
+//! Plugin interface types for Lurek2D.
 //!
-//! This crate defines the contract between the Luna2D host and plugin DLLs.
+//! This crate defines the contract between the Lurek2D host and plugin DLLs.
 //! It has zero dependencies and uses only `#[repr(C)]` types.
 
 use std::ffi::c_char;
@@ -74,7 +74,7 @@ pub type PluginEntryFn = unsafe extern "C" fn(L: *mut std::ffi::c_void) -> i32;
 ### 1.3 Verify
 
 ```powershell
-cd crates\luna2d-plugin-api
+cd crates\lurek2d-plugin-api
 cargo check
 cd ..\..
 ```
@@ -130,7 +130,7 @@ cargo test --test config_tests
 
 ---
 
-## Step 3 — Implement Plugin Loader (in luna2d-core)
+## Step 3 — Implement Plugin Loader (in lurek2d-core)
 
 ### 3.1 Create `src/engine/plugin_loader.rs`
 
@@ -347,7 +347,7 @@ In `Cargo.toml`:
 ```toml
 [dependencies]
 libloading = "0.8"
-luna2d-plugin-api = { path = "crates/luna2d-plugin-api" }
+lurek2d-plugin-api = { path = "crates/lurek2d-plugin-api" }
 ```
 
 ### 3.4 Verify
@@ -398,14 +398,14 @@ cargo run -- demos/hello_world  # Should work identically (no plugins configured
 
 ---
 
-## Step 5 — Create First Plugin (luna2d-gamedev)
+## Step 5 — Create First Plugin (lurek2d-gamedev)
 
 ### 5.1 Create Crate
 
-**File: `crates/luna2d-gamedev/Cargo.toml`**
+**File: `crates/lurek2d-gamedev/Cargo.toml`**
 ```toml
 [package]
-name = "luna2d-gamedev"
+name = "lurek2d-gamedev"
 version = "0.1.0"
 edition = "2021"
 
@@ -414,12 +414,12 @@ crate-type = ["cdylib"]
 
 [dependencies]
 mlua = { version = "0.9", features = ["luajit", "vendored", "module"] }
-luna2d-plugin-api = { path = "../luna2d-plugin-api" }
+lurek2d-plugin-api = { path = "../lurek2d-plugin-api" }
 ```
 
-**File: `crates/luna2d-gamedev/src/lib.rs`**
+**File: `crates/lurek2d-gamedev/src/lib.rs`**
 ```rust
-//! Luna2D Game Development Plugin.
+//! Lurek2D Game Development Plugin.
 //!
 //! Provides Tier 2 game-specific modules: tilemap, scene, ai, particles, etc.
 
@@ -429,7 +429,7 @@ use mlua::prelude::*;
 #[no_mangle]
 pub static LUNA_PLUGIN_API_VERSION: u32 = luna2d_plugin_api::API_VERSION;
 
-/// Entry point called by the Luna2D host.
+/// Entry point called by the Lurek2D host.
 ///
 /// # Safety
 /// `L` must be a valid, non-null pointer to an active `lua_State` owned by the host.
@@ -453,16 +453,16 @@ pub unsafe extern "C" fn luaopen_luna_gamedev(L: *mut std::ffi::c_void) -> i32 {
 
 fn register_all(lua: &Lua) -> LuaResult<()> {
     let globals = lua.globals();
-    let luna: LuaTable = globals.get("luna")?;
+    let luna: LuaTable = globals.get("lurek")?;
 
-    // Register each module into the existing luna.* namespace
+    // Register each module into the existing lurek.* namespace
     // Start with one module as a proof of concept:
     register_hello(lua, &luna)?;
 
     Ok(())
 }
 
-/// Proof-of-concept: registers luna.plugin_test namespace
+/// Proof-of-concept: registers lurek.plugin_test namespace
 fn register_hello(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -474,7 +474,7 @@ fn register_hello(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         Ok(env!("CARGO_PKG_VERSION"))
     })?)?;
 
-    luna.set("plugin_test", tbl)?;
+    lurek.set("plugin_test", tbl)?;
     Ok(())
 }
 ```
@@ -482,7 +482,7 @@ fn register_hello(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 ### 5.2 Build Plugin
 
 ```powershell
-cargo build -p luna2d-gamedev
+cargo build -p lurek2d-gamedev
 # Output: build/debug/luna_gamedev.dll (Windows)
 ```
 
@@ -514,15 +514,15 @@ This is the most labor-intensive step. Do one module at a time.
 
 Taking `tilemap` as an example:
 
-1. **Copy `src/tilemap/` → `crates/luna2d-gamedev/src/tilemap/`**
-2. **Copy `src/lua_api/tilemap_api.rs` → `crates/luna2d-gamedev/src/tilemap_api.rs`**
+1. **Copy `src/tilemap/` → `crates/lurek2d-gamedev/src/tilemap/`**
+2. **Copy `src/lua_api/tilemap_api.rs` → `crates/lurek2d-gamedev/src/tilemap_api.rs`**
 3. **Update imports**:
    - Replace `use crate::engine::SharedState` → remove; use Lua-only surface
    - Replace `use crate::math::*` → `use luna2d_core::math::*` (if core is a dep)
      OR re-implement needed math types locally
 4. **Refactor SharedState access**:
-   - `state.borrow().delta_time` → call `luna.time.getDelta()` via Lua
-   - `state.borrow_mut().draw_commands.push(...)` → call `luna.gfx.drawQuad()` via Lua
+   - `state.borrow().delta_time` → call `lurek.time.getDelta()` via Lua
+   - `state.borrow_mut().draw_commands.push(...)` → call `lurek.gfx.drawQuad()` via Lua
 5. **Register in `register_all()`**:
    ```rust
    tilemap::register(lua, &luna)?;
@@ -531,7 +531,7 @@ Taking `tilemap` as an example:
 7. **Remove from `src/`**: delete `src/tilemap/` (it now lives in the plugin)
 8. **Test**:
    ```powershell
-   cargo build -p luna2d-gamedev
+   cargo build -p lurek2d-gamedev
    copy build\debug\luna_gamedev.dll plugins\
    cargo run -- demos/tilemap_demo  # Must work identically
    ```
@@ -578,12 +578,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     tbl.set("update", lua.create_function(|lua, ()| {
         // Read state via Lua API
-        let luna: LuaTable = lua.globals().get("luna")?;
-        let time: LuaTable = luna.get("time")?;
+        let luna: LuaTable = lua.globals().get("lurek")?;
+        let time: LuaTable = lurek.get("time")?;
         let dt: f64 = time.call_method("getDelta", ())?;
 
         // Draw via Lua API
-        let gfx: LuaTable = luna.get("gfx")?;
+        let gfx: LuaTable = lurek.get("gfx")?;
         gfx.call_method("drawRect", (x, y, w, h, color))?;
 
         Ok(())
@@ -602,10 +602,10 @@ Once plugin loading works with a few modules, convert the entire repo to a works
 ```toml
 [workspace]
 members = [
-    "crates/luna2d-core",
-    "crates/luna2d-plugin-api",
-    "crates/luna2d-gamedev",
-    "crates/luna2d-bin",
+    "crates/lurek2d-core",
+    "crates/lurek2d-plugin-api",
+    "crates/lurek2d-gamedev",
+    "crates/lurek2d-bin",
 ]
 resolver = "2"
 
@@ -622,25 +622,25 @@ serde = { version = "1", features = ["derive"] }
 toml = "0.8"
 image = "0.25"
 libloading = "0.8"
-luna2d-plugin-api = { path = "crates/luna2d-plugin-api" }
+lurek2d-plugin-api = { path = "crates/lurek2d-plugin-api" }
 ```
 
-### 7.2 Move src/ → crates/luna2d-core/src/
+### 7.2 Move src/ → crates/lurek2d-core/src/
 
 ```powershell
 # Move all source except main.rs and bin/
-xcopy /E /I src crates\luna2d-core\src
-# Remove Tier 2 modules that went to luna2d-gamedev
-rmdir /S /Q crates\luna2d-core\src\tilemap
-rmdir /S /Q crates\luna2d-core\src\scene
+xcopy /E /I src crates\lurek2d-core\src
+# Remove Tier 2 modules that went to lurek2d-gamedev
+rmdir /S /Q crates\lurek2d-core\src\tilemap
+rmdir /S /Q crates\lurek2d-core\src\scene
 # ... etc
 ```
 
-### 7.3 Create luna2d-bin
+### 7.3 Create lurek2d-bin
 
 ```powershell
-# src/main.rs → crates/luna2d-bin/src/main.rs
-move src\main.rs crates\luna2d-bin\src\main.rs
+# src/main.rs → crates/lurek2d-bin/src/main.rs
+move src\main.rs crates\lurek2d-bin\src\main.rs
 ```
 
 ### 7.4 Fix All Imports
@@ -649,7 +649,7 @@ This is the most tedious step. Use a script to automate:
 
 ```powershell
 # Auto-replace crate:: with luna2d_core:: in gamedev plugin files
-Get-ChildItem -Recurse crates\luna2d-gamedev\src\*.rs | ForEach-Object {
+Get-ChildItem -Recurse crates\lurek2d-gamedev\src\*.rs | ForEach-Object {
     (Get-Content $_.FullName) -replace 'use crate::engine::', 'use luna2d_core::engine::' |
     Set-Content $_.FullName
 }
@@ -690,13 +690,13 @@ Update the CI workflow to build all workspace members:
 Update `tools/dist/dist.ps1`:
 ```powershell
 # Build main binary
-cargo build -p luna2d-bin --release
+cargo build -p lurek2d-bin --release
 
 # Build plugins
-cargo build -p luna2d-gamedev --release
+cargo build -p lurek2d-gamedev --release
 
 # Copy to dist folder
-Copy-Item build\release\luna2d.exe dist\
+Copy-Item build\release\lurek2d.exe dist\
 Copy-Item build\release\luna_gamedev.dll dist\plugins\
 ```
 
@@ -725,7 +725,7 @@ Create `docs/architecture/plugin-guide.md`:
 ### 9.2 Example Plugin
 
 Create `examples/plugin_hello/`:
-- Minimal plugin that adds `luna.hello.greet(name)`
+- Minimal plugin that adds `lurek.hello.greet(name)`
 - Shows the complete workflow from creation to loading
 
 ### 9.3 Update Existing Docs
@@ -744,9 +744,9 @@ After all steps are complete:
 - [ ] `cargo check --workspace` — no errors
 - [ ] `cargo test --workspace` — all tests pass (same count as pre-split)
 - [ ] `cargo clippy --workspace -- -D warnings` — clean
-- [ ] `cargo build --release -p luna2d-bin` — produces `luna2d.exe`
-- [ ] `cargo build --release -p luna2d-gamedev` — produces `luna_gamedev.dll`
-- [ ] Binary size of `luna2d.exe` < pre-split binary size
+- [ ] `cargo build --release -p lurek2d-bin` — produces `lurek2d.exe`
+- [ ] `cargo build --release -p lurek2d-gamedev` — produces `luna_gamedev.dll`
+- [ ] Binary size of `lurek2d.exe` < pre-split binary size
 - [ ] `luna_gamedev.dll` size < 5 MB
 - [ ] All demos work with plugin loading enabled
 - [ ] All demos work with `conf.toml` plugins = [] (no plugins — core only)

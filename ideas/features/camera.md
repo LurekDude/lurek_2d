@@ -45,7 +45,7 @@
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Gideros |
+| Feature | Lurek2D | Engine A | Engine B | Engine I |
 |---|---|---|---|---|
 | Camera follow | ✅ | ❌ (manual) | ❌ (manual) | ❌ |
 | Deadzone | ✅ | ❌ | ❌ | ❌ |

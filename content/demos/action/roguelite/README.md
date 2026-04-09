@@ -15,7 +15,7 @@ A real-time action roguelite inspired by Hades. The player clears rooms of enemi
 ## How to Run
 
 ```powershell
-cargo run -- demos/roguelite
+cargo run -- content/demos/roguelite
 ```
 
 ## Controls

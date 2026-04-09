@@ -1,4 +1,4 @@
-//! Luna2D application lifecycle using winit 0.30 + wgpu GPU rendering.
+//! Lurek2D application lifecycle using winit 0.30 + wgpu GPU rendering.
 //!
 //! Uses a `winit` event loop with `GpuRenderer` for hardware-accelerated rendering.
 //! The game loop structure (callbacks, SharedState, Lua VM) follows the standard pattern.
@@ -132,9 +132,9 @@ fn fit_contain_size(src_w: u32, src_h: u32, max_w: f32, max_h: f32) -> (f32, f32
     (src_w * scale, src_h * scale)
 }
 
-// ─── Luna2D Application handler ──────────────────────────────────────────────
+// ─── Lurek2D Application handler ──────────────────────────────────────────────
 
-/// Luna2D application state managed by the winit event loop.
+/// Lurek2D application state managed by the winit event loop.
 struct LunaApp {
     config: Config,
     game_dir: PathBuf,
@@ -434,7 +434,7 @@ impl LunaApp {
 
         let (device, queue) = pollster::block_on(adapter.request_device(
             &wgpu::DeviceDescriptor {
-                label: Some("Luna2D Device"),
+                label: Some("Lurek2D Device"),
                 required_features: wgpu::Features::empty(),
                 required_limits: wgpu::Limits::downlevel_defaults(),
                 memory_hints: Default::default(),
@@ -551,7 +551,7 @@ impl LunaApp {
 
         let state = Rc::new(RefCell::new(shared_state));
 
-        // Load the embedded OpenSans default font before Lua starts — all luna.gfx.print()
+        // Load the embedded OpenSans default font before Lua starts — all lurek.gfx.print()
         // calls without an active font will use this instead of the bitmap fallback.
         state.borrow_mut().load_default_font();
 
@@ -1260,7 +1260,7 @@ impl LunaApp {
             st.window_height = height;
             recompute_viewport(&mut st.window_state, width, height);
         }
-        // Fire luna.resize(w, h) callback
+        // Fire lurek.resize(w, h) callback
         if self.has_game {
             if let Some(lua) = &self.lua {
                 call_lua_callback(lua, "resize", (width, height));
@@ -2018,7 +2018,7 @@ impl ApplicationHandler for LunaApp {
                     return;
                 }
 
-                // Check quit flag from Lua (e.g., luna.signal.quit()).
+                // Check quit flag from Lua (e.g., lurek.signal.quit()).
                 if let Some(state) = &self.state {
                     if state.borrow().quit_requested {
                         event_loop.exit();
@@ -2219,7 +2219,7 @@ impl ApplicationHandler for LunaApp {
 
 // ─── App entry point (public API) ────────────────────────────────────────────
 
-/// Entry point for the Luna2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
+/// Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.
 ///
 /// # Fields
 /// - `config` — `Config`.
@@ -2297,7 +2297,7 @@ impl App {
 /// Initialises logging to both stderr and a log file.
 ///
 /// `log_file` is a path relative to `game_dir` (or absolute). When `None`,
-/// the file is placed at `cwd/luna2d.log`.  When `log_append` is `true` the
+/// the file is placed at `cwd/lurek2d.log`.  When `log_append` is `true` the
 /// file is opened in append mode instead of being truncated.
 /// `log_level` overrides the build-mode default level when `Some` — valid values:
 /// `"error"`, `"warn"`, `"info"`, `"debug"`, `"trace"`.
@@ -2309,7 +2309,7 @@ fn init_logging(
 ) {
     use std::io::Write as _;
 
-    // Resolve log file path: custom path relative to game_dir, or cwd/luna2d.log default.
+    // Resolve log file path: custom path relative to game_dir, or cwd/lurek2d.log default.
     let log_path = if let Some(custom) = log_file {
         let p = std::path::Path::new(custom);
         if p.is_absolute() {
@@ -2420,7 +2420,7 @@ fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A)
     if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
         if let Ok(func) = luna.get::<_, LuaFunction>(name) {
             if let Err(e) = func.call::<_, ()>(args) {
-                log_msg!(error, L011_LUA_ERROR, "luna.{}(): {}", name, e);
+                log_msg!(error, L011_LUA_ERROR, "lurek.{}(): {}", name, e);
             }
         }
     }
@@ -2440,7 +2440,7 @@ fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     Ok(())
 }
 
-/// Tries calling `luna.errorhandler(msg)`. If it exists and succeeds, returns its
+/// Tries calling `lurek.errorhandler(msg)`. If it exists and succeeds, returns its
 /// error screen (showing that the handler was called). If it fails or doesn't exist,
 /// returns the default error screen for the original error.
 fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {

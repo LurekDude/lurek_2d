@@ -5,9 +5,9 @@ Navigate three alien scenes, defeat a guardian using your energy gun, and reach 
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — silhouette-style visuals
-- `luna.input.isKeyDown()` — movement and held shield
-- `luna.keypressed()` — jump, shoot, shield
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — silhouette-style visuals
+- `lurek.input.isKeyDown()` — movement and held shield
+- `lurek.keypressed()` — jump, shoot, shield
 - Scene-based room transitions
 - Deflectable enemy projectiles using the energy shield
 

@@ -270,7 +270,7 @@ impl LuaUserData for LuaCompressedImageData {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.img` API table with the Lua VM.
+/// Registers the `lurek.img` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

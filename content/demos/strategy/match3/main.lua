@@ -1,6 +1,6 @@
 -- Match-3 Puzzle: Swap adjacent gems, match 3+, cascade combos
 -- Click two adjacent gems to swap, score points, special gems
--- Run with: cargo run -- demos/strategy/match3
+-- Run with: cargo run -- content/demos/strategy/match3
 
 local function lerp(a, b, t) return a + (b - a) * t end
 
@@ -231,11 +231,11 @@ local function has_valid_moves()
     return false
 end
 
-function luna.init()
+function lurek.init()
     init_grid()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Animate gem positions
     local all_settled = true
     for r = 1, GRID_SIZE do
@@ -303,7 +303,7 @@ function luna.process(dt)
     end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
     if button ~= 1 or state ~= STATE_IDLE then return end
 
     local col = math.floor((mx - GRID_X) / CELL) + 1
@@ -332,7 +332,7 @@ function luna.mousepressed(mx, my, button)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "r" then
         init_grid()
         score = 0
@@ -341,25 +341,25 @@ function luna.keypressed(key)
         state = STATE_IDLE
         selected = nil
     end
-    if key == "escape" then luna.signal.quit() end
+    if key == "escape" then lurek.signal.quit() end
 end
 
-function luna.render()
-    luna.gfx.setBackgroundColor(0.12, 0.1, 0.18)
+function lurek.render()
+    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.18)
 
     -- Title and score
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("MATCH-3", GRID_X, 10, 2)
-    luna.gfx.print("Score: " .. score, GRID_X + 250, 15, 1.5)
-    luna.gfx.print("Moves: " .. moves, GRID_X + 250, 38)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("MATCH-3", GRID_X, 10, 2)
+    lurek.gfx.print("Score: " .. score, GRID_X + 250, 15, 1.5)
+    lurek.gfx.print("Moves: " .. moves, GRID_X + 250, 38)
     if combo > 1 then
-        luna.gfx.setColor(1, 0.8, 0.1, 1)
-        luna.gfx.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
+        lurek.gfx.setColor(1, 0.8, 0.1, 1)
+        lurek.gfx.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
     end
 
     -- Grid background
-    luna.gfx.setColor(0.18, 0.16, 0.22, 1)
-    luna.gfx.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
+    lurek.gfx.setColor(0.18, 0.16, 0.22, 1)
+    lurek.gfx.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
 
     -- Gems
     for r = 1, GRID_SIZE do
@@ -371,27 +371,27 @@ function luna.render()
                 local pad = 3
 
                 -- Cell background
-                luna.gfx.setColor(0.14, 0.12, 0.18, 1)
-                luna.gfx.rectangle("fill", x, y, CELL, CELL)
+                lurek.gfx.setColor(0.14, 0.12, 0.18, 1)
+                lurek.gfx.rectangle("fill", x, y, CELL, CELL)
 
                 -- Gem
                 local clr = gem_colors[g.color]
-                luna.gfx.setColor(clr[1], clr[2], clr[3], 1)
-                luna.gfx.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
+                lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
+                lurek.gfx.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
 
                 -- Highlight for specials
                 if g.special == "bomb" then
-                    luna.gfx.setColor(1, 1, 1, 0.5)
-                    luna.gfx.circle("fill", x + CELL / 2, y + CELL / 2, 8)
+                    lurek.gfx.setColor(1, 1, 1, 0.5)
+                    lurek.gfx.circle("fill", x + CELL / 2, y + CELL / 2, 8)
                 elseif g.special == "wiper" then
-                    luna.gfx.setColor(1, 1, 1, 0.4)
-                    luna.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
-                    luna.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
+                    lurek.gfx.setColor(1, 1, 1, 0.4)
+                    lurek.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
+                    lurek.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
                 end
 
                 -- Shine
-                luna.gfx.setColor(1, 1, 1, 0.15)
-                luna.gfx.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
+                lurek.gfx.setColor(1, 1, 1, 0.15)
+                lurek.gfx.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
             end
         end
     end
@@ -400,14 +400,14 @@ function luna.render()
     if selected then
         local sx = GRID_X + (selected.c - 1) * CELL
         local sy = GRID_Y + (selected.r - 1) * CELL
-        luna.gfx.setColor(1, 1, 1, 0.5)
-        luna.gfx.setLineWidth(3)
-        luna.gfx.rectangle("line", sx, sy, CELL, CELL)
-        luna.gfx.setLineWidth(1)
+        lurek.gfx.setColor(1, 1, 1, 0.5)
+        lurek.gfx.setLineWidth(3)
+        lurek.gfx.rectangle("line", sx, sy, CELL, CELL)
+        lurek.gfx.setLineWidth(1)
     end
 
     -- Controls
-    luna.gfx.setColor(0.5, 0.5, 0.5, 1)
-    luna.gfx.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), SCREEN_W - 90, 10)
+    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+    lurek.gfx.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), SCREEN_W - 90, 10)
 end

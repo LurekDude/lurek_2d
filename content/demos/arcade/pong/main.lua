@@ -1,7 +1,7 @@
--- Pong — Classic Arcade (Luna2D demo)
+-- Pong — Classic Arcade (Lurek2D demo)
 -- Two-player Pong: Player 1 = W/S, Player 2 = Up/Down arrow keys.
 -- First to 7 points wins.
--- Run with: cargo run -- demos/arcade/pong
+-- Run with: cargo run -- content/demos/arcade/pong
 
 -- ── State ────────────────────────────────────────────────────────────────
 
@@ -38,23 +38,23 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.05)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.05)
     ball_reset(1)
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     flash_timer = math.max(0, flash_timer - dt)
     if game_over then return end
 
     -- Player 1 input (W/S)
-    if luna.input.isKeyDown("w") then p1.y = p1.y - PADDLE_SPEED * dt end
-    if luna.input.isKeyDown("s") then p1.y = p1.y + PADDLE_SPEED * dt end
+    if lurek.input.isKeyDown("w") then p1.y = p1.y - PADDLE_SPEED * dt end
+    if lurek.input.isKeyDown("s") then p1.y = p1.y + PADDLE_SPEED * dt end
     -- Player 2 input (Up/Down)
-    if luna.input.isKeyDown("up")   then p2.y = p2.y - PADDLE_SPEED * dt end
-    if luna.input.isKeyDown("down") then p2.y = p2.y + PADDLE_SPEED * dt end
+    if lurek.input.isKeyDown("up")   then p2.y = p2.y - PADDLE_SPEED * dt end
+    if lurek.input.isKeyDown("down") then p2.y = p2.y + PADDLE_SPEED * dt end
 
     p1.y = clamp(p1.y, 0, H - PADDLE_H)
     p2.y = clamp(p2.y, 0, H - PADDLE_H)
@@ -94,51 +94,51 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Center dashed line
-    luna.gfx.setColor(0.25, 0.25, 0.25)
+    lurek.gfx.setColor(0.25, 0.25, 0.25)
     for i = 0, H, 24 do
-        luna.gfx.rectangle("fill", W/2 - 2, i, 4, 12)
+        lurek.gfx.rectangle("fill", W/2 - 2, i, 4, 12)
     end
 
     -- Paddles
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
-    luna.gfx.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
+    lurek.gfx.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
 
     -- Ball (flash white/yellow after score)
     if flash_timer > 0 then
-        luna.gfx.setColor(1, 1, 0)
+        lurek.gfx.setColor(1, 1, 0)
     else
-        luna.gfx.setColor(1, 1, 1)
+        lurek.gfx.setColor(1, 1, 1)
     end
-    luna.gfx.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
+    lurek.gfx.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
 
     -- Scores
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print(tostring(p1.score), W/2 - 70, 18, 4)
-    luna.gfx.print(tostring(p2.score), W/2 + 38, 18, 4)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print(tostring(p1.score), W/2 - 70, 18, 4)
+    lurek.gfx.print(tostring(p2.score), W/2 + 38, 18, 4)
 
     -- Controls hint
-    luna.gfx.setColor(0.4, 0.4, 0.4)
-    luna.gfx.print("P1: W/S", 8, H - 18, 1)
-    luna.gfx.print("P2: Up/Down", W - 112, H - 18, 1)
+    lurek.gfx.setColor(0.4, 0.4, 0.4)
+    lurek.gfx.print("P1: W/S", 8, H - 18, 1)
+    lurek.gfx.print("P2: Up/Down", W - 112, H - 18, 1)
 
     -- Game-over overlay
     if game_over then
-        luna.gfx.setColor(0, 0, 0, 0.6)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.9, 0.1)
-        luna.gfx.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
-        luna.gfx.setColor(0.7, 0.7, 0.7)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.6)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.9, 0.1)
+        lurek.gfx.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
+        lurek.gfx.setColor(0.7, 0.7, 0.7)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "r" and game_over then
         p1.score = 0; p2.score = 0
         game_over = false; winner = 0

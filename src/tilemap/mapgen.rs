@@ -1,12 +1,12 @@
 //! Procedural map generation — MapBlock, MapGroup, MapScript, MapGen.
 //!
-//! This module is part of Luna2D's `tilemap` subsystem and provides the implementation
+//! This module is part of Lurek2D's `tilemap` subsystem and provides the implementation
 //! details for mapgen-related operations and data management.
 //! Key types exported from this module: `Edge`, `MapBlock`, `MapGroup`, `StepType`, `ScriptStep`.
 //! Primary functions: `from_str()`, `as_str()`, `new()`, `set_tile()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

@@ -1,14 +1,14 @@
 {
   "name": "luna-toolkit",
   "displayName": "Luna Toolkit",
-  "description": "The official VS Code extension for Luna2D game engine development. Lua IntelliSense, 100+ luna.* completions, live diagnostics, debug bridge, system monitor, test runner, visual editors, and full project tooling.",
+  "description": "The official VS Code extension for Lurek2D game engine development. Lua IntelliSense, 100+ lurek.* completions, live diagnostics, debug bridge, system monitor, test runner, visual editors, and full project tooling.",
   "version": "0.9.0",
-  "publisher": "luna2d",
+  "publisher": "lurek2d",
   "icon": "media/luna-logo.png",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RandomBladeDude/luna2d"
+    "url": "https://github.com/RandomBladeDude/lurek2d"
   },
   "engines": {
     "vscode": "^1.90.0"
@@ -24,7 +24,7 @@
     "game",
     "game engine",
     "2d",
-    "luna2d",
+    "lurek2d",
     "game development",
     "pixel art",
     "tilemap"
@@ -48,564 +48,564 @@
     "views": {
       "luna-sidebar": [
         {
-          "id": "luna.projectTools",
+          "id": "lurek.projectTools",
           "name": "Project"
         },
         {
-          "id": "luna.devTools",
+          "id": "lurek.devTools",
           "name": "Dev Tools"
         },
         {
-          "id": "luna.assetExplorer",
+          "id": "lurek.assetExplorer",
           "name": "Assets"
         },
         {
-          "id": "luna.aiCopilot",
+          "id": "lurek.aiCopilot",
           "name": "AI & Copilot"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "luna.projectTools",
-        "contents": "No Luna2D project detected.\n[Create New Project](command:luna.scaffold.project)\n[Open Folder with main.lua](command:vscode.openFolder)"
+        "view": "lurek.projectTools",
+        "contents": "No Lurek2D project detected.\n[Create New Project](command:lurek.scaffold.project)\n[Open Folder with main.lua](command:vscode.openFolder)"
       }
     ],
     "commands": [
       {
-        "command": "luna.runGame",
+        "command": "lurek.runGame",
         "title": "Luna: Run Game",
         "icon": "$(play)"
       },
       {
-        "command": "luna.stopGame",
+        "command": "lurek.stopGame",
         "title": "Luna: Stop Game",
         "icon": "$(debug-stop)"
       },
       {
-        "command": "luna.runWithArgs",
+        "command": "lurek.runWithArgs",
         "title": "Luna: Run with Arguments"
       },
       {
-        "command": "luna.runExample",
+        "command": "lurek.runExample",
         "title": "Luna: Run Example"
       },
       {
-        "command": "luna.test.all",
+        "command": "lurek.test.all",
         "title": "Luna: Run All Tests",
         "icon": "$(testing-run-all-icon)"
       },
       {
-        "command": "luna.test.rust.math",
+        "command": "lurek.test.rust.math",
         "title": "Luna: Test Math"
       },
       {
-        "command": "luna.test.rust.physics",
+        "command": "lurek.test.rust.physics",
         "title": "Luna: Test Physics"
       },
       {
-        "command": "luna.test.rust.graphics",
+        "command": "lurek.test.rust.graphics",
         "title": "Luna: Test Graphics"
       },
       {
-        "command": "luna.test.rust.audio",
+        "command": "lurek.test.rust.audio",
         "title": "Luna: Test Audio"
       },
       {
-        "command": "luna.test.rust.input",
+        "command": "lurek.test.rust.input",
         "title": "Luna: Test Input"
       },
       {
-        "command": "luna.test.rust.timer",
+        "command": "lurek.test.rust.timer",
         "title": "Luna: Test Timer"
       },
       {
-        "command": "luna.test.rust.filesystem",
+        "command": "lurek.test.rust.filesystem",
         "title": "Luna: Test Filesystem"
       },
       {
-        "command": "luna.test.rust.tilemap",
+        "command": "lurek.test.rust.tilemap",
         "title": "Luna: Test Tilemap"
       },
       {
-        "command": "luna.test.rust.scene",
+        "command": "lurek.test.rust.scene",
         "title": "Luna: Test Scene"
       },
       {
-        "command": "luna.test.rust.ai",
+        "command": "lurek.test.rust.ai",
         "title": "Luna: Test AI"
       },
       {
-        "command": "luna.test.rust.compute",
+        "command": "lurek.test.rust.compute",
         "title": "Luna: Test Compute"
       },
       {
-        "command": "luna.test.rust.data",
+        "command": "lurek.test.rust.data",
         "title": "Luna: Test Data"
       },
       {
-        "command": "luna.test.rust.dataframe",
+        "command": "lurek.test.rust.dataframe",
         "title": "Luna: Test DataFrame"
       },
       {
-        "command": "luna.test.rust.entity",
+        "command": "lurek.test.rust.entity",
         "title": "Luna: Test Entity"
       },
       {
-        "command": "luna.test.rust.event",
+        "command": "lurek.test.rust.event",
         "title": "Luna: Test Event"
       },
       {
-        "command": "luna.test.rust.graph",
+        "command": "lurek.test.rust.graph",
         "title": "Luna: Test Graph"
       },
       {
-        "command": "luna.test.rust.image",
+        "command": "lurek.test.rust.image",
         "title": "Luna: Test Image"
       },
       {
-        "command": "luna.test.rust.modding",
+        "command": "lurek.test.rust.modding",
         "title": "Luna: Test Modding"
       },
       {
-        "command": "luna.test.rust.particle",
+        "command": "lurek.test.rust.particle",
         "title": "Luna: Test Particle"
       },
       {
-        "command": "luna.test.rust.savegame",
+        "command": "lurek.test.rust.savegame",
         "title": "Luna: Test SaveGame"
       },
       {
-        "command": "luna.test.rust.sound",
+        "command": "lurek.test.rust.sound",
         "title": "Luna: Test Sound"
       },
       {
-        "command": "luna.test.rust.system",
+        "command": "lurek.test.rust.system",
         "title": "Luna: Test System"
       },
       {
-        "command": "luna.test.lua.all",
+        "command": "lurek.test.lua.all",
         "title": "Luna: Run All Lua Tests"
       },
       {
-        "command": "luna.test.lua.golden",
+        "command": "lurek.test.lua.golden",
         "title": "Luna: Run Golden Tests"
       },
       {
-        "command": "luna.test.generateForFile",
+        "command": "lurek.test.generateForFile",
         "title": "Luna: Generate Tests for File"
       },
       {
-        "command": "luna.test.generateForFunction",
+        "command": "lurek.test.generateForFunction",
         "title": "Luna: Generate Tests for Function"
       },
       {
-        "command": "luna.test.runCurrent",
+        "command": "lurek.test.runCurrent",
         "title": "Luna: Run Current Test"
       },
       {
-        "command": "luna.test.runAll",
+        "command": "lurek.test.runAll",
         "title": "Luna: Run All Lua Game Tests"
       },
       {
-        "command": "luna.test.coverage",
+        "command": "lurek.test.coverage",
         "title": "Luna: API Coverage (Game Tests)"
       },
       {
-        "command": "luna.scaffold.project",
+        "command": "lurek.scaffold.project",
         "title": "Luna: New Project from Template"
       },
       {
-        "command": "luna.scaffold.file",
+        "command": "lurek.scaffold.file",
         "title": "Luna: New File from Template"
       },
       {
-        "command": "luna.extractToModuleFile",
+        "command": "lurek.extractToModuleFile",
         "title": "Luna: Extract Selection to New Module File"
       },
       {
-        "command": "luna.package.zip",
+        "command": "lurek.package.zip",
         "title": "Luna: Package Game (.zip)"
       },
       {
-        "command": "luna.package.windows",
+        "command": "lurek.package.windows",
         "title": "Luna: Package for Windows"
       },
       {
-        "command": "luna.package.linux",
+        "command": "lurek.package.linux",
         "title": "Luna: Package for Linux"
       },
       {
-        "command": "luna.editor.tileMap",
+        "command": "lurek.editor.tileMap",
         "title": "Luna: Tile Map Editor"
       },
       {
-        "command": "luna.editor.sceneFlow",
+        "command": "lurek.editor.sceneFlow",
         "title": "Luna: Scene Flow Editor"
       },
       {
-        "command": "luna.editor.entity",
+        "command": "lurek.editor.entity",
         "title": "Luna: Entity Designer"
       },
       {
-        "command": "luna.editor.pixelArt",
+        "command": "lurek.editor.pixelArt",
         "title": "Luna: Pixel Art Editor"
       },
       {
-        "command": "luna.editor.dialog",
+        "command": "lurek.editor.dialog",
         "title": "Luna: Dialog Editor"
       },
       {
-        "command": "luna.editor.particle",
+        "command": "lurek.editor.particle",
         "title": "Luna: Particle Designer"
       },
       {
-        "command": "luna.editor.database",
+        "command": "lurek.editor.database",
         "title": "Luna: Database Browser"
       },
       {
-        "command": "luna.editor.procMap",
+        "command": "lurek.editor.procMap",
         "title": "Luna: Procedural Map Generator"
       },
       {
-        "command": "luna.editor.questTree",
+        "command": "lurek.editor.questTree",
         "title": "Luna: Quest / Tech Tree Editor"
       },
       {
-        "command": "luna.editor.guiWidget",
+        "command": "lurek.editor.guiWidget",
         "title": "Luna: GUI Widget Editor"
       },
       {
-        "command": "luna.editor.aiBehavior",
+        "command": "lurek.editor.aiBehavior",
         "title": "Luna: AI Behavior Tree"
       },
       {
-        "command": "luna.editor.graph",
+        "command": "lurek.editor.graph",
         "title": "Luna: Graph / Node Editor"
       },
       {
-        "command": "luna.editor.tilemapScript",
+        "command": "lurek.editor.tilemapScript",
         "title": "Luna: Tilemap Script Editor"
       },
       {
-        "command": "luna.editor.voxel",
+        "command": "lurek.editor.voxel",
         "title": "Luna: Voxel Editor"
       },
       {
-        "command": "luna.editor.testRunner",
+        "command": "lurek.editor.testRunner",
         "title": "Luna: Test Runner"
       },
       {
-        "command": "luna.editor.apiReference",
+        "command": "lurek.editor.apiReference",
         "title": "Luna: API Reference"
       },
       {
-        "command": "luna.editor.spriteAnim",
+        "command": "lurek.editor.spriteAnim",
         "title": "Luna: Sprite Animation Editor"
       },
       {
-        "command": "luna.editor.tileset",
+        "command": "lurek.editor.tileset",
         "title": "Luna: Tileset Editor"
       },
       {
-        "command": "luna.editor.audioMixer",
+        "command": "lurek.editor.audioMixer",
         "title": "Luna: Audio Mixer"
       },
       {
-        "command": "luna.editor.soundDsp",
+        "command": "lurek.editor.soundDsp",
         "title": "Luna: Sound DSP Panel"
       },
       {
-        "command": "luna.editor.postfxOverlay",
+        "command": "lurek.editor.postfxOverlay",
         "title": "Luna: PostFX & Overlay Designer"
       },
       {
-        "command": "luna.editor.colorPalette",
+        "command": "lurek.editor.colorPalette",
         "title": "Luna: Color Palette Editor"
       },
       {
-        "command": "luna.editor.inputMapper",
+        "command": "lurek.editor.inputMapper",
         "title": "Luna: Input Mapper"
       },
       {
-        "command": "luna.editor.timeline",
+        "command": "lurek.editor.timeline",
         "title": "Luna: Timeline Editor"
       },
       {
-        "command": "luna.editor.shaderPreview",
+        "command": "lurek.editor.shaderPreview",
         "title": "Luna: Shader Preview"
       },
       {
-        "command": "luna.editor.fontPreview",
+        "command": "lurek.editor.fontPreview",
         "title": "Luna: Font Preview"
       },
       {
-        "command": "luna.editor.localization",
+        "command": "lurek.editor.localization",
         "title": "Luna: Localization Editor"
       },
       {
-        "command": "luna.editor.physicsMaterials",
+        "command": "lurek.editor.physicsMaterials",
         "title": "Luna: Physics Materials Editor"
       },
       {
-        "command": "luna.editor.worldMap",
+        "command": "lurek.editor.worldMap",
         "title": "Luna: World Map Editor"
       },
       {
-        "command": "luna.browseApi",
+        "command": "lurek.browseApi",
         "title": "Luna: Browse API (Quick Pick)"
       },
       {
-        "command": "luna.openApiDocs",
+        "command": "lurek.openApiDocs",
         "title": "Luna: Open Lua API Docs"
       },
       {
-        "command": "luna.openWiki",
+        "command": "lurek.openWiki",
         "title": "Luna: Open Wiki"
       },
       {
-        "command": "luna.depGraph",
+        "command": "lurek.depGraph",
         "title": "Luna: Dependency Graph"
       },
       {
-        "command": "luna.depList",
+        "command": "lurek.depList",
         "title": "Luna: Dependency List"
       },
       {
-        "command": "luna.deps.showGraph",
+        "command": "lurek.deps.showGraph",
         "title": "Luna: Show Dependency Graph"
       },
       {
-        "command": "luna.deps.findCircular",
+        "command": "lurek.deps.findCircular",
         "title": "Luna: Find Circular Dependencies"
       },
       {
-        "command": "luna.deps.findOrphans",
+        "command": "lurek.deps.findOrphans",
         "title": "Luna: Find Orphan Modules"
       },
       {
-        "command": "luna.assets.refresh",
+        "command": "lurek.assets.refresh",
         "title": "Luna: Refresh Assets",
         "icon": "$(refresh)"
       },
       {
-        "command": "luna.assets.openPanel",
+        "command": "lurek.assets.openPanel",
         "title": "Luna: Open Asset Explorer"
       },
       {
-        "command": "luna.assets.findMissing",
+        "command": "lurek.assets.findMissing",
         "title": "Luna: Find Missing Assets"
       },
       {
-        "command": "luna.assets.insertPath",
+        "command": "lurek.assets.insertPath",
         "title": "Luna: Insert Asset Path"
       },
       {
-        "command": "luna.perf.openDashboard",
+        "command": "lurek.perf.openDashboard",
         "title": "Luna: Open Performance Dashboard",
         "icon": "$(dashboard)"
       },
       {
-        "command": "luna.perf.clearHistory",
+        "command": "lurek.perf.clearHistory",
         "title": "Luna: Clear Performance History"
       },
       {
-        "command": "luna.perf.openHotReload",
+        "command": "lurek.perf.openHotReload",
         "title": "Luna: Open Hot-Reload History"
       },
       {
-        "command": "luna.debug.connect",
+        "command": "lurek.debug.connect",
         "title": "Luna: Debug Connect"
       },
       {
-        "command": "luna.debug.disconnect",
+        "command": "lurek.debug.disconnect",
         "title": "Luna: Debug Disconnect"
       },
       {
-        "command": "luna.debug.runAndConnect",
+        "command": "lurek.debug.runAndConnect",
         "title": "Luna: Debug Run + Connect"
       },
       {
-        "command": "luna.debug.performance",
+        "command": "lurek.debug.performance",
         "title": "Luna: Debug Performance"
       },
       {
-        "command": "luna.debug.printHistory",
+        "command": "lurek.debug.printHistory",
         "title": "Luna: Debug Print History"
       },
       {
-        "command": "luna.debug.evaluate",
+        "command": "lurek.debug.evaluate",
         "title": "Luna: Debug Evaluate Lua"
       },
       {
-        "command": "luna.debug.hotReload",
+        "command": "lurek.debug.hotReload",
         "title": "Luna: Debug Hot Reload"
       },
       {
-        "command": "luna.debug.showStats",
+        "command": "lurek.debug.showStats",
         "title": "Luna: Debug Show Stats"
       },
       {
-        "command": "luna.debug.inspect",
+        "command": "lurek.debug.inspect",
         "title": "Luna: Debug Inspect Variable"
       },
       {
-        "command": "luna.debug.screenshot",
+        "command": "lurek.debug.screenshot",
         "title": "Luna: Debug Screenshot"
       },
       {
-        "command": "luna.debug.callStack",
+        "command": "lurek.debug.callStack",
         "title": "Luna: Debug Call Stack"
       },
       {
-        "command": "luna.debug.status",
+        "command": "lurek.debug.status",
         "title": "Luna: Debug Status"
       },
       {
-        "command": "luna.debug.openWatchers",
+        "command": "lurek.debug.openWatchers",
         "title": "Luna: Open Watchers Panel",
         "icon": "$(eye)"
       },
       {
-        "command": "luna.debug.openInspector",
+        "command": "lurek.debug.openInspector",
         "title": "Luna: Open Variable Inspector",
         "icon": "$(symbol-variable)"
       },
       {
-        "command": "luna.debug.openCallStack",
+        "command": "lurek.debug.openCallStack",
         "title": "Luna: Open Call Stack",
         "icon": "$(list-tree)"
       },
       {
-        "command": "luna.debug.addWatch",
+        "command": "lurek.debug.addWatch",
         "title": "Luna: Add Watch Expression"
       },
       {
-        "command": "luna.codeLens.toggle",
+        "command": "lurek.codeLens.toggle",
         "title": "Luna: Toggle Code Lens"
       },
       {
-        "command": "luna.system.openMonitor",
+        "command": "lurek.system.openMonitor",
         "title": "Luna: Open System Monitor",
         "icon": "$(pulse)"
       },
       {
-        "command": "luna.api.usageReport",
+        "command": "lurek.api.usageReport",
         "title": "Luna: Show API Usage Report",
         "icon": "$(graph)"
       },
       {
-        "command": "luna.api.quickInsert",
+        "command": "lurek.api.quickInsert",
         "title": "Luna: Quick Insert Luna API",
         "icon": "$(symbol-method)"
       },
       {
-        "command": "luna.cag.install",
+        "command": "lurek.cag.install",
         "title": "Luna: Install AI Config"
       },
       {
-        "command": "luna.cag.selectAgent",
+        "command": "lurek.cag.selectAgent",
         "title": "Luna: Select Agent"
       },
       {
-        "command": "luna.cag.selectSkill",
+        "command": "lurek.cag.selectSkill",
         "title": "Luna: Select Skill"
       },
       {
-        "command": "luna.cag.selectPrompt",
+        "command": "lurek.cag.selectPrompt",
         "title": "Luna: Select Prompt"
       },
       {
-        "command": "luna.cag.update",
+        "command": "lurek.cag.update",
         "title": "Luna: Update CAG Files"
       },
       {
-        "command": "luna.cag.deploy",
+        "command": "lurek.cag.deploy",
         "title": "Luna: Deploy Game Dev AI Layer"
       },
       {
-        "command": "luna.cag.scaffold",
+        "command": "lurek.cag.scaffold",
         "title": "Luna: Scaffold Project from Template"
       },
       {
-        "command": "luna.cag.updateGameDev",
+        "command": "lurek.cag.updateGameDev",
         "title": "Luna: Update Game Dev AI Layer"
       },
       {
-        "command": "luna.mcp.install",
+        "command": "lurek.mcp.install",
         "title": "Luna: Install MCP Server"
       },
       {
-        "command": "luna.mcp.status",
+        "command": "lurek.mcp.status",
         "title": "Luna: MCP Status"
       },
       {
-        "command": "luna.jam.timer",
+        "command": "lurek.jam.timer",
         "title": "Luna: Game Jam Timer"
       },
       {
-        "command": "luna.jam.quickBuild",
+        "command": "lurek.jam.quickBuild",
         "title": "Luna: Quick Build"
       },
       {
-        "command": "luna.jam.checklist",
+        "command": "lurek.jam.checklist",
         "title": "Luna: Submission Checklist"
       },
       {
-        "command": "luna.gameJam.quickStart",
+        "command": "lurek.gameJam.quickStart",
         "title": "Luna: Game Jam Quick Start"
       },
       {
-        "command": "luna.gameJam.addModule",
+        "command": "lurek.gameJam.addModule",
         "title": "Luna: Add Game Module"
       },
       {
-        "command": "luna.gameJam.timer",
+        "command": "lurek.gameJam.timer",
         "title": "Luna: Game Jam Countdown Timer"
       },
       {
-        "command": "luna.library.install",
+        "command": "lurek.library.install",
         "title": "Luna: Install Library"
       },
       {
-        "command": "luna.library.list",
+        "command": "lurek.library.list",
         "title": "Luna: List Libraries"
       },
       {
-        "command": "luna.library.browse",
+        "command": "lurek.library.browse",
         "title": "Luna: Browse Pattern Library"
       },
       {
-        "command": "luna.library.insertSnippet",
+        "command": "lurek.library.insertSnippet",
         "title": "Luna: Insert Code Snippet"
       },
       {
-        "command": "luna.library.newPattern",
+        "command": "lurek.library.newPattern",
         "title": "Luna: Save Selection as Pattern"
       },
       {
-        "command": "luna.apiCoverage",
+        "command": "lurek.apiCoverage",
         "title": "Luna: API Coverage Report"
       }
     ],
     "keybindings": [
       {
-        "command": "luna.runGame",
+        "command": "lurek.runGame",
         "key": "alt+l",
         "when": "editorTextFocus && resourceLangId == lua"
       },
       {
-        "command": "luna.stopGame",
+        "command": "lurek.stopGame",
         "key": "shift+alt+l",
-        "when": "luna.gameRunning"
+        "when": "lurek.gameRunning"
       },
       {
-        "command": "luna.openWiki",
+        "command": "lurek.openWiki",
         "key": "f2",
         "when": "editorTextFocus && resourceLangId == lua"
       },
       {
-        "command": "luna.test.all",
+        "command": "lurek.test.all",
         "key": "ctrl+shift+t",
         "when": "workspaceFolderCount > 0"
       }
@@ -613,51 +613,51 @@
     "menus": {
       "editor/context": [
         {
-          "command": "luna.runGame",
+          "command": "lurek.runGame",
           "when": "resourceLangId == lua",
           "group": "luna@1"
         },
         {
-          "command": "luna.openWiki",
+          "command": "lurek.openWiki",
           "when": "resourceLangId == lua",
           "group": "luna@2"
         },
         {
-          "command": "luna.test.generateForFile",
+          "command": "lurek.test.generateForFile",
           "when": "resourceLangId == lua",
           "group": "luna@3"
         }
       ],
       "explorer/context": [
         {
-          "command": "luna.runGame",
+          "command": "lurek.runGame",
           "when": "explorerResourceIsFolder",
           "group": "luna@1"
         }
       ],
       "view/title": [
         {
-          "command": "luna.assets.refresh",
-          "when": "view == luna.assetExplorer",
+          "command": "lurek.assets.refresh",
+          "when": "view == lurek.assetExplorer",
           "group": "navigation"
         },
         {
-          "command": "luna.assets.findMissing",
-          "when": "view == luna.assetExplorer",
+          "command": "lurek.assets.findMissing",
+          "when": "view == lurek.assetExplorer",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "luna.assets.insertPath",
-          "when": "view == luna.assetExplorer && viewItem =~ /^assetItem/",
+          "command": "lurek.assets.insertPath",
+          "when": "view == lurek.assetExplorer && viewItem =~ /^assetItem/",
           "group": "luna@1"
         }
       ]
     },
     "customEditors": [
       {
-        "viewType": "luna.sceneLuaEditor",
+        "viewType": "lurek.sceneLuaEditor",
         "displayName": "Luna Scene Editor",
         "selector": [
           {
@@ -676,148 +676,148 @@
     "configuration": {
       "title": "Luna Toolkit",
       "properties": {
-        "luna.lunaPath": {
+        "lurek.lunaPath": {
           "type": "string",
           "default": "",
-          "description": "Path to luna2d executable"
+          "description": "Path to lurek2d executable"
         },
-        "luna.srcDir": {
+        "lurek.srcDir": {
           "type": "string",
           "default": "",
           "description": "Game source subdirectory"
         },
-        "luna.saveOnRun": {
+        "lurek.saveOnRun": {
           "type": "boolean",
           "default": true,
           "description": "Save files before running"
         },
-        "luna.diagnostics.deprecationWarnings": {
+        "lurek.diagnostics.deprecationWarnings": {
           "type": "boolean",
           "default": true,
           "description": "Show deprecated API warnings"
         },
-        "luna.diagnostics.commonMistakes": {
+        "lurek.diagnostics.commonMistakes": {
           "type": "boolean",
           "default": true,
-          "description": "Detect common Luna2D mistakes"
+          "description": "Detect common Lurek2D mistakes"
         },
-        "luna.diagnostics.unusedRequires": {
+        "lurek.diagnostics.unusedRequires": {
           "type": "boolean",
           "default": true,
           "description": "Flag unused require statements"
         },
-        "luna.diagnostics.assetValidation": {
+        "lurek.diagnostics.assetValidation": {
           "type": "boolean",
           "default": true,
           "description": "Validate asset file paths"
         },
-        "luna.inlayHints.parameterNames": {
+        "lurek.inlayHints.parameterNames": {
           "type": "boolean",
           "default": true,
           "description": "Show parameter name hints"
         },
-        "luna.test.testDir": {
+        "lurek.test.testDir": {
           "type": "string",
           "default": "tests",
           "description": "Test directory path"
         },
-        "luna.test.luaTestDir": {
+        "lurek.test.luaTestDir": {
           "type": "string",
           "default": "tests/lua",
           "description": "Lua test directory"
         },
-        "luna.cag.installOnScaffold": {
+        "lurek.cag.installOnScaffold": {
           "type": "boolean",
           "default": true,
           "description": "Auto-install AI config on scaffold"
         },
-        "luna.package.outputDir": {
+        "lurek.package.outputDir": {
           "type": "string",
           "default": "dist",
           "description": "Build output directory"
         },
-        "luna.debugBridge.port": {
+        "lurek.debugBridge.port": {
           "type": "number",
           "default": 19740,
           "minimum": 1024,
           "maximum": 65535,
           "description": "Debug bridge TCP port"
         },
-        "luna.debugBridge.autoConnect": {
+        "lurek.debugBridge.autoConnect": {
           "type": "boolean",
           "default": true,
           "description": "Auto-connect on debug run"
         },
-        "luna.luaVersion": {
+        "lurek.luaVersion": {
           "type": "string",
           "enum": ["luajit", "5.4"],
           "default": "luajit",
           "description": "Lua runtime version for IntelliSense (LuaJIT or Lua 5.4)"
         },
-        "luna.inlayHints.enabled": {
+        "lurek.inlayHints.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Show parameter name hints inline"
         },
-        "luna.diagnostics.enabled": {
+        "lurek.diagnostics.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable Luna2D-specific diagnostics"
+          "description": "Enable Lurek2D-specific diagnostics"
         },
-        "luna.formatting.enabled": {
+        "lurek.formatting.enabled": {
           "type": "boolean",
           "default": true,
           "description": "Enable Lua code formatting"
         },
-        "luna.intellisense.luaStdlib": {
+        "lurek.intellisense.luaStdlib": {
           "type": "boolean",
           "default": true,
           "description": "Include Lua standard library in completions"
         },
-        "luna.intellisense.luajitHints": {
+        "lurek.intellisense.luajitHints": {
           "type": "boolean",
           "default": true,
           "description": "Show LuaJIT performance optimization hints (table alloc in hot path, string concat in loops, etc.)"
         },
-        "luna.intellisense.patternLibrary": {
+        "lurek.intellisense.patternLibrary": {
           "type": "boolean",
           "default": true,
           "description": "Offer pattern library snippets (state machine, object pool, class, event bus, etc.)"
         },
-        "luna.intellisense.keyNameCompletion": {
+        "lurek.intellisense.keyNameCompletion": {
           "type": "boolean",
           "default": true,
-          "description": "Show key name completions inside input API string arguments (luna.input.isDown, luna.keypressed)"
+          "description": "Show key name completions inside input API string arguments (lurek.input.isDown, lurek.keypressed)"
         },
-        "luna.intellisense.easingHoverChart": {
+        "lurek.intellisense.easingHoverChart": {
           "type": "boolean",
           "default": true,
           "description": "Show easing curve ASCII chart when hovering over easing function name strings"
         },
-        "luna.intellisense.typeInference": {
+        "lurek.intellisense.typeInference": {
           "type": "boolean",
           "default": true,
-          "description": "Track return types from luna.* factory functions and enable method completion on instances"
+          "description": "Track return types from lurek.* factory functions and enable method completion on instances"
         },
-        "luna.intellisense.globalWarnings": {
+        "lurek.intellisense.globalWarnings": {
           "type": "boolean",
           "default": true,
           "description": "Warn on implicit global variable writes (prefer local declarations)"
         },
-        "luna.intellisense.unusedAssets": {
+        "lurek.intellisense.unusedAssets": {
           "type": "boolean",
           "default": false,
           "description": "Detect asset files in assets/ that are never referenced in Lua code (may be slow on large projects)"
         },
-        "luna.intellisense.classPatternDetection": {
+        "lurek.intellisense.classPatternDetection": {
           "type": "boolean",
           "default": true,
           "description": "Detect OOP class patterns (setmetatable, __index) and enable method completion on class instances"
         },
-        "luna.debugger.port": {
+        "lurek.debugger.port": {
           "type": "number",
           "default": 8172,
-          "description": "Default TCP port for Luna2D debug communication"
+          "description": "Default TCP port for Lurek2D debug communication"
         }
       }
     },
@@ -836,7 +836,7 @@
     "debuggers": [
       {
         "type": "luna",
-        "label": "Luna2D",
+        "label": "Lurek2D",
         "program": "",
         "runtime": "",
         "languages": [
@@ -874,7 +874,7 @@
               },
               "enginePath": {
                 "type": "string",
-                "description": "Path to Luna2D engine executable (auto-detected if not set)"
+                "description": "Path to Lurek2D engine executable (auto-detected if not set)"
               },
               "args": {
                 "type": "array",
@@ -890,7 +890,7 @@
             "properties": {
               "debugPort": {
                 "type": "number",
-                "description": "TCP port of running Luna2D engine",
+                "description": "TCP port of running Lurek2D engine",
                 "default": 8172
               }
             }
@@ -898,22 +898,22 @@
         },
         "configurationSnippets": [
           {
-            "label": "Luna2D: Debug Game",
-            "description": "Launch and debug a Luna2D game",
+            "label": "Lurek2D: Debug Game",
+            "description": "Launch and debug a Lurek2D game",
             "body": {
               "type": "luna",
               "request": "launch",
-              "name": "Luna2D: Debug Game",
+              "name": "Lurek2D: Debug Game",
               "program": "^\"\\${workspaceFolder}\""
             }
           },
           {
-            "label": "Luna2D: Attach",
-            "description": "Attach to a running Luna2D game",
+            "label": "Lurek2D: Attach",
+            "description": "Attach to a running Lurek2D game",
             "body": {
               "type": "luna",
               "request": "attach",
-              "name": "Luna2D: Attach",
+              "name": "Lurek2D: Attach",
               "debugPort": 8172
             }
           }

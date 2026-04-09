@@ -1,7 +1,7 @@
--- Lemmings — Amiga 500 Classic (Luna2D demo)
+-- Lemmings — Amiga 500 Classic (Lurek2D demo)
 -- Guide lemmings to the exit by assigning them jobs: blocker, digger, builder, basher.
 -- Inspired by DMA Design's 1991 classic puzzle game.
--- Run with: cargo run -- demos/retro/lemmings
+-- Run with: cargo run -- content/demos/retro/lemmings
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -101,8 +101,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.4, 0.6, 0.9)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.4, 0.6, 0.9)
     build_terrain()
     lemmings = {}; spawned = 0; saved = 0; dead = 0; spawn_timer = 0
     skill_counts = { blocker = 3, digger = 5, builder = 4, basher = 3 }
@@ -112,7 +112,7 @@ end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     anim = anim + dt
 
@@ -236,10 +236,10 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Background sky gradient (simplified)
-    luna.gfx.setColor(0.45, 0.65, 0.95)
-    luna.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.gfx.setColor(0.45, 0.65, 0.95)
+    lurek.gfx.rectangle("fill", 0, 0, W, H)
 
     -- Terrain
     for x = 1, COLS do
@@ -247,103 +247,103 @@ function luna.render()
             if terrain[x] and terrain[x][y] then
                 local wx, wy = t2w(x, y)
                 local ratio = y / ROWS
-                luna.gfx.setColor(0.35 - ratio*0.1, 0.55 - ratio*0.1, 0.15)
-                luna.gfx.rectangle("fill", wx, wy, TILE, TILE)
+                lurek.gfx.setColor(0.35 - ratio*0.1, 0.55 - ratio*0.1, 0.15)
+                lurek.gfx.rectangle("fill", wx, wy, TILE, TILE)
                 -- Top edge highlight
                 if not (terrain[x] and terrain[x][y-1]) then
-                    luna.gfx.setColor(0.5, 0.8, 0.25)
-                    luna.gfx.rectangle("fill", wx, wy, TILE, 3)
+                    lurek.gfx.setColor(0.5, 0.8, 0.25)
+                    lurek.gfx.rectangle("fill", wx, wy, TILE, 3)
                 end
             end
         end
     end
 
     -- Exit door
-    luna.gfx.setColor(0.9, 0.7, 0.1)
-    luna.gfx.rectangle("fill", EXIT_X, EXIT_Y - 20, TILE * 2, TILE * 2 + 20)
-    luna.gfx.setColor(0, 0, 0)
-    luna.gfx.print("EXIT", EXIT_X + 3, EXIT_Y - 16, 1.1)
+    lurek.gfx.setColor(0.9, 0.7, 0.1)
+    lurek.gfx.rectangle("fill", EXIT_X, EXIT_Y - 20, TILE * 2, TILE * 2 + 20)
+    lurek.gfx.setColor(0, 0, 0)
+    lurek.gfx.print("EXIT", EXIT_X + 3, EXIT_Y - 16, 1.1)
 
     -- Spawn hatch
-    luna.gfx.setColor(0.8, 0.5, 0.2)
-    luna.gfx.rectangle("fill", SPAWN_X - 5, SPAWN_Y - 14, TILE * 2 + 10, TILE)
+    lurek.gfx.setColor(0.8, 0.5, 0.2)
+    lurek.gfx.rectangle("fill", SPAWN_X - 5, SPAWN_Y - 14, TILE * 2 + 10, TILE)
     local bounce = 0.5 + 0.5 * math.sin(anim * 8)
-    luna.gfx.setColor(1, 0.8, 0.1)
-    luna.gfx.rectangle("fill", SPAWN_X + 2, SPAWN_Y - 12 - bounce * 3, TILE + 6, 6)
+    lurek.gfx.setColor(1, 0.8, 0.1)
+    lurek.gfx.rectangle("fill", SPAWN_X + 2, SPAWN_Y - 12 - bounce * 3, TILE + 6, 6)
 
     -- Lemmings
     for _, lem in ipairs(lemmings) do
         if lem.alive then
             local jc = JOB_COLORS[lem.job] or JOB_COLORS.none
-            luna.gfx.setColor(jc[1], jc[2], jc[3])
-            luna.gfx.rectangle("fill", lem.x, lem.y, LSIZE, LSIZE)
+            lurek.gfx.setColor(jc[1], jc[2], jc[3])
+            lurek.gfx.rectangle("fill", lem.x, lem.y, LSIZE, LSIZE)
             -- Head
-            luna.gfx.setColor(0.9, 0.75, 0.6)
-            luna.gfx.circle("fill", lem.x + LSIZE/2, lem.y - 3, 5)
+            lurek.gfx.setColor(0.9, 0.75, 0.6)
+            lurek.gfx.circle("fill", lem.x + LSIZE/2, lem.y - 3, 5)
             -- Blue hat
-            luna.gfx.setColor(0.2, 0.2, 0.9)
-            luna.gfx.rectangle("fill", lem.x + 1, lem.y - 8, LSIZE - 2, 6)
+            lurek.gfx.setColor(0.2, 0.2, 0.9)
+            lurek.gfx.rectangle("fill", lem.x + 1, lem.y - 8, LSIZE - 2, 6)
             -- Walking legs
             local leg = math.floor(anim * 8) % 2 == 0
             if lem.on_ground and lem.job == "none" then
-                luna.gfx.setColor(jc[1] * 0.7, jc[2] * 0.7, jc[3] * 0.7)
-                luna.gfx.rectangle("fill", lem.x + (leg and 1 or 5), lem.y + LSIZE, 3, 4)
-                luna.gfx.rectangle("fill", lem.x + (leg and 5 or 1), lem.y + LSIZE, 3, 4)
+                lurek.gfx.setColor(jc[1] * 0.7, jc[2] * 0.7, jc[3] * 0.7)
+                lurek.gfx.rectangle("fill", lem.x + (leg and 1 or 5), lem.y + LSIZE, 3, 4)
+                lurek.gfx.rectangle("fill", lem.x + (leg and 5 or 1), lem.y + LSIZE, 3, 4)
             end
         end
     end
 
     -- HUD panel
-    luna.gfx.setColor(0.1, 0.1, 0.15, 0.85)
-    luna.gfx.rectangle("fill", 0, H - 42, W, 42)
-    luna.gfx.setColor(0.5, 1, 0.3)
-    luna.gfx.print("Saved: " .. saved .. "/" .. LEVEL_NEED, 8, H - 37, 1.5)
-    luna.gfx.setColor(1, 0.4, 0.4)
-    luna.gfx.print("Dead: " .. dead, 170, H - 37, 1.5)
-    luna.gfx.setColor(1, 0.8, 0.2)
-    luna.gfx.print("Left: " .. (LEVEL_TOTAL - spawned), 290, H - 37, 1.5)
+    lurek.gfx.setColor(0.1, 0.1, 0.15, 0.85)
+    lurek.gfx.rectangle("fill", 0, H - 42, W, 42)
+    lurek.gfx.setColor(0.5, 1, 0.3)
+    lurek.gfx.print("Saved: " .. saved .. "/" .. LEVEL_NEED, 8, H - 37, 1.5)
+    lurek.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.print("Dead: " .. dead, 170, H - 37, 1.5)
+    lurek.gfx.setColor(1, 0.8, 0.2)
+    lurek.gfx.print("Left: " .. (LEVEL_TOTAL - spawned), 290, H - 37, 1.5)
 
     -- Job buttons
     local jobs_row = {"blocker","digger","builder","basher"}
     for i, j in ipairs(jobs_row) do
         local bx = 380 + (i-1) * 100
         local sel = selected_job == j
-        luna.gfx.setColor(sel and 0.3 or 0.2, sel and 0.5 or 0.3, sel and 0.9 or 0.5)
-        luna.gfx.rectangle("fill", bx, H - 40, 94, 36)
+        lurek.gfx.setColor(sel and 0.3 or 0.2, sel and 0.5 or 0.3, sel and 0.9 or 0.5)
+        lurek.gfx.rectangle("fill", bx, H - 40, 94, 36)
         if sel then
-            luna.gfx.setColor(1, 1, 0.2)
-            luna.gfx.rectangle("line", bx, H - 40, 94, 36)
+            lurek.gfx.setColor(1, 1, 0.2)
+            lurek.gfx.rectangle("line", bx, H - 40, 94, 36)
         end
         local jc = JOB_COLORS[j]
-        luna.gfx.setColor(jc[1], jc[2], jc[3])
-        luna.gfx.print(j:upper() .. " " .. (skill_counts[j] or 0), bx + 4, H - 30, 1.2)
+        lurek.gfx.setColor(jc[1], jc[2], jc[3])
+        lurek.gfx.print(j:upper() .. " " .. (skill_counts[j] or 0), bx + 4, H - 30, 1.2)
     end
 
     -- Overlay
     if game_state ~= "playing" then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
         if game_state == "win" then
-            luna.gfx.setColor(0.2, 1, 0.4)
-            luna.gfx.print("LEVEL COMPLETE!", W/2 - 110, H/2 - 25, 3)
-            luna.gfx.setColor(1, 1, 1)
-            luna.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
+            lurek.gfx.setColor(0.2, 1, 0.4)
+            lurek.gfx.print("LEVEL COMPLETE!", W/2 - 110, H/2 - 25, 3)
+            lurek.gfx.setColor(1, 1, 1)
+            lurek.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
         else
-            luna.gfx.setColor(1, 0.2, 0.2)
-            luna.gfx.print("LEVEL FAILED", W/2 - 94, H/2 - 25, 3)
-            luna.gfx.setColor(1, 1, 1)
-            luna.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
+            lurek.gfx.setColor(1, 0.2, 0.2)
+            lurek.gfx.print("LEVEL FAILED", W/2 - 94, H/2 - 25, 3)
+            lurek.gfx.setColor(1, 1, 1)
+            lurek.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
         end
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to retry", W/2 - 88, H/2 + 58, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to retry", W/2 - 88, H/2 + 58, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
     -- Job cycle: 1-4 keys
     if key == "1" then selected_job = "blocker" end
     if key == "2" then selected_job = "digger" end

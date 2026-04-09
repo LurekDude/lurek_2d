@@ -1,5 +1,5 @@
 ---
-description: "Diagnose and fix threading issues in Luna2D: Channel deadlocks, Worker lifecycle bugs, message delivery failures, or background Lua VM errors. Use when debugging thread-related bugs."
+description: "Diagnose and fix threading issues in Lurek2D: Channel deadlocks, Worker lifecycle bugs, message delivery failures, or background Lua VM errors. Use when debugging thread-related bugs."
 ---
 
 # Fix Threading Issue

@@ -1,4 +1,4 @@
-//! Lightweight runtime data-validation schema for Luna2D game developers.
+//! Lightweight runtime data-validation schema for Lurek2D game developers.
 //!
 //! A [`Schema`] is built from a table of named [`FieldRule`]s and validates
 //! any Lua-table data record, returning a [`SchemaResult`] that can be
@@ -6,7 +6,7 @@
 //!
 //! Typical use — game config validation, save-data integrity, mod manifests:
 //! ```lua
-//! local schema = luna.docs.schema({
+//! local schema = lurek.docs.schema({
 //!   name    = { type = "string",  required = true },
 //!   level   = { type = "integer", min = 1, max = 100 },
 //!   class   = { type = "string",  enum = { "warrior", "mage", "rogue" } },

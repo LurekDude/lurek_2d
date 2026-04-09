@@ -6,15 +6,15 @@
 | **Architecture**   | 15 submodule files, flat layout under `src/math/` |
 | **Path**           | `src/math/` |
 | **Depends on**     | `fastrand` (external); `crate::engine::log_messages` (log constants in `spatial_hash.rs` only) |
-| **Depended on by** | Every other Luna2D module |
-| **Lua API**        | `luna.math` via `src/lua_api/math_api.rs` |
+| **Depended on by** | Every other Lurek2D module |
+| **Lua API**        | `lurek.math` via `src/lua_api/math_api.rs` |
 | **Tests — Rust**   | `tests/unit/math_tests.rs` (~60 tests, 857 lines) |
 | **Tests — Lua**    | `tests/lua/unit/test_math.lua` (~20 tests, 128 lines) |
 | **Inline tests**   | `easing.rs`, `tween.rs`, `spatial_hash.rs`, `geometry.rs`, `noise_generator.rs` |
 
 ## Purpose
 
-`math` is the **leaf of the dependency graph** — it has zero Tier-1+ internal Luna2D dependencies. Every other module may freely import it. It provides the core mathematical primitives, procedural generation utilities, and interpolation tools used throughout the engine.
+`math` is the **leaf of the dependency graph** — it has zero Tier-1+ internal Lurek2D dependencies. Every other module may freely import it. It provides the core mathematical primitives, procedural generation utilities, and interpolation tools used throughout the engine.
 
 ## Source Files
 
@@ -40,6 +40,6 @@
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/math.md`](../../specs/math.md)
+→ [`docs/specs/math.md`](../../docs/specs/math.md)
 
-_Update both this file **and** `specs/math.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/math.md` whenever source files, public types, or Lua bindings change._

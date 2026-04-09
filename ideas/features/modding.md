@@ -25,7 +25,7 @@ Modding framework: load, validate, and apply content mods. Mod manifest validati
 1. **No mod workshop/distribution**: No built-in mechanism for discovering or downloading mods. Must manually copy mod folders.
 2. **No mod API versioning**: Mods break when engine API changes. No `mod_api_version` concept to gate compatibility.
 3. **No mod capabilities/permissions**: No fine-grained control over what a mod can access (e.g., "this mod can read files but not write" or "this mod can't access network").
-4. **No lua-level API for modders**: No `luna.mod.registerHook("onEntitySpawn", fn)` — modders must know internal event names.
+4. **No lua-level API for modders**: No `lurek.mod.registerHook("onEntitySpawn", fn)` — modders must know internal event names.
 5. **No mod configuration UI**: No way for mods to declare configurable options that get auto-generated UI.
 6. **No mod hot reload**: Can't reload a mod without restarting the game.
 7. **No mod templates/scaffolding**: No `luna mod init` CLI command to create a mod skeleton.
@@ -33,7 +33,7 @@ Modding framework: load, validate, and apply content mods. Mod manifest validati
 ## Structural Issues
 
 - **Correct scope**: Modding is clearly a Tier 2 extension that layers on filesystem and event.
-- **Sandboxing quality**: How robust is the mod sandbox? If mods run in isolated Lua environments, can they access `luna.fs` to write arbitrary paths? Security concern.
+- **Sandboxing quality**: How robust is the mod sandbox? If mods run in isolated Lua environments, can they access `lurek.fs` to write arbitrary paths? Security concern.
 - **Integration with savegame**: Do save files track which mods were active? Loading a save with missing mods could corrupt state.
 
 ## Suggestions
@@ -42,12 +42,12 @@ Modding framework: load, validate, and apply content mods. Mod manifest validati
 2. **Add mod capabilities**: `mod.toml` declares `capabilities = ["read_files", "add_entities"]`. Engine enforces at sandbox level.
 3. **Add mod config schema**: `mod.toml` declares `[config]` section with typed fields. Engine auto-generates settings UI.
 4. **Track mods in save files**: Save files record active mod list + versions. Warn on load if mods are missing or version-mismatched.
-5. **Add mod hot reload**: `luna.modding.reloadMod(name)` — re-execute mod scripts without restart. Pairs with file watcher.
+5. **Add mod hot reload**: `lurek.modding.reloadMod(name)` — re-execute mod scripts without restart. Pairs with file watcher.
 6. **Add mod scaffolding**: CLI tool `luna mod init <name>` creates `mod.toml` template + folder structure.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Mod system | ✅ (built-in) | ❌ | ❌ | ❌ (plugins) |
 | Mod manifests | ✅ | N/A | N/A | N/A |

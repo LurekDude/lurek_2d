@@ -1,6 +1,6 @@
 ---
 name: workflow-update-roadmap-phase
-description: Update the status, tasks, or acceptance gates of an existing Luna2D roadmap phase file.
+description: Update the status, tasks, or acceptance gates of an existing Lurek2D roadmap phase file.
 ---
 
 # Update Roadmap Phase

@@ -1,6 +1,6 @@
 //! Autonomous agent with kinematic state and attached decision subsystems.
 //!
-//! An [`Agent`] is the fundamental unit of AI behavior in Luna2D. Each agent
+//! An [`Agent`] is the fundamental unit of AI behavior in Lurek2D. Each agent
 //! carries its own position, velocity, kinematic constraints (max speed and force),
 //! and a [`DecisionModel`] that determines which AI subsystems are ticked during
 //! the world's `update(dt)` pass.

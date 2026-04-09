@@ -17,8 +17,8 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::time::Instant;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn create_test_vm() -> mlua::Lua {
     let state = Rc::new(RefCell::new(SharedState::new(
@@ -228,14 +228,14 @@ fn lua_test_docs() {
     run_lua_test("unit/test_docs.lua");
 }
 
-// === luna.log tests ===
+// === lurek.log tests ===
 
 #[test]
 fn lua_test_log() {
     run_lua_test("unit/test_log.lua");
 }
 
-// === luna.gfx.newShape / CompoundShape tests ===
+// === lurek.gfx.newShape / CompoundShape tests ===
 
 #[test]
 fn lua_test_shape() {
@@ -289,7 +289,7 @@ fn lua_stress_data_compression() {
     run_lua_test("stress/test_data_compression_stress.lua");
 }
 
-// === luna.ui tests ===
+// === lurek.ui tests ===
 
 #[test]
 fn lua_test_gui() {
@@ -373,7 +373,7 @@ fn lua_test_audio() {
 }
 
 #[test]
-#[ignore = "luna.sprite.newDrawLayer not yet registered (sprite module pending)"]
+#[ignore = "lurek.sprite.newDrawLayer not yet registered (sprite module pending)"]
 fn lua_test_drawlayer() {
     run_lua_test("unit/test_drawlayer.lua");
 }
@@ -532,7 +532,7 @@ fn lua_test_camera() {
     run_lua_test("unit/test_camera.lua");
 }
 #[test]
-#[ignore = "luna.net raw ENet API is not yet registered in the Lua VM"]
+#[ignore = "lurek.net raw ENet API is not yet registered in the Lua VM"]
 fn lua_test_network_host() {
     run_lua_test("unit/test_network.lua");
 }
@@ -626,19 +626,19 @@ fn lua_golden_math() {
 // ─── Unit library tests (battle / crafting / dialog) ─────────────────────────
 
 #[test]
-#[ignore = "luna.turnbattle moved to library/battle; use lua_test_library_battle"]
+#[ignore = "lurek.turnbattle moved to library/battle; use lua_test_library_battle"]
 fn lua_unit_battle() {
     run_lua_test("unit/test_battle.lua");
 }
 
 #[test]
-#[ignore = "luna.crafting moved to library/crafting; use lua_test_library_crafting"]
+#[ignore = "lurek.crafting moved to library/crafting; use lua_test_library_crafting"]
 fn lua_unit_crafting() {
     run_lua_test("unit/test_crafting.lua");
 }
 
 #[test]
-#[ignore = "luna.dialog moved to library/dialog; use lua_test_library_dialog"]
+#[ignore = "lurek.dialog moved to library/dialog; use lua_test_library_dialog"]
 fn lua_unit_dialog() {
     run_lua_test("unit/test_dialog.lua");
 }

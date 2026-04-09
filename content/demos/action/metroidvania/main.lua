@@ -2,7 +2,7 @@
 -- Side-scrolling platformer with multiple rooms, abilities, and enemies
 -- Controls: WASD/Arrows to move, Space to jump, Shift to dash (when unlocked)
 -- Collect items to unlock abilities. Explore all rooms!
--- Run with: cargo run -- demos/action/metroidvania
+-- Run with: cargo run -- content/demos/action/metroidvania
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -116,21 +116,21 @@ local function isSolid(rx, ry, px, py, pw, ph)
     return false
 end
 
-function luna.init()
-    luna.window.setTitle("Metroidvania Exploration")
-    luna.gfx.setBackgroundColor(0.08, 0.06, 0.12)
-    camera = luna.camera.new(800, 600)
+function lurek.init()
+    lurek.window.setTitle("Metroidvania Exploration")
+    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.12)
+    camera = lurek.camera.new(800, 600)
     camera:setZoom(2.5)
     loadRoom(0, 0)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
     player.invincible = clamp(player.invincible - dt, 0, 9)
     -- Movement
     player.vx = 0
-    if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then player.vx = -player.speed; player.facing = -1 end
-    if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then player.vx = player.speed; player.facing = 1 end
+    if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then player.vx = -player.speed; player.facing = -1 end
+    if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then player.vx = player.speed; player.facing = 1 end
     -- Dash
     player.dashCooldown = clamp(player.dashCooldown - dt, 0, 9)
     if player.dashing then
@@ -186,15 +186,15 @@ end
 local function camera_apply()
     local x, y = camera:getPosition()
     local z    = camera:getZoom()
-    luna.gfx.push()
-    luna.gfx.scale(z, z)
-    luna.gfx.translate(-x, -y)
+    lurek.gfx.push()
+    lurek.gfx.scale(z, z)
+    lurek.gfx.translate(-x, -y)
 end
 local function camera_reset()
-    luna.gfx.pop()
+    lurek.gfx.pop()
 end
 
-function luna.render()
+function lurek.render()
     camera:setPosition(player.x - 120, player.y - 80)
     camera_apply()
     -- Draw room tiles
@@ -204,11 +204,11 @@ function luna.render()
             for col = 1, #rd.tiles[row] do
                 local v = rd.tiles[row][col]
                 local tx, ty = (col - 1) * tileSize, (row - 1) * tileSize
-                if v == 1 then luna.gfx.setColor(0.3, 0.25, 0.4); luna.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
-                elseif v == 2 then luna.gfx.setColor(0.4, 0.5, 0.3); luna.gfx.rectangle("fill", tx, ty, tileSize, 4)
+                if v == 1 then lurek.gfx.setColor(0.3, 0.25, 0.4); lurek.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
+                elseif v == 2 then lurek.gfx.setColor(0.4, 0.5, 0.3); lurek.gfx.rectangle("fill", tx, ty, tileSize, 4)
                 elseif v == 3 then
-                    if player.hasDash then luna.gfx.setColor(0.2, 0.2, 0.2, 0.3) else luna.gfx.setColor(0.8, 0.2, 0.2) end
-                    luna.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
+                    if player.hasDash then lurek.gfx.setColor(0.2, 0.2, 0.2, 0.3) else lurek.gfx.setColor(0.8, 0.2, 0.2) end
+                    lurek.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
                 end
             end
         end
@@ -216,51 +216,51 @@ function luna.render()
     -- Items
     for _, it in ipairs(items) do
         if it.alive then
-            if it.kind == "dash" then luna.gfx.setColor(0.2, 0.8, 1) else luna.gfx.setColor(0, 1, 0.4) end
-            luna.gfx.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
+            if it.kind == "dash" then lurek.gfx.setColor(0.2, 0.8, 1) else lurek.gfx.setColor(0, 1, 0.4) end
+            lurek.gfx.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
         end
     end
     -- Enemies
     for _, e in ipairs(enemies) do
-        if e.alive then luna.gfx.setColor(0.9, 0.2, 0.2); luna.gfx.rectangle("fill", e.x, e.y, e.w, e.h) end
+        if e.alive then lurek.gfx.setColor(0.9, 0.2, 0.2); lurek.gfx.rectangle("fill", e.x, e.y, e.w, e.h) end
     end
     -- Player
-    local blink = player.invincible > 0 and math.sin(luna.time.getTime() * 20) > 0
+    local blink = player.invincible > 0 and math.sin(lurek.time.getTime() * 20) > 0
     if not blink then
-        if player.dashing then luna.gfx.setColor(0.5, 0.8, 1) else luna.gfx.setColor(0.3, 0.9, 0.4) end
-        luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+        if player.dashing then lurek.gfx.setColor(0.5, 0.8, 1) else lurek.gfx.setColor(0.3, 0.9, 0.4) end
+        lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
-        luna.gfx.setColor(1, 1, 1)
+        lurek.gfx.setColor(1, 1, 1)
         local ex = player.facing > 0 and player.x + 9 or player.x + 3
-        luna.gfx.rectangle("fill", ex, player.y + 5, 4, 4)
+        lurek.gfx.rectangle("fill", ex, player.y + 5, 4, 4)
     end
     camera_reset()
     -- HUD
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
-    luna.gfx.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
-    luna.gfx.print("Score: " .. score, 10, 42)
-    if player.hasDash then luna.gfx.setColor(0.2, 0.8, 1); luna.gfx.print("[DASH]", 10, 58) end
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
+    lurek.gfx.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
+    lurek.gfx.print("Score: " .. score, 10, 42)
+    if player.hasDash then lurek.gfx.setColor(0.2, 0.8, 1); lurek.gfx.print("[DASH]", 10, 58) end
     -- Minimap
-    luna.gfx.setColor(0, 0, 0, 0.6)
-    luna.gfx.rectangle("fill", 700, 10, 80, 80)
+    lurek.gfx.setColor(0, 0, 0, 0.6)
+    lurek.gfx.rectangle("fill", 700, 10, 80, 80)
     for key, _ in pairs(visited) do
         local parts = {}; for p in key:gmatch("[^,]+") do parts[#parts + 1] = tonumber(p) end
         local mx = 740 + parts[1] * 18
         local my = 50 + parts[2] * 18
-        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then luna.gfx.setColor(0.3, 0.9, 0.4)
-        else luna.gfx.setColor(0.5, 0.5, 0.6) end
-        luna.gfx.rectangle("fill", mx, my, 14, 14)
+        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then lurek.gfx.setColor(0.3, 0.9, 0.4)
+        else lurek.gfx.setColor(0.5, 0.5, 0.6) end
+        lurek.gfx.rectangle("fill", mx, my, 14, 14)
     end
     if gameOver then
-        luna.gfx.setColor(0, 0, 0, 0.7); luna.gfx.rectangle("fill", 0, 0, 800, 600)
-        luna.gfx.setColor(1, 0.2, 0.2); luna.gfx.print("GAME OVER - Press R to restart", 260, 280, 1.5)
+        lurek.gfx.setColor(0, 0, 0, 0.7); lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+        lurek.gfx.setColor(1, 0.2, 0.2); lurek.gfx.print("GAME OVER - Press R to restart", 260, 280, 1.5)
     end
-    luna.gfx.setColor(0.5, 0.5, 0.5); luna.gfx.print("FPS: " .. luna.time.getFPS(), 700, 580)
+    lurek.gfx.setColor(0.5, 0.5, 0.5); lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 580)
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if gameOver and key == "r" then
         player.x = 100; player.y = 200; player.hp = 5; player.hasDash = false; player.vx = 0; player.vy = 0
         currentRoom = { x = 0, y = 0 }; visited = {}; score = 0; gameOver = false; loadRoom(0, 0)

@@ -1,7 +1,7 @@
-//! Integration tests for the RPG stats system (`luna.stats`).
+//! Integration tests for the RPG stats system (`lurek.stats`).
 
-use luna2d::lua_api::{create_lua_vm, SharedState};
-use luna2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;

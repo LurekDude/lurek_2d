@@ -1,9 +1,9 @@
 -- demos/showcase/pipeline_showcase/main.lua
--- Pipeline Showcase — demonstrates the full luna.scene + luna.entity + luna.ui
+-- Pipeline Showcase — demonstrates the full lurek.scene + lurek.entity + lurek.ui
 --   callback pipeline: ready, process, process_physics, process_late, render,
---   render_ui. Uses luna.scene.define() for clean scene class creation.
+--   render_ui. Uses lurek.scene.define() for clean scene class creation.
 -- Controls: Mouse to click buttons, ESC to go back.
--- Run with: cargo run -- demos/showcase/pipeline_showcase
+-- Run with: cargo run -- content/demos/showcase/pipeline_showcase
 
 local W, H = 800, 600
 
@@ -11,24 +11,24 @@ local W, H = 800, 600
 -- ── MENU SCENE ─────────────────────────────────────────────────════════════
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- luna.scene.define() returns a constructor function — call MenuScene() to instantiate.
-local MenuScene = luna.scene.define({})
+-- lurek.scene.define() returns a constructor function — call MenuScene() to instantiate.
+local MenuScene = lurek.scene.define({})
 
 function MenuScene:enter()
-    luna.gfx.setBackgroundColor(0.07, 0.08, 0.14)
+    lurek.gfx.setBackgroundColor(0.07, 0.08, 0.14)
 
-    self.btn_start = luna.ui.newButton("▶ Start Simulation")
+    self.btn_start = lurek.ui.newButton("▶ Start Simulation")
     self.btn_start:setPosition(W / 2 - 110, H / 2 - 30)
     self.btn_start:setSize(220, 44)
     self.btn_start:setOnClick(function()
-        luna.scene.switchTo(SimScene(), nil, 0, nil)
+        lurek.scene.switchTo(SimScene(), nil, 0, nil)
     end)
 
-    self.btn_quit = luna.ui.newButton("✕ Quit")
+    self.btn_quit = lurek.ui.newButton("✕ Quit")
     self.btn_quit:setPosition(W / 2 - 70, H / 2 + 28)
     self.btn_quit:setSize(140, 36)
     self.btn_quit:setOnClick(function()
-        luna.signal.quit()
+        lurek.signal.quit()
     end)
 end
 
@@ -39,43 +39,43 @@ end
 
 function MenuScene:process(dt)
     self.title_t = (self.title_t or 0) + dt
-    luna.ui.update(dt)
+    lurek.ui.update(dt)
 end
 
 function MenuScene:render()
     local cx    = W / 2
     local pulse = math.sin((self.title_t or 0) * 1.4) * 0.1 + 0.9
 
-    luna.gfx.setColor(0.4 * pulse, 0.7 * pulse, 1.0)
-    luna.gfx.print("PIPELINE SHOWCASE", cx - 148, H * 0.22, 3)
+    lurek.gfx.setColor(0.4 * pulse, 0.7 * pulse, 1.0)
+    lurek.gfx.print("PIPELINE SHOWCASE", cx - 148, H * 0.22, 3)
 
-    luna.gfx.setColor(0.55, 0.55, 0.75)
-    luna.gfx.print("luna.scene.define · luna.entity · luna.ui", cx - 148, H * 0.22 + 48, 1.3)
+    lurek.gfx.setColor(0.55, 0.55, 0.75)
+    lurek.gfx.print("lurek.scene.define · lurek.entity · lurek.ui", cx - 148, H * 0.22 + 48, 1.3)
 end
 
 function MenuScene:render_ui()
-    luna.ui.draw()
+    lurek.ui.draw()
 end
 
-function MenuScene:mousepressed(x, y, btn)  luna.ui.mousepressed(x, y, btn)  end
-function MenuScene:mousereleased(x, y, btn) luna.ui.mousereleased(x, y, btn) end
-function MenuScene:mousemoved(x, y)         luna.ui.mousemoved(x, y)         end
+function MenuScene:mousepressed(x, y, btn)  lurek.ui.mousepressed(x, y, btn)  end
+function MenuScene:mousereleased(x, y, btn) lurek.ui.mousereleased(x, y, btn) end
+function MenuScene:mousemoved(x, y)         lurek.ui.mousemoved(x, y)         end
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- ── SIMULATION SCENE ────────────────────────────────────────────════════════
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- SimScene — all 6 pipeline callbacks; uses luna.entity Universe for ECS particles.
-local SimScene = luna.scene.define({})
+-- SimScene — all 6 pipeline callbacks; uses lurek.entity Universe for ECS particles.
+local SimScene = lurek.scene.define({})
 
 local MAX_PARTICLES = 120
 
 function SimScene:enter()
-    luna.gfx.setBackgroundColor(0.04, 0.06, 0.10)
+    lurek.gfx.setBackgroundColor(0.04, 0.06, 0.10)
 end
 
 function SimScene:ready()
-    self.world         = luna.entity.newUniverse()
+    self.world         = lurek.entity.newUniverse()
     self.physics_ticks = 0
     self.spawn_timer   = 0
     self.late_calls    = 0
@@ -83,15 +83,15 @@ function SimScene:ready()
 
     for _ = 1, 20 do self:_spawnParticle() end
 
-    self.lbl_status = luna.ui.newLabel("")
+    self.lbl_status = lurek.ui.newLabel("")
     self.lbl_status:setPosition(10, H - 80)
     self.lbl_status:setSize(W - 20, 22)
 
-    self.btn_back = luna.ui.newButton("← Menu")
+    self.btn_back = lurek.ui.newButton("← Menu")
     self.btn_back:setPosition(W - 110, 6)
     self.btn_back:setSize(100, 32)
     self.btn_back:setOnClick(function()
-        luna.scene.switchTo(MenuScene(), nil, 0, nil)
+        lurek.scene.switchTo(MenuScene(), nil, 0, nil)
     end)
 end
 
@@ -111,7 +111,7 @@ function SimScene:process(dt)
             self:_spawnParticle()
         end
     end
-    luna.ui.update(dt)
+    lurek.ui.update(dt)
 end
 
 -- ── process_physics: fixed-timestep ECS update ──────────────────────────────
@@ -145,7 +145,7 @@ end
 
 function SimScene:process_late(dt)
     local count   = self.world and self.world:getEntityCount() or 0
-    local phys_dt = luna.time.getPhysicsDelta()
+    local phys_dt = lurek.time.getPhysicsDelta()
     local status  = string.format(
         "entities: %d   physics_dt: %.4fs   ticks this frame: %d",
         count, phys_dt, self.physics_ticks
@@ -162,9 +162,9 @@ function SimScene:render()
         local radius = self.world:get(id, "radius") or 4
         local color  = self.world:get(id, "color")
         if pos and color then
-            luna.gfx.setColor(color.r, color.g, color.b, 0.85)
+            lurek.gfx.setColor(color.r, color.g, color.b, 0.85)
             local d = radius * 2
-            luna.gfx.rect("fill", pos.x - radius, pos.y - radius, d, d)
+            lurek.gfx.rect("fill", pos.x - radius, pos.y - radius, d, d)
         end
     end
 end
@@ -172,25 +172,25 @@ end
 -- ── render_ui: HUD overlay ──────────────────────────────────────────────────
 
 function SimScene:render_ui()
-    luna.gfx.setColor(0.2, 0.4, 0.8, 0.9)
-    luna.gfx.rect("fill", 0, 0, W, 44)
-    luna.gfx.setColor(0.85, 0.9, 1.0)
-    luna.gfx.print("Simulation Scene — ECS particles via process_physics", 10, 12, 1.1)
+    lurek.gfx.setColor(0.2, 0.4, 0.8, 0.9)
+    lurek.gfx.rect("fill", 0, 0, W, 44)
+    lurek.gfx.setColor(0.85, 0.9, 1.0)
+    lurek.gfx.print("Simulation Scene — ECS particles via process_physics", 10, 12, 1.1)
 
-    luna.gfx.setColor(0.3, 0.6, 0.3, 0.85)
-    luna.gfx.rect("fill", 0, H - 44, W, 44)
-    luna.gfx.setColor(0.8, 1.0, 0.8)
-    luna.gfx.print(
+    lurek.gfx.setColor(0.3, 0.6, 0.3, 0.85)
+    lurek.gfx.rect("fill", 0, H - 44, W, 44)
+    lurek.gfx.setColor(0.8, 1.0, 0.8)
+    lurek.gfx.print(
         "process  →  process_physics (×N)  →  process_late  →  render  →  render_ui",
         10, H - 34, 0.95
     )
 
-    luna.ui.draw()
+    lurek.ui.draw()
 end
 
-function SimScene:mousepressed(x, y, btn)  luna.ui.mousepressed(x, y, btn)  end
-function SimScene:mousereleased(x, y, btn) luna.ui.mousereleased(x, y, btn) end
-function SimScene:mousemoved(x, y)         luna.ui.mousemoved(x, y)         end
+function SimScene:mousepressed(x, y, btn)  lurek.ui.mousepressed(x, y, btn)  end
+function SimScene:mousereleased(x, y, btn) lurek.ui.mousereleased(x, y, btn) end
+function SimScene:mousemoved(x, y)         lurek.ui.mousemoved(x, y)         end
 
 -- ── Internal: spawn one particle entity ─────────────────────────────────────
 
@@ -211,37 +211,37 @@ end
 -- ── ENGINE CALLBACKS ───────────────────────────────────────────════════════
 -- ═══════════════════════════════════════════════════════════════════════════
 
-function luna.init()
-    luna.window.setTitle("Pipeline Showcase")
-    luna.scene.push(MenuScene())   -- instantiate via luna.scene.define()
+function lurek.init()
+    lurek.window.setTitle("Pipeline Showcase")
+    lurek.scene.push(MenuScene())   -- instantiate via lurek.scene.define()
 end
 
 -- Dispatch pipeline callbacks to the active scene
-function luna.process_physics(dt) luna.scene.processPhysics(dt) end
-function luna.process(dt)         luna.scene.process(dt)        end
-function luna.process_late(dt)    luna.scene.processLate(dt)    end
-function luna.render()            luna.scene.render()           end
-function luna.render_ui()         luna.scene.renderUi()         end
+function lurek.process_physics(dt) lurek.scene.processPhysics(dt) end
+function lurek.process(dt)         lurek.scene.process(dt)        end
+function lurek.process_late(dt)    lurek.scene.processLate(dt)    end
+function lurek.render()            lurek.scene.render()           end
+function lurek.render_ui()         lurek.scene.renderUi()         end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "escape" then
-        if luna.scene.getStackSize() > 1 then
-            luna.scene.pop()
+        if lurek.scene.getStackSize() > 1 then
+            lurek.scene.pop()
         end
     end
 end
 
-function luna.mousepressed(x, y, btn)
-    local scene = luna.scene.getCurrent()
+function lurek.mousepressed(x, y, btn)
+    local scene = lurek.scene.getCurrent()
     if scene and scene.mousepressed then scene:mousepressed(x, y, btn) end
 end
 
-function luna.mousereleased(x, y, btn)
-    local scene = luna.scene.getCurrent()
+function lurek.mousereleased(x, y, btn)
+    local scene = lurek.scene.getCurrent()
     if scene and scene.mousereleased then scene:mousereleased(x, y, btn) end
 end
 
-function luna.mousemoved(x, y, dx, dy)
-    local scene = luna.scene.getCurrent()
+function lurek.mousemoved(x, y, dx, dy)
+    local scene = lurek.scene.getCurrent()
     if scene and scene.mousemoved then scene:mousemoved(x, y) end
 end

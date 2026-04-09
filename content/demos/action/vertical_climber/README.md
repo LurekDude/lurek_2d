@@ -15,7 +15,7 @@ A Doodle Jump-style infinite vertical climber. The player auto-bounces off any p
 ## How to Run
 
 ```powershell
-cargo run -- demos/vertical_climber
+cargo run -- content/demos/vertical_climber
 ```
 
 ## Controls

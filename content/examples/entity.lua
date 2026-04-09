@@ -1,14 +1,12 @@
 -- examples/entity.lua
--- luna.entity — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
--- All luna.entity API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.entity — Lightweight ECS with entity lifecycle, components, tags, layers, and blueprints.
 
 -- ── Creating a Universe ───────────────────────────────────────────────────────
 
 -- newUniverse() → Universe
 -- The Universe is the root ECS container; all entities, components, and
 -- systems are owned by it. Multiple universes can coexist.
-local world = luna.entity.newUniverse()
+local world = lurek.entity.newUniverse()
 
 -- ── Entity Lifecycle ──────────────────────────────────────────────────────────
 

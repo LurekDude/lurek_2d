@@ -1,4 +1,4 @@
-//! `luna.math` — Math utilities: random generators, transforms, Bezier curves, tweening,
+//! `lurek.math` — Math utilities: random generators, transforms, Bezier curves, tweening,
 //! spatial hashing, noise, easing, polygon triangulation, and color-space conversion.
 
 use mlua::prelude::*;
@@ -935,7 +935,7 @@ impl LuaUserData for LuaNoiseGenerator {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.math` API table with the Lua VM.
+/// Registers the `lurek.math` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`. The Lua VM.

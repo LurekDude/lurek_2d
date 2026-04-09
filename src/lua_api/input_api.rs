@@ -1,4 +1,4 @@
-//! `luna.keyboard` / `luna.mouse` / `luna.gamepad` / `luna.touch` — Input state queries and cursor management.
+//! `lurek.keyboard` / `lurek.mouse` / `lurek.gamepad` / `lurek.touch` — Input state queries and cursor management.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -43,7 +43,7 @@ impl LuaUserData for LuaCursor {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.keyboard`, `luna.mouse`, `luna.gamepad`, and `luna.touch` API tables.
+/// Registers the `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch` API tables.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.
@@ -51,7 +51,7 @@ impl LuaUserData for LuaCursor {
 /// - `state` — `Rc<RefCell<SharedState>>`.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
 
-    // ── luna.keyboard ─────────────────────────────────────────────────────────
+    // ── lurek.keyboard ─────────────────────────────────────────────────────────
 
     let keyboard = lua.create_table()?;
 
@@ -155,7 +155,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     luna.set("keyboard", keyboard)?;
 
-    // ── luna.mouse ────────────────────────────────────────────────────────────
+    // ── lurek.mouse ────────────────────────────────────────────────────────────
 
     let mouse = lua.create_table()?;
 
@@ -390,7 +390,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     luna.set("mouse", mouse)?;
 
-    // ── luna.gamepad ──────────────────────────────────────────────────────────
+    // ── lurek.gamepad ──────────────────────────────────────────────────────────
 
     let gamepad = lua.create_table()?;
 
@@ -661,7 +661,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     luna.set("gamepad", gamepad)?;
 
-    // ── luna.touch ────────────────────────────────────────────────────────────
+    // ── lurek.touch ────────────────────────────────────────────────────────────
 
     let touch = lua.create_table()?;
 

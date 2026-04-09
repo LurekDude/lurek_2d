@@ -1,6 +1,6 @@
 -- Colony Simulation — Top-down colony builder with colonist AI
 -- Click to place buildings (1=Farm, 2=Bed, 3=Rec), right-click to assign colonist
--- Run with: cargo run -- demos/simulation/colony_sim
+-- Run with: cargo run -- content/demos/simulation/colony_sim
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -52,9 +52,9 @@ local function new_colonist(x, y)
     }
 end
 
-function luna.init()
-    luna.window.setTitle("Colony Sim")
-    luna.gfx.setBackgroundColor(0.12, 0.15, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Colony Sim")
+    lurek.gfx.setBackgroundColor(0.12, 0.15, 0.1)
 
     colonists = {}
     buildings = {}
@@ -98,7 +98,7 @@ local function is_night()
     return norm > 0.7
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- day cycle
     day_time = day_time + dt
     if day_time >= day_length then
@@ -215,7 +215,7 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- day/night tint
     local night_alpha = 0
     local norm = day_time / day_length
@@ -224,26 +224,26 @@ function luna.render()
     end
 
     -- grid
-    luna.gfx.setColor(0.18, 0.2, 0.15, 0.3)
+    lurek.gfx.setColor(0.18, 0.2, 0.15, 0.3)
     for r = 0, ROWS do
-        luna.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
+        lurek.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
     end
     for c = 0, COLS do
-        luna.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
+        lurek.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
     end
 
     -- buildings
     for _, b in ipairs(buildings) do
         local col = BUILD_COLORS[b.type]
-        luna.gfx.setColor(col[1], col[2], col[3], 0.8)
-        luna.gfx.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
-        luna.gfx.setColor(1, 1, 1, 0.4)
-        luna.gfx.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        lurek.gfx.setColor(col[1], col[2], col[3], 0.8)
+        lurek.gfx.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        lurek.gfx.setColor(1, 1, 1, 0.4)
+        lurek.gfx.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
 
         -- label
-        luna.gfx.setColor(1, 1, 1, 0.6)
+        lurek.gfx.setColor(1, 1, 1, 0.6)
         local tag = ({ "F", "B", "R" })[b.type]
-        luna.gfx.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
+        lurek.gfx.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
     end
 
     -- colonists
@@ -253,47 +253,47 @@ function luna.render()
         if c.state == "working" then cr, cg, cb = 0.2, 0.9, 0.3 end
         if c.hunger < 20 or c.energy < 15 then cr, cg, cb = 1, 0.3, 0.2 end
 
-        luna.gfx.setColor(cr, cg, cb, 1)
-        luna.gfx.circle("fill", c.x * TILE, c.y * TILE, 5)
+        lurek.gfx.setColor(cr, cg, cb, 1)
+        lurek.gfx.circle("fill", c.x * TILE, c.y * TILE, 5)
 
         -- need indicators (tiny bars)
         local bx = c.x * TILE - 6
         local by = c.y * TILE - 10
         -- hunger (red)
-        luna.gfx.setColor(0.8, 0.2, 0.2, 0.7)
-        luna.gfx.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
+        lurek.gfx.setColor(0.8, 0.2, 0.2, 0.7)
+        lurek.gfx.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
         -- energy (blue)
-        luna.gfx.setColor(0.2, 0.4, 0.9, 0.7)
-        luna.gfx.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
+        lurek.gfx.setColor(0.2, 0.4, 0.9, 0.7)
+        lurek.gfx.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
         -- happiness (yellow)
-        luna.gfx.setColor(0.9, 0.8, 0.2, 0.7)
-        luna.gfx.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
+        lurek.gfx.setColor(0.9, 0.8, 0.2, 0.7)
+        lurek.gfx.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
     end
 
     -- placement ghost
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     local gc = math.floor(mx / TILE) + 0.5
     local gr = math.floor(my / TILE) + 0.5
     if gr <= ROWS then
         local col = BUILD_COLORS[place_type]
-        luna.gfx.setColor(col[1], col[2], col[3], 0.3)
-        luna.gfx.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
+        lurek.gfx.setColor(col[1], col[2], col[3], 0.3)
+        lurek.gfx.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
     end
 
     -- night overlay
     if night_alpha > 0 then
-        luna.gfx.setColor(0.02, 0.02, 0.08, night_alpha)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0.02, 0.02, 0.08, night_alpha)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD background
     local hud_y = ROWS * TILE
-    luna.gfx.setColor(0.1, 0.1, 0.12, 0.9)
-    luna.gfx.rectangle("fill", 0, hud_y, W, H - hud_y)
+    lurek.gfx.setColor(0.1, 0.1, 0.12, 0.9)
+    lurek.gfx.rectangle("fill", 0, hud_y, W, H - hud_y)
 
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
     local time_str = is_night() and "Night" or "Day"
-    luna.gfx.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
+    lurek.gfx.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
         day_count, time_str, food_store, materials, #colonists, BUILD_NAMES[place_type]),
         10, hud_y + 6, 0.8)
 
@@ -305,14 +305,14 @@ function luna.render()
                 math.floor(c.hunger), math.floor(c.energy), math.floor(c.happiness))
         end
     end
-    luna.gfx.setColor(0.8, 0.8, 0.8, 0.7)
-    luna.gfx.print(detail, 10, hud_y + 24, 0.65)
+    lurek.gfx.setColor(0.8, 0.8, 0.8, 0.7)
+    lurek.gfx.print(detail, 10, hud_y + 24, 0.65)
 
-    luna.gfx.setColor(1, 1, 1, 0.4)
-    luna.gfx.print("FPS: " .. luna.time.getFPS(), W - 70, hud_y + 6, 0.7)
+    lurek.gfx.setColor(1, 1, 1, 0.4)
+    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 70, hud_y + 6, 0.7)
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     local gc = math.floor(x / TILE) + 0.5
     local gr = math.floor(y / TILE) + 0.5
     if gr > ROWS then return end
@@ -323,8 +323,8 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "1" then place_type = 1 end
     if key == "2" then place_type = 2 end
     if key == "3" then place_type = 3 end

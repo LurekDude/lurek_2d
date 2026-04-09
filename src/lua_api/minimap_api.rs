@@ -1,4 +1,4 @@
-//! `luna.minimap` — Grid-based minimap with terrain, fog of war, objects, pings, and markers.
+//! `lurek.minimap` — Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -88,7 +88,7 @@ impl LuaUserData for LuaMinimap {
             |_, this, (x, y, terrain_type): (u32, u32, u32)| {
                 if x == 0 || y == 0 {
                     return Err(LuaError::RuntimeError(
-                        "luna.minimap: setTerrain coordinates are 1-based".into(),
+                        "lurek.minimap: setTerrain coordinates are 1-based".into(),
                     ));
                 }
                 this.inner.set_terrain(x - 1, y - 1, terrain_type);
@@ -104,7 +104,7 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("getTerrain", |_, this, (x, y): (u32, u32)| {
             if x == 0 || y == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.minimap: getTerrain coordinates are 1-based".into(),
+                    "lurek.minimap: getTerrain coordinates are 1-based".into(),
                 ));
             }
             Ok(this.inner.get_terrain(x - 1, y - 1))
@@ -201,7 +201,7 @@ impl LuaUserData for LuaMinimap {
         methods.add_method_mut("setFogLevel", |_, this, (x, y, level): (u32, u32, u8)| {
             if x == 0 || y == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.minimap: setFogLevel coordinates are 1-based".into(),
+                    "lurek.minimap: setFogLevel coordinates are 1-based".into(),
                 ));
             }
             this.inner.set_fog_level(x - 1, y - 1, FogLevel::from_u8(level));
@@ -216,7 +216,7 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("getFogLevel", |_, this, (x, y): (u32, u32)| {
             if x == 0 || y == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.minimap: getFogLevel coordinates are 1-based".into(),
+                    "lurek.minimap: getFogLevel coordinates are 1-based".into(),
                 ));
             }
             Ok(this.inner.get_fog_level(x - 1, y - 1) as u8)
@@ -288,7 +288,7 @@ impl LuaUserData for LuaMinimap {
             |_, this, (type_idx, visible): (usize, bool)| {
                 if type_idx == 0 {
                     return Err(LuaError::RuntimeError(
-                        "luna.minimap: object type index is 1-based".into(),
+                        "lurek.minimap: object type index is 1-based".into(),
                     ));
                 }
                 this.inner.set_object_type_visible(type_idx - 1, visible);
@@ -303,7 +303,7 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("isObjectTypeVisible", |_, this, type_idx: usize| {
             if type_idx == 0 {
                 return Err(LuaError::RuntimeError(
-                    "luna.minimap: object type index is 1-based".into(),
+                    "lurek.minimap: object type index is 1-based".into(),
                 ));
             }
             Ok(this.inner.is_object_type_visible(type_idx - 1))
@@ -331,7 +331,7 @@ impl LuaUserData for LuaMinimap {
             |_, this, (id, x, y, type_idx, owner): (u32, f32, f32, usize, Option<u32>)| {
                 if type_idx == 0 {
                     return Err(LuaError::RuntimeError(
-                        "luna.minimap: object type index is 1-based".into(),
+                        "lurek.minimap: object type index is 1-based".into(),
                     ));
                 }
                 this.inner
@@ -399,7 +399,7 @@ impl LuaUserData for LuaMinimap {
         methods.add_method_mut("setColorMode", |_, this, mode: String| {
             let cm = ColorMode::parse_mode(&mode).ok_or_else(|| {
                 LuaError::RuntimeError(format!(
-                    "luna.minimap: unknown color mode '{}', expected 'terrain' or 'political'",
+                    "lurek.minimap: unknown color mode '{}', expected 'terrain' or 'political'",
                     mode
                 ))
             })?;
@@ -738,7 +738,7 @@ impl LuaUserData for LuaMinimap {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `luna.minimap` API table with the Lua VM.
+/// Registers the `lurek.minimap` API table with the Lua VM.
 ///
 /// # Parameters
 /// - `lua` — `&Lua`.

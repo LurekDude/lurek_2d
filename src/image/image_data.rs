@@ -1,12 +1,12 @@
 //! CPU-side RGBA8 pixel buffer for image manipulation.
 //!
-//! This module is part of Luna2D's `image` subsystem and provides the implementation
+//! This module is part of Lurek2D's `image` subsystem and provides the implementation
 //! details for image data-related operations and data management.
 //! Key types exported from this module: `ImageData`.
 //! Primary functions: `new()`, `from_file()`, `from_bytes()`, `width()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::log_messages::{IM01_IMAGE_LOADED, IM02_IMAGE_MISMATCH};
 use crate::log_msg;

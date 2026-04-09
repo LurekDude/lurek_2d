@@ -3,13 +3,13 @@
 //! Like `Viewport`, but also tracks the scaled content dimensions for
 //! use with an automatic graphics transform stack.
 //!
-//! This module is part of Luna2D's `graphics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
 //! details for viewport scale-related operations and data management.
 //! Key types exported from this module: `ViewportScale`.
 //! Primary functions: `new()`, `resize()`, `get_game_dimensions()`, `get_scaled_dimensions()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::camera::viewport::ScaleMode;
 

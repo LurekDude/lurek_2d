@@ -1,10 +1,10 @@
 ---
-description: "**Manager** — Orchestrate multi-step Luna2D tasks across agents. Route work to specialists, define acceptance gates, track progress. Must not implement code directly."
+description: "**Manager** — Orchestrate multi-step Lurek2D tasks across agents. Route work to specialists, define acceptance gates, track progress. Must not implement code directly."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Manager
 ---
 
-# MANAGER — LUNA2D TASK ORCHESTRATION
+# MANAGER — LUREK2D TASK ORCHESTRATION
 
 ## MISSION
 

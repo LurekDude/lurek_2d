@@ -1,4 +1,4 @@
-//! TCP server thread for the Luna2D debug bridge.
+//! TCP server thread for the Lurek2D debug bridge.
 //!
 //! Runs a non-blocking accept loop that multiplexes reads from all connected
 //! clients, dispatches background-safe methods immediately, and queues

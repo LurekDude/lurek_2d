@@ -18,9 +18,9 @@ NEW_CHECK_FUNCTIONS = r'''
 
 
 def check_spec_file(module: str) -> List[Check]:
-    """SP-01 through SP-05: specs/<module>.md content checks."""
+    """SP-01 through SP-05: docs/specs/<module>.md content checks."""
     results: List[Check] = []
-    spec_path = WORKSPACE / "specs" / f"{module}.md"
+    spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
     api_file = LUA_API / f"{module}_api.rs"
     api_dir = LUA_API / f"{module}_api"
     has_lua_api = api_file.exists() or api_dir.is_dir()
@@ -28,7 +28,7 @@ def check_spec_file(module: str) -> List[Check]:
     # SP-01: spec file exists
     if not spec_path.exists():
         results.append(Check("SP-01", "Spec file exists", ERROR,
-                              f"specs/{module}.md is missing — create from template"))
+                              f"docs/specs/{module}.md is missing — create from template"))
         for code, name in [("SP-02", "Required spec sections"),
                             ("SP-03", "Summary quality"),
                             ("SP-04", "Lua API completeness"),
@@ -36,7 +36,7 @@ def check_spec_file(module: str) -> List[Check]:
             results.append(Check(code, name, ERROR, "Skipped — no spec file"))
         return results
 
-    results.append(Check("SP-01", "Spec file exists", PASS, f"specs/{module}.md exists"))
+    results.append(Check("SP-01", "Spec file exists", PASS, f"docs/specs/{module}.md exists"))
     content = read_text(spec_path)
 
     # SP-02: required sections
@@ -409,19 +409,19 @@ def check_float_comparisons(module: str) -> Check:
 
 
 def check_example_file(module: str) -> List[Check]:
-    """W-01 / W-02: examples/<module>.lua exists and covers the full API surface."""
+    """W-01 / W-02: content/examples/<module>.lua exists and covers the full API surface."""
     results: List[Check] = []
     example_file = WORKSPACE / "examples" / f"{module}.lua"
 
     if not example_file.exists():
         results.append(Check("W-01", "Example file exists", ERROR,
-                              f"examples/{module}.lua not found \u2014 create it"))
+                              f"content/examples/{module}.lua not found \u2014 create it"))
         results.append(Check("W-02", "API surface coverage", ERROR,
                               "Skipped \u2014 no example file"))
         return results
 
     results.append(Check("W-01", "Example file exists", PASS,
-                          f"examples/{module}.lua present"))
+                          f"content/examples/{module}.lua present"))
 
     api_file = LUA_API / f"{module}_api.rs"
     if not api_file.exists():
@@ -437,7 +437,7 @@ def check_example_file(module: str) -> List[Check]:
         shown = missing[:6]
         extra = f" (+{len(missing)-6} more)" if len(missing) > 6 else ""
         results.append(Check("W-02", "API surface coverage", ERROR,
-                              f"Functions absent from examples/{module}.lua: "
+                              f"Functions absent from content/examples/{module}.lua: "
                               + ", ".join(shown) + extra))
     else:
         results.append(Check("W-02", "API surface coverage", PASS,
@@ -490,7 +490,7 @@ NEW_ORCHESTRATOR = '''def audit_module(module: str) -> Tuple[str, List[Check], s
     # Phase 2: AGENT.md Quality
     checks.extend(check_agent_md(module))
 
-    # Phase 3: Technical Specification (specs/<module>.md)
+    # Phase 3: Technical Specification (docs/specs/<module>.md)
     checks.extend(check_spec_file(module))
 
     # Phase 4: Docstrings \u2014 domain module files
@@ -531,7 +531,7 @@ NEW_ORCHESTRATOR = '''def audit_module(module: str) -> Tuple[str, List[Check], s
     # Phase 8: Documentation, Examples & Wiki
     checks.extend(check_example_file(module))
     checks.append(Check("W-03", "Example comments", MANUAL,
-                          f"Verify examples/{module}.lua has realistic one-line comments per call"))
+                          f"Verify content/examples/{module}.lua has realistic one-line comments per call"))
     checks.append(Check("W-04", "Example\u2013spec sync", MANUAL,
                           "Verify function list in example matches spec Lua API table"))
     checks.append(check_wiki_page(module))
@@ -559,7 +559,7 @@ NEW_ORCHESTRATOR = '''def audit_module(module: str) -> Tuple[str, List[Check], s
 
     # Phase 11: Integration & Extension
     checks.append(Check("I-01", "Lua API usability", MANUAL,
-                          "Review luna.* conventions compliance"))
+                          "Review lurek.* conventions compliance"))
     checks.append(Check("I-02", "Extension panel", MANUAL,
                           "Check for structured data I/O for vscode-extension"))
     checks.append(check_config_integration(module))

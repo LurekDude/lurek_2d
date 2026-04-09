@@ -1,10 +1,10 @@
 [package]
-name = "luna2d"
+name = "lurek2d"
 version = "0.6.0"
 edition = "2021"
-description = "Luna2D — A cross-platform 2D game engine powered by Rust and Lua"
+description = "Lurek2D — A cross-platform 2D game engine powered by Rust and Lua"
 license = "MIT"
-authors = ["Luna2D Team"]
+authors = ["Lurek2D Team"]
 readme = "README.md"
 
 [features]
@@ -121,10 +121,10 @@ arboard = "3"
 # Cross-platform native file/message dialogs
 rfd = "0.14"
 
-# Zip archive reading for .lunar game packages
+# Zip archive reading for .lurek game packages
 zip = { version = "2", default-features = false, features = ["deflate"] }
 
-# Temporary directory management (used for .lunar extraction at runtime)
+# Temporary directory management (used for .lurek extraction at runtime)
 tempfile = "3"
 
 [dev-dependencies]
@@ -149,11 +149,11 @@ wgpu = { version = "22", default-features = false, features = ["wgsl", "vulkan-p
 winresource = "0.1"
 
 [[bin]]
-name = "luna2d"
+name = "lurek2d"
 path = "src/main.rs"
 
 [lib]
-name = "luna2d"
+name = "lurek2d"
 path = "src/lib.rs"
 
 [profile.dev]
@@ -478,12 +478,12 @@ path = "tests/rust/game/minimap_tests.rs"
 # name = "stats_tests"
 # path = "tests/rust/game/stats_tests.rs"
 
-# unregistered - audit before activating; tests luna.item + luna.inventory integration
+# unregistered - audit before activating; tests lurek.item + lurek.inventory integration
 # [[test]]
 # name = "inventory_item_tests"
 # path = "tests/rust/game/inventory_item_tests.rs"
 
-# unregistered - audit before activating; tests luna.item.* API
+# unregistered - audit before activating; tests lurek.item.* API
 # [[test]]
 # name = "item_tests"
 # path = "tests/rust/game/item_tests.rs"

@@ -12,6 +12,6 @@ mode: ask
    - Game title and description
    - Screenshots placeholder
    - Controls
-   - How to run (requires Luna2D)
+   - How to run (requires Lurek2D)
    - Credits
    - License

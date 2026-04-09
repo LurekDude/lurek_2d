@@ -1,9 +1,9 @@
--- Luna2D Stress Test: DataFrame Bulk Operations
+-- Lurek2D Stress Test: DataFrame Bulk Operations
 -- Tests large DataFrames with many rows and columns
 
 describe("dataframe stress: bulk row insertion", function()
     it("inserts 5000 rows", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("id", 0)
         df:addColumn("name", "")
         df:addColumn("score", 0.0)
@@ -17,7 +17,7 @@ describe("dataframe stress: bulk row insertion", function()
     end)
 
     it("reads back all 5000 rows correctly", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("value", 0)
 
         for i = 1, 5000 do
@@ -37,7 +37,7 @@ end)
 
 describe("dataframe stress: many columns", function()
     it("creates DataFrame with 50 columns", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
 
         for c = 1, 50 do
             df:addColumn("col_" .. c, 0)
@@ -63,7 +63,7 @@ end)
 
 describe("dataframe stress: column operations", function()
     it("adds and removes columns repeatedly", function()
-        local df = luna.dataframe.newDataFrame()
+        local df = lurek.dataframe.newDataFrame()
 
         -- Add 20 rows first
         df:addColumn("base", 0)

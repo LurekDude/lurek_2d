@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-doc_coverage.py — Luna2D documentation coverage analytics.
+doc_coverage.py — Lurek2D documentation coverage analytics.
 
-Scans all public Rust items in src/ and all luna.* Lua API functions,
+Scans all public Rust items in src/ and all lurek.* Lua API functions,
 counts those with doc comments (/// or ---), and reports coverage metrics.
 
 Outputs:
@@ -46,8 +46,8 @@ _PUB_ITEM_RE = re.compile(
     r"\s+([A-Za-z_][A-Za-z0-9_]*)"
 )
 
-# Matches luna.* function registrations in Lua API source.
-# _LUA_SET_RE matches luna.set("name", ...) — catches functions AND module mounts.
+# Matches lurek.* function registrations in Lua API source.
+# _LUA_SET_RE matches lurek.set("name", ...) — catches functions AND module mounts.
 # _LUA_SET2_RE matches only the well-known API table variables used in register()
 #   functions (tbl, graphics, keyboard, mouse, gamepad, touch, overlay_tbl, system).
 #   This avoids false positives from local return-table builders like t.set("x", ...)
@@ -57,7 +57,7 @@ _LUA_SET2_RE = re.compile(
     r'\b(?:tbl|graphics|keyboard|mouse|gamepad|touch|overlay_tbl|system)'
     r'\.set\s*\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,'
 )
-# Matches module-mount lines like `luna.set("timer", tbl)?;` — these are namespace
+# Matches module-mount lines like `lurek.set("timer", tbl)?;` — these are namespace
 # mounts, not individual function registrations, and need no per-function doc.
 _LUA_MOUNT_RE = re.compile(
     r'luna\.set\s*\(\s*"[^"]+"\s*,\s*'
@@ -125,7 +125,7 @@ def _collect_rust_items(src_dir: Path, module_filter: str | None) -> list[dict]:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _collect_lua_items(src_dir: Path) -> list[dict]:
-    """Walk src/lua_api/ and collect exposed luna.* functions with doc status."""
+    """Walk src/lua_api/ and collect exposed lurek.* functions with doc status."""
     lua_api_dir = src_dir / "lua_api"
     if not lua_api_dir.is_dir():
         return []
@@ -141,13 +141,13 @@ def _collect_lua_items(src_dir: Path) -> list[dict]:
 
         for i, line in enumerate(lines):
             stripped = line.strip()
-            # Look for luna.set("function_name", ...)
+            # Look for lurek.set("function_name", ...)
             m = _LUA_SET_RE.search(stripped) or _LUA_SET2_RE.search(stripped)
             if not m:
                 continue
             fn_name = m.group(1)
 
-            # Skip module-mount lines: luna.set("module", tbl_var) — these are
+            # Skip module-mount lines: lurek.set("module", tbl_var) — these are
             # namespace mounts, not individual API functions; they carry no
             # per-function doc obligation.
             if _LUA_MOUNT_RE.search(stripped):
@@ -214,7 +214,7 @@ def _print_summary(label: str, stats: dict) -> None:
 
 def main() -> None:  # noqa: C901
     parser = argparse.ArgumentParser(
-        description="Report docstring coverage for Luna2D public API items.",
+        description="Report docstring coverage for Lurek2D public API items.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
@@ -286,7 +286,7 @@ def main() -> None:  # noqa: C901
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    print("Luna2D Documentation Coverage")
+    print("Lurek2D Documentation Coverage")
     print("=" * 60)
     _print_summary("Rust public items", rust_stats)
     _print_summary("Lua API bindings", lua_stats)

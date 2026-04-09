@@ -1,8 +1,8 @@
-//! Audio subsystem for Luna2D games.
+//! Audio subsystem for Lurek2D games.
 //!
 //! This module provides sound loading, playback, and volume management through
 //! a [`Mixer`] that wraps the [rodio](https://crates.io/crates/rodio) audio library.
-//! Game code accesses audio through the `luna.audio` Lua bindings in [`crate::lua_api`],
+//! Game code accesses audio through the `lurek.audio` Lua bindings in [`crate::lua_api`],
 //! which delegates all work to [`Mixer`] and [`Bus`] instances stored in `SharedState`.
 //!
 //! # Key types

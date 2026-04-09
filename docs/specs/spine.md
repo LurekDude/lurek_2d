@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                      |
 | **Status**     | Implemented — Full                             |
-| **Lua API**    | `luna.spine`                                   |
+| **Lua API**    | `lurek.spine`                                   |
 | **Source**     | `src/spine/`                                   |
 | **Rust Tests** | `tests/rust/unit/spine_tests.rs`               |
 | **Lua Tests**  | `tests/lua/unit/test_spine.lua`                |
@@ -27,7 +27,7 @@ The design is inspired by the Spine runtime data model but uses entirely custom 
 ## Architecture
 
 ```
-                    luna.spine.newSkeleton(name)
+                    lurek.spine.newSkeleton(name)
                               │
                               ▼
                ┌──────────────────────────────┐
@@ -140,13 +140,13 @@ No public enums.
 
 ## Lua API
 
-Exposed under `luna.spine.*` by `src/lua_api/spine_api.rs`. The API provides a `LuaSkeleton` UserData type returned by the factory function.
+Exposed under `lurek.spine.*` by `src/lua_api/spine_api.rs`. The API provides a `LuaSkeleton` UserData type returned by the factory function.
 
 ### Module Functions
 
 | Function                    | Signature                                      | Description                                        |
 |-----------------------------|------------------------------------------------|----------------------------------------------------|
-| `luna.spine.newSkeleton`    | `(name: string) → Skeleton`                    | Creates a new empty skeleton with the given name   |
+| `lurek.spine.newSkeleton`    | `(name: string) → Skeleton`                    | Creates a new empty skeleton with the given name   |
 
 ### Skeleton Methods (UserData)
 
@@ -169,8 +169,8 @@ The `opts` table for `addBone`/`addChildBone` accepts: `x`, `y`, `rotation`, `sc
 
 ```lua
 -- Build a simple character skeleton and query world positions
-function luna.init()
-    skeleton = luna.spine.newSkeleton("character")
+function lurek.init()
+    skeleton = lurek.spine.newSkeleton("character")
 
     -- Root bone at (100, 200)
     local root = skeleton:addBone("root", { x = 100, y = 200 })
@@ -193,7 +193,7 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Move skeleton and re-propagate
     skeleton:setPosition(150, 250)
 end

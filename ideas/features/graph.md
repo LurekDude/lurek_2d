@@ -41,16 +41,16 @@ General-purpose directed graph data structure with traversal algorithms and flow
 ## Suggestions
 
 1. **Consider merging with pathfinding**: Make pathfinding the "spatial algorithms" module that includes both grid and graph pathfinding.
-2. **Move flow simulation to Tier 3**: `library/flow/` — pure Lua flow network simulation using `luna.graph` as the substrate. Removes niche gameplay from core engine.
+2. **Move flow simulation to Tier 3**: `library/flow/` — pure Lua flow network simulation using `lurek.graph` as the substrate. Removes niche gameplay from core engine.
 3. **Add graph serialization**: `graph:serialize()` → JSON-compatible table for save/load.
 4. **Add minimum spanning tree**: `graph:mst()` — Prim's or Kruskal's. Useful for procedural map connections.
 5. **Add A* on graph**: `graph:findPath(start, goal, heuristic)` — A* with custom heuristic function.
 
 ## Competitor Comparison
 
-No competitor 2D Lua engine has a built-in graph module. This is unique to Luna2D. However, graph algorithms are easily implemented in Lua — the value of a Rust implementation is pure performance.
+No competitor 2D Lua engine has a built-in graph module. This is unique to Lurek2D. However, graph algorithms are easily implemented in Lua — the value of a Rust implementation is pure performance.
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Graph data structure | ✅ | ❌ | ❌ | ❌ |
 | BFS/DFS | ✅ | ❌ | ❌ | ❌ |

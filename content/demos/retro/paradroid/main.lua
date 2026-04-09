@@ -1,7 +1,7 @@
--- Paradroid — C-64 Classic (Luna2D demo)
+-- Paradroid — C-64 Classic (Lurek2D demo)
 -- Top-down shooter on a space station. Transfer your program into enemy droids
 -- to take control of them. Inspired by Andrew Braybrook's 1985 C-64 masterpiece.
--- Run with: cargo run -- demos/retro/paradroid
+-- Run with: cargo run -- content/demos/retro/paradroid
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -97,21 +97,21 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.05, 0.05, 0.12)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.12)
     score = 0; level = 1
     reset()
 end
 
 -- ── Update ───────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     anim = anim + dt
 
     if game_state == "transfer" then
         -- Transfer minigame: player tries to keep bar in upper half
         local t = transfer
-        if luna.input.isKeyDown("space") then
+        if lurek.input.isKeyDown("space") then
             t.player_bar = math.min(100, t.player_bar + 120 * dt)
         else
             t.player_bar = math.max(0, t.player_bar - 60 * dt)
@@ -149,10 +149,10 @@ function luna.process(dt)
     -- Player movement (WASD / arrows)
     player.shoot_cd = math.max(0, player.shoot_cd - dt)
     local pvx, pvy = 0, 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a")  then pvx = -DROID_SPEED end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then pvx =  DROID_SPEED end
-    if luna.input.isKeyDown("up") or luna.input.isKeyDown("w")    then pvy = -DROID_SPEED end
-    if luna.input.isKeyDown("down") or luna.input.isKeyDown("s")  then pvy =  DROID_SPEED end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a")  then pvx = -DROID_SPEED end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then pvx =  DROID_SPEED end
+    if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w")    then pvy = -DROID_SPEED end
+    if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s")  then pvy =  DROID_SPEED end
 
     -- Normalize diagonal
     if pvx ~= 0 and pvy ~= 0 then pvx = pvx * 0.707; pvy = pvy * 0.707 end
@@ -249,27 +249,27 @@ end
 
 -- ── Draw ─────────────────────────────────────────────────────────────────
 
-function luna.render()
+function lurek.render()
     -- Room floor
-    luna.gfx.setColor(0.08, 0.08, 0.18)
-    luna.gfx.rectangle("fill", ROOM_X, ROOM_Y, ROOM_W, ROOM_H)
+    lurek.gfx.setColor(0.08, 0.08, 0.18)
+    lurek.gfx.rectangle("fill", ROOM_X, ROOM_Y, ROOM_W, ROOM_H)
 
     -- Floor grid
-    luna.gfx.setColor(0.12, 0.12, 0.25)
+    lurek.gfx.setColor(0.12, 0.12, 0.25)
     for c = 0, COLS do
-        luna.gfx.line(ROOM_X + c * CELL, ROOM_Y, ROOM_X + c * CELL, ROOM_Y + ROOM_H)
+        lurek.gfx.line(ROOM_X + c * CELL, ROOM_Y, ROOM_X + c * CELL, ROOM_Y + ROOM_H)
     end
     for r = 0, ROWS do
-        luna.gfx.line(ROOM_X, ROOM_Y + r * CELL, ROOM_X + ROOM_W, ROOM_Y + r * CELL)
+        lurek.gfx.line(ROOM_X, ROOM_Y + r * CELL, ROOM_X + ROOM_W, ROOM_Y + r * CELL)
     end
 
     -- Walls
-    luna.gfx.setColor(0.3, 0.3, 0.5)
+    lurek.gfx.setColor(0.3, 0.3, 0.5)
     for _, w in ipairs(walls) do
-        luna.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
-        luna.gfx.setColor(0.5, 0.5, 0.7)
-        luna.gfx.rectangle("line", w.x, w.y, w.w, w.h)
-        luna.gfx.setColor(0.3, 0.3, 0.5)
+        lurek.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
+        lurek.gfx.setColor(0.5, 0.5, 0.7)
+        lurek.gfx.rectangle("line", w.x, w.y, w.w, w.h)
+        lurek.gfx.setColor(0.3, 0.3, 0.5)
     end
 
     -- Transfer range circle
@@ -279,124 +279,124 @@ function luna.render()
                 local dx = (d.x + d.w/2) - (player.x + player.w/2)
                 local dy = (d.y + d.h/2) - (player.y + player.h/2)
                 if math.sqrt(dx*dx + dy*dy) < TRANSFER_RANGE + 10 then
-                    luna.gfx.setColor(0.1, 0.8, 0.6, 0.3)
-                    luna.gfx.circle("line", player.x + player.w/2, player.y + player.h/2, TRANSFER_RANGE)
+                    lurek.gfx.setColor(0.1, 0.8, 0.6, 0.3)
+                    lurek.gfx.circle("line", player.x + player.w/2, player.y + player.h/2, TRANSFER_RANGE)
                 end
             end
         end
     end
 
     -- Bullets
-    luna.gfx.setColor(1, 0.9, 0.1)
+    lurek.gfx.setColor(1, 0.9, 0.1)
     for _, b in ipairs(bullets) do
-        if not b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 3, 4, 6) end
+        if not b.enemy then lurek.gfx.rectangle("fill", b.x - 2, b.y - 3, 4, 6) end
     end
-    luna.gfx.setColor(1, 0.3, 0.1)
+    lurek.gfx.setColor(1, 0.3, 0.1)
     for _, b in ipairs(bullets) do
-        if b.enemy then luna.gfx.rectangle("fill", b.x - 2, b.y - 3, 4, 6) end
+        if b.enemy then lurek.gfx.rectangle("fill", b.x - 2, b.y - 3, 4, 6) end
     end
 
     -- Droids
     for _, d in ipairs(droids) do
         if d.alive and not d.is_player then
             local hue = d.energy / 100
-            luna.gfx.setColor(1 - hue, hue * 0.4, 0.6)
-            luna.gfx.rectangle("fill", d.x, d.y, d.w, d.h)
-            luna.gfx.setColor(0.8, 0.8, 1)
-            luna.gfx.rectangle("line", d.x, d.y, d.w, d.h)
+            lurek.gfx.setColor(1 - hue, hue * 0.4, 0.6)
+            lurek.gfx.rectangle("fill", d.x, d.y, d.w, d.h)
+            lurek.gfx.setColor(0.8, 0.8, 1)
+            lurek.gfx.rectangle("line", d.x, d.y, d.w, d.h)
             -- Rating number
-            luna.gfx.setColor(1, 1, 1)
-            luna.gfx.print(tostring(math.floor(d.rating / 100)), d.x + 6, d.y + 7, 1.2)
+            lurek.gfx.setColor(1, 1, 1)
+            lurek.gfx.print(tostring(math.floor(d.rating / 100)), d.x + 6, d.y + 7, 1.2)
         end
     end
 
     -- Player droid
     local pulse = 0.5 + 0.5 * math.sin(anim * 6)
-    luna.gfx.setColor(0.1 + pulse * 0.2, 0.8, 0.4)
-    luna.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.rectangle("line", player.x, player.y, player.w, player.h)
-    luna.gfx.setColor(0, 0, 0)
-    luna.gfx.print("0", player.x + 8, player.y + 7, 1.2)
+    lurek.gfx.setColor(0.1 + pulse * 0.2, 0.8, 0.4)
+    lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.rectangle("line", player.x, player.y, player.w, player.h)
+    lurek.gfx.setColor(0, 0, 0)
+    lurek.gfx.print("0", player.x + 8, player.y + 7, 1.2)
 
     -- HUD
-    luna.gfx.setColor(0, 0, 0, 0.65)
-    luna.gfx.rectangle("fill", 0, 0, W, 35)
-    luna.gfx.setColor(0.1, 0.9, 0.5)
-    luna.gfx.print("PARADROID", 8, 5, 1.8)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
-    luna.gfx.setColor(1, 0.5, 0.5)
+    lurek.gfx.setColor(0, 0, 0, 0.65)
+    lurek.gfx.rectangle("fill", 0, 0, W, 35)
+    lurek.gfx.setColor(0.1, 0.9, 0.5)
+    lurek.gfx.print("PARADROID", 8, 5, 1.8)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
+    lurek.gfx.setColor(1, 0.5, 0.5)
     -- Energy bar
     local emax = 130
-    luna.gfx.setColor(0.3, 0, 0)
-    luna.gfx.rectangle("fill", W - emax - 10, 7, emax, 16)
-    luna.gfx.setColor(0.1, 0.9, 0.2)
-    luna.gfx.rectangle("fill", W - emax - 10, 7, emax * (player.energy / PLAYER_ENERGY_MAX), 16)
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("E", W - emax - 22, 7, 1.4)
-    luna.gfx.setColor(0.5, 0.9, 1)
-    luna.gfx.print("Lv " .. level, W/2 + 60, 5, 1.6)
+    lurek.gfx.setColor(0.3, 0, 0)
+    lurek.gfx.rectangle("fill", W - emax - 10, 7, emax, 16)
+    lurek.gfx.setColor(0.1, 0.9, 0.2)
+    lurek.gfx.rectangle("fill", W - emax - 10, 7, emax * (player.energy / PLAYER_ENERGY_MAX), 16)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("E", W - emax - 22, 7, 1.4)
+    lurek.gfx.setColor(0.5, 0.9, 1)
+    lurek.gfx.print("Lv " .. level, W/2 + 60, 5, 1.6)
 
     -- T key hint
-    luna.gfx.setColor(0.5, 0.8, 1, 0.7)
-    luna.gfx.print("[T] Transfer  [Space] Shoot", ROOM_X, ROOM_Y + ROOM_H + 5, 1.3)
+    lurek.gfx.setColor(0.5, 0.8, 1, 0.7)
+    lurek.gfx.print("[T] Transfer  [Space] Shoot", ROOM_X, ROOM_Y + ROOM_H + 5, 1.3)
 
     -- Transfer minigame overlay
     if game_state == "transfer" then
         local cx, cy = W/2, H/2
-        luna.gfx.setColor(0, 0, 0, 0.8)
-        luna.gfx.rectangle("fill", cx - 160, cy - 80, 320, 160)
-        luna.gfx.setColor(0, 0.8, 0.8)
-        luna.gfx.rectangle("line", cx - 160, cy - 80, 320, 160)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("TRANSFER OVERRIDE", cx - 110, cy - 70, 1.6)
+        lurek.gfx.setColor(0, 0, 0, 0.8)
+        lurek.gfx.rectangle("fill", cx - 160, cy - 80, 320, 160)
+        lurek.gfx.setColor(0, 0.8, 0.8)
+        lurek.gfx.rectangle("line", cx - 160, cy - 80, 320, 160)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("TRANSFER OVERRIDE", cx - 110, cy - 70, 1.6)
         -- Bars
         local pb = transfer.player_bar / 100 * 200
-        luna.gfx.setColor(0.1, 0.3, 0.1)
-        luna.gfx.rectangle("fill", cx - 100, cy - 20, 200, 20)
-        luna.gfx.setColor(0.1, 0.9, 0.3)
-        luna.gfx.rectangle("fill", cx - 100, cy - 20, pb, 20)
+        lurek.gfx.setColor(0.1, 0.3, 0.1)
+        lurek.gfx.rectangle("fill", cx - 100, cy - 20, 200, 20)
+        lurek.gfx.setColor(0.1, 0.9, 0.3)
+        lurek.gfx.rectangle("fill", cx - 100, cy - 20, pb, 20)
         local eb = transfer.enemy_bar / 100 * 200
-        luna.gfx.setColor(0.3, 0.1, 0.1)
-        luna.gfx.rectangle("fill", cx - 100, cy + 10, 200, 20)
-        luna.gfx.setColor(0.9, 0.2, 0.1)
-        luna.gfx.rectangle("fill", cx - 100, cy + 10, eb, 20)
-        luna.gfx.setColor(0.6, 1, 0.6)
-        luna.gfx.print("YOU", cx - 95, cy - 18, 1.2)
-        luna.gfx.setColor(1, 0.6, 0.4)
-        luna.gfx.print("ENEMY", cx - 95, cy + 12, 1.2)
-        luna.gfx.setColor(0.9, 0.9, 0.5)
-        luna.gfx.print("Hold SPACE to override!", cx - 105, cy + 42, 1.4)
+        lurek.gfx.setColor(0.3, 0.1, 0.1)
+        lurek.gfx.rectangle("fill", cx - 100, cy + 10, 200, 20)
+        lurek.gfx.setColor(0.9, 0.2, 0.1)
+        lurek.gfx.rectangle("fill", cx - 100, cy + 10, eb, 20)
+        lurek.gfx.setColor(0.6, 1, 0.6)
+        lurek.gfx.print("YOU", cx - 95, cy - 18, 1.2)
+        lurek.gfx.setColor(1, 0.6, 0.4)
+        lurek.gfx.print("ENEMY", cx - 95, cy + 12, 1.2)
+        lurek.gfx.setColor(0.9, 0.9, 0.5)
+        lurek.gfx.print("Hold SPACE to override!", cx - 105, cy + 42, 1.4)
     end
 
     -- Overlays
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.2, 0.2)
-        luna.gfx.print("DROID DESTROYED", W/2 - 125, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.2, 0.2)
+        lurek.gfx.print("DROID DESTROYED", W/2 - 125, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     elseif game_state == "win" then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(0.2, 1, 0.4)
-        luna.gfx.print("STATION CLEARED!", W/2 - 125, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to play again", W/2 - 110, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(0.2, 1, 0.4)
+        lurek.gfx.print("STATION CLEARED!", W/2 - 125, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to play again", W/2 - 110, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
 
     if game_state == "playing" then
         if key == "space" and player.shoot_cd <= 0 then

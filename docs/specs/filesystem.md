@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.fs`                                    |
+| **Lua API**    | `lurek.fs`                                    |
 | **Source**     | `src/filesystem/`                                    |
 | **Rust Tests** | `tests/rust/unit/filesystem_tests.rs`                |
 | **Lua Tests**  | `tests/lua/unit/test_filesystem.lua`                 |
@@ -154,9 +154,9 @@ Status returned by `AsyncLoader::poll()`. Variants: `Pending` (still processing)
 
 ## Lua API
 
-Exposed under `luna.fs.*` by `src/lua_api/filesystem_api.rs`. The API provides sandboxed file I/O, directory queries, async asset loading, VFS mount management, and file handle operations. Two UserData types are also exposed: `FileHandle` (returned by `openFile`) and `FileData` (returned by `newFileData`).
+Exposed under `lurek.fs.*` by `src/lua_api/filesystem_api.rs`. The API provides sandboxed file I/O, directory queries, async asset loading, VFS mount management, and file handle operations. Two UserData types are also exposed: `FileHandle` (returned by `openFile`) and `FileData` (returned by `newFileData`).
 
-### Module Functions (`luna.fs.*`)
+### Module Functions (`lurek.fs.*`)
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -212,21 +212,21 @@ Exposed under `luna.fs.*` by `src/lua_api/filesystem_api.rs`. The API provides s
 
 ```lua
 -- Basic file read/write
-function luna.init()
+function lurek.init()
     -- Write save data (must be under save/)
-    luna.fs.write("save/progress.json", '{"score": 100}')
+    lurek.fs.write("save/progress.json", '{"score": 100}')
 
     -- Read it back
-    if luna.fs.exists("save/progress.json") then
-        local data = luna.fs.read("save/progress.json")
+    if lurek.fs.exists("save/progress.json") then
+        local data = lurek.fs.read("save/progress.json")
         print("Loaded: " .. data)
     end
 
     -- Append a log line
-    luna.fs.append("save/game.log", "Session started\n")
+    lurek.fs.append("save/game.log", "Session started\n")
 
     -- Query file info
-    local info = luna.fs.getInfo("save/progress.json")
+    local info = lurek.fs.getInfo("save/progress.json")
     if info then
         print("Type: " .. info.type)
         print("Size: " .. info.size .. " bytes")
@@ -236,19 +236,19 @@ end
 
 ```lua
 -- Directory listing and file handle I/O
-function luna.init()
+function lurek.init()
     -- List files in current directory
-    local items = luna.fs.getDirectoryItems(".")
+    local items = lurek.fs.getDirectoryItems(".")
     for _, name in ipairs(items) do
-        if luna.fs.isFile(name) then
+        if lurek.fs.isFile(name) then
             print("File: " .. name)
-        elseif luna.fs.isDirectory(name) then
+        elseif lurek.fs.isDirectory(name) then
             print("Dir:  " .. name)
         end
     end
 
     -- File handle for line-by-line reading
-    local fh = luna.fs.openFile("data/config.txt", "r")
+    local fh = lurek.fs.openFile("data/config.txt", "r")
     while not fh:isEOF() do
         local line = fh:readLine()
         if line then print(line) end
@@ -259,21 +259,21 @@ end
 
 ```lua
 -- Async loading and VFS mounting
-function luna.init()
+function lurek.init()
     -- Mount a mod directory
-    luna.fs.mount("mods/expansion", "/mods/expansion")
+    lurek.fs.mount("mods/expansion", "/mods/expansion")
 
     -- Load a Lua file from the VFS (searches mounts first)
-    local mod_init = luna.fs.load("mods/expansion/init.lua")
+    local mod_init = lurek.fs.load("mods/expansion/init.lua")
     mod_init()
 
     -- Start an async file load
-    handle = luna.fs.readAsync("assets/large_texture.png")
+    handle = lurek.fs.readAsync("assets/large_texture.png")
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if handle then
-        local status, data = luna.fs.pollAsync(handle)
+        local status, data = lurek.fs.pollAsync(handle)
         if status == "done" then
             print("Loaded " .. #data .. " bytes")
             handle = nil
@@ -304,7 +304,7 @@ end
 | `savegame`  | Related       | `savegame` calls `filesystem` to persist serialised save data  |
 | `modding`   | Related       | `modding` uses mount layers for mod discovery and load ordering |
 | `thread`    | Related       | Worker threads can use `filesystem` for background I/O         |
-| `lua_api`   | Imported by   | `src/lua_api/filesystem_api.rs` registers `luna.fs.*`  |
+| `lua_api`   | Imported by   | `src/lua_api/filesystem_api.rs` registers `lurek.fs.*`  |
 
 ## Notes
 
@@ -313,7 +313,7 @@ end
 - **Mount layers.** `mount()` only accepts source directories inside the game directory (canonicalised and validated). `mount_full()` accepts absolute paths but is not exposed to Lua — it is for internal engine use only. Mounts are searched newest-first by `load_chunk()` and `get_directory_items_merged()`.
 - **Async loader.** `AsyncLoader` uses a bounded sync channel (64 slots). If the queue is full, `request_load()` returns a handle whose poll result is an immediate error. The `resolve_read_path()` validation must happen on the main thread before `request_load()` to prevent TOCTOU races. Results are consumed once — the first `poll()` returning `Done` removes the entry.
 - **FileHandle buffering.** Read mode uses `BufReader`, Write and Append modes use `BufWriter`. The `Drop` implementation calls `close()` to flush pending writes automatically if the handle is not explicitly closed.
-- **Identity.** The `identity` field namespaces a game's save directory separately from its read-only asset tree, preventing save-file collisions between games sharing the same engine install. Set via `conf.lua` (`t.identity = "my_game"`) or `luna.fs.setIdentity()`.
+- **Identity.** The `identity` field namespaces a game's save directory separately from its read-only asset tree, preventing save-file collisions between games sharing the same engine install. Set via `conf.lua` (`t.identity = "my_game"`) or `lurek.fs.setIdentity()`.
 - **No network I/O.** The filesystem module is strictly local disk. No HTTP, WebSocket, or remote file access.
 - **Platform paths.** `get_user_directory()` reads `USERPROFILE` on Windows and `HOME` on Unix, falling back to the current directory. `get_save_directory()` returns `base_dir/save/`.
-- **Breaking change surface.** Renaming or removing any `luna.fs.*` function breaks existing Lua game scripts. The `getInfo` return table shape (`type`, `size`, `modtime`, `readonly`) is part of the public API contract.
+- **Breaking change surface.** Renaming or removing any `lurek.fs.*` function breaks existing Lua game scripts. The `getInfo` return table shape (`type`, `size`, `modtime`, `readonly`) is part of the public API contract.

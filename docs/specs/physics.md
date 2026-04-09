@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.physics`                                       |
+| **Lua API**    | `lurek.physics`                                       |
 | **Source**      | `src/physics/`                                       |
 | **Rust Tests** | `tests/rust/unit/physics_tests.rs`                        |
 | **Lua Tests**  | `tests/lua/unit/test_physics.lua`                    |
@@ -12,7 +12,7 @@
 
 ## Summary
 
-The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Luna2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
+The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Lurek2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
 
 The central type is `World`, which owns a `Vec<Body>` sync buffer alongside parallel rapier `RigidBodySet` and `ColliderSet` instances. The sync-buffer pattern decouples Lua property access from rapier internals: scripts read and write `Body` fields freely, and the `World::step()` method flushes those mutations into rapier, runs the simulation pipeline, then reads back computed positions, velocities, and angles for dynamic and kinematic bodies. Change detection caches (shape, restitution, friction, layer/mask) trigger automatic collider rebuilds only when a property actually changes, avoiding unnecessary rapier resource churn.
 
@@ -25,7 +25,7 @@ The module intentionally exposes a simplified subset of rapier2d. Complex solver
 ## Architecture
 
 ```
-luna.physics.newWorld(gx, gy)
+lurek.physics.newWorld(gx, gy)
         |
         v
     +--------------------------------------------------------------------+
@@ -105,7 +105,7 @@ Legacy collision contact data retained for backward compatibility.
 Extended shape types beyond basic rect/circle.
 
 - **`Shape`** (enum) — Five collision shape variants: `Rect`, `Circle`, `Polygon` (convex, max 8 vertices), `Edge` (line segment), `Chain` (connected edges, optionally closed). Provides `to_rapier_collider()` (crate-internal) for converting to rapier `ColliderBuilder` and `regular_polygon()` for generating regular N-gon vertices.
-- **`StandaloneShape`** (struct) — A shape value holding geometry plus default fixture parameters (density, friction, restitution, sensor flag). Created via `luna.physics.newCircleShape` et al. and attached to bodies with `world:addFixture`. Can be reused across multiple bodies.
+- **`StandaloneShape`** (struct) — A shape value holding geometry plus default fixture parameters (density, friction, restitution, sensor flag). Created via `lurek.physics.newCircleShape` et al. and attached to bodies with `world:addFixture`. Can be reused across multiple bodies.
 
 ### `physics::world`
 
@@ -164,9 +164,9 @@ Extended collision geometry. Variants: `Rect { width, height }`, `Circle { radiu
 
 ## Lua API
 
-Exposed under `luna.physics.*` by `src/lua_api/physics_api.rs`. The API provides two UserData types (`LuaWorld` and `LuaBody`) plus module-level factory functions.
+Exposed under `lurek.physics.*` by `src/lua_api/physics_api.rs`. The API provides two UserData types (`LuaWorld` and `LuaBody`) plus module-level factory functions.
 
-### Module-level functions (`luna.physics.*`)
+### Module-level functions (`lurek.physics.*`)
 
 | Function | Description |
 |----------|-------------|
@@ -286,9 +286,9 @@ Exposed under `luna.physics.*` by `src/lua_api/physics_api.rs`. The API provides
 ## Lua Examples
 
 ```lua
-function luna.init()
+function lurek.init()
     -- Create a world with downward gravity
-    world = luna.physics.newWorld(0, 9.81)
+    world = lurek.physics.newWorld(0, 9.81)
 
     -- Static ground platform
     ground = world:newBody(400, 580, "static")
@@ -307,7 +307,7 @@ function luna.init()
     trigger = world:newBody(600, 300, "sensor")
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     world:step(dt)
 
     -- Read ball state
@@ -316,7 +316,7 @@ function luna.process(dt)
     local angle = ball:getAngle()
 
     -- Move kinematic platform
-    platform:setPosition(300 + math.sin(luna.time.getTime()) * 100, 400)
+    platform:setPosition(300 + math.sin(lurek.time.getTime()) * 100, 400)
 
     -- Check collision events
     local events = world:getBeginContactEvents()
@@ -334,22 +334,22 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Draw ball
     local bx, by = ball:getPosition()
-    luna.gfx.circle("fill", bx, by, 20)
+    lurek.gfx.circle("fill", bx, by, 20)
 
     -- Draw ground
     local gx, gy = ground:getPosition()
-    luna.gfx.rectangle("fill", gx - 400, gy - 10, 800, 20)
+    lurek.gfx.rectangle("fill", gx - 400, gy - 10, 800, 20)
 end
 ```
 
 ### Joints example
 
 ```lua
-function luna.init()
-    world = luna.physics.newWorld(0, 9.81)
+function lurek.init()
+    world = lurek.physics.newWorld(0, 9.81)
 
     -- Two bodies connected by a revolute joint
     anchor = world:newBody(400, 200, "static")
@@ -366,9 +366,9 @@ function luna.init()
     mouseJoint = world:addMouseJoint(draggable:getId(), 500, 300, 1000)
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- Update mouse joint target to cursor position
-    local mx, my = luna.mouse.getPosition()
+    local mx, my = lurek.mouse.getPosition()
     world:setMouseJointTarget(mouseJoint, mx, my)
 
     world:step(dt)
@@ -390,7 +390,7 @@ end
 |------------|-------------|----------------------------------------------------------|
 | `engine`   | Imports from | Uses `SharedState`, `PhysicsWorldKey`, `PhysicsBodyKey`  |
 | `math`     | Imports from | `Vec2`, `Rect` for positions and shapes                  |
-| `lua_api`  | Imported by  | `src/lua_api/physics_api.rs` registers `luna.physics.*`  |
+| `lua_api`  | Imported by  | `src/lua_api/physics_api.rs` registers `lurek.physics.*`  |
 | `graphics` | Related      | Physics debug rendering draws body outlines via draw commands; no direct import |
 
 **Similar modules**: None — physics is the only simulation module. The `math` module provides linear algebra primitives but no physics simulation. The `particle` module (Tier 2) handles visual particle effects, not rigid-body physics.

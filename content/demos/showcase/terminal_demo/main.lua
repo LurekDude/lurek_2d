@@ -1,7 +1,7 @@
--- Terminal Demo for Luna2D
--- Demonstrates the luna.terminal widget system with a "Character Creator" UI.
+-- Terminal Demo for Lurek2D
+-- Demonstrates the lurek.terminal widget system with a "Character Creator" UI.
 -- Features: grid manipulation, borders, labels, textbox, list, button, focus, callbacks.
--- Run with: cargo run -- demos/showcase/terminal_demo
+-- Run with: cargo run -- content/demos/showcase/terminal_demo
 
 local term
 local border
@@ -17,7 +17,7 @@ local smokeRequested = false
 local smokeQuitNextFrame = false
 
 local function initSmokeMode()
-    local args = luna.platform.getArgs()
+    local args = lurek.platform.getArgs()
     local screenshotPrefix = "--smoke-screenshot="
 
     for i = 1, #args do
@@ -31,12 +31,12 @@ local function initSmokeMode()
     end
 end
 
-function luna.init()
+function lurek.init()
     initSmokeMode()
-    luna.gfx.setBackgroundColor(0, 0, 0)
+    lurek.gfx.setBackgroundColor(0, 0, 0)
 
     -- Create an 80×25 terminal grid
-    term = luna.terminal.newTerminal(80, 25)
+    term = lurek.terminal.newTerminal(80, 25)
 
     -- ── Direct cell manipulation ──────────────────────────────────────────
     -- Draw a decorative row of dots along the very top row
@@ -45,23 +45,23 @@ function luna.init()
     end
 
     -- ── Main border ──────────────────────────────────────────────────────
-    border = luna.terminal.newBorder(2, 2, 78, 23)
+    border = lurek.terminal.newBorder(2, 2, 78, 23)
     border:setStyle("double")
     border:setTitle(" Character Creator ")
     border:setColor(0.4, 0.6, 1.0)
     term:addWidget(border)
 
     -- ── Title label ──────────────────────────────────────────────────────
-    titleLabel = luna.terminal.newLabel(30, 4, "=== Create Your Hero ===")
+    titleLabel = lurek.terminal.newLabel(30, 4, "=== Create Your Hero ===")
     titleLabel:setColor(1.0, 0.85, 0.2)
     term:addWidget(titleLabel)
 
     -- ── Name input ───────────────────────────────────────────────────────
-    nameLabel = luna.terminal.newLabel(6, 7, "Name:")
+    nameLabel = lurek.terminal.newLabel(6, 7, "Name:")
     nameLabel:setColor(0.8, 0.8, 0.8)
     term:addWidget(nameLabel)
 
-    nameInput = luna.terminal.newTextBox(13, 7, 25)
+    nameInput = lurek.terminal.newTextBox(13, 7, 25)
     nameInput:setMaxLength(20)
     nameInput:setOnChange(function()
         updateStatus("Typing name: " .. nameInput:getText())
@@ -69,11 +69,11 @@ function luna.init()
     term:addWidget(nameInput)
 
     -- ── Class list ───────────────────────────────────────────────────────
-    classLabel = luna.terminal.newLabel(6, 10, "Class:")
+    classLabel = lurek.terminal.newLabel(6, 10, "Class:")
     classLabel:setColor(0.8, 0.8, 0.8)
     term:addWidget(classLabel)
 
-    classList = luna.terminal.newList(6, 12, 24, 6)
+    classList = lurek.terminal.newList(6, 12, 24, 6)
     classList:addItem("Warrior   - Melee tank")
     classList:addItem("Mage      - Arcane DPS")
     classList:addItem("Rogue     - Stealth & crits")
@@ -89,7 +89,7 @@ function luna.init()
     term:addWidget(classList)
 
     -- ── Create button ────────────────────────────────────────────────────
-    createBtn = luna.terminal.newButton(6, 20, 14, 1, "[ Create ]")
+    createBtn = lurek.terminal.newButton(6, 20, 14, 1, "[ Create ]")
     createBtn:setOnClick(function()
         local name = nameInput:getText()
         if name == "" then
@@ -105,7 +105,7 @@ function luna.init()
     term:addWidget(createBtn)
 
     -- ── Info panel on the right side ─────────────────────────────────────
-    local infoBorder = luna.terminal.newBorder(42, 6, 34, 14)
+    local infoBorder = lurek.terminal.newBorder(42, 6, 34, 14)
     infoBorder:setStyle("single")
     infoBorder:setTitle(" Info ")
     infoBorder:setColor(0.3, 0.7, 0.3)
@@ -122,13 +122,13 @@ function luna.init()
         { y = 17, text = "  Enter = press button" },
     }
     for _, line in ipairs(infoLines) do
-        local lbl = luna.terminal.newLabel(44, line.y, line.text)
+        local lbl = lurek.terminal.newLabel(44, line.y, line.text)
         lbl:setColor(0.6, 0.9, 0.6)
         term:addWidget(lbl)
     end
 
     -- ── Status bar ───────────────────────────────────────────────────────
-    statusLabel = luna.terminal.newLabel(6, 22, "Ready. Enter your character details above.")
+    statusLabel = lurek.terminal.newLabel(6, 22, "Ready. Enter your character details above.")
     statusLabel:setColor(0.5, 0.8, 1.0)
     term:addWidget(statusLabel)
 
@@ -161,29 +161,29 @@ end
 
 -- ── Callbacks ────────────────────────────────────────────────────────────
 
-function luna.process(dt)
+function lurek.process(dt)
     if smokeQuitNextFrame then
-        luna.signal.quit()
+        lurek.signal.quit()
     end
 end
 
-function luna.render()
+function lurek.render()
     term:draw(0, 0)
 
     -- Draw a small hint below the terminal
-    luna.gfx.setColor(0.4, 0.4, 0.4)
-    luna.gfx.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
+    lurek.gfx.setColor(0.4, 0.4, 0.4)
+    lurek.gfx.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
 
     if smokeMode and not smokeRequested then
-        luna.gfx.saveScreenshot(smokeScreenshotPath)
+        lurek.gfx.saveScreenshot(smokeScreenshotPath)
         smokeRequested = true
         smokeQuitNextFrame = true
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
         return
     end
 
@@ -200,10 +200,10 @@ function luna.keypressed(key)
     term:keypressed(key)
 end
 
-function luna.textinput(text)
+function lurek.textinput(text)
     term:textinput(text)
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     term:mousepressed(x, y, button)
 end

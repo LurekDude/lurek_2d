@@ -1,14 +1,14 @@
 -- Module availability guard (added by fix_nil_module_demos.py)
--- Run with: cargo run -- demos/showcase/province_demo
-if not luna.province then
-    function luna.init()
-        luna.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        luna.gfx.print("luna.province is not available in this build", 180, 270)
+-- Run with: cargo run -- content/demos/showcase/province_demo
+if not lurek.province then
+    function lurek.init()
+        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.gfx.print("lurek.province is not available in this build", 180, 270)
     end
     return
 end
 
--- Province Map Demo for Luna2D
+-- Province Map Demo for Lurek2D
 -- Demonstrates: world generation, map modes, fog of war, pathfinding, objects
 -- Uses the generic property system -- terrain, owner, etc. are just properties.
 
@@ -28,9 +28,9 @@ local terrain_colors = {
     desert   = { 0.9, 0.8, 0.5, 1.0 },
 }
 
-function luna.init()
+function lurek.init()
     -- Generate a random province world (shapes only -- no terrain assigned)
-    map = luna.province.generate({
+    map = lurek.province.generate({
         width = 200,
         height = 150,
         provinces = 40,
@@ -38,7 +38,7 @@ function luna.init()
     })
 
     -- Create property data store
-    data = luna.province.newData()
+    data = lurek.province.newData()
 
     -- Assign terrain as a generic property (game developer's choice!)
     local ids = map:getProvinceIds()
@@ -75,76 +75,76 @@ function luna.init()
     end
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     -- nothing dynamic in this demo
 end
 
-function luna.render()
+function lurek.render()
     if not map then return end
 
     local w = map:getWidth()
     local h = map:getHeight()
-    local sw = luna.gfx.getWidth()
-    local sh = luna.gfx.getHeight()
+    local sw = lurek.gfx.getWidth()
+    local sh = lurek.gfx.getHeight()
 
     -- Scale the province map to fill the window
     local sx = sw / w
     local sy = sh / h
     local scale = math.min(sx, sy)
 
-    luna.gfx.push()
-    luna.gfx.scale(scale, scale)
+    lurek.gfx.push()
+    lurek.gfx.scale(scale, scale)
 
     -- Draw province colour buffer
     local ids = map:getProvinceIds()
     for _, pid in ipairs(ids) do
         local r, g, b = map:getProvinceColor(pid)
-        luna.gfx.setColor(r / 255, g / 255, b / 255)
+        lurek.gfx.setColor(r / 255, g / 255, b / 255)
 
         -- Approximate: draw a small rect at centroid (real rendering would
         -- use the full pixel buffer, but this gives a visual indication)
         local cx, cy = map:getCentroid(pid)
         local area = map:getArea(pid)
         local side = math.sqrt(area)
-        luna.gfx.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
+        lurek.gfx.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
     end
 
     -- Highlight selected province
     if selected then
-        luna.gfx.setColor(1, 1, 0, 0.5)
+        lurek.gfx.setColor(1, 1, 0, 0.5)
         local cx, cy = map:getCentroid(selected)
-        luna.gfx.circle("fill", cx, cy, 5)
+        lurek.gfx.circle("fill", cx, cy, 5)
     end
 
     -- Draw path
     if path_ids then
-        luna.gfx.setColor(0, 1, 0)
+        lurek.gfx.setColor(0, 1, 0)
         for i = 1, #path_ids - 1 do
             local ax, ay = map:getCentroid(path_ids[i])
             local bx, by = map:getCentroid(path_ids[i + 1])
-            luna.gfx.line(ax, ay, bx, by)
+            lurek.gfx.line(ax, ay, bx, by)
         end
     end
 
-    luna.gfx.pop()
+    lurek.gfx.pop()
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1)
-    luna.gfx.print("Province Demo -- click to select, right-click to path", 10, 10)
-    luna.gfx.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
-    luna.gfx.print("Provinces: " .. map:getProvinceCount(), 10, 50)
+    lurek.gfx.setColor(1, 1, 1)
+    lurek.gfx.print("Province Demo -- click to select, right-click to path", 10, 10)
+    lurek.gfx.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
+    lurek.gfx.print("Provinces: " .. map:getProvinceCount(), 10, 50)
     if selected then
         local terrain = data:getProperty(selected, "terrain") or "unknown"
         local owner = data:getProperty(selected, "owner") or 0
-        luna.gfx.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
+        lurek.gfx.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if not map then return end
 
-    local sw = luna.gfx.getWidth()
-    local sh = luna.gfx.getHeight()
+    local sw = lurek.gfx.getWidth()
+    local sh = lurek.gfx.getHeight()
     local w = map:getWidth()
     local h = map:getHeight()
     local scale = math.min(sw / w, sh / h)
@@ -176,7 +176,7 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "m" then
         mode_idx = (mode_idx % #mode_names) + 1
         map:setMapMode(mode_names[mode_idx])

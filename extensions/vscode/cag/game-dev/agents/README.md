@@ -1,6 +1,6 @@
 # Game-Dev Agents
 
-11 specialist agents for Luna2D game development.
+11 specialist agents for Lurek2D game development.
 
 | Agent | Role |
 |---|---|

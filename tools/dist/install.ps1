@@ -1,12 +1,12 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Install or uninstall the Luna2D engine locally on Windows.
+    Install or uninstall the Lurek2D engine locally on Windows.
 
 .DESCRIPTION
-    Builds the Luna2D engine in release mode, copies the binary to
+    Builds the Lurek2D engine in release mode, copies the binary to
     %USERPROFILE%\bin (or a custom destination via -Destination), and
-    copies the demos/ folder so you can run games from any terminal.
+    copies the content/demos/ folder so you can run games from any terminal.
 
     Run with --uninstall / -Uninstall to remove a previous installation.
 
@@ -18,7 +18,7 @@
 
 .EXAMPLE
     .\tools\install.ps1
-    .\tools\install.ps1 -Destination "C:\Programs\luna2d"
+    .\tools\install.ps1 -Destination "C:\Programs\lurek2d"
     .\tools\install.ps1 --uninstall
 #>
 
@@ -30,13 +30,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$BinaryName  = 'luna.exe'
+$BinaryName  = 'lurek.exe'
 $BinaryDest  = Join-Path $Destination $BinaryName
 $ExamplesDest = Join-Path $Destination 'luna-examples'
 
 # ── Helper ────────────────────────────────────────────────────────────────────
 function Write-Step([string]$Msg) {
-    Write-Host "[luna2d] $Msg" -ForegroundColor Cyan
+    Write-Host "[lurek2d] $Msg" -ForegroundColor Cyan
 }
 
 function Write-OK([string]$Msg) {
@@ -50,7 +50,7 @@ function Write-Fail([string]$Msg) {
 
 # ── Uninstall path ─────────────────────────────────────────────────────────────
 if ($Uninstall) {
-    Write-Step "Uninstalling Luna2D from '$Destination' ..."
+    Write-Step "Uninstalling Lurek2D from '$Destination' ..."
 
     if (Test-Path $BinaryDest) {
         Remove-Item $BinaryDest -Force
@@ -76,11 +76,11 @@ if ($Uninstall) {
 $WorkspaceRoot = Split-Path $PSScriptRoot -Parent
 $CargoToml = Join-Path $WorkspaceRoot 'Cargo.toml'
 if (-not (Test-Path $CargoToml)) {
-    Write-Fail "Cannot find Cargo.toml. Run this script from the luna2d workspace root."
+    Write-Fail "Cannot find Cargo.toml. Run this script from the lurek2d workspace root."
 }
 
 # 2. Build release binary
-Write-Step "Building Luna2D (release) — this may take a minute..."
+Write-Step "Building Lurek2D (release) — this may take a minute..."
 Push-Location $WorkspaceRoot
 try {
     cargo build --release 2>&1 | ForEach-Object { Write-Host "    $_" }
@@ -91,7 +91,7 @@ try {
 Write-OK "Build succeeded."
 
 # 3. Locate the compiled binary
-$BuiltBinary = Join-Path $WorkspaceRoot 'build\release\luna.exe'
+$BuiltBinary = Join-Path $WorkspaceRoot 'build\release\lurek.exe'
 if (-not (Test-Path $BuiltBinary)) {
     Write-Fail "Expected binary at '$BuiltBinary' but it was not found."
 }
@@ -116,7 +116,7 @@ if (Test-Path $ExamplesSource) {
     Copy-Item $ExamplesSource -Destination $ExamplesDest -Recurse -Force
     Write-OK "Examples copied."
 } else {
-    Write-Host "[  --  ] demos/ folder not found — skipping."
+    Write-Host "[  --  ] content/demos/ folder not found — skipping."
 }
 
 # 7. PATH advisory
@@ -124,10 +124,10 @@ $PathDirs = $env:PATH -split ';'
 if ($Destination -notin $PathDirs) {
     Write-Host ""
     Write-Host "  NOTE: '$Destination' is not in your PATH." -ForegroundColor Yellow
-    Write-Host "  Add it to your user PATH to run luna2d from any terminal:" -ForegroundColor Yellow
+    Write-Host "  Add it to your user PATH to run lurek2d from any terminal:" -ForegroundColor Yellow
     Write-Host "    [System.Environment]::SetEnvironmentVariable('PATH', `$env:PATH + ';$Destination', 'User')" -ForegroundColor DarkYellow
     Write-Host ""
 }
 
-Write-OK "Luna2D installed. Run:  luna examples\hello_world"
+Write-OK "Lurek2D installed. Run:  luna examples\hello_world"
 Write-OK "Or use examples from:   $ExamplesDest"

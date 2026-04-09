@@ -1,22 +1,22 @@
 -- tests/lua/test_joystick_ext.lua
--- BDD-style integration tests for luna.gamepad background events extension
+-- BDD-style integration tests for lurek.gamepad background events extension
 
-describe("luna.gamepad.getBackgroundEvents", function()
+describe("lurek.gamepad.getBackgroundEvents", function()
     it("defaults to false", function()
-        expect_equal(false, luna.gamepad.getBackgroundEvents())
+        expect_equal(false, lurek.gamepad.getBackgroundEvents())
     end)
 end)
 
-describe("luna.gamepad.setBackgroundEvents", function()
+describe("lurek.gamepad.setBackgroundEvents", function()
     it("can enable background events", function()
-        luna.gamepad.setBackgroundEvents(true)
-        expect_equal(true, luna.gamepad.getBackgroundEvents())
+        lurek.gamepad.setBackgroundEvents(true)
+        expect_equal(true, lurek.gamepad.getBackgroundEvents())
     end)
 
     it("can disable background events", function()
-        luna.gamepad.setBackgroundEvents(true)
-        luna.gamepad.setBackgroundEvents(false)
-        expect_equal(false, luna.gamepad.getBackgroundEvents())
+        lurek.gamepad.setBackgroundEvents(true)
+        lurek.gamepad.setBackgroundEvents(false)
+        expect_equal(false, lurek.gamepad.getBackgroundEvents())
     end)
 end)
 

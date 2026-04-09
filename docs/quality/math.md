@@ -13,7 +13,7 @@
 - [ ] **B-02** — Registration-only: struct definitions (move to src/math/): LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator from lua_api/math_api.rs → src/math/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 527, line 534, line 555, line 558
-- [ ] **W-02** — API surface coverage: Functions absent from examples/math.lua: tau, huge
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/math.lua: tau, huge
 
 ### 🟡 Warnings — Should Fix
 
@@ -114,9 +114,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/math.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/math.lua: tau, huge |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/math.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ✅ PASS | content/examples/math.lua present |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/math.lua: tau, huge |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/math.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: acos, angleBetween, circleContainsPoint, circleIntersectsCircle — add to ## Lua API in specs/math.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Math-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
@@ -145,7 +145,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 

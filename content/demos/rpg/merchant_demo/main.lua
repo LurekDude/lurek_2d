@@ -1,11 +1,11 @@
 --[[
--- Run with: cargo run -- demos/rpg/merchant_demo
+-- Run with: cargo run -- content/demos/rpg/merchant_demo
   merchant_demo — Item System + Inventory: Shop / Trading Game
   ─────────────────────────────────────────────────────────────
-  Demonstrates how luna.item and luna.inventory model a merchant's
+  Demonstrates how lurek.item and lurek.inventory model a merchant's
   shop-keep simulation:
 
-    • Item catalog with base prices (luna.item.defineType base_stats)
+    • Item catalog with base prices (lurek.item.defineType base_stats)
     • Merchant stock as StackManager keyed by category
     • Player purse (coin tracking) + purchase bag (inventory container)
     • Group-by-category view of the merchant shelf
@@ -19,19 +19,19 @@
     [R]    Restock the merchant (refills all stacks)
 --]]
 
--- Polyfill: map luna.item and luna.inventory to library modules
-luna.item      = require("library.item")
-luna.inventory = require("library.inventory")
+-- Polyfill: map lurek.item and lurek.inventory to library modules
+lurek.item      = require("library.item")
+lurek.inventory = require("library.inventory")
 
 
 -- ── Item catalog ──────────────────────────────────────────────────────────
-luna.item.clearTypes()
-luna.item.defineType("iron_sword",   { category="weapon",    base_stats={ price=30, dmg=10, weight=3.0 }, base_tags={"weapon","equippable"} })
-luna.item.defineType("steel_sword",  { category="weapon",    base_stats={ price=80, dmg=18, weight=3.5 }, base_tags={"weapon","equippable"} })
-luna.item.defineType("leather_helm", { category="armor",     base_stats={ price=20, def= 3, weight=1.5 }, base_tags={"armor","equippable"} })
-luna.item.defineType("chain_helm",   { category="armor",     base_stats={ price=60, def= 7, weight=3.0 }, base_tags={"armor","equippable"} })
-luna.item.defineType("health_potion",{ category="consumable",base_stats={ price=15, hp =50, weight=0.5 }, base_tags={"consumable"} })
-luna.item.defineType("mana_potion",  { category="consumable",base_stats={ price=20, mp =40, weight=0.5 }, base_tags={"consumable"} })
+lurek.item.clearTypes()
+lurek.item.defineType("iron_sword",   { category="weapon",    base_stats={ price=30, dmg=10, weight=3.0 }, base_tags={"weapon","equippable"} })
+lurek.item.defineType("steel_sword",  { category="weapon",    base_stats={ price=80, dmg=18, weight=3.5 }, base_tags={"weapon","equippable"} })
+lurek.item.defineType("leather_helm", { category="armor",     base_stats={ price=20, def= 3, weight=1.5 }, base_tags={"armor","equippable"} })
+lurek.item.defineType("chain_helm",   { category="armor",     base_stats={ price=60, def= 7, weight=3.0 }, base_tags={"armor","equippable"} })
+lurek.item.defineType("health_potion",{ category="consumable",base_stats={ price=15, hp =50, weight=0.5 }, base_tags={"consumable"} })
+lurek.item.defineType("mana_potion",  { category="consumable",base_stats={ price=20, mp =40, weight=0.5 }, base_tags={"consumable"} })
 
 local SHELF_ITEMS = {
     "iron_sword", "steel_sword",
@@ -40,8 +40,8 @@ local SHELF_ITEMS = {
 }
 
 -- ── Merchant stock as StackManager ────────────────────────────────────────
-local merchant   = luna.item.newStackManager()
-local sales_log  = luna.item.newStackHistory(50)   -- sales ledger
+local merchant   = lurek.item.newStackManager()
+local sales_log  = lurek.item.newStackHistory(50)   -- sales ledger
 
 local function restock()
     for _, type_name in ipairs(SHELF_ITEMS) do
@@ -49,25 +49,25 @@ local function restock()
         -- Create or clear the stack
         local existing = merchant:getStack(stack_name)
         if not existing then
-            merchant:addStack(stack_name, luna.item.newStack(stack_name))
+            merchant:addStack(stack_name, lurek.item.newStack(stack_name))
         else
             existing:clear()
         end
         local s = merchant:getStack(stack_name)
         for i = 1, math.random(2, 5) do
-            s:push(luna.item.newItem(type_name))
+            s:push(lurek.item.newItem(type_name))
         end
     end
 end
 
 -- ── Player state ──────────────────────────────────────────────────────────
 local player_gold = 120
-local player_bag  = luna.inventory.newContainer("bag", "dynamic", 20)
+local player_bag  = lurek.inventory.newContainer("bag", "dynamic", 20)
 player_bag:setWeightLimit(30.0)
 
 -- ── Price lookup helper ───────────────────────────────────────────────────
 local function item_price(type_name)
-    local def = luna.item.getType(type_name)
+    local def = lurek.item.getType(type_name)
     if def and def.base_stats then
         return def.base_stats.price or 0
     end
@@ -94,7 +94,7 @@ local function try_buy(type_name)
     end
 
     -- Check weight room
-    local def = luna.item.getType(type_name)
+    local def = lurek.item.getType(type_name)
     local item_weight = (def and def.base_stats and def.base_stats.weight) or 0
     if player_bag:getCurrentWeight() + item_weight > 30.0 then
         message = "Bag too heavy to carry "..type_name
@@ -107,12 +107,12 @@ local function try_buy(type_name)
     player_gold = player_gold - price
 
     -- Add to inventory container
-    local inv_item = luna.inventory.newItem(it:getType())
+    local inv_item = lurek.inventory.newItem(it:getType())
     inv_item:setWeight(item_weight)
     player_bag:addItem(inv_item)
 
     -- Record sale
-    local temp = luna.item.newStack("tmp")
+    local temp = lurek.item.newStack("tmp")
     temp:push(it)
     sales_log:recordCustom(type_name, "sold_"..type_name, stack:size())
 
@@ -130,7 +130,7 @@ local function auto_buy()
         if s and s:size() > 0 then
             local price = item_price(type_name)
             if price <= player_gold then
-                local it = luna.item.newItem(type_name)
+                local it = lurek.item.newItem(type_name)
                 it:setStat("price", price)
                 table.insert(candidates, it)
                 table.insert(candidate_types, type_name)
@@ -145,21 +145,21 @@ local function auto_buy()
     end
 
     -- findNOfStat returns 0-based indices of the top-1 by price
-    local best = luna.item.findNOfStat(candidates, "price", 1)
+    local best = lurek.item.findNOfStat(candidates, "price", 1)
     if best and best[1] then
         local chosen = candidate_types[best[1] + 1]
         try_buy(chosen)
     end
 end
 
--- ── luna.init ─────────────────────────────────────────────────────────────
-function luna.init()
+-- ── lurek.init ─────────────────────────────────────────────────────────────
+function lurek.init()
     restock()
-    luna.window.setTitle("Merchant Demo — item + inventory shop system")
+    lurek.window.setTitle("Merchant Demo — item + inventory shop system")
 end
 
--- ── luna.keypressed ───────────────────────────────────────────────────────
-function luna.keypressed(key)
+-- ── lurek.keypressed ───────────────────────────────────────────────────────
+function lurek.keypressed(key)
     local num = tonumber(key)
     if num and num >= 1 and num <= #SHELF_ITEMS then
         try_buy(SHELF_ITEMS[num])
@@ -172,34 +172,34 @@ function luna.keypressed(key)
     end
 end
 
--- ── luna.process ───────────────────────────────────────────────────────────
-function luna.process(dt)
+-- ── lurek.process ───────────────────────────────────────────────────────────
+function lurek.process(dt)
     if message_timer > 0 then
         message_timer = message_timer - dt
     end
 end
 
--- ── luna.render ─────────────────────────────────────────────────────────────
+-- ── lurek.render ─────────────────────────────────────────────────────────────
 local function panel(x, y, w, h, title)
-    luna.gfx.setColor(0.10, 0.08, 0.20, 0.92)
-    luna.gfx.rectangle("fill", x, y, w, h)
-    luna.gfx.setColor(0.55, 0.45, 0.80, 1)
-    luna.gfx.rectangle("line", x, y, w, h)
-    luna.gfx.setColor(0.95, 0.90, 1.00, 1)
-    luna.gfx.print(title, x + 8, y + 6)
+    lurek.gfx.setColor(0.10, 0.08, 0.20, 0.92)
+    lurek.gfx.rectangle("fill", x, y, w, h)
+    lurek.gfx.setColor(0.55, 0.45, 0.80, 1)
+    lurek.gfx.rectangle("line", x, y, w, h)
+    lurek.gfx.setColor(0.95, 0.90, 1.00, 1)
+    lurek.gfx.print(title, x + 8, y + 6)
 end
 
-function luna.render()
+function lurek.render()
     -- Background
-    luna.gfx.setColor(0.06, 0.04, 0.12, 1)
-    luna.gfx.rectangle("fill", 0, 0, 800, 600)
+    lurek.gfx.setColor(0.06, 0.04, 0.12, 1)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
 
     -- ── Gold + weight ─────────────────────────────────────────────────────
     panel(20, 20, 220, 80, "PLAYER")
-    luna.gfx.setColor(1.0, 0.85, 0.2, 1)
-    luna.gfx.print(string.format("Gold: %dg", player_gold), 30, 48)
-    luna.gfx.setColor(0.6, 0.8, 0.6, 1)
-    luna.gfx.print(string.format("Bag: %.1f / 30.0 kg", player_bag:getCurrentWeight()), 30, 68)
+    lurek.gfx.setColor(1.0, 0.85, 0.2, 1)
+    lurek.gfx.print(string.format("Gold: %dg", player_gold), 30, 48)
+    lurek.gfx.setColor(0.6, 0.8, 0.6, 1)
+    lurek.gfx.print(string.format("Bag: %.1f / 30.0 kg", player_bag:getCurrentWeight()), 30, 68)
 
     -- ── Shelf ─────────────────────────────────────────────────────────────
     panel(260, 20, 520, 220, "MERCHANT SHELF  [1-6] to buy")
@@ -208,7 +208,7 @@ function luna.render()
         local stack = merchant:getStack("shelf_"..type_name)
         local qty   = stack and stack:size() or 0
         local price = item_price(type_name)
-        local def   = luna.item.getType(type_name)
+        local def   = lurek.item.getType(type_name)
         local stats = ""
         if def and def.base_stats then
             for k, v in pairs(def.base_stats) do
@@ -218,11 +218,11 @@ function luna.render()
             end
         end
         if qty > 0 then
-            luna.gfx.setColor(0.9, 0.85, 0.5, 1)
+            lurek.gfx.setColor(0.9, 0.85, 0.5, 1)
         else
-            luna.gfx.setColor(0.4, 0.4, 0.4, 1)
+            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
         end
-        luna.gfx.print(string.format("[%d] %-16s  %3dg  x%d   %s", i, type_name, price, qty, stats), 270, sy)
+        lurek.gfx.print(string.format("[%d] %-16s  %3dg  x%d   %s", i, type_name, price, qty, stats), 270, sy)
         sy = sy + 28
     end
 
@@ -235,16 +235,16 @@ function luna.render()
         if not slot:isEmpty() and shown < 6 then
             local st = slot:getStack()
             if st then
-                luna.gfx.setColor(0.85, 0.85, 0.85, 1)
-                luna.gfx.print("• "..st:getItem():getType(), 30, bag_y)
+                lurek.gfx.setColor(0.85, 0.85, 0.85, 1)
+                lurek.gfx.print("• "..st:getItem():getType(), 30, bag_y)
                 bag_y = bag_y + 20
                 shown = shown + 1
             end
         end
     end
     if shown == 0 then
-        luna.gfx.setColor(0.4, 0.4, 0.4, 1)
-        luna.gfx.print("(empty)", 30, 146)
+        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+        lurek.gfx.print("(empty)", 30, 146)
     end
 
     -- ── Sales ledger ──────────────────────────────────────────────────────
@@ -255,21 +255,21 @@ function luna.render()
     for i = start, #entries do
         local e = entries[i]
         if e then
-            luna.gfx.setColor(0.7, 0.9, 0.7, 1)
-            luna.gfx.print(string.format("#%d  sold %s  (remaining: %d)", i, e.label, e.size_after), 30, log_y)
+            lurek.gfx.setColor(0.7, 0.9, 0.7, 1)
+            lurek.gfx.print(string.format("#%d  sold %s  (remaining: %d)", i, e.label, e.size_after), 30, log_y)
             log_y = log_y + 24
         end
     end
 
     -- ── Controls hint ─────────────────────────────────────────────────────
     panel(20, 496, 760, 40, "")
-    luna.gfx.setColor(0.6, 0.6, 0.8, 1)
-    luna.gfx.print("[1-6] buy item   [A] auto-buy best value   [R] restock merchant", 30, 506)
+    lurek.gfx.setColor(0.6, 0.6, 0.8, 1)
+    lurek.gfx.print("[1-6] buy item   [A] auto-buy best value   [R] restock merchant", 30, 506)
 
     -- ── Flash message ─────────────────────────────────────────────────────
     if message_timer > 0 then
         local alpha = math.min(1.0, message_timer / 0.4)
-        luna.gfx.setColor(1.0, 0.9, 0.3, alpha)
-        luna.gfx.print(message, 260, 256)
+        lurek.gfx.setColor(1.0, 0.9, 0.3, alpha)
+        lurek.gfx.print(message, 260, 256)
     end
 end

@@ -3,13 +3,13 @@
 //! Wraps `fastrand::Rng` with engine-compatible API including
 //! seeding, state save/restore, and normal distribution sampling.
 //!
-//! This module is part of Luna2D's `math` subsystem and provides the implementation
+//! This module is part of Lurek2D's `math` subsystem and provides the implementation
 //! details for random-related operations and data management.
 //! Key types exported from this module: `RandomGenerator`.
 //! Primary functions: `new()`, `with_seed()`, `random()`, `random_int()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use fastrand::Rng;
 

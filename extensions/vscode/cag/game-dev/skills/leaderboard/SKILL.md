@@ -5,7 +5,7 @@ High score table with persistence, sorted display, new high score highlight, and
 ## Key Concepts
 
 - **Score table**: Array of entries with name, score, and date. Sorted descending by score.
-- **Persistence**: Save to file via `luna.data.encodeToml` / `luna.fs.write`.
+- **Persistence**: Save to file via `lurek.data.encodeToml` / `lurek.fs.write`.
 - **Max entries**: Keep top N scores (e.g., 10). Drop lowest when inserting a new high score.
 - **New high score detection**: After game over, check if the score qualifies. Highlight the new entry.
 - **Reset**: Clear the leaderboard via a debug command or settings menu.
@@ -18,17 +18,17 @@ local leaderboard = {}
 
 local function load_leaderboard()
     local path = "saves/leaderboard.toml"
-    if luna.fs.exists(path) then
-        local content = luna.fs.read(path)
-        local data = luna.data.decodeToml(content)
+    if lurek.fs.exists(path) then
+        local content = lurek.fs.read(path)
+        local data = lurek.data.decodeToml(content)
         leaderboard = data.scores or {}
     end
 end
 
 local function save_leaderboard()
     local data = { scores = leaderboard }
-    local toml = luna.data.encodeToml(data)
-    luna.fs.write("saves/leaderboard.toml", toml)
+    local toml = lurek.data.encodeToml(data)
+    lurek.fs.write("saves/leaderboard.toml", toml)
 end
 ```
 
@@ -70,29 +70,29 @@ end
 local highlight_rank = nil
 
 local function draw_leaderboard(ox, oy)
-    luna.gfx.setColor(0, 0, 0, 0.9)
-    luna.gfx.rectangle("fill", ox, oy, 400, 40 + #leaderboard * 28)
-    luna.gfx.setColor(1, 1, 0.5, 1)
-    luna.gfx.print("HIGH SCORES", ox + 140, oy + 8)
+    lurek.gfx.setColor(0, 0, 0, 0.9)
+    lurek.gfx.rectangle("fill", ox, oy, 400, 40 + #leaderboard * 28)
+    lurek.gfx.setColor(1, 1, 0.5, 1)
+    lurek.gfx.print("HIGH SCORES", ox + 140, oy + 8)
 
     for i, entry in ipairs(leaderboard) do
         local y = oy + 36 + (i - 1) * 28
         -- Highlight new score
         if i == highlight_rank then
-            luna.gfx.setColor(1, 1, 0, 1)
+            lurek.gfx.setColor(1, 1, 0, 1)
         else
-            luna.gfx.setColor(0.9, 0.9, 0.9, 1)
+            lurek.gfx.setColor(0.9, 0.9, 0.9, 1)
         end
 
         local rank = string.format("%2d.", i)
         local name = entry.name
         local score_str = tostring(entry.score)
-        luna.gfx.print(rank, ox + 20, y)
-        luna.gfx.print(name, ox + 60, y)
-        luna.gfx.print(score_str, ox + 280, y)
-        luna.gfx.print(entry.date or "", ox + 340, y)
+        lurek.gfx.print(rank, ox + 20, y)
+        lurek.gfx.print(name, ox + 60, y)
+        lurek.gfx.print(score_str, ox + 280, y)
+        lurek.gfx.print(entry.date or "", ox + 340, y)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 
@@ -113,13 +113,13 @@ local function draw_leaderboard_animated(ox, oy)
         local y = oy + 36 + (i - 1) * 28
         if i == highlight_rank then
             local pulse = 0.5 + 0.5 * math.sin(flash_timer * 6)
-            luna.gfx.setColor(1, 1, pulse, 1)
+            lurek.gfx.setColor(1, 1, pulse, 1)
         else
-            luna.gfx.setColor(0.9, 0.9, 0.9, 1)
+            lurek.gfx.setColor(0.9, 0.9, 0.9, 1)
         end
-        luna.gfx.print(string.format("%2d. %-12s %8d", i, entry.name, entry.score), ox + 20, y)
+        lurek.gfx.print(string.format("%2d. %-12s %8d", i, entry.name, entry.score), ox + 20, y)
     end
-    luna.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.setColor(1, 1, 1, 1)
 end
 ```
 

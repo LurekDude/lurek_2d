@@ -47,11 +47,11 @@ let plans: Vec<Option<Plan>> = agents
     .collect();
 ```
 
-**Alternative**: Use Lua worker threads via `luna.thread.new()`:
+**Alternative**: Use Lua worker threads via `lurek.thread.new()`:
 ```lua
 -- Game-script level parallelism
 for _, unit in ipairs(units) do
-    unit.plan_thread = luna.thread.new(function(state, goals)
+    unit.plan_thread = lurek.thread.new(function(state, goals)
         return goap.plan(state, goals, 10)
     end, unit.world_state, unit.goals)
 end

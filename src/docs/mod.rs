@@ -1,7 +1,7 @@
-//! API documentation catalog, quality reporting, and schema validation for Luna2D.
+//! API documentation catalog, quality reporting, and schema validation for Lurek2D.
 //!
 //! This module provides a structured way to describe, store, and validate
-//! documentation for the `luna.*` Lua API surface.  Tools and tests can
+//! documentation for the `lurek.*` Lua API surface.  Tools and tests can
 //! populate a [`Catalog`] at runtime and use [`QualityReport`] to surface
 //! incomplete or missing entries.
 //!

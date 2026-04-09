@@ -1,9 +1,9 @@
 ---
 name: gpu-programming
-description: "Load this skill when working with the Luna2D GPU rendering pipeline: wgpu device/surface setup, DrawCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
+description: "Load this skill when working with the Lurek2D GPU rendering pipeline: wgpu device/surface setup, DrawCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
 ---
 
-# GPU Programming — Luna2D
+# GPU Programming — Lurek2D
 
 ## Load When
 
@@ -37,16 +37,16 @@ winit Window (Arc<Window>)
                           └── GpuRenderer::render_frame()
 ```
 
-Luna2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes through `GpuRenderer` in `src/graphics/gpu_renderer.rs`.
+Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes through `GpuRenderer` in `src/graphics/gpu_renderer.rs`.
 
 ## DrawCommand Queue Lifecycle
 
 ```
 lua.draw() callback:
-  → Lua calls luna.gfx.drawImage(img, x, y)
+  → Lua calls lurek.gfx.drawImage(img, x, y)
   → lua_api pushes DrawCommand::DrawImage { ... } into SharedState::draw_commands
 
-After luna.draw() returns:
+After lurek.draw() returns:
   → GpuRenderer::render_frame(draw_commands) processes the queue
   → Each variant maps to wgpu render pass calls
   → swapchain present
@@ -77,7 +77,7 @@ Two WGSL shaders are embedded in the binary:
 
 ### Custom User Shaders
 
-Users provide WGSL fragment (or vertex+fragment) source via `luna.gfx.newShader`:
+Users provide WGSL fragment (or vertex+fragment) source via `lurek.gfx.newShader`:
 
 ```
 User WGSL source
@@ -96,7 +96,7 @@ User WGSL source
 - Access screen size via `luna_ScreenSize`, time via `luna_Time`
 - Return `vec4<f32>` (RGBA) from fragment shader
 - Do not declare bindings at group 0 (reserved for engine uniforms)
-- User uniforms go at group 2+; set via `luna.gfx.sendShaderUniform(shader, name, value)`
+- User uniforms go at group 2+; set via `lurek.gfx.sendShaderUniform(shader, name, value)`
 
 ### Validation Errors
 
@@ -105,7 +105,7 @@ Enable the wgpu validation layer during development:
 ```powershell
 $env:WGPU_BACKEND = "vulkan"   # force backend (optional)
 $env:RUST_LOG = "wgpu_core=warn,wgpu_hal=warn"
-cargo run -- demos/hello_world
+cargo run -- content/demos/hello_world
 ```
 
 Common wgpu errors:
@@ -137,11 +137,11 @@ state.borrow_mut().textures.remove(texture_key);
 
 ```lua
 -- Lua usage:
-local c = luna.gfx.newCanvas(512, 512)
-luna.gfx.setCanvas(c)
+local c = lurek.gfx.newCanvas(512, 512)
+lurek.gfx.setCanvas(c)
 -- ... draw calls render to canvas texture ...
-luna.gfx.setCanvas()               -- back to screen
-luna.gfx.draw(c, 0, 0)
+lurek.gfx.setCanvas()               -- back to screen
+lurek.gfx.draw(c, 0, 0)
 ```
 
 ```

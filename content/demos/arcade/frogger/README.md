@@ -5,9 +5,9 @@ to reach the lily pads at the top.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — frog, vehicles, logs, lily pads
-- `luna.keypressed()` — hop-based grid movement
-- `luna.gfx.print()` — HUD score, lives, and level
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — frog, vehicles, logs, lily pads
+- `lurek.keypressed()` — hop-based grid movement
+- `lurek.gfx.print()` — HUD score, lives, and level
 - Multiple scrolling lane types: road (avoid obstacles) and river (ride platforms)
 
 ## Controls

@@ -88,7 +88,7 @@ end
 ## Input Handling
 
 ```lua
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if not dialog.active then return end
     local node = current_node()
     if key == "return" or key == "space" then
@@ -119,25 +119,25 @@ local function draw_dialog()
     local sw, sh = 800, 600
     local bx, by, bw, bh = 20, sh - 140, sw - 40, 120
 
-    luna.gfx.setColor(0, 0, 0, 0.85)
-    luna.gfx.rectangle("fill", bx, by, bw, bh)
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.rectangle("line", bx, by, bw, bh)
+    lurek.gfx.setColor(0, 0, 0, 0.85)
+    lurek.gfx.rectangle("fill", bx, by, bw, bh)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.rectangle("line", bx, by, bw, bh)
 
     -- Speaker name
     if node.speaker then
-        luna.gfx.print(node.speaker, bx + 10, by + 6)
+        lurek.gfx.print(node.speaker, bx + 10, by + 6)
     end
 
     -- Typewriter text
     local visible = node.text:sub(1, dialog.char_index)
-    luna.gfx.print(visible, bx + 10, by + 26)
+    lurek.gfx.print(visible, bx + 10, by + 26)
 
     -- Choices
     if node.choices and dialog.char_index >= #node.text then
         for i, c in ipairs(node.choices) do
             local prefix = (i == (dialog.choice_index or 1)) and "> " or "  "
-            luna.gfx.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
+            lurek.gfx.print(prefix .. c.text, bx + 20, by + 50 + (i - 1) * 18)
         end
     end
 end

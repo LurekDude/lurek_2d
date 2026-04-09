@@ -1,10 +1,10 @@
-//! ENet host wrapper for the Luna2D networking subsystem.
+//! ENet host wrapper for the Lurek2D networking subsystem.
 //!
 //! [`NetworkHost`] owns a `rusty_enet::Host<UdpSocket>` and provides a safe
 //! Rust API that the Lua binding layers (`network_api`, `net_api`) consume.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::net::{SocketAddr, UdpSocket};
 use std::time::Duration;
@@ -16,7 +16,7 @@ use super::error::NetworkError;
 use crate::engine::log_messages::{NW01_HOST_BIND, NW04_NET_ERROR};
 use crate::log_msg;
 
-/// Wraps a `rusty_enet::Host<UdpSocket>` with Luna2D-specific defaults and
+/// Wraps a `rusty_enet::Host<UdpSocket>` with Lurek2D-specific defaults and
 /// limit enforcement.
 ///
 /// Created once per logical network endpoint (server or client). The caller

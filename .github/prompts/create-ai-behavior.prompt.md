@@ -1,5 +1,5 @@
 ---
-description: "Create a new AI behavior for Luna2D game entities. Use when implementing FSM states, behavior tree nodes, steering behaviors, or GOAP actions. Produces working Rust AI code with Lua bindings and tests."
+description: "Create a new AI behavior for Lurek2D game entities. Use when implementing FSM states, behavior tree nodes, steering behaviors, or GOAP actions. Produces working Rust AI code with Lua bindings and tests."
 ---
 
 # Create AI Behavior
@@ -31,7 +31,7 @@ description: "Create a new AI behavior for Luna2D game entities. Use when implem
    - Add to `src/lua_api/ai_api.rs`
    - Follow `register()` pattern with `Rc<RefCell<SharedState>>`
    - Return `LuaResult<T>` from all Lua-callable functions
-   - Register under `luna.ai.*` namespace
+   - Register under `lurek.ai.*` namespace
 
 4. **Write tests**
    - Add tests to `tests/rust/game/ai_tests.rs`
@@ -47,6 +47,6 @@ description: "Create a new AI behavior for Luna2D game entities. Use when implem
 ## Acceptance Criteria
 
 - [ ] New AI type compiles and passes tests
-- [ ] Lua bindings work under `luna.ai.*`
+- [ ] Lua bindings work under `lurek.ai.*`
 - [ ] Doc comments on all public items
 - [ ] No GPU, audio, or window dependencies in `src/ai/`

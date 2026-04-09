@@ -1,7 +1,7 @@
--- Boulder Dash — C-64 Classic (Luna2D demo)
+-- Boulder Dash — C-64 Classic (Lurek2D demo)
 -- Dig through caves, collect diamonds, and escape before time runs out.
 -- Avoid boulders that fall if their support is dug away.
--- Run with: cargo run -- demos/retro/boulder_dash
+-- Run with: cargo run -- content/demos/retro/boulder_dash
 
 -- ── Constants ────────────────────────────────────────────────────────────
 
@@ -78,8 +78,8 @@ end
 
 -- ── Load ─────────────────────────────────────────────────────────────────
 
-function luna.init()
-    luna.gfx.setBackgroundColor(0.04, 0.03, 0.01)
+function lurek.init()
+    lurek.gfx.setBackgroundColor(0.04, 0.03, 0.01)
     score = 0; lives = 3; level = 1
     gen_level()
 end
@@ -88,7 +88,7 @@ end
 
 local move_cd = 0
 
-function luna.process(dt)
+function lurek.process(dt)
     if game_state ~= "playing" then return end
     time_left = time_left - dt
     if time_left <= 0 then
@@ -101,10 +101,10 @@ function luna.process(dt)
 
     -- Movement
     local dx, dy = 0, 0
-    if luna.input.isKeyDown("left") or luna.input.isKeyDown("a")  then dx = -1 end
-    if luna.input.isKeyDown("right") or luna.input.isKeyDown("d") then dx =  1 end
-    if luna.input.isKeyDown("up") or luna.input.isKeyDown("w")    then dy = -1 end
-    if luna.input.isKeyDown("down") or luna.input.isKeyDown("s")  then dy =  1 end
+    if lurek.input.isKeyDown("left") or lurek.input.isKeyDown("a")  then dx = -1 end
+    if lurek.input.isKeyDown("right") or lurek.input.isKeyDown("d") then dx =  1 end
+    if lurek.input.isKeyDown("up") or lurek.input.isKeyDown("w")    then dy = -1 end
+    if lurek.input.isKeyDown("down") or lurek.input.isKeyDown("s")  then dy =  1 end
 
     if (dx ~= 0 or dy ~= 0) and move_cd <= 0 then
         move_cd = 0.14
@@ -162,19 +162,19 @@ end
 
 local function cell_px(cx, cy) return cx * CELL, cy * CELL + 40 end
 
-function luna.render()
+function lurek.render()
     -- HUD
-    luna.gfx.setColor(0, 0, 0)
-    luna.gfx.rectangle("fill", 0, 0, W, 40)
-    luna.gfx.setColor(0.9, 0.7, 0.2)
-    luna.gfx.print("BOULDER DASH", 8, 6, 1.6)
-    luna.gfx.setColor(0.3, 0.8, 1)
-    luna.gfx.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
-    luna.gfx.setColor(1, 0.4, 0.4)
+    lurek.gfx.setColor(0, 0, 0)
+    lurek.gfx.rectangle("fill", 0, 0, W, 40)
+    lurek.gfx.setColor(0.9, 0.7, 0.2)
+    lurek.gfx.print("BOULDER DASH", 8, 6, 1.6)
+    lurek.gfx.setColor(0.3, 0.8, 1)
+    lurek.gfx.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
+    lurek.gfx.setColor(1, 0.4, 0.4)
     local tsec = math.max(0, math.floor(time_left))
-    luna.gfx.print("Time: " .. tsec, W - 120, 8, 1.5)
-    luna.gfx.setColor(0.7, 0.9, 0.7)
-    luna.gfx.print("Score: " .. score, W/2 + 80, 8, 1.5)
+    lurek.gfx.print("Time: " .. tsec, W - 120, 8, 1.5)
+    lurek.gfx.setColor(0.7, 0.9, 0.7)
+    lurek.gfx.print("Score: " .. score, W/2 + 80, 8, 1.5)
 
     -- Map cells
     for y = 0, MAP_H - 1 do
@@ -183,20 +183,20 @@ function luna.render()
             if c ~= EMPTY then
                 local col = COLORS[c] or {1, 0, 1}
                 local px, py = cell_px(x, y)
-                luna.gfx.setColor(col[1], col[2], col[3])
+                lurek.gfx.setColor(col[1], col[2], col[3])
                 if c == BOULDER then
-                    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+                    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
                 elseif c == DIAMOND then
                     -- Diamond shape
-                    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
-                    luna.gfx.setColor(0.7, 1, 1)
-                    luna.gfx.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
+                    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
+                    lurek.gfx.setColor(0.7, 1, 1)
+                    lurek.gfx.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
                 elseif c == EXIT then
                     local open = diamonds_got >= diamonds_needed
-                    luna.gfx.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
-                    luna.gfx.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
+                    lurek.gfx.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
+                    lurek.gfx.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
                 else
-                    luna.gfx.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                    lurek.gfx.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
                 end
             end
         end
@@ -204,28 +204,28 @@ function luna.render()
 
     -- Player
     local px, py = cell_px(player_x, player_y)
-    luna.gfx.setColor(1, 0.9, 0.3)
-    luna.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
-    luna.gfx.setColor(0.2, 0.1, 0)
-    luna.gfx.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
-    luna.gfx.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
+    lurek.gfx.setColor(1, 0.9, 0.3)
+    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+    lurek.gfx.setColor(0.2, 0.1, 0)
+    lurek.gfx.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
+    lurek.gfx.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
 
     -- Game-over overlay
     if game_state == "gameover" then
-        luna.gfx.setColor(0, 0, 0, 0.75)
-        luna.gfx.rectangle("fill", 0, 0, W, H)
-        luna.gfx.setColor(1, 0.3, 0.1)
-        luna.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        luna.gfx.setColor(1, 1, 1)
-        luna.gfx.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
-        luna.gfx.setColor(0.6, 0.6, 0.6)
-        luna.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.gfx.setColor(0, 0, 0, 0.75)
+        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.gfx.setColor(1, 0.3, 0.1)
+        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.gfx.setColor(1, 1, 1)
+        lurek.gfx.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
+        lurek.gfx.setColor(0.6, 0.6, 0.6)
+        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 
 -- ── Input ────────────────────────────────────────────────────────────────
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
-    if key == "r" then luna.signal.restart() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
+    if key == "r" then lurek.signal.restart() end
 end

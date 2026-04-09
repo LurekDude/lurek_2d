@@ -4,7 +4,7 @@
 |----------------|------------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | `luna.light`                                         |
+| **Lua API**    | `lurek.light`                                         |
 | **Source**      | `src/light/`                                         |
 | **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The `light` module provides a CPU-side 2D dynamic lighting data model for Luna2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
+The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
 
 ## Source Files
 
@@ -33,6 +33,6 @@ The `light` module provides a CPU-side 2D dynamic lighting data model for Luna2D
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/light.md`](../../specs/light.md)
+→ [`docs/specs/light.md`](../../docs/specs/light.md)
 
-_Update both this file **and** `specs/light.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/light.md` whenever source files, public types, or Lua bindings change._

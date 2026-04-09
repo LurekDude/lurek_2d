@@ -15,7 +15,7 @@
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaLayeredImage, LuaCompressedImageData from lua_api/image_api.rs → src/image/
 - [ ] **R-02** — Dependency direction: image_data: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 133, line 166, line 213, line 226, line 227
-- [ ] **W-02** — API surface coverage: Functions absent from examples/image.lua: newLayeredImage, saveImage, loadImage, loadLayered
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/image.lua: newLayeredImage, saveImage, loadImage, loadLayered
 
 ### 🟡 Warnings — Should Fix
 
@@ -113,9 +113,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/image.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/image.lua: newLayeredImage, saveImage, loadImage, loadLayered |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/image.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ✅ PASS | content/examples/image.lua present |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/image.lua: newLayeredImage, saveImage, loadImage, loadLayered |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/image.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | All 3 functions consistent across spec and example |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Image-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
@@ -144,7 +144,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
 

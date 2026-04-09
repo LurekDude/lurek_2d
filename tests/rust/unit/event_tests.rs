@@ -1,6 +1,6 @@
 //! Integration tests for the event queue and signal modules.
 
-use luna2d::event::{Event, EventArg, EventQueue, Signal};
+use lurek2d::event::{Event, EventArg, EventQueue, Signal};
 
 #[test]
 fn event_queue_push_poll() {
@@ -182,7 +182,7 @@ fn event_wait_drains_in_order() {
 
 #[test]
 fn event_restart_requested_defaults_false() {
-    use luna2d::lua_api::SharedState;
+    use lurek2d::lua_api::SharedState;
     use std::path::PathBuf;
     let state = SharedState::new(800, 600, "Test", PathBuf::from("."));
     assert!(!state.restart_requested);
@@ -190,7 +190,7 @@ fn event_restart_requested_defaults_false() {
 
 #[test]
 fn event_restart_requested_can_be_set() {
-    use luna2d::lua_api::SharedState;
+    use lurek2d::lua_api::SharedState;
     use std::path::PathBuf;
     let mut state = SharedState::new(800, 600, "Test", PathBuf::from("."));
     state.restart_requested = true;

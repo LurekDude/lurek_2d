@@ -40,21 +40,21 @@ Audio playback and mixing via rodio: sound loading, multi-bus mixing, DSP effect
   - `audio/dsp` — effects, filters
   - `audio/spatial` — 3D panning
   - `audio/midi` — MIDI synthesis (currently disabled)
-- **Sound module confusion**: `src/sound/` exists as a separate module for raw PCM/SoundData. This should be merged into `audio` — having both `luna.audio` and `luna.sound` is confusing for users.
+- **Sound module confusion**: `src/sound/` exists as a separate module for raw PCM/SoundData. This should be merged into `audio` — having both `lurek.audio` and `lurek.sound` is confusing for users.
 - **MIDI is disabled**: Commented out / gated. Either fully implement or remove to reduce dead code.
 
 ## Suggestions
 
-1. **Merge `sound` into `audio`**: SoundData is conceptually part of the audio system. Having `luna.sound.newSound()` vs `luna.audio.newSource()` is confusing. Merge both under `luna.audio`.
-2. **Add sound pooling**: `luna.audio.newPool(sound, maxInstances)` — limits concurrent instances, reuses sources. Extremely common need for rapid-fire SFX.
-3. **Add crossfade**: `luna.audio.crossfade(from, to, duration)` — one-liner for music transitions.
+1. **Merge `sound` into `audio`**: SoundData is conceptually part of the audio system. Having `lurek.sound.newSound()` vs `lurek.audio.newSource()` is confusing. Merge both under `lurek.audio`.
+2. **Add sound pooling**: `lurek.audio.newPool(sound, maxInstances)` — limits concurrent instances, reuses sources. Extremely common need for rapid-fire SFX.
+3. **Add crossfade**: `lurek.audio.crossfade(from, to, duration)` — one-liner for music transitions.
 4. **Add random pitch variation**: `source:setRandomPitch(min, max)` — plays back with random pitch within range each time. Ubiquitous in game audio.
 5. **Add FFT/spectrum**: `source:getSpectrum(bands)` → returns frequency magnitudes. Unlocks music visualization and rhythm games entirely.
 6. **Add audio ducking**: `bus:setDuckTarget(otherBus, duckVolume, fadeTime)` — automatic duck when bus has active sources.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | FMOD (ref) |
+| Feature | Lurek2D | Engine A | Engine B | FMOD (ref) |
 |---|---|---|---|---|
 | Multi-bus mixing | ✅ | ❌ (manual) | ❌ | ✅ |
 | DSP effects | ✅ (9 types) | ✅ (QueueableSource) | ❌ | ✅ |

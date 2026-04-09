@@ -1,14 +1,13 @@
 -- examples/spine.lua
--- luna.spine — Hierarchical bone skeleton for 2D character animation rigs.
+-- lurek.spine — Hierarchical bone skeleton for 2D character animation rigs.
 -- Build skeletons at runtime, attach slots, query world transforms, and
 -- integrate with the graphics pipeline for frame-by-frame bone-driven rendering.
--- All luna.spine API methods demonstrated with code and comments.
 
 -- ── Creating a Skeleton ───────────────────────────────────────────────────────
 
--- luna.spine.newSkeleton(name) → Skeleton
+local skeleton = lurek.spine.newSkeleton(name)
 -- name: identifier string for this skeleton
-local skel = luna.spine.newSkeleton("character")
+local skel = lurek.spine.newSkeleton("character")
 
 -- ── Adding Bones ──────────────────────────────────────────────────────────────
 
@@ -80,25 +79,25 @@ skel:updateWorldTransforms()
 --[[
 -- Pre-defined sub-image quads for each body part in the spritesheet
 local sprites = {}   -- sprites["head"], sprites["torso"], sprites["arm"], etc.
-local sheet         -- luna.gfx.newImage("characters.png")
+local sheet         -- lurek.gfx.newImage("characters.png")
 
 -- Animate a bone angle over time
 local angle = 0
-function luna.process(dt)
+function lurek.process(dt)
     angle = angle + dt * 1.5
     -- oscillate the left arm bone
     -- (bone data is stored inside the Rust skeleton; set via opts then update)
     skel:updateWorldTransforms()
 end
 
-function luna.render()
+function lurek.render()
     -- Draw each slot's sprite at its bone's world transform
     local n = skel:boneCount()
     for i = 1, n do
         local w = skel:getBoneWorld(i)
         if w then
-            -- local quad = sprites[attachment_at_slot(i)]
-            -- luna.gfx.draw(sheet, quad, w.x, w.y, w.rotation, w.scale_x, w.scale_y)
+local quad = sprites[attachment_at_slot(i)]
+lurek.gfx.draw(sheet, quad, w.x, w.y, w.rotation, w.scale_x, w.scale_y)
         end
     end
 end

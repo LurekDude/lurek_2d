@@ -5,7 +5,7 @@
 | **Tier** | Tier 3 — Lunasome (pure Lua, no Rust dependencies) |
 | **Source** | `library/combat/init.lua` |
 | **Lua Tests** | `tests/lua/library/test_library_combat.lua` |
-| **Depends on** | `luna.*` public API only |
+| **Depends on** | `lurek.*` public API only |
 
 ## Summary
 

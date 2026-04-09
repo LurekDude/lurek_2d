@@ -4,19 +4,19 @@ A marine fishing simulation where you cast a line, wait for a bite, and reel in 
 
 ## What It Demonstrates
 
-- `luna.keyboard.isDown()` — movement, cast hold, and reel up/down input
-- `luna.keyboard.wasPressed()` — cast release and bait cycling
-- `luna.gfx.setColor()` / `luna.gfx.rectangle()` — underwater scene, tension bar, and HUD
-- `luna.gfx.circle()` — fish sprites and bobber rendering
-- `luna.time.getTime()` — sinusoidal fish-pull oscillation during the reel phase
-- `luna.mouse.getPosition()` — used indirectly to track cast direction
+- `lurek.keyboard.isDown()` — movement, cast hold, and reel up/down input
+- `lurek.keyboard.wasPressed()` — cast release and bait cycling
+- `lurek.gfx.setColor()` / `lurek.gfx.rectangle()` — underwater scene, tension bar, and HUD
+- `lurek.gfx.circle()` — fish sprites and bobber rendering
+- `lurek.time.getTime()` — sinusoidal fish-pull oscillation during the reel phase
+- `lurek.mouse.getPosition()` — used indirectly to track cast direction
 - Boid-lite fish movement — independent fish entities with random velocity changes
 - Depth-gated bite logic — fish only bite when the lure is within their depth range and matches the active bait
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/fishing
+cargo run -- content/demos/fishing
 ```
 
 ## Controls
@@ -36,4 +36,4 @@ cargo run -- demos/fishing
 - Tension must be kept inside `[tensionMin, tensionMax]`; if it breaks the bounds before `reelProgress` reaches 100, the fish escapes
 - Fish swim in a pool of up to 20 entities; they wander with random velocity kicks and are attracted toward the lure when bait matches
 - Day length is 120 seconds; unsold catches are tallied and cleared at midnight
-- Wave animation on the water surface uses a `waveOffset` driven by `luna.time.getTime()`
+- Wave animation on the water surface uses a `waveOffset` driven by `lurek.time.getTime()`

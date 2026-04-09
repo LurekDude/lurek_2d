@@ -1,9 +1,9 @@
 ---
 name: error-handling
-description: "Load this skill when designing or implementing error handling in Luna2D: Result types, EngineError variants, Lua error propagation, or panic prevention. Skip it for general Rust coding or test writing."
+description: "Load this skill when designing or implementing error handling in Lurek2D: Result types, EngineError variants, Lua error propagation, or panic prevention. Skip it for general Rust coding or test writing."
 ---
 
-# Error Handling — Luna2D Engine
+# Error Handling — Lurek2D Engine
 
 ## Load When
 

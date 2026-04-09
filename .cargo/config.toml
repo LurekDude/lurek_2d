@@ -1,4 +1,4 @@
-# Luna2D Cargo configuration
+# Lurek2D Cargo configuration
 # Redirect all build outputs to build/debug and build/release
 # instead of the default target/debug and target/release.
 

@@ -36,15 +36,15 @@ Binary data manipulation: create, read, write byte buffers with typed access. Co
 
 ## Suggestions
 
-1. **Rename to `buffer` or `binary`**: More descriptive than "data." `luna.buffer.new(1024)` reads better than `luna.data.new(1024)`.
-2. **Add MessagePack**: `luna.data.toMsgPack(table)` / `luna.data.fromMsgPack(bytes)` — efficient binary serialization for networking and save files.
+1. **Rename to `buffer` or `binary`**: More descriptive than "data." `lurek.buffer.new(1024)` reads better than `lurek.data.new(1024)`.
+2. **Add MessagePack**: `lurek.data.toMsgPack(table)` / `lurek.data.fromMsgPack(bytes)` — efficient binary serialization for networking and save files.
 3. **Add bit operations**: `buffer:setBit(byte, bit)` / `buffer:getBit(byte, bit)` / `buffer:readBits(offset, count)` — common for compact data formats.
 4. **Clarify boundary with compute**: Document that `data` is for I/O-oriented binary manipulation, `compute` is for mathematical operations on dense arrays.
-5. **Add ring buffer**: `luna.data.newRingBuffer(capacity)` — useful for streaming, network buffers, history tracking.
+5. **Add ring buffer**: `lurek.data.newRingBuffer(capacity)` — useful for streaming, network buffers, history tracking.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | Binary buffers | ✅ | ✅ (ByteData) | ❌ | ❌ |
 | Compression | ✅ (3 algos) | ✅ (lz4) | ❌ | ❌ |

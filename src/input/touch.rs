@@ -1,12 +1,12 @@
-//! Touch input state tracking for Luna2D.
+//! Touch input state tracking for Lurek2D.
 //!
-//! This module is part of Luna2D's `input` subsystem and provides the implementation
+//! This module is part of Lurek2D's `input` subsystem and provides the implementation
 //! details for touch-related operations and data management.
 //! Key types exported from this module: `TouchPoint`, `TouchState`.
 //! Primary functions: `new()`, `touch_start()`, `touch_move()`, `touch_end()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
 

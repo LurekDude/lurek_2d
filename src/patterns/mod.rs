@@ -1,7 +1,7 @@
-//! Game programming patterns for Luna2D Lua games.
+//! Game programming patterns for Lurek2D Lua games.
 //!
 //! Provides twelve classic game-code patterns as UserData objects exposed to Lua
-//! via `luna.patterns.*`.  Callbacks are stored in the Lua API layer; this
+//! via `lurek.patterns.*`.  Callbacks are stored in the Lua API layer; this
 //! module holds only pure-Rust state and logic.
 //!
 //! | Pattern | Type | Purpose |

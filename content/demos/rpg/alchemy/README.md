@@ -6,16 +6,16 @@ An alchemy workshop where you grind ingredients in a mortar, transfer them to a 
 
 - Multi-step pipeline UI: mortar → grind → cauldron → bottle → sell
 - Recipe matching by element totals (`fire`, `water`, `earth`, `air`) and temperature range
-- `luna.mouse.getPosition()` + AABB testing for all click targets
-- `luna.mousepressed` callback for drag-free click interactions
+- `lurek.mouse.getPosition()` + AABB testing for all click targets
+- `lurek.mousepressed` callback for drag-free click interactions
 - Accumulator-based cooldown timer for the grinding animation
 - Discovery tracking: first successful brew reveals a recipe name in the log
-- `luna.gfx.circle()`, `rectangle()`, and `print()` for all UI
+- `lurek.gfx.circle()`, `rectangle()`, and `print()` for all UI
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/alchemy
+cargo run -- content/demos/alchemy
 ```
 
 ## Controls

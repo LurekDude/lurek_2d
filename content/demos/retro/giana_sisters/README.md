@@ -5,9 +5,9 @@ rivalled Super Mario Bros. Collect gems, stomp enemies, and reach the exit.
 
 ## What It Demonstrates
 
-- `luna.gfx.rectangle()` / `luna.gfx.circle()` — tiles, player, enemies, gems
-- `luna.input.isKeyDown()` — smooth horizontal movement
-- `luna.keypressed()` — jumping
+- `lurek.gfx.rectangle()` / `lurek.gfx.circle()` — tiles, player, enemies, gems
+- `lurek.input.isKeyDown()` — smooth horizontal movement
+- `lurek.keypressed()` — jumping
 - Tile-based collision detection with full AABB resolution
 - Smooth camera scrolling with `lerp`
 

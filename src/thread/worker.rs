@@ -33,7 +33,7 @@ pub enum ThreadState {
 
 /// A background Lua thread running its own VM.
 ///
-/// Created via `luna.thread.newThread(code)`. Call `start()` to spawn the
+/// Created via `lurek.thread.newThread(code)`. Call `start()` to spawn the
 /// OS thread and `wait()` to block until completion. Errors are captured
 /// in `ThreadState::Error` and retrievable via `get_error()`.
 ///
@@ -158,11 +158,11 @@ impl LuaThread {
 /// Register only thread-safe modules in a worker Lua VM.
 ///
 /// Worker threads get:
-/// - `luna.thread.getChannel(name)` — access to named channels
+/// - `lurek.thread.getChannel(name)` — access to named channels
 /// - `arg` — table of arguments passed to `thread:start(...)`
 ///
-/// Worker threads do NOT get: `luna.gfx`, `luna.audio`, `luna.window`,
-/// `luna.input`, `luna.physics`, `luna.particles`, or any module that
+/// Worker threads do NOT get: `lurek.gfx`, `lurek.audio`, `lurek.window`,
+/// `lurek.input`, `lurek.physics`, `lurek.particles`, or any module that
 /// touches `SharedState`.
 fn register_thread_safe_modules(
     lua: &mlua::Lua,
@@ -171,7 +171,7 @@ fn register_thread_safe_modules(
 ) -> mlua::Result<()> {
     let luna = lua.create_table()?;
 
-    // luna.thread.getChannel(name)
+    // lurek.thread.getChannel(name)
     let thread_table = lua.create_table()?;
     let channels_clone = channels.clone();
     thread_table.set(
@@ -189,7 +189,7 @@ fn register_thread_safe_modules(
     )?;
     luna.set("thread", thread_table)?;
 
-    lua.globals().set("luna", luna)?;
+    lua.globals().set("lurek", luna)?;
 
     // Set up arg table from passed arguments
     let arg_table = lua.create_table()?;

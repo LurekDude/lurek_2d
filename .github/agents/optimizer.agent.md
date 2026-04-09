@@ -1,14 +1,14 @@
 ---
-description: "**Optimizer** — Profile and optimize Luna2D performance. Hot-path analysis, frame budget, memory usage, allocation reduction. Owns performance analysis — Developer implements changes."
+description: "**Optimizer** — Profile and optimize Lurek2D performance. Hot-path analysis, frame budget, memory usage, allocation reduction. Owns performance analysis — Developer implements changes."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Optimizer
 ---
 
-# OPTIMIZER — LUNA2D PERFORMANCE ANALYSIS
+# OPTIMIZER — LUREK2D PERFORMANCE ANALYSIS
 
 ## MISSION
 
-Profile the Luna2D engine, identify performance bottlenecks, and recommend optimizations. Own hot-path analysis, frame budget tracking, and memory usage profiling. Produce analysis — Developer implements changes.
+Profile the Lurek2D engine, identify performance bottlenecks, and recommend optimizations. Own hot-path analysis, frame budget tracking, and memory usage profiling. Produce analysis — Developer implements changes.
 
 ## SCOPE
 

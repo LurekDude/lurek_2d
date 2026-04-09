@@ -4,7 +4,7 @@
 |------------------|--------------------------------------------------------|
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
-| **Lua API**      | `luna.docs`                                            |
+| **Lua API**      | `lurek.docs`                                            |
 | **Source**       | `src/docs/`                                            |
 | **Rust Tests**   | `tests/rust/unit/docs_tests.rs`                        |
 | **Lua Tests**    | `tests/lua/unit/test_docs.lua`                         |
@@ -16,7 +16,7 @@ The `docs` module provides API documentation management, runtime reflection, and
 
 1. **Catalog / Validation** — `DocEntry`, `Catalog`, `ValidationReport`, `QualityReport` — scan live bindings, load TOML annotations, validate coverage and quality.
 2. **Schema validation** — `Schema`, `FieldRule`, `SchemaResult` — lightweight runtime data-validator for game config, save-state, and mod manifests. Defined in `src/docs/schema.rs`.
-3. **Live reflection** — `luna.docs.reflectLive(ns?)` walks the live `luna.*` Lua table and returns a structured name/type description; `luna.docs.reflectTable(t, name?)` reflects any arbitrary Lua table.
+3. **Live reflection** — `lurek.docs.reflectLive(ns?)` walks the live `lurek.*` Lua table and returns a structured name/type description; `lurek.docs.reflectTable(t, name?)` reflects any arbitrary Lua table.
 
 ## Source Files
 
@@ -31,4 +31,4 @@ The `docs` module provides API documentation management, runtime reflection, and
 
 ## Full Specification
 
-See [`specs/docs.md`](../../../specs/docs.md) for full architecture, type details, Lua API, examples, and notes.
+See [`docs/specs/docs.md`](../../../docs/specs/docs.md) for full architecture, type details, Lua API, examples, and notes.

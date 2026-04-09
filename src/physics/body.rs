@@ -1,12 +1,12 @@
 //! Body implementation for the `physics` subsystem.
 //!
-//! This module is part of Luna2D's `physics` subsystem and provides the implementation
+//! This module is part of Lurek2D's `physics` subsystem and provides the implementation
 //! details for body-related operations and data management.
 //! Key types exported from this module: `BodyType`, `BodyShape`, `Body`.
 //! Primary functions: `new()`, `new_circle()`, `new_polygon()`, `new_edge()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 //!
 use crate::engine::log_messages::{BD01, BD02, BD03};
 use crate::log_msg;

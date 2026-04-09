@@ -1,5 +1,5 @@
 ---
-description: "Fix a bug in the Luna2D engine: diagnose root cause, implement fix, verify with tests."
+description: "Fix a bug in the Lurek2D engine: diagnose root cause, implement fix, verify with tests."
 ---
 
 # Fix Engine Bug

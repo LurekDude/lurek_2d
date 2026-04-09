@@ -1,6 +1,6 @@
 //! Integration tests for the savegame module.
 
-use luna2d::savegame::{SaveManager, SaveValue};
+use lurek2d::savegame::{SaveManager, SaveValue};
 use std::collections::HashMap;
 
 // ─── Rust integration tests ───
@@ -28,7 +28,7 @@ fn serialize_nested_table() {
     inner.insert("hp".to_string(), SaveValue::Number(100.0));
     let mut outer = HashMap::new();
     outer.insert("player".to_string(), SaveValue::Table(inner));
-    let s = luna2d::savegame::serialize_table(&outer, 0).unwrap();
+    let s = lurek2d::savegame::serialize_table(&outer, 0).unwrap();
     assert!(s.contains("player ="));
     assert!(s.contains("hp = 100"));
 }
@@ -37,13 +37,13 @@ fn serialize_nested_table() {
 fn serialize_special_string_key() {
     let mut data = HashMap::new();
     data.insert("with space".to_string(), SaveValue::Bool(true));
-    let s = luna2d::savegame::serialize_table(&data, 0).unwrap();
+    let s = lurek2d::savegame::serialize_table(&data, 0).unwrap();
     assert!(s.contains("[\"with space\"]"));
 }
 
 #[test]
 fn serialize_nil_value() {
-    let s = luna2d::savegame::serialize_value(&SaveValue::Nil, 0).unwrap();
+    let s = lurek2d::savegame::serialize_value(&SaveValue::Nil, 0).unwrap();
     assert_eq!(s, "nil");
 }
 
@@ -53,8 +53,8 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use luna2d::engine::config::Config;
-use luna2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::engine::config::Config;
+use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) {
     let state = Rc::new(RefCell::new(SharedState::new(

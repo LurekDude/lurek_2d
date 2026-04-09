@@ -1,9 +1,9 @@
--- Luna2D Integration Test: Entity + AI
+-- Lurek2D Integration Test: Entity + AI
 -- Tests entity system with AI decision-making components
 
 describe("integration: entity with AI state machine", function()
     it("entities change state based on FSM", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         -- Create entities with AI state
         local ids = {}
@@ -17,7 +17,7 @@ describe("integration: entity with AI state machine", function()
         end
 
         -- Create FSM for entity behavior
-        local fsm = luna.ai.newStateMachine()
+        local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {
             onUpdate = function(dt)
                 -- idle behavior
@@ -46,7 +46,7 @@ end)
 
 describe("integration: entity tags with AI agents", function()
     it("entity tags drive AI behavior", function()
-        local universe = luna.entity.newUniverse()
+        local universe = lurek.entity.newUniverse()
 
         -- Create enemies and friendlies
         for i = 1, 5 do

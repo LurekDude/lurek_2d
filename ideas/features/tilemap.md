@@ -40,8 +40,8 @@ Tile-based map system: grid storage, tilesets with UV regions, auto-tiling (Wang
 
 ## Suggestions
 
-1. **Add Tiled JSON import** (high priority): `luna.tilemap.fromTiled(jsonPath)` — parse Tiled `.json` export. Import layers, tilesets, objects, properties. This alone would make Luna2D competitive for tile-based games.
-2. **Add LDtk import**: `luna.tilemap.fromLDtk(jsonPath)` — LDtk is increasingly popular with indie devs.
+1. **Add Tiled JSON import** (high priority): `lurek.tilemap.fromTiled(jsonPath)` — parse Tiled `.json` export. Import layers, tilesets, objects, properties. This alone would make Lurek2D competitive for tile-based games.
+2. **Add LDtk import**: `lurek.tilemap.fromLDtk(jsonPath)` — LDtk is increasingly popular with indie devs.
 3. **Add isometric rendering mode**: `tilemap:setProjection("isometric", tileWidth, tileHeight)` — draw tiles with diamond projection.
 4. **Add hex grid mode**: `tilemap:setProjection("hex", tileSize)` — hexagonal grid with offset/cube coordinate systems.
 5. **Add pathfinding bridge**: `tilemap:toNavGrid(walkableCheck)` → returns NavGrid for pathfinding module.
@@ -50,7 +50,7 @@ Tile-based map system: grid storage, tilesets with UV regions, auto-tiling (Wang
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Gideros |
+| Feature | Lurek2D | Engine A | Engine B | Engine I |
 |---|---|---|---|---|
 | Grid tilemap | ✅ | ❌ (STI lib) | ❌ | ✅ |
 | Auto-tile | ✅ (4+8 bit) | ❌ | ❌ | ❌ |

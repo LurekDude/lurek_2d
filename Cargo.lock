@@ -2055,7 +2055,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "luna2d"
+name = "lurek2d"
 version = "0.6.0"
 dependencies = [
  "arboard",

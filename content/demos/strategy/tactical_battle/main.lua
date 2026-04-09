@@ -1,7 +1,7 @@
 -- Tactical Turn-Based Battle
 -- Controls: Click unit to select, click tile to move/attack, Enter to end turn, Escape to quit
 -- Defeat all enemy units to win!
--- Run with: cargo run -- demos/strategy/tactical_battle
+-- Run with: cargo run -- content/demos/strategy/tactical_battle
 
 local function clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
 
@@ -87,9 +87,9 @@ local function makeUnit(gx, gy, team, class)
     return u
 end
 
-function luna.init()
-    luna.window.setTitle("Tactical Battle")
-    luna.gfx.setBackgroundColor(0.15, 0.12, 0.1)
+function lurek.init()
+    lurek.window.setTitle("Tactical Battle")
+    lurek.gfx.setBackgroundColor(0.15, 0.12, 0.1)
     -- Player units (blue)
     table.insert(units, makeUnit(1, 5, "player", "knight"))
     table.insert(units, makeUnit(1, 2, "player", "knight"))
@@ -161,7 +161,7 @@ local function aiTurn()
     endTurn()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     if gameOver then return end
     if msgTimer > 0 then msgTimer = msgTimer - dt end
     if turn == "enemy" then
@@ -170,32 +170,32 @@ function luna.process(dt)
     end
 end
 
-function luna.render()
+function lurek.render()
     -- Grid
     for gx = 0, GRID - 1 do
         for gy = 0, GRID - 1 do
             local px, py = OX + gx * TILE, OY + gy * TILE
             if (gx + gy) % 2 == 0 then
-                luna.gfx.setColor(0.25, 0.22, 0.18, 1)
+                lurek.gfx.setColor(0.25, 0.22, 0.18, 1)
             else
-                luna.gfx.setColor(0.3, 0.27, 0.22, 1)
+                lurek.gfx.setColor(0.3, 0.27, 0.22, 1)
             end
-            luna.gfx.rectangle("fill", px, py, TILE, TILE)
-            luna.gfx.setColor(0.15, 0.12, 0.1, 1)
-            luna.gfx.rectangle("line", px, py, TILE, TILE)
+            lurek.gfx.rectangle("fill", px, py, TILE, TILE)
+            lurek.gfx.setColor(0.15, 0.12, 0.1, 1)
+            lurek.gfx.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Reachable tiles
-    luna.gfx.setColor(0.2, 0.5, 0.9, 0.25)
+    lurek.gfx.setColor(0.2, 0.5, 0.9, 0.25)
     for _, r in ipairs(reachable) do
-        luna.gfx.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
+        lurek.gfx.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
     end
 
     -- Attackable highlights
-    luna.gfx.setColor(0.9, 0.2, 0.2, 0.3)
+    lurek.gfx.setColor(0.9, 0.2, 0.2, 0.3)
     for _, a in ipairs(attackable) do
-        luna.gfx.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
+        lurek.gfx.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
     end
 
     -- Units
@@ -205,59 +205,59 @@ function luna.render()
             local py = OY + u.gy * TILE + TILE / 2
             -- Team color
             if u.team == "player" then
-                luna.gfx.setColor(0.2, 0.4, 0.9, 1)
+                lurek.gfx.setColor(0.2, 0.4, 0.9, 1)
             else
-                luna.gfx.setColor(0.9, 0.25, 0.2, 1)
+                lurek.gfx.setColor(0.9, 0.25, 0.2, 1)
             end
             if u.class == "knight" then
-                luna.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
+                lurek.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
             else
-                luna.gfx.circle("fill", px, py, 14)
+                lurek.gfx.circle("fill", px, py, 14)
             end
             -- Selection ring
             if selected == i then
-                luna.gfx.setColor(1, 1, 0, 1)
-                luna.gfx.setLineWidth(2)
-                luna.gfx.circle("line", px, py, 20)
-                luna.gfx.setLineWidth(1)
+                lurek.gfx.setColor(1, 1, 0, 1)
+                lurek.gfx.setLineWidth(2)
+                lurek.gfx.circle("line", px, py, 20)
+                lurek.gfx.setLineWidth(1)
             end
             -- HP bar
             local hpFrac = u.hp / u.maxHp
-            luna.gfx.setColor(0.2, 0.2, 0.2, 1)
-            luna.gfx.rectangle("fill", px - 14, py + 18, 28, 4)
-            luna.gfx.setColor(0.1, 0.9, 0.2, 1)
-            luna.gfx.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
+            lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
+            lurek.gfx.rectangle("fill", px - 14, py + 18, 28, 4)
+            lurek.gfx.setColor(0.1, 0.9, 0.2, 1)
+            lurek.gfx.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
             -- Label
-            luna.gfx.setColor(1, 1, 1, 1)
+            lurek.gfx.setColor(1, 1, 1, 1)
             local label = u.class == "knight" and "K" or "A"
-            luna.gfx.print(label, px - 4, py - 6)
+            lurek.gfx.print(label, px - 4, py - 6)
             -- Moved indicator
             if u.moved then
-                luna.gfx.setColor(0.5, 0.5, 0.5, 0.5)
-                luna.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
+                lurek.gfx.setColor(0.5, 0.5, 0.5, 0.5)
+                lurek.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
             end
         end
     end
 
     -- HUD
-    luna.gfx.setColor(1, 1, 1, 1)
-    luna.gfx.print("Turn: " .. turn, 10, 10)
-    luna.gfx.print("[Enter] End Turn", 10, 30)
-    luna.gfx.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
+    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.gfx.print("Turn: " .. turn, 10, 10)
+    lurek.gfx.print("[Enter] End Turn", 10, 30)
+    lurek.gfx.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
 
     -- Message
     if msgTimer > 0 then
-        luna.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
-        luna.gfx.print(gameMessage, 240, 10, 1.2)
+        lurek.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
+        lurek.gfx.print(gameMessage, 240, 10, 1.2)
     end
 
     if gameOver then
-        luna.gfx.setColor(1, 1, 1, 1)
-        luna.gfx.print(gameMessage, 300, 280, 2)
+        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.gfx.print(gameMessage, 300, 280, 2)
     end
 end
 
-function luna.mousepressed(x, y, button)
+function lurek.mousepressed(x, y, button)
     if gameOver or turn ~= "player" then return end
     local gx = math.floor((x - OX) / TILE)
     local gy = math.floor((y - OY) / TILE)
@@ -304,7 +304,7 @@ function luna.mousepressed(x, y, button)
     end
 end
 
-function luna.keypressed(key)
-    if key == "escape" then luna.signal.quit() end
+function lurek.keypressed(key)
+    if key == "escape" then lurek.signal.quit() end
     if key == "return" and turn == "player" and not gameOver then endTurn() end
 end

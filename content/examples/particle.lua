@@ -1,14 +1,12 @@
 -- examples/particle.lua
--- luna.particles — Emitter-based 2D particle systems and trail ribbons.
--- All luna.particles API methods demonstrated with code and comments.
--- This file is documentation code, not a runnable game.
+-- lurek.particles — Emitter-based 2D particle systems and trail ribbons.
 
 -- ── Creating a Particle System ────────────────────────────────────────────────
 
 -- newSystem(config) → ParticleSystem
 -- The config table controls every aspect of particle behaviour.
 -- All fields are optional; unset fields use engine defaults.
-local ps = luna.particles.newSystem({
+local ps = lurek.particles.newSystem({
     -- Core emission settings
     maxParticles  = 500,        -- maximum live particles
     emissionRate  = 50,         -- particles per second (continuous)
@@ -54,13 +52,13 @@ local ps = luna.particles.newSystem({
     -- alphaKeyframes = { 1, 1, 0.5, 0 },
 
     -- Emission area distribution
-    --   "uniform" | "normal" | "ellipse" | "borderRectangle" | "borderEllipse"
+"uniform" | "normal" | "ellipse" | "borderRectangle" | "borderEllipse"
     areaDistribution = "uniform",
     areaWidth  = 0,
     areaHeight = 0,
 
     -- Emission shape
-    --   "point" | "circle" | "rectangle" | "ring" | "line" | "cone" | "star" | "spiral"
+"point" | "circle" | "rectangle" | "ring" | "line" | "cone" | "star" | "spiral"
     emissionShape = "point",
 
     -- Particle draw shape: "square" | "circle" | "triangle" | "spark" | "diamond"
@@ -147,10 +145,10 @@ local full = ps:isFull()
 -- ── Update / Draw ─────────────────────────────────────────────────────────────
 
 -- update(dt) — call each frame to advance simulation
-ps:update(luna.time.getDelta())
+ps:update(lurek.time.getDelta())
 
--- To draw the particle system, pass it to luna.gfx.draw():
--- luna.gfx.draw(ps, 0, 0)
+-- To draw the particle system, pass it to lurek.gfx.draw():
+lurek.gfx.draw(ps, 0, 0)
 
 -- ── Release ───────────────────────────────────────────────────────────────────
 
@@ -161,7 +159,7 @@ ps:release()
 
 -- newTrail() → Trail
 -- Trails produce a smooth ribbon following a moving point.
-local trail = luna.particles.newTrail()
+local trail = lurek.particles.newTrail()
 
 -- setWidth(start_w, end_w?) — ribbon width at head and tail
 trail:setWidth(8, 0)  -- tapers to a point
@@ -194,13 +192,13 @@ local pts = trail:getPointCount()
 -- clear() — remove all segments
 trail:clear()
 
--- To draw: luna.gfx.draw(trail, 0, 0)
+-- To draw: lurek.gfx.draw(trail, 0, 0)
 
 -- ── Typical Particle Usage ────────────────────────────────────────────────────
 
 --[[
-function luna.init()
-    fire = luna.particles.newSystem({
+function lurek.init()
+    fire = lurek.particles.newSystem({
         maxParticles  = 300,
         emissionRate  = 80,
         lifetimeMin   = 0.4,
@@ -218,12 +216,12 @@ function luna.init()
     fire:start()
 end
 
-function luna.process(dt)
+function lurek.process(dt)
     fire:update(dt)
 end
 
-function luna.render()
-    luna.gfx.draw(fire, 0, 0)
+function lurek.render()
+    lurek.gfx.draw(fire, 0, 0)
 end
 ]]
 

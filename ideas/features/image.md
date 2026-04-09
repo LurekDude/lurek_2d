@@ -43,11 +43,11 @@ CPU-side image manipulation: load, create, read/write pixels, format conversion,
 3. **Add blit/composite**: `image:blit(source, x, y, blendMode?)` — draw one ImageData onto another with optional blending.
 4. **Add sub-image extraction**: `image:getSubImage(x, y, w, h)` — extract region as new ImageData.
 5. **Add grayscale**: `image:toGrayscale()` — collapse to luminance.
-6. **Add GPU readback**: `luna.img.fromScreen()` or `canvas:toImageData()` — capture renderer output into CPU ImageData.
+6. **Add GPU readback**: `lurek.img.fromScreen()` or `canvas:toImageData()` — capture renderer output into CPU ImageData.
 
 ## Competitor Comparison
 
-| Feature | Luna2D | Love2D | Solar2D | Bevy |
+| Feature | Lurek2D | Engine A | Engine B | Engine D |
 |---|---|---|---|---|
 | ImageData | ✅ | ✅ | ❌ (display only) | ✅ (Image) |
 | Per-pixel access | ✅ | ✅ | ❌ | ✅ |

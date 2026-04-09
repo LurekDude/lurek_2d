@@ -1,7 +1,7 @@
 -- demos/showcase/entity_showcase/main.lua
--- Entity Showcase — every luna.entity.Universe method demonstrated interactively
+-- Entity Showcase — every lurek.entity.Universe method demonstrated interactively
 -- Controls: SPACE next chapter, R reset, ESC quit
--- Run with: cargo run -- demos/showcase/entity_showcase
+-- Run with: cargo run -- content/demos/showcase/entity_showcase
 
 -- ── state ─────────────────────────────────────────────────────
 local ecs
@@ -33,10 +33,10 @@ local draw_sys = {
                 local p = world:get(id, "pos")
                 local c = world:get(id, "col")
                 local r = world:has(id, "sz") and world:get(id, "sz") or 9
-                luna.gfx.setColor(c[1], c[2], c[3], 0.88)
-                luna.gfx.circle("fill", p.x, p.y, r)
-                luna.gfx.setColor(c[1] * 0.5, c[2] * 0.5, c[3] * 0.5, 0.5)
-                luna.gfx.circle("line", p.x, p.y, r)
+                lurek.gfx.setColor(c[1], c[2], c[3], 0.88)
+                lurek.gfx.circle("fill", p.x, p.y, r)
+                lurek.gfx.setColor(c[1] * 0.5, c[2] * 0.5, c[3] * 0.5, 0.5)
+                lurek.gfx.circle("line", p.x, p.y, r)
             end
         end
     end,
@@ -65,7 +65,7 @@ end
 
 local function reset()
     if ecs then ecs:clear() ; ecs:release() end
-    ecs = luna.entity.newUniverse()
+    ecs = lurek.entity.newUniverse()
 
     -- bitmap tag definitions (used in chapter 3)
     ecs:defineTag("HOSTILE")
@@ -283,7 +283,7 @@ chapters[7] = function()
     log_add("removeSystem(event_sys)")
     log_add("getSystemCount() -> " .. ecs:getSystemCount())
     -- clear / release on a temporary universe
-    local tmp = luna.entity.newUniverse()
+    local tmp = lurek.entity.newUniverse()
     tmp:spawn() ; tmp:spawn() ; tmp:spawn()
     local before = tmp:getEntityCount()
     tmp:clear()
@@ -293,26 +293,26 @@ chapters[7] = function()
 end
 
 -- ── load ──────────────────────────────────────────────────────
-function luna.init()
-    luna.window.setTitle("Entity Showcase")
-    luna.gfx.setBackgroundColor(0.06, 0.06, 0.12)
+function lurek.init()
+    lurek.window.setTitle("Entity Showcase")
+    lurek.gfx.setBackgroundColor(0.06, 0.06, 0.12)
     reset()
 end
 
 -- ── update ────────────────────────────────────────────────────
-function luna.process(dt)
+function lurek.process(dt)
     if chapter > 0 then
         ecs:update(dt)
     end
 end
 
 -- ── draw ──────────────────────────────────────────────────────
-function luna.render()
+function lurek.render()
     -- simulation area backdrop
-    luna.gfx.setColor(0.08, 0.08, 0.18)
-    luna.gfx.rectangle("fill", 10, 212, 780, 354)
-    luna.gfx.setColor(0.12, 0.12, 0.28)
-    luna.gfx.rectangle("line", 10, 212, 780, 354)
+    lurek.gfx.setColor(0.08, 0.08, 0.18)
+    lurek.gfx.rectangle("fill", 10, 212, 780, 354)
+    lurek.gfx.setColor(0.12, 0.12, 0.28)
+    lurek.gfx.rectangle("line", 10, 212, 780, 354)
 
     -- ECS entities via draw_sys
     if chapter > 0 then
@@ -320,51 +320,51 @@ function luna.render()
     end
 
     -- top header bar
-    luna.gfx.setColor(0.10, 0.10, 0.22)
-    luna.gfx.rectangle("fill", 0, 0, 800, 28)
-    luna.gfx.setColor(0.45, 0.82, 1.0)
-    luna.gfx.print("Entity Showcase — luna.entity Universe API", 10, 7)
+    lurek.gfx.setColor(0.10, 0.10, 0.22)
+    lurek.gfx.rectangle("fill", 0, 0, 800, 28)
+    lurek.gfx.setColor(0.45, 0.82, 1.0)
+    lurek.gfx.print("Entity Showcase — lurek.entity Universe API", 10, 7)
 
     -- chapter title
-    luna.gfx.setColor(1.0, 0.85, 0.3)
-    luna.gfx.print(chapter_name, 10, 33)
+    lurek.gfx.setColor(1.0, 0.85, 0.3)
+    lurek.gfx.print(chapter_name, 10, 33)
 
     -- controls hint
-    luna.gfx.setColor(0.48, 0.48, 0.60)
-    luna.gfx.print("SPACE: next chapter    R: reset    ESC: quit", 10, 51)
+    lurek.gfx.setColor(0.48, 0.48, 0.60)
+    lurek.gfx.print("SPACE: next chapter    R: reset    ESC: quit", 10, 51)
 
     -- divider
-    luna.gfx.setColor(0.18, 0.18, 0.36)
-    luna.gfx.line(10, 68, 790, 68)
+    lurek.gfx.setColor(0.18, 0.18, 0.36)
+    lurek.gfx.line(10, 68, 790, 68)
 
     -- API call log
-    luna.gfx.setColor(0.75, 0.95, 0.70)
+    lurek.gfx.setColor(0.75, 0.95, 0.70)
     for i, line in ipairs(log) do
-        luna.gfx.print(line, 16, 72 + (i - 1) * 14)
+        lurek.gfx.print(line, 16, 72 + (i - 1) * 14)
     end
 
     -- status bar
-    luna.gfx.setColor(0.08, 0.08, 0.20)
-    luna.gfx.rectangle("fill", 0, 573, 800, 27)
+    lurek.gfx.setColor(0.08, 0.08, 0.20)
+    lurek.gfx.rectangle("fill", 0, 573, 800, 27)
     if chapter > 0 then
-        luna.gfx.setColor(0.40, 0.65, 0.40)
-        luna.gfx.print(
+        lurek.gfx.setColor(0.40, 0.65, 0.40)
+        lurek.gfx.print(
             "entities: " .. ecs:getEntityCount() ..
             "  systems: " .. ecs:getSystemCount() ..
             "  chapter: " .. chapter .. "/7" ..
-            "  fps: " .. math.floor(luna.time.getFPS()),
+            "  fps: " .. math.floor(lurek.time.getFPS()),
             10, 579
         )
     else
-        luna.gfx.setColor(0.40, 0.50, 0.40)
-        luna.gfx.print("Press SPACE to begin the entity showcase", 10, 579)
+        lurek.gfx.setColor(0.40, 0.50, 0.40)
+        lurek.gfx.print("Press SPACE to begin the entity showcase", 10, 579)
     end
 end
 
 -- ── keypressed ────────────────────────────────────────────────
-function luna.keypressed(key)
+function lurek.keypressed(key)
     if key == "escape" then
-        luna.signal.quit()
+        lurek.signal.quit()
     elseif key == "space" then
         local next_ch = chapter + 1
         if next_ch > 7 then

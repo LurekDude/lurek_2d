@@ -3,12 +3,12 @@
 //! Each key type maps to a specific resource category, preventing
 //! accidental cross-pool lookups at compile time.
 //!
-//! This module is part of Luna2D's `engine` subsystem and provides the implementation
+//! This module is part of Lurek2D's `engine` subsystem and provides the implementation
 //! details for resource keys-related operations and data management.
 //! Key types exported from this module: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `ShapeKey`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use slotmap::new_key_type;
 

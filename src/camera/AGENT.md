@@ -4,7 +4,7 @@
 |----------------|------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems          |
 | **Status**     | Implemented — Full                       |
-| **Lua API**    | `luna.camera`                            |
+| **Lua API**    | `lurek.camera`                            |
 | **Source**      | `src/camera/`                            |
 | **Rust Tests** | `tests/rust/unit/camera_tests.rs`        |
 | **Lua Tests**  | `tests/lua/unit/test_camera.lua`         |
@@ -27,6 +27,6 @@ The `camera` module provides camera and viewport types for 2D rendering. It is a
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
 
-→ [`specs/camera.md`](../../specs/camera.md)
+→ [`docs/specs/camera.md`](../../docs/specs/camera.md)
 
-_Update both this file **and** `specs/camera.md` whenever source files, public types, or Lua bindings change._
+_Update both this file **and** `docs/specs/camera.md` whenever source files, public types, or Lua bindings change._

@@ -15,7 +15,7 @@ use crate::log_msg;
 
 /// An ordered shader-effect chain to apply when drawing a single image.
 ///
-/// Can be attached to a `luna.gfx.draw` call via the options-table
+/// Can be attached to a `lurek.gfx.draw` call via the options-table
 /// overload (`effect` key). Effects are applied in insertion order through
 /// each enabled pass. `to_passes` converts the chain to the lightweight
 /// Tier-1 type embedded into `DrawCommand` variants.

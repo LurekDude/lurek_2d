@@ -8,14 +8,14 @@ A two-mode vehicle construction game. In **build mode** place chassis, wheels, e
 - Grid snapping in build mode: mouse position mapped to nearest grid cell, part outline preview before placement
 - Budget constraint: each part type has a cost; placing a part deducts from the budget and is shown in the HUD
 - Physics body generation from parts: chassis → static body, wheels → circle bodies, engine → impulse source
-- Per-frame engine force: engine parts call `luna.physics.applyImpulse()` on the chassis body each update
+- Per-frame engine force: engine parts call `lurek.physics.applyImpulse()` on the chassis body each update
 - Wing lift: wing parts add upward force proportional to horizontal velocity
 - Scrolling test track generated from a segment table with road surface and obstacle bodies
 
 ## How to Run
 
 ```powershell
-cargo run -- demos/vehicle_builder
+cargo run -- content/demos/vehicle_builder
 ```
 
 ## Controls

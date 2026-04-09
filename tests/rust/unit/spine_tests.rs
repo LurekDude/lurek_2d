@@ -1,4 +1,4 @@
-use luna2d::spine::{Bone, Skeleton, Slot};
+use lurek2d::spine::{Bone, Skeleton, Slot};
 
 // ── Bone ──
 

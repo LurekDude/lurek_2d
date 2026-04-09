@@ -1,12 +1,12 @@
 //! Per-frame depth-sorted draw batcher.
 //!
-//! This module is part of Luna2D's `scene` subsystem and provides the implementation
+//! This module is part of Lurek2D's `scene` subsystem and provides the implementation
 //! details for depth sorter-related operations and data management.
 //! Key types exported from this module: `DepthEntry`, `DepthSorter`.
 //! Primary functions: `new()`, `add()`, `add_object()`, `sort()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 /// Entry in the depth-sorted draw queue. Consult the module-level documentation for the broader usage context and preconditions.
 ///

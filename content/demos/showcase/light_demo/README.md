@@ -1,6 +1,6 @@
 # Light Demo
 
-Demonstrates the Luna2D 2D lighting system.
+Demonstrates the Lurek2D 2D lighting system.
 
 ## Features
 
@@ -26,5 +26,5 @@ Demonstrates the Luna2D 2D lighting system.
 ## Run
 
 ```powershell
-cargo run -- demos/light_demo
+cargo run -- content/demos/light_demo
 ```

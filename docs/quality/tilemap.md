@@ -15,7 +15,7 @@
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 30, line 845, line 1682
 - [ ] **R-02** — Dependency direction: chunk: Tier2 imports log_msg(unassigned); mapgen: Tier2 imports log_msg(unassigned); tilemap: Tier2 imports log_msg(unassigned); tileset: Tier2 imports log_msg(unassigned); tmx: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 152, line 154, line 383, line 384, line 388
-- [ ] **W-02** — API surface coverage: Functions absent from examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT
 
 ### 🟡 Warnings — Should Fix
 
@@ -116,9 +116,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | examples/tilemap.lua present |
-| **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT |
-| **W-03** Example comments | 🔵 MANUAL | Verify examples/tilemap.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ✅ PASS | content/examples/tilemap.lua present |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/tilemap.lua: FLOOR, NORTH_WALL, WEST_WALL, OBJECT |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/tilemap.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: loadTMX, newMapGen, newMapScript — add to ## Lua API in specs/tilemap.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Tilemap-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
@@ -147,7 +147,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **I-01** Lua API usability | 🔵 MANUAL | Review luna.* conventions compliance |
+| **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
 | **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
 

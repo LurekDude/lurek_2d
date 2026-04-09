@@ -1,13 +1,13 @@
 //! Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM
 //! via sine-additive synthesis, and plays through a rodio `Sink`.
 //!
-//! This module is part of Luna2D's `audio` subsystem and provides the implementation
+//! This module is part of Lurek2D's `audio` subsystem and provides the implementation
 //! details for midi player-related operations and data management.
 //! Key types exported from this module: `MidiData`, `MidiPlayer`.
 //! Primary functions: `new()`, `load()`, `load_data()`, `is_loaded()`.
 //!
 //! All public items are documented. See the parent module for architectural context
-//! and the `luna.*` Lua API for the scripting interface.
+//! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::audio::PlayState;
 use crate::engine::resource_keys::BusKey;
