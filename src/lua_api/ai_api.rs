@@ -1916,18 +1916,14 @@ impl LuaUserData for LuaCommandQueue {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.ai` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // -- newWorld --
+    // ── newWorld ─────────────────────────────────────────────────────────────
     /// Creates a new AI world container.
     /// @return AIWorld
     tbl.set(
@@ -1939,7 +1935,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newBlackboard --
+    // ── newBlackboard ────────────────────────────────────────────────────────
     /// Creates a new standalone blackboard.
     /// @return Blackboard
     tbl.set(
@@ -1951,7 +1947,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newStateMachine --
+    // ── newStateMachine ──────────────────────────────────────────────────────
     /// Creates a new finite state machine.
     /// @return StateMachine
     tbl.set(
@@ -1963,7 +1959,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newBehaviorTree --
+    // ── newBehaviorTree ──────────────────────────────────────────────────────
     /// Creates a new behavior tree.
     /// @return BehaviorTree
     tbl.set(
@@ -1975,7 +1971,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newSelector --
+    // ── newSelector ──────────────────────────────────────────────────────────
     /// Creates a BT selector node.
     /// @return BTNode
     tbl.set(
@@ -1990,7 +1986,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newSequence --
+    // ── newSequence ──────────────────────────────────────────────────────────
     /// Creates a BT sequence node.
     /// @return BTNode
     tbl.set(
@@ -2005,7 +2001,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newParallel --
+    // ── newParallel ──────────────────────────────────────────────────────────
     /// Creates a BT parallel node with optional policies.
     /// @param successPolicy : string?
     /// @param failurePolicy : string?
@@ -2027,7 +2023,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newInverter --
+    // ── newInverter ──────────────────────────────────────────────────────────
     /// Creates a BT inverter decorator.
     /// @return BTNode
     tbl.set(
@@ -2044,7 +2040,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newRepeater --
+    // ── newRepeater ──────────────────────────────────────────────────────────
     /// Creates a BT repeater decorator.
     /// @param count : integer?
     /// @return BTNode
@@ -2064,7 +2060,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newSucceeder --
+    // ── newSucceeder ─────────────────────────────────────────────────────────
     /// Creates a BT succeeder decorator.
     /// @return BTNode
     tbl.set(
@@ -2081,7 +2077,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newAction --
+    // ── newAction ────────────────────────────────────────────────────────────
     /// Creates a BT action leaf with a Lua callback.
     /// @param callback : function
     /// @return BTNode
@@ -2095,7 +2091,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newCondition --
+    // ── newCondition ─────────────────────────────────────────────────────────
     /// Creates a BT condition leaf with a Lua predicate.
     /// @param callback : function
     /// @return BTNode
@@ -2109,7 +2105,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newSteeringManager --
+    // ── newSteeringManager ───────────────────────────────────────────────────
     /// Creates a new steering behavior manager.
     /// @return SteeringManager
     tbl.set(
@@ -2121,7 +2117,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newQLearner --
+    // ── newQLearner ──────────────────────────────────────────────────────────
     /// Creates a tabular Q-learner.
     /// @param stateCount : integer
     /// @param actionCount : integer
@@ -2135,7 +2131,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newUtilityAI --
+    // ── newUtilityAI ─────────────────────────────────────────────────────────
     /// Creates a new utility AI evaluator.
     /// @return UtilityAI
     tbl.set(
@@ -2147,7 +2143,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newGOAPPlanner --
+    // ── newGOAPPlanner ───────────────────────────────────────────────────────
     /// Creates a new GOAP planning solver.
     /// @return GOAPPlanner
     tbl.set(
@@ -2159,7 +2155,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newInfluenceMap --
+    // ── newInfluenceMap ──────────────────────────────────────────────────────
     /// Creates a multi-layer influence map grid.
     /// @param width : integer
     /// @param height : integer
@@ -2174,7 +2170,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newSquad --
+    // ── newSquad ─────────────────────────────────────────────────────────────
     /// Creates a named squad for formation positioning.
     /// @param name : string
     /// @return Squad
@@ -2187,7 +2183,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- newCommandQueue --
+    // ── newCommandQueue ──────────────────────────────────────────────────────
     /// Creates an RTS-style command queue.
     /// @return CommandQueue
     tbl.set(

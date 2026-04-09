@@ -23,6 +23,23 @@ The `camera` module provides camera and viewport types for 2D rendering. It is a
 | `viewport.rs`       | `ScaleMode` enum and `Viewport` struct for virtual-resolution mapping                   |
 | `viewport_scale.rs` | `ViewportScale` struct — `Viewport` variant with automatic scaled-dimension tracking     |
 
+## Key Types
+| Type | Location | Purpose |
+|------|----------|---------|
+| \Camera2D\ | \src/camera/mod.rs\ | 2D camera tracking position, zoom, and rotation |
+| \Camera\ | \src/camera/mod.rs\ | Active camera state driving the view transform |
+| \Viewport\ | \src/camera/mod.rs\ | Screen region mapped to a camera view |
+| \ScaleMode\ | \src/camera/mod.rs\ | Enum: Fixed, Fit, Fill, Stretch scaling modes |
+
+## Lua API Summary
+| Function | Signature | Purpose |
+|----------|-----------|---------|
+| \lurek.camera.new\ | \(x: number, y: number) → Camera2D\ | Create a 2D camera at position |
+| \lurek.camera.setPosition\ | \(cam: Camera2D, x: number, y: number) → nil\ | Move camera |
+| \lurek.camera.setZoom\ | \(cam: Camera2D, zoom: number) → nil\ | Set zoom level |
+| \lurek.camera.activate\ | \(cam: Camera2D) → nil\ | Set as the active render camera |
+| \lurek.camera.screenToWorld\ | \(cam: Camera2D, sx: number, sy: number) → number, number\ | Convert screen coords |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

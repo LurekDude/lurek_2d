@@ -2,7 +2,7 @@
 
 | Property       | Value                                        |
 |----------------|----------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extensions                   |
+| **Tier**       | Tier 1 — Core Subsystems                     |
 | **Status**     | Implemented — Full                           |
 | **Lua API**    | `lurek.simulator`                             |
 | **Source**      | `src/automation/`                            |
@@ -24,6 +24,23 @@ The `automation` module provides automated input simulation through timed step s
 | `script.rs`    | `Script` struct — named, time-sorted, `MAX_STEPS`-capped container of `Step` objects   |
 | `simulator.rs` | `Simulator` struct — playback engine with named script registry and `PlaybackState` FSM |
 | `step.rs`      | `Step` struct and `Action` enum — timed action records with 12 optional fields          |
+
+## Key Types
+| Type | Location | Purpose |
+|------|----------|---------|
+| \Simulator\ | \src/automation/mod.rs\ | Root simulation player managing script playback |
+| \Script\ | \src/automation/mod.rs\ | Ordered sequence of automation steps |
+| \Step\ | \src/automation/mod.rs\ | Single automation instruction |
+| \Action\ | \src/automation/mod.rs\ | Low-level action variant executed by the simulator |
+
+## Lua API Summary
+| Function | Signature | Purpose |
+|----------|-----------|---------|
+| \lurek.simulator.load\ | \(path: string) → nil\ | Load a TOML automation script |
+| \lurek.simulator.loadFromToml\ | \(name: string, toml: string) → nil\ | Parse and register a TOML script |
+| \lurek.simulator.play\ | \(name: string) → nil\ | Start script playback |
+| \lurek.simulator.stop\ | \() → nil\ | Halt playback |
+| \lurek.simulator.isPlaying\ | \() → boolean\ | Check if a script is active |
 
 ## Full Specification
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `audio`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 6 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 42 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,21 +8,14 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-01** — Module-level docs: Missing //! doc in: audio/dsp.rs
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields
 - [ ] **B-02** — Registration-only: struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/
-- [ ] **R-02** — Dependency direction: bus: Tier1 imports log_msg(unassigned); decoder: Tier1 imports log_msg(unassigned); dsp: Tier1 imports log_msg(unassigned); midi_player: Tier1 imports log_msg(unassigned); mixer: Tier1 imports log_msg(unassigned)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 237, line 312, line 353, line 402, line 404
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **S-03** — File size limits: Files >1500 LOC: audio/mixer.rs (1587 LOC)
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2034 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: ActiveEffect, AtomicParam, AudioSource, Bus, Decoder | Stale in spec: Enums, Structs, audio
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: bus:57, bus:103, midi:14, midi_player:218, midi_player:226 (+18 more)
-- [ ] **B-04** — No business logic in closures: '<closure@1076>' (28 LOC, line 1076) — extract body to src/audio/ | '<closure@1114>' (17 LOC, line 1114) — extract body to src/audio/ | '<closure@1520>' (16 LOC, line 1520) — extract body to src/audio/ | '<closure@1404>' has if/match/for — extract to src/audio/ | '<closure@1424>' has if/match/for — extract to src/audio/
+- [ ] **B-04** — No business logic in closures: '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ | '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ | '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ | '<closure@1391>' has if/match/for — extract to src/audio/ | '<closure@1411>' has if/match/for — extract to src/audio/
 - [ ] **Q-04** — Error handling: .unwrap() calls: bus:138, bus:161, midi:129, midi:132, midi:138
 
 ## Full Check Results
@@ -43,10 +36,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\audio\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 667 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/audio.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/audio.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -54,25 +47,25 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/audio.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/audio.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2034 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 76 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ActiveEffect, AtomicParam, AudioSource, Bus, Decoder \| Stale in spec: Enums, Structs, audio |
+| **SP-05** Key Types accuracy | ✅ PASS | 18 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **D-01** Module-level docs | ❌ ERROR | Missing //! doc in: audio/dsp.rs |
+| **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: bus:57, bus:103, midi:14, midi_player:218, midi_player:226 (+18 more) |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -82,7 +75,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/audio_api.rs present |
 | **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder |
 | **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/ |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1076>' (28 LOC, line 1076) — extract body to src/audio/ \| '<closure@1114>' (17 LOC, line 1114) — extract body to src/audio/ \| '<closure@1520>' (16 LOC, line 1520) — extract body to src/audio/ \| '<closure@1404>' has if/match/for — extract to src/audio/ \| '<closure@1424>' has if/match/for — extract to src/audio/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ \| '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ \| '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ \| '<closure@1391>' has if/match/for — extract to src/audio/ \| '<closure@1411>' has if/match/for — extract to src/audio/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -91,7 +84,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ❌ ERROR | bus: Tier1 imports log_msg(unassigned); decoder: Tier1 imports log_msg(unassigned); dsp: Tier1 imports log_msg(unassigned); midi_player: Tier1 imports log_msg(unassigned); mixer: Tier1 imports log_msg(unassigned) |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -103,7 +96,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\audio_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_audio.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 237, line 312, line 353, line 402, line 404 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 111 tests / 163 pub methods (68%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test audio_tests -- --nocapture |
@@ -115,8 +108,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/audio.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 76 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/audio.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 76 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Audio-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Audio-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

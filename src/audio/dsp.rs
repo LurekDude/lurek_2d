@@ -1,3 +1,9 @@
+//! Digital signal processing effects for the Lurek2D audio pipeline.
+//!
+//! Provides `AtomicParam` for lock-free parameter updates, `ActiveEffect` for
+//! tracking DSP state, and standard audio effects (volume, reverb, delay,
+//! equaliser, distortion, chorus, flanger, bitcrusher, compressor).
+
 use rodio::Source;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::{Arc, RwLock};

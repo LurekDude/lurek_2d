@@ -182,6 +182,7 @@ Exposed under `lurek.simulator.*` by `src/lua_api/automation_api.rs`. The API pr
 | `lurek.simulator.getStepCount` | `() → integer` | Total steps in active script |
 | `lurek.simulator.getCurrentScript` | `() → string?` | Name of active script, or nil if idle |
 | `lurek.simulator.getElapsedTime` | `() → number` | Seconds elapsed since playback started |
+| `lurek.simulator.loadFromToml` | `(name: string, toml_str: string)` | Parse a TOML string and register it as a named script |
 
 ### Step Table Format
 

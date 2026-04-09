@@ -1,6 +1,6 @@
 # Module Quality Report: `ai`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 5 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 43 ✅ / 2 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,19 +8,14 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 354, line 1283, line 1649
-- [ ] **R-02** — Dependency direction: blackboard: Tier2 imports log_msg(unassigned); command_queue: Tier2 imports log_msg(unassigned); fsm: Tier2 imports log_msg(unassigned); goap: Tier2 imports log_msg(unassigned); mod: Tier2 imports pathfinding(tier2)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 112, line 243, line 265, line 549, line 550
+- [ ] **R-02** — Dependency direction: mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2)
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-03** — Summary quality: Summary very long (2214 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AIWorld, Agent, BTNode, BTStatus, BehaviorTree | Stale in spec: Enums, Structs
+- [ ] **SP-03** — Summary quality: Summary very long (2215 chars)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: blackboard:212, fsm:147, goap:185, steering:32, steering:73 (+1 more)
-- [ ] **D-09** — Section separators: 19 bindings but no // ─── separator comments
 
 ## Full Check Results
 
@@ -40,10 +35,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\ai\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 632 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/ai.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/ai.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -51,11 +46,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/ai.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/ai.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2214 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2215 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 19 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AIWorld, Agent, BTNode, BTStatus, BehaviorTree \| Stale in spec: Enums, Structs |
+| **SP-05** Key Types accuracy | ✅ PASS | 28 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -69,8 +64,8 @@
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters, # Returns |
-| **D-09** Section separators | ⚠️ WARNING | 19 bindings but no // ─── separator comments |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -88,7 +83,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | blackboard: Tier2 imports log_msg(unassigned); command_queue: Tier2 imports log_msg(unassigned); fsm: Tier2 imports log_msg(unassigned); goap: Tier2 imports log_msg(unassigned); mod: Tier2 imports pathfinding(tier2) |
+| **R-02** Dependency direction | ❌ ERROR | mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2); mod: Tier2 imports pathfinding(tier2) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -100,7 +95,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\ai_tests.rs, tests\rust\game\ai_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_ai.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 112, line 243, line 265, line 549, line 550 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 83 tests / 98 pub methods (85%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test ai_tests -- --nocapture |
@@ -112,8 +107,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/ai.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 19 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/ai.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 19 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Ai-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Ai-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

@@ -215,7 +215,7 @@ impl MidiPlayer {
         self.play_state = PlayState::Stopped;
     }
 
-    /// Pauses playback. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Pauses playback.
     pub fn pause(&mut self) {
         if let Some(ref sink) = self.sink {
             sink.pause();
@@ -223,7 +223,7 @@ impl MidiPlayer {
         self.play_state = PlayState::Paused;
     }
 
-    /// Resumes paused playback. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Resumes paused playback.
     pub fn resume(&mut self) {
         if let Some(ref sink) = self.sink {
             sink.play();
@@ -249,7 +249,7 @@ impl MidiPlayer {
         self.play_state == PlayState::Paused
     }
 
-    /// Seeks to a position in seconds. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Seeks to a position in seconds.
     ///
     /// # Parameters
     /// - `secs` — `f64`.
@@ -281,7 +281,7 @@ impl MidiPlayer {
         self.volume = vol.max(0.0);
     }
 
-    /// Returns the master volume. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the master volume.
     ///
     /// # Returns
     /// `f32`.
@@ -313,7 +313,7 @@ impl MidiPlayer {
         self.tempo_scale = scale.max(0.01);
     }
 
-    /// Returns the current tempo scale factor. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the current tempo scale factor.
     ///
     /// # Returns
     /// `f32`.
@@ -321,7 +321,7 @@ impl MidiPlayer {
         self.tempo_scale
     }
 
-    /// Returns the current effective BPM. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the current effective BPM.
     ///
     /// # Returns
     /// `f64`.
@@ -429,7 +429,7 @@ impl MidiPlayer {
         self.midi_data.as_ref().map_or(0, |d| d.channel_count)
     }
 
-    /// Solos a channel (mutes all others). Consult the module-level documentation for the broader usage context and preconditions.
+    /// Solos a channel (mutes all others).
     ///
     /// # Parameters
     /// - `ch` — `usize`.
@@ -439,7 +439,7 @@ impl MidiPlayer {
         }
     }
 
-    /// Un-solos all channels (unmutes all). Consult the module-level documentation for the broader usage context and preconditions.
+    /// Un-solos all channels (unmutes all).
     pub fn unsolo_all(&mut self) {
         self.channel_muted = [false; 16];
     }
@@ -504,7 +504,7 @@ impl MidiPlayer {
         self.bus_key = key;
     }
 
-    /// Returns the audio bus key, if assigned. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the audio bus key, if assigned.
     ///
     /// # Returns
     /// `Option<BusKey>`.
@@ -512,7 +512,7 @@ impl MidiPlayer {
         self.bus_key
     }
 
-    /// Returns the current playback state. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the current playback state.
     ///
     /// # Returns
     /// `PlayState`.

@@ -51,7 +51,7 @@ use crate::engine::resource_keys::BusKey;
 use crate::engine::resource_keys::QueueableKey;
 use crate::engine::resource_keys::SoundKey;
 
-/// Type of audio source. Consult the module-level documentation for the broader usage context and preconditions.
+/// Type of audio source.
 ///
 /// # Variants
 /// - `Static` — Static variant.
@@ -64,7 +64,7 @@ pub enum SourceType {
     Stream,
 }
 
-/// Playback state of an audio source. Consult the module-level documentation for the broader usage context and preconditions.
+/// Playback state of an audio source.
 ///
 /// # Variants
 /// - `Stopped` — Stopped variant.
@@ -714,7 +714,7 @@ impl Mixer {
         self.sources.contains_key(key)
     }
 
-    /// Pauses all currently playing sources. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Pauses all currently playing sources.
     pub fn pause_all(&mut self) {
         for entry in self.sources.values_mut() {
             if let Some(ref sink) = entry.sink {
@@ -743,7 +743,7 @@ impl Mixer {
         }
     }
 
-    /// Resumes all paused sources. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Resumes all paused sources.
     pub fn resume_all(&mut self) {
         for entry in self.sources.values_mut() {
             if let Some(ref sink) = entry.sink {

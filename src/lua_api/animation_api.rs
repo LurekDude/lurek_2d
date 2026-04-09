@@ -243,7 +243,7 @@ impl LuaUserData for LuaAnimation {
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // -- new --
+    // ── new ──────────────────────────────────────────────────────────────────
     /// Creates a new, empty Animation controller.
     /// @return Animation
     tbl.set(

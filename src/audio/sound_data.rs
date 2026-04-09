@@ -156,7 +156,7 @@ impl SoundData {
         }
     }
 
-    /// Get the number of samples per channel. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get the number of samples per channel.
     ///
     /// # Returns
     /// `usize`.
@@ -167,7 +167,7 @@ impl SoundData {
         self.samples.len() / self.channels as usize
     }
 
-    /// Get the sample rate in Hz. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get the sample rate in Hz.
     ///
     /// # Returns
     /// `u32`.
@@ -175,7 +175,7 @@ impl SoundData {
         self.sample_rate
     }
 
-    /// Get the number of audio channels. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get the number of audio channels.
     ///
     /// # Returns
     /// `u16`.
@@ -183,7 +183,7 @@ impl SoundData {
         self.channels
     }
 
-    /// Get the bit depth. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get the bit depth.
     ///
     /// # Returns
     /// `u16`.
@@ -191,7 +191,7 @@ impl SoundData {
         self.bit_depth
     }
 
-    /// Get the duration in seconds. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get the duration in seconds.
     ///
     /// # Returns
     /// `f64`.
@@ -202,7 +202,7 @@ impl SoundData {
         self.sample_count() as f64 / self.sample_rate as f64
     }
 
-    /// Get a reference to the raw samples. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Get a reference to the raw samples.
     ///
     /// # Returns
     /// `&[f32]`.

@@ -24,6 +24,19 @@ The `animation` module provides frame-based sprite animation for 2D characters a
 | `event.rs`      | `AnimEvent` � enum of playback events (`Finished`, `FrameChanged`, `Looped`). |
 | `frame.rs`      | `AnimFrame` � a single frame with a source rectangle and optional duration override. Also defines `AnimationFrame` type alias. |
 
+## Key Types
+| Type | Location | Purpose |
+|------|----------|---------|
+| \Animation\ | \src/animation/mod.rs\ | Top-level animation player managing playback state |
+| \AnimClip\ | \src/animation/mod.rs\ | Named sequence of frames with duration and loop settings |
+| \AnimFrame\ | \src/animation/mod.rs\ | Single keyframe: sprite region, duration, flip, pivot |
+| \AnimEvent\ | \src/animation/mod.rs\ | Named event triggered at a specific frame |
+
+## Lua API Summary
+| Function | Signature | Purpose |
+|----------|-----------|---------|
+| \lurek.animation.new\ | \(clip_table: table) → Animation\ | Create an animation from a clip definition |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

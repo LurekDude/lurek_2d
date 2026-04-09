@@ -1,6 +1,6 @@
 # Module Quality Report: `camera`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 45 ✅ / 1 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,16 +8,11 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Stale in spec (not in code): getCamera, setCamera — remove from spec
-- [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
 - [ ] **B-02** — Registration-only: struct definitions (move to src/camera/): LuaCamera2D
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaCamera2D from lua_api/camera_api.rs → src/camera/
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Camera, Camera2D, ScaleMode, Viewport, ViewportScale | Stale in spec: Enums, Structs, camera
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: types:455
 - [ ] **T-05** — Test adequacy: 15 tests / 53 pub methods (28%) — low coverage
 
 ## Full Check Results
@@ -38,10 +33,10 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\camera\AGENT.md |
-| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 412 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | specs/camera.md exists |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/camera.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
@@ -49,11 +44,11 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/camera.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/camera.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1884 chars |
-| **SP-04** Lua API completeness | ❌ ERROR | Stale in spec (not in code): getCamera, setCamera — remove from spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Camera, Camera2D, ScaleMode, Viewport, ViewportScale \| Stale in spec: Enums, Structs, camera |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1885 chars |
+| **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
+| **SP-05** Key Types accuracy | ✅ PASS | 5 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -63,11 +58,11 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: types:455 |
+| **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ❌ ERROR | Rustdoc sections found (use @param/@return): # Parameters |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
@@ -110,8 +105,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/camera.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/camera.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Camera-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Camera-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

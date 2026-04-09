@@ -31,6 +31,31 @@ The AI module provides a comprehensive, modular game-intelligence toolkit that L
 | `utility_ai.rs`     | Multi-axis utility scorer with response curves for action selection              |
 | `world.rs`          | Top-level AI container that owns agents, maintains name→index lookup, and provides global blackboard |
 
+## Key Types
+| Type | Location | Purpose |
+|------|----------|---------|
+| \AIWorld\ | \src/ai/mod.rs\ | Root AI world managing all agents and planners |
+| \Agent\ | \src/ai/mod.rs\ | Game entity with assigned AI behaviours |
+| \Blackboard\ | \src/ai/blackboard.rs\ | Shared key-value store for inter-AI communication |
+| \StateMachine\ | \src/ai/fsm.rs\ | Finite state machine for agent behaviour scheduling |
+| \BehaviorTree\ | \src/ai/behavior_tree.rs\ | Hierarchical task network for agent decision-making |
+| \BTNode\ | \src/ai/behavior_tree.rs\ | Individual node in a behaviour tree |
+| \GOAPPlanner\ | \src/ai/goap.rs\ | Goal-Oriented Action Planning engine |
+| \InfluenceMap\ | \src/ai/influence_map.rs\ | 2D grid tracking factional influence scores |
+| \Squad\ | \src/ai/squad.rs\ | Group of agents sharing formation and coordination |
+
+## Lua API Summary
+| Function | Signature | Purpose |
+|----------|-----------|---------|
+| \lurek.ai.newWorld\ | \() → AIWorld\ | Create an AI world manager |
+| \lurek.ai.newAgent\ | \(world: AIWorld, x: number, y: number) → Agent\ | Spawn an agent |
+| \lurek.ai.newBlackboard\ | \() → Blackboard\ | Create a shared blackboard |
+| \lurek.ai.newStateMachine\ | \() → StateMachine\ | Create a finite state machine |
+| \lurek.ai.newBehaviorTree\ | \(schema: table) → BehaviorTree\ | Build a behaviour tree |
+| \lurek.ai.newGOAPPlanner\ | \() → GOAPPlanner\ | Create a GOAP planner |
+| \lurek.ai.newInfluenceMap\ | \(w: number, h: number, cell: number) → InfluenceMap\ | Create an influence grid |
+| \lurek.ai.newSquad\ | \() → Squad\ | Create an agent squad |
+
 ## Full Specification
 
 All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:

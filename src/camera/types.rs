@@ -452,7 +452,7 @@ impl Camera2D {
 
     // ── Shake ───────────────────────────────────────────────────────────
 
-    /// Starts a camera shake effect. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Starts a camera shake effect.
     ///
     /// # Parameters
     /// - `intensity` — Maximum pixel offset.

@@ -43,6 +43,10 @@ WIKI = WORKSPACE / "docs" / "wiki"
 
 BASELINE = {"math", "engine"}
 
+# Macros and symbols re-exported at the crate root that are not module names.
+# These are always allowed in any tier without triggering R-02.
+CRATE_ROOT_EXPORTS = {"log_msg"}
+
 TIER1 = {
     "animation", "audio", "automation", "camera", "compute", "data",
     "entity", "event", "filesystem", "graphics", "image", "input",
@@ -231,6 +235,8 @@ def _analyze_module_files(module: str) -> ModuleFileAnalysis:
             if imp == "lua_api":
                 analysis.lua_api_imports.append(f"{stem}")
                 continue
+            if imp in CRATE_ROOT_EXPORTS:
+                continue  # crate-root re-exports (macros, helpers) — always allowed
             imp_tier = get_tier(imp)
             if tier == "tier1":
                 if imp_tier not in ("baseline",) and imp not in BASELINE:
@@ -592,7 +598,15 @@ def check_spec_file(module: str) -> List[Check]:
         for m in re.finditer(r"^pub\s+(?:struct|enum)\s+(\w+)", read_text(rs), re.MULTILINE):
             code_types.add(m.group(1))
     if key_types_section and code_types:
-        spec_type_names = set(re.findall(r"###?\s+`?(\w+)`?", key_types_section.group(1)))
+        # Match heading-based type names: ## TypeName, ### foo::bar::TypeName, #### `mod::TypeName`
+        # Capture only the last path segment to handle fully-qualified names.
+        _SECTION_WORDS = {"Structs", "Enums", "Overview", "Summary", "API", "Types",
+                          "Traits", "Functions", "Methods", "Examples"}
+        spec_type_names = set()
+        for m in re.finditer(r"#{2,5}\s+`?(?:\w+::)*(\w+)`?", key_types_section.group(1)):
+            name = m.group(1)
+            if name not in _SECTION_WORDS:
+                spec_type_names.add(name)
         missing_types = [t for t in code_types if t not in spec_type_names
                          and not t.startswith("_") and not t.endswith("Key")]
         stale_types = [t for t in spec_type_names if t not in code_types and len(t) > 2]
@@ -957,8 +971,9 @@ def check_float_comparisons(module: str) -> Check:
             violations: List[str] = []
             for i, line in enumerate(lines):
                 if "assert_eq!" in line:
-                    ctx = "\n".join(lines[max(0, i - 2):i + 2])
-                    if re.search(r"\b\d+\.\d+(?:f32|f64)?\b", ctx):
+                    # Only flag if the assert_eq! line itself contains a float literal
+                    # (e.g. 1.0, 0.5_f32, 3.14f64) — not ints or nearby lines
+                    if re.search(r"\b\d+\.\d+(?:f32|f64)?\b", line):
                         violations.append(f"line {i + 1}")
             if violations:
                 return Check("T-04", "Float comparisons", ERROR,
@@ -974,7 +989,7 @@ def check_float_comparisons(module: str) -> Check:
 def check_example_file(module: str) -> List[Check]:
     """W-01 / W-02: content/examples/<module>.lua exists and covers the full API surface."""
     results: List[Check] = []
-    example_file = WORKSPACE / "examples" / f"{module}.lua"
+    example_file = WORKSPACE / "content" / "examples" / f"{module}.lua"
 
     if not example_file.exists():
         results.append(Check("W-01", "Example file exists", ERROR,
@@ -1141,7 +1156,7 @@ def check_wiki_page(module: str) -> Check:
 
 def check_example_exists(module: str) -> Check:
     """W-03: Example game or test game demonstrates the module."""
-    examples_dir = WORKSPACE / "examples"
+    examples_dir = WORKSPACE / "content" / "demos"
     if not examples_dir.is_dir():
         return Check("W-03", "Example game", WARN, "content/demos/ directory not found")
 

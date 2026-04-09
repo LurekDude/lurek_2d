@@ -20,6 +20,24 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.6.17] — 2025-07-19
 
+### Fixed
+- **Quality: ai, animation, audio, automation, camera** — First-pass quality fixes across 5 modules:
+  - D-08: Converted `# Parameters`/`# Returns`/`# Fields` rustdoc sections to `@param`/`@return` in `ai_api.rs`, `audio_api.rs`, `automation_api.rs`, `camera_api.rs`
+  - D-09: Added missing `// ── name ──────` section separator comments to `ai_api.rs` (19), `automation_api.rs` (17), `animation_api.rs` (1)
+  - D-04: Removed 24 stub docstrings (`Consult the module-level documentation…`) from `src/audio/` and `src/camera/` files
+  - D-01: Added `//!` module header to `src/audio/dsp.rs`
+  - A-02: Added `## Key Types` and `## Lua API Summary` tables to `src/ai/AGENT.md`, `src/animation/AGENT.md`, `src/audio/AGENT.md`, `src/automation/AGENT.md`, `src/camera/AGENT.md`
+  - automation R-01: Corrected tier label in `src/automation/AGENT.md` from Tier 2 to Tier 1
+  - automation SP-04: Added `lurek.simulator.loadFromToml` row to `docs/specs/automation.md`
+- **Audit tool** (`tools/audit/audit_module.py`) — Fixed four bugs:
+  - W-01: Wrong example file path (`examples/` → `content/examples/`)
+  - W-03: Wrong demo path (`examples/` → `content/demos/`)
+  - R-02: Added `CRATE_ROOT_EXPORTS` skip list to suppress false positives for `log_msg` macro
+  - T-04: Fixed float comparison check to test the `assert_eq!` line itself (not surrounding context window)
+  - SP-05: Updated heading regex to handle `####` and module-path-qualified type names; filter generic section words
+
+## [0.6.17] — 2025-07-19
+
 ### Changed
 - **Full project rename: Luna2D → Lurek2D / `luna.*` → `lurek.*`** — Complete rename of all identifiers, namespaces, and strings across the entire repository (the engine was not yet published):
   - Display name: `Luna2D` / `Luna 2D` → `Lurek2D` / `Lurek 2D` in all docs, comments, UI strings

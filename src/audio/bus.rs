@@ -54,7 +54,7 @@ impl Bus {
         }
     }
 
-    /// Returns the bus name. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Returns the bus name.
     ///
     /// # Returns
     /// `&str`.
@@ -100,7 +100,7 @@ impl Bus {
         self.paused = true;
     }
 
-    /// Resumes the bus. Consult the module-level documentation for the broader usage context and preconditions.
+    /// Resumes the bus.
     pub fn resume(&mut self) {
         log_msg!(debug, BU03, "{}", self.name);
         self.paused = false;

@@ -11,7 +11,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-/// MIDI SoundFont state. Consult the module-level documentation for the broader usage context and preconditions.
+/// MIDI SoundFont state.
 ///
 /// Tracks whether a SoundFont (SF2) file has been loaded and stores its raw
 /// bytes for future MIDI decoding. At most one SoundFont can be active at a

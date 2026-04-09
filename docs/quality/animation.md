@@ -1,6 +1,6 @@
 # Module Quality Report: `animation`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 5 ⚠️ / 9 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 44 ✅ / 1 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,23 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-02** — Template structure: Missing required sections: Purpose, Source Files, Full Specification
-- [ ] **A-03** — Purpose quality: No ## Purpose section found
-- [ ] **A-04** — Content sync: Files not in Source Files table: clip.rs, controller.rs, event.rs, frame.rs
-- [ ] **A-06** — Tier label: No Tier property in AGENT.md header
 - [ ] **B-02** — Registration-only: struct definitions (move to src/animation/): LuaAnimation
 - [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 21
-- [ ] **R-02** — Dependency direction: controller: Tier1 imports log_msg(unassigned)
-- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 35, line 36, line 48, line 83, line 90
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: clip.rs, controller.rs, event.rs, frame.rs, mod.rs
-- [ ] **SP-03** — Summary quality: Summary very long (2429 chars)
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AnimClip, AnimEvent, AnimFrame, Animation | Stale in spec: Enums, Structs, animation
-- [ ] **D-09** — Section separators: 3 bindings but no // ─── separator comments
-- [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected tier1
+- [ ] **SP-03** — Summary quality: Summary very long (2433 chars)
 
 ## Full Check Results
 
@@ -44,22 +34,22 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\animation\AGENT.md |
-| **A-02** Template structure | ❌ ERROR | Missing required sections: Purpose, Source Files, Full Specification |
-| **A-03** Purpose quality | ❌ ERROR | No ## Purpose section found |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: clip.rs, controller.rs, event.rs, frame.rs |
-| **A-05** Spec pointer | ✅ PASS | specs/animation.md exists |
-| **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: clip.rs, controller.rs, event.rs, frame.rs, mod.rs |
+| **A-02** Template structure | ✅ PASS | All sections present |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 222 chars |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/animation.md exists |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | specs/animation.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/animation.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2429 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2433 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 3 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AnimClip, AnimEvent, AnimFrame, Animation \| Stale in spec: Enums, Structs, animation |
+| **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -74,7 +64,7 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ⚠️ WARNING | 3 bindings but no // ─── separator comments |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
@@ -91,8 +81,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No **Tier** row in AGENT.md; expected tier1 |
-| **R-02** Dependency direction | ❌ ERROR | controller: Tier1 imports log_msg(unassigned) |
+| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
+| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -104,7 +94,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\animation_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_animation.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 35, line 36, line 48, line 83, line 90 |
+| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
 | **T-05** Test adequacy | ✅ PASS | 14 tests / 23 pub methods (61%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test animation_tests -- --nocapture |
@@ -116,8 +106,8 @@
 | **W-01** Example file exists | ✅ PASS | content/examples/animation.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 3 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/animation.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | All 3 functions consistent across spec and example |
-| **W-05** Wiki page | ✅ PASS | wiki\Animation-API.md |
+| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
+| **W-05** Wiki page | ✅ PASS | docs\wiki\Animation-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality

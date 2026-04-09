@@ -111,10 +111,7 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper for an audio source resource.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `SoundKey`. Slot key for the backing audio source.
+/// Fields: `state` (`Rc<RefCell<SharedState>>`), `key` (`SoundKey`).
 #[derive(Clone)]
 pub struct LuaSource {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -404,10 +401,7 @@ impl LuaUserData for LuaSource {
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper for an audio bus resource.
-///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-/// - `key` — `BusKey`. Slot key for the backing audio bus.
+/// Fields: `state` (`Rc<RefCell<SharedState>>`), `key` (`BusKey`).
 #[derive(Clone)]
 pub struct LuaBus {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -518,10 +512,7 @@ impl LuaUserData for LuaBus {
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper for the MIDI player.
-///
-/// # Fields
-/// - `inner` — `Rc<RefCell<MidiPlayer>>`. The MIDI player instance.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
+/// Fields: `inner` (`Rc<RefCell<MidiPlayer>>`), `state` (`Rc<RefCell<SharedState>>`).
 #[derive(Clone)]
 pub struct LuaMidiPlayer {
     pub(crate) inner: Rc<RefCell<MidiPlayer>>,
@@ -1054,14 +1045,10 @@ impl LuaUserData for LuaDecoder {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.audio` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`. The Lua VM.
-/// - `luna` — `&LuaTable`. The top-level `luna` table to register into.
-/// - `state` — `Rc<RefCell<SharedState>>`. Shared engine state.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
