@@ -1,6 +1,6 @@
 # Module Quality Report: `network`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 5 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -9,14 +9,17 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/network/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/network/): LuaNetworkHost
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaNetworkHost from lua_api/network_api.rs → src/network/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 38, line 45, line 67, line 125
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: NetworkError, NetworkEvent, NetworkHost, PeerStats | Stale in spec: Enums, Structs, network
 - [ ] **D-03** — Structured doc sections: Missing structured sections: host::NetworkHost (# Fields)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 379
+- [ ] **B-04** — No business logic in closures: '<closure@379>' (17 LOC, line 379) — extract body to src/network/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_constants_values, test_default_peers_within_max, test_create_host_client_defaults, test_create_host_custom_peers, test_create_host_max_peers (+21 more)
 
@@ -43,6 +46,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/network.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +56,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1628 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: NetworkError, NetworkEvent, NetworkHost, PeerStats \| Stale in spec: Enums, Structs, network |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -73,9 +78,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/network_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/network/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 379 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/network/): LuaNetworkHost |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaNetworkHost from lua_api/network_api.rs → src/network/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@379>' (17 LOC, line 379) — extract body to src/network/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -97,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_network.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_constants_values, test_default_peers_within_max, test_create_host_client_defaults, test_create_host_custom_peers, test_create_host_max_peers (+21 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 38, line 45, line 67, line 125 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 26 tests / 27 pub methods (96%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test network_tests -- --nocapture |
 
@@ -108,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/network.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/network.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Network-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

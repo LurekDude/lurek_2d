@@ -1,6 +1,6 @@
 # Module Quality Report: `physics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 27 ✅ / 8 ⚠️ / 8 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 28 ✅ / 11 ⚠️ / 9 ❌ / 19 🔵
 
 ---
 
@@ -9,9 +9,10 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **S-03** — File size limits: Files >2000 LOC: physics/world.rs (2122 LOC)
-- [ ] **SP-04** — Lua API completeness: Functions missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more)
+- [ ] **SP-04** — Lua API completeness: Missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) — add to ## Lua API in specs/physics.md
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/physics/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/physics/): LuaWorld, LuaBody, LuaPhysicsShape
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 98, line 1708
 - [ ] **R-02** — Dependency direction: body: Tier1 imports log_msg(unassigned); world: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 18, line 19, line 334, line 385, line 592
@@ -20,12 +21,15 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2133 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Body, BodyContact, BodyShape, BodyType, CollisionInfo | Stale in spec: Enums, Structs, physics
 - [ ] **D-03** — Structured doc sections: Missing structured sections: world::World (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: world:81, world:558, world:1332
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: bodyId, x, y, normalX, normalY (+1 more)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1506, line 1527, line 1549
+- [ ] **B-04** — No business logic in closures: '<closure@1549>' has if/match/for — extract to src/physics/ | '<closure@1643>' has if/match/for — extract to src/physics/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_friction_slows_body, test_angle_changes_under_torque, test_apply_impulse_changes_velocity, test_raycast_hits_body, test_raycast_misses_empty_world (+6 more)
+- [ ] **W-04** — Example–spec sync: In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md | In spec but not example: toi — add to examples/physics.lua
 - [ ] **Q-04** — Error handling: .unwrap() calls: world:39, world:51
 
 ## Full Check Results
@@ -51,6 +55,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/physics.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -59,8 +64,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/physics.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2133 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Functions missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: normalX, normalY, normalX, normalY, isTouching (+9 more) — add to ## Lua API in specs/physics.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Body, BodyContact, BodyShape, BodyType, CollisionInfo \| Stale in spec: Enums, Structs, physics |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -81,9 +87,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/physics_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/physics/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1506, line 1527, line 1549 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/physics/): LuaWorld, LuaBody, LuaPhysicsShape |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaWorld, LuaBody, LuaPhysicsShape from lua_api/physics_api.rs → src/physics/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1549>' has if/match/for — extract to src/physics/ \| '<closure@1643>' has if/match/for — extract to src/physics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 98, line 1708 |
 
@@ -105,7 +111,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_physics.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_friction_slows_body, test_angle_changes_under_torque, test_apply_impulse_changes_velocity, test_raycast_hits_body, test_raycast_misses_empty_world (+6 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 18, line 19, line 334, line 385, line 592 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 117 tests / 95 pub methods (123%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test physics_tests -- --nocapture |
 
@@ -116,7 +122,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/physics.lua present |
 | **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/physics.lua: normalX, normalY, toi, normalX, normalY, isTouching (+3 more) |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/physics.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: attachShape, destroyWorld, getCollisions, newChainShape — add to ## Lua API in specs/physics.md \| In spec but not example: toi — add to examples/physics.lua |
 | **W-05** Wiki page | ✅ PASS | wiki\Physics-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -128,6 +134,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: world:39, world:51 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `procgen`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 6 ⚠️ / 2 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 7 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -15,9 +15,10 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2323 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: CellularOpts, VoronoiOpts | Stale in spec: Enums, Structs, procgen
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: flood_fill:6, voronoi:11, voronoi:54
 - [ ] **D-09** — Section separators: 5 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 37, line 60, line 109
+- [ ] **B-04** — No business logic in closures: '<closure@133>' (21 LOC, line 133) — extract body to src/procgen/ | '<closure@37>' has if/match/for — extract to src/procgen/ | '<closure@109>' has if/match/for — extract to src/procgen/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
@@ -43,6 +44,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/procgen.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +54,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2323 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 5 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: CellularOpts, VoronoiOpts \| Stale in spec: Enums, Structs, procgen |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,7 +78,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/procgen_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 37, line 60, line 109 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@133>' (21 LOC, line 133) — extract body to src/procgen/ \| '<closure@37>' has if/match/for — extract to src/procgen/ \| '<closure@109>' has if/match/for — extract to src/procgen/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 134 |
 
@@ -97,7 +100,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_procgen.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 12 tests / 2 pub methods (600%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test procgen_tests -- --nocapture |
 
@@ -108,7 +111,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/procgen.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 5 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/procgen.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 5 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Procgen-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +123,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

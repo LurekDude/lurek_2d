@@ -1,6 +1,6 @@
 # Module Quality Report: `data`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 1 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 8 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -13,10 +13,11 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: BinValue, ByteData, CompressFormat, DataView, EncodeFormat | Stale in spec: Enums, Structs, data
 - [ ] **D-03** — Structured doc sections: Missing structured sections: dataview::LuaDataView (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: byte_data:114, byte_data:130, compress:13, encode:13, hash:14
 - [ ] **D-09** — Section separators: 13 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 111, line 129, line 145
+- [ ] **B-04** — No business logic in closures: '<closure@221>' (16 LOC, line 221) — extract body to src/data/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more)
 
@@ -43,6 +44,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/data.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +54,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1640 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 13 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: BinValue, ByteData, CompressFormat, DataView, EncodeFormat \| Stale in spec: Enums, Structs, data |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,7 +78,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/data_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 111, line 129, line 145 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@221>' (16 LOC, line 221) — extract body to src/data/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -97,7 +100,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_data.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_parse_toml_basic, test_lua_parse_toml_nested, test_lua_parse_toml_array, test_lua_encode_toml_basic, test_lua_toml_roundtrip (+1 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 190, line 361, line 363 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 54 tests / 26 pub methods (208%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test data_tests -- --nocapture |
 
@@ -108,7 +111,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/data.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 13 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/data.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 13 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Data-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +123,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

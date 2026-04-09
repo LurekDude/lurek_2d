@@ -1,6 +1,6 @@
 # Module Quality Report: `audio`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 32 ✅ / 6 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,8 @@
 
 - [ ] **D-01** — Module-level docs: Missing //! doc in: audio/dsp.rs
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/audio/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/
 - [ ] **R-02** — Dependency direction: bus: Tier1 imports log_msg(unassigned); decoder: Tier1 imports log_msg(unassigned); dsp: Tier1 imports log_msg(unassigned); midi_player: Tier1 imports log_msg(unassigned); mixer: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 237, line 312, line 353, line 402, line 404
 
@@ -19,8 +20,9 @@
 - [ ] **S-03** — File size limits: Files >1500 LOC: audio/mixer.rs (1587 LOC)
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2034 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: ActiveEffect, AtomicParam, AudioSource, Bus, Decoder | Stale in spec: Enums, Structs, audio
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: bus:57, bus:103, midi:14, midi_player:218, midi_player:226 (+18 more)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1114, line 1141, line 1201
+- [ ] **B-04** — No business logic in closures: '<closure@1076>' (28 LOC, line 1076) — extract body to src/audio/ | '<closure@1114>' (17 LOC, line 1114) — extract body to src/audio/ | '<closure@1520>' (16 LOC, line 1520) — extract body to src/audio/ | '<closure@1404>' has if/match/for — extract to src/audio/ | '<closure@1424>' has if/match/for — extract to src/audio/
 - [ ] **Q-04** — Error handling: .unwrap() calls: bus:138, bus:161, midi:129, midi:132, midi:138
 
 ## Full Check Results
@@ -46,6 +48,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/audio.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -55,7 +58,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2034 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 76 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ActiveEffect, AtomicParam, AudioSource, Bus, Decoder \| Stale in spec: Enums, Structs, audio |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -76,9 +80,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/audio_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/audio/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1114, line 1141, line 1201 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/audio/): LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSource, LuaBus, LuaMidiPlayer, LuaDecoder from lua_api/audio_api.rs → src/audio/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1076>' (28 LOC, line 1076) — extract body to src/audio/ \| '<closure@1114>' (17 LOC, line 1114) — extract body to src/audio/ \| '<closure@1520>' (16 LOC, line 1520) — extract body to src/audio/ \| '<closure@1404>' has if/match/for — extract to src/audio/ \| '<closure@1424>' has if/match/for — extract to src/audio/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -100,7 +104,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_audio.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 237, line 312, line 353, line 402, line 404 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 111 tests / 163 pub methods (68%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test audio_tests -- --nocapture |
 
@@ -111,7 +115,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/audio.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 76 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/audio.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 76 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Audio-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -123,6 +127,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: bus:138, bus:161, midi:129, midi:132, midi:138 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

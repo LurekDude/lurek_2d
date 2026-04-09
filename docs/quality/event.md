@@ -1,6 +1,6 @@
 # Module Quality Report: `event`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 31 ✅ / 7 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 9 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -11,16 +11,19 @@
 - [ ] **A-04** — Content sync: Files not in Source Files table: event_queue.rs
 - [ ] **D-06** — Lua API file docs: lua_api/event_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/event/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/event/): LuaSignal
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSignal from lua_api/event_api.rs → src/event/
 - [ ] **R-02** — Dependency direction: signal: Tier1 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: event_queue.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2348 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Event, EventArg, EventQueue, Signal, Subscription | Stale in spec: Enums, Structs, event
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: event_queue:24, event_queue:57, event_queue:77, signal:25
 - [ ] **D-09** — Section separators: 9 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 182
+- [ ] **B-04** — No business logic in closures: '<closure@182>' (20 LOC, line 182) — extract body to src/event/ | '<closure@212>' has if/match/for — extract to src/event/ | '<closure@265>' has if/match/for — extract to src/event/
 - [ ] **B-05** — Rc clone pattern: Possible missing state.clone() before move: line 213
 - [ ] **Q-04** — Error handling: .unwrap() calls: event_queue:245, event_queue:246, event_queue:275
 
@@ -47,6 +50,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: event_queue.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/event.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: event_queue.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -56,7 +60,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2348 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 9 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Event, EventArg, EventQueue, Signal, Subscription \| Stale in spec: Enums, Structs, event |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -77,9 +82,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/event_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/event/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 182 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/event/): LuaSignal |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSignal from lua_api/event_api.rs → src/event/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@182>' (20 LOC, line 182) — extract body to src/event/ \| '<closure@212>' has if/match/for — extract to src/event/ \| '<closure@265>' has if/match/for — extract to src/event/ |
 | **B-05** Rc clone pattern | ⚠️ WARNING | Possible missing state.clone() before move: line 213 |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -101,7 +106,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_event.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 19 tests / 18 pub methods (106%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test event_tests -- --nocapture |
 
@@ -112,7 +117,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/event.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 9 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/event.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 9 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Event-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -124,6 +129,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: event_queue:245, event_queue:246, event_queue:275 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `input`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 3 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 5 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,8 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/input/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/input/): LuaCursor
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaCursor from lua_api/input_api.rs → src/input/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 674
 - [ ] **R-02** — Dependency direction: gamepad: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 297, line 503, line 526, line 539
@@ -17,8 +18,10 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: CursorHandle, CursorKind, GamepadMappings, GamepadState, KeyboardState | Stale in spec: Enums, Structs, input
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: mouse:11, mouse:180, touch:13, touch:32, touch:51 (+1 more)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 151, line 291, line 328
+- [ ] **B-04** — No business logic in closures: '<closure@291>' (25 LOC, line 291) — extract body to src/input/ | '<closure@421>' has if/match/for — extract to src/input/ | '<closure@674>' has if/match/for — extract to src/input/
 
 ## Full Check Results
 
@@ -43,6 +46,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/input.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +56,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1891 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: CursorHandle, CursorKind, GamepadMappings, GamepadState, KeyboardState \| Stale in spec: Enums, Structs, input |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -73,9 +78,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/input_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/input/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 151, line 291, line 328 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/input/): LuaCursor |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaCursor from lua_api/input_api.rs → src/input/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@291>' (25 LOC, line 291) — extract body to src/input/ \| '<closure@421>' has if/match/for — extract to src/input/ \| '<closure@674>' has if/match/for — extract to src/input/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 674 |
 
@@ -97,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_input.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 297, line 503, line 526, line 539 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 65 tests / 57 pub methods (114%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test input_tests -- --nocapture |
 
@@ -108,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/input.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/input.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ✅ PASS | wiki\Input-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

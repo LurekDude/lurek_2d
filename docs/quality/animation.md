@@ -1,6 +1,6 @@
 # Module Quality Report: `animation`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 32 ✅ / 3 ⚠️ / 8 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 5 ⚠️ / 9 ❌ / 19 🔵
 
 ---
 
@@ -12,14 +12,17 @@
 - [ ] **A-03** — Purpose quality: No ## Purpose section found
 - [ ] **A-04** — Content sync: Files not in Source Files table: clip.rs, controller.rs, event.rs, frame.rs
 - [ ] **A-06** — Tier label: No Tier property in AGENT.md header
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/animation/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/animation/): LuaAnimation
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 21
 - [ ] **R-02** — Dependency direction: controller: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 35, line 36, line 48, line 83, line 90
 
 ### 🟡 Warnings — Should Fix
 
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: clip.rs, controller.rs, event.rs, frame.rs, mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2429 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AnimClip, AnimEvent, AnimFrame, Animation | Stale in spec: Enums, Structs, animation
 - [ ] **D-09** — Section separators: 3 bindings but no // ─── separator comments
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected tier1
 
@@ -46,6 +49,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: clip.rs, controller.rs, event.rs, frame.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/animation.md exists |
 | **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: clip.rs, controller.rs, event.rs, frame.rs, mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -55,7 +59,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2429 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 3 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AnimClip, AnimEvent, AnimFrame, Animation \| Stale in spec: Enums, Structs, animation |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -76,9 +81,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/animation_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/animation/ |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/animation/): LuaAnimation |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAnimation from lua_api/animation_api.rs → src/animation/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 21 |
 
@@ -100,7 +105,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_animation.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 35, line 36, line 48, line 83, line 90 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 14 tests / 23 pub methods (61%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test animation_tests -- --nocapture |
 
@@ -111,7 +116,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/animation.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 3 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/animation.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 3 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Animation-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -123,6 +128,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

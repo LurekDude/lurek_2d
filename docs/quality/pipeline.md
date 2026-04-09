@@ -1,6 +1,6 @@
 # Module Quality Report: `pipeline`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 6 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 7 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -9,15 +9,17 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/pipeline/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/pipeline/): LuaStep, LuaPipeline
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaStep, LuaPipeline from lua_api/pipeline_api.rs → src/pipeline/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 102, line 118
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2566 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: ErrorMode, ErrorPolicy, Pipeline, PipelineResult, PipelineScheduler | Stale in spec: Enums, Structs, pipeline
 - [ ] **D-09** — Section separators: 3 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 996, line 1024
+- [ ] **B-04** — No business logic in closures: '<closure@1024>' (60 LOC, line 1024) — extract body to src/pipeline/ | '<closure@996>' has if/match/for — extract to src/pipeline/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Pipeline-API.md)
 
@@ -44,6 +46,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/pipeline.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -53,7 +56,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2566 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 3 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ErrorMode, ErrorPolicy, Pipeline, PipelineResult, PipelineScheduler \| Stale in spec: Enums, Structs, pipeline |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -74,9 +78,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/pipeline_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/pipeline/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 996, line 1024 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/pipeline/): LuaStep, LuaPipeline |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaStep, LuaPipeline from lua_api/pipeline_api.rs → src/pipeline/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1024>' (60 LOC, line 1024) — extract body to src/pipeline/ \| '<closure@996>' has if/match/for — extract to src/pipeline/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -98,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_pipeline.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 102, line 118 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 18 tests / 27 pub methods (67%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test pipeline_tests -- --nocapture |
 
@@ -109,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/pipeline.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 3 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/pipeline.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 3 functions consistent across spec and example |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Pipeline-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -121,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

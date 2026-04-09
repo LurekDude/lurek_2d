@@ -1,6 +1,6 @@
 # Module Quality Report: `automation`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 2 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 5 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -8,7 +8,7 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Functions missing from spec: loadFromToml
+- [ ] **SP-04** — Lua API completeness: Missing from spec: loadFromToml — add to ## Lua API in specs/automation.md
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
 - [ ] **R-01** — Tier placement: AGENT.md tier 'Tier 2' ≠ registry tier 'tier1'
 - [ ] **R-02** — Dependency direction: simulator: Tier1 imports event(tier1); simulator: Tier1 imports log_msg(unassigned)
@@ -17,7 +17,10 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Action, Script, Simulator, Step | Stale in spec: Enums, Structs, automation
 - [ ] **D-09** — Section separators: 17 bindings but no // ─── separator comments
+- [ ] **B-04** — No business logic in closures: '<closure@36>' has if/match/for — extract to src/automation/
+- [ ] **W-04** — Example–spec sync: In example but not spec: loadFromToml — add to ## Lua API in specs/automation.md
 
 ## Full Check Results
 
@@ -42,6 +45,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/automation.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -50,8 +54,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/automation.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1654 chars |
-| **SP-04** Lua API completeness | ❌ ERROR | Functions missing from spec: loadFromToml |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: loadFromToml — add to ## Lua API in specs/automation.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Action, Script, Simulator, Step \| Stale in spec: Enums, Structs, automation |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -74,7 +79,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/automation_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@36>' has if/match/for — extract to src/automation/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -96,7 +101,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_automation.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 83, line 108, line 114, line 136, line 449 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 55 tests / 26 pub methods (212%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test automation_tests -- --nocapture |
 
@@ -107,7 +112,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/automation.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 17 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/automation.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: loadFromToml — add to ## Lua API in specs/automation.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Automation-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -119,6 +124,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

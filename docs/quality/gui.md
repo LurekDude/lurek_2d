@@ -1,6 +1,6 @@
 # Module Quality Report: `gui`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 29 ✅ / 9 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 10 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,7 @@
 
 - [ ] **D-06** — Lua API file docs: lua_api/gui_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/gui/
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTheme from lua_api/gui_api.rs → src/gui/
 - [ ] **R-02** — Dependency direction: context: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 68, line 449, line 740, line 742, line 744
 
@@ -18,11 +18,12 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2141 chars)
-- [ ] **SP-05** — Spec quality: Stub content found: PLACEHOLDER
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Accordion, AccordionSection, Button, CheckBox, ColorPicker | Stale in spec: Enums, Structs, gui
+- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-03** — Structured doc sections: Missing structured sections: context::WidgetKind (# Variants), widget::WidgetType (# Variants), widget::WidgetBase (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: controls:83, controls:89, extras:176, extras:375, extras:639 (+1 more)
 - [ ] **D-09** — Section separators: 51 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 64, line 82, line 101
+- [ ] **B-04** — No business logic in closures: '<closure@1855>' (23 LOC, line 1855) — extract body to src/gui/ | '<closure@3465>' (16 LOC, line 3465) — extract body to src/gui/ | '<closure@3807>' (17 LOC, line 3807) — extract body to src/gui/ | '<closure@4952>' (33 LOC, line 4952) — extract body to src/gui/ | '<closure@64>' has if/match/for — extract to src/gui/ | '<closure@82>' has if/match/for — extract to src/gui/
 - [ ] **B-05** — Rc clone pattern: Possible missing state.clone() before move: line 2059, line 3465
 - [ ] **Q-04** — Error handling: .unwrap() calls: data_graph_renderer:538
 
@@ -49,6 +50,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/gui.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -58,7 +60,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2141 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 51 bound functions in spec |
-| **SP-05** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Accordion, AccordionSection, Button, CheckBox, ColorPicker \| Stale in spec: Enums, Structs, gui |
+| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
 
 ### Phase 4 — Docstrings
 
@@ -80,8 +83,8 @@
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/gui_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/gui/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 64, line 82, line 101 |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTheme from lua_api/gui_api.rs → src/gui/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1855>' (23 LOC, line 1855) — extract body to src/gui/ \| '<closure@3465>' (16 LOC, line 3465) — extract body to src/gui/ \| '<closure@3807>' (17 LOC, line 3807) — extract body to src/gui/ \| '<closure@4952>' (33 LOC, line 4952) — extract body to src/gui/ \| '<closure@64>' has if/match/for — extract to src/gui/ \| '<closure@82>' has if/match/for — extract to src/gui/ |
 | **B-05** Rc clone pattern | ⚠️ WARNING | Possible missing state.clone() before move: line 2059, line 3465 |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -103,7 +106,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_gui.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 68, line 449, line 740, line 742, line 744 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 99 tests / 171 pub methods (58%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test gui_tests -- --nocapture |
 
@@ -114,7 +117,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/gui.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 51 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/gui.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 51 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Gui-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -126,6 +129,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: data_graph_renderer:538 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

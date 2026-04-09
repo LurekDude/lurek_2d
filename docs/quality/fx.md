@@ -1,6 +1,6 @@
 # Module Quality Report: `fx`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 4 ⚠️ / 6 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 7 ⚠️ / 7 ❌ / 19 🔵
 
 ---
 
@@ -8,19 +8,23 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Functions missing from spec: newPass, getEffectTypes
+- [ ] **SP-04** — Lua API completeness: Missing from spec: newPass, getEffectTypes — add to ## Lua API in specs/fx.md
 - [ ] **D-06** — Lua API file docs: lua_api/fx_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/fx/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/fx/): LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay from lua_api/fx_api.rs → src/fx/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 1119
 - [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_fx.lua
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2118 chars)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1123, line 1154, line 1238
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AmbientState, CloudState, FadeState, FilmGrainState, FlashState | Stale in spec: Enums, Structs
+- [ ] **B-04** — No business logic in closures: '<closure@1154>' (19 LOC, line 1154) — extract body to src/fx/ | '<closure@1184>' (45 LOC, line 1184) — extract body to src/fx/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **W-04** — Example–spec sync: In example but not spec: getEffectTypes, newPass — add to ## Lua API in specs/fx.md
 
 ## Full Check Results
 
@@ -45,6 +49,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/fx.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -53,8 +58,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/fx.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2118 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Functions missing from spec: newPass, getEffectTypes |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: newPass, getEffectTypes — add to ## Lua API in specs/fx.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AmbientState, CloudState, FadeState, FilmGrainState, FlashState \| Stale in spec: Enums, Structs |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,9 +81,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/fx_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/fx/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1123, line 1154, line 1238 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/fx/): LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaPostFxEffect, LuaPostFxStack, LuaImageEffect, LuaOverlay from lua_api/fx_api.rs → src/fx/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1154>' (19 LOC, line 1154) — extract body to src/fx/ \| '<closure@1184>' (45 LOC, line 1184) — extract body to src/fx/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 1119 |
 
@@ -99,7 +105,7 @@
 | **T-02** Lua test file | ❌ ERROR | Module has Lua API but no tests/lua/unit/test_fx.lua |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 27 tests / 57 pub methods (47%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test fx_tests -- --nocapture |
 
@@ -110,7 +116,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/fx.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 8 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/fx.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: getEffectTypes, newPass — add to ## Lua API in specs/fx.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Fx-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +128,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

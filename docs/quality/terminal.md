@@ -1,6 +1,6 @@
 # Module Quality Report: `terminal`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 5 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -9,15 +9,16 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/terminal/
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaTerminal, LuaWidget from lua_api/terminal_api.rs → src/terminal/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 22, line 72, line 287
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2485 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: BorderStyle, TCell, Terminal, Widget, WidgetBase | Stale in spec: Enums, Structs, terminal
 - [ ] **D-09** — Section separators: 7 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1197, line 1218, line 1240
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
@@ -43,6 +44,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/terminal.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +54,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2485 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 7 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: BorderStyle, TCell, Terminal, Widget, WidgetBase \| Stale in spec: Enums, Structs, terminal |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -74,8 +77,8 @@
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/terminal_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/terminal/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1197, line 1218, line 1240 |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaTerminal, LuaWidget from lua_api/terminal_api.rs → src/terminal/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -97,7 +100,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_terminal.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 22, line 72, line 287 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 44 tests / 61 pub methods (72%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test terminal_tests -- --nocapture |
 
@@ -108,7 +111,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/terminal.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 7 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/terminal.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 7 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Terminal-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +123,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

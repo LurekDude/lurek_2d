@@ -1,6 +1,6 @@
 # Module Quality Report: `lua_api`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 30 ✅ / 4 ⚠️ / 9 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 6 ⚠️ / 9 ❌ / 19 🔵
 
 ---
 
@@ -21,8 +21,10 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: fx_api:427, fx_api:1056, gui_api:819, gui_api:832, localization_api:247 (+1 more)
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
+- [ ] **T-05** — Test adequacy: 7 pub methods, 0 Rust tests — create test file
 - [ ] **Q-04** — Error handling: .unwrap() calls: audio_api:2282, thread_api:49, thread_api:59, thread_api:67, thread_api:74 (+1 more)
 
 ## Full Check Results
@@ -48,6 +50,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs, debugbridge_api.rs, devtools_api.rs, docs_api.rs, entity_api.rs, fx_api.rs, graph_api.rs, graphics_api.rs, gui_api.rs, light_api.rs, localization_api.rs, log_api.rs, lua_types.rs, minimap_api.rs, modding_api.rs, network_api.rs, pathfinding_api.rs, patterns_api.rs, pipeline_api.rs, procgen_api.rs, raycaster_api.rs, savegame_api.rs, scene_api.rs, serial_api.rs, spine_api.rs, thread_api.rs, tilemap_api.rs, tween_api.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/lua_api.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: ai_api.rs, animation_api.rs, automation_api.rs, camera_api.rs, compute_api.rs, dataframe_api.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -57,7 +60,8 @@
 | **SP-02** Required spec sections | ❌ ERROR | Missing sections: Key Types |
 | **SP-03** Summary quality | ✅ PASS | Summary is 694 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -102,7 +106,7 @@
 | **T-02** Lua test file | ✅ PASS | Module has no Lua API — skip |
 | **T-03** Test naming | ✅ PASS | No Rust test file — skip |
 | **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ⚠️ WARNING | 7 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test lua_api_tests -- --nocapture |
 
@@ -113,7 +117,7 @@
 | **W-01** Example file exists | ❌ ERROR | examples/lua_api.lua not found — create it |
 | **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/lua_api.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No Lua API — skip |
 | **W-05** Wiki page | ✅ PASS | Module has no Lua API — skip |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -125,6 +129,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: audio_api:2282, thread_api:49, thread_api:59, thread_api:67, thread_api:74 (+1 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

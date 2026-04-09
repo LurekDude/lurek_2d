@@ -1,6 +1,6 @@
 # Module Quality Report: `filesystem`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 32 ✅ / 7 ⚠️ / 4 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -10,17 +10,19 @@
 
 - [ ] **D-06** — Lua API file docs: lua_api/filesystem_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/filesystem/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/filesystem/): LuaFileData, LuaFileHandle
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaFileData, LuaFileHandle from lua_api/filesystem_api.rs → src/filesystem/
 - [ ] **R-02** — Dependency direction: vfs: Tier1 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-03** — Purpose quality: Purpose too long (1739 chars, target ≤500)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AsyncLoader, FileData, FileHandle, FileInfo, FileMode | Stale in spec: Enums, Structs, filesystem
 - [ ] **D-03** — Structured doc sections: Missing structured sections: async_loader::LoadHandle (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: async_loader:94, file_handle:16, file_handle:95, vfs:17
 - [ ] **D-09** — Section separators: 24 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 193, line 286, line 408
+- [ ] **B-04** — No business logic in closures: '<closure@286>' has if/match/for — extract to src/filesystem/
 - [ ] **Q-04** — Error handling: .unwrap() calls: async_loader:199, async_loader:201, async_loader:202, async_loader:245, async_loader:247
 
 ## Full Check Results
@@ -46,6 +48,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/filesystem.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -55,7 +58,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1739 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 24 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AsyncLoader, FileData, FileHandle, FileInfo, FileMode \| Stale in spec: Enums, Structs, filesystem |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -76,9 +80,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/filesystem_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/filesystem/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 193, line 286, line 408 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/filesystem/): LuaFileData, LuaFileHandle |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaFileData, LuaFileHandle from lua_api/filesystem_api.rs → src/filesystem/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@286>' has if/match/for — extract to src/filesystem/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -100,7 +104,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_filesystem.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 31 tests / 53 pub methods (58%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test filesystem_tests -- --nocapture |
 
@@ -111,7 +115,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/filesystem.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 24 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/filesystem.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 24 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Filesystem-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -123,6 +127,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: async_loader:199, async_loader:201, async_loader:202, async_loader:245, async_loader:247 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

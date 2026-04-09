@@ -1,6 +1,6 @@
 # Module Quality Report: `log`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 4 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 6 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -15,8 +15,10 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 125, line 186
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: MemoryEntry, Sink, SinkKind, SinkLevel, SinkRegistry | Stale in spec: Enums, Structs
+- [ ] **B-04** — No business logic in closures: '<closure@125>' (19 LOC, line 125) — extract body to src/log/ | '<closure@186>' (20 LOC, line 186) — extract body to src/log/ | '<closure@87>' has if/match/for — extract to src/log/ | '<closure@166>' has if/match/for — extract to src/log/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **T-05** — Test adequacy: 15 pub methods, 0 Rust tests — create test file
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Log-API.md)
 
 ## Full Check Results
@@ -42,6 +44,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/log.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -51,7 +54,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1479 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: MemoryEntry, Sink, SinkKind, SinkLevel, SinkRegistry \| Stale in spec: Enums, Structs |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -74,7 +78,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/log_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 125, line 186 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@125>' (19 LOC, line 125) — extract body to src/log/ \| '<closure@186>' (20 LOC, line 186) — extract body to src/log/ \| '<closure@87>' has if/match/for — extract to src/log/ \| '<closure@166>' has if/match/for — extract to src/log/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 166, line 186 |
 
@@ -96,7 +100,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_log.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | No Rust test file — skip |
 | **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ⚠️ WARNING | 15 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test log_tests -- --nocapture |
 
@@ -107,7 +111,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/log.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/log.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Log-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -119,6 +123,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

@@ -548,16 +548,31 @@ def check_spec_file(module: str) -> List[Check]:
     else:
         results.append(Check("SP-03", "Summary quality", ERROR, "No ## Summary section"))
 
-    # SP-04: Lua API completeness
+    # SP-04: Lua API completeness — bidirectional diff
     if has_lua_api and api_file.exists():
         api_content = read_text(api_file)
         bound_fns = re.findall(r'tbl\.set\(\s*"([^"]+)"', api_content)
         missing_fns = [fn for fn in bound_fns if fn not in content]
+        # Stale: names that appear in spec ## Lua API section but not in code
+        lua_api_section = re.search(r"## Lua API(.*?)(?=\n## |\Z)", content, re.DOTALL)
+        stale_fns: List[str] = []
+        if lua_api_section and bound_fns:
+            spec_api_text = lua_api_section.group(1)
+            # Look for function name patterns in the spec: `luna.module.funcName`
+            spec_fn_names = set(re.findall(r"`luna\.\w+\.(\w+)\s*\(", spec_api_text))
+            if spec_fn_names:
+                code_fn_set = set(bound_fns)
+                stale_fns = [fn for fn in spec_fn_names if fn not in code_fn_set]
+
+        details: List[str] = []
         if missing_fns:
             shown = missing_fns[:5]
             extra = f" (+{len(missing_fns)-5} more)" if len(missing_fns) > 5 else ""
-            results.append(Check("SP-04", "Lua API completeness", ERROR,
-                                  f"Functions missing from spec: {', '.join(shown)}{extra}"))
+            details.append(f"Missing from spec: {', '.join(shown)}{extra} — add to ## Lua API in specs/{module}.md")
+        if stale_fns:
+            details.append(f"Stale in spec (not in code): {', '.join(stale_fns[:4])} — remove from spec")
+        if details:
+            results.append(Check("SP-04", "Lua API completeness", ERROR, " | ".join(details)))
         elif bound_fns:
             results.append(Check("SP-04", "Lua API completeness", PASS,
                                   f"All {len(bound_fns)} bound functions in spec"))
@@ -566,17 +581,43 @@ def check_spec_file(module: str) -> List[Check]:
                                   "No tbl.set() bindings found"))
     else:
         results.append(Check("SP-04", "Lua API completeness", PASS,
-                              "No Lua API file \u2014 skip"
-                              if not has_lua_api else "api/ dir layout \u2014 manual check"))
+                              "No Lua API file — skip"
+                              if not has_lua_api else "api/ dir layout — manual check"))
 
-    # SP-05: spec quality (no stubs)
+    # SP-05: Key Types cross-reference — types in spec vs types in source
+    key_types_section = re.search(r"## Key Types(.*?)(?=\n## |\Z)", content, re.DOTALL)
+    mod_dir = SRC / module
+    code_types = set()
+    for rs in mod_dir.rglob("*.rs"):
+        for m in re.finditer(r"^pub\s+(?:struct|enum)\s+(\w+)", read_text(rs), re.MULTILINE):
+            code_types.add(m.group(1))
+    if key_types_section and code_types:
+        spec_type_names = set(re.findall(r"###?\s+`?(\w+)`?", key_types_section.group(1)))
+        missing_types = [t for t in code_types if t not in spec_type_names
+                         and not t.startswith("_") and not t.endswith("Key")]
+        stale_types = [t for t in spec_type_names if t not in code_types and len(t) > 2]
+        type_issues: List[str] = []
+        if missing_types:
+            type_issues.append(f"Types not in spec: {', '.join(sorted(missing_types)[:5])}")
+        if stale_types:
+            type_issues.append(f"Stale in spec: {', '.join(sorted(stale_types)[:4])}")
+        if type_issues:
+            results.append(Check("SP-05", "Key Types accuracy", WARN, " | ".join(type_issues)))
+        else:
+            results.append(Check("SP-05", "Key Types accuracy", PASS,
+                                  f"{len(code_types)} types — spec Key Types in sync"))
+    else:
+        results.append(Check("SP-05", "Key Types accuracy", PASS,
+                              "No Key Types section or no public types — skip"))
+
+    # SP-06: spec quality (no stubs)
     stub_hits = [p for p in ["TODO", "FIXME", "PLACEHOLDER", "Coming soon"]
                  if p.lower() in content.lower()]
     if stub_hits:
-        results.append(Check("SP-05", "Spec quality", WARN,
+        results.append(Check("SP-06", "Spec quality", WARN,
                               f"Stub content found: {', '.join(stub_hits)}"))
     else:
-        results.append(Check("SP-05", "Spec quality", PASS, "No stub content"))
+        results.append(Check("SP-06", "Spec quality", PASS, "No stub content"))
 
     return results
 
@@ -729,48 +770,89 @@ def check_lua_bridge(module: str) -> List[Check]:
     content = read_text(api_file)
     lines = content.splitlines()
 
-    # B-02: Only register() as pub fn
+    # B-02: Only register() as pub fn; also detect struct definitions
     extra_pub_fns = [f for f in re.findall(r"^pub\s+fn\s+(\w+)", content, re.MULTILINE)
                      if f != "register"]
+    pub_structs_in_api = re.findall(r"^pub\s+struct\s+(\w+)", content, re.MULTILINE)
+    b02_issues: List[str] = []
     if extra_pub_fns:
+        b02_issues.append(f"extra pub fn (move to src/{module}/): " + ", ".join(extra_pub_fns))
+    if pub_structs_in_api:
+        b02_issues.append(f"struct definitions (move to src/{module}/): " + ", ".join(pub_structs_in_api))
+    if b02_issues:
         results.append(Check("B-02", "Registration-only", ERROR,
-                              f"Extra pub fn in lua_api \u2014 move to src/{module}/: "
-                              + ", ".join(extra_pub_fns)))
+                              " | ".join(b02_issues)))
     else:
         results.append(Check("B-02", "Registration-only", PASS,
                               "Only register() is pub fn"))
 
-    # B-03: No impl LuaUserData in lua_api file
-    if "impl LuaUserData" in content:
+    # B-03: No impl LuaUserData in lua_api file — report exact struct name
+    ud_impls = re.findall(r"impl\s+LuaUserData\s+for\s+(\w+)", content)
+    if ud_impls:
+        structs = ", ".join(ud_impls)
         results.append(Check("B-03", "impl LuaUserData placement", ERROR,
-                              f"impl LuaUserData in lua_api \u2014 move to src/{module}/"))
+                              f"Move impl LuaUserData for {structs} from "
+                              f"lua_api/{module}_api.rs → src/{module}/"))
     else:
         results.append(Check("B-03", "impl LuaUserData placement", PASS,
                               "No LuaUserData impl in lua_api file"))
 
-    # B-04: long closures > 15 LOC (heuristic)
+    # B-04 / B-02b: Scan closures for size and control flow.
+    # For each tbl.set("name", lua.create_function(...)) block, measure LOC
+    # and look for control-flow keywords. Report: function name, LOC, action.
     large_closures: List[str] = []
-    closure_start = -1
-    closure_len = 0
-    for i, line in enumerate(lines):
-        stripped = line.strip()
+    logic_closures: List[str] = []
+    in_closure = False
+    closure_fn_name = ""
+    closure_start_line = 0
+    closure_depth = 0
+    closure_lines: List[str] = []
+
+    for i, raw in enumerate(lines):
+        stripped = raw.strip()
+
+        # Detect start of a new binding — grab the function name from the nearby tbl.set
         if re.search(r"lua\.create_(?:function|method)\b", stripped):
-            closure_start = i
-            closure_len = 0
-        if closure_start >= 0:
-            closure_len += 1
-            if closure_len > 15:
-                large_closures.append(f"line {closure_start + 1}")
-                closure_start = -1
-        if stripped.endswith("})?)?;") or stripped == "})?;":
-            closure_start = -1
-    if large_closures:
-        results.append(Check("B-04", "No business logic", WARN,
-                              f"Long closures (>15 LOC) \u2014 delegate to domain: "
-                              + ", ".join(large_closures[:3])))
+            # Look backward for the tbl.set("name", ...) on the same or preceding lines
+            name_m = None
+            for j in range(i, max(i - 3, -1), -1):
+                name_m = re.search(r'tbl\.set\(\s*"([^"]+)"', lines[j])
+                if name_m:
+                    break
+            in_closure = True
+            closure_fn_name = name_m.group(1) if name_m else f"<closure@{i+1}>"
+            closure_start_line = i + 1
+            closure_depth = 0
+            closure_lines = []
+
+        if in_closure:
+            closure_lines.append(stripped)
+            for ch in raw:
+                if ch == "{":
+                    closure_depth += 1
+                elif ch == "}":
+                    closure_depth -= 1
+            # Closure ends when depth returns to 0 after opening
+            if closure_depth <= 0 and len(closure_lines) > 2:
+                loc = len(closure_lines)
+                has_flow = any(re.search(r"\b(if |match |for |while |loop )", ln)
+                               for ln in closure_lines[1:-1])
+                if loc > 15:
+                    large_closures.append(
+                        f"'{closure_fn_name}' ({loc} LOC, line {closure_start_line}) "
+                        f"— extract body to src/{module}/")
+                elif has_flow:
+                    logic_closures.append(
+                        f"'{closure_fn_name}' has if/match/for — extract to src/{module}/")
+                in_closure = False
+
+    b04_issues = large_closures[:4] + logic_closures[:2]
+    if b04_issues:
+        results.append(Check("B-04", "No business logic in closures", WARN,
+                              " | ".join(b04_issues)))
     else:
-        results.append(Check("B-04", "No business logic", PASS,
-                              "Closures appear thin (\u226415 LOC)"))
+        results.append(Check("B-04", "No business logic in closures", PASS,
+                              "Closures appear thin (≤15 LOC, no control flow)"))
 
     # B-05: state.clone() before move |
     missing_clone: List[str] = []
@@ -1087,8 +1169,109 @@ def check_example_exists(module: str) -> Check:
                   f"No example found that demonstrates module '{module}'")
 
 
-# ── Orchestrator ──
+def check_test_adequacy(module: str) -> Check:
+    """T-05 (automated): Compare pub fn count in domain vs #[test] count in test file."""
+    mod_dir = SRC / module
+    pub_fn_count = 0
+    for rs in mod_dir.rglob("*.rs"):
+        pub_fn_count += len(re.findall(r"^    pub\s+fn\s+\w+", read_text(rs), re.MULTILINE))
+    if pub_fn_count == 0:
+        return Check("T-05", "Test adequacy", PASS, "No pub methods counted — skip")
 
+    test_file = None
+    for d in [TESTS_RUST / "unit", TESTS_RUST / "ext"]:
+        f = d / f"{module}_tests.rs"
+        if f.exists():
+            test_file = f
+            break
+    if not test_file:
+        return Check("T-05", "Test adequacy", WARN,
+                      f"{pub_fn_count} pub methods, 0 Rust tests — create test file")
+
+    test_count = len(re.findall(r"#\[test\]", read_text(test_file)))
+    ratio = test_count / pub_fn_count if pub_fn_count else 1.0
+    if ratio < 0.3:
+        return Check("T-05", "Test adequacy", WARN,
+                      f"{test_count} tests / {pub_fn_count} pub methods ({ratio:.0%}) — low coverage")
+    return Check("T-05", "Test adequacy", PASS,
+                  f"{test_count} tests / {pub_fn_count} pub methods ({ratio:.0%})")
+
+
+def check_log_prefix(module: str, analysis: ModuleFileAnalysis) -> Check:
+    """Q-07: Log calls use log:: prefix (log::info!, log::warn!, etc.)."""
+    mod_dir = SRC / module
+    bare_log: List[str] = []
+    for rs in mod_dir.rglob("*.rs"):
+        content = read_text(rs)
+        for i, line in enumerate(content.splitlines()):
+            stripped = line.strip()
+            if stripped.startswith("//"):
+                continue
+            # Bare info!/warn!/error!/debug! without log:: prefix
+            m = re.search(r'(?<!\w)(info|warn|error|debug)!\s*\(', stripped)
+            if m and "log::" not in stripped:
+                bare_log.append(f"{rs.stem}:{i+1}")
+    if bare_log:
+        shown = bare_log[:5]
+        extra = f" (+{len(bare_log)-5} more)" if len(bare_log) > 5 else ""
+        return Check("Q-07", "Log prefix", WARN,
+                      f"Bare log macro (add log:: prefix): {', '.join(shown)}{extra}")
+    return Check("Q-07", "Log prefix", PASS, "All log calls use log:: prefix")
+
+
+def check_example_spec_sync(module: str) -> Check:
+    """W-04: Functions in spec Lua API table match functions in examples/<module>.lua."""
+    spec_path = WORKSPACE / "specs" / f"{module}.md"
+    example_file = WORKSPACE / "examples" / f"{module}.lua"
+    api_file = LUA_API / f"{module}_api.rs"
+    if not api_file.exists():
+        return Check("W-04", "Example–spec sync", PASS, "No Lua API — skip")
+    if not spec_path.exists() or not example_file.exists():
+        return Check("W-04", "Example–spec sync", PASS, "Missing spec or example — other checks cover this")
+
+    api_content = read_text(api_file)
+    bound_fns = set(re.findall(r'tbl\.set\(\s*"([^"]+)"', api_content))
+    if not bound_fns:
+        return Check("W-04", "Example–spec sync", PASS, "No bound functions")
+
+    example_content = read_text(example_file)
+    spec_content = read_text(spec_path)
+
+    in_example = {fn for fn in bound_fns if fn in example_content}
+    in_spec = {fn for fn in bound_fns if fn in spec_content}
+    only_in_example = in_example - in_spec
+    only_in_spec = in_spec - in_example
+
+    issues: List[str] = []
+    if only_in_example:
+        issues.append(f"In example but not spec: {', '.join(sorted(only_in_example)[:4])} — add to ## Lua API in specs/{module}.md")
+    if only_in_spec:
+        issues.append(f"In spec but not example: {', '.join(sorted(only_in_spec)[:4])} — add to examples/{module}.lua")
+    if issues:
+        return Check("W-04", "Example–spec sync", WARN, " | ".join(issues))
+    return Check("W-04", "Example–spec sync", PASS,
+                  f"All {len(in_spec)} functions consistent across spec and example")
+
+
+def check_agent_source_files_complete(module: str) -> Check:
+    """A-04b: AGENT.md Source Files table covers all .rs files including submodule dirs."""
+    agent_path = SRC / module / "AGENT.md"
+    if not agent_path.exists():
+        return Check("A-04b", "Source Files completeness", PASS, "No AGENT.md — other check handles this")
+    content = read_text(agent_path)
+    mod_dir = SRC / module
+    # All .rs files (including in subdirs, not just top-level)
+    all_rs = {f.name for f in mod_dir.rglob("*.rs")}
+    listed = set(re.findall(r"\| `([^`]+\.rs)`", content))
+    unlisted = all_rs - listed
+    if unlisted:
+        return Check("A-04b", "Source Files completeness (incl. subdirs)", WARN,
+                      f"Nested .rs files not listed in AGENT.md: {', '.join(sorted(unlisted)[:6])}")
+    return Check("A-04b", "Source Files completeness (incl. subdirs)", PASS,
+                  "All nested .rs files listed in AGENT.md")
+
+
+# ── Orchestrator ──
 
 
 def audit_module(module: str) -> Tuple[str, List[Check], str]:
@@ -1112,6 +1295,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
 
     # Phase 2: AGENT.md Quality
     checks.extend(check_agent_md(module))
+    checks.append(check_agent_source_files_complete(module))
 
     # Phase 3: Technical Specification (specs/<module>.md)
     checks.extend(check_spec_file(module))
@@ -1144,8 +1328,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
     checks.append(check_lua_test_exists(module))
     checks.append(check_test_conventions(module))
     checks.append(check_float_comparisons(module))
-    checks.append(Check("T-05", "Test adequacy", MANUAL,
-                          "Verify coverage of all public functions"))
+    checks.append(check_test_adequacy(module))
     checks.append(Check("T-06", "Golden tests", MANUAL,
                           "Check if module qualifies for golden/snapshot tests"))
     checks.append(Check("T-07", "Tests pass", MANUAL,
@@ -1155,8 +1338,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
     checks.extend(check_example_file(module))
     checks.append(Check("W-03", "Example comments", MANUAL,
                           f"Verify examples/{module}.lua has realistic one-line comments per call"))
-    checks.append(Check("W-04", "Example–spec sync", MANUAL,
-                          "Verify function list in example matches spec Lua API table"))
+    checks.append(check_example_spec_sync(module))
     checks.append(check_wiki_page(module))
     checks.append(Check("W-06", "Changelog entry", MANUAL,
                           "Verify recent API changes have docs/CHANGELOG.md entries"))
@@ -1167,6 +1349,7 @@ def audit_module(module: str) -> Tuple[str, List[Check], str]:
                           "Verify log severity levels are appropriate (debug/info/warn/error)"))
     checks.append(check_unsafe(analysis))
     checks.append(check_unwrap(analysis))
+    checks.append(check_log_prefix(module, analysis))
     checks.append(Check("Q-05", "Rust best practices", MANUAL,
                           "Review for anti-patterns: unnecessary clones, redundant allocs"))
     checks.append(Check("Q-06", "Clippy clean", MANUAL,
@@ -1292,69 +1475,6 @@ def format_quality_report(module: str, checks: List[Check], result: str, date: s
     return "\n".join(lines) + "\n"
 
 
-def format_report(module: str, checks: List[Check], result: str) -> str:
-    """Format a human-readable audit report."""
-    lines = [
-        "=" * 60,
-        f"  LUNA2D MODULE AUDIT: {module} -- {result}",
-        "=" * 60,
-        "",
-    ]
-
-    # Group by phase
-    phases = {
-        "Phase 1 - Structure & Registration": ["S-"],
-        "Phase 2 - AGENT.md Quality": ["A-"],
-        "Phase 3 - Docstrings": ["D-"],
-        "Phase 4 - Architecture Compliance": ["R-"],
-        "Phase 5 - Test Coverage": ["T-"],
-        "Phase 6 - Documentation & Wiki": ["W-"],
-        "Phase 7 - Code Quality": ["Q-"],
-        "Phase 8 - Performance": ["P-"],
-        "Phase 9 - Integration & Extension": ["I-"],
-        "Phase 10 - Localization & Logging": ["L-"],
-    }
-
-    for phase_name, prefixes in phases.items():
-        phase_checks = [c for c in checks
-                        if any(c.code.startswith(p) for p in prefixes)]
-        if not phase_checks:
-            continue
-        lines.append(f"  {phase_name}")
-        for c in phase_checks:
-            icon = {PASS: "+", WARN: "!", ERROR: "X", MANUAL: "?"}[c.verdict]
-            lines.append(f"    [{icon}] {c.verdict:7s}  {c.code}  {c.name}")
-            if c.verdict != PASS and c.verdict != MANUAL:
-                lines.append(f"              -> {c.detail}")
-        lines.append("")
-
-    # Score
-    errors = sum(1 for c in checks if c.verdict == ERROR)
-    warnings = sum(1 for c in checks if c.verdict == WARN)
-    passes = sum(1 for c in checks if c.verdict == PASS)
-    manual = sum(1 for c in checks if c.verdict == MANUAL)
-
-    lines.append("=" * 60)
-    lines.append(f"  SCORE: {passes} PASS / {warnings} WARNING / {errors} ERROR"
-                 f" / {manual} MANUAL -> {result}")
-    lines.append("=" * 60)
-
-    if errors:
-        lines.append("")
-        lines.append("  REQUIRED ACTIONS (ERRORs):")
-        for i, c in enumerate(c for c in checks if c.verdict == ERROR):
-            lines.append(f"    {i+1}. {c.code}: {c.detail}")
-
-    if warnings:
-        lines.append("")
-        lines.append("  RECOMMENDED IMPROVEMENTS (WARNINGs):")
-        for i, c in enumerate(c for c in checks if c.verdict == WARN):
-            lines.append(f"    {i+1}. {c.code}: {c.detail}")
-
-    lines.append("")
-    return "\n".join(lines)
-
-
 def resolve_modules(args: argparse.Namespace) -> List[str]:
     """Resolve module list from CLI arguments."""
     if args.all:
@@ -1396,12 +1516,11 @@ def main() -> int:
 
     results = []
     all_passed = True
-    output_lines = []
 
     for mod in modules:
         mod_dir = SRC / mod
         if not mod_dir.is_dir():
-            print(f"Warning: src/{mod}/ does not exist — skipping", file=sys.stderr)
+            print(f"Warning: src/{mod}/ does not exist — skipping", file=sys.stderr, flush=True)
             continue
 
         module_name, checks, result = audit_module(mod)
@@ -1411,10 +1530,6 @@ def main() -> int:
             all_passed = False
 
         if not args.json:
-            output_lines.append(format_report(module_name, checks, result))
-
-        # Write per-module docs/quality/<module>.md if requested
-        if args.docs_quality:
             import datetime
             quality_dir = WORKSPACE / "docs" / "quality"
             quality_dir.mkdir(parents=True, exist_ok=True)
@@ -1422,60 +1537,26 @@ def main() -> int:
             qr = format_quality_report(module_name, checks, result, date_str)
             qpath = quality_dir / f"{module_name}.md"
             qpath.write_text(qr, encoding="utf-8")
-            print(f"  docs/quality/{module_name}.md ({result})", file=sys.stderr)
+            # One short line — never fills the pipe.
+            print(f"docs/quality/{module_name}.md [{result}]", flush=True)
 
-        # Release cached file content between modules so memory stays bounded
-        # when auditing many modules with --all or --tier.
+        # Release cached file content between modules so memory stays bounded.
         clear_file_cache()
 
-    # Batch summary
     if len(modules) > 1 and not args.json:
-        output_lines.append("=" * 60)
-        output_lines.append("  BATCH AUDIT SUMMARY")
-        output_lines.append("=" * 60)
-        output_lines.append("")
-        output_lines.append(f"  {'Module':<20s} {'PASS':>5s} {'WARN':>5s} {'ERR':>5s} {'Result':>7s}")
-        output_lines.append(f"  {'-'*20} {'-'*5} {'-'*5} {'-'*5} {'-'*7}")
-        for r in results:
-            p = sum(1 for c in r["checks"] if c["verdict"] == PASS)
-            w = sum(1 for c in r["checks"] if c["verdict"] == WARN)
-            e = sum(1 for c in r["checks"] if c["verdict"] == ERROR)
-            output_lines.append(
-                f"  {r['module']:<20s} {p:>5d} {w:>5d} {e:>5d} {r['result']:>7s}")
         passed = sum(1 for r in results if r["result"] == "PASS")
-        output_lines.append("")
-        output_lines.append(f"  Overall: {passed}/{len(results)} modules passed")
-        output_lines.append("")
+        failed = len(results) - passed
+        print(f"\n{passed}/{len(results)} passed — {failed} failed — reports in docs/quality/",
+              flush=True)
 
     if args.json:
         output = json.dumps(results, indent=2)
         if args.output:
             Path(args.output).write_text(output, encoding="utf-8")
-            print(f"Report saved to {args.output}", flush=True)
+            print(f"JSON report saved to {args.output}", flush=True)
         else:
-            # Print JSON line-by-line so the pipe never fills up.
             for ln in output.splitlines():
                 print(ln, flush=True)
-        return 0 if all_passed else 1
-
-    # Text report: always write to --output when given.
-    # When --docs-quality is active the per-module Markdown files are the
-    # primary artifact; only write a brief progress summary to stdout so the
-    # pipe never blocks on large batches.
-    if args.output:
-        Path(args.output).write_text("\n".join(output_lines), encoding="utf-8")
-        print(f"Report saved to {args.output}", flush=True)
-    elif args.docs_quality:
-        # Docs-quality mode: all output went to docs/quality/; just print totals.
-        passed  = sum(1 for r in results if r["result"] == "PASS")
-        failed  = sum(1 for r in results if r["result"] == "FAIL")
-        print(f"Quality reports written to docs/quality/  ({passed} PASS, {failed} FAIL)",
-              flush=True)
-    else:
-        # Normal mode: emit lines one-by-one with flush so the pipe drains
-        # continuously and never deadlocks in VS Code's extension host.
-        for ln in "\n".join(output_lines).splitlines():
-            print(ln, flush=True)
 
     return 0 if all_passed else 1
 

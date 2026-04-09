@@ -1,6 +1,6 @@
 # Module Quality Report: `patterns`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 6 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 8 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -9,16 +9,18 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **A-04** — Content sync: Files not in Source Files table: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs, throttle.rs
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/patterns/
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 782, line 1254, line 1414
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs
 - [ ] **SP-03** — Summary quality: Summary very long (3948 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Blackboard, BlackboardValue, CommandEntry, CommandStack, Debounce | Stale in spec: Enums, Structs, patterns
 - [ ] **D-03** — Structured doc sections: Missing structured sections: simple_state::SimpleState (# Fields)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1516, line 1532, line 1550
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Patterns-API.md)
 
 ## Full Check Results
@@ -44,6 +46,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs, throttle.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/patterns.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: blackboard.rs, funnel.rs, observer.rs, priority_queue.rs, ring.rs, simple_state.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -53,7 +56,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3948 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Blackboard, BlackboardValue, CommandEntry, CommandStack, Debounce \| Stale in spec: Enums, Structs, patterns |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,8 +79,8 @@
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/patterns_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/patterns/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1516, line 1532, line 1550 |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaEventBus, LuaObjectPool, LuaCommandStack, LuaServiceLocator, LuaFactory, LuaSimpleState, LuaBlackboard, LuaObserver, LuaThrottle, LuaDebounce, LuaPriorityQueue, LuaRing, LuaFunnel from lua_api/patterns_api.rs → src/patterns/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 782, line 1254, line 1414 |
 
@@ -98,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_patterns.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ⚠️ WARNING | 34 tests / 121 pub methods (28%) — low coverage |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test patterns_tests -- --nocapture |
 
@@ -109,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/patterns.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/patterns.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Patterns-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -121,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

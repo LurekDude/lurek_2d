@@ -1,6 +1,6 @@
 # Module Quality Report: `tween`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 3 ⚠️ / 7 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 4 ⚠️ / 7 ❌ / 19 🔵
 
 ---
 
@@ -18,7 +18,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 67, line 99, line 116
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
+- [ ] **B-04** — No business logic in closures: '<closure@134>' (20 LOC, line 134) — extract body to src/tween/ | '<closure@184>' has if/match/for — extract to src/tween/ | '<closure@201>' has if/match/for — extract to src/tween/
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Tween-API.md)
 
@@ -45,6 +46,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/tween.md exists |
 | **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -54,7 +56,8 @@
 | **SP-02** Required spec sections | ❌ ERROR | Missing sections: Summary, Source Files, Key Types |
 | **SP-03** Summary quality | ❌ ERROR | No ## Summary section |
 | **SP-04** Lua API completeness | ✅ PASS | All 9 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -77,7 +80,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/tween_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 67, line 99, line 116 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@134>' (20 LOC, line 134) — extract body to src/tween/ \| '<closure@184>' has if/match/for — extract to src/tween/ \| '<closure@201>' has if/match/for — extract to src/tween/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 201 |
 
@@ -99,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_tween.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 16 tests / 18 pub methods (89%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test tween_tests -- --nocapture |
 
@@ -110,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/tween.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 9 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/tween.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 9 functions consistent across spec and example |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Tween-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

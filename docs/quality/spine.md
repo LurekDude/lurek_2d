@@ -1,6 +1,6 @@
 # Module Quality Report: `spine`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 4 ⚠️ / 4 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 6 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -10,13 +10,16 @@
 
 - [ ] **D-01** — Module-level docs: Missing //! doc in: spine/bone.rs, spine/skeleton.rs, spine/slot.rs
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/spine/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/spine/): LuaSkeleton
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSkeleton from lua_api/spine_api.rs → src/spine/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 20, line 21, line 32, line 38, line 60
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2143 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Bone, BoneParams, Skeleton, Slot | Stale in spec: Enums, Structs, spine
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Spine-API.md)
 
@@ -43,6 +46,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/spine.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -52,7 +56,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2143 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Bone, BoneParams, Skeleton, Slot \| Stale in spec: Enums, Structs, spine |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -73,9 +78,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/spine_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/spine/ |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/spine/): LuaSkeleton |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSkeleton from lua_api/spine_api.rs → src/spine/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -97,7 +102,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_spine.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 20, line 21, line 32, line 38, line 60 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 13 tests / 15 pub methods (87%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test spine_tests -- --nocapture |
 
@@ -108,7 +113,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/spine.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/spine.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Spine-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -120,6 +125,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

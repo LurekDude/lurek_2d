@@ -1,6 +1,6 @@
 # Module Quality Report: `graphics`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 29 ✅ / 7 ⚠️ / 7 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 31 ✅ / 9 ⚠️ / 8 ❌ / 19 🔵
 
 ---
 
@@ -11,7 +11,8 @@
 - [ ] **S-03** — File size limits: Files >2000 LOC: graphics/gpu_renderer.rs (4172 LOC)
 - [ ] **D-01** — Module-level docs: Missing //! doc in: graphics/color.rs
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/graphics/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/graphics/): LuaImageData, LuaImage, LuaNineSlice, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 171, line 2152
 - [ ] **R-02** — Dependency direction: canvas: Tier1 imports log_msg(unassigned); font: Tier1 imports log_msg(unassigned); gpu_renderer: Tier1 imports log_msg(unassigned); mesh: Tier1 imports log_msg(unassigned); shader: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 43, line 313, line 509, line 525, line 880
@@ -19,10 +20,12 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2471 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AtlasRegion, BatchEntry, BlendMode, Canvas, Color | Stale in spec: Enums, Structs, Type, graphics
 - [ ] **D-03** — Structured doc sections: Missing structured sections: renderer::DrawCommand (# Variants)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: draw_layer:14, draw_layer:26, draw_layer:53, mesh:18, mesh:34 (+5 more)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1257, line 1288, line 1313
+- [ ] **B-04** — No business logic in closures: '<closure@1437>' (23 LOC, line 1437) — extract body to src/graphics/ | '<closure@1469>' (25 LOC, line 1469) — extract body to src/graphics/ | '<closure@1540>' (31 LOC, line 1540) — extract body to src/graphics/ | '<closure@1589>' (119 LOC, line 1589) — extract body to src/graphics/ | '<closure@1933>' has if/match/for — extract to src/graphics/ | '<closure@1954>' has if/match/for — extract to src/graphics/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_texture_handle_reuse_reports_invalid_texture, test_phase01_released_numeric_texture_handle_reports_invalid_texture, test_phase01_released_font_handle_reuse_reports_invalid_font, test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch, test_transform_push_queues_push_transform (+71 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: gpu_renderer:964, gpu_renderer:974, gpu_renderer:979, gpu_renderer:984, gpu_renderer:989 (+40 more)
 
@@ -49,6 +52,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/graphics.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -58,7 +62,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2471 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AtlasRegion, BatchEntry, BlendMode, Canvas, Color \| Stale in spec: Enums, Structs, Type, graphics |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -79,9 +84,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/graphics_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/graphics/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1257, line 1288, line 1313 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/graphics/): LuaImageData, LuaImage, LuaNineSlice, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaImageData, LuaNineSlice, LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaMesh, LuaShader, LuaQuad, LuaShape, LuaDrawLayer from lua_api/graphics_api.rs → src/graphics/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1437>' (23 LOC, line 1437) — extract body to src/graphics/ \| '<closure@1469>' (25 LOC, line 1469) — extract body to src/graphics/ \| '<closure@1540>' (31 LOC, line 1540) — extract body to src/graphics/ \| '<closure@1589>' (119 LOC, line 1589) — extract body to src/graphics/ \| '<closure@1933>' has if/match/for — extract to src/graphics/ \| '<closure@1954>' has if/match/for — extract to src/graphics/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 171, line 2152 |
 
@@ -103,7 +108,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_graphics.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_texture_handle_reuse_reports_invalid_texture, test_phase01_released_numeric_texture_handle_reports_invalid_texture, test_phase01_released_font_handle_reuse_reports_invalid_font, test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch, test_transform_push_queues_push_transform (+71 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 43, line 313, line 509, line 525, line 880 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 112 tests / 86 pub methods (130%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test graphics_tests -- --nocapture |
 
@@ -114,7 +119,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/graphics.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/graphics.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ✅ PASS | wiki\Graphics-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -126,6 +131,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: gpu_renderer:964, gpu_renderer:974, gpu_renderer:979, gpu_renderer:984, gpu_renderer:989 (+40 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

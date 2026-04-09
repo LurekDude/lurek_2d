@@ -1,6 +1,6 @@
 # Module Quality Report: `pathfinding`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 30 ✅ / 8 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 32 ✅ / 10 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -8,9 +8,10 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Functions missing from spec: newNavGridFromTileMap
+- [ ] **SP-04** — Lua API completeness: Missing from spec: newNavGridFromTileMap — add to ## Lua API in specs/pathfinding.md
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/pathfinding/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/pathfinding/): LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField from lua_api/pathfinding_api.rs → src/pathfinding/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 23, line 526, line 653
 - [ ] **R-02** — Dependency direction: astar: Tier2 imports log_msg(unassigned); flow_field: Tier2 imports log_msg(unassigned); grid: Tier2 imports log_msg(unassigned); hpa: Tier2 imports log_msg(unassigned); influence_map: Tier2 imports log_msg(unassigned)
 
@@ -19,10 +20,12 @@
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **A-03** — Purpose quality: Purpose too long (2248 chars, target ≤500)
 - [ ] **SP-03** — Summary quality: Summary very long (2248 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AbstractEdge, AbstractGraph, AbstractNode, Cell, Chunk | Stale in spec: Enums, Structs, Type, pathfinding
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: async_pool:142, grid:89, grid:97, nav_grid:240, pathgrid:15 (+2 more)
 - [ ] **D-09** — Section separators: 8 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 930, line 959, line 989
+- [ ] **B-04** — No business logic in closures: '<closure@1005>' (30 LOC, line 1005) — extract body to src/pathfinding/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_nav_grid_new_dimensions, test_nav_grid_new_all_walkable, test_nav_grid_set_get_cost, test_nav_grid_cost_out_of_bounds, test_nav_grid_blocked (+49 more)
+- [ ] **W-04** — Example–spec sync: In example but not spec: newNavGridFromTileMap — add to ## Lua API in specs/pathfinding.md
 - [ ] **Q-04** — Error handling: .unwrap() calls: grid:259, grid:274, grid:339, grid:354, grid:414 (+16 more)
 
 ## Full Check Results
@@ -48,6 +51,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/pathfinding.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -56,8 +60,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/pathfinding.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2248 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Functions missing from spec: newNavGridFromTileMap |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: newNavGridFromTileMap — add to ## Lua API in specs/pathfinding.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AbstractEdge, AbstractGraph, AbstractNode, Cell, Chunk \| Stale in spec: Enums, Structs, Type, pathfinding |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -78,9 +83,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/pathfinding_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/pathfinding/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 930, line 959, line 989 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/pathfinding/): LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaNavGrid, LuaUnitPathfinder, LuaFlowField, LuaPathGrid, LuaAiFlowField from lua_api/pathfinding_api.rs → src/pathfinding/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1005>' (30 LOC, line 1005) — extract body to src/pathfinding/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 23, line 526, line 653 |
 
@@ -102,7 +107,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_pathfinding.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_nav_grid_new_dimensions, test_nav_grid_new_all_walkable, test_nav_grid_set_get_cost, test_nav_grid_cost_out_of_bounds, test_nav_grid_blocked (+49 more) |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 54 tests / 96 pub methods (56%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test pathfinding_tests -- --nocapture |
 
@@ -113,7 +118,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/pathfinding.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 8 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/pathfinding.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: newNavGridFromTileMap — add to ## Lua API in specs/pathfinding.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Pathfinding-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -125,6 +130,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: grid:259, grid:274, grid:339, grid:354, grid:414 (+16 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

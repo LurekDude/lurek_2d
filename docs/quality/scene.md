@@ -1,6 +1,6 @@
 # Module Quality Report: `scene`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 6 ⚠️ / 4 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 7 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,8 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/scene/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/scene/): LuaDepthSorter
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaDepthSorter from lua_api/scene_api.rs → src/scene/
 - [ ] **R-02** — Dependency direction: stack: Tier2 imports log_msg(unassigned); transition: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 95, line 97, line 99, line 109, line 112
 
@@ -17,8 +18,9 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2498 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: ActiveTransition, DepthEntry, DepthSorter, SceneStack, TransitionType | Stale in spec: Enums, Structs, scene
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: depth_sorter:11, depth_sorter:26, depth_sorter:49, stack:62, stack:98 (+2 more)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 179, line 225, line 262
+- [ ] **B-04** — No business logic in closures: '<closure@225>' (24 LOC, line 225) — extract body to src/scene/ | '<closure@327>' (21 LOC, line 327) — extract body to src/scene/ | '<closure@306>' has if/match/for — extract to src/scene/ | '<closure@358>' has if/match/for — extract to src/scene/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_transition_type_from_lua_str_all_variants, test_transition_type_from_lua_str_unknown_returns_none, test_active_transition_progress_zero_to_one, test_active_transition_zero_duration_instant, test_active_transition_is_complete (+31 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: stack:118, stack:145, stack:194, stack:403
 
@@ -45,6 +47,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/scene.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -54,7 +57,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2498 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 27 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ActiveTransition, DepthEntry, DepthSorter, SceneStack, TransitionType \| Stale in spec: Enums, Structs, scene |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,9 +79,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/scene_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/scene/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 179, line 225, line 262 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/scene/): LuaDepthSorter |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaDepthSorter from lua_api/scene_api.rs → src/scene/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@225>' (24 LOC, line 225) — extract body to src/scene/ \| '<closure@327>' (21 LOC, line 327) — extract body to src/scene/ \| '<closure@306>' has if/match/for — extract to src/scene/ \| '<closure@358>' has if/match/for — extract to src/scene/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -99,7 +103,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_scene.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_transition_type_from_lua_str_all_variants, test_transition_type_from_lua_str_unknown_returns_none, test_active_transition_progress_zero_to_one, test_active_transition_zero_duration_instant, test_active_transition_is_complete (+31 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 95, line 97, line 99, line 109, line 112 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 36 tests / 36 pub methods (100%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test scene_tests -- --nocapture |
 
@@ -110,7 +114,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/scene.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 27 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/scene.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 27 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Scene-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +126,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: stack:118, stack:145, stack:194, stack:403 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

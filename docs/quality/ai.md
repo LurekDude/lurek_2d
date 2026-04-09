@@ -1,6 +1,6 @@
 # Module Quality Report: `ai`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 5 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 5 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,7 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/ai/
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 354, line 1283, line 1649
 - [ ] **R-02** — Dependency direction: blackboard: Tier2 imports log_msg(unassigned); command_queue: Tier2 imports log_msg(unassigned); fsm: Tier2 imports log_msg(unassigned); goap: Tier2 imports log_msg(unassigned); mod: Tier2 imports pathfinding(tier2)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 112, line 243, line 265, line 549, line 550
@@ -18,9 +18,9 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2214 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AIWorld, Agent, BTNode, BTStatus, BehaviorTree | Stale in spec: Enums, Structs
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: blackboard:212, fsm:147, goap:185, steering:32, steering:73 (+1 more)
 - [ ] **D-09** — Section separators: 19 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 1998, line 2015, line 2035
 
 ## Full Check Results
 
@@ -45,6 +45,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/ai.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -54,7 +55,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2214 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 19 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AIWorld, Agent, BTNode, BTStatus, BehaviorTree \| Stale in spec: Enums, Structs |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -76,8 +78,8 @@
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/ai_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/ai/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 1998, line 2015, line 2035 |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaAIWorld, LuaAgent, LuaBlackboard, LuaStateMachine, LuaBehaviorTree, LuaBTNode, LuaSteeringManager, LuaQLearner, LuaUtilityAI, LuaGOAPPlanner, LuaInfluenceMap, LuaSquad, LuaCommandQueue from lua_api/ai_api.rs → src/ai/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 354, line 1283, line 1649 |
 
@@ -99,7 +101,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_ai.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 112, line 243, line 265, line 549, line 550 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 83 tests / 98 pub methods (85%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test ai_tests -- --nocapture |
 
@@ -110,7 +112,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/ai.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 19 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/ai.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 19 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Ai-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +124,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `debugbridge`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 37 ✅ / 5 ⚠️ / 1 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 41 ✅ / 6 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -14,8 +14,9 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2366 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: BridgeShared, PendingRequest, PendingResponse, PrintEntry | Stale in spec: Enums, Structs, debugbridge
 - [ ] **D-03** — Structured doc sections: Missing structured sections: bridge::PendingRequest (# Fields), bridge::PendingResponse (# Fields), bridge::PrintEntry (# Fields), bridge::BridgeShared (# Fields)
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 43, line 75, line 118
+- [ ] **B-04** — No business logic in closures: '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ | '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ | '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ | '<closure@75>' has if/match/for — extract to src/debugbridge/ | '<closure@369>' has if/match/for — extract to src/debugbridge/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 
 ## Full Check Results
@@ -41,6 +42,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/debugbridge.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -50,7 +52,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2366 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: BridgeShared, PendingRequest, PendingResponse, PrintEntry \| Stale in spec: Enums, Structs, debugbridge |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -73,7 +76,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/debugbridge_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 43, line 75, line 118 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ \| '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ \| '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ \| '<closure@75>' has if/match/for — extract to src/debugbridge/ \| '<closure@369>' has if/match/for — extract to src/debugbridge/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 311, line 369 |
 
@@ -95,7 +98,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_debugbridge.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 20 tests / 7 pub methods (286%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test debugbridge_tests -- --nocapture |
 
@@ -106,7 +109,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/debugbridge.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/debugbridge.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ✅ PASS | wiki\Debugbridge-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -118,6 +121,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

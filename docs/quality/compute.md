@@ -1,6 +1,6 @@
 # Module Quality Report: `compute`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 30 ✅ / 6 ⚠️ / 7 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 32 ✅ / 8 ⚠️ / 8 ❌ / 19 🔵
 
 ---
 
@@ -12,15 +12,18 @@
 - [ ] **A-03** — Purpose quality: No ## Purpose section found
 - [ ] **A-04** — Content sync: Files not in Source Files table: array.rs, ops.rs, spatial.rs
 - [ ] **A-06** — Tier label: No Tier property in AGENT.md header
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/compute/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/compute/): LuaArray
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaArray from lua_api/compute_api.rs → src/compute/
 - [ ] **R-02** — Dependency direction: array: Tier1 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 66, line 67, line 76, line 92, line 138
 
 ### 🟡 Warnings — Should Fix
 
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: array.rs, mod.rs, ops.rs, spatial.rs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: DataType, NdArray | Stale in spec: Enums, Structs, compute
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: array:16, array:63, array:107, ops:130, ops:154 (+16 more)
 - [ ] **D-09** — Section separators: 5 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 653, line 670, line 688
+- [ ] **B-04** — No business logic in closures: '<closure@688>' (16 LOC, line 688) — extract body to src/compute/
 - [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected tier1
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_new_creates_zero_initialized_array, test_zeros_1d, test_ones_fills_with_one, test_ones_int32, test_range_ascending (+74 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: array:463, array:464, array:465, array:478, array:489 (+53 more)
@@ -48,6 +51,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: array.rs, ops.rs, spatial.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/compute.md exists |
 | **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: array.rs, mod.rs, ops.rs, spatial.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -57,7 +61,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1669 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 5 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: DataType, NdArray \| Stale in spec: Enums, Structs, compute |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -78,9 +83,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/compute_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/compute/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 653, line 670, line 688 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/compute/): LuaArray |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaArray from lua_api/compute_api.rs → src/compute/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@688>' (16 LOC, line 688) — extract body to src/compute/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -102,7 +107,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_compute.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_new_creates_zero_initialized_array, test_zeros_1d, test_ones_fills_with_one, test_ones_int32, test_range_ascending (+74 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 66, line 67, line 76, line 92, line 138 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 79 tests / 25 pub methods (316%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test compute_tests -- --nocapture |
 
@@ -113,7 +118,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/compute.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 5 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/compute.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 5 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Compute-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -125,6 +130,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: array:463, array:464, array:465, array:478, array:489 (+53 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

@@ -1,6 +1,6 @@
 # Module Quality Report: `localization`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 6 ⚠️ / 3 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 7 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -15,9 +15,10 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
-- [ ] **SP-05** — Spec quality: Stub content found: PLACEHOLDER
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Catalog, CatalogError, PluralForm | Stale in spec: Enums, Structs, localization
+- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: interpolation:3, interpolation:9, interpolation:11, interpolation:12
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 109, line 183, line 403
+- [ ] **B-04** — No business logic in closures: '<closure@109>' (16 LOC, line 109) — extract body to src/localization/ | '<closure@183>' (29 LOC, line 183) — extract body to src/localization/ | '<closure@403>' (35 LOC, line 403) — extract body to src/localization/ | '<closure@129>' has if/match/for — extract to src/localization/ | '<closure@141>' has if/match/for — extract to src/localization/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Localization-API.md)
 
@@ -44,6 +45,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/localization.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -53,7 +55,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1915 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Catalog, CatalogError, PluralForm \| Stale in spec: Enums, Structs, localization |
+| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
 
 ### Phase 4 — Docstrings
 
@@ -76,7 +79,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/localization_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
 | **B-03** impl LuaUserData placement | ✅ PASS | No LuaUserData impl in lua_api file |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 109, line 183, line 403 |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@109>' (16 LOC, line 109) — extract body to src/localization/ \| '<closure@183>' (29 LOC, line 183) — extract body to src/localization/ \| '<closure@403>' (35 LOC, line 403) — extract body to src/localization/ \| '<closure@129>' has if/match/for — extract to src/localization/ \| '<closure@141>' has if/match/for — extract to src/localization/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 141, line 165, line 224 |
 
@@ -98,7 +101,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_localization.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 143, line 148, line 149, line 150, line 179 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 26 tests / 21 pub methods (124%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test localization_tests -- --nocapture |
 
@@ -109,7 +112,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/localization.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/localization.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No bound functions |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Localization-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -121,6 +124,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

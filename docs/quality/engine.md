@@ -1,6 +1,6 @@
 # Module Quality Report: `engine`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 29 ✅ / 8 ⚠️ / 6 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 9 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -11,8 +11,6 @@
 - [ ] **S-03** — File size limits: Files >2000 LOC: engine/app.rs (2814 LOC)
 - [ ] **D-01** — Module-level docs: Missing //! doc in: engine/temp_test.rs
 - [ ] **R-03** — No lua_api import: app imports lua_api
-- [ ] **W-01** — Example file exists: examples/engine.lua not found — create it
-- [ ] **W-02** — API surface coverage: Skipped — no example file
 - [ ] **Q-01** — No println!: println!/eprintln! found: app:2150
 
 ### 🟡 Warnings — Should Fix
@@ -20,7 +18,8 @@
 - [ ] **S-04** — File naming: Potentially misleading names: temp_test.rs
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (3943 chars)
-- [ ] **SP-05** — Spec quality: Stub content found: PLACEHOLDER
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: App, Config, DebugOverlay, EngineError, ErrorCategory | Stale in spec: Enums, Structs, engine
+- [ ] **SP-06** — Spec quality: Stub content found: PLACEHOLDER
 - [ ] **D-03** — Structured doc sections: Missing structured sections: app_winit::App (# Fields), config::ModulesConfig (# Fields), error_screen::ErrorScreen (# Fields), messages::MessageCatalog (# Fields), resource_keys::TextureKey (# Fields), resource_keys::FontKey (# Fields) (+14 more)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: config:45, resource_keys:24, resource_keys:26, resource_keys:28, resource_keys:30 (+1 more)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_get_arch, test_lua_get_env_existing, test_lua_get_env_missing, test_lua_get_args, test_lua_parse_args_with_table (+3 more)
@@ -49,6 +48,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/engine.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: baseline) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -58,7 +58,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (3943 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
-| **SP-05** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: App, Config, DebugOverlay, EngineError, ErrorCategory \| Stale in spec: Enums, Structs, engine |
+| **SP-06** Spec quality | ⚠️ WARNING | Stub content found: PLACEHOLDER |
 
 ### Phase 4 — Docstrings
 
@@ -103,7 +104,7 @@
 | **T-02** Lua test file | ✅ PASS | Module has no Lua API — skip |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_get_arch, test_lua_get_env_existing, test_lua_get_env_missing, test_lua_get_args, test_lua_parse_args_with_table (+3 more) |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 25 tests / 29 pub methods (86%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test engine_tests -- --nocapture |
 
@@ -111,10 +112,10 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ❌ ERROR | examples/engine.lua not found — create it |
-| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-01** Example file exists | ✅ PASS | examples/engine.lua present |
+| **W-02** API surface coverage | ✅ PASS | No Lua API binding file — skip |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/engine.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | No Lua API — skip |
 | **W-05** Wiki page | ✅ PASS | Module has no Lua API — skip |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -126,6 +127,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: app:1117, app:1182, shared_state:462 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

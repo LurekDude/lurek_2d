@@ -1,6 +1,6 @@
 # Module Quality Report: `savegame`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 5 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 35 ✅ / 7 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -11,13 +11,16 @@
 - [ ] **A-04** — Content sync: Files not in Source Files table: save_manager.rs
 - [ ] **D-06** — Lua API file docs: lua_api/savegame_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/savegame/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/savegame/): LuaSaveManager
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaSaveManager from lua_api/savegame_api.rs → src/savegame/
 - [ ] **R-02** — Dependency direction: save_data: Tier2 imports log_msg(unassigned); save_manager: Tier2 imports log_msg(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: save_manager.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2004 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: SaveManager, SaveValue, SlotMeta | Stale in spec: Enums, Structs, savegame
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: save_data:16, save_data:85, save_data:109, save_data:171, save_data:236
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_save_manager, test_lua_register_collect, test_lua_collect_restore_roundtrip, test_lua_dirty_tracking, test_lua_schema_version (+5 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: save_data:331, save_data:358, save_manager:410, save_manager:437
@@ -45,6 +48,7 @@
 | **A-04** Content sync | ❌ ERROR | Files not in Source Files table: save_manager.rs |
 | **A-05** Spec pointer | ✅ PASS | specs/savegame.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: save_manager.rs |
 
 ### Phase 3 — Technical Specification
 
@@ -54,7 +58,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2004 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: SaveManager, SaveValue, SlotMeta \| Stale in spec: Enums, Structs, savegame |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,9 +80,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/savegame_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/savegame/ |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/savegame/): LuaSaveManager |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaSaveManager from lua_api/savegame_api.rs → src/savegame/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -99,7 +104,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_savegame.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_new_save_manager, test_lua_register_collect, test_lua_collect_restore_roundtrip, test_lua_dirty_tracking, test_lua_schema_version (+5 more) |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 15 tests / 35 pub methods (43%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test savegame_tests -- --nocapture |
 
@@ -110,7 +115,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/savegame.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/savegame.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Savegame-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +127,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: save_data:331, save_data:358, save_manager:410, save_manager:437 |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

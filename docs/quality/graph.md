@@ -1,6 +1,6 @@
 # Module Quality Report: `graph`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 5 ⚠️ / 4 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 38 ✅ / 6 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -9,13 +9,14 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/graph/
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaGraphItem, LuaEdge, LuaNode, LuaGraph from lua_api/graph_api.rs → src/graph/
 - [ ] **R-02** — Dependency direction: core: Tier2 imports log_msg(unassigned); simulation: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 124, line 239, line 301, line 374, line 495
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: ConversionRule, Demand, Edge, FlowMode, Graph | Stale in spec: Enums, Structs, graph
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: core:20, item:11, item:82, node:124, node:137 (+2 more)
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_graph_new_is_empty, test_node_add_increments_count_and_returns_unique_ids, test_node_remove_cleans_connected_edges, test_node_remove_nonexistent_returns_false, test_node_get_ids_matches_count (+43 more)
 - [ ] **W-05** — Wiki page: No wiki page found (expected wiki/Graph-API.md)
@@ -44,6 +45,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/graph.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -53,7 +55,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1888 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: ConversionRule, Demand, Edge, FlowMode, Graph \| Stale in spec: Enums, Structs, graph |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,8 +78,8 @@
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/graph_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/graph/ |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaGraphItem, LuaEdge, LuaNode, LuaGraph from lua_api/graph_api.rs → src/graph/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -98,7 +101,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_graph.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_graph_new_is_empty, test_node_add_increments_count_and_returns_unique_ids, test_node_remove_cleans_connected_edges, test_node_remove_nonexistent_returns_false, test_node_get_ids_matches_count (+43 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 124, line 239, line 301, line 374, line 495 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 48 tests / 111 pub methods (43%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test graph_tests -- --nocapture |
 
@@ -109,7 +112,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/graph.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/graph.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
 | **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected wiki/Graph-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -121,6 +124,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: algorithms:186, algorithms:200, algorithms:201, algorithms:222, algorithms:223 (+122 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

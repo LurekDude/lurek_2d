@@ -1,6 +1,6 @@
 # Module Quality Report: `math`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 31 ✅ / 7 ⚠️ / 5 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 9 ⚠️ / 6 ❌ / 19 🔵
 
 ---
 
@@ -8,9 +8,10 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-04** — Lua API completeness: Functions missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more)
+- [ ] **SP-04** — Lua API completeness: Missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more) — add to ## Lua API in specs/math.md
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/math/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/math/): LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator from lua_api/math_api.rs → src/math/
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 527, line 534, line 555, line 558
 - [ ] **W-02** — API surface coverage: Functions absent from examples/math.lua: tau, huge
 
@@ -18,9 +19,11 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2303 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: DistType, FractalType, MapGenOptions, NoiseKind, SpatialItem | Stale in spec: Geometry, Polygon
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more)
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: pi, tau, huge
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 959, line 982, line 1022
+- [ ] **B-04** — No business logic in closures: '<closure@1022>' (17 LOC, line 1022) — extract body to src/math/ | '<closure@1379>' (27 LOC, line 1379) — extract body to src/math/ | '<closure@1597>' (21 LOC, line 1597) — extract body to src/math/ | '<closure@2005>' (21 LOC, line 2005) — extract body to src/math/ | '<closure@959>' has if/match/for — extract to src/math/ | '<closure@1414>' has if/match/for — extract to src/math/
+- [ ] **W-04** — Example–spec sync: In example but not spec: acos, angleBetween, circleContainsPoint, circleIntersectsCircle — add to ## Lua API in specs/math.md
 - [ ] **Q-04** — Error handling: .unwrap() calls: bezier:357, easing:433, easing:434, easing:435, easing:441 (+9 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
@@ -47,6 +50,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/math.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: baseline) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -55,8 +59,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/math.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2303 chars) |
-| **SP-04** Lua API completeness | ❌ ERROR | Functions missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more) |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: angleBetween, circleContainsPoint, circleIntersectsCircle, circleIntersectsLine, circleIntersectsSegment (+15 more) — add to ## Lua API in specs/math.md |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: DistType, FractalType, MapGenOptions, NoiseKind, SpatialItem \| Stale in spec: Geometry, Polygon |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -77,9 +82,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/math_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/math/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 959, line 982, line 1022 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/math/): LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaRandomGenerator, LuaTransform, LuaBezierCurve, LuaTween, LuaSpatialHash, LuaNoiseGenerator from lua_api/math_api.rs → src/math/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1022>' (17 LOC, line 1022) — extract body to src/math/ \| '<closure@1379>' (27 LOC, line 1379) — extract body to src/math/ \| '<closure@1597>' (21 LOC, line 1597) — extract body to src/math/ \| '<closure@2005>' (21 LOC, line 2005) — extract body to src/math/ \| '<closure@959>' has if/match/for — extract to src/math/ \| '<closure@1414>' has if/match/for — extract to src/math/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -101,7 +106,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_math.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 527, line 534, line 555, line 558 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 82 tests / 107 pub methods (77%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test math_tests -- --nocapture |
 
@@ -112,7 +117,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/math.lua present |
 | **W-02** API surface coverage | ❌ ERROR | Functions absent from examples/math.lua: tau, huge |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/math.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ⚠️ WARNING | In example but not spec: acos, angleBetween, circleContainsPoint, circleIntersectsCircle — add to ## Lua API in specs/math.md |
 | **W-05** Wiki page | ✅ PASS | wiki\Math-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -124,6 +129,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: bezier:357, easing:433, easing:434, easing:435, easing:441 (+9 more) |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

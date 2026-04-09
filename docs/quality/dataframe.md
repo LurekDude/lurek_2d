@@ -1,6 +1,6 @@
 # Module Quality Report: `dataframe`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 33 ✅ / 6 ⚠️ / 4 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 36 ✅ / 7 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -8,7 +8,8 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/dataframe/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/dataframe/): LuaDataFrame, LuaDatabase
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaDataFrame, LuaDatabase from lua_api/dataframe_api.rs → src/dataframe/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 77, line 648
 - [ ] **R-02** — Dependency direction: frame: Tier2 imports log_msg(unassigned); query: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 47, line 64, line 69, line 95, line 99
@@ -17,9 +18,10 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2248 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: CellValue, ColRef, DataFrame, Database | Stale in spec: Enums, Structs, dataframe
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: frame:137, frame:151, frame:214, frame:226, frame:234 (+8 more)
 - [ ] **D-09** — Section separators: 7 bindings but no // ─── separator comments
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 801
+- [ ] **B-04** — No business logic in closures: '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ | '<closure@868>' has if/match/for — extract to src/dataframe/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_cellvalue_nil_is_nil, test_cellvalue_as_number, test_cellvalue_as_text, test_cellvalue_as_bool, test_cellvalue_display_nil (+95 more)
 
 ## Full Check Results
@@ -45,6 +47,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/dataframe.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -54,7 +57,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2248 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 7 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: CellValue, ColRef, DataFrame, Database \| Stale in spec: Enums, Structs, dataframe |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -75,9 +79,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/dataframe_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/dataframe/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 801 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/dataframe/): LuaDataFrame, LuaDatabase |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaDataFrame, LuaDatabase from lua_api/dataframe_api.rs → src/dataframe/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ \| '<closure@868>' has if/match/for — extract to src/dataframe/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 77, line 648 |
 
@@ -99,7 +103,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_dataframe.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_cellvalue_nil_is_nil, test_cellvalue_as_number, test_cellvalue_as_text, test_cellvalue_as_bool, test_cellvalue_display_nil (+95 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 47, line 64, line 69, line 95, line 99 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 100 tests / 63 pub methods (159%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test dataframe_tests -- --nocapture |
 
@@ -110,7 +114,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/dataframe.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 7 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/dataframe.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 7 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Dataframe-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -122,6 +126,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

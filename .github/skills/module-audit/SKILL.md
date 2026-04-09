@@ -51,9 +51,11 @@ The user specifies targets as module names, tier groups, or `all`:
 
 Additional modules that exist in `src/` but may not be in the official tier table (e.g., `terminal`, `spine`, `serial`, `raycaster`, `procgen`, `pipeline`, `network`, `light`, `fx`, `postfx`) should be audited using the tier rules inferred from their imports and AGENT.md.
 
-## AGENT.md Canonical Template
+## AGENT.md Canonical Format (SHORT)
 
-When checking A-02 (template structure), the canonical AGENT.md structure is:
+**AGENT.md is a SHORT file.** All architecture, types, Lua API, and examples live in `specs/<module>.md`. See `.github/skills/agent-md/SKILL.md` for the full two-layer authoring rules.
+
+When checking A-02 (template structure), the canonical short AGENT.md format is:
 
 ```markdown
 # `<module>` — Agent Reference
@@ -62,25 +64,16 @@ When checking A-02 (template structure), the canonical AGENT.md structure is:
 |----------|-------|
 | **Tier** | Tier N — Description |
 | **Status** | Implemented — Full / Partial / Stub |
-| **Lua API** | `luna.<module>` |
+| **Lua API** | `luna.<module>` (or `—` if none) |
 | **Source** | `src/<module>/` |
 | **Rust Tests** | `tests/rust/unit/<module>_tests.rs` |
-| **Lua Tests** | `tests/lua/unit/test_<module>.lua` |
-| **Architecture** | `docs/API/<module>-design.md` (if exists) |
+| **Lua Tests** | `tests/lua/unit/test_<module>.lua` (or `—` if none) |
+| **Architecture** | `docs/API/<module>-design.md` (if exists, else `—`) |
 
-## Summary
+## Purpose
 
-500–1000 characters describing:
-- What the module does (purpose)
-- How it works (architecture overview)
-- What design decisions were made and why
-- What is intentionally NOT included (scope boundaries)
-
-## Architecture
-
-```
-ASCII diagram of module internals
-```
+2–5 sentences. What the module does and its scope boundary. Should let an
+agent decide whether to enter this module or a different one.
 
 ## Source Files
 
@@ -88,71 +81,29 @@ ASCII diagram of module internals
 |------|---------|
 | `file.rs` | One-line description |
 
-## Submodules
+## Full Specification
 
-### `<module>::<submodule>`
+→ [`specs/<module>.md`](../../specs/<module>.md)
 
-Description of submodule purpose.
-
-- **`TypeName`** (struct/enum): Brief description.
-
-## Key Types
-
-### Structs
-
-#### `<module>::<type>::StructName`
-
-Brief description.
-
-### Enums
-
-#### `<module>::<type>::EnumName`
-
-Brief description.
-
-## Lua API
-
-Exposed under `luna.<module>.*` by `src/lua_api/<module>_api.rs`.
-
-## Lua Examples
-
-```lua
--- Example: Basic usage of luna.<module>
-function luna.init()
-    -- setup code
-end
-
-function luna.process(dt)
-    -- update code
-end
+_Update both this file and `specs/<module>.md` whenever source files,
+public types, or Lua bindings change._
 ```
 
-## Item Summary
+### Required Sections in AGENT.md (ERROR if missing)
+- H1 heading
+- Metadata table with `**Tier**` row
+- `## Purpose`
+- `## Source Files`
+- `## Full Specification` with link to `specs/<module>.md`
 
-| Kind | Count |
-|------|-------|
-| `struct` | N |
-| `enum` | N |
-| `fn` | N |
-| **Total** | **N** |
-```
-
-### Required Sections
-
-These sections MUST be present (ERROR if missing):
-- Property table (at top)
-- Summary
-- Source Files
-- Key Types
-- Item Summary
-
-### Recommended Sections
-
-These sections SHOULD be present (WARNING if missing):
-- Architecture (ASCII diagram)
-- Submodules
-- Lua API
-- Lua Examples
+### What Does NOT Belong in AGENT.md
+- `## Summary` (500+ chars) → goes in `specs/<module>.md`
+- `## Architecture` / ASCII diagrams → goes in `specs/<module>.md`
+- `## Submodules` → goes in `specs/<module>.md`
+- `## Key Types` → goes in `specs/<module>.md`
+- `## Lua API` table → goes in `specs/<module>.md`
+- `## Lua Examples` → goes in `specs/<module>.md`
+- `## Item Summary` → goes in `specs/<module>.md`
 
 ## Check Procedures
 
@@ -245,80 +196,217 @@ Verification:
 
 ## Python Validation Tool
 
-For automated checks, use:
-```
-python tools/audit/audit_module.py <module_name>
+The audit runner automates checks across 12 phases using a single-pass file analyzer
+(each `.rs` file is read exactly once per run). **Every invocation always writes a
+per-module Markdown report to `docs/quality/<module>.md`** — nothing large ever
+goes to stdout, so the VS Code pipe never blocks.
+
+```powershell
+# Single module — writes docs/quality/<module>.md, prints one line
+python tools/audit/audit_module.py <module>
+
+# All modules — writes 46 reports, prints one line per module + summary
 python tools/audit/audit_module.py --all
+
+# Tier subset
 python tools/audit/audit_module.py --tier 1
+
+# JSON output (structured, for programmatic use)
+python tools/audit/audit_module.py <module> --json
 ```
 
-This tool automates checks S-01 through S-03, D-01, D-02, D-05, R-02, R-03, Q-01, Q-02, Q-03, and T-01, T-02. Manual checks are flagged as `MANUAL` in the output.
+Exit code: 0 = all PASS, 1 = any FAIL, 2 = argument error.
+Run time: ~0.12 s per module, under 5 s for all 46 modules.
+
+### What every report contains (`docs/quality/<module>.md`)
+
+```
+# Module Quality Report: `<module>`
+> Status: 🔴 FAIL | Score: X ✅ / Y ⚠️ / Z ❌ / N 🔵
+
+## Action Items
+### 🔴 Errors — Must Fix Before Merge
+- [ ] B-03 — impl LuaUserData placement:
+       Move impl LuaUserData for LuaFoo from lua_api/<m>_api.rs → src/<m>/foo.rs
+- [ ] B-02 — Registration-only:
+       struct definitions (move to src/<m>/): LuaFoo
+- [ ] SP-04 — Lua API completeness:
+       Missing from spec: load, unload (+2 more) — add to ## Lua API in specs/<m>.md
+       Stale in spec (not in code): oldFn — remove from spec
+- [ ] W-02 — API surface coverage:
+       Missing in examples/<m>.lua: load, unload — add with use-case comment
+- [ ] T-04 — Float comparisons:
+       assert_eq! with floats at: foo_tests.rs:117, foo_tests.rs:119
+...
+
+### 🟡 Warnings — Should Fix
+- [ ] B-04 — No business logic in closures:
+       'load' (28 LOC, line 42) — extract body to src/<m>/
+       'save' has if/match/for — extract to src/<m>/
+
+## Full Check Results
+[Phase-by-phase table with all verdicts]
+```
+
+Automated checks: S-01..S-04, A-01..A-07, A-04b, SP-01..SP-06, D-01..D-09,
+B-01..B-06, R-01..R-03, T-01..T-05, W-01..W-02, W-04..W-05, Q-01, Q-03..Q-04,
+Q-07, I-03. Manual checks are flagged as `🔵 MANUAL` in the report.
+
+## CAG Audit → Fix → Verify Loop
+
+When an agent needs to fix module quality issues, follow this loop:
+
+### Step 1 — Generate reports
+
+```powershell
+# One module
+python tools/audit/audit_module.py <module>
+
+# All modules (batch)
+python tools/audit/audit_module.py --all
+```
+
+### Step 2 — Read the report
+
+Open `docs/quality/<module>.md`. The **Action Items** section at the top lists
+every ❌ Error and ⚠️ Warning checkbox with **a precise fix instruction** — file
+path, method name, and what to do. Read all errors before writing any code.
+
+### Step 3 — Fix by check ID in priority order
+
+#### B-02 / B-03: struct/impl in lua_api
+The report names the exact struct: `impl LuaUserData for LuaFoo`.
+1. Move the `struct LuaFoo` definition to `src/<module>/foo.rs`
+2. Move the `impl LuaUserData for LuaFoo` block to the same file
+3. Add `pub use foo::LuaFoo;` in `src/<module>/mod.rs`
+4. Remove from `src/lua_api/<module>_api.rs`
+
+#### B-04: closure body too large
+The report names the function and LOC: `'load' (28 LOC, line 42)`.
+1. Extract the closure body into a domain method: `pub fn load(...) -> ... { ... }`
+   in `src/<module>/mod.rs` or a dedicated file
+2. Replace the closure body with a single delegation call:
+   `let r = s.borrow_mut().load(arg)?; Ok(r)`
+
+#### SP-04: Functions missing from spec / stale in spec
+The report names missing functions explicitly.
+1. For each missing: add a row to `## Lua API` in `specs/<module>.md` with
+   signature, parameters, return type, and one-line description
+2. For each stale: remove the row from `## Lua API`
+
+#### SP-05: Types missing/stale in Key Types
+Reports `Types not in spec: Clock, Scheduler`.
+1. Add a `### Clock` section to `## Key Types` in `specs/<module>.md`
+
+#### W-02: Missing from examples/<module>.lua
+The report names the exact function names.
+1. Add `luna.<module>.<funcName>(...)` call to `examples/<module>.lua`
+2. Prefix each call with a one-line realistic use-case comment
+
+#### W-04: Example–spec sync mismatch
+Reports which side has the extra entries.
+1. Sync by adding to whichever side is missing
+
+#### T-04: assert_eq! on floats
+The report gives exact file:line.
+Replace `assert_eq!(a, b)` with `assert!((a - b).abs() < 1e-5)`.
+
+#### T-03: test_ prefix on test names
+The report lists the exact function names.
+Rename `fn test_foo_bar()` → `fn foo_bar_expected()` using search-replace.
+
+#### D-06: Missing //! on lua_api file
+First line of `src/lua_api/<module>_api.rs` must be: `//! <module> Lua API — registers luna.<module>.* bindings.`
+
+#### D-08: Rustdoc sections in lua_api
+Find `# Parameters` / `# Returns` in `src/lua_api/<module>_api.rs`.
+Replace with `/// @param name : type` and `/// @return type` format.
+
+#### D-09: Missing section separators
+Add `// ── funcName ──────────────────────────────────────` before each `tbl.set` block.
+
+### Step 4 — Re-run and verify
+
+```powershell
+python tools/audit/audit_module.py <module>
+# Report updated in docs/quality/<module>.md
+# Status should show 🟢 PASS when all errors resolved and warnings < 3
+```
+
+### Batch fix strategy
+
+For multiple modules, read all reports first to identify patterns, then fix the
+most common error type across all modules before re-running batch mode:
+
+```powershell
+# Run batch, write reports
+python tools/audit/audit_module.py --all
+
+# Read reports to find patterns
+Get-Content docs/quality/timer.md, docs/quality/physics.md, docs/quality/audio.md
+
+# After fixing, re-run batch to verify all
+python tools/audit/audit_module.py --all --docs-quality
+```
 
 ## Report Template
 
+The `--docs-quality` flag writes a Markdown report to `docs/quality/<module>.md`.
+The `stdout` report format (without `--docs-quality`) shows:
+
 ```
-═══════════════════════════════════════════════════════
-  LUNA2D MODULE AUDIT: <module>
-═══════════════════════════════════════════════════════
+════════════════════════════════════════════════════════
+  LUNA2D MODULE AUDIT: <module> -- FAIL
+════════════════════════════════════════════════════════
 
-Phase 1 — Structure & Registration
-  [PASS]    S-01  lib.rs registration
-  [WARNING] S-02  mod.rs simplicity — 45 lines of logic
-  [PASS]    S-03  File size limits
-  [PASS]    S-04  File naming
-  [PASS]    S-05  Module necessity
-  [PASS]    S-06  Large crate dependencies
+  Phase 1 - Structure & Registration
+    [+] PASS     S-01  lib.rs registration
+    [!] WARNING  S-02  mod.rs simplicity — 45 lines of logic
+    [+] PASS     S-03  File size limits
+    ...
 
-Phase 2 — AGENT.md Quality
-  [PASS]    A-01  AGENT.md exists
-  [ERROR]   A-02  Template structure — missing Lua Examples section
-  [PASS]    A-03  Summary quality — 723 chars
-  [WARNING] A-04  Content sync — body.rs not in Source Files table
-  [PASS]    A-05  Lua examples
-  [PASS]    A-06  Tier label
+  Phase 2 - AGENT.md Quality
+    [+] PASS     A-01  AGENT.md exists
+    [X] ERROR    A-02  Template structure — missing Key Types section
+    ...
 
-Phase 3 — Docstrings
-  ...
+════════════════════════════════════════════════════════
+  SCORE: 32 PASS / 6 WARNING / 5 ERROR / 21 MANUAL -> FAIL
+════════════════════════════════════════════════════════
 
-═══════════════════════════════════════════════════════
-  SCORE: 22 PASS / 2 WARNING / 1 ERROR → FAIL
-═══════════════════════════════════════════════════════
-
-REQUIRED ACTIONS (ERRORs):
-  1. A-02: Add Lua Examples section to AGENT.md
-
-RECOMMENDED IMPROVEMENTS (WARNINGs):
-  1. S-02: Extract 45 lines of logic from mod.rs into named file
-  2. A-04: Add body.rs to Source Files table in AGENT.md
+  REQUIRED ACTIONS (ERRORs):
+    1. A-02: Add Key Types section to AGENT.md
 ```
 
 ## Batch Mode
 
-When auditing multiple modules, produce:
-1. Individual module reports (as above)
-2. A summary table at the end:
+When auditing multiple modules with `--all`, the tool:
+1. Runs all 64 checks per module
+2. Writes `docs/quality/<module>.md` for each module (if `--docs-quality` flag set)
+3. Prints a batch summary to stdout:
 
 ```
-═══════════════════════════════════════════════════════
-  BATCH AUDIT SUMMARY
-═══════════════════════════════════════════════════════
+════════════════════════════════════════════════════════
+  BATCH AUDIT SUMMARY (46 modules)
+════════════════════════════════════════════════════════
 
-| Module | PASS | WARN | ERROR | Result |
-|--------|------|------|-------|--------|
-| physics | 26 | 1 | 0 | PASS |
-| audio | 24 | 2 | 1 | FAIL |
-| math | 27 | 0 | 0 | PASS |
+  PASS:   timer, math, input, ...
+  FAIL:   physics, audio, animation, ...
 
-Overall: 2/3 modules passed
+  PASS: 12 / 46 modules
 ```
+
+Use `Get-ChildItem docs/quality/` to verify all reports were written.
 
 ## Post-Audit Fix Workflow
 
-When the user requests fixes after an audit:
+See **CAG Audit → Fix → Verify Loop** above for the full agent workflow.
+Summary of fix priority:
 
-1. **Prioritize**: Fix ERRORs before WARNINGs
-2. **Phase order**: Structure → AGENT.md → Docstrings → Tests → Docs/Wiki
-3. **Validate incrementally**: After each fix, re-run only the affected check
-4. **Never run full build**: Use `cargo check` during fixes
-5. **Scoped tests only**: `cargo test --test <module>_tests` — never `cargo test`
-6. **Commit when clean**: Only after all ERRORs resolved and WARNINGs < 3
+1. **Read** `docs/quality/<module>.md` — the Action Items section is the work queue
+2. **Fix ERRORs** — blocking; must fix all before merge
+3. **Fix WARNINGs** — reduce until fewer than 3 remain
+4. **Re-run** `python tools/audit/audit_module.py <module> --docs-quality` after each fix batch
+5. **Never run full build** during fixes — use `cargo check`
+6. **Scoped tests only** — `cargo test --test <module>_tests` — never bare `cargo test`
+7. **Commit when clean** — only after Status shows 🟢 PASS in `docs/quality/<module>.md`

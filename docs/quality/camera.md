@@ -1,6 +1,6 @@
 # Module Quality Report: `camera`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 39 ✅ / 2 ⚠️ / 2 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 40 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -8,13 +8,17 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
+- [ ] **SP-04** — Lua API completeness: Stale in spec (not in code): getCamera, setCamera — remove from spec
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/camera/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/camera/): LuaCamera2D
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaCamera2D from lua_api/camera_api.rs → src/camera/
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: Camera, Camera2D, ScaleMode, Viewport, ViewportScale | Stale in spec: Enums, Structs, camera
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: types:455
+- [ ] **T-05** — Test adequacy: 15 tests / 53 pub methods (28%) — low coverage
 
 ## Full Check Results
 
@@ -39,6 +43,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/camera.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -47,8 +52,9 @@
 | **SP-01** Spec file exists | ✅ PASS | specs/camera.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1884 chars |
-| **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-04** Lua API completeness | ❌ ERROR | Stale in spec (not in code): getCamera, setCamera — remove from spec |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Camera, Camera2D, ScaleMode, Viewport, ViewportScale \| Stale in spec: Enums, Structs, camera |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -69,9 +75,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/camera_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/camera/ |
-| **B-04** No business logic | ✅ PASS | Closures appear thin (≤15 LOC) |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/camera/): LuaCamera2D |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaCamera2D from lua_api/camera_api.rs → src/camera/ |
+| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -93,7 +99,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_camera.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ⚠️ WARNING | 15 tests / 53 pub methods (28%) — low coverage |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test camera_tests -- --nocapture |
 
@@ -104,7 +110,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/camera.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/camera.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 1 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Camera-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -116,6 +122,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 

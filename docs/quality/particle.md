@@ -1,6 +1,6 @@
 # Module Quality Report: `particle`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 31 ✅ / 6 ⚠️ / 6 ❌ / 21 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-09  |  **Score**: 34 ✅ / 7 ⚠️ / 7 ❌ / 19 🔵
 
 ---
 
@@ -10,7 +10,8 @@
 
 - [ ] **D-06** — Lua API file docs: lua_api/particle_api.rs missing //! module-level doc
 - [ ] **D-08** — No rustdoc in lua_api: Rustdoc sections found (use @param/@return): # Parameters, # Returns, # Fields
-- [ ] **B-03** — impl LuaUserData placement: impl LuaUserData in lua_api — move to src/particle/
+- [ ] **B-02** — Registration-only: struct definitions (move to src/particle/): LuaParticleSystem, LuaTrail
+- [ ] **B-03** — impl LuaUserData placement: Move impl LuaUserData for LuaParticleSystem, LuaTrail from lua_api/particle_api.rs → src/particle/
 - [ ] **B-06** — Flat registration body: tbl.set() inside {} block (anti-pattern): line 32, line 1012
 - [ ] **R-02** — Dependency direction: emitter: Tier2 imports log_msg(unassigned)
 - [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 186, line 190, line 425, line 443, line 1330
@@ -19,9 +20,10 @@
 
 - [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-03** — Summary quality: Summary very long (2255 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AreaDistribution, EmissionShape, EmitterState, InsertMode, Particle | Stale in spec: Enums, Structs, particle
 - [ ] **D-03** — Structured doc sections: Missing structured sections: config::ParticleConfig (# Fields)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: config:150, emitter:14, trail:32
-- [ ] **B-04** — No business logic: Long closures (>15 LOC) — delegate to domain: line 965, line 987
+- [ ] **B-04** — No business logic in closures: '<closure@965>' has if/match/for — extract to src/particle/ | '<closure@1014>' has if/match/for — extract to src/particle/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_particle_handle_reuse_reports_invalid_system, test_phase01_released_particle_long_tail_accessors_report_invalid_system, test_phase01_released_particle_long_tail_mutators_report_invalid_system, test_particle_new_system_default, test_particle_new_system_with_config (+55 more)
 
 ## Full Check Results
@@ -47,6 +49,7 @@
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | specs/particle.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -56,7 +59,8 @@
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2255 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 2 bound functions in spec |
-| **SP-05** Spec quality | ✅ PASS | No stub content |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AreaDistribution, EmissionShape, EmitterState, InsertMode, Particle \| Stale in spec: Enums, Structs, particle |
+| **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
 
@@ -77,9 +81,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **B-01** Dedicated API file | ✅ PASS | lua_api/particle_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn |
-| **B-03** impl LuaUserData placement | ❌ ERROR | impl LuaUserData in lua_api — move to src/particle/ |
-| **B-04** No business logic | ⚠️ WARNING | Long closures (>15 LOC) — delegate to domain: line 965, line 987 |
+| **B-02** Registration-only | ❌ ERROR | struct definitions (move to src/particle/): LuaParticleSystem, LuaTrail |
+| **B-03** impl LuaUserData placement | ❌ ERROR | Move impl LuaUserData for LuaParticleSystem, LuaTrail from lua_api/particle_api.rs → src/particle/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@965>' has if/match/for — extract to src/particle/ \| '<closure@1014>' has if/match/for — extract to src/particle/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ❌ ERROR | tbl.set() inside {} block (anti-pattern): line 32, line 1012 |
 
@@ -101,7 +105,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_particle.lua registered in harness |
 | **T-03** Test naming | ⚠️ WARNING | test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_particle_handle_reuse_reports_invalid_system, test_phase01_released_particle_long_tail_accessors_report_invalid_system, test_phase01_released_particle_long_tail_mutators_report_invalid_system, test_particle_new_system_default, test_particle_new_system_with_config (+55 more) |
 | **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 186, line 190, line 425, line 443, line 1330 |
-| **T-05** Test adequacy | 🔵 MANUAL | Verify coverage of all public functions |
+| **T-05** Test adequacy | ✅ PASS | 84 tests / 30 pub methods (280%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test particle_tests -- --nocapture |
 
@@ -112,7 +116,7 @@
 | **W-01** Example file exists | ✅ PASS | examples/particle.lua present |
 | **W-02** API surface coverage | ✅ PASS | All 2 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify examples/particle.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | 🔵 MANUAL | Verify function list in example matches spec Lua API table |
+| **W-04** Example–spec sync | ✅ PASS | All 2 functions consistent across spec and example |
 | **W-05** Wiki page | ✅ PASS | wiki\Particle-API.md |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
@@ -124,6 +128,7 @@
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
 | **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
 
