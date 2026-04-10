@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::{LT01, LT02, LT03};
+use crate::runtime::log_messages::{LT01, LT02, LT03};
 use crate::light::attenuation::Attenuation;
 use crate::light::blend_mode::LightBlendMode;
 use crate::light::falloff::FalloffMode;

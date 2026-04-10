@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use lurek2d::ai::*;
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 use lurek2d::pathfinding::{InfluenceMap, PathGrid, SimpleFlowField};
 

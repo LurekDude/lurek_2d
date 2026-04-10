@@ -12,7 +12,7 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::engine::SharedState;
+use crate::runtime::SharedState;
 use crate::lua_api::lua_types::{add_type_methods, LunaType};
 
 // ===========================================================================

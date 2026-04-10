@@ -9,7 +9,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use super::effect::PostFxEffect;
-use crate::engine::log_messages::{IE01, IE02, IE03};
+use crate::runtime::log_messages::{IE01, IE02, IE03};
 use crate::graphics::ShaderPassDescriptor;
 use crate::log_msg;
 

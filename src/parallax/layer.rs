@@ -3,7 +3,7 @@
 //! Pure-Rust domain module — no mlua imports. All Lua binding code lives in
 //! `src/lua_api/parallax_api.rs`.
 
-use crate::engine::resource_keys::TextureKey;
+use crate::runtime::resource_keys::TextureKey;
 use crate::graphics::BlendMode;
 
 // ── ParallaxDrawBatch ────────────────────────────────────────────────────────

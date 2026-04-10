@@ -17,7 +17,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 use std::time::Instant;
 
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn create_test_vm() -> mlua::Lua {

@@ -1,6 +1,6 @@
 //! Terminal grid state and input handling.
 
-use crate::engine::resource_keys::FontKey;
+use crate::runtime::resource_keys::FontKey;
 use crate::graphics::renderer::RenderCommand;
 
 use super::cell::{TCell, DEFAULT_FG};

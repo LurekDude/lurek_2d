@@ -13,7 +13,7 @@
 //! Input events are forwarded from Lua callbacks and dispatched to the widget
 //! tree by hit-testing against widget bounds.
 
-use crate::engine::log_messages::{GU01_CTX_INIT, GU02_WIDGET_ADD};
+use crate::runtime::log_messages::{GU01_CTX_INIT, GU02_WIDGET_ADD};
 use crate::ui::containers::{
     DockPanel, GUIWindow, Layout, NinePatch, Panel, ScrollPanel, SplitPanel,
 };

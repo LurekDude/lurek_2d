@@ -13,8 +13,8 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
-use crate::engine::config::ModulesConfig;
-pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
+use crate::runtime::config::ModulesConfig;
+pub use crate::runtime::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `lurek.signal.*` event queue and signal API.
 pub mod event_api;
@@ -418,7 +418,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 /// # Returns
 /// `LuaResult<Lua>`.
 pub fn create_test_vm() -> LuaResult<Lua> {
-    use crate::engine::config::Config;
+    use crate::runtime::config::Config;
     use std::path::PathBuf;
     let state = Rc::new(RefCell::new(SharedState::new(
         800,

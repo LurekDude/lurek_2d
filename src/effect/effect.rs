@@ -6,7 +6,7 @@
 use std::collections::HashMap;
 
 use super::effect_type::PostFxEffectType;
-use crate::engine::log_messages::{FE01, FE02, FE03};
+use crate::runtime::log_messages::{FE01, FE02, FE03};
 use crate::log_msg;
 
 /// A single post-processing effect with named float parameters.

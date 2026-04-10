@@ -11,7 +11,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::AS01;
+use crate::runtime::log_messages::AS01;
 use crate::log_msg;
 
 /// 3D spatial audio state for an audio source.

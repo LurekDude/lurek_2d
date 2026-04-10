@@ -33,7 +33,7 @@
 //! power_preference = "high"
 //! ```
 
-use crate::engine::log_messages::{
+use crate::runtime::log_messages::{
     L050_MODULE_DEP_DISABLED, L051_CONF_READ_ERR, L052_CONF_PARSE_ERR,
 };
 #[allow(unused_imports)]

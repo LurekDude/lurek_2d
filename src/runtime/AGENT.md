@@ -5,7 +5,7 @@
 | **Tier**       | Baseline — always-on runtime substrate               |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | — (foundation module; no dedicated `lurek.engine` namespace) |
-| **Source**     | `src/engine/`                                        |
+| **Source**     | `src/runtime/`                                        |
 | **Rust Tests** | `tests/rust/unit/engine_tests.rs`                    |
 | **Lua Tests**  | —                                                    |
 | **Architecture** | `docs/architecture/engine-architecture.md`          |

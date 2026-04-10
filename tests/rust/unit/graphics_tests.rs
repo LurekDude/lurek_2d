@@ -5,8 +5,8 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use lurek2d::animation::Animation;
-use lurek2d::engine::config::Config;
-use lurek2d::engine::resource_keys::TextureKey;
+use lurek2d::runtime::config::Config;
+use lurek2d::runtime::resource_keys::TextureKey;
 use lurek2d::graphics::renderer::{
     CompareMode, DepthMode, RenderCommand, DrawMode, StencilAction, TextAlign, TextureData,
 };

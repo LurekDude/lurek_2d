@@ -3,7 +3,7 @@
 //! Renders green text on a semi-transparent background in the top-right corner
 //! of the screen. Can be toggled at runtime via F12 or `lurek.platform.setDebugOverlay()`.
 
-use crate::engine::resource_keys::FontKey;
+use crate::runtime::resource_keys::FontKey;
 use crate::graphics::renderer::{RenderCommand, DrawMode};
 
 /// Debug overlay showing FPS and render statistics.
@@ -100,7 +100,7 @@ impl Default for DebugOverlay {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::engine::resource_keys::FontKey;
+    use crate::runtime::resource_keys::FontKey;
     use slotmap::SlotMap;
 
     #[test]

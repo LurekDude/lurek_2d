@@ -9,7 +9,7 @@ use super::atmosphere::{
 };
 use super::screen_effects::{FadeState, FlashState, ShakeState};
 use super::weather::{WeatherParticle, WeatherState, WeatherType};
-use crate::engine::log_messages::{OV01, OV02, OV03};
+use crate::runtime::log_messages::{OV01, OV02, OV03};
 use crate::log_msg;
 
 /// Composable per-frame screen-effect overlay managing multiple visual subsystems.

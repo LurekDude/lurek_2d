@@ -6,7 +6,7 @@ use super::math::{
     interpolate_alphas, interpolate_colors, interpolate_sizes, rand_normal, rand_range,
 };
 use super::particle::Particle;
-use crate::engine::log_messages::{PE01, PE02, PE03, PE04};
+use crate::runtime::log_messages::{PE01, PE02, PE03, PE04};
 use crate::graphics::renderer::{ParticleInstance, ParticleRenderShape, RenderCommand};
 use crate::log_msg;
 use crate::particle::shapes::ParticleShape;

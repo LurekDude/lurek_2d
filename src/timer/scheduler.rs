@@ -14,7 +14,7 @@
 //! sched.cancel(rid);
 //! ```
 
-use crate::engine::log_messages::{TI01, TI02, TI03, TI04};
+use crate::runtime::log_messages::{TI01, TI02, TI03, TI04};
 use crate::log_msg;
 /// A single scheduled event with optional name and pause state.
 ///

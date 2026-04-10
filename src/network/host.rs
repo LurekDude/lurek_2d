@@ -13,7 +13,7 @@ use rusty_enet::{self as enet, Host, HostSettings, Packet, PacketKind, PeerID};
 
 use super::constants::{DEFAULT_CHANNELS, DEFAULT_PEERS, MAX_PEERS};
 use super::error::NetworkError;
-use crate::engine::log_messages::{NW01_HOST_BIND, NW04_NET_ERROR};
+use crate::runtime::log_messages::{NW01_HOST_BIND, NW04_NET_ERROR};
 use crate::log_msg;
 
 /// Wraps a `rusty_enet::Host<UdpSocket>` with Lurek2D-specific defaults and

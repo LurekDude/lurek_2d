@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::resource_keys::TextureKey;
+use crate::runtime::resource_keys::TextureKey;
 
 /// A batch of sprites sharing a single texture, drawn in one GPU call.
 ///

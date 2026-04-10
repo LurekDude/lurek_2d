@@ -1,6 +1,6 @@
 //! Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, and navigation.
 
-use crate::engine::log_messages::MM01_MINIMAP_INIT;
+use crate::runtime::log_messages::MM01_MINIMAP_INIT;
 use crate::log_msg;
 use std::collections::HashMap;
 

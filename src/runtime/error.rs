@@ -16,7 +16,7 @@
 //! or in the Lurek2D issue tracker.
 //!
 //! Lua errors are wrapped as [`EngineError::LuaError`] so they can flow through the same
-//! result type and be presented by [`crate::engine::error_screen::ErrorScreen`].
+//! result type and be presented by [`crate::app::error_screen::ErrorScreen`].
 
 use thiserror::Error;
 

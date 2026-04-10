@@ -11,7 +11,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::{PF01_GRID_INIT, PF03_NO_PATH};
+use crate::runtime::log_messages::{PF01_GRID_INIT, PF03_NO_PATH};
 use crate::log_msg;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, VecDeque};

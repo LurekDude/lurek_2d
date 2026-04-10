@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::{IM01_IMAGE_LOADED, IM02_IMAGE_MISMATCH};
+use crate::runtime::log_messages::{IM01_IMAGE_LOADED, IM02_IMAGE_MISMATCH};
 use crate::log_msg;
 use mlua::prelude::*;
 

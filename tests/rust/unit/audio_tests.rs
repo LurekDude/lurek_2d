@@ -9,7 +9,7 @@ use lurek2d::audio::MidiPlayer;
 use lurek2d::audio::Mixer;
 use lurek2d::audio::PlayState;
 use lurek2d::audio::SourceType;
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_audio_vm() -> mlua::Lua {
@@ -613,7 +613,7 @@ fn mixer_tell_after_stop_is_zero() {
 #[test]
 fn audio_seek_invalid_id_is_noop_via_lua() {
     // seek on a non-existent source should return a runtime error, not panic.
-    use lurek2d::engine::config::Config;
+    use lurek2d::runtime::config::Config;
     use lurek2d::lua_api::{create_lua_vm, SharedState};
     use std::cell::RefCell;
     use std::path::PathBuf;

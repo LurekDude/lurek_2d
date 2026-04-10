@@ -8,8 +8,8 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 //!
-use crate::engine::log_messages::{GD01, GD02, GD03};
-use crate::engine::EngineError;
+use crate::runtime::log_messages::{GD01, GD02, GD03};
+use crate::runtime::EngineError;
 use crate::log_msg;
 use std::collections::HashMap;
 use std::io::{BufRead, Write};

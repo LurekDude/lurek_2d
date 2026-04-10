@@ -10,7 +10,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::error::{EngineError, EngineResult};
+use crate::runtime::error::{EngineError, EngineResult};
 
 // ── Embedded bitmap font PNGs ────────────────────────────────────────────────────────────────────
 const FONT_3X5: &[u8] = include_bytes!("../../assets/fonts/bitmap_3x5.png");

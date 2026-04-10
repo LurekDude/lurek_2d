@@ -6,7 +6,7 @@
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet, VecDeque};
 
-use crate::engine::log_messages::{HP01, HP02, HP03};
+use crate::runtime::log_messages::{HP01, HP02, HP03};
 use crate::log_msg;
 use crate::pathfind::astar;
 use crate::pathfind::nav_grid::NavGrid;

@@ -5,7 +5,7 @@
 | **Tier**           | Baseline (leaf) |
 | **Architecture**   | 15 submodule files, flat layout under `src/math/` |
 | **Path**           | `src/math/` |
-| **Depends on**     | `fastrand` (external); `crate::engine::log_messages` (log constants in `spatial_hash.rs` only) |
+| **Depends on**     | `fastrand` (external); `crate::runtime::log_messages` (log constants in `spatial_hash.rs` only) |
 | **Depended on by** | Every other Lurek2D module |
 | **Lua API**        | `lurek.math` via `src/lua_api/math_api.rs` |
 | **Tests — Rust**   | `tests/unit/math_tests.rs` (~60 tests, 857 lines) |

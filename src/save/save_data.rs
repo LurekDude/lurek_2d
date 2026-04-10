@@ -10,7 +10,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use std::collections::HashMap;
-use crate::engine::log_messages::{SV01_SAVE_INIT};
+use crate::runtime::log_messages::{SV01_SAVE_INIT};
 use crate::log_msg;
 
 /// Metadata extracted from a save-slot header without loading the full save data.

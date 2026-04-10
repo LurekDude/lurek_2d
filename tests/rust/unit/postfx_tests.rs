@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {

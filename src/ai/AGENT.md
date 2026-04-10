@@ -18,7 +18,7 @@ The AI module provides a comprehensive, modular game-intelligence toolkit that L
 
 | File                | Purpose                                                                          |
 |---------------------|----------------------------------------------------------------------------------|
-| `mod.rs`            | Module declarations, re-exports from `crate::pathfinding` (FlowField, Cell, PathGrid, InfluenceMap) |
+| `mod.rs`            | Module declarations, re-exports from `crate::pathfind` (FlowField, Cell, PathGrid, InfluenceMap) |
 | `agent.rs`          | Autonomous agent with kinematic state (position, velocity) and pluggable decision models |
 | `behavior_tree.rs`  | Behavior tree with composite (Selector, Sequence, Parallel), decorator (Inverter, Repeater, Succeeder), and leaf (Action, Condition) nodes |
 | `blackboard.rs`     | Typed key-value store with optional parent chain for hierarchical lookup         |

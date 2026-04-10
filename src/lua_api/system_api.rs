@@ -13,7 +13,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use super::SharedState;
-use crate::engine::log_messages::{self, LA03_OPEN_URL_REJECTED, LA04_CLIPBOARD_WRITE_FAIL, LA05_CLIPBOARD_UNAVAIL, LA06_CLIPBOARD_READ_FAIL};
+use crate::runtime::log_messages::{self, LA03_OPEN_URL_REJECTED, LA04_CLIPBOARD_WRITE_FAIL, LA05_CLIPBOARD_UNAVAIL, LA06_CLIPBOARD_READ_FAIL};
 use crate::log_msg;
 
 /// Returns the number of logical processors available.

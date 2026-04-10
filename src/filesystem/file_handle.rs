@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::error::{EngineError, EngineResult};
+use crate::runtime::error::{EngineError, EngineResult};
 use crate::filesystem::GameFS;
 use std::io::{BufRead, BufReader, BufWriter, Read, Seek, SeekFrom, Write};
 use std::path::PathBuf;

@@ -98,7 +98,8 @@ pub mod debugbridge;
 /// API documentation catalog and quality reporting for the lurek.* API surface.
 pub mod docs;
 /// Core engine lifecycle, configuration, and error types.
-pub mod engine;
+pub mod runtime;
+pub mod app;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
 pub mod ecs;
 /// Sandboxed game filesystem (GameFS).
@@ -184,7 +185,8 @@ pub mod window;
 /// the archive is extracted to a temporary directory and the engine runs from there.
 /// The temporary directory is cleaned up automatically when the engine exits.
 pub fn lurek_run() {
-    use engine::{App, Config};
+    use app::App;
+    use runtime::Config;
     use std::env;
 
     std::panic::set_hook(Box::new(|info| {
@@ -204,7 +206,7 @@ pub fn lurek_run() {
         let msg = format!("Lurek2D panicked: {}{}", payload, location);
         log_msg!(
             error,
-            crate::engine::log_messages::L060_LUA_CALLBACK_ERROR,
+            crate::runtime::log_messages::L060_LUA_CALLBACK_ERROR,
             "{}",
             msg
         );
@@ -267,7 +269,7 @@ pub fn lurek_run() {
                     let msg = format!("Failed to open .lurek archive '{}': {}", path.display(), e);
                     log_msg!(
                         error,
-                        crate::engine::log_messages::L060_LUA_CALLBACK_ERROR,
+                        crate::runtime::log_messages::L060_LUA_CALLBACK_ERROR,
                         "{}",
                         msg
                     );

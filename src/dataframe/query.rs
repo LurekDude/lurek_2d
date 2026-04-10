@@ -8,7 +8,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
-use crate::engine::log_messages::DF01_RIGHT_JOIN_UNIMPL;
+use crate::runtime::log_messages::DF01_RIGHT_JOIN_UNIMPL;
 use crate::log_msg;
 
 // ---------------------------------------------------------------------------

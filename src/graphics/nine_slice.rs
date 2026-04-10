@@ -5,7 +5,7 @@
 //! center stretches in both axes. This preserves visual quality when
 //! scaling UI panels, buttons, and dialog boxes.
 
-use crate::engine::resource_keys::TextureKey;
+use crate::runtime::resource_keys::TextureKey;
 
 /// A single patch rectangle: `(src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h)`.
 pub type Patch = (f32, f32, f32, f32, f32, f32, f32, f32);

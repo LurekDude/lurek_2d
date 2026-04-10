@@ -13,7 +13,7 @@
 
 use std::collections::HashMap;
 
-use crate::engine::log_messages::{RL01, RL02, RL03};
+use crate::runtime::log_messages::{RL01, RL02, RL03};
 use crate::log_msg;
 
 /// Definition of a named relation type with a fixed set of valid level strings.

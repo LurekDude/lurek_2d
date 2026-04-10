@@ -6,8 +6,8 @@ use slotmap::Key;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::engine::resource_keys::*;
-use crate::engine::ScreenshotRequest;
+use crate::runtime::resource_keys::*;
+use crate::runtime::ScreenshotRequest;
 use crate::graphics::shape::{CompoundShape, ShapeCommand};
 use crate::graphics::sprite_batch::BatchEntry;
 use crate::graphics::{

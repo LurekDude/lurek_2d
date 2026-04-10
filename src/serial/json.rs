@@ -3,7 +3,7 @@
 //! Converts between JSON strings and `SerialValue` using `serde_json`.
 
 use super::lua_table::SerialValue;
-use crate::engine::log_messages::{SR01_JSON_OK, SR03_JSON_ENC};
+use crate::runtime::log_messages::{SR01_JSON_OK, SR03_JSON_ENC};
 use crate::log_msg;
 use indexmap::IndexMap;
 use serde_json::Value as JsonValue;

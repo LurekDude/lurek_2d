@@ -9,7 +9,7 @@
 //! # Usage
 //!
 //! ```rust,ignore
-//! use crate::engine::log_messages::L003_GAME_LOADED;
+//! use crate::runtime::log_messages::L003_GAME_LOADED;
 //!
 //! // Simple — catalog text only:
 //! log_msg!(info, L003_GAME_LOADED);
@@ -102,7 +102,7 @@ impl MessageCatalog {
 /// Initialise the global message catalog from the embedded TOML.
 ///
 /// Safe to call multiple times — only the first call takes effect.
-/// Called automatically by [`App::new`](crate::engine::App) during engine startup.
+/// Called automatically by [`App::new`](crate::app::App) during engine startup.
 pub fn init() {
     CATALOG.get_or_init(|| MessageCatalog::from_toml(CATALOG_TOML));
 }

@@ -1,6 +1,6 @@
 ﻿//! Window management — Tier 1 Engine Subsystem.
 //!
-//! Provides pure Rust functions for reading and writing [`crate::engine::shared_state::WindowState`]
+//! Provides pure Rust functions for reading and writing [`crate::runtime::shared_state::WindowState`]
 //! fields.  **No winit calls are made in this module.**  Deferred window operations are placed in
 //! `pending_*` fields and consumed by `engine::app::App` at the start of the next frame.
 //!

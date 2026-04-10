@@ -16,7 +16,7 @@ use std::collections::HashMap;
 use super::body::{Body, BodyShape, BodyType};
 use super::shape::Shape;
 
-use crate::engine::log_messages::{P001_PULLEY_JOINT_FALLBACK, P002_GEAR_JOINT_FALLBACK};
+use crate::runtime::log_messages::{P001_PULLEY_JOINT_FALLBACK, P002_GEAR_JOINT_FALLBACK};
 #[allow(unused_imports)]
 use crate::log_msg;
 

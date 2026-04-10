@@ -6,7 +6,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::EngineError;
+use crate::runtime::EngineError;
 
 /// GPU-compressed texture format identifier.
 ///

@@ -17,13 +17,13 @@ use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::keyboard::PhysicalKey;
 use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
 
-use crate::engine::debug_overlay::DebugOverlay;
-use crate::engine::error_screen::ErrorScreen;
-use crate::engine::resource_keys::{
+use super::debug_overlay::DebugOverlay;
+use super::error_screen::ErrorScreen;
+use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
-use crate::engine::shared_state::WindowState;
-use crate::engine::{FullscreenType, SharedState};
+use crate::runtime::shared_state::WindowState;
+use crate::runtime::{FullscreenType, SharedState};
 use crate::graphics::renderer::{DrawMode, RenderCommand, TextureData};
 use crate::graphics::GpuRenderer;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
@@ -36,8 +36,8 @@ use gilrs::{
     Gilrs,
 };
 
-use super::config::Config;
-use crate::engine::log_messages::{
+use crate::runtime::config::Config;
+use crate::runtime::log_messages::{
     L003_GAME_LOADED, L006_SPLASH_SCREEN, L007_NO_MAIN_LUA, L010_RENDER_ERROR, L011_LUA_ERROR,
     L016_LUA_VM_INIT_FAIL, L017_MAIN_LUA_READ_FAIL, L021_CLIPBOARD_FAIL, L023_GPU_TEX_TOO_SMALL,
     L024_SURFACE_LOST, L033_GPU_ADAPTER, L034_GPU_TEX_DIM, L035_GPU_INIT, L036_GAMEPAD_CONNECTED,
@@ -1073,7 +1073,7 @@ impl LunaApp {
                             } else {
                                 log_msg!(
                                     info,
-                                    crate::engine::log_messages::L001_ENGINE_START,
+                                    crate::runtime::log_messages::L001_ENGINE_START,
                                     "auto-screenshot saved to: {}",
                                     path.display()
                                 );
@@ -2292,10 +2292,10 @@ impl App {
             self.config.log_level.as_deref(),
         );
         // Initialise the message catalog before any log_msg! calls.
-        crate::engine::messages::init();
+        crate::runtime::messages::init();
         log_msg!(
             info,
-            crate::engine::log_messages::L001_ENGINE_START,
+            crate::runtime::log_messages::L001_ENGINE_START,
             "v{} (wgpu GPU backend)",
             env!("CARGO_PKG_VERSION"),
         );
@@ -2316,7 +2316,7 @@ impl App {
         );
         event_loop.run_app(&mut app).expect("Event loop error");
 
-        log_msg!(info, crate::engine::log_messages::L002_ENGINE_STOP);
+        log_msg!(info, crate::runtime::log_messages::L002_ENGINE_STOP);
     }
 }
 

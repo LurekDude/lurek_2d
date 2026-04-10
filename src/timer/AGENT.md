@@ -18,7 +18,7 @@ tracks frame delta (elapsed seconds since the last tick), total elapsed time
 since game start, rolling FPS computed over a 1-second sliding window, and a
 60-frame rolling average delta useful for smooth HUD display of frame time.
 `Clock` is stored inside `SharedState` and ticked once per engine frame by the
-main loop in `src/engine/app.rs`; the `dt` that `lurek.update(dt)` receives is
+main loop in `src/runtime/app.rs`; the `dt` that `lurek.update(dt)` receives is
 the `Clock`'s last-tick delta. The module also exposes a free function
 `sleep(seconds)` that blocks the calling thread � a convenience for loading
 screens or startup delays that should never be called in the hot loop.

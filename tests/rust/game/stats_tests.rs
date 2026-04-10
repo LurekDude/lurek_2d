@@ -1,7 +1,7 @@
 //! Integration tests for the RPG stats system (`lurek.stats`).
 
 use lurek2d::lua_api::{create_lua_vm, SharedState};
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;

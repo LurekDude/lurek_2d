@@ -17,7 +17,7 @@ use winit::window::Window;
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
 use crate::camera::Camera;
-use crate::engine::resource_keys::{
+use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
 use crate::filesystem::GameFS;
@@ -459,7 +459,7 @@ impl SharedState {
     ///
     /// # Returns
     /// `u64` — An opaque handle ID used to poll the load result.
-    pub fn request_async_load(&mut self, path: &str) -> crate::engine::error::EngineResult<u64> {
+    pub fn request_async_load(&mut self, path: &str) -> crate::runtime::error::EngineResult<u64> {
         let resolved = self.fs.resolve_read_path(path)?;
         if self.async_loader.is_none() {
             self.async_loader = Some(crate::filesystem::AsyncLoader::new());

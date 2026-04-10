@@ -11,7 +11,7 @@
 use super::core::Graph;
 use super::item::ItemPosition;
 use super::node::FlowMode;
-use crate::engine::log_messages::{GR01, GR02};
+use crate::runtime::log_messages::{GR01, GR02};
 use crate::log_msg;
 
 /// Events generated during simulation for the Lua callback layer to dispatch.

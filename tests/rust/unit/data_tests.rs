@@ -9,7 +9,7 @@ use lurek2d::data::compress::{compress, decompress, CompressFormat};
 use lurek2d::data::encode::{decode, encode, EncodeFormat};
 use lurek2d::data::hash::{hash, HashAlgorithm};
 use lurek2d::data::toml_convert;
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 
 fn make_vm() -> mlua::Lua {

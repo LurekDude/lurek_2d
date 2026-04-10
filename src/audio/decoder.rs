@@ -4,8 +4,8 @@
 //! chunks, enabling streaming playback without loading the entire file into
 //! memory.
 
-use crate::engine::log_messages::AD01_AUDIO_DECODED;
-use crate::engine::EngineError;
+use crate::runtime::log_messages::AD01_AUDIO_DECODED;
+use crate::runtime::EngineError;
 use crate::log_msg;
 
 /// Streaming audio decoder that reads PCM in fixed-size chunks.

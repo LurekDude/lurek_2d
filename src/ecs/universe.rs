@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::{EN01_UNIVERSE_INIT, EN02_ENTITY_SPAWN};
+use crate::runtime::log_messages::{EN01_UNIVERSE_INIT, EN02_ENTITY_SPAWN};
 use crate::log_msg;
 use mlua::{Function, Lua, RegistryKey, Result as LuaResult, Table, Value as LuaValue};
 use std::collections::{HashMap, HashSet};

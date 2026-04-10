@@ -4,8 +4,8 @@
 //! including the error title, message, traceback, and instructions
 //! to quit or restart.
 
-use crate::engine::error::EngineError;
-use crate::engine::resource_keys::FontKey;
+use crate::runtime::error::EngineError;
+use crate::runtime::resource_keys::FontKey;
 use crate::graphics::renderer::{RenderCommand, DrawMode};
 
 /// Blue error screen background color.

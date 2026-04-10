@@ -5,7 +5,7 @@
 
 use std::collections::HashMap;
 
-use crate::engine::log_messages::{SS01, SS02};
+use crate::runtime::log_messages::{SS01, SS02};
 use crate::log_msg;
 use crate::math::Rect;
 

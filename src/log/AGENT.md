@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The `log` module provides structured log level management and configurable output sinks for Lua game scripts. It exposes `set_level()`, `get_level()`, and `enabled_for()` on the Rust side, delegating to `crate::engine::log_messages`.
+The `log` module provides structured log level management and configurable output sinks for Lua game scripts. It exposes `set_level()`, `get_level()`, and `enabled_for()` on the Rust side, delegating to `crate::runtime::log_messages`.
 
 The Lua API at `lurek.log.*` allows scripts to emit messages at specific severity levels (`debug`, `info`, `warn`, `error`) with an optional _tag_ string (second argument). Every log function also dispatches to any registered `Sink` destinations beyond the default stderr channel. Game developers can add **file sinks** (append to disk, UTF-8) and **memory sinks** (bounded ring buffer) to route log output to custom destinations — similar to Python's `logging.Handler` model.
 

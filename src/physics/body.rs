@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 //!
-use crate::engine::log_messages::{BD01, BD02, BD03};
+use crate::runtime::log_messages::{BD01, BD02, BD03};
 use crate::log_msg;
 use crate::math::{Rect, Vec2};
 use crate::physics::shape::Shape;

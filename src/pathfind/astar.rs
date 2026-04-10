@@ -10,7 +10,7 @@
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-use crate::engine::log_messages::{AT01, AT02, AT03};
+use crate::runtime::log_messages::{AT01, AT02, AT03};
 use crate::log_msg;
 use crate::pathfind::nav_grid::{DiagonalMode, NavGrid};
 

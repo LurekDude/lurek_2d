@@ -10,7 +10,7 @@
 
 use std::collections::HashMap;
 
-use crate::engine::log_messages::{GC01, GC02, GC03, GC04};
+use crate::runtime::log_messages::{GC01, GC02, GC03, GC04};
 use crate::log_msg;
 
 use super::edge::Edge;

@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::engine::log_messages::LA02_PIPELINE_CALLBACK_FAIL;
+use crate::runtime::log_messages::LA02_PIPELINE_CALLBACK_FAIL;
 use crate::log_msg;
 use crate::pipeline::{ErrorMode, Pipeline, PipelineScheduler, PipelineStep, StepStatus};
 

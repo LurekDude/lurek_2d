@@ -6,7 +6,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::engine::resource_keys::ParticleKey;
+use crate::runtime::resource_keys::ParticleKey;
 use crate::particle::{ParticleConfig, ParticleSystem, Trail};
 
 // -------------------------------------------------------------------------------

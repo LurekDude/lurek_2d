@@ -26,7 +26,7 @@ use crate::input::keyboard::winit_key_to_string;
 use crate::lua_api::{create_lua_vm, SharedState};
 use crate::timer::Clock;
 
-use super::config::Config;
+use crate::runtime::config::Config;
 
 // ─── Lurek2D Application handler ──────────────────────────────────────────────
 

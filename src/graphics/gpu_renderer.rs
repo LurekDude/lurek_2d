@@ -15,11 +15,11 @@ use std::sync::mpsc;
 
 use bytemuck::{Pod, Zeroable};
 
-use crate::engine::log_messages::{
+use crate::runtime::log_messages::{
     G002_SCREENSHOT_ZERO_SIZE, G003_SCREENSHOT_MAP_FAIL, G004_SCREENSHOT_RECV_FAIL,
     G005_SCREENSHOT_DATA_FAIL,
 };
-use crate::engine::resource_keys::{
+use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::graphics::mesh::Mesh;

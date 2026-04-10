@@ -6,7 +6,7 @@
 
 use super::ray_hit::RayHit;
 use super::sprite_projection::SpriteProjection;
-use crate::engine::log_messages::RC01;
+use crate::runtime::log_messages::RC01;
 use crate::log_msg;
 
 /// 2D grid-based raycaster using DDA traversal.

@@ -1,6 +1,6 @@
 //! Structured log level management and configurable log sinks for Lurek2D scripts.
 //!
-//! Delegates to Rust's `log` crate via `crate::engine::log_messages`. Log
+//! Delegates to Rust's `log` crate via `crate::runtime::log_messages`. Log
 //! output from game scripts appears alongside engine log output and is
 //! controlled by the `RUST_LOG` environment variable.
 //!
@@ -13,7 +13,7 @@ pub mod sinks;
 
 pub use sinks::{MemoryEntry, Sink, SinkLevel, SinkRegistry};
 
-use crate::engine::log_messages;
+use crate::runtime::log_messages;
 
 /// Sets the active log level to the named value.
 ///

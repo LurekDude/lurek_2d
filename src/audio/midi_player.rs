@@ -10,12 +10,12 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::audio::PlayState;
-use crate::engine::resource_keys::BusKey;
+use crate::runtime::resource_keys::BusKey;
 // use midly::{MetaMessage, MidiMessage, Smf, TrackEventKind}; // MIDI disabled
 // To re-enable: restore midly = "0.5" in Cargo.toml and uncomment imports + restore fn bodies from git
 use rodio::Source;
 // use std::collections::HashSet; // only needed for MIDI load_data (disabled)
-use crate::engine::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};
+use crate::runtime::log_messages::{A001_MIDI_READ_FAIL, A002_MIDI_DISABLED};
 use crate::log_msg;
 use std::path::Path;
 

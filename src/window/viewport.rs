@@ -5,7 +5,7 @@
 //! the window is resized or the scale mode changes.  These functions treat the pre-computed
 //! values as read-only; callers should use [`set_scale_mode`] to request a change.
 
-use crate::engine::shared_state::WindowState;
+use crate::runtime::shared_state::WindowState;
 
 /// Returns the logical game width in virtual pixels.
 ///

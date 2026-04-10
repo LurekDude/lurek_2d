@@ -12,7 +12,7 @@ use std::collections::HashMap;
 
 use super::tilemap::TileMap;
 use super::tileset::TileSet;
-use crate::engine::log_messages::{MG01, MG02, MG03};
+use crate::runtime::log_messages::{MG01, MG02, MG03};
 use crate::log_msg;
 
 /// Cardinal edge direction for block-segment connectivity.

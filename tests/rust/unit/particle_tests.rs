@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
 
-use lurek2d::engine::config::Config;
+use lurek2d::runtime::config::Config;
 use lurek2d::graphics::renderer::{RenderCommand, ParticleRenderShape};
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 use lurek2d::particle::{

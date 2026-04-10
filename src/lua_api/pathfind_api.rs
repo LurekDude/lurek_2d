@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use super::tilemap_api::LuaTileMap;
-use crate::engine::log_messages::LA08_PATHFINDING_THREAD_UNIMPL;
+use crate::runtime::log_messages::LA08_PATHFINDING_THREAD_UNIMPL;
 use crate::log_msg;
 use crate::pathfind::ai_flow_field::FlowField as AiFlowField;
 use crate::pathfind::hpa::{build_abstract, AbstractGraph};

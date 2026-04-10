@@ -9,7 +9,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 /// Maximum number of elements allowed in a single NdArray.
-use crate::engine::log_messages::{CP01_NDARRAY_ALLOC, CP02_NDARRAY_LARGE};
+use crate::runtime::log_messages::{CP01_NDARRAY_ALLOC, CP02_NDARRAY_LARGE};
 use crate::log_msg;
 const MAX_ELEMENTS: usize = 268_435_456;
 

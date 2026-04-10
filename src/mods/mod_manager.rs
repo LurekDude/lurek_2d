@@ -11,7 +11,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use crate::engine::log_messages::{MD01_MGR_INIT, MD02_MOD_REG, MD04_ORDER_OK};
+use crate::runtime::log_messages::{MD01_MGR_INIT, MD02_MOD_REG, MD04_ORDER_OK};
 use crate::log_msg;
 use std::collections::{HashMap, HashSet};
 

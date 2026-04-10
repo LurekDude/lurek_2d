@@ -2,7 +2,7 @@
 
 use super::bone::Bone;
 use super::slot::Slot;
-use crate::engine::log_messages::SP01_SKEL_LOADED;
+use crate::runtime::log_messages::SP01_SKEL_LOADED;
 use crate::log_msg;
 
 /// Parameters for creating and adding a bone in one call.

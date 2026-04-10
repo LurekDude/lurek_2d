@@ -3,7 +3,7 @@
 //! [`PostFxStack`] manages an ordered chain of effects that captures and
 //! processes the rendered scene each frame.
 
-use crate::engine::log_messages::{FX01, FX02};
+use crate::runtime::log_messages::{FX01, FX02};
 use crate::log_msg;
 /// An ordered chain of effects that captures and processes the rendered scene.
 ///

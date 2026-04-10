@@ -2,7 +2,7 @@
 
 use std::fs;
 
-use lurek2d::engine::Config;
+use lurek2d::runtime::Config;
 use tempfile::TempDir;
 
 fn write_conf(temp_dir: &TempDir, contents: &str) {

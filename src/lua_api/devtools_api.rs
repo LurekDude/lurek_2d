@@ -10,7 +10,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::devtools::{FrameStats, FileWatcher, Logger, Profiler, ProfileZone};
-use crate::engine::SharedState;
+use crate::runtime::SharedState;
 
 // ---------------------------------------------------------------------------
 // Bridge state

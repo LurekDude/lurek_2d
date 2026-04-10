@@ -10,7 +10,7 @@ use std::sync::{Arc, Condvar, Mutex};
 
 use mlua::prelude::*;
 
-use crate::engine::log_messages::{CH01, CH02, CH03, CH04};
+use crate::runtime::log_messages::{CH01, CH02, CH03, CH04};
 use crate::log_msg;
 
 /// Serializable values that can be sent between threads.

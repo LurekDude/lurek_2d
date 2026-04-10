@@ -5,7 +5,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::engine::resource_keys::{LightKey, OccluderKey};
+use crate::runtime::resource_keys::{LightKey, OccluderKey};
 use crate::light::{
     Attenuation, FalloffMode, FlickerConfig, Light2D, LightBlendMode, LightType, Occluder,
     ShadowFilter,

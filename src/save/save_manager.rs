@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use mlua::prelude::{LuaError, LuaResult, LuaValue};
 
-use crate::engine::log_messages::{SV01, SV02, SV03, SV04};
+use crate::runtime::log_messages::{SV01, SV02, SV03, SV04};
 use crate::log_msg;
 
 /// Metadata extracted from a save slot.

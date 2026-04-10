@@ -8,8 +8,8 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 //!
-use crate::engine::error::{EngineError, EngineResult};
-use crate::engine::log_messages::{FS01_GAMEFS_INIT, FS04_PATH_TRAVERSAL, FS05_VFS_MOUNT};
+use crate::runtime::error::{EngineError, EngineResult};
+use crate::runtime::log_messages::{FS01_GAMEFS_INIT, FS04_PATH_TRAVERSAL, FS05_VFS_MOUNT};
 use crate::filesystem::file_handle::{FileHandle, FileMode};
 use crate::log_msg;
 use std::path::{Path, PathBuf};

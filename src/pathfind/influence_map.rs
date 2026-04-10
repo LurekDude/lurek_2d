@@ -26,7 +26,7 @@
 
 use std::collections::HashMap;
 
-use crate::engine::log_messages::{IF01, IF02, IF03};
+use crate::runtime::log_messages::{IF01, IF02, IF03};
 use crate::log_msg;
 
 /// A multi-layer spatial float grid for influence mapping and strategic reasoning.

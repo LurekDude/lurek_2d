@@ -5,7 +5,7 @@
 //! made here.  Deferred operations are stored in `pending_*` fields and executed by
 //! `engine::app::App` at the start of the next frame.
 
-use crate::engine::shared_state::{FullscreenType, WindowState};
+use crate::runtime::shared_state::{FullscreenType, WindowState};
 
 /// Information about the current window mode.
 ///

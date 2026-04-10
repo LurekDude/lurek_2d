@@ -5,7 +5,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use crate::engine::log_messages::{HX01, HX02};
+use crate::runtime::log_messages::{HX01, HX02};
 use crate::log_msg;
 
 /// Entry in the spatial hash. Consult the module-level documentation for the broader usage context and preconditions.

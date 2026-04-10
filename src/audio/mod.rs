@@ -21,7 +21,7 @@
 //!
 //! Buses are pure data containers; the mixer multiplies source volume/pitch by bus values on
 //! every `set_volume` or `update` call.  Audio sources are tracked in a slot-map keyed by
-//! [`crate::engine::resource_keys::SoundKey`], giving O(1) lookup and safe handle
+//! [`crate::runtime::resource_keys::SoundKey`], giving O(1) lookup and safe handle
 //! invalidation when sources are released.
 
 /// Named audio bus for grouping sources under shared volume/pitch/pause controls.
@@ -84,12 +84,12 @@ pub fn get_playback_device() -> String {
 /// - `name` — `&str`. Device name to select.
 ///
 /// # Returns
-/// `Result<(), crate::engine::error::EngineError>`.
-pub fn set_playback_device(name: &str) -> Result<(), crate::engine::error::EngineError> {
+/// `Result<(), crate::runtime::error::EngineError>`.
+pub fn set_playback_device(name: &str) -> Result<(), crate::runtime::error::EngineError> {
     if get_playback_devices().iter().any(|d| d == name) {
         Ok(())
     } else {
-        Err(crate::engine::error::EngineError::AudioError(format!(
+        Err(crate::runtime::error::EngineError::AudioError(format!(
             "Unknown audio device: {}",
             name
         )))

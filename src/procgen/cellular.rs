@@ -5,7 +5,7 @@
 
 use mlua::prelude::*;
 use super::lcg::Lcg;
-use crate::engine::log_messages::{PG01_CELLULAR_START, PG02_CELLULAR_DONE};
+use crate::runtime::log_messages::{PG01_CELLULAR_START, PG02_CELLULAR_DONE};
 use crate::log_msg;
 
 /// Options for cellular automata generation.

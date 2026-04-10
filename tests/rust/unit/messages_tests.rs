@@ -3,7 +3,7 @@
 //! Tests cover catalog parsing, ID resolution, global `get_message`, and the
 //! uniqueness contract for all registered stable IDs.
 
-use lurek2d::engine::messages::{catalog, get_message, init, MessageCatalog};
+use lurek2d::runtime::messages::{catalog, get_message, init, MessageCatalog};
 
 // ---------------------------------------------------------------------------
 // Parsing

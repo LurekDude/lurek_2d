@@ -5,7 +5,7 @@
 
 use mlua::prelude::*;
 use super::lcg::Lcg;
-use crate::engine::log_messages::{VR01, VR02};
+use crate::runtime::log_messages::{VR01, VR02};
 use crate::log_msg;
 
 /// Options for Voronoi diagram generation. Controls seed points, grid dimensions,

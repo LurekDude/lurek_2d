@@ -7,7 +7,7 @@ use crate::math::Rect;
 use super::clip::AnimClip;
 use super::event::AnimEvent;
 use super::frame::AnimFrame;
-use crate::engine::log_messages::{AN01_ANIM_CTRL_INIT, AN02_CLIP_ADDED, AN03_CLIP_NOT_FOUND};
+use crate::runtime::log_messages::{AN01_ANIM_CTRL_INIT, AN02_CLIP_ADDED, AN03_CLIP_NOT_FOUND};
 use crate::log_msg;
 
 /// Sprite animation with named clips, speed control, and playback events.
