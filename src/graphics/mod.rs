@@ -22,7 +22,7 @@ pub mod image_effect;
 pub mod mesh;
 /// Nine-slice (9-patch) image rendering for scalable UI elements.
 pub mod nine_slice;
-/// DrawCommand queue, draw enums, and texture data types.
+/// RenderCommand queue, draw enums, and texture data types.
 pub mod renderer;
 /// Custom WGSL shader support with uniform variables.
 pub mod shader;
@@ -47,7 +47,7 @@ pub use image_effect::ShaderPassDescriptor;
 pub use mesh::{Mesh, MeshDrawMode, MeshVertex};
 pub use nine_slice::{NineSlice, Patch};
 pub use renderer::{
-    BlendMode, CompareMode, DepthMode, DrawCommand, DrawMode, DrawableKind, StencilAction,
+    BlendMode, CompareMode, DepthMode, RenderCommand, DrawMode, DrawableKind, StencilAction,
     StencilMode, TextAlign, TextureData,
 };
 pub use shader::{Shader, UniformValue};

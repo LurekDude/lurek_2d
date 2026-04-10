@@ -1,5 +1,6 @@
 //! `luna.effect` — Composable visual effects: post-processing pipeline and screen overlays.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -530,6 +531,7 @@ impl LuaUserData for LuaImageEffect {
 /// Lua-side wrapper around [`Overlay`].
 pub struct LuaOverlay {
     inner: Overlay,
+    state: Rc<RefCell<SharedState>>,
 }
 
 impl LuaUserData for LuaOverlay {
@@ -1116,10 +1118,29 @@ impl LuaUserData for LuaOverlay {
 
         // ── Misc ─────────────────────────────────────────────────────────────
 
-        // -- draw --
-        /// No-op placeholder; the overlay is rendered by the engine's draw pass.
+        // -- render --
+        /// Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
+        ///
+        /// Calls `build_render_commands` on the inner `Overlay` and extends the frame
+        /// render queue. Must be called inside `lurek.render_ui` for correct screen-space
+        /// layering (after world geometry, before post-processing).
+        ///
         /// @return nil
-        methods.add_method("draw", |_, _this, ()| Ok(()));
+        methods.add_method("render", |_, this, ()| {
+            let cmds = this.inner.build_render_commands();
+            this.state.borrow_mut().render_commands.extend(cmds);
+            Ok(())
+        });
+
+        // -- drawToImage --
+        /// Renders the overlay state (flash, fade, effects) to a CPU ImageData.
+        /// @param width : integer
+        /// @param height : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
+            let img = this.inner.draw_state_to_image(w, h);
+            Ok(LuaImageData { inner: img })
+        });
 
         // -- type --
         /// Returns the type name of this object ("Overlay").
@@ -1300,13 +1321,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param width : integer
     /// @param height : integer
     /// @return Overlay
+    let s = state.clone();
     tbl.set(
         "newOverlay",
-        lua.create_function(|lua, (w, h): (Option<u32>, Option<u32>)| {
+        lua.create_function(move |lua, (w, h): (Option<u32>, Option<u32>)| {
             let width = w.unwrap_or(800);
             let height = h.unwrap_or(600);
             lua.create_userdata(LuaOverlay {
                 inner: Overlay::new(width, height),
+                state: s.clone(),
             })
         })?,
     )?;

@@ -10,7 +10,7 @@
 
 ## Current Feature Summary
 
-- 45+ `DrawCommand` variants queued during `lurek.draw()`, processed by GPU renderer after callback returns
+- 45+ `RenderCommand` variants queued during `lurek.draw()`, processed by GPU renderer after callback returns
 - 7 UserData types: LuaImage, LuaFont, LuaCanvas, LuaSpriteBatch, LuaShader, LuaMesh, LuaSpriteSheet
 - 66+ Lua API functions across drawing, text, transforms, canvases, shaders
 - Sprite sheets with animation frame extraction
@@ -35,7 +35,7 @@
 
 ## Structural Issues
 
-- **Module is too large** (18 files, 66+ Lua functions, 45+ DrawCommand variants). This is the largest module in the engine. Consider splitting:
+- **Module is too large** (18 files, 66+ Lua functions, 45+ RenderCommand variants). This is the largest module in the engine. Consider splitting:
   - `graphics/core` — renderer, draw commands, color, blend modes
   - `graphics/text` — font loading, text layout, alignment, wrapping
   - `graphics/sprite` — sprite sheets, sprite batches, texture atlases

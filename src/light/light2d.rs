@@ -666,5 +666,64 @@ impl Light2D {
     }
     Ok(())
 }
+    /// Draw a side-by-side comparison of falloff modes as radial gradients.
+    ///
+    /// # Parameters
+    /// - `modes` — `&[(FalloffMode, &str)]`. Mode and label pairs.
+    /// - `radius` — `f32`. Light radius for each sample.
+    /// - `width` — `u32`. Image width.
+    /// - `height` — `u32`. Image height.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_falloff_comparison_to_image(
+        modes: &[(FalloffMode, &str)],
+        radius: f32,
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(10, 10, 15, 255);
+
+        let count = modes.len().max(1);
+        let cell_w = width / count as u32;
+
+        for (i, &(mode, name)) in modes.iter().enumerate() {
+            let ox = i as i32 * cell_w as i32;
+            let cx = ox + cell_w as i32 / 2;
+            let cy = height as i32 / 2;
+            let ri = radius as i32;
+
+            for dy in -ri..=ri {
+                for dx in -ri..=ri {
+                    let dist = ((dx * dx + dy * dy) as f32).sqrt();
+                    if dist > radius { continue; }
+                    let t = dist / radius;
+                    let intensity = match mode {
+                        FalloffMode::Linear => 1.0 - t,
+                        FalloffMode::Smooth => 1.0 - t * t,
+                        FalloffMode::Constant => 1.0,
+                    };
+                    let px = (cx + dx) as u32;
+                    let py = (cy + dy) as u32;
+                    if px < width && py < height {
+                        let r = (255.0 * intensity) as u8;
+                        let g = (200.0 * intensity * 0.8) as u8;
+                        let b = (100.0 * intensity * 0.4) as u8;
+                        let existing = img.get_pixel(px, py).unwrap_or((0, 0, 0, 0));
+                        let nr = r.max(existing.0);
+                        let ng = g.max(existing.1);
+                        let nb = b.max(existing.2);
+                        img.set_pixel(px, py, nr, ng, nb, 255);
+                    }
+                }
+            }
+            img.draw_label(name, ox + 30, (height - 15) as i32, 200, 200, 200);
+        }
+
+        img.draw_label("LIGHT FALLOFF MODES", (width / 3) as i32, 3, 100, 255, 100);
+        img
+    }
+
 }
 

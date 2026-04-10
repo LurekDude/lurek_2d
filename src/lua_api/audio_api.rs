@@ -502,8 +502,9 @@ impl LuaUserData for LuaBus {
         /// Returns true if this object is of the given type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "Bus" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "Bus" || name == "Object")
+        });
     }
 }
 
@@ -669,9 +670,7 @@ impl LuaUserData for LuaMidiPlayer {
         // -- getVolume --
         /// Returns the current MIDI volume.
         /// @return number
-        methods.add_method("getVolume", |_, this, ()| {
-            Ok(this.inner.borrow().volume())
-        });
+        methods.add_method("getVolume", |_, this, ()| Ok(this.inner.borrow().volume()));
 
         // -- setBus --
         /// Routes MIDI output through a bus (or nil to clear).
@@ -814,9 +813,7 @@ impl LuaUserData for LuaMidiPlayer {
             "setChannelInstrument",
             |_, this, (ch, inst): (usize, u8)| {
                 if (1..=16).contains(&ch) {
-                    this.inner
-                        .borrow_mut()
-                        .set_channel_instrument(ch - 1, inst);
+                    this.inner.borrow_mut().set_channel_instrument(ch - 1, inst);
                 }
                 Ok(())
             },
@@ -950,8 +947,9 @@ impl LuaUserData for LuaMidiPlayer {
         /// Returns true if this object is of the given type.
         /// @param name : string
         /// @return boolean
-        methods.add_method("typeOf", |_, _, name: String| Ok(name == "MidiPlayer" || name == "Object"));
-
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "MidiPlayer" || name == "Object")
+        });
     }
 }
 
@@ -972,11 +970,8 @@ impl LuaUserData for LuaDecoder {
         methods.add_method_mut("decode", |lua, this, ()| match this.inner.decode() {
             Some(pcm_i16) => {
                 let samples: Vec<f32> = pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
-                let sd = SoundData::from_samples(
-                    samples,
-                    this.inner.sample_rate,
-                    this.inner.channels,
-                );
+                let sd =
+                    SoundData::from_samples(samples, this.inner.sample_rate, this.inner.channels);
                 Ok(LuaValue::UserData(lua.create_userdata(sd)?))
             }
             None => Ok(LuaValue::Nil),
@@ -992,9 +987,7 @@ impl LuaUserData for LuaDecoder {
         // -- getBitDepth --
         /// Returns the bit depth.
         /// @return integer
-        methods.add_method("getBitDepth", |_, this, ()| {
-            Ok(this.inner.bit_depth as u32)
-        });
+        methods.add_method("getBitDepth", |_, this, ()| Ok(this.inner.bit_depth as u32));
 
         // -- getSampleRate --
         /// Returns the sample rate in Hz.
@@ -1545,10 +1538,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // ── getMaxSources ─────────────────────────────────────────────────────────
     /// Returns the maximum number of simultaneous sources.
     /// @return integer
-    tbl.set(
-        "getMaxSources",
-        lua.create_function(|_, ()| Ok(64))?,
-    )?;
+    tbl.set("getMaxSources", lua.create_function(|_, ()| Ok(64))?)?;
 
     // ── getDuration ───────────────────────────────────────────────────────────
     /// Returns the total duration of a source in seconds.
@@ -1839,16 +1829,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "setOrientation",
         lua.create_function(
-            move |_,
-                  (id_val, fx, fy, fz, ux, uy, uz): (
-                LuaValue,
-                f32,
-                f32,
-                f32,
-                f32,
-                f32,
-                f32,
-            )| {
+            move |_, (id_val, fx, fy, fz, ux, uy, uz): (LuaValue, f32, f32, f32, f32, f32, f32)| {
                 let key = sound_key_from_value(&id_val)?;
                 s.borrow_mut()
                     .mixer
@@ -1913,9 +1894,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let s = state.clone();
     tbl.set(
         "getDistanceModel",
-        lua.create_function(move |_, ()| {
-            Ok(s.borrow().mixer.get_distance_model().to_string())
-        })?,
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_distance_model().to_string()))?,
     )?;
 
     // ── setMeter ──────────────────────────────────────────────────────────────
@@ -2220,12 +2199,21 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (bus_name, effect_type_str, params): (String, String, Option<mlua::Table>)| {
                 let st = s.borrow();
-                let bus_key = st.mixer.get_bus_by_name(&bus_name)
+                let bus_key = st
+                    .mixer
+                    .get_bus_by_name(&bus_name)
                     .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
-                let bus = st.mixer.get_bus(bus_key)
+                let bus = st
+                    .mixer
+                    .get_bus(bus_key)
                     .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
-                let p1_val = params.as_ref().and_then(|t| t.get::<_, f32>("value").ok()).unwrap_or(1000.0);
-                let eid = bus.add_effect(&effect_type_str, p1_val).map_err(LuaError::RuntimeError)?;
+                let p1_val = params
+                    .as_ref()
+                    .and_then(|t| t.get::<_, f32>("value").ok())
+                    .unwrap_or(1000.0);
+                let eid = bus
+                    .add_effect(&effect_type_str, p1_val)
+                    .map_err(LuaError::RuntimeError)?;
                 Ok(Some(eid))
             },
         )?,
@@ -2241,11 +2229,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "remove_effect",
         lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
             let st = s.borrow();
-            let bus_key = st.mixer.get_bus_by_name(&bus_name)
+            let bus_key = st
+                .mixer
+                .get_bus_by_name(&bus_name)
                 .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
-            let bus = st.mixer.get_bus(bus_key)
+            let bus = st
+                .mixer
+                .get_bus(bus_key)
                 .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
-            bus.remove_effect(effect_id).map_err(LuaError::RuntimeError).map(|_| true)
+            bus.remove_effect(effect_id)
+                .map_err(LuaError::RuntimeError)
+                .map(|_| true)
         })?,
     )?;
 
@@ -2262,14 +2256,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (bus_name, effect_id, param_name, value): (String, u32, String, f32)| {
                 let st = s.borrow();
-                let bus_key = st.mixer.get_bus_by_name(&bus_name)
+                let bus_key = st
+                    .mixer
+                    .get_bus_by_name(&bus_name)
                     .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
-                let bus = st.mixer.get_bus(bus_key)
+                let bus = st
+                    .mixer
+                    .get_bus(bus_key)
                     .ok_or_else(|| LuaError::external(format!("Bus not found: {}", bus_name)))?;
                 let fx_list = bus.effects.read().unwrap();
-                let fx = fx_list.iter().find(|fx| fx.id == effect_id)
-                    .ok_or_else(|| LuaError::external(format!("Effect not found: {}", effect_id)))?;
-                fx.set_param(&param_name, value).map_err(LuaError::RuntimeError).map(|_| true)
+                let fx = fx_list
+                    .iter()
+                    .find(|fx| fx.id == effect_id)
+                    .ok_or_else(|| {
+                        LuaError::external(format!("Effect not found: {}", effect_id))
+                    })?;
+                fx.set_param(&param_name, value)
+                    .map_err(LuaError::RuntimeError)
+                    .map(|_| true)
             },
         )?,
     )?;
@@ -2284,9 +2288,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "saveWAV",
         lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
-            let sd = sd_ud.borrow::<SoundData>().map_err(|_| {
-                LuaError::RuntimeError("argument must be a SoundData".into())
-            })?;
+            let sd = sd_ud
+                .borrow::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
             let bytes = sd.encode_wav();
             if let Some(parent) = path.parent() {
                 std::fs::create_dir_all(parent).map_err(LuaError::external)?;

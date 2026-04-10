@@ -185,4 +185,45 @@ impl Trail {
     pub fn set_tail_color(&mut self, color: Color) {
         self.tail_color = color;
     }
+
+    /// Render the trail ribbon to an image with color interpolation.
+    ///
+    /// Draws line segments between consecutive points, interpolating
+    /// color from `head_color` to `tail_color` based on relative age.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(10, 8, 15, 255);
+        if self.points.len() < 2 {
+            return img;
+        }
+        let max_age = self.lifetime.max(0.001);
+        for i in 0..self.points.len() - 1 {
+            let a = &self.points[i];
+            let b = &self.points[i + 1];
+            let t = a.age / max_age;
+            let hr = self.head_color.r as f32;
+            let hg = self.head_color.g as f32;
+            let hb = self.head_color.b as f32;
+            let tr = self.tail_color.r as f32;
+            let tg = self.tail_color.g as f32;
+            let tb = self.tail_color.b as f32;
+            let r = (hr + (tr - hr) * t) as u8;
+            let g = (hg + (tg - hg) * t) as u8;
+            let blue = (hb + (tb - hb) * t) as u8;
+            let alpha = ((1.0 - t) * 255.0) as u8;
+            img.draw_line(
+                a.x as i32, a.y as i32,
+                b.x as i32, b.y as i32,
+                r, g, blue, alpha,
+            );
+        }
+        img
+    }
 }

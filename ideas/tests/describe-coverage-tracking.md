@@ -37,7 +37,7 @@ A scanner can parse the string argument of `describe()` and recognize patterns l
 |----------|------|------|
 | `-- @covers` before block | Explicit, grep-able, decoupled from structure | Requires separate annotation, easy to forget |
 | `describe("lurek.x.y", ...)` naming | Tests are self-documenting, works with existing tools | Changes describe display names, requires naming discipline |
-| **Both combined** | `-- @covers` for inline `it()` tests; `describe()` name convention for method grouping | Small redundancy | 
+| **Both combined** | `-- @covers` for inline `it()` tests; `describe()` name convention for method grouping | Small redundancy |
 
 **Recommendation**: Use both. `describe("lurek.audio.newBus", ...)` is the primary declaration. `-- @covers` is used within `it()` blocks when a single `it()` tests multiple API functions.
 

@@ -206,7 +206,7 @@ pub enum BlendMode {
 /// - `DrawImage` — Blits a texture (by index) at position `(x, y)`.
 /// - `DrawImageEx` — Draws a texture with full transform (rotation, scale, origin offset).
 /// - `DrawQuad` — Draws a sub-region (quad) of a texture with full transform.
-/// - `Print` — Renders text using the built-in bitmap font.
+/// - `Print` — Renders text using a loaded bitmap font.
 /// - `SetLineWidth` — Sets the stroke width for subsequent outline draws.
 /// - `PushTransform` — Saves the current transform onto the stack.
 /// - `PopTransform` — Restores the previous transform from the stack.
@@ -220,7 +220,7 @@ pub enum BlendMode {
 /// - `EndPostFx` — Stop capturing; resume rendering to the previous target.
 /// - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target.
 #[derive(Debug, Clone)]
-pub enum DrawCommand {
+pub enum RenderCommand {
     SetColor(f32, f32, f32, f32),
     Rectangle {
         mode: DrawMode,
@@ -317,6 +317,7 @@ pub enum DrawCommand {
         effect: Option<Vec<ShaderPassDescriptor>>,
     },
     Print {
+        font_key: FontKey,
         text: String,
         x: f32,
         y: f32,
@@ -364,19 +365,7 @@ pub enum DrawCommand {
         angle2: f32,
         segments: u32,
     },
-    /// Draw text using a loaded TTF font.
-    PrintFont {
-        /// Key into `SharedState::fonts`.
-        font_key: FontKey,
-        /// The text string to render.
-        text: String,
-        /// X position in pixels.
-        x: f32,
-        /// Y position in pixels.
-        y: f32,
-        /// Scale multiplier applied to the font's native size.
-        scale: f32,
-    },
+
     /// Draw all sprites in a sprite batch as a single batched draw call.
     DrawBatch {
         /// Key into `SharedState::sprite_batches`.
@@ -523,7 +512,7 @@ pub enum DrawCommand {
     ///
     /// Each entry in `particles` represents one live particle with its pre-computed world position,
     /// color, rotation, size, and shape. The renderer iterates the list and dispatches to the
-    /// appropriate geometry helper for each particle, avoiding N separate top-level `DrawCommand`
+    /// appropriate geometry helper for each particle, avoiding N separate top-level `RenderCommand`
     /// dispatches.
     DrawParticleSystem {
         /// Pre-computed per-particle render data for this frame.
@@ -532,8 +521,8 @@ pub enum DrawCommand {
     /// Begin capturing the framebuffer for post-processing.
     ///
     /// Subsequent draw calls render into the capture target associated with the named post-FX
-    /// stack. Call [`DrawCommand::EndPostFx`] to stop capturing, then
-    /// [`DrawCommand::ApplyPostFx`] to composite the effects back onto the screen.
+    /// stack. Call [`RenderCommand::EndPostFx`] to stop capturing, then
+    /// [`RenderCommand::ApplyPostFx`] to composite the effects back onto the screen.
     BeginPostFx {
         /// Identifier for the post-FX stack managing this capture pass.
         stack_id: u64,
@@ -592,7 +581,7 @@ pub enum ParticleRenderShape {
 
 /// Per-particle render data for a single frame.
 ///
-/// Produced by `ParticleSystem::draw_commands()` and consumed by the GPU renderer's
+/// Produced by `ParticleSystem::build_render_commands()` and consumed by the GPU renderer's
 /// `DrawParticleSystem` arm. All positions are in world space.
 ///
 /// # Fields
@@ -641,7 +630,7 @@ pub struct ParticleInstance {
 /// Type discriminator for resources that can be passed to lurek.gfx.draw.
 ///
 /// Used to dispatch the polymorphic draw(drawable, ...) Lua API to the
-/// correct DrawCommand variant based on resource type.
+/// correct RenderCommand variant based on resource type.
 ///
 /// # Variants
 /// - Image(TextureKey) — A loaded texture (Image).

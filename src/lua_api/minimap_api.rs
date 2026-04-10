@@ -1,5 +1,6 @@
 //! `lurek.minimap` — Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -14,6 +15,7 @@ use crate::minimap::{ColorMode, FogLevel, Minimap};
 /// Lua-side wrapper around a [`Minimap`].
 pub struct LuaMinimap {
     inner: Minimap,
+    state: Rc<RefCell<SharedState>>,
 }
 
 impl LuaUserData for LuaMinimap {
@@ -731,6 +733,29 @@ impl LuaUserData for LuaMinimap {
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "Minimap" || name == "Object"));
 
+        // ── Rendering ──
+
+        // -- render --
+        /// Renders the minimap to the screen at the given position.
+        /// @param x : number?
+        /// @param y : number?
+        methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
+            let sx = x.unwrap_or(0.0);
+            let sy = y.unwrap_or(0.0);
+            let cmds = this.inner.build_render_commands(sx, sy);
+            this.state.borrow_mut().render_commands.extend(cmds);
+            Ok(())
+        });
+
+        // -- drawToImage --
+        /// Renders the minimap grid to a CPU ImageData.
+        /// @param pixel_size : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, pixel_size: u32| {
+            let img = this.inner.draw_to_image(pixel_size);
+            Ok(LuaImageData { inner: img })
+        });
+
     }
 }
 
@@ -742,7 +767,7 @@ impl LuaUserData for LuaMinimap {
 /// @param lua : &Lua
 /// @param luna : &LuaTable
 /// @param _state : Rc<RefCell<SharedState>>
-pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newMinimap --
@@ -752,14 +777,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param display_w : integer?
     /// @param display_h : integer?
     /// @return Minimap
+    let s = state.clone();
     tbl.set(
         "newMinimap",
         lua.create_function(
-            |_, (grid_w, grid_h, display_w, display_h): (u32, u32, Option<u32>, Option<u32>)| {
+            move |_, (grid_w, grid_h, display_w, display_h): (u32, u32, Option<u32>, Option<u32>)| {
                 let dw = display_w.unwrap_or(200);
                 let dh = display_h.unwrap_or(200);
                 Ok(LuaMinimap {
                     inner: Minimap::new(grid_w, grid_h, dw, dh),
+                    state: s.clone(),
                 })
             },
         )?,

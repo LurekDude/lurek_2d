@@ -35,7 +35,7 @@
 
 ## Phase 1: CPU Work Elimination (Effort: 1�2 weeks)
 
-### 1.1 Frustum culling for DrawCommands
+### 1.1 Frustum culling for RenderCommands
 - **Priority**: P0
 - **What**: Add AABB check before tessellation in render_pass.rs
 - **Impact**: Eliminate 30�80% of tessellation for scrolling games

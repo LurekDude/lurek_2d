@@ -262,9 +262,9 @@ impl ImageData {
     pub fn draw_circle(&mut self, cx: i32, cy: i32, radius: u32, r: u8, g: u8, b: u8, a: u8) {
         let rad = radius as i32;
         let y0 = (cy - rad).max(0) as u32;
-        let y1 = ((cy + rad + 1).min(self.height as i32)) as u32;
+        let y1 = ((cy + rad + 1).min(self.height as i32).max(0)) as u32;
         let x0_bound = (cx - rad).max(0) as u32;
-        let x1_bound = ((cx + rad + 1).min(self.width as i32)) as u32;
+        let x1_bound = ((cx + rad + 1).min(self.width as i32).max(0)) as u32;
         let r2 = (radius * radius) as i64;
         for py in y0..y1 {
             let dy = py as i32 - cy;

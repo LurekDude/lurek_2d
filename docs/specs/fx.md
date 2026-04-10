@@ -26,7 +26,7 @@ stored as a `HashMap<String, f32>` so new shader uniforms can be added without c
 struct layout. `PostFxStack` is an ordered pipeline of effect indices with per-slot enable
 flags and ping-pong canvas dimensions; Lua calls `beginCapture()` then draws then `endCapture()`
 then `apply()` each frame. `ImageEffect` is a lighter-weight per-image effect chain that
-converts its entries to `ShaderPassDescriptor` values for embedding into `DrawCommand` variants.
+converts its entries to `ShaderPassDescriptor` values for embedding into `RenderCommand` variants.
 
 **Screen overlays** (world-simulation effects): `Overlay` aggregates twelve independently
 toggled subsystems — ambient lighting with time-of-day colour cycling (`AmbientState`),
@@ -74,7 +74,7 @@ src/fx/ (Tier 2 data models)
 | `atmosphere.rs` | Data-only structs for atmospheric effects: `CloudState` (scrolling shadow blobs), `FogState` (uniform translucent tint), `HeatHazeState` (sine-wave UV distortion), `VignetteState` (radial edge darkening), `FilmGrainState` (per-pixel noise), `LightningState` (single-shot hard flash). |
 | `effect.rs` | `PostFxEffect` — a single post-processing shader pass with a `HashMap<String, f32>` parameter bag, builder helpers, and type introspection. |
 | `effect_type.rs` | `PostFxEffectType` enum — 16 built-in effect kinds plus `Custom`. Provides `from_name`/`name` round-trip parsing and `default_params()` preset maps. |
-| `image_effect.rs` | `ImageEffect` — an ordered chain of `Rc<RefCell<PostFxEffect>>` entries. Converts to `Vec<ShaderPassDescriptor>` via `to_passes()` for embedding into `DrawCommand` variants. Imports from `crate::graphics` (Tier 1). |
+| `image_effect.rs` | `ImageEffect` — an ordered chain of `Rc<RefCell<PostFxEffect>>` entries. Converts to `Vec<ShaderPassDescriptor>` via `to_passes()` for embedding into `RenderCommand` variants. Imports from `crate::graphics` (Tier 1). |
 | `overlay.rs` | `Overlay` — aggregates all 12 screen-effect subsystems. `update(dt)` advances ambient, weather, flash, shake, fade, clouds, and lightning. Trigger methods for flash, shake, fade, and lightning. Query methods for shake offset and flash/lightning alpha. |
 | `screen_effects.rs` | Three one-shot screen effects: `FlashState` (colour burst fading to transparent), `ShakeState` (decaying xorshift PRNG pixel offset), `FadeState` (alpha interpolation between start and target). |
 | `stack.rs` | `PostFxStack` — ordered chain of effect indices with parallel `enabled` flags. Manages ping-pong canvas dimensions. 1-based position insertion, per-index enable/disable, and `enabled_effects()` for the GPU layer. |
@@ -183,7 +183,7 @@ A single post-processing effect with named float parameters stored in `HashMap<S
 
 #### `fx::image_effect::ImageEffect`
 
-Ordered chain of `Rc<RefCell<PostFxEffect>>` entries for per-image draw calls. Effects are applied in insertion order through each enabled pass. `to_passes()` converts the chain to `Vec<ShaderPassDescriptor>` for embedding into `DrawCommand` variants. Methods: `new(name)`, `add_effect`, `get_effect_by_index`, `get_effect_by_name`, `remove_by_index`, `remove_by_name`, `clear`, `effect_count`, `to_passes`.
+Ordered chain of `Rc<RefCell<PostFxEffect>>` entries for per-image draw calls. Effects are applied in insertion order through each enabled pass. `to_passes()` converts the chain to `Vec<ShaderPassDescriptor>` for embedding into `RenderCommand` variants. Methods: `new(name)`, `add_effect`, `get_effect_by_index`, `get_effect_by_name`, `remove_by_index`, `remove_by_name`, `clear`, `effect_count`, `to_passes`.
 
 #### `fx::overlay::Overlay`
 

@@ -6,10 +6,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use crate::data::{
-    self, BinValue, ByteData, CompressFormat, DataView, EncodeFormat, HashAlgorithm, LuaDataView, PackValue,
-};
 use crate::data::toml_convert;
+use crate::data::{
+    self, BinValue, ByteData, CompressFormat, DataView, EncodeFormat, HashAlgorithm, LuaDataView,
+    PackValue,
+};
 
 // -------------------------------------------------------------------------------
 // Pack conversion helpers
@@ -105,9 +106,9 @@ fn toml_value_to_lua<'lua>(lua: &'lua Lua, value: &toml::Value) -> LuaResult<Lua
             }
             Ok(LuaValue::Table(tbl))
         }
-        toml::Value::Datetime(dt) => {
-            lua.create_string(dt.to_string().as_bytes()).map(LuaValue::String)
-        }
+        toml::Value::Datetime(dt) => lua
+            .create_string(dt.to_string().as_bytes())
+            .map(LuaValue::String),
     }
 }
 
@@ -118,7 +119,9 @@ fn lua_table_to_toml_value(value: &LuaValue) -> LuaResult<toml::Value> {
         LuaValue::Integer(n) => Ok(toml::Value::Integer(*n)),
         LuaValue::Number(f) => Ok(toml::Value::Float(*f)),
         LuaValue::String(s) => {
-            let st = s.to_str().map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+            let st = s
+                .to_str()
+                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
             Ok(toml::Value::String(st.to_string()))
         }
         LuaValue::Table(tbl) => {
@@ -137,7 +140,9 @@ fn lua_table_to_toml_value(value: &LuaValue) -> LuaResult<toml::Value> {
                 let mut map = toml::map::Map::new();
                 for pair in tbl.clone().pairs::<LuaString, LuaValue>() {
                     let (k, v) = pair?;
-                    let key = k.to_str().map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+                    let key = k
+                        .to_str()
+                        .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
                     map.insert(key.to_string(), lua_table_to_toml_value(&v)?);
                 }
                 Ok(toml::Value::Table(map))
@@ -180,9 +185,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "unpack",
         lua.create_function(
             |lua, (fmt, raw, offset): (String, LuaString, Option<usize>)| {
-                let (values, next_pos) =
-                    data::unpack(&fmt, raw.as_bytes(), offset.unwrap_or(0))
-                        .map_err(LuaError::RuntimeError)?;
+                let (values, next_pos) = data::unpack(&fmt, raw.as_bytes(), offset.unwrap_or(0))
+                    .map_err(LuaError::RuntimeError)?;
                 let mut result = pack_values_to_lua(lua, values)?;
                 result.push(LuaValue::Integer(next_pos as i64));
                 Ok(LuaMultiValue::from_vec(result))
@@ -231,10 +235,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "decompress",
         lua.create_function(|lua, (format_str, compressed): (String, LuaString)| {
-            let format =
-                CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
-            let result = data::decompress(compressed.as_bytes(), format)
-                .map_err(LuaError::RuntimeError)?;
+            let format = CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
+            let result =
+                data::decompress(compressed.as_bytes(), format).map_err(LuaError::RuntimeError)?;
             lua.create_string(&result)
         })?,
     )?;
@@ -247,8 +250,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "encode",
         lua.create_function(|_, (format_str, raw_data): (String, LuaString)| {
-            let format =
-                EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
+            let format = EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             Ok(data::encode(format, raw_data.as_bytes()))
         })?,
     )?;
@@ -261,8 +263,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "decode",
         lua.create_function(|lua, (format_str, encoded): (String, String)| {
-            let format =
-                EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
+            let format = EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             let result = data::decode(format, &encoded).map_err(LuaError::RuntimeError)?;
             lua.create_string(&result)
         })?,
@@ -276,8 +277,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "hash",
         lua.create_function(|_, (algo_str, raw_data): (String, LuaString)| {
-            let algo =
-                HashAlgorithm::parse_str(&algo_str).map_err(LuaError::RuntimeError)?;
+            let algo = HashAlgorithm::parse_str(&algo_str).map_err(LuaError::RuntimeError)?;
             Ok(data::hash(algo, raw_data.as_bytes()))
         })?,
     )?;
@@ -320,8 +320,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let total = bytes.len();
                 let off = offset.unwrap_or(0);
                 let sz = size.unwrap_or_else(|| total.saturating_sub(off));
-                let dv =
-                    DataView::new_slice(bytes, off, sz).map_err(LuaError::RuntimeError)?;
+                let dv = DataView::new_slice(bytes, off, sz).map_err(LuaError::RuntimeError)?;
                 lua.create_userdata(LuaDataView::new(dv))
             },
         )?,
@@ -348,12 +347,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @return ...
     tbl.set(
         "read",
-        lua.create_function(|lua, (fmt, raw, offset): (String, LuaString, Option<usize>)| {
-            let (bvs, _) = data::bin_read(&fmt, raw.as_bytes(), offset.unwrap_or(0))
-                .map_err(LuaError::RuntimeError)?;
-            let lv = bin_values_to_lua(lua, bvs)?;
-            Ok(LuaMultiValue::from_vec(lv))
-        })?,
+        lua.create_function(
+            |lua, (fmt, raw, offset): (String, LuaString, Option<usize>)| {
+                let (bvs, _) = data::bin_read(&fmt, raw.as_bytes(), offset.unwrap_or(0))
+                    .map_err(LuaError::RuntimeError)?;
+                let lv = bin_values_to_lua(lua, bvs)?;
+                Ok(LuaMultiValue::from_vec(lv))
+            },
+        )?,
     )?;
 
     // -- size --
@@ -397,7 +398,6 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
 impl LuaUserData for LuaDataView {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- getUInt8 --
         /// Reads an unsigned 8-bit integer at the given offset.
         /// @param offset : integer
@@ -486,9 +486,6 @@ impl LuaUserData for LuaDataView {
         // -- getSize --
         /// Returns the size of this view in bytes.
         /// @return integer
-        methods.add_method("getSize", |_, this, ()| {
-            Ok(this.inner.get_size() as i64)
-        });
-
+        methods.add_method("getSize", |_, this, ()| Ok(this.inner.get_size() as i64));
     }
 }

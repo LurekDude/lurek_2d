@@ -6,9 +6,9 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use lurek2d::ai::*;
-use lurek2d::pathfinding::{InfluenceMap, PathGrid, SimpleFlowField};
 use lurek2d::engine::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
+use lurek2d::pathfinding::{InfluenceMap, PathGrid, SimpleFlowField};
 
 // ===========================================================================
 // Helpers
@@ -1138,4 +1138,3 @@ fn command_queue_target() {
     assert!((target.0 - 42.5).abs() < 1e-5);
     assert!((target.1 - (-17.0)).abs() < 1e-5);
 }
-

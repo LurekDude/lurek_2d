@@ -522,7 +522,7 @@ Taking `tilemap` as an example:
      OR re-implement needed math types locally
 4. **Refactor SharedState access**:
    - `state.borrow().delta_time` → call `lurek.time.getDelta()` via Lua
-   - `state.borrow_mut().draw_commands.push(...)` → call `lurek.gfx.drawQuad()` via Lua
+   - `state.borrow_mut().render_commands.push(...)` → call `lurek.gfx.drawQuad()` via Lua
 5. **Register in `register_all()`**:
    ```rust
    tilemap::register(lua, &luna)?;
@@ -567,7 +567,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set("update", lua.create_function(move |_, ()| {
         let dt = s.borrow().delta_time;
         let mut s = s.borrow_mut();
-        s.draw_commands.push(DrawCommand::Rect { ... });
+        s.render_commands.push(RenderCommand::Rect { ... });
         Ok(())
     })?)?;
 }

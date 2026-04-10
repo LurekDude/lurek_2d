@@ -1,5 +1,6 @@
 //! `lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -193,6 +194,92 @@ impl LuaUserData for LuaRaycaster {
                 t.set("distance", sp.distance)?;
                 t.set("visible", sp.visible)?;
                 Ok(t)
+            },
+        );
+
+        // -- drawTopDown --
+        /// Renders a top-down grid view with player marker to an ImageData.
+        /// @param px : number
+        /// @param py : number
+        /// @param angle : number
+        /// @param scale : integer
+        /// @return ImageData
+        methods.add_method(
+            "drawTopDown",
+            |_, this, (px, py, angle, scale): (f32, f32, f32, u32)| {
+                let img = this.inner.draw_top_down_to_image(px, py, angle, scale);
+                Ok(LuaImageData { inner: img })
+            },
+        );
+
+        // -- drawView --
+        /// Renders a first-person column view to an ImageData.
+        /// @param px : number
+        /// @param py : number
+        /// @param angle : number
+        /// @param fov : number
+        /// @param width : integer
+        /// @param height : integer
+        /// @param max_dist : number
+        /// @return ImageData
+        methods.add_method(
+            "drawView",
+            |_, this, (px, py, angle, fov, w, h, max_dist): (f32, f32, f32, f32, u32, u32, f32)| {
+                let img = this.inner.draw_view_to_image(px, py, angle, fov, w, h, max_dist);
+                Ok(LuaImageData { inner: img })
+            },
+        );
+
+        // -- drawDepthMap --
+        /// Renders a depth-map column view to an ImageData.
+        /// @param px : number
+        /// @param py : number
+        /// @param angle : number
+        /// @param fov : number
+        /// @param num_rays : integer
+        /// @param width : integer
+        /// @param height : integer
+        /// @param max_dist : number
+        /// @return ImageData
+        methods.add_method(
+            "drawDepthMap",
+            |_, this, (px, py, angle, fov, num_rays, w, h, max_dist): (f32, f32, f32, f32, u32, u32, u32, f32)| {
+                let img = this.inner.draw_depth_map_to_image(px, py, angle, fov, num_rays, w, h, max_dist);
+                Ok(LuaImageData { inner: img })
+            },
+        );
+
+        // -- drawLineOfSight --
+        /// Renders a line-of-sight test between two points to an ImageData.
+        /// @param ax : number
+        /// @param ay : number
+        /// @param bx : number
+        /// @param by : number
+        /// @param scale : integer
+        /// @return ImageData
+        methods.add_method(
+            "drawLineOfSight",
+            |_, this, (ax, ay, bx, by, scale): (f32, f32, f32, f32, u32)| {
+                let img = this.inner.draw_line_of_sight_to_image(ax, ay, bx, by, scale);
+                Ok(LuaImageData { inner: img })
+            },
+        );
+
+        // -- drawCameraSweep --
+        /// Renders a mosaic of first-person views from evenly spaced angles to an ImageData.
+        /// @param x : number
+        /// @param y : number
+        /// @param fov : number
+        /// @param max_dist : number
+        /// @param num_frames : integer
+        /// @param frame_w : integer
+        /// @param frame_h : integer
+        /// @return ImageData
+        methods.add_method(
+            "drawCameraSweep",
+            |_, this, (x, y, fov, max_dist, num_frames, fw, fh): (f32, f32, f32, f32, u32, u32, u32)| {
+                let img = this.inner.draw_camera_sweep_to_image(x, y, fov, max_dist, num_frames, fw, fh);
+                Ok(LuaImageData { inner: img })
             },
         );
     }

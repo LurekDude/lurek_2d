@@ -3,7 +3,7 @@
 //! Provides `Light2D`, a pure data container describing a circular point light
 //! source in 2D space (position, radius, color, intensity, enabled flag).
 //! No GPU resources are stored here; the renderer receives light data via
-//! `DrawCommand` variants and performs all GPU work after the Lua callback returns.
+//! `RenderCommand` variants and performs all GPU work after the Lua callback returns.
 //!
 //! Also provides `LightBlendMode`, `FalloffMode`, `ShadowFilter` enums,
 //! `LightType` (Point/Directional/Spot), `Attenuation` coefficients,

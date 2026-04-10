@@ -154,7 +154,7 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 
 **Rules**: tiers only import downward. No cross-imports within the same tier. Domain modules never import `lua_api`. See [docs/architecture/engine-architecture.md](docs/architecture/engine-architecture.md) for the full spec.
 
-**Rendering**: `DrawCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes — no GPU calls inside Lua closures.
+**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes — no GPU calls inside Lua closures.
 
 **State**: Resources (textures, fonts, meshes, canvases, …) live in typed `SlotMap` pools in `SharedState`. Keys are opaque typed handles — no string lookups at runtime.
 

@@ -9,14 +9,19 @@ use std::rc::{Rc, Weak};
 use crate::terminal::{BorderStyle, Terminal, TerminalEvent, Widget, WidgetKind};
 
 // -------------------------------------------------------------------------------
-// Constants
+// Helpers
 // -------------------------------------------------------------------------------
 
-/// Default cell width in pixels for coordinate conversion.
-const CELL_W: f32 = 8.0;
-
-/// Default cell height in pixels for coordinate conversion.
-const CELL_H: f32 = 14.0;
+/// Returns `(cell_w, cell_h)` from the active/default font, or `(8.0, 14.0)` as fallback.
+fn font_cell_size(st: &SharedState) -> (f32, f32) {
+    let key = st.active_font.or(st.default_font);
+    if let Some(fk) = key {
+        if let Some(font) = st.fonts.get(fk) {
+            return (font.cell_width() as f32, font.size());
+        }
+    }
+    (8.0, 14.0)
+}
 
 // -------------------------------------------------------------------------------
 // Binding infrastructure
@@ -470,10 +475,12 @@ impl LuaUserData for LuaTerminal {
         });
 
         // -- getCellSize --
-        /// Returns the default cell size in pixels.
-        /// @return number, number
-        methods.add_method("getCellSize", |_, _this, ()| {
-            Ok((CELL_W as f64, CELL_H as f64))
+        /// Returns the current cell size in pixels derived from the active font.
+        /// @return integer, integer
+        methods.add_method("getCellSize", |_, this, ()| {
+            let st = this.binding.shared_state.borrow();
+            let (cw, ch) = font_cell_size(&st);
+            Ok((cw as u32, ch as u32))
         });
 
         // -- addWidget --
@@ -582,8 +589,9 @@ impl LuaUserData for LuaTerminal {
         methods.add_method(
             "mousepressed",
             |lua, this, (px, py, button): (f32, f32, Option<usize>)| {
-                let col = (px / CELL_W).floor() as usize + 1;
-                let row = (py / CELL_H).floor() as usize + 1;
+                let (cell_w, cell_h) = font_cell_size(&this.binding.shared_state.borrow());
+                let col = (px / cell_w).floor() as usize + 1;
+                let row = (py / cell_h).floor() as usize + 1;
                 let (_, events) = this.binding.terminal.borrow_mut().mousepressed_with_events(
                     col,
                     row,
@@ -595,22 +603,64 @@ impl LuaUserData for LuaTerminal {
         );
 
         // -- draw --
-        /// Renders the terminal grid and widgets as draw commands.
+        /// Renders the terminal grid and widgets as render commands.
         /// @param x : number?
         /// @param y : number?
         /// @return nil
-        methods.add_method("draw", |_, this, (x, y): (Option<f32>, Option<f32>)| {
-            let commands = this.binding.terminal.borrow().build_draw_commands(
-                x.unwrap_or(0.0),
-                y.unwrap_or(0.0),
-                CELL_W,
-                CELL_H,
-            );
-            this.binding
-                .shared_state
-                .borrow_mut()
-                .draw_commands
-                .extend(commands);
+        methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
+            let st = this.binding.shared_state.borrow();
+            let font_key = st.active_font.or(st.default_font);
+            if let Some(fk) = font_key {
+                let (cell_w, cell_h) = font_cell_size(&st);
+                let commands = this.binding.terminal.borrow().build_render_commands(
+                    x.unwrap_or(0.0),
+                    y.unwrap_or(0.0),
+                    cell_w,
+                    cell_h,
+                    fk,
+                );
+                drop(st);
+                this.binding
+                    .shared_state
+                    .borrow_mut()
+                    .render_commands
+                    .extend(commands);
+            }
+            Ok(())
+        });
+
+        // -- setFont --
+        /// Sets the terminal font by pixel height, snapping to the nearest built-in size.
+        /// @param height : integer
+        /// @return nil
+        methods.add_method("setFont", |_, this, height: u32| {
+            let idx = crate::graphics::Font::nearest_size(height);
+            let st = this.binding.shared_state.borrow();
+            if let Some(key) = st.default_fonts[idx] {
+                drop(st);
+                this.binding.shared_state.borrow_mut().active_font = Some(key);
+                Ok(())
+            } else {
+                Err(LuaError::RuntimeError(
+                    "terminal:setFont: built-in fonts not loaded".into(),
+                ))
+            }
+        });
+
+        // -- autoResize --
+        /// Resizes the window to exactly fit the terminal grid at the current font size.
+        /// @return nil
+        methods.add_method("autoResize", |_, this, ()| {
+            let st = this.binding.shared_state.borrow();
+            let terminal = this.binding.terminal.borrow();
+            let cols = terminal.cols();
+            let rows = terminal.rows();
+            let (cell_w, cell_h) = font_cell_size(&st);
+            let new_w = cols as u32 * cell_w as u32;
+            let new_h = rows as u32 * cell_h as u32;
+            drop(terminal);
+            drop(st);
+            this.binding.shared_state.borrow_mut().window_state.pending_size = Some((new_w, new_h));
             Ok(())
         });
 

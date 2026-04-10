@@ -28,7 +28,7 @@ description: "Design a new lurek.* Lua API surface. Use when adding a new functi
    - Shapes always `(mode, x, y, ...)` where mode is `"fill"` or `"line"`
    - IDs always numeric (not string handles)
 5. Write a Lua usage example showing the intended developer experience
-6. Identify the Rust `DrawCommand` variant or `SharedState` field this will need
+6. Identify the Rust `RenderCommand` variant or `SharedState` field this will need
 7. Document any side effects or ordering constraints (e.g., "must be called inside `lurek.draw()`")
 8. Record the finalized spec in `docs/API/lua_api_reference_generated.md`
 
@@ -36,7 +36,7 @@ description: "Design a new lurek.* Lua API surface. Use when adding a new functi
 
 - Finalized function signature with parameter types and defaults
 - Lua usage example (3–10 lines)
-- Description of required Rust changes (what `DrawCommand` variant or state field)
+- Description of required Rust changes (what `RenderCommand` variant or state field)
 - Updated `docs/API/lua_api_reference_generated.md` entry
 
 ## Acceptance

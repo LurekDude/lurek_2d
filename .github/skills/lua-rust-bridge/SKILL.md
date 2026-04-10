@@ -173,13 +173,13 @@ Before implementing the Lua bridge, verify the domain module provides:
 
 **Never render inside a Lua closure.** Lua callbacks must not call any GPU commands directly. Instead:
 
-1. During `lurek.draw()`, push `DrawCommand` variants to `state.borrow_mut().draw_commands`
+1. During `lurek.draw()`, push `RenderCommand` variants to `state.borrow_mut().draw_commands`
 2. Return from the Lua callback
 3. The engine processes draw commands after `lurek.draw()` returns and renders the frame
 
 ```rust
 // CORRECT — queue a draw command
-let cmd = DrawCommand::Rectangle { ... };
+let cmd = RenderCommand::Rectangle { ... };
 state.borrow_mut().draw_commands.push(cmd);
 
 // WRONG — never call wgpu render methods inside a Lua closure

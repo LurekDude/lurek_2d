@@ -36,19 +36,19 @@ describe("stress: <module> <operation>", function()
     it("<operation> × <count> completes in <budget>", function()
         local COUNT = 10000
         local start = lurek.time.getTime()
-        
+
         for i = 1, COUNT do
             -- operation under test
         end
-        
+
         local elapsed = lurek.time.getTime() - start
         local ops_per_sec = COUNT / elapsed
-        
-        print(string.format("[STRESS] %s: %d ops in %.3fs (%.0f ops/sec)", 
+
+        print(string.format("[STRESS] %s: %d ops in %.3fs (%.0f ops/sec)",
             "<operation>", COUNT, elapsed, ops_per_sec))
-        
+
         -- Performance gate: must complete within budget (generous for CI)
-        expect_equal(true, elapsed < 10.0, 
+        expect_equal(true, elapsed < 10.0,
             "<operation> exceeded 10s budget: " .. elapsed .. "s")
     end)
 end)
@@ -216,7 +216,7 @@ function measure(name, count, fn)
     fn()
     local elapsed = lurek.time.getTime() - start
     local ops_per_sec = count / elapsed
-    print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)", 
+    print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)",
         name, count, elapsed, ops_per_sec))
     return elapsed, ops_per_sec
 end
@@ -327,7 +327,7 @@ Budget: 5s total
 Target: Transform push/pop operations (used in scene graph rendering)
 Operations:
 - Push/pop transform stack 1000000 times (translate + rotate + scale)
-- Compose 10000 transform chains (depth 20) 
+- Compose 10000 transform chains (depth 20)
 - World-space conversion: 100000 local→world transforms
 - Camera viewport transform: 100000 screen↔world conversions
 
@@ -353,7 +353,7 @@ Budget: 10s total
 Target: PostFX pipeline configuration stress
 Operations:
 - Build FX chain with 20 passes, configure × 10000 iterations
-- Enable/disable individual passes × 100000 times  
+- Enable/disable individual passes × 100000 times
 - Change effect parameters per-frame × 10000 frames (parametric animations)
 - Switch between 5 preset FX chains × 10000 times
 

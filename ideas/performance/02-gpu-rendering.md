@@ -6,9 +6,9 @@ Lurek2D renders via wgpu 22 with this per-frame pipeline:
 
 ```
 lurek.draw() Lua callback
-    ↓ pushes DrawCommand variants to Vec<DrawCommand>
+    ↓ pushes RenderCommand variants to Vec<RenderCommand>
 CPU tessellation (render_pass.rs)
-    ↓ converts DrawCommand → ColorVertex / TexVertex arrays
+    ↓ converts RenderCommand → ColorVertex / TexVertex arrays
 Batch assembly
     ↓ groups by (texture, blend, shader, target) → PreparedDraw
 GPU buffer upload
@@ -43,7 +43,7 @@ No per-frame heap allocation — buffers reused each frame. This is good.
 ## Opportunity 1: Frustum/Viewport Culling (Effort: Medium, Impact: HIGH)
 
 ### Problem
-Every `DrawCommand` is tessellated into vertices regardless of whether it's
+Every `RenderCommand` is tessellated into vertices regardless of whether it's
 visible. A game drawing 1000 sprites on a scrollable map tessellates all 1000
 even if only 100 are on screen.
 
@@ -68,7 +68,7 @@ for cmd in commands {
 - **Large tilemap**: Combined with chunk culling, eliminates entire chunks
 
 ### Implementation Notes
-- Each DrawCommand variant needs an AABB calculator (trivial for Rect, Image;
+- Each RenderCommand variant needs an AABB calculator (trivial for Rect, Image;
   approximate for Circle, Text)
 - Camera viewport is already available in `SharedState`
 - `LargeMapRenderer` already does chunk-level culling — this extends it to ALL draw types
@@ -131,7 +131,7 @@ Lurek2D already has `SpriteBatch` (`src/graphics/sprite_batch.rs`). Ensure it:
 
 ### Problem
 Static geometry (background scenery, UI elements, non-moving sprites) is
-re-tessellated from `DrawCommand` → vertices every frame. This is wasted CPU work.
+re-tessellated from `RenderCommand` → vertices every frame. This is wasted CPU work.
 
 ### Solution
 Add a cached draw mode where tessellated geometry is stored and reused:
@@ -198,11 +198,11 @@ games, the GPU is idle most of the time — the CPU is the bottleneck.
 ## Opportunity 5: Parallel Tessellation (Effort: Medium, Impact: Low–Medium)
 
 ### Concept
-Split the DrawCommand queue into N chunks, tessellate each chunk on a
+Split the RenderCommand queue into N chunks, tessellate each chunk on a
 separate thread (rayon), merge results into the final vertex buffer.
 
 ```rust
-let chunks: Vec<&[DrawCommand]> = commands.chunks(commands.len() / num_threads);
+let chunks: Vec<&[RenderCommand]> = commands.chunks(commands.len() / num_threads);
 let results: Vec<(Vec<ColorVertex>, Vec<u32>)> = chunks
     .par_iter()
     .map(|chunk| tessellate_chunk(chunk, &transform_stack))

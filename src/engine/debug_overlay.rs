@@ -3,14 +3,15 @@
 //! Renders green text on a semi-transparent background in the top-right corner
 //! of the screen. Can be toggled at runtime via F12 or `lurek.platform.setDebugOverlay()`.
 
-use crate::graphics::renderer::{DrawCommand, DrawMode};
+use crate::engine::resource_keys::FontKey;
+use crate::graphics::renderer::{RenderCommand, DrawMode};
 
 /// Debug overlay showing FPS and render statistics.
 ///
 /// # Fields
 /// - `enabled` — `bool`.
 ///
-/// Generates `DrawCommand` sequences for rendering performance info in the
+/// Generates `RenderCommand` sequences for rendering performance info in the
 /// top-right corner of the screen.
 pub struct DebugOverlay {
     /// Whether the overlay is currently visible.
@@ -36,11 +37,15 @@ impl DebugOverlay {
     /// - `draw_calls` — Number of draw calls in the last frame.
     ///
     /// # Returns
-    /// A `Vec<DrawCommand>` to append after the main game rendering.
-    pub fn draw_commands(&self, screen_w: u32, fps: f64, draw_calls: u32) -> Vec<DrawCommand> {
+    /// A `Vec<RenderCommand>` to append after the main game rendering.
+    pub fn build_render_commands(&self, screen_w: u32, fps: f64, draw_calls: u32, font_key: Option<FontKey>) -> Vec<RenderCommand> {
         if !self.enabled {
             return Vec::new();
         }
+        let font_key = match font_key {
+            Some(fk) => fk,
+            None => return Vec::new(),
+        };
 
         let scale = 2.0_f32;
         let glyph_w = 8.0_f32 * scale;
@@ -58,8 +63,8 @@ impl DebugOverlay {
 
         vec![
             // Semi-transparent dark background
-            DrawCommand::SetColor(0.0, 0.0, 0.0, 0.6),
-            DrawCommand::Rectangle {
+            RenderCommand::SetColor(0.0, 0.0, 0.0, 0.6),
+            RenderCommand::Rectangle {
                 mode: DrawMode::Fill,
                 x: box_x,
                 y: box_y,
@@ -67,14 +72,16 @@ impl DebugOverlay {
                 h: box_h,
             },
             // Green text
-            DrawCommand::SetColor(0.2, 1.0, 0.2, 1.0),
-            DrawCommand::Print {
+            RenderCommand::SetColor(0.2, 1.0, 0.2, 1.0),
+            RenderCommand::Print {
+                font_key,
                 text: fps_text,
                 x: box_x + padding,
                 y: box_y + padding,
                 scale,
             },
-            DrawCommand::Print {
+            RenderCommand::Print {
+                font_key,
                 text: dc_text,
                 x: box_x + padding,
                 y: box_y + padding + line_h,
@@ -93,12 +100,16 @@ impl Default for DebugOverlay {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::engine::resource_keys::FontKey;
+    use slotmap::SlotMap;
 
     #[test]
     fn test_disabled_returns_empty() {
         let overlay = DebugOverlay::new();
         assert!(!overlay.enabled);
-        let cmds = overlay.draw_commands(800, 60.0, 10);
+        let mut fonts: SlotMap<FontKey, ()> = SlotMap::with_key();
+        let fk = fonts.insert(());
+        let cmds = overlay.build_render_commands(800, 60.0, 10, Some(fk));
         assert!(cmds.is_empty());
     }
 
@@ -106,7 +117,17 @@ mod tests {
     fn test_enabled_returns_commands() {
         let mut overlay = DebugOverlay::new();
         overlay.enabled = true;
-        let cmds = overlay.draw_commands(800, 60.0, 10);
+        let mut fonts: SlotMap<FontKey, ()> = SlotMap::with_key();
+        let fk = fonts.insert(());
+        let cmds = overlay.build_render_commands(800, 60.0, 10, Some(fk));
         assert!(!cmds.is_empty());
+    }
+
+    #[test]
+    fn test_enabled_no_font_returns_empty() {
+        let mut overlay = DebugOverlay::new();
+        overlay.enabled = true;
+        let cmds = overlay.build_render_commands(800, 60.0, 10, None);
+        assert!(cmds.is_empty());
     }
 }

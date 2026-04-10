@@ -134,7 +134,7 @@ Rules:
 - Order tasks by dependency (a task that creates a type before a task that uses it)
 - Flag tasks that modify existing `pub` API (breaking change risk)
 - Flag tasks that require changes to `SharedState` (affects all modules)
-- Flag tasks that need a new `DrawCommand` variant (requires GPU pipeline change)
+- Flag tasks that need a new `RenderCommand` variant (requires GPU pipeline change)
 
 If `DRY_RUN=true`, stop here and print the plan. Do not proceed to implementation.
 
@@ -192,7 +192,7 @@ python tools/docs/collect_docs.py --report-missing
 
 Zero missing docs is required before proceeding to Step 6.
 
-### 5d — Update `DrawCommand` Queue (graphics phases only)
+### 5d — Update `RenderCommand` Queue (graphics phases only)
 
 
 Never render inside a Lua closure — push to the queue, process after `lurek.draw()` returns.
@@ -297,7 +297,7 @@ Open `docs/architecture/engine-architecture.md`. If the phase:
 
 - **Added a new module**: add it to the module list with one-sentence description and its dependency direction
 - **Changed SharedState fields**: update the SharedState section
-- **Added a `DrawCommand` variant**: update the draw pipeline section
+- **Added a `RenderCommand` variant**: update the draw pipeline section
 - **Added a new crate dependency**: update the "Dependencies" table
 - **Changed any public `lurek.*` function signature**: note the change in the API surface section
 

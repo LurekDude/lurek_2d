@@ -550,7 +550,7 @@ impl Graph {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(25, 25, 35, 255);
         let cx = width as f32 / 2.0;

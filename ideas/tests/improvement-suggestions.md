@@ -21,7 +21,7 @@
 **Recommendation**: Every module's unit test should have a dedicated `describe("error handling", ...)` block that:
 
 - Passes nil where a table is expected → expects LuaError
-- Passes wrong types (string where number expected) → expects LuaError  
+- Passes wrong types (string where number expected) → expects LuaError
 - Passes out-of-range values (negative sizes, NaN, infinity) → expects error or graceful handling
 - Calls methods on destroyed/released objects → expects error
 
@@ -160,7 +160,7 @@ function measure(name, count, fn)
     fn()
     local elapsed = lurek.time.getTime() - start
     local ops_per_sec = count / elapsed
-    print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)", 
+    print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)",
         name, count, elapsed, ops_per_sec))
     return elapsed, ops_per_sec
 end

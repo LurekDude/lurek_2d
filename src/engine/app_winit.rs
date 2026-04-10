@@ -20,7 +20,7 @@ use winit::event::{ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 
-use crate::graphics::renderer::{DrawCommand, DrawMode};
+use crate::graphics::renderer::{RenderCommand, DrawMode};
 use crate::graphics::GpuRenderer;
 use crate::input::keyboard::winit_key_to_string;
 use crate::lua_api::{create_lua_vm, SharedState};
@@ -499,42 +499,45 @@ fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A)
     }
 }
 
-fn make_splash_commands(width: u32, height: u32, time: f64) -> Vec<DrawCommand> {
+fn make_splash_commands(width: u32, height: u32, time: f64, font_key: FontKey) -> Vec<RenderCommand> {
     let cx = width as f32 / 2.0;
     let cy = height as f32 / 2.0;
     let pulse = 1.0 + (time * 2.0).sin() as f32 * 0.05;
     let moon_r = 60.0 * pulse;
     vec![
-        DrawCommand::SetColor(0.95, 0.90, 0.55, 1.0),
-        DrawCommand::Circle {
+        RenderCommand::SetColor(0.95, 0.90, 0.55, 1.0),
+        RenderCommand::Circle {
             mode: DrawMode::Fill,
             x: cx,
             y: cy - 40.0,
             r: moon_r,
         },
-        DrawCommand::SetColor(0.12, 0.08, 0.20, 1.0),
-        DrawCommand::Circle {
+        RenderCommand::SetColor(0.12, 0.08, 0.20, 1.0),
+        RenderCommand::Circle {
             mode: DrawMode::Fill,
             x: cx + 25.0,
             y: cy - 55.0,
             r: moon_r * 0.85,
         },
-        DrawCommand::SetColor(0.95, 0.90, 0.55, 1.0),
-        DrawCommand::Print {
+        RenderCommand::SetColor(0.95, 0.90, 0.55, 1.0),
+        RenderCommand::Print {
+            font_key,
             text: "LUREK2D".to_string(),
             x: cx - 54.0,
             y: cy + 50.0,
             scale: 3.0,
         },
-        DrawCommand::SetColor(0.6, 0.55, 0.7, 1.0),
-        DrawCommand::Print {
+        RenderCommand::SetColor(0.6, 0.55, 0.7, 1.0),
+        RenderCommand::Print {
+            font_key,
             text: "2D Game Engine".to_string(),
             x: cx - 84.0,
             y: cy + 85.0,
             scale: 2.0,
         },
-        DrawCommand::SetColor(0.4, 0.35, 0.5, 1.0),
-        DrawCommand::Print {
+        RenderCommand::SetColor(0.4, 0.35, 0.5, 1.0),
+        RenderCommand::Print {
+            font_key,
             text: "v0.2.0".to_string(),
             x: cx - 36.0,
             y: cy + 115.0,

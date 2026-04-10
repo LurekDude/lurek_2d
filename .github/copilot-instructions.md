@@ -62,7 +62,7 @@ Lurek2D uses a strictly layered architecture enforced by Rust's module visibilit
 
 **Tier 3 — Lunasome** (`content/library/`) — Pure-Lua standard libraries that consume only the public `lurek.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
 
-**Rendering**: `DrawCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
+**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
 
 **State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/engine/resource_keys.rs`.
 
@@ -85,7 +85,7 @@ Lurek2D uses a strictly layered architecture enforced by Rust's module visibilit
 | `Solver` | Performs structured root-cause analysis when no obvious solution exists, evaluates alternatives against binding constraints, and delivers a decision-ready recommendation with trade-off analysis |
 | `Developer` | Implements Rust engine features, fixes bugs, adds new source modules, and maintains non-specialised Rust subsystem code across all tiers |
 | `Lua-Designer` | Designs and evolves the `lurek.*` Lua API surface, enforcing naming conventions, parameter patterns, sensible defaults, and API consistency across all binding modules |
-| `Renderer` | Owns the wgpu GPU pipeline: device and surface setup, `DrawCommand` queue processing, texture management, WGSL shaders, blend modes, and canvas render-to-texture |
+| `Renderer` | Owns the wgpu GPU pipeline: device and surface setup, `RenderCommand` queue processing, texture management, WGSL shaders, blend modes, and canvas render-to-texture |
 | `Physicist` | Owns the `src/physics/` rapier2d integration: rigid bodies, colliders, shapes, joints, raycasting, collision events, and the `lurek.physics.*` Lua API |
 | `Audio-Eng` | Owns the `src/audio/` rodio integration: mixer, audio buses, static and streaming sources, volume/pitch/pan, and the `lurek.audio.*` Lua API |
 | `Tester` | Writes and maintains all tests — Rust integration tests in `tests/`, Lua BDD tests in `tests/lua/`, golden snapshot tests, and stress tests |

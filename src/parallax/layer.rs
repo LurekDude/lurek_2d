@@ -40,7 +40,7 @@ pub struct ParallaxDrawBatch {
 /// Holds all parameters (scroll, tiling, visual) and accumulates autonomous
 /// scroll over time via [`ParallaxLayer::update`].  Call
 /// [`ParallaxLayer::build_draw_calls`] each frame to obtain the tile positions
-/// to push to the `DrawCommand` queue.
+/// to push to the `RenderCommand` queue.
 ///
 /// # Fields
 /// - `texture_key` — GPU texture to draw.

@@ -5,8 +5,8 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::image::{CompressedImageData, ImageData, LayeredImage};
 use crate::image::serial;
+use crate::image::{CompressedImageData, ImageData, LayeredImage};
 
 // -------------------------------------------------------------------------------
 // LuaLayeredImage UserData
@@ -19,7 +19,6 @@ pub struct LuaLayeredImage {
 
 impl LuaUserData for LuaLayeredImage {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- getWidth --
         /// Returns the canvas width shared by all layers.
         /// @return integer
@@ -67,9 +66,7 @@ impl LuaUserData for LuaLayeredImage {
             this.inner
                 .get_layer(index - 1)
                 .map(|l| lua.create_userdata(l.data.clone()))
-                .ok_or_else(|| {
-                    LuaError::RuntimeError(format!("layer {} does not exist", index))
-                })?
+                .ok_or_else(|| LuaError::RuntimeError(format!("layer {} does not exist", index)))?
         });
 
         // -- setLayer --
@@ -77,15 +74,18 @@ impl LuaUserData for LuaLayeredImage {
         /// @param index : integer
         /// @param imagedata : ImageData
         /// @return boolean
-        methods.add_method_mut("setLayer", |_, this, (index, img): (usize, LuaAnyUserData)| {
-            if index == 0 {
-                return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
-            }
-            let src = img.borrow::<ImageData>().map_err(|_| {
-                LuaError::RuntimeError("argument must be an ImageData".into())
-            })?;
-            Ok(this.inner.set_layer_image(index - 1, &src))
-        });
+        methods.add_method_mut(
+            "setLayer",
+            |_, this, (index, img): (usize, LuaAnyUserData)| {
+                if index == 0 {
+                    return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
+                }
+                let src = img
+                    .borrow::<ImageData>()
+                    .map_err(|_| LuaError::RuntimeError("argument must be an ImageData".into()))?;
+                Ok(this.inner.set_layer_image(index - 1, &src))
+            },
+        );
 
         // -- getOpacity --
         /// Returns the opacity of a layer in [0.0, 1.0].
@@ -106,15 +106,12 @@ impl LuaUserData for LuaLayeredImage {
         /// @param index : integer
         /// @param opacity : number
         /// @return boolean
-        methods.add_method_mut(
-            "setOpacity",
-            |_, this, (index, opacity): (usize, f32)| {
-                if index == 0 {
-                    return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
-                }
-                Ok(this.inner.set_opacity(index - 1, opacity))
-            },
-        );
+        methods.add_method_mut("setOpacity", |_, this, (index, opacity): (usize, f32)| {
+            if index == 0 {
+                return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
+            }
+            Ok(this.inner.set_opacity(index - 1, opacity))
+        });
 
         // -- isVisible --
         /// Returns whether a layer is visible.
@@ -135,15 +132,12 @@ impl LuaUserData for LuaLayeredImage {
         /// @param index : integer
         /// @param visible : boolean
         /// @return boolean
-        methods.add_method_mut(
-            "setVisible",
-            |_, this, (index, visible): (usize, bool)| {
-                if index == 0 {
-                    return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
-                }
-                Ok(this.inner.set_visible(index - 1, visible))
-            },
-        );
+        methods.add_method_mut("setVisible", |_, this, (index, visible): (usize, bool)| {
+            if index == 0 {
+                return Err(LuaError::RuntimeError("layer index must be >= 1".into()));
+            }
+            Ok(this.inner.set_visible(index - 1, visible))
+        });
 
         // -- getName --
         /// Returns the name of a layer.
@@ -212,7 +206,6 @@ impl LuaUserData for LuaLayeredImage {
         methods.add_method("save", |_, this, path: String| {
             serial::save_layered(&this.inner, &path).map_err(LuaError::external)
         });
-
     }
 }
 
@@ -227,20 +220,15 @@ pub struct LuaCompressedImageData {
 
 impl LuaUserData for LuaCompressedImageData {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- getWidth --
         /// Returns the width of the base mip level in pixels.
         /// @return integer
-        methods.add_method("getWidth", |_, this, ()| {
-            Ok(this.inner.width)
-        });
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width));
 
         // -- getHeight --
         /// Returns the height of the base mip level in pixels.
         /// @return integer
-        methods.add_method("getHeight", |_, this, ()| {
-            Ok(this.inner.height)
-        });
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height));
 
         // -- getDimensions --
         /// Returns the width and height of the base mip level.
@@ -262,7 +250,6 @@ impl LuaUserData for LuaCompressedImageData {
         methods.add_method("getFormat", |_, this, ()| {
             Ok(this.inner.get_format().to_string())
         });
-
     }
 }
 
@@ -288,9 +275,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |lua, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let first = iter.next().ok_or_else(|| {
-                LuaError::RuntimeError(
-                    "newImageData expects (width, height) or (filename)".into(),
-                )
+                LuaError::RuntimeError("newImageData expects (width, height) or (filename)".into())
             })?;
             let img = if let LuaValue::String(ref filename) = first {
                 let name = filename
@@ -382,9 +367,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let path_str = path
                 .to_str()
                 .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
-            let img = img_ud.borrow::<ImageData>().map_err(|_| {
-                LuaError::RuntimeError("argument must be an ImageData".into())
-            })?;
+            let img = img_ud
+                .borrow::<ImageData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be an ImageData".into()))?;
             serial::save_image(&img, path_str).map_err(LuaError::external)
         })?,
     )?;
@@ -399,9 +384,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "savePNG",
         lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
-            let img = img_ud.borrow::<ImageData>().map_err(|_| {
-                LuaError::RuntimeError("argument must be an ImageData".into())
-            })?;
+            let img = img_ud
+                .borrow::<ImageData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be an ImageData".into()))?;
             let bytes = img.encode_png().map_err(LuaError::RuntimeError)?;
             if let Some(parent) = path.parent() {
                 std::fs::create_dir_all(parent).map_err(LuaError::external)?;

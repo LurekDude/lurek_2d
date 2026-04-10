@@ -7,7 +7,7 @@ use super::math::{
 };
 use super::particle::Particle;
 use crate::engine::log_messages::{PE01, PE02, PE03, PE04};
-use crate::graphics::renderer::{DrawCommand, ParticleInstance, ParticleRenderShape};
+use crate::graphics::renderer::{ParticleInstance, ParticleRenderShape, RenderCommand};
 use crate::log_msg;
 use crate::particle::shapes::ParticleShape;
 
@@ -25,7 +25,7 @@ use crate::particle::shapes::ParticleShape;
 /// - `prev_emitter_y` — `f32`.
 ///
 /// Call `update(dt)` each frame to advance physics and spawn new particles,
-/// then `draw_commands(ox, oy)` to obtain the `DrawCommand` list for rendering.
+/// then `build_render_commands(ox, oy)` to obtain the `RenderCommand` list for rendering.
 #[derive(Clone, Debug)]
 pub struct ParticleSystem {
     /// Emitter configuration (shared by all particles in this system).
@@ -355,10 +355,10 @@ impl ParticleSystem {
         self.particles.len() >= self.config.max_particles as usize
     }
 
-    /// Generates `DrawCommand`s for rendering all live particles.
+    /// Generates `RenderCommand`s for rendering all live particles.
     ///
     /// # Returns
-    /// `Vec<DrawCommand>`.
+    /// `Vec<RenderCommand>`.
     ///
     /// All particles are batched into a single `DrawParticleSystem` command. Each particle
     /// is sized and colored by multi-stop interpolation based on remaining lifetime.
@@ -367,7 +367,7 @@ impl ParticleSystem {
     /// # Parameters
     /// - `ox` — World X offset added to each particle position.
     /// - `oy` — World Y offset added to each particle position.
-    pub fn draw_commands(&self, ox: f32, oy: f32) -> Vec<DrawCommand> {
+    pub fn build_render_commands(&self, ox: f32, oy: f32) -> Vec<RenderCommand> {
         if self.particles.is_empty() {
             return Vec::new();
         }
@@ -441,7 +441,7 @@ impl ParticleSystem {
             });
         }
 
-        vec![DrawCommand::DrawParticleSystem {
+        vec![RenderCommand::DrawParticleSystem {
             particles: instances,
         }]
     }
@@ -461,7 +461,7 @@ impl ParticleSystem {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
         let w = width as i32;
@@ -499,13 +499,229 @@ impl ParticleSystem {
         img.draw_circle(
             self.emitter_x as i32,
             self.emitter_y as i32,
-            3, 255, 255, 255, 255,
+            3,
+            255,
+            255,
+            255,
+            255,
         );
         img
     }
 
-}
+    /// Render an explosion burst: particles radiate from center with
+    /// age-based red-to-yellow coloring.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_explosion_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(10, 8, 15, 255);
+        for p in &self.particles {
+            let t = p.life / p.max_life;
+            let r = 255u8;
+            let g = (t * 200.0) as u8;
+            let b = (t * 60.0) as u8;
+            let size = (3.0 + t * 4.0) as u32;
+            img.draw_circle(p.x as i32, p.y as i32, size, r, g, b, (t * 255.0) as u8);
+        }
+        img.draw_label("EXPLOSION", 4, 4, 255, 160, 60);
+        img
+    }
 
+    /// Render particles styled as falling rain streaks.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_rain_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(30, 35, 50, 255);
+        for p in &self.particles {
+            let t = p.life / p.max_life;
+            let alpha = (t * 200.0) as u8 + 30;
+            img.draw_line(
+                p.x as i32,
+                p.y as i32,
+                p.x as i32,
+                p.y as i32 + 6,
+                140,
+                160,
+                220,
+                alpha,
+            );
+        }
+        img.draw_label("RAIN", 4, 4, 140, 180, 255);
+        img
+    }
+
+    /// Render particles as hot orange sparks with short trails.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_spark_trail_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(10, 8, 12, 255);
+        for p in &self.particles {
+            let t = p.life / p.max_life;
+            let r = 255u8;
+            let g = (80.0 + t * 150.0) as u8;
+            let b = (t * 50.0) as u8;
+            img.draw_circle(p.x as i32, p.y as i32, 2, r, g, b, (t * 255.0) as u8);
+            img.draw_line(
+                p.x as i32,
+                p.y as i32,
+                p.x as i32 - 3,
+                p.y as i32 + 3,
+                r / 2,
+                g / 2,
+                b / 2,
+                (t * 128.0) as u8,
+            );
+        }
+        img.draw_label("SPARKS", 4, 4, 255, 200, 80);
+        img
+    }
+
+    /// Render a lifecycle strip showing the particle count at each step.
+    ///
+    /// `snapshots` contains pairs of (step_index, particle_count). Each
+    /// step is drawn as a column bar, with a dot marking the count percentage.
+    ///
+    /// # Parameters
+    /// - `snapshots` — `&[(u32, usize)]`. (step, count) pairs.
+    /// - `max_particles` — `usize`. Max capacity for scaling.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    /// Render particles over a provided background image.
+    ///
+    /// Particles are drawn on top of `bg` without overwriting pixels that
+    /// fall outside particle areas. The background pixels are preserved
+    /// where no particle overlaps.
+    ///
+    /// # Parameters
+    /// - `bg` — `crate::image::ImageData`. Background image to composite over.
+    ///
+    /// # Returns
+    /// `crate::image::ImageData`.
+    pub fn draw_over_image(&self, mut bg: crate::image::ImageData) -> crate::image::ImageData {
+        let w = bg.width() as i32;
+        let h = bg.height() as i32;
+        for p in &self.particles {
+            if p.life <= 0.0 {
+                continue;
+            }
+            let px = (p.x + self.emitter_x) as i32;
+            let py = (p.y + self.emitter_y) as i32;
+            if px < -10 || px > w + 10 || py < -10 || py > h + 10 {
+                continue;
+            }
+            let t = 1.0 - (p.life / p.max_life);
+            let r = (255.0 * (1.0 - t * 0.5)) as u8;
+            let g = (128.0 * (1.0 - t)) as u8;
+            let b = 0u8;
+            let size = (4.0f32 * (1.0 - t)).max(1.0) as i32;
+            let y0 = (py - size).max(0);
+            let y1 = (py + size + 1).min(h);
+            let x0 = (px - size).max(0);
+            let x1 = (px + size + 1).min(w);
+            let r2 = (size * size) as i64;
+            for sy in y0..y1 {
+                let dy = (sy - py) as i64;
+                for sx in x0..x1 {
+                    let dx = (sx - px) as i64;
+                    if dx * dx + dy * dy <= r2 {
+                        bg.set_pixel(sx as u32, sy as u32, r, g, b, 200);
+                    }
+                }
+            }
+        }
+        bg.draw_circle(
+            self.emitter_x as i32,
+            self.emitter_y as i32,
+            3,
+            255,
+            255,
+            255,
+            255,
+        );
+        bg
+    }
+
+    /// Paint live spark particles onto an existing mutable image.
+    ///
+    /// Draws each live particle as a coloured dot using heat-map colours
+    /// (yellow-hot at full life, red at end of life). Unlike
+    /// `render_spark_trail_to_image`, this does not create a new canvas —
+    /// it composites directly onto the supplied `img`.
+    ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`. Target canvas to paint onto.
+    pub fn paint_onto(&self, img: &mut crate::image::ImageData) {
+        let w = img.width() as i32;
+        let h = img.height() as i32;
+        for p in &self.particles {
+            if p.life <= 0.0 {
+                continue;
+            }
+            let px = p.x as i32;
+            let py = p.y as i32;
+            if px < 0 || px >= w || py < 0 || py >= h {
+                continue;
+            }
+            let age_frac = 1.0 - p.life / p.max_life;
+            let r = 255u8;
+            let g = (220.0 * (1.0 - age_frac)) as u8;
+            let b = (80.0 * (1.0 - age_frac * 0.8)) as u8;
+            img.set_pixel(px as u32, py as u32, r, g, b, 255);
+        }
+    }
+
+    pub fn draw_lifecycle_to_image(
+        snapshots: &[(u32, usize)],
+        max_particles: usize,
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(15, 15, 25, 255);
+        img.draw_label("LIFECYCLE", 4, 4, 180, 220, 255);
+        if snapshots.is_empty() || max_particles == 0 {
+            return img;
+        }
+        let bar_w = (width as f32 / snapshots.len().max(1) as f32) as u32;
+        let plot_h = height - 24;
+        for (i, &(_step, count)) in snapshots.iter().enumerate() {
+            let t = count as f32 / max_particles as f32;
+            let bar_h = (t * plot_h as f32) as u32;
+            let x = i as u32 * bar_w;
+            let y = height - bar_h;
+            let r = (t * 200.0) as u8 + 40;
+            let g = ((1.0 - t) * 200.0) as u8 + 40;
+            for bx in 0..bar_w.saturating_sub(1) {
+                for by in 0..bar_h {
+                    if (x + bx) < width && (y + by) < height {
+                        img.set_pixel(x + bx, y + by, r, g, 80, 200);
+                    }
+                }
+            }
+        }
+        img
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -597,10 +813,11 @@ mod tests {
         sys.update(1.0);
         let count = sys.count();
         assert!(count > 0);
-        let cmds = sys.draw_commands(0.0, 0.0);
+        let cmds = sys.build_render_commands(0.0, 0.0);
         // All particles are batched into a single DrawParticleSystem command
         assert_eq!(cmds.len(), 1);
-        if let crate::graphics::renderer::DrawCommand::DrawParticleSystem { particles } = &cmds[0] {
+        if let crate::graphics::renderer::RenderCommand::DrawParticleSystem { particles } = &cmds[0]
+        {
             assert_eq!(particles.len(), count);
         } else {
             panic!("expected DrawParticleSystem");
@@ -813,7 +1030,7 @@ mod tests {
         cfg.lifetime_max = 1.0;
         let mut sys = ParticleSystem::new(cfg);
         sys.update(0.5); // emit some particles
-        let cmds = sys.draw_commands(0.0, 0.0);
+        let cmds = sys.build_render_commands(0.0, 0.0);
         // Should have commands; alpha should be driven by alpha_keyframes
         assert!(!cmds.is_empty());
     }

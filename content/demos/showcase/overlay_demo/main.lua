@@ -102,7 +102,7 @@ function lurek.render()
         y = y + 20
     end
 
-    overlay:draw()
+    overlay:render()
 end
 
 function lurek.keypressed(key)

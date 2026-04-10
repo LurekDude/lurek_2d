@@ -1,5 +1,6 @@
 //! `lurek.tilemap` — Tile-based map authoring, chunk streaming, isometric and hex coordinate helpers.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -277,6 +278,7 @@ impl LuaUserData for LuaTileSet {
 #[derive(Clone)]
 pub struct LuaTileMap {
     pub(super) inner: Rc<RefCell<TileMap>>,
+    state: Rc<RefCell<SharedState>>,
 }
 
 impl LuaUserData for LuaTileMap {
@@ -726,6 +728,29 @@ impl LuaUserData for LuaTileMap {
                 Ok(())
             },
         );
+
+        // ── Rendering ──
+
+        // -- render --
+        /// Renders the tile map to the screen at the given offset.
+        /// @param ox : number?
+        /// @param oy : number?
+        methods.add_method("render", |_, this, (ox, oy): (Option<f32>, Option<f32>)| {
+            let sx = ox.unwrap_or(0.0);
+            let sy = oy.unwrap_or(0.0);
+            let cmds = this.inner.borrow().build_render_commands(sx, sy);
+            this.state.borrow_mut().render_commands.extend(cmds);
+            Ok(())
+        });
+
+        // -- drawToImage --
+        /// Renders the tile map to a CPU ImageData using the given tile pixel size.
+        /// @param tile_size : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, tile_size: u32| {
+            let img = this.inner.borrow().draw_to_image(tile_size);
+            Ok(LuaImageData { inner: img })
+        });
     }
 }
 
@@ -1411,6 +1436,7 @@ impl LuaUserData for LuaMapScript {
 pub struct LuaMapGen {
     group: Rc<RefCell<MapGroup>>,
     inner: Rc<RefCell<crate::tilemap::mapgen::MapGen>>,
+    state: Rc<RefCell<SharedState>>,
 }
 
 impl LuaUserData for LuaMapGen {
@@ -1432,6 +1458,7 @@ impl LuaUserData for LuaMapGen {
                     .generate(&this.group.borrow(), script_index, seed, name);
                 Ok(LuaTileMap {
                     inner: Rc::new(RefCell::new(tm)),
+                    state: this.state.clone(),
                 })
             },
         );
@@ -1446,7 +1473,7 @@ impl LuaUserData for LuaMapGen {
 /// @param lua : &Lua
 /// @param luna : &LuaTable
 /// @param _state : Rc<RefCell<SharedState>>
-pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // ── Factory functions ───────────────────────────────────────────────
@@ -1495,16 +1522,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param tileHeight : integer
     /// @param chunkSize : integer?
     /// @return TileMap
+    let s = state.clone();
     tbl.set(
         "newTileMap",
         lua.create_function(
-            |lua, (tile_width, tile_height, chunk_size): (u32, u32, Option<u32>)| {
+            move |lua, (tile_width, tile_height, chunk_size): (u32, u32, Option<u32>)| {
                 lua.create_userdata(LuaTileMap {
                     inner: Rc::new(RefCell::new(TileMap::new(
                         tile_width,
                         tile_height,
                         chunk_size.unwrap_or(16),
                     ))),
+                    state: s.clone(),
                 })
             },
         )?,
@@ -1893,6 +1922,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    let s3 = state.clone();
     // -- newMapGen --
     /// Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
     /// @param group : MapGroup
@@ -1902,7 +1932,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @return MapGen
     tbl.set(
         "newMapGen",
-        lua.create_function(|_, args: mlua::Variadic<LuaValue>| {
+        lua.create_function(move |_, args: mlua::Variadic<LuaValue>| {
             if args.len() < 3 {
                 return Err(LuaError::RuntimeError(
                     "newMapGen: expected (group, preset, segmentSize) or (group, w, h, segmentSize)"
@@ -1972,6 +2002,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     return Ok(LuaMapGen {
                         group: group_rc,
                         inner: Rc::new(RefCell::new(gen)),
+                        state: s3.clone(),
                     });
                 }
                 LuaValue::Number(w) => {
@@ -1999,6 +2030,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     return Ok(LuaMapGen {
                         group: group_rc,
                         inner: Rc::new(RefCell::new(gen)),
+                        state: s3.clone(),
                     });
                 }
                 _ => {
@@ -2012,6 +2044,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(LuaMapGen {
                 group: group_rc,
                 inner: Rc::new(RefCell::new(gen)),
+                state: s3.clone(),
             })
         })?,
     )?;

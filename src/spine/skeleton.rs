@@ -273,7 +273,7 @@ impl Skeleton {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
 
@@ -301,4 +301,52 @@ impl Skeleton {
 
         img
     }
+    /// Draw skeleton with colour-coded joints and bone labels.
+    ///
+    /// Each bone gets a unique colour; lines show parent→child connections.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`. Image width.
+    /// - `height` — `u32`. Image height.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_bones_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 20, 30, 255);
+
+        // Predefined palette for up to 12 bones
+        let palette: [(u8, u8, u8); 12] = [
+            (255, 200, 80), (200, 100, 100), (255, 150, 100),
+            (100, 150, 255), (100, 150, 255), (100, 200, 100),
+            (100, 200, 100), (200, 100, 255), (200, 100, 255),
+            (180, 180, 80), (80, 180, 180), (180, 80, 180),
+        ];
+
+        // Draw bone connections
+        for bone in &self.bones {
+            if let Some(pi) = bone.parent_index {
+                let parent = &self.bones[pi];
+                img.draw_line(
+                    parent.world_x as i32, parent.world_y as i32,
+                    bone.world_x as i32, bone.world_y as i32,
+                    180, 180, 200, 255,
+                );
+            }
+        }
+
+        // Draw joint circles with labels
+        for (i, bone) in self.bones.iter().enumerate() {
+            let (r, g, b) = palette[i % palette.len()];
+            img.draw_circle(bone.world_x as i32, bone.world_y as i32, 5, r, g, b, 255);
+            let label = bone.name.to_uppercase();
+            img.draw_label(&label, bone.world_x as i32 + 8, bone.world_y as i32 - 3, r, g, b);
+        }
+
+        let count_str = format!("{} BONES", self.bone_count());
+        img.draw_label(&count_str, 10, (height - 15) as i32, 200, 200, 200);
+        img.draw_label("SPINE BONES OK", (width / 3) as i32, (height - 15) as i32, 100, 255, 100);
+        img
+    }
+
 }

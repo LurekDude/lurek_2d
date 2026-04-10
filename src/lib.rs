@@ -106,7 +106,6 @@ pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
-pub mod graphic;
 pub mod graphics;
 /// CPU-side pixel-level image manipulation.
 pub mod image;

@@ -18,7 +18,7 @@ description: "Analyze and reduce memory usage in the Lurek2D engine. Use when fr
 
 1. Load skill `performance-profiling/SKILL.md`
 2. Identify allocation hot-paths in the game loop:
-   - `draw_commands: Vec<DrawCommand>` — is it cleared or recreated each frame?
+   - `render_commands: Vec<RenderCommand>` — is it cleared or recreated each frame?
    - `Renderer::execute_commands()` — is a new `Vec` allocated per call?
    - Lua string arguments — are `String::from()` calls avoidable?
 3. Check `SharedState.draw_commands`:
@@ -38,7 +38,7 @@ description: "Analyze and reduce memory usage in the Lurek2D engine. Use when fr
 ## Acceptance
 
 - [ ] Per-frame `Vec` reallocations in hot path reduced or eliminated
-- [ ] `draw_commands` cleared with `.clear()` not re-created
+- [ ] `render_commands` cleared with `.clear()` not re-created
 - [ ] `to_u32_buffer()` does not allocate a new `Vec<u32>` each frame
 - [ ] `cargo test` still passes after any changes
 

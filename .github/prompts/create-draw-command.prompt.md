@@ -1,12 +1,12 @@
 ---
-description: "Create a new DrawCommand variant for the rendering pipeline with full integration."
+description: "Create a new RenderCommand variant for the rendering pipeline with full integration."
 ---
 
 # Create Draw Command
 
 ## Purpose
 
-Add a new DrawCommand variant to the rendering pipeline.
+Add a new RenderCommand variant to the rendering pipeline.
 
 ## Inputs
 
@@ -16,7 +16,7 @@ Add a new DrawCommand variant to the rendering pipeline.
 
 ## Steps
 
-1. Add variant to `DrawCommand` enum in `src/graphics/mod.rs`
+1. Add variant to `RenderCommand` enum in `src/graphics/mod.rs`
 2. Implement rendering in `src/graphics/renderer.rs` match arm
 3. Add Lua binding in `src/lua_api/graphics_api.rs`
 4. Update `docs/API/lua_api_reference_generated.md`
@@ -25,7 +25,7 @@ Add a new DrawCommand variant to the rendering pipeline.
 
 ## Acceptance
 
-- [ ] DrawCommand variant is data-only (no logic)
+- [ ] RenderCommand variant is data-only (no logic)
 - [ ] Renderer processes command correctly
 - [ ] Lua binding follows `lurek.gfx.*` pattern
 - [ ] Tests pass, clippy clean

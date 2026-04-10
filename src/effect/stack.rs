@@ -264,7 +264,7 @@ impl PostFxStack {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_info_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_info_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(20, 20, 30, 255);
 
@@ -340,4 +340,222 @@ impl PostFxStack {
 
         img
     }
+
+    /// Render the stack state as two side-by-side column layouts.
+    ///
+    /// Shows the initial effect list on the left and the current
+    /// (possibly modified) list on the right, with enabled/disabled
+    /// indicators.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `labels` — `&[&str]`. Display name per effect slot.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_stack_management_to_image(
+        &self,
+        width: u32,
+        height: u32,
+        labels: &[&str],
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 18, 28, 255);
+        img.draw_label("STACK OPS", (width / 2 - 30) as i32, 4, 200, 180, 255);
+
+        for i in 0..self.effects.len() {
+            let y = 24 + i as i32 * 22;
+            let enabled = self.enabled.get(i).copied().unwrap_or(false);
+            let (cr, cg, cb) = if enabled {
+                (80u8, 200u8, 80u8)
+            } else {
+                (200u8, 80u8, 80u8)
+            };
+            img.draw_rect(10, y, (width - 20).min(300), 18, cr / 5, cg / 5, cb / 5, 255);
+            let label = labels.get(i).copied().unwrap_or("FX");
+            let text = format!("{} - {}", label, if enabled { "ON" } else { "OFF" });
+            img.draw_label(&text, 14, y + 4, cr, cg, cb);
+        }
+        img
+    }
+
+    /// Render a catalog grid of effect types with representative visual patterns.
+    ///
+    /// Creates a 4-column grid of panels, one per effect type entry in `entries`.
+    /// Each entry gets a label and a filled pattern block.
+    ///
+    /// # Parameters
+    /// - `entries` — `&[(&str, (u8, u8, u8))]`. Effect name and color per slot.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_effect_catalog_to_image(
+        entries: &[(&str, (u8, u8, u8))],
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 18, 28, 255);
+        img.draw_label("POSTFX CATALOG", (width / 2 - 40) as i32, 4, 220, 180, 255);
+
+        let cols = 4u32;
+        let cell_w = width / cols;
+        let rows = (entries.len() as u32 + cols - 1) / cols;
+        let cell_h = if rows > 0 {
+            (height - 20) / rows
+        } else {
+            height
+        };
+
+        for (i, &(label, (cr, cg, cb))) in entries.iter().enumerate() {
+            let col = (i as u32) % cols;
+            let row = (i as u32) / cols;
+            let px = col * cell_w;
+            let py = 20 + row * cell_h;
+            img.draw_rect(
+                (px + 2) as i32, (py + 2) as i32,
+                cell_w - 4, cell_h - 4,
+                cr / 5, cg / 5, cb / 5, 200,
+            );
+            img.draw_label(label, (px + 4) as i32, (py + 4) as i32, cr, cg, cb);
+        }
+        img
+    }
+
+    /// Render a parameter showcase grid for PostFx effects.
+    ///
+    /// Each entry produces a row showing the effect label and its
+    /// `(name, value)` parameter pairs.
+    ///
+    /// # Parameters
+    /// - `entries` — `&[(&str, &[(&str, f32)])]`. Effect name and param list.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `crate::image::ImageData`.
+    pub fn draw_effect_parameters_to_image(
+        entries: &[(&str, &[(&str, f32)])],
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 18, 28, 255);
+        let title_x = width.saturating_sub(76) / 2;
+        img.draw_label("POSTFX PARAMETERS", title_x as i32, 4, 200, 180, 255);
+
+        let mut y = 24i32;
+        for &(label, params) in entries {
+            if y + 52 > height as i32 {
+                break;
+            }
+            img.draw_rect(10, y, width - 20, 50, 30, 28, 42, 255);
+            img.draw_label(label, 14, y + 4, 220, 180, 100);
+
+            let mut px = 14i32;
+            for &(name, val) in params {
+                let text = format!("{}:{:.1}", name.to_uppercase(), val);
+                img.draw_label(&text, px, y + 18, 100, 200, 100);
+                px += (text.len() as i32 + 1) * 4;
+            }
+            y += 58;
+        }
+        img
+    }
+
+    /// Render a bar preview for a small set of PostFx effect types.
+    ///
+    /// Draws one coloured row per entry with dot markers for parameter count.
+    /// Suitable for showing 4–8 built-in effect types side-by-side in evidence
+    /// tests.
+    ///
+    /// # Parameters
+    /// - `entries` — `&[(&str, (u8, u8, u8), usize)]`. (label, colour, param_count).
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `crate::image::ImageData`.
+    pub fn draw_effect_type_bars_to_image(
+        entries: &[(&str, (u8, u8, u8), usize)],
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(25, 25, 35, 255);
+        img.draw_label("POSTFX EFFECT TYPES", (width / 2).saturating_sub(60) as i32, 4, 200, 180, 255);
+
+        let row_h = if entries.is_empty() { height } else { (height - 20) / entries.len() as u32 };
+
+        for (i, &(label, (cr, cg, cb), param_count)) in entries.iter().enumerate() {
+            let y_base = (20 + i as u32 * row_h) as i32;
+            let row_h_i = row_h.saturating_sub(4);
+            img.draw_rect(20, y_base, width - 40, row_h_i, cr / 3, cg / 3, cb / 3, 200);
+            img.draw_rect(20, y_base, width - 40, 2, cr, cg, cb, 255);
+            img.draw_label(label, 28, y_base + 4, cr, cg, cb);
+            for p in 0..param_count {
+                let dot_x = 40 + p as i32 * 20;
+                let dot_y = y_base + row_h as i32 / 2;
+                img.draw_circle(dot_x, dot_y, 5, cr, cg, cb, 255);
+            }
+        }
+        img
+    }
+
+    /// Render a bar preview for a list of PostFx effect types,
+    /// auto-assigning colours and counting parameters.
+    ///
+    /// Each type is instantiated to query its parameter names, then
+    /// drawn as a coloured row with dot indicators for parameter count.
+    ///
+    /// # Parameters
+    /// - `types` — `&[PostFxEffectType]`. Effect types to visualise.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `crate::image::ImageData`.
+    pub fn draw_effect_types_to_image(
+        types: &[super::PostFxEffectType],
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let palette: &[(u8, u8, u8)] = &[
+            (180, 80, 80), (80, 180, 80), (80, 80, 180), (180, 180, 80),
+            (180, 80, 180), (80, 180, 180), (200, 130, 60), (130, 60, 200),
+        ];
+        let entries: Vec<(&str, (u8, u8, u8), usize)> = types
+            .iter()
+            .enumerate()
+            .map(|(i, t)| {
+                let effect = super::PostFxEffect::new(t.clone());
+                let param_count = effect.get_parameter_names().len();
+                let label: &str = match t {
+                    super::PostFxEffectType::Vignette => "VIGNETTE",
+                    super::PostFxEffectType::Grayscale => "GRAYSCALE",
+                    super::PostFxEffectType::Chromatic => "CHROMATIC",
+                    super::PostFxEffectType::Blur => "BLUR",
+                    super::PostFxEffectType::Pixelate => "PIXELATE",
+                    super::PostFxEffectType::Invert => "INVERT",
+                    super::PostFxEffectType::Sepia => "SEPIA",
+                    super::PostFxEffectType::Scanlines => "SCANLINES",
+                    super::PostFxEffectType::Bloom => "BLOOM",
+                    super::PostFxEffectType::Crt => "CRT",
+                    super::PostFxEffectType::Godrays => "GODRAYS",
+                    super::PostFxEffectType::ColourGrade => "COLOUR_GRADE",
+                    super::PostFxEffectType::EdgeDetect => "EDGE_DETECT",
+                    super::PostFxEffectType::HueShift => "HUE_SHIFT",
+                    super::PostFxEffectType::Noise => "NOISE",
+                    super::PostFxEffectType::Custom => "CUSTOM",
+                };
+                let color = palette[i % palette.len()];
+                (label, color, param_count)
+            })
+            .collect();
+        Self::draw_effect_type_bars_to_image(&entries, width, height)
+    }
+
 }

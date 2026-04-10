@@ -18,6 +18,49 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.0] — 2025-07-27
+### Changed
+- **BREAKING: Bitmap font system replaces fontdue TTF rendering** — all text rendering now uses embedded bitmap/pixel font sprite sheets. The `fontdue` crate has been removed entirely.
+  - 6 built-in monospaced bitmap font sizes: 3×5, 5×7, 6×10, 8×14, 10×18, 12×22 pixels (cell width × cell height).
+  - Box-drawing characters (U+2500–U+257F) included for sizes ≥6×10.
+  - `Font` struct rewritten: no more TTF parsing, glyph caching, or atlas growing. Glyphs are computed from grid position in the sprite sheet.
+  - `glyph()` now takes `&self` (was `&mut self`) and returns `Option<GlyphInfo>` by value (was `Option<&GlyphInfo>`).
+  - `text_width()` and `wrap_text()` now take `&self` (were `&mut self`).
+  - `RenderCommand::PrintFont` variant removed — unified into `RenderCommand::Print` with a `font_key` field.
+  - `render_text()` and `bitmap_char()` deleted from `gpu_renderer.rs`.
+
+### Added
+- `lurek.graphic.newFont(pixel_height)` — select a built-in bitmap font by pixel height (snaps to nearest available size). Accepts number or `"default"` string.
+- `lurek.graphic.getFontSizes()` — returns a table of available built-in font pixel heights `{5, 7, 10, 14, 18, 22}`.
+- `lurek.graphic.getDefaultFont(pixel_height?)` — returns a built-in font handle for the given size (default: 14).
+- `lurek.graphic.getFontCellWidth(font)` — returns the cell width of a monospaced bitmap font.
+- Terminal `setFont(pixel_height)`, `getCellSize()`, `autoResize()` methods for bitmap font integration with auto-scaling window.
+- `Font::load_all_sizes()`, `Font::nearest_size()`, `Font::from_png_bytes()`, `Font::cell_width()`, `Font::has_box_drawing()` public API.
+- `SharedState::default_fonts: [Option<FontKey>; 6]` — all 6 built-in sizes pre-loaded at startup.
+- `SharedState::pending_window_resize` field for terminal auto-resize.
+- 6 bitmap font PNG sprite sheets in `assets/fonts/` (bitmap_3x5.png through bitmap_12x22.png).
+
+### Removed
+- `fontdue` crate dependency.
+- `RenderCommand::PrintFont` variant (merged into `Print`).
+- `render_text()` and `bitmap_char()` functions from gpu_renderer.
+- `Font::from_bytes()` (TTF loading) — replaced by `Font::from_png_bytes()`.
+- `Font::ensure_glyph()` — no longer needed (grid-based lookup).
+- `Font::grow_atlas()` — fixed-size atlas from PNG.
+
+---
+
+## [0.6.35] — 2026-04-12
+### Added
+- **GPU render() methods** for `Minimap`, `TileMap`, `Overlay`, and `ParticleSystem` — four modules now support per-frame GPU rendering via `obj:render()` which pushes `RenderCommand`s to the render queue. Previously these modules only had CPU-based `draw_to_image()`.
+  - `lurek.particle`: `ParticleSystem:render(ox?, oy?)` — expands particles into individual shape/image primitives (Rectangle, Circle, Triangle, Line, DrawImageEx, DrawQuad).
+  - `lurek.overlay`: `Overlay:render()` — emits screen-sized colored rectangles for flash, fade, lightning, and vignette effects with correct alpha animation.
+  - `lurek.minimap`: `Minimap:render(x?, y?)` — draws terrain cells, objects, and markers as colored rectangles/circles at the given screen position.
+  - `lurek.tilemap`: `TileMap:render(ox?, oy?)` — draws tile layers as colored rectangles with per-tile tints and visibility culling.
+- Domain-level `build_render_commands()` added to `Minimap`, `TileMap`, and `Overlay` for clean Lua API ↔ domain separation.
+
+---
+
 ## [0.6.34] — 2026-04-12
 ### Added
 - **Parallax background system** (`src/parallax/`, `src/lua_api/parallax_api.rs`) — new Tier 2 module providing `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`. Features: per-layer scroll factor (X and Y independently), autoscroll (ambient drift via `rem_euclid`-bounded accumulator), horizontal and vertical texture tiling, opacity, RGBA tint, blend modes, z-ordering, visibility, and pixel-offset clamping. `ParallaxSet` batches update/draw calls and auto-sorts layers by z on add. `drawAuto()` reads `SharedState.camera.position`; `draw(cam_x, cam_y)` accepts explicit camera position. New `ModulesConfig.parallax` flag (default `true`, requires graphics). Tests: `tests/lua/unit/test_parallax.lua`, `tests/lua/integration/test_parallax_camera.lua`. Spec: `docs/specs/parallax.md`.

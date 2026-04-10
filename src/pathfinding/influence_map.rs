@@ -382,7 +382,7 @@ impl InfluenceMap {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, cell_size: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, cell_size: u32) -> crate::image::ImageData {
         let w = self.width as u32;
         let h = self.height as u32;
         let mut img = crate::image::ImageData::new(w * cell_size, h * cell_size);

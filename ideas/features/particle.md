@@ -34,7 +34,7 @@
 
 ## Structural Issues
 
-- **Clean separation**: Particle is data + simulation. Rendering goes through DrawCommand queue via graphics. This is correct.
+- **Clean separation**: Particle is data + simulation. Rendering goes through RenderCommand queue via graphics. This is correct.
 - **Single emitter type**: One ParticleEmitter does everything. No specialized emitter types (trail emitter, billboard emitter).
 
 ## Suggestions

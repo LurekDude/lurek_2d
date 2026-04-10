@@ -45,9 +45,9 @@ term:clear()
 
 -- ── Drawing the Terminal ──────────────────────────────────────────────────────
 
--- term:draw(x?, y?)  — render the grid at screen coordinate (x, y), default (0, 0)
+-- term:render(x?, y?)  — render the grid at screen coordinate (x, y), default (0, 0)
 -- Call inside lurek.draw():
-term:draw(0, 0)
+term:render(0, 0)
 
 -- ── Forwarding Input ─────────────────────────────────────────────────────────
 
@@ -250,6 +250,6 @@ function lurek.mousepressed(x, y, button)
 end
 
 function lurek.render()
-    my_term:draw(0, 0)
+    my_term:render(0, 0)
 end
 ]]

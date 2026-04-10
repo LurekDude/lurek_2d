@@ -60,7 +60,7 @@ describe("Vec2:normalized property", function()
             end
         end
     end)
-    
+
     it("lerp at t=0 always returns start value", function()
         math.randomseed(99)
         for i = 1, 100 do

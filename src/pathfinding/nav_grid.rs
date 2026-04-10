@@ -445,7 +445,7 @@ impl NavGrid {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(
+    pub fn draw_to_image(
         &self,
         cell_size: u32,
         path: Option<&[(u32, u32)]>,

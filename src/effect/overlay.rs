@@ -476,7 +476,54 @@ impl Overlay {
         self.lightning.color[3] * (1.0 - progress)
     }
 
-    // ── CPU rendering ──
+    /// Builds the per-frame GPU render commands for all active overlay effects.
+    ///
+    /// Emits `SetColor` + `Rectangle` commands for flash, fade, lightning, and vignette
+    /// effects that are currently active. The returned `Vec` is empty when no effects are
+    /// visible, making it cheap to extend the render queue unconditionally.
+    ///
+    /// # Returns
+    /// `Vec<RenderCommand>` — zero or more draw commands, ordered back-to-front.
+    pub fn build_render_commands(&self) -> Vec<crate::graphics::renderer::RenderCommand> {
+        use crate::graphics::renderer::{DrawMode, RenderCommand};
+        let mut cmds = Vec::new();
+        let w = self.width as f32;
+        let h = self.height as f32;
+
+        // Flash: linear alpha fade from flash.color[3] to 0.
+        let flash_a = self.get_flash_alpha();
+        if flash_a > 0.0 {
+            let [r, g, b, _] = self.flash.color;
+            cmds.push(RenderCommand::SetColor(r, g, b, flash_a));
+            cmds.push(RenderCommand::Rectangle { mode: DrawMode::Fill, x: 0.0, y: 0.0, w, h });
+        }
+
+        // Fade: animated alpha stored in fade.color[3].
+        if self.fade.active && self.fade.color[3] > 0.0 {
+            let [r, g, b, a] = self.fade.color;
+            cmds.push(RenderCommand::SetColor(r, g, b, a));
+            cmds.push(RenderCommand::Rectangle { mode: DrawMode::Fill, x: 0.0, y: 0.0, w, h });
+        }
+
+        // Lightning: hard flash distinct from the soft flash above.
+        let lightning_a = self.get_lightning_alpha();
+        if lightning_a > 0.0 {
+            let [r, g, b, _] = self.lightning.color;
+            cmds.push(RenderCommand::SetColor(r, g, b, lightning_a));
+            cmds.push(RenderCommand::Rectangle { mode: DrawMode::Fill, x: 0.0, y: 0.0, w, h });
+        }
+
+        // Vignette: full-screen darkening rectangle (no color field — always dark).
+        if self.vignette.enabled && self.vignette.strength > 0.0 {
+            let a = (self.vignette.strength * 0.5).clamp(0.0, 1.0);
+            cmds.push(RenderCommand::SetColor(0.0, 0.0, 0.0, a));
+            cmds.push(RenderCommand::Rectangle { mode: DrawMode::Fill, x: 0.0, y: 0.0, w, h });
+        }
+
+        cmds
+    }
+
+    // -- CPU rendering --
 
     /// Renders a diagnostic image showing the current overlay state.
     ///
@@ -489,7 +536,7 @@ impl Overlay {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_state_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_state_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(15, 15, 25, 255);
 
@@ -517,6 +564,201 @@ impl Overlay {
         let fade_val = (fade_a * 255.0) as u8;
         img.draw_rect(0, fade_y, width, section_h, 0, 0, 0, fade_val);
         img.draw_label("FADE", 4, fade_y + 4, 220, 220, 230);
+
+        img
+    }
+
+    /// Render a flash-alpha progression as a horizontal strip of panels.
+    ///
+    /// Triggers a flash, then samples the alpha at each time-step in
+    /// `steps`, drawing a `panel_w × height` panel per step side-by-side.
+    ///
+    /// # Parameters
+    /// - `r` — `f32`. Flash red (0–1).
+    /// - `g` — `f32`. Flash green (0–1).
+    /// - `b` — `f32`. Flash blue (0–1).
+    /// - `alpha` — `f32`. Flash start alpha.
+    /// - `duration` — `f32`. Flash duration in seconds.
+    /// - `steps` — `&[f32]`. Delta-time values per panel.
+    /// - `panel_w` — `u32`. Width of each panel.
+    /// - `height` — `u32`. Height of the output image.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn draw_flash_sequence_to_image(
+        &mut self,
+        r: f32,
+        g: f32,
+        b: f32,
+        alpha: f32,
+        duration: f32,
+        steps: &[f32],
+        panel_w: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        self.trigger_flash(r, g, b, alpha, duration);
+        let total_w = panel_w * steps.len() as u32;
+        let mut img = crate::image::ImageData::new(total_w, height);
+        img.fill(15, 15, 25, 255);
+        for (frame, dt) in steps.iter().enumerate() {
+            if *dt > 0.0 {
+                self.update(*dt);
+            }
+            let flash_alpha = self.get_flash_alpha();
+            let ox = (frame as u32 * panel_w) as i32;
+            for y in 0..height {
+                for x in 0..panel_w {
+                    let base_r = 40u8;
+                    let base_g = 60u8;
+                    let base_b = 80u8;
+                    let pr = (base_r as f32 + (255.0 - base_r as f32) * flash_alpha) as u8;
+                    let pg = (base_g as f32 + (0.0 - base_g as f32) * flash_alpha).max(0.0) as u8;
+                    let pb = (base_b as f32 + (0.0 - base_b as f32) * flash_alpha).max(0.0) as u8;
+                    img.set_pixel((ox as u32) + x, y, pr, pg, pb, 255);
+                }
+            }
+        }
+        img
+    }
+
+    /// Render a shake-offset trail as dots on a canvas.
+    ///
+    /// Triggers a shake, updates over several frames, and draws each
+    /// offset as a circle on the image.
+    ///
+    /// # Parameters
+    /// - `offsets` — `&[(f32, f32)]`. Pre-recorded shake offsets.
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_shake_trail_to_image(
+        offsets: &[(f32, f32)],
+        width: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(15, 15, 25, 255);
+        let cx = width as i32 / 2;
+        let cy = height as i32 / 2;
+        // Crosshair
+        img.draw_line(cx - 20, cy, cx + 20, cy, 60, 60, 80, 255);
+        img.draw_line(cx, cy - 20, cx, cy + 20, 60, 60, 80, 255);
+        for (i, &(ox, oy)) in offsets.iter().enumerate() {
+            let t = i as f32 / offsets.len().max(1) as f32;
+            let r = (100.0 + t * 155.0) as u8;
+            let g = (200.0 - t * 100.0) as u8;
+            let px = cx + ox as i32;
+            let py = cy + oy as i32;
+            if px >= 0 && py >= 0 && (px as u32) < width && (py as u32) < height {
+                img.draw_circle(px, py, 3, r, g, 120, 200);
+            }
+        }
+        img
+    }
+
+    /// Render a fade-alpha progression as a horizontal strip of panels.
+    ///
+    /// Shows `steps.len()` panels side-by-side, each blended towards
+    /// black at the corresponding alpha level.
+    ///
+    /// # Parameters
+    /// - `steps` — `&[f32]`. Alpha values per panel (0–1).
+    /// - `panel_w` — `u32`. Width of each panel.
+    /// - `height` — `u32`. Height of the output image.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_fade_transition_to_image(
+        steps: &[f32],
+        panel_w: u32,
+        height: u32,
+    ) -> crate::image::ImageData {
+        let total_w = panel_w * steps.len() as u32;
+        let mut img = crate::image::ImageData::new(total_w, height);
+        img.fill(15, 15, 25, 255);
+        for (i, &alpha) in steps.iter().enumerate() {
+            let ox = i as u32 * panel_w;
+            for y in 0..height {
+                for x in 0..panel_w {
+                    let base = 180u8;
+                    let v = (base as f32 * (1.0 - alpha)) as u8;
+                    img.set_pixel(ox + x, y, v, v, v, 255);
+                }
+            }
+        }
+        img
+    }
+
+    /// Render a 4-panel trigger visualization (flash, shake, fade, lightning).
+    ///
+    /// Creates a `width × height` image with four quadrant panels
+    /// showing active overlay states and labels.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn draw_trigger_panel_to_image(&mut self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 18, 28, 255);
+        let half_w = width / 2;
+        let half_h = height / 2;
+
+        // Panel 1: Flash (top-left)
+        self.trigger_flash(1.0, 0.0, 0.0, 0.8, 0.5);
+        img.draw_rect(2, 2, half_w - 4, half_h - 4, 40, 10, 10, 255);
+        img.draw_label("FLASH", 6, 6, 255, 80, 80);
+        for dy in 0..((half_h - 30) as u32) {
+            let t = 1.0 - (dy as f32 / (half_h - 30) as f32);
+            let a = (t * 0.8 * 200.0) as u8;
+            if a > 20 {
+                for dx in 0..(half_w - 10) {
+                    img.set_pixel(5 + dx, 22 + dy, 200, 20, 20, a);
+                }
+            }
+        }
+        self.clear();
+
+        // Panel 2: Shake (top-right)
+        self.trigger_shake(15.0, 0.4);
+        let (ox, oy) = self.get_shake_offset();
+        img.draw_rect(half_w as i32 + 2, 2, half_w - 4, half_h - 4, 10, 10, 40, 255);
+        img.draw_label("SHAKE", half_w as i32 + 6, 6, 100, 100, 255);
+        let scx = half_w as i32 + half_w as i32 / 2;
+        let scy = half_h as i32 / 2;
+        img.draw_circle(scx, scy, 20, 40, 40, 80, 255);
+        img.draw_circle(scx + (ox * 2.0) as i32, scy + (oy * 2.0) as i32, 4, 255, 100, 100, 255);
+        self.clear();
+
+        // Panel 3: Fade (bottom-left)
+        self.trigger_fade(0.0, 0.0, 0.0, 0.7, 1.0);
+        img.draw_rect(2, half_h as i32 + 2, half_w - 4, half_h - 4, 10, 10, 10, 255);
+        img.draw_label("FADE", 6, half_h as i32 + 6, 180, 180, 200);
+        for dx in 0..(half_w - 10) {
+            let t = dx as f32 / (half_w - 10) as f32;
+            let alpha = (t * 0.7 * 255.0) as u8;
+            for dy in 0..(half_h - 30) {
+                img.set_pixel(5 + dx, half_h + 22 + dy, 0, 0, 0, alpha);
+            }
+        }
+        self.clear();
+
+        // Panel 4: Lightning (bottom-right)
+        self.trigger_lightning();
+        img.draw_rect(half_w as i32 + 2, half_h as i32 + 2, half_w - 4, half_h - 4, 20, 20, 30, 255);
+        img.draw_label("LIGHTNING", half_w as i32 + 6, half_h as i32 + 6, 220, 220, 255);
+        for dy in 0..((half_h - 30) as u32) {
+            for dx in 0..(half_w - 10) {
+                let flash = 200u8.saturating_sub((dy * 2) as u8);
+                img.set_pixel(half_w + 5 + dx, half_h + 22 + dy, flash, flash, 255u8.min(flash + 40), 180);
+            }
+        }
+        self.clear();
 
         img
     }

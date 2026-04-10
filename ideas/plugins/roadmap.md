@@ -175,7 +175,7 @@ static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the s
 
 - [ ] **P2.4** Refactor `lurek2d-gamedev` modules to NOT require `SharedState`:
   - Each module manages its own internal state
-  - Rendering goes through `lurek.gfx.*` Lua calls (not direct DrawCommand enqueue)
+  - Rendering goes through `lurek.gfx.*` Lua calls (not direct RenderCommand enqueue)
   - State queries use `lurek.time.getDelta()`, `lurek.window.getWidth()`, etc.
   - **THIS IS THE HARDEST TASK** — see "SharedState Decoupling" below
 
@@ -214,7 +214,7 @@ static lib to a cdylib. Verify that `luna_gamedev.dll` loads and registers the s
 The current Tier 2 modules receive `Rc<RefCell<SharedState>>` and use it for:
 
 1. **Reading frame state** (delta_time, window_size, mouse_pos) — replace with Lua calls
-2. **Enqueuing DrawCommands** — replace with Lua calls to `lurek.gfx.drawQuad()` etc.
+2. **Enqueuing RenderCommands** — replace with Lua calls to `lurek.gfx.drawQuad()` etc.
 3. **Accessing resource pools** (texture keys, font keys) — keep resource IDs as Lua
    integers/strings, let core resolve them
 4. **Modifying shared state** (adding entities, events) — use `lurek.entity.*`, `lurek.signal.*`
@@ -305,7 +305,7 @@ commands), provide a C-ABI vtable of host capabilities.
 - [ ] **P4.7** Document vtable API, versioning, and forward-compatibility rules
 
 ### Acceptance Gate
-- Plugin can enqueue custom DrawCommands via vtable
+- Plugin can enqueue custom RenderCommands via vtable
 - vtable version check works
 - Example 3D raycasting plugin renders correctly
 

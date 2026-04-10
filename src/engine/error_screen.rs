@@ -1,12 +1,12 @@
 //! Visual error screen for displaying Lua and engine errors to the user.
 //!
-//! Generates `DrawCommand` sequences that render a blue error screen,
+//! Generates `RenderCommand` sequences that render a blue error screen,
 //! including the error title, message, traceback, and instructions
 //! to quit or restart.
 
 use crate::engine::error::EngineError;
 use crate::engine::resource_keys::FontKey;
-use crate::graphics::renderer::{DrawCommand, DrawMode};
+use crate::graphics::renderer::{RenderCommand, DrawMode};
 
 /// Blue error screen background color.
 const ERROR_BG: [f32; 4] = [0.11, 0.22, 0.53, 1.0];
@@ -24,10 +24,10 @@ const GLYPH_W: f32 = 8.0;
 /// Line height at scale 1.0 for the built-in bitmap font.
 const LINE_H: f32 = 14.0;
 
-/// Visual error screen that generates `DrawCommand` sequences for the GPU renderer.
+/// Visual error screen that generates `RenderCommand` sequences for the GPU renderer.
 ///
 /// Stores a pre-processed error title, message lines, and traceback so that
-/// `draw_commands()` can emit a frame without any game assets loaded.
+/// `build_render_commands()` can emit a frame without any game assets loaded.
 /// # Fields
 /// - `title` — See field documentation.
 /// - `message` — See field documentation.
@@ -114,7 +114,7 @@ impl ErrorScreen {
         Self::from_error(&err.to_string())
     }
 
-    /// Generates a sequence of `DrawCommand` values that render the error screen.
+    /// Generates a sequence of `RenderCommand` values that render the error screen.
     ///
     /// # Parameters
     /// - `screen_w` — `u32`.
@@ -123,29 +123,29 @@ impl ErrorScreen {
     /// - `body_font` — `Option<FontKey>`.
     ///
     /// # Returns
-    /// `Vec<DrawCommand>`.
+    /// `Vec<RenderCommand>`.
     ///
-    /// When `heading_font` and `body_font` are `Some`, uses TTF `PrintFont` commands
+    /// When `heading_font` and `body_font` are `Some`, uses `Print` commands
     /// for crisp text. Falls back to the built-in bitmap `Print` when `None`.
-    pub fn draw_commands(
+    pub fn build_render_commands(
         &self,
         screen_w: u32,
         screen_h: u32,
         heading_font: Option<FontKey>,
         body_font: Option<FontKey>,
-    ) -> Vec<DrawCommand> {
+    ) -> Vec<RenderCommand> {
         let mut cmds = Vec::new();
         let margin_x = 40.0_f32;
         let mut y = 40.0_f32;
 
         // Blue background fill
-        cmds.push(DrawCommand::SetColor(
+        cmds.push(RenderCommand::SetColor(
             ERROR_BG[0],
             ERROR_BG[1],
             ERROR_BG[2],
             ERROR_BG[3],
         ));
-        cmds.push(DrawCommand::Rectangle {
+        cmds.push(RenderCommand::Rectangle {
             mode: DrawMode::Fill,
             x: 0.0,
             y: 0.0,
@@ -154,14 +154,14 @@ impl ErrorScreen {
         });
 
         // "Error" heading
-        cmds.push(DrawCommand::SetColor(
+        cmds.push(RenderCommand::SetColor(
             ERROR_TITLE_COLOR[0],
             ERROR_TITLE_COLOR[1],
             ERROR_TITLE_COLOR[2],
             ERROR_TITLE_COLOR[3],
         ));
         if let Some(fk) = heading_font {
-            cmds.push(DrawCommand::PrintFont {
+            cmds.push(RenderCommand::Print {
                 font_key: fk,
                 text: "Error".to_string(),
                 x: margin_x,
@@ -170,17 +170,12 @@ impl ErrorScreen {
             });
             y += 50.0;
         } else {
-            cmds.push(DrawCommand::Print {
-                text: "Error".to_string(),
-                x: margin_x,
-                y,
-                scale: 3.0,
-            });
-            y += LINE_H * 3.0 + 10.0;
+            // No font available — skip heading
+            y += 50.0;
         }
 
         // Error title (first line)
-        cmds.push(DrawCommand::SetColor(
+        cmds.push(RenderCommand::SetColor(
             ERROR_TEXT_COLOR[0],
             ERROR_TEXT_COLOR[1],
             ERROR_TEXT_COLOR[2],
@@ -205,7 +200,7 @@ impl ErrorScreen {
         // Traceback
         if !self.traceback_lines.is_empty() {
             y += body_line_h * 0.5;
-            cmds.push(DrawCommand::SetColor(0.8, 0.8, 0.9, 1.0));
+            cmds.push(RenderCommand::SetColor(0.8, 0.8, 0.9, 1.0));
             self.push_text(&mut cmds, "Traceback:", margin_x, y, body_font);
             y += body_line_h;
             let indent = if body_font.is_some() {
@@ -222,7 +217,7 @@ impl ErrorScreen {
         // Footer instructions
         let footer = "Press Escape to quit  |  R to restart  |  Ctrl+C to copy error";
         let footer_y = screen_h as f32 - 50.0;
-        cmds.push(DrawCommand::SetColor(
+        cmds.push(RenderCommand::SetColor(
             ERROR_FOOTER_COLOR[0],
             ERROR_FOOTER_COLOR[1],
             ERROR_FOOTER_COLOR[2],
@@ -250,29 +245,22 @@ impl ErrorScreen {
         parts.join("\n")
     }
 
-    /// Pushes a text draw command, choosing `PrintFont` (TTF) or `Print` (bitmap).
+    /// Pushes a text draw command using the loaded font.
     fn push_text(
         &self,
-        cmds: &mut Vec<DrawCommand>,
+        cmds: &mut Vec<RenderCommand>,
         text: &str,
         x: f32,
         y: f32,
         font_key: Option<FontKey>,
     ) {
         if let Some(fk) = font_key {
-            cmds.push(DrawCommand::PrintFont {
+            cmds.push(RenderCommand::Print {
                 font_key: fk,
                 text: text.to_string(),
                 x,
                 y,
                 scale: 1.0,
-            });
-        } else {
-            cmds.push(DrawCommand::Print {
-                text: text.to_string(),
-                x,
-                y,
-                scale: 2.0,
             });
         }
     }
@@ -463,7 +451,7 @@ mod tests {
         let screen = ErrorScreen::from_error("Something went wrong");
         assert_eq!(screen.title, "Something went wrong");
         assert!(screen.traceback_lines.is_empty());
-        let cmds = screen.draw_commands(800, 600, None, None);
+        let cmds = screen.build_render_commands(800, 600, None, None);
         assert!(!cmds.is_empty());
     }
 

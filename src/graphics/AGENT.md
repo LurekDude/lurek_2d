@@ -12,7 +12,7 @@
 
 ## Purpose
 
-The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `DrawCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
 ## Source Files
 
@@ -23,11 +23,11 @@ The graphics module owns the entire GPU rendering pipeline for Lurek2D — from 
 | `decal_surface.rs` | Persistent surface descriptor for stamping decal textures            |
 | `draw_layer.rs`    | Z-ordered draw callback queue for controlling render order           |
 | `font.rs`          | TTF/OTF font loading via fontdue, glyph rasterization, shelf-packed RGBA atlas |
-| `gpu_renderer.rs`  | GPU-accelerated 2D renderer backed by wgpu; processes DrawCommand queue, manages GPU resources and render passes |
+| `gpu_renderer.rs`  | GPU-accelerated 2D renderer backed by wgpu; processes RenderCommand queue, manages GPU resources and render passes |
 | `image_effect.rs`  | Per-image shader-effect pass descriptor for the draw command pipeline |
 | `mesh.rs`          | Custom geometry mesh with per-vertex position, UV, and color data    |
 | `nine_slice.rs`    | Nine-slice (9-patch) image rendering for scalable UI elements        |
-| `renderer.rs`      | `DrawCommand` enum (45+ variants), `BlendMode`, `DrawMode`, `TextAlign`, `StencilMode`, `TextureData`, and related types |
+| `renderer.rs`      | `RenderCommand` enum (45+ variants), `BlendMode`, `DrawMode`, `TextAlign`, `StencilMode`, `TextureData`, and related types |
 | `shader.rs`        | Custom WGSL shader support — source validation via naga, uniform variables, per-shader pipeline |
 | `shape.rs`         | `CompoundShape` builder and `ShapeCommand` sub-enum for multi-primitive vector drawing |
 | `sprite.rs`        | `Sprite` struct — texture handle + transform + tint color wrapper    |

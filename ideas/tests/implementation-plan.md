@@ -137,7 +137,7 @@ For every new `.lua` test file, add a corresponding entry in `tests/lua/harness.
 #[test] fn lua_test_integration_entity_physics() { run_lua_test("integration/test_entity_physics.lua"); }
 // ... etc
 
-// Stress tests  
+// Stress tests
 #[test] fn lua_test_stress_ai() { run_lua_test("stress/test_stress_ai.lua"); }
 // ... etc
 ```
@@ -202,7 +202,7 @@ Phase 7: CI Integration (week 13)
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Canvas:getPixel() unavailable in headless | High | Fall back to DrawCommand queue inspection |
+| Canvas:getPixel() unavailable in headless | High | Fall back to RenderCommand queue inspection |
 | LuaJIT string.format differs from Lua 5.4 | Medium | Use fixed-precision formatting in golden tests |
 | False-positive heuristic matches mask real gaps | Medium | Prioritize marker rollout over heuristic improvements |
 | Integration tests cross module boundaries wrong | Low | Each test imports exactly 2+ `lurek.*` namespaces |

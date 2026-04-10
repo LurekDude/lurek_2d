@@ -164,7 +164,11 @@ fn frame_stats_fps_computed_from_dt() {
         stats.record(1.0 / 60.0);
     }
     let snap = stats.snapshot();
-    assert!((snap.fps - 60.0).abs() < 1.0, "fps should be ~60, got {}", snap.fps);
+    assert!(
+        (snap.fps - 60.0).abs() < 1.0,
+        "fps should be ~60, got {}",
+        snap.fps
+    );
 }
 
 #[test]

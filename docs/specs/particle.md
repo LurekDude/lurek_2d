@@ -12,7 +12,7 @@
 
 ## Summary
 
-The particle module implements a CPU-side emitter-based 2D particle system with trail-ribbon rendering. A `ParticleSystem` spawns short-lived `Particle` entities each frame according to a ~50-field `ParticleConfig`, advances their position and velocity through gravity, radial/tangential acceleration, linear damping, quadratic drag, orbital rotation, and turbulence, then culls expired particles — keeping allocation bounded by `ParticleConfig::max_particles`. The surviving particle state is batched into a single `DrawCommand::DrawParticleSystem` for the GPU renderer to draw as textured quads or geometric shape primitives (Square, Circle, Triangle, Spark, Diamond) in one instanced draw call.
+The particle module implements a CPU-side emitter-based 2D particle system with trail-ribbon rendering. A `ParticleSystem` spawns short-lived `Particle` entities each frame according to a ~50-field `ParticleConfig`, advances their position and velocity through gravity, radial/tangential acceleration, linear damping, quadratic drag, orbital rotation, and turbulence, then culls expired particles — keeping allocation bounded by `ParticleConfig::max_particles`. The surviving particle state is batched into a single `RenderCommand::DrawParticleSystem` for the GPU renderer to draw as textured quads or geometric shape primitives (Square, Circle, Triangle, Spark, Diamond) in one instanced draw call.
 
 Multi-stop interpolation drives particle size, color (RGBA), and alpha over each particle's normalised lifetime (0 = birth, 1 = death). An independent `alpha_keyframes` array can override the alpha channel from the color gradient. A `color_by_speed` mode maps color stops to the particle's current speed instead of lifetime. Eight emission shapes (Point, Circle, Rectangle, Ring, Line, Cone, Star, Spiral) control where particles spawn relative to the emitter, while six area-distribution modes (None, Uniform, Normal, Ellipse, BorderEllipse, BorderRectangle) provide a secondary spatial spread layer. Particles can be detached (world-space) or attached (move with emitter) via the `RelativeMode` setting.
 
@@ -61,9 +61,9 @@ lurek.particles.newSystem(config)
 | +-- 9. Remove dead particles                         |
 | +-- 10. Emit new particles if active                 |
 |                                                      |
-| draw_commands(ox, oy)                                |
+| build_render_commands(ox, oy)                                |
 | +-- Batch all particles into one                     |
-|     DrawCommand::DrawParticleSystem                  |
+|     RenderCommand::DrawParticleSystem                  |
 |     +-- interpolate_sizes(t)                         |
 |     +-- interpolate_colors(t) or color_by_speed      |
 |     +-- interpolate_alphas(t) override               |
@@ -93,7 +93,7 @@ lurek.particles.newTrail(lifetime, start_width)
 | `config.rs`   | `ParticleConfig` (~50 fields) and enums: `AreaDistribution`, `InsertMode`, `EmitterState`, `EmissionShape`, `RelativeMode` |
 | `shapes.rs`   | `ParticleShape` enum — five geometric render primitives (Square, Circle, Triangle, Spark, Diamond) |
 | `particle.rs` | `Particle` struct — per-particle live state (position, velocity, lifetime, rotation, acceleration) |
-| `emitter.rs`  | `ParticleSystem` struct — simulation loop, physics integration, `draw_commands()` builder, and inline unit tests |
+| `emitter.rs`  | `ParticleSystem` struct — simulation loop, physics integration, `build_render_commands()` builder, and inline unit tests |
 | `math.rs`     | Math helpers: `lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`, `rand_range`, `rand_normal` |
 | `emission.rs` | Spawn-offset calculators for area distribution (`emission_offset`) and emission shapes (`emission_shape_offset`) |
 | `trail.rs`    | `Trail` and `TrailPoint` — time-fading ribbon effect with width taper and color gradient |
@@ -168,7 +168,7 @@ Per-particle live state held in the `ParticleSystem` pool. Fields: position (x, 
 
 #### `particle::emitter::ParticleSystem`
 
-The main emitter struct. Holds a `ParticleConfig`, a `Vec<Particle>` pool (pre-allocated to `max_particles` capacity), emitter world position, a fractional emit accumulator for sub-frame emission accuracy, lifecycle state (`EmitterState`), accumulated emitter age, and previous-frame position for move interpolation. Public methods: `new`, `update`, `emit`, `count`, `reset`, `start`, `stop`, `pause`, `resume`, `move_to`, `clone_config`, `is_active`, `is_paused`, `is_stopped`, `is_empty`, `is_full`, `draw_commands`.
+The main emitter struct. Holds a `ParticleConfig`, a `Vec<Particle>` pool (pre-allocated to `max_particles` capacity), emitter world position, a fractional emit accumulator for sub-frame emission accuracy, lifecycle state (`EmitterState`), accumulated emitter age, and previous-frame position for move interpolation. Public methods: `new`, `update`, `emit`, `count`, `reset`, `start`, `stop`, `pause`, `resume`, `move_to`, `clone_config`, `is_active`, `is_paused`, `is_stopped`, `is_empty`, `is_full`, `render_commands`.
 
 #### `particle::trail::TrailPoint`
 
@@ -360,19 +360,19 @@ end
 |-------------|---------------|----------------------------------------------------|
 | `engine`    | Imports from  | Uses `SharedState`, `ParticleKey` (SlotMap key)    |
 | `math`      | Imports from  | `Color` type for trail head/tail colors            |
-| `graphics`  | Related       | Pushes `DrawCommand::DrawParticleSystem` into draw queue; `ParticleRenderShape` mirrors `ParticleShape` |
+| `graphics`  | Related       | Pushes `RenderCommand::DrawParticleSystem` into draw queue; `ParticleRenderShape` mirrors `ParticleShape` |
 | `lua_api`   | Imported by   | `src/lua_api/particle_api.rs` registers `lurek.particles.*` with `LuaParticleSystem` and `LuaTrail` UserData |
 | `compute`   | Alternative   | GPU compute path recommended for >10K particles; particle module is CPU-only |
 | `graphics::renderer` | Bridge | `ParticleInstance` and `ParticleRenderShape` are the GPU-side data types consumed by the renderer |
 
 ## Notes
 
-- **CPU simulation only**: All particle positions are updated in Rust each frame. The GPU renderer only receives the final per-particle instance data via `DrawCommand::DrawParticleSystem`. No GPU-side simulation or readback.
+- **CPU simulation only**: All particle positions are updated in Rust each frame. The GPU renderer only receives the final per-particle instance data via `RenderCommand::DrawParticleSystem`. No GPU-side simulation or readback.
 - **Pool size fixed at creation**: The particle pool is pre-allocated to `max_particles` capacity via `Vec::with_capacity`. The pool never grows beyond this cap. New particles are silently dropped when the pool is full.
 - **Sub-frame emission accuracy**: The `emit_accumulator` field tracks fractional particles between frames, ensuring consistent visual density regardless of frame rate.
 - **Emission shape vs area distribution**: When `emission_shape` is anything other than `Point`, it takes precedence over `area_distribution`. Both systems compute a spawn offset `(dx, dy)` but only one is used per particle.
 - **Texture is optional**: Untextured particles render as geometric shapes from `ParticleShape`. When a texture is set, quad sub-regions can cycle via lifetime progress or animated frame playback.
-- **Trail is independent**: `Trail` is a standalone type, not coupled to `ParticleSystem`. It does not produce `DrawCommand`s itself — the rendering integration is handled by the Lua API or user code.
+- **Trail is independent**: `Trail` is a standalone type, not coupled to `ParticleSystem`. It does not produce `RenderCommand`s itself — the rendering integration is handled by the Lua API or user code.
 - **Inline unit tests**: `emitter.rs` contains 29 inline `#[cfg(test)]` unit tests covering default config, emission, death, state transitions, interpolation, emission shapes, alpha keyframes, and clone.
 - **External crate**: Uses `fastrand` for all random sampling (uniform and Box-Muller normal). No thread-local RNG state — safe for single-threaded particle updates but not deterministically reproducible across runs.
 - **Breaking change surface**: Renaming config table keys in `particle_api.rs::config_from_table` breaks existing Lua game scripts. The camelCase key names (`emissionRate`, `lifetimeMin`, etc.) are the stable API contract.

@@ -15,7 +15,7 @@
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
 - [ ] **SP-03** — Summary quality: Summary very long (2475 chars)
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: Color | Stale in spec: Patch, Type
-- [ ] **D-03** — Structured doc sections: Missing structured sections: renderer::DrawCommand (# Variants)
+- [ ] **D-03** — Structured doc sections: Missing structured sections: renderer::RenderCommand (# Variants)
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: draw_layer:14, draw_layer:26, draw_layer:53, mesh:18, mesh:34 (+5 more)
 - [ ] **B-04** — No business logic in closures: '<closure@1424>' (23 LOC, line 1424) — extract body to src/graphics/ | '<closure@1456>' (25 LOC, line 1456) — extract body to src/graphics/ | '<closure@1527>' (31 LOC, line 1527) — extract body to src/graphics/ | '<closure@1576>' (119 LOC, line 1576) — extract body to src/graphics/ | '<closure@1920>' has if/match/for — extract to src/graphics/ | '<closure@1941>' has if/match/for — extract to src/graphics/
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_phase01_released_texture_handle_reuse_reports_invalid_texture, test_phase01_released_numeric_texture_handle_reports_invalid_texture, test_phase01_released_font_handle_reuse_reports_invalid_font, test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch, test_transform_push_queues_push_transform (+71 more)
@@ -63,7 +63,7 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: renderer::DrawCommand (# Variants) |
+| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: renderer::RenderCommand (# Variants) |
 | **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: draw_layer:14, draw_layer:26, draw_layer:53, mesh:18, mesh:34 (+5 more) |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |

@@ -1,76 +1,78 @@
-//! TTF/OTF font loading, glyph rasterization, and atlas packing for GPU text rendering.
+//! Bitmap font loading and glyph lookup for GPU text rendering.
 //!
-//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
-//! details for font-related operations and data management.
+//! This module provides embedded bitmap/pixel fonts loaded from PNG sprite sheets.
+//! Each font is a fixed-width grid of glyphs covering ASCII printable characters
+//! and optionally Unicode box-drawing characters (U+2500–2580).
+//!
 //! Key types exported from this module: `Font`, `GlyphInfo`.
-//! Primary functions: `from_bytes()`, `ensure_glyph()`, `text_width()`, `line_height()`.
+//! Primary functions: `from_png_bytes()`, `load_all_sizes()`, `glyph()`, `text_width()`.
 //!
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::engine::error::{EngineError, EngineResult};
-use crate::engine::log_messages::G006_ATLAS_MAX_SIZE;
-#[allow(unused_imports)]
-use crate::log_msg;
-use std::collections::HashMap;
 
-/// Initial atlas dimensions in pixels.
-const INITIAL_ATLAS_SIZE: u32 = 512;
-/// Maximum atlas dimensions in pixels.
-const MAX_ATLAS_SIZE: u32 = 2048;
-/// Padding between glyphs in the atlas to prevent bleeding.
-const GLYPH_PADDING: u32 = 1;
+// ── Embedded bitmap font PNGs ────────────────────────────────────────────────────────────────────
+const FONT_3X5: &[u8] = include_bytes!("../../assets/fonts/bitmap_3x5.png");
+const FONT_5X7: &[u8] = include_bytes!("../../assets/fonts/bitmap_5x7.png");
+const FONT_6X10: &[u8] = include_bytes!("../../assets/fonts/bitmap_6x10.png");
+const FONT_8X14: &[u8] = include_bytes!("../../assets/fonts/bitmap_8x14.png");
+const FONT_10X18: &[u8] = include_bytes!("../../assets/fonts/bitmap_10x18.png");
+const FONT_12X22: &[u8] = include_bytes!("../../assets/fonts/bitmap_12x22.png");
 
-/// A loaded TTF/OTF font with a glyph atlas for GPU rendering.
+/// Available font pixel heights, smallest to largest.
+pub const AVAILABLE_HEIGHTS: [u32; 6] = [5, 7, 10, 14, 18, 22];
+
+/// Available font cell sizes as `(width, height)` pairs, matching `AVAILABLE_HEIGHTS` order.
+pub const AVAILABLE_CELL_SIZES: [(u32, u32); 6] = [
+    (3, 5),
+    (5, 7),
+    (6, 10),
+    (8, 14),
+    (10, 18),
+    (12, 22),
+];
+
+/// A bitmap font loaded from an embedded PNG sprite sheet.
 ///
-/// Wraps a `fontdue::Font` for parsing and rasterization, caches rasterized
-/// glyphs in a HashMap, and packs them into a row-based RGBA atlas bitmap.
+/// Glyph positions are computed from grid coordinates — no HashMap cache needed.
+/// The atlas bitmap is the decoded RGBA image data from the PNG.
 ///
 /// # Fields
-/// - `inner` — `fontdue::Font`.
-/// - `size` — `f32`.
-/// - `glyphs` — `HashMap<char`.
-/// - `atlas_bitmap` — `Vec<u8>`.
-/// - `atlas_width` — `u32`.
-/// - `atlas_height` — `u32`.
-/// - `cursor_x` — `u32`.
-/// - `cursor_y` — `u32`.
-/// - `row_height` — `u32`.
-/// - `line_height` — `f32`.
-/// - `ascent` — `f32`.
-/// - `descent` — `f32`.
-/// - `dirty` — `bool`.
+/// - `atlas_bitmap` — `Vec<u8>`. RGBA pixel data decoded from the PNG sprite sheet.
+/// - `atlas_width` — `u32`. Width of the atlas in pixels.
+/// - `atlas_height` — `u32`. Height of the atlas in pixels.
+/// - `cell_width` — `u32`. Width of each glyph cell in pixels.
+/// - `cell_height` — `u32`. Height of each glyph cell in pixels.
+/// - `has_box_drawing` — `bool`. Whether this font includes box-drawing characters.
+/// - `line_height_mul` — `f32`. Multiplier for line spacing (default 1.0).
+/// - `dirty` — `bool`. True when atlas data needs GPU re-upload.
 pub struct Font {
-    inner: fontdue::Font,
-    size: f32,
-    glyphs: HashMap<char, GlyphInfo>,
     atlas_bitmap: Vec<u8>,
     atlas_width: u32,
     atlas_height: u32,
-    cursor_x: u32,
-    cursor_y: u32,
-    row_height: u32,
-    line_height: f32,
-    ascent: f32,
-    descent: f32,
+    cell_width: u32,
+    cell_height: u32,
+    has_box_drawing: bool,
+    line_height_mul: f32,
     dirty: bool,
 }
 
-/// Information about a single rasterized glyph in the atlas.
-///
-/// # Fields
-/// - `uv_x` — `f32`.
-/// - `uv_y` — `f32`.
-/// - `uv_w` — `f32`.
-/// - `uv_h` — `f32`.
-/// - `width` — `u32`.
-/// - `height` — `u32`.
-/// - `advance_width` — `f32`.
-/// - `offset_x` — `f32`.
-/// - `offset_y` — `f32`.
+/// Information about a single glyph in the atlas.
 ///
 /// Contains UV coordinates for sampling the atlas texture and metric
 /// data for text layout (advance width, baseline offset).
+///
+/// # Fields
+/// - `uv_x` — `f32`. U coordinate of the glyph's left edge (normalized 0.0..1.0).
+/// - `uv_y` — `f32`. V coordinate of the glyph's top edge (normalized 0.0..1.0).
+/// - `uv_w` — `f32`. Width of the glyph region (normalized 0.0..1.0).
+/// - `uv_h` — `f32`. Height of the glyph region (normalized 0.0..1.0).
+/// - `width` — `u32`. Pixel width of the glyph.
+/// - `height` — `u32`. Pixel height of the glyph.
+/// - `advance_width` — `f32`. Horizontal advance after this glyph.
+/// - `offset_x` — `f32`. Horizontal offset from cursor to glyph left edge.
+/// - `offset_y` — `f32`. Vertical offset from baseline to glyph top edge.
 #[derive(Debug, Clone, Copy)]
 pub struct GlyphInfo {
     /// U coordinate of the glyph's left edge in the atlas (normalized 0.0..1.0).
@@ -94,192 +96,175 @@ pub struct GlyphInfo {
 }
 
 impl Font {
-    /// Parses a TTF/OTF font from raw bytes and pre-rasterizes printable ASCII glyphs.
+    /// Creates a bitmap font from raw PNG bytes.
+    ///
+    /// Decodes the PNG into RGBA pixel data and stores it as the atlas bitmap.
+    /// The sprite sheet must be a grid of `cell_w` x `cell_h` cells, 16 columns wide.
     ///
     /// # Parameters
-    /// - `data` — Raw font file bytes (TTF or OTF).
-    /// - `size` — Font size in pixels.
+    /// - `data` — Raw PNG file bytes.
+    /// - `cell_w` — Width of each glyph cell in pixels.
+    /// - `cell_h` — Height of each glyph cell in pixels.
+    /// - `has_box` — Whether the sheet includes box-drawing rows.
     ///
     /// # Returns
-    /// A `Font` with printable ASCII (32..=126) pre-rasterized, or an error string.
-    pub fn from_bytes(data: &[u8], size: f32) -> EngineResult<Font> {
-        let settings = fontdue::FontSettings {
-            scale: size,
-            ..fontdue::FontSettings::default()
-        };
-        let inner = fontdue::Font::from_bytes(data, settings)
-            .map_err(|e| EngineError::RenderError(format!("Failed to parse font: {}", e)))?;
+    /// `EngineResult<Font>`.
+    pub fn from_png_bytes(data: &[u8], cell_w: u32, cell_h: u32, has_box: bool) -> EngineResult<Font> {
+        let img = image::load_from_memory(data)
+            .map_err(|e| EngineError::RenderError(format!("Failed to decode bitmap font PNG: {}", e)))?
+            .to_rgba8();
 
-        let atlas_width = INITIAL_ATLAS_SIZE;
-        let atlas_height = INITIAL_ATLAS_SIZE;
-        let atlas_bitmap = vec![0u8; (atlas_width * atlas_height * 4) as usize];
+        let atlas_width = img.width();
+        let atlas_height = img.height();
+        let atlas_bitmap = img.into_raw();
 
-        let metrics = inner.horizontal_line_metrics(size);
-        let line_height = metrics
-            .map(|m| m.ascent - m.descent + m.line_gap)
-            .unwrap_or(size * 1.2);
-        let ascent = metrics.map(|m| m.ascent).unwrap_or(size);
-        let descent = metrics.map(|m| m.descent).unwrap_or(-size * 0.2);
-
-        let mut font = Font {
-            inner,
-            size,
-            glyphs: HashMap::new(),
+        Ok(Font {
             atlas_bitmap,
             atlas_width,
             atlas_height,
-            cursor_x: 0,
-            cursor_y: 0,
-            row_height: 0,
-            line_height,
-            ascent,
-            descent,
+            cell_width: cell_w,
+            cell_height: cell_h,
+            has_box_drawing: has_box,
+            line_height_mul: 1.0,
             dirty: true,
-        };
-
-        // Pre-rasterize printable ASCII
-        for ch in ' '..='~' {
-            font.ensure_glyph(ch);
-        }
-
-        Ok(font)
+        })
     }
 
-    /// Ensures a glyph is rasterized and present in the atlas cache.
+    /// Loads all 6 built-in bitmap font sizes from embedded PNGs.
     ///
-    /// If the character has already been rasterized, this is a no-op.
-    /// Otherwise the glyph is rasterized via fontdue and packed into the atlas.
+    /// # Returns
+    /// `Vec<(Font, u32, u32)>` — Each entry is `(font, cell_width, cell_height)`.
+    pub fn load_all_sizes() -> Vec<(Font, u32, u32)> {
+        let specs: [(u32, u32, &[u8], bool); 6] = [
+            (3, 5, FONT_3X5, false),
+            (5, 7, FONT_5X7, false),
+            (6, 10, FONT_6X10, true),
+            (8, 14, FONT_8X14, true),
+            (10, 18, FONT_10X18, true),
+            (12, 22, FONT_12X22, true),
+        ];
+
+        specs
+            .iter()
+            .filter_map(|&(cw, ch, data, has_box)| {
+                match Font::from_png_bytes(data, cw, ch, has_box) {
+                    Ok(font) => Some((font, cw, ch)),
+                    Err(e) => {
+                        log::warn!("Failed to load bitmap font {}x{}: {}", cw, ch, e);
+                        None
+                    }
+                }
+            })
+            .collect()
+    }
+
+    /// Returns the index into `AVAILABLE_HEIGHTS` for the nearest matching font size.
     ///
     /// # Parameters
-    /// - `ch` — The character to rasterize.
-    pub fn ensure_glyph(&mut self, ch: char) {
-        if self.glyphs.contains_key(&ch) {
-            return;
-        }
-
-        let (metrics, bitmap) = self.inner.rasterize(ch, self.size);
-
-        let glyph_w = metrics.width as u32;
-        let glyph_h = metrics.height as u32;
-
-        // Handle zero-size glyphs (e.g. space)
-        if glyph_w == 0 || glyph_h == 0 {
-            let info = GlyphInfo {
-                uv_x: 0.0,
-                uv_y: 0.0,
-                uv_w: 0.0,
-                uv_h: 0.0,
-                width: 0,
-                height: 0,
-                advance_width: metrics.advance_width,
-                offset_x: metrics.xmin as f32,
-                offset_y: metrics.ymin as f32,
-            };
-            self.glyphs.insert(ch, info);
-            return;
-        }
-
-        // Check if glyph fits in current row
-        if self.cursor_x + glyph_w + GLYPH_PADDING > self.atlas_width {
-            // Move to next row
-            self.cursor_y += self.row_height + GLYPH_PADDING;
-            self.cursor_x = 0;
-            self.row_height = 0;
-        }
-
-        // Check if we need to grow the atlas vertically
-        if self.cursor_y + glyph_h > self.atlas_height {
-            self.grow_atlas();
-        }
-
-        // Blit the single-channel alpha bitmap into the RGBA atlas
-        let x0 = self.cursor_x;
-        let y0 = self.cursor_y;
-        for row in 0..glyph_h {
-            for col in 0..glyph_w {
-                let src_idx = (row * glyph_w + col) as usize;
-                let alpha = bitmap[src_idx];
-                let dst_x = x0 + col;
-                let dst_y = y0 + row;
-                let dst_idx = ((dst_y * self.atlas_width + dst_x) * 4) as usize;
-                self.atlas_bitmap[dst_idx] = 255; // R
-                self.atlas_bitmap[dst_idx + 1] = 255; // G
-                self.atlas_bitmap[dst_idx + 2] = 255; // B
-                self.atlas_bitmap[dst_idx + 3] = alpha; // A
+    /// - `pixel_height` — Desired font height in pixels.
+    ///
+    /// # Returns
+    /// Index into `AVAILABLE_HEIGHTS` / `AVAILABLE_CELL_SIZES`.
+    pub fn nearest_size(pixel_height: u32) -> usize {
+        let mut best = 0;
+        let mut best_diff = u32::MAX;
+        for (i, &h) in AVAILABLE_HEIGHTS.iter().enumerate() {
+            let diff = pixel_height.abs_diff(h);
+            if diff < best_diff {
+                best_diff = diff;
+                best = i;
             }
         }
+        best
+    }
 
-        let info = GlyphInfo {
-            uv_x: x0 as f32 / self.atlas_width as f32,
-            uv_y: y0 as f32 / self.atlas_height as f32,
-            uv_w: glyph_w as f32 / self.atlas_width as f32,
-            uv_h: glyph_h as f32 / self.atlas_height as f32,
-            width: glyph_w,
-            height: glyph_h,
-            advance_width: metrics.advance_width,
-            offset_x: metrics.xmin as f32,
-            offset_y: metrics.ymin as f32,
-        };
-
-        self.cursor_x += glyph_w + GLYPH_PADDING;
-        if glyph_h > self.row_height {
-            self.row_height = glyph_h;
+    /// Returns the grid position `(col, row)` for a character in the sprite sheet.
+    fn glyph_position(&self, ch: char) -> Option<(u32, u32)> {
+        let cp = ch as u32;
+        if (0x20..0x80).contains(&cp) {
+            let idx = cp - 0x20;
+            Some((idx % 16, idx / 16))
+        } else if (0x2500..0x2580).contains(&cp) && self.has_box_drawing {
+            let idx = cp - 0x2500;
+            Some((idx % 16, 6 + idx / 16))
+        } else {
+            None
         }
+    }
 
-        self.glyphs.insert(ch, info);
-        self.dirty = true;
+    /// Returns glyph information for a character by computing its UV from the grid position.
+    ///
+    /// # Parameters
+    /// - `ch` — The character to look up.
+    ///
+    /// # Returns
+    /// `Option<GlyphInfo>`, or `None` if the character is not in this font's sprite sheet.
+    pub fn glyph(&self, ch: char) -> Option<GlyphInfo> {
+        let (col, row) = self.glyph_position(ch)?;
+
+        let px_x = col * self.cell_width;
+        let px_y = row * self.cell_height;
+
+        Some(GlyphInfo {
+            uv_x: px_x as f32 / self.atlas_width as f32,
+            uv_y: px_y as f32 / self.atlas_height as f32,
+            uv_w: self.cell_width as f32 / self.atlas_width as f32,
+            uv_h: self.cell_height as f32 / self.atlas_height as f32,
+            width: self.cell_width,
+            height: self.cell_height,
+            advance_width: self.cell_width as f32,
+            offset_x: 0.0,
+            offset_y: 0.0,
+        })
     }
 
     /// Returns the total advance width of the given text string in pixels.
-    ///
-    /// Ensures all characters are rasterized before measuring.
     ///
     /// # Parameters
     /// - `text` — The text string to measure.
     ///
     /// # Returns
-    /// The sum of advance widths for all characters.
-    pub fn text_width(&mut self, text: &str) -> f32 {
-        let mut width = 0.0;
+    /// The sum of advance widths for all characters. Unknown characters are skipped.
+    pub fn text_width(&self, text: &str) -> f32 {
+        let mut width = 0.0f32;
         for ch in text.chars() {
-            self.ensure_glyph(ch);
-            if let Some(info) = self.glyphs.get(&ch) {
+            if let Some(info) = self.glyph(ch) {
                 width += info.advance_width;
             }
         }
         width
     }
 
-    /// Returns the vertical line height (ascent - descent + line gap) in pixels.
+    /// Returns the vertical line height in pixels (cell_height x line_height_mul).
     ///
     /// # Returns
     /// `f32`.
     pub fn line_height(&self) -> f32 {
-        self.line_height
+        self.cell_height as f32 * self.line_height_mul
     }
 
-    /// Sets the vertical line height in pixels.
+    /// Sets the line height multiplier.
     ///
     /// # Parameters
-    /// - `height` — `f32`.
-    pub fn set_line_height(&mut self, height: f32) {
-        self.line_height = height;
+    /// - `mul` — `f32`. Multiplier applied to `cell_height` for line spacing.
+    pub fn set_line_height(&mut self, mul: f32) {
+        self.line_height_mul = mul;
     }
 
-    /// Returns the font's ascent (distance from baseline to top) in pixels.
+    /// Returns the font's ascent (cell_height as f32, for backwards compatibility).
     ///
     /// # Returns
     /// `f32`.
     pub fn ascent(&self) -> f32 {
-        self.ascent
+        self.cell_height as f32
     }
 
-    /// Returns the font's descent (distance from baseline to bottom, typically negative) in pixels.
+    /// Returns the font's descent (0.0 for bitmap fonts, for backwards compatibility).
     ///
     /// # Returns
     /// `f32`.
     pub fn descent(&self) -> f32 {
-        self.descent
+        0.0
     }
 
     /// Returns the atlas RGBA pixel data and its dimensions.
@@ -303,27 +288,31 @@ impl Font {
         self.dirty = false;
     }
 
-    /// Returns glyph information for a character, rasterizing it on demand if needed.
-    ///
-    /// # Parameters
-    /// - `ch` — The character to look up.
-    ///
-    /// # Returns
-    /// A reference to the `GlyphInfo`, or `None` if rasterization fails.
-    pub fn glyph(&mut self, ch: char) -> Option<&GlyphInfo> {
-        self.ensure_glyph(ch);
-        self.glyphs.get(&ch)
-    }
-
-    /// Returns the font size in pixels that this font was created with.
+    /// Returns the font cell height as f32 (the effective "size" of this bitmap font).
     ///
     /// # Returns
     /// `f32`.
     pub fn size(&self) -> f32 {
-        self.size
+        self.cell_height as f32
     }
 
-    /// Break text into lines that fit within `limit` pixel width.
+    /// Returns the glyph cell width in pixels.
+    ///
+    /// # Returns
+    /// `u32`.
+    pub fn cell_width(&self) -> u32 {
+        self.cell_width
+    }
+
+    /// Returns whether this font includes box-drawing characters.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn has_box_drawing(&self) -> bool {
+        self.has_box_drawing
+    }
+
+    /// Breaks text into lines that fit within `limit` pixel width.
     ///
     /// # Parameters
     /// - `text` — `&str`.
@@ -331,7 +320,7 @@ impl Font {
     ///
     /// # Returns
     /// `Vec<String>`.
-    pub fn wrap_text(&mut self, text: &str, limit: f32) -> Vec<String> {
+    pub fn wrap_text(&self, text: &str, limit: f32) -> Vec<String> {
         let mut lines = Vec::new();
         for line in text.split('\n') {
             if line.is_empty() {
@@ -366,46 +355,5 @@ impl Font {
             lines.push(String::new());
         }
         lines
-    }
-
-    /// Doubles the atlas dimensions (up to `MAX_ATLAS_SIZE`) and copies existing data.
-    fn grow_atlas(&mut self) {
-        let new_width = (self.atlas_width * 2).min(MAX_ATLAS_SIZE);
-        let new_height = (self.atlas_height * 2).min(MAX_ATLAS_SIZE);
-
-        if new_width == self.atlas_width && new_height == self.atlas_height {
-            log_msg!(
-                warn,
-                G006_ATLAS_MAX_SIZE,
-                "{}x{}",
-                MAX_ATLAS_SIZE,
-                MAX_ATLAS_SIZE
-            );
-            return;
-        }
-
-        let mut new_bitmap = vec![0u8; (new_width * new_height * 4) as usize];
-
-        // Copy existing rows into the new bitmap
-        for row in 0..self.atlas_height {
-            let src_start = (row * self.atlas_width * 4) as usize;
-            let src_end = src_start + (self.atlas_width * 4) as usize;
-            let dst_start = (row * new_width * 4) as usize;
-            let dst_end = dst_start + (self.atlas_width * 4) as usize;
-            new_bitmap[dst_start..dst_end].copy_from_slice(&self.atlas_bitmap[src_start..src_end]);
-        }
-
-        // Recalculate UVs for existing glyphs
-        for info in self.glyphs.values_mut() {
-            info.uv_x = info.uv_x * self.atlas_width as f32 / new_width as f32;
-            info.uv_y = info.uv_y * self.atlas_height as f32 / new_height as f32;
-            info.uv_w = info.uv_w * self.atlas_width as f32 / new_width as f32;
-            info.uv_h = info.uv_h * self.atlas_height as f32 / new_height as f32;
-        }
-
-        self.atlas_bitmap = new_bitmap;
-        self.atlas_width = new_width;
-        self.atlas_height = new_height;
-        self.dirty = true;
     }
 }

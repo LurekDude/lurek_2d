@@ -970,7 +970,7 @@ Name every `describe()` block that targets a specific API function after that fu
 
 ```lua
 describe("lurek.audio.newBus", function()   -- module function
-    it("creates bus with given name", ...) 
+    it("creates bus with given name", ...)
     it("rejects empty name", ...)
 end)
 

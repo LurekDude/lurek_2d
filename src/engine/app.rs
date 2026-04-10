@@ -24,7 +24,7 @@ use crate::engine::resource_keys::{
 };
 use crate::engine::shared_state::WindowState;
 use crate::engine::{FullscreenType, SharedState};
-use crate::graphics::renderer::{DrawCommand, DrawMode, TextureData};
+use crate::graphics::renderer::{DrawMode, RenderCommand, TextureData};
 use crate::graphics::GpuRenderer;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
@@ -214,7 +214,7 @@ struct LunaApp {
     max_surface_dim: u32,
 
     /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
-    render_cmd_buf: Vec<DrawCommand>,
+    render_cmd_buf: Vec<RenderCommand>,
 
     /// If `Some`, write an auto-screenshot PNG to this absolute path and quit.
     auto_screenshot_path: Option<PathBuf>,
@@ -551,9 +551,9 @@ impl LunaApp {
 
         let state = Rc::new(RefCell::new(shared_state));
 
-        // Load the embedded OpenSans default font before Lua starts — all lurek.gfx.print()
-        // calls without an active font will use this instead of the bitmap fallback.
-        state.borrow_mut().load_default_font();
+        // Load the embedded bitmap default fonts before Lua starts — all lurek.gfx.print()
+        // calls without an active font will use these instead of the bitmap fallback.
+        state.borrow_mut().load_default_fonts();
 
         let lua = match create_lua_vm(state.clone(), &self.config.modules) {
             Ok(l) => l,
@@ -858,7 +858,7 @@ impl LunaApp {
         }
 
         // ── 5. render (main draw pass) ──────────────────────────────────
-        state.borrow_mut().draw_commands.clear();
+        state.borrow_mut().render_commands.clear();
         if let Err(e) = call_lua_callback_checked(lua, "render", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
@@ -875,9 +875,12 @@ impl LunaApp {
             let st = state.borrow();
             (st.fps, st.render_stats.draw_calls, st.window_width)
         };
-        let overlay_cmds = self.debug_overlay.draw_commands(w, fps, draw_calls);
+        let overlay_font = state.borrow().active_font.or(state.borrow().default_font);
+        let overlay_cmds =
+            self.debug_overlay
+                .build_render_commands(w, fps, draw_calls, overlay_font);
         if !overlay_cmds.is_empty() {
-            state.borrow_mut().draw_commands.extend(overlay_cmds);
+            state.borrow_mut().render_commands.extend(overlay_cmds);
         }
     }
 
@@ -907,7 +910,7 @@ impl LunaApp {
         ) = {
             let st = state.borrow();
             (
-                st.draw_commands.clone(),
+                st.render_commands.clone(),
                 st.textures.clone(),
                 st.shaders.clone(),
                 st.default_filter.clone(),
@@ -932,29 +935,29 @@ impl LunaApp {
         if use_viewport {
             self.render_cmd_buf.clear();
             if vp_mode == "letterbox" || vp_mode == "pixel" {
-                self.render_cmd_buf.push(DrawCommand::SetScissor(Some((
+                self.render_cmd_buf.push(RenderCommand::SetScissor(Some((
                     vp_offset_x,
                     vp_offset_y,
                     game_w * vp_scale_x,
                     game_h * vp_scale_y,
                 ))));
             }
-            self.render_cmd_buf.push(DrawCommand::PushTransform);
-            self.render_cmd_buf.push(DrawCommand::Translate {
+            self.render_cmd_buf.push(RenderCommand::PushTransform);
+            self.render_cmd_buf.push(RenderCommand::Translate {
                 x: vp_offset_x,
                 y: vp_offset_y,
             });
-            self.render_cmd_buf.push(DrawCommand::Scale {
+            self.render_cmd_buf.push(RenderCommand::Scale {
                 sx: vp_scale_x,
                 sy: vp_scale_y,
             });
             self.render_cmd_buf.extend(commands.iter().cloned());
-            self.render_cmd_buf.push(DrawCommand::PopTransform);
+            self.render_cmd_buf.push(RenderCommand::PopTransform);
             if vp_mode == "letterbox" || vp_mode == "pixel" {
-                self.render_cmd_buf.push(DrawCommand::SetScissor(None));
+                self.render_cmd_buf.push(RenderCommand::SetScissor(None));
             }
         }
-        let final_commands: &Vec<DrawCommand> = if use_viewport {
+        let final_commands: &Vec<RenderCommand> = if use_viewport {
             &self.render_cmd_buf
         } else {
             &commands
@@ -1102,19 +1105,32 @@ impl LunaApp {
             .as_ref()
             .map_or(0.0, |s| s.borrow().clock.total());
 
-        // Lazily initialise shared TTF engine fonts (used by both splash and error screens).
+        // Lazily initialise shared bitmap engine fonts (used by both splash and error screens).
         if self.engine_fonts.is_none() {
-            static FONT_DATA: &[u8] = include_bytes!("../../assets/fonts/OpenSans.ttf");
             let mut fonts: SlotMap<FontKey, crate::graphics::Font> = SlotMap::with_key();
-            let title_font =
-                crate::graphics::Font::from_bytes(FONT_DATA, 36.0).expect("embedded font");
-            let small_font =
-                crate::graphics::Font::from_bytes(FONT_DATA, 18.0).expect("embedded font");
-            let title_key = fonts.insert(title_font);
-            let small_key = fonts.insert(small_font);
-            self.engine_fonts = Some((fonts, title_key, small_key));
+            let all = crate::graphics::Font::load_all_sizes();
+            // title = nearest to 36px (index 5 = 22px), small = nearest to 18px (index 4 = 18px)
+            let title_idx = crate::graphics::Font::nearest_size(36);
+            let small_idx = crate::graphics::Font::nearest_size(18);
+            let mut title_key = None;
+            let mut small_key = None;
+            for (i, (font, _cw, _ch)) in all.into_iter().enumerate() {
+                let key = fonts.insert(font);
+                if i == title_idx {
+                    title_key = Some(key);
+                }
+                if i == small_idx {
+                    small_key = Some(key);
+                }
+            }
+            let tk = title_key.expect("embedded bitmap fonts");
+            let sk = small_key.expect("embedded bitmap fonts");
+            self.engine_fonts = Some((fonts, tk, sk));
         }
-        let (splash_fonts, _title_key, small_key) = self.engine_fonts.as_mut().expect("engine_fonts initialized above");
+        let (splash_fonts, _title_key, small_key) = self
+            .engine_fonts
+            .as_mut()
+            .expect("engine_fonts initialized above");
 
         if self.splash_branding.is_none() && !self.splash_branding_failed {
             self.splash_branding = load_splash_branding();
@@ -1167,21 +1183,33 @@ impl LunaApp {
             return;
         };
 
-        // Re-use the shared engine fonts (same OpenSans 36/18 pt as the splash screen).
+        // Re-use the shared bitmap engine fonts (same sizes as the splash screen).
         if self.engine_fonts.is_none() {
-            static FONT_DATA: &[u8] = include_bytes!("../../assets/fonts/OpenSans.ttf");
             let mut fonts: SlotMap<FontKey, crate::graphics::Font> = SlotMap::with_key();
-            let title_font =
-                crate::graphics::Font::from_bytes(FONT_DATA, 36.0).expect("embedded font");
-            let small_font =
-                crate::graphics::Font::from_bytes(FONT_DATA, 18.0).expect("embedded font");
-            let title_key = fonts.insert(title_font);
-            let small_key = fonts.insert(small_font);
-            self.engine_fonts = Some((fonts, title_key, small_key));
+            let all = crate::graphics::Font::load_all_sizes();
+            let title_idx = crate::graphics::Font::nearest_size(36);
+            let small_idx = crate::graphics::Font::nearest_size(18);
+            let mut title_key = None;
+            let mut small_key = None;
+            for (i, (font, _cw, _ch)) in all.into_iter().enumerate() {
+                let key = fonts.insert(font);
+                if i == title_idx {
+                    title_key = Some(key);
+                }
+                if i == small_idx {
+                    small_key = Some(key);
+                }
+            }
+            let tk = title_key.expect("embedded bitmap fonts");
+            let sk = small_key.expect("embedded bitmap fonts");
+            self.engine_fonts = Some((fonts, tk, sk));
         }
-        let (error_fonts, heading_key, body_key) = self.engine_fonts.as_mut().expect("engine_fonts initialized above");
+        let (error_fonts, heading_key, body_key) = self
+            .engine_fonts
+            .as_mut()
+            .expect("engine_fonts initialized above");
 
-        let cmds = error_screen.draw_commands(
+        let cmds = error_screen.build_render_commands(
             renderer.width,
             renderer.height,
             Some(*heading_key),
@@ -2476,7 +2504,7 @@ fn make_splash_commands(
     fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
     branding: Option<&SplashBranding>,
     drag_hover: bool,
-) -> Vec<DrawCommand> {
+) -> Vec<RenderCommand> {
     let width_f = width as f32;
     let height_f = height as f32;
     let cx = width_f / 2.0;
@@ -2493,7 +2521,7 @@ fn make_splash_commands(
     let top_margin = 24.0_f32;
     let hint_band_top = height_f - 82.0;
 
-    let mut cmds: Vec<DrawCommand> = Vec::new();
+    let mut cmds: Vec<RenderCommand> = Vec::new();
 
     if let Some(branding) = branding {
         let (icon_w, icon_h) = fit_contain_size(
@@ -2518,8 +2546,8 @@ fn make_splash_commands(
             (banner_center_y - banner_h * 0.5 - 32.0 - icon_h * 0.5).max(icon_center_min);
         let icon_center_y = (height_f * 0.33).clamp(icon_center_min, icon_center_max);
 
-        cmds.push(DrawCommand::SetColor(1.0, 1.0, 1.0, 1.0));
-        cmds.push(DrawCommand::DrawImageEx {
+        cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 1.0));
+        cmds.push(RenderCommand::DrawImageEx {
             texture_key: branding.large_icon.texture_key,
             x: cx,
             y: icon_center_y,
@@ -2530,7 +2558,7 @@ fn make_splash_commands(
             oy: branding.large_icon.height as f32 * 0.5,
             effect: None,
         });
-        cmds.push(DrawCommand::DrawImageEx {
+        cmds.push(RenderCommand::DrawImageEx {
             texture_key: branding.banner.texture_key,
             x: cx,
             y: banner_center_y,
@@ -2545,19 +2573,19 @@ fn make_splash_commands(
 
     // ── Drop hint (bottom of screen) ─────────────────────────────────────────
     if drag_hover {
-        cmds.push(DrawCommand::SetColor(0.40, 0.80, 0.40, 0.15));
-        cmds.push(DrawCommand::Rectangle {
+        cmds.push(RenderCommand::SetColor(0.40, 0.80, 0.40, 0.15));
+        cmds.push(RenderCommand::Rectangle {
             mode: DrawMode::Fill,
             x: cx - 220.0,
             y: height_f - 70.0,
             w: 440.0,
             h: 40.0,
         });
-        cmds.push(DrawCommand::SetColor(0.50, 0.90, 0.50, 1.0));
+        cmds.push(RenderCommand::SetColor(0.50, 0.90, 0.50, 1.0));
     } else {
-        cmds.push(DrawCommand::SetColor(0.35, 0.30, 0.45, 1.0));
+        cmds.push(RenderCommand::SetColor(0.35, 0.30, 0.45, 1.0));
     }
-    cmds.push(DrawCommand::PrintFont {
+    cmds.push(RenderCommand::Print {
         font_key: small_key,
         text: hint_text.to_string(),
         x: cx - hint_w / 2.0,

@@ -88,7 +88,7 @@ Tests: body-entity sync, collision events on entities, removing entity removes b
 
 #### test_entity_graphics.lua
 ```
-Modules: entity + graphics  
+Modules: entity + graphics
 Scenario: Create entity → set sprite/draw component → verify draw commands generated
 Tests: entity position → draw position sync, visibility toggle, z-ordering
 ```
@@ -266,7 +266,7 @@ Evidence: Canvas pixel readback before/after effect application
 
 #### test_graphics_animation.lua
 ```
-Modules: graphics + animation  
+Modules: graphics + animation
 Scenario: Animation drives which sprite frame is drawn
 Tests: animation at frame 0 draws expected region, advance to frame N draws correct region
 Evidence: Canvas pixel readback verifies different pixel regions per frame
@@ -342,7 +342,7 @@ Tests: build playlist table → toJSON → fromJSON → recreate same source lis
 
 #### test_audio_filesystem.lua
 ```
-Modules: audio + filesystem  
+Modules: audio + filesystem
 Scenario: Audio sources loaded from GameFS sandbox
 Tests: load sound from game folder → plays from correct path; invalid path → descriptive LuaError
 Tests: streaming source reads chunks from filesystem without full load

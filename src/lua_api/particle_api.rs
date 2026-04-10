@@ -1,5 +1,6 @@
 //! `luna.particles` — Emitter-based 2D particle systems and trail ribbons.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -803,6 +804,100 @@ impl LuaUserData for LuaParticleSystem {
             Ok(())
         });
 
+
+        // -- render --
+        /// Renders all live particles to the GPU command queue.
+        ///
+        /// Calls `build_render_commands` on the particle system and expands the resulting
+        /// `DrawParticleSystem` snapshot into per-particle `RenderCommand` primitives
+        /// (geometry or textured sprites). Must be called inside `lurek.render`.
+        ///
+        /// @param ox : number?  World X offset added to every particle (default 0).
+        /// @param oy : number?  World Y offset added to every particle (default 0).
+        /// @return nil
+        methods.add_method("render", |_, this, (ox, oy): (Option<f32>, Option<f32>)| {
+            use crate::graphics::renderer::{DrawMode, ParticleRenderShape, RenderCommand};
+            let ox = ox.unwrap_or(0.0);
+            let oy = oy.unwrap_or(0.0);
+            // Snapshot particles while borrowing immutably; drop borrow before borrow_mut.
+            let cmds = {
+                let st = this.state.borrow();
+                match st.particle_systems.get(this.key) {
+                    Some(ps) => ps.build_render_commands(ox, oy),
+                    None => return Ok(()),
+                }
+            };
+            // Expand DrawParticleSystem into per-particle primitives.
+            let mut st = this.state.borrow_mut();
+            for cmd in cmds {
+                if let RenderCommand::DrawParticleSystem { particles } = cmd {
+                    for p in &particles {
+                        if let Some(tex_key) = p.texture_key {
+                            if let Some([qx, qy, qw, qh]) = p.quad {
+                                let (tex_w, tex_h) = p.quad_tex_dims.unwrap_or((qw, qh));
+                                let scale = if qw > 0.0 { p.size / qw } else { 1.0 };
+                                st.render_commands.push(RenderCommand::DrawQuad {
+                                    texture_key: tex_key,
+                                    quad_x: qx, quad_y: qy, quad_w: qw, quad_h: qh,
+                                    tex_w, tex_h,
+                                    x: p.x, y: p.y, rotation: p.rotation,
+                                    sx: scale, sy: scale,
+                                    ox: p.size * 0.5, oy: p.size * 0.5,
+                                    effect: None,
+                                });
+                            } else {
+                                st.render_commands.push(RenderCommand::DrawImageEx {
+                                    texture_key: tex_key,
+                                    x: p.x, y: p.y, rotation: p.rotation,
+                                    sx: 1.0, sy: 1.0,
+                                    ox: p.size * 0.5, oy: p.size * 0.5,
+                                    effect: None,
+                                });
+                            }
+                        } else {
+                            st.render_commands.push(RenderCommand::SetColor(p.r, p.g, p.b, p.a));
+                            let half = p.size * 0.5;
+                            match p.shape {
+                                ParticleRenderShape::Square | ParticleRenderShape::Diamond => {
+                                    st.render_commands.push(RenderCommand::Rectangle {
+                                        mode: DrawMode::Fill,
+                                        x: p.x - half, y: p.y - half,
+                                        w: p.size, h: p.size,
+                                    });
+                                }
+                                ParticleRenderShape::Circle => {
+                                    st.render_commands.push(RenderCommand::Circle {
+                                        mode: DrawMode::Fill,
+                                        x: p.x, y: p.y, r: half,
+                                    });
+                                }
+                                ParticleRenderShape::Triangle => {
+                                    st.render_commands.push(RenderCommand::Triangle {
+                                        mode: DrawMode::Fill,
+                                        x1: p.x, y1: p.y - half,
+                                        x2: p.x - half, y2: p.y + half,
+                                        x3: p.x + half, y3: p.y + half,
+                                    });
+                                }
+                                ParticleRenderShape::Spark => {
+                                    let len = p.size * 1.5;
+                                    let dx = p.rotation.cos() * len;
+                                    let dy = p.rotation.sin() * len;
+                                    st.render_commands.push(RenderCommand::Line {
+                                        x1: p.x - dx, y1: p.y - dy,
+                                        x2: p.x + dx, y2: p.y + dy,
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    st.render_commands.push(cmd);
+                }
+            }
+            Ok(())
+        });
+
         // -- clone --
         /// Creates a copy of this particle system (config only, no live particles).
         /// @return ParticleSystem
@@ -815,6 +910,19 @@ impl LuaUserData for LuaParticleSystem {
             };
             let key = state.borrow_mut().particle_systems.insert(new_ps);
             lua.create_userdata(LuaParticleSystem { state, key })
+        });
+
+        // -- drawToImage --
+        /// Renders all live particles to a CPU ImageData.
+        /// @param width : integer
+        /// @param height : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
+            let st = this.state.borrow();
+            let ps = st.particle_systems.get(this.key)
+                .ok_or_else(|| LuaError::runtime("ParticleSystem handle is invalid (released)"))?;
+            let img = ps.draw_to_image(w, h);
+            Ok(LuaImageData { inner: img })
         });
     }
 }
@@ -932,6 +1040,16 @@ impl LuaUserData for LuaTrail {
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
+        });
+
+        // -- drawToImage --
+        /// Renders the trail ribbon to a CPU ImageData.
+        /// @param width : integer
+        /// @param height : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
+            let img = this.inner.draw_to_image(w, h);
+            Ok(LuaImageData { inner: img })
         });
     }
 }

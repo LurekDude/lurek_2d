@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use lurek2d::engine::config::Config;
-use lurek2d::graphics::renderer::{DrawCommand, ParticleRenderShape};
+use lurek2d::graphics::renderer::{RenderCommand, ParticleRenderShape};
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 use lurek2d::particle::{
     interpolate_colors, interpolate_sizes, AreaDistribution, EmissionShape, InsertMode,
@@ -304,12 +304,12 @@ fn particle_draw_generates_commands() {
     let st = state.borrow();
     // draw_commands batches all particles into a single DrawParticleSystem command
     assert_eq!(
-        st.draw_commands.len(),
+        st.render_commands.len(),
         1,
         "expected one DrawParticleSystem command"
     );
-    match &st.draw_commands[0] {
-        DrawCommand::DrawParticleSystem { particles } => {
+    match &st.render_commands[0] {
+        RenderCommand::DrawParticleSystem { particles } => {
             assert!(!particles.is_empty(), "particles list should be non-empty");
         }
         other => panic!("expected DrawParticleSystem, got {:?}", other),
@@ -1326,14 +1326,14 @@ fn particle_system_draw_commands_returns_one_entry() {
     sys.emit(10);
     assert_eq!(sys.count(), 10);
 
-    let cmds = sys.draw_commands(0.0, 0.0);
+    let cmds = sys.build_render_commands(0.0, 0.0);
     assert_eq!(
         cmds.len(),
         1,
         "draw_commands should return exactly one DrawParticleSystem"
     );
     match &cmds[0] {
-        DrawCommand::DrawParticleSystem { particles } => {
+        RenderCommand::DrawParticleSystem { particles } => {
             assert_eq!(particles.len(), 10, "should have 10 particle instances");
         }
         other => panic!("expected DrawParticleSystem, got {:?}", other),
@@ -1344,7 +1344,7 @@ fn particle_system_draw_commands_returns_one_entry() {
 fn particle_system_draw_commands_empty_when_no_particles() {
     let sys = ParticleSystem::new(ParticleConfig::default());
     assert_eq!(sys.count(), 0);
-    let cmds = sys.draw_commands(0.0, 0.0);
+    let cmds = sys.build_render_commands(0.0, 0.0);
     assert!(
         cmds.is_empty(),
         "fresh system with no particles should return empty draw list"
@@ -1362,9 +1362,9 @@ fn particle_instance_color_matches_config() {
     sys.stop();
     sys.emit(1);
 
-    let cmds = sys.draw_commands(0.0, 0.0);
+    let cmds = sys.build_render_commands(0.0, 0.0);
     let particles = match &cmds[0] {
-        DrawCommand::DrawParticleSystem { particles } => particles,
+        RenderCommand::DrawParticleSystem { particles } => particles,
         other => panic!("expected DrawParticleSystem, got {:?}", other),
     };
     let inst = &particles[0];
@@ -1396,9 +1396,9 @@ fn particle_instance_shape_reflects_config() {
     sys.stop();
     sys.emit(1);
 
-    let cmds = sys.draw_commands(0.0, 0.0);
+    let cmds = sys.build_render_commands(0.0, 0.0);
     let particles = match &cmds[0] {
-        DrawCommand::DrawParticleSystem { particles } => particles,
+        RenderCommand::DrawParticleSystem { particles } => particles,
         other => panic!("expected DrawParticleSystem, got {:?}", other),
     };
     assert!(
@@ -1418,9 +1418,9 @@ fn particle_spark_shape_draw_commands() {
     sys.stop();
     sys.emit(1);
 
-    let cmds = sys.draw_commands(0.0, 0.0);
+    let cmds = sys.build_render_commands(0.0, 0.0);
     let particles = match &cmds[0] {
-        DrawCommand::DrawParticleSystem { particles } => particles,
+        RenderCommand::DrawParticleSystem { particles } => particles,
         other => panic!("expected DrawParticleSystem, got {:?}", other),
     };
     assert!(

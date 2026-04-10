@@ -43,7 +43,7 @@
 
 1. **Add one-way platforms**: `body:setOneWay(true, direction)` — essential for platformers. This alone would unlock a major genre.
 2. **Add collision callbacks**: `world:setBeginContact(fn)` / `world:setEndContact(fn)` — more ergonomic than polling. Keep polling as an alternative.
-3. **Add debug draw**: `world:debugDraw()` — renders all collider wireframes, joint lines, contact points. Use DrawCommand queue like everything else.
+3. **Add debug draw**: `world:debugDraw()` — renders all collider wireframes, joint lines, contact points. Use RenderCommand queue like everything else.
 4. **Add CCD flag**: `body:setCCD(enabled)` — prevent tunneling for bullets, fast projectiles.
 5. **Create lightweight collision module** (new): `lurek.collision.testAABB(a, b)`, `lurek.collision.testCircles(...)` — no physics world needed. Many game types (puzzle, RPG, visual novel with interactable regions) need overlap detection without simulation.
 6. **Add breakable joints**: `joint:setBreakForce(max)` — enables destructible structures, a popular game mechanic.

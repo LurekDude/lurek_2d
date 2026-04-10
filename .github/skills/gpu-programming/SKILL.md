@@ -1,13 +1,13 @@
 ---
 name: gpu-programming
-description: "Load this skill when working with the Lurek2D GPU rendering pipeline: wgpu device/surface setup, DrawCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
+description: "Load this skill when working with the Lurek2D GPU rendering pipeline: wgpu device/surface setup, RenderCommand queue, render passes, texture management, custom WGSL shaders, blend modes, canvas render-to-texture, or transform stacks. Also covers profiling GPU frame time and diagnosing wgpu validation errors. Skip it for font rasterization details, Lua API design, or physics."
 ---
 
 # GPU Programming — Lurek2D
 
 ## Load When
 
-- Implementing or modifying a `DrawCommand` variant
+- Implementing or modifying a `RenderCommand` variant
 - Adding a wgpu render pipeline (new blend mode, new shader type)
 - Writing or debugging custom WGSL shaders
 - Texture management — loading, uploading, caching by `TextureKey`
@@ -18,7 +18,7 @@ description: "Load this skill when working with the Lurek2D GPU rendering pipeli
 ## Owns
 
 - wgpu device/adapter/surface setup and swapchain lifecycle
-- `DrawCommand` queue lifecycle and variant dispatch
+- `RenderCommand` queue lifecycle and variant dispatch
 - Built-in WGSL shaders and custom user shader pipeline
 - Texture upload, format selection, and deferred destruction
 - Blend mode pipeline cache
@@ -39,27 +39,27 @@ winit Window (Arc<Window>)
 
 Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes through `GpuRenderer` in `src/graphics/gpu_renderer.rs`.
 
-## DrawCommand Queue Lifecycle
+## RenderCommand Queue Lifecycle
 
 ```
 lua.draw() callback:
   → Lua calls lurek.gfx.drawImage(img, x, y)
-  → lua_api pushes DrawCommand::DrawImage { ... } into SharedState::draw_commands
+  → lua_api pushes RenderCommand::DrawImage { ... } into SharedState::render_commands
 
 After lurek.draw() returns:
-  → GpuRenderer::render_frame(draw_commands) processes the queue
+  → GpuRenderer::render_frame(render_commands) processes the queue
   → Each variant maps to wgpu render pass calls
   → swapchain present
 ```
 
 **Invariants:**
-- Never render inside a Lua closure — push DrawCommands only
-- `draw_commands` is cleared at the start of each frame's draw step (step 7)
+- Never render inside a Lua closure — push RenderCommands only
+- `render_commands` is cleared at the start of each frame's draw step (step 7)
 - Only one `wgpu::CommandEncoder` is created per frame in `render_frame()`
 
-## Adding a New DrawCommand Variant
+## Adding a New RenderCommand Variant
 
-1. Add variant to `DrawCommand` enum in `src/graphics/renderer.rs`
+1. Add variant to `RenderCommand` enum in `src/graphics/renderer.rs`
 2. Add execution arm in `src/graphics/gpu_renderer.rs` (match arm)
 3. Add Lua push function in `src/lua_api/graphics_api.rs`
 4. Add Lua BDD test in `tests/lua/unit/test_graphics.lua`
@@ -122,8 +122,8 @@ let texture_key = state.borrow_mut().textures.insert(TextureData {
 });
 gpu_renderer.upload_texture(texture_key, rgba_bytes);
 
-// Reference by key in DrawCommand:
-DrawCommand::DrawImage { texture_key, x, y, w, h, ... }
+// Reference by key in RenderCommand:
+RenderCommand::DrawImage { texture_key, x, y, w, h, ... }
 
 // Release (queued for deferred GPU destruction at next frame start):
 state.borrow_mut().textures.remove(texture_key);

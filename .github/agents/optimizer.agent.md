@@ -16,7 +16,7 @@ Profile the Lurek2D engine, identify performance bottlenecks, and recommend opti
 - Hot-path identification in the game loop
 - Frame budget analysis (16.6ms target for 60fps)
 - Memory allocation profiling and reduction strategies
-- Rendering pipeline performance (DrawCommand throughput)
+- Rendering pipeline performance (RenderCommand throughput)
 - Physics step performance (collision detection scaling)
 - Lua/Rust boundary crossing overhead analysis
 

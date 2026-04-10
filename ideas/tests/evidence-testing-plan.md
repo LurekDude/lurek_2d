@@ -248,7 +248,7 @@ tests/rust/ext/light_smoke_tests.rs
 ```
 
 Each light test:
-1. Render scene WITHOUT the light feature → save `no_light.png`  
+1. Render scene WITHOUT the light feature → save `no_light.png`
 2. Render scene WITH the light feature → save `with_light.png`
 3. Compare pixel brightness at the illuminated region: `with_light` must be brighter
 
@@ -502,7 +502,7 @@ tests/rust/ext/light_smoke_tests.rs
 ```
 
 Each light test:
-1. Render scene WITHOUT the light feature → save `no_light.png`  
+1. Render scene WITHOUT the light feature → save `no_light.png`
 2. Render scene WITH the light feature → save `with_light.png`
 3. Compare pixel brightness at the illuminated region: `with_light` must be brighter
 

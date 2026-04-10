@@ -1,6 +1,6 @@
 ---
 description: "**Architect** — Design Lurek2D module structure, dependency graph, and API organization. Own module boundaries, crate layout, and dependency direction rules. Does not implement code."
-tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, vscode.mermaid-chat-features/renderMermaidDiagram, todo]
 name: Architect
 ---
 

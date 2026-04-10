@@ -14,7 +14,7 @@
 
 The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
 
-The module is purely a data container layer. It holds no GPU resources, performs no rendering, and issues no draw commands. The renderer reads `LightWorld` state each frame and produces the actual lighting pass via `DrawCommand` variants in the graphics pipeline. This separation means the light module can be tested headlessly without a GPU context.
+The module is purely a data container layer. It holds no GPU resources, performs no rendering, and issues no draw commands. The renderer reads `LightWorld` state each frame and produces the actual lighting pass via `RenderCommand` variants in the graphics pipeline. This separation means the light module can be tested headlessly without a GPU context.
 
 Key design decisions: (1) `Light2D` is a flat struct with 23 public fields covering all light parameters — no inheritance or trait hierarchy. (2) `LightWorld` uses `SlotMap<LightKey, Light2D>` and `SlotMap<OccluderKey, Occluder>` for O(1) insert/remove/lookup with generational key safety. (3) The system auto-enables when the first light is added. (4) Bitmask fields (`light_mask`, `shadow_mask`) control per-light/per-occluder interaction filtering. (5) `FlickerConfig` provides built-in sinusoidal intensity modulation driven by `advance_flickers(dt)` on the world. (6) Group operations (`set_group_enabled`, `set_group_intensity`, `set_group_color`) allow batch control of lights sharing a `group_id`.
 
@@ -55,7 +55,7 @@ Data flow:
   Lua scripts → lurek.light.* (light_api.rs)
     → mutates LightWorld in SharedState
       → renderer reads LightWorld during render_frame()
-        → produces lighting pass via DrawCommand queue
+        → produces lighting pass via RenderCommand queue
 ```
 
 ## Source Files

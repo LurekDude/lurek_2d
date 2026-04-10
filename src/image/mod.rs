@@ -28,5 +28,8 @@ pub use palette_lut::PaletteLUT;
 pub mod layers;
 pub use layers::{ImageLayer, LayeredImage};
 
+/// Standalone visualization helpers for Tier 1 modules (animation, camera, etc.).
+pub mod visualization;
+
 /// Binary `.lim` format serialization for [`ImageData`] and [`LayeredImage`].
 pub mod serial;

@@ -20,14 +20,14 @@ use crate::camera::Camera;
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
-use crate::signal::EventQueue;
 use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
-use crate::graphics::renderer::{BlendMode, DepthMode, DrawCommand, StencilMode, TextureData};
+use crate::graphics::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
 use crate::graphics::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
 use crate::light::LightWorld;
 use crate::particle::ParticleSystem;
+use crate::signal::EventQueue;
 use crate::timer::Clock;
 
 /// Fullscreen mode type for window management.
@@ -222,7 +222,7 @@ pub struct ScreenshotRequest {
 /// Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
 ///
 /// # Fields
-/// - `draw_commands` — Queue of pending `DrawCommand` values, flushed each frame.
+/// - `render_commands` — Queue of pending `RenderCommand` values, flushed each frame.
 /// - `current_color` — Active RGBA draw color `[r, g, b, a]`.
 /// - `background_color` — Screen clear color set by `lurek.gfx.setBackgroundColor`.
 /// - `textures` — Loaded texture pixel data, indexed by `Texture::id`.
@@ -251,7 +251,7 @@ pub struct ScreenshotRequest {
 /// # Fields
 /// Shared mutable state accessible by both the engine loop and Lua closures.
 pub struct SharedState {
-    pub draw_commands: Vec<DrawCommand>,
+    pub render_commands: Vec<RenderCommand>,
     pub current_color: [f32; 4],
     pub background_color: [f32; 4],
     pub textures: SlotMap<TextureKey, TextureData>,
@@ -278,8 +278,10 @@ pub struct SharedState {
     pub fonts: SlotMap<FontKey, crate::graphics::Font>,
     /// Key of the currently active font (`None` = use default engine font).
     pub active_font: Option<FontKey>,
-    /// Built-in OpenSans engine font loaded at startup — used when `active_font` is `None`.
+    /// Built-in bitmap engine font loaded at startup — used when `active_font` is `None`.
     pub default_font: Option<FontKey>,
+    /// All 6 built-in bitmap font sizes, indexed by `AVAILABLE_HEIGHTS` order.
+    pub default_fonts: [Option<FontKey>; 6],
     /// Loaded sprite batches for batched rendering.
     pub sprite_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>,
     /// Off-screen render targets (canvases) for compositing.
@@ -375,7 +377,7 @@ impl SharedState {
     pub fn new(width: u32, height: u32, title: &str, game_dir: PathBuf) -> Self {
         let fs = GameFS::new(game_dir.clone());
         SharedState {
-            draw_commands: Vec::new(),
+            render_commands: Vec::new(),
             current_color: [1.0, 1.0, 1.0, 1.0],
             background_color: [0.15, 0.12, 0.25, 1.0],
             textures: SlotMap::with_key(),
@@ -398,6 +400,7 @@ impl SharedState {
             fonts: SlotMap::with_key(),
             active_font: None,
             default_font: None,
+            default_fonts: [None; 6],
             sprite_batches: SlotMap::with_key(),
             canvases: SlotMap::with_key(),
             particle_systems: SlotMap::with_key(),
@@ -461,25 +464,30 @@ impl SharedState {
         if self.async_loader.is_none() {
             self.async_loader = Some(crate::filesystem::AsyncLoader::new());
         }
-        let handle = self.async_loader.as_ref().expect("async_loader initialized above").request_load(resolved);
+        let handle = self
+            .async_loader
+            .as_ref()
+            .expect("async_loader initialized above")
+            .request_load(resolved);
         Ok(handle.0)
     }
 
-    /// Loads the embedded OpenSans-Regular font into `fonts` and stores the key in `default_font`.
+    /// Loads all 6 embedded bitmap fonts into `fonts` and stores their keys in `default_fonts`.
     ///
+    /// Index 3 (14px) becomes `default_font` and `active_font`.
     /// Called once during `init_lua`. Idempotent — does nothing if `default_font` is already set.
-    pub fn load_default_font(&mut self) {
+    pub fn load_default_fonts(&mut self) {
         if self.default_font.is_some() {
             return;
         }
-        const OPENSANS: &[u8] = include_bytes!("../../assets/fonts/OpenSans.ttf");
-        match crate::graphics::Font::from_bytes(OPENSANS, 16.0) {
-            Ok(font) => {
-                let key = self.fonts.insert(font);
+        let sizes = crate::graphics::Font::load_all_sizes();
+        for (i, (font, _cw, _ch)) in sizes.into_iter().enumerate() {
+            let key = self.fonts.insert(font);
+            self.default_fonts[i] = Some(key);
+            // Index 3 = 14px = default
+            if i == 3 {
                 self.default_font = Some(key);
-            }
-            Err(err) => {
-                log::warn!("Failed to load built-in OpenSans font: {}", err);
+                self.active_font = Some(key);
             }
         }
     }
@@ -536,7 +544,7 @@ impl SharedState {
     /// `RendererStats`.
     pub fn compute_stats(&self) -> RendererStats {
         RendererStats {
-            draw_calls: self.draw_commands.len(),
+            draw_calls: self.render_commands.len(),
             textures: self.textures.len(),
             fonts: self.fonts.len(),
             canvases: self.canvases.len(),

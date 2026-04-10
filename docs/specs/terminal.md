@@ -18,7 +18,7 @@ At its core, `Terminal` owns a 2D grid of `TCell` records — each cell stores a
 
 On top of the raw grid, the module provides a compositing widget system. `Widget` combines a `WidgetBase` (shared position, size, visibility, enabled, tag fields) with a `WidgetKind` discriminant that covers six widget types: `Label` (static text), `Button` (clickable, fires `on_click` callbacks), `TextBox` (single-line editable text input with cursor navigation, max-length enforcement, and `on_change` callbacks), `List` (scrollable selectable item list with `on_select` callbacks), `Border` (decorative frame with title and three line-drawing styles — single, double, ASCII), and `Panel` (container that groups child widgets by index). Widgets are attached to terminals via `add_widget()`, composited into the cell grid during rendering via `render_cells()`, and receive routed keyboard, text, and mouse input through the terminal's event system.
 
-The rendering pipeline converts composited cells into `DrawCommand::Print` sequences grouped by colour runs, suitable for pushing directly into `SharedState::draw_commands`. The module does not own any GPU resources — it relies entirely on the graphics module's text rendering through `DrawCommand`. The Lua API wraps terminals and widgets as UserData objects with a binding layer that tracks widget attachment state, manages callback registries, and supports detach/reattach workflows with snapshot preservation.
+The rendering pipeline converts composited cells into `RenderCommand::Print` sequences grouped by colour runs, suitable for pushing directly into `SharedState::render_commands`. The module does not own any GPU resources — it relies entirely on the graphics module's text rendering through `RenderCommand`. The Lua API wraps terminals and widgets as UserData objects with a binding layer that tracks widget attachment state, manages callback registries, and supports detach/reattach workflows with snapshot preservation.
 
 **Scope boundary**: `terminal` is a Tier 2 module; it may import `math`, `engine`, and Tier 1 modules but must not import other Tier 2 modules. It does not perform font rasterisation (handled by `graphics`), file I/O, or audio playback.
 
@@ -41,15 +41,15 @@ lurek.terminal.newTerminal(cols, rows)
 │                         └─────────────────────────────────┘  │
 │                                                              │
 │  render_cells() ─► composite widgets onto grid snapshot      │
-│  build_draw_commands(ox, oy, cell_w, cell_h)                 │
+│  build_render_commands(ox, oy, cell_w, cell_h)                 │
 │       │                                                      │
 │       ▼                                                      │
-│  Vec<DrawCommand::Print + SetColor>                          │
+│  Vec<RenderCommand::Print + SetColor>                          │
 │       │  (colour runs per row)                               │
 └───────┼──────────────────────────────────────────────────────┘
         │
         ▼
-  SharedState.draw_commands ─► GpuRenderer
+  SharedState.render_commands ─► GpuRenderer
 ```
 
 ### Input Flow
@@ -119,7 +119,7 @@ Grid-based character-cell terminal emulator with widget support. Maintains a 2D 
 - **Grid**: `new`, `set`, `get`, `try_get`, `clear`, `resize`, `print`, `set_char`, `set_fg`, `set_bg`, `get_dimensions`, `get_cursor`, `set_cursor`, `cols`, `rows`.
 - **Widgets**: `add_widget`, `remove_widget`, `clear_widgets`, `get_widget`, `get_widget_mut`, `get_widget_count`, `widget_count`, `find_by_tag`, `set_focus`, `get_focused`.
 - **Input**: `keypressed`, `textinput`, `mousepressed` (plus `pub(crate)` `*_with_events` variants that return `TerminalEvent` vectors).
-- **Rendering**: `build_draw_commands(ox, oy, cell_w, cell_h)` composites widgets onto the grid and emits `DrawCommand::Print` + `DrawCommand::SetColor` sequences.
+- **Rendering**: `build_render_commands(ox, oy, cell_w, cell_h)` composites widgets onto the grid and emits `RenderCommand::Print` + `RenderCommand::SetColor` sequences.
 
 Implements `Default` (80 × 40 grid).
 
@@ -345,22 +345,22 @@ end
 |------------|-------------|--------------------------------------------------------------|
 | `math`     | Imports from | Uses `Vec2` and colour constants                            |
 | `engine`   | Imports from | Uses `SharedState` for draw command output                   |
-| `graphics` | Imports from | Uses `DrawCommand` (`Print`, `SetColor`) from `renderer.rs`  |
+| `graphics` | Imports from | Uses `RenderCommand` (`Print`, `SetColor`) from `renderer.rs`  |
 | `lua_api`  | Imported by  | `terminal_api.rs` binds `Terminal` and `Widget` as UserData  |
 
 **Similar modules and differentiation:**
 
 - **`gui`** (Tier 2): Retained-mode widget UI with pixel-level layout; `terminal` uses character-cell grid addressing and is oriented towards text-mode interfaces (roguelikes, consoles, REPL). They share no types. Both have widget types named `Button`, `Label`, `TextBox`, `Panel` — this is **intentional design**: `gui` renders them as pixel graphics; `terminal` renders them as character-cell text. Same conceptual interface, different renderers.
-- **`graphics`**: Owns GPU resources, font rasterisation, and the render pipeline. `terminal` produces `DrawCommand` values but never touches GPU textures or surfaces directly.
+- **`graphics`**: Owns GPU resources, font rasterisation, and the render pipeline. `terminal` produces `RenderCommand` values but never touches GPU textures or surfaces directly.
 
 ## Notes
 
-- **Config gate**: The terminal module is gated by `modules.terminal = true` in `conf.lua` and requires `modules.graphics = true` (since it emits `DrawCommand` values).
+- **Config gate**: The terminal module is gated by `modules.terminal = true` in `conf.lua` and requires `modules.graphics = true` (since it emits `RenderCommand` values).
 - **Grid limits**: Maximum grid size is 512 columns × 256 rows (constants `MAX_COLS`, `MAX_ROWS` in `terminal_state.rs`). Requests beyond these are clamped silently.
 - **Coordinate convention**: All Lua-facing and public Rust APIs use 1-based coordinates. Internal storage is 0-based. The Lua binding converts pixel coordinates to grid positions using fixed cell dimensions (8 × 14 pixels) for `mousepressed`.
 - **Widget attachment model**: Widgets can exist in a detached state (created but not added to a terminal) or an attached state. The Lua binding layer tracks attachment via `WidgetAttachment` and preserves widget state through snapshot copies when widgets are detached. A widget cannot be attached to two terminals simultaneously.
 - **Callback dispatch**: Button clicks, text changes, and list selection changes produce `TerminalEvent` values internally. The Lua binding layer dispatches these through stored `LuaRegistryKey` callback functions. Callbacks fire synchronously during `keypressed`, `textinput`, or `mousepressed` calls.
-- **Rendering output**: `build_draw_commands()` groups cells into colour runs per row, emitting one `DrawCommand::SetColor` + `DrawCommand::Print` pair per run. The final command resets colour to white. The cell size (8 × 14 pixels) is a constant in `terminal_api.rs`, not configurable per-terminal.
+- **Rendering output**: `build_build_render_commands()` groups cells into colour runs per row, emitting one `RenderCommand::SetColor` + `RenderCommand::Print` pair per run. The final command resets colour to white. The cell size (8 × 14 pixels) is a constant in `terminal_api.rs`, not configurable per-terminal.
 - **Panel children by index**: `Panel` children are stored as indices into the parent terminal's widget list. When widgets are removed, all panels in the terminal have their child indices adjusted via `adjust_panel_children_after_removal()`.
 - **No GPU ownership**: The module creates zero GPU resources. It depends on whichever font is currently active in `SharedState` for text rendering resolution.
 - **Unicode support**: Cells store full `u32` codepoints. Box-drawing characters (used by `BorderStyle::Single` and `Double`) are UTF-8 encoded in the source file.

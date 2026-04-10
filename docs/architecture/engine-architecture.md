@@ -33,7 +33,7 @@
 24. [Error Handling and Recovery](#error-handling-and-recovery)
 25. [Configuration System](#configuration-system)
 26. [Callback Contract](#callback-contract)
-27. [DrawCommand Queue Reference](#drawcommand-queue-reference)
+27. [RenderCommand Queue Reference](#rendercommand-queue-reference)
 28. [Dependencies](#dependencies)
 29. [File Structure](#file-structure)
 30. [Legacy and Migration-State Modules](#legacy-and-migration-state-modules)
@@ -355,7 +355,7 @@ If any step fails, the engine transitions to `RunState::Error(ErrorScreen)`.
 
 ### No-Game Behaviour
 
-When no game directory is provided, the engine displays a built-in splash screen — the Lurek2D logo and project identity rendered through the same DrawCommand system. The splash screen runs at 60 FPS until the user closes the window. **Drag-and-drop** is supported: drop a game folder onto the splash window to load it immediately.
+When no game directory is provided, the engine displays a built-in splash screen — the Lurek2D logo and project identity rendered through the same RenderCommand system. The splash screen runs at 60 FPS until the user closes the window. **Drag-and-drop** is supported: drop a game folder onto the splash window to load it immediately.
 
 ---
 
@@ -384,13 +384,13 @@ The game loop runs inside `App::run()` using winit's `ApplicationHandler` trait.
 │ 6b. Call lurek.process(dt)      → game logic                     │
 │ 6c. Call lurek.process_late(dt) → post-logic update              │
 │ 7.  Clear draw command queue                                    │
-│ 8a. Call lurek.render()         → game pushes DrawCommands       │
-│ 8b. Call lurek.render_ui()      → UI/HUD overlay DrawCommands    │
+│ 8a. Call lurek.render()         → game pushes RenderCommands       │
+│ 8b. Call lurek.render_ui()      → UI/HUD overlay RenderCommands    │
 │ 9. GpuRenderer::render_frame()                                 │
 │    ├── Flush pending resource removals (deferred destruction)   │
 │    ├── Update auto-uniforms (time, screen size)                 │
 │    ├── Acquire swapchain texture                                │
-│    ├── Process DrawCommand queue → wgpu render passes           │
+│    ├── Process RenderCommand queue → wgpu render passes           │
 │    └── Present surface                                          │
 │10. Reset per-frame state       → scroll deltas, pressed/        │
 │                                   released arrays, events       │
@@ -443,7 +443,7 @@ pub struct SharedState {
     pub particle_systems: SlotMap<ParticleKey, ParticleSystem>,
 
     // ── Rendering State ──────────────────────────────
-    pub draw_commands:      Vec<DrawCommand>,
+    pub render_commands:    Vec<RenderCommand>,
     pub current_color:      Color,
     pub background_color:   Color,
     pub current_font:       Option<FontKey>,
@@ -523,7 +523,7 @@ Rust: load pixels → insert into textures SlotMap → upload to GPU
 Lua: lurek.gfx.draw(img, 100, 200)
   │
   ▼
-Rust: push DrawImage { texture_key, ... } into draw_commands
+Rust: push DrawImage { texture_key, ... } into render_commands
   │
   ▼
 Lua: img:release()    OR    garbage collection
@@ -913,7 +913,7 @@ All callbacks are optional — the engine checks if the function exists before c
 | `lurek.process_physics(dt)` | fixed delta (seconds) | 0–N times per frame at fixed timestep (default 1/60s) |
 | `lurek.process(dt)` | delta time (seconds) | Once per frame (variable timestep) |
 | `lurek.process_late(dt)` | delta time (seconds) | Once per frame, after `process`, before `render` |
-| `lurek.render()` | — | Once per frame (push DrawCommands here) |
+| `lurek.render()` | — | Once per frame (push RenderCommands here) |
 | `lurek.render_ui()` | — | Once per frame, after `render` (UI/HUD overlay) |
 
 ### Input Callbacks
@@ -947,18 +947,18 @@ loop:
     process_physics(fixed_dt)   -- 0..N times (fixed 1/60s default)
     process(dt)                 -- once (variable dt)
     process_late(dt)            -- once (variable dt)
-    [draw_commands cleared]
-    render()                    -- once (push DrawCommands)
-    render_ui()                 -- once (UI overlay DrawCommands)
+    [render_commands cleared]
+    render()                    -- once (push RenderCommands)
+    render_ui()                 -- once (UI overlay RenderCommands)
     [debug overlay appended]
     [GPU render pass]
 ```
 
 ---
 
-## DrawCommand Queue Reference
+## RenderCommand Queue Reference
 
-The `DrawCommand` enum defines all rendering operations that Lua can request:
+The `RenderCommand` enum defines all rendering operations that Lua can request:
 
 ### Shape Drawing
 

@@ -299,7 +299,7 @@ impl FlowField {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, cell_size: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, cell_size: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(self.width * cell_size, self.height * cell_size);
         img.fill(40, 45, 55, 255);
         // Draw blocked cells

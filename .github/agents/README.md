@@ -16,7 +16,7 @@ Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine d
 | `Solver`       | Root-cause analysis and solution selection  | Hard problem with no obvious answer               |
 | `Developer`    | Implement Rust engine features              | Writing or modifying Rust source code             |
 | `Lua-Designer` | Design the `lurek.*` Lua API surface         | Adding/changing Lua-facing APIs                   |
-| `Renderer`     | Graphics pipeline and rendering             | Working on wgpu, DrawCommand, textures       |
+| `Renderer`     | Graphics pipeline and rendering             | Working on wgpu, RenderCommand, textures       |
 | `Physicist`    | Physics engine implementation               | Collision, bodies, world step, forces             |
 | `Audio-Eng`    | Audio system and rodio integration          | Sound loading, playback, mixer                    |
 | `Tester`       | Write and maintain tests                    | Adding tests, fixing test failures, coverage      |
@@ -74,7 +74,7 @@ Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine d
 
 - Rust source file change → `Developer`
 - New `lurek.*` function → `Lua-Designer` then `Developer`
-- DrawCommand or Renderer change → `Renderer`
+- RenderCommand or Renderer change → `Renderer`
 - Physics body/world/collision → `Physicist`
 - Audio mixer/source → `Audio-Eng`
 - Test file → `Tester`

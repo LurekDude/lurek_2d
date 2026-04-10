@@ -18,10 +18,10 @@ src/lua_api/parallax_api.rs    → Lua bridge: LuaParallaxLayer, LuaParallaxSet
 ```
 
 **Tier 2** — imports `crate::engine` (TextureKey, SharedState) and
-`crate::graphics` (BlendMode, DrawCommand).  Zero imports of any Tier 1
+`crate::graphics` (BlendMode, RenderCommand).  Zero imports of any Tier 1
 domain module.
 
-**No new DrawCommand variant** — V1 uses the existing `DrawImageEx` variant with
+**No new RenderCommand variant** — V1 uses the existing `DrawImageEx` variant with
 multiple tile copies per repeat axis.  A future `DrawTiledImage` GPU path would
 reduce the draw call count for wide tiling scenarios.
 
@@ -44,7 +44,7 @@ For repeat axes the renderer tiles from `start_x` across the full screen width
 ### `ParallaxDrawBatch`
 
 Returned by `ParallaxLayer::build_draw_calls()`.  Consumed by the Lua API bridge
-to push `DrawCommand` entries.
+to push `RenderCommand` entries.
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -171,7 +171,7 @@ V1 uses the existing `DrawImageEx` for each tile.  For a typical N≤8 layer
 background with 2–4 horizontal tiles per layer the overhead is bounded and
 negligible on Intel UHD hardware.
 
-**Future path** — Add `DrawCommand::DrawTiledImage { texture_key, sx, sy, u_offset, v_offset }` as a single GPU draw call per layer.  The GPU samples a wrapping texture coordinate (`u = (screen_x / tex_w + u_offset) mod 1.0`) which completely eliminates CPU tiling arithmetic and reduces draw call count from 4× to 1× per layer.  This requires a WGSL shader variant with `address_mode: Repeat` on the sampler.
+**Future path** — Add `RenderCommand::DrawTiledImage { texture_key, sx, sy, u_offset, v_offset }` as a single GPU draw call per layer.  The GPU samples a wrapping texture coordinate (`u = (screen_x / tex_w + u_offset) mod 1.0`) which completely eliminates CPU tiling arithmetic and reduces draw call count from 4× to 1× per layer.  This requires a WGSL shader variant with `address_mode: Repeat` on the sampler.
 
 ## 7. Threading Notes
 

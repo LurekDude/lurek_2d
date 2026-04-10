@@ -41,7 +41,7 @@ description: "Load this skill when analyzing or optimizing Lurek2D performance: 
 - **Zero-alloc hot path**: Avoid `Vec::new()`, `String::from()`, `clone()` in per-frame code
 - **Pre-allocate buffers**: Reuse Vec/String buffers across frames with `clear()` + reuse
 - **Batch lua calls**: Minimize Lua/Rust boundary crossings per frame
-- **DrawCommand as data**: DrawCommands should be cheap to create (no allocations in variants)
+- **RenderCommand as data**: RenderCommands should be cheap to create (no allocations in variants)
 - **Spatial partitioning**: Use grid or quadtree for collision if body count exceeds ~50
 - **Profile tools**: Use `std::time::Instant` for timing; consider `cargo flamegraph` for deep profiling
 - **Texture atlas**: Batch draw calls by texture to reduce state changes in renderer
@@ -123,7 +123,7 @@ The overlay shows per-frame draw call count — the primary signal for render pe
 
 | Hot Path | Location | Bottleneck |
 |----------|----------|------------|
-| DrawCommand processing | `src/graphics/gpu_renderer.rs` | Draw call count, state changes |
+| RenderCommand processing | `src/graphics/gpu_renderer.rs` | Draw call count, state changes |
 | Sprite batch flush | `src/graphics/sprite_batch.rs` | Vertex buffer upload size |
 | Physics world step | `src/physics/world.rs` | Body + collider count |
 | Lua `lurek.update()` | `src/engine/app.rs` | Lua computation + GC |

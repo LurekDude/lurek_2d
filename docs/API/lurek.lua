@@ -1,7 +1,7 @@
 ---@meta
 --- Auto-generated Lurek2D API documentation for LuaCATS.
 
-lurek = {}
+luna = {}
 
 ---@class lurek.ai
 lurek.ai = {}
@@ -1473,6 +1473,12 @@ function lurek.audio.resume(id_val) end
 ---@return nil
 function lurek.audio.resumeAll() end
 
+--- Saves a SoundData as a 16-bit PCM WAV file at the given path.
+---@param sd_ud any
+---@param filename any
+---@return nil
+function lurek.audio.saveWAV(sd_ud, filename) end
+
 --- Seeks to a time position in seconds.
 ---@param id_val any
 ---@param pos any
@@ -1536,15 +1542,15 @@ function lurek.audio.setMeter(scale) end
 function lurek.audio.setMidiSoundFont(path) end
 
 --- Sets the 6-component orientation of a source.
----@param source Source
----@param fx number
----@param fy number
----@param fz number
----@param ux number
----@param uy number
----@param uz number
+---@param id_val any
+---@param fx any
+---@param fy any
+---@param fz any
+---@param ux any
+---@param uy any
+---@param uz any
 ---@return nil
-function lurek.audio.setOrientation(source, fx, fy, fz, ux, uy, uz) end
+function lurek.audio.setOrientation(id_val, fx, fy, fz, ux, uy, uz) end
 
 --- Sets stereo panning (-1.0 left to 1.0 right).
 ---@param id_val any
@@ -2059,6 +2065,53 @@ function lurek.compute.zeros(shape, dtype) end
 ---@class lurek.data
 lurek.data = {}
 
+---@class DataView
+local DataView = {}
+
+--- Reads a 64-bit float at the given offset.
+---@param offset any
+---@return number
+function DataView:getDouble(offset) end
+
+--- Reads a 32-bit float at the given offset.
+---@param offset any
+---@return number
+function DataView:getFloat(offset) end
+
+--- Reads a signed 16-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getInt16(offset) end
+
+--- Reads a signed 32-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getInt32(offset) end
+
+--- Reads a signed 8-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getInt8(offset) end
+
+--- Returns the size of this view in bytes.
+---@return integer
+function DataView:getSize() end
+
+--- Reads an unsigned 16-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getUInt16(offset) end
+
+--- Reads an unsigned 32-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getUInt32(offset) end
+
+--- Reads an unsigned 8-bit integer at the given offset.
+---@param offset any
+---@return integer
+function DataView:getUInt8(offset) end
+
 --- Compresses data using the given algorithm (deflate, gzip, lz4).
 ---@param format_str any
 ---@param raw_data any
@@ -2083,6 +2136,11 @@ function lurek.data.decompress(format_str, compressed) end
 ---@param raw_data any
 ---@return string
 function lurek.data.encode(format_str, raw_data) end
+
+--- Encodes a Lua table into a TOML string.
+---@param tbl any
+---@return string
+function lurek.data.encodeToml(tbl) end
 
 --- Returns the number of bytes the given format and values would occupy.
 ---@param fmt any
@@ -2113,6 +2171,11 @@ function lurek.data.newDataView(raw, offset, size) end
 ---@param vals any
 ---@return string
 function lurek.data.pack(fmt, vals) end
+
+--- Parses a TOML string into a Lua table.
+---@param text any
+---@return table
+function lurek.data.parseToml(text) end
 
 --- Reads values using the Lurek2D Binary Pack Format.
 ---@param fmt any
@@ -3003,511 +3066,8 @@ function lurek.docs.validate(catalog_ud) end
 ---@return any
 function lurek.docs.validateModule(module_name, catalog_ud) end
 
----@class lurek.entity
-lurek.entity = {}
-
---- Lua-side wrapper around a [`Universe`] ECS world.
----@class Universe
-local Universe = {}
-
---- Adds a system table to the universe.
----@param system any
----@return nil
-function Universe:addSystem(system) end
-
---- Attaches a string tag to an entity.
----@param id any
----@param tag any
----@return nil
-function Universe:addTag(id, tag) end
-
---- Adds a bitmap tag to an entity.
----@param id any
----@param name any
----@return nil
-function Universe:bitmapTag(id, name) end
-
---- Removes a bitmap tag from an entity.
----@param id any
----@param name any
----@return nil
-function Universe:bitmapUntag(id, name) end
-
---- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
----@return nil
-function Universe:clear() end
-
---- Defines a bitmap tag name, returning its bit index.
----@param name any
----@return integer
-function Universe:defineTag(name) end
-
---- Calls draw(system, world) on each registered system.
----@return nil
-function Universe:draw() end
-
---- Calls callback(id, value) for every entity with the named component.
----@param name any
----@param callback any
----@return nil
-function Universe:each(name, callback) end
-
---- Emits a named event to all systems that implement the handler.
----@param args any
----@return nil
-function Universe:emit(args) end
-
---- Returns the component value for an entity, or nil if missing.
----@param id any
----@param name any
----@return table
-function Universe:get(id, name) end
-
---- Returns the bit index for a bitmap tag name, or nil if undefined.
----@param name any
----@return integer?
-function Universe:getBitmapTagBit(name) end
-
---- Returns a deep copy of a blueprint's component table, or nil.
----@param name any
----@return table
-function Universe:getBlueprintComponents(name) end
-
---- Returns all direct child entity IDs.
----@param parent_id any
----@return table
-function Universe:getChildren(parent_id) end
-
---- Returns all component names for an entity.
----@param id any
----@return table
-function Universe:getComponents(id) end
-
---- Returns all alive entity IDs.
----@return table
-function Universe:getEntities() end
-
---- Returns all alive entities on a specific layer.
----@param layer any
----@return table
-function Universe:getEntitiesByLayer(layer) end
-
---- Returns all alive entities with the given string tag.
----@param tag any
----@return table
-function Universe:getEntitiesByTag(tag) end
-
---- Returns all alive entities sorted by layer then ID.
----@return table
-function Universe:getEntitiesSorted() end
-
---- Returns the number of alive entities.
----@return integer
-function Universe:getEntityCount() end
-
---- Returns the layer for an entity, defaulting to zero.
----@param id any
----@return integer
-function Universe:getLayer(id) end
-
---- Returns the parent entity ID, or nil if unparented.
----@param child_id any
----@return integer?
-function Universe:getParent(child_id) end
-
---- Returns the number of registered systems.
----@return integer
-function Universe:getSystemCount() end
-
---- Returns all string tags for an entity.
----@param id any
----@return table
-function Universe:getTags(id) end
-
---- Returns true if the entity has the named component.
----@param id any
----@param name any
----@return boolean
-function Universe:has(id, name) end
-
---- Returns true if the entity has the given bitmap tag.
----@param id any
----@param name any
----@return boolean
-function Universe:hasBitmapTag(id, name) end
-
---- Returns true if a blueprint with the given name exists.
----@param name any
----@return boolean
-function Universe:hasBlueprint(name) end
-
---- Returns true if the entity carries the given tag.
----@param id any
----@param tag any
----@return boolean
-function Universe:hasTag(id, tag) end
-
---- Returns true if the entity ID is currently alive.
----@param id any
----@return boolean
-function Universe:isAlive(id) end
-
---- Destroys the entity with the given ID, freeing its slot for reuse.
----@param id any
----@return nil
-function Universe:kill(id) end
-
---- Kills an entity and all its descendants recursively.
----@param id any
----@return nil
-function Universe:killRecursive(id) end
-
---- Returns all defined blueprint names.
----@return table
-function Universe:listBlueprints() end
-
---- Returns entity IDs that have all listed component names.
----@param args any
----@return table
-function Universe:query(args) end
-
---- Returns all alive entities with all of the listed bitmap tags.
----@param names any
----@return table
-function Universe:queryBitmapAll(names) end
-
---- Returns all alive entities with any of the listed bitmap tags.
----@param names any
----@return table
-function Universe:queryBitmapAny(names) end
-
---- Returns all alive entities with the given bitmap tag.
----@param name any
----@return table
-function Universe:queryBitmapTag(name) end
-
---- Releases all universe state, equivalent to clear.
----@return nil
-function Universe:release() end
-
---- Removes a component from an entity.
----@param id any
----@param name any
----@return nil
-function Universe:remove(id, name) end
-
---- Removes a blueprint definition.
----@param name any
----@return nil
-function Universe:removeBlueprint(name) end
-
---- Removes a system table from the universe.
----@param system any
----@return nil
-function Universe:removeSystem(system) end
-
---- Removes a string tag from an entity.
----@param id any
----@param tag any
----@return nil
-function Universe:removeTag(id, tag) end
-
---- Sets a component value on an entity.
----@param id any
----@param name any
----@param value any
----@return nil
-function Universe:set(id, name, value) end
-
---- Sets the layer for an entity.
----@param id any
----@param layer any
----@return nil
-function Universe:setLayer(id, layer) end
-
---- Creates a new entity and returns its packed ID.
----@return integer
-function Universe:spawn() end
-
---- Calls update(system, world, dt) on each registered system.
----@param dt any
----@return nil
-function Universe:update(dt) end
-
---- Creates a new empty ECS universe.
----@return Universe
-function lurek.entity.newUniverse() end
-
----@class lurek.signal
-lurek.signal = {}
-
---- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
----@class Signal
-local Signal = {}
-
---- Removes all callbacks for the named event.
----@param name any
----@return integer
-function Signal:clear(name) end
-
---- Removes all callbacks across all events.
----@return integer
-function Signal:clearAll() end
-
---- Emits the named event, calling all registered callbacks with extra arguments.
----@param args any
----@return nil
-function Signal:emit(args) end
-
---- Returns the callback count for the named event.
----@param name any
----@return integer
-function Signal:getCount(name) end
-
---- Returns the total callback count across all events.
----@return integer
-function Signal:getTotalCount() end
-
---- Removes a subscription by handle ID.
----@param handle any
----@return boolean
-function Signal:remove(handle) end
-
---- Returns the type name of this object.
----@return string
-function Signal:type() end
-
---- Returns true if the given type name matches this object's type or any parent type.
----@param name any
----@return boolean
-function Signal:typeOf(name) end
-
---- Discards all pending events in the queue.
----@return nil
-function lurek.signal.clear() end
-
---- Pushes an exit event, requesting the engine to stop.
----@param code? any (optional)
----@return nil
-function lurek.signal.exit(code) end
-
---- Creates a new pub-sub Signal dispatcher.
----@return Signal
-function lurek.signal.newSignal() end
-
---- Returns an iterator function that pops events from the queue.
----@return function
-function lurek.signal.poll() end
-
---- Syncs OS-level events into the queue (no-op in Lurek2D push model).
----@return nil
-function lurek.signal.pump() end
-
---- Pushes a custom event onto the event queue.
----@param args any
----@return nil
-function lurek.signal.push(args) end
-
---- Alias for `exit()` — requests the engine to stop at the end of the current frame.
----@return nil
-function lurek.signal.quit() end
-
---- Requests that the engine restart at the beginning of the next frame.
----@return nil
-function lurek.signal.restart() end
-
---- Blocks until the next event arrives or the optional timeout elapses.
----@param timeout? any (optional)
----@return string?
-function lurek.signal.wait(timeout) end
-
----@class lurek.filesystem
-lurek.filesystem = {}
-
---- Lua-side wrapper around a [`FileData`] buffer.
----@class FileData
-local FileData = {}
-
---- Returns the virtual path this data was loaded from.
----@return string
-function FileData:getFilename() end
-
---- Returns the file size in bytes.
----@return integer
-function FileData:getSize() end
-
---- Returns the file content as a Lua string.
----@return string
-function FileData:getString() end
-
---- Lua-side wrapper around a [`FileHandle`] with interior mutability.
----@class FileHandle
-local FileHandle = {}
-
---- Flushes any pending writes and closes the file handle.
----@return nil
-function FileHandle:close() end
-
---- Flushes all buffered writes to disk without closing the handle.
----@return nil
-function FileHandle:flush() end
-
---- Returns the access mode the file was opened with.
----@return string
-function FileHandle:getMode() end
-
---- Returns the size of the open file in bytes.
----@return integer
-function FileHandle:getSize() end
-
---- Returns whether the read cursor has reached the end of the file.
----@return boolean
-function FileHandle:isEOF() end
-
---- Reads bytes from the file, returning them as a string.
----@param count? any (optional)
----@return string
-function FileHandle:read(count) end
-
---- Reads the next line from the file without the trailing newline.
----@return string?
-function FileHandle:readLine() end
-
---- Seeks the file position to the given byte offset from the start.
----@param pos any
----@return integer
-function FileHandle:seek(pos) end
-
---- Returns the current read/write byte offset from the start of the file.
----@return integer
-function FileHandle:tell() end
-
---- Writes a string to the file and returns the number of bytes written.
----@param data any
----@return integer
-function FileHandle:write(data) end
-
---- Opens the file in append mode and writes the given string at the end.
----@param path any
----@param data any
----@return nil
-function lurek.filesystem.append(path, data) end
-
---- Creates a directory and any missing parent directories in the save area.
----@param path any
----@return nil
-function lurek.filesystem.createDirectory(path) end
-
---- Returns whether the given file or directory exists.
----@param path any
----@return boolean
-function lurek.filesystem.exists(path) end
-
---- Returns a table containing the names of every file and subdirectory in the given path.
----@param path any
----@return table
-function lurek.filesystem.getDirectoryItems(path) end
-
---- Returns the identity string used to locate the game's save directory.
----@return string
-function lurek.filesystem.getIdentity() end
-
---- Returns a table of metadata for a path, or nil if the path does not exist.
----@param path any
----@return table?
-function lurek.filesystem.getInfo(path) end
-
---- Returns the sandboxed save data directory path.
----@return string
-function lurek.filesystem.getSaveDirectory() end
-
---- Returns the absolute path of the directory the game was loaded from.
----@return string
-function lurek.filesystem.getSource() end
-
---- Returns the current user's home directory path.
----@return string
-function lurek.filesystem.getUserDirectory() end
-
---- Returns the current working directory path.
----@return string
-function lurek.filesystem.getWorkingDirectory() end
-
---- Returns whether the given path is a directory.
----@param path any
----@return boolean
-function lurek.filesystem.isDirectory(path) end
-
---- Returns whether the given path is a regular file.
----@param path any
----@return boolean
-function lurek.filesystem.isFile(path) end
-
---- Returns an iterator function over the lines of a text file.
----@param path any
----@return function
-function lurek.filesystem.lines(path) end
-
---- Loads and compiles a Lua file from the VFS, returning it as a callable function.
----@param path any
----@return function
-function lurek.filesystem.load(path) end
-
---- Mounts a directory at a virtual path inside the game filesystem.
----@param src any
----@param mp any
----@return boolean
-function lurek.filesystem.mount(src, mp) end
-
---- Loads a file from the VFS into a FileData buffer.
----@param path any
----@return FileData
-function lurek.filesystem.newFileData(path) end
-
---- Opens a file and returns a readable/writable file handle.
----@param path any
----@param mode any
----@return FileHandle
-function lurek.filesystem.openFile(path, mode) end
-
---- Polls an async load handle, returning status and optional data.
----@param handle_id any
----@return string
-function lurek.filesystem.pollAsync(handle_id) end
-
---- Reads a text file and returns its contents as a string.
----@param path any
----@return string
-function lurek.filesystem.read(path) end
-
---- Starts loading a file in the background and returns an opaque handle.
----@param path any
----@return integer
-function lurek.filesystem.readAsync(path) end
-
---- Permanently deletes a file or empty directory from the save directory.
----@param path any
----@return nil
-function lurek.filesystem.remove(path) end
-
---- Sets the identity string that names the game's sandboxed save-data directory.
----@param name any
----@return nil
-function lurek.filesystem.setIdentity(name) end
-
---- Removes a virtual mount layer by mountpoint.
----@param mp any
----@return boolean
-function lurek.filesystem.unmount(mp) end
-
---- Writes a string to a file in the save directory.
----@param path any
----@param data any
----@return nil
-function lurek.filesystem.write(path, data) end
-
----@class lurek.fx
-lurek.fx = {}
+---@class lurek.effect
+lurek.effect = {}
 
 --- Lua-side wrapper around [`ImageEffect`].
 ---@class ImageEffect
@@ -3578,10 +3138,6 @@ local Overlay = {}
 --- Resets all overlay subsystems to their default inactive state.
 ---@return nil
 function Overlay:clear() end
-
---- No-op placeholder; the overlay is rendered by the engine's draw pass.
----@return nil
-function Overlay:draw() end
 
 --- Returns the current ambient tint as r, g, b, a components.
 ---@return number
@@ -3714,6 +3270,10 @@ function Overlay:isVignetteEnabled() end
 --- Returns whether the weather particle system is active.
 ---@return boolean
 function Overlay:isWeatherEnabled() end
+
+--- No-op placeholder; the overlay is rendered by the engine's render pass.
+---@return nil
+function Overlay:render() end
 
 --- Resizes the overlay to match new window dimensions.
 ---@param w any
@@ -4020,45 +3580,459 @@ function PostFxStack:typeOf(name) end
 
 --- Returns the list of all built-in effect type names.
 ---@return table
-function lurek.fx.getEffectTypes() end
+function lurek.effect.getEffectTypes() end
 
 --- Creates a custom shader post-processing effect.
 ---@param shader_id any
 ---@return PostFxEffect
-function lurek.fx.newCustomEffect(shader_id) end
+function lurek.effect.newCustomEffect(shader_id) end
 
 --- Creates a new built-in post-processing effect by type name.
 ---@param type_name any
 ---@return PostFxEffect
-function lurek.fx.newEffect(type_name) end
+function lurek.effect.newEffect(type_name) end
 
 --- Creates a new per-image effect chain. Accepts:
 ---@param args any
 ---@return ImageEffect
-function lurek.fx.newImageEffect(args) end
-
---- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
----@param w any
----@param h any
----@return Overlay
-function lurek.fx.newOverlay(w, h) end
+function lurek.effect.newImageEffect(args) end
 
 --- Creates a new screen overlay controller for weather, flash, shake, and fade effects.
 ---@param w? any (optional)
 ---@param h? any (optional)
 ---@return Overlay
-function lurek.fx.newOverlay(w, h) end
+function lurek.effect.newOverlay(w, h) end
 
 --- Creates a custom-shader post-processing effect (alias for newCustomEffect).
 ---@param shader_id any
 ---@return PostFxEffect
-function lurek.fx.newPass(shader_id) end
+function lurek.effect.newPass(shader_id) end
 
 --- Creates a new post-processing pipeline stack.
 ---@param w? any (optional)
 ---@param h? any (optional)
 ---@return PostFxStack
-function lurek.fx.newStack(w, h) end
+function lurek.effect.newStack(w, h) end
+
+---@class lurek.entity
+lurek.entity = {}
+
+--- Lua-side wrapper around a [`Universe`] ECS world.
+---@class Universe
+local Universe = {}
+
+--- Adds a system table to the universe.
+---@param system any
+---@return nil
+function Universe:addSystem(system) end
+
+--- Attaches a string tag to an entity.
+---@param id any
+---@param tag any
+---@return nil
+function Universe:addTag(id, tag) end
+
+--- Adds a bitmap tag to an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:bitmapTag(id, name) end
+
+--- Removes a bitmap tag from an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:bitmapUntag(id, name) end
+
+--- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
+---@return nil
+function Universe:clear() end
+
+--- Defines a bitmap tag name, returning its bit index.
+---@param name any
+---@return integer
+function Universe:defineTag(name) end
+
+--- Calls callback(id, value) for every entity with the named component.
+---@param name any
+---@param callback any
+---@return nil
+function Universe:each(name, callback) end
+
+--- Emits a named event to all systems that implement the handler.
+---@param args any
+---@return nil
+function Universe:emit(args) end
+
+--- Returns the component value for an entity, or nil if missing.
+---@param id any
+---@param name any
+---@return table
+function Universe:get(id, name) end
+
+--- Returns the bit index for a bitmap tag name, or nil if undefined.
+---@param name any
+---@return integer?
+function Universe:getBitmapTagBit(name) end
+
+--- Returns a deep copy of a blueprint's component table, or nil.
+---@param name any
+---@return table
+function Universe:getBlueprintComponents(name) end
+
+--- Returns all direct child entity IDs.
+---@param parent_id any
+---@return table
+function Universe:getChildren(parent_id) end
+
+--- Returns all component names for an entity.
+---@param id any
+---@return table
+function Universe:getComponents(id) end
+
+--- Returns all alive entity IDs.
+---@return table
+function Universe:getEntities() end
+
+--- Returns all alive entities on a specific layer.
+---@param layer any
+---@return table
+function Universe:getEntitiesByLayer(layer) end
+
+--- Returns all alive entities with the given string tag.
+---@param tag any
+---@return table
+function Universe:getEntitiesByTag(tag) end
+
+--- Returns all alive entities sorted by layer then ID.
+---@return table
+function Universe:getEntitiesSorted() end
+
+--- Returns the number of alive entities.
+---@return integer
+function Universe:getEntityCount() end
+
+--- Returns the layer for an entity, defaulting to zero.
+---@param id any
+---@return integer
+function Universe:getLayer(id) end
+
+--- Returns the parent entity ID, or nil if unparented.
+---@param child_id any
+---@return integer?
+function Universe:getParent(child_id) end
+
+--- Returns the number of registered systems.
+---@return integer
+function Universe:getSystemCount() end
+
+--- Returns all string tags for an entity.
+---@param id any
+---@return table
+function Universe:getTags(id) end
+
+--- Returns true if the entity has the named component.
+---@param id any
+---@param name any
+---@return boolean
+function Universe:has(id, name) end
+
+--- Returns true if the entity has the given bitmap tag.
+---@param id any
+---@param name any
+---@return boolean
+function Universe:hasBitmapTag(id, name) end
+
+--- Returns true if a blueprint with the given name exists.
+---@param name any
+---@return boolean
+function Universe:hasBlueprint(name) end
+
+--- Returns true if the entity carries the given tag.
+---@param id any
+---@param tag any
+---@return boolean
+function Universe:hasTag(id, tag) end
+
+--- Returns true if the entity ID is currently alive.
+---@param id any
+---@return boolean
+function Universe:isAlive(id) end
+
+--- Destroys the entity with the given ID, freeing its slot for reuse.
+---@param id any
+---@return nil
+function Universe:kill(id) end
+
+--- Kills an entity and all its descendants recursively.
+---@param id any
+---@return nil
+function Universe:killRecursive(id) end
+
+--- Returns all defined blueprint names.
+---@return table
+function Universe:listBlueprints() end
+
+--- Returns entity IDs that have all listed component names.
+---@param args any
+---@return table
+function Universe:query(args) end
+
+--- Returns all alive entities with all of the listed bitmap tags.
+---@param names any
+---@return table
+function Universe:queryBitmapAll(names) end
+
+--- Returns all alive entities with any of the listed bitmap tags.
+---@param names any
+---@return table
+function Universe:queryBitmapAny(names) end
+
+--- Returns all alive entities with the given bitmap tag.
+---@param name any
+---@return table
+function Universe:queryBitmapTag(name) end
+
+--- Releases all universe state, equivalent to clear.
+---@return nil
+function Universe:release() end
+
+--- Removes a component from an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:remove(id, name) end
+
+--- Removes a blueprint definition.
+---@param name any
+---@return nil
+function Universe:removeBlueprint(name) end
+
+--- Removes a system table from the universe.
+---@param system any
+---@return nil
+function Universe:removeSystem(system) end
+
+--- Removes a string tag from an entity.
+---@param id any
+---@param tag any
+---@return nil
+function Universe:removeTag(id, tag) end
+
+--- Calls render(system, world) on each registered system.
+---@return nil
+function Universe:render() end
+
+--- Sets a component value on an entity.
+---@param id any
+---@param name any
+---@param value any
+---@return nil
+function Universe:set(id, name, value) end
+
+--- Sets the layer for an entity.
+---@param id any
+---@param layer any
+---@return nil
+function Universe:setLayer(id, layer) end
+
+--- Creates a new entity and returns its packed ID.
+---@return integer
+function Universe:spawn() end
+
+--- Calls update(system, world, dt) on each registered system.
+---@param dt any
+---@return nil
+function Universe:update(dt) end
+
+--- Creates a new empty ECS universe.
+---@return Universe
+function lurek.entity.newUniverse() end
+
+---@class lurek.filesystem
+lurek.filesystem = {}
+
+--- Lua-side wrapper around a [`FileData`] buffer.
+---@class FileData
+local FileData = {}
+
+--- Returns the virtual path this data was loaded from.
+---@return string
+function FileData:getFilename() end
+
+--- Returns the file size in bytes.
+---@return integer
+function FileData:getSize() end
+
+--- Returns the file content as a Lua string.
+---@return string
+function FileData:getString() end
+
+--- Lua-side wrapper around a [`FileHandle`] with interior mutability.
+---@class FileHandle
+local FileHandle = {}
+
+--- Flushes any pending writes and closes the file handle.
+---@return nil
+function FileHandle:close() end
+
+--- Flushes all buffered writes to disk without closing the handle.
+---@return nil
+function FileHandle:flush() end
+
+--- Returns the access mode the file was opened with.
+---@return string
+function FileHandle:getMode() end
+
+--- Returns the size of the open file in bytes.
+---@return integer
+function FileHandle:getSize() end
+
+--- Returns whether the read cursor has reached the end of the file.
+---@return boolean
+function FileHandle:isEOF() end
+
+--- Reads bytes from the file, returning them as a string.
+---@param count? any (optional)
+---@return string
+function FileHandle:read(count) end
+
+--- Reads the next line from the file without the trailing newline.
+---@return string?
+function FileHandle:readLine() end
+
+--- Seeks the file position to the given byte offset from the start.
+---@param pos any
+---@return integer
+function FileHandle:seek(pos) end
+
+--- Returns the current read/write byte offset from the start of the file.
+---@return integer
+function FileHandle:tell() end
+
+--- Writes a string to the file and returns the number of bytes written.
+---@param data any
+---@return integer
+function FileHandle:write(data) end
+
+--- Opens the file in append mode and writes the given string at the end.
+---@param path any
+---@param data any
+---@return nil
+function lurek.filesystem.append(path, data) end
+
+--- Creates a directory and any missing parent directories in the save area.
+---@param path any
+---@return nil
+function lurek.filesystem.createDirectory(path) end
+
+--- Returns whether the given file or directory exists.
+---@param path any
+---@return boolean
+function lurek.filesystem.exists(path) end
+
+--- Returns a table containing the names of every file and subdirectory in the given path.
+---@param path any
+---@return table
+function lurek.filesystem.getDirectoryItems(path) end
+
+--- Returns the identity string used to locate the game's save directory.
+---@return string
+function lurek.filesystem.getIdentity() end
+
+--- Returns a table of metadata for a path, or nil if the path does not exist.
+---@param path any
+---@return table?
+function lurek.filesystem.getInfo(path) end
+
+--- Returns the sandboxed save data directory path.
+---@return string
+function lurek.filesystem.getSaveDirectory() end
+
+--- Returns the absolute path of the directory the game was loaded from.
+---@return string
+function lurek.filesystem.getSource() end
+
+--- Returns the current user's home directory path.
+---@return string
+function lurek.filesystem.getUserDirectory() end
+
+--- Returns the current working directory path.
+---@return string
+function lurek.filesystem.getWorkingDirectory() end
+
+--- Returns whether the given path is a directory.
+---@param path any
+---@return boolean
+function lurek.filesystem.isDirectory(path) end
+
+--- Returns whether the given path is a regular file.
+---@param path any
+---@return boolean
+function lurek.filesystem.isFile(path) end
+
+--- Returns an iterator function over the lines of a text file.
+---@param path any
+---@return function
+function lurek.filesystem.lines(path) end
+
+--- Loads and compiles a Lua file from the VFS, returning it as a callable function.
+---@param path any
+---@return function
+function lurek.filesystem.load(path) end
+
+--- Mounts a directory at a virtual path inside the game filesystem.
+---@param src any
+---@param mp any
+---@return boolean
+function lurek.filesystem.mount(src, mp) end
+
+--- Loads a file from the VFS into a FileData buffer.
+---@param path any
+---@return FileData
+function lurek.filesystem.newFileData(path) end
+
+--- Opens a file and returns a readable/writable file handle.
+---@param path any
+---@param mode any
+---@return FileHandle
+function lurek.filesystem.openFile(path, mode) end
+
+--- Polls an async load handle, returning status and optional data.
+---@param handle_id any
+---@return string
+function lurek.filesystem.pollAsync(handle_id) end
+
+--- Reads a text file and returns its contents as a string.
+---@param path any
+---@return string
+function lurek.filesystem.read(path) end
+
+--- Starts loading a file in the background and returns an opaque handle.
+---@param path any
+---@return integer
+function lurek.filesystem.readAsync(path) end
+
+--- Permanently deletes a file or empty directory from the save directory.
+---@param path any
+---@return nil
+function lurek.filesystem.remove(path) end
+
+--- Sets the identity string that names the game's sandboxed save-data directory.
+---@param name any
+---@return nil
+function lurek.filesystem.setIdentity(name) end
+
+--- Removes a virtual mount layer by mountpoint.
+---@param mp any
+---@return boolean
+function lurek.filesystem.unmount(mp) end
+
+--- Writes a string to a file in the save directory.
+---@param path any
+---@param data any
+---@return nil
+function lurek.filesystem.write(path, data) end
 
 ---@class lurek.graph
 lurek.graph = {}
@@ -4554,8 +4528,8 @@ function Node:typeOf(name) end
 ---@return Graph
 function lurek.graph.newGraph() end
 
----@class lurek.graphics
-lurek.graphics = {}
+---@class lurek.graphic
+lurek.graphic = {}
 
 --- Lua-side handle to an off-screen render target stored in SharedState.
 ---@class Canvas
@@ -4879,7 +4853,7 @@ function SpriteBatch:typeOf() end
 
 --- Applies an affine transform matrix.
 ---@param mat any
-function lurek.graphics.applyTransform(mat) end
+function lurek.graphic.applyTransform(mat) end
 
 --- Draws a partial circle arc at the given position with specified radius and angle range.
 ---@param mode string
@@ -4889,33 +4863,33 @@ function lurek.graphics.applyTransform(mat) end
 ---@param angle1 number
 ---@param angle2 number
 ---@param segments? integer? (optional)
-function lurek.graphics.arc(mode, x, y, radius, angle1, angle2, segments) end
+function lurek.graphic.arc(mode, x, y, radius, angle1, angle2, segments) end
 
 --- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
 ---@param callback any
 ---@return nil
-function lurek.graphics.captureScreenshot(callback) end
+function lurek.graphic.captureScreenshot(callback) end
 
 --- Draws a circle.
 ---@param mode any
 ---@param x any
 ---@param y any
 ---@param radius any
-function lurek.graphics.circle(mode, x, y, radius) end
+function lurek.graphic.circle(mode, x, y, radius) end
 
 --- Clears the draw command queue (resets the screen).
 ---@param r? any (optional)
 ---@param g? any (optional)
 ---@param b? any (optional)
-function lurek.graphics.clear(r, g, b) end
+function lurek.graphic.clear(r, g, b) end
 
 --- Resets the stencil mode to the default (keep / always / 0).
 ---@return nil
-function lurek.graphics.clearStencil() end
+function lurek.graphic.clearStencil() end
 
 --- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
 ---@param args any
-function lurek.graphics.draw(args) end
+function lurek.graphic.draw(args) end
 
 --- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
 ---@param slice any
@@ -4924,7 +4898,7 @@ function lurek.graphics.draw(args) end
 ---@param w any
 ---@param h any
 ---@return nil
-function lurek.graphics.drawNineSlice(slice, x, y, w, h) end
+function lurek.graphic.drawNineSlice(slice, x, y, w, h) end
 
 --- Draws a portion of an image defined by a Quad.
 ---@param image Image
@@ -4936,7 +4910,7 @@ function lurek.graphics.drawNineSlice(slice, x, y, w, h) end
 ---@param sy? number? (optional)
 ---@param ox? number? (optional)
 ---@param oy? number? (optional)
-function lurek.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
+function lurek.graphic.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 
 --- Draws an ellipse.
 ---@param mode any
@@ -4944,154 +4918,154 @@ function lurek.graphics.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 ---@param y any
 ---@param rx any
 ---@param ry any
-function lurek.graphics.ellipse(mode, x, y, rx, ry) end
+function lurek.graphic.ellipse(mode, x, y, rx, ry) end
 
 --- Returns the current background color.
 ---@return number
-function lurek.graphics.getBackgroundColor() end
+function lurek.graphic.getBackgroundColor() end
 
 --- Returns the current blend mode as a string.
 ---@return string
-function lurek.graphics.getBlendMode() end
+function lurek.graphic.getBlendMode() end
 
 --- Returns the current canvas, or nil if drawing to screen.
 ---@return Canvas?
-function lurek.graphics.getCanvas() end
+function lurek.graphic.getCanvas() end
 
 --- Returns the dimensions of a canvas.
 ---@param ud any
 ---@return integer
-function lurek.graphics.getCanvasSize(ud) end
+function lurek.graphic.getCanvasSize(ud) end
 
 --- Returns the current drawing color.
 ---@return number
-function lurek.graphics.getColor() end
+function lurek.graphic.getColor() end
 
 --- Returns the current color mask.
 ---@return boolean
-function lurek.graphics.getColorMask() end
+function lurek.graphic.getColorMask() end
 
 --- Returns the default texture filter mode.
 ---@return string
-function lurek.graphics.getDefaultFilter() end
+function lurek.graphic.getDefaultFilter() end
 
 --- Returns the current depth mode as (mode, write).
 ---@return string
-function lurek.graphics.getDepthMode() end
+function lurek.graphic.getDepthMode() end
 
 --- Returns window width and height.
 ---@return integer
-function lurek.graphics.getDimensions() end
+function lurek.graphic.getDimensions() end
 
 --- Returns the currently active font, or nil.
 ---@return Font?
-function lurek.graphics.getFont() end
+function lurek.graphic.getFont() end
 
 --- Returns the ascent of the given font.
 ---@param ud any
 ---@return number
-function lurek.graphics.getFontAscent(ud) end
+function lurek.graphic.getFontAscent(ud) end
 
 --- Returns the descent of the given font.
 ---@param ud any
 ---@return number
-function lurek.graphics.getFontDescent(ud) end
+function lurek.graphic.getFontDescent(ud) end
 
 --- Returns the line height of the given font.
 ---@param ud any
 ---@return number
-function lurek.graphics.getFontHeight(ud) end
+function lurek.graphic.getFontHeight(ud) end
 
 --- Returns the line height of the given font (alias for getFontHeight).
 ---@param ud any
 ---@return number
-function lurek.graphics.getFontLineHeight(ud) end
+function lurek.graphic.getFontLineHeight(ud) end
 
 --- Returns the pixel width of text in the given font.
 ---@param ud any
 ---@param text any
 ---@return number
-function lurek.graphics.getFontWidth(ud, text) end
+function lurek.graphic.getFontWidth(ud, text) end
 
 --- Returns wrapped lines and the maximum line width.
 ---@param text any
 ---@param limit any
 ---@return table
-function lurek.graphics.getFontWrap(text, limit) end
+function lurek.graphic.getFontWrap(text, limit) end
 
 --- Returns the window height in pixels.
 ---@return integer
-function lurek.graphics.getHeight() end
+function lurek.graphic.getHeight() end
 
 --- Returns the current line width.
 ---@return number
-function lurek.graphics.getLineWidth() end
+function lurek.graphic.getLineWidth() end
 
 --- Returns the current point size.
 ---@return number
-function lurek.graphics.getPointSize() end
+function lurek.graphic.getPointSize() end
 
 --- Returns the active scissor rectangle, or nothing.
 ---@return number?
-function lurek.graphics.getScissor() end
+function lurek.graphic.getScissor() end
 
 --- Returns the active shader, or nil.
 ---@return Shader?
-function lurek.graphics.getShader() end
+function lurek.graphic.getShader() end
 
 --- Returns a table of renderer statistics.
 ---@return table
-function lurek.graphics.getStats() end
+function lurek.graphic.getStats() end
 
 --- Returns the current stencil mode as (action, compare, value).
 ---@return string
-function lurek.graphics.getStencilMode() end
+function lurek.graphic.getStencilMode() end
 
 --- Returns the window width in pixels.
 ---@return integer
-function lurek.graphics.getWidth() end
+function lurek.graphic.getWidth() end
 
 --- Intersects the current scissor with a new rectangle.
 ---@param x any
 ---@param y any
 ---@param w any
 ---@param h any
-function lurek.graphics.intersectScissor(x, y, w, h) end
+function lurek.graphic.intersectScissor(x, y, w, h) end
 
 --- Returns whether wireframe mode is active.
 ---@return boolean
-function lurek.graphics.isWireframe() end
+function lurek.graphic.isWireframe() end
 
 --- Draws a line between two points.
 ---@param args any
-function lurek.graphics.line(args) end
+function lurek.graphic.line(args) end
 
 --- Creates an off-screen render canvas.
 ---@param width any
 ---@param height any
 ---@return Canvas
-function lurek.graphics.newCanvas(width, height) end
+function lurek.graphic.newCanvas(width, height) end
 
 --- Creates a new z-ordered draw-call queue.
 ---@return DrawLayer
-function lurek.graphics.newDrawLayer() end
+function lurek.graphic.newDrawLayer() end
 
 --- Loads a TTF/OTF font from a file.
 ---@param path any
 ---@param size? any (optional)
 ---@return Font
-function lurek.graphics.newFont(path, size) end
+function lurek.graphic.newFont(path, size) end
 
 --- Loads an image from a file path or creates one from ImageData.
 ---@param arg any
 ---@return Image
-function lurek.graphics.newImage(arg) end
+function lurek.graphic.newImage(arg) end
 
 --- Creates a custom mesh from vertex data.
 ---@param verts any
 ---@param mode? any (optional)
 ---@return Mesh
-function lurek.graphics.newMesh(verts, mode) end
+function lurek.graphic.newMesh(verts, mode) end
 
 --- Creates a 9-slice descriptor from a texture and inset values.
 ---@param image any
@@ -5100,7 +5074,7 @@ function lurek.graphics.newMesh(verts, mode) end
 ---@param bottom any
 ---@param left any
 ---@return NineSlice
-function lurek.graphics.newNineSlice(image, top, right, bottom, left) end
+function lurek.graphic.newNineSlice(image, top, right, bottom, left) end
 
 --- Creates a new Quad viewport into a texture.
 ---@param x any
@@ -5110,43 +5084,43 @@ function lurek.graphics.newNineSlice(image, top, right, bottom, left) end
 ---@param sw any
 ---@param sh any
 ---@return Quad
-function lurek.graphics.newQuad(x, y, w, h, sw, sh) end
+function lurek.graphic.newQuad(x, y, w, h, sw, sh) end
 
 --- Compiles a custom WGSL shader and returns its handle.
 ---@param code any
 ---@return Shader
-function lurek.graphics.newShader(code) end
+function lurek.graphic.newShader(code) end
 
 --- Creates a new empty [`CompoundShape`] stored in the resource pool.
 ---@return Shape
-function lurek.graphics.newShape() end
+function lurek.graphic.newShape() end
 
 --- Creates a new sprite batch for the given image.
 ---@param ud any
 ---@param max? any (optional)
 ---@return SpriteBatch
-function lurek.graphics.newSpriteBatch(ud, max) end
+function lurek.graphic.newSpriteBatch(ud, max) end
 
 --- Resets the transform to the identity.
-function lurek.graphics.origin() end
+function lurek.graphic.origin() end
 
 --- Draws a list of points.
 ---@param args any
-function lurek.graphics.points(args) end
+function lurek.graphic.points(args) end
 
 --- Draws a polygon from a list of vertices.
 ---@param args any
-function lurek.graphics.polygon(args) end
+function lurek.graphic.polygon(args) end
 
 --- Pops the transform from the stack.
-function lurek.graphics.pop() end
+function lurek.graphic.pop() end
 
 --- Draws text at the given position.
 ---@param text any
 ---@param x? any (optional)
 ---@param y? any (optional)
 ---@param scale? any (optional)
-function lurek.graphics.print(text, x, y, scale) end
+function lurek.graphic.print(text, x, y, scale) end
 
 --- Draws word-wrapped text within a given width.
 ---@param text any
@@ -5154,10 +5128,10 @@ function lurek.graphics.print(text, x, y, scale) end
 ---@param y any
 ---@param limit any
 ---@param align? any (optional)
-function lurek.graphics.printf(text, x, y, limit, align) end
+function lurek.graphic.printf(text, x, y, limit, align) end
 
 --- Pushes the current transform onto the stack.
-function lurek.graphics.push() end
+function lurek.graphic.push() end
 
 --- Draws a rectangle.
 ---@param mode string
@@ -5167,112 +5141,112 @@ function lurek.graphics.push() end
 ---@param h number
 ---@param rx? number? (optional)
 ---@param ry? number? (optional)
-function lurek.graphics.rectangle(mode, x, y, w, h, rx, ry) end
+function lurek.graphic.rectangle(mode, x, y, w, h, rx, ry) end
 
 --- Rotates the coordinate system.
 ---@param angle any
-function lurek.graphics.rotate(angle) end
+function lurek.graphic.rotate(angle) end
 
 --- Queues a screenshot to be saved after the current frame.
 ---@param path any
-function lurek.graphics.saveScreenshot(path) end
+function lurek.graphic.saveScreenshot(path) end
 
 --- Scales the coordinate system.
 ---@param sx any
 ---@param sy? any (optional)
-function lurek.graphics.scale(sx, sy) end
+function lurek.graphic.scale(sx, sy) end
 
 --- Sets the background clear color.
 ---@param r any
 ---@param g any
 ---@param b any
-function lurek.graphics.setBackgroundColor(r, g, b) end
+function lurek.graphic.setBackgroundColor(r, g, b) end
 
 --- Sets the blend mode for drawing.
 ---@param mode any
-function lurek.graphics.setBlendMode(mode) end
+function lurek.graphic.setBlendMode(mode) end
 
 --- Sets the active render target to a Canvas, or back to the screen.
 ---@param ud? any (optional)
-function lurek.graphics.setCanvas(ud) end
+function lurek.graphic.setCanvas(ud) end
 
 --- Sets the current drawing color.
 ---@param r any
 ---@param g any
 ---@param b any
 ---@param a? any (optional)
-function lurek.graphics.setColor(r, g, b, a) end
+function lurek.graphic.setColor(r, g, b, a) end
 
 --- Sets which RGBA channels are written. Reset with no args.
 ---@param args any
-function lurek.graphics.setColorMask(args) end
+function lurek.graphic.setColorMask(args) end
 
 --- Sets the default texture filter mode.
 ---@param min any
 ---@param mag any
 ---@param anisotropy? any (optional)
-function lurek.graphics.setDefaultFilter(min, mag, anisotropy) end
+function lurek.graphic.setDefaultFilter(min, mag, anisotropy) end
 
 --- Sets the depth test comparison and write enable.
 ---@param mode any
 ---@param write? any (optional)
-function lurek.graphics.setDepthMode(mode, write) end
+function lurek.graphic.setDepthMode(mode, write) end
 
 --- Sets the active font for print calls.
 ---@param ud any
-function lurek.graphics.setFont(ud) end
+function lurek.graphic.setFont(ud) end
 
 --- Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
 ---@param font any
 ---@param lh any
 ---@return nil
-function lurek.graphics.setFontLineHeight(font, lh) end
+function lurek.graphic.setFontLineHeight(font, lh) end
 
 --- Sets the line width for outline drawing.
 ---@param w any
-function lurek.graphics.setLineWidth(w) end
+function lurek.graphic.setLineWidth(w) end
 
 --- Sets the point diameter in pixels.
 ---@param size any
-function lurek.graphics.setPointSize(size) end
+function lurek.graphic.setPointSize(size) end
 
 --- Restricts drawing to a rectangle, or clears scissor if no args.
 ---@param args any
-function lurek.graphics.setScissor(args) end
+function lurek.graphic.setScissor(args) end
 
 --- Sets the active shader, or clears it.
 ---@param ud? any (optional)
-function lurek.graphics.setShader(ud) end
+function lurek.graphic.setShader(ud) end
 
 --- Sets the stencil buffer write/test mode.
 ---@param action any
 ---@param compare? any (optional)
 ---@param value? any (optional)
-function lurek.graphics.setStencilMode(action, compare, value) end
+function lurek.graphic.setStencilMode(action, compare, value) end
 
 --- Sets the stencil comparison test, or disables stencil testing.
 ---@param compare? any (optional)
 ---@param value? any (optional)
-function lurek.graphics.setStencilTest(compare, value) end
+function lurek.graphic.setStencilTest(compare, value) end
 
 --- Enables or disables wireframe rendering.
 ---@param enabled any
-function lurek.graphics.setWireframe(enabled) end
+function lurek.graphic.setWireframe(enabled) end
 
 --- Shears the coordinate system.
 ---@param kx any
 ---@param ky any
-function lurek.graphics.shear(kx, ky) end
+function lurek.graphic.shear(kx, ky) end
 
 --- Begins stencil writing with the given action and value.
 ---@param action? any (optional)
 ---@param value? any (optional)
-function lurek.graphics.stencil(action, value) end
+function lurek.graphic.stencil(action, value) end
 
 --- Translates the coordinate system.
 ---@param x any
 ---@param y any
-function lurek.graphics.translate(x, y) end
+function lurek.graphic.translate(x, y) end
 
 --- Draws a triangle.
 ---@param mode any
@@ -5282,1567 +5256,7 @@ function lurek.graphics.translate(x, y) end
 ---@param y2 any
 ---@param x3 any
 ---@param y3 any
-function lurek.graphics.triangle(mode, x1, y1, x2, y2, x3, y3) end
-
----@class lurek.gui
-lurek.gui = {}
-
---- Adds Accordion-specific methods (1-based sections in Lua).
----@class Accordion
-local Accordion = {}
-
---- Adds a section entry to this Accordion widget.
----@param title any
----@param content_idx? any (optional)
----@return nil
-function Accordion:addSection(title, content_idx) end
-
---- Returns the section count of this Accordion widget.
----@return integer
-function Accordion:getSectionCount() end
-
---- Returns the section title of this Accordion widget.
----@param section_idx any
----@return nil
-function Accordion:getSectionTitle(section_idx) end
-
---- Returns true if exclusive is enabled for this Accordion widget.
----@return boolean
-function Accordion:isExclusive() end
-
---- Returns true if section expanded is enabled for this Accordion widget.
----@param section_idx any
----@return boolean
-function Accordion:isSectionExpanded(section_idx) end
-
---- Sets the exclusive for this Accordion widget.
----@param v any
----@return nil
-function Accordion:setExclusive(v) end
-
---- Toggles the expanded/collapsed status of an Accordion section.
----@param section_idx any
----@return nil
-function Accordion:toggleSection(section_idx) end
-
---- Adds Button-specific methods to a widget table.
----@class Button
-local Button = {}
-
---- Returns the text of this Button widget.
----@return string
-function Button:getText() end
-
---- Sets the text for this Button widget.
----@param text any
----@return nil
-function Button:setText(text) end
-
---- Adds CheckBox-specific methods to a widget table.
----@class Checkbox
-local Checkbox = {}
-
---- Returns the text of this Checkbox widget.
----@return string
-function Checkbox:getText() end
-
---- Returns true if checked is enabled for this Checkbox widget.
----@return boolean
-function Checkbox:isChecked() end
-
---- Sets the checked for this Checkbox widget.
----@param checked any
----@return nil
-function Checkbox:setChecked(checked) end
-
---- Sets the text for this Checkbox widget.
----@param text any
----@return nil
-function Checkbox:setText(text) end
-
---- Adds ColorPicker-specific methods.
----@class Color_Picker
-local Color_Picker = {}
-
---- Returns the color of this Color_Picker widget.
----@return number
-function Color_Picker:getColor() end
-
---- Returns the color mode of this Color_Picker widget.
----@return string
-function Color_Picker:getColorMode() end
-
---- Returns the show alpha of this Color_Picker widget.
----@return boolean
-function Color_Picker:getShowAlpha() end
-
---- Sets the color for this Color_Picker widget.
----@param r any
----@param green any
----@param b any
----@param a? any (optional)
----@return nil
-function Color_Picker:setColor(r, green, b, a) end
-
---- Sets the color mode for this Color_Picker widget.
----@param mode any
----@return nil
-function Color_Picker:setColorMode(mode) end
-
---- Registers a callback invoked when this widget's value changes.
----@param f any
----@return nil
-function Color_Picker:setOnChange(f) end
-
---- Sets the show alpha for this Color_Picker widget.
----@param v any
----@return nil
-function Color_Picker:setShowAlpha(v) end
-
---- Adds ComboBox-specific methods (1-based indices in Lua).
----@class Combo_Box
-local Combo_Box = {}
-
---- Adds a item entry to this Combo_Box widget.
----@param text any
----@return nil
-function Combo_Box:addItem(text) end
-
---- Clears all items entries from this Combo_Box widget.
----@return nil
-function Combo_Box:clearItems() end
-
---- Returns the item of this Combo_Box widget.
----@param index any
----@return string
-function Combo_Box:getItem(index) end
-
---- Returns the item count of this Combo_Box widget.
----@return integer
-function Combo_Box:getItemCount() end
-
---- Returns the selected index of this Combo_Box widget.
----@return integer
-function Combo_Box:getSelectedIndex() end
-
---- Returns the selected item of this Combo_Box widget.
----@return string
-function Combo_Box:getSelectedItem() end
-
---- Removes the item from this Combo_Box widget.
----@param index any
----@return nil
-function Combo_Box:removeItem(index) end
-
---- Sets the selected index for this Combo_Box widget.
----@param index any
----@return nil
-function Combo_Box:setSelectedIndex(index) end
-
---- Adds Dialog-specific methods.
----@class Dialog
-local Dialog = {}
-
---- Adds a button entry to this Dialog widget.
----@param text any
----@param cb? any (optional)
----@return nil
-function Dialog:addButton(text, cb) end
-
---- Closes and removes this dialog from the screen.
----@return nil
-function Dialog:close() end
-
---- Returns the content of this Dialog widget.
----@return integer
-function Dialog:getContent() end
-
---- Returns the title of this Dialog widget.
----@return string
-function Dialog:getTitle() end
-
---- Returns true if modal is enabled for this Dialog widget.
----@return boolean
-function Dialog:isModal() end
-
---- Returns true if open is enabled for this Dialog widget.
----@return boolean
-function Dialog:isOpen() end
-
---- Performs the open operation on this Dialog widget.
----@return nil
-function Dialog:open() end
-
---- Sets the content for this Dialog widget.
----@param content_idx? any (optional)
----@return nil
-function Dialog:setContent(content_idx) end
-
---- Sets the modal for this Dialog widget.
----@param v any
----@return nil
-function Dialog:setModal(v) end
-
---- Registers a callback invoked when this dialog is closed.
----@param f any
----@return nil
-function Dialog:setOnClose(f) end
-
---- Sets the title for this Dialog widget.
----@param title any
----@return nil
-function Dialog:setTitle(title) end
-
---- Adds DockPanel-specific methods.
----@class Dock_Panel
-local Dock_Panel = {}
-
---- Performs the dock operation on this Dock_Panel widget.
----@param child_idx any
----@param side any
----@return nil
-function Dock_Panel:dock(child_idx, side) end
-
---- Returns the docked count of this Dock_Panel widget.
----@return integer
-function Dock_Panel:getDockedCount() end
-
---- Returns the split size of this Dock_Panel widget.
----@param side any
----@return nil
-function Dock_Panel:getSplitSize(side) end
-
---- Sets the split size for this Dock_Panel widget.
----@param side any
----@param size any
----@return nil
-function Dock_Panel:setSplitSize(side, size) end
-
---- Performs the undock operation on this Dock_Panel widget.
----@param child_idx any
----@return nil
-function Dock_Panel:undock(child_idx) end
-
---- Adds GUITable-specific methods (1-based rows/cols in Lua).
----@class Gui_Table
-local Gui_Table = {}
-
---- Adds a column entry to this Gui_Table widget.
----@param header any
----@param width? any (optional)
----@return nil
-function Gui_Table:addColumn(header, width) end
-
---- Adds a row entry to this Gui_Table widget.
----@param cells any
----@return nil
-function Gui_Table:addRow(cells) end
-
---- Returns the cell of this Gui_Table widget.
----@param row any
----@param col any
----@return nil
-function Gui_Table:getCell(row, col) end
-
---- Returns the column count of this Gui_Table widget.
----@return integer
-function Gui_Table:getColumnCount() end
-
---- Returns the row count of this Gui_Table widget.
----@return integer
-function Gui_Table:getRowCount() end
-
---- Returns the selected row of this Gui_Table widget.
----@return nil
-function Gui_Table:getSelectedRow() end
-
---- Returns true if sortable is enabled for this Gui_Table widget.
----@return boolean
-function Gui_Table:isSortable() end
-
---- Sets the cell for this Gui_Table widget.
----@param row any
----@param col any
----@param text any
----@return nil
-function Gui_Table:setCell(row, col, text) end
-
---- Registers a callback invoked when a table row is selected.
----@param f any
----@return nil
-function Gui_Table:setOnSelect(f) end
-
---- Sets the selected row for this Gui_Table widget.
----@param row? any (optional)
----@return nil
-function Gui_Table:setSelectedRow(row) end
-
---- Sets the sortable for this Gui_Table widget.
----@param v any
----@return nil
-function Gui_Table:setSortable(v) end
-
---- Adds GUIWindow-specific methods.
----@class Gui_Window
-local Gui_Window = {}
-
---- Returns the title of this Gui_Window widget.
----@return string
-function Gui_Window:getTitle() end
-
---- Returns true if closeable is enabled for this Gui_Window widget.
----@return boolean
-function Gui_Window:isCloseable() end
-
---- Returns true if draggable is enabled for this Gui_Window widget.
----@return boolean
-function Gui_Window:isDraggable() end
-
---- Returns true if resizable is enabled for this Gui_Window widget.
----@return boolean
-function Gui_Window:isResizable() end
-
---- Sets the closeable for this Gui_Window widget.
----@param v any
----@return nil
-function Gui_Window:setCloseable(v) end
-
---- Sets the draggable for this Gui_Window widget.
----@param v any
----@return nil
-function Gui_Window:setDraggable(v) end
-
---- Registers a callback invoked when this window is closed.
----@param f any
----@return nil
-function Gui_Window:setOnClose(f) end
-
---- Sets the resizable for this Gui_Window widget.
----@param v any
----@return nil
-function Gui_Window:setResizable(v) end
-
---- Sets the title for this Gui_Window widget.
----@param title any
----@return nil
-function Gui_Window:setTitle(title) end
-
---- Adds ImageWidget-specific methods.
----@class Image_Widget
-local Image_Widget = {}
-
---- Queues a toast notification from a table.
----@param toast_table any
----@return nil
-function Image_Widget:addToast(toast_table) end
-
---- Clears keyboard focus.
----@return nil
-function Image_Widget:clearFocus() end
-
---- Moves focus to the next focusable widget.
----@return nil
-function Image_Widget:focusNext() end
-
---- Moves focus to the previous focusable widget.
----@return nil
-function Image_Widget:focusPrev() end
-
---- Returns the focused widget index or nil.
----@return number
-function Image_Widget:getFocus() end
-
---- Returns the root panel widget table.
----@return table
-function Image_Widget:getRoot() end
-
---- Returns the scale mode of this Image_Widget widget.
----@return string
-function Image_Widget:getScaleMode() end
-
---- Returns whether a theme is set.
----@return boolean
-function Image_Widget:getTheme() end
-
---- Returns the tint of this Image_Widget widget.
----@return number
-function Image_Widget:getTint() end
-
---- Returns the number of active toasts.
----@return number
-function Image_Widget:getToastCount() end
-
---- Returns the total widget count in the context.
----@return number
-function Image_Widget:getWidgetCount() end
-
---- Forwards a key press event to the GUI.
----@param key any
----@return boolean
-function Image_Widget:keypressed(key) end
-
---- Forwards a mouse move event to the GUI.
----@param x any
----@param y any
----@return boolean
-function Image_Widget:mousemoved(x, y) end
-
---- Forwards a mouse press event to the GUI.
----@param x any
----@param y any
----@param btn? any (optional)
----@return boolean
-function Image_Widget:mousepressed(x, y, btn) end
-
---- Forwards a mouse release event to the GUI.
----@param x any
----@param y any
----@param btn? any (optional)
----@return boolean
-function Image_Widget:mousereleased(x, y, btn) end
-
---- Creates a collapsible accordion widget.
----@return table
-function Image_Widget:newAccordion() end
-
---- Creates a button widget.
----@param text? any (optional)
----@return table
-function Image_Widget:newButton(text) end
-
---- Creates a checkbox widget.
----@param text? any (optional)
----@return table
-function Image_Widget:newCheckbox(text) end
-
---- Creates a color picker widget.
----@return table
-function Image_Widget:newColorPicker() end
-
---- Creates a dropdown combo box widget.
----@return table
-function Image_Widget:newComboBox() end
-
---- Creates a modal dialog widget.
----@param title? any (optional)
----@return table
-function Image_Widget:newDialog(title) end
-
---- Creates a dock panel.
----@return table
-function Image_Widget:newDockPanel() end
-
---- Creates an image display widget.
----@return table
-function Image_Widget:newImageWidget() end
-
---- Creates a text label widget.
----@param text? any (optional)
----@return table
-function Image_Widget:newLabel(text) end
-
---- Creates a flexbox layout container.
----@param direction? any (optional)
----@return table
-function Image_Widget:newLayout(direction) end
-
---- Creates a selectable list widget.
----@return table
-function Image_Widget:newList() end
-
---- Creates a menu bar widget.
----@return table
-function Image_Widget:newMenuBar() end
-
---- Creates a menu item widget.
----@param text? any (optional)
----@return table
-function Image_Widget:newMenuItem(text) end
-
---- Creates a 9-patch slicer widget.
----@return table
-function Image_Widget:newNinePatch() end
-
---- Creates a container panel widget.
----@return table
-function Image_Widget:newPanel() end
-
---- Creates a progress bar widget.
----@param min? any (optional)
----@param max? any (optional)
----@return table
-function Image_Widget:newProgressBar(min, max) end
-
---- Creates a grouped radio button widget.
----@param text? any (optional)
----@param group? any (optional)
----@return table
-function Image_Widget:newRadioButton(text, group) end
-
---- Creates a scroll bar widget.
----@param vertical? any (optional)
----@return table
-function Image_Widget:newScrollBar(vertical) end
-
---- Creates a scrollable panel widget.
----@return table
-function Image_Widget:newScrollPanel() end
-
---- Creates a separator line.
----@param vertical? any (optional)
----@return table
-function Image_Widget:newSeparator(vertical) end
-
---- Creates a value slider widget.
----@param min? any (optional)
----@param max? any (optional)
----@return table
-function Image_Widget:newSlider(min, max) end
-
---- Creates a spacing filler widget.
----@param w? any (optional)
----@param h? any (optional)
----@return table
-function Image_Widget:newSpacer(w, h) end
-
---- Creates a resizable split panel.
----@param orientation? any (optional)
----@return table
-function Image_Widget:newSplitPanel(orientation) end
-
---- Creates a status bar widget.
----@return table
-function Image_Widget:newStatusBar() end
-
---- Creates a tab bar widget.
----@return table
-function Image_Widget:newTabBar() end
-
---- Creates a data table widget.
----@return table
-function Image_Widget:newTable() end
-
---- Creates a text input widget.
----@return table
-function Image_Widget:newTextInput() end
-
---- Creates a new theme instance.
----@return Theme
-function Image_Widget:newTheme() end
-
---- Creates a toast notification widget.
----@param message? any (optional)
----@param duration? any (optional)
----@return table
-function Image_Widget:newToast(message, duration) end
-
---- Creates a toolbar widget.
----@param orientation? any (optional)
----@return table
-function Image_Widget:newToolbar(orientation) end
-
---- Creates a tooltip panel widget.
----@param text? any (optional)
----@return table
-function Image_Widget:newTooltipPanel(text) end
-
---- Creates a collapsible tree view widget.
----@return table
-function Image_Widget:newTreeView() end
-
---- Creates a draggable window widget.
----@param title? any (optional)
----@return table
-function Image_Widget:newWindow(title) end
-
---- Sets keyboard focus to a widget or clears it.
----@param widget? any (optional)
----@return nil
-function Image_Widget:setFocus(widget) end
-
---- Sets the scale mode for this Image_Widget widget.
----@param mode any
----@return nil
-function Image_Widget:setScaleMode(mode) end
-
---- Sets the active GUI theme.
----@param theme_ud any
----@return nil
-function Image_Widget:setTheme(theme_ud) end
-
---- Sets the tint for this Image_Widget widget.
----@param r any
----@param green any
----@param b any
----@param a? any (optional)
----@return nil
-function Image_Widget:setTint(r, green, b, a) end
-
---- Forwards text input to the focused text input widget.
----@param text any
----@return boolean
-function Image_Widget:textinput(text) end
-
---- Advances toast timers, removes expired toasts, and dispatches pending GUI events.
----@param dt any
----@return nil
-function Image_Widget:update(dt) end
-
---- Forwards a mouse wheel event to the GUI.
----@param x any
----@param y any
----@return boolean
-function Image_Widget:wheelmoved(x, y) end
-
---- Adds Label-specific methods to a widget table.
----@class Label
-local Label = {}
-
---- Returns the text of this Label widget.
----@return string
-function Label:getText() end
-
---- Sets the text for this Label widget.
----@param text any
----@return nil
-function Label:setText(text) end
-
---- Adds Layout-specific methods.
----@class Layout
-local Layout = {}
-
---- Returns the align of this Layout widget.
----@return string
-function Layout:getAlign() end
-
---- Returns the direction of this Layout widget.
----@return string
-function Layout:getDirection() end
-
---- Returns the justify of this Layout widget.
----@return string
-function Layout:getJustify() end
-
---- Returns the spacing of this Layout widget.
----@return number
-function Layout:getSpacing() end
-
---- Returns the wrap of this Layout widget.
----@return boolean
-function Layout:getWrap() end
-
---- Sets the align for this Layout widget.
----@param align any
----@return nil
-function Layout:setAlign(align) end
-
---- Sets the columns for this Layout widget.
----@param n any
----@return nil
-function Layout:setColumns(n) end
-
---- Sets the direction for this Layout widget.
----@param dir any
----@return nil
-function Layout:setDirection(dir) end
-
---- Sets the justify for this Layout widget.
----@param justify any
----@return nil
-function Layout:setJustify(justify) end
-
---- Sets the spacing for this Layout widget.
----@param spacing any
----@return nil
-function Layout:setSpacing(spacing) end
-
---- Sets the wrap for this Layout widget.
----@param wrap any
----@return nil
-function Layout:setWrap(wrap) end
-
---- Adds ListBox-specific methods (1-based indices in Lua).
----@class List_Box
-local List_Box = {}
-
---- Adds a item entry to this List_Box widget.
----@param text any
----@return nil
-function List_Box:addItem(text) end
-
---- Clears all items entries from this List_Box widget.
----@return nil
-function List_Box:clearItems() end
-
---- Returns the item of this List_Box widget.
----@param index any
----@return string
-function List_Box:getItem(index) end
-
---- Returns the item count of this List_Box widget.
----@return integer
-function List_Box:getItemCount() end
-
---- Returns the selected index of this List_Box widget.
----@return integer
-function List_Box:getSelectedIndex() end
-
---- Removes the item from this List_Box widget.
----@param index any
----@return nil
-function List_Box:removeItem(index) end
-
---- Sets the item height for this List_Box widget.
----@param h any
----@return nil
-function List_Box:setItemHeight(h) end
-
---- Sets the selected index for this List_Box widget.
----@param index any
----@return nil
-function List_Box:setSelectedIndex(index) end
-
---- Adds MenuBar-specific methods.
----@class Menu_Bar
-local Menu_Bar = {}
-
---- Adds a menu entry to this Menu_Bar widget.
----@param menu_idx any
----@return nil
-function Menu_Bar:addMenu(menu_idx) end
-
---- Returns the menu count of this Menu_Bar widget.
----@return integer
-function Menu_Bar:getMenuCount() end
-
---- Returns the menus of this Menu_Bar widget.
----@return nil
-function Menu_Bar:getMenus() end
-
---- Removes the menu from this Menu_Bar widget.
----@param menu_idx any
----@return nil
-function Menu_Bar:removeMenu(menu_idx) end
-
---- Adds MenuItem-specific methods.
----@class Menu_Item
-local Menu_Item = {}
-
---- Adds a sub item entry to this Menu_Item widget.
----@param child_idx any
----@return nil
-function Menu_Item:addSubItem(child_idx) end
-
---- Returns the shortcut of this Menu_Item widget.
----@return string
-function Menu_Item:getShortcut() end
-
---- Returns the sub items of this Menu_Item widget.
----@return nil
-function Menu_Item:getSubItems() end
-
---- Returns the text of this Menu_Item widget.
----@return string
-function Menu_Item:getText() end
-
---- Returns true if checked is enabled for this Menu_Item widget.
----@return boolean
-function Menu_Item:isChecked() end
-
---- Sets the checked for this Menu_Item widget.
----@param v any
----@return nil
-function Menu_Item:setChecked(v) end
-
---- Registers a callback invoked when this menu item is clicked.
----@param f any
----@return nil
-function Menu_Item:setOnClick(f) end
-
---- Sets the shortcut for this Menu_Item widget.
----@param shortcut any
----@return nil
-function Menu_Item:setShortcut(shortcut) end
-
---- Sets the text for this Menu_Item widget.
----@param text any
----@return nil
-function Menu_Item:setText(text) end
-
---- Adds NinePatch-specific methods.
----@class Nine_Patch
-local Nine_Patch = {}
-
---- Returns the image dimensions of this Nine_Patch widget.
----@return integer
-function Nine_Patch:getImageDimensions() end
-
---- Returns the insets of this Nine_Patch widget.
----@return integer
-function Nine_Patch:getInsets() end
-
---- Returns the slices of this Nine_Patch widget.
----@return table
-function Nine_Patch:getSlices() end
-
---- Sets the image dimensions for this Nine_Patch widget.
----@param w any
----@param h any
----@return nil
-function Nine_Patch:setImageDimensions(w, h) end
-
---- Sets the insets for this Nine_Patch widget.
----@param left any
----@param top any
----@param right any
----@param bottom any
----@return nil
-function Nine_Patch:setInsets(left, top, right, bottom) end
-
---- Adds Panel-specific methods.
----@class Panel
-local Panel = {}
-
---- Returns the title of this Panel widget.
----@return string
-function Panel:getTitle() end
-
---- Sets the scrollable for this Panel widget.
----@param scrollable any
----@return nil
-function Panel:setScrollable(scrollable) end
-
---- Sets the title for this Panel widget.
----@param title any
----@return nil
-function Panel:setTitle(title) end
-
---- Adds ProgressBar-specific methods to a widget table.
----@class Progress_Bar
-local Progress_Bar = {}
-
---- Returns the max of this Progress_Bar widget.
----@return number
-function Progress_Bar:getMax() end
-
---- Returns the min of this Progress_Bar widget.
----@return number
-function Progress_Bar:getMin() end
-
---- Returns the progress of this Progress_Bar widget.
----@return number
-function Progress_Bar:getProgress() end
-
---- Returns the value of this Progress_Bar widget.
----@return number
-function Progress_Bar:getValue() end
-
---- Sets the range for this Progress_Bar widget.
----@param min any
----@param max any
----@return nil
-function Progress_Bar:setRange(min, max) end
-
---- Sets the value for this Progress_Bar widget.
----@param v any
----@return nil
-function Progress_Bar:setValue(v) end
-
---- Adds RadioButton-specific methods.
----@class Radio_Button
-local Radio_Button = {}
-
---- Returns the group of this Radio_Button widget.
----@return string
-function Radio_Button:getGroup() end
-
---- Returns the text of this Radio_Button widget.
----@return string
-function Radio_Button:getText() end
-
---- Returns true if selected is enabled for this Radio_Button widget.
----@return boolean
-function Radio_Button:isSelected() end
-
---- Sets the group for this Radio_Button widget.
----@param group any
----@return nil
-function Radio_Button:setGroup(group) end
-
---- Registers a callback invoked when this widget's value changes.
----@param f any
----@return nil
-function Radio_Button:setOnChange(f) end
-
---- Sets the selected for this Radio_Button widget.
----@param v any
----@return nil
-function Radio_Button:setSelected(v) end
-
---- Sets the text for this Radio_Button widget.
----@param text any
----@return nil
-function Radio_Button:setText(text) end
-
---- Adds ScrollBar-specific methods.
----@class Scroll_Bar
-local Scroll_Bar = {}
-
---- Returns the content size of this Scroll_Bar widget.
----@return number
-function Scroll_Bar:getContentSize() end
-
---- Returns the scroll position of this Scroll_Bar widget.
----@return number
-function Scroll_Bar:getScrollPosition() end
-
---- Returns the view size of this Scroll_Bar widget.
----@return number
-function Scroll_Bar:getViewSize() end
-
---- Returns true if vertical is enabled for this Scroll_Bar widget.
----@return boolean
-function Scroll_Bar:isVertical() end
-
---- Sets the content size for this Scroll_Bar widget.
----@param v any
----@return nil
-function Scroll_Bar:setContentSize(v) end
-
---- Registers a callback invoked when this widget's value changes.
----@param f any
----@return nil
-function Scroll_Bar:setOnChange(f) end
-
---- Sets the scroll position for this Scroll_Bar widget.
----@param v any
----@return nil
-function Scroll_Bar:setScrollPosition(v) end
-
---- Sets the view size for this Scroll_Bar widget.
----@param v any
----@return nil
-function Scroll_Bar:setViewSize(v) end
-
---- Adds ScrollPanel-specific methods.
----@class Scroll_Panel
-local Scroll_Panel = {}
-
---- Returns the content size of this Scroll_Panel widget.
----@return number
-function Scroll_Panel:getContentSize() end
-
---- Returns the max scroll of this Scroll_Panel widget.
----@return number
-function Scroll_Panel:getMaxScroll() end
-
---- Returns the scroll position of this Scroll_Panel widget.
----@return number
-function Scroll_Panel:getScrollPosition() end
-
---- Returns the scroll speed of this Scroll_Panel widget.
----@return number
-function Scroll_Panel:getScrollSpeed() end
-
---- Sets the content size for this Scroll_Panel widget.
----@param w any
----@param h any
----@return nil
-function Scroll_Panel:setContentSize(w, h) end
-
---- Sets the scroll position for this Scroll_Panel widget.
----@param x any
----@param y any
----@return nil
-function Scroll_Panel:setScrollPosition(x, y) end
-
---- Sets the scroll speed for this Scroll_Panel widget.
----@param speed any
----@return nil
-function Scroll_Panel:setScrollSpeed(speed) end
-
---- Adds Separator-specific methods.
----@class Separator
-local Separator = {}
-
---- Returns the thickness of this Separator widget.
----@return number
-function Separator:getThickness() end
-
---- Returns true if vertical is enabled for this Separator widget.
----@return boolean
-function Separator:isVertical() end
-
---- Sets the thickness for this Separator widget.
----@param thickness any
----@return nil
-function Separator:setThickness(thickness) end
-
---- Sets the vertical for this Separator widget.
----@param v any
----@return nil
-function Separator:setVertical(v) end
-
---- Adds Slider-specific methods to a widget table.
----@class Slider
-local Slider = {}
-
---- Returns the max of this Slider widget.
----@return number
-function Slider:getMax() end
-
---- Returns the min of this Slider widget.
----@return number
-function Slider:getMin() end
-
---- Returns the value of this Slider widget.
----@return number
-function Slider:getValue() end
-
---- Sets the range for this Slider widget.
----@param min any
----@param max any
----@return nil
-function Slider:setRange(min, max) end
-
---- Sets the step for this Slider widget.
----@param step any
----@return nil
-function Slider:setStep(step) end
-
---- Sets the value for this Slider widget.
----@param v any
----@return nil
-function Slider:setValue(v) end
-
---- Adds SplitPanel-specific methods.
----@class Split_Panel
-local Split_Panel = {}
-
---- Returns the first child of this Split_Panel widget.
----@return nil
-function Split_Panel:getFirstChild() end
-
---- Returns the min panel size of this Split_Panel widget.
----@return number
-function Split_Panel:getMinPanelSize() end
-
---- Returns the orientation of this Split_Panel widget.
----@return string
-function Split_Panel:getOrientation() end
-
---- Returns the second child of this Split_Panel widget.
----@return nil
-function Split_Panel:getSecondChild() end
-
---- Returns the split position of this Split_Panel widget.
----@return number
-function Split_Panel:getSplitPosition() end
-
---- Sets the first child for this Split_Panel widget.
----@param child_idx any
----@return nil
-function Split_Panel:setFirstChild(child_idx) end
-
---- Sets the min panel size for this Split_Panel widget.
----@param v any
----@return nil
-function Split_Panel:setMinPanelSize(v) end
-
---- Sets the orientation for this Split_Panel widget.
----@param v any
----@return nil
-function Split_Panel:setOrientation(v) end
-
---- Sets the second child for this Split_Panel widget.
----@param child_idx any
----@return nil
-function Split_Panel:setSecondChild(child_idx) end
-
---- Sets the split position for this Split_Panel widget.
----@param v any
----@return nil
-function Split_Panel:setSplitPosition(v) end
-
---- Adds StatusBar-specific methods.
----@class Status_Bar
-local Status_Bar = {}
-
---- Adds a section entry to this Status_Bar widget.
----@param text any
----@param width? any (optional)
----@return nil
-function Status_Bar:addSection(text, width) end
-
---- Returns the section count of this Status_Bar widget.
----@return integer
-function Status_Bar:getSectionCount() end
-
---- Returns the section text of this Status_Bar widget.
----@param section_idx any
----@return integer
-function Status_Bar:getSectionText(section_idx) end
-
---- Sets the section text for this Status_Bar widget.
----@param section_idx any
----@param text any
----@return nil
-function Status_Bar:setSectionText(section_idx, text) end
-
---- Adds TabBar-specific methods (1-based indices in Lua).
----@class Tab_Bar
-local Tab_Bar = {}
-
---- Adds a tab entry to this Tab_Bar widget.
----@param label any
----@return nil
-function Tab_Bar:addTab(label) end
-
---- Returns the active tab of this Tab_Bar widget.
----@return integer
-function Tab_Bar:getActiveTab() end
-
---- Returns the tab of this Tab_Bar widget.
----@param index any
----@return integer
-function Tab_Bar:getTab(index) end
-
---- Returns the tab count of this Tab_Bar widget.
----@return integer
-function Tab_Bar:getTabCount() end
-
---- Removes the tab from this Tab_Bar widget.
----@param index any
----@return nil
-function Tab_Bar:removeTab(index) end
-
---- Sets the active tab for this Tab_Bar widget.
----@param index any
----@return nil
-function Tab_Bar:setActiveTab(index) end
-
---- Adds TextInput-specific methods to a widget table.
----@class Text_Input
-local Text_Input = {}
-
---- Returns the cursor position of this Text_Input widget.
----@return integer
-function Text_Input:getCursorPosition() end
-
---- Returns the placeholder of this Text_Input widget.
----@return string
-function Text_Input:getPlaceholder() end
-
---- Returns the text of this Text_Input widget.
----@return string
-function Text_Input:getText() end
-
---- Returns true if focused is enabled for this Text_Input widget.
----@return boolean
-function Text_Input:isFocused() end
-
---- Sets the max length for this Text_Input widget.
----@param n any
----@return nil
-function Text_Input:setMaxLength(n) end
-
---- Sets the placeholder for this Text_Input widget.
----@param text any
----@return nil
-function Text_Input:setPlaceholder(text) end
-
---- Sets the text for this Text_Input widget.
----@param text any
----@return nil
-function Text_Input:setText(text) end
-
---- Adds Toast-specific methods.
----@class Toast
-local Toast = {}
-
---- Returns the duration of this Toast widget.
----@return number
-function Toast:getDuration() end
-
---- Returns the message of this Toast widget.
----@return string
-function Toast:getMessage() end
-
---- Returns the progress of this Toast widget.
----@return number
-function Toast:getProgress() end
-
---- Returns true if expired is enabled for this Toast widget.
----@return boolean
-function Toast:isExpired() end
-
---- Sets the duration for this Toast widget.
----@param d any
----@return nil
-function Toast:setDuration(d) end
-
---- Sets the message for this Toast widget.
----@param msg any
----@return nil
-function Toast:setMessage(msg) end
-
---- Adds Toolbar-specific methods.
----@class Toolbar
-local Toolbar = {}
-
---- Adds a button entry to this Toolbar widget.
----@param id any
----@param tooltip? any (optional)
----@return nil
-function Toolbar:addButton(id, tooltip) end
-
---- Returns the button of this Toolbar widget.
----@param id any
----@return boolean
-function Toolbar:getButton(id) end
-
---- Returns the orientation of this Toolbar widget.
----@return string
-function Toolbar:getOrientation() end
-
---- Returns true if button toggled is enabled for this Toolbar widget.
----@param id any
----@return boolean
-function Toolbar:isButtonToggled(id) end
-
---- Sets the button enabled for this Toolbar widget.
----@param id any
----@param enabled any
----@return nil
-function Toolbar:setButtonEnabled(id, enabled) end
-
---- Sets the button toggled for this Toolbar widget.
----@param id any
----@param toggled any
----@return nil
-function Toolbar:setButtonToggled(id, toggled) end
-
---- Sets the orientation for this Toolbar widget.
----@param v any
----@return nil
-function Toolbar:setOrientation(v) end
-
---- Adds TooltipPanel-specific methods.
----@class Tooltip_Panel
-local Tooltip_Panel = {}
-
---- Returns the delay of this Tooltip_Panel widget.
----@return number
-function Tooltip_Panel:getDelay() end
-
---- Returns the target of this Tooltip_Panel widget.
----@return nil
-function Tooltip_Panel:getTarget() end
-
---- Returns the text of this Tooltip_Panel widget.
----@return string
-function Tooltip_Panel:getText() end
-
---- Sets the delay for this Tooltip_Panel widget.
----@param v any
----@return nil
-function Tooltip_Panel:setDelay(v) end
-
---- Sets the target for this Tooltip_Panel widget.
----@param target? any (optional)
----@return nil
-function Tooltip_Panel:setTarget(target) end
-
---- Sets the text for this Tooltip_Panel widget.
----@param text any
----@return nil
-function Tooltip_Panel:setText(text) end
-
---- Adds TreeView-specific methods (1-based indices in Lua).
----@class Tree_View
-local Tree_View = {}
-
---- Adds a node entry to this Tree_View widget.
----@param text any
----@param parent_index? any (optional)
----@return nil
-function Tree_View:addNode(text, parent_index) end
-
---- Clears all nodes entries from this Tree_View widget.
----@return nil
-function Tree_View:clearNodes() end
-
---- Performs the collapse all operation on this Tree_View widget.
----@return nil
-function Tree_View:collapseAll() end
-
---- Performs the collapse node operation on this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:collapseNode(index) end
-
---- Performs the expand all operation on this Tree_View widget.
----@return nil
-function Tree_View:expandAll() end
-
---- Performs the expand node operation on this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:expandNode(index) end
-
---- Returns the child nodes of this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:getChildNodes(index) end
-
---- Returns the node count of this Tree_View widget.
----@return integer
-function Tree_View:getNodeCount() end
-
---- Returns the node depth of this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:getNodeDepth(index) end
-
---- Returns the node text of this Tree_View widget.
----@param index any
----@return string
-function Tree_View:getNodeText(index) end
-
---- Returns the parent node of this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:getParentNode(index) end
-
---- Returns the selected node of this Tree_View widget.
----@return integer
-function Tree_View:getSelectedNode() end
-
---- Returns true if expanded is enabled for this Tree_View widget.
----@param index any
----@return boolean
-function Tree_View:isExpanded(index) end
-
---- Returns true if node expanded is enabled for this Tree_View widget.
----@param index any
----@return boolean
-function Tree_View:isNodeExpanded(index) end
-
---- Removes the node from this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:removeNode(index) end
-
---- Sets the node icon for this Tree_View widget.
----@param index any
----@param icon any
----@return nil
-function Tree_View:setNodeIcon(index, icon) end
-
---- Sets the node text for this Tree_View widget.
----@param index any
----@param text any
----@return nil
-function Tree_View:setNodeText(index, text) end
-
---- Sets the selected node for this Tree_View widget.
----@param index any
----@return nil
-function Tree_View:setSelectedNode(index) end
-
---- Toggles the expanded/collapsed status of a Tree_View node.
----@param index any
----@return nil
-function Tree_View:toggleNode(index) end
-
---- Adds a child widget to this container.
----@param child any
----@return nil
-function lurek.gui.addChild(child) end
-
---- Removes all anchor constraints.
----@return nil
-function lurek.gui.clearAnchor() end
-
---- Returns whether (x, y) is inside this widget.
----@param x any
----@param y any
----@return boolean
-function lurek.gui.containsPoint(x, y) end
-
---- Recursively searches for a widget by id starting from this widget.
----@param id any
----@return table
-function lurek.gui.findById(id) end
-
---- Returns the number of children in this container.
----@return number
-function lurek.gui.getChildCount() end
-
---- Returns the flex-grow factor.
----@return number
-function lurek.gui.getFlexGrow() end
-
---- Returns the flex-shrink factor.
----@return number
-function lurek.gui.getFlexShrink() end
-
---- Returns the widget string identifier.
----@return string
-function lurek.gui.getId() end
-
---- Returns the widget margin (top, right, bottom, left).
----@return number
-function lurek.gui.getMargin() end
-
---- Returns the maximum widget size.
----@return number
-function lurek.gui.getMaxSize() end
-
---- Returns the minimum widget size.
----@return number
-function lurek.gui.getMinSize() end
-
---- Returns the widget padding (top, right, bottom, left).
----@return number
-function lurek.gui.getPadding() end
-
---- Returns the widget position.
----@return number
-function lurek.gui.getPosition() end
-
---- Returns the widget size.
----@return number
-function lurek.gui.getSize() end
-
---- Returns the widget interaction state name.
----@return string
-function lurek.gui.getState() end
-
---- Returns the widget tooltip text.
----@return string
-function lurek.gui.getTooltip() end
-
---- Returns the widget z-order.
----@return number
-function lurek.gui.getZOrder() end
-
---- Returns whether the widget is enabled.
----@return boolean
-function lurek.gui.isEnabled() end
-
---- Returns whether the widget is visible.
----@return boolean
-function lurek.gui.isVisible() end
-
---- Removes a child widget from this container.
----@param child any
----@return nil
-function lurek.gui.removeChild(child) end
-
---- Sets anchor edges (left, top, right, bottom).
----@param left number
----@param top number
----@param right number
----@param bottom number
----@return nil
-function lurek.gui.setAnchor(left, top, right, bottom) end
-
---- Sets center anchor offsets.
----@param cx? any (optional)
----@param cy? any (optional)
----@return nil
-function lurek.gui.setAnchorCenter(cx, cy) end
-
---- Sets whether the widget is enabled.
----@param v any
----@return nil
-function lurek.gui.setEnabled(v) end
-
---- Sets the flex-grow factor.
----@param grow any
----@return nil
-function lurek.gui.setFlexGrow(grow) end
-
---- Sets the flex-shrink factor.
----@param shrink any
----@return nil
-function lurek.gui.setFlexShrink(shrink) end
-
---- Sets the widget string identifier.
----@param id any
----@return nil
-function lurek.gui.setId(id) end
-
---- Sets widget margin (CSS-like: top, right?, bottom?, left?).
----@param top any
----@param right? any (optional)
----@param bottom? any (optional)
----@param left? any (optional)
----@return nil
-function lurek.gui.setMargin(top, right, bottom, left) end
-
---- Sets the maximum widget size.
----@param w any
----@param h any
----@return nil
-function lurek.gui.setMaxSize(w, h) end
-
---- Sets the minimum widget size.
----@param w any
----@param h any
----@return nil
-function lurek.gui.setMinSize(w, h) end
-
---- Registers a callback invoked when this widget's value changes.
----@param f any
----@return nil
-function lurek.gui.setOnChange(f) end
-
---- Registers a callback invoked when this widget is clicked.
----@param f any
----@return nil
-function lurek.gui.setOnClick(f) end
-
---- Stores a custom draw callback for later invocation.
----@param f any
----@return nil
-function lurek.gui.setOnDraw(f) end
-
---- Sets widget padding (CSS-like: top, right?, bottom?, left?).
----@param top any
----@param right? any (optional)
----@param bottom? any (optional)
----@param left? any (optional)
----@return nil
-function lurek.gui.setPadding(top, right, bottom, left) end
-
---- Sets the widget position.
----@param x any
----@param y any
----@return nil
-function lurek.gui.setPosition(x, y) end
-
---- Sets the widget size.
----@param w any
----@param h any
----@return nil
-function lurek.gui.setSize(w, h) end
-
---- Sets the widget tooltip text.
----@param text any
----@return nil
-function lurek.gui.setTooltip(text) end
-
---- Sets widget visibility.
----@param v any
----@return nil
-function lurek.gui.setVisible(v) end
-
---- Sets the widget z-order for draw sorting.
----@param z any
----@return nil
-function lurek.gui.setZOrder(z) end
+function lurek.graphic.triangle(mode, x1, y1, x2, y2, x3, y3) end
 
 ---@class lurek.image
 lurek.image = {}
@@ -6926,17 +5340,23 @@ function LayeredImage:removeLayer(index) end
 ---@return nil
 function LayeredImage:save(path) end
 
---- Replaces a layer's pixel buffer with a copy of the given ImageData.
----@param index any
----@param img any
----@return boolean
-function LayeredImage:setLayer(index, img) end
-
 --- Renames a layer.
 ---@param index any
 ---@param name any
 ---@return boolean
 function LayeredImage:setName(index, name) end
+
+--- Sets the opacity of a layer. Value is clamped to [0.0, 1.0].
+---@param index any
+---@param opacity any
+---@return boolean
+function LayeredImage:setOpacity(index, opacity) end
+
+--- Shows or hides a layer during compositing.
+---@param index any
+---@param visible any
+---@return boolean
+function LayeredImage:setVisible(index, visible) end
 
 --- Swaps two layers by their 1-based indices, changing their compositing order.
 ---@param a any
@@ -6980,6 +5400,12 @@ function lurek.image.newLayeredImage(width, height) end
 ---@param filename any
 ---@return nil
 function lurek.image.saveImage(img_ud, filename) end
+
+--- Saves a flat ImageData as a PNG file at the given path.
+---@param img_ud any
+---@param filename any
+---@return nil
+function lurek.image.savePNG(img_ud, filename) end
 
 ---@class lurek.input
 lurek.input = {}
@@ -9063,6 +7489,177 @@ function NetworkHost:setChannelLimit(limit) end
 ---@param opts any
 ---@return NetworkHost
 function lurek.network.newHost(opts) end
+
+---@class lurek.parallax
+lurek.parallax = {}
+
+--- Lua-side handle to a single parallax background layer.
+---@class ParallaxLayer
+local ParallaxLayer = {}
+
+--- Removes scroll clamping so the layer scrolls freely.
+function ParallaxLayer:clearClamp() end
+
+--- Returns the autoscroll velocity as `(vx, vy)`.
+---@return number
+function ParallaxLayer:getAutoscroll() end
+
+--- Returns the current blend mode as a string.
+---@return string
+function ParallaxLayer:getBlendMode() end
+
+--- Returns the static offset as `(x, y)`.
+---@return number
+function ParallaxLayer:getOffset() end
+
+--- Returns the current opacity.
+---@return number
+function ParallaxLayer:getOpacity() end
+
+--- Returns the scroll factor as `(x, y)`.
+---@return number
+function ParallaxLayer:getScrollFactor() end
+
+--- Returns the current tint as `(r, g, b, a)`.
+---@return number
+function ParallaxLayer:getTint() end
+
+--- Returns the draw-order depth.
+---@return integer
+function ParallaxLayer:getZ() end
+
+--- Returns `true` if the layer is currently visible.
+---@return boolean
+function ParallaxLayer:isVisible() end
+
+--- Draws the layer using an explicit camera world position.
+---@param cam_x any
+---@param cam_y any
+function ParallaxLayer:render(cam_x, cam_y) end
+
+--- Draws the layer using the engine active camera position automatically.
+function ParallaxLayer:renderAuto() end
+
+--- Resets the autonomous scroll accumulator to zero.
+function ParallaxLayer:resetAutoscroll() end
+
+--- Sets the autonomous scroll velocity in world-pixels per second.
+---@param vx any
+---@param vy any
+function ParallaxLayer:setAutoscroll(vx, vy) end
+
+--- Sets the GPU blend mode for this layer.
+---@param mode any
+function ParallaxLayer:setBlendMode(mode) end
+
+--- Sets the static world-pixel position bias added on top of camera scroll.
+---@param x any
+---@param y any
+function ParallaxLayer:setOffset(x, y) end
+
+--- Sets the layer-wide opacity override in `[0.0, 1.0]`.
+---@param a any
+function ParallaxLayer:setOpacity(a) end
+
+--- Sets whether the layer tiles on the X and Y axes.
+---@param rx any
+---@param ry any
+function ParallaxLayer:setRepeat(rx, ry) end
+
+--- Sets the texture display scale factor on each axis.
+---@param sx any
+---@param sy any
+function ParallaxLayer:setScale(sx, sy) end
+
+--- Sets the scroll factor relative to camera movement on each axis.
+---@param x any
+---@param y any
+function ParallaxLayer:setScrollFactor(x, y) end
+
+--- Sets the multiplicative RGBA tint applied to all pixels of this layer.
+---@param r any
+---@param g any
+---@param b any
+---@param a any
+function ParallaxLayer:setTint(r, g, b, a) end
+
+--- Shows or hides this layer.
+---@param v any
+function ParallaxLayer:setVisible(v) end
+
+--- Sets the draw-order depth. Lower values render first (further back).
+---@param z any
+function ParallaxLayer:setZ(z) end
+
+--- Returns the type name of this object.
+---@return string
+function ParallaxLayer:type() end
+
+--- Advances the autonomous scroll accumulator by `dt` seconds.
+---@param dt any
+function ParallaxLayer:update(dt) end
+
+--- Lua-side container that groups `LuaParallaxLayer` objects for scene-level management.
+---@class ParallaxSet
+local ParallaxSet = {}
+
+--- Adds a layer to this set.
+---@param layer any
+function ParallaxSet:addLayer(layer) end
+
+--- Returns the name of this set.
+---@return string
+function ParallaxSet:getName() end
+
+--- Returns `true` if the set is currently visible.
+---@return boolean
+function ParallaxSet:isVisible() end
+
+--- Returns the number of layers in this set.
+---@return integer
+function ParallaxSet:layerCount() end
+
+--- Removes the layer at the given 1-based index.
+---@param index any
+---@return boolean
+function ParallaxSet:removeLayerAt(index) end
+
+--- Draws all visible layers in ascending `z` order using an explicit camera position.
+---@param cam_x any
+---@param cam_y any
+function ParallaxSet:render(cam_x, cam_y) end
+
+--- Draws all visible layers using the engine active camera position.
+function ParallaxSet:renderAuto() end
+
+--- Sets the name of this set.
+---@param name any
+function ParallaxSet:setName(name) end
+
+--- Shows or hides all layers in this set.
+---@param v any
+function ParallaxSet:setVisible(v) end
+
+--- Re-sorts all layers by ascending `z` value.
+function ParallaxSet:sortByZ() end
+
+--- Returns the type name of this object.
+---@return string
+function ParallaxSet:type() end
+
+--- Advances the autoscroll accumulator of every layer by `dt` seconds.
+---@param dt any
+function ParallaxSet:update(dt) end
+
+--- Creates a new parallax background layer from an options table.
+---@param opts any
+---@return LuaParallaxLayer
+function lurek.parallax.newLayer(opts) end
+
+--- Creates a new empty parallax set with the given name.
+---@param name any
+---@return LuaParallaxSet
+function lurek.parallax.newSet(name) end
 
 ---@class lurek.particle
 lurek.particle = {}
@@ -11363,6 +9960,89 @@ function lurek.serial.toJson(value, pretty) end
 ---@return string
 function lurek.serial.toToml(value) end
 
+---@class lurek.signal
+lurek.signal = {}
+
+--- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
+---@class Signal
+local Signal = {}
+
+--- Removes all callbacks for the named event.
+---@param name any
+---@return integer
+function Signal:clear(name) end
+
+--- Removes all callbacks across all events.
+---@return integer
+function Signal:clearAll() end
+
+--- Emits the named event, calling all registered callbacks with extra arguments.
+---@param args any
+---@return nil
+function Signal:emit(args) end
+
+--- Returns the callback count for the named event.
+---@param name any
+---@return integer
+function Signal:getCount(name) end
+
+--- Returns the total callback count across all events.
+---@return integer
+function Signal:getTotalCount() end
+
+--- Removes a subscription by handle ID.
+---@param handle any
+---@return boolean
+function Signal:remove(handle) end
+
+--- Returns the type name of this object.
+---@return string
+function Signal:type() end
+
+--- Returns true if the given type name matches this object's type or any parent type.
+---@param name any
+---@return boolean
+function Signal:typeOf(name) end
+
+--- Discards all pending events in the queue.
+---@return nil
+function lurek.signal.clear() end
+
+--- Pushes an exit event, requesting the engine to stop.
+---@param code? any (optional)
+---@return nil
+function lurek.signal.exit(code) end
+
+--- Creates a new pub-sub Signal dispatcher.
+---@return Signal
+function lurek.signal.newSignal() end
+
+--- Returns an iterator function that pops events from the queue.
+---@return function
+function lurek.signal.poll() end
+
+--- Syncs OS-level events into the queue (no-op in Lurek2D push model).
+---@return nil
+function lurek.signal.pump() end
+
+--- Pushes a custom event onto the event queue.
+---@param args any
+---@return nil
+function lurek.signal.push(args) end
+
+--- Alias for `exit()` — requests the engine to stop at the end of the current frame.
+---@return nil
+function lurek.signal.quit() end
+
+--- Requests that the engine restart at the beginning of the next frame.
+---@return nil
+function lurek.signal.restart() end
+
+--- Blocks until the next event arrives or the optional timeout elapses.
+---@param timeout? any (optional)
+---@return string?
+function lurek.signal.wait(timeout) end
+
 ---@class lurek.spine
 lurek.spine = {}
 
@@ -11530,12 +10210,6 @@ function Terminal:clear() end
 ---@return nil
 function Terminal:clearWidgets() end
 
---- Renders the terminal grid and widgets as draw commands.
----@param x? any (optional)
----@param y? any (optional)
----@return nil
-function Terminal:draw(x, y) end
-
 --- Returns the cell data at 1-based coordinates.
 ---@param col any
 ---@param row any
@@ -11567,6 +10241,12 @@ function Terminal:keypressed(key) end
 ---@param widget_ud any
 ---@return nil
 function Terminal:removeWidget(widget_ud) end
+
+--- Renders the terminal grid and widgets as render commands.
+---@param x? any (optional)
+---@param y? any (optional)
+---@return nil
+function Terminal:render(x, y) end
 
 --- Sets a cell at 1-based coordinates with character FG and BG colours.
 ---@param args any
@@ -11799,6 +10479,31 @@ function lurek.terminal.newTextBox(col, row, width) end
 
 ---@class lurek.thread
 lurek.thread = {}
+
+---@class Channel
+local Channel = {}
+
+function Channel:clear() end
+
+---@param timeout? any (optional)
+function Channel:demand(timeout) end
+
+function Channel:getCount() end
+
+function Channel:peek() end
+
+function Channel:pop() end
+
+---@param value any
+function Channel:push(value) end
+
+---@param value any
+function Channel:supply(value) end
+
+function Channel:type() end
+
+---@param name any
+function Channel:typeOf(name) end
 
 --- Lua-side wrapper around a background [`LuaThread`].
 ---@class ThreadHandle
@@ -12605,6 +11310,57 @@ function lurek.time.step() end
 ---@class lurek.tween
 lurek.tween = {}
 
+---@class Tween
+local Tween = {}
+
+--- Returns raw 0..1 playback progress (not eased, not accounting for yoyo).
+---@return number
+function Tween:getProgress() end
+
+--- Returns true if the tween is still running (not completed or cancelled).
+---@return boolean
+function Tween:isActive() end
+
+--- Pauses this tween; time stops advancing but the tween is not cancelled.
+---@return nil
+function Tween:pause() end
+
+--- Resumes a paused tween.
+---@return nil
+function Tween:resume() end
+
+--- Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
+---@param n any
+---@return nil
+function Tween:setRepeat(n) end
+
+--- Enables or disables yoyo (ping-pong) on each repeat cycle.
+---@param enabled any
+---@return nil
+function Tween:setYoyo(enabled) end
+
+---@class TweenParallel
+local TweenParallel = {}
+
+--- Cancels the parallel group immediately.
+---@return nil
+function TweenParallel:cancel() end
+
+--- Returns true if the parallel is running and not yet complete.
+---@return boolean
+function TweenParallel:isActive() end
+
+---@class TweenSequence
+local TweenSequence = {}
+
+--- Cancels the sequence and stops all pending steps.
+---@return nil
+function TweenSequence:cancel() end
+
+--- Returns true if the sequence has been started and has not yet completed.
+---@return boolean
+function TweenSequence:isActive() end
+
 --- Cancels all active tweens, sequences, and parallels immediately.
 ---@return nil
 function lurek.tween.cancelAll() end
@@ -12649,6 +11405,1590 @@ function lurek.tween.tween(duration, target, fields, easing) end
 ---@param dt any
 ---@return nil
 function lurek.tween.update(dt) end
+
+---@class lurek.ui
+lurek.ui = {}
+
+--- Adds Accordion-specific methods (1-based sections in Lua).
+---@class Accordion
+local Accordion = {}
+
+--- Adds a section entry to this Accordion widget.
+---@param title any
+---@param content_idx? any (optional)
+---@return nil
+function Accordion:addSection(title, content_idx) end
+
+--- Returns the section count of this Accordion widget.
+---@return integer
+function Accordion:getSectionCount() end
+
+--- Returns the section title of this Accordion widget.
+---@param section_idx any
+---@return nil
+function Accordion:getSectionTitle(section_idx) end
+
+--- Returns true if exclusive is enabled for this Accordion widget.
+---@return boolean
+function Accordion:isExclusive() end
+
+--- Returns true if section expanded is enabled for this Accordion widget.
+---@param section_idx any
+---@return boolean
+function Accordion:isSectionExpanded(section_idx) end
+
+--- Sets the exclusive for this Accordion widget.
+---@param v any
+---@return nil
+function Accordion:setExclusive(v) end
+
+--- Toggles the expanded/collapsed status of an Accordion section.
+---@param section_idx any
+---@return nil
+function Accordion:toggleSection(section_idx) end
+
+--- Adds Button-specific methods to a widget table.
+---@class Button
+local Button = {}
+
+--- Returns the text of this Button widget.
+---@return string
+function Button:getText() end
+
+--- Sets the text for this Button widget.
+---@param text any
+---@return nil
+function Button:setText(text) end
+
+--- Adds CheckBox-specific methods to a widget table.
+---@class Checkbox
+local Checkbox = {}
+
+--- Returns the text of this Checkbox widget.
+---@return string
+function Checkbox:getText() end
+
+--- Returns true if checked is enabled for this Checkbox widget.
+---@return boolean
+function Checkbox:isChecked() end
+
+--- Sets the checked for this Checkbox widget.
+---@param checked any
+---@return nil
+function Checkbox:setChecked(checked) end
+
+--- Sets the text for this Checkbox widget.
+---@param text any
+---@return nil
+function Checkbox:setText(text) end
+
+--- Adds ColorPicker-specific methods.
+---@class Color_Picker
+local Color_Picker = {}
+
+--- Returns the color of this Color_Picker widget.
+---@return number
+function Color_Picker:getColor() end
+
+--- Returns the color mode of this Color_Picker widget.
+---@return string
+function Color_Picker:getColorMode() end
+
+--- Returns the show alpha of this Color_Picker widget.
+---@return boolean
+function Color_Picker:getShowAlpha() end
+
+--- Sets the color for this Color_Picker widget.
+---@param r any
+---@param green any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Color_Picker:setColor(r, green, b, a) end
+
+--- Sets the color mode for this Color_Picker widget.
+---@param mode any
+---@return nil
+function Color_Picker:setColorMode(mode) end
+
+--- Registers a callback invoked when this widget's value changes.
+---@param f any
+---@return nil
+function Color_Picker:setOnChange(f) end
+
+--- Sets the show alpha for this Color_Picker widget.
+---@param v any
+---@return nil
+function Color_Picker:setShowAlpha(v) end
+
+--- Adds ComboBox-specific methods (1-based indices in Lua).
+---@class Combo_Box
+local Combo_Box = {}
+
+--- Adds a item entry to this Combo_Box widget.
+---@param text any
+---@return nil
+function Combo_Box:addItem(text) end
+
+--- Clears all items entries from this Combo_Box widget.
+---@return nil
+function Combo_Box:clearItems() end
+
+--- Returns the item of this Combo_Box widget.
+---@param index any
+---@return string
+function Combo_Box:getItem(index) end
+
+--- Returns the item count of this Combo_Box widget.
+---@return integer
+function Combo_Box:getItemCount() end
+
+--- Returns the selected index of this Combo_Box widget.
+---@return integer
+function Combo_Box:getSelectedIndex() end
+
+--- Returns the selected item of this Combo_Box widget.
+---@return string
+function Combo_Box:getSelectedItem() end
+
+--- Removes the item from this Combo_Box widget.
+---@param index any
+---@return nil
+function Combo_Box:removeItem(index) end
+
+--- Sets the selected index for this Combo_Box widget.
+---@param index any
+---@return nil
+function Combo_Box:setSelectedIndex(index) end
+
+--- Adds Dialog-specific methods.
+---@class Dialog
+local Dialog = {}
+
+--- Adds a button entry to this Dialog widget.
+---@param text any
+---@param cb? any (optional)
+---@return nil
+function Dialog:addButton(text, cb) end
+
+--- Closes and removes this dialog from the screen.
+---@return nil
+function Dialog:close() end
+
+--- Returns the content of this Dialog widget.
+---@return integer
+function Dialog:getContent() end
+
+--- Returns the title of this Dialog widget.
+---@return string
+function Dialog:getTitle() end
+
+--- Returns true if modal is enabled for this Dialog widget.
+---@return boolean
+function Dialog:isModal() end
+
+--- Returns true if open is enabled for this Dialog widget.
+---@return boolean
+function Dialog:isOpen() end
+
+--- Performs the open operation on this Dialog widget.
+---@return nil
+function Dialog:open() end
+
+--- Sets the content for this Dialog widget.
+---@param content_idx? any (optional)
+---@return nil
+function Dialog:setContent(content_idx) end
+
+--- Sets the modal for this Dialog widget.
+---@param v any
+---@return nil
+function Dialog:setModal(v) end
+
+--- Registers a callback invoked when this dialog is closed.
+---@param f any
+---@return nil
+function Dialog:setOnClose(f) end
+
+--- Sets the title for this Dialog widget.
+---@param title any
+---@return nil
+function Dialog:setTitle(title) end
+
+--- Adds DockPanel-specific methods.
+---@class Dock_Panel
+local Dock_Panel = {}
+
+--- Performs the dock operation on this Dock_Panel widget.
+---@param child_idx any
+---@param side any
+---@return nil
+function Dock_Panel:dock(child_idx, side) end
+
+--- Returns the docked count of this Dock_Panel widget.
+---@return integer
+function Dock_Panel:getDockedCount() end
+
+--- Returns the split size of this Dock_Panel widget.
+---@param side any
+---@return nil
+function Dock_Panel:getSplitSize(side) end
+
+--- Sets the split size for this Dock_Panel widget.
+---@param side any
+---@param size any
+---@return nil
+function Dock_Panel:setSplitSize(side, size) end
+
+--- Performs the undock operation on this Dock_Panel widget.
+---@param child_idx any
+---@return nil
+function Dock_Panel:undock(child_idx) end
+
+--- Adds GUITable-specific methods (1-based rows/cols in Lua).
+---@class Gui_Table
+local Gui_Table = {}
+
+--- Adds a column entry to this Gui_Table widget.
+---@param header any
+---@param width? any (optional)
+---@return nil
+function Gui_Table:addColumn(header, width) end
+
+--- Adds a row entry to this Gui_Table widget.
+---@param cells any
+---@return nil
+function Gui_Table:addRow(cells) end
+
+--- Returns the cell of this Gui_Table widget.
+---@param row any
+---@param col any
+---@return nil
+function Gui_Table:getCell(row, col) end
+
+--- Returns the column count of this Gui_Table widget.
+---@return integer
+function Gui_Table:getColumnCount() end
+
+--- Returns the row count of this Gui_Table widget.
+---@return integer
+function Gui_Table:getRowCount() end
+
+--- Returns the selected row of this Gui_Table widget.
+---@return nil
+function Gui_Table:getSelectedRow() end
+
+--- Returns true if sortable is enabled for this Gui_Table widget.
+---@return boolean
+function Gui_Table:isSortable() end
+
+--- Sets the cell for this Gui_Table widget.
+---@param row any
+---@param col any
+---@param text any
+---@return nil
+function Gui_Table:setCell(row, col, text) end
+
+--- Registers a callback invoked when a table row is selected.
+---@param f any
+---@return nil
+function Gui_Table:setOnSelect(f) end
+
+--- Sets the selected row for this Gui_Table widget.
+---@param row? any (optional)
+---@return nil
+function Gui_Table:setSelectedRow(row) end
+
+--- Sets the sortable for this Gui_Table widget.
+---@param v any
+---@return nil
+function Gui_Table:setSortable(v) end
+
+--- Adds GUIWindow-specific methods.
+---@class Gui_Window
+local Gui_Window = {}
+
+--- Returns the title of this Gui_Window widget.
+---@return string
+function Gui_Window:getTitle() end
+
+--- Returns true if closeable is enabled for this Gui_Window widget.
+---@return boolean
+function Gui_Window:isCloseable() end
+
+--- Returns true if draggable is enabled for this Gui_Window widget.
+---@return boolean
+function Gui_Window:isDraggable() end
+
+--- Returns true if resizable is enabled for this Gui_Window widget.
+---@return boolean
+function Gui_Window:isResizable() end
+
+--- Sets the closeable for this Gui_Window widget.
+---@param v any
+---@return nil
+function Gui_Window:setCloseable(v) end
+
+--- Sets the draggable for this Gui_Window widget.
+---@param v any
+---@return nil
+function Gui_Window:setDraggable(v) end
+
+--- Registers a callback invoked when this window is closed.
+---@param f any
+---@return nil
+function Gui_Window:setOnClose(f) end
+
+--- Sets the resizable for this Gui_Window widget.
+---@param v any
+---@return nil
+function Gui_Window:setResizable(v) end
+
+--- Sets the title for this Gui_Window widget.
+---@param title any
+---@return nil
+function Gui_Window:setTitle(title) end
+
+--- Adds ImageWidget-specific methods.
+---@class Image_Widget
+local Image_Widget = {}
+
+--- Queues a toast notification from a table.
+---@param toast_table any
+---@return nil
+function Image_Widget:addToast(toast_table) end
+
+--- Clears keyboard focus.
+---@return nil
+function Image_Widget:clearFocus() end
+
+--- Headless compatibility stub for GUI draw.
+---@return nil
+function Image_Widget:draw() end
+
+--- Moves focus to the next focusable widget.
+---@return nil
+function Image_Widget:focusNext() end
+
+--- Moves focus to the previous focusable widget.
+---@return nil
+function Image_Widget:focusPrev() end
+
+--- Returns the focused widget index or nil.
+---@return number
+function Image_Widget:getFocus() end
+
+--- Returns the root panel widget table.
+---@return table
+function Image_Widget:getRoot() end
+
+--- Returns the scale mode of this Image_Widget widget.
+---@return string
+function Image_Widget:getScaleMode() end
+
+--- Returns whether a theme is set.
+---@return boolean
+function Image_Widget:getTheme() end
+
+--- Returns the tint of this Image_Widget widget.
+---@return number
+function Image_Widget:getTint() end
+
+--- Returns the number of active toasts.
+---@return number
+function Image_Widget:getToastCount() end
+
+--- Returns the total widget count in the context.
+---@return number
+function Image_Widget:getWidgetCount() end
+
+--- Forwards a key press event to the GUI.
+---@param key any
+---@return boolean
+function Image_Widget:keypressed(key) end
+
+--- Forwards a mouse move event to the GUI.
+---@param x any
+---@param y any
+---@return boolean
+function Image_Widget:mousemoved(x, y) end
+
+--- Forwards a mouse press event to the GUI.
+---@param x any
+---@param y any
+---@param btn? any (optional)
+---@return boolean
+function Image_Widget:mousepressed(x, y, btn) end
+
+--- Forwards a mouse release event to the GUI.
+---@param x any
+---@param y any
+---@param btn? any (optional)
+---@return boolean
+function Image_Widget:mousereleased(x, y, btn) end
+
+--- Creates a collapsible accordion widget.
+---@return table
+function Image_Widget:newAccordion() end
+
+--- Creates a button widget.
+---@param text? any (optional)
+---@return table
+function Image_Widget:newButton(text) end
+
+--- Creates a checkbox widget.
+---@param text? any (optional)
+---@return table
+function Image_Widget:newCheckbox(text) end
+
+--- Creates a color picker widget.
+---@return table
+function Image_Widget:newColorPicker() end
+
+--- Creates a dropdown combo box widget.
+---@return table
+function Image_Widget:newComboBox() end
+
+--- Creates a modal dialog widget.
+---@param title? any (optional)
+---@return table
+function Image_Widget:newDialog(title) end
+
+--- Creates a dock panel.
+---@return table
+function Image_Widget:newDockPanel() end
+
+--- Creates an image display widget.
+---@return table
+function Image_Widget:newImageWidget() end
+
+--- Creates a text label widget.
+---@param text? any (optional)
+---@return table
+function Image_Widget:newLabel(text) end
+
+--- Creates a flexbox layout container.
+---@param direction? any (optional)
+---@return table
+function Image_Widget:newLayout(direction) end
+
+--- Creates a selectable list widget.
+---@return table
+function Image_Widget:newList() end
+
+--- Creates a menu bar widget.
+---@return table
+function Image_Widget:newMenuBar() end
+
+--- Creates a menu item widget.
+---@param text? any (optional)
+---@return table
+function Image_Widget:newMenuItem(text) end
+
+--- Creates a 9-patch slicer widget.
+---@return table
+function Image_Widget:newNinePatch() end
+
+--- Creates a container panel widget.
+---@return table
+function Image_Widget:newPanel() end
+
+--- Creates a progress bar widget.
+---@param min? any (optional)
+---@param max? any (optional)
+---@return table
+function Image_Widget:newProgressBar(min, max) end
+
+--- Creates a grouped radio button widget.
+---@param text? any (optional)
+---@param group? any (optional)
+---@return table
+function Image_Widget:newRadioButton(text, group) end
+
+--- Creates a scroll bar widget.
+---@param vertical? any (optional)
+---@return table
+function Image_Widget:newScrollBar(vertical) end
+
+--- Creates a scrollable panel widget.
+---@return table
+function Image_Widget:newScrollPanel() end
+
+--- Creates a separator line.
+---@param vertical? any (optional)
+---@return table
+function Image_Widget:newSeparator(vertical) end
+
+--- Creates a value slider widget.
+---@param min? any (optional)
+---@param max? any (optional)
+---@return table
+function Image_Widget:newSlider(min, max) end
+
+--- Creates a spacing filler widget.
+---@param w? any (optional)
+---@param h? any (optional)
+---@return table
+function Image_Widget:newSpacer(w, h) end
+
+--- Creates a resizable split panel.
+---@param orientation? any (optional)
+---@return table
+function Image_Widget:newSplitPanel(orientation) end
+
+--- Creates a status bar widget.
+---@return table
+function Image_Widget:newStatusBar() end
+
+--- Creates a tab bar widget.
+---@return table
+function Image_Widget:newTabBar() end
+
+--- Creates a data table widget.
+---@return table
+function Image_Widget:newTable() end
+
+--- Creates a text input widget.
+---@return table
+function Image_Widget:newTextInput() end
+
+--- Creates a new theme instance.
+---@return Theme
+function Image_Widget:newTheme() end
+
+--- Creates a toast notification widget.
+---@param message? any (optional)
+---@param duration? any (optional)
+---@return table
+function Image_Widget:newToast(message, duration) end
+
+--- Creates a toolbar widget.
+---@param orientation? any (optional)
+---@return table
+function Image_Widget:newToolbar(orientation) end
+
+--- Creates a tooltip panel widget.
+---@param text? any (optional)
+---@return table
+function Image_Widget:newTooltipPanel(text) end
+
+--- Creates a collapsible tree view widget.
+---@return table
+function Image_Widget:newTreeView() end
+
+--- Creates a draggable window widget.
+---@param title? any (optional)
+---@return table
+function Image_Widget:newWindow(title) end
+
+--- Sets keyboard focus to a widget or clears it.
+---@param widget? any (optional)
+---@return nil
+function Image_Widget:setFocus(widget) end
+
+--- Sets the scale mode for this Image_Widget widget.
+---@param mode any
+---@return nil
+function Image_Widget:setScaleMode(mode) end
+
+--- Sets the active GUI theme.
+---@param theme_ud any
+---@return nil
+function Image_Widget:setTheme(theme_ud) end
+
+--- Sets the tint for this Image_Widget widget.
+---@param r any
+---@param green any
+---@param b any
+---@param a? any (optional)
+---@return nil
+function Image_Widget:setTint(r, green, b, a) end
+
+--- Forwards text input to the focused text input widget.
+---@param text any
+---@return boolean
+function Image_Widget:textinput(text) end
+
+--- Advances toast timers, removes expired toasts, and dispatches pending GUI events.
+---@param dt any
+---@return nil
+function Image_Widget:update(dt) end
+
+--- Forwards a mouse wheel event to the GUI.
+---@param x any
+---@param y any
+---@return boolean
+function Image_Widget:wheelmoved(x, y) end
+
+--- Adds Label-specific methods to a widget table.
+---@class Label
+local Label = {}
+
+--- Returns the text of this Label widget.
+---@return string
+function Label:getText() end
+
+--- Sets the text for this Label widget.
+---@param text any
+---@return nil
+function Label:setText(text) end
+
+--- Adds Layout-specific methods.
+---@class Layout
+local Layout = {}
+
+--- Returns the align of this Layout widget.
+---@return string
+function Layout:getAlign() end
+
+--- Returns the direction of this Layout widget.
+---@return string
+function Layout:getDirection() end
+
+--- Returns the justify of this Layout widget.
+---@return string
+function Layout:getJustify() end
+
+--- Returns the spacing of this Layout widget.
+---@return number
+function Layout:getSpacing() end
+
+--- Returns the wrap of this Layout widget.
+---@return boolean
+function Layout:getWrap() end
+
+--- Sets the align for this Layout widget.
+---@param align any
+---@return nil
+function Layout:setAlign(align) end
+
+--- Sets the columns for this Layout widget.
+---@param n any
+---@return nil
+function Layout:setColumns(n) end
+
+--- Sets the direction for this Layout widget.
+---@param dir any
+---@return nil
+function Layout:setDirection(dir) end
+
+--- Sets the justify for this Layout widget.
+---@param justify any
+---@return nil
+function Layout:setJustify(justify) end
+
+--- Sets the spacing for this Layout widget.
+---@param spacing any
+---@return nil
+function Layout:setSpacing(spacing) end
+
+--- Sets the wrap for this Layout widget.
+---@param wrap any
+---@return nil
+function Layout:setWrap(wrap) end
+
+--- Adds ListBox-specific methods (1-based indices in Lua).
+---@class List_Box
+local List_Box = {}
+
+--- Adds a item entry to this List_Box widget.
+---@param text any
+---@return nil
+function List_Box:addItem(text) end
+
+--- Clears all items entries from this List_Box widget.
+---@return nil
+function List_Box:clearItems() end
+
+--- Returns the item of this List_Box widget.
+---@param index any
+---@return string
+function List_Box:getItem(index) end
+
+--- Returns the item count of this List_Box widget.
+---@return integer
+function List_Box:getItemCount() end
+
+--- Returns the selected index of this List_Box widget.
+---@return integer
+function List_Box:getSelectedIndex() end
+
+--- Removes the item from this List_Box widget.
+---@param index any
+---@return nil
+function List_Box:removeItem(index) end
+
+--- Sets the item height for this List_Box widget.
+---@param h any
+---@return nil
+function List_Box:setItemHeight(h) end
+
+--- Sets the selected index for this List_Box widget.
+---@param index any
+---@return nil
+function List_Box:setSelectedIndex(index) end
+
+--- Adds MenuBar-specific methods.
+---@class Menu_Bar
+local Menu_Bar = {}
+
+--- Adds a menu entry to this Menu_Bar widget.
+---@param menu_idx any
+---@return nil
+function Menu_Bar:addMenu(menu_idx) end
+
+--- Returns the menu count of this Menu_Bar widget.
+---@return integer
+function Menu_Bar:getMenuCount() end
+
+--- Returns the menus of this Menu_Bar widget.
+---@return nil
+function Menu_Bar:getMenus() end
+
+--- Removes the menu from this Menu_Bar widget.
+---@param menu_idx any
+---@return nil
+function Menu_Bar:removeMenu(menu_idx) end
+
+--- Adds MenuItem-specific methods.
+---@class Menu_Item
+local Menu_Item = {}
+
+--- Adds a sub item entry to this Menu_Item widget.
+---@param child_idx any
+---@return nil
+function Menu_Item:addSubItem(child_idx) end
+
+--- Returns the shortcut of this Menu_Item widget.
+---@return string
+function Menu_Item:getShortcut() end
+
+--- Returns the sub items of this Menu_Item widget.
+---@return nil
+function Menu_Item:getSubItems() end
+
+--- Returns the text of this Menu_Item widget.
+---@return string
+function Menu_Item:getText() end
+
+--- Returns true if checked is enabled for this Menu_Item widget.
+---@return boolean
+function Menu_Item:isChecked() end
+
+--- Sets the checked for this Menu_Item widget.
+---@param v any
+---@return nil
+function Menu_Item:setChecked(v) end
+
+--- Registers a callback invoked when this menu item is clicked.
+---@param f any
+---@return nil
+function Menu_Item:setOnClick(f) end
+
+--- Sets the shortcut for this Menu_Item widget.
+---@param shortcut any
+---@return nil
+function Menu_Item:setShortcut(shortcut) end
+
+--- Sets the text for this Menu_Item widget.
+---@param text any
+---@return nil
+function Menu_Item:setText(text) end
+
+--- Adds NinePatch-specific methods.
+---@class Nine_Patch
+local Nine_Patch = {}
+
+--- Returns the image dimensions of this Nine_Patch widget.
+---@return integer
+function Nine_Patch:getImageDimensions() end
+
+--- Returns the insets of this Nine_Patch widget.
+---@return integer
+function Nine_Patch:getInsets() end
+
+--- Returns the slices of this Nine_Patch widget.
+---@return table
+function Nine_Patch:getSlices() end
+
+--- Sets the image dimensions for this Nine_Patch widget.
+---@param w any
+---@param h any
+---@return nil
+function Nine_Patch:setImageDimensions(w, h) end
+
+--- Sets the insets for this Nine_Patch widget.
+---@param left any
+---@param top any
+---@param right any
+---@param bottom any
+---@return nil
+function Nine_Patch:setInsets(left, top, right, bottom) end
+
+--- Adds Panel-specific methods.
+---@class Panel
+local Panel = {}
+
+--- Returns the title of this Panel widget.
+---@return string
+function Panel:getTitle() end
+
+--- Sets the scrollable for this Panel widget.
+---@param scrollable any
+---@return nil
+function Panel:setScrollable(scrollable) end
+
+--- Sets the title for this Panel widget.
+---@param title any
+---@return nil
+function Panel:setTitle(title) end
+
+--- Adds ProgressBar-specific methods to a widget table.
+---@class Progress_Bar
+local Progress_Bar = {}
+
+--- Returns the max of this Progress_Bar widget.
+---@return number
+function Progress_Bar:getMax() end
+
+--- Returns the min of this Progress_Bar widget.
+---@return number
+function Progress_Bar:getMin() end
+
+--- Returns the progress of this Progress_Bar widget.
+---@return number
+function Progress_Bar:getProgress() end
+
+--- Returns the value of this Progress_Bar widget.
+---@return number
+function Progress_Bar:getValue() end
+
+--- Sets the range for this Progress_Bar widget.
+---@param min any
+---@param max any
+---@return nil
+function Progress_Bar:setRange(min, max) end
+
+--- Sets the value for this Progress_Bar widget.
+---@param v any
+---@return nil
+function Progress_Bar:setValue(v) end
+
+--- Adds RadioButton-specific methods.
+---@class Radio_Button
+local Radio_Button = {}
+
+--- Returns the group of this Radio_Button widget.
+---@return string
+function Radio_Button:getGroup() end
+
+--- Returns the text of this Radio_Button widget.
+---@return string
+function Radio_Button:getText() end
+
+--- Returns true if selected is enabled for this Radio_Button widget.
+---@return boolean
+function Radio_Button:isSelected() end
+
+--- Sets the group for this Radio_Button widget.
+---@param group any
+---@return nil
+function Radio_Button:setGroup(group) end
+
+--- Registers a callback invoked when this widget's value changes.
+---@param f any
+---@return nil
+function Radio_Button:setOnChange(f) end
+
+--- Sets the selected for this Radio_Button widget.
+---@param v any
+---@return nil
+function Radio_Button:setSelected(v) end
+
+--- Sets the text for this Radio_Button widget.
+---@param text any
+---@return nil
+function Radio_Button:setText(text) end
+
+--- Adds ScrollBar-specific methods.
+---@class Scroll_Bar
+local Scroll_Bar = {}
+
+--- Returns the content size of this Scroll_Bar widget.
+---@return number
+function Scroll_Bar:getContentSize() end
+
+--- Returns the scroll position of this Scroll_Bar widget.
+---@return number
+function Scroll_Bar:getScrollPosition() end
+
+--- Returns the view size of this Scroll_Bar widget.
+---@return number
+function Scroll_Bar:getViewSize() end
+
+--- Returns true if vertical is enabled for this Scroll_Bar widget.
+---@return boolean
+function Scroll_Bar:isVertical() end
+
+--- Sets the content size for this Scroll_Bar widget.
+---@param v any
+---@return nil
+function Scroll_Bar:setContentSize(v) end
+
+--- Registers a callback invoked when this widget's value changes.
+---@param f any
+---@return nil
+function Scroll_Bar:setOnChange(f) end
+
+--- Sets the scroll position for this Scroll_Bar widget.
+---@param v any
+---@return nil
+function Scroll_Bar:setScrollPosition(v) end
+
+--- Sets the view size for this Scroll_Bar widget.
+---@param v any
+---@return nil
+function Scroll_Bar:setViewSize(v) end
+
+--- Adds ScrollPanel-specific methods.
+---@class Scroll_Panel
+local Scroll_Panel = {}
+
+--- Returns the content size of this Scroll_Panel widget.
+---@return number
+function Scroll_Panel:getContentSize() end
+
+--- Returns the max scroll of this Scroll_Panel widget.
+---@return number
+function Scroll_Panel:getMaxScroll() end
+
+--- Returns the scroll position of this Scroll_Panel widget.
+---@return number
+function Scroll_Panel:getScrollPosition() end
+
+--- Returns the scroll speed of this Scroll_Panel widget.
+---@return number
+function Scroll_Panel:getScrollSpeed() end
+
+--- Sets the content size for this Scroll_Panel widget.
+---@param w any
+---@param h any
+---@return nil
+function Scroll_Panel:setContentSize(w, h) end
+
+--- Sets the scroll position for this Scroll_Panel widget.
+---@param x any
+---@param y any
+---@return nil
+function Scroll_Panel:setScrollPosition(x, y) end
+
+--- Sets the scroll speed for this Scroll_Panel widget.
+---@param speed any
+---@return nil
+function Scroll_Panel:setScrollSpeed(speed) end
+
+--- Adds Separator-specific methods.
+---@class Separator
+local Separator = {}
+
+--- Returns the thickness of this Separator widget.
+---@return number
+function Separator:getThickness() end
+
+--- Returns true if vertical is enabled for this Separator widget.
+---@return boolean
+function Separator:isVertical() end
+
+--- Sets the thickness for this Separator widget.
+---@param thickness any
+---@return nil
+function Separator:setThickness(thickness) end
+
+--- Sets the vertical for this Separator widget.
+---@param v any
+---@return nil
+function Separator:setVertical(v) end
+
+--- Adds Slider-specific methods to a widget table.
+---@class Slider
+local Slider = {}
+
+--- Returns the max of this Slider widget.
+---@return number
+function Slider:getMax() end
+
+--- Returns the min of this Slider widget.
+---@return number
+function Slider:getMin() end
+
+--- Returns the value of this Slider widget.
+---@return number
+function Slider:getValue() end
+
+--- Sets the range for this Slider widget.
+---@param min any
+---@param max any
+---@return nil
+function Slider:setRange(min, max) end
+
+--- Sets the step for this Slider widget.
+---@param step any
+---@return nil
+function Slider:setStep(step) end
+
+--- Sets the value for this Slider widget.
+---@param v any
+---@return nil
+function Slider:setValue(v) end
+
+--- Adds SplitPanel-specific methods.
+---@class Split_Panel
+local Split_Panel = {}
+
+--- Returns the first child of this Split_Panel widget.
+---@return nil
+function Split_Panel:getFirstChild() end
+
+--- Returns the min panel size of this Split_Panel widget.
+---@return number
+function Split_Panel:getMinPanelSize() end
+
+--- Returns the orientation of this Split_Panel widget.
+---@return string
+function Split_Panel:getOrientation() end
+
+--- Returns the second child of this Split_Panel widget.
+---@return nil
+function Split_Panel:getSecondChild() end
+
+--- Returns the split position of this Split_Panel widget.
+---@return number
+function Split_Panel:getSplitPosition() end
+
+--- Sets the first child for this Split_Panel widget.
+---@param child_idx any
+---@return nil
+function Split_Panel:setFirstChild(child_idx) end
+
+--- Sets the min panel size for this Split_Panel widget.
+---@param v any
+---@return nil
+function Split_Panel:setMinPanelSize(v) end
+
+--- Sets the orientation for this Split_Panel widget.
+---@param v any
+---@return nil
+function Split_Panel:setOrientation(v) end
+
+--- Sets the second child for this Split_Panel widget.
+---@param child_idx any
+---@return nil
+function Split_Panel:setSecondChild(child_idx) end
+
+--- Sets the split position for this Split_Panel widget.
+---@param v any
+---@return nil
+function Split_Panel:setSplitPosition(v) end
+
+--- Adds StatusBar-specific methods.
+---@class Status_Bar
+local Status_Bar = {}
+
+--- Adds a section entry to this Status_Bar widget.
+---@param text any
+---@param width? any (optional)
+---@return nil
+function Status_Bar:addSection(text, width) end
+
+--- Returns the section count of this Status_Bar widget.
+---@return integer
+function Status_Bar:getSectionCount() end
+
+--- Returns the section text of this Status_Bar widget.
+---@param section_idx any
+---@return integer
+function Status_Bar:getSectionText(section_idx) end
+
+--- Resizes the section list for this Status_Bar widget.
+---@param count any
+---@return nil
+function Status_Bar:setSectionCount(count) end
+
+--- Sets the section text for this Status_Bar widget.
+---@param section_idx any
+---@param text any
+---@return nil
+function Status_Bar:setSectionText(section_idx, text) end
+
+--- Compatibility shim for assigning a widget to a section.
+---@param section_idx any
+---@param widget any
+---@return nil
+function Status_Bar:setSectionWidget(section_idx, widget) end
+
+--- Adds TabBar-specific methods (1-based indices in Lua).
+---@class Tab_Bar
+local Tab_Bar = {}
+
+--- Adds a tab entry to this Tab_Bar widget.
+---@param label any
+---@return nil
+function Tab_Bar:addTab(label) end
+
+--- Returns the active tab of this Tab_Bar widget.
+---@return integer
+function Tab_Bar:getActiveTab() end
+
+--- Returns the tab of this Tab_Bar widget.
+---@param index any
+---@return integer
+function Tab_Bar:getTab(index) end
+
+--- Returns the tab count of this Tab_Bar widget.
+---@return integer
+function Tab_Bar:getTabCount() end
+
+--- Removes the tab from this Tab_Bar widget.
+---@param index any
+---@return nil
+function Tab_Bar:removeTab(index) end
+
+--- Sets the active tab for this Tab_Bar widget.
+---@param index any
+---@return nil
+function Tab_Bar:setActiveTab(index) end
+
+--- Adds TextInput-specific methods to a widget table.
+---@class Text_Input
+local Text_Input = {}
+
+--- Returns the cursor position of this Text_Input widget.
+---@return integer
+function Text_Input:getCursorPosition() end
+
+--- Returns the placeholder of this Text_Input widget.
+---@return string
+function Text_Input:getPlaceholder() end
+
+--- Returns the text of this Text_Input widget.
+---@return string
+function Text_Input:getText() end
+
+--- Returns true if focused is enabled for this Text_Input widget.
+---@return boolean
+function Text_Input:isFocused() end
+
+--- Sets the max length for this Text_Input widget.
+---@param n any
+---@return nil
+function Text_Input:setMaxLength(n) end
+
+--- Sets the placeholder for this Text_Input widget.
+---@param text any
+---@return nil
+function Text_Input:setPlaceholder(text) end
+
+--- Sets the text for this Text_Input widget.
+---@param text any
+---@return nil
+function Text_Input:setText(text) end
+
+--- Adds Toast-specific methods.
+---@class Toast
+local Toast = {}
+
+--- Returns the duration of this Toast widget.
+---@return number
+function Toast:getDuration() end
+
+--- Returns the message of this Toast widget.
+---@return string
+function Toast:getMessage() end
+
+--- Returns the progress of this Toast widget.
+---@return number
+function Toast:getProgress() end
+
+--- Returns true if expired is enabled for this Toast widget.
+---@return boolean
+function Toast:isExpired() end
+
+--- Sets the duration for this Toast widget.
+---@param d any
+---@return nil
+function Toast:setDuration(d) end
+
+--- Sets the message for this Toast widget.
+---@param msg any
+---@return nil
+function Toast:setMessage(msg) end
+
+--- Adds Toolbar-specific methods.
+---@class Toolbar
+local Toolbar = {}
+
+--- Adds a button entry to this Toolbar widget.
+---@param id any
+---@param tooltip? any (optional)
+---@return nil
+function Toolbar:addButton(id, tooltip) end
+
+--- Adds a separator entry to this Toolbar widget.
+---@return nil
+function Toolbar:addSeparator() end
+
+--- Adds a spacer entry to this Toolbar widget.
+---@param size? any (optional)
+---@return nil
+function Toolbar:addSpacer(size) end
+
+--- Returns the button of this Toolbar widget.
+---@param id any
+---@return boolean
+function Toolbar:getButton(id) end
+
+--- Returns the orientation of this Toolbar widget.
+---@return string
+function Toolbar:getOrientation() end
+
+--- Returns true if button toggled is enabled for this Toolbar widget.
+---@param id any
+---@return boolean
+function Toolbar:isButtonToggled(id) end
+
+--- Sets the button enabled for this Toolbar widget.
+---@param id any
+---@param enabled any
+---@return nil
+function Toolbar:setButtonEnabled(id, enabled) end
+
+--- Sets the button toggled for this Toolbar widget.
+---@param id any
+---@param toggled any
+---@return nil
+function Toolbar:setButtonToggled(id, toggled) end
+
+--- Sets the orientation for this Toolbar widget.
+---@param v any
+---@return nil
+function Toolbar:setOrientation(v) end
+
+--- Adds TooltipPanel-specific methods.
+---@class Tooltip_Panel
+local Tooltip_Panel = {}
+
+--- Returns the delay of this Tooltip_Panel widget.
+---@return number
+function Tooltip_Panel:getDelay() end
+
+--- Returns the target of this Tooltip_Panel widget.
+---@return nil
+function Tooltip_Panel:getTarget() end
+
+--- Returns the text of this Tooltip_Panel widget.
+---@return string
+function Tooltip_Panel:getText() end
+
+--- Sets the delay for this Tooltip_Panel widget.
+---@param v any
+---@return nil
+function Tooltip_Panel:setDelay(v) end
+
+--- Sets the target for this Tooltip_Panel widget.
+---@param target? any (optional)
+---@return nil
+function Tooltip_Panel:setTarget(target) end
+
+--- Sets the text for this Tooltip_Panel widget.
+---@param text any
+---@return nil
+function Tooltip_Panel:setText(text) end
+
+--- Adds TreeView-specific methods (1-based indices in Lua).
+---@class Tree_View
+local Tree_View = {}
+
+--- Adds a node entry to this Tree_View widget.
+---@param text any
+---@param parent_index? any (optional)
+---@return nil
+function Tree_View:addNode(text, parent_index) end
+
+--- Clears all nodes entries from this Tree_View widget.
+---@return nil
+function Tree_View:clearNodes() end
+
+--- Performs the collapse all operation on this Tree_View widget.
+---@return nil
+function Tree_View:collapseAll() end
+
+--- Performs the collapse node operation on this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:collapseNode(index) end
+
+--- Performs the expand all operation on this Tree_View widget.
+---@return nil
+function Tree_View:expandAll() end
+
+--- Performs the expand node operation on this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:expandNode(index) end
+
+--- Returns the child nodes of this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:getChildNodes(index) end
+
+--- Returns the node count of this Tree_View widget.
+---@return integer
+function Tree_View:getNodeCount() end
+
+--- Returns the node depth of this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:getNodeDepth(index) end
+
+--- Returns the node text of this Tree_View widget.
+---@param index any
+---@return string
+function Tree_View:getNodeText(index) end
+
+--- Returns the parent node of this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:getParentNode(index) end
+
+--- Returns the selected node of this Tree_View widget.
+---@return integer
+function Tree_View:getSelectedNode() end
+
+--- Returns true if expanded is enabled for this Tree_View widget.
+---@param index any
+---@return boolean
+function Tree_View:isExpanded(index) end
+
+--- Returns true if node expanded is enabled for this Tree_View widget.
+---@param index any
+---@return boolean
+function Tree_View:isNodeExpanded(index) end
+
+--- Removes the node from this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:removeNode(index) end
+
+--- Sets the node icon for this Tree_View widget.
+---@param index any
+---@param icon any
+---@return nil
+function Tree_View:setNodeIcon(index, icon) end
+
+--- Sets the node text for this Tree_View widget.
+---@param index any
+---@param text any
+---@return nil
+function Tree_View:setNodeText(index, text) end
+
+--- Sets the selected node for this Tree_View widget.
+---@param index any
+---@return nil
+function Tree_View:setSelectedNode(index) end
+
+--- Toggles the expanded/collapsed status of a Tree_View node.
+---@param index any
+---@return nil
+function Tree_View:toggleNode(index) end
+
+--- Adds a child widget to this container.
+---@param child any
+---@return nil
+function lurek.ui.addChild(child) end
+
+--- Removes all anchor constraints.
+---@return nil
+function lurek.ui.clearAnchor() end
+
+--- Returns whether (x, y) is inside this widget.
+---@param x any
+---@param y any
+---@return boolean
+function lurek.ui.containsPoint(x, y) end
+
+--- Recursively searches for a widget by id starting from this widget.
+---@param id any
+---@return table
+function lurek.ui.findById(id) end
+
+--- Returns the number of children in this container.
+---@return number
+function lurek.ui.getChildCount() end
+
+--- Returns the flex-grow factor.
+---@return number
+function lurek.ui.getFlexGrow() end
+
+--- Returns the flex-shrink factor.
+---@return number
+function lurek.ui.getFlexShrink() end
+
+--- Returns the widget string identifier.
+---@return string
+function lurek.ui.getId() end
+
+--- Returns the widget margin (top, right, bottom, left).
+---@return number
+function lurek.ui.getMargin() end
+
+--- Returns the maximum widget size.
+---@return number
+function lurek.ui.getMaxSize() end
+
+--- Returns the minimum widget size.
+---@return number
+function lurek.ui.getMinSize() end
+
+--- Returns the widget padding (top, right, bottom, left).
+---@return number
+function lurek.ui.getPadding() end
+
+--- Returns the widget position.
+---@return number
+function lurek.ui.getPosition() end
+
+--- Returns the widget size.
+---@return number
+function lurek.ui.getSize() end
+
+--- Returns the widget interaction state name.
+---@return string
+function lurek.ui.getState() end
+
+--- Returns the widget tooltip text.
+---@return string
+function lurek.ui.getTooltip() end
+
+--- Returns the widget z-order.
+---@return number
+function lurek.ui.getZOrder() end
+
+--- Returns whether the widget is enabled.
+---@return boolean
+function lurek.ui.isEnabled() end
+
+--- Returns whether the widget is visible.
+---@return boolean
+function lurek.ui.isVisible() end
+
+--- Removes a child widget from this container.
+---@param child any
+---@return nil
+function lurek.ui.removeChild(child) end
+
+--- Sets anchor edges (left, top, right, bottom).
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@return nil
+function lurek.ui.setAnchor(left, top, right, bottom) end
+
+--- Sets center anchor offsets.
+---@param cx? any (optional)
+---@param cy? any (optional)
+---@return nil
+function lurek.ui.setAnchorCenter(cx, cy) end
+
+--- Sets whether the widget is enabled.
+---@param v any
+---@return nil
+function lurek.ui.setEnabled(v) end
+
+--- Sets the flex-grow factor.
+---@param grow any
+---@return nil
+function lurek.ui.setFlexGrow(grow) end
+
+--- Sets the flex-shrink factor.
+---@param shrink any
+---@return nil
+function lurek.ui.setFlexShrink(shrink) end
+
+--- Sets the widget string identifier.
+---@param id any
+---@return nil
+function lurek.ui.setId(id) end
+
+--- Sets widget margin (CSS-like: top, right?, bottom?, left?).
+---@param top any
+---@param right? any (optional)
+---@param bottom? any (optional)
+---@param left? any (optional)
+---@return nil
+function lurek.ui.setMargin(top, right, bottom, left) end
+
+--- Sets the maximum widget size.
+---@param w any
+---@param h any
+---@return nil
+function lurek.ui.setMaxSize(w, h) end
+
+--- Sets the minimum widget size.
+---@param w any
+---@param h any
+---@return nil
+function lurek.ui.setMinSize(w, h) end
+
+--- Registers a callback invoked when this widget's value changes.
+---@param f any
+---@return nil
+function lurek.ui.setOnChange(f) end
+
+--- Registers a callback invoked when this widget is clicked.
+---@param f any
+---@return nil
+function lurek.ui.setOnClick(f) end
+
+--- Stores a custom draw callback for later invocation.
+---@param f any
+---@return nil
+function lurek.ui.setOnDraw(f) end
+
+--- Sets widget padding (CSS-like: top, right?, bottom?, left?).
+---@param top any
+---@param right? any (optional)
+---@param bottom? any (optional)
+---@param left? any (optional)
+---@return nil
+function lurek.ui.setPadding(top, right, bottom, left) end
+
+--- Sets the widget position.
+---@param x any
+---@param y any
+---@return nil
+function lurek.ui.setPosition(x, y) end
+
+--- Sets the widget size.
+---@param w any
+---@param h any
+---@return nil
+function lurek.ui.setSize(w, h) end
+
+--- Sets the widget tooltip text.
+---@param text any
+---@return nil
+function lurek.ui.setTooltip(text) end
+
+--- Sets widget visibility.
+---@param v any
+---@return nil
+function lurek.ui.setVisible(v) end
+
+--- Sets the widget z-order for draw sorting.
+---@param z any
+---@return nil
+function lurek.ui.setZOrder(z) end
 
 ---@class lurek.window
 lurek.window = {}

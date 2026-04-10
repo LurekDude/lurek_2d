@@ -1,6 +1,6 @@
 //! GPU-accelerated 2D renderer for Lurek2D, backed by wgpu.
 //!
-//! Processes a `DrawCommand` queue each frame, tessellates geometry on the CPU,
+//! Processes a `RenderCommand` queue each frame, tessellates geometry on the CPU,
 //! uploads vertex / index data to GPU buffers, and issues a single render pass.
 //!
 //! # Design
@@ -23,7 +23,7 @@ use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::graphics::mesh::Mesh;
-use crate::graphics::renderer::{BlendMode, DrawCommand, DrawMode, TextAlign, TextureData};
+use crate::graphics::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
 use crate::graphics::shader::{Shader, ShaderFragmentInput, UniformValue};
 use crate::log_msg;
 use crate::math::{Mat3, Vec2};
@@ -340,7 +340,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 
 // ─── GpuRenderer ─────────────────────────────────────────────────────────────
 
-/// GPU-accelerated renderer that processes `DrawCommand` queues via wgpu.
+/// GPU-accelerated renderer that processes `RenderCommand` queues via wgpu.
 ///
 /// # Fields
 /// - `device` — `wgpu::Device`.
@@ -874,7 +874,7 @@ impl GpuRenderer {
     ///
     /// # Parameters
     /// - `surface` — `&wgpu::Surface<'static>`.
-    /// - `commands` — `&[DrawCommand]`.
+    /// - `commands` — `&[RenderCommand]`.
     /// - `textures` — `&SlotMap<TextureKey, TextureData>`.
     /// - `fonts` — `&mut SlotMap<FontKey, crate::graphics::Font>`.
     /// - `sprite_batches` — `&SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>`.
@@ -892,7 +892,7 @@ impl GpuRenderer {
     pub fn render_frame(
         &mut self,
         surface: &wgpu::Surface<'static>,
-        commands: &[DrawCommand],
+        commands: &[RenderCommand],
         textures: &SlotMap<TextureKey, TextureData>,
         fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
         light_world: &crate::light::light_world::LightWorld,
@@ -952,54 +952,54 @@ impl GpuRenderer {
 
         for cmd in commands {
             match cmd {
-                DrawCommand::SetColor(r, g, b, a) => {
+                RenderCommand::SetColor(r, g, b, a) => {
                     current_color = [*r, *g, *b, *a];
                 }
-                DrawCommand::SetLineWidth(w) => {
+                RenderCommand::SetLineWidth(w) => {
                     line_width = *w;
                 }
 
                 // ── Transform stack ──────────────────────────────────────
-                DrawCommand::PushTransform => {
+                RenderCommand::PushTransform => {
                     let top = *transform_stack.last().unwrap();
                     transform_stack.push(top);
                 }
-                DrawCommand::PopTransform => {
+                RenderCommand::PopTransform => {
                     if transform_stack.len() > 1 {
                         transform_stack.pop();
                     }
                 }
-                DrawCommand::Translate { x, y } => {
+                RenderCommand::Translate { x, y } => {
                     let m = Mat3::from_translation(Vec2 { x: *x, y: *y });
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
-                DrawCommand::Rotate { angle } => {
+                RenderCommand::Rotate { angle } => {
                     let m = Mat3::from_rotation(*angle);
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
-                DrawCommand::Scale { sx, sy } => {
+                RenderCommand::Scale { sx, sy } => {
                     let m = Mat3::from_scale(Vec2 { x: *sx, y: *sy });
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
-                DrawCommand::Shear { kx, ky } => {
+                RenderCommand::Shear { kx, ky } => {
                     let m = Mat3::from_shear(*kx, *ky);
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
-                DrawCommand::Origin => {
+                RenderCommand::Origin => {
                     let top = transform_stack.last_mut().unwrap();
                     *top = Mat3::identity();
                 }
-                DrawCommand::ApplyTransform { matrix } => {
+                RenderCommand::ApplyTransform { matrix } => {
                     let m = Mat3::from_row_major(matrix);
                     let top = transform_stack.last_mut().unwrap();
                     *top = *top * m;
                 }
 
-                DrawCommand::Rectangle { mode, x, y, w, h } => {
+                RenderCommand::Rectangle { mode, x, y, w, h } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
@@ -1033,7 +1033,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::RoundedRectangle {
+                RenderCommand::RoundedRectangle {
                     mode,
                     x,
                     y,
@@ -1077,7 +1077,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Circle { mode, x, y, r } => {
+                RenderCommand::Circle { mode, x, y, r } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
@@ -1112,7 +1112,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Ellipse { mode, x, y, rx, ry } => {
+                RenderCommand::Ellipse { mode, x, y, rx, ry } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
@@ -1147,7 +1147,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Triangle {
+                RenderCommand::Triangle {
                     mode,
                     x1,
                     y1,
@@ -1191,7 +1191,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Polygon { mode, vertices } => {
+                RenderCommand::Polygon { mode, vertices } => {
                     let mode = if wireframe { &DrawMode::Line } else { mode };
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
@@ -1222,7 +1222,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Line { x1, y1, x2, y2 } => {
+                RenderCommand::Line { x1, y1, x2, y2 } => {
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
                     let mut idxs = Vec::new();
@@ -1254,7 +1254,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::Polyline { points } => {
+                RenderCommand::Polyline { points } => {
                     if points.len() >= 4 {
                         let t = transform_stack.last().unwrap();
                         let mut verts = Vec::new();
@@ -1292,7 +1292,7 @@ impl GpuRenderer {
                         );
                     }
                 }
-                DrawCommand::Arc {
+                RenderCommand::Arc {
                     mode,
                     x,
                     y,
@@ -1338,211 +1338,11 @@ impl GpuRenderer {
                     );
                 }
 
-                DrawCommand::SetBlendMode(mode) => {
+                RenderCommand::SetBlendMode(mode) => {
                     current_blend_mode = *mode;
                 }
 
-                DrawCommand::Print { text, x, y, scale } => {
-                    let t = transform_stack.last().unwrap();
-                    let mut verts = Vec::new();
-                    let mut idxs = Vec::new();
-                    render_text(
-                        &mut verts,
-                        &mut idxs,
-                        t,
-                        current_color,
-                        text,
-                        *x,
-                        *y,
-                        *scale,
-                    );
-                    let (target_width, target_height) =
-                        self.target_dimensions(current_target, canvases);
-                    append_color_draw(
-                        &mut draws,
-                        &mut all_color_verts,
-                        &mut all_color_idxs,
-                        current_target,
-                        current_blend_mode,
-                        normalize_scissor(current_scissor, target_width, target_height),
-                        color_mask_bits,
-                        active_shader.filter(|key| shaders.contains_key(*key)),
-                        stencil_mode,
-                        stencil_reference,
-                        verts,
-                        idxs,
-                    );
-                }
-
-                DrawCommand::DrawImage {
-                    texture_key,
-                    x,
-                    y,
-                    effect: _,
-                } => {
-                    if let Some(gt) = self.gpu_textures.get(*texture_key) {
-                        let w = gt.width as f32;
-                        let h = gt.height as f32;
-                        let t = transform_stack.last().unwrap();
-                        let mut verts = Vec::with_capacity(4);
-                        let mut idxs = Vec::with_capacity(6);
-                        push_tex_quad(
-                            &mut verts,
-                            &mut idxs,
-                            t,
-                            current_color,
-                            *x,
-                            *y,
-                            0.0,
-                            1.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            w,
-                            h,
-                            0.0,
-                            0.0,
-                            1.0,
-                            1.0,
-                        );
-                        let (target_width, target_height) =
-                            self.target_dimensions(current_target, canvases);
-                        append_tex_draw(
-                            &mut draws,
-                            &mut all_tex_verts,
-                            &mut all_tex_idxs,
-                            current_target,
-                            TexRef::Texture(*texture_key),
-                            current_blend_mode,
-                            normalize_scissor(current_scissor, target_width, target_height),
-                            color_mask_bits,
-                            active_shader.filter(|key| shaders.contains_key(*key)),
-                            stencil_mode,
-                            stencil_reference,
-                            verts,
-                            idxs,
-                        );
-                    }
-                }
-                DrawCommand::DrawImageEx {
-                    texture_key,
-                    x,
-                    y,
-                    rotation,
-                    sx,
-                    sy,
-                    ox,
-                    oy,
-                    effect: _,
-                } => {
-                    if let Some(gt) = self.gpu_textures.get(*texture_key) {
-                        let w = gt.width as f32;
-                        let h = gt.height as f32;
-                        let t = transform_stack.last().unwrap();
-                        let mut verts = Vec::with_capacity(4);
-                        let mut idxs = Vec::with_capacity(6);
-                        push_tex_quad(
-                            &mut verts,
-                            &mut idxs,
-                            t,
-                            current_color,
-                            *x,
-                            *y,
-                            *rotation,
-                            *sx,
-                            *sy,
-                            *ox,
-                            *oy,
-                            w,
-                            h,
-                            0.0,
-                            0.0,
-                            1.0,
-                            1.0,
-                        );
-                        let (target_width, target_height) =
-                            self.target_dimensions(current_target, canvases);
-                        append_tex_draw(
-                            &mut draws,
-                            &mut all_tex_verts,
-                            &mut all_tex_idxs,
-                            current_target,
-                            TexRef::Texture(*texture_key),
-                            current_blend_mode,
-                            normalize_scissor(current_scissor, target_width, target_height),
-                            color_mask_bits,
-                            active_shader.filter(|key| shaders.contains_key(*key)),
-                            stencil_mode,
-                            stencil_reference,
-                            verts,
-                            idxs,
-                        );
-                    }
-                }
-                DrawCommand::DrawQuad {
-                    texture_key,
-                    quad_x,
-                    quad_y,
-                    quad_w,
-                    quad_h,
-                    tex_w,
-                    tex_h,
-                    x,
-                    y,
-                    rotation,
-                    sx,
-                    sy,
-                    ox,
-                    oy,
-                    effect: _,
-                } => {
-                    if let Some(_gt) = self.gpu_textures.get(*texture_key) {
-                        let t = transform_stack.last().unwrap();
-                        let mut verts = Vec::with_capacity(4);
-                        let mut idxs = Vec::with_capacity(6);
-                        let u0 = quad_x / tex_w;
-                        let v0 = quad_y / tex_h;
-                        let u1 = (quad_x + quad_w) / tex_w;
-                        let v1 = (quad_y + quad_h) / tex_h;
-                        push_tex_quad(
-                            &mut verts,
-                            &mut idxs,
-                            t,
-                            current_color,
-                            *x,
-                            *y,
-                            *rotation,
-                            *sx,
-                            *sy,
-                            *ox,
-                            *oy,
-                            *quad_w,
-                            *quad_h,
-                            u0,
-                            v0,
-                            u1,
-                            v1,
-                        );
-                        let (target_width, target_height) =
-                            self.target_dimensions(current_target, canvases);
-                        append_tex_draw(
-                            &mut draws,
-                            &mut all_tex_verts,
-                            &mut all_tex_idxs,
-                            current_target,
-                            TexRef::Texture(*texture_key),
-                            current_blend_mode,
-                            normalize_scissor(current_scissor, target_width, target_height),
-                            color_mask_bits,
-                            active_shader.filter(|key| shaders.contains_key(*key)),
-                            stencil_mode,
-                            stencil_reference,
-                            verts,
-                            idxs,
-                        );
-                    }
-                }
-                DrawCommand::PrintFont {
+                RenderCommand::Print {
                     font_key,
                     ref text,
                     x,
@@ -1550,10 +1350,6 @@ impl GpuRenderer {
                     scale,
                 } => {
                     if let Some(font) = fonts.get_mut(*font_key) {
-                        for ch in text.chars() {
-                            font.ensure_glyph(ch);
-                        }
-
                         if self.ensure_font_atlas(*font_key, font, default_filter) {
                             let t = transform_stack.last().unwrap();
                             let font_size = font.size();
@@ -1617,7 +1413,177 @@ impl GpuRenderer {
                         }
                     }
                 }
-                DrawCommand::DrawBatch { batch_key } => {
+
+                RenderCommand::DrawImage {
+                    texture_key,
+                    x,
+                    y,
+                    effect: _,
+                } => {
+                    if let Some(gt) = self.gpu_textures.get(*texture_key) {
+                        let w = gt.width as f32;
+                        let h = gt.height as f32;
+                        let t = transform_stack.last().unwrap();
+                        let mut verts = Vec::with_capacity(4);
+                        let mut idxs = Vec::with_capacity(6);
+                        push_tex_quad(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            current_color,
+                            *x,
+                            *y,
+                            0.0,
+                            1.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            w,
+                            h,
+                            0.0,
+                            0.0,
+                            1.0,
+                            1.0,
+                        );
+                        let (target_width, target_height) =
+                            self.target_dimensions(current_target, canvases);
+                        append_tex_draw(
+                            &mut draws,
+                            &mut all_tex_verts,
+                            &mut all_tex_idxs,
+                            current_target,
+                            TexRef::Texture(*texture_key),
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, target_width, target_height),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
+                    }
+                }
+                RenderCommand::DrawImageEx {
+                    texture_key,
+                    x,
+                    y,
+                    rotation,
+                    sx,
+                    sy,
+                    ox,
+                    oy,
+                    effect: _,
+                } => {
+                    if let Some(gt) = self.gpu_textures.get(*texture_key) {
+                        let w = gt.width as f32;
+                        let h = gt.height as f32;
+                        let t = transform_stack.last().unwrap();
+                        let mut verts = Vec::with_capacity(4);
+                        let mut idxs = Vec::with_capacity(6);
+                        push_tex_quad(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            current_color,
+                            *x,
+                            *y,
+                            *rotation,
+                            *sx,
+                            *sy,
+                            *ox,
+                            *oy,
+                            w,
+                            h,
+                            0.0,
+                            0.0,
+                            1.0,
+                            1.0,
+                        );
+                        let (target_width, target_height) =
+                            self.target_dimensions(current_target, canvases);
+                        append_tex_draw(
+                            &mut draws,
+                            &mut all_tex_verts,
+                            &mut all_tex_idxs,
+                            current_target,
+                            TexRef::Texture(*texture_key),
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, target_width, target_height),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
+                    }
+                }
+                RenderCommand::DrawQuad {
+                    texture_key,
+                    quad_x,
+                    quad_y,
+                    quad_w,
+                    quad_h,
+                    tex_w,
+                    tex_h,
+                    x,
+                    y,
+                    rotation,
+                    sx,
+                    sy,
+                    ox,
+                    oy,
+                    effect: _,
+                } => {
+                    if let Some(_gt) = self.gpu_textures.get(*texture_key) {
+                        let t = transform_stack.last().unwrap();
+                        let mut verts = Vec::with_capacity(4);
+                        let mut idxs = Vec::with_capacity(6);
+                        let u0 = quad_x / tex_w;
+                        let v0 = quad_y / tex_h;
+                        let u1 = (quad_x + quad_w) / tex_w;
+                        let v1 = (quad_y + quad_h) / tex_h;
+                        push_tex_quad(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            current_color,
+                            *x,
+                            *y,
+                            *rotation,
+                            *sx,
+                            *sy,
+                            *ox,
+                            *oy,
+                            *quad_w,
+                            *quad_h,
+                            u0,
+                            v0,
+                            u1,
+                            v1,
+                        );
+                        let (target_width, target_height) =
+                            self.target_dimensions(current_target, canvases);
+                        append_tex_draw(
+                            &mut draws,
+                            &mut all_tex_verts,
+                            &mut all_tex_idxs,
+                            current_target,
+                            TexRef::Texture(*texture_key),
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, target_width, target_height),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
+                    }
+                }
+
+                RenderCommand::DrawBatch { batch_key } => {
                     if let Some(batch) = sprite_batches.get(*batch_key) {
                         let tex_key = batch.texture_key();
                         if let Some(gt) = self.gpu_textures.get(tex_key) {
@@ -1671,15 +1637,15 @@ impl GpuRenderer {
                         }
                     }
                 }
-                DrawCommand::SetCanvas(canvas) => {
+                RenderCommand::SetCanvas(canvas) => {
                     current_target = match canvas {
                         Some(key) => RenderTargetId::Canvas(*key),
                         None => RenderTargetId::Screen,
                     };
                     self.render_stats.canvas_switches += 1;
                 }
-                DrawCommand::RegisterCanvas { .. } => {}
-                DrawCommand::DrawCanvas {
+                RenderCommand::RegisterCanvas { .. } => {}
+                RenderCommand::DrawCanvas {
                     canvas_key,
                     x,
                     y,
@@ -1733,23 +1699,23 @@ impl GpuRenderer {
                         );
                     }
                 }
-                DrawCommand::SetPointSize(size) => {
+                RenderCommand::SetPointSize(size) => {
                     point_size = *size;
                 }
 
-                DrawCommand::SetScissor(rect) => {
+                RenderCommand::SetScissor(rect) => {
                     current_scissor = *rect;
                 }
 
-                DrawCommand::SetColorMask(r, g, b, a) => {
+                RenderCommand::SetColorMask(r, g, b, a) => {
                     color_mask_bits = color_write_mask_bits((*r, *g, *b, *a));
                 }
 
-                DrawCommand::SetWireframe(enabled) => {
+                RenderCommand::SetWireframe(enabled) => {
                     wireframe = *enabled;
                 }
 
-                DrawCommand::Points { points } => {
+                RenderCommand::Points { points } => {
                     let t = transform_stack.last().unwrap();
                     let mut verts = Vec::new();
                     let mut idxs = Vec::new();
@@ -1780,7 +1746,7 @@ impl GpuRenderer {
                         idxs,
                     );
                 }
-                DrawCommand::PrintFormatted {
+                RenderCommand::PrintFormatted {
                     font_key,
                     ref text,
                     x,
@@ -1794,12 +1760,6 @@ impl GpuRenderer {
                         let wrapped = font.wrap_text(text, *limit / ratio);
                         let lh = font.line_height() * ratio;
                         let font_size = font.size();
-
-                        for line in &wrapped {
-                            for ch in line.chars() {
-                                font.ensure_glyph(ch);
-                            }
-                        }
 
                         if self.ensure_font_atlas(*font_key, font, default_filter) {
                             let t = transform_stack.last().unwrap();
@@ -1876,14 +1836,14 @@ impl GpuRenderer {
                     }
                 }
 
-                DrawCommand::StencilBegin { action, value } => {
+                RenderCommand::StencilBegin { action, value } => {
                     stencil_mode = StencilMode::Write(*action);
                     stencil_reference = *value;
                 }
-                DrawCommand::StencilEnd => {
+                RenderCommand::StencilEnd => {
                     stencil_mode = StencilMode::Disabled;
                 }
-                DrawCommand::SetStencilTest(test) => match test {
+                RenderCommand::SetStencilTest(test) => match test {
                     Some((compare, value)) => {
                         stencil_mode = StencilMode::Test(*compare);
                         stencil_reference = *value;
@@ -1893,7 +1853,7 @@ impl GpuRenderer {
                         stencil_reference = 0;
                     }
                 },
-                DrawCommand::DrawMesh {
+                RenderCommand::DrawMesh {
                     mesh_key,
                     x,
                     y,
@@ -1994,8 +1954,8 @@ impl GpuRenderer {
                         }
                     }
                 }
-                DrawCommand::SyncMesh { .. } => {}
-                DrawCommand::DrawNineSlice {
+                RenderCommand::SyncMesh { .. } => {}
+                RenderCommand::DrawNineSlice {
                     texture_key,
                     tex_w,
                     tex_h,
@@ -2069,18 +2029,18 @@ impl GpuRenderer {
                         );
                     }
                 }
-                DrawCommand::SetShader(shader) => {
+                RenderCommand::SetShader(shader) => {
                     active_shader = shader.filter(|key| shaders.contains_key(*key));
                 }
                 // DrawShape and DrawParticleSystem are not yet GPU-implemented;
                 // silence non-exhaustive-pattern error until renderer support is added.
-                DrawCommand::DrawShape { .. } => {}
-                DrawCommand::DrawParticleSystem { .. } => {}
+                RenderCommand::DrawShape { .. } => {}
+                RenderCommand::DrawParticleSystem { .. } => {}
                 // Post-FX capture/apply are managed by the PostFxStack at a higher level;
                 // the GPU renderer acknowledges these commands but does not process them here.
-                DrawCommand::BeginPostFx { .. } => {}
-                DrawCommand::EndPostFx { .. } => {}
-                DrawCommand::ApplyPostFx { .. } => {}
+                RenderCommand::BeginPostFx { .. } => {}
+                RenderCommand::EndPostFx { .. } => {}
+                RenderCommand::ApplyPostFx { .. } => {}
             }
         }
 
@@ -3809,45 +3769,6 @@ fn build_rounded_rect_path(
     pts
 }
 
-/// Render bitmap text as coloured quads (one quad per lit pixel).
-#[allow(clippy::too_many_arguments)]
-fn render_text(
-    cv: &mut Vec<ColorVertex>,
-    ci: &mut Vec<u32>,
-    t: &Mat3,
-    color: [f32; 4],
-    text: &str,
-    x: f32,
-    y: f32,
-    scale: f32,
-) {
-    let char_w = 6.0 * scale;
-    let px_w = char_w / 5.0;
-    let px_h = (8.0 * scale) / 7.0;
-    for (i, ch) in text.chars().enumerate() {
-        if ch == ' ' {
-            continue;
-        }
-        let cx = x + i as f32 * char_w;
-        let pattern = bitmap_char(ch);
-        for (row, &bits) in pattern.iter().enumerate() {
-            for col in 0..5u8 {
-                if bits & (1 << (4 - col)) != 0 {
-                    let px = cx + col as f32 * px_w;
-                    let py = y + row as f32 * px_h;
-                    let pts = [
-                        apply(t, px, py),
-                        apply(t, px + px_w, py),
-                        apply(t, px + px_w, py + px_h),
-                        apply(t, px, py + px_h),
-                    ];
-                    push_quad_verts(cv, ci, &pts, color);
-                }
-            }
-        }
-    }
-}
-
 /// Push a textured quad with full affine transform support.
 ///
 /// `w`, `h` — display size of the quad before scale.
@@ -3894,143 +3815,6 @@ fn push_tex_quad(
         });
     }
     ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
-}
-
-// ─── Bitmap font ─────────────────────────────────────────────────────────────
-
-/// Returns a 7-row × 5-bit bitmap pattern for the given character.
-fn bitmap_char(ch: char) -> [u8; 7] {
-    match ch.to_ascii_uppercase() {
-        'A' => [
-            0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001,
-        ],
-        'B' => [
-            0b11110, 0b10001, 0b11110, 0b10001, 0b10001, 0b10001, 0b11110,
-        ],
-        'C' => [
-            0b01110, 0b10001, 0b10000, 0b10000, 0b10000, 0b10001, 0b01110,
-        ],
-        'D' => [
-            0b11100, 0b10010, 0b10001, 0b10001, 0b10001, 0b10010, 0b11100,
-        ],
-        'E' => [
-            0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111,
-        ],
-        'F' => [
-            0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000,
-        ],
-        'G' => [
-            0b01110, 0b10001, 0b10000, 0b10111, 0b10001, 0b10001, 0b01110,
-        ],
-        'H' => [
-            0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001,
-        ],
-        'I' => [
-            0b01110, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110,
-        ],
-        'J' => [
-            0b00111, 0b00010, 0b00010, 0b00010, 0b00010, 0b10010, 0b01100,
-        ],
-        'K' => [
-            0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001,
-        ],
-        'L' => [
-            0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111,
-        ],
-        'M' => [
-            0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001,
-        ],
-        'N' => [
-            0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b10001,
-        ],
-        'O' => [
-            0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110,
-        ],
-        'P' => [
-            0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000,
-        ],
-        'Q' => [
-            0b01110, 0b10001, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101,
-        ],
-        'R' => [
-            0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001,
-        ],
-        'S' => [
-            0b01110, 0b10001, 0b10000, 0b01110, 0b00001, 0b10001, 0b01110,
-        ],
-        'T' => [
-            0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100,
-        ],
-        'U' => [
-            0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110,
-        ],
-        'V' => [
-            0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100,
-        ],
-        'W' => [
-            0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b11011, 0b10001,
-        ],
-        'X' => [
-            0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001,
-        ],
-        'Y' => [
-            0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100, 0b00100,
-        ],
-        'Z' => [
-            0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111,
-        ],
-        '0' => [
-            0b01110, 0b10011, 0b10101, 0b10101, 0b11001, 0b10001, 0b01110,
-        ],
-        '1' => [
-            0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110,
-        ],
-        '2' => [
-            0b01110, 0b10001, 0b00001, 0b00110, 0b01000, 0b10000, 0b11111,
-        ],
-        '3' => [
-            0b01110, 0b10001, 0b00001, 0b00110, 0b00001, 0b10001, 0b01110,
-        ],
-        '4' => [
-            0b00010, 0b00110, 0b01010, 0b10010, 0b11111, 0b00010, 0b00010,
-        ],
-        '5' => [
-            0b11111, 0b10000, 0b11110, 0b00001, 0b00001, 0b10001, 0b01110,
-        ],
-        '6' => [
-            0b01110, 0b10000, 0b10000, 0b11110, 0b10001, 0b10001, 0b01110,
-        ],
-        '7' => [
-            0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b01000, 0b01000,
-        ],
-        '8' => [
-            0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110,
-        ],
-        '9' => [
-            0b01110, 0b10001, 0b10001, 0b01111, 0b00001, 0b00001, 0b01110,
-        ],
-        '!' => [
-            0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00100,
-        ],
-        '.' => [
-            0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100,
-        ],
-        ',' => [
-            0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100, 0b01000,
-        ],
-        ':' => [
-            0b00000, 0b00100, 0b00000, 0b00000, 0b00000, 0b00100, 0b00000,
-        ],
-        '-' => [
-            0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000,
-        ],
-        '/' => [
-            0b00001, 0b00010, 0b00010, 0b00100, 0b01000, 0b01000, 0b10000,
-        ],
-        _ => [
-            0b01110, 0b01010, 0b01010, 0b01010, 0b01010, 0b00000, 0b01010,
-        ],
-    }
 }
 
 #[cfg(test)]

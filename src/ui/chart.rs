@@ -2,7 +2,7 @@
 //!
 //! Provides line, bar, scatter, pie, and area chart types with a shared
 //! [`ChartConfig`] for titles, colours, grid, and axis styling.  Each chart
-//! type implements [`render_to_image`] producing a self-contained PNG-ready
+//! type implements [`draw_to_image`] producing a self-contained PNG-ready
 //! `ImageData` with no GPU dependency.
 
 use crate::image::ImageData;
@@ -219,7 +219,7 @@ impl LineChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self) -> ImageData {
         let cfg = &self.config;
         let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -346,7 +346,7 @@ impl BarChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self) -> ImageData {
         let cfg = &self.config;
         let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -442,7 +442,7 @@ impl ScatterPlot {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self) -> ImageData {
         let cfg = &self.config;
         let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
@@ -541,7 +541,7 @@ impl PieChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self) -> ImageData {
         let cfg = &self.config;
         let w = cfg.width;
         let h = cfg.height;
@@ -707,7 +707,7 @@ impl AreaChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self) -> ImageData {
         let cfg = &self.config;
         let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;

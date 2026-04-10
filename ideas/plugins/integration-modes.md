@@ -83,7 +83,7 @@ their own engine. Custom game launchers. Game editors (with the engine embedded 
 panel).
 
 **Advantages**:
-- Full Rust type safety — direct access to `SharedState`, `DrawCommand`, etc.
+- Full Rust type safety — direct access to `SharedState`, `RenderCommand`, etc.
 - No DLL boundary, no ABI concerns
 - Compile-time feature selection via Cargo features
 

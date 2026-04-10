@@ -254,7 +254,7 @@ These golden tests cover graphics processing, post-effects, image transforms, an
 
 ### 13. Graphics Processing Golden (NEW)
 
-**File**: `tests/lua/golden/test_graphics_golden.lua`  
+**File**: `tests/lua/golden/test_graphics_golden.lua`
 **Rust Golden**: `tests/rust/golden/expected/image/graphics_shapes.png`
 
 #### State Golden (Headless — Lua)
@@ -296,7 +296,7 @@ Pixel tests to add: circle, ellipse, line (AA edge pixels), polygon, arc, rounde
 
 ### 14. Post-Processing Effects Golden (NEW)
 
-**File**: `tests/lua/golden/test_postfx_golden.lua`  
+**File**: `tests/lua/golden/test_postfx_golden.lua`
 **Rust Golden**: `tests/rust/golden/expected/image/postfx_blur.png`, `postfx_vignette.png`, etc.
 
 #### State Golden (Headless)
@@ -405,7 +405,7 @@ Verify Spine skeleton bone transforms are deterministic:
 
 #### test_serial_golden.lua (EXPANDED — add encryption round-trip)
 Add to existing plan:
-- `encrypt("aes256", key, "plaintext")` → `decrypt` → original  
+- `encrypt("aes256", key, "plaintext")` → `decrypt` → original
 - Verify ciphertext is NOT the same as plaintext (sanity check)
 - HMAC signature over fixed data → fixed signature
 
@@ -422,7 +422,7 @@ Add to existing plan:
 #### test_procgen_extended_golden.lua (EXPANDED)
 Add to existing procgen plan:
 - Voronoi diagram with seed=99 → exact cell centers
-- Poisson disk sampling with seed=7, r=2 → deterministic point set  
+- Poisson disk sampling with seed=7, r=2 → deterministic point set
 - Markov chain text generation with seed=42, 3rd-order | 5-word output → exact string
 
 ---

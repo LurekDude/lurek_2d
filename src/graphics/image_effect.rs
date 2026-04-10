@@ -4,7 +4,7 @@
 //! This type lives in Tier 1 and has **no imports from `src/postfx/`**.
 //!
 //! The bridge layer (`lua_api`) creates `Vec<ShaderPassDescriptor>` values (via
-//! `ImageEffect::to_passes()`) and embeds them into `DrawCommand` variants
+//! `ImageEffect::to_passes()`) and embeds them into `RenderCommand` variants
 //! before the frame is submitted to the GPU renderer.
 
 use std::collections::HashMap;

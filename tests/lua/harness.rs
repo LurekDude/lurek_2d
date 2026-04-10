@@ -27,6 +27,7 @@ fn create_test_vm() -> mlua::Lua {
         "Test",
         PathBuf::from("."),
     )));
+    state.borrow_mut().load_default_fonts();
     let lua = create_lua_vm(state, &Config::default().modules).expect("Failed to create Lua VM");
 
     // Load test framework
@@ -552,6 +553,11 @@ fn lua_test_raycaster() {
 #[test]
 fn lua_test_spine() {
     run_lua_test("unit/test_spine.lua");
+}
+
+#[test]
+fn lua_test_rendering_drawing_contract() {
+    run_lua_test("unit/test_rendering_drawing_contract.lua");
 }
 
 #[test]

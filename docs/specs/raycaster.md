@@ -344,7 +344,7 @@ end
 ## Notes
 
 - **Constraint A-03 compliance**: The raycaster produces 2D column draw data (screen Y ranges, shading, texture coordinates) that Lua scripts render as filled rectangles or textured quads via `lurek.gfx`. No 3D scene graph or perspective projection pipeline is involved — it is pseudo-3D rendering via 2D draw calls, which is explicitly allowed under A-03.
-- **Renderer-agnostic**: The module never touches `DrawCommand`, `SharedState` resource pools, or GPU types. All output is plain `f32`/`u32`/`Vec<u8>` data that the Lua layer consumes through the `lurek.raycaster` API and renders independently.
+- **Renderer-agnostic**: The module never touches `RenderCommand`, `SharedState` resource pools, or GPU types. All output is plain `f32`/`u32`/`Vec<u8>` data that the Lua layer consumes through the `lurek.raycaster` API and renders independently.
 - **Cell type `u32`**: Wall cells store `u32` values. Zero means empty; any positive value is a wall type that scripts can use for multi-texture lookup.
 - **Fisheye correction**: `cast_rays` applies `cos(angle_diff)` correction to perpendicular distances. `cast_ray` returns the raw perpendicular distance. The `raw_distance` field always holds the uncorrected Euclidean distance.
 - **`cast_rays_flat` layout**: 5 floats per ray in order: `[distance, cell_value, side, tex_u, hit(0/1)]`. This flat format is optimised for `ColumnBatch::update_from_ray_data` and avoids per-ray Lua table creation overhead.

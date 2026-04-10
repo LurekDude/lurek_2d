@@ -265,7 +265,7 @@ Manager routes each Fix task to the appropriate specialist agent with a **five-b
 |---|---|
 | Missing Rust struct / fn | `Developer` |
 | Missing Lua binding | `Developer` |
-| Graphics DrawCommand | `Renderer` |
+| Graphics RenderCommand | `Renderer` |
 | Physics body / world | `Physicist` |
 | Audio mixer | `Audio-Eng` |
 | Input state | `Developer` |

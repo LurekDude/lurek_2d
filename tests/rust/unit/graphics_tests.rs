@@ -1,4 +1,4 @@
-//! Integration tests for the Lurek2D graphics module.
+﻿//! Integration tests for the Lurek2D graphics module.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -8,7 +8,7 @@ use lurek2d::animation::Animation;
 use lurek2d::engine::config::Config;
 use lurek2d::engine::resource_keys::TextureKey;
 use lurek2d::graphics::renderer::{
-    CompareMode, DepthMode, DrawCommand, DrawMode, StencilAction, TextAlign, TextureData,
+    CompareMode, DepthMode, RenderCommand, DrawMode, StencilAction, TextAlign, TextureData,
 };
 use lurek2d::graphics::sprite_batch::BatchEntry;
 use lurek2d::graphics::BlendMode;
@@ -162,22 +162,22 @@ fn test_phase01_released_font_handle_reuse_reports_invalid_font() {
     let result = lua
         .load(
             r#"
-            local released = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 18)
+            local released = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
             assert(type(released) == "userdata")
-            assert(lurek.gfx.releaseFont(released) == true)
+            assert(released:release() == true)
 
-            local replacement = lurek.gfx.newFont("assets/fonts/OpenSans.ttf", 20)
+            local replacement = lurek.graphic.newFont("assets/fonts/bitmap_6x10.png", 10)
             assert(type(replacement) == "userdata")
             assert(replacement:getHeight() > 0)
 
-            lurek.gfx.setFont(released)
+            lurek.graphic.setFont(released)
             "#,
         )
         .exec();
 
     assert_lua_error_contains(
         result,
-        "lurek.gfx.setFont: font handle is not valid or was released",
+        "lurek.graphic.setFont: font handle is not valid or was released",
     );
 }
 
@@ -216,8 +216,8 @@ fn test_transform_push_queues_push_transform() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.push()");
     assert!(matches!(
-        state.borrow().draw_commands.last(),
-        Some(DrawCommand::PushTransform)
+        state.borrow().render_commands.last(),
+        Some(RenderCommand::PushTransform)
     ));
 }
 
@@ -226,8 +226,8 @@ fn test_transform_pop_queues_pop_transform() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.pop()");
     assert!(matches!(
-        state.borrow().draw_commands.last(),
-        Some(DrawCommand::PopTransform)
+        state.borrow().render_commands.last(),
+        Some(RenderCommand::PopTransform)
     ));
 }
 
@@ -236,11 +236,11 @@ fn test_transform_translate_queues_correct_values() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.translate(30, 45)");
     let st = state.borrow();
-    if let Some(DrawCommand::Translate { x, y }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Translate { x, y }) = st.render_commands.last() {
         assert!((x - 30.0).abs() < 1e-5);
         assert!((y - 45.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Translate");
+        panic!("Expected RenderCommand::Translate");
     }
 }
 
@@ -249,10 +249,10 @@ fn test_transform_rotate_queues_angle() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.rotate(1.5707963)");
     let st = state.borrow();
-    if let Some(DrawCommand::Rotate { angle }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Rotate { angle }) = st.render_commands.last() {
         assert!((angle - std::f32::consts::FRAC_PI_2).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Rotate");
+        panic!("Expected RenderCommand::Rotate");
     }
 }
 
@@ -261,11 +261,11 @@ fn test_transform_scale_uniform_defaults_sy_to_sx() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.scale(2)");
     let st = state.borrow();
-    if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Scale { sx, sy }) = st.render_commands.last() {
         assert!((sx - 2.0).abs() < 1e-5);
         assert!((sy - 2.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Scale");
+        panic!("Expected RenderCommand::Scale");
     }
 }
 
@@ -274,11 +274,11 @@ fn test_transform_scale_nonuniform_queues_distinct_sx_sy() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.scale(3, 0.5)");
     let st = state.borrow();
-    if let Some(DrawCommand::Scale { sx, sy }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Scale { sx, sy }) = st.render_commands.last() {
         assert!((sx - 3.0).abs() < 1e-5);
         assert!((sy - 0.5).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Scale");
+        panic!("Expected RenderCommand::Scale");
     }
 }
 
@@ -294,7 +294,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
         r#"lurek.gfx.arc("fill", 100, 200, 50, 0, 3.14159265)"#,
     );
     let st = state.borrow();
-    if let Some(DrawCommand::Arc {
+    if let Some(RenderCommand::Arc {
         mode,
         x,
         y,
@@ -302,7 +302,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
         angle1,
         angle2,
         segments,
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         assert!(matches!(mode, DrawMode::Fill));
         assert!((x - 100.0).abs() < 1e-5);
@@ -312,7 +312,7 @@ fn test_arc_fill_mode_queues_arc_command_with_default_segments() {
         assert!((angle2 - std::f32::consts::PI).abs() < 1e-4);
         assert_eq!(*segments, 32);
     } else {
-        panic!("Expected DrawCommand::Arc");
+        panic!("Expected RenderCommand::Arc");
     }
 }
 
@@ -321,10 +321,10 @@ fn test_arc_line_mode_queues_line_draw_mode() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, r#"lurek.gfx.arc("line", 0, 0, 10, 0, 1)"#);
     let st = state.borrow();
-    if let Some(DrawCommand::Arc { mode, .. }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Arc { mode, .. }) = st.render_commands.last() {
         assert!(matches!(mode, DrawMode::Line));
     } else {
-        panic!("Expected DrawCommand::Arc");
+        panic!("Expected RenderCommand::Arc");
     }
 }
 
@@ -333,10 +333,10 @@ fn test_arc_explicit_segments_overrides_default() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, r#"lurek.gfx.arc("fill", 0, 0, 20, 0, 6.28, 16)"#);
     let st = state.borrow();
-    if let Some(DrawCommand::Arc { segments, .. }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Arc { segments, .. }) = st.render_commands.last() {
         assert_eq!(*segments, 16);
     } else {
-        panic!("Expected DrawCommand::Arc");
+        panic!("Expected RenderCommand::Arc");
     }
 }
 
@@ -349,7 +349,7 @@ fn test_drawex_defaults_rotation_scale_origin_to_identity() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.drawEx(0, 100, 200)");
     let st = state.borrow();
-    if let Some(DrawCommand::DrawImageEx {
+    if let Some(RenderCommand::DrawImageEx {
         texture_key,
         x,
         y,
@@ -359,7 +359,7 @@ fn test_drawex_defaults_rotation_scale_origin_to_identity() {
         ox,
         oy,
         ..
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         let _ = texture_key;
         assert!((x - 100.0).abs() < 1e-5);
@@ -370,7 +370,7 @@ fn test_drawex_defaults_rotation_scale_origin_to_identity() {
         assert!((ox - 0.0).abs() < 1e-5);
         assert!((oy - 0.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::DrawImageEx");
+        panic!("Expected RenderCommand::DrawImageEx");
     }
 }
 
@@ -382,7 +382,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
         "lurek.gfx.drawEx(1, 50, 60, 0.785, 2.0, 1.5, 10, 20)",
     );
     let st = state.borrow();
-    if let Some(DrawCommand::DrawImageEx {
+    if let Some(RenderCommand::DrawImageEx {
         texture_key,
         x,
         y,
@@ -392,7 +392,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
         ox,
         oy,
         ..
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         let _ = texture_key;
         assert!((x - 50.0).abs() < 1e-5);
@@ -403,7 +403,7 @@ fn test_drawex_with_all_params_queues_correct_values() {
         assert!((ox - 10.0).abs() < 1e-5);
         assert!((oy - 20.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::DrawImageEx");
+        panic!("Expected RenderCommand::DrawImageEx");
     }
 }
 
@@ -418,7 +418,7 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
         "#,
     );
     let st = state.borrow();
-    if let Some(DrawCommand::DrawQuad {
+    if let Some(RenderCommand::DrawQuad {
         texture_key,
         quad_x,
         quad_y,
@@ -434,7 +434,7 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
         ox,
         oy,
         ..
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         let _ = texture_key;
         assert!((quad_x - 10.0).abs() < 1e-5);
@@ -451,7 +451,7 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
         assert!((ox - 0.0).abs() < 1e-5);
         assert!((oy - 0.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::DrawQuad");
+        panic!("Expected RenderCommand::DrawQuad");
     }
 }
 
@@ -505,14 +505,14 @@ fn test_polyline_two_points_queues_polyline_command() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.polyline(10, 20, 30, 40)");
     let st = state.borrow();
-    if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Polyline { points }) = st.render_commands.last() {
         assert_eq!(points.len(), 4);
         assert!((points[0] - 10.0).abs() < 1e-5);
         assert!((points[1] - 20.0).abs() < 1e-5);
         assert!((points[2] - 30.0).abs() < 1e-5);
         assert!((points[3] - 40.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Polyline");
+        panic!("Expected RenderCommand::Polyline");
     }
 }
 
@@ -521,35 +521,35 @@ fn test_polyline_three_points_queues_six_coordinates() {
     let (state, lua) = make_graphics_vm();
     run_draw(&lua, "lurek.gfx.polyline(0, 0, 50, 100, 100, 0)");
     let st = state.borrow();
-    if let Some(DrawCommand::Polyline { points }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Polyline { points }) = st.render_commands.last() {
         assert_eq!(points.len(), 6);
         assert!((points[4] - 100.0).abs() < 1e-5);
         assert!((points[5] - 0.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Polyline");
+        panic!("Expected RenderCommand::Polyline");
     }
 }
 
 // ===========================================================================
-// Feature 6: TTF Font Loading
+// Feature 6: Bitmap Font Loading
 // ===========================================================================
 
-/// Helper: load the bundled test font (Roboto-Regular).
+/// Helper: load the bundled test font (bitmap 8x14).
 fn load_test_font() -> Font {
-    let font_data = include_bytes!("../../../assets/fonts/Roboto-Regular.ttf");
-    Font::from_bytes(font_data, 24.0).expect("Failed to load test font")
+    let font_data = include_bytes!("../../../assets/fonts/bitmap_8x14.png");
+    Font::from_png_bytes(font_data, 8, 14, true).expect("Failed to load bitmap test font")
 }
 
 #[test]
-fn test_font_from_bytes_creates_font() {
+fn test_font_from_png_bytes_creates_font() {
     let font = load_test_font();
-    // Pre-rasterizes printable ASCII — the glyph for 'A' should exist
+    // Bitmap font has positive size
     assert!(font.size() > 0.0);
 }
 
 #[test]
 fn test_font_text_width_returns_positive() {
-    let mut font = load_test_font();
+    let font = load_test_font();
     let w = font.text_width("Hello");
     assert!(
         w > 0.0,
@@ -580,7 +580,7 @@ fn test_font_atlas_dimensions_valid() {
 
 #[test]
 fn test_font_glyph_info_for_ascii() {
-    let mut font = load_test_font();
+    let font = load_test_font();
     let info = font.glyph('A').expect("Glyph 'A' should exist");
     assert!(info.width > 0, "Glyph 'A' width should be > 0");
     assert!(info.height > 0, "Glyph 'A' height should be > 0");
@@ -604,13 +604,13 @@ fn test_new_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        local font = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
         assert(font ~= nil, "newFont should return a Font object")
         assert(type(font) == "userdata", "Font should be userdata")
         "#,
     )
     .exec()
-    .expect("newFont should succeed with valid TTF file");
+    .expect("newFont should succeed with valid bitmap PNG");
 }
 
 #[test]
@@ -618,9 +618,9 @@ fn test_set_get_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        lurek.gfx.setFont(font)
-        local got = lurek.gfx.getFont()
+        local font = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
+        lurek.graphic.setFont(font)
+        local got = lurek.graphic.getFont()
         assert(got ~= nil, "getFont should return the set font")
         "#,
     )
@@ -629,25 +629,25 @@ fn test_set_get_font_lua_binding() {
 }
 
 #[test]
-fn test_print_with_font_pushes_print_font_command() {
+fn test_print_with_font_pushes_print_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        lurek.gfx.setFont(font)
-        lurek.gfx.print("Hello TTF", 10, 20)
+        local font = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
+        lurek.graphic.setFont(font)
+        lurek.graphic.print("Hello bitmap", 10, 20)
         "#,
     )
     .exec()
     .unwrap();
     let st = state.borrow();
-    let has_print_font = st
-        .draw_commands
+    let has_print = st
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::PrintFont { .. }));
+        .any(|cmd| matches!(cmd, RenderCommand::Print { .. }));
     assert!(
-        has_print_font,
-        "print() with active font should push PrintFont command"
+        has_print,
+        "print() with active font should push Print command"
     );
 }
 
@@ -657,8 +657,8 @@ fn test_get_font_width_returns_positive() {
     let width: f32 = lua
         .load(
             r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return lurek.gfx.getFontWidth(font, "Hello")
+        local font = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
+        return lurek.graphic.getFontWidth(font, "Hello")
         "#,
         )
         .eval()
@@ -675,8 +675,8 @@ fn test_get_font_height_returns_positive() {
     let height: f32 = lua
         .load(
             r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return lurek.gfx.getFontHeight(font)
+        local font = lurek.graphic.newFont("assets/fonts/bitmap_8x14.png", 14)
+        return lurek.graphic.getFontHeight(font)
         "#,
         )
         .eval()
@@ -769,9 +769,9 @@ fn test_draw_batch_lua_command() {
     .unwrap();
     let st = state.borrow();
     let has_draw_batch = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawBatch { .. }));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawBatch { .. }));
     assert!(has_draw_batch, "drawBatch should push DrawBatch command");
 }
 
@@ -797,9 +797,9 @@ fn test_set_blend_mode_lua() {
     .unwrap();
     let st = state.borrow();
     assert!(st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetBlendMode(BlendMode::Add))));
+        .any(|cmd| matches!(cmd, RenderCommand::SetBlendMode(BlendMode::Add))));
 }
 
 #[test]
@@ -821,10 +821,10 @@ fn test_set_blend_mode_pushes_draw_command() {
     )
     .exec()
     .unwrap();
-    let cmds = &state.borrow().draw_commands;
+    let cmds = &state.borrow().render_commands;
     let blend_cmds: Vec<_> = cmds
         .iter()
-        .filter(|c| matches!(c, DrawCommand::SetBlendMode(_)))
+        .filter(|c| matches!(c, RenderCommand::SetBlendMode(_)))
         .collect();
     assert_eq!(blend_cmds.len(), 2, "Should have 2 SetBlendMode commands");
 }
@@ -847,9 +847,9 @@ fn test_set_blend_mode_additive_alias() {
         .unwrap();
     let st = state.borrow();
     assert!(st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetBlendMode(BlendMode::Add))));
+        .any(|cmd| matches!(cmd, RenderCommand::SetBlendMode(BlendMode::Add))));
 }
 
 #[test]
@@ -966,9 +966,9 @@ fn test_animation_lua_update_and_draw() {
     .unwrap();
     let st = state.borrow();
     assert!(st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawQuad { .. })));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawQuad { .. })));
 }
 
 #[test]
@@ -1060,13 +1060,13 @@ fn test_canvas_set_canvas_pushes_command_and_get_canvas_round_trips() {
     .unwrap();
     let st = state.borrow();
     let has_set_canvas = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetCanvas(Some(_))));
+        .any(|cmd| matches!(cmd, RenderCommand::SetCanvas(Some(_))));
     let has_reset_canvas = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetCanvas(None)));
+        .any(|cmd| matches!(cmd, RenderCommand::SetCanvas(None)));
     assert!(has_set_canvas, "should have SetCanvas(Some(_))");
     assert!(has_reset_canvas, "should have SetCanvas(None)");
 }
@@ -1084,9 +1084,9 @@ fn test_canvas_draw_pushes_command() {
     .unwrap();
     let st = state.borrow();
     let has_draw_canvas = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawCanvas { .. }));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawCanvas { .. }));
     assert!(has_draw_canvas, "should have DrawCanvas command");
 }
 
@@ -1103,10 +1103,10 @@ fn test_canvas_draw_with_transform() {
     .unwrap();
     let st = state.borrow();
     let cmd = st
-        .draw_commands
+        .render_commands
         .iter()
-        .find(|cmd| matches!(cmd, DrawCommand::DrawCanvas { .. }));
-    if let Some(DrawCommand::DrawCanvas {
+        .find(|cmd| matches!(cmd, RenderCommand::DrawCanvas { .. }));
+    if let Some(RenderCommand::DrawCanvas {
         canvas_key: _,
         x,
         y,
@@ -1155,15 +1155,15 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
     assert_eq!(st.canvases.len(), 0);
     assert!(st.active_canvas.is_none());
     assert!(
-        st.draw_commands
+        st.render_commands
             .iter()
-            .any(|cmd| matches!(cmd, DrawCommand::SetCanvas(Some(_)))),
+            .any(|cmd| matches!(cmd, RenderCommand::SetCanvas(Some(_)))),
         "should record the canvas activation"
     );
     assert!(
-        st.draw_commands
+        st.render_commands
             .iter()
-            .filter(|cmd| matches!(cmd, DrawCommand::SetCanvas(None)))
+            .filter(|cmd| matches!(cmd, RenderCommand::SetCanvas(None)))
             .count()
             >= 1,
         "should reset the active canvas when it is released"
@@ -1180,11 +1180,11 @@ fn test_phase02_shear_queues_command_with_expected_factors() {
     run_draw(&lua, "lurek.gfx.shear(0.5, -0.25)");
 
     let st = state.borrow();
-    if let Some(DrawCommand::Shear { kx, ky }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Shear { kx, ky }) = st.render_commands.last() {
         assert!((*kx - 0.5).abs() < 1e-5);
         assert!((*ky + 0.25).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Shear");
+        panic!("Expected RenderCommand::Shear");
     }
 }
 
@@ -1194,8 +1194,8 @@ fn test_phase02_origin_queues_origin_command() {
     run_draw(&lua, "lurek.gfx.origin()");
 
     assert!(matches!(
-        state.borrow().draw_commands.last(),
-        Some(DrawCommand::Origin)
+        state.borrow().render_commands.last(),
+        Some(RenderCommand::Origin)
     ));
 }
 
@@ -1238,13 +1238,13 @@ fn test_phase02_scissor_round_trips_and_intersects() {
     .unwrap();
 
     let st = state.borrow();
-    if let Some(DrawCommand::SetScissor(Some((x, y, w, h)))) = st.draw_commands.last() {
+    if let Some(RenderCommand::SetScissor(Some((x, y, w, h)))) = st.render_commands.last() {
         assert!((*x - 50.0).abs() < 1e-5);
         assert!((*y - 30.0).abs() < 1e-5);
         assert!((*w - 60.0).abs() < 1e-5);
         assert!((*h - 40.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::SetScissor(Some(_))");
+        panic!("Expected RenderCommand::SetScissor(Some(_))");
     }
 }
 
@@ -1309,7 +1309,7 @@ fn test_phase02_stats_report_resource_counts_and_render_counters() {
         r#"
         _phase02_image = lurek.gfx.newImage("assets/icon.png")
         _phase02_canvas = lurek.gfx.newCanvas(32, 16)
-        _phase02_font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        _phase02_font = lurek.gfx.newFont("assets/fonts/bitmap_8x14.png", 14)
         "#,
     )
     .exec()
@@ -1371,27 +1371,27 @@ fn test_phase02_stencil_queues_begin_geometry_end_and_test_commands() {
 
     let st = state.borrow();
     assert!(matches!(
-        st.draw_commands.get(0),
-        Some(DrawCommand::StencilBegin {
+        st.render_commands.get(0),
+        Some(RenderCommand::StencilBegin {
             action: StencilAction::Increment,
             value: 7
         })
     ));
     assert!(matches!(
-        st.draw_commands.get(1),
-        Some(DrawCommand::Rectangle { .. })
+        st.render_commands.get(1),
+        Some(RenderCommand::Rectangle { .. })
     ));
     assert!(matches!(
-        st.draw_commands.get(2),
-        Some(DrawCommand::StencilEnd)
+        st.render_commands.get(2),
+        Some(RenderCommand::StencilEnd)
     ));
     assert!(matches!(
-        st.draw_commands.get(3),
-        Some(DrawCommand::SetStencilTest(Some((CompareMode::Greater, 7))))
+        st.render_commands.get(3),
+        Some(RenderCommand::SetStencilTest(Some((CompareMode::Greater, 7))))
     ));
     assert!(matches!(
-        st.draw_commands.get(4),
-        Some(DrawCommand::SetStencilTest(None))
+        st.render_commands.get(4),
+        Some(RenderCommand::SetStencilTest(None))
     ));
 }
 
@@ -1416,13 +1416,13 @@ fn test_phase02_shader_round_trips_active_shader_and_uniforms() {
     let st = state.borrow();
     assert_eq!(st.shaders.len(), 1);
     assert!(st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetShader(Some(_)))));
+        .any(|cmd| matches!(cmd, RenderCommand::SetShader(Some(_)))));
     assert!(st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::SetShader(None))));
+        .any(|cmd| matches!(cmd, RenderCommand::SetShader(None))));
 }
 
 #[test]
@@ -1467,10 +1467,10 @@ fn test_phase02_released_mesh_handle_reports_invalid_mesh_and_skips_queueing_dra
 
     let st = state.borrow();
     assert!(
-        st.draw_commands
+        st.render_commands
             .iter()
-            .all(|cmd| !matches!(cmd, DrawCommand::DrawMesh { .. })),
-        "released mesh draw should fail before queueing DrawCommand::DrawMesh"
+            .all(|cmd| !matches!(cmd, RenderCommand::DrawMesh { .. })),
+        "released mesh draw should fail before queueing RenderCommand::DrawMesh"
     );
 }
 
@@ -1518,7 +1518,7 @@ fn test_phase02_mesh_round_trips_vertex_state_texture_and_draw_command() {
     assert_eq!(mesh.vertex_count(), 3);
     assert_eq!(mesh.texture, Some(tex_key));
     assert_eq!(mesh.indices.as_ref(), Some(&vec![0, 1, 2]));
-    if let Some(DrawCommand::DrawMesh {
+    if let Some(RenderCommand::DrawMesh {
         mesh_key,
         x,
         y,
@@ -1527,7 +1527,7 @@ fn test_phase02_mesh_round_trips_vertex_state_texture_and_draw_command() {
         sy,
         ox,
         oy,
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         assert!(st.meshes.contains_key(*mesh_key));
         assert!((*x - 5.0).abs() < 1e-5);
@@ -1538,7 +1538,7 @@ fn test_phase02_mesh_round_trips_vertex_state_texture_and_draw_command() {
         assert!((*ox - 4.0).abs() < 1e-5);
         assert!((*oy - 5.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::DrawMesh");
+        panic!("Expected RenderCommand::DrawMesh");
     }
 }
 
@@ -1558,13 +1558,13 @@ fn test_phase02_points_accept_table_pairs_and_queue_draw_command() {
     .unwrap();
 
     let st = state.borrow();
-    if let Some(DrawCommand::Points { points }) = st.draw_commands.last() {
+    if let Some(RenderCommand::Points { points }) = st.render_commands.last() {
         assert_eq!(points.len(), 3);
         assert!((points[0].0 - 1.0).abs() < 1e-5 && (points[0].1 - 2.0).abs() < 1e-5);
         assert!((points[1].0 - 3.0).abs() < 1e-5 && (points[1].1 - 4.0).abs() < 1e-5);
         assert!((points[2].0 - 5.0).abs() < 1e-5 && (points[2].1 - 6.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::Points");
+        panic!("Expected RenderCommand::Points");
     }
 }
 
@@ -1573,7 +1573,7 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        local font = lurek.gfx.newFont("assets/fonts/bitmap_8x14.png", 14)
         lurek.gfx.setFont(font)
         lurek.gfx.printf("wrapped text", 12, 34, 56, "center")
         "#,
@@ -1582,7 +1582,7 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
     .unwrap();
 
     let st = state.borrow();
-    if let Some(DrawCommand::PrintFormatted {
+    if let Some(RenderCommand::PrintFormatted {
         text,
         x,
         y,
@@ -1590,7 +1590,7 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
         align,
         scale,
         ..
-    }) = st.draw_commands.last()
+    }) = st.render_commands.last()
     {
         assert_eq!(text, "wrapped text");
         assert!((*x - 12.0).abs() < 1e-5);
@@ -1599,7 +1599,7 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
         assert_eq!(*align, TextAlign::Center);
         assert!((*scale - 1.0).abs() < 1e-5);
     } else {
-        panic!("Expected DrawCommand::PrintFormatted");
+        panic!("Expected RenderCommand::PrintFormatted");
     }
 }
 
@@ -1763,8 +1763,8 @@ fn nine_slice_lua_api_creates_and_draws() {
     .unwrap();
 
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawNineSlice { x, y, w, h, .. }
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawNineSlice { x, y, w, h, .. }
             if (*x - 50.0).abs() < 1e-5
             && (*y - 50.0).abs() < 1e-5
             && (*w - 300.0).abs() < 1e-5
@@ -1773,7 +1773,7 @@ fn nine_slice_lua_api_creates_and_draws() {
     });
     assert!(
         found,
-        "Expected DrawCommand::DrawNineSlice in draw commands"
+        "Expected RenderCommand::DrawNineSlice in draw commands"
     );
 }
 
@@ -1792,8 +1792,8 @@ fn nine_slice_lua_method_draw() {
     .unwrap();
 
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawNineSlice { x, y, w, h, .. }
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawNineSlice { x, y, w, h, .. }
             if (*x - 10.0).abs() < 1e-5
             && (*y - 20.0).abs() < 1e-5
             && (*w - 400.0).abs() < 1e-5
@@ -1802,7 +1802,7 @@ fn nine_slice_lua_method_draw() {
     });
     assert!(
         found,
-        "Expected DrawCommand::DrawNineSlice from method call"
+        "Expected RenderCommand::DrawNineSlice from method call"
     );
 }
 
@@ -1932,15 +1932,15 @@ fn test_phase02_wireframe_round_trips_and_queues_command() {
 
     let st = state.borrow();
     assert!(
-        st.draw_commands
+        st.render_commands
             .iter()
-            .any(|c| matches!(c, DrawCommand::SetWireframe(true))),
+            .any(|c| matches!(c, RenderCommand::SetWireframe(true))),
         "setWireframe(true) should push SetWireframe(true) command"
     );
     assert!(
-        st.draw_commands
+        st.render_commands
             .iter()
-            .any(|c| matches!(c, DrawCommand::SetWireframe(false))),
+            .any(|c| matches!(c, RenderCommand::SetWireframe(false))),
         "setWireframe(false) should push SetWireframe(false) command"
     );
 }
@@ -1964,10 +1964,12 @@ fn test_font_ascent_descent() {
 fn test_font_set_line_height() {
     let mut font = load_test_font();
     let original = font.line_height();
+    assert!((original - 14.0).abs() < f32::EPSILON, "8x14 font default line_height");
+    // set_line_height sets the multiplier; line_height() = cell_height * mul
     font.set_line_height(2.0);
-    assert!((font.line_height() - 2.0).abs() < f32::EPSILON);
-    // Restore
-    font.set_line_height(original);
+    assert!((font.line_height() - 28.0).abs() < f32::EPSILON);
+    // Restore to 1.0 multiplier
+    font.set_line_height(1.0);
     assert!((font.line_height() - original).abs() < f32::EPSILON);
 }
 
@@ -1999,12 +2001,12 @@ fn graphics_draw_dispatch_image_userdata_pushes_draw_image() {
     );
     let st = state.borrow();
     let found = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-5 && (*y - 20.0).abs() < 1e-5));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-5 && (*y - 20.0).abs() < 1e-5));
     assert!(
         found,
-        "Expected DrawCommand::DrawImage after draw(img, 10, 20)"
+        "Expected RenderCommand::DrawImage after draw(img, 10, 20)"
     );
 }
 
@@ -2019,12 +2021,12 @@ fn graphics_draw_dispatch_image_with_rotation_pushes_draw_image_ex() {
         "#,
     );
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawImageEx { rotation, .. } if (*rotation - 1.57).abs() < 0.01)
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawImageEx { rotation, .. } if (*rotation - 1.57).abs() < 0.01)
     });
     assert!(
         found,
-        "Expected DrawCommand::DrawImageEx with rotation after draw(img, x, y, r)"
+        "Expected RenderCommand::DrawImageEx with rotation after draw(img, x, y, r)"
     );
 }
 
@@ -2039,12 +2041,12 @@ fn graphics_draw_dispatch_canvas_userdata_pushes_draw_canvas() {
         "#,
     );
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawCanvas { x, y, .. } if (*x - 30.0).abs() < 1e-5 && (*y - 40.0).abs() < 1e-5)
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawCanvas { x, y, .. } if (*x - 30.0).abs() < 1e-5 && (*y - 40.0).abs() < 1e-5)
     });
     assert!(
         found,
-        "Expected DrawCommand::DrawCanvas after draw(canvas, 30, 40)"
+        "Expected RenderCommand::DrawCanvas after draw(canvas, 30, 40)"
     );
 }
 
@@ -2061,12 +2063,12 @@ fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
     );
     let st = state.borrow();
     let found = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawBatch { .. }));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawBatch { .. }));
     assert!(
         found,
-        "Expected DrawCommand::DrawBatch after draw(batch, 0, 0)"
+        "Expected RenderCommand::DrawBatch after draw(batch, 0, 0)"
     );
 }
 
@@ -2095,8 +2097,8 @@ fn graphics_draw_ex_dispatch_image_userdata_pushes_draw_image_ex() {
         "#,
     );
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawImageEx { x, y, rotation, sx, .. }
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawImageEx { x, y, rotation, sx, .. }
             if (*x - 15.0).abs() < 1e-5
             && (*y - 25.0).abs() < 1e-5
             && (*rotation - 0.5).abs() < 0.01
@@ -2104,7 +2106,7 @@ fn graphics_draw_ex_dispatch_image_userdata_pushes_draw_image_ex() {
     });
     assert!(
         found,
-        "Expected DrawCommand::DrawImageEx after drawEx(img, ...)"
+        "Expected RenderCommand::DrawImageEx after drawEx(img, ...)"
     );
 }
 
@@ -2120,12 +2122,12 @@ fn graphics_draw_ex_dispatch_canvas_userdata_pushes_draw_canvas() {
     );
     let st = state.borrow();
     let found = st
-        .draw_commands
+        .render_commands
         .iter()
-        .any(|cmd| matches!(cmd, DrawCommand::DrawCanvas { .. }));
+        .any(|cmd| matches!(cmd, RenderCommand::DrawCanvas { .. }));
     assert!(
         found,
-        "Expected DrawCommand::DrawCanvas after drawEx(canvas, ...)"
+        "Expected RenderCommand::DrawCanvas after drawEx(canvas, ...)"
     );
 }
 
@@ -2141,8 +2143,8 @@ fn graphics_draw_ex_sy_defaults_to_sx() {
     );
     let st = state.borrow();
     // sy should equal sx (3.0) when not provided
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawImageEx { sx, sy, .. }
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawImageEx { sx, sy, .. }
             if (*sx - 3.0).abs() < 1e-5 && (*sy - 3.0).abs() < 1e-5)
     });
     assert!(found, "drawEx sy should default to sx when omitted");
@@ -2177,12 +2179,12 @@ fn graphics_capture_screenshot_stores_callback() {
 }
 
 // ===========================================================================
-// Phase 3: DrawCommand image and canvas variants
+// Phase 3: RenderCommand image and canvas variants
 // ===========================================================================
 
 #[test]
-fn graphics_draw_command_image_variant() {
-    // Verify DrawCommand::DrawImage is pushed when drawing an Image at default transform.
+fn graphics_render_command_image_variant() {
+    // Verify RenderCommand::DrawImage is pushed when drawing an Image at default transform.
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
@@ -2192,15 +2194,15 @@ fn graphics_draw_command_image_variant() {
     "#,
     );
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-4 && (*y - 20.0).abs() < 1e-4)
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawImage { x, y, .. } if (*x - 10.0).abs() < 1e-4 && (*y - 20.0).abs() < 1e-4)
     });
-    assert!(found, "Expected DrawCommand::DrawImage to be queued");
+    assert!(found, "Expected RenderCommand::DrawImage to be queued");
 }
 
 #[test]
 fn graphics_draw_command_canvas_variant() {
-    // Verify DrawCommand::DrawCanvas is pushed when drawing a Canvas.
+    // Verify RenderCommand::DrawCanvas is pushed when drawing a Canvas.
     let (state, lua) = make_graphics_vm();
     run_draw(
         &lua,
@@ -2210,10 +2212,10 @@ fn graphics_draw_command_canvas_variant() {
     "#,
     );
     let st = state.borrow();
-    let found = st.draw_commands.iter().any(|cmd| {
-        matches!(cmd, DrawCommand::DrawCanvas { x, y, .. } if (*x - 5.0).abs() < 1e-4 && (*y - 15.0).abs() < 1e-4)
+    let found = st.render_commands.iter().any(|cmd| {
+        matches!(cmd, RenderCommand::DrawCanvas { x, y, .. } if (*x - 5.0).abs() < 1e-4 && (*y - 15.0).abs() < 1e-4)
     });
-    assert!(found, "Expected DrawCommand::DrawCanvas to be queued");
+    assert!(found, "Expected RenderCommand::DrawCanvas to be queued");
 }
 
 // ===========================================================================

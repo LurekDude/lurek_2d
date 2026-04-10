@@ -162,10 +162,11 @@ impl LuaUserData for LuaUniverse {
             Ok(())
         });
 
-        // -- draw --
-        /// Calls draw(system, world) on each registered system.
+        // -- render --
+        /// Calls render(system, world) on each registered system.
+        /// Falls back to draw(system, world) for backward compatibility.
         /// @return nil
-        methods.add_method("draw", |lua, this, ()| {
+        methods.add_method("render", |lua, this, ()| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
                 return Ok(());
@@ -174,8 +175,10 @@ impl LuaUserData for LuaUniverse {
             let world = this.clone();
             for i in 1..=count {
                 let system: LuaTable = store.get(i)?;
-                if let Ok(func) = system.get::<_, LuaFunction>("draw") {
-                    func.call::<_, ()>((system.clone(), world.clone()))?;
+                let func = system.get::<_, LuaFunction>("render")
+                    .or_else(|_| system.get::<_, LuaFunction>("draw"));
+                if let Ok(f) = func {
+                    f.call::<_, ()>((system.clone(), world.clone()))?;
                 }
             }
             Ok(())

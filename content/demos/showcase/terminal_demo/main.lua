@@ -168,7 +168,7 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    term:draw(0, 0)
+    term:render(0, 0)
 
     -- Draw a small hint below the terminal
     lurek.gfx.setColor(0.4, 0.4, 0.4)

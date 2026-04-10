@@ -832,7 +832,7 @@ impl Minimap {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_to_image(&self, _pixel_size: u32) -> crate::image::ImageData {
+    pub fn draw_to_image(&self, _pixel_size: u32) -> crate::image::ImageData {
         let w = self.display_width;
         let h = self.display_height;
         let cell_w = w / self.grid_width.max(1);
@@ -917,5 +917,106 @@ impl Minimap {
         }
 
         img
+    }
+
+    /// Generates GPU `RenderCommand`s for the minimap at the given screen position.
+    ///
+    /// # Parameters
+    /// - `screen_x` — `f32` — Screen X of the minimap top-left corner.
+    /// - `screen_y` — `f32` — Screen Y of the minimap top-left corner.
+    ///
+    /// # Returns
+    /// `Vec<RenderCommand>`.
+    pub fn build_render_commands(
+        &self,
+        screen_x: f32,
+        screen_y: f32,
+    ) -> Vec<crate::graphics::renderer::RenderCommand> {
+        use crate::graphics::renderer::{DrawMode, RenderCommand};
+
+        let mut cmds: Vec<RenderCommand> = Vec::new();
+        let cw = (self.display_width / self.grid_width.max(1)) as f32;
+        let ch = (self.display_height / self.grid_height.max(1)) as f32;
+
+        // ── Terrain cells ──────────────────────────────────────────────────────
+        for gy in 0..self.grid_height {
+            for gx in 0..self.grid_width {
+                let terrain_type = self.get_terrain(gx, gy);
+                let tc = self.get_terrain_color(terrain_type);
+                let mut mult = 1.0f32;
+                if self.fog_enabled {
+                    let fog = self.get_fog_level(gx, gy);
+                    mult = match fog {
+                        FogLevel::Visible => 1.0,
+                        FogLevel::Explored => 0.5,
+                        FogLevel::Hidden => 0.15,
+                    };
+                }
+                cmds.push(RenderCommand::SetColor(
+                    tc[0] * mult,
+                    tc[1] * mult,
+                    tc[2] * mult,
+                    1.0,
+                ));
+                cmds.push(RenderCommand::Rectangle {
+                    mode: DrawMode::Fill,
+                    x: screen_x + gx as f32 * cw,
+                    y: screen_y + gy as f32 * ch,
+                    w: cw,
+                    h: ch,
+                });
+            }
+        }
+
+        // ── Objects ────────────────────────────────────────────────────────────
+        for obj in self.objects.values() {
+            let ox = screen_x + obj.x * cw;
+            let oy = screen_y + obj.y * ch;
+            let ot = self.object_types.get(obj.type_index);
+            let (r, g, b) = if let Some(ot) = ot {
+                (ot.color[0], ot.color[1], ot.color[2])
+            } else {
+                (1.0f32, 1.0, 1.0)
+            };
+            cmds.push(RenderCommand::SetColor(r, g, b, 1.0));
+            cmds.push(RenderCommand::Circle {
+                mode: DrawMode::Fill,
+                x: ox,
+                y: oy,
+                r: 4.0,
+            });
+        }
+
+        // ── Markers ────────────────────────────────────────────────────────────
+        for marker in self.markers.values() {
+            let mx = screen_x + marker.x * cw;
+            let my = screen_y + marker.y * ch;
+            cmds.push(RenderCommand::SetColor(
+                marker.color[0],
+                marker.color[1],
+                marker.color[2],
+                marker.color[3],
+            ));
+            cmds.push(RenderCommand::Circle {
+                mode: DrawMode::Fill,
+                x: mx,
+                y: my,
+                r: 3.0,
+            });
+            cmds.push(RenderCommand::Line {
+                x1: mx - 4.0,
+                y1: my,
+                x2: mx + 4.0,
+                y2: my,
+            });
+            cmds.push(RenderCommand::Line {
+                x1: mx,
+                y1: my - 4.0,
+                x2: mx,
+                y2: my + 4.0,
+            });
+        }
+
+        cmds
     }
 }

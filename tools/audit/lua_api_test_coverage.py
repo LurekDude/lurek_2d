@@ -103,7 +103,7 @@ def collect_api_functions(api_data: Dict, module_filter: Optional[str] = None) -
 
 def scan_markers(tests_dir: Path) -> Dict[str, List[Dict]]:
     """Scan all Lua test files for @covers markers.
-    
+
     Returns: {test_file_rel_path: [{"marker": "lurek.math.sin", "line": 5}, ...]}
     """
     results: Dict[str, List[Dict]] = {}
@@ -133,7 +133,7 @@ def scan_markers(tests_dir: Path) -> Dict[str, List[Dict]]:
 
 def normalize_api_name(lua_name: str) -> str:
     """Normalize an API name for matching.
-    
+
     "lurek.math.sin" -> "lurek.math.sin"
     "Vec2:length" -> "Vec2:length"
     """
@@ -145,7 +145,7 @@ def build_marker_coverage(
     marker_data: Dict[str, List[Dict]],
 ) -> Tuple[Set[str], Dict[str, List[str]], List[Dict]]:
     """Match @covers markers against canonical API list.
-    
+
     Returns:
         covered_names: set of lua_name strings that have markers
         coverage_map: {lua_name: [test_files]}

@@ -1,7 +1,7 @@
 //! `ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.
 //!
 //! [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them
-//! to lightweight [`crate::graphic::ShaderPassDescriptor`] values via
+//! to lightweight [`crate::graphics::ShaderPassDescriptor`] values via
 //! [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted
 //! to import from `crate::graphics` (Tier 1).
 
@@ -10,7 +10,7 @@ use std::rc::Rc;
 
 use super::effect::PostFxEffect;
 use crate::engine::log_messages::{IE01, IE02, IE03};
-use crate::graphic::ShaderPassDescriptor;
+use crate::graphics::ShaderPassDescriptor;
 use crate::log_msg;
 
 /// An ordered shader-effect chain to apply when drawing a single image.
@@ -18,7 +18,7 @@ use crate::log_msg;
 /// Can be attached to a `lurek.graphic.draw` call via the options-table
 /// overload (`effect` key). Effects are applied in insertion order through
 /// each enabled pass. `to_passes` converts the chain to the lightweight
-/// Tier-1 type embedded into `DrawCommand` variants.
+/// Tier-1 type embedded into `RenderCommand` variants.
 ///
 /// Each effect entry is stored as a shared `Rc<RefCell<PostFxEffect>>` so that
 /// Lua-side handles returned by `addEffect` or `getEffect` reflect mutations
@@ -150,7 +150,7 @@ impl ImageEffect {
     /// Converts the effect chain to lightweight [`ShaderPassDescriptor`] values for the Tier-1 graphics layer.
     ///
     /// Each [`PostFxEffect`] is converted by copying its type name, parameter map,
-    /// and enabled flag. The result is embedded into a `DrawCommand` variant.
+    /// and enabled flag. The result is embedded into a `RenderCommand` variant.
     ///
     /// # Returns
     /// `Vec<ShaderPassDescriptor>`.

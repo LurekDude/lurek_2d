@@ -120,7 +120,7 @@ impl Theme {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn render_button_states_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+    pub fn draw_button_states_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
         let mut img = crate::image::ImageData::new(width, height);
         img.fill(45, 45, 55, 255);
 

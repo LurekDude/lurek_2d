@@ -207,7 +207,7 @@ imageeffect:typeOf("myName")
 
 -- ─── Overlay ───────────────────────────────────────────────────────────────────
 
-overlay:draw()  -- No-op placeholder; the overlay is rendered by the engine's draw pass
+overlay:render()  -- No-op placeholder; the overlay is rendered by the engine's draw pass
 local ambient_color = overlay:getAmbientColor()  -- Returns the current ambient tint as r, g, b, a components
 local cloud_count = overlay:getCloudCount()  -- Returns the current cloud shadow instance count
 local cloud_opacity = overlay:getCloudOpacity()  -- Returns the current cloud shadow opacity

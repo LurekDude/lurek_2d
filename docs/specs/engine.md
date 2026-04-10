@@ -76,9 +76,9 @@ App::run(game_dir)
         │     ├── apply pending WindowState operations
         │     ├── Clock::tick() → dt
         │     ├── lurek.update(dt)
-        │     ├── clear draw_commands
-        │     ├── lurek.draw() → game pushes DrawCommands
-        │     ├── DebugOverlay → append overlay DrawCommands
+        │     ├── clear render_commands
+        │     ├── lurek.draw() → game pushes RenderCommands
+        │     ├── DebugOverlay → append overlay RenderCommands
         │     ├── GpuRenderer::render_frame(commands) → present
         │     └── reset per-frame state
         │
@@ -99,7 +99,7 @@ App::run(game_dir)
         │     ├── Subsystems: Mixer, Clock, GameFS, Camera, EventQueue,
         │     │     LightWorld, MidiState
         │     ├── Input: KeyboardState, MouseState, TouchState, gamepads
-        │     ├── Draw state: draw_commands, color, blend_mode, scissor,
+        │     ├── Draw state: render_commands, color, blend_mode, scissor,
         │     │     stencil_mode, depth_mode, wireframe, color_mask
         │     └── Window: WindowState (query + pending operations)
         │
@@ -109,7 +109,7 @@ App::run(game_dir)
         │
         ├── ErrorScreen (blue error display)
         │     ├── from_error(), from_lua_error(), from_engine_error()
-        │     └── draw_commands() → Vec<DrawCommand>
+        │     └── build_render_commands() → Vec<RenderCommand>
         │
         ├── DebugOverlay (F12 toggle, FPS + draw calls)
         │
@@ -165,7 +165,7 @@ Engine and window configuration loaded from `conf.lua`.
 
 Debug overlay for displaying FPS and draw call statistics.
 
-- **`DebugOverlay`** (struct): Toggleable overlay (`enabled` field). `draw_commands()` generates `DrawCommand` sequences (green text on semi-transparent background) for the top-right corner.
+- **`DebugOverlay`** (struct): Toggleable overlay (`enabled` field). `build_render_commands()` generates `RenderCommand` sequences (green text on semi-transparent background) for the top-right corner.
 
 ### `engine::error`
 
@@ -179,7 +179,7 @@ Structured error types and result alias.
 
 Visual error screen for Lua and engine errors.
 
-- **`ErrorScreen`** (struct): Stores pre-processed title, message lines, and traceback. Constructors: `from_error(&str)`, `from_lua_error(&mlua::Error)`, `from_engine_error(&EngineError)`. `draw_commands()` generates a full blue-background error display with TTF or bitmap fallback text. `as_text()` returns the error as plain text for clipboard copy.
+- **`ErrorScreen`** (struct): Stores pre-processed title, message lines, and traceback. Constructors: `from_error(&str)`, `from_lua_error(&mlua::Error)`, `from_engine_error(&EngineError)`. `build_render_commands()` generates a full blue-background error display with TTF or bitmap fallback text. `as_text()` returns the error as plain text for clipboard copy.
 - **`wrap_text`** (fn): Word-boundary text wrapping to a column width.
 - **`format_traceback`** (fn): Cleans and formats Lua traceback strings.
 
@@ -260,7 +260,7 @@ Frame rate cap via `target_fps` (default 60).
 
 #### `engine::debug_overlay::DebugOverlay`
 
-Toggleable FPS and draw-call counter. `draw_commands()` produces a `Vec<DrawCommand>` sequence when `enabled` is true; returns empty when disabled.
+Toggleable FPS and draw-call counter. `build_render_commands()` produces a `Vec<RenderCommand>` sequence when `enabled` is true; returns empty when disabled.
 
 #### `engine::error_screen::ErrorScreen`
 
@@ -340,7 +340,7 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    -- called every frame; push DrawCommands here
+    -- called every frame; push RenderCommands here
 end
 
 function lurek.errorhandler(msg)
@@ -366,7 +366,7 @@ end
 | Module          | Relationship | Notes |
 |-----------------|--------------|-------|
 | `math`          | Imports from | `Vec2`, `Color`, `Rect` (Baseline leaf — no deps) |
-| `graphics`      | Imports from | `GpuRenderer`, `DrawCommand`, `DrawMode`, `TextureData`, `Canvas`, `Mesh`, `Shader`, `Font`, `SpriteBatch`, `CompoundShape`, `BlendMode`, `StencilMode`, `DepthMode`, `RenderStats` |
+| `graphics`      | Imports from | `GpuRenderer`, `RenderCommand`, `DrawMode`, `TextureData`, `Canvas`, `Mesh`, `Shader`, `Font`, `SpriteBatch`, `CompoundShape`, `BlendMode`, `StencilMode`, `DepthMode`, `RenderStats` |
 | `audio`         | Imports from | `Mixer`, `MidiState` |
 | `input`         | Imports from | `KeyboardState`, `MouseState`, `GamepadState`, `TouchState`, `GamepadMappings`, `SystemCursor`, key/button conversion functions |
 | `timer`         | Imports from | `Clock` |

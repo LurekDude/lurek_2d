@@ -119,15 +119,15 @@ Lurek2D is a software-rendered (tiny-skia � Pixmap � u32 buffer � minifb) 
 
 **Lurek2D gaps this addresses:**
 
-1. **Sprite blending / draw modes** � `tiny-skia`'s `BlendMode` enum supports `SourceOver`, `Multiply`, `Screen`, `Overlay`, `Hardlight`, `ColorDodge`, `Difference`, `Exclusion`, `Hue`, `Saturation`, `Plus` etc. Lurek2D currently only ever uses `SourceOver`. Exposing these through `DrawCommand::SetBlendMode` would unlock per-sprite blending from Lua.
+1. **Sprite blending / draw modes** � `tiny-skia`'s `BlendMode` enum supports `SourceOver`, `Multiply`, `Screen`, `Overlay`, `Hardlight`, `ColorDodge`, `Difference`, `Exclusion`, `Hue`, `Saturation`, `Plus` etc. Lurek2D currently only ever uses `SourceOver`. Exposing these through `RenderCommand::SetBlendMode` would unlock per-sprite blending from Lua.
 
 2. **Camera transform integration** � Camera struct already exists with a world-to-screen `Mat3`. The missing step is applying it in `Renderer::flush()` before drawing each `DrawImage` or shape. Implementation is straightforward: multiply sprite position through `camera.view_matrix()`.
 
-3. **Z-ordering / draw layers** � Lurek2D draws in call order. A `DrawCommand::SetLayer(i32)` variant + stable-sort in `flush()` would support depth control from Lua without changing the API contract.
+3. **Z-ordering / draw layers** � Lurek2D draws in call order. A `RenderCommand::SetLayer(i32)` variant + stable-sort in `flush()` would support depth control from Lua without changing the API contract.
 
 4. **9-slice images** � Useful for UI panels. Can be implemented natively using 9 `DrawImage` calls with pre-split rects; no new crate needed.
 
-5. **Render-to-texture / canvas** � `tiny-skia` supports drawing into any `Pixmap`. Adding a `DrawCommand::BeginCanvas/EndCanvas` pair that creates a temporary Pixmap and saves it as a texture would enable render targets from Lua.
+5. **Render-to-texture / canvas** � `tiny-skia` supports drawing into any `Pixmap`. Adding a `RenderCommand::BeginCanvas/EndCanvas` pair that creates a temporary Pixmap and saves it as a texture would enable render targets from Lua.
 
 6. **Sprite batching** � Currently each `DrawImage` is an independent skia call. For performance with hundreds of sprites, caching a sprite sheet into a single Pixmap and UV-slicing would help. This is a custom implementation; no crate does it for the tiny-skia model.
 
@@ -392,7 +392,7 @@ Lurek2D uses a hardcoded embedded bitmap font for `lurek.gfx.print()`. It render
    - Add `fontdue` to `Cargo.toml`
    - Implement `FontAtlas` struct: loads font, rasterizes all printable ASCII at a given `px_size` into a tiny-skia `Pixmap` atlas
    - Store atlas as a `Texture` in the renderer
-   - `DrawCommand::Print` variant gains a `font_id: u32` and `size: f32` field
+   - `RenderCommand::Print` variant gains a `font_id: u32` and `size: f32` field
    - Expose via `lurek.gfx.newFont(path, size)` � handle, `lurek.gfx.print(text, x, y, font)`
 
 2. **Glyph metrics** � After adding fontdue, expose `lurek.gfx.getTextWidth(text, font)` and `lurek.gfx.getTextHeight(font)` for layout calculations.
@@ -481,7 +481,7 @@ Lurek2D has no UI library. In-game UI (health bars, buttons, menus) is built man
 
 **A) In-game UI for game developers:**
 - Simple panel/button/text primitives
-- Should work with the existing DrawCommand queue
+- Should work with the existing RenderCommand queue
 - Best approach: implement a `lurek.ui` Lua module built on top of existing `lurek.gfx.*` primitives
 - No Rust crate needed � pure Lua
 
@@ -628,7 +628,7 @@ The following is a prioritized backlog of features to add to Lurek2D, ordered by
 | Audio loop + pause/resume | 2h | High | Audio | `rodio::Sink::pause()` / `Sink::repeat_infinite()` |
 | Gamepad exposure to Lua | 4h | High | Input + Lua | Expose existing `GamepadState` via `lurek.gamepad.*` |
 | Camera integration in renderer | 4h | High | Graphics | Apply `camera.view_matrix()` in `Renderer::flush()` |
-| Draw layer Z-ordering | 4h | High | Graphics | Add `DrawCommand::SetLayer(i32)`, sort in `flush()` |
+| Draw layer Z-ordering | 4h | High | Graphics | Add `RenderCommand::SetLayer(i32)`, sort in `flush()` |
 | gilrs gamepad polling | 8h | High | Input | Add `gilrs` crate, poll in game loop |
 | Audio pitch control | 2h | Medium | Audio | `rodio::Source::speed(ratio)` |
 | Easing functions | 4h | High | Math | Native Rust math, expose via `lurek.math.*` |
@@ -654,7 +654,7 @@ The following is a prioritized backlog of features to add to Lurek2D, ordered by
 | kira audio upgrade | 1 week | High | Audio | Replace rodio with kira for richer audio |
 | Spring animation | 1 day | Medium | Math | Port `natura` spring model |
 | Asset hot reload | 3 days | High | Filesystem | `assets_manager` crate |
-| render-to-texture | 3 days | Medium | Graphics | Offscreen Pixmap, new DrawCommand variants |
+| render-to-texture | 3 days | Medium | Graphics | Offscreen Pixmap, new RenderCommand variants |
 
 ### Priority 4 � Stretch Goals
 
@@ -699,7 +699,7 @@ These features are well within Lurek2D's own design space and should be implemen
 5. **In-game debug overlay** � Print variables on screen without a full UI framework
 6. **Tween manager** � Supported by Lua tables + `lurek.time.getDelta()`
 7. **Basic steering AI** � Seek/flee/arrive implemented as `Vec2`-returning functions
-8. **9-slice rendering** � 9 `DrawImage` calls, no new Drawcommand needed
+8. **9-slice rendering** � 9 `DrawImage` calls, no new RenderCommand needed
 9. **`lurek.math.clamp()`, `lerp()`, `map()` extensions** � Small but commonly needed
 10. **Simple particle system** � `ParticleEmitter` struct with position/velocity/lifetime table
 

@@ -1,6 +1,7 @@
 //! Terminal grid state and input handling.
 
-use crate::graphics::renderer::DrawCommand;
+use crate::engine::resource_keys::FontKey;
+use crate::graphics::renderer::RenderCommand;
 
 use super::cell::{TCell, DEFAULT_FG};
 use super::widget::{BorderStyle, Widget, WidgetKind};
@@ -1050,7 +1051,7 @@ impl Terminal {
     }
 
     /// Render the terminal grid (with widget overlays) into a list of
-    /// [`DrawCommand`] values suitable for pushing to `SharedState`.
+    /// [`RenderCommand`] values suitable for pushing to `SharedState`.
     ///
     /// # Parameters
     /// - `ox` — `f32`. X pixel offset.
@@ -1059,14 +1060,15 @@ impl Terminal {
     /// - `cell_h` — `f32`. Pixel height of one cell.
     ///
     /// # Returns
-    /// `Vec<DrawCommand>`.
-    pub fn build_draw_commands(
+    /// `Vec<RenderCommand>`.
+    pub fn build_render_commands(
         &self,
         ox: f32,
         oy: f32,
         cell_w: f32,
         cell_h: f32,
-    ) -> Vec<DrawCommand> {
+        font_key: FontKey,
+    ) -> Vec<RenderCommand> {
         let cells = self.render_cells();
         let mut commands = Vec::new();
 
@@ -1080,18 +1082,19 @@ impl Terminal {
             let mut run_color = row_cells[0].fg;
             let mut run_text = String::new();
 
-            let flush_run = |commands: &mut Vec<DrawCommand>,
+            let flush_run = |commands: &mut Vec<RenderCommand>,
                              run_start: usize,
                              run_color: [f32; 4],
                              run_text: &mut String| {
                 if !run_text.trim().is_empty() {
-                    commands.push(DrawCommand::SetColor(
+                    commands.push(RenderCommand::SetColor(
                         run_color[0],
                         run_color[1],
                         run_color[2],
                         run_color[3],
                     ));
-                    commands.push(DrawCommand::Print {
+                    commands.push(RenderCommand::Print {
+                        font_key,
                         text: run_text.clone(),
                         x: ox + run_start as f32 * cell_w,
                         y: oy + row as f32 * cell_h,
@@ -1115,7 +1118,7 @@ impl Terminal {
         }
 
         if !commands.is_empty() {
-            commands.push(DrawCommand::SetColor(1.0, 1.0, 1.0, 1.0));
+            commands.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 1.0));
         }
 
         commands

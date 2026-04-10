@@ -82,7 +82,7 @@ describe("lurek.gfx color functions", function()
             lurek.gfx.setColor(1, 0, 0)
         end)
     end)
-    
+
     it("setBackgroundColor accepts 3 args", function()
         expect_no_error(function()
             lurek.gfx.setBackgroundColor(0.1, 0.1, 0.1)
@@ -101,7 +101,7 @@ describe("Vec2 operations", function()
         local v = lurek.math.newVec2(1, 0)
         expect_near(1.0, v:length(), 1e-10)
     end)
-    
+
     it("normalize produces unit length", function()
         local v = lurek.math.newVec2(3, 4)
         local n = v:normalize()
@@ -113,12 +113,12 @@ end)
 ### Evidence Test Example
 ```lua
 -- @covers lurek.gfx.rectangle
--- @evidence log:DrawCommand::Rectangle
+-- @evidence log:RenderCommand::Rectangle
 describe("rectangle drawing", function()
     it("rectangle produces draw command", function()
         lurek.gfx.rectangle("fill", 10, 10, 100, 50)
         -- In headless mode, verify the draw command was queued
-        -- Evidence: log output confirms DrawCommand was created
+        -- Evidence: log output confirms RenderCommand was created
     end)
 end)
 ```

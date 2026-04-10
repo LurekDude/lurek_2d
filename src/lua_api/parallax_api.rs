@@ -1,4 +1,4 @@
-//! `lurek.parallax` — multi-layer scrolling background system.
+﻿//! `lurek.parallax` — multi-layer scrolling background system.
 //!
 //! Registers `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`.
 //! Domain logic lives in `src/parallax/`; this file is the thin Lua bridge only.
@@ -8,7 +8,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::graphics::{BlendMode, DrawCommand};
+use crate::graphics::{BlendMode, RenderCommand};
 use crate::parallax::layer::ParallaxLayer;
 
 use crate::lua_api::graphic_api::LuaImage;
@@ -61,7 +61,7 @@ impl LuaParallaxLayer {
 
     /// Internal helper — push all `DrawImageEx` commands for this layer without
     /// re-borrowing state (caller already holds the mutable reference).
-    fn push_draw_commands_internal(
+    fn push_render_commands_internal(
         layer: &ParallaxLayer,
         st: &mut SharedState,
         cam_x: f32,
@@ -74,17 +74,17 @@ impl LuaParallaxLayer {
             return;
         };
 
-        st.draw_commands.push(DrawCommand::SetColor(
+        st.render_commands.push(RenderCommand::SetColor(
             batch.color[0],
             batch.color[1],
             batch.color[2],
             batch.color[3],
         ));
-        st.draw_commands
-            .push(DrawCommand::SetBlendMode(batch.blend_mode));
+        st.render_commands
+            .push(RenderCommand::SetBlendMode(batch.blend_mode));
 
         for (tx, ty) in &batch.tiles {
-            st.draw_commands.push(DrawCommand::DrawImageEx {
+            st.render_commands.push(RenderCommand::DrawImageEx {
                 texture_key: batch.texture_key,
                 x: *tx,
                 y: *ty,
@@ -123,10 +123,10 @@ impl LuaUserData for LuaParallaxLayer {
         /// Sets the draw color and blend mode to this layer's settings.
         /// @param cam_x : number
         /// @param cam_y : number
-        methods.add_method("draw", |_, this, (cam_x, cam_y): (f32, f32)| {
+        methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             let layer = this.layer.borrow();
             let mut st = this.state.borrow_mut();
-            Self::push_draw_commands_internal(&layer, &mut st, cam_x, cam_y);
+            Self::push_render_commands_internal(&layer, &mut st, cam_x, cam_y);
             Ok(())
         });
 
@@ -134,7 +134,7 @@ impl LuaUserData for LuaParallaxLayer {
         /// Draws the layer using the engine active camera position automatically.
         ///
         /// Equivalent to `layer:draw(lurek.camera.x, lurek.camera.y)`.
-        methods.add_method("drawAuto", |_, this, ()| {
+        methods.add_method("renderAuto", |_, this, ()| {
             let layer = this.layer.borrow();
             let cam_x;
             let cam_y;
@@ -144,7 +144,7 @@ impl LuaUserData for LuaParallaxLayer {
                 cam_y = st.camera.position.y;
             }
             let mut st = this.state.borrow_mut();
-            Self::push_draw_commands_internal(&layer, &mut st, cam_x, cam_y);
+            Self::push_render_commands_internal(&layer, &mut st, cam_x, cam_y);
             Ok(())
         });
 
@@ -460,21 +460,21 @@ impl LuaUserData for LuaParallaxSet {
         /// Must be called inside a `lurek.render` or `lurek.render_ui` callback.
         /// @param cam_x : number
         /// @param cam_y : number
-        methods.add_method("draw", |_, this, (cam_x, cam_y): (f32, f32)| {
+        methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             if !this.visible {
                 return Ok(());
             }
             for l in &this.layers {
                 let layer = l.layer.borrow();
                 let mut st = this.state.borrow_mut();
-                LuaParallaxLayer::push_draw_commands_internal(&layer, &mut st, cam_x, cam_y);
+                LuaParallaxLayer::push_render_commands_internal(&layer, &mut st, cam_x, cam_y);
             }
             Ok(())
         });
 
         // ── drawAuto ──────────────────────────────────────────────────────────
         /// Draws all visible layers using the engine active camera position.
-        methods.add_method("drawAuto", |_, this, ()| {
+        methods.add_method("renderAuto", |_, this, ()| {
             if !this.visible {
                 return Ok(());
             }
@@ -485,7 +485,7 @@ impl LuaUserData for LuaParallaxSet {
             for l in &this.layers {
                 let layer = l.layer.borrow();
                 let mut st = this.state.borrow_mut();
-                LuaParallaxLayer::push_draw_commands_internal(&layer, &mut st, cam_x, cam_y);
+                LuaParallaxLayer::push_render_commands_internal(&layer, &mut st, cam_x, cam_y);
             }
             Ok(())
         });

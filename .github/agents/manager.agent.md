@@ -93,7 +93,7 @@ git status                           # review working tree
 | Hard problem with no obvious answer  | `Solver`        | Problem statement, constraints, prior attempts       |
 | Rust implementation needed           | `Developer`     | Spec, affected files, acceptance criteria            |
 | Lua API design question              | `Lua-Designer`  | API surface area, naming constraints, use cases      |
-| Graphics pipeline work               | `Renderer`      | DrawCommand spec, rendering requirements             |
+| Graphics pipeline work               | `Renderer`      | RenderCommand spec, rendering requirements             |
 | Physics feature                      | `Physicist`     | Body/World requirements, collision behavior          |
 | Audio feature                        | `Audio-Eng`     | Sound requirements, format, playback needs           |
 | Tests needed                         | `Tester`        | What to test, expected behavior, module scope        |

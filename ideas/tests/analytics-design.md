@@ -149,7 +149,7 @@ EVIDENCE COVERAGE
 ### 7. Test-per-Function Distribution
 
 ```
-TESTS-PER-FUNCTION DISTRIBUTION 
+TESTS-PER-FUNCTION DISTRIBUTION
   0 tests (uncovered):   512 functions (19.8%)
   1 test:               1024 functions (39.6%)
   2-3 tests:             718 functions (27.7%)
@@ -225,7 +225,7 @@ class FunctionCoverage:
     has_golden_test: bool
     test_files: list[str]
 
-@dataclass 
+@dataclass
 class ModuleCoverage:
     name: str
     category: str
@@ -252,11 +252,11 @@ class ModuleCoverage:
   <!-- Executive Summary cards (4 big numbers) -->
   <section id="summary">
     <card>2588 API Functions</card>
-    <card>80.5% Heuristic Coverage</card>  
+    <card>80.5% Heuristic Coverage</card>
     <card>12.3% Marker Coverage</card>
     <card>8.1% Evidence Coverage</card>
   </section>
-  
+
   <!-- Module table with sortable columns + color-coded grades -->
   <section id="modules">
     <table id="module-table" data-sortable>
@@ -264,23 +264,23 @@ class ModuleCoverage:
       ...rows sorted by grade ascending (worst first)...
     </table>
   </section>
-  
+
   <!-- Category bar chart (horizontal bars per category) -->
   <section id="categories">
     <!-- SVG bar chart: rendering/audio/physics... vs coverage% -->
   </section>
-  
+
   <!-- Uncovered function explorer (filter by module) -->
   <section id="uncovered">
     <select id="module-filter">...</select>
     <table>Function | Heuristic | Marker | Suggestion</table>
   </section>
-  
+
   <!-- Distribution histogram (tests per function) -->
   <section id="distribution">
     <!-- SVG histogram: 0,1,2-3,4-5,6+ tests/function -->
   </section>
-  
+
   <!-- Trend chart (if previous JSON exists) -->
   <section id="trend">
     <!-- SVG line chart: marker% and evidence% over time -->
@@ -342,7 +342,7 @@ class ModuleCoverage:
   run: |
     python tools/audit/test_analytics.py --json
     python tools/audit/test_analytics.py --trend   # fails if marker% decreased
-    
+
 - name: Upload analytics report
   uses: actions/upload-artifact@v3
   with:

@@ -10,12 +10,49 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (0 items)
+## 1. Rust→Lua Gaps (30 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-*All public Rust functions appear to be exposed to Lua.*
+### `image::visualization`
+
+- `animation_playback_control_to_image` — Render an animation playback-control timeline diagram.  Draw `src/image/visualization.rs:1406`
+- `bezier_curves_to_image` — Render multiple cubic Bezier curves with control-point overl `src/image/visualization.rs:549`
+- `camera_bounds_to_image` — Render a camera bounds-clamping summary panel.  Draws the wo `src/image/visualization.rs:1242`
+- `camera_follow_to_image` — Render a camera follow-and-deadzone trail diagram.  Draws th `src/image/visualization.rs:1287`
+- `camera_rotation_to_image` — Render six camera rotation steps in a 3-column grid.  Each p `src/image/visualization.rs:1163`
+- `camera_shake_to_image` — Render a camera shake trail and move-by result.  Draws per-f `src/image/visualization.rs:1348`
+- `cellular_grid_to_image` — Render a cellular automata grid (1=alive, 0=dead) as a scale `src/image/visualization.rs:608`
+- `dungeon_grid_to_image` — Render a BSP dungeon grid (0=floor, 1=wall) as a scaled tile `src/image/visualization.rs:699`
+- `easing_comparison_to_image` — Render multiple easing curves overlaid on a single chart.  E `src/image/visualization.rs:504`
+- `easing_gallery_to_image` — Render a gallery of easing curves as a grid of small charts. `src/image/visualization.rs:453`
+- `filled_primitives_to_image` — Render filled rectangle and circle primitives with HSV-colou `src/image/visualization.rs:906`
+- `heightmap_to_image` — Render a flat heightmap buffer as a colored elevation image. `src/image/visualization.rs:358`
+- `hud_bars_to_image` — Render a game HUD with HP/MP/Stamina/XP bars and skill coold `src/image/visualization.rs:1074`
+- `noise_comparison_to_image` — Render multiple noise maps side by side as a horizontal stri `src/image/visualization.rs:762`
+- `noise_map_to_image` — Render a noise map buffer as a grayscale image (normalised ` `src/image/visualization.rs:738`
+- `noise_raw_to_image` — Render a 2D noise function where the output is already in `[ `src/image/visualization.rs:287`
+- `noise_terrain_to_image` — Render a 2D noise function as a terrain-colored image.  Maps `src/image/visualization.rs:317`
+- `noise_to_image` — Render a 2D noise function to a grayscale image.  Samples `n `src/image/visualization.rs:258`
+- `panel_layout_to_image` — Render a mock settings panel with title bar, sliders, checkb `src/image/visualization.rs:952`
+- `points_to_image` — Render a set of 2D points as dots on a dark background.  # P `src/image/visualization.rs:672`
+- `polygon_gallery_to_image` — Render a gallery of regular polygons (triangle→dodecagon), a `src/image/visualization.rs:811`
+- `render_animation_frame_grid_to_image` — Render an animation's frame grid as a strip of numbered cell `src/image/visualization.rs:23`
+- `render_animation_playback_to_image` — Render an animation playback strip as snapshot columns.  Dra `src/image/visualization.rs:80`
+- `render_camera_debug_to_image` — Render a camera debug visualization showing viewport, positi `src/image/visualization.rs:132`
+- `render_camera_zoom_comparison_to_image` — Render a zoom comparison showing the world at multiple zoom  `src/image/visualization.rs:199`
+- `spiral_to_image` — Render concentric colored circles to demonstrate angular seg `src/image/visualization.rs:875`
+- `terrain_elevation_to_image` — Render a flat heightmap buffer with terrain-band coloring.   `src/image/visualization.rs:411`
+- `voronoi_to_image` — Render a Voronoi region map as a colored image.  Each region `src/image/visualization.rs:644`
+
+### `math::color`
+
+- `hsv_to_rgb` — Convert an HSV color to RGB byte components.  # Parameters - `src/math/color.rs:153`
+
+### `signal::event_queue`
+
+- `event_to_lua_multi` — Converts an [`Event`] into a Lua multi-value (name followed  `src/signal/event_queue.rs:203`
 
 ---
 
@@ -28,12 +65,33 @@ These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 ---
 
-## 3. Lua Docstring Issues (0 items)
+## 3. Lua Docstring Issues (14 items)
 
 Lua API items with missing or very short descriptions (< 15 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
-*All Lua API items have adequate descriptions.*
+### `data`
+
+- `class` **`lurek.data.DataView`** — *(no description)*
+
+### `thread`
+
+- `class` **`lurek.thread.Channel`** — *(no description)*
+- `method` **`Channel:clear`** — *(no description)*
+- `method` **`Channel:demand`** — *(no description)*
+- `method` **`Channel:getCount`** — *(no description)*
+- `method` **`Channel:peek`** — *(no description)*
+- `method` **`Channel:pop`** — *(no description)*
+- `method` **`Channel:push`** — *(no description)*
+- `method` **`Channel:supply`** — *(no description)*
+- `method` **`Channel:type`** — *(no description)*
+- `method` **`Channel:typeOf`** — *(no description)*
+
+### `tween`
+
+- `class` **`lurek.tween.Tween`** — *(no description)*
+- `class` **`lurek.tween.TweenParallel`** — *(no description)*
+- `class` **`lurek.tween.TweenSequence`** — *(no description)*
 
 ---
 

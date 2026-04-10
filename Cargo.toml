@@ -1,6 +1,6 @@
 [package]
 name = "lurek2d"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2021"
 description = "Lurek2D — A cross-platform 2D game engine powered by Rust and Lua"
 license = "MIT"
@@ -48,9 +48,6 @@ rodio = { version = "0.17", default-features = false, features = ["wav", "vorbis
 
 # MIDI file parsing — disabled; midly removed to reduce binary size.
 # Re-enable: restore `midly = "0.5"` here and uncomment code in src/audio/midi_player.rs
-
-# TTF/OTF font parsing and glyph rasterization
-fontdue = "0.9"
 
 # Logging
 log = "0.4"

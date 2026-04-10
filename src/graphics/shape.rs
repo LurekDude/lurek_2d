@@ -3,7 +3,7 @@
 //! This module provides [`CompoundShape`] and [`ShapeCommand`], which together
 //! implement an object-space command buffer for vector primitives.  A Lua script
 //! builds up a [`CompoundShape`] once, then replays it any number of times via
-//! [`crate::graphics::DrawCommand::DrawShape`] with a per-call affine transform.
+//! [`crate::graphics::RenderCommand::DrawShape`] with a per-call affine transform.
 //!
 //! **Tier position**: Tier 1 (`graphics`).
 //! Imports only from within the `graphics` crate-module (`super::renderer`).
@@ -13,11 +13,11 @@ use super::renderer::DrawMode;
 
 /// A single drawing command stored inside a [`CompoundShape`] command queue.
 ///
-/// This is a restricted subset of [`crate::graphics::DrawCommand`] — only
+/// This is a restricted subset of [`crate::graphics::RenderCommand`] — only
 /// primitive draw commands and rendering-state setters are included.
 /// Transform commands (`PushTransform`, `Translate`, etc.) are intentionally
 /// excluded: the shape's transform is applied once at draw time by the
-/// `DrawCommand::DrawShape` wrapper.
+/// `RenderCommand::DrawShape` wrapper.
 ///
 /// # Variants
 /// - `SetColor` — changes the active color for following commands.
@@ -151,10 +151,10 @@ pub enum ShapeCommand {
 }
 
 /// A compound shape that accumulates draw primitives in local (object-space)
-/// coordinates and replays them as a unified entity via [`crate::graphics::DrawCommand::DrawShape`].
+/// coordinates and replays them as a unified entity via [`crate::graphics::RenderCommand::DrawShape`].
 ///
 /// Build up commands with [`push_command`](CompoundShape::push_command), then submit
-/// a [`crate::graphics::DrawCommand::DrawShape`] each frame to draw with an affine transform.
+/// a [`crate::graphics::RenderCommand::DrawShape`] each frame to draw with an affine transform.
 ///
 /// # Fields
 /// - `commands` — `Vec<ShapeCommand>`. The ordered list of drawing commands.

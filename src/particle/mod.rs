@@ -17,7 +17,7 @@
 //! | `config.rs`   | Enums (`AreaDistribution`, `InsertMode`, `EmitterState`, `EmissionShape`, `RelativeMode`) and `ParticleConfig` (~50 fields) |
 //! | `shapes.rs`   | `ParticleShape` enum — five geometric render primitives |
 //! | `particle.rs` | `Particle` per-particle live state (pos, vel, life, rotation, …) |
-//! | `emitter.rs`  | `ParticleSystem` simulation loop, physics integration, and `draw_commands()` |
+//! | `emitter.rs`  | `ParticleSystem` simulation loop, physics integration, and `build_render_commands()` |
 //! | `math.rs`     | Math helpers: `lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas` |
 //! | `emission.rs` | Spawn-offset calculators for area distribution and emission shapes |
 

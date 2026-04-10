@@ -1,19 +1,19 @@
 {
   "meta": {
-    "generated": "2026-04-09T20:20:44.119941+00:00",
+    "generated": "2026-04-10T17:09:07.228642+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.6.0",
     "stats": {
-      "lua_functions": 2588,
-      "lua_modules": 45
+      "lua_functions": 2631,
+      "lua_modules": 46
     }
   },
   "lua_api": {
     "summary": {
-      "total_functions": 2588,
-      "documented": 2579,
+      "total_functions": 2631,
+      "documented": 2622,
       "coverage_pct": 99.7,
-      "modules": 45
+      "modules": 46
     },
     "modules": {
       "ai": {
@@ -3054,7 +3054,7 @@
               ]
             ],
             "inferred_return": "Source",
-            "line": 1061,
+            "line": 1054,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3080,7 +3080,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 1099,
+            "line": 1092,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3101,7 +3101,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1126,
+            "line": 1119,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3127,7 +3127,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1142,
+            "line": 1135,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3148,7 +3148,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1157,
+            "line": 1150,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3169,7 +3169,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1171,
+            "line": 1164,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3190,7 +3190,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1186,
+            "line": 1179,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3216,7 +3216,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1202,
+            "line": 1195,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3237,7 +3237,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1217,
+            "line": 1210,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3258,7 +3258,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1231,
+            "line": 1224,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3279,7 +3279,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1245,
+            "line": 1238,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3300,7 +3300,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1259,
+            "line": 1252,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3326,7 +3326,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1274,
+            "line": 1267,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3347,7 +3347,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1289,
+            "line": 1282,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3368,7 +3368,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1303,
+            "line": 1296,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3394,7 +3394,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1320,
+            "line": 1313,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3415,7 +3415,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1335,
+            "line": 1328,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3436,7 +3436,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1349,
+            "line": 1342,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3451,7 +3451,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number",
-            "line": 1361,
+            "line": 1354,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3466,7 +3466,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 1370,
+            "line": 1363,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3481,7 +3481,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 1379,
+            "line": 1372,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3502,7 +3502,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 1389,
+            "line": 1382,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3523,7 +3523,7 @@
               ]
             ],
             "inferred_return": "Source",
-            "line": 1409,
+            "line": 1402,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3538,7 +3538,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "nil",
-            "line": 1430,
+            "line": 1423,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3553,7 +3553,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "nil",
-            "line": 1442,
+            "line": 1435,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3568,7 +3568,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "nil",
-            "line": 1454,
+            "line": 1447,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3589,7 +3589,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 1467,
+            "line": 1460,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3610,7 +3610,7 @@
               ]
             ],
             "inferred_return": "Bus",
-            "line": 1487,
+            "line": 1480,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3636,7 +3636,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1505,
+            "line": 1498,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3657,7 +3657,7 @@
               ]
             ],
             "inferred_return": "Bus",
-            "line": 1530,
+            "line": 1523,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3672,7 +3672,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 1548,
+            "line": 1541,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3693,7 +3693,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1558,
+            "line": 1548,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3714,7 +3714,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1572,
+            "line": 1562,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3740,7 +3740,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1587,
+            "line": 1577,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3766,7 +3766,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1604,
+            "line": 1594,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3792,7 +3792,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1620,
+            "line": 1610,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3813,7 +3813,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1635,
+            "line": 1625,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3834,7 +3834,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1649,
+            "line": 1639,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3855,7 +3855,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1663,
+            "line": 1653,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3881,7 +3881,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1679,
+            "line": 1669,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3902,7 +3902,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1694,
+            "line": 1684,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3928,7 +3928,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1709,
+            "line": 1699,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3943,7 +3943,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number",
-            "line": 1721,
+            "line": 1711,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3974,7 +3974,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1736,
+            "line": 1726,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -3989,7 +3989,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number",
-            "line": 1750,
+            "line": 1740,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4025,7 +4025,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1766,
+            "line": 1756,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4046,7 +4046,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1784,
+            "line": 1774,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4082,7 +4082,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1801,
+            "line": 1791,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4103,7 +4103,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1819,
+            "line": 1809,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4115,7 +4115,7 @@
             "full_doc": "Sets the 6-component orientation of a source.\n@param source : Source\n@param fx : number\n@param fy : number\n@param fz : number\n@param ux : number\n@param uy : number\n@param uz : number\n@return nil",
             "params_doc": "",
             "returns_doc": "",
-            "inferred_sig": "",
+            "inferred_sig": "(id_val, fx, fy, fz, ux, uy, uz)",
             "typed_params": [
               [
                 "source",
@@ -4154,7 +4154,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1839,
+            "line": 1829,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4175,7 +4175,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 1866,
+            "line": 1847,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4196,7 +4196,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1880,
+            "line": 1861,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4211,7 +4211,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number",
-            "line": 1892,
+            "line": 1873,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4232,7 +4232,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1902,
+            "line": 1883,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4247,7 +4247,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "string",
-            "line": 1914,
+            "line": 1895,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4268,7 +4268,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1925,
+            "line": 1904,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4283,7 +4283,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number",
-            "line": 1936,
+            "line": 1915,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4304,7 +4304,7 @@
               ]
             ],
             "inferred_return": "MidiPlayer",
-            "line": 1949,
+            "line": 1928,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4325,7 +4325,7 @@
               ]
             ],
             "inferred_return": "SoundData",
-            "line": 1973,
+            "line": 1952,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4346,7 +4346,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 1990,
+            "line": 1969,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4361,7 +4361,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "boolean",
-            "line": 2012,
+            "line": 1991,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4376,7 +4376,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "nil",
-            "line": 2021,
+            "line": 2000,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4402,7 +4402,7 @@
               ]
             ],
             "inferred_return": "Decoder",
-            "line": 2035,
+            "line": 2014,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4438,7 +4438,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 2058,
+            "line": 2037,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4464,7 +4464,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2084,
+            "line": 2063,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4485,7 +4485,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 2101,
+            "line": 2080,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4506,7 +4506,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2114,
+            "line": 2093,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4527,7 +4527,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2128,
+            "line": 2107,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4542,7 +4542,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "table",
-            "line": 2140,
+            "line": 2119,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4557,7 +4557,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "string",
-            "line": 2155,
+            "line": 2134,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4578,7 +4578,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2164,
+            "line": 2143,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4604,7 +4604,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2178,
+            "line": 2157,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4630,7 +4630,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2197,
+            "line": 2176,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4661,7 +4661,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 2218,
+            "line": 2197,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4687,7 +4687,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 2240,
+            "line": 2228,
             "file": "src/lua_api/audio_api.rs"
           },
           {
@@ -4723,7 +4723,33 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 2260,
+            "line": 2254,
+            "file": "src/lua_api/audio_api.rs"
+          },
+          {
+            "name": "saveWAV",
+            "lua_name": "lurek.audio.saveWAV",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Saves a SoundData as a 16-bit PCM WAV file at the given path.",
+            "full_doc": "Saves a SoundData as a 16-bit PCM WAV file at the given path.\n@param sounddata : SoundData\n@param path : string\n@return nil",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(sd_ud, filename)",
+            "typed_params": [
+              [
+                "sounddata",
+                "SoundData",
+                false
+              ],
+              [
+                "path",
+                "string",
+                false
+              ]
+            ],
+            "inferred_return": "nil",
+            "line": 2287,
             "file": "src/lua_api/audio_api.rs"
           }
         ],
@@ -5380,7 +5406,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 528,
+                "line": 529,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5401,7 +5427,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 538,
+                "line": 539,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5416,7 +5442,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 546,
+                "line": 547,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5431,7 +5457,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 553,
+                "line": 554,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5452,7 +5478,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 561,
+                "line": 562,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5467,7 +5493,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 569,
+                "line": 570,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5482,7 +5508,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 577,
+                "line": 578,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5497,7 +5523,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 585,
+                "line": 586,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5512,7 +5538,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 596,
+                "line": 597,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5527,7 +5553,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 604,
+                "line": 605,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5542,7 +5568,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 612,
+                "line": 613,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5557,7 +5583,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 619,
+                "line": 620,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5578,7 +5604,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 627,
+                "line": 628,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5593,7 +5619,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 635,
+                "line": 636,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5608,7 +5634,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 640,
+                "line": 641,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5629,7 +5655,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 648,
+                "line": 649,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5644,7 +5670,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 656,
+                "line": 657,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5665,7 +5691,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 664,
+                "line": 665,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5680,7 +5706,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 672,
+                "line": 673,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5701,7 +5727,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 680,
+                "line": 679,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5716,7 +5742,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "Bus",
-                "line": 698,
+                "line": 697,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5737,7 +5763,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 712,
+                "line": 711,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5752,7 +5778,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 725,
+                "line": 724,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5767,7 +5793,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 733,
+                "line": 732,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5788,7 +5814,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 741,
+                "line": 740,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5803,7 +5829,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 749,
+                "line": 748,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5818,7 +5844,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 756,
+                "line": 755,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5844,7 +5870,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 765,
+                "line": 764,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5865,7 +5891,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 776,
+                "line": 775,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5891,7 +5917,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 789,
+                "line": 788,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5912,7 +5938,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 800,
+                "line": 799,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5933,7 +5959,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 829,
+                "line": 826,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5948,7 +5974,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 840,
+                "line": 837,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5969,7 +5995,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 848,
+                "line": 845,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5984,7 +6010,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 858,
+                "line": 855,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -5999,7 +6025,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 866,
+                "line": 863,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6020,7 +6046,7 @@
                   ]
                 ],
                 "inferred_return": "string",
-                "line": 874,
+                "line": 871,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6046,7 +6072,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 891,
+                "line": 888,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6067,7 +6093,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 902,
+                "line": 899,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6082,7 +6108,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 913,
+                "line": 910,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6103,7 +6129,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 921,
+                "line": 918,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6124,7 +6150,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 930,
+                "line": 927,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6145,7 +6171,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 939,
+                "line": 936,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6160,7 +6186,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 947,
+                "line": 944,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6181,7 +6207,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 953,
+                "line": 950,
                 "file": "src/lua_api/audio_api.rs"
               }
             ]
@@ -6201,7 +6227,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "SoundData",
-                "line": 972,
+                "line": 970,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6216,7 +6242,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 988,
+                "line": 983,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6231,7 +6257,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 995,
+                "line": 990,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6246,7 +6272,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 1002,
+                "line": 995,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6261,7 +6287,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 1007,
+                "line": 1000,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6282,7 +6308,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 1013,
+                "line": 1006,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6297,7 +6323,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 1021,
+                "line": 1014,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6312,7 +6338,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 1029,
+                "line": 1022,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6327,7 +6353,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 1034,
+                "line": 1027,
                 "file": "src/lua_api/audio_api.rs"
               },
               {
@@ -6342,7 +6368,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 1039,
+                "line": 1032,
                 "file": "src/lua_api/audio_api.rs"
               }
             ]
@@ -8103,7 +8129,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 94,
+            "line": 169,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8134,7 +8160,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 109,
+            "line": 184,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8155,7 +8181,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 127,
+            "line": 201,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8186,7 +8212,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 143,
+            "line": 217,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8212,7 +8238,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 161,
+            "line": 235,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8238,7 +8264,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 177,
+            "line": 250,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8264,7 +8290,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 191,
+            "line": 263,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8290,7 +8316,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 206,
+            "line": 277,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8311,7 +8337,7 @@
               ]
             ],
             "inferred_return": "ByteData",
-            "line": 219,
+            "line": 289,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8342,7 +8368,7 @@
               ]
             ],
             "inferred_return": "DataView",
-            "line": 245,
+            "line": 315,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8363,7 +8389,7 @@
               ]
             ],
             "inferred_return": "string",
-            "line": 264,
+            "line": 333,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8394,7 +8420,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 279,
+            "line": 348,
             "file": "src/lua_api/data_api.rs"
           },
           {
@@ -8415,7 +8441,49 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 293,
+            "line": 364,
+            "file": "src/lua_api/data_api.rs"
+          },
+          {
+            "name": "parseToml",
+            "lua_name": "lurek.data.parseToml",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Parses a TOML string into a Lua table.",
+            "full_doc": "Parses a TOML string into a Lua table.\n@param text : string\n@return table",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(text)",
+            "typed_params": [
+              [
+                "text",
+                "string",
+                false
+              ]
+            ],
+            "inferred_return": "table",
+            "line": 375,
+            "file": "src/lua_api/data_api.rs"
+          },
+          {
+            "name": "encodeToml",
+            "lua_name": "lurek.data.encodeToml",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Encodes a Lua table into a TOML string.",
+            "full_doc": "Encodes a Lua table into a TOML string.\n@param tbl : table\n@return string",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(tbl)",
+            "typed_params": [
+              [
+                "tbl",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "string",
+            "line": 387,
             "file": "src/lua_api/data_api.rs"
           }
         ],
@@ -8441,7 +8509,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 311,
+                "line": 405,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8462,7 +8530,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 322,
+                "line": 416,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8483,7 +8551,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 333,
+                "line": 427,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8504,7 +8572,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 344,
+                "line": 438,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8525,7 +8593,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 355,
+                "line": 449,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8546,7 +8614,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 366,
+                "line": 460,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8567,7 +8635,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 377,
+                "line": 471,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8588,7 +8656,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 388,
+                "line": 482,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8603,7 +8671,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 395,
+                "line": 489,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -14237,12 +14305,12 @@
                 "file": "src/lua_api/effect_api.rs"
               },
               {
-                "name": "draw",
-                "lua_name": "Overlay:draw",
+                "name": "render",
+                "lua_name": "Overlay:render",
                 "kind": "method",
                 "owner_type": "Overlay",
-                "description": "No-op placeholder; the overlay is rendered by the engine's draw pass.",
-                "full_doc": "No-op placeholder; the overlay is rendered by the engine's draw pass.\n@return nil",
+                "description": "No-op placeholder; the overlay is rendered by the engine's render pass.",
+                "full_doc": "No-op placeholder; the overlay is rendered by the engine's render pass.\n@return nil",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
@@ -14643,12 +14711,12 @@
                 "file": "src/lua_api/entity_api.rs"
               },
               {
-                "name": "draw",
-                "lua_name": "Universe:draw",
+                "name": "render",
+                "lua_name": "Universe:render",
                 "kind": "method",
                 "owner_type": "Universe",
-                "description": "Calls draw(system, world) on each registered system.",
-                "full_doc": "Calls draw(system, world) on each registered system.\n@return nil",
+                "description": "Calls render(system, world) on each registered system.",
+                "full_doc": "Calls render(system, world) on each registered system.\n@return nil",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "()",
@@ -18741,7 +18809,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 2048,
+            "line": 2050,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18762,7 +18830,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 2067,
+            "line": 2071,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18788,7 +18856,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 2088,
+            "line": 2092,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18809,7 +18877,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 2098,
+            "line": 2102,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18830,7 +18898,7 @@
               ]
             ],
             "inferred_return": "number",
-            "line": 2117,
+            "line": 2123,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18856,7 +18924,7 @@
               ]
             ],
             "inferred_return": "table",
-            "line": 2137,
+            "line": 2145,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18877,7 +18945,7 @@
               ]
             ],
             "inferred_return": "Image",
-            "line": 2169,
+            "line": 2177,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18903,7 +18971,7 @@
               ]
             ],
             "inferred_return": "Canvas",
-            "line": 2225,
+            "line": 2233,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18924,7 +18992,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2251,
+            "line": 2259,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18939,7 +19007,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "Canvas?",
-            "line": 2281,
+            "line": 2289,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18960,7 +19028,7 @@
               ]
             ],
             "inferred_return": "integer",
-            "line": 2300,
+            "line": 2308,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -18986,7 +19054,7 @@
               ]
             ],
             "inferred_return": "SpriteBatch",
-            "line": 2322,
+            "line": 2332,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19012,7 +19080,7 @@
               ]
             ],
             "inferred_return": "Mesh",
-            "line": 2352,
+            "line": 2362,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19033,7 +19101,7 @@
               ]
             ],
             "inferred_return": "Shader",
-            "line": 2398,
+            "line": 2408,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19054,7 +19122,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2415,
+            "line": 2426,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19069,7 +19137,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "Shader?",
-            "line": 2445,
+            "line": 2456,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19115,7 +19183,7 @@
               ]
             ],
             "inferred_return": "Quad",
-            "line": 2471,
+            "line": 2482,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19130,7 +19198,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "",
-            "line": 2485,
+            "line": 2496,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19145,7 +19213,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "",
-            "line": 2498,
+            "line": 2509,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19171,7 +19239,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2511,
+            "line": 2522,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19192,7 +19260,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2525,
+            "line": 2536,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19218,7 +19286,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2540,
+            "line": 2551,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19244,7 +19312,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2556,
+            "line": 2567,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19259,7 +19327,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "",
-            "line": 2569,
+            "line": 2580,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19280,7 +19348,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2581,
+            "line": 2592,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19316,7 +19384,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2606,
+            "line": 2617,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19331,7 +19399,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "number?",
-            "line": 2635,
+            "line": 2646,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19367,7 +19435,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2658,
+            "line": 2669,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19403,7 +19471,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2684,
+            "line": 2695,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19418,7 +19486,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "boolean",
-            "line": 2709,
+            "line": 2720,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19439,7 +19507,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2720,
+            "line": 2731,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19454,7 +19522,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "boolean",
-            "line": 2734,
+            "line": 2745,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19480,7 +19548,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2746,
+            "line": 2757,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19506,7 +19574,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2774,
+            "line": 2785,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19537,7 +19605,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2812,
+            "line": 2823,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19552,7 +19620,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "string",
-            "line": 2856,
+            "line": 2867,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19567,7 +19635,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "nil",
-            "line": 2889,
+            "line": 2900,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19593,7 +19661,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2902,
+            "line": 2913,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19608,7 +19676,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "string",
-            "line": 2929,
+            "line": 2940,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19623,7 +19691,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 2954,
+            "line": 2965,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19638,7 +19706,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 2963,
+            "line": 2974,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19653,7 +19721,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "integer",
-            "line": 2972,
+            "line": 2983,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19684,7 +19752,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 2988,
+            "line": 2999,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19699,7 +19767,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "string",
-            "line": 3002,
+            "line": 3013,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19714,7 +19782,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "table",
-            "line": 3020,
+            "line": 3031,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19735,7 +19803,7 @@
               ]
             ],
             "inferred_return": "",
-            "line": 3042,
+            "line": 3053,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19756,7 +19824,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 3060,
+            "line": 3071,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19797,7 +19865,7 @@
               ]
             ],
             "inferred_return": "NineSlice",
-            "line": 3078,
+            "line": 3089,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19838,7 +19906,7 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 3116,
+            "line": 3127,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19853,7 +19921,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "Shape",
-            "line": 3157,
+            "line": 3168,
             "file": "src/lua_api/graphic_api.rs"
           },
           {
@@ -19868,7 +19936,7 @@
             "inferred_sig": "()",
             "typed_params": [],
             "inferred_return": "DrawLayer",
-            "line": 3171,
+            "line": 3182,
             "file": "src/lua_api/graphic_api.rs"
           }
         ],
@@ -21057,7 +21125,7 @@
               ]
             ],
             "inferred_return": "ImageData",
-            "line": 286,
+            "line": 273,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21078,7 +21146,7 @@
               ]
             ],
             "inferred_return": "CompressedImageData",
-            "line": 331,
+            "line": 316,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21099,7 +21167,7 @@
               ]
             ],
             "inferred_return": "boolean",
-            "line": 348,
+            "line": 333,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21125,7 +21193,7 @@
               ]
             ],
             "inferred_return": "LayeredImage",
-            "line": 363,
+            "line": 348,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21151,7 +21219,33 @@
               ]
             ],
             "inferred_return": "nil",
-            "line": 378,
+            "line": 363,
+            "file": "src/lua_api/image_api.rs"
+          },
+          {
+            "name": "savePNG",
+            "lua_name": "lurek.image.savePNG",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Saves a flat ImageData as a PNG file at the given path.",
+            "full_doc": "Saves a flat ImageData as a PNG file at the given path.\n@param imagedata : ImageData\n@param path : string\n@return nil",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(img_ud, filename)",
+            "typed_params": [
+              [
+                "imagedata",
+                "ImageData",
+                false
+              ],
+              [
+                "path",
+                "string",
+                false
+              ]
+            ],
+            "inferred_return": "nil",
+            "line": 383,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21172,7 +21266,7 @@
               ]
             ],
             "inferred_return": "ImageData",
-            "line": 397,
+            "line": 403,
             "file": "src/lua_api/image_api.rs"
           },
           {
@@ -21193,7 +21287,7 @@
               ]
             ],
             "inferred_return": "LayeredImage",
-            "line": 414,
+            "line": 420,
             "file": "src/lua_api/image_api.rs"
           }
         ],
@@ -21213,7 +21307,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 26,
+                "line": 25,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21228,7 +21322,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 31,
+                "line": 30,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21243,7 +21337,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 36,
+                "line": 35,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21264,7 +21358,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 42,
+                "line": 41,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21285,7 +21379,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 52,
+                "line": 51,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21306,33 +21400,7 @@
                   ]
                 ],
                 "inferred_return": "ImageData",
-                "line": 63,
-                "file": "src/lua_api/image_api.rs"
-              },
-              {
-                "name": "setLayer",
-                "lua_name": "LayeredImage:setLayer",
-                "kind": "method",
-                "owner_type": "LayeredImage",
-                "description": "Replaces a layer's pixel buffer with a copy of the given ImageData.",
-                "full_doc": "Replaces a layer's pixel buffer with a copy of the given ImageData.\n@param index : integer\n@param imagedata : ImageData\n@return boolean",
-                "params_doc": "",
-                "returns_doc": "",
-                "inferred_sig": "(index, img)",
-                "typed_params": [
-                  [
-                    "index",
-                    "integer",
-                    false
-                  ],
-                  [
-                    "imagedata",
-                    "ImageData",
-                    false
-                  ]
-                ],
-                "inferred_return": "boolean",
-                "line": 80,
+                "line": 62,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21357,6 +21425,32 @@
                 "file": "src/lua_api/image_api.rs"
               },
               {
+                "name": "setOpacity",
+                "lua_name": "LayeredImage:setOpacity",
+                "kind": "method",
+                "owner_type": "LayeredImage",
+                "description": "Sets the opacity of a layer. Value is clamped to [0.0, 1.0].",
+                "full_doc": "Sets the opacity of a layer. Value is clamped to [0.0, 1.0].\n@param index : integer\n@param opacity : number\n@return boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(index, opacity)",
+                "typed_params": [
+                  [
+                    "index",
+                    "integer",
+                    false
+                  ],
+                  [
+                    "opacity",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "boolean",
+                "line": 109,
+                "file": "src/lua_api/image_api.rs"
+              },
+              {
                 "name": "isVisible",
                 "lua_name": "LayeredImage:isVisible",
                 "kind": "method",
@@ -21374,7 +21468,33 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 123,
+                "line": 120,
+                "file": "src/lua_api/image_api.rs"
+              },
+              {
+                "name": "setVisible",
+                "lua_name": "LayeredImage:setVisible",
+                "kind": "method",
+                "owner_type": "LayeredImage",
+                "description": "Shows or hides a layer during compositing.",
+                "full_doc": "Shows or hides a layer during compositing.\n@param index : integer\n@param visible : boolean\n@return boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(index, visible)",
+                "typed_params": [
+                  [
+                    "index",
+                    "integer",
+                    false
+                  ],
+                  [
+                    "visible",
+                    "boolean",
+                    false
+                  ]
+                ],
+                "inferred_return": "boolean",
+                "line": 135,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21395,7 +21515,7 @@
                   ]
                 ],
                 "inferred_return": "string",
-                "line": 152,
+                "line": 146,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21421,7 +21541,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 167,
+                "line": 161,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21447,7 +21567,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 179,
+                "line": 173,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21462,7 +21582,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "ImageData",
-                "line": 204,
+                "line": 198,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21483,7 +21603,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 212,
+                "line": 206,
                 "file": "src/lua_api/image_api.rs"
               }
             ]
@@ -21503,7 +21623,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 234,
+                "line": 226,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21518,7 +21638,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 241,
+                "line": 231,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21533,7 +21653,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 248,
+                "line": 236,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21548,7 +21668,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 255,
+                "line": 243,
                 "file": "src/lua_api/image_api.rs"
               },
               {
@@ -21563,7 +21683,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 262,
+                "line": 250,
                 "file": "src/lua_api/image_api.rs"
               }
             ]
@@ -30058,6 +30178,764 @@
                 "inferred_return": "boolean",
                 "line": 346,
                 "file": "src/lua_api/network_api.rs"
+              }
+            ]
+          }
+        }
+      },
+      "parallax": {
+        "description": "Registers `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`.\nDomain logic lives in `src/parallax/`; this file is the thin Lua bridge only.",
+        "source_file": "src/lua_api/parallax_api.rs",
+        "functions": [
+          {
+            "name": "newLayer",
+            "lua_name": "lurek.parallax.newLayer",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Creates a new parallax background layer from an options table.",
+            "full_doc": "Creates a new parallax background layer from an options table.\n\nRequired field — `texture`: a `LuaImage` returned by `lurek.gfx.newImage()`.\nOptional fields: `scroll_factor_x`, `scroll_factor_y`, `offset_x`, `offset_y`,\n`autoscroll_x`, `autoscroll_y`, `repeat_x`, `repeat_y`, `z`, `opacity`,\n`tint_r`, `tint_g`, `tint_b`, `tint_a`, `blend_mode`, `visible`,\n`scale_x`, `scale_y`.\n@param opts : table\n@return LuaParallaxLayer",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(opts)",
+            "typed_params": [
+              [
+                "opts",
+                "table",
+                false
+              ]
+            ],
+            "inferred_return": "LuaParallaxLayer",
+            "line": 537,
+            "file": "src/lua_api/parallax_api.rs"
+          },
+          {
+            "name": "newSet",
+            "lua_name": "lurek.parallax.newSet",
+            "kind": "function",
+            "owner_type": "",
+            "description": "Creates a new empty parallax set with the given name.",
+            "full_doc": "Creates a new empty parallax set with the given name.\n\nA set groups multiple layers for scene-level management: update all and\ndraw all in one call.\n@param name : string\n@return LuaParallaxSet",
+            "params_doc": "",
+            "returns_doc": "",
+            "inferred_sig": "(name)",
+            "typed_params": [
+              [
+                "name",
+                "string",
+                false
+              ]
+            ],
+            "inferred_return": "LuaParallaxSet",
+            "line": 631,
+            "file": "src/lua_api/parallax_api.rs"
+          }
+        ],
+        "classes": {
+          "ParallaxLayer": {
+            "description": "Lua-side handle to a single parallax background layer.",
+            "methods": [
+              {
+                "name": "type",
+                "lua_name": "ParallaxLayer:type",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the type name of this object.",
+                "full_doc": "Returns the type name of this object.\n@return string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "string",
+                "line": 107,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "update",
+                "lua_name": "ParallaxLayer:update",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Advances the autonomous scroll accumulator by `dt` seconds.",
+                "full_doc": "Advances the autonomous scroll accumulator by `dt` seconds.\n\nCall once per frame in `lurek.process` before drawing.\n@param dt : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(dt)",
+                "typed_params": [
+                  [
+                    "dt",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 114,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "render",
+                "lua_name": "ParallaxLayer:render",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Draws the layer using an explicit camera world position.",
+                "full_doc": "Draws the layer using an explicit camera world position.\n\nMust be called inside a `lurek.render` or `lurek.render_ui` callback.\nSets the draw color and blend mode to this layer's settings.\n@param cam_x : number\n@param cam_y : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(cam_x, cam_y)",
+                "typed_params": [
+                  [
+                    "cam_x",
+                    "number",
+                    false
+                  ],
+                  [
+                    "cam_y",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 126,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "renderAuto",
+                "lua_name": "ParallaxLayer:renderAuto",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Draws the layer using the engine active camera position automatically.",
+                "full_doc": "Draws the layer using the engine active camera position automatically.\n\nEquivalent to `layer:draw(lurek.camera.x, lurek.camera.y)`.",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "",
+                "line": 137,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "resetAutoscroll",
+                "lua_name": "ParallaxLayer:resetAutoscroll",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Resets the autonomous scroll accumulator to zero.",
+                "full_doc": "Resets the autonomous scroll accumulator to zero.\n\nUseful when switching scenes to restart ambient drift from the origin.",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "",
+                "line": 155,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setScrollFactor",
+                "lua_name": "ParallaxLayer:setScrollFactor",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the scroll factor relative to camera movement on each axis.",
+                "full_doc": "Sets the scroll factor relative to camera movement on each axis.\n\n`0` = fully fixed (sky); `1` = moves with camera (no parallax);\n`0.3` = slow far-background layer.\n@param x : number\n@param y : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(x, y)",
+                "typed_params": [
+                  [
+                    "x",
+                    "number",
+                    false
+                  ],
+                  [
+                    "y",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 167,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getScrollFactor",
+                "lua_name": "ParallaxLayer:getScrollFactor",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the scroll factor as `(x, y)`.",
+                "full_doc": "Returns the scroll factor as `(x, y)`.\n@return number, number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "number",
+                "line": 176,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setOffset",
+                "lua_name": "ParallaxLayer:setOffset",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the static world-pixel position bias added on top of camera scroll.",
+                "full_doc": "Sets the static world-pixel position bias added on top of camera scroll.\n@param x : number\n@param y : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(x, y)",
+                "typed_params": [
+                  [
+                    "x",
+                    "number",
+                    false
+                  ],
+                  [
+                    "y",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 185,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getOffset",
+                "lua_name": "ParallaxLayer:getOffset",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the static offset as `(x, y)`.",
+                "full_doc": "Returns the static offset as `(x, y)`.\n@return number, number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "number",
+                "line": 194,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setAutoscroll",
+                "lua_name": "ParallaxLayer:setAutoscroll",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the autonomous scroll velocity in world-pixels per second.",
+                "full_doc": "Sets the autonomous scroll velocity in world-pixels per second.\n\nPositive X scrolls right; positive Y scrolls down.\n@param vx : number\n@param vy : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(vx, vy)",
+                "typed_params": [
+                  [
+                    "vx",
+                    "number",
+                    false
+                  ],
+                  [
+                    "vy",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 205,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getAutoscroll",
+                "lua_name": "ParallaxLayer:getAutoscroll",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the autoscroll velocity as `(vx, vy)`.",
+                "full_doc": "Returns the autoscroll velocity as `(vx, vy)`.\n@return number, number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "number",
+                "line": 214,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setRepeat",
+                "lua_name": "ParallaxLayer:setRepeat",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets whether the layer tiles on the X and Y axes.",
+                "full_doc": "Sets whether the layer tiles on the X and Y axes.\n@param repeat_x : boolean\n@param repeat_y : boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(rx, ry)",
+                "typed_params": [
+                  [
+                    "repeat_x",
+                    "boolean",
+                    false
+                  ],
+                  [
+                    "repeat_y",
+                    "boolean",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 223,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setScale",
+                "lua_name": "ParallaxLayer:setScale",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the texture display scale factor on each axis.",
+                "full_doc": "Sets the texture display scale factor on each axis.\n\nValues > 1 zoom in (larger tiles); values < 1 zoom out (more tiles).\n@param sx : number\n@param sy : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(sx, sy)",
+                "typed_params": [
+                  [
+                    "sx",
+                    "number",
+                    false
+                  ],
+                  [
+                    "sy",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 236,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setZ",
+                "lua_name": "ParallaxLayer:setZ",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the draw-order depth. Lower values render first (further back).",
+                "full_doc": "Sets the draw-order depth. Lower values render first (further back).\n@param z : integer",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(z)",
+                "typed_params": [
+                  [
+                    "z",
+                    "integer",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 245,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getZ",
+                "lua_name": "ParallaxLayer:getZ",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the draw-order depth.",
+                "full_doc": "Returns the draw-order depth.\n@return integer",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "integer",
+                "line": 253,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setOpacity",
+                "lua_name": "ParallaxLayer:setOpacity",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the layer-wide opacity override in `[0.0, 1.0]`.",
+                "full_doc": "Sets the layer-wide opacity override in `[0.0, 1.0]`.\n@param a : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(a)",
+                "typed_params": [
+                  [
+                    "a",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 258,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getOpacity",
+                "lua_name": "ParallaxLayer:getOpacity",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the current opacity.",
+                "full_doc": "Returns the current opacity.\n@return number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "number",
+                "line": 266,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setTint",
+                "lua_name": "ParallaxLayer:setTint",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the multiplicative RGBA tint applied to all pixels of this layer.",
+                "full_doc": "Sets the multiplicative RGBA tint applied to all pixels of this layer.\n\nAll components in `[0.0, 1.0]`. Default: `(1, 1, 1, 1)` (white — no tint).\n@param r : number\n@param g : number\n@param b : number\n@param a : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(r, g, b, a)",
+                "typed_params": [
+                  [
+                    "r",
+                    "number",
+                    false
+                  ],
+                  [
+                    "g",
+                    "number",
+                    false
+                  ],
+                  [
+                    "b",
+                    "number",
+                    false
+                  ],
+                  [
+                    "a",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 276,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getTint",
+                "lua_name": "ParallaxLayer:getTint",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the current tint as `(r, g, b, a)`.",
+                "full_doc": "Returns the current tint as `(r, g, b, a)`.\n@return number, number, number, number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "number",
+                "line": 284,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setBlendMode",
+                "lua_name": "ParallaxLayer:setBlendMode",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Sets the GPU blend mode for this layer.",
+                "full_doc": "Sets the GPU blend mode for this layer.\n\nValid modes: `\"alpha\"` (default), `\"add\"`, `\"multiply\"`, `\"replace\"`, `\"screen\"`.\n@param mode : string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(mode)",
+                "typed_params": [
+                  [
+                    "mode",
+                    "string",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 294,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getBlendMode",
+                "lua_name": "ParallaxLayer:getBlendMode",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns the current blend mode as a string.",
+                "full_doc": "Returns the current blend mode as a string.\n@return string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "string",
+                "line": 302,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setVisible",
+                "lua_name": "ParallaxLayer:setVisible",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Shows or hides this layer.",
+                "full_doc": "Shows or hides this layer.\n@param visible : boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(v)",
+                "typed_params": [
+                  [
+                    "visible",
+                    "boolean",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 309,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "isVisible",
+                "lua_name": "ParallaxLayer:isVisible",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Returns `true` if the layer is currently visible.",
+                "full_doc": "Returns `true` if the layer is currently visible.\n@return boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "boolean",
+                "line": 317,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "clearClamp",
+                "lua_name": "ParallaxLayer:clearClamp",
+                "kind": "method",
+                "owner_type": "ParallaxLayer",
+                "description": "Removes scroll clamping so the layer scrolls freely.",
+                "full_doc": "Removes scroll clamping so the layer scrolls freely.",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "",
+                "line": 340,
+                "file": "src/lua_api/parallax_api.rs"
+              }
+            ]
+          },
+          "ParallaxSet": {
+            "description": "Lua-side container that groups `LuaParallaxLayer` objects for scene-level management.",
+            "methods": [
+              {
+                "name": "type",
+                "lua_name": "ParallaxSet:type",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Returns the type name of this object.",
+                "full_doc": "Returns the type name of this object.\n@return string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "string",
+                "line": 387,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "addLayer",
+                "lua_name": "ParallaxSet:addLayer",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Adds a layer to this set.",
+                "full_doc": "Adds a layer to this set.\n\nThe layer is added by shared reference: mutating the original variable\nafter adding is reflected in the set.  The set is re-sorted by `z` on\nevery add.\n@param layer : LuaParallaxLayer",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(layer)",
+                "typed_params": [
+                  [
+                    "layer",
+                    "LuaParallaxLayer",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 396,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "removeLayerAt",
+                "lua_name": "ParallaxSet:removeLayerAt",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Removes the layer at the given 1-based index.",
+                "full_doc": "Removes the layer at the given 1-based index.\n\nReturns `true` if a layer was removed, `false` if the index was out of range.\n@param index : integer\n@return boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(index)",
+                "typed_params": [
+                  [
+                    "index",
+                    "integer",
+                    false
+                  ]
+                ],
+                "inferred_return": "boolean",
+                "line": 409,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "layerCount",
+                "lua_name": "ParallaxSet:layerCount",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Returns the number of layers in this set.",
+                "full_doc": "Returns the number of layers in this set.\n@return integer",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "integer",
+                "line": 421,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "sortByZ",
+                "lua_name": "ParallaxSet:sortByZ",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Re-sorts all layers by ascending `z` value.",
+                "full_doc": "Re-sorts all layers by ascending `z` value.\n\nCall this after changing any layer's `z` value via `layer:setZ()`.",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "",
+                "line": 427,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setVisible",
+                "lua_name": "ParallaxSet:setVisible",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Shows or hides all layers in this set.",
+                "full_doc": "Shows or hides all layers in this set.\n@param visible : boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(v)",
+                "typed_params": [
+                  [
+                    "visible",
+                    "boolean",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 435,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "isVisible",
+                "lua_name": "ParallaxSet:isVisible",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Returns `true` if the set is currently visible.",
+                "full_doc": "Returns `true` if the set is currently visible.\n@return boolean",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "boolean",
+                "line": 443,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "update",
+                "lua_name": "ParallaxSet:update",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Advances the autoscroll accumulator of every layer by `dt` seconds.",
+                "full_doc": "Advances the autoscroll accumulator of every layer by `dt` seconds.\n\nCall once per frame in `lurek.process`.\n@param dt : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(dt)",
+                "typed_params": [
+                  [
+                    "dt",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 450,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "render",
+                "lua_name": "ParallaxSet:render",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Draws all visible layers in ascending `z` order using an explicit camera position.",
+                "full_doc": "Draws all visible layers in ascending `z` order using an explicit camera position.\n\nMust be called inside a `lurek.render` or `lurek.render_ui` callback.\n@param cam_x : number\n@param cam_y : number",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(cam_x, cam_y)",
+                "typed_params": [
+                  [
+                    "cam_x",
+                    "number",
+                    false
+                  ],
+                  [
+                    "cam_y",
+                    "number",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 463,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "renderAuto",
+                "lua_name": "ParallaxSet:renderAuto",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Draws all visible layers using the engine active camera position.",
+                "full_doc": "Draws all visible layers using the engine active camera position.",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "",
+                "line": 477,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "getName",
+                "lua_name": "ParallaxSet:getName",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Returns the name of this set.",
+                "full_doc": "Returns the name of this set.\n@return string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "()",
+                "typed_params": [],
+                "inferred_return": "string",
+                "line": 496,
+                "file": "src/lua_api/parallax_api.rs"
+              },
+              {
+                "name": "setName",
+                "lua_name": "ParallaxSet:setName",
+                "kind": "method",
+                "owner_type": "ParallaxSet",
+                "description": "Sets the name of this set.",
+                "full_doc": "Sets the name of this set.\n@param name : string",
+                "params_doc": "",
+                "returns_doc": "",
+                "inferred_sig": "(name)",
+                "typed_params": [
+                  [
+                    "name",
+                    "string",
+                    false
+                  ]
+                ],
+                "inferred_return": "",
+                "line": 501,
+                "file": "src/lua_api/parallax_api.rs"
               }
             ]
           }
@@ -40710,12 +41588,12 @@
                 "file": "src/lua_api/terminal_api.rs"
               },
               {
-                "name": "draw",
-                "lua_name": "Terminal:draw",
+                "name": "render",
+                "lua_name": "Terminal:render",
                 "kind": "method",
                 "owner_type": "Terminal",
-                "description": "Renders the terminal grid and widgets as draw commands.",
-                "full_doc": "Renders the terminal grid and widgets as draw commands.\n@param x : number?\n@param y : number?\n@return nil",
+                "description": "Renders the terminal grid and widgets as render commands.",
+                "full_doc": "Renders the terminal grid and widgets as render commands.\n@param x : number?\n@param y : number?\n@return nil",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "([x], [y])",

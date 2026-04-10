@@ -25,7 +25,7 @@
 ### 1.1 Add @covers Markers to Existing Tests
 Priority order (lowest coverage first):
 1. `test_system.lua` — add markers for all 22 system functions
-2. `test_math.lua` — add markers for Vec2, Mat3, trig, noise functions  
+2. `test_math.lua` — add markers for Vec2, Mat3, trig, noise functions
 3. `test_log.lua` — add markers for all 13 log functions
 4. `test_localization.lua` — add markers for 27 functions
 5. `test_physics.lua` — add markers for Body, Joint, World methods

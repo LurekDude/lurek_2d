@@ -155,6 +155,6 @@ until they are wired into `src/lib.rs`.
 ## Key Patterns
 
 - **SharedState**: `Rc<RefCell<SharedState>>` shared between Lua closures and engine loop.
-- **DrawCommand queue**: Lua `lurek.draw()` pushes commands; GPU renderer processes them after callback.
+- **RenderCommand queue**: Lua `lurek.draw()` pushes commands; GPU renderer processes them after callback.
 - **SlotMap resource pools**: Generational IDs prevent use-after-free for textures, fonts, etc.
 - **register() pattern**: Each lua_api sub-module has `pub fn register(lua, table, state)`.

@@ -1,5 +1,6 @@
 //! `lurek.spine` — Skeletal animation: bone hierarchies, slots, and world-transform propagation.
 
+use super::graphic_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -138,6 +139,16 @@ impl LuaUserData for LuaSkeleton {
         /// @return integer
         methods.add_method("slotCount", |_, this, ()| {
             Ok(this.inner.slot_count())
+        });
+
+        // -- drawToImage --
+        /// Renders the skeleton as a stick-figure debug view into a new ImageData.
+        /// @param width : integer
+        /// @param height : integer
+        /// @return ImageData
+        methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
+            let img = this.inner.draw_to_image(w, h);
+            Ok(LuaImageData { inner: img })
         });
 
     }
