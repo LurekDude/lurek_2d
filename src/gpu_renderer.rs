@@ -895,7 +895,7 @@ impl GpuRenderer {
         commands: &[RenderCommand],
         textures: &SlotMap<TextureKey, TextureData>,
         fonts: &mut SlotMap<FontKey, crate::graphic::Font>,
-        light_world: &crate::light::light_world::LightWorld,
+        light_world: &crate::render::light::light_world::LightWorld,
         sprite_batches: &SlotMap<SpriteBatchKey, crate::graphic::SpriteBatch>,
         canvases: &SlotMap<CanvasKey, crate::graphic::Canvas>,
         meshes: &SlotMap<MeshKey, Mesh>,

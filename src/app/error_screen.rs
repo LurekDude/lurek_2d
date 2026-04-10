@@ -6,7 +6,7 @@
 
 use crate::runtime::error::EngineError;
 use crate::runtime::resource_keys::FontKey;
-use crate::graphics::renderer::{RenderCommand, DrawMode};
+use crate::render::renderer::{RenderCommand, DrawMode};
 
 /// Blue error screen background color.
 const ERROR_BG: [f32; 4] = [0.11, 0.22, 0.53, 1.0];

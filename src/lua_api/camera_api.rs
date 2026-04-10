@@ -5,7 +5,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::camera::Camera2D;
+use crate::render::camera::Camera2D;
 
 // -------------------------------------------------------------------------------
 // LuaCamera2D UserData

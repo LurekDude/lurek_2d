@@ -976,8 +976,8 @@ impl TileMap {
         &self,
         offset_x: f32,
         offset_y: f32,
-    ) -> Vec<crate::graphics::renderer::RenderCommand> {
-        use crate::graphics::renderer::{DrawMode, RenderCommand};
+    ) -> Vec<crate::render::renderer::RenderCommand> {
+        use crate::render::renderer::{DrawMode, RenderCommand};
 
         let mut cmds: Vec<RenderCommand> = Vec::new();
         if self.layers.is_empty() {

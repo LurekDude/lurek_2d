@@ -1,7 +1,7 @@
 //! `ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.
 //!
 //! [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them
-//! to lightweight [`crate::graphics::ShaderPassDescriptor`] values via
+//! to lightweight [`crate::render::ShaderPassDescriptor`] values via
 //! [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted
 //! to import from `crate::graphics` (Tier 1).
 
@@ -10,7 +10,7 @@ use std::rc::Rc;
 
 use super::effect::PostFxEffect;
 use crate::runtime::log_messages::{IE01, IE02, IE03};
-use crate::graphics::ShaderPassDescriptor;
+use crate::render::ShaderPassDescriptor;
 use crate::log_msg;
 
 /// An ordered shader-effect chain to apply when drawing a single image.

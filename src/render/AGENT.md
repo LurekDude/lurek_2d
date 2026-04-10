@@ -5,7 +5,7 @@
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
 | **Lua API**    | `lurek.gfx`                                              |
-| **Source**     | `src/graphics/`                                              |
+| **Source**     | `src/render/`                                              |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
 | **Architecture** | `docs/architecture/engine-architecture.md` § Rendering Pipeline |

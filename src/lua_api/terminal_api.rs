@@ -634,7 +634,7 @@ impl LuaUserData for LuaTerminal {
         /// @param height : integer
         /// @return nil
         methods.add_method("setFont", |_, this, height: u32| {
-            let idx = crate::graphics::Font::nearest_size(height);
+            let idx = crate::render::Font::nearest_size(height);
             let st = this.binding.shared_state.borrow();
             if let Some(key) = st.default_fonts[idx] {
                 drop(st);

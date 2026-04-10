@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::runtime::resource_keys::{LightKey, OccluderKey};
-use crate::light::{
+use crate::render::light::{
     Attenuation, FalloffMode, FlickerConfig, Light2D, LightBlendMode, LightType, Occluder,
     ShadowFilter,
 };

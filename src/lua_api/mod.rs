@@ -129,7 +129,7 @@ pub mod math_api;
 pub mod physics_api;
 
 /// Registers the `lurek.gfx.*` rendering and drawing API.
-pub mod graphic_api;
+pub mod render_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
 pub mod system_api;
@@ -380,7 +380,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // graphics: lurek.gfx
     if modules.graphics {
-        graphic_api::register(&lua, &luna, state.clone())?;
+        render_api::register(&lua, &luna, state.clone())?;
     }
 
     // Register lurek.conf as a no-op runtime callback.

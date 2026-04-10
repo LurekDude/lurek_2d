@@ -7,14 +7,14 @@ use std::rc::Rc;
 use lurek2d::animation::Animation;
 use lurek2d::runtime::config::Config;
 use lurek2d::runtime::resource_keys::TextureKey;
-use lurek2d::graphics::renderer::{
+use lurek2d::render::renderer::{
     CompareMode, DepthMode, RenderCommand, DrawMode, StencilAction, TextAlign, TextureData,
 };
-use lurek2d::graphics::sprite_batch::BatchEntry;
-use lurek2d::graphics::BlendMode;
-use lurek2d::graphics::Font;
-use lurek2d::graphics::NineSlice;
-use lurek2d::graphics::SpriteBatch;
+use lurek2d::render::sprite_batch::BatchEntry;
+use lurek2d::render::BlendMode;
+use lurek2d::render::Font;
+use lurek2d::render::NineSlice;
+use lurek2d::render::SpriteBatch;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 use lurek2d::math::Color;
 use slotmap::{Key, SlotMap};
@@ -948,7 +948,7 @@ fn test_animation_lua_update_and_draw() {
     // Create a small fake texture entry so drawAnimation has a valid texture
     {
         let mut st = state.borrow_mut();
-        st.textures.insert(lurek2d::graphics::renderer::TextureData {
+        st.textures.insert(lurek2d::render::renderer::TextureData {
             pixels: vec![255; 64 * 64 * 4],
             width: 64,
             height: 64,

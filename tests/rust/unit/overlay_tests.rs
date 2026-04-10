@@ -1,6 +1,6 @@
 ﻿//! Integration tests for the Overlay (screen-effect overlay) module.
 
-use lurek2d::effect::{
+use lurek2d::render::effect::{
     AmbientState, CloudState, FadeState, FilmGrainState, FlashState, FogState, HeatHazeState,
     LightningState, Overlay, ShakeState, VignetteState, WeatherState, WeatherType,
 };

@@ -4,7 +4,7 @@
 //! of the screen. Can be toggled at runtime via F12 or `lurek.platform.setDebugOverlay()`.
 
 use crate::runtime::resource_keys::FontKey;
-use crate::graphics::renderer::{RenderCommand, DrawMode};
+use crate::render::renderer::{RenderCommand, DrawMode};
 
 /// Debug overlay showing FPS and render statistics.
 ///

@@ -4,7 +4,7 @@
 //! `src/lua_api/parallax_api.rs`.
 
 use crate::runtime::resource_keys::TextureKey;
-use crate::graphics::BlendMode;
+use crate::render::BlendMode;
 
 // ── ParallaxDrawBatch ────────────────────────────────────────────────────────
 

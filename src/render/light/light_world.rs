@@ -4,8 +4,8 @@ use slotmap::SlotMap;
 
 use crate::runtime::log_messages::{LW01_LIGHT_WORLD_INIT, LW02_LIGHT_ADD};
 use crate::runtime::resource_keys::{LightKey, OccluderKey};
-use crate::light::light2d::Light2D;
-use crate::light::occluder::Occluder;
+use crate::render::light::light2d::Light2D;
+use crate::render::light::occluder::Occluder;
 use crate::log_msg;
 use crate::math::Color;
 

@@ -9,12 +9,12 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::runtime::log_messages::{LT01, LT02, LT03};
-use crate::light::attenuation::Attenuation;
-use crate::light::blend_mode::LightBlendMode;
-use crate::light::falloff::FalloffMode;
-use crate::light::flicker::FlickerConfig;
-use crate::light::light_type::LightType;
-use crate::light::shadow::ShadowFilter;
+use crate::render::light::attenuation::Attenuation;
+use crate::render::light::blend_mode::LightBlendMode;
+use crate::render::light::falloff::FalloffMode;
+use crate::render::light::flicker::FlickerConfig;
+use crate::render::light::light_type::LightType;
+use crate::render::light::shadow::ShadowFilter;
 use crate::log_msg;
 use crate::math::Color;
 use mlua::prelude::{LuaError, LuaResult, LuaTable, LuaValue};

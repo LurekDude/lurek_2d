@@ -7,7 +7,7 @@ use super::math::{
 };
 use super::particle::Particle;
 use crate::runtime::log_messages::{PE01, PE02, PE03, PE04};
-use crate::graphics::renderer::{ParticleInstance, ParticleRenderShape, RenderCommand};
+use crate::render::renderer::{ParticleInstance, ParticleRenderShape, RenderCommand};
 use crate::log_msg;
 use crate::particle::shapes::ParticleShape;
 
@@ -816,7 +816,7 @@ mod tests {
         let cmds = sys.build_render_commands(0.0, 0.0);
         // All particles are batched into a single DrawParticleSystem command
         assert_eq!(cmds.len(), 1);
-        if let crate::graphics::renderer::RenderCommand::DrawParticleSystem { particles } = &cmds[0]
+        if let crate::render::renderer::RenderCommand::DrawParticleSystem { particles } = &cmds[0]
         {
             assert_eq!(particles.len(), count);
         } else {

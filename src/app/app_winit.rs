@@ -20,8 +20,8 @@ use winit::event::{ElementState, MouseButton, WindowEvent};
 use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoop};
 use winit::window::{Window, WindowId};
 
-use crate::graphics::renderer::{RenderCommand, DrawMode};
-use crate::graphics::GpuRenderer;
+use crate::render::renderer::{RenderCommand, DrawMode};
+use crate::render::GpuRenderer;
 use crate::input::keyboard::winit_key_to_string;
 use crate::lua_api::{create_lua_vm, SharedState};
 use crate::timer::Clock;

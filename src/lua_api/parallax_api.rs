@@ -8,10 +8,10 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::graphics::{BlendMode, RenderCommand};
+use crate::render::{BlendMode, RenderCommand};
 use crate::parallax::layer::ParallaxLayer;
 
-use crate::lua_api::graphic_api::LuaImage;
+use crate::lua_api::render_api::LuaImage;
 
 // ===============================================================================
 // Helpers

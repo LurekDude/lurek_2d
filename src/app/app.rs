@@ -24,8 +24,8 @@ use crate::runtime::resource_keys::{
 };
 use crate::runtime::shared_state::WindowState;
 use crate::runtime::{FullscreenType, SharedState};
-use crate::graphics::renderer::{DrawMode, RenderCommand, TextureData};
-use crate::graphics::GpuRenderer;
+use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
+use crate::render::GpuRenderer;
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
 use crate::lua_api::create_lua_vm;
@@ -189,7 +189,7 @@ struct LunaApp {
     /// Lazily-initialised TTF fonts shared by both the splash and error screens.
     ///
     /// Tuple: (font_store, title_key at 36 pt, body_key at 18 pt).
-    engine_fonts: Option<(SlotMap<FontKey, crate::graphics::Font>, FontKey, FontKey)>,
+    engine_fonts: Option<(SlotMap<FontKey, crate::render::Font>, FontKey, FontKey)>,
 
     /// Cached embedded PNG branding used by the no-game splash screen.
     splash_branding: Option<SplashBranding>,
@@ -1107,11 +1107,11 @@ impl LunaApp {
 
         // Lazily initialise shared bitmap engine fonts (used by both splash and error screens).
         if self.engine_fonts.is_none() {
-            let mut fonts: SlotMap<FontKey, crate::graphics::Font> = SlotMap::with_key();
-            let all = crate::graphics::Font::load_all_sizes();
+            let mut fonts: SlotMap<FontKey, crate::render::Font> = SlotMap::with_key();
+            let all = crate::render::Font::load_all_sizes();
             // title = nearest to 36px (index 5 = 22px), small = nearest to 18px (index 4 = 18px)
-            let title_idx = crate::graphics::Font::nearest_size(36);
-            let small_idx = crate::graphics::Font::nearest_size(18);
+            let title_idx = crate::render::Font::nearest_size(36);
+            let small_idx = crate::render::Font::nearest_size(18);
             let mut title_key = None;
             let mut small_key = None;
             for (i, (font, _cw, _ch)) in all.into_iter().enumerate() {
@@ -1148,13 +1148,13 @@ impl LunaApp {
             self.drag_hover,
         );
         let bg = [0.12, 0.08, 0.20, 1.0];
-        let no_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch> = SlotMap::with_key();
-        let no_canvases: SlotMap<CanvasKey, crate::graphics::Canvas> = SlotMap::with_key();
+        let no_batches: SlotMap<SpriteBatchKey, crate::render::SpriteBatch> = SlotMap::with_key();
+        let no_canvases: SlotMap<CanvasKey, crate::render::Canvas> = SlotMap::with_key();
         let empty_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
-        let no_meshes: SlotMap<MeshKey, crate::graphics::Mesh> = SlotMap::with_key();
-        let no_shaders: SlotMap<ShaderKey, crate::graphics::Shader> = SlotMap::with_key();
+        let no_meshes: SlotMap<MeshKey, crate::render::Mesh> = SlotMap::with_key();
+        let no_shaders: SlotMap<ShaderKey, crate::render::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
-        let no_lights = crate::light::light_world::LightWorld::new();
+        let no_lights = crate::render::light::light_world::LightWorld::new();
         let splash_textures = branding.map_or(&empty_textures, |assets| &assets.textures);
         if let Err(e) = renderer.render_frame(
             surface,
@@ -1185,10 +1185,10 @@ impl LunaApp {
 
         // Re-use the shared bitmap engine fonts (same sizes as the splash screen).
         if self.engine_fonts.is_none() {
-            let mut fonts: SlotMap<FontKey, crate::graphics::Font> = SlotMap::with_key();
-            let all = crate::graphics::Font::load_all_sizes();
-            let title_idx = crate::graphics::Font::nearest_size(36);
-            let small_idx = crate::graphics::Font::nearest_size(18);
+            let mut fonts: SlotMap<FontKey, crate::render::Font> = SlotMap::with_key();
+            let all = crate::render::Font::load_all_sizes();
+            let title_idx = crate::render::Font::nearest_size(36);
+            let small_idx = crate::render::Font::nearest_size(18);
             let mut title_key = None;
             let mut small_key = None;
             for (i, (font, _cw, _ch)) in all.into_iter().enumerate() {
@@ -1216,13 +1216,13 @@ impl LunaApp {
             Some(*body_key),
         );
         let bg = [0.11, 0.22, 0.53, 1.0];
-        let no_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch> = SlotMap::with_key();
-        let no_canvases: SlotMap<CanvasKey, crate::graphics::Canvas> = SlotMap::with_key();
+        let no_batches: SlotMap<SpriteBatchKey, crate::render::SpriteBatch> = SlotMap::with_key();
+        let no_canvases: SlotMap<CanvasKey, crate::render::Canvas> = SlotMap::with_key();
         let no_textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
-        let no_meshes: SlotMap<MeshKey, crate::graphics::Mesh> = SlotMap::with_key();
-        let no_shaders: SlotMap<ShaderKey, crate::graphics::Shader> = SlotMap::with_key();
+        let no_meshes: SlotMap<MeshKey, crate::render::Mesh> = SlotMap::with_key();
+        let no_shaders: SlotMap<ShaderKey, crate::render::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
-        let no_lights = crate::light::light_world::LightWorld::new();
+        let no_lights = crate::render::light::light_world::LightWorld::new();
         if let Err(e) = renderer.render_frame(
             surface,
             &cmds,
@@ -1554,7 +1554,7 @@ fn load_embedded_splash_texture(
 
     let rgba = image.to_rgba8();
     let (width, height) = rgba.dimensions();
-    match crate::graphics::Texture::from_rgba(width, height, rgba.into_raw(), textures) {
+    match crate::render::Texture::from_rgba(width, height, rgba.into_raw(), textures) {
         Ok(texture) => Some(SplashTexture {
             texture_key: texture.key,
             width: texture.width,
@@ -2501,7 +2501,7 @@ fn make_splash_commands(
     width: u32,
     height: u32,
     small_key: FontKey,
-    fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
+    fonts: &mut SlotMap<FontKey, crate::render::Font>,
     branding: Option<&SplashBranding>,
     drag_hover: bool,
 ) -> Vec<RenderCommand> {

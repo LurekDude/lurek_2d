@@ -484,8 +484,8 @@ impl Overlay {
     ///
     /// # Returns
     /// `Vec<RenderCommand>` — zero or more draw commands, ordered back-to-front.
-    pub fn build_render_commands(&self) -> Vec<crate::graphics::renderer::RenderCommand> {
-        use crate::graphics::renderer::{DrawMode, RenderCommand};
+    pub fn build_render_commands(&self) -> Vec<crate::render::renderer::RenderCommand> {
+        use crate::render::renderer::{DrawMode, RenderCommand};
         let mut cmds = Vec::new();
         let w = self.width as f32;
         let h = self.height as f32;

@@ -1,6 +1,6 @@
 //! `lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.
 
-use super::graphic_api::LuaImageData;
+use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;

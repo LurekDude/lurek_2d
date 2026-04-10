@@ -1,6 +1,6 @@
 ﻿//! Integration tests for the PostFX (post-processing effects) module.
 
-use lurek2d::effect::{PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::render::effect::{PostFxEffect, PostFxEffectType, PostFxStack};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;

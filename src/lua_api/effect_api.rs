@@ -1,12 +1,12 @@
 //! `luna.effect` — Composable visual effects: post-processing pipeline and screen overlays.
 
-use super::graphic_api::LuaImageData;
+use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::effect::{
+use crate::render::effect::{
     ImageEffect, Overlay, PostFxEffect, PostFxEffectType, PostFxStack, WeatherType,
 };
 

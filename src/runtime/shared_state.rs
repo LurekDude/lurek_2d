@@ -16,16 +16,16 @@ use winit::window::Window;
 
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
-use crate::camera::Camera;
+use crate::render::camera::Camera;
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
 use crate::filesystem::GameFS;
-use crate::graphics::gpu_renderer::RenderStats;
-use crate::graphics::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
-use crate::graphics::{Canvas, CompoundShape, Mesh, Shader};
+use crate::render::gpu_renderer::RenderStats;
+use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
+use crate::render::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
-use crate::light::LightWorld;
+use crate::render::light::LightWorld;
 use crate::particle::ParticleSystem;
 use crate::event::EventQueue;
 use crate::timer::Clock;
@@ -275,7 +275,7 @@ pub struct SharedState {
     /// Current blend mode for draw operations.
     pub blend_mode: BlendMode,
     /// Loaded TTF fonts for text rendering.
-    pub fonts: SlotMap<FontKey, crate::graphics::Font>,
+    pub fonts: SlotMap<FontKey, crate::render::Font>,
     /// Key of the currently active font (`None` = use default engine font).
     pub active_font: Option<FontKey>,
     /// Built-in bitmap engine font loaded at startup — used when `active_font` is `None`.
@@ -283,7 +283,7 @@ pub struct SharedState {
     /// All 6 built-in bitmap font sizes, indexed by `AVAILABLE_HEIGHTS` order.
     pub default_fonts: [Option<FontKey>; 6],
     /// Loaded sprite batches for batched rendering.
-    pub sprite_batches: SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>,
+    pub sprite_batches: SlotMap<SpriteBatchKey, crate::render::SpriteBatch>,
     /// Off-screen render targets (canvases) for compositing.
     pub canvases: SlotMap<CanvasKey, Canvas>,
     /// Active particle systems.
@@ -480,7 +480,7 @@ impl SharedState {
         if self.default_font.is_some() {
             return;
         }
-        let sizes = crate::graphics::Font::load_all_sizes();
+        let sizes = crate::render::Font::load_all_sizes();
         for (i, (font, _cw, _ch)) in sizes.into_iter().enumerate() {
             let key = self.fonts.insert(font);
             self.default_fonts[i] = Some(key);

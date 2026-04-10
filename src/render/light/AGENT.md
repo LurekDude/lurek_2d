@@ -5,7 +5,7 @@
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.light`                                         |
-| **Source**      | `src/light/`                                         |
+| **Source**      | `src/render/light/`                                         |
 | **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
 | **Architecture** | —                                                  |

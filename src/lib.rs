@@ -74,7 +74,6 @@ pub mod audio;
 /// Automated input simulation via timed step scripts for testing and replay.
 pub mod automation;
 /// Camera and viewport types for 2D rendering.
-pub mod camera;
 /// Property tween system: animate any Lua table field with easing, sequences, and parallels.
 pub mod tween;
 // migration-state: pub mod battle; — now library/battle/init.lua
@@ -107,13 +106,12 @@ pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
-pub mod graphics;
+pub mod render;
 /// CPU-side pixel-level image manipulation.
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
 pub mod input;
 /// 2D point-light data container for dynamic lighting systems.
-pub mod light;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
 pub mod i18n;
 /// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
@@ -125,7 +123,6 @@ pub mod ui;
 // migration-state: pub mod inventory; — now library/inventory/init.lua
 // migration-state: pub mod item; — now library/item/init.lua
 /// Composable visual effects layer: post-processing pipeline (bloom, blur, CRT, color grading) and screen overlays (weather, ambient, shake, fog).
-pub mod effect;
 /// Foundational math types: Vec2, Mat3, Rect.
 pub mod math;
 /// Minimap content extraction, FOV mask, and tile sampling.

@@ -1,6 +1,6 @@
 //! `lurek.minimap` — Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
-use super::graphic_api::LuaImageData;
+use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;

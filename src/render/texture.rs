@@ -11,7 +11,7 @@
 use crate::runtime::error::{EngineError, EngineResult};
 use crate::runtime::log_messages::TX01_TEX_DECODED;
 use crate::runtime::resource_keys::TextureKey;
-use crate::graphics::renderer::TextureData;
+use crate::render::renderer::TextureData;
 use crate::log_msg;
 use slotmap::SlotMap;
 use std::path::Path;

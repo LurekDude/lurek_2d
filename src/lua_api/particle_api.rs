@@ -1,6 +1,6 @@
 //! `luna.particles` — Emitter-based 2D particle systems and trail ribbons.
 
-use super::graphic_api::LuaImageData;
+use super::render_api::LuaImageData;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -816,7 +816,7 @@ impl LuaUserData for LuaParticleSystem {
         /// @param oy : number?  World Y offset added to every particle (default 0).
         /// @return nil
         methods.add_method("render", |_, this, (ox, oy): (Option<f32>, Option<f32>)| {
-            use crate::graphics::renderer::{DrawMode, ParticleRenderShape, RenderCommand};
+            use crate::render::renderer::{DrawMode, ParticleRenderShape, RenderCommand};
             let ox = ox.unwrap_or(0.0);
             let oy = oy.unwrap_or(0.0);
             // Snapshot particles while borrowing immutably; drop borrow before borrow_mut.

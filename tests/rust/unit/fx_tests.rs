@@ -5,11 +5,11 @@
 //!
 //! These tests are purely in-memory (no GPU, no window, no audio).
 
-use lurek2d::effect::{
+use lurek2d::render::effect::{
     AmbientState, FadeState, FilmGrainState, FogState, HeatHazeState, Overlay, ShakeState,
     VignetteState, WeatherType,
 };
-use lurek2d::effect::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::render::effect::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
 
 // ═════════════════════════════════════════════════════════════════════════
 // PostFxEffectType

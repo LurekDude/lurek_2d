@@ -1,14 +1,14 @@
 //! Integration tests for Phase 24 graphics extension types.
 
 use lurek2d::animation::{AnimEvent, Animation};
-use lurek2d::camera::Camera2D;
-use lurek2d::camera::{ScaleMode, Viewport, ViewportScale};
-use lurek2d::graphics::decal_surface::DecalSurface;
-use lurek2d::graphics::draw_layer::DrawLayer;
-use lurek2d::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
-use lurek2d::graphics::texture_atlas::TextureAtlas;
+use lurek2d::render::camera::Camera2D;
+use lurek2d::render::camera::{ScaleMode, Viewport, ViewportScale};
+use lurek2d::render::decal_surface::DecalSurface;
+use lurek2d::render::draw_layer::DrawLayer;
+use lurek2d::render::sprite_sheet::{DirectionLayout, SpriteSheet};
+use lurek2d::render::texture_atlas::TextureAtlas;
 use lurek2d::image::palette_lut::PaletteLUT;
-use lurek2d::light::light2d::Light2D;
+use lurek2d::render::light::light2d::Light2D;
 use lurek2d::math::Color;
 use lurek2d::math::Rect;
 use lurek2d::particle::trail::Trail;

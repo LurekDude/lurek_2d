@@ -22,9 +22,9 @@ use crate::runtime::log_messages::{
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
-use crate::graphics::mesh::Mesh;
-use crate::graphics::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
-use crate::graphics::shader::{Shader, ShaderFragmentInput, UniformValue};
+use crate::render::mesh::Mesh;
+use crate::render::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
+use crate::render::shader::{Shader, ShaderFragmentInput, UniformValue};
 use crate::log_msg;
 use crate::math::{Mat3, Vec2};
 use slotmap::{SlotMap, SparseSecondaryMap};
@@ -140,8 +140,8 @@ enum GeometryKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 enum StencilMode {
     Disabled,
-    Write(crate::graphics::renderer::StencilAction),
-    Test(crate::graphics::renderer::CompareMode),
+    Write(crate::render::renderer::StencilAction),
+    Test(crate::render::renderer::CompareMode),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -701,7 +701,7 @@ impl GpuRenderer {
     fn ensure_font_atlas(
         &mut self,
         font_key: FontKey,
-        font: &mut crate::graphics::Font,
+        font: &mut crate::render::Font,
         default_filter: &(String, String, u32),
     ) -> bool {
         let (data, w, h) = font.atlas_data();
@@ -823,8 +823,8 @@ impl GpuRenderer {
     fn prune_released_resources(
         &mut self,
         textures: &SlotMap<TextureKey, TextureData>,
-        fonts: &SlotMap<FontKey, crate::graphics::Font>,
-        canvases: &SlotMap<CanvasKey, crate::graphics::Canvas>,
+        fonts: &SlotMap<FontKey, crate::render::Font>,
+        canvases: &SlotMap<CanvasKey, crate::render::Canvas>,
         shaders: &SlotMap<ShaderKey, Shader>,
     ) {
         let stale_textures: Vec<TextureKey> = self
@@ -876,9 +876,9 @@ impl GpuRenderer {
     /// - `surface` — `&wgpu::Surface<'static>`.
     /// - `commands` — `&[RenderCommand]`.
     /// - `textures` — `&SlotMap<TextureKey, TextureData>`.
-    /// - `fonts` — `&mut SlotMap<FontKey, crate::graphics::Font>`.
-    /// - `sprite_batches` — `&SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>`.
-    /// - `canvases` — `&SlotMap<CanvasKey, crate::graphics::Canvas>`.
+    /// - `fonts` — `&mut SlotMap<FontKey, crate::render::Font>`.
+    /// - `sprite_batches` — `&SlotMap<SpriteBatchKey, crate::render::SpriteBatch>`.
+    /// - `canvases` — `&SlotMap<CanvasKey, crate::render::Canvas>`.
     /// - `meshes` — `&SlotMap<MeshKey, Mesh>`.
     /// - `shaders` — `&SlotMap<ShaderKey, Shader>`.
     /// - `default_filter` — `&(String, String, u32)`.
@@ -894,10 +894,10 @@ impl GpuRenderer {
         surface: &wgpu::Surface<'static>,
         commands: &[RenderCommand],
         textures: &SlotMap<TextureKey, TextureData>,
-        fonts: &mut SlotMap<FontKey, crate::graphics::Font>,
-        light_world: &crate::light::light_world::LightWorld,
-        sprite_batches: &SlotMap<SpriteBatchKey, crate::graphics::SpriteBatch>,
-        canvases: &SlotMap<CanvasKey, crate::graphics::Canvas>,
+        fonts: &mut SlotMap<FontKey, crate::render::Font>,
+        light_world: &crate::render::light::light_world::LightWorld,
+        sprite_batches: &SlotMap<SpriteBatchKey, crate::render::SpriteBatch>,
+        canvases: &SlotMap<CanvasKey, crate::render::Canvas>,
         meshes: &SlotMap<MeshKey, Mesh>,
         shaders: &SlotMap<ShaderKey, Shader>,
         default_filter: &(String, String, u32),
@@ -1970,7 +1970,7 @@ impl GpuRenderer {
                 } => {
                     if self.gpu_textures.get(*texture_key).is_some() {
                         let t = transform_stack.last().unwrap();
-                        let ns = crate::graphics::NineSlice::new(
+                        let ns = crate::render::NineSlice::new(
                             *texture_key,
                             *top,
                             *right,
@@ -2446,7 +2446,7 @@ impl GpuRenderer {
     fn target_dimensions(
         &self,
         target: RenderTargetId,
-        canvases: &SlotMap<CanvasKey, crate::graphics::Canvas>,
+        canvases: &SlotMap<CanvasKey, crate::render::Canvas>,
     ) -> (u32, u32) {
         match target {
             RenderTargetId::Screen => (self.width, self.height),
@@ -3620,37 +3620,37 @@ fn stencil_face_state(stencil_mode: StencilMode) -> wgpu::StencilFaceState {
     }
 }
 
-fn compare_function(compare: crate::graphics::renderer::CompareMode) -> wgpu::CompareFunction {
+fn compare_function(compare: crate::render::renderer::CompareMode) -> wgpu::CompareFunction {
     match compare {
-        crate::graphics::renderer::CompareMode::Equal => wgpu::CompareFunction::Equal,
-        crate::graphics::renderer::CompareMode::NotEqual => wgpu::CompareFunction::NotEqual,
-        crate::graphics::renderer::CompareMode::Less => wgpu::CompareFunction::Less,
-        crate::graphics::renderer::CompareMode::LessEqual => wgpu::CompareFunction::LessEqual,
-        crate::graphics::renderer::CompareMode::Greater => wgpu::CompareFunction::Greater,
-        crate::graphics::renderer::CompareMode::GreaterEqual => wgpu::CompareFunction::GreaterEqual,
-        crate::graphics::renderer::CompareMode::Always => wgpu::CompareFunction::Always,
-        crate::graphics::renderer::CompareMode::Never => wgpu::CompareFunction::Never,
+        crate::render::renderer::CompareMode::Equal => wgpu::CompareFunction::Equal,
+        crate::render::renderer::CompareMode::NotEqual => wgpu::CompareFunction::NotEqual,
+        crate::render::renderer::CompareMode::Less => wgpu::CompareFunction::Less,
+        crate::render::renderer::CompareMode::LessEqual => wgpu::CompareFunction::LessEqual,
+        crate::render::renderer::CompareMode::Greater => wgpu::CompareFunction::Greater,
+        crate::render::renderer::CompareMode::GreaterEqual => wgpu::CompareFunction::GreaterEqual,
+        crate::render::renderer::CompareMode::Always => wgpu::CompareFunction::Always,
+        crate::render::renderer::CompareMode::Never => wgpu::CompareFunction::Never,
     }
 }
 
-fn stencil_operation(action: crate::graphics::renderer::StencilAction) -> wgpu::StencilOperation {
+fn stencil_operation(action: crate::render::renderer::StencilAction) -> wgpu::StencilOperation {
     match action {
-        crate::graphics::renderer::StencilAction::Replace => wgpu::StencilOperation::Replace,
-        crate::graphics::renderer::StencilAction::Increment => {
+        crate::render::renderer::StencilAction::Replace => wgpu::StencilOperation::Replace,
+        crate::render::renderer::StencilAction::Increment => {
             wgpu::StencilOperation::IncrementClamp
         }
-        crate::graphics::renderer::StencilAction::Decrement => {
+        crate::render::renderer::StencilAction::Decrement => {
             wgpu::StencilOperation::DecrementClamp
         }
-        crate::graphics::renderer::StencilAction::IncrementWrap => {
+        crate::render::renderer::StencilAction::IncrementWrap => {
             wgpu::StencilOperation::IncrementWrap
         }
-        crate::graphics::renderer::StencilAction::DecrementWrap => {
+        crate::render::renderer::StencilAction::DecrementWrap => {
             wgpu::StencilOperation::DecrementWrap
         }
-        crate::graphics::renderer::StencilAction::Keep => wgpu::StencilOperation::Keep,
-        crate::graphics::renderer::StencilAction::Zero => wgpu::StencilOperation::Zero,
-        crate::graphics::renderer::StencilAction::Invert => wgpu::StencilOperation::Invert,
+        crate::render::renderer::StencilAction::Keep => wgpu::StencilOperation::Keep,
+        crate::render::renderer::StencilAction::Zero => wgpu::StencilOperation::Zero,
+        crate::render::renderer::StencilAction::Invert => wgpu::StencilOperation::Invert,
     }
 }
 
@@ -3915,7 +3915,7 @@ mod tests {
     use std::convert::TryInto;
 
     use super::*;
-    use crate::graphics::renderer::{CompareMode, StencilAction};
+    use crate::render::renderer::{CompareMode, StencilAction};
 
     const VALID_WGSL_FRAGMENT_SHADER: &str = r#"
 @fragment

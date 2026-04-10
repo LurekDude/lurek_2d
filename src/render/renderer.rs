@@ -10,8 +10,8 @@
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
-use crate::graphics::image_effect::ShaderPassDescriptor;
-use crate::graphics::mesh::Mesh;
+use crate::render::image_effect::ShaderPassDescriptor;
+use crate::render::mesh::Mesh;
 
 /// Stencil comparison mode for `lurek.gfx.setStencilTest`.
 ///
@@ -487,7 +487,7 @@ pub enum RenderCommand {
     },
     /// Draw all primitives in a compound shape with a unified affine transform.
     ///
-    /// The renderer processes the shape's [`crate::graphics::ShapeCommand`] queue wrapped in a
+    /// The renderer processes the shape's [`crate::render::ShapeCommand`] queue wrapped in a
     /// `PushTransform`/`PopTransform` pair, applying the given transform before
     /// dispatching each command.
     DrawShape {

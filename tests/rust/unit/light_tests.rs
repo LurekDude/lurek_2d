@@ -1,6 +1,6 @@
 //! Integration tests for lurek2d::light.
 
-use lurek2d::light::*;
+use lurek2d::render::light::*;
 use lurek2d::math::{Color, Vec2};
 
 // ── Enum Defaults ─────────────────────────────────────────────────────────────

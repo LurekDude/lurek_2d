@@ -931,8 +931,8 @@ impl Minimap {
         &self,
         screen_x: f32,
         screen_y: f32,
-    ) -> Vec<crate::graphics::renderer::RenderCommand> {
-        use crate::graphics::renderer::{DrawMode, RenderCommand};
+    ) -> Vec<crate::render::renderer::RenderCommand> {
+        use crate::render::renderer::{DrawMode, RenderCommand};
 
         let mut cmds: Vec<RenderCommand> = Vec::new();
         let cw = (self.display_width / self.grid_width.max(1)) as f32;

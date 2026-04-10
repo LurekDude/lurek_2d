@@ -8,9 +8,9 @@ use std::rc::Rc;
 
 use crate::runtime::resource_keys::*;
 use crate::runtime::ScreenshotRequest;
-use crate::graphics::shape::{CompoundShape, ShapeCommand};
-use crate::graphics::sprite_batch::BatchEntry;
-use crate::graphics::{
+use crate::render::shape::{CompoundShape, ShapeCommand};
+use crate::render::sprite_batch::BatchEntry;
+use crate::render::{
     BlendMode, Canvas, CompareMode, DepthMode, RenderCommand, DrawMode, Font, Mesh, MeshDrawMode,
     MeshVertex, Shader, SpriteBatch, StencilAction, StencilMode, TextAlign, Texture, UniformValue,
 };
@@ -1965,7 +1965,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             // Handle: newFont(number) — select built-in by pixel height
             if let Some(LuaValue::Number(n)) = args.get(0) {
                 let height = *n as u32;
-                let idx = crate::graphics::Font::nearest_size(height);
+                let idx = crate::render::Font::nearest_size(height);
                 if let Some(key) = st.default_fonts[idx] {
                     return Ok(LuaFont { state: s.clone(), key });
                 }
@@ -1977,7 +1977,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             // Handle: newFont(integer) — select built-in by pixel height
             if let Some(LuaValue::Integer(n)) = args.get(0) {
                 let height = *n as u32;
-                let idx = crate::graphics::Font::nearest_size(height);
+                let idx = crate::render::Font::nearest_size(height);
                 if let Some(key) = st.default_fonts[idx] {
                     return Ok(LuaFont { state: s.clone(), key });
                 }
@@ -2004,7 +2004,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
             // "default" keyword
             if path == "default" {
-                let idx = crate::graphics::Font::nearest_size(size as u32);
+                let idx = crate::render::Font::nearest_size(size as u32);
                 if let Some(key) = st.default_fonts[idx] {
                     return Ok(LuaFont { state: s.clone(), key });
                 }
@@ -2073,7 +2073,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getFontSizes",
         lua.create_function(|lua, ()| {
             let tbl = lua.create_table()?;
-            for (i, &h) in crate::graphics::font::AVAILABLE_HEIGHTS.iter().enumerate() {
+            for (i, &h) in crate::render::font::AVAILABLE_HEIGHTS.iter().enumerate() {
                 tbl.set(i + 1, h)?;
             }
             Ok(tbl)
@@ -2089,7 +2089,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "getDefaultFont",
         lua.create_function(move |_, pixel_height: Option<u32>| {
             let height = pixel_height.unwrap_or(14);
-            let idx = crate::graphics::Font::nearest_size(height);
+            let idx = crate::render::Font::nearest_size(height);
             let st = s.borrow();
             if let Some(key) = st.default_fonts[idx] {
                 Ok(LuaFont {
