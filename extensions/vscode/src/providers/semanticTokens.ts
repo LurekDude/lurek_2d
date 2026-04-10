@@ -8,7 +8,7 @@ const analyzer = new LuaDocumentAnalyzer();
 // ── Token legend ─────────────────────────────────────────────
 
 const tokenTypes = [
-    'namespace',    // 0  luna, luna.graphics, luna.physics
+    'namespace',    // 0  lurek, lurek.graphics, lurek.physics
     'function',     // 1  function definitions and calls
     'method',       // 2  obj:method calls
     'parameter',    // 3  function parameters
@@ -23,7 +23,7 @@ const tokenTypes = [
     'enumMember',   // 12 enum string values
     'macro',        // 13 LuaJIT FFI
     'decorator',    // 14 LuaCATS annotations
-    'event',        // 15 luna.* callbacks
+    'event',        // 15 lurek.* callbacks
 ];
 
 const tokenModifiers = [
@@ -38,7 +38,7 @@ const tokenModifiers = [
 
 const legend = new vscode.SemanticTokensLegend(tokenTypes, tokenModifiers);
 
-const LUNA_CALLBACKS = new Set([
+const LUREK_CALLBACKS = new Set([
     'load', 'update', 'draw', 'keypressed', 'keyreleased', 'textinput',
     'mousepressed', 'mousereleased', 'wheelmoved',
     'gamepadpressed', 'gamepadreleased', 'gamepadaxis',
@@ -92,8 +92,8 @@ function computeSemanticTokens(document: vscode.TextDocument, apiData: ApiDataSe
         }
     }
 
-    // Collect known luna API function names
-    const lunaFuncNames = new Set(apiData.getAllFunctions().map(f => f.name));
+    // Collect known lurek API function names
+    const lurekFuncNames = new Set(apiData.getAllFunctions().map(f => f.name));
     const deprecatedFuncs = new Set(apiData.getAllFunctions().filter(f => f.deprecated).map(f => f.name));
 
     // Collect enum values
@@ -146,7 +146,7 @@ function computeSemanticTokens(document: vscode.TextDocument, apiData: ApiDataSe
                 classifyIdentifier(
                     builder, tok, prevCode, nextCode, tokens, i,
                     paramNames, localNames, localFuncNames, declaredLines,
-                    lunaFuncNames, deprecatedFuncs, apiData,
+                    lurekFuncNames, deprecatedFuncs, apiData,
                 );
                 break;
         }
@@ -170,18 +170,18 @@ function classifyIdentifier(
     localNames: Set<string>,
     localFuncNames: Set<string>,
     declaredLines: Map<string, number>,
-    lunaFuncNames: Set<string>,
+    lurekFuncNames: Set<string>,
     deprecatedFuncs: Set<string>,
     apiData: ApiDataService,
 ): void {
     const name = tok.value;
 
-    // `luna` as namespace
-    if (name === 'luna') {
+    // `lurek` as namespace
+    if (name === 'lurek') {
         // Check if next is `.callbackName` → event
         if (nextCode?.value === '.') {
             const afterDot = findNextNonWhitespaceAfter(allTokens, idx, 2);
-            if (afterDot?.type === TokenType.Identifier && LUNA_CALLBACKS.has(afterDot.value)) {
+            if (afterDot?.type === TokenType.Identifier && LUREK_CALLBACKS.has(afterDot.value)) {
                 pushToken(builder, tok, 'namespace', []);
                 return;
             }
@@ -190,16 +190,16 @@ function classifyIdentifier(
         return;
     }
 
-    // Property after `luna.` — could be module namespace, callback (event), or API function
+    // Property after `lurek.` — could be module namespace, callback (event), or API function
     if (prevCode?.value === '.' || prevCode?.value === ':') {
         // Walk back to find the root
         const chain = getIdentifierChain(allTokens, idx);
 
-        if (chain.startsWith('luna.')) {
-            const afterLuna = chain.slice(5);
-            const parts = afterLuna.split('.');
+        if (chain.startsWith('lurek.')) {
+            const afterLurek = chain.slice(5);
+            const parts = afterLurek.split('.');
 
-            // luna.graphics, luna.physics etc → submodule names = namespace
+            // lurek.graphics, lurek.physics etc → submodule names = namespace
             if (apiData.getModule(parts[0])) {
                 if (parts.length === 1 && nextCode?.value !== '(') {
                     pushToken(builder, tok, 'namespace', []);
@@ -207,14 +207,14 @@ function classifyIdentifier(
                 }
             }
 
-            // luna.update, luna.draw etc → callback event
-            if (parts.length === 1 && LUNA_CALLBACKS.has(name)) {
+            // lurek.update, lurek.draw etc → callback event
+            if (parts.length === 1 && LUREK_CALLBACKS.has(name)) {
                 pushToken(builder, tok, 'event', []);
                 return;
             }
 
-            // luna API function call
-            if (lunaFuncNames.has(name)) {
+            // lurek API function call
+            if (lurekFuncNames.has(name)) {
                 const mods: string[] = ['defaultLibrary'];
                 if (deprecatedFuncs.has(name)) mods.push('deprecated');
                 pushToken(builder, tok, 'function', mods);
@@ -243,7 +243,7 @@ function classifyIdentifier(
     if (nextCode?.value === '(') {
         if (localFuncNames.has(name)) {
             pushToken(builder, tok, 'function', []);
-        } else if (lunaFuncNames.has(name)) {
+        } else if (lurekFuncNames.has(name)) {
             const mods: string[] = ['defaultLibrary'];
             if (deprecatedFuncs.has(name)) mods.push('deprecated');
             pushToken(builder, tok, 'function', mods);
@@ -361,7 +361,7 @@ function findNextNonWhitespaceAfter(tokens: Token[], idx: number, skip: number):
 
 /**
  * Walk backwards from the given index to build a dotted identifier chain
- * like "luna.graphics.draw".
+ * like "lurek.graphics.draw".
  */
 function getIdentifierChain(tokens: Token[], idx: number): string {
     let chain = tokens[idx].value;

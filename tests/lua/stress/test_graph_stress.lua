@@ -1,5 +1,7 @@
 -- Lurek2D Stress Test: Graph Flow Simulation
 -- Tests large graph creation, edge traversal, and simulation ticks
+-- @stress lurek.graph.newGraph
+
 
 describe("graph stress: large graph creation", function()
     it("creates a 500-node chain graph", function()

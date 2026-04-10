@@ -7,7 +7,7 @@ export class EntityEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.entity", "Entity Designer");
+    super(context, "lurek.editor.entity", "Entity Designer");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {
@@ -203,9 +203,9 @@ export class EntityEditor extends WebviewEditor {
         let lua = '-- Entity factory functions\\nlocal entities = {}\\n\\n';
         for (const ent of entities) {
           lua += 'function entities.create' + ent.name.replace(/[^a-zA-Z0-9]/g,'') + '(x, y)\\n';
-          lua += '  local e = luna.entity.spawn()\\n';
+          lua += '  local e = lurek.entity.spawn()\\n';
           for (const [comp, data] of Object.entries(ent.components)) {
-            lua += '  luna.entity.addComponent(e, "' + comp.toLowerCase() + '", {\\n';
+            lua += '  lurek.entity.addComponent(e, "' + comp.toLowerCase() + '", {\\n';
             for (const [k, v] of Object.entries(data)) {
               if (typeof v === 'string') lua += '    ' + k + ' = "' + v + '",\\n';
               else if (typeof v === 'boolean') lua += '    ' + k + ' = ' + v + ',\\n';

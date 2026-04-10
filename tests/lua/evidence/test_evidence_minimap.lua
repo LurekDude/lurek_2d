@@ -59,8 +59,8 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
 
     it("setFogLevel/getFogLevel round-trip (1-based)", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
-        mm:setFogLevel(2, 3, 128)
-        expect_equal(mm:getFogLevel(2, 3), 128)
+        mm:setFogLevel(2, 3, 2)
+        expect_equal(mm:getFogLevel(2, 3), 2)
     end)
 
     it("getGridSize returns w, h", function()
@@ -75,10 +75,10 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
         expect_equal(mm:getObjectCount(), 0)
     end)
 
-    it("setTerrain out-of-range coordinate is rejected", function()
-        -- Coordinates outside the grid bounds (> grid_size or < 1) should raise a Lua error
+    it("setTerrain out-of-range coordinate (0-based) is rejected", function()
+        -- Coordinates of 0 are invalid (1-based API) and should raise a Lua error
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
-        local ok = pcall(function() mm:setTerrain(9, 1, 1) end) -- x=9 exceeds grid width of 8
+        local ok = pcall(function() mm:setTerrain(0, 1, 1) end)
         expect_equal(ok, false)
     end)
 

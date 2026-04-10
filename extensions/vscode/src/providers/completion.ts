@@ -93,11 +93,11 @@ interface StringContextRule {
 
 const STRING_CONTEXT_RULES: StringContextRule[] = [
   {
-    pattern: /luna\.input\.(?:isDown|isUp)\s*\(\s*["']$/,
+    pattern: /lurek\.input\.(?:isDown|isUp)\s*\(\s*["']$/,
     values: KEY_NAMES.map(k => ({ label: k, detail: "Key name" })),
   },
   {
-    pattern: /luna\.graphics\.setBlendMode\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.setBlendMode\s*\(\s*["']$/,
     values: [
       { label: "alpha", detail: "Standard alpha blending" },
       { label: "add", detail: "Additive blending" },
@@ -111,7 +111,7 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    pattern: /luna\.graphics\.setLineCap\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.setLineCap\s*\(\s*["']$/,
     values: [
       { label: "none", detail: "No line cap" },
       { label: "butt", detail: "Flat cap (default)" },
@@ -120,7 +120,7 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    pattern: /luna\.graphics\.setLineJoin\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.setLineJoin\s*\(\s*["']$/,
     values: [
       { label: "miter", detail: "Sharp join (default)" },
       { label: "bevel", detail: "Flat corner join" },
@@ -128,7 +128,7 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    pattern: /luna\.physics\.newBody\s*\([^)]*,\s*["']$/,
+    pattern: /lurek\.physics\.newBody\s*\([^)]*,\s*["']$/,
     values: [
       { label: "static", detail: "Immovable body" },
       { label: "dynamic", detail: "Fully simulated body" },
@@ -136,7 +136,7 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    pattern: /luna\.audio\.newSource\s*\([^)]*,\s*["']$/,
+    pattern: /lurek\.audio\.newSource\s*\([^)]*,\s*["']$/,
     values: [
       { label: "static", detail: "Load entirely into memory" },
       { label: "stream", detail: "Stream from disk" },
@@ -159,28 +159,28 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    pattern: /luna\.graphics\.setDefaultFilter\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.setDefaultFilter\s*\(\s*["']$/,
     values: [
       { label: "nearest", detail: "Pixel-perfect (no filtering)" },
       { label: "linear", detail: "Smooth bilinear filtering" },
     ],
   },
   {
-    pattern: /luna\.graphics\.setLineStyle\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.setLineStyle\s*\(\s*["']$/,
     values: [
       { label: "rough", detail: "Aliased line" },
       { label: "smooth", detail: "Anti-aliased line" },
     ],
   },
   {
-    pattern: /luna\.graphics\.(?:rectangle|circle|polygon|ellipse|arc)\s*\(\s*["']$/,
+    pattern: /lurek\.graphics\.(?:rectangle|circle|polygon|ellipse|arc)\s*\(\s*["']$/,
     values: [
       { label: "fill", detail: "Filled shape" },
       { label: "line", detail: "Outlined shape" },
     ],
   },
   {
-    pattern: /(?:easing|ease|tween)\s*[=:]\s*["']$|luna\.tween\.\w+\s*\([^)]*["']$/i,
+    pattern: /(?:easing|ease|tween)\s*[=:]\s*["']$|lurek\.tween\.\w+\s*\([^)]*["']$/i,
     values: [
       { label: "linear", detail: "Constant speed" },
       { label: "inQuad", detail: "Accelerating (quadratic)" },
@@ -210,8 +210,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
   },
   // ── I1 additions ────────────────────────────────────────────
   {
-    // luna.graphics.printf 5th arg: alignment
-    pattern: /luna\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']$/,
+    // lurek.graphics.printf 5th arg: alignment
+    pattern: /lurek\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']$/,
     values: [
       { label: "left", detail: "Left-aligned text" },
       { label: "center", detail: "Center-aligned text" },
@@ -220,8 +220,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // luna.graphics.setStencilTest mode
-    pattern: /luna\.graphics\.(?:setStencilTest|stencil)\s*\([^)]*["']$/,
+    // lurek.graphics.setStencilTest mode
+    pattern: /lurek\.graphics\.(?:setStencilTest|stencil)\s*\([^)]*["']$/,
     values: [
       { label: "greater", detail: "Draw where stencil > value" },
       { label: "greaterequal", detail: "Draw where stencil >= value" },
@@ -234,8 +234,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // luna.input.getAxis / isGamepadDown axis name
-    pattern: /luna\.input\.(?:getAxis|isGamepadAxis)\s*\([^)]*,\s*["']$/,
+    // lurek.input.getAxis / isGamepadDown axis name
+    pattern: /lurek\.input\.(?:getAxis|isGamepadAxis)\s*\([^)]*,\s*["']$/,
     values: [
       { label: "leftx", detail: "Left stick X axis" },
       { label: "lefty", detail: "Left stick Y axis" },
@@ -247,7 +247,7 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
   },
   {
     // Gamepad button names
-    pattern: /luna\.input\.(?:isGamepadDown|isGamepadUp|wasGamepadPressed)\s*\([^)]*,\s*["']$/,
+    pattern: /lurek\.input\.(?:isGamepadDown|isGamepadUp|wasGamepadPressed)\s*\([^)]*,\s*["']$/,
     values: [
       { label: "a", detail: "A button (Cross on PS)" },
       { label: "b", detail: "B button (Circle on PS)" },
@@ -269,8 +269,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // luna.graphics.setArcType / arc type
-    pattern: /luna\.graphics\.arc\s*\(\s*["']$/,
+    // lurek.graphics.setArcType / arc type
+    pattern: /lurek\.graphics\.arc\s*\(\s*["']$/,
     values: [
       { label: "pie", detail: "Pie-slice arc" },
       { label: "open", detail: "Open arc (lines to centre not drawn)" },
@@ -278,8 +278,8 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
     ],
   },
   {
-    // luna.audio setEffect type
-    pattern: /luna\.audio\.(?:setEffect|newEffect)\s*\([^)]*,\s*["']$/,
+    // lurek.audio setEffect type
+    pattern: /lurek\.audio\.(?:setEffect|newEffect)\s*\([^)]*,\s*["']$/,
     values: [
       { label: "reverb", detail: "Reverb / room effect" },
       { label: "delay", detail: "Echo delay" },
@@ -299,30 +299,30 @@ const STRING_CONTEXT_RULES: StringContextRule[] = [
 // ── Constructor → object type mapping ────────────────────────
 
 const CONSTRUCTOR_RETURN_TYPES: Record<string, string> = {
-  "luna.graphics.newImage": "Image",
-  "luna.graphics.newCanvas": "Canvas",
-  "luna.graphics.newFont": "Font",
-  "luna.graphics.newShader": "Shader",
-  "luna.graphics.newQuad": "Quad",
-  "luna.graphics.newMesh": "Mesh",
-  "luna.graphics.newSpriteBatch": "SpriteBatch",
-  "luna.graphics.newParticleSystem": "ParticleSystem",
-  "luna.graphics.newImageData": "ImageData",
-  "luna.audio.newSource": "Source",
-  "luna.physics.newWorld": "World",
-  "luna.physics.newBody": "Body",
-  "luna.physics.newFixture": "Fixture",
-  "luna.physics.newRectangleShape": "Shape",
-  "luna.physics.newCircleShape": "Shape",
-  "luna.physics.newPolygonShape": "Shape",
-  "luna.physics.newEdgeShape": "Shape",
-  "luna.physics.newChainShape": "Shape",
-  "luna.physics.newDistanceJoint": "Joint",
-  "luna.physics.newRevoluteJoint": "Joint",
-  "luna.physics.newPrismaticJoint": "Joint",
-  "luna.physics.newWeldJoint": "Joint",
-  "luna.thread.newChannel": "Channel",
-  "luna.thread.newThread": "Thread",
+  "lurek.graphics.newImage": "Image",
+  "lurek.graphics.newCanvas": "Canvas",
+  "lurek.graphics.newFont": "Font",
+  "lurek.graphics.newShader": "Shader",
+  "lurek.graphics.newQuad": "Quad",
+  "lurek.graphics.newMesh": "Mesh",
+  "lurek.graphics.newSpriteBatch": "SpriteBatch",
+  "lurek.graphics.newParticleSystem": "ParticleSystem",
+  "lurek.graphics.newImageData": "ImageData",
+  "lurek.audio.newSource": "Source",
+  "lurek.physics.newWorld": "World",
+  "lurek.physics.newBody": "Body",
+  "lurek.physics.newFixture": "Fixture",
+  "lurek.physics.newRectangleShape": "Shape",
+  "lurek.physics.newCircleShape": "Shape",
+  "lurek.physics.newPolygonShape": "Shape",
+  "lurek.physics.newEdgeShape": "Shape",
+  "lurek.physics.newChainShape": "Shape",
+  "lurek.physics.newDistanceJoint": "Joint",
+  "lurek.physics.newRevoluteJoint": "Joint",
+  "lurek.physics.newPrismaticJoint": "Joint",
+  "lurek.physics.newWeldJoint": "Joint",
+  "lurek.thread.newChannel": "Channel",
+  "lurek.thread.newThread": "Thread",
 };
 
 // ── Frequently used functions (sort boost) ───────────────────
@@ -397,7 +397,7 @@ function inferObjectType(
   const lines = document.getText().split("\n");
   for (let lineIdx = position.line; lineIdx >= 0; lineIdx--) {
     const assignMatch = lines[lineIdx].match(
-      new RegExp(`(?:local\\s+)?${escapeRegex(objName)}\\s*=\\s*(luna\\.[\\w.]+)\\s*\\(`),
+      new RegExp(`(?:local\\s+)?${escapeRegex(objName)}\\s*=\\s*(lurek\\.[\\w.]+)\\s*\\(`),
     );
     if (assignMatch) {
       const constructorPath = assignMatch[1];
@@ -441,8 +441,8 @@ export function register(
           }
         } catch { /* continue */ }
 
-        // ── A: luna.module.func — function completions ──
-        const moduleFuncMatch = before.match(/luna\.(\w+)\.(\w*)$/);
+        // ── A: lurek.module.func — function completions ──
+        const moduleFuncMatch = before.match(/lurek\.(\w+)\.(\w*)$/);
         if (moduleFuncMatch) {
           const modName = moduleFuncMatch[1];
           const partial = moduleFuncMatch[2].toLowerCase();
@@ -468,8 +468,8 @@ export function register(
             });
         }
 
-        // ── A: luna. — module name completions ──
-        const moduleMatch = before.match(/luna\.(\w*)$/);
+        // ── A: lurek. — module name completions ──
+        const moduleMatch = before.match(/lurek\.(\w*)$/);
         if (moduleMatch) {
           const partial = moduleMatch[1].toLowerCase();
           const items: vscode.CompletionItem[] = [];
@@ -478,7 +478,7 @@ export function register(
             if (partial && !modName.toLowerCase().startsWith(partial)) continue;
             const mod = apiData.getModule(modName);
             const item = new vscode.CompletionItem(modName, vscode.CompletionItemKind.Module);
-            item.detail = `luna.${modName}`;
+            item.detail = `lurek.${modName}`;
             if (mod?.description) {
               item.documentation = new vscode.MarkdownString(mod.description);
             }
@@ -486,7 +486,7 @@ export function register(
             items.push(item);
           }
 
-          // Callbacks under luna.
+          // Callbacks under lurek.
           for (const cb of apiData.getCallbacks()) {
             if (partial && !cb.name.toLowerCase().startsWith(partial)) continue;
             const item = new vscode.CompletionItem(cb.name, vscode.CompletionItemKind.Event);
@@ -591,11 +591,11 @@ export function register(
             items.push(item);
           }
 
-          // luna namespace
-          const lunaItem = new vscode.CompletionItem("luna", vscode.CompletionItemKind.Module);
-          lunaItem.detail = "Luna2D engine API";
-          lunaItem.sortText = "1luna";
-          items.push(lunaItem);
+          // lurek namespace
+          const lurekItem = new vscode.CompletionItem("lurek", vscode.CompletionItemKind.Module);
+          lurekItem.detail = "Lurek2D engine API";
+          lurekItem.sortText = "1lurek";
+          items.push(lurekItem);
 
           // E: Local variables from document analysis
           try {

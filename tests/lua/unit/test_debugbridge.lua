@@ -2,6 +2,21 @@
 -- Tests the lurek.debugbridge TCP debug server API
 
 -- ===== Lifecycle =====
+-- @covers lurek.debugbridge.broadcast
+-- @covers lurek.debugbridge.capturePrint
+-- @covers lurek.debugbridge.clearPrintHistory
+-- @covers lurek.debugbridge.getClientCount
+-- @covers lurek.debugbridge.getPerformance
+-- @covers lurek.debugbridge.getPort
+-- @covers lurek.debugbridge.getPrintHistory
+-- @covers lurek.debugbridge.isRunning
+-- @covers lurek.debugbridge.isScreenshotRequested
+-- @covers lurek.debugbridge.poll
+-- @covers lurek.debugbridge.requestScreenshot
+-- @covers lurek.debugbridge.setMaxPrintHistory
+-- @covers lurek.debugbridge.start
+-- @covers lurek.debugbridge.stop
+
 
 describe("lurek.debugbridge lifecycle", function()
 

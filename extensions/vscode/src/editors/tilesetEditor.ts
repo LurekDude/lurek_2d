@@ -7,7 +7,7 @@ export class TilesetEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.tilesetEditor", "Tileset");
+    super(context, "lurek.tilesetEditor", "Tileset");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

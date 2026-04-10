@@ -1,5 +1,12 @@
 -- Lurek2D Stress Test: Math Operations
 -- Performs thousands of math operations to test throughput
+-- @stress lurek.math.abs
+-- @stress lurek.math.atan2
+-- @stress lurek.math.cos
+-- @stress lurek.math.random
+-- @stress lurek.math.sin
+-- @stress lurek.math.sqrt
+
 
 describe("math stress: trigonometry throughput", function()
     it("10000 sin/cos pairs", function()

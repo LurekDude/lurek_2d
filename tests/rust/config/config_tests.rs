@@ -15,7 +15,7 @@ fn config_load_from_conf_lua_parses_phase01_fields() {
     write_conf(
         &temp_dir,
         r#"
-        function luna.conf(t)
+        function lurek.conf(t)
             t.window.title = "Phase 01"
             t.window.width = 1280
             t.window.height = 720
@@ -69,7 +69,7 @@ fn config_load_from_conf_lua_maps_empty_phase01_optionals_to_none() {
     write_conf(
         &temp_dir,
         r#"
-        function luna.conf(t)
+        function lurek.conf(t)
             t.window.minwidth = 0
             t.window.minheight = 0
             t.window.icon = ""
@@ -102,7 +102,7 @@ fn config_load_from_conf_lua_parses_graphics_backend_options() {
     for backend in ["auto", "dx12", "vulkan", "metal"] {
         write_conf(
             &temp_dir,
-            &format!(r#"function luna.conf(t) t.graphics.backend = "{backend}" end"#),
+            &format!(r#"function lurek.conf(t) t.graphics.backend = "{backend}" end"#),
         );
         let (config, error) = Config::load_from_conf_lua(temp_dir.path());
         assert!(
@@ -122,7 +122,7 @@ fn config_load_from_conf_lua_parses_graphics_power_preference_options() {
     for pref in ["high", "low", "none"] {
         write_conf(
             &temp_dir,
-            &format!(r#"function luna.conf(t) t.graphics.power_preference = "{pref}" end"#),
+            &format!(r#"function lurek.conf(t) t.graphics.power_preference = "{pref}" end"#),
         );
         let (config, error) = Config::load_from_conf_lua(temp_dir.path());
         assert!(
@@ -141,7 +141,7 @@ fn config_graphics_rejects_unknown_backend_keeps_default() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     write_conf(
         &temp_dir,
-        r#"function luna.conf(t) t.graphics.backend = "opengl" end"#,
+        r#"function lurek.conf(t) t.graphics.backend = "opengl" end"#,
     );
     let (config, _) = Config::load_from_conf_lua(temp_dir.path());
     // Unknown backend must not overwrite the default — stays "auto".
@@ -153,7 +153,7 @@ fn config_graphics_rejects_unknown_power_preference_keeps_default() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     write_conf(
         &temp_dir,
-        r#"function luna.conf(t) t.graphics.power_preference = "turbo" end"#,
+        r#"function lurek.conf(t) t.graphics.power_preference = "turbo" end"#,
     );
     let (config, _) = Config::load_from_conf_lua(temp_dir.path());
     // Unknown value must not overwrite the default — stays "high".
@@ -165,7 +165,7 @@ fn config_graphics_is_case_insensitive() {
     let temp_dir = TempDir::new().expect("Failed to create temp dir");
     write_conf(
         &temp_dir,
-        r#"function luna.conf(t)
+        r#"function lurek.conf(t)
             t.graphics.backend = "DX12"
             t.graphics.power_preference = "LOW"
         end"#,

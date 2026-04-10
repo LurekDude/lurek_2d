@@ -389,6 +389,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- savePNG --
+    /// Saves a flat ImageData as a PNG file at the given path.
+    /// @param imagedata : ImageData
+    /// @param path : string
+    /// @return nil
+    let s = state.clone();
+    tbl.set(
+        "savePNG",
+        lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
+            let path = s.borrow().game_dir.join(&filename);
+            let img = img_ud.borrow::<ImageData>().map_err(|_| {
+                LuaError::RuntimeError("argument must be an ImageData".into())
+            })?;
+            let bytes = img.encode_png().map_err(LuaError::RuntimeError)?;
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent).map_err(LuaError::external)?;
+            }
+            std::fs::write(&path, &bytes).map_err(LuaError::external)
+        })?,
+    )?;
+
     // -- loadImage --
     /// Loads an ImageData from a LIMG binary file.
     /// @param path : string

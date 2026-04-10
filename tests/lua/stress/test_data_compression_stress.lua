@@ -1,5 +1,10 @@
 -- Lurek2D Stress Test: Data Compression, Hash, and Encoding Throughput
 -- Tests compression output, hashing, and encode/decode at scale
+-- @stress lurek.data.compress
+-- @stress lurek.data.decode
+-- @stress lurek.data.encode
+-- @stress lurek.data.hash
+
 
 describe("data stress: compression creates output", function()
     it("compresses a large string with deflate", function()

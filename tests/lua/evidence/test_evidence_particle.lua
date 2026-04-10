@@ -19,24 +19,24 @@ end
 describe("Evidence: lurek.particles API + PNG visualization", function()
 
     it("newSystem creates a ParticleSystem", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         expect_equal(sys:count(), 0)
     end)
 
     it("new system isEmpty", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         expect_equal(sys:isEmpty(), true)
     end)
 
     it("emit adds particles", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         sys:emit(10)
         -- emit() places particles immediately; count must be positive
         expect_equal(sys:count() > 0, true)
     end)
 
     it("start/stop change active state", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         sys:start()
         expect_equal(sys:isActive(), true)
         sys:stop()
@@ -44,7 +44,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
     end)
 
     it("pause/resume change paused state", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         sys:start()
         sys:pause()
         expect_equal(sys:isPaused(), true)
@@ -53,14 +53,14 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
     end)
 
     it("reset clears particles", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         sys:emit(50)
         sys:reset()
         expect_equal(sys:count(), 0)
     end)
 
     it("setPosition/getPosition round-trip", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         sys:setPosition(123, 456)
         local x, y = sys:getPosition()
         expect_near(x, 123, 0.001)
@@ -68,17 +68,17 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
     end)
 
     it("type returns 'ParticleSystem'", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         expect_equal(sys:type(), "ParticleSystem")
     end)
 
     it("typeOf returns true for 'ParticleSystem'", function()
-        local sys = lurek.particles.newSystem(100)
+        local sys = lurek.particles.newSystem()
         expect_equal(sys:typeOf("ParticleSystem"), true)
     end)
 
     it("newTrail creates a trail without error", function()
-        local ok = pcall(lurek.particles.newTrail, 50)
+        local ok = pcall(lurek.particles.newTrail, 1.0, 5.0)
         expect_equal(ok, true)
     end)
 
@@ -104,7 +104,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
             {192, 192},
         }
         for i = 1, #positions do
-            local sys = lurek.particles.newSystem(200)
+            local sys = lurek.particles.newSystem()
             sys:setPosition(positions[i][1], positions[i][2])
             sys:start()
             sys:emit(30)
@@ -139,7 +139,7 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
         local img = lurek.img.newImageData(W, H)
         img:fill(5, 5, 15, 255)
 
-        local sys = lurek.particles.newSystem(500)
+        local sys = lurek.particles.newSystem()
         sys:setPosition(64, 64)
         sys:start()
 

@@ -15,10 +15,10 @@ const SNIPPETS: SnippetEntry[] = [
   {
     label: "Draw sprite",
     category: "Graphics",
-    code: `local img = luna.graphics.newImage("assets/sprite.png")
+    code: `local img = lurek.graphics.newImage("assets/sprite.png")
 
-function luna.draw()
-  luna.graphics.draw(img, x, y)
+function lurek.draw()
+  lurek.graphics.draw(img, x, y)
 end`,
   },
   {
@@ -29,13 +29,13 @@ local current_frame = 1
 local frame_timer = 0
 local frame_duration = 0.1
 
-function luna.load()
+function lurek.load()
   for i = 1, 4 do
-    frames[i] = luna.graphics.newImage("assets/frame" .. i .. ".png")
+    frames[i] = lurek.graphics.newImage("assets/frame" .. i .. ".png")
   end
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   frame_timer = frame_timer + dt
   if frame_timer >= frame_duration then
     frame_timer = frame_timer - frame_duration
@@ -43,8 +43,8 @@ function luna.update(dt)
   end
 end
 
-function luna.draw()
-  luna.graphics.draw(frames[current_frame], x, y)
+function lurek.draw()
+  lurek.graphics.draw(frames[current_frame], x, y)
 end`,
   },
   {
@@ -65,7 +65,7 @@ local function emit(px, py, count)
   end
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   for i = #particles, 1, -1 do
     local p = particles[i]
     p.x = p.x + p.vx * dt
@@ -75,13 +75,13 @@ function luna.update(dt)
   end
 end
 
-function luna.draw()
+function lurek.draw()
   for _, p in ipairs(particles) do
     local a = p.life
-    luna.graphics.setColor(1, 0.8, 0.2, a)
-    luna.graphics.circle("fill", p.x, p.y, 3)
+    lurek.graphics.setColor(1, 0.8, 0.2, a)
+    lurek.graphics.circle("fill", p.x, p.y, 3)
   end
-  luna.graphics.setColor(1, 1, 1, 1)
+  lurek.graphics.setColor(1, 1, 1, 1)
 end`,
   },
   {
@@ -96,7 +96,7 @@ local function startShake(duration, intensity)
   shake_intensity = intensity
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   if shake_timer > 0 then
     shake_timer = shake_timer - dt
     shake_ox = (math.random() - 0.5) * 2 * shake_intensity
@@ -106,11 +106,11 @@ function luna.update(dt)
   end
 end
 
-function luna.draw()
-  luna.graphics.push()
-  luna.graphics.translate(shake_ox, shake_oy)
+function lurek.draw()
+  lurek.graphics.push()
+  lurek.graphics.translate(shake_ox, shake_oy)
   -- Draw your game here
-  luna.graphics.pop()
+  lurek.graphics.pop()
 end`,
   },
 
@@ -120,17 +120,17 @@ end`,
     category: "Input",
     code: `local player = { x = 400, y = 300, speed = 200 }
 
-function luna.update(dt)
-  if luna.keyboard.isDown("w") or luna.keyboard.isDown("up") then
+function lurek.update(dt)
+  if lurek.keyboard.isDown("w") or lurek.keyboard.isDown("up") then
     player.y = player.y - player.speed * dt
   end
-  if luna.keyboard.isDown("s") or luna.keyboard.isDown("down") then
+  if lurek.keyboard.isDown("s") or lurek.keyboard.isDown("down") then
     player.y = player.y + player.speed * dt
   end
-  if luna.keyboard.isDown("a") or luna.keyboard.isDown("left") then
+  if lurek.keyboard.isDown("a") or lurek.keyboard.isDown("left") then
     player.x = player.x - player.speed * dt
   end
-  if luna.keyboard.isDown("d") or luna.keyboard.isDown("right") then
+  if lurek.keyboard.isDown("d") or lurek.keyboard.isDown("right") then
     player.x = player.x + player.speed * dt
   end
 end`,
@@ -140,18 +140,18 @@ end`,
     category: "Input",
     code: `local player = { x = 400, y = 300, angle = 0 }
 
-function luna.update(dt)
-  local mx, my = luna.mouse.getPosition()
+function lurek.update(dt)
+  local mx, my = lurek.mouse.getPosition()
   player.angle = math.atan2(my - player.y, mx - player.x)
 end
 
-function luna.draw()
-  luna.graphics.push()
-  luna.graphics.translate(player.x, player.y)
-  luna.graphics.rotate(player.angle)
-  luna.graphics.setColor(0.3, 0.7, 1)
-  luna.graphics.rectangle("fill", -16, -8, 32, 16)
-  luna.graphics.pop()
+function lurek.draw()
+  lurek.graphics.push()
+  lurek.graphics.translate(player.x, player.y)
+  lurek.graphics.rotate(player.angle)
+  lurek.graphics.setColor(0.3, 0.7, 1)
+  lurek.graphics.rectangle("fill", -16, -8, 32, 16)
+  lurek.graphics.pop()
 end`,
   },
   {
@@ -159,8 +159,8 @@ end`,
     category: "Input",
     code: `local player = { x = 400, y = 300, speed = 200 }
 
-function luna.update(dt)
-  local axes = luna.gamepad.getAxes(1)
+function lurek.update(dt)
+  local axes = lurek.gamepad.getAxes(1)
   if axes then
     local deadzone = 0.2
     if math.abs(axes.leftx) > deadzone then
@@ -172,7 +172,7 @@ function luna.update(dt)
   end
 end
 
-function luna.gamepadpressed(id, button)
+function lurek.gamepadpressed(id, button)
   if button == "a" then
     -- Jump or action
   end
@@ -183,18 +183,18 @@ end`,
     category: "Input",
     code: `local touches = {}
 
-function luna.touchpressed(id, x, y, dx, dy, pressure)
+function lurek.touchpressed(id, x, y, dx, dy, pressure)
   touches[id] = { x = x, y = y, startX = x, startY = y }
 end
 
-function luna.touchmoved(id, x, y, dx, dy, pressure)
+function lurek.touchmoved(id, x, y, dx, dy, pressure)
   if touches[id] then
     touches[id].x = x
     touches[id].y = y
   end
 end
 
-function luna.touchreleased(id, x, y, dx, dy, pressure)
+function lurek.touchreleased(id, x, y, dx, dy, pressure)
   if touches[id] then
     local swipeX = x - touches[id].startX
     local swipeY = y - touches[id].startY
@@ -221,10 +221,10 @@ local moveSpeed = 200
 local friction = 0.85
 local ground_y = 500
 
-function luna.update(dt)
+function lurek.update(dt)
   -- Horizontal
-  if luna.keyboard.isDown("left") then player.vx = -moveSpeed
-  elseif luna.keyboard.isDown("right") then player.vx = moveSpeed
+  if lurek.keyboard.isDown("left") then player.vx = -moveSpeed
+  elseif lurek.keyboard.isDown("right") then player.vx = moveSpeed
   else player.vx = player.vx * friction end
 
   -- Gravity
@@ -244,7 +244,7 @@ function luna.update(dt)
   end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "space" and player.onGround then
     player.vy = jumpForce
   end
@@ -255,12 +255,12 @@ end`,
     category: "Physics",
     code: `local player = { x = 400, y = 300, vx = 0, vy = 0, speed = 200, friction = 8 }
 
-function luna.update(dt)
+function lurek.update(dt)
   local ix, iy = 0, 0
-  if luna.keyboard.isDown("w") then iy = iy - 1 end
-  if luna.keyboard.isDown("s") then iy = iy + 1 end
-  if luna.keyboard.isDown("a") then ix = ix - 1 end
-  if luna.keyboard.isDown("d") then ix = ix + 1 end
+  if lurek.keyboard.isDown("w") then iy = iy - 1 end
+  if lurek.keyboard.isDown("s") then iy = iy + 1 end
+  if lurek.keyboard.isDown("a") then ix = ix - 1 end
+  if lurek.keyboard.isDown("d") then ix = ix + 1 end
 
   -- Normalize
   local len = math.sqrt(ix * ix + iy * iy)
@@ -292,7 +292,7 @@ local function shoot(x, y, angle, speed)
   })
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   for i = #bullets, 1, -1 do
     local b = bullets[i]
     b.x = b.x + b.vx * dt
@@ -304,10 +304,10 @@ function luna.update(dt)
   end
 end
 
-function luna.draw()
-  luna.graphics.setColor(1, 1, 0)
+function lurek.draw()
+  lurek.graphics.setColor(1, 1, 0)
   for _, b in ipairs(bullets) do
-    luna.graphics.circle("fill", b.x, b.y, 3)
+    lurek.graphics.circle("fill", b.x, b.y, 3)
   end
 end`,
   },
@@ -347,22 +347,22 @@ local function drawHealthBar(x, y, w, h)
   local pct = hp.current / hp.max
 
   -- Background
-  luna.graphics.setColor(0.2, 0.2, 0.2)
-  luna.graphics.rectangle("fill", x, y, w, h)
+  lurek.graphics.setColor(0.2, 0.2, 0.2)
+  lurek.graphics.rectangle("fill", x, y, w, h)
 
   -- Fill
   local color_r = (1 - pct) * 2
   local color_g = pct * 2
-  luna.graphics.setColor(math.min(color_r, 1), math.min(color_g, 1), 0)
-  luna.graphics.rectangle("fill", x, y, w * pct, h)
+  lurek.graphics.setColor(math.min(color_r, 1), math.min(color_g, 1), 0)
+  lurek.graphics.rectangle("fill", x, y, w * pct, h)
 
   -- Border
-  luna.graphics.setColor(0.8, 0.8, 0.8)
-  luna.graphics.rectangle("line", x, y, w, h)
+  lurek.graphics.setColor(0.8, 0.8, 0.8)
+  lurek.graphics.rectangle("line", x, y, w, h)
 
   -- Text
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print(hp.current .. "/" .. hp.max, x + 4, y + 2)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print(hp.current .. "/" .. hp.max, x + 4, y + 2)
 end`,
   },
   {
@@ -378,7 +378,7 @@ local function showDialog(speaker, text)
   dialog.timer = 0
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   if not dialog.active then return end
   dialog.timer = dialog.timer + dt
   if dialog.timer >= dialog.speed then
@@ -387,7 +387,7 @@ function luna.update(dt)
   end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if dialog.active and (key == "space" or key == "return") then
     if dialog.char_idx < #dialog.text then
       dialog.char_idx = #dialog.text
@@ -399,14 +399,14 @@ end
 
 local function drawDialog()
   if not dialog.active then return end
-  luna.graphics.setColor(0, 0, 0, 0.85)
-  luna.graphics.rectangle("fill", 50, 400, 700, 150)
-  luna.graphics.setColor(0.7, 0.7, 0.9)
-  luna.graphics.rectangle("line", 50, 400, 700, 150)
-  luna.graphics.setColor(0.9, 0.8, 1)
-  luna.graphics.print(dialog.speaker, 70, 410)
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print(string.sub(dialog.text, 1, dialog.char_idx), 70, 440)
+  lurek.graphics.setColor(0, 0, 0, 0.85)
+  lurek.graphics.rectangle("fill", 50, 400, 700, 150)
+  lurek.graphics.setColor(0.7, 0.7, 0.9)
+  lurek.graphics.rectangle("line", 50, 400, 700, 150)
+  lurek.graphics.setColor(0.9, 0.8, 1)
+  lurek.graphics.print(dialog.speaker, 70, 410)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print(string.sub(dialog.text, 1, dialog.char_idx), 70, 440)
 end`,
   },
   {
@@ -417,7 +417,7 @@ end`,
   selected = 1,
 }
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "up" then
     menu.selected = menu.selected - 1
     if menu.selected < 1 then menu.selected = #menu.items end
@@ -426,21 +426,21 @@ function luna.keypressed(key)
     if menu.selected > #menu.items then menu.selected = 1 end
   elseif key == "return" then
     if menu.items[menu.selected] == "Quit" then
-      luna.event.quit()
+      lurek.event.quit()
     end
   end
 end
 
-function luna.draw()
-  luna.graphics.setBackgroundColor(0.1, 0.1, 0.15)
+function lurek.draw()
+  lurek.graphics.setBackgroundColor(0.1, 0.1, 0.15)
   for i, item in ipairs(menu.items) do
     local y = 200 + (i - 1) * 50
     if i == menu.selected then
-      luna.graphics.setColor(1, 0.9, 0.2)
-      luna.graphics.print("> " .. item, 300, y)
+      lurek.graphics.setColor(1, 0.9, 0.2)
+      lurek.graphics.print("> " .. item, 300, y)
     else
-      luna.graphics.setColor(0.7, 0.7, 0.7)
-      luna.graphics.print("  " .. item, 300, y)
+      lurek.graphics.setColor(0.7, 0.7, 0.7)
+      lurek.graphics.print("  " .. item, 300, y)
     end
   end
 end`,
@@ -452,25 +452,25 @@ end`,
 
 local function drawMinimap(world_objects, player, world_w, world_h)
   -- Background
-  luna.graphics.setColor(0, 0, 0, 0.6)
-  luna.graphics.rectangle("fill", minimap.x, minimap.y, minimap.w, minimap.h)
-  luna.graphics.setColor(0.5, 0.5, 0.5)
-  luna.graphics.rectangle("line", minimap.x, minimap.y, minimap.w, minimap.h)
+  lurek.graphics.setColor(0, 0, 0, 0.6)
+  lurek.graphics.rectangle("fill", minimap.x, minimap.y, minimap.w, minimap.h)
+  lurek.graphics.setColor(0.5, 0.5, 0.5)
+  lurek.graphics.rectangle("line", minimap.x, minimap.y, minimap.w, minimap.h)
 
   local sx = minimap.w / world_w
   local sy = minimap.h / world_h
 
   -- Objects
-  luna.graphics.setColor(0.4, 0.4, 0.6)
+  lurek.graphics.setColor(0.4, 0.4, 0.6)
   for _, obj in ipairs(world_objects) do
-    luna.graphics.rectangle("fill",
+    lurek.graphics.rectangle("fill",
       minimap.x + obj.x * sx, minimap.y + obj.y * sy,
       math.max(obj.w * sx, 2), math.max(obj.h * sy, 2))
   end
 
   -- Player dot
-  luna.graphics.setColor(0, 1, 0)
-  luna.graphics.circle("fill", minimap.x + player.x * sx, minimap.y + player.y * sy, 3)
+  lurek.graphics.setColor(0, 1, 0)
+  lurek.graphics.circle("fill", minimap.x + player.x * sx, minimap.y + player.y * sy, 3)
 end`,
   },
 
@@ -482,23 +482,23 @@ end`,
 
 local function playMusic(file)
   if music.current then
-    luna.audio.stop(music.current)
+    lurek.audio.stop(music.current)
   end
-  music.current = luna.audio.newSource(file, "stream")
-  luna.audio.setVolume(music.current, music.volume)
-  luna.audio.play(music.current)
+  music.current = lurek.audio.newSource(file, "stream")
+  lurek.audio.setVolume(music.current, music.volume)
+  lurek.audio.play(music.current)
 end
 
 local function setMusicVolume(vol)
   music.volume = math.max(0, math.min(1, vol))
   if music.current then
-    luna.audio.setVolume(music.current, music.volume)
+    lurek.audio.setVolume(music.current, music.volume)
   end
 end
 
 local function stopMusic()
   if music.current then
-    luna.audio.stop(music.current)
+    lurek.audio.stop(music.current)
     music.current = nil
   end
 end`,
@@ -509,16 +509,16 @@ end`,
     code: `local sfx = {}
 
 local function loadSFX(name, file)
-  sfx[name] = luna.audio.newSource(file, "static")
+  sfx[name] = lurek.audio.newSource(file, "static")
 end
 
 local function playSFX(name, volume, pitch)
   local s = sfx[name]
   if s then
-    local clone = luna.audio.clone(s)
-    luna.audio.setVolume(clone, volume or 1.0)
-    luna.audio.setPitch(clone, pitch or 1.0)
-    luna.audio.play(clone)
+    local clone = lurek.audio.clone(s)
+    lurek.audio.setVolume(clone, volume or 1.0)
+    lurek.audio.setPitch(clone, pitch or 1.0)
+    lurek.audio.play(clone)
   end
 end
 
@@ -531,20 +531,20 @@ end
     category: "Audio",
     code: `local master_volume = 1.0
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "+" or key == "=" then
     master_volume = math.min(master_volume + 0.1, 1.0)
-    luna.audio.setMasterVolume(master_volume)
+    lurek.audio.setMasterVolume(master_volume)
   elseif key == "-" then
     master_volume = math.max(master_volume - 0.1, 0.0)
-    luna.audio.setMasterVolume(master_volume)
+    lurek.audio.setMasterVolume(master_volume)
   elseif key == "m" then
     if master_volume > 0 then
       master_volume = 0
     else
       master_volume = 1.0
     end
-    luna.audio.setMasterVolume(master_volume)
+    lurek.audio.setMasterVolume(master_volume)
   end
 end`,
   },
@@ -555,24 +555,24 @@ end`,
 
 local function crossfadeTo(newMusic, duration)
   crossfade.from = crossfade.to or nil
-  crossfade.to = luna.audio.newSource(newMusic, "stream")
-  luna.audio.setVolume(crossfade.to, 0)
-  luna.audio.play(crossfade.to)
+  crossfade.to = lurek.audio.newSource(newMusic, "stream")
+  lurek.audio.setVolume(crossfade.to, 0)
+  lurek.audio.play(crossfade.to)
   crossfade.progress = 0
   crossfade.duration = duration or 2.0
   crossfade.active = true
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   if not crossfade.active then return end
   crossfade.progress = crossfade.progress + dt / crossfade.duration
   if crossfade.progress >= 1 then
     crossfade.progress = 1
     crossfade.active = false
-    if crossfade.from then luna.audio.stop(crossfade.from) end
+    if crossfade.from then lurek.audio.stop(crossfade.from) end
   end
-  if crossfade.from then luna.audio.setVolume(crossfade.from, 1 - crossfade.progress) end
-  if crossfade.to then luna.audio.setVolume(crossfade.to, crossfade.progress) end
+  if crossfade.from then lurek.audio.setVolume(crossfade.from, 1 - crossfade.progress) end
+  if crossfade.to then lurek.audio.setVolume(crossfade.to, crossfade.progress) end
 end`,
   },
 
@@ -599,13 +599,13 @@ end`,
       return tostring(val)
     end
   end
-  luna.filesystem.write(filename, "return " .. serialize(data))
+  lurek.filesystem.write(filename, "return " .. serialize(data))
 end
 
 local function loadGame(filename)
   filename = filename or "save.lua"
-  if not luna.filesystem.exists(filename) then return nil end
-  local content = luna.filesystem.read(filename)
+  if not lurek.filesystem.exists(filename) then return nil end
+  local content = lurek.filesystem.read(filename)
   local fn = load(content)
   return fn and fn() or nil
 end`,
@@ -621,8 +621,8 @@ end`,
 }
 
 local function loadConfig()
-  if luna.filesystem.exists("config.lua") then
-    local content = luna.filesystem.read("config.lua")
+  if lurek.filesystem.exists("config.lua") then
+    local content = lurek.filesystem.read("config.lua")
     local fn = load(content)
     if fn then
       local loaded = fn()
@@ -643,7 +643,7 @@ local function saveConfig()
     end
   end
   table.insert(lines, "}")
-  luna.filesystem.write("config.lua", table.concat(lines, "\\n"))
+  lurek.filesystem.write("config.lua", table.concat(lines, "\\n"))
 end`,
   },
   {
@@ -653,8 +653,8 @@ end`,
 local MAX_SCORES = 10
 
 local function loadScores()
-  if luna.filesystem.exists("scores.lua") then
-    local content = luna.filesystem.read("scores.lua")
+  if lurek.filesystem.exists("scores.lua") then
+    local content = lurek.filesystem.read("scores.lua")
     local fn = load(content)
     if fn then scores = fn() or {} end
   end
@@ -666,7 +666,7 @@ local function saveScores()
     table.insert(lines, string.format('  { name = %q, score = %d },', entry.name, entry.score))
   end
   table.insert(lines, "}")
-  luna.filesystem.write("scores.lua", table.concat(lines, "\\n"))
+  lurek.filesystem.write("scores.lua", table.concat(lines, "\\n"))
 end
 
 local function addScore(name, score)
@@ -742,9 +742,9 @@ function listPatternFiles(extensionPath: string): Array<{ name: string; fullPath
 // ─── Commands ─────────────────────────────────────────────
 
 export function registerLibraryCommands(context: vscode.ExtensionContext): void {
-  // ── luna.library.browse ──────────────────────────────────
+  // ── lurek.library.browse ──────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.library.browse", async () => {
+    vscode.commands.registerCommand("lurek.library.browse", async () => {
       const patterns = listPatternFiles(context.extensionPath);
       if (patterns.length === 0) {
         vscode.window.showInformationMessage("No patterns found in data/patterns/.");
@@ -757,7 +757,7 @@ export function registerLibraryCommands(context: vscode.ExtensionContext): void 
           description: `data/patterns/${p.name}.lua`,
           fullPath: p.fullPath,
         })),
-        { placeHolder: "Browse Luna2D patterns" }
+        { placeHolder: "Browse Lurek2D patterns" }
       );
       if (!picked) {
         return;
@@ -809,9 +809,9 @@ export function registerLibraryCommands(context: vscode.ExtensionContext): void 
     })
   );
 
-  // ── luna.library.insertSnippet ───────────────────────────
+  // ── lurek.library.insertSnippet ───────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.library.insertSnippet", async () => {
+    vscode.commands.registerCommand("lurek.library.insertSnippet", async () => {
       const categories = getCategories();
 
       const catPick = await vscode.window.showQuickPick(
@@ -849,9 +849,9 @@ export function registerLibraryCommands(context: vscode.ExtensionContext): void 
     })
   );
 
-  // ── luna.library.newPattern ──────────────────────────────
+  // ── lurek.library.newPattern ──────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.library.newPattern", async () => {
+    vscode.commands.registerCommand("lurek.library.newPattern", async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor || editor.selection.isEmpty) {
         vscode.window.showWarningMessage("Select some Lua code first to create a pattern from it.");
@@ -888,7 +888,7 @@ export function registerLibraryCommands(context: vscode.ExtensionContext): void 
       });
 
       const header = [
-        `--- ${name} pattern for Luna2D.`,
+        `--- ${name} pattern for Lurek2D.`,
         `--- ${description ?? "Custom pattern."}`,
         `---`,
         `--- Category: ${category ?? "general"}`,

@@ -1,3 +1,12 @@
+-- @covers lurek.fs.exists
+-- @covers lurek.fs.load
+-- @covers lurek.fs.mount
+-- @covers lurek.fs.newFileData
+-- @covers lurek.fs.read
+-- @covers lurek.fs.remove
+-- @covers lurek.fs.unmount
+-- @covers lurek.fs.write
+
 ﻿-- Lurek2D Filesystem API Tests
 
 describe("lurek.fs module exists", function()

@@ -1,5 +1,10 @@
 -- Lurek2D Integration Test: Math + Graphics (headless-safe)
 -- Tests math operations used in graphics contexts without requiring GPU
+-- @covers lurek.math.abs
+-- @covers lurek.math.cos
+-- @covers lurek.math.floor
+-- @covers lurek.math.sin
+
 
 describe("math for graphics transformations", function()
     it("rotation matrix components", function()

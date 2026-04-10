@@ -18,6 +18,26 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.34] — 2026-04-12
+### Added
+- **Parallax background system** (`src/parallax/`, `src/lua_api/parallax_api.rs`) — new Tier 2 module providing `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`. Features: per-layer scroll factor (X and Y independently), autoscroll (ambient drift via `rem_euclid`-bounded accumulator), horizontal and vertical texture tiling, opacity, RGBA tint, blend modes, z-ordering, visibility, and pixel-offset clamping. `ParallaxSet` batches update/draw calls and auto-sorts layers by z on add. `drawAuto()` reads `SharedState.camera.position`; `draw(cam_x, cam_y)` accepts explicit camera position. New `ModulesConfig.parallax` flag (default `true`, requires graphics). Tests: `tests/lua/unit/test_parallax.lua`, `tests/lua/integration/test_parallax_camera.lua`. Spec: `docs/specs/parallax.md`.
+
+---
+
+## [0.6.33] — 2026-04-10
+### Added
+- **VS Code extension — type inference** (`typeInference.ts`) — rewrote type inference engine: 25+ factory return types (Canvas, Image, Font, Shader, Entity, Timer, Tween, World, Body, ParticleSystem, etc.), dot-access now shows both fields and methods (fixes missing Canvas method completions), colon-access completions, OOP class instance tracking via `setmetatable`, module alias detection (`local gfx = lurek.graphics`), variable re-assignment tracking, hover provider showing type and factory origin.
+- **VS Code extension — diagnostics** (`diagnostics.ts`) — 4 new diagnostic rules (total now 13): per-frame allocation warning (newImage/newSource/newFont/newCanvas/newShader inside update/draw callbacks), missing `test_summary()` in test files, entity nil access without guard, colon-vs-dot method call suggestion.
+- **VS Code extension — debug adapter** (`luaDebugAdapter.ts`) — auto-detect game path from active editor (finds nearest `main.lua`), auto-detect engine binary from workspace `build/` folder, 4 launch configurations (Debug Game, Debug Current Demo, Debug with Stop on Entry, Attach to Running). Improved `luaDebugSession.ts` with `build/debug`/`build/release` binary scanning, increased retries from 3→5, delay from 500→800ms.
+- **VS Code extension — sidebar** (`sidebar.ts`) — Project Health section (main.lua/conf.lua detection, Lua file count, test folder detection), game status indicator in Run section, last test result display in Testing section, state tracking methods.
+- **VS Code extension — test infrastructure** — new test framework: `src/test/mocks/vscode.ts` (MockTextDocument, MockPosition, MockRange, MockCancellationToken), `src/test/unit/typeInference.test.ts` (23 tests covering factory types, scanDocument, getTypeInfoForVar, getMethodsForVar), `src/test/unit/luaParser.test.ts` (26 tests covering tokenization, analysis, utility methods), mocha runner infrastructure (`runTest.ts`, `suite/index.ts`).
+### Changed
+- **VS Code extension — build** (`esbuild.config.mjs`) — added `--test` flag for compiling test files alongside main bundle; updated test externals.
+- **VS Code extension — architecture doc** (`docs/architecture/vscode-architecture.md`) — updated to v0.9.0: extension2.ts as active entry point, 13 diagnostic rules, full type inference description, test infrastructure section, correct build pipeline (esbuild → dist/), sidebar features, debug auto-detect.
+- **VS Code extension — runtime/sidebar fixes** (`extensions/vscode/`) — corrected broken sidebar command IDs for Library and Game Jam actions, rebuilt Asset Explorer to scan the actual game root and render nested folders, switched API reference lookups to `docs/API/lua-api.md`, and repackaged/reinstalled the extension to replace stale local installs that were still serving old command/view registrations.
+- **VS Code extension — API source of truth** (`extensions/vscode/src/services/apiData.ts`, `extensions/vscode/src/services/apiDocs.ts`) — the extension now prefers `docs/API/lurek.lua` as the workspace API source, parses its LuaCATS `@param` / `@return` annotations for richer signatures, and uses the same source for command search and MCP API lookups instead of falling back to the compact markdown reference first.
+- **VS Code extension — sidebar activation manifest** (`extensions/vscode/package.json`, `extensions/vscode/src/test/unit/commandRegistration.test.ts`) — added manifest contributions for the sidebar's editor, API, CAG, debug, packaging, and tooling commands so VS Code can resolve clicked items reliably, and added a regression test that checks the reported sidebar command IDs are both contributed and registered after activation.
+
 ## [0.6.32] — 2026-04-10
 ### Changed
 - **Test skill** (`testing-rust/SKILL.md`) — expanded BDD assertion table with `expect_greater`, `expect_less`, `expect_in_range`, `expect_contains`, `expect_match`, `expect_length`, `expect_deep_equal`; added "Performance and Golden helpers" subsection documenting `measure()`, `expect_golden()`, `expect_canvas_pixel()`; expanded "Golden Tests" section with Lua golden test pattern; added section 9 "Marker Annotations" (`@covers` syntax, placement rules, describe-block naming, scanner commands); added section 10 "Evidence-Based Testing" (all 3 tiers with code examples, evidence tags table).

@@ -503,6 +503,10 @@ name = "golden_tests"
 path = "tests/rust/golden/harness.rs"
 
 [[test]]
+name = "evidence_tests"
+path = "tests/rust/golden/evidence.rs"
+
+[[test]]
 name = "lua_tests"
 path = "tests/lua/harness.rs"
 

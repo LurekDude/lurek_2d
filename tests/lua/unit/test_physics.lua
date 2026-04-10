@@ -1,4 +1,18 @@
 -- Lurek2D Physics API Tests
+-- @covers lurek.physics.attachShape
+-- @covers lurek.physics.getBody
+-- @covers lurek.physics.isSleepingAllowed
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.newChainShape
+-- @covers lurek.physics.newCircleShape
+-- @covers lurek.physics.newEdgeShape
+-- @covers lurek.physics.newPolygonShape
+-- @covers lurek.physics.newRectangleShape
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.setBodyVelocity
+-- @covers lurek.physics.setSleepingAllowed
+-- @covers lurek.physics.step
+
 
 describe("lurek.physics module exists", function()
     it("lurek.physics is a table", function()

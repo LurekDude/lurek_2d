@@ -7,7 +7,7 @@ export class QuestTreeEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.questTree", "Quest / Tech Tree Editor");
+    super(context, "lurek.editor.questTree", "Quest / Tech Tree Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

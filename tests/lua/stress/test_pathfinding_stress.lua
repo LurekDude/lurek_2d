@@ -1,5 +1,9 @@
 -- Lurek2D Stress Test: Pathfinding on Large Grids
 -- Tests A* and flow field computation at scale
+-- @stress lurek.pathfinding.newFlowField
+-- @stress lurek.pathfinding.newNavGrid
+-- @stress lurek.pathfinding.newPathfinder
+
 
 describe("pathfinding stress: large grid A*", function()
     it("pathfinds on a 200x200 open grid", function()

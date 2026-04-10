@@ -24,7 +24,7 @@ fn inventory_new_item_default_type() {
     let result: String = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         return item:getType()
     "#,
         )
@@ -39,7 +39,7 @@ fn inventory_item_weight() {
     let w: f64 = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("rock")
+        local item = lurek.inventory.newItem("rock")
         item:setWeight(3.5)
         return item:getWeight()
     "#,
@@ -55,7 +55,7 @@ fn inventory_item_size() {
     let (w, h): (u32, u32) = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("potion")
+        local item = lurek.inventory.newItem("potion")
         item:setSize(2, 3)
         return item:getSize()
     "#,
@@ -71,7 +71,7 @@ fn inventory_item_stack_limit() {
     let n: u32 = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("arrow")
+        local item = lurek.inventory.newItem("arrow")
         item:setStackLimit(99)
         return item:getStackLimit()
     "#,
@@ -87,7 +87,7 @@ fn inventory_item_tags() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:addTag("weapon")
         item:addTag("metal")
         return item:hasTag("weapon") and not item:hasTag("armor")
@@ -104,7 +104,7 @@ fn inventory_item_remove_tag() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:addTag("weapon")
         item:removeTag("weapon")
         return item:hasTag("weapon")
@@ -121,7 +121,7 @@ fn inventory_item_clone() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:setWeight(5.0)
         local copy = item:clone()
         copy:setWeight(1.0)
@@ -139,7 +139,7 @@ fn inventory_item_type_method() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("bow")
+        local item = lurek.inventory.newItem("bow")
         return item:type() == "Item"
     "#,
         )
@@ -156,9 +156,9 @@ fn inventory_itemstack_new() {
     let qty: u32 = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("potion")
+        local item = lurek.inventory.newItem("potion")
         item:setStackLimit(10)
-        local stack = luna.inventory.newItemStack(item, 5)
+        local stack = lurek.inventory.newItemStack(item, 5)
         return stack:getQuantity()
     "#,
         )
@@ -173,9 +173,9 @@ fn inventory_itemstack_add_remove() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("potion")
+        local item = lurek.inventory.newItem("potion")
         item:setStackLimit(10)
-        local stack = luna.inventory.newItemStack(item, 5, 10)
+        local stack = lurek.inventory.newItemStack(item, 5, 10)
         local leftover = stack:add(3)
         local removed = stack:remove(2)
         return stack:getQuantity() == 6 and leftover == 0 and removed == 2
@@ -192,9 +192,9 @@ fn inventory_itemstack_is_full() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("coin")
+        local item = lurek.inventory.newItem("coin")
         item:setStackLimit(10)
-        local stack = luna.inventory.newItemStack(item, 10, 10)
+        local stack = lurek.inventory.newItemStack(item, 10, 10)
         return stack:isFull()
     "#,
         )
@@ -209,9 +209,9 @@ fn inventory_itemstack_split() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("gem")
+        local item = lurek.inventory.newItem("gem")
         item:setStackLimit(20)
-        local stack = luna.inventory.newItemStack(item, 8, 20)
+        local stack = lurek.inventory.newItemStack(item, 8, 20)
         local half = stack:split(4)
         return stack:getQuantity() == 4 and half ~= nil and half:getQuantity() == 4
     "#,
@@ -227,10 +227,10 @@ fn inventory_itemstack_merge() {
     let res: bool = lua
         .load(
             r#"
-        local item = luna.inventory.newItem("coin")
+        local item = lurek.inventory.newItem("coin")
         item:setStackLimit(10)
-        local a = luna.inventory.newItemStack(item, 4, 10)
-        local b = luna.inventory.newItemStack(item, 3, 10)
+        local a = lurek.inventory.newItemStack(item, 4, 10)
+        local b = lurek.inventory.newItemStack(item, 3, 10)
         local leftover = a:merge(b)
         return a:getQuantity() == 7 and leftover == 0
     "#,
@@ -248,7 +248,7 @@ fn inventory_slot_new_and_state() {
     let res: bool = lua
         .load(
             r#"
-        local slot = luna.inventory.newSlot("weapon", "active")
+        local slot = lurek.inventory.newSlot("weapon", "active")
         return slot:getType() == "weapon" and slot:getState() == "active"
     "#,
         )
@@ -263,9 +263,9 @@ fn inventory_slot_can_accept() {
     let res: bool = lua
         .load(
             r#"
-        local slot = luna.inventory.newSlot("any", "active")
+        local slot = lurek.inventory.newSlot("any", "active")
         slot:setCapacity(1, 1)
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:setSize(1, 1)
         return slot:canAccept(item)
     "#,
@@ -281,12 +281,12 @@ fn inventory_slot_set_and_clear() {
     let res: bool = lua
         .load(
             r#"
-        local slot = luna.inventory.newSlot("any", "active")
+        local slot = lurek.inventory.newSlot("any", "active")
         slot:setCapacity(2, 2)
-        local item = luna.inventory.newItem("potion")
+        local item = lurek.inventory.newItem("potion")
         item:setSize(1, 1)
         item:setStackLimit(5)
-        local stack = luna.inventory.newItemStack(item, 1, 5)
+        local stack = lurek.inventory.newItemStack(item, 1, 5)
         local placed = slot:setStack(stack)
         local empty_before = slot:isEmpty()
         slot:clear()
@@ -306,7 +306,7 @@ fn inventory_container_new_and_slot_count() {
     let n: u32 = lua
         .load(
             r#"
-        local c = luna.inventory.newContainer("backpack", "fixed", 5)
+        local c = lurek.inventory.newContainer("backpack", "fixed", 5)
         return c:getSlotCount()
     "#,
         )
@@ -321,7 +321,7 @@ fn inventory_container_expand() {
     let res: bool = lua
         .load(
             r#"
-        local c = luna.inventory.newContainer("chest", "expandable", 3)
+        local c = lurek.inventory.newContainer("chest", "expandable", 3)
         c:setMaxSlots(10)
         local ok = c:expand(4)
         return ok and c:getSlotCount() == 7
@@ -338,7 +338,7 @@ fn inventory_container_get_slot() {
     let res: bool = lua
         .load(
             r#"
-        local c = luna.inventory.newContainer("bag", "fixed", 3)
+        local c = lurek.inventory.newContainer("bag", "fixed", 3)
         local slot = c:getSlot(1)
         return slot ~= nil
     "#,
@@ -354,9 +354,9 @@ fn inventory_container_weight() {
     let res: bool = lua
         .load(
             r#"
-        local c = luna.inventory.newContainer("bag", "fixed", 5)
+        local c = lurek.inventory.newContainer("bag", "fixed", 5)
         c:setWeightLimit(20.0)
-        local item = luna.inventory.newItem("rock")
+        local item = lurek.inventory.newItem("rock")
         item:setWeight(5.0)
         item:setStackLimit(10)
         c:addItem(item, 2)
@@ -377,8 +377,8 @@ fn inventory_add_and_get_container() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
-        local c = luna.inventory.newContainer("backpack", "fixed", 5)
+        local inv = lurek.inventory.newInventory()
+        local c = lurek.inventory.newContainer("backpack", "fixed", 5)
         inv:addContainer("backpack", c)
         local got = inv:getContainer("backpack")
         return got ~= nil and got:getName() == "backpack"
@@ -395,14 +395,14 @@ fn inventory_equip_and_unequip() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
-        local slot = luna.inventory.newSlot("any", "active")
+        local inv = lurek.inventory.newInventory()
+        local slot = lurek.inventory.newSlot("any", "active")
         slot:setCapacity(2, 2)
         inv:addEquipSlot("mainhand", slot)
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:setSize(1, 1)
         item:setStackLimit(1)
-        local stack = luna.inventory.newItemStack(item, 1, 1)
+        local stack = lurek.inventory.newItemStack(item, 1, 1)
         local ok = inv:equip("mainhand", stack)
         local equipped = inv:getEquipped("mainhand")
         inv:unequip("mainhand")
@@ -421,19 +421,19 @@ fn inventory_item_set_active() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
-        local slot = luna.inventory.newSlot("any", "active")
+        local inv = lurek.inventory.newInventory()
+        local slot = lurek.inventory.newSlot("any", "active")
         slot:setCapacity(2, 2)
         inv:addEquipSlot("mainhand", slot)
         -- Equip an item with tag "weapon"
-        local item = luna.inventory.newItem("sword")
+        local item = lurek.inventory.newItem("sword")
         item:addTag("weapon")
         item:setSize(1, 1)
         item:setStackLimit(1)
-        local stack = luna.inventory.newItemStack(item, 1, 1)
+        local stack = lurek.inventory.newItemStack(item, 1, 1)
         inv:equip("mainhand", stack)
         -- Create set requiring "weapon" in mainhand
-        local set = luna.inventory.newItemSet("swordsman")
+        local set = lurek.inventory.newItemSet("swordsman")
         set:addRequirement("weapon", "mainhand")
         inv:addItemSet(set)
         local active = inv:getActiveSets()
@@ -451,7 +451,7 @@ fn inventory_subsystems() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
+        local inv = lurek.inventory.newInventory()
         inv:enableSubsystem("weight")
         inv:enableSubsystem("size")
         local w = inv:isSubsystemEnabled("weight")
@@ -472,10 +472,10 @@ fn inventory_transfer_between_containers() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
-        local src = luna.inventory.newContainer("src", "fixed", 3)
-        local dst = luna.inventory.newContainer("dst", "fixed", 3)
-        local item = luna.inventory.newItem("gem")
+        local inv = lurek.inventory.newInventory()
+        local src = lurek.inventory.newContainer("src", "fixed", 3)
+        local dst = lurek.inventory.newContainer("dst", "fixed", 3)
+        local item = lurek.inventory.newItem("gem")
         item:setSize(1,1)
         item:setStackLimit(5)
         src:addItem(item, 2)
@@ -496,7 +496,7 @@ fn inventory_type_method() {
     let res: bool = lua
         .load(
             r#"
-        local inv = luna.inventory.newInventory()
+        local inv = lurek.inventory.newInventory()
         return inv:type() == "Inventory"
     "#,
         )
@@ -509,8 +509,8 @@ fn inventory_type_method() {
 fn container_count_item() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.inventory.newContainer("main")
-        c:addItem(luna.inventory.newItem("sword"), 3)
+        local c = lurek.inventory.newContainer("main")
+        c:addItem(lurek.inventory.newItem("sword"), 3)
         assert(c:countItem("sword") == 3, "count 3 swords")
         assert(c:countItem("shield") == 0, "0 shields")
     "#).exec().unwrap();
@@ -520,8 +520,8 @@ fn container_count_item() {
 fn container_has_item() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.inventory.newContainer("main")
-        c:addItem(luna.inventory.newItem("potion"), 5)
+        local c = lurek.inventory.newContainer("main")
+        c:addItem(lurek.inventory.newItem("potion"), 5)
         assert(c:hasItem("potion"), "has at least 1")
         assert(c:hasItem("potion", 5), "has 5")
         assert(not c:hasItem("potion", 6), "doesn't have 6")
@@ -532,8 +532,8 @@ fn container_has_item() {
 fn container_remove_item() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.inventory.newContainer("main")
-        c:addItem(luna.inventory.newItem("arrow"), 10)
+        local c = lurek.inventory.newContainer("main")
+        c:addItem(lurek.inventory.newItem("arrow"), 10)
         local ok = c:removeItem("arrow", 4)
         assert(ok, "remove 4 ok")
         assert(c:countItem("arrow") == 6, "6 arrows left")
@@ -547,9 +547,9 @@ fn container_remove_item() {
 fn container_to_list() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.inventory.newContainer("main")
-        c:addItem(luna.inventory.newItem("gem"), 2)
-        c:addItem(luna.inventory.newItem("herb"), 7)
+        local c = lurek.inventory.newContainer("main")
+        c:addItem(lurek.inventory.newItem("gem"), 2)
+        c:addItem(lurek.inventory.newItem("herb"), 7)
         local list = c:toList()
         assert(#list == 2, "2 item entries")
         local found = {}
@@ -565,9 +565,9 @@ fn container_to_list() {
 fn inventory_has_item_cross_container() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local c1 = luna.inventory.newContainer("main")
-        c1:addItem(luna.inventory.newItem("coin"), 5)
+        local inv = lurek.inventory.newInventory()
+        local c1 = lurek.inventory.newContainer("main")
+        c1:addItem(lurek.inventory.newItem("coin"), 5)
         inv:addContainer("main", c1)
         assert(inv:hasItem("coin", 5), "has 5 coins")
         assert(not inv:hasItem("coin", 6), "not 6")
@@ -578,9 +578,9 @@ fn inventory_has_item_cross_container() {
 fn inventory_remove_from_any() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local c = luna.inventory.newContainer("main")
-        c:addItem(luna.inventory.newItem("grain"), 8)
+        local inv = lurek.inventory.newInventory()
+        local c = lurek.inventory.newContainer("main")
+        c:addItem(lurek.inventory.newItem("grain"), 8)
         inv:addContainer("main", c)
         assert(inv:countItem("grain") == 8, "8 grain")
         local ok = inv:removeFromAny("grain", 5)
@@ -598,7 +598,7 @@ fn inventory_remove_from_any() {
 fn inventory_item_resource_ref() {
     let lua = make_vm();
     lua.load(r#"
-        local it = luna.inventory.newItem("sword")
+        local it = lurek.inventory.newItem("sword")
         assert(it:getResourceRef() == nil, "nil by default")
         it:setResourceRef("sprites/sword.png")
         assert(it:getResourceRef() == "sprites/sword.png", "stores string")
@@ -614,7 +614,7 @@ fn inventory_item_resource_ref() {
 fn inventory_item_user_data() {
     let lua = make_vm();
     lua.load(r#"
-        local it = luna.inventory.newItem("potion")
+        local it = lurek.inventory.newItem("potion")
         assert(it:getUserData() == nil, "nil by default")
         it:setUserData({ heal = 50, cooldown = 3.0 })
         local ud = it:getUserData()
@@ -627,7 +627,7 @@ fn inventory_item_user_data() {
 fn inventory_item_clone_preserves_type() {
     let lua = make_vm();
     lua.load(r#"
-        local it = luna.inventory.newItem("axe")
+        local it = lurek.inventory.newItem("axe")
         it:setWeight(5.0)
         local copy = it:clone()
         assert(copy:getType() == "axe", "type preserved")
@@ -641,11 +641,11 @@ fn inventory_item_clone_preserves_type() {
 fn inventory_slot_get_item() {
     let lua = make_vm();
     lua.load(r#"
-        local slot = luna.inventory.newSlot("any")
+        local slot = lurek.inventory.newSlot("any")
         assert(slot:getItem() == nil, "nil when empty")
-        local it = luna.inventory.newItem("sword")
+        local it = lurek.inventory.newItem("sword")
         it:setWeight(3.0)
-        local stack = luna.inventory.newItemStack(it, 1, 1)
+        local stack = lurek.inventory.newItemStack(it, 1, 1)
         slot:setStack(stack)
         local got = slot:getItem()
         assert(got ~= nil, "got item")
@@ -657,7 +657,7 @@ fn inventory_slot_get_item() {
 fn inventory_itemset_requirement_count() {
     let lua = make_vm();
     lua.load(r#"
-        local set = luna.inventory.newItemSet("warrior")
+        local set = lurek.inventory.newItemSet("warrior")
         assert(set:getRequirementCount() == 0, "empty")
         set:addRequirement("heavy_armor", "chest")
         set:addRequirement("heavy_armor", "legs")
@@ -669,20 +669,20 @@ fn inventory_itemset_requirement_count() {
 fn inventory_itemset_is_active() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local slot = luna.inventory.newSlot("any", "active")
+        local inv = lurek.inventory.newInventory()
+        local slot = lurek.inventory.newSlot("any", "active")
         inv:addEquipSlot("head", slot)
 
-        local set = luna.inventory.newItemSet("plate")
+        local set = lurek.inventory.newItemSet("plate")
         set:addRequirement("heavy", "head")
 
         -- not active yet
         assert(not set:isActive(inv), "not active before equip")
 
         -- equip an item with "heavy" tag
-        local it = luna.inventory.newItem("helm")
+        local it = lurek.inventory.newItem("helm")
         it:addTag("heavy")
-        local stack = luna.inventory.newItemStack(it, 1, 1)
+        local stack = lurek.inventory.newItemStack(it, 1, 1)
         inv:equip("head", stack)
 
         assert(set:isActive(inv), "active after equip")
@@ -693,7 +693,7 @@ fn inventory_itemset_is_active() {
 fn inventory_itemset_bonus_ref() {
     let lua = make_vm();
     lua.load(r#"
-        local set = luna.inventory.newItemSet("mage")
+        local set = lurek.inventory.newItemSet("mage")
         assert(set:getBonusRef() == nil, "nil by default")
         set:setBonusRef({ spell_power = 10, mana_regen = 2 })
         local b = set:getBonusRef()
@@ -706,9 +706,9 @@ fn inventory_itemset_bonus_ref() {
 fn inventory_split_stack() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local c = luna.inventory.newContainer("bag", "fixed", 5)
-        local arrow = luna.inventory.newItem("arrow")
+        local inv = lurek.inventory.newInventory()
+        local c = lurek.inventory.newContainer("bag", "fixed", 5)
+        local arrow = lurek.inventory.newItem("arrow")
         arrow:setStackLimit(20)
         c:addItem(arrow, 20)
         inv:addContainer("bag", c)
@@ -729,10 +729,10 @@ fn inventory_split_stack() {
 fn inventory_merge_stacks() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local c = luna.inventory.newContainer("bag", "fixed", 5)
+        local inv = lurek.inventory.newInventory()
+        local c = lurek.inventory.newContainer("bag", "fixed", 5)
         -- stack_limit=10 so first addItem fills slot 0, second fills slot 1
-        local coin = luna.inventory.newItem("coin")
+        local coin = lurek.inventory.newItem("coin")
         coin:setStackLimit(10)
         c:addItem(coin, 10)
         c:addItem(coin, 5)
@@ -748,9 +748,9 @@ fn inventory_merge_stacks() {
 fn inventory_get_item_sets() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
-        local s1 = luna.inventory.newItemSet("warrior")
-        local s2 = luna.inventory.newItemSet("mage")
+        local inv = lurek.inventory.newInventory()
+        local s1 = lurek.inventory.newItemSet("warrior")
+        local s2 = lurek.inventory.newItemSet("mage")
         inv:addItemSet(s1)
         inv:addItemSet(s2)
 
@@ -765,7 +765,7 @@ fn inventory_get_item_sets() {
 fn inventory_callbacks() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
+        local inv = lurek.inventory.newInventory()
         local log = {}
 
         inv:setCallback("on_equip", function(slot, item)
@@ -792,7 +792,7 @@ fn inventory_callbacks() {
 fn inventory_callback_fire_missing_event() {
     let lua = make_vm();
     lua.load(r#"
-        local inv = luna.inventory.newInventory()
+        local inv = lurek.inventory.newInventory()
         -- firing a non-existent callback should not error
         inv:fireCallback("on_magic")
     "#).exec().unwrap();
@@ -802,7 +802,7 @@ fn inventory_callback_fire_missing_event() {
 fn inventory_split_stack_validates_index() {
     let lua = make_vm();
     let result = lua.load(r#"
-        local inv = luna.inventory.newInventory()
+        local inv = lurek.inventory.newInventory()
         inv:splitStack("bag", 0, 5)
     "#).exec();
     assert!(result.is_err(), "slot index 0 should fail");

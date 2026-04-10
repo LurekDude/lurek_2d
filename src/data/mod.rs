@@ -20,6 +20,8 @@ pub mod encode;
 pub mod hash;
 /// Binary pack/unpack utilities compatible with the LÖVE2D `data.pack` API.
 pub mod pack;
+/// TOML value parsing and encoding utilities.
+pub mod toml_convert;
 pub use bin_pack::{
     measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue,
 };

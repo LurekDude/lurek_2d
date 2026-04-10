@@ -139,8 +139,8 @@ fn phase_03_keyboard_lua_multi_key_is_down_returns_true_when_any_key_is_pressed(
 
     lua.load(
         r#"
-        assert(luna.keyboard.isDown("a", "space", "escape") == true)
-        assert(luna.keyboard.isDown("a", "escape") == false)
+        assert(lurek.keyboard.isDown("a", "space", "escape") == true)
+        assert(lurek.keyboard.isDown("a", "escape") == false)
         "#,
     )
     .exec()
@@ -153,11 +153,11 @@ fn phase_03_keyboard_lua_key_repeat_toggle_round_trips() {
 
     lua.load(
         r#"
-        assert(luna.keyboard.hasKeyRepeat() == false)
-        luna.keyboard.setKeyRepeat(true)
-        assert(luna.keyboard.hasKeyRepeat() == true)
-        luna.keyboard.setKeyRepeat(false)
-        assert(luna.keyboard.hasKeyRepeat() == false)
+        assert(lurek.keyboard.hasKeyRepeat() == false)
+        lurek.keyboard.setKeyRepeat(true)
+        assert(lurek.keyboard.hasKeyRepeat() == true)
+        lurek.keyboard.setKeyRepeat(false)
+        assert(lurek.keyboard.hasKeyRepeat() == false)
         "#,
     )
     .exec()
@@ -170,11 +170,11 @@ fn phase_03_keyboard_lua_text_input_toggle_round_trips() {
 
     lua.load(
         r#"
-        assert(luna.keyboard.hasTextInput() == false)
-        luna.keyboard.setTextInput(true)
-        assert(luna.keyboard.hasTextInput() == true)
-        luna.keyboard.setTextInput(false)
-        assert(luna.keyboard.hasTextInput() == false)
+        assert(lurek.keyboard.hasTextInput() == false)
+        lurek.keyboard.setTextInput(true)
+        assert(lurek.keyboard.hasTextInput() == true)
+        lurek.keyboard.setTextInput(false)
+        assert(lurek.keyboard.hasTextInput() == false)
         "#,
     )
     .exec()
@@ -184,7 +184,7 @@ fn phase_03_keyboard_lua_text_input_toggle_round_trips() {
 #[test]
 fn gamepad_lua_get_count_empty() {
     let (_state, lua) = make_vm();
-    lua.load("assert(luna.gamepad.getCount() == 0)")
+    lua.load("assert(lurek.gamepad.getCount() == 0)")
         .exec()
         .unwrap();
 }
@@ -195,8 +195,8 @@ fn gamepad_lua_is_connected() {
     state.borrow_mut().gamepads.push(GamepadState::new(0));
     lua.load(
         r#"
-        assert(luna.gamepad.isConnected(0) == true)
-        assert(luna.gamepad.isConnected(1) == false)
+        assert(lurek.gamepad.isConnected(0) == true)
+        assert(lurek.gamepad.isConnected(1) == false)
         "#,
     )
     .exec()
@@ -211,9 +211,9 @@ fn gamepad_lua_is_down() {
     state.borrow_mut().gamepads.push(gp);
     lua.load(
         r#"
-        assert(luna.gamepad.isDown(0, 0) == true)
-        assert(luna.gamepad.isDown(0, 1) == false)
-        assert(luna.gamepad.isDown(5, 0) == false)
+        assert(lurek.gamepad.isDown(0, 0) == true)
+        assert(lurek.gamepad.isDown(0, 1) == false)
+        assert(lurek.gamepad.isDown(5, 0) == false)
         "#,
     )
     .exec()
@@ -228,9 +228,9 @@ fn gamepad_lua_get_axis() {
     state.borrow_mut().gamepads.push(gp);
     lua.load(
         r#"
-        local v = luna.gamepad.getAxis(0, 1)
+        local v = lurek.gamepad.getAxis(0, 1)
         assert(math.abs(v - (-0.5)) < 0.001)
-        local zero = luna.gamepad.getAxis(0, 99)
+        local zero = lurek.gamepad.getAxis(0, 99)
         assert(math.abs(zero) < 0.001)
         "#,
     )
@@ -258,24 +258,24 @@ fn phase_03_gamepad_lua_inventory_and_metadata_contract() {
 
     lua.load(
         r#"
-        assert(luna.gamepad.getCount() == 2)
-        assert(luna.gamepad.getJoystickCount() == 2)
+        assert(lurek.gamepad.getCount() == 2)
+        assert(lurek.gamepad.getJoystickCount() == 2)
 
-        local ids = luna.gamepad.getJoysticks()
+        local ids = lurek.gamepad.getJoysticks()
         assert(type(ids) == "table")
         assert(#ids == 1)
         assert(ids[1] == 0)
 
-        assert(luna.gamepad.isConnected(0) == true)
-        assert(luna.gamepad.isConnected(1) == false)
-        assert(luna.gamepad.isGamepad(0) == true)
-        assert(luna.gamepad.isGamepad(1) == false)
-        assert(luna.gamepad.getName(0) == "Pad Zero")
-        assert(luna.gamepad.getButtonCount(0) == 1)
-        assert(luna.gamepad.getAxisCount(0) == 1)
-        assert(luna.gamepad.isDown(0, 0) == true)
-        assert(math.abs(luna.gamepad.getAxis(0, 1) - 0.25) < 0.001)
-        assert(luna.gamepad.isVibrationSupported(0) == false)
+        assert(lurek.gamepad.isConnected(0) == true)
+        assert(lurek.gamepad.isConnected(1) == false)
+        assert(lurek.gamepad.isGamepad(0) == true)
+        assert(lurek.gamepad.isGamepad(1) == false)
+        assert(lurek.gamepad.getName(0) == "Pad Zero")
+        assert(lurek.gamepad.getButtonCount(0) == 1)
+        assert(lurek.gamepad.getAxisCount(0) == 1)
+        assert(lurek.gamepad.isDown(0, 0) == true)
+        assert(math.abs(lurek.gamepad.getAxis(0, 1) - 0.25) < 0.001)
+        assert(lurek.gamepad.isVibrationSupported(0) == false)
         "#,
     )
     .exec()
@@ -380,11 +380,11 @@ fn mouse_lua_get_position() {
     state.borrow_mut().mouse.y = 200.0;
     lua.load(
         r#"
-        local x, y = luna.mouse.getPosition()
+        local x, y = lurek.mouse.getPosition()
         assert(math.abs(x - 100) < 0.01)
         assert(math.abs(y - 200) < 0.01)
-        assert(math.abs(luna.mouse.getX() - 100) < 0.01)
-        assert(math.abs(luna.mouse.getY() - 200) < 0.01)
+        assert(math.abs(lurek.mouse.getX() - 100) < 0.01)
+        assert(math.abs(lurek.mouse.getY() - 200) < 0.01)
         "#,
     )
     .exec()
@@ -397,9 +397,9 @@ fn mouse_lua_is_down_five_buttons() {
     state.borrow_mut().mouse.buttons[3] = true; // back button
     lua.load(
         r#"
-        assert(luna.mouse.isDown(4) == true)
-        assert(luna.mouse.isDown(1) == false)
-        assert(luna.mouse.isDown(5) == false)
+        assert(lurek.mouse.isDown(4) == true)
+        assert(lurek.mouse.isDown(1) == false)
+        assert(lurek.mouse.isDown(5) == false)
         "#,
     )
     .exec()
@@ -411,9 +411,9 @@ fn mouse_lua_visibility() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(luna.mouse.isVisible() == true)
-        luna.mouse.setVisible(false)
-        assert(luna.mouse.isVisible() == false)
+        assert(lurek.mouse.isVisible() == true)
+        lurek.mouse.setVisible(false)
+        assert(lurek.mouse.isVisible() == false)
         "#,
     )
     .exec()
@@ -425,9 +425,9 @@ fn mouse_lua_grabbed() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(luna.mouse.isGrabbed() == false)
-        luna.mouse.setGrabbed(true)
-        assert(luna.mouse.isGrabbed() == true)
+        assert(lurek.mouse.isGrabbed() == false)
+        lurek.mouse.setGrabbed(true)
+        assert(lurek.mouse.isGrabbed() == true)
         "#,
     )
     .exec()
@@ -439,9 +439,9 @@ fn mouse_lua_relative_mode() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(luna.mouse.getRelativeMode() == false)
-        luna.mouse.setRelativeMode(true)
-        assert(luna.mouse.getRelativeMode() == true)
+        assert(lurek.mouse.getRelativeMode() == false)
+        lurek.mouse.setRelativeMode(true)
+        assert(lurek.mouse.getRelativeMode() == true)
         "#,
     )
     .exec()
@@ -453,9 +453,9 @@ fn mouse_lua_cursor() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(luna.mouse.getCursor() == "arrow")
-        luna.mouse.setCursor("hand")
-        assert(luna.mouse.getCursor() == "hand")
+        assert(lurek.mouse.getCursor() == "arrow")
+        lurek.mouse.setCursor("hand")
+        assert(lurek.mouse.getCursor() == "hand")
         "#,
     )
     .exec()
@@ -468,7 +468,7 @@ fn mouse_lua_wheel_delta() {
     state.borrow_mut().mouse.accumulate_scroll(0.0, 3.0);
     lua.load(
         r#"
-        local dx, dy = luna.mouse.getWheelDelta()
+        local dx, dy = lurek.mouse.getWheelDelta()
         assert(math.abs(dx) < 0.01)
         assert(math.abs(dy - 3.0) < 0.01)
         "#,
@@ -544,11 +544,11 @@ fn touch_move_nonexistent_ignored() {
 #[test]
 fn touch_lua_get_touch_count() {
     let (state, lua) = make_vm();
-    lua.load("assert(luna.touch.getTouchCount() == 0)")
+    lua.load("assert(lurek.touch.getTouchCount() == 0)")
         .exec()
         .unwrap();
     state.borrow_mut().touch.touch_start(1, 10.0, 20.0, 1.0);
-    lua.load("assert(luna.touch.getTouchCount() == 1)")
+    lua.load("assert(lurek.touch.getTouchCount() == 1)")
         .exec()
         .unwrap();
 }
@@ -559,11 +559,11 @@ fn touch_lua_get_position() {
     state.borrow_mut().touch.touch_start(42, 123.0, 456.0, 0.9);
     lua.load(
         r#"
-        local x, y = luna.touch.getPosition(42)
+        local x, y = lurek.touch.getPosition(42)
         assert(math.abs(x - 123.0) < 0.01)
         assert(math.abs(y - 456.0) < 0.01)
         -- nonexistent touch returns 0,0
-        local nx, ny = luna.touch.getPosition(999)
+        local nx, ny = lurek.touch.getPosition(999)
         assert(math.abs(nx) < 0.01)
         assert(math.abs(ny) < 0.01)
         "#,
@@ -578,10 +578,10 @@ fn touch_lua_get_pressure() {
     state.borrow_mut().touch.touch_start(7, 50.0, 60.0, 0.75);
     lua.load(
         r#"
-        local p = luna.touch.getPressure(7)
+        local p = lurek.touch.getPressure(7)
         assert(math.abs(p - 0.75) < 0.01)
         -- nonexistent returns 0
-        local p2 = luna.touch.getPressure(999)
+        local p2 = lurek.touch.getPressure(999)
         assert(math.abs(p2) < 0.01)
         "#,
     )
@@ -596,7 +596,7 @@ fn touch_lua_get_touches() {
     state.borrow_mut().touch.touch_start(2, 30.0, 40.0, 1.0);
     lua.load(
         r#"
-        local touches = luna.touch.getTouches()
+        local touches = lurek.touch.getTouches()
         assert(#touches == 2)
         local by_id = {}
         for _, t in ipairs(touches) do
@@ -816,9 +816,9 @@ fn mouse_lua_get_system_cursor_returns_userdata() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local c = luna.mouse.getSystemCursor("arrow")
+        local c = lurek.mouse.getSystemCursor("arrow")
         assert(type(c) == "userdata")
-        local c2 = luna.mouse.getSystemCursor("hand")
+        local c2 = lurek.mouse.getSystemCursor("hand")
         assert(type(c2) == "userdata")
         "#,
     )
@@ -831,7 +831,7 @@ fn mouse_lua_is_cursor_supported() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ok = luna.mouse.isCursorSupported()
+        local ok = lurek.mouse.isCursorSupported()
         assert(type(ok) == "boolean")
         assert(ok == true)
         "#,
@@ -845,9 +845,9 @@ fn mouse_lua_set_cursor_with_userdata() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local c = luna.mouse.getSystemCursor("hand")
-        luna.mouse.setCursor(c)
-        assert(luna.mouse.getCursor() == "hand")
+        local c = lurek.mouse.getSystemCursor("hand")
+        lurek.mouse.setCursor(c)
+        assert(lurek.mouse.getCursor() == "hand")
         "#,
     )
     .exec()
@@ -859,9 +859,9 @@ fn mouse_lua_set_cursor_nil_resets_to_arrow() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        luna.mouse.setCursor("hand")
-        luna.mouse.setCursor(nil)
-        assert(luna.mouse.getCursor() == "arrow")
+        lurek.mouse.setCursor("hand")
+        lurek.mouse.setCursor(nil)
+        assert(lurek.mouse.getCursor() == "arrow")
         "#,
     )
     .exec()
@@ -873,10 +873,10 @@ fn keyboard_lua_is_modifier_active_returns_bool() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(type(luna.keyboard.isModifierActive("shift")) == "boolean")
-        assert(type(luna.keyboard.isModifierActive("ctrl")) == "boolean")
-        assert(luna.keyboard.isModifierActive("shift") == false)
-        assert(luna.keyboard.isModifierActive("capslock") == false)
+        assert(type(lurek.keyboard.isModifierActive("shift")) == "boolean")
+        assert(type(lurek.keyboard.isModifierActive("ctrl")) == "boolean")
+        assert(lurek.keyboard.isModifierActive("shift") == false)
+        assert(lurek.keyboard.isModifierActive("capslock") == false)
         "#,
     )
     .exec()
@@ -948,8 +948,8 @@ fn gamepad_mapping_lua_set_and_get() {
     lua.load(
         r#"
         local guid = "030000005e0400008e02000014010000"
-        luna.gamepad.setGamepadMapping(guid, guid .. ",XInput,a:b0")
-        local s = luna.gamepad.getGamepadMappingString(guid)
+        lurek.gamepad.setGamepadMapping(guid, guid .. ",XInput,a:b0")
+        local s = lurek.gamepad.getGamepadMappingString(guid)
         assert(type(s) == "string")
         assert(s:find("XInput") ~= nil)
         "#,
@@ -963,7 +963,7 @@ fn gamepad_mapping_lua_get_unknown_returns_nil() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local s = luna.gamepad.getGamepadMappingString("unknown")
+        local s = lurek.gamepad.getGamepadMappingString("unknown")
         assert(s == nil)
         "#,
     )

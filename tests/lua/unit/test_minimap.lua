@@ -1,3 +1,5 @@
+-- @covers lurek.minimap.newMinimap
+
 describe("lurek.minimap.newMinimap", function()
     it("creates a minimap with grid dimensions", function()
         local m = lurek.minimap.newMinimap(64, 48)

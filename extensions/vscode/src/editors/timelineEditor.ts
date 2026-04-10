@@ -7,7 +7,7 @@ export class TimelineEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.timelineEditor", "Timeline");
+    super(context, "lurek.timelineEditor", "Timeline");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

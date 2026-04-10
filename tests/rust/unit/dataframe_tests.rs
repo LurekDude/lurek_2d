@@ -44,13 +44,13 @@ fn cellvalue_as_number() {
 
 #[test]
 fn cellvalue_as_text() {
-    assert!(("hi" - CellValue::Text("hi".to_string()).as_text().unwrap()).abs() < 1e-5);
+    assert_eq!(CellValue::Text("hi".to_string()).as_text().unwrap(), "hi");
     assert!(CellValue::Number(1.0).as_text().is_none());
 }
 
 #[test]
 fn cellvalue_as_bool() {
-    assert!((true - CellValue::Bool(true).as_bool().unwrap()).abs() < 1e-5);
+    assert!(CellValue::Bool(true).as_bool().unwrap());
     assert!(CellValue::Nil.as_bool().is_none());
 }
 
@@ -61,12 +61,12 @@ fn cellvalue_display_nil() {
 
 #[test]
 fn cellvalue_display_number_integer() {
-    assert!((format!("{}" - CellValue::Number(42.0).abs() < 1e-5)), "42");
+    assert_eq!(format!("{}", CellValue::Number(42.0)), "42");
 }
 
 #[test]
 fn cellvalue_display_number_float() {
-    assert!((format!("{}" - CellValue::Number(3.14).abs() < 1e-5)), "3.14");
+    assert_eq!(format!("{}", CellValue::Number(3.14)), "3.14");
 }
 
 #[test]
@@ -92,9 +92,9 @@ fn cellvalue_debug_variants() {
 #[test]
 fn cellvalue_cmp_for_sort_nil_goes_last() {
     use std::cmp::Ordering;
-    assert!((Ordering::Greater - CellValue::Nil.cmp_for_sort(&CellValue::Number(1.0))).abs() < 1e-5);
-    assert!((Ordering::Less - CellValue::Number(1.0).cmp_for_sort(&CellValue::Nil)).abs() < 1e-5);
-    assert!((Ordering::Equal - CellValue::Nil.cmp_for_sort(&CellValue::Nil)).abs() < 1e-5);
+    assert_eq!(CellValue::Nil.cmp_for_sort(&CellValue::Number(1.0)), Ordering::Greater);
+    assert_eq!(CellValue::Number(1.0).cmp_for_sort(&CellValue::Nil), Ordering::Less);
+    assert_eq!(CellValue::Nil.cmp_for_sort(&CellValue::Nil), Ordering::Equal);
 }
 
 // ============================================================================
@@ -104,30 +104,31 @@ fn cellvalue_cmp_for_sort_nil_goes_last() {
 #[test]
 fn dataframe_new_empty() {
     let df = DataFrame::new();
-    assert!((0 - df.nrows()).abs() < 1e-5);
-    assert!((0 - df.ncols()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 0);
+    assert_eq!(df.ncols(), 0);
     assert!(df.columns().is_empty());
 }
 
 #[test]
 fn dataframe_default_is_empty() {
     let df = DataFrame::default();
-    assert!((0 - df.nrows()).abs() < 1e-5);
-    assert!((0 - df.ncols()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 0);
+    assert_eq!(df.ncols(), 0);
 }
 
 #[test]
 fn dataframe_from_raw() {
     let df = sample_df();
-    assert!((3 - df.nrows()).abs() < 1e-5);
-    assert!((2 - df.ncols()).abs() < 1e-5);
-    assert!((&["name", "score"] - df.columns()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 3);
+    assert_eq!(df.ncols(), 2);
+    let cols: Vec<&str> = df.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["name", "score"]);
 }
 
 #[test]
 fn dataframe_count_alias() {
     let df = sample_df();
-    assert!((df.nrows( - df.count()).abs() < 1e-5));
+    assert_eq!(df.nrows(), df.count());
 }
 
 // ============================================================================
@@ -139,11 +140,11 @@ fn dataframe_add_column() {
     let mut df = sample_df();
     df.add_column("grade", CellValue::Text("A".to_string()))
         .unwrap();
-    assert!((3 - df.ncols()).abs() < 1e-5);
-    assert!(("grade" - df.columns()[2]).abs() < 1e-5);
+    assert_eq!(df.ncols(), 3);
+    assert_eq!(df.columns()[2], "grade");
     // Default value filled for existing rows
     let col = df.get_column(ColRef::Name("grade".to_string())).unwrap();
-    assert!((3 - col.len()).abs() < 1e-5);
+    assert_eq!(col.len(), 3);
     assert_eq!(col[0], CellValue::Text("A".to_string()));
 }
 
@@ -158,8 +159,9 @@ fn dataframe_add_column_duplicate_errors() {
 fn dataframe_remove_column_by_name() {
     let mut df = sample_df();
     df.remove_column(ColRef::Name("score".to_string())).unwrap();
-    assert!((1 - df.ncols()).abs() < 1e-5);
-    assert!((&["name"] - df.columns()).abs() < 1e-5);
+    assert_eq!(df.ncols(), 1);
+    let cols: Vec<&str> = df.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["name"]);
 }
 
 #[test]
@@ -174,7 +176,8 @@ fn dataframe_rename_column() {
     let mut df = sample_df();
     df.rename_column(ColRef::Name("score".to_string()), "points")
         .unwrap();
-    assert!((&["name", "points"] - df.columns()).abs() < 1e-5);
+    let cols: Vec<&str> = df.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["name", "points"]);
 }
 
 #[test]
@@ -188,7 +191,7 @@ fn dataframe_rename_column_duplicate_errors() {
 fn dataframe_get_column_by_name() {
     let df = sample_df();
     let col = df.get_column(ColRef::Name("name".to_string())).unwrap();
-    assert!((3 - col.len()).abs() < 1e-5);
+    assert_eq!(col.len(), 3);
     assert_eq!(col[0], CellValue::Text("Alice".to_string()));
 }
 
@@ -197,7 +200,7 @@ fn dataframe_get_column_by_index() {
     let df = sample_df();
     // ColRef::Index is 1-based
     let col = df.get_column(ColRef::Index(2)).unwrap();
-    assert!((col[0] - CellValue::Number(90.0).abs() < 1e-5));
+    assert_eq!(col[0], CellValue::Number(90.0));
 }
 
 #[test]
@@ -226,7 +229,7 @@ fn dataframe_add_row_returns_index() {
         ("score".to_string(), CellValue::Number(95.0)),
     ]);
     assert_eq!(idx, 3);
-    assert!((4 - df.nrows()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 4);
 }
 
 #[test]
@@ -241,7 +244,7 @@ fn dataframe_add_row_missing_column_fills_nil() {
 fn dataframe_remove_row() {
     let mut df = sample_df();
     df.remove_row(1).unwrap();
-    assert!((2 - df.nrows()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 2);
     // Row 0 is still Alice, row 1 is now Charlie
     let val = df.get_value(1, ColRef::Name("name".to_string())).unwrap();
     assert_eq!(val, CellValue::Text("Charlie".to_string()));
@@ -257,11 +260,11 @@ fn dataframe_remove_row_out_of_range_errors() {
 fn dataframe_get_row() {
     let df = sample_df();
     let row = df.get_row(0).unwrap();
-    assert!((2 - row.len()).abs() < 1e-5);
-    assert!(("name" - row[0].0).abs() < 1e-5);
-    assert!((CellValue::Text("Alice".to_string( - row[0].1).abs() < 1e-5)));
-    assert!(("score" - row[1].0).abs() < 1e-5);
-    assert!((row[1].1 - CellValue::Number(90.0).abs() < 1e-5));
+    assert_eq!(row.len(), 2);
+    assert_eq!(row[0].0, "name");
+    assert_eq!(row[0].1, CellValue::Text("Alice".to_string()));
+    assert_eq!(row[1].0, "score");
+    assert_eq!(row[1].1, CellValue::Number(90.0));
 }
 
 #[test]
@@ -278,7 +281,7 @@ fn dataframe_get_row_out_of_range_errors() {
 fn dataframe_get_value() {
     let df = sample_df();
     let val = df.get_value(1, ColRef::Name("score".to_string())).unwrap();
-    assert!((val - CellValue::Number(75.0).abs() < 1e-5));
+    assert_eq!(val, CellValue::Number(75.0));
 }
 
 #[test]
@@ -291,7 +294,7 @@ fn dataframe_set_value() {
     )
     .unwrap();
     let val = df.get_value(0, ColRef::Name("score".to_string())).unwrap();
-    assert!((val - CellValue::Number(100.0).abs() < 1e-5));
+    assert_eq!(val, CellValue::Number(100.0));
 }
 
 #[test]
@@ -322,12 +325,9 @@ fn filter_equals() {
             &CellValue::Text("Bob".to_string()),
         )
         .unwrap();
-    assert!((1 - result.nrows()).abs() < 1e-5);
-    assert!((ColRef::Name("name".to_string( - result
-            .get_value(0).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("Bob".to_string())
-    );
+    assert_eq!(result.nrows(), 1);
+    let val = result.get_value(0, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Bob".to_string()));
 }
 
 #[test]
@@ -340,7 +340,7 @@ fn filter_not_equals() {
             &CellValue::Text("Bob".to_string()),
         )
         .unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 2);
 }
 
 #[test]
@@ -353,12 +353,9 @@ fn filter_less_than() {
             &CellValue::Number(85.0),
         )
         .unwrap();
-    assert!((1 - result.nrows()).abs() < 1e-5);
-    assert!((ColRef::Name("name".to_string( - result
-            .get_value(0).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("Bob".to_string())
-    );
+    assert_eq!(result.nrows(), 1);
+    let val = result.get_value(0, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Bob".to_string()));
 }
 
 #[test]
@@ -371,7 +368,7 @@ fn filter_greater_equal() {
             &CellValue::Number(85.0),
         )
         .unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 2);
 }
 
 #[test]
@@ -384,7 +381,7 @@ fn filter_less_equal() {
             &CellValue::Number(85.0),
         )
         .unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 2);
 }
 
 #[test]
@@ -397,7 +394,7 @@ fn filter_greater_than() {
             &CellValue::Number(85.0),
         )
         .unwrap();
-    assert!((1 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 1);
 }
 
 #[test]
@@ -411,7 +408,7 @@ fn filter_contains() {
         )
         .unwrap();
     // "Alice" and "Charlie" both contain "li"
-    assert!((2 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 2);
 }
 
 #[test]
@@ -435,8 +432,8 @@ fn filter_no_matches_returns_empty() {
             &CellValue::Number(999.0),
         )
         .unwrap();
-    assert!((0 - result.nrows()).abs() < 1e-5);
-    assert!((2 - result.ncols()).abs() < 1e-5); // columns preserved
+    assert_eq!(result.nrows(), 0);
+    assert_eq!(result.ncols(), 2); // columns preserved
 }
 
 // ============================================================================
@@ -453,8 +450,8 @@ fn sort_ascending() {
     let last = sorted
         .get_value(2, ColRef::Name("score".to_string()))
         .unwrap();
-    assert!((first - CellValue::Number(75.0).abs() < 1e-5));
-    assert!((last - CellValue::Number(90.0).abs() < 1e-5));
+    assert!((first.as_number().unwrap() - 75.0).abs() < 1e-5);
+    assert!((last.as_number().unwrap() - 90.0).abs() < 1e-5);
 }
 
 #[test]
@@ -464,41 +461,39 @@ fn sort_descending() {
     let first = sorted
         .get_value(0, ColRef::Name("score".to_string()))
         .unwrap();
-    assert!((first - CellValue::Number(90.0).abs() < 1e-5));
+    assert!((first.as_number().unwrap() - 90.0).abs() < 1e-5);
 }
 
 #[test]
 fn head() {
     let df = sample_df();
     let h = df.head(2);
-    assert!((2 - h.nrows()).abs() < 1e-5);
-    assert!((ColRef::Name("name".to_string( - h.get_value(0).abs() < 1e-5))).unwrap(),
-        CellValue::Text("Alice".to_string())
-    );
+    assert_eq!(h.nrows(), 2);
+    let val = h.get_value(0, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Alice".to_string()));
 }
 
 #[test]
 fn head_larger_than_nrows() {
     let df = sample_df();
     let h = df.head(100);
-    assert!((3 - h.nrows()).abs() < 1e-5);
+    assert_eq!(h.nrows(), 3);
 }
 
 #[test]
 fn tail() {
     let df = sample_df();
     let t = df.tail(1);
-    assert!((1 - t.nrows()).abs() < 1e-5);
-    assert!((ColRef::Name("name".to_string( - t.get_value(0).abs() < 1e-5))).unwrap(),
-        CellValue::Text("Charlie".to_string())
-    );
+    assert_eq!(t.nrows(), 1);
+    let val = t.get_value(0, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Charlie".to_string()));
 }
 
 #[test]
 fn slice_basic() {
     let df = sample_df();
     let s = df.slice(0, 1).unwrap();
-    assert!((2 - s.nrows()).abs() < 1e-5); // inclusive on both ends
+    assert_eq!(s.nrows(), 2); // inclusive on both ends
 }
 
 #[test]
@@ -511,7 +506,7 @@ fn slice_out_of_range_start_errors() {
 fn slice_end_clamped() {
     let df = sample_df();
     let s = df.slice(1, 999).unwrap();
-    assert!((2 - s.nrows()).abs() < 1e-5); // rows 1 and 2
+    assert_eq!(s.nrows(), 2); // rows 1 and 2
 }
 
 // ============================================================================
@@ -524,9 +519,10 @@ fn select_columns() {
     let projected = df
         .select_columns(&[ColRef::Name("score".to_string())])
         .unwrap();
-    assert!((1 - projected.ncols()).abs() < 1e-5);
-    assert!((&["score"] - projected.columns()).abs() < 1e-5);
-    assert!((3 - projected.nrows()).abs() < 1e-5);
+    assert_eq!(projected.ncols(), 1);
+    let cols: Vec<&str> = projected.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["score"]);
+    assert_eq!(projected.nrows(), 3);
 }
 
 #[test]
@@ -541,7 +537,7 @@ fn unique() {
         ]],
     );
     let vals = df.unique(ColRef::Name("color".to_string())).unwrap();
-    assert!((3 - vals.len()).abs() < 1e-5);
+    assert_eq!(vals.len(), 3);
 }
 
 #[test]
@@ -555,8 +551,9 @@ fn count_by() {
         ]],
     );
     let counts = df.count_by(ColRef::Name("color".to_string())).unwrap();
-    assert!((2 - counts.nrows()).abs() < 1e-5); // red and blue
-    assert!((&["value", "count"] - counts.columns()).abs() < 1e-5);
+    assert_eq!(counts.nrows(), 2); // red and blue
+    let cols: Vec<&str> = counts.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["value", "count"]);
 }
 
 #[test]
@@ -570,7 +567,7 @@ fn drop_nil() {
         ]],
     );
     let cleaned = df.drop_nil(ColRef::Name("x".to_string())).unwrap();
-    assert!((2 - cleaned.nrows()).abs() < 1e-5);
+    assert_eq!(cleaned.nrows(), 2);
 }
 
 // ============================================================================
@@ -609,8 +606,8 @@ fn join_inner() {
             "inner",
         )
         .unwrap();
-    assert!((2 - joined.nrows()).abs() < 1e-5); // ids 1 and 3
-    assert!((3 - joined.ncols()).abs() < 1e-5); // id, name, score (id is shared)
+    assert_eq!(joined.nrows(), 2); // ids 1 and 3
+    assert_eq!(joined.ncols(), 3); // id, name, score (id is shared)
 }
 
 // ============================================================================
@@ -692,7 +689,7 @@ fn variance() {
 fn stddev() {
     let df = numeric_df();
     let sd = df.stddev(ColRef::Name("val".to_string())).unwrap();
-    // sqrt(200) ≈ 14.14213562
+    // sqrt(200) ~= 14.14213562
     assert!((sd - 200.0_f64.sqrt()).abs() < 1e-5);
 }
 
@@ -715,7 +712,7 @@ fn describe_returns_stats_rows() {
     let desc = df.describe();
     // Should have "stat" column + one column per numeric column
     assert!(desc.ncols() >= 2);
-    assert!((8 - desc.nrows()).abs() < 1e-5); // count, mean, std, min, 25%, 50%, 75%, max
+    assert_eq!(desc.nrows(), 8); // count, mean, std, min, 25%, 50%, 75%, max
 }
 
 #[test]
@@ -725,7 +722,7 @@ fn describe_empty_no_numeric_returns_empty() {
         vec![vec![CellValue::Text("a".to_string())]],
     );
     let desc = df.describe();
-    assert!((0 - desc.ncols()).abs() < 1e-5);
+    assert_eq!(desc.ncols(), 0);
 }
 
 // ============================================================================
@@ -737,15 +734,15 @@ fn csv_roundtrip() {
     let df = sample_df();
     let csv = df.to_csv();
     let restored = lurek2d::dataframe::serial::from_csv(&csv).unwrap();
-    assert!((df.nrows( - restored.nrows()).abs() < 1e-5));
-    assert!((df.ncols( - restored.ncols()).abs() < 1e-5));
-    assert!((df.columns( - restored.columns()).abs() < 1e-5));
-    // Check a value
-    assert!((ColRef::Name("name".to_string( - restored
-            .get_value(0).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("Alice".to_string())
-    );
+    assert_eq!(df.nrows(), restored.nrows());
+    assert_eq!(df.ncols(), restored.ncols());
+    {
+        let cols: Vec<&str> = restored.columns().iter().map(|s| s.as_str()).collect();
+        let orig: Vec<&str> = df.columns().iter().map(|s| s.as_str()).collect();
+        assert_eq!(cols, orig);
+    }
+    let val = restored.get_value(0, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Alice".to_string()));
 }
 
 #[test]
@@ -765,7 +762,7 @@ fn csv_numeric_roundtrip() {
 fn csv_empty() {
     let csv = "";
     let df = lurek2d::dataframe::serial::from_csv(csv).unwrap();
-    assert!((0 - df.nrows()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 0);
 }
 
 // ============================================================================
@@ -777,26 +774,23 @@ fn json_roundtrip() {
     let df = sample_df();
     let json = df.to_json();
     let restored = lurek2d::dataframe::serial::from_json(&json).unwrap();
-    assert!((df.nrows( - restored.nrows()).abs() < 1e-5));
-    assert!((df.ncols( - restored.ncols()).abs() < 1e-5));
-    assert!((ColRef::Name("name".to_string( - restored
-            .get_value(1).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("Bob".to_string())
-    );
+    assert_eq!(df.nrows(), restored.nrows());
+    assert_eq!(df.ncols(), restored.ncols());
+    let val = restored.get_value(1, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Bob".to_string()));
 }
 
 #[test]
 fn json_empty_array() {
     let df = lurek2d::dataframe::serial::from_json("[]").unwrap();
-    assert!((0 - df.nrows()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 0);
 }
 
 #[test]
 fn json_with_null_and_bool() {
     let json = r#"[{"a": 1, "b": null, "c": true}]"#;
     let df = lurek2d::dataframe::serial::from_json(json).unwrap();
-    assert!((1 - df.nrows()).abs() < 1e-5);
+    assert_eq!(df.nrows(), 1);
     let b_val = df.get_value(0, ColRef::Name("b".to_string())).unwrap();
     assert!(b_val.is_nil());
     let c_val = df.get_value(0, ColRef::Name("c".to_string())).unwrap();
@@ -812,14 +806,15 @@ fn binary_roundtrip() {
     let df = sample_df();
     let bytes = df.to_binary();
     let restored = lurek2d::dataframe::serial::from_binary(&bytes).unwrap();
-    assert!((df.nrows( - restored.nrows()).abs() < 1e-5));
-    assert!((df.ncols( - restored.ncols()).abs() < 1e-5));
-    assert!((df.columns( - restored.columns()).abs() < 1e-5));
-    assert!((ColRef::Name("name".to_string( - restored
-            .get_value(2).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("Charlie".to_string())
-    );
+    assert_eq!(df.nrows(), restored.nrows());
+    assert_eq!(df.ncols(), restored.ncols());
+    {
+        let cols: Vec<&str> = restored.columns().iter().map(|s| s.as_str()).collect();
+        let orig: Vec<&str> = df.columns().iter().map(|s| s.as_str()).collect();
+        assert_eq!(cols, orig);
+    }
+    let val = restored.get_value(2, ColRef::Name("name".to_string())).unwrap();
+    assert_eq!(val, CellValue::Text("Charlie".to_string()));
 }
 
 #[test]
@@ -850,16 +845,10 @@ fn binary_roundtrip_all_types() {
         .as_number()
         .unwrap();
     assert!((n - 3.14).abs() < 1e-5);
-    assert!((ColRef::Name("c".to_string( - restored
-            .get_value(0).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Text("hello".to_string())
-    );
-    assert!((ColRef::Name("d".to_string( - restored
-            .get_value(0).abs() < 1e-5)))
-            .unwrap(),
-        CellValue::Bool(false)
-    );
+    let c_val = restored.get_value(0, ColRef::Name("c".to_string())).unwrap();
+    assert_eq!(c_val, CellValue::Text("hello".to_string()));
+    let d_val = restored.get_value(0, ColRef::Name("d".to_string())).unwrap();
+    assert_eq!(d_val, CellValue::Bool(false));
 }
 
 #[test]
@@ -882,17 +871,18 @@ fn binary_too_short_errors() {
 fn sql_select_star() {
     let df = sample_df();
     let result = lurek2d::dataframe::sql::query_sql(&df, "SELECT * FROM data").unwrap();
-    assert!((3 - result.nrows()).abs() < 1e-5);
-    assert!((2 - result.ncols()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 3);
+    assert_eq!(result.ncols(), 2);
 }
 
 #[test]
 fn sql_select_specific_column() {
     let df = sample_df();
     let result = lurek2d::dataframe::sql::query_sql(&df, "SELECT name FROM data").unwrap();
-    assert!((1 - result.ncols()).abs() < 1e-5);
-    assert!((&["name"] - result.columns()).abs() < 1e-5);
-    assert!((3 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.ncols(), 1);
+    let cols: Vec<&str> = result.columns().iter().map(|s| s.as_str()).collect();
+    assert_eq!(cols, vec!["name"]);
+    assert_eq!(result.nrows(), 3);
 }
 
 #[test]
@@ -900,7 +890,7 @@ fn sql_where_clause() {
     let df = sample_df();
     let result =
         lurek2d::dataframe::sql::query_sql(&df, "SELECT * FROM data WHERE score > 80").unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5); // Alice (90) and Charlie (85)
+    assert_eq!(result.nrows(), 2); // Alice (90) and Charlie (85)
 }
 
 #[test]
@@ -938,7 +928,7 @@ fn sql_group_by_count() {
         "SELECT dept, COUNT(salary) FROM data GROUP BY dept",
     )
     .unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5); // eng and sales
+    assert_eq!(result.nrows(), 2); // eng and sales
 }
 
 #[test]
@@ -961,7 +951,7 @@ fn sql_group_by_sum() {
     let result =
         lurek2d::dataframe::sql::query_sql(&df, "SELECT dept, SUM(salary) FROM data GROUP BY dept")
             .unwrap();
-    assert!((2 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 2);
 }
 
 // ============================================================================
@@ -971,14 +961,14 @@ fn sql_group_by_sum() {
 #[test]
 fn database_new_empty() {
     let db = Database::new();
-    assert!((0 - db.table_count()).abs() < 1e-5);
+    assert_eq!(db.table_count(), 0);
     assert!(db.list_tables().is_empty());
 }
 
 #[test]
 fn database_default_empty() {
     let db = Database::default();
-    assert!((0 - db.table_count()).abs() < 1e-5);
+    assert_eq!(db.table_count(), 0);
 }
 
 #[test]
@@ -988,7 +978,7 @@ fn database_add_and_get_table() {
     assert!(db.has_table("users"));
     assert!(!db.has_table("missing"));
     let t = db.get_table("users").unwrap();
-    assert!((3 - t.nrows()).abs() < 1e-5);
+    assert_eq!(t.nrows(), 3);
 }
 
 #[test]
@@ -997,7 +987,7 @@ fn database_get_table_mut() {
     db.add_table("users", sample_df());
     let t = db.get_table_mut("users").unwrap();
     t.add_row(&[("name".to_string(), CellValue::Text("Diana".to_string()))]);
-    assert!((4 - db.get_table("users").unwrap().nrows()).abs() < 1e-5);
+    assert_eq!(db.get_table("users").unwrap().nrows(), 4);
 }
 
 #[test]
@@ -1006,7 +996,7 @@ fn database_remove_table() {
     db.add_table("users", sample_df());
     db.remove_table("users").unwrap();
     assert!(!db.has_table("users"));
-    assert!((0 - db.table_count()).abs() < 1e-5);
+    assert_eq!(db.table_count(), 0);
 }
 
 #[test]
@@ -1030,7 +1020,7 @@ fn database_table_count() {
     let mut db = Database::new();
     db.add_table("a", DataFrame::new());
     db.add_table("b", DataFrame::new());
-    assert!((2 - db.table_count()).abs() < 1e-5);
+    assert_eq!(db.table_count(), 2);
 }
 
 #[test]
@@ -1039,7 +1029,7 @@ fn database_clear() {
     db.add_table("a", DataFrame::new());
     db.add_table("b", sample_df());
     db.clear();
-    assert!((0 - db.table_count()).abs() < 1e-5);
+    assert_eq!(db.table_count(), 0);
     assert!(db.list_tables().is_empty());
 }
 
@@ -1050,7 +1040,7 @@ fn database_merge() {
     let mut db2 = Database::new();
     db2.add_table("t2", sample_df());
     db1.merge(db2);
-    assert!((2 - db1.table_count()).abs() < 1e-5);
+    assert_eq!(db1.table_count(), 2);
     assert!(db1.has_table("t1"));
     assert!(db1.has_table("t2"));
 }
@@ -1064,8 +1054,8 @@ fn clone_df_independent() {
     let df = sample_df();
     let mut clone = df.clone_df();
     clone.remove_row(0).unwrap();
-    assert!((2 - clone.nrows()).abs() < 1e-5);
-    assert!((3 - df.nrows()).abs() < 1e-5); // original unchanged
+    assert_eq!(clone.nrows(), 2);
+    assert_eq!(df.nrows(), 3); // original unchanged
 }
 
 // ============================================================================
@@ -1085,7 +1075,7 @@ fn fill_nil() {
     df.fill_nil(ColRef::Name("x".to_string()), CellValue::Number(0.0))
         .unwrap();
     let val = df.get_value(1, ColRef::Name("x".to_string())).unwrap();
-    assert!((val - CellValue::Number(0.0).abs() < 1e-5));
+    assert_eq!(val, CellValue::Number(0.0));
 }
 
 // ============================================================================
@@ -1100,7 +1090,7 @@ fn dataframe_merge_appends_rows() {
         vec![vec![CellValue::Number(2.0), CellValue::Number(3.0)]],
     );
     df1.merge(&df2);
-    assert!((3 - df1.nrows()).abs() < 1e-5);
+    assert_eq!(df1.nrows(), 3);
 }
 
 // ============================================================================
@@ -1115,15 +1105,13 @@ fn random_deterministic_with_seed() {
     ];
     let df1 = DataFrame::random(&defs, 5, Some(42));
     let df2 = DataFrame::random(&defs, 5, Some(42));
-    assert!((5 - df1.nrows()).abs() < 1e-5);
-    assert!((5 - df2.nrows()).abs() < 1e-5);
-    // Same seed → same data
+    assert_eq!(df1.nrows(), 5);
+    assert_eq!(df2.nrows(), 5);
+    // Same seed -> same data
     for row in 0..5 {
-        assert!((ColRef::Name("name".to_string( - df1.get_value(row).abs() < 1e-5)))
-                .unwrap(),
-            df2.get_value(row, ColRef::Name("name".to_string()))
-                .unwrap(),
-        );
+        let v1 = df1.get_value(row, ColRef::Name("name".to_string())).unwrap();
+        let v2 = df2.get_value(row, ColRef::Name("name".to_string())).unwrap();
+        assert_eq!(v1, v2);
     }
 }
 
@@ -1136,7 +1124,7 @@ fn sql_database_from_table() {
     let mut db = Database::new();
     db.add_table("users", sample_df());
     let result = lurek2d::dataframe::sql::query_sql_database(&db, "SELECT * FROM users").unwrap();
-    assert!((3 - result.nrows()).abs() < 1e-5);
+    assert_eq!(result.nrows(), 3);
 }
 
 #[test]

@@ -1,4 +1,8 @@
 -- Lurek2D battle API tests
+-- @covers lurek.turnbattle.newAction
+-- @covers lurek.turnbattle.newBattle
+-- @covers lurek.turnbattle.newCombatant
+
 
 describe("lurek.turnbattle module exists", function()
     it("is a table", function()

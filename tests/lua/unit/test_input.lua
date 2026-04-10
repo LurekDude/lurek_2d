@@ -1,4 +1,44 @@
 -- Lurek2D Input API Tests
+-- @covers lurek.gamepad.getAxis
+-- @covers lurek.gamepad.getAxisCount
+-- @covers lurek.gamepad.getButtonCount
+-- @covers lurek.gamepad.getCount
+-- @covers lurek.gamepad.getGUID
+-- @covers lurek.gamepad.getGamepadMappingString
+-- @covers lurek.gamepad.getHat
+-- @covers lurek.gamepad.getJoystickCount
+-- @covers lurek.gamepad.getJoysticks
+-- @covers lurek.gamepad.getName
+-- @covers lurek.gamepad.isConnected
+-- @covers lurek.gamepad.isDown
+-- @covers lurek.gamepad.isGamepad
+-- @covers lurek.gamepad.isVibrationSupported
+-- @covers lurek.gamepad.loadGamepadMappings
+-- @covers lurek.gamepad.saveGamepadMappings
+-- @covers lurek.gamepad.setGamepadMapping
+-- @covers lurek.gamepad.setVibration
+-- @covers lurek.keyboard.getKeyFromScancode
+-- @covers lurek.keyboard.getScancodeFromKey
+-- @covers lurek.keyboard.hasKeyRepeat
+-- @covers lurek.keyboard.hasTextInput
+-- @covers lurek.keyboard.isDown
+-- @covers lurek.keyboard.isModifierActive
+-- @covers lurek.keyboard.isScancodeDown
+-- @covers lurek.keyboard.setKeyRepeat
+-- @covers lurek.keyboard.setTextInput
+-- @covers lurek.mouse.getCursor
+-- @covers lurek.mouse.getPosition
+-- @covers lurek.mouse.getSystemCursor
+-- @covers lurek.mouse.getX
+-- @covers lurek.mouse.getY
+-- @covers lurek.mouse.isCursorSupported
+-- @covers lurek.mouse.isDown
+-- @covers lurek.mouse.setCursor
+-- @covers lurek.touch.getPosition
+-- @covers lurek.touch.getPressure
+-- @covers lurek.touch.getTouchCount
+-- @covers lurek.touch.getTouches
+
 
 describe("lurek.keyboard module exists", function()
     it("lurek.keyboard is a table", function()

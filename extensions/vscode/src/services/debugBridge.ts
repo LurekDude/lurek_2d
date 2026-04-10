@@ -13,7 +13,7 @@ interface DebugResponse {
 }
 
 /**
- * Debug bridge: TCP communication with a running Luna2D engine instance.
+ * Debug bridge: TCP communication with a running Lurek2D engine instance.
  */
 export class DebugBridge {
   private socket: net.Socket | null = null;
@@ -30,7 +30,7 @@ export class DebugBridge {
   private statsInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    this.outputChannel = vscode.window.createOutputChannel("Luna Debug");
+    this.outputChannel = vscode.window.createOutputChannel("Lurek2D Debug");
   }
 
   /** Whether the bridge is currently connected. */
@@ -38,14 +38,14 @@ export class DebugBridge {
     return this.connected;
   }
 
-  /** Connect to running Luna2D engine debug port. */
+  /** Connect to running Lurek2D engine debug port. */
   async connect(port?: number): Promise<boolean> {
     if (this.connected) {
       this.outputChannel.appendLine("[debug] Already connected.");
       return true;
     }
 
-    const targetPort = port ?? vscode.workspace.getConfiguration("luna.debugBridge").get<number>("port", DEFAULT_PORT);
+    const targetPort = port ?? vscode.workspace.getConfiguration("lurek.debugBridge").get<number>("port", DEFAULT_PORT);
 
     return new Promise<boolean>((resolve) => {
       const socket = new net.Socket();
@@ -60,7 +60,7 @@ export class DebugBridge {
         this.socket = socket;
         this.connected = true;
         this.buffer = "";
-        this.outputChannel.appendLine(`[debug] Connected to Luna2D on port ${targetPort}`);
+        this.outputChannel.appendLine(`[debug] Connected to Lurek2D on port ${targetPort}`);
         resolve(true);
       });
 
@@ -203,7 +203,7 @@ export class DebugBridge {
   getStatusInfo(): { connected: boolean; port: number } {
     return {
       connected: this.connected,
-      port: vscode.workspace.getConfiguration("luna.debugBridge").get<number>("port", DEFAULT_PORT),
+      port: vscode.workspace.getConfiguration("lurek.debugBridge").get<number>("port", DEFAULT_PORT),
     };
   }
 
@@ -214,7 +214,7 @@ export class DebugBridge {
     }
     this.statsItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 50);
     this.statsItem.text = "$(pulse) FPS: --";
-    this.statsItem.tooltip = "Luna2D Engine Stats";
+    this.statsItem.tooltip = "Lurek2D Engine Stats";
     this.statsItem.show();
 
     this.statsInterval = setInterval(async () => {
@@ -262,7 +262,7 @@ export class DebugBridge {
   private sendRequest(type: string, data: Record<string, unknown>): Promise<DebugResponse> {
     return new Promise<DebugResponse>((resolve, reject) => {
       if (!this.connected || !this.socket) {
-        reject(new Error("Not connected to Luna2D engine."));
+        reject(new Error("Not connected to Lurek2D engine."));
         return;
       }
 

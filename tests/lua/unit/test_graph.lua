@@ -1,6 +1,8 @@
 -- Lurek2D Graph API Tests
 
 -- Helper: build a simple 2-node graph with one edge
+-- @covers lurek.graph.newGraph
+
 local function make_simple_graph()
     local g = lurek.graph.newGraph()
     local n1 = g:addNode("source", -1)

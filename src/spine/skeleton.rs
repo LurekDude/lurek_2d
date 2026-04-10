@@ -258,4 +258,47 @@ impl Skeleton {
             }
         }
     }
+
+    // ── CPU rendering ──
+
+    /// Renders the skeleton as a stick figure to an `ImageData`.
+    ///
+    /// Draws bones as lines from parent to child and joint circles at
+    /// each bone's world position. Call `update_world_transforms()` before
+    /// this method to ensure positions are current.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 20, 30, 255);
+
+        // Draw bones as lines from parent to child
+        for bone in &self.bones {
+            if let Some(pi) = bone.parent_index {
+                let parent = &self.bones[pi];
+                img.draw_line(
+                    parent.world_x as i32,
+                    parent.world_y as i32,
+                    bone.world_x as i32,
+                    bone.world_y as i32,
+                    200,
+                    200,
+                    220,
+                    255,
+                );
+            }
+        }
+
+        // Draw joint circles at each bone
+        for bone in &self.bones {
+            img.draw_circle(bone.world_x as i32, bone.world_y as i32, 4, 255, 120, 80, 255);
+        }
+
+        img
+    }
 }

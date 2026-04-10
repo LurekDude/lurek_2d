@@ -16,25 +16,40 @@ export class LuaDebugConfigurationProvider
   implements vscode.DebugConfigurationProvider
 {
   resolveDebugConfiguration(
-    _folder: vscode.WorkspaceFolder | undefined,
+    folder: vscode.WorkspaceFolder | undefined,
     config: vscode.DebugConfiguration,
     _token?: vscode.CancellationToken,
   ): vscode.ProviderResult<vscode.DebugConfiguration> {
     if (!config.type) {
-      config.type = "luna";
+      config.type = "lurek";
     }
     if (!config.request) {
       config.request = "launch";
     }
     if (!config.name) {
-      config.name = "Luna2D: Debug Game";
+      config.name = "Lurek2D: Debug Game";
     }
     if (!config.program) {
-      config.program = "${workspaceFolder}";
+      // Auto-detect: look for main.lua in workspace root or active editor dir
+      const wsRoot = folder?.uri.fsPath ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      const activeFile = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+      if (activeFile) {
+        // If the active file is a main.lua, use its directory as the game path
+        const activeDir = require("path").dirname(activeFile);
+        const mainLua = require("path").join(activeDir, "main.lua");
+        if (require("fs").existsSync(mainLua)) {
+          config.program = activeDir;
+        } else {
+          config.program = wsRoot ?? "${workspaceFolder}";
+        }
+      } else {
+        config.program = wsRoot ?? "${workspaceFolder}";
+      }
     }
     if (!config.luaVersion) {
       config.luaVersion = vscode.workspace
-        .getConfiguration("luna")
+        .getConfiguration("lurek")
         .get("luaVersion", "luajit");
     }
     if (config.stopOnEntry === undefined) {
@@ -42,6 +57,19 @@ export class LuaDebugConfigurationProvider
     }
     if (!config.debugPort) {
       config.debugPort = 8172;
+    }
+    // Auto-detect engine binary from workspace build/ folder
+    if (!config.enginePath) {
+      const wsRoot = folder?.uri.fsPath ?? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+      if (wsRoot) {
+        const buildDebug = require("path").join(wsRoot, "build", "debug", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
+        const buildRelease = require("path").join(wsRoot, "build", "release", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
+        if (require("fs").existsSync(buildDebug)) {
+          config.enginePath = buildDebug;
+        } else if (require("fs").existsSync(buildRelease)) {
+          config.enginePath = buildRelease;
+        }
+      }
     }
     return config;
   }
@@ -51,16 +79,30 @@ export class LuaDebugConfigurationProvider
   ): vscode.ProviderResult<vscode.DebugConfiguration[]> {
     return [
       {
-        type: "luna",
+        type: "lurek",
         request: "launch",
-        name: "Luna2D: Debug Game",
+        name: "Lurek2D: Debug Game",
         program: "${workspaceFolder}",
         stopOnEntry: false,
       },
       {
-        type: "luna",
+        type: "lurek",
+        request: "launch",
+        name: "Lurek2D: Debug Current Demo",
+        program: "${fileDirname}",
+        stopOnEntry: false,
+      },
+      {
+        type: "lurek",
+        request: "launch",
+        name: "Lurek2D: Debug with Stop on Entry",
+        program: "${workspaceFolder}",
+        stopOnEntry: true,
+      },
+      {
+        type: "lurek",
         request: "attach",
-        name: "Luna2D: Attach to Running",
+        name: "Lurek2D: Attach to Running",
         debugPort: 8172,
       },
     ];
@@ -72,7 +114,7 @@ export function register(context: vscode.ExtensionContext): void {
   const configProvider = new LuaDebugConfigurationProvider();
 
   context.subscriptions.push(
-    vscode.debug.registerDebugAdapterDescriptorFactory("luna", factory),
-    vscode.debug.registerDebugConfigurationProvider("luna", configProvider),
+    vscode.debug.registerDebugAdapterDescriptorFactory("lurek", factory),
+    vscode.debug.registerDebugConfigurationProvider("lurek", configProvider),
   );
 }

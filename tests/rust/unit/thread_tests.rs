@@ -155,7 +155,7 @@ fn test_thread_runs_code() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("result")
+            local ch = lurek.thread.getChannel("result")
             ch:push(42)
         "#
         .into(),
@@ -181,7 +181,7 @@ fn test_thread_channel_communication() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("pipe")
+            local ch = lurek.thread.getChannel("pipe")
             local val = ch:demand(5.0)
             ch:push(val + 1)
         "#
@@ -234,7 +234,7 @@ fn test_thread_is_running() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("blocker")
+            local ch = lurek.thread.getChannel("blocker")
             ch:demand(5.0)
         "#
         .into(),
@@ -265,7 +265,7 @@ fn test_thread_cannot_restart_while_running() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("blocker")
+            local ch = lurek.thread.getChannel("blocker")
             ch:demand(5.0)
         "#
         .into(),
@@ -294,7 +294,7 @@ fn test_thread_string_channel_value() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("strings")
+            local ch = lurek.thread.getChannel("strings")
             ch:push("hello from thread")
         "#
         .into(),
@@ -321,7 +321,7 @@ fn test_thread_with_args() {
 
     let mut thread = LuaThread::new(
         r#"
-            local ch = luna.thread.getChannel("args_result")
+            local ch = lurek.thread.getChannel("args_result")
             -- Args are in the global 'arg' table
             ch:push(arg[1])
             ch:push(arg[2])

@@ -817,4 +817,105 @@ impl Minimap {
             ping.remaining > 0.0
         });
     }
+
+    // ── CPU rendering ──
+
+    /// Renders the minimap to an `ImageData` for evidence/testing.
+    ///
+    /// Draws terrain cells coloured by terrain type (or political owner
+    /// colours), applies fog-of-war dimming, and stamps objects and markers
+    /// on top.
+    ///
+    /// # Parameters
+    /// - `pixel_size` — `u32` — Output image size in pixels (both width and height
+    ///   are derived from `display_width` / `display_height`).
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, _pixel_size: u32) -> crate::image::ImageData {
+        let w = self.display_width;
+        let h = self.display_height;
+        let cell_w = w / self.grid_width.max(1);
+        let cell_h = h / self.grid_height.max(1);
+
+        let mut img = crate::image::ImageData::new(w, h);
+
+        // Draw terrain cells
+        for gy in 0..self.grid_height {
+            for gx in 0..self.grid_width {
+                let terrain_type = self.get_terrain(gx, gy);
+                let tc = match self.color_mode {
+                    ColorMode::Political => {
+                        // Find first object in this cell and use its owner colour
+                        let mut owner_c = self.get_terrain_color(terrain_type);
+                        for obj in self.objects.values() {
+                            let ox = obj.x as u32;
+                            let oy = obj.y as u32;
+                            // If there are objects with this owner, paint the cell area
+                            if ox / self.grid_width.max(1) == gx / 1
+                                || oy / self.grid_height.max(1) == gy / 1
+                            {
+                                owner_c = self.get_owner_color(obj.owner);
+                                break;
+                            }
+                        }
+                        owner_c
+                    }
+                    _ => self.get_terrain_color(terrain_type),
+                };
+
+                let mut mult = 1.0f32;
+                if self.fog_enabled {
+                    let fog = self.get_fog_level(gx, gy);
+                    mult = match fog {
+                        FogLevel::Visible => 1.0,
+                        FogLevel::Explored => 0.5,
+                        FogLevel::Hidden => 0.15,
+                    };
+                }
+
+                let r = (tc[0] * 255.0 * mult) as u8;
+                let g = (tc[1] * 255.0 * mult) as u8;
+                let b = (tc[2] * 255.0 * mult) as u8;
+
+                for py in 0..cell_h {
+                    for px in 0..cell_w {
+                        img.set_pixel(gx * cell_w + px, gy * cell_h + py, r, g, b, 255);
+                    }
+                }
+            }
+        }
+
+        // Draw objects
+        for obj in self.objects.values() {
+            let screen_x = (obj.x * cell_w as f32) as i32;
+            let screen_y = (obj.y * cell_h as f32) as i32;
+            let ot = self.object_types.get(obj.type_index);
+            let (cr, cg, cb, radius) = if let Some(ot) = ot {
+                (
+                    (ot.color[0] * 255.0) as u8,
+                    (ot.color[1] * 255.0) as u8,
+                    (ot.color[2] * 255.0) as u8,
+                    4u32,
+                )
+            } else {
+                (255, 255, 255, 3)
+            };
+            img.draw_circle(screen_x, screen_y, radius, cr, cg, cb, 255);
+        }
+
+        // Draw markers
+        for marker in self.markers.values() {
+            let mx = (marker.x * cell_w as f32) as i32;
+            let my = (marker.y * cell_h as f32) as i32;
+            let mr = (marker.color[0] * 255.0) as u8;
+            let mg = (marker.color[1] * 255.0) as u8;
+            let mb = (marker.color[2] * 255.0) as u8;
+            img.draw_circle(mx, my, 3, mr, mg, mb, 255);
+            img.draw_line(mx - 4, my, mx + 4, my, mr, mg, mb, 255);
+            img.draw_line(mx, my - 4, mx, my + 4, mr, mg, mb, 255);
+        }
+
+        img
+    }
 }

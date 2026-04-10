@@ -1,5 +1,14 @@
 -- Lurek2D Integration Test: Tilemap + Physics
 -- Tests using tilemap solid tiles to create physics collision boundaries
+-- @covers lurek.pathfinding.newNavGrid
+-- @covers lurek.pathfinding.newPathfinder
+-- @covers lurek.physics.destroyWorld
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.step
+-- @covers lurek.tilemap.newTileMap
+-- @covers lurek.tilemap.newTileSet
+
 
 describe("integration: tilemap solid tiles as physics boundaries", function()
     it("creates physics bodies from solid tiles", function()

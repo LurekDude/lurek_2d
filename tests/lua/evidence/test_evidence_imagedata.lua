@@ -1,0 +1,148 @@
+-- test_evidence_imagedata.lua
+-- Evidence test: ImageData pixel creation, manipulation, and PNG save
+
+describe("Evidence: ImageData creation and pixels", function()
+
+    it("newImageData creates correct dimensions", function()
+        local img = lurek.img.newImageData(8, 8)
+        expect_equal(img:getWidth(), 8)
+        expect_equal(img:getHeight(), 8)
+        local w, h = img:getDimensions()
+        expect_equal(w, 8)
+        expect_equal(h, 8)
+    end)
+
+    it("fresh ImageData pixels are transparent black", function()
+        local img = lurek.img.newImageData(4, 4)
+        local r, g, b, a = img:getPixel(0, 0)
+        expect_equal(r, 0)
+        expect_equal(g, 0)
+        expect_equal(b, 0)
+        expect_equal(a, 0)
+    end)
+
+    it("setPixel and getPixel round-trip correctly", function()
+        local img = lurek.img.newImageData(16, 16)
+        img:setPixel(0,  0,  255, 0,   0,   255)
+        img:setPixel(1,  0,  0,   255, 0,   255)
+        img:setPixel(2,  0,  0,   0,   255, 255)
+        img:setPixel(15, 15, 128, 64,  32,  200)
+
+        local r, g, b, a = img:getPixel(0, 0)
+        expect_equal(r, 255)
+        expect_equal(g, 0)
+        expect_equal(b, 0)
+        expect_equal(a, 255)
+
+        r, g, b, a = img:getPixel(1, 0)
+        expect_equal(r, 0)
+        expect_equal(g, 255)
+        expect_equal(b, 0)
+
+        r, g, b, a = img:getPixel(15, 15)
+        expect_equal(r, 128)
+        expect_equal(g, 64)
+        expect_equal(b, 32)
+        expect_equal(a, 200)
+    end)
+
+    it("fill colors every pixel", function()
+        local img = lurek.img.newImageData(4, 4)
+        img:fill(100, 150, 200, 255)
+        for y = 0, 3 do
+            for x = 0, 3 do
+                local r, g, b, a = img:getPixel(x, y)
+                expect_equal(r, 100)
+                expect_equal(g, 150)
+                expect_equal(b, 200)
+                expect_equal(a, 255)
+            end
+        end
+    end)
+
+    it("mapPixel transforms every pixel", function()
+        local img = lurek.img.newImageData(4, 4)
+        img:fill(50, 100, 150, 255)
+        img:mapPixel(function(x, y, r, g, b, a)
+            return 255 - r, 255 - g, 255 - b, a
+        end)
+        local r, g, b, a = img:getPixel(0, 0)
+        expect_equal(r, 205)
+        expect_equal(g, 155)
+        expect_equal(b, 105)
+        expect_equal(a, 255)
+    end)
+
+    it("getString returns correct byte count", function()
+        local img = lurek.img.newImageData(8, 8)
+        local bytes = img:getString()
+        expect_equal(#bytes, 8 * 8 * 4)  -- RGBA, 4 bytes per pixel
+    end)
+
+    it("encode('png') returns non-empty PNG bytes as a table", function()
+        local img = lurek.img.newImageData(8, 8)
+        img:fill(255, 0, 0, 255)
+        local bytes = img:encode("png")
+        expect_equal(type(bytes), "table")
+        -- PNG magic number: 0x89 0x50 0x4E 0x47
+        expect_equal(bytes[1], 0x89)
+        expect_equal(bytes[2], 0x50)
+        expect_equal(bytes[3], 0x4E)
+        expect_equal(bytes[4], 0x47)
+    end)
+
+    it("savePNG writes a PNG file to disk", function()
+        local img = lurek.img.newImageData(16, 16)
+        img:fill(0, 128, 255, 255)
+        lurek.img.savePNG(img, "tests/lua/evidence/output/imagedata_basic.png")
+        -- If we get here without error, the file was saved
+        expect_equal(true, true)
+    end)
+
+    it("crop produces a sub-image with correct dimensions", function()
+        local img = lurek.img.newImageData(16, 16)
+        img:fill(200, 100, 50, 255)
+        local sub = img:crop(4, 4, 6, 6)
+        expect_equal(sub:getWidth(), 6)
+        expect_equal(sub:getHeight(), 6)
+        local r, g, b, a = sub:getPixel(0, 0)
+        expect_equal(r, 200)
+        expect_equal(g, 100)
+        expect_equal(b, 50)
+    end)
+
+    it("resizeNearest scales to new dimensions", function()
+        local img = lurek.img.newImageData(4, 4)
+        img:fill(255, 0, 0, 255)
+        local big = img:resizeNearest(8, 8)
+        expect_equal(big:getWidth(), 8)
+        expect_equal(big:getHeight(), 8)
+        local r, g, b, a = big:getPixel(0, 0)
+        expect_equal(r, 255)
+        expect_equal(g, 0)
+        expect_equal(b, 0)
+    end)
+
+    it("flipHorizontal mirrors pixels correctly", function()
+        local img = lurek.img.newImageData(4, 1)
+        img:setPixel(0, 0, 255, 0, 0, 255)
+        img:setPixel(3, 0, 0,   0, 255, 255)
+        img:flipHorizontal()
+        local r, g, b, a = img:getPixel(0, 0)
+        expect_equal(r, 0)
+        expect_equal(b, 255)
+        r, g, b, a = img:getPixel(3, 0)
+        expect_equal(r, 255)
+        expect_equal(b, 0)
+    end)
+
+    it("rotate90cw produces transposed dimensions", function()
+        local img = lurek.img.newImageData(4, 8)
+        local rotated = img:rotate90cw()
+        expect_equal(rotated:getWidth(), 8)
+        expect_equal(rotated:getHeight(), 4)
+    end)
+
+end)
+
+test_summary()

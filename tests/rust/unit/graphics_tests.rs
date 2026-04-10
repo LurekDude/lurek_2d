@@ -95,15 +95,15 @@ fn test_phase01_released_texture_handle_reuse_reports_invalid_texture() {
     let result = lua
         .load(
             r#"
-            local released = luna.gfx.newImage("assets/icon.png")
+            local released = lurek.gfx.newImage("assets/icon.png")
             assert(type(released) == "userdata")
-            assert(luna.gfx.release(released) == true)
+            assert(lurek.gfx.release(released) == true)
 
-            local replacement = luna.gfx.newImage("assets/splash.png")
+            local replacement = lurek.gfx.newImage("assets/splash.png")
             assert(type(replacement) == "userdata")
             assert(replacement:getWidth() > 0)
 
-            luna.gfx.draw(released, 10, 20)
+            lurek.gfx.draw(released, 10, 20)
             "#,
         )
         .exec();
@@ -119,7 +119,7 @@ fn test_phase01_released_numeric_texture_handle_reports_invalid_texture() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        _phase01_texture = luna.gfx.newImage("assets/icon.png")
+        _phase01_texture = lurek.gfx.newImage("assets/icon.png")
         assert(type(_phase01_texture) == "userdata")
         "#,
     )
@@ -139,13 +139,13 @@ fn test_phase01_released_numeric_texture_handle_reports_invalid_texture() {
 
     let script = format!(
         r#"
-        assert(luna.gfx.release({released_texture_id}) == true)
+        assert(lurek.gfx.release({released_texture_id}) == true)
 
-        local replacement = luna.gfx.newImage("assets/splash.png")
+        local replacement = lurek.gfx.newImage("assets/splash.png")
         assert(type(replacement) == "userdata")
         assert(replacement:getWidth() > 0)
 
-        luna.gfx.draw({released_texture_id}, 10, 20)
+        lurek.gfx.draw({released_texture_id}, 10, 20)
         "#,
     );
     let result = lua.load(&script).exec();
@@ -162,15 +162,15 @@ fn test_phase01_released_font_handle_reuse_reports_invalid_font() {
     let result = lua
         .load(
             r#"
-            local released = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 18)
+            local released = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 18)
             assert(type(released) == "userdata")
-            assert(luna.gfx.releaseFont(released) == true)
+            assert(lurek.gfx.releaseFont(released) == true)
 
-            local replacement = luna.gfx.newFont("assets/fonts/OpenSans.ttf", 20)
+            local replacement = lurek.gfx.newFont("assets/fonts/OpenSans.ttf", 20)
             assert(type(replacement) == "userdata")
             assert(replacement:getHeight() > 0)
 
-            luna.gfx.setFont(released)
+            lurek.gfx.setFont(released)
             "#,
         )
         .exec();
@@ -187,16 +187,16 @@ fn test_phase01_released_sprite_batch_handle_reuse_reports_invalid_batch() {
     let result = lua
         .load(
             r#"
-            local image = luna.gfx.newImage("assets/icon.png")
-            local released = luna.gfx.newSpriteBatch(image, 4)
+            local image = lurek.gfx.newImage("assets/icon.png")
+            local released = lurek.gfx.newSpriteBatch(image, 4)
             assert(type(released) == "userdata")
-            assert(luna.gfx.releaseBatch(released) == true)
+            assert(lurek.gfx.releaseBatch(released) == true)
 
-            local replacement = luna.gfx.newSpriteBatch(image, 4)
+            local replacement = lurek.gfx.newSpriteBatch(image, 4)
             assert(type(replacement) == "userdata")
             assert(replacement:getCount() == 0)
 
-            luna.gfx.spriteBatchAdd(released, 1, 2)
+            lurek.gfx.spriteBatchAdd(released, 1, 2)
             "#,
         )
         .exec();
@@ -413,8 +413,8 @@ fn test_newquad_and_drawquad_queue_draw_quad_command() {
     run_draw(
         &lua,
         r#"
-        local q = luna.gfx.newQuad(10, 20, 64, 64, 256, 256)
-        luna.gfx.drawQuad(0, q, 100, 200)
+        local q = lurek.gfx.newQuad(10, 20, 64, 64, 256, 256)
+        lurek.gfx.drawQuad(0, q, 100, 200)
         "#,
     );
     let st = state.borrow();
@@ -464,8 +464,8 @@ fn test_get_color_returns_set_color_values() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setColor(0.5, 0.25, 0.75, 1.0)
-        _r, _g, _b, _a = luna.gfx.getColor()
+        lurek.gfx.setColor(0.5, 0.25, 0.75, 1.0)
+        _r, _g, _b, _a = lurek.gfx.getColor()
         "#,
     )
     .exec()
@@ -483,7 +483,7 @@ fn test_get_color_returns_set_color_values() {
 #[test]
 fn test_get_color_default_is_white() {
     let (_state, lua) = make_graphics_vm();
-    lua.load("_r, _g, _b, _a = luna.gfx.getColor()")
+    lua.load("_r, _g, _b, _a = lurek.gfx.getColor()")
         .exec()
         .unwrap();
     let r: f32 = lua.globals().get("_r").unwrap();
@@ -604,7 +604,7 @@ fn test_new_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
         assert(font ~= nil, "newFont should return a Font object")
         assert(type(font) == "userdata", "Font should be userdata")
         "#,
@@ -618,9 +618,9 @@ fn test_set_get_font_lua_binding() {
     let (_, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.gfx.setFont(font)
-        local got = luna.gfx.getFont()
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        lurek.gfx.setFont(font)
+        local got = lurek.gfx.getFont()
         assert(got ~= nil, "getFont should return the set font")
         "#,
     )
@@ -633,9 +633,9 @@ fn test_print_with_font_pushes_print_font_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.gfx.setFont(font)
-        luna.gfx.print("Hello TTF", 10, 20)
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        lurek.gfx.setFont(font)
+        lurek.gfx.print("Hello TTF", 10, 20)
         "#,
     )
     .exec()
@@ -657,8 +657,8 @@ fn test_get_font_width_returns_positive() {
     let width: f32 = lua
         .load(
             r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return luna.gfx.getFontWidth(font, "Hello")
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        return lurek.gfx.getFontWidth(font, "Hello")
         "#,
         )
         .eval()
@@ -675,8 +675,8 @@ fn test_get_font_height_returns_positive() {
     let height: f32 = lua
         .load(
             r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        return luna.gfx.getFontHeight(font)
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        return lurek.gfx.getFontHeight(font)
         "#,
         )
         .eval()
@@ -760,9 +760,9 @@ fn test_draw_batch_lua_command() {
         .unwrap();
     lua.load(
         r#"
-        local batch = luna.gfx.newSpriteBatch(_tex_id, 100)
-        luna.gfx.spriteBatchAdd(batch, 10, 20)
-        luna.gfx.drawBatch(batch)
+        local batch = lurek.gfx.newSpriteBatch(_tex_id, 100)
+        lurek.gfx.spriteBatchAdd(batch, 10, 20)
+        lurek.gfx.drawBatch(batch)
         "#,
     )
     .exec()
@@ -789,8 +789,8 @@ fn test_set_blend_mode_lua() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setBlendMode("add")
-        assert(luna.gfx.getBlendMode() == "add")
+        lurek.gfx.setBlendMode("add")
+        assert(lurek.gfx.getBlendMode() == "add")
         "#,
     )
     .exec()
@@ -814,9 +814,9 @@ fn test_set_blend_mode_pushes_draw_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setBlendMode("multiply")
-        luna.gfx.rectangle("fill", 10, 20, 100, 100)
-        luna.gfx.setBlendMode("alpha")
+        lurek.gfx.setBlendMode("multiply")
+        lurek.gfx.rectangle("fill", 10, 20, 100, 100)
+        lurek.gfx.setBlendMode("alpha")
         "#,
     )
     .exec()
@@ -833,7 +833,7 @@ fn test_set_blend_mode_pushes_draw_command() {
 fn test_get_blend_mode_default_is_alpha() {
     let (_state, lua) = make_graphics_vm();
     let mode: String = lua
-        .load("return luna.gfx.getBlendMode()")
+        .load("return lurek.gfx.getBlendMode()")
         .eval()
         .unwrap();
     assert_eq!(mode, "alpha");
@@ -858,8 +858,8 @@ fn test_blend_mode_all_variants() {
     for mode in &["alpha", "add", "multiply", "replace", "screen"] {
         lua.load(&format!(
             r#"
-            luna.gfx.setBlendMode("{}")
-            assert(luna.gfx.getBlendMode() == "{}")
+            lurek.gfx.setBlendMode("{}")
+            assert(lurek.gfx.getBlendMode() == "{}")
             "#,
             mode, mode
         ))
@@ -929,10 +929,10 @@ fn test_animation_lua_create_and_query() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local id = luna.gfx.newAnimation(32, 32, 4, 8, 0.1)
+        local id = lurek.gfx.newAnimation(32, 32, 4, 8, 0.1)
         assert(type(id) == "number")
-        assert(luna.gfx.isAnimationPlaying(id) == true)
-        assert(luna.gfx.getAnimationFrame(id) == 0)
+        assert(lurek.gfx.isAnimationPlaying(id) == true)
+        assert(lurek.gfx.getAnimationFrame(id) == 0)
     "#,
     )
     .exec()
@@ -956,10 +956,10 @@ fn test_animation_lua_update_and_draw() {
     }
     lua.load(
         r#"
-        local anim = luna.gfx.newAnimation(32, 32, 2, 4, 0.1)
-        luna.gfx.updateAnimation(anim, 0.15)
-        assert(luna.gfx.getAnimationFrame(anim) == 1)
-        luna.gfx.drawAnimation(anim, 0, 100, 200)
+        local anim = lurek.gfx.newAnimation(32, 32, 2, 4, 0.1)
+        lurek.gfx.updateAnimation(anim, 0.15)
+        assert(lurek.gfx.getAnimationFrame(anim) == 1)
+        lurek.gfx.drawAnimation(anim, 0, 100, 200)
     "#,
     )
     .exec()
@@ -977,15 +977,15 @@ fn test_animation_lua_pause_resume_reset() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local id = luna.gfx.newAnimation(32, 32, 4, 4, 0.1)
-        luna.gfx.pauseAnimation(id)
-        assert(luna.gfx.isAnimationPlaying(id) == false)
-        luna.gfx.resumeAnimation(id)
-        assert(luna.gfx.isAnimationPlaying(id) == true)
-        luna.gfx.updateAnimation(id, 0.2)
-        assert(luna.gfx.getAnimationFrame(id) > 0)
-        luna.gfx.resetAnimation(id)
-        assert(luna.gfx.getAnimationFrame(id) == 0)
+        local id = lurek.gfx.newAnimation(32, 32, 4, 4, 0.1)
+        lurek.gfx.pauseAnimation(id)
+        assert(lurek.gfx.isAnimationPlaying(id) == false)
+        lurek.gfx.resumeAnimation(id)
+        assert(lurek.gfx.isAnimationPlaying(id) == true)
+        lurek.gfx.updateAnimation(id, 0.2)
+        assert(lurek.gfx.getAnimationFrame(id) > 0)
+        lurek.gfx.resetAnimation(id)
+        assert(lurek.gfx.getAnimationFrame(id) == 0)
     "#,
     )
     .exec()
@@ -1001,8 +1001,8 @@ fn test_canvas_new_returns_userdata_handles() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local c0 = luna.gfx.newCanvas(256, 128)
-        local c1 = luna.gfx.newCanvas(64, 64)
+        local c0 = lurek.gfx.newCanvas(256, 128)
+        local c1 = lurek.gfx.newCanvas(64, 64)
         assert(type(c0) == "userdata", "canvas should return userdata")
         assert(type(c1) == "userdata", "canvas should return userdata")
         assert(c0:type() == "Canvas")
@@ -1029,8 +1029,8 @@ fn test_canvas_get_size_accepts_canvas_userdata() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.gfx.newCanvas(320, 240)
-        local w, h = luna.gfx.getCanvasSize(canvas)
+        local canvas = lurek.gfx.newCanvas(320, 240)
+        local w, h = lurek.gfx.getCanvasSize(canvas)
         assert(w == 320, "width should be 320")
         assert(h == 240, "height should be 240")
     "#,
@@ -1044,16 +1044,16 @@ fn test_canvas_set_canvas_pushes_command_and_get_canvas_round_trips() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.gfx.newCanvas(100, 100)
-        luna.gfx.setCanvas(canvas)
-        local active = luna.gfx.getCanvas()
+        local canvas = lurek.gfx.newCanvas(100, 100)
+        lurek.gfx.setCanvas(canvas)
+        local active = lurek.gfx.getCanvas()
         assert(active ~= nil)
         assert(active:type() == "Canvas")
         assert(active:getWidth() == 100)
         assert(active:getHeight() == 100)
-        luna.gfx.rectangle("fill", 0, 0, 50, 50)
-        luna.gfx.setCanvas()
-        assert(luna.gfx.getCanvas() == nil)
+        lurek.gfx.rectangle("fill", 0, 0, 50, 50)
+        lurek.gfx.setCanvas()
+        assert(lurek.gfx.getCanvas() == nil)
     "#,
     )
     .exec()
@@ -1076,8 +1076,8 @@ fn test_canvas_draw_pushes_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.gfx.newCanvas(200, 200)
-        luna.gfx.drawCanvas(canvas, 10, 20)
+        local canvas = lurek.gfx.newCanvas(200, 200)
+        lurek.gfx.drawCanvas(canvas, 10, 20)
     "#,
     )
     .exec()
@@ -1095,8 +1095,8 @@ fn test_canvas_draw_with_transform() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local canvas = luna.gfx.newCanvas(100, 100)
-        luna.gfx.drawCanvas(canvas, 50, 60, 1.57, 2.0, 3.0, 10, 20)
+        local canvas = lurek.gfx.newCanvas(100, 100)
+        lurek.gfx.drawCanvas(canvas, 50, 60, 1.57, 2.0, 3.0, 10, 20)
     "#,
     )
     .exec()
@@ -1135,13 +1135,13 @@ fn test_canvas_release_active_canvas_clears_target_and_invalidates_handle() {
     let result = lua
         .load(
             r#"
-            local canvas = luna.gfx.newCanvas(100, 100)
-            luna.gfx.setCanvas(canvas)
-            assert(luna.gfx.getCanvas() ~= nil)
-            assert(luna.gfx.releaseCanvas(canvas) == true)
-            assert(luna.gfx.getCanvas() == nil)
+            local canvas = lurek.gfx.newCanvas(100, 100)
+            lurek.gfx.setCanvas(canvas)
+            assert(lurek.gfx.getCanvas() ~= nil)
+            assert(lurek.gfx.releaseCanvas(canvas) == true)
+            assert(lurek.gfx.getCanvas() == nil)
 
-            luna.gfx.drawCanvas(canvas, 1, 2)
+            lurek.gfx.drawCanvas(canvas, 1, 2)
             "#,
         )
         .exec();
@@ -1204,16 +1204,16 @@ fn test_phase02_get_stack_depth_tracks_push_pop_origin_and_reset() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        assert(luna.gfx.getStackDepth() == 1)
-        luna.gfx.push()
-        luna.gfx.push()
-        assert(luna.gfx.getStackDepth() == 3)
-        luna.gfx.origin()
-        assert(luna.gfx.getStackDepth() == 3)
-        luna.gfx.pop()
-        assert(luna.gfx.getStackDepth() == 2)
-        luna.gfx.reset()
-        assert(luna.gfx.getStackDepth() == 1)
+        assert(lurek.gfx.getStackDepth() == 1)
+        lurek.gfx.push()
+        lurek.gfx.push()
+        assert(lurek.gfx.getStackDepth() == 3)
+        lurek.gfx.origin()
+        assert(lurek.gfx.getStackDepth() == 3)
+        lurek.gfx.pop()
+        assert(lurek.gfx.getStackDepth() == 2)
+        lurek.gfx.reset()
+        assert(lurek.gfx.getStackDepth() == 1)
         "#,
     )
     .exec()
@@ -1225,12 +1225,12 @@ fn test_phase02_scissor_round_trips_and_intersects() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setScissor(10, 20, 100, 50)
-        local x, y, w, h = luna.gfx.getScissor()
+        lurek.gfx.setScissor(10, 20, 100, 50)
+        local x, y, w, h = lurek.gfx.getScissor()
         assert(x == 10 and y == 20 and w == 100 and h == 50)
 
-        luna.gfx.intersectScissor(50, 30, 100, 100)
-        x, y, w, h = luna.gfx.getScissor()
+        lurek.gfx.intersectScissor(50, 30, 100, 100)
+        x, y, w, h = lurek.gfx.getScissor()
         assert(x == 50 and y == 30 and w == 60 and h == 40)
         "#,
     )
@@ -1253,12 +1253,12 @@ fn test_phase02_color_mask_round_trips_and_resets() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setColorMask(false, true, false, true)
-        local r, g, b, a = luna.gfx.getColorMask()
+        lurek.gfx.setColorMask(false, true, false, true)
+        local r, g, b, a = lurek.gfx.getColorMask()
         assert(r == false and g == true and b == false and a == true)
 
-        luna.gfx.setColorMask()
-        r, g, b, a = luna.gfx.getColorMask()
+        lurek.gfx.setColorMask()
+        r, g, b, a = lurek.gfx.getColorMask()
         assert(r == true and g == true and b == true and a == true)
         "#,
     )
@@ -1271,8 +1271,8 @@ fn test_phase02_default_filter_round_trips_min_and_mag() {
     let (_state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setDefaultFilter("linear", "nearest")
-        local min, mag = luna.gfx.getDefaultFilter()
+        lurek.gfx.setDefaultFilter("linear", "nearest")
+        local min, mag = lurek.gfx.getDefaultFilter()
         assert(min == "linear")
         assert(mag == "nearest")
         "#,
@@ -1287,8 +1287,8 @@ fn test_phase02_default_filter_round_trips_anisotropy() {
     let result = lua
         .load(
             r#"
-            luna.gfx.setDefaultFilter("linear", "nearest", 4)
-            local min, mag, anisotropy = luna.gfx.getDefaultFilter()
+            lurek.gfx.setDefaultFilter("linear", "nearest", 4)
+            local min, mag, anisotropy = lurek.gfx.getDefaultFilter()
             assert(min == "linear")
             assert(mag == "nearest")
             assert(anisotropy == 4, "anisotropy should round-trip")
@@ -1307,9 +1307,9 @@ fn test_phase02_stats_report_resource_counts_and_render_counters() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        _phase02_image = luna.gfx.newImage("assets/icon.png")
-        _phase02_canvas = luna.gfx.newCanvas(32, 16)
-        _phase02_font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        _phase02_image = lurek.gfx.newImage("assets/icon.png")
+        _phase02_canvas = lurek.gfx.newCanvas(32, 16)
+        _phase02_font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
         "#,
     )
     .exec()
@@ -1323,7 +1323,7 @@ fn test_phase02_stats_report_resource_counts_and_render_counters() {
 
     lua.load(
         r#"
-        local stats = luna.gfx.getStats()
+        local stats = lurek.gfx.getStats()
         assert(stats.drawcalls == 3)
         assert(stats.canvasswitches == 2)
         assert(stats.images == 1)
@@ -1341,8 +1341,8 @@ fn test_phase02_stats_texture_memory_reflects_loaded_images() {
     let result = lua
         .load(
             r#"
-            luna.gfx.newImage("assets/icon.png")
-            local stats = luna.gfx.getStats()
+            lurek.gfx.newImage("assets/icon.png")
+            local stats = lurek.gfx.getStats()
             assert(stats.texturememory > 0, "texturememory should grow after loading an image")
             "#,
         )
@@ -1359,11 +1359,11 @@ fn test_phase02_stencil_queues_begin_geometry_end_and_test_commands() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.stencil(function()
-            luna.gfx.rectangle("fill", 1, 2, 3, 4)
+        lurek.gfx.stencil(function()
+            lurek.gfx.rectangle("fill", 1, 2, 3, 4)
         end, "increment", 7, true)
-        luna.gfx.setStencilTest("greater", 7)
-        luna.gfx.setStencilTest()
+        lurek.gfx.setStencilTest("greater", 7)
+        lurek.gfx.setStencilTest()
         "#,
     )
     .exec()
@@ -1400,13 +1400,13 @@ fn test_phase02_shader_round_trips_active_shader_and_uniforms() {
     let (state, lua) = make_graphics_vm();
     let script = format!(
         r#"
-        local shader = luna.gfx.newShader([=[{}]=])
-        luna.gfx.setShader(shader)
-        assert(luna.gfx.getShader() == shader)
-        luna.gfx.sendShader(shader, "tint", {{1.0, 0.5, 0.25, 1.0}})
-        assert(luna.gfx.hasShaderUniform(shader, "tint"))
-        luna.gfx.setShader()
-        assert(luna.gfx.getShader() == nil)
+        local shader = lurek.gfx.newShader([=[{}]=])
+        lurek.gfx.setShader(shader)
+        assert(lurek.gfx.getShader() == shader)
+        lurek.gfx.sendShader(shader, "tint", {{1.0, 0.5, 0.25, 1.0}})
+        assert(lurek.gfx.hasShaderUniform(shader, "tint"))
+        lurek.gfx.setShader()
+        assert(lurek.gfx.getShader() == nil)
         "#,
         VALID_WGSL_FRAGMENT_SHADER
     );
@@ -1441,21 +1441,21 @@ fn test_phase02_released_mesh_handle_reports_invalid_mesh_and_skips_queueing_dra
     let result = lua
         .load(
             r#"
-            local released = luna.gfx.newMesh({
+            local released = lurek.gfx.newMesh({
                 {0, 0, 0, 0, 1, 0, 0, 1},
                 {8, 0, 1, 0, 0, 1, 0, 1},
                 {0, 8, 0, 1, 0, 0, 1, 1},
             })
-            assert(luna.gfx.releaseMesh(released) == true)
+            assert(lurek.gfx.releaseMesh(released) == true)
 
-            local replacement = luna.gfx.newMesh({
+            local replacement = lurek.gfx.newMesh({
                 {1, 1, 0, 0, 1, 1, 1, 1},
                 {9, 1, 1, 0, 1, 1, 1, 1},
                 {1, 9, 0, 1, 1, 1, 1, 1},
             })
-            assert(luna.gfx.getMeshVertexCount(replacement) == 3)
+            assert(lurek.gfx.getMeshVertexCount(replacement) == 3)
 
-            luna.gfx.drawMesh(released, 5, 6)
+            lurek.gfx.drawMesh(released, 5, 6)
             "#,
         )
         .exec();
@@ -1488,22 +1488,22 @@ fn test_phase02_mesh_round_trips_vertex_state_texture_and_draw_command() {
 
     lua.load(
         r#"
-        local mesh = luna.gfx.newMesh({
+        local mesh = lurek.gfx.newMesh({
             {0, 0, 0, 0, 1, 0, 0, 1},
             {8, 0, 1, 0, 0, 1, 0, 1},
             {0, 8, 0, 1, 0, 0, 1, 1},
         }, "fan")
 
-        assert(luna.gfx.getMeshVertexCount(mesh) == 3)
+        assert(lurek.gfx.getMeshVertexCount(mesh) == 3)
 
-        luna.gfx.setMeshVertex(mesh, 2, {10, 0, 1, 0, 1, 1, 0, 1})
-        local x, y, u, v, r, g, b, a = luna.gfx.getMeshVertex(mesh, 2)
+        lurek.gfx.setMeshVertex(mesh, 2, {10, 0, 1, 0, 1, 1, 0, 1})
+        local x, y, u, v, r, g, b, a = lurek.gfx.getMeshVertex(mesh, 2)
         assert(x == 10 and y == 0 and u == 1 and v == 0)
         assert(r == 1 and g == 1 and b == 0 and a == 1)
 
-        luna.gfx.setMeshTexture(mesh, _phase02_mesh_texture)
-        luna.gfx.setMeshVertexMap(mesh, {1, 2, 3})
-        luna.gfx.drawMesh(mesh, 5, 6, 0.5, 2, 3, 4, 5)
+        lurek.gfx.setMeshTexture(mesh, _phase02_mesh_texture)
+        lurek.gfx.setMeshVertexMap(mesh, {1, 2, 3})
+        lurek.gfx.drawMesh(mesh, 5, 6, 0.5, 2, 3, 4, 5)
         "#,
     )
     .exec()
@@ -1547,7 +1547,7 @@ fn test_phase02_points_accept_table_pairs_and_queue_draw_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.points({
+        lurek.gfx.points({
             {1, 2},
             {3, 4},
             {5, 6},
@@ -1573,9 +1573,9 @@ fn test_phase02_printf_pushes_formatted_text_command_with_alignment() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        local font = luna.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
-        luna.gfx.setFont(font)
-        luna.gfx.printf("wrapped text", 12, 34, 56, "center")
+        local font = lurek.gfx.newFont("assets/fonts/Roboto-Regular.ttf", 16)
+        lurek.gfx.setFont(font)
+        lurek.gfx.printf("wrapped text", 12, 34, 56, "center")
         "#,
     )
     .exec()
@@ -1754,9 +1754,9 @@ fn nine_slice_lua_api_creates_and_draws() {
 
     lua.load(
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        local ns = luna.gfx.newNineSlice(img, 10, 10, 10, 10)
-        luna.gfx.drawNineSlice(ns, 50, 50, 300, 200)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        local ns = lurek.gfx.newNineSlice(img, 10, 10, 10, 10)
+        lurek.gfx.drawNineSlice(ns, 50, 50, 300, 200)
         "#,
     )
     .exec()
@@ -1783,8 +1783,8 @@ fn nine_slice_lua_method_draw() {
 
     lua.load(
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        local ns = luna.gfx.newNineSlice(img, 5, 5, 5, 5)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        local ns = lurek.gfx.newNineSlice(img, 5, 5, 5, 5)
         ns:draw(10, 20, 400, 300)
         "#,
     )
@@ -1813,8 +1813,8 @@ fn nine_slice_lua_get_insets() {
     let result: (f32, f32, f32, f32) = lua
         .load(
             r#"
-            local img = luna.gfx.newImage("assets/icon.png")
-            local ns = luna.gfx.newNineSlice(img, 12, 8, 15, 6)
+            local img = lurek.gfx.newImage("assets/icon.png")
+            local ns = lurek.gfx.newNineSlice(img, 12, 8, 15, 6)
             return ns:getInsets()
             "#,
         )
@@ -1834,8 +1834,8 @@ fn nine_slice_lua_negative_insets_error() {
     let result = lua
         .load(
             r#"
-            local img = luna.gfx.newImage("assets/icon.png")
-            local ns = luna.gfx.newNineSlice(img, -5, 10, 10, 10)
+            local img = lurek.gfx.newImage("assets/icon.png")
+            local ns = lurek.gfx.newNineSlice(img, -5, 10, 10, 10)
             "#,
         )
         .exec();
@@ -1850,8 +1850,8 @@ fn nine_slice_lua_excessive_insets_error() {
     let result = lua
         .load(
             r#"
-            local img = luna.gfx.newImage("assets/icon.png")
-            local ns = luna.gfx.newNineSlice(img, 500, 500, 500, 500)
+            local img = lurek.gfx.newImage("assets/icon.png")
+            local ns = lurek.gfx.newNineSlice(img, 500, 500, 500, 500)
             "#,
         )
         .exec();
@@ -1864,36 +1864,36 @@ fn test_phase02_reset_restores_phase02_state_defaults() {
     let (_state, lua) = make_graphics_vm();
     let setup = format!(
         r#"
-        local shader = luna.gfx.newShader([=[{}]=])
-        local canvas = luna.gfx.newCanvas(8, 8)
+        local shader = lurek.gfx.newShader([=[{}]=])
+        local canvas = lurek.gfx.newCanvas(8, 8)
 
-        luna.gfx.push()
-        luna.gfx.push()
-        luna.gfx.setScissor(1, 2, 3, 4)
-        luna.gfx.setColorMask(false, true, false, true)
-        luna.gfx.setPointSize(5)
-        luna.gfx.setShader(shader)
-        luna.gfx.setCanvas(canvas)
-        luna.gfx.reset()
+        lurek.gfx.push()
+        lurek.gfx.push()
+        lurek.gfx.setScissor(1, 2, 3, 4)
+        lurek.gfx.setColorMask(false, true, false, true)
+        lurek.gfx.setPointSize(5)
+        lurek.gfx.setShader(shader)
+        lurek.gfx.setCanvas(canvas)
+        lurek.gfx.reset()
         "#,
         VALID_WGSL_FRAGMENT_SHADER
     );
     lua.load(&setup).exec().unwrap();
 
     let scissor_arity: i64 = lua
-        .load("return select('#', luna.gfx.getScissor())")
+        .load("return select('#', lurek.gfx.getScissor())")
         .eval()
         .unwrap();
     let color_mask: (bool, bool, bool, bool) = lua
-        .load("return luna.gfx.getColorMask()")
+        .load("return lurek.gfx.getColorMask()")
         .eval()
         .unwrap();
     let point_size: f32 = lua
-        .load("return luna.gfx.getPointSize()")
+        .load("return lurek.gfx.getPointSize()")
         .eval()
         .unwrap();
-    let shader_value: mlua::Value = lua.load("return luna.gfx.getShader()").eval().unwrap();
-    let canvas_value: mlua::Value = lua.load("return luna.gfx.getCanvas()").eval().unwrap();
+    let shader_value: mlua::Value = lua.load("return lurek.gfx.getShader()").eval().unwrap();
+    let canvas_value: mlua::Value = lua.load("return lurek.gfx.getCanvas()").eval().unwrap();
 
     assert_eq!(scissor_arity, 0, "reset should disable scissor");
     assert_eq!(
@@ -1920,11 +1920,11 @@ fn test_phase02_wireframe_round_trips_and_queues_command() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        assert(luna.gfx.isWireframe() == false)
-        luna.gfx.setWireframe(true)
-        assert(luna.gfx.isWireframe() == true)
-        luna.gfx.setWireframe(false)
-        assert(luna.gfx.isWireframe() == false)
+        assert(lurek.gfx.isWireframe() == false)
+        lurek.gfx.setWireframe(true)
+        assert(lurek.gfx.isWireframe() == true)
+        lurek.gfx.setWireframe(false)
+        assert(lurek.gfx.isWireframe() == false)
         "#,
     )
     .exec()
@@ -1993,8 +1993,8 @@ fn graphics_draw_dispatch_image_userdata_pushes_draw_image() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        luna.gfx.draw(img, 10, 20)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        lurek.gfx.draw(img, 10, 20)
         "#,
     );
     let st = state.borrow();
@@ -2014,8 +2014,8 @@ fn graphics_draw_dispatch_image_with_rotation_pushes_draw_image_ex() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        luna.gfx.draw(img, 5, 10, 1.57)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        lurek.gfx.draw(img, 5, 10, 1.57)
         "#,
     );
     let st = state.borrow();
@@ -2034,8 +2034,8 @@ fn graphics_draw_dispatch_canvas_userdata_pushes_draw_canvas() {
     run_draw(
         &lua,
         r#"
-        local canvas = luna.gfx.newCanvas(64, 64)
-        luna.gfx.draw(canvas, 30, 40)
+        local canvas = lurek.gfx.newCanvas(64, 64)
+        lurek.gfx.draw(canvas, 30, 40)
         "#,
     );
     let st = state.borrow();
@@ -2054,9 +2054,9 @@ fn graphics_draw_dispatch_sprite_batch_userdata_pushes_draw_batch() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        local batch = luna.gfx.newSpriteBatch(img, 10)
-        luna.gfx.draw(batch, 0, 0)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        local batch = lurek.gfx.newSpriteBatch(img, 10)
+        lurek.gfx.draw(batch, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2090,8 +2090,8 @@ fn graphics_draw_ex_dispatch_image_userdata_pushes_draw_image_ex() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        luna.gfx.drawEx(img, 15, 25, 0.5, 2.0, 2.0, 0, 0)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        lurek.gfx.drawEx(img, 15, 25, 0.5, 2.0, 2.0, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2114,8 +2114,8 @@ fn graphics_draw_ex_dispatch_canvas_userdata_pushes_draw_canvas() {
     run_draw(
         &lua,
         r#"
-        local canvas = luna.gfx.newCanvas(32, 32)
-        luna.gfx.drawEx(canvas, 5, 10, 0, 1, 1, 0, 0)
+        local canvas = lurek.gfx.newCanvas(32, 32)
+        lurek.gfx.drawEx(canvas, 5, 10, 0, 1, 1, 0, 0)
         "#,
     );
     let st = state.borrow();
@@ -2135,8 +2135,8 @@ fn graphics_draw_ex_sy_defaults_to_sx() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        luna.gfx.drawEx(img, 0, 0, 0, 3.0)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        lurek.gfx.drawEx(img, 0, 0, 0, 3.0)
         "#,
     );
     let st = state.borrow();
@@ -2161,7 +2161,7 @@ fn graphics_capture_screenshot_stores_callback() {
         .load(
             r#"
         local fired = false
-        luna.gfx.captureScreenshot(function(img)
+        lurek.gfx.captureScreenshot(function(img)
             fired = true
             assert(type(img) == "userdata", "expected ImageData userdata")
         end)
@@ -2187,8 +2187,8 @@ fn graphics_draw_command_image_variant() {
     run_draw(
         &lua,
         r#"
-        local img = luna.gfx.newImage("assets/icon.png")
-        luna.gfx.draw(img, 10, 20)
+        local img = lurek.gfx.newImage("assets/icon.png")
+        lurek.gfx.draw(img, 10, 20)
     "#,
     );
     let st = state.borrow();
@@ -2205,8 +2205,8 @@ fn graphics_draw_command_canvas_variant() {
     run_draw(
         &lua,
         r#"
-        local c = luna.gfx.newCanvas(64, 64)
-        luna.gfx.draw(c, 5, 15)
+        local c = lurek.gfx.newCanvas(64, 64)
+        lurek.gfx.draw(c, 5, 15)
     "#,
     );
     let st = state.borrow();
@@ -2228,7 +2228,7 @@ fn graphics_screenshot_request_queued_without_panic() {
         .load(
             r#"
         local fired = false
-        luna.gfx.captureScreenshot(function(img)
+        lurek.gfx.captureScreenshot(function(img)
             fired = true
         end)
         assert(fired, "captureScreenshot callback must be invoked")
@@ -2328,7 +2328,7 @@ fn graphics_depth_mode_round_trip() {
 fn graphics_stencil_mode_defaults_in_get() {
     let (_state, lua) = make_graphics_vm();
     let result: (String, String, u8) = lua
-        .load(r#"return luna.gfx.getStencilMode()"#)
+        .load(r#"return lurek.gfx.getStencilMode()"#)
         .eval()
         .expect("getStencilMode failed");
     assert_eq!(result.0, "keep");
@@ -2340,7 +2340,7 @@ fn graphics_stencil_mode_defaults_in_get() {
 fn graphics_depth_mode_defaults_in_get() {
     let (_state, lua) = make_graphics_vm();
     let result: (String, bool) = lua
-        .load(r#"return luna.gfx.getDepthMode()"#)
+        .load(r#"return lurek.gfx.getDepthMode()"#)
         .eval()
         .expect("getDepthMode failed");
     assert_eq!(result.0, "always");
@@ -2352,8 +2352,8 @@ fn graphics_clear_stencil_resets_to_default() {
     let (state, lua) = make_graphics_vm();
     lua.load(
         r#"
-        luna.gfx.setStencilMode("replace", "equal", 7)
-        luna.gfx.clearStencil()
+        lurek.gfx.setStencilMode("replace", "equal", 7)
+        lurek.gfx.clearStencil()
         "#,
     )
     .exec()

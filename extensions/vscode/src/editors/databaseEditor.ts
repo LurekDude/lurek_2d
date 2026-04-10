@@ -7,7 +7,7 @@ export class DatabaseEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.database", "Database Browser");
+    super(context, "lurek.editor.database", "Database Browser");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

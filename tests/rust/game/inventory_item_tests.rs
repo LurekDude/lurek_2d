@@ -32,13 +32,13 @@ fn make_vm() -> mlua::Lua {
 
 /// Define a standard set of item archetypes used across several tests.
 const SETUP_ITEM_TYPES: &str = r#"
-    luna.item.clearTypes()
-    luna.item.defineType("sword",  { category = "weapon",    stats = { dmg = 12, weight = 3.5 }, tags = {"equippable","weapon"} })
-    luna.item.defineType("shield", { category = "armor",     stats = { def = 8,  weight = 5.0 }, tags = {"equippable","armor"} })
-    luna.item.defineType("helmet", { category = "armor",     stats = { def = 4,  weight = 2.0 }, tags = {"equippable","armor"} })
-    luna.item.defineType("potion", { category = "consumable",stats = { hp  = 50, weight = 0.5 }, tags = {"consumable"} })
-    luna.item.defineType("arrow",  { category = "ammo",      stats = { dmg = 3,  weight = 0.1 }, tags = {"ammo","stackable"} })
-    luna.item.defineType("coin",   { category = "currency",  stats = { value=1,  weight = 0.01}, tags = {"currency","stackable"} })
+    lurek.item.clearTypes()
+    lurek.item.defineType("sword",  { category = "weapon",    stats = { dmg = 12, weight = 3.5 }, tags = {"equippable","weapon"} })
+    lurek.item.defineType("shield", { category = "armor",     stats = { def = 8,  weight = 5.0 }, tags = {"equippable","armor"} })
+    lurek.item.defineType("helmet", { category = "armor",     stats = { def = 4,  weight = 2.0 }, tags = {"equippable","armor"} })
+    lurek.item.defineType("potion", { category = "consumable",stats = { hp  = 50, weight = 0.5 }, tags = {"consumable"} })
+    lurek.item.defineType("arrow",  { category = "ammo",      stats = { dmg = 3,  weight = 0.1 }, tags = {"ammo","stackable"} })
+    lurek.item.defineType("coin",   { category = "currency",  stats = { value=1,  weight = 0.01}, tags = {"currency","stackable"} })
 "#;
 
 // ── 1. Pool loot drop → inventory container ───────────────────────────────
@@ -53,16 +53,16 @@ fn pool_loot_drop_fills_inventory() {
             r#"
         {}
         -- Build a loot pool (sword rare, potion common)
-        local pool = luna.item.newItemPool()
+        local pool = lurek.item.newItemPool()
         pool:add("sword",  1)
         pool:add("potion", 5)
         pool:add("coin",   10)
 
         -- Draw 6 loot items via drawItems (returns array of LuaItem)
-        local bag = luna.inventory.newContainer("bag", "dynamic", 20)
+        local bag = lurek.inventory.newContainer("bag", "dynamic", 20)
         local added = 0
         for _, it in ipairs(pool:drawItems(6)) do
-            local inv_item = luna.inventory.newItem(it:getItemType())
+            local inv_item = lurek.inventory.newItem(it:getItemType())
             if bag:addItem(inv_item) then
                 added = added + 1
             end
@@ -88,14 +88,14 @@ fn builder_starter_loadout_equips_cleanly() {
             r#"
         {}
         -- Build exactly one sword + one shield
-        local builder = luna.item.newStackBuilder()
+        local builder = lurek.item.newStackBuilder()
         builder:add("sword",  1)
         builder:add("shield", 1)
         local gear_stack = builder:build("starter_gear")
 
         -- Create a player inventory with equipment slots
-        local inv = luna.inventory.newInventory()
-        local container = luna.inventory.newContainer("backpack", "dynamic", 20)
+        local inv = lurek.inventory.newInventory()
+        local container = lurek.inventory.newContainer("backpack", "dynamic", 20)
         inv:addContainer("backpack", container)
 
         -- Equip each item from the gear stack by popping
@@ -104,7 +104,7 @@ fn builder_starter_loadout_equips_cleanly() {
             local it = gear_stack:pop()
             if it then
                 -- Add to backpack via inventory item bridged by type name
-                local inv_item = luna.inventory.newItem(it:getItemType())
+                local inv_item = lurek.inventory.newItem(it:getItemType())
                 container:addItem(inv_item)
             end
         end
@@ -133,18 +133,18 @@ fn weight_limit_restricts_carried_items() {
             r#"
         {}
         -- Bag can carry at most 15.0 weight units
-        local bag = luna.inventory.newContainer("bag", "dynamic", 20)
+        local bag = lurek.inventory.newContainer("bag", "dynamic", 20)
         bag:setWeightLimit(15.0)
 
         -- Try to add 4 swords (each weighs 3.5 → total 14.0 fits; 5th would be 17.5)
         local LIMIT = 15.0
         local added = 0
         for i = 1, 5 do
-            local it = luna.item.newItem("sword")
+            local it = lurek.item.newItem("sword")
             local item_w = it:getStat("weight")            -- 3.5
             -- Enforce weight limit manually (Container.add_item doesn't block by weight)
             if bag:getCurrentWeight() + item_w <= LIMIT then
-                local inv_item = luna.inventory.newItem("sword")
+                local inv_item = lurek.inventory.newItem("sword")
                 inv_item:setWeight(item_w)
                 if bag:addItem(inv_item) then
                     added = added + 1
@@ -174,12 +174,12 @@ fn pickup_journal_tracks_collected_items() {
         .load(&format!(
             r#"
         {}
-        local history = luna.item.newHistory(10)
-        local bag_stack = luna.item.newStack("bag")
+        local history = lurek.item.newHistory(10)
+        local bag_stack = lurek.item.newStack("bag")
 
         local pickups = {{ "potion", "arrow", "coin", "potion" }}
         for i, type_name in ipairs(pickups) do
-            local it = luna.item.newItem(type_name)
+            local it = lurek.item.newItem(type_name)
             bag_stack:push(it)
             history:recordCustom("bag", "picked_up_" .. type_name, bag_stack:size())
         end
@@ -211,17 +211,17 @@ fn shop_purchase_moves_item_to_player_bag() {
         {}
         -- Stock the shop with 5 potions using a plain LuaStack
         -- (StackManager::getStack returns a snapshot copy, so we use a plain stack)
-        local shop_stack = luna.item.newStack("potions")
+        local shop_stack = lurek.item.newStack("potions")
         for i = 1, 5 do
-            shop_stack:push(luna.item.newItem("potion"))
+            shop_stack:push(lurek.item.newItem("potion"))
         end
 
         -- Player buys 2 potions
-        local player_bag = luna.inventory.newContainer("bag", "dynamic", 10)
+        local player_bag = lurek.inventory.newContainer("bag", "dynamic", 10)
         for i = 1, 2 do
             local bought = shop_stack:pop()  -- remove from shop
             if bought then
-                local inv_item = luna.inventory.newItem(bought:getItemType())
+                local inv_item = lurek.inventory.newItem(bought:getItemType())
                 player_bag:addItem(inv_item)
             end
         end
@@ -252,15 +252,15 @@ fn find_best_weapons_by_dmg_then_equip() {
         {}
         -- Four candidates: three swords (all dmg=12) and one arrow (dmg=3)
         local candidates = {{
-            luna.item.newItem("sword"),   -- dmg 12
-            luna.item.newItem("sword"),   -- dmg 12
-            luna.item.newItem("sword"),   -- dmg 12
-            luna.item.newItem("arrow"),   -- dmg 3
+            lurek.item.newItem("sword"),   -- dmg 12
+            lurek.item.newItem("sword"),   -- dmg 12
+            lurek.item.newItem("sword"),   -- dmg 12
+            lurek.item.newItem("arrow"),   -- dmg 3
         }}
 
         -- findNOfStat finds groups where EXACTLY 3 items share the same stat value.
         -- Only the three swords satisfy this (all have dmg=12).
-        local groups = luna.item.findNOfStat(candidates, "dmg", 3)
+        local groups = lurek.item.findNOfStat(candidates, "dmg", 3)
         local group = groups[1]
 
         return #groups, group.items[1]:getItemType()
@@ -285,15 +285,15 @@ fn full_armor_set_activates_in_inventory() {
             r#"
         {}
         -- Build the armor set definition
-        local armor_set = luna.inventory.newItemSet("full_armor")
+        local armor_set = lurek.inventory.newItemSet("full_armor")
 
         -- Player picks up both armor pieces
-        local inv = luna.inventory.newInventory()
-        local bag = luna.inventory.newContainer("bag", "dynamic", 10)
+        local inv = lurek.inventory.newInventory()
+        local bag = lurek.inventory.newContainer("bag", "dynamic", 10)
         inv:addContainer("bag", bag)
 
         for _, t in ipairs({{"helmet","shield"}}) do
-            local inv_item = luna.inventory.newItem(t)
+            local inv_item = lurek.inventory.newItem(t)
             bag:addItem(inv_item)
         end
 
@@ -322,24 +322,24 @@ fn group_by_category_routes_items_to_containers() {
         {}
         -- Mixed loot from a dungeon chest
         local loot = {{
-            luna.item.newItem("sword"),
-            luna.item.newItem("potion"),
-            luna.item.newItem("potion"),
-            luna.item.newItem("sword"),
-            luna.item.newItem("coin"),
+            lurek.item.newItem("sword"),
+            lurek.item.newItem("potion"),
+            lurek.item.newItem("potion"),
+            lurek.item.newItem("sword"),
+            lurek.item.newItem("coin"),
         }}
 
         -- Group by category
         -- groupByCategory returns {{ ["weapon"] = {{items...}}, ["consumable"] = {{items...}}, ... }}
-        local groups = luna.item.groupByCategory(loot)
+        local groups = lurek.item.groupByCategory(loot)
 
         -- Two inventory containers, one per category we care about
-        local weapons_bag    = luna.inventory.newContainer("weapons",    "dynamic", 10)
-        local consumable_bag = luna.inventory.newContainer("consumables","dynamic", 10)
+        local weapons_bag    = lurek.inventory.newContainer("weapons",    "dynamic", 10)
+        local consumable_bag = lurek.inventory.newContainer("consumables","dynamic", 10)
 
         for cat, items in pairs(groups) do
             for _, it in ipairs(items) do
-                local inv_item = luna.inventory.newItem(it:getItemType())
+                local inv_item = lurek.inventory.newItem(it:getItemType())
                 if cat == "weapon" then
                     weapons_bag:addItem(inv_item)
                 elseif cat == "consumable" then

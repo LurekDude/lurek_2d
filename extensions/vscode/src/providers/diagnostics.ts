@@ -9,10 +9,10 @@ const analyzer = new LuaDocumentAnalyzer();
 
 /**
  * Registers the Lua diagnostics provider.
- * Runs 6 diagnostic rules on document open, save, and change (debounced).
+ * Runs 13 diagnostic rules on document open, save, and change (debounced).
  */
 export function register(context: vscode.ExtensionContext, apiData: ApiDataService): void {
-    const collection = vscode.languages.createDiagnosticCollection('luna');
+    const collection = vscode.languages.createDiagnosticCollection('lurek');
     context.subscriptions.push(collection);
 
     const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -32,8 +32,12 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
             diagnostics.push(...checkThreadRandom(text, info));
             diagnostics.push(...checkMissingCallback(text, document, info));
             diagnostics.push(...checkWrongEnumValue(text, apiData));
-            diagnostics.push(...checkUnknownLunaFunc(text, apiData));
+            diagnostics.push(...checkUnknownLurekFunc(text, apiData));
             checkConfLua(text, document, diagnostics);
+            diagnostics.push(...checkPerFrameAllocation(text, info));
+            diagnostics.push(...checkMissingTestSummary(text, document));
+            diagnostics.push(...checkEntityNilAccess(text));
+            diagnostics.push(...checkMethodColonDot(text));
 
             collection.set(document.uri, diagnostics);
         } catch {
@@ -72,7 +76,7 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
     }
 }
 
-// ── Rule 1: luna.deprecated ──────────────────────────────────
+// ── Rule 1: lurek.deprecated ──────────────────────────────────
 
 function checkDeprecated(text: string, apiData: ApiDataService): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
@@ -97,8 +101,8 @@ function checkDeprecated(text: string, apiData: ApiDataService): vscode.Diagnost
                     `${fn.fullPath} is deprecated. ${fn.deprecated}`,
                     vscode.DiagnosticSeverity.Warning,
                 );
-                diag.code = 'luna.deprecated';
-                diag.source = 'Luna Toolkit';
+                diag.code = 'lurek.deprecated';
+                diag.source = 'Lurek2D Toolkit';
                 diag.tags = [vscode.DiagnosticTag.Deprecated];
                 diagnostics.push(diag);
             }
@@ -108,14 +112,14 @@ function checkDeprecated(text: string, apiData: ApiDataService): vscode.Diagnost
     return diagnostics;
 }
 
-// ── Rule 2: luna.colorRange ──────────────────────────────────
+// ── Rule 2: lurek.colorRange ──────────────────────────────────
 
 function checkColorRange(text: string): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
 
     const colorFuncPattern =
-        /luna\.graphics\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
+        /lurek\.graphics\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -136,8 +140,8 @@ function checkColorRange(text: string): vscode.Diagnostic[] {
                 `Color values should be in 0-1 range. Did you mean ${converted.join(', ')}?`,
                 vscode.DiagnosticSeverity.Warning,
             );
-            diag.code = 'luna.colorRange';
-            diag.source = 'Luna Toolkit';
+            diag.code = 'lurek.colorRange';
+            diag.source = 'Lurek2D Toolkit';
             diagnostics.push(diag);
         }
     }
@@ -145,7 +149,7 @@ function checkColorRange(text: string): vscode.Diagnostic[] {
     return diagnostics;
 }
 
-// ── Rule 3: luna.unusedRequire ────────────────────────────────
+// ── Rule 3: lurek.unusedRequire ────────────────────────────────
 
 function checkUnusedRequire(
     text: string,
@@ -167,8 +171,8 @@ function checkUnusedRequire(
                 `Required module '${varName}' is never used`,
                 vscode.DiagnosticSeverity.Hint,
             );
-            diag.code = 'luna.unusedRequire';
-            diag.source = 'Luna Toolkit';
+            diag.code = 'lurek.unusedRequire';
+            diag.source = 'Lurek2D Toolkit';
             diag.tags = [vscode.DiagnosticTag.Unnecessary];
             diagnostics.push(diag);
         }
@@ -177,7 +181,7 @@ function checkUnusedRequire(
     return diagnostics;
 }
 
-// ── Rule 4: luna.assetNotFound ────────────────────────────────
+// ── Rule 4: lurek.assetNotFound ────────────────────────────────
 
 function checkAssetNotFound(
     text: string,
@@ -188,7 +192,7 @@ function checkAssetNotFound(
 
     const lines = text.split('\n');
     const assetFuncPattern =
-        /luna\.(?:graphics\.newImage|audio\.newSource|filesystem\.read)\s*\(\s*["']([^"']+)["']/g;
+        /lurek\.(?:graphics\.newImage|audio\.newSource|filesystem\.read)\s*\(\s*["']([^"']+)["']/g;
 
     const docDir = path.dirname(document.uri.fsPath);
     const wsRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -224,22 +228,22 @@ function checkAssetNotFound(
                     `Asset file '${assetPath}' not found in workspace`,
                     vscode.DiagnosticSeverity.Warning,
                 );
-                diag.code = 'luna.assetNotFound';
-                diag.source = 'Luna Toolkit';
+                diag.code = 'lurek.assetNotFound';
+                diag.source = 'Lurek2D Toolkit';
                 diagnostics.push(diag);
             }
         }
     }
 }
 
-// ── Rule 5: luna.threadRandom ────────────────────────────────
+// ── Rule 5: lurek.threadRandom ────────────────────────────────
 
 function checkThreadRandom(
     text: string,
     info: ReturnType<typeof analyzer.analyze>,
 ): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
-    if (!text.includes('luna.thread')) return diagnostics;
+    if (!text.includes('lurek.thread')) return diagnostics;
 
     const lines = text.split('\n');
     const randomPattern = /\bmath\.random\s*\(/g;
@@ -255,7 +259,7 @@ function checkThreadRandom(
 
             // Heuristic: check if surrounding scope contains thread-related code
             const scopeLines = lines.slice(scope.startLine, scope.endLine + 1).join('\n');
-            if (!scopeLines.includes('luna.thread')) continue;
+            if (!scopeLines.includes('lurek.thread')) continue;
 
             const range = new vscode.Range(i, match.index, i, match.index + 'math.random'.length);
             const diag = new vscode.Diagnostic(
@@ -263,8 +267,8 @@ function checkThreadRandom(
                 'math.random in threads may produce identical sequences. Consider seeding with thread ID.',
                 vscode.DiagnosticSeverity.Information,
             );
-            diag.code = 'luna.threadRandom';
-            diag.source = 'Luna Toolkit';
+            diag.code = 'lurek.threadRandom';
+            diag.source = 'Lurek2D Toolkit';
             diagnostics.push(diag);
         }
     }
@@ -272,7 +276,7 @@ function checkThreadRandom(
     return diagnostics;
 }
 
-// ── Rule 6: luna.missingCallback ─────────────────────────────
+// ── Rule 6: lurek.missingCallback ─────────────────────────────
 
 function checkMissingCallback(
     text: string,
@@ -286,20 +290,20 @@ function checkMissingCallback(
     if (fileName !== 'main.lua') return diagnostics;
 
     const hasUpdate = info.callbacks.some(cb => cb.name === 'update')
-        || /luna\.update\s*=\s*function/.test(text);
+        || /lurek\.update\s*=\s*function/.test(text);
     const hasDraw = info.callbacks.some(cb => cb.name === 'draw')
-        || /luna\.draw\s*=\s*function/.test(text);
+        || /lurek\.draw\s*=\s*function/.test(text);
 
     if (!hasUpdate && !hasDraw) {
         const lines = text.split('\n');
         const range = new vscode.Range(0, 0, 0, lines[0]?.length ?? 0);
         const diag = new vscode.Diagnostic(
             range,
-            'main.lua should define luna.update(dt) and/or luna.draw()',
+            'main.lua should define lurek.update(dt) and/or lurek.draw()',
             vscode.DiagnosticSeverity.Information,
         );
-        diag.code = 'luna.missingCallback';
-        diag.source = 'Luna Toolkit';
+        diag.code = 'lurek.missingCallback';
+        diag.source = 'Lurek2D Toolkit';
         diagnostics.push(diag);
     }
 
@@ -311,42 +315,42 @@ function checkMissingCallback(
 // Known enum sets per function/param pattern
 const ENUM_RULES: { pattern: RegExp; valid: string[]; label: string }[] = [
     {
-        pattern: /luna\.graphics\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,
         valid: ['fill', 'line'],
         label: 'draw mode',
     },
     {
-        pattern: /luna\.graphics\.setBlendMode\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.setBlendMode\s*\(\s*["']([^"']+)["']/g,
         valid: ['alpha', 'add', 'subtract', 'multiply', 'replace', 'screen', 'darken', 'lighten', 'none'],
         label: 'blend mode',
     },
     {
-        pattern: /luna\.graphics\.setLineStyle\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.setLineStyle\s*\(\s*["']([^"']+)["']/g,
         valid: ['smooth', 'rough'],
         label: 'line style',
     },
     {
-        pattern: /luna\.graphics\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,
         valid: ['linear', 'nearest'],
         label: 'texture filter',
     },
     {
-        pattern: /luna\.graphics\.setFilter\s*\(\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.setFilter\s*\(\s*["']([^"']+)["']/g,
         valid: ['linear', 'nearest'],
         label: 'texture filter',
     },
     {
-        pattern: /luna\.audio\.newSource\s*\([^,]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.audio\.newSource\s*\([^,]*,\s*["']([^"']+)["']/g,
         valid: ['static', 'stream'],
         label: 'audio source type',
     },
     {
-        pattern: /luna\.physics\.newBody\s*\([^,]*,[^,]*,[^,]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.physics\.newBody\s*\([^,]*,[^,]*,[^,]*,\s*["']([^"']+)["']/g,
         valid: ['dynamic', 'static', 'kinematic'],
         label: 'body type',
     },
     {
-        pattern: /luna\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,
+        pattern: /lurek\.graphics\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,
         valid: ['left', 'center', 'right', 'justify'],
         label: 'text alignment',
     },
@@ -390,8 +394,8 @@ function checkWrongEnumValue(text: string, _apiData: ApiDataService): vscode.Dia
                     ? `Unknown ${rule.label} "${value}". Did you mean "${suggestion}"? Valid: ${rule.valid.join(', ')}`
                     : `Unknown ${rule.label} "${value}". Valid values: ${rule.valid.join(', ')}`;
                 const diag = new vscode.Diagnostic(range, msg, vscode.DiagnosticSeverity.Warning);
-                diag.code = 'luna.wrongEnumValue';
-                diag.source = 'Luna Toolkit';
+                diag.code = 'lurek.wrongEnumValue';
+                diag.source = 'Lurek2D Toolkit';
                 diagnostics.push(diag);
             }
         }
@@ -400,12 +404,12 @@ function checkWrongEnumValue(text: string, _apiData: ApiDataService): vscode.Dia
     return diagnostics;
 }
 
-// ── D6: Unknown luna.module.function call ─────────────────────
+// ── D6: Unknown lurek.module.function call ─────────────────────
 
-function checkUnknownLunaFunc(text: string, apiData: ApiDataService): vscode.Diagnostic[] {
+function checkUnknownLurekFunc(text: string, apiData: ApiDataService): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const lines = text.split('\n');
-    const callPattern = /luna\.(\w+)\.(\w+)\s*\(/g;
+    const callPattern = /lurek\.(\w+)\.(\w+)\s*\(/g;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -415,7 +419,7 @@ function checkUnknownLunaFunc(text: string, apiData: ApiDataService): vscode.Dia
         while ((m = callPattern.exec(line)) !== null) {
             const modName = m[1];
             const funcName = m[2];
-            const fullPath = `luna.${modName}.${funcName}`;
+            const fullPath = `lurek.${modName}.${funcName}`;
             const mod = apiData.getModule(modName);
             if (!mod) continue; // unknown module — skip (not our concern)
             const knownFn = apiData.getFunction(fullPath);
@@ -424,15 +428,15 @@ function checkUnknownLunaFunc(text: string, apiData: ApiDataService): vscode.Dia
             const methodFn = apiData.getFunctions(modName).find(f => f.name === funcName);
             if (methodFn) continue;
 
-            const col = m.index + `luna.${modName}.`.length;
+            const col = m.index + `lurek.${modName}.`.length;
             const range = new vscode.Range(i, col, i, col + funcName.length);
             const diag = new vscode.Diagnostic(
                 range,
-                `"${funcName}" is not a known function in luna.${modName}`,
+                `"${funcName}" is not a known function in lurek.${modName}`,
                 vscode.DiagnosticSeverity.Warning,
             );
-            diag.code = 'luna.unknownFunction';
-            diag.source = 'Luna Toolkit';
+            diag.code = 'lurek.unknownFunction';
+            diag.source = 'Lurek2D Toolkit';
             diagnostics.push(diag);
         }
     }
@@ -481,9 +485,191 @@ function checkConfLua(
                 `"${key}" is not a recognised conf.lua key in t.${section}. Valid: ${validKeys.join(', ')}`,
                 vscode.DiagnosticSeverity.Warning,
             );
-            diag.code = 'luna.confKey';
-            diag.source = 'Luna Toolkit';
+            diag.code = 'lurek.confKey';
+            diag.source = 'Lurek2D Toolkit';
             diagnostics.push(diag);
         }
     }
+}
+
+// ── Rule 10: Per-frame allocation detection ───────────────────
+
+/**
+ * Warns about common per-frame allocation pitfalls: calling factory functions
+ * like newImage, newSource, newFont inside callbacks that run every frame
+ * (lurek.update, lurek.draw, lurek.render, lurek.render_ui).
+ */
+function checkPerFrameAllocation(
+    text: string,
+    info: ReturnType<typeof analyzer.analyze>,
+): vscode.Diagnostic[] {
+    const diagnostics: vscode.Diagnostic[] = [];
+    const lines = text.split('\n');
+    const allocPattern = /lurek\.(?:graphics\.(?:newImage|newFont|newCanvas|newShader|newSpriteBatch|newMesh)|audio\.(?:newSource)|image\.load)\s*\(/g;
+    const frameCallbacks = ['update', 'draw', 'render', 'render_ui', 'process', 'process_late', 'process_physics'];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trimStart().startsWith('--')) continue;
+
+        allocPattern.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = allocPattern.exec(line)) !== null) {
+            // Check if this line is inside a per-frame callback scope
+            const scope = analyzer.getScopeAt(info, i);
+            if (!scope) continue;
+
+            const isPerFrame = frameCallbacks.some(cb => {
+                const scopeText = lines.slice(scope.startLine, Math.min(scope.startLine + 3, lines.length)).join('\n');
+                return scopeText.includes(`lurek.${cb}`) || scopeText.includes(`function ${cb}`);
+            });
+
+            if (!isPerFrame) continue;
+
+            const funcName = m[0].replace(/\s*\($/, '');
+            const range = new vscode.Range(i, m.index, i, m.index + funcName.length);
+            const diag = new vscode.Diagnostic(
+                range,
+                `${funcName} called inside a per-frame callback. This allocates every frame — move to lurek.init() or lurek.ready().`,
+                vscode.DiagnosticSeverity.Warning,
+            );
+            diag.code = 'lurek.perFrameAlloc';
+            diag.source = 'Lurek2D Toolkit';
+            diagnostics.push(diag);
+        }
+    }
+
+    return diagnostics;
+}
+
+// ── Rule 11: Missing test_summary() in test files ─────────────
+
+/**
+ * Checks if Lua files under tests/lua/ end with a test_summary() call,
+ * which is required by the Lurek2D test harness.
+ */
+function checkMissingTestSummary(
+    text: string,
+    document: vscode.TextDocument,
+): vscode.Diagnostic[] {
+    const diagnostics: vscode.Diagnostic[] = [];
+    const filePath = document.uri.fsPath.replace(/\\/g, '/');
+
+    // Only applies to test files
+    if (!filePath.includes('tests/lua/') && !filePath.includes('tests\\lua\\')) return diagnostics;
+    if (!filePath.endsWith('.lua')) return diagnostics;
+    // Skip the init.lua harness itself
+    if (filePath.endsWith('init.lua')) return diagnostics;
+
+    const hasTestSummary = /\btest_summary\s*\(\s*\)/.test(text);
+    if (!hasTestSummary) {
+        const lines = text.split('\n');
+        const lastLine = lines.length - 1;
+        const range = new vscode.Range(lastLine, 0, lastLine, lines[lastLine]?.length ?? 0);
+        const diag = new vscode.Diagnostic(
+            range,
+            'Lua test file is missing test_summary() call at the end. Required by the Lurek2D test harness.',
+            vscode.DiagnosticSeverity.Warning,
+        );
+        diag.code = 'lurek.missingTestSummary';
+        diag.source = 'Lurek2D Toolkit';
+        diagnostics.push(diag);
+    }
+
+    return diagnostics;
+}
+
+// ── Rule 12: Entity nil access after find ─────────────────────
+
+/**
+ * Warns when a lurek.entity.find() result is used without nil-checking.
+ * entity.find() can return nil, so accessing methods directly is unsafe.
+ */
+function checkEntityNilAccess(text: string): vscode.Diagnostic[] {
+    const diagnostics: vscode.Diagnostic[] = [];
+    const lines = text.split('\n');
+
+    // Detect pattern: local X = lurek.entity.find(...) \n X:method() or X.method without if X then
+    const findPattern = /\blocal\s+(\w+)\s*=\s*lurek\.entity\.find\s*\(/g;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trimStart().startsWith('--')) continue;
+
+        findPattern.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = findPattern.exec(line)) !== null) {
+            const varName = m[1];
+            // Check next 5 lines for unguarded access
+            let hasGuard = false;
+            for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+                const checkLine = lines[j].trim();
+                if (checkLine.startsWith('--')) continue;
+                if (checkLine.includes(`if ${varName}`) || checkLine.includes(`if not ${varName}`)) {
+                    hasGuard = true;
+                    break;
+                }
+                // Direct method call without guard
+                const accessPattern = new RegExp(`\\b${varName}\\s*[:.:]\\s*\\w+`);
+                if (accessPattern.test(checkLine) && !hasGuard) {
+                    const col = checkLine.indexOf(varName);
+                    const range = new vscode.Range(j, col, j, col + varName.length);
+                    const diag = new vscode.Diagnostic(
+                        range,
+                        `'${varName}' from lurek.entity.find() may be nil. Consider adding: if ${varName} then`,
+                        vscode.DiagnosticSeverity.Information,
+                    );
+                    diag.code = 'lurek.entityNilAccess';
+                    diag.source = 'Lurek2D Toolkit';
+                    diagnostics.push(diag);
+                    break; // Only report once per find()
+                }
+            }
+        }
+    }
+
+    return diagnostics;
+}
+
+// ── Rule 13: Method call colon vs dot warning ─────────────────
+
+/**
+ * Detects common mistake of using dot instead of colon for method calls
+ * on known Lurek2D objects. E.g. obj.setFilter(obj, ...) should be obj:setFilter(...)
+ */
+function checkMethodColonDot(text: string): vscode.Diagnostic[] {
+    const diagnostics: vscode.Diagnostic[] = [];
+    const lines = text.split('\n');
+
+    // Pattern: var.method(var, ...) — the variable appears as the first arg
+    const dotCallPattern = /\b(\w+)\.(\w+)\s*\(\s*\1\s*[,)]/g;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.trimStart().startsWith('--')) continue;
+
+        dotCallPattern.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = dotCallPattern.exec(line)) !== null) {
+            const varName = m[1];
+            const methodName = m[2];
+
+            // Skip lurek.* namespace calls (that's not a method call, it's a module call)
+            if (varName === 'lurek') continue;
+
+            const col = m.index;
+            const endCol = col + `${varName}.${methodName}`.length;
+            const range = new vscode.Range(i, col, i, endCol);
+            const diag = new vscode.Diagnostic(
+                range,
+                `Consider using colon syntax: ${varName}:${methodName}(...) instead of ${varName}.${methodName}(${varName}, ...)`,
+                vscode.DiagnosticSeverity.Information,
+            );
+            diag.code = 'lurek.colonSyntax';
+            diag.source = 'Lurek2D Toolkit';
+            diagnostics.push(diag);
+        }
+    }
+
+    return diagnostics;
 }

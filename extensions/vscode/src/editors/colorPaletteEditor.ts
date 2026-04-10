@@ -7,7 +7,7 @@ export class ColorPaletteEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.colorPaletteEditor", "Color Palette");
+    super(context, "lurek.colorPaletteEditor", "Color Palette");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

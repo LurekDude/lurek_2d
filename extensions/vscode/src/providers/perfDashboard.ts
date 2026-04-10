@@ -22,8 +22,8 @@ export function openPerfDashboard(context: vscode.ExtensionContext): void {
   }
 
   _panel = vscode.window.createWebviewPanel(
-    "luna.perfDashboard",
-    "Luna2D Performance",
+    "lurek.perfDashboard",
+    "Lurek2D Performance",
     vscode.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -79,7 +79,7 @@ function buildHtml(): string {
 </style>
 </head>
 <body>
-<h2>🎮 Luna2D Performance Dashboard</h2>
+<h2>🎮 Lurek2D Performance Dashboard</h2>
 <div class="stats">
   <div class="stat"><div class="stat-value" id="fps">–</div><div class="stat-label">FPS</div></div>
   <div class="stat"><div class="stat-value" id="frame">–</div><div class="stat-label">Frame ms</div></div>
@@ -92,7 +92,7 @@ function buildHtml(): string {
 <p class="chart-label">Frame time (ms)</p>
 <canvas id="msChart" width="600" height="120"></canvas>
 
-<div id="empty" class="empty">No data yet — run your game with luna.debug.connect() to stream performance data.</div>
+<div id="empty" class="empty">No data yet — run your game with lurek.debug.connect() to stream performance data.</div>
 
 <button onclick="clearData()">Clear History</button>
 

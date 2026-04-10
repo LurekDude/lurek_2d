@@ -15,7 +15,7 @@ const TEMPLATES: GameTemplate[] = [
   {
     label: "Platformer",
     description: "Side-scrolling platformer with jump physics",
-    confLua: `function luna.conf(t)
+    confLua: `function lurek.conf(t)
   t.window.title = "My Platformer"
   t.window.width = 800
   t.window.height = 600
@@ -27,16 +27,16 @@ local gravity = 980
 local jumpForce = -450
 local ground = 500
 
-function luna.load()
-  luna.window.setTitle("My Platformer")
+function lurek.load()
+  lurek.window.setTitle("My Platformer")
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   -- Horizontal movement
-  if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
     player.x = player.x - player.speed * dt
   end
-  if luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+  if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
     player.x = player.x + player.speed * dt
   end
 
@@ -52,38 +52,38 @@ function luna.update(dt)
   end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "space" and not player.jumping then
     player.vy = jumpForce
     player.jumping = true
   end
   if key == "escape" then
-    luna.event.quit()
+    lurek.event.quit()
   end
 end
 
-function luna.draw()
+function lurek.draw()
   -- Sky
-  luna.graphics.setBackgroundColor(0.4, 0.7, 1.0)
+  lurek.graphics.setBackgroundColor(0.4, 0.7, 1.0)
 
   -- Ground
-  luna.graphics.setColor(0.3, 0.6, 0.2)
-  luna.graphics.rectangle("fill", 0, ground, 800, 100)
+  lurek.graphics.setColor(0.3, 0.6, 0.2)
+  lurek.graphics.rectangle("fill", 0, ground, 800, 100)
 
   -- Player
-  luna.graphics.setColor(0.2, 0.4, 0.9)
-  luna.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
+  lurek.graphics.setColor(0.2, 0.4, 0.9)
+  lurek.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
   -- HUD
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print("Arrow keys / WASD to move, Space to jump", 10, 10)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print("Arrow keys / WASD to move, Space to jump", 10, 10)
 end
 `,
   },
   {
     label: "Top-Down RPG",
     description: "Tile-based RPG with 4-directional movement",
-    confLua: `function luna.conf(t)
+    confLua: `function lurek.conf(t)
   t.window.title = "My RPG"
   t.window.width = 640
   t.window.height = 480
@@ -94,25 +94,25 @@ local player = { x = 320, y = 240, w = 32, h = 32, speed = 150, dir = "down" }
 local map_w, map_h = 20, 15
 local tile_size = 32
 
-function luna.load()
-  luna.window.setTitle("My RPG")
+function lurek.load()
+  lurek.window.setTitle("My RPG")
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   local dx, dy = 0, 0
 
-  if luna.keyboard.isDown("up") or luna.keyboard.isDown("w") then
+  if lurek.keyboard.isDown("up") or lurek.keyboard.isDown("w") then
     dy = -1
     player.dir = "up"
-  elseif luna.keyboard.isDown("down") or luna.keyboard.isDown("s") then
+  elseif lurek.keyboard.isDown("down") or lurek.keyboard.isDown("s") then
     dy = 1
     player.dir = "down"
   end
 
-  if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
     dx = -1
     player.dir = "left"
-  elseif luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+  elseif lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
     dx = 1
     player.dir = "right"
   end
@@ -132,44 +132,44 @@ function luna.update(dt)
   player.y = math.max(0, math.min(player.y, map_h * tile_size - player.h))
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "escape" then
-    luna.event.quit()
+    lurek.event.quit()
   end
 end
 
-function luna.draw()
-  luna.graphics.setBackgroundColor(0.15, 0.15, 0.2)
+function lurek.draw()
+  lurek.graphics.setBackgroundColor(0.15, 0.15, 0.2)
 
   -- Draw grid
-  luna.graphics.setColor(0.25, 0.25, 0.3)
+  lurek.graphics.setColor(0.25, 0.25, 0.3)
   for x = 0, map_w - 1 do
     for y = 0, map_h - 1 do
-      luna.graphics.rectangle("line", x * tile_size, y * tile_size, tile_size, tile_size)
+      lurek.graphics.rectangle("line", x * tile_size, y * tile_size, tile_size, tile_size)
     end
   end
 
   -- Player
-  luna.graphics.setColor(0.2, 0.8, 0.3)
-  luna.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
+  lurek.graphics.setColor(0.2, 0.8, 0.3)
+  lurek.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
   -- Direction indicator
-  luna.graphics.setColor(1, 1, 1)
+  lurek.graphics.setColor(1, 1, 1)
   local cx, cy = player.x + player.w / 2, player.y + player.h / 2
   local indicators = { up = {0, -8}, down = {0, 8}, left = {-8, 0}, right = {8, 0} }
   local ind = indicators[player.dir]
-  luna.graphics.circle("fill", cx + ind[1], cy + ind[2], 4)
+  lurek.graphics.circle("fill", cx + ind[1], cy + ind[2], 4)
 
   -- HUD
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print("WASD / Arrow keys to move", 10, 10)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print("WASD / Arrow keys to move", 10, 10)
 end
 `,
   },
   {
     label: "Shooter",
     description: "Top-down shooter with projectiles",
-    confLua: `function luna.conf(t)
+    confLua: `function lurek.conf(t)
   t.window.title = "My Shooter"
   t.window.width = 800
   t.window.height = 600
@@ -185,23 +185,23 @@ local shoot_cooldown = 0.2
 local spawn_timer = 0
 local spawn_rate = 1.5
 
-function luna.load()
-  luna.window.setTitle("My Shooter")
+function lurek.load()
+  lurek.window.setTitle("My Shooter")
 end
 
-function luna.update(dt)
+function lurek.update(dt)
   -- Player movement
-  if luna.keyboard.isDown("left") or luna.keyboard.isDown("a") then
+  if lurek.keyboard.isDown("left") or lurek.keyboard.isDown("a") then
     player.x = player.x - player.speed * dt
   end
-  if luna.keyboard.isDown("right") or luna.keyboard.isDown("d") then
+  if lurek.keyboard.isDown("right") or lurek.keyboard.isDown("d") then
     player.x = player.x + player.speed * dt
   end
   player.x = math.max(0, math.min(player.x, 800 - player.w))
 
   -- Shooting
   shoot_timer = shoot_timer - dt
-  if luna.keyboard.isDown("space") and shoot_timer <= 0 then
+  if lurek.keyboard.isDown("space") and shoot_timer <= 0 then
     table.insert(bullets, { x = player.x + player.w / 2 - 2, y = player.y - 8, w = 4, h = 8 })
     shoot_timer = shoot_cooldown
   end
@@ -248,42 +248,42 @@ function luna.update(dt)
   end
 end
 
-function luna.keypressed(key)
+function lurek.keypressed(key)
   if key == "escape" then
-    luna.event.quit()
+    lurek.event.quit()
   end
 end
 
-function luna.draw()
-  luna.graphics.setBackgroundColor(0.05, 0.05, 0.1)
+function lurek.draw()
+  lurek.graphics.setBackgroundColor(0.05, 0.05, 0.1)
 
   -- Player
-  luna.graphics.setColor(0.2, 0.7, 1.0)
-  luna.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
+  lurek.graphics.setColor(0.2, 0.7, 1.0)
+  lurek.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
   -- Bullets
-  luna.graphics.setColor(1, 1, 0.3)
+  lurek.graphics.setColor(1, 1, 0.3)
   for _, b in ipairs(bullets) do
-    luna.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
+    lurek.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
   end
 
   -- Enemies
-  luna.graphics.setColor(1, 0.3, 0.3)
+  lurek.graphics.setColor(1, 0.3, 0.3)
   for _, e in ipairs(enemies) do
-    luna.graphics.rectangle("fill", e.x, e.y, e.w, e.h)
+    lurek.graphics.rectangle("fill", e.x, e.y, e.w, e.h)
   end
 
   -- HUD
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print("Score: " .. score, 10, 10)
-  luna.graphics.print("WASD to move, Space to shoot", 10, 30)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print("Score: " .. score, 10, 10)
+  lurek.graphics.print("WASD to move, Space to shoot", 10, 30)
 end
 `,
   },
   {
     label: "Puzzle",
     description: "Grid-based puzzle with tile swapping",
-    confLua: `function luna.conf(t)
+    confLua: `function lurek.conf(t)
   t.window.title = "My Puzzle"
   t.window.width = 480
   t.window.height = 520
@@ -302,8 +302,8 @@ local colors = {
   {0.9, 0.3, 0.9}, {0.3, 0.9, 0.9}, {0.9, 0.6, 0.2}, {0.6, 0.2, 0.9},
 }
 
-function luna.load()
-  luna.window.setTitle("My Puzzle")
+function lurek.load()
+  lurek.window.setTitle("My Puzzle")
   -- Fill grid with paired colors
   local tiles = {}
   for i = 1, (grid_size * grid_size) / 2 do
@@ -327,7 +327,7 @@ function luna.load()
   end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
   if button ~= 1 then return end
 
   local gx = math.floor((mx - padding) / tile_size) + 1
@@ -356,13 +356,13 @@ function luna.mousepressed(mx, my, button)
   end
 end
 
-function luna.keypressed(key)
-  if key == "r" then luna.load() end
-  if key == "escape" then luna.event.quit() end
+function lurek.keypressed(key)
+  if key == "r" then lurek.load() end
+  if key == "escape" then lurek.event.quit() end
 end
 
-function luna.draw()
-  luna.graphics.setBackgroundColor(0.12, 0.12, 0.15)
+function lurek.draw()
+  lurek.graphics.setBackgroundColor(0.12, 0.12, 0.15)
 
   for y = 1, grid_size do
     for x = 1, grid_size do
@@ -373,27 +373,27 @@ function luna.draw()
       local th = tile_size - 8
 
       if tile.revealed or tile.matched then
-        luna.graphics.setColor(tile.color[1], tile.color[2], tile.color[3])
+        lurek.graphics.setColor(tile.color[1], tile.color[2], tile.color[3])
       else
-        luna.graphics.setColor(0.3, 0.3, 0.35)
+        lurek.graphics.setColor(0.3, 0.3, 0.35)
       end
-      luna.graphics.rectangle("fill", px, py, tw, th)
+      lurek.graphics.rectangle("fill", px, py, tw, th)
 
       -- Border
-      luna.graphics.setColor(0.5, 0.5, 0.55)
-      luna.graphics.rectangle("line", px, py, tw, th)
+      lurek.graphics.setColor(0.5, 0.5, 0.55)
+      lurek.graphics.rectangle("line", px, py, tw, th)
     end
   end
 
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print("Moves: " .. moves .. "  |  R to restart", 10, 10)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print("Moves: " .. moves .. "  |  R to restart", 10, 10)
 end
 `,
   },
   {
     label: "Visual Novel",
     description: "Dialog-driven narrative with choices",
-    confLua: `function luna.conf(t)
+    confLua: `function lurek.conf(t)
   t.window.title = "My Visual Novel"
   t.window.width = 800
   t.window.height = 600
@@ -455,12 +455,12 @@ local scenes = {
 local current_scene = "intro"
 local hover_choice = 0
 
-function luna.load()
-  luna.window.setTitle("My Visual Novel")
+function lurek.load()
+  lurek.window.setTitle("My Visual Novel")
 end
 
-function luna.update(dt)
-  local mx, my = luna.mouse.getPosition()
+function lurek.update(dt)
+  local mx, my = lurek.mouse.getPosition()
   local scene = scenes[current_scene]
   hover_choice = 0
 
@@ -472,7 +472,7 @@ function luna.update(dt)
   end
 end
 
-function luna.mousepressed(mx, my, button)
+function lurek.mousepressed(mx, my, button)
   if button ~= 1 then return end
   local scene = scenes[current_scene]
   if hover_choice >= 1 and hover_choice <= #scene.choices then
@@ -481,8 +481,8 @@ function luna.mousepressed(mx, my, button)
   end
 end
 
-function luna.keypressed(key)
-  if key == "escape" then luna.event.quit() end
+function lurek.keypressed(key)
+  if key == "escape" then lurek.event.quit() end
   local scene = scenes[current_scene]
   local num = tonumber(key)
   if num and num >= 1 and num <= #scene.choices then
@@ -490,38 +490,38 @@ function luna.keypressed(key)
   end
 end
 
-function luna.draw()
-  luna.graphics.setBackgroundColor(0.1, 0.08, 0.15)
+function lurek.draw()
+  lurek.graphics.setBackgroundColor(0.1, 0.08, 0.15)
 
   local scene = scenes[current_scene]
 
   -- Dialog box background
-  luna.graphics.setColor(0.15, 0.12, 0.2, 0.95)
-  luna.graphics.rectangle("fill", 50, 280, 700, 100)
-  luna.graphics.setColor(0.6, 0.5, 0.8)
-  luna.graphics.rectangle("line", 50, 280, 700, 100)
+  lurek.graphics.setColor(0.15, 0.12, 0.2, 0.95)
+  lurek.graphics.rectangle("fill", 50, 280, 700, 100)
+  lurek.graphics.setColor(0.6, 0.5, 0.8)
+  lurek.graphics.rectangle("line", 50, 280, 700, 100)
 
   -- Speaker name
-  luna.graphics.setColor(0.8, 0.7, 1.0)
-  luna.graphics.print(scene.speaker, 70, 260)
+  lurek.graphics.setColor(0.8, 0.7, 1.0)
+  lurek.graphics.print(scene.speaker, 70, 260)
 
   -- Dialog text
-  luna.graphics.setColor(1, 1, 1)
-  luna.graphics.print(scene.text, 70, 300)
+  lurek.graphics.setColor(1, 1, 1)
+  lurek.graphics.print(scene.text, 70, 300)
 
   -- Choices
   for i, choice in ipairs(scene.choices) do
     local cy = 420 + (i - 1) * 50
     if hover_choice == i then
-      luna.graphics.setColor(0.3, 0.25, 0.45)
+      lurek.graphics.setColor(0.3, 0.25, 0.45)
     else
-      luna.graphics.setColor(0.2, 0.17, 0.3)
+      lurek.graphics.setColor(0.2, 0.17, 0.3)
     end
-    luna.graphics.rectangle("fill", 100, cy, 600, 40)
-    luna.graphics.setColor(0.6, 0.5, 0.8)
-    luna.graphics.rectangle("line", 100, cy, 600, 40)
-    luna.graphics.setColor(1, 1, 1)
-    luna.graphics.print(i .. ". " .. choice.text, 120, cy + 10)
+    lurek.graphics.rectangle("fill", 100, cy, 600, 40)
+    lurek.graphics.setColor(0.6, 0.5, 0.8)
+    lurek.graphics.rectangle("line", 100, cy, 600, 40)
+    lurek.graphics.setColor(1, 1, 1)
+    lurek.graphics.print(i .. ". " .. choice.text, 120, cy + 10)
   end
 end
 `,
@@ -620,9 +620,9 @@ function stopJamTimer(): void {
 // ─── Commands ─────────────────────────────────────────────
 
 export function registerGameJamCommands(context: vscode.ExtensionContext): void {
-  // ── luna.gameJam.quickStart ──────────────────────────────
+  // ── lurek.gameJam.quickStart ──────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.gameJam.quickStart", async () => {
+    vscode.commands.registerCommand("lurek.gameJam.quickStart", async () => {
       // Pick template
       const picked = await vscode.window.showQuickPick(
         TEMPLATES.map((t) => ({ label: t.label, description: t.description, template: t })),
@@ -688,9 +688,9 @@ export function registerGameJamCommands(context: vscode.ExtensionContext): void 
     })
   );
 
-  // ── luna.gameJam.addModule ───────────────────────────────
+  // ── lurek.gameJam.addModule ───────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.gameJam.addModule", async () => {
+    vscode.commands.registerCommand("lurek.gameJam.addModule", async () => {
       const picked = await vscode.window.showQuickPick(
         MODULES.map((m) => ({ label: m.label, description: m.description, module: m })),
         { placeHolder: "Choose a module to add" }
@@ -756,9 +756,9 @@ export function registerGameJamCommands(context: vscode.ExtensionContext): void 
     })
   );
 
-  // ── luna.gameJam.timer ───────────────────────────────────
+  // ── lurek.gameJam.timer ───────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.gameJam.timer", async () => {
+    vscode.commands.registerCommand("lurek.gameJam.timer", async () => {
       const picked = await vscode.window.showQuickPick(
         [
           { label: "30 minutes", minutes: 30 },

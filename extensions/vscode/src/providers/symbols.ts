@@ -5,9 +5,9 @@ import { LuaDocumentAnalyzer, LuaDocumentInfo, LuaSymbol } from "../services/lua
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
 const analyzer = new LuaDocumentAnalyzer();
 
-// ── Luna callbacks for Event kind ────────────────────────────
+// ── Lurek2D callbacks for Event kind ────────────────────────────
 
-const LUNA_CALLBACKS = new Set([
+const LUREK_CALLBACKS = new Set([
   "load", "update", "draw",
   "keypressed", "keyreleased", "textinput",
   "mousepressed", "mousereleased", "wheelmoved",
@@ -102,11 +102,11 @@ export function register(
                 ? new vscode.Range(sym.line, 0, sym.endLine, lines[sym.endLine]?.length ?? 0)
                 : getBlockRange(lines, sym.line);
 
-              // Check if this is a luna.* callback
+              // Check if this is a lurek.* callback
               const isCallback = info.callbacks.some(cb => cb.name === sym.name && cb.line === sym.line);
               const kind = isCallback ? vscode.SymbolKind.Event : vscode.SymbolKind.Function;
               const detail = isCallback ? "callback" : (sym.isLocal ? "local function" : "function");
-              const displayName = isCallback ? `luna.${sym.name}` : sym.name;
+              const displayName = isCallback ? `lurek.${sym.name}` : sym.name;
 
               const docSym = new vscode.DocumentSymbol(displayName, detail, kind, range, selRange);
 
@@ -220,14 +220,14 @@ function fallbackDocumentSymbols(lines: string[]): vscode.DocumentSymbol[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // function luna.callback(...)
-    const cbMatch = line.match(/^\s*function\s+(luna\.\w+)\s*\(/);
+    // function lurek.callback(...)
+    const cbMatch = line.match(/^\s*function\s+(lurek\.\w+)\s*\(/);
     if (cbMatch) {
       const name = cbMatch[1];
       const range = getBlockRange(lines, i);
       const selRange = new vscode.Range(i, 0, i, line.length);
-      const shortName = name.replace("luna.", "");
-      const kind = LUNA_CALLBACKS.has(shortName) ? vscode.SymbolKind.Event : vscode.SymbolKind.Function;
+      const shortName = name.replace("lurek.", "");
+      const kind = LUREK_CALLBACKS.has(shortName) ? vscode.SymbolKind.Event : vscode.SymbolKind.Function;
       symbols.push(new vscode.DocumentSymbol(name, "callback", kind, range, selRange));
       continue;
     }

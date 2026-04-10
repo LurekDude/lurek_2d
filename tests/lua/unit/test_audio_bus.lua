@@ -1,4 +1,12 @@
 -- Audio Bus and MidiPlayer integration tests (headless-safe)
+-- @covers lurek.audio.getListener2D
+-- @covers lurek.audio.getMaxSources
+-- @covers lurek.audio.getMeter
+-- @covers lurek.audio.newBus
+-- @covers lurek.audio.newMidiPlayer
+-- @covers lurek.audio.setListener2D
+-- @covers lurek.audio.setMeter
+
 
 describe("lurek.audio.newBus", function()
     it("creates a bus with the given name", function()

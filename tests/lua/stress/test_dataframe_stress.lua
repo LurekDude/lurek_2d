@@ -1,5 +1,7 @@
 -- Lurek2D Stress Test: DataFrame Bulk Operations
 -- Tests large DataFrames with many rows and columns
+-- @stress lurek.dataframe.newDataFrame
+
 
 describe("dataframe stress: bulk row insertion", function()
     it("inserts 5000 rows", function()

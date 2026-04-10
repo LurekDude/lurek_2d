@@ -1,5 +1,11 @@
 -- Lurek2D Lua BDD tests for lurek.procgen
 -- Headless: no GPU, no audio, no window.
+-- @covers lurek.procgen.cellularAutomata
+-- @covers lurek.procgen.floodFill
+-- @covers lurek.procgen.perlinNoise
+-- @covers lurek.procgen.poissonDisk
+-- @covers lurek.procgen.voronoi
+
 
 describe("lurek.procgen", function()
     describe("module interface", function()

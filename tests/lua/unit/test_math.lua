@@ -1,4 +1,20 @@
 -- Lurek2D Math API Tests
+-- @covers lurek.math.abs
+-- @covers lurek.math.atan2
+-- @covers lurek.math.ceil
+-- @covers lurek.math.clamp
+-- @covers lurek.math.cos
+-- @covers lurek.math.distance
+-- @covers lurek.math.floor
+-- @covers lurek.math.max
+-- @covers lurek.math.min
+-- @covers lurek.math.pi
+-- @covers lurek.math.random
+-- @covers lurek.math.simplexNoise
+-- @covers lurek.math.sin
+-- @covers lurek.math.sqrt
+-- @covers lurek.math.tan
+
 
 describe("lurek.math constants", function()
     it("has pi", function()

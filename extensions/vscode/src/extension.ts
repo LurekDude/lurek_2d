@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
 import { startMcpServer } from "./mcp/server";
+import { resolveWorkspaceApiDocPath, searchApiDocumentation } from "./services/apiDocs.js";
 
 /** Status bar item displayed when the extension is active. */
 let statusBarItem: vscode.StatusBarItem;
@@ -10,7 +11,7 @@ let statusBarItem: vscode.StatusBarItem;
 let mcpProcess: ReturnType<typeof startMcpServer> | undefined;
 
 /**
- * Activates the Luna2D extension.
+ * Activates the Lurek2D extension.
  *
  * Called by VS Code when a workspace containing `main.lua` or `Cargo.toml`
  * is opened. Registers commands, starts the MCP server, and shows a status
@@ -22,17 +23,17 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.StatusBarAlignment.Left,
     100
   );
-  statusBarItem.text = "$(rocket) Luna2D";
-  statusBarItem.tooltip = "Luna2D game engine is active";
+  statusBarItem.text = "$(rocket) Lurek2D";
+  statusBarItem.tooltip = "Lurek2D game engine is active";
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
 
   // Register commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna2d.runExample", runExampleCommand),
-    vscode.commands.registerCommand("luna2d.listExamples", listExamplesCommand),
-    vscode.commands.registerCommand("luna2d.checkBuild", checkBuildCommand),
-    vscode.commands.registerCommand("luna2d.getApiDoc", getApiDocCommand)
+    vscode.commands.registerCommand("lurek2d.runExample", runExampleCommand),
+    vscode.commands.registerCommand("lurek2d.listExamples", listExamplesCommand),
+    vscode.commands.registerCommand("lurek2d.checkBuild", checkBuildCommand),
+    vscode.commands.registerCommand("lurek2d.getApiDoc", getApiDocCommand)
   );
 
   // Start MCP server
@@ -41,11 +42,11 @@ export function activate(context: vscode.ExtensionContext): void {
     mcpProcess = startMcpServer(workspaceRoot);
   }
 
-  vscode.window.showInformationMessage("Luna2D extension activated.");
+  vscode.window.showInformationMessage("Lurek2D extension activated.");
 }
 
 /**
- * Deactivates the Luna2D extension.
+ * Deactivates the Lurek2D extension.
  *
  * Cleans up the MCP server process and status bar item.
  */
@@ -101,7 +102,7 @@ function listExampleNames(): string[] {
 }
 
 /**
- * Command: Luna2D: Run Example
+ * Command: Lurek2D: Run Example
  *
  * Shows a quick-pick list of available examples and runs the selected one
  * in an integrated terminal via `cargo run -- content/demos/<name>`.
@@ -109,60 +110,60 @@ function listExampleNames(): string[] {
 async function runExampleCommand(): Promise<void> {
   const examples = listExampleNames();
   if (examples.length === 0) {
-    vscode.window.showWarningMessage("No Luna2D examples found in workspace.");
+    vscode.window.showWarningMessage("No Lurek2D examples found in workspace.");
     return;
   }
 
   const selected = await vscode.window.showQuickPick(examples, {
-    placeHolder: "Select a Luna2D example to run",
+    placeHolder: "Select a Lurek2D example to run",
   });
 
   if (!selected) {
     return;
   }
 
-  const terminal = vscode.window.createTerminal("Luna2D Example");
+  const terminal = vscode.window.createTerminal("Lurek2D Example");
   terminal.show();
   terminal.sendText(`cargo run -- content/content/demos/${selected}`);
 }
 
 /**
- * Command: Luna2D: List Examples
+ * Command: Lurek2D: List Examples
  *
  * Displays the available example names in an information message.
  */
 async function listExamplesCommand(): Promise<void> {
   const examples = listExampleNames();
   if (examples.length === 0) {
-    vscode.window.showWarningMessage("No Luna2D examples found in workspace.");
+    vscode.window.showWarningMessage("No Lurek2D examples found in workspace.");
     return;
   }
 
-  const message = `Luna2D Examples: ${examples.join(", ")}`;
+  const message = `Lurek2D Examples: ${examples.join(", ")}`;
   vscode.window.showInformationMessage(message);
 }
 
 /**
- * Command: Luna2D: Check Build
+ * Command: Lurek2D: Check Build
  *
  * Runs `cargo check` in a terminal and reports results.
  */
 async function checkBuildCommand(): Promise<void> {
-  const terminal = vscode.window.createTerminal("Luna2D Build Check");
+  const terminal = vscode.window.createTerminal("Lurek2D Build Check");
   terminal.show();
   terminal.sendText("cargo check 2>&1");
 }
 
 /**
- * Command: Luna2D: Get API Documentation
+ * Command: Lurek2D: Get API Documentation
  *
- * Prompts the user for a query string and searches the bundled API reference
- * for matching entries. Results are displayed in a new editor tab.
+ * Prompts the user for a query string and searches the canonical workspace API
+ * reference. Results are displayed in a new editor tab.
  */
 async function getApiDocCommand(): Promise<void> {
   const query = await vscode.window.showInputBox({
-    placeHolder: "e.g. luna.graphics.draw",
-    prompt: "Search Luna2D API documentation",
+    placeHolder: "e.g. lurek.graphics.draw",
+    prompt: "Search Lurek2D API documentation",
   });
 
   if (!query) {
@@ -175,48 +176,18 @@ async function getApiDocCommand(): Promise<void> {
     return;
   }
 
-  const apiDocPath = path.join(
-    root,
-    "docs",
-    "lua_api_reference_generated.md"
-  );
+  const apiDocPath = resolveWorkspaceApiDocPath(root);
 
-  if (!fs.existsSync(apiDocPath)) {
+  if (!apiDocPath || !fs.existsSync(apiDocPath)) {
     vscode.window.showWarningMessage(
-      "API reference file not found. Run 'python tools/gen_lua_api.py' to generate it."
+      "API reference file not found. Expected docs/API/lurek.lua or docs/API/lua-api.md."
     );
     return;
   }
 
   try {
     const content = fs.readFileSync(apiDocPath, "utf-8");
-    const lines = content.split("\n");
-    const queryLower = query.toLowerCase();
-
-    // Find sections matching the query
-    const matches: string[] = [];
-    let currentSection: string[] = [];
-    let inMatch = false;
-
-    for (const line of lines) {
-      if (line.startsWith("##")) {
-        // Flush previous match
-        if (inMatch && currentSection.length > 0) {
-          matches.push(currentSection.join("\n"));
-        }
-        currentSection = [line];
-        inMatch = line.toLowerCase().includes(queryLower);
-      } else {
-        currentSection.push(line);
-        if (line.toLowerCase().includes(queryLower)) {
-          inMatch = true;
-        }
-      }
-    }
-    // Flush last section
-    if (inMatch && currentSection.length > 0) {
-      matches.push(currentSection.join("\n"));
-    }
+    const matches = searchApiDocumentation(content, apiDocPath, query);
 
     if (matches.length === 0) {
       vscode.window.showInformationMessage(
@@ -226,7 +197,10 @@ async function getApiDocCommand(): Promise<void> {
     }
 
     // Show results in a new untitled document
-    const resultText = `# Luna2D API — Search: "${query}"\n\n${matches.join("\n\n---\n\n")}`;
+    const formattedMatches = apiDocPath.endsWith(".lua")
+      ? matches.map((match) => `\`\`\`lua\n${match}\n\`\`\``)
+      : matches;
+    const resultText = `# Lurek2D API — Search: "${query}"\n\n${formattedMatches.join("\n\n---\n\n")}`;
     const doc = await vscode.workspace.openTextDocument({
       content: resultText,
       language: "markdown",

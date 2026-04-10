@@ -1,4 +1,26 @@
 -- Lurek2D Audio API Tests
+-- @covers lurek.audio.getDistanceModel
+-- @covers lurek.audio.getDopplerScale
+-- @covers lurek.audio.getFreeBufferCount
+-- @covers lurek.audio.getListener
+-- @covers lurek.audio.getListener2D
+-- @covers lurek.audio.getMasterVolume
+-- @covers lurek.audio.getPlaybackDevice
+-- @covers lurek.audio.getPlaybackDevices
+-- @covers lurek.audio.newDecoder
+-- @covers lurek.audio.newQueueableSource
+-- @covers lurek.audio.newSoundData
+-- @covers lurek.audio.newSource
+-- @covers lurek.audio.playQueueable
+-- @covers lurek.audio.queueSource
+-- @covers lurek.audio.setDistanceModel
+-- @covers lurek.audio.setDopplerScale
+-- @covers lurek.audio.setListener
+-- @covers lurek.audio.setListener2D
+-- @covers lurek.audio.setMasterVolume
+-- @covers lurek.audio.setPlaybackDevice
+-- @covers lurek.audio.stopQueueable
+
 
 describe("lurek.audio module exists", function()
     it("lurek.audio is a table", function()

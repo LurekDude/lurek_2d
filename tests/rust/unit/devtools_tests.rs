@@ -145,7 +145,7 @@ fn frame_stats_empty_snapshot_safe() {
     let stats = FrameStats::new(120);
     let snap = stats.snapshot();
     assert_eq!(snap.samples, 0);
-    assert!((snap.fps - 0.0).abs() < f32::EPSILON);
+    assert!((snap.fps - 0.0).abs() < f64::EPSILON);
 }
 
 #[test]

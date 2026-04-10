@@ -1,5 +1,14 @@
 -- Lurek2D Integration Test: AI + Physics
 -- Tests AI agents making decisions that affect physics bodies
+-- @covers lurek.ai.newSteeringManager
+-- @covers lurek.pathfinding.newNavGrid
+-- @covers lurek.pathfinding.newPathfinder
+-- @covers lurek.physics.getBody
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.setBodyVelocity
+-- @covers lurek.physics.step
+
 
 describe("integration: AI steering with physics bodies", function()
     it("agent seeks target in physics world", function()

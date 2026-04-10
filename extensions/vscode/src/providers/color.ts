@@ -7,7 +7,7 @@ const LUA_SELECTOR: vscode.DocumentSelector = { scheme: 'file', language: 'lua' 
 const COLOR_FUNCTIONS = ['setColor', 'setBackgroundColor', 'clear', 'newColor'];
 
 /**
- * Registers the color provider for luna.graphics color calls.
+ * Registers the color provider for lurek.graphics color calls.
  * Detects 0-1 range RGBA values and shows the VS Code color picker.
  */
 export function register(context: vscode.ExtensionContext, apiData: ApiDataService): void {
@@ -37,7 +37,7 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
 
 /** Build regex pattern for all color functions. */
 const COLOR_CALL_PATTERN = new RegExp(
-    `luna\\.graphics\\.(?:${COLOR_FUNCTIONS.join('|')})` +
+    `lurek\\.graphics\\.(?:${COLOR_FUNCTIONS.join('|')})` +
     `\\s*\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)\\s*,\\s*([\\d.]+)(?:\\s*,\\s*([\\d.]+))?\\s*\\)`,
     'g',
 );

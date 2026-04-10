@@ -287,4 +287,60 @@ impl FlowField {
         let (dx, dy) = self.get_direction(tx as u32, ty as u32);
         (dx * speed, dy * speed)
     }
+
+    /// Render the flow field to an image with direction arrows.
+    ///
+    /// Blocked cells are drawn dark red, non-blocked cells are dark blue-grey.
+    /// Each non-blocked cell has a short direction arrow drawn from center.
+    /// The first target cell is marked with a red circle.
+    ///
+    /// # Parameters
+    /// - `cell_size` — `u32`. Pixel size of each grid cell.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, cell_size: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(self.width * cell_size, self.height * cell_size);
+        img.fill(40, 45, 55, 255);
+        // Draw blocked cells
+        {
+            let g = self.grid.borrow();
+            for y in 0..self.height {
+                for x in 0..self.width {
+                    if g.is_blocked(x, y) {
+                        for py in 0..cell_size {
+                            for px in 0..cell_size {
+                                img.set_pixel(x * cell_size + px, y * cell_size + py, 90, 40, 40, 255);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Draw flow arrows
+        for y in 0..self.height {
+            for x in 0..self.width {
+                if !self.grid.borrow().is_blocked(x, y) {
+                    let (dx, dy) = self.get_direction(x, y);
+                    if dx.abs() > 0.01 || dy.abs() > 0.01 {
+                        let cx = (x * cell_size + cell_size / 2) as i32;
+                        let cy = (y * cell_size + cell_size / 2) as i32;
+                        let ex = cx + (dx * 6.0) as i32;
+                        let ey = cy + (dy * 6.0) as i32;
+                        img.draw_line(cx, cy, ex, ey, 100, 200, 255, 200);
+                    }
+                }
+            }
+        }
+        // Mark first target
+        if let Some(&(tx, ty)) = self.targets.first() {
+            img.draw_circle(
+                (tx * cell_size + cell_size / 2) as i32,
+                (ty * cell_size + cell_size / 2) as i32,
+                5, 255, 80, 80, 255,
+            );
+        }
+        img
+    }
+
 }

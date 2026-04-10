@@ -475,4 +475,49 @@ impl Overlay {
         let progress = self.lightning.elapsed / self.lightning.duration;
         self.lightning.color[3] * (1.0 - progress)
     }
+
+    // ── CPU rendering ──
+
+    /// Renders a diagnostic image showing the current overlay state.
+    ///
+    /// Visualises flash colour/alpha, shake offset, and fade level as
+    /// coloured rectangles with numeric labels — useful for evidence tests.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_state_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(15, 15, 25, 255);
+
+        let section_h = height / 3;
+
+        // Flash state (top third)
+        let flash_alpha = self.get_flash_alpha();
+        let fr = (self.flash.color[0] * 255.0) as u8;
+        let fg = (self.flash.color[1] * 255.0) as u8;
+        let fb = (self.flash.color[2] * 255.0) as u8;
+        let bar_w = (flash_alpha * width as f32) as u32;
+        img.draw_rect(0, 0, bar_w, section_h, fr, fg, fb, (flash_alpha * 200.0) as u8);
+        img.draw_label("FLASH", 4, 4, 220, 220, 230);
+
+        // Shake state (middle third)
+        let (sx, sy) = self.get_shake_offset();
+        let cy = section_h as i32 + section_h as i32 / 2;
+        let cx = width as i32 / 2;
+        img.draw_circle(cx + sx as i32, cy + sy as i32, 8, 80, 200, 255, 255);
+        img.draw_label("SHAKE", 4, section_h as i32 + 4, 220, 220, 230);
+
+        // Fade state (bottom third)
+        let fade_y = (section_h * 2) as i32;
+        let fade_a = self.fade.color[3];
+        let fade_val = (fade_a * 255.0) as u8;
+        img.draw_rect(0, fade_y, width, section_h, 0, 0, 0, fade_val);
+        img.draw_label("FADE", 4, fade_y + 4, 220, 220, 230);
+
+        img
+    }
 }

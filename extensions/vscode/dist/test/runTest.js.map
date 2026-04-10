@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/test/runTest.ts"],
+  "sourcesContent": ["/**\r\n * Test runner for Lurek2D VS Code extension.\r\n *\r\n * Uses @vscode/test-electron to launch a VS Code instance and run mocha tests.\r\n */\r\nimport * as path from \"path\";\r\nimport { runTests } from \"@vscode/test-electron\";\r\n\r\nasync function main(): Promise<void> {\r\n  try {\r\n    const extensionDevelopmentPath = path.resolve(__dirname, \"../../\");\r\n    const extensionTestsPath = path.resolve(__dirname, \"./suite/index\");\r\n\r\n    await runTests({\r\n      extensionDevelopmentPath,\r\n      extensionTestsPath,\r\n      launchArgs: [\r\n        \"--disable-extensions\",\r\n        \"--disable-gpu\",\r\n      ],\r\n    });\r\n  } catch (err) {\r\n    console.error(\"Failed to run tests:\", err);\r\n    process.exit(1);\r\n  }\r\n}\r\n\r\nmain();\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;AAKA,WAAsB;AACtB,2BAAyB;AAEzB,eAAe,OAAsB;AACnC,MAAI;AACF,UAAM,2BAAgC,aAAQ,WAAW,QAAQ;AACjE,UAAM,qBAA0B,aAAQ,WAAW,eAAe;AAElE,cAAM,+BAAS;AAAA,MACb;AAAA,MACA;AAAA,MACA,YAAY;AAAA,QACV;AAAA,QACA;AAAA,MACF;AAAA,IACF,CAAC;AAAA,EACH,SAAS,KAAK;AACZ,YAAQ,MAAM,wBAAwB,GAAG;AACzC,YAAQ,KAAK,CAAC;AAAA,EAChB;AACF;AAEA,KAAK;",
+  "names": []
+}

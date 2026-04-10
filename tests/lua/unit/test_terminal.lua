@@ -1,3 +1,11 @@
+-- @covers lurek.terminal.newBorder
+-- @covers lurek.terminal.newButton
+-- @covers lurek.terminal.newLabel
+-- @covers lurek.terminal.newList
+-- @covers lurek.terminal.newPanel
+-- @covers lurek.terminal.newTerminal
+-- @covers lurek.terminal.newTextBox
+
 ﻿-- tests/lua/unit/test_terminal.lua
 -- BDD tests for the lurek.terminal.* API.
 

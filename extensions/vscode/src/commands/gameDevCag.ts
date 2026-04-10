@@ -230,8 +230,8 @@ async function updateCag(context: vscode.ExtensionContext): Promise<void> {
 
 export function registerGameDevCagCommands(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.cag.deploy", () => deployCag(context)),
-    vscode.commands.registerCommand("luna.cag.scaffold", () => scaffoldFromTemplate(context)),
-    vscode.commands.registerCommand("luna.cag.updateGameDev", () => updateCag(context))
+    vscode.commands.registerCommand("lurek.cag.deploy", () => deployCag(context)),
+    vscode.commands.registerCommand("lurek.cag.scaffold", () => scaffoldFromTemplate(context)),
+    vscode.commands.registerCommand("lurek.cag.updateGameDev", () => updateCag(context))
   );
 }

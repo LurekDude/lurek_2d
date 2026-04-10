@@ -1311,7 +1311,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
-    luna.set("effect", tbl)?;
+    luna.set("overlay", tbl.clone())?;
+    luna.set("postfx", tbl)?;
 
     Ok(())
 }

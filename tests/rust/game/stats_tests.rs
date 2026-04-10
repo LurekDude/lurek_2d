@@ -21,7 +21,7 @@ fn stats_new_sheet() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         assert(sheet ~= nil, "sheet should not be nil")
         assert(sheet:type() == "Sheet", "type should be Sheet, got " .. sheet:type())
         "#,
@@ -35,7 +35,7 @@ fn stats_define_and_get() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("strength", 10.0)
         local v = sheet:get("strength")
         assert(math.abs(v - 10.0) < 1e-5, "expected 10.0, got " .. v)
@@ -50,7 +50,7 @@ fn stats_get_base() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("dex", 15.0)
         local base = sheet:getBase("dex")
         assert(math.abs(base - 15.0) < 1e-5, "expected 15.0, got " .. base)
@@ -65,7 +65,7 @@ fn stats_set_base() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("hp", 100.0)
         sheet:setBase("hp", 120.0)
         local v = sheet:get("hp")
@@ -81,7 +81,7 @@ fn stats_buff_add() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("str", 10.0)
         local h = sheet:addBuff("str", 5.0, 1.0, -1.0, "test")
         assert(h ~= nil, "buff handle should not be nil")
@@ -98,7 +98,7 @@ fn stats_buff_mul() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("atk", 10.0)
         sheet:addBuff("atk", 0.0, 2.0, -1.0, "rage")
         local v = sheet:get("atk")
@@ -114,7 +114,7 @@ fn stats_buff_add_and_mul() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("pow", 10.0)
         sheet:addBuff("pow", 5.0, 2.0, -1.0, "combined")
         -- (10 + 5) * 2 = 30
@@ -131,7 +131,7 @@ fn stats_buff_remove() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("spd", 20.0)
         local h = sheet:addBuff("spd", 10.0, 1.0, -1.0, "")
         local v = sheet:get("spd")
@@ -151,7 +151,7 @@ fn stats_buff_clear_all() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("a", 10.0)
         sheet:define("b", 5.0)
         sheet:addBuff("a", 10.0, 1.0, -1.0, "")
@@ -170,7 +170,7 @@ fn stats_buff_clear_by_stat() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("x", 10.0)
         sheet:define("y", 10.0)
         sheet:addBuff("x", 5.0, 1.0, -1.0, "")
@@ -189,7 +189,7 @@ fn stats_buff_timed_expires() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("temp", 10.0)
         sheet:addBuff("temp", 5.0, 1.0, 1.0, "timed")  -- 1 second buff
         assert(math.abs(sheet:get("temp") - 15.0) < 1e-5, "buff should be active")
@@ -206,7 +206,7 @@ fn stats_get_buffs() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("stat", 10.0)
         sheet:addBuff("stat", 3.0, 1.0, -1.0, "src1")
         sheet:addBuff("stat", 2.0, 1.0, -1.0, "src2")
@@ -223,7 +223,7 @@ fn stats_max_clamp() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("hp", 100.0, {max = 150.0})
         sheet:addBuff("hp", 200.0, 1.0, -1.0, "")
         local v = sheet:get("hp")
@@ -239,7 +239,7 @@ fn stats_min_clamp() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("morale", 50.0, {min = 0.0})
         sheet:addBuff("morale", -200.0, 1.0, -1.0, "")
         local v = sheet:get("morale")
@@ -255,9 +255,9 @@ fn stats_define_trait() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("str", 10.0)
-        luna.stats.defineTrait("strong", {
+        lurek.stats.defineTrait("strong", {
             buffs = { {stat="str", add=5.0, mul=1.0} }
         })
         sheet:addTrait("strong")
@@ -275,9 +275,9 @@ fn stats_remove_trait() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("int", 10.0)
-        luna.stats.defineTrait("smart", {
+        lurek.stats.defineTrait("smart", {
             buffs = { {stat="int", add=10.0, mul=1.0} }
         })
         sheet:addTrait("smart")
@@ -296,7 +296,7 @@ fn stats_flags() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         assert(sheet:hasFlag("poisoned") == false, "flag should not be set initially")
         sheet:setFlag("poisoned")
         assert(sheet:hasFlag("poisoned") == true, "flag should be set")
@@ -313,7 +313,7 @@ fn stats_get_flags() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setFlag("burning")
         sheet:setFlag("slowed")
         local flags = sheet:getFlags()
@@ -329,7 +329,7 @@ fn stats_add_xp_levelup() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setLevelThresholds({100, 200, 400})
         assert(sheet:getLevel() == 1, "should start at level 1")
         local gained = sheet:addXP(150.0)
@@ -346,7 +346,7 @@ fn stats_skill_define_and_use() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:defineSkill("slash", {maxLevel=5, cooldown=0.0})
         sheet:learnSkill("slash")
         assert(sheet:getSkillLevel("slash") == 1, "skill should be level 1")
@@ -363,7 +363,7 @@ fn stats_skill_cooldown() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:defineSkill("fireball", {maxLevel=3, cooldown=2.0})
         sheet:learnSkill("fireball")
         local cd = sheet:useSkill("fireball")
@@ -384,7 +384,7 @@ fn stats_action_points() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setActionPoints(3.0)
         local cur, max = sheet:getActionPoints()
         assert(math.abs(max - 3.0) < 1e-5, "max AP should be 3")
@@ -405,7 +405,7 @@ fn stats_morale() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setMorale(100.0)
         local cur, max = sheet:getMorale()
         assert(math.abs(max - 100.0) < 1e-5, "max morale should be 100")
@@ -424,7 +424,7 @@ fn stats_resistance_and_damage() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("hp", 100.0)
         sheet:setResistance("fire", 0.5)
         local resist = sheet:getResistance("fire")
@@ -445,7 +445,7 @@ fn stats_snapshot_restore() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("vigor", 50.0)
         sheet:setFlag("cursed")
         sheet:addXP(10.0)
@@ -469,7 +469,7 @@ fn stats_regen() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("mana", 50.0, {max = 100.0})
         sheet:setBase("mana", 50.0)
         sheet:setRegen("mana", 10.0)  -- 10 per second
@@ -488,19 +488,19 @@ fn stats_define_race_and_class() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("str", 10.0)
         sheet:define("int", 10.0)
-        luna.stats.defineRace("elf", {
+        lurek.stats.defineRace("elf", {
             bases = {str = -2.0, int = 3.0},
             traits = {}
         })
-        luna.stats.defineClass("mage", {
+        lurek.stats.defineClass("mage", {
             bases = {int = 5.0},
             traits = {}
         })
-        local races = luna.stats.getRaceNames()
-        local classes = luna.stats.getClassNames()
+        local races = lurek.stats.getRaceNames()
+        local classes = lurek.stats.getClassNames()
         assert(#races >= 1, "should have at least one race")
         assert(#classes >= 1, "should have at least one class")
         "#,
@@ -514,7 +514,7 @@ fn stats_encumbrance() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setEncumbrance(5.0, 10.0)
         local cur, max = sheet:getEncumbrance()
         assert(math.abs(cur - 5.0) < 1e-5, "current enc should be 5")
@@ -533,7 +533,7 @@ fn stats_initiative() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setInitiative(7.5)
         local init = sheet:getInitiative()
         assert(math.abs(init - 7.5) < 1e-5, "initiative should be 7.5")
@@ -548,7 +548,7 @@ fn stats_use_count() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("swords", 0.0)
         assert(sheet:getUseCount("swords") == 0, "initial use count should be 0")
         sheet:recordUse("swords")
@@ -565,7 +565,7 @@ fn stats_linear_level_thresholds() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setLevelThresholds({base=100, increment=50})
         local gained = sheet:addXP(110.0)
         assert(gained >= 1, "should level up at 100 xp")
@@ -579,7 +579,7 @@ fn stats_linear_level_thresholds() {
 fn sheet_get_stat_names() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("strength", 10.0)
         sheet:define("agility", 8.0)
         sheet:define("wisdom", 12.0)
@@ -597,7 +597,7 @@ fn sheet_get_stat_names() {
 fn sheet_get_buff_count() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("attack", 10.0)
         sheet:define("defense", 5.0)
         sheet:addBuff("attack", 2.0, 1.0, -1)
@@ -616,7 +616,7 @@ fn sheet_get_buff_count() {
 fn sheet_recover_action_points() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setActionPoints(10.0)
         sheet:spendActionPoints(7.0)
         local current = sheet:getActionPoints()
@@ -635,7 +635,7 @@ fn sheet_recover_action_points() {
 fn sheet_update_ticks_regen() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("hp", 50.0)
         sheet:setMax("hp", 100.0)
         sheet:setRegen("hp", 10.0)  -- 10 hp/s
@@ -649,7 +649,7 @@ fn sheet_update_ticks_regen() {
 fn sheet_snapshot_restore_roundtrip() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("str", 15.0)
         sheet:define("agi", 12.0)
         local snap = sheet:snapshot()
@@ -667,7 +667,7 @@ fn sheet_snapshot_restore_roundtrip() {
 fn sheet_set_and_get_xp_and_level() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setXP(0.0)
         sheet:setLevel(5)
         assert(sheet:getLevel() == 5, "level is 5")
@@ -678,7 +678,7 @@ fn sheet_set_and_get_xp_and_level() {
 fn sheet_begin_turn_restores_action_points() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:setActionPoints(4.0)
         sheet:spendActionPoints(3.0)
         assert(math.abs(sheet:getActionPoints() - 1.0) < 0.01, "1 AP left")
@@ -691,7 +691,7 @@ fn sheet_begin_turn_restores_action_points() {
 fn sheet_setmin_clamps_value() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("armor", 5.0)
         sheet:setMin("armor", 0.0)
         sheet:setBase("armor", -10.0)  -- below minimum
@@ -704,7 +704,7 @@ fn sheet_setmin_clamps_value() {
 fn sheet_setmax_clamps_value() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:define("speed", 10.0)
         sheet:setMax("speed", 20.0)
         sheet:setBase("speed", 50.0)  -- above maximum
@@ -717,7 +717,7 @@ fn sheet_setmax_clamps_value() {
 fn sheet_has_trait_returns_false_if_not_added() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         assert(sheet:hasTrait("warrior") == false, "trait not present")
     "#).exec().unwrap();
 }
@@ -726,7 +726,7 @@ fn sheet_has_trait_returns_false_if_not_added() {
 fn sheet_record_use_increments_count() {
     let lua = make_vm();
     lua.load(r#"
-        local sheet = luna.stats.newSheet()
+        local sheet = lurek.stats.newSheet()
         sheet:recordUse("fireball")
         sheet:recordUse("fireball")
         sheet:recordUse("fireball")

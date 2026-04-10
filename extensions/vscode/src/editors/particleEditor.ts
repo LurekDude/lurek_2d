@@ -7,7 +7,7 @@ export class ParticleEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.particle", "Particle Designer");
+    super(context, "lurek.editor.particle", "Particle Designer");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

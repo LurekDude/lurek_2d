@@ -3,6 +3,9 @@
 -- =============================================================================
 -- Construction — empty
 -- =============================================================================
+-- @covers lurek.postfx.loadImageEffect
+-- @covers lurek.postfx.newImageEffect
+
 
 describe("lurek.postfx.newImageEffect construction (empty)", function()
     it("newImageEffect is a function", function()

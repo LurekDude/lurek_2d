@@ -73,7 +73,7 @@ export function registerEditorCommands(
   context: vscode.ExtensionContext
 ): vscode.Disposable[] {
   return EDITORS.map((entry) =>
-    vscode.commands.registerCommand(`luna.editor.${entry.id}`, () =>
+    vscode.commands.registerCommand(`lurek.editor.${entry.id}`, () =>
       entry.open(context)
     )
   );

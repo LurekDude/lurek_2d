@@ -450,7 +450,155 @@ impl Raycaster2D {
             visible: true,
         }
     }
+
+    // ------------------------------------------------------------------
+    // Visualization
+    // ------------------------------------------------------------------
+
+    /// Render a top-down map view to an image.
+    ///
+    /// Each cell is drawn as a `scale × scale` block. Wall cells are colored
+    /// by their cell value, empty cells use the dark background color.
+    /// The player position is marked with a yellow circle and rays are cast
+    /// in all directions to show the line-of-sight fan.
+    ///
+    /// # Parameters
+    /// - `player_x` — `f32`. Player X position in cell coordinates.
+    /// - `player_y` — `f32`. Player Y position in cell coordinates.
+    /// - `player_angle` — `f32`. Player look direction in radians.
+    /// - `scale` — `u32`. Pixel size of each grid cell.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_top_down_to_image(
+        &self,
+        player_x: f32,
+        player_y: f32,
+        player_angle: f32,
+        scale: u32,
+    ) -> crate::image::ImageData {
+        let _ = player_angle; // reserved for future directional indicator
+        let mut img = crate::image::ImageData::new(self.width * scale, self.height * scale);
+        img.fill(40, 40, 50, 255);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let cell = self.get_cell(x, y);
+                if cell > 0 {
+                    let (r, g, b) = match cell {
+                        1 => (120u8, 120u8, 130u8),
+                        2 => (180, 80, 80),
+                        3 => (80, 80, 180),
+                        _ => (200, 200, 200),
+                    };
+                    for py in 0..scale {
+                        for px in 0..scale {
+                            img.set_pixel(x * scale + px, y * scale + py, r, g, b, 255);
+                        }
+                    }
+                }
+            }
+        }
+        // Draw player
+        img.draw_circle(
+            (player_x * scale as f32) as i32,
+            (player_y * scale as f32) as i32,
+            4, 255, 255, 0, 255,
+        );
+        // Cast rays in all directions
+        for angle_deg in (0..360).step_by(15) {
+            let angle = (angle_deg as f32).to_radians();
+            if let Some(hit) = self.cast_ray(player_x, player_y, angle, 20.0) {
+                let ex = (hit.hit_x * scale as f32) as i32;
+                let ey = (hit.hit_y * scale as f32) as i32;
+                img.draw_line(
+                    (player_x * scale as f32) as i32,
+                    (player_y * scale as f32) as i32,
+                    ex, ey, 255, 200, 0, 180,
+                );
+            }
+        }
+        img
+    }
+
+    /// Render a first-person column view to an image.
+    ///
+    /// Casts `width` rays across the given FOV from the player position and
+    /// draws vertical wall columns with distance-based shading. A sky gradient
+    /// fills the top half and a floor gradient fills the bottom half.
+    ///
+    /// # Parameters
+    /// - `player_x` — `f32`. Player X in cell coordinates.
+    /// - `player_y` — `f32`. Player Y in cell coordinates.
+    /// - `angle` — `f32`. Look direction in radians.
+    /// - `fov` — `f32`. Field of view in radians.
+    /// - `width` — `u32`. Output image width (one ray per column).
+    /// - `height` — `u32`. Output image height.
+    /// - `max_dist` — `f32`. Maximum ray distance.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_view_to_image(
+        &self,
+        player_x: f32,
+        player_y: f32,
+        angle: f32,
+        fov: f32,
+        width: u32,
+        height: u32,
+        max_dist: f32,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        let half_h = height / 2;
+        // Sky gradient
+        for y in 0..half_h {
+            let t = y as f32 / half_h as f32;
+            let r = (20.0 + t * 30.0) as u8;
+            let g = (30.0 + t * 40.0) as u8;
+            let b = (80.0 + t * 100.0) as u8;
+            for x in 0..width {
+                img.set_pixel(x, y, r, g, b, 255);
+            }
+        }
+        // Floor gradient
+        for y in half_h..height {
+            let t = (y - half_h) as f32 / half_h as f32;
+            let g = (80.0 - t * 40.0) as u8;
+            for x in 0..width {
+                img.set_pixel(x, y, g + 30, g + 10, g / 2 + 10, 255);
+            }
+        }
+        // Cast rays and draw wall columns
+        let rays = self.cast_rays(player_x, player_y, angle, fov, width, max_dist);
+        for (x, hit) in rays.iter().enumerate() {
+            if hit.hit {
+                let wall_h = (height as f32 / hit.distance.max(0.1)) as i32;
+                let top = half_h as i32 - wall_h / 2;
+                let bot = half_h as i32 + wall_h / 2;
+                let shade = (1.0f32 - hit.distance / max_dist).max(0.15);
+                let (cr, cg, cb) = match hit.cell_value {
+                    1 => (200u8, 80, 80),
+                    2 => (80, 180, 80),
+                    3 => (80, 100, 200),
+                    4 => (200, 180, 60),
+                    5 => (180, 80, 200),
+                    _ => (150, 150, 150),
+                };
+                let r = (cr as f32 * shade) as u8;
+                let g = (cg as f32 * shade) as u8;
+                let b = (cb as f32 * shade) as u8;
+                img.draw_line(
+                    x as i32, top.max(0),
+                    x as i32, bot.min(height as i32 - 1),
+                    r, g, b, 255,
+                );
+            }
+        }
+        img
+    }
+
 }
+
 
 #[cfg(test)]
 mod tests {

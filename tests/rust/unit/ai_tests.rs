@@ -1,4 +1,4 @@
-//! Game-level integration tests for the Lurek2D AI system.
+﻿//! Game-level integration tests for the Lurek2D AI system.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::rc::Rc;
 
 use lurek2d::ai::*;
+use lurek2d::pathfinding::{InfluenceMap, PathGrid, SimpleFlowField};
 use lurek2d::engine::config::Config;
 use lurek2d::lua_api::{create_lua_vm, SharedState};
 
@@ -637,7 +638,7 @@ fn pathgrid_out_of_bounds() {
 #[test]
 fn flowfield_new() {
     let walkable = vec![true; 25];
-    let ff = FlowField::new(5, 5, walkable);
+    let ff = SimpleFlowField::new(5, 5, walkable);
     assert_eq!(ff.width, 5);
     assert_eq!(ff.height, 5);
     assert!(ff.goal.is_none());
@@ -646,7 +647,7 @@ fn flowfield_new() {
 #[test]
 fn flowfield_set_goal_compute() {
     let walkable = vec![true; 25];
-    let mut ff = FlowField::new(5, 5, walkable);
+    let mut ff = SimpleFlowField::new(5, 5, walkable);
     ff.set_goal(4, 4);
     assert_eq!(ff.goal, Some((4, 4)));
     // Cell (0,0) should have a direction toward (4,4)
@@ -658,7 +659,7 @@ fn flowfield_set_goal_compute() {
 #[test]
 fn flowfield_get_distance() {
     let walkable = vec![true; 25];
-    let mut ff = FlowField::new(5, 5, walkable);
+    let mut ff = SimpleFlowField::new(5, 5, walkable);
     ff.set_goal(0, 0);
     // Goal cell has distance 0
     assert!((ff.get_distance(0, 0)).abs() < 1e-5);
@@ -677,7 +678,7 @@ fn flowfield_unreachable_cell() {
     walkable[3] = false; // block (0,1)
     walkable[4] = false; // block (1,1)
                          // Cell (0,0) is isolated from (2,2) since diagonal is also blocked
-    let mut ff = FlowField::new(3, 3, walkable);
+    let mut ff = SimpleFlowField::new(3, 3, walkable);
     ff.set_goal(2, 2);
     // (0,0) should be unreachable
     assert!(ff.get_distance(0, 0).is_infinite());
@@ -1137,3 +1138,4 @@ fn command_queue_target() {
     assert!((target.0 - 42.5).abs() < 1e-5);
     assert!((target.1 - (-17.0)).abs() < 1e-5);
 }
+

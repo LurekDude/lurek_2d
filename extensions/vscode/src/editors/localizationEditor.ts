@@ -7,7 +7,7 @@ export class LocalizationEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.localizationEditor", "Localization");
+    super(context, "lurek.localizationEditor", "Localization");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

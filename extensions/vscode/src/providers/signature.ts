@@ -79,7 +79,7 @@ export function register(
         const { functionName, paramIndex } = callCtx;
         let fn: ApiFunction | undefined;
 
-        // ── Luna2D API functions ──
+        // ── Lurek2D API functions ──
         fn = apiData.getFunction(functionName);
 
         // ── Method calls (obj:method) — try to find in all methods ──

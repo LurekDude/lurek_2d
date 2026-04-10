@@ -18,7 +18,7 @@ export class TestRunnerEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.testRunner", "Test Runner");
+    super(context, "lurek.editor.testRunner", "Test Runner");
     // Push discovered suites as soon as the panel is ready
     setTimeout(() => this.pushDiscoveredSuites(), 300);
   }
@@ -106,8 +106,8 @@ export class TestRunnerEditor extends WebviewEditor {
   }
 
   private runCargoTest(filter: string, label: string): void {
-    const existing = vscode.window.terminals.find((t) => t.name === "Luna Tests");
-    const terminal = existing ?? vscode.window.createTerminal("Luna Tests");
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Tests");
+    const terminal = existing ?? vscode.window.createTerminal("Lurek2D Tests");
     terminal.show();
     const cmd = filter ? `cargo test ${filter}` : "cargo test";
     terminal.sendText(cmd);
@@ -153,7 +153,7 @@ export class TestRunnerEditor extends WebviewEditor {
           <span id="statusSummary" style="font-size:12px;color:var(--text-dim)">Discovering…</span>
         </div>
         <div class="panel tree-panel" id="treePanel"><div id="discovering">⟳ Scanning tests/ directory…</div></div>
-        <div class="output-panel" id="output">Tests run in the "Luna Tests" terminal.\n\nSelect a suite and click "Run Selected Suite", or click ▶ next to any suite name.</div>
+        <div class="output-panel" id="output">Tests run in the "Lurek2D Tests" terminal.\n\nSelect a suite and click "Run Selected Suite", or click ▶ next to any suite name.</div>
         <div class="status-bar"><span id="statusBar">Ready</span></div>
       </div>
     `, `
@@ -172,7 +172,7 @@ export class TestRunnerEditor extends WebviewEditor {
         }
         if (data.type === 'testStarted') {
           document.getElementById('statusSummary').textContent = 'Running: ' + data.filter;
-          document.getElementById('output').textContent = '$ cargo test ' + data.filter + '\\n\\nSee "Luna Tests" terminal for live output.';
+          document.getElementById('output').textContent = '$ cargo test ' + data.filter + '\\n\\nSee "Lurek2D Tests" terminal for live output.';
         }
       });
 

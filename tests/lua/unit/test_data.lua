@@ -1,5 +1,10 @@
 -- tests/lua/unit/test_data.lua
 -- BDD tests for lurek.data.pack / unpack / getPackedSize / newDataView
+-- @covers lurek.data.getPackedSize
+-- @covers lurek.data.newDataView
+-- @covers lurek.data.pack
+-- @covers lurek.data.unpack
+
 
 describe("data.pack + data.unpack", function()
   it("round-trips f32", function()

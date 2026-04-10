@@ -101,16 +101,13 @@ pub mod docs;
 pub mod engine;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
 pub mod entity;
-/// Event queue for polling system and custom events.
-pub mod event;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
+pub mod graphic;
 pub mod graphics;
-/// Retained-mode widget UI system: buttons, panels, text fields, layouts.
-pub mod gui;
 /// CPU-side pixel-level image manipulation.
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
@@ -121,10 +118,14 @@ pub mod light;
 pub mod localization;
 /// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
 pub mod log;
+/// Event queue for polling system and custom events.
+pub mod signal;
+/// Retained-mode widget UI system: buttons, panels, text fields, layouts.
+pub mod ui;
 // migration-state: pub mod inventory; — now library/inventory/init.lua
 // migration-state: pub mod item; — now library/item/init.lua
 /// Composable visual effects layer: post-processing pipeline (bloom, blur, CRT, color grading) and screen overlays (weather, ambient, shake, fog).
-pub mod fx;
+pub mod effect;
 /// Foundational math types: Vec2, Mat3, Rect.
 pub mod math;
 /// Minimap content extraction, FOV mask, and tile sampling.
@@ -133,6 +134,8 @@ pub mod minimap;
 pub mod modding;
 /// UDP networking via ENet — reliable packet transport for multiplayer games.
 pub mod network;
+/// Multi-layer parallax background system with camera-relative scroll factors, autoscroll, tiling, blend modes, and scene grouping.
+pub mod parallax;
 /// (Deprecated — use `fx::screen` instead.) Composable per-frame screen-effect overlay.
 // pub mod overlay; — superseded by fx::screen
 /// Emitter-based 2D particle effects.

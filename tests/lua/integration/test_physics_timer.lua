@@ -1,5 +1,10 @@
 -- Lurek2D Integration Test: Physics + Timer
 -- Tests physics simulation stepping with time management
+-- @covers lurek.physics.destroyWorld
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.step
+
 
 describe("physics + timer integration", function()
     it("physics world step with timer delta", function()

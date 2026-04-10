@@ -1,5 +1,7 @@
 -- Entity module Lua tests
 -- Headless-safe. Each describe block creates a fresh Universe.
+-- @covers lurek.entity.newUniverse
+
 
 describe("Spawn and lifecycle", function()
     it("spawns entities with sequential IDs", function()

@@ -24,7 +24,7 @@ export async function installCag(): Promise<void> {
   }
 
   if (!engineGithub) {
-    vscode.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the luna_2d repository root.");
+    vscode.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the lurek2d repository root.");
     return;
   }
 

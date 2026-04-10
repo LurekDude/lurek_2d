@@ -1,5 +1,8 @@
 -- Lurek2D Integration Test: Entity + AI
 -- Tests entity system with AI decision-making components
+-- @covers lurek.ai.newStateMachine
+-- @covers lurek.entity.newUniverse
+
 
 describe("integration: entity with AI state machine", function()
     it("entities change state based on FSM", function()

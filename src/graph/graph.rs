@@ -490,7 +490,9 @@ impl Graph {
             .map(|e| e.id)
             .collect()
     }
+
 }
+
 
 #[cfg(test)]
 mod tests {

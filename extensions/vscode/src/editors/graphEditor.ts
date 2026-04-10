@@ -7,7 +7,7 @@ export class GraphEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.graph", "Graph / Node Editor");
+    super(context, "lurek.editor.graph", "Graph / Node Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

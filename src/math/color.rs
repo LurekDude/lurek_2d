@@ -141,6 +141,35 @@ impl Default for Color {
     }
 }
 
+/// Convert an HSV color to RGB byte components.
+///
+/// # Parameters
+/// - `h` — Hue in degrees `[0, 360)`. Values outside this range are wrapped via modulo.
+/// - `s` — Saturation in `[0.0, 1.0]`.
+/// - `v` — Value (brightness) in `[0.0, 1.0]`.
+///
+/// # Returns
+/// `(u8, u8, u8)` — red, green, blue components in `[0, 255]`.
+pub fn hsv_to_rgb(h: u16, s: f32, v: f32) -> (u8, u8, u8) {
+    let h = (h % 360) as f32;
+    let c = v * s;
+    let x = c * (1.0 - ((h / 60.0) % 2.0 - 1.0).abs());
+    let m = v - c;
+    let (r, g, b) = match (h / 60.0) as u8 {
+        0 => (c, x, 0.0),
+        1 => (x, c, 0.0),
+        2 => (0.0, c, x),
+        3 => (0.0, x, c),
+        4 => (x, 0.0, c),
+        _ => (c, 0.0, x),
+    };
+    (
+        ((r + m) * 255.0) as u8,
+        ((g + m) * 255.0) as u8,
+        ((b + m) * 255.0) as u8,
+    )
+}
+
 /// Convert a single sRGB gamma-space color component to linear space.
 ///
 /// Input and output in `[0.0, 1.0]`. Uses the standard IEC 61966-2-1 sRGB transfer function.

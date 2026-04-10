@@ -1,6 +1,10 @@
 -- lurek.thread API unit tests
 -- Headless-safe (no window / GPU / audio required).
 -- Tests the factory functions and Channel primitives; does not launch background VMs.
+-- @covers lurek.thread.getChannel
+-- @covers lurek.thread.newChannel
+-- @covers lurek.thread.newThread
+
 
 describe("lurek.thread module exists", function()
     it("lurek.thread is a table", function()

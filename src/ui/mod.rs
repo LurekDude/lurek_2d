@@ -62,3 +62,10 @@ pub use widget::{WidgetBase, WidgetState, WidgetType};
 /// Mathematical function graph and chart renderer (data series, viewport mapping).
 pub mod data_graph_renderer;
 pub use data_graph_renderer::{GraphRenderer, GraphSeries};
+
+/// Configurable chart rendering to `ImageData` (line, bar, scatter, pie, area).
+pub mod chart;
+pub use chart::{
+    AreaChart, AreaLayer, BarCategory, BarChart, ChartConfig, ChartMargin, ChartSeries,
+    LineChart, PieChart, PieSegment, ScatterPlot,
+};

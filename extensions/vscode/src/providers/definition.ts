@@ -5,7 +5,7 @@ import { LuaDocumentAnalyzer, LuaDocumentInfo } from "../services/luaParser.js";
 
 const LUA_SELECTOR: vscode.DocumentSelector = { scheme: "file", language: "lua" };
 const analyzer = new LuaDocumentAnalyzer();
-const LUNA_API_SCHEME = "luna-api";
+const LUREK_API_SCHEME = "lurek-api";
 
 // ── Document analysis cache ──────────────────────────────────
 
@@ -25,9 +25,9 @@ function getCachedAnalysis(document: vscode.TextDocument): LuaDocumentInfo {
   return info;
 }
 
-// ── Virtual document provider for luna.* API definitions ─────
+// ── Virtual document provider for lurek.* API definitions ─────
 
-class LunaApiDocumentProvider implements vscode.TextDocumentContentProvider {
+class LurekApiDocumentProvider implements vscode.TextDocumentContentProvider {
   constructor(private apiData: ApiDataService) {}
 
   provideTextDocumentContent(uri: vscode.Uri): string {
@@ -38,7 +38,7 @@ class LunaApiDocumentProvider implements vscode.TextDocumentContentProvider {
     }
 
     // Try as module
-    const modName = fullPath.replace("luna.", "");
+    const modName = fullPath.replace("lurek.", "");
     const mod = this.apiData.getModule(modName);
     if (mod) {
       return this.renderModule(mod);
@@ -49,7 +49,7 @@ class LunaApiDocumentProvider implements vscode.TextDocumentContentProvider {
 
   private renderFunction(fn: import("../services/apiData.js").ApiFunction): string {
     const lines: string[] = [];
-    lines.push(`-- Luna2D API Definition`);
+    lines.push(`-- Lurek2D API Definition`);
     lines.push(`-- ${fn.fullPath}`);
     lines.push(`--`);
     if (fn.description) {
@@ -94,7 +94,7 @@ class LunaApiDocumentProvider implements vscode.TextDocumentContentProvider {
 
   private renderModule(mod: import("../services/apiData.js").ApiModule): string {
     const lines: string[] = [];
-    lines.push(`-- Luna2D API Module: ${mod.fullPath}`);
+    lines.push(`-- Lurek2D API Module: ${mod.fullPath}`);
     if (mod.description) {
       lines.push(`-- ${mod.description}`);
     }
@@ -212,10 +212,10 @@ export function register(
   context: vscode.ExtensionContext,
   apiData: ApiDataService,
 ): void {
-  // Register virtual document provider for luna.* API definitions
-  const docProvider = new LunaApiDocumentProvider(apiData);
+  // Register virtual document provider for lurek.* API definitions
+  const docProvider = new LurekApiDocumentProvider(apiData);
   context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider(LUNA_API_SCHEME, docProvider),
+    vscode.workspace.registerTextDocumentContentProvider(LUREK_API_SCHEME, docProvider),
   );
 
   const provider = vscode.languages.registerDefinitionProvider(LUA_SELECTOR, {
@@ -236,13 +236,13 @@ export function register(
         }
       }
 
-      // ── luna.module.func → virtual API document ──
-      const lunaRange = document.getWordRangeAtPosition(position, /luna\.\w+\.\w+/);
-      if (lunaRange) {
-        const fullPath = document.getText(lunaRange);
+      // ── lurek.module.func → virtual API document ──
+      const lurekRange = document.getWordRangeAtPosition(position, /lurek\.\w+\.\w+/);
+      if (lurekRange) {
+        const fullPath = document.getText(lurekRange);
         const fn = apiData.getFunction(fullPath);
         if (fn) {
-          const uri = vscode.Uri.parse(`${LUNA_API_SCHEME}:/${fullPath}`);
+          const uri = vscode.Uri.parse(`${LUREK_API_SCHEME}:/${fullPath}`);
           return new vscode.Location(uri, new vscode.Position(0, 0));
         }
       }
@@ -252,9 +252,9 @@ export function register(
       if (!wordRange) return undefined;
       const word = document.getText(wordRange);
 
-      // Skip luna.* prefix situations
+      // Skip lurek.* prefix situations
       const beforeWord = lineText.substring(0, wordRange.start.character);
-      if (beforeWord.endsWith("luna.") || beforeWord.match(/luna\.\w+\.$/)) {
+      if (beforeWord.endsWith("lurek.") || beforeWord.match(/lurek\.\w+\.$/)) {
         return undefined;
       }
 

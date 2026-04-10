@@ -25,7 +25,7 @@ fn combatant_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("hero")
+        local c = lurek.battle.newCombatant("hero")
         assert(c:type() == "Combatant", "type()")
         assert(c:typeOf("Combatant"), "typeOf")
     "#,
@@ -39,7 +39,7 @@ fn combatant_name_and_team() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("hero")
+        local c = lurek.battle.newCombatant("hero")
         assert(c:getName() == "hero", "name")
         c:setTeam("player")
         assert(c:getTeam() == "player", "team")
@@ -54,7 +54,7 @@ fn combatant_hp_and_mp() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("hero")
+        local c = lurek.battle.newCombatant("hero")
         c:setMaxHp(100)
         c:setHp(100)
         c:setMaxMp(50)
@@ -73,7 +73,7 @@ fn combatant_take_damage() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("goblin")
+        local c = lurek.battle.newCombatant("goblin")
         c:setHp(100) ; c:setMaxHp(100)
         local dealt = c:takeDamage(30, "physical")
         assert(dealt == 30, "30 damage dealt")
@@ -90,7 +90,7 @@ fn combatant_death_from_damage() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("slime")
+        local c = lurek.battle.newCombatant("slime")
         c:setHp(10) ; c:setMaxHp(10)
         c:takeDamage(100, "fire")
         assert(not c:isAlive(), "dead")
@@ -105,7 +105,7 @@ fn combatant_heal() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("paladin")
+        local c = lurek.battle.newCombatant("paladin")
         c:setMaxHp(100) ; c:setHp(40)
         local healed = c:heal(25)
         assert(healed == 25, "healed 25")
@@ -123,7 +123,7 @@ fn combatant_resistance() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("fire_elemental")
+        local c = lurek.battle.newCombatant("fire_elemental")
         c:setMaxHp(100) ; c:setHp(100)
         c:setResistance("fire", 0.0)
         local dealt = c:takeDamage(50, "fire")
@@ -142,7 +142,7 @@ fn combatant_stats() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("warrior")
+        local c = lurek.battle.newCombatant("warrior")
         c:setStat("str", 15)
         assert(c:getStat("str") == 15, "str stat")
         assert(c:getStat("missing") == 0, "missing stat = 0")
@@ -157,7 +157,7 @@ fn combatant_status_effects() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("rogue")
+        local c = lurek.battle.newCombatant("rogue")
         assert(not c:hasStatus("poison"), "no poison initially")
         c:addStatus("poison", 3)
         assert(c:hasStatus("poison"), "has poison")
@@ -178,7 +178,7 @@ fn combatant_status_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("zombie")
+        local c = lurek.battle.newCombatant("zombie")
         c:addStatus("burn", 2)
         c:tickStatuses()
         local statuses = c:getStatuses()
@@ -202,7 +202,7 @@ fn action_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local a = luna.battle.newAction("slash")
+        local a = lurek.battle.newAction("slash")
         assert(a:type() == "CombatAction", "type()")
     "#,
     )
@@ -215,7 +215,7 @@ fn action_properties() {
     let lua = make_vm();
     lua.load(
         r#"
-        local a = luna.battle.newAction("fireball")
+        local a = lurek.battle.newAction("fireball")
         a:setBaseDamage(50)
         a:setDamageType("fire")
         a:setAccuracy(0.9)
@@ -238,7 +238,7 @@ fn action_cooldown_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local a = luna.battle.newAction("slam")
+        local a = lurek.battle.newAction("slam")
         a:setCooldown(2)
         assert(a:isReady(), "ready initially")
         a:tickCooldown()
@@ -259,7 +259,7 @@ fn status_effect_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local e = luna.battle.newStatusEffect("slow", 5)
+        local e = lurek.battle.newStatusEffect("slow", 5)
         assert(e:type() == "StatusEffect", "type()")
         assert(e:getName() == "slow", "name")
         assert(e:getDuration() == 5, "duration 5")
@@ -274,7 +274,7 @@ fn status_effect_stacks() {
     let lua = make_vm();
     lua.load(
         r#"
-        local e = luna.battle.newStatusEffect("bleed", 10)
+        local e = lurek.battle.newStatusEffect("bleed", 10)
         assert(e:getStacks() == 1, "1 stack init")
         e:setStacks(3)
         assert(e:getStacks() == 3, "3 stacks")
@@ -293,7 +293,7 @@ fn battle_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle("arena")
+        local b = lurek.battle.newBattle("arena")
         assert(b:type() == "CombatBattle", "type()")
         assert(b:getName() == "arena", "name")
     "#,
@@ -307,8 +307,8 @@ fn battle_add_combatant() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
-        local hero = luna.battle.newCombatant("hero")
+        local b = lurek.battle.newBattle()
+        local hero = lurek.battle.newCombatant("hero")
         hero:setHp(100) ; hero:setMaxHp(100)
         b:addCombatant(hero)
         assert(b:getCount() == 1, "1 combatant")
@@ -323,13 +323,13 @@ fn battle_attack() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
-        local hero = luna.battle.newCombatant("hero")
+        local b = lurek.battle.newBattle()
+        local hero = lurek.battle.newCombatant("hero")
         hero:setMaxHp(100) ; hero:setHp(100) ; hero:setTeam("players")
-        local punch = luna.battle.newAction("punch")
+        local punch = lurek.battle.newAction("punch")
         punch:setBaseDamage(40) ; punch:setAccuracy(1.0)
         hero:addAction(punch)
-        local goblin = luna.battle.newCombatant("goblin")
+        local goblin = lurek.battle.newCombatant("goblin")
         goblin:setMaxHp(100) ; goblin:setHp(100) ; goblin:setTeam("enemies")
         b:addCombatant(hero)
         b:addCombatant(goblin)
@@ -350,13 +350,13 @@ fn battle_over_when_team_wiped() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
-        local hero = luna.battle.newCombatant("hero")
+        local b = lurek.battle.newBattle()
+        local hero = lurek.battle.newCombatant("hero")
         hero:setMaxHp(100) ; hero:setHp(100) ; hero:setTeam("players")
-        local punch = luna.battle.newAction("kill")
+        local punch = lurek.battle.newAction("kill")
         punch:setBaseDamage(9999) ; punch:setAccuracy(1.0)
         hero:addAction(punch)
-        local boss = luna.battle.newCombatant("boss")
+        local boss = lurek.battle.newCombatant("boss")
         boss:setMaxHp(100) ; boss:setHp(100) ; boss:setTeam("enemies")
         b:addCombatant(hero) ; b:addCombatant(boss)
         assert(not b:isOver(), "not over yet")
@@ -374,9 +374,9 @@ fn battle_turn_management() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
+        local b = lurek.battle.newBattle()
         for i = 1, 3 do
-            local c = luna.battle.newCombatant("fighter"..i)
+            local c = lurek.battle.newCombatant("fighter"..i)
             c:setMaxHp(100) ; c:setHp(100) ; c:setTeam("team"..i)
             b:addCombatant(c)
         end
@@ -394,9 +394,9 @@ fn battle_alive_names() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
+        local b = lurek.battle.newBattle()
         for _, name in ipairs({"a", "b", "c"}) do
-            local c = luna.battle.newCombatant(name)
+            local c = lurek.battle.newCombatant(name)
             c:setMaxHp(100) ; c:setHp(100) ; c:setTeam("t")
             b:addCombatant(c)
         end
@@ -413,7 +413,7 @@ fn combatant_meta() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("bard")
+        local c = lurek.battle.newCombatant("bard")
         c:setMeta("guild", "thieves")
         assert(c:getMeta("guild") == "thieves", "meta value")
         assert(c:getMeta("missing") == nil, "missing meta = nil")
@@ -428,7 +428,7 @@ fn combatant_hp_mp_percent() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("hero")
+        local c = lurek.battle.newCombatant("hero")
         c:setHp(50.0)
         c:setMaxHp(200.0)
         c:setMp(25.0)
@@ -446,9 +446,9 @@ fn combatant_action_names() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("knight")
-        local a1 = luna.battle.newAction("slash")
-        local a2 = luna.battle.newAction("shield_bash")
+        local c = lurek.battle.newCombatant("knight")
+        local a1 = lurek.battle.newAction("slash")
+        local a2 = lurek.battle.newAction("shield_bash")
         c:addAction(a1)
         c:addAction(a2)
         local names = c:getActionNames()
@@ -468,7 +468,7 @@ fn combatant_status_names() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.battle.newCombatant("enemy")
+        local c = lurek.battle.newCombatant("enemy")
         c:addStatus("poison", 3)
         c:addStatus("slow", 2)
         local names = c:getStatusNames()
@@ -488,7 +488,7 @@ fn battle_combat_log() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle("log_test")
+        local b = lurek.battle.newBattle("log_test")
         b:addToLog("battle started")
         b:addToLog("hero attacks goblin")
         local log = b:getLog()
@@ -506,9 +506,9 @@ fn battle_remove_combatant() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
-        local c1 = luna.battle.newCombatant("hero")
-        local c2 = luna.battle.newCombatant("goblin")
+        local b = lurek.battle.newBattle()
+        local c1 = lurek.battle.newCombatant("hero")
+        local c2 = lurek.battle.newCombatant("goblin")
         b:addCombatant(c1)
         b:addCombatant(c2)
         assert(b:getCount() == 2, "2 combatants")
@@ -528,7 +528,7 @@ fn battle_force_end() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
+        local b = lurek.battle.newBattle()
         assert(not b:isOver(), "not over initially")
         b:forceEnd("heroes")
         assert(b:isOver(), "over after forceEnd")
@@ -544,7 +544,7 @@ fn battle_force_end_no_winner() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
+        local b = lurek.battle.newBattle()
         b:forceEnd(nil)
         assert(b:isOver(), "over")
         assert(b:getWinner() == nil, "no winner")
@@ -559,11 +559,11 @@ fn battle_log_from_attack() {
     let lua = make_vm();
     lua.load(
         r#"
-        local b = luna.battle.newBattle()
-        local hero = luna.battle.newCombatant("hero")
-        local goblin = luna.battle.newCombatant("goblin")
+        local b = lurek.battle.newBattle()
+        local hero = lurek.battle.newCombatant("hero")
+        local goblin = lurek.battle.newCombatant("goblin")
         goblin:setTeam("enemy")
-        local atk = luna.battle.newAction("strike")
+        local atk = lurek.battle.newAction("strike")
         atk:setAccuracy(1.0)
         hero:addAction(atk)
         b:addCombatant(hero)

@@ -79,8 +79,8 @@ export function openWatchersPanel(context: vscode.ExtensionContext): void {
   if (_panel) { _panel.reveal(vscode.ViewColumn.Two); return; }
 
   _panel = vscode.window.createWebviewPanel(
-    "luna.debugWatchers",
-    "Luna2D Watchers",
+    "lurek.debugWatchers",
+    "Lurek2D Watchers",
     vscode.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true },
   );

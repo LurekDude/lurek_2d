@@ -1,3 +1,13 @@
+-- @covers lurek.time.getAverageDelta
+-- @covers lurek.time.getDelta
+-- @covers lurek.time.getFPS
+-- @covers lurek.time.getMicroTime
+-- @covers lurek.time.getPhysicsDelta
+-- @covers lurek.time.getTime
+-- @covers lurek.time.setPhysicsDelta
+-- @covers lurek.time.sleep
+-- @covers lurek.time.step
+
 ﻿-- Lurek2D Timer API Tests
 
 describe("lurek.time module exists", function()

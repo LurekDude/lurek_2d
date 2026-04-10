@@ -7,7 +7,7 @@ export class PostFxOverlayEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.postfxOverlay", "PostFX & Overlay Designer");
+    super(context, "lurek.editor.postfxOverlay", "PostFX & Overlay Designer");
   }
 
   protected handleMessage(msg: { type: string; [key: string]: unknown }): void {
@@ -242,15 +242,15 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const fogColor = g('fogColor').value;
           code = '-- Weather: ' + preset + '\\n';
           if (preset !== 'Clear') {
-            code += 'local weather = luna.postfx.createWeather({\\n';
+            code += 'local weather = lurek.postfx.createWeather({\\n';
             code += '  preset   = "' + preset.toLowerCase().replace(/ /g,'_') + '",\\n';
             code += '  intensity = ' + intensity.toFixed(2) + ',\\n';
-            code += '  wind      = luna.math.vec2(' + windX + ', ' + windY + '),\\n';
-            code += '  color     = luna.graphics.newColor("' + color + '"),\\n';
+            code += '  wind      = lurek.math.vec2(' + windX + ', ' + windY + '),\\n';
+            code += '  color     = lurek.graphics.newColor("' + color + '"),\\n';
             code += '})\\n\\n';
-            code += 'function luna.update(dt)\\n  weather:update(dt)\\nend\\n';
-            code += 'function luna.draw()\\n  weather:draw()\\n';
-            if (fogDensity > 0) code += '  luna.postfx.fog({ density=' + fogDensity.toFixed(2) + ', color=luna.graphics.newColor("' + fogColor + '") })\\n';
+            code += 'function lurek.update(dt)\\n  weather:update(dt)\\nend\\n';
+            code += 'function lurek.draw()\\n  weather:draw()\\n';
+            if (fogDensity > 0) code += '  lurek.postfx.fog({ density=' + fogDensity.toFixed(2) + ', color=lurek.graphics.newColor("' + fogColor + '") })\\n';
             code += 'end';
           } else {
             code += '-- No weather effects active';
@@ -264,17 +264,17 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const stars = g('starsEnabled').checked;
           const speed = fv('todSpeed');
           code = '-- Time of Day Setup\\n';
-          code += 'local tod = luna.postfx.createTimeOfDay({\\n';
+          code += 'local tod = lurek.postfx.createTimeOfDay({\\n';
           code += '  hour         = ' + hour.toFixed(2) + ',\\n';
-          code += '  sky_color    = luna.graphics.newColor("' + sky + '"),\\n';
-          code += '  sun_color    = luna.graphics.newColor("' + sun + '"),\\n';
+          code += '  sky_color    = lurek.graphics.newColor("' + sky + '"),\\n';
+          code += '  sun_color    = lurek.graphics.newColor("' + sun + '"),\\n';
           code += '  ambient      = ' + ambient.toFixed(2) + ',\\n';
           code += '  moon_enabled = ' + moon + ',\\n';
           code += '  stars        = ' + stars + ',\\n';
           code += '  speed        = ' + speed.toFixed(3) + ',\\n';
           code += '})\\n\\n';
-          code += 'function luna.update(dt)\\n  tod:update(dt)\\nend\\n';
-          code += 'function luna.draw()\\n  tod:drawSky()\\n  -- draw game world here\\n  tod:drawOverlay()\\nend';
+          code += 'function lurek.update(dt)\\n  tod:update(dt)\\nend\\n';
+          code += 'function lurek.draw()\\n  tod:drawSky()\\n  -- draw game world here\\n  tod:drawOverlay()\\nend';
         } else if (currentTab === 'screen') {
           const lines = [];
           const vig = fv('vignette');
@@ -286,8 +286,8 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const px = fv('pixelSize');
           const grain = fv('filmGrain');
           const bloom_ = fv('bloom');
-          code = '-- Screen PostFX\\nfunction luna.draw()\\n  -- draw game\\n  local fx = luna.postfx.begin()\\n';
-          if (vig > 0)    lines.push('  fx:vignette({ strength=' + vig.toFixed(2) + ', color=luna.graphics.newColor("' + g('vignetteColor').value + '") })');
+          code = '-- Screen PostFX\\nfunction lurek.draw()\\n  -- draw game\\n  local fx = lurek.postfx.begin()\\n';
+          if (vig > 0)    lines.push('  fx:vignette({ strength=' + vig.toFixed(2) + ', color=lurek.graphics.newColor("' + g('vignetteColor').value + '") })');
           if (scan > 0)   lines.push('  fx:scanlines({ alpha=' + scan.toFixed(2) + ' })');
           if (sat !== 1)  lines.push('  fx:saturation(' + sat.toFixed(2) + ')');
           if (bright !== 1) lines.push('  fx:brightness(' + bright.toFixed(2) + ')');
@@ -296,14 +296,14 @@ export class PostFxOverlayEditor extends WebviewEditor {
           if (px > 1)     lines.push('  fx:pixelate(' + px + ')');
           if (grain > 0)  lines.push('  fx:filmGrain(' + grain.toFixed(2) + ')');
           if (bloom_ > 0) lines.push('  fx:bloom({ threshold=0.7, strength=' + bloom_.toFixed(2) + ' })');
-          code += lines.join('\\n') + '\\n  luna.postfx.finish(fx)\\nend';
+          code += lines.join('\\n') + '\\n  lurek.postfx.finish(fx)\\nend';
         } else if (currentTab === 'shake') {
           const amp = fv('shakeAmplitude'), freq = fv('shakeFrequency');
           const dur = fv('shakeDuration'), decay = fv('shakeDecay');
           const rot = fv('shakeRotation');
           const trauma = g('shakeTrauma').checked;
           code = '-- Camera Shake\\n';
-          code += 'local shaker = luna.camera.createShaker({\\n';
+          code += 'local shaker = lurek.camera.createShaker({\\n';
           code += '  amplitude  = ' + amp.toFixed(1) + ',\\n';
           code += '  frequency  = ' + freq + ',\\n';
           code += '  duration   = ' + dur.toFixed(2) + ',\\n';
@@ -312,8 +312,8 @@ export class PostFxOverlayEditor extends WebviewEditor {
           code += '  trauma     = ' + trauma + ',\\n';
           code += '})\\n\\n';
           code += '-- Trigger a shake (e.g. on explosion):\\nshaker:shake()\\n\\n';
-          code += 'function luna.update(dt)\\n  shaker:update(dt)\\nend\\n';
-          code += 'function luna.draw()\\n  shaker:push()\\n  -- draw everything here\\n  shaker:pop()\\nend';
+          code += 'function lurek.update(dt)\\n  shaker:update(dt)\\nend\\n';
+          code += 'function lurek.draw()\\n  shaker:push()\\n  -- draw everything here\\n  shaker:pop()\\nend';
         } else if (currentTab === 'overlay') {
           const preset = g('overlayPreset').value;
           const alpha = fv('overlayAlpha');
@@ -321,15 +321,15 @@ export class PostFxOverlayEditor extends WebviewEditor {
           const pulse = g('overlayPulsate').checked;
           const speed = fv('overlayPulseSpeed');
           code = '-- Overlay: ' + preset + '\\n';
-          code += 'local overlay = luna.postfx.createOverlay({\\n';
+          code += 'local overlay = lurek.postfx.createOverlay({\\n';
           code += '  preset  = "' + preset.toLowerCase().replace(/ /g,'_') + '",\\n';
-          code += '  color   = luna.graphics.newColor("' + color + '"),\\n';
+          code += '  color   = lurek.graphics.newColor("' + color + '"),\\n';
           code += '  alpha   = ' + alpha.toFixed(2) + ',\\n';
           code += '  pulsate = ' + pulse + ',\\n';
           if (pulse) code += '  speed   = ' + speed.toFixed(1) + ',\\n';
           code += '})\\n\\n';
-          code += 'function luna.update(dt)\\n  overlay:update(dt)\\nend\\n';
-          code += 'function luna.draw()\\n  -- draw game\\n  overlay:draw()\\nend';
+          code += 'function lurek.update(dt)\\n  overlay:update(dt)\\nend\\n';
+          code += 'function lurek.draw()\\n  -- draw game\\n  overlay:draw()\\nend';
         }
         g('codeOut').textContent = code;
       }

@@ -3,6 +3,10 @@
 -- =========================================================================
 -- Helper: table contains value
 -- =========================================================================
+-- @covers lurek.pipeline.fromTable
+-- @covers lurek.pipeline.newPipeline
+-- @covers lurek.pipeline.newStep
+
 local function table_contains(t, value)
     for _, v in ipairs(t) do
         if v == value then return true end

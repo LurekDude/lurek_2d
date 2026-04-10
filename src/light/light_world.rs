@@ -237,6 +237,79 @@ impl LightWorld {
             light.flicker.advance(dt);
         }
     }
+
+    /// Render the accumulated lightmap to an image.
+    ///
+    /// Each pixel accumulates additive light contributions from all lights using
+    /// quadratic distance falloff. Occluders are drawn as dark rectangles.
+    /// Light source centers are marked with bright dots.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`. Output image width.
+    /// - `height` — `u32`. Output image height.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(10, 10, 15, 255);
+
+        // Collect light parameters
+        let light_params: Vec<(f32, f32, f32, f32, f32, f32)> = self
+            .lights
+            .values()
+            .map(|l| (l.x, l.y, l.radius, l.color.r, l.color.g, l.color.b))
+            .collect();
+
+        // Accumulate light per pixel
+        for y in 0..height {
+            for x in 0..width {
+                let mut fr = 10.0f32;
+                let mut fg = 10.0f32;
+                let mut fb = 15.0f32;
+                for &(lx, ly, radius, lr, lg, lb) in &light_params {
+                    let dx = x as f32 - lx;
+                    let dy = y as f32 - ly;
+                    let dist = (dx * dx + dy * dy).sqrt();
+                    let atten = (1.0 - dist / radius).max(0.0);
+                    let atten = atten * atten; // quadratic falloff
+                    fr += lr * atten * 200.0;
+                    fg += lg * atten * 200.0;
+                    fb += lb * atten * 200.0;
+                }
+                img.set_pixel(x, y, fr.min(255.0) as u8, fg.min(255.0) as u8, fb.min(255.0) as u8, 255);
+            }
+        }
+
+        // Draw occluders as dark rectangles (simplified bounding box)
+        for occ in self.occluders.values() {
+            let verts = &occ.vertices;
+            if verts.len() >= 2 {
+                let mut min_x = f32::MAX;
+                let mut min_y = f32::MAX;
+                let mut max_x = f32::MIN;
+                let mut max_y = f32::MIN;
+                for v in verts {
+                    min_x = min_x.min(v.x);
+                    min_y = min_y.min(v.y);
+                    max_x = max_x.max(v.x);
+                    max_y = max_y.max(v.y);
+                }
+                img.draw_rect(
+                    min_x as i32, min_y as i32,
+                    (max_x - min_x) as u32, (max_y - min_y) as u32,
+                    20, 20, 25, 255,
+                );
+            }
+        }
+
+        // Draw light source markers
+        for l in self.lights.values() {
+            img.draw_circle(l.x as i32, l.y as i32, 5, 255, 240, 100, 255);
+        }
+        img
+    }
+
 }
 
 impl Default for LightWorld {

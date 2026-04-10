@@ -9,6 +9,7 @@ use std::sync::Arc;
 use crate::data::{
     self, BinValue, ByteData, CompressFormat, DataView, EncodeFormat, HashAlgorithm, LuaDataView, PackValue,
 };
+use crate::data::toml_convert;
 
 // -------------------------------------------------------------------------------
 // Pack conversion helpers
@@ -77,6 +78,75 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
             BinValue::Bytes(b) => lua.create_string(&b[..]).map(LuaValue::String),
         })
         .collect()
+}
+
+// -------------------------------------------------------------------------------
+// TOML conversion helpers
+// -------------------------------------------------------------------------------
+
+/// Converts a `toml::Value` to a `LuaValue`.
+fn toml_value_to_lua<'lua>(lua: &'lua Lua, value: &toml::Value) -> LuaResult<LuaValue<'lua>> {
+    match value {
+        toml::Value::String(s) => lua.create_string(s.as_bytes()).map(LuaValue::String),
+        toml::Value::Integer(n) => Ok(LuaValue::Integer(*n)),
+        toml::Value::Float(f) => Ok(LuaValue::Number(*f)),
+        toml::Value::Boolean(b) => Ok(LuaValue::Boolean(*b)),
+        toml::Value::Array(arr) => {
+            let tbl = lua.create_table()?;
+            for (i, v) in arr.iter().enumerate() {
+                tbl.set(i + 1, toml_value_to_lua(lua, v)?)?;
+            }
+            Ok(LuaValue::Table(tbl))
+        }
+        toml::Value::Table(map) => {
+            let tbl = lua.create_table()?;
+            for (k, v) in map {
+                tbl.set(k.as_str(), toml_value_to_lua(lua, v)?)?;
+            }
+            Ok(LuaValue::Table(tbl))
+        }
+        toml::Value::Datetime(dt) => {
+            lua.create_string(dt.to_string().as_bytes()).map(LuaValue::String)
+        }
+    }
+}
+
+/// Converts a `LuaValue` to a `toml::Value`.
+fn lua_table_to_toml_value(value: &LuaValue) -> LuaResult<toml::Value> {
+    match value {
+        LuaValue::Boolean(b) => Ok(toml::Value::Boolean(*b)),
+        LuaValue::Integer(n) => Ok(toml::Value::Integer(*n)),
+        LuaValue::Number(f) => Ok(toml::Value::Float(*f)),
+        LuaValue::String(s) => {
+            let st = s.to_str().map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+            Ok(toml::Value::String(st.to_string()))
+        }
+        LuaValue::Table(tbl) => {
+            // Determine if the table is an array (sequential integer keys starting at 1)
+            // or a map (string keys).
+            let len = tbl.raw_len();
+            if len > 0 {
+                // Check if it looks like a sequence
+                let mut arr = Vec::new();
+                for i in 1..=len {
+                    let v: LuaValue = tbl.raw_get(i)?;
+                    arr.push(lua_table_to_toml_value(&v)?);
+                }
+                Ok(toml::Value::Array(arr))
+            } else {
+                let mut map = toml::map::Map::new();
+                for pair in tbl.clone().pairs::<LuaString, LuaValue>() {
+                    let (k, v) = pair?;
+                    let key = k.to_str().map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+                    map.insert(key.to_string(), lua_table_to_toml_value(&v)?);
+                }
+                Ok(toml::Value::Table(map))
+            }
+        }
+        _ => Err(LuaError::RuntimeError(
+            "Cannot convert this Lua type to TOML".to_string(),
+        )),
+    }
 }
 
 // -------------------------------------------------------------------------------
@@ -294,6 +364,30 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "size",
         lua.create_function(|_, fmt: String| {
             data::bin_measure_size(&fmt).map_err(LuaError::RuntimeError)
+        })?,
+    )?;
+
+    // -- parseToml --
+    /// Parses a TOML string into a Lua table.
+    /// @param text : string
+    /// @return table
+    tbl.set(
+        "parseToml",
+        lua.create_function(|lua, text: String| {
+            let value = toml_convert::parse_toml(&text).map_err(LuaError::RuntimeError)?;
+            toml_value_to_lua(lua, &value)
+        })?,
+    )?;
+
+    // -- encodeToml --
+    /// Encodes a Lua table into a TOML string.
+    /// @param tbl : table
+    /// @return string
+    tbl.set(
+        "encodeToml",
+        lua.create_function(|_, tbl: LuaTable| {
+            let value = lua_table_to_toml_value(&LuaValue::Table(tbl))?;
+            toml_convert::encode_toml(&value).map_err(LuaError::RuntimeError)
         })?,
     )?;
 

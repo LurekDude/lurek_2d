@@ -1,6 +1,23 @@
 -- Lurek2D lurek.light.* API Tests
 
 -- ── Module-level functions ────────────────────────────────────────────────
+-- @covers lurek.light.advanceFlickers
+-- @covers lurek.light.clear
+-- @covers lurek.light.getAmbient
+-- @covers lurek.light.getGroupCount
+-- @covers lurek.light.getLightCount
+-- @covers lurek.light.getMaxLights
+-- @covers lurek.light.getOccluderCount
+-- @covers lurek.light.isEnabled
+-- @covers lurek.light.newLight
+-- @covers lurek.light.newOccluder
+-- @covers lurek.light.setAmbient
+-- @covers lurek.light.setEnabled
+-- @covers lurek.light.setGroupColor
+-- @covers lurek.light.setGroupEnabled
+-- @covers lurek.light.setGroupIntensity
+-- @covers lurek.light.setMaxLights
+
 
 describe("lurek.light module functions", function()
     it("lurek.light is a table", function()

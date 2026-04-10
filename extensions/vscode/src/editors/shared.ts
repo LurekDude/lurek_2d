@@ -14,7 +14,7 @@ export function getNonce(): string {
 }
 
 /**
- * Shared CSS theme for all Luna editors.
+ * Shared CSS theme for all Lurek2D editors.
  */
 export function getSharedCss(): string {
   return `
@@ -106,7 +106,7 @@ ${scripts}
 }
 
 /**
- * Abstract base class for all Luna webview editors.
+ * Abstract base class for all Lurek2D webview editors.
  */
 export abstract class WebviewEditor {
   protected panel: vscode.WebviewPanel;

@@ -1,3 +1,11 @@
+-- @covers lurek.platform.clipboard
+-- @covers lurek.platform.getClipboardText
+-- @covers lurek.platform.getInfo
+-- @covers lurek.platform.getOS
+-- @covers lurek.platform.getVersion
+-- @covers lurek.platform.setClipboardText
+-- @covers lurek.signal.quit
+
 ﻿-- Lurek2D System API Tests
 
 describe("lurek.platform module exists", function()

@@ -21,7 +21,7 @@ fn resource_new_manager() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         assert(mgr ~= nil, "manager should not be nil")
         assert(mgr:type() == "ResourceManager", "type should be ResourceManager, got " .. mgr:type())
         assert(mgr:typeOf("Object"), "should typeOf 'Object'")
@@ -36,7 +36,7 @@ fn resource_create_and_query() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         assert(mgr:hasResource("gold"), "should have gold")
         assert(not mgr:hasResource("silver"), "should not have silver")
@@ -54,7 +54,7 @@ fn resource_value_initial() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         local v = mgr:getValue("gold")
         assert(math.abs(v) < 0.001, "initial value should be 0, got " .. v)
@@ -69,7 +69,7 @@ fn resource_set_value() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("wood", 200)
         mgr:setValue("wood", 50)
         local v = mgr:getValue("wood")
@@ -85,7 +85,7 @@ fn resource_capacity() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("stone", 100)
         local cap = mgr:getCapacity("stone")
         assert(math.abs(cap - 100) < 0.001, "capacity should be 100, got " .. cap)
@@ -103,7 +103,7 @@ fn resource_minimum() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("health", 100)
         mgr:setMinimum("health", 10)
         local min = mgr:getMinimum("health")
@@ -123,7 +123,7 @@ fn resource_add_and_spend() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:add("gold", 50)
         assert(math.abs(mgr:getValue("gold") - 50) < 0.001, "should have 50 gold")
@@ -141,7 +141,7 @@ fn resource_spend_insufficient() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:add("gold", 10)
         local success = mgr:spend("gold", 50)
@@ -158,7 +158,7 @@ fn resource_can_afford() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("mana", 100)
         mgr:add("mana", 40)
         assert(mgr:canAfford("mana", 40), "should afford exactly 40")
@@ -175,7 +175,7 @@ fn resource_reserve_and_available() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:add("gold", 80)
         mgr:reserve("gold", 20)
@@ -195,7 +195,7 @@ fn resource_flow_rate_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("energy", 100)
         mgr:setFlowRate("energy", 10)
         mgr:tick(1.0)
@@ -212,7 +212,7 @@ fn resource_decay_rate_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("food", 100)
         mgr:setValue("food", 50)
         mgr:setDecayRate("food", 5)
@@ -230,7 +230,7 @@ fn resource_upkeep_turn() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:setValue("gold", 60)
         mgr:setUpkeep("gold", 10)
@@ -248,7 +248,7 @@ fn resource_group_total() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 200)
         mgr:newResource("silver", 200)
         mgr:newResource("wood", 200)
@@ -271,7 +271,7 @@ fn resource_overflow_clamp() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:setOverflow("gold", "clamp")
         mgr:add("gold", 150)
@@ -288,7 +288,7 @@ fn resource_overflow_lose() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:setOverflow("gold", "lose")
         mgr:add("gold", 50)
@@ -309,7 +309,7 @@ fn resource_enabled_flag() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("wood", 100)
         assert(mgr:isEnabled("wood"), "should be enabled by default")
         mgr:setEnabled("wood", false)
@@ -325,7 +325,7 @@ fn resource_visible_flag() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("wood", 100)
         assert(mgr:isVisible("wood"), "should be visible by default")
         mgr:setVisible("wood", false)
@@ -341,7 +341,7 @@ fn resource_locked_flag() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         assert(not mgr:isLocked("gold"), "should be unlocked by default")
         mgr:setLocked("gold", true)
@@ -357,7 +357,7 @@ fn resource_conversion_rule() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("wood", 200)
         mgr:newResource("planks", 200)
         mgr:setValue("wood", 100)
@@ -381,7 +381,7 @@ fn resource_convert_insufficient() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("wood", 200)
         mgr:newResource("planks", 200)
         mgr:setValue("wood", 2)
@@ -401,7 +401,7 @@ fn resource_remove_resource() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("temp", 100)
         assert(mgr:hasResource("temp"), "should have temp")
         mgr:removeResource("temp")
@@ -417,7 +417,7 @@ fn resource_reset() {
     let lua = make_vm();
     lua.load(
         r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:newResource("gold", 100)
         mgr:setValue("gold", 75)
         -- reset() clears the entire manager (all resources)
@@ -438,7 +438,7 @@ fn resource_error_unknown_resource() {
     let result = lua
         .load(
             r#"
-        local mgr = luna.resource.newManager()
+        local mgr = lurek.resource.newManager()
         mgr:getValue("nonexistent")
         "#,
         )
@@ -451,7 +451,7 @@ fn resource_manager_get_percent() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("mana", 100.0)
         rm:setValue("mana", 75.0)
         local p = rm:getPercent("mana")
@@ -471,7 +471,7 @@ fn resource_manager_is_full_empty() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("stamina", 50.0)
         rm:setValue("stamina", 50.0)
         assert(rm:isFull("stamina"), "full at max")
@@ -491,7 +491,7 @@ fn resource_manager_can_afford_all() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("wood", 50.0)
         rm:setValue("gold", 80.0)
@@ -510,7 +510,7 @@ fn resource_manager_spend_all() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("iron", 50.0)
         rm:setValue("gold", 60.0)
@@ -530,7 +530,7 @@ fn resource_manager_spend_all_rollback() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("iron", 10.0)
         rm:setValue("gold", 60.0)
@@ -553,7 +553,7 @@ fn resource_interest_rate_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("gold", 1000.0)
         rm:setValue("gold", 100.0)
         rm:setInterestRate("gold", 0.1)  -- 10% interest per tick
@@ -572,7 +572,7 @@ fn resource_decay_percent_tick() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("food", 100.0)
         rm:setValue("food", 100.0)
         rm:setDecayPercent("food", 0.1)  -- 10% decay per tick
@@ -591,7 +591,7 @@ fn resource_net_rate_includes_flow_upkeep_and_decay() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("mana", 100.0)
         rm:setFlowRate("mana", 5.0)   -- +5/s
         rm:setDecayRate("mana", 2.0)  -- -2/s
@@ -610,7 +610,7 @@ fn resource_get_resource_names_returns_all() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("gold", 100.0)
         rm:newResource("wood", 200.0)
         local names = rm:getResourceNames()
@@ -626,7 +626,7 @@ fn resource_has_resource_true_and_false() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("stone", 50.0)
         assert(rm:hasResource("stone") == true, "stone should exist")
         assert(rm:hasResource("diamond") == false, "diamond should not exist")
@@ -641,7 +641,7 @@ fn resource_reserve_and_unreserve_affects_available() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("silver", 100.0)
         rm:setValue("silver", 80.0)
         rm:reserve("silver", 30.0)
@@ -662,7 +662,7 @@ fn resource_group_operations() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("copper", 500.0)
         rm:newResource("tin", 500.0)
         rm:setValue("copper", 100.0)
@@ -682,7 +682,7 @@ fn resource_overflow_wrap_policy() {
     let lua = make_vm();
     lua.load(
         r#"
-        local rm = luna.resource.newManager()
+        local rm = lurek.resource.newManager()
         rm:newResource("energy", 100.0)
         rm:setValue("energy", 90.0)
         rm:setOverflow("energy", "wrap")

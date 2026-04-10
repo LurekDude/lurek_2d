@@ -1,5 +1,8 @@
 -- tests/lua/test_joystick_ext.lua
 -- BDD-style integration tests for lurek.gamepad background events extension
+-- @covers lurek.gamepad.getBackgroundEvents
+-- @covers lurek.gamepad.setBackgroundEvents
+
 
 describe("lurek.gamepad.getBackgroundEvents", function()
     it("defaults to false", function()

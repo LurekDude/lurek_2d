@@ -209,6 +209,50 @@ impl SoundData {
     pub fn as_samples(&self) -> &[f32] {
         &self.samples
     }
+
+    /// Encode the audio data as a WAV byte buffer (16-bit PCM).
+    ///
+    /// Converts the internal f32 samples to 16-bit signed PCM and wraps them
+    /// in a standard RIFF/WAV header.
+    ///
+    /// # Returns
+    /// `Vec<u8>`.
+    pub fn encode_wav(&self) -> Vec<u8> {
+        let num_samples = self.samples.len();
+        let bytes_per_sample: u16 = 2; // 16-bit PCM
+        let block_align = self.channels * bytes_per_sample;
+        let byte_rate = self.sample_rate * block_align as u32;
+        let data_size = (num_samples * bytes_per_sample as usize) as u32;
+        let file_size = 36 + data_size; // RIFF header = 44 bytes total, minus 8 for RIFF+size
+
+        let mut buf = Vec::with_capacity(44 + data_size as usize);
+
+        // RIFF header
+        buf.extend_from_slice(b"RIFF");
+        buf.extend_from_slice(&file_size.to_le_bytes());
+        buf.extend_from_slice(b"WAVE");
+
+        // fmt chunk
+        buf.extend_from_slice(b"fmt ");
+        buf.extend_from_slice(&16u32.to_le_bytes()); // chunk size
+        buf.extend_from_slice(&1u16.to_le_bytes()); // PCM format
+        buf.extend_from_slice(&self.channels.to_le_bytes());
+        buf.extend_from_slice(&self.sample_rate.to_le_bytes());
+        buf.extend_from_slice(&byte_rate.to_le_bytes());
+        buf.extend_from_slice(&block_align.to_le_bytes());
+        buf.extend_from_slice(&(bytes_per_sample * 8).to_le_bytes()); // bits per sample
+
+        // data chunk
+        buf.extend_from_slice(b"data");
+        buf.extend_from_slice(&data_size.to_le_bytes());
+        for &sample in &self.samples {
+            let clamped = sample.clamp(-1.0, 1.0);
+            let val = (clamped * 32767.0) as i16;
+            buf.extend_from_slice(&val.to_le_bytes());
+        }
+
+        buf
+    }
 }
 
 impl mlua::UserData for SoundData {

@@ -3,6 +3,15 @@
 -- lurek.net and _G.enet tests are guarded — they only run if those namespaces exist.
 -- Headless-safe (no GPU/window needed).
 -- @covers lurek.network.newHost
+-- @covers lurek.network.Host.service
+-- @covers lurek.network.Host.getAddress
+-- @covers lurek.network.Host.getPeerCount
+-- @covers lurek.network.Host.flush
+-- @covers lurek.network.Host.destroy
+-- @covers lurek.network.Host.setBandwidthLimit
+-- @covers lurek.network.Host.getPeers
+-- @covers lurek.network.Host.connect
+-- @covers lurek.network.Host.broadcast
 
 
 describe("lurek.network", function()

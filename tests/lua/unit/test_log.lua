@@ -1,4 +1,12 @@
 -- Lurek2D lurek.log API Tests
+-- @covers lurek.log.debug
+-- @covers lurek.log.error
+-- @covers lurek.log.getLevel
+-- @covers lurek.log.info
+-- @covers lurek.log.print
+-- @covers lurek.log.setLevel
+-- @covers lurek.log.warn
+
 
 describe("lurek.log namespace", function()
     it("lurek.log is a table", function()

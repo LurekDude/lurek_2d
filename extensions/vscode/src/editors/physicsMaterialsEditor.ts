@@ -7,7 +7,7 @@ export class PhysicsMaterialsEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.physicsMaterialsEditor", "Physics Materials");
+    super(context, "lurek.physicsMaterialsEditor", "Physics Materials");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

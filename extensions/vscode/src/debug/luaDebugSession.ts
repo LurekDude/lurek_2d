@@ -71,8 +71,8 @@ interface EngineVariable {
 }
 
 const THREAD_ID = 1;
-const MAX_CONNECT_RETRIES = 3;
-const RETRY_DELAY_MS = 500;
+const MAX_CONNECT_RETRIES = 5;
+const RETRY_DELAY_MS = 800;
 const DEFAULT_DEBUG_PORT = 8172;
 
 export class LuaDebugSession extends LoggingDebugSession {
@@ -95,7 +95,7 @@ export class LuaDebugSession extends LoggingDebugSession {
   private loadedSources: Source[] = [];
 
   public constructor() {
-    super("luna-debug.log");
+    super("lurek-debug.log");
     this.setDebuggerLinesStartAt1(true);
     this.setDebuggerColumnsStartAt1(true);
   }
@@ -155,7 +155,7 @@ export class LuaDebugSession extends LoggingDebugSession {
 
     const engineBinary = this.findEngineBinary(args.enginePath);
     if (!engineBinary) {
-      this.sendErrorResponse(response, 1001, "Luna2D engine not found. Set 'luna.lunaPath' in settings or ensure luna2d is on PATH.");
+      this.sendErrorResponse(response, 1001, "Lurek2D engine not found. Set 'lurek.enginePath' in settings or ensure lurek2d is on PATH.");
       return;
     }
 
@@ -334,7 +334,7 @@ export class LuaDebugSession extends LoggingDebugSession {
 
   protected threadsRequest(response: DebugProtocol.ThreadsResponse): void {
     response.body = {
-      threads: [new Thread(THREAD_ID, "Luna Main")],
+      threads: [new Thread(THREAD_ID, "Lurek2D Main")],
     };
     this.sendResponse(response);
   }
@@ -602,14 +602,14 @@ export class LuaDebugSession extends LoggingDebugSession {
     const text = args.text;
     const targets: CompletionItem[] = [];
 
-    // Provide luna.* namespace completions
-    if (text.startsWith("luna.")) {
-      const lunaModules = [
+    // Provide lurek.* namespace completions
+    if (text.startsWith("lurek.")) {
+      const lurekModules = [
         "graphics", "audio", "timer", "keyboard", "mouse", "gamepad",
         "touch", "window", "filesystem", "math", "physics", "system",
         "data", "event", "thread", "scene", "entity", "particle",
       ];
-      for (const mod of lunaModules) {
+      for (const mod of lurekModules) {
         if (mod.startsWith(text.slice(5))) {
           targets.push(new CompletionItem(mod, 9)); // 9 = Module
         }
@@ -661,7 +661,7 @@ export class LuaDebugSession extends LoggingDebugSession {
           } else {
             reject(
               new Error(
-                `Failed to connect to Luna2D engine on port ${port} after ${MAX_CONNECT_RETRIES} attempts: ${err.message}`,
+                `Failed to connect to Lurek2D engine on port ${port} after ${MAX_CONNECT_RETRIES} attempts: ${err.message}`,
               ),
             );
           }
@@ -674,7 +674,7 @@ export class LuaDebugSession extends LoggingDebugSession {
           this.socket = socket;
           this.receiveBuffer = "";
 
-          this.log(`Connected to Luna2D engine on port ${port}`);
+          this.log(`Connected to Lurek2D engine on port ${port}`);
 
           socket.on("data", (data: Buffer) => {
             this.onSocketData(data);
@@ -850,7 +850,7 @@ export class LuaDebugSession extends LoggingDebugSession {
   // ── Helpers ─────────────────────────────────────────────
 
   private findEngineBinary(configPath?: string): string | null {
-    // 1. Explicitly configured path
+    // 1. Explicitly configured path from launch.json
     if (configPath && fs.existsSync(configPath)) {
       return configPath;
     }
@@ -860,20 +860,42 @@ export class LuaDebugSession extends LoggingDebugSession {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       require("vscode") as typeof import("vscode")
     ).workspace
-      .getConfiguration("luna")
-      .get<string>("lunaPath", "");
+      .getConfiguration("lurek")
+      .get<string>("enginePath", "");
 
     if (settingsPath && fs.existsSync(settingsPath)) {
       return settingsPath;
     }
 
-    // 3. Common install locations (Windows)
+    // 3. Check workspace build/ folder (Lurek2D uses build/ instead of target/)
+    const wsRoot = (
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require("vscode") as typeof import("vscode")
+    ).workspace.workspaceFolders?.[0]?.uri.fsPath;
+
+    if (wsRoot) {
+      const exeName = process.platform === "win32" ? "lurek2d.exe" : "lurek2d";
+      const buildCandidates = [
+        path.join(wsRoot, "build", "debug", exeName),
+        path.join(wsRoot, "build", "release", exeName),
+        path.join(wsRoot, "target", "debug", exeName),
+        path.join(wsRoot, "target", "release", exeName),
+      ];
+      for (const candidate of buildCandidates) {
+        if (fs.existsSync(candidate)) {
+          this.log(`Found engine binary: ${candidate}`);
+          return candidate;
+        }
+      }
+    }
+
+    // 4. Common install locations
     const homeDir = process.env.USERPROFILE ?? process.env.HOME ?? "";
     const candidates = [
-      path.join(homeDir, "bin", "luna.exe"),
-      path.join(homeDir, "bin", "luna2d.exe"),
-      path.join(homeDir, "bin", "luna"),
-      path.join(homeDir, "bin", "luna2d"),
+      path.join(homeDir, "bin", "lurek2d.exe"),
+      path.join(homeDir, "bin", "lurek2d"),
+      path.join(homeDir, ".local", "bin", "lurek2d"),
+      "/usr/local/bin/lurek2d",
     ];
 
     for (const candidate of candidates) {
@@ -882,8 +904,8 @@ export class LuaDebugSession extends LoggingDebugSession {
       }
     }
 
-    // 4. Rely on PATH
-    const pathExe = process.platform === "win32" ? "luna.exe" : "luna2d";
+    // 5. Rely on PATH
+    const pathExe = process.platform === "win32" ? "lurek2d.exe" : "lurek2d";
     const pathDirs = (process.env.PATH ?? "").split(path.delimiter);
     for (const dir of pathDirs) {
       const fullPath = path.join(dir, pathExe);
@@ -938,6 +960,6 @@ export class LuaDebugSession extends LoggingDebugSession {
   }
 
   private log(message: string): void {
-    this.sendEvent(new OutputEvent(`[Luna Debug] ${message}\n`, "console"));
+    this.sendEvent(new OutputEvent(`[Lurek2D Debug] ${message}\n`, "console"));
   }
 }

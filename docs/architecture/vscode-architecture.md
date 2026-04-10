@@ -9,15 +9,15 @@
 
 | Field | Value |
 |---|---|
-| **Package name** | `lurek2d-vscode` |
+| **Package name** | `lurek2d-toolkit` |
 | **Display name** | Lurek2D |
 | **Description** | AI-first IDE support for Lurek2D game engine |
-| **Version** | 0.1.0 |
+| **Version** | 0.9.0 |
 | **Publisher** | lurek2d |
 | **VS Code engine** | `^1.90.0` |
-| **Language** | TypeScript (tsc, esbuild optional via `esbuild.config.mjs`) |
+| **Language** | TypeScript (esbuild bundled via `esbuild.config.mjs`) |
 | **Source root** | `extensions/vscode/src/` |
-| **Output** | `extensions/vscode/out/` (compiled JS) |
+| **Output** | `extensions/vscode/dist/extension.js` (single esbuild bundle) |
 | **License** | MIT |
 
 ---
@@ -47,8 +47,8 @@ On deactivation (`deactivate()`): kills the MCP server process if running.
 
 ```
 src/
-├── extension.ts          Entry point — activate / deactivate, command registration, MCP start
-├── extension2.ts         Alternative/experimental entry (not wired to package.json)
+├── extension.ts          Legacy entry point (limited commands)
+├── extension2.ts         Active entry point — activate / deactivate, full provider + command registration
 ├── commands/             Command implementations
 │   ├── cag.ts            CAG layer install command
 │   ├── debugBridge.ts    Debug bridge connect/disconnect/inspect commands
@@ -133,6 +133,15 @@ src/
 │   ├── lunaProcess.ts    LunaProcessService — binary resolution, run/stop, terminal management
 │   ├── statusBar.ts      Status bar helpers
 │   └── symbolIndex.ts    SymbolIndex — workspace-wide Lua symbol index (regex-based)
+├── test/                 Test infrastructure
+│   ├── runTest.ts        VS Code test electron launcher
+│   ├── mocks/
+│   │   └── vscode.ts     Mock VS Code API objects for unit tests
+│   ├── suite/
+│   │   └── index.ts      Mocha test suite runner
+│   └── unit/
+│       ├── typeInference.test.ts   Type inference engine tests
+│       └── luaParser.test.ts       Lua parser / analyzer tests
 └── cag/
     └── game-dev/         Bundled CAG game-dev layer (agents, skills, prompts)
 ```
@@ -143,13 +152,16 @@ src/
 
 ### 4.1 Entry Point
 
-`extension.ts` is the sole entry point wired to `package.json → "main"`. It owns:
+`extension2.ts` is the active entry point, bundled by esbuild into `dist/extension.js` and wired to `package.json → "main"`. It owns:
 
-- Status bar item lifecycle
-- Command registration (four commands exposed in `package.json`)
-- MCP server startup via `startMcpServer()`
+- Service instantiation: `ApiDataService`, `LunaProcessService`, `StatusBarService`, `DebugBridge`
+- Full provider registration (26 providers across IntelliSense, diagnostics, sidebar, monitoring)
+- Full command registration (run, debug, scaffold, editors, packaging, testing, CAG)
+- Sidebar tree view registration: `ProjectToolsProvider`, `DevToolsProvider`, `AiToolsProvider`, `AssetExplorerProvider`
+- Debug adapter and configuration provider registration
+- MCP server startup
 
-More complete command registration (run, debug, scaffold, editors, etc.) lives in `extension2.ts` and the `commands/` implementations, but is not yet wired into `package.json`.
+Note: The original `extension.ts` is a legacy entry point with limited command registration. `extension2.ts` is the active entry.
 
 ### 4.2 Service Layer
 
@@ -182,20 +194,21 @@ All providers target `{ scheme: "file", language: "lua" }`. Providers that use `
 | **Semantic Tokens** | `providers/semanticTokens.ts` | Full semantic highlighting with 16 token types: `namespace`, `function`, `method`, `parameter`, `variable`, `property`, `keyword`, `string`, `number`, `comment`, `operator`, `type`, `enumMember`, `macro`, `decorator`, `event`. Cached per document version. |
 | **Code Actions** | `providers/codeActions.ts` | Quick fixes (e.g., auto-import, correct API name). |
 | **Code Lens** | `providers/codeLens.ts` | Function reference count lenses on all function definitions. Luna callback functions (`lurek.load`, `lurek.update`, `lurek.draw`, etc.) get a `⚡ lurek.X callback` lens with API doc link instead. |
-| **Diagnostics** | `providers/diagnostics.ts` | 9 diagnostic rules, debounced at 300 ms: deprecated API usage, color value out of 0–1 range, unused `require` variables, missing asset file, `math.random` in thread context, missing luna callback registration, wrong enum string values, unknown `lurek.*` function names, invalid `conf.lua` fields. |
+| **Diagnostics** | `providers/diagnostics.ts` | 13 diagnostic rules, debounced at 300 ms: deprecated API usage, color value out of 0–1 range, unused `require` variables, missing asset file, `math.random` in thread context, missing luna callback registration, wrong enum string values, unknown `lurek.*` function names, invalid `conf.lua` fields, per-frame allocation warning, missing `test_summary()` in test files, entity nil access without guard, colon-vs-dot method call suggestion. |
 | **Folding** | `providers/folding.ts` | Folding ranges for Lua `function`/`end`, `if`/`end`, comment blocks. |
 | **Formatting** | `providers/formatting.ts` | Document formatter for Lua files. |
 | **Color** | `providers/color.ts` | Inline colour swatch for `lurek.graphics.setColor(r, g, b)` calls. |
 | **Asset Path** | `providers/assetPath.ts` | Path completion inside string arguments that resolve to workspace asset files. |
 | **LuaCATS** | `providers/luacatsProvider.ts` | Parses `---@class`, `---@field`, `---@param`, `---@return`, `---@type` annotations. Builds a per-document class registry with inheritance. Powers completions and hover for user-defined class instances. |
 | **LuaJIT Hints** | `providers/luajitHints.ts` | LuaJIT-specific hints (FFI, bit ops). |
-| **Type Inference** | `providers/typeInference.ts` | Lightweight type inference for user Lua variables to drive smarter completion. |
+| **Type Inference** | `providers/typeInference.ts` | Type inference engine for user Lua variables. Tracks 25+ factory return types (`Image`, `Canvas`, `Font`, `Shader`, `Entity`, `Timer`, `Tween`, `World`, `Body`, `ParticleSystem`, etc.), OOP class instances via `setmetatable`, module aliases (`local gfx = lurek.graphics`), and variable re-assignments. Provides dot-access completion (fields + methods), colon-access completion (methods), and hover information showing type and factory origin. |
 
 #### Sidebar / Tree Views
 
 | Provider | Contributes |
 |---|---|
-| `ProjectToolsProvider` (`providers/sidebar.ts`) | Sidebar section **Create** (New Project from Template, New File from Template), **Package**, **Libraries** |
+| `ProjectToolsProvider` (`providers/sidebar.ts`) | Sidebar section **Project Health** (main.lua/conf.lua detection, Lua file count, test detection), **Create** (New Project from Template, New File from Template), **Package**, **Libraries** |
+| `DevToolsProvider` (`providers/sidebar.ts`) | Sidebar sections **Run** (game status indicator, run/stop/run-with-args/run-example), **Debug** (connect/disconnect/inspect), **Testing** (last test result display, run all tests) |
 | `AssetExplorerProvider` (`providers/assetExplorer.ts`) | Sidebar tree of workspace assets filtered by type: images, audio, fonts, shaders. Items display file size and open on click. |
 
 #### Monitoring Webview Panels
@@ -274,7 +287,7 @@ The 29 editor panels are webview-only (HTML canvas + vanilla JS inside the webvi
 
 Implemented across two files:
 
-**`debug/luaDebugAdapter.ts`** — `LuaDebugAdapterFactory` (creates inline sessions) and `LuaDebugConfigurationProvider` (resolves and generates launch configurations). Default launch config: type `luna`, request `launch`, `program = ${workspaceFolder}`, `luaVersion = "luajit"`, `debugPort = 8172`, `stopOnEntry = false`.
+**`debug/luaDebugAdapter.ts`** — `LuaDebugAdapterFactory` (creates inline sessions) and `LuaDebugConfigurationProvider` (resolves and generates launch configurations). Provides 4 launch configurations: Debug Game, Debug Current Demo, Debug with Stop on Entry, and Attach to Running. Auto-detects game path from the active editor (finds nearest `main.lua`), auto-detects engine binary from `build/debug/` and `build/release/` workspace directories. Default settings: type `lurek`, request `launch`, `luaVersion = "luajit"`, `debugPort = 8172`, `stopOnEntry = false`.
 
 **`debug/luaDebugSession.ts`** — `LuaDebugSession extends DebugSession`. Implements the DAP protocol inline. Connects to the running engine's debug socket on the configured port.
 
@@ -321,11 +334,17 @@ LuaDocumentAnalyzer (luaParser.ts)
         │
         ├──▶ completion.ts     (lurek.* + builtins + LuaCATS completions)
         ├──▶ hover.ts          (keyword + API hover cards)
-        ├──▶ diagnostics.ts    (9 rule checks — debounced 300ms)
+        ├──▶ diagnostics.ts    (13 rule checks — debounced 300ms)
         ├──▶ semanticTokens.ts (16-type token classification)
         ├──▶ codeLens.ts       (ref counts + callback labels)
         ├──▶ inlayHints.ts     (parameter name hints)
         └──▶ definition.ts     (local symbol go-to)
+
+typeInference.ts (scanDocument → VarType[] + ClassInfo[] + ModuleAlias[])
+        │
+        ├──▶ dot-access completions  (fields + methods for typed variables)
+        ├──▶ colon-access completions (methods for typed variables + OOP instances)
+        └──▶ hover provider  (type + factory origin for typed variables)
 
 docs/API/lua_api_reference_generated.md
         │
@@ -425,15 +444,28 @@ interface CatsClass {
 
 | Script | Command |
 |---|---|
-| Compile | `npm run compile` → `tsc -p ./` → `out/` |
-| Watch | `npm run watch` → `tsc -watch -p ./` |
-| Bundle | `node esbuild.config.mjs` (esbuild, produces minified bundle) |
-| Package | `npm run package` → `npx @vscode/vsce package` → `.vsix` |
+| Bundle | `node esbuild.config.mjs` → `dist/extension.js` (single minified bundle) |
+| Bundle + Tests | `node esbuild.config.mjs --test` → also compiles `dist/test/` |
+| Watch | `node esbuild.config.mjs --watch` (incremental rebuild) |
+| Package | `npm run package` → `npx @vscode/vsce package --no-dependencies` → `.vsix` |
+| Test | `npm run test` → builds test bundle + launches VS Code test electron |
 
 **Dependencies**: only `@modelcontextprotocol/sdk ^1.0.0` at runtime.
-**Dev dependencies**: `@types/vscode`, `@types/node`, `typescript`, `@vscode/vsce`.
+**Dev dependencies**: `@types/vscode`, `@types/node`, `@types/mocha`, `typescript`, `@vscode/vsce`, `@vscode/test-electron`, `@vscode/debugadapter`, `esbuild`, `mocha`, `glob`.
 
-The compiled extension entry is `out/extension.js` as declared in `package.json → "main"`.
+The compiled extension entry is `dist/extension.js` as declared in `package.json → "main"`, bundled from `src/extension2.ts` by esbuild.
+
+### 7.1 Test Infrastructure
+
+The extension has a two-tier test setup:
+
+- **Unit tests** (`src/test/unit/`): Pure TypeScript tests with mock VS Code objects (`src/test/mocks/vscode.ts`). Test `typeInference`, `luaParser`, and provider logic without a VS Code instance.
+- **Integration tests** (`src/test/suite/`): Run via `@vscode/test-electron` in a real VS Code instance. Test end-to-end provider registration and user-facing behaviour.
+
+Test files:
+- `src/test/mocks/vscode.ts` — `MockTextDocument`, `MockPosition`, `MockRange`, `MockCancellationToken`
+- `src/test/unit/typeInference.test.ts` — FACTORY_TYPES registry, `scanDocument`, `getTypeInfoForVar`, `getMethodsForVar`
+- `src/test/unit/luaParser.test.ts` — Tokenization, symbol analysis, scope tracking, utility methods
 
 ---
 

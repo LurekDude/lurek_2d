@@ -1,3 +1,6 @@
+-- @stress lurek.particles.isActive
+-- @stress lurek.particles.newSystem
+
 ﻿-- Lurek2D Stress Test: Particle System Burst Emission
 -- Tests large particle counts and extended lifecycle simulation
 

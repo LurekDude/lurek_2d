@@ -1,5 +1,17 @@
 -- Lurek2D Integration Test: Math + Physics
 -- Tests that math functions work correctly with physics bodies
+-- @covers lurek.math.atan2
+-- @covers lurek.math.cos
+-- @covers lurek.math.max
+-- @covers lurek.math.min
+-- @covers lurek.math.pi
+-- @covers lurek.math.sin
+-- @covers lurek.math.sqrt
+-- @covers lurek.physics.destroyWorld
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.step
+
 
 describe("math + physics integration", function()
     it("Vec2 can be used for body positions", function()

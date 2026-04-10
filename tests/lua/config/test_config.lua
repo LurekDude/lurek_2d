@@ -1,3 +1,11 @@
+-- @covers lurek.platform.getOS
+-- @covers lurek.platform.getVersion
+-- @covers lurek.window.getHeight
+-- @covers lurek.window.getTitle
+-- @covers lurek.window.getWidth
+-- @covers lurek.window.isFullscreen
+-- @covers lurek.window.isResizable
+
 ﻿-- tests/lua/config/test_config.lua
 -- BDD tests for the lurek.conf(t) configuration API.
 -- These tests verify that the conf table is readable at runtime, that

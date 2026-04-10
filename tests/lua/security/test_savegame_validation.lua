@@ -1,5 +1,7 @@
 -- Lurek2D Validation Test: SaveManager Edge Cases
 -- Tests save/load with corrupted data, missing fields, and edge cases
+-- @security lurek.savegame.newSaveManager
+
 
 describe("validation: savegame edge cases", function()
     it("creates save manager without crash", function()

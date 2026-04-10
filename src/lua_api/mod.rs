@@ -17,7 +17,7 @@ use crate::engine::config::ModulesConfig;
 pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `lurek.signal.*` event queue and signal API.
-pub mod event_api;
+pub mod signal_api;
 
 /// Registers the `lurek.time.*` frame-timing API.
 pub mod timer_api;
@@ -108,13 +108,16 @@ pub mod ai_api;
 pub mod audio_api;
 
 /// Registers the `lurek.postfx.*` post-processing and screen overlay API.
-pub mod fx_api;
+pub mod effect_api;
 
 /// Registers the `lurek.particles.*` particle system and trail API.
 pub mod particle_api;
 
+/// Registers the `lurek.parallax.*` multi-layer parallax background API.
+pub mod parallax_api;
+
 /// Registers the `lurek.ui.*` retained-mode widget UI API.
-pub mod gui_api;
+pub mod ui_api;
 
 /// Registers the `lurek.tilemap.*` tile-based map authoring and coordinate helpers API.
 pub mod tilemap_api;
@@ -126,7 +129,7 @@ pub mod math_api;
 pub mod physics_api;
 
 /// Registers the `lurek.gfx.*` rendering and drawing API.
-pub mod graphics_api;
+pub mod graphic_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
 pub mod system_api;
@@ -166,14 +169,14 @@ pub mod lua_types;
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
 
-    // Create the luna namespace table and expose it as the `luna` global immediately.
+    // Create the lurek namespace table and expose it as the `lurek` global immediately.
     // This must happen before any register() call so that inline Lua snippets (e.g.
     // scene_api.rs) can reference `lurek.*` during module registration.
     let luna = lua.create_table()?;
     lua.globals().set("lurek", luna.clone())?;
 
     // event: lurek.signal (always registered — mandatory API)
-    event_api::register(&lua, &luna, state.clone())?;
+    signal_api::register(&lua, &luna, state.clone())?;
 
     // timer: lurek.time
     if modules.timer {
@@ -341,7 +344,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // fx: lurek.postfx
     if modules.overlay {
-        fx_api::register(&lua, &luna, state.clone())?;
+        effect_api::register(&lua, &luna, state.clone())?;
     }
 
     // particle: lurek.particles
@@ -349,9 +352,14 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         particle_api::register(&lua, &luna, state.clone())?;
     }
 
+    // parallax: lurek.parallax
+    if modules.parallax {
+        parallax_api::register(&lua, &luna, state.clone())?;
+    }
+
     // gui: lurek.ui
     if modules.gui {
-        gui_api::register(&lua, &luna, state.clone())?;
+        ui_api::register(&lua, &luna, state.clone())?;
     }
 
     // tilemap: lurek.tilemap
@@ -372,7 +380,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // graphics: lurek.gfx
     if modules.graphics {
-        graphics_api::register(&lua, &luna, state.clone())?;
+        graphic_api::register(&lua, &luna, state.clone())?;
     }
 
     // Register lurek.conf as a no-op runtime callback.

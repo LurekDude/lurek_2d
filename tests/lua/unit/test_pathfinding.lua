@@ -4,6 +4,13 @@
 -- ============================================================
 -- NavGrid creation and basic ops
 -- ============================================================
+-- @covers lurek.pathfinding.getThreadCount
+-- @covers lurek.pathfinding.newFlowField
+-- @covers lurek.pathfinding.newNavGrid
+-- @covers lurek.pathfinding.newNavGridFromTileMap
+-- @covers lurek.pathfinding.newPathfinder
+-- @covers lurek.tilemap.newTileMap
+
 describe("NavGrid creation", function()
     it("newNavGrid returns an object", function()
         local grid = lurek.pathfinding.newNavGrid(20, 20)

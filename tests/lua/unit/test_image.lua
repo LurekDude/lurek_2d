@@ -1,3 +1,12 @@
+-- @covers lurek.img.isCompressed
+-- @covers lurek.img.loadImage
+-- @covers lurek.img.loadLayered
+-- @covers lurek.img.newCompressedData
+-- @covers lurek.img.newImageData
+-- @covers lurek.img.newLayeredImage
+-- @covers lurek.img.saveImage
+-- @covers lurek.img.saveLayered
+
 ﻿-- tests/lua/unit/test_image.lua
 -- BDD tests for lurek.img ImageData API including all 20 effect methods.
 -- The headless VM has no filesystem, GPU, audio, or window APIs.

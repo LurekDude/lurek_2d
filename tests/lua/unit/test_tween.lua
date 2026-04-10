@@ -1,3 +1,13 @@
+-- @covers lurek.tween.cancelAll
+-- @covers lurek.tween.delay
+-- @covers lurek.tween.getActiveCount
+-- @covers lurek.tween.getEasingNames
+-- @covers lurek.tween.parallel
+-- @covers lurek.tween.registerEasing
+-- @covers lurek.tween.sequence
+-- @covers lurek.tween.tween
+-- @covers lurek.tween.update
+
 ﻿-- Lurek2D Lua BDD tests for lurek.tween
 -- Headless: no GPU, no audio, no window.
 -- Tests property tweening: table field animation, sequences, parallels, callbacks.

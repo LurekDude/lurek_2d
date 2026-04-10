@@ -104,7 +104,7 @@ fn test_lua_has_midi_soundfont_false() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        assert(luna.audio.hasMidiSoundFont() == false)
+        assert(lurek.audio.hasMidiSoundFont() == false)
         "#,
     )
     .exec()
@@ -116,8 +116,8 @@ fn test_lua_clear_midi_soundfont() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        luna.audio.clearMidiSoundFont()
-        assert(luna.audio.hasMidiSoundFont() == false)
+        lurek.audio.clearMidiSoundFont()
+        assert(lurek.audio.hasMidiSoundFont() == false)
         "#,
     )
     .exec()
@@ -130,7 +130,7 @@ fn test_lua_set_midi_soundfont_missing_file() {
     let result = lua
         .load(
             r#"
-            luna.audio.setMidiSoundFont("nonexistent.sf2")
+            lurek.audio.setMidiSoundFont("nonexistent.sf2")
             "#,
         )
         .exec();

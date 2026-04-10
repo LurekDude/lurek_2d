@@ -7,7 +7,7 @@ use lurek2d::graphics::decal_surface::DecalSurface;
 use lurek2d::graphics::draw_layer::DrawLayer;
 use lurek2d::graphics::sprite_sheet::{DirectionLayout, SpriteSheet};
 use lurek2d::graphics::texture_atlas::TextureAtlas;
-use lurek2d::gui::data_graph_renderer::GraphRenderer;
+use lurek2d::ui::data_graph_renderer::GraphRenderer;
 use lurek2d::image::palette_lut::PaletteLUT;
 use lurek2d::light::light2d::Light2D;
 use lurek2d::math::Color;

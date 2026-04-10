@@ -1,5 +1,11 @@
 -- Lurek2D Stress Test: Mass Body Creation
 -- Creates 1000 physics bodies and steps the world
+-- @stress lurek.math.floor
+-- @stress lurek.physics.destroyWorld
+-- @stress lurek.physics.newBody
+-- @stress lurek.physics.newWorld
+-- @stress lurek.physics.step
+
 
 describe("physics stress: 1000 bodies", function()
     it("creates 1000 bodies without error", function()

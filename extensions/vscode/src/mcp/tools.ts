@@ -1,6 +1,7 @@
 import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { resolveWorkspaceApiDocPath, searchApiDocumentation } from "../services/apiDocs.js";
 
 /**
  * MCP tool definition following the Model Context Protocol schema.
@@ -23,14 +24,14 @@ export type ToolHandler = (
 ) => Promise<string>;
 
 /**
- * Returns all MCP tool definitions for the Luna2D server.
+ * Returns all MCP tool definitions for the Lurek2D server.
  */
 export function getToolDefinitions(): ToolDefinition[] {
   return [
     {
-      name: "luna2d.runExample",
+      name: "lurek2d.runExample",
       description:
-        "Build and run a named Luna2D example, returning its output.",
+        "Build and run a named Lurek2D example, returning its output.",
       inputSchema: {
         type: "object",
         properties: {
@@ -44,32 +45,32 @@ export function getToolDefinitions(): ToolDefinition[] {
       },
     },
     {
-      name: "luna2d.getApiDoc",
+      name: "lurek2d.getApiDoc",
       description:
-        "Search the Luna2D Lua API documentation for a query string.",
+        "Search the Lurek2D Lua API documentation for a query string.",
       inputSchema: {
         type: "object",
         properties: {
           query: {
             type: "string",
             description:
-              'Search query (e.g. "luna.graphics.draw" or "physics").',
+              'Search query (e.g. "lurek.graphics.draw" or "physics").',
           },
         },
         required: ["query"],
       },
     },
     {
-      name: "luna2d.listExamples",
-      description: "List all available Luna2D example directories.",
+      name: "lurek2d.listExamples",
+      description: "List all available Lurek2D example directories.",
       inputSchema: {
         type: "object",
         properties: {},
       },
     },
     {
-      name: "luna2d.runLuaTest",
-      description: "Run a Lua test file against a debug build of Luna2D.",
+      name: "lurek2d.runLuaTest",
+      description: "Run a Lua test file against a debug build of Lurek2D.",
       inputSchema: {
         type: "object",
         properties: {
@@ -83,7 +84,7 @@ export function getToolDefinitions(): ToolDefinition[] {
       },
     },
     {
-      name: "luna2d.checkBuild",
+      name: "lurek2d.checkBuild",
       description:
         "Run `cargo check` and return compiler diagnostics.",
       inputSchema: {
@@ -92,9 +93,9 @@ export function getToolDefinitions(): ToolDefinition[] {
       },
     },
     {
-      name: "luna2d.getLogs",
+      name: "lurek2d.getLogs",
       description:
-        "Return the last N lines of Luna2D engine log output.",
+        "Return the last N lines of Lurek2D engine log output.",
       inputSchema: {
         type: "object",
         properties: {
@@ -139,7 +140,7 @@ function execCommand(
 }
 
 /**
- * Creates the handler for `luna2d.runExample`.
+ * Creates the handler for `lurek2d.runExample`.
  *
  * Builds and runs the specified demo via `cargo run -- content/demos/<name>`.
  */
@@ -168,10 +169,10 @@ export function handleRunExample(
 }
 
 /**
- * Creates the handler for `luna2d.getApiDoc`.
+ * Creates the handler for `lurek2d.getApiDoc`.
  *
- * Searches the generated API reference markdown for sections matching
- * the query string (case-insensitive).
+ * Searches the canonical workspace API reference for sections matching the
+ * query string (case-insensitive).
  */
 export function handleGetApiDoc(
   workspaceRoot: string
@@ -182,45 +183,21 @@ export function handleGetApiDoc(
       return "Error: 'query' parameter is required.";
     }
 
-    const apiDocPath = path.join(
-      workspaceRoot,
-      "docs",
-      "API",
-      "lua_api_reference_generated.md"
-    );
+    const apiDocPath = resolveWorkspaceApiDocPath(workspaceRoot);
 
-    if (!fs.existsSync(apiDocPath)) {
-      return "API reference not found. Run 'python tools/gen_lua_api.py' to generate it.";
+    if (!apiDocPath || !fs.existsSync(apiDocPath)) {
+      return "API reference not found. Expected docs/API/lurek.lua or docs/API/lua-api.md.";
     }
 
     const content = fs.readFileSync(apiDocPath, "utf-8");
-    const lines = content.split("\n");
-    const queryLower = query.toLowerCase();
-
-    const matches: string[] = [];
-    let currentSection: string[] = [];
-    let inMatch = false;
-
-    for (const line of lines) {
-      if (line.startsWith("##")) {
-        if (inMatch && currentSection.length > 0) {
-          matches.push(currentSection.join("\n"));
-        }
-        currentSection = [line];
-        inMatch = line.toLowerCase().includes(queryLower);
-      } else {
-        currentSection.push(line);
-        if (line.toLowerCase().includes(queryLower)) {
-          inMatch = true;
-        }
-      }
-    }
-    if (inMatch && currentSection.length > 0) {
-      matches.push(currentSection.join("\n"));
-    }
+    const matches = searchApiDocumentation(content, apiDocPath, query);
 
     if (matches.length === 0) {
       return `No documentation found for "${query}".`;
+    }
+
+    if (apiDocPath.endsWith(".lua")) {
+      return matches.map((match) => `\`\`\`lua\n${match}\n\`\`\``).join("\n\n---\n\n");
     }
 
     return matches.join("\n\n---\n\n");
@@ -228,7 +205,7 @@ export function handleGetApiDoc(
 }
 
 /**
- * Creates the handler for `luna2d.listExamples`.
+ * Creates the handler for `lurek2d.listExamples`.
  *
  * Returns a newline-separated list of example directory names.
  */
@@ -245,7 +222,7 @@ export function handleListExamples(
 }
 
 /**
- * Creates the handler for `luna2d.runLuaTest`.
+ * Creates the handler for `lurek2d.runLuaTest`.
  *
  * Runs a Lua test file via `cargo run -- <file>`.
  */
@@ -273,7 +250,7 @@ export function handleRunLuaTest(
 }
 
 /**
- * Creates the handler for `luna2d.checkBuild`.
+ * Creates the handler for `lurek2d.checkBuild`.
  *
  * Runs `cargo check` and returns the compiler output.
  */
@@ -286,7 +263,7 @@ export function handleCheckBuild(
 }
 
 /**
- * Creates the handler for `luna2d.getLogs`.
+ * Creates the handler for `lurek2d.getLogs`.
  *
  * Returns the last N lines from the engine log file, if any.
  * Falls back to a message indicating no log file was found.
@@ -299,8 +276,8 @@ export function handleGetLogs(
 
     // Check common log file locations
     const logPaths = [
-      path.join(workspaceRoot, "luna2d.log"),
-      path.join(workspaceRoot, "target", "luna2d.log"),
+      path.join(workspaceRoot, "lurek2d.log"),
+      path.join(workspaceRoot, "target", "lurek2d.log"),
     ];
 
     for (const logPath of logPaths) {
@@ -312,7 +289,7 @@ export function handleGetLogs(
       }
     }
 
-    return "No log file found. Engine logs are written to stdout by default. Use RUST_LOG=luna2d=debug to enable verbose logging.";
+    return "No log file found. Engine logs are written to stdout by default. Use RUST_LOG=lurek2d=debug to enable verbose logging.";
   };
 }
 

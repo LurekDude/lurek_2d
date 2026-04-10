@@ -1,7 +1,7 @@
-//! Integration tests for the gui module: WidgetState, WidgetType, WidgetBase,
+﻿//! Integration tests for the gui module: WidgetState, WidgetType, WidgetBase,
 //! controls, containers, extras, theme, and context.
 
-use lurek2d::gui::{
+use lurek2d::ui::{
     Accordion, AccordionSection, Button, CheckBox, ColorPicker, ComboBox, Dialog, DockPanel,
     GUITable, GUIWindow, GuiContext, ImageWidget, Label, Layout, LayoutDirection, ListBox, MenuBar,
     MenuItem, NinePatch, Panel, ProgressBar, RadioButton, ScrollBar, ScrollPanel, Separator,
@@ -1230,3 +1230,4 @@ fn widget_type_as_str_new_types() {
     assert_eq!(WidgetType::GUITable.as_str(), "guitable");
     assert_eq!(WidgetType::ImageWidget.as_str(), "imagewidget");
 }
+

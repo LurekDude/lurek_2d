@@ -26,7 +26,7 @@ fn window_native_dpi_scale_positive() {
     state.borrow_mut().window_state.dpi_scale = 2.0;
     lua.load(
         r#"
-        local s = luna.window.getNativeDPIScale()
+        local s = lurek.window.getNativeDPIScale()
         assert(type(s) == "number")
         assert(s > 0)
         assert(math.abs(s - 2.0) < 0.01)
@@ -41,7 +41,7 @@ fn window_native_dpi_scale_default_is_one() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local s = luna.window.getNativeDPIScale()
+        local s = lurek.window.getNativeDPIScale()
         assert(math.abs(s - 1.0) < 0.01)
         "#,
     )
@@ -55,7 +55,7 @@ fn window_display_orientation_is_landscape_for_wide_window() {
     // 800×600 window is landscape
     lua.load(
         r#"
-        local o = luna.window.getDisplayOrientation()
+        local o = lurek.window.getDisplayOrientation()
         assert(type(o) == "string")
         assert(o == "landscape")
         "#,
@@ -71,7 +71,7 @@ fn window_display_orientation_is_portrait_for_tall_window() {
     state.borrow_mut().window_height = 700;
     lua.load(
         r#"
-        local o = luna.window.getDisplayOrientation()
+        local o = lurek.window.getDisplayOrientation()
         assert(o == "portrait")
         "#,
     )
@@ -84,7 +84,7 @@ fn window_system_theme_returns_string() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local t = luna.window.getSystemTheme()
+        local t = lurek.window.getSystemTheme()
         assert(type(t) == "string")
         assert(t == "unknown" or t == "light" or t == "dark")
         "#,
@@ -98,7 +98,7 @@ fn window_safe_area_full_on_desktop() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local x, y, w, h = luna.window.getSafeArea()
+        local x, y, w, h = lurek.window.getSafeArea()
         assert(math.abs(x) < 0.01)
         assert(math.abs(y) < 0.01)
         assert(w > 0)
@@ -116,7 +116,7 @@ fn window_safe_area_matches_window_dimensions() {
     state.borrow_mut().window_height = 1080;
     lua.load(
         r#"
-        local x, y, w, h = luna.window.getSafeArea()
+        local x, y, w, h = lurek.window.getSafeArea()
         assert(math.abs(w - 1920) < 0.01)
         assert(math.abs(h - 1080) < 0.01)
         "#,
@@ -130,7 +130,7 @@ fn window_is_high_dpi_allowed_returns_bool() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ok = luna.window.isHighDPIAllowed()
+        local ok = lurek.window.isHighDPIAllowed()
         assert(type(ok) == "boolean")
         "#,
     )

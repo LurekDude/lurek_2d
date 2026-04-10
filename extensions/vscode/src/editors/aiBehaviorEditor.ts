@@ -7,7 +7,7 @@ export class AiBehaviorEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.aiBehavior", "AI Behavior Tree");
+    super(context, "lurek.editor.aiBehavior", "AI Behavior Tree");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

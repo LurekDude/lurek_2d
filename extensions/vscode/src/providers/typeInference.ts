@@ -8,27 +8,27 @@ const LUA_SELECTOR: vscode.DocumentSelector = {
 
 // ── Type information ──────────────────────────────────────
 
-interface MethodInfo {
+export interface MethodInfo {
   name: string;
   sig: string;
   desc: string;
 }
 
-interface FieldInfo {
+export interface FieldInfo {
   name: string;
   type: string;
   desc: string;
 }
 
-interface TypeInfo {
+export interface TypeInfo {
   typeName: string;
   methods: MethodInfo[];
   fields?: FieldInfo[];
 }
 
 /** Known factory functions → return type mappings. */
-const FACTORY_TYPES: Record<string, TypeInfo> = {
-  "luna.graphics.newImage": {
+export const FACTORY_TYPES: Record<string, TypeInfo> = {
+  "lurek.graphics.newImage": {
     typeName: "Image",
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
@@ -42,7 +42,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Image'" },
     ],
   },
-  "luna.graphics.newCanvas": {
+  "lurek.graphics.newCanvas": {
     typeName: "Canvas",
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
@@ -55,7 +55,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Canvas'" },
     ],
   },
-  "luna.graphics.newFont": {
+  "lurek.graphics.newFont": {
     typeName: "Font",
     methods: [
       { name: "getWidth", sig: ":getWidth(text)", desc: "Width of text in pixels" },
@@ -69,7 +69,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Font'" },
     ],
   },
-  "luna.graphics.newShader": {
+  "lurek.graphics.newShader": {
     typeName: "Shader",
     methods: [
       { name: "send", sig: ":send(name, value)", desc: "Set uniform value" },
@@ -78,7 +78,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Shader'" },
     ],
   },
-  "luna.graphics.newMesh": {
+  "lurek.graphics.newMesh": {
     typeName: "Mesh",
     methods: [
       { name: "setVertices", sig: ":setVertices(verts)", desc: "Set vertex data" },
@@ -88,7 +88,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Mesh'" },
     ],
   },
-  "luna.graphics.newSpriteBatch": {
+  "lurek.graphics.newSpriteBatch": {
     typeName: "SpriteBatch",
     methods: [
       { name: "add", sig: ":add(quad, x, y, r, sx, sy)", desc: "Add sprite to batch" },
@@ -100,7 +100,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'SpriteBatch'" },
     ],
   },
-  "luna.graphics.newQuad": {
+  "lurek.graphics.newQuad": {
     typeName: "Quad",
     methods: [
       { name: "getViewport", sig: ":getViewport()", desc: "Returns x, y, w, h" },
@@ -109,7 +109,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Quad'" },
     ],
   },
-  "luna.audio.newSource": {
+  "lurek.audio.newSource": {
     typeName: "Source",
     methods: [
       { name: "play", sig: ":play()", desc: "Start or resume playback" },
@@ -129,7 +129,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Source'" },
     ],
   },
-  "luna.physics.newWorld": {
+  "lurek.physics.newWorld": {
     typeName: "World",
     methods: [
       { name: "update", sig: ":update(dt)", desc: "Step the simulation" },
@@ -143,7 +143,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'World'" },
     ],
   },
-  "luna.physics.newBody": {
+  "lurek.physics.newBody": {
     typeName: "Body",
     methods: [
       { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
@@ -163,7 +163,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "type", sig: ":type()", desc: "Returns 'Body'" },
     ],
   },
-  "luna.graphics.newParticleSystem": {
+  "lurek.graphics.newParticleSystem": {
     typeName: "ParticleSystem",
     methods: [
       { name: "emit", sig: ":emit(count)", desc: "Emit particles" },
@@ -184,8 +184,8 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   // ── cardgame types ────────────────────────────────────────
-  // luna.cardgame.clone is an alias — it clones a Card from another (advanced use)
-  "luna.cardgame.clone": {
+  // lurek.cardgame.clone is an alias — it clones a Card from another (advanced use)
+  "lurek.cardgame.clone": {
     typeName: "Card",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
@@ -211,7 +211,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "setMeta", sig: ":setMeta(key, value)", desc: "Set metadata value" },
     ],
   },
-  "luna.cardgame.newCard": {
+  "lurek.cardgame.newCard": {
     typeName: "Card",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
@@ -239,7 +239,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "getAllCounters", sig: ":getAllCounters()", desc: "Returns all (kind, count) counter pairs" },
     ],
   },
-  "luna.cardgame.newDeck": {
+  "lurek.cardgame.newDeck": {
     typeName: "Deck",
     fields: [
       { name: "name", type: "string", desc: "Deck display name" },
@@ -263,7 +263,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "reset", sig: ":reset()", desc: "Reset to original state" },
     ],
   },
-  "luna.cardgame.newDeckBuilder": {
+  "lurek.cardgame.newDeckBuilder": {
     typeName: "DeckBuilder",
     fields: [
       { name: "min_cards", type: "integer", desc: "Minimum total cards required" },
@@ -274,7 +274,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "validate", sig: ":validate(deck)", desc: "Validate a deck, returns list of violation messages" },
     ],
   },
-  "luna.cardgame.newStackManager": {
+  "lurek.cardgame.newStackManager": {
     typeName: "StackManager",
     methods: [
       { name: "push", sig: ":push(entry)", desc: "Push an entry onto the stack" },
@@ -286,7 +286,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "findByKind", sig: ":findByKind(kind)", desc: "Find first entry matching a kind" },
     ],
   },
-  "luna.cardgame.newZone": {
+  "lurek.cardgame.newZone": {
     typeName: "Zone",
     fields: [
       { name: "name", type: "string", desc: "Zone name" },
@@ -303,7 +303,7 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "getAllTypes", sig: ":getAllTypes()", desc: "Return type strings of all cards" },
     ],
   },
-  "luna.cardgame.newCardPool": {
+  "lurek.cardgame.newCardPool": {
     typeName: "CardPool",
     fields: [
       { name: "name", type: "string", desc: "Pool name" },
@@ -317,31 +317,170 @@ const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "totalWeight", sig: ":totalWeight()", desc: "Total weight of all entries" },
     ],
   },
+  // ── entity types ──────────────────────────────────────────
+  "lurek.entity.new": {
+    typeName: "Entity",
+    methods: [
+      { name: "getId", sig: ":getId()", desc: "Returns entity ID" },
+      { name: "getTag", sig: ":getTag()", desc: "Returns entity tag" },
+      { name: "setTag", sig: ":setTag(tag)", desc: "Set entity tag" },
+      { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
+      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set position" },
+      { name: "getComponent", sig: ":getComponent(name)", desc: "Get component by name" },
+      { name: "addComponent", sig: ":addComponent(name, data)", desc: "Add component" },
+      { name: "removeComponent", sig: ":removeComponent(name)", desc: "Remove component" },
+      { name: "hasComponent", sig: ":hasComponent(name)", desc: "Returns true if entity has component" },
+      { name: "destroy", sig: ":destroy()", desc: "Destroy entity" },
+      { name: "isAlive", sig: ":isAlive()", desc: "Returns true if entity is alive" },
+      { name: "type", sig: ":type()", desc: "Returns 'Entity'" },
+    ],
+  },
+  // ── timer types ───────────────────────────────────────────
+  "lurek.timer.after": {
+    typeName: "Timer",
+    methods: [
+      { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
+      { name: "pause", sig: ":pause()", desc: "Pause the timer" },
+      { name: "resume", sig: ":resume()", desc: "Resume the timer" },
+      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
+      { name: "type", sig: ":type()", desc: "Returns 'Timer'" },
+    ],
+  },
+  "lurek.timer.every": {
+    typeName: "Timer",
+    methods: [
+      { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
+      { name: "pause", sig: ":pause()", desc: "Pause the timer" },
+      { name: "resume", sig: ":resume()", desc: "Resume the timer" },
+      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
+      { name: "type", sig: ":type()", desc: "Returns 'Timer'" },
+    ],
+  },
+  "lurek.timer.tween": {
+    typeName: "Tween",
+    methods: [
+      { name: "cancel", sig: ":cancel()", desc: "Cancel the tween" },
+      { name: "pause", sig: ":pause()", desc: "Pause the tween" },
+      { name: "resume", sig: ":resume()", desc: "Resume the tween" },
+      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
+      { name: "getProgress", sig: ":getProgress()", desc: "Returns progress 0-1" },
+      { name: "type", sig: ":type()", desc: "Returns 'Tween'" },
+    ],
+  },
+  // ── tilemap types ─────────────────────────────────────────
+  "lurek.tilemap.load": {
+    typeName: "Tilemap",
+    methods: [
+      { name: "draw", sig: ":draw()", desc: "Draw the tilemap" },
+      { name: "getWidth", sig: ":getWidth()", desc: "Returns width in tiles" },
+      { name: "getHeight", sig: ":getHeight()", desc: "Returns height in tiles" },
+      { name: "getTileAt", sig: ":getTileAt(x, y)", desc: "Get tile at grid position" },
+      { name: "setTileAt", sig: ":setTileAt(x, y, tile)", desc: "Set tile at grid position" },
+      { name: "getLayer", sig: ":getLayer(name)", desc: "Get layer by name" },
+      { name: "getLayerCount", sig: ":getLayerCount()", desc: "Returns number of layers" },
+      { name: "getProperty", sig: ":getProperty(name)", desc: "Get map property" },
+      { name: "type", sig: ":type()", desc: "Returns 'Tilemap'" },
+    ],
+  },
+  // ── scene types ───────────────────────────────────────────
+  "lurek.scene.new": {
+    typeName: "Scene",
+    methods: [
+      { name: "enter", sig: ":enter()", desc: "Called when scene becomes active" },
+      { name: "exit", sig: ":exit()", desc: "Called when scene is deactivated" },
+      { name: "update", sig: ":update(dt)", desc: "Update scene" },
+      { name: "draw", sig: ":draw()", desc: "Draw scene" },
+      { name: "getName", sig: ":getName()", desc: "Returns scene name" },
+      { name: "type", sig: ":type()", desc: "Returns 'Scene'" },
+    ],
+  },
+  // ── data types ────────────────────────────────────────────
+  "lurek.data.newStore": {
+    typeName: "DataStore",
+    methods: [
+      { name: "get", sig: ":get(key)", desc: "Get value by key" },
+      { name: "set", sig: ":set(key, value)", desc: "Set a key-value pair" },
+      { name: "delete", sig: ":delete(key)", desc: "Delete a key" },
+      { name: "has", sig: ":has(key)", desc: "Returns true if key exists" },
+      { name: "keys", sig: ":keys()", desc: "Returns all keys" },
+      { name: "values", sig: ":values()", desc: "Returns all values" },
+      { name: "clear", sig: ":clear()", desc: "Remove all entries" },
+      { name: "size", sig: ":size()", desc: "Returns number of entries" },
+      { name: "type", sig: ":type()", desc: "Returns 'DataStore'" },
+    ],
+  },
+  // ── event types ───────────────────────────────────────────
+  "lurek.event.on": {
+    typeName: "EventHandle",
+    methods: [
+      { name: "cancel", sig: ":cancel()", desc: "Unsubscribe from event" },
+      { name: "type", sig: ":type()", desc: "Returns 'EventHandle'" },
+    ],
+  },
+  // ── camera types ──────────────────────────────────────────
+  "lurek.camera.new": {
+    typeName: "Camera",
+    methods: [
+      { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
+      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set camera position" },
+      { name: "getZoom", sig: ":getZoom()", desc: "Returns zoom level" },
+      { name: "setZoom", sig: ":setZoom(zoom)", desc: "Set zoom level" },
+      { name: "getRotation", sig: ":getRotation()", desc: "Returns rotation in radians" },
+      { name: "setRotation", sig: ":setRotation(angle)", desc: "Set rotation" },
+      { name: "lookAt", sig: ":lookAt(x, y)", desc: "Center camera on position" },
+      { name: "shake", sig: ":shake(intensity, duration)", desc: "Apply screen shake" },
+      { name: "attach", sig: ":attach()", desc: "Apply camera transform" },
+      { name: "detach", sig: ":detach()", desc: "Reset camera transform" },
+      { name: "worldToScreen", sig: ":worldToScreen(wx, wy)", desc: "Convert world to screen coords" },
+      { name: "screenToWorld", sig: ":screenToWorld(sx, sy)", desc: "Convert screen to world coords" },
+      { name: "type", sig: ":type()", desc: "Returns 'Camera'" },
+    ],
+  },
 };
+
+// ── Known lurek sub-modules (for alias detection) ─────────
+const LUREK_MODULES = [
+  "graphics", "audio", "physics", "input", "timer", "filesystem",
+  "compute", "data", "image", "entity", "window", "thread",
+  "animation", "camera", "automation", "event", "math",
+  "particle", "tilemap", "scene", "savegame", "modding",
+  "graph", "pathfinding", "ai", "dataframe", "gui", "minimap",
+  "overlay", "postfx", "terminal", "cardgame", "tween",
+];
 
 // ── Variable → Type tracking ──────────────────────────────
 
-interface VarType {
+export interface VarType {
   varName: string;
   typeName: string;
+  factoryCall: string; // the factory function that created this, e.g. "lurek.graphics.newImage"
   line: number;
 }
 
-interface ClassInfo {
+export interface ModuleAlias {
+  varName: string;
+  modulePath: string; // e.g. "lurek.graphics"
+  line: number;
+}
+
+export interface ClassInfo {
   name: string;
   methods: MethodInfo[];
   instances: { varName: string; line: number }[];
 }
 
 /**
- * Scan document for `local var = luna.*.new*()` patterns and OOP classes.
+ * Scan document for `local var = lurek.*.new*()` patterns, OOP classes,
+ * module aliases (`local gfx = lurek.graphics`), and re-assignments.
  */
-function scanDocument(document: vscode.TextDocument): {
+export function scanDocument(document: vscode.TextDocument): {
   varTypes: VarType[];
   classes: ClassInfo[];
+  moduleAliases: ModuleAlias[];
 } {
   const varTypes: VarType[] = [];
   const classes: ClassInfo[] = [];
+  const moduleAliases: ModuleAlias[] = [];
   const classMap = new Map<string, ClassInfo>();
   const text = document.getText();
   const lines = text.split("\n");
@@ -349,15 +488,45 @@ function scanDocument(document: vscode.TextDocument): {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Match: local var = luna.module.anyFunction(...)
+    // Match: local var = lurek.module.anyFunction(...)
     const factoryMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(luna\.\w+\.\w+)\s*\(/
+      /\blocal\s+(\w+)\s*=\s*(lurek\.\w+\.\w+)\s*\(/
     );
     if (factoryMatch) {
       const [, varName, factoryCall] = factoryMatch;
       const typeInfo = FACTORY_TYPES[factoryCall];
       if (typeInfo) {
-        varTypes.push({ varName, typeName: typeInfo.typeName, line: i });
+        varTypes.push({ varName, typeName: typeInfo.typeName, factoryCall, line: i });
+      }
+    }
+
+    // Match module alias: local X = lurek.MODULE (no parentheses — not a function call)
+    const aliasMatch = line.match(
+      /\blocal\s+(\w+)\s*=\s*(lurek\.(\w+))\s*(?:$|--)/
+    );
+    if (aliasMatch) {
+      const [, varName, modulePath, moduleName] = aliasMatch;
+      if (LUREK_MODULES.includes(moduleName)) {
+        moduleAliases.push({ varName, modulePath, line: i });
+      }
+    }
+
+    // Match re-assignment: local b = a (where a is a known typed variable)
+    const reassignMatch = line.match(
+      /\blocal\s+(\w+)\s*=\s*(\w+)\s*(?:$|--)/
+    );
+    if (reassignMatch) {
+      const [, newVar, sourceVar] = reassignMatch;
+      const sourceType = varTypes.find(
+        (v) => v.varName === sourceVar && v.line < i
+      );
+      if (sourceType) {
+        varTypes.push({
+          varName: newVar,
+          typeName: sourceType.typeName,
+          factoryCall: sourceType.factoryCall,
+          line: i,
+        });
       }
     }
 
@@ -437,13 +606,34 @@ function scanDocument(document: vscode.TextDocument): {
     classes.push(cls);
   }
 
-  return { varTypes, classes };
+  return { varTypes, classes, moduleAliases };
+}
+
+/**
+ * Get the full TypeInfo for a variable at a given position.
+ */
+export function getTypeInfoForVar(
+  varName: string,
+  position: vscode.Position,
+  varTypes: VarType[],
+  classes: ClassInfo[]
+): { typeInfo: TypeInfo; factoryCall: string } | undefined {
+  const factoryVar = varTypes.find(
+    (v) => v.varName === varName && v.line < position.line
+  );
+  if (factoryVar) {
+    const typeInfo = Object.values(FACTORY_TYPES).find(
+      (t) => t.typeName === factoryVar.typeName
+    );
+    if (typeInfo) return { typeInfo, factoryCall: factoryVar.factoryCall };
+  }
+  return undefined;
 }
 
 /**
  * Get methods for a variable at a given position.
  */
-function getMethodsForVar(
+export function getMethodsForVar(
   varName: string,
   position: vscode.Position,
   varTypes: VarType[],
@@ -519,7 +709,7 @@ export function register(
     ":"
   );
 
-  // Dot provider — field completions (var.field)
+  // Dot provider — field + method completions (var.field, var.method)
   const dotProvider = vscode.languages.registerCompletionItemProvider(
     LUA_SELECTOR,
     {
@@ -530,43 +720,173 @@ export function register(
         const lineText = document.lineAt(position).text;
         const before = lineText.substring(0, position.character);
 
-        // Trigger on varName. but NOT luna. module paths (e.g. luna.graphics.)
+        // Trigger on varName. but NOT lurek. module paths (e.g. lurek.graphics.)
         const dotMatch = before.match(/\b(\w+)\.(\w*)$/);
         if (!dotMatch) return undefined;
 
         const varName = dotMatch[1];
-        // Skip luna.* module calls — those are handled by the main completion provider
-        if (varName === "luna") return undefined;
+        // Skip lurek.* module calls — those are handled by the main completion provider
+        if (varName === "lurek") return undefined;
 
         const partial = dotMatch[2].toLowerCase();
-        const { varTypes } = scanDocument(document);
+        const { varTypes, classes, moduleAliases } = scanDocument(document);
 
+        // Check module aliases: local gfx = lurek.graphics → gfx.newImage()
+        const alias = moduleAliases.find(
+          (a) => a.varName === varName && a.line < position.line
+        );
+        if (alias) {
+          const prefix = alias.modulePath + ".";
+          const items: vscode.CompletionItem[] = [];
+          for (const key of Object.keys(FACTORY_TYPES)) {
+            if (key.startsWith(prefix)) {
+              const funcName = key.substring(prefix.length);
+              if (!partial || funcName.toLowerCase().startsWith(partial)) {
+                const typeInfo = FACTORY_TYPES[key];
+                const item = new vscode.CompletionItem(
+                  funcName,
+                  vscode.CompletionItemKind.Function
+                );
+                item.detail = `→ ${typeInfo.typeName}`;
+                item.documentation = new vscode.MarkdownString(
+                  `Factory from \`${key}\``
+                );
+                item.sortText = `0${funcName}`;
+                items.push(item);
+              }
+            }
+          }
+          if (items.length > 0) return items;
+        }
+
+        const items: vscode.CompletionItem[] = [];
+
+        // Check factory-typed variables
         const factoryVar = varTypes.find(
           (v) => v.varName === varName && v.line < position.line
         );
-        if (!factoryVar) return undefined;
+        if (factoryVar) {
+          const typeInfo = Object.values(FACTORY_TYPES).find(
+            (t) => t.typeName === factoryVar.typeName
+          );
+          if (typeInfo) {
+            // Add fields
+            if (typeInfo.fields) {
+              for (const f of typeInfo.fields) {
+                if (partial && !f.name.toLowerCase().startsWith(partial)) continue;
+                const item = new vscode.CompletionItem(
+                  f.name,
+                  vscode.CompletionItemKind.Field
+                );
+                item.detail = f.type;
+                item.documentation = new vscode.MarkdownString(f.desc);
+                item.sortText = `0a${f.name}`; // Fields before methods
+                items.push(item);
+              }
+            }
+            // Add methods (Lua allows obj.method(obj, ...) syntax)
+            for (const m of typeInfo.methods) {
+              if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
+              const item = new vscode.CompletionItem(
+                m.name,
+                vscode.CompletionItemKind.Method
+              );
+              item.detail = m.sig;
+              item.documentation = new vscode.MarkdownString(m.desc);
+              item.sortText = `0b${m.name}`; // Methods after fields
+              items.push(item);
+            }
+          }
+        }
 
-        const typeInfo = Object.values(FACTORY_TYPES).find(
-          (t) => t.typeName === factoryVar.typeName
-        );
-        if (!typeInfo?.fields || typeInfo.fields.length === 0) return undefined;
-
-        return typeInfo.fields
-          .filter((f) => !partial || f.name.toLowerCase().startsWith(partial))
-          .map((f) => {
-            const item = new vscode.CompletionItem(
-              f.name,
-              vscode.CompletionItemKind.Field
+        // Check OOP class instances
+        if (items.length === 0) {
+          for (const cls of classes) {
+            const instance = cls.instances.find(
+              (inst) => inst.varName === varName && inst.line < position.line
             );
-            item.detail = f.type;
-            item.documentation = new vscode.MarkdownString(f.desc);
-            item.sortText = `0${f.name}`;
-            return item;
-          });
+            if (instance && cls.methods.length > 0) {
+              for (const m of cls.methods) {
+                if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
+                const item = new vscode.CompletionItem(
+                  m.name,
+                  vscode.CompletionItemKind.Method
+                );
+                item.detail = m.sig;
+                item.documentation = new vscode.MarkdownString(m.desc);
+                item.sortText = `0${m.name}`;
+                items.push(item);
+              }
+              break;
+            }
+          }
+        }
+
+        return items.length > 0 ? items : undefined;
       },
     },
     "."
   );
 
-  context.subscriptions.push(colonProvider, dotProvider);
+  // Hover provider — show type info for typed variables
+  const hoverProvider = vscode.languages.registerHoverProvider(LUA_SELECTOR, {
+    provideHover(
+      document: vscode.TextDocument,
+      position: vscode.Position
+    ): vscode.Hover | undefined {
+      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
+      if (!wordRange) return undefined;
+
+      const word = document.getText(wordRange);
+      const { varTypes, classes, moduleAliases } = scanDocument(document);
+
+      // Check module aliases
+      const alias = moduleAliases.find(
+        (a) => a.varName === word && a.line < position.line
+      );
+      if (alias) {
+        const md = new vscode.MarkdownString();
+        md.appendCodeblock(`${word}: module (${alias.modulePath})`, "lua");
+        md.appendMarkdown(`Alias for \`${alias.modulePath}\``);
+        return new vscode.Hover(md, wordRange);
+      }
+
+      // Check factory-typed variables
+      const result = getTypeInfoForVar(word, position, varTypes, classes);
+      if (result) {
+        const { typeInfo, factoryCall } = result;
+        const md = new vscode.MarkdownString();
+        md.appendCodeblock(`${word}: ${typeInfo.typeName}`, "lua");
+        md.appendMarkdown(`Created by \`${factoryCall}()\`\n\n`);
+        if (typeInfo.fields && typeInfo.fields.length > 0) {
+          md.appendMarkdown(
+            `**Fields:** ${typeInfo.fields.map((f) => `\`${f.name}\``).join(", ")}\n\n`
+          );
+        }
+        md.appendMarkdown(
+          `**Methods:** ${typeInfo.methods.map((m) => `\`${m.name}\``).join(", ")}`
+        );
+        return new vscode.Hover(md, wordRange);
+      }
+
+      // Check OOP class instances
+      for (const cls of classes) {
+        const instance = cls.instances.find(
+          (inst) => inst.varName === word && inst.line < position.line
+        );
+        if (instance && cls.methods.length > 0) {
+          const md = new vscode.MarkdownString();
+          md.appendCodeblock(`${word}: ${cls.name}`, "lua");
+          md.appendMarkdown(
+            `**Methods:** ${cls.methods.map((m) => `\`${m.name}\``).join(", ")}`
+          );
+          return new vscode.Hover(md, wordRange);
+        }
+      }
+
+      return undefined;
+    },
+  });
+
+  context.subscriptions.push(colonProvider, dotProvider, hoverProvider);
 }

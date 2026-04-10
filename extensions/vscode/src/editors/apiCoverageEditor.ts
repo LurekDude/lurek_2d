@@ -79,7 +79,7 @@ export class ApiCoverageEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.apiCoverage", "API Test Coverage");
+    super(context, "lurek.editor.apiCoverage", "API Test Coverage");
     this.loadReport();
   }
 

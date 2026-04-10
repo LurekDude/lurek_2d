@@ -182,7 +182,7 @@ fn test_lua_new_scheduler() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sched = luna.time.newScheduler()
+        local sched = lurek.time.newScheduler()
         assert(sched:getCount() == 0)
         "#,
     )
@@ -195,7 +195,7 @@ fn test_lua_scheduler_after() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sched = luna.time.newScheduler()
+        local sched = lurek.time.newScheduler()
         local called = false
         sched:after(0.5, function() called = true end)
         assert(sched:getCount() == 1)
@@ -215,7 +215,7 @@ fn test_lua_scheduler_every() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sched = luna.time.newScheduler()
+        local sched = lurek.time.newScheduler()
         local count = 0
         sched:every(0.5, function() count = count + 1 end, 3)
         sched:update(1.6)
@@ -232,7 +232,7 @@ fn test_lua_scheduler_cancel() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sched = luna.time.newScheduler()
+        local sched = lurek.time.newScheduler()
         local id = sched:after(1.0, function() end)
         assert(sched:cancel(id) == true)
         assert(sched:getCount() == 0)
@@ -248,7 +248,7 @@ fn test_lua_scheduler_cancel_all() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sched = luna.time.newScheduler()
+        local sched = lurek.time.newScheduler()
         sched:after(1.0, function() end)
         sched:every(0.5, function() end)
         local n = sched:cancelAll()

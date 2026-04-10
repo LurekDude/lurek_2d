@@ -1,5 +1,7 @@
 -- Lurek2D Stress Test: Entity Mass Spawn
 -- Tests entity creation, tag assignment, and component operations at scale
+-- @stress lurek.entity.newUniverse
+
 
 describe("entity stress: mass spawn", function()
     it("spawns 10000 entities", function()

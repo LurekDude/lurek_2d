@@ -7,7 +7,7 @@ export class WorldMapEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.worldMapEditor", "World Map");
+    super(context, "lurek.worldMapEditor", "World Map");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

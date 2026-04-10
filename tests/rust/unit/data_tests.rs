@@ -123,7 +123,7 @@ fn hash_sha1_known() {
 fn encode_decode_base64() {
     let original = b"Hello, Lurek2D!";
     let encoded = encode(EncodeFormat::Base64, original);
-    assert_eq!(encoded, "SGVsbG8sIEx1bmEyRCE=");
+    assert_eq!(encoded, "SGVsbG8sIEx1cmVrMkQh");
     let decoded = decode(EncodeFormat::Base64, &encoded).unwrap();
     assert_eq!(decoded, original);
 }
@@ -413,7 +413,7 @@ fn lua_parse_toml_basic_returns_table() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.data.parseToml('name = "hello"\ncount = 42\nactive = true')
+        local t = lurek.data.parseToml('name = "hello"\ncount = 42\nactive = true')
         assert(t.name == "hello")
         assert(t.count == 42)
         assert(t.active == true)
@@ -429,7 +429,7 @@ fn lua_parse_toml_nested_returns_table() {
     lua.load(
         r#"
         local toml_str = '[window]\nwidth = 800\nheight = 600\ntitle = "Lurek2D"'
-        local t = luna.data.parseToml(toml_str)
+        local t = lurek.data.parseToml(toml_str)
         assert(t.window.width == 800)
         assert(t.window.height == 600)
         assert(t.window.title == "Lurek2D")
@@ -444,7 +444,7 @@ fn lua_parse_toml_array_returns_seq() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.data.parseToml('items = [1, 2, 3]')
+        local t = lurek.data.parseToml('items = [1, 2, 3]')
         assert(#t.items == 3)
         assert(t.items[1] == 1)
         assert(t.items[2] == 2)
@@ -460,7 +460,7 @@ fn lua_encode_toml_basic_returns_string() {
     let lua = make_vm();
     lua.load(
         r#"
-        local result = luna.data.encodeToml({ name = "test", count = 5 })
+        local result = lurek.data.encodeToml({ name = "test", count = 5 })
         assert(type(result) == "string")
         assert(string.find(result, 'name = "test"'))
         assert(string.find(result, "count = 5"))
@@ -476,8 +476,8 @@ fn lua_toml_roundtrip_preserves_values() {
     lua.load(
         r#"
         local original = { title = "game", debug = true }
-        local encoded = luna.data.encodeToml(original)
-        local decoded = luna.data.parseToml(encoded)
+        local encoded = lurek.data.encodeToml(original)
+        local decoded = lurek.data.parseToml(encoded)
         assert(decoded.title == "game")
         assert(decoded.debug == true)
         "#,
@@ -492,7 +492,7 @@ fn lua_parse_toml_error_returns_lua_error() {
     let result = lua
         .load(
             r#"
-            luna.data.parseToml("invalid = [")
+            lurek.data.parseToml("invalid = [")
             "#,
         )
         .exec();

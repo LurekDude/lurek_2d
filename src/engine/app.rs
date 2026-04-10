@@ -9,7 +9,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::time::Instant;
 
-use crate::event::EventArg;
+use crate::signal::EventArg;
 use mlua::prelude::*;
 use winit::application::ApplicationHandler;
 use winit::event::{ElementState, MouseButton, WindowEvent};
@@ -2417,8 +2417,8 @@ fn init_logging(
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A) {
-    if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
-        if let Ok(func) = luna.get::<_, LuaFunction>(name) {
+    if let Ok(lurek) = lua.globals().get::<_, LuaTable>("lurek") {
+        if let Ok(func) = lurek.get::<_, LuaFunction>(name) {
             if let Err(e) = func.call::<_, ()>(args) {
                 log_msg!(error, L011_LUA_ERROR, "lurek.{}(): {}", name, e);
             }
@@ -2432,8 +2432,8 @@ fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     name: &str,
     args: A,
 ) -> Result<(), mlua::Error> {
-    if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
-        if let Ok(func) = luna.get::<_, LuaFunction>(name) {
+    if let Ok(lurek) = lua.globals().get::<_, LuaTable>("lurek") {
+        if let Ok(func) = lurek.get::<_, LuaFunction>(name) {
             func.call::<_, ()>(args)?;
         }
     }
@@ -2446,8 +2446,8 @@ fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
 fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
     let msg = format!("{}", err);
     log_msg!(error, L011_LUA_ERROR, "runtime: {}", msg);
-    if let Ok(luna) = lua.globals().get::<_, LuaTable>("luna") {
-        if let Ok(handler) = luna.get::<_, LuaFunction>("errorhandler") {
+    if let Ok(lurek) = lua.globals().get::<_, LuaTable>("lurek") {
+        if let Ok(handler) = lurek.get::<_, LuaFunction>("errorhandler") {
             match handler.call::<_, ()>(msg.clone()) {
                 Ok(()) => {
                     // Handler ran successfully — still show error screen since
@@ -2585,7 +2585,7 @@ mod tests {
 
         let lua = app.lua.as_ref().expect("Lua VM should be initialized");
         let reported_identity: String = lua
-            .load("return luna.fs.getIdentity()")
+            .load("return lurek.fs.getIdentity()")
             .eval()
             .expect("filesystem identity should be readable from Lua");
         assert_eq!(reported_identity, "phase01-save");

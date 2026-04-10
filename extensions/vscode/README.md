@@ -1,81 +1,118 @@
-# Lurek2D — VS Code Extension
+﻿# Lurek2D Toolkit - VS Code Extension
 
-AI-first IDE support for the [Lurek2D](https://github.com/lurek2d/lurek2d) game engine.
+Full-featured IDE support for the [Lurek2D](https://github.com/lurek2d/lurek2d) 2D game engine.
 
-## What This Extension Does
+## Overview
 
-Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts. This extension turns VS Code into the primary development environment for Lurek2D games by providing:
-
-- **MCP Server** — Exposes engine capabilities (example runner, API lookup, build checking) to GitHub Copilot agents via the Model Context Protocol
-- **CAG Documentation Bundling** — Ships `.instructions.md`, `.skill.md`, `.prompt.md`, and `.agent.md` files so Copilot agents automatically understand Lurek2D conventions
-- **Example Runner** — Browse and run Lurek2D examples directly from VS Code
-- **API Documentation** — Search and view `lurek.*` API reference without leaving the editor
+Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts. This extension turns VS Code into the primary development environment for Lurek2D games with **126 commands**, covering IntelliSense, debugging, testing, build/run, visual editors, and AI-assisted development.
 
 ## Features
 
-### MCP Tools (for Copilot Agents)
+### IntelliSense
 
-| Tool | Description |
-|---|---|
-| `lurek2d.runExample` | Build and run a named example, capture output |
-| `lurek2d.getApiDoc` | Return docs for a `lurek.*` function or module |
-| `lurek2d.listExamples` | List available example projects |
-| `lurek2d.runLuaTest` | Run a Lua test file on a debug build |
-| `lurek2d.checkBuild` | Run `cargo check` and return diagnostics |
-| `lurek2d.getLogs` | Return last N lines of engine log output |
+- **778+ API completions** - Full `lurek.*` namespace with parameter types, descriptions, and return values
+- **Hover documentation** - Inline docs for every `lurek.*` function with signatures and examples
+- **Signature help** - Parameter hints as you type function arguments
+- **Go to definition** - Navigate to `lurek.*` API virtual definitions
+- **Find references** - Locate all usages of functions and variables
+- **Symbol outline** - Document symbols for functions, callbacks, and locals
+- **Semantic highlighting** - Color-coded `lurek.*` API calls, callbacks, and deprecated functions
+- **Inlay hints** - Inline type annotations for `lurek.*` return values
+- **Code lens** - Quick links on `lurek.*` callbacks (load, update, draw, etc.)
+- **Diagnostics** - Warns about unknown `lurek.*` functions, deprecated APIs, missing callbacks
+- **Code actions** - Quick fixes for common issues, missing scaffolding, color picker integration
+- **Rename symbol** - Safe rename across the project (guards `lurek.*` API names)
+- **LuaJIT hints** - Warns about LuaJIT-specific pitfalls (64-bit integers, goto scoping, etc.)
+- **Type inference** - Infers return types from `lurek.*` constructors (newImage, newBody, etc.)
+- **LuaCATS support** - Parses `---@class`, `---@param`, `---@return` annotations for user types
+- **Asset path completion** - Autocomplete file paths in `lurek.graphics.newImage()` and similar
 
-### VS Code Commands
+### Debugging (16 commands)
 
-- **Lurek2D: Run Example** — Pick an example from a quick-pick menu and run it
-- **Lurek2D: List Examples** — Show available examples in an information message
-- **Lurek2D: Check Build** — Run `cargo check` and display results
-- **Lurek2D: Get API Documentation** — Search the `lurek.*` API reference
+- **Debug adapter (DAP)** - Launch or attach to a running Lurek2D game with breakpoints
+- **Debug bridge** - Connect/disconnect to engine debug socket for live inspection
+- **Hot reload** - Push code changes to a running game without restarting
+- **Evaluate expressions** - Run Lua expressions in the engine context
+- **Variable inspector** - Inspect Lua variables and tables in a live game
+- **Call stack** - View the current Lua call stack
+- **Performance dashboard** - Live engine stats (FPS, draw calls, memory) in a webview
+- **Screenshot capture** - Save a screenshot from the running engine
+
+### Build, Run and Package (10 commands)
+
+- **Run game** - Launch the current project with the Lurek2D engine
+- **Run with arguments** - Launch with custom CLI arguments
+- **Stop game** - Kill the running engine process
+- **Run example** - Pick and run any content/examples/ or content/demos/ project
+- **Quick build** - cargo build from the command palette
+- **Build check** - cargo check with diagnostics
+- **Package** - Build release binaries and distribution archives
+
+### Testing (30 commands)
+
+- **Run all tests** - cargo test from the command palette
+- **Run Lua tests** - Execute individual .lua test files
+- **Generate tests** - Auto-generate test scaffolding from `lurek.*` API usage
+- **Test coverage** - API coverage report showing tested vs untested functions
+- **Test runner editor** - Webview panel for browsing and running test suites
+
+### Visual Editors (29 editors)
+
+Webview-based editors for visual game asset authoring including animation, audio mixer, color palette, entity/ECS, font preview, GUI layout, keybinding, particle system, post-FX overlay, shader preview, sound DSP, sprite/spritesheet, state machine, tilemap, tween, API reference, and more.
+
+### AI-Assisted Development
+
+- **MCP Server** - Exposes 6 tools to GitHub Copilot agents (run example, API lookup, build check, test runner, log viewer, example listing)
+- **CAG bundling** - Ships .instructions.md, .skill.md, .prompt.md, and .agent.md files for Copilot context
+- **Pattern library** - Browse and insert common `lurek.*` code patterns
+- **Game jam starter** - Scaffold a new game project from genre templates
+
+### Other
+
+- **Asset explorer** - Tree view of project assets (images, sounds, scripts)
+- **Dependency graph** - Visualize module dependencies
+- **System monitor** - Live CPU/RAM monitoring of the engine process
+- **API coverage** - Report which `lurek.*` functions your project uses
+- **Scaffold** - Generate main.lua + conf.lua project templates
 
 ## Installation
 
 ### From VSIX
 
 ```bash
-cd vscode-extension
+cd extensions/vscode
 npm install
-npm run compile
-npm run package
-code --install-extension lurek2d-vscode-0.1.0.vsix
+node esbuild.config.mjs --production
+npx @vscode/vsce package --no-dependencies
+code --install-extension lurek2d-toolkit-0.9.0.vsix
 ```
 
-### From Marketplace
+### From Source (Development)
 
-Search for "Lurek2D" in the VS Code Extensions panel (when published).
+```bash
+cd extensions/vscode
+npm install
+node esbuild.config.mjs --watch
+# Then press F5 in VS Code to launch Extension Development Host
+```
 
-## Usage
+## Activation
 
-### For Game Developers
+The extension activates when a workspace contains main.lua, conf.lua, or Cargo.toml, or when you open any .lua file.
 
-1. Open a folder containing a `main.lua` file — the extension activates automatically
-2. Use the Command Palette (`Ctrl+Shift+P`) and type "Lurek2D" to see available commands
-3. The status bar shows "Lurek2D" when the extension is active
+## Settings
 
-### AI-First Workflow
-
-The primary workflow for Lurek2D is **human design, AI implementation**:
-
-1. **You** design the game logic, mechanics, and structure
-2. **Copilot agents** implement the Lua scripts using the bundled CAG documentation
-3. Agents call MCP tools to run examples, check builds, and look up API docs
-4. You iterate on the design while agents handle the implementation details
-
-The extension bundles all CAG context (instructions, skills, agents) so Copilot understands Lurek2D conventions without any additional setup.
+| Setting | Default | Description |
+|---|---|---|
+| `lurek.enginePath` | `""` | Path to the lurek2d binary (auto-detected if on PATH) |
+| `lurek.luaVersion` | `"luajit"` | Lua runtime: luajit or lua54 |
 
 ## Requirements
 
-- VS Code 1.90.0 or later
-- Rust toolchain (for building Lurek2D)
-- Lurek2D engine source (Cargo.toml in workspace)
-
-## Extension Settings
-
-This extension does not contribute any VS Code settings at this time.
+- VS Code 1.90.0+
+- For game development: lurek2d binary (built from engine source or installed)
+- For engine development: Rust toolchain + Cargo
 
 ## License
 
-MIT — same as Lurek2D engine.
+MIT - same as the Lurek2D engine.

@@ -2274,6 +2274,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
 
+    // ── saveWAV ───────────────────────────────────────────────────────────────
+    /// Saves a SoundData as a 16-bit PCM WAV file at the given path.
+    /// @param sounddata : SoundData
+    /// @param path : string
+    /// @return nil
+    let s = state.clone();
+    tbl.set(
+        "saveWAV",
+        lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
+            let path = s.borrow().game_dir.join(&filename);
+            let sd = sd_ud.borrow::<SoundData>().map_err(|_| {
+                LuaError::RuntimeError("argument must be a SoundData".into())
+            })?;
+            let bytes = sd.encode_wav();
+            if let Some(parent) = path.parent() {
+                std::fs::create_dir_all(parent).map_err(LuaError::external)?;
+            }
+            std::fs::write(&path, &bytes).map_err(LuaError::external)
+        })?,
+    )?;
+
     luna.set("audio", tbl)?;
     Ok(())
 }

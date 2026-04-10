@@ -1,4 +1,4 @@
-﻿//! Integration tests for the `luna.particles.*` Lua API and particle system.
+﻿//! Integration tests for the `lurek.particles.*` Lua API and particle system.
 
 use std::cell::RefCell;
 use std::path::PathBuf;
@@ -40,14 +40,14 @@ fn phase01_released_particle_handle_reuse_reports_invalid_system() {
     let result = lua
         .load(
             r#"
-            local released = luna.particles.newSystem({ emissionRate = 10 })
+            local released = lurek.particles.newSystem({ emissionRate = 10 })
             assert(type(released) == "userdata")
-            assert(luna.particles.release(released) == true)
+            assert(lurek.particles.release(released) == true)
 
-            local replacement = luna.particles.newSystem({ emissionRate = 20 })
+            local replacement = lurek.particles.newSystem({ emissionRate = 20 })
             assert(type(replacement) == "userdata")
 
-            luna.particles.getCount(released)
+            lurek.particles.getCount(released)
             "#,
         )
         .exec();
@@ -104,9 +104,9 @@ fn phase01_released_particle_long_tail_accessors_report_invalid_system() {
         let (_state, lua) = make_vm();
         let script = format!(
             r#"
-            local released = luna.particles.newSystem({{ emissionRate = 10 }})
+            local released = lurek.particles.newSystem({{ emissionRate = 10 }})
             assert(type(released) == "userdata")
-            assert(luna.particles.release(released) == true)
+            assert(lurek.particles.release(released) == true)
 
             {expression}
             "#,
@@ -137,9 +137,9 @@ fn phase01_released_particle_long_tail_mutators_report_invalid_system() {
         let (_state, lua) = make_vm();
         let script = format!(
             r#"
-            local released = luna.particles.newSystem({{ emissionRate = 10 }})
+            local released = lurek.particles.newSystem({{ emissionRate = 10 }})
             assert(type(released) == "userdata")
-            assert(luna.particles.release(released) == true)
+            assert(lurek.particles.release(released) == true)
 
             {expression}
             "#,
@@ -152,7 +152,7 @@ fn phase01_released_particle_long_tail_mutators_report_invalid_system() {
 #[test]
 fn particle_new_system_default() {
     let (state, lua) = make_vm();
-    lua.load("local id = luna.particles.newSystem(); assert(type(id) == 'userdata')")
+    lua.load("local id = lurek.particles.newSystem(); assert(type(id) == 'userdata')")
         .exec()
         .unwrap();
     let st = state.borrow();
@@ -165,7 +165,7 @@ fn particle_new_system_with_config() {
     let (state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             maxParticles = 100,
             emissionRate = 50,
             lifetimeMin = 0.5,
@@ -197,9 +197,9 @@ fn particle_update_and_count() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 100 })
-        luna.particles.update(id, 1.0)
-        local count = luna.particles.getCount(id)
+        local id = lurek.particles.newSystem({ emissionRate = 100 })
+        lurek.particles.update(id, 1.0)
+        local count = lurek.particles.getCount(id)
         assert(count > 0, "Expected particles after update, got " .. tostring(count))
         "#,
     )
@@ -212,18 +212,18 @@ fn particle_stop_and_start() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 1000, lifetimeMin = 10, lifetimeMax = 10 })
-        luna.particles.update(id, 0.1)
-        local c1 = luna.particles.getCount(id)
+        local id = lurek.particles.newSystem({ emissionRate = 1000, lifetimeMin = 10, lifetimeMax = 10 })
+        lurek.particles.update(id, 0.1)
+        local c1 = lurek.particles.getCount(id)
         assert(c1 > 0)
-        luna.particles.stop(id)
-        local frozen = luna.particles.getCount(id)
-        luna.particles.update(id, 0.1)
-        local c2 = luna.particles.getCount(id)
+        lurek.particles.stop(id)
+        local frozen = lurek.particles.getCount(id)
+        lurek.particles.update(id, 0.1)
+        local c2 = lurek.particles.getCount(id)
         assert(c2 <= frozen, "Expected no new particles after stop")
-        luna.particles.start(id)
-        luna.particles.update(id, 0.1)
-        local c3 = luna.particles.getCount(id)
+        lurek.particles.start(id)
+        lurek.particles.update(id, 0.1)
+        local c3 = lurek.particles.getCount(id)
         assert(c3 >= c2, "Expected new particles after start")
         "#,
     )
@@ -236,11 +236,11 @@ fn particle_reset() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 100 })
-        luna.particles.update(id, 1.0)
-        assert(luna.particles.getCount(id) > 0)
-        luna.particles.reset(id)
-        assert(luna.particles.getCount(id) == 0)
+        local id = lurek.particles.newSystem({ emissionRate = 100 })
+        lurek.particles.update(id, 1.0)
+        assert(lurek.particles.getCount(id) > 0)
+        lurek.particles.reset(id)
+        assert(lurek.particles.getCount(id) == 0)
         "#,
     )
     .exec()
@@ -252,8 +252,8 @@ fn particle_set_position() {
     let (state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setPosition(id, 100, 200)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setPosition(id, 100, 200)
         "#,
     )
     .exec()
@@ -269,8 +269,8 @@ fn particle_set_emission_rate() {
     let (state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 10 })
-        luna.particles.setEmissionRate(id, 500)
+        local id = lurek.particles.newSystem({ emissionRate = 10 })
+        lurek.particles.setEmissionRate(id, 500)
         "#,
     )
     .exec()
@@ -294,9 +294,9 @@ fn particle_draw_generates_commands() {
     let (state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 100 })
-        luna.particles.update(id, 1.0)
-        luna.particles.draw(id)
+        local id = lurek.particles.newSystem({ emissionRate = 100 })
+        lurek.particles.update(id, 1.0)
+        lurek.particles.draw(id)
         "#,
     )
     .exec()
@@ -321,8 +321,8 @@ fn particle_multiple_systems() {
     let (state, lua) = make_vm();
     lua.load(
         r#"
-        local id0 = luna.particles.newSystem({ emissionRate = 10 })
-        local id1 = luna.particles.newSystem({ emissionRate = 20 })
+        local id0 = lurek.particles.newSystem({ emissionRate = 10 })
+        local id1 = lurek.particles.newSystem({ emissionRate = 20 })
         assert(type(id0) == "userdata", "first system should return userdata")
         assert(type(id1) == "userdata", "second system should return userdata")
         assert(id0 ~= id1, "different systems should have different ids")
@@ -648,12 +648,12 @@ fn backward_compat_size_start_end() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             sizeStart = 10,
             sizeEnd = 2,
         })
         -- Sizes should be populated from sizeStart/sizeEnd
-        local sizes = luna.particles.getSizes(id)
+        local sizes = lurek.particles.getSizes(id)
         assert(sizes ~= nil, "sizes should not be nil")
         assert(math.abs(sizes[1] - 10) < 0.001, "first size should be 10, got " .. tostring(sizes[1]))
         assert(math.abs(sizes[2] - 2) < 0.001, "second size should be 2, got " .. tostring(sizes[2]))
@@ -668,11 +668,11 @@ fn backward_compat_color_start_end() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             colorStart = {1, 0, 0, 1},
             colorEnd = {0, 0, 1, 0.5},
         })
-        local colors = luna.particles.getColors(id)
+        local colors = lurek.particles.getColors(id)
         assert(colors ~= nil)
         assert(math.abs(colors[1][1] - 1) < 0.001, "start red should be 1")
         assert(math.abs(colors[1][2] - 0) < 0.001, "start green should be 0")
@@ -691,13 +691,13 @@ fn lua_pause_resume() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ emissionRate = 100 })
-        assert(luna.particles.isActive(id))
-        luna.particles.pause(id)
-        assert(luna.particles.isPaused(id))
-        assert(not luna.particles.isActive(id))
-        luna.particles.start(id)
-        assert(luna.particles.isActive(id))
+        local id = lurek.particles.newSystem({ emissionRate = 100 })
+        assert(lurek.particles.isActive(id))
+        lurek.particles.pause(id)
+        assert(lurek.particles.isPaused(id))
+        assert(not lurek.particles.isActive(id))
+        lurek.particles.start(id)
+        assert(lurek.particles.isActive(id))
         "#,
     )
     .exec()
@@ -709,14 +709,14 @@ fn lua_emit_burst() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             maxParticles = 1000,
             emissionRate = 0,
             lifetimeMin = 10,
             lifetimeMax = 10,
         })
-        luna.particles.emit(id, 50)
-        assert(luna.particles.getCount(id) == 50, "Expected 50 particles, got " .. luna.particles.getCount(id))
+        lurek.particles.emit(id, 50)
+        assert(lurek.particles.getCount(id) == 50, "Expected 50 particles, got " .. lurek.particles.getCount(id))
         "#,
     )
     .exec()
@@ -728,17 +728,17 @@ fn lua_clone_system() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             emissionRate = 100,
             lifetimeMin = 10,
             lifetimeMax = 10,
         })
-        luna.particles.update(id, 0.5)
-        assert(luna.particles.getCount(id) > 0)
-        local cloned = luna.particles.clone(id)
+        lurek.particles.update(id, 0.5)
+        assert(lurek.particles.getCount(id) > 0)
+        local cloned = lurek.particles.clone(id)
         assert(cloned ~= id)
-        assert(luna.particles.getCount(cloned) == 0, "Cloned system should have 0 particles")
-        assert(luna.particles.getEmissionRate(cloned) == 100, "Cloned should have same emission rate")
+        assert(lurek.particles.getCount(cloned) == 0, "Cloned system should have 0 particles")
+        assert(lurek.particles.getEmissionRate(cloned) == 100, "Cloned should have same emission rate")
         "#,
     )
     .exec()
@@ -750,9 +750,9 @@ fn lua_get_set_position() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setPosition(id, 42, 84)
-        local x, y = luna.particles.getPosition(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setPosition(id, 42, 84)
+        local x, y = lurek.particles.getPosition(id)
         assert(math.abs(x - 42) < 0.001)
         assert(math.abs(y - 84) < 0.001)
         "#,
@@ -766,9 +766,9 @@ fn lua_move_to() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.moveTo(id, 50, 75)
-        local x, y = luna.particles.getPosition(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.moveTo(id, 50, 75)
+        local x, y = lurek.particles.getPosition(id)
         assert(math.abs(x - 50) < 0.001)
         assert(math.abs(y - 75) < 0.001)
         "#,
@@ -782,17 +782,17 @@ fn lua_is_empty_is_full() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             maxParticles = 5,
             emissionRate = 0,
             lifetimeMin = 10,
             lifetimeMax = 10,
         })
-        assert(luna.particles.isEmpty(id), "should start empty")
-        assert(not luna.particles.isFull(id))
-        luna.particles.emit(id, 5)
-        assert(not luna.particles.isEmpty(id))
-        assert(luna.particles.isFull(id), "should be full at max")
+        assert(lurek.particles.isEmpty(id), "should start empty")
+        assert(not lurek.particles.isFull(id))
+        lurek.particles.emit(id, 5)
+        assert(not lurek.particles.isEmpty(id))
+        assert(lurek.particles.isFull(id), "should be full at max")
         "#,
     )
     .exec()
@@ -804,13 +804,13 @@ fn lua_lifetime_getters_setters() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setParticleLifetime(id, 0.5, 3.0)
-        local min, max = luna.particles.getParticleLifetime(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setParticleLifetime(id, 0.5, 3.0)
+        local min, max = lurek.particles.getParticleLifetime(id)
         assert(math.abs(min - 0.5) < 0.001)
         assert(math.abs(max - 3.0) < 0.001)
-        luna.particles.setEmitterLifetime(id, 5.0)
-        assert(math.abs(luna.particles.getEmitterLifetime(id) - 5.0) < 0.001)
+        lurek.particles.setEmitterLifetime(id, 5.0)
+        assert(math.abs(lurek.particles.getEmitterLifetime(id) - 5.0) < 0.001)
         "#,
     )
     .exec()
@@ -822,15 +822,15 @@ fn lua_speed_direction_spread() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setSpeed(id, 10, 200)
-        local smin, smax = luna.particles.getSpeed(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setSpeed(id, 10, 200)
+        local smin, smax = lurek.particles.getSpeed(id)
         assert(math.abs(smin - 10) < 0.001)
         assert(math.abs(smax - 200) < 0.001)
-        luna.particles.setDirection(id, 1.5)
-        assert(math.abs(luna.particles.getDirection(id) - 1.5) < 0.001)
-        luna.particles.setSpread(id, 0.5)
-        assert(math.abs(luna.particles.getSpread(id) - 0.5) < 0.001)
+        lurek.particles.setDirection(id, 1.5)
+        assert(math.abs(lurek.particles.getDirection(id) - 1.5) < 0.001)
+        lurek.particles.setSpread(id, 0.5)
+        assert(math.abs(lurek.particles.getSpread(id) - 0.5) < 0.001)
         "#,
     )
     .exec()
@@ -842,21 +842,21 @@ fn lua_acceleration_setters() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setLinearAcceleration(id, -10, -20, 10, 20)
-        local xmin, ymin, xmax, ymax = luna.particles.getLinearAcceleration(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setLinearAcceleration(id, -10, -20, 10, 20)
+        local xmin, ymin, xmax, ymax = lurek.particles.getLinearAcceleration(id)
         assert(math.abs(xmin - (-10)) < 0.001)
         assert(math.abs(ymax - 20) < 0.001)
-        luna.particles.setRadialAcceleration(id, 5, 50)
-        local rmin, rmax = luna.particles.getRadialAcceleration(id)
+        lurek.particles.setRadialAcceleration(id, 5, 50)
+        local rmin, rmax = lurek.particles.getRadialAcceleration(id)
         assert(math.abs(rmin - 5) < 0.001)
         assert(math.abs(rmax - 50) < 0.001)
-        luna.particles.setTangentialAcceleration(id, -30, 30)
-        local tmin, tmax = luna.particles.getTangentialAcceleration(id)
+        lurek.particles.setTangentialAcceleration(id, -30, 30)
+        local tmin, tmax = lurek.particles.getTangentialAcceleration(id)
         assert(math.abs(tmin - (-30)) < 0.001)
         assert(math.abs(tmax - 30) < 0.001)
-        luna.particles.setLinearDamping(id, 1, 3)
-        local dmin, dmax = luna.particles.getLinearDamping(id)
+        lurek.particles.setLinearDamping(id, 1, 3)
+        local dmin, dmax = lurek.particles.getLinearDamping(id)
         assert(math.abs(dmin - 1) < 0.001)
         assert(math.abs(dmax - 3) < 0.001)
         "#,
@@ -870,9 +870,9 @@ fn lua_sizes_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setSizes(id, 1, 5, 10, 2)
-        local sizes = luna.particles.getSizes(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setSizes(id, 1, 5, 10, 2)
+        local sizes = lurek.particles.getSizes(id)
         assert(#sizes == 4)
         assert(math.abs(sizes[1] - 1) < 0.001)
         assert(math.abs(sizes[4] - 2) < 0.001)
@@ -887,9 +887,9 @@ fn lua_colors_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setColors(id, {1, 0, 0, 1}, {0, 1, 0, 0.5}, {0, 0, 1, 0})
-        local colors = luna.particles.getColors(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setColors(id, {1, 0, 0, 1}, {0, 1, 0, 0.5}, {0, 0, 1, 0})
+        local colors = lurek.particles.getColors(id)
         assert(#colors == 3)
         assert(math.abs(colors[1][1] - 1) < 0.001, "first color red")
         assert(math.abs(colors[2][2] - 1) < 0.001, "second color green")
@@ -905,19 +905,19 @@ fn lua_rotation_spin_variation() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setRotation(id, 0, 6.28)
-        local rmin, rmax = luna.particles.getRotation(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setRotation(id, 0, 6.28)
+        local rmin, rmax = lurek.particles.getRotation(id)
         assert(math.abs(rmin - 0) < 0.001)
         assert(math.abs(rmax - 6.28) < 0.001)
-        luna.particles.setSpin(id, -5, 5)
-        local smin, smax = luna.particles.getSpin(id)
+        lurek.particles.setSpin(id, -5, 5)
+        local smin, smax = lurek.particles.getSpin(id)
         assert(math.abs(smin - (-5)) < 0.001)
         assert(math.abs(smax - 5) < 0.001)
-        luna.particles.setSpinVariation(id, 0.5)
-        assert(math.abs(luna.particles.getSpinVariation(id) - 0.5) < 0.001)
-        luna.particles.setSizeVariation(id, 0.8)
-        assert(math.abs(luna.particles.getSizeVariation(id) - 0.8) < 0.001)
+        lurek.particles.setSpinVariation(id, 0.5)
+        assert(math.abs(lurek.particles.getSpinVariation(id) - 0.5) < 0.001)
+        lurek.particles.setSizeVariation(id, 0.8)
+        assert(math.abs(lurek.particles.getSizeVariation(id) - 0.8) < 0.001)
         "#,
     )
     .exec()
@@ -929,10 +929,10 @@ fn lua_relative_rotation_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        assert(not luna.particles.hasRelativeRotation(id))
-        luna.particles.setRelativeRotation(id, true)
-        assert(luna.particles.hasRelativeRotation(id))
+        local id = lurek.particles.newSystem()
+        assert(not lurek.particles.hasRelativeRotation(id))
+        lurek.particles.setRelativeRotation(id, true)
+        assert(lurek.particles.hasRelativeRotation(id))
         "#,
     )
     .exec()
@@ -944,9 +944,9 @@ fn lua_emission_area() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setEmissionArea(id, "ellipse", 100, 50, 0.5, true)
-        local dist, w, h, angle, rel = luna.particles.getEmissionArea(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setEmissionArea(id, "ellipse", 100, 50, 0.5, true)
+        local dist, w, h, angle, rel = lurek.particles.getEmissionArea(id)
         assert(dist == "ellipse")
         assert(math.abs(w - 100) < 0.001)
         assert(math.abs(h - 50) < 0.001)
@@ -963,12 +963,12 @@ fn lua_insert_mode() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        assert(luna.particles.getInsertMode(id) == "top")
-        luna.particles.setInsertMode(id, "bottom")
-        assert(luna.particles.getInsertMode(id) == "bottom")
-        luna.particles.setInsertMode(id, "random")
-        assert(luna.particles.getInsertMode(id) == "random")
+        local id = lurek.particles.newSystem()
+        assert(lurek.particles.getInsertMode(id) == "top")
+        lurek.particles.setInsertMode(id, "bottom")
+        assert(lurek.particles.getInsertMode(id) == "bottom")
+        lurek.particles.setInsertMode(id, "random")
+        assert(lurek.particles.getInsertMode(id) == "random")
         "#,
     )
     .exec()
@@ -980,10 +980,10 @@ fn lua_buffer_size() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ maxParticles = 100 })
-        assert(luna.particles.getBufferSize(id) == 100)
-        luna.particles.setBufferSize(id, 50)
-        assert(luna.particles.getBufferSize(id) == 50)
+        local id = lurek.particles.newSystem({ maxParticles = 100 })
+        assert(lurek.particles.getBufferSize(id) == 100)
+        lurek.particles.setBufferSize(id, 50)
+        assert(lurek.particles.getBufferSize(id) == 50)
         "#,
     )
     .exec()
@@ -995,9 +995,9 @@ fn lua_offset() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setOffset(id, 16, 16)
-        local ox, oy = luna.particles.getOffset(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setOffset(id, 16, 16)
+        local ox, oy = lurek.particles.getOffset(id)
         assert(math.abs(ox - 16) < 0.001)
         assert(math.abs(oy - 16) < 0.001)
         "#,
@@ -1013,12 +1013,12 @@ fn lua_gravity_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({ gravityX = 10, gravityY = 20 })
-        local gx, gy = luna.particles.getGravity(id)
+        local id = lurek.particles.newSystem({ gravityX = 10, gravityY = 20 })
+        local gx, gy = lurek.particles.getGravity(id)
         assert(math.abs(gx - 10) < 0.001)
         assert(math.abs(gy - 20) < 0.001)
-        luna.particles.setGravity(id, -5, 100)
-        gx, gy = luna.particles.getGravity(id)
+        lurek.particles.setGravity(id, -5, 100)
+        gx, gy = lurek.particles.getGravity(id)
         assert(math.abs(gx - (-5)) < 0.001)
         assert(math.abs(gy - 100) < 0.001)
         "#,
@@ -1032,9 +1032,9 @@ fn lua_alphas_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
-        luna.particles.setAlphas(id, 1.0, 0.5, 0.0)
-        local alphas = luna.particles.getAlphas(id)
+        local id = lurek.particles.newSystem()
+        lurek.particles.setAlphas(id, 1.0, 0.5, 0.0)
+        local alphas = lurek.particles.getAlphas(id)
         assert(#alphas == 3)
         assert(math.abs(alphas[1] - 1.0) < 0.001)
         assert(math.abs(alphas[2] - 0.5) < 0.001)
@@ -1050,10 +1050,10 @@ fn lua_alphas_config() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             alphaKeyframes = {1.0, 0.8, 0.3, 0.0}
         })
-        local alphas = luna.particles.getAlphas(id)
+        local alphas = lurek.particles.getAlphas(id)
         assert(#alphas == 4)
         assert(math.abs(alphas[1] - 1.0) < 0.001)
         assert(math.abs(alphas[4] - 0.0) < 0.001)
@@ -1068,35 +1068,35 @@ fn lua_emission_shape_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
+        local id = lurek.particles.newSystem()
         -- Default is point
-        local shape = luna.particles.getEmissionShape(id)
+        local shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "point")
 
         -- Set to circle
-        luna.particles.setEmissionShape(id, "circle", { radius = 25.0, fill = false })
-        shape = luna.particles.getEmissionShape(id)
+        lurek.particles.setEmissionShape(id, "circle", { radius = 25.0, fill = false })
+        shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "circle")
         assert(math.abs(shape.radius - 25.0) < 0.001)
         assert(shape.fill == false)
 
         -- Set to rectangle
-        luna.particles.setEmissionShape(id, "rectangle", { width = 100, height = 50 })
-        shape = luna.particles.getEmissionShape(id)
+        lurek.particles.setEmissionShape(id, "rectangle", { width = 100, height = 50 })
+        shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "rectangle")
         assert(math.abs(shape.width - 100) < 0.001)
         assert(math.abs(shape.height - 50) < 0.001)
 
         -- Set to ring
-        luna.particles.setEmissionShape(id, "ring", { innerRadius = 5, outerRadius = 15 })
-        shape = luna.particles.getEmissionShape(id)
+        lurek.particles.setEmissionShape(id, "ring", { innerRadius = 5, outerRadius = 15 })
+        shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "ring")
         assert(math.abs(shape.innerRadius - 5) < 0.001)
         assert(math.abs(shape.outerRadius - 15) < 0.001)
 
         -- Set back to point
-        luna.particles.setEmissionShape(id, "point")
-        shape = luna.particles.getEmissionShape(id)
+        lurek.particles.setEmissionShape(id, "point")
+        shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "point")
         "#,
     )
@@ -1109,12 +1109,12 @@ fn lua_emission_shape_config() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             emissionShape = "circle",
             emissionShapeRadius = 30.0,
             emissionShapeFill = true
         })
-        local shape = luna.particles.getEmissionShape(id)
+        local shape = lurek.particles.getEmissionShape(id)
         assert(shape.type == "circle")
         assert(math.abs(shape.radius - 30.0) < 0.001)
         assert(shape.fill == true)
@@ -1129,15 +1129,15 @@ fn lua_relative_mode_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem()
+        local id = lurek.particles.newSystem()
         -- Default is detached
-        assert(luna.particles.getRelativeMode(id) == "detached")
+        assert(lurek.particles.getRelativeMode(id) == "detached")
 
-        luna.particles.setRelativeMode(id, "attached")
-        assert(luna.particles.getRelativeMode(id) == "attached")
+        lurek.particles.setRelativeMode(id, "attached")
+        assert(lurek.particles.getRelativeMode(id) == "attached")
 
-        luna.particles.setRelativeMode(id, "detached")
-        assert(luna.particles.getRelativeMode(id) == "detached")
+        lurek.particles.setRelativeMode(id, "detached")
+        assert(lurek.particles.getRelativeMode(id) == "detached")
         "#,
     )
     .exec()
@@ -1149,10 +1149,10 @@ fn lua_relative_mode_config() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local id = luna.particles.newSystem({
+        local id = lurek.particles.newSystem({
             relativeMode = "attached"
         })
-        assert(luna.particles.getRelativeMode(id) == "attached")
+        assert(lurek.particles.getRelativeMode(id) == "attached")
         "#,
     )
     .exec()
@@ -1164,7 +1164,7 @@ fn oo_gravity_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem()
+        local ps = lurek.particles.newSystem()
         ps:setGravity(0, 9.8)
         local gx, gy = ps:getGravity()
         assert(math.abs(gx) < 0.001)
@@ -1180,7 +1180,7 @@ fn oo_alphas_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem()
+        local ps = lurek.particles.newSystem()
         ps:setAlphas(1.0, 0.0)
         local alphas = ps:getAlphas()
         assert(#alphas == 2)
@@ -1197,7 +1197,7 @@ fn oo_emission_shape_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem()
+        local ps = lurek.particles.newSystem()
         ps:setEmissionShape("line", { length = 40, angle = 1.57 })
         local shape = ps:getEmissionShape()
         assert(shape.type == "line")
@@ -1214,7 +1214,7 @@ fn oo_relative_mode_api() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem()
+        local ps = lurek.particles.newSystem()
         ps:setRelativeMode("attached")
         assert(ps:getRelativeMode() == "attached")
         ps:setRelativeMode("detached")
@@ -1230,7 +1230,7 @@ fn oo_clone_method() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem({
+        local ps = lurek.particles.newSystem({
             emissionRate = 42,
             gravityX = 5,
             gravityY = 10
@@ -1508,7 +1508,7 @@ fn particle_lua_setshape_getshape_round_trip() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem({ maxParticles = 10 })
+        local ps = lurek.particles.newSystem({ maxParticles = 10 })
         local shapes = {"square", "circle", "triangle", "spark", "diamond"}
         for _, s in ipairs(shapes) do
             ps:setShape(s)
@@ -1526,7 +1526,7 @@ fn particle_lua_setshape_invalid_raises_error() {
     let result = lua
         .load(
             r#"
-        local ps = luna.particles.newSystem({ maxParticles = 10 })
+        local ps = lurek.particles.newSystem({ maxParticles = 10 })
         ps:setShape("hexagon")
         "#,
         )
@@ -1548,7 +1548,7 @@ fn particle_lua_default_shape_is_square() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local ps = luna.particles.newSystem({ maxParticles = 10 })
+        local ps = lurek.particles.newSystem({ maxParticles = 10 })
         assert(ps:getShape() == "square", "default shape should be square, got " .. ps:getShape())
         "#,
     )

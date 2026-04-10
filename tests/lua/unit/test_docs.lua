@@ -1,5 +1,31 @@
 -- tests/lua/test_docs.lua
 -- BDD tests for lurek.docs.* documentation management API
+-- @covers lurek.docs.coverage
+-- @covers lurek.docs.coverageModule
+-- @covers lurek.docs.describe
+-- @covers lurek.docs.getCatalog
+-- @covers lurek.docs.quality
+-- @covers lurek.docs.resetCatalog
+-- @covers lurek.docs.scan
+-- @covers lurek.docs.scanModule
+-- @covers lurek.docs.setParamInfo
+-- @covers lurek.docs.setReturnInfo
+-- @covers lurek.docs.validate
+-- @covers lurek.docs.validateModule
+-- @covers lurek.test.bar
+-- @covers lurek.test.foo
+-- @covers lurek.test.func
+-- @covers lurek.test.func2
+-- @covers lurek.test.g1
+-- @covers lurek.test.json
+-- @covers lurek.test.ms
+-- @covers lurek.test.q1
+-- @covers lurek.test.scored
+-- @covers lurek.test.sum
+-- @covers lurek.test.tt
+-- @covers lurek.test.w1
+-- @covers lurek.test.w2
+
 
 describe("lurek.docs", function()
 

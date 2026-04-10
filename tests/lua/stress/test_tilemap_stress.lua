@@ -1,5 +1,9 @@
 -- Lurek2D Stress Test: Large Tilemap Operations
 -- Tests creating and manipulating large tilemaps at scale
+-- @stress lurek.tilemap.newChunkMap
+-- @stress lurek.tilemap.newTileMap
+-- @stress lurek.tilemap.newTileSet
+
 
 describe("tilemap stress: large map creation", function()
     it("creates a 500x500 tilemap and fills it", function()

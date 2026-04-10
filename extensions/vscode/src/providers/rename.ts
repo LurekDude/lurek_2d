@@ -59,8 +59,8 @@ function doPrepareRename(
         return undefined;
     }
 
-    // Don't rename luna.* API names
-    if (isLunaApiName(document, position, word.text, apiData)) {
+    // Don't rename lurek.* API names
+    if (isLurekApiName(document, position, word.text, apiData)) {
         return undefined;
     }
 
@@ -85,7 +85,7 @@ function doRename(
 
     const word = getWordAt(document, position);
     if (!word || LUA_KEYWORDS.has(word.text)) return undefined;
-    if (isLunaApiName(document, position, word.text, apiData)) return undefined;
+    if (isLurekApiName(document, position, word.text, apiData)) return undefined;
 
     const symbolName = word.text;
     const info = analyzer.analyze(text);
@@ -152,7 +152,7 @@ function getWordAt(document: vscode.TextDocument, position: vscode.Position): Wo
     return { text: document.getText(range), range };
 }
 
-function isLunaApiName(
+function isLurekApiName(
     document: vscode.TextDocument,
     position: vscode.Position,
     word: string,
@@ -161,16 +161,16 @@ function isLunaApiName(
     const lineText = document.lineAt(position.line).text;
     const wordStart = position.character;
 
-    // Check if preceded by `luna.` or `luna.xxx.`
+    // Check if preceded by `lurek.` or `lurek.xxx.`
     const beforeWord = lineText.substring(0, wordStart);
-    if (/luna\.\w*\.?$/.test(beforeWord)) {
+    if (/lurek\.\w*\.?$/.test(beforeWord)) {
         // Check if it's a known API function
         const fn = apiData.getAllFunctions().find(f => f.name === word);
         if (fn) return true;
     }
 
-    // `luna` itself
-    if (word === 'luna') {
+    // `lurek` itself
+    if (word === 'lurek') {
         return true;
     }
 

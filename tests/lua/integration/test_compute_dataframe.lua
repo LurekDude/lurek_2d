@@ -1,5 +1,16 @@
 -- Lurek2D Integration Test: Compute + DataFrame
 -- Tests NdArray statistical operations feeding into DataFrame reports
+-- @covers lurek.compute.fromTable
+-- @covers lurek.compute.ones
+-- @covers lurek.compute.range
+-- @covers lurek.data.compress
+-- @covers lurek.data.decode
+-- @covers lurek.data.decompress
+-- @covers lurek.data.encode
+-- @covers lurek.data.hash
+-- @covers lurek.dataframe.newDataFrame
+-- @covers lurek.img.newImageData
+
 
 describe("integration: compute statistics to dataframe", function()
     it("compute array stats populate dataframe", function()

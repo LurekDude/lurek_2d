@@ -6,7 +6,7 @@ import * as fs from "fs";
  * Runs all tests (cargo test).
  */
 export function testAll(): void {
-  const terminal = getOrCreateTerminal("Luna Tests");
+  const terminal = getOrCreateTerminal("Lurek2D Tests");
   terminal.show();
   terminal.sendText("cargo test");
 }
@@ -15,7 +15,7 @@ export function testAll(): void {
  * Runs a specific Rust test module.
  */
 export function testModule(moduleName: string): void {
-  const terminal = getOrCreateTerminal("Luna Tests");
+  const terminal = getOrCreateTerminal("Lurek2D Tests");
   terminal.show();
   terminal.sendText(`cargo test ${moduleName}_tests`);
 }
@@ -24,7 +24,7 @@ export function testModule(moduleName: string): void {
  * Runs all Lua integration tests.
  */
 export function testLuaAll(): void {
-  const terminal = getOrCreateTerminal("Luna Tests");
+  const terminal = getOrCreateTerminal("Lurek2D Tests");
   terminal.show();
   terminal.sendText("cargo test --test lua_tests");
 }
@@ -33,7 +33,7 @@ export function testLuaAll(): void {
  * Runs golden (snapshot) tests.
  */
 export function testLuaGolden(): void {
-  const terminal = getOrCreateTerminal("Luna Tests");
+  const terminal = getOrCreateTerminal("Lurek2D Tests");
   terminal.show();
   terminal.sendText("cargo test --test golden_tests");
 }
@@ -117,7 +117,7 @@ if failed > 0 then error(failed .. " test(s) failed") end
 
     const skeleton = `//! Integration tests for the \`${moduleName}\` module.
 
-use luna2d::${moduleName};
+use lurek2d::${moduleName};
 
 fn make_test_state() {
     // TODO: set up any required state here

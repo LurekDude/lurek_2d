@@ -1,5 +1,18 @@
 -- Lurek2D Validation Test: Invalid API Arguments
 -- Tests that API functions handle bad inputs without crashing
+-- @security lurek.compute.zeros
+-- @security lurek.dataframe.newDataFrame
+-- @security lurek.entity.newUniverse
+-- @security lurek.graph.newGraph
+-- @security lurek.img.newImageData
+-- @security lurek.physics.destroyWorld
+-- @security lurek.physics.newBody
+-- @security lurek.physics.newWorld
+-- @security lurek.physics.setBodyVelocity
+-- @security lurek.physics.step
+-- @security lurek.tilemap.newTileMap
+-- @security lurek.tilemap.newTileSet
+
 
 describe("validation: physics invalid args", function()
     it("rejects nil world ID", function()

@@ -31,7 +31,7 @@ interface JsonRpcResponse {
  * stdout. It implements the MCP initialize, tools/list, and tools/call
  * methods.
  *
- * @param workspaceRoot - Absolute path to the Luna2D workspace root.
+ * @param workspaceRoot - Absolute path to the Lurek2D workspace root.
  * @returns A handle with a `kill()` method to shut down the server.
  */
 export function startMcpServer(workspaceRoot: string): { kill: () => void } {
@@ -47,7 +47,7 @@ export function startMcpServer(workspaceRoot: string): { kill: () => void } {
  * Runs the MCP server on stdio.
  *
  * This is the entry point when the server is launched as a standalone
- * process (e.g., `node out/mcp/server.js --workspace /path/to/luna2d`).
+ * process (e.g., `node out/mcp/server.js --workspace /path/to/lurek2d`).
  *
  * Reads newline-delimited JSON-RPC messages from stdin and writes
  * responses to stdout.
@@ -113,7 +113,7 @@ async function handleRequest(
           protocolVersion: "2024-11-05",
           capabilities: { tools: {} },
           serverInfo: {
-            name: "luna2d-mcp",
+            name: "lurek2d-mcp",
             version: "0.1.0",
           },
         },
@@ -206,12 +206,12 @@ function buildToolRegistry(
   } = require("./tools");
 
   const registry = new Map<string, ToolHandler>();
-  registry.set("luna2d.runExample", handleRunExample(workspaceRoot));
-  registry.set("luna2d.getApiDoc", handleGetApiDoc(workspaceRoot));
-  registry.set("luna2d.listExamples", handleListExamples(workspaceRoot));
-  registry.set("luna2d.runLuaTest", handleRunLuaTest(workspaceRoot));
-  registry.set("luna2d.checkBuild", handleCheckBuild(workspaceRoot));
-  registry.set("luna2d.getLogs", handleGetLogs(workspaceRoot));
+  registry.set("lurek2d.runExample", handleRunExample(workspaceRoot));
+  registry.set("lurek2d.getApiDoc", handleGetApiDoc(workspaceRoot));
+  registry.set("lurek2d.listExamples", handleListExamples(workspaceRoot));
+  registry.set("lurek2d.runLuaTest", handleRunLuaTest(workspaceRoot));
+  registry.set("lurek2d.checkBuild", handleCheckBuild(workspaceRoot));
+  registry.set("lurek2d.getLogs", handleGetLogs(workspaceRoot));
   return registry;
 }
 

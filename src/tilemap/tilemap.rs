@@ -885,6 +885,81 @@ impl TileMap {
         }
         None
     }
+
+
+    // ------------------------------------------------------------------
+    // Visualization
+    // ------------------------------------------------------------------
+
+    /// Render all layers to an image using default colors per tile GID.
+    ///
+    /// Each tile is drawn as a `tile_size × tile_size` block. Empty tiles
+    /// (GID 0) use a dark background, GID 1 uses green, GID 2 darker green,
+    /// and object GIDs (≥ 10) are drawn as colored circles. Tile borders are
+    /// drawn for the bottom layer.
+    ///
+    /// # Parameters
+    /// - `tile_size` — `u32`. Pixel size of each tile cell.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, tile_size: u32) -> crate::image::ImageData {
+        if self.layers.is_empty() {
+            return crate::image::ImageData::new(1, 1);
+        }
+        let lw = self.layers[0].width;
+        let lh = self.layers[0].height;
+        let mut img = crate::image::ImageData::new(lw * tile_size, lh * tile_size);
+        img.fill(20, 20, 30, 255);
+
+        for (li, layer) in self.layers.iter().enumerate() {
+            let w = layer.width.min(lw);
+            let h = layer.height.min(lh);
+            for y in 0..h {
+                for x in 0..w {
+                    let idx = layer.index(x, y).unwrap_or(0);
+                    let gid = layer.tiles[idx];
+                    if gid == 0 && li > 0 {
+                        continue; // transparent on upper layers
+                    }
+                    if gid >= 10 {
+                        // Object tile — draw as a circle
+                        let (r, g, b) = match gid {
+                            10 => (200u8, 50, 50),
+                            11 => (50, 50, 200),
+                            12 => (200, 200, 50),
+                            _ => (255, 255, 255),
+                        };
+                        let cx = (x * tile_size + tile_size / 2) as i32;
+                        let cy = (y * tile_size + tile_size / 2) as i32;
+                        img.draw_circle(cx, cy, 6, r, g, b, 255);
+                    } else {
+                        let (r, g, b) = match gid {
+                            1 => (80u8, 160, 80),
+                            2 => (60, 120, 60),
+                            _ => (40, 40, 40),
+                        };
+                        for py in 0..tile_size {
+                            for px in 0..tile_size {
+                                img.set_pixel(x * tile_size + px, y * tile_size + py, r, g, b, 255);
+                            }
+                        }
+                        if li == 0 {
+                            // Tile border on base layer
+                            for px in 0..tile_size {
+                                img.set_pixel(x * tile_size + px, y * tile_size, 30, 30, 50, 255);
+                            }
+                            for py in 0..tile_size {
+                                img.set_pixel(x * tile_size, y * tile_size + py, 30, 30, 50, 255);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        img
+    }
+
 }
 
 // ---------------------------------------------------------------------------
@@ -968,7 +1043,10 @@ fn sweep_aabb_vs_aabb(
         tile_y,
         t,
     })
+
+
 }
+
 
 #[cfg(test)]
 mod tests {

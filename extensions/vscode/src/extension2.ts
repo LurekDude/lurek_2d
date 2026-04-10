@@ -3,7 +3,7 @@ import * as path from "path";
 import { startMcpServer } from "./mcp/server.js";
 
 // Services
-import { LunaProcessService } from "./services/lunaProcess.js";
+import { LurekProcessService } from "./services/lurekProcess.js";
 import { StatusBarService } from "./services/statusBar.js";
 import { ApiDataService } from "./services/apiData.js";
 
@@ -46,7 +46,7 @@ import { openPerfDashboard } from "./providers/perfDashboard.js";
 import * as codeLensProvider from "./providers/codeLens.js";
 import { openWatchersPanel, addWatchFromEditor, setConnected as setWatchersConnected, setEvaluator as setWatchersEvaluator } from "./providers/debugWatchers.js";
 import { openSystemMonitor } from "./providers/systemMonitor.js";
-import { openApiUsageReport, quickInsertLunaApi } from "./providers/apiUsage.js";
+import { openApiUsageReport, quickInsertLurekApi } from "./providers/apiUsage.js";
 
 
 
@@ -90,29 +90,29 @@ import { register as registerDebugger } from "./debug/luaDebugAdapter.js";
 let mcpProcess: ReturnType<typeof startMcpServer> | undefined;
 
 /** Shared services. */
-let lunaProcess: LunaProcessService;
+let lurekProcess: LurekProcessService;
 let statusBar: StatusBarService;
 let apiData: ApiDataService;
 let debugBridge: DebugBridge;
 
 /**
- * Activates the Luna Toolkit extension.
+ * Activates the Lurek2D Toolkit extension.
  */
 export function activate(context: vscode.ExtensionContext): void {
   // ─── Services ────────────────────────────────────────────
-  lunaProcess = new LunaProcessService();
+  lurekProcess = new LurekProcessService();
   statusBar = new StatusBarService();
   apiData = new ApiDataService();
   debugBridge = new DebugBridge();
-  context.subscriptions.push(lunaProcess, statusBar, debugBridge);
+  context.subscriptions.push(lurekProcess, statusBar, debugBridge);
 
   // Load API data asynchronously (providers work with partial data until loaded)
   apiData.load(context.extensionPath).catch((err) => {
-    console.error("Failed to load Luna API data:", err);
+    console.error("Failed to load Lurek2D API data:", err);
   });
 
   // Wire status bar to process events
-  lunaProcess.onStatusChange((running) => {
+  lurekProcess.onStatusChange((running) => {
     if (running) {
       statusBar.setRunning();
     } else {
@@ -126,9 +126,9 @@ export function activate(context: vscode.ExtensionContext): void {
   const aiTools = new AiToolsProvider();
 
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider("luna.projectTools", projectTools),
-    vscode.window.registerTreeDataProvider("luna.devTools", devTools),
-    vscode.window.registerTreeDataProvider("luna.aiCopilot", aiTools)
+    vscode.window.registerTreeDataProvider("lurek.projectTools", projectTools),
+    vscode.window.registerTreeDataProvider("lurek.devTools", devTools),
+    vscode.window.registerTreeDataProvider("lurek.aiCopilot", aiTools)
   );
 
   // ─── Language Providers (IntelliSense) ───────────────────
@@ -161,17 +161,17 @@ export function activate(context: vscode.ExtensionContext): void {
   // ─── Asset Explorer Tree View ────────────────────────────
   const assetExplorer = new AssetExplorerProvider();
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider("luna.assetExplorer", assetExplorer),
+    vscode.window.registerTreeDataProvider("lurek.assetExplorer", assetExplorer),
   );
 
   // ─── Run Commands ────────────────────────────────────────
-  registerCommand(context, "luna.runGame", () => runGame(lunaProcess));
-  registerCommand(context, "luna.stopGame", () => stopGame(lunaProcess));
-  registerCommand(context, "luna.runWithArgs", () => runWithArgs(lunaProcess));
-  registerCommand(context, "luna.runExample", () => runExample(lunaProcess));
+  registerCommand(context, "lurek.runGame", () => runGame(lurekProcess));
+  registerCommand(context, "lurek.stopGame", () => stopGame(lurekProcess));
+  registerCommand(context, "lurek.runWithArgs", () => runWithArgs(lurekProcess));
+  registerCommand(context, "lurek.runExample", () => runExample(lurekProcess));
 
   // ─── Test Commands ───────────────────────────────────────
-  registerCommand(context, "luna.test.all", () => testAll());
+  registerCommand(context, "lurek.test.all", () => testAll());
 
   // Rust module tests
   const rustModules = [
@@ -183,21 +183,21 @@ export function activate(context: vscode.ExtensionContext): void {
     "stats", "thread", "tilemap", "timer",
   ];
   for (const mod of rustModules) {
-    registerCommand(context, `luna.test.rust.${mod}`, () => testModule(mod));
+    registerCommand(context, `lurek.test.rust.${mod}`, () => testModule(mod));
   }
 
-  registerCommand(context, "luna.test.lua.all", () => testLuaAll());
-  registerCommand(context, "luna.test.lua.golden", () => testLuaGolden());
+  registerCommand(context, "lurek.test.lua.all", () => testLuaAll());
+  registerCommand(context, "lurek.test.lua.golden", () => testLuaGolden());
 
   // Test generator commands (Phase 4)
   registerTestCommands(context);
 
   // ─── Scaffold Commands ───────────────────────────────────
-  registerCommand(context, "luna.scaffold.project", () => scaffoldProject());
-  registerCommand(context, "luna.scaffold.file", () => scaffoldFile());
+  registerCommand(context, "lurek.scaffold.project", () => scaffoldProject());
+  registerCommand(context, "lurek.scaffold.file", () => scaffoldFile());
 
   // ─── Refactor Commands ───────────────────────────────────
-  registerCommand(context, "luna.extractToModuleFile",
+  registerCommand(context, "lurek.extractToModuleFile",
     async (...args: unknown[]) => {
       const uri = args[0] as vscode.Uri | undefined;
       const range = args[1] as vscode.Range | undefined;
@@ -223,32 +223,32 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   // ─── Package Commands ────────────────────────────────────
-  registerCommand(context, "luna.package.zip", () => packageZip());
-  registerCommand(context, "luna.package.windows", () => packageWindows());
-  registerCommand(context, "luna.package.linux", () => packageLinux());
+  registerCommand(context, "lurek.package.zip", () => packageZip());
+  registerCommand(context, "lurek.package.windows", () => packageWindows());
+  registerCommand(context, "lurek.package.linux", () => packageLinux());
 
   // ─── Editor Commands ─────────────────────────────────────
   context.subscriptions.push(...registerEditorCommands(context));
 
   // ─── Asset Explorer Commands ─────────────────────────────
-  registerCommand(context, "luna.assets.refresh", () => assetExplorer.refresh());
-  registerCommand(context, "luna.assets.openPanel", () => {
-    vscode.window.showInformationMessage("Asset Explorer is in the sidebar under Luna2D.");
+  registerCommand(context, "lurek.assets.refresh", () => assetExplorer.refresh());
+  registerCommand(context, "lurek.assets.openPanel", () => {
+    vscode.window.showInformationMessage("Asset Explorer is in the sidebar under Lurek2D.");
   });
-  registerCommand(context, "luna.assets.findMissing", () => findMissingAssets());
-  registerCommand(context, "luna.assets.insertPath", (item: unknown) => {
+  registerCommand(context, "lurek.assets.findMissing", () => findMissingAssets());
+  registerCommand(context, "lurek.assets.insertPath", (item: unknown) => {
     if (item instanceof AssetItem) insertAssetPath(item);
   });
 
   // ─── Performance Dashboard Commands ─────────────────────
-  registerCommand(context, "luna.perf.openDashboard", () => openPerfDashboard(context));
-  registerCommand(context, "luna.perf.clearHistory", () => {
+  registerCommand(context, "lurek.perf.openDashboard", () => openPerfDashboard(context));
+  registerCommand(context, "lurek.perf.clearHistory", () => {
     const { clearHistory } = require("./providers/perfDashboard.js") as typeof import("./providers/perfDashboard.js");
     clearHistory();
   });
-  registerCommand(context, "luna.perf.openHotReload", () => {
+  registerCommand(context, "lurek.perf.openHotReload", () => {
     const panel = vscode.window.createWebviewPanel(
-      "luna.hotReload", "Hot-Reload History", vscode.ViewColumn.Two,
+      "lurek.hotReload", "Hot-Reload History", vscode.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true }
     );
     const events: { time: string; file: string; status: string }[] = [];
@@ -269,11 +269,11 @@ export function activate(context: vscode.ExtensionContext): void {
   });
 
   // ─── Dependency Graph Commands ───────────────────────────
-  registerCommand(context, "luna.deps.showGraph", () => depGraph(context));
-  registerCommand(context, "luna.deps.findCircular", async () => {
+  registerCommand(context, "lurek.deps.showGraph", () => depGraph(context));
+  registerCommand(context, "lurek.deps.findCircular", async () => {
     const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!wsRoot) { vscode.window.showErrorMessage("No workspace folder open."); return; }
-    const out = vscode.window.createOutputChannel("Luna Circular Deps");
+    const out = vscode.window.createOutputChannel("Lurek2D Circular Deps");
     out.show(true);
     out.appendLine("\uD83D\uDD0D Scanning for circular dependencies...");
     const nodeFsModule = require("fs") as typeof import("fs");
@@ -301,10 +301,10 @@ export function activate(context: vscode.ExtensionContext): void {
     if (sccs.length === 0) { out.appendLine("\u2705 No circular dependencies found."); } else { out.appendLine(`\u26A0\uFE0F  Found ${sccs.length} circular dependency cycle(s):`); sccs.forEach((scc, i) => out.appendLine(`  Cycle ${i+1}: ${scc.join(" \u2192 ")} \u2192 ${scc[scc.length-1]}`)); }
     out.appendLine("\nDone.");
   });
-  registerCommand(context, "luna.deps.findOrphans", async () => {
+  registerCommand(context, "lurek.deps.findOrphans", async () => {
     const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!wsRoot) { vscode.window.showErrorMessage("No workspace folder open."); return; }
-    const out = vscode.window.createOutputChannel("Luna Orphan Modules");
+    const out = vscode.window.createOutputChannel("Lurek2D Orphan Modules");
     out.show(true);
     out.appendLine("\uD83D\uDD0D Scanning for orphan modules...");
     const nodeFsModule = require("fs") as typeof import("fs");
@@ -326,11 +326,11 @@ export function activate(context: vscode.ExtensionContext): void {
   codeLensProvider.register(context, apiData);
 
   // ─── Debug Watchers + System Monitor ────────────────────
-  registerCommand(context, "luna.debug.openWatchers", () => openWatchersPanel(context));
-  registerCommand(context, "luna.debug.openInspector", () => {
+  registerCommand(context, "lurek.debug.openWatchers", () => openWatchersPanel(context));
+  registerCommand(context, "lurek.debug.openInspector", () => {
     const panel = vscode.window.createWebviewPanel(
-      "lunaVariableInspector",
-      "Luna Variable Inspector",
+      "lurekVariableInspector",
+      "Lurek2D Variable Inspector",
       vscode.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true }
     );
@@ -381,7 +381,7 @@ export function activate(context: vscode.ExtensionContext): void {
         let value = "(not connected — run game with debug bridge)";
         let type = "?";
         try {
-          const { DebugBridge } = await import("./debug/debugBridge");
+          const { DebugBridge } = await import("./services/debugBridge");
           if (DebugBridge.instance?.isConnected()) {
             const result = await DebugBridge.instance.evaluate(msg.expr);
             value = result?.resultString ?? "(nil)";
@@ -396,19 +396,16 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     }, undefined, context.subscriptions);
   });
-  registerCommand(context, "luna.debug.openCallStack", () => {
+  registerCommand(context, "lurek.debug.openCallStack", () => {
     vscode.window.showInformationMessage("Call stack available when connected to the Lua debug bridge.");
   });
-  registerCommand(context, "luna.debug.addWatch", () => {
+  registerCommand(context, "lurek.debug.addWatch", () => {
     const editor = vscode.window.activeTextEditor;
     if (editor) addWatchFromEditor(editor);
   });
-  registerCommand(context, "luna.system.openMonitor", () => openSystemMonitor(context));
-  registerCommand(context, "luna.api.usageReport", () => openApiUsageReport(context));
-  registerCommand(context, "luna.api.quickInsert", () => quickInsertLunaApi(apiData));
-  registerCommand(context, "luna.codeLens.toggle", () =>
-    vscode.commands.executeCommand("luna.codeLens.toggle"),
-  );
+  registerCommand(context, "lurek.system.openMonitor", () => openSystemMonitor(context));
+  registerCommand(context, "lurek.api.usageReport", () => openApiUsageReport(context));
+  registerCommand(context, "lurek.api.quickInsert", () => quickInsertLurekApi(apiData));
 
   // Wire watchers to debug bridge events (if debug bridge exposes events)
   if (typeof (debugBridge as unknown as { onConnected?: (fn: () => void) => void }).onConnected === "function") {
@@ -430,13 +427,13 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   // ─── Reference Commands ──────────────────────────────────
-  registerCommand(context, "luna.browseApi", () => browseApi());
-  registerCommand(context, "luna.openApiDocs", () => openApiDocs());
-  registerCommand(context, "luna.openWiki", () => openWiki());
-  registerCommand(context, "luna.depGraph", () => depGraph(context));
-  registerCommand(context, "luna.depList", () => depList());
-  registerCommand(context, "luna.apiCoverage", () => {
-    const terminal = vscode.window.createTerminal("Luna API Coverage");
+  registerCommand(context, "lurek.browseApi", () => browseApi());
+  registerCommand(context, "lurek.openApiDocs", () => openApiDocs());
+  registerCommand(context, "lurek.openWiki", () => openWiki());
+  registerCommand(context, "lurek.depGraph", () => depGraph(context));
+  registerCommand(context, "lurek.depList", () => depList());
+  registerCommand(context, "lurek.apiCoverage", () => {
+    const terminal = vscode.window.createTerminal("Lurek2D API Coverage");
     terminal.show();
     terminal.sendText("python tools/integration_coverage.py");
   });
@@ -447,16 +444,16 @@ export function activate(context: vscode.ExtensionContext): void {
   // ─── DAP Lua Debugger ────────────────────────────────────
   registerDebugger(context);
 
-  // ── luna.debug.runAndConnect — start game then auto-connect ──
-  registerCommand(context, "luna.debug.runAndConnect", async () => {
-    await runGame(lunaProcess);
+  // ── lurek.debug.runAndConnect — start game then auto-connect ──
+  registerCommand(context, "lurek.debug.runAndConnect", async () => {
+    await runGame(lurekProcess);
     // Give the engine a moment to boot before trying to connect
     await new Promise<void>((res) => setTimeout(res, 1500));
     const ok = await debugBridge.connect();
     if (ok) {
-      vscode.commands.executeCommand("setContext", "luna.debugConnected", true);
+      vscode.commands.executeCommand("setContext", "lurek.debugConnected", true);
       debugBridge.startStatsPolling();
-      vscode.window.showInformationMessage("Luna2D started and debug bridge connected.");
+      vscode.window.showInformationMessage("Lurek2D started and debug bridge connected.");
     } else {
       vscode.window.showWarningMessage(
         "Game launched but debug bridge could not connect. Is debug bridge enabled in conf.lua?"
@@ -464,15 +461,15 @@ export function activate(context: vscode.ExtensionContext): void {
     }
   });
 
-  // ── luna.debug.performance — live engine stats webview ───────
-  registerCommand(context, "luna.debug.performance", () => {
+  // ── lurek.debug.performance — live engine stats webview ───────
+  registerCommand(context, "lurek.debug.performance", () => {
     if (!debugBridge.isConnected) {
-      vscode.window.showErrorMessage("Not connected to Luna2D engine. Run 'Luna: Debug Connect' first.");
+      vscode.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
     const panel = vscode.window.createWebviewPanel(
-      "luna.debugPerf",
-      "Luna2D Live Performance",
+      "lurek.debugPerf",
+      "Lurek2D Live Performance",
       vscode.ViewColumn.Two,
       { enableScripts: true, retainContextWhenHidden: true },
     );
@@ -511,15 +508,15 @@ window.addEventListener('resize',draw);
     panel.onDidDispose(() => clearInterval(perfInterval));
   });
 
-  // ── luna.debug.printHistory — show debug output channel ──────
-  registerCommand(context, "luna.debug.printHistory", () => {
+  // ── lurek.debug.printHistory — show debug output channel ──────
+  registerCommand(context, "lurek.debug.printHistory", () => {
     debugBridge.showOutput();
   });
 
-  // ── luna.debug.screenshot — save screenshot from engine ──────
-  registerCommand(context, "luna.debug.screenshot", async () => {
+  // ── lurek.debug.screenshot — save screenshot from engine ──────
+  registerCommand(context, "lurek.debug.screenshot", async () => {
     if (!debugBridge.isConnected) {
-      vscode.window.showErrorMessage("Not connected to Luna2D engine. Run 'Luna: Debug Connect' first.");
+      vscode.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
     try {
@@ -542,10 +539,10 @@ window.addEventListener('resize',draw);
     }
   });
 
-  // ── luna.debug.callStack — show current Lua call stack ───────
-  registerCommand(context, "luna.debug.callStack", async () => {
+  // ── lurek.debug.callStack — show current Lua call stack ───────
+  registerCommand(context, "lurek.debug.callStack", async () => {
     if (!debugBridge.isConnected) {
-      vscode.window.showErrorMessage("Not connected to Luna2D engine. Run 'Luna: Debug Connect' first.");
+      vscode.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
       return;
     }
     try {
@@ -583,48 +580,48 @@ window.addEventListener('resize',draw);
     }
   });
 
-  // ── luna.debug.status — connection status info ────────────────
-  registerCommand(context, "luna.debug.status", async () => {
+  // ── lurek.debug.status — connection status info ────────────────
+  registerCommand(context, "lurek.debug.status", async () => {
     const info = debugBridge.getStatusInfo();
     if (!info.connected) {
       const choice = await vscode.window.showInformationMessage(
-        `Luna2D debug bridge: NOT connected (port ${info.port})`,
+        `Lurek2D debug bridge: NOT connected (port ${info.port})`,
         "Connect Now",
         "Dismiss",
       );
       if (choice === "Connect Now") {
-        vscode.commands.executeCommand("luna.debug.connect");
+        vscode.commands.executeCommand("lurek.debug.connect");
       }
     } else {
       try {
         const stats = await debugBridge.getStats();
         vscode.window.showInformationMessage(
-          `Luna2D connected on port ${info.port} · FPS: ${stats.fps} · Draw calls: ${stats.drawCalls} · Memory: ${(stats.memory / 1024 / 1024).toFixed(1)} MB`,
+          `Lurek2D connected on port ${info.port} · FPS: ${stats.fps} · Draw calls: ${stats.drawCalls} · Memory: ${(stats.memory / 1024 / 1024).toFixed(1)} MB`,
         );
       } catch {
-        vscode.window.showInformationMessage(`Luna2D debug bridge connected on port ${info.port}.`);
+        vscode.window.showInformationMessage(`Lurek2D debug bridge connected on port ${info.port}.`);
       }
     }
   });
 
   // ─── CAG Commands ────────────────────────────────────────
-  registerCommand(context, "luna.cag.install", () => installCag());
-  registerCommand(context, "luna.cag.selectAgent", () => selectAgent());
-  registerCommand(context, "luna.cag.selectSkill", () => selectSkill());
-  registerCommand(context, "luna.cag.selectPrompt", () => selectPrompt());
-  registerCommand(context, "luna.cag.update", () => {
+  registerCommand(context, "lurek.cag.install", () => installCag());
+  registerCommand(context, "lurek.cag.selectAgent", () => selectAgent());
+  registerCommand(context, "lurek.cag.selectSkill", () => selectSkill());
+  registerCommand(context, "lurek.cag.selectPrompt", () => selectPrompt());
+  registerCommand(context, "lurek.cag.update", () => {
     vscode.window.showInformationMessage(
       "CAG update is not yet implemented."
     );
   });
 
   // ─── MCP Commands ────────────────────────────────────────
-  registerCommand(context, "luna.mcp.install", () => {
+  registerCommand(context, "lurek.mcp.install", () => {
     vscode.window.showInformationMessage(
       "MCP server installation is not yet implemented."
     );
   });
-  registerCommand(context, "luna.mcp.status", () => {
+  registerCommand(context, "lurek.mcp.status", () => {
     vscode.window.showInformationMessage(
       mcpProcess ? "MCP server is running." : "MCP server is not running."
     );
@@ -632,12 +629,12 @@ window.addEventListener('resize',draw);
 
   // ─── Game Jam Commands (Phase 5a) ─────────────────────────
   registerGameJamCommands(context);
-  registerCommand(context, "luna.jam.quickBuild", () => {
-    const terminal = vscode.window.createTerminal("Luna Quick Build");
+  registerCommand(context, "lurek.jam.quickBuild", () => {
+    const terminal = vscode.window.createTerminal("Lurek2D Quick Build");
     terminal.show();
     terminal.sendText("cargo build --release");
   });
-  registerCommand(context, "luna.jam.checklist", () => {
+  registerCommand(context, "lurek.jam.checklist", () => {
     vscode.window.showInformationMessage(
       "Submission Checklist is not yet implemented."
     );
@@ -649,15 +646,15 @@ window.addEventListener('resize',draw);
   // ─── Game Dev CAG Commands ────────────────────────────────
   registerGameDevCagCommands(context);
 
-  // ─── Legacy Backward Compat (luna2d.* → luna.*) ─────────
-  registerCommand(context, "luna2d.runExample", () => runExample(lunaProcess));
-  registerCommand(context, "luna2d.listExamples", () => runExample(lunaProcess));
-  registerCommand(context, "luna2d.checkBuild", () => {
-    const terminal = vscode.window.createTerminal("Luna Build Check");
+  // ─── Legacy Backward Compat (lurek2d.* → lurek.*) ─────────
+  registerCommand(context, "lurek2d.runExample", () => runExample(lurekProcess));
+  registerCommand(context, "lurek2d.listExamples", () => runExample(lurekProcess));
+  registerCommand(context, "lurek2d.checkBuild", () => {
+    const terminal = vscode.window.createTerminal("Lurek2D Build Check");
     terminal.show();
     terminal.sendText("cargo check");
   });
-  registerCommand(context, "luna2d.getApiDoc", () => browseApi());
+  registerCommand(context, "lurek2d.getApiDoc", () => browseApi());
 
   // ─── MCP Server ──────────────────────────────────────────
   const workspaceRoot = getWorkspaceRoot();
@@ -671,9 +668,9 @@ window.addEventListener('resize',draw);
   // ─── Settings Change Listener ──────────────────────────
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("luna.luaVersion")) {
+      if (e.affectsConfiguration("lurek.luaVersion")) {
         apiData.load(context.extensionPath).catch((err) => {
-          console.error("Failed to reload Luna API data:", err);
+          console.error("Failed to reload Lurek2D API data:", err);
         });
         configureLuaWorkspaceLibrary(context);
       }
@@ -681,7 +678,7 @@ window.addEventListener('resize',draw);
   );
 
   // ─── Context Keys ───────────────────────────────────────
-  vscode.commands.executeCommand("setContext", "luna.gameRunning", false);
+  vscode.commands.executeCommand("setContext", "lurek.gameRunning", false);
 }
 
 /**
@@ -710,8 +707,8 @@ function getWorkspaceRoot(): string | undefined {
 }
 
 /**
- * Configures lua-language-server (sumneko.lua) to include the luna2d LuaCATS
- * type definitions and sets the Lua runtime version to match luna.luaVersion.
+ * Configures lua-language-server (sumneko.lua) to include the lurek2d LuaCATS
+ * type definitions and sets the Lua runtime version to match lurek.luaVersion.
  */
 function configureLuaWorkspaceLibrary(context: vscode.ExtensionContext): void {
   const annotationsDir = path.join(context.extensionPath, "data");
@@ -726,11 +723,11 @@ function configureLuaWorkspaceLibrary(context: vscode.ExtensionContext): void {
       .then(undefined, () => {/* ignore if not installed */});
   }
 
-  // Sync Lua.runtime.version to luna.luaVersion
-  const lunaVersion = vscode.workspace
-    .getConfiguration("luna")
+  // Sync Lua.runtime.version to lurek.luaVersion
+  const lurekVersion = vscode.workspace
+    .getConfiguration("lurek")
     .get<string>("luaVersion", "luajit");
-  const runtimeVersion = lunaVersion === "lua54" ? "Lua 5.4" : "LuaJIT";
+  const runtimeVersion = lurekVersion === "lua54" ? "Lua 5.4" : "LuaJIT";
   luaConfig
     .update("runtime.version", runtimeVersion, vscode.ConfigurationTarget.Global)
     .then(undefined, () => {/* ignore if not installed */});

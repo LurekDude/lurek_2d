@@ -445,7 +445,67 @@ impl ParticleSystem {
             particles: instances,
         }]
     }
+
+    // ------------------------------------------------------------------
+    // Visualization
+    // ------------------------------------------------------------------
+
+    /// Render all live particles to an image as colored circles.
+    ///
+    /// Each particle is drawn with its color interpolated from age. The emitter
+    /// position is marked with a white dot.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`. Output image width.
+    /// - `height` — `u32`. Output image height.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(15, 15, 25, 255);
+        let w = width as i32;
+        let h = height as i32;
+        for p in &self.particles {
+            if p.life > 0.0 {
+                let px = (p.x + self.emitter_x) as i32;
+                let py = (p.y + self.emitter_y) as i32;
+                if px < -10 || px > w + 10 || py < -10 || py > h + 10 {
+                    continue;
+                }
+                let t = 1.0 - (p.life / p.max_life);
+                let r = (255.0 * (1.0 - t * 0.5)) as u8;
+                let g = (128.0 * (1.0 - t)) as u8;
+                let b = 0u8;
+                let size = (4.0f32 * (1.0 - t)).max(1.0) as i32;
+                // Safe circle draw
+                let y0 = (py - size).max(0);
+                let y1 = (py + size + 1).min(h);
+                let x0 = (px - size).max(0);
+                let x1 = (px + size + 1).min(w);
+                let r2 = (size * size) as i64;
+                for sy in y0..y1 {
+                    let dy = (sy - py) as i64;
+                    for sx in x0..x1 {
+                        let dx = (sx - px) as i64;
+                        if dx * dx + dy * dy <= r2 {
+                            img.set_pixel(sx as u32, sy as u32, r, g, b, 200);
+                        }
+                    }
+                }
+            }
+        }
+        // Emitter marker
+        img.draw_circle(
+            self.emitter_x as i32,
+            self.emitter_y as i32,
+            3, 255, 255, 255, 255,
+        );
+        img
+    }
+
 }
+
 
 #[cfg(test)]
 mod tests {

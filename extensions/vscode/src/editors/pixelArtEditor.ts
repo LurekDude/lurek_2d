@@ -7,7 +7,7 @@ export class PixelArtEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.pixelArt", "Pixel Art Editor");
+    super(context, "lurek.editor.pixelArt", "Pixel Art Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

@@ -1,5 +1,13 @@
 -- Lurek2D Stress Test: Physics Collision Storm
 -- Tests mass body creation, extended simulation, and collision detection
+-- @stress lurek.physics.getBody
+-- @stress lurek.physics.getCollisions
+-- @stress lurek.physics.newBody
+-- @stress lurek.physics.newCircleBody
+-- @stress lurek.physics.newWorld
+-- @stress lurek.physics.setBodyVelocity
+-- @stress lurek.physics.step
+
 
 describe("physics stress: collision storm", function()
     it("creates 500 bodies in a confined space", function()

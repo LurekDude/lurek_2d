@@ -22,7 +22,7 @@ fn minimap_new_basic() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(64, 48)
+        local m = lurek.minimap.newMinimap(64, 48)
         assert(m:type() == "Minimap")
         assert(m:typeOf("Minimap"))
         assert(m:typeOf("Object"))
@@ -38,7 +38,7 @@ fn minimap_new_with_display_size() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(100, 80, 200, 160)
+        local m = lurek.minimap.newMinimap(100, 80, 200, 160)
         assert(m:getDisplayWidth() == 200)
         assert(m:getDisplayHeight() == 160)
     "#,
@@ -54,7 +54,7 @@ fn minimap_grid_size() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(32, 24)
+        local m = lurek.minimap.newMinimap(32, 24)
         assert(m:getGridWidth() == 32)
         assert(m:getGridHeight() == 24)
         local w, h = m:getGridSize()
@@ -72,7 +72,7 @@ fn minimap_display_size() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(64, 64)
+        local m = lurek.minimap.newMinimap(64, 64)
         m:setDisplaySize(256, 128)
         assert(m:getDisplayWidth() == 256)
         assert(m:getDisplayHeight() == 128)
@@ -91,7 +91,7 @@ fn minimap_terrain() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         -- default terrain is 0
         assert(m:getTerrain(1, 1) == 0)
         m:setTerrain(3, 4, 5)
@@ -107,7 +107,7 @@ fn minimap_terrain_color() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setTerrainColor(1, 0.2, 0.4, 0.6, 0.8)
         local r, g, b, a = m:getTerrainColor(1)
         assert(math.abs(r - 0.2) < 0.001)
@@ -125,7 +125,7 @@ fn minimap_terrain_color_default_alpha() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setTerrainColor(2, 0.1, 0.2, 0.3)
         local r, g, b, a = m:getTerrainColor(2)
         assert(math.abs(a - 1.0) < 0.001, "alpha should default to 1.0")
@@ -142,7 +142,7 @@ fn minimap_fog_toggle() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(not m:isFogEnabled())
         m:setFogEnabled(true)
         assert(m:isFogEnabled())
@@ -159,7 +159,7 @@ fn minimap_fog_level() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         -- default fog level is 0 (hidden)
         assert(m:getFogLevel(1, 1) == 0)
         m:setFogLevel(2, 3, 2) -- visible
@@ -177,7 +177,7 @@ fn minimap_fog_color() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setFogColor(0.1, 0.2, 0.3, 0.5)
         local r, g, b, a = m:getFogColor()
         assert(math.abs(r - 0.1) < 0.001)
@@ -195,7 +195,7 @@ fn minimap_fog_data_bulk() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(3, 3)
+        local m = lurek.minimap.newMinimap(3, 3)
         -- setFogData expects a flat table of w*h values, row-major, 1-based
         m:setFogData({
             2, 1, 0,
@@ -221,7 +221,7 @@ fn minimap_object_types() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(m:getObjectTypeCount() == 0)
         local idx = m:addObjectType("unit", 1.0, 0.0, 0.0)
         assert(idx == 1) -- 1-based
@@ -240,7 +240,7 @@ fn minimap_object_type_visibility() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         local idx = m:addObjectType("unit", 1.0, 0.0, 0.0)
         assert(m:isObjectTypeVisible(idx))
         m:setObjectTypeVisible(idx, false)
@@ -258,7 +258,7 @@ fn minimap_objects() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(100, 100)
+        local m = lurek.minimap.newMinimap(100, 100)
         local idx = m:addObjectType("unit", 1.0, 0.0, 0.0)
         assert(m:getObjectCount() == 0)
         m:setObject(1, 50.0, 60.0, idx)
@@ -283,7 +283,7 @@ fn minimap_owner_colors() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setOwnerColor(1, 0.0, 0.0, 1.0, 0.9)
         local r, g, b, a = m:getOwnerColor(1)
         assert(math.abs(r - 0.0) < 0.001)
@@ -303,7 +303,7 @@ fn minimap_color_mode() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(m:getColorMode() == "terrain")
         m:setColorMode("political")
         assert(m:getColorMode() == "political")
@@ -321,7 +321,7 @@ fn minimap_color_mode_invalid() {
     let result = lua
         .load(
             r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setColorMode("invalid")
     "#,
         )
@@ -336,7 +336,7 @@ fn minimap_zoom() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(math.abs(m:getZoom() - 1.0) < 0.001)
         m:setZoom(2.5)
         assert(math.abs(m:getZoom() - 2.5) < 0.001)
@@ -351,7 +351,7 @@ fn minimap_center() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setCenter(5.0, 3.0)
         local cx, cy = m:getCenter()
         assert(math.abs(cx - 5.0) < 0.001)
@@ -369,7 +369,7 @@ fn minimap_viewport_rect() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(100, 100)
+        local m = lurek.minimap.newMinimap(100, 100)
         -- initially nil
         assert(m:getViewportRect() == nil)
         m:setViewportRect(10, 20, 30, 40)
@@ -389,7 +389,7 @@ fn minimap_viewport_visible() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(m:isViewportVisible())
         m:setViewportVisible(false)
         assert(not m:isViewportVisible())
@@ -404,7 +404,7 @@ fn minimap_viewport_color() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setViewportColor(0.5, 0.6, 0.7, 0.3)
         local r, g, b, a = m:getViewportColor()
         assert(math.abs(r - 0.5) < 0.001)
@@ -424,7 +424,7 @@ fn minimap_pings() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(m:getPingCount() == 0)
         m:addPing(5, 5, 2.0)
         assert(m:getPingCount() == 1)
@@ -441,7 +441,7 @@ fn minimap_pings_expire() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:addPing(5, 5, 1.0)
         assert(m:getPingCount() == 1)
         m:update(0.5)
@@ -461,7 +461,7 @@ fn minimap_markers() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(m:getMarkerCount() == 0)
         local id = m:addMarker(3.0, 4.0, "Objective A")
         assert(m:getMarkerCount() == 1)
@@ -484,7 +484,7 @@ fn minimap_marker_with_color() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         local id = m:addMarker(1.0, 2.0, "Quest", 0.0, 1.0, 0.0, 0.5)
         assert(m:hasMarker(id))
         assert(m:getMarkerDescription(id) == "Quest")
@@ -501,7 +501,7 @@ fn minimap_anti_alias() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         assert(not m:isAntiAlias())
         m:setAntiAlias(true)
         assert(m:isAntiAlias())
@@ -518,7 +518,7 @@ fn minimap_coord_conversion() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10, 100, 100)
+        local m = lurek.minimap.newMinimap(10, 10, 100, 100)
         -- grid (0,0) at minimap position (0,0) should map to screen (0,0)
         local sx, sy = m:gridToScreen(0, 0, 0, 0)
         assert(type(sx) == "number")
@@ -540,7 +540,7 @@ fn minimap_update() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         -- just ensure it doesn't crash
         m:update(0.016)
         m:update(0.033)
@@ -557,7 +557,7 @@ fn minimap_full_workflow() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(32, 32, 200, 200)
+        local m = lurek.minimap.newMinimap(32, 32, 200, 200)
 
         -- Set terrain
         for x = 1, 32 do
@@ -628,7 +628,7 @@ fn minimap_terrain_data_bulk() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(3, 2)
+        local m = lurek.minimap.newMinimap(3, 2)
         -- 3x2 grid, row-major: row 1 = types 1,2,3; row 2 = types 4,5,6
         m:setTerrainData({1, 2, 3, 4, 5, 6})
         assert(m:getTerrain(1, 1) == 1)
@@ -650,7 +650,7 @@ fn minimap_tile_descriptions() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(5, 5)
+        local m = lurek.minimap.newMinimap(5, 5)
         assert(m:getTileDescription(0) == nil)
         m:setTileDescription(0, "Water")
         m:setTileDescription(1, "Grass")
@@ -674,7 +674,7 @@ fn minimap_hover_info() {
     lua.load(
         r#"
         -- 4x4 grid, 100x100 display, centered at (2,2)
-        local m = luna.minimap.newMinimap(4, 4, 100, 100)
+        local m = lurek.minimap.newMinimap(4, 4, 100, 100)
         m:setTerrainData({1,1,1,1, 1,2,2,1, 1,2,2,1, 1,1,1,1})
         m:setTileDescription(1, "Plains")
         m:setTileDescription(2, "Forest")
@@ -688,7 +688,7 @@ fn minimap_hover_info() {
         assert(info == "Plains", "expected Plains got " .. tostring(info))
 
         -- terrain type with no description → nil
-        local m2 = luna.minimap.newMinimap(4, 4, 100, 100)
+        local m2 = lurek.minimap.newMinimap(4, 4, 100, 100)
         m2:setTerrain(1, 1, 99)
         assert(m2:getHoverInfo(1, 1, 0, 0) == nil)
     "#,
@@ -704,7 +704,7 @@ fn minimap_clickable() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         -- default is true
         assert(m:isClickable())
         m:setClickable(false)
@@ -724,7 +724,7 @@ fn minimap_center_individual_getters() {
     let lua = make_vm();
     lua.load(
         r#"
-        local m = luna.minimap.newMinimap(10, 10)
+        local m = lurek.minimap.newMinimap(10, 10)
         m:setCenter(3.5, 7.25)
         assert(math.abs(m:getCenterX() - 3.5) < 0.001)
         assert(math.abs(m:getCenterY() - 7.25) < 0.001)

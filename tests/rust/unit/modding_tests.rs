@@ -93,7 +93,7 @@ fn test_lua_new_mod_basic() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({ id = "my-mod" })
+        local m = lurek.modding.newMod({ id = "my-mod" })
         assert(m:getId() == "my-mod")
         assert(m:getName() == "my-mod")
         assert(m:getVersion() == "1.0.0")
@@ -112,7 +112,7 @@ fn test_lua_new_mod_with_fields() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({
+        local m = lurek.modding.newMod({
             id = "adv",
             name = "Adventure",
             version = "3.1.0",
@@ -141,7 +141,7 @@ fn test_lua_mod_enable_disable() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({ id = "toggle" })
+        local m = lurek.modding.newMod({ id = "toggle" })
         assert(m:isEnabled() == true)
         m:setEnabled(false)
         assert(m:isEnabled() == false)
@@ -158,7 +158,7 @@ fn test_lua_mod_hooks() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({ id = "hooked" })
+        local m = lurek.modding.newMod({ id = "hooked" })
         assert(m:hasHook("init") == false)
         local called = false
         m:setHook("init", function() called = true end)
@@ -181,7 +181,7 @@ fn test_lua_mod_config() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({ id = "cfg" })
+        local m = lurek.modding.newMod({ id = "cfg" })
         assert(m:getConfig() == nil)
         m:setConfig({ volume = 0.8, fullscreen = true })
         local c = m:getConfig()
@@ -200,7 +200,7 @@ fn test_lua_mod_release_refs() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local m = luna.modding.newMod({ id = "cleanup" })
+        local m = lurek.modding.newMod({ id = "cleanup" })
         m:setHook("a", function() end)
         m:setHook("b", function() end)
         m:setConfig({ x = 1 })
@@ -219,9 +219,9 @@ fn test_lua_mod_manager_basic() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local mgr = luna.modding.newModManager()
+        local mgr = lurek.modding.newModManager()
         assert(mgr:getModCount() == 0)
-        local m = luna.modding.newMod({ id = "test" })
+        local m = lurek.modding.newMod({ id = "test" })
         mgr:registerMod(m)
         assert(mgr:getModCount() == 1)
         assert(mgr:hasMod("test") == true)
@@ -239,10 +239,10 @@ fn test_lua_mod_manager_load_order() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local mgr = luna.modding.newModManager()
-        mgr:registerMod(luna.modding.newMod({ id = "z", priority = 10 }))
-        mgr:registerMod(luna.modding.newMod({ id = "a", priority = 1 }))
-        mgr:registerMod(luna.modding.newMod({ id = "m", priority = 5 }))
+        local mgr = lurek.modding.newModManager()
+        mgr:registerMod(lurek.modding.newMod({ id = "z", priority = 10 }))
+        mgr:registerMod(lurek.modding.newMod({ id = "a", priority = 1 }))
+        mgr:registerMod(lurek.modding.newMod({ id = "m", priority = 5 }))
         local order = mgr:getLoadOrder()
         assert(#order == 3)
         assert(order[1].id == "a")
@@ -259,12 +259,12 @@ fn test_lua_mod_manager_validate_deps() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local mgr = luna.modding.newModManager()
-        mgr:registerMod(luna.modding.newMod({ id = "a", dependencies = {"missing"} }))
+        local mgr = lurek.modding.newModManager()
+        mgr:registerMod(lurek.modding.newMod({ id = "a", dependencies = {"missing"} }))
         local missing = mgr:validateDependencies()
         assert(#missing == 1)
         assert(missing[1] == "missing")
-        mgr:registerMod(luna.modding.newMod({ id = "missing" }))
+        mgr:registerMod(lurek.modding.newMod({ id = "missing" }))
         local missing2 = mgr:validateDependencies()
         assert(#missing2 == 0)
     "#,
@@ -278,14 +278,14 @@ fn test_lua_mod_manager_circular_deps() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local mgr = luna.modding.newModManager()
-        mgr:registerMod(luna.modding.newMod({ id = "a", dependencies = {"b"} }))
-        mgr:registerMod(luna.modding.newMod({ id = "b", dependencies = {"a"} }))
+        local mgr = lurek.modding.newModManager()
+        mgr:registerMod(lurek.modding.newMod({ id = "a", dependencies = {"b"} }))
+        mgr:registerMod(lurek.modding.newMod({ id = "b", dependencies = {"a"} }))
         assert(mgr:hasCircularDependencies() == true)
 
-        local mgr2 = luna.modding.newModManager()
-        mgr2:registerMod(luna.modding.newMod({ id = "x", dependencies = {"y"} }))
-        mgr2:registerMod(luna.modding.newMod({ id = "y" }))
+        local mgr2 = lurek.modding.newModManager()
+        mgr2:registerMod(lurek.modding.newMod({ id = "x", dependencies = {"y"} }))
+        mgr2:registerMod(lurek.modding.newMod({ id = "y" }))
         assert(mgr2:hasCircularDependencies() == false)
     "#,
     )
@@ -298,9 +298,9 @@ fn test_lua_mod_manager_get_all_mods() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local mgr = luna.modding.newModManager()
-        mgr:registerMod(luna.modding.newMod({ id = "alpha" }))
-        mgr:registerMod(luna.modding.newMod({ id = "beta" }))
+        local mgr = lurek.modding.newModManager()
+        mgr:registerMod(lurek.modding.newMod({ id = "alpha" }))
+        mgr:registerMod(lurek.modding.newMod({ id = "beta" }))
         local all = mgr:getAllMods()
         assert(#all == 2)
         assert(all[1].id == "alpha")

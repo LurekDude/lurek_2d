@@ -8,9 +8,9 @@ use std::rc::Rc;
 
 use crate::engine::resource_keys::*;
 use crate::engine::ScreenshotRequest;
-use crate::graphic::shape::{CompoundShape, ShapeCommand};
-use crate::graphic::sprite_batch::BatchEntry;
-use crate::graphic::{
+use crate::graphics::shape::{CompoundShape, ShapeCommand};
+use crate::graphics::sprite_batch::BatchEntry;
+use crate::graphics::{
     BlendMode, Canvas, CompareMode, DepthMode, DrawCommand, DrawMode, Font, Mesh, MeshDrawMode,
     MeshVertex, Shader, SpriteBatch, StencilAction, StencilMode, TextAlign, Texture, UniformValue,
 };

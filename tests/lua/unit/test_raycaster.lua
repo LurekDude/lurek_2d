@@ -1,5 +1,7 @@
 -- Lurek2D Lua BDD tests for lurek.raycaster
 -- Headless: no GPU, no audio, no window.
+-- @covers lurek.raycaster.new
+
 
 describe("lurek.raycaster", function()
     describe("module interface", function()

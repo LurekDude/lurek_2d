@@ -225,6 +225,8 @@ pub struct ModulesConfig {
     pub spine: bool,
     /// Enable lurek.terminal text-mode terminal emulator API.
     pub terminal: bool,
+    /// Enable lurek.parallax multi-layer scrolling background API.
+    pub parallax: bool,
 }
 
 impl ModulesConfig {
@@ -253,6 +255,10 @@ impl ModulesConfig {
             if self.overlay {
                 log_msg!(warn, L050_MODULE_DEP_DISABLED, "overlay requires graphics");
                 self.overlay = false;
+            }
+            if self.parallax {
+                log_msg!(warn, L050_MODULE_DEP_DISABLED, "parallax requires graphics");
+                self.parallax = false;
             }
             if self.terminal {
                 log_msg!(warn, L050_MODULE_DEP_DISABLED, "terminal requires graphics");
@@ -338,6 +344,7 @@ impl Default for Config {
                 raycaster: true,
                 spine: true,
                 terminal: true,
+                parallax: true,
             },
             performance: PerformanceConfig {
                 target_fps: 60,
@@ -470,19 +477,139 @@ impl Config {
         };
 
         let lua = Lua::new();
-        let eval_result = lua.load(&code).set_name("conf.lua").eval::<LuaValue>();
-        let config = match eval_result {
-            Ok(LuaValue::Table(t)) => Self::read_config_table(&t, config),
-            Ok(_) => {
-                // conf.lua did not return a table — no config to merge
-                config
-            }
-            Err(e) => {
-                log_msg!(warn, L052_CONF_PARSE_ERR, "{}", e);
-                return (config, Some(format!("Error in conf.lua: {}", e)));
-            }
+
+        // Set up the `lurek` global so conf.lua can define `function lurek.conf(t)`.
+        let lurek_table = match lua.create_table() {
+            Ok(t) => t,
+            Err(e) => return (config, Some(format!("Lua table creation failed: {e}"))),
         };
+        if let Err(e) = lua.globals().set("lurek", lurek_table.clone()) {
+            return (config, Some(format!("Failed to set lurek global: {e}")));
+        }
+
+        // Execute conf.lua — it either defines `lurek.conf(t)` or returns a table.
+        let eval_result = lua.load(&code).set_name("conf.lua").eval::<LuaValue>();
+
+        // Strategy 1: conf.lua returned a table directly → read it.
+        if let Ok(LuaValue::Table(t)) = &eval_result {
+            return (Self::read_config_table(t, config), None);
+        }
+
+        // If eval failed because conf.lua defines a function (no return), try exec.
+        if eval_result.is_err() {
+            if let Err(e) = lua.load(&code).set_name("conf.lua").exec() {
+                log_msg!(warn, L052_CONF_PARSE_ERR, "{}", e);
+                return (config, Some(format!("Error in conf.lua: {e}")));
+            }
+        }
+
+        // Strategy 2: conf.lua defined `function lurek.conf(t)` — call it.
+        if let Ok(conf_fn) = lurek_table.get::<_, mlua::Function>("conf") {
+            let config_table = match Self::build_config_table(&lua, &config) {
+                Ok(t) => t,
+                Err(e) => return (config, Some(format!("Failed to build config table: {e}"))),
+            };
+            if let Err(e) = conf_fn.call::<_, ()>(config_table.clone()) {
+                log_msg!(warn, L052_CONF_PARSE_ERR, "{}", e);
+                return (config, Some(format!("Error calling lurek.conf: {e}")));
+            }
+            return (Self::read_config_table(&config_table, config), None);
+        }
+
+        // conf.lua evaluated without error but returned nothing and defined no callback.
         (config, None)
+    }
+
+    /// Build a Lua table pre-populated with the current config defaults,
+    /// suitable for passing to `lurek.conf(t)`.
+    fn build_config_table<'a>(lua: &'a Lua, config: &Config) -> mlua::Result<LuaTable<'a>> {
+        let t = lua.create_table()?;
+
+        // window sub-table
+        let window = lua.create_table()?;
+        window.set("title", config.window.title.as_str())?;
+        window.set("width", config.window.width)?;
+        window.set("height", config.window.height)?;
+        window.set("vsync", config.window.vsync)?;
+        window.set("fullscreen", config.window.fullscreen)?;
+        window.set("resizable", config.window.resizable)?;
+        window.set("minwidth", config.window.min_width.unwrap_or(0))?;
+        window.set("minheight", config.window.min_height.unwrap_or(0))?;
+        window.set("borderless", config.window.borderless)?;
+        window.set("icon", config.window.icon.as_deref().unwrap_or(""))?;
+        window.set("displayindex", config.window.display_index)?;
+        window.set("scalemode", config.window.scale_mode.as_str())?;
+        window.set("gamewidth", config.window.game_width.unwrap_or(0))?;
+        window.set("gameheight", config.window.game_height.unwrap_or(0))?;
+        window.set("maximized", config.window.maximized)?;
+        t.set("window", window)?;
+
+        // graphics sub-table
+        let graphics = lua.create_table()?;
+        graphics.set("backend", config.graphics.backend.as_str())?;
+        graphics.set(
+            "power_preference",
+            config.graphics.power_preference.as_str(),
+        )?;
+        t.set("graphics", graphics)?;
+
+        // modules sub-table
+        let modules = lua.create_table()?;
+        modules.set("audio", config.modules.audio)?;
+        modules.set("physics", config.modules.physics)?;
+        modules.set("graphics", config.modules.graphics)?;
+        modules.set("input", config.modules.input)?;
+        modules.set("timer", config.modules.timer)?;
+        modules.set("filesystem", config.modules.filesystem)?;
+        modules.set("window", config.modules.window)?;
+        modules.set("particle", config.modules.particle)?;
+        modules.set("image", config.modules.image)?;
+        modules.set("gui", config.modules.gui)?;
+        modules.set("overlay", config.modules.overlay)?;
+        modules.set("tilemap", config.modules.tilemap)?;
+        modules.set("scene", config.modules.scene)?;
+        modules.set("savegame", config.modules.savegame)?;
+        modules.set("entity", config.modules.entity)?;
+        modules.set("ai", config.modules.ai)?;
+        modules.set("pathfinding", config.modules.pathfinding)?;
+        modules.set("thread", config.modules.thread)?;
+        modules.set("graph", config.modules.graph)?;
+        modules.set("data", config.modules.data)?;
+        modules.set("compute", config.modules.compute)?;
+        modules.set("minimap", config.modules.minimap)?;
+        modules.set("modding", config.modules.modding)?;
+        modules.set("pipeline", config.modules.pipeline)?;
+        modules.set("system", config.modules.system)?;
+        modules.set("localization", config.modules.localization)?;
+        modules.set("debug", config.modules.debug)?;
+        modules.set("animation", config.modules.animation)?;
+        modules.set("tween", config.modules.tween)?;
+        modules.set("camera", config.modules.camera)?;
+        modules.set("network", config.modules.network)?;
+        modules.set("procgen", config.modules.procgen)?;
+        modules.set("raycaster", config.modules.raycaster)?;
+        modules.set("spine", config.modules.spine)?;
+        modules.set("terminal", config.modules.terminal)?;
+        t.set("modules", modules)?;
+
+        // performance sub-table
+        let performance = lua.create_table()?;
+        performance.set("target_fps", config.performance.target_fps)?;
+        performance.set("physics_tick_rate", config.performance.physics_tick_rate)?;
+        t.set("performance", performance)?;
+
+        // top-level fields
+        t.set("identity", config.identity.as_deref().unwrap_or(""))?;
+        t.set("version", config.version.as_deref().unwrap_or(""))?;
+
+        // log sub-table
+        let log_tbl = lua.create_table()?;
+        log_tbl.set("file", config.log_file.as_deref().unwrap_or(""))?;
+        log_tbl.set("append", config.log_append)?;
+        log_tbl.set("level", config.log_level.as_deref().unwrap_or(""))?;
+        t.set("log", log_tbl)?;
+
+        Ok(t)
     }
 
     fn read_config_table(t: &LuaTable, default: Config) -> Config {

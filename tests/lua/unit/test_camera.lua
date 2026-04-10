@@ -1,5 +1,7 @@
 -- Lurek2D Lua BDD tests for lurek.camera
 -- Headless: no GPU, no audio, no window.
+-- @covers lurek.camera.new
+
 
 describe("lurek.camera", function()
     describe("module interface", function()

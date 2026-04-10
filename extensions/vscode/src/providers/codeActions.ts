@@ -46,13 +46,13 @@ function getCodeActions(
     // ── Diagnostic-driven quick fixes ──
     for (const diag of actionContext.diagnostics) {
         switch (diag.code) {
-            case 'luna.unusedRequire':
+            case 'lurek.unusedRequire':
                 actions.push(...createRemoveUnusedRequire(document, diag));
                 break;
-            case 'luna.missingCallback':
+            case 'lurek.missingCallback':
                 actions.push(...createGenerateCallbacks(document, diag));
                 break;
-            case 'luna.colorRange':
+            case 'lurek.colorRange':
                 actions.push(...createConvertColorRange(document, diag));
                 break;
         }
@@ -74,7 +74,7 @@ function getCodeActions(
         && !lineText.trimStart().startsWith('local ')
         && !lineText.trimStart().startsWith('function ')
         && !lineText.trimStart().startsWith('--')
-        && !lineText.includes('luna.')
+        && !lineText.includes('lurek.')
         && !lineText.includes('.')
         && !lineText.includes(':')
     ) {
@@ -146,33 +146,33 @@ function createGenerateCallbacks(
     const text = document.getText();
     const missing: string[] = [];
 
-    if (!/function\s+luna\.load\s*\(/.test(text) && !/luna\.load\s*=\s*function/.test(text)) {
+    if (!/function\s+lurek\.load\s*\(/.test(text) && !/lurek\.load\s*=\s*function/.test(text)) {
         missing.push('load');
     }
-    if (!/function\s+luna\.update\s*\(/.test(text) && !/luna\.update\s*=\s*function/.test(text)) {
+    if (!/function\s+lurek\.update\s*\(/.test(text) && !/lurek\.update\s*=\s*function/.test(text)) {
         missing.push('update');
     }
-    if (!/function\s+luna\.draw\s*\(/.test(text) && !/luna\.draw\s*=\s*function/.test(text)) {
+    if (!/function\s+lurek\.draw\s*\(/.test(text) && !/lurek\.draw\s*=\s*function/.test(text)) {
         missing.push('draw');
     }
 
     if (missing.length === 0) return [];
 
     const action = new vscode.CodeAction(
-        'Generate Luna2D callbacks',
+        'Generate Lurek2D callbacks',
         vscode.CodeActionKind.QuickFix,
     );
     action.edit = new vscode.WorkspaceEdit();
 
     const stubs: string[] = [];
     if (missing.includes('load')) {
-        stubs.push('function luna.load()\n    -- Initialize game\nend');
+        stubs.push('function lurek.load()\n    -- Initialize game\nend');
     }
     if (missing.includes('update')) {
-        stubs.push('function luna.update(dt)\n    -- Update game logic\nend');
+        stubs.push('function lurek.update(dt)\n    -- Update game logic\nend');
     }
     if (missing.includes('draw')) {
-        stubs.push('function luna.draw()\n    -- Draw game objects\nend');
+        stubs.push('function lurek.draw()\n    -- Draw game objects\nend');
     }
 
     const endPos = document.lineAt(document.lineCount - 1).range.end;
@@ -191,7 +191,7 @@ function createConvertColorRange(
     const text = document.getText(diag.range);
 
     const match = text.match(
-        /(luna\.graphics\.(?:setColor|setBackgroundColor|clear))\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/,
+        /(lurek\.graphics\.(?:setColor|setBackgroundColor|clear))\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/,
     );
     if (!match) return [];
 
@@ -324,7 +324,7 @@ function createExtractToFileModule(
         vscode.CodeActionKind.RefactorExtract,
     );
     action.command = {
-        command: 'luna.extractToModuleFile',
+        command: 'lurek.extractToModuleFile',
         title: 'Extract to new module file',
         arguments: [document.uri, range],
     };

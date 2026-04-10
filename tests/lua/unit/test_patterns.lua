@@ -4,6 +4,13 @@
 -- ===================================================================
 -- EventBus
 -- ===================================================================
+-- @covers lurek.patterns.newCommandStack
+-- @covers lurek.patterns.newEventBus
+-- @covers lurek.patterns.newFactory
+-- @covers lurek.patterns.newObjectPool
+-- @covers lurek.patterns.newServiceLocator
+-- @covers lurek.patterns.newSimpleState
+
 describe("lurek.patterns.newEventBus", function()
     it("creates an EventBus with type/typeOf", function()
         local bus = lurek.patterns.newEventBus()

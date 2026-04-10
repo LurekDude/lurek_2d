@@ -1,7 +1,7 @@
 ---@meta
 --- Auto-generated Lurek2D API documentation for LuaCATS.
 
-luna = {}
+lurek = {}
 
 ---@class lurek.ai
 lurek.ai = {}

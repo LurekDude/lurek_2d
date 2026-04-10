@@ -1,6 +1,33 @@
 -- Scene module Lua tests
 -- Headless-safe (no window/GPU/audio needed).
 -- lurek.scene is a module-level singleton; each describe calls lurek.scene.clear() first.
+-- @covers lurek.scene.clear
+-- @covers lurek.scene.draw
+-- @covers lurek.scene.getCurrent
+-- @covers lurek.scene.getData
+-- @covers lurek.scene.getRegistered
+-- @covers lurek.scene.getRegisteredNames
+-- @covers lurek.scene.getStackSize
+-- @covers lurek.scene.getTransitionProgress
+-- @covers lurek.scene.hasData
+-- @covers lurek.scene.hasRegistered
+-- @covers lurek.scene.isEmpty
+-- @covers lurek.scene.isTransitioning
+-- @covers lurek.scene.newDepthSorter
+-- @covers lurek.scene.pop
+-- @covers lurek.scene.process
+-- @covers lurek.scene.processLate
+-- @covers lurek.scene.processPhysics
+-- @covers lurek.scene.push
+-- @covers lurek.scene.registerScene
+-- @covers lurek.scene.removeData
+-- @covers lurek.scene.render
+-- @covers lurek.scene.renderUi
+-- @covers lurek.scene.setData
+-- @covers lurek.scene.switchTo
+-- @covers lurek.scene.unregisterScene
+-- @covers lurek.scene.update
+
 
 describe("Stack operations", function()
     it("starts empty and tracks push/pop/switchTo/clear correctly", function()

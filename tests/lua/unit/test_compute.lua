@@ -4,6 +4,12 @@
 -- =========================================================================
 -- 1. Module exists
 -- =========================================================================
+-- @covers lurek.compute.fromTable
+-- @covers lurek.compute.newArray
+-- @covers lurek.compute.ones
+-- @covers lurek.compute.range
+-- @covers lurek.compute.zeros
+
 describe("lurek.compute module exists", function()
     it("lurek.compute is a table", function()
         expect_type("table", lurek.compute)

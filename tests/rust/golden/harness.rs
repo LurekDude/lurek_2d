@@ -1,4 +1,4 @@
-//! Golden file tests — verify deterministic binary output.
+﻿//! Golden file tests — verify deterministic binary output.
 //!
 //! Creates known inputs, generates outputs, and compares against stored baselines
 //! in `tests/rust/golden/expected/`. On first run, baselines are generated automatically.
@@ -15,9 +15,9 @@ use lurek2d::data::compress::{compress, decompress, CompressFormat};
 use lurek2d::data::encode::{decode, encode, EncodeFormat};
 use lurek2d::data::hash::{hash, HashAlgorithm};
 use lurek2d::data::toml_convert::{encode_toml, parse_toml};
-use lurek2d::fx::PostFxStack;
-use lurek2d::fx::atmosphere::{CloudState, FogState, HeatHazeState, VignetteState};
-use lurek2d::fx::{FadeState, FlashState, ShakeState, WeatherState};
+use lurek2d::effect::PostFxStack;
+use lurek2d::effect::atmosphere::{CloudState, FogState, HeatHazeState, VignetteState};
+use lurek2d::effect::{FadeState, FlashState, ShakeState, WeatherState};
 use lurek2d::image::ImageData;
 use lurek2d::raycaster::Raycaster2D;
 use std::fs;
@@ -501,3 +501,4 @@ fn screenshot_raycaster_depth_map() {
     assert_eq!(img.width(), columns);
     assert_eq!(img.height(), height);
 }
+

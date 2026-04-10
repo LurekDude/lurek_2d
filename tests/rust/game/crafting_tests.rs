@@ -27,7 +27,7 @@ fn recipe_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("sword_recipe", "craft")
+        local r = lurek.crafting.newRecipe("sword_recipe", "craft")
         assert(r:type() == "Recipe", "type()")
         assert(r:typeOf("Recipe"), "typeOf")
     "#,
@@ -41,7 +41,7 @@ fn recipe_id_and_name() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("iron_sword")
+        local r = lurek.crafting.newRecipe("iron_sword")
         assert(r:getId() == "iron_sword", "id")
         r:setName("Iron Sword")
         assert(r:getName() == "Iron Sword", "name")
@@ -56,7 +56,7 @@ fn recipe_ingredients() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("potion")
+        local r = lurek.crafting.newRecipe("potion")
         r:addIngredient("herb", 3, true)
         r:addIngredient("water", 1, true)
         r:addIngredient("vial", 1, false)
@@ -76,7 +76,7 @@ fn recipe_outputs() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("sword")
+        local r = lurek.crafting.newRecipe("sword")
         r:addOutput("iron_sword", 1, "superior")
         local out = r:getOutputs()
         assert(#out == 1, "1 output")
@@ -94,7 +94,7 @@ fn recipe_time_and_station() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("armor")
+        local r = lurek.crafting.newRecipe("armor")
         r:setTime(30.0)
         r:setStationType("forge")
         r:setStationLevel(2)
@@ -112,7 +112,7 @@ fn recipe_skill_requirements() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("mithril_sword")
+        local r = lurek.crafting.newRecipe("mithril_sword")
         r:setSkill("smithing", 5)
         r:setSkillXp(25.0)
         assert(r:getSkill() == "smithing", "skill")
@@ -128,7 +128,7 @@ fn recipe_tags() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("bread")
+        local r = lurek.crafting.newRecipe("bread")
         r:addTag("food")
         r:addTag("cooking")
         assert(r:hasTag("food"), "has food")
@@ -144,7 +144,7 @@ fn recipe_enabled_toggle() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("steak")
+        local r = lurek.crafting.newRecipe("steak")
         assert(r:isEnabled(), "enabled by default")
         r:setEnabled(false)
         assert(not r:isEnabled(), "disabled")
@@ -163,7 +163,7 @@ fn registry_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
+        local reg = lurek.crafting.newRegistry()
         assert(reg:type() == "RecipeRegistry", "type()")
     "#,
     )
@@ -176,8 +176,8 @@ fn registry_add_and_get() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        local r = luna.crafting.newRecipe("potion")
+        local reg = lurek.crafting.newRegistry()
+        local r = lurek.crafting.newRecipe("potion")
         reg:add(r)
         assert(reg:count() == 1, "1 recipe")
         local got = reg:get("potion")
@@ -194,9 +194,9 @@ fn registry_remove() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        reg:add(luna.crafting.newRecipe("r1"))
-        reg:add(luna.crafting.newRecipe("r2"))
+        local reg = lurek.crafting.newRegistry()
+        reg:add(lurek.crafting.newRecipe("r1"))
+        reg:add(lurek.crafting.newRecipe("r2"))
         assert(reg:count() == 2, "2 before remove")
         reg:remove("r1")
         assert(reg:count() == 1, "1 after remove")
@@ -212,9 +212,9 @@ fn registry_ids() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
+        local reg = lurek.crafting.newRegistry()
         for _, id in ipairs({"a", "b", "c"}) do
-            reg:add(luna.crafting.newRecipe(id))
+            reg:add(lurek.crafting.newRecipe(id))
         end
         local ids = reg:getIds()
         assert(#ids == 3, "3 ids")
@@ -229,8 +229,8 @@ fn registry_find_by_output() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        local r = luna.crafting.newRecipe("sword_r")
+        local reg = lurek.crafting.newRegistry()
+        local r = lurek.crafting.newRecipe("sword_r")
         r:addOutput("iron_sword", 1, "normal")
         reg:add(r)
         local found = reg:findByOutput("iron_sword")
@@ -247,9 +247,9 @@ fn registry_for_station() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        local r1 = luna.crafting.newRecipe("anvil_r") ; r1:setStationType("anvil")
-        local r2 = luna.crafting.newRecipe("bench_r") ; r2:setStationType("workbench")
+        local reg = lurek.crafting.newRegistry()
+        local r1 = lurek.crafting.newRecipe("anvil_r") ; r1:setStationType("anvil")
+        local r2 = lurek.crafting.newRecipe("bench_r") ; r2:setStationType("workbench")
         reg:add(r1) ; reg:add(r2)
         local ids = reg:forStation("anvil")
         assert(#ids == 1, "1 anvil recipe")
@@ -269,7 +269,7 @@ fn station_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("forge", 3)
+        local s = lurek.crafting.newStation("forge", 3)
         assert(s:type() == "Station", "type()")
         assert(s:getType() == "forge", "station type")
         assert(s:getLevel() == 3, "level")
@@ -284,12 +284,12 @@ fn station_can_process_matching() {
     let lua = make_vm();
     lua.load(
         r#"
-        local station = luna.crafting.newStation("forge", 2)
-        local r = luna.crafting.newRecipe("sword")
+        local station = lurek.crafting.newStation("forge", 2)
+        local r = lurek.crafting.newRecipe("sword")
         r:setStationType("forge")
         r:setStationLevel(2)
         assert(station:canProcess(r), "can process matching recipe")
-        local r2 = luna.crafting.newRecipe("master_sword")
+        local r2 = lurek.crafting.newRecipe("master_sword")
         r2:setStationType("forge")
         r2:setStationLevel(5)
         assert(not station:canProcess(r2), "cannot process level 5 recipe")
@@ -304,8 +304,8 @@ fn station_speed_multiplier() {
     let lua = make_vm();
     lua.load(
         r#"
-        local station = luna.crafting.newStation("forge", 1)
-        local r = luna.crafting.newRecipe("shield")
+        local station = lurek.crafting.newStation("forge", 1)
+        local r = lurek.crafting.newRecipe("shield")
         r:setStationType("forge")
         r:setStationLevel(1)
         r:setTime(20.0)
@@ -325,7 +325,7 @@ fn station_active_flag() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("bench")
+        local s = lurek.crafting.newStation("bench")
         assert(s:isActive(), "active by default")
         s:setActive(false)
         assert(not s:isActive(), "inactive")
@@ -344,7 +344,7 @@ fn craft_skill_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sk = luna.crafting.newCraftSkill("smithing")
+        local sk = lurek.crafting.newCraftSkill("smithing")
         assert(sk:type() == "CraftSkill", "type()")
         assert(sk:getName() == "smithing", "name")
     "#,
@@ -358,7 +358,7 @@ fn craft_skill_level_up() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sk = luna.crafting.newCraftSkill("tailoring")
+        local sk = lurek.crafting.newCraftSkill("tailoring")
         assert(sk:getLevel() == 1, "starts level 1")
         assert(sk:getXp() == 0.0, "starts 0 xp")
         local leveled = sk:addXp(200.0)
@@ -375,12 +375,12 @@ fn craft_skill_can_use_recipe() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sk = luna.crafting.newCraftSkill("cooking")
+        local sk = lurek.crafting.newCraftSkill("cooking")
         sk:addXp(200.0)
-        local r = luna.crafting.newRecipe("bread")
+        local r = lurek.crafting.newRecipe("bread")
         r:setSkill("cooking", 1)
         assert(sk:canUse(r), "can use level 1 recipe")
-        local r2 = luna.crafting.newRecipe("master_feast")
+        local r2 = lurek.crafting.newRecipe("master_feast")
         r2:setSkill("cooking", 100)
         assert(not sk:canUse(r2), "cannot use level 100 recipe yet")
     "#,
@@ -394,7 +394,7 @@ fn craft_skill_xp_to_next() {
     let lua = make_vm();
     lua.load(
         r#"
-        local sk = luna.crafting.newCraftSkill("alchemy")
+        local sk = lurek.crafting.newCraftSkill("alchemy")
         local xp_needed = sk:getXpToNext()
         assert(xp_needed > 0, "xp needed > 0")
     "#,
@@ -412,7 +412,7 @@ fn craft_queue_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(5)
+        local q = lurek.crafting.newCraftQueue(5)
         assert(q:type() == "CraftQueue", "type()")
         assert(q:getMaxJobs() == 5, "max jobs")
     "#,
@@ -426,7 +426,7 @@ fn craft_queue_enqueue_and_update() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(3)
+        local q = lurek.crafting.newCraftQueue(3)
         local id = q:enqueue("potion", 1.0, 1)
         assert(id ~= nil, "got job id")
         assert(q:count() == 1, "1 job")
@@ -446,7 +446,7 @@ fn craft_queue_cancel() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(3)
+        local q = lurek.crafting.newCraftQueue(3)
         local id = q:enqueue("slow_item", 9999.0, 1)
         assert(q:count() == 1, "1 job")
         local ok = q:cancel(id)
@@ -463,7 +463,7 @@ fn craft_queue_is_full() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(2)
+        local q = lurek.crafting.newCraftQueue(2)
         q:enqueue("item", 9999.0, 1)
         q:enqueue("item", 9999.0, 1)
         assert(q:isFull(), "queue full")
@@ -480,7 +480,7 @@ fn craft_queue_get_job() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(5)
+        local q = lurek.crafting.newCraftQueue(5)
         local id = q:enqueue("widget", 10.0, 3)
         local job = q:getJob(id)
         assert(job ~= nil, "job found")
@@ -502,7 +502,7 @@ fn upgrade_tree_type_method() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.crafting.newUpgradeTree("skills")
+        local t = lurek.crafting.newUpgradeTree("skills")
         assert(t:type() == "UpgradeTree", "type()")
         assert(t:getName() == "skills", "name")
     "#,
@@ -516,7 +516,7 @@ fn upgrade_tree_add_and_unlock() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.crafting.newUpgradeTree()
+        local t = lurek.crafting.newUpgradeTree()
         t:addNode("fire_1", "Fire Affinity")
         assert(t:count() == 1, "1 node")
         assert(t:canUnlock("fire_1"), "can unlock root node")
@@ -534,7 +534,7 @@ fn upgrade_tree_prerequisites() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.crafting.newUpgradeTree()
+        local t = lurek.crafting.newUpgradeTree()
         t:addNode("base", "Base")
         t:addNode("adv", "Advanced", {"base"})
         assert(not t:canUnlock("adv"), "cannot unlock adv without base")
@@ -551,7 +551,7 @@ fn upgrade_tree_node_ids() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.crafting.newUpgradeTree()
+        local t = lurek.crafting.newUpgradeTree()
         for _, id in ipairs({"n1", "n2", "n3"}) do
             t:addNode(id, id)
         end
@@ -568,7 +568,7 @@ fn upgrade_tree_get_node() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.crafting.newUpgradeTree()
+        local t = lurek.crafting.newUpgradeTree()
         t:addNode("speed_boost", "Speed Boost")
         t:setNodeCost("speed_boost", {gold=50})
         local cost = t:getNodeCost("speed_boost")
@@ -587,8 +587,8 @@ fn recipe_get_tags() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        local r = luna.crafting.newRecipe("sword")
+        local reg = lurek.crafting.newRegistry()
+        local r = lurek.crafting.newRecipe("sword")
         r:addTag("weapon")
         r:addTag("metal")
         reg:add(r)
@@ -609,10 +609,10 @@ fn registry_find_by_tag() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
-        local r1 = luna.crafting.newRecipe("sword"); r1:addTag("weapon"); reg:add(r1)
-        local r2 = luna.crafting.newRecipe("axe"); r2:addTag("weapon"); reg:add(r2)
-        local r3 = luna.crafting.newRecipe("potion"); r3:addTag("consumable"); reg:add(r3)
+        local reg = lurek.crafting.newRegistry()
+        local r1 = lurek.crafting.newRecipe("sword"); r1:addTag("weapon"); reg:add(r1)
+        local r2 = lurek.crafting.newRecipe("axe"); r2:addTag("weapon"); reg:add(r2)
+        local r3 = lurek.crafting.newRecipe("potion"); r3:addTag("consumable"); reg:add(r3)
         local weapons = reg:findByTag("weapon")
         assert(#weapons == 2, "2 weapons")
         local consumables = reg:findByTag("consumable")
@@ -628,7 +628,7 @@ fn craftskill_set_level() {
     let lua = make_vm();
     lua.load(
         r#"
-        local skill = luna.crafting.newCraftSkill("smithing")
+        local skill = lurek.crafting.newCraftSkill("smithing")
         skill:addXp(900.0)
         local lvl_before = skill:getLevel()
         skill:setLevel(1)
@@ -645,7 +645,7 @@ fn upgrade_tree_reset_node() {
     let lua = make_vm();
     lua.load(
         r#"
-        local tree = luna.crafting.newUpgradeTree("tech")
+        local tree = lurek.crafting.newUpgradeTree("tech")
         tree:addNode("forge", 5)
         tree:unlock("forge")
         assert(tree:isUnlocked("forge"), "forge unlocked")
@@ -665,7 +665,7 @@ fn craft_queue_clear() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(3)
+        local q = lurek.crafting.newCraftQueue(3)
         q:enqueue("plank", 10.0, 1)
         q:enqueue("plank", 10.0, 1)
         assert(q:count() == 2, "2 jobs")
@@ -682,7 +682,7 @@ fn craft_queue_get_all_jobs() {
     let lua = make_vm();
     lua.load(
         r#"
-        local q = luna.crafting.newCraftQueue(5)
+        local q = lurek.crafting.newCraftQueue(5)
         q:enqueue("bolt", 5.0, 1)
         q:enqueue("nut", 3.0, 1)
         local jobs = q:getAllJobs()
@@ -710,7 +710,7 @@ fn recipe_category() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("heal_potion")
+        local r = lurek.crafting.newRecipe("heal_potion")
         assert(r:getCategory() == "", "default empty category")
         r:setCategory("potions")
         assert(r:getCategory() == "potions", "category set")
@@ -725,7 +725,7 @@ fn recipe_cooldown() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("fireball_scroll")
+        local r = lurek.crafting.newRecipe("fireball_scroll")
         assert(r:getCooldown() == 0, "default cooldown is 0")
         r:setCooldown(5.5)
         assert(math.abs(r:getCooldown() - 5.5) < 0.001, "cooldown set")
@@ -740,7 +740,7 @@ fn recipe_hand_craftable() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("stick")
+        local r = lurek.crafting.newRecipe("stick")
         assert(r:isHandCraftable(), "default hand craftable")
         r:setHandCraftable(false)
         assert(not r:isHandCraftable(), "hand craftable disabled")
@@ -755,7 +755,7 @@ fn recipe_clear_ingredients() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("test_recipe")
+        local r = lurek.crafting.newRecipe("test_recipe")
         r:addIngredient("iron", 3)
         r:addIngredient("wood", 2)
         assert(#r:getIngredients() == 2, "2 ingredients")
@@ -772,7 +772,7 @@ fn recipe_clear_outputs() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("test_recipe")
+        local r = lurek.crafting.newRecipe("test_recipe")
         r:addOutput("sword", 1)
         assert(#r:getOutputs() == 1, "1 output")
         r:clearOutputs()
@@ -792,7 +792,7 @@ fn station_max_level_and_upgrade() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("forge", 1)
+        local s = lurek.crafting.newStation("forge", 1)
         s:setMaxLevel(3)
         assert(s:getMaxLevel() == 3, "max level")
         assert(s:getLevel() == 1, "start level")
@@ -812,7 +812,7 @@ fn station_position_and_proximity() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("anvil", 1)
+        local s = lurek.crafting.newStation("anvil", 1)
         s:setPosition(100, 200)
         local x, y = s:getPosition()
         assert(x == 100 and y == 200, "position set")
@@ -831,7 +831,7 @@ fn station_fuel() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("furnace", 1)
+        local s = lurek.crafting.newStation("furnace", 1)
         s:setFuelCapacity(100)
         assert(s:getFuelCapacity() == 100, "capacity")
         assert(s:getFuelLevel() == 0, "starts empty")
@@ -854,7 +854,7 @@ fn station_quality_and_output_multiplier() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("alchemy_bench", 1)
+        local s = lurek.crafting.newStation("alchemy_bench", 1)
         s:setQualityBonus(0.15)
         assert(math.abs(s:getQualityBonus() - 0.15) < 0.001, "quality bonus")
         s:setOutputMultiplier(1.5)
@@ -870,7 +870,7 @@ fn station_metadata() {
     let lua = make_vm();
     lua.load(
         r#"
-        local s = luna.crafting.newStation("kiln", 1)
+        local s = lurek.crafting.newStation("kiln", 1)
         assert(s:getMetadata("owner") == nil, "nil when absent")
         s:setMetadata("owner", "player1")
         assert(s:getMetadata("owner") == "player1", "metadata set")
@@ -889,7 +889,7 @@ fn recipe_knowledge_type() {
     let lua = make_vm();
     lua.load(
         r#"
-        local k = luna.crafting.newRecipeKnowledge()
+        local k = lurek.crafting.newRecipeKnowledge()
         assert(k:type() == "RecipeKnowledge", "type")
     "#,
     )
@@ -902,7 +902,7 @@ fn recipe_knowledge_discover_and_forget() {
     let lua = make_vm();
     lua.load(
         r#"
-        local k = luna.crafting.newRecipeKnowledge()
+        local k = lurek.crafting.newRecipeKnowledge()
         assert(not k:isKnown("sword"), "not yet known")
         k:discover("sword", "scroll")
         assert(k:isKnown("sword"), "now known")
@@ -922,7 +922,7 @@ fn recipe_knowledge_auto_discover() {
     let lua = make_vm();
     lua.load(
         r#"
-        local k = luna.crafting.newRecipeKnowledge()
+        local k = lurek.crafting.newRecipeKnowledge()
         k:setAutoDiscover(true)
         assert(k:isAutoDiscover(), "auto on")
         assert(k:isKnown("anything"), "everything known")
@@ -939,7 +939,7 @@ fn recipe_knowledge_clear() {
     let lua = make_vm();
     lua.load(
         r#"
-        local k = luna.crafting.newRecipeKnowledge()
+        local k = lurek.crafting.newRecipeKnowledge()
         k:discover("a")
         k:discover("b")
         k:discover("c")
@@ -961,7 +961,7 @@ fn recipe_group_type() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.crafting.newRecipeGroup("Weapons")
+        local g = lurek.crafting.newRecipeGroup("Weapons")
         assert(g:type() == "RecipeGroup", "type")
     "#,
     )
@@ -974,7 +974,7 @@ fn recipe_group_add_remove() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.crafting.newRecipeGroup("Swords")
+        local g = lurek.crafting.newRecipeGroup("Swords")
         g:addRecipe("iron_sword")
         g:addRecipe("steel_sword")
         g:addRecipe("iron_sword")  -- duplicate
@@ -994,7 +994,7 @@ fn recipe_group_icon_and_order() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.crafting.newRecipeGroup("Potions")
+        local g = lurek.crafting.newRecipeGroup("Potions")
         g:setIcon("assets/potion.png")
         g:setOrder(5)
         assert(g:getIcon() == "assets/potion.png", "icon")
@@ -1010,7 +1010,7 @@ fn recipe_group_get_recipes() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.crafting.newRecipeGroup("Armor")
+        local g = lurek.crafting.newRecipeGroup("Armor")
         g:addRecipe("shield")
         g:addRecipe("helmet")
         local recipes = g:getRecipes()
@@ -1030,7 +1030,7 @@ fn recipe_advanced_methods() {
     let lua = make_vm();
     lua.load(
         r#"
-        local r = luna.crafting.newRecipe("elixir")
+        local r = lurek.crafting.newRecipe("elixir")
         r:addOutput("elixir", 1, "excellent")
         r:addByproduct("glass_shard", 2, 0.25)
         r:addCondition("weather", "rain")
@@ -1066,13 +1066,13 @@ fn registry_extended_lua_helpers() {
     let lua = make_vm();
     lua.load(
         r#"
-        local reg = luna.crafting.newRegistry()
+        local reg = lurek.crafting.newRegistry()
 
-        local sword = luna.crafting.newRecipe("iron_sword")
+        local sword = lurek.crafting.newRecipe("iron_sword")
         sword:setCategory("weapons")
         sword:addIngredient("iron_ingot", 2)
 
-        local soup = luna.crafting.newRecipe("herb_soup")
+        local soup = lurek.crafting.newRecipe("herb_soup")
         soup:setCategory("food")
         soup:addIngredient("herb", 3)
 
@@ -1106,7 +1106,7 @@ fn modifier_pool_lua_api() {
     let lua = make_vm();
     lua.load(
         r#"
-        local pool = luna.crafting.newModifierPool("rare_affixes")
+        local pool = lurek.crafting.newModifierPool("rare_affixes")
         pool:addModifier("keen", 2.0, {critChance = 0.1})
         pool:addModifier("heavy", 1.0, {damage = 5})
 

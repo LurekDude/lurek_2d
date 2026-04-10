@@ -20,7 +20,7 @@ use crate::camera::Camera;
 use crate::engine::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
-use crate::event::EventQueue;
+use crate::signal::EventQueue;
 use crate::filesystem::GameFS;
 use crate::graphics::gpu_renderer::RenderStats;
 use crate::graphics::renderer::{BlendMode, DepthMode, DrawCommand, StencilMode, TextureData};

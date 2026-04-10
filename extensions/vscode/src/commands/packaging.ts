@@ -4,7 +4,7 @@ import * as vscode from "vscode";
  * Packages the game as a zip archive using the platform-appropriate script.
  */
 export function packageZip(): void {
-  const terminal = getOrCreateTerminal("Luna Package");
+  const terminal = getOrCreateTerminal("Lurek2D Package");
   terminal.show();
   if (process.platform === "win32") {
     terminal.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1");
@@ -17,7 +17,7 @@ export function packageZip(): void {
  * Packages for Windows using dist.ps1.
  */
 export function packageWindows(): void {
-  const terminal = getOrCreateTerminal("Luna Package");
+  const terminal = getOrCreateTerminal("Lurek2D Package");
   terminal.show();
   terminal.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1");
 }
@@ -26,7 +26,7 @@ export function packageWindows(): void {
  * Packages for Linux/macOS using dist.sh.
  */
 export function packageLinux(): void {
-  const terminal = getOrCreateTerminal("Luna Package");
+  const terminal = getOrCreateTerminal("Lurek2D Package");
   terminal.show();
   terminal.sendText("bash tools/dist.sh");
 }

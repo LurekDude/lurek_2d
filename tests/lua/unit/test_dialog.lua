@@ -1,4 +1,6 @@
 -- Dialog API integration tests
+-- @covers lurek.dialog.newSequencer
+
 local total, passed, failed = 0, 0, 0
 
 local function describe(name, fn)

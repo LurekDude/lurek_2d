@@ -2,6 +2,14 @@
 -- Tests for lurek.dataframe tabular data API
 
 -- Helper to build a simple test DataFrame
+-- @covers lurek.dataframe.fromBinary
+-- @covers lurek.dataframe.fromCSV
+-- @covers lurek.dataframe.fromJSON
+-- @covers lurek.dataframe.fromTable
+-- @covers lurek.dataframe.newDataFrame
+-- @covers lurek.dataframe.newDatabase
+-- @covers lurek.dataframe.random
+
 local function make_test_df()
     local csv = "name,age,score\nAlice,30,90\nBob,25,85\nCharlie,35,92"
     return lurek.dataframe.fromCSV(csv)

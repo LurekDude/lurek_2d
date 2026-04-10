@@ -1,5 +1,7 @@
 -- Lurek2D Lua BDD tests for lurek.spine
 -- Headless: no GPU, no audio, no window.
+-- @covers lurek.spine.newSkeleton
+
 
 describe("lurek.spine", function()
     describe("module interface", function()

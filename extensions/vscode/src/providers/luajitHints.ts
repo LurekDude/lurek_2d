@@ -65,56 +65,56 @@ interface PerfRule {
 
 const PERF_RULES: PerfRule[] = [
   {
-    code: "luna.perf.tableAllocHotPath",
+    code: "lurek.perf.tableAllocHotPath",
     pattern: /\{\s*\}/,
     message: "Table allocation `{}` in hot path — consider pre-allocating or using an object pool.",
     severity: vscode.DiagnosticSeverity.Hint,
     hotPathOnly: true,
   },
   {
-    code: "luna.perf.newInHotPath",
-    pattern: /luna\.\w+\.new\w*\s*\(/,
-    message: "Resource creation (luna.*.new*) in hot path — move to luna.load() or cache the result.",
+    code: "lurek.perf.newInHotPath",
+    pattern: /lurek\.\w+\.new\w*\s*\(/,
+    message: "Resource creation (lurek.*.new*) in hot path — move to lurek.load() or cache the result.",
     severity: vscode.DiagnosticSeverity.Warning,
     hotPathOnly: true,
   },
   {
-    code: "luna.perf.globalInLoop",
+    code: "lurek.perf.globalInLoop",
     pattern: /\bfor\b.+\bdo\b/,
     message: "Loop detected — ensure frequently accessed globals are cached as locals above the loop.",
     severity: vscode.DiagnosticSeverity.Hint,
     hotPathOnly: false,
   },
   {
-    code: "luna.perf.stringConcatLoop",
+    code: "lurek.perf.stringConcatLoop",
     pattern: /\.\.\s*["']/,
     message: "String concatenation in loop — consider table.insert + table.concat for better performance.",
     severity: vscode.DiagnosticSeverity.Hint,
     hotPathOnly: true,
   },
   {
-    code: "luna.perf.pcallHotPath",
+    code: "lurek.perf.pcallHotPath",
     pattern: /\bpcall\s*\(/,
     message: "pcall in hot path adds overhead — consider error handling outside the frame loop.",
     severity: vscode.DiagnosticSeverity.Hint,
     hotPathOnly: true,
   },
   {
-    code: "luna.perf.mathFloor",
+    code: "lurek.perf.mathFloor",
     pattern: /math\.floor\s*\(/,
     message: "Consider bit.tobit() or x%1 for faster integer conversion in LuaJIT.",
     severity: vscode.DiagnosticSeverity.Hint,
     hotPathOnly: true,
   },
   {
-    code: "luna.perf.mathRandom",
+    code: "lurek.perf.mathRandom",
     pattern: /math\.random\s*\(/,
-    message: "Use luna.math.random() for deterministic, seedable RNG consistent across platforms.",
+    message: "Use lurek.math.random() for deterministic, seedable RNG consistent across platforms.",
     severity: vscode.DiagnosticSeverity.Information,
     hotPathOnly: false,
   },
   {
-    code: "luna.perf.unpackInLoop",
+    code: "lurek.perf.unpackInLoop",
     pattern: /\bunpack\s*\(/,
     message: "unpack() in hot path creates temporary values — prefer indexed access for known structures.",
     severity: vscode.DiagnosticSeverity.Hint,
@@ -132,54 +132,54 @@ interface CompatRule {
 
 /**
  * Patterns that are valid Lua 5.4 but not supported in LuaJIT.
- * Luna2D targets LuaJIT — these produce a Warning diagnostic.
+ * Lurek2D targets LuaJIT — these produce a Warning diagnostic.
  */
 const COMPAT_RULES: CompatRule[] = [
   {
-    code: "luna.compat.constAttribute",
+    code: "lurek.compat.constAttribute",
     pattern: /\blocal\s+\w+\s*<\s*const\s*>/,
     message:
       "Lua 5.4 `<const>` attribute is not supported in LuaJIT. Remove the attribute — LuaJIT inlines constants automatically.",
   },
   {
-    code: "luna.compat.closeAttribute",
+    code: "lurek.compat.closeAttribute",
     pattern: /\blocal\s+\w+\s*<\s*close\s*>/,
     message:
       "Lua 5.4 `<close>` (to-be-closed variable) is not supported in LuaJIT. Use explicit :close() or defer via a wrapper.",
   },
   {
-    code: "luna.compat.utf8Library",
+    code: "lurek.compat.utf8Library",
     pattern: /\butf8\s*\.\s*\w+\s*\(/,
     message:
-      "The `utf8` standard library is not available in LuaJIT. Use luna.utf8.* instead or the luajit-utf8 binding.",
+      "The `utf8` standard library is not available in LuaJIT. Use lurek.utf8.* instead or the luajit-utf8 binding.",
   },
   {
-    code: "luna.compat.tableMove",
+    code: "lurek.compat.tableMove",
     pattern: /\btable\s*\.\s*move\s*\(/,
     message:
       "`table.move` behaviour differs between Lua 5.4 and LuaJIT. Test carefully, or use a manual loop for portability.",
   },
   {
-    code: "luna.compat.bitwiseTilde",
+    code: "lurek.compat.bitwiseTilde",
     pattern: /(?<![=<>~])\s*~(?!\s*=)\s*(?![-\\/])/,
     message:
       "Lua 5.4 bitwise `~` (XOR / NOT) operator is not supported in LuaJIT. Use `bit.bxor(a, b)` or `bit.bnot(a)` instead.",
   },
   {
-    code: "luna.compat.intDivOp",
+    code: "lurek.compat.intDivOp",
     pattern: /\/\//,
     message:
       "Floor-division operator `//` is a LuaJIT extension that matches Lua 5.4. Behaviour is consistent — no action needed. (Hint only.)",
   },
   {
-    code: "luna.compat.warnLevel",
+    code: "lurek.compat.warnLevel",
     pattern: /\bwarn\s*\(/,
-    message: "`warn()` is a Lua 5.4-only function and is not available in LuaJIT. Use `print()` or `luna.log.warn()` instead.",
+    message: "`warn()` is a Lua 5.4-only function and is not available in LuaJIT. Use `print()` or `lurek.log.warn()` instead.",
   },
 ];
 
 /**
- * Detect which line ranges are inside luna.update or luna.draw (hot paths).
+ * Detect which line ranges are inside lurek.update or lurek.draw (hot paths).
  * Returns a set of 0-based line numbers considered "hot".
  */
 function findHotPathLines(text: string): Set<number> {
@@ -191,8 +191,8 @@ function findHotPathLines(text: string): Set<number> {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Detect function luna.update or luna.draw
-    if (/^\s*function\s+luna\.(update|draw)\s*\(/.test(line)) {
+    // Detect function lurek.update or lurek.draw
+    if (/^\s*function\s+lurek\.(update|draw)\s*\(/.test(line)) {
       inHotPath = true;
       depth = 0;
     }
@@ -325,10 +325,10 @@ export function register(
 
   // ── Performance hint diagnostics ────────────────────────
 
-  const diagCollection = vscode.languages.createDiagnosticCollection("luna.luajit");
+  const diagCollection = vscode.languages.createDiagnosticCollection("lurek.luajit");
   disposables.push(diagCollection);
 
-  const compatCollection = vscode.languages.createDiagnosticCollection("luna.compat");
+  const compatCollection = vscode.languages.createDiagnosticCollection("lurek.compat");
   disposables.push(compatCollection);
 
   function analyzePerfHints(document: vscode.TextDocument): void {
@@ -354,7 +354,7 @@ export function register(
           const range = new vscode.Range(i, startCol, i, endCol);
           const diag = new vscode.Diagnostic(range, rule.message, rule.severity);
           diag.code = rule.code;
-          diag.source = "Luna LuaJIT";
+          diag.source = "Lurek2D LuaJIT";
           diagnostics.push(diag);
         }
       }
@@ -383,12 +383,12 @@ export function register(
           const startCol = match.index;
           const endCol = match.index + match[0].length;
           const range = new vscode.Range(i, startCol, i, endCol);
-          const sev = rule.code === "luna.compat.intDivOp"
+          const sev = rule.code === "lurek.compat.intDivOp"
             ? vscode.DiagnosticSeverity.Hint
             : vscode.DiagnosticSeverity.Warning;
           const diag = new vscode.Diagnostic(range, rule.message, sev);
           diag.code = rule.code;
-          diag.source = "Luna Compat";
+          diag.source = "Lurek2D Compat";
           diagnostics.push(diag);
         }
       }

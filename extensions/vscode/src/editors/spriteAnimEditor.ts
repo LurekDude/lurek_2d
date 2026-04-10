@@ -7,7 +7,7 @@ export class SpriteAnimEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.spriteAnimEditor", "Sprite Animation");
+    super(context, "lurek.spriteAnimEditor", "Sprite Animation");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

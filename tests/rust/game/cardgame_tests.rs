@@ -39,11 +39,11 @@ fn item_define_and_get_type() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Sword", { category="weapon", stats={atk=5, weight=3} })
+        lurek.cardgame.defineType("Sword", { category="weapon", stats={atk=5, weight=3} })
 
-        local t = luna.cardgame.getType("Sword")
+        local t = lurek.cardgame.getType("Sword")
 
         assert(t ~= nil, "type should exist")
 
@@ -65,15 +65,15 @@ fn item_type_names_list() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("A", {})
+        lurek.cardgame.defineType("A", {})
 
-        luna.cardgame.defineType("B", {})
+        lurek.cardgame.defineType("B", {})
 
-        luna.cardgame.defineType("C", {})
+        lurek.cardgame.defineType("C", {})
 
-        local names = luna.cardgame.getTypeNames()
+        local names = lurek.cardgame.getTypeNames()
 
         assert(#names >= 3, "at least 3 names returned")
 
@@ -91,7 +91,7 @@ fn item_unknown_type_returns_nil() {
 
     lua.load(r#"
 
-        local t = luna.cardgame.getType("__does_not_exist__99")
+        local t = lurek.cardgame.getType("__does_not_exist__99")
 
         assert(t == nil, "unknown type should be nil")
 
@@ -117,7 +117,7 @@ fn item_new_has_correct_type_string() {
 
     lua.load(r#"
 
-        local item = luna.cardgame.newCard("Dagger")
+        local item = lurek.cardgame.newCard("Dagger")
 
         assert(item:type() == "Card", "type() should be Card")
 
@@ -137,7 +137,7 @@ fn item_stats_get_set_add() {
 
     lua.load(r#"
 
-        local item = luna.cardgame.newCard("Staff")
+        local item = lurek.cardgame.newCard("Staff")
 
         item:setStat("dmg", 10)
 
@@ -163,7 +163,7 @@ fn item_tags_add_has_remove() {
 
     lua.load(r#"
 
-        local item = luna.cardgame.newCard("Gem")
+        local item = lurek.cardgame.newCard("Gem")
 
         item:addTag("magic")
 
@@ -193,7 +193,7 @@ fn item_metadata_get_set() {
 
     lua.load(r#"
 
-        local item = luna.cardgame.newCard("Rune")
+        local item = lurek.cardgame.newCard("Rune")
 
         item:setMeta("desc", "An ancient rune")
 
@@ -223,13 +223,13 @@ fn stack_push_and_pop() {
 
     lua.load(r#"
 
-        local stack = luna.cardgame.newStack("hand")
+        local stack = lurek.cardgame.newStack("hand")
 
-        local item1 = luna.cardgame.newCard("Card1")
+        local item1 = lurek.cardgame.newCard("Card1")
 
         item1:setStat("value", 1)
 
-        local item2 = luna.cardgame.newCard("Card2")
+        local item2 = lurek.cardgame.newCard("Card2")
 
         item2:setStat("value", 2)
 
@@ -265,13 +265,13 @@ fn stack_capacity_limit() {
 
     lua.load(r#"
 
-        local stack = luna.cardgame.newStack("small", 2)
+        local stack = lurek.cardgame.newStack("small", 2)
 
-        local a = luna.cardgame.newCard("A")
+        local a = lurek.cardgame.newCard("A")
 
-        local b = luna.cardgame.newCard("B")
+        local b = lurek.cardgame.newCard("B")
 
-        local c = luna.cardgame.newCard("C")
+        local c = lurek.cardgame.newCard("C")
 
 
 
@@ -299,11 +299,11 @@ fn stack_shuffle_changes_order() {
 
     lua.load(r#"
 
-        local stack = luna.cardgame.newStack("pile")
+        local stack = lurek.cardgame.newStack("pile")
 
         for i = 1, 20 do
 
-            local it = luna.cardgame.newCard("X")
+            local it = lurek.cardgame.newCard("X")
 
             it:setStat("idx", i)
 
@@ -333,17 +333,17 @@ fn stack_search_and_count_by_type() {
 
     lua.load(r#"
 
-        local stack = luna.cardgame.newStack("deck")
+        local stack = lurek.cardgame.newStack("deck")
 
         for i = 1, 3 do
 
-            stack:push(luna.cardgame.newCard("Fire"))
+            stack:push(lurek.cardgame.newCard("Fire"))
 
         end
 
         for i = 1, 2 do
 
-            stack:push(luna.cardgame.newCard("Ice"))
+            stack:push(lurek.cardgame.newCard("Ice"))
 
         end
 
@@ -381,15 +381,15 @@ fn builder_build_produces_correct_stack() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Arrow", { category="ammo" })
+        lurek.cardgame.defineType("Arrow", { category="ammo" })
 
-        luna.cardgame.defineType("Bolt",  { category="ammo" })
+        lurek.cardgame.defineType("Bolt",  { category="ammo" })
 
 
 
-        local builder = luna.cardgame.newDeckBuilder()
+        local builder = lurek.cardgame.newDeckBuilder()
 
         builder:add("Arrow", 3)
 
@@ -419,13 +419,13 @@ fn builder_validate_catches_unknown_type() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Known", {})
+        lurek.cardgame.defineType("Known", {})
 
 
 
-        local builder = luna.cardgame.newDeckBuilder()
+        local builder = lurek.cardgame.newDeckBuilder()
 
         builder:add("Known", 5)
 
@@ -461,7 +461,7 @@ fn manager_create_and_move_between_stacks() {
 
     lua.load(r#"
 
-        local mgr = luna.cardgame.newZoneManager()
+        local mgr = lurek.cardgame.newZoneManager()
 
         mgr:createStack("hand")
 
@@ -473,7 +473,7 @@ fn manager_create_and_move_between_stacks() {
 
         local hand = mgr:getStack("hand")
 
-        hand:push(luna.cardgame.newCard("Card"))
+        hand:push(lurek.cardgame.newCard("Card"))
 
         mgr:addStack("hand", hand)  -- sync mutated stack back
 
@@ -509,15 +509,15 @@ fn pool_draw_items_not_empty() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Gem", {})
+        lurek.cardgame.defineType("Gem", {})
 
-        luna.cardgame.defineType("Coin", {})
+        lurek.cardgame.defineType("Coin", {})
 
 
 
-        local pool = luna.cardgame.newCardPool("loot")
+        local pool = lurek.cardgame.newCardPool("loot")
 
         pool:add("Gem", 3)
 
@@ -555,11 +555,11 @@ fn slot_capacity_and_overflow() {
 
     lua.load(r#"
 
-        local slot = luna.cardgame.newSlot("helmet", 1)
+        local slot = lurek.cardgame.newSlot("helmet", 1)
 
-        local a = luna.cardgame.newCard("HelmA")
+        local a = lurek.cardgame.newCard("HelmA")
 
-        local b = luna.cardgame.newCard("HelmB")
+        local b = lurek.cardgame.newCard("HelmB")
 
 
 
@@ -597,9 +597,9 @@ fn group_find_pairs() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("T", {})
+        lurek.cardgame.defineType("T", {})
 
 
 
@@ -611,7 +611,7 @@ fn group_find_pairs() {
 
         for _, v in ipairs(vals) do
 
-            local it = luna.cardgame.newCard("T")
+            local it = lurek.cardgame.newCard("T")
 
             it:setStat("val", v)
 
@@ -623,7 +623,7 @@ fn group_find_pairs() {
 
         -- Find pairs (groups of 2) by "val" stat
 
-        local groups = luna.cardgame.findNOfStat(items, "val", 2)
+        local groups = lurek.cardgame.findNOfStat(items, "val", 2)
 
         -- Should find 2 groups (val=1 and val=2 each appear twice)
 
@@ -651,7 +651,7 @@ fn history_record_and_query() {
 
     lua.load(r#"
 
-        local hist = luna.cardgame.newHistory()
+        local hist = lurek.cardgame.newHistory()
 
         assert(hist:len() == 0, "starts empty")
 
@@ -691,7 +691,7 @@ fn history_max_size_rolls_over() {
 
     lua.load(r#"
 
-        local hist = luna.cardgame.newHistory(3)
+        local hist = lurek.cardgame.newHistory(3)
 
         for i = 1, 5 do
 
@@ -723,7 +723,7 @@ fn card_subtype_get_set() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         assert(c:getSubtype() == "", "default subtype empty")
 
@@ -745,7 +745,7 @@ fn card_rarity_get_set() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         assert(c:getRarity() == "", "default rarity empty")
 
@@ -767,7 +767,7 @@ fn card_controller_get_set() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         assert(c:getController() == "", "default controller empty")
 
@@ -797,7 +797,7 @@ fn card_face_up_and_tapped() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         assert(c:isFaceUp() == true, "default face up")
 
@@ -825,7 +825,7 @@ fn card_tile_position_and_size() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         local x, y = c:getTilePosition()
 
@@ -869,11 +869,11 @@ fn card_reset_stats() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Sword", { stats = { atk = 10 } })
+        lurek.cardgame.defineType("Sword", { stats = { atk = 10 } })
 
-        local c = luna.cardgame.newCard("Sword")
+        local c = lurek.cardgame.newCard("Sword")
 
         assert(c:getStat("atk") == 10, "base atk")
 
@@ -899,7 +899,7 @@ fn card_clone_is_independent() {
 
     lua.load(r#"
 
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
 
         c:setName("Original")
 
@@ -941,7 +941,7 @@ fn stack_ordered_and_public() {
 
     lua.load(r#"
 
-        local s = luna.cardgame.newStack("hand")
+        local s = lurek.cardgame.newStack("hand")
 
         assert(s:isOrdered() == true, "default ordered")
 
@@ -977,9 +977,9 @@ fn define_type_with_subtype_rarity_max() {
 
     lua.load(r#"
 
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
 
-        luna.cardgame.defineType("Fireball", {
+        lurek.cardgame.defineType("Fireball", {
 
             category = "spell",
 
@@ -991,7 +991,7 @@ fn define_type_with_subtype_rarity_max() {
 
         })
 
-        local t = luna.cardgame.getType("Fireball")
+        local t = lurek.cardgame.getType("Fireball")
 
         assert(t.category == "spell", "category")
 
@@ -1015,8 +1015,8 @@ fn define_type_with_subtype_rarity_max() {
 fn card_has_unique_id() {
     let lua = make_vm();
     lua.load(r#"
-        local a = luna.cardgame.newCard("X")
-        local b = luna.cardgame.newCard("X")
+        local a = lurek.cardgame.newCard("X")
+        local b = lurek.cardgame.newCard("X")
         assert(a:getId() ~= b:getId(), "each card gets a different id")
         assert(a:getId() > 0, "id is positive")
     "#).exec().unwrap();
@@ -1028,7 +1028,7 @@ fn card_has_unique_id() {
 fn card_has_stat_and_modify_stat() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:setStat("hp", 10)
         assert(c:hasStat("hp"), "hasStat true")
         assert(not c:hasStat("mp"), "hasStat false")
@@ -1044,7 +1044,7 @@ fn card_has_stat_and_modify_stat() {
 fn card_counters_ops() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:setCounter("charge", 3)
         local all = c:getCounters()
         assert(all.charge == 3, "getCounters returns map")
@@ -1065,7 +1065,7 @@ fn card_counters_ops() {
 fn card_zone_alias() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:setZone("battlefield")
         assert(c:getZone() == "battlefield", "getZone/setZone")
         assert(c:getSlot() == "battlefield", "setZone reflected in getSlot")
@@ -1078,7 +1078,7 @@ fn card_zone_alias() {
 fn card_set_and_fire_script() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         local fired = false
         c:setScript("onPlay", function(card)
             fired = true
@@ -1092,7 +1092,7 @@ fn card_set_and_fire_script() {
 fn card_fire_script_missing_event_no_error() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:fireScript("nonExistent")
     "#).exec().unwrap();
 }
@@ -1103,7 +1103,7 @@ fn card_fire_script_missing_event_no_error() {
 fn card_cost_check_and_pay() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         assert(c:canPlay(nil), "canPlay true by default")
         c:setCostCheck(function(card, ctx) return false end)
         assert(not c:canPlay(nil), "canPlay false when check returns false")
@@ -1120,7 +1120,7 @@ fn card_cost_check_and_pay() {
 fn card_asset_storage() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:setAsset("icon", {path = "fireball.png"})
         local icon = c:getAsset("icon")
         assert(icon ~= nil, "asset not nil")
@@ -1135,14 +1135,14 @@ fn card_asset_storage() {
 fn card_snapshot_restore() {
     let lua = make_vm();
     lua.load(r#"
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         c:setName("Fireball")
         c:setStat("damage", 5)
         c:addTag("fire")
         local snap = c:snapshot()
         assert(snap.name == "Fireball", "snapshot name correct")
         assert(snap.stats.damage == 5, "snapshot stat correct")
-        local c2 = luna.cardgame.newCard("Y")
+        local c2 = lurek.cardgame.newCard("Y")
         c2:restore(snap)
         assert(c2:getName() == "Fireball", "restore sets name")
         assert(c2:getStat("damage") == 5, "restore sets stat")
@@ -1156,10 +1156,10 @@ fn card_snapshot_restore() {
 fn stack_set_name_and_card_count() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("hand")
+        local s = lurek.cardgame.newStack("hand")
         s:setName("discard")
         assert(s:getName() == "discard", "setName works")
-        local c = luna.cardgame.newCard("X")
+        local c = lurek.cardgame.newCard("X")
         s:addCard(c)
         assert(s:getCardCount() == 1, "getCardCount alias")
     "#).exec().unwrap();
@@ -1171,16 +1171,16 @@ fn stack_set_name_and_card_count() {
 fn stack_add_draw_remove_contains() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("pile")
-        local c = luna.cardgame.newCard("X")
+        local s = lurek.cardgame.newStack("pile")
+        local c = lurek.cardgame.newCard("X")
         s:addCard(c)
         assert(s:contains(c), "contains card")
         local drawn = s:drawCard()
         assert(drawn ~= nil, "drawCard returns card")
         assert(not s:contains(c), "card gone after draw")
         assert(s:isEmpty(), "stack empty after draw")
-        local c2 = luna.cardgame.newCard("Y")
-        local c3 = luna.cardgame.newCard("Z")
+        local c2 = lurek.cardgame.newCard("Y")
+        local c3 = lurek.cardgame.newCard("Z")
         s:addCard(c2)
         s:addCardBottom(c3)
         local bottom = s:drawCardBottom()
@@ -1194,8 +1194,8 @@ fn stack_add_draw_remove_contains() {
 fn stack_remove_card_by_identity() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("pile")
-        local c = luna.cardgame.newCard("X")
+        local s = lurek.cardgame.newStack("pile")
+        local c = lurek.cardgame.newCard("X")
         s:addCard(c)
         assert(s:removeCard(c), "removeCard returns true")
         assert(not s:contains(c), "card gone")
@@ -1209,9 +1209,9 @@ fn stack_remove_card_by_identity() {
 fn stack_filter_and_sort() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("pile")
+        local s = lurek.cardgame.newStack("pile")
         for i = 1, 5 do
-            local c = luna.cardgame.newCard("X")
+            local c = lurek.cardgame.newCard("X")
             c:setStat("v", i)
             s:addCard(c)
         end
@@ -1229,12 +1229,12 @@ fn stack_filter_and_sort() {
 fn stack_find_by_category() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Spell", { category = "magic" })
-        luna.cardgame.defineType("Sword", { category = "weapon" })
-        local s = luna.cardgame.newStack("pile")
-        for i = 1, 3 do s:addCard(luna.cardgame.newCard("Spell")) end
-        for i = 1, 2 do s:addCard(luna.cardgame.newCard("Sword")) end
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Spell", { category = "magic" })
+        lurek.cardgame.defineType("Sword", { category = "weapon" })
+        local s = lurek.cardgame.newStack("pile")
+        for i = 1, 3 do s:addCard(lurek.cardgame.newCard("Spell")) end
+        for i = 1, 2 do s:addCard(lurek.cardgame.newCard("Sword")) end
         local spells = s:findByCategory("magic")
         assert(#spells == 3, "findByCategory correct: " .. #spells)
     "#).exec().unwrap();
@@ -1246,13 +1246,13 @@ fn stack_find_by_category() {
 fn stack_capacity() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("hand")
+        local s = lurek.cardgame.newStack("hand")
         local cap = s:getCapacity()
         assert(cap == -1 or cap == 0, "unlimited by default, got: " .. cap)
         s:setCapacity(3)
         assert(s:getCapacity() == 3, "setCapacity 3")
-        for i = 1, 3 do s:addCard(luna.cardgame.newCard("X")) end
-        assert(not s:addCard(luna.cardgame.newCard("X")), "addCard fails at capacity")
+        for i = 1, 3 do s:addCard(lurek.cardgame.newCard("X")) end
+        assert(not s:addCard(lurek.cardgame.newCard("X")), "addCard fails at capacity")
     "#).exec().unwrap();
 }
 
@@ -1262,15 +1262,15 @@ fn stack_capacity() {
 fn stack_move_card_and_move_all() {
     let lua = make_vm();
     lua.load(r#"
-        local src = luna.cardgame.newStack("src")
-        local dst = luna.cardgame.newStack("dst")
-        local c = luna.cardgame.newCard("X")
+        local src = lurek.cardgame.newStack("src")
+        local dst = lurek.cardgame.newStack("dst")
+        local c = lurek.cardgame.newCard("X")
         src:addCard(c)
         local ok = src:moveCard(c, dst)
         assert(ok, "moveCard returns true")
         assert(not src:contains(c), "card gone from src")
         assert(dst:contains(c), "card in dst")
-        local c2 = luna.cardgame.newCard("Y")
+        local c2 = lurek.cardgame.newCard("Y")
         dst:addCard(c2)
         local n = dst:moveAllCards(src)
         assert(n == 2, "moveAllCards count is 2, got " .. n)
@@ -1285,9 +1285,9 @@ fn stack_move_card_and_move_all() {
 fn stack_get_cards_alias() {
     let lua = make_vm();
     lua.load(r#"
-        local s = luna.cardgame.newStack("hand")
-        s:addCard(luna.cardgame.newCard("X"))
-        s:addCard(luna.cardgame.newCard("Y"))
+        local s = lurek.cardgame.newStack("hand")
+        s:addCard(lurek.cardgame.newCard("X"))
+        s:addCard(lurek.cardgame.newCard("Y"))
         local cards = s:getCards()
         assert(#cards == 2, "getCards returns 2")
     "#).exec().unwrap();
@@ -1299,7 +1299,7 @@ fn stack_get_cards_alias() {
 fn deckbuilder_min_max_cards() {
     let lua = make_vm();
     lua.load(r#"
-        local b = luna.cardgame.newDeckBuilder()
+        local b = lurek.cardgame.newDeckBuilder()
         b:setMinCards(20)
         b:setMaxCards(60)
         assert(b:getMinCards() == 20, "getMinCards")
@@ -1313,10 +1313,10 @@ fn deckbuilder_min_max_cards() {
 fn deckbuilder_required_tag_validation() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Dragon", { category = "creature", tags = {"dragon"} })
-        luna.cardgame.defineType("Spell", { category = "spell" })
-        local b = luna.cardgame.newDeckBuilder()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Dragon", { category = "creature", tags = {"dragon"} })
+        lurek.cardgame.defineType("Spell", { category = "spell" })
+        local b = lurek.cardgame.newDeckBuilder()
         b:setMinCards(1)
         b:setMaxCards(10)
         b:addRequiredTag("dragon", 1)
@@ -1333,9 +1333,9 @@ fn deckbuilder_required_tag_validation() {
 fn deckbuilder_banned_type_remove() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Evil", { category = "villain" })
-        local b = luna.cardgame.newDeckBuilder()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Evil", { category = "villain" })
+        local b = lurek.cardgame.newDeckBuilder()
         b:addBannedType("Evil")
         local banned = b:getBannedTypes()
         assert(#banned == 1, "getBannedTypes after ban")
@@ -1351,9 +1351,9 @@ fn deckbuilder_banned_type_remove() {
 fn deckbuilder_custom_rule() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Card", { category = "misc" })
-        local b = luna.cardgame.newDeckBuilder()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Card", { category = "misc" })
+        local b = lurek.cardgame.newDeckBuilder()
         b:setMinCards(1)
         b:setMaxCards(10)
         b:add("Card", 2)
@@ -1379,7 +1379,7 @@ fn deckbuilder_custom_rule() {
 fn deckbuilder_get_max_copies() {
     let lua = make_vm();
     lua.load(r#"
-        local b = luna.cardgame.newDeckBuilder("deck")
+        local b = lurek.cardgame.newDeckBuilder("deck")
         b:setMaxCopies(3)
         assert(b:getMaxCopies() == 3, "getMaxCopies")
     "#).exec().unwrap();
@@ -1391,10 +1391,10 @@ fn deckbuilder_get_max_copies() {
 fn cardpool_get_card_types() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("A", {})
-        luna.cardgame.defineType("B", {})
-        local pool = luna.cardgame.newCardPool()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("A", {})
+        lurek.cardgame.defineType("B", {})
+        local pool = lurek.cardgame.newCardPool()
         pool:add("A", 2)
         pool:add("B", 3)
         local types = pool:getCardTypes()
@@ -1409,9 +1409,9 @@ fn cardpool_get_card_types() {
 fn cardpool_get_weight() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Rare", { rarity = "rare" })
-        local pool = luna.cardgame.newCardPool()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Rare", { rarity = "rare" })
+        local pool = lurek.cardgame.newCardPool()
         pool:add("Rare", 5)
         assert(pool:getWeight("Rare") == 5, "getWeight correct")
         assert(pool:getWeight("Missing") == 0, "getWeight missing is 0")
@@ -1424,9 +1424,9 @@ fn cardpool_get_weight() {
 fn cardpool_draw_random() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Card", {})
-        local pool = luna.cardgame.newCardPool()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Card", {})
+        local pool = lurek.cardgame.newCardPool()
         pool:add("Card", 1)
         local cards = pool:drawRandom(3)
         assert(#cards == 3, "drawRandom returns 3 cards")
@@ -1441,10 +1441,10 @@ fn cardpool_draw_random() {
 fn cardpool_set_rarity_weight_and_draw_by_rarity() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Common", { rarity = "common" })
-        luna.cardgame.defineType("Rare", { rarity = "rare" })
-        local pool = luna.cardgame.newCardPool()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Common", { rarity = "common" })
+        lurek.cardgame.defineType("Rare", { rarity = "rare" })
+        local pool = lurek.cardgame.newCardPool()
         pool:add("Common", 1)
         pool:add("Rare", 1)
         pool:setRarityWeight("common", 10)
@@ -1460,9 +1460,9 @@ fn cardpool_set_rarity_weight_and_draw_by_rarity() {
 fn cardpool_set_name_and_add_card_type() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineType("Hero", {})
-        local pool = luna.cardgame.newCardPool()
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineType("Hero", {})
+        local pool = lurek.cardgame.newCardPool()
         pool:setName("draft_pool")
         pool:addCardType("Hero", 3)
         assert(pool:size() == 1, "addCardType adds entry")
@@ -1476,7 +1476,7 @@ fn cardpool_set_name_and_add_card_type() {
 fn effect_stack_push_pop_peek() {
     let lua = make_vm();
     lua.load(r#"
-        local es = luna.cardgame.newEffectStack()
+        local es = lurek.cardgame.newEffectStack()
         assert(es:isEmpty(), "starts empty")
         es:push({ effect = "fireball", value = 5 })
         es:push({ effect = "lightning", value = 3 })
@@ -1496,7 +1496,7 @@ fn effect_stack_push_pop_peek() {
 fn effect_stack_clear_and_get_entries() {
     let lua = make_vm();
     lua.load(r#"
-        local es = luna.cardgame.newEffectStack()
+        local es = lurek.cardgame.newEffectStack()
         es:push({ effect = "a" })
         es:push({ effect = "b" })
         local entries = es:getEntries()
@@ -1512,7 +1512,7 @@ fn effect_stack_clear_and_get_entries() {
 fn effect_stack_resolve_all() {
     let lua = make_vm();
     lua.load(r#"
-        local es = luna.cardgame.newEffectStack()
+        local es = lurek.cardgame.newEffectStack()
         es:push({ effect = "a" })
         es:push({ effect = "b" })
         es:push({ effect = "c" })
@@ -1528,9 +1528,9 @@ fn effect_stack_resolve_all() {
 fn effect_stack_find_by_card() {
     let lua = make_vm();
     lua.load(r#"
-        local es = luna.cardgame.newEffectStack()
-        local c1 = luna.cardgame.newCard("X")
-        local c2 = luna.cardgame.newCard("Y")
+        local es = lurek.cardgame.newEffectStack()
+        local c1 = lurek.cardgame.newCard("X")
+        local c2 = lurek.cardgame.newCard("Y")
         es:push({ card = c1, effect = "hit" })
         es:push({ card = c2, effect = "block" })
         es:push({ card = c1, effect = "counter" })
@@ -1545,19 +1545,19 @@ fn effect_stack_find_by_card() {
 fn api_aliases_work() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
-        luna.cardgame.defineCardType("Warrior", { category = "unit" })
-        local t = luna.cardgame.getCardType("Warrior")
+        lurek.cardgame.clearTypes()
+        lurek.cardgame.defineCardType("Warrior", { category = "unit" })
+        local t = lurek.cardgame.getCardType("Warrior")
         assert(t ~= nil, "getCardType alias works")
-        local names = luna.cardgame.getCardTypeNames()
+        local names = lurek.cardgame.getCardTypeNames()
         assert(type(names) == "table", "getCardTypeNames alias works")
-        luna.cardgame.clearCardTypes()
-        local deck = luna.cardgame.newDeck("deck")
+        lurek.cardgame.clearCardTypes()
+        local deck = lurek.cardgame.newDeck("deck")
         assert(deck ~= nil, "newDeck alias works")
-        local zone = luna.cardgame.newZone("battlefield")
+        local zone = lurek.cardgame.newZone("battlefield")
         assert(zone ~= nil, "newZone alias works")
-        local es1 = luna.cardgame.newEffectStack()
-        local es2 = luna.cardgame.newStackManager()
+        local es1 = lurek.cardgame.newEffectStack()
+        local es2 = lurek.cardgame.newStackManager()
         assert(es1 ~= nil and es2 ~= nil, "effect stack constructors work")
     "#).exec().unwrap();
 }
@@ -1568,15 +1568,15 @@ fn api_aliases_work() {
 fn define_card_type_with_scripts_global() {
     let lua = make_vm();
     lua.load(r#"
-        luna.cardgame.clearTypes()
+        lurek.cardgame.clearTypes()
         local fired = false
-        luna.cardgame.defineCardType("Spell", {
+        lurek.cardgame.defineCardType("Spell", {
             category = "magic",
             scripts = {
                 onPlay = function(card) fired = true end,
             }
         })
-        local c = luna.cardgame.newCard("Spell")
+        local c = lurek.cardgame.newCard("Spell")
         c:fireScript("onPlay")
         assert(fired, "type-level script fires via fireScript")
     "#).exec().unwrap();

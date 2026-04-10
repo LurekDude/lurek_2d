@@ -11,8 +11,8 @@ export interface SystemSample {
   cpuPercent: number;
   ramUsedMb: number;
   ramTotalMb: number;
-  lunaProcessCpu: number;
-  lunaProcessRamMb: number;
+  lurekProcessCpu: number;
+  lurekProcessRamMb: number;
   gpuPercent?: number;
   gpuVramMb?: number;
   diskReadKbs?: number;
@@ -40,8 +40,8 @@ async function collectSample(): Promise<SystemSample> {
     cpuPercent: 0,
     ramUsedMb: 0,
     ramTotalMb: 0,
-    lunaProcessCpu: 0,
-    lunaProcessRamMb: 0,
+    lurekProcessCpu: 0,
+    lurekProcessRamMb: 0,
   };
 
   if (process.platform === "win32") {
@@ -59,15 +59,15 @@ async function collectWindows(sample: SystemSample): Promise<void> {
 $ErrorActionPreference = 'SilentlyContinue'
 $mem = Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory, TotalVisibleMemorySize
 $cpu = (Get-CimInstance -ClassName Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average
-$lunaProc = Get-Process -Name 'luna*','luna2d' -ErrorAction SilentlyContinue | Sort-Object CPU -Descending | Select-Object -First 1
+$lurekProc = Get-Process -Name 'lurek2d*','lurek2d' -ErrorAction SilentlyContinue | Sort-Object CPU -Descending | Select-Object -First 1
 $disk = Get-CimInstance Win32_PerfFormattedData_PerfDisk_LogicalDisk -Filter "Name='_Total'" | Select-Object DiskReadBytesPersec, DiskWriteBytesPersec
 $net = Get-CimInstance Win32_PerfFormattedData_Tcpip_NetworkInterface | Measure-Object -Property BytesSentPersec,BytesReceivedPersec -Sum
 [PSCustomObject]@{
   CPU = [int]$cpu
   MemFreeKB = [long]$mem.FreePhysicalMemory
   MemTotalKB = [long]$mem.TotalVisibleMemorySize
-  LunaCPU = if($lunaProc){ [math]::Round($lunaProc.CPU,1) } else { 0 }
-  LunaRAMMB = if($lunaProc){ [math]::Round($lunaProc.WorkingSet64 / 1MB, 1) } else { 0 }
+  LurekCPU = if($lurekProc){ [math]::Round($lurekProc.CPU,1) } else { 0 }
+  LurekRAMMB = if($lurekProc){ [math]::Round($lurekProc.WorkingSet64 / 1MB, 1) } else { 0 }
   DiskReadBps = if($disk){ [long]$disk.DiskReadBytesPersec } else { 0 }
   DiskWriteBps = if($disk){ [long]$disk.DiskWriteBytesPersec } else { 0 }
   NetSentBps = [long]$net.Sum[0]
@@ -81,8 +81,8 @@ $net = Get-CimInstance Win32_PerfFormattedData_Tcpip_NetworkInterface | Measure-
     sample.ramTotalMb = Math.round((data["MemTotalKB"] ?? 0) / 1024);
     const freeMb = Math.round((data["MemFreeKB"] ?? 0) / 1024);
     sample.ramUsedMb = sample.ramTotalMb - freeMb;
-    sample.lunaProcessCpu = data["LunaCPU"] ?? 0;
-    sample.lunaProcessRamMb = data["LunaRAMMB"] ?? 0;
+    sample.lurekProcessCpu = data["LurekCPU"] ?? 0;
+    sample.lurekProcessRamMb = data["LurekRAMMB"] ?? 0;
     const dr = data["DiskReadBps"] ?? 0;
     const dw = data["DiskWriteBps"] ?? 0;
     sample.diskReadKbs = Math.round(dr / 1024);
@@ -125,11 +125,11 @@ async function collectUnix(sample: SystemSample): Promise<void> {
 
   try {
     const { stdout: procOut } = await execFileAsync("sh", ["-c",
-      "ps -C luna2d -o %cpu=,rss= 2>/dev/null || ps aux | grep '[l]una' | awk '{print $3, $6}' | head -1"
+      "ps -C lurek2d -o %cpu=,rss= 2>/dev/null || ps aux | grep '[l]urek2d' | awk '{print $3, $6}' | head -1"
     ], { timeout: 2000 });
     const parts = procOut.trim().split(/\s+/);
-    sample.lunaProcessCpu = parseFloat(parts[0] ?? "0");
-    sample.lunaProcessRamMb = Math.round(parseInt(parts[1] ?? "0", 10) / 1024);
+    sample.lurekProcessCpu = parseFloat(parts[0] ?? "0");
+    sample.lurekProcessRamMb = Math.round(parseInt(parts[1] ?? "0", 10) / 1024);
   } catch { /* skip */ }
 }
 
@@ -157,8 +157,8 @@ export function openSystemMonitor(context: vscode.ExtensionContext): void {
   if (_panel) { _panel.reveal(vscode.ViewColumn.Two); return; }
 
   _panel = vscode.window.createWebviewPanel(
-    "luna.systemMonitor",
-    "Luna2D System Monitor",
+    "lurek.systemMonitor",
+    "Lurek2D System Monitor",
     vscode.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -199,7 +199,7 @@ function buildHtml(): string {
   .big { font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 2px; }
   .sub { font-size: 11px; opacity: 0.6; margin-bottom: 6px; }
   canvas { display: block; width: 100%; height: 60px; }
-  .luna-card { grid-column: 1 / -1; }
+  .lurek-card { grid-column: 1 / -1; }
   .row { display: flex; gap: 24px; }
   .row .stat { }
   .row .stat .big { font-size: 20px; }
@@ -219,7 +219,7 @@ function buildHtml(): string {
 <div class="status-row">
   <div class="dot idle" id="pollDot"></div>
   <span id="pollStatus" style="font-size:12px;opacity:.7">Starting…</span>
-  <span id="lunaStatus" class="badge idle">luna2d: not running</span>
+  <span id="lurekStatus" class="badge idle">lurek2d: not running</span>
 </div>
 
 <div class="grid">
@@ -262,14 +262,14 @@ function buildHtml(): string {
     <canvas id="netChart"></canvas>
   </div>
 
-  <!-- Luna2D process -->
-  <div class="card luna-card">
-    <div class="card-title">Luna2D Process</div>
+  <!-- Lurek2D process -->
+  <div class="card lurek-card">
+    <div class="card-title">Lurek2D Process</div>
     <div class="row">
-      <div class="stat"><div class="big" id="lunaCpu">–</div><div class="sub">CPU %</div></div>
-      <div class="stat"><div class="big" id="lunaRam">–</div><div class="sub">RAM MB</div></div>
+      <div class="stat"><div class="big" id="lurekCpu">–</div><div class="sub">CPU %</div></div>
+      <div class="stat"><div class="big" id="lurekRam">–</div><div class="sub">RAM MB</div></div>
     </div>
-    <canvas id="lunaChart"></canvas>
+    <canvas id="lurekChart"></canvas>
   </div>
 </div>
 
@@ -286,7 +286,7 @@ const COLOR = {
   diskR: '#9cdcfe',
   diskW: '#ce9178',
   net:   '#c586c0',
-  luna:  '#f48771',
+  lurek:  '#f48771',
 };
 
 function drawLine(canvasId, values, color, maxVal) {
@@ -316,14 +316,14 @@ function drawLine(canvasId, values, color, maxVal) {
 function updateUI() {
   if (_samples.length === 0) return;
   const last = _samples[_samples.length - 1];
-  const hasLuna = last.lunaProcessCpu > 0 || last.lunaProcessRamMb > 0;
+  const hasLurek = last.lurekProcessCpu > 0 || last.lurekProcessRamMb > 0;
   const hasGpu = last.gpuPercent !== undefined && last.gpuPercent !== null;
 
   // Poll status
   document.getElementById('pollDot').className = 'dot active';
   document.getElementById('pollStatus').textContent = 'Polling every 2s  ·  ' + _samples.length + ' samples';
-  document.getElementById('lunaStatus').textContent = hasLuna ? 'luna2d: running' : 'luna2d: not detected';
-  document.getElementById('lunaStatus').className = 'badge ' + (hasLuna ? 'run' : 'idle');
+  document.getElementById('lurekStatus').textContent = hasLurek ? 'lurek2d: running' : 'lurek2d: not detected';
+  document.getElementById('lurekStatus').className = 'badge ' + (hasLurek ? 'run' : 'idle');
 
   // CPU
   const cpuPct = last.cpuPercent;
@@ -354,11 +354,11 @@ function updateUI() {
   document.getElementById('netR').textContent = (last.netRecvKbs || 0);
   drawLine('netChart', _samples.map(s => (s.netSentKbs||0) + (s.netRecvKbs||0)), COLOR.net);
 
-  // Luna
-  document.getElementById('lunaCpu').textContent = last.lunaProcessCpu;
-  document.getElementById('lunaRam').textContent = last.lunaProcessRamMb;
-  document.getElementById('lunaCpu').style.color = last.lunaProcessCpu > 50 ? '#f44747' : 'inherit';
-  drawLine('lunaChart', _samples.map(s => s.lunaProcessCpu), COLOR.luna, 100);
+  // Lurek2D
+  document.getElementById('lurekCpu').textContent = last.lurekProcessCpu;
+  document.getElementById('lurekRam').textContent = last.lurekProcessRamMb;
+  document.getElementById('lurekCpu').style.color = last.lurekProcessCpu > 50 ? '#f44747' : 'inherit';
+  drawLine('lurekChart', _samples.map(s => s.lurekProcessCpu), COLOR.lurek, 100);
 }
 
 window.addEventListener('resize', updateUI);

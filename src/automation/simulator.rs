@@ -20,7 +20,7 @@
 
 use std::collections::HashMap;
 
-use crate::event::{Event, EventArg, EventQueue};
+use crate::signal::{Event, EventArg, EventQueue};
 
 use super::{Action, Script, Step};
 use crate::engine::log_messages::{AT01_SIM_INIT, AT02_SCRIPT_LOAD};

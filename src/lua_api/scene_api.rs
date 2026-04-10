@@ -708,9 +708,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // `lurek.scene.define(def)` — creates a reusable scene class (callable constructor).
     lua.load(
         r#"
-local _tbl = luna.scene
+local _tbl = lurek.scene
 
---- luna.scene.new(def) — create a scene instance directly from a methods table.
+--- lurek.scene.new(def) — create a scene instance directly from a methods table.
 --- @param def table  A table of optional scene callbacks (ready, process, render, …).
 --- @return table     A new scene instance whose metatable delegates to `def`.
 function _tbl.new(def)
@@ -719,7 +719,7 @@ function _tbl.new(def)
     return setmetatable({}, def)
 end
 
---- luna.scene.define(def) — create a reusable scene class.
+--- lurek.scene.define(def) — create a reusable scene class.
 --- Returns a zero-argument constructor function that produces new instances.
 --- @param def table  A table of optional scene callbacks shared across instances.
 --- @return function  Constructor: call it (no args) to get a fresh scene instance.

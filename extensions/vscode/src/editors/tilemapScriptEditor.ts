@@ -7,7 +7,7 @@ export class TilemapScriptEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.tilemapScript", "Tilemap Script Editor");
+    super(context, "lurek.editor.tilemapScript", "Tilemap Script Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

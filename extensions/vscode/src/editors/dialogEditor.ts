@@ -7,7 +7,7 @@ export class DialogEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.dialog", "Dialog Editor");
+    super(context, "lurek.editor.dialog", "Dialog Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

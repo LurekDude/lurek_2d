@@ -1,5 +1,7 @@
 -- Lurek2D Lua BDD tests for lurek.animation
 -- Headless: no GPU, no audio, no window.
+-- @covers lurek.animation.new
+
 
 describe("lurek.animation", function()
     describe("module interface", function()

@@ -4,7 +4,7 @@ import * as path from "path";
 
 // ── Public interfaces ────────────────────────────────────────
 
-/** A single parameter of a Luna API function. */
+/** A single parameter of a Lurek2D API function. */
 export interface ApiParam {
   name: string;
   type: string;
@@ -13,7 +13,7 @@ export interface ApiParam {
   default?: string;
 }
 
-/** A single Luna API function or method. */
+/** A single Lurek2D API function or method. */
 export interface ApiFunction {
   module: string;
   name: string;
@@ -30,7 +30,7 @@ export interface ApiFunction {
   sourceFile?: string;
 }
 
-/** A Luna API module (luna.graphics, luna.audio, etc.). */
+/** A Lurek2D API module (lurek.graphics, lurek.audio, etc.). */
 export interface ApiModule {
   name: string;
   fullPath: string;
@@ -41,7 +41,7 @@ export interface ApiModule {
   documentedEntries: number;
 }
 
-/** A Luna API enum type. */
+/** A Lurek2D API enum type. */
 export interface ApiEnum {
   name: string;
   values: string[];
@@ -70,27 +70,27 @@ const BUILTIN_ENUMS: Record<string, { values: string[]; descriptions: Map<string
 // ── Callback definitions ─────────────────────────────────────
 
 const CALLBACK_DEFS: { name: string; signature: string; description: string; params: ApiParam[] }[] = [
-  { name: "load", signature: "luna.load()", description: "Called once after the script is loaded.", params: [] },
-  { name: "update", signature: "luna.update(dt)", description: "Called every frame; `dt` is elapsed seconds.", params: [{ name: "dt", type: "number", description: "Delta time in seconds", optional: false }] },
-  { name: "draw", signature: "luna.draw()", description: "Called every frame for rendering.", params: [] },
-  { name: "keypressed", signature: "luna.keypressed(key)", description: "Called when a keyboard key is pressed.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
-  { name: "keyreleased", signature: "luna.keyreleased(key)", description: "Called when a keyboard key is released.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
-  { name: "textinput", signature: "luna.textinput(text)", description: "Called on text input.", params: [{ name: "text", type: "string", description: "Input character(s)", optional: false }] },
-  { name: "mousepressed", signature: "luna.mousepressed(x, y, button)", description: "Called when a mouse button is pressed.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
-  { name: "mousereleased", signature: "luna.mousereleased(x, y, button)", description: "Called when a mouse button is released.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
-  { name: "wheelmoved", signature: "luna.wheelmoved(x, y)", description: "Called on mouse wheel movement.", params: [{ name: "x", type: "number", description: "Horizontal scroll", optional: false }, { name: "y", type: "number", description: "Vertical scroll", optional: false }] },
-  { name: "gamepadpressed", signature: "luna.gamepadpressed(id, button)", description: "Called on gamepad button press.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
-  { name: "gamepadreleased", signature: "luna.gamepadreleased(id, button)", description: "Called on gamepad button release.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
-  { name: "gamepadaxis", signature: "luna.gamepadaxis(id, axis, value)", description: "Called on gamepad axis change.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "axis", type: "string", description: "Axis name", optional: false }, { name: "value", type: "number", description: "Axis value", optional: false }] },
-  { name: "joystickadded", signature: "luna.joystickadded(id)", description: "Called when a gamepad is connected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
-  { name: "joystickremoved", signature: "luna.joystickremoved(id)", description: "Called when a gamepad is disconnected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
-  { name: "touchpressed", signature: "luna.touchpressed(id, x, y, dx, dy, pressure)", description: "Called on touch start.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "touchmoved", signature: "luna.touchmoved(id, x, y, dx, dy, pressure)", description: "Called on touch move.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "touchreleased", signature: "luna.touchreleased(id, x, y, dx, dy, pressure)", description: "Called on touch end.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
-  { name: "focus", signature: "luna.focus(has_focus)", description: "Called when window gains or loses focus.", params: [{ name: "has_focus", type: "boolean", description: "Whether window has focus", optional: false }] },
-  { name: "visible", signature: "luna.visible(is_visible)", description: "Called when window visibility changes.", params: [{ name: "is_visible", type: "boolean", description: "Whether window is visible", optional: false }] },
-  { name: "resize", signature: "luna.resize(w, h)", description: "Called when the window is resized.", params: [{ name: "w", type: "number", description: "New width", optional: false }, { name: "h", type: "number", description: "New height", optional: false }] },
-  { name: "quit", signature: "luna.quit()", description: "Called when the window is closed.", params: [] },
+  { name: "load", signature: "lurek.load()", description: "Called once after the script is loaded.", params: [] },
+  { name: "update", signature: "lurek.update(dt)", description: "Called every frame; `dt` is elapsed seconds.", params: [{ name: "dt", type: "number", description: "Delta time in seconds", optional: false }] },
+  { name: "draw", signature: "lurek.draw()", description: "Called every frame for rendering.", params: [] },
+  { name: "keypressed", signature: "lurek.keypressed(key)", description: "Called when a keyboard key is pressed.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
+  { name: "keyreleased", signature: "lurek.keyreleased(key)", description: "Called when a keyboard key is released.", params: [{ name: "key", type: "string", description: "Key name", optional: false }] },
+  { name: "textinput", signature: "lurek.textinput(text)", description: "Called on text input.", params: [{ name: "text", type: "string", description: "Input character(s)", optional: false }] },
+  { name: "mousepressed", signature: "lurek.mousepressed(x, y, button)", description: "Called when a mouse button is pressed.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
+  { name: "mousereleased", signature: "lurek.mousereleased(x, y, button)", description: "Called when a mouse button is released.", params: [{ name: "x", type: "number", description: "Mouse X", optional: false }, { name: "y", type: "number", description: "Mouse Y", optional: false }, { name: "button", type: "number", description: "Button index", optional: false }] },
+  { name: "wheelmoved", signature: "lurek.wheelmoved(x, y)", description: "Called on mouse wheel movement.", params: [{ name: "x", type: "number", description: "Horizontal scroll", optional: false }, { name: "y", type: "number", description: "Vertical scroll", optional: false }] },
+  { name: "gamepadpressed", signature: "lurek.gamepadpressed(id, button)", description: "Called on gamepad button press.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
+  { name: "gamepadreleased", signature: "lurek.gamepadreleased(id, button)", description: "Called on gamepad button release.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "button", type: "string", description: "Button name", optional: false }] },
+  { name: "gamepadaxis", signature: "lurek.gamepadaxis(id, axis, value)", description: "Called on gamepad axis change.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }, { name: "axis", type: "string", description: "Axis name", optional: false }, { name: "value", type: "number", description: "Axis value", optional: false }] },
+  { name: "joystickadded", signature: "lurek.joystickadded(id)", description: "Called when a gamepad is connected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
+  { name: "joystickremoved", signature: "lurek.joystickremoved(id)", description: "Called when a gamepad is disconnected.", params: [{ name: "id", type: "number", description: "Gamepad ID", optional: false }] },
+  { name: "touchpressed", signature: "lurek.touchpressed(id, x, y, dx, dy, pressure)", description: "Called on touch start.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
+  { name: "touchmoved", signature: "lurek.touchmoved(id, x, y, dx, dy, pressure)", description: "Called on touch move.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
+  { name: "touchreleased", signature: "lurek.touchreleased(id, x, y, dx, dy, pressure)", description: "Called on touch end.", params: [{ name: "id", type: "number", description: "Touch ID", optional: false }, { name: "x", type: "number", description: "X position", optional: false }, { name: "y", type: "number", description: "Y position", optional: false }, { name: "dx", type: "number", description: "X delta", optional: false }, { name: "dy", type: "number", description: "Y delta", optional: false }, { name: "pressure", type: "number", description: "Touch pressure", optional: false }] },
+  { name: "focus", signature: "lurek.focus(has_focus)", description: "Called when window gains or loses focus.", params: [{ name: "has_focus", type: "boolean", description: "Whether window has focus", optional: false }] },
+  { name: "visible", signature: "lurek.visible(is_visible)", description: "Called when window visibility changes.", params: [{ name: "is_visible", type: "boolean", description: "Whether window is visible", optional: false }] },
+  { name: "resize", signature: "lurek.resize(w, h)", description: "Called when the window is resized.", params: [{ name: "w", type: "number", description: "New width", optional: false }, { name: "h", type: "number", description: "New height", optional: false }] },
+  { name: "quit", signature: "lurek.quit()", description: "Called when the window is closed.", params: [] },
 ];
 
 // ── Lua standard library ─────────────────────────────────────
@@ -286,7 +286,7 @@ const LUA_STDLIB: Record<string, StdlibTable> = {
 // ── Service class ────────────────────────────────────────────
 
 /**
- * Loads and serves Luna2D API metadata to all language providers.
+ * Loads and serves Lurek2D API metadata to all language providers.
  * Parses the generated API reference markdown and provides fast
  * lookup by module, function name, object type, and full path.
  */
@@ -302,9 +302,24 @@ export class ApiDataService {
   async load(extensionPath: string): Promise<void> {
     if (this.loaded) return;
 
-    // Priority 1: docs/API/api_data.json (precompiled)
+    // Priority 1: docs/API/lurek.lua (full LuaCATS reference)
     const wsRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (wsRoot) {
+      const luaCatsPath = path.join(wsRoot, "docs", "API", "lurek.lua");
+      if (fs.existsSync(luaCatsPath)) {
+        try {
+          const raw = fs.readFileSync(luaCatsPath, "utf-8");
+          this.loadFromLurekLua(raw);
+          this.initEnums();
+          this.initCallbacks();
+          this.loaded = true;
+          return;
+        } catch {
+          // fall through
+        }
+      }
+
+      // Priority 2: docs/API/api_data.json (precompiled)
       const jsonPath = path.join(wsRoot, "docs", "API", "api_data.json");
       if (fs.existsSync(jsonPath)) {
         try {
@@ -320,7 +335,7 @@ export class ApiDataService {
       }
     }
 
-    // Priority 2: data/api-data.json bundled with extension
+    // Priority 3: data/api-data.json bundled with extension
     const bundledJson = path.join(extensionPath, "data", "api-data.json");
     if (fs.existsSync(bundledJson)) {
       try {
@@ -335,13 +350,13 @@ export class ApiDataService {
       }
     }
 
-    // Priority 3: generated markdown in workspace
+    // Priority 4: docs/API/lua-api.md (compact generated reference)
     if (wsRoot) {
-      const mdPath = path.join(wsRoot, "docs", "API", "lua_api_reference_generated.md");
+      const mdPath = path.join(wsRoot, "docs", "API", "lua-api.md");
       if (fs.existsSync(mdPath)) {
         try {
           const md = fs.readFileSync(mdPath, "utf-8");
-          this.loadFromMarkdown(md);
+          this.loadFromLuaApiMd(md);
           this.initEnums();
           this.initCallbacks();
           this.loaded = true;
@@ -472,7 +487,7 @@ export class ApiDataService {
         const modName = String(raw.name ?? "");
         const mod: ApiModule = {
           name: modName,
-          fullPath: `luna.${modName}`,
+          fullPath: `lurek.${modName}`,
           description: String(raw.description ?? ""),
           functions: [],
           methods: [],
@@ -511,7 +526,7 @@ export class ApiDataService {
 
   private rawToApiFunction(modName: string, raw: Record<string, unknown>): ApiFunction {
     const name = String(raw.name ?? "");
-    const fullPath = String(raw.fullPath ?? `luna.${modName}.${name}`);
+    const fullPath = String(raw.fullPath ?? `lurek.${modName}.${name}`);
     const params: ApiParam[] = Array.isArray(raw.parameters)
       ? (raw.parameters as Record<string, unknown>[]).map(p => ({
           name: String(p.name ?? ""),
@@ -558,12 +573,12 @@ export class ApiDataService {
 
       // Clean up description — remove stray "Lua API:" and duplicated short sentences
       let desc = (currentFunc.description ?? "").trim();
-      desc = desc.replace(/\s*Luna [\w]+ API function\.\s*/g, " ").trim();
+      desc = desc.replace(/\s*Lurek2D [\w]+ API function\.\s*/g, " ").trim();
 
       const fn: ApiFunction = {
         module: currentModule.name,
         name: currentFunc.name,
-        fullPath: currentFunc.fullPath ?? `luna.${currentModule.name}.${currentFunc.name}`,
+        fullPath: currentFunc.fullPath ?? `lurek.${currentModule.name}.${currentFunc.name}`,
         signature: currentFunc.signature ?? "",
         description: desc,
         parameters: currentFunc.parameters ?? [],
@@ -598,8 +613,8 @@ export class ApiDataService {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
 
-      // ── Module header: ## luna.graphics ──
-      const modMatch = line.match(/^## (?:luna\.)?(\w+)/);
+      // ── Module header: ## lurek.graphics ──
+      const modMatch = line.match(/^## (?:lurek\.)?(\w+)/);
       if (modMatch && !line.startsWith("## Contents") && !line.startsWith("## Callbacks")) {
         flushFunc();
         if (currentModule) {
@@ -611,7 +626,7 @@ export class ApiDataService {
         const modName = modMatch[1].toLowerCase().replace(/-/g, "_");
         currentModule = {
           name: modName,
-          fullPath: `luna.${modName}`,
+          fullPath: `lurek.${modName}`,
           description: "",
           functions: [],
           methods: [],
@@ -652,9 +667,9 @@ export class ApiDataService {
         continue;
       }
 
-      // ── Function header: #### `luna.graphics.arc(mode, x, y, ...)` ──
+      // ── Function header: #### `lurek.graphics.arc(mode, x, y, ...)` ──
       const funcMatch = line.match(
-        /^#{3,4}\s+`?luna\.(\w+)\.(\w+)(?:\(([^)]*)\))?`?/
+        /^#{3,4}\s+`?lurek\.(\w+)\.(\w+)(?:\(([^)]*)\))?`?/
       );
       if (funcMatch && currentModule) {
         flushFunc();
@@ -664,8 +679,8 @@ export class ApiDataService {
           : [];
         currentFunc = {
           name: funcName,
-          fullPath: `luna.${currentModule.name}.${funcName}`,
-          signature: `luna.${currentModule.name}.${funcName}(${argStr ?? ""})`,
+          fullPath: `lurek.${currentModule.name}.${funcName}`,
+          signature: `lurek.${currentModule.name}.${funcName}(${argStr ?? ""})`,
           description: "",
           parameters: paramNames.map(n => ({
             name: n,
@@ -689,7 +704,7 @@ export class ApiDataService {
         currentObjectType = objType;
         currentFunc = {
           name: methName,
-          fullPath: `luna.${currentModule.name}.${objType}:${methName}`,
+          fullPath: `lurek.${currentModule.name}.${objType}:${methName}`,
           signature: `${objType}:${methName}(${argStr ?? ""})`,
           description: "",
           parameters: paramNames.map(n => ({
@@ -870,7 +885,7 @@ export class ApiDataService {
     this.callbackList = CALLBACK_DEFS.map(cb => ({
       module: "",
       name: cb.name,
-      fullPath: `luna.${cb.name}`,
+      fullPath: `lurek.${cb.name}`,
       signature: cb.signature,
       description: cb.description,
       parameters: cb.params,
@@ -892,6 +907,320 @@ export class ApiDataService {
       returnType: entry.returns,
       isMethod: false,
     };
+  }
+
+  // ── docs/API/lurek.lua loader ─────────────────────────────────────────────
+  // Parses the LuaCATS-style full API reference used as the workspace source of
+  // truth. This format includes richer @param and @return annotations than the
+  // compact lua-api.md reference.
+  private loadFromLurekLua(luaSource: string): void {
+    const lines = luaSource.split("\n");
+    let currentModule: ApiModule | null = null;
+    let pendingDescription: string[] = [];
+    let pendingParams: ApiParam[] = [];
+    let pendingReturns: string[] = [];
+
+    const finishModule = (): void => {
+      if (!currentModule) {
+        return;
+      }
+      currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
+      currentModule.documentedEntries = [
+        ...currentModule.functions,
+        ...currentModule.methods,
+      ].filter((fn) => fn.description.length > 0).length;
+      this.modules.set(currentModule.name, currentModule);
+    };
+
+    const clearPending = (): void => {
+      pendingDescription = [];
+      pendingParams = [];
+      pendingReturns = [];
+    };
+
+    const ensureModule = (moduleName: string): ApiModule => {
+      if (currentModule && currentModule.name === moduleName) {
+        return currentModule;
+      }
+
+      finishModule();
+      currentModule = {
+        name: moduleName,
+        fullPath: `lurek.${moduleName}`,
+        description: pendingDescription.join(" ").trim(),
+        functions: [],
+        methods: [],
+        totalEntries: 0,
+        documentedEntries: 0,
+      };
+      clearPending();
+      return currentModule;
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (line.length === 0) {
+        continue;
+      }
+
+      const descMatch = line.match(/^---(?!@)(.*)$/);
+      if (descMatch) {
+        const desc = descMatch[1].trim();
+        if (desc) {
+          pendingDescription.push(desc);
+        }
+        continue;
+      }
+
+      const paramMatch = line.match(/^---@param\s+(\w+)\s+(\S+)(?:\s+(.*))?$/);
+      if (paramMatch) {
+        const [, name, rawType, rawDesc] = paramMatch;
+        pendingParams.push({
+          name,
+          type: rawType.replace(/\?$/, ""),
+          description: rawDesc?.trim() ?? "",
+          optional: rawType.includes("?") || /optional/i.test(rawDesc ?? ""),
+        });
+        continue;
+      }
+
+      const returnMatch = line.match(/^---@return\s+(.+)$/);
+      if (returnMatch) {
+        pendingReturns.push(returnMatch[1].trim());
+        continue;
+      }
+
+      const moduleMatch = line.match(/^---@class\s+lurek\.([A-Za-z0-9_]+)\s*$/);
+      if (moduleMatch) {
+        finishModule();
+        currentModule = {
+          name: moduleMatch[1],
+          fullPath: `lurek.${moduleMatch[1]}`,
+          description: pendingDescription.join(" ").trim(),
+          functions: [],
+          methods: [],
+          totalEntries: 0,
+          documentedEntries: 0,
+        };
+        clearPending();
+        continue;
+      }
+
+      if (/^---@class\s+[A-Za-z_][A-Za-z0-9_]*(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*$/.test(line)) {
+        clearPending();
+        continue;
+      }
+
+      const functionMatch = line.match(/^function\s+lurek\.([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\(([^)]*)\)\s*end$/);
+      if (functionMatch) {
+        const [, moduleName, functionName, argStr] = functionMatch;
+        const module = ensureModule(moduleName);
+        const returns = pendingReturns.length > 0 ? pendingReturns.join(", ") : undefined;
+        const parameters = this.mergeSignatureParams(argStr, pendingParams);
+        const fn: ApiFunction = {
+          module: module.name,
+          name: functionName,
+          fullPath: `lurek.${module.name}.${functionName}`,
+          signature: `lurek.${module.name}.${functionName}(${argStr.trim()})`,
+          description: pendingDescription.join(" ").trim(),
+          parameters,
+          returns,
+          returnType: inferReturnType(returns),
+          isMethod: false,
+        };
+        module.functions.push(fn);
+        this.allFunctions.set(fn.fullPath, fn);
+        clearPending();
+        continue;
+      }
+
+      const methodMatch = line.match(/^function\s+([A-Za-z_][A-Za-z0-9_]*)[:.]([A-Za-z0-9_]+)\(([^)]*)\)\s*end$/);
+      if (methodMatch && currentModule) {
+        const [, objectType, methodName, argStr] = methodMatch;
+        const returns = pendingReturns.length > 0 ? pendingReturns.join(", ") : undefined;
+        const parameters = this.mergeSignatureParams(argStr, pendingParams);
+        const fn: ApiFunction = {
+          module: currentModule.name,
+          name: methodName,
+          fullPath: `lurek.${currentModule.name}.${objectType}:${methodName}`,
+          signature: `${objectType}:${methodName}(${argStr.trim()})`,
+          description: pendingDescription.join(" ").trim(),
+          parameters,
+          returns,
+          returnType: inferReturnType(returns),
+          isMethod: true,
+          objectType,
+        };
+        currentModule.methods.push(fn);
+        this.indexMethod(fn);
+        this.allFunctions.set(fn.fullPath, fn);
+        clearPending();
+        continue;
+      }
+
+      clearPending();
+    }
+
+    finishModule();
+  }
+
+
+  // ── lua-api.md loader ─────────────────────────────────────────────────────
+  // Parses the compact one-liner format used in docs/API/lua-api.md:
+  //   lurek.MODULE.FUNCNAME( params )[ -> returnType]  -- description
+  //   ObjType:methodName( params )[ -> returnType]  -- description
+  private loadFromLuaApiMd(md: string): void {
+    const lines = md.split("\n");
+    let currentModule: ApiModule | null = null;
+    let inCodeBlock = false;
+
+    const finishModule = (): void => {
+      if (!currentModule) return;
+      currentModule.totalEntries = currentModule.functions.length + currentModule.methods.length;
+      currentModule.documentedEntries = [
+        ...currentModule.functions,
+        ...currentModule.methods,
+      ].filter((f) => f.description.length > 0).length;
+      this.modules.set(currentModule.name, currentModule);
+    };
+
+    for (const line of lines) {
+      // Module header: ## `lurek.graphics` {#graphics}
+      const modMatch = line.match(/^## [`']?lurek\.([\w]+)[`']?/);
+      if (modMatch) {
+        finishModule();
+        const modName = modMatch[1];
+        currentModule = {
+          name: modName,
+          fullPath: `lurek.${modName}`,
+          description: "",
+          functions: [],
+          methods: [],
+          totalEntries: 0,
+          documentedEntries: 0,
+        };
+        inCodeBlock = false;
+
+        // Grab description from blockquote on next lines
+        continue;
+      }
+
+      // Module description from blockquote: > `lurek.gfx` — 2D drawing...
+      if (currentModule && line.startsWith(">") && !currentModule.description) {
+        const desc = line.replace(/^>\s*`[^`]*`\s*—\s*/, "").trim();
+        if (desc) currentModule.description = desc;
+        continue;
+      }
+
+      // Code block toggle
+      if (line.startsWith("```")) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+
+      if (!inCodeBlock || !currentModule) continue;
+
+      // Callback line: function lurek.load() -- desc
+      {
+        const m = line.match(/^function lurek\.(\w+)\(\s*(.*?)\s*\)\s*--\s*(.*)/);
+        if (m) {
+          // Callbacks are handled by initCallbacks() — skip
+          continue;
+        }
+      }
+
+      // Module function: lurek.MODULE.FUNCNAME( params ) -> ret  -- desc
+      {
+        const m = line.match(/^lurek\.(\w+)\.(\w+)\(\s*(.*?)\s*\)(?:\s*->\s*([^-]+?))?\s*--\s*(.*)/);
+        if (m) {
+          const [, , funcName, paramStr, retRaw, description] = m;
+          const returnType = retRaw?.trim() || undefined;
+          const parameters = this.parseParamStr(paramStr);
+          const fn: ApiFunction = {
+            module: currentModule.name,
+            name: funcName,
+            fullPath: `lurek.${currentModule.name}.${funcName}`,
+            signature: `lurek.${currentModule.name}.${funcName}(${paramStr})`,
+            description: description.trim(),
+            parameters,
+            returns: returnType,
+            returnType,
+            isMethod: false,
+          };
+          currentModule.functions.push(fn);
+          this.allFunctions.set(fn.fullPath, fn);
+          continue;
+        }
+      }
+
+      // Method: ObjType:methodName( params ) -> ret  -- desc
+      {
+        const m = line.match(/^([A-Z]\w*):([\w]+)\(\s*(.*?)\s*\)(?:\s*->\s*([^-]+?))?\s*--\s*(.*)/);
+        if (m) {
+          const [, objType, methName, paramStr, retRaw, description] = m;
+          const returnType = retRaw?.trim() || undefined;
+          const parameters = this.parseParamStr(paramStr);
+          const fn: ApiFunction = {
+            module: currentModule.name,
+            name: methName,
+            fullPath: `lurek.${currentModule.name}.${objType}:${methName}`,
+            signature: `${objType}:${methName}(${paramStr})`,
+            description: description.trim(),
+            parameters,
+            returns: returnType,
+            returnType,
+            isMethod: true,
+            objectType: objType,
+          };
+          currentModule.methods.push(fn);
+          this.indexMethod(fn);
+          this.allFunctions.set(fn.fullPath, fn);
+          continue;
+        }
+      }
+    }
+
+    finishModule();
+  }
+
+  // ── Param string parser ────────────────────────────────────────────────────
+  // Parses "name : type, name2 : type2?" style param strings from lua-api.md
+  private parseParamStr(paramStr: string): ApiParam[] {
+    if (!paramStr.trim()) return [];
+    return paramStr.split(",").map((p) => {
+      p = p.trim();
+      const optional = p.endsWith("?") || p.includes("?");
+      const colonIdx = p.indexOf(":");
+      if (colonIdx >= 0) {
+        const name = p.slice(0, colonIdx).trim().replace(/[?\[\]]/g, "");
+        const type = p.slice(colonIdx + 1).trim().replace(/\?$/, "").trim();
+        return { name: name || "_", type: type || "any", description: "", optional };
+      }
+      const name = p.replace(/[?\[\]]/g, "").trim();
+      return { name: name || "_", type: "any", description: "", optional };
+    });
+  }
+
+  private mergeSignatureParams(argStr: string, annotatedParams: ApiParam[]): ApiParam[] {
+    const params = annotatedParams.map((param) => ({ ...param }));
+    const existingNames = new Set(params.map((param) => param.name));
+    const signatureNames = argStr
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    for (const name of signatureNames) {
+      if (!existingNames.has(name)) {
+        params.push({
+          name,
+          type: "any",
+          description: "",
+          optional: false,
+        });
+      }
+    }
+
+    return params;
   }
 
   // ── Fallback data ──────────────────────────────────────────
@@ -1041,7 +1370,7 @@ export class ApiDataService {
     for (const [modName, modDesc, funcs] of mods) {
       const mod: ApiModule = {
         name: modName,
-        fullPath: `luna.${modName}`,
+        fullPath: `lurek.${modName}`,
         description: modDesc,
         functions: [],
         methods: [],
@@ -1052,8 +1381,8 @@ export class ApiDataService {
         const fn: ApiFunction = {
           module: modName,
           name,
-          fullPath: `luna.${modName}.${name}`,
-          signature: `luna.${modName}.${name}(${params.join(", ")})`,
+          fullPath: `lurek.${modName}.${name}`,
+          signature: `lurek.${modName}.${name}(${params.join(", ")})`,
           description: desc,
           parameters: params.map(p => ({
             name: p,

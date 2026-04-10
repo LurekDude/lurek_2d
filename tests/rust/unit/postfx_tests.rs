@@ -1,6 +1,6 @@
-//! Integration tests for the PostFX (post-processing effects) module.
+﻿//! Integration tests for the PostFX (post-processing effects) module.
 
-use lurek2d::fx::{PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::effect::{PostFxEffect, PostFxEffectType, PostFxStack};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -284,7 +284,7 @@ fn test_lua_postfx_new_effect() {
     let result: String = lua
         .load(
             r#"
-            local bloom = luna.postfx.newEffect("bloom")
+            local bloom = lurek.postfx.newEffect("bloom")
             return bloom:getEffectType()
         "#,
         )
@@ -307,7 +307,7 @@ fn test_lua_postfx_effect_parameters() {
     let result: (f32, f32, bool) = lua
         .load(
             r#"
-            local bloom = luna.postfx.newEffect("bloom")
+            local bloom = lurek.postfx.newEffect("bloom")
             bloom:setThreshold(0.5)
             local t = bloom:getParameter("threshold")
             local i = bloom:getParameter("intensity")
@@ -328,9 +328,9 @@ fn test_lua_postfx_stack_add_remove() {
     let count: i32 = lua
         .load(
             r#"
-            local stack = luna.postfx.newStack(800, 600)
-            local bloom = luna.postfx.newEffect("bloom")
-            local blur = luna.postfx.newEffect("blur")
+            local stack = lurek.postfx.newStack(800, 600)
+            local bloom = lurek.postfx.newEffect("bloom")
+            local blur = lurek.postfx.newEffect("blur")
             stack:add(bloom)
             stack:add(blur)
             local c1 = stack:getEffectCount()
@@ -350,7 +350,7 @@ fn test_lua_postfx_stack_dimensions() {
     let (w, h): (u32, u32) = lua
         .load(
             r#"
-            local stack = luna.postfx.newStack(1920, 1080)
+            local stack = lurek.postfx.newStack(1920, 1080)
             return stack:getWidth(), stack:getHeight()
         "#,
         )
@@ -366,7 +366,7 @@ fn test_lua_postfx_get_effect_types() {
     let count: i32 = lua
         .load(
             r#"
-            local types = luna.postfx.getEffectTypes()
+            local types = lurek.postfx.getEffectTypes()
             return #types
         "#,
         )
@@ -381,7 +381,7 @@ fn test_lua_postfx_new_pass() {
     let (t, built_in): (String, bool) = lua
         .load(
             r#"
-            local pass = luna.postfx.newPass(1)
+            local pass = lurek.postfx.newPass(1)
             return pass:getEffectType(), pass:isBuiltIn()
         "#,
         )
@@ -397,7 +397,7 @@ fn test_lua_postfx_effect_type_method() {
     let t: String = lua
         .load(
             r#"
-            local bloom = luna.postfx.newEffect("bloom")
+            local bloom = lurek.postfx.newEffect("bloom")
             return bloom:type()
         "#,
         )
@@ -510,7 +510,7 @@ fn lua_pixelate_effect_has_block_size_param() {
     let v: f32 = lua
         .load(
             r#"
-            local e = luna.postfx.newEffect("pixelate")
+            local e = lurek.postfx.newEffect("pixelate")
             return e:getParameter("block_size")
         "#,
         )
@@ -525,7 +525,7 @@ fn lua_sepia_effect_built_in() {
     let ok: bool = lua
         .load(
             r#"
-            local e = luna.postfx.newEffect("sepia")
+            local e = lurek.postfx.newEffect("sepia")
             return e:isBuiltIn()
         "#,
         )
@@ -540,7 +540,7 @@ fn lua_scanlines_effect_has_spacing_param() {
     let v: f32 = lua
         .load(
             r#"
-            local e = luna.postfx.newEffect("scanlines")
+            local e = lurek.postfx.newEffect("scanlines")
             return e:getParameter("spacing")
         "#,
         )
@@ -555,10 +555,10 @@ fn lua_new_effects_stack_add_remove() {
     let count: i32 = lua
         .load(
             r#"
-            local stack = luna.postfx.newStack(800, 600)
-            local pixelate = luna.postfx.newEffect("pixelate")
-            local sepia     = luna.postfx.newEffect("sepia")
-            local grayscale = luna.postfx.newEffect("grayscale")
+            local stack = lurek.postfx.newStack(800, 600)
+            local pixelate = lurek.postfx.newEffect("pixelate")
+            local sepia     = lurek.postfx.newEffect("sepia")
+            local grayscale = lurek.postfx.newEffect("grayscale")
             stack:add(pixelate)
             stack:add(sepia)
             stack:add(grayscale)
@@ -576,7 +576,7 @@ fn lua_hueshift_effect_name_roundtrip() {
     let name: String = lua
         .load(
             r#"
-            local e = luna.postfx.newEffect("hueshift")
+            local e = lurek.postfx.newEffect("hueshift")
             return e:getEffectType()
         "#,
         )
@@ -584,3 +584,4 @@ fn lua_hueshift_effect_name_roundtrip() {
         .expect("Lua eval failed");
     assert_eq!(name, "hueshift");
 }
+

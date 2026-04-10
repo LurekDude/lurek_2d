@@ -1,9 +1,14 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import {
+  findApiSymbolLine,
+  listApiEntries,
+  resolveWorkspaceApiDocPath,
+} from "../services/apiDocs.js";
 
 /**
- * Browse the API via quick-pick. Shows known luna.* functions from
+ * Browse the API via quick-pick. Shows known lurek.* functions from
  * the generated API reference if available.
  */
 export async function browseApi(): Promise<void> {
@@ -13,37 +18,37 @@ export async function browseApi(): Promise<void> {
     return;
   }
 
-  const apiPath = path.join(root, "docs", "API", "lua_api_reference_generated.md");
-  if (!fs.existsSync(apiPath)) {
+  const apiPath = resolveWorkspaceApiDocPath(root);
+  if (!apiPath || !fs.existsSync(apiPath)) {
     vscode.window.showWarningMessage(
-      "API reference not found. Run 'python tools/gen_lua_api.py' to generate it."
+      "API reference not found. Expected docs/API/lurek.lua or docs/API/lua-api.md."
     );
     return;
   }
 
   const content = fs.readFileSync(apiPath, "utf-8");
-  const headings = content
-    .split("\n")
-    .filter((line) => line.startsWith("## ") || line.startsWith("### "))
-    .map((line) => line.replace(/^#+\s*/, ""));
+  const entries = listApiEntries(content, apiPath);
 
-  if (headings.length === 0) {
+  if (entries.length === 0) {
     vscode.window.showInformationMessage("No API entries found.");
     return;
   }
 
-  const picked = await vscode.window.showQuickPick(headings, {
-    placeHolder: "Search Luna2D API...",
+  const picked = await vscode.window.showQuickPick(entries.map((entry) => ({
+    label: entry.label,
+    description: entry.kind,
+    line: entry.line,
+  })), {
+    placeHolder: "Search Lurek2D API...",
     matchOnDescription: true,
   });
 
   if (picked) {
-    // Open the doc and search for the heading
     const doc = await vscode.workspace.openTextDocument(apiPath);
     const editor = await vscode.window.showTextDocument(doc);
-    const lineIndex = content
-      .split("\n")
-      .findIndex((line) => line.includes(picked));
+    const lineIndex = typeof picked.line === "number"
+      ? picked.line
+      : findApiSymbolLine(content, apiPath, picked.label);
     if (lineIndex >= 0) {
       const pos = new vscode.Position(lineIndex, 0);
       editor.selection = new vscode.Selection(pos, pos);
@@ -62,10 +67,10 @@ export async function openApiDocs(): Promise<void> {
     return;
   }
 
-  const apiPath = path.join(root, "docs", "API", "lua_api_reference_generated.md");
-  if (!fs.existsSync(apiPath)) {
+  const apiPath = resolveWorkspaceApiDocPath(root);
+  if (!apiPath || !fs.existsSync(apiPath)) {
     vscode.window.showWarningMessage(
-      "API reference not found. Run 'python tools/gen_lua_api.py' first."
+      "API reference not found. Expected docs/API/lurek.lua or docs/API/lua-api.md."
     );
     return;
   }
@@ -75,7 +80,7 @@ export async function openApiDocs(): Promise<void> {
 }
 
 /**
- * Opens API docs for the luna.* symbol under the cursor, or browses
+ * Opens API docs for the lurek.* symbol under the cursor, or browses
  * the full reference if no symbol is found.
  */
 export async function openWiki(): Promise<void> {
@@ -83,27 +88,20 @@ export async function openWiki(): Promise<void> {
 
   const wordRange = editor?.document.getWordRangeAtPosition(
     editor.selection.active,
-    /luna\.[a-zA-Z0-9_.]+/
+    /lurek\.[a-zA-Z0-9_.]+/
   );
   const symbol = wordRange ? editor!.document.getText(wordRange) : undefined;
 
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (!root) { vscode.window.showErrorMessage("No workspace folder open."); return; }
 
-  const apiPath = path.join(root, "docs", "API", "lua_api_reference_generated.md");
-  const altPath = path.join(root, "docs", "lua-api.md");
-  const docPath = fs.existsSync(apiPath) ? apiPath : fs.existsSync(altPath) ? altPath : null;
+  const docPath = resolveWorkspaceApiDocPath(root) ?? null;
 
   if (docPath) {
     const content = fs.readFileSync(docPath, "utf-8");
-    const lines = content.split("\n");
 
     if (symbol) {
-      // Find the line with the symbol heading
-      const bare = symbol.replace(/^luna\./, "");
-      const lineIndex = lines.findIndex(
-        (l) => l.startsWith("##") && (l.includes(symbol) || l.includes(bare))
-      );
+      const lineIndex = findApiSymbolLine(content, docPath, symbol);
       const doc = await vscode.workspace.openTextDocument(docPath);
       const editorDoc = await vscode.window.showTextDocument(doc);
       const pos = new vscode.Position(Math.max(0, lineIndex), 0);
@@ -123,15 +121,15 @@ export async function openWiki(): Promise<void> {
 }
 
 /**
- * Shows an interactive Luna2D module dependency graph in a webview panel.
+ * Shows an interactive Lurek2D module dependency graph in a webview panel.
  * Reads the actual src/ directory structure to discover modules and
  * parses use crate:: statements to derive real edges.
  */
 export function depGraph(context: vscode.ExtensionContext): void {
   const root = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   const panel = vscode.window.createWebviewPanel(
-    "luna.depGraph",
-    "Luna2D Module Dependency Graph",
+    "lurek.depGraph",
+    "Lurek2D Module Dependency Graph",
     vscode.ViewColumn.One,
     { enableScripts: true, retainContextWhenHidden: true }
   );
@@ -454,7 +452,7 @@ draw();
  * Shows a dependency list in the output channel.
  */
 export function depList(): void {
-  const terminal = vscode.window.createTerminal("Luna Deps");
+  const terminal = vscode.window.createTerminal("Lurek2D Deps");
   terminal.show();
   terminal.sendText("cargo tree --depth 1");
 }

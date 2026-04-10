@@ -250,4 +250,94 @@ impl PostFxStack {
         self.effects.clear();
         self.enabled.clear();
     }
+
+    // ── CPU rendering ──
+
+    /// Renders a diagnostic image showing the effect stack layout.
+    ///
+    /// Each effect slot is drawn as a labelled box: green when enabled,
+    /// red with an X when disabled. Useful for evidence tests.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_info_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(20, 20, 30, 255);
+
+        let count = self.effects.len();
+        if count == 0 {
+            img.draw_label("EMPTY STACK", 10, 10, 180, 180, 190);
+            return img;
+        }
+
+        let box_gap = 10u32;
+        let total_gap = box_gap * (count as u32 + 1);
+        let box_w = if count > 0 {
+            (width.saturating_sub(total_gap)) / count as u32
+        } else {
+            60
+        };
+        let box_h = height.saturating_sub(60).min(100);
+        let box_y = (height - box_h) / 2;
+
+        for (i, &_effect_idx) in self.effects.iter().enumerate() {
+            let bx = box_gap + i as u32 * (box_w + box_gap);
+            let enabled = self.enabled.get(i).copied().unwrap_or(false);
+
+            let (r, g, b) = if enabled {
+                (80u8, 200u8, 80u8)
+            } else {
+                (200u8, 60u8, 60u8)
+            };
+
+            // Box background
+            img.draw_rect(bx as i32, box_y as i32, box_w, box_h, r / 3, g / 3, b / 3, 200);
+            // Top/bottom borders
+            img.draw_rect(bx as i32, box_y as i32, box_w, 2, r, g, b, 255);
+            img.draw_rect(
+                bx as i32,
+                (box_y + box_h - 2) as i32,
+                box_w,
+                2,
+                r,
+                g,
+                b,
+                255,
+            );
+
+            // X on disabled
+            if !enabled {
+                img.draw_line(
+                    bx as i32 + 10,
+                    box_y as i32 + 10,
+                    (bx + box_w) as i32 - 10,
+                    (box_y + box_h) as i32 - 10,
+                    200,
+                    60,
+                    60,
+                    255,
+                );
+                img.draw_line(
+                    (bx + box_w) as i32 - 10,
+                    box_y as i32 + 10,
+                    bx as i32 + 10,
+                    (box_y + box_h) as i32 - 10,
+                    200,
+                    60,
+                    60,
+                    255,
+                );
+            }
+
+            // Index label
+            let label = format!("FX{}", i);
+            img.draw_label(&label, bx as i32 + 4, box_y as i32 + 4, r, g, b);
+        }
+
+        img
+    }
 }

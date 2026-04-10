@@ -7,7 +7,7 @@ export class SceneFlowEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.sceneFlow", "Scene Flow Editor");
+    super(context, "lurek.editor.sceneFlow", "Scene Flow Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

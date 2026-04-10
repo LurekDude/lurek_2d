@@ -7,7 +7,7 @@ export class AudioMixerEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.audioMixerEditor", "Audio Mixer");
+    super(context, "lurek.audioMixerEditor", "Audio Mixer");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

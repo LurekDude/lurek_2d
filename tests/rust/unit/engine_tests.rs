@@ -160,7 +160,7 @@ fn lua_get_arch() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local arch = luna.platform.getArch()
+        local arch = lurek.platform.getArch()
         assert(type(arch) == "string")
         assert(#arch > 0)
         "#,
@@ -175,7 +175,7 @@ fn lua_get_env_existing() {
     lua.load(
         r#"
         -- PATH should exist on all platforms
-        local path = luna.platform.getEnv("PATH")
+        local path = lurek.platform.getEnv("PATH")
         assert(path ~= nil)
         assert(type(path) == "string")
         "#,
@@ -189,7 +189,7 @@ fn lua_get_env_missing() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local val = luna.platform.getEnv("LUREK2D_NONEXISTENT_VAR_12345")
+        local val = lurek.platform.getEnv("LUREK2D_NONEXISTENT_VAR_12345")
         assert(val == nil)
         "#,
     )
@@ -202,7 +202,7 @@ fn lua_get_args() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local args = luna.platform.getArgs()
+        local args = lurek.platform.getArgs()
         assert(type(args) == "table")
         "#,
     )
@@ -215,7 +215,7 @@ fn lua_parse_args_with_table() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local result = luna.platform.parseArgs({"--verbose", "--output=report.txt", "-f", "input.lua"})
+        local result = lurek.platform.parseArgs({"--verbose", "--output=report.txt", "-f", "input.lua"})
         assert(result.flags.verbose == true)
         assert(result.flags.f == true)
         assert(result.options.output == "report.txt")
@@ -231,7 +231,7 @@ fn lua_parse_args_end_of_options() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local result = luna.platform.parseArgs({"--debug", "--", "--not-a-flag"})
+        local result = lurek.platform.parseArgs({"--debug", "--", "--not-a-flag"})
         assert(result.flags.debug == true)
         assert(result.positional[1] == "--not-a-flag")
         "#,
@@ -245,11 +245,11 @@ fn lua_run_batch_basic() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local results = luna.platform.runBatch({
+        local results = lurek.platform.runBatch({
             add = function() return 1 + 1 end,
             mul = function() return 2 * 3 end,
         })
-        local passed, failed, skipped = luna.platform.getBatchResults(results)
+        local passed, failed, skipped = lurek.platform.getBatchResults(results)
         assert(passed == 2)
         assert(failed == 0)
         assert(skipped == 0)
@@ -264,11 +264,11 @@ fn lua_run_batch_with_error() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local results = luna.platform.runBatch({
+        local results = lurek.platform.runBatch({
             good = function() return true end,
             bad = function() error("fail") end,
         })
-        local passed, failed, skipped = luna.platform.getBatchResults(results)
+        local passed, failed, skipped = lurek.platform.getBatchResults(results)
         assert(passed + failed == 2)
         assert(failed >= 1)
         "#,

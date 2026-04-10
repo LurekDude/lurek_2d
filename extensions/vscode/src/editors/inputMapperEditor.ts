@@ -7,7 +7,7 @@ export class InputMapperEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.inputMapperEditor", "Input Mapper");
+    super(context, "lurek.inputMapperEditor", "Input Mapper");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

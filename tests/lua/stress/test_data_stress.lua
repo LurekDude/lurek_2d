@@ -1,5 +1,7 @@
 -- Lurek2D Stress Test: Data Structure Operations
 -- Tests large tables, string operations, and data encoding at scale
+-- @stress lurek.math.random
+
 
 describe("data stress: large tables", function()
     it("creates table with 10000 entries", function()

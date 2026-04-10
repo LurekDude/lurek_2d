@@ -1,3 +1,12 @@
+-- @covers lurek.data.decode
+-- @covers lurek.data.encode
+-- @covers lurek.data.encodeToml
+-- @covers lurek.data.hash
+-- @covers lurek.data.parseToml
+-- @covers lurek.platform.getClipboardText
+-- @covers lurek.platform.getOS
+-- @covers lurek.platform.setClipboardText
+
 ﻿-- Lurek2D Integration Test: Data + Filesystem
 -- Tests data encoding/compression with filesystem I/O
 

@@ -1,6 +1,6 @@
-//! Integration tests for the Overlay (screen-effect overlay) module.
+﻿//! Integration tests for the Overlay (screen-effect overlay) module.
 
-use lurek2d::fx::{
+use lurek2d::effect::{
     AmbientState, CloudState, FadeState, FilmGrainState, FlashState, FogState, HeatHazeState,
     LightningState, Overlay, ShakeState, VignetteState, WeatherState, WeatherType,
 };
@@ -513,7 +513,7 @@ fn overlay_is_active_clouds() {
 #[test]
 fn lua_overlay_create() {
     let lua = make_vm();
-    lua.load("local ov = luna.overlay.newOverlay(800, 600); assert(ov ~= nil)")
+    lua.load("local ov = lurek.overlay.newOverlay(800, 600); assert(ov ~= nil)")
         .exec()
         .expect("Failed to create overlay via Lua");
 }
@@ -523,7 +523,7 @@ fn lua_overlay_create_defaults() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:getWidth() == 800)
         assert(ov:getHeight() == 600)
     "#,
@@ -537,7 +537,7 @@ fn lua_overlay_dimensions() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay(1024, 768)
+        local ov = lurek.overlay.newOverlay(1024, 768)
         assert(ov:getWidth() == 1024)
         assert(ov:getHeight() == 768)
         local w, h = ov:getDimensions()
@@ -554,7 +554,7 @@ fn lua_overlay_resize() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay(800, 600)
+        local ov = lurek.overlay.newOverlay(800, 600)
         ov:resize(1920, 1080)
         assert(ov:getWidth() == 1920)
         assert(ov:getHeight() == 1080)
@@ -569,7 +569,7 @@ fn lua_overlay_is_active_initially_false() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:isActive() == false)
     "#,
     )
@@ -582,7 +582,7 @@ fn lua_overlay_ambient() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setAmbientEnabled(true)
         assert(ov:isAmbientEnabled() == true)
         assert(ov:isActive() == true)
@@ -603,7 +603,7 @@ fn lua_overlay_time_of_day() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setTimeOfDay(18.5)
         assert(math.abs(ov:getTimeOfDay() - 18.5) < 0.001)
     "#,
@@ -617,7 +617,7 @@ fn lua_overlay_weather() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setWeatherEnabled(true)
         assert(ov:isWeatherEnabled() == true)
         ov:setWeather("rain")
@@ -636,7 +636,7 @@ fn lua_overlay_weather_invalid() {
     let result = lua
         .load(
             r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setWeather("tornado")
     "#,
         )
@@ -649,7 +649,7 @@ fn lua_overlay_wind() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setWindDirection(1.5)
         assert(math.abs(ov:getWindDirection() - 1.5) < 0.001)
         ov:setWindSpeed(50.0)
@@ -665,7 +665,7 @@ fn lua_overlay_flash() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:isFlashing() == false)
         ov:flash(1, 0, 0)
         assert(ov:isFlashing() == true)
@@ -681,7 +681,7 @@ fn lua_overlay_shake() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:isShaking() == false)
         ov:shake(10.0, 0.5)
         assert(ov:isShaking() == true)
@@ -700,7 +700,7 @@ fn lua_overlay_fade() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:isFading() == false)
         ov:fade(0, 0, 0, 1.0, 1.0)
         assert(ov:isFading() == true)
@@ -715,7 +715,7 @@ fn lua_overlay_clouds() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setCloudShadows(true)
         assert(ov:isCloudShadowsEnabled() == true)
         ov:setCloudCount(10)
@@ -737,7 +737,7 @@ fn lua_overlay_lightning() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:triggerLightning()
         ov:setLightningColor(1, 1, 0.8, 0.9)
         local r, g, b, a = ov:getLightningColor()
@@ -755,7 +755,7 @@ fn lua_overlay_clear() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setWeatherEnabled(true)
         ov:setAmbientEnabled(true)
         assert(ov:isActive() == true)
@@ -772,7 +772,7 @@ fn lua_overlay_update() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:flash(1, 1, 1, 1, 0.1)
         assert(ov:isFlashing() == true)
         ov:update(0.2)
@@ -788,7 +788,7 @@ fn lua_overlay_type_name() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         assert(ov:type() == "Overlay")
         assert(ov:typeOf("Object") == true)
         assert(ov:typeOf("Overlay") == true)
@@ -804,7 +804,7 @@ fn lua_overlay_weather_all_types() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         local types = {"none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen"}
         for _, wt in ipairs(types) do
             ov:setWeather(wt)
@@ -821,7 +821,7 @@ fn lua_overlay_draw_noop() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:draw()  -- should not error
     "#,
     )
@@ -834,7 +834,7 @@ fn lua_overlay_ambient_color_default_alpha() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setAmbientColor(0.5, 0.5, 0.5)
         local r, g, b, a = ov:getAmbientColor()
         assert(math.abs(a - 1.0) < 0.001, "Default ambient alpha should be 1.0")
@@ -849,7 +849,7 @@ fn lua_overlay_flash_defaults() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:flash(1.0, 0.0, 0.0)
         assert(ov:isFlashing() == true)
         ov:update(0.3)
@@ -866,7 +866,7 @@ fn lua_overlay_shake_defaults() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:shake(5.0)
         assert(ov:isShaking() == true)
         ov:update(0.6)
@@ -883,7 +883,7 @@ fn lua_overlay_fade_defaults() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:fade(0, 0, 0)
         assert(ov:isFading() == true)
         ov:update(1.1)
@@ -958,7 +958,7 @@ fn lua_overlay_fog() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setFogEnabled(true)
         assert(ov:isFogEnabled() == true)
         ov:setFogDensity(0.7)
@@ -979,7 +979,7 @@ fn lua_overlay_heat_haze() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setHeatHazeEnabled(true)
         assert(ov:isHeatHazeEnabled() == true)
         ov:setHeatHazeIntensity(0.8)
@@ -995,7 +995,7 @@ fn lua_overlay_vignette() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setVignetteEnabled(true)
         assert(ov:isVignetteEnabled() == true)
         ov:setVignetteStrength(0.7)
@@ -1011,7 +1011,7 @@ fn lua_overlay_film_grain() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setFilmGrainEnabled(true)
         assert(ov:isFilmGrainEnabled() == true)
         ov:setFilmGrainIntensity(0.6)
@@ -1027,7 +1027,7 @@ fn lua_overlay_fog_color_default_alpha() {
     let lua = make_vm();
     lua.load(
         r#"
-        local ov = luna.overlay.newOverlay()
+        local ov = lurek.overlay.newOverlay()
         ov:setFogColor(0.3, 0.4, 0.5)
         local r, g, b, a = ov:getFogColor()
         assert(math.abs(a - 1.0) < 0.001, "Default fog alpha should be 1.0")
@@ -1036,3 +1036,4 @@ fn lua_overlay_fog_color_default_alpha() {
     .exec()
     .expect("Fog color alpha should default to 1.0");
 }
+

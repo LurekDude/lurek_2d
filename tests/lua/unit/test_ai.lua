@@ -3,6 +3,28 @@
 -- =========================================================================
 -- 1. lurek.ai module exists
 -- =========================================================================
+-- @covers lurek.ai.newAction
+-- @covers lurek.ai.newBehaviorTree
+-- @covers lurek.ai.newBlackboard
+-- @covers lurek.ai.newCommandQueue
+-- @covers lurek.ai.newCondition
+-- @covers lurek.ai.newGOAPPlanner
+-- @covers lurek.ai.newInfluenceMap
+-- @covers lurek.ai.newInverter
+-- @covers lurek.ai.newParallel
+-- @covers lurek.ai.newQLearner
+-- @covers lurek.ai.newRepeater
+-- @covers lurek.ai.newSelector
+-- @covers lurek.ai.newSequence
+-- @covers lurek.ai.newSquad
+-- @covers lurek.ai.newStateMachine
+-- @covers lurek.ai.newSteeringManager
+-- @covers lurek.ai.newSucceeder
+-- @covers lurek.ai.newUtilityAI
+-- @covers lurek.ai.newWorld
+-- @covers lurek.pathfinding.newPathFlowField
+-- @covers lurek.pathfinding.newPathGrid
+
 describe("lurek.ai module exists", function()
     it("lurek.ai is a table", function()
         expect_type("table", lurek.ai)

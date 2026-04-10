@@ -1,3 +1,7 @@
+-- @covers lurek.math.pi
+-- @covers lurek.math.sin
+-- @covers lurek.time.getDelta
+
 ﻿-- Lurek2D Integration Test: Timer + Math
 -- Tests that timer and math functions work together for game-loop scenarios
 

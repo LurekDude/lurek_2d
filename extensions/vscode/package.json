@@ -1,52 +1,789 @@
 {
-  "name": "lurek2d-vscode",
-  "displayName": "Lurek2D",
-  "description": "AI-first IDE support for Lurek2D game engine",
-  "version": "0.1.0",
+  "name": "lurek2d-toolkit",
+  "displayName": "Lurek2D Toolkit",
+  "description": "Official VS Code extension for Lurek2D game engine. 778+ lurek.* API completions, hover docs, signature help, diagnostics, semantic highlighting, debug adapter (DAP), build/run/package tools, 29 visual editors, and MCP server for AI agents.",
+  "version": "0.9.0",
   "publisher": "lurek2d",
   "icon": "media/luna-logo.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RandomBladeDude/lurek2d"
+  },
   "engines": {
     "vscode": "^1.90.0"
   },
   "categories": [
     "Programming Languages",
+    "Snippets",
+    "Debuggers",
     "Other"
+  ],
+  "keywords": [
+    "lua",
+    "game",
+    "game engine",
+    "2d",
+    "lurek2d",
+    "game development",
+    "pixel art",
+    "tilemap"
   ],
   "activationEvents": [
     "workspaceContains:**/main.lua",
     "workspaceContains:Cargo.toml"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lurek-sidebar",
+          "title": "Lurek2D Toolkit",
+          "icon": "media/sidebar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "lurek-sidebar": [
+        {
+          "id": "lurek.projectTools",
+          "name": "Project",
+          "icon": "$(tools)"
+        },
+        {
+          "id": "lurek.devTools",
+          "name": "Dev Tools",
+          "icon": "$(beaker)"
+        },
+        {
+          "id": "lurek.assetExplorer",
+          "name": "Assets",
+          "icon": "$(file-media)"
+        },
+        {
+          "id": "lurek.aiCopilot",
+          "name": "AI & Copilot",
+          "icon": "$(hubot)"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "lurek.projectTools",
+        "contents": "No Lurek2D project detected.\n[Create New Project](command:lurek.scaffold.project)\n[Open Folder with main.lua](command:vscode.openFolder)"
+      }
+    ],
     "commands": [
       {
-        "command": "lurek2d.runExample",
-        "title": "Lurek2D: Run Example"
+        "command": "lurek.scaffold.project",
+        "title": "Create New Project",
+        "icon": "$(new-folder)"
       },
       {
-        "command": "lurek2d.listExamples",
-        "title": "Lurek2D: List Examples"
+        "command": "lurek.scaffold.file",
+        "title": "Create New File",
+        "icon": "$(new-file)"
       },
       {
-        "command": "lurek2d.checkBuild",
-        "title": "Lurek2D: Check Build"
+        "command": "lurek.runGame",
+        "title": "Run Game",
+        "icon": "$(play)"
       },
       {
-        "command": "lurek2d.getApiDoc",
-        "title": "Lurek2D: Get API Documentation"
+        "command": "lurek.stopGame",
+        "title": "Stop Game",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "lurek.runWithArgs",
+        "title": "Run Game with Arguments",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "lurek.runExample",
+        "title": "Run Example",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "lurek.editor.testRunner",
+        "title": "Open Test Runner"
+      },
+      {
+        "command": "lurek.editor.tileMap",
+        "title": "Open Tile Map Editor"
+      },
+      {
+        "command": "lurek.editor.tileset",
+        "title": "Open Tileset Editor"
+      },
+      {
+        "command": "lurek.editor.tilemapScript",
+        "title": "Open Tilemap Script Editor"
+      },
+      {
+        "command": "lurek.editor.worldMap",
+        "title": "Open World Map Editor"
+      },
+      {
+        "command": "lurek.editor.procMap",
+        "title": "Open Procedural Map Generator"
+      },
+      {
+        "command": "lurek.editor.pixelArt",
+        "title": "Open Pixel Art Editor"
+      },
+      {
+        "command": "lurek.editor.spriteAnim",
+        "title": "Open Sprite Animation Editor"
+      },
+      {
+        "command": "lurek.editor.shaderPreview",
+        "title": "Open Shader Preview"
+      },
+      {
+        "command": "lurek.editor.colorPalette",
+        "title": "Open Color Palette"
+      },
+      {
+        "command": "lurek.editor.fontPreview",
+        "title": "Open Font Preview"
+      },
+      {
+        "command": "lurek.editor.sceneFlow",
+        "title": "Open Scene Flow Editor"
+      },
+      {
+        "command": "lurek.editor.entity",
+        "title": "Open Entity Designer"
+      },
+      {
+        "command": "lurek.editor.dialog",
+        "title": "Open Dialog Editor"
+      },
+      {
+        "command": "lurek.editor.questTree",
+        "title": "Open Quest Tree Editor"
+      },
+      {
+        "command": "lurek.editor.guiWidget",
+        "title": "Open GUI Widget Editor"
+      },
+      {
+        "command": "lurek.editor.timeline",
+        "title": "Open Timeline Cutscene Editor"
+      },
+      {
+        "command": "lurek.editor.inputMapper",
+        "title": "Open Input Mapper"
+      },
+      {
+        "command": "lurek.editor.localization",
+        "title": "Open Localization Editor"
+      },
+      {
+        "command": "lurek.editor.particle",
+        "title": "Open Particle Designer"
+      },
+      {
+        "command": "lurek.editor.physicsMaterials",
+        "title": "Open Physics Materials Editor"
+      },
+      {
+        "command": "lurek.editor.aiBehavior",
+        "title": "Open AI Behavior Tree Editor"
+      },
+      {
+        "command": "lurek.editor.voxel",
+        "title": "Open Voxel Editor"
+      },
+      {
+        "command": "lurek.editor.audioMixer",
+        "title": "Open Audio Mixer"
+      },
+      {
+        "command": "lurek.editor.soundDsp",
+        "title": "Open Sound DSP Panel"
+      },
+      {
+        "command": "lurek.editor.postfxOverlay",
+        "title": "Open PostFX Overlay Designer"
+      },
+      {
+        "command": "lurek.editor.database",
+        "title": "Open Database Browser"
+      },
+      {
+        "command": "lurek.editor.graph",
+        "title": "Open Graph Editor"
+      },
+      {
+        "command": "lurek.debug.runAndConnect",
+        "title": "Debug Run and Connect"
+      },
+      {
+        "command": "lurek.debug.connect",
+        "title": "Debug Connect"
+      },
+      {
+        "command": "lurek.debug.disconnect",
+        "title": "Debug Disconnect"
+      },
+      {
+        "command": "lurek.debug.evaluate",
+        "title": "Debug Evaluate Lua"
+      },
+      {
+        "command": "lurek.debug.openWatchers",
+        "title": "Open Watchers Panel"
+      },
+      {
+        "command": "lurek.debug.openInspector",
+        "title": "Open Variable Inspector"
+      },
+      {
+        "command": "lurek.debug.openCallStack",
+        "title": "Open Call Stack"
+      },
+      {
+        "command": "lurek.debug.performance",
+        "title": "Open Live Performance"
+      },
+      {
+        "command": "lurek.debug.screenshot",
+        "title": "Take Debug Screenshot"
+      },
+      {
+        "command": "lurek.debug.status",
+        "title": "Show Debug Status"
+      },
+      {
+        "command": "lurek.browseApi",
+        "title": "Browse API"
+      },
+      {
+        "command": "lurek.openApiDocs",
+        "title": "Open API Docs"
+      },
+      {
+        "command": "lurek.openWiki",
+        "title": "Open Wiki"
+      },
+      {
+        "command": "lurek.depGraph",
+        "title": "Open Dependency Graph"
+      },
+      {
+        "command": "lurek.depList",
+        "title": "Open Dependency List"
+      },
+      {
+        "command": "lurek.apiCoverage",
+        "title": "Run API Coverage"
+      },
+      {
+        "command": "lurek.test.all",
+        "title": "Run All Tests",
+        "icon": "$(testing-run-all-icon)"
+      },
+      {
+        "command": "lurek.test.lua.all",
+        "title": "Run Lua Tests"
+      },
+      {
+        "command": "lurek.test.lua.golden",
+        "title": "Run Golden Tests"
+      },
+      {
+        "command": "lurek.test.generateForFile",
+        "title": "Generate Tests for File"
+      },
+      {
+        "command": "lurek.package.zip",
+        "title": "Package Zip"
+      },
+      {
+        "command": "lurek.package.windows",
+        "title": "Package for Windows"
+      },
+      {
+        "command": "lurek.package.linux",
+        "title": "Package for Linux"
+      },
+      {
+        "command": "lurek.library.browse",
+        "title": "Browse Pattern Library"
+      },
+      {
+        "command": "lurek.library.insertSnippet",
+        "title": "Insert Pattern Library Snippet"
+      },
+      {
+        "command": "lurek.library.newPattern",
+        "title": "Save Selection as Pattern"
+      },
+      {
+        "command": "lurek.assets.refresh",
+        "title": "Refresh Assets",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "lurek.assets.openPanel",
+        "title": "Open Asset Explorer"
+      },
+      {
+        "command": "lurek.assets.findMissing",
+        "title": "Find Missing Assets"
+      },
+      {
+        "command": "lurek.assets.insertPath",
+        "title": "Insert Asset Path"
+      },
+      {
+        "command": "lurek.deps.showGraph",
+        "title": "Show Module Graph"
+      },
+      {
+        "command": "lurek.deps.findCircular",
+        "title": "Find Circular Dependencies"
+      },
+      {
+        "command": "lurek.deps.findOrphans",
+        "title": "Show Orphan Modules"
+      },
+      {
+        "command": "lurek.perf.openDashboard",
+        "title": "Open Performance Dashboard"
+      },
+      {
+        "command": "lurek.system.openMonitor",
+        "title": "Open System Monitor"
+      },
+      {
+        "command": "lurek.api.usageReport",
+        "title": "Open API Usage Report"
+      },
+      {
+        "command": "lurek.perf.openHotReload",
+        "title": "Open Hot Reload History"
+      },
+      {
+        "command": "lurek.perf.clearHistory",
+        "title": "Clear Performance History"
+      },
+      {
+        "command": "lurek.cag.install",
+        "title": "Install AI Config"
+      },
+      {
+        "command": "lurek.cag.selectAgent",
+        "title": "Select Agent"
+      },
+      {
+        "command": "lurek.cag.selectSkill",
+        "title": "Select Skill"
+      },
+      {
+        "command": "lurek.cag.selectPrompt",
+        "title": "Select Prompt"
+      },
+      {
+        "command": "lurek.cag.update",
+        "title": "Update AI Config Files"
+      },
+      {
+        "command": "lurek.mcp.install",
+        "title": "Install MCP Server"
+      },
+      {
+        "command": "lurek.mcp.status",
+        "title": "Show MCP Server Status"
+      },
+      {
+        "command": "lurek.gameJam.quickStart",
+        "title": "Game Jam Quick Start"
+      },
+      {
+        "command": "lurek.gameJam.addModule",
+        "title": "Add Game Jam Module"
+      },
+      {
+        "command": "lurek.gameJam.timer",
+        "title": "Open Game Jam Timer"
+      },
+      {
+        "command": "lurek.jam.quickBuild",
+        "title": "Game Jam Quick Build"
+      },
+      {
+        "command": "lurek.jam.checklist",
+        "title": "Open Submission Checklist"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "lurek.runGame",
+        "key": "alt+l",
+        "when": "editorTextFocus && resourceLangId == lua"
+      },
+      {
+        "command": "lurek.stopGame",
+        "key": "shift+alt+l",
+        "when": "lurek.gameRunning"
+      },
+      {
+        "command": "lurek.openWiki",
+        "key": "f2",
+        "when": "editorTextFocus && resourceLangId == lua"
+      },
+      {
+        "command": "lurek.test.all",
+        "key": "ctrl+shift+t",
+        "when": "workspaceFolderCount > 0"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "lurek.runGame",
+          "when": "resourceLangId == lua",
+          "group": "lurek@1"
+        },
+        {
+          "command": "lurek.openWiki",
+          "when": "resourceLangId == lua",
+          "group": "lurek@2"
+        },
+        {
+          "command": "lurek.test.generateForFile",
+          "when": "resourceLangId == lua",
+          "group": "lurek@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "lurek.runGame",
+          "when": "explorerResourceIsFolder",
+          "group": "lurek@1"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "lurek.assets.refresh",
+          "when": "view == lurek.assetExplorer",
+          "group": "navigation"
+        },
+        {
+          "command": "lurek.assets.findMissing",
+          "when": "view == lurek.assetExplorer",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "lurek.assets.insertPath",
+          "when": "view == lurek.assetExplorer && viewItem =~ /^assetItem/",
+          "group": "lurek@1"
+        }
+      ]
+    },
+    "customEditors": [
+      {
+        "viewType": "lurek.sceneLuaEditor",
+        "displayName": "Lurek2D Scene Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.scene.lua"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "lua",
+        "path": "./data/snippets.json"
+      }
+    ],
+    "configuration": {
+      "title": "Lurek2D Toolkit",
+      "properties": {
+        "lurek.lunaPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to lurek2d executable"
+        },
+        "lurek.srcDir": {
+          "type": "string",
+          "default": "",
+          "description": "Game source subdirectory"
+        },
+        "lurek.saveOnRun": {
+          "type": "boolean",
+          "default": true,
+          "description": "Save files before running"
+        },
+        "lurek.diagnostics.deprecationWarnings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show deprecated API warnings"
+        },
+        "lurek.diagnostics.commonMistakes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect common Lurek2D mistakes"
+        },
+        "lurek.diagnostics.unusedRequires": {
+          "type": "boolean",
+          "default": true,
+          "description": "Flag unused require statements"
+        },
+        "lurek.diagnostics.assetValidation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate asset file paths"
+        },
+        "lurek.inlayHints.parameterNames": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show parameter name hints"
+        },
+        "lurek.test.testDir": {
+          "type": "string",
+          "default": "tests",
+          "description": "Test directory path"
+        },
+        "lurek.test.luaTestDir": {
+          "type": "string",
+          "default": "tests/lua",
+          "description": "Lua test directory"
+        },
+        "lurek.cag.installOnScaffold": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-install AI config on scaffold"
+        },
+        "lurek.package.outputDir": {
+          "type": "string",
+          "default": "dist",
+          "description": "Build output directory"
+        },
+        "lurek.debugBridge.port": {
+          "type": "number",
+          "default": 19740,
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Debug bridge TCP port"
+        },
+        "lurek.debugBridge.autoConnect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-connect on debug run"
+        },
+        "lurek.luaVersion": {
+          "type": "string",
+          "enum": [
+            "luajit",
+            "5.4"
+          ],
+          "default": "luajit",
+          "description": "Lua runtime version for IntelliSense (LuaJIT or Lua 5.4)"
+        },
+        "lurek.inlayHints.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show parameter name hints inline"
+        },
+        "lurek.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Lurek2D-specific diagnostics"
+        },
+        "lurek.formatting.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Lua code formatting"
+        },
+        "lurek.intellisense.luaStdlib": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include Lua standard library in completions"
+        },
+        "lurek.intellisense.luajitHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show LuaJIT performance optimization hints (table alloc in hot path, string concat in loops, etc.)"
+        },
+        "lurek.intellisense.patternLibrary": {
+          "type": "boolean",
+          "default": true,
+          "description": "Offer pattern library snippets (state machine, object pool, class, event bus, etc.)"
+        },
+        "lurek.intellisense.keyNameCompletion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show key name completions inside input API string arguments (lurek.input.isDown, lurek.keypressed)"
+        },
+        "lurek.intellisense.easingHoverChart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show easing curve ASCII chart when hovering over easing function name strings"
+        },
+        "lurek.intellisense.typeInference": {
+          "type": "boolean",
+          "default": true,
+          "description": "Track return types from lurek.* factory functions and enable method completion on instances"
+        },
+        "lurek.intellisense.globalWarnings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Warn on implicit global variable writes (prefer local declarations)"
+        },
+        "lurek.intellisense.unusedAssets": {
+          "type": "boolean",
+          "default": false,
+          "description": "Detect asset files in assets/ that are never referenced in Lua code (may be slow on large projects)"
+        },
+        "lurek.intellisense.classPatternDetection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect OOP class patterns (setmetatable, __index) and enable method completion on class instances"
+        },
+        "lurek.debugger.port": {
+          "type": "number",
+          "default": 8172,
+          "description": "Default TCP port for Lurek2D debug communication"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "lua",
+        "aliases": [
+          "Lua"
+        ],
+        "extensions": [
+          ".lua"
+        ],
+        "configuration": "./data/language-configuration.json"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "lurek",
+        "label": "Lurek2D",
+        "program": "",
+        "runtime": "",
+        "languages": [
+          "lua"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Path to the game directory containing main.lua",
+                "default": "${workspaceFolder}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Stop on the first line of main.lua",
+                "default": false
+              },
+              "luaVersion": {
+                "type": "string",
+                "description": "Lua runtime version",
+                "enum": [
+                  "luajit",
+                  "5.4"
+                ],
+                "default": "luajit"
+              },
+              "debugPort": {
+                "type": "number",
+                "description": "TCP port for debug communication",
+                "default": 8172
+              },
+              "enginePath": {
+                "type": "string",
+                "description": "Path to Lurek2D engine executable (auto-detected if not set)"
+              },
+              "args": {
+                "type": "array",
+                "description": "Additional arguments to pass to the engine",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            }
+          },
+          "attach": {
+            "properties": {
+              "debugPort": {
+                "type": "number",
+                "description": "TCP port of running Lurek2D engine",
+                "default": 8172
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "Lurek2D: Debug Game",
+            "description": "Launch and debug a Lurek2D game",
+            "body": {
+              "type": "lurek",
+              "request": "launch",
+              "name": "Lurek2D: Debug Game",
+              "program": "^\"\\${workspaceFolder}\""
+            }
+          },
+          {
+            "label": "Lurek2D: Attach",
+            "description": "Attach to a running Lurek2D game",
+            "body": {
+              "type": "lurek",
+              "request": "attach",
+              "name": "Lurek2D: Attach",
+              "debugPort": 8172
+            }
+          }
+        ]
       }
     ]
   },
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "package": "npx @vscode/vsce package"
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.config.mjs --production",
+    "watch": "node esbuild.config.mjs --watch",
+    "test": "node esbuild.config.mjs --test && node ./dist/test/runTest.js",
+    "lint": "eslint src --ext ts",
+    "generate-api": "npx tsx tools/generate-api-data.ts",
+    "generate-snippets": "npx tsx tools/generate-snippets.ts",
+    "generate-luacats": "npx tsx tools/generate-luacats.ts",
+    "generate-all": "npm run generate-api && npm run generate-snippets && npm run generate-luacats",
+    "package": "npx @vscode/vsce package --no-dependencies --allow-missing-repository"
   },
   "devDependencies": {
-    "@types/vscode": "^1.90.0",
+    "@types/mocha": "^10.0.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.4.0",
-    "@vscode/vsce": "^2.26.0"
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/debugadapter": "^1.68.0",
+    "@vscode/debugprotocol": "^1.68.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^2.26.0",
+    "esbuild": "^0.21.0",
+    "eslint": "^8.56.0",
+    "glob": "^10.0.0",
+    "mocha": "^10.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0"

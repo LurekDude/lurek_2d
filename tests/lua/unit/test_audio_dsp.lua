@@ -1,5 +1,13 @@
 -- Tests for Real-Time Audio DSP & Buses API
 -- Implementing tests for the new flat handles and parameter sweeping logic per audio DSP design
+-- @covers lurek.audio.add_effect
+-- @covers lurek.audio.create_bus
+-- @covers lurek.audio.newSource
+-- @covers lurek.audio.play
+-- @covers lurek.audio.remove_effect
+-- @covers lurek.audio.set_bus_volume
+-- @covers lurek.audio.set_effect_param
+
 
 describe("lurek.audio.create_bus", function()
     it("creates a bus without returning an object", function()

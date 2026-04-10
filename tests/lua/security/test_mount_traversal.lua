@@ -1,3 +1,5 @@
+-- @security lurek.fs.mount
+
 ﻿-- Validate that mount() rejects path traversal attempts
 
 describe("filesystem security: mount traversal", function()

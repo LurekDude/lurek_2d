@@ -72,7 +72,7 @@ fn test_lua_new_save_manager() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         assert(sm:getSchemaVersion() == 0)
         assert(sm:isDirty() == false)
     "#,
@@ -86,7 +86,7 @@ fn test_lua_register_collect() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         local player_hp = 100
         sm:register("player",
             function() return { hp = player_hp } end,
@@ -107,7 +107,7 @@ fn test_lua_collect_restore_roundtrip() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         local score = 42
         sm:register("game",
             function() return { score = score } end,
@@ -128,7 +128,7 @@ fn test_lua_dirty_tracking() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         assert(sm:isDirty() == false)
         sm:markDirty()
         assert(sm:isDirty() == true)
@@ -143,7 +143,7 @@ fn test_lua_schema_version() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:setSchemaVersion(5)
         assert(sm:getSchemaVersion() == 5)
         local data = sm:collect()
@@ -159,7 +159,7 @@ fn test_lua_migration() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:setSchemaVersion(3)
         local migrated = false
         sm:addMigration(1, function(data)
@@ -183,7 +183,7 @@ fn test_lua_auto_save_update() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:enableAutoSave(2.0, "quicksave")
         sm:markDirty()
         local slot = sm:update(1.0)
@@ -201,7 +201,7 @@ fn test_lua_summary() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:setSummary("Level 3, 100 coins")
         assert(sm:getSummary() == "Level 3, 100 coins")
         local data = sm:collect()
@@ -217,7 +217,7 @@ fn test_lua_reset() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:register("mod1", function() return {} end, function(d) end)
         sm:setSchemaVersion(5)
         sm:markDirty()
@@ -235,7 +235,7 @@ fn test_lua_unregister() {
     let (_state, lua) = make_vm();
     lua.load(
         r#"
-        local sm = luna.savegame.newSaveManager()
+        local sm = lurek.savegame.newSaveManager()
         sm:register("mod1", function() return { x = 1 } end, function(d) end)
         sm:unregister("mod1")
         local data = sm:collect()

@@ -7,7 +7,7 @@ export class ProcMapEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.procMap", "Procedural Map Generator");
+    super(context, "lurek.editor.procMap", "Procedural Map Generator");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

@@ -7,7 +7,7 @@ export class GuiWidgetEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.guiWidget", "GUI Widget Editor");
+    super(context, "lurek.editor.guiWidget", "GUI Widget Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

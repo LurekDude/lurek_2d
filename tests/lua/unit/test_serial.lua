@@ -1,3 +1,10 @@
+-- @covers lurek.codec.fromCsv
+-- @covers lurek.codec.fromJson
+-- @covers lurek.codec.fromToml
+-- @covers lurek.codec.toCsv
+-- @covers lurek.codec.toJson
+-- @covers lurek.codec.toToml
+
 ﻿-- lurek.codec API unit tests
 -- Headless-safe (no window / GPU / audio required).
 

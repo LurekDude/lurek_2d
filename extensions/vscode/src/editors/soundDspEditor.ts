@@ -7,7 +7,7 @@ export class SoundDspEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.soundDsp", "Sound DSP Panel");
+    super(context, "lurek.editor.soundDsp", "Sound DSP Panel");
   }
 
   protected handleMessage(msg: { type: string; [key: string]: unknown }): void {
@@ -342,27 +342,27 @@ export class SoundDspEditor extends WebviewEditor {
 
         if (currentTab === 'chain') {
           code = '-- Sound DSP Chain\\n';
-          code += 'local dsp = luna.sound.createDsp()\\n\\n';
+          code += 'local dsp = lurek.sound.createDsp()\\n\\n';
           code += 'dsp:setMasterVolume(' + fv('masterVolume').toFixed(2) + ')\\n';
           code += 'dsp:setMasterPan(' + fv('masterPan').toFixed(2) + ')\\n';
           code += 'dsp:setSampleRate(' + sv('sampleRate') + ')\\n\\n';
           code += '-- Apply DSP to a source:\\n';
-          code += 'local src = luna.sound.load("my_sound.wav")\\n';
-          code += 'luna.sound.setDsp(src, dsp)\\n';
-          code += 'luna.sound.play(src)';
+          code += 'local src = lurek.sound.load("my_sound.wav")\\n';
+          code += 'lurek.sound.setDsp(src, dsp)\\n';
+          code += 'lurek.sound.play(src)';
         } else if (currentTab === 'eq') {
           code = '-- 7-Band Parametric EQ\\n';
-          code += 'local eq = luna.sound.createEq({\\n';
+          code += 'local eq = lurek.sound.createEq({\\n';
           const freqs = ['60','150','400','1000','2500','6000','16000'];
           EQ_BANDS.forEach((band, i) => {
             const gain = fv(band.id);
             if (gain !== 0) code += '  { freq=' + freqs[i] + ', gain=' + gain.toFixed(1) + ' },\\n';
           });
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, eq)';
+          code += 'lurek.sound.addEffect(src, eq)';
         } else if (currentTab === 'reverb') {
           code = '-- Reverb Effect\\n';
-          code += 'local reverb = luna.sound.createReverb({\\n';
+          code += 'local reverb = lurek.sound.createReverb({\\n';
           code += '  room_size  = ' + fv('reverbRoom').toFixed(2) + ',\\n';
           code += '  damping    = ' + fv('reverbDamp').toFixed(2) + ',\\n';
           code += '  wet_dry    = ' + fv('reverbMix').toFixed(2) + ',\\n';
@@ -370,12 +370,12 @@ export class SoundDspEditor extends WebviewEditor {
           code += '  width      = ' + fv('reverbWidth').toFixed(2) + ',\\n';
           code += '  decay      = ' + fv('reverbDecay').toFixed(1) + ',\\n';
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, reverb)';
+          code += 'lurek.sound.addEffect(src, reverb)';
         } else if (currentTab === 'echo') {
           const delay = fv('echoDelay');
           const syncBpm = bv('echoSyncBpm');
           code = '-- Echo / Delay Effect\\n';
-          code += 'local echo = luna.sound.createEcho({\\n';
+          code += 'local echo = lurek.sound.createEcho({\\n';
           if (syncBpm) {
             code += '  bpm        = ' + fv('echoBpm') + ',\\n';
             code += '  division   = ' + fv('echoDiv') + ',\\n';
@@ -386,10 +386,10 @@ export class SoundDspEditor extends WebviewEditor {
           code += '  wet_dry    = ' + fv('echoMix').toFixed(2) + ',\\n';
           code += '  ping_pong  = ' + bv('echoPingPong') + ',\\n';
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, echo)';
+          code += 'lurek.sound.addEffect(src, echo)';
         } else if (currentTab === 'chorus') {
           code = '-- ' + sv('chorusMode') + ' Effect\\n';
-          code += 'local chorus = luna.sound.createChorus({\\n';
+          code += 'local chorus = lurek.sound.createChorus({\\n';
           code += '  mode     = "' + sv('chorusMode').toLowerCase() + '",\\n';
           code += '  depth    = ' + fv('chorusDepth').toFixed(2) + ',\\n';
           code += '  rate     = ' + fv('chorusRate').toFixed(2) + ',\\n';
@@ -398,12 +398,12 @@ export class SoundDspEditor extends WebviewEditor {
           code += '  spread   = ' + fv('chorusSpread').toFixed(2) + ',\\n';
           if (sv('chorusMode') === 'Flanger') code += '  feedback = ' + fv('flangerFeedback').toFixed(2) + ',\\n';
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, chorus)';
+          code += 'lurek.sound.addEffect(src, chorus)';
         } else if (currentTab === 'pitch') {
           const semi = fv('pitchSemitones'), cents = fv('pitchCents'), rate = fv('pitchRate');
           const sweepFrom = fv('pitchSweepFrom'), sweepTo = fv('pitchSweepTo'), sweepTime = fv('pitchSweepTime');
           code = '-- Pitch Shift\\n';
-          code += 'local pitch = luna.sound.createPitchShift({\\n';
+          code += 'local pitch = lurek.sound.createPitchShift({\\n';
           if (semi !== 0) code += '  semitones = ' + semi + ',\\n';
           if (cents !== 0) code += '  cents     = ' + cents + ',\\n';
           if (rate !== 1) code += '  rate      = ' + rate.toFixed(2) + ',\\n';
@@ -412,11 +412,11 @@ export class SoundDspEditor extends WebviewEditor {
             code += '  sweep = { from=' + sweepFrom + ', to=' + sweepTo + ', time=' + sweepTime.toFixed(2) + ' },\\n';
           }
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, pitch)';
+          code += 'lurek.sound.addEffect(src, pitch)';
         } else if (currentTab === 'dynamics') {
           code = '-- Dynamics Processing\\n';
           const drive = fv('distDrive');
-          code += 'local chain = luna.sound.createDynamics({\\n';
+          code += 'local chain = lurek.sound.createDynamics({\\n';
           code += '  -- Compressor\\n';
           code += '  comp = {\\n';
           code += '    threshold = ' + fv('compThreshold') + ',  -- dB\\n';
@@ -434,11 +434,11 @@ export class SoundDspEditor extends WebviewEditor {
             code += '  distortion = { drive=' + drive.toFixed(2) + ', mode="' + sv('distMode').toLowerCase().replace(/ /g,'_') + '", mix=' + fv('distMix').toFixed(2) + ' },\\n';
           }
           code += '})\\n';
-          code += 'luna.sound.addEffect(src, chain)';
+          code += 'lurek.sound.addEffect(src, chain)';
         } else if (currentTab === 'generator') {
           const type = sv('genType').toLowerCase();
           code = '-- Procedural Sound: ' + sv('genType') + '\\n';
-          code += 'local synth = luna.sound.createSynth({\\n';
+          code += 'local synth = lurek.sound.createSynth({\\n';
           code += '  wave      = "' + type + '",\\n';
           code += '  frequency = ' + fv('genFreq') + ',\\n';
           code += '  volume    = ' + fv('genVol').toFixed(2) + ',\\n';
@@ -447,7 +447,7 @@ export class SoundDspEditor extends WebviewEditor {
           const sf = fv('pitchSweepFrom'), st2 = fv('pitchSweepTo'), sTime = fv('pitchSweepTime');
           if (sf !== 0 || st2 !== 0) code += '  sweep     = { from=' + sf + ', to=' + st2 + ', time=' + sTime.toFixed(2) + ' },\\n';
           code += '})\\n\\n';
-          code += '-- Play immediately:\\nluna.sound.play(luna.sound.fromSynth(synth))';
+          code += '-- Play immediately:\\nlurek.sound.play(lurek.sound.fromSynth(synth))';
         }
 
         g('codeOut').textContent = code;

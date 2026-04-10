@@ -18,9 +18,9 @@ fn make_vm() -> mlua::Lua {
 fn item_define_and_get_type() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("Sword", { category="weapon", stats={atk=5, weight=3} })
-        local t = luna.item.getType("Sword")
+        lurek.item.clearTypes()
+        lurek.item.defineType("Sword", { category="weapon", stats={atk=5, weight=3} })
+        local t = lurek.item.getType("Sword")
         assert(t ~= nil, "type should exist")
         assert(t.category == "weapon", "category")
         assert(t.stats.atk == 5, "base stat atk")
@@ -31,11 +31,11 @@ fn item_define_and_get_type() {
 fn item_type_names_list() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("A", {})
-        luna.item.defineType("B", {})
-        luna.item.defineType("C", {})
-        local names = luna.item.getTypeNames()
+        lurek.item.clearTypes()
+        lurek.item.defineType("A", {})
+        lurek.item.defineType("B", {})
+        lurek.item.defineType("C", {})
+        local names = lurek.item.getTypeNames()
         assert(#names >= 3, "at least 3 names returned")
     "#).exec().unwrap();
 }
@@ -44,7 +44,7 @@ fn item_type_names_list() {
 fn item_unknown_type_returns_nil() {
     let lua = make_vm();
     lua.load(r#"
-        local t = luna.item.getType("__does_not_exist__99")
+        local t = lurek.item.getType("__does_not_exist__99")
         assert(t == nil, "unknown type should be nil")
     "#).exec().unwrap();
 }
@@ -57,7 +57,7 @@ fn item_unknown_type_returns_nil() {
 fn item_new_has_correct_type_string() {
     let lua = make_vm();
     lua.load(r#"
-        local item = luna.item.newItem("Dagger")
+        local item = lurek.item.newItem("Dagger")
         assert(item:type() == "Item", "type() should be Item")
         assert(item:typeOf("Item"), "typeOf Item")
     "#).exec().unwrap();
@@ -67,7 +67,7 @@ fn item_new_has_correct_type_string() {
 fn item_stats_get_set_add() {
     let lua = make_vm();
     lua.load(r#"
-        local item = luna.item.newItem("Staff")
+        local item = lurek.item.newItem("Staff")
         item:setStat("dmg", 10)
         assert(item:getStat("dmg") == 10, "set and get stat")
         item:addStat("dmg", 5)
@@ -80,7 +80,7 @@ fn item_stats_get_set_add() {
 fn item_tags_add_has_remove() {
     let lua = make_vm();
     lua.load(r#"
-        local item = luna.item.newItem("Gem")
+        local item = lurek.item.newItem("Gem")
         item:addTag("magic")
         item:addTag("rare")
         assert(item:hasTag("magic"), "should have magic tag")
@@ -95,7 +95,7 @@ fn item_tags_add_has_remove() {
 fn item_metadata_get_set() {
     let lua = make_vm();
     lua.load(r#"
-        local item = luna.item.newItem("Rune")
+        local item = lurek.item.newItem("Rune")
         item:setMeta("desc", "An ancient rune")
         assert(item:getMeta("desc") == "An ancient rune", "meta round-trip")
         assert(item:getMeta("missing") == "", "missing meta is empty string")
@@ -110,10 +110,10 @@ fn item_metadata_get_set() {
 fn stack_push_and_pop() {
     let lua = make_vm();
     lua.load(r#"
-        local stack = luna.item.newStack("hand")
-        local item1 = luna.item.newItem("Card1")
+        local stack = lurek.item.newStack("hand")
+        local item1 = lurek.item.newItem("Card1")
         item1:setStat("value", 1)
-        local item2 = luna.item.newItem("Card2")
+        local item2 = lurek.item.newItem("Card2")
         item2:setStat("value", 2)
 
         stack:push(item1)
@@ -131,10 +131,10 @@ fn stack_push_and_pop() {
 fn stack_capacity_limit() {
     let lua = make_vm();
     lua.load(r#"
-        local stack = luna.item.newStack("small", 2)
-        local a = luna.item.newItem("A")
-        local b = luna.item.newItem("B")
-        local c = luna.item.newItem("C")
+        local stack = lurek.item.newStack("small", 2)
+        local a = lurek.item.newItem("A")
+        local b = lurek.item.newItem("B")
+        local c = lurek.item.newItem("C")
 
         stack:push(a)
         stack:push(b)
@@ -148,9 +148,9 @@ fn stack_capacity_limit() {
 fn stack_shuffle_changes_order() {
     let lua = make_vm();
     lua.load(r#"
-        local stack = luna.item.newStack("pile")
+        local stack = lurek.item.newStack("pile")
         for i = 1, 20 do
-            local it = luna.item.newItem("X")
+            local it = lurek.item.newItem("X")
             it:setStat("idx", i)
             stack:push(it)
         end
@@ -165,12 +165,12 @@ fn stack_shuffle_changes_order() {
 fn stack_search_and_count_by_type() {
     let lua = make_vm();
     lua.load(r#"
-        local stack = luna.item.newStack("deck")
+        local stack = lurek.item.newStack("deck")
         for i = 1, 3 do
-            stack:push(luna.item.newItem("Fire"))
+            stack:push(lurek.item.newItem("Fire"))
         end
         for i = 1, 2 do
-            stack:push(luna.item.newItem("Ice"))
+            stack:push(lurek.item.newItem("Ice"))
         end
         assert(stack:countByType("Fire") == 3, "3 Fire items")
         assert(stack:countByType("Ice") == 2, "2 Ice items")
@@ -189,11 +189,11 @@ fn stack_search_and_count_by_type() {
 fn builder_build_produces_correct_stack() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("Arrow", { category="ammo" })
-        luna.item.defineType("Bolt",  { category="ammo" })
+        lurek.item.clearTypes()
+        lurek.item.defineType("Arrow", { category="ammo" })
+        lurek.item.defineType("Bolt",  { category="ammo" })
 
-        local builder = luna.item.newStackBuilder()
+        local builder = lurek.item.newStackBuilder()
         builder:add("Arrow", 3)
         builder:add("Bolt", 2)
 
@@ -208,10 +208,10 @@ fn builder_build_produces_correct_stack() {
 fn builder_validate_catches_unknown_type() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("Known", {})
+        lurek.item.clearTypes()
+        lurek.item.defineType("Known", {})
 
-        local builder = luna.item.newStackBuilder()
+        local builder = lurek.item.newStackBuilder()
         builder:add("Known", 5)
         builder:setMaxCopies(3)  -- at most 3 copies of any type
 
@@ -229,13 +229,13 @@ fn builder_validate_catches_unknown_type() {
 fn manager_create_and_move_between_stacks() {
     let lua = make_vm();
     lua.load(r#"
-        local mgr = luna.item.newStackManager()
+        local mgr = lurek.item.newStackManager()
         mgr:createStack("hand")
         mgr:createStack("discard")
 
         -- Get the hand stack, add item, sync back to manager
         local hand = mgr:getStack("hand")
-        hand:push(luna.item.newItem("Card"))
+        hand:push(lurek.item.newItem("Card"))
         mgr:addStack("hand", hand)  -- sync mutated stack back
 
         assert(mgr:getStack("hand"):size() == 1, "1 item in hand")
@@ -253,11 +253,11 @@ fn manager_create_and_move_between_stacks() {
 fn pool_draw_items_not_empty() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("Gem", {})
-        luna.item.defineType("Coin", {})
+        lurek.item.clearTypes()
+        lurek.item.defineType("Gem", {})
+        lurek.item.defineType("Coin", {})
 
-        local pool = luna.item.newItemPool("loot")
+        local pool = lurek.item.newItemPool("loot")
         pool:add("Gem", 3)
         pool:add("Coin", 7)
         assert(pool:size() == 2, "2 entries in pool")
@@ -276,9 +276,9 @@ fn pool_draw_items_not_empty() {
 fn slot_capacity_and_overflow() {
     let lua = make_vm();
     lua.load(r#"
-        local slot = luna.item.newSlot("helmet", 1)
-        local a = luna.item.newItem("HelmA")
-        local b = luna.item.newItem("HelmB")
+        local slot = lurek.item.newSlot("helmet", 1)
+        local a = lurek.item.newItem("HelmA")
+        local b = lurek.item.newItem("HelmB")
 
         slot:push(a)
         assert(slot:isFull(), "slot full after 1 item")
@@ -297,20 +297,20 @@ fn slot_capacity_and_overflow() {
 fn group_find_pairs() {
     let lua = make_vm();
     lua.load(r#"
-        luna.item.clearTypes()
-        luna.item.defineType("T", {})
+        lurek.item.clearTypes()
+        lurek.item.defineType("T", {})
 
         -- Build an items array: values 1,1,2,2,3
         local items = {}
         local vals = {1, 1, 2, 2, 3}
         for _, v in ipairs(vals) do
-            local it = luna.item.newItem("T")
+            local it = lurek.item.newItem("T")
             it:setStat("val", v)
             table.insert(items, it)
         end
 
         -- Find pairs (groups of 2) by "val" stat
-        local groups = luna.item.findNOfStat(items, "val", 2)
+        local groups = lurek.item.findNOfStat(items, "val", 2)
         -- Should find 2 groups (val=1 and val=2 each appear twice)
         assert(#groups >= 2, "should find at least 2 groups with n=2: got " .. #groups)
     "#).exec().unwrap();
@@ -324,7 +324,7 @@ fn group_find_pairs() {
 fn history_record_and_query() {
     let lua = make_vm();
     lua.load(r#"
-        local hist = luna.item.newHistory()
+        local hist = lurek.item.newHistory()
         assert(hist:len() == 0, "starts empty")
 
         hist:recordCustom("deck", "initial shuffle", 20)
@@ -344,7 +344,7 @@ fn history_record_and_query() {
 fn history_max_size_rolls_over() {
     let lua = make_vm();
     lua.load(r#"
-        local hist = luna.item.newHistory(3)
+        local hist = lurek.item.newHistory(3)
         for i = 1, 5 do
             hist:recordCustom("s", "event " .. i, i)
         end

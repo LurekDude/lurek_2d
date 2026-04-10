@@ -7,6 +7,37 @@
 -- =========================================================================
 -- Module existence
 -- =========================================================================
+-- @covers lurek.tilemap.FLOOR
+-- @covers lurek.tilemap.NORTH_WALL
+-- @covers lurek.tilemap.OBJECT
+-- @covers lurek.tilemap.WEST_WALL
+-- @covers lurek.tilemap.fromScreenHex
+-- @covers lurek.tilemap.fromScreenIso
+-- @covers lurek.tilemap.hexArea
+-- @covers lurek.tilemap.hexDistance
+-- @covers lurek.tilemap.hexLine
+-- @covers lurek.tilemap.hexNeighbors
+-- @covers lurek.tilemap.hexReflect
+-- @covers lurek.tilemap.hexRing
+-- @covers lurek.tilemap.hexRotate
+-- @covers lurek.tilemap.hexRound
+-- @covers lurek.tilemap.hexSpiral
+-- @covers lurek.tilemap.isoDirectionFromAngle
+-- @covers lurek.tilemap.isoDirectionName
+-- @covers lurek.tilemap.isoRotate
+-- @covers lurek.tilemap.loadTMX
+-- @covers lurek.tilemap.newAutoTileSheet
+-- @covers lurek.tilemap.newChunkMap
+-- @covers lurek.tilemap.newIsoMap
+-- @covers lurek.tilemap.newMapBlock
+-- @covers lurek.tilemap.newMapGen
+-- @covers lurek.tilemap.newMapGroup
+-- @covers lurek.tilemap.newMapScript
+-- @covers lurek.tilemap.newTileMap
+-- @covers lurek.tilemap.newTileSet
+-- @covers lurek.tilemap.toScreenHex
+-- @covers lurek.tilemap.toScreenIso
+
 
 describe("lurek.tilemap module exists", function()
     it("lurek.tilemap is a table", function()

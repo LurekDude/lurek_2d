@@ -1,5 +1,9 @@
 -- Lurek2D Stress Test: Heavy Compute Operations
 -- Tests NdArray at scale: large matrix ops, reductions, broadcasting
+-- @stress lurek.compute.ones
+-- @stress lurek.compute.range
+-- @stress lurek.compute.zeros
+
 
 describe("compute stress: large array creation", function()
     it("creates and fills a 1000-element array", function()

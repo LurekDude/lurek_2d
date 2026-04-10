@@ -8,11 +8,11 @@ const analyzer = new LuaDocumentAnalyzer();
 
 /** Maps asset function patterns to their expected file extensions. */
 const ASSET_FUNC_EXTENSIONS: Record<string, string[]> = {
-    'luna.graphics.newImage': ['.png', '.jpg', '.jpeg', '.bmp', '.gif'],
-    'luna.audio.newSource': ['.ogg', '.wav', '.mp3', '.flac'],
-    'luna.filesystem.read': [],
-    'luna.filesystem.write': [],
-    'luna.filesystem.exists': [],
+    'lurek.graphics.newImage': ['.png', '.jpg', '.jpeg', '.bmp', '.gif'],
+    'lurek.audio.newSource': ['.ogg', '.wav', '.mp3', '.flac'],
+    'lurek.filesystem.read': [],
+    'lurek.filesystem.write': [],
+    'lurek.filesystem.exists': [],
 };
 
 /** Extensions shown for require() completions. */
@@ -50,8 +50,8 @@ async function getAssetCompletions(
     const lineText = document.lineAt(position).text;
     const textBefore = lineText.substring(0, position.character);
 
-    // Try matching an asset-loading function: luna.module.func("partial_path
-    const assetMatch = textBefore.match(/(luna\.\w+\.\w+)\s*\(\s*["']([^"']*)$/);
+    // Try matching an asset-loading function: lurek.module.func("partial_path
+    const assetMatch = textBefore.match(/(lurek\.\w+\.\w+)\s*\(\s*["']([^"']*)$/);
     // Try matching require: require("partial_path
     const requireMatch = textBefore.match(/require\s*\(\s*["']([^"']*)$/);
 

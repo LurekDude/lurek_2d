@@ -7,7 +7,7 @@ export class FontPreviewEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.fontPreviewEditor", "Font Preview");
+    super(context, "lurek.fontPreviewEditor", "Font Preview");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {
@@ -256,8 +256,8 @@ export class FontPreviewEditor extends WebviewEditor {
       });
 
       document.getElementById('btnExport').addEventListener('click', () => {
-        let lua = '-- Font configuration for Luna2D\\n';
-        lua += 'local font = luna.graphics.newFont("' + fontFamily + '", ' + fontSize + ')\\n';
+        let lua = '-- Font configuration for Lurek2D\\n';
+        lua += 'local font = lurek.graphics.newFont("' + fontFamily + '", ' + fontSize + ')\\n';
         lua += '-- Style: ' + (bold ? 'bold ' : '') + (italic ? 'italic' : 'normal') + '\\n';
         lua += '-- Color: { ' + parseInt(textColor.slice(1,3),16) + ', ' + parseInt(textColor.slice(3,5),16) + ', ' + parseInt(textColor.slice(5,7),16) + ' }\\n';
         lua += '-- Line height: ' + lineHeight.toFixed(1) + '\\n';

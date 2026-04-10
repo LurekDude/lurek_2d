@@ -37,14 +37,14 @@ fn phase01_released_audio_handle_reuse_reports_invalid_source() {
     let result = lua
         .load(
             r#"
-            local released = luna.audio.newSource("phase01-a.ogg", "static")
+            local released = lurek.audio.newSource("phase01-a.ogg", "static")
             assert(type(released) == "userdata")
-            assert(luna.audio.release(released) == true)
+            assert(lurek.audio.release(released) == true)
 
-            local replacement = luna.audio.newSource("phase01-b.ogg", "stream")
+            local replacement = lurek.audio.newSource("phase01-b.ogg", "stream")
             assert(type(replacement) == "userdata")
 
-            luna.audio.setVolume(released, 0.5)
+            lurek.audio.setVolume(released, 0.5)
             "#,
         )
         .exec();

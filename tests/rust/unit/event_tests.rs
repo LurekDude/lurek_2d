@@ -1,6 +1,6 @@
 //! Integration tests for the event queue and signal modules.
 
-use lurek2d::event::{Event, EventArg, EventQueue, Signal};
+use lurek2d::signal::{Event, EventArg, EventQueue, Signal};
 
 #[test]
 fn event_queue_push_poll() {

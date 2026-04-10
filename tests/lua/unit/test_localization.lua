@@ -4,6 +4,16 @@
 -- ===================================================================
 -- Setup helpers
 -- ===================================================================
+-- @covers lurek.localization.getAvailableLanguages
+-- @covers lurek.localization.getBase
+-- @covers lurek.localization.getLanguage
+-- @covers lurek.localization.hasLanguage
+-- @covers lurek.localization.loadTable
+-- @covers lurek.localization.onChange
+-- @covers lurek.localization.setBase
+-- @covers lurek.localization.setLanguage
+-- @covers lurek.localization.t
+
 local en = {
     greeting = "Hello",
     farewell = "Goodbye",

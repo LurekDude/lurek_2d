@@ -23,7 +23,7 @@ fn quest_new_objective() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("kill_wolves", "Kill 3 wolves", 3)
+        local obj = lurek.quest.newObjective("kill_wolves", "Kill 3 wolves", 3)
         return obj:getId() == "kill_wolves" and obj:getRequired() == 3 and obj:getCurrent() == 0
     "#)
         .eval().unwrap();
@@ -35,7 +35,7 @@ fn quest_objective_advance() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("collect", "Collect 5", 5)
+        local obj = lurek.quest.newObjective("collect", "Collect 5", 5)
         obj:advance(3)
         local s1 = obj:getStatus()
         obj:advance(2)
@@ -51,7 +51,7 @@ fn quest_objective_advance_clamps() {
     let lua = make_vm();
     let n: u32 = lua
         .load(r#"
-        local obj = luna.quest.newObjective("grab", "Grab 3", 3)
+        local obj = lurek.quest.newObjective("grab", "Grab 3", 3)
         obj:advance(100)
         return obj:getCurrent()
     "#)
@@ -64,7 +64,7 @@ fn quest_objective_is_complete_done() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("task", "Task", 1)
+        local obj = lurek.quest.newObjective("task", "Task", 1)
         obj:advance(1)
         return obj:isComplete()
     "#)
@@ -77,7 +77,7 @@ fn quest_objective_is_complete_skipped() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("opt", "Optional", 1)
+        local obj = lurek.quest.newObjective("opt", "Optional", 1)
         obj:setStatus("skipped")
         return obj:isComplete()
     "#)
@@ -90,7 +90,7 @@ fn quest_objective_tags() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("kill", "Kill enemies", 5)
+        local obj = lurek.quest.newObjective("kill", "Kill enemies", 5)
         obj:addTag("combat")
         obj:addTag("main")
         return obj:hasTag("combat") and not obj:hasTag("social")
@@ -104,7 +104,7 @@ fn quest_objective_set_progress() {
     let lua = make_vm();
     let status: String = lua
         .load(r#"
-        local obj = luna.quest.newObjective("farm", "Farm crops", 10)
+        local obj = lurek.quest.newObjective("farm", "Farm crops", 10)
         obj:setProgress(10)
         return obj:getStatus()
     "#)
@@ -117,7 +117,7 @@ fn quest_objective_type_method() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local obj = luna.quest.newObjective("t", "T", 1)
+        local obj = lurek.quest.newObjective("t", "T", 1)
         return obj:type() == "Objective"
     "#)
         .eval().unwrap();
@@ -131,7 +131,7 @@ fn quest_stage_new() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local stage = luna.quest.newStage("s1", "First Stage")
+        local stage = lurek.quest.newStage("s1", "First Stage")
         return stage:getId() == "s1" and stage:getName() == "First Stage"
     "#)
         .eval().unwrap();
@@ -143,8 +143,8 @@ fn quest_stage_add_and_get_objective() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local stage = luna.quest.newStage("findKey", "Find the Key")
-        local obj = luna.quest.newObjective("search_room", "Search the room", 1)
+        local stage = lurek.quest.newStage("findKey", "Find the Key")
+        local obj = lurek.quest.newObjective("search_room", "Search the room", 1)
         stage:addObjective(obj)
         local got = stage:getObjective("search_room")
         return got ~= nil and stage:getObjectiveCount() == 1
@@ -158,8 +158,8 @@ fn quest_stage_is_complete_all_done() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local stage = luna.quest.newStage("s", "S")
-        local obj = luna.quest.newObjective("o1", "Obj", 1)
+        local stage = lurek.quest.newStage("s", "S")
+        local obj = lurek.quest.newObjective("o1", "Obj", 1)
         stage:addObjective(obj)
         -- Stage not complete yet
         local before = stage:isComplete()
@@ -178,7 +178,7 @@ fn quest_new_and_status() {
     let lua = make_vm();
     let status: String = lua
         .load(r#"
-        local q = luna.quest.newQuest("q1", "My Quest")
+        local q = lurek.quest.newQuest("q1", "My Quest")
         return q:getStatus()
     "#)
         .eval().unwrap();
@@ -190,12 +190,12 @@ fn quest_start_complete_fail_cycle() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("test", "Test Quest")
+        local q = lurek.quest.newQuest("test", "Test Quest")
         q:start()
         local s1 = q:getStatus()
         q:complete()
         local s2 = q:getStatus()
-        local q2 = luna.quest.newQuest("t2", "T2")
+        local q2 = lurek.quest.newQuest("t2", "T2")
         q2:start()
         q2:fail()
         local s3 = q2:getStatus()
@@ -210,10 +210,10 @@ fn quest_add_stage_and_navigate() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("adventure", "Adventure")
-        q:addStage(luna.quest.newStage("intro", "Introduction"))
-        q:addStage(luna.quest.newStage("main", "Main Act"))
-        q:addStage(luna.quest.newStage("end", "Finale"))
+        local q = lurek.quest.newQuest("adventure", "Adventure")
+        q:addStage(lurek.quest.newStage("intro", "Introduction"))
+        q:addStage(lurek.quest.newStage("main", "Main Act"))
+        q:addStage(lurek.quest.newStage("end", "Finale"))
         local before = q:getCurrentStageIndex()
         q:nextStage()
         local mid = q:getCurrentStageIndex()
@@ -230,9 +230,9 @@ fn quest_advance_objective_through_quest() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("gather", "Gather Resources")
-        local stage = luna.quest.newStage("collect", "Collect")
-        local obj = luna.quest.newObjective("wood", "Get wood", 5)
+        local q = lurek.quest.newQuest("gather", "Gather Resources")
+        local stage = lurek.quest.newStage("collect", "Collect")
+        local obj = lurek.quest.newObjective("wood", "Get wood", 5)
         stage:addObjective(obj)
         q:addStage(stage)
         local ok = q:advanceObjective("wood", 5)
@@ -248,7 +248,7 @@ fn quest_journal() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("diary", "Diary")
+        local q = lurek.quest.newQuest("diary", "Diary")
         local i1 = q:addJournalEntry("Found a clue", "discovery")
         local i2 = q:addJournalEntry("Unlocked door", "progress")
         local journal = q:getJournal()
@@ -263,7 +263,7 @@ fn quest_metadata() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("deliver", "Delivery")
+        local q = lurek.quest.newQuest("deliver", "Delivery")
         q:setMeta("giver", "Old Man Jones")
         q:setMeta("location", "Mudshire")
         local giver = q:getMeta("giver")
@@ -279,7 +279,7 @@ fn quest_reward_and_visibility() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("slay", "Slay the Dragon")
+        local q = lurek.quest.newQuest("slay", "Slay the Dragon")
         q:setReward("100 gold pieces")
         q:setVisible(false)
         return q:getReward() == "100 gold pieces" and not q:isVisible()
@@ -293,7 +293,7 @@ fn quest_type_method() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local q = luna.quest.newQuest("t", "T")
+        local q = lurek.quest.newQuest("t", "T")
         return q:type() == "Quest"
     "#)
         .eval().unwrap();
@@ -307,9 +307,9 @@ fn quest_log_add_and_count() {
     let lua = make_vm();
     let n: u32 = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
-        log:addQuest(luna.quest.newQuest("q1", "Quest 1"))
-        log:addQuest(luna.quest.newQuest("q2", "Quest 2"))
+        local log = lurek.quest.newQuestLog()
+        log:addQuest(lurek.quest.newQuest("q1", "Quest 1"))
+        log:addQuest(lurek.quest.newQuest("q2", "Quest 2"))
         return log:getQuestCount()
     "#)
         .eval().unwrap();
@@ -321,8 +321,8 @@ fn quest_log_get_and_remove() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
-        log:addQuest(luna.quest.newQuest("main", "Main"))
+        local log = lurek.quest.newQuestLog()
+        log:addQuest(lurek.quest.newQuest("main", "Main"))
         local got = log:getQuest("main")
         local removed = log:removeQuest("main")
         local gone = log:getQuest("main")
@@ -337,9 +337,9 @@ fn quest_log_start_complete_fail() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
-        log:addQuest(luna.quest.newQuest("a", "A"))
-        log:addQuest(luna.quest.newQuest("b", "B"))
+        local log = lurek.quest.newQuestLog()
+        log:addQuest(lurek.quest.newQuest("a", "A"))
+        log:addQuest(lurek.quest.newQuest("b", "B"))
         log:startQuest("a")
         log:completeQuest("a")
         log:startQuest("b")
@@ -357,10 +357,10 @@ fn quest_log_quests_with_status() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
-        log:addQuest(luna.quest.newQuest("a", "A"))
-        log:addQuest(luna.quest.newQuest("b", "B"))
-        log:addQuest(luna.quest.newQuest("c", "C"))
+        local log = lurek.quest.newQuestLog()
+        log:addQuest(lurek.quest.newQuest("a", "A"))
+        log:addQuest(lurek.quest.newQuest("b", "B"))
+        log:addQuest(lurek.quest.newQuest("c", "C"))
         log:startQuest("b")
         log:startQuest("c")
         log:completeQuest("c")
@@ -377,10 +377,10 @@ fn quest_log_advance_objective() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
-        local q = luna.quest.newQuest("fetch", "Fetch")
-        local stage = luna.quest.newStage("go", "Go Get It")
-        local obj = luna.quest.newObjective("apples", "Get apples", 3)
+        local log = lurek.quest.newQuestLog()
+        local q = lurek.quest.newQuest("fetch", "Fetch")
+        local stage = lurek.quest.newStage("go", "Go Get It")
+        local obj = lurek.quest.newObjective("apples", "Get apples", 3)
         stage:addObjective(obj)
         q:addStage(stage)
         log:addQuest(q)
@@ -396,7 +396,7 @@ fn quest_log_type_method() {
     let lua = make_vm();
     let res: bool = lua
         .load(r#"
-        local log = luna.quest.newQuestLog()
+        local log = lurek.quest.newQuestLog()
         return log:type() == "QuestLog"
     "#)
         .eval().unwrap();
@@ -407,7 +407,7 @@ fn quest_log_type_method() {
 fn quest_completion_percent() {
     let lua = make_vm();
     lua.load(r#"
-        local q = luna.quest.newQuest("main_q")
+        local q = lurek.quest.newQuest("main_q")
         q:addObjective("o1", "kill 5 enemies", 5)
         q:addObjective("o2", "collect loot", 1)
         -- none complete yet
@@ -424,7 +424,7 @@ fn quest_completion_percent() {
 fn quest_active_objective_ids() {
     let lua = make_vm();
     lua.load(r#"
-        local q = luna.quest.newQuest("side_q")
+        local q = lurek.quest.newQuest("side_q")
         q:addObjective("a", "find key", 1)
         q:addObjective("b", "unlock door", 1)
         q:advanceObjective("a", 1)
@@ -438,7 +438,7 @@ fn quest_active_objective_ids() {
 fn quest_reset_objective() {
     let lua = make_vm();
     lua.load(r#"
-        local q = luna.quest.newQuest("retry_q")
+        local q = lurek.quest.newQuest("retry_q")
         q:addObjective("task1", "do thing", 3)
         q:advanceObjective("task1", 3)
         local pct = q:completionPercent()
@@ -454,10 +454,10 @@ fn quest_reset_objective() {
 fn questlog_status_filters() {
     let lua = make_vm();
     lua.load(r#"
-        local ql = luna.quest.newQuestLog()
-        local q1 = luna.quest.newQuest("hero_quest")
-        local q2 = luna.quest.newQuest("side_quest")
-        local q3 = luna.quest.newQuest("failed_quest")
+        local ql = lurek.quest.newQuestLog()
+        local q1 = lurek.quest.newQuest("hero_quest")
+        local q2 = lurek.quest.newQuest("side_quest")
+        local q3 = lurek.quest.newQuest("failed_quest")
         ql:addQuest(q1)
         ql:addQuest(q2)
         ql:addQuest(q3)
@@ -479,7 +479,7 @@ fn questlog_status_filters() {
 fn questlog_empty_status_filters() {
     let lua = make_vm();
     lua.load(r#"
-        local ql = luna.quest.newQuestLog()
+        local ql = lurek.quest.newQuestLog()
         assert(#ql:getActiveQuestIds() == 0, "no active")
         assert(#ql:getCompletedQuestIds() == 0, "no completed")
         assert(#ql:getFailedQuestIds() == 0, "no failed")

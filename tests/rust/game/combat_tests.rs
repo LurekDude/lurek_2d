@@ -27,7 +27,7 @@ fn collision_group_basic() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.shooter.newCollisionGroupSet()
+        local g = lurek.shooter.newCollisionGroupSet()
         assert(g:type() == "CollisionGroupSet", "type")
         assert(g:getGroupCount() == 0, "empty")
         local bit = g:defineGroup("player")
@@ -49,7 +49,7 @@ fn collision_group_collisions() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.shooter.newCollisionGroupSet()
+        local g = lurek.shooter.newCollisionGroupSet()
         g:defineGroup("player")
         g:defineGroup("enemy")
         g:defineGroup("bullet")
@@ -73,7 +73,7 @@ fn collision_group_max_16() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.shooter.newCollisionGroupSet()
+        local g = lurek.shooter.newCollisionGroupSet()
         for i = 1, 16 do
             g:defineGroup("group" .. i)
         end
@@ -91,7 +91,7 @@ fn collision_group_compute_mask() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.shooter.newCollisionGroupSet()
+        local g = lurek.shooter.newCollisionGroupSet()
         g:defineGroup("player")
         g:defineGroup("enemy")
         g:defineGroup("wall")
@@ -116,7 +116,7 @@ fn collision_group_names_and_reset() {
     let lua = make_vm();
     lua.load(
         r#"
-        local g = luna.shooter.newCollisionGroupSet()
+        local g = lurek.shooter.newCollisionGroupSet()
         g:defineGroup("alpha")
         g:defineGroup("beta")
         local names = g:getGroupNames()
@@ -136,7 +136,7 @@ fn chassis_creation() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         assert(c:type() == "Chassis", "type")
         assert(c:getBodyId() == 1, "body id")
         assert(c:getMaxHp() == 100.0, "max hp")
@@ -154,7 +154,7 @@ fn chassis_damage_and_heal() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         local dmg = c:takeDamage(30.0)
         assert(math.abs(dmg - 30.0) < 0.001, "30 damage dealt")
         assert(math.abs(c:getHp() - 70.0) < 0.001, "70 hp remaining")
@@ -174,7 +174,7 @@ fn chassis_heal_capped_at_max() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         c:takeDamage(20.0)
         c:heal(999.0)
         assert(math.abs(c:getHp() - 100.0) < 0.001, "heal capped at max hp")
@@ -189,7 +189,7 @@ fn chassis_slots() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         local slots = c:getSlots()
         assert(#slots == 0, "no slots initially")
         c:addSlot({id="main", x=0, y=0, sizeClass="large", arcMin=-1.57, arcMax=1.57})
@@ -210,7 +210,7 @@ fn chassis_armor() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         assert(c:getArmor("front") == 0.0, "default armor is 0")
         c:setArmor("front", 50.0)
         c:setArmor("rear", 20.0)
@@ -227,7 +227,7 @@ fn chassis_team_and_userdata() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         c:setTeam("allies")
         assert(c:getTeam() == "allies", "team")
         c:setUserData("player_tank")
@@ -243,7 +243,7 @@ fn chassis_destroy() {
     let lua = make_vm();
     lua.load(
         r#"
-        local c = luna.shooter.newChassis(1, 100.0)
+        local c = lurek.shooter.newChassis(1, 100.0)
         c:destroy()
         assert(c:isDestroyed(), "destroyed")
         assert(c:getHp() == 0.0, "hp zeroed on destroy")
@@ -260,7 +260,7 @@ fn turret_creation() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.shooter.newTurret(2, 3)
+        local t = lurek.shooter.newTurret(2, 3)
         assert(t:type() == "Turret", "type")
         assert(t:getBodyId() == 2, "body id")
         assert(t:getJointId() == 3, "joint id")
@@ -276,7 +276,7 @@ fn turret_aiming_and_turn_speed() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.shooter.newTurret(2, 3)
+        local t = lurek.shooter.newTurret(2, 3)
         t:setTurnSpeed(3.14)
         assert(math.abs(t:getTurnSpeed() - 3.14) < 0.001, "turn speed")
         t:aimAtAngle(1.0)
@@ -295,7 +295,7 @@ fn turret_arc_limits() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.shooter.newTurret(2, 3)
+        local t = lurek.shooter.newTurret(2, 3)
         t:setArcMin(-1.57)
         t:setArcMax(1.57)
         assert(math.abs(t:getArcMin() - (-1.57)) < 0.001, "arc min")
@@ -311,7 +311,7 @@ fn turret_size_class_and_destroy() {
     let lua = make_vm();
     lua.load(
         r#"
-        local t = luna.shooter.newTurret(5, 6)
+        local t = lurek.shooter.newTurret(5, 6)
         t:setSizeClass("heavy")
         assert(t:getSizeClass() == "heavy", "size class")
         t:destroy()
@@ -329,7 +329,7 @@ fn weapon_creation() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Plasma Cannon")
+        local w = lurek.shooter.newWeapon("Plasma Cannon")
         assert(w:type() == "Weapon", "type")
         assert(w:getName() == "Plasma Cannon", "name")
     "#,
@@ -343,7 +343,7 @@ fn weapon_fire_rate_and_ammo() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Gun")
+        local w = lurek.shooter.newWeapon("Gun")
         w:setFireRate(10.0)
         assert(w:getFireRate() == 10.0, "fire rate")
         w:setAmmo(50)
@@ -365,7 +365,7 @@ fn weapon_firing() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Auto")
+        local w = lurek.shooter.newWeapon("Auto")
         w:setFireRate(10.0)
         w:setAmmo(10)
         w:setMaxAmmo(10)
@@ -389,7 +389,7 @@ fn weapon_burst_and_spread() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Burst")
+        local w = lurek.shooter.newWeapon("Burst")
         w:setBurstSize(3)
         w:setBurstDelay(0.1)
         w:setSpread(0.05)
@@ -407,7 +407,7 @@ fn weapon_projectile_config() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Missile")
+        local w = lurek.shooter.newWeapon("Missile")
         w:setProjectileType("homing")
         assert(w:getProjectileType() == "homing", "proj type")
         w:setProjectileSpeed(500.0)
@@ -425,7 +425,7 @@ fn weapon_damage_and_penetration() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("Railgun")
+        local w = lurek.shooter.newWeapon("Railgun")
         w:setDamage(200.0)
         w:setDamageType("kinetic")
         w:setPenetration(80.0)
@@ -443,7 +443,7 @@ fn weapon_continuous_fire() {
     let lua = make_vm();
     lua.load(
         r#"
-        local w = luna.shooter.newWeapon("MG")
+        local w = lurek.shooter.newWeapon("MG")
         assert(not w:isFiring(), "not firing initially")
         w:startFiring()
         assert(w:isFiring(), "firing after start")
@@ -462,7 +462,7 @@ fn projectile_pool_creation() {
     let lua = make_vm();
     lua.load(
         r#"
-        local pool = luna.shooter.newProjectilePool(100)
+        local pool = lurek.shooter.newProjectilePool(100)
         assert(pool:type() == "ProjectilePool", "type")
         assert(pool:getPoolSize() == 100, "size")
         assert(pool:getActiveCount() == 0, "no active")
@@ -478,7 +478,7 @@ fn projectile_pool_spawn_release() {
     let lua = make_vm();
     lua.load(
         r#"
-        local pool = luna.shooter.newProjectilePool(10)
+        local pool = lurek.shooter.newProjectilePool(10)
         local idx = pool:spawn(0, 0, 0, 100, 10, "kinetic", 500)
         assert(idx ~= nil, "spawned")
         assert(pool:getActiveCount() == 1, "one active")
@@ -497,7 +497,7 @@ fn projectile_pool_exhaustion() {
     let lua = make_vm();
     lua.load(
         r#"
-        local pool = luna.shooter.newProjectilePool(3)
+        local pool = lurek.shooter.newProjectilePool(3)
         pool:spawn(0, 0, 0, 100, 10, "kinetic", 500)
         pool:spawn(1, 0, 0, 100, 10, "kinetic", 500)
         pool:spawn(2, 0, 0, 100, 10, "kinetic", 500)
@@ -516,7 +516,7 @@ fn projectile_pool_reset() {
     let lua = make_vm();
     lua.load(
         r#"
-        local pool = luna.shooter.newProjectilePool(5)
+        local pool = lurek.shooter.newProjectilePool(5)
         pool:spawn(0, 0, 0, 100, 10, "kinetic", 500)
         pool:spawn(1, 0, 0, 100, 10, "kinetic", 500)
         assert(pool:getActiveCount() == 2, "two active")
@@ -536,7 +536,7 @@ fn combat_world_creation() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
+        local world = lurek.shooter.newCombatWorld()
         assert(world:type() == "CombatWorld", "type")
         assert(world:getActiveChassisCount() == 0, "no chassis")
         assert(world:getActiveProjectileCount() == 0, "no projectiles")
@@ -551,17 +551,17 @@ fn combat_world_add_entities() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
-        local chassis = luna.shooter.newChassis(1, 100.0)
+        local world = lurek.shooter.newCombatWorld()
+        local chassis = lurek.shooter.newChassis(1, 100.0)
         local idx = world:addChassis(chassis)
         assert(idx == 0, "first chassis index")
         assert(world:getActiveChassisCount() == 1, "one chassis")
 
-        local turret = luna.shooter.newTurret(2, 3)
+        local turret = lurek.shooter.newTurret(2, 3)
         local tidx = world:addTurret(turret)
         assert(tidx == 0, "first turret index")
 
-        local weapon = luna.shooter.newWeapon("Gun")
+        local weapon = lurek.shooter.newWeapon("Gun")
         local widx = world:addWeapon(weapon)
         assert(widx == 0, "first weapon index")
     "#,
@@ -575,7 +575,7 @@ fn combat_world_update_reset() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
+        local world = lurek.shooter.newCombatWorld()
         world:update(0.016)
         world:reset()
         assert(world:getActiveChassisCount() == 0, "reset empty")
@@ -590,8 +590,8 @@ fn combat_world_get_entities() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
-        local chassis = luna.shooter.newChassis(10, 200.0)
+        local world = lurek.shooter.newCombatWorld()
+        local chassis = lurek.shooter.newChassis(10, 200.0)
         chassis:setTeam("red")
         world:addChassis(chassis)
         local retrieved = world:getChassis(0)
@@ -599,13 +599,13 @@ fn combat_world_get_entities() {
         assert(retrieved:getBodyId() == 10, "body id preserved")
         assert(retrieved:getMaxHp() == 200.0, "max hp preserved")
 
-        local turret = luna.shooter.newTurret(20, 30)
+        local turret = lurek.shooter.newTurret(20, 30)
         world:addTurret(turret)
         local rt = world:getTurret(0)
         assert(rt ~= nil, "retrieved turret")
         assert(rt:getBodyId() == 20, "turret body id")
 
-        local weapon = luna.shooter.newWeapon("Laser")
+        local weapon = lurek.shooter.newWeapon("Laser")
         world:addWeapon(weapon)
         local rw = world:getWeapon(0)
         assert(rw ~= nil, "retrieved weapon")
@@ -621,9 +621,9 @@ fn combat_world_cleanup() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
-        local c1 = luna.shooter.newChassis(1, 100.0)
-        local c2 = luna.shooter.newChassis(2, 100.0)
+        local world = lurek.shooter.newCombatWorld()
+        local c1 = lurek.shooter.newChassis(1, 100.0)
+        local c2 = lurek.shooter.newChassis(2, 100.0)
         world:addChassis(c1)
         world:addChassis(c2)
         assert(world:getActiveChassisCount() == 2, "two active")
@@ -645,8 +645,8 @@ fn combat_world_add_pool() {
     let lua = make_vm();
     lua.load(
         r#"
-        local world = luna.shooter.newCombatWorld()
-        local pool = luna.shooter.newProjectilePool(50)
+        local world = lurek.shooter.newCombatWorld()
+        local pool = lurek.shooter.newProjectilePool(50)
         local pidx = world:addPool(pool)
         assert(pidx == 0, "first pool index")
         local rp = world:getPool(0)

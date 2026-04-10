@@ -1,15 +1,15 @@
-//! Unit tests for the `fx` module (post-processing effects and screen overlays).
+﻿//! Unit tests for the `fx` module (post-processing effects and screen overlays).
 //!
 //! Covers: `PostFxStack`, `PostFxEffectType`, `PostFxEffect`, `ImageEffect`,
 //! and the `screen` overlay types (`Overlay`, `FogState`, `HeatHazeState`, etc.).
 //!
 //! These tests are purely in-memory (no GPU, no window, no audio).
 
-use lurek2d::fx::{
+use lurek2d::effect::{
     AmbientState, FadeState, FilmGrainState, FogState, HeatHazeState, Overlay, ShakeState,
     VignetteState, WeatherType,
 };
-use lurek2d::fx::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
+use lurek2d::effect::{ImageEffect, PostFxEffect, PostFxEffectType, PostFxStack};
 
 // ═════════════════════════════════════════════════════════════════════════
 // PostFxEffectType
@@ -273,3 +273,4 @@ fn weather_type_roundtrip() {
         }
     }
 }
+

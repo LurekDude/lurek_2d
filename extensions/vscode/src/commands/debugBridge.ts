@@ -2,24 +2,24 @@ import * as vscode from "vscode";
 import { DebugBridge } from "../services/debugBridge.js";
 
 /**
- * Registers debug bridge commands that interact with a running Luna2D engine.
+ * Registers debug bridge commands that interact with a running Lurek2D engine.
  */
 export function registerDebugBridgeCommands(
   context: vscode.ExtensionContext,
   bridge: DebugBridge,
 ): void {
-  // ── luna.debug.connect ───────────────────────────────────
+  // ── lurek.debug.connect ───────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.connect", async () => {
+    vscode.commands.registerCommand("lurek.debug.connect", async () => {
       if (bridge.isConnected) {
-        vscode.window.showInformationMessage("Already connected to Luna2D engine.");
+        vscode.window.showInformationMessage("Already connected to Lurek2D engine.");
         return;
       }
 
       const portStr = await vscode.window.showInputBox({
         prompt: "Debug bridge port",
         value: String(
-          vscode.workspace.getConfiguration("luna.debugBridge").get<number>("port", 19740)
+          vscode.workspace.getConfiguration("lurek.debugBridge").get<number>("port", 19740)
         ),
         validateInput: (v) => {
           const n = Number(v);
@@ -37,8 +37,8 @@ export function registerDebugBridgeCommands(
       bridge.showOutput();
       const ok = await bridge.connect(Number(portStr));
       if (ok) {
-        vscode.window.showInformationMessage("Connected to Luna2D engine.");
-        vscode.commands.executeCommand("setContext", "luna.debugConnected", true);
+        vscode.window.showInformationMessage("Connected to Lurek2D engine.");
+        vscode.commands.executeCommand("setContext", "lurek.debugConnected", true);
       } else {
         vscode.window.showErrorMessage(
           "Failed to connect. Is the engine running with debug bridge enabled?"
@@ -47,20 +47,20 @@ export function registerDebugBridgeCommands(
     })
   );
 
-  // ── luna.debug.disconnect ────────────────────────────────
+  // ── lurek.debug.disconnect ────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.disconnect", () => {
+    vscode.commands.registerCommand("lurek.debug.disconnect", () => {
       bridge.disconnect();
-      vscode.commands.executeCommand("setContext", "luna.debugConnected", false);
-      vscode.window.showInformationMessage("Disconnected from Luna2D engine.");
+      vscode.commands.executeCommand("setContext", "lurek.debugConnected", false);
+      vscode.window.showInformationMessage("Disconnected from Lurek2D engine.");
     })
   );
 
-  // ── luna.debug.evaluate ──────────────────────────────────
+  // ── lurek.debug.evaluate ──────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.evaluate", async () => {
+    vscode.commands.registerCommand("lurek.debug.evaluate", async () => {
       if (!bridge.isConnected) {
-        vscode.window.showErrorMessage("Not connected to Luna2D engine. Run 'Luna: Debug Connect' first.");
+        vscode.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
         return;
       }
 
@@ -83,11 +83,11 @@ export function registerDebugBridgeCommands(
     })
   );
 
-  // ── luna.debug.hotReload ─────────────────────────────────
+  // ── lurek.debug.hotReload ─────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.hotReload", async () => {
+    vscode.commands.registerCommand("lurek.debug.hotReload", async () => {
       if (!bridge.isConnected) {
-        vscode.window.showErrorMessage("Not connected to Luna2D engine.");
+        vscode.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
 
@@ -117,11 +117,11 @@ export function registerDebugBridgeCommands(
     })
   );
 
-  // ── luna.debug.showStats ─────────────────────────────────
+  // ── lurek.debug.showStats ─────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.showStats", async () => {
+    vscode.commands.registerCommand("lurek.debug.showStats", async () => {
       if (!bridge.isConnected) {
-        vscode.window.showErrorMessage("Not connected to Luna2D engine.");
+        vscode.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
 
@@ -130,11 +130,11 @@ export function registerDebugBridgeCommands(
     })
   );
 
-  // ── luna.debug.inspect ───────────────────────────────────
+  // ── lurek.debug.inspect ───────────────────────────────────
   context.subscriptions.push(
-    vscode.commands.registerCommand("luna.debug.inspect", async () => {
+    vscode.commands.registerCommand("lurek.debug.inspect", async () => {
       if (!bridge.isConnected) {
-        vscode.window.showErrorMessage("Not connected to Luna2D engine.");
+        vscode.window.showErrorMessage("Not connected to Lurek2D engine.");
         return;
       }
 

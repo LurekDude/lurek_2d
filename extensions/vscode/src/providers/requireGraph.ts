@@ -122,7 +122,7 @@ function detectCycles(
  * Registers the require dependency graph analysis provider.
  */
 export function register(context: vscode.ExtensionContext): void {
-  const diagCollection = vscode.languages.createDiagnosticCollection("luna.requireGraph");
+  const diagCollection = vscode.languages.createDiagnosticCollection("lurek.requireGraph");
   context.subscriptions.push(diagCollection);
 
   // File node cache
@@ -211,8 +211,8 @@ export function register(context: vscode.ExtensionContext): void {
               `Cannot resolve module "${req.moduleName}" — file not found in workspace.`,
               vscode.DiagnosticSeverity.Warning
             );
-            diag.code = "luna.requireMissing";
-            diag.source = "Luna Require Graph";
+            diag.code = "lurek.requireMissing";
+            diag.source = "Lurek2D Require Graph";
             diagnostics.push(diag);
           }
         }
@@ -234,8 +234,8 @@ export function register(context: vscode.ExtensionContext): void {
                 `Circular dependency detected: ${cycleNames.join(" → ")}`,
                 vscode.DiagnosticSeverity.Warning
               );
-              diag.code = "luna.requireCycle";
-              diag.source = "Luna Require Graph";
+              diag.code = "lurek.requireCycle";
+              diag.source = "Lurek2D Require Graph";
               diagnostics.push(diag);
               break;
             }

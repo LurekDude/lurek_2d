@@ -534,6 +534,73 @@ impl Graph {
             )),
         }
     }
+
+    // ------------------------------------------------------------------
+    // Visualization
+    // ------------------------------------------------------------------
+
+    /// Render the graph to an image with circular node layout.
+    ///
+    /// Nodes are laid out in a circle. Edges are drawn as lines. City nodes
+    /// appear red; all others green.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`. Output image width.
+    /// - `height` — `u32`. Output image height.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(25, 25, 35, 255);
+        let cx = width as f32 / 2.0;
+        let cy = height as f32 / 2.0;
+        let radius = (width.min(height) as f32) * 0.35;
+
+        // Collect nodes in ID order for stable layout
+        let mut node_ids: Vec<u64> = self.nodes.keys().copied().collect();
+        node_ids.sort();
+        let n = node_ids.len();
+        if n == 0 {
+            return img;
+        }
+
+        // Compute circular positions
+        let positions: Vec<(f32, f32)> = (0..n)
+            .map(|i| {
+                let angle = i as f32 * std::f32::consts::PI * 2.0 / n as f32
+                    - std::f32::consts::FRAC_PI_2;
+                (cx + radius * angle.cos(), cy + radius * angle.sin())
+            })
+            .collect();
+
+        // Build a map from node ID to index
+        let id_to_idx: std::collections::HashMap<u64, usize> =
+            node_ids.iter().enumerate().map(|(i, &id)| (id, i)).collect();
+
+        // Draw edges
+        for edge in self.edges.values() {
+            if let (Some(&ai), Some(&bi)) =
+                (id_to_idx.get(&edge.from_node), id_to_idx.get(&edge.to_node))
+            {
+                let (ax, ay) = positions[ai];
+                let (bx, by) = positions[bi];
+                img.draw_line(ax as i32, ay as i32, bx as i32, by as i32, 80, 120, 160, 200);
+            }
+        }
+
+        // Draw nodes
+        for (i, &nid) in node_ids.iter().enumerate() {
+            let (px, py) = positions[i];
+            let (r, g, b) = if self.nodes[&nid].node_type == "city" {
+                (200u8, 80, 80)
+            } else {
+                (80, 200, 80)
+            };
+            img.draw_circle(px as i32, py as i32, 8, r, g, b, 255);
+        }
+        img
+    }
 }
 
 #[cfg(test)]

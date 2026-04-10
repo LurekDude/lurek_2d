@@ -1,4 +1,22 @@
 -- Lua BDD tests for lurek.simulator (automation module)
+-- @covers lurek.simulator.getCurrentScript
+-- @covers lurek.simulator.getCurrentStep
+-- @covers lurek.simulator.getElapsedTime
+-- @covers lurek.simulator.getScripts
+-- @covers lurek.simulator.getStepCount
+-- @covers lurek.simulator.hasScript
+-- @covers lurek.simulator.isComplete
+-- @covers lurek.simulator.isPaused
+-- @covers lurek.simulator.isRunning
+-- @covers lurek.simulator.load
+-- @covers lurek.simulator.loadFromToml
+-- @covers lurek.simulator.pause
+-- @covers lurek.simulator.resume
+-- @covers lurek.simulator.start
+-- @covers lurek.simulator.stop
+-- @covers lurek.simulator.unload
+-- @covers lurek.simulator.update
+
 
 describe("lurek.simulator - namespace", function()
     it("should exist as a table", function()

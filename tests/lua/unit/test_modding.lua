@@ -1,6 +1,23 @@
 -- lurek.modding API unit tests
 -- Headless-safe (no window / GPU / audio required).
 -- Tests Mod and ModManager factory functions and metadata API.
+-- @covers lurek.modding.newMod
+-- @covers lurek.modding.newModManager
+-- @covers lurek.modding.Mod.getId
+-- @covers lurek.modding.Mod.getName
+-- @covers lurek.modding.Mod.getVersion
+-- @covers lurek.modding.Mod.getAuthor
+-- @covers lurek.modding.Mod.getPriority
+-- @covers lurek.modding.Mod.isEnabled
+-- @covers lurek.modding.Mod.setEnabled
+-- @covers lurek.modding.Mod.isLoaded
+-- @covers lurek.modding.ModManager.getLoadOrder
+-- @covers lurek.modding.ModManager.registerMod
+-- @covers lurek.modding.ModManager.getAllMods
+-- @covers lurek.modding.ModManager.hasMod
+-- @covers lurek.modding.ModManager.unregisterMod
+-- @covers lurek.modding.ModManager.getModCount
+
 
 describe("lurek.modding module exists", function()
     it("lurek.modding is a table", function()

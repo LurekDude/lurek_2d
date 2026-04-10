@@ -370,4 +370,38 @@ impl InfluenceMap {
             out[i] = weight_a * a[i] + weight_b * b[i];
         }
     }
+
+    /// Render the influence map to an image.
+    ///
+    /// Enemy influence is mapped to red and ally influence to blue. Cells with
+    /// no influence use a dark background. The "enemy" and "ally" layers are
+    /// read by convention; missing layers are treated as zero.
+    ///
+    /// # Parameters
+    /// - `cell_size` — `u32`. Pixel size of each grid cell.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(&self, cell_size: u32) -> crate::image::ImageData {
+        let w = self.width as u32;
+        let h = self.height as u32;
+        let mut img = crate::image::ImageData::new(w * cell_size, h * cell_size);
+        img.fill(30, 30, 35, 255);
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let enemy = self.get_influence("enemy", x, y);
+                let ally = self.get_influence("ally", x, y);
+                let r = (enemy.min(1.0) * 200.0) as u8 + 30;
+                let g = 30u8;
+                let b = (ally.min(1.0) * 200.0) as u8 + 30;
+                for py in 0..cell_size {
+                    for px in 0..cell_size {
+                        img.set_pixel(x as u32 * cell_size + px, y as u32 * cell_size + py, r, g, b, 255);
+                    }
+                }
+            }
+        }
+        img
+    }
+
 }

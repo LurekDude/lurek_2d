@@ -28,10 +28,10 @@ const PATTERNS: { regex: RegExp; kind: vscode.SymbolKind; group: number }[] = [
   { regex: /\blocal\s+(\w+)\s*=\s*\{\s*\}/g, kind: vscode.SymbolKind.Class, group: 1 },
   // CONSTANT = value (all-caps)
   { regex: /^([A-Z][A-Z_0-9]+)\s*=/gm, kind: vscode.SymbolKind.Constant, group: 1 },
-  // luna.callback assignment: luna.load = function ...
-  { regex: /\b(luna\.\w+)\s*=\s*function/g, kind: vscode.SymbolKind.Function, group: 1 },
-  // function luna.callback(...)
-  { regex: /\bfunction\s+(luna\.\w+)\s*\(/g, kind: vscode.SymbolKind.Function, group: 1 },
+  // lurek.callback assignment: lurek.load = function ...
+  { regex: /\b(lurek\.\w+)\s*=\s*function/g, kind: vscode.SymbolKind.Function, group: 1 },
+  // function lurek.callback(...)
+  { regex: /\bfunction\s+(lurek\.\w+)\s*\(/g, kind: vscode.SymbolKind.Function, group: 1 },
 ];
 
 /**
@@ -165,7 +165,7 @@ export class SymbolIndex {
         let containerName: string | undefined;
         if (name.includes(":")) {
           containerName = name.split(":")[0];
-        } else if (name.includes(".") && !name.startsWith("luna.")) {
+        } else if (name.includes(".") && !name.startsWith("lurek.")) {
           containerName = name.split(".")[0];
         }
 

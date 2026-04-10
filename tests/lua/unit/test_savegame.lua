@@ -1,6 +1,8 @@
 -- lurek.savegame API unit tests
 -- Headless-safe (no window / GPU / audio required).
 -- Tests SaveManager lifecycle and API surface; does not write to disk.
+-- @covers lurek.savegame.newSaveManager
+
 
 describe("lurek.savegame module exists", function()
     it("lurek.savegame is a table", function()

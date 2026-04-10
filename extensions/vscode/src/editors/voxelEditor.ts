@@ -7,7 +7,7 @@ export class VoxelEditor extends WebviewEditor {
   }
 
   private constructor(context: vscode.ExtensionContext) {
-    super(context, "luna.editor.voxel", "Voxel Editor");
+    super(context, "lurek.editor.voxel", "Voxel Editor");
   }
 
   protected handleMessage(msg: { type: string;[key: string]: unknown }): void {

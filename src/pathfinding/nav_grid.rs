@@ -430,4 +430,75 @@ impl NavGrid {
             dirty_rects: Vec::new(),
         }
     }
+
+    /// Render the navigation grid to an image with optional path overlay.
+    ///
+    /// Blocked cells (cost 0 / 255) are drawn dark red, high-cost cells are
+    /// brownish, and normal cells are dark green. An optional path is
+    /// highlighted in green, with start and end markers.
+    ///
+    /// # Parameters
+    /// - `cell_size` — `u32`. Pixel size of each grid cell.
+    /// - `path` — `Option<&[(u32, u32)]>`. Path cells to highlight.
+    /// - `start` — `Option<(u32, u32)>`. Start cell for circle marker.
+    /// - `end` — `Option<(u32, u32)>`. End cell for circle marker.
+    ///
+    /// # Returns
+    /// `ImageData`.
+    pub fn render_to_image(
+        &self,
+        cell_size: u32,
+        path: Option<&[(u32, u32)]>,
+        start: Option<(u32, u32)>,
+        end: Option<(u32, u32)>,
+    ) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(self.width * cell_size, self.height * cell_size);
+        img.fill(50, 50, 60, 255);
+        // Draw cells
+        for y in 0..self.height {
+            for x in 0..self.width {
+                let cost = self.get_cost(x, y);
+                let (r, g, b) = if cost == 0 || cost == 255 {
+                    (80u8, 30, 30) // blocked
+                } else if cost > 3 {
+                    (100, 80, 40) // high cost
+                } else {
+                    (50, 70, 50) // normal
+                };
+                for py in 0..cell_size {
+                    for px in 0..cell_size {
+                        img.set_pixel(x * cell_size + px, y * cell_size + py, r, g, b, 255);
+                    }
+                }
+            }
+        }
+        // Draw path
+        if let Some(p) = path {
+            for &(px, py) in p {
+                for dy in 2..cell_size.saturating_sub(2) {
+                    for dx in 2..cell_size.saturating_sub(2) {
+                        img.set_pixel(px * cell_size + dx, py * cell_size + dy, 0, 200, 100, 255);
+                    }
+                }
+            }
+        }
+        // Start marker
+        if let Some((sx, sy)) = start {
+            img.draw_circle(
+                (sx * cell_size + cell_size / 2) as i32,
+                (sy * cell_size + cell_size / 2) as i32,
+                6, 0, 255, 0, 255,
+            );
+        }
+        // End marker
+        if let Some((ex, ey)) = end {
+            img.draw_circle(
+                (ex * cell_size + cell_size / 2) as i32,
+                (ey * cell_size + cell_size / 2) as i32,
+                6, 255, 0, 0, 255,
+            );
+        }
+        img
+    }
+
 }

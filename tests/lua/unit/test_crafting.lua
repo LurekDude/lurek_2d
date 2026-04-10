@@ -1,4 +1,23 @@
 -- Lua BDD tests for lurek.crafting.*
+-- @covers lurek.crafting.CraftQueue
+-- @covers lurek.crafting.CraftSkill
+-- @covers lurek.crafting.ModifierPool
+-- @covers lurek.crafting.Recipe
+-- @covers lurek.crafting.RecipeGroup
+-- @covers lurek.crafting.RecipeKnowledge
+-- @covers lurek.crafting.RecipeRegistry
+-- @covers lurek.crafting.Station
+-- @covers lurek.crafting.UpgradeTree
+-- @covers lurek.crafting.newCraftQueue
+-- @covers lurek.crafting.newCraftSkill
+-- @covers lurek.crafting.newModifierPool
+-- @covers lurek.crafting.newRecipe
+-- @covers lurek.crafting.newRecipeGroup
+-- @covers lurek.crafting.newRecipeKnowledge
+-- @covers lurek.crafting.newRegistry
+-- @covers lurek.crafting.newStation
+-- @covers lurek.crafting.newUpgradeTree
+
 
 describe("lurek.crafting.Recipe", function()
     it("creates a recipe with id and type", function()

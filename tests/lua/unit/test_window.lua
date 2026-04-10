@@ -1,4 +1,40 @@
 -- Lurek2D Window API Tests
+-- @covers lurek.window.close
+-- @covers lurek.window.focus
+-- @covers lurek.window.fromPixels
+-- @covers lurek.window.getDPIScale
+-- @covers lurek.window.getDesktopDimensions
+-- @covers lurek.window.getDimensions
+-- @covers lurek.window.getDisplayCount
+-- @covers lurek.window.getDisplayOrientation
+-- @covers lurek.window.getFullscreen
+-- @covers lurek.window.getHeight
+-- @covers lurek.window.getMode
+-- @covers lurek.window.getNativeDPIScale
+-- @covers lurek.window.getPosition
+-- @covers lurek.window.getSafeArea
+-- @covers lurek.window.getSystemTheme
+-- @covers lurek.window.getTitle
+-- @covers lurek.window.getVSync
+-- @covers lurek.window.getWidth
+-- @covers lurek.window.hasFocus
+-- @covers lurek.window.hasMouseFocus
+-- @covers lurek.window.isHighDPIAllowed
+-- @covers lurek.window.isMaximized
+-- @covers lurek.window.isMinimized
+-- @covers lurek.window.isOpen
+-- @covers lurek.window.isVisible
+-- @covers lurek.window.maximize
+-- @covers lurek.window.minimize
+-- @covers lurek.window.requestAttention
+-- @covers lurek.window.restore
+-- @covers lurek.window.setFullscreen
+-- @covers lurek.window.setIcon
+-- @covers lurek.window.setMode
+-- @covers lurek.window.setPosition
+-- @covers lurek.window.setVSync
+-- @covers lurek.window.toPixels
+
 
 describe("lurek.window module exists", function()
     it("lurek.window is a table", function()

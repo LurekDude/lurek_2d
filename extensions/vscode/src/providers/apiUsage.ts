@@ -26,11 +26,11 @@ async function scanApiUsage(): Promise<ApiUsage[]> {
       const line = lines[i];
       if (line.trimStart().startsWith("--")) continue;
 
-      // Match luna.module.function( calls
-      const re = /luna\.(\w+)\.(\w+)\s*\(/g;
+      // Match lurek.module.function( calls
+      const re = /lurek\.(\w+)\.(\w+)\s*\(/g;
       let m: RegExpExecArray | null;
       while ((m = re.exec(line)) !== null) {
-        const key = `luna.${m[1]}.${m[2]}`;
+        const key = `lurek.${m[1]}.${m[2]}`;
         if (!usage.has(key)) {
           usage.set(key, { func: key, count: 0, files: new Set(), lines: [] });
         }
@@ -59,8 +59,8 @@ export async function openApiUsageReport(context: vscode.ExtensionContext): Prom
   }
 
   _panel = vscode.window.createWebviewPanel(
-    "luna.apiUsage",
-    "Luna2D API Usage",
+    "lurek.apiUsage",
+    "Lurek2D API Usage",
     vscode.ViewColumn.Two,
     { enableScripts: true, retainContextWhenHidden: true },
   );
@@ -106,7 +106,7 @@ function buildHtml(usages: ApiUsage[]): string {
     .sort((a, b) => b[1].reduce((s, u) => s + u.count, 0) - a[1].reduce((s, u) => s + u.count, 0))
     .map(([mod, fns]) => {
       const total = fns.reduce((s, u) => s + u.count, 0);
-      return `<tr><td><code>luna.${esc(mod)}</code></td><td>${fns.length}</td><td>${total}</td></tr>`;
+      return `<tr><td><code>lurek.${esc(mod)}</code></td><td>${fns.length}</td><td>${total}</td></tr>`;
     }).join("");
 
   const topRows = top10.map(u => {
@@ -148,7 +148,7 @@ function buildHtml(usages: ApiUsage[]): string {
 </style>
 </head>
 <body>
-<h2>📊 Luna2D API Usage Report</h2>
+<h2>📊 Lurek2D API Usage Report</h2>
 <button onclick="vscode.postMessage({type:'refresh'})">⟳ Re-scan</button>
 
 <div class="stats">
@@ -188,9 +188,9 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// ── Quick-insert Luna API function ────────────────────────────
+// ── Quick-insert Lurek2D API function ────────────────────────────
 
-export async function quickInsertLunaApi(apiData: ApiDataService): Promise<void> {
+export async function quickInsertLurekApi(apiData: ApiDataService): Promise<void> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage("Open a Lua file first.");
@@ -199,7 +199,7 @@ export async function quickInsertLunaApi(apiData: ApiDataService): Promise<void>
 
   const funcs: ApiFunction[] = apiData.getAllFunctions();
   const items: vscode.QuickPickItem[] = funcs
-    .filter(f => f.fullPath.startsWith("luna."))
+    .filter(f => f.fullPath.startsWith("lurek."))
     .map(f => ({
       label: f.fullPath,
       description: f.description ?? "",
@@ -207,7 +207,7 @@ export async function quickInsertLunaApi(apiData: ApiDataService): Promise<void>
     }));
 
   const picked = await vscode.window.showQuickPick(items, {
-    placeHolder: "Search luna.* function to insert…",
+    placeHolder: "Search lurek.* function to insert…",
     matchOnDescription: true,
     matchOnDetail: true,
   });

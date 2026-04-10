@@ -1,5 +1,7 @@
 -- tests/lua/test_drawlayer.lua
 -- Integration tests for lurek.gfx.newDrawLayer()
+-- @covers lurek.gfx.newDrawLayer
+
 
 local total, passed, failed = 0, 0, 0
 local current_describe = ""
