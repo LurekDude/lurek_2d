@@ -626,7 +626,7 @@ fn touch_lua_get_touches() {
 
 #[test]
 fn phase_03_keyboard_runtime_keypressed_callback_uses_key_scancode_and_repeat() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
     let keyboard_input_block =
         extract_arrow_block(&app_source, "WindowEvent::KeyboardInput { event, .. } =>");
 
@@ -636,7 +636,7 @@ fn phase_03_keyboard_runtime_keypressed_callback_uses_key_scancode_and_repeat() 
 
 #[test]
 fn phase_03_keyboard_runtime_keyreleased_is_not_guarded_by_prev_key_state() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
     let keyboard_input_block =
         extract_arrow_block(&app_source, "WindowEvent::KeyboardInput { event, .. } =>");
 
@@ -650,7 +650,7 @@ fn phase_03_keyboard_runtime_keyreleased_is_not_guarded_by_prev_key_state() {
 
 #[test]
 fn phase_03_textinput_runtime_only_invokes_lua_callback_when_text_input_enabled() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
     let ime_block = extract_braced_block(
         &app_source,
         "WindowEvent::Ime(winit::event::Ime::Commit(text)) =>",
@@ -666,7 +666,7 @@ fn phase_03_textinput_runtime_only_invokes_lua_callback_when_text_input_enabled(
 
 #[test]
 fn phase_03_mouse_runtime_applies_cursor_state_to_window_backend() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
 
     assert!(
         app_source.contains("set_cursor_visible"),
@@ -688,7 +688,7 @@ fn phase_03_mouse_runtime_applies_cursor_state_to_window_backend() {
 
 #[test]
 fn phase_03_gamepad_runtime_dispatches_button_axis_and_hotplug_callbacks() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
 
     for callback_name in [
         "gamepadpressed",
@@ -707,7 +707,7 @@ fn phase_03_gamepad_runtime_dispatches_button_axis_and_hotplug_callbacks() {
 
 #[test]
 fn phase_03_touch_runtime_dispatches_six_argument_callbacks() {
-    let app_source = read_source("src/engine/app.rs");
+    let app_source = read_source("src/app/app.rs");
     let touch_block = extract_braced_block(&app_source, "WindowEvent::Touch(touch) =>");
 
     assert!(

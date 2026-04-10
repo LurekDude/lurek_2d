@@ -11,13 +11,13 @@ use lurek2d::runtime::messages::{catalog, get_message, init, MessageCatalog};
 
 #[test]
 fn catalog_parses_embedded_toml() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     assert!(!c.is_empty(), "catalog must not be empty");
 }
 
 #[test]
 fn catalog_has_expected_entry_count() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     // We registered at least 30 baseline entries; tier stubs add none.
     assert!(c.len() >= 30, "expected >= 30 entries, got {}", c.len());
 }
@@ -28,25 +28,25 @@ fn catalog_has_expected_entry_count() {
 
 #[test]
 fn l001_resolves_to_human_text() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     assert_eq!(c.get("L001"), Some("Lurek2D Engine starting"));
 }
 
 #[test]
 fn l003_resolves_to_game_loaded() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     assert_eq!(c.get("L003"), Some("Game loaded"));
 }
 
 #[test]
 fn l010_resolves_to_render_error() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     assert_eq!(c.get("L010"), Some("Render error"));
 }
 
 #[test]
 fn unknown_id_returns_none() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     assert!(c.get("ZZUNKNOWN").is_none());
 }
 
@@ -93,7 +93,7 @@ fn init_is_idempotent() {
 
 #[test]
 fn all_baseline_ids_present() {
-    let c = MessageCatalog::from_toml(include_str!("../../../src/engine/cfg/messages.toml"));
+    let c = MessageCatalog::from_toml(include_str!("../../../src/runtime/cfg/messages.toml"));
     let required = [
         "L001", "L002", "L003", "L004", "L005", "L006", "L007", "L010", "L011", "L012", "L013",
         "L014", "L015", "L016", "L017", "L020", "L021", "L022", "L023", "L024", "L030", "L031",
