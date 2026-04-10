@@ -1,6 +1,6 @@
 //! Integration tests for `lurek2d::localization` — catalog, interpolation, plural forms.
 
-use lurek2d::localization::*;
+use lurek2d::i18n::*;
 use std::collections::HashMap;
 
 // ── Catalog ───────────────────────────────────────────────────────────────────

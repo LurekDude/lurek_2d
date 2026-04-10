@@ -1,7 +1,7 @@
 //! Integration tests for the entity module: Universe ECS with entity lifecycle,
 //! string tags, bitmap tags, layers, components, blueprints, and systems.
 
-use lurek2d::entity::Universe;
+use lurek2d::ecs::Universe;
 
 fn make_lua() -> mlua::Lua {
     mlua::Lua::new()

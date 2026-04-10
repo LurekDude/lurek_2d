@@ -1,7 +1,7 @@
 //! Integration tests for the automation simulation module.
 
 use lurek2d::automation::{Action, Script, Simulator, Step};
-use lurek2d::signal::EventQueue;
+use lurek2d::event::EventQueue;
 
 // ── Action tests ──────────────────────────────────────────────────────
 

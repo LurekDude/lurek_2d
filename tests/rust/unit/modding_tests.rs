@@ -1,6 +1,6 @@
 //! Integration tests for the modding module.
 
-use lurek2d::modding::{ModInfo, ModManager};
+use lurek2d::mods::{ModInfo, ModManager};
 
 // ─── Rust unit-level integration tests ───
 

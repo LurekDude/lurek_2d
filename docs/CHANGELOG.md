@@ -20,6 +20,12 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ## [0.7.0] — 2025-07-27
 ### Changed
+- **BREAKING: Major `src/` directory restructuring** — module import paths have changed across the entire codebase. Lua API surface is unchanged; only Rust `use crate::` imports are affected.
+  - `src/engine/` split into `src/runtime/` (config, error, shared_state, resource_keys) and `src/app/` (app lifecycle, debug overlay, error screen).
+  - `src/graphics/`, `src/camera/`, `src/light/`, `src/effect/` merged into unified `src/render/` module (with `render/camera/`, `render/light/`, `render/effect/` submodules).
+  - `src/graphic/` (dead code) deleted — bitmap font functions ported to `src/render/gpu_renderer.rs`.
+  - Module renames: `signal/` → `event/`, `pathfinding/` → `pathfind/`, `savegame/` → `save/`, `modding/` → `mods/`, `localization/` → `i18n/`, `entity/` → `ecs/`.
+  - Lua API file renames: `signal_api` → `event_api`, `pathfinding_api` → `pathfind_api`, `savegame_api` → `save_api`, `modding_api` → `mods_api`, `localization_api` → `i18n_api`, `entity_api` → `ecs_api`, `graphic_api` → `render_api`.
 - **BREAKING: Bitmap font system replaces fontdue TTF rendering** — all text rendering now uses embedded bitmap/pixel font sprite sheets. The `fontdue` crate has been removed entirely.
   - 6 built-in monospaced bitmap font sizes: 3×5, 5×7, 6×10, 8×14, 10×18, 12×22 pixels (cell width × cell height).
   - Box-drawing characters (U+2500–U+257F) included for sizes ≥6×10.

@@ -1,6 +1,6 @@
 //! Integration tests for the savegame module.
 
-use lurek2d::savegame::{SaveManager, SaveValue};
+use lurek2d::save::{SaveManager, SaveValue};
 use std::collections::HashMap;
 
 // ─── Rust integration tests ───
@@ -28,7 +28,7 @@ fn serialize_nested_table() {
     inner.insert("hp".to_string(), SaveValue::Number(100.0));
     let mut outer = HashMap::new();
     outer.insert("player".to_string(), SaveValue::Table(inner));
-    let s = lurek2d::savegame::serialize_table(&outer, 0).unwrap();
+    let s = lurek2d::save::serialize_table(&outer, 0).unwrap();
     assert!(s.contains("player ="));
     assert!(s.contains("hp = 100"));
 }
@@ -37,13 +37,13 @@ fn serialize_nested_table() {
 fn serialize_special_string_key() {
     let mut data = HashMap::new();
     data.insert("with space".to_string(), SaveValue::Bool(true));
-    let s = lurek2d::savegame::serialize_table(&data, 0).unwrap();
+    let s = lurek2d::save::serialize_table(&data, 0).unwrap();
     assert!(s.contains("[\"with space\"]"));
 }
 
 #[test]
 fn serialize_nil_value() {
-    let s = lurek2d::savegame::serialize_value(&SaveValue::Nil, 0).unwrap();
+    let s = lurek2d::save::serialize_value(&SaveValue::Nil, 0).unwrap();
     assert_eq!(s, "nil");
 }
 

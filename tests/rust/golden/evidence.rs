@@ -18,7 +18,7 @@ use lurek2d::math::color::Color;
 use lurek2d::math::easing;
 use lurek2d::math::rect::Rect;
 use lurek2d::minimap::{Minimap, FogLevel, ColorMode};
-use lurek2d::pathfinding::{NavGrid, astar, FlowField, InfluenceMap};
+use lurek2d::pathfind::{NavGrid, astar, FlowField, InfluenceMap};
 use lurek2d::procgen::{cellular_automata, CellularOpts, voronoi_diagram, VoronoiOpts, poisson_disk};
 use lurek2d::raycaster::Raycaster2D;
 use lurek2d::tilemap::TileMap;

@@ -7,7 +7,7 @@ use lurek2d::math::geometry;
 use lurek2d::math::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
 use lurek2d::math::spatial_hash::SpatialHash;
 use lurek2d::math::tween::Tween;
-use lurek2d::pathfinding::grid::Grid;
+use lurek2d::pathfind::grid::Grid;
 use lurek2d::procgen::{self, CellularOpts, VoronoiOpts};
 use lurek2d::raycaster::Raycaster2D;
 use lurek2d::raycaster::{cast_ray_2d, distance_shade, field_of_view, project_column, Segment};
