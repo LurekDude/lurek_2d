@@ -5,7 +5,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::entity::Universe;
+use crate::ecs::Universe;
 
 // -------------------------------------------------------------------------------
 // LuaUniverse UserData

@@ -2,7 +2,7 @@
 //! Moved from `ai/flowfield`; used by the Lua `lurek.ai.newFlowField` API.
 //!
 //! Note: this type operates on [`SimpleGrid`].  The higher-level
-//! [`crate::pathfinding::FlowField`] operates on [`NavGrid`] instead.
+//! [`crate::pathfind::FlowField`] operates on [`NavGrid`] instead.
 
 use std::collections::VecDeque;
 

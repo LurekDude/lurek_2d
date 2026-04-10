@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use crate::signal::{event_to_lua_multi, EventArg, Signal};
+use crate::event::{event_to_lua_multi, EventArg, Signal};
 
 // -------------------------------------------------------------------------------
 // Helpers

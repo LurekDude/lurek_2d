@@ -7,7 +7,7 @@ use std::rc::Rc;
 
 use std::collections::HashMap;
 use crate::filesystem::vfs::GameFS;
-use crate::savegame::{serialize_table, SaveManager, SaveValue};
+use crate::save::{serialize_table, SaveManager, SaveValue};
 
 // -------------------------------------------------------------------------------
 // Helpers

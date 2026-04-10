@@ -11,7 +11,7 @@ use crate::ai::{
     GOAPAction, GOAPGoal, GOAPPlanner, ParallelPolicy, QLearner, Squad,
     SteeringManager, UAAction, UtilityAI,
 };
-use crate::pathfinding::InfluenceMap;
+use crate::pathfind::InfluenceMap;
 
 // -------------------------------------------------------------------------------
 // LuaAIWorld UserData

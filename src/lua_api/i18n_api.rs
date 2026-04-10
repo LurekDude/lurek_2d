@@ -11,7 +11,7 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::engine::SharedState;
-use crate::localization::{interpolate, PluralForm, Catalog};
+use crate::i18n::{interpolate, PluralForm, Catalog};
 
 // ---------------------------------------------------------------------------
 // Bridge state

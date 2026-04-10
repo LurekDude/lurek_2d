@@ -5,7 +5,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::modding::{ModInfo, ModManager};
+use crate::mods::{ModInfo, ModManager};
 use std::collections::HashMap;
 
 // -------------------------------------------------------------------------------

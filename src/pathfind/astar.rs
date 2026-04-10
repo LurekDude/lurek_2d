@@ -12,7 +12,7 @@ use std::collections::BinaryHeap;
 
 use crate::engine::log_messages::{AT01, AT02, AT03};
 use crate::log_msg;
-use crate::pathfinding::nav_grid::{DiagonalMode, NavGrid};
+use crate::pathfind::nav_grid::{DiagonalMode, NavGrid};
 
 /// Diagonal movement cost (√2 ≈ 1.414).
 const SQRT2: f32 = std::f32::consts::SQRT_2;

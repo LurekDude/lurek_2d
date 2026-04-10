@@ -17,7 +17,7 @@ use crate::engine::config::ModulesConfig;
 pub use crate::engine::{ErrorInfo, FullscreenType, SharedState, WindowState};
 
 /// Registers the `lurek.signal.*` event queue and signal API.
-pub mod signal_api;
+pub mod event_api;
 
 /// Registers the `lurek.time.*` frame-timing API.
 pub mod timer_api;
@@ -42,13 +42,13 @@ pub mod automation_api;
 pub mod input_api;
 
 /// Registers the `lurek.savegame.*` slot-based save/load API.
-pub mod savegame_api;
+pub mod save_api;
 
 /// Registers the `lurek.data.*` binary data, compression, hashing, and encoding API.
 pub mod data_api;
 
 /// Registers the `lurek.entity.*` lightweight ECS API.
-pub mod entity_api;
+pub mod ecs_api;
 
 /// Registers the `lurek.scene.*` scene stack and depth-sorter API.
 pub mod scene_api;
@@ -60,7 +60,7 @@ pub mod compute_api;
 pub mod window_api;
 
 /// Registers the `lurek.modding.*` mod management API.
-pub mod modding_api;
+pub mod mods_api;
 
 /// Registers the `lurek.fs.*` sandboxed file I/O API.
 pub mod filesystem_api;
@@ -84,7 +84,7 @@ pub mod network_api;
 pub mod minimap_api;
 
 /// Registers the `lurek.pathfinding.*` grid-based pathfinding API.
-pub mod pathfinding_api;
+pub mod pathfind_api;
 
 /// Registers the `lurek.dataframe.*` tabular data API.
 pub mod dataframe_api;
@@ -141,7 +141,7 @@ pub mod devtools_api;
 pub mod debugbridge_api;
 
 /// Registers the `lurek.localization.*` multi-locale string catalog API.
-pub mod localization_api;
+pub mod i18n_api;
 
 /// Registers the `lurek.log.*` structured log level API.
 pub mod log_api;
@@ -176,7 +176,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     lua.globals().set("lurek", luna.clone())?;
 
     // event: lurek.signal (always registered — mandatory API)
-    signal_api::register(&lua, &luna, state.clone())?;
+    event_api::register(&lua, &luna, state.clone())?;
 
     // timer: lurek.time
     if modules.timer {
@@ -225,7 +225,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // localization: lurek.localization
     if modules.localization {
-        localization_api::register(&lua, &luna, state.clone())?;
+        i18n_api::register(&lua, &luna, state.clone())?;
     }
 
     // input: lurek.keyboard / lurek.mouse / lurek.gamepad / lurek.touch
@@ -234,7 +234,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     }
 
     // savegame: lurek.savegame (always registered — no config flag)
-    savegame_api::register(&lua, &luna, state.clone())?;
+    save_api::register(&lua, &luna, state.clone())?;
 
     // docs: lurek.docs (always registered — no config flag)
     docs_api::register(&lua, &luna)?;
@@ -246,7 +246,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     data_api::register(&lua, &luna, state.clone())?;
 
     // modding: lurek.modding (always registered — no config flag)
-    modding_api::register(&lua, &luna, state.clone())?;
+    mods_api::register(&lua, &luna, state.clone())?;
 
     // serial: lurek.codec (always registered — no config flag)
     serial_api::register(&lua, &luna, state.clone())?;
@@ -264,7 +264,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // entity: lurek.entity
     if modules.entity {
-        entity_api::register(&lua, &luna, state.clone())?;
+        ecs_api::register(&lua, &luna, state.clone())?;
     }
 
     // window: lurek.window
@@ -309,7 +309,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // pathfinding: lurek.pathfinding
     if modules.pathfinding {
-        pathfinding_api::register(&lua, &luna, state.clone())?;
+        pathfind_api::register(&lua, &luna, state.clone())?;
     }
 
     // terminal: lurek.terminal

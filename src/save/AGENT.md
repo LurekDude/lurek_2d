@@ -5,7 +5,7 @@
 | **Tier**       | Tier 2 — Engine Extensions                           |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.savegame`                                      |
-| **Source**     | `src/savegame/`                                      |
+| **Source**     | `src/save/`                                      |
 | **Rust Tests** | `tests/rust/unit/savegame_tests.rs`                  |
 | **Lua Tests**  | `tests/lua/unit/test_savegame.lua`                   |
 

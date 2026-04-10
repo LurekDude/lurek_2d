@@ -14,8 +14,8 @@ use std::rc::Rc;
 
 use crate::engine::log_messages::{UP01, UP02, UP03};
 use crate::log_msg;
-use crate::pathfinding::astar;
-use crate::pathfinding::nav_grid::NavGrid;
+use crate::pathfind::astar;
+use crate::pathfind::nav_grid::NavGrid;
 
 /// A waypoint along a computed path.
 ///

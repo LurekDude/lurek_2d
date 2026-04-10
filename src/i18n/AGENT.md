@@ -5,7 +5,7 @@
 | **Tier**         | Tier 1 — Core Engine Subsystems                        |
 | **Status**       | Implemented — Full                                     |
 | **Lua API**      | `lurek.localization`                                    |
-| **Source**       | `src/localization/`                                    |
+| **Source**       | `src/i18n/`                                    |
 | **Rust Tests**   | `tests/rust/unit/localization_tests.rs`                |
 | **Lua Tests**    | `tests/lua/unit/test_localization.lua`                 |
 | **Architecture** | —                                                      |

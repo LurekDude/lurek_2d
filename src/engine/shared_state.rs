@@ -27,7 +27,7 @@ use crate::graphics::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
 use crate::light::LightWorld;
 use crate::particle::ParticleSystem;
-use crate::signal::EventQueue;
+use crate::event::EventQueue;
 use crate::timer::Clock;
 
 /// Fullscreen mode type for window management.

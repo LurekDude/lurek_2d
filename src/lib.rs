@@ -100,7 +100,7 @@ pub mod docs;
 /// Core engine lifecycle, configuration, and error types.
 pub mod engine;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
-pub mod entity;
+pub mod ecs;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
@@ -114,11 +114,11 @@ pub mod input;
 /// 2D point-light data container for dynamic lighting systems.
 pub mod light;
 /// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
-pub mod localization;
+pub mod i18n;
 /// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
 pub mod log;
 /// Event queue for polling system and custom events.
-pub mod signal;
+pub mod event;
 /// Retained-mode widget UI system: buttons, panels, text fields, layouts.
 pub mod ui;
 // migration-state: pub mod inventory; — now library/inventory/init.lua
@@ -130,7 +130,7 @@ pub mod math;
 /// Minimap content extraction, FOV mask, and tile sampling.
 pub mod minimap;
 /// Mod management framework: metadata, dependencies, load ordering, hooks.
-pub mod modding;
+pub mod mods;
 /// UDP networking via ENet — reliable packet transport for multiplayer games.
 pub mod network;
 /// Multi-layer parallax background system with camera-relative scroll factors, autoscroll, tiling, blend modes, and scene grouping.
@@ -140,7 +140,7 @@ pub mod parallax;
 /// Emitter-based 2D particle effects.
 pub mod particle;
 /// Grid pathfinding: A★, HPA★, flow fields, and NavGrid unit-size navigation.
-pub mod pathfinding;
+pub mod pathfind;
 /// Game programming patterns: EventBus, ObjectPool, CommandStack, ServiceLocator, Factory, and StateMachine.
 pub mod patterns;
 /// Physics simulation with rigid bodies (rect and circle shapes), collision events, sensors, and layer filtering.
@@ -156,7 +156,7 @@ pub mod raycaster;
 // migration-state: pub mod province_map; — now library/province_map/init.lua
 // migration-state: pub mod quest; — now library/quest/init.lua
 /// Slot-based save/load system with collectors, schema versioning, and auto-save.
-pub mod savegame;
+pub mod save;
 /// Scene stack for managing game scene lifecycle, transitions, and depth-sorted rendering.
 pub mod scene;
 /// Skeletal animation: bone hierarchies, slots, and world-transform propagation.

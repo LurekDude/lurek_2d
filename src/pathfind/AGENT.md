@@ -5,7 +5,7 @@
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.pathfinding`                                   |
-| **Source**      | `src/pathfinding/`                                   |
+| **Source**      | `src/pathfind/`                                   |
 | **Rust Tests** | `tests/unit/pathfinding_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_pathfinding.lua`                |
 | **Architecture** | —                                                  |

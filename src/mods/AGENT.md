@@ -5,7 +5,7 @@
 | **Tier**       | Tier 2 — Reusable Engine Extensions                  |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.modding`                                       |
-| **Source**     | `src/modding/`                                       |
+| **Source**     | `src/mods/`                                       |
 | **Rust Tests** | `tests/rust/unit/modding_tests.rs`                   |
 | **Lua Tests**  | `tests/lua/unit/test_modding.lua`                    |
 | **Architecture** | —                                                  |

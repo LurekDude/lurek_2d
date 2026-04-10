@@ -5,7 +5,7 @@
 | **Tier**       | Tier 1 � Core Engine Subsystems                      |
 | **Status**     | Implemented � Full                                   |
 | **Lua API**    | `lurek.signal`                                         |
-| **Source**     | `src/signal/`                                         |
+| **Source**     | `src/event/`                                         |
 | **Rust Tests** | `tests/rust/unit/event_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_event.lua`                      |
 | **Architecture** | �                                                  |

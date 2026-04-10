@@ -5,7 +5,7 @@
 | **Tier**       | Tier 1 — Core Engine Subsystems                      |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.entity`                                        |
-| **Source**      | `src/entity/`                                        |
+| **Source**      | `src/ecs/`                                        |
 | **Rust Tests** | `tests/rust/unit/entity_tests.rs`                    |
 | **Lua Tests**  | `tests/lua/unit/test_entity.lua`                     |
 | **Architecture** | —                                                  |

@@ -8,10 +8,10 @@ use std::rc::Rc;
 use super::tilemap_api::LuaTileMap;
 use crate::engine::log_messages::LA08_PATHFINDING_THREAD_UNIMPL;
 use crate::log_msg;
-use crate::pathfinding::ai_flow_field::FlowField as AiFlowField;
-use crate::pathfinding::hpa::{build_abstract, AbstractGraph};
-use crate::pathfinding::pathgrid::PathGrid;
-use crate::pathfinding::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
+use crate::pathfind::ai_flow_field::FlowField as AiFlowField;
+use crate::pathfind::hpa::{build_abstract, AbstractGraph};
+use crate::pathfind::pathgrid::PathGrid;
+use crate::pathfind::{DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint};
 
 // -------------------------------------------------------------------------------
 // Helpers

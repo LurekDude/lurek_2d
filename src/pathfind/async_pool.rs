@@ -15,8 +15,8 @@ use std::sync::mpsc::{self, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-use crate::pathfinding::astar;
-use crate::pathfinding::nav_grid::NavGrid;
+use crate::pathfind::astar;
+use crate::pathfind::nav_grid::NavGrid;
 
 /// A request submitted to the thread pool.
 struct PathRequest {
