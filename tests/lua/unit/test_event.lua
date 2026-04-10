@@ -1,6 +1,13 @@
-﻿-- BDD tests for lurek.signal.pump, lurek.signal.wait, and lurek.signal.restart
+-- tests/lua/unit/test_event.lua
+-- BDD tests for the lurek.signal event subsystem (pump/wait/restart API).
+-- Headless-safe (no GPU/window needed).
+-- @covers lurek.signal.clear
+-- @covers lurek.signal.pump
+-- @covers lurek.signal.push
+-- @covers lurek.signal.restart
+-- @covers lurek.signal.wait
 
-describe("event.pump", function()
+describe("lurek.signal.pump", function()
   it("exists as a function", function()
     expect_equal(type(lurek.signal.pump), "function")
   end)
@@ -11,7 +18,7 @@ describe("event.pump", function()
   end)
 end)
 
-describe("event.wait", function()
+describe("lurek.signal.wait", function()
   it("exists as a function", function()
     expect_equal(type(lurek.signal.wait), "function")
   end)
@@ -35,7 +42,7 @@ describe("event.wait", function()
   end)
 end)
 
-describe("event.restart", function()
+describe("lurek.signal.restart", function()
   it("exists as a function", function()
     expect_equal(type(lurek.signal.restart), "function")
   end)

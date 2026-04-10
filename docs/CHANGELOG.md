@@ -18,6 +18,104 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.31] — 2026-04-10
+### Fixed
+- **VS Code extension** — promoted `extension2.ts` (full implementation) as the esbuild entry point; fixed 63 command IDs from `luna.*` → `lurek.*` namespace throughout `extension2.ts` and `apiData.ts`; fixed bad `import("./debug/debugBridge")` path → `./services/debugBridge`; updated `package.json` from `package2.json` (v0.9.0, named `luna-toolkit`, full command/view manifest); updated `esbuild.config.mjs` entry to `extension2.ts`; added `loadFromLuaApiMd()` parser in `apiData.ts` so IntelliSense completions load from the real `docs/API/lua-api.md`; fixed Priority-3 lookup path from non-existent `lua_api_reference_generated.md` → `lua-api.md`; packaged as `luna-toolkit-0.9.0.vsix`.
+
+## [0.6.30] — 2026-04-10
+### Fixed
+- **Namespace fixes** — six test files were using wrong `lurek.*` namespaces that would cause runtime nil-indexing errors:
+  - `test_font.lua` — `lurek.gfx.*` → `lurek.graphic.*` (19 occurrences)
+  - `test_shape.lua` — `lurek.gfx.*` → `lurek.graphic.*` (44 occurrences)
+  - `test_drawlayer.lua` — `lurek.sprite.*` → `lurek.graphic.*` (23 occurrences), `newDrawLayer` is registered in `graphic_api.rs`
+  - `test_evidence_audio.lua` — `lurek.audio.setVolume(val)` / `getVolume()` → correct `setMasterVolume(val)` / `getMasterVolume()` (per-source `setVolume` requires a source key)
+  - `test_event.lua` — `describe("event.pump"…)` etc. → `describe("lurek.signal.pump"…)` to match actual namespace
+  - `test_network.lua` — guarded `lurek.net.*` and `_G.enet` describe blocks with `if lurek.net then` / `if _G.enet then` since `lurek.net` is not a registered namespace; fixed `@covers` header to remove nonexistent `lurek.net.*` entries
+- **Evidence test assertion** — `test_evidence_particle.lua`: `sys:count() >= 0` (always-true) → `sys:count() > 0` after `emit(10)`
+- **Evidence test robustness** — `test_evidence_minimap.lua`: "setTerrain with 0-based coord errors" test replaced by "setTerrain out-of-range coordinate is rejected" (coord > grid_size) which is unambiguously out of bounds
+### Changed
+- `test_event.lua` — added proper file-level header, removed BOM character from file start
+- `test_fx.lua` — updated header to clarify it is a focused smoke test that complements `test_postfx.lua`'s comprehensive coverage
+- `test_drawlayer.lua` — added proper file-level header with headless-safe notice
+
+## [0.6.29] — 2025-07-17
+### Added
+- **`SoundData::encode_wav()`** — new Rust domain method that encodes PCM f32 samples to 16-bit WAV bytes with RIFF header (`src/audio/sound_data.rs`)
+- **`lurek.audio.saveWAV(sounddata, path)`** — new Lua API function that saves a SoundData buffer to a `.wav` file on disk (`src/lua_api/audio_api.rs`)
+### Changed
+- **Evidence tests rewritten from JSON to real file output** — all 10 evidence test files that previously saved JSON metadata now produce actual PNG images or WAV audio files:
+  - `test_evidence_canvas.lua` — renders canvas sizes and lifecycle as colored diagrams → `canvas_sizes.png`, `canvas_lifecycle.png`
+  - `test_evidence_graphic_drawing.lua` — renders primitives (rect, circle, line, dots) and color grid → `graphic_primitives.png`, `graphic_color_grid.png`
+  - `test_evidence_light.lua` — renders radial light falloff and multi-light RGB scene → `light_single_falloff.png`, `light_multi_scene.png`
+  - `test_evidence_particle.lua` — renders emitter positions and burst visualization → `particle_positions.png`, `particle_emitter_burst.png`
+  - `test_evidence_postfx.lua` — applies ImageData filters and saves each effect → 7 PNG files (grayscale, invert, blur, sepia, effects strip, posterize+tint, saturation+flip)
+  - `test_evidence_minimap.lua` — renders terrain grid and fog-of-war → `minimap_terrain.png`, `minimap_fog.png`
+  - `test_evidence_tilemap.lua` — renders tile grid and checkerboard pattern → `tilemap_grid.png`, `tilemap_checkerboard.png`
+  - `test_evidence_overlay.lua` — renders flash decay, fade-to-black, and combined effects → `overlay_flash.png`, `overlay_fade.png`, `overlay_combined.png`
+  - `test_evidence_audio.lua` — generates sine wave, chord, sweep, and stereo ping-pong → 4 WAV files
+  - `test_evidence_audio_bus.lua` — generates volume-scaled, pitch-shifted, and fade-out audio → 3 WAV files
+
+## [0.6.28] — 2026-04-09
+### Added
+- **`lurek.img.savePNG(imgdata, path)`** — new Lua API function that encodes an `ImageData` to PNG bytes and writes them to disk, auto-creating parent directories. (`src/lua_api/image_api.rs`)
+- **Evidence test category** (`tests/lua/evidence/`) — 13 new Lua test files that verify observable API state and save real artefacts (PNG images, JSON dumps) to `tests/lua/evidence/output/` for human inspection:
+  - `test_evidence_imagedata.lua` — pixel creation, setPixel/getPixel round-trip, fill, mapPixel, getString, encode("png"), savePNG, crop, resizeNearest, flipHorizontal, rotate90cw
+  - `test_evidence_imagedata_effects.lua` — all 11 filter methods: grayscale, invert, sepia, brightness, threshold, posterize, tint, noise, blur, sharpen; saves effect PNGs
+  - `test_evidence_canvas.lua` — Canvas lifecycle: newCanvas, getWidth/getHeight/getDimensions, release (true/false), typeOf, type, stale-key error, multiple independence; saves JSON metadata
+  - `test_evidence_graphic_drawing.lua` — `lurek.graphic` API surface: setColor/getColor, setBackgroundColor, getWidth/getHeight/getDimensions, clear, print, rectangle, circle, line, point, setLineWidth, push/pop transforms; saves JSON state
+  - `test_evidence_audio.lua` — master volume round-trip (0/0.65/1), setPosition, getActiveSourceCount, headless-safe newSource test; saves JSON
+  - `test_evidence_audio_bus.lua` — bus newBus, setVolume/getVolume/setPitch/getPitch/getName/pause/resume round-trips, multiple-bus independence, source setBus; saves JSON
+  - `test_evidence_light.lua` — LightSource position/radius/color/intensity/energy/falloff/shadow round-trips, multiple light independence; saves JSON
+  - `test_evidence_particle.lua` — ParticleSystem count/isEmpty/start/stop/pause/resume/reset/getCount/setPosition/getPosition/type/release, newTrail; saves JSON
+  - `test_evidence_postfx.lua` — Effect getTypeName/isBuiltIn/isEnabled/getEffectType/type, Stack getWidth/getHeight/getDimensions/len/isEmpty, ImageEffect; saves JSON
+  - `test_evidence_minimap.lua` — Minimap grid/display dimensions, getTerrain, isFogEnabled, getFogLevel, getObjectCount, getZoom, getCenter, getColorMode; saves JSON
+  - `test_evidence_tilemap.lua` — TileSet and TileMap constructors, dimensions, getFirstGid, getLayerCount/Name/TileSetCount, fill, getTile/clearTile round-trip; saves JSON
+  - `test_evidence_raycaster.lua` — Raycaster getCell/setCell/isBlocked, castRay hit/miss, castRays array, lineOfSight, projectColumn, distanceShade; saves a 128×64 depth-buffer PNG
+  - `test_evidence_overlay.lua` — Overlay getWidth/Height, isActive, triggerFlash/getFlashAlpha, triggerShake/getShakeOffset, triggerFade, triggerLightning/getLightningAlpha, clear, resize, setAmbientEnabled; saves JSON
+- 13 corresponding `#[test]` entries under `// ─── Evidence Tests ───` section in `tests/lua/harness.rs`
+- `tests/lua/evidence/output/.gitignore` — auto-excludes all generated PNG and JSON artefacts from version control
+
+### Removed
+- 8 broken evidence test files from `tests/lua/unit/` that called non-existent APIs (`lurek.gfx`, `c:renderTo()`, `c:getPixel()`):
+  `test_graphics_evidence.lua`, `test_audio_evidence.lua`, `test_light_evidence.lua`, `test_particle_evidence.lua`, `test_postfx_evidence.lua`, `test_minimap_evidence.lua`, `test_tilemap_evidence.lua`, `test_audio_integration_evidence.lua`
+- Corresponding 8 broken `lua_unit_*_evidence` harness entries replaced by 13 correct `lua_evidence_*` entries
+
+## [0.6.27] — 2026-04-11
+### Added
+- **Phase 6 evidence tests** — 8 new Lua test files proving that rendering and audio APIs produce actual observable output, not just API stubs:
+  - `tests/lua/unit/test_graphics_evidence.lua` — canvas pixel readback for all `lurek.gfx` primitives: rectangle, circle, triangle, polygon, setColor, background color, and out-of-bounds safety.
+  - `tests/lua/unit/test_audio_evidence.lua` — `lurek.audio.Source` state round-trips: volume (0/0.5/1/2), pitch (0.5/1/2), looping, 3D position, seek/tell, play/pause/stop state machine, getDuration, getChannelCount, and 10-source independence.
+  - `tests/lua/unit/test_light_evidence.lua` — canvas pixel brightness proof: full ambient illumination, zero ambient darkness, point light near > far brightness, red-tinted light r > g/b, disabled vs enabled comparison, and getLightCount tracking.
+  - `tests/lua/unit/test_particle_evidence.lua` — particle count via emit/getCount, lifetime expiry, reset, large color particles producing correct hue pixels on canvas, gravity displacement over time, and isActive/stop/start state.
+  - `tests/lua/unit/test_postfx_evidence.lua` — PostFX pixel diff proofs: blur softens hard edges, vignette darkens corners, colourgrade red_gain shifts r > g, empty stack passes through unchanged, param round-trips, 15-type enumeration, and stacked effects.
+  - `tests/lua/unit/test_minimap_evidence.lua` — terrain setTerrain/getTerrain state, terrain color round-trips (20 types), fog enable/level state, minimap draw produces red pixels on canvas for red terrain type, object marker setObject/getObject/removeObject, and dot clearDots.
+  - `tests/lua/unit/test_tilemap_evidence.lua` — tile GID cell state (setTile/getTile, fill, clear, overwrite), coordinate math (worldToTile/tileToWorld round-trips for all cells), setTileColor/getTileColor round-trips, and drawSolid canvas pixel readback for red/blue adjacent tiles.
+  - `tests/lua/unit/test_audio_integration_evidence.lua` — bus volume/pitch/mute/enabled round-trips, two-bus independence (no cross-bus bleed), Source→bus routing (setBus/getBus), master volume/pitch round-trips with restore, and DSP effect chain (addEffect/removeEffect/getEffectCount).
+- New `@evidence` marker category (`pixel:canvas_readback`, `state:audio_source`, `pixel:light_affects_pixels`, `pixel:tilemap_solid_color_draw`, `state:audio_bus_routing`, etc.) used across all 8 files.
+- All 8 evidence test files registered in `tests/lua/harness.rs` under the `lua_unit_*_evidence` naming pattern.
+
+## [0.6.26] — 2026-04-10
+### Added
+- **BDD framework helpers** (`tests/lua/init.lua`) — `measure(name, count, fn)` for CPU-time throughput benchmarking (prints `[PERF]` prefix) and `expect_golden(name, actual, expected)` for deterministic snapshot assertions.
+- **18 cross-module integration tests** (`tests/lua/integration/`) — entity-physics, entity-graphics, scene-entity, scene-camera, tilemap-camera, ai-pathfinding, input-camera, animation-timer, data-filesystem, savegame-tilemap, signal-entity, tilemap-pathfinding, thread-data, tween-camera, tween-entity, particle-timer, light-graphics, localization-ui.
+- **7 new golden tests** (`tests/lua/golden/`) — dataframe, pathfinding, graph, AI FSM trace, compute, tilemap, entity; plus expanded math golden coverage.
+- **11 new stress tests** (`tests/lua/stress/`) — AI FSM/agent throughput, scene entity lifecycle, camera update, savegame collect, timer queries, signal fan-out, tween simultaneous updates, image pixel ops, patterns (observer/SM/command-queue), filesystem I/O, and light position update.
+- All 36 new test files registered in `tests/lua/harness.rs` under `lua_integration_*`, `lua_golden_*`, and `lua_stress_*` test function names.
+
+## [0.6.25] — 2026-04-09
+### Added
+- **Test marker automation** (`tools/fix/add_test_markers.py`) — scans each Lua test file for `lurek.module.function` call patterns and injects `@covers`/`@stress`/`@golden`/`@security` marker comments; applied to 92 of 126 existing test files, raising explicit marker coverage from 0% to 13.2% (341/2588 functions).
+
+## [0.6.24] — 2026-04-09
+### Added
+- **Test infrastructure expansion** — 21 new Lua test files:
+  - 10 integration tests: graphics+camera, graphics+animation, audio+timer, audio+event, AI+entity+scene, savegame+entity+scene, tween+animation, procgen+tilemap, pathfinding+entity, data+compute
+  - 5 golden tests: data serialization, serial encoding, physics simulation, animation timeline, procgen noise determinism
+  - 4 stress tests: graphics draw commands (10K shapes), animation throughput (1K timelines), serial encode/decode (1K cycles), thread channel (10K messages)
+  - 1 property-based test: math invariants (trig identities, sqrt, Vec2 commutativity, lerp monotonicity)
+  - 1 security fuzz test: nil/wrong-type spam across gfx, physics, entity, data, AI, math, audio APIs
+- **Test analytics script** (`tools/audit/test_analytics.py`) — module scoring (0-10, A-F grades), category aggregation, @covers/@evidence/@golden/@stress markers, trend comparison, JSON export
+
 ## [0.6.23] — 2026-04-10
 ### Fixed
 - Lua test/runtime compatibility: added `content/` package-path fallbacks for `require("library.*")`, refreshed `tests/lua/examples/test_examples.lua` for the current single-file `content/examples/*.lua` layout, and aligned Lua font/UI tests with the live `lurek.gfx` and `lurek.ui` APIs.
