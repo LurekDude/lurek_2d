@@ -312,6 +312,65 @@ function expect_deep_equal(expected, actual, msg)
     end
 end
 
+-- Stress measurement helper: runs fn() count times, prints [PERF] line, returns elapsed seconds.
+-- @param name   : string  — label printed in [PERF] output
+-- @param count  : number  — iteration count
+-- @param fn     : function — operation under test
+-- @return number elapsed seconds
+function measure(name, count, fn)
+    local start = os.clock()
+    for _ = 1, count do fn() end
+    local elapsed = os.clock() - start
+    local ops_sec = (elapsed > 0) and (count / elapsed) or math.huge
+    io.write(string.format("[PERF] %s: %d ops in %.4fs (%.0f ops/sec)\n",
+        name, count, elapsed, ops_sec))
+    return elapsed
+end
+
+-- Golden comparison helper: compares actual string to expected baseline string.
+-- On first run (expected == nil) it prints the actual value for recording.
+-- @param name     : string  — label for error messages
+-- @param actual   : string  — serialized output to check
+-- @param expected : string  — hardcoded baseline (nil = print mode)
+function expect_golden(name, actual, expected)
+    if expected == nil then
+        io.write(string.format("[GOLDEN] %s:\n%s\n", name, tostring(actual)))
+    else
+        expect_equal(expected, actual, "golden mismatch: " .. name)
+    end
+end
+
+-- Canvas pixel verification helper for headless visual evidence tests.
+-- Reads a pixel from a Canvas object and asserts each RGBA channel is within tolerance.
+-- Requires canvas:getPixel(x, y) to be available (headless-safe via CPU readback).
+-- @param canvas    : Canvas  — canvas object to sample
+-- @param x         : number  — pixel x coordinate (0-based)
+-- @param y         : number  — pixel y coordinate (0-based)
+-- @param er        : number  — expected red channel [0.0, 1.0]
+-- @param eg        : number  — expected green channel [0.0, 1.0]
+-- @param eb        : number  — expected blue channel [0.0, 1.0]
+-- @param ea        : number  — expected alpha channel [0.0, 1.0]
+-- @param tolerance : number  — per-channel tolerance (default 0.05)
+-- @param msg       : string  — optional label for error messages
+function expect_canvas_pixel(canvas, x, y, er, eg, eb, ea, tolerance, msg)
+    tolerance = tolerance or 0.05
+    local label = msg and (msg .. " ") or ""
+    local ok, r, g, b, a = pcall(function() return canvas:getPixel(x, y) end)
+    if not ok then
+        error(string.format("%scanvas:getPixel(%d,%d) failed: %s", label, x, y, tostring(r)), 2)
+    end
+    local function ch(name, expected, actual)
+        if math.abs(expected - actual) > tolerance then
+            error(string.format("%spixel(%d,%d) %s: expected %.3f, got %.3f (tol %.3f)",
+                label, x, y, name, expected, actual, tolerance), 3)
+        end
+    end
+    ch("r", er, r or 0)
+    ch("g", eg, g or 0)
+    ch("b", eb, b or 0)
+    ch("a", ea, a or 0)
+end
+
 -- Print test summary and return pass/fail
 -- Outputs structured lines parseable by tools/parse_test_log.py:
 --   PASS [suite] test
