@@ -12,14 +12,10 @@
 //!
 //! # Architecture note
 //!
-//! All three types implement `mlua::LuaUserData` here — in the domain module —
-//! rather than in `src/lua_api/tween_api.rs`. This follows the Thin Wrapper Rule:
-//! the Lua API file may only contain `pub fn register()` and immediate-delegation
-//! closures; all business logic, state machines, and `impl` blocks live here.
-//!
-//! These types depend on `mlua` for `LuaRegistryKey` lifetime management and
-//! UserData registration. `mlua` is a first-class dependency of the whole crate, so
-//! domain modules are permitted to import it directly.
+//! `impl LuaUserData` blocks live in `src/lua_api/tween_api.rs` per the Thin
+//! Wrapper Rule. This domain module owns struct definitions, business logic,
+//! and state machines. It imports `mlua` because the handle types store
+//! `LuaRegistryKey` fields and accept `&Lua` for registry access.
 
 use mlua::prelude::*;
 
