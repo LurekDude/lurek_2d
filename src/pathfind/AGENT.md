@@ -29,6 +29,7 @@ The `pathfinding` module provides a multi-layer grid pathfinding stack for 2D ga
 | `influence_map.rs`  | Multi-layer spatial float grid for influence mapping and strategic AI reasoning   |
 | `nav_grid.rs`       | Navigation grid with u8 per-cell costs, diagonal modes, dirty rects, and snapshot |
 | `pathgrid.rs`       | Weighted f32-cost grid with Cell type, A★, and string-pulling (moved from `ai/pathgrid`) |
+| `render.rs`         | `NavGrid::generate_render_commands`, `FlowField::generate_render_commands`, `InfluenceMap::generate_render_commands` — debug overlay (pure CPU) |
 | `unit_pathfinder.rs`| Unit-size-aware pathfinder with LRU caching, partial paths, BFS nearest-walkable |
 
 ## Key Types

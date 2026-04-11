@@ -7,6 +7,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
+use crate::math::Vec2;
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
@@ -219,6 +220,7 @@ pub enum BlendMode {
 /// - `BeginPostFx` — Start capturing the framebuffer for post-processing; subsequent draw calls render into the capture target.
 /// - `EndPostFx` — Stop capturing; resume rendering to the previous target.
 /// - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target.
+/// - `DrawTexturedQuad` — Draws an arbitrary textured quad specified by four explicit screen-space corners and four UV coordinates.
 #[derive(Debug, Clone)]
 pub enum RenderCommand {
     SetColor(f32, f32, f32, f32),
@@ -536,6 +538,28 @@ pub enum RenderCommand {
     ApplyPostFx {
         /// Identifier for the post-FX stack whose effects will be applied.
         stack_id: u64,
+    },
+    /// Draw an arbitrary textured quad with perspective-correct UVs.
+    ///
+    /// Each corner and its corresponding UV coordinate are specified independently,
+    /// enabling perspective-correct mapping for raycaster wall faces, portal geometry,
+    /// and any other non-axis-aligned textured surface. The current transform stack
+    /// is applied to all four corners before submission to the GPU.
+    ///
+    /// # Fields
+    /// - `corners` — `[Vec2; 4]`. Screen-space corner positions in order: top-left, top-right, bottom-right, bottom-left.
+    /// - `uvs` — `[Vec2; 4]`. Normalized UV coordinates `[0.0, 1.0]` for each corner in the same order.
+    /// - `texture_key` — `TextureKey`. Texture to sample.
+    /// - `color` — `[f32; 4]`. Per-quad RGBA tint multiplied against the sampled colour.
+    DrawTexturedQuad {
+        /// Screen-space corner positions: top-left, top-right, bottom-right, bottom-left.
+        corners: [Vec2; 4],
+        /// Normalized UV coordinates `[0.0, 1.0]` for each corner in the same order as `corners`.
+        uvs: [Vec2; 4],
+        /// Texture to sample.
+        texture_key: TextureKey,
+        /// Per-quad RGBA tint multiplied against the sampled colour.
+        color: [f32; 4],
     },
 }
 

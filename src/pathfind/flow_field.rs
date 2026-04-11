@@ -254,6 +254,22 @@ impl FlowField {
         self.targets.clone()
     }
 
+    /// Grid width in cells.
+    ///
+    /// # Returns
+    /// `u32`.
+    pub fn get_width(&self) -> u32 {
+        self.width
+    }
+
+    /// Grid height in cells.
+    ///
+    /// # Returns
+    /// `u32`.
+    pub fn get_height(&self) -> u32 {
+        self.height
+    }
+
     /// Convert a world-space position into a velocity vector.
     ///
     /// # Parameters

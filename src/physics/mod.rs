@@ -13,6 +13,8 @@
 pub mod body;
 /// Collision event structs returned by `World::get_collision_events`.
 pub mod collision;
+/// Debug render commands and image export for the physics world.
+pub mod render;
 /// Extended shape types: Polygon, Edge, and Chain colliders.
 pub mod shape;
 /// The `World` struct and all simulation management: bodies, joints, raycasting, contacts.

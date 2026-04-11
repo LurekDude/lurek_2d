@@ -80,6 +80,8 @@ pub mod utility_ai;
 /// Spatial AI container that owns all agents, provides O(1) name-based lookup,
 /// holds the global blackboard, and ticks agents in priority order each frame.
 pub mod world;
+/// Debug render commands and image export for AI subsystems.
+pub mod render;
 
 pub use agent::{Agent, DecisionModel};
 pub use behavior_tree::{BTNode, BTStatus, BehaviorTree, ParallelPolicy};

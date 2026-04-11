@@ -132,6 +132,38 @@ impl InfluenceMap {
         0.0
     }
 
+    /// Number of cells along the X axis.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_width(&self) -> usize {
+        self.width
+    }
+
+    /// Number of cells along the Y axis.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_height(&self) -> usize {
+        self.height
+    }
+
+    /// World-space size of each cell.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_cell_size(&self) -> f32 {
+        self.cell_size
+    }
+
+    /// Names of all registered layers (order not guaranteed).
+    ///
+    /// # Returns
+    /// `Vec<&str>`.
+    pub fn get_layer_names(&self) -> Vec<&str> {
+        self.layers.keys().map(|s| s.as_str()).collect()
+    }
+
     /// Stamps circular influence in world-space coordinates with linear falloff.
     ///
     /// # Parameters

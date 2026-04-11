@@ -25,6 +25,7 @@ The graph module provides a general-purpose directed weighted graph with item fl
 | `item.rs`          | `GraphItem` and `ItemPosition` — typed flowing entities with decay and priority |
 | `node.rs`          | `Node`, `OverflowPolicy`, `FlowMode`, `ConversionRule`, `Supply`, `Demand`  |
 | `pathfinding.rs`   | `PathResult` and Dijkstra shortest-path, reachability, neighbour queries     |
+| `render.rs`        | `Graph::generate_render_commands` — circular-layout debug overlay (pure CPU)  |
 | `simulation.rs`    | `GraphEvent` enum and 7-phase simulation pipeline (`update`/`step`)          |
 | `supply_demand.rs` | Supply/demand matching with priority-ordered fulfillment via pathfinding     |
 | `graph.rs`         | Legacy duplicate of `core.rs` — not declared in `mod.rs`, dead code          |

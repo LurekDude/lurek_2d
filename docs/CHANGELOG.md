@@ -18,6 +18,16 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.14] — 2026-04-11
+### Added
+- **Phase 0 — `DrawTexturedQuad` RenderCommand** (`src/render/renderer.rs`): New variant `DrawTexturedQuad { corners: [Vec2;4], uvs: [Vec2;4], texture_key: TextureKey, color: [f32;4] }` added to the `RenderCommand` enum. GPU handler added to `src/render/gpu_renderer.rs` via `push_tex_quad_corners()` helper, enabling perspective-correct textured quad rendering from CPU domain modules.
+- **Phase 2A — Debug `generate_render_commands()` for five CPU-only modules**:
+  - `src/physics/render.rs` — `World::generate_render_commands()`: AABB outlines (Rectangle), velocity arrows (Line), contact points (Circle) for all rigid bodies in the physics world. CPU `draw_to_image()` included.
+  - `src/ai/render.rs` — FSM state labels (DrawText), BehaviorTree node boxes (Rectangle+Line) for AI debug overlays. `StateMachine::generate_render_commands()` and `BehaviorTree::generate_render_commands()` with `draw_to_image()`.
+  - `src/pathfind/render.rs` — `NavGrid::generate_render_commands()` (walkable/blocked cells), `FlowField::generate_render_commands()` (flow arrows), `InfluenceMap::generate_render_commands()` (heat-map rectangles). Public getters added to `flow_field.rs` and `influence_map.rs`.
+  - `src/graph/render.rs` — `Graph::generate_render_commands()` with circular layout: nodes as circles, edges as lines. `draw_to_image()` included.
+  - `src/procgen/render.rs` — `NoiseGrid::generate_render_commands()` (grayscale rectangles per noise cell) and `draw_to_image()`.
+
 ## [0.7.13] — 2026-04-11
 ### Added
 - **Phase 8 — Lua API Exposure** (`lurek.*` surface for render-command capabilities)

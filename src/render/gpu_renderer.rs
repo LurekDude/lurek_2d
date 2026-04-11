@@ -1583,6 +1583,37 @@ impl GpuRenderer {
                     }
                 }
 
+                RenderCommand::DrawTexturedQuad {
+                    corners,
+                    uvs,
+                    texture_key,
+                    color,
+                } => {
+                    if self.gpu_textures.contains_key(*texture_key) {
+                        let t = transform_stack.last().unwrap();
+                        let mut verts = Vec::with_capacity(4);
+                        let mut idxs = Vec::with_capacity(6);
+                        push_tex_quad_corners(&mut verts, &mut idxs, t, *color, corners, uvs);
+                        let (target_width, target_height) =
+                            self.target_dimensions(current_target, canvases);
+                        append_tex_draw(
+                            &mut draws,
+                            &mut all_tex_verts,
+                            &mut all_tex_idxs,
+                            current_target,
+                            TexRef::Texture(*texture_key),
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, target_width, target_height),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
+                    }
+                }
+
                 RenderCommand::DrawBatch { batch_key } => {
                     if let Some(batch) = sprite_batches.get(*batch_key) {
                         let tex_key = batch.texture_key();
@@ -3811,6 +3842,32 @@ fn push_tex_quad(
         tv.push(TexVertex {
             position: [wx, wy],
             uv: [uv[i].0, uv[i].1],
+            color: tint,
+        });
+    }
+    ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
+}
+
+/// Push a textured quad with four arbitrary screen-space corners and per-corner UVs.
+///
+/// Unlike [`push_tex_quad`], this function accepts pre-projected corner positions
+/// directly — no SRT decomposition. This supports perspective-correct quads
+/// (e.g. raycaster wall faces) where the four corners are not axis-aligned.
+/// The current world transform `t` is still applied to each corner.
+fn push_tex_quad_corners(
+    tv: &mut Vec<TexVertex>,
+    ti: &mut Vec<u32>,
+    t: &Mat3,
+    tint: [f32; 4],
+    corners: &[crate::math::Vec2; 4],
+    uvs: &[crate::math::Vec2; 4],
+) {
+    let base = tv.len() as u32;
+    for i in 0..4 {
+        let (wx, wy) = apply(t, corners[i].x, corners[i].y);
+        tv.push(TexVertex {
+            position: [wx, wy],
+            uv: [uvs[i].x, uvs[i].y],
             color: tint,
         });
     }

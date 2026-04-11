@@ -25,6 +25,8 @@ pub mod influence_map;
 pub mod nav_grid;
 /// Weighted walkability grid with `Cell` type (moved from ai/pathgrid).
 pub mod pathgrid;
+/// Debug render commands and image export for pathfinding data structures.
+pub mod render;
 /// Unit-radius-aware pathfinding wrapper over NavGrid.
 pub mod unit_pathfinder;
 

@@ -16,6 +16,8 @@ pub mod item;
 pub mod node;
 /// Dijkstra shortest-path on the graph.
 pub mod pathfinding;
+/// Debug render commands for graph visualization.
+pub mod render;
 /// Tick-based simulation: decay, transit, push/pull flow.
 pub mod simulation;
 /// Supply and demand processing for resource flow graphs.

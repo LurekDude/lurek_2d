@@ -32,7 +32,6 @@ pub mod shape;
 /// Grid-based sprite sheet with directional support and named groups.
 /// Texture loading and TextureData storage for the renderer.
 /// CPU-side bin-packing texture atlas using shelf algorithm.
-
 pub use canvas::Canvas;
 pub use decal_surface::DecalSurface;
 pub use draw_layer::DrawLayer;
@@ -41,7 +40,7 @@ pub use gpu_renderer::GpuRenderer;
 pub use image_effect::ShaderPassDescriptor;
 pub use mesh::{Mesh, MeshDrawMode, MeshVertex};
 pub use renderer::{
-    BlendMode, CompareMode, DepthMode, RenderCommand, DrawMode, DrawableKind, StencilAction,
+    BlendMode, CompareMode, DepthMode, DrawMode, DrawableKind, RenderCommand, StencilAction,
     StencilMode, TextAlign, TextureData,
 };
 pub use shader::{Shader, UniformValue};

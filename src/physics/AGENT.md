@@ -21,6 +21,7 @@ The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It
 | `mod.rs`       | Module entry point — re-exports public types and declares submodules |
 | `body.rs`      | `Body` struct, `BodyType`/`BodyShape` enums, constructors, coordinate transforms, bounding box |
 | `collision.rs` | `CollisionInfo` struct — legacy penetration/normal data (retained for backward compatibility) |
+| `render.rs`    | `World::generate_render_commands` and `World::draw_to_image` — debug overlay (pure CPU, no wgpu) |
 | `shape.rs`     | Extended `Shape` enum (polygon, edge, chain), `StandaloneShape` value type, rapier collider conversion |
 | `world.rs`     | `World` simulation manager, body/joint CRUD, step pipeline, raycasting, spatial queries, collision events |
 

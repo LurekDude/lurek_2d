@@ -30,6 +30,7 @@ The AI module provides a comprehensive, modular game-intelligence toolkit that L
 | `steering.rs`       | Reynolds-style steering behaviors with weighted or priority-based force combination |
 | `utility_ai.rs`     | Multi-axis utility scorer with response curves for action selection              |
 | `world.rs`          | Top-level AI container that owns agents, maintains name→index lookup, and provides global blackboard |
+| `render.rs`         | `StateMachine::generate_render_commands`, `StateMachine::draw_to_image`, `BehaviorTree::generate_render_commands`, `BehaviorTree::draw_to_image` — debug overlay (pure CPU) |
 
 ## Key Types
 | Type | Location | Purpose |

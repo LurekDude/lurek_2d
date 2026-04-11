@@ -23,6 +23,7 @@ The `procgen` module provides five stateless procedural-generation algorithms fo
 | `flood_fill.rs`  | BFS flood fill returning a binary reachability mask                  |
 | `noise_ext.rs`   | Seamlessly tileable periodic Perlin noise via hash-based gradients    |
 | `poisson.rs`     | Bridson's Poisson-disk sampling for well-distributed point sets       |
+| `render.rs`      | `NoiseGrid` struct with `from_perlin`, `generate_render_commands`, and `draw_to_image` — debug overlay |
 | `voronoi.rs`     | Voronoi region assignment + distance fields with optional domain warping |
 | `lcg.rs`         | Internal linear congruential generator (`pub(crate)`, not public)     |
 

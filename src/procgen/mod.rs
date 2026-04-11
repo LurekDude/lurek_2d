@@ -15,6 +15,8 @@ pub mod noise_ext;
 pub mod poisson;
 /// Voronoi diagram generation with optional warp.
 pub mod voronoi;
+/// Procedural generation visualization: `NoiseGrid` with `generate_render_commands` and `draw_to_image`.
+pub mod render;
 
 pub use cellular::{cellular_automata, CellularOpts};
 pub use flood_fill::flood_fill;
