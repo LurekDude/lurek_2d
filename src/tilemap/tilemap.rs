@@ -14,7 +14,7 @@ use crate::math::{Rect, Vec2};
 
 use super::mapgen::MapOrientation;
 use super::tileset::TileSet;
-use crate::engine::log_messages::{TM01_TILEMAP_INIT, TM02_TILESET_ADD, TM03_LAYER_ADD};
+use crate::runtime::log_messages::{TM01_TILEMAP_INIT, TM02_TILESET_ADD, TM03_LAYER_ADD};
 use crate::log_msg;
 
 /// A single layer of tiles in a [`TileMap`].
@@ -977,8 +977,8 @@ impl TileMap {
         &self,
         offset_x: f32,
         offset_y: f32,
-    ) -> Vec<crate::graphics::renderer::RenderCommand> {
-        use crate::graphics::renderer::{DrawMode, RenderCommand};
+    ) -> Vec<crate::render::renderer::RenderCommand> {
+        use crate::render::renderer::{DrawMode, RenderCommand};
 
         let mut cmds: Vec<RenderCommand> = Vec::new();
         if self.layers.is_empty() {

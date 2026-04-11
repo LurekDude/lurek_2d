@@ -273,12 +273,4 @@ impl Step {
     pub fn effective_scancode(&self) -> Option<&str> {
         self.scancode.as_deref().or(self.key.as_deref())
     }
-
-    /// Parses a Lua step-array table into a `Vec<Step>`.
-    ///
-    /// # Parameters
-    /// - `t` — `&LuaTable`.
-    ///
-    /// # Returns
-    /// `LuaResult<Vec<Self>>`.
 }
