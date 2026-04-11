@@ -13,29 +13,33 @@ use lurek2d::math::vec2::Vec2;
 use std::fs;
 use std::sync::Arc;
 
+use lurek2d::animation::Animation;
 use lurek2d::audio::dsp::{ActiveEffect, EffectParams, EffectType};
+use lurek2d::camera::Camera2D;
+use lurek2d::effect::effect::PostFxEffect;
+use lurek2d::effect::effect_type::PostFxEffectType;
+use lurek2d::effect::overlay::Overlay;
+use lurek2d::effect::stack::PostFxStack;
+use lurek2d::graph::Graph;
+use lurek2d::image::visualization;
+use lurek2d::image::LayeredImage;
+use lurek2d::light::{Attenuation, FalloffMode, Light2D, LightWorld, Occluder};
 use lurek2d::math::color::Color;
 use lurek2d::math::easing;
 use lurek2d::math::rect::Rect;
-use lurek2d::minimap::{Minimap, FogLevel, ColorMode};
-use lurek2d::pathfind::{NavGrid, astar, FlowField, InfluenceMap};
-use lurek2d::procgen::{cellular_automata, CellularOpts, voronoi_diagram, VoronoiOpts, poisson_disk};
-use lurek2d::raycaster::Raycaster2D;
-use lurek2d::tilemap::TileMap;
-use lurek2d::particle::{ParticleSystem, ParticleConfig};
-use lurek2d::animation::Animation;
-use lurek2d::render::camera::Camera2D;
-use lurek2d::graph::Graph;
-use lurek2d::image::LayeredImage;
-use lurek2d::render::light::{LightWorld, Light2D, Occluder, Attenuation, FalloffMode};
-use lurek2d::spine::{Skeleton, Bone};
-use lurek2d::render::effect::overlay::Overlay;
-use lurek2d::render::effect::effect::PostFxEffect;
-use lurek2d::render::effect::effect_type::PostFxEffectType;
-use lurek2d::render::effect::stack::PostFxStack;
+use lurek2d::minimap::{ColorMode, FogLevel, Minimap};
 use lurek2d::particle::Trail;
-use lurek2d::image::visualization;
-use lurek2d::ui::chart::{LineChart, BarChart, ScatterPlot, PieChart, AreaChart, ChartConfig, ChartMargin};
+use lurek2d::particle::{ParticleConfig, ParticleSystem};
+use lurek2d::pathfinding::{astar, FlowField, InfluenceMap, NavGrid};
+use lurek2d::procgen::{
+    cellular_automata, poisson_disk, voronoi_diagram, CellularOpts, VoronoiOpts,
+};
+use lurek2d::raycaster::Raycaster2D;
+use lurek2d::spine::{Bone, Skeleton};
+use lurek2d::tilemap::TileMap;
+use lurek2d::ui::chart::{
+    AreaChart, BarChart, ChartConfig, ChartMargin, LineChart, PieChart, ScatterPlot,
+};
 use lurek2d::ui::theme::Theme;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -71,7 +75,13 @@ fn save_png(name: &str, img: &ImageData) {
     fs::create_dir_all(dir).expect("failed to create evidence directory");
     let png = img.encode_png().expect("failed to encode PNG");
     fs::write(&path, &png).expect("failed to write PNG");
-    println!("Evidence PNG saved: {} ({}x{}, {} bytes)", path, img.width(), img.height(), png.len());
+    println!(
+        "Evidence PNG saved: {} ({}x{}, {} bytes)",
+        path,
+        img.width(),
+        img.height(),
+        png.len()
+    );
 }
 
 /// Write WAV evidence to the evidence folder.
@@ -295,10 +305,10 @@ fn evidence_image_draw_shapes_combined() {
 
     // House shape
     img.draw_rect(60, 140, 80, 80, 180, 120, 60, 255); // Body
-    img.draw_rect(85, 180, 30, 40, 100, 60, 30, 255);   // Door
-    img.draw_rect(70, 155, 20, 20, 150, 200, 255, 255);  // Window left
+    img.draw_rect(85, 180, 30, 40, 100, 60, 30, 255); // Door
+    img.draw_rect(70, 155, 20, 20, 150, 200, 255, 255); // Window left
     img.draw_rect(110, 155, 20, 20, 150, 200, 255, 255); // Window right
-    // Roof triangle via lines
+                                                         // Roof triangle via lines
     img.draw_line(55, 140, 100, 90, 200, 50, 50, 255);
     img.draw_line(100, 90, 145, 140, 200, 50, 50, 255);
     img.draw_line(55, 140, 145, 140, 200, 50, 50, 255);
@@ -650,7 +660,9 @@ fn evidence_math_fbm_noise() {
     let noise = NoiseGenerator::new(42);
     let img = visualization::noise_to_image(
         |x, y| noise.fbm(x, y, 6, 2.0, 0.5, NoiseKind::Perlin),
-        256, 256, 0.01,
+        256,
+        256,
+        0.01,
     );
     save_png("math/fbm_noise", &img);
 }
@@ -659,8 +671,17 @@ fn evidence_math_fbm_noise() {
 fn evidence_math_worley_noise() {
     let noise = NoiseGenerator::new(42);
     let img = visualization::noise_raw_to_image(
-        |x, y| noise.worley_2d(x, y, lurek2d::math::noise_generator::DistType::Euclidean, false),
-        256, 256, 0.02,
+        |x, y| {
+            noise.worley_2d(
+                x,
+                y,
+                lurek2d::math::noise_generator::DistType::Euclidean,
+                false,
+            )
+        },
+        256,
+        256,
+        0.02,
     );
     save_png("math/worley_noise", &img);
 }
@@ -670,7 +691,9 @@ fn evidence_math_noise_colored_terrain() {
     let noise = NoiseGenerator::new(12345);
     let img = visualization::noise_terrain_to_image(
         |x, y| noise.fbm(x, y, 6, 2.0, 0.5, NoiseKind::Perlin),
-        256, 256, 0.008,
+        256,
+        256,
+        0.008,
     );
     save_png("math/noise_terrain_map", &img);
 }
@@ -695,12 +718,15 @@ fn evidence_math_generate_map() {
 #[test]
 fn evidence_math_bezier_curve() {
     let img = visualization::bezier_curves_to_image(
-        &[(vec![
-            Vec2::new(10.0, 200.0),
-            Vec2::new(60.0, 20.0),
-            Vec2::new(180.0, 20.0),
-            Vec2::new(240.0, 200.0),
-        ], (0u8, 255u8, 100u8))],
+        &[(
+            vec![
+                Vec2::new(10.0, 200.0),
+                Vec2::new(60.0, 20.0),
+                Vec2::new(180.0, 20.0),
+                Vec2::new(240.0, 200.0),
+            ],
+            (0u8, 255u8, 100u8),
+        )],
         256,
         256,
     );
@@ -710,9 +736,33 @@ fn evidence_math_bezier_curve() {
 #[test]
 fn evidence_math_bezier_multiple() {
     let curves_data: Vec<(Vec<Vec2>, (u8, u8, u8))> = vec![
-        (vec![Vec2::new(10.0, 128.0), Vec2::new(80.0, 10.0), Vec2::new(170.0, 245.0), Vec2::new(245.0, 128.0)], (255u8, 80u8, 80u8)),
-        (vec![Vec2::new(128.0, 10.0), Vec2::new(10.0, 80.0), Vec2::new(245.0, 170.0), Vec2::new(128.0, 245.0)], (80u8, 255u8, 80u8)),
-        (vec![Vec2::new(10.0, 10.0), Vec2::new(245.0, 10.0), Vec2::new(10.0, 245.0), Vec2::new(245.0, 245.0)], (80u8, 80u8, 255u8)),
+        (
+            vec![
+                Vec2::new(10.0, 128.0),
+                Vec2::new(80.0, 10.0),
+                Vec2::new(170.0, 245.0),
+                Vec2::new(245.0, 128.0),
+            ],
+            (255u8, 80u8, 80u8),
+        ),
+        (
+            vec![
+                Vec2::new(128.0, 10.0),
+                Vec2::new(10.0, 80.0),
+                Vec2::new(245.0, 170.0),
+                Vec2::new(128.0, 245.0),
+            ],
+            (80u8, 255u8, 80u8),
+        ),
+        (
+            vec![
+                Vec2::new(10.0, 10.0),
+                Vec2::new(245.0, 10.0),
+                Vec2::new(10.0, 245.0),
+                Vec2::new(245.0, 245.0),
+            ],
+            (80u8, 80u8, 255u8),
+        ),
     ];
     let img = visualization::bezier_curves_to_image(&curves_data, 256, 256);
     save_png("math/bezier_multiple_curves", &img);
@@ -890,8 +940,14 @@ fn evidence_audio_waveform_visualization() {
     }
     let sound = SoundData::from_samples(samples, sample_rate, 1);
 
-    save_png("audio/waveform_sine_440hz", &visualization::waveform_to_image(&sound.samples(), sample_rate, 800, 300));
-    save_png("audio/waveform_sine_440hz_zoomed", &visualization::waveform_zoomed_to_image(&sound.samples(), 1000, 800, 300));
+    save_png(
+        "audio/waveform_sine_440hz",
+        &visualization::waveform_to_image(&sound.samples(), sample_rate, 800, 300),
+    );
+    save_png(
+        "audio/waveform_sine_440hz_zoomed",
+        &visualization::waveform_zoomed_to_image(&sound.samples(), 1000, 800, 300),
+    );
     save_wav("audio/waveform_sine_440hz_audio", &sound);
 }
 
@@ -935,28 +991,121 @@ fn evidence_image_all_effects_grid() {
 
     let effects: Vec<(&str, Box<dyn Fn(ImageData) -> ImageData>)> = vec![
         ("Original", Box::new(|img| img)),
-        ("Brightness", Box::new(|mut img: ImageData| { img.brightness(0.3); img })),
-        ("Contrast", Box::new(|mut img: ImageData| { img.contrast(2.0); img })),
-        ("Grayscale", Box::new(|mut img: ImageData| { img.grayscale(); img })),
-        ("Sepia", Box::new(|mut img: ImageData| { img.sepia(); img })),
-        ("Invert", Box::new(|mut img: ImageData| { img.invert(); img })),
-        ("Threshold", Box::new(|mut img: ImageData| { img.threshold(128); img })),
-        ("Posterize", Box::new(|mut img: ImageData| { img.posterize(4); img })),
-        ("Tint Red", Box::new(|mut img: ImageData| { img.tint(255, 0, 0, 0.5); img })),
-        ("Saturation0", Box::new(|mut img: ImageData| { img.saturation(0.0); img })),
-        ("Gamma Low", Box::new(|mut img: ImageData| { img.gamma(0.5); img })),
-        ("Gamma High", Box::new(|mut img: ImageData| { img.gamma(2.2); img })),
-        ("Noise", Box::new(|mut img: ImageData| { img.noise(60); img })),
-        ("AlphaMask", Box::new(|mut img: ImageData| { img.alpha_mask(0.5); img })),
-        ("FlipH", Box::new(|mut img: ImageData| { img.flip_horizontal(); img })),
-        ("FlipV", Box::new(|mut img: ImageData| { img.flip_vertical(); img })),
+        (
+            "Brightness",
+            Box::new(|mut img: ImageData| {
+                img.brightness(0.3);
+                img
+            }),
+        ),
+        (
+            "Contrast",
+            Box::new(|mut img: ImageData| {
+                img.contrast(2.0);
+                img
+            }),
+        ),
+        (
+            "Grayscale",
+            Box::new(|mut img: ImageData| {
+                img.grayscale();
+                img
+            }),
+        ),
+        (
+            "Sepia",
+            Box::new(|mut img: ImageData| {
+                img.sepia();
+                img
+            }),
+        ),
+        (
+            "Invert",
+            Box::new(|mut img: ImageData| {
+                img.invert();
+                img
+            }),
+        ),
+        (
+            "Threshold",
+            Box::new(|mut img: ImageData| {
+                img.threshold(128);
+                img
+            }),
+        ),
+        (
+            "Posterize",
+            Box::new(|mut img: ImageData| {
+                img.posterize(4);
+                img
+            }),
+        ),
+        (
+            "Tint Red",
+            Box::new(|mut img: ImageData| {
+                img.tint(255, 0, 0, 0.5);
+                img
+            }),
+        ),
+        (
+            "Saturation0",
+            Box::new(|mut img: ImageData| {
+                img.saturation(0.0);
+                img
+            }),
+        ),
+        (
+            "Gamma Low",
+            Box::new(|mut img: ImageData| {
+                img.gamma(0.5);
+                img
+            }),
+        ),
+        (
+            "Gamma High",
+            Box::new(|mut img: ImageData| {
+                img.gamma(2.2);
+                img
+            }),
+        ),
+        (
+            "Noise",
+            Box::new(|mut img: ImageData| {
+                img.noise(60);
+                img
+            }),
+        ),
+        (
+            "AlphaMask",
+            Box::new(|mut img: ImageData| {
+                img.alpha_mask(0.5);
+                img
+            }),
+        ),
+        (
+            "FlipH",
+            Box::new(|mut img: ImageData| {
+                img.flip_horizontal();
+                img
+            }),
+        ),
+        (
+            "FlipV",
+            Box::new(|mut img: ImageData| {
+                img.flip_vertical();
+                img
+            }),
+        ),
         ("Rotate90", Box::new(|img: ImageData| img.rotate_90_cw())),
         ("Blur", Box::new(|img: ImageData| img.blur(2))),
         ("Sharpen", Box::new(|img: ImageData| img.sharpen())),
-        ("Crop", Box::new(|img: ImageData| {
-            let c = img.crop(8, 8, 48, 48).unwrap();
-            c.resize_nearest(tile, tile)
-        })),
+        (
+            "Crop",
+            Box::new(|img: ImageData| {
+                let c = img.crop(8, 8, 48, 48).unwrap();
+                c.resize_nearest(tile, tile)
+            }),
+        ),
     ];
 
     for (i, (_name, apply)) in effects.iter().enumerate() {
@@ -969,7 +1118,6 @@ fn evidence_image_all_effects_grid() {
 
     save_png("combined/all_effects_grid", &canvas);
 }
-
 
 // =====================================================================
 // ===== TILEMAP — TileMap evidence =====
@@ -1037,7 +1185,15 @@ fn evidence_minimap_terrain() {
             let dx = x as f32 - 10.0;
             let dy = y as f32 - 7.5;
             let dist = (dx * dx + dy * dy).sqrt();
-            let terrain = if dist > 8.0 { 0 } else if dist > 5.0 { 1 } else if dist > 3.0 { 2 } else { 3 };
+            let terrain = if dist > 8.0 {
+                0
+            } else if dist > 5.0 {
+                1
+            } else if dist > 3.0 {
+                2
+            } else {
+                3
+            };
             mm.set_terrain(x, y, terrain);
         }
     }
@@ -1114,7 +1270,7 @@ fn evidence_minimap_political_mode() {
     // Set owner colors for different territories
     mm.set_owner_color(1, [0.8, 0.2, 0.2, 1.0]); // Red faction
     mm.set_owner_color(2, [0.2, 0.2, 0.8, 1.0]); // Blue faction
-    // Place units to show ownership
+                                                 // Place units to show ownership
     for i in 0..5u32 {
         mm.set_object(i, (2 + i * 2) as f32, 5.0, 0, 1);
         mm.set_object(10 + i, (2 + i * 2) as f32, 12.0, 0, 2);
@@ -1133,9 +1289,9 @@ fn evidence_raycaster_top_down() {
     let mut rc = Raycaster2D::new(16, 16);
     // Create walls around edges and some internal walls
     for i in 0..16 {
-        rc.set_cell(i, 0, 1);  // Top wall
+        rc.set_cell(i, 0, 1); // Top wall
         rc.set_cell(i, 15, 1); // Bottom wall
-        rc.set_cell(0, i, 1);  // Left wall
+        rc.set_cell(0, i, 1); // Left wall
         rc.set_cell(15, i, 1); // Right wall
     }
     // Internal walls
@@ -1213,12 +1369,7 @@ fn evidence_pathfinding_astar_basic() {
 
     let (path, _complete) = astar(&grid, (2, 2), (17, 12), 1, 10000);
 
-    let img = grid.draw_to_image(
-        16,
-        path.as_deref(),
-        Some((2, 2)),
-        Some((17, 12)),
-    );
+    let img = grid.draw_to_image(16, path.as_deref(), Some((2, 2)), Some((17, 12)));
     save_png("pathfinding/astar_basic", &img);
 }
 
@@ -1226,8 +1377,8 @@ fn evidence_pathfinding_astar_basic() {
 fn evidence_pathfinding_navgrid_costs() {
     let mut grid = NavGrid::new(20, 15);
     // Variable cost terrain
-    grid.fill_rect(0, 0, 20, 15, 1);  // Default cost 1
-    grid.fill_rect(6, 3, 4, 9, 5);    // High cost zone
+    grid.fill_rect(0, 0, 20, 15, 1); // Default cost 1
+    grid.fill_rect(6, 3, 4, 9, 5); // High cost zone
     grid.fill_rect(12, 0, 2, 15, 255); // Blocked
 
     let (path, _) = astar(&grid, (2, 7), (18, 7), 1, 10000);
@@ -1305,11 +1456,13 @@ fn evidence_procgen_cellular_cave() {
 #[test]
 fn evidence_procgen_voronoi_diagram() {
     // Generate seed points
-    let points: Vec<(f32, f32)> = (0..20).map(|i| {
-        let angle = i as f32 * 0.314159;
-        let r = 40.0 + (i as f32 * 7.3) % 50.0;
-        (128.0 + r * angle.cos(), 128.0 + r * angle.sin())
-    }).collect();
+    let points: Vec<(f32, f32)> = (0..20)
+        .map(|i| {
+            let angle = i as f32 * 0.314159;
+            let r = 40.0 + (i as f32 * 7.3) % 50.0;
+            (128.0 + r * angle.cos(), 128.0 + r * angle.sin())
+        })
+        .collect();
 
     let opts = VoronoiOpts {
         warp_scale: 0.0,
@@ -1318,13 +1471,15 @@ fn evidence_procgen_voronoi_diagram() {
     };
     let (regions, _cx, _cy) = voronoi_diagram(256, 256, &points, &opts);
 
-    let palette: Vec<(u8, u8, u8)> = (0..20).map(|i| {
-        let h = (i as f32 * 0.3).sin() * 0.5 + 0.5;
-        let r = (50.0 + h * 200.0) as u8;
-        let g = (80.0 + ((i as f32 * 0.7).cos() * 0.5 + 0.5) * 170.0) as u8;
-        let b = (60.0 + ((i as f32 * 1.1).sin() * 0.5 + 0.5) * 190.0) as u8;
-        (r, g, b)
-    }).collect();
+    let palette: Vec<(u8, u8, u8)> = (0..20)
+        .map(|i| {
+            let h = (i as f32 * 0.3).sin() * 0.5 + 0.5;
+            let r = (50.0 + h * 200.0) as u8;
+            let g = (80.0 + ((i as f32 * 0.7).cos() * 0.5 + 0.5) * 170.0) as u8;
+            let b = (60.0 + ((i as f32 * 1.1).sin() * 0.5 + 0.5) * 190.0) as u8;
+            (r, g, b)
+        })
+        .collect();
     let mut img = visualization::voronoi_to_image(&regions, 256, 256, &palette);
     // Draw seed points
     for &(px, py) in &points {
@@ -1335,11 +1490,13 @@ fn evidence_procgen_voronoi_diagram() {
 
 #[test]
 fn evidence_procgen_voronoi_warped() {
-    let points: Vec<(f32, f32)> = (0..15).map(|i| {
-        let angle = i as f32 * 0.42;
-        let r = 30.0 + (i as f32 * 11.0) % 60.0;
-        (128.0 + r * angle.cos(), 128.0 + r * angle.sin())
-    }).collect();
+    let points: Vec<(f32, f32)> = (0..15)
+        .map(|i| {
+            let angle = i as f32 * 0.42;
+            let r = 30.0 + (i as f32 * 11.0) % 60.0;
+            (128.0 + r * angle.cos(), 128.0 + r * angle.sin())
+        })
+        .collect();
 
     let opts = VoronoiOpts {
         warp_scale: 0.03,
@@ -1348,9 +1505,15 @@ fn evidence_procgen_voronoi_warped() {
     };
     let (regions, _, _) = voronoi_diagram(256, 256, &points, &opts);
 
-    let palette: Vec<(u8, u8, u8)> = (0..15).map(|i| {
-        ((70 + i * 12) as u8, (100 + i * 8) as u8, (50 + i * 14) as u8)
-    }).collect();
+    let palette: Vec<(u8, u8, u8)> = (0..15)
+        .map(|i| {
+            (
+                (70 + i * 12) as u8,
+                (100 + i * 8) as u8,
+                (50 + i * 14) as u8,
+            )
+        })
+        .collect();
     let img = visualization::voronoi_to_image(&regions, 256, 256, &palette);
     save_png("procgen/voronoi_warped", &img);
 }
@@ -1383,28 +1546,34 @@ fn evidence_procgen_poisson_dense() {
 #[test]
 fn evidence_easing_all_curves() {
     let funcs: &[(&str, &dyn Fn(f32) -> f32)] = &[
-        ("linear",     &|t| easing::apply("linear",     t).unwrap_or(t)),
-        ("inquad",     &|t| easing::apply("inquad",     t).unwrap_or(t)),
-        ("outquad",    &|t| easing::apply("outquad",    t).unwrap_or(t)),
-        ("inoutquad",  &|t| easing::apply("inoutquad",  t).unwrap_or(t)),
-        ("incubic",    &|t| easing::apply("incubic",    t).unwrap_or(t)),
-        ("outcubic",   &|t| easing::apply("outcubic",   t).unwrap_or(t)),
-        ("inoutcubic", &|t| easing::apply("inoutcubic", t).unwrap_or(t)),
-        ("inquart",    &|t| easing::apply("inquart",    t).unwrap_or(t)),
-        ("outquart",   &|t| easing::apply("outquart",   t).unwrap_or(t)),
-        ("inoutquart", &|t| easing::apply("inoutquart", t).unwrap_or(t)),
-        ("insine",     &|t| easing::apply("insine",     t).unwrap_or(t)),
-        ("outsine",    &|t| easing::apply("outsine",    t).unwrap_or(t)),
-        ("inoutsine",  &|t| easing::apply("inoutsine",  t).unwrap_or(t)),
-        ("inexpo",     &|t| easing::apply("inexpo",     t).unwrap_or(t)),
-        ("outexpo",    &|t| easing::apply("outexpo",    t).unwrap_or(t)),
-        ("inoutexpo",  &|t| easing::apply("inoutexpo",  t).unwrap_or(t)),
-        ("inelastic",  &|t| easing::apply("inelastic",  t).unwrap_or(t)),
-        ("outelastic", &|t| easing::apply("outelastic", t).unwrap_or(t)),
-        ("inbounce",   &|t| easing::apply("inbounce",   t).unwrap_or(t)),
-        ("outbounce",  &|t| easing::apply("outbounce",  t).unwrap_or(t)),
-        ("inback",     &|t| easing::apply("inback",     t).unwrap_or(t)),
-        ("outback",    &|t| easing::apply("outback",    t).unwrap_or(t)),
+        ("linear", &|t| easing::apply("linear", t).unwrap_or(t)),
+        ("inquad", &|t| easing::apply("inquad", t).unwrap_or(t)),
+        ("outquad", &|t| easing::apply("outquad", t).unwrap_or(t)),
+        ("inoutquad", &|t| easing::apply("inoutquad", t).unwrap_or(t)),
+        ("incubic", &|t| easing::apply("incubic", t).unwrap_or(t)),
+        ("outcubic", &|t| easing::apply("outcubic", t).unwrap_or(t)),
+        ("inoutcubic", &|t| {
+            easing::apply("inoutcubic", t).unwrap_or(t)
+        }),
+        ("inquart", &|t| easing::apply("inquart", t).unwrap_or(t)),
+        ("outquart", &|t| easing::apply("outquart", t).unwrap_or(t)),
+        ("inoutquart", &|t| {
+            easing::apply("inoutquart", t).unwrap_or(t)
+        }),
+        ("insine", &|t| easing::apply("insine", t).unwrap_or(t)),
+        ("outsine", &|t| easing::apply("outsine", t).unwrap_or(t)),
+        ("inoutsine", &|t| easing::apply("inoutsine", t).unwrap_or(t)),
+        ("inexpo", &|t| easing::apply("inexpo", t).unwrap_or(t)),
+        ("outexpo", &|t| easing::apply("outexpo", t).unwrap_or(t)),
+        ("inoutexpo", &|t| easing::apply("inoutexpo", t).unwrap_or(t)),
+        ("inelastic", &|t| easing::apply("inelastic", t).unwrap_or(t)),
+        ("outelastic", &|t| {
+            easing::apply("outelastic", t).unwrap_or(t)
+        }),
+        ("inbounce", &|t| easing::apply("inbounce", t).unwrap_or(t)),
+        ("outbounce", &|t| easing::apply("outbounce", t).unwrap_or(t)),
+        ("inback", &|t| easing::apply("inback", t).unwrap_or(t)),
+        ("outback", &|t| easing::apply("outback", t).unwrap_or(t)),
     ];
     let img = visualization::easing_gallery_to_image(funcs, 120, 80);
     save_png("easing/all_curves_gallery", &img);
@@ -1413,12 +1582,24 @@ fn evidence_easing_all_curves() {
 #[test]
 fn evidence_easing_comparison() {
     let curves: &[(&str, (u8, u8, u8), fn(f32) -> f32)] = &[
-        ("linear",     (200, 200, 200), |t| easing::apply("linear",     t).unwrap_or(t)),
-        ("inquad",     (255, 80,  80),  |t| easing::apply("inquad",     t).unwrap_or(t)),
-        ("outquad",    (80,  255, 80),  |t| easing::apply("outquad",    t).unwrap_or(t)),
-        ("inoutcubic", (80,  80,  255), |t| easing::apply("inoutcubic", t).unwrap_or(t)),
-        ("outelastic", (255, 200, 80),  |t| easing::apply("outelastic", t).unwrap_or(t)),
-        ("outbounce",  (200, 80,  255), |t| easing::apply("outbounce",  t).unwrap_or(t)),
+        ("linear", (200, 200, 200), |t| {
+            easing::apply("linear", t).unwrap_or(t)
+        }),
+        ("inquad", (255, 80, 80), |t| {
+            easing::apply("inquad", t).unwrap_or(t)
+        }),
+        ("outquad", (80, 255, 80), |t| {
+            easing::apply("outquad", t).unwrap_or(t)
+        }),
+        ("inoutcubic", (80, 80, 255), |t| {
+            easing::apply("inoutcubic", t).unwrap_or(t)
+        }),
+        ("outelastic", (255, 200, 80), |t| {
+            easing::apply("outelastic", t).unwrap_or(t)
+        }),
+        ("outbounce", (200, 80, 255), |t| {
+            easing::apply("outbounce", t).unwrap_or(t)
+        }),
     ];
     let img = visualization::easing_comparison_to_image(curves, 256, 256);
     save_png("easing/comparison_chart", &img);
@@ -1432,13 +1613,28 @@ fn evidence_easing_comparison() {
 fn evidence_light_point_lights() {
     let mut world = LightWorld::new();
     let mut l1 = Light2D::new(80.0, 80.0, 100.0);
-    l1.set_color(Color { r: 1.0, g: 0.3, b: 0.1, a: 1.0 });
+    l1.set_color(Color {
+        r: 1.0,
+        g: 0.3,
+        b: 0.1,
+        a: 1.0,
+    });
     l1.set_intensity(1.0);
     let mut l2 = Light2D::new(180.0, 120.0, 80.0);
-    l2.set_color(Color { r: 0.1, g: 0.3, b: 1.0, a: 1.0 });
+    l2.set_color(Color {
+        r: 0.1,
+        g: 0.3,
+        b: 1.0,
+        a: 1.0,
+    });
     l2.set_intensity(0.8);
     let mut l3 = Light2D::new(130.0, 200.0, 120.0);
-    l3.set_color(Color { r: 0.1, g: 1.0, b: 0.3, a: 1.0 });
+    l3.set_color(Color {
+        r: 0.1,
+        g: 1.0,
+        b: 0.3,
+        a: 1.0,
+    });
     l3.set_intensity(0.7);
 
     let _k1 = world.add_light(l1);
@@ -1697,13 +1893,13 @@ fn evidence_camera_zoom_levels() {
 
 fn make_sine_samples(freq: f32, duration: f32, sample_rate: u32) -> Vec<f32> {
     let n = (sample_rate as f32 * duration) as usize;
-    (0..n).map(|i| {
-        let t = i as f32 / sample_rate as f32;
-        (t * freq * 2.0 * std::f32::consts::PI).sin() * 0.8
-    }).collect()
+    (0..n)
+        .map(|i| {
+            let t = i as f32 / sample_rate as f32;
+            (t * freq * 2.0 * std::f32::consts::PI).sin() * 0.8
+        })
+        .collect()
 }
-
-
 
 #[test]
 fn evidence_dsp_lowpass_filter() {
@@ -1711,14 +1907,21 @@ fn evidence_dsp_lowpass_filter() {
     let samples = make_sine_samples(440.0, 1.0, sr);
 
     // Also add high-frequency component
-    let mut rich: Vec<f32> = samples.iter().enumerate().map(|(i, &s)| {
-        let t = i as f32 / sr as f32;
-        s + (t * 4000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
-    }).collect();
+    let mut rich: Vec<f32> = samples
+        .iter()
+        .enumerate()
+        .map(|(i, &s)| {
+            let t = i as f32 / sr as f32;
+            s + (t * 4000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
+        })
+        .collect();
 
     let before = SoundData::from_samples(rich.clone(), sr, 1);
     save_wav("audio_dsp/lowpass_before", &before);
-    save_png("audio_dsp/lowpass_before_waveform", &visualization::waveform_to_image(&rich, sr, 800, 300));
+    save_png(
+        "audio_dsp/lowpass_before_waveform",
+        &visualization::waveform_to_image(&rich, sr, 800, 300),
+    );
 
     // Apply lowpass filter
     let params = Arc::new(EffectParams::new(1, EffectType::Lowpass));
@@ -1730,21 +1933,29 @@ fn evidence_dsp_lowpass_filter() {
     let filtered: Vec<f32> = rich.iter().map(|&s| effect.process(s, 0, sr)).collect();
     let after = SoundData::from_samples(filtered.clone(), sr, 1);
     save_wav("audio_dsp/lowpass_after", &after);
-    save_png("audio_dsp/lowpass_after_waveform", &visualization::waveform_to_image(&filtered, sr, 800, 300));
+    save_png(
+        "audio_dsp/lowpass_after_waveform",
+        &visualization::waveform_to_image(&filtered, sr, 800, 300),
+    );
 }
 
 #[test]
 fn evidence_dsp_highpass_filter() {
     let sr = 44100u32;
-    let mut rich: Vec<f32> = (0..(sr as usize)).map(|i| {
-        let t = i as f32 / sr as f32;
-        (t * 200.0 * 2.0 * std::f32::consts::PI).sin() * 0.5
-        + (t * 3000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
-    }).collect();
+    let mut rich: Vec<f32> = (0..(sr as usize))
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            (t * 200.0 * 2.0 * std::f32::consts::PI).sin() * 0.5
+                + (t * 3000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
+        })
+        .collect();
 
     let before = SoundData::from_samples(rich.clone(), sr, 1);
     save_wav("audio_dsp/highpass_before", &before);
-    save_png("audio_dsp/highpass_before_waveform", &visualization::waveform_to_image(&rich, sr, 800, 300));
+    save_png(
+        "audio_dsp/highpass_before_waveform",
+        &visualization::waveform_to_image(&rich, sr, 800, 300),
+    );
 
     let params = Arc::new(EffectParams::new(2, EffectType::Highpass));
     params.set_param("cutoff", 1000.0).unwrap();
@@ -1755,23 +1966,31 @@ fn evidence_dsp_highpass_filter() {
     let filtered: Vec<f32> = rich.iter().map(|&s| effect.process(s, 0, sr)).collect();
     let after = SoundData::from_samples(filtered.clone(), sr, 1);
     save_wav("audio_dsp/highpass_after", &after);
-    save_png("audio_dsp/highpass_after_waveform", &visualization::waveform_to_image(&filtered, sr, 800, 300));
+    save_png(
+        "audio_dsp/highpass_after_waveform",
+        &visualization::waveform_to_image(&filtered, sr, 800, 300),
+    );
 }
 
 #[test]
 fn evidence_dsp_bandpass_filter() {
     let sr = 44100u32;
     // Three frequencies: 200Hz, 1000Hz, 5000Hz
-    let rich: Vec<f32> = (0..(sr as usize)).map(|i| {
-        let t = i as f32 / sr as f32;
-        (t * 200.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
-        + (t * 1000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
-        + (t * 5000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
-    }).collect();
+    let rich: Vec<f32> = (0..(sr as usize))
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            (t * 200.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
+                + (t * 1000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
+                + (t * 5000.0 * 2.0 * std::f32::consts::PI).sin() * 0.3
+        })
+        .collect();
 
     let before = SoundData::from_samples(rich.clone(), sr, 1);
     save_wav("audio_dsp/bandpass_before", &before);
-    save_png("audio_dsp/bandpass_before_waveform", &visualization::waveform_to_image(&rich, sr, 800, 300));
+    save_png(
+        "audio_dsp/bandpass_before_waveform",
+        &visualization::waveform_to_image(&rich, sr, 800, 300),
+    );
 
     let params = Arc::new(EffectParams::new(3, EffectType::Bandpass));
     params.set_param("cutoff", 1000.0).unwrap();
@@ -1782,7 +2001,10 @@ fn evidence_dsp_bandpass_filter() {
     let filtered: Vec<f32> = rich.iter().map(|&s| effect.process(s, 0, sr)).collect();
     let after = SoundData::from_samples(filtered.clone(), sr, 1);
     save_wav("audio_dsp/bandpass_after", &after);
-    save_png("audio_dsp/bandpass_after_waveform", &visualization::waveform_to_image(&filtered, sr, 800, 300));
+    save_png(
+        "audio_dsp/bandpass_after_waveform",
+        &visualization::waveform_to_image(&filtered, sr, 800, 300),
+    );
 }
 
 #[test]
@@ -1798,7 +2020,10 @@ fn evidence_dsp_reverb() {
 
     let before = SoundData::from_samples(samples.clone(), sr, 1);
     save_wav("audio_dsp/reverb_before", &before);
-    save_png("audio_dsp/reverb_before_waveform", &visualization::waveform_to_image(&samples, sr, 800, 300));
+    save_png(
+        "audio_dsp/reverb_before_waveform",
+        &visualization::waveform_to_image(&samples, sr, 800, 300),
+    );
 
     let params = Arc::new(EffectParams::new(4, EffectType::Reverb));
     params.set_param("room_size", 0.8).unwrap();
@@ -1809,7 +2034,10 @@ fn evidence_dsp_reverb() {
     let reverbed: Vec<f32> = samples.iter().map(|&s| effect.process(s, 0, sr)).collect();
     let after = SoundData::from_samples(reverbed.clone(), sr, 1);
     save_wav("audio_dsp/reverb_after", &after);
-    save_png("audio_dsp/reverb_after_waveform", &visualization::waveform_to_image(&reverbed, sr, 800, 300));
+    save_png(
+        "audio_dsp/reverb_after_waveform",
+        &visualization::waveform_to_image(&reverbed, sr, 800, 300),
+    );
 }
 
 #[test]
@@ -1819,8 +2047,14 @@ fn evidence_dsp_chorus() {
 
     let before = SoundData::from_samples(samples.clone(), sr, 1);
     save_wav("audio_dsp/chorus_before", &before);
-    save_png("audio_dsp/chorus_before_waveform", &visualization::waveform_to_image(&samples, sr, 800, 300));
-    save_png("audio_dsp/chorus_before_zoomed", &visualization::waveform_zoomed_to_image(&samples, 2000, 800, 300));
+    save_png(
+        "audio_dsp/chorus_before_waveform",
+        &visualization::waveform_to_image(&samples, sr, 800, 300),
+    );
+    save_png(
+        "audio_dsp/chorus_before_zoomed",
+        &visualization::waveform_zoomed_to_image(&samples, 2000, 800, 300),
+    );
 
     let params = Arc::new(EffectParams::new(5, EffectType::Chorus));
     params.set_param("rate", 1.5).unwrap();
@@ -1831,8 +2065,14 @@ fn evidence_dsp_chorus() {
     let chorused: Vec<f32> = samples.iter().map(|&s| effect.process(s, 0, sr)).collect();
     let after = SoundData::from_samples(chorused.clone(), sr, 1);
     save_wav("audio_dsp/chorus_after", &after);
-    save_png("audio_dsp/chorus_after_waveform", &visualization::waveform_to_image(&chorused, sr, 800, 300));
-    save_png("audio_dsp/chorus_after_zoomed", &visualization::waveform_zoomed_to_image(&chorused, 2000, 800, 300));
+    save_png(
+        "audio_dsp/chorus_after_waveform",
+        &visualization::waveform_to_image(&chorused, sr, 800, 300),
+    );
+    save_png(
+        "audio_dsp/chorus_after_zoomed",
+        &visualization::waveform_zoomed_to_image(&chorused, 2000, 800, 300),
+    );
 }
 
 #[test]
@@ -1840,10 +2080,12 @@ fn evidence_dsp_filter_sweep() {
     let sr = 44100u32;
     // White noise source
     let mut rng: u32 = 42;
-    let noise: Vec<f32> = (0..(sr as usize * 2)).map(|_| {
-        rng = rng.wrapping_mul(1103515245).wrapping_add(12345);
-        ((rng >> 16) as f32 / 32768.0 - 1.0) * 0.5
-    }).collect();
+    let noise: Vec<f32> = (0..(sr as usize * 2))
+        .map(|_| {
+            rng = rng.wrapping_mul(1103515245).wrapping_add(12345);
+            ((rng >> 16) as f32 / 32768.0 - 1.0) * 0.5
+        })
+        .collect();
 
     // Apply lowpass with sweeping cutoff
     let params = Arc::new(EffectParams::new(6, EffectType::Lowpass));
@@ -1851,16 +2093,23 @@ fn evidence_dsp_filter_sweep() {
     params.set_param("mix", 1.0).unwrap();
     let mut effect = ActiveEffect::new(params.clone(), sr, 1);
 
-    let swept: Vec<f32> = noise.iter().enumerate().map(|(i, &s)| {
-        let t = i as f32 / noise.len() as f32;
-        let cutoff = 200.0 + t * 8000.0; // sweep from 200Hz to 8200Hz
-        let _ = params.set_param("cutoff", cutoff);
-        effect.process(s, 0, sr)
-    }).collect();
+    let swept: Vec<f32> = noise
+        .iter()
+        .enumerate()
+        .map(|(i, &s)| {
+            let t = i as f32 / noise.len() as f32;
+            let cutoff = 200.0 + t * 8000.0; // sweep from 200Hz to 8200Hz
+            let _ = params.set_param("cutoff", cutoff);
+            effect.process(s, 0, sr)
+        })
+        .collect();
 
     let sound = SoundData::from_samples(swept.clone(), sr, 1);
     save_wav("audio_dsp/filter_sweep", &sound);
-    save_png("audio_dsp/filter_sweep_waveform", &visualization::waveform_to_image(&swept, sr, 800, 300));
+    save_png(
+        "audio_dsp/filter_sweep_waveform",
+        &visualization::waveform_to_image(&swept, sr, 800, 300),
+    );
 }
 
 // =====================================================================
@@ -1871,10 +2120,12 @@ fn evidence_dsp_filter_sweep() {
 fn evidence_audio_triangle_wave() {
     let sr = 44100u32;
     let n = 44100usize;
-    let samples: Vec<f32> = (0..n).map(|i| {
-        let phase = (i as f32 / sr as f32 * 440.0) % 1.0;
-        (2.0 * (2.0 * phase - 1.0).abs() - 1.0) * 0.7
-    }).collect();
+    let samples: Vec<f32> = (0..n)
+        .map(|i| {
+            let phase = (i as f32 / sr as f32 * 440.0) % 1.0;
+            (2.0 * (2.0 * phase - 1.0).abs() - 1.0) * 0.7
+        })
+        .collect();
     let sound = SoundData::from_samples(samples, sr, 1);
     save_wav("audio/triangle_wave_440hz", &sound);
 }
@@ -1887,33 +2138,43 @@ fn evidence_audio_fm_synthesis() {
     let modulator = 220.0f32;
     let mod_depth = 200.0f32;
 
-    let samples: Vec<f32> = (0..n).map(|i| {
-        let t = i as f32 / sr as f32;
-        let mod_signal = (t * modulator * 2.0 * std::f32::consts::PI).sin();
-        let freq = carrier + mod_signal * mod_depth;
-        let mut phase = 0.0f32;
-        // Approximate phase integration
-        phase = t * carrier * 2.0 * std::f32::consts::PI
-            + (mod_depth / modulator) * (t * modulator * 2.0 * std::f32::consts::PI).sin();
-        phase.sin() * 0.7
-    }).collect();
+    let samples: Vec<f32> = (0..n)
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            let mod_signal = (t * modulator * 2.0 * std::f32::consts::PI).sin();
+            let freq = carrier + mod_signal * mod_depth;
+            let mut phase = 0.0f32;
+            // Approximate phase integration
+            phase = t * carrier * 2.0 * std::f32::consts::PI
+                + (mod_depth / modulator) * (t * modulator * 2.0 * std::f32::consts::PI).sin();
+            phase.sin() * 0.7
+        })
+        .collect();
 
     let sound = SoundData::from_samples(samples.clone(), sr, 1);
     save_wav("audio/fm_synthesis", &sound);
-    save_png("audio/fm_synthesis_waveform", &visualization::waveform_to_image(&samples, sr, 800, 300));
-    save_png("audio/fm_synthesis_zoomed", &visualization::waveform_zoomed_to_image(&samples, 2000, 800, 300));
+    save_png(
+        "audio/fm_synthesis_waveform",
+        &visualization::waveform_to_image(&samples, sr, 800, 300),
+    );
+    save_png(
+        "audio/fm_synthesis_zoomed",
+        &visualization::waveform_zoomed_to_image(&samples, 2000, 800, 300),
+    );
 }
 
 #[test]
 fn evidence_audio_drum_kick() {
     let sr = 44100u32;
     let n = (sr as f32 * 0.3) as usize;
-    let samples: Vec<f32> = (0..n).map(|i| {
-        let t = i as f32 / sr as f32;
-        let env = (-t * 15.0).exp();
-        let freq = 150.0 * (-t * 8.0).exp() + 40.0;
-        (t * freq * 2.0 * std::f32::consts::PI).sin() * env * 0.9
-    }).collect();
+    let samples: Vec<f32> = (0..n)
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            let env = (-t * 15.0).exp();
+            let freq = 150.0 * (-t * 8.0).exp() + 40.0;
+            (t * freq * 2.0 * std::f32::consts::PI).sin() * env * 0.9
+        })
+        .collect();
     let sound = SoundData::from_samples(samples, sr, 1);
     save_wav("audio/drum_kick", &sound);
 }
@@ -1923,13 +2184,15 @@ fn evidence_audio_drum_hihat() {
     let sr = 44100u32;
     let n = (sr as f32 * 0.15) as usize;
     let mut rng: u32 = 999;
-    let samples: Vec<f32> = (0..n).map(|i| {
-        let t = i as f32 / sr as f32;
-        let env = (-t * 40.0).exp();
-        rng = rng.wrapping_mul(1103515245).wrapping_add(12345);
-        let noise = (rng >> 16) as f32 / 32768.0 - 1.0;
-        noise * env * 0.6
-    }).collect();
+    let samples: Vec<f32> = (0..n)
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            let env = (-t * 40.0).exp();
+            rng = rng.wrapping_mul(1103515245).wrapping_add(12345);
+            let noise = (rng >> 16) as f32 / 32768.0 - 1.0;
+            noise * env * 0.6
+        })
+        .collect();
     let sound = SoundData::from_samples(samples, sr, 1);
     save_wav("audio/drum_hihat", &sound);
 }
@@ -1939,15 +2202,17 @@ fn evidence_audio_pluck_string() {
     let sr = 44100u32;
     let freq = 330.0f32; // E4
     let n = sr as usize; // 1 second
-    let samples: Vec<f32> = (0..n).map(|i| {
-        let t = i as f32 / sr as f32;
-        let env = (-t * 3.0).exp();
-        let harmonics = (t * freq * 2.0 * std::f32::consts::PI).sin()
-            + 0.5 * (t * freq * 2.0 * 2.0 * std::f32::consts::PI).sin()
-            + 0.25 * (t * freq * 3.0 * 2.0 * std::f32::consts::PI).sin()
-            + 0.125 * (t * freq * 4.0 * 2.0 * std::f32::consts::PI).sin();
-        harmonics * env * 0.4
-    }).collect();
+    let samples: Vec<f32> = (0..n)
+        .map(|i| {
+            let t = i as f32 / sr as f32;
+            let env = (-t * 3.0).exp();
+            let harmonics = (t * freq * 2.0 * std::f32::consts::PI).sin()
+                + 0.5 * (t * freq * 2.0 * 2.0 * std::f32::consts::PI).sin()
+                + 0.25 * (t * freq * 3.0 * 2.0 * std::f32::consts::PI).sin()
+                + 0.125 * (t * freq * 4.0 * 2.0 * std::f32::consts::PI).sin();
+            harmonics * env * 0.4
+        })
+        .collect();
     let sound = SoundData::from_samples(samples, sr, 1);
     save_wav("audio/pluck_string_e4", &sound);
 }
@@ -1960,7 +2225,7 @@ fn evidence_audio_pluck_string() {
 fn evidence_combined_procgen_pathfinding() {
     // Generate a cave with cellular automata, then pathfind through it
     let opts = CellularOpts {
-        fill: 0.40,  // slightly less fill for more open space
+        fill: 0.40, // slightly less fill for more open space
         iterations: 4,
         birth: 5,
         survive: 4,
@@ -2014,14 +2279,28 @@ fn evidence_combined_noise_minimap() {
 
     for y in 0..h {
         for x in 0..w {
-            let val = noise.fbm(x as f64 * 0.08, y as f64 * 0.08, 4, 2.0, 0.5, NoiseKind::Perlin);
+            let val = noise.fbm(
+                x as f64 * 0.08,
+                y as f64 * 0.08,
+                4,
+                2.0,
+                0.5,
+                NoiseKind::Perlin,
+            );
             let h_val = val * 0.5 + 0.5;
-            let terrain = if h_val < 0.25 { 0 }
-                else if h_val < 0.35 { 1 }
-                else if h_val < 0.4 { 2 }
-                else if h_val < 0.65 { 3 }
-                else if h_val < 0.8 { 4 }
-                else { 5 };
+            let terrain = if h_val < 0.25 {
+                0
+            } else if h_val < 0.35 {
+                1
+            } else if h_val < 0.4 {
+                2
+            } else if h_val < 0.65 {
+                3
+            } else if h_val < 0.8 {
+                4
+            } else {
+                5
+            };
             mm.set_terrain(x, y, terrain);
         }
     }
@@ -2029,7 +2308,6 @@ fn evidence_combined_noise_minimap() {
     let img = mm.draw_to_image(8);
     save_png("combined/noise_minimap", &img);
 }
-
 
 // ═══════════════════════════════════════════════════════════════════
 // ██  SHAPES & POLYGON EVIDENCE
@@ -2082,7 +2360,10 @@ fn evidence_audio_stereo_pan_sweep() {
 
     let sd = SoundData::from_samples(stereo.clone(), sr, 2);
     save_wav("audio/stereo_pan_sweep", &sd);
-    save_png("audio/stereo_pan_sweep_waveform", &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400));
+    save_png(
+        "audio/stereo_pan_sweep_waveform",
+        &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400),
+    );
 }
 
 /// Hard-left stereo: tone only in left channel, silence in right.
@@ -2094,12 +2375,15 @@ fn evidence_audio_stereo_hard_left() {
     for i in 0..samples {
         let t = i as f32 / sr as f32;
         let tone = (t * 440.0 * std::f32::consts::TAU).sin() * 0.7;
-        stereo.push(tone);  // left
-        stereo.push(0.0);   // right: silence
+        stereo.push(tone); // left
+        stereo.push(0.0); // right: silence
     }
     let sd = SoundData::from_samples(stereo.clone(), sr, 2);
     save_wav("audio/stereo_hard_left", &sd);
-    save_png("audio/stereo_hard_left_waveform", &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400));
+    save_png(
+        "audio/stereo_hard_left_waveform",
+        &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400),
+    );
 }
 
 /// Hard-right stereo: tone only in right channel, silence in left.
@@ -2111,12 +2395,15 @@ fn evidence_audio_stereo_hard_right() {
     for i in 0..samples {
         let t = i as f32 / sr as f32;
         let tone = (t * 440.0 * std::f32::consts::TAU).sin() * 0.7;
-        stereo.push(0.0);   // left: silence
-        stereo.push(tone);  // right
+        stereo.push(0.0); // left: silence
+        stereo.push(tone); // right
     }
     let sd = SoundData::from_samples(stereo.clone(), sr, 2);
     save_wav("audio/stereo_hard_right", &sd);
-    save_png("audio/stereo_hard_right_waveform", &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400));
+    save_png(
+        "audio/stereo_hard_right_waveform",
+        &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400),
+    );
 }
 
 /// Stereo ping-pong: alternating bursts in left and right channels.
@@ -2131,13 +2418,20 @@ fn evidence_audio_stereo_ping_pong() {
         let t = i as f32 / sr as f32;
         let burst_idx = i / burst_len;
         let tone = (t * 660.0 * std::f32::consts::TAU).sin() * 0.6;
-        let (left, right) = if burst_idx % 2 == 0 { (tone, 0.0) } else { (0.0, tone) };
+        let (left, right) = if burst_idx % 2 == 0 {
+            (tone, 0.0)
+        } else {
+            (0.0, tone)
+        };
         stereo.push(left);
         stereo.push(right);
     }
     let sd = SoundData::from_samples(stereo.clone(), sr, 2);
     save_wav("audio/stereo_ping_pong", &sd);
-    save_png("audio/stereo_ping_pong_waveform", &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400));
+    save_png(
+        "audio/stereo_ping_pong_waveform",
+        &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400),
+    );
 }
 
 /// Spatial audio simulation: tone moving in a circle around the listener.
@@ -2155,11 +2449,14 @@ fn evidence_audio_spatial_circle() {
         // Pan using angle: cos(0)=right, cos(PI)=left
         let pan = (angle.cos() + 1.0) * 0.5; // 0=left, 1=right
         stereo.push(tone * (1.0 - pan)); // left
-        stereo.push(tone * pan);          // right
+        stereo.push(tone * pan); // right
     }
     let sd = SoundData::from_samples(stereo.clone(), sr, 2);
     save_wav("audio/spatial_circle", &sd);
-    save_png("audio/spatial_circle_waveform", &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400));
+    save_png(
+        "audio/spatial_circle_waveform",
+        &visualization::waveform_stereo_to_image(&stereo, sr, 800, 400),
+    );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2171,12 +2468,24 @@ fn evidence_audio_spatial_circle() {
 fn evidence_raycaster_textured_walls() {
     let mut rc = Raycaster2D::new(16, 16);
     // Create rooms with different wall types
-    for x in 0u32..16 { rc.set_cell(x, 0, 1); rc.set_cell(x, 15, 1); }
-    for y in 0u32..16 { rc.set_cell(0, y, 2); rc.set_cell(15, y, 2); }
+    for x in 0u32..16 {
+        rc.set_cell(x, 0, 1);
+        rc.set_cell(x, 15, 1);
+    }
+    for y in 0u32..16 {
+        rc.set_cell(0, y, 2);
+        rc.set_cell(15, y, 2);
+    }
     // Internal walls
-    for x in 4u32..8 { rc.set_cell(x, 4, 3); }
-    for y in 4u32..10 { rc.set_cell(7, y, 4); }
-    for x in 10u32..14 { rc.set_cell(x, 8, 5); }
+    for x in 4u32..8 {
+        rc.set_cell(x, 4, 3);
+    }
+    for y in 4u32..10 {
+        rc.set_cell(7, y, 4);
+    }
+    for x in 10u32..14 {
+        rc.set_cell(x, 8, 5);
+    }
 
     let img = rc.draw_view_to_image(3.0, 3.0, 0.6, std::f32::consts::FRAC_PI_3, 320, 200, 20.0);
     save_png("raycaster/textured_walls", &img);
@@ -2187,19 +2496,23 @@ fn evidence_raycaster_textured_walls() {
 fn evidence_raycaster_camera_sweep() {
     let mut rc = Raycaster2D::new(16, 16);
     // Simple walls
-    for x in 0u32..16 { rc.set_cell(x, 0, 1); rc.set_cell(x, 15, 1); }
-    for y in 0u32..16 { rc.set_cell(0, y, 1); rc.set_cell(15, y, 1); }
+    for x in 0u32..16 {
+        rc.set_cell(x, 0, 1);
+        rc.set_cell(x, 15, 1);
+    }
+    for y in 0u32..16 {
+        rc.set_cell(0, y, 1);
+        rc.set_cell(15, y, 1);
+    }
     // Pillars
-    rc.set_cell(4, 4, 2); rc.set_cell(4, 11, 2);
-    rc.set_cell(11, 4, 2); rc.set_cell(11, 11, 2);
+    rc.set_cell(4, 4, 2);
+    rc.set_cell(4, 11, 2);
+    rc.set_cell(11, 4, 2);
+    rc.set_cell(11, 11, 2);
     rc.set_cell(8, 8, 3);
 
-    let img = rc.draw_camera_sweep_to_image(
-        8.0, 8.0,
-        std::f32::consts::FRAC_PI_3,
-        20.0,
-        12, 120, 90,
-    );
+    let img =
+        rc.draw_camera_sweep_to_image(8.0, 8.0, std::f32::consts::FRAC_PI_3, 20.0, 12, 120, 90);
     save_png("raycaster/camera_sweep_12_angles", &img);
 }
 
@@ -2209,14 +2522,33 @@ fn evidence_raycaster_maze() {
     let mut rc = Raycaster2D::new(24, 24);
     // Outer walls
     for i in 0u32..24 {
-        rc.set_cell(i, 0, 1); rc.set_cell(i, 23, 1);
-        rc.set_cell(0, i, 1); rc.set_cell(23, i, 1);
+        rc.set_cell(i, 0, 1);
+        rc.set_cell(i, 23, 1);
+        rc.set_cell(0, i, 1);
+        rc.set_cell(23, i, 1);
     }
     // Maze corridors
-    for x in 2u32..22 { if x != 6 && x != 12 && x != 18 { rc.set_cell(x, 6, 2); } }
-    for x in 2u32..22 { if x != 4 && x != 10 && x != 16 { rc.set_cell(x, 12, 3); } }
-    for x in 2u32..22 { if x != 8 && x != 14 && x != 20 { rc.set_cell(x, 18, 4); } }
-    for y in 2u32..22 { if y % 4 != 0 { rc.set_cell(8, y, 2); rc.set_cell(16, y, 2); } }
+    for x in 2u32..22 {
+        if x != 6 && x != 12 && x != 18 {
+            rc.set_cell(x, 6, 2);
+        }
+    }
+    for x in 2u32..22 {
+        if x != 4 && x != 10 && x != 16 {
+            rc.set_cell(x, 12, 3);
+        }
+    }
+    for x in 2u32..22 {
+        if x != 8 && x != 14 && x != 20 {
+            rc.set_cell(x, 18, 4);
+        }
+    }
+    for y in 2u32..22 {
+        if y % 4 != 0 {
+            rc.set_cell(8, y, 2);
+            rc.set_cell(16, y, 2);
+        }
+    }
 
     let img = rc.draw_view_to_image(3.0, 3.0, 0.4, std::f32::consts::FRAC_PI_3, 400, 250, 30.0);
     save_png("raycaster/maze_scene", &img);
@@ -2239,7 +2571,9 @@ fn evidence_procgen_bsp_dungeon() {
             // Carve interior
             for ry in (y + 1)..(y + rh - 1) {
                 for rx in (x + 1)..(x + rw - 1) {
-                    if rx < w && ry < w { grid[(ry * w + rx) as usize] = 0; }
+                    if rx < w && ry < w {
+                        grid[(ry * w + rx) as usize] = 0;
+                    }
                 }
             }
             return;
@@ -2251,14 +2585,22 @@ fn evidence_procgen_bsp_dungeon() {
             carve_room(grid, w, x + split, y, rw - split, rh, depth + 1);
             // Connect with corridor
             let cy = y + rh / 2;
-            for rx in x..(x + rw) { if rx < w { grid[(cy * w + rx) as usize] = 0; } }
+            for rx in x..(x + rw) {
+                if rx < w {
+                    grid[(cy * w + rx) as usize] = 0;
+                }
+            }
         } else {
             let split = rh / 3 + (depth * 11 % (rh / 3 + 1));
             let split = split.min(rh - 3).max(3);
             carve_room(grid, w, x, y, rw, split, depth + 1);
             carve_room(grid, w, x, y + split, rw, rh - split, depth + 1);
             let cx = x + rw / 2;
-            for ry in y..(y + rh) { if ry < w { grid[(ry * w + cx) as usize] = 0; } }
+            for ry in y..(y + rh) {
+                if ry < w {
+                    grid[(ry * w + cx) as usize] = 0;
+                }
+            }
         }
     }
 
@@ -2291,15 +2633,19 @@ fn evidence_procgen_terrain_elevation() {
 fn evidence_procgen_octave_comparison() {
     let tile: usize = 128;
     let gen = NoiseGenerator::new(99);
-    let maps: Vec<Vec<f64>> = [1u32, 3, 6, 8].iter().map(|&octaves| {
-        let opts = MapGenOptions {
-            kind: NoiseKind::Perlin,
-            octaves,
-            scale_x: 0.04, scale_y: 0.04,
-            ..Default::default()
-        };
-        gen.generate_map(tile as u32, tile as u32, &opts)
-    }).collect();
+    let maps: Vec<Vec<f64>> = [1u32, 3, 6, 8]
+        .iter()
+        .map(|&octaves| {
+            let opts = MapGenOptions {
+                kind: NoiseKind::Perlin,
+                octaves,
+                scale_x: 0.04,
+                scale_y: 0.04,
+                ..Default::default()
+            };
+            gen.generate_map(tile as u32, tile as u32, &opts)
+        })
+        .collect();
     let refs: Vec<&[f64]> = maps.iter().map(|v| v.as_slice()).collect();
     let img = visualization::noise_comparison_to_image(&refs, tile as u32, tile as u32);
     save_png("procgen/octave_comparison_1_3_6_8", &img);
@@ -2321,8 +2667,10 @@ fn evidence_particle_explosion() {
     ps.move_to(200.0, 200.0);
     ps.start();
     ps.emit(500); // burst
-    // Simulate several frames
-    for _ in 0..20 { ps.update(0.05); }
+                  // Simulate several frames
+    for _ in 0..20 {
+        ps.update(0.05);
+    }
 
     let img = ps.draw_explosion_to_image(400, 400);
     save_png("particle/explosion", &img);
@@ -2334,16 +2682,18 @@ fn evidence_particle_rain() {
     let config = ParticleConfig {
         max_particles: 300,
         emission_rate: 150.0,
-        direction: std::f32::consts::FRAC_PI_2,  // downward
-        spread: 0.3,                               // slight angle spread
+        direction: std::f32::consts::FRAC_PI_2, // downward
+        spread: 0.3,                            // slight angle spread
         speed_min: 100.0,
         speed_max: 200.0,
         ..Default::default()
     };
     let mut ps = ParticleSystem::new(config);
-    ps.move_to(200.0, 10.0);  // top-center
+    ps.move_to(200.0, 10.0); // top-center
     ps.start();
-    for _ in 0..40 { ps.update(0.033); }
+    for _ in 0..40 {
+        ps.update(0.033);
+    }
 
     let img = ps.draw_rain_to_image(400, 300);
     save_png("particle/rain", &img);
@@ -2379,7 +2729,9 @@ fn evidence_particle_spark_trail() {
 
         let age = (1.0 - t) * 0.8 + 0.1;
         let steps = (age / 0.016) as usize;
-        for _ in 0..steps { ps.update(0.016); }
+        for _ in 0..steps {
+            ps.update(0.016);
+        }
 
         let spark_img = ps.draw_spark_trail_to_image(400, 300);
         // Composite spark particles onto the canvas
@@ -2411,9 +2763,7 @@ fn evidence_particle_spark_trail() {
 fn evidence_overlay_flash_sequence() {
     let mut overlay = Overlay::new(200, 150);
     let steps = [0.0f32, 0.15, 0.3, 0.45];
-    let img = overlay.draw_flash_sequence_to_image(
-        1.0, 0.0, 0.0, 0.8, 0.5, &steps, 200, 150,
-    );
+    let img = overlay.draw_flash_sequence_to_image(1.0, 0.0, 0.0, 0.8, 0.5, &steps, 200, 150);
     save_png("overlay/flash_sequence", &img);
 }
 
@@ -2443,9 +2793,15 @@ fn evidence_overlay_fade_transition() {
     // Sample 6 time points
     let mut steps = Vec::new();
     for frame in 0..6 {
-        if frame > 0 { overlay.update(0.18); }
+        if frame > 0 {
+            overlay.update(0.18);
+        }
         let active = overlay.is_active();
-        let brightness = if active { 1.0 - frame as f32 / 6.0 } else { 1.0 };
+        let brightness = if active {
+            1.0 - frame as f32 / 6.0
+        } else {
+            1.0
+        };
         steps.push(1.0 - brightness);
     }
 
@@ -2575,9 +2931,33 @@ fn evidence_image_dimensions_and_pixels() {
 #[test]
 fn evidence_math_bezier_cubic_curves() {
     let curve_data: &[(Vec<Vec2>, (u8, u8, u8))] = &[
-        (vec![Vec2::new(50.0, 350.0), Vec2::new(100.0, 50.0), Vec2::new(300.0, 50.0), Vec2::new(350.0, 350.0)], (255, 80, 80)),
-        (vec![Vec2::new(50.0, 200.0), Vec2::new(150.0, 50.0), Vec2::new(250.0, 350.0), Vec2::new(350.0, 200.0)], (80, 255, 80)),
-        (vec![Vec2::new(50.0, 100.0), Vec2::new(200.0, 350.0), Vec2::new(200.0, 50.0), Vec2::new(350.0, 300.0)], (80, 80, 255)),
+        (
+            vec![
+                Vec2::new(50.0, 350.0),
+                Vec2::new(100.0, 50.0),
+                Vec2::new(300.0, 50.0),
+                Vec2::new(350.0, 350.0),
+            ],
+            (255, 80, 80),
+        ),
+        (
+            vec![
+                Vec2::new(50.0, 200.0),
+                Vec2::new(150.0, 50.0),
+                Vec2::new(250.0, 350.0),
+                Vec2::new(350.0, 200.0),
+            ],
+            (80, 255, 80),
+        ),
+        (
+            vec![
+                Vec2::new(50.0, 100.0),
+                Vec2::new(200.0, 350.0),
+                Vec2::new(200.0, 50.0),
+                Vec2::new(350.0, 300.0),
+            ],
+            (80, 80, 255),
+        ),
     ];
     let img = visualization::bezier_curves_to_image(curve_data, 400, 400);
     save_png("math/bezier_cubic_curves", &img);
@@ -2620,7 +3000,10 @@ fn evidence_audio_adsr_envelope() {
 
     let sd = SoundData::from_samples(samples.clone(), sr, 1);
     save_wav("audio/adsr_envelope", &sd);
-    save_png("audio/adsr_envelope_waveform", &visualization::waveform_to_image(&samples, sr, 800, 300));
+    save_png(
+        "audio/adsr_envelope_waveform",
+        &visualization::waveform_to_image(&samples, sr, 800, 300),
+    );
 }
 
 /// White noise and pink noise spectrum comparison.
@@ -2633,7 +3016,9 @@ fn evidence_audio_noise_spectrum() {
     let mut white = Vec::with_capacity(total);
     let mut rng_state = 12345u64;
     for _ in 0..total {
-        rng_state = rng_state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+        rng_state = rng_state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
         let val = (rng_state >> 33) as f32 / (1u64 << 31) as f32 - 1.0;
         white.push(val * 0.5);
     }
@@ -2657,8 +3042,14 @@ fn evidence_audio_noise_spectrum() {
     let sd_pink = SoundData::from_samples(pink.clone(), sr, 1);
     save_wav("audio/white_noise", &sd_white);
     save_wav("audio/pink_noise", &sd_pink);
-    save_png("audio/white_noise_waveform", &visualization::waveform_to_image(&white, sr, 800, 300));
-    save_png("audio/pink_noise_waveform", &visualization::waveform_to_image(&pink, sr, 800, 300));
+    save_png(
+        "audio/white_noise_waveform",
+        &visualization::waveform_to_image(&white, sr, 800, 300),
+    );
+    save_png(
+        "audio/pink_noise_waveform",
+        &visualization::waveform_to_image(&pink, sr, 800, 300),
+    );
 }
 
 /// DSP effect chain: lowpass → reverb applied in sequence.
@@ -2700,9 +3091,18 @@ fn evidence_audio_dsp_chain() {
 
     let sd = SoundData::from_samples(after_chain.clone(), sr, 1);
     save_wav("audio_dsp/chain_lowpass_reverb", &sd);
-    save_png("audio_dsp/chain_before_waveform", &visualization::waveform_to_image(&rich, sr, 800, 300));
-    save_png("audio_dsp/chain_after_lowpass_waveform", &visualization::waveform_to_image(&after_lp, sr, 800, 300));
-    save_png("audio_dsp/chain_final_waveform", &visualization::waveform_to_image(&after_chain, sr, 800, 300));
+    save_png(
+        "audio_dsp/chain_before_waveform",
+        &visualization::waveform_to_image(&rich, sr, 800, 300),
+    );
+    save_png(
+        "audio_dsp/chain_after_lowpass_waveform",
+        &visualization::waveform_to_image(&after_lp, sr, 800, 300),
+    );
+    save_png(
+        "audio_dsp/chain_final_waveform",
+        &visualization::waveform_to_image(&after_chain, sr, 800, 300),
+    );
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -2718,11 +3118,23 @@ fn evidence_pathfinding_weighted_terrain() {
 
     // Create terrain with different costs
     // Forest (cost 3) in the middle
-    for y in 10..30 { for x in 10..30 { grid.set_cost(x, y, 3); } }
+    for y in 10..30 {
+        for x in 10..30 {
+            grid.set_cost(x, y, 3);
+        }
+    }
     // Swamp (cost 5) in upper area
-    for y in 5..15 { for x in 15..35 { grid.set_cost(x, y, 5); } }
+    for y in 5..15 {
+        for x in 15..35 {
+            grid.set_cost(x, y, 5);
+        }
+    }
     // Walls (blocked)
-    for x in 20..22 { for y in 15..35 { grid.set_blocked(x, y, true); } }
+    for x in 20..22 {
+        for y in 15..35 {
+            grid.set_blocked(x, y, true);
+        }
+    }
 
     // Find path
     let (path, _found) = astar(&grid, (2, 20), (38, 20), 1, 5000);
@@ -2751,7 +3163,16 @@ fn evidence_pathfinding_weighted_terrain() {
     // Draw path
     if let Some(ref path) = path {
         for &(px, py) in path {
-            img.draw_rect((px * 6 + 1) as i32, (py * 6 + 1) as i32, 3, 3, 255, 220, 50, 255);
+            img.draw_rect(
+                (px * 6 + 1) as i32,
+                (py * 6 + 1) as i32,
+                3,
+                3,
+                255,
+                220,
+                50,
+                255,
+            );
         }
     }
 
@@ -2773,18 +3194,21 @@ fn evidence_combined_terrain_raycaster() {
     let opts = MapGenOptions {
         kind: NoiseKind::Perlin,
         octaves: 3,
-        scale_x: 0.15, scale_y: 0.15,
+        scale_x: 0.15,
+        scale_y: 0.15,
         ..Default::default()
     };
     let noise = gen.generate_map(24, 24, &opts);
 
     let mut rc = Raycaster2D::new(24, 24);
-    for y in 0usize..24 { for x in 0usize..24 {
-        let v = noise[y * 24 + x] * 0.5 + 0.5;
-        if v > 0.5 {
-            rc.set_cell(x as u32, y as u32, 1 + (v * 3.0) as u32);
+    for y in 0usize..24 {
+        for x in 0usize..24 {
+            let v = noise[y * 24 + x] * 0.5 + 0.5;
+            if v > 0.5 {
+                rc.set_cell(x as u32, y as u32, 1 + (v * 3.0) as u32);
+            }
         }
-    }}
+    }
     // Ensure player position is clear
     rc.set_cell(12, 12, 0);
     rc.set_cell(11, 12, 0);
@@ -2800,9 +3224,11 @@ fn evidence_combined_tilemap_particles() {
     let mut tm = TileMap::new(16, 12, 16);
     let ground = tm.add_layer("ground", 16, 12);
     // Ground tiles
-    for y in 0..12 { for x in 0..16 {
-        tm.set_tile(ground, x, y, if (x + y) % 2 == 0 { 1 } else { 2 });
-    }}
+    for y in 0..12 {
+        for x in 0..16 {
+            tm.set_tile(ground, x, y, if (x + y) % 2 == 0 { 1 } else { 2 });
+        }
+    }
 
     // Create particle system
     let config = ParticleConfig {
@@ -2813,15 +3239,23 @@ fn evidence_combined_tilemap_particles() {
     let mut ps = ParticleSystem::new(config);
     ps.move_to(128.0, 96.0);
     ps.start();
-    for _ in 0..30 { ps.update(0.033); }
+    for _ in 0..30 {
+        ps.update(0.033);
+    }
 
     let mut bg = ImageData::new(256, 192);
     bg.fill(15, 15, 25, 255);
-    for y in 0..12u32 { for x in 0..16u32 {
-        let tile = tm.get_tile(ground, x, y);
-        let (r, g, b): (u8, u8, u8) = if tile == 1 { (50, 70, 50) } else { (40, 60, 40) };
-        bg.draw_rect((x * 16) as i32, (y * 16) as i32, 16, 16, r, g, b, 255);
-    }}
+    for y in 0..12u32 {
+        for x in 0..16u32 {
+            let tile = tm.get_tile(ground, x, y);
+            let (r, g, b): (u8, u8, u8) = if tile == 1 {
+                (50, 70, 50)
+            } else {
+                (40, 60, 40)
+            };
+            bg.draw_rect((x * 16) as i32, (y * 16) as i32, 16, 16, r, g, b, 255);
+        }
+    }
     let img = ps.draw_over_image(bg);
     save_png("combined/tilemap_particles", &img);
 }
@@ -2835,22 +3269,57 @@ fn evidence_chart_line_chart() {
         width: 400,
         height: 300,
         title: Some("LINE CHART".to_string()),
-        margin: ChartMargin { left: 40, right: 30, top: 30, bottom: 40 },
+        margin: ChartMargin {
+            left: 40,
+            right: 30,
+            top: 30,
+            bottom: 40,
+        },
         ..ChartConfig::default()
     };
     let mut chart = LineChart::new(cfg);
     chart.y_max = 100.0;
     chart.x_max = 6.0;
 
-    chart.add_series("SALES", &[
-        (0.0,20.0),(1.0,45.0),(2.0,35.0),(3.0,60.0),(4.0,55.0),(5.0,80.0),(6.0,75.0),
-    ], Color::new(0.86, 0.24, 0.24, 1.0));
-    chart.add_series("COSTS", &[
-        (0.0,10.0),(1.0,25.0),(2.0,50.0),(3.0,40.0),(4.0,70.0),(5.0,65.0),(6.0,90.0),
-    ], Color::new(0.24, 0.55, 0.86, 1.0));
-    chart.add_series("MISC", &[
-        (0.0,50.0),(1.0,40.0),(2.0,30.0),(3.0,45.0),(4.0,35.0),(5.0,25.0),(6.0,40.0),
-    ], Color::new(0.24, 0.71, 0.31, 1.0));
+    chart.add_series(
+        "SALES",
+        &[
+            (0.0, 20.0),
+            (1.0, 45.0),
+            (2.0, 35.0),
+            (3.0, 60.0),
+            (4.0, 55.0),
+            (5.0, 80.0),
+            (6.0, 75.0),
+        ],
+        Color::new(0.86, 0.24, 0.24, 1.0),
+    );
+    chart.add_series(
+        "COSTS",
+        &[
+            (0.0, 10.0),
+            (1.0, 25.0),
+            (2.0, 50.0),
+            (3.0, 40.0),
+            (4.0, 70.0),
+            (5.0, 65.0),
+            (6.0, 90.0),
+        ],
+        Color::new(0.24, 0.55, 0.86, 1.0),
+    );
+    chart.add_series(
+        "MISC",
+        &[
+            (0.0, 50.0),
+            (1.0, 40.0),
+            (2.0, 30.0),
+            (3.0, 45.0),
+            (4.0, 35.0),
+            (5.0, 25.0),
+            (6.0, 40.0),
+        ],
+        Color::new(0.24, 0.71, 0.31, 1.0),
+    );
 
     let img = chart.draw_to_image();
     save_png("chart/line_chart", &img);
@@ -2864,7 +3333,12 @@ fn evidence_chart_bar_chart() {
         height: 300,
         title: Some("BAR CHART".to_string()),
         bg_color: (245, 245, 248),
-        margin: ChartMargin { left: 45, right: 20, top: 30, bottom: 40 },
+        margin: ChartMargin {
+            left: 45,
+            right: 20,
+            top: 30,
+            bottom: 40,
+        },
         ..ChartConfig::default()
     };
     let mut chart = BarChart::new(cfg);
@@ -2888,7 +3362,12 @@ fn evidence_chart_scatter_plot() {
         height: 400,
         title: Some("SCATTER PLOT".to_string()),
         bg_color: (248, 248, 250),
-        margin: ChartMargin { left: 40, right: 20, top: 30, bottom: 30 },
+        margin: ChartMargin {
+            left: 40,
+            right: 20,
+            top: 30,
+            bottom: 30,
+        },
         ..ChartConfig::default()
     };
     let mut chart = ScatterPlot::new(cfg);
@@ -2955,12 +3434,27 @@ fn evidence_chart_area_chart() {
     };
     let mut chart = AreaChart::new(cfg);
 
-    chart.add_layer("ALPHA", &[20.0, 25.0, 30.0, 28.0, 35.0, 40.0, 38.0, 45.0, 42.0, 50.0, 48.0, 55.0],
-        Color::new(0.39, 0.59, 0.86, 1.0));
-    chart.add_layer("BETA", &[15.0, 18.0, 20.0, 22.0, 18.0, 25.0, 28.0, 24.0, 30.0, 28.0, 32.0, 30.0],
-        Color::new(0.39, 0.71, 0.39, 1.0));
-    chart.add_layer("GAMMA", &[10.0, 12.0, 8.0, 15.0, 12.0, 10.0, 14.0, 12.0, 8.0, 15.0, 10.0, 12.0],
-        Color::new(0.71, 0.39, 0.78, 1.0));
+    chart.add_layer(
+        "ALPHA",
+        &[
+            20.0, 25.0, 30.0, 28.0, 35.0, 40.0, 38.0, 45.0, 42.0, 50.0, 48.0, 55.0,
+        ],
+        Color::new(0.39, 0.59, 0.86, 1.0),
+    );
+    chart.add_layer(
+        "BETA",
+        &[
+            15.0, 18.0, 20.0, 22.0, 18.0, 25.0, 28.0, 24.0, 30.0, 28.0, 32.0, 30.0,
+        ],
+        Color::new(0.39, 0.71, 0.39, 1.0),
+    );
+    chart.add_layer(
+        "GAMMA",
+        &[
+            10.0, 12.0, 8.0, 15.0, 12.0, 10.0, 14.0, 12.0, 8.0, 15.0, 10.0, 12.0,
+        ],
+        Color::new(0.71, 0.39, 0.78, 1.0),
+    );
 
     let img = chart.draw_to_image();
     save_png("chart/area_chart", &img);
@@ -2988,36 +3482,39 @@ fn evidence_gui_hud_bars() {
     save_png("gui/hud_bars", &img);
 }
 
-
 // ===== POSTFX / OVERLAY / STACK — Effect system evidence =====
 
 /// Catalog all 16 PostFxEffectType variants — construction, parameters, type names.
 #[test]
 fn evidence_postfx_effect_catalog() {
     let variants: Vec<(PostFxEffectType, &str, (u8, u8, u8))> = vec![
-        (PostFxEffectType::Bloom,       "BLOOM",       (255, 220, 100)),
-        (PostFxEffectType::Blur,        "BLUR",        (150, 150, 220)),
-        (PostFxEffectType::Crt,         "CRT",         (100, 220, 100)),
-        (PostFxEffectType::Godrays,     "GODRAYS",     (255, 200, 80)),
-        (PostFxEffectType::Vignette,    "VIGNETTE",    (80, 60, 120)),
+        (PostFxEffectType::Bloom, "BLOOM", (255, 220, 100)),
+        (PostFxEffectType::Blur, "BLUR", (150, 150, 220)),
+        (PostFxEffectType::Crt, "CRT", (100, 220, 100)),
+        (PostFxEffectType::Godrays, "GODRAYS", (255, 200, 80)),
+        (PostFxEffectType::Vignette, "VIGNETTE", (80, 60, 120)),
         (PostFxEffectType::ColourGrade, "COLOURGRADE", (200, 120, 80)),
-        (PostFxEffectType::Chromatic,   "CHROMATIC",   (255, 80, 80)),
-        (PostFxEffectType::Pixelate,    "PIXELATE",    (80, 200, 180)),
-        (PostFxEffectType::Sepia,       "SEPIA",       (180, 150, 100)),
-        (PostFxEffectType::Grayscale,   "GRAYSCALE",   (160, 160, 160)),
-        (PostFxEffectType::Invert,      "INVERT",      (200, 200, 255)),
-        (PostFxEffectType::Scanlines,   "SCANLINES",   (100, 200, 100)),
-        (PostFxEffectType::EdgeDetect,  "EDGEDETECT",  (255, 255, 100)),
-        (PostFxEffectType::HueShift,    "HUESHIFT",    (200, 100, 255)),
-        (PostFxEffectType::Noise,       "NOISE",       (180, 180, 180)),
-        (PostFxEffectType::Custom,      "CUSTOM",      (255, 140, 60)),
+        (PostFxEffectType::Chromatic, "CHROMATIC", (255, 80, 80)),
+        (PostFxEffectType::Pixelate, "PIXELATE", (80, 200, 180)),
+        (PostFxEffectType::Sepia, "SEPIA", (180, 150, 100)),
+        (PostFxEffectType::Grayscale, "GRAYSCALE", (160, 160, 160)),
+        (PostFxEffectType::Invert, "INVERT", (200, 200, 255)),
+        (PostFxEffectType::Scanlines, "SCANLINES", (100, 200, 100)),
+        (PostFxEffectType::EdgeDetect, "EDGEDETECT", (255, 255, 100)),
+        (PostFxEffectType::HueShift, "HUESHIFT", (200, 100, 255)),
+        (PostFxEffectType::Noise, "NOISE", (180, 180, 180)),
+        (PostFxEffectType::Custom, "CUSTOM", (255, 140, 60)),
     ];
 
     // Exercise API for each variant
     for (variant, _label, _color) in &variants {
         let mut effect = PostFxEffect::new(variant.clone());
         let type_name = effect.get_type_name();
-        assert!(!type_name.is_empty(), "type_name should not be empty for {:?}", variant);
+        assert!(
+            !type_name.is_empty(),
+            "type_name should not be empty for {:?}",
+            variant
+        );
 
         if matches!(variant, PostFxEffectType::Custom) {
             assert!(!effect.is_built_in());
@@ -3075,12 +3572,36 @@ fn evidence_postfx_stack_management() {
 #[test]
 fn evidence_postfx_effect_parameters() {
     let test_cases: Vec<(PostFxEffectType, &str, Vec<(&str, f32)>)> = vec![
-        (PostFxEffectType::Bloom,     "BLOOM",     vec![("threshold", 0.8), ("intensity", 1.5), ("radius", 4.0)]),
-        (PostFxEffectType::Blur,      "BLUR",      vec![("radius", 3.0), ("sigma", 1.5)]),
-        (PostFxEffectType::Chromatic, "CHROMATIC", vec![("offset", 2.5), ("angle", 0.0)]),
-        (PostFxEffectType::Vignette,  "VIGNETTE",  vec![("strength", 0.6), ("radius", 0.8)]),
-        (PostFxEffectType::HueShift,  "HUESHIFT",  vec![("degrees", 90.0)]),
-        (PostFxEffectType::Noise,     "NOISE",     vec![("amount", 0.3), ("speed", 1.0)]),
+        (
+            PostFxEffectType::Bloom,
+            "BLOOM",
+            vec![("threshold", 0.8), ("intensity", 1.5), ("radius", 4.0)],
+        ),
+        (
+            PostFxEffectType::Blur,
+            "BLUR",
+            vec![("radius", 3.0), ("sigma", 1.5)],
+        ),
+        (
+            PostFxEffectType::Chromatic,
+            "CHROMATIC",
+            vec![("offset", 2.5), ("angle", 0.0)],
+        ),
+        (
+            PostFxEffectType::Vignette,
+            "VIGNETTE",
+            vec![("strength", 0.6), ("radius", 0.8)],
+        ),
+        (
+            PostFxEffectType::HueShift,
+            "HUESHIFT",
+            vec![("degrees", 90.0)],
+        ),
+        (
+            PostFxEffectType::Noise,
+            "NOISE",
+            vec![("amount", 0.3), ("speed", 1.0)],
+        ),
     ];
 
     for (variant, _label, params) in &test_cases {
@@ -3091,7 +3612,13 @@ fn evidence_postfx_effect_parameters() {
         for &(name, val) in params {
             effect.set_parameter(name, val);
             let got = effect.get_parameter(name, 0.0);
-            assert!((got - val).abs() < 1e-5, "param {} expected {} got {}", name, val, got);
+            assert!(
+                (got - val).abs() < 1e-5,
+                "param {} expected {} got {}",
+                name,
+                val,
+                got
+            );
             assert!(effect.has_parameter(name));
         }
         let missing = effect.get_parameter("nonexistent", 42.0);
@@ -3124,7 +3651,6 @@ fn evidence_postfx_effect_parameters() {
     let img = PostFxStack::draw_effect_parameters_to_image(&entry_slices, 500, 420);
     save_png("effects/postfx_parameters", &img);
 }
-
 
 /// Overlay system — trigger flash, shake, fade, lightning.
 #[test]
@@ -3191,7 +3717,10 @@ fn evidence_particle_trail_system() {
         trail3.push_point(x, y);
     }
     let filtered_count = trail3.get_point_count();
-    assert!(filtered_count < 100, "min_distance should filter close points");
+    assert!(
+        filtered_count < 100,
+        "min_distance should filter close points"
+    );
 
     let img3 = trail3.draw_to_image(300, 200);
     save_png("particle/trail_filtered", &img3);
@@ -3268,7 +3797,6 @@ fn evidence_particle_emitter_control() {
     save_png("particle/emitter_control", &img);
 }
 
-
 // =====================================================================
 // ===== BATCH 2 — Camera rotation, bounds, follow, shake =====
 // =====================================================================
@@ -3276,8 +3804,12 @@ fn evidence_particle_emitter_control() {
 #[test]
 fn evidence_camera_rotation_transform() {
     let rotations: Vec<(f32, &str)> = vec![
-        (0.0, "0"), (0.5, "0.5"), (1.0, "1.0"),
-        (1.57, "PI-2"), (2.1, "2.1"), (2.6, "2.6"),
+        (0.0, "0"),
+        (0.5, "0.5"),
+        (1.0, "1.0"),
+        (1.57, "PI-2"),
+        (2.1, "2.1"),
+        (2.6, "2.6"),
     ];
     // Verify rotation setter works
     for &(rot, _) in &rotations {
@@ -3285,9 +3817,7 @@ fn evidence_camera_rotation_transform() {
         cam.set_rotation(rot);
         assert!((cam.get_rotation() - rot).abs() < 1e-5);
     }
-    let img = visualization::draw_camera_rotation_grid_to_image(
-        &rotations, 120.0, 120.0, 400, 300,
-    );
+    let img = visualization::draw_camera_rotation_grid_to_image(&rotations, 120.0, 120.0, 400, 300);
     save_png("camera/rotation_transform", &img);
 }
 
@@ -3351,8 +3881,11 @@ fn evidence_camera_follow_deadzone() {
     // Simulate following for multiple frames, recording trail
     let mut trail: Vec<(f32, f32)> = Vec::new();
     let targets = [
-        (250.0f32, 180.0), (300.0, 200.0), (350.0, 150.0),
-        (280.0, 100.0), (200.0, 150.0),
+        (250.0f32, 180.0),
+        (300.0, 200.0),
+        (350.0, 150.0),
+        (280.0, 100.0),
+        (200.0, 150.0),
     ];
 
     for &(tx, ty) in &targets {
@@ -3372,7 +3905,12 @@ fn evidence_camera_follow_deadzone() {
 
     let targets_vec: Vec<(f32, f32)> = targets.to_vec();
     let img = visualization::draw_camera_follow_trail_to_image(
-        &trail, &targets_vec, (dw, dh), (cx, cy), 400, 300,
+        &trail,
+        &targets_vec,
+        (dw, dh),
+        (cx, cy),
+        400,
+        300,
     );
     save_png("camera/follow_deadzone", &img);
 }
@@ -3399,7 +3937,11 @@ fn evidence_camera_shake_effect() {
     let (vx, vy, vw, vh) = cam.get_visible_area();
 
     let img = visualization::draw_camera_shake_trail_to_image(
-        &positions, (mx, my), (vx, vy, vw, vh), 400, 200,
+        &positions,
+        (mx, my),
+        (vx, vy, vw, vh),
+        400,
+        200,
     );
     save_png("camera/shake_effect", &img);
 }
@@ -3412,8 +3954,8 @@ fn evidence_camera_shake_effect() {
 fn evidence_geometry_shapes_and_queries() {
     // Assertions — keep in test
     let points: Vec<f32> = vec![
-        50.0, 50.0, 100.0, 30.0, 150.0, 60.0, 130.0, 120.0,
-        80.0, 130.0, 40.0, 100.0, 90.0, 80.0, 110.0, 70.0,
+        50.0, 50.0, 100.0, 30.0, 150.0, 60.0, 130.0, 120.0, 80.0, 130.0, 40.0, 100.0, 90.0, 80.0,
+        110.0, 70.0,
     ];
     let _hull = lurek2d::math::convex_hull(&points);
 
@@ -3421,10 +3963,16 @@ fn evidence_geometry_shapes_and_queries() {
     assert!(lurek2d::math::point_in_polygon(&triangle, 380.0, 70.0));
     assert!(!lurek2d::math::point_in_polygon(&triangle, 320.0, 30.0));
 
-    assert!(lurek2d::math::circle_contains_point(100.0, 300.0, 40.0, 110.0, 310.0));
-    assert!(!lurek2d::math::circle_contains_point(100.0, 300.0, 40.0, 200.0, 300.0));
+    assert!(lurek2d::math::circle_contains_point(
+        100.0, 300.0, 40.0, 110.0, 310.0
+    ));
+    assert!(!lurek2d::math::circle_contains_point(
+        100.0, 300.0, 40.0, 200.0, 300.0
+    ));
 
-    assert!(lurek2d::math::circle_intersects_circle(300.0, 300.0, 30.0, 340.0, 300.0, 30.0));
+    assert!(lurek2d::math::circle_intersects_circle(
+        300.0, 300.0, 30.0, 340.0, 300.0, 30.0
+    ));
 
     let img = visualization::draw_geometry_shapes_to_image(500, 400);
     save_png("math/geometry_shapes", &img);
@@ -3434,21 +3982,17 @@ fn evidence_geometry_shapes_and_queries() {
 fn evidence_geometry_intersections() {
     // Assertions — keep in test
     let (hit, _point) = lurek2d::math::segment_intersects_segment(
-        20.0, 20.0, 150.0, 120.0,
-        20.0, 120.0, 150.0, 20.0,
+        20.0, 20.0, 150.0, 120.0, 20.0, 120.0, 150.0, 20.0,
     );
     assert!(hit);
 
     let (no_hit, _) = lurek2d::math::segment_intersects_segment(
-        20.0, 160.0, 100.0, 160.0,
-        20.0, 200.0, 100.0, 200.0,
+        20.0, 160.0, 100.0, 160.0, 20.0, 200.0, 100.0, 200.0,
     );
     assert!(!no_hit);
 
-    let (cl_hit, _p1, _p2) = lurek2d::math::circle_intersects_line(
-        300.0, 200.0, 50.0,
-        200.0, 200.0, 400.0, 200.0,
-    );
+    let (cl_hit, _p1, _p2) =
+        lurek2d::math::circle_intersects_line(300.0, 200.0, 50.0, 200.0, 200.0, 400.0, 200.0);
     assert!(cl_hit);
 
     let img = visualization::draw_geometry_intersections_to_image(450, 350);
@@ -3458,10 +4002,19 @@ fn evidence_geometry_intersections() {
 #[test]
 fn evidence_geometry_delaunay() {
     let pts: Vec<(f64, f64)> = vec![
-        (50.0, 50.0), (200.0, 30.0), (350.0, 70.0),
-        (30.0, 200.0), (150.0, 180.0), (280.0, 150.0), (370.0, 200.0),
-        (80.0, 320.0), (200.0, 350.0), (330.0, 300.0),
-        (120.0, 100.0), (250.0, 250.0), (180.0, 270.0),
+        (50.0, 50.0),
+        (200.0, 30.0),
+        (350.0, 70.0),
+        (30.0, 200.0),
+        (150.0, 180.0),
+        (280.0, 150.0),
+        (370.0, 200.0),
+        (80.0, 320.0),
+        (200.0, 350.0),
+        (330.0, 300.0),
+        (120.0, 100.0),
+        (250.0, 250.0),
+        (180.0, 270.0),
     ];
     let triangles = lurek2d::math::delaunay_triangulate(&pts);
     let img = visualization::draw_delaunay_to_image(&pts, &triangles, 400, 400);
@@ -3522,19 +4075,32 @@ fn evidence_graph_operations() {
     let stats = graph.get_stats();
     let stats_str = format!("N{} E{}", stats.nodes, stats.edges);
     let positions: Vec<(f32, f32)> = vec![
-        (80.0, 80.0), (200.0, 50.0), (320.0, 150.0),
-        (80.0, 220.0), (200.0, 250.0),
+        (80.0, 80.0),
+        (200.0, 50.0),
+        (320.0, 150.0),
+        (80.0, 220.0),
+        (200.0, 250.0),
     ];
     let node_labels = ["FACTORY", "WAREHOUSE", "SHOP", "FACTORY2", "WAREHOUSE2"];
     let node_colors = [
-        (200u8, 80, 80), (80, 160, 200), (80, 200, 80),
-        (200, 80, 80), (80, 160, 200),
+        (200u8, 80, 80),
+        (80, 160, 200),
+        (80, 200, 80),
+        (200, 80, 80),
+        (80, 160, 200),
     ];
     let edges_draw = [(0usize, 1), (1, 2), (3, 4), (4, 2)];
     let removed = [(0usize, 3)];
     let img = visualization::draw_graph_operations_to_image(
-        &positions, &node_labels, &node_colors,
-        &edges_draw, &removed, &stats_str, "GRAPH OPS OK", 400, 300,
+        &positions,
+        &node_labels,
+        &node_colors,
+        &edges_draw,
+        &removed,
+        &stats_str,
+        "GRAPH OPS OK",
+        400,
+        300,
     );
     save_png("graph/operations", &img);
 }
@@ -3583,8 +4149,14 @@ fn evidence_graph_item_flow() {
     ];
     let items_str = format!("ITEMS {}", stats.items);
     let img = visualization::draw_graph_item_flow_to_image(
-        &node_pos, &node_names, &node_colors,
-        &items, &items_str, "ITEM FLOW OK", 400, 200,
+        &node_pos,
+        &node_names,
+        &node_colors,
+        &items,
+        &items_str,
+        "ITEM FLOW OK",
+        400,
+        200,
     );
     save_png("graph/item_flow", &img);
 }
@@ -3641,9 +4213,9 @@ fn evidence_animation_playback_control() {
     anim.play("run");
     anim.set_frame(2);
     assert_eq!(anim.current_frame(), 2);
-    let quad_str = anim.current_quad().map(|q| {
-        format!("{:.0} {:.0} {:.0}X{:.0}", q.x, q.y, q.width, q.height)
-    });
+    let quad_str = anim
+        .current_quad()
+        .map(|q| format!("{:.0} {:.0} {:.0}X{:.0}", q.x, q.y, q.width, q.height));
 
     anim.play("jump");
     for _ in 0..20 {
@@ -3653,9 +4225,13 @@ fn evidence_animation_playback_control() {
 
     let summary = format!("{} FRAMES {} CLIPS", anim.get_frame_count(), 4);
     let img = visualization::animation_playback_control_to_image(
-        &run_frames, &idle_frames, 8,
-        quad_str.as_deref(), &summary,
-        500, 350,
+        &run_frames,
+        &idle_frames,
+        8,
+        quad_str.as_deref(),
+        &summary,
+        500,
+        350,
     );
     save_png("animation/playback_control", &img);
 }
@@ -3717,7 +4293,8 @@ fn evidence_layers_management() {
     let img = visualization::draw_image_comparison_to_image(
         &[&merged1, &merged2, &merged3],
         &["ORIGINAL", "SWAPPED", "REMOVED"],
-        620, 220,
+        620,
+        220,
     );
     save_png("layers/management", &img);
 }
@@ -3770,7 +4347,11 @@ fn evidence_sound_data_manipulation() {
     // Visualize via domain method
     let label = format!("{} HZ {} SAMP", freq as i32, sample_count);
     let img = visualization::draw_sound_waveform_to_image(
-        sound.samples(), &label, 500, 200, (200, 150, 120),
+        sound.samples(),
+        &label,
+        500,
+        200,
+        (200, 150, 120),
     );
     save_png("audio/sound_data_manipulation", &img);
 }
@@ -3947,16 +4528,26 @@ fn evidence_raycaster_procedural_textures() {
     let mut rc = Raycaster2D::new(16, 16);
 
     // Build map: outer walls + inner structures
-    for x in 0u32..16 { rc.set_cell(x, 0, 1); rc.set_cell(x, 15, 2); }
-    for y in 0u32..16 { rc.set_cell(0, y, 3); rc.set_cell(15, y, 4); }
+    for x in 0u32..16 {
+        rc.set_cell(x, 0, 1);
+        rc.set_cell(x, 15, 2);
+    }
+    for y in 0u32..16 {
+        rc.set_cell(0, y, 3);
+        rc.set_cell(15, y, 4);
+    }
     // Pillars
     rc.set_cell(5, 5, 5);
     rc.set_cell(10, 5, 5);
     rc.set_cell(5, 10, 5);
     rc.set_cell(10, 10, 5);
     // Internal wall
-    for x in 7u32..9 { rc.set_cell(x, 3, 6); rc.set_cell(x, 12, 6); }
+    for x in 7u32..9 {
+        rc.set_cell(x, 3, 6);
+        rc.set_cell(x, 12, 6);
+    }
 
-    let img = rc.draw_textured_view_to_image(3.5, 8.0, 0.4, std::f32::consts::FRAC_PI_3, 640, 400, 20.0);
+    let img =
+        rc.draw_textured_view_to_image(3.5, 8.0, 0.4, std::f32::consts::FRAC_PI_3, 640, 400, 20.0);
     save_png("raycaster/procedural_textures", &img);
 }
