@@ -144,6 +144,10 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                             .get("code")
                             .and_then(|v| v.as_str())
                             .unwrap_or("");
+                        // LUA-EVAL-JUSTIFIED: lua.load() here is the core feature of the debug-bridge
+                        // eval endpoint — it executes user-supplied Lua code from the connected
+                        // debug client.  This cannot be expressed as a Rust tbl.set() call
+                        // because the code string is dynamic and unknown at registration time.
                         match lua.load(code).eval::<LuaMultiValue>() {
                             Ok(vals) => {
                                 let values: Vec<serde_json::Value> = vals
@@ -158,7 +162,9 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                         }
                     }
                     "getCallStack" => {
-                        // Use debug.getinfo if available
+                        // LUA-EVAL-JUSTIFIED: lua.load() is required here because `debug.getinfo` is a
+                        // Lua C function that operates inside the Lua VM's debug state; mlua
+                        // provides no equivalent Rust API for stack-frame introspection.
                         let stack_result: LuaResult<LuaTable> = lua
                             .load(concat!(
                                 "local frames = {}\n",

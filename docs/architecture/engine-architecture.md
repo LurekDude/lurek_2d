@@ -105,10 +105,10 @@ content/library/  (Tier 3: Lunasome, pure Lua)
       Tier 2 extensions (particle, tilemap, scene, ai, pathfinding, ...)
             │ may import Tier 1
             ▼
-   Tier 1 core subsystems (graphics, audio, physics, input, timer, ...)
+   Tier 1 core subsystems (render, audio, physics, input, timer, ...)
             │ may import only Baseline
             ▼
-Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState)
+Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState) + src/runtime/ (substrate)
 ```
 
 ### Import Rules Summary
@@ -162,6 +162,20 @@ All other layers may freely import `math`.
 | `resource_keys.rs` | All SlotMap key type definitions |
 
 `SharedState` is defined here as the central runtime state shared with Lua closures via `Rc<RefCell<SharedState>>`.
+
+### `runtime/` — Extended Runtime Substrate
+
+`runtime` extends the Baseline alongside `engine/`. It provides stable log message ID constants, a TOML-backed message catalog, additional configuration types, and resource key utilities. All other modules may import from it.
+
+| File | Responsibility |
+|---|---|
+| `mod.rs` | Re-exports Config, SharedState, EngineError, resource key types, and `create_lua_vm` |
+| `config.rs` | `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig` |
+| `error.rs` | `EngineError` (12+ variants), `EngineResult<T>` |
+| `log_messages.rs` | Stable message ID constants (`L001`–`L082`), `set_log_level`, `log_msg!` macro |
+| `messages.rs` | `MessageCatalog` — TOML-backed message lookup |
+| `resource_keys.rs` | 14 typed SlotMap key newtypes (`TextureKey`, `FontKey`, `CanvasKey`, etc.) |
+| `shared_state.rs` | `SharedState`, `WindowState`, `FullscreenType`, `ErrorInfo`, `ScreenshotRequest` |
 
 ---
 
@@ -247,18 +261,19 @@ Tier 1 modules are engine-owned capabilities that sit directly on Baseline. **Im
 | `debugbridge` | `src/debugbridge/` | JSON-over-TCP debug server for VS Code extension and MCP remote inspection |
 | `devtools` | `src/devtools/` | Engine and game diagnostics: structured runtime monitoring and performance analysis |
 | `docs` | `src/docs/` | API documentation catalog powering IntelliSense, MCP tools, and doc generators |
-| `entity` | `src/entity/` | Lightweight ECS primitives and entity helpers |
+| `entity` | `src/ecs/` | Lightweight ECS primitives and entity helpers |
 | `event` | `src/event/` | Event queue and polling primitives |
 | `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
-| `graphics` | `src/graphics/` | GPU rendering pipeline, draw commands, textures, fonts, batching, shaders |
+| `render` | `src/render/` | GPU rendering pipeline, draw commands, textures, fonts, batching, shaders |
 | `image` | `src/image/` | CPU-side image manipulation (ImageData) |
 | `input` | `src/input/` | Keyboard, mouse, gamepad, and touch state management |
-| `localization` | `src/localization/` | Multi-locale string catalog with variable substitution and plural form selection |
+| `localization` | `src/i18n/` | Multi-locale string catalog with variable substitution and plural form selection |
 | `log` | `src/log/` | Structured Lua-script logging at configurable severity levels |
 | `patterns` | `src/patterns/` | Pure-Rust game-programming design patterns (FSM, observer, service locator, etc.) |
 | `physics` | `src/physics/` | Rigid bodies, shapes, collisions, joints, raycasting via rapier2d |
 | `thread` | `src/thread/` | Background Rust threads and Channel communication |
 | `timer` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
+| `tween` | `src/tween/` | Property animation system: tweens, sequences, parallel groups, and easing functions |
 | `window` | `src/window/` | Window lifecycle and state abstraction |
 
 ---
@@ -277,8 +292,9 @@ Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many 
 | `gui` | `src/gui/` | Retained-mode widget UI primitives |
 | `light` | `src/light/` | CPU-side 2D dynamic lighting data model (point, spot, directional) |
 | `minimap` | `src/minimap/` | Minimap extraction, FOV masking, tile sampling |
-| `modding` | `src/modding/` | Mod discovery, dependency resolution, load ordering |
+| `modding` | `src/mods/` | Mod discovery, dependency resolution, load ordering |
 | `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
+| `parallax` | `src/parallax/` | CPU-driven multi-layer parallax background system with tiling, autoscroll, and per-layer blend modes |
 | `particle` | `src/particle/` | Emitter-based 2D particle systems |
 | `pathfinding` | `src/pathfinding/` | Navigation grids, A★, HPA★, flow fields |
 | `pipeline` | `src/pipeline/` | DAG-based data pipeline orchestration and caching |
@@ -338,7 +354,7 @@ main.rs
   ├── create_lua_vm()
   │     ├── Create mlua::Lua VM (StdLib subset — no os, io, loadfile, dofile)
   │     ├── Create `luna` global table
-  │     ├── Register 40+ API modules (graphics, input, audio, timer, math, physics,
+  │     ├── Register 40+ API modules (render, input, audio, timer, math, physics,
   │     │                             filesystem, window, event, system, particle,
   │     │                             data, image, thread, terminal, ai, animation,
   │     │                             camera, compute, scene, tilemap, gui, ...)
@@ -1036,10 +1052,10 @@ src/
 │   ├── mod.rs, vec2.rs, mat3.rs, rect.rs, easing.rs, noise.rs,
 │   ├── random.rs, transform.rs, bezier.rs, triangulate.rs, color_space.rs
 │
-├── graphics/                        Tier 1: GPU rendering pipeline
-│   ├── mod.rs, gpu_renderer.rs, renderer.rs, shader.rs, mesh.rs,
-│   ├── texture.rs, color.rs, sprite.rs, sprite_batch.rs, camera.rs,
-│   ├── animation.rs, canvas.rs, font.rs
+├── render/                          Tier 1: GPU rendering pipeline (canonical, 42 files)
+│   └── (see src/render/ — GpuRenderer, RenderCommand, pipelines, textures, fonts, shaders)
+│
+├── graphics/                        [legacy stub — orphaned, not in active lib.rs pub mod list]
 │
 ├── audio/                           Tier 1: audio playback
 │   ├── mod.rs, mixer.rs, source.rs

@@ -33,6 +33,7 @@ pub mod animation_api;
 
 /// Registers the `lurek.thread.*` background threading API.
 pub mod thread_api;
+/// Registers the `lurek.tween.*` property animation API.
 pub mod tween_api;
 
 /// Registers the `lurek.simulator.*` automated input simulation API.

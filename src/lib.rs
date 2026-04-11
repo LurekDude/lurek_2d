@@ -91,31 +91,32 @@ pub mod devtools;
 pub mod serial;
 // migration-state: pub mod dialog; — now library/dialog/init.lua
 // migration-state: pub mod economy; — now library/economy/init.lua
+/// App module — engine lifecycle, main loop, and application state.
+pub mod app;
 /// TCP debug bridge for connecting external tools to a running Lurek2D game.
 pub mod debugbridge;
 /// API documentation catalog and quality reporting for the lurek.* API surface.
 pub mod docs;
-/// Core engine lifecycle, configuration, and error types.
-pub mod runtime;
-pub mod app;
 /// Lightweight entity-component-system with ID recycling, bitmap tags, layers, blueprints, and systems.
 pub mod ecs;
+/// Event queue for polling system and custom events.
+pub mod event;
 /// Sandboxed game filesystem (GameFS).
 pub mod filesystem;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
 pub mod graph;
-/// 2D GPU rendering pipeline, draw commands, and graphics types.
-pub mod render;
+/// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
+pub mod i18n;
 /// CPU-side pixel-level image manipulation.
 pub mod image;
 /// Keyboard, mouse, and gamepad input state.
 pub mod input;
-/// Multi-locale string catalog, variable interpolation, and CLDR plural rules.
-pub mod i18n;
 /// Script log-level management — delegates to the `log` crate via `engine::log_messages`.
 pub mod log;
-/// Event queue for polling system and custom events.
-pub mod event;
+/// 2D GPU rendering pipeline, draw commands, and graphics types.
+pub mod render;
+/// Core engine lifecycle, configuration, and error types.
+pub mod runtime;
 /// Retained-mode widget UI system: buttons, panels, text fields, layouts.
 pub mod ui;
 // migration-state: pub mod inventory; — now library/inventory/init.lua

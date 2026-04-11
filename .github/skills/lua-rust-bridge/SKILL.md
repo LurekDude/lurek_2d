@@ -137,6 +137,37 @@ if width == 0 {
 - Never panic on bad Lua input — always return a descriptive `LuaError`
 - Strip internal Rust source paths from error messages shown to Lua
 
+## Forbidden Patterns in lua_api Files
+
+`lua.load()` (and `lua.eval()`) are **forbidden** in `src/lua_api/*.rs` except for the narrow cases below. The validator (`tools/validate/validate_lua_api.py`) will fail on any unannoted `lua.load()` call found in a binding file.
+
+### Known Exceptions: LUA-EVAL-JUSTIFIED
+
+When a `lua.load()` call is genuinely unavoidable, suppress the validator with a comment placed **immediately before** the offending line:
+
+```rust
+// LUA-EVAL-JUSTIFIED: <one-sentence reason why lua.load() is unavoidable here>
+let result = lua.load(code).eval::<LuaMultiValue>()?;
+```
+
+**Placement rules:**
+- The `// LUA-EVAL-JUSTIFIED:` comment must be on the line directly before `lua.load()`. Only other comment lines may appear between them — intervening code lines reset the suppressor.
+- The reason must follow the colon on the same line (cannot be blank).
+
+**Acceptable uses:**
+- The eval/run IS the feature (e.g., `debugbridge_api.rs`: the REPL eval endpoint exists specifically to execute arbitrary Lua code at developer request).
+- Accessing the Lua `debug` library internals that have no Rust equivalent (e.g., `devtools_api.rs`: `debug.getinfo` stack introspection).
+
+**Unacceptable uses:**
+- Embedding game logic as Lua strings in a binding file — move it to a Lua library under `content/library/` or a domain helper.
+- Avoiding a proper Rust implementation for convenience.
+
+**Current justified uses in the codebase:**
+| File | Location | Reason |
+|------|----------|--------|
+| `src/lua_api/debugbridge_api.rs` | `lurek.debug.eval` binding | Eval IS the feature — executes arbitrary code provided by the developer REPL |
+| `src/lua_api/devtools_api.rs` | `debug.getinfo` introspection | Lua `debug` library has no Rust equivalent; needed for stack inspection |
+
 ## AGENT.md ↔ lua_api Sync Contract
 
 Every `src/<module>/AGENT.md` has a `## Lua API` footer pointing to `src/lua_api/<module>_api.rs`.

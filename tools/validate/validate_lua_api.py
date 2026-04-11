@@ -104,15 +104,39 @@ def check_no_rustdoc_sections(lines: list[str]) -> None:
 
 
 def check_no_embedded_lua(lines: list[str]) -> None:
-    """lua.load(...) and lua.eval(...) embed Lua code -- forbidden."""
+    """lua.load(...) and lua.eval(...) embed Lua code -- forbidden.
+
+    Comment lines (starting with //) are skipped so that explanatory
+    comments mentioning lua.load() are not flagged as violations.
+
+    A line bearing the marker ``// LUA-EVAL-JUSTIFIED:`` immediately before
+    a lua.load() call suppresses the error for that one call.  Use this only
+    for the eval/debug-introspection cases where embedding Lua IS the feature.
+    """
+    suppress_next = False
     for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("//"):
+            if "LUA-EVAL-JUSTIFIED:" in stripped:
+                suppress_next = True
+            continue  # skip all comment lines
         if re.search(r'\blua\.load\s*\(', line):
-            _err(i + 1,
-                 "FORBIDDEN `lua.load(...)` -- do not embed Lua code strings; "
-                 "move the logic to the domain module")
+            if suppress_next:
+                suppress_next = False
+            else:
+                _err(i + 1,
+                     "FORBIDDEN `lua.load(...)` -- do not embed Lua code strings; "
+                     "move the logic to the domain module")
+            continue
         if re.search(r'\blua\.eval\s*\(', line):
-            _err(i + 1,
-                 "FORBIDDEN `lua.eval(...)` -- do not embed Lua code strings")
+            if suppress_next:
+                suppress_next = False
+            else:
+                _err(i + 1,
+                     "FORBIDDEN `lua.eval(...)` -- do not embed Lua code strings")
+            continue
+        # Any non-comment, non-forbidden line resets the suppress flag
+        suppress_next = False
 
 
 def check_no_return_any(lines: list[str]) -> None:
@@ -173,6 +197,10 @@ def check_docstring_coverage(lines: list[str]) -> None:
         # Skip module registration calls (lurek.set) and table-building .set()
         if kind == "lurek.set":
             continue
+        # Skip Lua metamethod keys (__index, __newindex, __call, etc.) --
+        # these are always metatable internals, never API endpoint registrations.
+        if name.startswith("__"):
+            continue
         if ".set" in kind and not _is_api_registration(lines, i):
             continue
 
@@ -217,6 +245,9 @@ def check_section_headers(lines: list[str]) -> None:
 
         # Skip module registration calls (lurek.set) and table-building .set()
         if kind == "lurek.set":
+            continue
+        # Skip Lua metamethod keys (__index, __newindex, __call, etc.)
+        if name.startswith("__"):
             continue
         if ".set" in kind and not _is_api_registration(lines, i):
             continue

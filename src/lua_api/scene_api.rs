@@ -699,40 +699,46 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── Scene helpers ─────────────────────────────────────────────────────
 
-    // Expose `lurek.scene` in the global namespace BEFORE running inline Lua so
-    // that `lurek.scene` is resolvable when the snippet executes.
-    luna.set("scene", tbl.clone())?;
+    // `lurek.scene.new(def)` — creates a scene instance directly from a methods table.
+    // Implemented as a Rust closure using mlua set_metatable instead of setmetatable,
+    // keeping no embedded Lua strings in the api file.
+    /// Creates a scene instance directly from a methods table.
+    /// @param def : table?
+    /// @return table
+    tbl.set("new", lua.create_function(|lua, def: Option<LuaTable>| {
+        let def = match def {
+            Some(t) => t,
+            None => lua.create_table()?,
+        };
+        def.set("__index", def.clone())?;
+        let instance: LuaTable = lua.create_table()?;
+        instance.set_metatable(Some(def));
+        Ok(instance)
+    })?)?;
 
-    // Inline Lua helpers registered directly so they have zero Rust overhead.
-    // `lurek.scene.new(def)` — creates a scene instance from a methods table.
     // `lurek.scene.define(def)` — creates a reusable scene class (callable constructor).
-    lua.load(
-        r#"
-local _tbl = lurek.scene
+    // The definition table is stored in the Lua registry so the returned constructor
+    // closure can access it across multiple calls without holding a borrow.
+    /// Creates a reusable scene class — returns a zero-argument constructor function.
+    /// @param def : table?
+    /// @return function
+    tbl.set("define", lua.create_function(|lua, def: Option<LuaTable>| {
+        let def = match def {
+            Some(t) => t,
+            None => lua.create_table()?,
+        };
+        def.set("__index", def.clone())?;
+        let key = lua.create_registry_value(def)?;
+        let ctor = lua.create_function(move |inner_lua, ()| {
+            let def: LuaTable = inner_lua.registry_value(&key)?;
+            let instance: LuaTable = inner_lua.create_table()?;
+            instance.set_metatable(Some(def));
+            Ok(instance)
+        })?;
+        Ok(ctor)
+    })?)?;
 
---- lurek.scene.new(def) — create a scene instance directly from a methods table.
---- @param def table  A table of optional scene callbacks (ready, process, render, …).
---- @return table     A new scene instance whose metatable delegates to `def`.
-function _tbl.new(def)
-    def = def or {}
-    def.__index = def
-    return setmetatable({}, def)
-end
-
---- lurek.scene.define(def) — create a reusable scene class.
---- Returns a zero-argument constructor function that produces new instances.
---- @param def table  A table of optional scene callbacks shared across instances.
---- @return function  Constructor: call it (no args) to get a fresh scene instance.
-function _tbl.define(def)
-    def = def or {}
-    def.__index = def
-    return function()
-        return setmetatable({}, def)
-    end
-end
-    "#,
-    )
-    .exec()?;
+    luna.set("scene", tbl.clone())?;
 
     Ok(())
 }

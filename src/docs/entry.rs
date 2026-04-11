@@ -7,7 +7,6 @@ use std::collections::HashMap;
 /// - `name` — `String`. Parameter name.
 /// - `type_hint` — `Option<String>`. Optional type annotation.
 /// - `description` — `String`. Human-readable description.
-
 #[derive(Debug, Clone, Default)]
 pub struct ParamInfo {
     /// Parameter name.
@@ -39,7 +38,6 @@ pub struct ReturnInfo {
 /// - `description` — `String`. Full doc text.
 /// - `params` — `Vec<ParamInfo>`. Parameter metadata.
 /// - `returns` — `Vec<ReturnInfo>`. Return value metadata.
-
 #[derive(Debug, Clone, Default)]
 pub struct DocEntry {
     /// Short unqualified name (e.g. `"play"`).

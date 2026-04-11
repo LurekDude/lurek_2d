@@ -57,7 +57,6 @@ pub fn quality_grade(score: f64) -> &'static str {
 /// - `phantom` — `Vec<String>`. Catalog items not in the known API.
 /// - `incomplete` — `Vec<String>`. Entries with incomplete documentation.
 /// - `score` — `f64`. Completeness score 0.0–1.0.
-
 #[derive(Debug, Default)]
 pub struct ValidationReport {
     /// Qualified names that should have a doc entry but do not.
@@ -90,7 +89,6 @@ impl ValidationReport {
 /// - `missing` — `Vec<String>`. API items not in catalog.
 /// - `phantom` — `Vec<String>`. Catalog entries absent from API spec.
 /// - `incomplete` — `Vec<String>`. Entries with incomplete docs.
-
 pub struct QualityReport {
     /// Snapshot of all entries that were scored.
     pub entries: Vec<DocEntry>,

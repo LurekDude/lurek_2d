@@ -19,7 +19,15 @@ Always update this file **in the same commit** as the change. Use the commit typ
 ---
 
 ## [0.7.0] — 2025-07-27
+### Fixed
+- Cleared all BLOCKER-level `lua.load()` violations in `src/lua_api/scene_api.rs` (converted to Rust calls), `src/lua_api/debugbridge_api.rs`, and `src/lua_api/devtools_api.rs` (justified uses now marked with `// LUA-EVAL-JUSTIFIED:`).
+- Fixed 6 disconnected/missing doc comments across `src/docs/entry.rs`, `src/docs/report.rs`, `src/lib.rs`, `src/lua_api/mod.rs`.
+- Removed ghost `src/lua_api/parallax_api.rs` entry from `src/parallax/AGENT.md` Source Files table.
+- Updated `docs/architecture/engine-architecture.md`: corrected Tier 1 from `graphics/src/graphics/` to `render/src/render/`, marked `src/graphics/` as legacy stub, added 6 missing module tier rows (`ecs`, `i18n`, `tween` to T1; `mods`, `parallax` to T2; `runtime` to Baseline).
 ### Changed
+- `tools/validate/validate_lua_api.py` improved: comment-line skip in `check_no_embedded_lua`, `// LUA-EVAL-JUSTIFIED:` suppressor mechanism, `__`-metamethod key exclusions in coverage and header checks.
+- `.github/skills/lua-rust-bridge/SKILL.md` updated with "Forbidden Patterns in lua_api Files" section and `LUA-EVAL-JUSTIFIED` documentation.
+
 - **BREAKING: Major `src/` directory restructuring** — module import paths have changed across the entire codebase. Lua API surface is unchanged; only Rust `use crate::` imports are affected.
   - `src/engine/` split into `src/runtime/` (config, error, shared_state, resource_keys) and `src/app/` (app lifecycle, debug overlay, error screen).
   - `src/graphics/`, `src/camera/`, `src/light/`, `src/effect/` merged into unified `src/render/` module (with `render/camera/`, `render/light/`, `render/effect/` submodules).

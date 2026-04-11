@@ -26,7 +26,6 @@ modes, opacity, tint, and z-ordering.  Multiple layers can be grouped into a
 |---|---|
 | `src/parallax/mod.rs` | Module root, re-exports `ParallaxLayer`, `ParallaxDrawBatch` |
 | `src/parallax/layer.rs` | Pure-Rust domain logic: scroll math, tiling, draw batch building, 9 unit tests |
-| `src/lua_api/parallax_api.rs` | Lua bridge: `LuaParallaxLayer`, `LuaParallaxSet` UserData, `register()` |
 
 ## Full Specification
 
