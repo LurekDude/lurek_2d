@@ -25,89 +25,123 @@
 
 These fifteen principles are the soul of the project. They are not aspirational guidelines — they are **binding constraints**. Every feature proposal, API design, and architectural decision must be checked against this list. If a choice violates a principle, the choice changes or the principle is formally amended — never silently overridden.
 
-### 1. No Cycles, Ever
+### 1. No Cycles Ever
 
-The module graph is a DAG. A circular import is a hard build error and a build error is a gate — it stops the branch. There are no exceptions, no `unsafe` workarounds, no "temporary" cycles that get cleaned up later. If two modules appear to need each other, one of them is in the wrong group or the shared logic belongs in a third module they both depend on.
+The module import graph is a DAG — directed, acyclic. No exceptions. Every new source file must be placed in a group, and every import must point in a direction that preserves the DAG. If adding an import would create a cycle, the design is wrong — not the rule.
 
-→ See [engine-architecture.md](engine-architecture.md) § Module Group Dependency Graph.
+This is the load-bearing structural invariant. The five responsibility groups are a reading aid; "no cycles" is the enforceable law.
 
-### 2. Composition Root Is One-Way
+→ See [engine-architecture.md](engine-architecture.md) § Module Group Model.
 
-`app` and `scripting` can know everything — they sit at the top and wire everything together. Nothing below them imports `app` or `scripting`. `lua_api` (`scripting`) is an integration endpoint, not a library. Domain modules never import it.
+### 2. One Executable, One Install
 
-→ See [engine-architecture.md](engine-architecture.md) § Edge and Integration Layer.
+The engine ships as a single binary. No installer, no runtime dependencies, no DLL side-loading, no "install SDK A, then framework B, then plugin C." A user downloads `lurek2d` (or `lurek2d.exe`), drops it next to `main.lua`, and runs. **~20 MB** target file size, forever.
 
-### 3. Depend on Contracts, Not Backends
+This is the David vs. Goliath promise: a 20 MB engine competing with multi-gigabyte toolchains. If a feature would require the user to install a separate component, it either gets statically linked or it does not ship.
 
-Modules that have a platform-specific backend (audio, physics, render, filesystem) expose a pure-Rust contract type. Other modules import the contract, not the backend. When the backend swaps, nothing outside it recompiles. The contract lives in the module's `mod.rs` or a `contract.rs` file — never in the backend implementation.
+→ See [engine-architecture.md](engine-architecture.md) § Boot Sequence.
 
-### 4. Core Stays Boring
+### 3. Lua Scripts Are the Game
 
-`core` is errors, config, typed handles (resource keys), shared traits, and nothing else. It has no runtime state, no allocations at startup, no game logic. If you find yourself adding a non-trivial algorithm or a data structure that grows at runtime to `core`, that code belongs somewhere else.
+The engine is a runtime. The game is Lua. Everything the game creator touches is `.lua` — logic, configuration, scene definitions, dialogue trees, UI layouts. Rust owns the GPU, the physics solver, and the OS layer. Lua owns everything the player experiences.
 
-→ See [engine-architecture.md](engine-architecture.md) § Core Runtime Group.
+The `conf.lua` → `main.lua` → `lurek.init()` → `lurek.ready()` → main-loop pipeline is the only contract between engine and game. The pipeline ( `lurek.process_physics` → `lurek.process` → `lurek.process_late` → `lurek.render` → `lurek.render_ui` ) is deliberately structured so that someone — human or AI — can look at it for ten seconds and know where to start.
 
-### 5. World Is a Registry, Not a God Brain
+→ See [engine-architecture.md](engine-architecture.md) § Callback Contract.
 
-`world` holds `SharedState` — the typed `SlotMap` resource pools, the frame counter, the current `RunState`. It does not make decisions, does not call into domain modules, and does not own the game loop. `app` orchestrates; `world` stores. If `world` is growing methods that coordinate between modules, those methods belong in `app`.
+### 4. Engine Is Silent Unless Something Is Wrong
 
-→ See [engine-architecture.md](engine-architecture.md) § Core Runtime Group.
+No startup banners. No debug chatter. No "asset pipeline started." The engine runs. If it needs to tell you something, it uses `log::warn!` or `log::error!` — and the message is actionable. `info!` is reserved for lifecycle events (loaded, shutdown). `debug!` is reserved for per-frame diagnostics behind `RUST_LOG=debug`.
 
-### 6. Same-Layer Imports Are Allowed When Stable and Acyclic
+Production builds must not produce any terminal output during normal operation.
 
-The old rule — no cross-imports within a tier — was a proxy for the real rule, which is **no cycles**. Two modules in the same responsibility group may import each other if the import direction is stable, acyclic, and well-motivated. If `tilemap` needs `scene`'s transition state, that is allowed. If `scene` also needs `tilemap`, that is a cycle and is forbidden by Principle 1.
+### 5. Tests Are Proof, Not Process
 
-The key question is not "are they in the same group?" but "does adding this import create a cycle?"
+Tests exist to prove the engine works. They are not ceremony. Red → green → refactor is the rhythm, not a bureaucratic checklist.
 
-### 7. Split by Reason to Change, Not by File Length
+- **Rust tests** prove internal contracts.
+- **Lua BDD tests** prove the API surface from the user's perspective.
+- **Golden tests** prove deterministic output.
+- **Stress tests** prove the engine survives adversarial workloads.
 
-A 500-line file with one cohesive responsibility is better than five 100-line files that all change together. Split a module when its parts have genuinely different reasons to change — different owners, different stability, different abstraction level. Never split because the file "feels big."
-
-### 8. Draw Is a Projection Layer
-
-Every module that produces visual output has at most one file dedicated to projecting its internal state into `RenderCommand` values. That file is `draw.rs`. Business logic, state mutation, and data structures are in other files. `draw.rs` is a pure read-only projection: it calls no non-render APIs and mutates no state.
-
-→ See [engine-architecture.md](engine-architecture.md) § Rendering Pipeline.
-
-### 9. Pure Logic Stays Pure
-
-`math`, `procgen`, `graph`, `nav`, `serial`, and similar analytical modules must never import render, audio, input, or Lua APIs. If you need to visualise a graph for debugging, the visualisation lives in a `draw.rs` in the debug module — not in `graph` itself. These modules are the most reusable and the most stable. Protect that stability.
-
-### 10. CPU State and Runtime Resources Must Stay Separate
-
-A `Body` is CPU state — a plain Rust struct you can create in a test without a physics world. A `BodyHandle` is a runtime resource index into a `SlotMap`. These are different types and must never be merged. Every module that manages long-lived resources uses typed handle types (`TextureKey`, `FontKey`, `BodyHandle`, etc.), never raw indices or `usize`.
-
-→ See `src/engine/resource_keys.rs` for the canonical key type definitions.
-
-### 11. Tooling Lives at the Edge
-
-`devtools`, `debugbridge`, `automation`, and the VS Code extension are edge modules. They import everything. Nothing imports them. They are never compiled into production builds unless explicitly enabled. Debug features that ship to end users are a security and performance risk.
-
-→ See [engine-architecture.md](engine-architecture.md) § Edge and Integration Layer.
-
-### 12. Bindings Are Thin and One-Directional
-
-`src/lua_api/` owns all Lua-facing registration. This includes `pub fn register()`, Lua wrapper structs, `impl LuaUserData` blocks, and all `add_method` calls. Domain modules contain only pure-Rust business logic — never `impl LuaUserData` or any `mlua` import. This is not a style preference. Putting binding code in a domain module is a **blocking code review defect**.
-
-→ See the system prompt § Lua API Conventions for the complete canonical rule.
-
-### 13. Tests Follow Responsibility
-
-A test lives as close to the code it tests as possible. Private logic gets a `#[cfg(test)]` module in the same file. Public contracts get `tests/rust/unit/<module>_tests.rs`. Cross-module behaviour gets `tests/rust/ext/` or `tests/lua/integration/`. Do not put a unit test in an integration file just because an integration harness already exists.
+If a test does not prove something that could break, delete it.
 
 → See [test-framework.md](test-framework.md) for the complete test architecture.
 
-### 14. Merge Weak Modules Fast
+### 6. Same-Group Imports Are Allowed When Acyclic
 
-A module with fewer than three files that has been stable for more than one release cycle should be absorbed into its natural parent unless there is a specific versioning, ownership, or stability reason to keep it separate. Dead modules, stub modules, and "future work" modules accumulate entropy. If a module has no active owner and no active users, delete or merge it.
+The five-group model organises modules by responsibility, not by quarantine. Platform Services modules may import each other. Feature Systems modules may import each other. The only forbidden structure is a cycle. A `tilemap` borrowing scene state from `scene` is correct design — both are Feature Systems, and there is no cycle. The test is always: "does this import create a cycle?" Not: "are these in the same group?"
+
+→ See constraint T-03 in [Active Module Group Constraints](#active-module-group-constraints).
+
+### 7. Platform Services Hide the OS
+
+Every Platform Services module (`render`, `audio`, `physics`, `input`, `image`, `window`) exposes a pure-Rust interface. The exact GPU backend, audio driver, or physics solver is an implementation detail. Feature Systems modules see Rust types and function signatures — never raw OS handles, never `extern C`, never platform-specific structs leaking upward.
+
+→ See [engine-architecture.md](engine-architecture.md) § Platform Services Group.
+
+### 8. Engine Runs on a Laptop from 2018
+
+If it does not run on a 2018 laptop with an integrated GPU (Intel UHD 620, AMD Vega 8), it does not ship. Performance is measured on low-end hardware, not high-end developer machines.
+
+This means:
+- No features that require dedicated GPU memory >512 MB.
+- No shader features beyond wgpu baseline capabilities.
+- Frame budget: 16.6ms at 1080p on integrated graphics.
+- Aggressive batching and culling — every draw call counts.
+
+→ See constraint B-03 in [Technology Stack Constraints](#technology-stack-constraints).
+
+### 9. Foundations Are Pure
+
+Foundations group modules (`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`) must never import render, audio, input, physics, or Lua APIs. They are pure algorithms, data structures, and mathematical primitives. No OS interaction. No GPU. No scripting bridge. A Foundations module that needs a render type has been misplaced — move it or split it.
+
+→ See constraint T-06 in [Active Module Group Constraints](#active-module-group-constraints).
+
+### 10. Desktop First, Desktop Only
+
+Windows, macOS, Linux — x86_64 and ARM. **No mobile. No WASM.** This is not a limitation; it is a focus decision.
+
+Trying to support mobile and web would inject conditional compilation, touch-first interaction patterns, and deployment complexity into every module. The engine is better for the platforms it targets by ignoring the platforms it does not.
+
+→ See constraint A-02 in [Platform and Runtime Constraints](#platform-and-runtime-constraints).
+
+### 11. Lua Is Synchronous; Rust Is Parallel
+
+From the script author's perspective, every `lurek.*` call completes immediately and returns a result. There are no promises, no callbacks-after-callbacks, no async/await. The script is a linear, readable sequence of operations.
+
+Behind the scenes, Rust runs background threads for audio decoding, physics stepping, and worker tasks. But the Lua VM never sees them. Cross-thread communication happens through `Channel` objects — a typed, thread-safe MPMC queue with `push`, `pop`, and `demand` (blocking pop).
+
+Each worker thread gets its own Lua VM. Lua VMs cannot share state. This eliminates an entire category of concurrency bugs.
+
+→ See [engine-architecture.md](engine-architecture.md) § Threading Model.
+
+### 12. Composition Root Is One-Way
+
+`app` (the boot and event loop) and `lua_api` (the scripting bridge) sit at the top of the import graph. They wire the system together — they are never wired into. No module in Foundations, Core Runtime, Platform Services, or Feature Systems may import `app` or any `lua_api` binding module.
+
+→ See constraint T-04 in [Active Module Group Constraints](#active-module-group-constraints).
+
+### 13. Blank main.lua Is Valid
+
+An empty `main.lua` produces a black window. No crash, no error, no complaint. Every `lurek.*` callback is optional. This is the entry point for beginners: start with nothing, add one thing, see it work.
+
+This principle constrains API design: every function must have sensible defaults. If a beginner would always pass the same value for a parameter, that value is the default and the parameter is optional.
+
+→ See constraint C-04 in [API Design Constraints](#api-design-constraints).
+
+### 14. Platform Concerns Stay at the Edge
+
+Steam, Epic, itch.io, Android, iOS, WASM — none of these belong inside the five-group module stack. Platform SDK integrations live in external wrapping binaries only. The moment you couple a rendering call to a platform SDK, you have broken the portability of every module in every group below it.
+
+→ See constraints T-08 and A-04 in the constraints tables.
 
 ### 15. Optimise for Human and AI Readability
 
-Code is read far more often than it is written. The primary audience includes AI agents. Every public function, struct, and module must have a `///` doc comment that answers: "what does this do and when do I use it?" If a Copilot agent cannot use an API correctly from the docs alone, the docs and possibly the API design are wrong.
-
-One executable. One scripting language. One afternoon to learn. Keep it that way.
+Every structural choice — module names, group boundaries, API naming, callback conventions — should make the codebase easier to read, reason about, and extend. When two designs are otherwise equivalent, prefer the one that a Copilot agent could navigate correctly without clarification. Documentation is part of design. A function with no doc comment is incomplete.
 
 → Applies to all modules. Verified by `python tools/docs/collect_docs.py --report-missing`.
+
 
 ## Core Idea
 

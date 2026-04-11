@@ -198,11 +198,75 @@ Exposed under `lurek.light.*` by `src/lua_api/light_api.rs`. The API provides tw
 
 ### Light UserData methods
 
-`setPosition(x, y)`, `getPosition()`, `setRadius(r)`, `getRadius()`, `setColor(r, g, b [, a])`, `getColor()`, `setIntensity(i)`, `getIntensity()`, `setEnergy(e)`, `getEnergy()`, `setBlendMode(mode)`, `getBlendMode()`, `setFalloff(mode)`, `getFalloff()`, `setShadowEnabled(b)`, `isShadowEnabled()`, `setShadowColor(r, g, b [, a])`, `getShadowColor()`, `setShadowFilter(filter)`, `getShadowFilter()`, `setShadowSmooth(s)`, `getShadowSmooth()`, `setLightMask(mask)`, `getLightMask()`, `setShadowMask(mask)`, `getShadowMask()`, `setEnabled(b)`, `isEnabled()`, `setLightType(t)`, `getLightType()`, `setDirection(dir)`, `getDirection()`, `setInnerAngle(a)`, `getInnerAngle()`, `setOuterAngle(a)`, `getOuterAngle()`, `setAttenuation(c, l, q)`, `getAttenuation()`, `setFlicker(speed, strength)`, `getFlicker()`, `setFlickerEnabled(b)`, `isFlickerEnabled()`, `setGroupId(id)`, `getGroupId()`, `setVolumetric(b)`, `isVolumetric()`, `remove()`, `isValid()`
+| Method | Description |
+|---|---|
+| `light:setPosition(x, y)` | Sets the light's world-space position. |
+| `light:getPosition()` | Returns the light's world-space position as x, y. |
+| `light:setRadius(r)` | Sets the light's influence radius. |
+| `light:getRadius()` | Returns the light's influence radius. |
+| `light:setColor(r, g, b, a?)` | Sets the light's tint color. |
+| `light:getColor()` | Returns the light's tint color as r, g, b, a. |
+| `light:setIntensity(i)` | Sets the brightness multiplier. |
+| `light:getIntensity()` | Returns the brightness multiplier. |
+| `light:setEnergy(e)` | Sets the energy scaling factor. |
+| `light:getEnergy()` | Returns the energy scaling factor. |
+| `light:setBlendMode(mode)` | Sets the blend mode (`'add'`, `'sub'`, or `'mix'`). |
+| `light:getBlendMode()` | Returns the blend mode as a string. |
+| `light:setFalloff(mode)` | Sets the falloff mode (`'linear'`, `'smooth'`, or `'constant'`). |
+| `light:getFalloff()` | Returns the falloff mode as a string. |
+| `light:setShadowEnabled(b)` | Sets whether this light casts shadows. |
+| `light:isShadowEnabled()` | Returns whether this light casts shadows. |
+| `light:setShadowColor(r, g, b, a?)` | Sets the shadow region color. |
+| `light:getShadowColor()` | Returns the shadow region color as r, g, b, a. |
+| `light:setShadowFilter(filter)` | Sets the shadow edge filter (`'none'`, `'pcf5'`, or `'pcf13'`). |
+| `light:getShadowFilter()` | Returns the shadow edge filter as a string. |
+| `light:setShadowSmooth(s)` | Sets the shadow edge smoothing factor. |
+| `light:getShadowSmooth()` | Returns the shadow edge smoothing factor. |
+| `light:setLightMask(mask)` | Sets the light interaction bitmask. |
+| `light:getLightMask()` | Returns the light interaction bitmask. |
+| `light:setShadowMask(mask)` | Sets the shadow casting bitmask. |
+| `light:getShadowMask()` | Returns the shadow casting bitmask. |
+| `light:setEnabled(b)` | Sets whether this light is active. |
+| `light:isEnabled()` | Returns whether this light is active. |
+| `light:setLightType(t)` | Sets the geometric type (`'point'`, `'directional'`, or `'spot'`). |
+| `light:getLightType()` | Returns the geometric light type as a string. |
+| `light:setDirection(dir)` | Sets the direction angle in radians. |
+| `light:getDirection()` | Returns the direction angle in radians. |
+| `light:setInnerAngle(a)` | Sets the inner cone angle in radians for spot lights. |
+| `light:getInnerAngle()` | Returns the inner cone angle in radians. |
+| `light:setOuterAngle(a)` | Sets the outer cone angle in radians for spot lights. |
+| `light:getOuterAngle()` | Returns the outer cone angle in radians. |
+| `light:setAttenuation(c, l, q)` | Sets the custom attenuation coefficients (constant, linear, quadratic). |
+| `light:getAttenuation()` | Returns the attenuation coefficients as constant, linear, quadratic. |
+| `light:setFlicker(speed, strength)` | Sets the flicker effect speed and strength. |
+| `light:getFlicker()` | Returns the flicker effect speed and strength. |
+| `light:setFlickerEnabled(b)` | Sets whether the flicker effect is active. |
+| `light:isFlickerEnabled()` | Returns whether the flicker effect is active. |
+| `light:setGroupId(id)` | Sets the group identifier for batch operations. |
+| `light:getGroupId()` | Returns the group identifier. |
+| `light:setVolumetric(b)` | Sets whether this light hints at volumetric scattering. |
+| `light:isVolumetric()` | Returns whether this light hints at volumetric scattering. |
+| `light:setOpacity(o)` | Sets the light opacity (0.0–1.0). |
+| `light:getOpacity()` | Returns the light opacity. |
+| `light:remove()` | Removes this light from the world. |
+| `light:isValid()` | Returns whether this light handle is still valid. |
 
 ### Occluder UserData methods
 
-`setVertices(tbl)`, `getVertices()`, `setPosition(x, y)`, `getPosition()`, `setOpacity(o)`, `getOpacity()`, `setLightMask(mask)`, `getLightMask()`, `setEnabled(b)`, `isEnabled()`, `remove()`, `isValid()`
+| Method | Description |
+|---|---|
+| `occ:setVertices(tbl)` | Replaces the polygon vertices from a flat table `{x1, y1, x2, y2, ...}`. |
+| `occ:getVertices()` | Returns the polygon vertices as a flat table `{x1, y1, x2, y2, ...}`. |
+| `occ:setPosition(x, y)` | Sets the translation offset applied to all vertices. |
+| `occ:getPosition()` | Returns the translation offset as x, y. |
+| `occ:setOpacity(o)` | Sets the shadow opacity (0.0–1.0). |
+| `occ:getOpacity()` | Returns the shadow opacity. |
+| `occ:setLightMask(mask)` | Sets the light interaction bitmask. |
+| `occ:getLightMask()` | Returns the light interaction bitmask. |
+| `occ:setEnabled(b)` | Sets whether this occluder is active. |
+| `occ:isEnabled()` | Returns whether this occluder is active. |
+| `occ:remove()` | Removes this occluder from the world. |
+| `occ:isValid()` | Returns whether this occluder handle is still valid. |
 
 ### `newLight` opts table keys
 

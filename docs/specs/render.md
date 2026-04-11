@@ -165,26 +165,126 @@ GpuRenderer  (src/render/gpu_renderer.rs — wgpu backend)
 ### `texture_atlas` — CPU Bin-Packing Atlas
 - `TextureAtlas` — Shelf-algorithm CPU-side texture atlas packing utility.
 
-## Lua API Summary
+## Lua API
 
-Registered by `src/lua_api/render_api.rs` as `lurek.graphic`.
+Registered by `src/lua_api/render_api.rs` as `lurek.graphic`. The `lurek.graphic` namespace exposes resource creation and scene-graph drawing functions. Visual drawing commands (draw, rectangle, circle, print, etc.) are defined directly in this file. There is no separate `graphic_api.rs`.
 
-| Category          | Key functions                                                                        |
-|-------------------|--------------------------------------------------------------------------------------|
-| **Images**        | `newImage`, `draw`, `drawScaled`, `drawRotated`, `drawSub`, `getWidth`, `getHeight`  |
-| **Text**          | `newFont`, `print`, `printf`, `setFont`, `setNewFont`, `getTextWidth`                |
-| **Shapes**        | `rectangle`, `circle`, `polygon`, `line`, `point`, `newShape`, `drawShape`           |
-| **Canvas**        | `newCanvas`, `setCanvas`, `getCanvas`, `drawCanvas`                                  |
-| **Shaders**       | `newShader`, `setShader`, `sendShaderUniform`                                        |
-| **Mesh**          | `newMesh`, `drawMesh`                                                                |
-| **SpriteBatch**   | `newSpriteBatch`, `addSprite`, `flushBatch`, `drawBatch`                             |
-| **Color**         | `setColor`, `setBackgroundColor`, `getColor`                                         |
-| **Transforms**    | `push`, `pop`, `translate`, `rotate`, `scale`, `shear`, `origin`                    |
-| **State**         | `setBlendMode`, `setDepthMode`, `setStencilMode`, `setWireframe`, `setScissor`       |
-| **Screenshots**   | `saveScreenshot`                                                                     |
+### Stats fields
 
-For full parameter signatures and usage examples see [`docs/specs/graphics.md`](graphics.md),
-which documents the same `lurek.graphic.*` API surface in detail.
+These read-only fields on the `lurek.graphic` table expose per-frame renderer statistics:
+
+| Field | Description |
+|---|---|
+| `lurek.graphic.canvases` | Number of canvas render targets allocated. |
+| `lurek.graphic.drawcalls` | Number of GPU draw calls issued in the last frame. |
+| `lurek.graphic.fonts` | Number of font atlases loaded. |
+| `lurek.graphic.textures` | Number of GPU textures loaded. |
+| `lurek.graphic.texture_memory` | Estimated GPU texture memory in bytes. |
+
+### Image methods
+
+| Method | Description |
+|---|---|
+| `img:getWidth()` | Returns the width of this image in pixels. |
+| `img:getHeight()` | Returns the height of this image in pixels. |
+| `img:getDimensions()` | Returns the width and height as two integers. |
+| `img:release()` | Releases GPU texture memory; returns `true` on success. |
+| `img:type()` | Returns the type name `"Image"`. |
+| `img:typeOf(name)` | Returns `true` when name matches `"Image"` or a parent type. |
+
+### Font methods
+
+| Method | Description |
+|---|---|
+| `font:getWidth(text)` | Returns the rendered pixel width of text. |
+| `font:getHeight()` | Returns the line height of this font. |
+| `font:getLineHeight()` | Returns the line height multiplier. |
+| `font:setLineHeight(h)` | Sets the line height multiplier. |
+| `font:getAscent()` | Returns the ascent in pixels. |
+| `font:getDescent()` | Returns the descent in pixels. |
+| `font:getWrap(text, limit)` | Wraps text to limit and returns lines table plus max width. |
+| `font:release()` | Releases font atlas memory; returns `true` on success. |
+| `font:type()` | Returns the type name `"Font"`. |
+| `font:typeOf(name)` | Returns `true` when name matches `"Font"` or a parent type. |
+
+### Canvas methods
+
+| Method | Description |
+|---|---|
+| `canvas:getWidth()` | Returns the canvas width in pixels. |
+| `canvas:getHeight()` | Returns the canvas height in pixels. |
+| `canvas:getDimensions()` | Returns width and height as two integers. |
+| `canvas:release()` | Releases GPU framebuffer; returns `true` on success. |
+| `canvas:type()` | Returns the type name `"Canvas"`. |
+| `canvas:typeOf(name)` | Returns `true` when name matches `"Canvas"` or a parent type. |
+
+### SpriteBatch methods
+
+| Method | Description |
+|---|---|
+| `batch:add(x, y, r?, sx?, sy?, ox?, oy?)` | Adds a sprite entry; returns 1-based index or nil when full. |
+| `batch:clear()` | Removes all sprites from this batch. |
+| `batch:getCount()` | Returns the number of sprites in this batch. |
+| `batch:getBufferSize()` | Returns the maximum capacity. |
+| `batch:flush()` | Flushes the batch to the GPU draw queue. |
+| `batch:release()` | Releases this sprite batch; returns `true` on success. |
+| `batch:type()` | Returns the type name `"SpriteBatch"`. |
+| `batch:typeOf(name)` | Returns `true` when name matches `"SpriteBatch"` or a parent type. |
+
+### Mesh methods
+
+| Method | Description |
+|---|---|
+| `mesh:getVertexCount()` | Returns the number of vertices. |
+| `mesh:getVertex(i)` | Returns x, y, u, v, r, g, b, a for vertex at 1-based index. |
+| `mesh:setVertex(i, data)` | Sets vertex data at 1-based index from a flat table. |
+| `mesh:setTexture(img?)` | Assigns or clears the texture for this mesh. |
+| `mesh:queue()` | Queues this mesh for rendering this frame. |
+| `mesh:release()` | Releases this mesh; returns `true` on success. |
+| `mesh:type()` | Returns the type name `"Mesh"`. |
+| `mesh:typeOf(name)` | Returns `true` when name matches `"Mesh"` or a parent type. |
+
+### Shader methods
+
+| Method | Description |
+|---|---|
+| `shader:send(name, value)` | Sends a uniform value (number, boolean, or 2-4 element table). |
+| `shader:hasUniform(name)` | Returns whether this shader has a uniform with the given name. |
+| `shader:release()` | Releases this shader; returns `true` on success. |
+| `shader:type()` | Returns the type name `"Shader"`. |
+| `shader:typeOf(name)` | Returns `true` when name matches `"Shader"` or a parent type. |
+
+### Quad methods
+
+| Method | Description |
+|---|---|
+| `quad:getViewport()` | Returns the source rectangle as x, y, w, h. |
+| `quad:getTextureDimensions()` | Returns the reference texture width and height. |
+| `quad:type()` | Returns the type name `"Quad"`. |
+| `quad:typeOf(name)` | Returns `true` when name matches `"Quad"` or a parent type. |
+
+### NineSlice methods
+
+| Method | Description |
+|---|---|
+| `ns:getInsets()` | Returns the four inset values as top, right, bottom, left. |
+| `ns:getTextureSize()` | Returns the source texture width and height. |
+| `ns:type()` | Returns the type name `"NineSlice"`. |
+| `ns:typeOf(name)` | Returns `true` when name matches `"NineSlice"` or a parent type. |
+
+### Shape methods
+
+| Method | Description |
+|---|---|
+| `shape:getCommandCount()` | Returns the number of drawing commands stored. |
+| `shape:clear()` | Removes all commands and resets the shape to empty. |
+| `shape:setColor(r, g, b, a?)` | Sets the drawing color for subsequent primitives. |
+| `shape:setLineWidth(w)` | Sets the stroke width for subsequent outlined primitives. |
+| `shape:rectangle(mode, x, y, w, h)` | Queues a fill or line rectangle command. |
+| `shape:line(x1, y1, x2, y2)` | Queues a line segment command. |
+| `shape:polyline(vertices)` | Queues a polyline from a flat vertices table. |
+| `shape:type()` | Returns the type name `"Shape"`. |
+| `shape:typeOf(name)` | Returns `true` when name matches `"Shape"` or a parent type. |
 
 ## Lua Examples
 
@@ -263,6 +363,7 @@ lurek.graphic.setShader(nil)
 | `postfx`     | `src/postfx/` drives multi-pass effects using `BeginPostFx`/`EndPostFx`/`ApplyPostFx` commands. |
 | `particle`   | `src/particle/` pushes `DrawParticleSystem` commands into the render queue.          |
 | `light`      | `src/render/light/` manages `LightWorld` and occlusion geometry for the shadow pass. |
+
 ## Notes
 
 - **Deferred rendering**: Lua closures never touch the GPU directly. `GpuRenderer::render_frame()` processes the full `RenderCommand` queue in a single encoder pass after each callback returns.

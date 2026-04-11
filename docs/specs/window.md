@@ -114,19 +114,79 @@ No public enums in this module. The `FullscreenType` enum (`Desktop` | `Exclusiv
 
 ## Lua API
 
-Exposed under `lurek.window.*` by `src/lua_api/window_api.rs`. The API provides 39 functions organized into five categories:
+Exposed under `lurek.window.*` by `src/lua_api/window_api.rs`.
 
-**Window dimensions and mode** — `getWidth`, `getHeight`, `getDimensions`, `setMode`, `getMode`, `getPixelDimensions`, `getGameWidth`, `getGameHeight`.
+### Window dimensions and mode
 
-**Fullscreen and display** — `setFullscreen`, `getFullscreen`, `isFullscreen`, `isOpen`, `setVSync`, `getVSync`, `getFullscreenModes`, `getDisplayCount`, `getDesktopDimensions`, `getDisplayName`, `getDisplayOrientation`, `getSafeArea`, `getSystemTheme`, `isHighDPIAllowed`, `isResizable`.
+| Function | Description |
+|---|---|
+| `lurek.window.getWidth()` | Returns the window width in pixels. |
+| `lurek.window.getHeight()` | Returns the window height in pixels. |
+| `lurek.window.getDimensions()` | Returns window width and height as two integers. |
+| `lurek.window.getGameWidth()` | Returns the logical game width in virtual pixels. |
+| `lurek.window.getGameHeight()` | Returns the logical game height in virtual pixels. |
+| `lurek.window.getPixelDimensions()` | Returns the window dimensions in physical pixels. |
+| `lurek.window.setMode(w, h, flags?)` | Resizes the window; flags table accepts `fullscreen`, `fullscreentype`, `vsync`. |
+| `lurek.window.getMode()` | Returns width, height, and a flags table with current mode settings. |
 
-**Window state** — `setTitle`, `getTitle`, `hasFocus`, `hasMouseFocus`, `isMinimized`, `isMaximized`, `isVisible`, `minimize`, `maximize`, `restore`, `close`, `requestAttention`, `focus`, `setIcon`, `setPosition`, `getPosition`.
+### Fullscreen and display
 
-**DPI and coordinate conversion** — `getDPIScale`, `getNativeDPIScale`, `toPixels`, `fromPixels`.
+| Function | Description |
+|---|---|
+| `lurek.window.setFullscreen(enabled, fstype?)` | Enables or disables fullscreen mode. |
+| `lurek.window.getFullscreen()` | Returns the fullscreen state and type string. |
+| `lurek.window.isFullscreen()` | Returns whether the window is in fullscreen mode. |
+| `lurek.window.isOpen()` | Returns whether the window is open. |
+| `lurek.window.setVSync(mode)` | Sets the VSync mode (1=on, 0=off, -1=adaptive). |
+| `lurek.window.getVSync()` | Returns the current VSync mode integer. |
+| `lurek.window.getFullscreenModes()` | Returns all available fullscreen video modes. |
+| `lurek.window.getDisplayCount()` | Returns the number of connected displays. |
+| `lurek.window.getDesktopDimensions()` | Returns the desktop resolution as width, height. |
+| `lurek.window.getDisplayName(display?)` | Returns the name of the current display. |
+| `lurek.window.getDisplayOrientation()` | Returns the current display orientation (`"landscape"` or `"portrait"`). |
+| `lurek.window.getSafeArea()` | Returns the safe display area as x, y, w, h. |
+| `lurek.window.getSystemTheme()` | Returns the OS color theme preference. |
+| `lurek.window.isHighDPIAllowed()` | Returns whether high-DPI rendering is allowed. |
+| `lurek.window.isResizable()` | Returns whether the window can be resized by the user. |
 
-**Viewport scaling** — `getScaleInfo`, `getScaleMode`, `setScaleMode`.
+### Window state
 
-**Message box** — `showMessageBox`.
+| Function | Description |
+|---|---|
+| `lurek.window.setTitle(title)` | Sets the window title bar text. |
+| `lurek.window.getTitle()` | Returns the current window title. |
+| `lurek.window.hasFocus()` | Returns whether the window has keyboard focus. |
+| `lurek.window.hasMouseFocus()` | Returns whether the mouse cursor is inside the window. |
+| `lurek.window.isMinimized()` | Returns whether the window is minimized. |
+| `lurek.window.isMaximized()` | Returns whether the window is maximized. |
+| `lurek.window.isVisible()` | Returns whether the window is visible. |
+| `lurek.window.minimize()` | Minimizes the window to the taskbar. |
+| `lurek.window.maximize()` | Maximizes the window to fill the desktop. |
+| `lurek.window.restore()` | Restores the window from minimized or maximized state. |
+| `lurek.window.close()` | Requests the window to close. |
+| `lurek.window.requestAttention()` | Flashes the window in the taskbar to request user attention. |
+| `lurek.window.focus()` | Requests the window manager to bring the window to the foreground. |
+| `lurek.window.setIcon(path)` | Sets the window icon from a file path. |
+| `lurek.window.setPosition(x, y)` | Moves the window to the given screen position. |
+| `lurek.window.getPosition()` | Returns the window position as x, y in screen coordinates. |
+| `lurek.window.showMessageBox(title, msg, boxType?, btnType?)` | Shows a platform-native message box dialog; returns button string. |
+
+### DPI and coordinate conversion
+
+| Function | Description |
+|---|---|
+| `lurek.window.getDPIScale()` | Returns the DPI scaling factor for the window. |
+| `lurek.window.getNativeDPIScale()` | Returns the native DPI scale factor. |
+| `lurek.window.toPixels(value)` | Converts a device-independent coordinate to physical pixels. |
+| `lurek.window.fromPixels(value)` | Converts physical pixels to device-independent coordinates. |
+
+### Viewport scaling
+
+| Function | Description |
+|---|---|
+| `lurek.window.getScaleInfo()` | Returns a table with scale\_x, scale\_y, offset\_x, offset\_y, game\_width, game\_height. |
+| `lurek.window.getScaleMode()` | Returns the current viewport scale mode string. |
+| `lurek.window.setScaleMode(mode)` | Sets the viewport scale mode. |
 
 ## Lua Examples
 

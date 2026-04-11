@@ -298,11 +298,11 @@ Five error categories: `Init`, `Runtime`, `Resource`, `Script`, `System`. Used b
 Per-frame renderer statistics snapshot. Tracks draw call count, triangle count, batch count, and GPU frame time for profiling and debugging.
 ## Lua API
 
-No Lua API — foundation module. The engine module does not expose a `lurek.engine`
-namespace. It provides the infrastructure consumed by all other modules and by
-`src/lua_api/` for lifecycle orchestration. Lua interacts with engine functionality
-indirectly through `lurek.platform` (log level, system info), `lurek.window` (window
-state), `lurek.signal` (quit, restart), and `lurek.graphic` (draw commands, screenshot).
+`src/app/` exposes **no public `lurek.*` functions**. The application lifecycle (startup, event loop, frame tick) is managed internally by `App::run()` in Rust. Lua scripts interact with the engine exclusively through callbacks registered on the `lurek` global (`lurek.init`, `lurek.process`, `lurek.render`, etc.) — see `docs/architecture/engine-architecture.md` § Callback Contract.
+
+| Namespace | Status |
+|---|---|
+| `lurek.app` | Not registered — `src/app/` has no Lua API surface. |
 
 ## Lua Examples
 

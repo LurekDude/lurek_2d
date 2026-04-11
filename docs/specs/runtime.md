@@ -155,11 +155,13 @@ conf.toml / conf.lua
 | `LightKey`          | Opaque `SlotMap` key identifying a `Light` entry in `LightWorld`.                    |
 | `OccluderKey`       | Opaque `SlotMap` key identifying an occlusion polygon in `LightWorld`.               |
 
-## Lua API Summary
+## Lua API
 
-_No `lurek.*` bindings are registered for this module._ `runtime` is consumed by every
-other module as a dependency; Lua scripts interact with it indirectly through the typed
-resource handles returned by `lurek.graphic.newImage()`, `lurek.audio.newSource()`, etc.
+`src/runtime/` exposes **no public `lurek.*` functions** directly. It is the internal substrate consumed by every other module through `SharedState`. Lua scripts interact with runtime state indirectly via resource handles (e.g. `LuaImage`, `LuaFont`) returned by other API namespaces.
+
+| Namespace | Status |
+|---|---|
+| `lurek.runtime` | Not registered — `src/runtime/` has no Lua API surface. |
 
 ## Lua Examples
 
