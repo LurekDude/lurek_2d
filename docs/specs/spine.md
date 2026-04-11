@@ -71,6 +71,7 @@ The design is inspired by the Spine runtime data model but uses entirely custom 
 | `bone.rs`     | `Bone` struct — local and world transform fields, constructors           |
 | `skeleton.rs` | `Skeleton` and `BoneParams` — bone/slot management, world-transform propagation |
 | `slot.rs`     | `Slot` struct — bone attachment binding with tint colour and draw order   |
+| `mod.rs` | — |
 
 ## Submodules
 

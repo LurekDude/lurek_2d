@@ -76,6 +76,7 @@ SoundData ─── decoded f32 PCM buffer (UserData)
 | `mixer.rs`       | Core audio mixer: source loading, playback control, bus routing, spatial audio, queueable sources |
 | `sound_data.rs`  | Decoded PCM sample buffer with per-sample read/write access (Lua UserData)           |
 | `source.rs`      | AudioSource handle (legacy shim) and SpatialState for 3D positioning                 |
+| `mod.rs` | — |
 
 ## Submodules
 

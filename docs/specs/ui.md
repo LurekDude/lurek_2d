@@ -78,6 +78,7 @@ lurek.ui.update(dt)       →    GuiContext.update(dt) → expire toasts
 | `extras.rs` | Utility and advanced widgets: `Toast` (timed notifications), `Separator`, `Spacer`, `TreeView`/`TreeNode`, `Toolbar`/`ToolbarButton`, `MenuBar`/`MenuItem`, `Dialog`, `StatusBar`, `Accordion`/`AccordionSection`, `TooltipPanel`, `ColorPicker`, `GUITable`/`TableColumn`, `ImageWidget` |
 | `context.rs` | Central coordinator: `GuiContext` (widget pool, child management, focus cycling, toast queue, input routing), `WidgetKind` (type-erased enum wrapping all 32 widget types) |
 | `data_graph_renderer.rs` | Data visualization: `GraphRenderer` for line/scatter/bar charts with viewport ↔ world mapping, `GraphSeries` enum |
+| `chart.rs` | — |
 
 ## Submodules
 

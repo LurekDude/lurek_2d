@@ -26,6 +26,8 @@ modes, opacity, tint, and z-ordering.  Multiple layers can be grouped into a
 |---|---|
 | `src/parallax/mod.rs` | Module root, re-exports `ParallaxLayer`, `ParallaxDrawBatch` |
 | `src/parallax/layer.rs` | Pure-Rust domain logic: scroll math, tiling, draw batch building, 9 unit tests |
+| `layer.rs` | — |
+| `mod.rs` | — |
 
 ## Full Specification
 

@@ -21,6 +21,7 @@ The `network` module provides UDP networking for peer-to-peer and client-server 
 | `constants.rs` | Compile-time limits and defaults: `MAX_PEERS`, `DEFAULT_PEERS`, `MAX_CHANNELS`, `DEFAULT_CHANNELS` |
 | `error.rs`     | `NetworkError` enum with six variants for Lua-friendly error messages |
 | `host.rs`      | `NetworkHost` wrapper around `rusty_enet::Host<UdpSocket>`, `NetworkEvent` enum, `PeerStats` struct |
+| `mod.rs` | — |
 
 ## Key Types
 

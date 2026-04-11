@@ -57,6 +57,8 @@ Data flow:
 | `catalog.rs`   | `Catalog` — in-memory registry with search, filter, and query helpers            |
 | `report.rs`    | `ValidationReport`, `QualityReport`, `quality_score()`, `quality_grade()`        |
 | `mod.rs`       | Re-exports all public types                                                       |
+| `export.rs` | — |
+| `schema.rs` | — |
 
 ## Submodules
 

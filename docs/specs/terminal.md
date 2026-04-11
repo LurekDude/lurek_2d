@@ -79,6 +79,7 @@ lurek.mousepressed(x, y) ─► Terminal:mousepressed(px, py)
 | `cell.rs`            | `TCell` struct and default colour/character constants |
 | `terminal_state.rs`  | `Terminal` grid state, input routing, widget compositing, draw command generation |
 | `widget.rs`          | `WidgetBase`, `Widget`, `WidgetKind` enum, `BorderStyle` enum, widget constructors and mutation methods |
+| `mod.rs` | — |
 
 ## Submodules
 

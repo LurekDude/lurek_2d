@@ -29,6 +29,7 @@ is performed by the `lua_api` bridge layer, which reads the data models each fra
 | `screen_effects.rs` | Three one-shot screen effects: `FlashState` (colour burst fading to transparent), `ShakeState` (decaying xorshift PRNG pixel offset), `FadeState` (alpha interpolation between start and target). |
 | `stack.rs` | `PostFxStack` � ordered chain of effect indices with parallel `enabled` flags. Manages ping-pong canvas dimensions. 1-based position insertion, per-index enable/disable, and `enabled_effects()` for the GPU layer. |
 | `weather.rs` | `WeatherType` enum (8 variants: None, Rain, Snow, Hail, Dust, Leaves, Ash, Pollen), `WeatherParticle` (position, velocity, size, alpha), and `WeatherState` (spawn timer, wind, intensity, live particle pool). |
+| `mod.rs` | — |
 
 ## Key Types
 

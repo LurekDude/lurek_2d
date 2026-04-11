@@ -60,6 +60,13 @@ Note: The Lua API wrappers in `patterns_api.rs` use their own inner structs that
 | `factory.rs`        | `Factory` — named type registry with alias resolution                            |
 | `state_machine.rs`  | `StateMachine`, `TransitionRule`, `StateInfo` — validated FSM with history       |
 | `mod.rs`            | Re-exports all public types                                                      |
+| `blackboard.rs` | — |
+| `funnel.rs` | — |
+| `observer.rs` | — |
+| `priority_queue.rs` | — |
+| `ring.rs` | — |
+| `simple_state.rs` | — |
+| `throttle.rs` | — |
 
 ## Submodules
 

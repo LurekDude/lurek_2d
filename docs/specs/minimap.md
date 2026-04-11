@@ -76,6 +76,7 @@ lurek.minimap.newMinimap(gw, gh, dw, dh)
 |--------------|------------------------------------------------------------------------------------------|
 | `minimap.rs` | Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, zoom/pan, coordinate conversion, and time-based update. |
 | `types.rs`   | Supporting type definitions: `ColorMode` and `FogLevel` enums, `MinimapObjectType`, `MinimapObject`, `MinimapPing`, and `MinimapMarker` plain data structs. |
+| `mod.rs` | — |
 
 ## Submodules
 

@@ -55,6 +55,8 @@ src/image/
 | `serial.rs`      | LIMG binary format: save/load `ImageData` and `LayeredImage` with zlib compression              |
 | `compressed.rs`  | DDS/DXT compressed GPU texture container with format detection and loading                      |
 | `palette_lut.rs` | Colour palette lookup table mapping source colours to target colours                            |
+| `mod.rs` | — |
+| `visualization.rs` | — |
 
 ## Submodules
 

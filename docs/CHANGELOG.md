@@ -18,6 +18,18 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.4] — 2026-04-12
+### Fixed
+- Synced all 47 `src/<module>/AGENT.md` and `docs/specs/<module>.md` Source Files tables to match actual `.rs` files on disk.
+  - Removed ghost `*_api.rs` entries from Source Files tables (these live in `src/lua_api/`, not in domain module dirs; cross-module references in other sections remain).
+  - Added missing `mod.rs` entries to 9 AGENT.md files and 19 spec files.
+  - Added newly discovered files: `visualization.rs` (image), `toml_convert.rs` (data), `sinks.rs` (log), `save_manager.rs` (save), `event_queue.rs` (event), `chart.rs` (ui), `color.rs` (render), `export.rs`/`schema.rs` (docs), `layer.rs` (parallax), `engine.rs`/`handle.rs`/`state.rs` (tween), 7 patterns files.
+  - Fixed tween AGENT.md to use bare filenames instead of full `src/tween/` paths.
+  - Added `## Source Files` table to `docs/specs/parallax.md` (previously used code block only).
+- Completed `src/render/camera/`, `src/render/effect/`, `src/render/light/` deletion from git tracking (files were promoted to top-level modules in 0.7.3 but deletions were left unstaged).
+### Added
+- `tools/audit/audit_agent_md.py` — audits each module's AGENT.md and spec against actual disk files; reports GHOST (listed but deleted) and MISSING (on disk but unlisted) within Source Files tables only.
+
 ## [0.7.3] — 2026-04-11
 ### Fixed
 - Deleted `docs/specs/camera.md`, `docs/specs/effect.md`, `docs/specs/light.md` — these are submodules inside `src/render/`, not top-level modules, and should not have standalone specs; their architecture is documented in `docs/specs/render.md`.

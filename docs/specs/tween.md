@@ -23,6 +23,10 @@ the fixed-timestep accumulator. For complex multi-property animation graphs see 
 | `src/tween/engine.rs` | `TweenEngine` — manages active tweens; `tick(dt)` advances and removes completed tweens |
 | `src/tween/handle.rs` | Lua UserData handle types: `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, plus supporting `SequenceStep` and `ParallelEntry` data types |
 | `src/tween/state.rs` | Pure numeric tween timing state (`TweenState`) with easing-function application; no Lua dependencies |
+| `engine.rs` | — |
+| `handle.rs` | — |
+| `mod.rs` | — |
+| `state.rs` | — |
 
 ## Key Types
 

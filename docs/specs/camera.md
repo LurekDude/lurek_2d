@@ -53,6 +53,7 @@ camera (Tier 1 ÔÇö depends only on crate::math)
 | `types.rs`          | `Camera` (flat API) and `Camera2D` (smooth follow, dead zone, bounds, shake) structs    |
 | `viewport.rs`       | `ScaleMode` enum and `Viewport` struct for virtual-resolution mapping                   |
 | `viewport_scale.rs` | `ViewportScale` struct ÔÇö `Viewport` variant with automatic scaled-dimension tracking     |
+| `mod.rs` | — |
 
 ## Submodules
 

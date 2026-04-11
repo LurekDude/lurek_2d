@@ -82,6 +82,8 @@ GpuRenderer  (src/render/gpu_renderer.rs — wgpu backend)
 | `camera/`           | `Camera` struct — viewport offset, zoom, and world-to-screen projection |
 | `effect/`           | Post-processing effect descriptors consumed by the `postfx` module    |
 | `light/`            | `LightWorld` and occlusion geometry for 2D soft-shadow lighting       |
+| `color.rs` | — |
+| `mod.rs` | — |
 
 ## Key Types
 

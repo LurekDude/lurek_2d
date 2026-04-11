@@ -35,6 +35,7 @@ The graphics module owns the entire GPU rendering pipeline for Lurek2D — from 
 | `sprite_sheet.rs`  | Grid-based sprite sheet with directional support and named frame groups |
 | `texture.rs`       | Texture loading (PNG/JPEG/BMP), premultiplied-alpha conversion, and `TextureKey` handle |
 | `texture_atlas.rs` | CPU-side bin-packing texture atlas using shelf algorithm              |
+| `mod.rs`           | Module root — declares all submodules and re-exports public types     |
 
 ## Key Types
 

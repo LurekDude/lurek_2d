@@ -9,6 +9,14 @@ horizontal and/or vertical tiling, z-ordering, opacity, per-layer blend modes,
 and tint.  Multiple layers can be grouped into a `ParallaxSet` for scene-level
 management and batch update/draw calls.
 
+
+## Source Files
+
+| File        | Purpose                                                           |
+|-------------|-------------------------------------------------------------------|
+| `layer.rs`  | `ParallaxLayer`, `ParallaxDrawBatch` — pure Rust, no mlua            |
+| `mod.rs`    | Module root; re-exports `ParallaxLayer`, `ParallaxDrawBatch`      |
+
 ## 2. Architecture
 
 ```

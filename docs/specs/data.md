@@ -78,6 +78,8 @@ src/data/mod.rs  (re-exports all submodules)
 | `hash.rs` | Cryptographic hash functions — MD5, SHA-1, SHA-256, SHA-512 — returning hex-string digests. |
 | `pack.rs` | LÖVE2D-compatible binary pack/unpack with single-character format strings (`<`, `>`, `b`/`B`, `h`/`H`, `i`/`I`, `l`/`L`, `f`, `d`, `s`, `z`, `x`). |
 | `bin_pack.rs` | Lurek2D Binary Pack Format — space-separated named-token binary serialization. |
+| `mod.rs` | — |
+| `toml_convert.rs` | — |
 
 ## Submodules
 

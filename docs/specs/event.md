@@ -59,6 +59,7 @@ Internal Rust types:
 |-------------|-----------------------------------------------------------------|
 | `mod.rs`    | `EventArg` enum, `Event` struct, `EventQueue` FIFO queue       |
 | `signal.rs` | `Subscription` struct, `Signal` handle-based pub-sub dispatcher |
+| `event_queue.rs` | — |
 
 ## Submodules
 

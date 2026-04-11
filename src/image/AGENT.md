@@ -25,6 +25,7 @@ The `image` module provides CPU-side pixel-level access to RGBA image data. It i
 | `compressed.rs`  | DDS/DXT compressed GPU texture container with format detection and loading                    |
 | `palette_lut.rs`      | Colour palette lookup table mapping source colours to target colours          |
 | `visualization.rs`    | Standalone visualization helpers for Tier 1 modules; renders animation frame grids and camera bounds to `ImageData` without requiring a direct import of `image` in those modules |
+| `mod.rs` | — |
 
 ## Key Types
 

@@ -23,10 +23,10 @@ that contains no business logic — all structs, `impl` blocks, and algorithms l
 
 | File | Role |
 |---|---|
-| `src/tween/mod.rs` | Module root; re-exports all public types |
-| `src/tween/state.rs` | `TweenState` struct, `resolve_easing`, `builtin_easing_names` |
-| `src/tween/handle.rs` | `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, `SequenceStep`, `ParallelEntry` (structs + business logic) |
-| `src/tween/engine.rs` | `TweenEngine`: active-pool management, `update()`, `cancel_all()` |
+| `mod.rs` | Module root; re-exports all public types |
+| `state.rs` | `TweenState` struct, `resolve_easing`, `builtin_easing_names` |
+| `handle.rs` | `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, `SequenceStep`, `ParallelEntry` (structs + business logic) |
+| `engine.rs` | `TweenEngine`: active-pool management, `update()`, `cancel_all()` |
 
 ## Full Spec
 

@@ -46,6 +46,7 @@ src/lua_api/
 | File     | Purpose                                                                                |
 |----------|----------------------------------------------------------------------------------------|
 | `mod.rs` | `set_level()`, `get_level()`, `enabled_for()` — delegates to `engine::log_messages`    |
+| `sinks.rs` | — |
 
 ## Submodules
 

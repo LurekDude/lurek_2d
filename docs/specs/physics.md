@@ -80,6 +80,7 @@ lurek.physics.newWorld(gx, gy)
 | `collision.rs` | `CollisionInfo` struct — legacy penetration/normal data (retained for backward compatibility) |
 | `shape.rs`     | Extended `Shape` enum (polygon, edge, chain), `StandaloneShape` value type, rapier collider conversion |
 | `world.rs`     | `World` simulation manager, body/joint CRUD, step pipeline, raycasting, spatial queries, collision events |
+| `mod.rs` | — |
 
 ## Submodules
 
