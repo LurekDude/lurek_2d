@@ -9,35 +9,35 @@
 
 1. [Overview](#overview)
 2. [Project Identity](#project-identity)
-3. [Active Layer Model](#active-layer-model)
-4. [Module Dependency Graph](#module-dependency-graph)
-5. [Baseline Layer](#baseline-layer)
-6. [Bridge Layer — lua_api](#bridge-layer--lua_api)
-7. [Tier 1 — Core Engine Subsystems](#tier-1--core-engine-subsystems)
-8. [Tier 2 — Reusable Engine Extensions](#tier-2--reusable-engine-extensions)
-9. [Tier 3 — Lunasome (content/library/)](#tier-3--lunasome-library)
-10. [Boot Sequence](#boot-sequence)
-11. [Game Loop and Frame Model](#game-loop-and-frame-model)
-12. [State Architecture](#state-architecture)
-13. [Resource Management](#resource-management)
-14. [Rendering Pipeline](#rendering-pipeline)
-15. [Lua Binding Architecture](#lua-binding-architecture)
-16. [Input Pipeline](#input-pipeline)
-17. [Audio Pipeline](#audio-pipeline)
-18. [Physics Pipeline](#physics-pipeline)
-19. [Particle System](#particle-system)
-20. [Data and Image Modules](#data-and-image-modules)
-21. [Filesystem and Virtual FS](#filesystem-and-virtual-fs)
-22. [Window Management](#window-management)
-23. [Threading Model](#threading-model)
-24. [Error Handling and Recovery](#error-handling-and-recovery)
-25. [Configuration System](#configuration-system)
-26. [Callback Contract](#callback-contract)
-27. [RenderCommand Queue Reference](#rendercommand-queue-reference)
-28. [Dependencies](#dependencies)
-29. [File Structure](#file-structure)
-30. [Legacy and Migration-State Modules](#legacy-and-migration-state-modules)
-31. [Planned Build Variants](#planned-build-variants)
+3. [Module Group Model](#module-group-model)
+4. [Module Group Dependency Graph](#module-group-dependency-graph)
+5. [Foundations Group](#foundations-group)
+6. [Core Runtime Group](#core-runtime-group)
+7. [Platform Services Group](#platform-services-group)
+8. [Feature Systems Group](#feature-systems-group)
+9. [Edge and Integration Layer](#edge-and-integration-layer)
+10. [Lunasome — content/library/](#lunasome--contentlibrary)
+11. [Boot Sequence](#boot-sequence)
+12. [Game Loop and Frame Model](#game-loop-and-frame-model)
+13. [State Architecture](#state-architecture)
+14. [Resource Management](#resource-management)
+15. [Rendering Pipeline](#rendering-pipeline)
+16. [Lua Binding Architecture](#lua-binding-architecture)
+17. [Input Pipeline](#input-pipeline)
+18. [Audio Pipeline](#audio-pipeline)
+19. [Physics Pipeline](#physics-pipeline)
+20. [Particle System](#particle-system)
+21. [Data and Image Modules](#data-and-image-modules)
+22. [Filesystem and Virtual FS](#filesystem-and-virtual-fs)
+23. [Window Management](#window-management)
+24. [Threading Model](#threading-model)
+25. [Error Handling and Recovery](#error-handling-and-recovery)
+26. [Configuration System](#configuration-system)
+27. [Callback Contract](#callback-contract)
+28. [RenderCommand Queue Reference](#rendercommand-queue-reference)
+29. [Dependencies](#dependencies)
+30. [File Structure](#file-structure)
+31. [Migration Notes](#migration-notes)
 
 ---
 
@@ -67,67 +67,111 @@ Lurek2D is a rebellion against bloated game engines. The project symbol tells th
 
 ---
 
-## Active Layer Model
+## Module Group Model
 
-Lurek2D uses an **active four-layer runtime model** plus one bridge layer. This is a **logical dependency model**, not a filesystem grouping scheme. Most Rust engine modules live in flat `src/<module>/` directories. The layer contract is carried by import direction, not by nested folders.
+Lurek2D organises its Rust source into **five responsibility groups**. This is a **logical dependency model** — most modules live in flat `src/<module>/` directories. Group membership is determined by what a module imports and what reasons it has to change.
 
-| Layer | Path | Role |
+The central invariant is **Principle 1 of the Zen of Lurek 2.0**: the module import graph must be a DAG — no cycles, ever. Same-group imports are allowed when they are stable and acyclic (see Principle 6).
+
+| Group | Path | Role |
 |---|---|---|
-| **Baseline** | `src/math/`, `src/engine/` | Always-on runtime substrate — foundational algorithms and lifecycle |
-| **Tier 1** | `src/<module>/` | Core engine subsystems built directly on Baseline |
-| **Tier 2** | `src/<module>/` | Reusable engine extensions built on Baseline + Tier 1 |
-| **Bridge** | `src/lua_api/` | Registers the public `lurek.*` API; not a numbered tier |
-| **Tier 3** | `content/library/` | **Lunasome**: pure-Lua gameplay libraries consuming the public API |
+| **Foundations** | `src/math/`, `src/log/`, `src/data/`, `src/serial/`, `src/compute/`, `src/dataframe/`, `src/graph/`, `src/procgen/`, `src/patterns/` | Pure algorithms and data types — no render, no audio, no input, no Lua |
+| **Core Runtime** | `src/engine/` (→ `core` + `world`), `src/filesystem/`, `src/timer/`, `src/event/`, `src/thread/`, `src/network/` | Engine lifecycle, resource registry, sandboxed I/O, timing, events, concurrency |
+| **Platform Services** | `src/window/`, `src/input/`, `src/render/`, `src/image/`, `src/audio/`, `src/physics/` | OS-facing backends — each exposes a pure-Rust contract, not a backend-specific type |
+| **Feature Systems** | `src/ecs/`, `src/scene/`, `src/animation/`, `src/tween/`, `src/particle/`, `src/tilemap/`, `src/parallax/`, `src/minimap/`, `src/raycaster/`, `src/gui/`, `src/terminal/`, `src/ai/`, `src/pathfind/`, `src/save/`, `src/mods/`, `src/i18n/`, `src/automation/` | Game-domain services built on the layers below |
+| **Edge/Integration** | `src/lua_api/`, `src/app/` (boot + event loop), `src/devtools/`, `src/debugbridge/` | Composition root, scripting bridge, tooling — nothing in the engine imports these |
 
 ### Boundary Rules
 
-- **Baseline** (`math`, `engine`) is always available to all layers.
-- **Tier 1** modules may depend **only** on Baseline. No Tier 1 ↔ Tier 1 cross-imports.
-- **Tier 2** modules may depend on Baseline + Tier 1. No Tier 2 ↔ Tier 2 cross-imports.
-- **`lua_api`** (bridge) imports engine layers and exposes `lurek.*`. Domain Rust modules must **never** import it.
-- **Tier 3 Lunasome** lives in `content/library/` and consumes only public Lua-facing APIs. Lower engine layers do not depend on Tier 3.
-- **Examples** consume the public Lua surface but are not part of the numbered layer model.
+- **Foundations** modules must never import Platform Services, Feature Systems, or Edge/Integration.
+- **Core Runtime** may import Foundations. Must not import Platform Services, Feature Systems, or Edge/Integration.
+- **Platform Services** may import Foundations and Core Runtime. Must not import Feature Systems or Edge/Integration.
+- **Feature Systems** may import any group below them. Same-group imports are allowed when acyclic.
+- **`lua_api`** (scripting) and **`app`** sit in the Edge/Integration group. They may import all lower groups. No lower group may import them.
+- **Lunasome** (`content/library/`) is pure-Lua. It consumes only the public `lurek.*` API — no Rust internals.
+- The main rule: **no cycles**. If adding an import creates a cycle, the design is wrong.
 
 ---
 
-## Module Dependency Graph
+## Module Group Dependency Graph
+
+The five groups form a DAG. Arrows show the **only allowed import direction** (←). Same-group imports (dashed) are allowed when stable and acyclic.
 
 ```
-game scripts and content/examples/
-            │
-            ▼
-content/library/  (Tier 3: Lunasome, pure Lua)
-            │ consumes public lurek.* API
-            ▼
-      src/lua_api/  (bridge layer)
-            │ binds runtime to Lua
-            ▼
-      Tier 2 extensions (particle, tilemap, scene, ai, pathfinding, ...)
-            │ may import Tier 1
-            ▼
-   Tier 1 core subsystems (render, audio, physics, input, timer, ...)
-            │ may import only Baseline
-            ▼
-Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState) + src/runtime/ (substrate)
+     game scripts / content/examples/
+                  │
+                  ▼
+    content/library/  (Lunasome — pure Lua)
+                  │ consumes public lurek.* API
+                  ▼
+  ┌───────────────────────────────────────────────────────────┐
+  │            EDGE / INTEGRATION LAYER                       │
+  │   src/lua_api/  (scripting bridge, registers lurek.*)     │
+  │   src/app/      (boot sequence + event loop — top-level)  │
+  │   src/devtools/ src/debugbridge/  (tooling, edge only)    │
+  └───────────────────────────┬───────────────────────────────┘
+                              │ imports
+                              ▼
+  ┌───────────────────────────────────────────────────────────┐
+  │              FEATURE SYSTEMS GROUP                        │
+  │   ecs, scene, animation, tween, particle, tilemap,        │
+  │   parallax, minimap, raycaster, gui, terminal, ai,        │
+  │   nav, save, mods, i18n, automation                       │
+  └───────────────────────────┬───────────────────────────────┘
+                              │ imports
+                              ▼
+  ┌───────────────────────────────────────────────────────────┐
+  │             PLATFORM SERVICES GROUP                       │
+  │   window, input, render, image, audio, physics            │
+  └───────────────────────────┬───────────────────────────────┘
+                              │ imports
+                              ▼
+  ┌───────────────────────────────────────────────────────────┐
+  │              CORE RUNTIME GROUP                           │
+  │   engine (→core + world), filesystem, time, event,       │
+  │   task, network                                           │
+  └───────────────────────────┬───────────────────────────────┘
+                              │ imports
+                              ▼
+  ┌───────────────────────────────────────────────────────────┐
+  │               FOUNDATIONS GROUP                           │
+  │   math, log, data, serial, compute, dataframe, graph,     │
+  │   procgen, patterns                    (leaf — no deps)   │
+  └───────────────────────────────────────────────────────────┘
 ```
+
+Same-group (horizontal) imports are **allowed when stable and acyclic**. The one absolute rule: **no cycles anywhere in the graph**.
 
 ### Import Rules Summary
 
-| Source Module | May Import |
-|---|---|
-| `math` | Nothing (leaf module) |
-| `engine` | `math` |
-| Tier 1 modules | `math`, `engine` only |
-| Tier 2 modules | `math`, `engine`, any Tier 1 module |
-| `lua_api` (bridge) | Everything above |
-| `content/library/` (Tier 3) | Public `lurek.*` API only |
-| Domain modules | **Never** `lua_api` |
+| Source Group | May Import | Must Never Import |
+|---|---|---|
+| Foundations | nothing (leaf) | everything else |
+| Core Runtime | Foundations | Platform Services, Feature Systems, Edge |
+| Platform Services | Foundations, Core Runtime | Feature Systems, Edge/Integration |
+| Feature Systems | Foundations, Core Runtime, Platform Services; same-group when acyclic | Edge/Integration |
+| Edge/Integration (`lua_api`, `app`) | All lower groups | — (nothing imports Edge) |
+| Lunasome (`content/library/`) | Public `lurek.*` API only | Any Rust engine internals |
+| Any domain module | Its group + lower groups | `lua_api` or `app` (Edge/Integration) |
 
-**No circular dependencies** — the graph is always a DAG.
-
+**The one rule that subsumes all others**: the module graph is a DAG. No cycles, ever.
 ---
 
-## Baseline Layer
+## Foundations Group
+
+Foundations modules are **pure algorithms and data types**. They import nothing from Platform Services, Feature Systems, or Edge/Integration. They are the most reusable, most stable, and most test-friendly modules in the engine.
+
+| Module | Path | What it provides |
+|---|---|---|
+| `math` | `src/math/` | Vec2, Vec3, Mat3, Rect, Color, noise, easing, interpolation, random, bezier, triangulation |
+| `log` | `src/log/` | Structured Lua-script logging at configurable severity levels |
+| `data` | `src/data/` | Binary data (ByteData), compression, hashing, base64 encoding |
+| `serial` | `src/serial/` | Format-agnostic serialization: JSON, TOML, MessagePack |
+| `compute` | `src/compute/` | Dense numerical arrays (NdArray) and CPU-side compute helpers |
+| `dataframe` | `src/dataframe/` | Column-major tabular data structures |
+| `graph` | `src/graph/` | Directed graphs, flow simulation, graph algorithms |
+| `procgen` | `src/procgen/` | Procedural content generation: dungeons, terrain, noise, L-systems |
+| `patterns` | `src/patterns/` | Pure-Rust game-programming design patterns (FSM, observer, service locator) |
 
 ### `math/` — Foundational Algorithms
 
@@ -148,43 +192,47 @@ Baseline: src/math/ (leaf, no deps) + src/engine/ (lifecycle, SharedState) + src
 
 All other layers may freely import `math`.
 
-### `engine/` — Runtime Lifecycle
+---
 
-`engine` provides the application skeleton and is the top-level Rust orchestrator:
+## Core Runtime Group
+
+Core Runtime modules own the **engine lifecycle, resource registry, sandboxed I/O, timing, events, and concurrency**. They may import Foundations. They must not import Platform Services, Feature Systems, or Edge/Integration.
+
+> **Architectural note**: `src/engine/` currently combines config, errors, typed handles, `SharedState`, and boot logic in one crate. The target split is `core` (pure types — errors, config, resource keys, traits) and `world` (runtime state — SharedState, resource pools, registries). `app/` (boot sequence and event loop) moves to the Edge/Integration group. This migration is in progress.
+
+| Module | Path | Responsibility |
+|---|---|---|
+| `engine` → `core` | `src/engine/` | `EngineError`, `Config`, typed SlotMap key types (`TextureKey`, `FontKey`, etc.) |
+| `engine` → `world` | `src/engine/` | `SharedState` (resource pools, render commands, subsystem handles) |
+| `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
+| `time` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
+| `event` | `src/event/` | Event queue and polling primitives |
+| `task` | `src/thread/` | Background Rust threads and typed MPMC Channel communication |
+| `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
+
+### `engine/` — Runtime Types and SharedState
+
+`engine` currently provides both pure types (errors, config, resource keys) and runtime state (SharedState). Key files:
 
 | File | Responsibility |
 |---|---|
-| `app.rs` | `App` struct, `RunState` machine, game loop, error mode loop |
-| `config.rs` | `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig` |
 | `error.rs` | `EngineError` (12+ variants), `EngineResult<T>` |
-| `error_screen.rs` | `ErrorScreen` — blue error display with built-in font |
-| `debug_overlay.rs` | Debug HUD (FPS, draw calls, memory) |
-| `resource_keys.rs` | All SlotMap key type definitions |
-
-`SharedState` is defined here as the central runtime state shared with Lua closures via `Rc<RefCell<SharedState>>`.
-
-### `runtime/` — Extended Runtime Substrate
-
-`runtime` extends the Baseline alongside `engine/`. It provides stable log message ID constants, a TOML-backed message catalog, additional configuration types, and resource key utilities. All other modules may import from it.
-
-| File | Responsibility |
-|---|---|
-| `mod.rs` | Re-exports Config, SharedState, EngineError, resource key types, and `create_lua_vm` |
 | `config.rs` | `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig` |
-| `error.rs` | `EngineError` (12+ variants), `EngineResult<T>` |
-| `log_messages.rs` | Stable message ID constants (`L001`–`L082`), `set_log_level`, `log_msg!` macro |
-| `messages.rs` | `MessageCatalog` — TOML-backed message lookup |
 | `resource_keys.rs` | 14 typed SlotMap key newtypes (`TextureKey`, `FontKey`, `CanvasKey`, etc.) |
 | `shared_state.rs` | `SharedState`, `WindowState`, `FullscreenType`, `ErrorInfo`, `ScreenshotRequest` |
+| `app.rs` | `App` struct, `RunState` machine, game loop, error mode loop (→ will move to Edge) |
+| `error_screen.rs` | `ErrorScreen` — blue error display with built-in font |
+
+`SharedState` is shared between Lua closures and the engine loop via `Rc<RefCell<SharedState>>`.
 
 ---
 
-## Bridge Layer — lua_api
+## Edge and Integration Layer — lua_api
 
 `lua_api` sits above the engine layers. It imports runtime modules and exposes them through the `lurek.*` namespace.
 
 - It is **not** a numbered tier.
-- It may import Baseline, Tier 1, Tier 2, and migration-state gameplay Rust modules.
+- It may import Foundations, Core Runtime, Platform Services, Feature Systems, and migration-state modules.
 - Domain Rust modules must **never** import `lua_api`.
 
 Every binding module follows the registration pattern:
@@ -208,48 +256,52 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 | `lurek.physics` | `physics_api.rs` | Worlds, bodies, shapes, joints, raycasting |
 | `lurek.fs` | `filesystem_api.rs` | Sandboxed I/O, directories, archive mounting |
 | `lurek.window` | `window_api.rs` | Fullscreen, VSync, display info, DPI, clipboard |
-| `lurek.signal` | `event_api.rs` | Event queue, quit, push/poll/clear |
+| `lurek.event` | `event_api.rs` | Event queue, quit, push/poll/clear |
 | `lurek.platform` | `system_api.rs` | OS info, processor count, openURL, locales |
 | `lurek.particles` | `particle_api.rs` | Particle emitters, configuration, rendering |
 | `lurek.data` | `data_api.rs` | Binary data, compression, hashing, encoding |
 | `lurek.img` | `image_api.rs` | CPU pixel buffers, pixel manipulation |
-| `lurek.thread` | `thread_api.rs` | Worker threads, channels |
-| `lurek.tween` | `animation_api.rs` | Frame-based sprite animation, named clips, speed control |
+| `lurek.task` | `thread_api.rs` | Worker threads, channels |
+| `lurek.animation` | `animation_api.rs` | Frame-based sprite animation, named clips, speed control |
 | `lurek.camera` | `camera_api.rs` | Camera2D, viewport transforms |
 | `lurek.simulator` | `automation_api.rs` | Automated input simulation and replay |
-| `lurek.entity` | `entity_api.rs` | Lightweight ECS primitives |
+| `lurek.ecs` | `entity_api.rs` | Lightweight ECS primitives |
 | `lurek.scene` | `scene_api.rs` | Scene stack management and transitions |
 | `lurek.gpu` | `compute_api.rs` | Dense numerical arrays, CPU-side compute |
-| `lurek.savegame` | `savegame_api.rs` | Slot-based save/load, schema versioning |
+| `lurek.save` | `savegame_api.rs` | Slot-based save/load, schema versioning |
 | `lurek.codec` | `serial_api.rs` | JSON, TOML, MessagePack serialization |
 | `lurek.dataframe` | `dataframe_api.rs` | Column-major tabular data structures |
 | `lurek.light` | `light_api.rs` | 2D dynamic lighting and shadow casting |
-| `lurek.modding` | `modding_api.rs` | Mod discovery, dependency resolution, load ordering |
+| `lurek.mods` | `modding_api.rs` | Mod discovery, dependency resolution, load ordering |
 | `lurek.raycaster` | `raycaster_api.rs` | DDA grid raycasting for retro rendering |
 | `lurek.spine` | `spine_api.rs` | Spine 2D skeletal animation runtime |
 | `lurek.procgen` | `procgen_api.rs` | Procedural content generation algorithms |
 | `lurek.network` | `network_api.rs` | UDP networking, packet framing |
 | `lurek.minimap` | `minimap_api.rs` | Grid-based minimap extraction and FOV masking |
-| `lurek.pathfinding` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields |
+| `lurek.nav` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields — powered by `src/pathfind/` |
 | `lurek.terminal` | `terminal_api.rs` | In-game developer terminal / REPL |
 | `lurek.pipeline` | `pipeline_api.rs` | DAG pipeline orchestration and caching |
 | `lurek.patterns` | `patterns_api.rs` | Game programming design patterns toolkit |
 | `lurek.graph` | `graph_api.rs` | Directed graphs, flow simulation |
 | `lurek.ai` | `ai_api.rs` | FSMs, behaviour trees, GOAP, steering |
-| `lurek.postfx` | `fx_api.rs` | Post-processing effects, screen overlays |
+| `lurek.fx` | `fx_api.rs` | Post-processing effects, screen overlays |
 | `lurek.ui` | `gui_api.rs` | Retained-mode widget UI |
 | `lurek.tilemap` | `tilemap_api.rs` | Tilemaps, tilesets, coordinate helpers |
 | `lurek.devtools` | `devtools_api.rs` | Developer diagnostics and runtime profiling |
 | `lurek.debugbridge` | `debugbridge_api.rs` | JSON-over-TCP debug server for remote inspection |
-| `lurek.localization` | `localization_api.rs` | Multi-locale string catalogs with plural rules |
+| `lurek.i18n` | `localization_api.rs` | Multi-locale string catalogs with plural rules |
 | `lurek.log` | `log_api.rs` | Structured game-script logging |
 | `lurek.docs` | `docs_api.rs` | API documentation reference management |
 
 ---
 
-## Tier 1 — Core Engine Subsystems
+## Platform Services Group
 
-Tier 1 modules are engine-owned capabilities that sit directly on Baseline. **Import rule**: may only import `crate::math::*` and `crate::engine::*`.
+Platform Services modules are the engine's OS-facing backends — rendering, audio, physics, windowing, and input. Each exposes a pure-Rust contract type. Feature Systems modules import the contract, not the backend.
+
+**Import rule**: may import Foundations and Core Runtime. Must not import Feature Systems or Edge/Integration.
+
+> **Note**: `animation`, `tween`, `compute`, `data`, `devtools`, `debugbridge`, `log`, `patterns` listed below have been reclassified into their correct groups (Foundations, Core Runtime, or Edge/Integration) in the new model. The table below shows the **current source state** including transition-state modules.
 
 | Module | Path | Responsibility |
 |---|---|---|
@@ -261,26 +313,28 @@ Tier 1 modules are engine-owned capabilities that sit directly on Baseline. **Im
 | `debugbridge` | `src/debugbridge/` | JSON-over-TCP debug server for VS Code extension and MCP remote inspection |
 | `devtools` | `src/devtools/` | Engine and game diagnostics: structured runtime monitoring and performance analysis |
 | `docs` | `src/docs/` | API documentation catalog powering IntelliSense, MCP tools, and doc generators |
-| `entity` | `src/ecs/` | Lightweight ECS primitives and entity helpers |
+| `ecs` | `src/ecs/` | Lightweight ECS primitives and entity helpers |
 | `event` | `src/event/` | Event queue and polling primitives |
 | `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
 | `render` | `src/render/` | GPU rendering pipeline, draw commands, textures, fonts, batching, shaders |
 | `image` | `src/image/` | CPU-side image manipulation (ImageData) |
 | `input` | `src/input/` | Keyboard, mouse, gamepad, and touch state management |
-| `localization` | `src/i18n/` | Multi-locale string catalog with variable substitution and plural form selection |
+| `i18n` | `src/i18n/` | Multi-locale string catalog with variable substitution and plural form selection |
 | `log` | `src/log/` | Structured Lua-script logging at configurable severity levels |
 | `patterns` | `src/patterns/` | Pure-Rust game-programming design patterns (FSM, observer, service locator, etc.) |
 | `physics` | `src/physics/` | Rigid bodies, shapes, collisions, joints, raycasting via rapier2d |
-| `thread` | `src/thread/` | Background Rust threads and Channel communication |
-| `timer` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
+| `task` | `src/thread/` | Background Rust threads and Channel communication |
+| `time` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
 | `tween` | `src/tween/` | Property animation system: tweens, sequences, parallel groups, and easing functions |
 | `window` | `src/window/` | Window lifecycle and state abstraction |
 
 ---
 
-## Tier 2 — Reusable Engine Extensions
+## Feature Systems Group
 
-Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many game types. **Import rule**: may import Baseline and any Tier 1 module, but must **not** import other Tier 2 modules.
+Feature Systems modules are game-domain services built on the groups below them. Same-group imports are allowed when stable and acyclic (no cycles allowed).
+
+**Import rule**: may import Foundations, Core Runtime, and Platform Services. Same-group (Feature Systems) imports allowed when acyclic.
 
 | Module | Path | Responsibility |
 |---|---|---|
@@ -292,15 +346,15 @@ Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many 
 | `gui` | `src/gui/` | Retained-mode widget UI primitives |
 | `light` | `src/light/` | CPU-side 2D dynamic lighting data model (point, spot, directional) |
 | `minimap` | `src/minimap/` | Minimap extraction, FOV masking, tile sampling |
-| `modding` | `src/mods/` | Mod discovery, dependency resolution, load ordering |
+| `mods` | `src/mods/` | Mod discovery, dependency resolution, load ordering |
 | `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
 | `parallax` | `src/parallax/` | CPU-driven multi-layer parallax background system with tiling, autoscroll, and per-layer blend modes |
 | `particle` | `src/particle/` | Emitter-based 2D particle systems |
-| `pathfinding` | `src/pathfinding/` | Navigation grids, A★, HPA★, flow fields |
+| `nav` | `src/pathfind/` | Navigation grids, A★, HPA★, flow fields |
 | `pipeline` | `src/pipeline/` | DAG-based data pipeline orchestration and caching |
 | `procgen` | `src/procgen/` | Procedural content generation: dungeons, terrain, noise, L-systems |
 | `raycaster` | `src/raycaster/` | DDA grid raycasting for Wolfenstein-style retro rendering |
-| `savegame` | `src/savegame/` | Save/load orchestration and schema versioning |
+| `save` | `src/save/` | Save/load orchestration and schema versioning |
 | `scene` | `src/scene/` | Scene stack management and transitions |
 | `serial` | `src/serial/` | Format-agnostic serialization: JSON, TOML, MessagePack |
 | `spine` | `src/spine/` | Spine 2D skeletal animation: bone hierarchies, slots, world transforms |
@@ -309,9 +363,9 @@ Tier 2 modules build on Baseline + Tier 1 and remain broadly useful across many 
 
 ---
 
-## Tier 3 — Lunasome (content/library/)
+## Lunasome — content/library/
 
-Tier 3 is **Lunasome**: the pure-Lua standard library shipped alongside the engine. It is **not** embedded in the Rust binary. It lives under `content/library/` and consumes only the public `lurek.*` API.
+**Lunasome** is the pure-Lua standard library shipped alongside the engine. It is **not** embedded in the Rust binary. It lives under `content/library/` and consumes only the public `lurek.*` API.
 
 Lunasome is the target home for genre-specific and gameplay-domain-specific libraries. When functionality can live as pure Lua on top of the engine API, it belongs here.
 
@@ -1044,50 +1098,50 @@ src/
 ├── main.rs                          CLI entry point, arg parsing
 ├── lib.rs                           Library re-exports
 │
-├── engine/                          Baseline: lifecycle and shared state
+├── engine/                          Core Runtime: lifecycle and shared state (→ `core` + `world` split planned)
 │   ├── mod.rs, app.rs, config.rs, error.rs, error_screen.rs,
 │   ├── debug_overlay.rs, resource_keys.rs
 │
-├── math/                            Baseline: foundational algorithms
+├── math/                            Foundations: foundational algorithms
 │   ├── mod.rs, vec2.rs, mat3.rs, rect.rs, easing.rs, noise.rs,
 │   ├── random.rs, transform.rs, bezier.rs, triangulate.rs, color_space.rs
 │
-├── render/                          Tier 1: GPU rendering pipeline (canonical, 42 files)
+├── render/                          Platform Services: GPU rendering pipeline (canonical, 42 files)
 │   └── (see src/render/ — GpuRenderer, RenderCommand, pipelines, textures, fonts, shaders)
 │
 ├── graphics/                        [legacy stub — orphaned, not in active lib.rs pub mod list]
 │
-├── audio/                           Tier 1: audio playback
+├── audio/                           Platform Services: audio playback
 │   ├── mod.rs, mixer.rs, source.rs
 │
-├── input/                           Tier 1: input state
+├── input/                           Platform Services: input state
 │   ├── mod.rs, keyboard.rs, mouse.rs, gamepad.rs, touch.rs
 │
-├── physics/                         Tier 1: rigid-body physics
+├── physics/                         Platform Services: rigid-body physics
 │   ├── mod.rs, world.rs, body.rs, shape.rs, fixture.rs, joint.rs, contact.rs
 │
-├── timer/                           Tier 1: frame timing
+├── timer/                           Core Runtime: frame timing (lurek.time)
 │   ├── mod.rs, clock.rs
 │
-├── filesystem/                      Tier 1: sandboxed I/O
+├── filesystem/                      Core Runtime: sandboxed I/O
 │   ├── mod.rs, vfs.rs, file_handle.rs, virtual_fs.rs
 │
-├── data/                            Tier 1: binary data processing
+├── data/                            Foundations: binary data processing
 │   ├── mod.rs, byte_data.rs, compress.rs, hash.rs, encode.rs
 │
-├── image/                           Tier 1: CPU pixel manipulation
+├── image/                           Platform Services: CPU pixel manipulation
 │   ├── mod.rs, image_data.rs
 │
-├── particle/                        Tier 2: particle systems
+├── particle/                        Feature Systems: particle systems
 │   └── mod.rs
 │
-├── ai/                              Tier 2: game AI
-├── scene/                           Tier 2: scene management
-├── tilemap/                         Tier 2: tilemap rendering
-├── pathfinding/                     Tier 2: navigation and pathfinding
-├── ...                              (other Tier 2 modules)
+├── ai/                              Feature Systems: game AI
+├── scene/                           Feature Systems: scene management
+├── tilemap/                         Feature Systems: tilemap rendering
+├── nav/                             Feature Systems: navigation and pathfinding (pathfind)
+├── ...                              (other Feature Systems modules)
 │
-└── lua_api/                         Bridge: Lua API registration
+└── lua_api/                         Edge/Integration: Lua API registration (scripting bridge)
     ├── mod.rs, userdata.rs
     ├── graphics_api.rs, audio_api.rs, input_api.rs, timer_api.rs,
     ├── math_api.rs, physics_api.rs, filesystem_api.rs, window_api.rs,
@@ -1095,7 +1149,7 @@ src/
     ├── image_api.rs, thread_api.rs, terminal_api.rs,
     ├── thread_channel.rs, thread_worker.rs
 
-content/library/                             Tier 3: Lunasome (pure Lua)
+content/library/                             Lunasome (pure Lua — consumes public lurek.* API)
 ├── battle/, cardgame/, combat/, crafting/, dialog/, doll/,
 ├── economy/, inventory/, item/, province_map/, quest/, stats/
 
@@ -1110,14 +1164,14 @@ assets/                              Engine assets (splash, icon, fonts)
 
 ---
 
-## Legacy and Migration-State Modules
+## Migration Notes
 
-Several gameplay-oriented Rust modules still exist under `src/`. They remain buildable and testable but are **not** the active Tier 3 architecture target. The canonical Tier 3 location is `content/library/` (pure Lua).
+Several gameplay-oriented Rust modules still exist under `src/`. They remain buildable and testable but are **not** the active architecture target. The canonical gameplay-library location is `content/library/` (Lunasome — pure Lua).
 
 | Module | Status | Notes |
 |---|---|---|
 | `src/battle/`, `src/cardgame/`, `src/combat/`, `src/crafting/` | Migration-state | Being superseded by `content/library/` equivalents |
-| `src/dialog/`, `src/economy/`, `src/inventory/`, `src/item/` | Migration-state | Keep buildable, do not document as current Tier 3 |
+| `src/dialog/`, `src/economy/`, `src/inventory/`, `src/item/` | Migration-state | Keep buildable, do not document as active API |
 | `src/province_map/`, `src/quest/`, `src/stats/` | Migration-state | Future: may be removed when Lunasome equivalents are mature |
 
 ---
@@ -1126,9 +1180,9 @@ Several gameplay-oriented Rust modules still exist under `src/`. They remain bui
 
 The layer model supports future build variants (not yet implemented at the Cargo feature level):
 
-| Variant | Layers Included | Target Use Case |
+| Variant | Groups Included | Target Use Case |
 |---|---|---|
-| **Baseline** | Baseline + bridge | Minimal runtime substrate |
-| **Core** | Baseline + Tier 1 + bridge | Core engine without extensions |
-| **Extended** | Baseline + Tier 1 + Tier 2 + bridge | General-purpose runtime |
-| **Lunasome** | Extended + `content/library/` | Full runtime + standard Lua libraries |
+| **Minimal** | Foundations + Core Runtime + Edge | Headless runtime substrate |
+| **Core** | Foundations + Core Runtime + Platform Services + Edge | Core engine without Feature Systems |
+| **Standard** | All five groups | General-purpose runtime |
+| **Full** | Standard + `content/library/` | Full runtime + Lunasome standard libraries |

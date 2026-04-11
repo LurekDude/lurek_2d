@@ -18,6 +18,13 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.5] — 2026-04-12
+### Changed
+- **Architecture docs migrated to Zen of Lurek 2.0 and the five-group module model**: all three architecture documents (`docs/architecture/philosophy.md`, `docs/architecture/engine-architecture.md`, `docs/architecture/test-framework.md`) updated in the same pass.
+  - `philosophy.md`: Replaced 10 old principles with 15 Zen of Lurek 2.0 principles; replaced strict same-tier prohibition (T-03/T-04) with `No cycles, ever`; updated Active Module Group Constraints (T-01 through T-08) to reflect five-group structure; retired three legacy decisions (Strict Tier Numbering, Baseline→Tier naming, Tier 4 platform slot).
+  - `engine-architecture.md`: Replaced Active Layer Model and four-tier table with Module Group Model (five groups: Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration); updated module dependency graph; fixed eight stale Lua API namespace names (`signal`→`event`, `thread`→`task`, `entity`→`ecs`, `savegame`→`save`, `modding`→`mods`, `localization`→`i18n`, `pathfinding`→`nav`, `postfx`→`fx`); updated Tier 1/2 module tables to new group sections; added Core Runtime Group section.
+  - `test-framework.md`: Fixed stale module test file names (`timer_tests.rs`→`time_tests.rs`, `entity_tests.rs`→`ecs_tests.rs`, `thread_tests.rs`→`task_tests.rs`, `savegame_tests.rs`→`save_tests.rs`, `modding_tests.rs`→`mods_tests.rs`, `pathfinding_tests.rs`→`nav_tests.rs`, `camera_tests.rs` removed — merged into render, `graphics_tests.rs`→`render_tests.rs`); same for Lua test files; removed "Tier 3" tier-numbering language.
+
 ## [0.7.5] — 2026-04-11
 ### Fixed
 - Rewrote `docs/specs/` for 5 modules to include all 11 required sections (`## Summary`, `## Architecture`, `## Source Files`, `## Submodules`, `## Key Types`, `## Lua API`, `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`, plus header metadata table):

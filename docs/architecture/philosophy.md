@@ -7,13 +7,13 @@
 
 ## Table of Contents
 
-1. [The Zen of Luna](#the-zen-of-luna)
+1. [The Zen of Lurek 2.0](#the-zen-of-lurek-20)
 2. [Core Idea](#core-idea)
 3. [Project Identity](#project-identity)
 4. [Decision Heuristics](#decision-heuristics)
 5. [Platform and Runtime Constraints](#platform-and-runtime-constraints)
 6. [Technology Stack Constraints](#technology-stack-constraints)
-7. [Active Layer Model Constraints](#active-layer-model-constraints)
+7. [Active Module Group Constraints](#active-module-group-constraints)
 8. [API Design Constraints](#api-design-constraints)
 9. [Quality Gate Constraints](#quality-gate-constraints)
 10. [Constraint Status Model](#constraint-status-model)
@@ -21,105 +21,93 @@
 
 ---
 
-## The Zen of Luna
+## The Zen of Lurek 2.0
 
-These ten principles are the soul of the project. They are not aspirational guidelines — they are **binding constraints**. Every feature proposal, API design, and architectural decision must be checked against this list. If a choice violates a principle, the choice changes or the principle is formally amended — never silently overridden.
+These fifteen principles are the soul of the project. They are not aspirational guidelines — they are **binding constraints**. Every feature proposal, API design, and architectural decision must be checked against this list. If a choice violates a principle, the choice changes or the principle is formally amended — never silently overridden.
 
-### 1. One Executable, One Install
+### 1. No Cycles, Ever
 
-The engine ships as a single binary. No installer, no runtime dependencies, no DLL side-loading, no "install SDK A, then framework B, then plugin C." A user downloads `lurek2d` (or `lurek2d.exe`), drops it next to `main.lua`, and runs. **~20 MB** target file size, forever.
+The module graph is a DAG. A circular import is a hard build error and a build error is a gate — it stops the branch. There are no exceptions, no `unsafe` workarounds, no "temporary" cycles that get cleaned up later. If two modules appear to need each other, one of them is in the wrong group or the shared logic belongs in a third module they both depend on.
 
-This is the David vs. Goliath promise: a 20 MB engine competing with multi-gigabyte toolchains. If a feature would require the user to install a separate component, it either gets statically linked or it doesn't ship.
+→ See [engine-architecture.md](engine-architecture.md) § Module Group Dependency Graph.
 
-→ See [engine-architecture.md](engine-architecture.md) § Boot Sequence.
+### 2. Composition Root Is One-Way
 
-### 2. Lua Scripts Are the Game
+`app` and `scripting` can know everything — they sit at the top and wire everything together. Nothing below them imports `app` or `scripting`. `lua_api` (`scripting`) is an integration endpoint, not a library. Domain modules never import it.
 
-The engine is a runtime. The game is Lua. Everything the game creator touches is `.lua` — logic, configuration, scene definitions, dialogue trees, UI layouts. Rust owns the GPU, the physics solver, and the OS layer. Lua owns everything the player experiences.
+→ See [engine-architecture.md](engine-architecture.md) § Edge and Integration Layer.
 
-The `conf.lua` → `main.lua` → `lurek.init()` → `lurek.ready()` → main-loop pipeline is the only contract between engine and game. The pipeline ( `lurek.process_physics` → `lurek.process` → `lurek.process_late` → `lurek.render` → `lurek.render_ui` ) is deliberately structured so that someone — human or AI — can look at it for ten seconds and know where to start.
+### 3. Depend on Contracts, Not Backends
 
-→ See [engine-architecture.md](engine-architecture.md) § Callback Contract.
+Modules that have a platform-specific backend (audio, physics, render, filesystem) expose a pure-Rust contract type. Other modules import the contract, not the backend. When the backend swaps, nothing outside it recompiles. The contract lives in the module's `mod.rs` or a `contract.rs` file — never in the backend implementation.
 
-### 3. Engine Is Silent Unless Something Is Wrong
+### 4. Core Stays Boring
 
-No startup banners. No debug chatter. No "asset pipeline started." The engine runs. If it needs to tell you something, it uses `log::warn!` or `log::error!` — and the message is actionable. `info!` is reserved for lifecycle events (loaded, shutdown). `debug!` is reserved for per-frame diagnostics behind `RUST_LOG=debug`.
+`core` is errors, config, typed handles (resource keys), shared traits, and nothing else. It has no runtime state, no allocations at startup, no game logic. If you find yourself adding a non-trivial algorithm or a data structure that grows at runtime to `core`, that code belongs somewhere else.
 
-Production builds must not produce any terminal output during normal operation.
+→ See [engine-architecture.md](engine-architecture.md) § Core Runtime Group.
 
-### 4. Layer Model Is Load-Bearing
+### 5. World Is a Registry, Not a God Brain
 
-The Baseline → Tier 1 → Tier 2 → Tier 3 (Lunasome) layered architecture is not an organizational suggestion — it is a **structural invariant** enforced by import direction rules.
+`world` holds `SharedState` — the typed `SlotMap` resource pools, the frame counter, the current `RunState`. It does not make decisions, does not call into domain modules, and does not own the game loop. `app` orchestrates; `world` stores. If `world` is growing methods that coordinate between modules, those methods belong in `app`.
 
-- `math` depends on nothing.
-- `engine` depends on `math`.
-- Tier 1 depends on Baseline only — no Tier 1 ↔ Tier 1 cross-imports.
-- Tier 2 depends on Baseline + Tier 1 — no Tier 2 ↔ Tier 2 cross-imports.
-- `lua_api` bridges everything — no domain module imports `lua_api`.
-- `content/library/` (Tier 3) consumes public `lurek.*` APIs — no Rust internals.
+→ See [engine-architecture.md](engine-architecture.md) § Core Runtime Group.
 
-This is a DAG (directed acyclic graph). Circular dependencies are forbidden. Every proposed module must declare its tier before implementation starts.
+### 6. Same-Layer Imports Are Allowed When Stable and Acyclic
 
-→ See [engine-architecture.md](engine-architecture.md) § Active Layer Model, § Module Dependency Graph.
+The old rule — no cross-imports within a tier — was a proxy for the real rule, which is **no cycles**. Two modules in the same responsibility group may import each other if the import direction is stable, acyclic, and well-motivated. If `tilemap` needs `scene`'s transition state, that is allowed. If `scene` also needs `tilemap`, that is a cycle and is forbidden by Principle 1.
 
-### 5. Tests Are Proof, Not Process
+The key question is not "are they in the same group?" but "does adding this import create a cycle?"
 
-Tests exist to prove the engine works. They are not ceremony. Red → green → refactor is the rhythm, not a bureaucratic checklist.
+### 7. Split by Reason to Change, Not by File Length
 
-- **Rust tests** prove internal contracts.
-- **Lua BDD tests** prove the API surface from the user's perspective.
-- **Golden tests** prove deterministic output.
-- **Stress tests** prove the engine survives adversarial workloads.
+A 500-line file with one cohesive responsibility is better than five 100-line files that all change together. Split a module when its parts have genuinely different reasons to change — different owners, different stability, different abstraction level. Never split because the file "feels big."
 
-If a test doesn't prove something that could break, delete it.
+### 8. Draw Is a Projection Layer
+
+Every module that produces visual output has at most one file dedicated to projecting its internal state into `RenderCommand` values. That file is `draw.rs`. Business logic, state mutation, and data structures are in other files. `draw.rs` is a pure read-only projection: it calls no non-render APIs and mutates no state.
+
+→ See [engine-architecture.md](engine-architecture.md) § Rendering Pipeline.
+
+### 9. Pure Logic Stays Pure
+
+`math`, `procgen`, `graph`, `nav`, `serial`, and similar analytical modules must never import render, audio, input, or Lua APIs. If you need to visualise a graph for debugging, the visualisation lives in a `draw.rs` in the debug module — not in `graph` itself. These modules are the most reusable and the most stable. Protect that stability.
+
+### 10. CPU State and Runtime Resources Must Stay Separate
+
+A `Body` is CPU state — a plain Rust struct you can create in a test without a physics world. A `BodyHandle` is a runtime resource index into a `SlotMap`. These are different types and must never be merged. Every module that manages long-lived resources uses typed handle types (`TextureKey`, `FontKey`, `BodyHandle`, etc.), never raw indices or `usize`.
+
+→ See `src/engine/resource_keys.rs` for the canonical key type definitions.
+
+### 11. Tooling Lives at the Edge
+
+`devtools`, `debugbridge`, `automation`, and the VS Code extension are edge modules. They import everything. Nothing imports them. They are never compiled into production builds unless explicitly enabled. Debug features that ship to end users are a security and performance risk.
+
+→ See [engine-architecture.md](engine-architecture.md) § Edge and Integration Layer.
+
+### 12. Bindings Are Thin and One-Directional
+
+`src/lua_api/` owns all Lua-facing registration. This includes `pub fn register()`, Lua wrapper structs, `impl LuaUserData` blocks, and all `add_method` calls. Domain modules contain only pure-Rust business logic — never `impl LuaUserData` or any `mlua` import. This is not a style preference. Putting binding code in a domain module is a **blocking code review defect**.
+
+→ See the system prompt § Lua API Conventions for the complete canonical rule.
+
+### 13. Tests Follow Responsibility
+
+A test lives as close to the code it tests as possible. Private logic gets a `#[cfg(test)]` module in the same file. Public contracts get `tests/rust/unit/<module>_tests.rs`. Cross-module behaviour gets `tests/rust/ext/` or `tests/lua/integration/`. Do not put a unit test in an integration file just because an integration harness already exists.
 
 → See [test-framework.md](test-framework.md) for the complete test architecture.
 
-### 6. Platform Concerns Stay Outside the Stack
+### 14. Merge Weak Modules Fast
 
-Steam, Epic, itch.io, Android, iOS, WASM — all of these are real, all are important, and none of them belong in the active Baseline → Tier 1 → Tier 2 → Tier 3 stack. The moment you couple a rendering call to a platform SDK, you've broken the portability of the entire stack below it.
+A module with fewer than three files that has been stable for more than one release cycle should be absorbed into its natural parent unless there is a specific versioning, ownership, or stability reason to keep it separate. Dead modules, stub modules, and "future work" modules accumulate entropy. If a module has no active owner and no active users, delete or merge it.
 
-Platform integrations live at Tier 4 (future) or in external wrapping binaries. They may never be imported by Tier 1, 2, or 3 modules.
+### 15. Optimise for Human and AI Readability
 
-### 7. Engine Runs on a Laptop from 2018
+Code is read far more often than it is written. The primary audience includes AI agents. Every public function, struct, and module must have a `///` doc comment that answers: "what does this do and when do I use it?" If a Copilot agent cannot use an API correctly from the docs alone, the docs and possibly the API design are wrong.
 
-If it doesn't run on a 2018 laptop with an integrated GPU (Intel UHD 620, AMD Vega 8), it doesn't ship. Performance is measured on low-end hardware, not high-end developer machines.
+One executable. One scripting language. One afternoon to learn. Keep it that way.
 
-This means:
-- No features that require dedicated GPU memory >512 MB.
-- No shader features beyond wgpu baseline capabilities.
-- Frame budget: 16.6ms at 1080p on integrated graphics.
-- Aggressive batching and culling — every draw call counts.
-
-→ See constraint B-03 in [Technology Stack Constraints](#technology-stack-constraints).
-
-### 8. Blank main.lua Is Valid
-
-An empty `main.lua` produces a black window. No crash, no error, no complaint. Every `lurek.*` callback is optional. This is the entry point for beginners: start with nothing, add one thing, see it work.
-
-This principle constrains API design: every function must have sensible defaults. If a beginner would always pass the same value for a parameter, that value is the default and the parameter is optional.
-
-→ See constraint C-04 in [API Design Constraints](#api-design-constraints).
-
-### 9. Desktop First, Desktop Only
-
-Windows, macOS, Linux — x86_64 and ARM. **No mobile. No WASM.** This is not a limitation; it is a focus decision.
-
-Trying to support mobile and web would inject conditional compilation, touch-first interaction patterns, and deployment complexity into every module. The engine is better for the platforms it targets by ignoring the platforms it doesn't.
-
-→ See constraint A-02 in [Platform and Runtime Constraints](#platform-and-runtime-constraints).
-
-### 10. Lua Is Synchronous; Rust Is Parallel
-
-From the script author's perspective, every `lurek.*` call completes immediately and returns a result. There are no promises, no callbacks-after-callbacks, no async/await. The script is a linear, readable sequence of operations.
-
-Behind the scenes, Rust runs background threads for audio decoding, physics stepping, and worker tasks. But the Lua VM never sees them. Cross-thread communication happens through `Channel` objects — a typed, thread-safe MPMC queue with `push`, `pop`, and `demand` (blocking pop).
-
-Each worker thread gets its own Lua VM. Lua VMs cannot share state. This eliminates an entire category of concurrency bugs.
-
-→ See [engine-architecture.md](engine-architecture.md) § Threading Model.
-
----
+→ Applies to all modules. Verified by `python tools/docs/collect_docs.py --report-missing`.
 
 ## Core Idea
 
@@ -173,7 +161,7 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 | **A-01** | Active | Lurek2D is a **runtime only** — no embedded visual editor or IDE. The VS Code extension is an opt-in developer experience layer, not part of the engine binary. |
 | **A-02** | Active | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope. |
 | **A-03** | Active | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls. |
-| **A-04** | Active | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the Baseline → Tier 1 → Tier 2 → Tier 3 stack. |
+| **A-04** | Active | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the five-group module stack entirely — constraint T-08. |
 
 ---
 
@@ -189,20 +177,20 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 
 ---
 
-## Active Layer Model Constraints
+## Active Module Group Constraints
 
-These constraints formalize the [layer model](engine-architecture.md#active-layer-model) as enforceable rules.
+These constraints formalize the [module group model](engine-architecture.md#module-group-model) as enforceable rules. The old Baseline / Tier 1 / Tier 2 / Tier 3 naming is retired — see [Retired Decisions](#retired-decisions).
 
 | ID | Status | Constraint |
 |---|---|---|
-| **T-01** | Active | The active module stack is **Baseline + Tier 1 + Tier 2 + Tier 3**. Baseline is the always-on runtime substrate (`src/math/`, `src/engine/`). Tier 3 is **Lunasome**, the pure-Lua standard library (`content/library/`). |
-| **T-02** | Active | `lua_api` is the **bridge layer** that registers `lurek.*`. It is not a numbered tier. It may import all Rust tiers. |
-| **T-03** | Active | **Tier 1** Rust modules may only import `math` and `engine`. No Tier 1 ↔ Tier 1 cross-imports. |
-| **T-04** | Active | **Tier 2** Rust modules may import `math`, `engine`, and any Tier 1 module. No Tier 2 ↔ Tier 2 cross-imports. |
-| **T-05** | Active | **Tier 3** consists of pure-Lua libraries under `content/library/`. They consume public `lurek.*` APIs and must not depend on Rust engine internals. |
-| **T-06** | Active | No Rust domain module may import `lua_api`. The `lua_api` crate is the integration endpoint, not a dependency. |
-| **T-07** | Active | Legacy gameplay-oriented Rust modules still under `src/` are **migration-state**. Keep them buildable but do not document them as the current Tier 3 layer. Do not add features to them. |
-| **T-08** | Proposed | Future Cargo feature flags may expose Baseline / Core / Extended / Lunasome build variants corresponding to the active layer model. Not yet implemented. |
+| **T-01** | Active | The active module structure uses **five responsibility groups**: Foundations, Core Runtime, Platform Services, Feature Systems, and Edge/Integration. See [engine-architecture.md](engine-architecture.md) § Module Group Model. |
+| **T-02** | Active | `lua_api` (`scripting`) is the **binding layer** that registers `lurek.*`. It sits in the Edge/Integration group. It may import all Rust groups. No domain module may import `lua_api`. |
+| **T-03** | Active | **No cycles, ever.** The module import graph must remain a DAG. Same-group imports are allowed provided they are acyclic and stable. See Principle 1 and Principle 6 above. |
+| **T-04** | Active | **Composition root is one-way.** `app` and `scripting` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module. |
+| **T-05** | Active | **Lunasome** (`content/library/`) is the pure-Lua standard library. It consumes public `lurek.*` APIs only — no Rust engine internals, no `require` of engine source files. |
+| **T-06** | Active | **Foundations group modules** (`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`) must never import render, audio, input, physics, or Lua APIs. See Principle 9. |
+| **T-07** | Active | **Edge/Integration group modules** (`devtools`, `debugbridge`, `automation`) are never imported by domain modules. They are optional components compiled only for development builds. |
+| **T-08** | Active | Platform SDK integrations (Steam, Epic, itch.io store APIs) must not be imported by any module in Foundations, Core Runtime, Platform Services, or Feature Systems groups. They belong to external wrapping binaries only. |
 
 ---
 
@@ -253,4 +241,36 @@ To change a constraint's status:
 
 ## Retired Decisions
 
-*(None yet — this section tracks superseded assumptions for historical context.)*
+These decisions were once **Active** constraints but have been superseded. They are kept for historical context.
+
+### Retired: Strict Tier Numbering (T-03-old, T-04-old)
+
+**Original (Zen of Luna, c. v0.4):**
+- T-03: Tier 1 modules may only import `math` and `engine`. **No Tier 1 ↔ Tier 1 cross-imports.**
+- T-04: Tier 2 modules may import Baseline and any Tier 1 module. **No Tier 2 ↔ Tier 2 cross-imports.**
+
+**Why retired:** The blanket ban on same-tier imports was a proxy for the real invariant (no cycles). It was overly conservative and ruled out legitimate stable acyclic imports between modules at the same conceptual level. For example, `tilemap` importing scene transition state from `scene` is correct design — both are Feature Systems modules, and there is no cycle.
+
+**Replaced by:** T-03 (Active): No cycles, ever. Same-group imports are allowed when stable and acyclic. See Principle 1 and Principle 6 above.
+
+---
+
+### Retired: Baseline → Tier 1 → Tier 2 → Tier 3 Naming (T-01-old)
+
+**Original (Zen of Luna, c. v0.4):**
+- T-01: The active module stack is **Baseline + Tier 1 + Tier 2 + Tier 3**. Baseline is `src/math/` and `src/engine/`.
+
+**Why retired:** The Baseline/Tier nomenclature became misleading as the engine grew. `src/engine/` was a monolith that mixed config, resource keys, app state, and boot logic — not a clean substrate. The tier numbers implied a linear progression that did not match actual import topology. The new five-group model (Foundations → Core Runtime → Platform Services → Feature Systems → Edge/Integration) is more accurate and more legible for both humans and AI agents.
+
+**Replaced by:** T-01 (Active): Five responsibility groups. See [engine-architecture.md](engine-architecture.md) § Module Group Model.
+
+---
+
+### Retired: Tier 4 as the Platform Integration Slot
+
+**Original (Zen of Luna, c. v0.4):**
+- Principle 6: "Platform integrations live at Tier 4 (future) or in external wrapping binaries."
+
+**Why retired:** "Tier 4" was never defined or implemented. The concept is now captured cleanly in constraint T-08 (Active): platform SDK wrappers live entirely outside the five-group module stack.
+
+**Replaced by:** T-08 (Active) and constraint A-04 (Active, updated).

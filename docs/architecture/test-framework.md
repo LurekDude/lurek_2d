@@ -87,7 +87,7 @@ cargo test
 
 - **Rust tests** cover internal engine contracts: struct invariants, error handling, resource lifecycle, mathematical correctness. Direct crate access allows testing private-via-crate internals.
 - **Lua tests** cover the public `lurek.*` API surface: function signatures, return types, error messages, and end-to-end workflows. They run in the same VM game scripts use, catching API regressions from the user's perspective.
-- **Library tests** (`tests/lua/content/library/`) exclusively test Tier 3 Lunasome pure-Lua libraries. These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `content/library/` not in the engine.
+- **Library tests** (`tests/lua/content/library/`) exclusively test Lunasome pure-Lua libraries (`content/library/`). These were formerly tested via `tests/rust/game/` which is now retired — game systems (battle, cardgame, combat, crafting, inventory, quest, stats) live in `content/library/` — they are Lunasome libraries, not engine modules.
 
 ---
 
@@ -100,29 +100,28 @@ tests/
 ├── rust/                            Rust test binaries (all registered in Cargo.toml)
 │   ├── unit/                        One file per engine module — Rust struct invariants
 │   │   ├── math_tests.rs
-│   │   ├── graphics_tests.rs
+│   │   ├── render_tests.rs
 │   │   ├── audio_tests.rs
 │   │   ├── physics_tests.rs
 │   │   ├── input_tests.rs
-│   │   ├── timer_tests.rs
+│   │   ├── time_tests.rs
 │   │   ├── filesystem_tests.rs
 │   │   ├── compute_tests.rs
 │   │   ├── data_tests.rs
 │   │   ├── image_tests.rs
 │   │   ├── sound_tests.rs
 │   │   ├── event_tests.rs
-│   │   ├── entity_tests.rs
+│   │   ├── ecs_tests.rs
 │   │   ├── window_tests.rs
-│   │   ├── thread_tests.rs
+│   │   ├── task_tests.rs
 │   │   ├── animation_tests.rs
-│   │   ├── camera_tests.rs
 │   │   ├── particle_tests.rs
 │   │   ├── tilemap_tests.rs
 │   │   ├── scene_tests.rs
-│   │   ├── savegame_tests.rs
-│   │   ├── modding_tests.rs
+│   │   ├── save_tests.rs
+│   │   ├── mods_tests.rs
 │   │   ├── graph_tests.rs
-│   │   ├── pathfinding_tests.rs
+│   │   ├── nav_tests.rs
 │   │   ├── ai_tests.rs
 │   │   ├── terminal_tests.rs
 │   │   └── ...
@@ -166,7 +165,7 @@ tests/
     │   ├── test_audio.lua
     │   ├── test_physics.lua
     │   ├── test_input.lua
-    │   ├── test_timer.lua
+    │   ├── test_time.lua
     │   ├── test_filesystem.lua
     │   ├── test_data.lua
     │   ├── test_image.lua
@@ -175,7 +174,7 @@ tests/
     │   ├── test_particle.lua
     │   ├── test_scene.lua
     │   ├── test_tilemap.lua
-    │   ├── test_pathfinding.lua
+    │   ├── test_nav.lua
     │   ├── test_ai.lua
     │   ├── test_terminal.lua
     │   └── ...
@@ -198,25 +197,25 @@ tests/
     │   │   Rule: every test here must exercise ≥2 distinct lurek.* namespaces.
     │   │   Name format: test_<moduleA>_<moduleB>.lua
     │   ├── test_ai_physics.lua
-    │   ├── test_entity_ai.lua
+    │   ├── test_ecs_ai.lua
     │   ├── test_math_graphics.lua
     │   ├── test_math_physics.lua
     │   ├── test_physics_timer.lua
-    │   ├── test_save_entity.lua
+    │   ├── test_save_ecs.lua
     │   ├── test_tilemap_physics.lua
     │   └── ...
     │
     ├── stress/                      Throughput + security from Lua perspective
     │   ├── test_physics_stress.lua
     │   ├── test_math_stress.lua
-    │   ├── test_entity_stress.lua
+    │   ├── test_ecs_stress.lua
     │   ├── test_particle_stress.lua
     │   └── ...
     │
     ├── security/                    Lua sandbox + input validation tests
     │   ├── test_invalid_args.lua    nil spam, wrong types at API boundary
     │   ├── test_mount_traversal.lua path-traversal attempts via GameFS
-    │   ├── test_savegame_validation.lua
+    │   ├── test_save_validation.lua
     │   └── test_toml_validation.lua
     │
     ├── golden/                      Deterministic output Lua tests
