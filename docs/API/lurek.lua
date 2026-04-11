@@ -2130,6 +2130,7 @@ function lurek.compute.zeros(shape, dtype) end
 ---@class lurek.data
 lurek.data = {}
 
+--- Access structured binary data efficiently without copying.
 ---@class DataView
 local DataView = {}
 
@@ -10893,6 +10894,7 @@ function lurek.terminal.newTextBox(col, row, width) end
 ---@class lurek.thread
 lurek.thread = {}
 
+--- A synchronized message queue for cross-VM communication.
 ---@class Channel
 local Channel = {}
 
@@ -11754,6 +11756,7 @@ function lurek.time.step() end
 ---@class lurek.tween
 lurek.tween = {}
 
+--- A managed interpolation from start to end values over time.
 ---@class Tween
 local Tween = {}
 
@@ -11783,6 +11786,7 @@ function Tween:setRepeat(n) end
 ---@return nil
 function Tween:setYoyo(enabled) end
 
+--- A group of animations that run simultaneously over the same duration.
 ---@class TweenParallel
 local TweenParallel = {}
 
@@ -11794,6 +11798,7 @@ function TweenParallel:cancel() end
 ---@return boolean
 function TweenParallel:isActive() end
 
+--- A chained sequence of animations that run one after another.
 ---@class TweenSequence
 local TweenSequence = {}
 

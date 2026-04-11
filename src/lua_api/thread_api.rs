@@ -139,6 +139,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 
+/// A synchronized message queue for cross-VM communication.
 impl LuaUserData for LuaChannel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the type of the object.

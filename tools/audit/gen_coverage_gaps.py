@@ -82,12 +82,25 @@ _INTERNAL_MODULES = {
     "docs::report",
     # Image serialization helper (internal; save is handled by lurek.image.save)
     "image::serial",
+    "image::visualization",
     # Localization internal helpers (wrapped by lurek.localization.*)
     "localization::interpolation", "localization::plural",
+    "i18n::interpolation", "i18n::plural",
     # Log internal enabled_for check (not Lua-exposed)
     "log",
     # Tween state internal helpers (wrapped by lurek.tween.*)
     "tween::state",
+    # Additional internal modules
+    "animation::render",
+    "app::error_screen",
+    "ecs::universe",
+    "math::color",
+    "parallax::render",
+    "pathfind::astar",
+    "pathfind::graph_path",
+    "pathfind::hpa",
+    "save::save_data",
+    "save::save_manager",
 }
 
 # Minimum description length to be considered "documented"

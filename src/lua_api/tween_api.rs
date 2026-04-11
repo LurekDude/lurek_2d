@@ -220,6 +220,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 
+/// A managed interpolation from start to end values over time.
 impl LuaUserData for LuaTween {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // ── cancel ────────────────────────────────────────────────────────
@@ -329,6 +330,7 @@ impl LuaUserData for LuaTween {
     }
 }
 
+/// A chained sequence of animations that run one after another.
 impl LuaUserData for LuaTweenSequence {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // ── tween ─────────────────────────────────────────────────────────
@@ -449,6 +451,7 @@ impl LuaUserData for LuaTweenSequence {
     }
 }
 
+/// A group of animations that run simultaneously over the same duration.
 impl LuaUserData for LuaTweenParallel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // ── add ───────────────────────────────────────────────────────────

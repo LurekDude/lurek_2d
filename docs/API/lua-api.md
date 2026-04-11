@@ -1047,6 +1047,8 @@ lurek.thread.newThread( code : string ) -> Thread  -- Creates a new background t
 
 ### `Channel`
 
+A synchronized message queue for cross-VM communication.
+
 ```lua
 Channel:clear() -> nil  -- Clears all items from the channel
 Channel:demand( timeout : number? ) -> string|number|boolean|table|nil  -- Blocks until a value is available or the timeout expires, then removes and returns it
@@ -1490,6 +1492,8 @@ lurek.data.write( format : string ) -> string  -- Writes values using the Lurek2
 ```
 
 ### `DataView`
+
+Access structured binary data efficiently without copying.
 
 ```lua
 DataView:getDouble( offset : integer ) -> number  -- Reads a 64-bit float at the given offset
@@ -3775,6 +3779,8 @@ lurek.tween.update( dt : number ) -> nil  -- Advances all active tweens, sequenc
 
 ### `Tween`
 
+A managed interpolation from start to end values over time.
+
 ```lua
 Tween:getProgress() -> number  -- Returns raw 0..1 playback progress (not eased, not accounting for yoyo)
 Tween:isActive() -> boolean  -- Returns true if the tween is still running (not completed or cancelled)
@@ -3786,12 +3792,16 @@ Tween:setYoyo( enabled : boolean ) -> nil  -- Enables or disables yoyo (ping-pon
 
 ### `TweenParallel`
 
+A group of animations that run simultaneously over the same duration.
+
 ```lua
 TweenParallel:cancel() -> nil  -- Cancels the parallel group immediately
 TweenParallel:isActive() -> boolean  -- Returns true if the parallel is running and not yet complete
 ```
 
 ### `TweenSequence`
+
+A chained sequence of animations that run one after another.
 
 ```lua
 TweenSequence:cancel() -> nil  -- Cancels the sequence and stops all pending steps
