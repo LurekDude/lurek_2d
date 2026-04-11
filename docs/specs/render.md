@@ -79,11 +79,8 @@ GpuRenderer  (src/render/gpu_renderer.rs — wgpu backend)
 | `sprite_sheet.rs`   | Grid-based sprite sheet with directional support and named frame groups |
 | `texture.rs`        | Texture loading (PNG/JPEG/BMP), premultiplied-alpha conversion, and `TextureKey` handle |
 | `texture_atlas.rs`  | CPU-side bin-packing texture atlas using the shelf algorithm           |
-| `camera/`           | `Camera` struct — viewport offset, zoom, and world-to-screen projection |
-| `effect/`           | Post-processing effect descriptors consumed by the `postfx` module    |
-| `light/`            | `LightWorld` and occlusion geometry for 2D soft-shadow lighting       |
-| `color.rs` | — |
-| `mod.rs` | — |
+| `color.rs`          | Legacy `Color` struct file; not declared in `mod.rs` — canonical `Color` is in `src/math/color.rs` |
+| `mod.rs`            | Module root — declares all submodules via `pub mod` and re-exports public types      |
 
 ## Key Types
 
@@ -99,6 +96,74 @@ GpuRenderer  (src/render/gpu_renderer.rs — wgpu backend)
 | `CompoundShape`   | Builder for multi-primitive vector shapes composed of `ShapeCommand` sub-operations. |
 | `BlendMode`       | Five pre-built pipeline blend modes: `Alpha`, `Additive`, `Subtract`, `Multiply`, `Replace`. |
 | `TextureData`     | CPU-side `RgbaImage` pixel buffer tagged with its origin path for deduplication. |
+
+
+## Submodules
+
+### `canvas` — Off-screen Render Targets
+- `Canvas` — Width × height metadata for a GPU-managed off-screen render surface.
+
+### `decal_surface` — Decal Stamp Surface
+- `DecalSurface` — Persistent descriptor for stamping decal textures onto surfaces.
+
+### `draw_layer` — Z-Ordered Draw Callbacks
+- `DrawLayer` — Ordered list of draw callbacks keyed by layer index.
+- `LayerEntry` — Single callback entry with z-order and draw function.
+
+### `font` — Font Loading and Atlas
+- `Font` — TTF/OTF font backed by fontdue; owns the CPU-side glyph shelf-atlas.
+- `GlyphInfo` — Cached rasterized glyph metrics and atlas coordinates.
+
+### `gpu_renderer` — wgpu Renderer
+- `GpuRenderer` — Owns wgpu device, surface, pipeline cache, and GPU resource pools.
+- `RenderStats` — Per-frame draw call and vertex count statistics.
+
+### `image_effect` — Shader Effect Pass
+- `ShaderPassDescriptor` — Lightweight descriptor for a per-image shader pass in the pipeline.
+
+### `mesh` — Custom Geometry Mesh
+- `Mesh` — Indexed geometry with per-vertex position, UV, and color.
+- `MeshVertex` — Single vertex: position `(f32, f32)`, UV `(f32, f32)`, color `[f32; 4]`.
+- `MeshDrawMode` — `Triangles`, `Lines`, or `Points` draw topology.
+
+### `nine_slice` — 9-Patch Image Rendering
+- `NineSlice` — Nine-slice descriptor with four inset distances (top, right, bottom, left).
+- `Patch` — One of 9 rectangular quads composing the slice layout.
+
+### `renderer` — RenderCommand Queue and Draw Enums
+- `RenderCommand` — 45+ variant enum encoding every drawable GPU operation.
+- `BlendMode` — `Alpha`, `Additive`, `Subtract`, `Multiply`, `Replace`, `Screen`.
+- `DrawMode` — `Fill` or `Line` draw style.
+- `TextAlign` — `Left`, `Center`, or `Right` text alignment.
+- `StencilMode` — Stencil write/test configuration.
+- `StencilAction` — `Replace`, `Keep`, or `Zero` stencil operations.
+- `DepthMode` — `ReadWrite`, `ReadOnly`, or `None` depth buffer mode.
+- `CompareMode` — Depth/stencil comparison function selector.
+- `DrawableKind` — Canvas vs. swapchain render-target tag.
+- `TextureData` — CPU-side `RgbaImage` pixel buffer with deduplication path.
+
+### `shader` — Custom WGSL Shaders
+- `Shader` — Custom WGSL fragment shader with named uniform variables; naga-validated.
+- `UniformValue` — `Float`, `Vec2`, `Vec4`, or `Mat4` typed uniform binding.
+
+### `shape` — Compound Vector Shapes
+- `CompoundShape` — Builder accumulating `ShapeCommand` sub-operations for vector drawing.
+- `ShapeCommand` — Sub-operations: `Rectangle`, `Circle`, `Line`, `Polygon`, `Point`.
+
+### `sprite` — Sprite Wrapper
+- `Sprite` — Combines `TextureKey`, transform, and tint color into a drawable object.
+
+### `sprite_batch` — Efficient Multi-Sprite Rendering
+- `SpriteBatch` — Pre-sorted `BatchEntry` quad list sharing one texture; one GPU draw call.
+
+### `sprite_sheet` — Grid-Based Sprite Sheet
+- `SpriteSheet` — Grid animation source with named frame groups and directional support.
+
+### `texture` — Texture Loading
+- `Texture` — Loaded GPU texture with `TextureKey` handle, width, height, and path metadata.
+
+### `texture_atlas` — CPU Bin-Packing Atlas
+- `TextureAtlas` — Shelf-algorithm CPU-side texture atlas packing utility.
 
 ## Lua API Summary
 
@@ -121,7 +186,73 @@ Registered by `src/lua_api/render_api.rs` as `lurek.graphic`.
 For full parameter signatures and usage examples see [`docs/specs/graphics.md`](graphics.md),
 which documents the same `lurek.graphic.*` API surface in detail.
 
-## Cross-Module References
+## Lua Examples
+
+```lua
+-- Basic image and text rendering
+local img  = lurek.graphic.newImage("assets/player.png")
+local font = lurek.graphic.newFont("assets/ui.ttf", 24)
+
+lurek.render = function()
+    -- Fill background
+    lurek.graphic.setColor(0.1, 0.1, 0.2, 1.0)
+    lurek.graphic.rectangle("fill", 0, 0, 800, 600)
+
+    -- Draw sprite at original size
+    lurek.graphic.setColor(1, 1, 1, 1)
+    lurek.graphic.draw(img, 100, 200)
+
+    -- Draw with transform stack
+    lurek.graphic.push()
+    lurek.graphic.translate(400, 300)
+    lurek.graphic.rotate(math.pi / 4)
+    lurek.graphic.draw(img, -32, -32)
+    lurek.graphic.pop()
+
+    -- Draw filled circle
+    lurek.graphic.setColor(1, 0.5, 0, 1)
+    lurek.graphic.circle("fill", 200, 400, 40)
+
+    -- Print text
+    lurek.graphic.setColor(1, 1, 0, 1)
+    lurek.graphic.print(font, "Score: 100", 10, 10)
+end
+
+-- Canvas (off-screen render target)
+local fb = lurek.graphic.newCanvas(800, 600)
+
+lurek.render = function()
+    lurek.graphic.setCanvas(fb)
+    lurek.graphic.setColor(0, 0, 0, 1)
+    lurek.graphic.rectangle("fill", 0, 0, 800, 600)
+    -- ... draw scene ...
+    lurek.graphic.setCanvas(nil)
+
+    -- Composite canvas onto screen
+    lurek.graphic.drawCanvas(fb, 0, 0)
+end
+
+-- Custom WGSL shader
+local shader = lurek.graphic.newShader([[
+    @fragment fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
+        return vec4<f32>(uv.x, uv.y, 0.5, 1.0);
+    }
+]])
+lurek.graphic.setShader(shader)
+lurek.graphic.draw(img, 0, 0)
+lurek.graphic.setShader(nil)
+```
+
+## Item Summary
+
+| Kind                | Count |
+|---------------------|-------|
+| Structs             | 18    |
+| Enums               | 12    |
+| Functions (Lua API) | 66    |
+| **Total**           | **96** |
+
+## References
 
 | Module       | Relationship                                                                         |
 |--------------|--------------------------------------------------------------------------------------|
@@ -132,3 +263,11 @@ which documents the same `lurek.graphic.*` API surface in detail.
 | `postfx`     | `src/postfx/` drives multi-pass effects using `BeginPostFx`/`EndPostFx`/`ApplyPostFx` commands. |
 | `particle`   | `src/particle/` pushes `DrawParticleSystem` commands into the render queue.          |
 | `light`      | `src/render/light/` manages `LightWorld` and occlusion geometry for the shadow pass. |
+## Notes
+
+- **Deferred rendering**: Lua closures never touch the GPU directly. `GpuRenderer::render_frame()` processes the full `RenderCommand` queue in a single encoder pass after each callback returns.
+- **Pre-allocated vertex buffers**: 131 K color vertices and 16 K texture vertices are allocated at startup and reused every frame — no per-frame heap allocations in the hot path.
+- **Depth/stencil format**: `Depth24PlusStencil8`; the 8-bit stencil provides masking and cut-out operations via `StencilMode`.
+- **`color.rs` status**: `src/render/color.rs` exists as a file but is not declared in `mod.rs`. The canonical `Color` type for the engine lives in `src/math/color.rs`.
+- **Breaking change surface**: Adding a new `RenderCommand` variant is backward-compatible. Renaming or removing an existing variant breaks any serialized replay or record files.
+- **Pipeline cache**: The renderer caches `wgpu::RenderPipeline` objects keyed by `(BlendMode, shader_key, wireframe_flag)` to minimise state switches during a frame.

@@ -540,3 +540,126 @@ Covers: constants (`pi`), trigonometry (`sin`, `cos`, `tan`, `atan2`), basic fun
 - **New noise type**: add a method to `NoiseGenerator`, expose in `LuaNoiseGenerator` UserData methods in `math_api.rs`.
 - **New geometry function**: add to `geometry.rs`, expose via a `tbl.set(...)` in the register function of `math_api.rs`.
 - **New UserData type**: create a `Lua*` wrapper struct implementing `LuaUserData`, add a `new*` factory function in the register function. Follow the pattern of `LuaTween` or `LuaSpatialHash`.
+
+## Submodules
+
+### `vec2` — 2D Vector
+- `Vec2` — Copy 2D vector with arithmetic overloads, normalization, dot, lerp, rotate, directional constants.
+
+### `mat3` — 3×3 Matrix
+- `Mat3` — Row-major affine matrix: identity, translation, rotation, scale, shear, inverse, multiply.
+
+### `rect` — Axis-Aligned Bounding Box
+- `Rect` — AABB with center, area, contains, and intersects.
+
+### `color` — sRGB Color
+- `Color` — Clamped sRGB `[f32; 4]` with named constants, `from_u8`, `to_u8`, gamma conversion.
+
+### `bezier` — Bézier Curves
+- `BezierCurve` — Arbitrary-order De Casteljau curve with render, derivative, and arc-length methods.
+
+### `easing` — Easing Functions
+- 22 named easing functions + case-insensitive `apply(name, t)` dispatcher.
+
+### `geometry` — Geometry Functions
+- Free functions: angle, circle tests, polygon area/centroid, segment intersection, Bresenham, convex hull, Delaunay triangulation, point-in-polygon, line intersect.
+
+### `noise_functions` — Standalone Noise
+- Free functions: `perlin2d`/`3d`/`4d`, `simplex2d`, `simplex_noise_2d`/`3d`, `fbm`.
+
+### `noise_generator` — Seeded Noise Generator
+- `NoiseGenerator` — Seeded Perlin/Simplex/Worley generator with fractal combinators and map generation.
+- `NoiseKind` — `Perlin` or `Simplex` base algorithm selection.
+- `FractalType` — `Fbm`, `Ridged`, `PingPong`, `DomainWarpProgressive`, `DomainWarpIndependent`.
+- `DistType` — `Euclidean`, `Manhattan`, or `Chebyshev` distance metric for Worley noise.
+- `MapGenOptions` — Configuration for procedural 2D map generation.
+
+### `polygon` — Polygon Utilities
+- `triangulate(polygon)` — Ear-clipping triangulation with auto-CCW enforcement.
+- `is_convex(polygon)` — Cross-product consistency convexity test.
+
+### `random` — Pseudorandom Number Generator
+- `RandomGenerator` — fastrand wrapper with normal distribution and state serialization.
+
+### `spatial_hash` — Grid Spatial Index
+- `SpatialHash` — Grid-based broad-phase spatial index with rect/circle/segment queries.
+- `SpatialItem` — Stored item with string ID and AABB.
+
+### `transform` — Affine Transform
+- `Transform` — Fluent `Mat3` wrapper with translate/rotate/scale/shear/reset API.
+
+### `tween` — Math-Level Interpolation
+- `Tween` — Multi-value interpolation driver with easing name resolution.
+- `TweenValue` — Single interpolated channel (start, target f64 pair).
+
+---
+
+## Lua Examples
+
+```lua
+-- Easing and interpolation
+print(lurek.math.applyEasing("cubicOut", 0.5))  -- ~0.875
+
+-- Random number generator
+local rng = lurek.math.newRandomGenerator(42)
+print(rng:randomInt(1, 6))        -- dice roll
+print(rng:randomNormal(1.0, 0.0)) -- Gaussian sample
+
+-- Affine transform
+local t = lurek.math.newTransform()
+t:translate(100, 200)
+t:rotate(math.pi / 4)
+local px, py = t:transformPoint(10, 0)
+
+-- Bézier curve
+local curve = lurek.math.newBezierCurve({0,0, 100,0, 100,100, 200,100})
+local pt = curve:evaluate(0.5)   -- midpoint
+
+-- Spatial hash
+local sh = lurek.math.newSpatialHash(64)
+sh:insert("player", 100, 200, 32, 32)
+sh:insert("enemy",  150, 210, 32, 32)
+local hits = sh:queryRect(90, 190, 100, 100)
+for _, id in ipairs(hits) do print("near:", id) end
+
+-- Noise
+local gen = lurek.math.newNoiseGenerator(12345)
+local v = gen:perlin2d(1.23, 4.56)
+print(string.format("noise: %.4f", v))
+
+-- Polygon triangulation
+local tris = lurek.math.triangulate({0,0, 100,0, 50,80})
+for _, tri in ipairs(tris) do
+    -- tri is a table of 3 {x,y} points
+end
+```
+
+## Item Summary
+
+| Kind                | Count |
+|---------------------|-------|
+| Structs             | 9     |
+| Enums               | 4     |
+| Free Functions      | 20+   |
+| Functions (Lua API) | 60+   |
+| **Total**           | **90+** |
+
+## References
+
+| Module       | Relationship                                                                 |
+|--------------|------------------------------------------------------------------------------|
+| `runtime`    | `spatial_hash.rs` imports `crate::runtime::log_messages` for log constants. |
+| `tween`      | `src/tween/state.rs` imports `crate::math::easing` for easing resolution.   |
+| `render`     | Imports `Color`, `Vec2`, `Mat3`, `Rect` as foundational geometry types.      |
+| `physics`    | Imports `Vec2` for rigid-body positions and impulse vectors.                 |
+| `camera`     | Imports `Vec2`, `Mat3`, `Rect` for viewport transform computations.          |
+| `lua_api`    | `math_api.rs` registers all UserData and free functions under `lurek.math`.  |
+| All modules  | `Vec2`, `Mat3`, `Rect`, `Color` are imported by virtually every other module. |
+
+## Notes
+
+- **Baseline leaf**: `math` has zero internal Lurek2D dependencies (except `crate::runtime::log_messages` in `spatial_hash.rs`). It is safe to import from any tier.
+- **`Copy` types**: `Vec2`, `Mat3`, `Rect`, `Color`, `Transform` are all `Copy` — no heap allocation on use.
+- **`math::Tween` vs `tween` module**: `src/math/tween.rs` is a low-level single-value interpolation primitive. The full property-animation system lives in `src/tween/` (Tier 1).
+- **Easing alias support**: All 22 easing names accept multiple capitalisation forms (e.g. `"cubicOut"`, `"outCubic"`, `"CubicOut"`) via the `apply(name, t)` dispatcher.
+- **Breaking change surface**: Removing a named easing function or changing geometry function signatures is a breaking change for any Lua scripts using `lurek.math.*`.

@@ -1,67 +1,46 @@
 # `render` — Agent Reference
 
-| Property       | Value                                                        |
-|----------------|--------------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                              |
-| **Status**     | Implemented — Full                                           |
-| **Lua API**    | `lurek.graphic`                                          |
-| **Source**     | `src/render/`                                            |
-| **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
-| **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
-| **Architecture** | `docs/architecture/engine-architecture.md` § Rendering Pipeline |
+| Property         | Value                                                                         |
+|------------------|-------------------------------------------------------------------------------|
+| **Tier**         | Tier 1 — Core Engine Subsystems                                               |
+| **Status**       | Implemented — Full                                                            |
+| **Lua API**      | `lurek.graphic` (66 functions, 7 UserData types)                              |
+| **Source**       | `src/render/`                                                                 |
+| **Rust Tests**   | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
+| **Lua Tests**    | `tests/lua/unit/test_graphics.lua`                                            |
+| **Architecture** | `docs/architecture/engine-architecture.md` § Rendering Pipeline               |
 
 ## Purpose
 
-The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.graphic.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+`src/render/` is the authoritative GPU rendering pipeline for Lurek2D. It owns every
+stage from the high-level draw calls Lua scripts issue through `lurek.graphic.*`, through
+a deferred `RenderCommand` queue, to the wgpu GPU backend that executes those commands
+against the swapchain. No other module writes pixels to the screen; everything visual flows
+through this module. The Lua bridge lives in `src/lua_api/render_api.rs`.
 
 ## Source Files
 
 | File               | Purpose                                                              |
 |--------------------|----------------------------------------------------------------------|
-| `canvas.rs`        | Off-screen render target metadata (`Canvas` struct with width/height) |
-| `color.rs`         | Orphaned `Color` struct — not declared in `mod.rs`; active `Color` lives in `src/math/color.rs` |
-| `decal_surface.rs` | Persistent surface descriptor for stamping decal textures            |
-| `draw_layer.rs`    | Z-ordered draw callback queue for controlling render order           |
-| `font.rs`          | TTF/OTF font loading via fontdue, glyph rasterization, shelf-packed RGBA atlas |
-| `gpu_renderer.rs`  | GPU-accelerated 2D renderer backed by wgpu; processes RenderCommand queue, manages GPU resources and render passes |
-| `image_effect.rs`  | Per-image shader-effect pass descriptor for the draw command pipeline |
-| `mesh.rs`          | Custom geometry mesh with per-vertex position, UV, and color data    |
-| `nine_slice.rs`    | Nine-slice (9-patch) image rendering for scalable UI elements        |
-| `renderer.rs`      | `RenderCommand` enum (45+ variants), `BlendMode`, `DrawMode`, `TextAlign`, `StencilMode`, `TextureData`, and related types |
-| `shader.rs`        | Custom WGSL shader support — source validation via naga, uniform variables, per-shader pipeline |
-| `shape.rs`         | `CompoundShape` builder and `ShapeCommand` sub-enum for multi-primitive vector drawing |
-| `sprite.rs`        | `Sprite` struct — texture handle + transform + tint color wrapper    |
-| `sprite_batch.rs`  | Sprite batching for efficient rendering of many sprites sharing one texture |
-| `sprite_sheet.rs`  | Grid-based sprite sheet with directional support and named frame groups |
-| `texture.rs`       | Texture loading (PNG/JPEG/BMP), premultiplied-alpha conversion, and `TextureKey` handle |
-| `texture_atlas.rs` | CPU-side bin-packing texture atlas using shelf algorithm              |
-| `mod.rs`           | Module root — declares all submodules and re-exports public types     |
-
-## Key Types
-
-| Type | Description |
-|------|-------------|
-| `Canvas` | Principal type for the `graphics` module. |
-| `Color` | Principal type for the `graphics` module. |
-| `DecalSurface` | Principal type for the `graphics` module. |
-| `LayerEntry` | Principal type for the `graphics` module. |
-| `DrawLayer` | Principal type for the `graphics` module. |
-| `Font` | Principal type for the `graphics` module. |
-| `GlyphInfo` | Principal type for the `graphics` module. |
-| `RenderStats` | Principal type for the `graphics` module. |
-| `GpuRenderer` | Principal type for the `graphics` module. |
-| `ShaderPassDescriptor` | Principal type for the `graphics` module. |
-| `MeshDrawMode` | Principal type for the `graphics` module. |
-| `MeshVertex` | Principal type for the `graphics` module. |
-
-## Lua API Summary
-
-_No `lurek.*` bindings registered for this module._
+| `mod.rs`           | Module root — declares all submodules and re-exports public types.   |
+| `canvas.rs`        | `Canvas` — off-screen render target metadata (width, height).        |
+| `color.rs`         | Legacy `Color` file; canonical `Color` lives in `src/math/color.rs`. |
+| `decal_surface.rs` | `DecalSurface` — persistent descriptor for stamping decal textures.  |
+| `draw_layer.rs`    | `DrawLayer` — Z-ordered draw callback queue.                         |
+| `font.rs`          | `Font` — TTF/OTF font via fontdue, glyph rasterization, shelf atlas. |
+| `gpu_renderer.rs`  | `GpuRenderer` — wgpu device, surface, pipeline cache, resource pools.|
+| `image_effect.rs`  | `ShaderPassDescriptor` — per-image shader-effect pass descriptor.    |
+| `mesh.rs`          | `Mesh`, `MeshVertex`, `MeshDrawMode` — indexed geometry types.       |
+| `nine_slice.rs`    | `NineSlice`, `Patch` — 9-patch image rendering for scalable UI.      |
+| `renderer.rs`      | `RenderCommand` (45+ variants), `BlendMode`, draw enums, `TextureData`. |
+| `shader.rs`        | `Shader`, `UniformValue` — custom WGSL shader with naga validation.  |
+| `shape.rs`         | `CompoundShape`, `ShapeCommand` — batched vector shape builder.      |
+| `sprite.rs`        | `Sprite` — texture + transform + tint wrapper.                       |
+| `sprite_batch.rs`  | `SpriteBatch` — shared-texture quad batch for one GPU draw call.     |
+| `sprite_sheet.rs`  | `SpriteSheet` — grid animation with named frame groups.              |
+| `texture.rs`       | `Texture` — PNG/JPEG/BMP loader with `TextureKey` handle.            |
+| `texture_atlas.rs` | `TextureAtlas` — shelf-algorithm CPU-side atlas packing.             |
 
 ## Full Specification
 
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/render.md`](../../docs/specs/render.md)
-
-_Update both this file **and** `docs/specs/render.md` whenever source files, public types, or Lua bindings change._
+Full spec: [`docs/specs/render.md`](../../../docs/specs/render.md)

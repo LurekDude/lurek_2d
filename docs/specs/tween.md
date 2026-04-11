@@ -453,3 +453,91 @@ Four distinct systems handle different animation needs — they do not overlap:
 - **Color field recognition** — auto-lerp Color userdata fields
 - **Lua 5.4 `__index` proxy** — intercept property access on non-table targets
 - See `ideas/tween.md` (original design doc) for extended feature ideas
+
+## Submodules
+
+### `state` — Timing Core (`src/tween/state.rs`)
+- `TweenState` — Pure-Rust timing state: elapsed, duration, easing fn, pause flag.
+- `resolve_easing(name) -> Option<fn(f32) -> f32>` — Case-insensitive easing name lookup.
+- `builtin_easing_names() -> &'static [&'static str]` — All 23 built-in easing names.
+
+### `handle` — Lua UserData Handles (`src/tween/handle.rs`)
+- `LuaTween` — Single property tween with callbacks, repeat, and yoyo; implements `LuaUserData`.
+- `LuaTweenSequence` — Ordered step-chain with `Tween`, `Delay`, and `Callback` steps; implements `LuaUserData`.
+- `LuaTweenParallel` — Simultaneous tween group; completes when all arms finish; implements `LuaUserData`.
+- `SequenceStep` — Enum variant: step in a `LuaTweenSequence` (`Tween`, `Delay`, or `Callback`).
+- `ParallelEntry` — Inline tween arm owned by a `LuaTweenParallel`.
+
+### `engine` — Active-Pool Manager (`src/tween/engine.rs`)
+- `TweenEngine` — Tracks active `LuaTween`, `LuaTweenSequence`, and `LuaTweenParallel` references via `LuaRegistryKey`; drives `update()` and `cancelAll()`.
+
+---
+
+## Lua Examples
+
+```lua
+-- Simple property tween
+local player = { x = 0, y = 300, alpha = 1.0 }
+
+lurek.process = function(dt)
+    lurek.tween.update(dt)
+end
+
+-- Move and fade simultaneously
+lurek.tween.tween(1.0, player, { x = 500, alpha = 0.0 }, "cubicOut")
+    :onComplete(function()
+        print("player moved to", player.x)
+    end)
+
+-- Step sequence: jump arc
+lurek.tween.sequence()
+    :tween(0.2, player, { y = player.y - 80 }, "sineOut")
+    :tween(0.2, player, { y = player.y      }, "sineIn")
+    :callback(function() print("landed") end)
+    :start()
+
+-- Parallel group: multi-actor entrance
+lurek.tween.parallel()
+    :tween(0.5, hero,    { x = 200 }, "backOut")
+    :tween(0.5, villain, { x = 600 }, "backOut")
+    :onComplete(function() print("all actors in position") end)
+    :start()
+
+-- Infinite loop with yoyo
+lurek.tween.tween(1.5, torch_light, { radius = 60 }, "sineInOut")
+    :setRepeat(-1)
+    :setYoyo(true)
+
+-- Custom easing via Lua callback
+lurek.tween.registerEasing("bounce3", function(t)
+    return math.abs(math.sin(t * math.pi * 3))
+end)
+lurek.tween.tween(1.0, coin, { y = 0 }, "bounce3")
+```
+
+## Item Summary
+
+| Kind                | Count |
+|---------------------|-------|
+| Structs             | 6     |
+| Enums               | 1     |
+| Functions (Lua API) | 10    |
+| UserData methods    | 20+   |
+| **Total**           | **37+** |
+
+## References
+
+| Module       | Relationship                                                                              |
+|--------------|-------------------------------------------------------------------------------------------|
+| `math`       | `src/tween/state.rs` imports `crate::math::easing` for `resolve_easing` lookups.         |
+| `runtime`    | `LuaTween` holds `LuaRegistryKey` (mlua) to keep target tables alive in the Lua registry. |
+| `lua_api`    | `src/lua_api/tween_api.rs` is the thin registration wrapper; owns `pub fn register()`.    |
+| `animation`  | `src/animation/` is the higher-level animation graph; `tween` operates on table fields only. |
+
+## Notes
+
+- **Manual update model**: The engine does not tick tweens automatically. Scripts must call `lurek.tween.update(dt)` from `lurek.process(dt)`. This gives full control over pause/resume and scene transitions.
+- **Lazy start-value capture**: Start values are read from the target table on the first `update()` call, not at tween creation. Scripts may move the target between calls without causing jitter.
+- **Thin Wrapper Rule**: `src/lua_api/tween_api.rs` contains only `pub fn register()` and delegation closures. All business logic, structs, and algorithms live in `src/tween/`.
+- **`LuaUserData` in domain module**: `handle.rs` implements `LuaUserData` directly because the handle types are inherently Lua-coupled (they hold `LuaRegistryKey`). This is a documented exception to the standard thin-wrapper rule.
+- **Breaking change surface**: Changing `TweenState` field layout or `SequenceStep` variant names is a breaking change if scripts import serialized tween state.

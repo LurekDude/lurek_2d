@@ -1,42 +1,30 @@
-# parallax — Parallax Background Layer System
+# `parallax` — Agent Reference
 
-## Overview
+| Property         | Value                                                                         |
+|------------------|-------------------------------------------------------------------------------|
+| **Tier**         | Tier 2 — Engine Extensions                                                    |
+| **Status**       | Implemented — Full                                                            |
+| **Lua API**      | `lurek.parallax` (25 functions, 2 UserData types)                             |
+| **Source**       | `src/parallax/`                                                               |
+| **Rust Tests**   | inline in `src/parallax/layer.rs`                                             |
+| **Lua Tests**    | `tests/lua/unit/test_parallax.lua`, `tests/lua/integration/test_parallax_camera.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md` § Tier 2 Modules                  |
 
-Provides a CPU-driven, multi-layer 2D parallax background system.  Each
-`ParallaxLayer` scrolls at a different speed relative to the camera, supports
-autonomous drift (autoscroll), horizontal and vertical tiling, per-layer blend
-modes, opacity, tint, and z-ordering.  Multiple layers can be grouped into a
-`ParallaxSet` for scene-level management.
+## Purpose
 
-## Metadata
-
-| Key | Value |
-|---|---|
-| **Module tier** | Tier 2 (depends on `engine`, `graphics`; no Tier 1↔Tier 1 cross-imports) |
-| **Status** | Implemented |
-| **Lua API namespace** | `lurek.parallax` |
-| **Source** | `src/parallax/` |
-| **Lua bridge** | `src/lua_api/parallax_api.rs` |
-| **Tests** | `tests/lua/unit/test_parallax.lua`, `tests/lua/integration/test_parallax_camera.lua` |
-| **Full specification** | `docs/specs/parallax.md` |
+`src/parallax/` provides a CPU-driven, multi-layer 2D scrolling background system. Each
+`ParallaxLayer` scrolls at a configurable speed relative to the camera, supports autonomous
+drift (autoscroll), horizontal and vertical tiling, z-ordering, opacity, tint, and per-layer
+blend modes. Multiple layers can be grouped into a `ParallaxSet` for batch update and draw.
+The Lua bridge lives in `src/lua_api/parallax_api.rs`.
 
 ## Source Files
 
-| File | Purpose |
-|---|---|
-| `src/parallax/mod.rs` | Module root, re-exports `ParallaxLayer`, `ParallaxDrawBatch` |
-| `src/parallax/layer.rs` | Pure-Rust domain logic: scroll math, tiling, draw batch building, 9 unit tests |
-| `layer.rs` | — |
-| `mod.rs` | — |
+| File      | Purpose                                                                     |
+|-----------|-----------------------------------------------------------------------------|
+| `mod.rs`  | Module root; re-exports `ParallaxLayer` and `ParallaxDrawBatch`.            |
+| `layer.rs`| `ParallaxLayer` scroll logic, `ParallaxDrawBatch`, 9 inline unit tests.     |
 
 ## Full Specification
 
-See [`docs/specs/parallax.md`](../../../docs/specs/parallax.md) for:
-- Scroll formula and pixel offset calculation
-- All `ParallaxLayer` fields with types and defaults
-- Full `lurek.parallax.*` Lua API reference table
-- GPU optimisation notes (future `DrawTiledImage` path)
-- Threading notes (why update is single-threaded)
-- Physics integration patterns at the Lua script level
-- Scene transition recipes
-- Performance guidance
+Full spec: [`docs/specs/parallax.md`](../../../docs/specs/parallax.md)

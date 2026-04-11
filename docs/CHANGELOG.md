@@ -18,6 +18,23 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.5] — 2026-04-11
+### Fixed
+- Rewrote `docs/specs/` for 5 modules to include all 11 required sections (`## Summary`, `## Architecture`, `## Source Files`, `## Submodules`, `## Key Types`, `## Lua API`, `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`, plus header metadata table):
+  - **render**: Added `## Submodules` (18 submodule entries), `## Lua Examples`, `## Item Summary`, `## Notes`; renamed `## Cross-Module References` → `## References`; removed stale `camera/`, `effect/`, `light/` rows from Source Files table.
+  - **parallax**: Complete rewrite from ad-hoc sections to full 11-section format.
+  - **runtime**: Added `## Architecture` (wgpu data-flow diagram), `## Submodules`, `## Lua Examples`, `## Item Summary`, `## Notes`; renamed `## Cross-Module References` → `## References`.
+  - **math**: Added `## Submodules` (15 submodule entries), `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`.
+  - **tween**: Added `## Submodules` (3 submodule entries), `## Lua Examples`, `## Item Summary`, `## References`, `## Notes`.
+- Updated AGENT.md for all 5 modules to the required 5-section format (H1, metadata table, `## Purpose`, `## Source Files`, `## Full Specification`):
+  - **render**: Fixed incorrect "No lurek.* bindings" note; added correct `lurek.graphic` metadata.
+  - **parallax**: Corrected H1 format; removed duplicate source file entries.
+  - **runtime**: Removed stale `## Full Specification → app.md` pointer; fixed to point to `runtime.md`.
+  - **math**: Rewrote from long-form to required 5-section format; removed stale `## Key Types` and `## Lua API Summary` sections.
+  - **tween**: Removed extra `## Key Types` and `## Lua API Summary` sections; standardised `## Full Specification`.
+- `python work/check_spec_sections.py` now reports **0 missing sections** across all 47 modules.
+- `python tools/audit/audit_agent_md.py` now reports **PASS — All 47 modules: AGENT.md and spec match disk exactly**.
+
 ## [0.7.4] — 2026-04-12
 ### Fixed
 - Synced all 47 `src/<module>/AGENT.md` and `docs/specs/<module>.md` Source Files tables to match actual `.rs` files on disk.
