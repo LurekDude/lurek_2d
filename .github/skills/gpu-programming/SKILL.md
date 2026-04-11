@@ -37,7 +37,7 @@ winit Window (Arc<Window>)
                           └── GpuRenderer::render_frame()
 ```
 
-Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes through `GpuRenderer` in `src/graphics/gpu_renderer.rs`.
+Lurek2D targets **wgpu 22**. No raw OpenGL path exists. All rendering goes through `GpuRenderer` in `src/render/gpu_renderer.rs`.
 
 ## RenderCommand Queue Lifecycle
 
@@ -59,9 +59,9 @@ After lurek.draw() returns:
 
 ## Adding a New RenderCommand Variant
 
-1. Add variant to `RenderCommand` enum in `src/graphics/renderer.rs`
-2. Add execution arm in `src/graphics/gpu_renderer.rs` (match arm)
-3. Add Lua push function in `src/lua_api/graphics_api.rs`
+1. Add variant to `RenderCommand` enum in `src/render/renderer.rs`
+2. Add execution arm in `src/render/gpu_renderer.rs` (match arm)
+3. Add Lua push function in `src/lua_api/render_api.rs`
 4. Add Lua BDD test in `tests/lua/unit/test_graphics.lua`
 
 ## Shader Authoring (WGSL)
@@ -72,8 +72,8 @@ Two WGSL shaders are embedded in the binary:
 
 | Shader | File | Vertex | Fragment |
 |--------|------|--------|----------|
-| `COLOR_SHADER` | `embedded in src/graphics/gpu_renderer.rs (COLOR_SHADER)` | position + color | pass-through |
-| `TEXTURE_SHADER` | `embedded in src/graphics/gpu_renderer.rs (TEXTURE_SHADER)` | position + UV + color tint | texture sample |
+| `COLOR_SHADER` | `embedded in src/render/gpu_renderer.rs (COLOR_SHADER)` | position + color | pass-through |
+| `TEXTURE_SHADER` | `embedded in src/render/gpu_renderer.rs (TEXTURE_SHADER)` | position + UV + color tint | texture sample |
 
 ### Custom User Shaders
 

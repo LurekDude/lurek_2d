@@ -1,13 +1,13 @@
 ---
-description: "Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a runnable content/content/examples/<name>/main.lua."
+description: "Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a runnable content/examples/<name>/main.lua."
 ---
 
 # Create Lua Example
 
-**Purpose**: Add a new runnable Lua example to `content/content/examples/` that demonstrates a specific Lurek2D API capability.
+**Purpose**: Add a new runnable Lua example to `content/examples/` that demonstrates a specific Lurek2D API capability.
 **Use When**: A new API feature needs a working demo, or a tutorial use-case lacks a concrete example.
 **Do Not Use When**: The example would require assets not committed to the repo, or it tests edge cases rather than typical usage.
-**Scope**: `content/content/examples/` only; no `src/` changes.
+**Scope**: `content/examples/` only; no `src/` changes.
 
 ## Inputs
 
@@ -18,8 +18,8 @@ description: "Create a new self-contained Lua example game in content/examples/.
 ## Steps
 
 1. Load skill `lua-scripting/SKILL.md`
-2. Create directory `content/content/examples/<EXAMPLE_NAME>/`
-3. Write `content/content/examples/<EXAMPLE_NAME>/main.lua` with:
+2. Create directory `content/examples/<EXAMPLE_NAME>/`
+3. Write `content/examples/<EXAMPLE_NAME>/main.lua` with:
    - `local` variables for all state
    - `function lurek.init()` — initialization
    - `function lurek.process(dt)` — frame logic
@@ -29,18 +29,18 @@ description: "Create a new self-contained Lua example game in content/examples/.
    - Colors: `[0.0, 1.0]` float range
    - Shapes: `("fill"/"line", x, y, ...)`
    - Key names: `"space"`, `"escape"`, `"w"`, `"a"`, `"s"`, `"d"`
-5. Verify it runs: `cargo run -- content/content/examples/<EXAMPLE_NAME>`
+5. Verify it runs: `cargo run -- content/examples/<EXAMPLE_NAME>`
 6. Add entry to README.md examples table if it demonstrates a major feature
 
 ## Outputs
 
-- `content/content/examples/<EXAMPLE_NAME>/main.lua` — working, commented Lua script
-- Any required assets in `content/content/examples/<EXAMPLE_NAME>/` (images, audio)
-- Verified: `cargo run -- content/content/examples/<EXAMPLE_NAME>` opens a window without errors
+- `content/examples/<EXAMPLE_NAME>/main.lua` — working, commented Lua script
+- Any required assets in `content/examples/<EXAMPLE_NAME>/` (images, audio)
+- Verified: `cargo run -- content/examples/<EXAMPLE_NAME>` opens a window without errors
 
 ## Acceptance
 
-- [ ] Example runs with `cargo run -- content/content/examples/<EXAMPLE_NAME>`
+- [ ] Example runs with `cargo run -- content/examples/<EXAMPLE_NAME>`
 - [ ] Uses only `lurek.*` API — no external engine prefixes or undocumented functions
 - [ ] All variables are `local`
 - [ ] Under 100 lines (demos should be readable)
@@ -53,5 +53,5 @@ description: "Create a new self-contained Lua example game in content/examples/.
 **Related Prompts**: `create-game-example.prompt.md`
 **Commands**:
 ```powershell
-cargo run -- content/content/examples/<EXAMPLE_NAME>
+cargo run -- content/examples/<EXAMPLE_NAME>
 ```

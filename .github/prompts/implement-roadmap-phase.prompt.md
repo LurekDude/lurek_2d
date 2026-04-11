@@ -16,7 +16,7 @@ Load these skills **before** starting any step. Do not proceed without reading t
 2. `.github/skills/lua-api-design/SKILL.md` — `lurek.*` naming, parameter conventions, API alignment
 3. `.github/skills/rust-coding/SKILL.md` — Rust conventions, error handling, visibility
 4. `.github/skills/testing-rust/SKILL.md` — test patterns, float comparisons, headless safety
-5. Load domain skill matching the phase: `gpu-programming`, `physics-engine`, `audio-integration`, `input-handling`, `asset-pipeline` — whichever applies; for font/text consult `src/graphics/AGENT.md` (Font Rendering Patterns section)
+5. Load domain skill matching the phase: `gpu-programming`, `physics-engine`, `audio-integration`, `input-handling`, `asset-pipeline` — whichever applies; for font/text consult `src/render/AGENT.md` (Font Rendering Patterns section)
 
 ## Use When
 
@@ -388,7 +388,7 @@ The phase is not done until every item below is checked:
 
 | What the task touches | Route to |
 |---|---|
-| `src/graphics/` | **Renderer** |
+| `src/render/` | **Renderer** |
 | `src/physics/` | **Physicist** |
 | `src/audio/` | **Audio-Eng** |
 | `src/lua_api/` | **Developer** (binding wiring) + domain specialist |

@@ -30,7 +30,7 @@ description: "Full feature development workflow from design to merged code. Use 
 ### Phase 2: Implementation (Renderer / Physicist / Audio-Eng / Developer)
 
 4. Identify which specialist agent owns the implementation:
-   - `src/graphics/` → **Renderer**
+   - `src/render/` → **Renderer**
    - `src/physics/` → **Physicist**
    - `src/audio/` → **Audio-Eng**
    - Everything else → **Developer**

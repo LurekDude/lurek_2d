@@ -16,7 +16,7 @@ Implement and maintain the physics simulation. Own all `src/physics/` code: rigi
 - `src/physics/` — PhysicsPipeline, World, Body, Shape, Fixture, Joint, contact-event collection, raycasting, rapier2d integration
 - `src/lua_api/physics_api.rs` — All `lurek.physics.*` Lua bindings
 
-The physics module is a **Tier 1** engine subsystem that wraps rapier2d 0.32. Key invariants: `PhysicsBodyKey` (a `SlotMap` key) is the only physics handle exposed to Lua — never a raw rapier `RigidBodyHandle`. Contact events are collected in `World.contact_events` during `step()` and flushed as Lua callbacks afterward — never from inside the step. The module depends only on `math` and `engine`; it must not import `graphics`, `audio`, or any other Tier 1 sibling.
+The physics module is a **Platform Services** subsystem that wraps rapier2d 0.32. Key invariants: `PhysicsBodyKey` (a `SlotMap` key) is the only physics handle exposed to Lua — never a raw rapier `RigidBodyHandle`. Contact events are collected in `World.contact_events` during `step()` and flushed as Lua callbacks afterward — never from inside the step. The module depends only on `math` and `engine`; it must not import `render`, `audio`, or any other Platform Services sibling.
 
 **Must not become**:
 - Shadow Renderer doing collision visualization

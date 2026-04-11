@@ -22,8 +22,8 @@ Active binding decisions from `docs/architecture/philosophy.md` — do not propo
 
 - **A-01** Runtime only — no embedded visual editor or IDE
 - **A-02** Desktop only — Windows/Linux/macOS x86_64 + ARM. No mobile, no WASM
-- **A-03** 2D graphics only — no 3D scene graph. Raycasting and isometric rendering use 2D draw calls and are acceptable
-- **A-04** No distribution platform SDKs (Steam, Epic) in the core binary — Tier 4, out of scope
+- **A-03** 2D graphics only — no 3D scene graph. Raycasting (textured-quad 2.5D) and isometric rendering use 2D draw calls and are acceptable
+- **A-04** No distribution platform SDKs (Steam, Epic) in the core binary — lives outside the five-group module stack (T-08)
 - **B-01** LuaJIT is the primary runtime; `lua54` Cargo feature is a non-shipping development fallback
 - **B-02** wgpu 22 is the only renderer backend (Vulkan / DX12 / Metal) — no OpenGL path
 - **B-03** Games must run acceptably on integrated GPUs (Intel UHD, AMD APU) — 60 FPS at 1080p target
@@ -53,23 +53,23 @@ Lurek2D organises its Rust source into **five responsibility groups**. The one b
 **Foundations** — pure algorithms and data, no render/audio/input/Lua deps:
 `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`
 
-**Core Runtime** — engine lifecycle, resource registry, sandboxed I/O, asset loading, timing, events, concurrency:
-`core`, `world`, `filesystem`, `assets`, `time`, `event`, `task`, `network`
+**Core Runtime** — engine lifecycle, timing, events, threading, networking, sandboxed I/O:
+`runtime`, `event`, `timer`, `thread`, `network`, `filesystem`
 
 **Platform Services** — OS-facing backends, each behind a pure-Rust contract:
-`render`, `audio`, `physics`, `input`, `image`, `window`
+`render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect`, `camera`, `light`, `effect`
 
 **Feature Systems** — game-domain services; same-group imports allowed when acyclic:
-`entity`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `nav`, `save`, `mods`, `i18n`, `automation`
+`ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine`
 
 **Edge/Integration** — composition root and scripting bridge; nothing below imports these:
-`scripting` (`lua_api`, registers `lurek.*`), `app` (boot + event loop), `devtools`, `debugbridge`, `entrypoints`
+`app` (boot + event loop), `lua_api` (registers `lurek.*`), `devtools`, `debugbridge`, `docs`, `pipeline`, `bin`
 
 **Lunasome** (`content/library/`) — Pure-Lua standard libraries that consume only the public `lurek.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
 
 **Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
 
-**State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/engine/resource_keys.rs`.
+**State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/runtime/resource_keys.rs`.
 
 **Boot**: CLI args → `Config::load_from_conf_lua()` (conf.lua via temp Lua VM) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `lurek.init()` / `lurek.ready()` → winit event loop.
 
@@ -101,7 +101,7 @@ Lurek2D organises its Rust source into **five responsibility groups**. The one b
 | `Doc-Writer` | Writes and maintains all documentation in `docs/`, ensures `///` coverage on public items, runs the doc pipeline, and keeps `content/demos/README.md` current |
 | `Security` | Audits the Lua sandbox, GameFS path-traversal guards, Lua input validation, and `unsafe` blocks — reports findings to Developer, never implements fixes directly |
 | `CAG-Architect` | Maintains the `.github/` CAG layer — agents, skills, prompts, and the system prompt — and always runs `tools/validate/cag_validate.py` after every edit |
-| `Configurator` | Authors, validates, and documents `conf.lua` and `conf.toml` templates against the `Config` struct in `src/engine/config.rs` — does not modify engine Rust code |
+| `Configurator` | Authors, validates, and documents `conf.lua` and `conf.toml` templates against the `Config` struct in `src/runtime/config.rs` — does not modify engine Rust code |
 | `Hacker` | Performs adversarial probing of the `lurek.*` API and sandbox — stale keys, path traversal, double-release, nil spam, resource exhaustion — and feeds findings to Security and Tester |
 | `Player` | Reviews demos and API proposals through named user personas; provides subjective fun ratings and friction reports to Lua-Designer and Doc-Writer — never performs correctness checks |
 
@@ -113,7 +113,7 @@ Lurek2D-specific rules only — common Rust idioms apply without repetition:
 
 - `unsafe` requires a `// SAFETY:` comment explaining the invariant; never use raw pointers for state sharing
 - Per-frame code must not allocate on the heap — grow draw-call buffers at startup, not per frame
-- Engine resources live in `SlotMap<TypedKey, Resource>` — see `src/engine/resource_keys.rs` for all key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`, `SpriteBatchKey`, `ParticleKey`)
+- Engine resources live in `SlotMap<TypedKey, Resource>` — see `src/runtime/resource_keys.rs` for all key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`, `SpriteBatchKey`, `ParticleKey`)
 - Use `log::info!` / `log::warn!` / `log::error!` / `log::debug!` — never `println!` in engine code
 - Convert errors to `LuaError` at the Lua API boundary with `.map_err(LuaError::external)`
 

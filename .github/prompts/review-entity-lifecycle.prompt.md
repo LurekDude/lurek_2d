@@ -6,9 +6,9 @@ description: "Review entity lifecycle patterns for correctness: spawn, alive che
 
 ## Prerequisites
 
-- Read `src/entity/mod.rs` for Universe types
-- Read `src/lua_api/entity_api.rs` for Lua bindings
-- Read `tests/rust/unit/entity_tests.rs` for test patterns
+- Read `src/ecs/mod.rs` for Universe types
+- Read `src/lua_api/ecs_api.rs` for Lua bindings
+- Read `tests/rust/unit/ecs_tests.rs` for test patterns
 - Load the `ecs-architecture` skill
 
 ## Steps

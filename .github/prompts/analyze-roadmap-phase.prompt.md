@@ -28,7 +28,7 @@ Load these **before starting any step**:
    - Audio → `audio-integration`
    - Input / gamepad / touch → `input-handling`
    - Filesystem / assets → `asset-pipeline`
-   - Font / text → `src/graphics/AGENT.md` (Font Rendering Patterns section)
+   - Font / text → `src/render/AGENT.md` (Font Rendering Patterns section)
    - Animation → `animation-system`
    - Timers, math, system, data → `lua-api-design`
    - OO Lua API (Phase 13+) → `lua-api-design`

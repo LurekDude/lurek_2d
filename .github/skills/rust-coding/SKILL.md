@@ -30,7 +30,7 @@ description: "Load this skill when writing or reviewing Rust code in the Lurek2D
 ## Live Repository Contracts
 
 - `src/lib.rs` — all module re-exports via `pub mod`
-- `src/engine/error.rs` — `EngineError` enum definition
+- `src/runtime/error.rs` — `EngineError` enum definition
 - `src/lua_api/mod.rs` — `SharedState` struct and `create_lua_vm()` function
 
 ## Decision Rules
@@ -46,33 +46,34 @@ description: "Load this skill when writing or reviewing Rust code in the Lurek2D
 - **Testing**: Every public function should have at least one test
 - **Naming**: Types are `PascalCase`, functions are `snake_case`, constants are `SCREAMING_SNAKE_CASE`
 
-## Module Tier System
+## Module Group System
 
-Lurek2D source is organized in a strict tier direction — no circular deps:
+Lurek2D source is organized in five responsibility groups — no cycles, ever:
 
-| Tier | Modules | May import |
-|------|---------|-----------|
-| Foundation — Baseline | `math`, `engine` | `math` has no deps; `engine` imports `math` |
-| Tier 1 — Core | `graphics`, `audio`, `physics`, `input`, `timer`, `filesystem`, `compute`, `data`, `image`, `sound`, `event`, `entity`, `window`, `thread` | Baseline only — no T1↔T1 cross-imports |
-| Tier 2 — Extensions | `particle`, `tilemap`, `scene`, `savegame`, `modding`, `graph`, `pathfinding`, `ai`, `dataframe`, `resource` | Baseline + Tier 1 — no T2↔T2 cross-imports |
-| Tier 3 — Lunasome | `content/library/` (pure Lua) | Public `lurek.*` API only |
-| Bridge layer | `lua_api` | All tiers — domain modules never import `lua_api` |
+| Group | Modules | May import |
+|-------|---------|-----------|
+| Foundations | `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` | Pure algorithms — no render/audio/input/Lua deps |
+| Core Runtime | `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` | Foundations only |
+| Platform Services | `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` | Foundations + Core Runtime |
+| Feature Systems | `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` | Below groups; same-group OK when acyclic |
+| Edge/Integration | `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` | All groups — nothing below imports these |
+| Lunasome | `content/library/` (pure Lua) | Public `lurek.*` API only |
 
 **Forbidden import patterns:**
 ```rust
-// WRONG — Tier 1 importing Tier 1
-use crate::graphics::GpuRenderer;  // from inside src/audio/
-use crate::audio::Mixer;           // from inside src/graphics/
+// WRONG — same-group cross-import (Platform Services)
+use crate::render::GpuRenderer;    // from inside src/audio/
+use crate::audio::Mixer;           // from inside src/render/ — FORBIDDEN (same-group Platform Services cross-import)
 
 // WRONG — domain module importing lua_api
 use crate::lua_api::something;     // from inside src/physics/
 
-// CORRECT — always absolute, stay within tier rules
-use crate::engine::SharedState;    // Tier 1 importing Baseline
-use crate::math::Vec2;             // any tier importing math
+// CORRECT — importing from a lower group
+use crate::runtime::SharedState;   // Platform Services importing Core Runtime
+use crate::math::Vec2;             // any group importing Foundations
 ```
 
-**Rule**: Before adding a `use crate::` statement, check whether it crosses tier boundaries. If it does, refactor — never add an exception.
+**Rule**: Before adding a `use crate::` statement, check whether it crosses group boundaries upward. If it does, refactor — never add an exception.
 
 ## Build Commands Reference
 

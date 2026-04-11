@@ -33,15 +33,14 @@ description: "Load this skill when designing module boundaries, dependency direc
 
 ## Decision Rules
 
-- **Layer model** (strict):
-  - `math` → depends on nothing; it is the Baseline leaf
-  - `engine` → Baseline runtime lifecycle and shared state
-  - Tier 1 Rust modules → depend only on `math` and `engine`
-  - Tier 2 Rust modules → depend on Baseline + Tier 1, never other Tier 2 modules
-  - `lua_api` → bridge layer that imports engine modules to expose `lurek.*`
-  - `content/library/` → Tier 3 Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust gameplay module
-  - Gameplay-oriented Rust modules still under `src/` are migration-state code, not the target Tier 3 architecture for new work
-- **No same-tier cross-imports**: Tier 1 modules must not import other Tier 1 modules; Tier 2 modules must not import other Tier 2 modules
+- **Five-group responsibility model** (strict — see `docs/architecture/engine-architecture.md`):
+  - **Foundations**: `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` — pure algorithms and data, no render/audio/input/Lua deps
+  - **Core Runtime**: `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` — engine lifecycle, timing, events, threading
+  - **Platform Services**: `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` — OS-facing backends
+  - **Feature Systems**: `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` — game-domain services; same-group imports allowed when acyclic
+  - **Edge/Integration**: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` — composition root; nothing below imports these
+  - `content/library/` → Lunasome, pure Lua; when a new gameplay-domain helper can live there, prefer that over a new Rust module
+- **No upward imports**: lower groups must not import higher groups. Feature Systems allows same-group imports only when the dependency graph remains acyclic
 - **One responsibility**: Each module owns one subsystem — no shared kitchen-sink modules
 - **mod.rs pattern**: Each module has `mod.rs` for re-exports + separate files for types
 - **Visibility**: Default to `pub(crate)`; use `pub` only for types used by `tests/` or external consumers

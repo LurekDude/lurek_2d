@@ -16,9 +16,9 @@ Add a new RenderCommand variant to the rendering pipeline.
 
 ## Steps
 
-1. Add variant to `RenderCommand` enum in `src/graphics/mod.rs`
-2. Implement rendering in `src/graphics/renderer.rs` match arm
-3. Add Lua binding in `src/lua_api/graphics_api.rs`
+1. Add variant to `RenderCommand` enum in `src/render/mod.rs`
+2. Implement rendering in `src/render/renderer.rs` match arm
+3. Add Lua binding in `src/lua_api/render_api.rs`
 4. Update `docs/API/lua_api_reference_generated.md`
 5. Write test for the new command
 6. Run `cargo test` and `cargo clippy`
@@ -33,5 +33,5 @@ Add a new RenderCommand variant to the rendering pipeline.
 ## References
 
 - `gpu-programming` skill
-- `src/graphics/AGENT.md`
-- `src/graphics/mod.rs`
+- `src/render/AGENT.md`
+- `src/render/mod.rs`

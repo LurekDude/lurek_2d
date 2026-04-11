@@ -7,7 +7,7 @@ description: "Security audit for Lurek2D Lua sandboxing, filesystem access, and 
 **Purpose**: Audit the Lurek2D engine for security issues: Lua sandbox escapes, path traversal, untrusted script execution, and memory safety.
 **Use When**: Adding filesystem access to Lua API, loading scripts from user-supplied paths, or modifying the `GameFS` sandbox.
 **Do Not Use When**: Reviewing pure rendering or physics logic with no external inputs.
-**Scope**: `src/filesystem/`, `src/lua_api/filesystem_api.rs`, `src/engine/app.rs`, and any newly added Lua API that accepts path or shell arguments.
+**Scope**: `src/filesystem/`, `src/lua_api/filesystem_api.rs`, `src/app/app.rs`, and any newly added Lua API that accepts path or shell arguments.
 
 ## Inputs
 

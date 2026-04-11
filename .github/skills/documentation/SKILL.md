@@ -35,21 +35,22 @@ description: "Load this skill when writing or updating Lurek2D documentation: AP
 - `docs/architecture/test-framework.md` — test suite architecture and quality gates
 - `README.md` — project overview and quick start
 
-## Layer Model Terminology
+## Module Group Terminology
 
 Always use these exact terms when writing architecture or API documentation:
 
 | Term | Meaning |
 |------|---------|
-| **Baseline** | Always-on substrate: `src/math/` (leaf) + `src/engine/` (lifecycle) |
-| **Tier 1** | Core engine subsystems built on Baseline only |
-| **Tier 2** | Reusable engine extensions built on Baseline + Tier 1 |
-| **Tier 3 Lunasome** | Pure-Lua standard libraries under `content/library/` — NOT Rust source |
-| **bridge layer** | `src/lua_api/` — registers `lurek.*`; not a numbered tier |
+| **Foundations** | Pure algorithms and data: `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` |
+| **Core Runtime** | Engine lifecycle, timing, events, threading: `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` |
+| **Platform Services** | OS-facing backends: `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` |
+| **Feature Systems** | Game-domain services: `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` |
+| **Edge/Integration** | Composition root: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` |
+| **Lunasome** | Pure-Lua standard libraries under `content/library/` — NOT Rust source |
 
-`lua_api` is the bridge layer, not "Tier 3." Tier 3 Lunasome lives in `content/library/` and is pure Lua.
+`lua_api` is Edge/Integration (composition root), not Lunasome. Lunasome lives in `content/library/` and is pure Lua.
 
-Legacy gameplay Rust modules still under `src/` (`battle`, `cardgame`, `combat`, etc.) are **migration-state** — being superseded by `content/library/` equivalents. Document them as deprecated, not as active Tier 3.
+Legacy gameplay Rust modules still under `src/` are being superseded by `content/library/` equivalents. Document them as deprecated, not as active Lunasome.
 
 ## Testing Docs Conventions
 
@@ -70,7 +71,7 @@ Never conflate these. A failing integration test and a failing cargo run are dif
 - **One source of truth**: Don't duplicate information across doc files — cross-reference
 - **Lua perspective**: API reference written for Lua script authors, not Rust developers
 - **Function format**: `lurek.module.function(param1, param2)` — Returns: description
-- **Layer model terms**: Always use the exact terms from the table above (e.g., "Tier 1", "bridge layer")
+- **Group model terms**: Always use the exact terms from the table above (e.g., "Platform Services", "Edge/Integration")
 - **require("library.*)**: In code examples, `require("library.combat")` etc. refer to shipped Lua modules under `content/library/` — never describe `content/library/` as Rust source
 - **Example paths**: Run commands must use real directory names from `content/demos/` or `examples/` — not invented paths
 - **Architecture docs**: Must reflect current module structure — update when modules change

@@ -10,7 +10,7 @@ Profile and analyze the rendering pipeline performance.
 
 ## Steps
 
-1. Identify the rendering hot path in `src/graphics/renderer.rs`
+1. Identify the rendering hot path in `src/render/renderer.rs`
 2. Count draw commands processed per frame
 3. Check for per-frame allocations in render loop
 4. Analyze texture memory usage (loaded textures, format conversions)

@@ -29,8 +29,8 @@ description: "Load this skill when analyzing or optimizing Lurek2D performance: 
 
 ## Live Repository Contracts
 
-- `src/engine/app.rs` — main game loop (hot path)
-- `src/graphics/renderer.rs` — draw command processing (hot path)
+- `src/app/app.rs` — main game loop (hot path)
+- `src/render/renderer.rs` — draw command processing (hot path)
 - `src/physics/world.rs` — world step, collision detection (hot path)
 - `src/timer/clock.rs` — frame timing measurement
 
@@ -123,13 +123,13 @@ The overlay shows per-frame draw call count — the primary signal for render pe
 
 | Hot Path | Location | Bottleneck |
 |----------|----------|------------|
-| RenderCommand processing | `src/graphics/gpu_renderer.rs` | Draw call count, state changes |
-| Sprite batch flush | `src/graphics/sprite_batch.rs` | Vertex buffer upload size |
+| RenderCommand processing | `src/render/gpu_renderer.rs` | Draw call count, state changes |
+| Sprite batch flush | `src/render/sprite_batch.rs` | Vertex buffer upload size |
 | Physics world step | `src/physics/world.rs` | Body + collider count |
-| Lua `lurek.update()` | `src/engine/app.rs` | Lua computation + GC |
+| Lua `lurek.update()` | `src/app/app.rs` | Lua computation + GC |
 | Particle system update | `src/particle/mod.rs` | Active particle count |
-| Font glyph rasterization | `src/graphics/font.rs` | First-time cache miss only |
-| Texture decompression | `src/graphics/texture.rs` | Load time, not per-frame |
+| Font glyph rasterization | `src/render/font.rs` | First-time cache miss only |
+| Texture decompression | `src/render/texture.rs` | Load time, not per-frame |
 
 ---
 

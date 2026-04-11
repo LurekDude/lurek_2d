@@ -270,10 +270,10 @@ test_summary()
 
 ```lua
 -- measure(name, count, fn) — wraps fn(), prints [PERF] line, returns elapsed, ops_per_sec
-local elapsed, ops = measure("entity_create", 10000, function()
-    for i = 1, 10000 do lurek.entity.newEntity() end
+local elapsed, ops = measure("ecs_create", 10000, function()
+    for i = 1, 10000 do lurek.ecs.newEntity() end
 end)
-expect_less(elapsed, 1.0, "10k entity creates must finish under 1s")
+expect_less(elapsed, 1.0, "10k ECS entity creates must finish under 1s")
 
 -- expect_golden(name, data, expected) — deterministic inline comparison
 expect_golden("path_result", lurek.pathfinding.findPath(...), "[(1,1),(2,1),(3,1)]")
@@ -300,7 +300,7 @@ expect_canvas_pixel(canvas, 32, 32, 1.0, 0.0, 0.0, 1.0, 0.05, "center pixel must
 | `lurek.physics.*` | `lurek.audio.newSource` (no audio device) |
 | `lurek.time.*` | Any API that calls `winit` window methods |
 | `lurek.input.*` (state, no events) | `lurek.window.setSize` |
-| `lurek.entity.*` | Rendering commands |
+| `lurek.ecs.*` | Rendering commands |
 | `lurek.data.*`, `lurek.savegame.*` | — |
 | `lurek.tilemap.*`, `lurek.ai.*` | — |
 | Built-in Lua: `math.*`, `string.*`, `table.*` | — |

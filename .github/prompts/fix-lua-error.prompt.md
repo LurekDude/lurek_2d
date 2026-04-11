@@ -7,7 +7,7 @@ description: "Debug and fix Lua script errors in Lurek2D. Use when a Lua game sc
 **Purpose**: Diagnose and fix Lua errors thrown inside the Lurek2D engine at runtime.
 **Use When**: A `main.lua` script exits with an `mlua` error, `attempt to index a nil value`, `bad argument`, stack overflow, or similar Lua-side failure.
 **Do Not Use When**: The crash is a Rust panic (not an mlua `LuaError`) — use `fix-engine-bug.prompt.md` instead.
-**Scope**: `src/lua_api/`, `src/engine/app.rs`, and the affected Lua script.
+**Scope**: `src/lua_api/`, `src/app/app.rs`, and the affected Lua script.
 
 ## Inputs
 

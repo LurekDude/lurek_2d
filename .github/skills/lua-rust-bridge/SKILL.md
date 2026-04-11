@@ -195,7 +195,7 @@ To check alignment: `python tools/docs/gen_lua_api_data.py`
 ## Domain Module Checklist (before writing lua_api)
 
 Before implementing the Lua bridge, verify the domain module provides:
-- [ ] Typed resource key in `src/engine/resource_keys.rs`
+- [ ] Typed resource key in `src/runtime/resource_keys.rs`
 - [ ] Public API methods in `src/<module>/` (no business logic in lua_api)
 - [ ] `SharedState` field holding the resource pool
 - [ ] Clear ownership boundary (who allocates, who frees, who holds GPU resources)

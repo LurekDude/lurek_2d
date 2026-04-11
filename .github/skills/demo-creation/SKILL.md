@@ -1,6 +1,6 @@
 ---
 name: demo-creation
-description: "Load this skill when creating one or more new demo projects in content/demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/demos/README.md; using content/library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
+description: "Load this skill when creating one or more new demo projects in content/demos/. Use when: scaffolding a demo from a genre or feature description; generating conf.lua + main.lua + README.md + screen.png; registering a new demo in content/demos/README.md; using content/library/ modules alongside lurek.* API; creating batches of demos from a list of genres or specific needs. Skip it for content/examples/ single-file scripts (use examples-management skill), test writing, or engine Rust code."
 argument-hint: "genre, count, features, library modules, resolution, complexity"
 ---
 
@@ -28,7 +28,7 @@ argument-hint: "genre, count, features, library modules, resolution, complexity"
 
 ## Does Not Cover
 
-- `content/content/examples/` single-file scripts → use `examples-management` skill
+- `content/examples/` single-file scripts → use `examples-management` skill
 - Engine Rust changes needed by a demo → use `rust-coding` + `lua-rust-bridge` skills
 - Physics simulation internals → use `lua-scripting` skill alongside this one
 - Stubs and incomplete `content/library/` modules (check [library-integration](./references/library-integration.md) before picking a module)

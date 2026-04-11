@@ -6,7 +6,7 @@ description: "Analyze and optimize pathfinding performance: A★ cost, grid size
 
 ## Prerequisites
 
-- Read `src/pathfinding/mod.rs` for algorithm inventory
+- Read `src/pathfind/mod.rs` for algorithm inventory
 - Read `tests/rust/unit/pathfinding_tests.rs` for test setup patterns
 - Load the `pathfinding-systems` skill and `performance-profiling` skill
 

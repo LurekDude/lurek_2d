@@ -27,9 +27,9 @@ description: "Load this skill when designing or implementing error handling in L
 
 ## Live Repository Contracts
 
-- `src/engine/error.rs` — `EngineError` enum definition
+- `src/runtime/error.rs` — `EngineError` enum definition
 - `src/lua_api/mod.rs` — error conversion for Lua bindings
-- `src/engine/app.rs` — top-level error handling in game loop
+- `src/app/app.rs` — top-level error handling in game loop
 
 ## Decision Rules
 

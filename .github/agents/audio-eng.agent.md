@@ -16,7 +16,7 @@ Implement and maintain the audio pipeline. Own all `src/audio/` code: rodio inte
 - `src/audio/` — Mixer, AudioSource, Decoder, multichannel playback, spatial state, queueable buffers
 - `src/lua_api/audio_api.rs` — All `lurek.audio.*` Lua bindings
 
-The audio module is a **Tier 1** engine subsystem that depends only on `math` and `engine`. It wraps the `rodio` library for playback and exposes a uniform Lua interface covering static sources, streaming sources, streaming decoders, queueable PCM sources, spatial positioning, and playback-device selection. All file I/O flows through `GameFS` — never direct `std::fs` calls.
+The audio module is a **Platform Services** subsystem that depends only on `math` and `engine`. It wraps the `rodio` library for playback and exposes a uniform Lua interface covering static sources, streaming sources, streaming decoders, queueable PCM sources, spatial positioning, and playback-device selection. All file I/O flows through `GameFS` — never direct `std::fs` calls.
 
 **Must not become**:
 - Shadow Developer for non-audio engine code

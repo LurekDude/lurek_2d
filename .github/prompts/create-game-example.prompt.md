@@ -1,5 +1,5 @@
 ---
-description: "Create a new Lua game example in the content/content/examples/ directory with main.lua and all required assets."
+description: "Create a new Lua game example in the content/examples/ directory with main.lua and all required assets."
 ---
 
 # Create Game Example
@@ -27,22 +27,22 @@ Create a new Lua game example that demonstrates specific Lurek2D features.
 
 ## Steps
 
-1. Create directory `content/content/examples/<name>/`
-2. Write `content/content/examples/<name>/main.lua` with `lurek.load()`, `lurek.update(dt)`, `lurek.draw()`
+1. Create directory `content/examples/<name>/`
+2. Write `content/examples/<name>/main.lua` with `lurek.load()`, `lurek.update(dt)`, `lurek.draw()`
 3. Use only `lurek.*` API functions (never external engine prefixes)
 4. Use `local` for all variables (no globals except luna callbacks)
 5. Multiply movement by `dt` for frame-rate independence
 6. Add comments explaining key concepts
-7. Test with `cargo run -- content/content/examples/<name>`
+7. Test with `cargo run -- content/examples/<name>`
 
 ## Outputs
 
-- `content/content/examples/<name>/main.lua` — working game script
+- `content/examples/<name>/main.lua` — working game script
 - Optional asset files (images, sounds) in the example directory
 
 ## Acceptance
 
-- [ ] Runs with `cargo run -- content/content/examples/<name>` without errors
+- [ ] Runs with `cargo run -- content/examples/<name>` without errors
 - [ ] Uses only `lurek.*` API
 - [ ] All variables are `local`
 - [ ] Movement uses `dt` for frame independence
@@ -52,4 +52,4 @@ Create a new Lua game example that demonstrates specific Lurek2D features.
 
 - `lua-scripting` skill
 - `docs/API/lua_api_reference_generated.md`
-- Existing examples in `content/content/examples/`
+- Existing examples in `content/examples/`

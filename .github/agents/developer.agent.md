@@ -13,8 +13,9 @@ Write, modify, and fix Rust code in the Lurek2D engine. Owns general engine impl
 ## SCOPE
 
 **Owns**:
-- `src/engine/` — App lifecycle, Config, EngineError, SharedState, resource keys
-- `src/lua_api/` — Lua binding registration for all subsystems (except graphics, audio, physics which report to their specialists)
+- `src/app/` — App lifecycle, boot sequence, error screen, debug overlay
+- `src/runtime/` — Config, EngineError, SharedState, resource keys, log messages
+- `src/lua_api/` — Lua binding registration for all subsystems (except render, audio, physics which report to their specialists)
 - `src/input/` — Keyboard, mouse, gamepad, touch state; cursor management and gamepad mapping
 - `src/timer/` — Clock, delta timing
 - `src/filesystem/` — GameFS, VirtualFS, sandboxed I/O, archive mounting
@@ -26,7 +27,7 @@ Write, modify, and fix Rust code in the Lurek2D engine. Owns general engine impl
 - Bug fixes in any non-specialist module
 
 **Defers to**:
-- `Renderer` for `src/graphics/` pipeline changes
+- `Renderer` for `src/render/` GPU pipeline changes
 - `Physicist` for `src/physics/` simulation logic
 - `Audio-Eng` for `src/audio/` mixer/source changes
 - `Lua-Designer` for API surface decisions
@@ -162,7 +163,7 @@ lurek.set("myFunc", lua.create_function(move |_, args: ()| {
 })?)?;
 ```
 
-**New resource type** — add a typed key in `src/engine/resource_keys.rs` using `new_key_type!`, then a corresponding `SlotMap` field in `SharedState`. Resource keys: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `SpriteBatchKey`, `MeshKey`, `ShaderKey`.
+**New resource type** — add a typed key in `src/runtime/resource_keys.rs` using `new_key_type!`, then a corresponding `SlotMap` field in `SharedState`. Resource keys: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `SpriteBatchKey`, `MeshKey`, `ShaderKey`.
 
 **New `lurek.*` module** — registration pattern every API file uses:
 ```rust
@@ -182,7 +183,7 @@ some_engine_call().map_err(LuaError::external)?
 
 - Read the relevant `src/<module>/AGENT.md` before touching that module — it contains the invariants, types, and patterns specific to that subsystem
 - Clone `Rc` before every closure; scope `borrow_mut()` to the narrowest block and never hold it across a Lua callback boundary
-- New resource types need a typed key in `src/engine/resource_keys.rs` plus a corresponding `SlotMap` field in `SharedState` — never use `HashMap<String, T>` for resources
+- New resource types need a typed key in `src/runtime/resource_keys.rs` plus a corresponding `SlotMap` field in `SharedState` — never use `HashMap<String, T>` for resources
 - Add `///` doc comments to every `pub fn`, `pub struct`, `pub enum`, and `pub trait` before committing — `python tools/docs/collect_docs.py --report-missing` must exit 0
 - Per-frame code must not allocate on the heap — grow draw-call and command buffers once at startup
 - Use `log::info!` / `log::debug!` / `log::warn!` / `log::error!` throughout; never `println!` in engine code

@@ -49,49 +49,42 @@ Every Architect output includes:
 ## SUCCESS METRICS
 
 - Module dependency graph is acyclic
-- New work is placed in the correct layer: Baseline, Tier 1, Tier 2, bridge, or Tier 3 `content/library/`
-- No same-tier cross-imports at any engine tier level
-- No upward imports across engine tiers
-- `lua_api` is the bridge layer; lower engine layers do not depend on Tier 3 Lunasome
+- New work is placed in the correct group: Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration, or `content/library/` (Lunasome)
+- No upward imports across responsibility groups
+- Feature Systems allows same-group imports only when the dependency graph remains acyclic
+- Edge/Integration (`app`, `lua_api`) is the composition root; nothing below imports it
 - Each module has a clear, single responsibility
 - Public API is minimal — `pub(crate)` when cross-crate visibility isn't needed
 - New modules follow the existing `mod.rs` + subfile pattern
 
-## MODULE LAYER MODEL
+## MODULE RESPONSIBILITY GROUPS
 
-Lurek2D uses an active four-layer runtime model plus a bridge layer. See `docs/architecture.md` for the full tables.
+Lurek2D organises its Rust source into five responsibility groups. The binding invariant is **no cycles, ever** — the module import graph must be a DAG. See `docs/architecture/engine-architecture.md` for the authoritative tables.
 
-**Baseline**:
-- `math` — leaf, no Lurek2D dependencies
-- `engine` — runtime lifecycle and shared state
+**Foundations** — pure algorithms and data, no render/audio/input/Lua deps:
+`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`
 
-**Bridge**:
-- `lua_api` — registers `lurek.*`; not a numbered tier
+**Core Runtime** — engine lifecycle, timing, events, threading, networking, sandboxed I/O:
+`runtime`, `event`, `timer`, `thread`, `network`, `filesystem`
 
-**Tier 1 — Core Engine Subsystems** (import: Baseline only, no cross-Tier-1):
-`audio`, `automation`, `compute`, `data`, `entity`, `event`, `filesystem`, `graphics`, `image`, `input`, `physics`, `thread`, `timer`, `window`
+**Platform Services** — OS-facing backends, each behind a pure-Rust contract:
+`render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect`
 
-**Tier 2 — Reusable Engine Extensions** (import: Baseline + Tier 1, no cross-Tier-2):
-`ai`, `dataframe`, `graph`, `gui`, `minimap`, `modding`, `overlay`, `particle`, `pathfinding`, `postfx`, `savegame`, `scene`, `tilemap`
+**Feature Systems** — game-domain services; same-group imports allowed when acyclic:
+`ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine`
 
-**Tier 3 — Lunasome**:
-Pure-Lua gameplay libraries in `content/library/` that consume public `lurek.*` APIs rather than Rust internals.
+**Edge/Integration** — composition root and scripting bridge; nothing below imports these:
+`app` (boot + event loop), `lua_api` (registers `lurek.*`), `devtools`, `debugbridge`, `docs`, `pipeline`, `bin`
 
-**Legacy gameplay Rust modules**:
-Gameplay-oriented modules still under `src/` are migration-state code, not the target Tier 3 architecture for new gameplay libraries.
+**Lunasome** (`content/library/`):
+Pure-Lua gameplay libraries that consume public `lurek.*` APIs rather than Rust internals.
 
 **Rules**:
-- A new Rust module must be assigned to Baseline, Tier 1, Tier 2, or explicitly justified as bridge-layer work before implementation begins
-- Same-tier cross-imports are forbidden in engine layers
-- Upward imports across engine layers are forbidden
+- A new Rust module must be assigned to one of the five groups before implementation begins
+- Upward imports across groups are forbidden (Foundations ← Core Runtime ← Platform Services ← Feature Systems ← Edge/Integration)
+- Feature Systems allows same-group imports only when they keep the DAG acyclic
 - Domain modules must never import `lua_api`
 - New gameplay-domain helpers should prefer `content/library/` when they do not require Rust-owned resources
-
-**Planned build variants** (future Cargo feature flag work):
-- Baseline = Baseline + bridge
-- Core = Baseline + Tier 1 + bridge
-- Extended = Baseline + Tier 1 + Tier 2 + bridge
-- Lunasome = Extended + shipped `content/library/` content
 
 ## WORKFLOW
 
@@ -119,7 +112,7 @@ Gameplay-oriented modules still under `src/` are migration-state code, not the t
 
 ## BEST PRACTICES
 
-- Assign every proposed module to Baseline, Tier 1, Tier 2, bridge (`lua_api`), or Tier 3 (`content/library/`) **before** implementation begins — no untiered modules
+- Assign every proposed module to Foundations, Core Runtime, Platform Services, Feature Systems, or Edge/Integration **before** implementation begins — no ungrouped modules
 - Draw the dependency arrow as a diagram or table before writing prose — visual graphs surface circular imports immediately
 - `pub(crate)` is the default visibility; `pub` must be justified by cross-crate access need
 - New gameplay-domain helpers go to `content/library/` (pure Lua) unless they require Rust-owned resources that cannot be exposed as `lurek.*` values

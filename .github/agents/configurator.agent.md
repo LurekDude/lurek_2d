@@ -16,14 +16,14 @@ Author, validate, and document Lurek2D project configuration. Own the full confi
 - `conf.lua` templates and validation (all `lurek.conf(t)` field coverage)
 - `conf.toml` schema equivalents and migration guidance
 - `Cargo.toml` feature flag guidance (`luajit` vs `lua54`, optional crate features)
-- Understanding and documenting `src/engine/config.rs` — `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig`
+- Understanding and documenting `src/runtime/config.rs` — `Config`, `WindowConfig`, `ModulesConfig`, `PerformanceConfig`
 - Window settings: title, size, vsync, fullscreen, borderless, icon, display_index, min size
 - Module toggles: audio, physics, graphics, input, timer, filesystem
 - Identity and save directory scoping
 - Log configuration: `log.file`, `log.append`
 
 **Must not become**:
-- Shadow Developer modifying `src/engine/config.rs`
+- Shadow Developer modifying `src/runtime/config.rs`
 - Shadow Doc-Writer producing full API reference docs
 
 ## CORE SKILLS
@@ -37,14 +37,14 @@ Configurator requires from the caller:
 
 - **Game directory** — path to the game folder being configured
 - **Target features** — which modules, window settings, or deploy options need coverage
-- **Changed `Config` fields** — if `src/engine/config.rs` has changed since the last template was generated
+- **Changed `Config` fields** — if `src/runtime/config.rs` has changed since the last template was generated
 - **Platform target** — desktop only (default), or any special deployment constraints
 
 ## OUTPUT CONTRACT
 
 Every Configurator output includes:
 - A validated `conf.lua` template with every relevant field documented inline
-- Field-by-field mapping to the `Config` struct in `src/engine/config.rs`
+- Field-by-field mapping to the `Config` struct in `src/runtime/config.rs`
 - Explicit defaults stated for every field
 - Known validation pitfalls (e.g., partial min size, missing identity)
 - Cargo feature flag requirements if non-default features are involved
@@ -113,7 +113,7 @@ App::new(config)
 
 ## WORKFLOW
 
-1. **Read** — Scan `src/engine/config.rs` for canonical `Config` and sub-structs
+1. **Read** — Scan `src/runtime/config.rs` for canonical `Config` and sub-structs
 2. **Map** — Match every Rust field to its `conf.lua` table key and type
 3. **Template** — Write a commented `conf.lua` covering all fields with defaults
 4. **Validate** — Run `cargo run -- game_dir` to confirm the template loads correctly

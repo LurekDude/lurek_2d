@@ -21,7 +21,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 - Demo folder layout (conf.lua, main.lua, assets, README)
 - Examples ↔ API documentation pipeline integration
 - Smoke test support pattern (`--smoke` flag + `lurek.signal.quit()`)
-- `content/content/examples/README.md` and `content/demos/README.md` maintenance
+- `content/examples/README.md` and `content/demos/README.md` maintenance
 
 ## Two-Folder Model
 
@@ -46,9 +46,9 @@ content/examples/
 **Example file template:**
 
 ```lua
--- content/content/examples/timer.lua
+-- content/examples/timer.lua
 -- Demonstrates lurek.time API: basic delta time, FPS, sleep.
--- Run with: cargo run -- content/content/examples/timer
+-- Run with: cargo run -- content/examples/timer
 
 -- ── load ──────────────────────────────────────────────────────
 function lurek.init()
@@ -98,7 +98,7 @@ end
 | Quality | Description |
 |---------|-------------|
 | **One concept** | Demonstrates exactly one API namespace or one gameplay pattern |
-| **Self-contained** | Runs with `cargo run -- content/content/examples/<file>` without extra setup |
+| **Self-contained** | Runs with `cargo run -- content/examples/<file>` without extra setup |
 | **Commented** | Every section explains what it demonstrates and why |
 | **Minimal** | Strip everything that isn't directly demonstrating the concept |
 | **AI-readable** | An AI agent should be able to learn the full API surface from reading it |
@@ -106,9 +106,9 @@ end
 ## Adding a New Example (Checklist)
 
 **Minimal example** (one `.lua` file):
-1. Create `content/content/examples/<module>.lua` following the template above
-2. Test: `cargo run -- content/content/examples/<module>.lua`
-3. Link in `content/content/examples/README.md`
+1. Create `content/examples/<module>.lua` following the template above
+2. Test: `cargo run -- content/examples/<module>.lua`
+3. Link in `content/examples/README.md`
 4. If the example demonstrates a newly added API function, update `docs/API/lua_api_data.json`
 
 **Full demo** (game directory):
@@ -137,7 +137,7 @@ Examples can be run as smoke tests to verify engine functionality:
 
 ```powershell
 # Run example and exit immediately (headless verification)
-cargo run -- content/content/examples/graphics.lua -- --smoke
+cargo run -- content/examples/graphics.lua -- --smoke
 ```
 
 If an example supports a `--smoke` flag, it calls `lurek.quit()` after one frame to allow automated verification.
@@ -155,7 +155,7 @@ end
 
 ## Examples README
 
-`content/content/examples/README.md` and `content/demos/README.md` must stay alphabetically sorted and must link to each file/folder with a one-line description.
+`content/examples/README.md` and `content/demos/README.md` must stay alphabetically sorted and must link to each file/folder with a one-line description.
 
 Format:
 ```markdown
@@ -172,7 +172,7 @@ Update both README files whenever a new example or demo is added.
 - **Assets in content/examples/**: Resources that require manual download or aren't embedded — examples must be self-contained
 - **Stale demos**: Demos that use removed API functions (`lurek.old.func`) — run demos on every release to catch breakage
 - **Debug-print noise**: `print("test")` or `print(val)` left in committed examples
-- **Missing README entry**: Adding an example without updating `content/content/examples/README.md`
+- **Missing README entry**: Adding an example without updating `content/examples/README.md`
 
 ## Lua API Compliance
 

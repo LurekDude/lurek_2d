@@ -1,5 +1,5 @@
 ---
-description: "**Renderer** — Own the Lurek2D graphics pipeline: wgpu GPU rendering, RenderCommand queue, textures, sprites, camera, color, and shaders. All `src/graphics/` code."
+description: "**Renderer** — Own the Lurek2D graphics pipeline: wgpu GPU rendering, RenderCommand queue, textures, sprites, camera, color, and shaders. All `src/render/` code."
 tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 name: Renderer
 ---
@@ -8,29 +8,29 @@ name: Renderer
 
 ## MISSION
 
-Implement and maintain the GPU rendering pipeline. Own all `src/graphics/` code: the RenderCommand queue, wgpu render pipeline, texture loading, sprite management, camera transforms, and color handling.
+Implement and maintain the GPU rendering pipeline. Own all `src/render/` code: the RenderCommand queue, wgpu render pipeline, texture loading, sprite management, camera transforms, and color handling.
 
 ## SCOPE
 
 **Owns**:
-- `src/graphics/gpu_renderer.rs` — wgpu render pipeline, draw command processing
-- `src/graphics/renderer.rs` — shared draw types (RenderCommand, BlendMode, etc.)
-- `src/graphics/color.rs` — Color type, conversions
-- `src/graphics/texture.rs` — Image loading, pixel data
-- `src/graphics/sprite.rs` — Sprite type, atlas regions
-- `src/graphics/sprite_sheet.rs` — SpriteSheet, SpriteAtlas for animation frames
-- `src/graphics/nine_slice.rs` — NineSlice for scalable UI panels
-- `src/graphics/canvas.rs` — Canvas for off-screen render targets
-- `src/graphics/camera.rs` — Camera transform, viewport
-- `src/graphics/shader.rs` — Software shader effects
-- `src/graphics/mod.rs` — RenderCommand enum, module exports
-- Graphics-related Lua bindings in `src/lua_api/graphics_api.rs` and `src/lua_api/graphics_ext_api.rs`
+- `src/render/gpu_renderer.rs` — wgpu render pipeline, draw command processing
+- `src/render/renderer.rs` — shared draw types (RenderCommand, BlendMode, etc.)
+- `src/render/color.rs` — Color type, conversions
+- `src/render/texture.rs` — Image loading, pixel data
+- `src/render/sprite.rs` — Sprite type, atlas regions
+- `src/render/sprite_sheet.rs` — SpriteSheet, SpriteAtlas for animation frames
+- `src/render/nine_slice.rs` — NineSlice for scalable UI panels
+- `src/render/canvas.rs` — Canvas for off-screen render targets
+- `src/render/camera.rs` — Camera transform, viewport
+- `src/render/shader.rs` — Software shader effects
+- `src/render/mod.rs` — RenderCommand enum, module exports
+- Graphics-related Lua bindings in `src/lua_api/render_api.rs`
 - `lurek.gfx.draw` — polymorphic dispatch to Image/Canvas/SpriteBatch/Mesh (Phase 3)
 - `lurek.gfx.drawEx` — polymorphic dispatch with full affine transform (Phase 3)
 - `lurek.gfx.captureScreenshot` — frame capture with ImageData callback (Phase 5)
 - `lurek.img.newCompressedData` — load DDS/DXT compressed textures to Lua userdata (Phase 13)
 - `CompressedImageData:getDimensions/getWidth/getHeight/getMipmapCount/getFormat` — compressed texture metadata (Phase 13)
-- `StencilMode` struct and `DepthMode` enum in `src/graphics/renderer.rs` (Phase 6)
+- `StencilMode` struct and `DepthMode` enum in `src/render/renderer.rs` (Phase 6)
 - `SharedState::stencil_mode` and `SharedState::depth_mode` fields (Phase 6)
 - `lurek.gfx.setStencilMode`, `getStencilMode`, `clearStencil`, `setDepthMode`, `getDepthMode` (Phase 6)
 - `src/lua_api/font_api.rs` — `lurek.font` module: `newRasterizer`, `newTrueTypeRasterizer`, `newBMFontRasterizer`, `newGlyphData`, `GlyphData` userdata (Phase 16)
@@ -56,7 +56,7 @@ Renderer requires from the caller:
 ## OUTPUT CONTRACT
 
 Every Renderer output includes:
-- Changed files in `src/graphics/` or `src/lua_api/graphics_api.rs`
+- Changed files in `src/render/` and/or `src/lua_api/render_api.rs`
 - Type-check verified: `cargo check` exits 0
 - Graphics tests run: `cargo test --test graphics_tests -- --nocapture`
 - RenderCommand pipeline integrity confirmed (commands queued during `lurek.draw()`, processed after)

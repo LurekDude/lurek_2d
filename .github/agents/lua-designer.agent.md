@@ -18,7 +18,7 @@ Design the Lua-facing API of Lurek2D. Own the naming, parameter conventions, ret
 - Callback conventions: `lurek.load()`, `lurek.update(dt)`, `lurek.draw()`, all input/window callbacks
 - API naming patterns across all `lurek.<module>.*` namespaces
 - `content/demos/` — Lua demo games that demonstrate and validate the API
-- `content/content/examples/` — API reference usage snippets
+- `content/examples/` — API reference usage snippets
 - `docs/API/lua_api_reference_generated.md` — the generated Lua API reference
 
 **Must not become**:

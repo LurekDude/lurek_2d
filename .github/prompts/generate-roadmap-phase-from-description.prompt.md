@@ -109,7 +109,7 @@ For each sub-task:
   - A Lua API snippet showing the exact `lurek.*` calls and return types
 - **Agent** — which specialist implements this task:
   - `Developer` — general Rust/engine work
-  - `Renderer` — all `src/graphics/` code
+  - `Renderer` — all `src/render/` GPU pipeline code
   - `Physicist` — all `src/physics/` code
   - `Audio-Eng` — all `src/audio/` or `src/audio/` code
   - `Tester` — test files only

@@ -7,7 +7,7 @@ description: "Analyze and reduce memory usage in the Lurek2D engine. Use when fr
 **Purpose**: Profile and reduce per-frame memory allocations in the Lurek2D game loop.
 **Use When**: Frame times are inconsistent (GC pauses), heap allocations appear in profiles, or `Vec` growth is suspected.
 **Do Not Use When**: The issue is CPU-bound rendering time — use `analyze-render-performance.prompt.md` instead.
-**Scope**: `src/engine/app.rs`, `src/graphics/renderer.rs`, `src/lua_api/`.
+**Scope**: `src/app/app.rs`, `src/render/renderer.rs`, `src/lua_api/`.
 
 ## Inputs
 

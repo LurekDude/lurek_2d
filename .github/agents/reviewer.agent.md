@@ -69,7 +69,7 @@ Every Reviewer output includes:
 - [ ] Module deps: domain modules (`physics`, `audio`, `graphics`, ...) don't import each other (except through `math`)
 - [ ] Imports: absolute paths (`crate::path::Type`), never relative (`super::`, `self::`)
 - [ ] Visibility: `pub(crate)` for internal types; `pub` only for cross-crate surface
-- [ ] New resource type: defined via `new_key_type!` in `src/engine/resource_keys.rs`
+- [ ] New resource type: defined via `new_key_type!` in `src/runtime/resource_keys.rs`
 
 **Lua API**:
 - [ ] All bindings under `lurek.*` namespace — never bare globals
@@ -111,7 +111,7 @@ Every Reviewer output includes:
 - Run `cargo clippy -- -D warnings` and `cargo fmt --check` first — tool-detectable violations are pre-conditions, not review findings
 - Reference exact file paths and line ranges for every finding — never a vague “somewhere in `src/`”
 - Separate severity levels strictly: BLOCKER (must fix before merge), WARNING (should fix), NOTE (optional improvement)
-- Check import direction first thing: any `use lua_api::*` inside a domain module or same-tier cross-import is an automatic BLOCKER
+- Check import direction first thing: any `use lua_api::*` inside a domain module or forbidden cross-group import is an automatic BLOCKER
 - The `/// SAFETY:` rule is non-negotiable: every `unsafe` block without a justification comment is a BLOCKER regardless of how obvious the safety might seem
 - Assess test coverage as part of the review: a new `pub fn` or new `lurek.*` binding with no test is a WARNING
 - Stay in scope: only review files in the change set; do not bonus-audit unrelated modules

@@ -56,7 +56,7 @@ Scaffold missing sections: `python tools/audit/validate_agent_md.py --scaffold <
 The short AGENT.md must contain exactly these sections in order:
 
 1. **H1 heading** — `# \`<module>\` — Agent Reference`
-2. **Metadata table** — Tier, Status, Lua API, Source, Rust Tests, Lua Tests, Architecture link
+2. **Metadata table** — Group, Status, Lua API, Source, Rust Tests, Lua Tests, Architecture link
 3. **`## Purpose`** — One paragraph: what the module does and its scope boundary. Target 2–5 sentences. Must let an agent decide whether to open this module or a different one.
 4. **`## Source Files`** — Table mapping every `.rs` file in `src/<module>/` to its one-line purpose. Keep in sync when files are added or removed.
 5. **`## Full Specification`** — Standard footer paragraph pointing to `docs/specs/<module>.md`.
@@ -80,7 +80,7 @@ Must be the first content after the `# \`<module>\` — Agent Reference` heading
 ```markdown
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
+| **Group**      | Foundations / Core Runtime / Platform Services / Feature Systems / Edge⁠/⁠Integration |
 | **Status**     | Implemented — Full / Partial / Stub                  |
 | **Lua API**    | `lurek.<module>` (or `—` if none)                     |
 | **Source**     | `src/<module>/`                                      |
@@ -160,7 +160,7 @@ relationship, and the separation of duties. Format:
 ```
 
 Also include: which modules are **similar** and what differentiates them
-(e.g., `sound` vs `audio`, `image` vs `graphics`).
+(e.g., `audio` vs `audio`, `image` vs `graphics`).
 
 ### 11. `## Notes`
 

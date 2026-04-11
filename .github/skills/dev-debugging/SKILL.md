@@ -29,8 +29,8 @@ description: "Load this skill when diagnosing runtime bugs, crashes, or unexpect
 ## Live Repository Contracts
 
 - `src/lua_api/mod.rs` — SharedState borrow patterns (common source of bugs)
-- `src/engine/app.rs` — main loop where errors surface
-- `src/engine/error.rs` — EngineError types for error classification
+- `src/app/app.rs` — main loop where errors surface
+- `src/runtime/error.rs` — EngineError types for error classification
 
 ## Decision Rules
 
@@ -138,7 +138,7 @@ The most common engine crash. When you see:
 
 ```
 thread 'main' panicked at 'already borrowed: BorrowMutError'
-  src/lua_api/graphics_api.rs:42
+  src/lua_api/render_api.rs:42
 ```
 
 **Pattern**: Two code paths are simultaneously active that both borrow SharedState.

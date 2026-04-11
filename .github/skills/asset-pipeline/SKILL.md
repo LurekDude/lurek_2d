@@ -29,7 +29,7 @@ description: "Load this skill when working on Lurek2D asset loading: textures, a
 ## Live Repository Contracts
 
 - `src/filesystem/vfs.rs` — `GameFS` struct, sandboxed file operations
-- `src/graphics/texture.rs` — image loading, pixel buffer conversion
+- `src/render/texture.rs` — image loading, pixel buffer conversion
 - `src/audio/source.rs` — audio file loading
 
 ## Decision Rules

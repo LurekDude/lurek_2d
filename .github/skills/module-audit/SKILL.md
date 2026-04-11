@@ -37,19 +37,22 @@ Before running any checks, load these reference documents:
 
 ## Module Resolution
 
-The user specifies targets as module names, tier groups, or `all`:
+The user specifies targets as module names, group shortcuts, or `all`:
 
 | Input | Resolves to |
 |-------|-------------|
 | `physics` | `src/physics/` only |
 | `physics, audio` | Both modules |
-| `baseline` | `math`, `engine` |
-| `tier1` | `animation`, `audio`, `automation`, `camera`, `compute`, `data`, `entity`, `event`, `filesystem`, `graphics`, `image`, `input`, `physics`, `thread`, `timer`, `window` |
-| `tier2` | `ai`, `dataframe`, `graph`, `gui`, `minimap`, `modding`, `overlay`, `particle`, `pathfinding`, `postfx`, `savegame`, `scene`, `tilemap` |
-| `tier3` | Lua libraries in `content/library/` — different audit checks apply |
+| `foundations` | `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` |
+| `all_groups` | `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`, `runtime`, `event`, `timer`, `thread`, `network`, `filesystem`, `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect`, `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` |
+| `core-runtime` | `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` |
+| `platform-services` | `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` |
+| `feature-systems` | `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` |
+| `edge` | `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` |
+| `lunasome` | Lua libraries in `content/library/` — different audit checks apply |
 | `all` | All `src/` modules |
 
-Additional modules that exist in `src/` but may not be in the official tier table (e.g., `terminal`, `spine`, `serial`, `raycaster`, `procgen`, `pipeline`, `network`, `light`, `fx`, `postfx`) should be audited using the tier rules inferred from their imports and AGENT.md.
+All modules should be assigned to one of the five groups. Check `docs/architecture/engine-architecture.md` for the canonical group assignment.
 
 ## AGENT.md Canonical Format (SHORT)
 
@@ -174,12 +177,14 @@ Verification:
 ### R-01–R-05: Architecture Compliance
 
 ```
-1. Read docs/architecture/architecture.md for tier assignment
-2. Grep src/<module>/**/*.rs for `use crate::` imports
-3. Verify each import is from an allowed tier:
-   - Baseline modules: math may import nothing; engine may import math
-   - Tier 1: may import math, engine only
-   - Tier 2: may import math, engine, Tier 1
+1. Read `docs/architecture/engine-architecture.md` for group assignment
+2. Grep `src/<module>/**/*.rs` for `use crate::` imports
+3. Verify each import is from an allowed lower group:
+   - Foundations: `math` has no deps; other Foundations modules may import only Foundations
+   - Core Runtime: may import Foundations only
+   - Platform Services: may import Foundations + Core Runtime
+   - Feature Systems: may import below groups; same-group OK when acyclic
+   - Edge/Integration: may import all groups
 4. Verify no `use crate::lua_api` in domain module
 5. Cross-reference with other modules for scope overlap
 ```
@@ -209,7 +214,7 @@ python tools/audit/audit_module.py <module>
 python tools/audit/audit_module.py --all
 
 # Tier subset
-python tools/audit/audit_module.py --tier 1
+python tools/audit/audit_module.py --group platform-services
 
 # JSON output (structured, for programmatic use)
 python tools/audit/audit_module.py <module> --json
@@ -234,7 +239,7 @@ Run time: ~0.12 s per module, under 5 s for all 46 modules.
        Missing from spec: load, unload (+2 more) — add to ## Lua API in docs/specs/<m>.md
        Stale in spec (not in code): oldFn — remove from spec
 - [ ] W-02 — API surface coverage:
-       Missing in content/content/examples/<m>.lua: load, unload — add with use-case comment
+       Missing in content/examples/<m>.lua: load, unload — add with use-case comment
 - [ ] T-04 — Float comparisons:
        assert_eq! with floats at: foo_tests.rs:117, foo_tests.rs:119
 ...
@@ -298,9 +303,9 @@ The report names missing functions explicitly.
 Reports `Types not in spec: Clock, Scheduler`.
 1. Add a `### Clock` section to `## Key Types` in `docs/specs/<module>.md`
 
-#### W-02: Missing from content/content/examples/<module>.lua
+#### W-02: Missing from content/examples/<module>.lua
 The report names the exact function names.
-1. Add `lurek.<module>.<funcName>(...)` call to `content/content/examples/<module>.lua`
+1. Add `lurek.<module>.<funcName>(...)` call to `content/examples/<module>.lua`
 2. Prefix each call with a one-line realistic use-case comment
 
 #### W-04: Example–spec sync mismatch
