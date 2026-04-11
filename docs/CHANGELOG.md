@@ -18,6 +18,21 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.12] — 2026-04-11
+### Added
+- **Phase 1 — App auto-collection loop**: `src/app/app.rs` now automatically collects render commands from registered engine modules each frame in the correct draw order, without requiring Lua scripts to call module-level `render()` methods manually.
+  - Draw order 2 (before game world): parallax layers registered in `SharedState.auto_parallax_layers` are collected and emitted via `ParallaxLayer::generate_render_commands()`.
+  - Draw order 3 (before game world): tilemaps registered in `SharedState.auto_tilemaps` are collected via `TileMap::generate_render_commands(0, 0, cam_x, cam_y, cam_w, cam_h)`.
+  - Draw order 4: Lua `lurek.render()` callback (game world — unchanged).
+  - Draw order 6 (after game world): all particle systems in `SharedState.particle_systems` are auto-collected via `ParticleSystem::generate_render_commands()`.
+  - Draw order 9 (after `render_ui`): GUI context registered in `SharedState.auto_ui_ctx` is collected via `GuiContext::generate_render_commands()`.
+  - Stale `Weak<>` refs are pruned from `auto_parallax_layers` and `auto_tilemaps` once per frame.
+- **SharedState auto-collection fields** (`src/runtime/shared_state.rs`):
+  - `auto_parallax_layers: Vec<Weak<RefCell<ParallaxLayer>>>` — populated when `lurek.parallax.newLayer()` creates a `LuaParallaxLayer`.
+  - `auto_tilemaps: Vec<Weak<RefCell<TileMap>>>` — populated when `lurek.tilemap.newTileMap()` or `MapGen:generate()` creates a `LuaTileMap`.
+  - `auto_ui_ctx: Option<Weak<RefCell<GuiContext>>>` — set when the `lurek.ui` module is registered.
+- **Phase 6 — Light integration verified**: `SharedState.light_world` is correctly passed as `&s_ref.light_world` to `GpuRenderer::render_frame()`, which uses it in the dedicated `LIGHT RENDERING PASS` wgpu render pass. No code changes required — architecture is complete and correct.
+
 ## [0.7.11] — 2026-04-15
 ### Added
 - **Phase 3 + Phase 5 — render-command migration (final batch)**: Added `generate_render_commands()` and/or `draw_to_image()` to the five remaining complex modules.

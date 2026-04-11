@@ -4149,10 +4149,12 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 /// @param luna : &LuaTable
 /// @param state : Rc<RefCell<SharedState>>
 /// @return LuaResult<()>
-pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let ctx = Rc::new(RefCell::new(GuiContext::new()));
     let callbacks = Rc::new(RefCell::new(GuiCallbacks::default()));
+    // Register a weak ref for engine auto-collection (UI rendered after render_ui callback).
+    state.borrow_mut().auto_ui_ctx = Some(Rc::downgrade(&ctx));
 
     // -- newButton --
     /// Creates a button widget.

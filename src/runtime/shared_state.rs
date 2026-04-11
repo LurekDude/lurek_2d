@@ -7,8 +7,10 @@
 //! Also defines [`WindowState`], [`FullscreenType`], and [`ErrorInfo`] which are
 //! window-management types used by both `engine` and `lua_api`.
 
+use std::cell::RefCell;
 use std::collections::HashSet;
 use std::path::PathBuf;
+use std::rc::Weak;
 use std::sync::Arc;
 
 use slotmap::SlotMap;
@@ -26,7 +28,10 @@ use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, 
 use crate::render::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
 use crate::light::LightWorld;
+use crate::parallax::ParallaxLayer;
 use crate::particle::ParticleSystem;
+use crate::tilemap::TileMap;
+use crate::ui::GuiContext;
 use crate::event::EventQueue;
 use crate::timer::Clock;
 
@@ -358,6 +363,23 @@ pub struct SharedState {
     pub light_world: LightWorld,
     /// Fixed time-step for `process_physics` callback, in seconds (default 1/60).
     pub physics_fixed_dt: f64,
+    /// Parallax layers registered for engine auto-collection.
+    ///
+    /// Objects are added here when created via `lurek.parallax.newLayer()`.
+    /// The engine iterates these each frame (before the Lua render callback)
+    /// and appends their render commands in draw order.  Stale weak refs are
+    /// skipped automatically when the Lua userdata is garbage collected.
+    pub auto_parallax_layers: Vec<Weak<RefCell<ParallaxLayer>>>,
+    /// Tile maps registered for engine auto-collection.
+    ///
+    /// Objects are added here when created via `lurek.tilemap.newTileMap()`.
+    /// The engine collects commands from these before the Lua render callback.
+    pub auto_tilemaps: Vec<Weak<RefCell<TileMap>>>,
+    /// GUI context registered for engine auto-collection.
+    ///
+    /// Set when `lurek.ui` is registered.  The engine appends UI render
+    /// commands after the Lua `render_ui` callback each frame.
+    pub auto_ui_ctx: Option<Weak<RefCell<GuiContext>>>,
 }
 
 impl SharedState {
@@ -437,6 +459,9 @@ impl SharedState {
             depth_mode: (DepthMode::Always, false),
             light_world: LightWorld::new(),
             physics_fixed_dt: 1.0 / 60.0,
+            auto_parallax_layers: Vec::new(),
+            auto_tilemaps: Vec::new(),
+            auto_ui_ctx: None,
         }
     }
 

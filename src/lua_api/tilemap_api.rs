@@ -1459,8 +1459,11 @@ impl LuaUserData for LuaMapGen {
                     .inner
                     .borrow_mut()
                     .generate(&this.group.borrow(), script_index, seed, name);
+                let inner_rc = Rc::new(RefCell::new(tm));
+                // Register a weak ref for engine auto-collection.
+                this.state.borrow_mut().auto_tilemaps.push(Rc::downgrade(&inner_rc));
                 Ok(LuaTileMap {
-                    inner: Rc::new(RefCell::new(tm)),
+                    inner: inner_rc,
                     state: this.state.clone(),
                 })
             },
@@ -1530,12 +1533,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "newTileMap",
         lua.create_function(
             move |lua, (tile_width, tile_height, chunk_size): (u32, u32, Option<u32>)| {
+                let inner_rc = Rc::new(RefCell::new(TileMap::new(
+                    tile_width,
+                    tile_height,
+                    chunk_size.unwrap_or(16),
+                )));
+                // Register a weak ref for engine auto-collection.
+                s.borrow_mut().auto_tilemaps.push(Rc::downgrade(&inner_rc));
                 lua.create_userdata(LuaTileMap {
-                    inner: Rc::new(RefCell::new(TileMap::new(
-                        tile_width,
-                        tile_height,
-                        chunk_size.unwrap_or(16),
-                    ))),
+                    inner: inner_rc,
                     state: s.clone(),
                 })
             },

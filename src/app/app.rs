@@ -859,15 +859,80 @@ impl LunaApp {
 
         // ── 5. render (main draw pass) ──────────────────────────────────
         state.borrow_mut().render_commands.clear();
+
+        // ── 5a. Auto-collect: parallax layers (draw order 2 — before game world) ──
+        {
+            let s = state.borrow();
+            let cam_x = s.camera.position.x;
+            let cam_y = s.camera.position.y;
+            let screen_w = s.window_state.game_width;
+            let screen_h = s.window_state.game_height;
+            // Collect strong refs while holding the borrow; drop before borrow_mut below.
+            let layers: Vec<_> = s.auto_parallax_layers.iter()
+                .filter_map(|w| w.upgrade())
+                .collect();
+            drop(s);
+            for rc in &layers {
+                let cmds = rc.borrow().generate_render_commands(cam_x, cam_y, screen_w, screen_h);
+                state.borrow_mut().render_commands.extend(cmds);
+            }
+            // Purge stale weak refs once per frame.
+            state.borrow_mut().auto_parallax_layers.retain(|w| w.upgrade().is_some());
+        }
+
+        // ── 5b. Auto-collect: tilemaps (draw order 3 — background layers) ──
+        {
+            let s = state.borrow();
+            let cam_x = s.camera.position.x;
+            let cam_y = s.camera.position.y;
+            let cam_w = s.window_state.game_width;
+            let cam_h = s.window_state.game_height;
+            let maps: Vec<_> = s.auto_tilemaps.iter()
+                .filter_map(|w| w.upgrade())
+                .collect();
+            drop(s);
+            for rc in &maps {
+                let cmds = rc.borrow().generate_render_commands(0.0, 0.0, cam_x, cam_y, cam_w, cam_h);
+                state.borrow_mut().render_commands.extend(cmds);
+            }
+            // Purge stale weak refs once per frame.
+            state.borrow_mut().auto_tilemaps.retain(|w| w.upgrade().is_some());
+        }
+
+        // ── 5c. Lua render callback (draw order 4 — game world) ──────────
         if let Err(e) = call_lua_callback_checked(lua, "render", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
+        }
+
+        // ── 5d. Auto-collect: particle systems (draw order 6 — after game world) ─
+        // NOTE: Scripts that manually call `system:render()` inside `lurek.render()`
+        // will have their particles rendered twice (once by Lua, once here).  Use
+        // one approach per particle system: either manual Lua render OR auto-collect.
+        {
+            let s = state.borrow();
+            let particle_cmds: Vec<_> = s.particle_systems.values()
+                .flat_map(|ps| ps.generate_render_commands())
+                .collect();
+            drop(s);
+            state.borrow_mut().render_commands.extend(particle_cmds);
         }
 
         // ── 6. render_ui (UI/HUD overlay pass) ──────────────────────────
         if let Err(e) = call_lua_callback_checked(lua, "render_ui", ()) {
             self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
             return;
+        }
+
+        // ── 6a. Auto-collect: GUI context (draw order 9 — after render_ui) ──
+        {
+            let ui_cmds: Vec<_> = state.borrow()
+                .auto_ui_ctx
+                .as_ref()
+                .and_then(|w| w.upgrade())
+                .map(|rc| rc.borrow().generate_render_commands())
+                .unwrap_or_default();
+            state.borrow_mut().render_commands.extend(ui_cmds);
         }
 
         // Append debug overlay commands after game draw

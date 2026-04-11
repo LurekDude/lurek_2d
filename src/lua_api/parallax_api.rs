@@ -53,8 +53,14 @@ pub struct LuaParallaxLayer {
 
 impl LuaParallaxLayer {
     fn new(layer: ParallaxLayer, state: Rc<RefCell<SharedState>>) -> Self {
+        let layer_rc = Rc::new(RefCell::new(layer));
+        // Register a weak ref for engine auto-collection (draw order pass).
+        state
+            .borrow_mut()
+            .auto_parallax_layers
+            .push(Rc::downgrade(&layer_rc));
         LuaParallaxLayer {
-            layer: Rc::new(RefCell::new(layer)),
+            layer: layer_rc,
             state,
         }
     }
