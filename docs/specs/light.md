@@ -5,7 +5,7 @@
 | **Tier**       | Tier 2 — Engine Extension                            |
 | **Status**     | Implemented — Full                                   |
 | **Lua API**    | `lurek.light`                                         |
-| **Source**      | `src/light/`                                         |
+| **Source**      | `src/render/light/`                                  |
 | **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
 | **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
 | **Architecture** | —                                                  |
@@ -248,7 +248,7 @@ end
 
 function lurek.render()
     -- Draw your scene; the lighting system composites automatically
-    lurek.gfx.print("Move the mouse to move the torch", 10, 10)
+    lurek.graphic.print("Move the mouse to move the torch", 10, 10)
 end
 ```
 

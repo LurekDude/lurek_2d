@@ -352,7 +352,7 @@ end
 
 function lurek.render()
     -- Draw the minimap at screen position (580, 10)
-    -- (actual rendering is done by lurek.gfx using the minimap data)
+    -- (actual rendering is done by lurek.graphic using the minimap data)
 end
 ```
 

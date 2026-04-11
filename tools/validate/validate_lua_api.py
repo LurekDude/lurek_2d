@@ -48,6 +48,11 @@ def check_file_header(lines: list[str]) -> None:
 def check_register_signature(lines: list[str]) -> None:
     """pub fn register must exist with the canonical 3-argument signature."""
     for i, line in enumerate(lines):
+        # Skip comment lines (//!, //, or ///): they may mention `pub fn register()
+        # in prose and must not be treated as actual Rust function definitions.
+        stripped = line.strip()
+        if stripped.startswith("//"):
+            continue
         if "pub fn register(" in line:
             # capture up to 5 continuation lines for multi-line signatures
             block = "\n".join(lines[i: i + 6])
@@ -68,8 +73,19 @@ def check_register_signature(lines: list[str]) -> None:
 
 
 def check_module_registration(content: str) -> None:
-    """lurek.set("module", var) must appear at the end of register()."""
-    if not re.search(r'luna\.set\s*\(\s*"[\w]+"\s*,\s*\w+\s*\)', content):
+    """lurek.set("module", var) must appear at the end of register().
+
+    Handles:
+    - ``luna.set("name", tbl)`` — standard form
+    - ``luna.set("name", tbl.clone())`` — clone variant
+    - ``luna_table.set("name", ...)`` — alternate parameter name
+    """
+    # Match any identifier (possibly named luna_table, luna, etc.) calling .set("name", expr)
+    # where expr is an identifier with an optional .clone() call.
+    if not re.search(
+        r'\bluna(?:_\w+)?\s*\.\s*set\s*\(\s*"[\w]+"\s*,\s*\w+(?:\.clone\(\))?\s*\)',
+        content,
+    ):
         _err(0, 'No `lurek.set("module", tbl)?;` found -- module is not registered in the luna global table')
 
 

@@ -12,7 +12,7 @@
 
 ## Summary
 
-The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`lurek.gfx.newImage(imgdata)`). The module covers five distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), a compositing layer stack (`LayeredImage` / `ImageLayer`), a compressed binary serialisation format (`serial` / LIMG), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
+The `image` module provides CPU-side pixel-level access to RGBA image data. It is the raw pixel layer that sits beneath the GPU texture pipeline — `ImageData` is never on the GPU until explicitly uploaded via the graphics API (`lurek.graphic.newImage(imgdata)`). The module covers five distinct concerns: uncompressed RGBA pixel buffers (`ImageData`), GPU-compressed DDS texture containers (`CompressedImageData`), a compositing layer stack (`LayeredImage` / `ImageLayer`), a compressed binary serialisation format (`serial` / LIMG), and colour palette lookup tables for shader-based palette swapping (`PaletteLUT`).
 
 `ImageData` supports loading PNG/JPEG files from disk via the `image` crate, creating blank buffers, constructing from raw bytes, per-pixel read/write (`get_pixel` / `set_pixel`), bulk transforms (`map_pixel`, `paste`), PNG encoding, and raw byte extraction. Because it is pure `Vec<u8>` arithmetic with no GPU state, operations can be called freely during `lurek.load()` or inside background thread workers.
 
@@ -280,11 +280,11 @@ function lurek.init()
     end
 
     -- Upload to GPU for rendering
-    tex = lurek.gfx.newImage(imgdata)
+    tex = lurek.graphic.newImage(imgdata)
 end
 
 function lurek.render()
-    lurek.gfx.draw(tex, 100, 100)
+    lurek.graphic.draw(tex, 100, 100)
 end
 ```
 
@@ -295,7 +295,7 @@ function lurek.init()
     src:mapPixel(function(x, y, r, g, b, a)
         return 255 - r, 255 - g, 255 - b, a
     end)
-    inverted = lurek.gfx.newImage(src)
+    inverted = lurek.graphic.newImage(src)
 end
 ```
 
@@ -333,7 +333,7 @@ end
 
 ## Notes
 
-- `ImageData` is a CPU-side RGBA8 buffer; it has no GPU resources until `lurek.gfx.newImage(imgdata)` is called.
+- `ImageData` is a CPU-side RGBA8 buffer; it has no GPU resources until `lurek.graphic.newImage(imgdata)` is called.
 - `ImageData` implements `mlua::UserData` directly in `image_data.rs`, exposing Lua methods alongside the Rust API.
 - `mapPixel(fn)` calls the Lua function for every pixel — avoid for large images due to Lua→Rust boundary overhead per pixel.
 - PNG encoding via `encode("png")` is blocking and allocates; offload to a thread worker for non-blocking export of large images.

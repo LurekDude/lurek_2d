@@ -227,8 +227,8 @@ end
 function lurek.render()
     local q = anim:getQuad()
     if q then
-        -- Use the source quad with lurek.gfx.drawq()
-        -- lurek.gfx.drawq(spriteSheet, q.x, q.y, q.w, q.h, drawX, drawY)
+        -- Use the source quad with lurek.graphic.drawq()
+        -- lurek.graphic.drawq(spriteSheet, q.x, q.y, q.w, q.h, drawX, drawY)
     end
 end
 ```
@@ -249,7 +249,7 @@ end
 | `math`     | Imports from | Uses `Rect` for frame source quads.                                  |
 | `engine`   | Imports from | Uses `log_messages` for structured debug/warn log entries.            |
 | `lua_api`  | Imported by  | `animation_api.rs` wraps `Animation` as `LuaAnimation` UserData.     |
-| `graphics` | Related      | Not a code dependency. Scripts use animation quads with `lurek.gfx.draw()` / `drawq()`. |
+| `graphics` | Related      | Not a code dependency. Scripts use animation quads with `lurek.graphic.draw()` / `drawq()`. |
 
 **Similar modules**: `animation` handles frame-based sprite animation (sequences of source-rect quads). For skeletal/bone-hierarchy animation — where joints are driven by transforms rather than discrete sprite frames — use `spine` instead. `animation` is also distinct from `particle` (emitter-based particle effects) and from `graphics::sprite` (sprite draw state without timeline or clip logic).
 

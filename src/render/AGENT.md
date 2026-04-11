@@ -1,18 +1,18 @@
-# `graphics` — Agent Reference
+# `render` — Agent Reference
 
 | Property       | Value                                                        |
 |----------------|--------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
-| **Lua API**    | `lurek.gfx`                                              |
-| **Source**     | `src/render/`                                              |
+| **Lua API**    | `lurek.graphic`                                          |
+| **Source**     | `src/render/`                                            |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
 | **Architecture** | `docs/architecture/engine-architecture.md` § Rendering Pipeline |
 
 ## Purpose
 
-The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.graphic.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
 ## Source Files
 

@@ -805,6 +805,7 @@ impl LuaUserData for LuaShape {
 
         // -- clear --
         /// Removes all commands and resets the shape to empty.
+        /// @return nil
         methods.add_method("clear", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -835,6 +836,7 @@ impl LuaUserData for LuaShape {
         // -- setLineWidth --
         /// Sets the stroke width for subsequent outlined primitives.
         /// @param w : number  width in pixels
+        /// @return nil
         methods.add_method("setLineWidth", |_, this, w: f32| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -1017,6 +1019,7 @@ impl LuaUserData for LuaShape {
         /// @param y1 : number
         /// @param x2 : number
         /// @param y2 : number
+        /// @return nil
         methods.add_method("line", |_, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
             let mut st = this.state.borrow_mut();
             let shape = st.shapes.get_mut(this.key).ok_or_else(|| {
@@ -1029,6 +1032,7 @@ impl LuaUserData for LuaShape {
         // -- polyline --
         /// Queues a polyline command from variadic (x, y) coordinate pairs.
         /// @param ... : number  flat x1, y1, x2, y2, … (minimum 4 numbers = 2 points)
+        /// @return nil
         methods.add_method("polyline", |_, this, coords: mlua::Variadic<f32>| {
             let points: Vec<f32> = coords.into_iter().collect();
             if points.len() < 4 {
@@ -1158,6 +1162,7 @@ impl LuaUserData for LuaDrawLayer {
         /// Queues a draw callback at the given z-order.
         /// @param z : number
         /// @param fn : function
+        /// @return nil
         methods.add_method_mut("queue", |lua, this, (z, f): (f64, LuaFunction)| {
             let key = lua.create_registry_value(f)?;
             this.entries.push((z, key));
@@ -1165,6 +1170,7 @@ impl LuaUserData for LuaDrawLayer {
         });
 
         /// Sorts and calls all queued callbacks, then empties the queue.
+        /// @return nil
         methods.add_method_mut("flush", |lua, this, ()| {
             this.entries
                 .sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));

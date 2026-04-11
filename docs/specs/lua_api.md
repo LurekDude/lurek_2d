@@ -28,7 +28,7 @@ follows the same registration contract — `pub fn register(lua, luna_table, sta
 src/lua_api/
 ├── mod.rs            — create_lua_vm(), VM init, StdLib selection, global nulling
 ├── userdata.rs       — LunaType trait, shared UserData patterns
-├── graphics_api/     — lurek.gfx.*
+├── graphics_api/     — lurek.graphic.*
 ├── audio_api.rs      — lurek.audio.*
 ├── input_api.rs      — lurek.input.*, lurek.keyboard.*, lurek.mouse.*, lurek.gamepad.*
 ├── timer_api.rs      — lurek.time.*
@@ -164,7 +164,7 @@ impl LuaUserData for LuaImage {
 |------|---------|
 | `mod.rs` | VM creation, StdLib selection, global nulling, module registration |
 | `userdata.rs` | `LunaType` trait, shared UserData patterns |
-| `graphics_api/` | `lurek.gfx.*` — drawing, images, fonts, canvases, shaders |
+| `graphics_api/` | `lurek.graphic.*` — drawing, images, fonts, canvases, shaders |
 | `audio_api.rs` | `lurek.audio.*` — sources, playback, volume, buses |
 | `input_api.rs` | `lurek.input.*`, `lurek.keyboard.*`, `lurek.mouse.*`, `lurek.gamepad.*`, `lurek.touch.*` |
 | `timer_api.rs` | `lurek.time.*` — delta time, FPS, sleep (Gold standard for docstring format) |

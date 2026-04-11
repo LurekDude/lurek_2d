@@ -325,7 +325,7 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.draw(fire, 0, 0)
+    lurek.graphic.draw(fire, 0, 0)
 end
 ```
 

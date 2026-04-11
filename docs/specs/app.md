@@ -1,11 +1,11 @@
-# `engine` — Agent Reference
+# `app` — Agent Reference
 
 | Property       | Value                                                |
 |----------------|------------------------------------------------------|
 | **Tier**       | Baseline — always-on runtime substrate               |
 | **Status**     | Implemented — Full                                   |
-| **Lua API**    | — (foundation module; no dedicated `lurek.engine` namespace) |
-| **Source**     | `src/engine/`                                        |
+| **Lua API**    | — (foundation module; no dedicated `lurek.app` namespace) |
+| **Source**     | `src/app/` (lifecycle) · `src/runtime/` (config, shared state) |
 | **Rust Tests** | `tests/rust/unit/engine_tests.rs`                    |
 | **Lua Tests**  | —                                                    |
 | **Architecture** | `docs/architecture/engine-architecture.md`          |
@@ -310,7 +310,7 @@ No Lua API — foundation module. The engine module does not expose a `lurek.eng
 namespace. It provides the infrastructure consumed by all other modules and by
 `src/lua_api/` for lifecycle orchestration. Lua interacts with engine functionality
 indirectly through `lurek.platform` (log level, system info), `lurek.window` (window
-state), `lurek.signal` (quit, restart), and `lurek.gfx` (draw commands, screenshot).
+state), `lurek.signal` (quit, restart), and `lurek.graphic` (draw commands, screenshot).
 
 ## Lua Examples
 

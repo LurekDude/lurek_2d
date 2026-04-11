@@ -4,8 +4,8 @@
 |----------------|-----------------------------------------------------|
 | **Tier**       | Tier 2 — Engine Extensions                          |
 | **Status**     | Implemented — Full                                  |
-| **Lua API**    | `lurek.effect`                                           |
-| **Source**      | `src/effect/`                                           |
+| **Lua API**    | `lurek.overlay` / `lurek.postfx`                         |
+| **Source**      | `src/render/effect/`                                    |
 | **Rust Tests** | `tests/rust/unit/fx_tests.rs`                       |
 | **Lua Tests**  | —                                                   |
 | **Architecture** | —                                                 |

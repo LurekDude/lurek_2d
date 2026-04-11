@@ -690,6 +690,7 @@ impl ParticleSystem {
         }
     }
 
+    /// Renders a bar chart of particle lifecycle counts over time into an `ImageData` frame.
     pub fn draw_lifecycle_to_image(
         snapshots: &[(u32, usize)],
         max_particles: usize,

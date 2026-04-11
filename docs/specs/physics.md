@@ -352,11 +352,11 @@ end
 function lurek.render()
     -- Draw ball
     local bx, by = ball:getPosition()
-    lurek.gfx.circle("fill", bx, by, 20)
+    lurek.graphic.circle("fill", bx, by, 20)
 
     -- Draw ground
     local gx, gy = ground:getPosition()
-    lurek.gfx.rectangle("fill", gx - 400, gy - 10, 800, 20)
+    lurek.graphic.rectangle("fill", gx - 400, gy - 10, 800, 20)
 end
 ```
 

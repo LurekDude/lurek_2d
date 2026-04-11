@@ -337,10 +337,10 @@ local menu = {
     ready  = function(self) print("Menu ready — one-time setup") end,
     process = function(self, dt) end,
     render  = function(self)
-        lurek.gfx.print("Main Menu - Press Enter", 100, 100)
+        lurek.graphic.print("Main Menu - Press Enter", 100, 100)
     end,
     render_ui = function(self)
-        lurek.gfx.print("[Press Enter to start]", 100, 130)
+        lurek.graphic.print("[Press Enter to start]", 100, 130)
     end,
 }
 
@@ -359,10 +359,10 @@ local game = {
     process_physics    = function(self, dt) end,
     process_late       = function(self, dt) end,
     render             = function(self)
-        lurek.gfx.print("Level " .. self.level, 100, 100)
+        lurek.graphic.print("Level " .. self.level, 100, 100)
     end,
     render_ui          = function(self)
-        lurek.gfx.print("HUD", 10, 10)
+        lurek.graphic.print("HUD", 10, 10)
     end,
 }
 
@@ -406,9 +406,9 @@ local sorter = lurek.scene.newDepthSorter()
 
 function lurek.render()
     -- Add draw calls at different depths (lower = drawn first)
-    sorter:add(function() lurek.gfx.print("Background", 0, 0) end, 0)
-    sorter:add(function() lurek.gfx.print("Player", 100, 100) end, 50)
-    sorter:add(function() lurek.gfx.print("UI", 200, 10) end, 100)
+    sorter:add(function() lurek.graphic.print("Background", 0, 0) end, 0)
+    sorter:add(function() lurek.graphic.print("Player", 100, 100) end, 50)
+    sorter:add(function() lurek.graphic.print("UI", 200, 10) end, 100)
 
     -- Flush invokes them in depth order: 0, 50, 100
     sorter:flush()
@@ -422,7 +422,7 @@ function lurek.init()
     lurek.scene.registerScene("menu", {
         enter = function(self) end,
         draw  = function(self)
-            lurek.gfx.print("Menu", 10, 10)
+            lurek.graphic.print("Menu", 10, 10)
         end,
     })
 

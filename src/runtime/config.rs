@@ -146,7 +146,7 @@ pub struct WindowConfig {
 /// # Fields
 /// - `audio` — rodio audio subsystem (`lurek.audio`).
 /// - `physics` — rapier2d physics world (`lurek.physics`).
-/// - `graphics` — GPU render pipeline (`lurek.gfx`, `lurek.font`, `lurek.sprite`).
+/// - `graphics` — GPU render pipeline (`lurek.graphicphic`, `lurek.font`, `lurek.sprite`).
 /// - `input` — keyboard / mouse / gamepad input (`lurek.input`).
 /// - `timer` — frame timer and scheduled callbacks (`lurek.time`).
 /// - `filesystem` — sandboxed game filesystem (`lurek.fs`).

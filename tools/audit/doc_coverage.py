@@ -59,9 +59,10 @@ _LUA_SET2_RE = re.compile(
 )
 # Matches module-mount lines like `lurek.set("timer", tbl)?;` — these are namespace
 # mounts, not individual function registrations, and need no per-function doc.
+# Handles: bare variable names (tbl, parallax, ...)  AND `.clone()` variants (tbl.clone()).
 _LUA_MOUNT_RE = re.compile(
     r'luna\.set\s*\(\s*"[^"]+"\s*,\s*'
-    r'(?:tbl|graphics|keyboard|mouse|gamepad|touch|overlay_tbl|system)\s*\)'
+    r'[A-Za-z_][A-Za-z0-9_]*(?:\.clone\(\))?\s*\)'
 )
 
 
@@ -155,17 +156,24 @@ def _collect_lua_items(src_dir: Path) -> list[dict]:
 
             # Skip local-scope table builders: if `let tbl = lua.create_table()`
             # appears within the preceding 8 lines AND there is no `//` comment
-            # in the preceding 4 lines, then `tbl` is a temporary return-value
-            # table (e.g. inside a method closure or a helper function), not the
-            # register() API table.  Real API registrations always have a
-            # `// -- funcName --` section header or `///` doc comment before them.
-            has_nearby_create = any(
-                "let tbl = lua.create_table()" in lines[k]
-                for k in range(max(i - 8, 0), i)
-            )
+            # appearing AFTER that create_table() call, then `tbl` is a temporary
+            # return-value table (e.g. inside a method closure or a helper function),
+            # not the register() API table.  The AFTER constraint is critical: a `///`
+            # docstring for a parent dt.set() registration may appear a few lines
+            # above the create_table() but must not count as a doc for the inner tbl.
+            create_table_last = -1
+            for k in range(max(i - 12, 0), i):
+                if "let tbl = lua.create_table()" in lines[k]:
+                    create_table_last = k
+            has_nearby_create = create_table_last >= 0
+            # Only count a comment as legitimising the tbl.set if it appears
+            # AFTER the most recent create_table() call in the window.
             has_nearby_comment = any(
-                lines[k].strip().startswith("/// ")
-                or lines[k].strip().startswith("// -- ")
+                (
+                    lines[k].strip().startswith("/// ")
+                    or lines[k].strip().startswith("// -- ")
+                )
+                and k > create_table_last
                 for k in range(max(i - 4, 0), i)
             )
             if has_nearby_create and not has_nearby_comment:

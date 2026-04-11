@@ -33,6 +33,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param message : string
     /// @param tag : string?
     let s = sinks.clone();
+    /// @return nil
     log_table.set("debug", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
         let t = tag.as_deref().unwrap_or("Lua");
         log::debug!("[{}] {}", t, message);
@@ -45,6 +46,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param message : string
     /// @param tag : string?
     let s = sinks.clone();
+    /// @return nil
     log_table.set("info", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
         let t = tag.as_deref().unwrap_or("Lua");
         log::info!("[{}] {}", t, message);
@@ -57,6 +59,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param message : string
     /// @param tag : string?
     let s = sinks.clone();
+    /// @return nil
     log_table.set("warn", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
         let t = tag.as_deref().unwrap_or("Lua");
         log::warn!("[{}] {}", t, message);
@@ -69,6 +72,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param message : string
     /// @param tag : string?
     let s = sinks.clone();
+    /// @return nil
     log_table.set("error", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
         let t = tag.as_deref().unwrap_or("Lua");
         log::error!("[{}] {}", t, message);
@@ -82,6 +86,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param message : string
     /// @param tag : string?
     let s = sinks.clone();
+    /// @return nil
     log_table.set("print", lua.create_function(move |_, (level, message, tag): (String, String, Option<String>)| {
         let t = tag.as_deref().unwrap_or("Lua");
         let sink_level = match level.to_lowercase().as_str() {
@@ -98,6 +103,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // ── setLevel ────────────────────────────────────────────────────────
     /// Sets the minimum severity level for the default log channel.
     /// @param level : string
+    /// @return nil
     log_table.set("setLevel", lua.create_function(|_, level: String| {
         log_domain::set_level(&level);
         Ok(())
@@ -118,8 +124,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     ///   level     : string   (min level, default "debug")
     ///
     /// @param config : table
-    /// @return integer
     let s = sinks.clone();
+    /// @return integer
     log_table.set("addSink", lua.create_function(move |_, config: LuaTable| {
         let kind: String = config.get("type").unwrap_or_else(|_| "memory".to_string());
         let level_str: String = config.get("level").unwrap_or_else(|_| "debug".to_string());
@@ -143,8 +149,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // ── removeSink ───────────────────────────────────────────────────────
     /// Removes a sink by id. Returns true if one was removed.
     /// @param id : integer
-    /// @return boolean
     let s = sinks.clone();
+    /// @return boolean
     log_table.set("removeSink", lua.create_function(move |_, id: u64| {
         Ok(s.borrow_mut().remove(id))
     })?)?;
@@ -152,6 +158,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     // ── clearSinks ───────────────────────────────────────────────────────
     /// Removes all registered sinks (the default stderr channel is unaffected).
     let s = sinks.clone();
+    /// @return nil
     log_table.set("clearSinks", lua.create_function(move |_, ()| {
         s.borrow_mut().clear();
         Ok(())
@@ -159,8 +166,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // ── listSinks ────────────────────────────────────────────────────────
     /// Returns a table describing all registered sinks.
-    /// @return table
     let s = sinks.clone();
+    /// @return table
     log_table.set("listSinks", lua.create_function(move |lua, ()| {
         let tbl = lua.create_table()?;
         for (i, sink) in s.borrow().sinks.iter().enumerate() {
@@ -179,8 +186,8 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Returns an array of {level, tag, message} tables. Returns nil if id not found or wrong type.
     /// @param id : integer
     /// @param drain : boolean?
-    /// @return table?
     let s = sinks.clone();
+    /// @return table?
     log_table.set("readMemory", lua.create_function(move |lua, (id, drain): (u64, Option<bool>)| {
         let reg = s.borrow();
         let Some(sink) = reg.get(id) else { return Ok(LuaValue::Nil) };
@@ -206,6 +213,7 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Flushes the OS write buffer for a file sink.
     /// @param id : integer
     let s = sinks.clone();
+    /// @return nil
     log_table.set("flushFile", lua.create_function(move |_, id: u64| {
         if let Some(sink) = s.borrow().get(id) {
             sink.flush();

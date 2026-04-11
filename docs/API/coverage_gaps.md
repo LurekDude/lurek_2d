@@ -10,10 +10,28 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (30 items)
+## 1. Rust→Lua Gaps (64 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
+
+### `app::error_screen`
+
+- `format_traceback` — Cleans up a Lua traceback string for display.  # Parameters  `src/app/error_screen.rs:329`
+- `wrap_text` — Wraps a text string at word boundaries to fit within `max_ch `src/app/error_screen.rs:279`
+
+### `ecs::universe`
+
+- `deep_copy_table` — Deep-copies a Lua table recursively. Consult the module-leve `src/ecs/universe.rs:1179`
+
+### `i18n::interpolation`
+
+- `interpolate_pairs` — Thin wrapper: accepts `&[(impl Display, impl Display)]` pair `src/i18n/interpolation.rs:75`
+
+### `i18n::plural`
+
+- `pluralize` — Selects the correct plural string from a form map for the gi `src/i18n/plural.rs:111`
+- `pluralize_slavic` — Like [`pluralize`] but accepts integer counts and uses Slavi `src/i18n/plural.rs:130`
 
 ### `image::visualization`
 
@@ -24,6 +42,25 @@ This may be intentional (engine internals) or an oversight.
 - `camera_rotation_to_image` — Render six camera rotation steps in a 3-column grid.  Each p `src/image/visualization.rs:1163`
 - `camera_shake_to_image` — Render a camera shake trail and move-by result.  Draws per-f `src/image/visualization.rs:1348`
 - `cellular_grid_to_image` — Render a cellular automata grid (1=alive, 0=dead) as a scale `src/image/visualization.rs:608`
+- `colored_points_to_image` — Render a set of 2-D points, each colored by its index in the `src/image/visualization.rs:1685`
+- `draw_animation_frame_grid_to_image` — Render an animation's frame grid as a strip of numbered cell `src/image/visualization.rs:23`
+- `draw_animation_playback_to_image` — Render an animation playback strip as snapshot columns.  Dra `src/image/visualization.rs:80`
+- `draw_bezier_advanced_to_image` — Draw a bezier advanced operations overview.  Renders the ori `src/image/visualization.rs:2497`
+- `draw_camera_bounds_to_image` — Render a set of camera positions as labelled coloured rectan `src/image/visualization.rs:1779`
+- `draw_camera_debug_to_image` — Render a camera debug visualization showing viewport, positi `src/image/visualization.rs:132`
+- `draw_camera_follow_trail_to_image` — Render a camera follow trail with target points and dead-zon `src/image/visualization.rs:1815`
+- `draw_camera_rotation_grid_to_image` — Render a grid of camera rotation panels, each showing 8 colo `src/image/visualization.rs:1712`
+- `draw_camera_shake_trail_to_image` — Render a camera shake trail with fading circles and referenc `src/image/visualization.rs:1870`
+- `draw_camera_zoom_comparison_to_image` — Render a zoom comparison showing the world at multiple zoom  `src/image/visualization.rs:199`
+- `draw_color_wheel_to_image` — Draw an HSV colour wheel.  Generates radial hue-saturation g `src/image/visualization.rs:2413`
+- `draw_delaunay_to_image` — Draw Delaunay triangulation visualization.  Renders triangle `src/image/visualization.rs:2261`
+- `draw_geometry_intersections_to_image` — Draw geometry intersection tests visualization.  Renders seg `src/image/visualization.rs:2149`
+- `draw_geometry_shapes_to_image` — Draw a comprehensive geometry shapes & queries visualization `src/image/visualization.rs:2040`
+- `draw_graph_item_flow_to_image` — Render a pipeline graph with nodes, directional pipes, and i `src/image/visualization.rs:1981`
+- `draw_graph_operations_to_image` — Render a graph with explicit node positions, labels, edge li `src/image/visualization.rs:1921`
+- `draw_image_comparison_to_image` — Draw a side-by-side comparison of multiple images.  Places e `src/image/visualization.rs:2305`
+- `draw_pixel_transform_grid_to_image` — Draw a 4-column pixel transform grid: original, invert, gray `src/image/visualization.rs:2354`
+- `draw_sound_waveform_to_image` — Draw a single waveform as a colored plot on a dark backgroun `src/image/visualization.rs:2447`
 - `dungeon_grid_to_image` — Render a BSP dungeon grid (0=floor, 1=wall) as a scaled tile `src/image/visualization.rs:699`
 - `easing_comparison_to_image` — Render multiple easing curves overlaid on a single chart.  E `src/image/visualization.rs:504`
 - `easing_gallery_to_image` — Render a gallery of easing curves as a grid of small charts. `src/image/visualization.rs:453`
@@ -38,21 +75,42 @@ This may be intentional (engine internals) or an oversight.
 - `panel_layout_to_image` — Render a mock settings panel with title bar, sliders, checkb `src/image/visualization.rs:952`
 - `points_to_image` — Render a set of 2D points as dots on a dark background.  # P `src/image/visualization.rs:672`
 - `polygon_gallery_to_image` — Render a gallery of regular polygons (triangle→dodecagon), a `src/image/visualization.rs:811`
-- `render_animation_frame_grid_to_image` — Render an animation's frame grid as a strip of numbered cell `src/image/visualization.rs:23`
-- `render_animation_playback_to_image` — Render an animation playback strip as snapshot columns.  Dra `src/image/visualization.rs:80`
-- `render_camera_debug_to_image` — Render a camera debug visualization showing viewport, positi `src/image/visualization.rs:132`
-- `render_camera_zoom_comparison_to_image` — Render a zoom comparison showing the world at multiple zoom  `src/image/visualization.rs:199`
 - `spiral_to_image` — Render concentric colored circles to demonstrate angular seg `src/image/visualization.rs:875`
 - `terrain_elevation_to_image` — Render a flat heightmap buffer with terrain-band coloring.   `src/image/visualization.rs:411`
 - `voronoi_to_image` — Render a Voronoi region map as a colored image.  Each region `src/image/visualization.rs:644`
+- `waveform_stereo_to_image` — Render interleaved stereo audio samples as a two-channel wav `src/image/visualization.rs:1543`
+- `waveform_to_image` — Render audio samples as a waveform visualization.  Draws a w `src/image/visualization.rs:1468`
+- `waveform_zoomed_to_image` — Render a zoomed-in waveform showing individual sample cycles `src/image/visualization.rs:1610`
 
 ### `math::color`
 
 - `hsv_to_rgb` — Convert an HSV color to RGB byte components.  # Parameters - `src/math/color.rs:153`
 
-### `signal::event_queue`
+### `pathfind::astar`
 
-- `event_to_lua_multi` — Converts an [`Event`] into a Lua multi-value (name followed  `src/signal/event_queue.rs:203`
+- `astar` — Run A★ search on `grid` from `start` to `goal`.  # Parameter `src/pathfind/astar.rs:82`
+- `line_of_sight` — Check line-of-sight between two cells using Bresenham's algo `src/pathfind/astar.rs:300`
+- `smooth_path` — Smooth a path by removing unnecessary waypoints via line-of- `src/pathfind/astar.rs:342`
+
+### `pathfind::graph_path`
+
+- `find_province_path` — Find a path between two provinces using A* with centroid dis `src/pathfind/graph_path.rs:137`
+- `province_reachable` — Find all provinces reachable from `start` within a cost budg `src/pathfind/graph_path.rs:248`
+
+### `pathfind::hpa`
+
+- `hpa_star` — Run HPA★ from `start` to `goal` on the abstract graph, then  `src/pathfind/hpa.rs:384`
+- `is_reachable` — Check if `goal` is reachable from `start` using the abstract `src/pathfind/hpa.rs:521`
+
+### `save::save_data`
+
+- `serialize_table` — Serialize a simple Lua-compatible value hierarchy into a `re `src/save/save_data.rs:212`
+- `serialize_value` — Serializes a single Lua value into the TOML-compatible wire  `src/save/save_data.rs:244`
+
+### `save::save_manager`
+
+- `serialize_table` — Serialize a simple Lua-compatible value hierarchy into a `re `src/save/save_manager.rs:249`
+- `serialize_value` — Serialize a single value.  # Parameters - `value` — `&SaveVa `src/save/save_manager.rs:281`
 
 ---
 

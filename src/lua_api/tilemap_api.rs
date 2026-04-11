@@ -470,6 +470,7 @@ impl LuaUserData for LuaTileMap {
         /// @param layer : integer
         /// @param x : integer
         /// @param y : integer
+        /// @return nil
         methods.add_method("clearTile", |_, this, (layer, x, y): (usize, u32, u32)| {
             this.inner.borrow_mut().clear_tile(layer - 1, x - 1, y - 1);
             Ok(())
@@ -735,6 +736,7 @@ impl LuaUserData for LuaTileMap {
         /// Renders the tile map to the screen at the given offset.
         /// @param ox : number?
         /// @param oy : number?
+        /// @return nil
         methods.add_method("render", |_, this, (ox, oy): (Option<f32>, Option<f32>)| {
             let sx = ox.unwrap_or(0.0);
             let sy = oy.unwrap_or(0.0);
@@ -1027,6 +1029,7 @@ impl LuaUserData for LuaIsoMap {
         /// Sets the visibility of a level (1-based z).
         /// @param z : integer
         /// @param visible : boolean
+        /// @return nil
         methods.add_method("setLevelVisible", |_, this, (z, visible): (usize, bool)| {
             this.inner.borrow_mut().set_level_visible(z - 1, visible);
             Ok(())

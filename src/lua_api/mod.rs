@@ -128,7 +128,7 @@ pub mod math_api;
 /// Registers the `lurek.physics.*` rigid-body physics API.
 pub mod physics_api;
 
-/// Registers the `lurek.gfx.*` rendering and drawing API.
+/// Registers the `lurek.graphic.*` rendering and drawing API.
 pub mod render_api;
 
 /// Exposes low-level system queries (processor count, memory size, URL opening, locale, power).
@@ -378,7 +378,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         physics_api::register(&lua, &luna, state.clone())?;
     }
 
-    // graphics: lurek.gfx
+    // graphics: lurek.graphic
     if modules.graphics {
         render_api::register(&lua, &luna, state.clone())?;
     }

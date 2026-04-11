@@ -76,6 +76,7 @@ impl LuaUserData for LuaSchema {
 
         /// Validates data and throws a Lua error on failure with all error messages joined.
         /// @param data : table
+        /// @return nil
         methods.add_method("assert", |_, this, data: LuaTable| {
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
             for pair in data.clone().pairs::<String, LuaValue>() {
@@ -290,7 +291,7 @@ impl LuaUserData for ApiCatalog {
 
         /// Returns a single entry by qualified name, or nil.
         /// @param qualified_name : string
-        /// @return any
+        /// @return DocEntry?
         methods.add_method("getEntry", |_, this, qualified_name: String| {
             Ok(this.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
         });
@@ -340,7 +341,7 @@ impl LuaUserData for ApiCatalog {
 
         /// Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
         /// @param other : userdata
-        /// @return any
+        /// @return ApiCatalog
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<ApiCatalog>()?;
             let mut merged = this.0.clone();
@@ -359,7 +360,7 @@ impl LuaUserData for ApiCatalog {
 
         /// Returns a new catalog containing only entries for which predicate returns true.
         /// @param predicate : function
-        /// @return any
+        /// @return ApiCatalog
         methods.add_method("filter", |_lua, this, predicate: LuaFunction| {
             let mut filtered = Vec::new();
             for e in &this.0 {
@@ -763,7 +764,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- scan --------------------------------------------------------------
     /// Scan the lurek.* namespace to build an API catalog from live bindings.
     /// @param opts : table?
-    /// @return any
+    /// @return ApiCatalog
     docs_tbl.set(
         "scan",
         lua.create_function(|lua, _opts: Option<LuaTable>| {
@@ -778,7 +779,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- scanModule --------------------------------------------------------
     /// Scan a single module's bindings.
     /// @param module_name : string
-    /// @return any
+    /// @return ApiCatalog
     docs_tbl.set(
         "scanModule",
         lua.create_function(|lua, module_name: String| {
@@ -795,7 +796,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- loadToml ----------------------------------------------------------
     /// Load a TOML doc file into an ApiCatalog.
     /// @param path : string
-    /// @return any
+    /// @return ApiCatalog
     docs_tbl.set(
         "loadToml",
         lua.create_function(|lua, path: String| {
@@ -829,7 +830,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- loadAll -----------------------------------------------------------
     /// Load all .toml files in a directory and merge into a single ApiCatalog.
     /// @param directory : string
-    /// @return any
+    /// @return ApiCatalog
     docs_tbl.set(
         "loadAll",
         lua.create_function(|lua, directory: String| {
@@ -989,7 +990,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- validate ----------------------------------------------------------
     /// Validate catalog completeness against the live lurek.* bindings.
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return ValidationReport
     docs_tbl.set(
         "validate",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
@@ -1034,7 +1035,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// Validate a single module against the live lurek.<module>.* bindings.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return ValidationReport
     docs_tbl.set(
         "validateModule",
         lua.create_function(
@@ -1120,7 +1121,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- quality -----------------------------------------------------------
     /// Calculate quality metrics for a catalog or the internal catalog.
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return table
     let s = state.clone();
     docs_tbl.set(
         "quality",
@@ -1137,7 +1138,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// Calculate quality metrics for a single module.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return table
     let s = state.clone();
     docs_tbl.set(
         "qualityModule",
@@ -1159,7 +1160,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     // -- coverage ----------------------------------------------------------
     /// Return (documented_count, total_live_count) coverage tuple.
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return integer, integer
     docs_tbl.set(
         "coverage",
         lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
@@ -1180,7 +1181,7 @@ pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     /// Return (documented_count, total_live_count) for a single module.
     /// @param module_name : string
     /// @param catalog_ud : userdata?
-    /// @return any
+    /// @return integer, integer
     docs_tbl.set(
         "coverageModule",
         lua.create_function(

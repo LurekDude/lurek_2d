@@ -56,6 +56,28 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.6.36] — 2026-04-13
+### Fixed
+- **Docs/tooling audit** — comprehensive sync of all module documentation with the `refactor/src-migration-v2` source layout:
+  - `docs/specs/` renamed 6 stale files to match actual module names (`engine→app`, `entity→ecs`, `localization→i18n`, `modding→mods`, `pathfinding→pathfind`, `savegame→save`).
+  - Deleted 4 ghost specs for non-existent modules: `fx.md`, `graphic.md`, `gui.md`, `signal.md`.
+  - Created 2 new specs: `docs/specs/render.md` (src/render/ GPU pipeline) and `docs/specs/runtime.md` (src/runtime/ Baseline substrate).
+  - Fixed all `lurek.gfx` → `lurek.graphic` namespace references across 12 spec files — the actual runtime namespace is `lurek.graphic` registered by `render_api.rs`.
+  - Updated source path fields in `camera.md`, `light.md`, `effect.md`, `graphics.md` to reflect `src/render/camera/`, `src/render/light/`, `src/render/effect/` after migration.
+  - Fixed `effect.md` Lua API field: `lurek.effect` → `lurek.overlay` / `lurek.postfx`.
+  - Updated `docs/specs/README.md` modules list from 38 stale links to 49 correct links.
+  - Created `src/app/AGENT.md` and `src/graphics/AGENT.md` (previously missing).
+  - Fixed `src/render/AGENT.md` and `src/runtime/AGENT.md` titles and content to reflect current module names.
+- **`tools/audit/doc_coverage.py`** — fixed `_LUA_MOUNT_RE` regex to match any variable name (with optional `.clone()`); fixed `has_nearby_comment` logic to anchor comment detection after the most recent `let tbl = lua.create_table()` in the scan window; extended window from 8 to 12 lines. Gate: 100% public item coverage.
+- **`tools/validate/validate_lua_api.py`** — fixed `check_register_signature` to skip `//` comment lines (prevented false-positives on `pub fn register()` text in `//!` docstrings); updated `check_module_registration` regex to handle `luna_table.set(...)` and `.clone()` variants.
+- **`src/lua_api/`** — added ~200 missing `/// @return type` annotations across `devtools_api.rs`, `docs_api.rs`, `i18n_api.rs`, `log_api.rs`, `minimap_api.rs`, `parallax_api.rs`, `particle_api.rs`, `patterns_api.rs`, `render_api.rs`, `system_api.rs`, `thread_api.rs`, `tilemap_api.rs`.
+- **`src/particle/emitter.rs`** — added missing `///` docstring on `pub fn draw_lifecycle_to_image`.
+- **`src/lua_api/mod.rs`** — fixed stale doc comment `lurek.gfx.*` → `lurek.graphic` on the `render_api` module declaration.
+- **`src/runtime/config.rs`** — fixed docstring L149: `lurek.gfx` → `lurek.graphic`.
+- Regenerated `docs/API/lua-api.md`, `docs/API/rust-api.md`, `docs/API/lurek.lua`, `docs/API/coverage_gaps.md`.
+
+---
+
 ## [0.6.35] — 2026-04-12
 ### Added
 - **GPU render() methods** for `Minimap`, `TileMap`, `Overlay`, and `ParticleSystem` — four modules now support per-frame GPU rendering via `obj:render()` which pushes `RenderCommand`s to the render queue. Previously these modules only had CPU-based `draw_to_image()`.

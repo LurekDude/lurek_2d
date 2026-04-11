@@ -739,6 +739,7 @@ impl LuaUserData for LuaMinimap {
         /// Renders the minimap to the screen at the given position.
         /// @param x : number?
         /// @param y : number?
+        /// @return nil
         methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
             let sx = x.unwrap_or(0.0);
             let sy = y.unwrap_or(0.0);

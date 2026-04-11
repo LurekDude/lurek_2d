@@ -2550,14 +2550,16 @@ function lurek.debugbridge.stop() end
 lurek.devtools = {}
 
 --- Clears all log history.
+---@return nil
 function lurek.devtools.clearLog() end
 
 --- Clears all watched paths.
+---@return nil
 function lurek.devtools.clearWatches() end
 
 --- Evaluates a Lua string and returns (success, results...).
 ---@param code any
----@return any
+---@return boolean
 function lurek.devtools.eval(code) end
 
 --- Registers a named live watch. The getter function is called on demand to sample a value.
@@ -2633,6 +2635,7 @@ function lurek.devtools.isProfilingEnabled() end
 --- Logs a message at the given level.
 ---@param level any
 ---@param message any
+---@return nil
 function lurek.devtools.log(level, message) end
 
 --- Opens the console window (updates the console flag; returns true).
@@ -2640,17 +2643,21 @@ function lurek.devtools.log(level, message) end
 function lurek.devtools.openConsole() end
 
 --- Seals the current frame of profiling data.
+---@return nil
 function lurek.devtools.profileFrame() end
 
 --- Closes the most recent profiling zone.
+---@return nil
 function lurek.devtools.profilePop() end
 
 --- Opens a named profiling zone on the stack.
 ---@param name any
+---@return nil
 function lurek.devtools.profilePush(name) end
 
 --- Records a frame-time sample (call each frame with delta time in seconds).
 ---@param dt_val any
+---@return nil
 function lurek.devtools.recordFrameTime(dt_val) end
 
 --- Removes a watch by the id returned from exposeWatch. Returns true if removed.
@@ -2659,6 +2666,7 @@ function lurek.devtools.recordFrameTime(dt_val) end
 function lurek.devtools.removeWatch(id) end
 
 --- Clears all profiling data and resets the zone stack.
+---@return nil
 function lurek.devtools.resetProfile() end
 
 --- Polls all watched paths and returns paths whose mtime changed.
@@ -2667,26 +2675,32 @@ function lurek.devtools.scan() end
 
 --- Sets the frame-history buffer capacity (clamped 10-10000).
 ---@param size any
+---@return nil
 function lurek.devtools.setFrameHistorySize(size) end
 
 --- Enables or disables console log output.
 ---@param enabled any
+---@return nil
 function lurek.devtools.setLogConsole(enabled) end
 
 --- Sets the log file path (empty string disables file output).
 ---@param path any
+---@return nil
 function lurek.devtools.setLogFile(path) end
 
 --- Sets the minimum log level.
 ---@param level any
+---@return nil
 function lurek.devtools.setLogLevel(level) end
 
 --- Enables or disables the profiler.
 ---@param enabled any
+---@return nil
 function lurek.devtools.setProfilingEnabled(enabled) end
 
 --- Sets the file watch poll interval in seconds.
 ---@param interval any
+---@return nil
 function lurek.devtools.setWatchInterval(interval) end
 
 --- Takes a structured snapshot of all watches + frame stats + last profile frame.
@@ -2717,7 +2731,7 @@ function ApiCatalog:entryCount(module) end
 
 --- Returns a new catalog containing only entries for which predicate returns true.
 ---@param predicate any
----@return any
+---@return ApiCatalog
 function ApiCatalog:filter(predicate) end
 
 --- Returns all entries, optionally filtered to a single module.
@@ -2727,7 +2741,7 @@ function ApiCatalog:getEntries(module) end
 
 --- Returns a single entry by qualified name, or nil.
 ---@param qualified_name any
----@return any
+---@return DocEntry?
 function ApiCatalog:getEntry(qualified_name) end
 
 --- Returns a sorted list of module names present in the catalog.
@@ -2746,7 +2760,7 @@ function ApiCatalog:getTypes(module_name) end
 
 --- Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
 ---@param other any
----@return any
+---@return ApiCatalog
 function ApiCatalog:merge(other) end
 
 --- Returns a table of entries whose name, qualified name, or description contains query.
@@ -2875,6 +2889,7 @@ local Schema = {}
 
 --- Validates data and throws a Lua error on failure with all error messages joined.
 ---@param data any
+---@return nil
 function Schema:assert(data) end
 
 --- Returns true when the data passes all schema rules.
@@ -2947,13 +2962,13 @@ function lurek.docs.checkStaleness(catalog_ud, source_dir) end
 
 --- Return (documented_count, total_live_count) coverage tuple.
 ---@param catalog_ud? any (optional)
----@return any
+---@return integer
 function lurek.docs.coverage(catalog_ud) end
 
 --- Return (documented_count, total_live_count) for a single module.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
----@return any
+---@return integer
 function lurek.docs.coverageModule(module_name, catalog_ud) end
 
 --- Inject or update a description for a named API entry.
@@ -2996,23 +3011,23 @@ function lurek.docs.getCatalog() end
 
 --- Load all .toml files in a directory and merge into a single ApiCatalog.
 ---@param directory any
----@return any
+---@return ApiCatalog
 function lurek.docs.loadAll(directory) end
 
 --- Load a TOML doc file into an ApiCatalog.
 ---@param path any
----@return any
+---@return ApiCatalog
 function lurek.docs.loadToml(path) end
 
 --- Calculate quality metrics for a catalog or the internal catalog.
 ---@param catalog_ud? any (optional)
----@return any
+---@return table
 function lurek.docs.quality(catalog_ud) end
 
 --- Calculate quality metrics for a single module.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
----@return any
+---@return table
 function lurek.docs.qualityModule(module_name, catalog_ud) end
 
 --- Walks the live lurek.* Lua table and returns a structured reflection of all
@@ -3031,12 +3046,12 @@ function lurek.docs.resetCatalog() end
 
 --- Scan the lurek.* namespace to build an API catalog from live bindings.
 ---@param opts? any (optional)
----@return any
+---@return ApiCatalog
 function lurek.docs.scan(opts) end
 
 --- Scan a single module's bindings.
 ---@param module_name any
----@return any
+---@return ApiCatalog
 function lurek.docs.scanModule(module_name) end
 
 --- Creates a Schema validator from a rules table.
@@ -3057,14 +3072,249 @@ function lurek.docs.setReturnInfo(qualified_name, returns) end
 
 --- Validate catalog completeness against the live lurek.* bindings.
 ---@param catalog_ud? any (optional)
----@return any
+---@return ValidationReport
 function lurek.docs.validate(catalog_ud) end
 
 --- Validate a single module against the live lurek.<module>.* bindings.
 ---@param module_name any
 ---@param catalog_ud? any (optional)
----@return any
+---@return ValidationReport
 function lurek.docs.validateModule(module_name, catalog_ud) end
+
+---@class lurek.ecs
+lurek.ecs = {}
+
+--- Lua-side wrapper around a [`Universe`] ECS world.
+---@class Universe
+local Universe = {}
+
+--- Adds a system table to the universe.
+---@param system any
+---@return nil
+function Universe:addSystem(system) end
+
+--- Attaches a string tag to an entity.
+---@param id any
+---@param tag any
+---@return nil
+function Universe:addTag(id, tag) end
+
+--- Adds a bitmap tag to an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:bitmapTag(id, name) end
+
+--- Removes a bitmap tag from an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:bitmapUntag(id, name) end
+
+--- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
+---@return nil
+function Universe:clear() end
+
+--- Defines a bitmap tag name, returning its bit index.
+---@param name any
+---@return integer
+function Universe:defineTag(name) end
+
+--- Calls callback(id, value) for every entity with the named component.
+---@param name any
+---@param callback any
+---@return nil
+function Universe:each(name, callback) end
+
+--- Emits a named event to all systems that implement the handler.
+---@param args any
+---@return nil
+function Universe:emit(args) end
+
+--- Returns the component value for an entity, or nil if missing.
+---@param id any
+---@param name any
+---@return table
+function Universe:get(id, name) end
+
+--- Returns the bit index for a bitmap tag name, or nil if undefined.
+---@param name any
+---@return integer?
+function Universe:getBitmapTagBit(name) end
+
+--- Returns a deep copy of a blueprint's component table, or nil.
+---@param name any
+---@return table
+function Universe:getBlueprintComponents(name) end
+
+--- Returns all direct child entity IDs.
+---@param parent_id any
+---@return table
+function Universe:getChildren(parent_id) end
+
+--- Returns all component names for an entity.
+---@param id any
+---@return table
+function Universe:getComponents(id) end
+
+--- Returns all alive entity IDs.
+---@return table
+function Universe:getEntities() end
+
+--- Returns all alive entities on a specific layer.
+---@param layer any
+---@return table
+function Universe:getEntitiesByLayer(layer) end
+
+--- Returns all alive entities with the given string tag.
+---@param tag any
+---@return table
+function Universe:getEntitiesByTag(tag) end
+
+--- Returns all alive entities sorted by layer then ID.
+---@return table
+function Universe:getEntitiesSorted() end
+
+--- Returns the number of alive entities.
+---@return integer
+function Universe:getEntityCount() end
+
+--- Returns the layer for an entity, defaulting to zero.
+---@param id any
+---@return integer
+function Universe:getLayer(id) end
+
+--- Returns the parent entity ID, or nil if unparented.
+---@param child_id any
+---@return integer?
+function Universe:getParent(child_id) end
+
+--- Returns the number of registered systems.
+---@return integer
+function Universe:getSystemCount() end
+
+--- Returns all string tags for an entity.
+---@param id any
+---@return table
+function Universe:getTags(id) end
+
+--- Returns true if the entity has the named component.
+---@param id any
+---@param name any
+---@return boolean
+function Universe:has(id, name) end
+
+--- Returns true if the entity has the given bitmap tag.
+---@param id any
+---@param name any
+---@return boolean
+function Universe:hasBitmapTag(id, name) end
+
+--- Returns true if a blueprint with the given name exists.
+---@param name any
+---@return boolean
+function Universe:hasBlueprint(name) end
+
+--- Returns true if the entity carries the given tag.
+---@param id any
+---@param tag any
+---@return boolean
+function Universe:hasTag(id, tag) end
+
+--- Returns true if the entity ID is currently alive.
+---@param id any
+---@return boolean
+function Universe:isAlive(id) end
+
+--- Destroys the entity with the given ID, freeing its slot for reuse.
+---@param id any
+---@return nil
+function Universe:kill(id) end
+
+--- Kills an entity and all its descendants recursively.
+---@param id any
+---@return nil
+function Universe:killRecursive(id) end
+
+--- Returns all defined blueprint names.
+---@return table
+function Universe:listBlueprints() end
+
+--- Returns entity IDs that have all listed component names.
+---@param args any
+---@return table
+function Universe:query(args) end
+
+--- Returns all alive entities with all of the listed bitmap tags.
+---@param names any
+---@return table
+function Universe:queryBitmapAll(names) end
+
+--- Returns all alive entities with any of the listed bitmap tags.
+---@param names any
+---@return table
+function Universe:queryBitmapAny(names) end
+
+--- Returns all alive entities with the given bitmap tag.
+---@param name any
+---@return table
+function Universe:queryBitmapTag(name) end
+
+--- Releases all universe state, equivalent to clear.
+---@return nil
+function Universe:release() end
+
+--- Removes a component from an entity.
+---@param id any
+---@param name any
+---@return nil
+function Universe:remove(id, name) end
+
+--- Removes a blueprint definition.
+---@param name any
+---@return nil
+function Universe:removeBlueprint(name) end
+
+--- Removes a system table from the universe.
+---@param system any
+---@return nil
+function Universe:removeSystem(system) end
+
+--- Removes a string tag from an entity.
+---@param id any
+---@param tag any
+---@return nil
+function Universe:removeTag(id, tag) end
+
+--- Calls render(system, world) on each registered system.
+---@return nil
+function Universe:render() end
+
+--- Sets a component value on an entity.
+---@param id any
+---@param name any
+---@param value any
+---@return nil
+function Universe:set(id, name, value) end
+
+--- Sets the layer for an entity.
+---@param id any
+---@param layer any
+---@return nil
+function Universe:setLayer(id, layer) end
+
+--- Creates a new entity and returns its packed ID.
+---@return integer
+function Universe:spawn() end
+
+--- Calls update(system, world, dt) on each registered system.
+---@param dt any
+---@return nil
+function Universe:update(dt) end
+
+--- Creates a new empty ECS universe.
+---@return Universe
+function lurek.ecs.newUniverse() end
 
 ---@class lurek.effect
 lurek.effect = {}
@@ -3138,6 +3388,12 @@ local Overlay = {}
 --- Resets all overlay subsystems to their default inactive state.
 ---@return nil
 function Overlay:clear() end
+
+--- Renders the overlay state (flash, fade, effects) to a CPU ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function Overlay:drawToImage(w, h) end
 
 --- Returns the current ambient tint as r, g, b, a components.
 ---@return number
@@ -3271,7 +3527,7 @@ function Overlay:isVignetteEnabled() end
 ---@return boolean
 function Overlay:isWeatherEnabled() end
 
---- No-op placeholder; the overlay is rendered by the engine's render pass.
+--- Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
 ---@return nil
 function Overlay:render() end
 
@@ -3614,240 +3870,88 @@ function lurek.effect.newPass(shader_id) end
 ---@return PostFxStack
 function lurek.effect.newStack(w, h) end
 
----@class lurek.entity
-lurek.entity = {}
+---@class lurek.signal
+lurek.signal = {}
 
---- Lua-side wrapper around a [`Universe`] ECS world.
----@class Universe
-local Universe = {}
+--- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
+---@class Signal
+local Signal = {}
 
---- Adds a system table to the universe.
----@param system any
----@return nil
-function Universe:addSystem(system) end
-
---- Attaches a string tag to an entity.
----@param id any
----@param tag any
----@return nil
-function Universe:addTag(id, tag) end
-
---- Adds a bitmap tag to an entity.
----@param id any
----@param name any
----@return nil
-function Universe:bitmapTag(id, name) end
-
---- Removes a bitmap tag from an entity.
----@param id any
----@param name any
----@return nil
-function Universe:bitmapUntag(id, name) end
-
---- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
----@return nil
-function Universe:clear() end
-
---- Defines a bitmap tag name, returning its bit index.
+--- Removes all callbacks for the named event.
 ---@param name any
 ---@return integer
-function Universe:defineTag(name) end
+function Signal:clear(name) end
 
---- Calls callback(id, value) for every entity with the named component.
----@param name any
----@param callback any
----@return nil
-function Universe:each(name, callback) end
+--- Removes all callbacks across all events.
+---@return integer
+function Signal:clearAll() end
 
---- Emits a named event to all systems that implement the handler.
+--- Emits the named event, calling all registered callbacks with extra arguments.
 ---@param args any
 ---@return nil
-function Universe:emit(args) end
+function Signal:emit(args) end
 
---- Returns the component value for an entity, or nil if missing.
----@param id any
+--- Returns the callback count for the named event.
 ---@param name any
----@return table
-function Universe:get(id, name) end
-
---- Returns the bit index for a bitmap tag name, or nil if undefined.
----@param name any
----@return integer?
-function Universe:getBitmapTagBit(name) end
-
---- Returns a deep copy of a blueprint's component table, or nil.
----@param name any
----@return table
-function Universe:getBlueprintComponents(name) end
-
---- Returns all direct child entity IDs.
----@param parent_id any
----@return table
-function Universe:getChildren(parent_id) end
-
---- Returns all component names for an entity.
----@param id any
----@return table
-function Universe:getComponents(id) end
-
---- Returns all alive entity IDs.
----@return table
-function Universe:getEntities() end
-
---- Returns all alive entities on a specific layer.
----@param layer any
----@return table
-function Universe:getEntitiesByLayer(layer) end
-
---- Returns all alive entities with the given string tag.
----@param tag any
----@return table
-function Universe:getEntitiesByTag(tag) end
-
---- Returns all alive entities sorted by layer then ID.
----@return table
-function Universe:getEntitiesSorted() end
-
---- Returns the number of alive entities.
 ---@return integer
-function Universe:getEntityCount() end
+function Signal:getCount(name) end
 
---- Returns the layer for an entity, defaulting to zero.
----@param id any
+--- Returns the total callback count across all events.
 ---@return integer
-function Universe:getLayer(id) end
+function Signal:getTotalCount() end
 
---- Returns the parent entity ID, or nil if unparented.
----@param child_id any
----@return integer?
-function Universe:getParent(child_id) end
+--- Removes a subscription by handle ID.
+---@param handle any
+---@return boolean
+function Signal:remove(handle) end
 
---- Returns the number of registered systems.
----@return integer
-function Universe:getSystemCount() end
+--- Returns the type name of this object.
+---@return string
+function Signal:type() end
 
---- Returns all string tags for an entity.
----@param id any
----@return table
-function Universe:getTags(id) end
-
---- Returns true if the entity has the named component.
----@param id any
+--- Returns true if the given type name matches this object's type or any parent type.
 ---@param name any
 ---@return boolean
-function Universe:has(id, name) end
+function Signal:typeOf(name) end
 
---- Returns true if the entity has the given bitmap tag.
----@param id any
----@param name any
----@return boolean
-function Universe:hasBitmapTag(id, name) end
-
---- Returns true if a blueprint with the given name exists.
----@param name any
----@return boolean
-function Universe:hasBlueprint(name) end
-
---- Returns true if the entity carries the given tag.
----@param id any
----@param tag any
----@return boolean
-function Universe:hasTag(id, tag) end
-
---- Returns true if the entity ID is currently alive.
----@param id any
----@return boolean
-function Universe:isAlive(id) end
-
---- Destroys the entity with the given ID, freeing its slot for reuse.
----@param id any
+--- Discards all pending events in the queue.
 ---@return nil
-function Universe:kill(id) end
+function lurek.signal.clear() end
 
---- Kills an entity and all its descendants recursively.
----@param id any
+--- Pushes an exit event, requesting the engine to stop.
+---@param code? any (optional)
 ---@return nil
-function Universe:killRecursive(id) end
+function lurek.signal.exit(code) end
 
---- Returns all defined blueprint names.
----@return table
-function Universe:listBlueprints() end
+--- Creates a new pub-sub Signal dispatcher.
+---@return Signal
+function lurek.signal.newSignal() end
 
---- Returns entity IDs that have all listed component names.
+--- Returns an iterator function that pops events from the queue.
+---@return function
+function lurek.signal.poll() end
+
+--- Syncs OS-level events into the queue (no-op in Lurek2D push model).
+---@return nil
+function lurek.signal.pump() end
+
+--- Pushes a custom event onto the event queue.
 ---@param args any
----@return table
-function Universe:query(args) end
-
---- Returns all alive entities with all of the listed bitmap tags.
----@param names any
----@return table
-function Universe:queryBitmapAll(names) end
-
---- Returns all alive entities with any of the listed bitmap tags.
----@param names any
----@return table
-function Universe:queryBitmapAny(names) end
-
---- Returns all alive entities with the given bitmap tag.
----@param name any
----@return table
-function Universe:queryBitmapTag(name) end
-
---- Releases all universe state, equivalent to clear.
 ---@return nil
-function Universe:release() end
+function lurek.signal.push(args) end
 
---- Removes a component from an entity.
----@param id any
----@param name any
+--- Alias for `exit()` — requests the engine to stop at the end of the current frame.
 ---@return nil
-function Universe:remove(id, name) end
+function lurek.signal.quit() end
 
---- Removes a blueprint definition.
----@param name any
+--- Requests that the engine restart at the beginning of the next frame.
 ---@return nil
-function Universe:removeBlueprint(name) end
+function lurek.signal.restart() end
 
---- Removes a system table from the universe.
----@param system any
----@return nil
-function Universe:removeSystem(system) end
-
---- Removes a string tag from an entity.
----@param id any
----@param tag any
----@return nil
-function Universe:removeTag(id, tag) end
-
---- Calls render(system, world) on each registered system.
----@return nil
-function Universe:render() end
-
---- Sets a component value on an entity.
----@param id any
----@param name any
----@param value any
----@return nil
-function Universe:set(id, name, value) end
-
---- Sets the layer for an entity.
----@param id any
----@param layer any
----@return nil
-function Universe:setLayer(id, layer) end
-
---- Creates a new entity and returns its packed ID.
----@return integer
-function Universe:spawn() end
-
---- Calls update(system, world, dt) on each registered system.
----@param dt any
----@return nil
-function Universe:update(dt) end
-
---- Creates a new empty ECS universe.
----@return Universe
-function lurek.entity.newUniverse() end
+--- Blocks until the next event arrives or the optional timeout elapses.
+---@param timeout? any (optional)
+---@return string?
+function lurek.signal.wait(timeout) end
 
 ---@class lurek.filesystem
 lurek.filesystem = {}
@@ -4528,735 +4632,143 @@ function Node:typeOf(name) end
 ---@return Graph
 function lurek.graph.newGraph() end
 
----@class lurek.graphic
-lurek.graphic = {}
+---@class lurek.i18n
+lurek.i18n = {}
 
---- Lua-side handle to an off-screen render target stored in SharedState.
----@class Canvas
-local Canvas = {}
-
---- Returns width and height of this canvas.
----@return integer
-function Canvas:getDimensions() end
-
---- Returns the height of this canvas in pixels.
----@return integer
-function Canvas:getHeight() end
-
---- Returns the width of this canvas in pixels.
----@return integer
-function Canvas:getWidth() end
-
---- Releases GPU framebuffer memory for this canvas.
----@return boolean
-function Canvas:release() end
-
---- Returns the type name of this object.
----@return string
-function Canvas:type() end
-
---- Returns the type name of this object.
----@return string
-function Canvas:typeOf() end
-
---- Lua-side z-ordered draw queue. Callbacks are sorted by z and called on `flush()`.
----@class DrawLayer
-local DrawLayer = {}
-
---- Removes all queued callbacks without calling them.
----@return void
-function DrawLayer:clear() end
-
---- Sorts and calls all queued callbacks, then empties the queue.
-function DrawLayer:flush() end
-
---- Returns the number of queued callbacks.
----@return number
-function DrawLayer:getCount() end
-
---- Queues a draw callback at the given z-order.
----@param z any
----@param f any
-function DrawLayer:queue(z, f) end
-
---- Returns the type name.
----@return string
-function DrawLayer:type() end
-
---- Returns true if this object is an instance of the given type name.
----@param name any
----@return boolean
-function DrawLayer:typeOf(name) end
-
---- Lua-side handle to a loaded font stored in SharedState.
----@class Font
-local Font = {}
-
---- Returns the ascent of this font in pixels.
----@return number
-function Font:getAscent() end
-
---- Returns the descent of this font in pixels.
----@return number
-function Font:getDescent() end
-
---- Returns the line height of this font.
----@return number
-function Font:getHeight() end
-
---- Returns the line height multiplier of this font.
----@return number
-function Font:getLineHeight() end
-
---- Returns the rendered width of the given text string.
----@param text any
----@return number
-function Font:getWidth(text) end
-
---- Wraps text to the given width and returns the lines.
----@param text any
----@param limit any
+--- Builds an inverted word index for the active locale. Returns index as {word → {keys}}.
 ---@return table
-function Font:getWrap(text, limit) end
+function lurek.i18n.buildIndex() end
 
---- Releases this font and frees its atlas memory.
+--- Returns unique first-path-segment category prefixes for all active locale keys.
+---@return table
+function lurek.i18n.categories() end
+
+--- Returns all loaded locale codes (alias for getLanguages).
+---@return table
+function lurek.i18n.getAvailableLanguages() end
+
+--- Returns the base/fallback language.
+---@return string
+function lurek.i18n.getBase() end
+
+--- Returns the current fallback locale array.
+---@return table
+function lurek.i18n.getFallbacks() end
+
+--- Returns all known keys for the active locale.
+---@return table
+function lurek.i18n.getKeys() end
+
+--- Returns the currently active locale code, or nil if unset.
+---@return string?
+function lurek.i18n.getLanguage() end
+
+--- Returns all loaded locale codes.
+---@return table
+function lurek.i18n.getLanguages() end
+
+--- Returns whether a key exists in the active locale.
+---@param key any
 ---@return boolean
-function Font:release() end
+function lurek.i18n.hasKey(key) end
 
---- Sets the line height multiplier for this font.
----@param height any
+--- Returns whether a locale has been loaded.
+---@param locale any
+---@return boolean
+function lurek.i18n.hasLanguage(locale) end
+
+--- Interpolates {name} placeholders in a template string.
+---@param template any
+---@param vars any
+---@return string
+function lurek.i18n.interpolate(template, vars) end
+
+--- Returns the number of keys loaded in the active locale.
+---@return integer
+function lurek.i18n.keyCount() end
+
+--- Returns all keys in the active locale whose first path segment matches category.
+---@param category any
+---@return table
+function lurek.i18n.keysInCategory(category) end
+
+--- Loads a language table under the given locale code.
+---@param locale any
+---@param tbl any
 ---@return nil
-function Font:setLineHeight(height) end
+function lurek.i18n.loadTable(locale, tbl) end
 
---- Returns the type name of this object.
+--- Merges a flat key→value table into an existing locale without replacing the whole table.
+---@param locale any
+---@param entries any
+---@return nil
+function lurek.i18n.mergeLocale(locale, entries) end
+
+--- Unregisters all onChange callbacks.
+---@return nil
+function lurek.i18n.offChange() end
+
+--- Registers a callback invoked when setLanguage() is called (alias: onChange).
+---@param cb any
+---@return nil
+function lurek.i18n.onChange(cb) end
+
+--- Registers a callback invoked when setLanguage() is called.
+---@param cb any
+---@return nil
+function lurek.i18n.onLanguageChange(cb) end
+
+--- Returns the CLDR plural category for a number ("one" or "other", etc.).
+---@param n any
 ---@return string
-function Font:type() end
+function lurek.i18n.pluralFor(n) end
 
---- Returns the type name of this object.
----@return string
-function Font:typeOf() end
+--- Searches active locale values for a substring query (case-insensitive). Returns {key, value} pairs.
+---@param query any
+---@param limit? any (optional)
+---@return table
+function lurek.i18n.search(query, limit) end
 
---- Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
----@class Image
-local Image = {}
-
---- Returns width and height of this image.
----@return integer
-function Image:getDimensions() end
-
---- Returns the height of this image in pixels.
----@return integer
-function Image:getHeight() end
-
---- Returns the width of this image in pixels.
----@return integer
-function Image:getWidth() end
-
---- Releases the GPU texture memory for this image.
----@return boolean
-function Image:release() end
-
---- Returns the type name of this object.
----@return string
-function Image:type() end
-
---- Returns the type name of this object.
----@return string
-function Image:typeOf() end
-
---- Lua-side handle to a loaded texture stored in SharedState.
----@class ImageData
-local ImageData = {}
-
---- Returns the pixel height of this image buffer.
----@return integer
-function ImageData:getHeight() end
-
---- Returns the pixel width of this image buffer.
----@return integer
-function ImageData:getWidth() end
-
---- Returns the type name "ImageData".
----@return string
-function ImageData:type() end
-
---- Returns true when the given name matches "ImageData" or a parent type.
----@param name any
----@return boolean
-function ImageData:typeOf(name) end
-
---- Lua-side handle to a mesh stored in SharedState.
----@class Mesh
-local Mesh = {}
-
---- Returns vertex data at the given 1-based index.
+--- Searches the provided pre-built index for entries matching all words in query.
 ---@param index any
----@return number
-function Mesh:getVertex(index) end
+---@param query any
+---@param limit? any (optional)
+---@return table
+function lurek.i18n.searchIndexed(index, query, limit) end
 
---- Returns the number of vertices in this mesh.
----@return integer
-function Mesh:getVertexCount() end
-
---- Releases this mesh.
----@return boolean
-function Mesh:release() end
-
---- Assigns a texture to this mesh.
----@param ud? any (optional)
+--- Sets the base/fallback language (adds it as first fallback).
+---@param locale any
 ---@return nil
-function Mesh:setTexture(ud) end
+function lurek.i18n.setBase(locale) end
 
---- Sets vertex data at the given 1-based index.
----@param index any
----@param data any
+--- Sets the ordered list of fallback locale codes tried when a key is missing.
+---@param locales any
 ---@return nil
-function Mesh:setVertex(index, data) end
+function lurek.i18n.setFallbacks(locales) end
 
---- Returns the type name of this object.
----@return string
-function Mesh:type() end
-
---- Returns the type name of this object.
----@return string
-function Mesh:typeOf() end
-
---- Lua-side 9-slice descriptor.
----@class NineSlice
-local NineSlice = {}
-
---- Returns the four inset values as (top, right, bottom, left).
----@return number
-function NineSlice:getInsets() end
-
---- Returns the width and height of the source texture.
----@return integer
-function NineSlice:getTextureSize() end
-
---- Returns the type name "NineSlice".
----@return string
-function NineSlice:type() end
-
---- Returns true when the given name matches "NineSlice" or a parent type.
----@param name any
----@return boolean
-function NineSlice:typeOf(name) end
-
---- Lua-side quad viewport into a texture.
----@class Quad
-local Quad = {}
-
---- Returns the reference texture dimensions.
----@return number
-function Quad:getTextureDimensions() end
-
---- Returns the quad viewport rectangle.
----@return number
-function Quad:getViewport() end
-
---- Returns the type name of this object.
----@return string
-function Quad:type() end
-
---- Returns the type name of this object.
----@return string
-function Quad:typeOf() end
-
---- Lua-side handle to a compiled shader stored in SharedState.
----@class Shader
-local Shader = {}
-
---- Returns whether this shader has a uniform with the given name.
----@param name any
----@return boolean
-function Shader:hasUniform(name) end
-
---- Releases this shader.
----@return boolean
-function Shader:release() end
-
---- Sends a uniform value to this shader.
----@param name any
+--- Inserts or overwrites a single key in the given locale.
+---@param locale any
+---@param key any
 ---@param value any
 ---@return nil
-function Shader:send(name, value) end
+function lurek.i18n.setKey(locale, key, value) end
 
---- Returns the type name of this object.
+--- Sets the active translation language.
+---@param locale any
+---@return nil
+function lurek.i18n.setLanguage(locale) end
+
+--- Translates a key against the active locale with optional variable
+---@param key any
+---@param vars? any (optional)
+---@param count? any (optional)
 ---@return string
-function Shader:type() end
+function lurek.i18n.t(key, vars, count) end
 
---- Returns the type name of this object.
----@return string
-function Shader:typeOf() end
-
---- Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
----@class Shape
-local Shape = {}
-
---- Removes all commands and resets the shape to empty.
-function Shape:clear() end
-
---- Returns the number of drawing commands currently stored.
----@return integer
-function Shape:getCommandCount() end
-
---- Queues a line segment command.
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
-function Shape:line(x1, y1, x2, y2) end
-
---- Queues a polyline command from variadic (x, y) coordinate pairs.
-function Shape:polyline() end
-
---- Sets the stroke width for subsequent outlined primitives.
----@param w any
-function Shape:setLineWidth(w) end
-
---- Returns the type name of this object.
----@return string
-function Shape:type() end
-
---- Returns true if the given type name matches this object's type or any parent type.
----@param name any
+--- Unloads a locale from the catalog.
+---@param locale any
 ---@return boolean
-function Shape:typeOf(name) end
-
---- Lua-side handle to a sprite batch stored in SharedState.
----@class SpriteBatch
-local SpriteBatch = {}
-
---- Removes all sprites from this batch.
----@return nil
-function SpriteBatch:clear() end
-
---- Returns the maximum capacity of this batch.
----@return integer
-function SpriteBatch:getBufferSize() end
-
---- Returns the number of sprites in this batch.
----@return integer
-function SpriteBatch:getCount() end
-
---- Releases this sprite batch.
----@return boolean
-function SpriteBatch:release() end
-
---- Returns the type name of this object.
----@return string
-function SpriteBatch:type() end
-
---- Returns the type name of this object.
----@return string
-function SpriteBatch:typeOf() end
-
---- Applies an affine transform matrix.
----@param mat any
-function lurek.graphic.applyTransform(mat) end
-
---- Draws a partial circle arc at the given position with specified radius and angle range.
----@param mode string
----@param x number
----@param y number
----@param radius number
----@param angle1 number
----@param angle2 number
----@param segments? integer? (optional)
-function lurek.graphic.arc(mode, x, y, radius, angle1, angle2, segments) end
-
---- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
----@param callback any
----@return nil
-function lurek.graphic.captureScreenshot(callback) end
-
---- Draws a circle.
----@param mode any
----@param x any
----@param y any
----@param radius any
-function lurek.graphic.circle(mode, x, y, radius) end
-
---- Clears the draw command queue (resets the screen).
----@param r? any (optional)
----@param g? any (optional)
----@param b? any (optional)
-function lurek.graphic.clear(r, g, b) end
-
---- Resets the stencil mode to the default (keep / always / 0).
----@return nil
-function lurek.graphic.clearStencil() end
-
---- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
----@param args any
-function lurek.graphic.draw(args) end
-
---- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
----@param slice any
----@param x any
----@param y any
----@param w any
----@param h any
----@return nil
-function lurek.graphic.drawNineSlice(slice, x, y, w, h) end
-
---- Draws a portion of an image defined by a Quad.
----@param image Image
----@param quad Quad
----@param x? number? (optional)
----@param y? number? (optional)
----@param r? number? (optional)
----@param sx? number? (optional)
----@param sy? number? (optional)
----@param ox? number? (optional)
----@param oy? number? (optional)
-function lurek.graphic.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
-
---- Draws an ellipse.
----@param mode any
----@param x any
----@param y any
----@param rx any
----@param ry any
-function lurek.graphic.ellipse(mode, x, y, rx, ry) end
-
---- Returns the current background color.
----@return number
-function lurek.graphic.getBackgroundColor() end
-
---- Returns the current blend mode as a string.
----@return string
-function lurek.graphic.getBlendMode() end
-
---- Returns the current canvas, or nil if drawing to screen.
----@return Canvas?
-function lurek.graphic.getCanvas() end
-
---- Returns the dimensions of a canvas.
----@param ud any
----@return integer
-function lurek.graphic.getCanvasSize(ud) end
-
---- Returns the current drawing color.
----@return number
-function lurek.graphic.getColor() end
-
---- Returns the current color mask.
----@return boolean
-function lurek.graphic.getColorMask() end
-
---- Returns the default texture filter mode.
----@return string
-function lurek.graphic.getDefaultFilter() end
-
---- Returns the current depth mode as (mode, write).
----@return string
-function lurek.graphic.getDepthMode() end
-
---- Returns window width and height.
----@return integer
-function lurek.graphic.getDimensions() end
-
---- Returns the currently active font, or nil.
----@return Font?
-function lurek.graphic.getFont() end
-
---- Returns the ascent of the given font.
----@param ud any
----@return number
-function lurek.graphic.getFontAscent(ud) end
-
---- Returns the descent of the given font.
----@param ud any
----@return number
-function lurek.graphic.getFontDescent(ud) end
-
---- Returns the line height of the given font.
----@param ud any
----@return number
-function lurek.graphic.getFontHeight(ud) end
-
---- Returns the line height of the given font (alias for getFontHeight).
----@param ud any
----@return number
-function lurek.graphic.getFontLineHeight(ud) end
-
---- Returns the pixel width of text in the given font.
----@param ud any
----@param text any
----@return number
-function lurek.graphic.getFontWidth(ud, text) end
-
---- Returns wrapped lines and the maximum line width.
----@param text any
----@param limit any
----@return table
-function lurek.graphic.getFontWrap(text, limit) end
-
---- Returns the window height in pixels.
----@return integer
-function lurek.graphic.getHeight() end
-
---- Returns the current line width.
----@return number
-function lurek.graphic.getLineWidth() end
-
---- Returns the current point size.
----@return number
-function lurek.graphic.getPointSize() end
-
---- Returns the active scissor rectangle, or nothing.
----@return number?
-function lurek.graphic.getScissor() end
-
---- Returns the active shader, or nil.
----@return Shader?
-function lurek.graphic.getShader() end
-
---- Returns a table of renderer statistics.
----@return table
-function lurek.graphic.getStats() end
-
---- Returns the current stencil mode as (action, compare, value).
----@return string
-function lurek.graphic.getStencilMode() end
-
---- Returns the window width in pixels.
----@return integer
-function lurek.graphic.getWidth() end
-
---- Intersects the current scissor with a new rectangle.
----@param x any
----@param y any
----@param w any
----@param h any
-function lurek.graphic.intersectScissor(x, y, w, h) end
-
---- Returns whether wireframe mode is active.
----@return boolean
-function lurek.graphic.isWireframe() end
-
---- Draws a line between two points.
----@param args any
-function lurek.graphic.line(args) end
-
---- Creates an off-screen render canvas.
----@param width any
----@param height any
----@return Canvas
-function lurek.graphic.newCanvas(width, height) end
-
---- Creates a new z-ordered draw-call queue.
----@return DrawLayer
-function lurek.graphic.newDrawLayer() end
-
---- Loads a TTF/OTF font from a file.
----@param path any
----@param size? any (optional)
----@return Font
-function lurek.graphic.newFont(path, size) end
-
---- Loads an image from a file path or creates one from ImageData.
----@param arg any
----@return Image
-function lurek.graphic.newImage(arg) end
-
---- Creates a custom mesh from vertex data.
----@param verts any
----@param mode? any (optional)
----@return Mesh
-function lurek.graphic.newMesh(verts, mode) end
-
---- Creates a 9-slice descriptor from a texture and inset values.
----@param image any
----@param top any
----@param right any
----@param bottom any
----@param left any
----@return NineSlice
-function lurek.graphic.newNineSlice(image, top, right, bottom, left) end
-
---- Creates a new Quad viewport into a texture.
----@param x any
----@param y any
----@param w any
----@param h any
----@param sw any
----@param sh any
----@return Quad
-function lurek.graphic.newQuad(x, y, w, h, sw, sh) end
-
---- Compiles a custom WGSL shader and returns its handle.
----@param code any
----@return Shader
-function lurek.graphic.newShader(code) end
-
---- Creates a new empty [`CompoundShape`] stored in the resource pool.
----@return Shape
-function lurek.graphic.newShape() end
-
---- Creates a new sprite batch for the given image.
----@param ud any
----@param max? any (optional)
----@return SpriteBatch
-function lurek.graphic.newSpriteBatch(ud, max) end
-
---- Resets the transform to the identity.
-function lurek.graphic.origin() end
-
---- Draws a list of points.
----@param args any
-function lurek.graphic.points(args) end
-
---- Draws a polygon from a list of vertices.
----@param args any
-function lurek.graphic.polygon(args) end
-
---- Pops the transform from the stack.
-function lurek.graphic.pop() end
-
---- Draws text at the given position.
----@param text any
----@param x? any (optional)
----@param y? any (optional)
----@param scale? any (optional)
-function lurek.graphic.print(text, x, y, scale) end
-
---- Draws word-wrapped text within a given width.
----@param text any
----@param x any
----@param y any
----@param limit any
----@param align? any (optional)
-function lurek.graphic.printf(text, x, y, limit, align) end
-
---- Pushes the current transform onto the stack.
-function lurek.graphic.push() end
-
---- Draws a rectangle.
----@param mode string
----@param x number
----@param y number
----@param w number
----@param h number
----@param rx? number? (optional)
----@param ry? number? (optional)
-function lurek.graphic.rectangle(mode, x, y, w, h, rx, ry) end
-
---- Rotates the coordinate system.
----@param angle any
-function lurek.graphic.rotate(angle) end
-
---- Queues a screenshot to be saved after the current frame.
----@param path any
-function lurek.graphic.saveScreenshot(path) end
-
---- Scales the coordinate system.
----@param sx any
----@param sy? any (optional)
-function lurek.graphic.scale(sx, sy) end
-
---- Sets the background clear color.
----@param r any
----@param g any
----@param b any
-function lurek.graphic.setBackgroundColor(r, g, b) end
-
---- Sets the blend mode for drawing.
----@param mode any
-function lurek.graphic.setBlendMode(mode) end
-
---- Sets the active render target to a Canvas, or back to the screen.
----@param ud? any (optional)
-function lurek.graphic.setCanvas(ud) end
-
---- Sets the current drawing color.
----@param r any
----@param g any
----@param b any
----@param a? any (optional)
-function lurek.graphic.setColor(r, g, b, a) end
-
---- Sets which RGBA channels are written. Reset with no args.
----@param args any
-function lurek.graphic.setColorMask(args) end
-
---- Sets the default texture filter mode.
----@param min any
----@param mag any
----@param anisotropy? any (optional)
-function lurek.graphic.setDefaultFilter(min, mag, anisotropy) end
-
---- Sets the depth test comparison and write enable.
----@param mode any
----@param write? any (optional)
-function lurek.graphic.setDepthMode(mode, write) end
-
---- Sets the active font for print calls.
----@param ud any
-function lurek.graphic.setFont(ud) end
-
---- Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
----@param font any
----@param lh any
----@return nil
-function lurek.graphic.setFontLineHeight(font, lh) end
-
---- Sets the line width for outline drawing.
----@param w any
-function lurek.graphic.setLineWidth(w) end
-
---- Sets the point diameter in pixels.
----@param size any
-function lurek.graphic.setPointSize(size) end
-
---- Restricts drawing to a rectangle, or clears scissor if no args.
----@param args any
-function lurek.graphic.setScissor(args) end
-
---- Sets the active shader, or clears it.
----@param ud? any (optional)
-function lurek.graphic.setShader(ud) end
-
---- Sets the stencil buffer write/test mode.
----@param action any
----@param compare? any (optional)
----@param value? any (optional)
-function lurek.graphic.setStencilMode(action, compare, value) end
-
---- Sets the stencil comparison test, or disables stencil testing.
----@param compare? any (optional)
----@param value? any (optional)
-function lurek.graphic.setStencilTest(compare, value) end
-
---- Enables or disables wireframe rendering.
----@param enabled any
-function lurek.graphic.setWireframe(enabled) end
-
---- Shears the coordinate system.
----@param kx any
----@param ky any
-function lurek.graphic.shear(kx, ky) end
-
---- Begins stencil writing with the given action and value.
----@param action? any (optional)
----@param value? any (optional)
-function lurek.graphic.stencil(action, value) end
-
---- Translates the coordinate system.
----@param x any
----@param y any
-function lurek.graphic.translate(x, y) end
-
---- Draws a triangle.
----@param mode any
----@param x1 any
----@param y1 any
----@param x2 any
----@param y2 any
----@param x3 any
----@param y3 any
-function lurek.graphic.triangle(mode, x1, y1, x2, y2, x3, y3) end
+function lurek.i18n.unloadTable(locale) end
 
 ---@class lurek.image
 lurek.image = {}
@@ -6033,135 +5545,6 @@ function lurek.light.setGroupIntensity(group_id, intensity) end
 ---@return nil
 function lurek.light.setMaxLights(n) end
 
----@class lurek.localization
-lurek.localization = {}
-
---- Builds an inverted word index for the active locale. Returns index as {word → {keys}}.
----@return table
-function lurek.localization.buildIndex() end
-
---- Returns unique first-path-segment category prefixes for all active locale keys.
----@return table
-function lurek.localization.categories() end
-
---- Returns all loaded locale codes (alias for getLanguages).
----@return table
-function lurek.localization.getAvailableLanguages() end
-
---- Returns the base/fallback language.
----@return string
-function lurek.localization.getBase() end
-
---- Returns the current fallback locale array.
----@return table
-function lurek.localization.getFallbacks() end
-
---- Returns all known keys for the active locale.
----@return table
-function lurek.localization.getKeys() end
-
---- Returns the currently active locale code, or nil if unset.
----@return string?
-function lurek.localization.getLanguage() end
-
---- Returns all loaded locale codes.
----@return table
-function lurek.localization.getLanguages() end
-
---- Returns whether a key exists in the active locale.
----@param key any
----@return boolean
-function lurek.localization.hasKey(key) end
-
---- Returns whether a locale has been loaded.
----@param locale any
----@return boolean
-function lurek.localization.hasLanguage(locale) end
-
---- Interpolates {name} placeholders in a template string.
----@param template any
----@param vars any
----@return string
-function lurek.localization.interpolate(template, vars) end
-
---- Returns the number of keys loaded in the active locale.
----@return integer
-function lurek.localization.keyCount() end
-
---- Returns all keys in the active locale whose first path segment matches category.
----@param category any
----@return table
-function lurek.localization.keysInCategory(category) end
-
---- Loads a language table under the given locale code.
----@param locale any
----@param tbl any
-function lurek.localization.loadTable(locale, tbl) end
-
---- Merges a flat key→value table into an existing locale without replacing the whole table.
----@param locale any
----@param entries any
-function lurek.localization.mergeLocale(locale, entries) end
-
---- Unregisters all onChange callbacks.
-function lurek.localization.offChange() end
-
---- Registers a callback invoked when setLanguage() is called (alias: onChange).
----@param cb any
-function lurek.localization.onChange(cb) end
-
---- Registers a callback invoked when setLanguage() is called.
----@param cb any
-function lurek.localization.onLanguageChange(cb) end
-
---- Returns the CLDR plural category for a number ("one" or "other", etc.).
----@param n any
----@return string
-function lurek.localization.pluralFor(n) end
-
---- Searches active locale values for a substring query (case-insensitive). Returns {key, value} pairs.
----@param query any
----@param limit? any (optional)
----@return table
-function lurek.localization.search(query, limit) end
-
---- Searches the provided pre-built index for entries matching all words in query.
----@param index any
----@param query any
----@param limit? any (optional)
----@return table
-function lurek.localization.searchIndexed(index, query, limit) end
-
---- Sets the base/fallback language (adds it as first fallback).
----@param locale any
-function lurek.localization.setBase(locale) end
-
---- Sets the ordered list of fallback locale codes tried when a key is missing.
----@param locales any
-function lurek.localization.setFallbacks(locales) end
-
---- Inserts or overwrites a single key in the given locale.
----@param locale any
----@param key any
----@param value any
-function lurek.localization.setKey(locale, key, value) end
-
---- Sets the active translation language.
----@param locale any
-function lurek.localization.setLanguage(locale) end
-
---- Translates a key against the active locale with optional variable
----@param key any
----@param vars? any (optional)
----@param count? any (optional)
----@return string
-function lurek.localization.t(key, vars, count) end
-
---- Unloads a locale from the catalog.
----@param locale any
----@return boolean
-function lurek.localization.unloadTable(locale) end
-
 ---@class lurek.log
 lurek.log = {}
 
@@ -6171,20 +5554,24 @@ lurek.log = {}
 function lurek.log.addSink(config) end
 
 --- Removes all registered sinks (the default stderr channel is unaffected).
+---@return nil
 function lurek.log.clearSinks() end
 
 --- Emits a debug-severity log message. Also dispatches to configured sinks.
 ---@param message any
 ---@param tag? any (optional)
+---@return nil
 function lurek.log.debug(message, tag) end
 
 --- Emits an error-severity log message. Also dispatches to configured sinks.
 ---@param message any
 ---@param tag? any (optional)
+---@return nil
 function lurek.log.error(message, tag) end
 
 --- Flushes the OS write buffer for a file sink.
 ---@param id any
+---@return nil
 function lurek.log.flushFile(id) end
 
 --- Returns the name of the currently active minimum log level.
@@ -6194,6 +5581,7 @@ function lurek.log.getLevel() end
 --- Emits an info-severity log message. Also dispatches to configured sinks.
 ---@param message any
 ---@param tag? any (optional)
+---@return nil
 function lurek.log.info(message, tag) end
 
 --- Returns a table describing all registered sinks.
@@ -6204,6 +5592,7 @@ function lurek.log.listSinks() end
 ---@param level any
 ---@param message any
 ---@param tag? any (optional)
+---@return nil
 function lurek.log.print(level, message, tag) end
 
 --- Reads entries from a memory sink. If drain=true the buffer is cleared.
@@ -6219,11 +5608,13 @@ function lurek.log.removeSink(id) end
 
 --- Sets the minimum severity level for the default log channel.
 ---@param level any
+---@return nil
 function lurek.log.setLevel(level) end
 
 --- Emits a warn-severity log message. Also dispatches to configured sinks.
 ---@param message any
 ---@param tag? any (optional)
+---@return nil
 function lurek.log.warn(message, tag) end
 
 ---@class lurek.math
@@ -7015,6 +6406,11 @@ function Minimap:clearObjects() end
 ---@return nil
 function Minimap:clearViewportRect() end
 
+--- Renders the minimap grid to a CPU ImageData.
+---@param pixel_size any
+---@return ImageData
+function Minimap:drawToImage(pixel_size) end
+
 --- Returns the center coordinates as x, y.
 ---@return number
 function Minimap:getCenter() end
@@ -7155,6 +6551,12 @@ function Minimap:removeMarker(id) end
 ---@return boolean
 function Minimap:removeObject(id) end
 
+--- Renders the minimap to the screen at the given position.
+---@param x? any (optional)
+---@param y? any (optional)
+---@return nil
+function Minimap:render(x, y) end
+
 --- Sets whether anti-aliasing is enabled.
 ---@param enabled any
 ---@return nil
@@ -7236,8 +6638,8 @@ function Minimap:update(dt) end
 ---@return Minimap
 function lurek.minimap.newMinimap(grid_w, grid_h, display_w, display_h) end
 
----@class lurek.modding
-lurek.modding = {}
+---@class lurek.mods
+lurek.mods = {}
 
 --- Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 ---@class Mod
@@ -7385,11 +6787,11 @@ function ModManager:validateDependencies() end
 --- Creates a new Mod from an info table with at least an `id` field.
 ---@param info any
 ---@return Mod
-function lurek.modding.newMod(info) end
+function lurek.mods.newMod(info) end
 
 --- Creates a new empty ModManager.
 ---@return ModManager
-function lurek.modding.newModManager() end
+function lurek.mods.newModManager() end
 
 ---@class lurek.network
 lurek.network = {}
@@ -7498,6 +6900,7 @@ lurek.parallax = {}
 local ParallaxLayer = {}
 
 --- Removes scroll clamping so the layer scrolls freely.
+---@return nil
 function ParallaxLayer:clearClamp() end
 
 --- Returns the autoscroll velocity as `(vx, vy)`.
@@ -7535,45 +6938,55 @@ function ParallaxLayer:isVisible() end
 --- Draws the layer using an explicit camera world position.
 ---@param cam_x any
 ---@param cam_y any
+---@return nil
 function ParallaxLayer:render(cam_x, cam_y) end
 
 --- Draws the layer using the engine active camera position automatically.
+---@return nil
 function ParallaxLayer:renderAuto() end
 
 --- Resets the autonomous scroll accumulator to zero.
+---@return nil
 function ParallaxLayer:resetAutoscroll() end
 
 --- Sets the autonomous scroll velocity in world-pixels per second.
 ---@param vx any
 ---@param vy any
+---@return nil
 function ParallaxLayer:setAutoscroll(vx, vy) end
 
 --- Sets the GPU blend mode for this layer.
 ---@param mode any
+---@return nil
 function ParallaxLayer:setBlendMode(mode) end
 
 --- Sets the static world-pixel position bias added on top of camera scroll.
 ---@param x any
 ---@param y any
+---@return nil
 function ParallaxLayer:setOffset(x, y) end
 
 --- Sets the layer-wide opacity override in `[0.0, 1.0]`.
 ---@param a any
+---@return nil
 function ParallaxLayer:setOpacity(a) end
 
 --- Sets whether the layer tiles on the X and Y axes.
 ---@param rx any
 ---@param ry any
+---@return nil
 function ParallaxLayer:setRepeat(rx, ry) end
 
 --- Sets the texture display scale factor on each axis.
 ---@param sx any
 ---@param sy any
+---@return nil
 function ParallaxLayer:setScale(sx, sy) end
 
 --- Sets the scroll factor relative to camera movement on each axis.
 ---@param x any
 ---@param y any
+---@return nil
 function ParallaxLayer:setScrollFactor(x, y) end
 
 --- Sets the multiplicative RGBA tint applied to all pixels of this layer.
@@ -7581,14 +6994,17 @@ function ParallaxLayer:setScrollFactor(x, y) end
 ---@param g any
 ---@param b any
 ---@param a any
+---@return nil
 function ParallaxLayer:setTint(r, g, b, a) end
 
 --- Shows or hides this layer.
 ---@param v any
+---@return nil
 function ParallaxLayer:setVisible(v) end
 
 --- Sets the draw-order depth. Lower values render first (further back).
 ---@param z any
+---@return nil
 function ParallaxLayer:setZ(z) end
 
 --- Returns the type name of this object.
@@ -7597,6 +7013,7 @@ function ParallaxLayer:type() end
 
 --- Advances the autonomous scroll accumulator by `dt` seconds.
 ---@param dt any
+---@return nil
 function ParallaxLayer:update(dt) end
 
 --- Lua-side container that groups `LuaParallaxLayer` objects for scene-level management.
@@ -7605,6 +7022,7 @@ local ParallaxSet = {}
 
 --- Adds a layer to this set.
 ---@param layer any
+---@return nil
 function ParallaxSet:addLayer(layer) end
 
 --- Returns the name of this set.
@@ -7627,20 +7045,25 @@ function ParallaxSet:removeLayerAt(index) end
 --- Draws all visible layers in ascending `z` order using an explicit camera position.
 ---@param cam_x any
 ---@param cam_y any
+---@return nil
 function ParallaxSet:render(cam_x, cam_y) end
 
 --- Draws all visible layers using the engine active camera position.
+---@return nil
 function ParallaxSet:renderAuto() end
 
 --- Sets the name of this set.
 ---@param name any
+---@return nil
 function ParallaxSet:setName(name) end
 
 --- Shows or hides all layers in this set.
 ---@param v any
+---@return nil
 function ParallaxSet:setVisible(v) end
 
 --- Re-sorts all layers by ascending `z` value.
+---@return nil
 function ParallaxSet:sortByZ() end
 
 --- Returns the type name of this object.
@@ -7649,6 +7072,7 @@ function ParallaxSet:type() end
 
 --- Advances the autoscroll accumulator of every layer by `dt` seconds.
 ---@param dt any
+---@return nil
 function ParallaxSet:update(dt) end
 
 --- Creates a new parallax background layer from an options table.
@@ -7675,6 +7099,12 @@ function ParticleSystem:clone() end
 --- Returns the number of living particles.
 ---@return integer
 function ParticleSystem:count() end
+
+--- Renders all live particles to a CPU ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function ParticleSystem:drawToImage(w, h) end
 
 --- Emits a burst of the given number of particles.
 ---@param count any
@@ -7815,6 +7245,12 @@ function ParticleSystem:pause() end
 ---@return nil
 function ParticleSystem:release() end
 
+--- Renders all live particles to the GPU command queue.
+---@param ox? any (optional)
+---@param oy? any (optional)
+---@return nil
+function ParticleSystem:render(ox, oy) end
+
 --- Removes all particles and resets the emitter.
 ---@return nil
 function ParticleSystem:reset() end
@@ -7825,14 +7261,17 @@ function ParticleSystem:resume() end
 
 --- Sets the maximum number of particles (resizes the pool).
 ---@param n any
+---@return nil
 function ParticleSystem:setBufferSize(n) end
 
 --- Sets color keyframes. Each arg is a table {r, g, b, a}.
 ---@param colors any
+---@return nil
 function ParticleSystem:setColors(colors) end
 
 --- Sets emission direction in radians.
 ---@param dir any
+---@return nil
 function ParticleSystem:setDirection(dir) end
 
 --- Sets emission area distribution and size.
@@ -7841,23 +7280,28 @@ function ParticleSystem:setDirection(dir) end
 ---@param h any
 ---@param angle? any (optional)
 ---@param dir_rel? any (optional)
+---@return nil
 function ParticleSystem:setEmissionArea(dist, w, h, angle, dir_rel) end
 
 --- Sets particles emitted per second.
 ---@param rate any
+---@return nil
 function ParticleSystem:setEmissionRate(rate) end
 
 --- Sets how long the emitter runs before auto-stopping. Negative = infinite.
 ---@param t any
+---@return nil
 function ParticleSystem:setEmitterLifetime(t) end
 
 --- Sets gravity (x, y).
 ---@param gx any
 ---@param gy any
+---@return nil
 function ParticleSystem:setGravity(gx, gy) end
 
 --- Sets the insert mode: "top", "bottom", or "random".
 ---@param mode any
+---@return nil
 function ParticleSystem:setInsertMode(mode) end
 
 --- Sets linear acceleration range.
@@ -7865,75 +7309,91 @@ function ParticleSystem:setInsertMode(mode) end
 ---@param ymin any
 ---@param xmax any
 ---@param ymax any
+---@return nil
 function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
 
 --- Sets linear damping range.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setLinearDamping(min, max) end
 
 --- Sets the render origin offset.
 ---@param ox any
 ---@param oy any
+---@return nil
 function ParticleSystem:setOffset(ox, oy) end
 
 --- Sets min and max particle lifetime in seconds.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setParticleLifetime(min, max) end
 
 --- Sets the emitter world position.
 ---@param x any
 ---@param y any
+---@return nil
 function ParticleSystem:setPosition(x, y) end
 
 --- Sets radial acceleration range.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setRadialAcceleration(min, max) end
 
 --- Sets whether particle rotation follows velocity direction.
 ---@param v any
+---@return nil
 function ParticleSystem:setRelativeRotation(v) end
 
 --- Sets initial rotation range in radians.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setRotation(min, max) end
 
 --- Sets the particle draw shape.
 ---@param shape any
+---@return nil
 function ParticleSystem:setShape(shape) end
 
 --- Sets size variation (0–1).
 ---@param v any
+---@return nil
 function ParticleSystem:setSizeVariation(v) end
 
 --- Sets size keyframes (varargs: each number is one keyframe).
 ---@param sizes any
+---@return nil
 function ParticleSystem:setSizes(sizes) end
 
 --- Sets min/max initial speed.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setSpeed(min, max) end
 
 --- Sets angular velocity range.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setSpin(min, max) end
 
 --- Sets spin variation (0–1).
 ---@param v any
+---@return nil
 function ParticleSystem:setSpinVariation(v) end
 
 --- Sets emission spread (half-angle cone) in radians.
 ---@param spread any
+---@return nil
 function ParticleSystem:setSpread(spread) end
 
 --- Sets tangential acceleration range.
 ---@param min any
 ---@param max any
+---@return nil
 function ParticleSystem:setTangentialAcceleration(min, max) end
 
 --- Starts or restarts particle emission.
@@ -7965,6 +7425,12 @@ local Trail = {}
 --- Removes all trail points.
 ---@return nil
 function Trail:clear() end
+
+--- Renders the trail ribbon to a CPU ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function Trail:drawToImage(w, h) end
 
 --- Returns the trail point lifetime in seconds.
 ---@return number
@@ -8016,8 +7482,8 @@ function lurek.particle.newSystem(config) end
 ---@return Trail
 function lurek.particle.newTrail(lifetime, start_width) end
 
----@class lurek.pathfinding
-lurek.pathfinding = {}
+---@class lurek.pathfind
+lurek.pathfind = {}
 
 --- Lua-side wrapper around a PathGrid-based [`AiFlowField`].
 ---@class AiFlowField
@@ -8291,47 +7757,47 @@ function UnitPathfinder:typeOf(name) end
 
 --- Returns the background pathfinding thread count (currently always 0).
 ---@return integer
-function lurek.pathfinding.getThreadCount() end
+function lurek.pathfind.getThreadCount() end
 
 --- Creates a new FlowField backed by a NavGrid.
 ---@param grid_ud any
 ---@return FlowField
-function lurek.pathfinding.newFlowField(grid_ud) end
+function lurek.pathfind.newFlowField(grid_ud) end
 
 --- Creates a new NavGrid with all cells walkable.
 ---@param width any
 ---@param height any
 ---@return NavGrid
-function lurek.pathfinding.newNavGrid(width, height) end
+function lurek.pathfind.newNavGrid(width, height) end
 
 --- Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable).
 ---@param tm_ud any
 ---@param layer_index any
 ---@param blocked_table any
 ---@return NavGrid
-function lurek.pathfinding.newNavGridFromTileMap(tm_ud, layer_index, blocked_table) end
+function lurek.pathfind.newNavGridFromTileMap(tm_ud, layer_index, blocked_table) end
 
 --- Creates a new BFS flow field from a PathGrid.
 ---@param grid_ud any
 ---@return AiFlowField
-function lurek.pathfinding.newPathFlowField(grid_ud) end
+function lurek.pathfind.newPathFlowField(grid_ud) end
 
 --- Creates a new PathGrid with per-cell cost and walkability.
 ---@param w any
 ---@param h any
 ---@param cell_size any
 ---@return PathGrid
-function lurek.pathfinding.newPathGrid(w, h, cell_size) end
+function lurek.pathfind.newPathGrid(w, h, cell_size) end
 
 --- Creates a new UnitPathfinder backed by a NavGrid.
 ---@param grid_ud any
 ---@return UnitPathfinder
-function lurek.pathfinding.newPathfinder(grid_ud) end
+function lurek.pathfind.newPathfinder(grid_ud) end
 
 --- Sets the background pathfinding thread count (currently a no-op).
 ---@param count any
 ---@return nil
-function lurek.pathfinding.setThreadCount(count) end
+function lurek.pathfind.setThreadCount(count) end
 
 ---@class lurek.patterns
 lurek.patterns = {}
@@ -8342,14 +7808,16 @@ local Blackboard = {}
 
 --- Removes a fact from the blackboard.
 ---@param key any
+---@return nil
 function Blackboard:clear(key) end
 
 --- Clears all facts from the blackboard.
+---@return nil
 function Blackboard:clearAll() end
 
 --- Gets a fact from the blackboard. Returns nil if not set.
 ---@param key any
----@return any
+---@return boolean|number|string|nil
 function Blackboard:get(key) end
 
 --- Returns the monotonic revision counter (incremented on every write).
@@ -8368,6 +7836,7 @@ function Blackboard:keys() end
 --- Sets a fact on the blackboard. Accepts boolean, number, or string values.
 ---@param key any
 ---@param value any
+---@return nil
 function Blackboard:set(key, value) end
 
 --- Returns all facts as a flat key→value table.
@@ -8376,6 +7845,7 @@ function Blackboard:snapshot() end
 
 --- Removes a watcher subscription by id.
 ---@param id any
+---@return nil
 function Blackboard:unwatch(id) end
 
 --- Subscribes to changes on a specific key (or "*" for all changes).
@@ -8397,12 +7867,14 @@ function CommandStack:canRedo() end
 function CommandStack:canUndo() end
 
 --- Clears all command history, releasing Lua registry values.
+---@return nil
 function CommandStack:clearAll() end
 
 --- Executes a named command and records it in undo/redo history.
 ---@param name any
 ---@param exec_fn any
 ---@param undo_fn? any (optional)
+---@return nil
 function CommandStack:execute(name, exec_fn, undo_fn) end
 
 --- Returns the name of the most recently executed command, or nil.
@@ -8426,6 +7898,7 @@ function CommandStack:undo() end
 local Debounce = {}
 
 --- Cancels the pending trigger without firing.
+---@return nil
 function Debounce:cancel() end
 
 --- Returns the total number of times this debounce has fired.
@@ -8438,9 +7911,11 @@ function Debounce:isPending() end
 
 --- Sets the callback invoked when the debounce fires.
 ---@param f any
+---@return nil
 function Debounce:onFire(f) end
 
 --- Records an input event, resetting the idle timer.
+---@return nil
 function Debounce:trigger() end
 
 --- Advances the idle timer by dt seconds; fires the callback if idle wait expired.
@@ -8454,13 +7929,16 @@ local EventBus = {}
 
 --- Removes all listeners for a specific event.
 ---@param event any
+---@return nil
 function EventBus:clear(event) end
 
 --- Removes all listeners on this EventBus.
+---@return nil
 function EventBus:clearAll() end
 
 --- Dispatches an event, calling all registered listeners in priority order.
 ---@param args any
+---@return nil
 function EventBus:emit(args) end
 
 --- Returns all event names that have at least one listener.
@@ -8474,6 +7952,7 @@ function EventBus:getListenerCount(event) end
 
 --- Removes a previously registered event listener by subscription ID.
 ---@param id any
+---@return nil
 function EventBus:off(id) end
 
 --- Registers a listener callback for an event.
@@ -8490,14 +7969,16 @@ local Factory = {}
 --- Registers an alias pointing to an existing canonical type name.
 ---@param alias any
 ---@param canonical any
+---@return nil
 function Factory:alias(alias, canonical) end
 
 --- Removes all registered type constructors and aliases.
+---@return nil
 function Factory:clearAll() end
 
 --- Creates an instance of the named type by invoking its constructor.
 ---@param args any
----@return any
+---@return table|userdata
 function Factory:create(args) end
 
 --- Returns a table of all registered type names.
@@ -8512,10 +7993,12 @@ function Factory:has(type_name) end
 --- Registers a named type constructor function.
 ---@param type_name any
 ---@param ctor any
+---@return nil
 function Factory:register(type_name, ctor) end
 
 --- Unregisters a type constructor (and any aliases pointing to it).
 ---@param type_name any
+---@return nil
 function Factory:remove(type_name) end
 
 --- Lua wrapper for the Funnel (event aggregator) pattern.
@@ -8523,9 +8006,11 @@ function Factory:remove(type_name) end
 local Funnel = {}
 
 --- Discards all buffered entries without flushing.
+---@return nil
 function Funnel:discard() end
 
 --- Manually flushes all pending entries, invoking the onFlush callback.
+---@return nil
 function Funnel:flush() end
 
 --- Returns the total number of flushes performed.
@@ -8534,6 +8019,7 @@ function Funnel:getFlushCount() end
 
 --- Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries.
 ---@param f any
+---@return nil
 function Funnel:onFlush(f) end
 
 --- Returns the number of buffered entries not yet flushed.
@@ -8543,6 +8029,7 @@ function Funnel:pendingCount() end
 --- Adds an event to the funnel. Immediately flushes if max_entries reached or window is 0.
 ---@param tag any
 ---@param value? any (optional)
+---@return nil
 function Funnel:push(tag, value) end
 
 --- Advances the window timer by dt seconds; flushes when window expires.
@@ -8555,14 +8042,16 @@ function Funnel:update(dt) end
 local ObjectPool = {}
 
 --- Acquires an available object from the pool; returns nil if empty.
----@return any
+---@return string|number|boolean|table|nil
 function ObjectPool:acquire() end
 
 --- Inserts a pre-built object into the available pool.
 ---@param value any
+---@return nil
 function ObjectPool:add(value) end
 
 --- Clears all objects from the pool, releasing Lua registry values.
+---@return nil
 function ObjectPool:clearAll() end
 
 --- Returns the number of currently active (acquired) objects.
@@ -8579,6 +8068,7 @@ function ObjectPool:getTotalCount() end
 
 --- Returns an object to the available pool.
 ---@param value any
+---@return nil
 function ObjectPool:release(value) end
 
 --- Lua wrapper for the Observer pattern.
@@ -8587,7 +8077,7 @@ local Observer = {}
 
 --- Gets a property value, or nil if not set.
 ---@param key any
----@return any
+---@return string|number|boolean|table|nil
 function Observer:get(key) end
 
 --- Returns the total number of active subscriptions.
@@ -8597,6 +8087,7 @@ function Observer:getCount() end
 --- Sets a property value and fires subscribed watchers.
 ---@param key any
 ---@param new_val any
+---@return nil
 function Observer:set(key, new_val) end
 
 --- Subscribes to changes on a property key (or "*" for all).
@@ -8608,6 +8099,7 @@ function Observer:subscribe(key, callback, once) end
 
 --- Removes a subscription by id.
 ---@param id any
+---@return nil
 function Observer:unsubscribe(id) end
 
 --- Lua wrapper for the PriorityQueue pattern.
@@ -8615,6 +8107,7 @@ function Observer:unsubscribe(id) end
 local PriorityQueue = {}
 
 --- Removes all items from the queue.
+---@return nil
 function PriorityQueue:clearAll() end
 
 --- Returns true when the queue has no items.
@@ -8626,11 +8119,11 @@ function PriorityQueue:isEmpty() end
 function PriorityQueue:len() end
 
 --- Returns the highest-priority item without removing it, or nil if empty.
----@return any
+---@return string|number|boolean|table|nil
 function PriorityQueue:peek() end
 
 --- Removes and returns the highest-priority item, or nil if empty.
----@return any
+---@return string|number|boolean|table|nil
 function PriorityQueue:pop() end
 
 --- Inserts an item with a priority. Higher priorities are dequeued first.
@@ -8649,6 +8142,7 @@ local Ring = {}
 function Ring:average() end
 
 --- Removes all entries from the ring.
+---@return nil
 function Ring:clear() end
 
 --- Returns true when the ring is at capacity.
@@ -8682,6 +8176,7 @@ function Ring:toArray() end
 local ServiceLocator = {}
 
 --- Removes all registered services.
+---@return nil
 function ServiceLocator:clearAll() end
 
 --- Returns a table of all registered service names.
@@ -8695,16 +8190,18 @@ function ServiceLocator:has(name) end
 
 --- Retrieves a registered service by name; returns nil if not found.
 ---@param name any
----@return any
+---@return string|number|boolean|table|nil
 function ServiceLocator:locate(name) end
 
 --- Registers a named service with an associated Lua value.
 ---@param name any
 ---@param value any
+---@return nil
 function ServiceLocator:provide(name, value) end
 
 --- Unregisters and removes a named service.
 ---@param name any
+---@return nil
 function ServiceLocator:remove(name) end
 
 --- Lua wrapper for the SimpleState finite state machine pattern.
@@ -8714,9 +8211,11 @@ local SimpleState = {}
 --- Registers a named state with optional enter, exit, and update callbacks.
 ---@param name any
 ---@param callbacks? any (optional)
+---@return nil
 function SimpleState:addState(name, callbacks) end
 
 --- Removes all states and callbacks from this state machine.
+---@return nil
 function SimpleState:clearAll() end
 
 --- Returns the name of the current state, or nil if none is active.
@@ -8739,6 +8238,7 @@ function SimpleState:transitionTo(name) end
 
 --- Calls the update callback of the current state with the given delta time.
 ---@param dt any
+---@return nil
 function SimpleState:update(dt) end
 
 --- Lua wrapper for the Throttle pattern.
@@ -8755,13 +8255,16 @@ function Throttle:getProgress() end
 
 --- Sets the callback invoked when the throttle fires.
 ---@param f any
+---@return nil
 function Throttle:onFire(f) end
 
 --- Resets the elapsed counter without firing.
+---@return nil
 function Throttle:reset() end
 
 --- Enables or disables the throttle.
 ---@param v any
+---@return nil
 function Throttle:setEnabled(v) end
 
 --- Advances the timer by dt seconds; fires the callback if the interval elapsed.
@@ -8771,66 +8274,66 @@ function Throttle:update(dt) end
 
 --- Creates a new Blackboard shared key-value store.
 ---@param name? any (optional)
----@return any
+---@return Blackboard
 function lurek.patterns.newBlackboard(name) end
 
 --- Creates a new CommandStack instance.
 ---@param max_size? any (optional)
----@return any
+---@return CommandStack
 function lurek.patterns.newCommandStack(max_size) end
 
 --- Creates a trailing-edge debounce that fires after the input stream is idle for wait seconds.
 ---@param wait any
----@return any
+---@return Debounce
 function lurek.patterns.newDebounce(wait) end
 
 --- Creates a new EventBus instance.
 ---@param name? any (optional)
----@return any
+---@return EventBus
 function lurek.patterns.newEventBus(name) end
 
 --- Creates a new Factory instance.
----@return any
+---@return Factory
 function lurek.patterns.newFactory() end
 
 --- Creates a time-windowed event aggregator. window=0 means flush on every push.
 ---@param window any
 ---@param max_entries? any (optional)
 ---@param name? any (optional)
----@return any
+---@return Funnel
 function lurek.patterns.newFunnel(window, max_entries, name) end
 
 --- Creates a new ObjectPool instance.
----@return any
+---@return ObjectPool
 function lurek.patterns.newObjectPool() end
 
 --- Creates a new reactive property Observer.
 ---@param name? any (optional)
----@return any
+---@return Observer
 function lurek.patterns.newObserver(name) end
 
 --- Creates a stable priority-ordered task queue.
 ---@param name? any (optional)
----@return any
+---@return PriorityQueue
 function lurek.patterns.newPriorityQueue(name) end
 
 --- Creates a fixed-capacity circular history buffer.
 ---@param capacity any
 ---@param name? any (optional)
----@return any
+---@return Ring
 function lurek.patterns.newRing(capacity, name) end
 
 --- Creates a new ServiceLocator instance.
----@return any
+---@return ServiceLocator
 function lurek.patterns.newServiceLocator() end
 
 --- Creates a new SimpleState finite state machine instance.
----@return any
+---@return SimpleState
 function lurek.patterns.newSimpleState() end
 
 --- Creates a leading-edge rate limiter that fires at most once per interval seconds.
 ---@param interval any
----@return any
+---@return Throttle
 function lurek.patterns.newThrottle(interval) end
 
 ---@class lurek.physics
@@ -9662,8 +9165,757 @@ function lurek.raycaster.new(w, h) end
 ---@return number
 function lurek.raycaster.projectColumn(distance, fov, screen_height) end
 
----@class lurek.savegame
-lurek.savegame = {}
+---@class lurek.render
+lurek.render = {}
+
+--- Lua-side handle to an off-screen render target stored in SharedState.
+---@class Canvas
+local Canvas = {}
+
+--- Returns width and height of this canvas.
+---@return integer
+function Canvas:getDimensions() end
+
+--- Returns the height of this canvas in pixels.
+---@return integer
+function Canvas:getHeight() end
+
+--- Returns the width of this canvas in pixels.
+---@return integer
+function Canvas:getWidth() end
+
+--- Releases GPU framebuffer memory for this canvas.
+---@return boolean
+function Canvas:release() end
+
+--- Returns the type name of this object.
+---@return string
+function Canvas:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Canvas:typeOf() end
+
+--- Lua-side z-ordered draw queue. Callbacks are sorted by z and called on `flush()`.
+---@class DrawLayer
+local DrawLayer = {}
+
+--- Removes all queued callbacks without calling them.
+---@return void
+function DrawLayer:clear() end
+
+--- Sorts and calls all queued callbacks, then empties the queue.
+---@return nil
+function DrawLayer:flush() end
+
+--- Returns the number of queued callbacks.
+---@return number
+function DrawLayer:getCount() end
+
+--- Queues a draw callback at the given z-order.
+---@param z any
+---@param f any
+---@return nil
+function DrawLayer:queue(z, f) end
+
+--- Returns the type name.
+---@return string
+function DrawLayer:type() end
+
+--- Returns true if this object is an instance of the given type name.
+---@param name any
+---@return boolean
+function DrawLayer:typeOf(name) end
+
+--- Lua-side handle to a loaded font stored in SharedState.
+---@class Font
+local Font = {}
+
+--- Returns the ascent of this font in pixels.
+---@return number
+function Font:getAscent() end
+
+--- Returns the descent of this font in pixels.
+---@return number
+function Font:getDescent() end
+
+--- Returns the line height of this font.
+---@return number
+function Font:getHeight() end
+
+--- Returns the line height multiplier of this font.
+---@return number
+function Font:getLineHeight() end
+
+--- Returns the rendered width of the given text string.
+---@param text any
+---@return number
+function Font:getWidth(text) end
+
+--- Wraps text to the given width and returns the lines.
+---@param text any
+---@param limit any
+---@return table
+function Font:getWrap(text, limit) end
+
+--- Releases this font and frees its atlas memory.
+---@return boolean
+function Font:release() end
+
+--- Sets the line height multiplier for this font.
+---@param height any
+---@return nil
+function Font:setLineHeight(height) end
+
+--- Returns the type name of this object.
+---@return string
+function Font:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Font:typeOf() end
+
+--- Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
+---@class Image
+local Image = {}
+
+--- Returns width and height of this image.
+---@return integer
+function Image:getDimensions() end
+
+--- Returns the height of this image in pixels.
+---@return integer
+function Image:getHeight() end
+
+--- Returns the width of this image in pixels.
+---@return integer
+function Image:getWidth() end
+
+--- Releases the GPU texture memory for this image.
+---@return boolean
+function Image:release() end
+
+--- Returns the type name of this object.
+---@return string
+function Image:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Image:typeOf() end
+
+--- Lua-side handle to a loaded texture stored in SharedState.
+---@class ImageData
+local ImageData = {}
+
+--- Returns the pixel height of this image buffer.
+---@return integer
+function ImageData:getHeight() end
+
+--- Returns the pixel width of this image buffer.
+---@return integer
+function ImageData:getWidth() end
+
+--- Returns the type name "ImageData".
+---@return string
+function ImageData:type() end
+
+--- Returns true when the given name matches "ImageData" or a parent type.
+---@param name any
+---@return boolean
+function ImageData:typeOf(name) end
+
+--- Lua-side handle to a mesh stored in SharedState.
+---@class Mesh
+local Mesh = {}
+
+--- Returns vertex data at the given 1-based index.
+---@param index any
+---@return number
+function Mesh:getVertex(index) end
+
+--- Returns the number of vertices in this mesh.
+---@return integer
+function Mesh:getVertexCount() end
+
+--- Releases this mesh.
+---@return boolean
+function Mesh:release() end
+
+--- Assigns a texture to this mesh.
+---@param ud? any (optional)
+---@return nil
+function Mesh:setTexture(ud) end
+
+--- Sets vertex data at the given 1-based index.
+---@param index any
+---@param data any
+---@return nil
+function Mesh:setVertex(index, data) end
+
+--- Returns the type name of this object.
+---@return string
+function Mesh:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Mesh:typeOf() end
+
+--- Lua-side 9-slice descriptor.
+---@class NineSlice
+local NineSlice = {}
+
+--- Returns the four inset values as (top, right, bottom, left).
+---@return number
+function NineSlice:getInsets() end
+
+--- Returns the width and height of the source texture.
+---@return integer
+function NineSlice:getTextureSize() end
+
+--- Returns the type name "NineSlice".
+---@return string
+function NineSlice:type() end
+
+--- Returns true when the given name matches "NineSlice" or a parent type.
+---@param name any
+---@return boolean
+function NineSlice:typeOf(name) end
+
+--- Lua-side quad viewport into a texture.
+---@class Quad
+local Quad = {}
+
+--- Returns the reference texture dimensions.
+---@return number
+function Quad:getTextureDimensions() end
+
+--- Returns the quad viewport rectangle.
+---@return number
+function Quad:getViewport() end
+
+--- Returns the type name of this object.
+---@return string
+function Quad:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Quad:typeOf() end
+
+--- Lua-side handle to a compiled shader stored in SharedState.
+---@class Shader
+local Shader = {}
+
+--- Returns whether this shader has a uniform with the given name.
+---@param name any
+---@return boolean
+function Shader:hasUniform(name) end
+
+--- Releases this shader.
+---@return boolean
+function Shader:release() end
+
+--- Sends a uniform value to this shader.
+---@param name any
+---@param value any
+---@return nil
+function Shader:send(name, value) end
+
+--- Returns the type name of this object.
+---@return string
+function Shader:type() end
+
+--- Returns the type name of this object.
+---@return string
+function Shader:typeOf() end
+
+--- Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
+---@class Shape
+local Shape = {}
+
+--- Removes all commands and resets the shape to empty.
+---@return nil
+function Shape:clear() end
+
+--- Returns the number of drawing commands currently stored.
+---@return integer
+function Shape:getCommandCount() end
+
+--- Queues a line segment command.
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@return nil
+function Shape:line(x1, y1, x2, y2) end
+
+--- Queues a polyline command from variadic (x, y) coordinate pairs.
+---@return nil
+function Shape:polyline() end
+
+--- Sets the stroke width for subsequent outlined primitives.
+---@param w any
+---@return nil
+function Shape:setLineWidth(w) end
+
+--- Returns the type name of this object.
+---@return string
+function Shape:type() end
+
+--- Returns true if the given type name matches this object's type or any parent type.
+---@param name any
+---@return boolean
+function Shape:typeOf(name) end
+
+--- Lua-side handle to a sprite batch stored in SharedState.
+---@class SpriteBatch
+local SpriteBatch = {}
+
+--- Removes all sprites from this batch.
+---@return nil
+function SpriteBatch:clear() end
+
+--- Returns the maximum capacity of this batch.
+---@return integer
+function SpriteBatch:getBufferSize() end
+
+--- Returns the number of sprites in this batch.
+---@return integer
+function SpriteBatch:getCount() end
+
+--- Releases this sprite batch.
+---@return boolean
+function SpriteBatch:release() end
+
+--- Returns the type name of this object.
+---@return string
+function SpriteBatch:type() end
+
+--- Returns the type name of this object.
+---@return string
+function SpriteBatch:typeOf() end
+
+--- Applies an affine transform matrix.
+---@param mat any
+function lurek.render.applyTransform(mat) end
+
+--- Draws a partial circle arc at the given position with specified radius and angle range.
+---@param mode string
+---@param x number
+---@param y number
+---@param radius number
+---@param angle1 number
+---@param angle2 number
+---@param segments? integer? (optional)
+function lurek.render.arc(mode, x, y, radius, angle1, angle2, segments) end
+
+--- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
+---@param callback any
+---@return nil
+function lurek.render.captureScreenshot(callback) end
+
+--- Draws a circle.
+---@param mode any
+---@param x any
+---@param y any
+---@param radius any
+function lurek.render.circle(mode, x, y, radius) end
+
+--- Clears the draw command queue (resets the screen).
+---@param r? any (optional)
+---@param g? any (optional)
+---@param b? any (optional)
+function lurek.render.clear(r, g, b) end
+
+--- Resets the stencil mode to the default (keep / always / 0).
+---@return nil
+function lurek.render.clearStencil() end
+
+--- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
+---@param args any
+function lurek.render.draw(args) end
+
+--- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
+---@param slice any
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return nil
+function lurek.render.drawNineSlice(slice, x, y, w, h) end
+
+--- Draws a portion of an image defined by a Quad.
+---@param image Image
+---@param quad Quad
+---@param x? number? (optional)
+---@param y? number? (optional)
+---@param r? number? (optional)
+---@param sx? number? (optional)
+---@param sy? number? (optional)
+---@param ox? number? (optional)
+---@param oy? number? (optional)
+function lurek.render.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
+
+--- Draws an ellipse.
+---@param mode any
+---@param x any
+---@param y any
+---@param rx any
+---@param ry any
+function lurek.render.ellipse(mode, x, y, rx, ry) end
+
+--- Returns the current background color.
+---@return number
+function lurek.render.getBackgroundColor() end
+
+--- Returns the current blend mode as a string.
+---@return string
+function lurek.render.getBlendMode() end
+
+--- Returns the current canvas, or nil if drawing to screen.
+---@return Canvas?
+function lurek.render.getCanvas() end
+
+--- Returns the dimensions of a canvas.
+---@param ud any
+---@return integer
+function lurek.render.getCanvasSize(ud) end
+
+--- Returns the current drawing color.
+---@return number
+function lurek.render.getColor() end
+
+--- Returns the current color mask.
+---@return boolean
+function lurek.render.getColorMask() end
+
+--- Returns the default texture filter mode.
+---@return string
+function lurek.render.getDefaultFilter() end
+
+--- Returns a built-in font by pixel height (snaps to nearest available size).
+---@param pixel_height? any (optional)
+---@return Font
+function lurek.render.getDefaultFont(pixel_height) end
+
+--- Returns the current depth mode as (mode, write).
+---@return string
+function lurek.render.getDepthMode() end
+
+--- Returns window width and height.
+---@return integer
+function lurek.render.getDimensions() end
+
+--- Returns the currently active font, or nil.
+---@return Font?
+function lurek.render.getFont() end
+
+--- Returns the ascent of the given font.
+---@param ud any
+---@return number
+function lurek.render.getFontAscent(ud) end
+
+--- Returns the cell width of the given font (for monospaced bitmap fonts).
+---@param ud any
+---@return number
+function lurek.render.getFontCellWidth(ud) end
+
+--- Returns the descent of the given font.
+---@param ud any
+---@return number
+function lurek.render.getFontDescent(ud) end
+
+--- Returns the line height of the given font.
+---@param ud any
+---@return number
+function lurek.render.getFontHeight(ud) end
+
+--- Returns the line height of the given font (alias for getFontHeight).
+---@param ud any
+---@return number
+function lurek.render.getFontLineHeight(ud) end
+
+--- Returns a table of available built-in font pixel heights.
+---@return table
+function lurek.render.getFontSizes() end
+
+--- Returns the pixel width of text in the given font.
+---@param ud any
+---@param text any
+---@return number
+function lurek.render.getFontWidth(ud, text) end
+
+--- Returns wrapped lines and the maximum line width.
+---@param text any
+---@param limit any
+---@return table
+function lurek.render.getFontWrap(text, limit) end
+
+--- Returns the window height in pixels.
+---@return integer
+function lurek.render.getHeight() end
+
+--- Returns the current line width.
+---@return number
+function lurek.render.getLineWidth() end
+
+--- Returns the current point size.
+---@return number
+function lurek.render.getPointSize() end
+
+--- Returns the active scissor rectangle, or nothing.
+---@return number?
+function lurek.render.getScissor() end
+
+--- Returns the active shader, or nil.
+---@return Shader?
+function lurek.render.getShader() end
+
+--- Returns a table of renderer statistics.
+---@return table
+function lurek.render.getStats() end
+
+--- Returns the current stencil mode as (action, compare, value).
+---@return string
+function lurek.render.getStencilMode() end
+
+--- Returns the window width in pixels.
+---@return integer
+function lurek.render.getWidth() end
+
+--- Intersects the current scissor with a new rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+function lurek.render.intersectScissor(x, y, w, h) end
+
+--- Returns whether wireframe mode is active.
+---@return boolean
+function lurek.render.isWireframe() end
+
+--- Draws a line between two points.
+---@param args any
+function lurek.render.line(args) end
+
+--- Creates an off-screen render canvas.
+---@param width any
+---@param height any
+---@return Canvas
+function lurek.render.newCanvas(width, height) end
+
+--- Creates a new z-ordered draw-call queue.
+---@return DrawLayer
+function lurek.render.newDrawLayer() end
+
+--- Loads a bitmap font PNG from a file, or selects a built-in size by pixel height.
+---@param args any
+---@return Font
+function lurek.render.newFont(args) end
+
+--- Loads an image from a file path or creates one from ImageData.
+---@param arg any
+---@return Image
+function lurek.render.newImage(arg) end
+
+--- Creates a custom mesh from vertex data.
+---@param verts any
+---@param mode? any (optional)
+---@return Mesh
+function lurek.render.newMesh(verts, mode) end
+
+--- Creates a 9-slice descriptor from a texture and inset values.
+---@param image any
+---@param top any
+---@param right any
+---@param bottom any
+---@param left any
+---@return NineSlice
+function lurek.render.newNineSlice(image, top, right, bottom, left) end
+
+--- Creates a new Quad viewport into a texture.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param sw any
+---@param sh any
+---@return Quad
+function lurek.render.newQuad(x, y, w, h, sw, sh) end
+
+--- Compiles a custom WGSL shader and returns its handle.
+---@param code any
+---@return Shader
+function lurek.render.newShader(code) end
+
+--- Creates a new empty [`CompoundShape`] stored in the resource pool.
+---@return Shape
+function lurek.render.newShape() end
+
+--- Creates a new sprite batch for the given image.
+---@param ud any
+---@param max? any (optional)
+---@return SpriteBatch
+function lurek.render.newSpriteBatch(ud, max) end
+
+--- Resets the transform to the identity.
+function lurek.render.origin() end
+
+--- Draws a list of points.
+---@param args any
+function lurek.render.points(args) end
+
+--- Draws a polygon from a list of vertices.
+---@param args any
+function lurek.render.polygon(args) end
+
+--- Pops the transform from the stack.
+function lurek.render.pop() end
+
+--- Draws text at the given position.
+---@param text any
+---@param x? any (optional)
+---@param y? any (optional)
+---@param scale? any (optional)
+function lurek.render.print(text, x, y, scale) end
+
+--- Draws word-wrapped text within a given width.
+---@param text any
+---@param x any
+---@param y any
+---@param limit any
+---@param align? any (optional)
+function lurek.render.printf(text, x, y, limit, align) end
+
+--- Pushes the current transform onto the stack.
+function lurek.render.push() end
+
+--- Draws a rectangle.
+---@param mode string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param rx? number? (optional)
+---@param ry? number? (optional)
+function lurek.render.rectangle(mode, x, y, w, h, rx, ry) end
+
+--- Rotates the coordinate system.
+---@param angle any
+function lurek.render.rotate(angle) end
+
+--- Queues a screenshot to be saved after the current frame.
+---@param path any
+function lurek.render.saveScreenshot(path) end
+
+--- Scales the coordinate system.
+---@param sx any
+---@param sy? any (optional)
+function lurek.render.scale(sx, sy) end
+
+--- Sets the background clear color.
+---@param r any
+---@param g any
+---@param b any
+function lurek.render.setBackgroundColor(r, g, b) end
+
+--- Sets the blend mode for drawing.
+---@param mode any
+function lurek.render.setBlendMode(mode) end
+
+--- Sets the active render target to a Canvas, or back to the screen.
+---@param ud? any (optional)
+function lurek.render.setCanvas(ud) end
+
+--- Sets the current drawing color.
+---@param r any
+---@param g any
+---@param b any
+---@param a? any (optional)
+function lurek.render.setColor(r, g, b, a) end
+
+--- Sets which RGBA channels are written. Reset with no args.
+---@param args any
+function lurek.render.setColorMask(args) end
+
+--- Sets the default texture filter mode.
+---@param min any
+---@param mag any
+---@param anisotropy? any (optional)
+function lurek.render.setDefaultFilter(min, mag, anisotropy) end
+
+--- Sets the depth test comparison and write enable.
+---@param mode any
+---@param write? any (optional)
+function lurek.render.setDepthMode(mode, write) end
+
+--- Sets the active font for print calls.
+---@param ud any
+function lurek.render.setFont(ud) end
+
+--- Sets the line height of the given font (stub — returns nil; fonts are immutable in headless mode).
+---@param font any
+---@param lh any
+---@return nil
+function lurek.render.setFontLineHeight(font, lh) end
+
+--- Sets the line width for outline drawing.
+---@param w any
+function lurek.render.setLineWidth(w) end
+
+--- Sets the point diameter in pixels.
+---@param size any
+function lurek.render.setPointSize(size) end
+
+--- Restricts drawing to a rectangle, or clears scissor if no args.
+---@param args any
+function lurek.render.setScissor(args) end
+
+--- Sets the active shader, or clears it.
+---@param ud? any (optional)
+function lurek.render.setShader(ud) end
+
+--- Sets the stencil buffer write/test mode.
+---@param action any
+---@param compare? any (optional)
+---@param value? any (optional)
+function lurek.render.setStencilMode(action, compare, value) end
+
+--- Sets the stencil comparison test, or disables stencil testing.
+---@param compare? any (optional)
+---@param value? any (optional)
+function lurek.render.setStencilTest(compare, value) end
+
+--- Enables or disables wireframe rendering.
+---@param enabled any
+function lurek.render.setWireframe(enabled) end
+
+--- Shears the coordinate system.
+---@param kx any
+---@param ky any
+function lurek.render.shear(kx, ky) end
+
+--- Begins stencil writing with the given action and value.
+---@param action? any (optional)
+---@param value? any (optional)
+function lurek.render.stencil(action, value) end
+
+--- Translates the coordinate system.
+---@param x any
+---@param y any
+function lurek.render.translate(x, y) end
+
+--- Draws a triangle.
+---@param mode any
+---@param x1 any
+---@param y1 any
+---@param x2 any
+---@param y2 any
+---@param x3 any
+---@param y3 any
+function lurek.render.triangle(mode, x1, y1, x2, y2, x3, y3) end
+
+---@class lurek.save
+lurek.save = {}
 
 --- Lua-side wrapper around [`SaveManager`] with per-module callback storage.
 ---@class SaveManager
@@ -9753,7 +10005,7 @@ function SaveManager:update(dt) end
 
 --- Creates a new SaveManager for slot-based save/load operations.
 ---@return SaveManager
-function lurek.savegame.newSaveManager() end
+function lurek.save.newSaveManager() end
 
 ---@class lurek.scene
 lurek.scene = {}
@@ -9960,89 +10212,6 @@ function lurek.serial.toJson(value, pretty) end
 ---@return string
 function lurek.serial.toToml(value) end
 
----@class lurek.signal
-lurek.signal = {}
-
---- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
----@class Signal
-local Signal = {}
-
---- Removes all callbacks for the named event.
----@param name any
----@return integer
-function Signal:clear(name) end
-
---- Removes all callbacks across all events.
----@return integer
-function Signal:clearAll() end
-
---- Emits the named event, calling all registered callbacks with extra arguments.
----@param args any
----@return nil
-function Signal:emit(args) end
-
---- Returns the callback count for the named event.
----@param name any
----@return integer
-function Signal:getCount(name) end
-
---- Returns the total callback count across all events.
----@return integer
-function Signal:getTotalCount() end
-
---- Removes a subscription by handle ID.
----@param handle any
----@return boolean
-function Signal:remove(handle) end
-
---- Returns the type name of this object.
----@return string
-function Signal:type() end
-
---- Returns true if the given type name matches this object's type or any parent type.
----@param name any
----@return boolean
-function Signal:typeOf(name) end
-
---- Discards all pending events in the queue.
----@return nil
-function lurek.signal.clear() end
-
---- Pushes an exit event, requesting the engine to stop.
----@param code? any (optional)
----@return nil
-function lurek.signal.exit(code) end
-
---- Creates a new pub-sub Signal dispatcher.
----@return Signal
-function lurek.signal.newSignal() end
-
---- Returns an iterator function that pops events from the queue.
----@return function
-function lurek.signal.poll() end
-
---- Syncs OS-level events into the queue (no-op in Lurek2D push model).
----@return nil
-function lurek.signal.pump() end
-
---- Pushes a custom event onto the event queue.
----@param args any
----@return nil
-function lurek.signal.push(args) end
-
---- Alias for `exit()` — requests the engine to stop at the end of the current frame.
----@return nil
-function lurek.signal.quit() end
-
---- Requests that the engine restart at the beginning of the next frame.
----@return nil
-function lurek.signal.restart() end
-
---- Blocks until the next event arrives or the optional timeout elapses.
----@param timeout? any (optional)
----@return string?
-function lurek.signal.wait(timeout) end
-
 ---@class lurek.spine
 lurek.spine = {}
 
@@ -10059,6 +10228,12 @@ function Skeleton:addBone(name, opts) end
 --- Returns the total number of bones.
 ---@return integer
 function Skeleton:boneCount() end
+
+--- Renders the skeleton as a stick-figure debug view into a new ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function Skeleton:drawToImage(w, h) end
 
 --- Returns the index of the named bone, or nil if not found.
 ---@param name any
@@ -10098,7 +10273,7 @@ function lurek.spine.newSkeleton(name) end
 lurek.system = {}
 
 --- Returns the CPU architecture string for the current machine.
----@return any
+---@return string
 function lurek.system.getArch() end
 
 --- Returns the command-line arguments as a table.
@@ -10107,11 +10282,11 @@ function lurek.system.getArgs() end
 
 --- Returns the output table from the most recently completed runBatch call.
 ---@param results any
----@return any
+---@return integer
 function lurek.system.getBatchResults(results) end
 
 --- Returns the current contents of the system clipboard.
----@return any
+---@return string
 function lurek.system.getClipboardText() end
 
 --- Returns whether the debug overlay is currently visible.
@@ -10119,42 +10294,42 @@ function lurek.system.getDebugOverlay() end
 
 --- Returns the value of the named OS environment variable, or nil if not set.
 ---@param name any
----@return any
+---@return string?
 function lurek.system.getEnv(name) end
 
 --- Returns a table of system information including OS name, CPU model, and installed RAM.
----@return any
+---@return table
 function lurek.system.getInfo() end
 
 --- Returns the last unhandled error message, or nil.
----@return any
+---@return table?
 function lurek.system.getLastError() end
 
 --- Returns the name of the current minimum log level for runtime messages.
 function lurek.system.getLogLevel() end
 
 --- Returns the total amount of installed system RAM in megabytes.
----@return any
+---@return integer
 function lurek.system.getMemorySize() end
 
 --- Returns the host operating system name ('Windows', 'Linux', 'macOS').
----@return any
+---@return string
 function lurek.system.getOS() end
 
 --- Returns battery state, percentage charged, and estimated time remaining.
----@return any
+---@return string
 function lurek.system.getPowerInfo() end
 
 --- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
----@return any
+---@return table
 function lurek.system.getPreferredLocales() end
 
 --- Returns the number of logical CPU cores available.
----@return any
+---@return integer
 function lurek.system.getProcessorCount() end
 
 --- Returns the Lurek2D engine version string.
----@return any
+---@return string
 function lurek.system.getVersion() end
 
 --- Emit a log message from Lua at the specified level.
@@ -10164,18 +10339,18 @@ function lurek.system.log(level, message) end
 
 --- Opens a URL in the system's default browser.
 ---@param url any
----@return any
+---@return boolean
 function lurek.system.openURL(url) end
 
 --- Parses a command-line argument string and returns a structured key/value table.
 ---@param args? any (optional)
----@return any
+---@return table
 function lurek.system.parseArgs(args) end
 
 --- Runs a list of shell commands in parallel and returns immediately without blocking.
 ---@param tasks any
 ---@param opts? any (optional)
----@return any
+---@return table
 function lurek.system.runBatch(tasks, opts) end
 
 --- Replaces the system clipboard contents with the given string.
@@ -10202,6 +10377,10 @@ local Terminal = {}
 ---@return nil
 function Terminal:addWidget(widget_ud) end
 
+--- Resizes the window to exactly fit the terminal grid at the current font size.
+---@return nil
+function Terminal:autoResize() end
+
 --- Clears all cells to defaults.
 ---@return nil
 function Terminal:clear() end
@@ -10216,8 +10395,8 @@ function Terminal:clearWidgets() end
 ---@return integer
 function Terminal:get(col, row) end
 
---- Returns the default cell size in pixels.
----@return number
+--- Returns the current cell size in pixels derived from the active font.
+---@return integer
 function Terminal:getCellSize() end
 
 --- Returns the terminal grid dimensions.
@@ -10257,6 +10436,11 @@ function Terminal:set(args) end
 ---@param value any
 ---@return nil
 function Terminal:setFocus(value) end
+
+--- Sets the terminal font by pixel height, snapping to the nearest built-in size.
+---@param height any
+---@return nil
+function Terminal:setFont(height) end
 
 --- Routes text input to the focused widget and fires callbacks.
 ---@param text any
@@ -10483,26 +10667,35 @@ lurek.thread = {}
 ---@class Channel
 local Channel = {}
 
+---@return nil
 function Channel:clear() end
 
 ---@param timeout? any (optional)
+---@return string|number|boolean|table|nil
 function Channel:demand(timeout) end
 
+---@return integer
 function Channel:getCount() end
 
+---@return string|number|boolean|table|nil
 function Channel:peek() end
 
+---@return string|number|boolean|table|nil
 function Channel:pop() end
 
 ---@param value any
+---@return integer
 function Channel:push(value) end
 
 ---@param value any
+---@return nil
 function Channel:supply(value) end
 
+---@return string
 function Channel:type() end
 
 ---@param name any
+---@return boolean
 function Channel:typeOf(name) end
 
 --- Lua-side wrapper around a background [`LuaThread`].
@@ -10689,6 +10882,7 @@ function IsoMap:screenToTile(sx, sy) end
 --- Sets the visibility of a level (1-based z).
 ---@param z any
 ---@param visible any
+---@return nil
 function IsoMap:setLevelVisible(z, visible) end
 
 --- Sets the screen pixel origin.
@@ -10831,7 +11025,13 @@ function TileMap:addTileSet(ts_ud) end
 ---@param layer any
 ---@param x any
 ---@param y any
+---@return nil
 function TileMap:clearTile(layer, x, y) end
+
+--- Renders the tile map to a CPU ImageData using the given tile pixel size.
+---@param tile_size any
+---@return ImageData
+function TileMap:drawToImage(tile_size) end
 
 --- Fills an entire layer with the given GID (1-based layer).
 ---@param layer any
@@ -10914,6 +11114,12 @@ function TileMap:getViewport() end
 ---@param y any
 ---@return boolean
 function TileMap:isSolid(layer, x, y) end
+
+--- Renders the tile map to the screen at the given offset.
+---@param ox? any (optional)
+---@param oy? any (optional)
+---@return nil
+function TileMap:render(ox, oy) end
 
 --- Sets the map orientation from a string ("topdown" or "sideview").
 ---@param orientation any

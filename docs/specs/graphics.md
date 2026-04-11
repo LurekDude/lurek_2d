@@ -4,19 +4,19 @@
 |----------------|--------------------------------------------------------------|
 | **Tier**       | Tier 1 — Core Engine Subsystems                              |
 | **Status**     | Implemented — Full                                           |
-| **Lua API**    | `lurek.gfx`                                              |
-| **Source**     | `src/graphics/`                                              |
+| **Lua API**    | `lurek.graphic`                                              |
+| **Source**     | `src/render/` (graphics pipeline; domain types in `src/graphics/`)phics/`)   |
 | **Rust Tests** | `tests/rust/unit/graphics_tests.rs`, `tests/rust/ext/graphics_ext_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs` |
 | **Lua Tests**  | `tests/lua/unit/test_graphics.lua`                           |
 | **Architecture** | `docs/architecture/engine-architecture.md` § Rendering Pipeline |
 
 ## Summary
 
-The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.gfx.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
+The graphics module owns the entire GPU rendering pipeline for Lurek2D — from the high-level draw calls that Lua scripts issue through `lurek.graphic.*`, through a deferred `RenderCommand` queue that batches all rendering work, to the wgpu GPU backend that executes those commands against the swapchain. No other module writes pixels to the screen; everything visual flows through this module.
 
 The module is built around a **deferred command queue** architecture: during `lurek.draw()`, Lua pushes `RenderCommand` variants into a `Vec<RenderCommand>` stored in `SharedState`. After the Lua callback returns, the engine calls `GpuRenderer::render_frame()` which processes the queue in one GPU encoder pass. This means Lua never touches the GPU directly — it constructs a declarative list of rendering intent, and the renderer has full visibility over the draw list to minimise pipeline state switches before any GPU work begins.
 
-All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `lurek.gfx.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
+All GPU resources (textures, fonts, canvases, shaders, meshes, sprite batches, and compound shapes) are identified by typed `SlotMap` keys that are opaque to Lua. When a script calls `lurek.graphic.newImage("hero.png")`, Lua receives a lightweight `LuaImage` userdata wrapping a `TextureKey`; the actual `wgpu::Texture` and `wgpu::TextureView` live inside `GpuRenderer` and are never exposed to Lua. This keeps Lua values small and eliminates the need for Lua `__gc` finalizers on GPU resources.
 
 The transform stack (`push/pop/translate/rotate/scale/shear/origin`) is implemented as `RenderCommand` variants — the renderer maintains a `Mat3` matrix stack as it processes the queue, multiplying incoming transforms and applying the accumulated matrix to all vertices in scope. The module also provides stencil buffer support (write + test), depth mode control, blend modes (five pre-built pipeline variants), scissor clipping, color masking, wireframe mode, and custom WGSL shader support with per-shader uniform buffers.
 
@@ -25,7 +25,7 @@ Scope boundary: the `animation`, `camera`, and `Color` types have been **extract
 ## Architecture
 
 ```
-lurek.gfx.* (Lua API — 66 functions, 7 UserData types)
+lurek.graphic.* (Lua API — 66 functions, 7 UserData types)
   │
   ▼
 RenderCommand queue (SharedState::render_commands)
@@ -161,7 +161,7 @@ Draw command types, blend modes, stencil state, and texture data for the renderi
 - **`TextureData`** (struct): Raw RGBA pixel data (premultiplied alpha) with width and height.
 - **`ParticleRenderShape`** (enum): Geometric shape for untextured particle rendering — `Square`, `Circle`, `Triangle`, `Spark`, `Diamond`.
 - **`ParticleInstance`** (struct): Pre-computed per-particle render data (position, color, rotation, size, shape, optional texture/quad).
-- **`DrawableKind`** (enum): Type discriminator for `lurek.gfx.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
+- **`DrawableKind`** (enum): Type discriminator for `lurek.graphic.draw()` polymorphism — `Image`, `Canvas`, `SpriteBatch`, `Mesh`.
 
 ### `graphics::shader`
 
@@ -256,7 +256,7 @@ Per-frame rendering statistics: draw calls, texture switches, canvas switches, s
 Custom geometry mesh with per-vertex position, UV, and color data. Supports optional index buffers and optional textures. Three draw modes: triangles, fan, strip.
 
 **Public functions:**
-- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `lurek.gfx.newMesh`.
+- `from_vertex_rows(rows: &[[f32; 8]], mode: MeshDrawMode) -> Self` — Creates a `Mesh` from a slice of flat 8-element rows `[x, y, u, v, r, g, b, a]`; convenience constructor used by `lurek.graphic.newMesh`.
 
 #### `graphics::mesh::MeshVertex`
 
@@ -346,7 +346,7 @@ Shape fill mode — `Fill` (solid) or `Line` (outline using current line width).
 
 #### `graphics::renderer::DrawableKind`
 
-Type discriminator for `lurek.gfx.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
+Type discriminator for `lurek.graphic.draw()` polymorphism — `Image(TextureKey)`, `Canvas(CanvasKey)`, `SpriteBatch(SpriteBatchKey)`, `Mesh(MeshKey)`.
 
 #### `graphics::mesh::MeshDrawMode`
 
@@ -380,119 +380,119 @@ Single patch rectangle tuple: `(src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w,
 
 ## Lua API
 
-Exposed under `lurek.gfx.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
+Exposed under `lurek.graphic.*` by `src/lua_api/graphics_api.rs` (2,407 lines). The API provides 66 namespace functions and 7 UserData types.
 
 ### Namespace Functions (66)
 
 #### Color
-- `lurek.gfx.setColor(r, g, b, a?)` — set the active draw color
-- `lurek.gfx.getColor()` — get the current draw color (r, g, b, a)
-- `lurek.gfx.setBackgroundColor(r, g, b, a?)` — set the clear/background color
-- `lurek.gfx.getBackgroundColor()` — get the current background color
+- `lurek.graphic.setColor(r, g, b, a?)` — set the active draw color
+- `lurek.graphic.getColor()` — get the current draw color (r, g, b, a)
+- `lurek.graphic.setBackgroundColor(r, g, b, a?)` — set the clear/background color
+- `lurek.graphic.getBackgroundColor()` — get the current background color
 
 #### Shape Drawing
-- `lurek.gfx.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
-- `lurek.gfx.circle(mode, x, y, r)` — draw a circle
-- `lurek.gfx.ellipse(mode, x, y, rx, ry)` — draw an ellipse
-- `lurek.gfx.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
-- `lurek.gfx.line(x1, y1, x2, y2, ...)` — draw a line or polyline
-- `lurek.gfx.polygon(mode, vertices)` — draw a polygon from a flat vertex list
-- `lurek.gfx.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
-- `lurek.gfx.points(...)` — draw points at specified coordinates
+- `lurek.graphic.rectangle(mode, x, y, w, h, rx?, ry?)` — draw a rectangle (optionally rounded)
+- `lurek.graphic.circle(mode, x, y, r)` — draw a circle
+- `lurek.graphic.ellipse(mode, x, y, rx, ry)` — draw an ellipse
+- `lurek.graphic.triangle(mode, x1, y1, x2, y2, x3, y3)` — draw a triangle
+- `lurek.graphic.line(x1, y1, x2, y2, ...)` — draw a line or polyline
+- `lurek.graphic.polygon(mode, vertices)` — draw a polygon from a flat vertex list
+- `lurek.graphic.arc(mode, x, y, r, angle1, angle2, segments?)` — draw an arc
+- `lurek.graphic.points(...)` — draw points at specified coordinates
 
 #### Drawing
-- `lurek.gfx.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
-- `lurek.gfx.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
+- `lurek.graphic.draw(drawable, x?, y?, r?, sx?, sy?, ox?, oy?)` — draw an Image, Canvas, SpriteBatch, or Mesh
+- `lurek.graphic.drawq(image, quad, x, y, r?, sx?, sy?, ox?, oy?)` — draw a sub-region of an image using a Quad
 
 #### Text
-- `lurek.gfx.print(text, x, y)` — draw text at a position
-- `lurek.gfx.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
+- `lurek.graphic.print(text, x, y)` — draw text at a position
+- `lurek.graphic.printf(text, x, y, limit, align?)` — draw word-wrapped, aligned text
 
 #### Clear
-- `lurek.gfx.clear(r?, g?, b?, a?)` — clear the screen or active canvas
+- `lurek.graphic.clear(r?, g?, b?, a?)` — clear the screen or active canvas
 
 #### Line and Point Style
-- `lurek.gfx.setLineWidth(width)` — set the stroke width
-- `lurek.gfx.getLineWidth()` — get the current stroke width
-- `lurek.gfx.setPointSize(size)` — set the point size
-- `lurek.gfx.getPointSize()` — get the current point size
+- `lurek.graphic.setLineWidth(width)` — set the stroke width
+- `lurek.graphic.getLineWidth()` — get the current stroke width
+- `lurek.graphic.setPointSize(size)` — set the point size
+- `lurek.graphic.getPointSize()` — get the current point size
 
 #### Blend Mode
-- `lurek.gfx.setBlendMode(mode)` — set the active blend mode
-- `lurek.gfx.getBlendMode()` — get the current blend mode
+- `lurek.graphic.setBlendMode(mode)` — set the active blend mode
+- `lurek.graphic.getBlendMode()` — get the current blend mode
 
 #### Font Management
-- `lurek.gfx.newFont(path, size)` — load a TTF/OTF font
-- `lurek.gfx.setFont(font)` — set the active font
-- `lurek.gfx.getFont()` — get the active font
-- `lurek.gfx.getFontWidth(text)` — get pixel width of text in the current font
-- `lurek.gfx.getFontHeight()` — get the line height of the current font
-- `lurek.gfx.getFontAscent()` — get the ascent of the current font
-- `lurek.gfx.getFontDescent()` — get the descent of the current font
-- `lurek.gfx.getFontWrap(text, limit)` — get word-wrap info for the current font
+- `lurek.graphic.newFont(path, size)` — load a TTF/OTF font
+- `lurek.graphic.setFont(font)` — set the active font
+- `lurek.graphic.getFont()` — get the active font
+- `lurek.graphic.getFontWidth(text)` — get pixel width of text in the current font
+- `lurek.graphic.getFontHeight()` — get the line height of the current font
+- `lurek.graphic.getFontAscent()` — get the ascent of the current font
+- `lurek.graphic.getFontDescent()` — get the descent of the current font
+- `lurek.graphic.getFontWrap(text, limit)` — get word-wrap info for the current font
 
 #### Image Management
-- `lurek.gfx.newImage(path)` — load an image from file as a GPU texture
+- `lurek.graphic.newImage(path)` — load an image from file as a GPU texture
 
 #### Canvas Management
-- `lurek.gfx.newCanvas(width, height)` — create an off-screen render target
-- `lurek.gfx.setCanvas(canvas?)` — set the active render target (nil = screen)
-- `lurek.gfx.getCanvas()` — get the active canvas (nil if drawing to screen)
-- `lurek.gfx.getCanvasSize(canvas)` — get canvas dimensions
+- `lurek.graphic.newCanvas(width, height)` — create an off-screen render target
+- `lurek.graphic.setCanvas(canvas?)` — set the active render target (nil = screen)
+- `lurek.graphic.getCanvas()` — get the active canvas (nil if drawing to screen)
+- `lurek.graphic.getCanvasSize(canvas)` — get canvas dimensions
 
 #### SpriteBatch
-- `lurek.gfx.newSpriteBatch(image, maxSprites?)` — create a sprite batch
+- `lurek.graphic.newSpriteBatch(image, maxSprites?)` — create a sprite batch
 
 #### Mesh
-- `lurek.gfx.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
+- `lurek.graphic.newMesh(vertices, mode?, image?)` — create a custom geometry mesh
 
 #### Shader
-- `lurek.gfx.newShader(source)` — compile a custom WGSL fragment shader
-- `lurek.gfx.setShader(shader?)` — set the active shader (nil = default pipeline)
-- `lurek.gfx.getShader()` — get the active shader
+- `lurek.graphic.newShader(source)` — compile a custom WGSL fragment shader
+- `lurek.graphic.setShader(shader?)` — set the active shader (nil = default pipeline)
+- `lurek.graphic.getShader()` — get the active shader
 
 #### Quad
-- `lurek.gfx.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
+- `lurek.graphic.newQuad(x, y, w, h, sw, sh)` — create a sub-region quad for sprite-sheet access
 
 #### Transform Stack
-- `lurek.gfx.push()` — push a copy of the current transform
-- `lurek.gfx.pop()` — pop the top transform
-- `lurek.gfx.translate(x, y)` — apply a translation
-- `lurek.gfx.rotate(angle)` — apply a rotation (radians)
-- `lurek.gfx.scale(sx, sy?)` — apply a scale
-- `lurek.gfx.shear(kx, ky)` — apply a shear (skew)
-- `lurek.gfx.origin()` — reset transform to identity
-- `lurek.gfx.applyTransform(transform)` — apply a Transform userdata
+- `lurek.graphic.push()` — push a copy of the current transform
+- `lurek.graphic.pop()` — pop the top transform
+- `lurek.graphic.translate(x, y)` — apply a translation
+- `lurek.graphic.rotate(angle)` — apply a rotation (radians)
+- `lurek.graphic.scale(sx, sy?)` — apply a scale
+- `lurek.graphic.shear(kx, ky)` — apply a shear (skew)
+- `lurek.graphic.origin()` — reset transform to identity
+- `lurek.graphic.applyTransform(transform)` — apply a Transform userdata
 
 #### Scissor
-- `lurek.gfx.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
-- `lurek.gfx.getScissor()` — get the current scissor rectangle
-- `lurek.gfx.intersectScissor(x, y, w, h)` — intersect with the current scissor
+- `lurek.graphic.setScissor(x?, y?, w?, h?)` — set or clear the scissor rectangle
+- `lurek.graphic.getScissor()` — get the current scissor rectangle
+- `lurek.graphic.intersectScissor(x, y, w, h)` — intersect with the current scissor
 
 #### Color Mask
-- `lurek.gfx.setColorMask(r, g, b, a)` — set which color channels can be written
-- `lurek.gfx.getColorMask()` — get the current color mask
+- `lurek.graphic.setColorMask(r, g, b, a)` — set which color channels can be written
+- `lurek.graphic.getColorMask()` — get the current color mask
 
 #### Wireframe
-- `lurek.gfx.setWireframe(enable)` — enable or disable wireframe mode
-- `lurek.gfx.isWireframe()` — check if wireframe mode is active
+- `lurek.graphic.setWireframe(enable)` — enable or disable wireframe mode
+- `lurek.graphic.isWireframe()` — check if wireframe mode is active
 
 #### Stencil
-- `lurek.gfx.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
-- `lurek.gfx.setStencilTest(compareMode?, value?)` — set or disable stencil testing
+- `lurek.graphic.stencil(func, action?, value?)` — execute a function that writes to the stencil buffer
+- `lurek.graphic.setStencilTest(compareMode?, value?)` — set or disable stencil testing
 
 #### Window Dimensions
-- `lurek.gfx.getWidth()` — get the window width in pixels
-- `lurek.gfx.getHeight()` — get the window height in pixels
-- `lurek.gfx.getDimensions()` — get the window dimensions (w, h)
+- `lurek.graphic.getWidth()` — get the window width in pixels
+- `lurek.graphic.getHeight()` — get the window height in pixels
+- `lurek.graphic.getDimensions()` — get the window dimensions (w, h)
 
 #### Default Filter
-- `lurek.gfx.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
-- `lurek.gfx.getDefaultFilter()` — get the current default filter mode
+- `lurek.graphic.setDefaultFilter(mode)` — set the default texture filter mode ("nearest" or "linear")
+- `lurek.graphic.getDefaultFilter()` — get the current default filter mode
 
 #### Stats and Screenshot
-- `lurek.gfx.getStats()` — get per-frame render statistics table
-- `lurek.gfx.saveScreenshot(path)` — save a screenshot PNG to the save directory
+- `lurek.graphic.getStats()` — get per-frame render statistics table
+- `lurek.graphic.saveScreenshot(path)` — save a screenshot PNG to the save directory
 
 ### UserData Types (7)
 
@@ -522,10 +522,10 @@ Methods: `getViewport()`, `setViewport(x, y, w, h)`, `getTextureDimensions()`, `
 ```lua
 function lurek.init()
     -- Load resources
-    img = lurek.gfx.newImage("player.png")
-    font = lurek.gfx.newFont("font.ttf", 18)
-    canvas = lurek.gfx.newCanvas(800, 600)
-    batch = lurek.gfx.newSpriteBatch(img, 100)
+    img = lurek.graphic.newImage("player.png")
+    font = lurek.graphic.newFont("font.ttf", 18)
+    canvas = lurek.graphic.newCanvas(800, 600)
+    batch = lurek.graphic.newSpriteBatch(img, 100)
 
     -- Add sprites to batch
     for i = 1, 10 do
@@ -535,37 +535,37 @@ end
 
 function lurek.render()
     -- Render scene to canvas
-    lurek.gfx.setCanvas(canvas)
-    lurek.gfx.clear(0.1, 0.1, 0.2)
+    lurek.graphic.setCanvas(canvas)
+    lurek.graphic.clear(0.1, 0.1, 0.2)
 
     -- Transform stack
-    lurek.gfx.push()
-    lurek.gfx.translate(400, 300)
-    lurek.gfx.rotate(0.5)
-    lurek.gfx.draw(img, -32, -32)
-    lurek.gfx.pop()
+    lurek.graphic.push()
+    lurek.graphic.translate(400, 300)
+    lurek.graphic.rotate(0.5)
+    lurek.graphic.draw(img, -32, -32)
+    lurek.graphic.pop()
 
     -- Draw shapes
-    lurek.gfx.setColor(1, 0, 0)
-    lurek.gfx.rectangle("fill", 50, 50, 100, 80)
-    lurek.gfx.setColor(0, 1, 0)
-    lurek.gfx.circle("line", 300, 200, 40)
+    lurek.graphic.setColor(1, 0, 0)
+    lurek.graphic.rectangle("fill", 50, 50, 100, 80)
+    lurek.graphic.setColor(0, 1, 0)
+    lurek.graphic.circle("line", 300, 200, 40)
 
     -- Draw batch
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.draw(batch, 0, 300)
+    lurek.graphic.setColor(1, 1, 1)
+    lurek.graphic.draw(batch, 0, 300)
 
     -- Switch to screen
-    lurek.gfx.setCanvas()
+    lurek.graphic.setCanvas()
 
     -- Composite canvas to screen
-    lurek.gfx.draw(canvas, 0, 0)
+    lurek.graphic.draw(canvas, 0, 0)
 
     -- Draw text
-    lurek.gfx.setFont(font)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: 42", 10, 10)
-    lurek.gfx.printf("Centered text", 0, 560, 800, "center")
+    lurek.graphic.setFont(font)
+    lurek.graphic.setColor(1, 1, 1)
+    lurek.graphic.print("Score: 42", 10, 10)
+    lurek.graphic.printf("Centered text", 0, 560, 800, "center")
 end
 ```
 
@@ -590,7 +590,7 @@ end
 | `animation` | Related       | Extracted module; `animation` provides sprite animation types      |
 | `particle`  | Related       | Tier 2 module; pushes `DrawParticleSystem` commands into the draw queue |
 | `postfx`    | Related       | Tier 2 module; provides `PostFxStack` and `PostFxEffect`; graphics handles `BeginPostFx`/`EndPostFx`/`ApplyPostFx` commands |
-| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `lurek.gfx.*` bindings |
+| `lua_api`   | Imported by   | `src/lua_api/graphics_api.rs` registers all `lurek.graphic.*` bindings |
 
 **Similar modules and differentiation:**
 - `image` vs `graphics`: `image` owns CPU-side pixel buffers (`ImageData`) for manipulation; `graphics` owns GPU-side textures and rendering.
@@ -612,4 +612,4 @@ end
 - **Coordinate system**: Origin at top-left, Y increases downward (screen coordinates).
 - **Custom shaders**: WGSL fragment shaders with auto-prepended globals (`luna_ScreenSize`, `luna_Time`). Validated by naga before pipeline creation. Return a descriptive `LuaError` on validation failure.
 - **Stencil support**: Two-phase workflow — `stencil()` writes to the stencil buffer, then `setStencilTest()` configures subsequent draws to pass/fail based on the stencil value.
-- **Screenshot**: `lurek.gfx.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.
+- **Screenshot**: `lurek.graphic.saveScreenshot(path)` reads back the surface buffer asynchronously and encodes to PNG. Not suitable for per-frame capture.

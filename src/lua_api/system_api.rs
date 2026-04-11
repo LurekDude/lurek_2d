@@ -144,7 +144,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getOS() -> string
     /// Returns the host operating system name ('Windows', 'Linux', 'macOS').
-    /// @return any
+    /// @return string
     system.set(
         "getOS",
         lua.create_function(|_, ()| {
@@ -166,7 +166,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getVersion() -> string
     /// Returns the Lurek2D engine version string.
-    /// @return any
+    /// @return string
     system.set(
         "getVersion",
         lua.create_function(|_, ()| Ok(env!("CARGO_PKG_VERSION").to_string()))?,
@@ -174,7 +174,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getProcessorCount() -> integer
     /// Returns the number of logical CPU cores available.
-    /// @return any
+    /// @return integer
     system.set(
         "getProcessorCount",
         lua.create_function(|_, ()| Ok(get_processor_count()))?,
@@ -182,7 +182,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getMemorySize() -> integer (MiB)
     /// Returns the total amount of installed system RAM in megabytes.
-    /// @return any
+    /// @return integer
     /// RAM size in megabytes as an integer.
     system.set(
         "getMemorySize",
@@ -192,7 +192,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.openURL(url) -> bool
     /// Opens a URL in the system's default browser.
     /// @param url : string
-    /// @return any
+    /// @return boolean
     system.set(
         "openURL",
         lua.create_function(|_, url: String| Ok(open_url(&url)))?,
@@ -200,7 +200,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getPreferredLocales() -> table of strings
     /// Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
-    /// @return any
+    /// @return table
     /// Table of locale strings ordered from most to least preferred.
     system.set(
         "getPreferredLocales",
@@ -209,7 +209,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
     /// Returns battery state, percentage charged, and estimated time remaining.
-    /// @return any
+    /// @return string, integer?, integer?
     /// Table with fields state ('battery','charging','charged','unknown'), percent, and seconds.
     system.set(
         "getPowerInfo",
@@ -221,7 +221,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getInfo() -> table { engine, version, lua_version, renderer, os, processors, memory }
     /// Returns a table of system information including OS name, CPU model, and installed RAM.
-    /// @return any
+    /// @return table
     /// Table with fields os, cpu, cores, and ram.
     system.set(
         "getInfo",
@@ -278,7 +278,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getClipboardText() -> string ÔÇö reads text from the system clipboard.
     /// Returns the current contents of the system clipboard.
-    /// @return any
+    /// @return string
     system.set(
         "getClipboardText",
         lua.create_function(|_, ()| match arboard::Clipboard::new() {
@@ -371,7 +371,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     {
         /// Returns the last unhandled error message, or nil.
         let s = state_for_error.clone();
-        /// @return any
+        /// @return table?
         system.set(
             "getLastError",
             lua.create_function(move |lua, ()| {
@@ -398,7 +398,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getArch() -> string
     /// Returns the CPU architecture string for the current machine.
-    /// @return any
+    /// @return string
     /// One of 'x86_64', 'aarch64', 'arm', etc.
     system.set(
         "getArch",
@@ -408,7 +408,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getEnv(name) -> string|nil
     /// Returns the value of the named OS environment variable, or nil if not set.
     /// @param name : string
-    /// @return any
+    /// @return string?
     /// - `name` ÔÇö Environment variable name (case-sensitive on Linux/macOS).
     /// String value of the variable, or nil if it is not set.
     system.set(
@@ -437,7 +437,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.parseArgs([argTable]) -> { flags={}, options={}, positional={} }
     /// Parses a command-line argument string and returns a structured key/value table.
     /// @param args : table?
-    /// @return any
+    /// @return table
     /// - `args` ÔÇö Argument string or table (e.g. '--flag=value --bool').
     /// Table mapping flag names to their values or true for boolean flags.
     system.set(
@@ -506,7 +506,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Runs a list of shell commands in parallel and returns immediately without blocking.
     /// @param tasks : table
     /// @param opts : table?
-    /// @return any
+    /// @return table
     /// - `commands` ÔÇö Table of command strings to execute concurrently.
     /// A batch handle ID used to retrieve results with getBatchResults.
     system.set(
@@ -559,7 +559,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // lurek.platform.getBatchResults(results) -> passed, failed, skipped
     /// Returns the output table from the most recently completed runBatch call.
     /// @param results : table
-    /// @return any
+    /// @return integer, integer, integer
     /// - `handle` ÔÇö Batch handle returned by runBatch.
     /// Table mapping each command to its stdout string, or nil if not yet done.
     system.set(
