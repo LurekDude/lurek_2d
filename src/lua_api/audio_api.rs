@@ -2305,16 +2305,40 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
 impl mlua::UserData for SoundData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── getSampleCount ──────────────────────────────────────────
+        /// Get the total number of samples.
+        /// @return integer
         methods.add_method("getSampleCount", |_, this, ()| Ok(this.sample_count()));
+        // ── getSampleRate ──────────────────────────────────────────
+        /// Get the sample rate.
+        /// @return integer
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.sample_rate()));
+        // ── getChannelCount ──────────────────────────────────────────
+        /// Get the number of channels.
+        /// @return integer
         methods.add_method("getChannelCount", |_, this, ()| Ok(this.channel_count()));
+        // ── getDuration ──────────────────────────────────────────
+        /// Get the audio duration in seconds.
+        /// @return number
         methods.add_method("getDuration", |_, this, ()| Ok(this.duration()));
+        // ── getBitDepth ──────────────────────────────────────────
+        /// Get the bit depth.
+        /// @return integer
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.bit_depth()));
+        // ── getSample ──────────────────────────────────────────
+        /// Get a specific sample by index.
+        /// @param index : integer
+        /// @return number
         methods.add_method("getSample", |_, this, index: usize| {
             this.get_sample(index).ok_or_else(|| {
                 LuaError::RuntimeError(format!("Sample index {} out of bounds", index))
             })
         });
+        // ── setSample ──────────────────────────────────────────
+        /// Set a specific sample by index.
+        /// @param index : integer
+        /// @param value : number
+        /// @return nil
         methods.add_method_mut("setSample", |_, this, (index, value): (usize, f32)| {
             if this.set_sample(index, value) {
                 Ok(())

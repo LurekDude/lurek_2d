@@ -492,8 +492,18 @@ impl LuaUserData for LuaDataView {
 
 impl mlua::UserData for ByteData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── getSize ──────────────────────────────────────────────
+        /// Get the size.
+        /// @return integer
         methods.add_method("getSize", |_, this, ()| Ok(this.len()));
+        // ── getString ──────────────────────────────────────────────
+        /// Get the string representation.
+        /// @return string
         methods.add_method("getString", |_, this, ()| Ok(this.get_string()));
+        // ── getByte ──────────────────────────────────────────────
+        /// Get a byte at the specified offset.
+        /// @param offset : integer
+        /// @return integer
         methods.add_method("getByte", |_, this, offset: usize| {
             this.get_byte(offset).ok_or_else(|| {
                 LuaError::RuntimeError(format!(
@@ -503,6 +513,11 @@ impl mlua::UserData for ByteData {
                 ))
             })
         });
+        // ── setByte ──────────────────────────────────────────────
+        /// Set a byte at the specified offset.
+        /// @param offset : integer
+        /// @param value : integer
+        /// @return nil
         methods.add_method_mut("setByte", |_, this, (offset, value): (usize, u8)| {
             if this.set_byte(offset, value) {
                 Ok(())
@@ -514,6 +529,9 @@ impl mlua::UserData for ByteData {
                 )))
             }
         });
+        // ── clone ──────────────────────────────────────────────
+        /// Clone the ByteData.
+        /// @return ByteData
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(this.clone_data())
         });

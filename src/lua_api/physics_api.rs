@@ -864,6 +864,7 @@ impl LuaUserData for LuaWorld {
         /// Changes the body type.
         /// @param bodyId : integer
         /// @param bodyType : string
+        /// @return nil
         methods.add_method("setBodyType", |_, this, (id, bt): (usize, String)| {
             let body_type = parse_body_type(&bt)?;
             this.world.borrow_mut().set_body_type(id, body_type);

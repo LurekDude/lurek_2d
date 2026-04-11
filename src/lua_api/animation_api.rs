@@ -222,14 +222,10 @@ impl LuaUserData for LuaAnimation {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.animation` API table with the Lua VM.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-///
-/// # Returns
-/// `LuaResult<()>`.
+/// @param lua : Lua
+/// @param luna : LuaTable 
+/// @param _state : SharedState
+/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
