@@ -11,13 +11,13 @@ argument-hint: "genre, count, features, library modules, resolution, complexity"
 - Generating a new `content/demos/<name>/` project from scratch
 - Scaffolding multiple demos in one pass (batch creation)
 - A demo uses `content/library/` modules alongside `lurek.*`
-- You need the full 4-file bundle: `conf.lua`, `main.lua`, `README.md`, `screen.png`
+- You need the full 4-file bundle: `conf.toml`, `main.lua`, `README.md`, `screen.png`
 - Registering a newly created demo in `content/demos/README.md`
 
 ## Owns
 
 - `content/demos/<name>/` folder scaffold and 4-file bundle
-- `conf.lua` resolution variants and module flag conventions
+- `conf.toml` resolution variants and module flag conventions
 - `main.lua` canonical section order and mandatory invariants
 - `README.md` 5-section template and accuracy rules
 - `screen.png` generation via `tools/screenshots/gen_demo_screenshots.py`
@@ -39,7 +39,7 @@ Every demo **must** produce exactly these four artifacts (no more, no fewer unle
 
 | File | Required | Notes |
 |------|----------|-------|
-| `content/demos/<name>/conf.lua` | Yes | Window config, title, resolution, modules |
+| `content/demos/<name>/conf.toml` | Yes | Window config, title, resolution, modules |
 | `content/demos/<name>/main.lua` | Yes | Game entry point — canonical structure below |
 | `content/demos/<name>/README.md` | Yes | 5-section doc, see template |
 | `content/demos/<name>/screen.png` | Yes | Auto-generated via screenshot tool |
@@ -58,18 +58,19 @@ Optional additions:
 - No spaces, no hyphens, no version numbers
 - Must not duplicate an existing `content/demos/` folder — check with `Get-ChildItem content/demos/`
 
-### Step 2 — Write `conf.lua`
+### Step 2 — Write `conf.toml`
 
-See [conf-templates](./references/conf-templates.md) for resolution variants and module flags.
+See [conf-templates](./references/conf-templates.md) for TOML resolution templates and module flags.
 
 **Minimal template** (use this unless the demo needs a non-standard size):
-```lua
-function lurek.conf(t)
-    t.window.title  = "<Demo Title>"
-    t.window.width  = 800
-    t.window.height = 600
-    t.performance.target_fps = 60
-end
+```toml
+[window]
+title      = "<Demo Title>"
+width      = 800
+height     = 600
+
+[performance]
+target_fps = 60
 ```
 
 Acceptable non-standard resolutions (must leave a comment explaining why):
@@ -78,9 +79,10 @@ Acceptable non-standard resolutions (must leave a comment explaining why):
 - `1024 × 768` — strategy overviews, maps, tactical views
 
 Add module flags only when the demo actually needs them:
-```lua
-    t.modules.physics  = true   -- only if lurek.physics.* is used
-    t.modules.audio    = false  -- suppress audio init if demo is silent
+```toml
+[modules]
+physics = true   # only if lurek.physics.* is used
+audio   = false  # suppress audio init if demo is silent
 ```
 
 ### Step 3 — Write `main.lua`
@@ -268,7 +270,7 @@ cargo run -- content/demos/<name>
 When generating N > 1 demos from a list of genres:
 
 1. Derive names for all demos first — confirm no name collisions
-2. Generate `conf.lua` + `main.lua` for each in order
+2. Generate `conf.toml` + `main.lua` for each in order
 3. Generate all `README.md` files
 4. Run screenshot tool for all at once:
    ```powershell
@@ -288,7 +290,7 @@ See [genre-patterns](./references/genre-patterns.md) for a pre-mapped table of c
 
 Before marking a demo complete:
 
-- [ ] `conf.lua` — title matches demo name, valid resolution, target_fps = 60
+- [ ] `conf.toml` — title matches demo name, valid resolution, target_fps = 60
 - [ ] `main.lua` — all 4 callbacks present; `escape` quits; no globals; dt used for movement
 - [ ] `main.lua` — only `lurek.*` API calls and optionally approved `library.*` requires
 - [ ] `main.lua` — no `print()` statements; debug output via `lurek.log.debug()`

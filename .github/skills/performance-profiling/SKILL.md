@@ -109,7 +109,7 @@ Requires `perf` on Linux or `dtrace` on macOS. On Windows use:
 Enable the built-in FPS + draw call counter:
 
 ```lua
--- conf.lua
+-- conf.toml
 function lurek.conf(t)
     t.debug.overlay = true   -- shows FPS, draw calls, frame time in top-left
 end

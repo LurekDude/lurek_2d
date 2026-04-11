@@ -162,7 +162,7 @@ logToFile("ERROR", "physics body nil at spawn point")
 ### Conditional verbose mode
 
 ```lua
--- conf.lua: expose a debug flag
+-- conf.toml / conf.lua: expose a debug flag
 function lurek.conf(t)
     t.identity.name = "mygame"
 end

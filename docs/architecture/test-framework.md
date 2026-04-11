@@ -48,7 +48,7 @@ Both layers run headless — no window, no GPU, no audio device required. This e
 |---|---|---|
 | Purpose | Documentation — shows one `lurek.*` API in isolation | Fully functional game showcases |
 | Testable? | **No** — these are read-only reference scripts | **Yes** — every demo must have a test |
-| Format | Single-file, heavily commented | Folder with `main.lua` and optional `conf.lua` |
+| Format | Single-file, heavily commented | Folder with `main.lua` and optional `conf.toml` |
 
 Examples are not tested. They exist to document API usage and are not expected to execute in a test harness. **Demos must all pass CI** — each demo has exactly one test file in `tests/lua/content/demos/`.
 
@@ -867,9 +867,45 @@ expect_near(0.0, b, 0.01)
 
 ### Priority Modules for Evidence Testing
 
-- **P0**: `gfx` (shapes, colors), `light` (illumination), `particle` (emission)
+- **P0**: `gfx` (shapes, colors), `light` (illumination), `particle` (emission), `raycaster` (2.5D scene)
 - **P1**: `camera` (viewport), `tilemap` (tile rendering), `entity` (draw components)
 - **P2**: `animation` (frame display), `postfx` (shader effects), `gui` (widget rendering)
+
+### Model-Level `draw_to_image()` Evidence (Headless, No GPU)
+
+Some domain modules provide a `draw_to_image()` function that produces a
+CPU pixel buffer (`ImageData`) by software-rasterizing the module's output.
+This enables **headless visual evidence testing** without any GPU or window.
+
+**The `draw_to_image()` function lives in the model** (`src/<module>/draw.rs`),
+NOT in the renderer. It is a testing and debugging utility, not the
+production render path.
+
+| Module | Evidence Function | What it Produces |
+|---|---|---|
+| `raycaster` | `draw_to_image(scene, width, height)` | CPU-rasterized first-person view from `RaycasterScene` quads |
+| `tilemap` | `draw_to_image(map, viewport)` (planned) | CPU-rasterized tile grid for golden tests |
+| `minimap` | `draw_to_image(minimap)` (planned) | CPU-rasterized minimap overview |
+
+#### Raycaster Evidence Pattern
+
+```lua
+-- Verify raycaster produces correct visual output (headless, no GPU)
+local ray = lurek.raycaster.new(grid, config)
+local scene = ray:buildScene(player_x, player_y, player_angle, fov)
+local img = ray:drawToImage(scene, 320, 240)
+
+-- Check that walls are visible (non-black pixels in the middle band)
+local r, g, b, a = img:getPixel(160, 120)
+expect_true(r > 0.0 or g > 0.0 or b > 0.0)
+
+-- Save for golden comparison
+img:save("tests/golden/raycaster_basic.png")
+```
+
+**Key property**: `draw_to_image()` is deterministic — given the same grid,
+camera position, and angle, it always produces the same pixel output. This
+makes it ideal for golden image regression tests.
 
 ### Known Evidence Gap — Light System
 

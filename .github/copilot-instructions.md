@@ -71,7 +71,7 @@ Lurek2D organises its Rust source into **five responsibility groups**. The one b
 
 **State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/runtime/resource_keys.rs`.
 
-**Boot**: CLI args → `Config::load_from_conf_lua()` (conf.lua via temp Lua VM) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `lurek.init()` / `lurek.ready()` → winit event loop.
+**Boot**: CLI args → `Config::load()` (conf.toml preferred; conf.lua legacy fallback) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `lurek.init()` / `lurek.ready()` → winit event loop.
 
 ## CAG Routing
 
@@ -250,7 +250,7 @@ Use scoped `--test <module>` during development. Full `cargo test` only at commi
 src/              Rust source — Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration
 docs/specs/       Full technical specifications for every src/<module>/ (one <module>.md per module)
 content/library/          Lunasome — pure-Lua libraries (no Rust engine internals)
-content/demos/            Playable Lua game demos — each has main.lua and optional conf.lua
+content/demos/            Playable Lua game demos — each has main.lua and optional conf.toml
 content/examples/         Single-file Lua API usage scripts — one per lurek.* module
 tests/            Rust + Lua test suites (rust/unit/, rust/stress/, rust/golden/, rust/config/, rust/security/, rust/ext/, lua/unit/, lua/content/library/, lua/integration/, lua/content/demos/)
 docs/             Architecture docs, generated API refs (docs/API/), performance notes

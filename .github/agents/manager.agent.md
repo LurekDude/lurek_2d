@@ -104,7 +104,7 @@ git status                           # review working tree
 | Documentation update                 | `Doc-Writer`    | What changed, what docs are stale                    |
 | Security concern                     | `Security`      | Attack surface, threat model, affected code          |
 | CAG layer edit                       | `CAG-Architect` | Which CAG file, what needs changing                  |
-| conf.lua / conf.toml / Cargo feature | `Configurator`  | Config fields needed, game dir, deployment target    |
+| conf.toml / conf.lua / Cargo feature | `Configurator`  | Config fields needed, game dir, deployment target    |
 | Adversarial edge case discovery      | `Hacker`        | API surface to probe, attack surface module          |
 | Gameplay / API experience review     | `Player`        | Example scripts, API proposal, docs to evaluate      |
 

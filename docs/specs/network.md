@@ -244,5 +244,5 @@ end
 - **Destroyed host guard**: After `destroy()` is called, every method that accesses the inner host returns `NetworkError::HostDestroyed` via the private `host()` / `host_mut()` helpers. Double-destroy is safe and idempotent.
 - **Lua compatibility layer**: The Lua tests verify a `lurek.net` / `_G.enet` surface with underscore-style naming (`host_create`, `linked_version`, `get_socket_address`, etc.) for developers porting code from LÖVE's `lua-enet` binding.
 - **No encryption**: Packets are plain UDP datagrams. Applications requiring security must implement encryption at the Lua level or use a VPN/tunnel.
-- **Config gating**: The module is behind `modules.network` in `conf.lua`. When disabled, `lurek.network` is not registered and the `rusty_enet` host is never created.
+- **Config gating**: The module is behind `modules.network` in `conf.toml` (or `conf.lua`). When disabled, `lurek.network` is not registered and the `rusty_enet` host is never created.
 - **Breaking change surface**: Renaming UserData methods (e.g. `service`, `send`, `broadcast`) or changing the event table field names would break all multiplayer game scripts.

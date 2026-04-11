@@ -145,7 +145,7 @@ Application lifecycle using winit 0.30 + wgpu GPU rendering.
 
 ### `engine::config`
 
-Engine and window configuration loaded from `conf.lua`.
+Engine and window configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy).
 
 - **`Config`** (struct): Top-level container with `window`, `graphics`, `modules`, `performance`, `identity`, `version`, `log_file`, `log_append`, `log_level` fields. `load_from_conf_lua(game_dir)` creates a temporary Lua VM, executes `conf.lua`, and reads values back.
 - **`WindowConfig`** (struct): Window geometry (width, height), title, vsync, fullscreen, resizable, min size, borderless, icon path, display index, scale mode, game resolution, maximized.
@@ -310,7 +310,7 @@ N/A — engine is a foundation module with no dedicated Lua API surface. Game sc
 interact with engine functionality through higher-level namespaces:
 
 ```lua
--- conf.lua — engine configuration (read by engine::config)
+-- conf.toml — engine configuration (preferred format)
 function lurek.conf(t)
     t.window.title  = "My Game"
     t.window.width  = 1280

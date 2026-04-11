@@ -10,7 +10,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 - Adding a new Lua example to `content/examples/` or demo to `content/demos/`
 - Reviewing an existing example for correctness or code quality
 - Understanding the difference between `content/examples/` and `content/demos/`
-- Writing conf.lua for a demo
+- Writing conf.toml for a demo
 - Linking an example to the API documentation pipeline
 - Setting up an example to work as a smoke test
 
@@ -28,7 +28,7 @@ description: "Load this skill when adding, modifying, or reviewing content in th
 | Folder | Purpose | Scope | Format |
 |--------|---------|-------|--------|
 | `content/examples/` | Minimal single-file API demonstrations | One `.lua` file per API area | ~30–100 lines, no conf.lua |
-| `content/demos/` | Larger showcase games/feature demos | Full game directory (conf.lua + main.lua + assets) | 100–500+ lines, multiple files |
+| `content/demos/` | Larger showcase games/feature demos | Full game directory (conf.toml + main.lua + assets) | 100–500+ lines, multiple files |
 
 **Rule**: An `content/examples/` file shows one API namespace in the simplest possible way. A `content/demos/` folder is a small, complete game or feature showcase.
 
@@ -71,7 +71,7 @@ end
 **Required elements:**
 - Top comment block: file path, one-line purpose, run command
 - Small section comments `-- ── section ──` before `load`, `update`, `draw`
-- No `conf.lua` (uses default window settings)
+- No `conf.toml` (uses default window settings)
 - Self-contained: no external assets unless they are embedded in the engine
 
 ## content/demos/ Folder Structure
@@ -79,12 +79,12 @@ end
 ```
 content/demos/<name>/
 ├── main.lua      — required; game entry point
-├── conf.lua      — optional; custom window/module settings
+├── conf.toml     — optional; custom window/module settings
 ├── README.md     — optional; what the demo shows
 └── assets/       — optional; sprites, sounds, maps
 ```
 
-**conf.lua template:**
+**conf.toml template:**
 ```lua
 function lurek.conf(t)
     t.window.title = "Demo Name"
@@ -112,7 +112,7 @@ end
 4. If the example demonstrates a newly added API function, update `docs/API/lua_api_data.json`
 
 **Full demo** (game directory):
-1. Create `content/demos/<name>/` with `main.lua` (+ optional `conf.lua`, assets, README)
+1. Create `content/demos/<name>/` with `main.lua` (+ optional `conf.toml`, assets, README)
 2. Test: `cargo run -- content/demos/<name>`
 3. Link in `content/demos/README.md`
 4. Verify the demo runs to completion with no errors and no stale `print` debug output
@@ -241,4 +241,4 @@ world:newBody(x, y, true)   -- boolean
 |------|---------|------------|
 | `require()` | ❌ No — must be single-file, self-contained | ✅ May use `require("library.*")` for shipped Lunasome modules |
 | `os.*` / `io.*` system calls | ❌ Never — use `lurek.fs.*` for file access | ❌ Never |
-| `conf.lua` | ✅ Required for each demo folder | ❌ Not applicable (single-file) |
+| `conf.toml` | ✅ Required for each demo folder | ❌ Not applicable (single-file) |

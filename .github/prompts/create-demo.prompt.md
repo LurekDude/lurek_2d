@@ -1,5 +1,5 @@
 ---
-description: "Create one or more new Lurek2D demo projects in content/demos/. Generates conf.lua, main.lua, README.md, and screen.png for each demo. Use when: scaffolding demos from genre descriptions; creating batch demos from a list; adding demos that use content/library/ modules. Inputs: genre, count, specific lurek.* features, library modules, resolution, complexity."
+description: "Create one or more new Lurek2D demo projects in content/demos/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. Use when: scaffolding demos from genre descriptions; creating batch demos from a list; adding demos that use content/library/ modules. Inputs: genre, count, specific lurek.* features, library modules, resolution, complexity."
 name: "Create Demo"
 argument-hint: "genre(s), count, features, library modules, resolution, complexity"
 agent: agent
@@ -34,7 +34,7 @@ Collect the following from the user's request. All inputs except `GENRE` are opt
 
 For each demo requested, produce the **complete 4-file bundle**:
 
-1. `content/demos/<name>/conf.lua`
+1. `content/demos/<name>/conf.toml`
 2. `content/demos/<name>/main.lua`
 3. `content/demos/<name>/README.md`
 4. `content/demos/<name>/screen.png` — via screenshot tool (see Step 6 in skill)
@@ -59,8 +59,8 @@ Then for **all demos in this run**, update:
   [library-integration](../skills/demo-creation/references/library-integration.md)
   — **never scaffold a demo that requires a 🔧 Stub module**
 
-### 3. Write `conf.lua`
-- Pick the right resolution template from [conf-templates](../skills/demo-creation/references/conf-templates.md)
+### 3. Write `conf.toml`
+- Pick the right TOML resolution template from [conf-templates](../skills/demo-creation/references/conf-templates.md)
   matching the genre and `RESOLUTION` input
 - Add module flags only when the demo requires a non-default module state
 

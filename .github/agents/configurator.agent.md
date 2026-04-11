@@ -121,7 +121,7 @@ App::new(config)
 
 ## DECISION GATES
 
-- **Self-handle**: conf.lua templates, TOML equivalents, feature flag documentation, config validation
+- **Self-handle**: conf.toml templates, conf.lua legacy equivalents, feature flag documentation, config validation
 - **Consult Developer**: Config struct has changed and templates need updating
 - **Consult Lua-Designer**: New config option needs a `lurek.conf(t)` field designed
 - **Consult Doc-Writer**: Config templates need publishing to user-facing docs

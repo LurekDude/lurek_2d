@@ -285,7 +285,7 @@ CLI args
   │
   ▼
 Config::load_from_conf_lua()
-  │  ← Temporary Lua VM loads conf.lua
+  │  ← conf.toml (preferred) or conf.lua (legacy fallback)
   │     Reads: window size, title, modules, vsync, physics settings
   │     Returns: Config struct
   ▼
@@ -315,8 +315,8 @@ winit event loop starts
 
 - No GPU draw calls before `GpuRenderer` is fully initialised
 - No Lua execution before all `lurek.*` modules are registered
-- `conf.lua` runs in a temporary, sandboxed Lua VM — not the game VM
-- If `conf.lua` is missing, defaults apply (800×600 window, all modules enabled)
+- `conf.toml` is read first; if absent, `conf.lua` runs in a temporary sandboxed Lua VM (legacy fallback)
+- If neither `conf.toml` nor `conf.lua` is present, defaults apply (800×600 window, all modules enabled)
 - If no game directory is provided, the engine shows the splash screen
 
 ---
@@ -798,13 +798,13 @@ App::new(config)
 | `pixel_perfect` | Integer scaling only, centred |
 | `expand` | Design resolution fills, extra space visible |
 
-Scale mode is set via `conf.lua` or `lurek.camera.setScaleMode()`.
+Scale mode is set via `conf.toml` (or legacy `conf.lua`) or `lurek.camera.setScaleMode()`.
 
 ---
 
 ## Configuration System
 
-### conf.lua (game-authored)
+### conf.toml / conf.lua (game-authored configuration)
 
 ```lua
 function lurek.conf(config)
@@ -820,7 +820,7 @@ function lurek.conf(config)
 end
 ```
 
-`conf.lua` runs in a **temporary Lua VM** before the game VM is created.
+`conf.toml` is parsed at startup (preferred format). `conf.lua` is a legacy alternative executed in a temporary Lua VM.
 It returns a `Config` struct that drives engine initialisation.
 
 ### Config Struct
@@ -834,7 +834,7 @@ Defined in `src/runtime/config.rs`. Fields include:
 
 ### Fallback
 
-If `conf.lua` is missing, all defaults apply: 800×600 window, all modules
+If no configuration file is found, all defaults apply: 800×600 window, all modules
 enabled, 60 FPS target.
 
 ### Format Rule (B-05)

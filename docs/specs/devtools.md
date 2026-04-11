@@ -14,7 +14,7 @@
 
 The `devtools` module is the **engine and game diagnostics toolkit** for engine developers and advanced game developers who need deep runtime visibility. It gives Lua scripts access to structured runtime monitoring and performance analysis capabilities that go beyond simple logging — without requiring any external profiling tools or IDE debugger.
 
-This module is gated by `modules.debug = true` in `conf.lua` and is NOT available in release builds where that flag is false. It is intended for development and profiling workflows, not for production game logic.
+This module is gated by `modules.debug = true` in `conf.toml` (or `conf.lua`) and is NOT available in release builds where that flag is false. It is intended for development and profiling workflows, not for production game logic.
 
 The module contains four orthogonal components:
 

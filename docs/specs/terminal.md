@@ -356,7 +356,7 @@ end
 
 ## Notes
 
-- **Config gate**: The terminal module is gated by `modules.terminal = true` in `conf.lua` and requires `modules.graphics = true` (since it emits `RenderCommand` values).
+- **Config gate**: The terminal module is gated by `modules.terminal = true` in `conf.toml` (or `conf.lua`) and requires `modules.graphics = true` (since it emits `RenderCommand` values).
 - **Grid limits**: Maximum grid size is 512 columns × 256 rows (constants `MAX_COLS`, `MAX_ROWS` in `terminal_state.rs`). Requests beyond these are clamped silently.
 - **Coordinate convention**: All Lua-facing and public Rust APIs use 1-based coordinates. Internal storage is 0-based. The Lua binding converts pixel coordinates to grid positions using fixed cell dimensions (8 × 14 pixels) for `mousepressed`.
 - **Widget attachment model**: Widgets can exist in a detached state (created but not added to a terminal) or an attached state. The Lua binding layer tracks attachment via `WidgetAttachment` and preserves widget state through snapshot copies when widgets are detached. A widget cannot be attached to two terminals simultaneously.

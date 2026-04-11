@@ -27,7 +27,7 @@ Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine d
 | `Doc-Writer`   | Documentation and tutorials                 | API docs, README updates, example writing         |
 | `Security`     | Memory safety and Lua sandboxing            | Input validation, path traversal, unsafe audit    |
 | `CAG-Architect`| Maintain the CAG layer files                | Adding/editing agents, skills, prompts, instructions |
-| `Configurator` | conf.lua/conf.toml templates, Cargo features| game config, feature flags, deployment setup         |
+| `Configurator` | conf.toml/conf.lua templates, Cargo features| game config, feature flags, deployment setup         |
 | `Hacker`       | Adversarial edge case discovery             | finding attack vectors, feeding Security and Tester  |
 | `Player`       | Subjective gameplay/API experience review   | fun assessment, friction identification via personas |
 
@@ -64,7 +64,7 @@ Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine d
 | `Doc-Writer`   | Docs, tutorials, API reference            | Shadow Developer for code changes        |
 | `Security`     | Safety audits, sandboxing review          | Shadow Developer patching vulnerabilities|
 | `CAG-Architect`| CAG file maintenance, validation rules    | Shadow Developer for engine code         |
-| `Configurator` | conf.lua/conf.toml templates, Cargo feature flags | Shadow Developer or Architect        |
+| `Configurator` | conf.toml/conf.lua templates, Cargo feature flags | Shadow Developer or Architect        |
 | `Hacker`       | Adversarial probing, edge case discovery  | Shadow Developer fixing vulnerabilities (route to Security/Tester) |
 | `Player`       | Subjective experience reports via personas| Shadow Lua-Designer or Doc-Writer for API changesry |
 
@@ -89,7 +89,7 @@ Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine d
 - Complex multi-phase new feature → `Planner` → `Manager`
 - External docs/API needed → `Research`
 - Hard engineering problem → `Solver`
-- conf.lua / conf.toml design → `Configurator`
+- conf.toml / conf.lua design → `Configurator`
 - Adversarial edge case discovery → `Hacker`
 - Fun / ergonomics / experience review → `Player`
 

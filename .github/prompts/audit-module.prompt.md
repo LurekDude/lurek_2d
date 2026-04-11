@@ -198,7 +198,7 @@ The Lua API file (`src/lua_api/<module>_api.rs`) is a **registration-only wrappe
 |---|-------|----------------|
 | I-01 | **Lua API usability** | Module's Lua API follows `lurek.*` conventions: sensible defaults, optional parameters, lowercase key names. Violations = WARNING. |
 | I-02 | **Extension panel** | If module has or could have a VS Code extension panel (world editor, particle editor, etc.), verify it exposes structured data (TOML/JSON) for tool integration. No structured I/O where expected = WARNING. |
-| I-03 | **Config integration** | If module has configurable settings, they are exposed via `conf.lua` / `ModulesConfig` and documented. Missing config integration = WARNING. |
+| I-03 | **Config integration** | If module has configurable settings, they are exposed via `conf.toml` / `ModulesConfig` and documented. Missing config integration = WARNING. |
 
 ### Phase 12 — Localization & Logging
 
