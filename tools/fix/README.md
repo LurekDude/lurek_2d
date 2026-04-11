@@ -23,11 +23,9 @@ stale path references.
 
 | Script | Purpose | Key args |
 |---|---|---|
-| `fix_gpu_renderer.py` | One-off fix for corrupted `gpu_renderer.rs` UTF-8 encoding | — |
 | `fix_type_stub_vars.py` | Fix type stub variable declarations | — |
 | `fix_typeof_args.py` | Fix typeof() argument patterns | — |
 | `strip_instance_method_comments.py` | Strip stale instance method doc comments | `--dry-run` |
-| `update_paths.py` | Bulk-rewrite `docs/API/*` path references to `docs/logs/*` | `--dry-run` |
 
 ### Example/content fixers — modify content/ files
 

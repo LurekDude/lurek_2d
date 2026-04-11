@@ -25,7 +25,7 @@ import re
 from pathlib import Path
 
 ROOT       = Path(__file__).resolve().parents[2]
-EXAMPLES   = ROOT / "examples"
+EXAMPLES   = ROOT / "content" / "examples"
 
 # Matches:  local class_name = VAR:type()  -- optional comment
 _TYPE_RE = re.compile(

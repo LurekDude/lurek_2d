@@ -507,7 +507,7 @@ def main():
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parent.parent.parent
-    demos_dir = repo_root / "demos"
+    demos_dir = repo_root / "content" / "demos"
 
     if not demos_dir.is_dir():
         print(f"ERROR: content/demos/ not found at {demos_dir}", file=sys.stderr)

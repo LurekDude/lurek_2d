@@ -37,7 +37,6 @@ coverage — producing reports that tell you what still needs work.
 | `audit_module.py` | 12-phase module quality audit (PASS/WARN/ERROR) | `docs/quality/<module>.md` / JSON |
 | `validate_agent_md.py` | Validate AGENT.md structure (M-01 to M-12) | stdout / JSON |
 | `module_audit.py` | Module restructuring & reference audit | stdout / JSON |
-| `audit_agent_md.py` | Legacy AGENT.md auditor (superseded by `validate_agent_md.py`) | stdout |
 
 ### Specialised audits
 
@@ -54,7 +53,6 @@ coverage — producing reports that tell you what still needs work.
 |---|---|
 | `annotate_tests.py` | Add annotation metadata to test files |
 | `parse_test_log.py` | Parse Rust test execution logs |
-| `patch_audit_module.py` | One-off fixer for audit_module.py output |
 
 ## Common usage
 

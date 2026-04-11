@@ -1,4 +1,11 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
+"""Cross-reference content/examples/ scripts against the lurek.* Lua API.
+
+Reports which API functions are covered by an example and which are not.
+
+Usage:
+    python tools/audit/example_coverage.py
+"""
 from __future__ import annotations
 import argparse, json, re, sys
 from dataclasses import dataclass, field
@@ -6,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 API_JSON = ROOT / 'docs' / 'logs' / 'lua_api_data.json'
-EXAMPLES_DIR = ROOT / 'examples'
+EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
 MODULE_TO_EXAMPLE = {
     'ai':'ai.lua','animation':'animation.lua','audio':'audio.lua',

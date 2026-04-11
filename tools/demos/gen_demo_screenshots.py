@@ -153,7 +153,7 @@ def main():
         sys.exit(1)
     print("[binary] {}".format(binary))
 
-    demos_root = Path(args.demos_dir) if args.demos_dir else repo_root / "demos"
+    demos_root = Path(args.demos_dir) if args.demos_dir else repo_root / "content" / "demos"
     if not demos_root.is_dir():
         print("ERROR: demos directory not found: {}".format(demos_root), file=sys.stderr)
         sys.exit(1)

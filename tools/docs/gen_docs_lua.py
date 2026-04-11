@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 gen_docs_lua.py -- Generate Lua API reference from docs/logs/lua_api_data.json.
 

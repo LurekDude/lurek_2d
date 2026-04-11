@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 gen_lua_api.py — Lurek2D Lua API parser library.
 

@@ -38,7 +38,7 @@ def check_file_header(lines: list[str]) -> None:
     for i, raw in enumerate(lines[:3]):
         line = raw.rstrip()
         if line.startswith("//!"):
-            if not re.match(r'//! `luna\.\w+`', line):
+            if not re.match(r'//! `lurek\.\w+`', line):
                 _warn(i + 1,
                       'File header exists but does not match `//! `lurek.<module>` -- description`')
             return
@@ -76,7 +76,7 @@ def check_module_registration(content: str) -> None:
     """lurek.set("module", var) must appear at the end of register().
 
     Handles:
-    - ``luna.set("name", tbl)`` — standard form
+    - ``luna.set("name", tbl)`` — standard form (Rust param is named ``luna``)
     - ``luna.set("name", tbl.clone())`` — clone variant
     - ``luna_table.set("name", ...)`` — alternate parameter name
     """
@@ -86,7 +86,7 @@ def check_module_registration(content: str) -> None:
         r'\bluna(?:_\w+)?\s*\.\s*set\s*\(\s*"[\w]+"\s*,\s*\w+(?:\.clone\(\))?\s*\)',
         content,
     ):
-        _err(0, 'No `lurek.set("module", tbl)?;` found -- module is not registered in the luna global table')
+        _err(0, 'No `luna.set("module", tbl)?;` found -- module is not registered in the lurek global table')
 
 
 def check_no_rustdoc_sections(lines: list[str]) -> None:

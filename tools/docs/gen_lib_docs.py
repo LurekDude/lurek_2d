@@ -30,7 +30,7 @@ from typing import Optional
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 REPO_ROOT   = Path(__file__).resolve().parent.parent.parent
-LIB_DIR     = REPO_ROOT / "library"
+LIB_DIR     = REPO_ROOT / "content" / "library"
 OUT_DIR     = REPO_ROOT / "docs" / "API" / "libs"
 WIKI_DIR    = REPO_ROOT / "docs" / "wiki"
 

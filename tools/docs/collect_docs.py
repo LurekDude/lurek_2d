@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 collect_docs.py — Lurek2D rich structured API documentation collector.
 

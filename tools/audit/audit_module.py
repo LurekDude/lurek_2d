@@ -1106,12 +1106,12 @@ def check_config_integration(module: str) -> Check:
     if not has_lua_api:
         return Check("I-03", "Config integration", PASS,
                       "No Lua API \u2014 config flag not expected")
-    config_rs = read_text(SRC / "engine" / "config.rs")
+    config_rs = read_text(SRC / "runtime" / "config.rs")
     if module in config_rs:
         return Check("I-03", "Config integration", PASS,
-                      f"Module referenced in src/engine/config.rs")
+                      f"Module referenced in src/runtime/config.rs")
     return Check("I-03", "Config integration", WARN,
-                  f"Module not in src/engine/config.rs \u2014 add to ModulesConfig if toggleable")
+                  f"Module not in src/runtime/config.rs \u2014 add to ModulesConfig if toggleable")
 
 
 def check_rust_test_exists(module: str) -> Check:
@@ -1309,7 +1309,7 @@ def check_log_prefix(module: str, analysis: ModuleFileAnalysis) -> Check:
 def check_example_spec_sync(module: str) -> Check:
     """W-04: Functions in docs/specs/<module>.md Lua API table match functions in content/examples/<module>.lua."""
     spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
-    example_file = WORKSPACE / "examples" / f"{module}.lua"
+    example_file = WORKSPACE / "content" / "examples" / f"{module}.lua"
     api_file = LUA_API / f"{module}_api.rs"
     if not api_file.exists():
         return Check("W-04", "Example–spec sync", PASS, "No Lua API — skip")

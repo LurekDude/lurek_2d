@@ -165,7 +165,7 @@ def extract_lua_signature(comment: str) -> tuple[str, str, str]:
       "lurek.physics.setBodySize(world_id, body_id, w, h)"
       → ("physics", "setBodySize", "(world_id, body_id, w, h)")
     """
-    m = re.search(r"luna\.(\w+)\.(\w+)(\([^)]*\))?", comment)
+    m = re.search(r"lurek\.(\w+)\.(\w+)(\([^)]*\))?", comment)
     if m:
         module = m.group(1)
         func_name = m.group(2)

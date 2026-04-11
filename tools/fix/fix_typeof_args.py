@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT     = Path(__file__).resolve().parents[2]
 DATA_F   = ROOT / "docs" / "logs" / "lua_api_data.json"
-EXAMPLES = ROOT / "examples"
+EXAMPLES = ROOT / "content" / "examples"
 
 # ── Load all class names from JSON ──────────────────────────────────────────
 with open(DATA_F, encoding="utf-8") as f:

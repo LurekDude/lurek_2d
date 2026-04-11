@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 ROOT     = Path(__file__).resolve().parents[2]
-EXAMPLES = ROOT / "examples"
+EXAMPLES = ROOT / "content" / "examples"
 
 # Matches: -- Foo instance methods (variable: bar)
 _PATTERN = re.compile(r'^-- \S.*? instance methods \(variable: \w+\)\s*$', re.MULTILINE)

@@ -21,13 +21,12 @@ go under `work/{session}/scripts/` and are archived at session end.
 |---|---|---|
 | [`tools/docs/`](docs/README.md) | Documentation generators — produce `docs/API/`, `docs/logs/`, `docs/wiki/` | 15 |
 | [`tools/audit/`](audit/README.md) | Quality auditing, coverage analytics, gap reports | 19 |
-| [`tools/fix/`](fix/README.md) | Code fixers and docstring improvers | 13 |
+| [`tools/fix/`](fix/README.md) | Code fixers and docstring improvers | 14 |
 | [`tools/validate/`](validate/README.md) | Schema and structure validators (exit 1 on failure) | 5 |
 | [`tools/dist/`](dist/README.md) | Build, package, and install scripts | 7 |
-| [`tools/github/`](github/README.md) | GitHub project management automation | 2 |
-| [`tools/demos/`](demos/) | Demo folder management | 1 |
-| [`tools/screenshots/`](screenshots/) | Demo screenshot generation | 1 |
-| [`tools/scripts/`](scripts/) | Dev helper scripts | 1 |
+| [`tools/github/`](github/README.md) | GitHub project management automation | 1 |
+| [`tools/demos/`](demos/) | Demo folder management and screenshot generation | 2 |
+| [`tools/dev/`](dev/README.md) | Dev helper scripts | 1 |
 
 ---
 
@@ -131,8 +130,6 @@ and `tools/audit/` in the correct dependency order. Produces:
 | `stress_report.py` | Stress test timing report | stdout / JSON |
 | `test_analytics.py` | Test execution trend analysis | stdout |
 | `parse_test_log.py` | Parse Rust test execution logs (internal helper) | parsed data |
-| `audit_agent_md.py` | Legacy AGENT.md auditor (superseded by `validate_agent_md.py`) | stdout |
-| `patch_audit_module.py` | One-off fixer for audit_module.py output (internal) | — |
 
 ### Validators (`tools/validate/`)
 
@@ -178,8 +175,6 @@ All validators exit 0 on pass, 1 on failure.
 | `fix_type_stub_vars.py` | Fix type stub variable declarations | — |
 | `fix_typeof_args.py` | Fix typeof() argument calls | — |
 | `strip_instance_method_comments.py` | Remove instance method doc comments | — |
-| `update_paths.py` | Bulk rewrite `docs/API/*` path references to `docs/logs/*` | — |
-| `fix_gpu_renderer.py` | One-off fix for GPU renderer file (UTF-8 box-drawing chars) | — |
 
 ### Build & Distribution (`tools/dist/`)
 
@@ -197,26 +192,26 @@ All validators exit 0 on pass, 1 on failure.
 
 | Script | Purpose | Args |
 |---|---|---|
-| `ideas_to_github_issues.py` | Create GitHub issues from `docs/ideas/` | `--repo`, `--token`, `--path`, `--dry-run` |
-| `print_issue_mapping.py` | Print issue mapping table | — |
+| `ideas_to_github_issues.py` | Create GitHub issues from `ideas/` | `--repo`, `--token`, `--path`, `--dry-run` |
 
-### Other (`tools/demos/`, `tools/screenshots/`, `tools/scripts/`)
+### Demo Management (`tools/demos/`)
 
 | Script | Purpose |
 |---|---|
 | `demos/organize_demos.py` | Demo folder organisation/cleanup |
-| `screenshots/gen_demo_screenshots.py` | Generate demo screenshots for docs |
-| `scripts/test_fix_loop.py` | Dev helper: test-fix iteration loop |
+| `demos/gen_demo_screenshots.py` | Generate demo screenshots for docs |
+
+### Dev Helpers (`tools/dev/`)
+
+| Script | Purpose |
+|---|---|
+| `dev/test_fix_loop.py` | Dev helper: test-fix iteration loop |
 
 ### Root-level scripts
 
 | Script | Status | Purpose |
 |---|---|---|
 | `gen_all_docs.py` | **Active** — Pipeline orchestrator | Runs all doc + coverage scripts in order |
-| `fix_callback_luna.py` | Legacy | One-off callback fix |
-| `fix_draw_layer.py` | Legacy | One-off draw layer fix |
-| `tmp_write_devtools.py` | Temporary | Devtools scaffolder |
-| `tmp_write_localization.py` | Temporary | Localization scaffolder |
 
 ---
 

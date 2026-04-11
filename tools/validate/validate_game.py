@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Dict, List, Set
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-EXAMPLES_DIR = WORKSPACE_ROOT / "examples"
+EXAMPLES_DIR = WORKSPACE_ROOT / "content" / "examples"
 
 
 def _build_api_manifest() -> Dict[str, Set[str]]:

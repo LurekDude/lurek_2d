@@ -34,13 +34,13 @@ from textwrap import dedent
 
 ROOT     = Path(__file__).resolve().parent.parent.parent
 SPECS    = ROOT / "docs" / "specs"
-EXAMPLES = ROOT / "examples"
-LIBRARY  = ROOT / "library"
-DEMOS    = ROOT / "demos"
+EXAMPLES = ROOT / "content" / "examples"
+LIBRARY  = ROOT / "content" / "library"
+DEMOS    = ROOT / "content" / "demos"
 TOOLS    = ROOT / "tools"
 DOCS     = ROOT / "docs"
 GITHUB   = ROOT / ".github"
-VSEXT    = ROOT / "vscode-extension"
+VSEXT    = ROOT / "extensions" / "vscode"
 WIKI     = ROOT / "docs" / "wiki"
 
 GITHUB_URL = "https://github.com/LurekDude/luna_2d"

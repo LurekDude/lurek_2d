@@ -30,10 +30,10 @@ import urllib.request
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Create GitHub issues from docs/ideas markdown files")
+    p = argparse.ArgumentParser(description="Create GitHub issues from ideas/ markdown files")
     p.add_argument("--repo", default=None, help="GitHub repo in owner/repo form")
     p.add_argument("--token", default=None, help="GitHub personal access token")
-    p.add_argument("--path", default="docs/ideas", help="Path to ideas markdown files")
+    p.add_argument("--path", default="ideas", help="Path to ideas markdown files")
     p.add_argument("--label", default="idea", help="Label to apply to created issues")
     p.add_argument("--dry-run", action="store_true", help="Don't call GitHub, only print what would be done")
     p.add_argument("--skip-existing", action="store_true", help="Skip issues when one with same title already exists")
