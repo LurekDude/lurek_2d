@@ -22,8 +22,7 @@ The particle module implements a CPU-side emitter-based 2D particle system with 
 | `config.rs`   | `ParticleConfig` (~50 fields) and enums: `AreaDistribution`, `InsertMode`, `EmitterState`, `EmissionShape`, `RelativeMode` |
 | `shapes.rs`   | `ParticleShape` enum � five geometric render primitives (Square, Circle, Triangle, Spark, Diamond) |
 | `particle.rs` | `Particle` struct � per-particle live state (position, velocity, lifetime, rotation, acceleration) |
-| `emitter.rs`  | `ParticleSystem` struct � simulation loop, physics integration, `build_render_commands()` builder, and inline unit tests |
-| `math.rs`     | Math helpers: `lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`, `rand_range`, `rand_normal` |
+| `emitter.rs`  | `ParticleSystem` struct � simulation loop, physics integration, `build_render_commands()` builder, and inline unit tests || `render.rs`   | GPU render-command generation interface: `ParticleSystem::generate_render_commands()` and `Trail::generate_render_commands()` wrappers around the existing `build_render_commands()` methods || `math.rs`     | Math helpers: `lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`, `rand_range`, `rand_normal` |
 | `emission.rs` | Spawn-offset calculators for area distribution (`emission_offset`) and emission shapes (`emission_shape_offset`) |
 | `trail.rs`    | `Trail` and `TrailPoint` — time-fading ribbon effect with width taper and color gradient. `build_render_commands()` emits width-tapered triangle-strip quads with head→tail color interpolation. |
 

@@ -19,6 +19,7 @@ The `spine` module implements skeletal 2D animation through bone hierarchies, sl
 | File          | Purpose                                                                  |
 |---------------|--------------------------------------------------------------------------|
 | `bone.rs`     | `Bone` struct — local and world transform fields, constructors           |
+| `render.rs`   | GPU render-command generation: `Skeleton::generate_render_commands(x, y)` emits bone circles and slot attachment-placeholder rectangles |
 | `skeleton.rs` | `Skeleton` and `BoneParams` — bone/slot management, world-transform propagation |
 | `slot.rs`     | `Slot` struct — bone attachment binding with tint colour and draw order   |
 | `mod.rs` | — |

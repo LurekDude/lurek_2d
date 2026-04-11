@@ -18,7 +18,8 @@ The `minimap` module provides a self-contained, grid-based minimap data model fo
 
 | File         | Purpose                                                                                  |
 |--------------|------------------------------------------------------------------------------------------|
-| `minimap.rs` | Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, zoom/pan, coordinate conversion, and time-based update. |
+| `minimap.rs` | Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, zoom/pan, coordinate conversion, and time-based update. Includes `pings()` and `markers_iter()` accessors for sibling render modules. |
+| `render.rs`  | GPU render-command generation: `Minimap::generate_render_commands(screen_x, screen_y)` emits background, terrain cells (fog-dimmed), viewport outline, and ping circles. |
 | `types.rs`   | Supporting type definitions: `ColorMode` and `FogLevel` enums, `MinimapObjectType`, `MinimapObject`, `MinimapPing`, and `MinimapMarker` plain data structs. |
 | `mod.rs` | — |
 

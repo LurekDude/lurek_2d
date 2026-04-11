@@ -7,6 +7,8 @@
 
 /// Bone hierarchy node: local transform (translation, rotation, scale), parent pointer, and child list.
 pub mod bone;
+/// GPU render-command generation for skeletal animation skeletons.
+pub mod render;
 /// `Skeleton` root type: manages the bone tree and calls `update_world_transforms()` to compute world-space positions.
 pub mod skeleton;
 /// Attachment slot that links a bone to a displayable resource (sprite, mesh, or point attachment).

@@ -21,6 +21,7 @@ The `tilemap` module provides a comprehensive tilemap toolkit for 2D game develo
 |---|---|---|
 | `mod.rs` | ~50 | Module root — declares 11 submodules, re-exports all public types |
 | `tilemap.rs` | ~950 | Core `TileMap` with multi-layer support, viewport culling, tile animation, 4/8-bit autotile, collision (overlap + swept AABB) |
+| `render.rs` | ~170 | GPU render-command generation: `TileMap::generate_render_commands(offset_x, offset_y, cam_x, cam_y, cam_w, cam_h)` emits per-tile `SetColor+Rectangle` with frustum culling |
 | `tileset.rs` | ~400 | `TileSet` — atlas layout, quad computation, animation frames, solid flags, 4-bit and 8-bit autotile rule storage |
 | `chunk.rs` | ~270 | `ChunkMap` — sparse chunk-based storage for large/infinite maps using `HashMap<(i32,i32), Vec<u32>>` |
 | `isomap.rs` | ~480 | `IsoMap` — multi-level isometric tilemap with painter's-algorithm draw ordering and coordinate conversion |

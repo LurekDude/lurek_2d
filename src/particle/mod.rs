@@ -32,6 +32,8 @@ pub mod math;
 /// Per-particle live state struct.
 #[allow(clippy::module_inception)]
 pub mod particle;
+/// GPU render-command generation interface (`generate_render_commands()` wrappers).
+pub mod render;
 /// `ParticleShape` geometric render primitive enum.
 pub mod shapes;
 

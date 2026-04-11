@@ -614,6 +614,28 @@ impl Minimap {
         self.pings.len()
     }
 
+    /// Return a slice of all active pings.
+    ///
+    /// Intended for use by sibling render modules that need to iterate pings
+    /// without access to the private `pings` field.
+    ///
+    /// # Returns
+    /// `&[MinimapPing]`.
+    pub fn pings(&self) -> &[MinimapPing] {
+        &self.pings
+    }
+
+    /// Return an iterator over all markers.
+    ///
+    /// Intended for use by sibling render modules that need to iterate markers
+    /// without access to the private `markers` field.
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = &MinimapMarker>`.
+    pub fn markers_iter(&self) -> impl Iterator<Item = &MinimapMarker> {
+        self.markers.values()
+    }
+
     // ── Markers ──
 
     /// Add a persistent marker and return its auto-assigned ID.

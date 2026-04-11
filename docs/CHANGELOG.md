@@ -18,6 +18,15 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.11] — 2026-04-15
+### Added
+- **Phase 3 + Phase 5 — render-command migration (final batch)**: Added `generate_render_commands()` and/or `draw_to_image()` to the five remaining complex modules.
+  - `src/ui/render.rs` — `GuiContext::generate_render_commands()` (alias for `build_render_commands(FontKey::default())`) and `GuiContext::draw_to_image(w, h)` (DFS widget-bounds CPU rasterisation). 3 new unit tests.
+  - `src/minimap/render.rs` — `Minimap::generate_render_commands(screen_x, screen_y)` producing background rectangle, fog-aware terrain cells, viewport-outline, and ping circles. Added `pings()` and `markers_iter()` public accessor methods on `Minimap`. 4 unit tests.
+  - `src/tilemap/render.rs` — `TileMap::generate_render_commands(offset_x, offset_y, cam_x, cam_y, cam_w, cam_h)` with per-layer frustum culling, GID-based fallback colour table matching `draw_to_image`, and object-tile circle markers. 4 unit tests.
+  - `src/particle/render.rs` — `ParticleSystem::generate_render_commands()` and `Trail::generate_render_commands()` zero-offset wrappers around the existing `build_render_commands()` methods. 3 unit tests.
+  - `src/spine/render.rs` — `Skeleton::generate_render_commands(x, y)` emitting bone-position fill circles (tinted by matching slot colour) and slot-attachment outline rectangles. 3 unit tests.
+
 ## [0.7.10] — 2026-04-15
 ### Added
 - **Phase 2B/2C/2D — render-command migration**: Added `generate_render_commands()` and `draw_to_image()` to five more modules; animation and camera draw_to_image live in `image::visualization` to avoid circular dependencies.

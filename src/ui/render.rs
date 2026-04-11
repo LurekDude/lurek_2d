@@ -199,6 +199,72 @@ impl GuiContext {
 
         cmds
     }
+
+    /// Generate render commands using the default font key.
+    ///
+    /// Convenience alias for [`build_render_commands`](Self::build_render_commands)
+    /// that passes [`FontKey::default()`], satisfying the standard
+    /// `generate_render_commands()` contract used across engine modules.
+    ///
+    /// # Returns
+    /// `Vec<RenderCommand>`.
+    pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
+        self.build_render_commands(FontKey::default())
+    }
+
+    /// Render the widget tree to a CPU image for headless layout testing.
+    ///
+    /// Draws a dark background and fills a coloured rectangle for each
+    /// visible widget at its declared bounds. Text content is not rasterised
+    /// (no font atlas available CPU-side).
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `crate::image::ImageData`.
+    pub fn draw_to_image(&self, width: u32, height: u32) -> crate::image::ImageData {
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(30, 30, 40, 255);
+
+        let default_style = WidgetStyle::default();
+        let Some(children) = self.widgets.first().and_then(|w| w.children()) else {
+            return img;
+        };
+
+        let mut stack: Vec<usize> = children.iter().copied().collect();
+        while let Some(idx) = stack.pop() {
+            let Some(widget) = self.widgets.get(idx) else {
+                continue;
+            };
+            let base = widget.base();
+            if !base.visible {
+                continue;
+            }
+            let style = self
+                .theme
+                .as_ref()
+                .and_then(|t| t.get_style(base.widget_type, base.state))
+                .unwrap_or(&default_style);
+            let [r, g, b, a] = style.bg_color;
+            let alpha = (a * 255.0) as u8;
+            img.draw_rect(
+                base.x as i32,
+                base.y as i32,
+                base.width as u32,
+                base.height as u32,
+                (r * 255.0) as u8,
+                (g * 255.0) as u8,
+                (b * 255.0) as u8,
+                alpha,
+            );
+            if let Some(ch) = widget.children() {
+                stack.extend_from_slice(ch);
+            }
+        }
+        img
+    }
 }
 
 #[cfg(test)]
@@ -244,5 +310,23 @@ mod tests {
         let cmds = ctx.build_render_commands(FontKey::default());
         let has_print = cmds.iter().any(|c| matches!(c, RenderCommand::Print { text, .. } if text == "Hello"));
         assert!(has_print, "expected a Print command with 'Hello'");
+    }
+
+    #[test]
+    fn generate_render_commands_matches_build() {
+        let mut ctx = GuiContext::new();
+        let idx = ctx.add_button("Ok");
+        ctx.add_child(0, idx);
+        let a = ctx.generate_render_commands();
+        let b = ctx.build_render_commands(FontKey::default());
+        assert_eq!(a.len(), b.len(), "generate_render_commands must produce same count as build_render_commands");
+    }
+
+    #[test]
+    fn draw_to_image_returns_correct_size() {
+        let ctx = GuiContext::new();
+        let img = ctx.draw_to_image(64, 48);
+        assert_eq!(img.width(), 64);
+        assert_eq!(img.height(), 48);
     }
 }

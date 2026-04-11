@@ -23,6 +23,8 @@ pub mod tilemap;
 pub mod tileset;
 /// Tiled TMX/TSX map format parser.
 pub mod tmx;
+/// GPU render-command generation for TileMap layers.
+pub mod render;
 
 pub use autotile_sheet::{AutoTileLayout, AutoTileSheet};
 pub use chunk::ChunkMap;

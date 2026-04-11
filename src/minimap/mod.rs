@@ -11,6 +11,8 @@
 /// Core Minimap data model.
 #[allow(clippy::module_inception)]
 pub mod minimap;
+/// GPU render-command generation for the minimap overlay.
+pub mod render;
 /// Supporting type definitions: enums and plain data structs.
 pub mod types;
 
