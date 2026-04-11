@@ -24,6 +24,8 @@ The `camera` module provides camera and viewport types for 2D rendering. It is a
 | `viewport_scale.rs` | `ViewportScale` struct — `Viewport` variant with automatic scaled-dimension tracking     |
 | `render.rs`         | `begin_render_commands()` and `end_render_command()` on `Camera` and `Camera2D`; emits `PushTransform` / `Translate` / `Rotate` / `Scale` / `PopTransform` render commands. |
 
+> **Note:** `draw_to_image()` for `Camera2D` lives in `src/image/visualization.rs` as the free function `draw_camera_to_image(cam, width, height)`. `Camera` cannot import `crate::image` directly because `image::visualization` already imports `crate::camera`, which would create a circular dependency.
+
 ## Key Types
 | Type | Location | Purpose |
 |------|----------|---------|

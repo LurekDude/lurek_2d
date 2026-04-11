@@ -25,6 +25,8 @@ The `animation` module provides frame-based sprite animation for 2D characters a
 | `frame.rs`      | `AnimFrame` — a single frame with a source rectangle and optional duration override. Also defines `AnimationFrame` type alias. |
 | `render.rs`     | `AnimRenderParams` struct and `generate_render_command()` on `Animation`; converts current frame quad into `DrawQuad` render command. |
 
+> **Note:** `draw_to_image()` for `Animation` lives in `src/image/visualization.rs` as the free function `draw_animation_to_image(anim, width, height)`. `Animation` cannot import `crate::image` directly because `image::visualization` already imports `crate::animation`, which would create a circular dependency.
+
 ## Key Types
 | Type | Location | Purpose |
 |------|----------|---------|

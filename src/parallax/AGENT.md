@@ -25,6 +25,7 @@ The Lua bridge lives in `src/lua_api/parallax_api.rs`.
 | `mod.rs`   | Module root; re-exports `ParallaxLayer` and `ParallaxDrawBatch`.            |
 | `layer.rs` | `ParallaxLayer` scroll logic, `ParallaxDrawBatch`, 9 inline unit tests.     |
 | `render.rs`| `generate_render_commands()` on `ParallaxLayer`; converts `ParallaxDrawBatch` into `Vec<RenderCommand>` (`SetColor` + `SetBlendMode` + `DrawImageEx` per tile). |
+| `draw.rs`  | CPU headless drawing — `draw_to_image()` on `ParallaxLayer`; returns solid-colour fill from layer tint and opacity for headless testing. |
 
 ## Full Specification
 

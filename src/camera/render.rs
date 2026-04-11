@@ -48,6 +48,26 @@ impl Camera {
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
     }
+
+    /// Wrap `scene_commands` in the camera's transform scope.
+    ///
+    /// Produces `[PushTransform, Translate, (Rotate)?, (Scale)?, ...scene_commands..., PopTransform]`.
+    /// Convenience wrapper around `begin_render_commands()` / `end_render_command()`.
+    ///
+    /// # Parameters
+    /// - `scene_commands` — `Vec<RenderCommand>`. Draw calls to wrap.
+    ///
+    /// # Returns
+    /// `Vec<RenderCommand>`.
+    pub fn generate_render_commands(
+        &self,
+        scene_commands: Vec<RenderCommand>,
+    ) -> Vec<RenderCommand> {
+        let mut cmds = self.begin_render_commands();
+        cmds.extend(scene_commands);
+        cmds.push(RenderCommand::PopTransform);
+        cmds
+    }
 }
 
 impl Camera2D {
@@ -86,6 +106,26 @@ impl Camera2D {
     /// `RenderCommand`.
     pub fn end_render_command() -> RenderCommand {
         RenderCommand::PopTransform
+    }
+
+    /// Wrap `scene_commands` in the camera's transform scope.
+    ///
+    /// Produces `[PushTransform, Translate, (Rotate)?, (Scale)?, ...scene_commands..., PopTransform]`.
+    /// Convenience wrapper around `begin_render_commands()` / `end_render_command()`.
+    ///
+    /// # Parameters
+    /// - `scene_commands` — `Vec<RenderCommand>`. Draw calls to wrap.
+    ///
+    /// # Returns
+    /// `Vec<RenderCommand>`.
+    pub fn generate_render_commands(
+        &self,
+        scene_commands: Vec<RenderCommand>,
+    ) -> Vec<RenderCommand> {
+        let mut cmds = self.begin_render_commands();
+        cmds.extend(scene_commands);
+        cmds.push(RenderCommand::PopTransform);
+        cmds
     }
 }
 

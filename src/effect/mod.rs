@@ -37,6 +37,8 @@ pub mod effect_type;
 pub mod image_effect;
 /// Render-command generation for post-processing effects.
 pub mod render;
+/// CPU software-rendering fallback for headless draw-to-image.
+pub mod draw;
 /// Ordered pipeline of post-processing passes applied to the rendered scene.
 pub mod stack;
 

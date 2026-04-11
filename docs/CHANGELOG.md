@@ -18,6 +18,32 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.10] — 2026-04-15
+### Added
+- **Phase 2B/2C/2D — render-command migration**: Added `generate_render_commands()` and `draw_to_image()` to five more modules; animation and camera draw_to_image live in `image::visualization` to avoid circular dependencies.
+  - `src/terminal/render.rs` — `Terminal::generate_render_commands(font_key, char_w, char_h, scale)` (background rectangle + Print per cell) and `Terminal::draw_to_image(width, height)`.
+  - `src/scene/render.rs` — `SceneStack::generate_render_commands()` (always empty — scene IDs carry no render data) and `SceneStack::draw_to_image(width, height)` (dark blank placeholder).
+  - `src/image/render.rs` — `ImageData::generate_render_commands(texture_key, x, y)` (single `DrawImage` command) and `ImageData::draw_to_image()` (returns a clone).
+  - `src/effect/draw.rs` — `PostFxStack::draw_to_image(width, height)` (violet tint when effects are active, dark grey otherwise).
+  - `src/parallax/draw.rs` — `ParallaxLayer::draw_to_image(width, height)` (transparent when invisible, tint × opacity otherwise).
+  - `src/image/visualization.rs` — `draw_animation_to_image(anim, width, height)` and `draw_camera_to_image(cam, width, height)` free functions (animation/camera cannot import image due to existing circular dependency).
+  - `src/camera/render.rs` — Added `Camera::generate_render_commands(scene_commands)` and `Camera2D::generate_render_commands(scene_commands)` convenience wrappers (wrap scene commands in push/translate/scale/rotate/pop transform stack).
+### Fixed
+- `src/lua_api/image_api.rs` — Removed duplicate `use crate::image::image_data::ImageData` import (E0252).
+
+## [0.7.9] — 2026-04-14
+### Added
+- **Phase 2A — Debug overlay render commands**: Added `generate_render_commands()` and (where absent) `draw_to_image()` to five engine modules, all pure-CPU with no wgpu/winit/mlua imports.
+  - `src/physics/render.rs` — `World::generate_render_commands()` (body outlines coloured by type; velocity arrows for dynamic bodies) and `World::draw_to_image()`.
+  - `src/ai/render.rs` — `StateMachine::generate_render_commands()` + `draw_to_image()` (state boxes, transition lines); `BehaviorTree::generate_render_commands()` + `draw_to_image()` (depth-column node layout).
+  - `src/pathfind/render.rs` — `NavGrid::generate_render_commands()` (per-cell fill); `FlowField::generate_render_commands()` (directional arrow stubs); `InfluenceMap::generate_render_commands()` (signed heatmap rectangles).
+  - `src/graph/render.rs` — `Graph::generate_render_commands()` (circular node layout, edge lines).
+  - `src/procgen/render.rs` — `NoiseGrid` struct with `from_perlin()`, `generate_render_commands()`, and `draw_to_image()`.
+- `src/pathfind/flow_field.rs` — Added `FlowField::get_width()` and `get_height()` public getters.
+- `src/pathfind/influence_map.rs` — Added `InfluenceMap::get_width()`, `get_height()`, `get_cell_size()`, and `get_layer_names()` public getters.
+
+---
+
 ## [0.7.8] — 2026-04-13
 ### Changed
 - `raycaster`: Upgraded `WallQuad`, `FloorQuad`, `CeilingQuad`, and `BillboardSprite` to perspective-correct textured-quad rendering.

@@ -21,6 +21,7 @@ The `terminal` module provides a grid-based character-cell terminal emulator wit
 | `cell.rs`            | `TCell` struct and default colour/character constants |
 | `terminal_state.rs`  | `Terminal` grid state, input routing, widget compositing, draw command generation |
 | `widget.rs`          | `WidgetBase`, `Widget`, `WidgetKind` enum, `BorderStyle` enum, widget constructors and mutation methods |
+| `render.rs`          | Render-command generation — `generate_render_commands()` and `draw_to_image()` on `Terminal` |
 | `mod.rs` | — |
 
 ## Key Types

@@ -7,7 +7,6 @@ use std::rc::Rc;
 
 use crate::image::serial;
 use crate::image::{CompressedImageData, ImageData, LayeredImage};
-use crate::image::image_data::ImageData;
 
 // -------------------------------------------------------------------------------
 // LuaLayeredImage UserData

@@ -24,7 +24,8 @@ The `image` module provides CPU-side pixel-level access to RGBA image data. It i
 | `serial.rs`      | LIMG binary format: save/load `ImageData` and `LayeredImage` with zlib compression            |
 | `compressed.rs`  | DDS/DXT compressed GPU texture container with format detection and loading                    |
 | `palette_lut.rs`      | Colour palette lookup table mapping source colours to target colours          |
-| `visualization.rs`    | Standalone visualization helpers for Tier 1 modules; renders animation frame grids and camera bounds to `ImageData` without requiring a direct import of `image` in those modules |
+| `visualization.rs`    | Standalone visualization helpers for Tier 1 modules; renders animation frame grids and camera bounds to `ImageData` without requiring a direct import of `image` in those modules. Also provides `draw_animation_to_image()` and `draw_camera_to_image()` as the standard draw-to-image entry points for those types. |
+| `render.rs`           | GPU render-command generation — `generate_render_commands()` and `draw_to_image()` on `ImageData` |
 | `mod.rs` | — |
 
 ## Key Types

@@ -2619,6 +2619,49 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     img
 }
 
+// ── draw_to_image entry points ────────────────────────────────────────────────
+//
+// `Animation` and `Camera2D` cannot import `crate::image` (circular dependency:
+// `crate::image::visualization` already imports those types). These free functions
+// provide the standard `draw_to_image(width, height) -> ImageData` interface for
+// callers that have an `&Animation` or `&Camera2D` but need a CPU pixel buffer.
+
+/// Render an animation as a CPU image for headless testing.
+///
+/// Delegates to [`draw_animation_frame_grid_to_image`] with cell dimensions
+/// derived from the requested output size and frame count.
+///
+/// # Parameters
+/// - `anim` — `&Animation`. Animation controller to render.
+/// - `width` — `u32`. Output image width in pixels.
+/// - `height` — `u32`. Output image height in pixels.
+///
+/// # Returns
+/// `ImageData`.
+pub fn draw_animation_to_image(anim: &Animation, width: u32, height: u32) -> ImageData {
+    let frame_count = anim.get_frame_count().max(1) as u32;
+    let cols = frame_count.min(8);
+    let cell_w = (width / cols).max(1);
+    let cell_h = height.max(1);
+    draw_animation_frame_grid_to_image(anim, cell_w, cell_h)
+}
+
+/// Render a camera as a CPU image for headless testing.
+///
+/// Delegates to [`draw_camera_debug_to_image`] using the output dimensions as
+/// world dimensions, producing a 1:1 grid with the camera viewport overlaid.
+///
+/// # Parameters
+/// - `cam` — `&Camera2D`. Camera to visualize.
+/// - `width` — `u32`. Output image width in pixels.
+/// - `height` — `u32`. Output image height in pixels.
+///
+/// # Returns
+/// `ImageData`.
+pub fn draw_camera_to_image(cam: &Camera2D, width: u32, height: u32) -> ImageData {
+    draw_camera_debug_to_image(cam, width as f32, height as f32, width, height)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

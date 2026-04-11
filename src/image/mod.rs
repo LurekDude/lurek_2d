@@ -34,6 +34,9 @@ pub mod visualization;
 /// Binary `.lim` format serialization for [`ImageData`] and [`LayeredImage`].
 pub mod serial;
 
+/// GPU render-command generation for [`ImageData`].
+pub mod render;
+
 /// GPU texture handle with dimensions, format, and filtering.
 pub mod texture;
 /// Atlas of named sub-regions within a single texture.

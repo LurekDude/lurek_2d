@@ -27,6 +27,7 @@ the one below it, with its full state intact.
 | `stack.rs`        | LIFO scene stack with named registry, inter-scene data store, and transition integration |
 | `transition.rs`   | `TransitionType` enum with Lua string parsing, `ActiveTransition` timer with progress tracking |
 | `depth_sorter.rs` | Per-frame depth-sorted draw batcher with function and object callback support |
+| `render.rs`       | Render-command generation — `generate_render_commands()` and `draw_to_image()` on `SceneStack` |
 
 ## Key Types
 

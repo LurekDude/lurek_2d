@@ -15,6 +15,8 @@
 mod cell;
 mod terminal_state;
 mod widget;
+/// Render-command generation and CPU drawing for the terminal module.
+pub mod render;
 
 pub use cell::TCell;
 pub use terminal_state::Terminal;
