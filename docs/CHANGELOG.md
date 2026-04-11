@@ -18,6 +18,21 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.1] — 2026-04-11
+### Removed
+- Deleted orphaned source files `src/mod.rs`, `src/gpu_renderer.rs`, `src/renderer.rs` (superseded by `src/render/` module).
+- Deleted orphaned `src/graphics/` stub directory (all code migrated to `src/render/` in v0.7.0).
+- Deleted orphaned spec files `docs/specs/camera.md`, `docs/specs/effect.md`, `docs/specs/light.md`, `docs/specs/graphics.md` (modules merged into `src/render/`).
+### Fixed
+- Added 21 missing files to `src/render/AGENT.md` Source Files table (camera/, effect/, light/ submodules).
+- Added `visualization.rs` to `src/image/AGENT.md`; added `chart.rs` to `src/ui/AGENT.md`.
+- Removed ghost file entries from `docs/specs/tween.md` and `docs/specs/app.md`; synced to actual disk state.
+- Removed stale `graphics.md` / `camera.md` / `effect.md` / `light.md` entries from `docs/specs/README.md`.
+- Added `# Fields`, `# Parameters`, `# Returns` sections to missing pub items across `src/debugbridge/bridge.rs`, `src/debugbridge/server.rs`, `src/log/mod.rs`, `src/data/dataview.rs`, `src/patterns/simple_state.rs`, `src/particle/emitter.rs`.
+- Added `#[cfg(test)]` blocks with unit tests to 19 previously-untested files: all `src/serial/*.rs`, `src/image/serial.rs`, `src/image/visualization.rs`, `src/data/bin_pack.rs`, `src/data/pack.rs`, `src/dataframe/serial.rs`, `src/dataframe/sql.rs`, `src/audio/mod.rs`, `src/particle/math.rs`, `src/pathfind/astar.rs`, `src/pathfind/graph_path.rs`, `src/pathfind/hpa.rs`, `src/render/light/light2d.rs`, `src/terminal/terminal_state.rs`.
+### Changed
+- Regenerated `docs/API/rust-api.md` and `docs/API/lua-api.md` to remove stale `graphics` / `camera` / `effect` / `light` references.
+
 ## [0.7.0] — 2025-07-27
 ### Fixed
 - Cleared all BLOCKER-level `lua.load()` violations in `src/lua_api/scene_api.rs` (converted to Rust calls), `src/lua_api/debugbridge_api.rs`, and `src/lua_api/devtools_api.rs` (justified uses now marked with `// LUA-EVAL-JUSTIFIED:`).

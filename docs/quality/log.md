@@ -1,14 +1,19 @@
 # Module Quality Report: `log`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: mod: Tier1 imports runtime(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@123>' (19 LOC, line 123) — extract body to src/log/ | '<closure@184>' (20 LOC, line 184) — extract body to src/log/ | '<closure@85>' has if/match/for — extract to src/log/ | '<closure@164>' has if/match/for — extract to src/log/
+- [ ] **B-04** — No business logic in closures: '<closure@129>' (19 LOC, line 129) — extract body to src/log/ | '<closure@191>' (20 LOC, line 191) — extract body to src/log/ | '<closure@90>' has if/match/for — extract to src/log/ | '<closure@171>' has if/match/for — extract to src/log/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -29,7 +34,7 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\log\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 1245 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 1246 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/log.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
@@ -67,7 +72,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/log_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@123>' (19 LOC, line 123) — extract body to src/log/ \| '<closure@184>' (20 LOC, line 184) — extract body to src/log/ \| '<closure@85>' has if/match/for — extract to src/log/ \| '<closure@164>' has if/match/for — extract to src/log/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@129>' (19 LOC, line 129) — extract body to src/log/ \| '<closure@191>' (20 LOC, line 191) — extract body to src/log/ \| '<closure@90>' has if/match/for — extract to src/log/ \| '<closure@171>' has if/match/for — extract to src/log/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -76,7 +81,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
+| **R-02** Dependency direction | ❌ ERROR | mod: Tier1 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -130,7 +135,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

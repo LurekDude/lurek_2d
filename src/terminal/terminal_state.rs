@@ -1130,3 +1130,22 @@ impl Default for Terminal {
         Self::new(80, 40)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn terminal_new_clamps_dimensions_to_max() {
+        let t = Terminal::new(MAX_COLS + 100, MAX_ROWS + 100);
+        assert_eq!(t.cols(), MAX_COLS);
+        assert_eq!(t.rows(), MAX_ROWS);
+    }
+
+    #[test]
+    fn terminal_new_small_dimensions_preserved() {
+        let t = Terminal::new(10, 5);
+        assert_eq!(t.cols(), 10);
+        assert_eq!(t.rows(), 5);
+    }
+}

@@ -1,15 +1,20 @@
 # Module Quality Report: `scene`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: stack: Tier2 imports runtime(unassigned); transition: Tier2 imports runtime(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
 - [ ] **B-04** — No business logic in closures: '<closure@223>' (24 LOC, line 223) — extract body to src/scene/ | '<closure@325>' (21 LOC, line 325) — extract body to src/scene/ | '<closure@304>' has if/match/for — extract to src/scene/ | '<closure@356>' has if/match/for — extract to src/scene/
 - [ ] **Q-04** — Error handling: .unwrap() calls: stack:118, stack:145, stack:194, stack:403
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -77,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | stack: Tier2 imports runtime(unassigned); transition: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -131,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

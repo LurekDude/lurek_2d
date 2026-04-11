@@ -1,15 +1,24 @@
-# Module Quality Report: `patterns`
+# Module Quality Report: `ecs`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 39 ✅ / 5 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **T-01** — Rust test file: No test file found for module 'ecs'
+- [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_ecs.lua
+- [ ] **W-01** — Example file exists: content/examples/ecs.lua not found — create it
+- [ ] **W-02** — API surface coverage: Skipped — no example file
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring
-- [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: relationships:335, universe:19, universe:693, universe:1017, universe:1171
+- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **T-05** — Test adequacy: 63 pub methods, 0 Rust tests — create test file
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Ecs-API.md)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -18,7 +27,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (patterns_api) |
+| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (ecs_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
 | **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
@@ -29,23 +38,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **A-01** AGENT.md exists | ✅ PASS | src\patterns\AGENT.md |
+| **A-01** AGENT.md exists | ✅ PASS | src\ecs\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 1333 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 617 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | docs/specs/patterns.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/ecs.md exists |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | docs/specs/patterns.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/ecs.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1560 chars |
-| **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1693 chars |
+| **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
+| **SP-05** Key Types accuracy | ✅ PASS | 4 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -55,18 +64,18 @@
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ✅ PASS | No stub docs found |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: relationships:335, universe:19, universe:693, universe:1017, universe:1171 |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **B-01** Dedicated API file | ✅ PASS | lua_api/patterns_api.rs present |
+| **B-01** Dedicated API file | ✅ PASS | lua_api/ecs_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
 | **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
@@ -77,8 +86,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
+| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
+| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -87,23 +96,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\patterns_tests.rs |
-| **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_patterns.lua registered in harness |
-| **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ⚠️ WARNING | 34 tests / 121 pub methods (28%) — low coverage |
+| **T-01** Rust test file | ❌ ERROR | No test file found for module 'ecs' |
+| **T-02** Lua test file | ❌ ERROR | Module has Lua API but no tests/lua/unit/test_ecs.lua |
+| **T-03** Test naming | ✅ PASS | No Rust test file — skip |
+| **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
+| **T-05** Test adequacy | ⚠️ WARNING | 63 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
-| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test patterns_tests -- --nocapture |
+| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test ecs_tests -- --nocapture |
 
 ### Phase 8 — Documentation & Wiki
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | content/examples/patterns.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
-| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/patterns.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ❌ ERROR | content/examples/ecs.lua not found — create it |
+| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/ecs.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ✅ PASS | docs\wiki\Patterns-API.md |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Ecs-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality
@@ -148,7 +157,7 @@
 Re-run this report after applying fixes:
 
 ```powershell
-python tools/audit/audit_module.py patterns --docs-quality
+python tools/audit/audit_module.py ecs --docs-quality
 ```
 
 Fix all ❌ Errors, then address ⚠️ Warnings until status shows **PASS**.

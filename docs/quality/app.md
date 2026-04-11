@@ -1,16 +1,24 @@
-# Module Quality Report: `patterns`
+# Module Quality Report: `app`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 40 ✅ / 3 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **A-02** — Template structure: Missing required sections: Full Specification
+- [ ] **R-03** — No lua_api import: app imports lua_api
+- [ ] **T-01** — Rust test file: No test file found for module 'app'
+- [ ] **W-01** — Example file exists: content/examples/app.lua not found — create it
+- [ ] **W-02** — API surface coverage: Skipped — no example file
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring
-- [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
-- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
+- [ ] **SP-05** — Key Types accuracy: Stale in spec: Config, EngineError, ErrorCategory, ErrorInfo
+- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **T-05** — Test adequacy: 11 pub methods, 0 Rust tests — create test file
 
 ## Full Check Results
 
@@ -18,7 +26,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (patterns_api) |
+| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
 | **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
@@ -29,23 +37,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **A-01** AGENT.md exists | ✅ PASS | src\patterns\AGENT.md |
-| **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 1333 chars |
+| **A-01** AGENT.md exists | ✅ PASS | src\app\AGENT.md |
+| **A-02** Template structure | ❌ ERROR | Missing required sections: Full Specification |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 954 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | docs/specs/patterns.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/app.md exists |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
 | **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | docs/specs/patterns.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/app.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1560 chars |
-| **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1855 chars |
+| **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Stale in spec: Config, EngineError, ErrorCategory, ErrorInfo |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -57,29 +65,29 @@
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
-| **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
-| **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
+| **D-06** Lua API file docs | ✅ PASS | No Lua API file — skip |
+| **D-07** @param/@return annotations | ✅ PASS | No Lua API file — skip |
+| **D-08** No rustdoc in lua_api | ✅ PASS | No Lua API file — skip |
+| **D-09** Section separators | ✅ PASS | No Lua API file — skip |
 
 ### Phase 5 — Lua↔Rust Bridge
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **B-01** Dedicated API file | ✅ PASS | lua_api/patterns_api.rs present |
-| **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
-| **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
-| **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
-| **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
+| **B-01** Dedicated API file | ✅ PASS | No Lua API — skip |
+| **B-02** Registration-only | ✅ PASS | No Lua API — skip |
+| **B-03** impl LuaUserData placement | ✅ PASS | No Lua API — skip |
+| **B-04** No business logic | ✅ PASS | No Lua API — skip |
+| **B-05** Rc clone pattern | ✅ PASS | No Lua API — skip |
+| **B-06** Flat registration body | ✅ PASS | No Lua API — skip |
 
 ### Phase 6 — Architecture Compliance
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
-| **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
+| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
+| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-03** No lua_api import | ❌ ERROR | app imports lua_api |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
 
@@ -87,23 +95,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\patterns_tests.rs |
-| **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_patterns.lua registered in harness |
-| **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ⚠️ WARNING | 34 tests / 121 pub methods (28%) — low coverage |
+| **T-01** Rust test file | ❌ ERROR | No test file found for module 'app' |
+| **T-02** Lua test file | ✅ PASS | Module has no Lua API — skip |
+| **T-03** Test naming | ✅ PASS | No Rust test file — skip |
+| **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
+| **T-05** Test adequacy | ⚠️ WARNING | 11 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
-| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test patterns_tests -- --nocapture |
+| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test app_tests -- --nocapture |
 
 ### Phase 8 — Documentation & Wiki
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | content/examples/patterns.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
-| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/patterns.lua has realistic one-line comments per call |
-| **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ✅ PASS | docs\wiki\Patterns-API.md |
+| **W-01** Example file exists | ❌ ERROR | content/examples/app.lua not found — create it |
+| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/app.lua has realistic one-line comments per call |
+| **W-04** Example–spec sync | ✅ PASS | No Lua API — skip |
+| **W-05** Wiki page | ✅ PASS | Module has no Lua API — skip |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality
@@ -132,7 +140,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
+| **I-03** Config integration | ✅ PASS | No Lua API — config flag not expected |
 
 ### Phase 12 — Localization & Logging
 
@@ -148,7 +156,7 @@
 Re-run this report after applying fixes:
 
 ```powershell
-python tools/audit/audit_module.py patterns --docs-quality
+python tools/audit/audit_module.py app --docs-quality
 ```
 
 Fix all ❌ Errors, then address ⚠️ Warnings until status shows **PASS**.

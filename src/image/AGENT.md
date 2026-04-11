@@ -23,7 +23,8 @@ The `image` module provides CPU-side pixel-level access to RGBA image data. It i
 | `layers.rs`      | `ImageLayer` + `LayeredImage`: compositing layer stack with order, opacity, visibility, Porter-Duff merge |
 | `serial.rs`      | LIMG binary format: save/load `ImageData` and `LayeredImage` with zlib compression            |
 | `compressed.rs`  | DDS/DXT compressed GPU texture container with format detection and loading                    |
-| `palette_lut.rs` | Colour palette lookup table mapping source colours to target colours                          |
+| `palette_lut.rs`      | Colour palette lookup table mapping source colours to target colours          |
+| `visualization.rs`    | Standalone visualization helpers for Tier 1 modules; renders animation frame grids and camera bounds to `ImageData` without requiring a direct import of `image` in those modules |
 
 ## Key Types
 

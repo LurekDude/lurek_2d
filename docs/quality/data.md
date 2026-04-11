@@ -1,15 +1,20 @@
 # Module Quality Report: `data`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **SP-04** — Lua API completeness: Missing from spec: parseToml, encodeToml — add to ## Lua API in docs/specs/data.md
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@221>' (16 LOC, line 221) — extract body to src/data/
+- [ ] **B-04** — No business logic in closures: '<closure@291>' (16 LOC, line 291) — extract body to src/data/
 - [ ] **Q-04** — Error handling: .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more)
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -43,7 +48,7 @@
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/data.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1642 chars |
-| **SP-04** Lua API completeness | ✅ PASS | All 13 bound functions in spec |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: parseToml, encodeToml — add to ## Lua API in docs/specs/data.md |
 | **SP-05** Key Types accuracy | ✅ PASS | 8 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
@@ -68,7 +73,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/data_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@221>' (16 LOC, line 221) — extract body to src/data/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@291>' (16 LOC, line 291) — extract body to src/data/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -99,7 +104,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/data.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 13 bound functions in example |
+| **W-02** API surface coverage | ✅ PASS | All 15 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/data.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
 | **W-05** Wiki page | ✅ PASS | docs\wiki\Data-API.md |
@@ -131,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

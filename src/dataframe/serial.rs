@@ -850,3 +850,25 @@ impl Database {
         out
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn csv_round_trip_preserves_column_names_and_row_count() {
+        let csv = "name,age\nalice,30\nbob,25\n";
+        let df = from_csv(csv).unwrap();
+        assert_eq!(df.ncols(), 2);
+        assert_eq!(df.nrows(), 2);
+        let back = df.to_csv();
+        assert!(back.contains("name") && back.contains("age"));
+    }
+
+    #[test]
+    fn from_csv_empty_input_returns_empty_dataframe() {
+        let df = from_csv("").unwrap();
+        assert_eq!(df.ncols(), 0);
+        assert_eq!(df.nrows(), 0);
+    }
+}

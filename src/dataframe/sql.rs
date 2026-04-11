@@ -1075,3 +1075,24 @@ fn agg_col_name(func: &AggFunc, arg: &AggArg) -> String {
     };
     format!("{func_name}({arg_name})")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::dataframe::serial::from_csv;
+
+    #[test]
+    fn query_sql_select_star_returns_all_rows() {
+        let df = from_csv("a,b\n1,2\n3,4\n").unwrap();
+        let result = query_sql(&df, "SELECT * FROM df").unwrap();
+        assert_eq!(result.nrows(), 2);
+        assert_eq!(result.ncols(), 2);
+    }
+
+    #[test]
+    fn query_sql_where_clause_filters_rows() {
+        let df = from_csv("x,y\n10,1\n20,2\n30,3\n").unwrap();
+        let result = query_sql(&df, "SELECT * FROM df WHERE x > 15").unwrap();
+        assert_eq!(result.nrows(), 2);
+    }
+}

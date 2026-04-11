@@ -727,3 +727,27 @@ impl Light2D {
 
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_light_has_expected_defaults() {
+        let light = Light2D::new(10.0, 20.0, 100.0);
+        assert!((light.x - 10.0).abs() < 1e-5);
+        assert!((light.y - 20.0).abs() < 1e-5);
+        assert!((light.radius - 100.0).abs() < 1e-5);
+        assert!((light.intensity - 1.0).abs() < 1e-5);
+        assert!(light.enabled);
+    }
+
+    #[test]
+    fn set_position_updates_coordinates() {
+        let mut light = Light2D::new(0.0, 0.0, 50.0);
+        light.set_position(5.5, -3.2);
+        let (x, y) = light.get_position();
+        assert!((x - 5.5).abs() < 1e-5);
+        assert!((y - (-3.2)).abs() < 1e-5);
+    }
+}

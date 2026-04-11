@@ -9,6 +9,12 @@ use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 /// A request from a TCP client that requires main-thread (Lua) execution.
+///
+/// # Fields
+/// - `id` — `u64`.
+/// - `method` — `String`.
+/// - `params` — `serde_json::Value`.
+/// - `client_idx` — `usize`.
 #[derive(Clone)]
 pub struct PendingRequest {
     /// JSON-RPC request id.
@@ -22,6 +28,11 @@ pub struct PendingRequest {
 }
 
 /// A response produced on the main thread for delivery back to a TCP client.
+///
+/// # Fields
+/// - `id` — `u64`.
+/// - `result` — `serde_json::Value`.
+/// - `client_idx` — `usize`.
 #[derive(Clone)]
 pub struct PendingResponse {
     /// Matches the `id` from the originating [`PendingRequest`].
@@ -33,6 +44,12 @@ pub struct PendingResponse {
 }
 
 /// A single structured print log entry captured from `lurek.print`.
+///
+/// # Fields
+/// - `timestamp` — `f64`.
+/// - `message` — `String`.
+/// - `source` — `String`.
+/// - `line` — `u32`.
 #[derive(Clone, serde::Serialize)]
 pub struct PrintEntry {
     /// Seconds since bridge start when this entry was recorded.
@@ -46,6 +63,20 @@ pub struct PrintEntry {
 }
 
 /// State shared between the TCP server background thread and the Lua main thread.
+///
+/// # Fields
+/// - `pending_requests` — `VecDeque<PendingRequest>`.
+/// - `pending_responses` — `VecDeque<PendingResponse>`.
+/// - `broadcast_queue` — `VecDeque<String>`.
+/// - `print_history` — `Vec<PrintEntry>`.
+/// - `max_print_history` — `usize`.
+/// - `frame_times` — `Vec<f64>`.
+/// - `max_frame_times` — `usize`.
+/// - `screenshot_requested` — `bool`.
+/// - `screenshot_scale` — `u32`.
+/// - `client_count` — `usize`.
+/// - `port` — `u16`.
+/// - `epoch` — `Instant`.
 pub struct BridgeShared {
     /// Requests waiting for main-thread (Lua) execution.
     pub pending_requests: VecDeque<PendingRequest>,
@@ -75,6 +106,9 @@ pub struct BridgeShared {
 
 impl BridgeShared {
     /// Creates a new `BridgeShared` with default capacities.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             pending_requests: VecDeque::new(),
@@ -93,11 +127,17 @@ impl BridgeShared {
     }
 
     /// Returns seconds elapsed since the bridge was created.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn elapsed(&self) -> f64 {
         self.epoch.elapsed().as_secs_f64()
     }
 
     /// Returns a JSON performance summary computed from recent frame-time data.
+    ///
+    /// # Returns
+    /// `serde_json::Value`.
     pub fn get_performance(&self) -> serde_json::Value {
         if self.frame_times.is_empty() {
             return serde_json::json!({
@@ -121,6 +161,11 @@ impl BridgeShared {
     }
 
     /// Appends a print entry to the history, evicting the oldest if the buffer is full.
+    ///
+    /// # Parameters
+    /// - `msg` — `&str`.
+    /// - `source` — `&str`.
+    /// - `line` — `u32`.
     pub fn push_print(&mut self, msg: &str, source: &str, line: u32) {
         let entry = PrintEntry {
             timestamp: self.elapsed(),

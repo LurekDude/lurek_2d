@@ -386,3 +386,31 @@ fn parse_header(data: &[u8]) -> Result<(u8, &[u8]), String> {
     let type_flag = data[5];
     Ok((type_flag, &data[6..]))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::image::ImageData;
+
+    #[test]
+    fn encode_then_decode_flat_preserves_pixels() {
+        let mut img = ImageData::new(2, 2);
+        img.set_pixel(0, 0, 255, 0, 128, 255);
+        img.set_pixel(1, 1, 0, 200, 50, 128);
+
+        let encoded = encode_flat(&img).unwrap();
+        // Header: 4 magic + 1 version + 1 type = 6 bytes minimum
+        assert!(encoded.len() > 6);
+        assert_eq!(&encoded[0..4], b"LIMG");
+        assert_eq!(encoded[4], 1); // version
+        assert_eq!(encoded[5], 0); // TYPE_FLAT
+
+        let (type_flag, payload) = parse_header(&encoded).unwrap();
+        assert_eq!(type_flag, 0);
+        let decoded = decode_flat(payload).unwrap();
+        assert_eq!(decoded.width(), 2);
+        assert_eq!(decoded.height(), 2);
+        let (r, g, b, a) = decoded.get_pixel(0, 0).unwrap();
+        assert_eq!((r, g, b, a), (255, 0, 128, 255));
+    }
+}

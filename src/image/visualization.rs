@@ -2618,3 +2618,35 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     img.draw_label("BEZIER ADVANCED OK", 150, (height - 15) as i32, 100, 255, 100);
     img
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::animation::Animation;
+
+    fn make_anim_with_frames(count: usize) -> Animation {
+        let mut anim = Animation::new();
+        for _ in 0..count {
+            anim.add_frame(crate::math::Rect::new(0.0, 0.0, 16.0, 16.0));
+        }
+        anim
+    }
+
+    #[test]
+    fn draw_animation_frame_grid_produces_correct_dimensions() {
+        // 3 frames, cell 4x4 → strip: min(3,8)=3 cols, 1 row → 12x4 image
+        let anim = make_anim_with_frames(3);
+        let img = draw_animation_frame_grid_to_image(&anim, 4, 4);
+        assert_eq!(img.width(), 12);
+        assert_eq!(img.height(), 4);
+    }
+
+    #[test]
+    fn draw_animation_frame_grid_zero_frames_uses_one_cell() {
+        let anim = make_anim_with_frames(0);
+        let img = draw_animation_frame_grid_to_image(&anim, 8, 8);
+        // max(0,1)=1 frame → 1 col, 1 row → 8x8
+        assert_eq!(img.width(), 8);
+        assert_eq!(img.height(), 8);
+    }
+}

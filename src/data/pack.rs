@@ -523,3 +523,25 @@ fn read8(data: &[u8], pos: usize, fmt: char) -> Result<[u8; 8], String> {
         data[pos + 7],
     ])
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn pack_u8_little_endian_single_byte() {
+        let values = vec![PackValue::UInt(42)];
+        let buf = pack("<B", &values).unwrap();
+        assert_eq!(buf.len(), 1);
+        assert_eq!(buf.as_bytes()[0], 42u8);
+    }
+
+    #[test]
+    fn pack_i16_big_endian() {
+        let values = vec![PackValue::Int(256)];
+        let buf = pack(">h", &values).unwrap();
+        assert_eq!(buf.len(), 2);
+        // 256 in big-endian i16 = [0x01, 0x00]
+        assert_eq!(&buf.as_bytes()[..2], &[0x01, 0x00]);
+    }
+}

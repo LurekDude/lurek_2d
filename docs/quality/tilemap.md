@@ -1,15 +1,20 @@
 # Module Quality Report: `tilemap`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tilemap: Tier2 imports runtime(unassigned); tilemap: Tier2 imports render(unassigned); tileset: Tier2 imports runtime(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: isomap:51, large_map_renderer:213, mapgen:797, polygon_map:18, polygon_map:289 (+10 more)
-- [ ] **B-04** — No business logic in closures: '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ | '<closure@1905>' (112 LOC, line 1905) — extract body to src/tilemap/ | '<closure@2025>' (40 LOC, line 2025) — extract body to src/tilemap/ | '<closure@1682>' has if/match/for — extract to src/tilemap/ | '<closure@1731>' has if/match/for — extract to src/tilemap/
+- [ ] **B-04** — No business logic in closures: '<closure@1553>' (17 LOC, line 1553) — extract body to src/tilemap/ | '<closure@1938>' (115 LOC, line 1938) — extract body to src/tilemap/ | '<closure@2061>' (40 LOC, line 2061) — extract body to src/tilemap/ | '<closure@1714>' has if/match/for — extract to src/tilemap/ | '<closure@1763>' has if/match/for — extract to src/tilemap/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -68,7 +73,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/tilemap_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1521>' (17 LOC, line 1521) — extract body to src/tilemap/ \| '<closure@1905>' (112 LOC, line 1905) — extract body to src/tilemap/ \| '<closure@2025>' (40 LOC, line 2025) — extract body to src/tilemap/ \| '<closure@1682>' has if/match/for — extract to src/tilemap/ \| '<closure@1731>' has if/match/for — extract to src/tilemap/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1553>' (17 LOC, line 1553) — extract body to src/tilemap/ \| '<closure@1938>' (115 LOC, line 1938) — extract body to src/tilemap/ \| '<closure@2061>' (40 LOC, line 2061) — extract body to src/tilemap/ \| '<closure@1714>' has if/match/for — extract to src/tilemap/ \| '<closure@1763>' has if/match/for — extract to src/tilemap/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -77,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tilemap: Tier2 imports runtime(unassigned); tilemap: Tier2 imports render(unassigned); tileset: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -90,7 +95,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_tilemap.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ✅ PASS | 159 tests / 228 pub methods (70%) |
+| **T-05** Test adequacy | ✅ PASS | 159 tests / 232 pub methods (69%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test tilemap_tests -- --nocapture |
 
@@ -131,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

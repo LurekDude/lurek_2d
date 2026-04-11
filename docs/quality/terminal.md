@@ -1,15 +1,20 @@
 # Module Quality Report: `terminal`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: terminal_state: Tier2 imports runtime(unassigned); terminal_state: Tier2 imports render(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
 - [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **SP-03** — Summary quality: Summary very long (2485 chars)
+- [ ] **SP-03** — Summary quality: Summary very long (2491 chars)
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -42,7 +47,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/terminal.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2485 chars) |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2491 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 7 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 6 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -77,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | terminal_state: Tier2 imports runtime(unassigned); terminal_state: Tier2 imports render(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -131,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

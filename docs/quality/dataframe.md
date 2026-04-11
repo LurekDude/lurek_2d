@@ -1,14 +1,20 @@
 # Module Quality Report: `dataframe`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: frame: Tier2 imports runtime(unassigned); query: Tier2 imports runtime(unassigned)
+- [ ] **T-04** — Float comparisons: assert_eq! with float literals (use abs()<epsilon): line 203, line 267, line 284, line 297, line 1078
+
 ### 🟡 Warnings — Should Fix
 
 - [ ] **B-04** — No business logic in closures: '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ | '<closure@868>' has if/match/for — extract to src/dataframe/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -76,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | frame: Tier2 imports runtime(unassigned); query: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -88,7 +94,7 @@
 | **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\dataframe_tests.rs |
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_dataframe.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
+| **T-04** Float comparisons | ❌ ERROR | assert_eq! with float literals (use abs()<epsilon): line 203, line 267, line 284, line 297, line 1078 |
 | **T-05** Test adequacy | ✅ PASS | 100 tests / 63 pub methods (159%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test dataframe_tests -- --nocapture |
@@ -130,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

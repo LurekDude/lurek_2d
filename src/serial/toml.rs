@@ -75,3 +75,34 @@ fn serial_to_toml(val: &SerialValue) -> Result<toml::Value, String> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serial::lua_table::SerialValue;
+
+    #[test]
+    fn round_trip_simple_table() {
+        let src = "[section]\nkey = \"value\"\nnum = 42\n";
+        let parsed = from_toml(src).unwrap();
+        let back = to_toml(&parsed).unwrap();
+        // Should round-trip without error; check key presence
+        assert!(back.contains("key"));
+        assert!(back.contains("value"));
+    }
+
+    #[test]
+    fn from_toml_integer_preserved() {
+        let src = "[t]\nn = 7\n";
+        let parsed = from_toml(src).unwrap();
+        match parsed {
+            SerialValue::Map(m) => match m.get("t") {
+                Some(SerialValue::Map(inner)) => {
+                    assert!(matches!(inner.get("n"), Some(SerialValue::Int(7))));
+                }
+                _ => panic!("expected nested map"),
+            },
+            other => panic!("expected Map, got {:?}", other),
+        }
+    }
+}

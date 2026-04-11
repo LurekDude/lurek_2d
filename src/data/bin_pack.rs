@@ -589,3 +589,31 @@ fn coerce_str(values: &[BinValue], idx: usize, token: &str) -> Result<String, St
         )),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn measure_size_fixed_tokens_matches_write_output() {
+        // "u8 u16 u32 u64" = 1+2+4+8 = 15 bytes
+        let size = measure_size("u8 u16 u32 u64").unwrap();
+        assert_eq!(size, 15);
+    }
+
+    #[test]
+    fn write_and_read_round_trip_u32() {
+        let values = vec![BinValue::U32(0xDEAD_BEEF)];
+        let buf = write("u32", &values).unwrap();
+        assert_eq!(buf.len(), 4);
+        let (back, _pos) = read("u32", buf.as_bytes(), 0).unwrap();
+        assert_eq!(back.len(), 1);
+        assert!(matches!(back[0], BinValue::U32(0xDEAD_BEEF)));
+    }
+
+    #[test]
+    fn measure_size_rejects_variable_length_tokens() {
+        assert!(measure_size("str").is_err());
+        assert!(measure_size("cstr").is_err());
+    }
+}

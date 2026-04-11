@@ -150,3 +150,38 @@ fn serial_value_to_csv_field(val: &SerialValue) -> String {
         SerialValue::Seq(_) | SerialValue::Map(_) => "[complex]".to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serial::lua_table::SerialValue;
+
+    #[test]
+    fn from_csv_with_headers_returns_seq_of_maps() {
+        let csv = "name,score\nalice,10\nbob,20\n";
+        let result = from_csv(csv, CsvOptions::default()).unwrap();
+        match result {
+            SerialValue::Seq(rows) => {
+                assert_eq!(rows.len(), 2);
+                match &rows[0] {
+                    SerialValue::Map(m) => {
+                        assert!(matches!(m.get("name"), Some(SerialValue::Str(s)) if s == "alice"));
+                    }
+                    other => panic!("expected Map, got {:?}", other),
+                }
+            }
+            other => panic!("expected Seq, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn from_csv_no_headers_returns_seq_of_seqs() {
+        let csv = "a,b\nc,d\n";
+        let opts = CsvOptions { has_headers: false, ..CsvOptions::default() };
+        let result = from_csv(csv, opts).unwrap();
+        match result {
+            SerialValue::Seq(rows) => assert_eq!(rows.len(), 2),
+            other => panic!("expected Seq, got {:?}", other),
+        }
+    }
+}

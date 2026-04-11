@@ -19,11 +19,17 @@ use crate::runtime::log_messages;
 ///
 /// `level` must be one of `"off"`, `"error"`, `"warn"`, `"info"`, `"debug"`, or `"trace"`.
 /// Unrecognised values are silently ignored.
+///
+/// # Parameters
+/// - `level` — `&str`.
 pub fn set_level(level: &str) {
     log_messages::set_log_level(level);
 }
 
 /// Returns the current log level name as a static string (e.g. `"info"`).
+///
+/// # Returns
+/// `String`.
 pub fn get_level() -> String {
     log_messages::get_log_level().to_string()
 }
@@ -31,6 +37,12 @@ pub fn get_level() -> String {
 /// Returns `true` when messages at `level` would be emitted under the current filter.
 ///
 /// This uses the `log` crate's `max_level()` for the check.
+///
+/// # Parameters
+/// - `level` — `&str`.
+///
+/// # Returns
+/// `bool`.
 pub fn enabled_for(level: &str) -> bool {
     use ::log::LevelFilter;
     let filter = match level.to_lowercase().as_str() {

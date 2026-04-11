@@ -1,6 +1,6 @@
 # Module Quality Report: `devtools`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -8,7 +8,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@164>' (18 LOC, line 164) — extract body to src/devtools/ | '<closure@272>' (17 LOC, line 272) — extract body to src/devtools/ | '<closure@394>' (19 LOC, line 394) — extract body to src/devtools/ | '<closure@490>' (16 LOC, line 490) — extract body to src/devtools/ | '<closure@115>' has if/match/for — extract to src/devtools/ | '<closure@240>' has if/match/for — extract to src/devtools/
+- [ ] **D-07** — @param/@return annotations: Missing @param/@return before: p50, p95, p99, samples
+- [ ] **B-04** — No business logic in closures: '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ | '<closure@481>' (19 LOC, line 481) — extract body to src/devtools/ | '<closure@595>' (20 LOC, line 595) — extract body to src/devtools/ | '<closure@623>' (56 LOC, line 623) — extract body to src/devtools/ | '<closure@125>' has if/match/for — extract to src/devtools/ | '<closure@289>' has if/match/for — extract to src/devtools/
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -57,7 +58,7 @@
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
-| **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
+| **D-07** @param/@return annotations | ⚠️ WARNING | Missing @param/@return before: p50, p95, p99, samples |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
 | **D-09** Section separators | ✅ PASS | Separators present |
 
@@ -68,7 +69,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/devtools_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@164>' (18 LOC, line 164) — extract body to src/devtools/ \| '<closure@272>' (17 LOC, line 272) — extract body to src/devtools/ \| '<closure@394>' (19 LOC, line 394) — extract body to src/devtools/ \| '<closure@490>' (16 LOC, line 490) — extract body to src/devtools/ \| '<closure@115>' has if/match/for — extract to src/devtools/ \| '<closure@240>' has if/match/for — extract to src/devtools/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ \| '<closure@481>' (19 LOC, line 481) — extract body to src/devtools/ \| '<closure@595>' (20 LOC, line 595) — extract body to src/devtools/ \| '<closure@623>' (56 LOC, line 623) — extract body to src/devtools/ \| '<closure@125>' has if/match/for — extract to src/devtools/ \| '<closure@289>' has if/match/for — extract to src/devtools/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 

@@ -16,6 +16,11 @@ use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
 /// Accepts new connections, reads newline-delimited JSON messages from each
 /// client, and writes pending responses back.  Stops when `running` is set to
 /// `false`.
+///
+/// # Parameters
+/// - `listener` — `TcpListener`.
+/// - `shared` — `Arc<Mutex<BridgeShared>>`.
+/// - `running` — `Arc<AtomicBool>`.
 pub fn server_thread(
     listener: TcpListener,
     shared: Arc<Mutex<BridgeShared>>,
@@ -107,6 +112,11 @@ pub fn server_thread(
 /// Parses a newline-terminated JSON message from a client and either responds
 /// immediately (background-safe methods) or queues a [`PendingRequest`] for the
 /// main thread.
+///
+/// # Parameters
+/// - `line` — `&str`.
+/// - `client_idx` — `usize`.
+/// - `shared` — `&Arc<Mutex<BridgeShared>>`.
 pub fn handle_client_message(
     line: &str,
     client_idx: usize,

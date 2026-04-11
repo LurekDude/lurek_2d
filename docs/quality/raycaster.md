@@ -1,15 +1,20 @@
 # Module Quality Report: `raycaster`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: column_batch: Tier2 imports runtime(unassigned); dda: Tier2 imports runtime(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **T-05** — Test adequacy: 10 tests / 44 pub methods (23%) — low coverage
-- [ ] **Q-04** — Error handling: .unwrap() calls: dda:488, doors:203, segment:101, visibility:39, visibility:55
+- [ ] **T-05** — Test adequacy: 10 tests / 50 pub methods (20%) — low coverage
+- [ ] **Q-04** — Error handling: .unwrap() calls: dda:979, doors:203, segment:101, visibility:39, visibility:55
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -42,7 +47,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/raycaster.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1782 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1786 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 3 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 13 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -77,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | column_batch: Tier2 imports runtime(unassigned); dda: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -90,7 +95,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_raycaster.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ⚠️ WARNING | 10 tests / 44 pub methods (23%) — low coverage |
+| **T-05** Test adequacy | ⚠️ WARNING | 10 tests / 50 pub methods (20%) — low coverage |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test raycaster_tests -- --nocapture |
 
@@ -112,7 +117,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: dda:488, doors:203, segment:101, visibility:39, visibility:55 |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: dda:979, doors:203, segment:101, visibility:39, visibility:55 |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
@@ -131,7 +136,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

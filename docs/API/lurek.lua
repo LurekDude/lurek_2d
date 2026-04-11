@@ -10045,6 +10045,11 @@ function DepthSorter:sort() end
 ---@return nil
 function lurek.scene.clear() end
 
+--- Creates a reusable scene class — returns a zero-argument constructor function.
+---@param def? any (optional)
+---@return function
+function lurek.scene.define(def) end
+
 --- Draws all scenes in the stack from bottom to top (legacy name; prefer `render`).
 ---@return nil
 function lurek.scene.draw() end
@@ -10092,6 +10097,11 @@ function lurek.scene.isEmpty() end
 --- Returns true if a scene transition is currently active.
 ---@return boolean
 function lurek.scene.isTransitioning() end
+
+--- Creates a scene instance directly from a methods table.
+---@param def? any (optional)
+---@return table
+function lurek.scene.new(def) end
 
 --- Creates a new DepthSorter for z-ordered draw batching.
 ---@return DepthSorter

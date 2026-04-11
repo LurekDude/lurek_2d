@@ -86,3 +86,29 @@ fn serial_to_json(val: &SerialValue) -> JsonValue {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serial::lua_table::SerialValue;
+
+    #[test]
+    fn round_trip_bool_and_number() {
+        let val = SerialValue::Seq(vec![SerialValue::Bool(true), SerialValue::Int(42)]);
+        let json = to_json(&val, false).unwrap();
+        let parsed = from_json(&json).unwrap();
+        match parsed {
+            SerialValue::Seq(v) => {
+                assert_eq!(v.len(), 2);
+                assert!(matches!(v[0], SerialValue::Bool(true)));
+            }
+            other => panic!("expected Seq, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn from_json_string_value() {
+        let result = from_json(r#""hello""#).unwrap();
+        assert!(matches!(result, SerialValue::Str(s) if s == "hello"));
+    }
+}

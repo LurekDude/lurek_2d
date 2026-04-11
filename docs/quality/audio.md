@@ -1,15 +1,22 @@
 # Module Quality Report: `audio`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 42 ✅ / 3 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **SP-04** — Lua API completeness: Missing from spec: saveWAV — add to ## Lua API in docs/specs/audio.md
+- [ ] **R-02** — Dependency direction: bus: Tier1 imports runtime(unassigned); decoder: Tier1 imports runtime(unassigned); decoder: Tier1 imports runtime(unassigned); dsp: Tier1 imports runtime(unassigned); midi_player: Tier1 imports runtime(unassigned)
+- [ ] **W-02** — API surface coverage: Functions absent from content/examples/audio.lua: saveWAV
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ | '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ | '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ | '<closure@1391>' has if/match/for — extract to src/audio/ | '<closure@1411>' has if/match/for — extract to src/audio/
+- [ ] **B-04** — No business logic in closures: '<closure@1056>' (28 LOC, line 1056) — extract body to src/audio/ | '<closure@1094>' (17 LOC, line 1094) — extract body to src/audio/ | '<closure@1500>' (16 LOC, line 1500) — extract body to src/audio/ | '<closure@2199>' (20 LOC, line 2199) — extract body to src/audio/ | '<closure@1384>' has if/match/for — extract to src/audio/ | '<closure@1404>' has if/match/for — extract to src/audio/
 - [ ] **Q-04** — Error handling: .unwrap() calls: bus:138, bus:161, midi:129, midi:132, midi:138
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -43,7 +50,7 @@
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/audio.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 819 chars |
-| **SP-04** Lua API completeness | ✅ PASS | All 76 bound functions in spec |
+| **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: saveWAV — add to ## Lua API in docs/specs/audio.md |
 | **SP-05** Key Types accuracy | ✅ PASS | 18 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
@@ -68,7 +75,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/audio_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1063>' (28 LOC, line 1063) — extract body to src/audio/ \| '<closure@1101>' (17 LOC, line 1101) — extract body to src/audio/ \| '<closure@1507>' (16 LOC, line 1507) — extract body to src/audio/ \| '<closure@1391>' has if/match/for — extract to src/audio/ \| '<closure@1411>' has if/match/for — extract to src/audio/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1056>' (28 LOC, line 1056) — extract body to src/audio/ \| '<closure@1094>' (17 LOC, line 1094) — extract body to src/audio/ \| '<closure@1500>' (16 LOC, line 1500) — extract body to src/audio/ \| '<closure@2199>' (20 LOC, line 2199) — extract body to src/audio/ \| '<closure@1384>' has if/match/for — extract to src/audio/ \| '<closure@1404>' has if/match/for — extract to src/audio/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -77,7 +84,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
+| **R-02** Dependency direction | ❌ ERROR | bus: Tier1 imports runtime(unassigned); decoder: Tier1 imports runtime(unassigned); decoder: Tier1 imports runtime(unassigned); dsp: Tier1 imports runtime(unassigned); midi_player: Tier1 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -90,7 +97,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_audio.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ✅ PASS | 111 tests / 163 pub methods (68%) |
+| **T-05** Test adequacy | ✅ PASS | 111 tests / 164 pub methods (68%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test audio_tests -- --nocapture |
 
@@ -99,7 +106,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/audio.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 76 bound functions in example |
+| **W-02** API surface coverage | ❌ ERROR | Functions absent from content/examples/audio.lua: saveWAV |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/audio.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
 | **W-05** Wiki page | ✅ PASS | docs\wiki\Audio-API.md |
@@ -131,7 +138,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

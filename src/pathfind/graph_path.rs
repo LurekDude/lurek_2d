@@ -316,3 +316,41 @@ fn centroid_distance(a: &(f32, f32), b: &(f32, f32)) -> f64 {
     let dy = (a.1 - b.1) as f64;
     (dx * dx + dy * dy).sqrt()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::{HashMap, HashSet};
+
+    fn make_linear_graph(n: u32) -> (HashMap<u32, Vec<u32>>, HashMap<u32, (f32, f32)>, HashMap<(u32, u32), HashSet<String>>) {
+        let mut neighbors: HashMap<u32, Vec<u32>> = HashMap::new();
+        let mut centroids: HashMap<u32, (f32, f32)> = HashMap::new();
+        let edge_tags: HashMap<(u32, u32), HashSet<String>> = HashMap::new();
+        for i in 0..n {
+            centroids.insert(i, (i as f32 * 10.0, 0.0));
+            if i + 1 < n {
+                neighbors.entry(i).or_default().push(i + 1);
+                neighbors.entry(i + 1).or_default().push(i);
+            }
+        }
+        (neighbors, centroids, edge_tags)
+    }
+
+    #[test]
+    fn find_province_path_same_node_returns_single() {
+        let (neighbors, centroids, edge_tags) = make_linear_graph(3);
+        let cost_fn = ProvinceCostFn::new();
+        let path = find_province_path(&neighbors, &centroids, &edge_tags, 1, 1, &cost_fn).unwrap();
+        assert_eq!(path.provinces, vec![1]);
+        assert!((path.total_cost - 0.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn find_province_path_linear_chain_finds_route() {
+        let (neighbors, centroids, edge_tags) = make_linear_graph(4);
+        let cost_fn = ProvinceCostFn::new();
+        let path = find_province_path(&neighbors, &centroids, &edge_tags, 0, 3, &cost_fn).unwrap();
+        assert_eq!(path.provinces.first(), Some(&0));
+        assert_eq!(path.provinces.last(), Some(&3));
+    }
+}

@@ -1,6 +1,6 @@
-# Module Quality Report: `minimap`
+# Module Quality Report: `render`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 33 ✅ / 10 ⚠️ / 5 ❌ / 19 🔵
 
 ---
 
@@ -8,12 +8,23 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **R-02** — Dependency direction: minimap: Tier2 imports runtime(unassigned); minimap: Tier2 imports render(unassigned)
+- [ ] **S-03** — File size limits: Files >3000 LOC: render/gpu_renderer.rs (4049 LOC)
+- [ ] **T-01** — Rust test file: No test file found for module 'render'
+- [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_render.lua
+- [ ] **W-01** — Example file exists: content/examples/render.lua not found — create it
+- [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs
-- [ ] **T-05** — Test adequacy: 65 pub methods, 0 Rust tests — create test file
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: ambient.rs, atmosphere.rs, attenuation.rs, blend_mode.rs, effect.rs, effect_type.rs
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AmbientState, AtlasRegion, Attenuation, BatchEntry, BlendMode
+- [ ] **D-03** — Structured doc sections: Missing structured sections: light2d::Light2D (# Fields), renderer::RenderCommand (# Variants)
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: draw_layer:14, draw_layer:26, draw_layer:53, mesh:18, mesh:34 (+5 more)
+- [ ] **B-04** — No business logic in closures: '<closure@1430>' (23 LOC, line 1430) — extract body to src/render/ | '<closure@1462>' (25 LOC, line 1462) — extract body to src/render/ | '<closure@1533>' (31 LOC, line 1533) — extract body to src/render/ | '<closure@1582>' (119 LOC, line 1582) — extract body to src/render/ | '<closure@1924>' has if/match/for — extract to src/render/ | '<closure@1945>' has if/match/for — extract to src/render/
+- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
+- [ ] **T-05** — Test adequacy: 295 pub methods, 0 Rust tests — create test file
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Render-API.md)
+- [ ] **Q-04** — Error handling: .unwrap() calls: gpu_renderer:964, gpu_renderer:974, gpu_renderer:979, gpu_renderer:984, gpu_renderer:989 (+39 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -22,9 +33,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (minimap_api) |
+| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (render_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (3 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ❌ ERROR | Files >3000 LOC: render/gpu_renderer.rs (4049 LOC) |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -33,23 +44,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **A-01** AGENT.md exists | ✅ PASS | src\minimap\AGENT.md |
+| **A-01** AGENT.md exists | ✅ PASS | src\render\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 433 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 393 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | docs/specs/minimap.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/render.md exists |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: ambient.rs, atmosphere.rs, attenuation.rs, blend_mode.rs, effect.rs, effect_type.rs |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | docs/specs/minimap.md exists |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/render.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1911 chars |
-| **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
-| **SP-05** Key Types accuracy | ✅ PASS | 7 types — spec Key Types in sync |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1614 chars |
+| **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AmbientState, AtlasRegion, Attenuation, BatchEntry, BlendMode |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -58,8 +69,8 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ✅ PASS | No stub docs found |
+| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: light2d::Light2D (# Fields), renderer::RenderCommand (# Variants) |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: draw_layer:14, draw_layer:26, draw_layer:53, mesh:18, mesh:34 (+5 more) |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
@@ -70,10 +81,10 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **B-01** Dedicated API file | ✅ PASS | lua_api/minimap_api.rs present |
+| **B-01** Dedicated API file | ✅ PASS | lua_api/render_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1430>' (23 LOC, line 1430) — extract body to src/render/ \| '<closure@1462>' (25 LOC, line 1462) — extract body to src/render/ \| '<closure@1533>' (31 LOC, line 1533) — extract body to src/render/ \| '<closure@1582>' (119 LOC, line 1582) — extract body to src/render/ \| '<closure@1924>' has if/match/for — extract to src/render/ \| '<closure@1945>' has if/match/for — extract to src/render/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -81,8 +92,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | minimap: Tier2 imports runtime(unassigned); minimap: Tier2 imports render(unassigned) |
+| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
+| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -91,23 +102,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ✅ PASS | Found: tests\rust\game\minimap_tests.rs |
-| **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_minimap.lua registered in harness |
+| **T-01** Rust test file | ❌ ERROR | No test file found for module 'render' |
+| **T-02** Lua test file | ❌ ERROR | Module has Lua API but no tests/lua/unit/test_render.lua |
 | **T-03** Test naming | ✅ PASS | No Rust test file — skip |
 | **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
-| **T-05** Test adequacy | ⚠️ WARNING | 65 pub methods, 0 Rust tests — create test file |
+| **T-05** Test adequacy | ⚠️ WARNING | 295 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
-| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test minimap_tests -- --nocapture |
+| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test render_tests -- --nocapture |
 
 ### Phase 8 — Documentation & Wiki
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | content/examples/minimap.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 1 bound functions in example |
-| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/minimap.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ❌ ERROR | content/examples/render.lua not found — create it |
+| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/render.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ✅ PASS | docs\wiki\Minimap-API.md |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Render-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality
@@ -117,7 +128,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: gpu_renderer:964, gpu_renderer:974, gpu_renderer:979, gpu_renderer:984, gpu_renderer:989 (+39 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
@@ -152,7 +163,7 @@
 Re-run this report after applying fixes:
 
 ```powershell
-python tools/audit/audit_module.py minimap --docs-quality
+python tools/audit/audit_module.py render --docs-quality
 ```
 
 Fix all ❌ Errors, then address ⚠️ Warnings until status shows **PASS**.

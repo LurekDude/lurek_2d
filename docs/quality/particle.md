@@ -1,14 +1,19 @@
 # Module Quality Report: `particle`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **R-02** — Dependency direction: config: Tier2 imports runtime(unassigned); emitter: Tier2 imports render(unassigned); emitter: Tier2 imports runtime(unassigned)
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@958>' has if/match/for — extract to src/particle/ | '<closure@1007>' has if/match/for — extract to src/particle/
+- [ ] **B-04** — No business logic in closures: '<closure@1100>' has if/match/for — extract to src/particle/ | '<closure@1149>' has if/match/for — extract to src/particle/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -29,7 +34,7 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\particle\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 697 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 699 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/particle.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier2) |
@@ -41,7 +46,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/particle.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1754 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1756 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 2 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 11 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -67,7 +72,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/particle_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@958>' has if/match/for — extract to src/particle/ \| '<closure@1007>' has if/match/for — extract to src/particle/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1100>' has if/match/for — extract to src/particle/ \| '<closure@1149>' has if/match/for — extract to src/particle/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -76,7 +81,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier2 rules |
+| **R-02** Dependency direction | ❌ ERROR | config: Tier2 imports runtime(unassigned); emitter: Tier2 imports render(unassigned); emitter: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -89,7 +94,7 @@
 | **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_particle.lua registered in harness |
 | **T-03** Test naming | ✅ PASS | Test names follow convention |
 | **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ✅ PASS | 84 tests / 30 pub methods (280%) |
+| **T-05** Test adequacy | ✅ PASS | 84 tests / 38 pub methods (221%) |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
 | **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test particle_tests -- --nocapture |
 
@@ -130,7 +135,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

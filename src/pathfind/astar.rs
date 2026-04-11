@@ -368,3 +368,29 @@ pub fn smooth_path(grid: &NavGrid, path: &[(u32, u32)], unit_size: u32) -> Vec<(
 
     smoothed
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::pathfind::nav_grid::NavGrid;
+
+    #[test]
+    fn astar_finds_path_on_open_grid() {
+        let grid = NavGrid::new(5, 5);
+        let (path, complete) = astar(&grid, (0, 0), (4, 4), 1, 0);
+        assert!(complete);
+        let p = path.unwrap();
+        assert_eq!(p.first(), Some(&(0, 0)));
+        assert_eq!(p.last(), Some(&(4, 4)));
+    }
+
+    #[test]
+    fn astar_returns_none_path_when_start_is_blocked() {
+        // cost 0 = blocked
+        let costs = vec![0u8; 25]; // all blocked
+        let grid = NavGrid::from_costs(5, 5, costs);
+        let (path, complete) = astar(&grid, (0, 0), (4, 4), 1, 0);
+        assert!(!complete);
+        assert!(path.is_none() || path.as_ref().map(|p| p.is_empty()).unwrap_or(true));
+    }
+}

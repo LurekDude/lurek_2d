@@ -1,6 +1,6 @@
 # Module Quality Report: `debugbridge`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -10,6 +10,7 @@
 
 - [ ] **D-03** — Structured doc sections: Missing structured sections: bridge::PendingRequest (# Fields), bridge::PendingResponse (# Fields), bridge::PrintEntry (# Fields), bridge::BridgeShared (# Fields)
 - [ ] **B-04** — No business logic in closures: '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ | '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ | '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ | '<closure@75>' has if/match/for — extract to src/debugbridge/ | '<closure@369>' has if/match/for — extract to src/debugbridge/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -131,7 +132,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

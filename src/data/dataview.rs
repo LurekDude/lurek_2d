@@ -223,6 +223,12 @@ pub struct LuaDataView {
 
 impl LuaDataView {
     /// Creates a new `LuaDataView` wrapping the given `DataView`.
+    ///
+    /// # Parameters
+    /// - `inner` — `DataView`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(inner: DataView) -> Self {
         Self { inner }
     }

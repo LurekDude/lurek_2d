@@ -19,12 +19,10 @@ the fixed-timestep accumulator. For complex multi-property animation graphs see 
 
 | File | Purpose |
 |---|---|
-| `src/tween/mod.rs` | Module root; re-exports `TweenEngine`, `TweenState`, `SequenceStep`, `ParallelEntry` |
+| `src/tween/mod.rs` | Module root; re-exports `TweenEngine`, `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, `TweenState`, `SequenceStep`, `ParallelEntry` |
 | `src/tween/engine.rs` | `TweenEngine` — manages active tweens; `tick(dt)` advances and removes completed tweens |
-| `src/tween/tween_state.rs` | `TweenState` — per-tween runtime state: target, property, progress, easing fn |
-| `src/tween/sequence.rs` | `SequenceStep` — one step in a chained tween sequence |
-| `src/tween/parallel.rs` | `ParallelEntry` — one arm in a simultaneous tween group |
-| `src/lua_api/tween_api.rs` | Registers `lurek.tween.*`; wraps engine as `LuaTween`, sequences as `LuaTweenSequence`, parallel as `LuaTweenParallel` |
+| `src/tween/handle.rs` | Lua UserData handle types: `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, plus supporting `SequenceStep` and `ParallelEntry` data types |
+| `src/tween/state.rs` | Pure numeric tween timing state (`TweenState`) with easing-function application; no Lua dependencies |
 
 ## Key Types
 

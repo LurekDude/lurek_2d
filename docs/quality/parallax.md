@@ -1,15 +1,31 @@
-# Module Quality Report: `patterns`
+# Module Quality Report: `parallax`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 32 ✅ / 7 ⚠️ / 9 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
+### 🔴 Errors — Must Fix Before Merge
+
+- [ ] **A-02** — Template structure: Missing required sections: Purpose
+- [ ] **A-03** — Purpose quality: No ## Purpose section found
+- [ ] **A-04** — Content sync: Files not in Source Files table: layer.rs
+- [ ] **A-06** — Tier label: No Tier property in AGENT.md header
+- [ ] **SP-02** — Required spec sections: Missing sections: Summary, Architecture, Source Files, Key Types, Lua API
+- [ ] **SP-03** — Summary quality: No ## Summary section
+- [ ] **T-01** — Rust test file: No test file found for module 'parallax'
+- [ ] **W-01** — Example file exists: content/examples/parallax.lua not found — create it
+- [ ] **W-02** — API surface coverage: Skipped — no example file
+
 ### 🟡 Warnings — Should Fix
 
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring
-- [ ] **T-05** — Test adequacy: 34 tests / 121 pub methods (28%) — low coverage
+- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: layer.rs, mod.rs
+- [ ] **B-04** — No business logic in closures: '<closure@555>' (82 LOC, line 555) — extract body to src/parallax/
+- [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
+- [ ] **T-05** — Test adequacy: 4 pub methods, 0 Rust tests — create test file
+- [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Parallax-API.md)
+- [ ] **Q-04** — Error handling: .unwrap() calls: layer:361, layer:371, layer:380, layer:401
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -18,7 +34,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (patterns_api) |
+| **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (parallax_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
 | **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
@@ -29,23 +45,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **A-01** AGENT.md exists | ✅ PASS | src\patterns\AGENT.md |
-| **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 1333 chars |
-| **A-04** Content sync | ✅ PASS | All .rs files listed |
-| **A-05** Spec pointer | ✅ PASS | docs/specs/patterns.md exists |
-| **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
-| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
+| **A-01** AGENT.md exists | ✅ PASS | src\parallax\AGENT.md |
+| **A-02** Template structure | ❌ ERROR | Missing required sections: Purpose |
+| **A-03** Purpose quality | ❌ ERROR | No ## Purpose section found |
+| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: layer.rs |
+| **A-05** Spec pointer | ✅ PASS | docs/specs/parallax.md exists |
+| **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
+| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: layer.rs, mod.rs |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **SP-01** Spec file exists | ✅ PASS | docs/specs/patterns.md exists |
-| **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1560 chars |
+| **SP-01** Spec file exists | ✅ PASS | docs/specs/parallax.md exists |
+| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Summary, Architecture, Source Files, Key Types, Lua API |
+| **SP-03** Summary quality | ❌ ERROR | No ## Summary section |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Observer, ObserverEntry, PriorityItem, PriorityQueue, Ring |
+| **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -60,16 +76,16 @@
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
 | **D-07** @param/@return annotations | ✅ PASS | All bindings have @param/@return annotations |
 | **D-08** No rustdoc in lua_api | ✅ PASS | No rustdoc sections in Lua API file |
-| **D-09** Section separators | ✅ PASS | < 3 bindings — skip |
+| **D-09** Section separators | ✅ PASS | Separators present |
 
 ### Phase 5 — Lua↔Rust Bridge
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **B-01** Dedicated API file | ✅ PASS | lua_api/patterns_api.rs present |
+| **B-01** Dedicated API file | ✅ PASS | lua_api/parallax_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ✅ PASS | Closures appear thin (≤15 LOC, no control flow) |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@555>' (82 LOC, line 555) — extract body to src/parallax/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -77,8 +93,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ✅ PASS | All imports follow tier1 rules |
+| **R-01** Tier placement | ⚠️ WARNING | No **Tier** row in AGENT.md; expected unassigned |
+| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -87,23 +103,23 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **T-01** Rust test file | ✅ PASS | Found: tests\rust\unit\patterns_tests.rs |
-| **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_patterns.lua registered in harness |
-| **T-03** Test naming | ✅ PASS | Test names follow convention |
-| **T-04** Float comparisons | ✅ PASS | No float assert_eq! found |
-| **T-05** Test adequacy | ⚠️ WARNING | 34 tests / 121 pub methods (28%) — low coverage |
+| **T-01** Rust test file | ❌ ERROR | No test file found for module 'parallax' |
+| **T-02** Lua test file | ✅ PASS | tests/lua/unit/test_parallax.lua registered in harness |
+| **T-03** Test naming | ✅ PASS | No Rust test file — skip |
+| **T-04** Float comparisons | ✅ PASS | No Rust test file — skip |
+| **T-05** Test adequacy | ⚠️ WARNING | 4 pub methods, 0 Rust tests — create test file |
 | **T-06** Golden tests | 🔵 MANUAL | Check if module qualifies for golden/snapshot tests |
-| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test patterns_tests -- --nocapture |
+| **T-07** Tests pass | 🔵 MANUAL | Run: cargo test --test parallax_tests -- --nocapture |
 
 ### Phase 8 — Documentation & Wiki
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **W-01** Example file exists | ✅ PASS | content/examples/patterns.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 0 bound functions in example |
-| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/patterns.lua has realistic one-line comments per call |
+| **W-01** Example file exists | ❌ ERROR | content/examples/parallax.lua not found — create it |
+| **W-02** API surface coverage | ❌ ERROR | Skipped — no example file |
+| **W-03** Example comments | 🔵 MANUAL | Verify content/examples/parallax.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
-| **W-05** Wiki page | ✅ PASS | docs\wiki\Patterns-API.md |
+| **W-05** Wiki page | ⚠️ WARNING | No wiki page found (expected docs/wiki/Parallax-API.md) |
 | **W-06** Changelog entry | 🔵 MANUAL | Verify recent API changes have docs/CHANGELOG.md entries |
 
 ### Phase 9 — Code Quality
@@ -113,7 +129,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: layer:361, layer:371, layer:380, layer:401 |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |
@@ -148,7 +164,7 @@
 Re-run this report after applying fixes:
 
 ```powershell
-python tools/audit/audit_module.py patterns --docs-quality
+python tools/audit/audit_module.py parallax --docs-quality
 ```
 
 Fix all ❌ Errors, then address ⚠️ Warnings until status shows **PASS**.

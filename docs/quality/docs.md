@@ -1,6 +1,6 @@
 # Module Quality Report: `docs`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -9,7 +9,8 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: phantom, incomplete, moduleScores, stale, current (+1 more)
-- [ ] **B-04** — No business logic in closures: '<closure@801>' (26 LOC, line 801) — extract body to src/docs/ | '<closure@835>' (38 LOC, line 835) — extract body to src/docs/ | '<closure@882>' (27 LOC, line 882) — extract body to src/docs/ | '<closure@918>' (21 LOC, line 918) — extract body to src/docs/ | '<closure@1127>' has if/match/for — extract to src/docs/ | '<closure@1144>' has if/match/for — extract to src/docs/
+- [ ] **B-04** — No business logic in closures: '<closure@802>' (26 LOC, line 802) — extract body to src/docs/ | '<closure@836>' (38 LOC, line 836) — extract body to src/docs/ | '<closure@883>' (27 LOC, line 883) — extract body to src/docs/ | '<closure@919>' (21 LOC, line 919) — extract body to src/docs/ | '<closure@1128>' has if/match/for — extract to src/docs/ | '<closure@1145>' has if/match/for — extract to src/docs/
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -68,7 +69,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/docs_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@801>' (26 LOC, line 801) — extract body to src/docs/ \| '<closure@835>' (38 LOC, line 835) — extract body to src/docs/ \| '<closure@882>' (27 LOC, line 882) — extract body to src/docs/ \| '<closure@918>' (21 LOC, line 918) — extract body to src/docs/ \| '<closure@1127>' has if/match/for — extract to src/docs/ \| '<closure@1144>' has if/match/for — extract to src/docs/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@802>' (26 LOC, line 802) — extract body to src/docs/ \| '<closure@836>' (38 LOC, line 836) — extract body to src/docs/ \| '<closure@883>' (27 LOC, line 883) — extract body to src/docs/ \| '<closure@919>' (21 LOC, line 919) — extract body to src/docs/ \| '<closure@1128>' has if/match/for — extract to src/docs/ \| '<closure@1145>' has if/match/for — extract to src/docs/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -131,7 +132,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

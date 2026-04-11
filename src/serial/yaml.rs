@@ -83,3 +83,23 @@ fn serial_to_yaml(val: &SerialValue) -> YamlValue {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::serial::lua_table::SerialValue;
+
+    #[test]
+    fn round_trip_string_value() {
+        let val = SerialValue::Str("hello".to_string());
+        let yaml = to_yaml(&val).unwrap();
+        let back = from_yaml(&yaml).unwrap();
+        assert!(matches!(back, SerialValue::Str(s) if s.trim() == "hello"));
+    }
+
+    #[test]
+    fn from_yaml_null_becomes_null_variant() {
+        let result = from_yaml("~").unwrap();
+        assert!(matches!(result, SerialValue::Null));
+    }
+}
