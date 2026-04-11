@@ -18,6 +18,23 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.6] — 2026-04-13
+### Fixed
+- Fixed `tools/audit/quality_report.py`: corrected 4 broken script path references (`doc_audit.py`→`audit/doc_audit.py`, `test_coverage.py`→`audit/test_coverage.py`, `module_audit.py`→`audit/module_audit.py`, `validate_game.py`→`validate/validate_game.py`). Dashboard now shows real data instead of 0% everywhere.
+- Fixed `tools/audit/doc_audit.py`: corrected `collect_docs.py` path, added `json_flag` parameter for `gen_lua_api_data.py` compatibility, rewrote `_analyze_lua_api()` to handle nested JSON structure.
+
+### Added
+- Created `.github/skills/quality-pipeline/SKILL.md` — full audit→diagnose→fix→verify cycle skill with issue-to-fix routing table, quality sweep recipes, and tool category reference.
+- Added `quality-pipeline` to the system prompt skill catalog.
+
+### Changed
+- Rewrote `tools/README.md` with complete inventory of all 65+ scripts, tool relationship map, overlap-free ownership table, and quality pipeline guide.
+- Updated `tools/docs/README.md`: added `gen_wiki_api.py`, `gen_lua_library_api.py`; organised scripts into data layer / reference generators / legacy categories; fixed output paths.
+- Updated `tools/audit/README.md`: added 8 missing scripts (`lua_api_test_coverage.py`, `example_coverage.py`, `unit_test_api_coverage.py`, `test_analytics.py`, `stress_report.py`, `audit_agent_md.py`, `patch_audit_module.py`, `annotate_tests.py`, `parse_test_log.py`); organised into master dashboards / docstring / test / module / specialised categories.
+- Updated `tools/validate/README.md`: added `validate_module_coverage.py`; added key args column.
+- Updated `tools/fix/README.md`: added 8 missing scripts (`add_test_markers.py`, `expand_examples.py`, `fix_type_stub_vars.py`, `fix_typeof_args.py`, `format_examples.py`, `improve_examples.py`, `strip_instance_method_comments.py`, `uncomment_examples.py`); organised into docstring fixers / source code fixers / example fixers / test helpers categories.
+- Updated `copilot-instructions.md` CLI Tools section: added quality-pipeline skill reference, removed duplicate API refs line, replaced stale `module_audit.py` with `quality_report.py`.
+
 ## [0.7.5] — 2026-04-12
 ### Changed
 - **Spec Lua API coverage enforced**: Fixed `## Lua API` sections in 6 specs (`app`, `i18n`, `light`, `render`, `runtime`, `window`) to list every function in markdown tables following `data.md` golden standard. Added `docs/specs/SPEC_TEMPLATE.md` canonical format reference and `work/check_spec_quality.py` validator (47/47 modules pass).

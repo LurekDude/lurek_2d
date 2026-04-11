@@ -1,7 +1,7 @@
 # tools/docs — Documentation Generators
 
 Scripts that **read** the Lurek2D source tree and **write** documentation
-output files under `docs/API/`, `docs/logs/`, and `docs/wiki/`.
+output files under `docs/API/`, `docs/logs/`, `docs/tests/`, and `docs/wiki/`.
 
 Run the full pipeline in one command:
 ```powershell
@@ -10,36 +10,55 @@ python tools/gen_all_docs.py
 
 ## Scripts
 
-| Script | Purpose | Output |
+### Data layer — machine-readable JSON from source
+
+| Script | Reads | Produces | Key args |
+|---|---|---|---|
+| `gen_rust_api_data.py` | `src/**/*.rs` | `docs/logs/rust_api_data.json` | `--output` |
+| `gen_lua_api_data.py` | `src/lua_api/*.rs` | `docs/logs/lua_api_data.json` | `--output`, `--verbose` |
+
+### Reference generators — human-readable docs from JSON
+
+| Script | Reads | Produces | Key args |
+|---|---|---|---|
+| `gen_docs_lua.py` | `lua_api_data.json` | `docs/API/lua-api.md` | — |
+| `gen_docs_rust.py` | `rust_api_data.json` | `docs/API/rust-api.md` | — |
+| `gen_luadoc.py` | `lua_api_data.json` | `docs/API/lurek.lua` (LuaCATS IDE stubs) | — |
+| `gen_wiki_api.py` | `lua_api_data.json` | `docs/wiki/API-Reference.md` | — |
+| `gen_lib_docs.py` | `content/library/` | `docs/API/lib-api.md` | — |
+| `gen_engine_docs.py` | `src/` structure | `docs/API/` engine docs | — |
+| `gen_lua_dev_docs.py` | `lua_api_data.json` | `docs/API/` developer docs | — |
+| `gen_lua_library_api.py` | `content/library/` | LuaCATS stubs for Lunasome modules | — |
+| `gen_test_docs.py` | `tests/` | `docs/tests/test_docs_rust.md`, `docs/tests/test_docs_lua.md` | `--mode rust\|lua`, `--output` |
+
+### Legacy / standalone reference
+
+| Script | Purpose | Key args |
 |---|---|---|
-| `collect_docs.py` | Scan `src/` and generate rich API doc with missing-doc report | `docs/API/api_generated.md` |
-| `gen_docs_lua.py` | Compact Lua API reference from `lua_api_data.json` | `docs/API/lua-api.md` |
-| `gen_docs_rust.py` | Compact Rust API reference from `rust_api_data.json` | `docs/API/rust-api.md` |
-| `gen_engine_docs.py` | Engine internals documentation | `docs/API/` |
-| `gen_lib_docs.py` | Library Lua (`content/library/`) API docs | `docs/API/lib-api.md` |
-| `gen_lua_api.py` | Lua API reference scanner — reads `@param`/`@return` tags from `src/lua_api/` | `docs/API/lua_api_reference_generated.md` |
-| `gen_lua_api_data.py` | Machine-readable Lua API JSON | `docs/API/lua_api_data.json` |
-| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeleton stubs from Rust module docstrings | `src/lua_api/*.rs` |
-| `gen_lua_dev_docs.py` | Lua developer-facing documentation | `docs/API/` |
-| `gen_lua_library_api.py` | Library Lua type annotation extraction | `docs/API/` |
-| `gen_luadoc.py` | LuaCATS type-annotation stubs for VS Code IntelliSense | `docs/API/lurek.lua` |
-| `gen_rust_api_data.py` | Machine-readable Rust API JSON | `docs/API/rust_api_data.json` |
-| `gen_test_docs.py` | Human-readable test catalog from Rust/Lua test files | `docs/API/test_docs.md` |
-| `gen_wiki_api.py` | Game-developer API cheatsheet | `docs/wiki/API-Reference.md` |
+| `gen_lua_api.py` | Original Lua API scanner (reads `@param`/`@return`) | `--check` (coverage check, exit 1 if stale) |
+| `collect_docs.py` | Rich Rust API doc collector with missing-doc report | `--report-missing`, `--suggest`, `--json`, `--output` |
+| `gen_lua_api_skeleton.py` | Generate `src/lua_api/*_api.rs` skeleton stubs | `--module NAME`, `--all`, `--dry-run`, `--list` |
 
 ## Common usage
 
 ```powershell
+# Full pipeline (all generators + coverage)
+python tools/gen_all_docs.py
+
 # Regenerate only the Lua API reference
 python tools/docs/gen_lua_api.py
 
 # Check Lua API coverage (exits 1 if stale)
 python tools/docs/gen_lua_api.py --check
 
-# Regenerate Lua + Rust JSON intermediates
+# Regenerate JSON intermediates
 python tools/docs/gen_lua_api_data.py
 python tools/docs/gen_rust_api_data.py
 
-# Generate a new lua_api skeleton for a module
+# Generate lua_api skeleton for a module
 python tools/docs/gen_lua_api_skeleton.py --module physics
+python tools/docs/gen_lua_api_skeleton.py --all --dry-run
+
+# List items missing /// docs
+python tools/docs/collect_docs.py --report-missing
 ```

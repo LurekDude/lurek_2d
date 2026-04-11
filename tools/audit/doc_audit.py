@@ -29,12 +29,20 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 TOOLS_DIR = WORKSPACE_ROOT / "tools"
 
 
-def _run_json_tool(script: str, extra_args: list = None) -> dict:
-    """Run a tools/ script with --json and return parsed output."""
+def _run_json_tool(script: str, extra_args: list = None, *, json_flag: bool = True) -> dict:
+    """Run a tools/ script and return parsed JSON output.
+
+    If *json_flag* is True (default), passes ``--json --output <tmp>``.
+    If False, passes only ``--output <tmp>`` (for scripts that always
+    produce JSON and don't have a ``--json`` switch).
+    """
     with tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w") as f:
         tmp = Path(f.name)
 
-    cmd = [sys.executable, str(TOOLS_DIR / script), "--json", "--output", str(tmp)]
+    cmd = [sys.executable, str(TOOLS_DIR / script)]
+    if json_flag:
+        cmd.append("--json")
+    cmd.extend(["--output", str(tmp)])
     if extra_args:
         cmd.extend(extra_args)
 
@@ -93,30 +101,55 @@ def _analyze_rust_docs(data: dict) -> dict:
 
 
 def _analyze_lua_api(data: dict) -> dict:
-    """Analyze Lua API documentation coverage from gen_lua_api.py JSON."""
-    summary = data.get("summary", {})
-    functions = data.get("functions", [])
+    """Analyze Lua API documentation coverage from gen_lua_api_data.py JSON."""
+    # gen_lua_api_data.py nests everything under "lua_api"
+    lua_api = data.get("lua_api", data)
+    summary = lua_api.get("summary", {})
+    modules = lua_api.get("modules", {})
 
-    total = len(functions)
-    documented = sum(1 for f in functions if f.get("description"))
+    # Flatten module functions into a single list for per-item analysis
+    functions = []
+    for mod_name, mod_info in modules.items():
+        for fn in mod_info.get("functions", []):
+            fn["module"] = mod_name
+            functions.append(fn)
+
+    total = summary.get("total_functions", len(functions))
+    documented = summary.get("documented", sum(1 for f in functions if f.get("description")))
     missing = [
         {
-            "lua_name": f["lua_name"],
-            "module": f["module"],
-            "kind": f["kind"],
-            "file": f["file"],
-            "line": f["line"],
+            "lua_name": f.get("lua_name", f.get("name", "?")),
+            "module": f.get("module", "?"),
+            "kind": f.get("kind", "function"),
+            "file": f.get("file", "?"),
+            "line": f.get("line", 0),
         }
         for f in functions
         if not f.get("description")
     ]
+
+    # Build per-module summary table
+    by_module = {}
+    for mod_name, mod_info in modules.items():
+        fns = mod_info.get("functions", [])
+        fn_count = sum(1 for f in fns if f.get("kind") != "method")
+        method_count = sum(1 for f in fns if f.get("kind") == "method")
+        mod_documented = sum(1 for f in fns if f.get("description"))
+        mod_total = len(fns)
+        by_module[mod_name] = {
+            "total": mod_total,
+            "functions": fn_count,
+            "methods": method_count,
+            "documented": mod_documented,
+            "undocumented": mod_total - mod_documented,
+        }
 
     return {
         "total_functions": total,
         "documented": documented,
         "missing_count": total - documented,
         "coverage_pct": round(documented / total * 100, 1) if total else 100.0,
-        "by_module": summary,
+        "by_module": by_module,
         "missing_items": missing[:50],  # cap for readability
     }
 
@@ -205,12 +238,12 @@ def main() -> int:
     args = parser.parse_args()
 
     print("[INFO] Running Rust documentation scan...", file=sys.stderr)
-    rust_data = _run_json_tool("collect_docs.py")
+    rust_data = _run_json_tool("docs/collect_docs.py")
     if not rust_data:
         return 2
 
     print("[INFO] Running Lua API scan...", file=sys.stderr)
-    lua_data = _run_json_tool("docs/gen_lua_api_data.py", [])
+    lua_data = _run_json_tool("docs/gen_lua_api_data.py", [], json_flag=False)
     if not lua_data:
         return 2
 

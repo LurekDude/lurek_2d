@@ -172,16 +172,16 @@ def main() -> int:
     args = parser.parse_args()
 
     print("[1/4] Running documentation audit...", file=sys.stderr)
-    doc_data = _run_tool("doc_audit.py")
+    doc_data = _run_tool("audit/doc_audit.py")
 
     print("[2/4] Running test coverage analysis...", file=sys.stderr)
-    test_data = _run_tool("test_coverage.py")
+    test_data = _run_tool("audit/test_coverage.py")
 
     print("[3/4] Running module audit...", file=sys.stderr)
-    module_data = _run_tool("module_audit.py")
+    module_data = _run_tool("audit/module_audit.py")
 
     print("[4/4] Running API validation...", file=sys.stderr)
-    validation_data = _run_tool("validate_game.py", ["--all-examples"])
+    validation_data = _run_tool("validate/validate_game.py", ["--all-examples"])
 
     if args.json:
         report = json.dumps({

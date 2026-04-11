@@ -78,7 +78,7 @@ Lurek2D organises its Rust source into **five responsibility groups**. The one b
 **Load order**: System Prompt → `src/<module>/AGENT.md` (overview) → `docs/specs/<module>.md` (full spec, load when deep detail needed) → relevant skill files → agent
 
 **Skill catalog** — all skills live in `.github/skills/`. Load the relevant `SKILL.md` before working in that domain.
-`agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `visual-effects` · `vscode-extension`
+`agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `quality-pipeline` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `visual-effects` · `vscode-extension`
 
 **Agent roster** — full definitions in `.github/agents/`:
 
@@ -210,12 +210,12 @@ All permanent tools live in `tools/` organised by category. See `tools/README.md
 | `tools/github/` | GitHub automation (`ideas_to_github_issues.py` …) |
 
 Key invocations:
+- **Quality sweep**: Load `quality-pipeline` skill for the full audit→fix→verify cycle
 - **CAG**: `python tools/validate/cag_validate.py [--type agent|skill|prompt] [--file <path>]`
 - **Docs**: `python tools/gen_all_docs.py` · `python tools/docs/collect_docs.py [--report-missing|--suggest]`
 - **Coverage**: `python tools/audit/doc_coverage.py` · `python tools/audit/test_coverage.py [--suggest]`
-- **Audit**: `python tools/audit/audit_module.py <name>` · `python tools/audit/module_audit.py`
+- **Audit**: `python tools/audit/audit_module.py <name>` · `python tools/audit/quality_report.py`
 - **Lua API**: `python tools/docs/gen_lua_api_skeleton.py [--all|--module <name>|--list]`
-- **API refs**: `docs/API/lua-api.md` (Lua) · `docs/API/rust-api.md` (Rust) · run `gen_all_docs.py` to regenerate
 - **API refs**: `docs/API/lua-api.md` (Lua) · `docs/API/rust-api.md` (Rust) · run `gen_all_docs.py` to regenerate
 - **Assets**: All artwork in `assets/` is maintained manually. Do not run Python generators.
 - **Distribution**: `powershell tools/dist/dist.ps1` / `bash tools/dist/dist.sh`
