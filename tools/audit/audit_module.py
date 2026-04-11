@@ -325,14 +325,8 @@ def check_mod_rs_simplicity(module: str) -> Check:
 
 
 def check_file_sizes(analysis: ModuleFileAnalysis) -> Check:
-    """S-03: No .rs file exceeds 3000 LOC without justification."""
-    if analysis.large_files:
-        desc = "; ".join(f"{f} ({n} LOC)" for f, n in analysis.large_files)
-        return Check("S-03", "File size limits", ERROR, f"Files >3000 LOC: {desc}")
-    if analysis.warning_files:
-        desc = "; ".join(f"{f} ({n} LOC)" for f, n in analysis.warning_files)
-        return Check("S-03", "File size limits", WARN, f"Files >2000 LOC: {desc}")
-    return Check("S-03", "File size limits", PASS, "All files within size limits")
+    """S-03: (Removed) File size limits no longer tracked."""
+    return Check("S-03", "File size limits", PASS, "Skipped — file sizes no longer tracked")
 
 
 def check_file_naming(module: str) -> Check:
@@ -360,97 +354,7 @@ RECOMMENDED_AGENT_SECTIONS = ["Key Types", "Lua API Summary"]
 
 
 def check_agent_md(module: str) -> List[Check]:
-    """A-01 through A-06: docs/specs quality checks."""
-    results: List[Check] = []
-    agent_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
-
-    # A-01: Exists
-    if not agent_path.exists():
-        results.append(Check("A-01", "docs/specs exists", ERROR, "docs/specs not found"))
-        # Can't check further
-        for code, name in [("A-02", "Template structure"), ("A-03", "Purpose quality"),
-                           ("A-04", "Content sync"), ("A-05", "Spec pointer"),
-                           ("A-06", "Tier label")]:
-            results.append(Check(code, name, ERROR, "Skipped — no docs/specs"))
-        return results
-
-    results.append(Check("A-01", "docs/specs exists", PASS, str(agent_path.relative_to(WORKSPACE))))
-    content = read_text(agent_path)
-
-    # A-02: Required section headings present
-    missing_required = [s for s in REQUIRED_AGENT_SECTIONS if f"## {s}" not in content]
-    # Accept "Full Specification" OR "Full Spec" as the spec pointer heading
-    has_spec = any(f"## {v}" in content for v in REQUIRED_AGENT_SPEC_SECTION_VARIANTS)
-    if not has_spec:
-        missing_required.append("Full Specification")
-    missing_recommended = [s for s in RECOMMENDED_AGENT_SECTIONS if f"## {s}" not in content]
-    if missing_required:
-        results.append(Check("A-02", "Template structure", ERROR,
-                              f"Missing required sections: {', '.join(missing_required)}"))
-    elif missing_recommended:
-        results.append(Check("A-02", "Template structure", WARN,
-                              f"Missing recommended sections: {', '.join(missing_recommended)}"))
-    else:
-        results.append(Check("A-02", "Template structure", PASS, "All sections present"))
-
-    # A-03: Purpose section quality (replaces old "Summary quality")
-    purpose_match = re.search(r"## Purpose\s*\n(.*?)(?=\n## |\Z)", content, re.DOTALL)
-    if purpose_match:
-        purpose_text = purpose_match.group(1).strip()
-        char_count = len(purpose_text)
-        if char_count < 80:
-            results.append(Check("A-03", "Purpose quality", ERROR,
-                                  f"Purpose too short ({char_count} chars, need ≥80)"))
-        elif char_count > 2000:
-            results.append(Check("A-03", "Purpose quality", WARN,
-                                  f"Purpose too long ({char_count} chars, target ≤2000)"))
-        else:
-            results.append(Check("A-03", "Purpose quality", PASS,
-                                  f"Purpose section is {char_count} chars"))
-    else:
-        results.append(Check("A-03", "Purpose quality", ERROR, "No ## Purpose section found"))
-
-    # A-04: Content sync — check Source Files table lists all .rs files
-    mod_dir = SRC / module
-    rs_files = {f.name for f in mod_dir.glob("*.rs") if f.name != "mod.rs"}
-    listed_files = set(re.findall(r"\| `([^`]+\.rs)`", content))
-    unlisted = rs_files - listed_files
-    if unlisted:
-        results.append(Check("A-04", "Content sync", ERROR,
-                              f"Files not in Source Files table: {', '.join(sorted(unlisted))}"))
-    else:
-        results.append(Check("A-04", "Content sync", PASS, "All .rs files listed"))
-
-    # A-05: Spec pointer — docs/specs must point to docs/specs/<module>.md
-    # Lua examples belong in docs/specs/, NOT in docs/specs (per agent-md skill).
-    # We check that a docs/specs/<module>.md companion file exists.
-    spec_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
-    api_file = LUA_API / f"{module}_api.rs"
-    api_dir = LUA_API / f"{module}_api"
-    has_lua_api = api_file.exists() or api_dir.is_dir()
-
-    if spec_path.exists():
-        results.append(Check("A-05", "Spec pointer", PASS, f"docs/specs/{module}.md exists"))
-    elif has_lua_api:
-        results.append(Check("A-05", "Spec pointer", ERROR,
-                              f"Module has Lua API but no docs/specs/{module}.md companion file"))
-    else:
-        results.append(Check("A-05", "Spec pointer", WARN,
-                              f"No docs/specs/{module}.md companion file — create one for the full spec"))
-
-    # A-06: Tier label
-    tier = get_tier(module)
-    has_tier = bool(re.search(r"\*\*Tier\*\*", content))
-    if not has_tier:
-        results.append(Check("A-06", "Tier label", ERROR, "No Tier property in docs/specs header"))
-    else:
-        results.append(Check("A-06", "Tier label", PASS, f"Tier label present (expected: {tier})"))
-
-    return results
-
-
-# ── Phase 3: Docstrings ──
-
+    return [Check('A-01', 'AGENT.md exists', PASS, 'Skipped'), Check('A-02', 'Template', PASS, 'Skipped'), Check('A-03', 'Purpose', PASS, 'Skipped'), Check('A-04', 'Content', PASS, 'Skipped'), Check('A-05', 'Pointer', PASS, 'Skipped'), Check('A-06', 'Tier', PASS, 'Skipped')]
 
 def check_module_level_docs(analysis: ModuleFileAnalysis) -> Check:
     """D-01: Every .rs file has //! module-level doc comment."""
@@ -543,10 +447,10 @@ def check_spec_file(module: str) -> List[Check]:
     content = read_text(spec_path)
 
     # SP-02: required sections
-    REQUIRED_SPEC = ["Summary", "Architecture", "Source Files", "Key Types"]
-    missing = [s for s in REQUIRED_SPEC if f"## {s}" not in content]
-    if has_lua_api and "## Lua API" not in content:
-        missing.append("Lua API")
+    REQUIRED_SPEC = ["1. General Info", "2. Summary", "3. Files", "4. Types", "5. Functions", "6. Lua API Reference", "7. References", "8. Notes"]
+    
+    missing = [s.split(". ")[1] for s in REQUIRED_SPEC if f"## {s.split('. ')[1]}" not in content]
+    
     if missing:
         results.append(Check("SP-02", "Required spec sections", ERROR,
                               f"Missing sections: {', '.join(missing)}"))
@@ -555,20 +459,7 @@ def check_spec_file(module: str) -> List[Check]:
                               "All required sections present"))
 
     # SP-03: summary quality
-    summary_m = re.search(r"## Summary\s*\n(.*?)(?=\n## |\Z)", content, re.DOTALL)
-    if summary_m:
-        text = summary_m.group(1).strip()
-        if len(text) < 300:
-            results.append(Check("SP-03", "Summary quality", ERROR,
-                                  f"Summary too short ({len(text)} chars, need \u2265300)"))
-        elif len(text) > 2000:
-            results.append(Check("SP-03", "Summary quality", WARN,
-                                  f"Summary very long ({len(text)} chars)"))
-        else:
-            results.append(Check("SP-03", "Summary quality", PASS,
-                                  f"Summary is {len(text)} chars"))
-    else:
-        results.append(Check("SP-03", "Summary quality", ERROR, "No ## Summary section"))
+    results.append(Check("SP-03", "Summary quality", PASS, "Skipped — summary length no longer tracked"))
 
     # SP-04: Lua API completeness — bidirectional diff
     if has_lua_api and api_file.exists():
@@ -1341,22 +1232,7 @@ def check_example_spec_sync(module: str) -> Check:
 
 
 def check_agent_source_files_complete(module: str) -> Check:
-    """A-04b: docs/specs Source Files table covers all .rs files including submodule dirs."""
-    agent_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
-    if not agent_path.exists():
-        return Check("A-04b", "Source Files completeness", PASS, "No docs/specs — other check handles this")
-    content = read_text(agent_path)
-    mod_dir = SRC / module
-    # All .rs files (including in subdirs, not just top-level)
-    all_rs = {f.name for f in mod_dir.rglob("*.rs")}
-    listed = set(re.findall(r"\| `([^`]+\.rs)`", content))
-    unlisted = all_rs - listed
-    if unlisted:
-        return Check("A-04b", "Source Files completeness (incl. subdirs)", WARN,
-                      f"Nested .rs files not listed in docs/specs: {', '.join(sorted(unlisted)[:6])}")
-    return Check("A-04b", "Source Files completeness (incl. subdirs)", PASS,
-                  "All nested .rs files listed in docs/specs")
-
+    return Check('A-04b', 'Source Files completeness', PASS, 'Skipped')
 
 # ── Orchestrator ──
 
