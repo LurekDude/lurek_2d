@@ -39,12 +39,6 @@ pub mod texture;
 /// CPU-side bin-packing texture atlas using shelf algorithm.
 pub mod texture_atlas;
 
-/// 2D camera system: viewport, scaling, zoom, scrolling.
-pub mod camera;
-/// Visual effects pipeline: post-processing, overlays, weather, atmosphere.
-pub mod effect;
-/// 2D lighting system: lights, shadows, occluders, blend modes.
-pub mod light;
 pub use canvas::Canvas;
 pub use decal_surface::DecalSurface;
 pub use draw_layer::DrawLayer;

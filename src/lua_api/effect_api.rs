@@ -6,7 +6,7 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::render::effect::{
+use crate::effect::{
     ImageEffect, Overlay, PostFxEffect, PostFxEffectType, PostFxStack, WeatherType,
 };
 

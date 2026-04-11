@@ -1154,7 +1154,7 @@ impl LunaApp {
         let no_meshes: SlotMap<MeshKey, crate::render::Mesh> = SlotMap::with_key();
         let no_shaders: SlotMap<ShaderKey, crate::render::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
-        let no_lights = crate::render::light::light_world::LightWorld::new();
+        let no_lights = crate::light::light_world::LightWorld::new();
         let splash_textures = branding.map_or(&empty_textures, |assets| &assets.textures);
         if let Err(e) = renderer.render_frame(
             surface,
@@ -1222,7 +1222,7 @@ impl LunaApp {
         let no_meshes: SlotMap<MeshKey, crate::render::Mesh> = SlotMap::with_key();
         let no_shaders: SlotMap<ShaderKey, crate::render::Shader> = SlotMap::with_key();
         let default_filter = ("linear".to_string(), "linear".to_string(), 1);
-        let no_lights = crate::render::light::light_world::LightWorld::new();
+        let no_lights = crate::light::light_world::LightWorld::new();
         if let Err(e) = renderer.render_frame(
             surface,
             &cmds,

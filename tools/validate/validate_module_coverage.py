@@ -29,12 +29,6 @@ SPECS_README = SPECS / "README.md"
 # from the "must have AGENT.md" check because they are not domain modules.
 INFRA_MODULES = {"lua_api", "bin"}
 
-# These specs exist for Lua API namespaces whose Rust source lives as
-# submodules inside another top-level src/ directory (e.g. src/render/camera/).
-# They have their own user-facing lurek.* namespace so they get their own spec.
-# The validator must not flag them as orphans.
-LUA_NAMESPACE_SPECS = {"camera", "effect", "light"}
-
 
 def main():
     parser = argparse.ArgumentParser(description="Validate module spec/AGENT.md coverage")
@@ -56,15 +50,10 @@ def main():
     src_set = set(src_modules)
     spec_set = set(spec_files)
 
-    # Specs that exist for Lua API namespaces whose Rust code lives as a
-    # submodule inside another src/ dir. They are NOT orphans.
-    valid_non_src_specs = LUA_NAMESPACE_SPECS & spec_set
-
     # --- Report ---
     missing_spec = sorted(src_set - spec_set)
     missing_agent = sorted(m for m in src_modules if not (SRC / m / "AGENT.md").exists())
-    # Only flag as orphan if it's not a known Lua namespace spec
-    orphan_specs = sorted((spec_set - src_set) - LUA_NAMESPACE_SPECS)
+    orphan_specs = sorted(spec_set - src_set)
 
     has_errors = False
 
@@ -89,10 +78,6 @@ def main():
             print(f"  MISSING_AGENT  src/{m}/AGENT.md")
         print()
 
-    if valid_non_src_specs:
-        print(f"INFO — Lua namespace specs (Rust code lives in src/render/ subfolders,"
-              f" but each has its own lurek.* API): {sorted(valid_non_src_specs)}")
-        print()
 
     if not has_errors:
         print(f"PASS — All {len(src_modules)} src/ modules have AGENT.md and docs/specs/*.md")
@@ -105,8 +90,7 @@ def main():
           f"{len(missing_agent)} missing AGENT.md")
 
     if args.fix_readme:
-        # Include src modules + infra + lua namespace specs in README
-        all_entries = sorted(set(src_modules) | INFRA_MODULES | LUA_NAMESPACE_SPECS)
+        all_entries = sorted(set(src_modules) | INFRA_MODULES)
         _rewrite_readme(all_entries)
 
     return 1 if has_errors else 0

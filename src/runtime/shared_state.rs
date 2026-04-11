@@ -16,7 +16,7 @@ use winit::window::Window;
 
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
-use crate::render::camera::Camera;
+use crate::camera::Camera;
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
 };
@@ -25,7 +25,7 @@ use crate::render::gpu_renderer::RenderStats;
 use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
 use crate::render::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
-use crate::render::light::LightWorld;
+use crate::light::LightWorld;
 use crate::particle::ParticleSystem;
 use crate::event::EventQueue;
 use crate::timer::Clock;

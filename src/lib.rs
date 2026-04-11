@@ -115,6 +115,12 @@ pub mod input;
 pub mod log;
 /// 2D GPU rendering pipeline, draw commands, and graphics types.
 pub mod render;
+/// 2D camera system: viewport, scaling, zoom, smooth follow, dead-zone, and shake.
+pub mod camera;
+/// Visual effects pipeline: post-processing, overlays, weather, and atmosphere.
+pub mod effect;
+/// 2D lighting system: lights, shadows, occluders, and blend modes.
+pub mod light;
 /// Core engine lifecycle, configuration, and error types.
 pub mod runtime;
 /// Retained-mode widget UI system: buttons, panels, text fields, layouts.

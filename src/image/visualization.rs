@@ -5,7 +5,7 @@
 //! accepting the domain object by reference.
 
 use crate::animation::Animation;
-use crate::render::camera::Camera2D;
+use crate::camera::Camera2D;
 use super::ImageData;
 
 /// Render an animation's frame grid as a strip of numbered cells.
