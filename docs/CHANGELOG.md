@@ -18,6 +18,13 @@ Always update this file **in the same commit** as the change. Use the commit typ
 
 ---
 
+## [0.7.3] — 2026-04-11
+### Fixed
+- Deleted `docs/specs/camera.md`, `docs/specs/effect.md`, `docs/specs/light.md` — these are submodules inside `src/render/`, not top-level modules, and should not have standalone specs; their architecture is documented in `docs/specs/render.md`.
+- Rewrote `docs/specs/README.md` to exactly match actual `src/` top-level module directories (44 domain modules + 2 infra entries: `bin`, `lua_api`).
+### Added
+- `tools/validate/validate_module_coverage.py` — new script that validates every `src/<module>/` has both an `AGENT.md` and a `docs/specs/<module>.md`, and reports any orphan specs with no matching source directory. Run: `python tools/validate/validate_module_coverage.py [--fix-readme]`.
+
 ## [0.7.2] — 2026-04-11
 ### Fixed
 - Restored incorrectly deleted spec files `docs/specs/camera.md`, `docs/specs/effect.md`, `docs/specs/light.md` — these modules still exist as active submodules under `src/render/camera/`, `src/render/effect/`, `src/render/light/` with dedicated Lua APIs (`camera_api.rs`, `effect_api.rs`, `light_api.rs`).

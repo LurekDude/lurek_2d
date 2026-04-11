@@ -24,14 +24,12 @@ You **must** update **all** of the following in the same commit:
 | `content/library/` | Update Lunasome modules that depend on the changed API |
 
 ## Modules
-
 - [ai](ai.md)
 - [animation](animation.md)
 - [app](app.md)
 - [audio](audio.md)
 - [automation](automation.md)
 - [bin](bin.md)
-- [camera](camera.md) *(submodule of `src/render/camera/`)*
 - [compute](compute.md)
 - [data](data.md)
 - [dataframe](dataframe.md)
@@ -39,15 +37,14 @@ You **must** update **all** of the following in the same commit:
 - [devtools](devtools.md)
 - [docs](docs.md)
 - [ecs](ecs.md)
-- [effect](effect.md) *(submodule of `src/render/effect/`)*
 - [event](event.md)
 - [filesystem](filesystem.md)
 - [graph](graph.md)
 - [i18n](i18n.md)
 - [image](image.md)
 - [input](input.md)
-- [light](light.md) *(submodule of `src/render/light/`)*
 - [log](log.md)
+- [lua_api](lua_api.md)
 - [math](math.md)
 - [minimap](minimap.md)
 - [mods](mods.md)
