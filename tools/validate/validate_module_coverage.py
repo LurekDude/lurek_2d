@@ -25,10 +25,15 @@ SPECS = ROOT / "docs" / "specs"
 SPECS_README = SPECS / "README.md"
 
 # These src/ subdirectories are infrastructure / bridge layers.
-# They are NOT top-level domain modules but their specs are still valid.
-# Exclude them from the src_modules scan so they don't generate
-# "missing spec" or "orphan spec" false positives.
+# They have dedicated specs (bin.md, lua_api.md) but are excluded
+# from the "must have AGENT.md" check because they are not domain modules.
 INFRA_MODULES = {"lua_api", "bin"}
+
+# These specs exist for Lua API namespaces whose Rust source lives as
+# submodules inside another top-level src/ directory (e.g. src/render/camera/).
+# They have their own user-facing lurek.* namespace so they get their own spec.
+# The validator must not flag them as orphans.
+LUA_NAMESPACE_SPECS = {"camera", "effect", "light"}
 
 
 def main():
@@ -51,10 +56,15 @@ def main():
     src_set = set(src_modules)
     spec_set = set(spec_files)
 
+    # Specs that exist for Lua API namespaces whose Rust code lives as a
+    # submodule inside another src/ dir. They are NOT orphans.
+    valid_non_src_specs = LUA_NAMESPACE_SPECS & spec_set
+
     # --- Report ---
     missing_spec = sorted(src_set - spec_set)
     missing_agent = sorted(m for m in src_modules if not (SRC / m / "AGENT.md").exists())
-    orphan_specs = sorted(spec_set - src_set)
+    # Only flag as orphan if it's not a known Lua namespace spec
+    orphan_specs = sorted((spec_set - src_set) - LUA_NAMESPACE_SPECS)
 
     has_errors = False
 
@@ -79,6 +89,11 @@ def main():
             print(f"  MISSING_AGENT  src/{m}/AGENT.md")
         print()
 
+    if valid_non_src_specs:
+        print(f"INFO — Lua namespace specs (Rust code lives in src/render/ subfolders,"
+              f" but each has its own lurek.* API): {sorted(valid_non_src_specs)}")
+        print()
+
     if not has_errors:
         print(f"PASS — All {len(src_modules)} src/ modules have AGENT.md and docs/specs/*.md")
 
@@ -90,25 +105,26 @@ def main():
           f"{len(missing_agent)} missing AGENT.md")
 
     if args.fix_readme:
-        _rewrite_readme(src_modules + sorted(INFRA_MODULES))
+        # Include src modules + infra + lua namespace specs in README
+        all_entries = sorted(set(src_modules) | INFRA_MODULES | LUA_NAMESPACE_SPECS)
+        _rewrite_readme(all_entries)
 
     return 1 if has_errors else 0
 
 
-def _rewrite_readme(src_modules):
-    """Rewrite docs/specs/README.md module list to match actual src/ dirs."""
+def _rewrite_readme(all_entries):
+    """Rewrite docs/specs/README.md module list."""
     existing = SPECS_README.read_text(encoding="utf-8")
-    # Find the marker line and replace everything after it
     marker = "## Modules\n"
     if marker not in existing:
         print("WARNING: Could not find '## Modules' section in README.md — skipping rewrite")
         return
 
     prefix = existing[: existing.index(marker) + len(marker)]
-    links = "\n".join(f"- [{m}]({m}.md)" for m in sorted(src_modules))
+    links = "\n".join(f"- [{m}]({m}.md)" for m in sorted(all_entries))
     new_content = prefix + links + "\n"
     SPECS_README.write_text(new_content, encoding="utf-8")
-    print(f"\nREWROTE docs/specs/README.md — {len(src_modules)} module entries")
+    print(f"\nREWROTE docs/specs/README.md — {len(all_entries)} entries")
 
 
 if __name__ == "__main__":
