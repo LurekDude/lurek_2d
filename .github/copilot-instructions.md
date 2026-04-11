@@ -48,19 +48,24 @@ cargo test && cargo clippy -- -D warnings
 
 ## Architecture
 
-Lurek2D uses a strictly layered architecture enforced by Rust's module visibility rules and the import direction rules in `docs/architecture/engine-architecture.md`. No lower tier may import a higher tier; all cross-tier flows go upward only.
+Lurek2D organises its Rust source into **five responsibility groups**. The one binding invariant is **no cycles, ever** — the module import graph must be a DAG. See `docs/architecture/philosophy.md` (Zen of Lurek 2.0) and `docs/architecture/engine-architecture.md` for the authoritative rules.
 
-**Baseline** — `src/math/` (leaf, no internal deps) provides Vec2, Mat3, Rect, Color, noise, easing, random, transform, bezier, and triangulation. `src/engine/` provides `SharedState`, `EngineError`, `Config`, `App`, `RunState`, and all typed `SlotMap` resource keys.
+**Foundations** — pure algorithms and data, no render/audio/input/Lua deps:
+`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`
 
-**Tier 1** (Core subsystems — Baseline imports only, no Tier 1 ↔ Tier 1 cross-imports):
-`graphics`, `audio`, `physics`, `input`, `timer`, `filesystem`, `compute`, `data`, `image`, `sound`, `event`, `entity`, `window`, `thread`, `animation`, `camera`, `automation`
+**Core Runtime** — engine lifecycle, resource registry, sandboxed I/O, asset loading, timing, events, concurrency:
+`core`, `world`, `filesystem`, `assets`, `time`, `event`, `task`, `network`
 
-**Tier 2** (Engine extensions — Baseline + Tier 1, no Tier 2 ↔ Tier 2 cross-imports):
-`particle`, `tilemap`, `scene`, `savegame`, `modding`, `graph`, `pathfinding`, `ai`, `dataframe`, `gui`, `minimap`, `overlay`, `postfx`, `terminal`
+**Platform Services** — OS-facing backends, each behind a pure-Rust contract:
+`render`, `audio`, `physics`, `input`, `image`, `window`
 
-**Bridge** — `src/lua_api/` registers the `lurek.*` Lua API. It may import all Rust tiers. Domain modules must **never** import `lua_api`.
+**Feature Systems** — game-domain services; same-group imports allowed when acyclic:
+`entity`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `nav`, `save`, `mods`, `i18n`, `automation`
 
-**Tier 3 — Lunasome** (`content/library/`) — Pure-Lua standard libraries that consume only the public `lurek.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
+**Edge/Integration** — composition root and scripting bridge; nothing below imports these:
+`scripting` (`lua_api`, registers `lurek.*`), `app` (boot + event loop), `devtools`, `debugbridge`, `entrypoints`
+
+**Lunasome** (`content/library/`) — Pure-Lua standard libraries that consume only the public `lurek.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
 
 **Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
 
@@ -242,9 +247,9 @@ Use scoped `--test <module>` during development. Full `cargo test` only at commi
 ### Repository Layout
 
 ```
-src/              Rust source — Baseline, Tier 1, Tier 2, and lua_api bridge
+src/              Rust source — Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration
 docs/specs/       Full technical specifications for every src/<module>/ (one <module>.md per module)
-content/library/          Tier 3 Lunasome — pure-Lua libraries (no Rust engine internals)
+content/library/          Lunasome — pure-Lua libraries (no Rust engine internals)
 content/demos/            Playable Lua game demos — each has main.lua and optional conf.lua
 content/examples/         Single-file Lua API usage scripts — one per lurek.* module
 tests/            Rust + Lua test suites (rust/unit/, rust/stress/, rust/golden/, rust/config/, rust/security/, rust/ext/, lua/unit/, lua/content/library/, lua/integration/, lua/content/demos/)

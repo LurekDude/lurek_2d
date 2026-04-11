@@ -71,15 +71,15 @@ Lurek2D is a rebellion against bloated game engines. The project symbol tells th
 
 Lurek2D organises its Rust source into **five responsibility groups**. This is a **logical dependency model** — most modules live in flat `src/<module>/` directories. Group membership is determined by what a module imports and what reasons it has to change.
 
-The central invariant is **Principle 1 of the Zen of Lurek 2.0**: the module import graph must be a DAG — no cycles, ever. Same-group imports are allowed when they are stable and acyclic (see Principle 6).
+The central invariant is **Rule 1 of the Zen of Lurek 2.0**: the module import graph must be a DAG — no cycles, ever. Same-group imports are allowed when they are stable and acyclic (see Rule 6).
 
 | Group | Path | Role |
 |---|---|---|
 | **Foundations** | `src/math/`, `src/log/`, `src/data/`, `src/serial/`, `src/compute/`, `src/dataframe/`, `src/graph/`, `src/procgen/`, `src/patterns/` | Pure algorithms and data types — no render, no audio, no input, no Lua |
-| **Core Runtime** | `src/engine/` (→ `core` + `world`), `src/filesystem/`, `src/timer/`, `src/event/`, `src/thread/`, `src/network/` | Engine lifecycle, resource registry, sandboxed I/O, timing, events, concurrency |
+| **Core Runtime** | `src/core/`, `src/world/`, `src/filesystem/`, `src/assets/`, `src/time/`, `src/event/`, `src/task/`, `src/network/` | Engine lifecycle, resource registry, sandboxed I/O, asset loading, timing, events, concurrency |
 | **Platform Services** | `src/window/`, `src/input/`, `src/render/`, `src/image/`, `src/audio/`, `src/physics/` | OS-facing backends — each exposes a pure-Rust contract, not a backend-specific type |
-| **Feature Systems** | `src/ecs/`, `src/scene/`, `src/animation/`, `src/tween/`, `src/particle/`, `src/tilemap/`, `src/parallax/`, `src/minimap/`, `src/raycaster/`, `src/gui/`, `src/terminal/`, `src/ai/`, `src/pathfind/`, `src/save/`, `src/mods/`, `src/i18n/`, `src/automation/` | Game-domain services built on the layers below |
-| **Edge/Integration** | `src/lua_api/`, `src/app/` (boot + event loop), `src/devtools/`, `src/debugbridge/` | Composition root, scripting bridge, tooling — nothing in the engine imports these |
+| **Feature Systems** | `src/entity/`, `src/scene/`, `src/animation/`, `src/tween/`, `src/particle/`, `src/tilemap/`, `src/parallax/`, `src/minimap/`, `src/raycaster/`, `src/ui/`, `src/terminal/`, `src/ai/`, `src/nav/`, `src/save/`, `src/mods/`, `src/i18n/`, `src/automation/` | Game-domain services built on the groups below |
+| **Edge/Integration** | `src/scripting/` (`lua_api`), `src/app/`, `src/devtools/`, `src/debugbridge/`, `src/entrypoints/` | Composition root, scripting bridge, tooling — nothing in the engine imports these |
 
 ### Boundary Rules
 
@@ -106,7 +106,7 @@ The five groups form a DAG. Arrows show the **only allowed import direction** (�
                   ▼
   ┌───────────────────────────────────────────────────────────┐
   │            EDGE / INTEGRATION LAYER                       │
-  │   src/lua_api/  (scripting bridge, registers lurek.*)     │
+  │   src/scripting/  (lua_api bridge, registers lurek.*)     │
   │   src/app/      (boot sequence + event loop — top-level)  │
   │   src/devtools/ src/debugbridge/  (tooling, edge only)    │
   └───────────────────────────┬───────────────────────────────┘
@@ -114,8 +114,8 @@ The five groups form a DAG. Arrows show the **only allowed import direction** (�
                               ▼
   ┌───────────────────────────────────────────────────────────┐
   │              FEATURE SYSTEMS GROUP                        │
-  │   ecs, scene, animation, tween, particle, tilemap,        │
-  │   parallax, minimap, raycaster, gui, terminal, ai,        │
+  │   entity, scene, animation, tween, particle, tilemap,        │
+  │   parallax, minimap, raycaster, ui, terminal, ai,        │
   │   nav, save, mods, i18n, automation                       │
   └───────────────────────────┬───────────────────────────────┘
                               │ imports
@@ -128,7 +128,7 @@ The five groups form a DAG. Arrows show the **only allowed import direction** (�
                               ▼
   ┌───────────────────────────────────────────────────────────┐
   │              CORE RUNTIME GROUP                           │
-  │   engine (→core + world), filesystem, time, event,       │
+  │   core, world, filesystem, assets, time, event,       │
   │   task, network                                           │
   └───────────────────────────┬───────────────────────────────┘
                               │ imports
@@ -198,16 +198,16 @@ All other layers may freely import `math`.
 
 Core Runtime modules own the **engine lifecycle, resource registry, sandboxed I/O, timing, events, and concurrency**. They may import Foundations. They must not import Platform Services, Feature Systems, or Edge/Integration.
 
-> **Architectural note**: `src/engine/` currently combines config, errors, typed handles, `SharedState`, and boot logic in one crate. The target split is `core` (pure types — errors, config, resource keys, traits) and `world` (runtime state — SharedState, resource pools, registries). `app/` (boot sequence and event loop) moves to the Edge/Integration group. This migration is in progress.
+> **Architectural note**: `src/core/` owns pure types (errors, config, resource keys, traits). `src/world/` owns runtime state (SharedState, resource pools, registries). `src/app/` (boot sequence and event loop) is in the Edge/Integration group.
 
 | Module | Path | Responsibility |
 |---|---|---|
-| `engine` → `core` | `src/engine/` | `EngineError`, `Config`, typed SlotMap key types (`TextureKey`, `FontKey`, etc.) |
-| `engine` → `world` | `src/engine/` | `SharedState` (resource pools, render commands, subsystem handles) |
+| `core` | `src/core/` | `EngineError`, `Config`, typed SlotMap key types (`TextureKey`, `FontKey`, etc.) |
+| `world` | `src/world/` | `SharedState` (resource pools, render commands, subsystem handles) |
 | `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
-| `time` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
+| `time` | `src/time/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
 | `event` | `src/event/` | Event queue and polling primitives |
-| `task` | `src/thread/` | Background Rust threads and typed MPMC Channel communication |
+| `task` | `src/task/` | Background Rust threads and typed MPMC Channel communication |
 | `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
 
 ### `engine/` — Runtime Types and SharedState
@@ -278,7 +278,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 | `lurek.procgen` | `procgen_api.rs` | Procedural content generation algorithms |
 | `lurek.network` | `network_api.rs` | UDP networking, packet framing |
 | `lurek.minimap` | `minimap_api.rs` | Grid-based minimap extraction and FOV masking |
-| `lurek.nav` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields — powered by `src/pathfind/` |
+| `lurek.nav` | `pathfinding_api.rs` | Navigation grids, A★, HPA★, flow fields — powered by `src/nav/` |
 | `lurek.terminal` | `terminal_api.rs` | In-game developer terminal / REPL |
 | `lurek.pipeline` | `pipeline_api.rs` | DAG pipeline orchestration and caching |
 | `lurek.patterns` | `patterns_api.rs` | Game programming design patterns toolkit |
@@ -313,7 +313,7 @@ Platform Services modules are the engine's OS-facing backends — rendering, aud
 | `debugbridge` | `src/debugbridge/` | JSON-over-TCP debug server for VS Code extension and MCP remote inspection |
 | `devtools` | `src/devtools/` | Engine and game diagnostics: structured runtime monitoring and performance analysis |
 | `docs` | `src/docs/` | API documentation catalog powering IntelliSense, MCP tools, and doc generators |
-| `ecs` | `src/ecs/` | Lightweight ECS primitives and entity helpers |
+| `entity` | `src/entity/` | Lightweight ECS primitives and entity helpers |
 | `event` | `src/event/` | Event queue and polling primitives |
 | `filesystem` | `src/filesystem/` | Sandboxed game filesystem (GameFS), VirtualFS, archive mounting |
 | `render` | `src/render/` | GPU rendering pipeline, draw commands, textures, fonts, batching, shaders |
@@ -323,8 +323,8 @@ Platform Services modules are the engine's OS-facing backends — rendering, aud
 | `log` | `src/log/` | Structured Lua-script logging at configurable severity levels |
 | `patterns` | `src/patterns/` | Pure-Rust game-programming design patterns (FSM, observer, service locator, etc.) |
 | `physics` | `src/physics/` | Rigid bodies, shapes, collisions, joints, raycasting via rapier2d |
-| `task` | `src/thread/` | Background Rust threads and Channel communication |
-| `time` | `src/timer/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
+| `task` | `src/task/` | Background Rust threads and Channel communication |
+| `time` | `src/time/` | Frame timing (Clock), FPS tracking, scheduled callbacks |
 | `tween` | `src/tween/` | Property animation system: tweens, sequences, parallel groups, and easing functions |
 | `window` | `src/window/` | Window lifecycle and state abstraction |
 
@@ -343,14 +343,14 @@ Feature Systems modules are game-domain services built on the groups below them.
 | `dataframe` | `src/dataframe/` | Column-major tabular data structures |
 | `fx` | `src/fx/` | Composable post-processing visual effects pipeline |
 | `graph` | `src/graph/` | Directed graphs, flow simulation, graph algorithms |
-| `gui` | `src/gui/` | Retained-mode widget UI primitives |
+| `ui` | `src/ui/` | Retained-mode widget UI primitives |
 | `light` | `src/light/` | CPU-side 2D dynamic lighting data model (point, spot, directional) |
 | `minimap` | `src/minimap/` | Minimap extraction, FOV masking, tile sampling |
 | `mods` | `src/mods/` | Mod discovery, dependency resolution, load ordering |
 | `network` | `src/network/` | UDP networking via ENet: peer-to-peer and client-server multiplayer |
 | `parallax` | `src/parallax/` | CPU-driven multi-layer parallax background system with tiling, autoscroll, and per-layer blend modes |
 | `particle` | `src/particle/` | Emitter-based 2D particle systems |
-| `nav` | `src/pathfind/` | Navigation grids, A★, HPA★, flow fields |
+| `nav` | `src/nav/` | Navigation grids, A★, HPA★, flow fields |
 | `pipeline` | `src/pipeline/` | DAG-based data pipeline orchestration and caching |
 | `procgen` | `src/procgen/` | Procedural content generation: dungeons, terrain, noise, L-systems |
 | `raycaster` | `src/raycaster/` | DDA grid raycasting for Wolfenstein-style retro rendering |
