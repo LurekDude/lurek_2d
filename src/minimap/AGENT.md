@@ -1,44 +1,30 @@
-# `minimap` — Agent Reference
+﻿# minimap
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.minimap`                                       |
-| **Source**     | `src/minimap/`                                       |
-| **Rust Tests** | `tests/rust/game/minimap_tests.rs`                   |
-| **Lua Tests**  | `tests/lua/unit/test_minimap.lua`                    |
-| **Architecture** | —                                                  |
+## Module Info
+- Module name: `minimap`
+- Module group: `Feature Systems`
+- Spec path: `docs/specs/minimap.md`
+- Lua API path(s): `src/lua_api/minimap_api.rs`
+- Rust test path(s): `tests/rust/game/minimap_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_minimap.lua`, `tests/lua/evidence/test_evidence_minimap.lua`
 
-## Purpose
+## Module Purpose
+The `minimap` module provides a compact overhead representation of a larger game world. It stores terrain cells, fog-of-war state, tracked objects, temporary pings, persistent markers, and the current viewport rectangle so scripts can present navigational context without rebuilding that logic every frame.
 
-The `minimap` module provides a self-contained, grid-based minimap data model for overhead map displays commonly used in strategy, RPG, and open-world games. It is a **Tier 2 Engine Extension** that operates as a **pure CPU data-model module** — it has zero GPU or wgpu dependencies. All rendering responsibility is delegated to the `lua_api` bridge layer, which reads the minimap state and produces draw commands or texture uploads.
+It exists to centralize minimap state and coordinate conversion in one CPU-side system. That keeps world-to-minimap math, visibility bookkeeping, and ping or marker lifecycle out of UI code and out of unrelated gameplay modules.
 
-## Source Files
+It intentionally does not own input handling, camera control, or texture-backed rendering. The module produces draw-ready data and render commands, but the actual UI composition and event routing stay elsewhere.
 
-| File         | Purpose                                                                                  |
-|--------------|------------------------------------------------------------------------------------------|
-| `minimap.rs` | Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, zoom/pan, coordinate conversion, and time-based update. Includes `pings()` and `markers_iter()` accessors for sibling render modules. |
-| `render.rs`  | GPU render-command generation: `Minimap::generate_render_commands(screen_x, screen_y)` emits background, terrain cells (fog-dimmed), viewport outline, and ping circles. |
-| `types.rs`   | Supporting type definitions: `ColorMode` and `FogLevel` enums, `MinimapObjectType`, `MinimapObject`, `MinimapPing`, and `MinimapMarker` plain data structs. |
-| `mod.rs` | — |
+## Files
+- `mod.rs` - Declares the minimap submodules and re-exports the core minimap and support types.
+- `minimap.rs` - Implements the main `Minimap` state container, including terrain cells, fog, tracked objects, markers, pings, zoom, pan, and coordinate transforms.
+- `render.rs` - Generates render commands for the minimap background, cells, viewport rectangle, and animated pings.
+- `types.rs` - Defines shared enums and data records such as fog levels, color modes, objects, pings, and markers.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `Minimap` | Principal type for the `minimap` module. |
-| `ColorMode` | Principal type for the `minimap` module. |
-| `FogLevel` | Principal type for the `minimap` module. |
-| `MinimapObjectType` | Principal type for the `minimap` module. |
-| `MinimapObject` | Principal type for the `minimap` module. |
-| `MinimapPing` | Principal type for the `minimap` module. |
-| `MinimapMarker` | Principal type for the `minimap` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/minimap.md`](../../docs/specs/minimap.md)
-
-_Update both this file **and** `docs/specs/minimap.md` whenever source files, public types, or Lua bindings change._
+- `Minimap` - The main grid-based minimap model. It owns terrain, visibility, tracked entities, overlays, and minimap-space conversions.
+- `ColorMode` - Chooses how minimap cells are colored, such as terrain-driven versus owner-driven display.
+- `FogLevel` - Encodes whether a minimap cell is hidden, explored, or currently visible.
+- `MinimapObject` - A tracked world object projected onto the minimap with position, type, and owner metadata.
+- `MinimapPing` - A temporary animated alert marker used for events or attention cues.
+- `MinimapMarker` - A persistent named marker with descriptive text for locations of interest.

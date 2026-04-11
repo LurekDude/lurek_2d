@@ -1,54 +1,60 @@
-# `ai` — Agent Reference
+﻿# ai
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.ai`                                            |
-| **Source**      | `src/ai/`                                            |
-| **Rust Tests** | `tests/rust/unit/ai_tests.rs`                        |
-| **Lua Tests**  | `tests/lua/unit/test_ai.lua`                         |
-| **Architecture** | —                                                  |
+## Module Info
+- Module name: `ai`
+- Module group: `Feature Systems`
+- Spec path: `docs/specs/ai.md`
+- Lua API path(s): `src/lua_api/ai_api.rs`
+- Rust test path(s): `tests/rust/unit/ai_tests.rs`, `tests/rust/game/ai_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_ai.lua`, `tests/lua/golden/test_ai_golden.lua`, `tests/lua/integration/test_entity_ai.lua`, `tests/lua/integration/test_ai_physics.lua`, `tests/lua/integration/test_ai_pathfinding.lua`, `tests/lua/integration/test_ai_entity_scene.lua`, `tests/lua/stress/test_ai_stress.lua`
 
-## Purpose
+## Module Purpose
+The `ai` module is Lurek2D's gameplay decision-making toolkit. It brings together multiple AI paradigms including finite state machines, behavior trees, steering, GOAP, utility AI, Q-learning, squad formations, command queues, and blackboard-driven coordination so different game genres can pick the right model instead of being forced into one framework.
 
-The AI module provides a comprehensive, modular game-intelligence toolkit that Lua scripts can assemble to match the needs of each actor in a scene. Rather than committing to a single AI paradigm it offers five interchangeable decision models — finite state machines for reactive logic, behaviour trees for conditional priority behaviour, steering behaviours for smooth movement, GOAP for goal-oriented NPC planning, utility AI for scored multi-axis action selection, and tabular Q-learning for reinforcement learning — all managed through a central `AIWorld` registry that tracks agents, blackboards, and shared spatial structures.
+It exists to keep decision logic, action scoring, and agent coordination separate from entities, physics, and scripts that only want to consume the results. The module owns the reusable AI algorithms and shared data models; the Lua bridge exposes them, and game code decides how to wire them into actual actors.
 
-## Source Files
+It intentionally does not own pathfinding algorithms at the implementation level, rendering beyond optional debug helpers, or any authoritative scene or entity storage. It can reference pathfinding data and provide debug output, but world simulation and movement application stay outside the module.
 
-| File                | Purpose                                                                          |
-|---------------------|----------------------------------------------------------------------------------|
-| `mod.rs`            | Module declarations, re-exports from `crate::pathfind` (FlowField, Cell, PathGrid, InfluenceMap) |
-| `agent.rs`          | Autonomous agent with kinematic state (position, velocity) and pluggable decision models |
-| `behavior_tree.rs`  | Behavior tree with composite (Selector, Sequence, Parallel), decorator (Inverter, Repeater, Succeeder), and leaf (Action, Condition) nodes |
-| `blackboard.rs`     | Typed key-value store with optional parent chain for hierarchical lookup         |
-| `command_queue.rs`  | RTS-style ordered command queue with enqueue, push-front, replace, and cancel    |
-| `fsm.rs`            | Finite state machine with priority-ordered guarded transitions and lifecycle callbacks |
-| `goap.rs`           | Goal-Oriented Action Planning using A★ search over boolean world state           |
-| `qlearner.rs`       | Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning       |
-| `squad.rs`          | Multi-agent formation groups with offset computation (line, wedge, circle, column) |
-| `steering.rs`       | Reynolds-style steering behaviors with weighted or priority-based force combination |
-| `utility_ai.rs`     | Multi-axis utility scorer with response curves for action selection              |
-| `world.rs`          | Top-level AI container that owns agents, maintains name→index lookup, and provides global blackboard |
-| `render.rs`         | `StateMachine::generate_render_commands`, `StateMachine::draw_to_image`, `BehaviorTree::generate_render_commands`, `BehaviorTree::draw_to_image` — debug overlay (pure CPU) |
+## Files
+- `mod.rs` - Declares the AI submodules and re-exports the main decision-model and support types, including selected pathfinding-facing types.
+- `agent.rs` - Defines the core `Agent` record and the top-level decision-model selection enum used to attach different AI styles to an actor.
+- `behavior_tree.rs` - Implements behavior tree nodes, statuses, composite policies, and the execution model for hierarchical decision logic.
+- `blackboard.rs` - Provides a hierarchical key-value blackboard for local and shared AI state.
+- `command_queue.rs` - Implements queued AI commands with priorities, interruptibility, and callback integration.
+- `fsm.rs` - Defines finite state machine structures, state callbacks, and guarded transitions.
+- `goap.rs` - Implements GOAP planning primitives and planner search over world-state facts.
+- `qlearner.rs` - Provides a tabular Q-learning implementation for trainable action selection.
+- `render.rs` - Generates debug render output for AI state, plans, or decision structures when visual inspection is needed.
+- `squad.rs` - Defines squad grouping, formation handling, and shared blackboard coordination.
+- `steering.rs` - Implements movement steering behaviors such as seek, flee, arrive, wander, pursue, evade, and flocking.
+- `utility_ai.rs` - Implements utility-based action scoring with considerations and response curves.
+- `world.rs` - Defines `AIWorld`, the central registry and coordination surface for agents and shared AI state.
 
 ## Key Types
-| Type | Location | Purpose |
-|------|----------|---------|
-| \AIWorld\ | \src/ai/mod.rs\ | Root AI world managing all agents and planners |
-| \Agent\ | \src/ai/mod.rs\ | Game entity with assigned AI behaviours |
-| \Blackboard\ | \src/ai/blackboard.rs\ | Shared key-value store for inter-AI communication |
-| \StateMachine\ | \src/ai/fsm.rs\ | Finite state machine for agent behaviour scheduling |
-| \BehaviorTree\ | \src/ai/behavior_tree.rs\ | Hierarchical task network for agent decision-making |
-| \BTNode\ | \src/ai/behavior_tree.rs\ | Individual node in a behaviour tree |
-| \GOAPPlanner\ | \src/ai/goap.rs\ | Goal-Oriented Action Planning engine |
-| \InfluenceMap\ | \src/ai/influence_map.rs\ | 2D grid tracking factional influence scores |
-| \Squad\ | \src/ai/squad.rs\ | Group of agents sharing formation and coordination |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/ai.md`](../../docs/specs/ai.md)
-
-_Update both this file **and** `docs/specs/ai.md` whenever source files, public types, or Lua bindings change._
+- `AIWorld` - The central AI registry. It owns agents, shared blackboard access, and world-level coordination of AI state.
+- `Agent` - One autonomous actor record with movement state, limits, selected decision model, and local blackboard.
+- `DecisionModel` - Chooses which AI paradigm an `Agent` is currently using.
+- `StateMachine` - Finite state machine with named states and guarded transitions.
+- `StateCallbacks` - Bundles per-state lifecycle callbacks for FSM behavior.
+- `Transition` - One guarded edge between FSM states.
+- `BehaviorTree` - Hierarchical decision structure for composite, decorator, and leaf AI behavior.
+- `BTNode` - The behavior-tree node enum describing the actual tree shape.
+- `BTStatus` - The execution result returned by behavior-tree steps.
+- `ParallelPolicy` - Defines how parallel behavior-tree nodes determine success or failure.
+- `Blackboard` - Hierarchical key-value state store used for AI coordination and memory.
+- `BlackboardValue` - The value enum stored in a `Blackboard`.
+- `CommandQueue` - Ordered queue of AI commands waiting to run or interrupt one another.
+- `Command` - One queued AI command with priority and callback information.
+- `GOAPPlanner` - Planner that searches action sequences over world-state facts.
+- `GOAPAction` - One GOAP action with preconditions and effects.
+- `GOAPGoal` - Desired end-state description for GOAP planning.
+- `SteeringManager` - Combines steering behaviors to produce movement intent.
+- `SteeringBehaviorType` - Names the available steering behaviors.
+- `CombineMode` - Controls how multiple steering behaviors are merged.
+- `UtilityAI` - Scores candidate actions using considerations and response curves.
+- `Consideration` - One input dimension used in utility scoring.
+- `ResponseCurve` - The curve applied to a consideration value before scoring.
+- `UAAction` - A candidate action inside a utility-AI model.
+- `QLearner` - Tabular reinforcement learner for action value estimation.
+- `Squad` - Group-level AI container for formations and shared decisions.
+- `FormationType` - Identifies the supported squad formation patterns.

@@ -4,9 +4,9 @@
 //! render helpers that produce `ImageData` from their structs live here,
 //! accepting the domain object by reference.
 
+use super::ImageData;
 use crate::animation::Animation;
 use crate::camera::Camera2D;
-use super::ImageData;
 
 /// Render an animation's frame grid as a strip of numbered cells.
 ///
@@ -20,11 +20,7 @@ use super::ImageData;
 ///
 /// # Returns
 /// `ImageData`.
-pub fn draw_animation_frame_grid_to_image(
-    anim: &Animation,
-    cell_w: u32,
-    cell_h: u32,
-) -> ImageData {
+pub fn draw_animation_frame_grid_to_image(anim: &Animation, cell_w: u32, cell_h: u32) -> ImageData {
     let frame_count = anim.get_frame_count().max(1) as u32;
     let cols = frame_count.min(8);
     let rows = (frame_count + cols - 1) / cols;
@@ -49,7 +45,9 @@ pub fn draw_animation_frame_grid_to_image(
             (py + 1) as i32,
             cell_w - 2,
             cell_h - 2,
-            r / 4, g / 4, b / 4,
+            r / 4,
+            g / 4,
+            b / 4,
             255,
         );
         // Border
@@ -58,7 +56,14 @@ pub fn draw_animation_frame_grid_to_image(
         img.draw_rect(px as i32, py as i32, 1, cell_h, r, g, b, 255);
         img.draw_rect((px + cell_w - 1) as i32, py as i32, 1, cell_h, r, g, b, 255);
         let label = format!("{}", i);
-        img.draw_label(&label, (px + 4) as i32, (py + cell_h / 2 - 4) as i32, r, g, b);
+        img.draw_label(
+            &label,
+            (px + 4) as i32,
+            (py + cell_h / 2 - 4) as i32,
+            r,
+            g,
+            b,
+        );
     }
     img
 }
@@ -477,7 +482,8 @@ pub fn easing_gallery_to_image(
             let t = step as f32 / 100.0;
             let v = func(t);
             let px = ox as i32 + (t * (chart_w - 1) as f32) as i32;
-            let py = oy as i32 + chart_h as i32 - 1
+            let py = oy as i32 + chart_h as i32
+                - 1
                 - (v.clamp(0.0, 1.5) / 1.5 * (chart_h - 1) as f32) as i32;
             if step > 0 {
                 img.draw_line(prev_x, prev_y, px, py, 100, 220, 160, 255);
@@ -523,8 +529,7 @@ pub fn easing_comparison_to_image(
             let t = step as f32 / 200.0;
             let v = func(t);
             let px = (t * (width - 1) as f32) as i32;
-            let py = (height - 1) as i32
-                - (v.clamp(-0.2, 1.3) * 170.0 + 20.0) as i32;
+            let py = (height - 1) as i32 - (v.clamp(-0.2, 1.3) * 170.0 + 20.0) as i32;
             img.draw_line(prev.0, prev.1, px, py, *r, *g, *b, 220);
             prev = (px, py);
         }
@@ -580,7 +585,16 @@ pub fn bezier_curves_to_image(
             let t1 = (i + 1) as f32 / steps as f32;
             let pt0 = bez.evaluate(t0);
             let pt1 = bez.evaluate(t1);
-            img.draw_line(pt0.x as i32, pt0.y as i32, pt1.x as i32, pt1.y as i32, *cr, *cg, *cb, 255);
+            img.draw_line(
+                pt0.x as i32,
+                pt0.y as i32,
+                pt1.x as i32,
+                pt1.y as i32,
+                *cr,
+                *cg,
+                *cb,
+                255,
+            );
         }
 
         // Control points
@@ -696,12 +710,7 @@ pub fn points_to_image(
 ///
 /// # Returns
 /// `ImageData`.
-pub fn dungeon_grid_to_image(
-    grid: &[u8],
-    grid_w: u32,
-    grid_h: u32,
-    cell_size: u32,
-) -> ImageData {
+pub fn dungeon_grid_to_image(grid: &[u8], grid_w: u32, grid_h: u32, cell_size: u32) -> ImageData {
     let mut img = ImageData::new(grid_w * cell_size, grid_h * cell_size);
     img.fill(15, 15, 25, 255);
     for y in 0..grid_h {
@@ -759,11 +768,7 @@ pub fn noise_map_to_image(data: &[f64], width: u32, height: u32) -> ImageData {
 ///
 /// # Returns
 /// `ImageData`.
-pub fn noise_comparison_to_image(
-    maps: &[&[f64]],
-    tile_w: u32,
-    tile_h: u32,
-) -> ImageData {
+pub fn noise_comparison_to_image(maps: &[&[f64]], tile_w: u32, tile_h: u32) -> ImageData {
     let count = maps.len() as u32;
     let mut img = ImageData::new(tile_w * count, tile_h);
     for (i, data) in maps.iter().enumerate() {
@@ -778,7 +783,6 @@ pub fn noise_comparison_to_image(
     }
     img
 }
-
 
 // ── Standalone shape and UI visualization helpers ─────────────────────────
 
@@ -796,7 +800,11 @@ fn hsv_to_rgb_viz(h: u16, s: f32, v: f32) -> (u8, u8, u8) {
         4 => (x, 0.0, c),
         _ => (c, 0.0, x),
     };
-    (((r + m) * 255.0) as u8, ((g + m) * 255.0) as u8, ((b + m) * 255.0) as u8)
+    (
+        ((r + m) * 255.0) as u8,
+        ((g + m) * 255.0) as u8,
+        ((b + m) * 255.0) as u8,
+    )
 }
 
 /// Render a gallery of regular polygons (triangle→dodecagon), a five-pointed
@@ -813,19 +821,18 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     img.fill(15, 15, 25, 255);
 
     let shapes: &[(i32, i32, i32, usize, (u8, u8, u8))] = &[
-        (85,  85,  60, 3,  (255, 100, 100)),
-        (255, 85,  60, 4,  (100, 255, 100)),
-        (425, 85,  60, 5,  (100, 100, 255)),
-        (85,  255, 60, 6,  (255, 255, 100)),
-        (255, 255, 60, 8,  (255, 100, 255)),
+        (85, 85, 60, 3, (255, 100, 100)),
+        (255, 85, 60, 4, (100, 255, 100)),
+        (425, 85, 60, 5, (100, 100, 255)),
+        (85, 255, 60, 6, (255, 255, 100)),
+        (255, 255, 60, 8, (255, 100, 255)),
         (425, 255, 60, 12, (100, 255, 255)),
     ];
     for &(cx, cy, radius, sides, (r, g, b)) in shapes {
         for i in 0..sides {
-            let a0 = std::f32::consts::TAU * i as f32 / sides as f32
-                - std::f32::consts::FRAC_PI_2;
-            let a1 = std::f32::consts::TAU * (i + 1) as f32 / sides as f32
-                - std::f32::consts::FRAC_PI_2;
+            let a0 = std::f32::consts::TAU * i as f32 / sides as f32 - std::f32::consts::FRAC_PI_2;
+            let a1 =
+                std::f32::consts::TAU * (i + 1) as f32 / sides as f32 - std::f32::consts::FRAC_PI_2;
             let x0 = cx + (radius as f32 * a0.cos()) as i32;
             let y0 = cy + (radius as f32 * a0.sin()) as i32;
             let x1 = cx + (radius as f32 * a1.cos()) as i32;
@@ -838,10 +845,16 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     let (sx, sy, sr) = (170i32, 425i32, 70i32);
     let star_pts: Vec<(i32, i32)> = (0..10)
         .map(|i| {
-            let angle = std::f32::consts::TAU * i as f32 / 10.0
-                - std::f32::consts::FRAC_PI_2;
-            let rv = if i % 2 == 0 { sr as f32 } else { sr as f32 * 0.4 };
-            (sx + (rv * angle.cos()) as i32, sy + (rv * angle.sin()) as i32)
+            let angle = std::f32::consts::TAU * i as f32 / 10.0 - std::f32::consts::FRAC_PI_2;
+            let rv = if i % 2 == 0 {
+                sr as f32
+            } else {
+                sr as f32 * 0.4
+            };
+            (
+                sx + (rv * angle.cos()) as i32,
+                sy + (rv * angle.sin()) as i32,
+            )
         })
         .collect();
     for i in 0..10 {
@@ -853,7 +866,13 @@ pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     // Arrow shape
     let (ax, ay) = (340i32, 425i32);
     let arrow: [(i32, i32); 7] = [
-        (0, -50), (30, 0), (15, 0), (15, 50), (-15, 50), (-15, 0), (-30, 0),
+        (0, -50),
+        (30, 0),
+        (15, 0),
+        (15, 50),
+        (-15, 50),
+        (-15, 0),
+        (-30, 0),
     ];
     for i in 0..arrow.len() {
         let (x0, y0) = arrow[i];
@@ -1040,7 +1059,11 @@ pub fn panel_layout_to_image(width: u32, height: u32) -> ImageData {
     let csy = pby + 22;
     img.draw_label("THEME", px + 12, csy, 180, 180, 190);
     let swatch_colors: [(u8, u8, u8); 5] = [
-        (200, 60, 60), (60, 160, 200), (60, 180, 80), (200, 180, 60), (160, 80, 200),
+        (200, 60, 60),
+        (60, 160, 200),
+        (60, 180, 80),
+        (200, 180, 60),
+        (160, 80, 200),
     ];
     for (i, &(cr, cg, cb)) in swatch_colors.iter().enumerate() {
         let sx = sl_x + i as i32 * 22;
@@ -1124,7 +1147,9 @@ pub fn hud_bars_to_image(width: u32, height: u32) -> ImageData {
                 for ix in (scx - 15)..=(scx + 15) {
                     let dx = ix as f32 - scx as f32;
                     let dy = iy as f32 - scy as f32;
-                    if dx * dx + dy * dy > 14.0 * 14.0 { continue; }
+                    if dx * dx + dy * dy > 14.0 * 14.0 {
+                        continue;
+                    }
                     let mut a = dy.atan2(dx);
                     if a < -std::f32::consts::FRAC_PI_2 {
                         a += 2.0 * std::f32::consts::PI;
@@ -1143,7 +1168,6 @@ pub fn hud_bars_to_image(width: u32, height: u32) -> ImageData {
     img.draw_label("GAME HUD", (width / 2 - 20) as i32, 10, 220, 220, 230);
     img
 }
-
 
 // ── Camera rotation visualization ───────────────────────────────
 
@@ -1202,13 +1226,14 @@ pub fn camera_rotation_to_image(
         for bx in 0..panel_w as i32 {
             if ox + bx < width as i32 {
                 img.set_pixel((ox + bx) as u32, oy.max(0) as u32, 60, 60, 80, 255);
-                if (oy + panel_h as i32 - 1) >= 0
-                    && (oy + panel_h as i32 - 1) < height as i32
-                {
+                if (oy + panel_h as i32 - 1) >= 0 && (oy + panel_h as i32 - 1) < height as i32 {
                     img.set_pixel(
                         (ox + bx) as u32,
                         (oy + panel_h as i32 - 1) as u32,
-                        60, 60, 80, 255,
+                        60,
+                        60,
+                        80,
+                        255,
                     );
                 }
             }
@@ -1220,7 +1245,9 @@ pub fn camera_rotation_to_image(
         "CAMERA ROTATION",
         (width / 2).saturating_sub(56) as i32,
         (height.saturating_sub(15)) as i32,
-        100, 200, 100,
+        100,
+        200,
+        100,
     );
     img
 }
@@ -1262,7 +1289,9 @@ pub fn camera_bounds_to_image(
         "CAMERA BOUNDS",
         (width / 2).saturating_sub(48) as i32,
         (height.saturating_sub(15)) as i32,
-        100, 200, 100,
+        100,
+        200,
+        100,
     );
     img
 }
@@ -1304,8 +1333,13 @@ pub fn camera_follow_to_image(
         img.draw_line(x1 as i32, y1 as i32, x2 as i32, y2 as i32, r, g, 120, 200);
     }
 
-    let tgt_colors: [(u8, u8, u8); 5] =
-        [(255, 80, 80), (80, 255, 80), (80, 80, 255), (255, 255, 80), (200, 80, 255)];
+    let tgt_colors: [(u8, u8, u8); 5] = [
+        (255, 80, 80),
+        (80, 255, 80),
+        (80, 80, 255),
+        (255, 255, 80),
+        (200, 80, 255),
+    ];
     for (i, &(tx, ty)) in targets.iter().enumerate() {
         let (r, g, b) = tgt_colors[i % tgt_colors.len()];
         img.draw_circle(tx as i32, ty as i32, 6, r, g, b, 255);
@@ -1316,14 +1350,19 @@ pub fn camera_follow_to_image(
         (cam_pos.1 - dz_size.1 / 2.0) as i32,
         dz_size.0 as u32,
         dz_size.1 as u32,
-        255, 255, 100, 80,
+        255,
+        255,
+        100,
+        80,
     );
 
     img.draw_label(
         "FOLLOW AND DEADZONE",
         (width / 2).saturating_sub(72) as i32,
         (height.saturating_sub(15)) as i32,
-        100, 200, 100,
+        100,
+        200,
+        100,
     );
     img
 }
@@ -1369,7 +1408,9 @@ pub fn camera_shake_to_image(
         "CENTER",
         (center.0 as i32 - 25).max(0),
         (center.1 as i32 - 16).max(0),
-        255, 255, 255,
+        255,
+        255,
+        255,
     );
 
     img.draw_circle(moved.0 as i32, moved.1 as i32, 4, 80, 255, 80, 255);
@@ -1377,10 +1418,19 @@ pub fn camera_shake_to_image(
         "MOVED BY",
         (moved.0 as i32 + 8).min(width as i32 - 60),
         (moved.1 as i32).min(height as i32 - 10),
-        80, 255, 80,
+        80,
+        255,
+        80,
     );
 
-    img.draw_label(area_info, 10, (height.saturating_sub(20)) as i32, 180, 180, 200);
+    img.draw_label(
+        area_info,
+        10,
+        (height.saturating_sub(20)) as i32,
+        180,
+        180,
+        200,
+    );
     img.draw_label("CAMERA SHAKE AND MOVE", 100, 5, 100, 200, 100);
     img
 }
@@ -1417,7 +1467,11 @@ pub fn animation_playback_control_to_image(
 
     for (i, &f) in run_frames.iter().enumerate() {
         let x = 10 + i as i32 * 24;
-        let t = if total_frames > 0 { f as f32 / total_frames as f32 } else { 0.0 };
+        let t = if total_frames > 0 {
+            f as f32 / total_frames as f32
+        } else {
+            0.0
+        };
         let r = (80.0 + t * 175.0) as u8;
         let g = (200.0 - t * 120.0) as u8;
         img.draw_rect(x, 20, 20, 30, r, g, 80, 255);
@@ -1429,7 +1483,11 @@ pub fn animation_playback_control_to_image(
 
     for (i, &f) in idle_frames.iter().enumerate() {
         let x = 10 + i as i32 * 24;
-        let t = if total_frames > 0 { f as f32 / total_frames as f32 } else { 0.0 };
+        let t = if total_frames > 0 {
+            f as f32 / total_frames as f32
+        } else {
+            0.0
+        };
         let r = (60.0 + t * 140.0) as u8;
         let g = (160.0 - t * 100.0) as u8;
         img.draw_rect(x, 150, 20, 30, r, g, 60, 255);
@@ -1441,12 +1499,21 @@ pub fn animation_playback_control_to_image(
     }
 
     img.draw_label("JUMP CLIP DONE", 10, 250, 200, 180, 100);
-    img.draw_label(summary, 10, (height.saturating_sub(20)) as i32, 100, 255, 100);
+    img.draw_label(
+        summary,
+        10,
+        (height.saturating_sub(20)) as i32,
+        100,
+        255,
+        100,
+    );
     img.draw_label(
         "ANIMATION PLAYBACK OK",
         150,
         (height.saturating_sub(20)) as i32,
-        100, 255, 100,
+        100,
+        255,
+        100,
     );
     img
 }
@@ -1492,7 +1559,11 @@ pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height:
         img.set_pixel(x, center_y, 60, 60, 80, 255);
     }
 
-    let peak = samples.iter().map(|s| s.abs()).fold(0.0f32, f32::max).max(0.01);
+    let peak = samples
+        .iter()
+        .map(|s| s.abs())
+        .fold(0.0f32, f32::max)
+        .max(0.01);
     let scale = 0.9 / peak;
 
     let samples_per_pixel = samples.len().max(1) / plot_w as usize;
@@ -1510,7 +1581,16 @@ pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height:
             let y_top = (margin as f32 + (1.0 - max_val) * 0.5 * plot_h as f32) as i32;
             let y_bot = (margin as f32 + (1.0 - min_val) * 0.5 * plot_h as f32) as i32;
             let px = (margin + x) as i32;
-            img.draw_line(px, y_top.max(margin as i32), px, y_bot.min((height - margin) as i32), 80, 180, 255, 255);
+            img.draw_line(
+                px,
+                y_top.max(margin as i32),
+                px,
+                y_bot.min((height - margin) as i32),
+                80,
+                180,
+                255,
+                255,
+            );
         }
     }
 
@@ -1540,7 +1620,12 @@ pub fn waveform_to_image(samples: &[f32], _sample_rate: u32, width: u32, height:
 ///
 /// # Returns
 /// `ImageData`.
-pub fn waveform_stereo_to_image(samples: &[f32], _sample_rate: u32, width: u32, height: u32) -> ImageData {
+pub fn waveform_stereo_to_image(
+    samples: &[f32],
+    _sample_rate: u32,
+    width: u32,
+    height: u32,
+) -> ImageData {
     let margin = 40u32;
     let plot_w = width - margin * 2;
     let ch_height = (height - margin * 2) / 2;
@@ -1550,7 +1635,11 @@ pub fn waveform_stereo_to_image(samples: &[f32], _sample_rate: u32, width: u32, 
     let left: Vec<f32> = samples.iter().step_by(2).copied().collect();
     let right: Vec<f32> = samples.iter().skip(1).step_by(2).copied().collect();
 
-    let peak = samples.iter().map(|s| s.abs()).fold(0.0f32, f32::max).max(0.01);
+    let peak = samples
+        .iter()
+        .map(|s| s.abs())
+        .fold(0.0f32, f32::max)
+        .max(0.01);
     let scale = 0.85 / peak;
 
     let sep_y = margin + ch_height;
@@ -1569,8 +1658,14 @@ pub fn waveform_stereo_to_image(samples: &[f32], _sample_rate: u32, width: u32, 
     for (ch_idx, ch_samples) in [&left, &right].iter().enumerate() {
         let base_y = margin as f32 + ch_idx as f32 * ch_height as f32;
         let spp = ch_samples.len().max(1) / plot_w as usize;
-        if spp == 0 { continue; }
-        let (cr, cg, cb) = if ch_idx == 0 { (80, 200, 255) } else { (255, 160, 60) };
+        if spp == 0 {
+            continue;
+        }
+        let (cr, cg, cb) = if ch_idx == 0 {
+            (80, 200, 255)
+        } else {
+            (255, 160, 60)
+        };
         for x in 0..plot_w {
             let start = x as usize * spp;
             let end = (start + spp).min(ch_samples.len());
@@ -1607,7 +1702,12 @@ pub fn waveform_stereo_to_image(samples: &[f32], _sample_rate: u32, width: u32, 
 ///
 /// # Returns
 /// `ImageData`.
-pub fn waveform_zoomed_to_image(samples: &[f32], max_samples: usize, width: u32, height: u32) -> ImageData {
+pub fn waveform_zoomed_to_image(
+    samples: &[f32],
+    max_samples: usize,
+    width: u32,
+    height: u32,
+) -> ImageData {
     let zoomed: Vec<f32> = samples.iter().take(max_samples).copied().collect();
     let margin = 40u32;
     let plot_w = width - margin * 2;
@@ -1632,7 +1732,11 @@ pub fn waveform_zoomed_to_image(samples: &[f32], max_samples: usize, width: u32,
         img.set_pixel(x, center_y, 60, 60, 80, 255);
     }
 
-    let peak = zoomed.iter().map(|s| s.abs()).fold(0.0f32, f32::max).max(0.01);
+    let peak = zoomed
+        .iter()
+        .map(|s| s.abs())
+        .fold(0.0f32, f32::max)
+        .max(0.01);
     let scale = 0.9 / peak;
 
     let n = zoomed.len();
@@ -1651,7 +1755,16 @@ pub fn waveform_zoomed_to_image(samples: &[f32], max_samples: usize, width: u32,
             let px = (margin + x) as i32;
             let cy = center_y as i32;
             let (y0, y1) = if y < cy { (y, cy) } else { (cy, y) };
-            img.draw_line(px, y0.max(margin as i32), px, y1.min((height - margin) as i32), 80, 180, 255, 255);
+            img.draw_line(
+                px,
+                y0.max(margin as i32),
+                px,
+                y1.min((height - margin) as i32),
+                80,
+                180,
+                255,
+                255,
+            );
             if y >= margin as i32 && y < (height - margin) as i32 {
                 img.set_pixel(px as u32, y as u32, 140, 220, 255, 255);
             }
@@ -1695,7 +1808,6 @@ pub fn colored_points_to_image(points: &[(f32, f32)], width: u32, height: u32) -
     }
     img
 }
-
 
 /// Render a grid of camera rotation panels, each showing 8 coloured dots
 /// transformed through the rotation.
@@ -1755,7 +1867,10 @@ pub fn draw_camera_rotation_grid_to_image(
                     img.set_pixel(
                         (ox + bx) as u32,
                         (oy + viewport_h as i32 - 1) as u32,
-                        60, 60, 80, 255,
+                        60,
+                        60,
+                        80,
+                        255,
                     );
                 }
             }
@@ -1763,7 +1878,14 @@ pub fn draw_camera_rotation_grid_to_image(
         img.draw_label(label, ox + 4, oy + 4, 200, 200, 200);
     }
 
-    img.draw_label("CAMERA ROTATION", (width / 2 - 50) as i32, (height - 15) as i32, 100, 200, 100);
+    img.draw_label(
+        "CAMERA ROTATION",
+        (width / 2 - 50) as i32,
+        (height - 15) as i32,
+        100,
+        200,
+        100,
+    );
     img
 }
 
@@ -1796,7 +1918,14 @@ pub fn draw_camera_bounds_to_image(
         img.draw_label(&pos_str, 215, y + 20, 180, 180, 180);
     }
 
-    img.draw_label("CAMERA BOUNDS", (width / 2 - 40) as i32, (height - 15) as i32, 100, 200, 100);
+    img.draw_label(
+        "CAMERA BOUNDS",
+        (width / 2 - 40) as i32,
+        (height - 15) as i32,
+        100,
+        200,
+        100,
+    );
     img
 }
 
@@ -1849,10 +1978,20 @@ pub fn draw_camera_follow_trail_to_image(
         (cy - dh / 2.0) as i32,
         dw as u32,
         dh as u32,
-        255, 255, 100, 80,
+        255,
+        255,
+        100,
+        80,
     );
 
-    img.draw_label("FOLLOW AND DEADZONE", (width / 2 - 60) as i32, (height - 15) as i32, 100, 200, 100);
+    img.draw_label(
+        "FOLLOW AND DEADZONE",
+        (width / 2 - 60) as i32,
+        (height - 15) as i32,
+        100,
+        200,
+        100,
+    );
     img
 }
 
@@ -1886,8 +2025,23 @@ pub fn draw_camera_shake_trail_to_image(
     }
 
     // Reference center
-    img.draw_circle((width / 2) as i32, (height / 2) as i32, 4, 255, 255, 255, 255);
-    img.draw_label("CENTER", (width / 2 - 20) as i32, (height / 2 - 16) as i32, 255, 255, 255);
+    img.draw_circle(
+        (width / 2) as i32,
+        (height / 2) as i32,
+        4,
+        255,
+        255,
+        255,
+        255,
+    );
+    img.draw_label(
+        "CENTER",
+        (width / 2 - 20) as i32,
+        (height / 2 - 16) as i32,
+        255,
+        255,
+        255,
+    );
 
     // Move-by indicator
     let (mx, my) = moved_pos;
@@ -1899,7 +2053,14 @@ pub fn draw_camera_shake_trail_to_image(
     let info = format!("{:.0} {:.0} {:.0}X{:.0}", vx, vy, vw, vh);
     img.draw_label(&info, 10, (height - 20) as i32, 180, 180, 200);
 
-    img.draw_label("CAMERA SHAKE AND MOVE", (width / 2 - 70) as i32, 5, 100, 200, 100);
+    img.draw_label(
+        "CAMERA SHAKE AND MOVE",
+        (width / 2 - 70) as i32,
+        5,
+        100,
+        200,
+        100,
+    );
     img
 }
 
@@ -1937,7 +2098,9 @@ pub fn draw_graph_operations_to_image(
         if a < positions.len() && b < positions.len() {
             let (ax, ay) = positions[a];
             let (bx, by) = positions[b];
-            img.draw_line(ax as i32, ay as i32, bx as i32, by as i32, 80, 120, 180, 200);
+            img.draw_line(
+                ax as i32, ay as i32, bx as i32, by as i32, 80, 120, 180, 200,
+            );
         }
     }
 
@@ -1952,7 +2115,11 @@ pub fn draw_graph_operations_to_image(
 
     // Draw nodes
     for (i, &(px, py)) in positions.iter().enumerate() {
-        let (r, g, b) = if i < colors.len() { colors[i] } else { (180, 180, 180) };
+        let (r, g, b) = if i < colors.len() {
+            colors[i]
+        } else {
+            (180, 180, 180)
+        };
         img.draw_circle(px as i32, py as i32, 14, r, g, b, 255);
         if i < labels.len() {
             img.draw_label(labels[i], (px - 30.0) as i32, (py + 18.0) as i32, r, g, b);
@@ -1999,16 +2166,45 @@ pub fn draw_graph_item_flow_to_image(
         let end_x = bx as i32 - 30;
         img.draw_line(start_x, ay as i32, end_x, by as i32, 100, 150, 200, 200);
         // Arrow head
-        img.draw_line(end_x - 10, by as i32 - 5, end_x, by as i32, 100, 150, 200, 200);
-        img.draw_line(end_x - 10, by as i32 + 5, end_x, by as i32, 100, 150, 200, 200);
+        img.draw_line(
+            end_x - 10,
+            by as i32 - 5,
+            end_x,
+            by as i32,
+            100,
+            150,
+            200,
+            200,
+        );
+        img.draw_line(
+            end_x - 10,
+            by as i32 + 5,
+            end_x,
+            by as i32,
+            100,
+            150,
+            200,
+            200,
+        );
     }
 
     // Draw nodes
     for (i, &(px, py)) in node_pos.iter().enumerate() {
-        let (r, g, b) = if i < node_colors.len() { node_colors[i] } else { (180, 180, 180) };
+        let (r, g, b) = if i < node_colors.len() {
+            node_colors[i]
+        } else {
+            (180, 180, 180)
+        };
         img.draw_circle(px as i32, py as i32, 20, r, g, b, 255);
         if i < node_names.len() {
-            img.draw_label(node_names[i], (px - 22.0) as i32, (py + 25.0) as i32, r, g, b);
+            img.draw_label(
+                node_names[i],
+                (px - 22.0) as i32,
+                (py + 25.0) as i32,
+                r,
+                g,
+                b,
+            );
         }
     }
 
@@ -2045,8 +2241,8 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
 
     // 1. Convex hull
     let points: Vec<f32> = vec![
-        50.0, 50.0, 100.0, 30.0, 150.0, 60.0, 130.0, 120.0,
-        80.0, 130.0, 40.0, 100.0, 90.0, 80.0, 110.0, 70.0,
+        50.0, 50.0, 100.0, 30.0, 150.0, 60.0, 130.0, 120.0, 80.0, 130.0, 40.0, 100.0, 90.0, 80.0,
+        110.0, 70.0,
     ];
     let hull = crate::math::convex_hull(&points);
     for i in 0..points.len() / 2 {
@@ -2058,9 +2254,14 @@ pub fn draw_geometry_shapes_to_image(width: u32, height: u32) -> ImageData {
     for i in 0..hull_n {
         let j = (i + 1) % hull_n;
         img.draw_line(
-            hull[i * 2] as i32, hull[i * 2 + 1] as i32,
-            hull[j * 2] as i32, hull[j * 2 + 1] as i32,
-            200, 200, 80, 255,
+            hull[i * 2] as i32,
+            hull[i * 2 + 1] as i32,
+            hull[j * 2] as i32,
+            hull[j * 2 + 1] as i32,
+            200,
+            200,
+            80,
+            255,
         );
     }
     img.draw_label("CONVEX HULL", 50, 140, 200, 200, 80);
@@ -2153,10 +2354,8 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
     let h = height as i32;
 
     // 1. Segment-segment intersection
-    let (_hit, point) = crate::math::segment_intersects_segment(
-        20.0, 20.0, 150.0, 120.0,
-        20.0, 120.0, 150.0, 20.0,
-    );
+    let (_hit, point) =
+        crate::math::segment_intersects_segment(20.0, 20.0, 150.0, 120.0, 20.0, 120.0, 150.0, 20.0);
     img.draw_line(20, 20, 150, 120, 200, 80, 80, 255);
     img.draw_line(20, 120, 150, 20, 80, 80, 200, 255);
     if let Some((ix, iy)) = point {
@@ -2166,18 +2365,14 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
 
     // 2. No intersection
     let (_no_hit, _) = crate::math::segment_intersects_segment(
-        20.0, 160.0, 100.0, 160.0,
-        20.0, 200.0, 100.0, 200.0,
+        20.0, 160.0, 100.0, 160.0, 20.0, 200.0, 100.0, 200.0,
     );
     img.draw_line(20, 160, 100, 160, 200, 80, 80, 255);
     img.draw_line(20, 200, 100, 200, 80, 200, 80, 255);
     img.draw_label("NO HIT", 30, 210, 200, 80, 80);
 
     // 3. Closest point on segment
-    let (cpx, cpy) = crate::math::closest_point_on_segment(
-        250.0, 30.0,
-        200.0, 80.0, 350.0, 80.0,
-    );
+    let (cpx, cpy) = crate::math::closest_point_on_segment(250.0, 30.0, 200.0, 80.0, 350.0, 80.0);
     img.draw_line(200, 80, 350, 80, 80, 180, 200, 255);
     img.draw_circle(250, 30, 4, 255, 100, 100, 255);
     img.draw_circle(cpx as i32, cpy as i32, 4, 100, 255, 100, 255);
@@ -2185,10 +2380,8 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
     img.draw_label("CLOSEST PT", 230, 90, 80, 180, 200);
 
     // 4. Circle-line intersection
-    let (_cl_hit, p1, p2) = crate::math::circle_intersects_line(
-        300.0, 200.0, 50.0,
-        200.0, 200.0, 400.0, 200.0,
-    );
+    let (_cl_hit, p1, p2) =
+        crate::math::circle_intersects_line(300.0, 200.0, 50.0, 200.0, 200.0, 400.0, 200.0);
     for a in 0..360 {
         let rad = a as f32 * std::f32::consts::PI / 180.0;
         let px = (300.0 + 50.0 * rad.cos()) as i32;
@@ -2207,10 +2400,8 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
     img.draw_label("CIRCLE-LINE", 273, 260, 100, 100, 200);
 
     // 5. Circle-segment intersection
-    let (cs_hit, sp1, sp2) = crate::math::circle_intersects_segment(
-        100.0, 300.0, 30.0,
-        60.0, 280.0, 140.0, 320.0,
-    );
+    let (cs_hit, sp1, sp2) =
+        crate::math::circle_intersects_segment(100.0, 300.0, 30.0, 60.0, 280.0, 140.0, 320.0);
     for a in 0..360 {
         let rad = a as f32 * std::f32::consts::PI / 180.0;
         let px = (100.0 + 30.0 * rad.cos()) as i32;
@@ -2231,10 +2422,8 @@ pub fn draw_geometry_intersections_to_image(width: u32, height: u32) -> ImageDat
     img.draw_label("CIRCLE-SEG", 60, 335, 200, 150, 80);
 
     // 6. Line intersection (infinite lines)
-    let result = crate::math::line_intersect(
-        200.0, 260.0, 400.0, 340.0,
-        200.0, 340.0, 400.0, 260.0,
-    );
+    let result =
+        crate::math::line_intersect(200.0, 260.0, 400.0, 340.0, 200.0, 340.0, 400.0, 260.0);
     img.draw_line(200, 260, 400, 340, 200, 80, 200, 200);
     img.draw_line(200, 340, 400, 260, 80, 200, 200, 200);
     if let Some((ix, iy)) = result {
@@ -2275,9 +2464,36 @@ pub fn draw_delaunay_to_image(
             0
         };
         let (r, g, b) = hsv_to_rgb_viz(hue, 0.5, 0.7);
-        img.draw_line(tri[0] as i32, tri[1] as i32, tri[2] as i32, tri[3] as i32, r, g, b, 200);
-        img.draw_line(tri[2] as i32, tri[3] as i32, tri[4] as i32, tri[5] as i32, r, g, b, 200);
-        img.draw_line(tri[4] as i32, tri[5] as i32, tri[0] as i32, tri[1] as i32, r, g, b, 200);
+        img.draw_line(
+            tri[0] as i32,
+            tri[1] as i32,
+            tri[2] as i32,
+            tri[3] as i32,
+            r,
+            g,
+            b,
+            200,
+        );
+        img.draw_line(
+            tri[2] as i32,
+            tri[3] as i32,
+            tri[4] as i32,
+            tri[5] as i32,
+            r,
+            g,
+            b,
+            200,
+        );
+        img.draw_line(
+            tri[4] as i32,
+            tri[5] as i32,
+            tri[0] as i32,
+            tri[1] as i32,
+            r,
+            g,
+            b,
+            200,
+        );
     }
 
     for &(px, py) in points {
@@ -2285,7 +2501,14 @@ pub fn draw_delaunay_to_image(
     }
 
     let count_str = format!("{} TRIANGLES", tri_count);
-    img.draw_label(&count_str, 10, (height.saturating_sub(20)) as i32, 100, 200, 100);
+    img.draw_label(
+        &count_str,
+        10,
+        (height.saturating_sub(20)) as i32,
+        100,
+        200,
+        100,
+    );
     img.draw_label("DELAUNAY TRIANGULATION", 80, 5, 100, 255, 100);
     img
 }
@@ -2390,9 +2613,18 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
         for x in 0..col_w {
             if let Some((r, g, b, _a)) = img.get_pixel(x, y) {
                 let gray = ((r as u16 + g as u16 + b as u16) / 3) as u8;
-                let sr = (gray as u16).saturating_mul(255).saturating_div(200).min(255) as u8;
-                let sg = (gray as u16).saturating_mul(200).saturating_div(200).min(255) as u8;
-                let sb = (gray as u16).saturating_mul(150).saturating_div(200).min(255) as u8;
+                let sr = (gray as u16)
+                    .saturating_mul(255)
+                    .saturating_div(200)
+                    .min(255) as u8;
+                let sg = (gray as u16)
+                    .saturating_mul(200)
+                    .saturating_div(200)
+                    .min(255) as u8;
+                let sb = (gray as u16)
+                    .saturating_mul(150)
+                    .saturating_div(200)
+                    .min(255) as u8;
                 img.set_pixel(col_w * 3 + x, y, sr, sg, sb, 255);
             }
         }
@@ -2432,7 +2664,6 @@ pub fn draw_color_wheel_to_image(width: u32, height: u32) -> ImageData {
     img
 }
 
-
 /// Draw a single waveform as a colored plot on a dark background.
 ///
 /// # Parameters
@@ -2459,9 +2690,22 @@ pub fn draw_sound_waveform_to_image(
     let mid_y = (height / 2) as i32;
 
     // Center line
-    img.draw_line(margin as i32, mid_y, (width - margin) as i32, mid_y, 60, 60, 80, 150);
+    img.draw_line(
+        margin as i32,
+        mid_y,
+        (width - margin) as i32,
+        mid_y,
+        60,
+        60,
+        80,
+        150,
+    );
 
-    let step = if plot_w == 0 { 1 } else { samples.len().max(1) / plot_w as usize };
+    let step = if plot_w == 0 {
+        1
+    } else {
+        samples.len().max(1) / plot_w as usize
+    };
     let step = step.max(1);
     let h_half = (height / 2) as f32 * 0.8;
 
@@ -2511,9 +2755,14 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let pts = curve.render(60);
     for i in 1..pts.len() {
         img.draw_line(
-            pts[i - 1].x as i32, pts[i - 1].y as i32,
-            pts[i].x as i32, pts[i].y as i32,
-            200, 120, 80, 255,
+            pts[i - 1].x as i32,
+            pts[i - 1].y as i32,
+            pts[i].x as i32,
+            pts[i].y as i32,
+            200,
+            120,
+            80,
+            255,
         );
     }
 
@@ -2525,8 +2774,12 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
         let y1 = 350 + (dpts[i - 1].y * 0.3) as i32;
         let x2 = 50 + (dpts[i].x * 0.3) as i32;
         let y2 = 350 + (dpts[i].y * 0.3) as i32;
-        if x1 >= 0 && y1 >= 0 && x2 < width as i32 && y2 < height as i32
-            && x1 < width as i32 && y1 < height as i32
+        if x1 >= 0
+            && y1 >= 0
+            && x2 < width as i32
+            && y2 < height as i32
+            && x1 < width as i32
+            && y1 < height as i32
         {
             img.draw_line(x1, y1, x2, y2, 80, 200, 200, 200);
         }
@@ -2537,9 +2790,14 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let seg_pts = curve.render_segment(0.2, 0.8, 30);
     for i in 1..seg_pts.len() {
         img.draw_line(
-            seg_pts[i - 1].x as i32, (seg_pts[i - 1].y + 5.0) as i32,
-            seg_pts[i].x as i32, (seg_pts[i].y + 5.0) as i32,
-            255, 255, 80, 255,
+            seg_pts[i - 1].x as i32,
+            (seg_pts[i - 1].y + 5.0) as i32,
+            seg_pts[i].x as i32,
+            (seg_pts[i].y + 5.0) as i32,
+            255,
+            255,
+            80,
+            255,
         );
     }
     img.draw_label("SEGMENT 0.2-0.8", 150, 210, 255, 255, 80);
@@ -2560,9 +2818,14 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let orig_pts = editable.render(20);
     for i in 1..orig_pts.len() {
         img.draw_line(
-            orig_pts[i - 1].x as i32, orig_pts[i - 1].y as i32,
-            orig_pts[i].x as i32, orig_pts[i].y as i32,
-            150, 150, 150, 200,
+            orig_pts[i - 1].x as i32,
+            orig_pts[i - 1].y as i32,
+            orig_pts[i].x as i32,
+            orig_pts[i].y as i32,
+            150,
+            150,
+            150,
+            200,
         );
     }
 
@@ -2572,9 +2835,14 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let edited_pts = editable.render(20);
     for i in 1..edited_pts.len() {
         img.draw_line(
-            edited_pts[i - 1].x as i32, edited_pts[i - 1].y as i32,
-            edited_pts[i].x as i32, edited_pts[i].y as i32,
-            80, 200, 80, 255,
+            edited_pts[i - 1].x as i32,
+            edited_pts[i - 1].y as i32,
+            edited_pts[i].x as i32,
+            edited_pts[i].y as i32,
+            80,
+            200,
+            80,
+            255,
         );
     }
 
@@ -2589,18 +2857,28 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let t_pts = transform_curve.render(15);
     for i in 1..t_pts.len() {
         img.draw_line(
-            t_pts[i - 1].x as i32, t_pts[i - 1].y as i32,
-            t_pts[i].x as i32, t_pts[i].y as i32,
-            200, 80, 80, 180,
+            t_pts[i - 1].x as i32,
+            t_pts[i - 1].y as i32,
+            t_pts[i].x as i32,
+            t_pts[i].y as i32,
+            200,
+            80,
+            80,
+            180,
         );
     }
     transform_curve.translate(0.0, 20.0);
     let tt_pts = transform_curve.render(15);
     for i in 1..tt_pts.len() {
         img.draw_line(
-            tt_pts[i - 1].x as i32, tt_pts[i - 1].y as i32,
-            tt_pts[i].x as i32, tt_pts[i].y as i32,
-            80, 80, 200, 180,
+            tt_pts[i - 1].x as i32,
+            tt_pts[i - 1].y as i32,
+            tt_pts[i].x as i32,
+            tt_pts[i].y as i32,
+            80,
+            80,
+            200,
+            180,
         );
     }
 
@@ -2615,7 +2893,14 @@ pub fn draw_bezier_advanced_to_image(width: u32, height: u32) -> ImageData {
     let angle_str = format!("A {:.2}", angle);
     img.draw_label(&angle_str, ix as i32 + 8, iy as i32, 255, 100, 255);
 
-    img.draw_label("BEZIER ADVANCED OK", 150, (height - 15) as i32, 100, 255, 100);
+    img.draw_label(
+        "BEZIER ADVANCED OK",
+        150,
+        (height - 15) as i32,
+        100,
+        255,
+        100,
+    );
     img
 }
 

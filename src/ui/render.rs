@@ -184,7 +184,8 @@ impl GuiContext {
     ///
     /// # Returns
     /// `Vec<RenderCommand>`.
-    pub fn build_render_commands(&self, font_key: FontKey) -> Vec<RenderCommand> {
+    pub fn build_render_commands(&mut self, font_key: FontKey) -> Vec<RenderCommand> {
+        self.run_layout_pass();
         let default_style = WidgetStyle::default();
         let mut cmds = Vec::new();
 
@@ -208,7 +209,7 @@ impl GuiContext {
     ///
     /// # Returns
     /// `Vec<RenderCommand>`.
-    pub fn generate_render_commands(&self) -> Vec<RenderCommand> {
+    pub fn generate_render_commands(&mut self) -> Vec<RenderCommand> {
         self.build_render_commands(FontKey::default())
     }
 
@@ -274,7 +275,7 @@ mod tests {
 
     #[test]
     fn empty_context_no_commands() {
-        let ctx = GuiContext::new();
+        let mut ctx = GuiContext::new();
         let cmds = ctx.build_render_commands(FontKey::default());
         assert!(cmds.is_empty());
     }
@@ -286,8 +287,14 @@ mod tests {
         ctx.add_child(0, idx);
         let cmds = ctx.build_render_commands(FontKey::default());
         // At minimum: SetColor + Rectangle (bg) + SetColor + SetLineWidth + Rectangle (border) + SetColor + Print (text)
-        assert!(cmds.len() >= 5, "expected at least 5 commands, got {}", cmds.len());
-        let has_print = cmds.iter().any(|c| matches!(c, RenderCommand::Print { text, .. } if text == "Click"));
+        assert!(
+            cmds.len() >= 5,
+            "expected at least 5 commands, got {}",
+            cmds.len()
+        );
+        let has_print = cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Print { text, .. } if text == "Click"));
         assert!(has_print, "expected a Print command with 'Click'");
     }
 
@@ -308,7 +315,9 @@ mod tests {
         let idx = ctx.add_label("Hello");
         ctx.add_child(0, idx);
         let cmds = ctx.build_render_commands(FontKey::default());
-        let has_print = cmds.iter().any(|c| matches!(c, RenderCommand::Print { text, .. } if text == "Hello"));
+        let has_print = cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Print { text, .. } if text == "Hello"));
         assert!(has_print, "expected a Print command with 'Hello'");
     }
 
@@ -319,7 +328,11 @@ mod tests {
         ctx.add_child(0, idx);
         let a = ctx.generate_render_commands();
         let b = ctx.build_render_commands(FontKey::default());
-        assert_eq!(a.len(), b.len(), "generate_render_commands must produce same count as build_render_commands");
+        assert_eq!(
+            a.len(),
+            b.len(),
+            "generate_render_commands must produce same count as build_render_commands"
+        );
     }
 
     #[test]

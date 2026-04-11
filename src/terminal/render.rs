@@ -139,7 +139,13 @@ mod tests {
     #[test]
     fn generate_render_commands_single_char_emits_color_and_print() {
         let mut t = Terminal::new(4, 2);
-        t.set(1, 1, b'A' as u32, [1.0, 1.0, 1.0, 1.0], [0.0, 0.0, 0.0, 0.0]);
+        t.set(
+            1,
+            1,
+            b'A' as u32,
+            [1.0, 1.0, 1.0, 1.0],
+            [0.0, 0.0, 0.0, 0.0],
+        );
         let cmds = t.generate_render_commands(dummy_font(), 8.0, 16.0, 1.0);
         assert_eq!(cmds.len(), 2, "SetColor + Print for one non-space cell");
         assert!(matches!(cmds[0], RenderCommand::SetColor(_, _, _, _)));
@@ -157,7 +163,13 @@ mod tests {
     #[test]
     fn draw_to_image_non_space_cell_writes_pixels() {
         let mut t = Terminal::new(2, 2);
-        t.set(1, 1, b'X' as u32, [1.0, 0.0, 0.0, 1.0], [0.0, 0.0, 0.0, 0.0]);
+        t.set(
+            1,
+            1,
+            b'X' as u32,
+            [1.0, 0.0, 0.0, 1.0],
+            [0.0, 0.0, 0.0, 0.0],
+        );
         let img = t.draw_to_image(64, 32);
         if let Some((r, g, b, _)) = img.get_pixel(0, 0) {
             assert!(r > 100 && g < 50 && b < 50, "expected red cell pixel");

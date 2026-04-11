@@ -1,58 +1,41 @@
-# `particle` � Agent Reference
+﻿# particle - Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 � Reusable Engine Extensions                  |
-| **Status**     | Implemented � Full                                   |
-| **Lua API**    | `lurek.particles`                                      |
-| **Source**      | `src/particle/`                                      |
-| **Rust Tests** | `tests/rust/unit/particle_tests.rs`                  |
-| **Lua Tests**  | `tests/lua/unit/test_particle.lua`                   |
-| **Architecture** | �                                                  |
+## Module Info
 
-## Purpose
+- Module: particle
+- Group: Feature Systems
+- Spec: docs/specs/particle.md
+- Lua API: src/lua_api/particle_api.rs
+- Rust tests: tests/rust/unit/particle_tests.rs
+- Lua tests: tests/lua/unit/test_particle.lua, tests/lua/stress/test_particle_stress.lua, tests/lua/integration/test_particle_timer.lua, tests/lua/evidence/test_evidence_particle.lua
 
-The particle module implements a CPU-side emitter-based 2D particle system with trail-ribbon rendering. A `ParticleSystem` spawns short-lived `Particle` entities each frame according to a ~50-field `ParticleConfig`, advances their position and velocity through gravity, radial/tangential acceleration, linear damping, quadratic drag, orbital rotation, and turbulence, then culls expired particles � keeping allocation bounded by `ParticleConfig::max_particles`. The surviving particle state is batched into a single `RenderCommand::DrawParticleSystem` for the GPU renderer to draw as textured quads or geometric shape primitives (Square, Circle, Triangle, Spark, Diamond) in one instanced draw call.
+## Module Purpose
 
-## Source Files
+The particle module owns emitter-driven 2D particles and trail ribbons. It defines emitter configuration, particle spawning rules, lifetime interpolation, motion updates, trail point aging, and the render-command payloads that describe how those effects should be drawn.
 
-| File | Purpose |
-|------|---------|
-| `mod.rs`      | Module entry point, re-exports all public types, tier and sub-file table in module-level docs |
-| `config.rs`   | `ParticleConfig` (~50 fields) and enums: `AreaDistribution`, `InsertMode`, `EmitterState`, `EmissionShape`, `RelativeMode` |
-| `shapes.rs`   | `ParticleShape` enum � five geometric render primitives (Square, Circle, Triangle, Spark, Diamond) |
-| `particle.rs` | `Particle` struct � per-particle live state (position, velocity, lifetime, rotation, acceleration) |
-| `emitter.rs`  | `ParticleSystem` struct � simulation loop, physics integration, `build_render_commands()` builder, and inline unit tests || `render.rs`   | GPU render-command generation interface: `ParticleSystem::generate_render_commands()` and `Trail::generate_render_commands()` wrappers around the existing `build_render_commands()` methods || `math.rs`     | Math helpers: `lerp`, `interpolate_sizes`, `interpolate_colors`, `interpolate_alphas`, `rand_range`, `rand_normal` |
-| `emission.rs` | Spawn-offset calculators for area distribution (`emission_offset`) and emission shapes (`emission_shape_offset`) |
-| `trail.rs`    | `Trail` and `TrailPoint` — time-fading ribbon effect with width taper and color gradient. `build_render_commands()` emits width-tapered triangle-strip quads with head→tail color interpolation. |
+This module exists so transient visual effects can be expressed as reusable CPU simulations instead of one-off draw code. It decides how particles spawn, move, age, and fade, but it does not own gameplay triggers, scene membership, or GPU execution. The renderer consumes the batched particle and trail command data after this module has already produced the effect state.
+
+## Files
+
+- mod.rs: Declares the particle submodules and re-exports the public emitter, config, particle, trail, and helper types.
+- config.rs: Defines ParticleConfig and the enums that control emission shape, area distribution, insert mode, emitter state, and relative motion.
+- emission.rs: Computes spawn offsets from the configured area-distribution and emission-shape rules.
+- emitter.rs: Defines ParticleSystem, including spawning, simulation updates, emitter lifecycle, and batched render-command generation.
+- particle.rs: Defines Particle, the live per-particle state record used during simulation.
+- math.rs: Defines interpolation and random-sampling helpers used during particle updates.
+- shapes.rs: Defines ParticleShape, the geometric primitive enum for untextured particle rendering.
+- trail.rs: Defines Trail and TrailPoint for fading ribbon effects built from timestamped points.
+- render.rs: Provides standard generate_render_commands wrappers for particle systems and trails.
 
 ## Key Types
 
-| Type | Description |
-|------|-------------|
-| `AreaDistribution` | Principal type for the `particle` module. |
-| `InsertMode` | Principal type for the `particle` module. |
-| `EmitterState` | Principal type for the `particle` module. |
-| `EmissionShape` | Principal type for the `particle` module. |
-| `RelativeMode` | Principal type for the `particle` module. |
-| `ParticleConfig` | Principal type for the `particle` module. |
-| `ParticleSystem` | Principal type for the `particle` module. |
-| `Particle` | Principal type for the `particle` module. |
-| `ParticleShape` | Principal type for the `particle` module. |
-| `TrailPoint` | Principal type for the `particle` module. |
-| `Trail` | Principal type for the `particle` module. |
-
-## Lua API Summary
-
-| Function | Description |
-|----------|-------------|
-| `lurek.particle.newSystem()` | See `docs/specs/particle.md`. |
-| `lurek.particle.newTrail()` | See `docs/specs/particle.md`. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-� [`docs/specs/particle.md`](../../docs/specs/particle.md)
-
-_Update both this file **and** `docs/specs/particle.md` whenever source files, public types, or Lua bindings change._
+- ParticleConfig: Main emitter configuration object controlling spawn rate, lifetime, forces, interpolation curves, rendering shape, and batching limits.
+- ParticleSystem: Main emitter simulation that owns the live particle pool and advances it each frame.
+- Particle: Per-particle runtime state including position, velocity, lifetime, rotation, and acceleration terms.
+- ParticleShape: Enum selecting the geometric primitive used for untextured particles.
+- EmissionShape: Enum controlling where particles spawn relative to the emitter.
+- AreaDistribution: Enum controlling secondary spread across rectangular or elliptical areas.
+- EmitterState: Enum tracking whether an emitter is active, paused, or stopped.
+- RelativeMode: Enum controlling whether particles remain in world space or move with the emitter.
+- Trail: Fading ribbon effect that stores and ages trail points over time.
+- TrailPoint: Individual point stored inside a Trail.

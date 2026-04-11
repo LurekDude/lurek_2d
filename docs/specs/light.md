@@ -1,366 +1,293 @@
-﻿# `light` ÔÇö Agent Reference
+# `light` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 ÔÇö Engine Extension                            |
-| **Status**     | Implemented ÔÇö Full                                   |
-| **Lua API**    | `lurek.light`                                         |
-| **Source**      | `src/render/light/`                                  |
-| **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
-| **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
-| **Architecture** | ÔÇö                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Platform Services |
+| **Status** | Implemented |
+| **Lua API** | `lurek.light` |
+| **Source** | `src/light/` |
+| **Rust Tests** | none found in the workspace |
+| **Lua Tests** | none found in the workspace |
+| **Architecture** | `docs/architecture/engine-architecture.md § Platform Services` |
+
+---
 
 ## Summary
 
-The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2D. It stores all state needed to describe point, directional, and spot light sources in 2D space ÔÇö position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
+The light module owns the CPU-side 2D lighting model. It defines individual lights, occluders, attenuation, falloff, flicker, blend behavior, shadow filtering, and the LightWorld container that groups active lighting state into keyed pools for the renderer to consume later.
 
-The module is purely a data container layer. It holds no GPU resources, performs no rendering, and issues no draw commands. The renderer reads `LightWorld` state each frame and produces the actual lighting pass via `RenderCommand` variants in the graphics pipeline. This separation means the light module can be tested headlessly without a GPU context.
+This module keeps lighting data and rules separate from shader execution. It describes what lights and occluders exist and how they should behave, but it does not perform shadow rendering, final compositing, or scene ownership. That boundary keeps the lighting state testable and lets the renderer decide how to turn these descriptions into an actual lighting pass.
 
-Key design decisions: (1) `Light2D` is a flat struct with 23 public fields covering all light parameters ÔÇö no inheritance or trait hierarchy. (2) `LightWorld` uses `SlotMap<LightKey, Light2D>` and `SlotMap<OccluderKey, Occluder>` for O(1) insert/remove/lookup with generational key safety. (3) The system auto-enables when the first light is added. (4) Bitmask fields (`light_mask`, `shadow_mask`) control per-light/per-occluder interaction filtering. (5) `FlickerConfig` provides built-in sinusoidal intensity modulation driven by `advance_flickers(dt)` on the world. (6) Group operations (`set_group_enabled`, `set_group_intensity`, `set_group_color`) allow batch control of lights sharing a `group_id`.
+**Scope boundary**: This module currently depends on `image`, `math`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
 
-Scope boundary: GPU shadow mapping, ray-marching, and rendering live in `graphics` and `lua_api`. The `light` module does not import `graphics` ÔÇö it only imports `math` (for `Vec2`, `Color`) and `engine` (for `SlotMap` keys and log messages). Volumetric scattering is flagged via `Light2D::volumetric` but not implemented at the data level ÔÇö the renderer decides how to use the hint.
+---
 
 ## Architecture
 
 ```
-LightWorld (resource pool)
-ÔöťÔöÇÔöÇ lights: SlotMap<LightKey, Light2D>
-Ôöé   ÔööÔöÇÔöÇ Light2D
-Ôöé       ÔöťÔöÇÔöÇ position (x, y)
-Ôöé       ÔöťÔöÇÔöÇ radius, color, intensity, enabled, energy
-Ôöé       ÔöťÔöÇÔöÇ blend_mode  Ôćĺ LightBlendMode (Add | Sub | Mix)
-Ôöé       ÔöťÔöÇÔöÇ falloff     Ôćĺ FalloffMode (Linear | Smooth | Constant)
-Ôöé       ÔöťÔöÇÔöÇ light_type  Ôćĺ LightType (Point | Directional | Spot)
-Ôöé       Ôöé   ÔöťÔöÇÔöÇ direction (radians)
-Ôöé       Ôöé   ÔööÔöÇÔöÇ inner_angle, outer_angle (for Spot)
-Ôöé       ÔöťÔöÇÔöÇ attenuation Ôćĺ Attenuation (constant, linear, quadratic)
-Ôöé       ÔöťÔöÇÔöÇ flicker     Ôćĺ FlickerConfig (speed, strength, phase)
-Ôöé       ÔöťÔöÇÔöÇ shadow_enabled, shadow_color, shadow_filter, shadow_smooth
-Ôöé       ÔöťÔöÇÔöÇ light_mask, shadow_mask (u16 bitmasks)
-Ôöé       ÔööÔöÇÔöÇ group_id, volumetric
-Ôöé
-ÔöťÔöÇÔöÇ occluders: SlotMap<OccluderKey, Occluder>
-Ôöé   ÔööÔöÇÔöÇ Occluder
-Ôöé       ÔöťÔöÇÔöÇ vertices: Vec<Vec2> (3..=256)
-Ôöé       ÔöťÔöÇÔöÇ position: Vec2
-Ôöé       ÔöťÔöÇÔöÇ opacity: f32
-Ôöé       ÔöťÔöÇÔöÇ light_mask: u16
-Ôöé       ÔööÔöÇÔöÇ enabled: bool
-Ôöé
-ÔöťÔöÇÔöÇ ambient: Color
-ÔöťÔöÇÔöÇ enabled: bool
-ÔööÔöÇÔöÇ max_lights: u16
-
-Data flow:
-  Lua scripts Ôćĺ lurek.light.* (light_api.rs)
-    Ôćĺ mutates LightWorld in SharedState
-      Ôćĺ renderer reads LightWorld during render_frame()
-        Ôćĺ produces lighting pass via RenderCommand queue
+lurek.light.* (Lua API — src/lua_api/light_api.rs)
+    |
+    v
+src/light/mod.rs
+    |- attenuation.rs - attenuation
+    |- blend_mode.rs - blend_mode
+    |- falloff.rs - falloff
+    |- flicker.rs - flicker
+    |- light2d.rs - light2d
+    |- light_type.rs - light_type
+    |- light_world.rs - light_world
+    |- occluder.rs - occluder
+    |- ...
 ```
+
+---
 
 ## Source Files
 
-| File              | Purpose                                                        |
-|-------------------|----------------------------------------------------------------|
-| `mod.rs`          | Module root ÔÇö re-exports all public types, declares submodules |
-| `attenuation.rs`  | `Attenuation` struct ÔÇö custom distance falloff coefficients    |
-| `blend_mode.rs`   | `LightBlendMode` enum ÔÇö additive / subtractive / mix blending  |
-| `falloff.rs`      | `FalloffMode` enum ÔÇö linear / smooth / constant intensity decay|
-| `flicker.rs`      | `FlickerConfig` struct ÔÇö sinusoidal intensity modulation       |
-| `light2d.rs`      | `Light2D` struct ÔÇö primary light data container (23 fields)    |
-| `light_type.rs`   | `LightType` enum ÔÇö point / directional / spot geometry         |
-| `light_world.rs`  | `LightWorld` struct ÔÇö SlotMap pool for lights and occluders    |
-| `occluder.rs`     | `Occluder` struct ÔÇö polygon shadow caster definition           |
-| `shadow.rs`       | `ShadowFilter` enum ÔÇö shadow edge quality (none / PCF5 / PCF13)|
+| File | Purpose |
+|------|---------|
+| `attenuation.rs` | Defines coefficient-based attenuation for custom distance decay. |
+| `blend_mode.rs` | Defines how light mixes with the scene. |
+| `falloff.rs` | Defines the high-level radial falloff enum. |
+| `flicker.rs` | Defines flicker configuration and phase advancement helpers. |
+| `light2d.rs` | Defines Light2D, the main per-light data record with position, radius, color, intensity, masks, shadows, geometry, attenuation, flicker, and grouping. |
+| `light_type.rs` | Defines the geometric light-type enum for point, directional, and spot lights. |
+| `light_world.rs` | Defines LightWorld, the keyed container for active lights, occluders, ambient color, limits, and group operations. |
+| `mod.rs` | Declares the lighting submodules and re-exports the public light types. |
+| `occluder.rs` | Defines Occluder, a polygon shadow caster with transform, opacity, mask, and enabled state. |
+| `shadow.rs` | Defines the shadow edge-filter enum. |
+
+---
 
 ## Submodules
 
 ### `light::attenuation`
 
-Custom attenuation coefficients for light falloff curves.
+Defines coefficient-based attenuation for custom distance decay.
 
-- **`Attenuation`** (struct): Three-coefficient (constant, linear, quadratic) model controlling how light intensity decays with distance. Computes `1 / (c + l*d + q*d┬▓)`.
+- **`Attenuation`** (struct): Custom attenuation coefficients controlling light intensity decay.
 
 ### `light::blend_mode`
 
-Light blend mode enum for controlling how light color mixes with the scene.
+Defines how light mixes with the scene.
 
-- **`LightBlendMode`** (enum): Selects compositing strategy ÔÇö `Add` (brightens), `Sub` (darkens), or `Mix` (lerp by intensity). Default: `Add`.
+- **`LightBlendMode`** (enum): How light color mixes with the scene.
 
 ### `light::falloff`
 
-Falloff mode enum for controlling how light intensity decays over distance.
+Defines the high-level radial falloff enum.
 
-- **`FalloffMode`** (enum): Selects radial decay shape ÔÇö `Linear` (ramp to zero), `Smooth` (quadratic ease-out), or `Constant` (full intensity with hard cutoff). Default: `Linear`.
+- **`FalloffMode`** (enum): How light intensity decays from center to edge.
 
 ### `light::flicker`
 
-Built-in flicker effect configuration for lights.
+Defines flicker configuration and phase advancement helpers.
 
-- **`FlickerConfig`** (struct): Drives sinusoidal intensity modulation via `speed` (rad/s), `strength` (amplitude fraction), and an auto-advancing `phase`. Computes multiplier as `1 + strength * sin(phase)`.
+- **`FlickerConfig`** (struct): Built-in flicker effect that modulates light intensity over time.
 
 ### `light::light2d`
 
-2D point light data container ÔÇö the primary type in this module.
+Defines Light2D, the main per-light data record with position, radius, color, intensity, masks, shadows, geometry, attenuation, flicker, and grouping.
 
-- **`Light2D`** (struct): Flat data container with 23 public fields describing a 2D light source: position, radius, color, intensity, enabled, energy, blend mode, falloff, shadow settings, masks, light type, direction, cone angles, attenuation, flicker, group ID, and volumetric flag.
+- **`Light2D`** (struct): 2D point light with position, radius, color, intensity, and shadow settings.
 
 ### `light::light_type`
 
-Geometric light type variants.
+Defines the geometric light-type enum for point, directional, and spot lights.
 
-- **`LightType`** (enum): `Point` (omnidirectional), `Directional` (parallel rays, no positional falloff), or `Spot` (cone defined by inner/outer angles). Default: `Point`.
+- **`LightType`** (enum): The geometric shape of a light source.
 
 ### `light::light_world`
 
-Resource pool and state for the 2D lighting system.
+Defines LightWorld, the keyed container for active lights, occluders, ambient color, limits, and group operations.
 
-- **`LightWorld`** (struct): Owns `SlotMap<LightKey, Light2D>` and `SlotMap<OccluderKey, Occluder>` pools, plus global ambient color, enabled flag, and max_lights cap. Provides add/remove/get/clear operations, group batch operations, and `advance_flickers(dt)`.
+- **`LightWorld`** (struct): Resource pool and state for the 2D lighting system.
 
 ### `light::occluder`
 
-Polygon shadow caster for the 2D lighting system.
+Defines Occluder, a polygon shadow caster with transform, opacity, mask, and enabled state.
 
-- **`Occluder`** (struct): Convex or concave polygon (3ÔÇô256 vertices) in local space with a translation offset, opacity (0ÔÇô1), light interaction bitmask, and enabled flag. Panics if vertex count is outside 3..=256.
+- **`Occluder`** (struct): Polygon shadow caster that blocks light.
 
 ### `light::shadow`
 
-Shadow filter enum for controlling edge quality of shadow boundaries.
+Defines the shadow edge-filter enum.
 
-- **`ShadowFilter`** (enum): `None` (hard edges), `Pcf5` (5-tap percentage-closer filtering), or `Pcf13` (13-tap PCF for smoother edges). Default: `None`.
+- **`ShadowFilter`** (enum): Edge quality for shadow boundaries.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `light::attenuation::Attenuation`
+#### `Light2D`
 
-Custom attenuation coefficients controlling light intensity decay. Three fields: `constant` (f32, default 1.0), `linear` (f32, default 0.0), `quadratic` (f32, default 0.0). The effective intensity at distance `d` is `intensity / (constant + linear * d + quadratic * d┬▓)`. Provides `new(c, l, q)` constructor and `factor(distance) -> f32` for computing the attenuation multiplier. Implements `Default` (no custom attenuation).
+Main per-light data container used by Lua and the renderer-facing lighting world.
 
-#### `light::flicker::FlickerConfig`
+#### `LightWorld`
 
-Built-in flicker effect that modulates light intensity over time. Fields: `enabled` (bool), `speed` (f32, default 8.0 rad/s), `strength` (f32, default 0.15), `phase` (f32, auto-advances). Provides `new(speed, strength)` (creates enabled config), `multiplier() -> f32` (returns current intensity scale), and `advance(dt)` (advances phase, wraps at 2¤Ç). Implements `Default` (disabled).
+Owner of the light and occluder pools, ambient settings, limits, and group operations.
 
-#### `light::light2d::Light2D`
+#### `Occluder`
 
-2D point light with position, radius, color, intensity, and shadow settings. Contains 23 public fields covering all light parameters. Constructor `new(x, y, radius)` creates a white, enabled, point light at the given position. Provides getter/setter pairs for every field: position, radius, color, intensity, enabled, energy, blend_mode, falloff, shadow_enabled, shadow_color, shadow_filter, shadow_smooth, light_mask, shadow_mask, light_type, direction, inner_angle, outer_angle, attenuation, group_id, volumetric. Also provides `flicker()` and `flicker_mut()` for direct flicker config access.
+Polygon shadow caster with vertices, transform, opacity, mask, and enabled state.
 
-#### `light::light_world::LightWorld`
+#### `LightType`
 
-Resource pool and state for the 2D lighting system. Owns `SlotMap<LightKey, Light2D>` and `SlotMap<OccluderKey, Occluder>` plus `ambient` color, `enabled` flag, and `max_lights` cap (default 64). Auto-enables when the first light is added. Provides: `add_light`, `add_occluder`, `remove_light`, `remove_occluder`, `get_light`, `get_light_mut`, `get_occluder`, `get_occluder_mut`, `light_count`, `occluder_count`, `clear`, `has_active_lights`, `set_group_enabled`, `set_group_intensity`, `set_group_color`, `group_count`, `advance_flickers`. Implements `Default`.
+Enum distinguishing point, directional, and spot light behavior.
 
-#### `light::occluder::Occluder`
+#### `LightBlendMode`
 
-Polygon shadow caster that blocks light. Fields: `vertices` (Vec\<Vec2\>, 3ÔÇô256 verts), `position` (Vec2), `opacity` (f32, 0ÔÇô1), `light_mask` (u16), `enabled` (bool). Constructor `new(vertices)` panics if vertex count is outside 3..=256. Provides getter/setter pairs for vertices, position, opacity, light_mask, and enabled.
+Enum controlling additive, subtractive, or mixed scene contribution.
 
-### Enums
+#### `FalloffMode`
 
-#### `light::blend_mode::LightBlendMode`
+Enum describing how intensity decays from center to edge.
 
-How light color mixes with the scene. Variants: `Add` (additive, default ÔÇö brightens), `Sub` (subtractive ÔÇö darkens), `Mix` (lerp by intensity). Implements `Default` (Add).
+#### `Attenuation`
 
-#### `light::falloff::FalloffMode`
+Coefficient-based custom falloff model.
 
-How light intensity decays from center to edge. Variants: `Linear` (default ÔÇö ramp to zero), `Smooth` (quadratic ease-out for soft falloff), `Constant` (full intensity with hard cutoff at edge). Implements `Default` (Linear).
+#### `FlickerConfig`
 
-#### `light::light_type::LightType`
+Time-varying intensity modulation for torches, unstable lights, and similar effects.
 
-The geometric shape of a light source. Variants: `Point` (default ÔÇö omnidirectional), `Directional` (parallel rays, no positional falloff), `Spot` (cone defined by direction + inner/outer angles). Implements `Default` (Point).
+#### `ShadowFilter`
 
-#### `light::shadow::ShadowFilter`
+Enum selecting the shadow edge filtering quality.
 
-Edge quality for shadow boundaries. Variants: `None` (default ÔÇö hard edges), `Pcf5` (5-tap percentage-closer filtering for soft edges), `Pcf13` (13-tap PCF for smoother edges). Implements `Default` (None).
+---
 
 ## Lua API
 
-Exposed under `lurek.light.*` by `src/lua_api/light_api.rs`. The API provides two UserData types (`Light` and `Occluder`) and module-level functions for world management.
+Exposed under `lurek.light.*` by `src/lua_api/light_api.rs`.
 
-### Module-level functions
+### Module Functions
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `lurek.light.newLight` | `(x, y, radius [, opts])` Ôćĺ Light | Creates a point light; opts table overrides defaults |
-| `lurek.light.newOccluder` | `(vertices [, opts])` Ôćĺ Occluder | Creates a shadow polygon from flat `{x1,y1,...}` table |
-| `lurek.light.setAmbient` | `(r, g, b [, a])` | Sets global ambient light color |
-| `lurek.light.getAmbient` | `()` Ôćĺ r, g, b, a | Returns global ambient color |
-| `lurek.light.setEnabled` | `(enabled)` | Enables/disables the lighting system |
-| `lurek.light.isEnabled` | `()` Ôćĺ bool | Returns lighting system state |
-| `lurek.light.getLightCount` | `()` Ôćĺ int | Number of lights in the world |
-| `lurek.light.getOccluderCount` | `()` Ôćĺ int | Number of occluders in the world |
-| `lurek.light.getMaxLights` | `()` Ôćĺ int | Max lights processed per frame |
-| `lurek.light.setMaxLights` | `(n)` | Sets max lights (clamped 1ÔÇô256) |
-| `lurek.light.clear` | `()` | Removes all lights and occluders |
-| `lurek.light.setGroupEnabled` | `(groupId, enabled)` | Enables/disables all lights in a group |
-| `lurek.light.setGroupIntensity` | `(groupId, intensity)` | Sets intensity for a group |
-| `lurek.light.setGroupColor` | `(groupId, r, g, b [, a])` | Sets color for a group |
-| `lurek.light.getGroupCount` | `(groupId)` Ôćĺ int | Number of lights in a group |
-| `lurek.light.advanceFlickers` | `(dt)` | Advances flicker phase for all lights |
+| Function | Description |
+|----------|-------------|
+| `lurek.light.newLight` | Creates a new light at (x, y) with the given radius and optional settings. |
+| `lurek.light.newOccluder` | Creates a new shadow occluder from a vertex table and optional settings. |
+| `lurek.light.setAmbient` | Sets the global ambient light color. |
+| `lurek.light.getAmbient` | Returns the global ambient light color as (r, g, b, a). |
+| `lurek.light.setEnabled` | Sets whether the lighting system is active. |
+| `lurek.light.isEnabled` | Returns whether the lighting system is active. |
+| `lurek.light.getLightCount` | Returns the number of lights in the world. |
+| `lurek.light.getOccluderCount` | Returns the number of occluders in the world. |
+| `lurek.light.getMaxLights` | Returns the maximum number of lights processed per frame. |
+| `lurek.light.setMaxLights` | Sets the maximum number of lights processed per frame (clamped 1–256). |
+| `lurek.light.clear` | Removes all lights and occluders, resets ambient to default. |
+| `lurek.light.setGroupEnabled` | Sets the enabled state for all lights in the given group. |
+| `lurek.light.setGroupIntensity` | Sets the intensity for all lights in the given group. |
+| `lurek.light.setGroupColor` | Sets the color for all lights in the given group. |
+| `lurek.light.getGroupCount` | Returns the number of lights in the given group. |
+| `lurek.light.advanceFlickers` | Advances flicker phase for all lights with flicker enabled. |
 
-### Light UserData methods
-
-| Method | Description |
-|---|---|
-| `light:setPosition(x, y)` | Sets the light's world-space position. |
-| `light:getPosition()` | Returns the light's world-space position as x, y. |
-| `light:setRadius(r)` | Sets the light's influence radius. |
-| `light:getRadius()` | Returns the light's influence radius. |
-| `light:setColor(r, g, b, a?)` | Sets the light's tint color. |
-| `light:getColor()` | Returns the light's tint color as r, g, b, a. |
-| `light:setIntensity(i)` | Sets the brightness multiplier. |
-| `light:getIntensity()` | Returns the brightness multiplier. |
-| `light:setEnergy(e)` | Sets the energy scaling factor. |
-| `light:getEnergy()` | Returns the energy scaling factor. |
-| `light:setBlendMode(mode)` | Sets the blend mode (`'add'`, `'sub'`, or `'mix'`). |
-| `light:getBlendMode()` | Returns the blend mode as a string. |
-| `light:setFalloff(mode)` | Sets the falloff mode (`'linear'`, `'smooth'`, or `'constant'`). |
-| `light:getFalloff()` | Returns the falloff mode as a string. |
-| `light:setShadowEnabled(b)` | Sets whether this light casts shadows. |
-| `light:isShadowEnabled()` | Returns whether this light casts shadows. |
-| `light:setShadowColor(r, g, b, a?)` | Sets the shadow region color. |
-| `light:getShadowColor()` | Returns the shadow region color as r, g, b, a. |
-| `light:setShadowFilter(filter)` | Sets the shadow edge filter (`'none'`, `'pcf5'`, or `'pcf13'`). |
-| `light:getShadowFilter()` | Returns the shadow edge filter as a string. |
-| `light:setShadowSmooth(s)` | Sets the shadow edge smoothing factor. |
-| `light:getShadowSmooth()` | Returns the shadow edge smoothing factor. |
-| `light:setLightMask(mask)` | Sets the light interaction bitmask. |
-| `light:getLightMask()` | Returns the light interaction bitmask. |
-| `light:setShadowMask(mask)` | Sets the shadow casting bitmask. |
-| `light:getShadowMask()` | Returns the shadow casting bitmask. |
-| `light:setEnabled(b)` | Sets whether this light is active. |
-| `light:isEnabled()` | Returns whether this light is active. |
-| `light:setLightType(t)` | Sets the geometric type (`'point'`, `'directional'`, or `'spot'`). |
-| `light:getLightType()` | Returns the geometric light type as a string. |
-| `light:setDirection(dir)` | Sets the direction angle in radians. |
-| `light:getDirection()` | Returns the direction angle in radians. |
-| `light:setInnerAngle(a)` | Sets the inner cone angle in radians for spot lights. |
-| `light:getInnerAngle()` | Returns the inner cone angle in radians. |
-| `light:setOuterAngle(a)` | Sets the outer cone angle in radians for spot lights. |
-| `light:getOuterAngle()` | Returns the outer cone angle in radians. |
-| `light:setAttenuation(c, l, q)` | Sets the custom attenuation coefficients (constant, linear, quadratic). |
-| `light:getAttenuation()` | Returns the attenuation coefficients as constant, linear, quadratic. |
-| `light:setFlicker(speed, strength)` | Sets the flicker effect speed and strength. |
-| `light:getFlicker()` | Returns the flicker effect speed and strength. |
-| `light:setFlickerEnabled(b)` | Sets whether the flicker effect is active. |
-| `light:isFlickerEnabled()` | Returns whether the flicker effect is active. |
-| `light:setGroupId(id)` | Sets the group identifier for batch operations. |
-| `light:getGroupId()` | Returns the group identifier. |
-| `light:setVolumetric(b)` | Sets whether this light hints at volumetric scattering. |
-| `light:isVolumetric()` | Returns whether this light hints at volumetric scattering. |
-| `light:setOpacity(o)` | Sets the light opacity (0.0–1.0). |
-| `light:getOpacity()` | Returns the light opacity. |
-| `light:remove()` | Removes this light from the world. |
-| `light:isValid()` | Returns whether this light handle is still valid. |
-
-### Occluder UserData methods
+### `Light` Methods
 
 | Method | Description |
-|---|---|
-| `occ:setVertices(tbl)` | Replaces the polygon vertices from a flat table `{x1, y1, x2, y2, ...}`. |
-| `occ:getVertices()` | Returns the polygon vertices as a flat table `{x1, y1, x2, y2, ...}`. |
-| `occ:setPosition(x, y)` | Sets the translation offset applied to all vertices. |
-| `occ:getPosition()` | Returns the translation offset as x, y. |
-| `occ:setOpacity(o)` | Sets the shadow opacity (0.0–1.0). |
-| `occ:getOpacity()` | Returns the shadow opacity. |
-| `occ:setLightMask(mask)` | Sets the light interaction bitmask. |
-| `occ:getLightMask()` | Returns the light interaction bitmask. |
-| `occ:setEnabled(b)` | Sets whether this occluder is active. |
-| `occ:isEnabled()` | Returns whether this occluder is active. |
-| `occ:remove()` | Removes this occluder from the world. |
-| `occ:isValid()` | Returns whether this occluder handle is still valid. |
+|--------|-------------|
+| `light:setPosition(...)` | Sets the light's world-space position. |
+| `light:getPosition(...)` | Returns the light's world-space position. |
+| `light:setRadius(...)` | Sets the light's influence radius. |
+| `light:getRadius(...)` | Returns the light's influence radius. |
+| `light:setColor(...)` | Sets the light's tint color. |
+| `light:getColor(...)` | Returns the light's tint color as (r, g, b, a). |
+| `light:setIntensity(...)` | Sets the brightness multiplier. |
+| `light:getIntensity(...)` | Returns the brightness multiplier. |
+| `light:setEnergy(...)` | Sets the energy scaling factor. |
+| `light:getEnergy(...)` | Returns the energy scaling factor. |
+| `light:setBlendMode(...)` | Sets the blend mode ('add', 'sub', or 'mix'). |
+| `light:getBlendMode(...)` | Returns the blend mode as a string. |
+| `light:setFalloff(...)` | Sets the falloff mode ('linear', 'smooth', or 'constant'). |
+| `light:getFalloff(...)` | Returns the falloff mode as a string. |
+| `light:setShadowEnabled(...)` | Sets whether this light casts shadows. |
+| `light:isShadowEnabled(...)` | Returns whether this light casts shadows. |
+| `light:getShadowColor(...)` | Returns the shadow region color as (r, g, b, a). |
+| `light:setShadowFilter(...)` | Sets the shadow edge filter ('none', 'pcf5', or 'pcf13'). |
+| `light:getShadowFilter(...)` | Returns the shadow edge filter as a string. |
+| `light:setShadowSmooth(...)` | Sets the shadow edge smoothing factor. |
+| `light:getShadowSmooth(...)` | Returns the shadow edge smoothing factor. |
+| `light:setLightMask(...)` | Sets the light interaction bitmask. |
+| `light:getLightMask(...)` | Returns the light interaction bitmask. |
+| `light:setShadowMask(...)` | Sets the shadow casting bitmask. |
+| `light:getShadowMask(...)` | Returns the shadow casting bitmask. |
+| `light:setEnabled(...)` | Sets whether this light is active. |
+| `light:isEnabled(...)` | Returns whether this light is active. |
+| `light:setLightType(...)` | Sets the geometric light type ('point', 'directional', or 'spot'). |
+| `light:getLightType(...)` | Returns the geometric light type as a string. |
+| `light:setDirection(...)` | Sets the direction angle in radians. |
+| `light:getDirection(...)` | Returns the direction angle in radians. |
+| `light:setInnerAngle(...)` | Sets the inner cone angle in radians for spot lights. |
+| `light:getInnerAngle(...)` | Returns the inner cone angle in radians. |
+| `light:setOuterAngle(...)` | Sets the outer cone angle in radians for spot lights. |
+| `light:getOuterAngle(...)` | Returns the outer cone angle in radians. |
+| `light:setAttenuation(...)` | Sets the custom attenuation coefficients (constant, linear, quadratic). |
+| `light:getAttenuation(...)` | Returns the custom attenuation coefficients as (constant, linear, quadratic). |
+| `light:setFlicker(...)` | Sets the flicker effect speed and strength (enables flicker). |
+| `light:getFlicker(...)` | Returns the flicker effect speed and strength. |
+| `light:setFlickerEnabled(...)` | Sets whether the flicker effect is active. |
+| `light:isFlickerEnabled(...)` | Returns whether the flicker effect is active. |
+| `light:setGroupId(...)` | Sets the group identifier for batch operations. |
+| `light:getGroupId(...)` | Returns the group identifier. |
+| `light:setVolumetric(...)` | Sets whether this light hints at volumetric scattering. |
+| `light:isVolumetric(...)` | Returns whether this light hints at volumetric scattering. |
+| `light:remove(...)` | Removes this light from the world. |
+| `light:isValid(...)` | Returns whether this light handle is still valid. |
 
-### `newLight` opts table keys
+### `Occluder` Methods
 
-`color` (table `{r,g,b[,a]}`), `intensity`, `energy`, `blend` (`"add"`/`"sub"`/`"mix"`), `falloff` (`"linear"`/`"smooth"`/`"constant"`), `shadowEnabled`, `shadowColor`, `shadowFilter` (`"none"`/`"pcf5"`/`"pcf13"`), `shadowSmooth`, `lightMask`, `shadowMask`, `enabled`, `type` (`"point"`/`"directional"`/`"spot"`), `direction`, `innerAngle`, `outerAngle`, `groupId`, `volumetric`, `flickerSpeed`, `flickerStrength`, `attConstant`, `attLinear`, `attQuadratic`
+| Method | Description |
+|--------|-------------|
+| `occluder:setVertices(...)` | Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}. |
+| `occluder:getVertices(...)` | Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}. |
+| `occluder:setPosition(...)` | Sets the translation offset applied to all vertices. |
+| `occluder:getPosition(...)` | Returns the translation offset as (x, y). |
+| `occluder:setOpacity(...)` | Sets the shadow opacity (0.0–1.0). |
+| `occluder:getOpacity(...)` | Returns the shadow opacity. |
+| `occluder:setLightMask(...)` | Sets the light interaction bitmask. |
+| `occluder:getLightMask(...)` | Returns the light interaction bitmask. |
+| `occluder:setEnabled(...)` | Sets whether this occluder is active. |
+| `occluder:isEnabled(...)` | Returns whether this occluder is active. |
+| `occluder:remove(...)` | Removes this occluder from the world. |
+| `occluder:isValid(...)` | Returns whether this occluder handle is still valid. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- Basic point light with flicker and an occluder casting shadows
-local torch, wall
-
-function lurek.init()
-    -- Create a warm torch light with flicker
-    torch = lurek.light.newLight(400, 300, 200, {
-        color = {1.0, 0.8, 0.4},
-        intensity = 1.2,
-        falloff = "smooth",
-        shadowEnabled = true,
-        flickerSpeed = 10,
-        flickerStrength = 0.2,
-    })
-
-    -- Create a rectangular occluder (wall)
-    wall = lurek.light.newOccluder({
-        100, 200,   -- top-left
-        200, 200,   -- top-right
-        200, 400,   -- bottom-right
-        100, 400,   -- bottom-left
-    })
-
-    -- Set dim ambient so unlit areas are not pitch black
-    lurek.light.setAmbient(0.05, 0.05, 0.1)
-end
-
-function lurek.process(dt)
-    -- Move the torch to follow the mouse
-    local mx, my = lurek.mouse.getPosition()
-    torch:setPosition(mx, my)
-
-    -- Advance all flicker effects
-    lurek.light.advanceFlickers(dt)
-end
-
-function lurek.render()
-    -- Draw your scene; the lighting system composites automatically
-    lurek.graphic.print("Move the mouse to move the torch", 10, 10)
+-- Minimal namespace check for lurek.light.
+if lurek.light then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Spot light with group management
-function lurek.init()
-    -- Create three spot lights in group 1
-    for i = 1, 3 do
-        lurek.light.newLight(200 * i, 300, 150, {
-            type = "spot",
-            direction = math.pi / 2,
-            innerAngle = math.pi / 8,
-            outerAngle = math.pi / 4,
-            groupId = 1,
-        })
-    end
-
-    -- Dim the entire group at once
-    lurek.light.setGroupIntensity(1, 0.5)
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count |
-|------------|-------|
-| `struct`   | 5     |
-| `enum`     | 4     |
-| `fn`       | 78    |
-| **Total**  | **87**|
+| Kind | Count |
+|------|-------|
+| `struct` | 5 |
+| `enum` | 4 |
+| `fn` (Lua API) | 75 |
+| **Total** | **84** |
+
+---
 
 ## References
 
-| Module      | Relationship | Notes                                                    |
-|-------------|--------------|----------------------------------------------------------|
-| `math`      | Imports from | Uses `Vec2` (occluder vertices/position) and `Color` (light tint, ambient, shadow color) |
-| `engine`    | Imports from | Uses `LightKey`, `OccluderKey` (SlotMap keys from `resource_keys.rs`), log message constants |
-| `lua_api`   | Imported by  | `light_api.rs` exposes `lurek.light.*` ÔÇö provides `LuaLight` and `LuaOccluder` UserData types |
-| `graphics`  | Related      | Renderer reads `LightWorld` from `SharedState` to produce the lighting pass; light module does not import graphics |
-| `particle`  | Similar      | Both are Tier 2 modules with SlotMap resource pools; particle owns visual emission, light owns illumination data |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `math` | Imports or references `math` from `src/math/`. | Cross-group dependency from Platform Services to Foundations. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Platform Services to Core Runtime. |
+
+---
 
 ## Notes
 
-- **CPU-only data model**: The `light` module holds zero GPU resources. All rendering is performed by the graphics pipeline reading `LightWorld` from `SharedState`. This makes the module fully testable without a GPU context.
-- **Auto-enable behaviour**: `LightWorld::add_light()` sets `enabled = true` automatically when the first light is inserted. Scripts do not need to call `lurek.light.setEnabled(true)` explicitly.
-- **Occluder vertex limits**: `Occluder::new()` panics (Rust-side assert) if the vertex count is outside 3..=256. The Lua API (`parse_vertex_table`) validates 6..=512 flat elements (i.e., 3..=256 vertices) before reaching the Rust constructor.
-- **Bitmask filtering**: `light_mask` and `shadow_mask` on both `Light2D` and `Occluder` default to `0xFFFF` (all bits set), meaning all lights interact with all occluders by default. Custom masks allow selective light-occluder filtering without removing objects.
-- **Flicker phase wrapping**: `FlickerConfig::advance()` wraps `phase` at `2¤Ç` to prevent float overflow during long-running sessions.
-- **Max lights cap**: `LightWorld::max_lights` defaults to 64 and is clamped to 1ÔÇô256 by the Lua API. The renderer uses this to limit per-frame processing.
-- **No `Default` on `Light2D`**: `Light2D` does not implement `Default` ÔÇö use `Light2D::new(x, y, radius)` which provides sensible defaults for all other fields (white, intensity 1.0, enabled, point type, no shadows, no flicker).
-- **Module tier**: Although `mod.rs` states "Tier 1", the module is classified as **Tier 2 ÔÇö Engine Extension** in the architecture docs because it builds on top of Baseline functionality to provide a reusable lighting abstraction.
+- **Source of truth**: Keep this spec synchronized with `src/light/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

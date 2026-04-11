@@ -1,40 +1,31 @@
-# `entity` — Agent Reference
+# `ecs` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.entity`                                        |
-| **Source**      | `src/ecs/`                                        |
-| **Rust Tests** | `tests/rust/unit/entity_tests.rs`                    |
-| **Lua Tests**  | `tests/lua/unit/test_entity.lua`                     |
-| **Architecture** | —                                                  |
+## Module Info
 
-## Purpose
+- Module name: `ecs`
+- Module group: Feature Systems
+- Spec path: `docs/specs/ecs.md`
+- Lua API path(s): `src/lua_api/ecs_api.rs`
+- Rust test path(s): none found under `tests/` with `ecs` in the path
+- Lua test path(s): none found under `tests/` with `ecs` in the path
 
-The entity module provides Lurek2D's lightweight entity-component-system (ECS) built around the `Universe` struct — a self-contained ECS world that manages entity lifecycle, components, tags, layers, blueprints, parent-child hierarchies, and ordered system dispatch. Entities are identified by generational packed IDs: the upper 8 bits store a generation counter and the lower 24 bits store the slot index, so a stale entity ID from a previously destroyed entity is detected at the Rust boundary before it can access wrong data. This prevents use-after-free bugs without requiring garbage collection or `unsafe` code.
+## Module Purpose
 
-## Source Files
+The `ecs` module owns Lurek2D's lightweight entity world and related relationship utilities. Its main job is to create and destroy entities safely, store arbitrary component data in Lua-owned tables, track tags and layers, manage parent-child hierarchies, define blueprints, and dispatch registered systems in a controlled order.
 
-| File               | Purpose                                                                     |
-|--------------------|-----------------------------------------------------------------------------|
-| `mod.rs`           | Module root — declares submodules, re-exports `Universe`, `RelationType`, `Relationship`, `RelationshipManager`, `deep_copy_table` |
-| `universe.rs`      | `Universe` struct — entity lifecycle, components, string/bitmap tags, layers, blueprints, parent-child, systems, `deep_copy_table` helper |
-| `relationships.rs` | `RelationType`, `Relationship`, `RelationshipManager` — symmetric pair-based relations with numeric values and named-state levels |
+This module exists to give Lua game code a flexible property-bag ECS rather than a rigid Rust archetype ECS. `Universe` handles identity, lifecycle, and indexing concerns while leaving component schemas dynamic. That makes it suitable for script-heavy gameplay code where components and systems evolve quickly and where entity data needs to remain easy to inspect and modify from Lua.
+
+The module intentionally does not own rendering, physics simulation, scene transitions, or specialized gameplay logic. It can store data for those systems and dispatch systems that act on that data, but it does not define how a sprite, collider, or scene should behave. The separate relationship types also do not model gameplay semantics by themselves; they only provide a reusable container for pairwise relation values and named levels.
+
+## Files
+
+- `mod.rs`: Declares the ECS submodules and re-exports the main world and relationship types.
+- `universe.rs`: Defines `Universe`, including generational entity IDs, component storage via Lua registry tables, tags, layers, blueprints, hierarchy management, and ordered system dispatch.
+- `relationships.rs`: Defines reusable relationship types and the `RelationshipManager` for symmetric pairwise values and named relation levels.
 
 ## Key Types
 
-| Type | Description |
-|------|-------------|
-| `RelationType` | Principal type for the `entity` module. |
-| `Relationship` | Principal type for the `entity` module. |
-| `RelationshipManager` | Principal type for the `entity` module. |
-| `Universe` | Principal type for the `entity` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/entity.md`](../../docs/specs/entity.md)
-
-_Update both this file **and** `docs/specs/entity.md` whenever source files, public types, or Lua bindings change._
+- `Universe`: The main ECS world object that owns entity lifecycle, component storage, tags, layers, blueprints, parent-child links, and registered systems.
+- `RelationshipManager`: A standalone manager for pairwise entity relationships that is separate from `Universe` but often complements ECS-driven gameplay.
+- `Relationship`: The stored record for one normalized entity pair, including a numeric value and per-type named levels.
+- `RelationType`: The definition of one named relationship category and its allowed level strings.

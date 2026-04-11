@@ -1,158 +1,105 @@
 # `bin` — Agent Reference
 
-| Property       | Value                                            |
-|----------------|--------------------------------------------------|
-| **Tier**       | Special — CLI entry point (not a numbered tier)  |
-| **Status**     | Implemented — Full                               |
-| **Lua API**    | —                                                |
-| **Source**      | `src/bin/`                                       |
-| **Rust Tests** | —                                                |
-| **Lua Tests**  | —                                                |
-| **Architecture** | —                                              |
+| Property | Value |
+|----------|-------|
+| **Tier** | Edge/Integration |
+| **Status** | Implemented |
+| **Lua API** | Indirect / none |
+| **Source** | `src/bin/` |
+| **Rust Tests** | None dedicated |
+| **Lua Tests** | None |
+| **Architecture** | `docs/architecture/engine-architecture.md § Edge / Integration` |
+
+---
 
 ## Summary
 
-The `bin` module contains the `lurekc` binary entry point — a console-less launcher for
-Lurek2D on Windows. Setting `#![cfg_attr(windows, windows_subsystem = "windows")]` suppresses
-the black terminal window that would otherwise appear alongside the game window, providing a
-polished experience for distributed games. On Linux and macOS the attribute is ignored and
-`lurekc` behaves identically to the standard `lurek2d` binary.
+The bin module holds alternative compiled entry points for the engine. It exists so the project can ship or develop with different binary behaviors while still routing all real startup logic through the shared library crate.
 
-The `lurekc` binary is auto-discovered by Cargo from `src/bin/lurekc.rs`. It contains a single
-`main()` function that delegates immediately to `luna2d::lurek_run()` — the shared entry point
-defined in `src/lib.rs`. All CLI argument parsing, config loading, `.lurek` archive extraction,
-panic hook installation, and engine loop execution happen inside `lurek_run()`, not in this file.
+Right now the important distinction is between the main console-attached launcher and the console-less Windows launcher under src/bin/. The bin module keeps that packaging concern separate from engine startup behavior, which still belongs in lib.rs and app.
 
-The companion binary `lurek2d` lives at `src/main.rs` and is the console-attached development
-binary. Both binaries call the same `lurek_run()` function; the only difference is the
-`windows_subsystem` attribute on `lurekc`.
+This module does not own configuration parsing, platform initialization, splash behavior, or the event loop. If a change affects engine boot semantics rather than which binary wrapper calls into them, it belongs somewhere else.
 
-A batch-file wrapper `lurekc.bat` exists at the repository root for scenarios where a separately
-compiled `lurekc.exe` is unavailable — it launches `lurek2d.exe` via `start /B` to detach the
-console window.
+**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
 
-**Scope boundary**: `lurekc.rs` contains zero engine logic. It is a three-line file whose sole
-purpose is the Windows subsystem attribute plus a call to the library crate. Any changes to
-boot sequence, CLI parsing, or config loading belong in `src/lib.rs` (`lurek_run`) or
-`src/engine/app.rs` (`App::new` / `App::run`), never here.
+---
 
 ## Architecture
 
 ```
-                     +---------------+      +---------------+
-                     |  lurek2d.exe   |      |  lurekc.exe    |
-                     |  src/main.rs  |      | src/bin/lurekc |
-                     |  (console)    |      |  (no console) |
-                     +-------+-------+      +-------+-------+
-                             |                      |
-                             +----------+-----------+
-                                        |
-                                        v
-                            +-----------------------+
-                            |  luna2d::lurek_run()   |
-                            |     src/lib.rs        |
-                            +-----------+-----------+
-                                        |
-              +-------------------------+-------------------------+
-              v                         v                         v
-    Install panic hook         Parse CLI args            Extract .lurek
-    (Windows msgbox)           (game dir or cwd)         archive if needed
-              |                         |                         |
-              +-------------------------+-------------------------+
-                                        |
-                                        v
-                            +-----------------------+
-                            | Config::load_from_    |
-                            |   conf_lua(&game_dir) |
-                            +-----------+-----------+
-                                        |
-                                        v
-                            +-----------------------+
-                            |  App::new(config)     |
-                            |  app.run(game_dir)    |
-                            +-----------------------+
+No direct Lua namespace — consumed through app/runtime integration or other bindings
+    |
+    v
+src/bin/mod.rs
+    |- lurekc.rs - lurekc
 ```
+
+---
 
 ## Source Files
 
-| File       | Purpose                                                                              |
-|------------|--------------------------------------------------------------------------------------|
-| `lurekc.rs` | Console-less binary entry point; sets `windows_subsystem = "windows"` and calls `lurek_run()` |
+| File | Purpose |
+|------|---------|
+| `lurekc.rs` | Minimal console-less launcher for Windows builds that applies the windows_subsystem attribute and then delegates straight to lurek2d::lurek_run(). This file should stay intentionally tiny because it is only a wrapper binary. |
+
+---
 
 ## Submodules
 
-None. The `bin` directory contains a single standalone binary source file with no submodules.
+### `bin::lurekc`
+
+Minimal console-less launcher for Windows builds that applies the windows_subsystem attribute and then delegates straight to lurek2d::lurek_run(). This file should stay intentionally tiny because it is only a wrapper binary.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-No public structs.
+#### `main`
 
-### Enums
+The only meaningful symbol in this module is the binary entry function in lurekc.rs.
 
-No public enums.
+---
 
 ## Lua API
 
-No Lua API — CLI binary entry point only.
+This module does not expose a dedicated direct Lua namespace. It is consumed indirectly through higher-level engine callbacks, shared state, or other `lurek.*` surfaces.
+
+---
 
 ## Lua Examples
 
-`lurekc` is not invoked from Lua. Usage is from the command line:
-
-```sh
-# Launch a game without a console window (Windows release distribution)
-lurekc path/to/my_game
-
-# Show the Lurek2D splash screen without a console window
-lurekc
-
-# Launch a .lurek archive (zip-packaged game)
-lurekc my_game.lurek
+```lua
+-- This module has no dedicated direct Lua namespace.
+-- It is used indirectly through other engine systems.
 ```
 
-Equivalent development commands using the console-attached binary:
-
-```sh
-# Development — console stays open for log output
-lurek2d path/to/my_game
-cargo run -- path/to/my_game
-```
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 0     |
-| `enum`    | 0     |
-| `fn`      | 1     |
-| **Total** | **1** |
+| Kind | Count |
+|------|-------|
+| `struct` | 0 |
+| `enum` | 0 |
+| `fn` (Lua API) | 0 |
+| **Total** | **0** |
+
+---
 
 ## References
 
-| Module   | Relationship | Notes                                                             |
-|----------|--------------|-------------------------------------------------------------------|
-| `lib.rs` | Calls into   | `lurekc.rs` calls `luna2d::lurek_run()` — the shared boot function  |
-| `engine` | Indirect     | `lurek_run()` creates `Config` and `App`; `lurekc` never touches them directly |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| — | No top-level `crate::<module>` imports were detected in this module's source files. | Keep the source files as the primary dependency reference. |
 
-The companion binary `src/main.rs` (`lurek2d`) is the console-attached counterpart. Both share
-identical behaviour via `lurek_run()`; the only difference is the Windows subsystem attribute.
+---
 
 ## Notes
 
-- **Three-line file**: `lurekc.rs` is intentionally minimal. If you need to change boot
-  behaviour, edit `lurek_run()` in `src/lib.rs` or `App::new()` / `App::run()` in
-  `src/engine/app.rs`. Never add logic to `lurekc.rs` itself.
-- **Cargo auto-discovery**: `src/bin/lurekc.rs` is automatically discovered as the `lurekc`
-  binary by Cargo. There is no explicit `[[bin]]` entry for it in `Cargo.toml` — only the
-  main `lurek2d` binary at `src/main.rs` has one.
-- **Windows-only effect**: The `#![cfg_attr(windows, windows_subsystem = "windows")]`
-  attribute only affects Windows builds. On Linux and macOS `lurekc` is functionally identical
-  to `lurek2d`.
-- **Batch-file fallback**: `lurekc.bat` at the repo root provides console-less launching
-  without a separate binary by using `start "" /B lurek2d.exe %*`. This is used in
-  distribution scenarios where only one `.exe` is shipped.
-- **No tests**: `lurekc.rs` has no dedicated tests because it contains no logic — it is a
-  pass-through to `lurek_run()`. Testing the boot sequence is covered by integration tests
-  that exercise `lurek_run()` or `App::run()` directly.
+- **Source of truth**: Keep this spec synchronized with `src/bin/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.
+- **Lua surface**: This module has no dedicated direct `lurek.*` namespace and is typically consumed through higher integration layers.

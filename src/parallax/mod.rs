@@ -65,11 +65,11 @@
 //! set:type()                → "ParallaxSet"
 //! ```
 
+/// CPU software-rendering fallback for headless draw-to-image.
+pub mod draw;
 /// Parallax layer data model and draw-call batch builder.
 pub mod layer;
 /// Render-command generation for parallax layers.
 pub mod render;
-/// CPU software-rendering fallback for headless draw-to-image.
-pub mod draw;
 
 pub use layer::{ParallaxDrawBatch, ParallaxLayer};

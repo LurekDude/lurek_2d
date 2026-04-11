@@ -13,10 +13,10 @@
 //! `engine`, and Tier 1 modules. It must not import other Tier 2 modules.
 
 mod cell;
-mod terminal_state;
-mod widget;
 /// Render-command generation and CPU drawing for the terminal module.
 pub mod render;
+mod terminal_state;
+mod widget;
 
 pub use cell::TCell;
 pub use terminal_state::Terminal;

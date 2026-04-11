@@ -51,7 +51,10 @@ mod tests {
     fn empty_system_gives_empty_commands() {
         let sys = ParticleSystem::new(ParticleConfig::default());
         let cmds = sys.generate_render_commands();
-        assert!(cmds.is_empty(), "a new emitter with no particles should produce no commands");
+        assert!(
+            cmds.is_empty(),
+            "a new emitter with no particles should produce no commands"
+        );
     }
 
     #[test]

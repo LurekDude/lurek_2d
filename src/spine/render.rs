@@ -121,7 +121,13 @@ mod tests {
         let skel = make_skeleton_with_bone();
         let cmds = skel.generate_render_commands(0.0, 0.0);
         assert!(
-            cmds.iter().any(|c| matches!(c, RenderCommand::Circle { mode: DrawMode::Fill, .. })),
+            cmds.iter().any(|c| matches!(
+                c,
+                RenderCommand::Circle {
+                    mode: DrawMode::Fill,
+                    ..
+                }
+            )),
             "expected a Fill circle for the bone"
         );
     }

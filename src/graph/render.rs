@@ -36,14 +36,17 @@ impl Graph {
 
         let positions: Vec<(f32, f32)> = (0..n)
             .map(|i| {
-                let angle = i as f32 * std::f32::consts::PI * 2.0 / n as f32
-                    - std::f32::consts::FRAC_PI_2;
+                let angle =
+                    i as f32 * std::f32::consts::PI * 2.0 / n as f32 - std::f32::consts::FRAC_PI_2;
                 (cx + radius * angle.cos(), cy + radius * angle.sin())
             })
             .collect();
 
-        let id_to_idx: std::collections::HashMap<u64, usize> =
-            node_ids.iter().enumerate().map(|(i, &id)| (id, i)).collect();
+        let id_to_idx: std::collections::HashMap<u64, usize> = node_ids
+            .iter()
+            .enumerate()
+            .map(|(i, &id)| (id, i))
+            .collect();
 
         let edge_count = self.edges.len();
         let mut cmds = Vec::with_capacity(edge_count * 2 + n * 2 + 2);

@@ -1,50 +1,35 @@
-# `docs` — Agent Reference
+# docs
 
-| Property         | Value                                                  |
-|------------------|--------------------------------------------------------|
-| **Tier**         | Tier 1 — Core Engine Subsystems                        |
-| **Status**       | Implemented — Full                                     |
-| **Lua API**      | `lurek.docs`                                            |
-| **Source**       | `src/docs/`                                            |
-| **Rust Tests**   | `tests/rust/unit/docs_tests.rs`                        |
-| **Lua Tests**    | `tests/lua/unit/test_docs.lua`                         |
-| **Architecture** | —                                                      |
+## Module Info
+- Module name: docs
+- Module group: Edge/Integration
+- Spec path: docs/specs/docs.md
+- Lua API path(s): src/lua_api/docs_api.rs
+- Rust test path(s): tests/rust/unit/docs_tests.rs
+- Lua test path(s): tests/lua/unit/test_docs.lua
 
-## Purpose
+## Module Purpose
 
-The `docs` module provides API documentation management, runtime reflection, and game-data validation:
+The docs module provides runtime documentation and schema data structures for the lurek.* API surface. It exists so the engine, VS Code extension, documentation generators, and Lua-side tooling can work from a structured catalog of API entries, quality metrics, and lightweight validation rules instead of relying only on free-form markdown.
 
-1. **Catalog / Validation** — `DocEntry`, `Catalog`, `ValidationReport`, `QualityReport` — scan live bindings, load TOML annotations, validate coverage and quality.
-2. **Schema validation** — `Schema`, `FieldRule`, `SchemaResult` — lightweight runtime data-validator for game config, save-state, and mod manifests. Defined in `src/docs/schema.rs`.
-3. **Live reflection** — `lurek.docs.reflectLive(ns?)` walks the live `lurek.*` Lua table and returns a structured name/type description; `lurek.docs.reflectTable(t, name?)` reflects any arbitrary Lua table.
+At the center of the module is DocEntry metadata collected into a Catalog, along with reporting helpers that measure completeness and quality. The schema layer complements that by validating Lua data against explicit field rules, which makes the module useful for config, manifest, and documentation-related tooling as well as reflection.
 
-## Source Files
+This module does not parse Rust source files directly and it does not replace the generated docs pipeline under tools and docs/. It provides the runtime-facing structures and export helpers that other systems can populate, query, validate, and serialize.
 
-| File           | Purpose                                                                          |
-|----------------|----------------------------------------------------------------------------------|
-| `entry.rs`     | `DocEntry`, `ParamInfo`, `ReturnInfo` — data types for a single API entry        |
-| `catalog.rs`   | `Catalog` — in-memory registry with search, filter, and query helpers            |
-| `report.rs`    | `ValidationReport`, `QualityReport`, `quality_score()`, `quality_grade()`        |
-| `schema.rs`    | `Schema`, `FieldRule`, `FieldType`, `SchemaError`, `SchemaResult` — data validation |
-| `export.rs`    | `export_all`, `export_completions`, `export_hover`, `export_signatures`          |
-| `mod.rs`       | Re-exports all public types                                                       |
+## Files
+- mod.rs: Module root that re-exports documentation, reporting, schema, and export helpers. It gives the rest of the codebase one place to import the runtime docs surface.
+- entry.rs: Defines DocEntry, ParamInfo, and ReturnInfo. This file owns the shape of one documented API item and the metadata needed to describe its parameters and return values.
+- catalog.rs: Defines Catalog, the in-memory collection of DocEntry values. It is the lookup and search layer for module-based queries, kind filtering, and direct entry retrieval.
+- report.rs: Defines ValidationReport, QualityReport, and the scoring helpers that evaluate doc completeness. This is where documentation metadata becomes measurable quality data.
+- schema.rs: Defines Schema, FieldRule, FieldType, SchemaError, and SchemaResult for runtime validation of structured Lua data. It is the module boundary between reflective documentation metadata and enforceable data rules.
+- export.rs: Converts catalogs into editor-facing export formats such as completion, hover, and signature payloads. This file is the bridge from internal doc metadata to downstream tooling output.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `Catalog` | Principal type for the `docs` module. |
-| `ParamInfo` | Principal type for the `docs` module. |
-| `ReturnInfo` | Principal type for the `docs` module. |
-| `DocEntry` | Principal type for the `docs` module. |
-| `ValidationReport` | Principal type for the `docs` module. |
-| `QualityReport` | Principal type for the `docs` module. |
-| `FieldType` | Principal type for the `docs` module. |
-| `FieldRule` | Principal type for the `docs` module. |
-| `SchemaError` | Principal type for the `docs` module. |
-| `SchemaResult` | Principal type for the `docs` module. |
-| `Schema` | Principal type for the `docs` module. |
-
-## Full Specification
-
-See [`docs/specs/docs.md`](../../../docs/specs/docs.md) for full architecture, type details, Lua API, examples, and notes.
+- DocEntry: Canonical description of one documented API item, including identity, module, kind, prose, parameters, returns, examples, and metadata. It is the most important type in the module because nearly every other piece of functionality builds on it.
+- ParamInfo: Structured parameter metadata attached to a DocEntry. It keeps function signatures machine-readable instead of burying argument details in prose.
+- ReturnInfo: Structured return-value metadata attached to a DocEntry. It exists for the same reason as ParamInfo, but for outputs.
+- Catalog: In-memory store for DocEntry values with search and filtering helpers. It is the first place to inspect when tools cannot find entries they expect.
+- ValidationReport: Comparison result between the catalog and some observed or expected API surface. It is useful when auditing missing, phantom, or incomplete docs.
+- QualityReport: Aggregate scoring output for doc quality at entry and module level. It exists so tooling can quantify documentation quality instead of only reporting raw missing fields.
+- Schema: Named set of validation rules for structured Lua-side data. It gives the module a second role beyond pure documentation: validating data contracts.
+- FieldRule and FieldType: The rule and type vocabulary used by Schema. These are the types to inspect when data validation becomes too permissive or too strict.

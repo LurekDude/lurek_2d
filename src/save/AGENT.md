@@ -1,45 +1,26 @@
-# `savegame` — Agent Reference
+# save
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extensions                           |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.savegame`                                      |
-| **Source**     | `src/save/`                                      |
-| **Rust Tests** | `tests/rust/unit/savegame_tests.rs`                  |
-| **Lua Tests**  | `tests/lua/unit/test_savegame.lua`                   |
+## Module Info
+- Module name: `save`
+- Module group: `Feature Systems`
+- Spec path: `docs/specs/save.md`
+- Lua API path(s): `src/lua_api/save_api.rs`
+- Rust test path(s): `tests/rust/unit/savegame_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_savegame.lua`, `tests/lua/stress/test_savegame_stress.lua`, `tests/lua/security/test_savegame_validation.lua`, `tests/lua/integration/test_save_entity.lua`, `tests/lua/integration/test_savegame_tilemap.lua`, `tests/lua/integration/test_savegame_entity_scene.lua`
 
-## Purpose
+## Module Purpose
+The `save` module provides slot-based savegame coordination for Lua-driven games. It tracks registered save collectors, restore callbacks, schema versions, dirty state, auto-save timing, and slot metadata while keeping the actual save payload in a Lua-serializable value model.
 
-The savegame module provides a pure-data save manager for slot-based game save/load
-with schema versioning, dirty-state tracking, auto-save timers, and Lua-literal
-serialisation.  `SaveManager` is the central struct that tracks named collector
-modules, migration version chains, and an auto-save timer that only fires when
-the in-memory state is dirty.  The serialisation subsystem converts a `HashMap<String,
-SaveValue>` tree into a `return { key = value, ... }` Lua-literal string that
-`loadfile()` can deserialise without any custom parser — no JSON, no MessagePack,
-just valid Lua source.
+It exists so save orchestration, migration bookkeeping, and slot metadata do not get scattered across gameplay modules. Systems can register what they need to persist, and the save manager provides a stable place to coordinate schema upgrades and slot lifecycle.
 
-## Source Files
+It intentionally does not own general filesystem policy, encryption, cloud sync, binary serialization, or rollback history. The module focuses on save structure and coordination; higher layers decide when and where files are read or written.
 
-| File           | Purpose                                                                                 |
-|----------------|-----------------------------------------------------------------------------------------|
-| `mod.rs`            | Module root: `SlotMeta`, `SaveManager`, `SaveValue` enum, `serialize_table`/`serialize_value` functions, private Lua-string helpers, inline unit tests |
-| `save_data.rs`      | Alternate copy of save data types (orphaned — not declared via `mod save_data;` in `mod.rs`) |
-| `save_manager.rs`   | `SaveManager` implementation — slot management, load/save lifecycle, and file I/O |
+## Files
+- `mod.rs` - Declares the save submodules and re-exports the public save manager, value, metadata, and serialization-facing types.
+- `save_data.rs` - Holds an alternate save-data type definition set that currently lives in the module tree but is not the primary surface re-exported from `mod.rs`.
+- `save_manager.rs` - Implements `SaveManager`, slot metadata, schema versioning, dirty tracking, collector registration, restore hooks, and auto-save timing.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `SlotMeta` | Principal type for the `savegame` module. |
-| `SaveManager` | Principal type for the `savegame` module. |
-| `SaveValue` | Principal type for the `savegame` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/savegame.md`](../../docs/specs/savegame.md)
-
-_Update both this file **and** `docs/specs/savegame.md` whenever source files, public types, or Lua bindings change._
+- `SaveManager` - The central save coordination object. It owns collectors, restore callbacks, schema versioning, dirty state, auto-save timers, and slot metadata handling.
+- `SaveValue` - The Lua-serializable value enum used to represent saved data trees without depending on arbitrary engine internals.
+- `SlotMeta` - Metadata describing a save slot, such as name, timestamp, version, and summary fields.

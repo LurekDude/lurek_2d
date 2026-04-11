@@ -1,326 +1,465 @@
-# `patterns` — Full Specification
+# `patterns` — Agent Reference
 
-| Property         | Value                                                  |
-|------------------|--------------------------------------------------------|
-| **Tier**         | Tier 1 — Core Engine Subsystems                        |
-| **Status**       | Implemented — Full                                     |
-| **Lua API**      | `lurek.patterns`                                        |
-| **Source**       | `src/patterns/`                                        |
-| **Rust Tests**   | `tests/rust/unit/patterns_tests.rs`                    |
-| **Lua Tests**    | `tests/lua/unit/test_patterns.lua`                     |
-| **Architecture** | —                                                      |
+| Property | Value |
+|----------|-------|
+| **Tier** | Foundations |
+| **Status** | Implemented |
+| **Lua API** | `lurek.patterns` |
+| **Source** | `src/patterns/` |
+| **Rust Tests** | `tests/rust/unit/patterns_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_patterns.lua`; `tests/lua/stress/test_patterns_stress.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Foundations` |
+
+---
 
 ## Summary
 
-The `patterns` module provides pure-Rust implementations of classic game-programming design patterns, exposed via `lurek.patterns.*` factory functions. Each factory returns a Lua UserData object wrapping the corresponding domain type. All six domain types are pure Rust with no mlua dependency; Lua plumbing (registry keys, UserData) lives in `src/lua_api/patterns_api.rs`. The API is gated by `modules.pipeline = true` in `conf.lua`.
+The `patterns` module owns reusable coordination primitives for Lurek2D gameplay code. It gathers small, pure-Rust building blocks such as event buses, state trackers, queues, registries, object pools, throttles, blackboards, and similar logic helpers that can be shared across many higher-level systems.
 
-The patterns are:
+This module exists so common gameplay-control patterns do not have to be reimplemented ad hoc in Lua or buried inside unrelated engine modules. Most types here intentionally store only the domain-side bookkeeping and metadata, while the Lua API layer adds callback storage, registry keys, and UserData wrappers on top.
 
-1. **EventBus** — Priority-ordered publish/subscribe bus. Listeners fire sorted by numeric priority; `once` listeners auto-remove after the first call.
-2. **ObjectPool** — Capacity-bounded ID-pool. `acquire()` moves an ID from idle to active; `release(id)` returns it. `prewarm(n)` pre-populates the idle pool.
-3. **CommandStack** — Undo/redo history. Each command stores execute/undo Lua callbacks. `beginBatch()`/`endBatch()` groups commands into one undoable unit.
-4. **ServiceLocator** — Named Lua-value registry. `provide(name, value)` registers any value; `locate(name)` retrieves it at runtime without direct references.
-5. **Factory** — Named constructor registry. `register(typeName, fn)` stores a constructor; `create(typeName, ...)` calls it.
-6. **SimpleState** — Named-state tracker with enter/exit/update callbacks per state. Any registered state can be entered at any time; no guard-validated transitions.
+`patterns` intentionally does not own the engine's global event system, ECS state, AI decision policies, or task-graph execution. It provides generic mechanics and containers; feature modules are responsible for deciding when and why to use them.
 
-Also includes: **Blackboard** (shared key-value store), **Debounce/Throttle** (rate-limiting wrappers), **Funnel** (data-pipeline combiner), and **PriorityQueue** / **Ring** utilities.
+**Scope boundary**: This module currently acts as a mostly self-contained part of the Foundations layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+
+---
 
 ## Architecture
 
 ```
-src/patterns/
-├── mod.rs             re-exports all public types
-├── event_bus.rs       EventBus + Subscription
-├── object_pool.rs     ObjectPool
-├── command_stack.rs   CommandStack + CommandEntry
-├── service_locator.rs ServiceLocator
-├── factory.rs         Factory
-└── state_machine.rs   StateMachine + TransitionRule + StateInfo
-
-src/lua_api/
-└── patterns_api.rs    Lua UserData wrappers (callbacks stored via LuaRegistryKey)
-    ├── LuaEventBus    → EventBusInner (Lua listener keys + Subscription metadata)
-    ├── LuaObjectPool  → ObjectPoolInner
-    ├── LuaCommandStack → CommandStackInner (Lua execute/undo keys)
-    ├── LuaServiceLocator → ServiceLocatorInner (Lua value keys)
-    ├── LuaFactory     → FactoryInner (Lua constructor keys)
-    └── LuaSimpleState → SimpleStateInner (Lua enter/exit/update keys)
+lurek.patterns.* (Lua API — src/lua_api/patterns_api.rs)
+    |
+    v
+src/patterns/mod.rs
+    |- blackboard.rs - blackboard
+    |- command_stack.rs - command_stack
+    |- event_bus.rs - event_bus
+    |- factory.rs - factory
+    |- funnel.rs - funnel
+    |- object_pool.rs - object_pool
+    |- observer.rs - observer
+    |- priority_queue.rs - priority_queue
+    |- ...
 ```
 
-Note: The Lua API wrappers in `patterns_api.rs` use their own inner structs that store `LuaRegistryKey` for callbacks. The domain types in `src/patterns/` provide pure-Rust reference implementations suitable for Rust-side tests and future non-Lua use (e.g., automation scripts, test harnesses).
+---
 
 ## Source Files
 
-| File                | Purpose                                                                          |
-|---------------------|----------------------------------------------------------------------------------|
-| `event_bus.rs`      | `EventBus`, `Subscription` — pub/sub event bus with priority and once semantics  |
-| `object_pool.rs`    | `ObjectPool` — capacity-bounded ID-based idle/active object pool                |
-| `command_stack.rs`  | `CommandStack`, `CommandEntry` — undo/redo stack with batch grouping             |
-| `service_locator.rs`| `ServiceLocator` — named string-keyed service registry                           |
-| `factory.rs`        | `Factory` — named type registry with alias resolution                            |
-| `state_machine.rs`  | `StateMachine`, `TransitionRule`, `StateInfo` — validated FSM with history       |
-| `mod.rs`            | Re-exports all public types                                                      |
-| `blackboard.rs` | — |
-| `funnel.rs` | — |
-| `observer.rs` | — |
-| `priority_queue.rs` | — |
-| `ring.rs` | — |
-| `simple_state.rs` | — |
-| `throttle.rs` | — |
+| File | Purpose |
+|------|---------|
+| `blackboard.rs` | Implements a shared typed key-value board with revision tracking for cross-system facts. |
+| `command_stack.rs` | Tracks undo and redo history metadata, including cursor position and batching state. |
+| `event_bus.rs` | Implements named event-subscription metadata with priority ordering and one-shot listeners. |
+| `factory.rs` | Implements a constructor-name registry with optional alias resolution. |
+| `funnel.rs` | Implements a time-windowed event collector that can batch inputs before flushing. |
+| `mod.rs` | Declares the patterns submodules and re-exports the public helper types. |
+| `object_pool.rs` | Implements slot bookkeeping for reusable pooled objects, including idle and active tracking. |
+| `observer.rs` | Implements per-key watcher metadata for reactive property changes. |
+| `priority_queue.rs` | Implements a stable highest-priority-first queue for small agenda or turn-order workloads. |
+| `ring.rs` | Implements a fixed-capacity circular history buffer for numeric or string-tagged entries. |
+| `service_locator.rs` | Implements a named-service presence registry used by the Lua layer to store actual values. |
+| `simple_state.rs` | Implements a lightweight named-state tracker with a single active state and no validated transition graph. |
+| `state_machine.rs` | Implements a fuller finite-state machine with registered states, explicit transition rules, and history. |
+| `throttle.rs` | Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting. |
+
+---
 
 ## Submodules
 
-### `patterns::event_bus`
+### `patterns::blackboard`
 
-- `Subscription`: `id: u64`, `event: String`, `priority: i32`, `once: bool`
-- `EventBus`: subscribe/unsubscribe/emit metadata, `get_listeners()`, `drain_once()`, `clear_event()`, `clear_all()`
+Implements a shared typed key-value board with revision tracking for cross-system facts.
 
-### `patterns::object_pool`
-
-- `ObjectPool`: `idle: Vec<u64>`, `active: HashSet<u64>`, `next_id: u64`, `capacity: usize`
-- Methods: `acquire()→Option<u64>`, `release(id)→bool`, `prewarm(n)`, `is_active(id)→bool`, `idle_count()`, `active_count()`
+- **`BlackboardValue`** (enum): A value that can be stored on a [`Blackboard`].
+- **`Blackboard`** (struct): Shared key-value data store for coordinating AI and game subsystems.
 
 ### `patterns::command_stack`
 
-- `CommandEntry`: `id: u64`, `name: String`, `has_undo: bool`
-- `CommandStack`: `push(name,has_undo)→u64`, `step_undo()→Option<u64>`, `step_redo()→Option<u64>`, `peek_undo()→Option<&CommandEntry>`, `peek_redo()→Option<&CommandEntry>`, `begin_batch()`, `end_batch()→Option<Vec<u64>>`, `clear()`, `undo_count()`, `redo_count()`
+Tracks undo and redo history metadata, including cursor position and batching state.
 
-### `patterns::service_locator`
+- **`CommandEntry`** (struct): Metadata for a single recorded command.
+- **`CommandStack`** (struct): Undo/redo command history with named groups and batch support.
 
-- `ServiceLocator`: `HashSet<String>` for registered service names
-- Methods: `register(name)`, `unregister(name)→bool`, `has(name)→bool`, `names()→Vec<&str>`, `clear()`
+### `patterns::event_bus`
 
-Note: Domain `ServiceLocator` only tracks name presence; actual Lua values are stored via `LuaRegistryKey` in the Lua wrapper.
+Implements named event-subscription metadata with priority ordering and one-shot listeners.
+
+- **`Subscription`** (struct): Event subscription record (metadata only).
+- **`EventBus`** (struct): Ordered subscription registry for a named event bus.
 
 ### `patterns::factory`
 
-- `Factory`: `types: HashSet<String>`, `aliases: HashMap<String,String>`
-- Methods: `register(type_name)`, `unregister(type_name)→bool`, `has(type_name)→bool`, `resolve(alias)→Option<&str>`, `add_alias(alias,target)`, `type_names()→Vec<&str>`, `clear()`
+Implements a constructor-name registry with optional alias resolution.
+
+- **`Factory`** (struct): Constructor-name registry (metadata only; constructors stored in lua_api layer).
+
+### `patterns::funnel`
+
+Implements a time-windowed event collector that can batch inputs before flushing.
+
+- **`FunnelEntry`** (struct): A single event collected by a [`Funnel`].
+- **`Funnel`** (struct): Batching event collector.
+
+### `patterns::object_pool`
+
+Implements slot bookkeeping for reusable pooled objects, including idle and active tracking.
+
+- **`ObjectPool`** (struct): Slot-tracking object pool (metadata only; Lua objects stored in lua_api layer).
+
+### `patterns::observer`
+
+Implements per-key watcher metadata for reactive property changes.
+
+- **`ObserverEntry`** (struct): A single observer subscription record (metadata only; callback in Lua layer).
+- **`Observer`** (struct): Reactive property bag: stores string-keyed string values and tracks subscriptions by property key.
+
+### `patterns::priority_queue`
+
+Implements a stable highest-priority-first queue for small agenda or turn-order workloads.
+
+- **`PriorityItem`** (struct): A single queued item record (payload stored in Lua API layer).
+- **`PriorityQueue`** (struct): Stable priority queue for game tasks, spells, turn orders, and agendas.
+
+### `patterns::ring`
+
+Implements a fixed-capacity circular history buffer for numeric or string-tagged entries.
+
+- **`Ring`** (struct): Fixed-capacity circular value ring.
+- **`RingEntry`** (struct): A single entry in a [`Ring`].
+
+### `patterns::service_locator`
+
+Implements a named-service presence registry used by the Lua layer to store actual values.
+
+- **`ServiceLocator`** (struct): Named-service registry (metadata only; values stored in lua_api layer).
+
+### `patterns::simple_state`
+
+Implements a lightweight named-state tracker with a single active state and no validated transition graph.
+
+- **`SimpleState`** (struct): Finite state machine that tracks a set of named states and the current one.
 
 ### `patterns::state_machine`
 
-- `TransitionRule`: `from: String`, `to: String`, `label: Option<String>`, `has_guard: bool`
-- `StateInfo`: `has_enter: bool`, `has_exit: bool`, `has_update: bool`
-- `StateMachine`: `current: String`, `states: HashMap<String,StateInfo>`, `transitions: Vec<TransitionRule>`, `history: Vec<String>`, `history_cap: usize`
-- Methods: `new(initial)`, `add_state(name,has_enter,has_exit,has_update)`, `has_state(name)→bool`, `state_names()→Vec<&str>`, `add_transition(from,to,label,has_guard)`, `can_transition(to)→bool`, `get_transition(from,to)→Option<&TransitionRule>`, `transition_to(to)→bool`, `history()→&[String]`, `reachable_from(state)→Vec<String>`, `has_update_callback()→bool`
+Implements a fuller finite-state machine with registered states, explicit transition rules, and history.
+
+- **`TransitionRule`** (struct): A permitted transition between two states.
+- **`StateMachine`** (struct): Finite-state machine with history stack and transition validation.
+
+### `patterns::throttle`
+
+Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting.
+
+- **`Throttle`** (struct): Enforces a minimum interval between callback invocations (leading-edge).
+- **`Debounce`** (struct): Delays callback invocation until the input stream is idle (trailing-edge).
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `patterns::event_bus::EventBus`
-Pub/sub event bus. `subscribe(event, priority, once)→u64` returns a subscription ID. `unsubscribe(id)→bool` removes it. `get_listeners(event)→Vec<&Subscription>` returns sorted (by priority desc) listener records. `drain_once(event)` removes all `once=true` listeners for an event. Actual callback invocation is done in `patterns_api.rs`.
+#### `Blackboard`
 
-#### `patterns::object_pool::ObjectPool`
-ID-based capacity-bounded pool. IDs are `u64` integers. `acquire()` returns the next idle ID or `None` if at capacity. `release(id)→bool` returns true if the ID was active. `prewarm(n)` pre-creates `n` idle entries up to capacity.
+Shared fact store for lightweight cross-system coordination.
 
-#### `patterns::command_stack::CommandStack`
-Undo/redo command history with cursor-based navigation. `begin_batch()` / `end_batch()` group multiple commands. `clear()` wipes history and resets cursor. The domain type stores only names and undo-capability flags; Lua callbacks live in `patterns_api.rs`.
+#### `BlackboardValue`
 
-#### `patterns::service_locator::ServiceLocator`
-Name-presence registry. Only tracks which service names have been registered — no values stored at the domain level (values are `LuaRegistryKey` in the Lua wrapper).
+Tagged value enum stored inside a `Blackboard`.
 
-#### `patterns::factory::Factory`
-Named type registry with alias resolution. `resolve(name)` follows the alias chain until a canonical registered type is found. Circular aliases are prevented by `resolve()` returning `None` after a fixed iteration limit.
+#### `CommandStack`
 
-#### `patterns::state_machine::StateMachine`
-Validated FSM. Transitions are only allowed along pre-registered edges. `can_transition(to)→bool` checks without side effects. `transition_to(to)→bool` performs the transition, fires enter/exit callbacks (via `patterns_api.rs`), and appends to history. History is a ring capped at `history_cap` (default 64).
+Undo and redo metadata tracker.
 
-#### `patterns::command_stack::CommandEntry`
-A single entry in the undo/redo history. Fields: `id: u64`, `name: String`, `has_undo: bool`. Read via `CommandStack::peek_undo()` / `peek_redo()`.
+#### `CommandEntry`
 
-#### `patterns::blackboard::Blackboard`
-Shared key-value store. `set(key, value)` inserts a `BlackboardValue`; `get(key)` returns `Option<&BlackboardValue>`; `remove(key)` deletes an entry; `clear()` empties the board; `keys()` returns all stored keys.
+Single recorded command inside a `CommandStack`.
 
-#### `patterns::throttle::Debounce`
-Rate-limiting wrapper. `update(dt)→bool` returns `true` once the debounce interval has elapsed since the last trigger. `reset()` restarts the timer.
+#### `EventBus`
 
-#### `patterns::funnel::Funnel`
-Data-pipeline aggregator. Collects values from multiple sources via `push(value)`, then `flush()` processes the batch. `is_ready()→bool` returns `true` when the funnel has reached its drain threshold.
+Named pub-sub registry that orders listeners by priority.
 
-#### `patterns::funnel::FunnelEntry`
-A single item held inside a [`Funnel`] pending the next flush. Fields: `value: LuaRegistryKey` (Lua API wrapper value).
+#### `Subscription`
 
-### Enums
+Metadata record for one event-bus listener.
 
-#### `patterns::blackboard::BlackboardValue`
-Typed variant stored inside a [`Blackboard`]. Variants: `Boolean(bool)`, `Integer(i64)`, `Float(f64)`, `Text(String)`, `Nil`.
+#### `Factory`
 
-No other public enums in this module.
+Named constructor registry.
+
+#### `ObjectPool`
+
+Slot manager for reusable objects.
+
+#### `Observer`
+
+Per-key subscription registry for reactive property changes.
+
+#### `ObserverEntry`
+
+Metadata for one observer subscription.
+
+#### `PriorityQueue`
+
+Stable priority queue for small scheduling and agenda workloads.
+
+#### `PriorityItem`
+
+Entry stored inside a `PriorityQueue`.
+
+#### `Ring`
+
+Fixed-capacity rolling history buffer.
+
+#### `RingEntry`
+
+One retained ring-buffer entry with optional numeric or string payload and a tag.
+
+#### `ServiceLocator`
+
+Named-service registry.
+
+#### `SimpleState`
+
+Minimal state tracker with one active named state.
+
+#### `StateMachine`
+
+Transition-aware finite-state machine with registered states and visit history.
+
+#### `TransitionRule`
+
+Declares one allowed transition in a `StateMachine`.
+
+#### `Throttle`
+
+Leading-edge rate limiter that decides when a callback is allowed to fire.
+
+#### `Debounce`
+
+Trailing-edge idle timer that delays firing until input settles.
+
+#### `Funnel`
+
+Batch collector that groups time-adjacent events before a flush.
+
+#### `FunnelEntry`
+
+Single buffered record inside a `Funnel`.
+
+---
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/patterns_api.rs` under `lurek.patterns.*`.
+Exposed under `lurek.patterns.*` by `src/lua_api/patterns_api.rs`.
 
-Each factory function returns a new Lua UserData object. All callback-holding inner types in `patterns_api.rs` use `LuaRegistryKey` to hold Lua function references.
+### Module Functions
 
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.patterns.newEventBus()` | `→ EventBus` | Create a new publish/subscribe bus |
-| `bus:on(event, cb, priority?)` | `→ id` | Subscribe; returns subscription ID |
-| `bus:off(id)` | — | Unsubscribe by subscription ID |
-| `bus:emit(event, ...)` | — | Fire all listeners for an event |
-| `bus:clear(event)` | — | Remove all listeners for one event |
-| `bus:clearAll()` | — | Remove all listeners on all events |
-| `bus:getListenerCount(event)` | `→ int` | Count subscribers for an event |
-| `bus:getEvents()` | `→ table` | Array of registered event names |
-| `lurek.patterns.newObjectPool()` | `→ ObjectPool` | Create a new object pool |
-| `pool:add(value)` | — | Add a pre-built Lua value to the pool |
-| `pool:acquire()` | `→ any\|nil` | Borrow an available value (nil if empty) |
-| `pool:release(value)` | — | Return a borrowed value to the pool |
-| `pool:getActiveCount()` | `→ int` | Number of currently borrowed values |
-| `pool:getAvailableCount()` | `→ int` | Number of idle (available) values |
-| `pool:getTotalCount()` | `→ int` | Total tracked values (active + available) |
-| `pool:clearAll()` | — | Empty the pool and release all registry values |
-| `lurek.patterns.newCommandStack(maxSize?)` | `→ CommandStack` | Create a new undo/redo stack |
-| `stack:execute(name, exec_fn, undo_fn?)` | — | Call exec_fn immediately and push to history |
-| `stack:undo()` | `→ boolean` | Execute undo on top command |
-| `stack:redo()` | `→ boolean` | Re-execute last undone command |
-| `stack:canUndo()` | `→ boolean` | Whether undo is available |
-| `stack:canRedo()` | `→ boolean` | Whether redo is available |
-| `stack:getHistorySize()` | `→ int` | Number of commands |
-| `stack:getCurrentName()` | `→ string\|nil` | Name of the last executed command |
-| `stack:clearAll()` | — | Clear history and free callbacks |
-| `lurek.patterns.newServiceLocator()` | `→ ServiceLocator` | Create a new service registry |
-| `sl:provide(name, value)` | — | Register a value under a name |
-| `sl:locate(name)` | `→ any\|nil` | Retrieve a registered value |
-| `sl:has(name)` | `→ boolean` | Check if a name is registered |
-| `sl:remove(name)` | — | Unregister a service |
-| `sl:getServices()` | `→ table` | Array of registered service names |
-| `sl:clearAll()` | — | Remove all services |
-| `lurek.patterns.newFactory()` | `→ Factory` | Create a new constructor registry |
-| `factory:register(type, fn)` | — | Register a constructor function |
-| `factory:create(type, ...)` | `→ any` | Call the constructor with args |
-| `factory:has(type)` | `→ boolean` | Check if a type is registered |
-| `factory:getTypes()` | `→ table` | Array of registered type names |
-| `factory:remove(type)` | — | Unregister a type |
-| `factory:clearAll()` | — | Remove all registrations |
-| `lurek.patterns.newSimpleState()` | `→ SimpleState` | Create a new FSM |
-| `fsm:addState(name, {enter?,exit?,update?})` | — | Register a state with callbacks |
-| `fsm:transitionTo(name)` | `→ boolean` | Move to a new state |
-| `fsm:update(dt)` | — | Call current state's update |
-| `fsm:getCurrent()` | `→ string\|nil` | Current state name |
-| `fsm:hasState(name)` | `→ boolean` | Check if a state exists |
-| `fsm:getStates()` | `→ table` | Array of all state names |
-| `fsm:clearAll()` | — | Remove all states and callbacks |
+| Function | Description |
+|----------|-------------|
+| `lurek.patterns.newEventBus` | Creates a new EventBus instance. |
+| `lurek.patterns.newObjectPool` | Creates a new ObjectPool instance. |
+| `lurek.patterns.newCommandStack` | Creates a new CommandStack instance. |
+| `lurek.patterns.newServiceLocator` | Creates a new ServiceLocator instance. |
+| `lurek.patterns.newFactory` | Creates a new Factory instance. |
+| `lurek.patterns.newSimpleState` | Creates a new SimpleState finite state machine instance. |
+| `lurek.patterns.newBlackboard` | Creates a new Blackboard shared key-value store. |
+| `lurek.patterns.newObserver` | Creates a new reactive property Observer. |
+| `lurek.patterns.newThrottle` | Creates a leading-edge rate limiter that fires at most once per interval seconds. |
+| `lurek.patterns.newDebounce` | Creates a trailing-edge debounce that fires after the input stream is idle for wait seconds. |
+| `lurek.patterns.newPriorityQueue` | Creates a stable priority-ordered task queue. |
+| `lurek.patterns.newRing` | Creates a fixed-capacity circular history buffer. |
+| `lurek.patterns.newFunnel` | Creates a time-windowed event aggregator. window=0 means flush on every push. |
+
+### `Blackboard` Methods
+
+| Method | Description |
+|--------|-------------|
+| `blackboard:set(...)` | Sets a fact on the blackboard. Accepts boolean, number, or string values. |
+| `blackboard:get(...)` | Gets a fact from the blackboard. Returns nil if not set. |
+| `blackboard:has(...)` | Returns true when the key has a non-nil value. |
+| `blackboard:clear(...)` | Removes a fact from the blackboard. |
+| `blackboard:keys(...)` | Returns all set fact keys as a table. |
+| `blackboard:watch(...)` | Subscribes to changes on a specific key (or "*" for all changes). |
+| `blackboard:unwatch(...)` | Removes a watcher subscription by id. |
+| `blackboard:getRevision(...)` | Returns the monotonic revision counter (incremented on every write). |
+| `blackboard:snapshot(...)` | Returns all facts as a flat key→value table. |
+| `blackboard:clearAll(...)` | Clears all facts from the blackboard. |
+
+### `CommandStack` Methods
+
+| Method | Description |
+|--------|-------------|
+| `commandstack:execute(...)` | Executes a named command and records it in undo/redo history. |
+| `commandstack:undo(...)` | Undoes the most recent command. Returns true if successful. |
+| `commandstack:redo(...)` | Re-executes the next undone command. Returns true if successful. |
+| `commandstack:canUndo(...)` | Returns true if the most recent command can be undone. |
+| `commandstack:canRedo(...)` | Returns true if there is a command available to redo. |
+| `commandstack:getHistorySize(...)` | Returns the total number of recorded commands (undo + redo). |
+| `commandstack:getCurrentName(...)` | Returns the name of the most recently executed command, or nil. |
+| `commandstack:clearAll(...)` | Clears all command history, releasing Lua registry values. |
+
+### `Debounce` Methods
+
+| Method | Description |
+|--------|-------------|
+| `debounce:onFire(...)` | Sets the callback invoked when the debounce fires. |
+| `debounce:trigger(...)` | Records an input event, resetting the idle timer. |
+| `debounce:update(...)` | Advances the idle timer by dt seconds; fires the callback if idle wait expired. |
+| `debounce:cancel(...)` | Cancels the pending trigger without firing. |
+| `debounce:isPending(...)` | Returns true when a trigger is pending. |
+| `debounce:getFireCount(...)` | Returns the total number of times this debounce has fired. |
+
+### `EventBus` Methods
+
+| Method | Description |
+|--------|-------------|
+| `eventbus:on(...)` | Registers a listener callback for an event. |
+| `eventbus:off(...)` | Removes a previously registered event listener by subscription ID. |
+| `eventbus:emit(...)` | Dispatches an event, calling all registered listeners in priority order. |
+| `eventbus:clear(...)` | Removes all listeners for a specific event. |
+| `eventbus:clearAll(...)` | Removes all listeners on this EventBus. |
+| `eventbus:getListenerCount(...)` | Returns the number of listeners registered for an event. |
+| `eventbus:getEvents(...)` | Returns all event names that have at least one listener. |
+
+### `Factory` Methods
+
+| Method | Description |
+|--------|-------------|
+| `factory:register(...)` | Registers a named type constructor function. |
+| `factory:create(...)` | Creates an instance of the named type by invoking its constructor. |
+| `factory:has(...)` | Returns true if the named type (or alias) is registered. |
+| `factory:alias(...)` | Registers an alias pointing to an existing canonical type name. |
+| `factory:getTypes(...)` | Returns a table of all registered type names. |
+| `factory:remove(...)` | Unregisters a type constructor (and any aliases pointing to it). |
+| `factory:clearAll(...)` | Removes all registered type constructors and aliases. |
+
+### `Funnel` Methods
+
+| Method | Description |
+|--------|-------------|
+| `funnel:onFlush(...)` | Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries. |
+| `funnel:push(...)` | Adds an event to the funnel. Immediately flushes if max_entries reached or window is 0. |
+| `funnel:update(...)` | Advances the window timer by dt seconds; flushes when window expires. |
+| `funnel:flush(...)` | Manually flushes all pending entries, invoking the onFlush callback. |
+| `funnel:discard(...)` | Discards all buffered entries without flushing. |
+| `funnel:pendingCount(...)` | Returns the number of buffered entries not yet flushed. |
+| `funnel:getFlushCount(...)` | Returns the total number of flushes performed. |
+
+### `ObjectPool` Methods
+
+| Method | Description |
+|--------|-------------|
+| `objectpool:add(...)` | Inserts a pre-built object into the available pool. |
+| `objectpool:acquire(...)` | Acquires an available object from the pool; returns nil if empty. |
+| `objectpool:release(...)` | Returns an object to the available pool. |
+| `objectpool:getActiveCount(...)` | Returns the number of currently active (acquired) objects. |
+| `objectpool:getAvailableCount(...)` | Returns the number of available (idle) objects in the pool. |
+| `objectpool:getTotalCount(...)` | Returns the total number of tracked objects (active + available). |
+| `objectpool:clearAll(...)` | Clears all objects from the pool, releasing Lua registry values. |
+
+### `Observer` Methods
+
+| Method | Description |
+|--------|-------------|
+| `observer:set(...)` | Sets a property value and fires subscribed watchers. |
+| `observer:get(...)` | Gets a property value, or nil if not set. |
+| `observer:subscribe(...)` | Subscribes to changes on a property key (or "*" for all). |
+| `observer:unsubscribe(...)` | Removes a subscription by id. |
+| `observer:getCount(...)` | Returns the total number of active subscriptions. |
+
+### `PriorityQueue` Methods
+
+| Method | Description |
+|--------|-------------|
+| `priorityqueue:push(...)` | Inserts an item with a priority. Higher priorities are dequeued first. |
+| `priorityqueue:pop(...)` | Removes and returns the highest-priority item, or nil if empty. |
+| `priorityqueue:peek(...)` | Returns the highest-priority item without removing it, or nil if empty. |
+| `priorityqueue:len(...)` | Returns the number of items in the queue. |
+| `priorityqueue:isEmpty(...)` | Returns true when the queue has no items. |
+| `priorityqueue:clearAll(...)` | Removes all items from the queue. |
+
+### `Ring` Methods
+
+| Method | Description |
+|--------|-------------|
+| `ring:push(...)` | Pushes a value (number or string) with an optional tag. Overwrites oldest on overflow. |
+| `ring:latest(...)` | Returns the most recently pushed entry, or nil. |
+| `ring:toArray(...)` | Returns all entries (oldest first) as an array of {id, tag, value?, text?} tables. |
+| `ring:sum(...)` | Returns the sum of all numeric values in the ring. |
+| `ring:average(...)` | Returns the average of all numeric values, or 0 if empty. |
+| `ring:len(...)` | Returns the number of entries currently in the ring. |
+| `ring:isFull(...)` | Returns true when the ring is at capacity. |
+| `ring:clear(...)` | Removes all entries from the ring. |
+
+### `ServiceLocator` Methods
+
+| Method | Description |
+|--------|-------------|
+| `servicelocator:provide(...)` | Registers a named service with an associated Lua value. |
+| `servicelocator:locate(...)` | Retrieves a registered service by name; returns nil if not found. |
+| `servicelocator:has(...)` | Returns true if a service with the given name is registered. |
+| `servicelocator:remove(...)` | Unregisters and removes a named service. |
+| `servicelocator:getServices(...)` | Returns a table of all registered service names. |
+| `servicelocator:clearAll(...)` | Removes all registered services. |
+
+### `SimpleState` Methods
+
+| Method | Description |
+|--------|-------------|
+| `simplestate:addState(...)` | Registers a named state with optional enter, exit, and update callbacks. |
+| `simplestate:transitionTo(...)` | Transitions to a named state, calling exit/enter callbacks as needed. |
+| `simplestate:update(...)` | Calls the update callback of the current state with the given delta time. |
+| `simplestate:getCurrent(...)` | Returns the name of the current state, or nil if none is active. |
+| `simplestate:hasState(...)` | Returns true if a state with the given name is registered. |
+| `simplestate:getStates(...)` | Returns a table of all registered state names. |
+| `simplestate:clearAll(...)` | Removes all states and callbacks from this state machine. |
+
+### `Throttle` Methods
+
+| Method | Description |
+|--------|-------------|
+| `throttle:onFire(...)` | Sets the callback invoked when the throttle fires. |
+| `throttle:update(...)` | Advances the timer by dt seconds; fires the callback if the interval elapsed. |
+| `throttle:reset(...)` | Resets the elapsed counter without firing. |
+| `throttle:getProgress(...)` | Returns the normalised progress through the current interval [0, 1]. |
+| `throttle:getFireCount(...)` | Returns the total number of times this throttle has fired. |
+| `throttle:setEnabled(...)` | Enables or disables the throttle. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- === EventBus ===
-local bus = lurek.patterns.newEventBus()
-
-bus:on("player_died", function(cause)
-    print("Player died:", cause)
-end, 10)  -- priority 10
-
-bus:on("player_died", function()
-    -- plays sound (lower priority — fires second)
-end, 5)
-
-bus:emit("player_died", "lava")  -- fires both listeners
-
--- === ObjectPool (bullet pool) ===
-local pool = lurek.patterns.newObjectPool()
-pool:setCapacity(100)
-pool:prewarm(20)
-
-local bullets = {}
-local function spawn_bullet()
-    local id = pool:acquire()
-    if id then
-        bullets[id] = { x=100, y=200, vx=5, vy=0 }
-    end
-end
-
-local function destroy_bullet(id)
-    bullets[id] = nil
-    pool:release(id)
-end
-
--- === CommandStack (editor undo-redo) ===
-local cmds = lurek.patterns.newCommandStack()
-local placed = {}
-
-local function place_tile(x, y, tile)
-    local old = placed[x .. "," .. y]
-    cmds:push("place_tile",
-        function() placed[x..","..y] = tile end,
-        function() placed[x..","..y] = old end
-    )
-end
-
--- lurek.input.onKeyDown("z") → cmds:undo()
--- lurek.input.onKeyDown("y") → cmds:redo()
-
--- === ServiceLocator ===
-local services = lurek.patterns.newServiceLocator()
-
--- Register at boot
-services:provide("audio", { play = function(snd) lurek.audio.play(snd) end })
-services:provide("ui", require("ui_manager"))
-
--- Access anywhere
-services:locate("audio").play("explosion.ogg")
-
--- === Factory ===
-local factory = lurek.patterns.newFactory()
-
-factory:register("goblin", function(x, y)
-    return { type="goblin", x=x, y=y, hp=10 }
-end)
-factory:register("troll", function(x, y)
-    return { type="troll", x=x, y=y, hp=50 }
-end)
-
-local enemy = factory:create("goblin", 100, 200)
-
--- === SimpleState (game state machine) ===
-local game_fsm = lurek.patterns.newSimpleState()
-
-game_fsm:addState("menu", {
-    enter = function() print("Entering menu") end,
-    exit  = function() print("Leaving menu") end,
-})
-game_fsm:addState("playing", {
-    enter  = function() print("Game started!") end,
-    update = function(dt) -- move entities end
-end,
-})
-game_fsm:addState("paused", {
-    enter = function() print("Paused") end,
-})
-
-game_fsm:transitionTo("menu")  -- fires enter
-
-lurek.process = function(dt)
-    game_fsm:update(dt)
+-- Minimal namespace check for lurek.patterns.
+if lurek.patterns then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
+---
+
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 8     |
-| `enum`    | 0     |
-| `fn`      | 50+   |
-| **Total** | **58+** |
+| Kind | Count |
+|------|-------|
+| `struct` | 21 |
+| `enum` | 1 |
+| `fn` (Lua API) | 103 |
+| **Total** | **125** |
+
+---
 
 ## References
 
-| Module       | Relationship | Notes                                                       |
-|--------------|--------------|-------------------------------------------------------------|
-| `engine`     | Imports from | `SharedState` used in `patterns_api.rs` only (`_state`)     |
-| `lua_api`    | Imported by  | `patterns_api.rs` registers the Lua surface                 |
-| `pipeline`   | —            | Patterns are logic utilities; pipeline composes task graphs |
-| `event`      | Similar      | `lurek.signal` is the engine event bus; `EventBus` is per-game-system |
-| `ai`         | Could use    | FSM in `ai` is behaviour-tree driven; `SimpleState` is lighter-weight |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| — | No top-level `crate::<module>` imports were detected in this module's source files. | Keep the source files as the primary dependency reference. |
+
+---
 
 ## Notes
 
-- `LuaSimpleState` stores callbacks as `LuaRegistryKey` — `clearAll()` must be called to release them if the FSM is discarded, otherwise they are never GC'd.
-- `CommandStack::push` in the Lua API immediately calls the execute function — there is no deferred execution.
-- `ObjectPool::acquire()` returns `nil` when at capacity — always check before use.
-- The domain pattern types (`EventBus`, `ObjectPool`, etc.) in `src/patterns/` are pure Rust and can be used in Rust tests without Lua. The `LuaXxx` wrappers in `patterns_api.rs` are Lua-specific and cannot be used from Rust tests.
-- The Lua `SimpleState` does **not** validate transitions — any `transitionTo` succeeds if the state exists. Use the domain `StateMachine` from Rust code if transition guards are required.
+- **Source of truth**: Keep this spec synchronized with `src/patterns/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

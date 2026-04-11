@@ -1,41 +1,31 @@
-# `network` — Agent Reference
+# network
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extension                            |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.network`                                       |
-| **Source**      | `src/network/`                                       |
-| **Rust Tests** | `tests/rust/unit/network_tests.rs`                   |
-| **Lua Tests**  | `tests/lua/unit/test_network.lua`                    |
-| **Architecture** | —                                                  |
+## Module Info
+- Module name: `network`
+- Module group: `Core Runtime`
+- Spec path: `docs/specs/network.md`
+- Lua API path(s): `src/lua_api/network_api.rs`
+- Rust test path(s): `tests/rust/unit/network_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_network.lua`
 
-## Purpose
+## Module Purpose
 
-The `network` module provides UDP networking for peer-to-peer and client-server multiplayer games via the ENet protocol. It wraps the `rusty_enet` crate behind a safe Rust API (`NetworkHost`) that the Lua binding layer consumes. A `NetworkHost` binds to a local UDP socket and acts simultaneously as server (accepting incoming connections) and client (initiating outgoing connections). All I/O is driven by a single `service()` event pump that returns typed `NetworkEvent` values (`Connect`, `Disconnect`, `Receive`). Packets are delivered over numbered channels with configurable reliability (reliable ordered or unreliable sequenced). The module enforces a hard ceiling of 8 simultaneous peers (`MAX_PEERS`) targeting small-scale multiplayer (LAN co-op, local tournaments). Constants for peer limits, channel counts, and their defaults live in `constants.rs`. Error handling uses a dedicated `NetworkError` enum with six variants covering peer limits, I/O failures, ENet internals, destroyed hosts, invalid peers, and address parsing. The Lua API is exposed under `lurek.network` with a single factory function `newHost` that accepts an options table and returns a `NetworkHost` UserData object with 22 methods. The Lua tests also verify a `lurek.net` / `enet` compatibility surface that mirrors raw ENet function signatures for LÖVE portability.
+The network module gives Lurek2D a small ENet-backed UDP transport layer for multiplayer features. It owns host creation, peer connection lifecycle, packet send and broadcast operations, bandwidth and channel limits, and the typed event stream returned by servicing an ENet host.
 
-## Source Files
+This module exists so Lua gameplay code can use networking without depending directly on `rusty_enet` types or raw socket setup. The Rust side enforces Lurek2D-specific defaults such as peer caps and convenience byte-send helpers, while the Lua binding turns host operations and network events into script-friendly methods and tables.
 
-| File           | Purpose                                                              |
-|----------------|----------------------------------------------------------------------|
-| `constants.rs` | Compile-time limits and defaults: `MAX_PEERS`, `DEFAULT_PEERS`, `MAX_CHANNELS`, `DEFAULT_CHANNELS` |
-| `error.rs`     | `NetworkError` enum with six variants for Lua-friendly error messages |
-| `host.rs`      | `NetworkHost` wrapper around `rusty_enet::Host<UdpSocket>`, `NetworkEvent` enum, `PeerStats` struct |
-| `mod.rs` | — |
+It intentionally does not own matchmaking, replication strategy, game-state serialization, security, or NAT traversal. If the work involves packet schemas, rollback, prediction, or encrypted transport, that belongs in higher-level Lua code or another module. This module stops at transport reliability, peer management, and querying host or peer state.
+
+## Files
+- `mod.rs` is the public module root and architectural summary. It keeps the surface limited to constants, errors, and the ENet host wrapper.
+- `constants.rs` defines the compile-time peer and channel limits plus their defaults. These values encode the scale the engine expects networking to target.
+- `error.rs` defines `NetworkError`, the module's transport-level failure type. Use it when the issue is host lifecycle, peer selection, bind address parsing, or ENet and socket failures.
+- `host.rs` implements `NetworkHost`, `NetworkEvent`, and `PeerStats`. This is the main operational file for binding, connecting, servicing, sending, disconnecting, and querying peers.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `NetworkError` | Principal type for the `network` module. |
-| `NetworkHost` | Principal type for the `network` module. |
-| `NetworkEvent` | Principal type for the `network` module. |
-| `PeerStats` | Principal type for the `network` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/network.md`](../../docs/specs/network.md)
-
-_Update both this file **and** `docs/specs/network.md` whenever source files, public types, or Lua bindings change._
+- `NetworkHost` is the module's main ownership object. It wraps the ENet host, tracks whether the host has been destroyed, and exposes the transport operations the Lua API needs.
+- `NetworkEvent` is the typed output of the service pump. It is the boundary between ENet's raw event stream and the engine's higher-level scripting surface.
+- `PeerStats` is a snapshot object for inspection and diagnostics. It keeps runtime peer metrics separate from connection-control methods.
+- `NetworkError` is the transport-specific error enum. It distinguishes invalid peer access, destroyed hosts, invalid addresses, peer-limit violations, I/O errors, and ENet failures.
+- `MAX_PEERS`, `DEFAULT_PEERS`, `MAX_CHANNELS`, and `DEFAULT_CHANNELS` are small constants, but they matter because they define the practical scale and defaults the rest of the module assumes.
+- `LuaNetworkHost` in `src/lua_api/network_api.rs` is the public scripting wrapper around `NetworkHost`. It is the important bridge that fixes the method names, event-table layout, and options-table contract seen by Lua game code.

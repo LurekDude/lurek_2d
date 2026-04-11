@@ -66,6 +66,7 @@ You **must** update **all** of the following in the same commit:
 - [scene](scene.md)
 - [serial](serial.md)
 - [spine](spine.md)
+- [sprite](sprite.md)
 - [terminal](terminal.md)
 - [thread](thread.md)
 - [tilemap](tilemap.md)

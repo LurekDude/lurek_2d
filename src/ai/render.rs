@@ -114,7 +114,16 @@ impl StateMachine {
                 (50, 80, 140)
             };
             let strip_y = (i as u32 * row_h) as i32;
-            img.draw_rect(2, strip_y + 2, width - 4, row_h.saturating_sub(4), r, g, b, 200);
+            img.draw_rect(
+                2,
+                strip_y + 2,
+                width - 4,
+                row_h.saturating_sub(4),
+                r,
+                g,
+                b,
+                200,
+            );
         }
 
         img
@@ -157,9 +166,7 @@ fn bt_depth(node: &BTNode) -> usize {
     match node {
         BTNode::Selector { children, .. }
         | BTNode::Sequence { children, .. }
-        | BTNode::Parallel { children, .. } => {
-            1 + children.iter().map(bt_depth).max().unwrap_or(0)
-        }
+        | BTNode::Parallel { children, .. } => 1 + children.iter().map(bt_depth).max().unwrap_or(0),
         BTNode::Inverter { child }
         | BTNode::Repeater { child, .. }
         | BTNode::Succeeder { child } => 1 + bt_depth(child),
@@ -291,17 +298,37 @@ impl BehaviorTree {
 }
 
 /// Recursively paint a behavior tree onto an `ImageData` in a depth-column layout.
-fn draw_bt_image(img: &mut ImageData, node: &BTNode, depth: u32, slot: u32, node_w: u32, node_h: u32) {
+fn draw_bt_image(
+    img: &mut ImageData,
+    node: &BTNode,
+    depth: u32,
+    slot: u32,
+    node_w: u32,
+    node_h: u32,
+) {
     let gap = 2u32;
     let x = (depth * (node_w + gap)) as i32;
     let y = (slot * (node_h + gap)) as i32;
 
     let (r, g, b) = match node {
-        BTNode::Selector { .. } | BTNode::Sequence { .. } | BTNode::Parallel { .. } => (80u8, 120, 200),
-        BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } => (200, 140, 60),
+        BTNode::Selector { .. } | BTNode::Sequence { .. } | BTNode::Parallel { .. } => {
+            (80u8, 120, 200)
+        }
+        BTNode::Inverter { .. } | BTNode::Repeater { .. } | BTNode::Succeeder { .. } => {
+            (200, 140, 60)
+        }
         BTNode::Action { .. } | BTNode::Condition { .. } => (80, 200, 80),
     };
-    img.draw_rect(x, y, node_w.saturating_sub(gap), node_h.saturating_sub(gap), r, g, b, 220);
+    img.draw_rect(
+        x,
+        y,
+        node_w.saturating_sub(gap),
+        node_h.saturating_sub(gap),
+        r,
+        g,
+        b,
+        220,
+    );
 
     let children: Vec<&BTNode> = match node {
         BTNode::Selector { children, .. }

@@ -16,6 +16,8 @@ pub mod coords;
 pub mod isomap;
 /// Procedural map generation scripts and room placement.
 pub mod mapgen;
+/// GPU render-command generation for TileMap layers.
+pub mod render;
 #[allow(clippy::module_inception)]
 /// Core tilemap: layers, tile CRUD, sweep queries, and serialization.
 pub mod tilemap;
@@ -23,8 +25,6 @@ pub mod tilemap;
 pub mod tileset;
 /// Tiled TMX/TSX map format parser.
 pub mod tmx;
-/// GPU render-command generation for TileMap layers.
-pub mod render;
 
 pub use autotile_sheet::{AutoTileLayout, AutoTileSheet};
 pub use chunk::ChunkMap;

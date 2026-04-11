@@ -1,42 +1,27 @@
-# `log` — Agent Reference
+# log
 
-| Property         | Value                                                  |
-|------------------|--------------------------------------------------------|
-| **Tier**         | Tier 1 — Core Engine Subsystems                        |
-| **Status**       | Implemented — Full                                     |
-| **Lua API**      | `lurek.log`                                             |
-| **Source**       | `src/log/`                                             |
-| **Rust Tests**   | —                                                      |
-| **Lua Tests**    | `tests/lua/unit/test_log.lua`                          |
-| **Architecture** | —                                                      |
+## Module Info
+- Module name: `log`
+- Module group: `Foundations`
+- Spec path: `docs/specs/log.md`
+- Lua API path(s): `src/lua_api/log_api.rs`
+- Rust test path(s): `tests/rust/unit/log_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_log.lua`
 
-## Purpose
+## Module Purpose
+The `log` module owns the engine-facing logging domain that Lua scripts and other code can target without talking directly to the global logging backend. It provides a thin, stable layer for log level control and for dispatching script-originated messages into additional sinks such as files and in-memory ring buffers.
 
-The `log` module provides structured log level management and configurable output sinks for Lua game scripts. It exposes `set_level()`, `get_level()`, and `enabled_for()` on the Rust side, delegating to `crate::runtime::log_messages`.
+This module exists to separate logging policy from Lua registration code. The domain types in `src/log/` define what a sink is, how entries are filtered, and how sink fan-out works, while `src/lua_api/log_api.rs` decides how that functionality is exposed under `lurek.log` for a single VM.
 
-The Lua API at `lurek.log.*` allows scripts to emit messages at specific severity levels (`debug`, `info`, `warn`, `error`) with an optional _tag_ string (second argument). Every log function also dispatches to any registered `Sink` destinations beyond the default stderr channel. Game developers can add **file sinks** (append to disk, UTF-8) and **memory sinks** (bounded ring buffer) to route log output to custom destinations — similar to Python's `logging.Handler` model.
+`log` intentionally does not own engine-wide logger initialization, formatting, `RUST_LOG` parsing, or the general diagnostic UI story. It delegates level storage to `runtime::log_messages`, and it does not replace `devtools` or `debugbridge`, which serve different debugging and capture workflows.
 
-`src/lua_api/log_api.rs` maintains a `Rc<RefCell<SinkRegistry>>` that is captured by all log-function closures. `src/log/sinks.rs` provides the `SinkLevel`, `SinkKind`, `Sink`, and `SinkRegistry` types. All Rust `log` crate output still flows through `env_logger` and the `RUST_LOG` environment variable.
-
-**Separation from `devtools`**: `lurek.log` routes to stderr via `env_logger` + optional sinks — it is the **operational engine log**. `lurek.devtools.logger` is an **in-memory ring buffer** used for in-game diagnostic panels.
-
-## Source Files
-
-| File        | Purpose                                                                                      |
-|-------------|----------------------------------------------------------------------------------------------|
-| `mod.rs`    | `set_level()`, `get_level()`, `enabled_for()` — delegates to `engine::log_messages`; re-exports `sinks` |
-| `sinks.rs`  | `SinkLevel`, `MemoryEntry`, `SinkKind`, `Sink`, `SinkRegistry` — configurable sink dispatch  |
+## Files
+- `mod.rs`: Defines the small public domain surface for setting and querying the active log level and re-exports sink-related types.
+- `sinks.rs`: Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks, and the registry that tracks active outputs.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `SinkLevel` | Principal type for the `log` module. |
-| `MemoryEntry` | Principal type for the `log` module. |
-| `SinkKind` | Principal type for the `log` module. |
-| `Sink` | Principal type for the `log` module. |
-| `SinkRegistry` | Principal type for the `log` module. |
-
-## Full Specification
-
-See [`docs/specs/log.md`](../../../docs/specs/log.md) for full architecture, type details, Lua API, examples, and notes.
+- `SinkLevel`: Severity threshold used by sink filtering. It keeps file and memory sinks consistent even when the Lua caller uses string level names.
+- `MemoryEntry`: Captured log record stored by memory sinks. It is intentionally small so Lua tooling can inspect recent messages without coupling to the Rust `log` crate.
+- `SinkKind`: Backend enum for the supported sink storage strategies. It distinguishes append-to-file behavior from bounded in-memory buffering.
+- `Sink`: Single output destination with an id, minimum level, and concrete backend. It is the unit the Lua API creates, lists, flushes, and removes.
+- `SinkRegistry`: Mutable collection of active sinks for one runtime context. The Lua layer keeps one registry per VM and uses it to fan out every emitted message.

@@ -1,210 +1,145 @@
-# `log` — Full Specification
+# `log` — Agent Reference
 
-| Property         | Value                                                  |
-|------------------|--------------------------------------------------------|
-| **Tier**         | Tier 1 — Core Engine Subsystems                        |
-| **Status**       | Implemented — Full                                     |
-| **Lua API**      | `lurek.log`                                             |
-| **Source**       | `src/log/`                                             |
-| **Rust Tests**   | —                                                      |
-| **Lua Tests**    | `tests/lua/unit/test_log.lua`                          |
-| **Architecture** | —                                                      |
+| Property | Value |
+|----------|-------|
+| **Tier** | Foundations |
+| **Status** | Implemented |
+| **Lua API** | `lurek.log` |
+| **Source** | `src/log/` |
+| **Rust Tests** | `tests/rust/unit/log_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_log.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Foundations` |
+
+---
 
 ## Summary
 
-The `log` module is the **game developer's logging tool** for Lua scripts. It lets Lua game code emit structured messages at configurable severity levels, so developers can trace game logic, fire debug output, and monitor runtime state without touching Rust code or engine internals.
+The `log` module owns the engine-facing logging domain that Lua scripts and other code can target without talking directly to the global logging backend. It provides a thin, stable layer for log level control and for dispatching script-originated messages into additional sinks such as files and in-memory ring buffers.
 
-Internally, `log` is a thin adapter over `crate::engine::log_messages` that exposes `set_level()`, `get_level()`, and `enabled_for()` as Rust functions, and binds them — along with per-severity emit functions — to the `lurek.log.*` Lua namespace.
+This module exists to separate logging policy from Lua registration code. The domain types in `src/log/` define what a sink is, how entries are filtered, and how sink fan-out works, while `src/lua_api/log_api.rs` decides how that functionality is exposed under `lurek.log` for a single VM.
 
-The Lua API exposes five severity levels: `debug`, `info`, `warn`, `error`, and `trace`. Game scripts can emit at a fixed level (`lurek.log.debug`, `lurek.log.info`, etc.) or at a caller-specified level (`lurek.log.print(level, message)`). The active minimum level can be read and changed at runtime with `lurek.log.getLevel()` and `lurek.log.setLevel(level)`.
+`log` intentionally does not own engine-wide logger initialization, formatting, `RUST_LOG` parsing, or the general diagnostic UI story. It delegates level storage to `runtime::log_messages`, and it does not replace `devtools` or `debugbridge`, which serve different debugging and capture workflows.
 
-All messages are routed through the Rust `log` crate and appear in the engine's standard output alongside engine-originated log lines. Lua-originated messages are prefixed with `[Lua]` to distinguish them. Runtime filtering is controlled by the `RUST_LOG` environment variable (e.g., `RUST_LOG=lurek2d=debug`).
+**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
 
-This module intentionally does **not** provide:
-- Structured JSON log output — messages are strings only
-- Per-script log level overrides — one global level applies to all Lua output
-- Log persistence or file output — that is a concern for the engine's `env_logger` configuration
+---
 
 ## Architecture
 
 ```
-src/log/
-└── mod.rs    set_level(), get_level(), enabled_for() — domain layer over engine::log_messages
-
-src/engine/
-└── log_messages.rs    set_log_level(level), get_log_level() → &'static str
-
-src/lua_api/
-└── log_api.rs    Registers lurek.log.* functions:
-                  debug, info, warn, error, trace, print → emit via log crate macros
-                  setLevel → crate::log::set_level()
-                  getLevel → crate::log::get_level()
+lurek.log.* (Lua API — src/lua_api/log_api.rs)
+    |
+    v
+src/log/mod.rs
+    |- sinks.rs - sinks
 ```
+
+---
 
 ## Source Files
 
-| File     | Purpose                                                                                |
-|----------|----------------------------------------------------------------------------------------|
-| `mod.rs` | `set_level()`, `get_level()`, `enabled_for()` — delegates to `engine::log_messages`    |
-| `sinks.rs` | — |
+| File | Purpose |
+|------|---------|
+| `mod.rs` | Defines the small public domain surface for setting and querying the active log level and re-exports sink-related types. |
+| `sinks.rs` | Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks, and the registry that tracks active outputs. |
+
+---
 
 ## Submodules
 
-### `log` (root)
+### `log::sinks`
 
-- `set_level(level: &str)` — pass-through to `log_messages::set_log_level`; unrecognised values are silently ignored
-- `get_level() → String` — returns the current level name (e.g., `"info"`)
-- `enabled_for(level: &str) → bool` — compares against `log::max_level()`; accepts `"error"`, `"warn"`, `"warning"`, `"info"`, `"debug"`, `"trace"`; returns `false` for `"off"` and unrecognised values.
+Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks, and the registry that tracks active outputs.
 
-> **Architecture note**: `src/lua_api/log_api.rs` calls `crate::log::set_level()` and `crate::log::get_level()` so that the `lua_api` layer uses the domain module as intended.
+- **`SinkLevel`** (enum): Minimum log level that a sink will accept.
+- **`MemoryEntry`** (struct): A single log entry retained by a [`SinkKind::Memory`] sink.
+- **`SinkKind`** (enum): The dispatching strategy for a registered sink.
+- **`Sink`** (struct): A registered log output destination.
+- **`SinkRegistry`** (struct): Thread-local registry of active log sinks.
 
-### `log::sinks` — Configurable Sink Dispatch
-
-`src/log/sinks.rs` adds the **sink system** — a `SinkRegistry` that log functions dispatch to in addition to the default `env_logger` stderr output. This mirrors the `logging.Handler` model from Python: game code and tools can register file sinks (UTF-8 append) or memory sinks (bounded ring buffer) without touching the Rust `log` crate configuration.
-
-#### Key types
-
-| Type | Description |
-|---|---|
-| `SinkLevel` | `Debug \| Info \| Warn \| Error` — minimum level for a sink |
-| `MemoryEntry` | `{ level: String, message: String, tag: String }` — one ring-buffer entry |
-| `SinkKind` | `File { file: Mutex<File>, path: String }` or `Memory { entries: Mutex<VecDeque<MemoryEntry>>, capacity: usize }` |
-| `Sink` | `{ id: u64, min_level: SinkLevel, kind: SinkKind }` — single output destination |
-| `SinkRegistry` | `Vec<Sink>` + `next_id: u64`; `add()`, `remove()`, `clear()`, `dispatch()`, `get()` |
-
-`SinkRegistry` is wrapped in `Rc<RefCell<SinkRegistry>>` at the Lua API layer and captured by every log-function closure.
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `log::sinks::MemoryEntry`
+#### `SinkLevel`
 
-A single log entry retained by a `SinkKind::Memory` sink. Fields: `level: SinkLevel`, `message: String`, `tag: String`. Implements `Debug`, `Clone`.
+Severity threshold used by sink filtering.
 
-#### `log::sinks::Sink`
+#### `MemoryEntry`
 
-A configured log output destination. Fields: `id: u64`, `min_level: SinkLevel`, `kind: SinkKind`. Constructed via `Sink::memory(id, capacity, min_level)` or `Sink::file(id, path, min_level)`.
+Captured log record stored by memory sinks.
 
-| Method | Signature | Description |
-|---|---|---|
-| `write` | `(level, tag, message)` | Dispatch one entry; silently drops entries below `min_level` |
-| `read_memory` | `(drain: bool) → Option<Vec<MemoryEntry>>` | Read ring-buffer entries; returns `None` for file sinks |
-| `type_name` | `() → &'static str` | Returns `"file"` or `"memory"` |
-| `path` | `() → Option<&str>` | Returns filesystem path for file sinks |
-| `flush` | `()` | Flush file OS write buffers |
+#### `SinkKind`
 
-#### `log::sinks::SinkRegistry`
+Backend enum for the supported sink storage strategies.
 
-Ordered collection of active [`Sink`] instances. Fields: `sinks: Vec<Sink>`, `next_id: u64` (private). Constructed via `SinkRegistry::new()`.
+#### `Sink`
 
-| Method | Signature | Description |
-|---|---|---|
-| `add` | `(sink: Sink) → u64` | Add a sink; returns assigned id |
-| `remove` | `(id: u64) → bool` | Remove sink by id; returns `true` if found |
-| `clear` | `()` | Remove all sinks |
-| `dispatch` | `(level, tag, message)` | Fan-out to all sinks |
-| `get` | `(id: u64) → Option<&Sink>` | Return a sink by id |
+Single output destination with an id, minimum level, and concrete backend.
 
-### Enums
+#### `SinkRegistry`
 
-#### `log::sinks::SinkLevel`
+Mutable collection of active sinks for one runtime context.
 
-Minimum log level that a sink will accept. Variants: `Debug < Info < Warn < Error`. Implements `PartialOrd` for level comparison.
-
-| Method | Description |
-|---|---|
-| `from_str(s)` | Parse `"debug"/"info"/"warn"/"warning"/"error"/"err"` |
-| `as_str()` | Returns uppercase static strings: `"DEBUG"`, `"INFO"`, `"WARN"`, `"ERROR"` |
-
-#### `log::sinks::SinkKind`
-
-The dispatch strategy for a [`Sink`]. Variants:
-- `File { file: Mutex<File>, path: String }` — writes to a UTF-8 append-mode file
-- `Memory { entries: Mutex<VecDeque<MemoryEntry>>, capacity: usize }` — bounded ring buffer
+---
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/log_api.rs` under `lurek.log.*`. All emit functions accept an optional second string argument `tag` (defaults to `"Lua"`).
+Exposed under `lurek.log.*` by `src/lua_api/log_api.rs`.
 
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.log.debug(message, tag?)` | `(string, string?)` | Emit a `debug`-severity message. |
-| `lurek.log.info(message, tag?)` | `(string, string?)` | Emit an `info`-severity message. |
-| `lurek.log.warn(message, tag?)` | `(string, string?)` | Emit a `warn`-severity message. |
-| `lurek.log.error(message, tag?)` | `(string, string?)` | Emit an `error`-severity message. |
-| `lurek.log.print(level, message)` | `(string, string)` | Emit at a named level. |
-| `lurek.log.setLevel(level)` | `(string)` | Set minimum runtime log level. |
-| `lurek.log.getLevel()` | `→ string` | Return current level name. |
-| `lurek.log.addSink(cfg) → id` | `(table) → integer` | Add a file or memory sink. `cfg.type = "file"` requires `cfg.path`; `"memory"` accepts `cfg.capacity` (default 200). `cfg.level` sets `SinkLevel` (default `"debug"`). |
-| `lurek.log.removeSink(id) → bool` | `(integer) → boolean` | Remove a sink by id. |
-| `lurek.log.clearSinks()` | `()` | Remove all sinks. |
-| `lurek.log.listSinks() → table` | `() → table` | Returns `{id, type, level, path?}[]`. |
-| `lurek.log.readMemory(id, drain?) → table?` | `(integer, boolean?) → table?` | Read memory sink entries. `drain = true` clears after reading. Returns `nil` if not a memory sink. |
-| `lurek.log.flushFile(id)` | `(integer)` | Flush OS write buffers for a file sink. No-op if not a file sink. |
+### Module Functions
+
+| Function | Description |
+|----------|-------------|
+| `lurek.log.debug` | Emits a debug-severity log message. Also dispatches to configured sinks. |
+| `lurek.log.info` | Emits an info-severity log message. Also dispatches to configured sinks. |
+| `lurek.log.warn` | Emits a warn-severity log message. Also dispatches to configured sinks. |
+| `lurek.log.error` | Emits an error-severity log message. Also dispatches to configured sinks. |
+| `lurek.log.print` | Emits a log message at the specified level. Also dispatches to sinks. |
+| `lurek.log.setLevel` | Sets the minimum severity level for the default log channel. |
+| `lurek.log.getLevel` | Returns the name of the currently active minimum log level. |
+| `lurek.log.addSink` | Registers a new output sink. Returns its numeric id. |
+| `lurek.log.removeSink` | Removes a sink by id. Returns true if one was removed. |
+| `lurek.log.clearSinks` | Removes all registered sinks (the default stderr channel is unaffected). |
+| `lurek.log.listSinks` | Returns a table describing all registered sinks. |
+| `lurek.log.readMemory` | Reads entries from a memory sink. If drain=true the buffer is cleared. |
+| `lurek.log.flushFile` | Flushes the OS write buffer for a file sink. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- Basic level-specific logging with optional tag
-lurek.log.info("Game initialised")
-lurek.log.debug("Player position: x=" .. x, "PlayerSys")  -- tagged
-lurek.log.warn("Texture not found, using fallback")
-
--- Dynamic level selection
-lurek.log.print("warn", "fallback asset activated")
-
--- Runtime level control
-lurek.log.setLevel("debug")
-lurek.log.setLevel("warn")
-print("Active log level:", lurek.log.getLevel())
-
--- Add a memory sink (ring buffer, capacity 100)
-local mem_id = lurek.log.addSink({ type = "memory", capacity = 100 })
-
--- Read entries from the memory sink
-local entries = lurek.log.readMemory(mem_id)      -- non-destructive
-local drained = lurek.log.readMemory(mem_id, true) -- clears after read
-
--- Add a file sink (UTF-8 append)
-local ok, file_id = pcall(function()
-    return lurek.log.addSink({ type = "file", path = "save/game.log", level = "info" })
-end)
-if ok then
-    lurek.log.flushFile(file_id)
+-- Minimal namespace check for lurek.log.
+if lurek.log then
+    -- Call the documented functions in the Lua API tables above.
 end
-
--- Inspect active sinks
-for _, s in ipairs(lurek.log.listSinks()) do
-    print(s.id, s.type, s.level, s.path or "")
-end
-
--- Clean up
-lurek.log.clearSinks()
 ```
+
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 3     |
-| `enum`    | 2     |
-| `fn`      | 13    |
+| Kind | Count |
+|------|-------|
+| `struct` | 3 |
+| `enum` | 2 |
+| `fn` (Lua API) | 13 |
 | **Total** | **18** |
+
+---
 
 ## References
 
-| Module          | Relationship | Notes                                                                    |
-|-----------------|--------------|--------------------------------------------------------------------------|
-| `engine`        | Imports from | `set_level` and `get_level` delegate to `engine::log_messages`           |
-| `lua_api`       | Imported by  | `log_api.rs` registers the `lurek.log.*` surface and owns the `SinkRegistry` |
-| `debugbridge`   | Related      | `debugbridge.capturePrint` captures Lua `print()` output; `lurek.log` emits via `log` crate — two separate channels |
-| `devtools`      | Related      | `devtools.Logger` is a structured in-game history buffer; `lurek.log` is the engine-level operational log. **Boundary**: three separate channels by design. |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Foundations to Core Runtime. |
+
+---
 
 ## Notes
 
-- All Lua log messages are prefixed with `[Lua]` in the stdlib `log` crate output.
-- `lurek.log.print` with an unknown `level` string falls back to `info`.
-- Sinks are dispatched **after** the `log!` macro, so `RUST_LOG` filtering does not suppress sink output.
-- `SinkKind::File` uses `Mutex<File>` internally; creating a file sink will fail with a Lua error if the path is not writable — always wrap `addSink` in `pcall`.
-- There are no Rust unit tests for this module because all behaviour is a pass-through to `engine::log_messages`; the Lua test in `tests/lua/unit/test_log.lua` validates the Lua API surface.
+- **Source of truth**: Keep this spec synchronized with `src/log/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

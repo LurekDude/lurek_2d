@@ -55,7 +55,10 @@ mod tests {
         let mut stack = SceneStack::new();
         let _ = stack.next_scene_id();
         let cmds = stack.generate_render_commands();
-        assert!(cmds.is_empty(), "scene stack should return no render commands");
+        assert!(
+            cmds.is_empty(),
+            "scene stack should return no render commands"
+        );
     }
 
     #[test]

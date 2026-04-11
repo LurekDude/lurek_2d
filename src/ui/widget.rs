@@ -254,6 +254,8 @@ impl WidgetType {
 /// - `anchor_center_y` — `Option<f32>`. Vertical centre anchor.
 /// - `flex_grow` — `f32`. Flexbox grow factor.
 /// - `flex_shrink` — `f32`. Flexbox shrink factor.
+/// - `computed_rect` — `crate::math::Rect`. Computed screen-space rectangle after layout.
+/// - `is_visible` — `bool`. Whether this widget is visible after layout (not clipped by parent).
 #[derive(Debug, Clone)]
 pub struct WidgetBase {
     /// Optional identifier for `findById` lookup.
@@ -306,6 +308,10 @@ pub struct WidgetBase {
     pub flex_grow: f32,
     /// Flexbox shrink factor.
     pub flex_shrink: f32,
+    /// Computed screen-space rectangle after layout. Written by `run_layout_pass()`.
+    pub computed_rect: crate::math::Rect,
+    /// Whether this widget is visible after layout (not clipped by parent).
+    pub is_visible: bool,
 }
 
 impl WidgetBase {
@@ -347,6 +353,8 @@ impl WidgetBase {
             anchor_center_y: None,
             flex_grow: 0.0,
             flex_shrink: 0.0,
+            computed_rect: crate::math::Rect::new(0.0, 0.0, 0.0, 0.0),
+            is_visible: true,
         }
     }
 

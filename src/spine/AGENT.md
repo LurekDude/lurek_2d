@@ -1,42 +1,26 @@
-# `spine` — Agent Reference
+﻿# spine
 
-| Property       | Value                                          |
-|----------------|------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extension                      |
-| **Status**     | Implemented — Full                             |
-| **Lua API**    | `lurek.spine`                                   |
-| **Source**     | `src/spine/`                                   |
-| **Rust Tests** | `tests/rust/unit/spine_tests.rs`               |
-| **Lua Tests**  | `tests/lua/unit/test_spine.lua`                |
-| **Architecture** | —                                            |
+## Module Info
+- Group: Feature Systems.
+- Source: `src/spine/`.
+- Spec: `docs/specs/spine.md`.
+- Lua bridge: `src/lua_api/spine_api.rs` registers `lurek.spine`.
+- Runtime focus: skeletal bone hierarchies, slots, world-transform propagation, and debug-oriented rendering helpers.
 
-## Purpose
+## Module Purpose
+The spine module owns skeletal 2D animation data for rigs that need parent-child transform propagation instead of frame-only sprite swaps. It exists so games can build a `Skeleton` from bones and slots, update world transforms deterministically, and query attachment points from Lua without exposing renderer internals.
 
-The `spine` module implements skeletal 2D animation through bone hierarchies, slots, and world-transform propagation. It is a Tier 2 Engine Extension that provides the data model for hierarchical bone rigs without any GPU, audio, or windowing dependency. The module is purely computational — it owns bone graph construction, local-to-world transform propagation, and slot-based attachment binding but delegates all rendering to the `lua_api` bridge layer.
+Its core boundary is the bone graph and slot metadata: local transforms, parent indices, root transform state, and slot attachment records live here, while timeline playback, texture ownership, and final draw policy stay outside the module. The render helper in this directory is intentionally a debug-facing bridge that turns current skeleton state into simple draw commands rather than a full animation renderer.
 
-## Source Files
-
-| File          | Purpose                                                                  |
-|---------------|--------------------------------------------------------------------------|
-| `bone.rs`     | `Bone` struct — local and world transform fields, constructors           |
-| `render.rs`   | GPU render-command generation: `Skeleton::generate_render_commands(x, y)` emits bone circles and slot attachment-placeholder rectangles |
-| `skeleton.rs` | `Skeleton` and `BoneParams` — bone/slot management, world-transform propagation |
-| `slot.rs`     | `Slot` struct — bone attachment binding with tint colour and draw order   |
-| `mod.rs` | — |
+## Files
+- `mod.rs`: Module root and re-export surface for the public skeletal types.
+- `bone.rs`: Individual bone data with local transform input and cached world transform output.
+- `render.rs`: Debug render-command generation for bones and slot attachment placeholders.
+- `skeleton.rs`: Skeleton ownership, bone and slot management, transform propagation, and CPU image helpers.
+- `slot.rs`: Slot data binding an attachment name, tint, and draw order to a bone index.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `Bone` | Principal type for the `spine` module. |
-| `BoneParams` | Principal type for the `spine` module. |
-| `Skeleton` | Principal type for the `spine` module. |
-| `Slot` | Principal type for the `spine` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/spine.md`](../../docs/specs/spine.md)
-
-_Update both this file **and** `docs/specs/spine.md` whenever source files, public types, or Lua bindings change._
+- `Skeleton`: Top-level rig object that owns bones, slots, root transform state, and hierarchy updates.
+- `Bone`: Single skeletal node with local transform fields and propagated world transform fields.
+- `BoneParams`: Convenience parameter bundle for creating bones in one call.
+- `Slot`: Attachment record that binds a named visual slot to a specific bone.

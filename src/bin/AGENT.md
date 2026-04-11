@@ -1,33 +1,23 @@
-# `bin` — Agent Reference
+# bin
 
-| Property       | Value                                            |
-|----------------|--------------------------------------------------|
-| **Tier**       | Special — CLI entry point (not a numbered tier)  |
-| **Status**     | Implemented — Full                               |
-| **Lua API**    | —                                                |
-| **Source**      | `src/bin/`                                       |
-| **Rust Tests** | —                                                |
-| **Lua Tests**  | —                                                |
-| **Architecture** | —                                              |
+## Module Info
+- Module name: bin
+- Module group: Edge/Integration
+- Spec path: docs/specs/bin.md
+- Lua API path(s): None
+- Rust test path(s): None dedicated
+- Lua test path(s): None
 
-## Purpose
+## Module Purpose
 
-The `bin` module contains the `lurekc` binary entry point — a console-less launcher for
-Lurek2D on Windows. Setting `#![cfg_attr(windows, windows_subsystem = "windows")]` suppresses
-the black terminal window that would otherwise appear alongside the game window, providing a
-polished experience for distributed games. On Linux and macOS the attribute is ignored and
-`lurekc` behaves identically to the standard `lurek2d` binary.
+The bin module holds alternative compiled entry points for the engine. It exists so the project can ship or develop with different binary behaviors while still routing all real startup logic through the shared library crate.
 
-## Source Files
+Right now the important distinction is between the main console-attached launcher and the console-less Windows launcher under src/bin/. The bin module keeps that packaging concern separate from engine startup behavior, which still belongs in lib.rs and app.
 
-| File       | Purpose                                                                              |
-|------------|--------------------------------------------------------------------------------------|
-| `lurekc.rs` | Console-less binary entry point; sets `windows_subsystem = "windows"` and calls `lurek_run()` |
+This module does not own configuration parsing, platform initialization, splash behavior, or the event loop. If a change affects engine boot semantics rather than which binary wrapper calls into them, it belongs somewhere else.
 
-## Full Specification
+## Files
+- lurekc.rs: Minimal console-less launcher for Windows builds that applies the windows_subsystem attribute and then delegates straight to lurek2d::lurek_run(). This file should stay intentionally tiny because it is only a wrapper binary.
 
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/bin.md`](../../docs/specs/bin.md)
-
-_Update both this file **and** `docs/specs/bin.md` whenever source files, public types, or Lua bindings change._
+## Key Types
+- main: The only meaningful symbol in this module is the binary entry function in lurekc.rs. Its entire purpose is to hand control to the shared library entry point without adding alternate boot logic.

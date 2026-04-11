@@ -1,289 +1,159 @@
 # `automation` — Agent Reference
 
-| Property       | Value                                        |
-|----------------|----------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extensions                   |
-| **Status**     | Implemented — Full                           |
-| **Lua API**    | `lurek.simulator`                             |
-| **Source**      | `src/automation/`                            |
-| **Rust Tests** | `tests/rust/unit/automation_tests.rs`        |
-| **Lua Tests**  | `tests/lua/unit/test_automation.lua`         |
-| **Architecture** | —                                          |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.automation` |
+| **Source** | `src/automation/` |
+| **Rust Tests** | tests/rust/unit/automation_tests.rs |
+| **Lua Tests** | tests/lua/unit/test_automation.lua |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
+
+---
 
 ## Summary
 
-The `automation` module provides automated input simulation through timed step scripts. It is a Tier 2 Engine Extension that depends on `crate::engine` (Baseline) and `crate::event` (Tier 1). It does not depend on `crate::math`.
+The automation module replays scripted input into the engine event queue. It exists so tests, demos, and developer tooling can drive the game exactly as if keys, mouse movement, clicks, wheel events, or text input came from real hardware.
 
-A `Script` contains an ordered list of `Step` records, each pairing a wall-clock offset (seconds from script start) with an `Action` variant — one of eight kinds: `KeyPress`, `KeyRelease`, `TextInput`, `MouseMove`, `MousePress`, `MouseRelease`, `MouseWheel`, and `Wait`. The `Simulator` plays back a loaded script by comparing elapsed game time against each step's timestamp and injecting the corresponding synthetic event into the engine's `EventQueue`. Injected events are indistinguishable from real hardware input as far as the game is concerned.
+Its core abstraction is a named Script made of timed Step records. A Simulator owns those scripts, advances playback over time, and turns each due Step into a synthetic event for the shared EventQueue. That keeps automation compatible with the rest of the input stack instead of inventing a separate test-only path.
 
-Primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions. Scripts are loaded from Lua tables via `lurek.simulator.load` and can be replayed multiple times. The `Simulator` owns a named registry of scripts; loading a script with an existing name replaces the previous one. Steps beyond `MAX_STEPS` (100 000) are silently truncated to cap memory at roughly 12 MB per script (CSF-010 allocation guard).
+This module does not own input state, window events, or general scheduling. Real hardware capture and input state live in input and the app loop, while generic timers and callback scheduling belong in timer. Automation only manages script data, playback state, and event injection.
 
-The `Simulator` follows a strict playback lifecycle: `Idle → Running → Complete`, with optional `Paused` transitions. Stopping resets elapsed time and step index. The module only injects events into the `EventQueue`; it does not consume them. Actual input handling remains in `src/input/`. The `Simulator` is not `Send` or `Sync` — it is owned by the main Lua thread via `Rc<RefCell<Simulator>>`.
+**Scope boundary**: This module currently depends on `event`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-                        Lua game script
-                              │
-                 lurek.simulator.load("demo", data)
-                 lurek.simulator.start("demo")
-                              │
-                              ▼
-                   ┌──────────────────┐
-                   │  automation_api  │  (bridge — src/lua_api/)
-                   │  parse_steps()   │
-                   └────────┬─────────┘
-                            │ constructs Script from Lua tables
-                            ▼
-              ┌──────────────────────────┐
-              │       Simulator          │  (simulator.rs)
-              │  ┌────────────────────┐  │
-              │  │ scripts: HashMap   │  │  named script registry
-              │  │ active_script      │  │  currently playing name
-              │  │ state: Playback    │  │  Idle/Running/Paused/Complete
-              │  │ elapsed / step_idx │  │  playback position
-              │  └────────────────────┘  │
-              │        │                 │
-              │   update(dt, eq)         │
-              │        │                 │
-              │        ▼                 │
-              │  ┌───────────┐           │
-              │  │  Script   │           │  (script.rs)
-              │  │  name     │           │  named, time-sorted, capped
-              │  │  steps[]  │───────┐   │
-              │  └───────────┘       │   │
-              └──────────────────────│───┘
-                                     │
-                          ┌──────────▼──────────┐
-                          │   Step (step.rs)     │
-                          │  time: f32           │
-                          │  action: Action      │
-                          │  key/scancode/x/y/…  │
-                          └──────────┬──────────┘
-                                     │
-                          dispatch_step()
-                                     │
-                                     ▼
-                          ┌─────────────────┐
-                          │   EventQueue    │  (crate::event)
-                          │  push(Event)    │  synthetic input events
-                          └─────────────────┘
+lurek.automation.* (Lua API — src/lua_api/automation_api.rs)
+    |
+    v
+src/automation/mod.rs
+    |- script.rs - script
+    |- simulator.rs - simulator
+    |- step.rs - step
 ```
+
+---
 
 ## Source Files
 
-| File           | Purpose                                                                                |
-|----------------|----------------------------------------------------------------------------------------|
-| `mod.rs`       | Module root — re-exports `Script`, `Simulator`, `Step`, `Action`; module-level docs    |
-| `script.rs`    | `Script` struct — named, time-sorted, `MAX_STEPS`-capped container of `Step` objects   |
-| `simulator.rs` | `Simulator` struct — playback engine with named script registry and `PlaybackState` FSM |
-| `step.rs`      | `Step` struct and `Action` enum — timed action records with 12 optional fields          |
+| File | Purpose |
+|------|---------|
+| `mod.rs` | Module root that documents the automation surface and re-exports Script, Simulator, Action, and Step. This is the shortest entry point for understanding what the module exposes to other Rust code. |
+| `script.rs` | Defines Script, the named container for a time-sorted list of Steps. It also enforces the step-count cap and supports TOML-based script loading. |
+| `simulator.rs` | Defines Simulator and its internal playback state machine. This is the runtime engine that loads scripts, starts and stops playback, advances elapsed time, and pushes synthetic events into the EventQueue. |
+| `step.rs` | Defines the Action enum and Step record that describe a single timed automation action. This file is the schema for every script entry regardless of whether it comes from Lua, TOML, or Rust-side tests. |
+
+---
 
 ## Submodules
 
 ### `automation::script`
 
-Named, time-sorted, capacity-capped collection of `Step` objects. Scripts are indexed by name in the `Simulator` and selected for playback via `Simulator::start`. The step cap of `MAX_STEPS` (100 000) guards against unbounded memory allocation.
+Defines Script, the named container for a time-sorted list of Steps. It also enforces the step-count cap and supports TOML-based script loading.
 
 - **`Script`** (struct): A named simulation script containing an ordered sequence of timed steps.
 
 ### `automation::simulator`
 
-Playback engine that holds a `HashMap<String, Script>` registry and advances an elapsed-time cursor each frame, dispatching steps whose timestamps have been reached into the `EventQueue`. Manages a four-state FSM: Idle → Running → Paused/Complete.
+Defines Simulator and its internal playback state machine. This is the runtime engine that loads scripts, starts and stops playback, advances elapsed time, and pushes synthetic events into the EventQueue.
 
-- **`Simulator`** (struct): Automated input simulation engine with script registry and playback state.
+- **`Simulator`** (struct): Automated input simulation engine.
 
 ### `automation::step`
 
-Building blocks of a simulation script. Each `Step` pairs a wall-clock offset with an `Action` variant and optional action-specific parameters (key name, mouse coordinates, button index, text, click count, repeat flag).
+Defines the Action enum and Step record that describe a single timed automation action. This file is the schema for every script entry regardless of whether it comes from Lua, TOML, or Rust-side tests.
 
-- **`Step`** (struct): A single timed step in a simulation script with 12 fields.
-- **`Action`** (enum): The action type for a simulation step — 8 variants mapping to synthetic input events.
+- **`Action`** (enum): The action type for a simulation step.
+- **`Step`** (struct): A single timed step in a simulation script.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `automation::script::Script`
+#### `Script`
 
-A named simulation script containing an ordered sequence of timed steps. On construction, steps are sorted by `time` ascending and truncated to `MAX_STEPS` (100 000). Scripts are stored in the `Simulator` indexed by name; loading a script with an existing name replaces the previous one.
+Named automation script with optional human-readable metadata and an ordered Vec of Step values.
 
-**Fields**: `name: String`, `description: Option<String>`, `steps: Vec<Step>`.
+#### `Simulator`
 
-**Key methods**:
-- `Script::new(name, steps)` — Create a script; sorts steps by time, truncates to cap.
-- `Script::with_description(name, description, steps)` — Create with explicit description.
-- `Script::step_count()` — Return the number of steps.
+Playback engine that owns the script registry, current script selection, elapsed time, next-step index, and running or paused state.
 
-#### `automation::simulator::Simulator`
+#### `Step`
 
-Automated input simulation engine. Holds a named registry of `Script` objects and plays back the active script by injecting synthetic input events into the provided `EventQueue` on each `update` call. Not `Send` or `Sync` — owned via `Rc<RefCell<Simulator>>`.
+One timed automation record with optional fields for key names, scancodes, mouse coordinates, wheel deltas, button data, and text input.
 
-**Fields**: `scripts: HashMap<String, Script>`, `active_script: Option<String>`, `elapsed: f32`, `next_step_idx: usize`, `state: PlaybackState` (private enum).
+#### `Action`
 
-**Key methods**:
-- `Simulator::new()` — Create with empty registry in Idle state.
-- `Simulator::load(script)` — Register a script by name (replaces existing).
-- `Simulator::unload(name)` — Remove a script; auto-stops if active.
-- `Simulator::has_script(name)` — Check if a script name is registered.
-- `Simulator::get_scripts()` — Return all registered script names.
-- `Simulator::start(name)` — Begin playback from the start; returns `Err` if not loaded.
-- `Simulator::stop()` — Reset to Idle; clear active script and elapsed time.
-- `Simulator::pause()` — Freeze playback at current position.
-- `Simulator::resume()` — Continue from paused position.
-- `Simulator::update(dt, event_queue)` — Advance clock, dispatch due steps into EventQueue.
-- `Simulator::is_running()` / `is_paused()` / `is_complete()` — State queries.
-- `Simulator::current_step()` — Index of next step to dispatch.
-- `Simulator::step_count()` — Total steps in active script.
-- `Simulator::current_script()` — Name of active script or `None`.
-- `Simulator::elapsed_time()` — Seconds since playback started.
+Enum of supported automation actions such as keypress, mousemove, mousepress, and wait.
 
-#### `automation::step::Step`
-
-A single timed step in a simulation script. Pairs a wall-clock offset (`time`) with an `Action` and optional action-specific fields. Only `time` and `action` are required; all other fields default to `None`/`false`.
-
-**Fields**: `time: f32`, `action: Action`, `key: Option<String>`, `scancode: Option<String>`, `x: Option<f64>`, `y: Option<f64>`, `dx: Option<f64>`, `dy: Option<f64>`, `button: Option<u32>`, `text: Option<String>`, `is_repeat: bool`, `clicks: Option<u32>`.
-
-**Key methods**:
-- `Step::new(time, action)` — Create with defaults for all optional fields.
-- `Step::effective_scancode()` — Return `scancode` if set, else fall back to `key`.
-
-### Enums
-
-#### `automation::step::Action`
-
-The action type for a simulation step. Each variant maps to a synthetic input event injected into the `EventQueue` during playback. Parse from string with `Action::parse_action`; convert back with `Action::as_str`.
-
-**Variants**: `KeyPress`, `KeyRelease`, `MouseMove`, `MousePress`, `MouseRelease`, `MouseWheel`, `TextInput`, `Wait`.
-
-**Key methods**:
-- `Action::parse_action(s)` — Parse lowercase string (`"keypress"`, `"wait"`, etc.) into variant.
-- `Action::as_str()` — Return canonical lowercase string representation.
+---
 
 ## Lua API
 
-Exposed under `lurek.simulator.*` by `src/lua_api/automation_api.rs`. The API provides 16 functions for loading, controlling, and querying script playback. Scripts are loaded from Lua tables containing a `steps` array and optional `meta` table. The bridge function `parse_steps` converts Lua step tables into `Vec<Step>`.
+Exposed under `lurek.automation.*` by `src/lua_api/automation_api.rs`.
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `lurek.simulator.load` | `(name: string, data: table)` | Load a named script from a table with `steps` array and optional `meta.description` |
-| `lurek.simulator.unload` | `(name: string) → boolean` | Remove a loaded script; returns true if it existed |
-| `lurek.simulator.hasScript` | `(name: string) → boolean` | Check if a script name is registered |
-| `lurek.simulator.getScripts` | `() → table` | Return array of all registered script names |
-| `lurek.simulator.start` | `(name: string)` | Start playback of named script from the beginning |
-| `lurek.simulator.stop` | `()` | Stop playback, reset to idle |
-| `lurek.simulator.pause` | `()` | Pause playback at current position |
-| `lurek.simulator.resume` | `()` | Resume from paused position |
-| `lurek.simulator.update` | `(dt: number)` | Advance clock by dt seconds, dispatch due steps |
-| `lurek.simulator.isRunning` | `() → boolean` | True if actively playing a script |
-| `lurek.simulator.isPaused` | `() → boolean` | True if paused |
-| `lurek.simulator.isComplete` | `() → boolean` | True if all steps in active script dispatched |
-| `lurek.simulator.getCurrentStep` | `() → integer` | Index of next step to dispatch |
-| `lurek.simulator.getStepCount` | `() → integer` | Total steps in active script |
-| `lurek.simulator.getCurrentScript` | `() → string?` | Name of active script, or nil if idle |
-| `lurek.simulator.getElapsedTime` | `() → number` | Seconds elapsed since playback started |
-| `lurek.simulator.loadFromToml` | `(name: string, toml_str: string)` | Parse a TOML string and register it as a named script |
+### Module Functions
 
-### Step Table Format
+| Function | Description |
+|----------|-------------|
+| `lurek.automation.load` | Loads a named script from a Lua data table containing a steps array. |
+| `lurek.automation.unload` | Removes a loaded script by name, returning true if it existed. |
+| `lurek.automation.hasScript` | Returns true if a script with the given name is registered. |
+| `lurek.automation.getScripts` | Returns an array of all registered script names. |
+| `lurek.automation.start` | Starts playback of the named script from the beginning. |
+| `lurek.automation.stop` | Stops playback and resets the simulator to idle. |
+| `lurek.automation.pause` | Pauses playback at the current step position. |
+| `lurek.automation.resume` | Resumes playback from a paused position. |
+| `lurek.automation.update` | Advances the playback clock by dt seconds, dispatching due steps. |
+| `lurek.automation.isRunning` | Returns true if the simulator is actively playing a script. |
+| `lurek.automation.isPaused` | Returns true if playback is currently paused. |
+| `lurek.automation.isComplete` | Returns true if all steps in the active script have been dispatched. |
+| `lurek.automation.getCurrentStep` | Returns the index of the next step to be dispatched. |
+| `lurek.automation.getStepCount` | Returns the total number of steps in the active script. |
+| `lurek.automation.getCurrentScript` | Returns the name of the active script, or nil if idle. |
+| `lurek.automation.getElapsedTime` | Returns seconds elapsed since playback started. |
+| `lurek.automation.loadFromToml` | Parses a TOML string and registers it as a named script. |
 
-Each entry in the `steps` array is a table with these fields:
-
-| Field | Type | Required | Default | Used by |
-|-------|------|----------|---------|---------|
-| `action` | string | yes | — | all |
-| `time` | number | no | `0.0` | all |
-| `key` | string | no | `nil` | keypress, keyrelease |
-| `scancode` | string | no | `key` | keypress, keyrelease |
-| `x` | number | no | `0.0` | mousemove, mousepress, mouserelease, mousewheel |
-| `y` | number | no | `0.0` | mousemove, mousepress, mouserelease, mousewheel |
-| `dx` | number | no | `0.0` | mousemove |
-| `dy` | number | no | `0.0` | mousemove |
-| `button` | integer | no | `1` | mousepress, mouserelease |
-| `text` | string | no | `""` | textinput |
-| `isRepeat` | boolean | no | `false` | keypress |
-| `clicks` | integer | no | `1` | mousepress |
+---
 
 ## Lua Examples
 
 ```lua
--- Load a script with keyboard and mouse steps
-function lurek.init()
-    lurek.simulator.load("test_input", {
-        steps = {
-            { time = 0.1, action = "keypress",    key = "space" },
-            { time = 0.3, action = "keyrelease",  key = "space" },
-            { time = 0.5, action = "mousemove",   x = 400, y = 300, dx = 10, dy = 5 },
-            { time = 0.7, action = "mousepress",  x = 400, y = 300, button = 1 },
-            { time = 0.8, action = "mouserelease", x = 400, y = 300, button = 1 },
-            { time = 1.0, action = "textinput",   text = "hello" },
-            { time = 1.5, action = "wait" },
-        },
-        meta = { description = "Integration test: basic input sequence" },
-    })
-    lurek.simulator.start("test_input")
-end
-
-function lurek.process(dt)
-    lurek.simulator.update(dt)
-
-    if lurek.simulator.isComplete() then
-        print("Script finished after " .. lurek.simulator.getElapsedTime() .. "s")
-        lurek.simulator.stop()
-    end
+-- Minimal namespace check for lurek.automation.
+if lurek.automation then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Pause/resume and introspection
-function lurek.process(dt)
-    lurek.simulator.update(dt)
-
-    -- Pause on a specific step
-    if lurek.simulator.getCurrentStep() >= 3 and lurek.simulator.isRunning() then
-        lurek.simulator.pause()
-    end
-
-    -- Report progress
-    local step = lurek.simulator.getCurrentStep()
-    local total = lurek.simulator.getStepCount()
-    local name = lurek.simulator.getCurrentScript() or "none"
-    print(string.format("Script '%s': step %d/%d", name, step, total))
-end
-```
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 3     |
-| `enum`    | 1     |
-| `fn`      | 24    |
-| **Total** | **28** |
+| Kind | Count |
+|------|-------|
+| `struct` | 3 |
+| `enum` | 1 |
+| `fn` (Lua API) | 17 |
+| **Total** | **21** |
+
+---
 
 ## References
 
-| Module    | Relationship | Notes                                                        |
-|-----------|-------------|--------------------------------------------------------------|
-| `engine`  | Imports from | Log messages (`log_msg!`, `AT01_SIM_INIT`, `AT02_SCRIPT_LOAD`) |
-| `event`   | Imports from | `Event`, `EventArg`, `EventQueue` — step dispatch target     |
-| `lua_api` | Imported by  | Registers `lurek.simulator.*` via `automation_api.rs`          |
-| `input`   | Related      | Automation injects events that the input module consumes; the two modules do not import each other |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `event` | Imports or references `event` from `src/event/`. | Cross-group dependency from Feature Systems to Core Runtime. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
+
+---
 
 ## Notes
 
-- **Tier classification**: The module is Tier 2 (not Tier 1) because it imports `crate::event`, which is Tier 1. The Tier 1 no-cross-import rule prohibits this at the same tier.
-- **Lua namespace**: The API is `lurek.simulator.*`, not `lurek.automation.*`. The table is registered via `lurek.set("simulator", tbl)`.
-- **Simulator ownership**: `Simulator` is `Rc<RefCell<Simulator>>` in the Lua API — separate from `SharedState`. It is not stored in `SharedState`; the automation API creates and owns its own instance during registration.
-- **Event injection only**: The module pushes synthetic `Event` objects into the `EventQueue`. It never reads or consumes events. The input module (`src/input/`) handles actual input state.
-- **Memory cap**: `MAX_STEPS = 100_000` per script (~12 MB at ~120 bytes/step). Steps beyond this are silently truncated during `Script::new`. This is a security guard (CSF-010).
-- **PlaybackState is private**: The four-state FSM (`Idle`, `Running`, `Paused`, `Complete`) is private to `simulator.rs`. External code queries state via `is_running()`, `is_paused()`, `is_complete()`.
-- **No persistence**: Scripts exist only in memory. There is no built-in save/load to disk — scripts are constructed from Lua tables each time.
-- **Thread safety**: `Simulator` is not `Send` or `Sync`. It must remain on the main thread.
-- **Breaking change surface**: Renaming step action strings (`"keypress"`, `"mousemove"`, etc.) or the `lurek.simulator.*` function names would break all existing automation scripts.
-
-## See Also
-
-| Module | Relationship |
-|---|---|
-| `timer::Scheduler` | For timed Lua callbacks (`after(delay)` / `every(interval)`), use `lurek.time.newScheduler()`. `automation.Simulator` is for replaying **recorded input scripts**, not general timed callbacks. |
-| `patterns::StateMachine` | `Simulator` contains an internal 4-state FSM (`Idle/Running/Paused/Complete`). For **game-level** FSM needs (menus, NPC states, combat phases), use `lurek.patterns.newStateMachine()` instead. |
+- **Source of truth**: Keep this spec synchronized with `src/automation/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

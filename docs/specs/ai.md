@@ -1,623 +1,530 @@
 # `ai` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.ai`                                            |
-| **Source**      | `src/ai/`                                            |
-| **Rust Tests** | `tests/rust/unit/ai_tests.rs`                        |
-| **Lua Tests**  | `tests/lua/unit/test_ai.lua`                         |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.ai` |
+| **Source** | `src/ai/` |
+| **Rust Tests** | `tests/rust/unit/ai_tests.rs`, `tests/rust/game/ai_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_ai.lua`, `tests/lua/golden/test_ai_golden.lua`, `tests/lua/integration/test_entity_ai.lua`, `tests/lua/integration/test_ai_physics.lua`, `tests/lua/integration/test_ai_pathfinding.lua`, `tests/lua/integration/test_ai_entity_scene.lua`, `tests/lua/stress/test_ai_stress.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
+
+---
 
 ## Summary
 
-The AI module provides a modular game-intelligence toolkit assembled from six interchangeable decision models: finite state machines, behaviour trees, steering behaviours (7 Reynolds behaviors), GOAP planning, utility AI, and tabular Q-learning. Agents and models are registered in a central `AIWorld`. A hierarchical `Blackboard` key-value store enables write-local/read-parent-chain shared memory between agents. `Squad` formations, a `CommandQueue`, and `InfluenceMap` cover collective intelligence.
+The `ai` module is Lurek2D's gameplay decision-making toolkit. It brings together multiple AI paradigms including finite state machines, behavior trees, steering, GOAP, utility AI, Q-learning, squad formations, command queues, and blackboard-driven coordination so different game genres can pick the right model instead of being forced into one framework.
 
-All computation is pure CPU math — no GPU, audio, or window access. Depends on `math`, `engine`, and `pathfinding` (for `PathGrid`, `FlowField`, and `InfluenceMap` re-exports). Grid and flow-field types are re-exported into `lurek.ai.*` for a unified namespace. No per-frame heap allocation in steady state.
+It exists to keep decision logic, action scoring, and agent coordination separate from entities, physics, and scripts that only want to consume the results. The module owns the reusable AI algorithms and shared data models; the Lua bridge exposes them, and game code decides how to wire them into actual actors.
+
+It intentionally does not own pathfinding algorithms at the implementation level, rendering beyond optional debug helpers, or any authoritative scene or entity storage. It can reference pathfinding data and provide debug output, but world simulation and movement application stay outside the module.
+
+**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-AIWorld (central registry, owns all agents)
-  │
-  ├── Agent ─── DecisionModel selection
-  │     ├── Fsm ─────────► StateMachine (states + guarded transitions)
-  │     ├── Bt ──────────► BehaviorTree (composite/decorator/leaf nodes)
-  │     ├── Steering ────► SteeringManager (7 Reynolds behaviors)
-  │     ├── FsmSteering ─► StateMachine + SteeringManager
-  │     └── BtSteering ──► BehaviorTree + SteeringManager
-  │
-  ├── Blackboard ─── hierarchical key-value store (parent chain)
-  │     ├── Global (world level)
-  │     ├── Agent-local → parent: Global
-  │     └── Squad-level (independent)
-  │
-  ├── Planning
-  │     ├── GOAPPlanner ── A* over boolean precondition/effect space
-  │     └── UtilityAI ──── scored action selection via response curves
-  │
-  ├── Spatial (re-exported from crate::pathfinding)
-  │     ├── PathGrid ──── A* with octile heuristic + LoS smoothing
-  │     ├── FlowField ─── BFS-based 8-directional movement
-  │     └── InfluenceMap ─ named layers with stamp/propagate/decay
-  │
-  ├── Learning
-  │     └── QLearner ──── tabular Q-learning with epsilon-greedy + Bellman
-  │
-  ├── Group
-  │     ├── Squad ─────── formation positioning (Line/Wedge/Circle/Column/None)
-  │     └── CommandQueue ─ FIFO command buffer with interrupt and cancel
-  │
-  └── Steering
-        └── SteeringManager ── 7 behaviors combined (Seek/Flee/Arrive/Wander/Pursue/Evade/Flock)
-              └── CombineMode: Weighted (sum all) or Priority (first non-zero wins)
+lurek.ai.* (Lua API — src/lua_api/ai_api.rs)
+    |
+    v
+src/ai/mod.rs
+    |- agent.rs - agent
+    |- behavior_tree.rs - behavior_tree
+    |- blackboard.rs - blackboard
+    |- command_queue.rs - command_queue
+    |- fsm.rs - fsm
+    |- goap.rs - goap
+    |- qlearner.rs - qlearner
+    |- render.rs - render
+    |- ...
 ```
+
+---
 
 ## Source Files
 
-| File                | Purpose                                                                          |
-|---------------------|----------------------------------------------------------------------------------|
-| `mod.rs`            | Module declarations, re-exports from `crate::pathfinding` (FlowField, Cell, PathGrid, InfluenceMap) |
-| `agent.rs`          | Autonomous agent with kinematic state (position, velocity) and pluggable decision models |
-| `behavior_tree.rs`  | Behavior tree with composite (Selector, Sequence, Parallel), decorator (Inverter, Repeater, Succeeder), and leaf (Action, Condition) nodes |
-| `blackboard.rs`     | Typed key-value store with optional parent chain for hierarchical lookup         |
-| `command_queue.rs`  | RTS-style ordered command queue with enqueue, push-front, replace, and cancel    |
-| `fsm.rs`            | Finite state machine with priority-ordered guarded transitions and lifecycle callbacks |
-| `goap.rs`           | Goal-Oriented Action Planning using A★ search over boolean world state           |
-| `qlearner.rs`       | Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning       |
-| `squad.rs`          | Multi-agent formation groups with offset computation (line, wedge, circle, column) |
-| `steering.rs`       | Reynolds-style steering behaviors with weighted or priority-based force combination |
-| `utility_ai.rs`     | Multi-axis utility scorer with response curves for action selection              |
-| `world.rs`          | Top-level AI container that owns agents, maintains name→index lookup, and provides global blackboard |
+| File | Purpose |
+|------|---------|
+| `agent.rs` | Defines the core `Agent` record and the top-level decision-model selection enum used to attach different AI styles to an actor. |
+| `behavior_tree.rs` | Implements behavior tree nodes, statuses, composite policies, and the execution model for hierarchical decision logic. |
+| `blackboard.rs` | Provides a hierarchical key-value blackboard for local and shared AI state. |
+| `command_queue.rs` | Implements queued AI commands with priorities, interruptibility, and callback integration. |
+| `fsm.rs` | Defines finite state machine structures, state callbacks, and guarded transitions. |
+| `goap.rs` | Implements GOAP planning primitives and planner search over world-state facts. |
+| `mod.rs` | Declares the AI submodules and re-exports the main decision-model and support types, including selected pathfinding-facing types. |
+| `qlearner.rs` | Provides a tabular Q-learning implementation for trainable action selection. |
+| `render.rs` | Generates debug render output for AI state, plans, or decision structures when visual inspection is needed. |
+| `squad.rs` | Defines squad grouping, formation handling, and shared blackboard coordination. |
+| `steering.rs` | Implements movement steering behaviors such as seek, flee, arrive, wander, pursue, evade, and flocking. |
+| `utility_ai.rs` | Implements utility-based action scoring with considerations and response curves. |
+| `world.rs` | Defines `AIWorld`, the central registry and coordination surface for agents and shared AI state. |
+
+---
 
 ## Submodules
 
 ### `ai::agent`
 
-Autonomous agent with kinematic state and attached decision subsystems.
+Defines the core `Agent` record and the top-level decision-model selection enum used to attach different AI styles to an actor.
 
-- **`DecisionModel`** (enum) — Controls which AI subsystems are ticked during `AIWorld::update`. Variants: `Fsm`, `Bt`, `Steering`, `FsmSteering`, `BtSteering`.
-- **`Agent`** (struct) — Autonomous AI agent with position, velocity, max_speed, max_force, decision model, local blackboard, tags, and optional FSM/BT/steering indices.
+- **`DecisionModel`** (enum): Controls which AI subsystems are ticked for an agent during `AIWorld::update`.
+- **`Agent`** (struct): An autonomous AI agent with kinematic state and pluggable decision subsystems.
 
 ### `ai::behavior_tree`
 
-Behavior tree with composite, decorator, and leaf nodes.
+Implements behavior tree nodes, statuses, composite policies, and the execution model for hierarchical decision logic.
 
-- **`BTStatus`** (enum) — Execution status returned by every BT node: `Success`, `Failure`, `Running`.
-- **`ParallelPolicy`** (enum) — Policy for Parallel composite result aggregation: `RequireOne`, `RequireAll`.
-- **`BTNode`** (enum) — A node in the behavior tree: composites (`Selector`, `Sequence`, `Parallel`), decorators (`Inverter`, `Repeater`, `Succeeder`), and leaves (`Action`, `Condition`).
-- **`BehaviorTree`** (struct) — Root container wrapping an optional root `BTNode` and caching the `BTStatus` from the last tick.
+- **`BTStatus`** (enum): Execution status returned by every behavior tree node after a tick.
+- **`ParallelPolicy`** (enum): Policy for determining when a Parallel composite node succeeds or fails.
+- **`BTNode`** (enum): A node in the behavior tree.
+- **`BehaviorTree`** (struct): Root container for a behavior tree instance.
 
 ### `ai::blackboard`
 
-Typed key-value store with optional parent chain for hierarchical lookup.
+Provides a hierarchical key-value blackboard for local and shared AI state.
 
-- **`BlackboardValue`** (enum) — A typed value: `Number(f64)`, `Bool(bool)`, `Text(String)`.
-- **`Blackboard`** (struct) — Hierarchical key-value store with entries `HashMap<String, BlackboardValue>` and optional parent chain.
+- **`BlackboardValue`** (enum): A typed value stored in a blackboard slot.
+- **`Blackboard`** (struct): A hierarchical key-value store for sharing named data between AI subsystems.
 
 ### `ai::command_queue`
 
-RTS-style ordered command queue for scheduling unit actions.
+Implements queued AI commands with priorities, interruptibility, and callback integration.
 
-- **`Command`** (struct) — A single command with kind, Lua callback, target coordinates, priority, and interruptible flag.
-- **`CommandQueue`** (struct) — FIFO queue of `Command` entries with enqueue, push-front, replace, cancel, and advance operations.
+- **`Command`** (struct): A single RTS unit command with metadata and a Lua tick callback.
+- **`CommandQueue`** (struct): A FIFO queue of [`Command`] entries for sequential unit action scheduling.
 
 ### `ai::fsm`
 
-Finite state machine with priority-ordered guarded transitions.
+Defines finite state machine structures, state callbacks, and guarded transitions.
 
-- **`StateCallbacks`** (struct) — Lua lifecycle hooks for a single FSM state: `on_enter`, `on_update`, `on_exit` (all optional `RegistryKey`).
-- **`Transition`** (struct) — A directed edge with source, destination, optional guard predicate, and priority.
-- **`StateMachine`** (struct) — Manages named states with lifecycle callbacks, priority-ordered guarded transitions, current state tracking, and time-in-state counter.
+- **`StateCallbacks`** (struct): Lua lifecycle hooks for a single FSM state.
+- **`Transition`** (struct): A directed edge in the FSM state graph with an optional guard predicate.
+- **`StateMachine`** (struct): A finite state machine that manages named states with lifecycle callbacks and priority-ordered guarded transitions.
 
 ### `ai::goap`
 
-Goal-Oriented Action Planning (GOAP) using A★ search over boolean world state.
+Implements GOAP planning primitives and planner search over world-state facts.
 
-- **`GOAPAction`** (struct) — A GOAP action with name, cost, optional Lua callback, boolean preconditions, and boolean effects.
-- **`GOAPGoal`** (struct) — A planning goal with name, priority, and target boolean world state.
-- **`GOAPPlanner`** (struct) — A★ planner that finds optimal action sequences to satisfy goals. Holds `Vec<GOAPAction>` and `Vec<GOAPGoal>`. Hard limit of 10,000 A★ iterations.
+- **`GOAPAction`** (struct): A single GOAP action with boolean preconditions and effects.
+- **`GOAPGoal`** (struct): A planning goal expressed as a desired boolean world state.
+- **`GOAPPlanner`** (struct): A★ planner that finds optimal action sequences to satisfy goals over boolean world state.
 
 ### `ai::qlearner`
 
-Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
+Provides a tabular Q-learning implementation for trainable action selection.
 
-- **`QLearner`** (struct) — Maintains a flat Q-table (`Vec<f64>`, `state_count × action_count`). Parameters: α (learning rate), γ (discount factor), ε (exploration rate), epsilon_decay. Supports JSON serialize/deserialize for saving trained policies.
+- **`QLearner`** (struct): Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
+
+### `ai::render`
+
+Generates debug render output for AI state, plans, or decision structures when visual inspection is needed.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
 ### `ai::squad`
 
-Multi-agent formation groups with offset computation.
+Defines squad grouping, formation handling, and shared blackboard coordination.
 
-- **`FormationType`** (enum) — Formation shapes: `None`, `Line`, `Wedge`, `Circle`, `Column`.
-- **`Squad`** (struct) — Named group of agents with members list, optional leader, formation type, spacing, and a shared blackboard.
+- **`FormationType`** (enum): Formation shapes for squad positioning.
+- **`Squad`** (struct): A named group of agents with formation positioning and shared state.
 
 ### `ai::steering`
 
-Reynolds-style steering behaviors with weighted/priority combination.
+Implements movement steering behaviors such as seek, flee, arrive, wander, pursue, evade, and flocking.
 
-- **`Force`** (type alias) — `(f32, f32)` — 2D force vector.
-- **`CombineMode`** (enum) — How multiple behaviors are combined: `Weighted` (sum all × weight) or `Priority` (first non-zero wins).
-- **`SteeringBase`** (struct) — Shared parameters: `weight` and `enabled` flag.
-- **`SteeringBehaviorType`** (enum) — All concrete behavior variants: `Seek`, `Flee`, `Arrive`, `Wander`, `Pursue`, `Evade`, `Flock`. Each carries its own parameters plus a `SteeringBase`.
-- **`SteeringManager`** (struct) — Manages a list of steering behaviors, combines forces per `CombineMode`, and caches `last_force`.
+- **`Force`** (type): 2D force vector (fx, fy).
+- **`CombineMode`** (enum): Determines how multiple active steering behaviors are combined into a single resultant force applied to the agent.
+- **`SteeringBase`** (struct): Shared parameters common to all steering behavior instances.
+- **`SteeringBehaviorType`** (enum): All concrete steering behavior types supported by the AI system.
+- **`SteeringManager`** (struct): Manages a list of steering behaviors and combines their forces each frame.
 
 ### `ai::utility_ai`
 
-Multi-axis utility scorer that chooses the action with highest composite score.
+Implements utility-based action scoring with considerations and response curves.
 
-- **`ResponseCurve`** (enum) — Mathematical function shapes: `Linear`, `Quadratic`, `Logistic`, `Logit`, `Step`.
-- **`Consideration`** (struct) — A single evaluation axis with name, Lua callback, response curve, curve parameters (p1, p2, p3), and weight.
-- **`UAAction`** (struct) — A candidate action with name, scorer callback, considerations, and momentum bonus.
-- **`UtilityAI`** (struct) — Evaluates candidate actions, caches `last_action` index and `last_scores` array.
+- **`ResponseCurve`** (enum): Mathematical function shapes for transforming raw consideration inputs into normalized scores.
+- **`Consideration`** (struct): A single evaluation axis within a utility action's scoring function.
+- **`UAAction`** (struct): A candidate action in the utility AI decision space.
+- **`UtilityAI`** (struct): Multi-axis utility scorer that evaluates candidate actions and chooses the one with the highest composite score.
 
 ### `ai::world`
 
-Top-level AI container that owns agents and ticks them in descending priority order.
+Defines `AIWorld`, the central registry and coordination surface for agents and shared AI state.
 
-- **`AIWorld`** (struct) — Owns `Vec<Agent>`, `HashMap<String, usize>` name-index, and a global `Blackboard`. Provides `add_agent`, `remove_agent`, `update(dt)`.
+- **`AIWorld`** (struct): Top-level AI container that owns agents and provides global shared state.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `ai::world::AIWorld`
+#### `AIWorld`
 
-Top-level AI container that owns agents and provides global shared state. Agents are stored in a contiguous `Vec` for cache-friendly iteration. A `HashMap<String, usize>` provides O(1) name-based lookup. The global blackboard is automatically set as the parent of each agent's local blackboard on `add_agent()`.
+The central AI registry.
 
-#### `ai::agent::Agent`
+#### `Agent`
 
-An autonomous AI agent with kinematic state and pluggable decision subsystems. Carries position, velocity, max_speed, max_force, a `DecisionModel`, per-agent blackboard (parent-chained to global), tags for group queries, and optional indices into the world's FSM/BT/steering storage.
+One autonomous actor record with movement state, limits, selected decision model, and local blackboard.
 
-#### `ai::behavior_tree::BehaviorTree`
+#### `DecisionModel`
 
-Root container for a behavior tree instance. Wraps an optional root `BTNode` and caches the `BTStatus` from the last tick. The tree is traversed from root each frame, resuming from running nodes.
+Chooses which AI paradigm an `Agent` is currently using.
 
-#### `ai::blackboard::Blackboard`
+#### `StateMachine`
 
-A hierarchical key-value store for sharing named data between AI subsystems. Supports three value types (`Number`, `Bool`, `Text`). Reads walk the parent chain; writes always target the local store. Used by agents, squads, and the AI world.
+Finite state machine with named states and guarded transitions.
 
-#### `ai::command_queue::Command`
+#### `StateCallbacks`
 
-A single RTS unit command with `kind` string, Lua `callback` (`fn(dt) → bool`), target coordinates, priority, and `interruptible` flag. Processed one at a time from the front of a `CommandQueue`.
+Bundles per-state lifecycle callbacks for FSM behavior.
 
-#### `ai::command_queue::CommandQueue`
+#### `Transition`
 
-A FIFO queue of `Command` entries. Supports `enqueue` (back), `push_front` (interrupt), `replace` (clear + enqueue), `cancel_current` (if interruptible), and `advance` (pop front).
+One guarded edge between FSM states.
 
-#### `ai::utility_ai::Consideration`
+#### `BehaviorTree`
 
-A single evaluation axis within a utility action's scoring function. Queries a game-state value via its Lua callback, transforms through a `ResponseCurve`, and multiplies by weight.
+Hierarchical decision structure for composite, decorator, and leaf AI behavior.
 
-#### `ai::goap::GOAPAction`
+#### `BTNode`
 
-A GOAP action with name, cost, optional Lua callback, boolean preconditions, and boolean effects. Used as building blocks for A★ plan search.
+The behavior-tree node enum describing the actual tree shape.
 
-#### `ai::goap::GOAPGoal`
+#### `BTStatus`
 
-A planning goal expressed as a desired boolean world state with name and priority. The planner selects the highest-priority goal for planning.
+The execution result returned by behavior-tree steps.
 
-#### `ai::goap::GOAPPlanner`
+#### `ParallelPolicy`
 
-A★ planner that finds optimal action sequences to satisfy goals over boolean world state. Holds `Vec<GOAPAction>` and `Vec<GOAPGoal>`. Stateless between calls — each `plan()` is a fresh search. Hard limit of 10,000 iterations.
+Defines how parallel behavior-tree nodes determine success or failure.
 
-#### `ai::qlearner::QLearner`
+#### `Blackboard`
 
-Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning. Maintains a flat Q-table (`Vec<f64>`, `state_count × action_count`). Hyperparameters: α=0.1, γ=0.9, ε=0.1, decay=0.995 (defaults). Supports JSON serialization for saving/loading trained policies.
+Hierarchical key-value state store used for AI coordination and memory.
 
-#### `ai::squad::Squad`
+#### `BlackboardValue`
 
-A named group of agents with formation positioning and shared blackboard. Tracks agent names (not owned `Agent` structs). Call `get_formation_position(member_idx, leader_pos)` to compute ideal world-space positions per formation type.
+The value enum stored in a `Blackboard`.
 
-#### `ai::fsm::StateCallbacks`
+#### `CommandQueue`
 
-Lua lifecycle hooks for a single FSM state: `on_enter` (once on transition in), `on_update` (every frame), `on_exit` (once on transition out). All optional `RegistryKey` references.
+Ordered queue of AI commands waiting to run or interrupt one another.
 
-#### `ai::fsm::StateMachine`
+#### `Command`
 
-A finite state machine with named states, lifecycle callbacks, and priority-ordered guarded transitions. In exactly one state at a time. Transitions sorted by descending priority — first passing guard wins. Tracks `time_in_state` for time-based guards.
+One queued AI command with priority and callback information.
 
-#### `ai::fsm::Transition`
+#### `GOAPPlanner`
 
-A directed edge in the FSM state graph with source, destination, optional guard predicate (`fn(agent, dt) → bool`), and priority for evaluation ordering.
+Planner that searches action sequences over world-state facts.
 
-#### `ai::steering::SteeringBase`
+#### `GOAPAction`
 
-Shared parameters common to all steering behavior instances: `weight` multiplier and `enabled` flag. Carried by every `SteeringBehaviorType` variant.
+One GOAP action with preconditions and effects.
 
-#### `ai::steering::SteeringManager`
+#### `GOAPGoal`
 
-Manages a list of `SteeringBehaviorType` instances, combines their forces per `CombineMode` (Weighted or Priority), truncates to `max_force`, and caches the `last_force` result.
+Desired end-state description for GOAP planning.
 
-#### `ai::utility_ai::UAAction`
+#### `SteeringManager`
 
-A candidate action in the utility AI decision space. Has a name, scorer callback, zero or more `Consideration`s, and a `momentum_bonus` for action inertia.
+Combines steering behaviors to produce movement intent.
 
-#### `ai::utility_ai::UtilityAI`
+#### `SteeringBehaviorType`
 
-Multi-axis utility scorer. Holds `Vec<UAAction>`, evaluates each action's considerations, applies momentum bonuses, and records the winning action index and score array.
+Names the available steering behaviors.
 
-### Enums
+#### `CombineMode`
 
-#### `ai::agent::DecisionModel`
+Controls how multiple steering behaviors are merged.
 
-Controls which AI subsystems are ticked for an agent during `AIWorld::update`. Variants: `Fsm`, `Bt`, `Steering`, `FsmSteering` (FSM first, then steering), `BtSteering` (BT first, then steering). Parsed from Lua strings (`"fsm"`, `"bt"`, `"steering"`, `"fsm+steering"`, `"bt+steering"`).
+#### `UtilityAI`
 
-#### `ai::behavior_tree::BTStatus`
+Scores candidate actions using considerations and response curves.
 
-Execution status returned by every BT node: `Success`, `Failure`, `Running`. Composites and decorators use this to decide whether to continue, abort, or resume child traversal.
+#### `Consideration`
 
-#### `ai::behavior_tree::ParallelPolicy`
+One input dimension used in utility scoring.
 
-Policy for Parallel composite result aggregation: `RequireOne` (any single child) or `RequireAll` (every child). Parsed from `"requireOne"` / `"requireAll"`.
+#### `ResponseCurve`
 
-#### `ai::behavior_tree::BTNode`
+The curve applied to a consideration value before scoring.
 
-A BT node. Composites: `Selector` (first success), `Sequence` (first failure), `Parallel` (policy-based). Decorators: `Inverter`, `Repeater`, `Succeeder`. Leaves: `Action` (Lua callback → status string), `Condition` (Lua predicate → bool). Composite nodes store `running_idx` for multi-frame resume.
+#### `UAAction`
 
-#### `ai::blackboard::BlackboardValue`
+A candidate action inside a utility-AI model.
 
-A typed blackboard value: `Number(f64)`, `Bool(bool)`, `Text(String)`. Matches the primitive types commonly passed between Lua callbacks and the AI subsystem.
+#### `QLearner`
 
-#### `ai::steering::CombineMode`
+Tabular reinforcement learner for action value estimation.
 
-How multiple steering behaviors are combined: `Weighted` (sum all forces × weight, truncate to max_force) or `Priority` (use first non-zero force). Parsed from `"weighted"` / `"priority"`.
+#### `Squad`
 
-#### `ai::steering::SteeringBehaviorType`
+Group-level AI container for formations and shared decisions.
 
-All concrete steering behavior variants: `Seek`, `Flee` (with panic distance), `Arrive` (with slowing radius), `Wander` (projected circle), `Pursue` (intercept prediction), `Evade` (threat prediction), `Flock` (separation + alignment + cohesion). Each carries its parameters and a `SteeringBase`.
+#### `FormationType`
 
-#### `ai::squad::FormationType`
+Identifies the supported squad formation patterns.
 
-Formation shapes for squad positioning: `None`, `Line`, `Wedge`, `Circle`, `Column`. Parsed from lowercase Lua strings.
-
-#### `ai::utility_ai::ResponseCurve`
-
-Mathematical function shapes for response curves: `Linear` (p1×x+p2), `Quadratic` (p1×x²+p2×x+p3), `Logistic` (S-curve), `Logit` (inverse sigmoid), `Step` (hard threshold).
+---
 
 ## Lua API
 
-The full Lua-facing surface is registered in `src/lua_api/ai_api.rs` under the `lurek.ai` namespace. The API exposes 19 factory functions for creating AI objects and 10 UserData types with method APIs.
+Exposed under `lurek.ai.*` by `src/lua_api/ai_api.rs`.
 
-### Factory Functions (`lurek.ai.*`)
+### Module Functions
 
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `newWorld()` | `AIWorld` | Creates a new AI world container |
-| `newBlackboard()` | `Blackboard` | Creates a standalone blackboard |
-| `newStateMachine()` | `StateMachine` | Creates a new finite state machine |
-| `newBehaviorTree()` | `BehaviorTree` | Creates a new behavior tree |
-| `newSelector()` | `BTNode` | Creates a BT selector composite |
-| `newSequence()` | `BTNode` | Creates a BT sequence composite |
-| `newParallel(successPolicy?, failurePolicy?)` | `BTNode` | Creates a BT parallel composite |
-| `newInverter()` | `BTNode` | Creates a BT inverter decorator |
-| `newRepeater(count?)` | `BTNode` | Creates a BT repeater decorator |
-| `newSucceeder()` | `BTNode` | Creates a BT succeeder decorator |
-| `newAction(callback)` | `BTNode` | Creates a BT action leaf |
-| `newCondition(callback)` | `BTNode` | Creates a BT condition leaf |
-| `newSteeringManager()` | `SteeringManager` | Creates a steering behavior manager |
-| `newQLearner(stateCount, actionCount)` | `QLearner` | Creates a tabular Q-learner |
-| `newUtilityAI()` | `UtilityAI` | Creates a utility AI evaluator |
-| `newGOAPPlanner()` | `GOAPPlanner` | Creates a GOAP planning solver |
-| `newInfluenceMap(width, height, cellSize)` | `InfluenceMap` | Creates a multi-layer influence map grid |
-| `newSquad(name)` | `Squad` | Creates a named squad |
-| `newCommandQueue()` | `CommandQueue` | Creates an RTS-style command queue |
+| Function | Description |
+|----------|-------------|
+| `lurek.ai.newWorld` | Creates a new AI world container. |
+| `lurek.ai.newBlackboard` | Creates a new standalone blackboard. |
+| `lurek.ai.newStateMachine` | Creates a new finite state machine. |
+| `lurek.ai.newBehaviorTree` | Creates a new behavior tree. |
+| `lurek.ai.newSelector` | Creates a BT selector node. |
+| `lurek.ai.newSequence` | Creates a BT sequence node. |
+| `lurek.ai.newParallel` | Creates a BT parallel node with optional policies. |
+| `lurek.ai.newInverter` | Creates a BT inverter decorator. |
+| `lurek.ai.newRepeater` | Creates a BT repeater decorator. |
+| `lurek.ai.newSucceeder` | Creates a BT succeeder decorator. |
+| `lurek.ai.newAction` | Creates a BT action leaf with a Lua callback. |
+| `lurek.ai.newCondition` | Creates a BT condition leaf with a Lua predicate. |
+| `lurek.ai.newSteeringManager` | Creates a new steering behavior manager. |
+| `lurek.ai.newQLearner` | Creates a tabular Q-learner. |
+| `lurek.ai.newUtilityAI` | Creates a new utility AI evaluator. |
+| `lurek.ai.newGOAPPlanner` | Creates a new GOAP planning solver. |
+| `lurek.ai.newInfluenceMap` | Creates a multi-layer influence map grid. |
+| `lurek.ai.newSquad` | Creates a named squad for formation positioning. |
+| `lurek.ai.newCommandQueue` | Creates an RTS-style command queue. |
 
-### AIWorld Methods
+### `AIWorld` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addAgent(name)` | `Agent` | Registers a new named agent |
-| `getAgent(name)` | `Agent?` | Returns agent handle by name |
-| `removeAgent(agent)` | — | Removes an agent by handle |
-| `getAgentCount()` | `integer` | Number of registered agents |
-| `getGlobalBlackboard()` | `Blackboard` | Snapshot of the world blackboard |
-| `update(dt)` | — | Advances all agents by dt seconds |
+| Method | Description |
+|--------|-------------|
+| `aiworld:addAgent(...)` | Registers a new named agent and returns its handle. |
+| `aiworld:getAgent(...)` | Returns the agent handle for the given name, or nil. |
+| `aiworld:removeAgent(...)` | Removes an agent by its userdata handle. |
+| `aiworld:getAgentCount(...)` | Returns the number of registered agents. |
+| `aiworld:getGlobalBlackboard(...)` | Returns a snapshot of the world-level blackboard. |
+| `aiworld:update(...)` | Advances all agents by dt seconds. |
+| `aiworld:type(...)` | Returns the type name of this object. |
+| `aiworld:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Agent Methods
+### `Agent` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getName()` | `string` | Agent's registered name |
-| `setPosition(x, y)` | — | Sets world-space position |
-| `getPosition()` | `number, number` | Current position |
-| `setVelocity(x, y)` | — | Sets velocity vector |
-| `getVelocity()` | `number, number` | Current velocity |
-| `setMaxSpeed(v)` | — | Sets maximum speed cap |
-| `getMaxSpeed()` | `number` | Maximum speed cap |
-| `setMaxForce(v)` | — | Sets maximum steering force |
-| `getMaxForce()` | `number` | Maximum steering force |
-| `setPriority(p)` | — | Sets scheduling priority |
-| `getPriority()` | `integer` | Scheduling priority |
-| `setDecisionModel(model)` | — | Sets active decision model |
-| `getDecisionModel()` | `string` | Current decision model name |
-| `addTag(tag)` | — | Adds a tag |
-| `removeTag(tag)` | — | Removes a tag |
-| `hasTag(tag)` | `boolean` | Tag membership check |
-| `getBlackboard()` | `Blackboard` | Agent's local blackboard |
+| Method | Description |
+|--------|-------------|
+| `agent:getName(...)` | Returns the agent's registered name. |
+| `agent:setPosition(...)` | Sets the agent's world-space position. |
+| `agent:getPosition(...)` | Returns the agent's current position. |
+| `agent:setVelocity(...)` | Sets the agent's velocity vector. |
+| `agent:getVelocity(...)` | Returns the agent's current velocity. |
+| `agent:setMaxSpeed(...)` | Sets the maximum speed cap. |
+| `agent:getMaxSpeed(...)` | Returns the maximum speed cap. |
+| `agent:setMaxForce(...)` | Sets the maximum steering force cap. |
+| `agent:getMaxForce(...)` | Returns the maximum steering force cap. |
+| `agent:setPriority(...)` | Sets the scheduling priority (higher = earlier). |
+| `agent:getPriority(...)` | Returns the agent's scheduling priority. |
+| `agent:setDecisionModel(...)` | Sets the active decision model. |
+| `agent:getDecisionModel(...)` | Returns the name of the current decision model. |
+| `agent:addTag(...)` | Adds a tag to this agent. |
+| `agent:removeTag(...)` | Removes a tag from this agent. |
+| `agent:hasTag(...)` | Returns true if the agent has the given tag. |
+| `agent:getBlackboard(...)` | Returns the agent's local blackboard. |
+| `agent:type(...)` | Returns the type name of this object. |
+| `agent:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Blackboard Methods
+### `BTNode` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `setNumber(key, value)` | — | Stores a number |
-| `getNumber(key, default?)` | `number` | Retrieves a number (default: 0) |
-| `setBool(key, value)` | — | Stores a boolean |
-| `getBool(key, default?)` | `boolean` | Retrieves a boolean (default: false) |
-| `setString(key, value)` | — | Stores a string |
-| `getString(key, default?)` | `string` | Retrieves a string (default: "") |
-| `has(key)` | `boolean` | Checks existence (local + parent) |
-| `remove(key)` | — | Removes a local entry |
-| `clear()` | — | Removes all local entries |
-| `getKeys()` | `table` | All local keys as a table |
-| `getSize()` | `integer` | Number of local entries |
+| Method | Description |
+|--------|-------------|
+| `btnode:addChild(...)` | Adds a child node (Selector, Sequence, or Parallel only). |
+| `btnode:getChildCount(...)` | Returns the number of direct children. |
+| `btnode:reset(...)` | Resets all running-child memos and repeater counters. |
+| `btnode:setChild(...)` | Sets the single child of a decorator node. |
+| `btnode:setCount(...)` | Sets the repeat count for a Repeater node. |
+| `btnode:getCount(...)` | Returns the repeat count, or 0 if not a Repeater. |
+| `btnode:setSuccessPolicy(...)` | Sets the success policy for a Parallel node. |
+| `btnode:setFailurePolicy(...)` | Sets the failure policy for a Parallel node. |
+| `btnode:getNodeType(...)` | Returns the node type as a string. |
+| `btnode:type(...)` | Returns the type name of this object. |
+| `btnode:typeOf(...)` | Returns true if this object is of the given type. |
 
-### StateMachine Methods
+### `BehaviorTree` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addState(name, opts)` | — | Registers a state with `{onEnter, onUpdate, onExit}` callbacks |
-| `addTransition(from, to, guard?, priority?)` | — | Adds a guarded transition |
-| `setInitialState(name)` | — | Sets the initial state |
-| `getCurrentState()` | `string?` | Current state name |
-| `forceState(name)` | — | Forces a state transition |
-| `getTimeInState()` | `number` | Seconds in current state |
+| Method | Description |
+|--------|-------------|
+| `behaviortree:setRoot(...)` | Sets the root node of this behavior tree. |
+| `behaviortree:getLastStatus(...)` | Returns the status from the last tick. |
+| `behaviortree:type(...)` | Returns the type name of this object. |
+| `behaviortree:typeOf(...)` | Returns true if this object is of the given type. |
 
-### BehaviorTree Methods
+### `Blackboard` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `setRoot(node)` | — | Sets the root BTNode |
-| `getLastStatus()` | `string` | Status from last tick |
+| Method | Description |
+|--------|-------------|
+| `blackboard:setNumber(...)` | Stores a number under the given key. |
+| `blackboard:setBool(...)` | Stores a boolean under the given key. |
+| `blackboard:setString(...)` | Stores a string under the given key. |
+| `blackboard:has(...)` | Returns true if a value exists under the key. |
+| `blackboard:remove(...)` | Removes the entry at key. |
+| `blackboard:clear(...)` | Removes all local entries. |
+| `blackboard:getKeys(...)` | Returns all local keys as a table. |
+| `blackboard:getSize(...)` | Returns the number of local entries. |
+| `blackboard:type(...)` | Returns the type name of this object. |
+| `blackboard:typeOf(...)` | Returns true if this object is of the given type. |
 
-### BTNode Methods
+### `CommandQueue` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addChild(child)` | — | Adds child (Selector/Sequence/Parallel only) |
-| `getChildCount()` | `integer` | Number of direct children |
-| `reset()` | — | Resets running-child memos and repeater counters |
-| `setChild(child)` | — | Sets decorator child (Inverter/Repeater/Succeeder) |
-| `setCount(n)` | — | Sets repeat count (Repeater only) |
-| `getCount()` | `integer` | Repeat count |
-| `setSuccessPolicy(policy)` | — | Sets Parallel success policy |
-| `setFailurePolicy(policy)` | — | Sets Parallel failure policy |
-| `getNodeType()` | `string` | Node type name |
+| Method | Description |
+|--------|-------------|
+| `commandqueue:cancelCurrent(...)` | Cancels the front command if it is interruptible. |
+| `commandqueue:clear(...)` | Discards all queued commands. |
+| `commandqueue:getCount(...)` | Returns the number of queued commands. |
+| `commandqueue:isEmpty(...)` | Returns true if there are no queued commands. |
+| `commandqueue:getCurrentType(...)` | Returns the kind of the front command, or nil. |
+| `commandqueue:getCurrentTarget(...)` | Returns the target coordinates of the front command. |
+| `commandqueue:type(...)` | Returns the type name of this object. |
+| `commandqueue:typeOf(...)` | Returns true if this object is of the given type. |
 
-### SteeringManager Methods
+### `GOAPPlanner` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addSeek(tx, ty, weight?)` | — | Adds Seek behavior |
-| `addFlee(tx, ty, panicDist?, weight?)` | — | Adds Flee behavior |
-| `addArrive(tx, ty, slowingRadius?, weight?)` | — | Adds Arrive behavior |
-| `addWander(radius?, dist?, jitter?, weight?)` | — | Adds Wander behavior |
-| `addPursue(targetName?, weight?)` | — | Adds Pursue behavior |
-| `addEvade(threatName?, weight?)` | — | Adds Evade behavior |
-| `addFlock(neighborRadius?, sepW?, alignW?, cohW?, weight?)` | — | Adds Flock behavior |
-| `getBehaviorCount()` | `integer` | Number of active behaviors |
-| `setCombineMode(mode)` | — | Sets force combination mode |
-| `getCombineMode()` | `string` | Current combination mode |
-| `getLastSteering()` | `number, number` | Last computed force |
-| `calculate(px, py, vx, vy, maxSpeed, maxForce, dt)` | `number, number` | Computes combined steering force |
+| Method | Description |
+|--------|-------------|
+| `goapplanner:getActionCount(...)` | Returns the number of registered actions. |
+| `goapplanner:getGoalCount(...)` | Returns the number of registered goals. |
+| `goapplanner:type(...)` | Returns the type name of this object. |
+| `goapplanner:typeOf(...)` | Returns true if this object is of the given type. |
 
-### QLearner Methods
+### `InfluenceMap` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `chooseAction(state)` | `integer` | Epsilon-greedy action selection (1-based) |
-| `bestAction(state)` | `integer` | Greedy-best action (1-based) |
-| `learn(state, action, reward, nextState)` | — | Bellman Q-learning update (1-based) |
-| `getQValue(state, action)` | `number` | Q-value for state-action pair (1-based) |
-| `setQValue(state, action, value)` | — | Overwrites Q-value (1-based) |
-| `endEpisode()` | — | Ends episode, applies epsilon decay |
-| `getEpisodeCount()` | `integer` | Completed episodes |
-| `getStateCount()` | `integer` | Number of states |
-| `getActionCount()` | `integer` | Number of actions |
-| `setLearningRate(v)` | — | Sets alpha |
-| `getLearningRate()` | `number` | Current alpha |
-| `setDiscountFactor(v)` | — | Sets gamma |
-| `getDiscountFactor()` | `number` | Current gamma |
-| `setExplorationRate(v)` | — | Sets epsilon |
-| `getExplorationRate()` | `number` | Current epsilon |
-| `setExplorationDecay(v)` | — | Sets epsilon decay multiplier |
-| `getExplorationDecay()` | `number` | Current decay multiplier |
-| `serialize()` | `string` | JSON-serializes Q-table |
-| `deserialize(json)` | — | Restores Q-table from JSON |
+| Method | Description |
+|--------|-------------|
+| `influencemap:addLayer(...)` | Adds a named influence layer. |
+| `influencemap:hasLayer(...)` | Returns true if the named layer exists. |
+| `influencemap:decay(...)` | Multiplies all influences by a decay factor. |
+| `influencemap:clearLayer(...)` | Clears all influence in a layer. |
+| `influencemap:clearAll(...)` | Clears all layers. |
+| `influencemap:getMaxPosition(...)` | Returns the world-space position of the maximum value. |
+| `influencemap:getMinPosition(...)` | Returns the world-space position of the minimum value. |
+| `influencemap:getWidth(...)` | Returns the grid width. |
+| `influencemap:getHeight(...)` | Returns the grid height. |
+| `influencemap:getCellSize(...)` | Returns the cell size in world units. |
+| `influencemap:type(...)` | Returns the type name of this object. |
+| `influencemap:typeOf(...)` | Returns true if this object is of the given type. |
 
-### UtilityAI Methods
+### `QLearner` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addAction(name, scorer, weight?)` | — | Adds a scored action |
-| `evaluate()` | `string?` | Evaluates all actions, returns best name |
-| `getActionCount()` | `integer` | Number of registered actions |
-| `getLastAction()` | `string?` | Name of last chosen action |
+| Method | Description |
+|--------|-------------|
+| `qlearner:chooseAction(...)` | Selects an action using epsilon-greedy policy (1-based). |
+| `qlearner:bestAction(...)` | Returns the greedy-best action for the state (1-based). |
+| `qlearner:getQValue(...)` | Returns the Q-value for a state-action pair (1-based). |
+| `qlearner:endEpisode(...)` | Ends the current episode, applying epsilon decay. |
+| `qlearner:getEpisodeCount(...)` | Returns the number of completed episodes. |
+| `qlearner:getStateCount(...)` | Returns the number of discrete states. |
+| `qlearner:getActionCount(...)` | Returns the number of discrete actions. |
+| `qlearner:setLearningRate(...)` | Sets the learning rate alpha. |
+| `qlearner:getLearningRate(...)` | Returns the current learning rate. |
+| `qlearner:setDiscountFactor(...)` | Sets the discount factor gamma. |
+| `qlearner:getDiscountFactor(...)` | Returns the current discount factor. |
+| `qlearner:setExplorationRate(...)` | Sets the exploration rate epsilon. |
+| `qlearner:getExplorationRate(...)` | Returns the current exploration rate. |
+| `qlearner:setExplorationDecay(...)` | Sets the epsilon decay multiplier. |
+| `qlearner:getExplorationDecay(...)` | Returns the epsilon decay multiplier. |
+| `qlearner:serialize(...)` | Serializes the Q-table to a JSON string. |
+| `qlearner:deserialize(...)` | Restores the Q-table from a JSON string. |
+| `qlearner:type(...)` | Returns the type name of this object. |
+| `qlearner:typeOf(...)` | Returns true if this object is of the given type. |
 
-### GOAPPlanner Methods
+### `Squad` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addAction(name, cost?, callback?)` | — | Adds a GOAP action |
-| `setPrecondition(actionName, key, value)` | — | Sets a boolean precondition |
-| `setEffect(actionName, key, value)` | — | Sets a boolean effect |
-| `addGoal(name, priority?)` | — | Adds a planning goal |
-| `setGoalState(goalName, key, value)` | — | Sets a boolean goal condition |
-| `plan(worldState, maxDepth?)` | `table` | Runs A★ planning, returns action sequence |
-| `getActionCount()` | `integer` | Number of actions |
-| `getGoalCount()` | `integer` | Number of goals |
+| Method | Description |
+|--------|-------------|
+| `squad:getName(...)` | Returns the squad name. |
+| `squad:addMember(...)` | Adds an agent by name to this squad. |
+| `squad:removeMember(...)` | Removes an agent by name from this squad. |
+| `squad:getMemberCount(...)` | Returns the number of squad members. |
+| `squad:getMembers(...)` | Returns the member names as a table. |
+| `squad:setLeader(...)` | Sets the squad leader by name. |
+| `squad:getLeader(...)` | Returns the leader name, or nil. |
+| `squad:getFormation(...)` | Returns the current formation type name. |
+| `squad:getFormationSpacing(...)` | Returns the formation spacing in world units. |
+| `squad:getBlackboard(...)` | Returns the squad's shared blackboard. |
+| `squad:type(...)` | Returns the type name of this object. |
+| `squad:typeOf(...)` | Returns true if this object is of the given type. |
 
-### InfluenceMap Methods
+### `StateMachine` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `addLayer(name)` | — | Adds a named influence layer |
-| `hasLayer(name)` | `boolean` | Checks if layer exists |
-| `setInfluence(layer, x, y, value)` | — | Sets influence at cell (1-based) |
-| `getInfluence(layer, x, y)` | `number` | Gets influence at cell (1-based) |
-| `stampInfluence(layer, wx, wy, radius, value, falloff?)` | — | Radial stamp in world-space |
-| `propagate(layer, momentum?)` | — | Propagates influence values |
-| `decay(layer, factor)` | — | Multiplies all values by decay factor |
-| `clearLayer(layer)` | — | Clears a layer |
-| `clearAll()` | — | Clears all layers |
-| `getMaxPosition(layer)` | `number, number` | World-space position of maximum |
-| `getMinPosition(layer)` | `number, number` | World-space position of minimum |
-| `queryRect(layer, wx, wy, ww, wh)` | `number` | Summed influence in rectangle |
-| `blend(layerA, weightA, layerB, weightB, dest)` | — | Blends two layers into destination |
-| `getWidth()` | `integer` | Grid width |
-| `getHeight()` | `integer` | Grid height |
-| `getCellSize()` | `number` | Cell size in world units |
+| Method | Description |
+|--------|-------------|
+| `statemachine:addState(...)` | Registers a named state with optional lifecycle callbacks. |
+| `statemachine:setInitialState(...)` | Sets the initial state. |
+| `statemachine:getCurrentState(...)` | Returns the current state name, or nil. |
+| `statemachine:forceState(...)` | Forces a transition to the named state. |
+| `statemachine:getTimeInState(...)` | Returns seconds spent in the current state. |
+| `statemachine:type(...)` | Returns the type name of this object. |
+| `statemachine:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Squad Methods
+### `SteeringManager` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `getName()` | `string` | Squad name |
-| `addMember(name)` | — | Adds an agent by name |
-| `removeMember(name)` | — | Removes an agent by name |
-| `getMemberCount()` | `integer` | Number of members |
-| `getMembers()` | `table` | Member names as table |
-| `setLeader(name)` | — | Sets the squad leader |
-| `getLeader()` | `string?` | Leader name |
-| `setFormation(ftype, spacing?)` | — | Sets formation type and spacing |
-| `getFormation()` | `string` | Current formation type name |
-| `getFormationSpacing()` | `number` | Formation spacing in world units |
-| `getFormationPosition(memberIdx, leaderX, leaderY)` | `number, number` | World-space position for member (1-based) |
-| `getBlackboard()` | `Blackboard` | Squad's shared blackboard |
+| Method | Description |
+|--------|-------------|
+| `steeringmanager:getBehaviorCount(...)` | Returns the number of active behaviors. |
+| `steeringmanager:setCombineMode(...)` | Sets the force combination mode. |
+| `steeringmanager:getCombineMode(...)` | Returns the current combination mode. |
+| `steeringmanager:getLastSteering(...)` | Returns the last computed steering force. |
+| `steeringmanager:type(...)` | Returns the type name of this object. |
+| `steeringmanager:typeOf(...)` | Returns true if this object is of the given type. |
 
-### CommandQueue Methods
+### `UtilityAI` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `enqueue(kind, callback, opts?)` | — | Appends command to back |
-| `pushFront(kind, callback, opts?)` | — | Inserts at front (interrupt) |
-| `replace(kind, callback, opts?)` | — | Clears queue, enqueues one command |
-| `cancelCurrent()` | `boolean` | Cancels front command if interruptible |
-| `clear()` | — | Discards all queued commands |
-| `getCount()` | `integer` | Number of queued commands |
-| `isEmpty()` | `boolean` | Whether queue is empty |
-| `getCurrentType()` | `string?` | Kind of front command |
-| `getCurrentTarget()` | `number, number` | Target coordinates of front command |
+| Method | Description |
+|--------|-------------|
+| `utilityai:evaluate(...)` | Evaluates all actions and returns the best action name, or nil. |
+| `utilityai:getActionCount(...)` | Returns the number of registered actions. |
+| `utilityai:getLastAction(...)` | Returns the name of the last chosen action, or nil. |
+| `utilityai:type(...)` | Returns the type name of this object. |
+| `utilityai:typeOf(...)` | Returns true if this object is of the given type. |
+
+---
 
 ## Lua Examples
 
-### FSM-based NPC patrol with steering
-
 ```lua
-function lurek.init()
-    world = lurek.ai.newWorld()
-    local agent = world:addAgent("guard")
-    agent:setPosition(100, 200)
-    agent:setMaxSpeed(80)
-    agent:setDecisionModel("fsm+steering")
-
-    -- FSM: patrol ↔ chase
-    local fsm = lurek.ai.newStateMachine()
-    fsm:addState("patrol", {
-        onEnter = function(a) print(a:getName() .. " now patrolling") end,
-        onUpdate = function(a, dt) end
-    })
-    fsm:addState("chase", {
-        onEnter = function(a) print(a:getName() .. " chasing!") end
-    })
-    fsm:addTransition("patrol", "chase", function(a, dt)
-        return a:getBlackboard():getBool("enemy_spotted")
-    end, 10)
-    fsm:setInitialState("patrol")
-
-    -- Steering: seek the patrol waypoint
-    steering = lurek.ai.newSteeringManager()
-    steering:addSeek(400, 300, 1.0)
-end
-
-function lurek.process(dt)
-    world:update(dt)
+-- Minimal namespace check for lurek.ai.
+if lurek.ai then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-### GOAP planning for a woodcutter NPC
-
-```lua
-local planner = lurek.ai.newGOAPPlanner()
-
-planner:addAction("chop_tree", 2.0)
-planner:setPrecondition("chop_tree", "has_axe", true)
-planner:setEffect("chop_tree", "has_wood", true)
-
-planner:addAction("craft_axe", 4.0)
-planner:setPrecondition("craft_axe", "has_iron", true)
-planner:setEffect("craft_axe", "has_axe", true)
-
-planner:addAction("mine_iron", 3.0)
-planner:setEffect("mine_iron", "has_iron", true)
-
-planner:addGoal("get_wood", 1.0)
-planner:setGoalState("get_wood", "has_wood", true)
-
-local plan = planner:plan({ has_axe = false, has_iron = false, has_wood = false }, 10)
--- plan = {"mine_iron", "craft_axe", "chop_tree"}
-for i, action in ipairs(plan) do
-    print(i, action)
-end
-```
-
-### Q-learner training loop
-
-```lua
-local ql = lurek.ai.newQLearner(16, 4)  -- 16 states, 4 actions
-ql:setLearningRate(0.2)
-ql:setExplorationRate(0.3)
-
-for episode = 1, 1000 do
-    local state = 1
-    for step = 1, 50 do
-        local action = ql:chooseAction(state)
-        local next_state = (state + action - 1) % 16 + 1
-        local reward = (next_state == 16) and 10.0 or -0.1
-        ql:learn(state, action, reward, next_state)
-        state = next_state
-        if state == 16 then break end
-    end
-    ql:endEpisode()
-end
-
--- Save trained policy
-local json = ql:serialize()
-lurek.fs.write("ai_policy.json", json)
-```
+---
 
 ## Item Summary
 
-| Kind       | Count  |
-|------------|--------|
-| `struct`   | 18     |
-| `enum`     | 9      |
-| `type`     | 1      |
-| `fn`       | 97     |
-| **Total**  | **125** |
+| Kind | Count |
+|------|-------|
+| `struct` | 19 |
+| `enum` | 9 |
+| `fn` (Lua API) | 144 |
+| **Total** | **172** |
+
+---
 
 ## References
 
-| Module         | Relationship | Notes                                                        |
-|----------------|--------------|--------------------------------------------------------------|
-| `math`         | Imports from | Used indirectly for Vec2-like operations (tuples used instead) |
-| `engine`       | Imports from | Uses log message constants (`BB01`, `CQ01`, `FN01`, `GP01`)  |
-| `pathfinding`  | Imports from | Re-exports `FlowField`, `Cell`, `PathGrid`, `InfluenceMap`   |
-| `lua_api`      | Imported by  | `src/lua_api/ai_api.rs` binds all types to Lua               |
-| `mlua`         | Depends on   | `RegistryKey` stores Lua callbacks in FSM, BT, GOAP, utility AI, commands |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
 
-**Similar modules**: The `pathfinding` module provides the raw grid algorithms (A★, flow fields, influence maps) that this module re-exports and wraps for AI use. The `ai` module adds agent decision-making (FSM, BT, steering, Q-learning, utility AI, GOAP) on top of pathfinding primitives.
+---
 
 ## Notes
 
-- **All AI is pure CPU math** — no GPU, audio, or window access. Every subsystem runs headlessly in tests.
-- **Lua callbacks via RegistryKey** — FSM state callbacks, BT leaf callbacks, GOAP action callbacks, utility AI scorers, and command queue tick callbacks are all stored as `mlua::RegistryKey` references. They are called by the AIWorld update loop, not by the AI types themselves.
-- **1-based Lua indices** — QLearner `chooseAction`, `bestAction`, `learn`, `getQValue`, `setQValue` all use 1-based state/action indices at the Lua boundary, internally converting to 0-based via `saturating_sub(1)`. InfluenceMap cell coordinates are also 1-based in Lua.
-- **Blackboard cloning** — `getBlackboard()` on Agent and Squad returns a cloned snapshot, not a live reference. Mutations to the returned blackboard do not affect the agent's actual blackboard. This is a Lua API limitation of the current design.
-- **No per-frame allocation** — Vectors for agents, behaviors, and commands are grown at creation time. Steady-state update loops do not allocate.
-- **GOAP search limits** — The planner enforces a hard limit of 10,000 A★ iterations and a configurable `max_depth` (default 10) to prevent runaway computation.
-- **QLearner serialization** — The Q-table can be serialized to JSON (`serialize()`) and restored (`deserialize()`), enabling save/load of trained policies between sessions.
-- **Steering multi-agent behaviors** — `Pursue`, `Evade`, and `Flock` return `(0, 0)` from `SteeringBehaviorType::calculate()` because they need other agents' positions. These forces are computed at the `AIWorld` level during `update()`.
-- **FormationType strings** — Formations are serialized to/from lowercase Lua strings: `"none"`, `"line"`, `"wedge"`, `"circle"`, `"column"`.
-- **CommandQueue opts table** — `enqueue`, `pushFront`, and `replace` accept an optional table with `targetX`, `targetY`, `priority`, and `interruptible` fields.
-- **Breaking change surface** — Renaming any `lurek.ai.new*` factory function or changing UserData method signatures will break Lua game scripts. The Q-learner's 1-based index convention is load-bearing.
+- **Source of truth**: Keep this spec synchronized with `src/ai/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

@@ -1,213 +1,161 @@
 # `event` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.signal`                                         |
-| **Source**     | `src/event/`                                         |
-| **Rust Tests** | `tests/rust/unit/event_tests.rs`                     |
-| **Lua Tests**  | `tests/lua/unit/test_event.lua`                      |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Core Runtime |
+| **Status** | Implemented |
+| **Lua API** | `lurek.event` |
+| **Source** | `src/event/` |
+| **Rust Tests** | `tests/rust/unit/event_tests.rs`, plus inline unit coverage in `src/event/event_queue.rs` and `src/event/signal.rs` |
+| **Lua Tests** | `tests/lua/unit/test_event.lua`, `tests/lua/integration/test_audio_event.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Core Runtime` |
+
+---
 
 ## Summary
 
-The event module provides two complementary messaging primitives for Lurek2D games: a FIFO **EventQueue** for pollable named events, and a handle-based **Signal** pub-sub dispatcher for callback-driven event handling. Together they give game scripts full control over inter-system communication without tight coupling.
+The event module gives Lurek2D two lightweight messaging primitives: a FIFO event queue for polling named events and a handle-based signal dispatcher for callback-style fan-out. It exists so gameplay code can communicate across systems without introducing direct ownership or import dependencies between those systems.
 
-> **Namespace Note**: `lurek.signal` combines two independent primitives under one namespace:
-> - `lurek.signal.push / poll / clear / wait` — the **FIFO `EventQueue`** that receives system input events and custom game events; consuming via `poll()` does **not** interact with `Signal` instances.
-> - `lurek.signal.newSignal()` — a factory that creates handle-based **pub-sub `Signal`** dispatchers; emitting on a `Signal` does **not** affect the `EventQueue`.
-> These are independent. When you need priority-ordered listeners or automatic one-shot removal, use `lurek.patterns.newEventBus()` instead of `newSignal()`.
+The queue side is about ordered delivery and explicit consumption. Engine or gameplay code can push named events with primitive payload values, and scripts can poll or wait for them later. The signal side is about local pub-sub: listeners subscribe by name, get handles back, and can be removed or cleared without needing a full feature-rich event bus.
+
+This module intentionally does not own OS input capture, scene transitions, or higher-order event orchestration policies. Hardware events originate in `input` and the app loop, richer callback patterns live under `patterns`, and Lua registry management for callbacks belongs in `src/lua_api/event_api.rs` rather than in the core `event` data structures.
+
+**Scope boundary**: This module currently depends on `runtime`. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-lurek.signal.*  (Lua API)
-  │
-  ├── push(name, ...) ──► EventQueue.push_event(name, args)
-  ├── poll()           ──► iterator → EventQueue.poll() → Event
-  ├── clear()          ──► EventQueue.clear()
-  ├── pump()           ──► EventQueue.pump()  (no-op)
-  ├── wait(timeout?)   ──► EventQueue.wait(timeout_ms)
-  ├── quit(code?)      ──► SharedState.quit_requested = true
-  ├── restart()        ──► SharedState.restart_requested = true
-  │
-  └── newSignal()      ──► LuaSignal UserData
-                            │
-                            ├── register(name, fn) → handle (u64)
-                            ├── emit(name, ...)    → calls all matching callbacks
-                            ├── remove(handle)     → bool
-                            ├── clear(name)        → count removed
-                            ├── clearAll()         → count removed
-                            ├── getCount(name)     → usize
-                            └── getTotalCount()    → usize
-
-Internal Rust types:
-
-  EventQueue { events: VecDeque<Event> }
-    └── Event { name: String, args: Vec<EventArg> }
-         └── EventArg::Str | Num | Bool | Nil
-
-  Signal { next_handle: u64, subscriptions: HashMap<String, Vec<u64>>,
-           handle_to_name: HashMap<u64, String> }
-    └── Subscription { handle: u64, name: String }
+lurek.event.* (Lua API — src/lua_api/event_api.rs)
+    |
+    v
+src/event/mod.rs
+    |- event_queue.rs - event_queue
+    |- signal.rs - signal
 ```
+
+---
 
 ## Source Files
 
-| File        | Purpose                                                         |
-|-------------|-----------------------------------------------------------------|
-| `mod.rs`    | `EventArg` enum, `Event` struct, `EventQueue` FIFO queue       |
-| `signal.rs` | `Subscription` struct, `Signal` handle-based pub-sub dispatcher |
-| `event_queue.rs` | — |
+| File | Purpose |
+|------|---------|
+| `event_queue.rs` | Event types and FIFO event queue. |
+| `mod.rs` | Event queue for polling system and custom events. |
+| `signal.rs` | Handle-based pub-sub signal system. |
+
+---
 
 ## Submodules
 
-### `event::mod`
+### `event::event_queue`
 
-Core FIFO event queue for named game events with typed arguments.
+Event types and FIFO event queue.
 
-- **`EventArg`** (enum): Typed argument value attached to an event. Variants: `Str(String)`, `Num(f64)`, `Bool(bool)`, `Nil`.
-- **`Event`** (struct): A single event in the queue. Fields: `name: String`, `args: Vec<EventArg>`.
-- **`EventQueue`** (struct): FIFO queue backed by `VecDeque<Event>`. Methods: `new()`, `push(event)`, `push_event(name, args)`, `poll() → Option<Event>`, `clear()`, `is_empty() → bool`, `len() → usize`, `pump()`, `wait(timeout_ms) → Option<Event>`.
+- **`EventArg`** (enum): Argument values that can be attached to events.
+- **`Event`** (struct): A single event in the event queue.
+- **`EventQueue`** (struct): FIFO event queue for system and custom events.
 
 ### `event::signal`
 
-Handle-based pub-sub signal system. Callbacks are stored externally (Lua registry); the Rust struct tracks only subscription metadata.
+Handle-based pub-sub signal system.
 
-- **`Subscription`** (struct): A single subscription entry. Fields: `handle: u64`, `name: String`.
-- **`Signal`** (struct): Pub-sub dispatcher with monotonic handle allocation. Fields: `next_handle: u64`, `subscriptions: HashMap<String, Vec<u64>>`, `handle_to_name: HashMap<u64, String>`. Methods: `new()`, `subscribe(name) → u64`, `remove(handle) → bool`, `clear(name) → usize`, `clear_all() → usize`, `get_handles(name) → Vec<u64>`, `get_count(name) → usize`, `get_total_count() → usize`.
+- **`Subscription`** (struct): A single subscription entry in a [`Signal`].
+- **`Signal`** (struct): Handle-based pub-sub signal dispatcher.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `event::Event`
+#### `EventArg`
 
-A single event in the event queue. Contains a string `name` identifying the event type and a `Vec<EventArg>` payload of typed arguments. Created by game scripts via `lurek.signal.push()` or by the engine for system events.
+Argument values that can be attached to events.
 
-#### `event::EventQueue`
+#### `Event`
 
-FIFO event queue backed by `VecDeque<Event>`. Supports push, poll (pop front), clear, length queries, a no-op `pump()` for API parity, and a `wait(timeout_ms)` that spin-sleeps with 1 ms granularity until an event arrives or the timeout expires.
+A single event in the event queue.
 
-#### `event::signal::Subscription`
+#### `EventQueue`
 
-A single subscription entry in a `Signal`. Stores the unique `handle` ID and the event `name` it listens to. Used internally by `Signal` for bookkeeping.
+FIFO event queue for system and custom events.
 
-#### `event::signal::Signal`
+#### `Subscription`
 
-Handle-based pub-sub signal dispatcher. Listeners subscribe by event name and receive a monotonically increasing handle ID. When an event is emitted, all matching handles fire in registration order. The actual callback functions are stored externally (in the Lua registry via `LuaSignal`); this struct tracks only the subscription metadata.
+A single subscription entry in a [`Signal`].
 
-### Enums
+#### `Signal`
 
-#### `event::EventArg`
+Handle-based pub-sub signal dispatcher.
 
-Typed argument value that can be attached to an event. Four variants: `Str(String)` for text, `Num(f64)` for numbers, `Bool(bool)` for flags, and `Nil` for absent values. Maps directly to Lua primitive types at the API boundary.
+---
 
 ## Lua API
 
-Registered by `src/lua_api/event_api.rs` under the `lurek.signal` namespace. Provides eight top-level functions and a `Signal` UserData type with seven methods.
+Exposed under `lurek.event.*` by `src/lua_api/event_api.rs`.
 
-### Top-level functions
+### Module Functions
 
-| Function                     | Description                                                       |
-|------------------------------|-------------------------------------------------------------------|
-| `lurek.signal.push(name, ...)` | Pushes a custom event with the given name and optional arguments  |
-| `lurek.signal.poll()`          | Returns an iterator function that pops events as `name, arg1, ...` |
-| `lurek.signal.clear()`         | Discards all pending events in the queue                          |
-| `lurek.signal.pump()`          | No-op sync point (Lurek2D uses a push model)                      |
-| `lurek.signal.wait(timeout?)`  | Blocks until an event arrives or timeout (seconds) elapses        |
-| `lurek.signal.quit(code?)`     | Requests engine shutdown with optional exit code                  |
-| `lurek.signal.restart()`       | Requests engine restart at the next frame boundary                |
-| `lurek.signal.newSignal()`     | Creates and returns a new `Signal` UserData object                |
+| Function | Description |
+|----------|-------------|
+| `lurek.event.exit` | Pushes an exit event, requesting the engine to stop. |
+| `lurek.event.push` | Pushes a custom event onto the event queue. |
+| `lurek.event.poll` | Returns an iterator function that pops events from the queue. |
+| `lurek.event.clear` | Discards all pending events in the queue. |
+| `lurek.event.newSignal` | Creates a new pub-sub Signal dispatcher. |
+| `lurek.event.pump` | Syncs OS-level events into the queue (no-op in Lurek2D push model). |
+| `lurek.event.wait` | Blocks until the next event arrives or the optional timeout elapses. |
+| `lurek.event.restart` | Requests that the engine restart at the beginning of the next frame. |
+| `lurek.event.quit` | Alias for `exit()` — requests the engine to stop at the end of the current frame. |
 
-### Signal UserData methods
+### `Signal` Methods
 
-| Method                          | Description                                                  |
-|---------------------------------|--------------------------------------------------------------|
-| `Signal:register(name, fn)`     | Registers a callback for the named event; returns handle ID  |
-| `Signal:emit(name, ...)`        | Fires all callbacks registered for the name with extra args  |
-| `Signal:remove(handle)`         | Removes a subscription by handle; returns `true` if found    |
-| `Signal:clear(name)`            | Removes all callbacks for the named event; returns count     |
-| `Signal:clearAll()`             | Removes all callbacks across all events; returns count       |
-| `Signal:getCount(name)`         | Returns the callback count for the named event               |
-| `Signal:getTotalCount()`        | Returns the total callback count across all events           |
+| Method | Description |
+|--------|-------------|
+| `signal:emit(...)` | Emits the named event, calling all registered callbacks with extra arguments. |
+| `signal:remove(...)` | Removes a subscription by handle ID. |
+| `signal:clear(...)` | Removes all callbacks for the named event. |
+| `signal:clearAll(...)` | Removes all callbacks across all events. |
+| `signal:getCount(...)` | Returns the callback count for the named event. |
+| `signal:getTotalCount(...)` | Returns the total callback count across all events. |
+| `signal:type(...)` | Returns the type name of this object. |
+| `signal:typeOf(...)` | Returns true if the given type name matches this object's type or any parent type. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- Polling events in the game loop
-function lurek.process(dt)
-    for name, a1, a2 in lurek.signal.poll() do
-        if name == "coin_collected" then
-            score = score + a1
-        elseif name == "quit" then
-            lurek.signal.quit()
-        end
-    end
-end
-
-function lurek.keypressed(key)
-    if key == "space" then
-        lurek.signal.push("coin_collected", 10)
-    end
+-- Minimal namespace check for lurek.event.
+if lurek.event then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Using Signal for decoupled pub-sub
-local sig = lurek.signal.newSignal()
-
-function lurek.init()
-    -- Register two listeners for "damage"
-    sig:register("damage", function(amount)
-        hp = hp - amount
-        print("Ouch! HP:", hp)
-    end)
-
-    local handle = sig:register("damage", function(amount)
-        print("Damage log:", amount)
-    end)
-
-    -- Fire the event
-    sig:emit("damage", 25)
-
-    -- Remove one listener
-    sig:remove(handle)
-
-    -- Query counts
-    print("damage listeners:", sig:getCount("damage"))   -- 1
-    print("total listeners:", sig:getTotalCount())        -- 1
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count |
-|------------|-------|
-| `struct`   | 4     |
-| `enum`     | 1     |
-| `fn`       | 17    |
-| **Total**  | **22**|
+| Kind | Count |
+|------|-------|
+| `struct` | 4 |
+| `enum` | 1 |
+| `fn` (Lua API) | 17 |
+| **Total** | **22** |
+
+---
 
 ## References
 
-| Module    | Relationship | Notes                                                           |
-|-----------|--------------|-----------------------------------------------------------------|
-| `engine`  | Imports from | `EventQueue` stored in `SharedState`; `quit_requested` / `restart_requested` / `exit_code` flags live on `SharedState` |
-| `math`    | Imports from | Only indirectly (leaf module); no direct type imports            |
-| `input`   | Related      | `input` manages hardware-level key/mouse/gamepad state; `event` provides a user-programmable message queue and pub-sub layer |
-| `scene`   | Related      | Scene transitions may push events; scenes can subscribe via `Signal` |
-| `patterns` | Related | `patterns::EventBus` provides priority-ordered and one-shot callbacks; use `lurek.patterns.newEventBus()` when ordering or auto-removal is needed over the simpler `Signal` |
-| `lua_api`  | Imported by  | `src/lua_api/event_api.rs` registers `lurek.signal.*` and wraps `Signal` as `LuaSignal` UserData |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+
+---
 
 ## Notes
 
-- The `EventQueue` is a FIFO buffer backed by `VecDeque`. Events are consumed one at a time by `lurek.signal.poll()`, which returns an iterator — use `for name, a1, a2 in lurek.signal.poll() do ... end`.
-- `lurek.signal.push(name, ...)` accepts variadic arguments of string, number, boolean, or nil. Non-primitive types (tables, userdata) are coerced to `Nil`.
-- `lurek.signal.pump()` is a no-op. Lurek2D uses a push model where OS events are already enqueued by the time callbacks fire. It exists solely for API parity.
-- `lurek.signal.wait(timeout)` spin-sleeps with 1 ms granularity. It is intended for worker-thread synchronisation patterns, not for use inside the main game loop. Passing `0` performs a single non-blocking check.
-- `Signal` callbacks fire in registration order. The Rust `Signal` struct stores only handle metadata; the actual Lua callback functions are stored in the Lua registry via `LuaRegistryKey` and cleaned up on `remove` / `clear` / `clearAll`.
-- `lurek.signal.quit(code?)` and `lurek.signal.restart()` set flags on `SharedState` (`quit_requested`, `restart_requested`). The engine reads these at frame boundaries — calling them does not terminate execution immediately.
-- Do not push events from inside `lurek.draw()` — the draw callback should be side-effect free.
-- The `Subscription` struct is `#[allow(dead_code)]` — it exists for bookkeeping but its fields are not directly read outside of `Signal` internals.
+- **Source of truth**: Keep this spec synchronized with `src/event/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

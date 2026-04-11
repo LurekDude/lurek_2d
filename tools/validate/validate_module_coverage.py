@@ -3,8 +3,8 @@
 validate_module_coverage.py
 ============================
 Validates that every top-level src/<module>/ directory has:
-  1. An AGENT.md file inside it
-  2. A matching docs/specs/<module>.md file
+    1. An AGENT.md file inside it
+    2. A matching docs/specs/<module>.md file
 
 Also reports any docs/specs/*.md files that have NO matching src/<module>/ dir
 (these are orphaned specs that should be removed or merged).
@@ -24,12 +24,6 @@ SRC = ROOT / "src"
 SPECS = ROOT / "docs" / "specs"
 SPECS_README = SPECS / "README.md"
 
-# These src/ subdirectories are infrastructure / bridge layers.
-# They have dedicated specs (bin.md, lua_api.md) but are excluded
-# from the "must have AGENT.md" check because they are not domain modules.
-INFRA_MODULES = {"lua_api", "bin"}
-
-
 def main():
     parser = argparse.ArgumentParser(description="Validate module spec/AGENT.md coverage")
     parser.add_argument("--fix-readme", action="store_true",
@@ -39,12 +33,12 @@ def main():
     # --- Gather ground truth ---
     src_modules = sorted(
         d.name for d in SRC.iterdir()
-        if d.is_dir() and d.name not in INFRA_MODULES and not d.name.startswith(".")
+        if d.is_dir() and not d.name.startswith(".")
     )
 
     spec_files = sorted(
         f.stem for f in SPECS.glob("*.md")
-        if f.name != "README.md" and f.stem not in INFRA_MODULES
+        if f.name not in {"README.md", "SPEC_TEMPLATE.md"}
     )
 
     src_set = set(src_modules)
@@ -90,8 +84,7 @@ def main():
           f"{len(missing_agent)} missing AGENT.md")
 
     if args.fix_readme:
-        all_entries = sorted(set(src_modules) | INFRA_MODULES)
-        _rewrite_readme(all_entries)
+        _rewrite_readme(src_modules)
 
     return 1 if has_errors else 0
 

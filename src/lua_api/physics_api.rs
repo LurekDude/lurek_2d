@@ -192,18 +192,15 @@ impl LuaUserData for LuaWorld {
         /// @param y : number
         /// @param bodyType : string
         /// @return Body
-        methods.add_method(
-            "newBody",
-            |_, this, (x, y, bt): (f32, f32, String)| {
-                let body_type = parse_body_type(&bt)?;
-                let body = Body::new(x, y, body_type);
-                let id = this.world.borrow_mut().add_body(body);
-                Ok(LuaBody {
-                    world: Rc::clone(&this.world),
-                    id,
-                })
-            },
-        );
+        methods.add_method("newBody", |_, this, (x, y, bt): (f32, f32, String)| {
+            let body_type = parse_body_type(&bt)?;
+            let body = Body::new(x, y, body_type);
+            let id = this.world.borrow_mut().add_body(body);
+            Ok(LuaBody {
+                world: Rc::clone(&this.world),
+                id,
+            })
+        });
 
         // -- newCircleBody --
         /// Creates a new circular body and adds it to the world.
@@ -269,8 +266,7 @@ impl LuaUserData for LuaWorld {
             "newEdgeBody",
             |_, this, (x, y, x1, y1, x2, y2, bt): (f32, f32, f32, f32, f32, f32, String)| {
                 let body_type = parse_body_type(&bt)?;
-                let body =
-                    Body::new_edge(x, y, Vec2::new(x1, y1), Vec2::new(x2, y2), body_type);
+                let body = Body::new_edge(x, y, Vec2::new(x1, y1), Vec2::new(x2, y2), body_type);
                 let id = this.world.borrow_mut().add_body(body);
                 Ok(LuaBody {
                     world: Rc::clone(&this.world),
@@ -329,10 +325,14 @@ impl LuaUserData for LuaWorld {
                 LuaMultiValue,
             )| {
                 let shape = shape_from_lua(lua, &shape_type, args)?;
-                let idx = this
-                    .world
-                    .borrow_mut()
-                    .add_fixture(body_id, shape, density, friction, restitution, sensor);
+                let idx = this.world.borrow_mut().add_fixture(
+                    body_id,
+                    shape,
+                    density,
+                    friction,
+                    restitution,
+                    sensor,
+                );
                 Ok(idx)
             },
         );
@@ -700,11 +700,13 @@ impl LuaUserData for LuaWorld {
         /// @return table|nil
         methods.add_method(
             "raycast",
-            |lua, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| {
-                match this.world.borrow().raycast(x1, y1, x2, y2) {
-                    Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
-                    None => Ok(LuaValue::Nil),
-                }
+            |lua, this, (x1, y1, x2, y2): (f32, f32, f32, f32)| match this
+                .world
+                .borrow()
+                .raycast(x1, y1, x2, y2)
+            {
+                Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
+                None => Ok(LuaValue::Nil),
             },
         );
 
@@ -718,11 +720,13 @@ impl LuaUserData for LuaWorld {
         /// @return table|nil
         methods.add_method(
             "raycastClosest",
-            |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| {
-                match this.world.borrow().raycast_closest(x1, y1, dx, dy, max_dist) {
-                    Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
-                    None => Ok(LuaValue::Nil),
-                }
+            |lua, this, (x1, y1, dx, dy, max_dist): (f32, f32, f32, f32, f32)| match this
+                .world
+                .borrow()
+                .raycast_closest(x1, y1, dx, dy, max_dist)
+            {
+                Some(hit) => Ok(LuaValue::Table(raycast_hit_to_table(lua, &hit)?)),
+                None => Ok(LuaValue::Nil),
             },
         );
 
@@ -860,14 +864,11 @@ impl LuaUserData for LuaWorld {
         /// Changes the body type.
         /// @param bodyId : integer
         /// @param bodyType : string
-        methods.add_method(
-            "setBodyType",
-            |_, this, (id, bt): (usize, String)| {
-                let body_type = parse_body_type(&bt)?;
-                this.world.borrow_mut().set_body_type(id, body_type);
-                Ok(())
-            },
-        );
+        methods.add_method("setBodyType", |_, this, (id, bt): (usize, String)| {
+            let body_type = parse_body_type(&bt)?;
+            this.world.borrow_mut().set_body_type(id, body_type);
+            Ok(())
+        });
 
         // -- getBodyType --
         /// Returns the body type as a string.
@@ -987,9 +988,7 @@ impl LuaUserData for LuaBody {
         /// @param omega : number
         /// @return nil
         methods.add_method("setAngularVelocity", |_, this, omega: f32| {
-            this.world
-                .borrow_mut()
-                .set_angular_velocity(this.id, omega);
+            this.world.borrow_mut().set_angular_velocity(this.id, omega);
             Ok(())
         });
 
@@ -1013,11 +1012,7 @@ impl LuaUserData for LuaBody {
         /// Returns the body type as a string.
         /// @return string
         methods.add_method("getType", |_, this, ()| {
-            Ok(this
-                .world
-                .borrow()
-                .get_body_type_str(this.id)
-                .to_string())
+            Ok(this.world.borrow().get_body_type_str(this.id).to_string())
         });
 
         // -- setType --
@@ -1194,9 +1189,7 @@ impl LuaUserData for LuaBody {
         /// @param scale : number
         /// @return nil
         methods.add_method("setGravityScale", |_, this, scale: f32| {
-            this.world
-                .borrow_mut()
-                .set_gravity_scale(this.id, scale);
+            this.world.borrow_mut().set_gravity_scale(this.id, scale);
             Ok(())
         });
 
@@ -1212,9 +1205,7 @@ impl LuaUserData for LuaBody {
         /// @param fixed : boolean
         /// @return nil
         methods.add_method("setFixedRotation", |_, this, fixed: bool| {
-            this.world
-                .borrow_mut()
-                .set_fixed_rotation(this.id, fixed);
+            this.world.borrow_mut().set_fixed_rotation(this.id, fixed);
             Ok(())
         });
 
@@ -1230,9 +1221,7 @@ impl LuaUserData for LuaBody {
         /// @param damping : number
         /// @return nil
         methods.add_method("setLinearDamping", |_, this, damping: f32| {
-            this.world
-                .borrow_mut()
-                .set_linear_damping(this.id, damping);
+            this.world.borrow_mut().set_linear_damping(this.id, damping);
             Ok(())
         });
 
@@ -1353,13 +1342,11 @@ impl LuaUserData for LuaPhysicsShape {
         // -- getRadius --
         /// Returns the radius. Only valid for circle shapes.
         /// @return number
-        methods.add_method("getRadius", |_, this, ()| {
-            match this.inner.borrow().shape {
-                Shape::Circle { radius } => Ok(radius),
-                _ => Err(LuaError::RuntimeError(
-                    "getRadius: shape is not a circle".to_string(),
-                )),
-            }
+        methods.add_method("getRadius", |_, this, ()| match this.inner.borrow().shape {
+            Shape::Circle { radius } => Ok(radius),
+            _ => Err(LuaError::RuntimeError(
+                "getRadius: shape is not a circle".to_string(),
+            )),
         });
 
         // -- getBoundingBox --
@@ -1521,17 +1508,19 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @return number, number, number, number
     tbl.set(
         "getBody",
-        lua.create_function(|_, (_world_ud, body_ud): (LuaAnyUserData, LuaAnyUserData)| {
-            let body = body_ud.borrow::<LuaBody>()?;
-            let w = body.world.borrow();
-            let (x, y) = w
-                .get_body(body.id)
-                .map_or((0.0_f32, 0.0_f32), |b| (b.position.x, b.position.y));
-            let (vx, vy) = w
-                .get_body(body.id)
-                .map_or((0.0_f32, 0.0_f32), |b| (b.velocity.x, b.velocity.y));
-            Ok((x, y, vx, vy))
-        })?,
+        lua.create_function(
+            |_, (_world_ud, body_ud): (LuaAnyUserData, LuaAnyUserData)| {
+                let body = body_ud.borrow::<LuaBody>()?;
+                let w = body.world.borrow();
+                let (x, y) = w
+                    .get_body(body.id)
+                    .map_or((0.0_f32, 0.0_f32), |b| (b.position.x, b.position.y));
+                let (vx, vy) = w
+                    .get_body(body.id)
+                    .map_or((0.0_f32, 0.0_f32), |b| (b.velocity.x, b.velocity.y));
+                Ok((x, y, vx, vy))
+            },
+        )?,
     )?;
 
     // -- setBodyVelocity -- (flat)
@@ -1563,11 +1552,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @return boolean
     tbl.set(
         "isSleepingAllowed",
-        lua.create_function(|_, (_world_ud, body_ud): (LuaAnyUserData, LuaAnyUserData)| {
-            let body = body_ud.borrow::<LuaBody>()?;
-            let allowed = body.world.borrow().is_sleeping_allowed(body.id);
-            Ok(allowed)
-        })?,
+        lua.create_function(
+            |_, (_world_ud, body_ud): (LuaAnyUserData, LuaAnyUserData)| {
+                let body = body_ud.borrow::<LuaBody>()?;
+                let allowed = body.world.borrow().is_sleeping_allowed(body.id);
+                Ok(allowed)
+            },
+        )?,
     )?;
 
     // -- setSleepingAllowed -- (flat)

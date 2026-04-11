@@ -1,41 +1,28 @@
-# `serial` � Agent Reference
+# serial
 
-| Property         | Value                                                |
-|------------------|------------------------------------------------------|
-| **Tier**         | Tier 2 � Engine Extensions                           |
-| **Status**       | Implemented � Full                                   |
-| **Lua API**      | `lurek.codec`                                        |
-| **Source**        | `src/serial/`                                        |
-| **Rust Tests**   | `tests/rust/unit/serial_tests.rs`                    |
-| **Lua Tests**    | `tests/lua/unit/test_serial.lua`                     |
-| **Architecture** | �                                                    |
+## Module Info
+- Module name: `serial`
+- Module group: `Foundations`
+- Spec path: `docs/specs/serial.md`
+- Lua API path(s): `src/lua_api/serial_api.rs`
+- Rust test path(s): `tests/rust/unit/serial_tests.rs`; inline tests in `src/serial/csv.rs`, `src/serial/json.rs`, `src/serial/toml.rs`, `src/serial/yaml.rs`
+- Lua test path(s): `tests/lua/unit/test_serial.lua`
 
-## Purpose
+## Module Purpose
+The `serial` module owns structured text serialization for Lurek2D. It defines `SerialValue` as a format-neutral intermediate tree and then converts between that tree and concrete text formats such as JSON, TOML, and CSV.
 
-The `serial` module provides format-agnostic serialization and deserialization for structured data in Lurek2D. It defines `SerialValue`, a common intermediate representation with seven variants (Null, Bool, Int, Float, Str, Seq, Map) that every format driver produces and consumes. This design allows a Lua script to load a JSON file, mutate the resulting value tree, and re-serialize it as TOML � or vice versa � without any format-specific knowledge in the game code.
+This module exists so the Lua API can expose one consistent `lurek.codec` namespace instead of making game code learn different crate-specific value models. The module's core design is that each format driver only needs to translate to and from `SerialValue`, while the Lua bridge handles table conversion separately.
 
-## Source Files
+`serial` intentionally does not own binary packing, compression, hashing, or raw byte-buffer manipulation; those belong to `src/data/`. It also does not own file I/O, save orchestration, or config loading policy. The `yaml.rs` file remains on disk, but the live module surface excludes YAML by commenting it out in `mod.rs` to respect the repository's TOML-over-YAML rule.
 
-| File           | Purpose                                                                                   |
-|----------------|-------------------------------------------------------------------------------------------|
-| `mod.rs`       | Module root � declares submodules, re-exports public functions and types.                 |
-| `lua_table.rs` | Defines `SerialValue`, the common intermediate representation shared by all format drivers.|
-| `json.rs`      | JSON parsing (`from_json`) and serialization (`to_json`) via `serde_json`.                |
-| `toml.rs`      | TOML parsing (`from_toml`) and serialization (`to_toml`) via the `toml` crate.            |
-| `csv.rs`       | CSV parsing (`from_csv`) and serialization (`to_csv`) via the `csv` crate with `CsvOptions`.|
-| `yaml.rs`      | YAML parsing and serialization via `serde_yml`. **Disabled** � commented out in `mod.rs`. |
+## Files
+- `mod.rs`: Declares the active format drivers and re-exports the public serialization surface used by the Lua bridge and Rust callers.
+- `csv.rs`: Parses and writes CSV using `CsvOptions`, with support for header-based row maps or positional row sequences.
+- `json.rs`: Converts between JSON text and `SerialValue`, including the module's only built-in structured success logging.
+- `lua_table.rs`: Defines `SerialValue` plus generic conversion between that tree and Lua values and tables.
+- `toml.rs`: Converts between TOML text and `SerialValue`, enforcing TOML-specific constraints such as a table root and no null values.
+- `yaml.rs`: Implements YAML conversion helpers on disk, but the module root does not compile or re-export it.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `CsvOptions` | Principal type for the `serial` module. |
-| `SerialValue` | Principal type for the `serial` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-� [`docs/specs/serial.md`](../../docs/specs/serial.md)
-
-_Update both this file **and** `docs/specs/serial.md` whenever source files, public types, or Lua bindings change._
+- `SerialValue`: Common intermediate representation shared by every active text format driver. It is the central type that keeps JSON, TOML, CSV, and Lua-table conversion decoupled from one another.
+- `CsvOptions`: Configuration for CSV parsing and encoding. It controls delimiter choice and whether the first row should be treated as headers.

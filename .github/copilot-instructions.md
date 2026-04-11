@@ -189,6 +189,7 @@ Format for a new entry:
 
 ### Git Rules
 
+- Never stash git to check if previous changes are relevant !!! Always check `git status` and `git diff` to confirm exactly which files are staged for commit`
 - Never `git add .` — stage only files directly changed by the current task
 - Commit format: `type(scope): description` — types: `feat` `fix` `refactor` `test` `docs` `chore`
 - One logical change per commit — one accepted phase = one commit

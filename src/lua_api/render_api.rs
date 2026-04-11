@@ -6,15 +6,18 @@ use slotmap::Key;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::runtime::resource_keys::*;
-use crate::runtime::ScreenshotRequest;
+use crate::image::ImageData;
+use crate::image::Texture;
+use crate::math::Rect;
 use crate::render::shape::{CompoundShape, ShapeCommand};
 use crate::render::sprite_batch::BatchEntry;
-use crate::render::{BlendMode, Canvas, CompareMode, DepthMode, RenderCommand, DrawMode, Font, Mesh, MeshDrawMode, MeshVertex, Shader, StencilAction, StencilMode, TextAlign, UniformValue, };
-use crate::sprite::{SpriteBatch};
-use crate::image::{Texture};
-use crate::image::ImageData;
-use crate::math::Rect;
+use crate::render::{
+    BlendMode, Canvas, CompareMode, DepthMode, DrawMode, Font, Mesh, MeshDrawMode, MeshVertex,
+    RenderCommand, Shader, StencilAction, StencilMode, TextAlign, UniformValue,
+};
+use crate::runtime::resource_keys::*;
+use crate::runtime::ScreenshotRequest;
+use crate::sprite::SpriteBatch;
 
 // ===============================================================================
 // UserData wrapper types
@@ -1330,13 +1333,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                             });
                     }
                     None => {
-                        s.borrow_mut().render_commands.push(RenderCommand::Rectangle {
-                            mode: dm,
-                            x,
-                            y,
-                            w,
-                            h,
-                        });
+                        s.borrow_mut()
+                            .render_commands
+                            .push(RenderCommand::Rectangle {
+                                mode: dm,
+                                x,
+                                y,
+                                w,
+                                h,
+                            });
                     }
                 }
                 Ok(())
@@ -1403,15 +1408,17 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "triangle",
         lua.create_function(
             move |_, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
-                s.borrow_mut().render_commands.push(RenderCommand::Triangle {
-                    mode: parse_draw_mode(&mode),
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    x3,
-                    y3,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::Triangle {
+                        mode: parse_draw_mode(&mode),
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        x3,
+                        y3,
+                    });
                 Ok(())
             },
         )?,
@@ -1745,23 +1752,25 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let sy = sy.unwrap_or(1.0);
                 let ox = ox.unwrap_or(0.0);
                 let oy = oy.unwrap_or(0.0);
-                s.borrow_mut().render_commands.push(RenderCommand::DrawQuad {
-                    texture_key: img_key,
-                    quad_x: qx,
-                    quad_y: qy,
-                    quad_w: qw,
-                    quad_h: qh,
-                    tex_w: qsw,
-                    tex_h: qsh,
-                    x,
-                    y,
-                    rotation: r,
-                    sx,
-                    sy,
-                    ox,
-                    oy,
-                    effect: None,
-                });
+                s.borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::DrawQuad {
+                        texture_key: img_key,
+                        quad_x: qx,
+                        quad_y: qy,
+                        quad_w: qw,
+                        quad_h: qh,
+                        tex_w: qsw,
+                        tex_h: qsh,
+                        x,
+                        y,
+                        rotation: r,
+                        sx,
+                        sy,
+                        ox,
+                        oy,
+                        effect: None,
+                    });
                 Ok(())
             },
         )?,
@@ -1972,7 +1981,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let height = *n as u32;
                 let idx = crate::render::Font::nearest_size(height);
                 if let Some(key) = st.default_fonts[idx] {
-                    return Ok(LuaFont { state: s.clone(), key });
+                    return Ok(LuaFont {
+                        state: s.clone(),
+                        key,
+                    });
                 }
                 return Err(LuaError::RuntimeError(
                     "lurek.graphic.newFont: built-in fonts not loaded".into(),
@@ -1984,7 +1996,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let height = *n as u32;
                 let idx = crate::render::Font::nearest_size(height);
                 if let Some(key) = st.default_fonts[idx] {
-                    return Ok(LuaFont { state: s.clone(), key });
+                    return Ok(LuaFont {
+                        state: s.clone(),
+                        key,
+                    });
                 }
                 return Err(LuaError::RuntimeError(
                     "lurek.graphic.newFont: built-in fonts not loaded".into(),
@@ -1993,12 +2008,20 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
             // Handle: newFont(string) or newFont(string, number)
             let path = match args.get(0) {
-                Some(LuaValue::String(s)) => s.to_str().map_err(|e| {
-                    LuaError::RuntimeError(format!("lurek.graphic.newFont: invalid path: {}", e))
-                })?.to_string(),
-                _ => return Err(LuaError::RuntimeError(
-                    "lurek.graphic.newFont: expected string path or number size".into(),
-                )),
+                Some(LuaValue::String(s)) => s
+                    .to_str()
+                    .map_err(|e| {
+                        LuaError::RuntimeError(format!(
+                            "lurek.graphic.newFont: invalid path: {}",
+                            e
+                        ))
+                    })?
+                    .to_string(),
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "lurek.graphic.newFont: expected string path or number size".into(),
+                    ))
+                }
             };
 
             let size = match args.get(1) {
@@ -2011,7 +2034,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             if path == "default" {
                 let idx = crate::render::Font::nearest_size(size as u32);
                 if let Some(key) = st.default_fonts[idx] {
-                    return Ok(LuaFont { state: s.clone(), key });
+                    return Ok(LuaFont {
+                        state: s.clone(),
+                        key,
+                    });
                 }
             }
 
@@ -2028,7 +2054,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let font = Font::from_png_bytes(&data, cell_w, cell_h, false)
                 .map_err(|e| LuaError::RuntimeError(format!("lurek.graphic.newFont: {}", e)))?;
             let key = st.fonts.insert(font);
-            Ok(LuaFont { state: s.clone(), key })
+            Ok(LuaFont {
+                state: s.clone(),
+                key,
+            })
         })?,
     )?;
 
@@ -2619,7 +2648,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     graphics.set(
         "pop",
         lua.create_function(move |_, ()| {
-            s.borrow_mut().render_commands.push(RenderCommand::PopTransform);
+            s.borrow_mut()
+                .render_commands
+                .push(RenderCommand::PopTransform);
             Ok(())
         })?,
     )?;
@@ -2813,7 +2844,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let b = to_bool(&args[2]);
                 let a = to_bool(&args[3]);
                 st.color_mask = (r, g, b, a);
-                st.render_commands.push(RenderCommand::SetColorMask(r, g, b, a));
+                st.render_commands
+                    .push(RenderCommand::SetColorMask(r, g, b, a));
             } else {
                 st.color_mask = (true, true, true, true);
                 st.render_commands
@@ -2843,7 +2875,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, enabled: bool| {
             let mut st = s.borrow_mut();
             st.wireframe = enabled;
-            st.render_commands.push(RenderCommand::SetWireframe(enabled));
+            st.render_commands
+                .push(RenderCommand::SetWireframe(enabled));
             Ok(())
         })?,
     )?;
@@ -3149,6 +3182,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             stats.set("fonts", r.fonts)?;
             stats.set("canvases", r.canvases)?;
             stats.set("texture_memory", r.texture_memory)?;
+            // GPU-level stats from the actual renderer
+            stats.set("gpu_draw_calls", st.render_stats.draw_calls)?;
+            stats.set("batched_draws", st.render_stats.batched_draws)?;
+            stats.set("texture_switches", st.render_stats.texture_switches)?;
+            stats.set("canvas_switches", st.render_stats.canvas_switches)?;
+            stats.set("shader_switches", st.render_stats.shader_switches)?;
             Ok(stats)
         })?,
     )?;

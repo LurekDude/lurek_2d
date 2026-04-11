@@ -1,52 +1,32 @@
-# `camera` — Agent Reference
+﻿# camera - Agent Reference
 
-| Property       | Value                                    |
-|----------------|------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems          |
-| **Status**     | Implemented — Full                       |
-| **Lua API**    | `lurek.camera`                            |
-| **Source**      | `src/camera/`                                   |
-| **Rust Tests** | `tests/rust/unit/camera_tests.rs`        |
-| **Lua Tests**  | `tests/lua/unit/test_camera.lua`         |
-| **Architecture** | —                                      |
+## Module Info
 
-## Purpose
+- Module: camera
+- Group: Platform Services
+- Spec: docs/specs/camera.md
+- Lua API: src/lua_api/camera_api.rs
+- Rust tests: tests/rust/unit/camera_tests.rs
+- Lua tests: tests/lua/unit/test_camera.lua, tests/lua/stress/test_camera_stress.lua, tests/lua/integration/test_tween_camera.lua, tests/lua/integration/test_tilemap_camera.lua, tests/lua/integration/test_scene_camera.lua, tests/lua/integration/test_parallax_camera.lua, tests/lua/integration/test_input_camera.lua, tests/lua/integration/test_graphics_camera.lua
 
-The `camera` module provides camera and viewport types for 2D rendering. It is a Tier 1 engine module extracted from `src/render/` during the graphics-module-split session; it depends only on `crate::math` (Vec2, Mat3, Rect) and never imports wgpu, winit, or any other engine module. `SharedState` holds a `Camera` field accessed by the GPU renderer each frame to apply the view transform to all draw commands.
+## Module Purpose
 
-## Source Files
+The camera module owns 2D camera math and virtual viewport mapping. It provides the simple Camera type used for view transforms, the richer Camera2D type used for follow behavior and coordinate conversion, and the viewport helpers that map a logical game resolution onto an actual window.
 
-| File                | Purpose                                                                                 |
-|---------------------|-----------------------------------------------------------------------------------------|
-| `mod.rs`            | Module root — declares types, viewport, viewport_scale, render submodules and re-exports Camera, Camera2D, ScaleMode, Viewport, ViewportScale |
-| `types.rs`          | `Camera` (flat API) and `Camera2D` (smooth follow, dead zone, bounds, shake) structs    |
-| `viewport.rs`       | `ScaleMode` enum and `Viewport` struct for virtual-resolution mapping                   |
-| `viewport_scale.rs` | `ViewportScale` struct — `Viewport` variant with automatic scaled-dimension tracking     |
-| `render.rs`         | `begin_render_commands()` and `end_render_command()` on `Camera` and `Camera2D`; emits `PushTransform` / `Translate` / `Rotate` / `Scale` / `PopTransform` render commands. |
+This module stays on the CPU side of the engine. It can produce transform-stack render commands and screen-to-world conversions, but it does not own live window state, renderer internals, or scene logic. Other systems decide what the camera follows and when it moves; camera is responsible for the math and state needed to express that behavior cleanly.
 
-> **Note:** `draw_to_image()` for `Camera2D` lives in `src/image/visualization.rs` as the free function `draw_camera_to_image(cam, width, height)`. `Camera` cannot import `crate::image` directly because `image::visualization` already imports `crate::camera`, which would create a circular dependency.
+## Files
+
+- mod.rs: Declares the camera submodules and re-exports the public camera and viewport surface.
+- types.rs: Defines Camera and Camera2D, including transforms, follow logic, bounds, shake, and coordinate conversion.
+- viewport.rs: Defines ScaleMode and Viewport for logical-resolution scaling and coordinate mapping.
+- viewport_scale.rs: Defines ViewportScale, a viewport helper that also tracks scaled output dimensions.
+- render.rs: Converts Camera and Camera2D state into push, translate, rotate, scale, and pop render commands.
 
 ## Key Types
-| Type | Location | Purpose |
-|------|----------|---------|
-| \Camera2D\ | \src/render/camera/mod.rs\ | 2D camera tracking position, zoom, and rotation |
-| \Camera\ | \src/render/camera/mod.rs\ | Active camera state driving the view transform |
-| \Viewport\ | \src/render/camera/mod.rs\ | Screen region mapped to a camera view |
-| \ScaleMode\ | \src/render/camera/mod.rs\ | Enum: Fixed, Fit, Fill, Stretch scaling modes |
 
-## Lua API Summary
-| Function | Signature | Purpose |
-|----------|-----------|---------|
-| \lurek.camera.new\ | \(x: number, y: number) → Camera2D\ | Create a 2D camera at position |
-| \lurek.camera.setPosition\ | \(cam: Camera2D, x: number, y: number) → nil\ | Move camera |
-| \lurek.camera.setZoom\ | \(cam: Camera2D, zoom: number) → nil\ | Set zoom level |
-| \lurek.camera.activate\ | \(cam: Camera2D) → nil\ | Set as the active render camera |
-| \lurek.camera.screenToWorld\ | \(cam: Camera2D, sx: number, sy: number) → number, number\ | Convert screen coords |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/camera.md`](../../docs/specs/camera.md)
-
-_Update both this file **and** `docs/specs/camera.md` whenever source files, public types, or Lua bindings change._
+- Camera: Lightweight camera state with position, zoom, rotation, and view-matrix generation.
+- Camera2D: Gameplay-facing 2D camera with follow targets, dead zones, look-ahead, bounds clamping, shake, and coordinate helpers.
+- Viewport: Logical-resolution mapper that computes scale and offset for letterbox, stretch, and pixel-perfect modes.
+- ViewportScale: Viewport variant that also tracks scaled pixel dimensions for transform-stack integration.
+- ScaleMode: Enum selecting letterbox, stretch, or pixel-perfect viewport behavior.

@@ -1,250 +1,154 @@
-# `debugbridge` — Full Specification
+# `debugbridge` — Agent Reference
 
-| Property         | Value                                                  |
-|------------------|--------------------------------------------------------|
-| **Tier**         | Tier 1 — Core Engine Subsystems                        |
-| **Status**       | Implemented — Full                                     |
-| **Lua API**      | `lurek.debugbridge`                                     |
-| **Source**       | `src/debugbridge/`                                     |
-| **Rust Tests**   | —                                                      |
-| **Lua Tests**    | `tests/lua/unit/test_debugbridge.lua`                  |
-| **Architecture** | —                                                      |
+| Property | Value |
+|----------|-------|
+| **Tier** | Edge/Integration |
+| **Status** | Implemented |
+| **Lua API** | `lurek.debugbridge` |
+| **Source** | `src/debugbridge/` |
+| **Rust Tests** | tests/rust/unit/debugbridge_tests.rs |
+| **Lua Tests** | tests/lua/unit/test_debugbridge.lua |
+| **Architecture** | `docs/architecture/engine-architecture.md § Edge / Integration` |
+
+---
 
 ## Summary
 
-The `debugbridge` module embeds a JSON-over-TCP server (bound to 127.0.0.1 only) inside the running Lurek2D game. It serves **both audiences**: game developers debugging game logic via the VS Code extension, and engine developers inspecting engine internals via the MCP server. Neither audience requires any embed or plugin in the game script.
+The debugbridge module exposes a local TCP bridge so external tools can inspect and interact with a running Lurek2D game. It exists primarily to support editor integration, remote diagnostics, eval-style tooling, and light runtime telemetry without embedding those tool protocols throughout the rest of the engine.
 
-The server accepts newline-delimited JSON messages from multiple concurrent TCP clients. Requests fall into two categories: **background-safe** (methods the server thread handles directly using cached data) and **main-thread** (methods that require Lua execution — `eval`, `getCallStack`, `getLocals`, `getGlobals`). Main-thread methods are placed in `BridgeShared::pending_requests` and dispatched by calling `lurek.debugbridge.poll()` from the game's update loop each frame. Responses queue into `BridgeShared::pending_responses` and are written back to the originating client by the server thread.
+The module is built around a strict thread boundary. A background server thread accepts newline-delimited JSON requests from local clients, handles the background-safe methods immediately, and queues main-thread work for Lua-facing operations such as eval or stack inspection. Shared bridge state then carries pending requests, pending responses, print history, broadcast messages, and rolling performance samples between the two sides.
 
-Key features:
-- **`eval`** — evaluate arbitrary Lua code in-process and return the result as JSON
-- **`getCallStack`** — walk the Lua debug call stack via `debug.getinfo`
-- **`getLocals`** — enumerate local variables at a specific stack level via `debug.getlocal`
-- **`getGlobals`** — capture up to 200 primitive global variables
-- **Print capture** — game scripts call `lurek.debugbridge.capturePrint` to feed a circular history buffer; the server broadcasts each entry as a `"print"` event to all clients
-- **Performance sampling** — `poll()` records frame delta each call; `getPerformance()` returns fps, dt, avgDt, minDt, maxDt
-- **Screenshot request** — tools set `screenshot_requested` via `requestScreenshot(scale?)`; the render loop checks the flag after capture
-- **Broadcast** — any game script can push a named JSON event to all connected clients with `broadcast(event, json_data)`
+This module does not own the engine's scripting model, screenshot rendering, or general logging infrastructure. It transports tool requests and responses safely, but the actual work is still performed by the main thread, the Lua VM, or other engine modules.
 
-The server binds to 127.0.0.1 only. Ports below 1024 are rejected with a Lua error. The default port is 19740.
+**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
 
-## Ownership Rule
-
-`debugbridge` manages **three distinct channels** — each has a separate purpose and must not be conflated:
-
-| Channel | Owner | Purpose |
-|---|---|---|
-| `lurek.debugbridge.print_history` | `debugbridge` | TCP delivery feed for external tools (VS Code extension, MCP server). Push via `capturePrint()`. |
-| `lurek.log.*` | `log` | Engine-level operational log — routes through the Rust `log` crate to stdout/stderr. |
-| `lurek.devtools.logger` | `devtools` | In-game structured diagnostic history for in-game UI panels. |
-
-These three channels are independent by design. Emitting to one does not affect the others.
-
-For frame timing: `debugbridge.getPerformance()` reads from an internal sample buffer populated automatically by `poll()`. For basic fps/delta in game scripts, use `lurek.time.getDelta()` and `lurek.time.getFps()` directly (zero setup — the engine auto-ticks the clock).
+---
 
 ## Architecture
 
 ```
-src/debugbridge/
-├── mod.rs        Re-exports BridgeShared, PendingRequest, PendingResponse,
-│                 PrintEntry, SharedBridge, server_thread, handle_client_message
-├── bridge.rs     BridgeShared — Arc<Mutex<>> shared between TCP thread and Lua
-│                 PendingRequest, PendingResponse — main-thread method queue
-│                 PrintEntry — timestamped print history entry
-│                 SharedBridge — type alias for Arc<Mutex<BridgeShared>>
-└── server.rs     server_thread(listener, shared, running) — accept loop on bg thread
-                  handle_client_message(line, idx, shared) — parse + dispatch one message
-
-src/lua_api/
-└── debugbridge_api.rs  Registers lurek.debugbridge.*
-                        Owns: Arc<Mutex<BridgeShared>>, Arc<AtomicBool> running,
-                              Arc<Mutex<Option<JoinHandle<()>>>> thread_handle
-
-Thread model:
-  Main thread (Lua):  start(), stop(), poll(), capturePrint(),
-                      getPerformance(), requestScreenshot(), isScreenshotRequested(),
-                      broadcast(), getPort(), getClientCount(), isRunning(),
-                      getPrintHistory(), clearPrintHistory(), setMaxPrintHistory()
-
-  Background thread:  server_thread() — TCP accept + read + write
-                      Communicates only via Arc<Mutex<BridgeShared>>
-
-Request flow:
-  Client TCP → server_thread reads line → handle_client_message:
-    background-safe: writes response directly to broadcast_queue or inline
-    main-thread:     pushes PendingRequest to pending_requests
-  Lua poll() → drains pending_requests → executes method → pushes PendingResponse
-  server_thread → drains pending_responses → writes JSON to client TCP stream
+lurek.debugbridge.* (Lua API — src/lua_api/debugbridge_api.rs)
+    |
+    v
+src/debugbridge/mod.rs
+    |- bridge.rs - bridge
+    |- server.rs - server
 ```
+
+---
 
 ## Source Files
 
-| File        | Purpose                                                                                                          |
-|-------------|------------------------------------------------------------------------------------------------------------------|
-| `bridge.rs` | `BridgeShared`, `PendingRequest`, `PendingResponse`, `PrintEntry`, `SharedBridge` — shared state types           |
-| `server.rs` | `server_thread()`, `handle_client_message()` — non-blocking TCP accept loop and message dispatch                  |
-| `mod.rs`    | Re-exports all public types                                                                                       |
+| File | Purpose |
+|------|---------|
+| `bridge.rs` | Defines the shared state records that move data between the TCP thread and the main thread. This file owns bridge-side queues, print-history tracking, and lightweight performance aggregation. |
+| `mod.rs` | Module root that re-exports the shared bridge types and server entry points. It provides the small public surface other modules use when they need to start or interact with the bridge. |
+| `server.rs` | Implements the TCP accept loop and client-message dispatch layer. It is the networking and protocol entry point for the bridge. |
+
+---
 
 ## Submodules
 
 ### `debugbridge::bridge`
 
-- `PendingRequest`: `id: u64`, `method: String`, `params: serde_json::Value`, `client_idx: usize`
-- `PendingResponse`: `id: u64`, `result: serde_json::Value`, `client_idx: usize`
-- `PrintEntry`: `timestamp: f64`, `message: String`, `source: String`, `line: u32`
-- `BridgeShared`: See Key Types below.
-- `SharedBridge`: type alias `Arc<Mutex<BridgeShared>>`
+Defines the shared state records that move data between the TCP thread and the main thread. This file owns bridge-side queues, print-history tracking, and lightweight performance aggregation.
+
+- **`PendingRequest`** (struct): A request from a TCP client that requires main-thread (Lua) execution.
+- **`PendingResponse`** (struct): A response produced on the main thread for delivery back to a TCP client.
+- **`PrintEntry`** (struct): A single structured print log entry captured from `lurek.print`.
+- **`BridgeShared`** (struct): State shared between the TCP server background thread and the Lua main thread.
+- **`SharedBridge`** (type): Type alias for the shared state handle passed between threads.
 
 ### `debugbridge::server`
 
-- `server_thread(listener, shared, running)` — blocking accept loop; sets non-blocking on the listener and polls all clients each iteration. Stops when `running` is set `false`.
-- `handle_client_message(line, idx, shared)` — parses a JSON line, routes background-safe methods immediately, pushes main-thread methods to `pending_requests`.
+Implements the TCP accept loop and client-message dispatch layer. It is the networking and protocol entry point for the bridge.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `debugbridge::bridge::BridgeShared`
-Central shared state. Fields:
-- `pending_requests: VecDeque<PendingRequest>` — main-thread method queue
-- `pending_responses: VecDeque<PendingResponse>` — responses awaiting TCP delivery
-- `broadcast_queue: VecDeque<String>` — JSON event strings for all clients
-- `print_history: Vec<PrintEntry>` — circular print log (capacity `max_print_history`, default 2000)
-- `frame_times: Vec<f64>` — recent dt samples (capacity `max_frame_times`, default 300)
-- `screenshot_requested: bool` — flag set by `requestScreenshot()`
-- `screenshot_scale: u32` — downscale factor for next screenshot (1–8)
-- `client_count: usize` — number of currently connected TCP clients
-- `port: u16` — bound port (0 if not running)
-- `epoch: Instant` — start time for `elapsed()` timestamps
-- `BridgeShared::new()` — default capacities, `port = 0`, `epoch = Instant::now()`
-- `elapsed()→f64` — seconds since bridge creation
-- `get_performance()→serde_json::Value` — `{fps, dt, avgDt, minDt, maxDt}` from frame_times
-- `push_print(msg, source, line)` — appends a `PrintEntry`, evicts oldest if over capacity
+#### `BridgeShared`
 
-#### `debugbridge::bridge::PendingRequest`
-A request from a TCP client that requires main-thread Lua execution. Carries a JSON-RPC `id`, method name, raw JSON `params`, and the `client_idx` of the sender.
+Central shared bridge state wrapped behind Arc<Mutex<...>>.
 
-#### `debugbridge::bridge::PendingResponse`
-A response to send back to a TCP client after main-thread execution. Carries the matching JSON-RPC `id`, the JSON `result`, and the target `client_idx`.
+#### `SharedBridge`
 
-#### `debugbridge::bridge::PrintEntry`
-One structured `lurek.print` log entry. `timestamp` is seconds since bridge start. Serialisable with `serde::Serialize` for JSON broadcast.
+Type alias for the shared bridge handle used across the module and Lua bridge.
 
-### Enums
+#### `PendingRequest`
 
-No public enums.
+Queued main-thread request record containing the request id, method name, params, and source client index.
+
+#### `PendingResponse`
+
+Queued reply destined for a specific client.
+
+#### `PrintEntry`
+
+Timestamped print-capture record used for tooling visibility into Lua-side print output.
+
+---
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/debugbridge_api.rs` under `lurek.debugbridge.*`. There are no UserData objects — all functions operate directly on the shared `Arc<Mutex<BridgeShared>>` state.
+Exposed under `lurek.debugbridge.*` by `src/lua_api/debugbridge_api.rs`.
 
-### Lifecycle
+### Module Functions
 
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.start(port?)` | `→ boolean` | Bind to `127.0.0.1:port` and start the server thread. Default port 19740. Returns `false` if already running. Errors if `port < 1024` or bind fails. |
-| `lurek.debugbridge.stop()` | — | Set `running = false` and join the server thread. |
-| `lurek.debugbridge.isRunning()` | `→ boolean` | True when the server thread is active. |
-| `lurek.debugbridge.getPort()` | `→ integer` | Bound port, or 0 if not running. |
-| `lurek.debugbridge.getClientCount()` | `→ integer` | Number of currently connected TCP clients. |
+| Function | Description |
+|----------|-------------|
+| `lurek.debugbridge.start` | Start the TCP debug server on 127.0.0.1:port. |
+| `lurek.debugbridge.stop` | Stop the TCP debug server and close all connections. |
+| `lurek.debugbridge.isRunning` | Returns whether the server is currently running. |
+| `lurek.debugbridge.getPort` | Returns the server port (0 if not running). |
+| `lurek.debugbridge.getClientCount` | Returns the number of connected TCP clients. |
+| `lurek.debugbridge.poll` | Poll for pending Lua-dependent requests from TCP clients. |
+| `lurek.debugbridge.capturePrint` | Captures a print message and broadcasts it to connected clients. |
+| `lurek.debugbridge.getPrintHistory` | Returns the print history. |
+| `lurek.debugbridge.clearPrintHistory` | Clears the print history. |
+| `lurek.debugbridge.setMaxPrintHistory` | Sets the maximum print history size. |
+| `lurek.debugbridge.getPerformance` | Returns performance statistics. |
+| `lurek.debugbridge.requestScreenshot` | Flags a screenshot request for the next frame. |
+| `lurek.debugbridge.isScreenshotRequested` | Returns whether a screenshot is currently requested. |
+| `lurek.debugbridge.broadcast` | Broadcasts a JSON event to all connected clients. |
 
-### Main-Thread Dispatch
-
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.poll()` | — | Drain `pending_requests` and execute each on the Lua main thread. Must be called each frame. Also auto-records the current frame delta from `lurek.time.getDelta()` into the performance buffer — no manual `recordFrame()` call is needed. Supported methods: `eval`, `getCallStack`, `getLocals`, `getGlobals`. |
-
-### Print Capture
-
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.capturePrint(msg, source?, line?)` | — | Append a print entry and broadcast a `"print"` event to all clients. |
-| `lurek.debugbridge.getPrintHistory(count?)` | `→ table` | Return up to `count` most recent print entries as `{timestamp, message, source, line}` records. |
-| `lurek.debugbridge.clearPrintHistory()` | — | Clear the print history buffer. |
-| `lurek.debugbridge.setMaxPrintHistory(max)` | — | Set the print history capacity (clamped 1–100000). Truncates oldest entries immediately if needed. |
-
-### Performance
-
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.getPerformance()` | `→ table` | Returns `{fps, dt, avgDt, minDt, maxDt}` computed from frame samples that `poll()` records automatically each call. |
-
-### Screenshots
-
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.requestScreenshot(scale?)` | — | Set `screenshot_requested = true` and `screenshot_scale` (1–8, default 1). |
-| `lurek.debugbridge.isScreenshotRequested()` | `→ boolean` | True when a screenshot has been requested. |
-
-### Broadcast
-
-| Function | Signature | Description |
-|---|---|---|
-| `lurek.debugbridge.broadcast(event, json_data)` | — | Push a named JSON event (`{event, data}`) to all connected clients. |
+---
 
 ## Lua Examples
 
 ```lua
--- Start the bridge at game init
-function lurek.init()
-    if lurek.debugbridge.start(19740) then
-        print("Debug bridge active on port", lurek.debugbridge.getPort())
-    end
-end
-
--- Poll for debugger requests each frame (also auto-records frame time)
-function lurek.process(dt)
-    lurek.debugbridge.poll()
-end
-
--- Forward print calls to connected tools
-local real_print = print
-print = function(...)
-    local msg = table.concat({...}, "\t")
-    real_print(msg)
-    local info = debug.getinfo(2, "Sl")
-    lurek.debugbridge.capturePrint(
-        msg,
-        info and info.short_src or "?",
-        info and info.currentline or 0
-    )
-end
-
--- Broadcast a custom game event to the VS Code extension
-function on_player_died(cause)
-    lurek.debugbridge.broadcast("player_died", require("json").encode({ cause = cause }))
-end
-
--- Graceful shutdown
-function lurek.quit()
-    lurek.debugbridge.stop()
+-- Minimal namespace check for lurek.debugbridge.
+if lurek.debugbridge then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
+---
+
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 4     |
-| `enum`    | 0     |
-| `fn`      | 14    |
+| Kind | Count |
+|------|-------|
+| `struct` | 4 |
+| `enum` | 0 |
+| `fn` (Lua API) | 14 |
 | **Total** | **18** |
+
+---
 
 ## References
 
-| Module       | Relationship | Notes                                                              |
-|--------------|--------------|--------------------------------------------------------------------|
-| `engine`     | —            | `debugbridge_api.rs` receives no `SharedState`; uses only Lua context |
-| `lua_api`    | Imported by  | `debugbridge_api.rs` registers the `lurek.debugbridge.*` surface    |
-| `vscode-extension` | Consumer | Connects to the TCP bridge for runtime inspection features        |
-| `thread`     | Similar      | `lurek.thread` uses `Channel` for Lua-to-Lua VM comms; `debugbridge` uses raw TCP for external tool comms |
-| `graphics`   | Coordinates  | Screenshot capture requires the graphics module to export a frame |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| — | No top-level `crate::<module>` imports were detected in this module's source files. | Keep the source files as the primary dependency reference. |
+
+---
 
 ## Notes
 
-- `poll()` must be called from the Lua main thread (typically in `lurek.process`). Forgetting `poll()` means all `eval` / inspect requests from the VS Code extension will silently queue forever. `poll()` also auto-records the current frame delta from `lurek.time.getDelta()` — so `getPerformance()` will always reflect the current frame rate as long as `poll()` is called each frame.
-- The bridge blocks on `running.store(false)` and then `handle.join()` during `stop()`. If the server thread is stuck on a blocking operation, `stop()` may hang briefly. This should not occur in practice because the listener is set non-blocking.
-- `requestScreenshot` only sets the flag — actually capturing and delivering the screenshot is the responsibility of the engine render loop or game code that checks `isScreenshotRequested()`.
-- Ports below 1024 are rejected with a `LuaError::RuntimeError`. On some systems, even ports above 1024 may require firewall adjustment; however, since the bridge binds to 127.0.0.1 only, external network access is never possible.
-- `push_print` evicts from the front of the `Vec<PrintEntry>` buffer, which is O(n). For scripts that emit very high print volumes, consider reducing `max_print_history` with `setMaxPrintHistory`.
-- The `getLocals` method inspects locals at a fixed stack level relative to the `poll()` call frame. The level reported to clients is offset by the call depth introduced by `poll()` itself; clients should account for this.
+- **Source of truth**: Keep this spec synchronized with `src/debugbridge/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

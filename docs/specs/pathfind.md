@@ -1,480 +1,323 @@
-# `pathfinding` — Agent Reference
+# `pathfind` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.pathfinding`                                   |
-| **Source**      | `src/pathfinding/`                                   |
-| **Rust Tests** | `tests/rust/unit/pathfinding_tests.rs`                    |
-| **Lua Tests**  | `tests/lua/unit/test_pathfinding.lua`                |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.pathfind` |
+| **Source** | `src/pathfind/` |
+| **Rust Tests** | `tests/rust/unit/pathfinding_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_pathfinding.lua`, `tests/lua/stress/test_pathfinding_stress.lua`, `tests/lua/golden/test_pathfinding_golden.lua`, `tests/lua/integration/test_tilemap_pathfinding.lua`, `tests/lua/integration/test_pathfinding_entity.lua`, `tests/lua/integration/test_ai_pathfinding.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
+
+---
 
 ## Summary
 
-The pathfinding module provides a comprehensive multi-layer grid pathfinding stack for 2D games, covering everything from simple A★ grid searches to hierarchical long-range navigation and crowd-steering flow fields. The module is organized around three grid abstractions — `NavGrid`, `PathGrid`, and `Grid` — each serving different use cases: `NavGrid` is the primary u8-cost grid used by the A★ engine, HPA★ hierarchy, flow fields, and the `UnitPathfinder` wrapper; `PathGrid` is a legacy f32-cost grid from the former `ai/pathgrid` with built-in A★, Dijkstra, and string-pulling; `Grid` is a standalone grid supporting A★, Dijkstra, BFS, and flow field generation with f32 costs. The A★ implementation in `astar.rs` supports octile and Manhattan heuristics, partial paths with node expansion limits, unit-size-aware footprint checking, and Theta★ line-of-sight path smoothing. `FlowField` provides Dijkstra-sourced direction vectors for steering crowds of units toward single or multiple targets with integrated cost queries and world-space velocity steering. `AiFlowField` (in `ai_flow_field.rs`) is a simpler BFS-based variant for basic walkability grids. Hierarchical A★ (`hpa.rs`) pre-computes an abstract graph by dividing the `NavGrid` into chunks, finding entrance pairs on chunk boundaries, and connecting intra-chunk entrances via local A★ — enabling fast long-range queries that skip fine-grained grid search. `UnitPathfinder` wraps `NavGrid` with LRU path caching, unit-radius-aware passability checks, partial path support, nearest-walkable BFS, flood-fill reachability, and heuristic distance queries. `PathThreadPool` dispatches A★ requests to background worker threads with cancellation support, keeping the game loop unblocked for expensive queries. Graph-level pathfinding (`graph_path.
+The `pathfind` module is Lurek2D's navigation algorithm stack. It covers A-star, flow fields, hierarchical pathfinding, influence maps, unit-size-aware path requests, adjacency-graph pathing, and background worker support for expensive searches.
 
+It exists so movement planning and spatial search stay isolated from AI orchestration, physics, and scene code. Other modules can consume paths, flow directions, or influence values without re-implementing grids, heuristics, smoothing, or asynchronous dispatch.
+
+It intentionally does not own agent decision-making, movement execution, collision resolution, or rendering beyond optional debug output. It answers where to go and how to evaluate traversability, not how a game object should behave once a path exists.
+
+**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-lurek.pathfinding (Lua API — pathfinding_api.rs)
-  │
-  ├── LuaNavGrid ─────────────────────────────────────────────────────
-  │     └── NavGrid (nav_grid.rs)
-  │           ├── u8 cost grid, 0=blocked, 1-255=cost
-  │           ├── DiagonalMode: None | Always | NoCornerCut
-  │           ├── HPA★ chunk_size, dirty_rects for incremental updates
-  │           └── snapshot() for thread-safe cloning
-  │
-  ├── LuaUnitPathfinder ──────────────────────────────────────────────
-  │     └── UnitPathfinder (unit_pathfinder.rs)
-  │           ├── Shared Rc<RefCell<NavGrid>>
-  │           ├── A★ (astar.rs): octile/Manhattan, Theta★ smoothing
-  │           ├── LRU path cache (HashMap + Vec<CacheKey>)
-  │           ├── unit_size footprint → multi-cell walkability
-  │           ├── find_partial_path (node limit)
-  │           ├── find_nearest_walkable (BFS)
-  │           └── is_reachable (flood fill)
-  │
-  ├── LuaFlowField ──────────────────────────────────────────────────
-  │     └── FlowField (flow_field.rs)
-  │           ├── Dijkstra integration field from NavGrid
-  │           ├── Single or multi-target, unit_size-aware
-  │           ├── Normalised direction vectors per cell
-  │           └── steer(world_x, world_y, speed, tile_w, tile_h)
-  │
-  ├── LuaPathGrid ───────────────────────────────────────────────────
-  │     └── PathGrid (pathgrid.rs)
-  │           ├── f32 cost grid with Cell { walkable, cost }
-  │           ├── A★ with 8-dir corner-cut prevention
-  │           └── find_path_smoothed (greedy string-pulling)
-  │
-  ├── LuaAiFlowField ────────────────────────────────────────────────
-  │     └── ai_flow_field::FlowField
-  │           ├── BFS-based (simple walkability, no costs)
-  │           └── set_goal → recompute, get_direction, get_distance
-  │
-  ├── HPA★ (hpa.rs) ─────────────────────────────────────────────────
-  │     ├── build_abstract: chunk grid → boundary entrances → intra-chunk A★
-  │     ├── AbstractGraph { nodes, edges, chunks }
-  │     ├── hpa_star: abstract A★ → local tile refinement
-  │     └── is_reachable: chunk-level BFS connectivity
-  │
-  ├── PathThreadPool (async_pool.rs) ─────────────────────────────────
-  │     ├── std::thread workers with mpsc channels
-  │     ├── submit(id, grid_snapshot, start, goal, unit_size)
-  │     ├── poll() → Vec<(id, Option<path>)>
-  │     └── cancel(id) — best-effort cancellation
-  │
-  ├── Graph Pathfinding (graph_path.rs) ──────────────────────────────
-  │     ├── find_province_path: A★ over adjacency graph + centroids
-  │     ├── province_reachable: Dijkstra within cost budget
-  │     └── ProvinceCostFn: tag_costs, province_costs, blocked set
-  │
-  ├── Grid (grid.rs) ────────────────────────────────────────────────
-  │     ├── Standalone f32-cost grid
-  │     ├── A★, Dijkstra, BFS pathfinding
-  │     └── build_flow_field (Dijkstra-based)
-  │
-  └── InfluenceMap (influence_map.rs) ────────────────────────────────
-        ├── Multi-layer float grid (named layers)
-        ├── stamp_influence, propagate, decay
-        ├── max_position, min_position, query_rect
-        └── blend(layer_a, weight_a, layer_b, weight_b, dest)
+lurek.pathfind.* (Lua API — src/lua_api/pathfind_api.rs)
+    |
+    v
+src/pathfind/mod.rs
+    |- ai_flow_field.rs - ai_flow_field
+    |- astar.rs - astar
+    |- async_pool.rs - async_pool
+    |- flow_field.rs - flow_field
+    |- graph_path.rs - graph_path
+    |- grid.rs - grid
+    |- hpa.rs - hpa
+    |- influence_map.rs - influence_map
+    |- ...
 ```
+
+---
 
 ## Source Files
 
-| File                | Purpose                                                                          |
-|---------------------|----------------------------------------------------------------------------------|
-| `mod.rs`            | Module declaration, public re-exports, and type aliases                          |
-| `ai_flow_field.rs`  | BFS-based flow field for simple walkability grids (moved from `ai/flowfield`)    |
-| `astar.rs`          | A★ search with octile/Manhattan heuristic, line-of-sight, and Theta★ smoothing   |
-| `async_pool.rs`     | Thread pool for asynchronous off-thread A★ path computation                      |
-| `flow_field.rs`     | Dijkstra-based flow field for NavGrid with multi-target and world-space steering |
-| `graph_path.rs`     | Adjacency-graph A★ and Dijkstra for province maps and sparse neighbor topologies |
-| `grid.rs`           | Standalone 2D grid with A★, Dijkstra, BFS pathfinding and flow field generation  |
-| `hpa.rs`            | Hierarchical Pathfinding A★ (HPA★): chunk abstraction, entrance detection, tile refinement |
-| `influence_map.rs`  | Multi-layer spatial float grid for influence mapping and strategic AI reasoning   |
-| `nav_grid.rs`       | Navigation grid with u8 per-cell costs, diagonal modes, dirty rects, and snapshot |
-| `pathgrid.rs`       | Weighted f32-cost grid with Cell type, A★, and string-pulling (moved from `ai/pathgrid`) |
-| `unit_pathfinder.rs`| Unit-size-aware pathfinder with LRU caching, partial paths, BFS nearest-walkable |
+| File | Purpose |
+|------|---------|
+| `ai_flow_field.rs` | Provides a simpler BFS-style flow-field implementation used for lightweight AI movement support. |
+| `astar.rs` | Implements A-star search, line-of-sight checks, and path smoothing helpers over navigation grids. |
+| `async_pool.rs` | Dispatches pathfinding work to background threads with request management and cancellation support. |
+| `flow_field.rs` | Implements Dijkstra-based flow fields for crowd steering toward one or more targets. |
+| `graph_path.rs` | Implements adjacency-graph pathfinding for province-style or node-link worlds instead of regular grids. |
+| `grid.rs` | Defines a standalone grid with generic path search, BFS, Dijkstra, and flow-field generation support. |
+| `hpa.rs` | Implements hierarchical pathfinding using chunk abstraction and entrance-based higher-level search. |
+| `influence_map.rs` | Stores and updates multi-layer spatial influence values for tactical or strategic reasoning. |
+| `mod.rs` | Declares the pathfinding submodules and re-exports the main grids, algorithms, and support types. |
+| `nav_grid.rs` | Defines the main navigation grid with walkability, costs, diagonal rules, and thread-friendly snapshots. |
+| `pathgrid.rs` | Provides an alternate path grid with float costs and built-in path operations. |
+| `render.rs` | Generates debug render output for grids, flow fields, and influence maps. |
+| `unit_pathfinder.rs` | Wraps pathfinding for unit-sized actors, including caching, partial paths, and nearest-walkable recovery. |
+
+---
 
 ## Submodules
 
-### `pathfinding::ai_flow_field`
+### `pathfind::ai_flow_field`
 
-BFS-based flow field for simple walkability grids. Operates on a flat `Vec<bool>` walkability array rather than a cost grid. Moved from `ai/flowfield`; used by `lurek.pathfinding.newPathFlowField`.
+Provides a simpler BFS-style flow-field implementation used for lightweight AI movement support.
 
-- **`FlowField`** (struct) — BFS flow field storing normalised direction vectors and BFS distances toward a goal cell. Supports 8-directional expansion with √2 diagonal cost.
+- **`FlowField`** (struct): BFS flow field that stores normalized direction vectors toward a goal.
 
-### `pathfinding::astar`
+### `pathfind::astar`
 
-A★ search engine for `NavGrid` with multiple heuristic modes and path post-processing.
+Implements A-star search, line-of-sight checks, and path smoothing helpers over navigation grids.
 
-- **`astar()`** (fn) — Run A★ from start to goal on a `NavGrid`, returning `(Option<path>, complete)`. Supports `unit_size` footprint and `max_nodes` expansion limit for partial paths.
-- **`line_of_sight()`** (fn) — Bresenham line-of-sight check between two cells, respecting `unit_size` footprint.
-- **`smooth_path()`** (fn) — Remove unnecessary waypoints via line-of-sight checks (Theta★-style post-processing).
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
-### `pathfinding::async_pool`
+### `pathfind::async_pool`
 
-Thread pool for off-thread A★ computation against snapshots of `NavGrid`.
+Dispatches pathfinding work to background threads with request management and cancellation support.
 
-- **`PathResult`** (type alias) — `(u64, Option<Vec<(u32, u32)>>)` — completed path result with request ID.
-- **`PathThreadPool`** (struct) — Worker thread pool with `submit()`, `poll()`, and `cancel()` methods. Pre/post cancellation checks avoid wasted computation.
+- **`PathResult`** (type): A completed path result returned by [`PathThreadPool::poll`].
+- **`PathThreadPool`** (struct): A pool of worker threads that process pathfinding requests asynchronously.
 
-### `pathfinding::flow_field`
+### `pathfind::flow_field`
 
-Dijkstra-based flow field operating on `NavGrid` with cost-weighted expansion.
+Implements Dijkstra-based flow fields for crowd steering toward one or more targets.
 
-- **`FlowField`** (struct) — Pre-computed flow field with normalised direction vectors and integrated cost-to-target per cell. Supports single-target `calculate()`, multi-target `calculate_multi()`, direction queries, angle queries, cost-to-target queries, and world-space `steer()` for velocity conversion.
+- **`FlowField`** (struct): A pre-computed flow field that stores a direction vector and integrated cost for every cell, guiding any unit toward one or more target cells.
 
-### `pathfinding::graph_path`
+### `pathfind::graph_path`
 
-Adjacency-graph pathfinding using A★ and Dijkstra over abstract neighbor maps.
+Implements adjacency-graph pathfinding for province-style or node-link worlds instead of regular grids.
 
-- **`ProvincePath`** (struct) — A path result with ordered province IDs and total cost.
-- **`ProvinceCostFn`** (struct) — Configurable cost function with `default_cost`, per-province cost overrides, edge tag costs (e.g. `"river"` → 0.5), and blocked province sets.
-- **`find_province_path()`** (fn) — A★ search on adjacency graph with centroid distance heuristic.
-- **`province_reachable()`** (fn) — Dijkstra reachability within a cost budget, returning a map of reachable node IDs to costs.
+- **`ProvincePath`** (struct): A path through the province adjacency graph.
+- **`ProvinceCostFn`** (struct): Configurable cost function for province pathfinding.
 
-### `pathfinding::grid`
+### `pathfind::grid`
 
-Standalone 2D pathfinding grid with per-cell walkability and f32 movement costs.
+Defines a standalone grid with generic path search, BFS, Dijkstra, and flow-field generation support.
 
-- **`Grid`** (struct) — Grid supporting A★ (`find_path_astar`), Dijkstra (`find_path_dijkstra`), BFS (`find_path_bfs`), and flow field generation (`build_flow_field`). Coordinates are 0-based with 4-directional or 8-directional neighbour expansion.
+- **`Grid`** (struct): 2D pathfinding grid with per-cell walkability and movement costs.
 
-### `pathfinding::hpa`
+### `pathfind::hpa`
 
-Hierarchical Pathfinding A★ (HPA★) for fast long-range queries on large grids.
+Implements hierarchical pathfinding using chunk abstraction and entrance-based higher-level search.
 
-- **`AbstractEdge`** (struct) — Edge in the abstract graph connecting two entrance nodes with a cost.
-- **`AbstractNode`** (struct) — Entrance point on a chunk boundary with tile coordinates and chunk ID.
-- **`Chunk`** (struct) — Region of the grid with top-left position, dimensions, and entrance node indices.
-- **`AbstractGraph`** (struct) — Pre-computed abstract graph with nodes, adjacency edges, chunk map, and grid metadata.
-- **`build_abstract()`** (fn) — Build the abstract graph from a `NavGrid` by dividing into chunks, finding boundary entrances, and connecting intra-chunk entrances via local A★.
-- **`hpa_star()`** (fn) — Run HPA★ from start to goal: insert temporary nodes, search abstract graph, refine to tile-level path.
-- **`is_reachable()`** (fn) — Fast chunk-level BFS connectivity check.
+- **`AbstractEdge`** (struct): An edge in the abstract graph connecting two entrance nodes.
+- **`AbstractNode`** (struct): A node in the abstract graph, representing an entrance point on a chunk boundary.
+- **`Chunk`** (struct): A chunk region of the grid used during abstract graph construction.
+- **`AbstractGraph`** (struct): Pre-computed abstract graph for hierarchical A★ queries.
 
-### `pathfinding::influence_map`
+### `pathfind::influence_map`
 
-Multi-layer spatial float grid for strategic area analysis and influence mapping. Moved from `src/ai/influence_map.rs`; re-exported as `crate::ai::InfluenceMap` for backward compatibility.
+Stores and updates multi-layer spatial influence values for tactical or strategic reasoning.
 
-- **`InfluenceMap`** (struct) — Grid with fixed dimensions (`width × height`), configurable `cell_size`, and named float layers. Operations: `add_layer`, `set_influence`, `get_influence`, `stamp_influence` (circular with falloff), `propagate` (3×3 averaging), `decay`, `clear_layer`, `clear_all`, `max_position`, `min_position`, `query_rect`, `blend`.
+- **`InfluenceMap`** (struct): A multi-layer spatial float grid for influence mapping and strategic reasoning.
 
-### `pathfinding::nav_grid`
+### `pathfind::nav_grid`
 
-Primary navigation grid type used by A★, HPA★, flow fields, and unit pathfinding.
+Defines the main navigation grid with walkability, costs, diagonal rules, and thread-friendly snapshots.
 
-- **`DiagonalMode`** (enum) — `None` (4-dir), `Always` (8-dir), `NoCornerCut` (8-dir but diagonal blocked when adjacent cardinal is impassable). Parses from Lua strings via `from_lua_str`.
-- **`NavGrid`** (struct) — 2D u8 cost grid (0=blocked, 1-255=traversal cost). Supports `fill`, `fill_rect`, `load_from_bytes`, `save_to_bytes`, `set_chunk_size`, `set_diagonal_mode`, `neighbors`, `is_walkable` with unit footprint, `set_dirty`/`clear_dirty` for incremental HPA★ updates, and `snapshot()` for thread-safe cloning.
+- **`DiagonalMode`** (enum): Controls how diagonal movement is handled during pathfinding.
+- **`NavGrid`** (struct): A 2D grid of traversal costs used by pathfinding algorithms.
 
-### `pathfinding::pathgrid`
+### `pathfind::pathgrid`
 
-Legacy weighted grid from `ai/pathgrid` with `Cell` type and self-contained A★.
+Provides an alternate path grid with float costs and built-in path operations.
 
-- **`Cell`** (struct) — Grid cell with `walkable: bool` and `cost: f32` fields.
-- **`PathGrid`** (struct) — A★ navigation grid with world-space cell size. Methods: `find_path` (A★ with 8-dir corner-cut prevention, returns world-space waypoints), `find_path_smoothed` (greedy string-pulling), `cell_center`, `set_walkable`, `set_cost`, `get_cost`.
+- **`Cell`** (struct): Single cell of the navigation grid.
+- **`PathGrid`** (struct): A★ navigation grid.
 
-### `pathfinding::unit_pathfinder`
+### `pathfind::render`
 
-High-level pathfinder wrapping `NavGrid` with caching and convenience methods.
+Generates debug render output for grids, flow fields, and influence maps.
 
-- **`Waypoint`** (struct) — Tile-coordinate waypoint with `x: u32`, `y: u32`.
-- **`UnitPathfinder`** (struct) — Pathfinder with `find_path`, `find_path_smooth` (Theta★), `find_partial_path` (node limit), `find_nearest_walkable` (BFS), `is_reachable` (flood fill), `heuristic_distance`, `line_of_sight`, `get_path_length`, `get_path_cost`, and LRU cache management (`set_cache_enabled`, `clear_cache`, `get_cache_size`, `set_cache_max_size`).
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+### `pathfind::unit_pathfinder`
+
+Wraps pathfinding for unit-sized actors, including caching, partial paths, and nearest-walkable recovery.
+
+- **`Waypoint`** (struct): A waypoint along a computed path.
+- **`UnitPathfinder`** (struct): A pathfinder that operates on a shared `NavGrid` with optional result caching.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `pathfinding::ai_flow_field::FlowField`
+#### `NavGrid`
 
-BFS flow field that stores normalised direction vectors toward a goal. Each cell holds a direction `(f32, f32)` and a BFS distance `f32`. Operates on a simple `Vec<bool>` walkability array with 8-directional expansion. Construct with `new(width, height, walkable)`, set goal with `set_goal(gx, gy)`, query with `get_direction(x, y)` and `get_distance(x, y)`.
+The main navigation grid used by most search helpers, storing blocked cells, movement costs, and diagonal policy.
 
-#### `pathfinding::async_pool::PathThreadPool`
+#### `PathGrid`
 
-A pool of worker threads that process A★ pathfinding requests asynchronously. Each worker pulls requests from a shared MPSC channel, runs `astar::astar` on a `NavGrid` snapshot, and pushes results to a result channel. Supports pre- and post-computation cancellation checks. Construct with `new(thread_count)`, dispatch with `submit()`, collect with `poll()`.
+Alternate grid representation with float costs and built-in path utilities.
 
-#### `pathfinding::flow_field::FlowField`
+#### `Grid`
 
-Dijkstra-based flow field backed by a shared `Rc<RefCell<NavGrid>>`. Stores normalised direction vectors and integrated cost-to-target for every cell. Supports single-target `calculate()`, multi-target `calculate_multi()`, direction queries, angle queries, cost-to-target queries, and world-space velocity steering via `steer()`.
+Standalone generic grid type for search algorithms and support operations.
 
-#### `pathfinding::graph_path::ProvincePath`
+#### `FlowField`
 
-A path through an adjacency graph containing an ordered `Vec<u32>` of province IDs from start to goal and the accumulated `total_cost: f64`.
+Direction-field result that guides many agents toward a destination without separate full path storage per actor.
 
-#### `pathfinding::graph_path::ProvinceCostFn`
+#### `InfluenceMap`
 
-Configurable cost function for graph pathfinding. Fields: `default_cost: f64`, `province_costs: HashMap<u32, f64>` (per-province overrides), `tag_costs: HashMap<String, f64>` (edge tag costs), `blocked: HashSet<u32>` (impassable provinces). Returns `None` from `cost_for()` for blocked provinces.
+Multi-layer float grid for tactical influence, pressure, or ownership analysis.
 
-#### `pathfinding::grid::Grid`
+#### `UnitPathfinder`
 
-Standalone 2D pathfinding grid with per-cell `walkable: Vec<bool>` and `costs: Vec<f32>`. Provides `find_path_astar`, `find_path_dijkstra`, `find_path_bfs`, and `build_flow_field`. Includes inline unit tests.
+High-level wrapper that adapts pathfinding to unit radius, caching, partial paths, and recovery logic.
 
-#### `pathfinding::hpa::AbstractEdge`
+#### `PathThreadPool`
 
-An edge in the abstract HPA★ graph connecting two entrance nodes with a `cost: f32` representing tile-level distance through the chunk.
+Background worker pool for off-thread path requests.
 
-#### `pathfinding::hpa::AbstractNode`
+#### `AbstractGraph`
 
-An entrance point on a chunk boundary with tile coordinates `(x, y)` and the `chunk: (u32, u32)` it belongs to.
+Higher-level graph abstraction used by hierarchical pathfinding.
 
-#### `pathfinding::hpa::Chunk`
+#### `Cell`
 
-A chunk region with column/row indices, top-left tile position, dimensions, and a list of entrance node indices into the `AbstractGraph`.
+Core cell representation used by one of the grid variants.
 
-#### `pathfinding::hpa::AbstractGraph`
-
-Pre-computed abstract graph for HPA★. Contains `nodes: Vec<AbstractNode>`, `edges: Vec<Vec<AbstractEdge>>` (adjacency list), `chunks: HashMap<(u32,u32), Chunk>`, and grid metadata (width, height, chunk_size).
-
-#### `pathfinding::influence_map::InfluenceMap`
-
-Multi-layer spatial float grid for influence mapping and strategic AI reasoning. Grid has fixed dimensions with configurable `cell_size` in world units. Named float layers support stamping, propagation, decay, positional queries, rectangular queries, and weighted blending.
-
-#### `pathfinding::nav_grid::NavGrid`
-
-Primary 2D navigation grid with u8 per-cell costs (0=blocked, 1-255). Supports diagonal modes, HPA★ chunk sizing, dirty rect tracking for incremental updates, byte serialization, and thread-safe `snapshot()` cloning.
-
-#### `pathfinding::pathgrid::Cell`
-
-Single cell of the `PathGrid` with `walkable: bool` and `cost: f32` (default: walkable, cost 1.0).
-
-#### `pathfinding::pathgrid::PathGrid`
-
-A★ navigation grid with world-space `cell_size`. Cells stored row-major. Self-contained A★ with 8-directional movement and corner-cut prevention. Returns world-space `(f32, f32)` waypoints.
-
-#### `pathfinding::unit_pathfinder::Waypoint`
-
-A tile-coordinate waypoint with `x: u32` and `y: u32` (0-based). Derives `Copy`, `PartialEq`, `Eq`, `Hash`.
-
-#### `pathfinding::unit_pathfinder::UnitPathfinder`
-
-High-level pathfinder backed by a shared `Rc<RefCell<NavGrid>>`. Provides A★ with caching, Theta★ smoothing, partial path search, nearest-walkable BFS, flood-fill reachability, heuristic distance, and line-of-sight checks. LRU cache evicts oldest entries when exceeding `cache_max_size` (default 1024).
-
-### Enums
-
-#### `pathfinding::nav_grid::DiagonalMode`
-
-Controls how diagonal movement is handled. Variants:
-- `None` — 4-directional movement only.
-- `Always` — 8-directional; diagonals always allowed at cost √2.
-- `NoCornerCut` — 8-directional but diagonals blocked when either adjacent cardinal neighbour is impassable.
-
-**Type Aliases**: `PathResult` = `(u64, Option<Vec<(u32, u32)>>)` — A completed path result with request ID and optional path.
+---
 
 ## Lua API
 
-Exposed under `lurek.pathfinding.*` by `src/lua_api/pathfinding_api.rs`. All grid coordinates in the Lua API are **1-based**; the binding layer converts to/from 0-based internally.
+Exposed under `lurek.pathfind.*` by `src/lua_api/pathfind_api.rs`.
 
-### Constructor Functions
+### Module Functions
 
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `lurek.pathfinding.newNavGrid(w, h)` | `NavGrid` | Create a NavGrid with all cells walkable (cost 1) |
-| `lurek.pathfinding.newPathfinder(grid)` | `UnitPathfinder` | Create a UnitPathfinder backed by a NavGrid |
-| `lurek.pathfinding.newFlowField(grid)` | `FlowField` | Create a FlowField backed by a NavGrid |
-| `lurek.pathfinding.newPathGrid(w, h, cellSize)` | `PathGrid` | Create a PathGrid with per-cell cost and walkability |
-| `lurek.pathfinding.newPathFlowField(grid)` | `AiFlowField` | Create a BFS flow field from a PathGrid |
-| `lurek.pathfinding.setThreadCount(n)` | `nil` | Set background thread count (currently no-op) |
-| `lurek.pathfinding.getThreadCount()` | `integer` | Get background thread count (currently always 0) |
-| `lurek.pathfinding.newNavGridFromTileMap(tilemap, walkable)` | Creates a `NavGrid` from an existing `TileMap`, marking tiles as walkable based on the `walkable` predicate function. |
+| Function | Description |
+|----------|-------------|
+| `lurek.pathfind.newNavGrid` | Creates a new NavGrid with all cells walkable. |
+| `lurek.pathfind.newPathfinder` | Creates a new UnitPathfinder backed by a NavGrid. |
+| `lurek.pathfind.newFlowField` | Creates a new FlowField backed by a NavGrid. |
+| `lurek.pathfind.newPathGrid` | Creates a new PathGrid with per-cell cost and walkability. |
+| `lurek.pathfind.newPathFlowField` | Creates a new BFS flow field from a PathGrid. |
+| `lurek.pathfind.setThreadCount` | Sets the background pathfinding thread count (currently a no-op). |
+| `lurek.pathfind.getThreadCount` | Returns the background pathfinding thread count (currently always 0). |
+| `lurek.pathfind.newNavGridFromTileMap` | Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable). |
 
-### NavGrid Methods
+### `AiFlowField` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `grid:getWidth()` | `integer` | Grid width in cells |
-| `grid:getHeight()` | `integer` | Grid height in cells |
-| `grid:getDimensions()` | `integer, integer` | Width and height |
-| `grid:setCost(x, y, cost)` | `nil` | Set cell traversal cost (1-based) |
-| `grid:getCost(x, y)` | `integer` | Get cell traversal cost (1-based) |
-| `grid:setBlocked(x, y, blocked)` | `nil` | Block or unblock a cell |
-| `grid:isBlocked(x, y)` | `boolean` | Check if cell is blocked |
-| `grid:isWalkable(x, y, unitSize?)` | `boolean` | Check if unit footprint is walkable |
-| `grid:fill(cost)` | `nil` | Set every cell to cost |
-| `grid:fillRect(x, y, w, h, cost)` | `nil` | Set rectangular area to cost |
-| `grid:loadFromString(data)` | `nil` | Overwrite grid from raw byte string |
-| `grid:saveToString()` | `string` | Export grid as byte string |
-| `grid:setChunkSize(size)` | `nil` | Set HPA★ chunk size |
-| `grid:getChunkSize()` | `integer` | Get HPA★ chunk size |
-| `grid:rebuildAbstract()` | `nil` | Rebuild HPA★ abstract graph |
-| `grid:setDirty(x, y, w, h)` | `nil` | Record dirty rectangle |
-| `grid:clearDirty()` | `nil` | Clear dirty rectangles |
-| `grid:setDiagonalMode(mode)` | `nil` | Set diagonal mode ("none"/"always"/"nocornercut") |
-| `grid:getDiagonalMode()` | `string` | Get current diagonal mode |
+| Method | Description |
+|--------|-------------|
+| `aiflowfield:getWidth(...)` | Returns the grid width. |
+| `aiflowfield:getHeight(...)` | Returns the grid height. |
+| `aiflowfield:hasGoal(...)` | Returns true if a goal has been set. |
+| `aiflowfield:setGoal(...)` | Sets the goal cell and triggers BFS recomputation (1-based coordinates). |
+| `aiflowfield:getDirection(...)` | Returns the normalised direction toward the goal (1-based coordinates). |
+| `aiflowfield:getDistance(...)` | Returns the BFS distance to the goal (1-based coordinates). |
+| `aiflowfield:type(...)` | Returns the type name of this object. |
+| `aiflowfield:typeOf(...)` | Returns true if this object is of the given type. |
 
-### UnitPathfinder Methods
+### `FlowField` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `pf:findPath(x1, y1, x2, y2, unitSize?)` | `table?` | A★ path (array of `{x, y}`, 1-based) |
-| `pf:findPathSmooth(x1, y1, x2, y2, unitSize?)` | `table?` | Theta★ smoothed path |
-| `pf:getPathLength(path)` | `number` | Euclidean length of a path table |
-| `pf:getPathCost(path)` | `number` | Sum of grid traversal costs along path |
-| `pf:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize?)` | `table, boolean` | Partial path with completion flag |
-| `pf:findNearestWalkable(x, y, maxRadius, unitSize?)` | `integer?, integer?` | Nearest walkable cell via BFS |
-| `pf:isReachable(x1, y1, x2, y2, unitSize?)` | `boolean` | Flood-fill connectivity check |
-| `pf:heuristicDistance(x1, y1, x2, y2)` | `number` | Octile heuristic distance |
-| `pf:lineOfSight(x1, y1, x2, y2, unitSize?)` | `boolean` | Bresenham line-of-sight check |
-| `pf:setCacheEnabled(enabled)` | `nil` | Enable/disable path caching |
-| `pf:isCacheEnabled()` | `boolean` | Check if caching is enabled |
-| `pf:clearCache()` | `nil` | Clear all cached paths |
-| `pf:getCacheSize()` | `integer` | Number of cached entries |
-| `pf:setCacheMaxSize(n)` | `nil` | Set max cache entries |
+| Method | Description |
+|--------|-------------|
+| `flowfield:getDirection(...)` | Returns the normalised direction vector at a cell (1-based coordinates). |
+| `flowfield:getDirectionAngle(...)` | Returns the flow direction as an angle in radians (1-based coordinates). |
+| `flowfield:getCostToTarget(...)` | Returns the integrated cost to the nearest target (1-based coordinates). |
+| `flowfield:isCalculated(...)` | Returns true if the flow field has been computed at least once. |
+| `flowfield:getTargets(...)` | Returns the target cells from the most recent computation (1-based coordinates). |
+| `flowfield:type(...)` | Returns the type name of this object. |
+| `flowfield:typeOf(...)` | Returns true if this object is of the given type. |
 
-### FlowField Methods
+### `NavGrid` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `ff:calculate(tx, ty, unitSize?)` | `nil` | Compute flow toward single target |
-| `ff:calculateMulti(targets, unitSize?)` | `nil` | Compute flow toward multiple targets |
-| `ff:getDirection(x, y)` | `number, number` | Normalised direction at cell |
-| `ff:getDirectionAngle(x, y)` | `number` | Direction as angle in radians |
-| `ff:getCostToTarget(x, y)` | `number` | Integrated cost to nearest target |
-| `ff:isCalculated()` | `boolean` | Whether field has been computed |
-| `ff:getTargets()` | `table` | Target cells from last computation |
-| `ff:steer(wx, wy, speed, tw, th)` | `number, number` | World-space velocity vector |
+| Method | Description |
+|--------|-------------|
+| `navgrid:getWidth(...)` | Returns the grid width in cells. |
+| `navgrid:getHeight(...)` | Returns the grid height in cells. |
+| `navgrid:getDimensions(...)` | Returns the grid dimensions as width, height. |
+| `navgrid:setCost(...)` | Sets the traversal cost of a cell (1-based coordinates). |
+| `navgrid:getCost(...)` | Returns the traversal cost of a cell (1-based coordinates). |
+| `navgrid:isBlocked(...)` | Returns true if the cell is blocked (1-based coordinates). |
+| `navgrid:fill(...)` | Sets every cell to the given cost. |
+| `navgrid:loadFromString(...)` | Overwrites the grid from a raw byte string (row-major, one byte per cell). |
+| `navgrid:saveToString(...)` | Exports the cost grid as a byte string (row-major, one byte per cell). |
+| `navgrid:setChunkSize(...)` | Sets the HPA★ chunk size. |
+| `navgrid:getChunkSize(...)` | Returns the current HPA★ chunk size. |
+| `navgrid:rebuildAbstract(...)` | Rebuilds the HPA★ abstract graph from the current grid state. |
+| `navgrid:setDirty(...)` | Records a dirty rectangle for incremental HPA★ updates (1-based coordinates). |
+| `navgrid:clearDirty(...)` | Clears all pending dirty rectangles. |
+| `navgrid:setDiagonalMode(...)` | Sets the diagonal movement mode. |
+| `navgrid:getDiagonalMode(...)` | Returns the current diagonal movement mode as a string. |
+| `navgrid:type(...)` | Returns the type name of this object. |
+| `navgrid:typeOf(...)` | Returns true if this object is of the given type. |
 
-### PathGrid Methods
+### `PathGrid` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `pg:getWidth()` | `integer` | Grid width |
-| `pg:getHeight()` | `integer` | Grid height |
-| `pg:getCellSize()` | `number` | World-space cell size |
-| `pg:setWalkable(x, y, walkable)` | `nil` | Set cell walkability |
-| `pg:isWalkable(x, y)` | `boolean` | Check cell walkability |
-| `pg:setCost(x, y, cost)` | `nil` | Set cell cost multiplier |
-| `pg:getCost(x, y)` | `number` | Get cell cost multiplier |
-| `pg:findPath(sx, sy, gx, gy)` | `table?` | A★ path (world-space waypoints) |
-| `pg:findPathSmoothed(sx, sy, gx, gy)` | `table?` | String-pulled A★ path |
+| Method | Description |
+|--------|-------------|
+| `pathgrid:getWidth(...)` | Returns the grid width in cells. |
+| `pathgrid:getHeight(...)` | Returns the grid height in cells. |
+| `pathgrid:getCellSize(...)` | Returns the world-space size of each cell. |
+| `pathgrid:setWalkable(...)` | Sets the walkability of a cell (1-based coordinates). |
+| `pathgrid:isWalkable(...)` | Returns true if a cell is walkable (1-based coordinates). |
+| `pathgrid:setCost(...)` | Sets the cost multiplier for a cell (1-based coordinates). |
+| `pathgrid:getCost(...)` | Returns the cost multiplier for a cell (1-based coordinates). |
+| `pathgrid:type(...)` | Returns the type name of this object. |
+| `pathgrid:typeOf(...)` | Returns true if this object is of the given type. |
 
-### AiFlowField Methods
+### `UnitPathfinder` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `aff:getWidth()` | `integer` | Grid width |
-| `aff:getHeight()` | `integer` | Grid height |
-| `aff:hasGoal()` | `boolean` | Whether a goal is set |
-| `aff:setGoal(x, y)` | `nil` | Set goal and trigger recomputation |
-| `aff:getGoal()` | `integer?, integer?` | Current goal or nil |
-| `aff:getDirection(x, y)` | `number, number` | Direction toward goal |
-| `aff:getDistance(x, y)` | `number` | BFS distance to goal |
+| Method | Description |
+|--------|-------------|
+| `unitpathfinder:getPathLength(...)` | Returns the euclidean length of a path table. |
+| `unitpathfinder:getPathCost(...)` | Returns the sum of grid traversal costs along a path. |
+| `unitpathfinder:setCacheEnabled(...)` | Enables or disables path result caching. |
+| `unitpathfinder:isCacheEnabled(...)` | Returns true if path result caching is enabled. |
+| `unitpathfinder:clearCache(...)` | Removes all cached path results. |
+| `unitpathfinder:getCacheSize(...)` | Returns the number of entries in the path cache. |
+| `unitpathfinder:setCacheMaxSize(...)` | Sets the maximum number of cached path entries. |
+| `unitpathfinder:type(...)` | Returns the type name of this object. |
+| `unitpathfinder:typeOf(...)` | Returns true if this object is of the given type. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- Basic A★ pathfinding with NavGrid + UnitPathfinder
-function lurek.init()
-    -- Create a 40x30 navigation grid (1-based in Lua)
-    grid = lurek.pathfinding.newNavGrid(40, 30)
-
-    -- Block a wall of cells
-    for x = 10, 20 do
-        grid:setBlocked(x, 15, true)
-    end
-
-    -- Set diagonal mode (default is "nocornercut")
-    grid:setDiagonalMode("nocornercut")
-
-    -- Create a unit pathfinder backed by the grid
-    pathfinder = lurek.pathfinding.newPathfinder(grid)
-
-    -- Find a path from (1,1) to (38,28)
-    path = pathfinder:findPath(1, 1, 38, 28)
-    if path then
-        print("Path found with " .. #path .. " waypoints")
-        -- Each waypoint is { x = ..., y = ... } (1-based)
-        for _, wp in ipairs(path) do
-            print("  -> (" .. wp.x .. ", " .. wp.y .. ")")
-        end
-    end
-
-    -- Smoothed path using Theta★ line-of-sight
-    smooth = pathfinder:findPathSmooth(1, 1, 38, 28)
-    if smooth then
-        print("Smooth path: " .. #smooth .. " waypoints")
-    end
+-- Minimal namespace check for lurek.pathfind.
+if lurek.pathfind then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Flow field for crowd steering
-function lurek.init()
-    grid = lurek.pathfinding.newNavGrid(50, 50)
-    flow = lurek.pathfinding.newFlowField(grid)
-
-    -- Compute flow toward cell (25, 25)
-    flow:calculate(25, 25)
-end
-
-function lurek.process(dt)
-    if flow:isCalculated() then
-        -- Steer a unit at world position toward the target
-        local vx, vy = flow:steer(unit_x, unit_y, 100, 32, 32)
-        unit_x = unit_x + vx * dt
-        unit_y = unit_y + vy * dt
-    end
-end
-```
-
-```lua
--- PathGrid with per-cell costs and path smoothing
-function lurek.init()
-    local pg = lurek.pathfinding.newPathGrid(20, 20, 32)
-
-    -- Create a swamp region with higher cost
-    for x = 5, 10 do
-        for y = 5, 10 do
-            pg:setCost(x, y, 3.0)
-        end
-    end
-
-    -- Block a wall
-    for x = 12, 12 do
-        for y = 1, 15 do
-            pg:setWalkable(x, y, false)
-        end
-    end
-
-    local path = pg:findPathSmoothed(1, 1, 20, 20)
-    if path then
-        print("Smoothed path with " .. #path .. " points")
-    end
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count |
-|------------|-------|
-| `struct`   | 16    |
-| `enum`     | 1     |
-| `type`     | 1     |
-| `pub fn`   | 8     |
-| **Total**  | **26** |
+| Kind | Count |
+|------|-------|
+| `struct` | 16 |
+| `enum` | 1 |
+| `fn` (Lua API) | 59 |
+| **Total** | **76** |
+
+---
 
 ## References
 
-| Module      | Relationship | Notes                                                          |
-|-------------|--------------|----------------------------------------------------------------|
-| `engine`    | Imports from | Uses log messages from `log_messages` module                   |
-| `math`      | Imports from | `Vec2`, `Rect` for grid coordinates (indirect usage)           |
-| `ai`        | Related      | `InfluenceMap` moved from `ai/`; re-exported for backward compatibility. `ai` module uses pathfinding for movement. |
-| `tilemap`   | Related      | Tilemaps commonly provide the walkability grid for pathfinding  |
-| `lua_api`   | Imported by  | `src/lua_api/pathfinding_api.rs` registers `lurek.pathfinding.*` |
-| `thread`    | Related      | `PathThreadPool` uses `std::thread` directly (not `thread` module); background pathfinding concept aligns with `lurek.thread` |
-| `graph`     | Similar      | `graph` module provides generic directed graphs; `graph_path.rs` provides A★/Dijkstra over adjacency maps specifically for navigation |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
+
+---
 
 ## Notes
 
-- **1-based Lua coordinates**: All Lua API coordinates are 1-based. The binding layer in `pathfinding_api.rs` subtracts 1 on input and adds 1 on output. Forgetting this conversion causes off-by-one pathfinding failures.
-- **NavGrid cost semantics**: Cost `0` means blocked, `1`–`255` are traversal costs. This is a `u8` grid — no floating-point costs. Use `PathGrid` if you need `f32` costs.
-- **Three grid types**: `NavGrid` (primary, u8 cost, used by A★/HPA★/FlowField/UnitPathfinder), `PathGrid` (legacy, f32 cost, self-contained A★), `Grid` (standalone, f32 cost, A★/Dijkstra/BFS/flow field). New code should prefer `NavGrid` + `UnitPathfinder`.
-- **HPA★ graph must be rebuilt**: After modifying the `NavGrid`, call `grid:rebuildAbstract()` before HPA★ queries. Dirty rects are tracked but incremental updating is not yet implemented.
-- **Thread pool uses NavGrid snapshots**: `PathThreadPool.submit()` requires a `NavGrid::snapshot()` clone because workers run on separate threads. The main-thread `NavGrid` can be modified while workers are computing.
-- **Cache invalidation**: `UnitPathfinder` caches path results keyed by `(start, goal, unit_size)`. If the grid changes, call `pf:clearCache()` to avoid stale paths.
-- **InfluenceMap provenance**: Moved from `src/ai/influence_map.rs` to `src/pathfinding/influence_map.rs`. A re-export `crate::ai::InfluenceMap` exists for backward compatibility.
-- **setThreadCount/getThreadCount**: Currently no-ops in the Lua API. The `PathThreadPool` Rust type is functional but not yet exposed to Lua beyond these stubs.
-- **Breaking change surface**: Renaming NavGrid methods, changing coordinate conventions (0-based vs 1-based), or altering the `DiagonalMode` enum variants would break existing Lua scripts using `lurek.pathfinding.*`.
+- **Source of truth**: Keep this spec synchronized with `src/pathfind/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

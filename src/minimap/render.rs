@@ -169,13 +169,15 @@ mod tests {
     fn empty_minimap_emits_background() {
         let map = Minimap::new(10, 10, 100, 100);
         let cmds = map.generate_render_commands(0.0, 0.0);
+        assert!(!cmds.is_empty(), "expected at least a background rectangle");
         assert!(
-            !cmds.is_empty(),
-            "expected at least a background rectangle"
-        );
-        assert!(
-            cmds.iter()
-                .any(|c| matches!(c, RenderCommand::Rectangle { mode: DrawMode::Fill, .. })),
+            cmds.iter().any(|c| matches!(
+                c,
+                RenderCommand::Rectangle {
+                    mode: DrawMode::Fill,
+                    ..
+                }
+            )),
             "expected a Fill rectangle for background"
         );
     }
@@ -185,7 +187,9 @@ mod tests {
         let map = Minimap::new(8, 8, 80, 80);
         let cmds = map.generate_render_commands(0.0, 0.0);
         assert!(
-            !cmds.iter().any(|c| matches!(c, RenderCommand::Circle { .. })),
+            !cmds
+                .iter()
+                .any(|c| matches!(c, RenderCommand::Circle { .. })),
             "expected no Circle commands when there are no pings"
         );
     }
@@ -196,7 +200,8 @@ mod tests {
         map.add_ping(4.0, 4.0, 1.0, [1.0, 0.0, 0.0, 1.0]);
         let cmds = map.generate_render_commands(0.0, 0.0);
         assert!(
-            cmds.iter().any(|c| matches!(c, RenderCommand::Circle { .. })),
+            cmds.iter()
+                .any(|c| matches!(c, RenderCommand::Circle { .. })),
             "expected a Circle command for the ping"
         );
     }
@@ -207,8 +212,13 @@ mod tests {
         map.set_viewport_rect(2.0, 2.0, 4.0, 4.0);
         let cmds = map.generate_render_commands(0.0, 0.0);
         assert!(
-            cmds.iter()
-                .any(|c| matches!(c, RenderCommand::Rectangle { mode: DrawMode::Line, .. })),
+            cmds.iter().any(|c| matches!(
+                c,
+                RenderCommand::Rectangle {
+                    mode: DrawMode::Line,
+                    ..
+                }
+            )),
             "expected a Line rectangle for the viewport overlay"
         );
     }

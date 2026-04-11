@@ -1,49 +1,33 @@
-# `animation` � Agent Reference
+﻿# animation - Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 � Core Engine Subsystems                      |
-| **Status**     | Implemented � Full                                   |
-| **Lua API**    | `lurek.animation`                                     |
-| **Source**     | `src/animation/`                                     |
-| **Rust Tests** | `tests/rust/unit/animation_tests.rs`                 |
-| **Lua Tests**  | `tests/lua/unit/test_animation.lua`                  |
-| **Architecture** | �                                                  |
+## Module Info
 
-## Purpose
+- Module: animation
+- Group: Feature Systems
+- Spec: docs/specs/animation.md
+- Lua API: src/lua_api/animation_api.rs
+- Rust tests: tests/rust/unit/animation_tests.rs
+- Lua tests: tests/lua/unit/test_animation.lua, tests/lua/stress/test_animation_stress.lua, tests/lua/integration/test_tween_animation.lua, tests/lua/integration/test_graphics_animation.lua, tests/lua/integration/test_animation_timer.lua, tests/lua/golden/test_animation_golden.lua
 
-The `animation` module provides frame-based sprite animation for 2D characters and objects. It is a Tier 1 Engine Subsystem that depends only on `crate::math` (for `Rect`) and `crate::engine` (for structured log messages).
+## Module Purpose
 
-## Source Files
+The animation module owns frame-based sprite playback. It stores reusable frame definitions, named clips, playback state, speed control, and emitted animation events while staying independent from scene ownership, textures, and gameplay rules.
 
-| File            | Purpose                                                                  |
-|-----------------|--------------------------------------------------------------------------|
-| `mod.rs`        | Module root — declares submodules and re-exports `AnimClip`, `Animation`, `AnimEvent`, `AnimFrame`, `AnimationFrame`, `AnimRenderParams`. |
-| `clip.rs`       | `AnimClip` — a named animation clip with frame indices, FPS, and loop flag. |
-| `controller.rs` | `Animation` — the main playback controller with frame pool, clip registry, update loop, and event queue. |
-| `event.rs`      | `AnimEvent` — enum of playback events (`Finished`, `FrameChanged`, `Looped`). |
-| `frame.rs`      | `AnimFrame` — a single frame with a source rectangle and optional duration override. Also defines `AnimationFrame` type alias. |
-| `render.rs`     | `AnimRenderParams` struct and `generate_render_command()` on `Animation`; converts current frame quad into `DrawQuad` render command. |
+This module exists to answer one narrow question well: given frames and clips, which frame should be active now and what events should fire as playback advances. Rendering integration lives in helper methods that turn the current frame into render-command data, but the module does not own GPU work, sprite assets, or non-frame-based animation systems such as tweening or skeletal animation.
 
-> **Note:** `draw_to_image()` for `Animation` lives in `src/image/visualization.rs` as the free function `draw_animation_to_image(anim, width, height)`. `Animation` cannot import `crate::image` directly because `image::visualization` already imports `crate::animation`, which would create a circular dependency.
+## Files
+
+- mod.rs: Declares the animation submodules and re-exports the public frame, clip, controller, event, and render parameter types.
+- clip.rs: Defines AnimClip, the named sequence of frame indices with clip FPS and looping behavior.
+- controller.rs: Defines Animation, the main playback controller for frames, clips, speed, current state, and pending events.
+- event.rs: Defines AnimEvent, the event enum emitted for frame changes, loops, and completion.
+- frame.rs: Defines AnimFrame plus the AnimationFrame compatibility alias.
+- render.rs: Converts the current animation frame into renderer-facing DrawQuad command data.
 
 ## Key Types
-| Type | Location | Purpose |
-|------|----------|---------|
-| \Animation\ | \src/animation/mod.rs\ | Top-level animation player managing playback state |
-| \AnimClip\ | \src/animation/mod.rs\ | Named sequence of frames with duration and loop settings |
-| \AnimFrame\ | \src/animation/mod.rs\ | Single keyframe: sprite region, duration, flip, pivot |
-| \AnimEvent\ | \src/animation/mod.rs\ | Named event triggered at a specific frame |
 
-## Lua API Summary
-| Function | Signature | Purpose |
-|----------|-----------|---------|
-| \lurek.animation.new\ | \(clip_table: table) → Animation\ | Create an animation from a clip definition |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-� [`docs/specs/animation.md`](../../docs/specs/animation.md)
-
-_Update both this file **and** `docs/specs/animation.md` whenever source files, public types, or Lua bindings change._
+- Animation: Main playback controller that owns frames, clips, speed, timers, and pending events.
+- AnimClip: Named ordered frame sequence with clip-local FPS and looping configuration.
+- AnimFrame: One source rectangle plus an optional per-frame duration override.
+- AnimEvent: Playback event enum used to report frame changes, loops, and finished clips.
+- AnimRenderParams: Caller-supplied texture and transform bundle used when generating render commands.

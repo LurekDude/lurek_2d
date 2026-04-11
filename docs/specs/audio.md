@@ -1,427 +1,408 @@
 # `audio` — Agent Reference
 
-| Property       | Value                                                                    |
-|----------------|--------------------------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                                          |
-| **Status**     | Implemented — Full                                                       |
-| **Lua API**    | `lurek.audio`                                                             |
-| **Source**     | `src/audio/`                                                             |
+| Property | Value |
+|----------|-------|
+| **Tier** | Platform Services |
+| **Status** | Implemented |
+| **Lua API** | `lurek.audio` |
+| **Source** | `src/audio/` |
 | **Rust Tests** | `tests/rust/unit/audio_tests.rs`, `tests/rust/unit/audio_sound_tests.rs` |
-| **Lua Tests**  | `tests/lua/unit/test_audio.lua`, `tests/lua/unit/test_audio_dsp.lua`, `tests/lua/unit/test_audio_bus.lua` |
-| **Architecture** | —                                                                      |
+| **Lua Tests** | `tests/lua/unit/test_audio.lua`, `tests/lua/unit/test_audio_bus.lua`, `tests/lua/unit/test_audio_dsp.lua`, `tests/lua/integration/test_audio_timer.lua`, `tests/lua/integration/test_audio_event.lua`, `tests/lua/evidence/test_evidence_audio.lua`, `tests/lua/evidence/test_evidence_audio_bus.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Platform Services` |
+
+---
 
 ## Summary
 
-The audio module wraps `rodio` into a game-oriented mixing layer. It decodes WAV, OGG Vorbis, FLAC, and MP3 files into static (in-memory) or streaming sources stored in a `SlotMap<SoundKey>`. Per-source playback controls cover volume, pitch, looping, fade in/out, seek, and 2D spatial panning. Real-time DSP (lowpass, highpass, bandpass, reverb, chorus) is applied via a lock-free `DynamicEffectSource` chain on the audio thread. Named buses group sources for batch volume/pitch control.
+The audio module is Lurek2D's playback and mixing backend. It owns sound loading and decoding, per-source playback state, bus routing, master volume, spatial audio state, queueable PCM playback, and the DSP chain used to apply filters and other real-time effects to audio sources and buses.
 
-`MidiPlayer` synthesises MIDI to PCM at 44100 Hz with per-channel mute and tempo scaling. `Decoder` provides chunked PCM streaming; `QueueableSource` lets game code push raw PCM buffers; `SoundData` stores decoded f32 samples for procedural audio from Lua. Falls back gracefully to headless mode when no audio device is available.
+This module exists so gameplay code can treat sound as engine-managed resources instead of juggling raw backend handles. `Mixer` is the operational center, `Bus` provides grouped control over multiple sources, `SoundData` exposes editable PCM data to Lua, and the DSP types make effect updates safe to push from the main thread while playback continues on the audio thread.
+
+It intentionally does not own filesystem sandboxing, frame timing, or scripting registration. Audio files still come through `filesystem`, the app loop decides when scripts call playback functions, and `src/lua_api/audio_api.rs` decides how the audio surface is exposed to Lua. It also does not currently provide a full multi-device backend or a finished MIDI pipeline; MIDI support is partially present in code but currently constrained by missing parsing dependencies.
+
+**Scope boundary**: This module currently depends on `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-Mixer (central audio manager)
-  │
-  ├── Sources ─── SlotMap<SoundKey, AudioEntry>
-  │     ├── Static ── entire file decoded into Arc<Vec<u8>> (low-latency SFX)
-  │     └── Stream ── opened fresh from disk on each play (low-memory music)
-  │
-  ├── Playback control (per-source)
-  │     ├── play / pause / resume / stop
-  │     ├── set_volume / set_pitch / set_pan / set_looping
-  │     ├── fade_in (linear ramp over duration)
-  │     ├── seek (rebuilds sink with skip_duration)
-  │     ├── clone_source (Arc sharing of decoded data)
-  │     └── spatial: position / velocity / orientation → auto-pan
-  │
-  ├── Bus routing ─── SlotMap<BusKey, Bus>
-  │     ├── Bus { name, volume, pitch, paused, effects }
-  │     └── DSP effect chain via SharedEffectGraph
-  │           ├── Lowpass / Highpass / Bandpass (biquad)
-  │           ├── Reverb (comb-filter)
-  │           └── Chorus (short-delay comb)
-  │
-  ├── Queueable sources ─── SlotMap<QueueableKey, QueueableSource>
-  │     └── Manual PCM buffering for procedural audio
-  │
-  ├── Spatial audio
-  │     ├── Listener position / orientation / velocity
-  │     ├── Per-source position / velocity / orientation
-  │     ├── Doppler scale
-  │     └── Distance attenuation model
-  │
-  ├── Master volume ── global scalar on all output
-  │
-  └── MidiPlayer ─── sine-additive PCM synthesis
-        ├── Per-track/channel mute, solo, volume, instrument
-        ├── Tempo changes (scale + BPM)
-        ├── Looping and bus routing
-        └── Real-time rendering at 44100 Hz
-
-Decoder ─── chunked streaming PCM reader
-  └── from_file → decode() chunks → SoundData
-
-SoundData ─── decoded f32 PCM buffer (UserData)
-  └── per-sample get/set, duration, channel info
+lurek.audio.* (Lua API — src/lua_api/audio_api.rs)
+    |
+    v
+src/audio/mod.rs
+    |- bus.rs - bus
+    |- decoder.rs - decoder
+    |- dsp.rs - dsp
+    |- midi.rs - midi
+    |- midi_player.rs - midi_player
+    |- mixer.rs - mixer
+    |- sound_data.rs - sound_data
+    |- source.rs - source
+    |- ...
 ```
+
+---
 
 ## Source Files
 
-| File             | Purpose                                                                              |
-|------------------|--------------------------------------------------------------------------------------|
-| `bus.rs`         | Named audio bus with shared volume, pitch, pause, and DSP effect chain               |
-| `decoder.rs`     | Streaming audio decoder for chunked PCM reading from disk                            |
-| `dsp.rs`         | DSP effect chain: AtomicParam, EffectType, EffectParams, ActiveEffect, DynamicEffectSource |
-| `midi.rs`        | MIDI SoundFont state management (SF2 validation and storage)                         |
-| `midi_player.rs` | Software MIDI synthesizer with sine-additive PCM rendering via rodio Sink            |
-| `mixer.rs`       | Core audio mixer: source loading, playback control, bus routing, spatial audio, queueable sources |
-| `sound_data.rs`  | Decoded PCM sample buffer with per-sample read/write access (Lua UserData)           |
-| `source.rs`      | AudioSource handle (legacy shim) and SpatialState for 3D positioning                 |
-| `mod.rs` | — |
+| File | Purpose |
+|------|---------|
+| `bus.rs` | Named audio bus for grouping sources under shared volume, pitch, and pause controls. |
+| `decoder.rs` | Streaming audio decoder for chunked PCM reading. |
+| `dsp.rs` | Digital signal processing effects for the Lurek2D audio pipeline. |
+| `midi.rs` | MIDI SoundFont state management. |
+| `midi_player.rs` | Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM via sine-additive synthesis, and plays through a rodio `Sink`. |
+| `mixer.rs` | Core audio mixer that owns every loaded sound and drives playback through rodio. |
+| `mod.rs` | Audio subsystem for Lurek2D games. |
+| `sound_data.rs` | Decoded PCM audio sample buffer with per-sample read/write access. |
+| `source.rs` | Audio source type and playback state enums for the audio subsystem. |
+
+---
 
 ## Submodules
 
 ### `audio::bus`
 
-Named audio bus for grouping sources under shared volume, pitch, and pause controls. Buses hold a thread-safe DSP effect chain via `Arc<RwLock<Vec<Arc<EffectParams>>>>`.
+Named audio bus for grouping sources under shared volume, pitch, and pause controls.
 
-- **`Bus`** (struct) — A named audio bus applying volume, pitch, and pause overrides to all assigned sources. Pure data container; the Mixer multiplies source values by bus values.
+- **`Bus`** (struct): A named audio bus that applies volume, pitch, and pause overrides to all sources assigned to it.
 
 ### `audio::decoder`
 
-Streaming audio decoder that reads PCM in fixed-size chunks. Eagerly reads the full file on construction, then serves chunks of configurable size on each `decode()` call.
+Streaming audio decoder for chunked PCM reading.
 
-- **`Decoder`** (struct) — Chunked PCM decoder with seek, tell, rewind, and duration queries.
+- **`Decoder`** (struct): Streaming audio decoder that reads PCM in fixed-size chunks.
 
 ### `audio::dsp`
 
-Real-time DSP effect processing for the audio pipeline. Effects are configured on the main thread via lock-free `AtomicParam` values and applied on the audio thread inside `DynamicEffectSource`.
+Digital signal processing effects for the Lurek2D audio pipeline.
 
-- **`AtomicParam`** (struct) — Thread-safe atomic f32 parameter backed by AtomicU32 bit-cast.
-- **`EffectType`** (enum) — DSP effect category: Lowpass, Highpass, Bandpass, Reverb, Chorus.
-- **`EffectParams`** (struct) — Shared configuration for a single DSP effect slot with atomic parameters.
-- **`ActiveEffect`** (struct) — Per-stream instantiation of an EffectParams slot holding biquad filter history and comb-filter delay buffer.
-- **`SharedEffectGraph`** (struct) — Thread-safe graph of active DSP effects shared between main and audio threads.
-- **`DynamicEffectSource<I>`** (struct) — A rodio Source wrapper that applies a dynamic chain of DSP effects to an inner audio source.
+- **`AtomicParam`** (struct): Thread-safe atomic `f32` parameter backed by an `AtomicU32` bit-cast.
+- **`EffectType`** (enum): Category of DSP audio effect applied to a sound source.
+- **`EffectParams`** (struct): Shared configuration for a single DSP effect slot.
+- **`ActiveEffect`** (struct): Per-stream instantiation of an `EffectParams` slot, holding the filter state for a single audio stream.
+- **`SharedEffectGraph`** (struct): Shared, thread-safe graph of active DSP effects owned by a sound source.
+- **`DynamicEffectSource`** (struct): A rodio `Source` wrapper that applies a dynamic chain of DSP effects to an inner audio source.
 
 ### `audio::midi`
 
-MIDI SoundFont state management. Tracks whether a SoundFont (SF2) file has been loaded and stores its raw bytes.
+MIDI SoundFont state management.
 
-- **`MidiState`** (struct) — Stores optional SF2 data with RIFF header validation.
+- **`MidiState`** (struct): MIDI SoundFont state.
 
 ### `audio::midi_player`
 
-Software MIDI synthesizer. Parses MIDI via `midly`, renders all tracks to a PCM buffer, and plays through a rodio Sink. Currently disabled at the crate level (midly removed from Cargo.toml).
+Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM via sine-additive synthesis, and plays through a rodio `Sink`.
 
-- **`MidiData`** (struct) — Pre-parsed MIDI metadata: duration, ticks per beat, tempo, track names, note count, channel count.
-- **`MidiPlayer`** (struct) — Full MIDI player with per-channel volume, muting, solo, track muting, tempo scaling, looping, and bus routing.
+- **`MidiData`** (struct): Pre-parsed MIDI metadata extracted during `load()`.
+- **`MidiPlayer`** (struct): Software MIDI player with sine-additive synthesis.
 
 ### `audio::mixer`
 
-Core audio mixer that owns every loaded sound and drives playback through rodio. Single point of entry for all audio operations.
+Core audio mixer that owns every loaded sound and drives playback through rodio.
 
-- **`SourceType`** (enum) — Static (decoded to memory) or Stream (decoded on-the-fly from disk).
-- **`PlayState`** (enum) — Stopped, Playing, or Paused.
-- **`QueueableSource`** (struct) — Manually-fed streaming audio source with a FIFO buffer queue for raw f32 PCM data.
-- **`Mixer`** (struct) — Central audio manager: source SlotMap, bus SlotMap, queueable SlotMap, master volume, spatial listener state, rodio output stream.
+- **`SourceType`** (enum): Type of audio source.
+- **`PlayState`** (enum): Playback state of an audio source.
+- **`QueueableSource`** (struct): A manually-fed streaming audio source that accepts raw f32 PCM data pushed buffer-by-buffer.
+- **`Mixer`** (struct): The `Mixer` is the single point of entry for all audio operations in Lurek2D.
 
 ### `audio::sound_data`
 
-Decoded PCM audio sample buffer with per-sample read/write access. Implements `mlua::UserData` for direct Lua access.
+Decoded PCM audio sample buffer with per-sample read/write access.
 
-- **`SoundData`** (struct) — Interleaved f32 PCM samples clamped to [-1.0, 1.0], with metadata (sample rate, channels, bit depth).
+- **`SoundData`** (struct): Decoded audio samples in f32 PCM format.
 
 ### `audio::source`
 
-Audio source handle and spatial state types.
+Audio source type and playback state enums for the audio subsystem.
 
-- **`SpatialState`** (struct) — 3D position, velocity, and orientation for spatial audio panning.
-- **`AudioSource`** (struct) — Legacy handle for a loaded audio asset (superseded by Mixer's SlotMap, kept for API compatibility).
+- **`SpatialState`** (struct): 3D spatial audio state for an audio source.
+- **`AudioSource`** (struct): Handle for a loaded audio asset (legacy compatibility shim).
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `audio::bus::Bus`
+#### `Bus`
 
-A named audio bus that applies volume, pitch, and pause overrides to all sources assigned to it. Buses are pure data containers — the Mixer multiplies source volume/pitch by bus values. Holds a thread-safe DSP effect chain via `Arc<RwLock<Vec<Arc<EffectParams>>>>`. Methods: `new()`, `name()`, `volume()`, `set_volume()`, `pitch()`, `set_pitch()`, `pause()`, `resume()`, `is_paused()`.
+A named audio bus that applies volume, pitch, and pause overrides to all sources assigned to it.
 
-#### `audio::decoder::Decoder`
+#### `Decoder`
 
-Streaming audio decoder that reads PCM in fixed-size buffer chunks. Eagerly decodes the full file on construction via rodio, then serves chunks on each `decode()` call. Fields: `path`, `sample_rate`, `channels`, `bit_depth`, `buffer_size`. Methods: `from_file()`, `decode()`, `get_duration()`, `seek()`, `tell()`, `is_seekable()`, `rewind()`.
+Streaming audio decoder that reads PCM in fixed-size chunks.
 
-#### `audio::dsp::AtomicParam`
+#### `AtomicParam`
 
-Thread-safe atomic f32 parameter backed by an AtomicU32 bit-cast. Enables lock-free reads and writes across the audio thread and the main engine thread. Methods: `new()`, `get()`, `set()`.
+Thread-safe atomic `f32` parameter backed by an `AtomicU32` bit-cast.
 
-#### `audio::dsp::EffectParams`
+#### `EffectType`
 
-Shared configuration for a single DSP effect slot. Contains the effect type and three atomic parameters (p1: cutoff/room_size, p2: center/mix, p3: reserved). Shared between threads via `Arc<EffectParams>`.
+Category of DSP audio effect applied to a sound source.
 
-#### `audio::dsp::ActiveEffect`
+#### `EffectParams`
 
-Per-stream instantiation of an EffectParams slot. Owns biquad filter history (x1/x2/y1/y2 for two channels) and the comb-filter delay buffer used by reverb and chorus effects. Methods: `new()`, `process()`.
+Shared configuration for a single DSP effect slot.
 
-#### `audio::dsp::SharedEffectGraph`
+#### `ActiveEffect`
 
-Thread-safe graph of active DSP effects owned by a sound source or bus. The main thread pushes `Arc<EffectParams>` entries; the audio thread reads them via non-blocking `try_read`.
+Per-stream instantiation of an `EffectParams` slot, holding the filter state for a single audio stream.
 
-#### `audio::dsp::DynamicEffectSource<I>`
+#### `SharedEffectGraph`
 
-A rodio `Source` wrapper that applies a dynamic chain of DSP effects to an inner audio source. On every audio-thread sample, checks the shared effect list and processes through each ActiveEffect in sequence. Implements `Iterator` and `rodio::Source`.
+Shared, thread-safe graph of active DSP effects owned by a sound source.
 
-#### `audio::midi::MidiState`
+#### `DynamicEffectSource`
 
-MIDI SoundFont state management. Tracks whether a SoundFont (SF2) file has been loaded, validates RIFF/sfbk headers, and stores raw bytes. Methods: `new()`, `set_soundfont()`, `has_soundfont()`, `clear_soundfont()`, `soundfont_path()`, `soundfont_data()`.
+A rodio `Source` wrapper that applies a dynamic chain of DSP effects to an inner audio source.
 
-#### `audio::midi_player::MidiData`
-
-Pre-parsed MIDI metadata extracted during `load()`. Contains duration, ticks per beat, original tempo BPM, track count, track names, note count, and channel count.
-
-#### `audio::midi_player::MidiPlayer`
-
-Software MIDI player with sine-additive synthesis. Renders all tracks to a PCM buffer on `play()` and feeds the result into a rodio Sink. Supports per-channel volume, muting, solo, track muting, tempo scaling, looping, and bus routing. Key methods: `new()`, `load()`, `load_data()`, `is_loaded()`, `play()`, `pause()`, `stop()`, `seek()`, `tell()`, `duration()`.
-
-#### `audio::mixer::QueueableSource`
-
-A manually-fed streaming audio source that accepts raw f32 PCM data pushed buffer-by-buffer. Game code pushes audio data into the queue via `queue_buffer`. Fields: `sample_rate`, `bit_depth`, `channels`, `buffer_count`, `queued_buffers`, `free_buffers`.
-
-#### `audio::mixer::Mixer`
-
-Central audio manager. Owns `SlotMap<SoundKey, AudioEntry>` for loaded sounds, `SlotMap<BusKey, Bus>` for named routing groups, `SlotMap<QueueableKey, QueueableSource>` for manual PCM streaming, master volume, spatial listener state (position, orientation, velocity, Doppler scale, distance model), and the rodio output stream. Falls back to headless mode when no audio device is available.
-
-#### `audio::sound_data::SoundData`
-
-Decoded audio samples in f32 PCM format. Stores interleaved samples (for stereo: L, R, L, R, ...). Samples are clamped to [-1.0, 1.0] on write. Implements `mlua::UserData` with Lua methods: `getSampleCount`, `getSampleRate`, `getChannelCount`, `getDuration`, `getBitDepth`, `getSample`, `setSample`.
-
-#### `audio::source::SpatialState`
-
-3D spatial audio state for a source. Contains position `[x, y, z]`, velocity `[x, y, z]`, and orientation (forward + up, 6 floats). Used to compute panning relative to the listener position.
-
-#### `audio::source::AudioSource`
-
-Legacy handle for a loaded audio asset. Superseded by Mixer's SlotMap-based AudioEntry system but kept for API compatibility. Fields: `id`, `file_path`, `volume`, `looping`.
-
-### Enums
-
-#### `audio::dsp::EffectType`
-
-Category of DSP audio effect. Variants: `Lowpass` (biquad low-pass filter), `Highpass` (biquad high-pass filter), `Bandpass` (biquad band-pass filter), `Reverb` (comb-filter reverb), `Chorus` (short-delay chorus/flanger).
-
-#### `audio::mixer::SourceType`
-
-Type of audio source. Variants: `Static` (decoded fully into memory, low latency, higher RAM), `Stream` (streamed from disk incrementally, lower memory).
-
-#### `audio::mixer::PlayState`
-
-Playback state of an audio source. Variants: `Stopped` (not playing, at beginning), `Playing` (currently playing), `Paused` (playing but paused).
+---
 
 ## Lua API
 
-Exposed under `lurek.audio.*` by `src/lua_api/audio_api.rs`. The API surface includes source lifecycle, playback control, bus management, spatial audio, DSP effects, MIDI synthesis, streaming decoders, queueable sources, and device enumeration.
+Exposed under `lurek.audio.*` by `src/lua_api/audio_api.rs`.
 
 ### Module Functions
 
 | Function | Description |
 |----------|-------------|
-| `lurek.audio.newSource(path, type)` | Loads an audio file; type is `"static"` or `"stream"` (default) |
-| `lurek.audio.play(source, options)` | Plays a source; optional `{bus="name"}` table for bus routing |
-| `lurek.audio.stop(source)` | Stops playback and resets position |
-| `lurek.audio.pause(source)` | Pauses playback at current position |
-| `lurek.audio.resume(source)` | Resumes playback from pause |
-| `lurek.audio.setVolume(source, vol)` | Sets per-source volume |
-| `lurek.audio.getVolume(source)` | Returns per-source volume |
-| `lurek.audio.setPitch(source, pitch)` | Sets pitch multiplier |
-| `lurek.audio.getPitch(source)` | Returns pitch multiplier |
-| `lurek.audio.isPlaying(source)` | Returns true if playing |
-| `lurek.audio.isPaused(source)` | Returns true if paused |
-| `lurek.audio.isStopped(source)` | Returns true if stopped |
-| `lurek.audio.setLooping(source, bool)` | Enables/disables looping |
-| `lurek.audio.isLooping(source)` | Returns looping state |
-| `lurek.audio.playLooping(source)` | Plays in continuous loop |
-| `lurek.audio.setPan(source, pan)` | Sets stereo panning (-1.0 to 1.0) |
-| `lurek.audio.getPan(source)` | Returns stereo panning value |
-| `lurek.audio.setMasterVolume(vol)` | Sets global master volume |
-| `lurek.audio.getMasterVolume()` | Returns global master volume |
-| `lurek.audio.getActiveSourceCount()` | Returns number of playing sources |
-| `lurek.audio.getSourceCount()` | Returns total loaded source count |
-| `lurek.audio.getSourceType(source)` | Returns `"static"` or `"stream"` |
-| `lurek.audio.clone(source)` | Creates independent copy of a source |
-| `lurek.audio.pauseAll()` | Pauses all playing sources |
-| `lurek.audio.stopAll()` | Stops all sources |
-| `lurek.audio.resumeAll()` | Resumes all paused sources |
-| `lurek.audio.release(source)` | Releases source and frees memory |
-| `lurek.audio.getDuration(source)` | Returns total duration in seconds |
-| `lurek.audio.tell(source)` | Returns current playback position |
-| `lurek.audio.seek(source, pos)` | Seeks to time position in seconds |
-| `lurek.audio.setLowpass(source, hz)` | Applies lowpass filter at cutoff |
-| `lurek.audio.setHighpass(source, hz)` | Applies highpass filter at cutoff |
-| `lurek.audio.getLowpass(source)` | Returns lowpass cutoff frequency |
-| `lurek.audio.getHighpass(source)` | Returns highpass cutoff frequency |
-| `lurek.audio.clearFilter(source)` | Removes all filters from source |
-| `lurek.audio.fadeIn(source, dur)` | Fades in from silence over duration |
-| `lurek.audio.getFadeIn(source)` | Returns fade-in duration |
-| `lurek.audio.getMaxSources()` | Returns max simultaneous sources (64) |
-| `lurek.audio.newBus(name)` | Creates a named audio bus |
-| `lurek.audio.setSourceBus(source, bus)` | Assigns source to a bus |
-| `lurek.audio.getSourceBus(source)` | Returns assigned bus or nil |
-| `lurek.audio.create_bus(name, parent)` | Creates bus by name (functional style) |
-| `lurek.audio.set_bus_volume(name, vol)` | Sets bus volume by name |
-| `lurek.audio.add_effect(bus, type, params)` | Adds DSP effect to a bus |
-| `lurek.audio.remove_effect(bus, id)` | Removes DSP effect from a bus |
-| `lurek.audio.set_effect_param(bus, id, param, val)` | Sets DSP effect parameter |
-| `lurek.audio.setListener2D(x, y)` | Sets 2D listener position |
-| `lurek.audio.getListener2D()` | Returns 2D listener position |
-| `lurek.audio.setListener(x, y, z)` | Sets 3D listener position |
-| `lurek.audio.getListener()` | Returns 3D listener position |
-| `lurek.audio.setPosition(source, x, y, z)` | Sets source 3D position |
-| `lurek.audio.getPosition(source)` | Returns source 3D position |
-| `lurek.audio.setVelocity(source, x, y, z)` | Sets source velocity (Doppler) |
-| `lurek.audio.getVelocity(source)` | Returns source velocity |
-| `lurek.audio.setOrientation(source, fx, fy, fz, ux, uy, uz)` | Sets source orientation |
-| `lurek.audio.getOrientation(source)` | Returns source orientation |
-| `lurek.audio.setDopplerScale(scale)` | Sets global Doppler scale factor |
-| `lurek.audio.getDopplerScale()` | Returns Doppler scale factor |
-| `lurek.audio.setDistanceModel(model)` | Sets distance attenuation model |
-| `lurek.audio.getDistanceModel()` | Returns distance model name |
-| `lurek.audio.setMeter(scale)` | Sets metering scale (stub) |
-| `lurek.audio.getMeter()` | Returns peak level (stub) |
-| `lurek.audio.newMidiPlayer(path)` | Creates MIDI player, optionally loading a file |
-| `lurek.audio.newSoundData(args)` | Creates SoundData from file or silent buffer |
-| `lurek.audio.setMidiSoundFont(path)` | Sets global SoundFont for MIDI |
-| `lurek.audio.hasMidiSoundFont()` | Returns true if SoundFont loaded |
-| `lurek.audio.clearMidiSoundFont()` | Unloads active SoundFont |
-| `lurek.audio.newDecoder(path, bufsize)` | Creates a streaming decoder |
-| `lurek.audio.newQueueableSource(rate, bits, ch, bufs)` | Creates queueable PCM source |
-| `lurek.audio.queueSource(id, sounddata)` | Pushes PCM buffer into queue |
-| `lurek.audio.getFreeBufferCount(id)` | Returns free queue buffer slots |
-| `lurek.audio.playQueueable(id)` | Starts queueable source playback |
-| `lurek.audio.stopQueueable(id)` | Stops queueable source |
-| `lurek.audio.getPlaybackDevices()` | Returns table of output device names |
-| `lurek.audio.getPlaybackDevice()` | Returns current output device name |
-| `lurek.audio.setPlaybackDevice(name)` | Selects output device by name |
+| `lurek.audio.newSource` | Loads an audio file and returns a Source handle. |
+| `lurek.audio.play` | Plays a source, with optional bus routing via options table. |
+| `lurek.audio.stop` | Stops playback and resets seek position. |
+| `lurek.audio.setVolume` | Sets source playback volume. |
+| `lurek.audio.getVolume` | Returns the source volume. |
+| `lurek.audio.pause` | Pauses playback at the current position. |
+| `lurek.audio.resume` | Resumes playback from pause. |
+| `lurek.audio.setPitch` | Sets source pitch multiplier. |
+| `lurek.audio.getPitch` | Returns the source pitch multiplier. |
+| `lurek.audio.isPlaying` | Returns true if the source is playing. |
+| `lurek.audio.isPaused` | Returns true if the source is paused. |
+| `lurek.audio.isStopped` | Returns true if the source is stopped. |
+| `lurek.audio.setLooping` | Enables or disables looping. |
+| `lurek.audio.isLooping` | Returns true if looping is enabled. |
+| `lurek.audio.playLooping` | Plays the source in a continuous loop. |
+| `lurek.audio.setPan` | Sets stereo panning (-1.0 left to 1.0 right). |
+| `lurek.audio.getPan` | Returns the source stereo panning. |
+| `lurek.audio.setMasterVolume` | Sets the global master volume. |
+| `lurek.audio.getMasterVolume` | Returns the global master volume. |
+| `lurek.audio.getActiveSourceCount` | Returns the number of currently playing sources. |
+| `lurek.audio.getSourceCount` | Returns the total number of registered sources. |
+| `lurek.audio.getSourceType` | Returns the type string ("static" or "stream") of a source. |
+| `lurek.audio.clone` | Creates an independent copy of a source. |
+| `lurek.audio.pauseAll` | Pauses all currently playing sources. |
+| `lurek.audio.stopAll` | Stops all currently playing sources. |
+| `lurek.audio.resumeAll` | Resumes all paused sources. |
+| `lurek.audio.release` | Releases a source and frees its memory. |
+| `lurek.audio.newBus` | Creates a named audio bus for grouping sources. |
+| `lurek.audio.setSourceBus` | Assigns a source to a bus. |
+| `lurek.audio.getSourceBus` | Returns the bus a source is assigned to, or nil. |
+| `lurek.audio.getMaxSources` | Returns the maximum number of simultaneous sources. |
+| `lurek.audio.getDuration` | Returns the total duration of a source in seconds. |
+| `lurek.audio.tell` | Returns the current playback position in seconds. |
+| `lurek.audio.seek` | Seeks to a time position in seconds. |
+| `lurek.audio.setLowpass` | Applies a low-pass filter to a source. |
+| `lurek.audio.setHighpass` | Applies a high-pass filter to a source. |
+| `lurek.audio.getLowpass` | Returns the low-pass filter cutoff of a source. |
+| `lurek.audio.getHighpass` | Returns the high-pass filter cutoff of a source. |
+| `lurek.audio.clearFilter` | Removes any active filter from a source. |
+| `lurek.audio.fadeIn` | Fades a source in from silence over the given duration. |
+| `lurek.audio.getFadeIn` | Returns the fade-in duration of a source. |
+| `lurek.audio.setListener2D` | Sets the 2D listener position for spatial audio. |
+| `lurek.audio.getListener2D` | Returns the 2D listener position (x, y). |
+| `lurek.audio.setListener` | Sets the 3D listener position. |
+| `lurek.audio.getListener` | Returns the 3D listener position (x, y, z). |
+| `lurek.audio.setPosition` | Sets the 3D position of a source. |
+| `lurek.audio.getPosition` | Returns the 3D position of a source (x, y, z). |
+| `lurek.audio.setVelocity` | Sets the velocity of a source for Doppler. |
+| `lurek.audio.getVelocity` | Returns the velocity of a source (x, y, z). |
+| `lurek.audio.setOrientation` | Sets the 6-component orientation of a source. |
+| `lurek.audio.getOrientation` | Returns the 6-component orientation of a source. |
+| `lurek.audio.setDopplerScale` | Sets the global Doppler effect scale. |
+| `lurek.audio.getDopplerScale` | Returns the current Doppler scale. |
+| `lurek.audio.setDistanceModel` | Sets the distance attenuation model. |
+| `lurek.audio.getDistanceModel` | Returns the current distance model name. |
+| `lurek.audio.setMeter` | Sets the metering scale (stub). |
+| `lurek.audio.getMeter` | Returns the current peak level (stub). |
+| `lurek.audio.newMidiPlayer` | Creates a MIDI player, optionally loading a file. |
+| `lurek.audio.newSoundData` | Creates a SoundData from a file or as a silent buffer. |
+| `lurek.audio.setMidiSoundFont` | Sets the global SoundFont for MIDI synthesis. |
+| `lurek.audio.hasMidiSoundFont` | Returns true if a SoundFont is loaded. |
+| `lurek.audio.clearMidiSoundFont` | Unloads the active SoundFont. |
+| `lurek.audio.newDecoder` | Creates a streaming audio decoder. |
+| `lurek.audio.newQueueableSource` | Creates a queueable source for manual PCM buffering. |
+| `lurek.audio.queueSource` | Pushes a SoundData buffer into a queueable source. |
+| `lurek.audio.getFreeBufferCount` | Returns the free buffer slots in a queueable source. |
+| `lurek.audio.playQueueable` | Starts playback of a queueable source. |
+| `lurek.audio.stopQueueable` | Stops a queueable source and drains its buffers. |
+| `lurek.audio.getPlaybackDevices` | Returns a table of available audio output device names. |
+| `lurek.audio.getPlaybackDevice` | Returns the current audio output device name. |
+| `lurek.audio.setPlaybackDevice` | Selects an audio output device by name. |
+| `lurek.audio.create_bus` | Creates a bus by name (functional style). |
+| `lurek.audio.set_bus_volume` | Sets a bus volume by name. |
+| `lurek.audio.add_effect` | Adds a DSP effect to a bus. |
+| `lurek.audio.remove_effect` | Removes a DSP effect from a bus. |
+| `lurek.audio.set_effect_param` | Sets a parameter on a DSP effect. |
+| `lurek.audio.saveWAV` | Saves a SoundData as a 16-bit PCM WAV file at the given path. |
 
-### Source Methods
+### `Bus` Methods
 
-`play()`, `stop()`, `pause()`, `resume()`, `setVolume(vol)`, `getVolume()`, `setPitch(pitch)`, `getPitch()`, `setLooping(bool)`, `isLooping()`, `isPlaying()`, `isPaused()`, `isStopped()`, `setPan(pan)`, `getPan()`, `clone()`, `getType()`, `getDuration()`, `tell()`, `seek(pos)`, `setLowpass(hz)`, `setHighpass(hz)`, `getLowpass()`, `getHighpass()`, `clearFilter()`, `fadeIn(dur)`, `getFadeIn()`
+| Method | Description |
+|--------|-------------|
+| `bus:getName(...)` | Returns the bus name. |
+| `bus:setVolume(...)` | Sets the volume for all sources on this bus. |
+| `bus:getVolume(...)` | Returns the bus volume. |
+| `bus:setPitch(...)` | Sets the pitch multiplier for all sources on this bus. |
+| `bus:getPitch(...)` | Returns the bus pitch multiplier. |
+| `bus:pause(...)` | Pauses all sources on this bus. |
+| `bus:resume(...)` | Resumes all sources on this bus. |
+| `bus:isPaused(...)` | Returns true if this bus is paused. |
+| `bus:type(...)` | Returns the type name of this object. |
+| `bus:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Bus Methods
+### `Decoder` Methods
 
-`getName()`, `setVolume(vol)`, `getVolume()`, `setPitch(pitch)`, `getPitch()`, `pause()`, `resume()`, `isPaused()`
+| Method | Description |
+|--------|-------------|
+| `decoder:decode(...)` | Decodes the next chunk of samples, or nil at EOF. |
+| `decoder:getChannelCount(...)` | Returns the number of audio channels. |
+| `decoder:getBitDepth(...)` | Returns the bit depth. |
+| `decoder:getSampleRate(...)` | Returns the sample rate in Hz. |
+| `decoder:getDuration(...)` | Returns the total duration in seconds. |
+| `decoder:seek(...)` | Seeks to a time offset in seconds. |
+| `decoder:rewind(...)` | Rewinds to the beginning. |
+| `decoder:tell(...)` | Returns the current position in seconds. |
+| `decoder:isSeekable(...)` | Returns true if seeking is supported. |
+| `decoder:release(...)` | Releases the decoder (no-op). |
 
-### MidiPlayer Methods
+### `MidiPlayer` Methods
 
-`load(path)`, `loadData(data)`, `isLoaded()`, `getFilePath()`, `setSoundFont(path)`, `getSoundFontPath()`, `useDefaultSoundFont()`, `play()`, `pause()`, `stop()`, `isPlaying()`, `isPaused()`, `seek(secs)`, `tell()`, `getDuration()`, `setLooping(bool)`, `isLooping()`, `setVolume(vol)`, `getVolume()`, `setBus(bus)`, `getBus()`, `setTempo(bpm)`, `getTempo()`, `getOriginalTempo()`, `setTempoScale(scale)`, `getTempoScale()`, `getTicksPerBeat()`, `setChannelVolume(ch, vol)`, `getChannelVolume(ch)`, `setChannelMuted(ch, muted)`, `isChannelMuted(ch)`, `setChannelInstrument(ch, inst)`, `getChannelInstrument(ch)`, `getChannelCount()`, `soloChannel(ch)`, `unsoloAll()`, `getTrackCount()`, `getTrackName(idx)`, `setTrackMuted(idx, muted)`, `isTrackMuted(idx)`, `getNoteCount()`, `setOnNoteOn(cb)`, `setOnNoteOff(cb)`, `setOnEnd(cb)`
+| Method | Description |
+|--------|-------------|
+| `midiplayer:load(...)` | Loads a MIDI file from the given path. |
+| `midiplayer:loadData(...)` | Loads MIDI data from a Lua string. |
+| `midiplayer:isLoaded(...)` | Returns true if a MIDI sequence is loaded. |
+| `midiplayer:getFilePath(...)` | Returns the file path of the loaded MIDI, or nil. |
+| `midiplayer:setSoundFont(...)` | Loads a SoundFont file into this player (stub). |
+| `midiplayer:getSoundFontPath(...)` | Returns the SoundFont file path, or nil (stub). |
+| `midiplayer:useDefaultSoundFont(...)` | Reverts to the built-in default SoundFont (stub). |
+| `midiplayer:play(...)` | Starts MIDI playback. |
+| `midiplayer:pause(...)` | Pauses MIDI playback. |
+| `midiplayer:stop(...)` | Stops MIDI playback. |
+| `midiplayer:isPlaying(...)` | Returns true if MIDI is currently playing. |
+| `midiplayer:isPaused(...)` | Returns true if MIDI playback is paused. |
+| `midiplayer:seek(...)` | Seeks to a time position in seconds. |
+| `midiplayer:tell(...)` | Returns the current playback position in seconds. |
+| `midiplayer:getDuration(...)` | Returns the total MIDI duration in seconds. |
+| `midiplayer:setLooping(...)` | Enables or disables looping. |
+| `midiplayer:isLooping(...)` | Returns true if looping is enabled. |
+| `midiplayer:setVolume(...)` | Sets MIDI playback volume. |
+| `midiplayer:getVolume(...)` | Returns the current MIDI volume. |
+| `midiplayer:setBus(...)` | Routes MIDI output through a bus (or nil to clear). |
+| `midiplayer:getBus(...)` | Returns the assigned bus, or nil. |
+| `midiplayer:setTempo(...)` | Sets playback tempo in BPM. |
+| `midiplayer:getTempo(...)` | Returns the current tempo in BPM. |
+| `midiplayer:getOriginalTempo(...)` | Returns the original MIDI file tempo in BPM. |
+| `midiplayer:setTempoScale(...)` | Sets the tempo scale factor (1.0 = original speed). |
+| `midiplayer:getTempoScale(...)` | Returns the current tempo scale factor. |
+| `midiplayer:getTicksPerBeat(...)` | Returns the PPQ resolution from the MIDI header. |
+| `midiplayer:setChannelVolume(...)` | Sets volume for a MIDI channel (1-indexed). |
+| `midiplayer:getChannelVolume(...)` | Returns the volume for a MIDI channel (1-indexed). |
+| `midiplayer:setChannelMuted(...)` | Mutes or unmutes a MIDI channel (1-indexed). |
+| `midiplayer:isChannelMuted(...)` | Returns true if a MIDI channel is muted (1-indexed). |
+| `midiplayer:getChannelInstrument(...)` | Returns the GM instrument for a MIDI channel (1-indexed). |
+| `midiplayer:getChannelCount(...)` | Returns the number of MIDI channels. |
+| `midiplayer:soloChannel(...)` | Solos a MIDI channel (1-indexed). |
+| `midiplayer:unsoloAll(...)` | Clears solo on all channels. |
+| `midiplayer:getTrackCount(...)` | Returns the number of tracks in the MIDI sequence. |
+| `midiplayer:getTrackName(...)` | Returns the name of a MIDI track (1-indexed), or nil. |
+| `midiplayer:setTrackMuted(...)` | Mutes or unmutes a track (1-indexed). |
+| `midiplayer:isTrackMuted(...)` | Returns true if a track is muted (1-indexed). |
+| `midiplayer:getNoteCount(...)` | Returns the total note count in the MIDI sequence. |
+| `midiplayer:setOnNoteOn(...)` | Registers a note-on callback (stub). |
+| `midiplayer:setOnNoteOff(...)` | Registers a note-off callback (stub). |
+| `midiplayer:setOnEnd(...)` | Registers a playback-end callback (stub). |
+| `midiplayer:type(...)` | Returns the type name of this object. |
+| `midiplayer:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Decoder Methods
+### `Source` Methods
 
-`decode()`, `getChannelCount()`, `getBitDepth()`, `getSampleRate()`, `getDuration()`, `seek(offset)`, `rewind()`, `tell()`, `isSeekable()`, `release()`
+| Method | Description |
+|--------|-------------|
+| `source:play(...)` | Starts or resumes playback. |
+| `source:stop(...)` | Stops playback and resets seek position. |
+| `source:pause(...)` | Pauses playback at the current position. |
+| `source:resume(...)` | Resumes playback from the paused position. |
+| `source:setVolume(...)` | Sets playback volume (0.0 = silent, 1.0 = full). |
+| `source:getVolume(...)` | Returns the current volume multiplier. |
+| `source:setPitch(...)` | Sets the pitch multiplier (1.0 = normal). |
+| `source:getPitch(...)` | Returns the current pitch multiplier. |
+| `source:setLooping(...)` | Enables or disables looping playback. |
+| `source:isLooping(...)` | Returns true if looping is enabled. |
+| `source:isPlaying(...)` | Returns true if currently playing. |
+| `source:isPaused(...)` | Returns true if playback is paused. |
+| `source:isStopped(...)` | Returns true if playback has stopped. |
+| `source:setPan(...)` | Sets stereo panning (-1.0 left to 1.0 right). |
+| `source:getPan(...)` | Returns the current stereo panning value. |
+| `source:clone(...)` | Creates an independent copy of this source. |
+| `source:getType(...)` | Returns the source type ("static" or "stream"). |
+| `source:getDuration(...)` | Returns the total duration in seconds. |
+| `source:tell(...)` | Returns the current playback position in seconds. |
+| `source:seek(...)` | Seeks to a time position in seconds. |
+| `source:setLowpass(...)` | Applies a low-pass filter at the given cutoff frequency. |
+| `source:setHighpass(...)` | Applies a high-pass filter at the given cutoff frequency. |
+| `source:getLowpass(...)` | Returns the low-pass filter cutoff frequency. |
+| `source:getHighpass(...)` | Returns the high-pass filter cutoff frequency. |
+| `source:clearFilter(...)` | Removes any active filter from this source. |
+| `source:fadeIn(...)` | Fades in from silence over the given duration in seconds. |
+| `source:getFadeIn(...)` | Returns the current fade-in duration in seconds. |
 
-### SoundData Methods
+### `mlua` Methods
 
-`getSampleCount()`, `getSampleRate()`, `getChannelCount()`, `getDuration()`, `getBitDepth()`, `getSample(index)`, `setSample(index, value)`
+| Method | Description |
+|--------|-------------|
+| `mlua:getSampleCount(...)` | Lua-facing function documented in the binding source. |
+| `mlua:getSampleRate(...)` | Lua-facing function documented in the binding source. |
+| `mlua:getChannelCount(...)` | Lua-facing function documented in the binding source. |
+| `mlua:getDuration(...)` | Lua-facing function documented in the binding source. |
+| `mlua:getBitDepth(...)` | Lua-facing function documented in the binding source. |
+| `mlua:getSample(...)` | Lua-facing function documented in the binding source. |
+| `mlua:setSample(...)` | Lua-facing function documented in the binding source. |
+
+---
 
 ## Lua Examples
 
 ```lua
--- Basic audio playback with bus routing
-function lurek.init()
-    -- Create audio buses
-    music_bus = lurek.audio.newBus("music")
-    sfx_bus = lurek.audio.newBus("sfx")
-    music_bus:setVolume(0.7)
-
-    -- Load a streaming music source and assign to bus
-    music = lurek.audio.newSource("music.ogg", "stream")
-    music:setLooping(true)
-    music:setVolume(0.8)
-    lurek.audio.setSourceBus(music, music_bus)
-    music:play()
-
-    -- Load a static SFX source
-    sfx = lurek.audio.newSource("jump.wav", "static")
-    lurek.audio.setSourceBus(sfx, sfx_bus)
-end
-
-function lurek.keypressed(key)
-    if key == "space" then
-        -- Clone so multiple overlapping plays work
-        local s = sfx:clone()
-        s:play()
-    elseif key == "m" then
-        -- Mute/unmute music bus
-        if music_bus:isPaused() then
-            music_bus:resume()
-        else
-            music_bus:pause()
-        end
-    end
+-- Minimal namespace check for lurek.audio.
+if lurek.audio then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- DSP effects on a bus
-function lurek.init()
-    local bus = lurek.audio.newBus("fx")
-    local id = lurek.audio.add_effect("fx", "lowpass", { value = 2000 })
-    lurek.audio.set_effect_param("fx", id, "cutoff", 1500)
-end
-```
-
-```lua
--- Spatial audio with 2D listener
-function lurek.init()
-    lurek.audio.setListener2D(400, 300)
-    local src = lurek.audio.newSource("footsteps.ogg", "static")
-    lurek.audio.setPosition(src, 200, 300, 0)
-    src:play()
-end
-
-function lurek.process(dt)
-    -- Move listener with player position
-    local px, py = player.x, player.y
-    lurek.audio.setListener2D(px, py)
-end
-```
-
-```lua
--- Procedural audio with SoundData
-function lurek.init()
-    local sd = lurek.audio.newSoundData(44100, 44100, 1)  -- 1 second mono
-    for i = 0, sd:getSampleCount() - 1 do
-        local t = i / sd:getSampleRate()
-        sd:setSample(i, math.sin(2 * math.pi * 440 * t) * 0.5)
-    end
-end
-```
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 15    |
-| `enum`    | 3     |
-| `fn`      | 3     |
-| **Total** | **21** |
+| Kind | Count |
+|------|-------|
+| `struct` | 15 |
+| `enum` | 3 |
+| `fn` (Lua API) | 176 |
+| **Total** | **194** |
+
+---
 
 ## References
 
-| Module       | Relationship | Notes                                                        |
-|--------------|--------------|--------------------------------------------------------------|
-| `engine`     | Imports from | Uses `SharedState`, `EngineError`, `SoundKey`, `BusKey`, `QueueableKey` resource keys |
-| `math`       | Imports from | No direct import, but spatial audio uses float vectors       |
-| `sound`      | Similar to   | `sound` module owns `SoundData` type; `audio` owns playback. `SoundData` is defined in `audio::sound_data` but also re-exported from `sound` |
-| `lua_api`    | Imported by  | `audio_api.rs` binds all public types to `lurek.audio.*` namespace |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Platform Services to Core Runtime. |
+
+---
 
 ## Notes
 
-- **Headless fallback**: `Mixer::new()` catches `rodio::OutputStream::try_default()` errors and runs with `stream_handle = None`. All playback calls become no-ops. This enables CI and test environments without audio devices.
-- **rodio version**: Uses rodio 0.17. `Sink` does not expose playback position, so the mixer tracks play-start instants and accumulated pre-pause seconds manually for `tell()`.
-- **MIDI disabled**: The `midly` crate has been removed from `Cargo.toml`. `MidiPlayer::load_data()` always returns `false`. To re-enable, restore `midly = "0.5"` and uncomment the parsing code in `midi_player.rs`.
-- **Static source caching**: Static sources decode file bytes into `Arc<Vec<u8>>` on first play. Subsequent `play()` and `clone_source()` calls share the `Arc`, avoiding redundant allocations.
-- **Seek implementation**: Seeking rebuilds the entire rodio Sink from scratch using `skip_duration()`. This is necessary because rodio Sinks are not seekable. Cost is proportional to the skip duration for streamed sources.
-- **DSP thread safety**: `EffectParams` uses `AtomicParam` (AtomicU32 bit-cast) for lock-free parameter mutation from the main thread while the audio thread reads. The `DynamicEffectSource` syncs its `ActiveEffect` list on each audio frame via `try_read` on an `RwLock`.
-- **Bus effect chain**: Bus effects are stored in `Arc<RwLock<Vec<Arc<EffectParams>>>>` on the `Bus` struct. When a source assigned to a bus is played, the mixer wraps the audio stream in a `DynamicEffectSource` that references the bus's effect list.
-- **Panning law**: Spatial panning uses a simple linear law: `pan = (source_x - listener_x) / 200.0`, clamped to [-1.0, 1.0]. Applied via `rodio::source::ChannelVolume`.
-- **QueueableSource**: Game code pushes raw f32 PCM buffers into a FIFO queue. The `playQueueable` and `stopQueueable` calls manage state bookkeeping only; actual audio flow is driven by the queued buffers.
-- **Breaking change surface**: Renaming or removing any `lurek.audio.*` function or Source/Bus/MidiPlayer method will break existing game scripts. The Source UserData methods (play, stop, setVolume, etc.) are the most commonly used API surface.
+- **Source of truth**: Keep this spec synchronized with `src/audio/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

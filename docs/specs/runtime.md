@@ -1,209 +1,198 @@
 # `runtime` — Agent Reference
 
-| Property       | Value                                                        |
-|----------------|--------------------------------------------------------------|
-| **Tier**       | Baseline — always-on runtime substrate                       |
-| **Status**     | Implemented — Full                                           |
-| **Lua API**    | — (foundation module; no `lurek.runtime` namespace)          |
-| **Source**     | `src/runtime/`                                               |
-| **Rust Tests** | `tests/rust/unit/engine_tests.rs`                            |
-| **Lua Tests**  | —                                                            |
-| **Architecture** | `docs/architecture/engine-architecture.md`                 |
+| Property | Value |
+|----------|-------|
+| **Tier** | Core Runtime |
+| **Status** | Implemented |
+| **Lua API** | Indirect / none |
+| **Source** | `src/runtime/` |
+| **Rust Tests** | `tests/rust/unit/window_tests.rs`, `tests/rust/ext/graphics_runtime_smoke_tests.rs`, plus runtime-focused unit coverage embedded in `src/runtime/messages.rs` |
+| **Lua Tests** | `tests/lua/config/test_config.lua`, `tests/lua/harness.rs` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Core Runtime` |
+
+---
 
 ## Summary
 
-`src/runtime/` is the foundational substrate of Lurek2D — it owns configuration loading,
-the central shared mutable state, the structured error taxonomy, stable log-message IDs,
-the human-readable message catalog, and the typed `SlotMap` resource keys that identify
-every GPU and audio object in the engine. It sits at the Baseline tier alongside `src/math/`,
-meaning every other module in the system may import from it; the runtime module itself has
-no incoming engine-module dependencies.
+The runtime module is the engine's shared substrate. It defines startup configuration, the canonical engine error type, stable log message IDs, the embedded human-readable message catalog, and the central `SharedState` object that all Lua bindings and the main loop mutate through `Rc<RefCell<_>>`.
 
-`Config` is loaded once at startup from `conf.toml` (preferred) or the legacy `conf.lua`.
-Missing fields fall back to built-in defaults, so game authors only need to specify settings
-they want to change. `SharedState` is created immediately after config loading, wrapped in
-`Rc<RefCell<SharedState>>`, and cloned into every Lua API closure and into the engine event
-loop. It is the single mutable hub that connects all subsystems: resource pools, render
-command queue, input state, audio mixer references, camera, and event queue.
+This module exists so the rest of Lurek2D can agree on a single source of truth for engine-wide state and identifiers. Rendering, input, audio, events, timers, filesystem access, and many higher-level systems all meet here through typed resource pools, per-frame timing fields, the event queue, and pending runtime actions such as restart, quit, async loads, and screenshots.
 
-Resource pools use Rust's `slotmap` crate with 14 purpose-typed key newtypes. Typed keys
-prevent accidental cross-pool lookups at compile time — a `TextureKey` cannot be used to
-look up a `Font`, and the compiler enforces this without runtime overhead. All resource
-lifetimes are managed by the engine; Lua receives lightweight UserData wrapping a key copy,
-so no `__gc` finalizer is needed.
+It intentionally does not own subsystem behavior. Rendering logic lives in `render`, audio mixing in `audio`, input device state machines in `input`, sandboxed path policy in `filesystem`, and Lua-facing registration in `src/lua_api/`. If a change is about how a subsystem behaves rather than how global state is stored or shared, that change usually belongs outside `runtime`.
 
-`EngineError` defines 12 variants with stable short codes (`E001`–`E012`) so that log
-messages written by one engine version remain parseable by tooling targeting an older
-version. At the Lua API boundary every `EngineError` is converted to `LuaError` via
-`.map_err(LuaError::external)`. The `log_messages` submodule provides stable named
-constants (`L001`–`L082`, `A001`–`A004`) used by `log_msg!` so that log message text
-can be updated without breaking log-grep scripts.
+**Scope boundary**: This module currently depends on `audio`, `camera`, `event`, `filesystem`, `input`, `light`, `parallax`, `particle`, and other adjacent modules. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-conf.toml / conf.lua
-        │
-        ▼
-  Config::load()           (src/runtime/config.rs)
-        │
-        ▼
-  SharedState::new()       (src/runtime/shared_state.rs)
-        │  Rc<RefCell<SharedState>>
-        ├── render_commands: Vec<RenderCommand>
-        ├── textures:        SlotMap<TextureKey, Texture>
-        ├── fonts:           SlotMap<FontKey, Font>
-        ├── canvases:        SlotMap<CanvasKey, Canvas>
-        ├── sprite_batches:  SlotMap<SpriteBatchKey, SpriteBatch>
-        ├── meshes:          SlotMap<MeshKey, Mesh>
-        ├── shaders:         SlotMap<ShaderKey, Shader>
-        ├── shapes:          SlotMap<ShapeKey, CompoundShape>
-        ├── particles:       SlotMap<ParticleKey, ParticleSystem>
-        ├── audio_sources:   SlotMap<SoundKey / BusKey / ...>
-        ├── input_state      (keyboard, mouse, gamepad)
-        ├── camera
-        ├── event_queue
-        └── window_state
-
-  EngineError              (src/runtime/error.rs)
-        │  E001–E012 stable codes
-        └── .map_err(LuaError::external) at every Lua API boundary
-
-  MessageCatalog           (src/runtime/messages.rs)
-        │  TOML-backed log message strings embedded at compile time
-        └── cfg/messages.toml (include_str!)
-
-  Resource key newtypes    (src/runtime/resource_keys.rs)
-        │  14 typed SlotMap keys — compiler-enforced cross-pool safety
-        └── TextureKey, FontKey, CanvasKey, SoundKey, ParticleKey,
-            SpriteBatchKey, ShaderKey, MeshKey, ShapeKey, BusKey,
-            MidiPlayerKey, QueueableKey, LightKey, OccluderKey
+No direct Lua namespace — consumed through app/runtime integration or other bindings
+    |
+    v
+src/runtime/mod.rs
+    |- config.rs - config
+    |- error.rs - error
+    |- log_messages.rs - log_messages
+    |- messages.rs - messages
+    |- resource_keys.rs - resource_keys
+    |- shared_state.rs - shared_state
 ```
+
+---
 
 ## Source Files
 
-| File                | Purpose                                                                                 |
-|---------------------|-----------------------------------------------------------------------------------------|
-| `mod.rs`            | Re-exports `Config`, `SharedState`, `EngineError`, all resource key types, and the `create_lua_vm` entry point. |
-| `config.rs`         | `Config`, `WindowConfig`, `GraphicsConfig`, `ModulesConfig`, `PerformanceConfig` — loaded from `conf.toml` or `conf.lua` via a temporary Lua VM. |
-| `error.rs`          | `EngineError` (12 variants with stable codes `E001`–`E012`), `ErrorCategory`, `EngineResult<T>`. |
-| `log_messages.rs`   | Stable message ID constants (`L001`–`L082`, `A001`–`A004`), `set_log_level` / `get_log_level`, `log_msg!` macro. |
-| `messages.rs`       | `MessageCatalog` — TOML-backed message lookup via `init()`, `get_message()`, and `catalog()`. |
-| `resource_keys.rs`  | 14 typed `SlotMap` key newtypes for every resource category. |
-| `shared_state.rs`   | `SharedState`, `WindowState`, `FullscreenType`, `ErrorInfo`, `ScreenshotRequest`. |
-| `cfg/messages.toml` | TOML text strings for all stable log messages, embedded at compile time via `include_str!`. |
+| File | Purpose |
+|------|---------|
+| `config.rs` | Engine configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy). |
+| `error.rs` | Structured error types and result alias for the Lurek2D engine. |
+| `log_messages.rs` | Structured logging with stable message IDs for the Lurek2D engine. |
+| `messages.rs` | TOML-backed message catalog for stable, human-readable engine log messages. |
+| `mod.rs` | Core engine runtime: configuration, error handling, shared state, and resource management. |
+| `resource_keys.rs` | Typed resource keys for generational ID-based resource pools. |
+| `shared_state.rs` | Central shared runtime state for the Lurek2D engine. |
+
+---
 
 ## Submodules
 
-### `config` — Engine Configuration
-- `Config` — Top-level config container loaded from `conf.toml` or `conf.lua`.
-- `WindowConfig` — Window dimensions, title, vsync, fullscreen, resize policy.
-- `GraphicsConfig` — GPU backend (`"auto"`, `"dx12"`, `"vulkan"`, `"metal"`) and power preference.
-- `ModulesConfig` — Boolean feature-flags for optional subsystem registration.
-- `PerformanceConfig` — `fps_cap` (max frames per second).
+### `runtime::config`
 
-### `error` — Typed Error Taxonomy
-- `EngineError` — 12-variant error enum with stable codes `E001`–`E012`.
-- `ErrorCategory` — Groups errors by origin: `Io`, `Script`, `Gpu`, `Asset`, `Config`, `Logic`.
-- `EngineResult<T>` — `type EngineResult<T> = Result<T, EngineError>`.
+Engine configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy).
 
-### `log_messages` — Stable Log IDs
-- Stable named constants `L001`–`L082` and `A001`–`A004` for all engine log messages.
-- `set_log_level(level)` / `get_log_level()` — Runtime log-level control.
-- `log_msg!` macro — Emit a stable-ID log message via the `log` crate.
+- **`Config`** (struct): Top-level engine configuration.
+- **`GraphicsConfig`** (struct): GPU backend and power-preference settings resolved once at engine startup.
+- **`WindowConfig`** (struct): Window dimensions, title, vsync, fullscreen, and resize settings.
+- **`ModulesConfig`** (struct): Flags to enable or disable optional engine subsystems.
+- **`PerformanceConfig`** (struct): Frame rate cap and other performance tuning options.
 
-### `messages` — Human-Readable Message Catalog
-- `MessageCatalog` — TOML-backed message lookup; text updated without recompile via `cfg/messages.toml`.
+### `runtime::error`
 
-### `resource_keys` — Typed SlotMap Keys
-- 14 typed key newtypes: `TextureKey`, `FontKey`, `CanvasKey`, `SoundKey`, `ParticleKey`, `SpriteBatchKey`, `ShaderKey`, `MeshKey`, `ShapeKey`, `BusKey`, `MidiPlayerKey`, `QueueableKey`, `LightKey`, `OccluderKey`.
-- Keys are compiler-checked: a `TextureKey` cannot look up a `Font`.
+Structured error types and result alias for the Lurek2D engine.
 
-### `shared_state` — Central Mutable Hub
-- `SharedState` — `Rc<RefCell<…>>` hub shared between the engine loop and all Lua closures; holds all resource pools, render command queue, input state, camera, and event queue.
-- `WindowState` — Runtime window geometry and focus flags updated each frame.
-- `FullscreenType` — `Borderless` or `Exclusive` fullscreen modes.
-- `ErrorInfo` — Structured error data for display in the error overlay.
-- `ScreenshotRequest` — One-shot screenshot capture request with output path.
+- **`ErrorCategory`** (enum): Error category for grouping related engine errors.
+- **`EngineError`** (enum): All possible error conditions that can occur in the Lurek2D engine.
+- **`EngineResult`** (type): Convenience alias for `Result<T, EngineError>` used throughout the engine.
+
+### `runtime::log_messages`
+
+Structured logging with stable message IDs for the Lurek2D engine.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+### `runtime::messages`
+
+TOML-backed message catalog for stable, human-readable engine log messages.
+
+- **`MessageCatalog`** (struct): Immutable map from stable message ID (e.g.
+
+### `runtime::resource_keys`
+
+Typed resource keys for generational ID-based resource pools.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+### `runtime::shared_state`
+
+Central shared runtime state for the Lurek2D engine.
+
+- **`FullscreenType`** (enum): Fullscreen mode type for window management.
+- **`WindowState`** (struct): Tracks window state and queues window operations for the event loop.
+- **`ErrorInfo`** (struct): Structured error information for the last engine error.
+- **`ScreenshotRequest`** (struct): Pending request to save the next rendered screen frame as a PNG.
+- **`SharedState`** (struct): Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
+- **`RendererStats`** (struct): Snapshot of renderer statistics for a single frame.
+
+---
 
 ## Key Types
 
-| Type                | Description                                                                          |
-|---------------------|--------------------------------------------------------------------------------------|
-| `Config`            | Top-level engine configuration container; holds `WindowConfig`, `GraphicsConfig`, `ModulesConfig`, and `PerformanceConfig`. Loaded from `conf.toml` (or `conf.lua`) at startup with sensible defaults for all omitted fields. |
-| `WindowConfig`      | Window dimensions, title, vsync flag, fullscreen mode, and resize policy.            |
-| `GraphicsConfig`    | GPU backend selection (`"auto"`, `"dx12"`, `"vulkan"`, `"metal"`) and power preference resolved at device creation. |
-| `ModulesConfig`     | Boolean feature-flags controlling which optional subsystems are initialised and which `lurek.*` namespaces are registered (audio, physics, graphics, etc.). |
-| `PerformanceConfig` | Frame-rate cap (`fps_cap`) — the maximum frames per second the engine will render.   |
-| `SharedState`       | Central mutable hub shared between the engine loop and all Lua closures via `Rc<RefCell<SharedState>>`; holds resource pools, render command queue, input state, camera, event queue, and audio mixer reference. |
-| `WindowState`       | Runtime window geometry and focus/visibility flags updated each frame by the OS event handler. |
-| `EngineError`       | 12-variant typed error enum with stable codes `E001`–`E012`; converts to `LuaError` at every Lua API boundary. |
-| `EngineResult<T>`   | `type EngineResult<T> = Result<T, EngineError>` — the standard return type for all fallible engine operations. |
-| `MessageCatalog`    | TOML-backed string table for all human-readable log message bodies; keeps source code free of long literal strings. |
-| `TextureKey`        | Opaque `SlotMap` key identifying a loaded GPU texture in `SharedState::textures`.    |
-| `FontKey`           | Opaque `SlotMap` key identifying a loaded `Font` (fontdue atlas) in `SharedState::fonts`. |
-| `CanvasKey`         | Opaque `SlotMap` key identifying an off-screen `Canvas` render target.               |
-| `SoundKey`          | Opaque `SlotMap` key identifying an audio source registered with the Mixer.          |
-| `ParticleKey`       | Opaque `SlotMap` key identifying a `ParticleSystem` instance.                        |
-| `SpriteBatchKey`    | Opaque `SlotMap` key identifying a `SpriteBatch` in `SharedState::sprite_batches`.   |
-| `ShaderKey`         | Opaque `SlotMap` key identifying a custom WGSL `Shader` and its compiled pipeline.   |
-| `MeshKey`           | Opaque `SlotMap` key identifying a custom-geometry `Mesh`.                           |
-| `ShapeKey`          | Opaque `SlotMap` key identifying a `CompoundShape` command buffer.                   |
-| `BusKey`            | Opaque `SlotMap` key identifying an audio bus in the Mixer.                          |
-| `MidiPlayerKey`     | Opaque `SlotMap` key identifying an active MIDI player instance.                     |
-| `QueueableKey`      | Opaque `SlotMap` key for audio sources registered in the Mixer's queue.              |
-| `LightKey`          | Opaque `SlotMap` key identifying a `Light` entry in `LightWorld`.                    |
-| `OccluderKey`       | Opaque `SlotMap` key identifying an occlusion polygon in `LightWorld`.               |
+### Public Types
+
+#### `Config`
+
+Top-level engine configuration.
+
+#### `GraphicsConfig`
+
+GPU backend and power-preference settings resolved once at engine startup.
+
+#### `WindowConfig`
+
+Window dimensions, title, vsync, fullscreen, and resize settings.
+
+#### `ModulesConfig`
+
+Flags to enable or disable optional engine subsystems.
+
+#### `PerformanceConfig`
+
+Frame rate cap and other performance tuning options.
+
+#### `ErrorCategory`
+
+Error category for grouping related engine errors.
+
+#### `EngineError`
+
+All possible error conditions that can occur in the Lurek2D engine.
+
+#### `EngineResult`
+
+Convenience alias for `Result<T, EngineError>` used throughout the engine.
+
+---
 
 ## Lua API
 
-`src/runtime/` exposes **no public `lurek.*` functions** directly. It is the internal substrate consumed by every other module through `SharedState`. Lua scripts interact with runtime state indirectly via resource handles (e.g. `LuaImage`, `LuaFont`) returned by other API namespaces.
+This module does not expose a dedicated direct Lua namespace. It is consumed indirectly through higher-level engine callbacks, shared state, or other `lurek.*` surfaces.
 
-| Namespace | Status |
-|---|---|
-| `lurek.runtime` | Not registered — `src/runtime/` has no Lua API surface. |
+---
 
 ## Lua Examples
 
-_`runtime` has no `lurek.*` Lua API. Scripts interact with its types indirectly through resource handles returned by other modules._
-
 ```lua
--- Config is read at startup from conf.toml.
--- Scripts cannot access Config at runtime — it is consumed during engine init.
-
--- Typed resource handles are returned by API functions and used opaquely:
-local img = lurek.graphic.newImage("assets/player.png")
--- 'img' wraps a TextureKey internally; the script never sees the key value.
-
--- Window state can be queried via lurek.window:
-local w, h = lurek.window.getSize()
-print(string.format("window: %d × %d", w, h))
+-- This module has no dedicated direct Lua namespace.
+-- It is used indirectly through other engine systems.
 ```
+
+---
 
 ## Item Summary
 
-| Kind              | Count |
-|-------------------|-------|
-| Structs           | 12    |
-| Enums             | 7     |
-| Resource key types | 14   |
-| Free functions    | 5     |
-| **Total**         | **38** |
+| Kind | Count |
+|------|-------|
+| `struct` | 11 |
+| `enum` | 3 |
+| `fn` (Lua API) | 0 |
+| **Total** | **14** |
+
+---
 
 ## References
 
-| Module       | Relationship                                                                         |
-|--------------|--------------------------------------------------------------------------------------|
-| `app`        | `src/app/` reads `Config` at startup and wraps `SharedState` in the winit event loop. |
-| `render`     | `SharedState::render_commands` is the deferred `RenderCommand` queue processed by `GpuRenderer`. All GPU resource pools (`textures`, `fonts`, `canvases`, …) are `SlotMap` fields on `SharedState`. |
-| `audio`      | `SharedState` holds a reference to the rodio `Mixer`; `SoundKey` and `BusKey` address audio resources. |
-| `lua_api`    | Every `src/lua_api/<module>_api.rs` registration function receives a cloned `Rc<RefCell<SharedState>>`; `EngineError` converts to `LuaError` at each boundary. |
-| `math`       | `Baseline` — `src/math/` is the only other Baseline module; both are safe to import from every tier. |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `audio` | Imports or references `audio` from `src/audio/`. | Cross-group dependency from Core Runtime to Platform Services. |
+| `camera` | Imports or references `camera` from `src/camera/`. | Cross-group dependency from Core Runtime to Platform Services. |
+| `event` | Imports or references `event` from `src/event/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `filesystem` | Imports or references `filesystem` from `src/filesystem/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `input` | Imports or references `input` from `src/input/`. | Cross-group dependency from Core Runtime to Platform Services. |
+| `light` | Imports or references `light` from `src/light/`. | Cross-group dependency from Core Runtime to Platform Services. |
+| `parallax` | Imports or references `parallax` from `src/parallax/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+| `particle` | Imports or references `particle` from `src/particle/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+| `raycaster` | Imports or references `raycaster` from `src/raycaster/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Core Runtime to Platform Services. |
+| `sprite` | Imports or references `sprite` from `src/sprite/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+| `tilemap` | Imports or references `tilemap` from `src/tilemap/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+| `timer` | Imports or references `timer` from `src/timer/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `ui` | Imports or references `ui` from `src/ui/`. | Cross-group dependency from Core Runtime to Feature Systems. |
+
+---
+
 ## Notes
 
-- **Baseline module**: `runtime` may be imported by every other module in the engine. It has no internal Lurek2D module dependencies (other than `src/math/` for `Color` and `Vec2`).
-- **`Rc<RefCell<SharedState>>`**: All Lua API closures clone this `Rc` on registration. Borrowing must be kept to the shortest possible scope; never hold a `RefMut` across a Lua boundary.
-- **Stable error codes**: `E001`–`E012` are guaranteed not to change between minor versions. Log-grep scripts may rely on them. Message text (in `messages.toml`) may change without incrementing the code.
-- **14 resource key types**: Each is a distinct newtype around `slotmap::DefaultKey`. They are not serializable; do not save keys across sessions.
-- **`conf.lua` legacy**: The `conf.lua` bootstrap loader uses a temporary Lua VM to parse game config before the main VM is created. The preferred format going forward is `conf.toml`.
-- **Breaking change surface**: Adding a field to `Config` or `SharedState` is backward-compatible with defaults. Removing or renaming a field is a breaking change for all conf files.
+- **Source of truth**: Keep this spec synchronized with `src/runtime/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.
+- **Lua surface**: This module has no dedicated direct `lurek.*` namespace and is typically consumed through higher integration layers.

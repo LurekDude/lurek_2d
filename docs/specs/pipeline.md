@@ -1,402 +1,235 @@
 # `pipeline` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extension                            |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.pipeline`                                      |
-| **Source**      | `src/pipeline/`                                      |
-| **Rust Tests** | `tests/rust/unit/pipeline_tests.rs`                  |
-| **Lua Tests**  | `tests/lua/unit/test_pipeline.lua`                   |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Edge/Integration |
+| **Status** | Implemented |
+| **Lua API** | `lurek.pipeline` |
+| **Source** | `src/pipeline/` |
+| **Rust Tests** | tests/rust/unit/pipeline_tests.rs |
+| **Lua Tests** | tests/lua/unit/test_pipeline.lua |
+| **Architecture** | `docs/architecture/engine-architecture.md § Edge / Integration` |
+
+---
 
 ## Summary
 
-The `pipeline` module is a **DAG-based pipeline orchestrator** for composing multi-step
-sequential and parallel workflows entirely in Lua. It is a Tier 2 Engine Extension that
-depends only on `crate::engine` (for log messages) and the standard library — it does not
-import `crate::math`, `mlua`, or any other Tier 1/Tier 2 module.
+The pipeline module provides a DAG-based workflow engine for Lua and Rust callers that need ordered, dependency-aware multi-step execution. It exists to let games and tools describe work as named steps with dependencies, delays, retry policy, and error policy instead of hand-writing orchestration logic in ad hoc callback chains.
 
-A `Pipeline` owns a directed acyclic graph of `PipelineStep` nodes stored in a `HashMap`
-keyed by step name. Each step declares its upstream dependencies as a list of step names,
-plus per-step configuration: delay timer, retry count/delay, error policy, optional flag,
-tag, and arbitrary string metadata. `Pipeline::validate()` checks that all dependency names
-resolve to existing steps and that the graph is cycle-free using Kahn's topological sort
-algorithm. `Pipeline::get_parallel_groups()` partitions the sorted steps into parallel
-execution levels — all steps at level N depend only on steps at levels 0..N-1 and may
-therefore run concurrently.
+The module splits cleanly into data-model and execution-support pieces. Pipeline and PipelineStep describe the graph and per-step state, PipelineScheduler manages time-based readiness for delayed execution, and PipelineResult captures the final outcome of a run. That design keeps validation, scheduling, and result reporting inspectable and testable in isolation.
 
-`PipelineScheduler` tracks per-step delay timers and overall wall-clock elapsed time. It is
-initialised by `start()`, advanced each frame by `update(dt)`, and returns the names of
-steps whose delays have elapsed and whose dependencies are satisfied.
+This module does not own the actual business work performed by each step. Callbacks, I/O, rendering, or gameplay logic belong to the code attached to the pipeline, while pipeline itself only validates the graph, computes execution order, tracks runtime state, and enforces error-handling rules.
 
-`PipelineResult` and `PipelineStatus` represent the aggregated outcome of a pipeline run,
-tracking which steps completed, failed, were skipped, or were cancelled, plus wall-clock
-duration and per-step error messages.
+**Scope boundary**: This module currently depends on `runtime`. It stays within the Edge/Integration responsibility boundary defined in the architecture docs.
 
-The Lua API (`lurek.pipeline.*`) provides two execution modes: **synchronous** (`run()`)
-which executes the full DAG in topological order within a single frame, and **asynchronous**
-(`runAsync()` + `update(dt)`) which runs one ready step per tick, suitable for spreading
-work across frames. Both modes support a shared context table whose `results` sub-table
-accumulates return values from each step callback, allowing downstream steps to consume
-upstream output. Pipelines support lifecycle callbacks (`setOnComplete`, `setOnStepComplete`,
-`setOnStepError`), condition gates that can skip steps, retry-on-failure with configurable
-attempt count, and two error modes (`"abort"` — stop on first failure, `"continue"` — skip
-failed step and proceed). Serialisation is supported via `toTable()` / `fromTable()` for
-declarative pipeline definitions.
-
-**Scope boundary**: `pipeline` is a pure orchestration module. It does not perform I/O,
-rendering, physics, or audio. Step callback implementations live in user Lua scripts. The
-module has no GPU, window, or audio device requirements and runs fully headless in tests.
+---
 
 ## Architecture
 
 ```
-lurek.pipeline (Lua API)
-  │
-  │  newStep(name, fn?)        → LuaStep  (UserData wrapper)
-  │  newPipeline(name?)        → LuaPipeline (UserData wrapper)
-  │  fromTable(def)            → LuaPipeline
-  │
-  ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  pipeline_api.rs (bridge)                    │
-│  LuaStep  ──wraps──▶  PipelineStep (Rc<RefCell<>>)          │
-│  LuaPipeline ─wraps─▶ Pipeline + PipelineScheduler          │
-│                        + step_wrappers HashMap               │
-│  Lua registry keys:  callback, condition, on_error,         │
-│                       on_complete, on_step_complete,         │
-│                       on_step_error, context                 │
-└────────────┬────────────────────────────────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    src/pipeline/ (Rust)                      │
-│                                                             │
-│  dag.rs ─────── Pipeline { steps: HashMap<String, Step> }   │
-│     │            add_step / remove_step / validate           │
-│     │            get_execution_order (Kahn's topo sort)      │
-│     │            get_parallel_groups (level assignment)       │
-│     │            ErrorMode { Abort, Continue }               │
-│     │                                                       │
-│  step.rs ────── PipelineStep { name, deps, delay, optional, │
-│     │            retry_count, retry_delay, on_error, tag,    │
-│     │            metadata, status, attempt, duration, ...}   │
-│     │            StepStatus { Pending → Waiting → Running    │
-│     │                         → Completed | Failed | Skipped │
-│     │                         | Cancelled }                  │
-│     │            ErrorPolicy { Abort, Continue, Retry }      │
-│     │                                                       │
-│  scheduler.rs ─ PipelineScheduler { delay_timers, is_running,│
-│     │            elapsed }                                   │
-│     │            start / update(dt) / mark_step_waiting      │
-│     │                                                       │
-│  result.rs ──── PipelineResult { status, completed, failed,  │
-│                  skipped, cancelled, total_duration, errors } │
-│                  PipelineStatus { Pending, Running,           │
-│                  Completed, Failed, Cancelled }               │
-└─────────────────────────────────────────────────────────────┘
+lurek.pipeline.* (Lua API — src/lua_api/pipeline_api.rs)
+    |
+    v
+src/pipeline/mod.rs
+    |- dag.rs - dag
+    |- result.rs - result
+    |- scheduler.rs - scheduler
+    |- step.rs - step
 ```
+
+---
 
 ## Source Files
 
-| File           | Purpose                                                                              |
-|----------------|--------------------------------------------------------------------------------------|
-| `mod.rs`       | Module root — declares submodules, re-exports `Pipeline`, `PipelineStep`, `PipelineResult`, `PipelineScheduler`, `ErrorMode`, `ErrorPolicy`, `PipelineStatus`, `StepStatus` |
-| `dag.rs`       | DAG container (`Pipeline`) — step storage, topological sort (Kahn's algorithm), cycle detection, parallel group levelling, `ErrorMode` enum |
-| `step.rs`      | Step definition (`PipelineStep`) — name, deps, delay, retry, optional, tag, metadata, runtime status tracking; `StepStatus` and `ErrorPolicy` enums |
-| `result.rs`    | Execution outcome (`PipelineResult`) — aggregated completed/failed/skipped/cancelled lists, wall-clock duration, error pairs; `PipelineStatus` enum |
-| `scheduler.rs` | Delay timer manager (`PipelineScheduler`) — per-step countdown, elapsed tracking, ready-step detection on `update(dt)` |
+| File | Purpose |
+|------|---------|
+| `dag.rs` | Defines Pipeline and the graph-level algorithms such as dependency validation, topological ordering, and parallel-group calculation. This is the core file for execution-order semantics. |
+| `mod.rs` | Module root that re-exports the pipeline graph, step, scheduler, and result types. It is the stable import surface for the orchestration engine. |
+| `result.rs` | Defines PipelineResult and the overall PipelineStatus enum. This file turns a run into a structured success or failure record instead of a loose set of side effects. |
+| `scheduler.rs` | Defines PipelineScheduler, the time-based helper that determines which delayed steps are ready to run. It is the timing primitive for async or multi-frame pipeline execution. |
+| `step.rs` | Defines PipelineStep plus the step-level enums for status and error policy. It owns what one node in the workflow knows about dependencies, delays, retries, tags, and runtime outcome. |
+
+---
 
 ## Submodules
 
 ### `pipeline::dag`
 
-DAG container for pipeline steps. Implements topological sort via Kahn's algorithm for
-execution ordering, cycle detection, and parallel group levelling for concurrent execution.
+Defines Pipeline and the graph-level algorithms such as dependency validation, topological ordering, and parallel-group calculation. This is the core file for execution-order semantics.
 
-- **`Pipeline`** (struct): Owns a `HashMap<String, PipelineStep>` and a global `ErrorMode`. Provides `add_step`, `remove_step`, `get_step`, `get_step_mut`, `get_steps`, `get_step_count`, `clear`, `validate`, `get_execution_order`, `get_parallel_groups`, and `reset`.
-- **`ErrorMode`** (enum): Determines pipeline-wide failure behaviour — `Abort` (stop on first failure) or `Continue` (skip failed step and proceed).
-
-### `pipeline::step`
-
-Defines a single node in the pipeline DAG with full runtime lifecycle tracking.
-
-- **`PipelineStep`** (struct): A named unit of work with dependency list, delay timer, optional flag, retry config, error policy, tag, metadata, and mutable runtime fields (status, attempt, duration, error message).
-- **`StepStatus`** (enum): Seven-state lifecycle — `Pending`, `Waiting`, `Running`, `Completed`, `Failed`, `Skipped`, `Cancelled`.
-- **`ErrorPolicy`** (enum): Per-step failure behaviour — `Abort`, `Continue`, or `Retry`.
+- **`ErrorMode`** (enum): Determines how the pipeline responds when a step fails.
+- **`Pipeline`** (struct): A directed acyclic graph (DAG) container that holds pipeline steps and their dependencies.
 
 ### `pipeline::result`
 
-Aggregated outcome of a complete pipeline execution.
+Defines PipelineResult and the overall PipelineStatus enum. This file turns a run into a structured success or failure record instead of a loose set of side effects.
 
-- **`PipelineResult`** (struct): Tracks lists of completed, failed, skipped, and cancelled step names, wall-clock `total_duration`, and `(step_name, error_message)` error pairs. Provides `is_success()` and `summary()`.
-- **`PipelineStatus`** (enum): Overall pipeline state — `Pending`, `Running`, `Completed`, `Failed`, `Cancelled`.
+- **`PipelineStatus`** (enum): Overall status of a pipeline execution.
+- **`PipelineResult`** (struct): Aggregated outcome of a complete pipeline run.
 
 ### `pipeline::scheduler`
 
-Time-based dispatch that triggers ready steps after their configured delay elapses.
+Defines PipelineScheduler, the time-based helper that determines which delayed steps are ready to run. It is the timing primitive for async or multi-frame pipeline execution.
 
-- **`PipelineScheduler`** (struct): Maintains a `HashMap<String, f32>` of remaining delay seconds per step, plus `is_running` and `elapsed` fields. `start()` initialises timers, `update(dt)` ticks them and returns ready step names, `mark_step_waiting()` starts a step's countdown, `reset()` clears all state.
+- **`PipelineScheduler`** (struct): Tracks per-step delay timers and overall wall-clock time for a pipeline run.
+
+### `pipeline::step`
+
+Defines PipelineStep plus the step-level enums for status and error policy. It owns what one node in the workflow knows about dependencies, delays, retries, tags, and runtime outcome.
+
+- **`StepStatus`** (enum): Execution status of a single pipeline step.
+- **`ErrorPolicy`** (enum): Determines how the pipeline reacts when this step fails.
+- **`PipelineStep`** (struct): A single node in a pipeline DAG representing one unit of work.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `pipeline::dag::Pipeline`
+#### `Pipeline`
 
-A directed acyclic graph container that holds pipeline steps and their dependencies.
-`Pipeline` owns step definitions in a `HashMap<String, PipelineStep>` and provides
-validation, topological ordering, and parallel group partitioning. A global `error_mode`
-(`ErrorMode`) controls pipeline-wide failure handling. Key methods: `new(name)`,
-`add_step(step)`, `remove_step(name)`, `get_step(name)`, `get_step_mut(name)`,
-`get_steps()`, `get_step_count()`, `clear()`, `validate()`, `get_execution_order()`,
-`get_parallel_groups()`, `reset()`.
+The top-level DAG container keyed by step name.
 
-#### `pipeline::step::PipelineStep`
+#### `PipelineStep`
 
-A single node in a pipeline DAG representing one unit of work. Identified by a unique
-`name` within its parent `Pipeline`. Configuration fields: `deps` (dependency names),
-`delay` (seconds to wait after deps finish), `optional` (if true, downstream proceeds
-on failure), `retry_count`, `retry_delay`, `on_error` (per-step `ErrorPolicy`), `tag`,
-`metadata` (arbitrary string key/value pairs). Runtime fields: `status` (`StepStatus`),
-`attempt`, `duration`, `error_msg` — all reset by `reset()`.
+One named node in a workflow with dependency, delay, retry, metadata, and runtime-status fields.
 
-#### `pipeline::result::PipelineResult`
+#### `PipelineScheduler`
 
-Aggregated outcome of a complete pipeline run. Fields: `status` (`PipelineStatus`),
-`completed` / `failed` / `skipped` / `cancelled` (name lists), `total_duration`
-(wall-clock seconds), `errors` (vector of `(step_name, error_message)` tuples).
-`is_success()` returns `true` if no steps failed. `summary()` returns a human-readable
-one-line status string.
+Helper that tracks elapsed time and per-step delays to decide when steps become ready.
 
-#### `pipeline::scheduler::PipelineScheduler`
+#### `PipelineResult`
 
-Tracks per-step delay timers and overall wall-clock time for a pipeline run. `start()`
-populates timers from each step's configured delay. `update(dt)` decrements active
-timers and returns the names of steps whose delay has elapsed. `mark_step_waiting()`
-starts a newly-eligible step's countdown. `reset()` clears all state.
+Structured summary of completed, failed, skipped, or cancelled work after execution.
 
-### Enums
+#### `ErrorMode`
 
-#### `pipeline::dag::ErrorMode`
+Pipeline-level policy for whether a failing step aborts the whole pipeline or allows execution to continue.
 
-Pipeline-wide failure handling: `Abort` stops execution on the first failed step;
-`Continue` skips the failed step and proceeds with remaining steps. Serialises to
-`"abort"` / `"continue"` strings for Lua via `as_str()` / `from_str_lua()`.
+#### `ErrorPolicy`
 
-#### `pipeline::step::StepStatus`
+Step-level failure policy used when a single step needs behavior that differs from the pipeline default.
 
-Seven-state execution lifecycle for a single step: `Pending` → `Waiting` (deps
-satisfied, delay counting) → `Running` → `Completed` | `Failed` | `Skipped` |
-`Cancelled`. Serialises to lowercase strings via `as_str()`.
+#### `StepStatus`
 
-#### `pipeline::step::ErrorPolicy`
+Enum that represents the lifecycle of one step from pending through running to a terminal state.
 
-Per-step failure behaviour: `Abort` (abort the entire pipeline), `Continue` (skip
-this step, proceed), `Retry` (retry up to `retry_count` times before falling back).
+#### `PipelineStatus`
 
-#### `pipeline::result::PipelineStatus`
+Overall run-status enum for a full pipeline.
 
-Overall pipeline state: `Pending`, `Running`, `Completed`, `Failed`, `Cancelled`.
+---
 
 ## Lua API
 
 Exposed under `lurek.pipeline.*` by `src/lua_api/pipeline_api.rs`.
 
-The API provides two UserData types — `PipelineStep` and `Pipeline` — plus three
-factory functions on the `lurek.pipeline` table.
+### Module Functions
 
-### Factory Functions
+| Function | Description |
+|----------|-------------|
+| `lurek.pipeline.newStep` | Creates a new pipeline step with the given name and optional callback. |
+| `lurek.pipeline.newPipeline` | Creates a new empty pipeline with the given name (defaults to "pipeline"). |
+| `lurek.pipeline.fromTable` | Deserialises a pipeline from a definition table. |
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `lurek.pipeline.newStep` | `(name: string, fn?: function) → PipelineStep` | Creates a new step; optional callback set immediately |
-| `lurek.pipeline.newPipeline` | `(name?: string) → Pipeline` | Creates an empty pipeline (defaults to `"pipeline"`) |
-| `lurek.pipeline.fromTable` | `(def: table) → Pipeline` | Deserialises a pipeline from a declarative definition table |
+### `Pipeline` Methods
 
-### PipelineStep Methods
+| Method | Description |
+|--------|-------------|
+| `pipeline:addStep(...)` | Adds a step to the pipeline. Returns self for chaining. |
+| `pipeline:removeStep(...)` | Removes a step from the pipeline by name. |
+| `pipeline:getStep(...)` | Returns the LuaStep wrapper for the named step, or nil. |
+| `pipeline:getSteps(...)` | Returns a Lua array of all step wrappers in the pipeline. |
+| `pipeline:getStepCount(...)` | Returns the total number of steps. |
+| `pipeline:getStepsByTag(...)` | Returns a Lua array of all steps whose tag matches the given string. |
+| `pipeline:clear(...)` | Clears all steps from the pipeline. |
+| `pipeline:validate(...)` | Validates the pipeline DAG. Returns (ok, error_array). |
+| `pipeline:getExecutionOrder(...)` | Returns the topological execution order as an array of step names. |
+| `pipeline:getParallelGroups(...)` | Returns parallel execution groups as a nested array of step name arrays. |
+| `pipeline:run(...)` | Executes the pipeline synchronously in topological order. |
+| `pipeline:runAsync(...)` | Starts an async pipeline run. Steps are executed one-per-frame via update(dt). |
+| `pipeline:update(...)` | Advances the async pipeline by one tick. Returns true when all steps are done. |
+| `pipeline:cancel(...)` | Cancels all pending and waiting steps. |
+| `pipeline:reset(...)` | Resets all step states and clears the async context. |
+| `pipeline:isRunning(...)` | Returns true if the pipeline is currently running asynchronously. |
+| `pipeline:isComplete(...)` | Returns true if all steps have reached a terminal state. |
+| `pipeline:setErrorMode(...)` | Sets the pipeline error mode: "abort" or "continue". |
+| `pipeline:getErrorMode(...)` | Returns the current error mode as a string. |
+| `pipeline:getResult(...)` | Returns the current result table built from step states, or nil. |
+| `pipeline:getContext(...)` | Returns the stored async context table, or nil. |
+| `pipeline:setOnComplete(...)` | Sets the callback to invoke when the pipeline completes. |
+| `pipeline:setOnStepError(...)` | Sets the callback to invoke each time a step fails. |
+| `pipeline:getName(...)` | Returns the pipeline's name. |
+| `pipeline:setName(...)` | Sets the pipeline's name. |
+| `pipeline:toTable(...)` | Serialises the pipeline definition to a Lua table (no callbacks). |
+| `pipeline:type(...)` | Returns the type name of this object. |
+| `pipeline:typeOf(...)` | Returns true if this object is of the given type. |
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `getName` | `() → string` | Returns the step's unique name |
-| `setCallback` | `(fn: function)` | Sets the execute callback |
-| `setCondition` | `(fn?: function)` | Sets a condition gate (return `false` to skip) |
-| `setDelay` | `(seconds: number)` | Sets post-dependency delay |
-| `getDelay` | `() → number` | Returns configured delay |
-| `setTimeout` | `(seconds: number)` | Stores a timeout in metadata |
-| `getTimeout` | `() → number` | Returns stored timeout (0 if unset) |
-| `setRetryCount` | `(count: integer)` | Sets max retry attempts |
-| `getRetryCount` | `() → integer` | Returns retry count |
-| `setRetryDelay` | `(seconds: number)` | Sets delay between retries |
-| `setOptional` | `(optional: boolean)` | Marks step as optional |
-| `isOptional` | `() → boolean` | Returns optional flag |
-| `setOnError` | `(fn?: function)` | Sets per-step error callback |
-| `setData` | `(key: string, value: string)` | Stores arbitrary metadata |
-| `getData` | `(key: string) → string?` | Retrieves metadata by key |
-| `setTag` | `(tag: string)` | Sets grouping tag |
-| `getTag` | `() → string?` | Returns tag or nil |
-| `dependsOn` | `(dep: string\|PipelineStep) → PipelineStep` | Adds a dependency; returns self for chaining |
-| `getDependencies` | `() → table` | Returns array of dependency names |
-| `getDependencyCount` | `() → integer` | Returns dependency count |
-| `getStatus` | `() → string` | Returns current status string |
-| `getError` | `() → string?` | Returns last error message or nil |
-| `getDuration` | `() → number` | Returns execution duration in seconds |
-| `getAttempt` | `() → integer` | Returns number of attempts so far |
+### `Step` Methods
 
-### Pipeline Methods
+| Method | Description |
+|--------|-------------|
+| `step:getName(...)` | Returns the unique name of this step. |
+| `step:setCallback(...)` | Stores a Lua function as the execute callback for this step. |
+| `step:setCondition(...)` | Stores a Lua function (or nil) as the run-condition for this step. |
+| `step:setDelay(...)` | Sets the delay in seconds to wait after dependencies finish. |
+| `step:getDelay(...)` | Returns the configured delay in seconds. |
+| `step:setTimeout(...)` | Stores a timeout in seconds in the step's metadata. |
+| `step:getTimeout(...)` | Returns the timeout stored in metadata, or 0.0 if unset. |
+| `step:setRetryCount(...)` | Sets the maximum number of retry attempts on failure. |
+| `step:getRetryCount(...)` | Returns the configured retry count. |
+| `step:setRetryDelay(...)` | Sets the delay in seconds between retry attempts. |
+| `step:setOptional(...)` | Marks whether this step is optional (downstream steps continue on failure). |
+| `step:isOptional(...)` | Returns whether this step is marked as optional. |
+| `step:setOnError(...)` | Stores a Lua function (or nil) to call if this step fails. |
+| `step:setData(...)` | Stores an arbitrary string value under the given key in step metadata. |
+| `step:getData(...)` | Retrieves a metadata value by key, returning nil if not found. |
+| `step:setTag(...)` | Sets the tag on this step for grouping and filtering. |
+| `step:getTag(...)` | Returns the tag on this step, or nil if unset. |
+| `step:dependsOn(...)` | Adds a dependency on another step by name or PipelineStep. Returns self for chaining. |
+| `step:getDependencies(...)` | Returns the list of dependency step names. |
+| `step:getDependencyCount(...)` | Returns the number of declared dependencies. |
+| `step:getStatus(...)` | Returns the current execution status as a string. |
+| `step:getError(...)` | Returns the error message from the last failed attempt, or nil. |
+| `step:getDuration(...)` | Returns total seconds spent executing this step. |
+| `step:getAttempt(...)` | Returns the number of execution attempts so far. |
+| `step:type(...)` | Returns the type name "PipelineStep". |
+| `step:typeOf(...)` | Returns true when the given name matches "PipelineStep" or a parent type. |
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `addStep` | `(step: PipelineStep) → Pipeline` | Adds a step; returns self for chaining |
-| `removeStep` | `(name: string)` | Removes a step by name |
-| `getStep` | `(name: string) → PipelineStep?` | Looks up a step by name |
-| `getSteps` | `() → table` | Returns array of all steps |
-| `getStepCount` | `() → integer` | Returns total step count |
-| `getStepsByTag` | `(tag: string) → table` | Returns steps matching the tag |
-| `clear` | `()` | Removes all steps |
-| `validate` | `() → boolean, table` | Validates DAG; returns ok + error list |
-| `getExecutionOrder` | `() → table?, string?` | Returns topological order or error |
-| `getParallelGroups` | `() → table?, string?` | Returns nested parallel level arrays |
-| `run` | `(context?: table) → table` | Executes synchronously; returns result table |
-| `runAsync` | `(context?: table)` | Starts async execution (one step per `update` tick) |
-| `update` | `(dt: number) → boolean` | Advances async run; returns true when complete |
-| `cancel` | `()` | Cancels all pending/waiting steps |
-| `reset` | `()` | Resets all step states and async context |
-| `isRunning` | `() → boolean` | Returns true if async run is in progress |
-| `isComplete` | `() → boolean` | Returns true if all steps are terminal |
-| `setErrorMode` | `(mode: string)` | Sets `"abort"` or `"continue"` |
-| `getErrorMode` | `() → string` | Returns current error mode |
-| `getResult` | `() → table?` | Returns current result table |
-| `getContext` | `() → table?` | Returns stored async context |
-| `setOnComplete` | `(fn?: function)` | Sets pipeline-complete callback |
-| `setOnStepComplete` | `(fn?: function)` | Sets per-step-complete callback |
-| `setOnStepError` | `(fn?: function)` | Sets per-step-error callback |
-| `getName` | `() → string` | Returns pipeline name |
-| `setName` | `(name: string)` | Sets pipeline name |
-| `toTable` | `() → table` | Serialises definition (no callbacks) |
-
-### Result Table (returned by `run()`)
-
-```lua
-{
-    success = true|false,           -- true if no steps failed
-    completed = {"step1", ...},     -- names of completed steps
-    failed = {"step3", ...},        -- names of failed steps
-    skipped = {"step2", ...},       -- names of skipped steps
-    cancelled = {"step4", ...},     -- names of cancelled steps
-    totalDuration = 0.003,          -- wall-clock seconds
-    errors = {{"step3", "msg"}, ...} -- (name, message) pairs
-}
-```
+---
 
 ## Lua Examples
 
 ```lua
--- Synchronous pipeline: multi-stage world generation
-function lurek.init()
-    local terrain = lurek.pipeline.newStep("terrain", function(ctx)
-        return { heightmap = generate_heightmap(ctx.seed) }
-    end)
-
-    local rivers = lurek.pipeline.newStep("rivers", function(ctx)
-        return place_rivers(ctx.results.terrain.heightmap)
-    end)
-    rivers:dependsOn(terrain)
-
-    local cities = lurek.pipeline.newStep("cities", function(ctx)
-        return place_cities(ctx.results.terrain.heightmap, ctx.results.rivers)
-    end)
-    cities:dependsOn(terrain):dependsOn(rivers)
-
-    local pipe = lurek.pipeline.newPipeline("worldgen")
-    pipe:addStep(terrain):addStep(rivers):addStep(cities)
-
-    local result = pipe:run({ seed = 42 })
-    if result.success then
-        print("World generated in " .. result.totalDuration .. "s")
-    else
-        for _, err in ipairs(result.errors) do
-            print("FAILED: " .. err[1] .. " — " .. err[2])
-        end
-    end
+-- Minimal namespace check for lurek.pipeline.
+if lurek.pipeline then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Async pipeline: spread loading across frames
-local loader
-
-function lurek.init()
-    loader = lurek.pipeline.fromTable({
-        name = "asset_loader",
-        steps = {
-            { name = "textures",  fn = function(ctx) return load_textures()  end },
-            { name = "sounds",    fn = function(ctx) return load_sounds()    end },
-            { name = "combine",   fn = function(ctx) return true end,
-              deps = {"textures", "sounds"} },
-        }
-    })
-    loader:setOnComplete(function(result)
-        print("Loading done: " .. (result.success and "OK" or "FAIL"))
-    end)
-    loader:runAsync()
-end
-
-function lurek.process(dt)
-    if loader:isRunning() then
-        loader:update(dt)
-    end
-end
-```
-
-```lua
--- Declarative pipeline with error handling and retries
-local pipe = lurek.pipeline.newPipeline("robust")
-pipe:setErrorMode("continue")
-
-local fetch = lurek.pipeline.newStep("fetch", function(ctx)
-    return download_data(ctx.url)
-end)
-fetch:setRetryCount(3)
-fetch:setRetryDelay(1.0)
-fetch:setTimeout(10)
-
-local parse = lurek.pipeline.newStep("parse", function(ctx)
-    return parse_data(ctx.results.fetch)
-end)
-parse:dependsOn(fetch)
-parse:setOptional(true)
-
-pipe:addStep(fetch):addStep(parse)
-local r = pipe:run({ url = "https://example.com/data" })
-```
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 4     |
-| `enum`    | 4     |
-| `fn`      | 25    |
-| **Total** | **33** |
+| Kind | Count |
+|------|-------|
+| `struct` | 4 |
+| `enum` | 4 |
+| `fn` (Lua API) | 57 |
+| **Total** | **65** |
+
+---
 
 ## References
 
-| Module          | Relationship | Notes                                             |
-|-----------------|--------------|----------------------------------------------------|
-| `engine`        | Imports from | Uses `log_messages` constants (`PL01_*`, `PL02_*`, `LA02_*`) via `log_msg!` macro |
-| `lua_api`       | Imported by  | `pipeline_api.rs` wraps all types as `LuaStep`/`LuaPipeline` UserData |
-| `scene`         | Similar      | `scene` manages a stack of game scenes with transitions; `pipeline` orchestrates DAG-ordered step workflows — different abstractions |
-| `automation`    | Similar      | `automation` records/replays input sequences; `pipeline` orchestrates arbitrary Lua callbacks in dependency order |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Edge/Integration to Core Runtime. |
+
+---
 
 ## Notes
 
-- **No external crate dependencies**: The Rust module uses only `std::collections` (`HashMap`, `HashSet`, `VecDeque`). All graph algorithms are hand-written.
-- **Execution is single-threaded**: Despite the `get_parallel_groups()` API, the current Lua-side execution in `pipeline_api.rs` runs steps sequentially in topological order (sync) or one-per-tick (async). True parallel execution would require separate Lua VMs per thread.
-- **Step callbacks are stored as Lua registry keys**: The `LuaStep` and `LuaPipeline` wrappers use `Rc<RefCell<Option<LuaRegistryKey>>>` for callbacks. This means callbacks cannot be serialised by `toTable()` — only structural data (name, deps, delay, tag, etc.) is preserved.
-- **Context table is shared**: Both `run()` and `runAsync()` pass a single Lua table as `ctx` to every step callback. Upstream return values are stored in `ctx.results.<step_name>`. Steps may also read/write arbitrary keys on `ctx`.
-- **Retry semantics**: When a step has `retry_count > 0`, the callback is re-invoked up to `retry_count + 1` total times. The retry delay field exists on `PipelineStep` but is not currently enforced as a wall-clock wait in `execute_step_sync` — retries happen immediately in sequence.
-- **Condition gates**: A step with a condition function that returns `false` is set to `Skipped` status. If the step is marked `optional`, downstream dependencies proceed normally.
-- **Headless safe**: All pipeline types and the Lua API work without a window, GPU, or audio device. Tests run fully headless.
-- **Breaking change surface**: Renaming step method names on `LuaPipeline` or `LuaStep` will break any Lua script using `lurek.pipeline.*`. The `fromTable()` schema (`name`, `deps`, `fn`, `delay`, `optional`, `retryCount`, `retryDelay`, `tag`, `errorMode`) is a serialisation contract.
+- **Source of truth**: Keep this spec synchronized with `src/pipeline/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

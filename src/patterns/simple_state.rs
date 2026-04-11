@@ -26,7 +26,10 @@ impl SimpleState {
     /// # Returns
     /// `Self`.
     pub fn new() -> Self {
-        Self { states: HashSet::new(), current: None }
+        Self {
+            states: HashSet::new(),
+            current: None,
+        }
     }
 
     /// Registers a state by name.  Returns `false` if `name` already exists.

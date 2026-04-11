@@ -13,6 +13,7 @@
 //! Input events are forwarded from Lua callbacks and dispatched to the widget
 //! tree by hit-testing against widget bounds.
 
+use crate::log_msg;
 use crate::runtime::log_messages::{GU01_CTX_INIT, GU02_WIDGET_ADD};
 use crate::ui::containers::{
     DockPanel, GUIWindow, Layout, NinePatch, Panel, ScrollPanel, SplitPanel,
@@ -27,7 +28,6 @@ use crate::ui::extras::{
 };
 use crate::ui::theme::Theme;
 use crate::ui::widget::{WidgetBase, WidgetState};
-use crate::log_msg;
 
 /// A single interaction event emitted by the GUI widget tree.
 ///
@@ -334,6 +334,57 @@ impl GuiContext {
     /// `Vec<GuiEvent>`.
     pub fn drain_events(&mut self) -> Vec<GuiEvent> {
         self.pending_events.drain(..).collect()
+    }
+
+    // ── Layout ────────────────────────────────────────────────────────
+
+    /// Walk the widget tree and write `computed_rect` on each widget.
+    ///
+    /// Top-level widgets use their declared `(x, y, width, height)`.
+    /// Children are offset by their parent's `computed_rect` origin.
+    /// A zero width or height inherits the parent dimension (auto-sizing).
+    pub fn run_layout_pass(&mut self) {
+        let root_rect = crate::math::Rect::new(0.0, 0.0, 0.0, 0.0);
+        let root_children: Vec<usize> = self
+            .widgets
+            .first()
+            .and_then(|w| w.children())
+            .cloned()
+            .unwrap_or_default();
+        for &child_idx in &root_children {
+            self.layout_widget(child_idx, &root_rect);
+        }
+    }
+
+    /// Recursively compute layout for a single widget and its children.
+    fn layout_widget(&mut self, idx: usize, parent_rect: &crate::math::Rect) {
+        if idx >= self.widgets.len() {
+            return;
+        }
+
+        // Compute this widget's screen-space rect
+        let (x, y, mut w, mut h) = {
+            let base = self.widgets[idx].base();
+            (base.x, base.y, base.width, base.height)
+        };
+        if w == 0.0 && parent_rect.width > 0.0 {
+            w = parent_rect.width;
+        }
+        if h == 0.0 && parent_rect.height > 0.0 {
+            h = parent_rect.height;
+        }
+        let computed = crate::math::Rect::new(parent_rect.x + x, parent_rect.y + y, w, h);
+        {
+            let base = self.widgets[idx].base_mut();
+            base.computed_rect = computed;
+            base.is_visible = true;
+        }
+
+        // Recurse into children
+        let child_indices: Vec<usize> = self.widgets[idx].children().cloned().unwrap_or_default();
+        for child_idx in child_indices {
+            self.layout_widget(child_idx, &computed);
+        }
     }
 
     // ── Widget constructors ───────────────────────────────────────────
@@ -962,7 +1013,9 @@ impl GuiContext {
                     // Emit Click for activatable widget types
                     let is_clickable = matches!(
                         self.widgets[i],
-                        WidgetKind::Button(_) | WidgetKind::RadioButton(_) | WidgetKind::MenuItem(_)
+                        WidgetKind::Button(_)
+                            | WidgetKind::RadioButton(_)
+                            | WidgetKind::MenuItem(_)
                     );
                     if is_clickable {
                         self.pending_events.push(GuiEvent::Click(i));

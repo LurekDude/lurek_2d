@@ -6,7 +6,6 @@
 
 use std::sync::Arc;
 
-
 /// A windowed, read-only view into a shared byte buffer.
 ///
 /// Uses `Arc<Vec<u8>>` for shared ownership so that multiple views can reference the
@@ -211,7 +210,6 @@ impl DataView {
         }
     }
 }
-
 
 /// Lua-side wrapper around [`DataView`].
 ///

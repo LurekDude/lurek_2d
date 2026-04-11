@@ -117,11 +117,7 @@ pub fn server_thread(
 /// - `line` — `&str`.
 /// - `client_idx` — `usize`.
 /// - `shared` — `&Arc<Mutex<BridgeShared>>`.
-pub fn handle_client_message(
-    line: &str,
-    client_idx: usize,
-    shared: &Arc<Mutex<BridgeShared>>,
-) {
+pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<BridgeShared>>) {
     let parsed: serde_json::Value = match serde_json::from_str(line) {
         Ok(v) => v,
         Err(_) => return,
@@ -161,10 +157,7 @@ pub fn handle_client_message(
             });
         }
         "getPrintHistory" => {
-            let count = params
-                .get("count")
-                .and_then(|v| v.as_u64())
-                .unwrap_or(0) as usize;
+            let count = params.get("count").and_then(|v| v.as_u64()).unwrap_or(0) as usize;
             let result = if count == 0 {
                 serde_json::to_value(&sh.print_history).unwrap_or_default()
             } else {

@@ -19,21 +19,22 @@ use winit::window::Window;
 use crate::audio::midi::MidiState;
 use crate::audio::Mixer;
 use crate::camera::Camera;
-use crate::runtime::resource_keys::{
-    CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
-};
+use crate::event::EventQueue;
 use crate::filesystem::GameFS;
-use crate::render::gpu_renderer::RenderStats;
-use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
-use crate::render::{Canvas, CompoundShape, Mesh, Shader};
 use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
 use crate::light::LightWorld;
 use crate::parallax::ParallaxLayer;
 use crate::particle::ParticleSystem;
+use crate::raycaster::RaycasterScene;
+use crate::render::gpu_renderer::RenderStats;
+use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
+use crate::render::{Canvas, CompoundShape, Mesh, Shader};
+use crate::runtime::resource_keys::{
+    CanvasKey, FontKey, MeshKey, ParticleKey, ShaderKey, ShapeKey, SpriteBatchKey, TextureKey,
+};
 use crate::tilemap::TileMap;
-use crate::ui::GuiContext;
-use crate::event::EventQueue;
 use crate::timer::Clock;
+use crate::ui::GuiContext;
 
 /// Fullscreen mode type for window management.
 ///
@@ -385,6 +386,12 @@ pub struct SharedState {
     /// Set when `lurek.ui` is registered.  The engine appends UI render
     /// commands after the Lua `render_ui` callback each frame.
     pub auto_ui_ctx: Option<Weak<RefCell<GuiContext>>>,
+    /// Raycaster scene output from the last `buildScene()` call.
+    ///
+    /// Set by `lurek.raycaster.Raycaster:buildScene()` and cleared at the start
+    /// of each frame.  The renderer converts these quads to `DrawTexturedQuad`
+    /// commands during the auto-collect phase.
+    pub raycaster_output: Option<RaycasterScene>,
 }
 
 impl SharedState {
@@ -468,6 +475,7 @@ impl SharedState {
             auto_parallax_layers: Vec::new(),
             auto_tilemaps: Vec::new(),
             auto_ui_ctx: None,
+            raycaster_output: None,
         }
     }
 

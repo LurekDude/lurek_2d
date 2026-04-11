@@ -1,428 +1,296 @@
 # `physics` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.physics`                                       |
-| **Source**      | `src/physics/`                                       |
-| **Rust Tests** | `tests/rust/unit/physics_tests.rs`                        |
-| **Lua Tests**  | `tests/lua/unit/test_physics.lua`                    |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Platform Services |
+| **Status** | Implemented |
+| **Lua API** | `lurek.physics` |
+| **Source** | `src/physics/` |
+| **Rust Tests** | none found in the workspace |
+| **Lua Tests** | none found in the workspace |
+| **Architecture** | `docs/architecture/engine-architecture.md § Platform Services` |
+
+---
 
 ## Summary
 
-The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Lurek2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
+The physics module owns the engine's 2D simulation state and the stable, script-facing data model wrapped around rapier2d. It exists so Lua code can work with bodies, shapes, joints, and collision events through stable integer IDs and plain values instead of backend handles.
 
-The central type is `World`, which owns a `Vec<Body>` sync buffer alongside parallel rapier `RigidBodySet` and `ColliderSet` instances. The sync-buffer pattern decouples Lua property access from rapier internals: scripts read and write `Body` fields freely, and the `World::step()` method flushes those mutations into rapier, runs the simulation pipeline, then reads back computed positions, velocities, and angles for dynamic and kinematic bodies. Change detection caches (shape, restitution, friction, layer/mask) trigger automatic collider rebuilds only when a property actually changes, avoiding unnecessary rapier resource churn.
+Its core boundary is the `World` sync layer: scripts mutate `Body` records, `World::step` mirrors those changes into rapier, advances simulation, then reads the authoritative results back out. The module also owns collision and raycast query results plus CPU-side debug rendering helpers, but it does not own gameplay interpretation of contacts or the Lua registration code itself.
 
-Four body types cover standard 2D game patterns: `Dynamic` (full simulation), `Static` (immovable terrain), `Kinematic` (script-controlled platforms), and `Sensor` (overlap detection without forces). Five collision shapes are supported: axis-aligned rectangles, circles, convex polygons (max 8 vertices), edges (line segments), and chains (connected polylines, optionally closed). Bodies support multi-fixture attachment via `add_fixture`, enabling compound collision geometry on a single body.
+**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
 
-Ten joint types are available: Revolute, Distance, Prismatic, Weld, Rope, Wheel, Friction, Motor, Mouse, plus stubs for Pulley and Gear (which fall back to weld joints with a warning). Joints support motor speed, angular limits, and target position updates. Three raycast variants (brute-force, query-pipeline closest, query-pipeline all) and two spatial queries (AABB intersection, point query) enable line-of-sight checks, hit detection, and area triggers.
+---
+
 ## Architecture
 
 ```
-lurek.physics.newWorld(gx, gy)
-        |
-        v
-    +--------------------------------------------------------------------+
-    |  World                                                             |
-    |                                                                    |
-    |  +------------------------------+  +------------------------+     |
-    |  | Body Sync Buffer (Vec<Body>) |  | Rapier Pipeline        |     |
-    |  | +- position, velocity, angle |  | +- RigidBodySet        |     |
-    |  | +- mass, restitution, friction|  | +- ColliderSet         |     |
-    |  | +- body_type, layer, mask    |  | +- ImpulseJointSet     |     |
-    |  | +- shape / shape_ext         |  | +- BroadPhaseBvh       |     |
-    |  +------------------------------+  | +- NarrowPhase         |     |
-    |                 |                  | +- CCDSolver            |     |
-    |  +--------------v--------------+   | +- PhysicsPipeline     |     |
-    |  | Change Detection Caches     |   +------------------------+     |
-    |  | +- cached_shapes            |                                  |
-    |  | +- cached_restitutions      |   +------------------------+     |
-    |  | +- cached_frictions         |   | Handle Mappings        |     |
-    |  | +- cached_layers            |   | +- body_handles        |     |
-    |  +-----------------------------+   | +- collider_handles    |     |
-    |                                    | +- extra_collider_hdls  |     |
-    |  step(dt) flow:                    | +- collider_to_body    |     |
-    |  (1) Detect changed props ->       | +- joint_handles       |     |
-    |     rebuild_collider()             | +- mouse_joint_anchors |     |
-    |  (2) Sync Body -> rapier rb        +------------------------+     |
-    |  (3) pipeline.step() w/ events                                    |
-    |  (4) Read back pos/vel/angle       +------------------------+     |
-    |  (5) Map CollisionEvent ->         | Event Buffers          |     |
-    |     BodyContact { body_a, body_b } | +- collision_events    |     |
-    |                                    | +- begin_contact_events|     |
-    |                                    | +- end_contact_events  |     |
-    |                                    +------------------------+     |
-    +--------------------------------------------------------------------+
-
-    Joints (10 types)              Shapes (5 types)
-    +- Revolute (pin)              +- Rect { width, height }
-    +- Distance (fixed length)     +- Circle { radius }
-    +- Prismatic (slider)          +- Polygon { vertices } (max 8)
-    +- Weld (rigid)                +- Edge { v1, v2 }
-    +- Rope (max distance)         +- Chain { vertices, closed }
-    +- Wheel (spring + rotation)
-    +- Friction (velocity damping) Queries
-    +- Motor (force-driven)        +- raycast (brute-force nearest)
-    +- Mouse (spring to target)    +- raycastClosest (query pipeline)
-    +- Pulley (stub -> weld)       +- raycastAll (all hits)
-    +- Gear (stub -> weld)         +- queryAABB (bodies in rect)
-                                   +- getBodyAtPoint (point query)
+lurek.physics.* (Lua API — src/lua_api/physics_api.rs)
+    |
+    v
+src/physics/mod.rs
+    |- body.rs - body
+    |- collision.rs - collision
+    |- render.rs - render
+    |- shape.rs - shape
+    |- world.rs - world
 ```
+
+---
 
 ## Source Files
 
-| File           | Purpose                                                      |
-|----------------|--------------------------------------------------------------|
-| `body.rs`      | `Body` struct, `BodyType`/`BodyShape` enums, constructors, coordinate transforms, bounding box |
-| `collision.rs` | `CollisionInfo` struct — legacy penetration/normal data (retained for backward compatibility) |
-| `shape.rs`     | Extended `Shape` enum (polygon, edge, chain), `StandaloneShape` value type, rapier collider conversion |
-| `world.rs`     | `World` simulation manager, body/joint CRUD, step pipeline, raycasting, spatial queries, collision events |
-| `mod.rs` | — |
+| File | Purpose |
+|------|---------|
+| `body.rs` | Script-facing rigid-body types, constructors, bounding boxes, and local/world point helpers. |
+| `collision.rs` | Backward-compatible `CollisionInfo` contact record retained on the public API surface. |
+| `mod.rs` | Module root and public re-export surface for bodies, shapes, collision records, and the world. |
+| `render.rs` | Debug overlay render-command generation and CPU image export for headless inspection. |
+| `shape.rs` | Extended collider geometry and reusable standalone fixture descriptors. |
+| `world.rs` | Simulation owner for rapier sets, body and collider mappings, joints, stepping, events, and spatial queries. |
+
+---
 
 ## Submodules
 
 ### `physics::body`
 
-Body types, shapes, and the `Body` struct used by the physics world.
+Script-facing rigid-body types, constructors, bounding boxes, and local/world point helpers.
 
-- **`BodyType`** (enum) — Determines whether a physics body is affected by forces and gravity. Variants: `Static`, `Dynamic`, `Kinematic`, `Sensor`.
-- **`BodyShape`** (enum) — Describes basic collision geometry: `Rect { width, height }` or `Circle { radius }`.
-- **`Body`** (struct) — A rigid body with position, velocity, mass, shape, and restitution. Bodies live in a `World` and are identified by stable integer indices. Provides five constructors (`new`, `new_circle`, `new_polygon`, `new_edge`, `new_chain`), bounding box computation, collision layer filtering, body type name accessor, and local/world coordinate transforms.
+- **`BodyType`** (enum): Determines whether a physics body is affected by forces and gravity.
+- **`BodyShape`** (enum): Describes the collision geometry of a body.
+- **`Body`** (struct): A rigid body with position, velocity, mass, shape, and restitution.
 
 ### `physics::collision`
 
-Legacy collision contact data retained for backward compatibility.
+Backward-compatible `CollisionInfo` contact record retained on the public API surface.
 
-- **`CollisionInfo`** (struct) — Stores penetration depth and separating normal between two bodies. Not actively used by the rapier-backed simulation; collision detection is handled internally by rapier. See `World::get_collision_events()` for the current event API.
+- **`CollisionInfo`** (struct): Collision contact data: penetration depth and separating normal.
+
+### `physics::render`
+
+Debug overlay render-command generation and CPU image export for headless inspection.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
 ### `physics::shape`
 
-Extended shape types beyond basic rect/circle.
+Extended collider geometry and reusable standalone fixture descriptors.
 
-- **`Shape`** (enum) — Five collision shape variants: `Rect`, `Circle`, `Polygon` (convex, max 8 vertices), `Edge` (line segment), `Chain` (connected edges, optionally closed). Provides `to_rapier_collider()` (crate-internal) for converting to rapier `ColliderBuilder` and `regular_polygon()` for generating regular N-gon vertices.
-- **`StandaloneShape`** (struct) — A shape value holding geometry plus default fixture parameters (density, friction, restitution, sensor flag). Created via `lurek.physics.newCircleShape` et al. and attached to bodies with `world:addFixture`. Can be reused across multiple bodies.
+- **`Shape`** (enum): Extended collision shape for physics bodies.
+- **`StandaloneShape`** (struct): A standalone shape value holding geometry and default fixture parameters.
 
 ### `physics::world`
 
-The core simulation manager wrapping the rapier2d pipeline.
+Simulation owner for rapier sets, body and collider mappings, joints, stepping, events, and spatial queries.
 
-- **`BodyContact`** (struct) — Collision event with stable integer body IDs (`body_a`, `body_b`). Generated by `World::step()` when two bodies start overlapping.
-- **`RaycastHit`** (struct) — Raycast result containing `body_id`, hit `point`, surface `normal`, and distance `toi`.
-- **`ContactInfo`** (struct) — Narrow-phase contact data with body IDs, contact normal, and `is_touching` flag.
-- **`World`** (struct) — Simulates a 2D physics world using rapier2d. Owns the body sync buffer, rapier pipeline fields, handle mappings, joint table, collision event buffers, and meter scaling. Provides 78 public methods covering body management, joint creation, simulation stepping, raycasting, spatial queries, and contact retrieval.
+- **`BodyContact`** (struct): Collision event generated by `World::step` when two bodies start overlapping.
+- **`RaycastHit`** (struct): Result of a `World::raycast` query.
+- **`ContactInfo`** (struct): Contact information between two bodies from the narrow phase.
+- **`World`** (struct): Simulates a 2D physics world using rapier2d.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `physics::body::Body`
+#### `World`
 
-A rigid body with position, velocity, mass, shape, and restitution. Fields: `position` (Vec2), `velocity` (Vec2), `mass` (f32), `body_type` (BodyType), `shape` (BodyShape), `restitution` (f32), `layer`/`mask` (u32 bitmasks), `width`/`height` (convenience), `friction` (f32), `angle` (f32), `angular_velocity` (f32), `shape_ext` (Option<Shape>). Constructors: `new()` (rect), `new_circle()`, `new_polygon()`, `new_edge()`, `new_chain()`. Methods: `bounding_box()`, `collides_with_layer()`, `get_bounding_box()`, `get_type()`, `get_world_point()`, `get_local_point()`.
+Central simulation owner for bodies, joints, queries, cached collider state, and event buffers.
 
-#### `physics::collision::CollisionInfo`
+#### `Body`
 
-Legacy collision contact data: `penetration` (f32) and `normal` (Vec2). Retained for backward compatibility; the active API uses `World::get_collision_events()`.
+Lua-friendly rigid-body record mirrored into and out of rapier state.
 
-#### `physics::shape::StandaloneShape`
+#### `BodyType`
 
-Standalone shape value with default fixture parameters. Fields: `shape` (Shape), `density` (f32, default 1.0), `friction` (f32, default 0.5), `restitution` (f32, default 0.0), `sensor` (bool, default false). Methods: `new()`, `get_type()`, `get_radius()`, `get_bounding_box()`.
+Simulation mode selector for static, dynamic, kinematic, and sensor bodies.
 
-#### `physics::world::BodyContact`
+#### `BodyShape`
 
-Collision event produced by `World::step()`. Fields: `body_a` (usize), `body_b` (usize).
+Lightweight common-shape enum for rectangle and circle bodies.
 
-#### `physics::world::RaycastHit`
+#### `Shape`
 
-Raycast query result. Fields: `body_id` (usize), `point` ((f32, f32)), `normal` ((f32, f32)), `toi` (f32).
+Extended collider enum for polygons, edges, chains, and the simple primitive cases.
 
-#### `physics::world::ContactInfo`
+#### `StandaloneShape`
 
-Narrow-phase contact pair. Fields: `body_a` (usize), `body_b` (usize), `normal_x` (f32), `normal_y` (f32), `is_touching` (bool).
+Reusable shape-plus-fixture descriptor for attaching extra colliders.
 
-#### `physics::world::World`
+#### `BodyContact`
 
-The 2D physics simulation. Key internal fields: `bodies` (Vec<Body>), rapier pipeline components (`pipeline`, `rbodies`, `rcolliders`, `impulse_joints`, etc.), handle mappings (`body_handles`, `collider_handles`, `collider_to_body`), change detection caches, collision event buffers, `joint_types` (Vec<&'static str>), `mouse_joint_anchors` (HashMap), `pixels_per_meter` (f32).
+Stable-ID collision event emitted from simulation results.
 
-### Enums
+#### `RaycastHit`
 
-#### `physics::body::BodyType`
+Query result carrying hit body, hit point, normal, and distance.
 
-Body simulation mode. Variants: `Static` (immovable), `Dynamic` (full physics), `Kinematic` (script-controlled position), `Sensor` (overlap detection only).
+#### `ContactInfo`
 
-#### `physics::body::BodyShape`
+Narrow-phase contact snapshot for detailed per-pair inspection.
 
-Basic collision geometry. Variants: `Rect { width, height }`, `Circle { radius }`.
+#### `CollisionInfo`
 
-#### `physics::shape::Shape`
+Legacy compatibility record still exposed alongside newer contact models.
 
-Extended collision geometry. Variants: `Rect { width, height }`, `Circle { radius }`, `Polygon { vertices }` (convex, max 8 vertices), `Edge { v1, v2 }` (line segment), `Chain { vertices, closed }` (connected edges).
+---
 
 ## Lua API
 
-Exposed under `lurek.physics.*` by `src/lua_api/physics_api.rs`. The API provides two UserData types (`LuaWorld` and `LuaBody`) plus module-level factory functions.
+Exposed under `lurek.physics.*` by `src/lua_api/physics_api.rs`.
 
-### Module-level functions (`lurek.physics.*`)
+### Module Functions
 
 | Function | Description |
 |----------|-------------|
-| `newWorld(gx, gy)` | Create a physics world with given gravity vector |
-| `newRectangleShape(w, h)` | Create a rectangle shape descriptor |
-| `newCircleShape(radius)` | Create a circle shape descriptor |
-| `newEdgeShape(x1, y1, x2, y2)` | Create an edge shape descriptor |
+| `lurek.physics.newWorld` | Creates a new physics world with the given gravity vector. |
+| `lurek.physics.step` | Advances the physics world by dt seconds. |
+| `lurek.physics.destroyWorld` | Marks a physics world for destruction. Subsequent operations on the world |
+| `lurek.physics.newBody` | Creates a new rectangular body in the given world. |
+| `lurek.physics.getBody` | Returns the position and velocity of a body (x, y, vx, vy). |
+| `lurek.physics.setBodyVelocity` | Sets the velocity of a body. |
+| `lurek.physics.isSleepingAllowed` | Returns whether the body is allowed to sleep. |
+| `lurek.physics.setSleepingAllowed` | Sets whether the body is allowed to sleep. |
+| `lurek.physics.newRectangleShape` | Creates a rectangle shape userdata. |
+| `lurek.physics.newCircleShape` | Creates a circle shape userdata. |
+| `lurek.physics.newEdgeShape` | Creates an edge (line segment) shape userdata. |
+| `lurek.physics.newPolygonShape` | Creates a convex polygon shape userdata from flat variadic vertex pairs. |
+| `lurek.physics.newChainShape` | Creates a chain shape userdata from flat variadic vertex pairs. |
+| `lurek.physics.attachShape` | Attaches a standalone shape to a body as an additional fixture. |
+| `lurek.physics.getCollisions` | Returns all collision events from the last simulation step. |
+| `lurek.physics.debugDraw` | Enables or disables the physics debug overlay (AABB boxes and velocity vectors). |
 
-### World methods (`world:*`)
-
-| Method | Description |
-|--------|-------------|
-| `step(dt)` | Advance simulation by dt seconds |
-| `clear()` | Remove all bodies and joints |
-| `getGravity()` | Returns (gx, gy) |
-| `setGravity(gx, gy)` | Set gravity vector |
-| `setMeter(ppm)` | Set pixels-per-meter scale |
-| `getMeter()` | Get pixels-per-meter scale |
-| `toPhysics(px)` | Convert pixels to physics units |
-| `toPixels(m)` | Convert physics units to pixels |
-| `getBodyCount()` | Total body count |
-| `getBodyIds()` | All body IDs as table |
-| `destroyBody(id)` | Remove a body |
-| `newBody(x, y, type)` | Create rectangular body |
-| `newCircleBody(x, y, r, type)` | Create circular body |
-| `newPolygonBody(x, y, verts, type)` | Create polygon body |
-| `newEdgeBody(x, y, x1, y1, x2, y2, type)` | Create edge body |
-| `newChainBody(x, y, verts, closed, type)` | Create chain body |
-| `addFixture(bodyId, shapeType, density, friction, restitution, sensor, ...)` | Add extra collider |
-| `fixtureCount(bodyId)` | Fixture count on body |
-| `setFixtureFriction(bodyId, idx, friction)` | Set fixture friction |
-| `setFixtureRestitution(bodyId, idx, restitution)` | Set fixture restitution |
-| `setFixtureSensor(bodyId, idx, sensor)` | Set fixture sensor flag |
-| `addRevoluteJoint(a, b, ax, ay)` | Pin joint |
-| `addDistanceJoint(a, b, ax1, ay1, ax2, ay2, len)` | Fixed-length joint |
-| `addPrismaticJoint(a, b, ax, ay, axisX, axisY)` | Slider joint |
-| `addWeldJoint(a, b, ax, ay)` | Rigid attachment |
-| `addRopeJoint(a, b, ax1, ay1, ax2, ay2, max)` | Max-distance joint |
-| `addWheelJoint(a, b, ax, ay, axisX, axisY)` | Spring + rotation |
-| `addFrictionJoint(a, b, ax, ay, maxF, maxT)` | Velocity damping |
-| `addMotorJoint(a, b, factor)` | Force-driven joint |
-| `addMouseJoint(bodyId, tx, ty, maxF)` | Spring to target point |
-| `addPulleyJoint(a, b, ax, ay)` | Stub (falls back to weld) |
-| `addGearJoint(a, b, ax, ay)` | Stub (falls back to weld) |
-| `jointCount()` | Total joint count |
-| `getJointIds()` | All joint IDs |
-| `getJointBodies(jid)` | Bodies connected by joint |
-| `destroyJoint(jid)` | Remove a joint |
-| `getJointType(jid)` | Joint type name |
-| `setJointMotorSpeed(jid, speed)` | Set angular motor speed |
-| `getJointMotorSpeed(jid)` | Get angular motor speed |
-| `setJointLimitsEnabled(jid, enabled)` | Enable/disable angular limits |
-| `setJointLimits(jid, lower, upper)` | Set angular limits |
-| `getJointLimits(jid)` | Get angular limits (lower, upper) |
-| `setMouseJointTarget(jid, x, y)` | Update mouse joint target |
-| `raycast(x1, y1, x2, y2)` | Nearest hit (brute-force) |
-| `raycastClosest(x1, y1, dx, dy, maxDist)` | Nearest hit (query pipeline) |
-| `raycastAll(x1, y1, dx, dy, maxDist)` | All hits |
-| `queryAABB(x, y, w, h)` | Body IDs in rectangle |
-| `getBodyAtPoint(x, y)` | Body at point (or nil) |
-| `getCollisionEvents()` | Collision events from last step |
-| `getBeginContactEvents()` | Begin-contact events |
-| `getEndContactEvents()` | End-contact events |
-| `getContacts()` | All narrow-phase contacts |
-| `getBodyContacts(bodyId)` | Contacts for a specific body |
-| `setBodyType(bodyId, type)` | Change body type |
-| `getBodyType(bodyId)` | Get body type string |
-
-### Body methods (`body:*`)
+### `Body` Methods
 
 | Method | Description |
 |--------|-------------|
-| `getId()` | Stable integer ID |
-| `getPosition()` | Returns (x, y) |
-| `setPosition(x, y)` | Teleport body |
-| `getX()` | X position |
-| `getY()` | Y position |
-| `getVelocity()` | Returns (vx, vy) |
-| `setVelocity(vx, vy)` | Set linear velocity |
-| `getAngle()` | Rotation in radians |
-| `setAngle(angle)` | Set rotation |
-| `getAngularVelocity()` | Spin rate (rad/s) |
-| `setAngularVelocity(omega)` | Set spin rate |
-| `getMass()` | Body mass |
-| `setMass(mass)` | Set body mass |
-| `getType()` | Body type string |
-| `setType(type)` | Change body type |
-| `getWidth()` | Body width |
-| `getHeight()` | Body height |
-| `getFriction()` | Friction coefficient |
-| `setFriction(friction)` | Set friction |
-| `getRestitution()` | Bounciness |
-| `setRestitution(restitution)` | Set bounciness |
-| `getLayer()` | Collision layer bitmask |
-| `setLayer(layer)` | Set collision layer |
-| `getMask()` | Collision mask bitmask |
-| `setMask(mask)` | Set collision mask |
-| `applyImpulse(ix, iy)` | Apply linear impulse |
-| `applyForce(fx, fy)` | Apply continuous force |
-| `applyTorque(torque)` | Apply rotational force |
-| `applyForceAtPoint(fx, fy, px, py)` | Force at world point |
-| `applyAngularImpulse(impulse)` | Apply angular impulse |
-| `getGravityScale()` | Per-body gravity multiplier |
-| `setGravityScale(scale)` | Set gravity multiplier |
-| `isFixedRotation()` | Rotation locked? |
-| `setFixedRotation(fixed)` | Lock/unlock rotation |
-| `getLinearDamping()` | Linear damping coefficient |
-| `setLinearDamping(damping)` | Set linear damping |
-| `getAngularDamping()` | Angular damping coefficient |
-| `setAngularDamping(damping)` | Set angular damping |
-| `isBullet()` | CCD enabled? |
-| `setBullet(bullet)` | Enable/disable CCD |
-| `isSleepingAllowed()` | Can body sleep? |
-| `setSleepingAllowed(allowed)` | Allow/disallow sleeping |
-| `destroy()` | Remove body from world |
+| `body:getId(...)` | Returns the body's integer ID. |
+| `body:getPosition(...)` | Returns the body position (x, y). |
+| `body:setPosition(...)` | Sets the body position. |
+| `body:getX(...)` | Returns the body X position. |
+| `body:getY(...)` | Returns the body Y position. |
+| `body:getVelocity(...)` | Returns the body velocity (vx, vy). |
+| `body:setVelocity(...)` | Sets the body velocity. |
+| `body:getAngle(...)` | Returns the body angle in radians. |
+| `body:setAngle(...)` | Sets the body angle in radians. |
+| `body:getAngularVelocity(...)` | Returns the angular velocity in radians/s. |
+| `body:setAngularVelocity(...)` | Sets the angular velocity. |
+| `body:getMass(...)` | Returns the body mass. |
+| `body:setMass(...)` | Sets the body mass. |
+| `body:getType(...)` | Returns the body type as a string. |
+| `body:setType(...)` | Sets the body type. |
+| `body:getWidth(...)` | Returns the body width. |
+| `body:getHeight(...)` | Returns the body height. |
+| `body:getFriction(...)` | Returns the body friction coefficient. |
+| `body:setFriction(...)` | Sets the body friction coefficient. |
+| `body:getRestitution(...)` | Returns the body restitution (bounciness). |
+| `body:setRestitution(...)` | Sets the body restitution (bounciness). |
+| `body:getLayer(...)` | Returns the collision layer bitmask. |
+| `body:setLayer(...)` | Sets the collision layer bitmask. |
+| `body:getMask(...)` | Returns the collision mask bitmask. |
+| `body:setMask(...)` | Sets the collision mask bitmask. |
+| `body:applyImpulse(...)` | Applies a linear impulse to the body. |
+| `body:applyForce(...)` | Applies a continuous force to the body. |
+| `body:applyTorque(...)` | Applies a torque (rotational force). |
+| `body:applyAngularImpulse(...)` | Applies an angular impulse. |
+| `body:getGravityScale(...)` | Returns the per-body gravity multiplier. |
+| `body:setGravityScale(...)` | Sets the per-body gravity multiplier. |
+| `body:isFixedRotation(...)` | Returns whether rotation is locked. |
+| `body:setFixedRotation(...)` | Locks or unlocks rotation. |
+| `body:getLinearDamping(...)` | Returns the linear damping coefficient. |
+| `body:setLinearDamping(...)` | Sets the linear damping coefficient. |
+| `body:getAngularDamping(...)` | Returns the angular damping coefficient. |
+| `body:setAngularDamping(...)` | Sets the angular damping coefficient. |
+| `body:isBullet(...)` | Returns whether CCD is enabled. |
+| `body:setBullet(...)` | Enables or disables CCD. |
+| `body:isSleepingAllowed(...)` | Returns whether the body can sleep. |
+| `body:setSleepingAllowed(...)` | Sets whether the body can sleep. |
+| `body:destroy(...)` | Removes this body from the world. |
 
+### `PhysicsShape` Methods
 
-### Additional API
+| Method | Description |
+|--------|-------------|
+| `physicsshape:getType(...)` | Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain". |
+| `physicsshape:getRadius(...)` | Returns the radius. Only valid for circle shapes. |
+| `physicsshape:getBoundingBox(...)` | Returns the axis-aligned bounding box (x1, y1, x2, y2). |
+| `physicsshape:setDensity(...)` | Sets the density for this shape (used when attaching to a body). |
+| `physicsshape:setFriction(...)` | Sets the friction coefficient. |
+| `physicsshape:setRestitution(...)` | Sets the restitution (bounciness) coefficient. |
+| `physicsshape:setSensor(...)` | Sets whether this shape is a sensor (non-colliding trigger). |
+| `physicsshape:destroy(...)` | Releases this shape handle (GC handles cleanup). |
 
-| Function | Description |
-|---|---|
-| `attachShape(bodyId, shapeId)` | Attach a shape to a body |
-| `bodyA` | First body in a collision contact |
-| `bodyB` | Second body in a collision contact |
-| `destroyWorld()` | Destroy the current physics world |
-| `getCollisions()` | All collision pairs from last step |
-| `isTouching(bodyId1, bodyId2)` | True if two bodies are currently touching |
-| `newChainShape(vertices)` | Create a chain shape from vertex list |
-| `newPolygonShape(vertices)` | Create a convex polygon shape |
-| `normalX` | X component of collision contact normal |
-| `normalY` | Y component of collision contact normal |
-| `setBodyVelocity(bodyId, vx, vy)` | Set body linear velocity directly |
-| `toi` | Time-of-impact value for the contact |
+### `World` Methods
+
+| Method | Description |
+|--------|-------------|
+| `world:step(...)` | Advances the physics simulation by dt seconds. |
+| `world:clear(...)` | Resets the world, removing all bodies and joints. |
+| `world:getGravity(...)` | Returns the gravity vector (gx, gy). |
+| `world:setGravity(...)` | Sets the gravity vector. |
+| `world:setMeter(...)` | Sets the pixels-per-meter scaling factor. |
+| `world:getMeter(...)` | Returns the pixels-per-meter scaling factor. |
+| `world:toPhysics(...)` | Converts a pixel value to physics units. |
+| `world:toPixels(...)` | Converts a physics-unit value to pixels. |
+| `world:getBodyCount(...)` | Returns the total number of bodies in the world. |
+| `world:getBodyIds(...)` | Returns all body IDs in the world. |
+| `world:destroyBody(...)` | Removes a body from the world. |
+| `world:newBody(...)` | Creates a new rectangular body and adds it to the world. |
+| `world:fixtureCount(...)` | Returns the number of fixtures on a body. |
+| `world:jointCount(...)` | Returns the total number of joints. |
+| `world:getJointIds(...)` | Returns all joint IDs. |
+| `world:getJointBodies(...)` | Returns the two body IDs connected by a joint. |
+| `world:destroyJoint(...)` | Removes a joint from the world. |
+| `world:getJointType(...)` | Returns the type name of a joint. |
+| `world:getJointMotorSpeed(...)` | Returns the motor speed on a joint's angular axis. |
+| `world:getJointLimits(...)` | Returns the angular limits on a joint. |
+| `world:getBodyAtPoint(...)` | Returns the body ID at a world-space point, or nil. |
+| `world:getCollisionEvents(...)` | Returns collision events from the last step. |
+| `world:getBeginContactEvents(...)` | Returns begin-contact events from the last step. |
+| `world:getEndContactEvents(...)` | Returns end-contact events from the last step. |
+| `world:getContacts(...)` | Returns all contact pairs from the narrow phase. |
+| `world:getBodyContacts(...)` | Returns contacts involving a specific body. |
+| `world:setBodyType(...)` | Changes the body type. |
+| `world:getBodyType(...)` | Returns the body type as a string. |
+
+---
 
 ## Lua Examples
 
 ```lua
-function lurek.init()
-    -- Create a world with downward gravity
-    world = lurek.physics.newWorld(0, 9.81)
-
-    -- Static ground platform
-    ground = world:newBody(400, 580, "static")
-    ground:setFriction(0.8)
-    ground:setRestitution(0.0)
-
-    -- Dynamic bouncing ball
-    ball = world:newCircleBody(400, 100, 20, "dynamic")
-    ball:setRestitution(0.7)
-    ball:setLinearDamping(0.1)
-
-    -- Kinematic moving platform
-    platform = world:newBody(300, 400, "kinematic")
-
-    -- Sensor trigger zone
-    trigger = world:newBody(600, 300, "sensor")
-end
-
-function lurek.process(dt)
-    world:step(dt)
-
-    -- Read ball state
-    local x, y = ball:getPosition()
-    local vx, vy = ball:getVelocity()
-    local angle = ball:getAngle()
-
-    -- Move kinematic platform
-    platform:setPosition(300 + math.sin(lurek.time.getTime()) * 100, 400)
-
-    -- Check collision events
-    local events = world:getBeginContactEvents()
-    for _, evt in ipairs(events) do
-        if evt.bodyA == trigger:getId() or evt.bodyB == trigger:getId() then
-            -- Trigger zone entered
-        end
-    end
-
-    -- Raycast for line-of-sight
-    local hit = world:raycast(0, 300, 800, 300)
-    if hit then
-        local hitId = hit.bodyId
-        local hx, hy = hit.x, hit.y
-    end
-end
-
-function lurek.render()
-    -- Draw ball
-    local bx, by = ball:getPosition()
-    lurek.graphic.circle("fill", bx, by, 20)
-
-    -- Draw ground
-    local gx, gy = ground:getPosition()
-    lurek.graphic.rectangle("fill", gx - 400, gy - 10, 800, 20)
+-- Minimal namespace check for lurek.physics.
+if lurek.physics then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-### Joints example
-
-```lua
-function lurek.init()
-    world = lurek.physics.newWorld(0, 9.81)
-
-    -- Two bodies connected by a revolute joint
-    anchor = world:newBody(400, 200, "static")
-    pendulum = world:newBody(400, 300, "dynamic")
-    joint = world:addRevoluteJoint(anchor:getId(), pendulum:getId(), 0, 0)
-
-    -- Distance joint
-    bodyA = world:newBody(200, 200, "dynamic")
-    bodyB = world:newBody(300, 200, "dynamic")
-    world:addDistanceJoint(bodyA:getId(), bodyB:getId(), 0, 0, 0, 0, 100)
-
-    -- Mouse joint for dragging
-    draggable = world:newBody(500, 300, "dynamic")
-    mouseJoint = world:addMouseJoint(draggable:getId(), 500, 300, 1000)
-end
-
-function lurek.process(dt)
-    -- Update mouse joint target to cursor position
-    local mx, my = lurek.mouse.getPosition()
-    world:setMouseJointTarget(mouseJoint, mx, my)
-
-    world:step(dt)
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count  |
-|------------|--------|
-| `struct`   | 7      |
-| `enum`     | 3      |
-| `fn`       | 94     |
-| **Total**  | **104** |
+| Kind | Count |
+|------|-------|
+| `struct` | 7 |
+| `enum` | 3 |
+| `fn` (Lua API) | 94 |
+| **Total** | **104** |
+
+---
 
 ## References
 
-| Module     | Relationship | Notes                                                    |
-|------------|-------------|----------------------------------------------------------|
-| `engine`   | Imports from | Uses `SharedState`, `PhysicsWorldKey`, `PhysicsBodyKey`  |
-| `math`     | Imports from | `Vec2`, `Rect` for positions and shapes                  |
-| `lua_api`  | Imported by  | `src/lua_api/physics_api.rs` registers `lurek.physics.*`  |
-| `graphics` | Related      | Physics debug rendering draws body outlines via draw commands; no direct import |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `math` | Imports or references `math` from `src/math/`. | Cross-group dependency from Platform Services to Foundations. |
+| `render` | Imports or references `render` from `src/render/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Platform Services to Core Runtime. |
 
-**Similar modules**: None — physics is the only simulation module. The `math` module provides linear algebra primitives but no physics simulation. The `particle` module (Tier 2) handles visual particle effects, not rigid-body physics.
+---
 
 ## Notes
 
-- **rapier2d 0.32** is the underlying physics engine. All rapier types are internal; Lua scripts interact only with stable integer body/joint IDs.
-- **Sync-buffer pattern**: Lua writes to `Body` fields -> changes flushed to rapier at `step()` -> results read back. Change detection (shape, restitution, friction, layer/mask) avoids unnecessary collider rebuilds.
-- **`step(dt)` call frequency**: Call once per frame with the real delta time. The module does not perform fixed-timestep subdivision internally; the caller controls the timestep.
-- **Body destruction preserves IDs**: `destroy_body()` disables the rapier rigid body and marks the slot as static rather than removing it from the `Vec<Body>`. This keeps all other body indices stable. Destroyed body slots are never reused.
-- **Sensor bodies** generate `beginContact`/`endContact` events but exert no physical forces. They map to rapier `Fixed` rigid bodies with collider `sensor = true`.
-- **Kinematic bodies** use `set_next_kinematic_translation` / `set_next_kinematic_rotation` in rapier, enabling smooth interpolation rather than teleporting.
-- **Pulley and Gear joints** are stubs that fall back to weld joints with a `log::warn!` message, because rapier2d 0.32 has no direct equivalent.
-- **Mouse joint** creates an internal kinematic anchor body and a spring joint. The anchor body is tracked in `mouse_joint_anchors` and repositioned via `set_mouse_joint_target`.
-- **Thread safety**: The `World` uses `Rc<RefCell<World>>` in Lua bindings and cannot be shared across threads. Create separate worlds per thread if needed.
-- **`LocalEventCollector`** uses `Mutex<Vec<CollisionEvent>>` because rapier2d 0.32 requires `EventHandler: Send + Sync`, even though the physics pipeline runs single-threaded.
-- **Polygon vertices**: Maximum 8 vertices for `Shape::Polygon`. The polygon must be convex; rapier's `convex_hull` builder handles winding order.
-- **Multi-fixture bodies**: `add_fixture()` attaches additional colliders to an existing body. The primary collider uses index 0; extras start at 1. Fixture friction, restitution, and sensor flag can be set per-fixture.
-- **Breaking change surface**: Renaming or removing any Lua-facing method on `LuaWorld` or `LuaBody` will break user scripts. Body ID stability is a hard contract — never change the index assignment scheme.
+- **Source of truth**: Keep this spec synchronized with `src/physics/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

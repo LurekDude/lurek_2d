@@ -1,73 +1,41 @@
-# `light` — Agent Reference
+﻿# light - Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extension                            |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.light`                                         |
-| **Source**      | `src/light/`                                                |
-| **Rust Tests** | `tests/rust/unit/light_tests.rs`                     |
-| **Lua Tests**  | `tests/lua/unit/test_light.lua`                      |
-| **Architecture** | —                                                  |
+## Module Info
 
-## Purpose
+- Module: light
+- Group: Platform Services
+- Spec: docs/specs/light.md
+- Lua API: src/lua_api/light_api.rs
+- Rust tests: tests/rust/unit/light_tests.rs
+- Lua tests: tests/lua/unit/test_light.lua, tests/lua/stress/test_light_stress.lua, tests/lua/integration/test_light_graphics.lua, tests/lua/evidence/test_evidence_light.lua
 
-The `light` module provides a CPU-side 2D dynamic lighting data model for Lurek2D. It stores all state needed to describe point, directional, and spot light sources in 2D space — position, radius, colour, intensity, falloff curves, shadow settings, flicker effects, attenuation coefficients, bitmask-based filtering, and group management. It also provides `Occluder` polygons that define shadow-casting geometry and `LightWorld`, a SlotMap-based resource pool that aggregates all lights and occluders for a scene.
+## Module Purpose
 
-## Source Files
+The light module owns the CPU-side 2D lighting model. It defines individual lights, occluders, attenuation, falloff, flicker, blend behavior, shadow filtering, and the LightWorld container that groups active lighting state into keyed pools for the renderer to consume later.
 
-| File              | Purpose                                                        |
-|-------------------|----------------------------------------------------------------|
-| `mod.rs`          | Module root — re-exports all public types, declares submodules |
-| `attenuation.rs`  | `Attenuation` struct — custom distance falloff coefficients    |
-| `blend_mode.rs`   | `LightBlendMode` enum — additive / subtractive / mix blending  |
-| `falloff.rs`      | `FalloffMode` enum — linear / smooth / constant intensity decay|
-| `flicker.rs`      | `FlickerConfig` struct — sinusoidal intensity modulation       |
-| `light2d.rs`      | `Light2D` struct — primary light data container (23 fields)    |
-| `light_type.rs`   | `LightType` enum — point / directional / spot geometry         |
-| `light_world.rs`  | `LightWorld` struct — SlotMap pool for lights and occluders    |
-| `occluder.rs`     | `Occluder` struct — polygon shadow caster definition           |
-| `shadow.rs`       | `ShadowFilter` enum — shadow edge quality (none / PCF5 / PCF13)|
+This module keeps lighting data and rules separate from shader execution. It describes what lights and occluders exist and how they should behave, but it does not perform shadow rendering, final compositing, or scene ownership. That boundary keeps the lighting state testable and lets the renderer decide how to turn these descriptions into an actual lighting pass.
+
+## Files
+
+- mod.rs: Declares the lighting submodules and re-exports the public light types.
+- light2d.rs: Defines Light2D, the main per-light data record with position, radius, color, intensity, masks, shadows, geometry, attenuation, flicker, and grouping.
+- light_world.rs: Defines LightWorld, the keyed container for active lights, occluders, ambient color, limits, and group operations.
+- occluder.rs: Defines Occluder, a polygon shadow caster with transform, opacity, mask, and enabled state.
+- light_type.rs: Defines the geometric light-type enum for point, directional, and spot lights.
+- blend_mode.rs: Defines how light mixes with the scene.
+- falloff.rs: Defines the high-level radial falloff enum.
+- attenuation.rs: Defines coefficient-based attenuation for custom distance decay.
+- flicker.rs: Defines flicker configuration and phase advancement helpers.
+- shadow.rs: Defines the shadow edge-filter enum.
 
 ## Key Types
 
-| Type | Description |
-|------|-------------|
-| `Attenuation` | Principal type for the `light` module. |
-| `LightBlendMode` | Principal type for the `light` module. |
-| `FalloffMode` | Principal type for the `light` module. |
-| `FlickerConfig` | Principal type for the `light` module. |
-| `Light2D` | Principal type for the `light` module. |
-| `LightType` | Principal type for the `light` module. |
-| `LightWorld` | Principal type for the `light` module. |
-| `Occluder` | Principal type for the `light` module. |
-| `ShadowFilter` | Principal type for the `light` module. |
-
-## Lua API Summary
-
-| Function | Description |
-|----------|-------------|
-| `lurek.light.newLight()` | See `docs/specs/light.md`. |
-| `lurek.light.newOccluder()` | See `docs/specs/light.md`. |
-| `lurek.light.setAmbient()` | See `docs/specs/light.md`. |
-| `lurek.light.getAmbient()` | See `docs/specs/light.md`. |
-| `lurek.light.setEnabled()` | See `docs/specs/light.md`. |
-| `lurek.light.isEnabled()` | See `docs/specs/light.md`. |
-| `lurek.light.getLightCount()` | See `docs/specs/light.md`. |
-| `lurek.light.getOccluderCount()` | See `docs/specs/light.md`. |
-| `lurek.light.getMaxLights()` | See `docs/specs/light.md`. |
-| `lurek.light.setMaxLights()` | See `docs/specs/light.md`. |
-| `lurek.light.clear()` | See `docs/specs/light.md`. |
-| `lurek.light.setGroupEnabled()` | See `docs/specs/light.md`. |
-| `lurek.light.setGroupIntensity()` | See `docs/specs/light.md`. |
-| `lurek.light.setGroupColor()` | See `docs/specs/light.md`. |
-| `lurek.light.getGroupCount()` | See `docs/specs/light.md`. |
-| `lurek.light.advanceFlickers()` | See `docs/specs/light.md`. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/light.md`](../../docs/specs/light.md)
-
-_Update both this file **and** `docs/specs/light.md` whenever source files, public types, or Lua bindings change._
+- Light2D: Main per-light data container used by Lua and the renderer-facing lighting world.
+- LightWorld: Owner of the light and occluder pools, ambient settings, limits, and group operations.
+- Occluder: Polygon shadow caster with vertices, transform, opacity, mask, and enabled state.
+- LightType: Enum distinguishing point, directional, and spot light behavior.
+- LightBlendMode: Enum controlling additive, subtractive, or mixed scene contribution.
+- FalloffMode: Enum describing how intensity decays from center to edge.
+- Attenuation: Coefficient-based custom falloff model.
+- FlickerConfig: Time-varying intensity modulation for torches, unstable lights, and similar effects.
+- ShadowFilter: Enum selecting the shadow edge filtering quality.

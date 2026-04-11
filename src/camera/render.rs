@@ -150,14 +150,18 @@ mod tests {
     fn camera_with_zoom_emits_scale() {
         let cam = Camera::new(Vec2::ZERO, 2.0, 0.0);
         let cmds = cam.begin_render_commands();
-        assert!(cmds.iter().any(|c| matches!(c, RenderCommand::Scale { .. })));
+        assert!(cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Scale { .. })));
     }
 
     #[test]
     fn camera_with_rotation_emits_rotate() {
         let cam = Camera::new(Vec2::ZERO, 1.0, 0.5);
         let cmds = cam.begin_render_commands();
-        assert!(cmds.iter().any(|c| matches!(c, RenderCommand::Rotate { .. })));
+        assert!(cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Rotate { .. })));
     }
 
     #[test]
@@ -175,8 +179,12 @@ mod tests {
         } else {
             panic!("Expected Translate");
         }
-        assert!(cmds.iter().any(|c| matches!(c, RenderCommand::Rotate { .. })));
-        assert!(cmds.iter().any(|c| matches!(c, RenderCommand::Scale { .. })));
+        assert!(cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Rotate { .. })));
+        assert!(cmds
+            .iter()
+            .any(|c| matches!(c, RenderCommand::Scale { .. })));
     }
 
     #[test]

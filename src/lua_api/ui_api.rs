@@ -122,6 +122,23 @@ fn create_widget_table<'a>(
         })?,
     )?;
 
+    // -- getRect --
+    /// Returns the computed screen-space rectangle after layout.
+    /// @return number, number, number, number
+    let c = ctx.clone();
+    t.set(
+        "getRect",
+        lua.create_function(move |_, ()| {
+            let g = c.borrow();
+            if let Some(w) = g.widgets.get(idx) {
+                let r = &w.base().computed_rect;
+                Ok((r.x, r.y, r.width, r.height))
+            } else {
+                Ok((0.0, 0.0, 0.0, 0.0))
+            }
+        })?,
+    )?;
+
     // -- setVisible --
     /// Sets widget visibility.
     /// @param visible : boolean

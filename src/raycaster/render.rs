@@ -123,7 +123,7 @@ impl RaycasterScene {
 mod tests {
     use super::*;
     use crate::math::Vec2;
-    use crate::raycaster::scene::{CeilingQuad, FloorQuad, WallQuad, RaycasterScene};
+    use crate::raycaster::scene::{CeilingQuad, FloorQuad, RaycasterScene, WallQuad};
 
     fn make_corners(x: f32, y: f32, w: f32, h: f32) -> [Vec2; 4] {
         [
@@ -135,7 +135,12 @@ mod tests {
     }
 
     fn unit_uvs() -> [Vec2; 4] {
-        [Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)]
+        [
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(1.0, 1.0),
+            Vec2::new(0.0, 1.0),
+        ]
     }
 
     #[test]
@@ -145,7 +150,8 @@ mod tests {
         let cmds = scene.generate_render_commands();
         // Only the SetBlendMode preamble, no geometry commands
         assert!(
-            cmds.iter().all(|c| matches!(c, RenderCommand::SetBlendMode(_))),
+            cmds.iter()
+                .all(|c| matches!(c, RenderCommand::SetBlendMode(_))),
             "Empty scene should have no geometry commands"
         );
     }
@@ -175,7 +181,8 @@ mod tests {
         });
         let cmds = scene.generate_render_commands();
         assert!(
-            cmds.iter().any(|c| matches!(c, RenderCommand::DrawTexturedQuad { .. })),
+            cmds.iter()
+                .any(|c| matches!(c, RenderCommand::DrawTexturedQuad { .. })),
             "Expected a DrawTexturedQuad command"
         );
     }

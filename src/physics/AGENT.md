@@ -1,49 +1,33 @@
-# `physics` — Agent Reference
+﻿# physics
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 1 — Core Engine Subsystems                      |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.physics`                                       |
-| **Source**      | `src/physics/`                                       |
-| **Rust Tests** | `tests/unit/physics_tests.rs`                        |
-| **Lua Tests**  | `tests/lua/unit/test_physics.lua`                    |
-| **Architecture** | —                                                  |
+## Module Info
+- Group: Platform Services.
+- Source: `src/physics/`.
+- Spec: `docs/specs/physics.md`.
+- Lua bridge: `src/lua_api/physics_api.rs` registers `lurek.physics`.
+- Runtime focus: rapier-backed 2D rigid bodies, joints, contacts, raycasts, and query helpers.
 
-## Purpose
+## Module Purpose
+The physics module owns the engine's 2D simulation state and the stable, script-facing data model wrapped around rapier2d. It exists so Lua code can work with bodies, shapes, joints, and collision events through stable integer IDs and plain values instead of backend handles.
 
-The physics module provides 2D rigid-body simulation backed by rapier2d 0.32. It wraps the rapier2d pipeline behind a Lurek2D-native API surface that exposes stable integer body and joint IDs suitable for Lua storage and serialization, hiding rapier's opaque internal handles entirely.
+Its core boundary is the `World` sync layer: scripts mutate `Body` records, `World::step` mirrors those changes into rapier, advances simulation, then reads the authoritative results back out. The module also owns collision and raycast query results plus CPU-side debug rendering helpers, but it does not own gameplay interpretation of contacts or the Lua registration code itself.
 
-## Source Files
-
-| File           | Purpose                                                      |
-|----------------|--------------------------------------------------------------|
-| `mod.rs`       | Module entry point — re-exports public types and declares submodules |
-| `body.rs`      | `Body` struct, `BodyType`/`BodyShape` enums, constructors, coordinate transforms, bounding box |
-| `collision.rs` | `CollisionInfo` struct — legacy penetration/normal data (retained for backward compatibility) |
-| `render.rs`    | `World::generate_render_commands` and `World::draw_to_image` — debug overlay (pure CPU, no wgpu) |
-| `shape.rs`     | Extended `Shape` enum (polygon, edge, chain), `StandaloneShape` value type, rapier collider conversion |
-| `world.rs`     | `World` simulation manager, body/joint CRUD, step pipeline, raycasting, spatial queries, collision events |
+## Files
+- `mod.rs`: Module root and public re-export surface for bodies, shapes, collision records, and the world.
+- `body.rs`: Script-facing rigid-body types, constructors, bounding boxes, and local/world point helpers.
+- `collision.rs`: Backward-compatible `CollisionInfo` contact record retained on the public API surface.
+- `shape.rs`: Extended collider geometry and reusable standalone fixture descriptors.
+- `world.rs`: Simulation owner for rapier sets, body and collider mappings, joints, stepping, events, and spatial queries.
+- `render.rs`: Debug overlay render-command generation and CPU image export for headless inspection.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `BodyType` | Principal type for the `physics` module. |
-| `BodyShape` | Principal type for the `physics` module. |
-| `Body` | Principal type for the `physics` module. |
-| `CollisionInfo` | Principal type for the `physics` module. |
-| `Shape` | Principal type for the `physics` module. |
-| `StandaloneShape` | Principal type for the `physics` module. |
-| `BodyContact` | Principal type for the `physics` module. |
-| `RaycastHit` | Principal type for the `physics` module. |
-| `ContactInfo` | Principal type for the `physics` module. |
-| `World` | Principal type for the `physics` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/physics.md`](../../docs/specs/physics.md)
-
-_Update both this file **and** `docs/specs/physics.md` whenever source files, public types, or Lua bindings change._
+- `World`: Central simulation owner for bodies, joints, queries, cached collider state, and event buffers.
+- `Body`: Lua-friendly rigid-body record mirrored into and out of rapier state.
+- `BodyType`: Simulation mode selector for static, dynamic, kinematic, and sensor bodies.
+- `BodyShape`: Lightweight common-shape enum for rectangle and circle bodies.
+- `Shape`: Extended collider enum for polygons, edges, chains, and the simple primitive cases.
+- `StandaloneShape`: Reusable shape-plus-fixture descriptor for attaching extra colliders.
+- `BodyContact`: Stable-ID collision event emitted from simulation results.
+- `RaycastHit`: Query result carrying hit body, hit point, normal, and distance.
+- `ContactInfo`: Narrow-phase contact snapshot for detailed per-pair inspection.
+- `CollisionInfo`: Legacy compatibility record still exposed alongside newer contact models.

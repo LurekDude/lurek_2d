@@ -50,13 +50,16 @@ impl NoiseGrid {
                 let nx = x as f64 * scale;
                 let ny = y as f64 * scale;
                 // perlin_noise_periodic returns roughly [-1, 1]; remap to [0, 1]
-                let v = (perlin_noise_periodic(nx, ny, px, py) * 0.5 + 0.5)
-                    .clamp(0.0, 1.0) as f32;
+                let v = (perlin_noise_periodic(nx, ny, px, py) * 0.5 + 0.5).clamp(0.0, 1.0) as f32;
                 cells.push(v);
             }
         }
 
-        Self { width, height, cells }
+        Self {
+            width,
+            height,
+            cells,
+        }
     }
 
     /// Generate render commands visualising the noise grid as a greyscale tile mosaic.

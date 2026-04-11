@@ -1,57 +1,44 @@
-# `graph` — Agent Reference
+﻿# graph - Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.graph`                                         |
-| **Source**      | `src/graph/`                                         |
-| **Rust Tests** | `tests/rust/unit/graph_tests.rs`                     |
-| **Lua Tests**  | `tests/lua/unit/test_graph.lua`                      |
-| **Architecture** | —                                                  |
+## Module Info
 
-## Purpose
+- Module: graph
+- Group: Foundations
+- Spec: docs/specs/graph.md
+- Lua API: src/lua_api/graph_api.rs
+- Rust tests: tests/rust/unit/graph_tests.rs plus inline graph module tests
+- Lua tests: tests/lua/unit/test_graph.lua and related graph stress and golden suites
 
-The graph module provides a general-purpose directed weighted graph with item flow simulation, Dijkstra pathfinding, and a classical algorithm suite. It is a Tier 2 engine extension that depends only on Baseline (`math`, `engine`) and no Tier 1 modules. Game developers use it whenever their data is naturally relational rather than spatial: dialogue trees where nodes are lines and edges are player choices, quest dependency systems where completing a quest unlocks others, skill trees, resource production pipelines, logistics networks, and dungeon layout validation.
+## Module Purpose
 
-## Source Files
+The graph module owns directed node-edge-item networks plus the algorithms needed to simulate flow through them. It combines CRUD-style graph storage with routing, connected-component and cycle analysis, item transit, conversion rules, queueing, and supply-demand fulfillment.
 
-| File               | Purpose                                                                      |
-|--------------------|------------------------------------------------------------------------------|
-| `mod.rs`           | Module declarations, re-exports of public types                              |
-| `algorithms.rs`    | Graph algorithms — connected components (BFS), cycle detection (DFS), topological sort (Kahn's) |
-| `core.rs`          | `Graph` struct — node, edge, and item CRUD, stats, edge queries              |
-| `edge.rs`          | `Edge` struct — directed connection with capacity, cooldown, type filtering  |
-| `item.rs`          | `GraphItem` and `ItemPosition` — typed flowing entities with decay and priority |
-| `node.rs`          | `Node`, `OverflowPolicy`, `FlowMode`, `ConversionRule`, `Supply`, `Demand`  |
-| `pathfinding.rs`   | `PathResult` and Dijkstra shortest-path, reachability, neighbour queries     |
-| `render.rs`        | `Graph::generate_render_commands` — circular-layout debug overlay (pure CPU)  |
-| `simulation.rs`    | `GraphEvent` enum and 7-phase simulation pipeline (`update`/`step`)          |
-| `supply_demand.rs` | Supply/demand matching with priority-ordered fulfillment via pathfinding     |
-| `graph.rs`         | Legacy duplicate of `core.rs` — not declared in `mod.rs`, dead code          |
-| `traversal.rs`     | Legacy duplicate of `pathfinding.rs` — not declared in `mod.rs`, dead code   |
+This module exists for systems whose logic is relational rather than spatial, such as logistics networks, production chains, dependency graphs, or abstract game-economy flows. It is intentionally not a renderer or a world-space pathfinding system. The small render helper is only for debug visualization, and the legacy graph.rs and traversal.rs files are older on-disk copies rather than the active public surface declared by mod.rs.
+
+## Files
+
+- mod.rs: Declares the active graph submodules and re-exports the public graph, node, edge, item, and event types.
+- core.rs: Defines Graph and GraphStats plus node, edge, and item management operations.
+- node.rs: Defines Node and the flow, overflow, conversion, supply, and demand types that give nodes gameplay meaning.
+- edge.rs: Defines Edge, the directed connection with capacity, travel timing, cooldowns, weights, and item-type filters.
+- item.rs: Defines GraphItem and ItemPosition for typed items that rest on nodes or travel across edges.
+- pathfinding.rs: Adds Dijkstra-based shortest-path, reachability, and neighbor queries.
+- algorithms.rs: Adds connected-component, cycle-detection, and topological-sort helpers.
+- simulation.rs: Implements the main tick pipeline and emits GraphEvent values for transit, decay, conversion, queue, and routing activity.
+- supply_demand.rs: Matches demand declarations to supplies and routes created items through the graph.
+- render.rs: Generates debug render commands for visualizing graph state without making graph a rendering subsystem.
+- graph.rs: Older duplicate graph container file kept on disk but not declared by mod.rs.
+- traversal.rs: Older duplicate pathfinding file kept on disk but not declared by mod.rs.
 
 ## Key Types
 
-| Type | Description |
-|------|-------------|
-| `GraphStats` | Principal type for the `graph` module. |
-| `Graph` | Principal type for the `graph` module. |
-| `Edge` | Principal type for the `graph` module. |
-| `ItemPosition` | Principal type for the `graph` module. |
-| `GraphItem` | Principal type for the `graph` module. |
-| `OverflowPolicy` | Principal type for the `graph` module. |
-| `FlowMode` | Principal type for the `graph` module. |
-| `ConversionRule` | Principal type for the `graph` module. |
-| `Supply` | Principal type for the `graph` module. |
-| `Demand` | Principal type for the `graph` module. |
-| `Node` | Principal type for the `graph` module. |
-| `PathResult` | Principal type for the `graph` module. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/graph.md`](../../docs/specs/graph.md)
-
-_Update both this file **and** `docs/specs/graph.md` whenever source files, public types, or Lua bindings change._
+- Graph: Central directed graph container that owns nodes, edges, items, and most module behavior through impl blocks.
+- GraphStats: Read-only state summary for graph size, activity, demand, supply, and queued items.
+- Node: Rich vertex type with capacity, flow mode, overflow policy, queueing, conversion rules, supplies, demands, and tags.
+- Edge: Directed connection that controls routing cost, travel time, cooldown, capacity, and allowed item types.
+- GraphItem: Typed entity that moves through the graph with lifetime, priority, and current position state.
+- ItemPosition: Enum describing whether an item is at a node, in transit on an edge, or unplaced.
+- FlowMode: Enum describing whether a node passively holds items or actively pushes and or pulls them.
+- OverflowPolicy: Enum describing how full nodes reject, destroy, or queue incoming items.
+- GraphEvent: Event enum emitted by simulation and demand processing for Lua callback dispatch.
+- PathResult: Shortest-path result containing ordered node IDs, edge IDs, and total path cost.

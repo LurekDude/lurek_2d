@@ -1,368 +1,233 @@
 # `terminal` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.terminal`                                      |
-| **Source**      | `src/terminal/`                                      |
-| **Rust Tests** | `tests/rust/unit/terminal_tests.rs`                       |
-| **Lua Tests**  | `tests/lua/unit/test_terminal.lua`                   |
-| **Architecture** | `docs/API/terminal-design.md`                      |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.terminal` |
+| **Source** | `src/terminal/` |
+| **Rust Tests** | `tests/rust/unit/terminal_tests.rs`, `tests/rust/ext/terminal_demo_smoke_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_terminal.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
+
+---
 
 ## Summary
 
-The `terminal` module provides a grid-based character-cell terminal emulator with an integrated widget toolkit for building in-game developer consoles, debug overlays, roguelike interfaces, and text-mode REPL panels. It is a Tier 2 Engine Extension gated by the `modules.terminal` configuration flag (which requires graphics to be enabled).
+The `terminal` module provides a character-cell UI surface for consoles, debug overlays, roguelike interfaces, and text-driven tools. It owns the terminal grid, cursor state, terminal-native widgets, and the logic that composites widgets into cells before draw output is generated.
 
-At its core, `Terminal` owns a 2D grid of `TCell` records — each cell stores a Unicode codepoint plus foreground and background RGBA colours. Grid dimensions are capped at 512 columns by 256 rows. All public coordinate parameters exposed to callers use 1-based indexing while internal storage is 0-based, following the Lua convention. The terminal supports direct cell manipulation (`set`, `get`, `set_char`, `set_fg`, `set_bg`), cursor positioning, string printing, grid clearing, and dynamic resizing while preserving existing content.
+It exists to support interfaces that work best as text grids rather than pixel-perfect UI layouts. That keeps terminal behavior, line drawing, widget focus, and cell-level edits separate from the general `ui` module and separate from the renderer's lower-level drawing primitives.
 
-On top of the raw grid, the module provides a compositing widget system. `Widget` combines a `WidgetBase` (shared position, size, visibility, enabled, tag fields) with a `WidgetKind` discriminant that covers six widget types: `Label` (static text), `Button` (clickable, fires `on_click` callbacks), `TextBox` (single-line editable text input with cursor navigation, max-length enforcement, and `on_change` callbacks), `List` (scrollable selectable item list with `on_select` callbacks), `Border` (decorative frame with title and three line-drawing styles — single, double, ASCII), and `Panel` (container that groups child widgets by index). Widgets are attached to terminals via `add_widget()`, composited into the cell grid during rendering via `render_cells()`, and receive routed keyboard, text, and mouse input through the terminal's event system.
+It intentionally does not own font rasterization, filesystem-backed shells, command parsing, or operating-system terminals. It is an in-engine text surface and widget set, not a platform console abstraction.
 
-The rendering pipeline converts composited cells into `RenderCommand::Print` sequences grouped by colour runs, suitable for pushing directly into `SharedState::render_commands`. The module does not own any GPU resources — it relies entirely on the graphics module's text rendering through `RenderCommand`. The Lua API wraps terminals and widgets as UserData objects with a binding layer that tracks widget attachment state, manages callback registries, and supports detach/reattach workflows with snapshot preservation.
+**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
 
-**Scope boundary**: `terminal` is a Tier 2 module; it may import `math`, `engine`, and Tier 1 modules but must not import other Tier 2 modules. It does not perform font rasterisation (handled by `graphics`), file I/O, or audio playback.
+---
 
 ## Architecture
 
 ```
-lurek.terminal.newTerminal(cols, rows)
-         │
-         ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Terminal (terminal_state.rs)                                │
-│  ┌──────────────────┐  ┌─────────────────────────────────┐  │
-│  │ grid: Vec<TCell>  │  │ widgets: Vec<Widget>            │  │
-│  │ (cols × rows)     │  │  ├── Label   (text, color)      │  │
-│  │                   │  │  ├── Button  (text, on_click)   │  │
-│  │ cursor_col/row    │  │  ├── TextBox (text, cursor)     │  │
-│  └──────────────────┘  │  ├── List    (items, selected)   │  │
-│                         │  ├── Border  (style, title)     │  │
-│                         │  └── Panel   (children[])       │  │
-│                         └─────────────────────────────────┘  │
-│                                                              │
-│  render_cells() ─► composite widgets onto grid snapshot      │
-│  build_render_commands(ox, oy, cell_w, cell_h)                 │
-│       │                                                      │
-│       ▼                                                      │
-│  Vec<RenderCommand::Print + SetColor>                          │
-│       │  (colour runs per row)                               │
-└───────┼──────────────────────────────────────────────────────┘
-        │
-        ▼
-  SharedState.render_commands ─► GpuRenderer
+lurek.terminal.* (Lua API — src/lua_api/terminal_api.rs)
+    |
+    v
+src/terminal/mod.rs
+    |- cell.rs - cell
+    |- render.rs - render
+    |- terminal_state.rs - terminal_state
+    |- widget.rs - widget
 ```
 
-### Input Flow
-
-```
-lurek.keypressed(key) ─► Terminal:keypressed(key)
-                            │
-                            ▼
-                   focused widget routing
-                   ├── TextBox: backspace/delete/left/right/home/end
-                   ├── List: up/down selection
-                   ├── Button: return/space → ButtonClicked event
-                   └── TerminalEvent → callback dispatch
-
-lurek.textinput(text) ─► Terminal:textinput(text)
-                            └── TextBox: insert at cursor
-
-lurek.mousepressed(x, y) ─► Terminal:mousepressed(px, py)
-                            └── pixel → grid coord conversion
-                                └── hit test widgets (reverse order)
-```
+---
 
 ## Source Files
 
-| File                 | Purpose                                              |
-|----------------------|------------------------------------------------------|
-| `cell.rs`            | `TCell` struct and default colour/character constants |
-| `terminal_state.rs`  | `Terminal` grid state, input routing, widget compositing, draw command generation |
-| `widget.rs`          | `WidgetBase`, `Widget`, `WidgetKind` enum, `BorderStyle` enum, widget constructors and mutation methods |
-| `mod.rs` | — |
+| File | Purpose |
+|------|---------|
+| `cell.rs` | Defines the `TCell` character-cell record with foreground and background color data. |
+| `mod.rs` | Declares the terminal submodules and re-exports the grid, widget, and border types. |
+| `render.rs` | Converts terminal contents and terminal widgets into render commands or CPU-side image output. |
+| `terminal_state.rs` | Implements the main `Terminal` state, including the cell grid, cursor, focus, input routing, and terminal events. |
+| `widget.rs` | Defines terminal-native widget metadata and the concrete widget kinds used inside a terminal surface. |
+
+---
 
 ## Submodules
 
 ### `terminal::cell`
 
-Cell data types for the terminal grid.
+Defines the `TCell` character-cell record with foreground and background color data.
 
-- **`TCell`** (struct): A single character cell storing a Unicode codepoint and two RGBA float colours (foreground and background).
+- **`TCell`** (struct): A single character cell in the terminal grid.
+
+### `terminal::render`
+
+Converts terminal contents and terminal widgets into render commands or CPU-side image output.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
 ### `terminal::terminal_state`
 
-Terminal grid state, input handling, and rendering.
+Implements the main `Terminal` state, including the cell grid, cursor, focus, input routing, and terminal events.
 
-- **`Terminal`** (struct): Grid-based character-cell terminal emulator with a 2D `TCell` grid, cursor, widget list, and focus management.
-- **`TerminalEvent`** (enum, `pub(crate)`): Internal event discriminant — `ButtonClicked`, `TextChanged`, `SelectionChanged` — emitted by input routing and consumed by the Lua binding layer's callback dispatch.
+- **`TerminalEvent`** (enum): Internal terminal event emitted by input routing.
+- **`Terminal`** (struct): A grid-based character-cell terminal emulator with widget support.
 
 ### `terminal::widget`
 
-Widget types for the terminal UI system.
+Defines terminal-native widget metadata and the concrete widget kinds used inside a terminal surface.
 
-- **`WidgetBase`** (struct): Shared base fields for all widgets — position, size, visibility, enabled state, and free-form tag.
-- **`Widget`** (struct): Combines a `WidgetBase` with a `WidgetKind` variant; provides constructors and kind-specific mutation methods.
-- **`BorderStyle`** (enum): Line-drawing style for border widgets — `Single` (Unicode box-drawing), `Double`, or `Ascii` (`+`, `-`, `|`).
-- **`WidgetKind`** (enum): Concrete widget type discriminant with six variants: `Label`, `Button`, `TextBox`, `List`, `Border`, `Panel`.
+- **`BorderStyle`** (enum): Line-drawing style for [`WidgetKind::Border`] widgets.
+- **`WidgetBase`** (struct): Shared base fields for all terminal widgets.
+- **`WidgetKind`** (enum): Concrete widget type discriminant.
+- **`Widget`** (struct): A terminal widget combining shared [`WidgetBase`] fields with a concrete [`WidgetKind`] variant.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `terminal::cell::TCell`
+#### `Terminal`
 
-A single character cell in the terminal grid. Each cell stores a Unicode codepoint (`ch: u32`, default U+0020 space) and two RGBA float colours — `fg` (foreground, default white) and `bg` (background, default transparent black). Implements `Default`, `Clone`, `Copy`, `PartialEq`, and `Debug`.
+The main character-grid surface.
 
-#### `terminal::terminal_state::Terminal`
+#### `TCell`
 
-Grid-based character-cell terminal emulator with widget support. Maintains a 2D grid of `TCell` records (`cols × rows`, capped at 512 × 256), a cursor position, a flat `Vec<Widget>` list, and an optional focused widget index. Key operations:
+One terminal cell with a character codepoint and foreground or background colors.
 
-- **Grid**: `new`, `set`, `get`, `try_get`, `clear`, `resize`, `print`, `set_char`, `set_fg`, `set_bg`, `get_dimensions`, `get_cursor`, `set_cursor`, `cols`, `rows`.
-- **Widgets**: `add_widget`, `remove_widget`, `clear_widgets`, `get_widget`, `get_widget_mut`, `get_widget_count`, `widget_count`, `find_by_tag`, `set_focus`, `get_focused`.
-- **Input**: `keypressed`, `textinput`, `mousepressed` (plus `pub(crate)` `*_with_events` variants that return `TerminalEvent` vectors).
-- **Rendering**: `build_render_commands(ox, oy, cell_w, cell_h)` composites widgets onto the grid and emits `RenderCommand::Print` + `RenderCommand::SetColor` sequences.
+#### `Widget`
 
-Implements `Default` (80 × 40 grid).
+A terminal widget instance combining base geometry and a concrete widget kind.
 
-#### `terminal::widget::WidgetBase`
+#### `WidgetBase`
 
-Shared base fields for all terminal widgets: `x` and `y` (0-based internal position), `width` and `height` (cells), `visible` (default `true`), `enabled` (default `true`), and `tag` (empty string). Provides `new()`, `position_1based()`, and `set_position_1based()`.
+Shared widget metadata such as position, size, visibility, enabled state, and tagging.
 
-#### `terminal::widget::Widget`
+#### `WidgetKind`
 
-Combines a `WidgetBase` with a `WidgetKind` variant. Provides six constructors (`new_label`, `new_button`, `new_text_box`, `new_list`, `new_border`, `new_panel`) that accept 1-based coordinates. Kind-specific mutation methods include:
+Enumerates the built-in terminal widget variants such as label, button, text box, list, border, and panel.
 
-- **Label/Button/TextBox**: `set_text`, `get_text`.
-- **Label/Border**: `set_color`, `get_color`.
-- **TextBox**: `set_max_length`, `get_max_length`.
-- **List**: `add_item`, `remove_item_1based`, `clear_items`, `get_item_count`, `get_item_1based`, `set_selected_1based`, `get_selected_1based`.
-- **Border**: `set_border_style`, `get_border_style`, `set_title`, `get_title`.
-- **Type checks**: `is_button`, `is_textbox`, `is_list`, `is_panel`.
+#### `BorderStyle`
 
-### Enums
+Selects the line-drawing character set used for borders.
 
-#### `terminal::widget::BorderStyle`
+#### `TerminalEvent`
 
-Line-drawing style for `Border` widgets. Three variants:
+Internal event enum used when terminal widget interactions need to report changes.
 
-- `Single` (default) — Unicode single-line box-drawing characters (`┌`, `─`, `│`, etc.).
-- `Double` — Unicode double-line box-drawing characters (`╔`, `═`, `║`, etc.).
-- `Ascii` — Plain ASCII characters (`+`, `-`, `|`).
-
-Methods: `from_str_name(&str) -> Option<Self>`, `as_str() -> &'static str`.
-
-#### `terminal::widget::WidgetKind`
-
-Concrete widget type discriminant with six variants:
-
-- `Label { text, color }` — Static or dynamic text label with RGBA colour.
-- `Button { text }` — Clickable button; activates on `return` or `space` key, or mouse click.
-- `TextBox { text, max_length, cursor_pos }` — Single-line editable text input with cursor navigation (backspace, delete, left, right, home, end).
-- `List { items, selected, scroll_offset }` — Scrollable list of selectable strings; navigated with up/down keys or mouse click.
-- `Border { style, title, color }` — Decorative border frame with optional title rendered in the top border.
-- `Panel { children }` — Container grouping child widgets by their indices in the parent terminal's widget list.
+---
 
 ## Lua API
 
-Exposed under `lurek.terminal.*` by `src/lua_api/terminal_api.rs`. The API provides two UserData types — `Terminal` and `Widget` — with method-based interfaces. Widgets can be created independently and then attached to terminals, or detached and reattached later while preserving their state via snapshot binding.
+Exposed under `lurek.terminal.*` by `src/lua_api/terminal_api.rs`.
 
-### Factory Functions
+### Module Functions
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `lurek.terminal.newTerminal` | `(cols?, rows?) → Terminal` | Create a terminal grid (default 80×40) |
-| `lurek.terminal.newLabel` | `(col, row, text?) → Widget` | Create a label widget |
-| `lurek.terminal.newButton` | `(col, row, width, height?, text?) → Widget` | Create a button widget |
-| `lurek.terminal.newTextBox` | `(col, row, width) → Widget` | Create a text box widget |
-| `lurek.terminal.newList` | `(col, row, width, height) → Widget` | Create a list widget |
-| `lurek.terminal.newBorder` | `(col, row, width, height) → Widget` | Create a border widget |
-| `lurek.terminal.newPanel` | `(col, row, width?, height?) → Widget` | Create a panel widget |
+| Function | Description |
+|----------|-------------|
+| `lurek.terminal.newTerminal` | Creates a new terminal grid with the given dimensions. |
+| `lurek.terminal.newLabel` | Creates a new label widget at 1-based coordinates. |
+| `lurek.terminal.newButton` | Creates a new button widget at 1-based coordinates. |
+| `lurek.terminal.newTextBox` | Creates a new single-line text box widget at 1-based coordinates. |
+| `lurek.terminal.newList` | Creates a new scrollable list widget at 1-based coordinates. |
+| `lurek.terminal.newBorder` | Creates a new decorative border widget at 1-based coordinates. |
+| `lurek.terminal.newPanel` | Creates a new container panel widget at 1-based coordinates. |
 
-### Terminal Methods
+### `Terminal` Methods
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `Terminal:set` | `(col, row, ch, fr, fg, fb, fa, br, bg, bb, ba)` | Set cell at 1-based coords with character and colours |
-| `Terminal:get` | `(col, row) → ch, fr, fg, fb, fa, br, bg, bb, ba` | Get cell data at 1-based coords |
-| `Terminal:clear` | `()` | Clear all cells to defaults |
-| `Terminal:getDimensions` | `() → cols, rows` | Get grid dimensions |
-| `Terminal:getCellSize` | `() → width, height` | Get default cell size in pixels (8×14) |
-| `Terminal:addWidget` | `(widget)` | Attach a widget to this terminal |
-| `Terminal:removeWidget` | `(widget)` | Detach a widget from this terminal |
-| `Terminal:clearWidgets` | `()` | Detach all widgets |
-| `Terminal:getWidgetCount` | `() → integer` | Count attached widgets |
-| `Terminal:setFocus` | `(widget?)` | Focus a widget or clear focus |
-| `Terminal:getFocused` | `() → Widget?` | Get focused widget or nil |
-| `Terminal:keypressed` | `(key) → boolean` | Route key press to focused widget |
-| `Terminal:textinput` | `(text) → boolean` | Route text input to focused widget |
-| `Terminal:mousepressed` | `(px, py, button?)` | Route mouse press via pixel coords |
-| `Terminal:draw` | `(x?, y?)` | Render grid and widgets as draw commands |
+| Method | Description |
+|--------|-------------|
+| `terminal:set(...)` | Sets a cell at 1-based coordinates with character FG and BG colours. |
+| `terminal:get(...)` | Returns the cell data at 1-based coordinates. |
+| `terminal:clear(...)` | Clears all cells to defaults. |
+| `terminal:getDimensions(...)` | Returns the terminal grid dimensions. |
+| `terminal:getCellSize(...)` | Returns the current cell size in pixels derived from the active font. |
+| `terminal:addWidget(...)` | Attaches a widget to this terminal. |
+| `terminal:removeWidget(...)` | Detaches a widget from this terminal. |
+| `terminal:clearWidgets(...)` | Detaches all widgets from this terminal. |
+| `terminal:getWidgetCount(...)` | Returns the number of attached widgets. |
+| `terminal:setFocus(...)` | Sets the focused widget, or clears focus if nil is passed. |
+| `terminal:getFocused(...)` | Returns the currently focused widget, or nil. |
+| `terminal:keypressed(...)` | Routes a key press to the focused widget and fires callbacks. |
+| `terminal:textinput(...)` | Routes text input to the focused widget and fires callbacks. |
+| `terminal:render(...)` | Renders the terminal grid and widgets as render commands. |
+| `terminal:setFont(...)` | Sets the terminal font by pixel height, snapping to the nearest built-in size. |
+| `terminal:autoResize(...)` | Resizes the window to exactly fit the terminal grid at the current font size. |
 
-### Widget Methods (all types)
+### `Widget` Methods
 
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `Widget:setPosition` | `(col, row)` | Set position (1-based) |
-| `Widget:getPosition` | `() → col, row` | Get position (1-based) |
-| `Widget:setSize` | `(width, height)` | Set size in cells |
-| `Widget:getSize` | `() → width, height` | Get size in cells |
-| `Widget:setVisible` | `(visible)` | Set visibility |
-| `Widget:isVisible` | `() → boolean` | Check visibility |
-| `Widget:setEnabled` | `(enabled)` | Set input acceptance |
-| `Widget:isEnabled` | `() → boolean` | Check input acceptance |
-| `Widget:setTag` | `(tag)` | Set identification tag |
-| `Widget:getTag` | `() → string` | Get identification tag |
+| Method | Description |
+|--------|-------------|
+| `widget:setPosition(...)` | Sets the widget position from 1-based coordinates. |
+| `widget:getPosition(...)` | Returns the widget position as 1-based coordinates. |
+| `widget:setSize(...)` | Sets the widget size in cells. |
+| `widget:getSize(...)` | Returns the widget size in cells. |
+| `widget:setVisible(...)` | Sets the widget visibility. |
+| `widget:isVisible(...)` | Returns whether the widget is visible. |
+| `widget:setEnabled(...)` | Sets whether the widget accepts input. |
+| `widget:isEnabled(...)` | Returns whether the widget accepts input. |
+| `widget:setTag(...)` | Sets the free-form identification tag. |
+| `widget:getTag(...)` | Returns the free-form identification tag. |
+| `widget:setText(...)` | Sets the text content of a label, button, or text box widget. |
+| `widget:getText(...)` | Returns the text content of a label, button, or text box widget. |
+| `widget:getColor(...)` | Returns the colour of a label or border widget. |
+| `widget:setOnClick(...)` | Registers a click callback for a button widget. |
+| `widget:setMaxLength(...)` | Sets the maximum character length of a text box widget. |
+| `widget:getMaxLength(...)` | Returns the maximum character length of a text box widget. |
+| `widget:setOnChange(...)` | Registers a text change callback for a text box widget. |
+| `widget:addItem(...)` | Adds an item to a list widget. |
+| `widget:removeItem(...)` | Removes an item from a list widget by 1-based index. |
+| `widget:clearItems(...)` | Removes all items from a list widget. |
+| `widget:getItemCount(...)` | Returns the number of items in a list widget. |
+| `widget:getItem(...)` | Returns a list item by 1-based index. |
+| `widget:setSelected(...)` | Sets the selected item in a list widget by 1-based index. |
+| `widget:getSelected(...)` | Returns the selected item index (1-based) in a list widget, or nil. |
+| `widget:setOnSelect(...)` | Registers a selection change callback for a list widget. |
+| `widget:setStyle(...)` | Sets the border style of a border widget. |
+| `widget:getStyle(...)` | Returns the border style name of a border widget. |
+| `widget:setTitle(...)` | Sets the title of a border widget. |
+| `widget:getTitle(...)` | Returns the title of a border widget. |
+| `widget:addChild(...)` | Adds a child widget to a panel widget. |
+| `widget:removeChild(...)` | Removes a child widget from a panel widget. |
+| `widget:clearChildren(...)` | Removes all children from a panel widget. |
+| `widget:getChildCount(...)` | Returns the number of children in a panel widget. |
+| `widget:getChild(...)` | Returns a child widget from a panel by 1-based index, or nil. |
 
-### Widget Methods (kind-specific)
-
-| Method | Applies To | Signature | Description |
-|--------|------------|-----------|-------------|
-| `Widget:setText` | Label, Button, TextBox | `(text)` | Set text content |
-| `Widget:getText` | Label, Button, TextBox | `() → string` | Get text content |
-| `Widget:setColor` | Label, Border | `(r, g, b, a?)` | Set colour |
-| `Widget:getColor` | Label, Border | `() → r, g, b, a` | Get colour |
-| `Widget:setOnClick` | Button | `(callback?)` | Register click callback |
-| `Widget:setMaxLength` | TextBox | `(max)` | Set max character length |
-| `Widget:getMaxLength` | TextBox | `() → integer` | Get max character length |
-| `Widget:setOnChange` | TextBox | `(callback?)` | Register text change callback |
-| `Widget:addItem` | List | `(item)` | Add a list item |
-| `Widget:removeItem` | List | `(index)` | Remove item by 1-based index |
-| `Widget:clearItems` | List | `()` | Remove all items |
-| `Widget:getItemCount` | List | `() → integer` | Count items |
-| `Widget:getItem` | List | `(index) → string` | Get item by 1-based index |
-| `Widget:setSelected` | List | `(index?)` | Set selected item (1-based) |
-| `Widget:getSelected` | List | `() → integer?` | Get selected item (1-based) |
-| `Widget:setOnSelect` | List | `(callback?)` | Register selection callback |
-| `Widget:setStyle` | Border | `(style)` | Set border style name |
-| `Widget:getStyle` | Border | `() → string` | Get border style name |
-| `Widget:setTitle` | Border | `(title)` | Set border title |
-| `Widget:getTitle` | Border | `() → string` | Get border title |
-| `Widget:addChild` | Panel | `(child)` | Add child widget |
-| `Widget:removeChild` | Panel | `(child)` | Remove child widget |
-| `Widget:clearChildren` | Panel | `()` | Remove all children |
-| `Widget:getChildCount` | Panel | `() → integer` | Count children |
-| `Widget:getChild` | Panel | `(index) → Widget?` | Get child by 1-based index |
+---
 
 ## Lua Examples
 
 ```lua
--- Debug console with text input and command list
-
-local term, input, output, border
-
-function lurek.init()
-    -- Create a 60×20 terminal grid
-    term = lurek.terminal.newTerminal(60, 20)
-
-    -- Decorative border around the entire grid
-    border = lurek.terminal.newBorder(1, 1, 60, 20)
-    border:setTitle("Debug Console")
-    border:setStyle("double")
-    term:addWidget(border)
-
-    -- Scrollable output list
-    output = lurek.terminal.newList(2, 2, 56, 16)
-    output:addItem("Welcome to Lurek2D debug console.")
-    output:addItem("Type a command and press Enter.")
-    term:addWidget(output)
-
-    -- Text input box at the bottom
-    input = lurek.terminal.newTextBox(2, 19, 56)
-    input:setMaxLength(80)
-    input:setOnChange(function()
-        -- Fires on every keystroke
-    end)
-    term:addWidget(input)
-    term:setFocus(input)
-end
-
-function lurek.keypressed(key)
-    if key == "return" then
-        local cmd = input:getText()
-        if #cmd > 0 then
-            output:addItem("> " .. cmd)
-            input:setText("")
-        end
-    else
-        term:keypressed(key)
-    end
-end
-
-function lurek.textinput(text)
-    term:textinput(text)
-end
-
-function lurek.render()
-    term:draw(20, 20)
+-- Minimal namespace check for lurek.terminal.
+if lurek.terminal then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Menu with buttons and a selection callback
-
-local term, btn_start, btn_quit
-
-function lurek.init()
-    term = lurek.terminal.newTerminal(30, 10)
-
-    local title = lurek.terminal.newLabel(8, 2, "== Main Menu ==")
-    term:addWidget(title)
-
-    btn_start = lurek.terminal.newButton(8, 5, 14, 1, "Start Game")
-    btn_start:setOnClick(function()
-        print("Starting game!")
-    end)
-    term:addWidget(btn_start)
-    term:setFocus(btn_start)
-
-    btn_quit = lurek.terminal.newButton(8, 7, 14, 1, "Quit")
-    btn_quit:setOnClick(function()
-        lurek.signal.quit()
-    end)
-    term:addWidget(btn_quit)
-end
-
-function lurek.keypressed(key)
-    term:keypressed(key)
-end
-
-function lurek.render()
-    term:draw(100, 80)
-end
-```
+---
 
 ## Item Summary
 
-| Kind     | Count |
-|----------|-------|
-| `struct` | 4     |
-| `enum`   | 2     |
-| `fn`     | 61    |
-| **Total** | **67** |
+| Kind | Count |
+|------|-------|
+| `struct` | 4 |
+| `enum` | 3 |
+| `fn` (Lua API) | 57 |
+| **Total** | **64** |
+
+---
 
 ## References
 
-| Module     | Relationship | Notes                                                        |
-|------------|-------------|--------------------------------------------------------------|
-| `math`     | Imports from | Uses `Vec2` and colour constants                            |
-| `engine`   | Imports from | Uses `SharedState` for draw command output                   |
-| `graphics` | Imports from | Uses `RenderCommand` (`Print`, `SetColor`) from `renderer.rs`  |
-| `lua_api`  | Imported by  | `terminal_api.rs` binds `Terminal` and `Widget` as UserData  |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
 
-**Similar modules and differentiation:**
-
-- **`gui`** (Tier 2): Retained-mode widget UI with pixel-level layout; `terminal` uses character-cell grid addressing and is oriented towards text-mode interfaces (roguelikes, consoles, REPL). They share no types. Both have widget types named `Button`, `Label`, `TextBox`, `Panel` — this is **intentional design**: `gui` renders them as pixel graphics; `terminal` renders them as character-cell text. Same conceptual interface, different renderers.
-- **`graphics`**: Owns GPU resources, font rasterisation, and the render pipeline. `terminal` produces `RenderCommand` values but never touches GPU textures or surfaces directly.
+---
 
 ## Notes
 
-- **Config gate**: The terminal module is gated by `modules.terminal = true` in `conf.toml` (or `conf.lua`) and requires `modules.graphics = true` (since it emits `RenderCommand` values).
-- **Grid limits**: Maximum grid size is 512 columns × 256 rows (constants `MAX_COLS`, `MAX_ROWS` in `terminal_state.rs`). Requests beyond these are clamped silently.
-- **Coordinate convention**: All Lua-facing and public Rust APIs use 1-based coordinates. Internal storage is 0-based. The Lua binding converts pixel coordinates to grid positions using fixed cell dimensions (8 × 14 pixels) for `mousepressed`.
-- **Widget attachment model**: Widgets can exist in a detached state (created but not added to a terminal) or an attached state. The Lua binding layer tracks attachment via `WidgetAttachment` and preserves widget state through snapshot copies when widgets are detached. A widget cannot be attached to two terminals simultaneously.
-- **Callback dispatch**: Button clicks, text changes, and list selection changes produce `TerminalEvent` values internally. The Lua binding layer dispatches these through stored `LuaRegistryKey` callback functions. Callbacks fire synchronously during `keypressed`, `textinput`, or `mousepressed` calls.
-- **Rendering output**: `build_build_render_commands()` groups cells into colour runs per row, emitting one `RenderCommand::SetColor` + `RenderCommand::Print` pair per run. The final command resets colour to white. The cell size (8 × 14 pixels) is a constant in `terminal_api.rs`, not configurable per-terminal.
-- **Panel children by index**: `Panel` children are stored as indices into the parent terminal's widget list. When widgets are removed, all panels in the terminal have their child indices adjusted via `adjust_panel_children_after_removal()`.
-- **No GPU ownership**: The module creates zero GPU resources. It depends on whichever font is currently active in `SharedState` for text rendering resolution.
-- **Unicode support**: Cells store full `u32` codepoints. Box-drawing characters (used by `BorderStyle::Single` and `Double`) are UTF-8 encoded in the source file.
-- **Breaking change surface**: Renaming or removing any `lurek.terminal.*` factory function or `Terminal:*` / `Widget:*` method will break Lua scripts that use the terminal widget system. The `demos/terminal_demo/` example exercises the full API.
+- **Source of truth**: Keep this spec synchronized with `src/terminal/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

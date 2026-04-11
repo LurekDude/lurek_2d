@@ -1,391 +1,155 @@
 # `app` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Baseline — always-on runtime substrate               |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | — (foundation module; no dedicated `lurek.app` namespace) |
-| **Source**     | `src/app/` (lifecycle) · `src/runtime/` (config, shared state) |
-| **Rust Tests** | `tests/rust/unit/engine_tests.rs`                    |
-| **Lua Tests**  | —                                                    |
-| **Architecture** | `docs/architecture/engine-architecture.md`          |
+| Property | Value |
+|----------|-------|
+| **Tier** | Edge/Integration |
+| **Status** | Implemented |
+| **Lua API** | Indirect / none |
+| **Source** | `src/app/` |
+| **Rust Tests** | tests/rust/unit/engine_tests.rs; tests/rust/ext/graphics_runtime_smoke_tests.rs |
+| **Lua Tests** | None dedicated |
+| **Architecture** | `docs/architecture/engine-architecture.md § Edge / Integration` |
+
+---
 
 ## Summary
 
-The engine module is the foundational layer of Lurek2D — it owns the application
-lifecycle, the main game loop, configuration loading, shared mutable state, error
-handling, structured logging, and the typed resource keys that identify every GPU
-object in the engine.  It sits at the Baseline tier alongside `math`, meaning every
-other module in the system may import from it.  No domain module imports `lua_api`;
-engine is the only upward-facing dependency root.
+The app module is the engine composition root. It exists to turn configuration, platform services, shared runtime state, and the Lua VM into a running desktop application with a winit event loop, GPU renderer, input processing, and frame lifecycle callbacks.
 
-`App` drives the winit 0.30 `ApplicationHandler` event loop.  Internally a private
-`LunaApp` struct owns the wgpu surface, GPU renderer, Lua VM, gamepad polling via
-gilrs, and the `RunState` machine (`Running → Error → Restarting`).  `resumed()`
-initialises the GPU adapter/device/surface, applies the correct startup window
-title for either game mode or the no-game splash, and fires the first redraw;
-`window_event()` routes OS input events to `KeyboardState`, `MouseState`,
-`GamepadState`, and `TouchState` and fires the corresponding `lurek.*` callbacks;
-`about_to_wait()` calls `tick_frame()` which runs the full update/draw cycle and
-presents the rendered frame.  This event-driven architecture is required for correct
-behaviour on macOS and ensures tight integration with the OS event queue on all
-desktop targets (Windows, Linux, macOS).
+This is where engine startup policy lives: window creation, renderer initialization, splash behavior when no game is loaded, SharedState ownership, frame pacing, restart or error-screen transitions, and routing of OS events into engine systems. If a change affects the overall boot sequence or the order in which runtime systems come alive, it usually lands here.
 
-When no game is loaded, `app.rs` renders a lightweight engine splash directly through
-the existing renderer path instead of opening a separate asset viewer.  The splash
-now embeds and caches two branded PNGs (`assets/svg/large_icon.png` and
-`assets/svg/banner.png`) once per process, draws the large icon in the upper portion
-of the window and the banner near the bottom, preserves the drag-and-drop hint and
-hover highlight, and keeps the engine version out of the draw list by appending it
-to the window title only while the splash is active.
+The module intentionally does not own the underlying domain logic for rendering, input, audio, physics, or Lua bindings. It wires those systems together and drives them at runtime, but their actual behavior lives in their own modules. App is orchestration, not a place for subsystem-specific business logic.
 
+**Scope boundary**: This module currently depends on `event`, `image`, `input`, `light`, `lua_api`, `math`, `render`, `runtime`, and other adjacent modules. It stays within the Edge/Integration responsibility boundary defined in the architecture docs.
+
+---
 
 ## Architecture
 
 ```
-App::run(game_dir)
-  │
-  ├── EventLoop::run_app(LunaApp)
-  │
-  └── LunaApp (private winit ApplicationHandler)
-        │
-        ├── resumed()
-        │     ├── create Window (winit) with Config settings
-        │     ├── init_gpu() → wgpu Instance → Adapter → Device → Surface
-        │     │     └── GpuRenderer::new(device, queue, format, w, h)
-        │     └── first RedrawRequested triggers init_lua()
-        │           ├── create_lua_vm(SharedState, ModulesConfig)
-        │           ├── load and exec main.lua (or show cached PNG splash)
-        │           └── call lurek.load()
-        │
-        ├── window_event()
-        │     ├── KeyEvent → KeyboardState → lurek.keypressed / keyreleased
-        │     ├── Ime(Commit) → lurek.textinput
-        │     ├── CursorMoved → MouseState → lurek.mousemoved
-        │     ├── MouseInput → lurek.mousepressed / mousereleased
-        │     ├── MouseWheel → lurek.wheelmoved
-        │     ├── Touch → TouchState → lurek.touchpressed / moved / released
-        │     ├── Focused → lurek.focus
-        │     ├── Occluded → lurek.visible
-        │     ├── Resized → reconfigure surface → lurek.resize
-        │     ├── DroppedFile → load game folder (drag-and-drop)
-        │     └── CloseRequested → lurek.quit() → RunState
-        │
-        ├── about_to_wait() → tick_frame()
-        │     ├── gilrs gamepad polling → lurek.gamepadpressed / axis / etc.
-        │     ├── apply pending WindowState operations
-        │     ├── Clock::tick() → dt
-        │     ├── lurek.update(dt)
-        │     ├── clear render_commands
-        │     ├── lurek.draw() → game pushes RenderCommands
-        │     ├── DebugOverlay → append overlay RenderCommands
-        │     ├── GpuRenderer::render_frame(commands) → present
-        │     └── reset per-frame state
-        │
-        ├── RunState machine
-        │     Running ──error──▶ Error(ErrorScreen)
-        │       ▲                    │ [Esc] → Quitting
-        │       └── [R] ◀── Restarting ◀─┘
-        │
-        ├── Config (loaded before window creation)
-        │     ├── WindowConfig { title, w, h, vsync, fullscreen, scale_mode, ... }
-        │     ├── GraphicsConfig { backend, power_preference }
-        │     ├── ModulesConfig { 30+ boolean flags }
-        │     └── PerformanceConfig { target_fps }
-        │
-        ├── SharedState (Rc<RefCell<>>)
-        │     ├── SlotMap pools: textures, fonts, canvases, shaders, meshes,
-        │     │     sprite_batches, shapes, particle_systems
-        │     ├── Subsystems: Mixer, Clock, GameFS, Camera, EventQueue,
-        │     │     LightWorld, MidiState
-        │     ├── Input: KeyboardState, MouseState, TouchState, gamepads
-        │     ├── Draw state: render_commands, color, blend_mode, scissor,
-        │     │     stencil_mode, depth_mode, wireframe, color_mask
-        │     └── Window: WindowState (query + pending operations)
-        │
-        ├── EngineError (12 variants, E1001–E1012)
-        │     ├── ErrorCategory: Init | Runtime | Resource | Script | System
-        │     └── code(), category(), recovery_hint()
-        │
-        ├── ErrorScreen (blue error display)
-        │     ├── from_error(), from_lua_error(), from_engine_error()
-        │     └── build_render_commands() → Vec<RenderCommand>
-        │
-        ├── DebugOverlay (F12 toggle, FPS + draw calls)
-        │
-        ├── MessageCatalog (TOML-backed, embedded at compile time)
-        │     └── log_msg! macro → "[L001] Human-readable text"
-        │
-        └── ResourceKeys (14 typed SlotMap key newtypes)
-              TextureKey, FontKey, CanvasKey, SoundKey, ParticleKey,
-              SpriteBatchKey, ShaderKey, MeshKey, ShapeKey, BusKey,
-              MidiPlayerKey, QueueableKey, LightKey, OccluderKey
+No direct Lua namespace — consumed through app/runtime integration or other bindings
+    |
+    v
+src/app/mod.rs
+    |- app.rs - app
+    |- app_winit.rs - app_winit
+    |- debug_overlay.rs - debug_overlay
+    |- error_screen.rs - error_screen
 ```
+
+---
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| `mod.rs` | Module declaration; re-exports `App` and the debug overlay and error screen types |
-| `app.rs` | Application lifecycle: `App`, private `LunaApp` (winit `ApplicationHandler`), `RunState`, game loop, GPU init, Lua VM init, input routing, PNG-branded splash screen, drag-and-drop, window title state |
-| `app_winit.rs` | **Dead file** — not declared in `mod.rs`, not compiled. Preserved for historical reference only. |
-| `debug_overlay.rs` | `DebugOverlay` — FPS and draw-call counter rendered in the top-right corner (F12 toggle) |
-| `error_screen.rs` | `ErrorScreen` — blue error display with word-wrap, traceback, TTF/bitmap text rendering |
+| `app.rs` | Defines the public App entry point and the internal runtime implementation that owns the window, event loop integration, renderer, Lua VM, and frame lifecycle. This is the main file for startup flow, event handling, splash mode, and run-state transitions. |
+| `app_winit.rs` | Contains alternate or parked winit-specific app code that is not part of the active module export surface. Treat it as implementation context, not the first place to extend live behavior unless it is reconnected deliberately. |
+| `debug_overlay.rs` | Defines DebugOverlay, the lightweight in-engine overlay for frame and draw statistics. It exists so app-level runtime state can expose quick visual diagnostics without dragging in the full devtools stack. |
+| `error_screen.rs` | Defines ErrorScreen, the structured presentation for runtime and Lua failures. This file owns how fatal problems become user-visible render commands instead of raw crashes or console output. |
+| `mod.rs` | Module root that exposes the public app-facing types. It keeps the external surface small while hiding most of the runtime wiring details. |
+
+---
 
 ## Submodules
 
-### `engine::app`
+### `app::app`
 
-Application lifecycle using winit 0.30 + wgpu GPU rendering.
+Defines the public App entry point and the internal runtime implementation that owns the window, event loop integration, renderer, Lua VM, and frame lifecycle. This is the main file for startup flow, event handling, splash mode, and run-state transitions.
 
-- **`App`** (struct): Public entry point. Holds `Config` and launches the winit event loop via `App::run()`.
-- **`LunaApp`** (struct, private): winit `ApplicationHandler` implementation. Owns the window, wgpu surface, `GpuRenderer`, Lua VM, `SharedState`, gilrs gamepad polling, `RunState`, and `DebugOverlay`.
-- **`RunState`** (enum, private): `Running` | `Error(ErrorScreen)` | `Restarting`.
-- **`recompute_viewport`** (fn, private): Recalculates viewport scale/offset for letterbox, stretch, and pixel scaling modes.
+- **`App`** (struct): Entry point for the Lurek2D engine.
 
-### `engine::config`
+### `app::app_winit`
 
-Engine and window configuration loaded from `conf.toml` (preferred) or `conf.lua` (legacy).
+Contains alternate or parked winit-specific app code that is not part of the active module export surface. Treat it as implementation context, not the first place to extend live behavior unless it is reconnected deliberately.
 
-- **`Config`** (struct): Top-level container with `window`, `graphics`, `modules`, `performance`, `identity`, `version`, `log_file`, `log_append`, `log_level` fields. `load_from_conf_lua(game_dir)` creates a temporary Lua VM, executes `conf.lua`, and reads values back.
-- **`WindowConfig`** (struct): Window geometry (width, height), title, vsync, fullscreen, resizable, min size, borderless, icon path, display index, scale mode, game resolution, maximized.
-- **`GraphicsConfig`** (struct): GPU backend selection (`"auto"`, `"dx12"`, `"vulkan"`, `"metal"`) and power preference (`"high"`, `"low"`, `"none"`).
-- **`ModulesConfig`** (struct): 30+ boolean flags toggling optional subsystems (audio, physics, graphics, input, timer, filesystem, window, particle, image, gui, overlay, tilemap, scene, savegame, entity, ai, pathfinding, thread, graph, data, compute, minimap, modding, pipeline, system, localization, debug, animation, camera, network, procgen, raycaster, spine, terminal). `validate_and_fix()` enforces dependency constraints.
-- **`PerformanceConfig`** (struct): Frame rate cap via `target_fps` (default 60).
+- **`App`** (struct): Entry point for the Lurek2D engine.
 
-### `engine::debug_overlay`
+### `app::debug_overlay`
 
-Debug overlay for displaying FPS and draw call statistics.
+Defines DebugOverlay, the lightweight in-engine overlay for frame and draw statistics. It exists so app-level runtime state can expose quick visual diagnostics without dragging in the full devtools stack.
 
-- **`DebugOverlay`** (struct): Toggleable overlay (`enabled` field). `build_render_commands()` generates `RenderCommand` sequences (green text on semi-transparent background) for the top-right corner.
+- **`DebugOverlay`** (struct): Debug overlay showing FPS and render statistics.
 
-### `engine::error`
+### `app::error_screen`
 
-Structured error types and result alias.
+Defines ErrorScreen, the structured presentation for runtime and Lua failures. This file owns how fatal problems become user-visible render commands instead of raw crashes or console output.
 
-- **`ErrorCategory`** (enum): Five variants — `Init`, `Runtime`, `Resource`, `Script`, `System`. `as_str()` returns the lowercase name.
-- **`EngineError`** (enum): 12 `thiserror`-derived variants — `InitializationError`, `RenderError`, `InputError`, `AudioError`, `PhysicsError`, `FileSystemError`, `LuaError`, `WindowError`, `ConfigError`, `ResourceNotFound`, `ResourceNotLoaded`, `IoError`. Each carries `code()` (E1001–E1012), `category()`, and `recovery_hint()`.
-- **`EngineResult<T>`** (type): Alias for `Result<T, EngineError>`.
+- **`ErrorScreen`** (struct): Visual error screen that generates `RenderCommand` sequences for the GPU renderer.
 
-### `engine::error_screen`
-
-Visual error screen for Lua and engine errors.
-
-- **`ErrorScreen`** (struct): Stores pre-processed title, message lines, and traceback. Constructors: `from_error(&str)`, `from_lua_error(&mlua::Error)`, `from_engine_error(&EngineError)`. `build_render_commands()` generates a full blue-background error display with TTF or bitmap fallback text. `as_text()` returns the error as plain text for clipboard copy.
-- **`wrap_text`** (fn): Word-boundary text wrapping to a column width.
-- **`format_traceback`** (fn): Cleans and formats Lua traceback strings.
-
-### `engine::log_messages`
-
-Structured logging with stable message IDs.
-
-- **`set_log_level`** (fn): Sets the global log level at runtime via `log::set_max_level`.
-- **`get_log_level`** (fn): Returns the current log level name as `&'static str`.
-- **`log_msg!`** (macro): Emits structured log messages with stable ID prefix and catalog text lookup. Supports five log levels and optional dynamic arguments.
-- **70+ `pub const`** values: Stable message IDs grouped by subsystem — lifecycle (`L001`–`L007`), GPU (`L033`–`L035`), errors (`L010`–`L017`), warnings (`L020`–`L024`, `L050`–`L053`), subsystems (`L036`–`L044`), debug (`L030`–`L032`), app surface/cursor/screenshot (`L070`–`L082`), callbacks (`L060`), audio (`A001`–`A004`), graphics (`G001`–`G005`), physics (`P001`–`P002`), dataframe (`DF01`), Lua API layer (`LA01`–`LA08`).
-
-### `engine::messages`
-
-TOML-backed human-readable message catalog.
-
-- **`MessageCatalog`** (struct): Immutable map from message ID to text, parsed from the embedded `messages.toml`. Methods: `from_toml()`, `get()`, `len()`, `is_empty()`.
-- **`init`** (fn): Initialises the global `OnceLock<MessageCatalog>` from the embedded TOML. Safe to call multiple times.
-- **`get_message`** (fn): Resolves a stable message ID to its human-readable text; returns the raw ID if the catalog is not initialised.
-- **`catalog`** (fn): Returns `Option<&'static MessageCatalog>`.
-
-### `engine::resource_keys`
-
-Typed resource keys for generational ID-based resource pools.
-
-- **`TextureKey`** (struct): Key for texture resources.
-- **`FontKey`** (struct): Key for font resources.
-- **`CanvasKey`** (struct): Key for canvas off-screen render targets.
-- **`SoundKey`** (struct): Key for audio source entries in the Mixer.
-- **`ParticleKey`** (struct): Key for particle system instances.
-- **`SpriteBatchKey`** (struct): Key for sprite batch instances.
-- **`ShaderKey`** (struct): Key for custom shader instances.
-- **`MeshKey`** (struct): Key for mesh instances.
-- **`ShapeKey`** (struct): Key for compound shape instances.
-- **`BusKey`** (struct): Key for audio bus instances.
-- **`MidiPlayerKey`** (struct): Key for MIDI player instances.
-- **`QueueableKey`** (struct): Key for queueable audio source instances.
-- **`LightKey`** (struct): Key for light source instances in LightWorld.
-- **`OccluderKey`** (struct): Key for shadow occluder instances in LightWorld.
-
-### `engine::shared_state`
-
-Central shared runtime state.
-
-- **`FullscreenType`** (enum): `Desktop` (borderless) or `Exclusive` (true fullscreen).
-- **`WindowState`** (struct): Window query state (focused, minimized, maximized, visible, DPI scale, position) and pending operations (title, fullscreen, position, size, minimize, maximize, restore, close, attention, icon, vsync, scale mode). Also holds viewport scaling values (game_width, game_height, scale factors, offsets).
-- **`ErrorInfo`** (struct): Captured error info — message, code, category, optional hint.
-- **`ScreenshotRequest`** (struct): Pending PNG save request with destination path.
-- **`SharedState`** (struct): The central hub. Holds all SlotMap resource pools, subsystem instances (Mixer, Clock, GameFS, Camera, EventQueue, LightWorld, MidiState), input state, draw command queue, per-frame statistics, and async loader. `new()` initialises all fields to safe defaults. `step_timer()` advances the clock. `request_async_load()` and `poll_async_load()` manage background file reads.
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `engine::app::App`
+#### `App`
 
-Public entry point for the Lurek2D engine. Accepts a `Config` and an optional conf.lua error message. `App::run(game_dir, explicit_game_dir)` launches the winit event loop and does not return until the window is closed.
+Public entry point used to launch the engine with loaded configuration and optional startup error context.
 
-#### `engine::config::Config`
+#### `LunaApp`
 
-Top-level engine configuration container. Loaded from `conf.lua` via `Config::load_from_conf_lua(game_dir)` which returns `(Config, Option<String>)` — the config and an optional warning message. All fields have sensible defaults.
+Internal winit application handler that owns most live runtime state during execution.
 
-#### `engine::config::WindowConfig`
+#### `RunState`
 
-Window geometry, title, vsync, fullscreen, resizable, min size, borderless, icon path, display index, scale mode (`"none"`, `"letterbox"`, `"stretch"`, `"pixel"`), logical game resolution, and maximized flag.
+Internal state machine that distinguishes normal execution from error display and restart transitions.
 
-#### `engine::config::GraphicsConfig`
+#### `DebugOverlay`
 
-GPU backend selection (`"auto"`, `"dx12"`, `"vulkan"`, `"metal"`) and power preference (`"high"`, `"low"`, `"none"`). Read once at startup; changing after GPU init has no effect.
+Small runtime overlay for FPS and draw-call visibility.
 
-#### `engine::config::ModulesConfig`
+#### `ErrorScreen`
 
-30+ boolean flags controlling which optional subsystems are enabled. `validate_and_fix()` disables modules that depend on absent prerequisites (e.g. particle requires graphics).
+Structured error presentation model that converts failures into readable render commands.
 
-#### `engine::config::PerformanceConfig`
+---
 
-Frame rate cap via `target_fps` (default 60).
-
-#### `engine::debug_overlay::DebugOverlay`
-
-Toggleable FPS and draw-call counter. `build_render_commands()` produces a `Vec<RenderCommand>` sequence when `enabled` is true; returns empty when disabled.
-
-#### `engine::error_screen::ErrorScreen`
-
-Blue error display with word-wrapped message, traceback, and help footer. Supports TTF fonts when available or falls back to built-in bitmap text. `as_text()` returns the error as plain text for clipboard copy.
-
-#### `engine::messages::MessageCatalog`
-
-Immutable map from stable message ID strings to human-readable text. Parsed from the compile-time-embedded `messages.toml` TOML catalog.
-
-#### `engine::shared_state::WindowState`
-
-Tracks window query state (focused, minimized, maximized, visible, DPI scale, position) and queues pending window operations set by Lua and consumed by the event loop. Also holds viewport scaling state for letterbox/stretch/pixel modes.
-
-#### `engine::shared_state::ErrorInfo`
-
-Captured structured error info: message, stable code, category, optional recovery hint.
-
-#### `engine::shared_state::ScreenshotRequest`
-
-Pending request to save the next rendered frame as a PNG to the given path.
-
-#### `engine::shared_state::SharedState`
-
-Central shared state passed as `Rc<RefCell<SharedState>>` to every Lua API closure and the engine loop. Owns all resource pools (textures, fonts, canvases, meshes, shaders, shapes, sprite batches, particle systems), subsystem instances (Mixer, Clock, GameFS, Camera, EventQueue, LightWorld, MidiState), input state, draw command queue, per-frame statistics, and async loader.
-
-### Enums
-
-#### `engine::error::ErrorCategory`
-
-Five error categories: `Init`, `Runtime`, `Resource`, `Script`, `System`. Used by `EngineError::category()` for structured grouping.
-
-#### `engine::error::EngineError`
-
-12 `thiserror`-derived variants with stable four-digit codes (E1001–E1012): `InitializationError`, `RenderError`, `InputError`, `AudioError`, `PhysicsError`, `FileSystemError`, `LuaError`, `WindowError`, `ConfigError`, `ResourceNotFound`, `ResourceNotLoaded`, `IoError`. Methods: `code()`, `category()`, `recovery_hint()`.
-
-#### `engine::shared_state::FullscreenType`
-
-`Desktop` (borderless fullscreen at desktop resolution) or `Exclusive` (true fullscreen that takes over the display).
-
-
-#### `engine::shared_state::RendererStats`
-
-Per-frame renderer statistics snapshot. Tracks draw call count, triangle count, batch count, and GPU frame time for profiling and debugging.
 ## Lua API
 
-`src/app/` exposes **no public `lurek.*` functions**. The application lifecycle (startup, event loop, frame tick) is managed internally by `App::run()` in Rust. Lua scripts interact with the engine exclusively through callbacks registered on the `lurek` global (`lurek.init`, `lurek.process`, `lurek.render`, etc.) — see `docs/architecture/engine-architecture.md` § Callback Contract.
+This module does not expose a dedicated direct Lua namespace. It is consumed indirectly through higher-level engine callbacks, shared state, or other `lurek.*` surfaces.
 
-| Namespace | Status |
-|---|---|
-| `lurek.app` | Not registered — `src/app/` has no Lua API surface. |
+---
 
 ## Lua Examples
 
-N/A — engine is a foundation module with no dedicated Lua API surface. Game scripts
-interact with engine functionality through higher-level namespaces:
-
 ```lua
--- conf.toml — engine configuration (preferred format)
-function lurek.conf(t)
-    t.window.title  = "My Game"
-    t.window.width  = 1280
-    t.window.height = 720
-    t.window.vsync  = true
-    t.modules.physics = true
-    t.performance.target_fps = 60
-end
+-- This module has no dedicated direct Lua namespace.
+-- It is used indirectly through other engine systems.
 ```
 
-```lua
--- main.lua — engine callbacks (dispatched by engine::app)
-function lurek.init()
-    -- called once after main.lua executes
-end
-
-function lurek.process(dt)
-    -- called every frame with delta time
-end
-
-function lurek.render()
-    -- called every frame; push RenderCommands here
-end
-
-function lurek.errorhandler(msg)
-    -- optional: custom error handling before error screen
-    return msg
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count |
-|------------|-------|
-| `struct`   | 27    |
-| `enum`     | 3     |
-| `type`     | 1     |
-| `fn`       | 30    |
-| `const`    | 73    |
-| `macro`    | 1     |
-| **Total**  | **135** |
+| Kind | Count |
+|------|-------|
+| `struct` | 4 |
+| `enum` | 0 |
+| `fn` (Lua API) | 0 |
+| **Total** | **4** |
+
+---
 
 ## References
 
-| Module          | Relationship | Notes |
-|-----------------|--------------|-------|
-| `math`          | Imports from | `Vec2`, `Color`, `Rect` (Baseline leaf — no deps) |
-| `graphics`      | Imports from | `GpuRenderer`, `RenderCommand`, `DrawMode`, `TextureData`, `Canvas`, `Mesh`, `Shader`, `Font`, `SpriteBatch`, `CompoundShape`, `BlendMode`, `StencilMode`, `DepthMode`, `RenderStats` |
-| `audio`         | Imports from | `Mixer`, `MidiState` |
-| `input`         | Imports from | `KeyboardState`, `MouseState`, `GamepadState`, `TouchState`, `GamepadMappings`, `SystemCursor`, key/button conversion functions |
-| `timer`         | Imports from | `Clock` |
-| `filesystem`    | Imports from | `GameFS`, `AsyncLoader`, `LoadHandle`, `LoadResult`, `LoadStatus` |
-| `camera`        | Imports from | `Camera` |
-| `event`         | Imports from | `EventQueue`, `EventArg` |
-| `particle`      | Imports from | `ParticleSystem` |
-| `light`         | Imports from | `LightWorld` |
-| `lua_api`       | Imports from | `create_lua_vm` (for Lua VM initialization) |
-| `lua_api`       | Imported by  | All `lua_api/*_api.rs` modules receive `Rc<RefCell<SharedState>>` |
-| All Tier 1/2    | Imported by  | Every module uses `EngineError`, `EngineResult`, resource keys |
-| `main.rs`       | Imported by  | Constructs `App` and calls `App::run()` |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `event` | Imports or references `event` from `src/event/`. | Cross-group dependency from Edge/Integration to Core Runtime. |
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Edge/Integration to Platform Services. |
+| `input` | Imports or references `input` from `src/input/`. | Cross-group dependency from Edge/Integration to Platform Services. |
+| `light` | Imports or references `light` from `src/light/`. | Cross-group dependency from Edge/Integration to Platform Services. |
+| `lua_api` | Imports or references `lua_api` from `src/lua_api/`. | Same responsibility group; allowed when the dependency graph stays acyclic. |
+| `math` | Imports or references `math` from `src/math/`. | Cross-group dependency from Edge/Integration to Foundations. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Edge/Integration to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Edge/Integration to Core Runtime. |
+| `sprite` | Imports or references `sprite` from `src/sprite/`. | Cross-group dependency from Edge/Integration to Feature Systems. |
+| `timer` | Imports or references `timer` from `src/timer/`. | Cross-group dependency from Edge/Integration to Core Runtime. |
 
-**Similar modules**: `engine` is unique — no other module serves the same role. The closest relationship is with `lua_api`, which is the bridge layer that registers the `lurek.*` namespace using types from `engine`.
+---
 
 ## Notes
 
-- **`app_winit.rs` is dead code**: It is not declared in `mod.rs` and is not compiled. Preserved for historical reference only. Do not modify it.
-- **`temp_test.rs` is a placeholder**: Contains only the text `testing`. Not compiled or tested.
-- **`Rc<RefCell<>>` is intentional**: `SharedState` uses `Rc<RefCell<>>` because all Lua callbacks are single-threaded. Never change this to `Arc<Mutex<>>` — it would add lock overhead with zero benefit since worker threads get separate Lua VMs.
-- **`conf.lua` errors are non-fatal**: `Config::load_from_conf_lua()` returns defaults on error. The error message is passed through to the engine for later display, but the window still opens.
-- **RunState machine is private**: `RunState` and `LunaApp` are not public. External code only interacts with `App::new()` and `App::run()`.
-- **ErrorScreen supports TTF fallback**: When the engine fonts are available, error text renders with `PrintFont` commands. Otherwise, it falls back to the built-in bitmap font at a larger scale.
-- **Resource keys are cross-module**: The 14 key types defined in `resource_keys.rs` are used throughout the entire engine (graphics, audio, particle, light, etc.), not just within the engine module.
-- **`log_msg!` macro requires `MessageCatalog::init()`**: Called automatically by `App::new()`. If used before init, the macro falls back to printing the raw message ID.
-- **Viewport scaling**: `recompute_viewport()` supports four modes (`"none"`, `"letterbox"`, `"stretch"`, `"pixel"`) and is called on every window resize. Coordinates are transformed from game-space to window-space.
-- **Splash branding is embedded and cached**: The no-game splash decodes `assets/svg/large_icon.png` and `assets/svg/banner.png` once, stores them in a private `SlotMap<TextureKey, TextureData>`, and reuses those textures on every splash frame instead of regenerating vector-style art.
-- **Splash title carries the version**: The version string is no longer rendered into the splash draw commands. While no game is loaded, `app.rs` appends `v{CARGO_PKG_VERSION}` to the window title and resets back to the normal configured title when a game is loaded.
-- **Drag-and-drop**: The splash screen supports dropping a game folder onto the window to load it immediately, enabling a zero-CLI workflow.
-- **No `unsafe` in this module** except one `// SAFETY:` documented cast in `get_message()` to extend the lifetime of `OnceLock`-stored strings to `'static`.
+- **Source of truth**: Keep this spec synchronized with `src/app/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.
+- **Lua surface**: This module has no dedicated direct `lurek.*` namespace and is typically consumed through higher integration layers.

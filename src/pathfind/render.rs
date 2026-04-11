@@ -14,7 +14,7 @@ impl NavGrid {
     /// Generate debug render commands visualising the navigation grid.
     ///
     /// Each cell is drawn as a solid rectangle:
-    /// - dark grey — walkable  
+    /// - dark grey — walkable
     /// - red — blocked
     ///
     /// # Parameters

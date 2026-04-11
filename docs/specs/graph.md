@@ -1,440 +1,361 @@
 # `graph` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.graph`                                         |
-| **Source**      | `src/graph/`                                         |
-| **Rust Tests** | `tests/rust/unit/graph_tests.rs`                     |
-| **Lua Tests**  | `tests/lua/unit/test_graph.lua`                      |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Foundations |
+| **Status** | Implemented |
+| **Lua API** | `lurek.graph` |
+| **Source** | `src/graph/` |
+| **Rust Tests** | none found in the workspace |
+| **Lua Tests** | none found in the workspace |
+| **Architecture** | `docs/architecture/engine-architecture.md § Foundations` |
+
+---
 
 ## Summary
 
-The graph module provides a general-purpose directed weighted graph with item flow simulation, Dijkstra pathfinding, and a classical algorithm suite. It is a Tier 2 engine extension that depends only on Baseline (`math`, `engine`) and no Tier 1 modules. Game developers use it whenever their data is naturally relational rather than spatial: dialogue trees where nodes are lines and edges are player choices, quest dependency systems where completing a quest unlocks others, skill trees, resource production pipelines, logistics networks, and dungeon layout validation.
+The graph module owns directed node-edge-item networks plus the algorithms needed to simulate flow through them. It combines CRUD-style graph storage with routing, connected-component and cycle analysis, item transit, conversion rules, queueing, and supply-demand fulfillment.
 
-Nodes are richly configurable vertices with capacity limits, overflow policies (reject, destroy, queue), flow modes (passive, push, pull, both), rate-limited push/pull timers, conversion rules that transform N items of type A into M items of type B, supply and demand declarations, FIFO queues, and freeform string tags. Edges are directed connections carrying weight (for pathfinding), travel time, speed modifiers, cooldown timers, capacity limits, bidirectional flags, and item-type allow-lists. Items are typed entities that flow through the network with optional decay timers, priority ordering, and position tracking (at-node, in-transit with progress fraction, or unplaced).
+This module exists for systems whose logic is relational rather than spatial, such as logistics networks, production chains, dependency graphs, or abstract game-economy flows. It is intentionally not a renderer or a world-space pathfinding system. The small render helper is only for debug visualization, and the legacy graph.rs and traversal.rs files are older on-disk copies rather than the active public surface declared by mod.rs.
 
-The simulation engine (`update(dt)`) processes seven phases per tick: decay → transit → cooldowns → push flow → pull flow → conversions → queue dequeue. Each phase emits `GraphEvent` variants that the Lua API dispatches to registered callbacks. A separate `process_demand()` pass matches demand declarations to supply declarations using priority ordering and shortest-path routing.
+**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
 
-The module intentionally does NOT provide visual rendering helpers, spatial hashing, or A* with heuristics — for spatial pathfinding on grids, use `src/pathfinding/` instead. The graph module operates on abstract node IDs, not world-space coordinates.
+---
 
 ## Architecture
 
 ```
-Graph (HashMap-based directed graph)
-  │
-  ├── Node ── vertex with 22+ configurable fields
-  │     ├── capacity, active, overflow_policy, flow_mode
-  │     ├── push_rate, pull_rate, push_filter, pull_filter
-  │     ├── process_time, queue_enabled, queue_capacity
-  │     ├── ConversionRule (in_type → out_type, in_count:out_count)
-  │     ├── Supply / Demand declarations
-  │     ├── VecDeque<u64> queue (FIFO item buffer)
-  │     ├── Vec<u64> items (currently held)
-  │     └── HashSet<String> tags
-  │
-  ├── Edge ── directed connection with flow control
-  │     ├── weight, travel_time, speed_modifier
-  │     ├── capacity, throughput, cooldown, cooldown_timer
-  │     ├── bidirectional flag, active flag
-  │     ├── allowed_types filter (HashSet<String>)
-  │     └── items_in_transit (Vec<u64>)
-  │
-  ├── GraphItem ── typed entity flowing through the network
-  │     ├── ItemPosition: AtNode(u64) | InTransit{edge_id,progress} | Unplaced
-  │     ├── item_type, decay_time, remaining_life, alive
-  │     └── priority (i32)
-  │
-  ├── algorithms.rs ── graph theory algorithms (impl Graph)
-  │     ├── get_components() → Vec<Vec<u64>> (BFS, weakly connected)
-  │     ├── has_cycle() → bool (DFS 3-colour)
-  │     └── topological_sort() → Option<Vec<u64>> (Kahn's algorithm)
-  │
-  ├── pathfinding.rs ── shortest-path queries (impl Graph)
-  │     ├── find_path(from, to) → Option<PathResult> (Dijkstra)
-  │     ├── find_path_for_item(item_id, from, to) → Option<PathResult>
-  │     ├── get_distance(from, to) → Option<f64>
-  │     ├── get_reachable(from, max_dist) → Vec<u64>
-  │     └── get_neighbors(node_id) → Vec<u64>
-  │
-  ├── simulation.rs ── tick-based flow engine (impl Graph)
-  │     ├── update(dt) → Vec<GraphEvent>
-  │     ├── step() → Vec<GraphEvent>  (= update(1.0))
-  │     └── 7-phase pipeline: decay → transit → cooldowns
-  │         → push_flow → pull_flow → conversions → queues
-  │
-  └── supply_demand.rs ── economic simulation (impl Graph)
-        ├── process_demand() → Vec<GraphEvent>
-        └── Priority-ordered demand fulfillment via pathfinding
+lurek.graph.* (Lua API — src/lua_api/graph_api.rs)
+    |
+    v
+src/graph/mod.rs
+    |- algorithms.rs - algorithms
+    |- core.rs - core
+    |- edge.rs - edge
+    |- graph.rs - graph
+    |- item.rs - item
+    |- node.rs - node
+    |- pathfinding.rs - pathfinding
+    |- render.rs - render
+    |- ...
 ```
+
+---
 
 ## Source Files
 
-| File               | Purpose                                                                      |
-|--------------------|------------------------------------------------------------------------------|
-| `mod.rs`           | Module declarations, re-exports of public types                              |
-| `algorithms.rs`    | Graph algorithms — connected components (BFS), cycle detection (DFS), topological sort (Kahn's) |
-| `core.rs`          | `Graph` struct — node, edge, and item CRUD, stats, edge queries              |
-| `edge.rs`          | `Edge` struct — directed connection with capacity, cooldown, type filtering  |
-| `item.rs`          | `GraphItem` and `ItemPosition` — typed flowing entities with decay and priority |
-| `node.rs`          | `Node`, `OverflowPolicy`, `FlowMode`, `ConversionRule`, `Supply`, `Demand`  |
-| `pathfinding.rs`   | `PathResult` and Dijkstra shortest-path, reachability, neighbour queries     |
-| `simulation.rs`    | `GraphEvent` enum and 7-phase simulation pipeline (`update`/`step`)          |
-| `supply_demand.rs` | Supply/demand matching with priority-ordered fulfillment via pathfinding     |
-| `graph.rs`         | Legacy duplicate of `core.rs` — not declared in `mod.rs`, dead code          |
-| `traversal.rs`     | Legacy duplicate of `pathfinding.rs` — not declared in `mod.rs`, dead code   |
+| File | Purpose |
+|------|---------|
+| `algorithms.rs` | Adds connected-component, cycle-detection, and topological-sort helpers. |
+| `core.rs` | Defines Graph and GraphStats plus node, edge, and item management operations. |
+| `edge.rs` | Defines Edge, the directed connection with capacity, travel timing, cooldowns, weights, and item-type filters. |
+| `graph.rs` | Older duplicate graph container file kept on disk but not declared by mod.rs. |
+| `item.rs` | Defines GraphItem and ItemPosition for typed items that rest on nodes or travel across edges. |
+| `mod.rs` | Declares the active graph submodules and re-exports the public graph, node, edge, item, and event types. |
+| `node.rs` | Defines Node and the flow, overflow, conversion, supply, and demand types that give nodes gameplay meaning. |
+| `pathfinding.rs` | Adds Dijkstra-based shortest-path, reachability, and neighbor queries. |
+| `render.rs` | Generates debug render commands for visualizing graph state without making graph a rendering subsystem. |
+| `simulation.rs` | Implements the main tick pipeline and emits GraphEvent values for transit, decay, conversion, queue, and routing activity. |
+| `supply_demand.rs` | Matches demand declarations to supplies and routes created items through the graph. |
+| `traversal.rs` | Older duplicate pathfinding file kept on disk but not declared by mod.rs. |
+
+---
 
 ## Submodules
 
 ### `graph::algorithms`
 
-Graph algorithms — connected components, cycle detection, topological sort. All methods are `impl Graph` extension methods.
+Adds connected-component, cycle-detection, and topological-sort helpers.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
 ### `graph::core`
 
-Top-level directed graph container with node, edge, and item management.
+Defines Graph and GraphStats plus node, edge, and item management operations.
 
-- **`GraphStats`** (struct): Statistics snapshot with counts of nodes, edges, items, active entities, in-transit items, demand/supply totals, and queued items.
-- **`Graph`** (struct): A directed graph with `HashMap<u64, Node>` nodes, `HashMap<u64, Edge>` edges, and `HashMap<u64, GraphItem>` items. Provides CRUD for all three entity types, `send_item` for starting transit, `get_stats` for aggregate metrics, and edge queries (`get_outgoing_edges`, `get_incoming_edges`, `get_edge_between`).
+- **`GraphStats`** (struct): A read-only statistics snapshot captured from a [`Graph`] at a point in time.
+- **`Graph`** (struct): A directed graph with typed nodes, edges, and flowing items.
 
 ### `graph::edge`
 
-Graph edge — a directed connection between two nodes with flow control.
+Defines Edge, the directed connection with capacity, travel timing, cooldowns, weights, and item-type filters.
 
-- **`Edge`** (struct): A directed connection with weight, travel time, speed modifier, capacity, throughput, cooldown, bidirectional flag, item-type allow-list, and in-transit item tracking.
+- **`Edge`** (struct): A directed connection between two nodes in the graph.
+
+### `graph::graph`
+
+Older duplicate graph container file kept on disk but not declared by mod.rs.
+
+- **`GraphStats`** (struct): Statistics snapshot of the graph state.
+- **`Graph`** (struct): A directed graph with typed nodes, edges, and flowing items.
 
 ### `graph::item`
 
-Graph item — a typed entity that flows through the network.
+Defines GraphItem and ItemPosition for typed items that rest on nodes or travel across edges.
 
-- **`ItemPosition`** (enum): Where a `GraphItem` resides — `AtNode(u64)`, `InTransit { edge_id, progress }`, or `Unplaced`.
-- **`GraphItem`** (struct): A typed entity with `item_type`, `decay_time`, `remaining_life`, `alive` flag, `priority`, and `position`.
+- **`ItemPosition`** (enum): The current location of a [`GraphItem`] within the simulation graph.
+- **`GraphItem`** (struct): A typed entity that flows through the graph network.
 
 ### `graph::node`
 
-Graph node — a vertex with capacity, flow control, conversion rules, and queuing.
+Defines Node and the flow, overflow, conversion, supply, and demand types that give nodes gameplay meaning.
 
-- **`OverflowPolicy`** (enum): What happens when items arrive at a full node — `Reject`, `Destroy`, or `Queue`.
-- **`FlowMode`** (enum): How a node participates in automatic item flow — `Passive`, `Push`, `Pull`, or `Both`.
-- **`ConversionRule`** (struct): Converts `in_count` items of `in_type` into `out_count` items of `out_type`.
-- **`Supply`** (struct): A supply declaration with `item_type` and `quantity` (`-1` = unlimited).
-- **`Demand`** (struct): A demand declaration with `item_type`, `quantity`, and `priority`.
-- **`Node`** (struct): A vertex with 22+ fields covering capacity, active state, overflow policy, flow mode, push/pull rates and filters, process time, queue, items, conversion rules, demand/supply declarations, and tags.
+- **`OverflowPolicy`** (enum): What happens when items arrive at a full node.
+- **`FlowMode`** (enum): How a node participates in automatic item flow.
+- **`ConversionRule`** (struct): A rule that converts N input items of one type into M output items of another.
+- **`Supply`** (struct): Declares that a node can produce items of a given type up to a specified quantity.
+- **`Demand`** (struct): Declares that a node needs items of a given type, with a priority for fulfillment ordering.
+- **`Node`** (struct): A vertex in the graph with capacity, flow control, conversion, and queuing.
 
 ### `graph::pathfinding`
 
-Dijkstra pathfinding and reachability queries on the graph.
+Adds Dijkstra-based shortest-path, reachability, and neighbor queries.
 
-- **`PathResult`** (struct): Result of a successful pathfinding query with `nodes: Vec<u64>`, `edges: Vec<u64>`, and `cost: f64`.
+- **`PathResult`** (struct): Result of a successful pathfinding query.
+
+### `graph::render`
+
+Generates debug render commands for visualizing graph state without making graph a rendering subsystem.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
 ### `graph::simulation`
 
-Simulation engine — `update(dt)` and `step()` for item flow, decay, transit, and conversions.
+Implements the main tick pipeline and emits GraphEvent values for transit, decay, conversion, queue, and routing activity.
 
-- **`GraphEvent`** (enum): Events generated during simulation — 11 variants: `ItemEnter`, `ItemLeave`, `ItemDecay`, `ItemConvert`, `ItemLost`, `EdgeEnter`, `EdgeLeave`, `DemandFulfilled`, `SupplyDepleted`, `ItemQueued`, `ItemDequeued`.
+- **`GraphEvent`** (enum): Events generated during simulation for the Lua callback layer to dispatch.
 
 ### `graph::supply_demand`
 
-Supply/demand processing — matches demands to supplies using priority ordering and Dijkstra pathfinding, creating and routing items automatically.
+Matches demand declarations to supplies and routes created items through the graph.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+### `graph::traversal`
+
+Older duplicate pathfinding file kept on disk but not declared by mod.rs.
+
+- **`PathResult`** (struct): Result of a successful pathfinding query.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `graph::node::ConversionRule`
+#### `Graph`
 
-A rule that converts `in_count` items of `in_type` into `out_count` items of `out_type`. Keyed by `in_type` in the node's `conversions` HashMap.
+Central directed graph container that owns nodes, edges, items, and most module behavior through impl blocks.
 
-#### `graph::node::Demand`
+#### `GraphStats`
 
-A demand declaration on a node with `item_type`, `quantity`, and `priority` (higher = more urgent). Used by `process_demand()` to match supplies to demands.
+Read-only state summary for graph size, activity, demand, supply, and queued items.
 
-#### `graph::node::Supply`
+#### `Node`
 
-A supply declaration on a node with `item_type` and `quantity`. A quantity of `-1` means unlimited supply.
+Rich vertex type with capacity, flow mode, overflow policy, queueing, conversion rules, supplies, demands, and tags.
 
-#### `graph::edge::Edge`
+#### `Edge`
 
-A directed connection between two nodes. Carries `weight` (pathfinding cost), `travel_time` (seconds for transit), `speed_modifier`, `capacity` (max in-transit items, `-1` = unlimited), `throughput`, `cooldown` / `cooldown_timer`, `bidirectional` flag, `active` flag, and `allowed_types` item-type whitelist.
+Directed connection that controls routing cost, travel time, cooldown, capacity, and allowed item types.
 
-#### `graph::core::Graph`
+#### `GraphItem`
 
-The top-level directed graph container. Stores nodes, edges, and items in `HashMap<u64, T>` with auto-incrementing IDs. Provides full CRUD for all entity types, `send_item` to start transit on an edge, `get_stats` for aggregate metrics, and edge connectivity queries.
+Typed entity that moves through the graph with lifetime, priority, and current position state.
 
-#### `graph::item::GraphItem`
+#### `ItemPosition`
 
-A typed entity that flows through the graph network. Has `item_type`, `decay_time` (`-1.0` = no decay), `remaining_life`, `alive` flag, `priority`, and `position` (`ItemPosition`).
+Enum describing whether an item is at a node, in transit on an edge, or unplaced.
 
-#### `graph::core::GraphStats`
+#### `FlowMode`
 
-Statistics snapshot struct with 10 fields: `nodes`, `edges`, `items`, `active_nodes`, `active_edges`, `items_in_transit`, `items_on_nodes`, `total_demand`, `total_supply`, `queued_items`.
+Enum describing whether a node passively holds items or actively pushes and or pulls them.
 
-#### `graph::node::Node`
+#### `OverflowPolicy`
 
-A vertex with 22+ fields: `id`, `node_type`, `capacity`, `active`, `overflow_policy`, `flow_mode`, `push_rate`, `pull_rate`, `push_filter`, `pull_filter`, `process_time`, `queue_enabled`, `queue_capacity`, `queue`, `items`, `conversions`, `demands`, `supplies`, `tags`, `push_timer`, `pull_timer`, `process_accumulator`.
+Enum describing how full nodes reject, destroy, or queue incoming items.
 
-#### `graph::pathfinding::PathResult`
+#### `GraphEvent`
 
-Result of a successful pathfinding query. Contains `nodes: Vec<u64>` (ordered source→dest), `edges: Vec<u64>` (edges traversed), and `cost: f64` (sum of edge weights).
+Event enum emitted by simulation and demand processing for Lua callback dispatch.
 
-### Enums
+#### `PathResult`
 
-#### `graph::node::FlowMode`
+Shortest-path result containing ordered node IDs, edge IDs, and total path cost.
 
-How a node participates in automatic item flow. Variants: `Passive` (no flow), `Push` (sends items out), `Pull` (pulls items in), `Both` (push and pull).
-
-#### `graph::simulation::GraphEvent`
-
-Events generated during simulation. 11 variants: `ItemEnter { item_id, node_id }`, `ItemLeave { item_id, node_id }`, `ItemDecay { item_id }`, `ItemConvert { node_id, consumed, produced }`, `ItemLost { item_id, node_id }`, `EdgeEnter { item_id, edge_id }`, `EdgeLeave { item_id, edge_id }`, `DemandFulfilled { demand_node, supply_node, item_type, count }`, `SupplyDepleted { node_id, item_type }`, `ItemQueued { item_id, node_id }`, `ItemDequeued { item_id, node_id }`.
-
-#### `graph::item::ItemPosition`
-
-Where a `GraphItem` currently resides. Variants: `AtNode(u64)`, `InTransit { edge_id: u64, progress: f64 }`, `Unplaced`.
-
-#### `graph::node::OverflowPolicy`
-
-What happens when items arrive at a full node. Variants: `Reject` (item stays put), `Destroy` (item killed), `Queue` (item placed in FIFO queue).
+---
 
 ## Lua API
 
-The Lua API is registered in `src/lua_api/graph_api.rs` under the `lurek.graph` namespace. The single factory function `lurek.graph.newGraph()` creates a `Graph` userdata. All other operations are methods on the returned Graph, Node, Edge, and GraphItem userdata handles.
+Exposed under `lurek.graph.*` by `src/lua_api/graph_api.rs`.
 
-### `lurek.graph` namespace
+### Module Functions
 
-| Function             | Returns    | Description                                |
-|----------------------|------------|--------------------------------------------|
-| `lurek.graph.newGraph()` | `Graph` | Creates a new empty directed graph         |
+| Function | Description |
+|----------|-------------|
+| `lurek.graph.newGraph` | Creates a new empty directed graph for item flow simulation. |
 
-### Graph methods
+### `Edge` Methods
 
-| Method                                         | Returns       | Description                                                    |
-|------------------------------------------------|---------------|----------------------------------------------------------------|
-| `g:addNode(type?, capacity?)`                  | `Node`        | Adds a node (defaults: type `"default"`, capacity `-1`)        |
-| `g:removeNode(node)`                           | `boolean`     | Removes a node and all connected edges                         |
-| `g:hasNode(node)`                              | `boolean`     | Whether the node exists                                        |
-| `g:getNodes()`                                 | `table`       | All Node handles                                               |
-| `g:getNodeCount()`                             | `integer`     | Number of nodes                                                |
-| `g:addEdge(from, to, type?)`                   | `Edge`        | Adds a directed edge between two nodes                         |
-| `g:removeEdge(edge)`                           | `boolean`     | Removes an edge                                                |
-| `g:hasEdge(edge)`                              | `boolean`     | Whether the edge exists                                        |
-| `g:getEdges()`                                 | `table`       | All Edge handles                                               |
-| `g:getEdgeCount()`                             | `integer`     | Number of edges                                                |
-| `g:getEdgeBetween(from, to)`                   | `Edge?`       | Edge between two nodes, or nil                                 |
-| `g:createItem(type?, decay?)`                  | `GraphItem`   | Creates an unplaced item (defaults: `"default"`, `-1.0`)       |
-| `g:addItem(item, node)`                        | `boolean`     | Places an item at a node                                       |
-| `g:removeItem(item)`                           | `boolean`     | Removes an item entirely                                       |
-| `g:hasItem(item)`                              | `boolean`     | Whether the item exists                                        |
-| `g:getItems()`                                 | `table`       | All GraphItem handles                                          |
-| `g:getItemCount()`                             | `integer`     | Number of items                                                |
-| `g:sendItem(item, edge)`                       | `boolean`     | Starts item transit on an edge                                 |
-| `g:update(dt)`                                 | `nil`         | Advances simulation by dt seconds, fires event callbacks       |
-| `g:step()`                                     | `nil`         | One discrete simulation step (= `update(1.0)`)                 |
-| `g:findPath(from, to)`                         | `table?`      | Dijkstra shortest path — `{nodes, edges, cost}` or nil         |
-| `g:findPathForItem(item, from, to)`            | `table?`      | Shortest path filtered by item type/cooldown/active             |
-| `g:getDistance(from, to)`                       | `number?`     | Shortest path distance, or nil                                 |
-| `g:getReachable(from, maxDist?)`               | `table`       | All reachable Node handles                                     |
-| `g:getNeighbors(node)`                         | `table`       | Direct neighbour Node handles                                  |
-| `g:getComponents()`                            | `table`       | Weakly connected components (table of tables of Nodes)         |
-| `g:hasCycle()`                                 | `boolean`     | Whether a directed cycle exists                                |
-| `g:topologicalSort()`                          | `table?`      | Topological order of Nodes, or nil if cycle                    |
-| `g:processDemand()`                            | `nil`         | Processes supply/demand declarations, fires event callbacks    |
-| `g:getStats()`                                 | `table`       | Statistics snapshot table                                      |
-| `g:on(event, func)`                            | `nil`         | Registers a callback for a simulation event                    |
+| Method | Description |
+|--------|-------------|
+| `edge:getType(...)` | Returns the edge type string. |
+| `edge:setType(...)` | Sets the edge type string. |
+| `edge:getFrom(...)` | Returns the source node handle. |
+| `edge:getTo(...)` | Returns the destination node handle. |
+| `edge:getCapacity(...)` | Returns the edge capacity (-1 = unlimited). |
+| `edge:setCapacity(...)` | Sets the edge capacity (-1 = unlimited). |
+| `edge:getThroughput(...)` | Returns items per second this edge can transfer. |
+| `edge:setThroughput(...)` | Sets items per second this edge can transfer. |
+| `edge:getTravelTime(...)` | Returns the travel time in seconds for items on this edge. |
+| `edge:setTravelTime(...)` | Sets the travel time in seconds for items on this edge. |
+| `edge:getWeight(...)` | Returns the pathfinding weight of this edge. |
+| `edge:setWeight(...)` | Sets the pathfinding weight of this edge. |
+| `edge:getSpeedModifier(...)` | Returns the speed modifier applied to items in transit. |
+| `edge:setSpeedModifier(...)` | Sets the speed modifier applied to items in transit. |
+| `edge:getCooldown(...)` | Returns the cooldown duration in seconds. |
+| `edge:setCooldown(...)` | Sets the cooldown duration in seconds. |
+| `edge:isOnCooldown(...)` | Returns true if the edge is currently on cooldown. |
+| `edge:isBidirectional(...)` | Returns true if items can travel the edge in either direction. |
+| `edge:setBidirectional(...)` | Sets whether items can travel the edge in either direction. |
+| `edge:isActive(...)` | Returns true if the edge is active. |
+| `edge:setActive(...)` | Sets the active state of this edge. |
+| `edge:getItemsInTransit(...)` | Returns a table of GraphItem handles currently in transit on this edge. |
+| `edge:addAllowedType(...)` | Adds an item type to the edge allow-list. |
+| `edge:removeAllowedType(...)` | Removes an item type from the edge allow-list. |
+| `edge:clearAllowedTypes(...)` | Clears the edge allow-list so all item types are permitted. |
+| `edge:isItemTypeAllowed(...)` | Returns true if the given item type is allowed on this edge. |
+| `edge:type(...)` | Returns the type name "GraphEdge". |
+| `edge:typeOf(...)` | Returns true when the given name matches "GraphEdge" or a parent type. |
 
-### Node methods
+### `Graph` Methods
 
-| Method                                         | Returns       | Description                                           |
-|------------------------------------------------|---------------|-------------------------------------------------------|
-| `n:getType()`                                  | `string`      | Node type string                                      |
-| `n:setType(t)`                                 | `nil`         | Set node type                                         |
-| `n:getCapacity()`                              | `integer`     | Capacity (`-1` = unlimited)                           |
-| `n:setCapacity(c)`                             | `nil`         | Set capacity                                          |
-| `n:getItemCount()`                             | `integer`     | Items currently at node                               |
-| `n:isFull()`                                   | `boolean`     | Whether at capacity                                   |
-| `n:isActive()`                                 | `boolean`     | Whether active                                        |
-| `n:setActive(a)`                               | `nil`         | Set active state                                      |
-| `n:getOverflowPolicy()`                        | `string`      | `"reject"`, `"destroy"`, or `"queue"`                 |
-| `n:setOverflowPolicy(p)`                       | `nil`         | Set from string                                       |
-| `n:getFlowMode()`                              | `string`      | `"passive"`, `"push"`, `"pull"`, or `"both"`          |
-| `n:setFlowMode(m)`                             | `nil`         | Set from string                                       |
-| `n:getPushRate()` / `setPushRate(r)`           | `number`/`nil`| Push rate (items/sec)                                 |
-| `n:getPullRate()` / `setPullRate(r)`           | `number`/`nil`| Pull rate (items/sec)                                 |
-| `n:getPushFilter()` / `setPushFilter(f?)`      | `string?`/`nil`| Push type filter                                     |
-| `n:getPullFilter()` / `setPullFilter(f?)`      | `string?`/`nil`| Pull type filter                                     |
-| `n:getProcessTime()` / `setProcessTime(t)`     | `number`/`nil`| Queue processing time                                 |
-| `n:isQueueEnabled()` / `setQueueEnabled(e)`    | `boolean`/`nil`| Queue toggle                                         |
-| `n:getQueueCapacity()` / `setQueueCapacity(c)` | `integer`/`nil`| Queue capacity (`-1` = unlimited)                    |
-| `n:getQueueSize()`                             | `integer`     | Items in queue                                        |
-| `n:getItems()`                                 | `table`       | GraphItem handles at this node                        |
-| `n:getEdges(dir?)`                             | `table`       | Edge handles — dir: `"in"`, `"out"`, `"both"` (default) |
-| `n:setConversion(in, out, inN?, outN?)`        | `nil`         | Add/replace conversion rule                           |
-| `n:clearConversion(in_type)`                   | `nil`         | Remove conversion by input type                       |
-| `n:clearAllConversions()`                      | `nil`         | Remove all conversions                                |
-| `n:addTag(tag)` / `removeTag(tag)`             | `nil`/`boolean`| Tag management                                       |
-| `n:hasTag(tag)`                                | `boolean`     | Check tag                                             |
-| `n:clearTags()` / `getTags()`                  | `nil`/`table` | Clear or list all tags                                |
-| `n:addSupply(type, qty)`                       | `nil`         | Declare supply                                        |
-| `n:removeSupply(type)` / `clearSupplies()`     | `boolean`/`nil`| Remove supply declarations                           |
-| `n:addDemand(type, qty, priority?)`            | `nil`         | Declare demand (priority default 0)                   |
-| `n:removeDemand(type)` / `clearDemands()`      | `boolean`/`nil`| Remove demand declarations                           |
-| `n:enqueue(item)` / `dequeue()`               | `boolean`/`GraphItem?`| Queue operations                                |
+| Method | Description |
+|--------|-------------|
+| `graph:removeNode(...)` | Removes a node from the graph. |
+| `graph:hasNode(...)` | Returns true if the node exists in the graph. |
+| `graph:getNodes(...)` | Returns a table of all Node handles. |
+| `graph:getNodeCount(...)` | Returns the number of nodes in the graph. |
+| `graph:removeEdge(...)` | Removes an edge from the graph. |
+| `graph:hasEdge(...)` | Returns true if the edge exists in the graph. |
+| `graph:getEdges(...)` | Returns a table of all Edge handles. |
+| `graph:getEdgeCount(...)` | Returns the number of edges in the graph. |
+| `graph:removeItem(...)` | Removes an item from the graph entirely. |
+| `graph:hasItem(...)` | Returns true if the item exists in the graph. |
+| `graph:getItems(...)` | Returns a table of all GraphItem handles. |
+| `graph:getItemCount(...)` | Returns the number of items in the graph. |
+| `graph:update(...)` | Advances simulation by dt seconds and fires event callbacks. |
+| `graph:step(...)` | Runs one discrete simulation step and fires event callbacks. |
+| `graph:getNeighbors(...)` | Returns a table of direct neighbor Node handles. |
+| `graph:getComponents(...)` | Returns weakly connected components as a table of tables of Node handles. |
+| `graph:hasCycle(...)` | Returns true if the graph contains a directed cycle. |
+| `graph:topologicalSort(...)` | Returns a topologically sorted table of Node handles, or nil if a cycle exists. |
+| `graph:processDemand(...)` | Processes all supply/demand declarations and fires event callbacks. |
+| `graph:getStats(...)` | Returns a statistics snapshot table. |
+| `graph:type(...)` | Returns the type name of this object. |
+| `graph:typeOf(...)` | Returns true if this object is of the given type. |
 
-### Edge methods
+### `GraphItem` Methods
 
-| Method                                         | Returns       | Description                                           |
-|------------------------------------------------|---------------|-------------------------------------------------------|
-| `e:getType()` / `setType(t)`                  | `string`/`nil`| Edge type                                             |
-| `e:getFrom()` / `e:getTo()`                   | `Node`        | Source / destination node handles                     |
-| `e:getCapacity()` / `setCapacity(c)`           | `integer`/`nil`| Transit capacity (`-1` = unlimited)                  |
-| `e:getThroughput()` / `setThroughput(t)`       | `number`/`nil`| Items per second                                     |
-| `e:getTravelTime()` / `setTravelTime(t)`       | `number`/`nil`| Seconds per item transit                              |
-| `e:getWeight()` / `setWeight(w)`               | `number`/`nil`| Pathfinding cost                                     |
-| `e:getSpeedModifier()` / `setSpeedModifier(m)` | `number`/`nil`| Speed multiplier                                     |
-| `e:getCooldown()` / `setCooldown(c)`           | `number`/`nil`| Cooldown duration                                    |
-| `e:isOnCooldown()`                             | `boolean`     | Currently cooling down                                |
-| `e:isBidirectional()` / `setBidirectional(b)`  | `boolean`/`nil`| Two-way traversal                                    |
-| `e:isActive()` / `setActive(a)`               | `boolean`/`nil`| Active state                                         |
-| `e:getItemsInTransit()`                        | `table`       | GraphItem handles in transit                          |
-| `e:addAllowedType(t)` / `removeAllowedType(t)`| `nil`/`boolean`| Item-type allow-list                                 |
-| `e:clearAllowedTypes()`                        | `nil`         | Clear allow-list (allow all)                          |
-| `e:isItemTypeAllowed(t)`                       | `boolean`     | Check allow-list                                      |
+| Method | Description |
+|--------|-------------|
+| `graphitem:getType(...)` | Returns the item type string. |
+| `graphitem:setType(...)` | Sets the item type string. |
+| `graphitem:getDecayTime(...)` | Returns the decay time in seconds (-1 = immortal). |
+| `graphitem:setDecayTime(...)` | Sets the decay time in seconds (-1 = immortal). |
+| `graphitem:getRemainingLife(...)` | Returns the remaining life in seconds. |
+| `graphitem:isAlive(...)` | Returns true if the item is alive. |
+| `graphitem:kill(...)` | Marks the item as dead. |
+| `graphitem:getPriority(...)` | Returns the item priority. |
+| `graphitem:setPriority(...)` | Sets the item priority. |
+| `graphitem:getPosition(...)` | Returns the item position: node userdata if at a node, (edge, progress) |
+| `graphitem:type(...)` | Returns the type name of this object. |
+| `graphitem:typeOf(...)` | Returns true if this object is of the given type. |
 
-### GraphItem methods
+### `Node` Methods
 
-| Method                                         | Returns       | Description                                           |
-|------------------------------------------------|---------------|-------------------------------------------------------|
-| `i:getType()` / `setType(t)`                  | `string`/`nil`| Item type                                             |
-| `i:getDecayTime()` / `setDecayTime(t)`         | `number`/`nil`| Decay time (`-1` = immortal)                         |
-| `i:getRemainingLife()`                         | `number`      | Seconds of life left                                  |
-| `i:isAlive()`                                  | `boolean`     | Whether alive                                         |
-| `i:kill()`                                     | `nil`         | Mark as dead                                          |
-| `i:getPriority()` / `setPriority(p)`           | `integer`/`nil`| Flow/delivery ordering                               |
-| `i:getPosition()`                              | `Node\|Edge,number\|nil` | Position: Node if at-node, Edge+progress if in-transit, nothing if unplaced |
+| Method | Description |
+|--------|-------------|
+| `node:getType(...)` | Returns the node type string. |
+| `node:setType(...)` | Sets the node type string. |
+| `node:getCapacity(...)` | Returns the node capacity (-1 = unlimited). |
+| `node:setCapacity(...)` | Sets the node capacity (-1 = unlimited). |
+| `node:getItemCount(...)` | Returns the number of items currently at this node. |
+| `node:isFull(...)` | Returns true if the node has reached its capacity. |
+| `node:isActive(...)` | Returns true if the node is active. |
+| `node:setActive(...)` | Sets the active state of this node. |
+| `node:getOverflowPolicy(...)` | Returns the overflow policy as a string. |
+| `node:setOverflowPolicy(...)` | Sets the overflow policy from a string. |
+| `node:getFlowMode(...)` | Returns the flow mode as a string. |
+| `node:setFlowMode(...)` | Sets the flow mode from a string. |
+| `node:getPushRate(...)` | Returns items per second this node pushes. |
+| `node:setPushRate(...)` | Sets items per second this node pushes. |
+| `node:getPullRate(...)` | Returns items per second this node pulls. |
+| `node:setPullRate(...)` | Sets items per second this node pulls. |
+| `node:getPushFilter(...)` | Returns the push filter string, or nil if unset. |
+| `node:setPushFilter(...)` | Sets the push filter string, or nil to clear. |
+| `node:getPullFilter(...)` | Returns the pull filter string, or nil if unset. |
+| `node:setPullFilter(...)` | Sets the pull filter string, or nil to clear. |
+| `node:getProcessTime(...)` | Returns the processing time in seconds. |
+| `node:setProcessTime(...)` | Sets the processing time in seconds. |
+| `node:isQueueEnabled(...)` | Returns true if the node queue is enabled. |
+| `node:setQueueEnabled(...)` | Enables or disables the node queue. |
+| `node:getQueueCapacity(...)` | Returns the queue capacity (-1 = unlimited). |
+| `node:setQueueCapacity(...)` | Sets the queue capacity (-1 = unlimited). |
+| `node:getQueueSize(...)` | Returns the number of items currently in the queue. |
+| `node:getItems(...)` | Returns a table of GraphItem handles at this node. |
+| `node:getEdges(...)` | Returns a table of Edge handles connected to this node. |
+| `node:clearConversion(...)` | Removes the conversion rule for the given input type. |
+| `node:clearAllConversions(...)` | Removes all conversion rules from this node. |
+| `node:addTag(...)` | Adds a tag to this node. |
+| `node:removeTag(...)` | Removes a tag from this node. |
+| `node:hasTag(...)` | Returns true if this node has the given tag. |
+| `node:clearTags(...)` | Removes all tags from this node. |
+| `node:getTags(...)` | Returns a table of tag strings on this node. |
+| `node:removeSupply(...)` | Removes the supply declaration for the given item type. |
+| `node:clearSupplies(...)` | Removes all supply declarations from this node. |
+| `node:removeDemand(...)` | Removes the demand declaration for the given item type. |
+| `node:clearDemands(...)` | Removes all demand declarations from this node. |
+| `node:enqueue(...)` | Pushes an item into the node queue. |
+| `node:dequeue(...)` | Pops the next item from the node queue, or nil if empty. |
+| `node:type(...)` | Returns the type name "GraphNode". |
+| `node:typeOf(...)` | Returns true when the given name matches "GraphNode" or a parent type. |
 
-### Callback events for `g:on(event, func)`
-
-| Event              | Callback args                            | When fired                                    |
-|--------------------|------------------------------------------|-----------------------------------------------|
-| `"itemEnter"`      | `(item, node)`                           | Item arrived at a node                        |
-| `"itemLeave"`      | `(item, node)`                           | Item left a node onto an edge                 |
-| `"itemDecay"`      | `(item)`                                 | Item's remaining life reached zero            |
-| `"itemConvert"`    | `(node, consumed_tbl, produced_tbl)`     | Conversion rule fired                         |
-| `"itemLost"`       | `(item, node)`                           | Item destroyed by overflow policy             |
-| `"edgeEnter"`      | `(item, edge)`                           | Item started transit on an edge               |
-| `"edgeLeave"`      | `(item, edge)`                           | Item finished transit on an edge              |
-| `"demandFulfilled"`| `(demand_node, supply_node, type, count)`| Demand satisfied by supply                    |
-| `"supplyDepleted"` | `(node, item_type)`                      | Supply quantity reached zero                  |
-| `"itemQueued"`     | `(item, node)`                           | Item placed in node queue                     |
-| `"itemDequeued"`   | `(item, node)`                           | Item removed from node queue                  |
+---
 
 ## Lua Examples
 
 ```lua
--- Build a simple resource pipeline: mine → smelter → warehouse
-function lurek.init()
-    graph = lurek.graph.newGraph()
-
-    -- Create nodes with types and capacities
-    mine      = graph:addNode("mine", -1)
-    smelter   = graph:addNode("smelter", 5)
-    warehouse = graph:addNode("warehouse", 20)
-
-    -- Connect with directed edges
-    local e1 = graph:addEdge(mine, smelter)
-    e1:setTravelTime(2.0)
-    e1:setWeight(1.0)
-
-    local e2 = graph:addEdge(smelter, warehouse)
-    e2:setTravelTime(1.5)
-
-    -- Configure smelter: convert 2 ore into 1 ingot
-    smelter:setFlowMode("both")
-    smelter:setConversion("ore", "ingot", 2, 1)
-
-    -- Mine pushes ore automatically
-    mine:setFlowMode("push")
-    mine:setPushRate(0.5)
-
-    -- Register event callbacks
-    graph:on("itemEnter", function(item, node)
-        print(item:getType() .. " arrived at " .. node:getType())
-    end)
-
-    graph:on("itemConvert", function(node, consumed, produced)
-        print("Smelted " .. #consumed .. " ore into " .. #produced .. " ingot")
-    end)
-
-    -- Seed initial resources
-    for i = 1, 6 do
-        local ore = graph:createItem("ore", -1)
-        graph:addItem(ore, mine)
-    end
-end
-
-function lurek.process(dt)
-    graph:update(dt)
-
-    -- Check stats
-    local stats = graph:getStats()
-    if stats.itemsOnNodes > 0 then
-        -- Find path from mine to warehouse
-        local path = graph:findPath(mine, warehouse)
-        if path then
-            print("Path cost: " .. path.cost)
-        end
-    end
+-- Minimal namespace check for lurek.graph.
+if lurek.graph then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Supply/demand example: village demands food from farm
-function lurek.init()
-    g = lurek.graph.newGraph()
-
-    local farm    = g:addNode("farm", -1)
-    local village = g:addNode("village", 10)
-    g:addEdge(farm, village)
-
-    -- Farm supplies 5 food
-    farm:addSupply("food", 5)
-    -- Village demands 3 food at priority 1
-    village:addDemand("food", 3, 1)
-
-    g:on("demandFulfilled", function(demand_node, supply_node, item_type, count)
-        print(count .. " " .. item_type .. " delivered")
-    end)
-
-    -- Process all supply/demand in one pass
-    g:processDemand()
-end
-```
+---
 
 ## Item Summary
 
-| Kind       | Count |
-|------------|-------|
-| `struct`   | 9     |
-| `enum`     | 4     |
-| `fn`       | 50+   |
-| **Total**  | **63+** |
+| Kind | Count |
+|------|-------|
+| `struct` | 12 |
+| `enum` | 4 |
+| `fn` (Lua API) | 107 |
+| **Total** | **123** |
+
+---
 
 ## References
 
-| Module        | Relationship | Notes                                                          |
-|---------------|--------------|----------------------------------------------------------------|
-| `engine`      | Imports from | Uses `log_messages` constants and `SharedState` (via lua_api)  |
-| `math`        | Imports from | Baseline dependency (not directly used, but available)         |
-| `lua_api`     | Imported by  | `graph_api.rs` binds the full API to `lurek.graph`              |
-| `pathfinding` | Similar      | `src/pathfinding/` provides grid-based A★/HPA★/flow fields for spatial navigation; `graph` provides abstract node-based Dijkstra on relational graphs |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Foundations to Platform Services. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Foundations to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Foundations to Core Runtime. |
+
+---
 
 ## Notes
 
-- **Dead files**: `graph.rs` and `traversal.rs` exist in `src/graph/` but are NOT declared in `mod.rs`. They are legacy duplicates of `core.rs` and `pathfinding.rs` respectively. Do not edit them — they are dead code.
-- **All algorithms are `impl Graph`**: The `algorithms.rs`, `pathfinding.rs`, `simulation.rs`, and `supply_demand.rs` files add methods to `Graph` via `impl Graph` blocks rather than introducing new types. This keeps the API surface on a single type.
-- **HashMap-based, not SlotMap**: Unlike most Lurek2D resource pools, the graph uses `HashMap<u64, T>` with auto-incrementing IDs rather than `SlotMap`. This is intentional — graphs are self-contained userdata objects that do not participate in the engine's shared resource pool system.
-- **Rc<RefCell<Graph>> in Lua**: The Lua wrapper (`LuaGraph`) holds `Rc<RefCell<Graph>>` internally. Node, Edge, and GraphItem handles all share the same `Rc`, meaning they are lightweight views into the same graph. Removing a node invalidates all handles to that node — methods will return "node not found" errors.
-- **Event dispatch is synchronous**: `g:update(dt)` and `g:processDemand()` collect events first, then dispatch all callbacks after the simulation pass completes. Callbacks may safely read graph state but should avoid mutating the graph during dispatch to prevent borrow conflicts.
-- **No rendering integration**: The graph module is entirely abstract. It does not produce `RenderCommand`s or interact with the graphics pipeline. Games must implement their own visual representation of graph state in `lurek.draw()`.
-- **Thread safety**: The graph is not thread-safe (`Rc<RefCell<>>` not `Arc<Mutex<>>`). It must be used from the main Lua VM only.
+- **Source of truth**: Keep this spec synchronized with `src/graph/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

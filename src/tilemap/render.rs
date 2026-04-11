@@ -160,9 +160,20 @@ mod tests {
         let cmds = m.generate_render_commands(0.0, 0.0, 0.0, 0.0, f32::MAX, f32::MAX);
         let rects = cmds
             .iter()
-            .filter(|c| matches!(c, RenderCommand::Rectangle { mode: DrawMode::Fill, .. }))
+            .filter(|c| {
+                matches!(
+                    c,
+                    RenderCommand::Rectangle {
+                        mode: DrawMode::Fill,
+                        ..
+                    }
+                )
+            })
             .count();
-        assert!(rects >= 2, "expected at least 2 fill rectangles, got {rects}");
+        assert!(
+            rects >= 2,
+            "expected at least 2 fill rectangles, got {rects}"
+        );
     }
 
     #[test]
@@ -174,7 +185,10 @@ mod tests {
             .iter()
             .filter(|c| matches!(c, RenderCommand::Rectangle { .. }))
             .count();
-        assert_eq!(rects, 0, "hidden layer should produce no rectangle commands");
+        assert_eq!(
+            rects, 0,
+            "hidden layer should produce no rectangle commands"
+        );
     }
 
     #[test]

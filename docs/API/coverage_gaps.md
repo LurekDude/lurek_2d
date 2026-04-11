@@ -10,10 +10,14 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (64 items)
+## 1. Rust→Lua Gaps (68 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
+
+### `animation::render`
+
+- `quad_to_draw_command` — Converts a source quad and render parameters into a `DrawQua `src/animation/render.rs:76`
 
 ### `app::error_screen`
 
@@ -45,12 +49,14 @@ This may be intentional (engine internals) or an oversight.
 - `colored_points_to_image` — Render a set of 2-D points, each colored by its index in the `src/image/visualization.rs:1685`
 - `draw_animation_frame_grid_to_image` — Render an animation's frame grid as a strip of numbered cell `src/image/visualization.rs:23`
 - `draw_animation_playback_to_image` — Render an animation playback strip as snapshot columns.  Dra `src/image/visualization.rs:80`
+- `draw_animation_to_image` — Render an animation as a CPU image for headless testing.  De `src/image/visualization.rs:2641`
 - `draw_bezier_advanced_to_image` — Draw a bezier advanced operations overview.  Renders the ori `src/image/visualization.rs:2497`
 - `draw_camera_bounds_to_image` — Render a set of camera positions as labelled coloured rectan `src/image/visualization.rs:1779`
 - `draw_camera_debug_to_image` — Render a camera debug visualization showing viewport, positi `src/image/visualization.rs:132`
 - `draw_camera_follow_trail_to_image` — Render a camera follow trail with target points and dead-zon `src/image/visualization.rs:1815`
 - `draw_camera_rotation_grid_to_image` — Render a grid of camera rotation panels, each showing 8 colo `src/image/visualization.rs:1712`
 - `draw_camera_shake_trail_to_image` — Render a camera shake trail with fading circles and referenc `src/image/visualization.rs:1870`
+- `draw_camera_to_image` — Render a camera as a CPU image for headless testing.  Delega `src/image/visualization.rs:2661`
 - `draw_camera_zoom_comparison_to_image` — Render a zoom comparison showing the world at multiple zoom  `src/image/visualization.rs:199`
 - `draw_color_wheel_to_image` — Draw an HSV colour wheel.  Generates radial hue-saturation g `src/image/visualization.rs:2413`
 - `draw_delaunay_to_image` — Draw Delaunay triangulation visualization.  Renders triangle `src/image/visualization.rs:2261`
@@ -85,6 +91,10 @@ This may be intentional (engine internals) or an oversight.
 ### `math::color`
 
 - `hsv_to_rgb` — Convert an HSV color to RGB byte components.  # Parameters - `src/math/color.rs:153`
+
+### `parallax::render`
+
+- `batch_to_render_commands` — Converts a pre-computed [`ParallaxDrawBatch`] into render co `src/parallax/render.rs:51`
 
 ### `pathfind::astar`
 

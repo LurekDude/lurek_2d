@@ -1,293 +1,160 @@
-# `modding` — Agent Reference
+# `mods` — Agent Reference
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Reusable Engine Extensions                  |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.modding`                                       |
-| **Source**     | `src/modding/`                                       |
-| **Rust Tests** | `tests/rust/unit/modding_tests.rs`                   |
-| **Lua Tests**  | `tests/lua/unit/test_modding.lua`                    |
-| **Architecture** | —                                                  |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.mods` |
+| **Source** | `src/mods/` |
+| **Rust Tests** | none found in the workspace |
+| **Lua Tests** | none found in the workspace |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
+
+---
 
 ## Summary
 
-The `modding` module provides infrastructure for player-created mods: discovering, registering,
-ordering, and validating game mods without modifying original game files. It is a Tier 2 engine
-extension that depends only on Baseline (`engine`, `math`), using the `toml` crate for manifest
-parsing and `std::fs` for directory scanning.
+The `mods` module provides the metadata and load-order layer for user-created modifications. It discovers mod manifests, parses their metadata, validates dependency relationships, and computes deterministic ordering so the rest of the engine can decide what to mount or reload.
 
-The module centres on `ModInfo` (per-mod metadata) and `ModManager` (centralised registry).
-`ModManager` handles registration, lookup, priority-based load ordering with optional custom
-overrides, dependency validation (missing and circular), filesystem folder scanning with
-`mod.toml` parsing, and a hot-reload queue.
+It exists to keep mod discovery and dependency reasoning out of filesystem code, asset loading, and script execution. By centralizing manifest parsing and ordering here, the engine has one consistent place to answer which mods exist, which are enabled, and which should load first.
 
-Mods are discovered by scanning a designated directory (typically `mods/`). Each subdirectory
-containing a `mod.toml` is parsed into a `ModInfo`. The TOML format fields are: `id` (required),
-`name`, `version`, `author`, `description`, `priority`, and `dependencies`. Load ordering is
-deterministic: ascending `priority` value with alphabetical ID as tiebreaker. A custom explicit
-load order via `set_load_order()` places those mods first.
+It intentionally does not execute mod scripts, mount assets into the virtual filesystem, or enforce sandboxing. Those responsibilities belong in higher integration layers; this module is the registry and ordering layer.
 
-Circular dependency detection uses iterative DFS. `validate_dependencies()` reports unregistered
-declared dependencies before load. The Lua API exposes `LuaMod` (wrapping `ModInfo` with hook
-callbacks and config) and `LuaModManager` (wrapping `ModManager`) via
-`lurek.modding.newMod(info)` and `lurek.modding.newModManager()`.
+**Scope boundary**: This module currently depends on `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
 
-Scope boundary: this module handles discovery, metadata, ordering, and dependency validation. It
-does **not** execute mod Lua scripts, mount mod assets into `GameFS`, or provide mod sandboxing.
+---
 
 ## Architecture
 
 ```
-lurek.modding.newMod(info)         lurek.modding.newModManager()
-        │                                    │
-        ▼                                    ▼
-   ┌──────────┐                      ┌───────────────┐
-   │  LuaMod  │◄─── registerMod ────│ LuaModManager  │
-   │ (UserData)│                     │  (UserData)    │
-   ├──────────┤                      ├───────────────┤
-   │ ModInfo  │                      │  ModManager   │
-   │ hooks    │                      │   mods: Vec   │
-   │ config   │                      │   custom_order│
-   └──────────┘                      │   reload_queue│
-                                     └───────┬───────┘
-                                             │
-                              ┌──────────────┼──────────────┐
-                              ▼              ▼              ▼
-                       Registration     Load Order     Validation
-                       ┌──────────┐   ┌───────────┐  ┌────────────┐
-                       │register  │   │ priority  │  │ missing    │
-                       │unregister│   │ custom    │  │ circular   │
-                       │has/get/  │   │ ordering  │  │ DFS cycle  │
-                       │count/all │   └───────────┘  └────────────┘
-                       └──────────┘
-                              │
-                              ▼
-                     Folder Scanning        Hot-Reload
-                     ┌─────────────┐       ┌───────────┐
-                     │ scan_folder │       │ mark      │
-                     │ parse TOML  │       │ get queue │
-                     │ auto-register│      │ clear     │
-                     └─────────────┘       └───────────┘
+lurek.mods.* (Lua API — src/lua_api/mods_api.rs)
+    |
+    v
+src/mods/mod.rs
+    |- mod_manager.rs - mod_manager
 ```
+
+---
 
 ## Source Files
 
-| File              | Purpose                                                       |
-|-------------------|---------------------------------------------------------------|
-| `mod.rs`          | Module root — re-exports `mod_manager` submodule              |
-| `mod_manager.rs`  | `ModInfo` struct and `ModManager` registry with all operations |
+| File | Purpose |
+|------|---------|
+| `mod.rs` | Declares the mod-management surface and re-exports the manager implementation. |
+| `mod_manager.rs` | Implements mod discovery, manifest parsing, dependency validation, custom load ordering, and queued reload tracking. |
+
+---
 
 ## Submodules
 
-### `modding::mod_manager`
+### `mods::mod_manager`
 
-Core implementation of the mod management framework.
+Implements mod discovery, manifest parsing, dependency validation, custom load ordering, and queued reload tracking.
 
-- **`ModInfo`** (struct) — Per-mod metadata record: id, name, version, author, description, priority, dependencies, enabled/loaded state, and filesystem path.
-- **`ModManager`** (struct) — Centralised registry that stores `Vec<ModInfo>`, an optional custom load order, and a hot-reload queue. Provides registration, lookup, priority-based load ordering, folder scanning with TOML parsing, dependency validation, and reload queueing.
+- **`ModInfo`** (struct): Metadata record describing one registered game mod.
+- **`ModManager`** (struct): Centralized registry for managing mods, resolving load order, validating dependencies, scanning mod folders, and queuing hot-reloads.
+
+---
 
 ## Key Types
 
-### Structs
+### Public Types
 
-#### `modding::mod_manager::ModInfo`
+#### `ModManager`
 
-Metadata describing a single mod. All fields are public. The `id` field is the
-unique identifier and the only required field when constructing via `ModInfo::new()`.
-Defaults: `version` = `"1.0.0"`, `priority` = `0`, `enabled` = `true`, `loaded` = `false`,
-`path` = `None`, `dependencies` = empty vec.
+The central registry for discovered mods.
 
-**Fields:**
-- `id: String` — Unique mod identifier (required).
-- `name: String` — Human-readable display name (defaults to `id`).
-- `version: String` — Semantic version string.
-- `author: String` — Author name.
-- `description: String` — Mod description text.
-- `priority: i32` — Load order priority (lower = loaded first).
-- `dependencies: Vec<String>` — List of required mod IDs.
-- `enabled: bool` — Whether the mod is enabled.
-- `loaded: bool` — Whether the mod has been loaded.
-- `path: Option<String>` — Filesystem path to the mod root folder.
+#### `ModInfo`
 
-**Public functions:**
-- `new(id: impl Into<String>) -> Self` — Creates a `ModInfo` with sensible defaults.
-- `from_parts(id, name, version, author, description, priority, dependencies) -> Self` — Creates a fully-populated `ModInfo` in one call; used by `lurek.modding.register` Lua API binding.
+One parsed mod manifest plus runtime status fields such as enabled, loaded, priority, dependencies, and filesystem path.
 
-#### `modding::mod_manager::ModManager`
-
-Centralised registry for managing mods. Stores mods in a `Vec<ModInfo>`,
-an optional custom load order (`Option<Vec<String>>`), and a hot-reload
-queue (`Vec<String>`). Implements `Default`.
-
-**Public functions:**
-- `new() -> Self` — Creates an empty manager.
-- `register_mod(&mut self, info: ModInfo)` — Registers or replaces a mod by ID.
-- `unregister_mod(&mut self, id: &str) -> bool` — Removes a mod; also removes it from the reload queue.
-- `get_mod(&self, id: &str) -> Option<&ModInfo>` — Lookup by ID.
-- `get_mod_mut(&mut self, id: &str) -> Option<&mut ModInfo>` — Mutable lookup by ID.
-- `has_mod(&self, id: &str) -> bool` — Existence check.
-- `mod_count(&self) -> usize` — Number of registered mods.
-- `all_mods(&self) -> &[ModInfo]` — Slice of all registered mods.
-- `load_order(&self) -> Vec<&ModInfo>` — Mods in effective load order (custom or priority-based).
-- `set_load_order(&mut self, order: Vec<String>)` — Sets explicit load order by mod IDs.
-- `clear_load_order(&mut self)` — Reverts to priority-based sorting.
-- `get_custom_load_order(&self) -> Option<&[String]>` — Returns the current custom order, if any.
-- `scan_folder(&mut self, path: &str) -> Vec<ModInfo>` — Scans a directory for `mod.toml` files and auto-registers discovered mods.
-- `mark_for_reload(&mut self, id: &str) -> bool` — Adds a registered mod to the reload queue (deduplicated).
-- `get_reload_queue(&self) -> &[String]` — Current reload queue.
-- `clear_reload_queue(&mut self)` — Clears the reload queue.
-- `validate_dependencies(&self) -> Vec<String>` — Returns mod IDs whose dependencies are missing.
-- `has_circular_dependencies(&self) -> bool` — DFS cycle detection across the dependency graph.
-
-### Enums
-
-No public enums in this module.
+---
 
 ## Lua API
 
-Exposed under `lurek.modding.*` by `src/lua_api/modding_api.rs`. The API surface consists of two factory functions and two UserData types.
+Exposed under `lurek.mods.*` by `src/lua_api/mods_api.rs`.
 
-### Factory Functions
+### Module Functions
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `lurek.modding.newMod` | `(info: table) -> Mod` | Creates a `Mod` from an info table. Requires an `id` field; optional: `name`, `version`, `author`, `description`, `priority`, `dependencies`. |
-| `lurek.modding.newModManager` | `() -> ModManager` | Creates a new empty `ModManager`. |
+| Function | Description |
+|----------|-------------|
+| `lurek.mods.newMod` | Creates a new Mod from an info table with at least an `id` field. |
+| `lurek.mods.newModManager` | Creates a new empty ModManager. |
 
-### Mod UserData Methods
+### `Mod` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `mod:getId()` | `string` | Unique mod identifier. |
-| `mod:getName()` | `string` | Display name. |
-| `mod:getVersion()` | `string` | Version string. |
-| `mod:getAuthor()` | `string` | Author name. |
-| `mod:getDescription()` | `string` | Mod description. |
-| `mod:getDependencies()` | `table` | Array of required mod IDs. |
-| `mod:getPriority()` | `integer` | Load-order priority. |
-| `mod:isEnabled()` | `boolean` | Whether the mod is enabled. |
-| `mod:setEnabled(enabled)` | `nil` | Sets the enabled state. |
-| `mod:isLoaded()` | `boolean` | Whether the mod has been loaded. |
-| `mod:setHook(name, func)` | `nil` | Registers a named hook callback (replaces existing). |
-| `mod:getHook(name)` | `function?` | Returns the hook function or nil. |
-| `mod:hasHook(name)` | `boolean` | Whether a hook with the given name exists. |
-| `mod:getHookNames()` | `table` | Array of registered hook names. |
-| `mod:setConfig(value)` | `nil` | Stores an arbitrary config value. |
-| `mod:getConfig()` | `any?` | Returns the stored config value or nil. |
-| `mod:releaseRefs()` | `nil` | Releases all hook and config Lua registry references. |
+| Method | Description |
+|--------|-------------|
+| `mod:getId(...)` | Returns the unique mod identifier. |
+| `mod:getName(...)` | Returns the display name. |
+| `mod:getVersion(...)` | Returns the version string. |
+| `mod:getAuthor(...)` | Returns the author name. |
+| `mod:getDescription(...)` | Returns the mod description. |
+| `mod:getDependencies(...)` | Returns the list of required mod IDs. |
+| `mod:getPriority(...)` | Returns the load-order priority. |
+| `mod:isEnabled(...)` | Returns whether the mod is enabled. |
+| `mod:setEnabled(...)` | Sets the enabled state. |
+| `mod:isLoaded(...)` | Returns whether the mod has been loaded. |
+| `mod:getHook(...)` | Returns the hook function for the given name, or nil. |
+| `mod:hasHook(...)` | Returns whether a hook with the given name exists. |
+| `mod:getHookNames(...)` | Returns an array of registered hook names. |
+| `mod:setConfig(...)` | Stores an arbitrary config value for this mod. |
+| `mod:getConfig(...)` | Returns the stored config value, or nil. |
+| `mod:releaseRefs(...)` | Releases all hook and config registry references. |
 
-### ModManager UserData Methods
+### `ModManager` Methods
 
-| Method | Returns | Description |
-|--------|---------|-------------|
-| `mgr:registerMod(mod)` | `nil` | Registers a Mod userdata. |
-| `mgr:unregisterMod(id)` | `boolean` | Removes a mod by ID. |
-| `mgr:hasMod(id)` | `boolean` | Whether a mod is registered. |
-| `mgr:getModCount()` | `integer` | Number of registered mods. |
-| `mgr:getAllMods()` | `table` | Array of info tables for all mods. |
-| `mgr:getLoadOrder()` | `table` | Array of info tables in effective load order. |
-| `mgr:setLoadOrder(order)` | `nil` | Sets explicit load order from string array. |
-| `mgr:clearLoadOrder()` | `nil` | Reverts to priority-based sorting. |
-| `mgr:scanFolder(path)` | `table` | Scans directory for mods and registers them. |
-| `mgr:getModPath(id)` | `string?` | Filesystem path of a registered mod. |
-| `mgr:validateDependencies()` | `table` | Array of mod IDs with missing deps. |
-| `mgr:hasCircularDependencies()` | `boolean` | Whether circular dependency cycles exist. |
-| `mgr:markForReload(id)` | `boolean` | Marks a mod for hot-reload. |
-| `mgr:getReloadQueue()` | `table` | Array of mod IDs pending reload. |
-| `mgr:clearReloadQueue()` | `nil` | Clears the reload queue. |
+| Method | Description |
+|--------|-------------|
+| `modmanager:registerMod(...)` | Registers a mod from its Mod userdata. |
+| `modmanager:unregisterMod(...)` | Removes a mod by ID and returns whether it was found. |
+| `modmanager:hasMod(...)` | Returns whether a mod with the given ID is registered. |
+| `modmanager:getModCount(...)` | Returns the number of registered mods. |
+| `modmanager:getAllMods(...)` | Returns an array of info tables for all registered mods. |
+| `modmanager:getLoadOrder(...)` | Returns an array of info tables in effective load order. |
+| `modmanager:validateDependencies(...)` | Returns an array of mod IDs with missing dependencies. |
+| `modmanager:hasCircularDependencies(...)` | Returns whether any circular dependency cycles exist. |
+| `modmanager:setLoadOrder(...)` | Sets an explicit load order from an array of mod ID strings. |
+| `modmanager:clearLoadOrder(...)` | Clears the custom load order, reverting to priority-based sorting. |
+| `modmanager:scanFolder(...)` | Scans a directory for mods with mod.toml and registers them. |
+| `modmanager:getModPath(...)` | Returns the filesystem path of a registered mod, or nil. |
+| `modmanager:markForReload(...)` | Marks a registered mod for hot-reload. |
+| `modmanager:getReloadQueue(...)` | Returns the array of mod IDs pending hot-reload. |
+| `modmanager:clearReloadQueue(...)` | Clears the reload queue without reloading. |
+
+---
 
 ## Lua Examples
 
 ```lua
-function lurek.init()
-    -- Create a mod manager
-    local mgr = lurek.modding.newModManager()
-
-    -- Scan the mods/ directory for mod.toml files
-    local found = mgr:scanFolder("mods/")
-    print("Discovered " .. #found .. " mods")
-
-    -- Validate dependencies before loading
-    local missing = mgr:validateDependencies()
-    if #missing > 0 then
-        print("Missing dependencies: " .. table.concat(missing, ", "))
-        return
-    end
-
-    -- Check for circular dependencies
-    if mgr:hasCircularDependencies() then
-        print("Circular dependency detected!")
-        return
-    end
-
-    -- Get the resolved load order
-    local order = mgr:getLoadOrder()
-    for i, info in ipairs(order) do
-        print(i .. ". " .. info.name .. " v" .. info.version)
-    end
+-- Minimal namespace check for lurek.mods.
+if lurek.mods then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
-```lua
--- Creating mods programmatically with hooks
-local m = lurek.modding.newMod({
-    id       = "weather-fx",
-    name     = "Weather Effects",
-    version  = "1.0.0",
-    author   = "Luna",
-    priority = 10,
-    dependencies = { "core-utils" },
-})
-
--- Register a named hook
-m:setHook("onWeatherChange", function(weather_type)
-    print("Weather changed to: " .. weather_type)
-end)
-
--- Store per-mod config
-m:setConfig({ rain_intensity = 0.8, snow = false })
-
--- Later, retrieve and invoke
-if m:hasHook("onWeatherChange") then
-    local fn = m:getHook("onWeatherChange")
-    fn("rain")
-end
-
-local cfg = m:getConfig()
-print("Rain intensity: " .. cfg.rain_intensity)
-```
+---
 
 ## Item Summary
 
-| Kind      | Count |
-|-----------|-------|
-| `struct`  | 2     |
-| `enum`    | 0     |
-| `fn`      | 19    |
-| **Total** | **21**|
+| Kind | Count |
+|------|-------|
+| `struct` | 2 |
+| `enum` | 0 |
+| `fn` (Lua API) | 33 |
+| **Total** | **35** |
+
+---
 
 ## References
 
-| Module       | Relationship  | Notes                                                      |
-|--------------|---------------|------------------------------------------------------------|
-| `engine`     | Imports from  | Uses `log_messages` constants (`MD01_MGR_INIT`, `MD02_MOD_REG`, `MD04_ORDER_OK`) via `log_msg!` macro |
-| `math`       | —             | Not imported (no geometry or colour needed)                 |
-| `filesystem` | Related       | Mods may declare asset overrides that `GameFS`/`VirtualFS` resolves; modding itself does not import filesystem |
-| `lua_api`    | Imported by   | `src/lua_api/modding_api.rs` registers `lurek.modding.*`, wraps `ModInfo` as `LuaMod` and `ModManager` as `LuaModManager` |
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
 
-**Similar modules:**
-- `savegame` — Also Tier 2, also manages user-side data. Modding handles content discovery and ordering; savegame handles persistence and schema versioning.
+---
 
 ## Notes
 
-- **TOML is the manifest format.** Mod metadata is parsed from `mod.toml` files using the `toml` crate. JSON and YAML are not accepted. This follows constraint B-05.
-- **`id` is the only required TOML field.** All other fields (`name`, `version`, `author`, `description`, `priority`, `dependencies`) are optional and have sensible defaults.
-- **Load order is deterministic.** Priority ascending, then alphabetical ID. Custom order overrides via `set_load_order()` take precedence for listed mods; unlisted mods are appended in priority order.
-- **Circular dependency detection** uses a three-set DFS (unvisited, visiting, visited). A `true` return from `has_circular_dependencies()` means at least one cycle exists but does not identify which mods are involved.
-- **`scan_folder` does real filesystem I/O** via `std::fs::read_dir`. It is not sandboxed through `GameFS`. This is intentional — mod discovery happens before the game's virtual filesystem is fully mounted.
-- **Hot-reload queue is a notification mechanism only.** `mark_for_reload()` adds a mod ID to a queue; the module does not perform the actual reload. The game's main loop is responsible for polling `get_reload_queue()` and re-executing mod scripts.
-- **Lua hook storage** uses `LuaRegistryKey`. Call `releaseRefs()` when discarding a `LuaMod` to prevent registry leaks.
-- **Re-registering a mod replaces it.** If `register_mod()` is called with a `ModInfo` whose `id` already exists, the old entry is overwritten in place. This is by design for mod updates.
-- **No SlotMap keys.** Unlike graphics/audio resources, mods are stored in a plain `Vec<ModInfo>` with linear ID lookup. This is adequate because mod counts are small (typically < 100).
-- **Breaking change surface:** Renaming `mod.toml` fields or changing the `ModInfo` field names would break existing mod manifests and any game code that reads info tables from `getAllMods()` / `getLoadOrder()`.
+- **Source of truth**: Keep this spec synchronized with `src/mods/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

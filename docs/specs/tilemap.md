@@ -1,594 +1,488 @@
-# tilemap — AGENT.md
+# `tilemap` — Agent Reference
 
-| Field | Value |
-|---|---|
-| **Module** | `tilemap` |
-| **Path** | `src/tilemap/` |
-| **Tier** | Tier 2 — Engine Extension |
-| **Imports** | `math` (Vec2, Rect, Color), `engine` (log_messages) |
-| **Peer deps** | None (no Tier 2 ↔ Tier 2 cross-imports) |
-| **Lua namespace** | `lurek.tilemap` |
-| **API file** | `src/lua_api/tilemap_api.rs` |
-| **Test files** | `tests/rust/unit/tilemap_tests.rs` (159 tests), `tests/lua/unit/test_tilemap.lua` (151 tests), `tests/lua/integration/test_tilemap_physics.lua`, `tests/lua/integration/test_tilemap_physics2.lua`, `tests/lua/stress/test_tilemap_stress.lua`, `tests/lua/stress/test_tilemap_stress2.lua` |
+| Property | Value |
+|----------|-------|
+| **Tier** | Feature Systems |
+| **Status** | Implemented |
+| **Lua API** | `lurek.tilemap` |
+| **Source** | `src/tilemap/` |
+| **Rust Tests** | `tests/rust/unit/tilemap_tests.rs` |
+| **Lua Tests** | `tests/lua/unit/test_tilemap.lua`, `tests/lua/stress/test_tilemap_stress.lua`, `tests/lua/integration/test_tilemap_physics.lua`, `tests/lua/integration/test_tilemap_pathfinding.lua`, `tests/lua/integration/test_tilemap_camera.lua`, `tests/lua/integration/test_savegame_tilemap.lua`, `tests/lua/integration/test_procgen_tilemap.lua`, `tests/lua/golden/test_tilemap_golden.lua`, `tests/lua/evidence/test_evidence_tilemap.lua` |
+| **Architecture** | `docs/architecture/engine-architecture.md § Feature Systems` |
 
 ---
 
 ## Summary
 
-The `tilemap` module provides a comprehensive tilemap toolkit for 2D game development: orthogonal and isometric grids, sparse chunk-based infinite maps, hex and iso coordinate math, tile animation, per-tile collision detection with swept AABB support, autotiling (4-bit cardinal and 8-bit directional including blob-47 and composite-48 sheet helpers), TMX/TSX file parsing (Tiled editor import), procedural map generation via block prefabs and scripted placement steps, polygon region maps with point-in-polygon hit detection, a large-map renderer with LOD and camera-based chunk culling, and a first-person tile-walker controller for dungeon-crawler movement. The module is self-contained at Tier 2, importing only `math` (Vec2, Rect, Color) and `engine` (log_messages). It exposes seven UserData types to Lua (`TileSet`, `TileMap`, `AutoTileSheet`, `ChunkMap`, `IsoMap`, `MapBlock`, `MapGroup`) plus 16 standalone coordinate-helper functions. All Lua layer/tile indices use 1-based Lua convention, while Rust internals use 0-based indexing; the API boundary in `tilemap_api.rs` performs the translation. Additional Rust-only types (`LargeMapRenderer`, `PolygonMap`, `TileWalker`) are exported for direct Rust consumption but have no Lua bindings yet.
+The `tilemap` module is Lurek2D's general-purpose grid world toolkit. It owns orthogonal tile layers, tilesets, autotiling, isometric map data, sparse chunk storage, Tiled TMX import, procedural block-based generation, coordinate helpers, and a few specialized map-side utilities such as polygon regions and first-person tile walking.
+
+It exists so scripts can build and query tile-driven worlds without pushing map rules into the renderer or the physics layer. The module focuses on map representation, map math, tile semantics, and CPU-side generation or query work. The Lua bridge exposes the script-facing API, but the actual state and algorithms live here.
+
+It intentionally does not own GPU resources, texture loading, camera policy, scene management, or physics simulation. It can generate render commands and collision-friendly map queries, but rendering stays in `render` and collision resolution stays outside the module.
+
+**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
 
 ---
 
 ## Architecture
 
 ```
-                  lurek.tilemap (Lua namespace)
-                         |
-                         v
-            +--- tilemap_api.rs -----------------------------------+
-            |  LuaTileSet   LuaTileMap   LuaAutoTileSheet          |
-            |  LuaChunkMap  LuaIsoMap    LuaMapBlock   LuaMapGroup |
-            |  + 16 coord helpers (iso, hex)                       |
-            +------------------+-----------------------------------+
-                               | Rc<RefCell<T>>
-  +----------------------------+------------------------------------+
-  |                    src/tilemap/                                  |
-  |                                                                 |
-  |  tilemap.rs --- TileMap, TileLayer, SweepResult                |
-  |       |             multi-layer, animation, autotile, collision |
-  |       +-- tileset.rs --- TileSet, TileAnimFrame                |
-  |                             atlas layout, solid flags, autotile |
-  |                                                                 |
-  |  chunk.rs ---- ChunkMap                                        |
-  |                    sparse HashMap-based infinite storage        |
-  |                                                                 |
-  |  isomap.rs --- IsoMap, IsoLevel, IsoTile, IsoTilePart,        |
-  |                IsoDrawItem                                      |
-  |                    multi-level iso with painter's-algorithm     |
-  |                                                                 |
-  |  coords.rs -- 17 standalone functions (iso + hex)              |
-  |                                                                 |
-  |  autotile_sheet.rs -- AutoTileSheet, AutoTileLayout            |
-  |                          bitmask-to-tile lookup tables          |
-  |                                                                 |
-  |  mapgen.rs --- MapGen, MapBlock, MapGroup, MapScript,          |
-  |                MapZone, ScriptStep, StepType, Edge,            |
-  |                MapOrientation, LayerMode, MapSize              |
-  |                    procedural generation via scripts            |
-  |                                                                 |
-  |  tmx.rs ------ load_tmx(), TmxMap, TmxTileset, TmxTileLayer,  |
-  |                TmxObjectLayer, TmxObject, TmxOrientation,      |
-  |                TmxStaggerAxis, TmxLayer                        |
-  |                    Tiled editor XML parser                      |
-  |                                                                 |
-  |  large_map_renderer.rs -- LargeMapRenderer, MapChunk           |
-  |                              LOD + camera-based culling        |
-  |                                                                 |
-  |  polygon_map.rs -- PolygonMap, PolygonRegion                   |
-  |                       hit detection, labels, highlighting      |
-  |                                                                 |
-  |  tile_walker.rs -- TileWalker, Facing                          |
-  |                       first-person grid movement + interp      |
-  +-------------------------------------------------------------+
-         |                              |
-         v                              v
-  crate::math (Vec2, Rect, Color)   crate::engine (log_messages)
+lurek.tilemap.* (Lua API — src/lua_api/tilemap_api.rs)
+    |
+    v
+src/tilemap/mod.rs
+    |- autotile_sheet.rs - autotile_sheet
+    |- chunk.rs - chunk
+    |- coords.rs - coords
+    |- isomap.rs - isomap
+    |- large_map_renderer.rs - large_map_renderer
+    |- mapgen.rs - mapgen
+    |- polygon_map.rs - polygon_map
+    |- render.rs - render
+    |- ...
 ```
 
 ---
 
 ## Source Files
 
-| File | Lines | Purpose |
-|---|---|---|
-| `mod.rs` | ~50 | Module root — declares 11 submodules, re-exports all public types |
-| `tilemap.rs` | ~950 | Core `TileMap` with multi-layer support, viewport culling, tile animation, 4/8-bit autotile, collision (overlap + swept AABB) |
-| `tileset.rs` | ~400 | `TileSet` — atlas layout, quad computation, animation frames, solid flags, 4-bit and 8-bit autotile rule storage |
-| `chunk.rs` | ~270 | `ChunkMap` — sparse chunk-based storage for large/infinite maps using `HashMap<(i32,i32), Vec<u32>>` |
-| `isomap.rs` | ~480 | `IsoMap` — multi-level isometric tilemap with painter's-algorithm draw ordering and coordinate conversion |
-| `coords.rs` | ~400 | 17 standalone coordinate helpers for diamond-iso projection, iso direction/rotation, and hex grids (axial coordinates) |
-| `autotile_sheet.rs` | ~500 | `AutoTileSheet` — bitmask-to-tile lookup tables for blob-47, composite-48 (quarter-tile), and minimal-16 autotile layouts |
-| `mapgen.rs` | ~1200 | `MapGen`, `MapBlock`, `MapGroup`, `MapScript`, `ScriptStep` — block-prefab procedural map generation with scripted placement |
-| `tmx.rs` | ~450 | `load_tmx()` — Tiled TMX/TSX format parser (CSV, XML, base64, zlib, gzip data encodings) |
-| `large_map_renderer.rs` | ~430 | `LargeMapRenderer` — optimized large-map renderer with chunk-based dirty tracking, LOD thresholds, and camera viewport culling |
-| `polygon_map.rs` | ~280 | `PolygonMap` — named polygon regions with point-in-polygon hit detection, highlighting, labels, and bounding box queries |
-| `tile_walker.rs` | ~380 | `TileWalker` — tile-based first-person movement controller with cardinal Facing, smooth interpolation, and relative direction |
+| File | Purpose |
+|------|---------|
+| `autotile_sheet.rs` | Defines autotile lookup tables for blob-47, composite-48, and minimal-16 layouts and applies those rules onto a `TileSet`. |
+| `chunk.rs` | Implements `ChunkMap`, a sparse chunked tile store for very large or effectively infinite worlds with negative coordinate support. |
+| `coords.rs` | Provides standalone isometric and hex-grid conversion helpers so scripts and engine code can reason about non-orthogonal tile coordinates without embedding projection math elsewhere. |
+| `isomap.rs` | Stores multi-level isometric maps and yields painter-ordered draw items for floor, wall, and object parts per cell. |
+| `large_map_renderer.rs` | Tracks chunk visibility, dirty state, viewport, and LOD metadata for large tile worlds that need efficient culling-friendly batching. |
+| `mapgen.rs` | Implements prefab blocks, grouped block libraries, scripted generation steps, and map assembly logic for procedural tilemap authoring. |
+| `mod.rs` | Declares the tilemap submodules and re-exports the main map, tileset, generation, TMX, isometric, and utility types as the public module surface. |
+| `polygon_map.rs` | Manages named polygon regions with hit testing, labels, highlight state, and bounding-box queries for map overlays or province-style regions. |
+| `render.rs` | Adds `TileMap` render-command generation so tile layers can be turned into CPU-side draw commands without putting map traversal logic in the renderer. |
+| `tile_walker.rs` | Implements a cardinal, cell-by-cell movement controller for dungeon-crawler or raycast-style navigation on a tile grid. |
+| `tilemap.rs` | Holds the core layered `TileMap`, including tile CRUD, per-layer display state, viewport culling, animation state, and tile collision queries. |
+| `tileset.rs` | Defines `TileSet` atlas layout, per-tile animation frames, solid flags, and 4-bit or 8-bit autotile rule tables. |
+| `tmx.rs` | Parses Tiled TMX data, including tilesets, tile layers, object layers, and supported encoded tile payloads. |
 
 ---
 
 ## Submodules
 
-### `tilemap` (tilemap.rs)
-Core orthogonal tilemap engine. Manages a stack of named `TileLayer`s, each a flat `Vec<u32>` of global tile IDs. Supports per-tile tinting via `tile_tints`, viewport-based culling, tile animation (driven by `TileSet` frame data), and orientation (`TopDown` / `SideView`). Autotile: computes 4-bit cardinal and 8-bit directional bitmasks then replaces tiles via `TileSet` rule lookups — both whole-layer and localized 3×3-neighborhood variants. Collision: `is_solid()` delegates to tileset solid flags; `rect_overlaps_solid()` checks world-space AABB overlap; `sweep_rect()` performs swept AABB continuous collision detection and returns `SweepResult` with contact point, surface normal, tile coordinates, and time-of-impact.
+### `tilemap::autotile_sheet`
 
-### `tileset` (tileset.rs)
-Defines the atlas layout for a tile image. Each `TileSet` has a first GID, tile count, columns, tile dimensions, spacing, and margin. Computes source quads from atlas layout. Stores per-tile solid flags (`HashSet<u32>`), animation frame sequences (`HashMap<u32, Vec<TileAnimFrame>>`), and autotile rules in two maps: `auto_rules_4` (4-bit cardinal, key = `(String, u8)` → `u32`) and `auto_rules_8` (8-bit directional, key = `(String, u16)` → `u32`).
+Defines autotile lookup tables for blob-47, composite-48, and minimal-16 layouts and applies those rules onto a `TileSet`.
 
-### `chunk` (chunk.rs)
-Sparse chunk-based tile storage for arbitrarily large or infinite maps. Tiles are organized into square chunks of configurable size in a `HashMap<(i32,i32), Vec<u32>>`. Uses Euclidean division for correct negative coordinate support. Key operations: get/set/clear tiles, fill rectangles, load/unload chunks, query visible chunks by world-pixel viewport, iterate chunk tiles, and compute chunk-to-tile ranges and world rects.
+- **`AutoTileLayout`** (enum): Predefined autotile sheet layout variants.
+- **`AutoTileSheet`** (struct): An autotile sheet that maps layout conventions to bitmask-based tile selection.
 
-### `isomap` (isomap.rs)
-Multi-level isometric tilemap. Each `IsoLevel` is a grid of `IsoTile`s, each containing 4 GID slots corresponding to `IsoTilePart` variants: `Floor`, `NorthWall`, `WestWall`, `Object`. The `IsoMap` manages a stack of toggleable levels with a configurable pixel height between levels. `tile_to_screen()` / `screen_to_tile()` perform diamond isometric projection. `draw_iter()` yields all tile parts in painter's-algorithm order (diagonal sweep: ascending `d = tx + ty`, then ascending `tx`, then ascending `z`, then part order) for correct back-to-front rendering.
+### `tilemap::chunk`
 
-### `coords` (coords.rs)
-17 standalone coordinate conversion functions for isometric and hexagonal grid systems. Isometric: `to_screen_iso()`, `from_screen_iso()` (diamond projection), `iso_rotate()` (direction rotation 1–4), `iso_direction_name()`, `iso_direction_from_angle()`. Hexagonal (axial coordinates, pointy-top): `to_screen_hex()`, `from_screen_hex()`, `hex_neighbors()`, `hex_distance()`, `hex_round()`, `hex_line()` (Bresenham-style), `hex_ring()`, `hex_spiral()`, `hex_area()`, `hex_rotate()` (cube-coordinate rotation by 60° steps), `hex_reflect()` (cube-coordinate reflection across q/r/s axis).
+Implements `ChunkMap`, a sparse chunked tile store for very large or effectively infinite worlds with negative coordinate support.
 
-### `autotile_sheet` (autotile_sheet.rs)
-Manages bitmask-to-tile index mappings for three autotile layout variants. `Blob47` supports 47 distinct tiles using 8-bit bitmasks reduced to 4-bit + corner masking. `Composite48` uses 48 pre-composed tiles in a 6-column grid and also provides quarter-tile source/destination rects for rendering individual quarter-pieces (TL, TR, BL, BR). `Minimal16` uses a 16-tile 4-bit edge set. `apply_to_tileset()` bulk-registers all bitmask→tile rules into a `TileSet`. `get_quarter_rects()` returns four source `Rect`s for composite rendering of any 8-bit bitmask configuration.
+- **`ChunkMap`** (struct): A chunk-based tilemap that supports large and infinite maps through sparse storage.
 
-### `mapgen` (mapgen.rs)
-Procedural map generation framework. `MapBlock` is a multi-layer tile prefab with named segments and edge-connection side IDs for constraint-based placement. `MapGroup` collects blocks and `MapScript`s. `ScriptStep` configures a single generation operation (8 step types: FillRandom, PlaceBlock, PlaceRandom, PlaceLine, FloodFill, FillArea, DrawPath, FillRect) with 27 parameters including chance, repeat count, rotation, mirroring, conditional execution, zone filtering, and size filters. `MapGen` processes scripts via an LCG PRNG to produce `TileMap` output; `generate_world()` tiles multiple generation regions into a larger world map. Currently FillRandom, PlaceBlock, and FillRect are implemented; other step types are stubs.
+### `tilemap::coords`
 
-### `tmx` (tmx.rs)
-Parses Tiled editor TMX/TSX map files from XML using `roxmltree`. Supports tile layer data in CSV, XML element, base64, base64+zlib, and base64+gzip encodings; does not support zstd or infinite maps. Produces a `TmxMap` containing `TmxTileset`s (with solid tile markers), `TmxTileLayer`s (tile GID arrays), and `TmxObjectLayer`s (positioned objects with type, dimensions, and optional GID). Parses map-level properties: orientation (orthogonal, isometric, staggered, hexagonal), stagger axis, hex side length, and background color.
+Provides standalone isometric and hex-grid conversion helpers so scripts and engine code can reason about non-orthogonal tile coordinates without embedding projection math elsewhere.
 
-### `large_map_renderer` (large_map_renderer.rs)
-Optimized renderer for large tilemaps using chunk-based dirty tracking and camera-viewport culling. The map is divided into `MapChunk`s of configurable size; each chunk has a dirty flag for incremental updates. The renderer maintains camera state (position, zoom) and viewport dimensions to compute visible chunk ranges. LOD support: three distance thresholds (`lod_thresholds`) with `lod_enabled` flag. Key operations: `set_map_data()` for bulk loading, per-tile get/set with automatic chunk invalidation, `get_visible_chunks()` for rendering only what is on screen.
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
 
-### `polygon_map` (polygon_map.rs)
-Named polygon region map for province/territory-style overlays. `PolygonRegion` stores a flat vertex array, fill color, optional label text with font size. `PolygonMap` manages regions in a `HashMap<String, PolygonRegion>` with configurable outline color/width and highlight color/name. `get_region_at()` performs ray-casting point-in-polygon queries. Supports centroid calculation, bounding box computation, per-region color/label management, and single-region highlighting.
+### `tilemap::isomap`
 
-### `tile_walker` (tile_walker.rs)
-First-person tile-based movement controller for dungeon crawlers and grid-based games. `Facing` enum (North=0, East=1, South=2, West=3) with parsing, angle conversion, delta computation, and rotation methods. `TileWalker` tracks current position, facing, and previous state for smooth interpolation. Movement: `move_forward()`, `move_backward()`, `strafe_left()`, `strafe_right()`, `turn_left()`, `turn_right()`, `turn_around()`. `begin_move()` snapshots state; `get_interpolated_position()` and `get_interpolated_angle()` (shortest-path) provide smooth animation between steps. `get_relative_facing()` returns "front"/"back"/"left"/"right" for a target tile.
+Stores multi-level isometric maps and yields painter-ordered draw items for floor, wall, and object parts per cell.
+
+- **`IsoTilePart`** (enum): The four sub-slots within each isometric map cell, rendered in this order.
+- **`IsoTile`** (struct): One map cell containing four GIDs, one per [`IsoTilePart`].
+- **`IsoLevel`** (struct): One Z-level of the isometric map — a 2-D grid of [`IsoTile`]s.
+- **`IsoDrawItem`** (struct): One renderable item produced by [`IsoMap::draw_iter`] in painter's order.
+- **`IsoMap`** (struct): Multi-level isometric tilemap with painter's-algorithm draw iteration.
+
+### `tilemap::large_map_renderer`
+
+Tracks chunk visibility, dirty state, viewport, and LOD metadata for large tile worlds that need efficient culling-friendly batching.
+
+- **`MapChunk`** (struct): A chunk of tiles pre-batched for fast culling and rendering.
+- **`LargeMapRenderer`** (struct): Optimized large tile-map renderer with chunked culling.
+
+### `tilemap::mapgen`
+
+Implements prefab blocks, grouped block libraries, scripted generation steps, and map assembly logic for procedural tilemap authoring.
+
+- **`Edge`** (enum): Cardinal edge direction for block-segment connectivity.
+- **`MapBlock`** (struct): A prefab grid of tiles that can be stamped into a generated map.
+- **`MapGroup`** (struct): A biome-like container holding [`MapBlock`] prefabs and [`MapScript`] generators.
+- **`StepType`** (enum): The type of operation a [`ScriptStep`] performs.
+- **`ScriptStep`** (struct): A single step in a [`MapScript`] with rich configuration.
+- **`MapScript`** (struct): A named sequence of [`ScriptStep`]s that drives procedural generation.
+- **`MapOrientation`** (enum): Map orientation for visual layout hints.
+- **`LayerMode`** (enum): How layers are managed during generation.
+- **`MapSize`** (enum): Predefined map size presets expressed in segment-grid units.
+- **`MapZone`** (struct): A named horizontal zone within a generated map.
+
+### `tilemap::polygon_map`
+
+Manages named polygon regions with hit testing, labels, highlight state, and bounding-box queries for map overlays or province-style regions.
+
+- **`PolygonRegion`** (struct): A named polygon region.
+- **`PolygonMap`** (struct): Polygon map renderer with region management and hit detection.
+
+### `tilemap::render`
+
+Adds `TileMap` render-command generation so tile layers can be turned into CPU-side draw commands without putting map traversal logic in the renderer.
+
+- **No exported Rust types in this file**: this submodule is primarily supporting logic or free functions.
+
+### `tilemap::tile_walker`
+
+Implements a cardinal, cell-by-cell movement controller for dungeon-crawler or raycast-style navigation on a tile grid.
+
+- **`Facing`** (enum): Cardinal facing direction.
+- **`TileWalker`** (struct): Tile-based movement controller for first-person grid navigation.
+
+### `tilemap::tilemap`
+
+Holds the core layered `TileMap`, including tile CRUD, per-layer display state, viewport culling, animation state, and tile collision queries.
+
+- **`TileLayer`** (struct): A single layer of tiles in a [`TileMap`].
+- **`SweepResult`** (struct): Result of a swept-AABB collision test against solid tiles.
+- **`TileMap`** (struct): A 2D tile map composed of layers, tilesets, and viewport-clipped rendering state.
+
+### `tilemap::tileset`
+
+Defines `TileSet` atlas layout, per-tile animation frames, solid flags, and 4-bit or 8-bit autotile rule tables.
+
+- **`TileAnimFrame`** (struct): A single frame in a tile animation sequence.
+- **`TileSet`** (struct): A tile set that maps local tile IDs to atlas regions, animations, and collision flags.
+
+### `tilemap::tmx`
+
+Parses Tiled TMX data, including tilesets, tile layers, object layers, and supported encoded tile payloads.
+
+- **`TmxOrientation`** (enum): Rendering orientation of the map, as specified in the TMX `orientation` attribute.
+- **`TmxStaggerAxis`** (enum): The axis along which isometric / hexagonal tiles are staggered.
+- **`TmxTileset`** (struct): A tileset reference embedded in a TMX map.
+- **`TmxTileLayer`** (struct): A standard tile layer from a TMX map.
+- **`TmxObjectLayer`** (struct): An object layer (object group) from a TMX map.
+- **`TmxObject`** (struct): A single Tiled object within an object layer.
+- **`TmxLayer`** (enum): Variant tag for TMX map layers.
+- **`TmxMap`** (struct): A fully-parsed TMX map.
 
 ---
-
 
 ## Key Types
 
-### AutoTileLayout
+### Public Types
 
-`enum` defined in `autotile_sheet.rs`.
+#### `TileMap`
 
+The main layered orthogonal map container.
 
-### AutoTileSheet
+#### `TileLayer`
 
-`struct` defined in `autotile_sheet.rs`.
+A single named tile layer with visibility, tint, parallax, offset, and per-tile GID storage.
 
+#### `SweepResult`
 
-### ChunkMap
+The return value for swept AABB tile collision tests, carrying hit point, normal, tile coordinates, and time-of-impact.
 
-`struct` defined in `chunk.rs`.
+#### `TileSet`
 
+Atlas metadata plus per-tile behavior such as solidity, animation, and autotile rule mappings.
 
-### Edge
+#### `TileAnimFrame`
 
-`enum` defined in `mapgen.rs`.
+One frame in a tile animation sequence, pairing a local tile id with a duration.
 
+#### `AutoTileSheet`
 
-### Facing
+Precomputed autotile layout helper that maps neighbor bitmasks to tile indices for common autotile atlas formats.
 
-`enum` defined in `tile_walker.rs`.
+#### `AutoTileLayout`
 
+Enumerates the supported autotile sheet conventions and therefore which lookup rules apply.
 
-### IsoDrawItem
+#### `ChunkMap`
 
-`struct` defined in `isomap.rs`.
+Sparse tile storage for streamed or massive maps where allocating one dense grid would be wasteful.
 
+#### `IsoMap`
 
-### IsoLevel
+Multi-level isometric map model that stores four tile parts per cell and yields stable painter-order iteration.
 
-`struct` defined in `isomap.rs`.
+#### `IsoLevel`
 
+One Z-level within an `IsoMap`, holding the grid of `IsoTile` cells for that floor.
 
-### IsoMap
+#### `IsoTilePart` - Names the four per-cell isometric slots`
 
-`struct` defined in `isomap.rs`.
+floor, north wall, west wall, and object.
 
+#### `IsoDrawItem`
 
-### IsoTile
+A render-ready isometric cell part with tile coordinates, level, part, gid, and projected screen position.
 
-`struct` defined in `isomap.rs`.
+#### `MapBlock`
 
+A reusable prefab tile block with multi-layer tile data and edge metadata for procedural placement.
 
-### IsoTilePart
+#### `MapGroup`
 
-`enum` defined in `isomap.rs`.
+A named collection of blocks and generation scripts that acts like a biome or prefab library.
 
+#### `MapGen`
 
-### LargeMapRenderer
+The procedural assembly engine that consumes blocks and scripted steps to build a `TileMap`.
 
-`struct` defined in `large_map_renderer.rs`.
+#### `MapScript`
 
+A reusable scripted generation recipe composed of ordered `ScriptStep` values.
 
-### LayerMode
+#### `ScriptStep`
 
-`enum` defined in `mapgen.rs`.
+One procedural generation operation with parameters such as placement mode, size filters, repetition, and chance.
 
+#### `StepType`
 
-### MapBlock
+Identifies which generation action a `ScriptStep` performs.
 
-`struct` defined in `mapgen.rs`.
+#### `MapOrientation`
 
+Describes the intended map orientation mode used by generation and map construction code.
 
-### MapChunk
+#### `LargeMapRenderer`
 
-`struct` defined in `large_map_renderer.rs`.
+CPU-side helper for chunk visibility and LOD bookkeeping over large dense tilemaps.
 
+#### `MapChunk`
 
-### MapGen
+The chunk record stored by `LargeMapRenderer`, including dirty state and the chunk's local tile payload.
 
-`struct` defined in `mapgen.rs`.
+#### `PolygonMap`
 
+A named region overlay useful for province, zone, or area queries over a world map.
 
-### MapGroup
+#### `PolygonRegion`
 
-`struct` defined in `mapgen.rs`.
+One polygon region entry with geometry, display color, and optional label.
 
+#### `TileWalker`
 
-### MapOrientation
+Simple first-person or grid-walk movement state with facing and interpolation support.
 
-`enum` defined in `mapgen.rs`.
+#### `Facing`
 
+Cardinal facing direction used by `TileWalker`.
 
-### MapScript
+#### `TmxMap`
 
-`struct` defined in `mapgen.rs`.
+Parsed TMX document containing map dimensions, tilesets, and loaded layers.
 
+#### `TmxTileset`
 
-### MapSize
+TMX-side tileset metadata, including atlas info and solid tile markers.
 
-`enum` defined in `mapgen.rs`.
+#### `TmxLayer`
 
+Tagged enum for the layer kinds parsed from a TMX file.
 
-### MapZone
+#### `TmxTileLayer`
 
-`struct` defined in `mapgen.rs`.
+Parsed tile layer payload from TMX.
 
+#### `TmxObjectLayer`
 
-### PolygonMap
+Parsed object-layer payload from TMX.
 
-`struct` defined in `polygon_map.rs`.
+#### `TmxObject`
 
+One object entry from a TMX object layer.
 
-### PolygonRegion
+#### `TmxOrientation`
 
-`struct` defined in `polygon_map.rs`.
+TMX map orientation enum.
 
+#### `IsoTilePart`
 
-### ScriptStep
+Principal type for the `tilemap` module.
 
-`struct` defined in `mapgen.rs`.
+#### `IsoTile`
 
+Principal type for the `tilemap` module.
 
-### StepType
+#### `Edge`
 
-`enum` defined in `mapgen.rs`.
-
-
-### SweepResult
-
-`struct` defined in `tilemap.rs`.
-
-
-### TileAnimFrame
-
-`struct` defined in `tileset.rs`.
-
-
-### TileLayer
-
-`struct` defined in `tilemap.rs`.
-
-
-### TileMap
-
-`struct` defined in `tilemap.rs`.
-
-
-### TileSet
-
-`struct` defined in `tileset.rs`.
-
-
-### TileWalker
-
-`struct` defined in `tile_walker.rs`.
-
-
-### TmxLayer
-
-`enum` defined in `tmx.rs`.
-
-
-### TmxMap
-
-`struct` defined in `tmx.rs`.
-
-
-### TmxObject
-
-`struct` defined in `tmx.rs`.
-
-
-### TmxObjectLayer
-
-`struct` defined in `tmx.rs`.
-
-
-### TmxOrientation
-
-`enum` defined in `tmx.rs`.
-
-
-### TmxStaggerAxis
-
-`enum` defined in `tmx.rs`.
-
-
-### TmxTileLayer
-
-`struct` defined in `tmx.rs`.
-
-
-### TmxTileset
-
-`struct` defined in `tmx.rs`.
-
-
-## Lua API
-
-Registered by `src/lua_api/tilemap_api.rs` under `lurek.tilemap`.
-
-### Factory Functions
-
-| Lua Function | Returns | Description |
-|---|---|---|
-| `lurek.tilemap.newTileSet(firstGid, tileCount, columns, tileW, tileH, spacing?, margin?)` | `TileSet` | Create a tileset with atlas layout |
-| `lurek.tilemap.newTileMap(tileW, tileH, chunkSize?)` | `TileMap` | Create a tilemap (default chunk 16) |
-| `lurek.tilemap.newAutoTileSheet(tileW, tileH, layout?)` | `AutoTileSheet` | Create autotile sheet ("blob47", "composite48", "minimal16") |
-| `lurek.tilemap.newChunkMap(chunkSize?)` | `ChunkMap` | Create sparse chunk storage |
-| `lurek.tilemap.newIsoMap(w, h, tileW, tileH, levelH)` | `IsoMap` | Create empty isometric map |
-| `lurek.tilemap.newMapBlock(w, h, layers?, segmentSize?)` | `MapBlock` | Create tile prefab |
-| `lurek.tilemap.newMapGroup(name)` | `MapGroup` | Create block group |
-
-### Coordinate Helpers (standalone)
-
-| Lua Function | Returns | Description |
-|---|---|---|
-| `lurek.tilemap.toScreenIso(tx, ty, tileW, tileH)` | `sx, sy` | Diamond iso projection |
-| `lurek.tilemap.fromScreenIso(sx, sy, tileW, tileH)` | `tx, ty` | Reverse iso projection |
-| `lurek.tilemap.toScreenHex(q, r, size)` | `sx, sy` | Axial hex → screen |
-| `lurek.tilemap.fromScreenHex(sx, sy, size)` | `q, r` | Screen → axial hex |
-| `lurek.tilemap.hexNeighbors(q, r)` | `table` | Six neighbor coords |
-| `lurek.tilemap.hexDistance(q1, r1, q2, r2)` | `integer` | Hex Manhattan distance |
-| `lurek.tilemap.hexRound(q, r)` | `q, r` | Snap to nearest hex |
-| `lurek.tilemap.hexLine(q1, r1, q2, r2)` | `table` | Hex line cells |
-| `lurek.tilemap.hexRing(q, r, radius)` | `table` | Ring at distance |
-| `lurek.tilemap.hexSpiral(q, r, radius)` | `table` | Concentric spiral |
-| `lurek.tilemap.hexArea(q, r, radius)` | `table` | Filled hex disk |
-| `lurek.tilemap.hexRotate(q, r, cq, cr, steps)` | `q, r` | Cube rotation |
-| `lurek.tilemap.hexReflect(q, r, cq, cr, axis)` | `q, r` | Cube reflection |
-| `lurek.tilemap.isoRotate(direction, steps)` | `integer` | Rotate iso direction |
-| `lurek.tilemap.isoDirectionName(direction)` | `string` | Direction to name |
-| `lurek.tilemap.isoDirectionFromAngle(angle)` | `integer` | Angle to direction |
-
-### TileSet Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:getFirstGid()` | `integer` | First global tile ID |
-| `:getTileCount()` | `integer` | Total tiles |
-| `:getColumns()` | `integer` | Atlas columns |
-| `:getTileWidth()` | `integer` | Tile width px |
-| `:getTileHeight()` | `integer` | Tile height px |
-| `:getTileDimensions()` | `w, h` | Both dimensions |
-| `:getSpacing()` | `integer` | Atlas spacing |
-| `:getMargin()` | `integer` | Atlas margin |
-| `:getQuad(tileId)` | `x, y, w, h` | Atlas source rect |
-| `:setAnimation(tileId, frames)` | `nil` | Set frame sequence |
-| `:getAnimation(tileId)` | `table?` | Get frame sequence |
-| `:setSolid(tileId, solid)` | `nil` | Mark tile solid |
-| `:isSolid(tileId)` | `boolean` | Check solid flag |
-| `:setAutoTileRule(type, mask, id)` | `nil` | Register 4-bit rule |
-| `:getAutoTileId(type, mask)` | `integer?` | Lookup 4-bit rule |
-| `:setAutoTileRule8(type, mask, id)` | `nil` | Register 8-bit rule |
-| `:getAutoTileId8(type, mask)` | `integer?` | Lookup 8-bit rule |
-
-### TileMap Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:addTileSet(tileset)` | `nil` | Attach tileset |
-| `:getTileSetCount()` | `integer` | Tileset count |
-| `:addLayer(name, w, h)` | `integer` | Add layer (1-based index) |
-| `:getLayerCount()` | `integer` | Layer count |
-| `:getLayerName(idx)` | `string?` | Layer name |
-| `:setLayerVisible(idx, visible)` | `nil` | Toggle visibility |
-| `:getLayerVisible(idx)` | `boolean` | Check visibility |
-| `:setLayerColor(idx, r, g, b, a)` | `nil` | Set layer tint |
-| `:getLayerColor(idx)` | `r, g, b, a` | Get layer tint |
-| `:setLayerOffset(idx, ox, oy)` | `nil` | Set pixel offset |
-| `:getLayerOffset(idx)` | `ox, oy` | Get pixel offset |
-| `:setLayerParallax(idx, px, py)` | `nil` | Set parallax factor |
-| `:getLayerParallax(idx)` | `px, py` | Get parallax factor |
-| `:setTile(layer, x, y, gid)` | `nil` | Set tile GID (1-based) |
-| `:getTile(layer, x, y)` | `integer` | Get tile GID (1-based) |
-| `:clearTile(layer, x, y)` | `nil` | Clear tile (1-based) |
-| `:fill(layer, gid)` | `nil` | Fill entire layer |
-| `:setViewport(x, y, w, h)` | `nil` | Set render viewport |
-| `:getViewport()` | `x, y, w, h` | Get viewport |
-| `:update(dt)` | `nil` | Advance animations |
-| `:worldToTile(wx, wy)` | `tx, ty` | Pixel → tile (1-based) |
-| `:tileToWorld(tx, ty)` | `wx, wy` | Tile → pixel (1-based) |
-| `:getTileWidth()` | `integer` | Tile width px |
-| `:getTileHeight()` | `integer` | Tile height px |
-| `:getTileDimensions()` | `w, h` | Both dimensions |
-| `:getChunkSize()` | `integer` | Spatial chunk size |
-| `:isSolid(layer, x, y)` | `boolean` | Check solid (1-based) |
-| `:applyAutoTile(layer, type)` | `nil` | 4-bit autotile full layer |
-| `:applyAutoTileAt(layer, x, y, type)` | `nil` | 4-bit autotile local |
-| `:applyAutoTile8(layer, type)` | `nil` | 8-bit autotile full layer |
-| `:applyAutoTile8At(layer, x, y, type)` | `nil` | 8-bit autotile local |
-| `:rectOverlapsSolid(layer, x, y, w, h)` | `boolean` | AABB solid check |
-| `:sweepRect(layer, x, y, w, h, dx, dy)` | `table?` | Swept AABB collision |
-| `:getOrientation()` | `string` | "topdown" or "sideview" |
-| `:setOrientation(str)` | `nil` | Set orientation |
-| `:setTileTint(layer, x, y, r, g, b, a)` | `nil` | Per-tile tint (1-based) |
-
-### AutoTileSheet Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:getLayout()` | `string` | Layout name |
-| `:getTileCount()` | `integer` | Tile count |
-| `:getTileWidth()` | `integer` | Tile width px |
-| `:getTileHeight()` | `integer` | Tile height px |
-| `:applyToTileSet(tileset, type, startGid?)` | `nil` | Bulk-register rules |
-| `:getBitmaskForTile(idx)` | `integer` | Reverse lookup |
-| `:getTileForBitmask(mask)` | `integer?` | Forward lookup |
-| `:getQuad(idx)` | `x, y, w, h` | Atlas source rect |
-
-### ChunkMap Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:getTile(x, y)` | `integer` | GID at tile coords |
-| `:setTile(x, y, gid)` | `nil` | Set tile |
-| `:clearTile(x, y)` | `nil` | Clear tile |
-| `:fillRect(x0, y0, x1, y1, gid)` | `nil` | Fill rect |
-| `:loadChunk(cx, cy)` | `nil` | Pre-allocate chunk |
-| `:unloadChunk(cx, cy)` | `nil` | Free chunk |
-| `:getChunkSize()` | `integer` | Tiles per side |
-| `:getLoadedChunks()` | `table` | All loaded chunk coords |
-| `:getChunksInView(vx, vy, vw, vh, tw, th)` | `table` | Visible chunk coords |
-| `:chunkTileRange(cx, cy)` | `x0, y0, x1, y1` | Tile range for chunk |
-
-### IsoMap Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:addLevel()` | `integer` | Add Z-level (1-based) |
-| `:getLevelCount()` | `integer` | Level count |
-| `:setLevelVisible(z, visible)` | `nil` | Toggle level |
-| `:isLevelVisible(z)` | `boolean` | Check level visibility |
-| `:setTilePart(z, x, y, part, gid)` | `nil` | Write tile part (1-based z,x,y; 0-based part) |
-| `:getTilePart(z, x, y, part)` | `integer` | Read tile part |
-| `:fillLevel(z, part, gid)` | `nil` | Fill level |
-| `:setOrigin(x, y)` | `nil` | Set screen origin |
-| `:getWidth()` | `integer` | Map width tiles |
-| `:getHeight()` | `integer` | Map height tiles |
-| `:getTileWidth()` | `integer` | Tile footprint width px |
-| `:getTileHeight()` | `integer` | Tile footprint height px |
-| `:getLevelHeight()` | `integer` | Vertical offset per level |
-| `:tileToScreen(tx, ty, tz)` | `sx, sy` | Iso projection |
-| `:screenToTile(sx, sy)` | `tx, ty` | Reverse projection (Z=0) |
-
-### MapBlock Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:setTile(layer, x, y, gid)` | `nil` | Set tile (1-based) |
-| `:getTile(layer, x, y)` | `integer` | Get tile (1-based) |
-| `:setSide(edge, segment, sideId)` | `nil` | Set edge connection |
-| `:getSide(edge, segment)` | `integer` | Get edge connection |
-| `:getWidth()` | `integer` | Block width tiles |
-| `:getHeight()` | `integer` | Block height tiles |
-| `:getDimensions()` | `w, h` | Both dimensions |
-| `:getLayerCount()` | `integer` | Layer count |
-| `:getSegmentSize()` | `integer` | Segment size |
-| `:getWidthInSegments()` | `integer` | Segment columns |
-| `:getHeightInSegments()` | `integer` | Segment rows |
-| `:setName(name)` | `nil` | Set name |
-| `:getName()` | `string` | Get name |
-| `:setWeight(weight)` | `nil` | Placement weight |
-| `:getWeight()` | `number` | Get weight |
-
-### MapGroup Methods
-
-| Method | Returns | Description |
-|---|---|---|
-| `:addBlock(block)` | `nil` | Add block |
-| `:getBlockCount()` | `integer` | Block count |
-| `:removeBlock(idx)` | `nil` | Remove block (1-based) |
-| `:getName()` | `string` | Group name |
+Principal type for the `tilemap` module.
 
 ---
 
+## Lua API
 
-### Additional API
+Exposed under `lurek.tilemap.*` by `src/lua_api/tilemap_api.rs`.
+
+### Module Functions
 
 | Function | Description |
-|---|---|
-| `FLOOR` | Tile type constant: passable floor cell |
-| `NORTH_WALL` | Tile type constant: wall on north edge |
-| `OBJECT` | Tile type constant: object / obstacle cell |
-| `WEST_WALL` | Tile type constant: wall on west edge |
-| `loadTMX(path)` | Load a Tiled TMX map file |
-| `newMapGen(w, h, options)` | Create a procedural map generator |
-| `newMapScript(script)` | Create a map from a Lua script description |
+|----------|-------------|
+| `lurek.tilemap.newTileSet` | Creates a new TileSet with the given atlas layout parameters. |
+| `lurek.tilemap.newTileMap` | Creates a new TileMap with the given tile size and chunk size. |
+| `lurek.tilemap.newAutoTileSheet` | Creates a new AutoTileSheet with the given tile dimensions and layout. |
+| `lurek.tilemap.newChunkMap` | Creates a new ChunkMap with the given chunk size. |
+| `lurek.tilemap.newIsoMap` | Creates a new IsoMap with no levels. |
+| `lurek.tilemap.newMapBlock` | Creates a new MapBlock with the given dimensions. |
+| `lurek.tilemap.newMapGroup` | Creates a new empty MapGroup with the given name. |
+| `lurek.tilemap.toScreenIso` | Converts tile coordinates to screen position using diamond isometric projection. |
+| `lurek.tilemap.fromScreenIso` | Converts screen position back to tile coordinates for diamond isometric projection. |
+| `lurek.tilemap.toScreenHex` | Converts axial hex coordinates to screen position (pointy-top layout). |
+| `lurek.tilemap.fromScreenHex` | Converts screen position back to axial hex coordinates (pointy-top layout). |
+| `lurek.tilemap.hexNeighbors` | Returns the six axial neighbor coordinates as a table of {q, r} pairs. |
+| `lurek.tilemap.hexDistance` | Returns the hex distance between two axial coordinates. |
+| `lurek.tilemap.hexRound` | Rounds fractional axial coordinates to the nearest hex cell. |
+| `lurek.tilemap.hexLine` | Returns all hex cells along a line between two axial coordinates as a table. |
+| `lurek.tilemap.hexRing` | Returns all cells at exactly radius distance from (q, r) as a table. |
+| `lurek.tilemap.hexSpiral` | Returns all hex cells from center outward to radius, ring by ring, as a table. |
+| `lurek.tilemap.hexArea` | Returns all hex cells within radius distance (filled hex circle) as a table. |
+| `lurek.tilemap.hexRotate` | Rotates hex coordinates around a center by steps x 60 degrees clockwise. |
+| `lurek.tilemap.hexReflect` | Reflects hex coordinates across an axis through the center. |
+| `lurek.tilemap.isoRotate` | Rotates an isometric direction (1-4) clockwise by steps. |
+| `lurek.tilemap.isoDirectionName` | Returns the name of an isometric direction (1-4). |
+| `lurek.tilemap.isoDirectionFromAngle` | Snaps an angle (in radians) to the nearest isometric direction (1-4). |
+| `lurek.tilemap.newMapScript` | Creates a new empty MapScript procedural generation script. |
+| `lurek.tilemap.newMapGen` | Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size. |
+| `lurek.tilemap.loadTMX` | Parses a TMX XML string and returns a table with map metadata and layers. |
+
+### `AutoTileSheet` Methods
+
+| Method | Description |
+|--------|-------------|
+| `autotilesheet:getLayout(...)` | Returns the layout variant as a string. |
+| `autotilesheet:getTileCount(...)` | Returns the number of tiles in this sheet. |
+| `autotilesheet:getTileWidth(...)` | Returns the tile width in pixels. |
+| `autotilesheet:getTileHeight(...)` | Returns the tile height in pixels. |
+| `autotilesheet:getBitmaskForTile(...)` | Returns the bitmask value associated with a 1-based local tile ID. |
+| `autotilesheet:getTileForBitmask(...)` | Returns the 1-based tile ID for a given bitmask, or nil. |
+| `autotilesheet:getQuad(...)` | Returns the atlas region rectangle for the 1-based tile ID. |
+
+### `ChunkMap` Methods
+
+| Method | Description |
+|--------|-------------|
+| `chunkmap:getTile(...)` | Returns the GID at tile coordinate (x, y). |
+| `chunkmap:setTile(...)` | Sets the GID at tile coordinate (x, y). |
+| `chunkmap:clearTile(...)` | Clears the tile at (x, y) by setting its GID to 0. |
+| `chunkmap:loadChunk(...)` | Pre-allocates the chunk at chunk coordinates (cx, cy). |
+| `chunkmap:unloadChunk(...)` | Removes the chunk at chunk coordinates (cx, cy) from memory. |
+| `chunkmap:getChunkSize(...)` | Returns the chunk size (tiles per side). |
+| `chunkmap:getLoadedChunks(...)` | Returns a table of all currently loaded chunk coordinates as {{cx, cy}, ...}. |
+| `chunkmap:chunkTileRange(...)` | Returns the tile coordinate range for chunk (cx, cy) as (x0, y0, x1, y1). |
+
+### `IsoMap` Methods
+
+| Method | Description |
+|--------|-------------|
+| `isomap:addLevel(...)` | Appends a new empty Z-level and returns its 1-based index. |
+| `isomap:getLevelCount(...)` | Returns the number of Z-levels currently in the map. |
+| `isomap:setLevelVisible(...)` | Sets the visibility of a level (1-based z). |
+| `isomap:isLevelVisible(...)` | Returns the visibility of a level (1-based z). |
+| `isomap:fillLevel(...)` | Fills every cell in level z with gid for the given part (1-based z; 0-based part). |
+| `isomap:setOrigin(...)` | Sets the screen pixel origin. |
+| `isomap:getWidth(...)` | Returns the map width in tiles. |
+| `isomap:getHeight(...)` | Returns the map height in tiles. |
+| `isomap:getTileWidth(...)` | Returns the tile footprint width in pixels. |
+| `isomap:getTileHeight(...)` | Returns the tile footprint height in pixels. |
+| `isomap:getLevelHeight(...)` | Returns the vertical pixel offset between consecutive Z-levels. |
+| `isomap:tileToScreen(...)` | Projects isometric tile coordinates (tx, ty, tz) to screen pixels. |
+| `isomap:screenToTile(...)` | Converts screen pixel coordinates to isometric tile coordinates at Z-level 0. |
+
+### `MapBlock` Methods
+
+| Method | Description |
+|--------|-------------|
+| `mapblock:getTile(...)` | Returns the GID of the tile at (x, y) on the given layer (1-based). |
+| `mapblock:getSide(...)` | Returns the side connection ID for a segment on a given edge. |
+| `mapblock:getWidth(...)` | Returns the block width in tiles. |
+| `mapblock:getHeight(...)` | Returns the block height in tiles. |
+| `mapblock:getDimensions(...)` | Returns the block dimensions as (width, height) in tiles. |
+| `mapblock:getLayerCount(...)` | Returns the number of layers in this block. |
+| `mapblock:getSegmentSize(...)` | Returns the segment size in tiles. |
+| `mapblock:getWidthInSegments(...)` | Returns the number of segments along the width. |
+| `mapblock:getHeightInSegments(...)` | Returns the number of segments along the height. |
+| `mapblock:setName(...)` | Sets the human-readable name of this block. |
+| `mapblock:getName(...)` | Returns the name of this block. |
+| `mapblock:setWeight(...)` | Sets the placement weight. |
+| `mapblock:getWeight(...)` | Returns the placement weight. |
+
+### `MapGroup` Methods
+
+| Method | Description |
+|--------|-------------|
+| `mapgroup:addBlock(...)` | Adds a block to this group. |
+| `mapgroup:getBlockCount(...)` | Returns the number of blocks in this group. |
+| `mapgroup:removeBlock(...)` | Removes a block by 1-based index. |
+| `mapgroup:getName(...)` | Returns the name of this group. |
+| `mapgroup:addScript(...)` | Adds a MapScript to this group. |
+| `mapgroup:getScriptCount(...)` | Returns the number of scripts in this group. |
+
+### `MapScript` Methods
+
+| Method | Description |
+|--------|-------------|
+| `mapscript:getStepCount(...)` | Returns the number of steps in this script. |
+| `mapscript:addStep(...)` | Appends a generation step from a step-definition table. |
+
+### `TileMap` Methods
+
+| Method | Description |
+|--------|-------------|
+| `tilemap:addTileSet(...)` | Adds a tileset to this map. |
+| `tilemap:getTileSetCount(...)` | Returns the number of tilesets attached to this map. |
+| `tilemap:getTileSet(...)` | Returns a tileset by 1-based index, or nil if out of range. |
+| `tilemap:addLayer(...)` | Adds a new empty layer and returns its 1-based index. |
+| `tilemap:getLayerCount(...)` | Returns the number of layers. |
+| `tilemap:getLayerName(...)` | Returns the name of a layer by 1-based index. |
+| `tilemap:getLayerVisible(...)` | Returns layer visibility. |
+| `tilemap:getLayerColor(...)` | Returns the RGBA tint color of a layer. |
+| `tilemap:getLayerOffset(...)` | Returns the pixel offset of a layer. |
+| `tilemap:getLayerParallax(...)` | Returns the parallax factor of a layer. |
+| `tilemap:getTile(...)` | Returns the GID at (x, y) on the given layer (1-based). |
+| `tilemap:clearTile(...)` | Clears a tile (sets GID to 0) at (x, y) on the given layer (1-based). |
+| `tilemap:fill(...)` | Fills an entire layer with the given GID (1-based layer). |
+| `tilemap:getViewport(...)` | Returns the viewport as (x, y, w, h) or nil if not set. |
+| `tilemap:update(...)` | Advances tile animation timers by dt seconds. |
+| `tilemap:worldToTile(...)` | Converts world pixel coordinates to tile coordinates. |
+| `tilemap:tileToWorld(...)` | Converts tile coordinates to world pixel coordinates (1-based input). |
+| `tilemap:getTileWidth(...)` | Returns the tile width in pixels. |
+| `tilemap:getTileHeight(...)` | Returns the tile height in pixels. |
+| `tilemap:getTileDimensions(...)` | Returns tile dimensions as (width, height). |
+| `tilemap:getChunkSize(...)` | Returns the chunk size used for spatial partitioning. |
+| `tilemap:isSolid(...)` | Returns true if the tile at (x, y) on layer is solid (1-based). |
+| `tilemap:getOrientation(...)` | Returns the map orientation as a string ("topdown" or "sideview"). |
+| `tilemap:setOrientation(...)` | Sets the map orientation from a string ("topdown" or "sideview"). |
+| `tilemap:render(...)` | Renders the tile map to the screen at the given offset. |
+| `tilemap:drawToImage(...)` | Renders the tile map to a CPU ImageData using the given tile pixel size. |
+
+### `TileSet` Methods
+
+| Method | Description |
+|--------|-------------|
+| `tileset:getFirstGid(...)` | Returns the first global ID assigned to this tileset. |
+| `tileset:getTileCount(...)` | Returns the total number of tiles in this tileset. |
+| `tileset:getColumns(...)` | Returns the number of tile columns in the atlas texture. |
+| `tileset:getTileWidth(...)` | Returns the width of a single tile in pixels. |
+| `tileset:getTileHeight(...)` | Returns the height of a single tile in pixels. |
+| `tileset:getTileDimensions(...)` | Returns the tile dimensions as (width, height). |
+| `tileset:getSpacing(...)` | Returns the spacing in pixels between tiles in the atlas. |
+| `tileset:getMargin(...)` | Returns the margin in pixels around the edges of the atlas. |
+| `tileset:getQuad(...)` | Computes the atlas source rectangle for a 1-based local tile ID. |
+| `tileset:getAnimation(...)` | Returns the animation frames for a 1-based local tile ID as a table of {tileid, duration}, or nil. |
+| `tileset:setSolid(...)` | Sets whether a 1-based local tile ID is solid for collision purposes. |
+| `tileset:isSolid(...)` | Returns whether a 1-based local tile ID is solid. |
+
+---
 
 ## Lua Examples
 
-### Basic orthogonal tilemap
 ```lua
--- Create tileset and map
-local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 32)
-ts:setSolid(5, true)  -- mark tile 5 as solid
-
-local map = lurek.tilemap.newTileMap(32, 32)
-map:addTileSet(ts)
-map:addLayer("ground", 20, 15)
-map:fill(1, 1)          -- fill layer 1 with GID 1
-map:setTile(1, 5, 5, 3) -- set tile at (5,5) to GID 3
-map:setViewport(0, 0, 640, 480)
-
--- Animation
-ts:setAnimation(1, {{2, 200}, {3, 200}, {4, 200}})
-map:update(dt)
-```
-
-### 4-bit autotile
-```lua
-local ts = lurek.tilemap.newTileSet(1, 64, 8, 32, 32)
-for mask = 0, 15 do
-    ts:setAutoTileRule("grass", mask, mask + 1)
-end
-local map = lurek.tilemap.newTileMap(32, 32)
-map:addTileSet(ts)
-map:addLayer("terrain", 20, 15)
-map:fill(1, 1)
-map:applyAutoTile(1, "grass")        -- whole layer
-map:setTile(1, 3, 3, 5)
-map:applyAutoTileAt(1, 3, 3, "grass") -- localized update
-```
-
-### Hex grid coordinate helpers
-```lua
-local sx, sy = lurek.tilemap.toScreenHex(3, 2, 32)
-local q, r = lurek.tilemap.fromScreenHex(sx, sy, 32)
-local neighbors = lurek.tilemap.hexNeighbors(q, r)
-local dist = lurek.tilemap.hexDistance(0, 0, 3, 2)
-local ring = lurek.tilemap.hexRing(0, 0, 2)
-local line = lurek.tilemap.hexLine(0, 0, 5, 3)
-```
-
-### Sparse chunk map
-```lua
-local chunks = lurek.tilemap.newChunkMap(16)
-chunks:setTile(100, 200, 5)
-chunks:loadChunk(0, 0)
-local visible = chunks:getChunksInView(0, 0, 800, 600, 32, 32)
-local x0, y0, x1, y1 = chunks:chunkTileRange(0, 0)
-```
-
-### Isometric map
-```lua
-local iso = lurek.tilemap.newIsoMap(10, 10, 64, 32, 24)
-iso:addLevel()
-iso:setTilePart(1, 1, 1, 0, 5)  -- Floor of tile (1,1) on level 1
-iso:setOrigin(400, 100)
-local sx, sy = iso:tileToScreen(3.0, 2.0, 0.0)
-```
-
-### Swept AABB collision
-```lua
-local result = map:sweepRect(1, px, py, pw, ph, dx, dy)
-if result then
-    -- result.contactX, result.contactY = contact point
-    -- result.normalX, result.normalY   = surface normal
-    -- result.tileX, result.tileY       = colliding tile (1-based)
-    -- result.t                         = time of impact [0,1]
+-- Minimal namespace check for lurek.tilemap.
+if lurek.tilemap then
+    -- Call the documented functions in the Lua API tables above.
 end
 ```
 
@@ -596,48 +490,27 @@ end
 
 ## Item Summary
 
-| Category | Count |
-|---|---|
-| Source files | 12 |
-| Structs | 27 |
-| Enums | 11 |
-| Standalone functions | 18 (17 coords + 1 tmx) |
-| Lua UserData types | 7 (TileSet, TileMap, AutoTileSheet, ChunkMap, IsoMap, MapBlock, MapGroup) |
-| Lua factory functions | 7 |
-| Lua coord helpers | 16 |
-| Lua methods (total) | ~120 across all UserData types |
-| Rust tests | 159 (tests/rust/unit/tilemap_tests.rs) + inline tests in tileset.rs, large_map_renderer.rs, coords.rs |
-| Lua tests | 151 (tests/lua/unit/test_tilemap.lua) + integration + stress |
+| Kind | Count |
+|------|-------|
+| `struct` | 27 |
+| `enum` | 11 |
+| `fn` (Lua API) | 113 |
+| **Total** | **151** |
 
 ---
 
 ## References
 
-- `src/math/vec2.rs` — `Vec2` used by coordinate functions and `SweepResult`
-- `src/math/rect.rs` — `Rect` used by atlas quads, viewports, swept collision, autotile sheet rects
-- `src/math/color.rs` — `Color` used by `PolygonMap`, `PolygonRegion`, layer tints
-- `src/lua_api/tilemap_api.rs` — Lua binding layer (7 UserData types + 16 standalone functions)
-- `tests/rust/unit/tilemap_tests.rs` — 159 Rust integration tests
-- `tests/lua/unit/test_tilemap.lua` — 151 Lua BDD tests
-- `tests/lua/integration/test_tilemap_physics.lua` — Tilemap + collision cross-module tests
-- `tests/lua/integration/test_tilemap_physics2.lua` — Additional tilemap + collision tests
-- `tests/lua/stress/test_tilemap_stress.lua` — Performance stress tests
-- `tests/lua/stress/test_tilemap_stress2.lua` — Additional stress tests
-- `examples/tilemap.lua` — Lua tilemap usage example
-- External crate `roxmltree` — XML parsing for TMX files
-- External crate `base64` — Base64 decoding for TMX tile data
-- External crate `flate2` — zlib/gzip decompression for TMX tile data
+| Module | Relationship | Notes |
+|--------|--------------|-------|
+| `image` | Imports or references `image` from `src/image/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `math` | Imports or references `math` from `src/math/`. | Cross-group dependency from Feature Systems to Foundations. |
+| `render` | Imports or references `render` from `src/render/`. | Cross-group dependency from Feature Systems to Platform Services. |
+| `runtime` | Imports or references `runtime` from `src/runtime/`. | Cross-group dependency from Feature Systems to Core Runtime. |
 
 ---
 
 ## Notes
 
-- **Index convention**: All Lua-facing layer/tile indices are 1-based; Rust internals are 0-based. The `tilemap_api.rs` boundary performs `idx - 1` on inputs and `idx + 1` on outputs.
-- **Rust-only types**: `LargeMapRenderer`, `MapChunk`, `PolygonMap`, `PolygonRegion`, `TileWalker`, and `Facing` are exported from the Rust module but have no Lua UserData wrappers in `tilemap_api.rs`.
-- **MapGen Lua binding**: `MapGen` is exposed to Lua via `LuaMapGen` (UserData). `mapgen:generate(scriptIndex?, seed?, layerName?)` returns a `TileMap`; `layerName` defaults to `"main"`. `MapBlock` and `MapGroup` are also exposed.
-- **TMX parser limitations**: `load_tmx()` does not support zstd compression, infinite maps, or embedded TSX references. Only external `.tsx` references are parsed inline. The parser is also not exposed to Lua.
-- **Autotile step stubs**: `StepType::PlaceRandom`, `PlaceLine`, `FloodFill`, `FillArea`, and `DrawPath` are declared in `mapgen.rs` but not yet implemented in `MapGen::generate()`.
-- **TileWalker collision**: `can_move_to()` always returns `true`; actual collision checking is deferred to the Lua layer.
-- **Composite autotile rendering**: `AutoTileSheet::get_quarter_rects()` returns source sub-rects for quarter-tile rendering; the engine has no built-in composite draw call — game scripts must issue four blit calls per tile.
-- **IsoMap draw_iter()**: Yields all tile parts including those with `gid == 0`; Lua should skip drawing those to keep the Rust side allocation-free.
-- **LCG PRNG**: `MapGen` uses a simple linear congruential generator (`Lcg`) for deterministic procedural generation, not the engine's `RandomGenerator`.
+- **Source of truth**: Keep this spec synchronized with `src/tilemap/`, the matching AGENT files, and any relevant Lua bindings.
+- **Generation note**: This file was generated from current source and AGENT metadata, then intended for manual refinement when behavior changes.

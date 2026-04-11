@@ -2,6 +2,11 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.7.16] — 2026-04-11
+### Changed
+- Rewrote every `src/<module>/AGENT.md` into a new module-reference format centered on `Module Info`, `Module Purpose`, `Files`, and `Key Types`, and preserved the prior content as sibling `AGENT.legacy.md` backups across all 50 `src/` modules.
+- Generated complete `docs/specs/<module>.md` files for all 50 top-level `src/` modules, added `tools/docs/gen_module_specs.py` as the reusable spec generator, and aligned `tools/validate/validate_module_coverage.py` with the full top-level module set including `bin` and `lua_api`.
+
 ## Versioning scheme
 
 ```
@@ -17,6 +22,20 @@ MAJOR.MINOR.PATCH
 Always update this file **in the same commit** as the change. Use the commit type as the section label.
 
 ---
+
+## [0.7.15] — 2025-06-28
+### Added
+- **GPU render stats exposed to Lua** (`src/lua_api/render_api.rs`): `lurek.graphics.getStats()` now returns GPU-level stats: `gpu_draw_calls`, `batched_draws`, `texture_switches`, `canvas_switches`, `shader_switches` alongside existing command-count stats.
+- **UI computed layout** (`src/ui/widget.rs`, `src/ui/context.rs`, `src/ui/render.rs`): `WidgetBase` now has `computed_rect: Rect` and `is_visible: bool` fields. `GuiContext::run_layout_pass()` propagates layout from parent to child widgets. `generate_render_commands()` calls layout pass automatically.
+- **widget:getRect() Lua API** (`src/lua_api/ui_api.rs`): New method returns computed `(x, y, width, height)` after layout.
+- **Raycaster SharedState wiring** (`src/runtime/shared_state.rs`, `src/lua_api/raycaster_api.rs`): `SharedState.raycaster_output` stores `RaycasterScene` built by raycaster API. Cleared each frame.
+- **GPU 2D lighting pass** (`src/render/gpu_renderer.rs`): Full radial point-light rendering with WGSL shader, light accumulation texture (additive blend), and multiply-blend compositing over the scene. Replaces the previous empty stub.
+- **GPU shadow maps** (`src/render/gpu_renderer.rs`): 1D radial shadow textures per shadow-enabled light. CPU-side ray casting against occluder edges produces per-angle distance maps. Packed into R32Float shadow atlas texture, sampled in LIGHT_SHADER fragment stage. `LightVertex` struct carries `shadow_v` for atlas row lookup. `compute_1d_shadow_map()` handles ray-segment intersection with light_mask filtering.
+- **Raycaster GPU rendering** (`src/app/app.rs`): `RaycasterScene` quads (walls, floors, ceilings, billboard sprites) auto-converted to `DrawTexturedQuad` render commands with back-to-front depth sorting. Minecraft-style 3D FPS perspective via textured quad approach.
+- **docs/specs/sprite.md**: Full specification for the new `src/sprite/` module.
+
+### Changed
+- **render-command-architecture.md**: Updated "Current State vs Target State" — all previously ❌ items now ✅. Implementation Checklist fully checked (raycaster GPU path, shadow map generation, all phases complete except tooling-only docstring check).
 
 ## [0.7.14] — 2026-04-11
 ### Added

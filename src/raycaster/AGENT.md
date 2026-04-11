@@ -1,78 +1,53 @@
-# `raycaster` — Agent Reference
+﻿# raycaster
 
-| Property       | Value                                                |
-|----------------|------------------------------------------------------|
-| **Tier**       | Tier 2 — Engine Extensions                           |
-| **Status**     | Implemented — Full                                   |
-| **Lua API**    | `lurek.raycaster`                                     |
-| **Source**      | `src/raycaster/`                                     |
-| **Rust Tests** | `tests/rust/unit/raycaster_tests.rs`                 |
-| **Lua Tests**  | `tests/lua/unit/test_raycaster.lua`                  |
-| **Architecture** | —                                                  |
+## Module Info
+- Module name: `raycaster`
+- Module group: `Feature Systems`
+- Spec path: `docs/specs/raycaster.md`
+- Lua API path(s): `src/lua_api/raycaster_api.rs`
+- Rust test path(s): `tests/rust/unit/raycaster_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_raycaster.lua`, `tests/lua/evidence/test_evidence_raycaster.lua`
 
-## Purpose
+## Module Purpose
+The `raycaster` module provides Lurek2D's retro first-person and dungeon-view geometry stack. It owns DDA grid traversal, segment ray tests, visibility computation, billboard projection, per-column depth information, optional lighting and door helpers, and scene construction for textured-quad output.
 
-The `raycaster` module implements a DDA-based 2D grid raycaster designed for Wolfenstein-style retro FPS and dungeon-crawler games. It operates on a flat integer cell grid (`Raycaster2D`) and produces results as either plain numeric column data **or** as a complete `RaycasterScene` of textured quads with per-polygon lighting — suitable for dungeon-crawler style rendering where each surface (wall, floor, ceiling, sprite) is a full textured quad, not a column strip.
+It exists so scripts can build Wolfenstein-style or dungeon-crawler views using deterministic CPU-side math instead of relying on a full 3D engine. The module focuses on spatial queries and projection results that can later be rendered by the Lua bridge or the render system.
 
-The module provides two rendering paths:
-1. **Column-strip** (`ColumnBatch` / `ColumnData`) — classic Wolfenstein-style per-column rendering via `lurek.gfx` draw calls.
-2. **Textured-quad** (`RaycasterScene` / `WallQuad` / `FloorQuad` / `CeilingQuad` / `BillboardSprite`) — dungeon-crawler style rendering where each surface is a perspective-correct textured quad with per-polygon `light` RGBA tint. Built by `RaycasterScene::build()` and converted to `Vec<RenderCommand>` by `generate_render_commands()`.
+It intentionally does not own GPU setup, camera input policy, texture management, or general scene orchestration. It produces hits, projected columns, and scene quads; rendering those results remains outside the module.
 
-## Source Files
-
-| File                     | Purpose                                                        |
-|--------------------------|----------------------------------------------------------------|
-| `mod.rs`                 | Module root; re-exports all public types and functions          |
-| `dda.rs`                 | `Raycaster2D` grid struct and DDA traversal algorithms         |
-| `ray_hit.rs`             | `RayHit` result struct returned per cast column                |
-| `segment.rs`             | `Segment` line type and `cast_ray_2d` geometry raycaster       |
-| `visibility.rs`          | `field_of_view` — visibility polygon via endpoint raycasting   |
-| `projection.rs`          | `project_column` column geometry and `distance_shade` falloff  |
-| `sprite_projection.rs`   | `SpriteProjection` billboard transform for screen-space sprites|
-| `column_batch.rs`        | `ColumnBatch` / `ColumnData` — per-column wall rendering state |
-| `depth_buffer.rs`        | `DepthBuffer` — 1D per-column depth for sprite occlusion       |
-| `doors.rs`               | `Door`, `DoorManager`, `DoorDirection`, `DoorState` — sliding door animation |
-| `heightmap.rs`           | `HeightMap` — per-cell variable floor and ceiling heights      |
-| `lighting.rs`            | `PointLight`, `compute_lighting`, `apply_lit_shade`            |
-| `minimap_overlay.rs`     | `extract_minimap` (RGBA crop) and `draw_player_arrow`          |
-| `scene.rs`               | `RaycasterScene`, `WallQuad`, `FloorQuad`, `CeilingQuad`, `BillboardSprite` — textured-quad scene types with per-polygon `light: [f32; 4]` RGBA tint and `corners: [Vec2; 4]` / `uvs: [Vec2; 4]` |
-| `build_scene.rs`         | `RaycasterScene::build()`, `SceneBuildParams`, `WorldSprite` — builds a complete scene from a `Raycaster2D` grid with per-polygon lighting |
-| `render.rs`              | `generate_render_commands()` on `RaycasterScene` — converts the scene into `Vec<RenderCommand>` (DrawTexturedQuad per textured quad; SetColor + Rectangle for untextured fallbacks) |
-| `draw.rs`                | `draw_to_image()` on `RaycasterScene` — CPU software-rendering fallback; produces an `ImageData` for headless testing |
+## Files
+- `mod.rs` - Declares the raycaster submodules and re-exports the core hit, scene, lighting, door, and helper types.
+- `build_scene.rs` - Builds a `RaycasterScene` from map, light, and sprite inputs so higher layers can render textured quads instead of raw hit columns.
+- `column_batch.rs` - Defines column-oriented rendering payloads used by older or alternative wall-strip style outputs.
+- `dda.rs` - Implements the main `Raycaster2D` DDA grid traversal, multi-ray casting, and line-of-sight queries.
+- `depth_buffer.rs` - Stores per-column depth values for sprite occlusion and front-to-back visibility checks.
+- `doors.rs` - Manages door state, orientation, and sliding animation timing for grid-based raycast worlds.
+- `draw.rs` - Provides CPU-side image drawing for `RaycasterScene`, useful for software rendering or headless verification.
+- `heightmap.rs` - Tracks per-cell floor and ceiling height variation for stepped or multi-height raycast spaces.
+- `lighting.rs` - Defines point lights and computes light influence or lit shading values for projected geometry.
+- `minimap_overlay.rs` - Extracts minimap-friendly data and player-arrow overlays from raycast world state.
+- `projection.rs` - Converts ray hits into projected wall geometry and shading metrics.
+- `ray_hit.rs` - Defines the per-ray hit result returned by DDA and related casting helpers.
+- `render.rs` - Converts a `RaycasterScene` into `RenderCommand` output for textured-quad rendering.
+- `scene.rs` - Defines the high-level scene model of walls, floors, ceilings, and billboard sprites used after geometric casting.
+- `segment.rs` - Implements raycasting against arbitrary 2D segments instead of a grid.
+- `sprite_projection.rs` - Projects billboard sprites into screen space with depth and size data.
+- `visibility.rs` - Builds visibility polygons and related field-of-view data from 2D geometry.
 
 ## Key Types
-
-| Type | Description |
-|------|-------------|
-| `Raycaster2D` | DDA grid raycaster — cast_rays, set_cell, get_cell. |
-| `RayHit` | Per-ray hit result: distance, hit position, tex_u, cell_value. |
-| `ColumnBatch` | Column-strip rendering batch (legacy path). |
-| `ColumnData` | Per-column wall rendering state (legacy path). |
-| `RaycasterScene` | Complete textured-quad scene: walls, floors, ceilings, sprites. |
-| `WallQuad` | Single wall segment as a perspective-correct textured quad with `corners`, `uvs`, and per-polygon `light` RGBA. |
-| `FloorQuad` | Single floor tile as a textured quad with `corners`, `uvs`, and per-polygon `light` RGBA. |
-| `CeilingQuad` | Single ceiling tile as a textured quad with `corners`, `uvs`, and per-polygon `light` RGBA. |
-| `BillboardSprite` | World-space sprite projected as a camera-facing textured quad with `corners`, `uvs`, and per-polygon `light` RGBA. |
-| `SceneBuildParams` | Camera, lighting, and rendering parameters for scene building. |
-| `WorldSprite` | Input sprite definition (world position, texture, size). |
-| `PointLight` | Point light source for per-polygon lighting calculation. |
-| `DepthBuffer` | 1D per-column depth buffer for sprite occlusion. |
-| `Door` / `DoorManager` | Sliding door animation and management. |
-| `HeightMap` | Per-cell variable floor and ceiling heights. |
-| `Segment` | Line segment with ray intersection testing. |
-
-## Lua API Summary
-
-| Function | Description |
-|----------|-------------|
-| `lurek.raycaster.new()` | See `docs/specs/raycaster.md`. |
-| `lurek.raycaster.projectColumn()` | See `docs/specs/raycaster.md`. |
-| `lurek.raycaster.distanceShade()` | See `docs/specs/raycaster.md`. |
-
-## Full Specification
-
-All architecture diagrams, detailed type documentation, Lua API reference, examples, and cross-module references live in the consolidated spec:
-
-→ [`docs/specs/raycaster.md`](../../docs/specs/raycaster.md)
-
-_Update both this file **and** `docs/specs/raycaster.md` whenever source files, public types, or Lua bindings change._
+- `Raycaster2D` - The main DDA grid raycaster over integer world cells. It answers ray hits, multi-ray sweeps, and line-of-sight checks.
+- `RayHit` - A single cast result describing hit distance, impacted cell, hit side, texture coordinate, and hit position.
+- `RaycasterScene` - A render-ready scene assembled from raycast results, carrying quads for walls, floors, ceilings, and sprites.
+- `WallQuad` - One textured wall polygon in a built raycaster scene.
+- `FloorQuad` - One projected floor polygon in a built raycaster scene.
+- `CeilingQuad` - One projected ceiling polygon in a built raycaster scene.
+- `BillboardSprite` - A sprite projected into the raycast view that still faces the camera.
+- `PointLight` - A point light source used by the optional lighting helpers.
+- `DepthBuffer` - Per-column depth storage used to hide sprites or geometry that should fall behind walls.
+- `DoorManager` - Owns door records and their animation state over time.
+- `Door` - One animated door in a raycast map.
+- `DoorState` - Encodes whether a door is closed, opening, open, or closing.
+- `DoorDirection` - Describes how a door opens relative to the map grid.
+- `HeightMap` - Per-cell floor and ceiling height data for non-flat raycast worlds.
+- `ColumnBatch` - Column-oriented wall rendering payload for strip-based outputs.
+- `ColumnData` - One projected column entry inside a `ColumnBatch`.

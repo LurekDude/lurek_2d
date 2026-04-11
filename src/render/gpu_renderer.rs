@@ -15,6 +15,11 @@ use std::sync::mpsc;
 
 use bytemuck::{Pod, Zeroable};
 
+use crate::log_msg;
+use crate::math::{Mat3, Vec2};
+use crate::render::mesh::Mesh;
+use crate::render::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
+use crate::render::shader::{Shader, ShaderFragmentInput, UniformValue};
 use crate::runtime::log_messages::{
     G002_SCREENSHOT_ZERO_SIZE, G003_SCREENSHOT_MAP_FAIL, G004_SCREENSHOT_RECV_FAIL,
     G005_SCREENSHOT_DATA_FAIL,
@@ -22,11 +27,6 @@ use crate::runtime::log_messages::{
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
-use crate::render::mesh::Mesh;
-use crate::render::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
-use crate::render::shader::{Shader, ShaderFragmentInput, UniformValue};
-use crate::log_msg;
-use crate::math::{Mat3, Vec2};
 use slotmap::{SlotMap, SparseSecondaryMap};
 
 // ─── Vertex types ────────────────────────────────────────────────────────────
@@ -47,6 +47,24 @@ struct TexVertex {
     uv: [f32; 2],
     color: [f32; 4],
 }
+
+/// Vertex for the 2D lighting pass with per-light shadow information.
+#[repr(C)]
+#[derive(Copy, Clone, Pod, Zeroable)]
+struct LightVertex {
+    position: [f32; 2],
+    uv: [f32; 2],
+    color: [f32; 4],
+    /// Normalized V coordinate into the shadow atlas (−1.0 = no shadow map).
+    shadow_v: f32,
+    _pad: [f32; 3],
+}
+
+/// Resolution (width) of each 1D radial shadow map.
+const SHADOW_MAP_RES: usize = 256;
+
+/// Maximum number of shadow-mapped lights in a single frame.
+const MAX_SHADOW_LIGHTS: usize = 128;
 
 /// Uniform buffer containing the viewport dimensions for NDC conversion.
 #[repr(C)]
@@ -99,6 +117,8 @@ const MAX_COLOR_VERTS: u64 = 1 << 17; // 131 072 vertices
 const MAX_COLOR_IDXS: u64 = 1 << 19; // 524 288 indices
 const MAX_TEX_VERTS: u64 = 1 << 14; // 16 384 vertices
 const MAX_TEX_IDXS: u64 = 1 << 16; // 65 536 indices
+
+const MAX_LIGHT_QUADS: usize = 128;
 
 /// Per-frame rendering statistics.
 ///
@@ -338,7 +358,91 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 }
 "#;
 
+const LIGHT_SHADER: &str = r#"
+struct VertexInput {
+    @location(0) position: vec2<f32>,
+    @location(1) uv:       vec2<f32>,
+    @location(2) color:    vec4<f32>,
+    @location(3) shadow_v: f32,
+}
+struct VertexOutput {
+    @builtin(position) clip_position: vec4<f32>,
+    @location(0)       uv:            vec2<f32>,
+    @location(1)       color:         vec4<f32>,
+    @location(2)       shadow_v:      f32,
+}
+struct Viewport {
+    size: vec2<f32>,
+    time: f32,
+    _pad: f32,
+    view_col0: vec4<f32>,
+    view_col1: vec4<f32>,
+    view_col2: vec4<f32>,
+}
+@group(0) @binding(0) var<uniform> viewport: Viewport;
+@group(1) @binding(0) var shadow_atlas: texture_2d<f32>;
+@group(1) @binding(1) var shadow_sampler: sampler;
+
+@vertex
+fn vs_main(in: VertexInput) -> VertexOutput {
+    var out: VertexOutput;
+    let view = mat3x3<f32>(
+        viewport.view_col0.xyz,
+        viewport.view_col1.xyz,
+        viewport.view_col2.xyz,
+    );
+    let cam_pos = view * vec3<f32>(in.position, 1.0);
+    out.clip_position = vec4<f32>(
+        (cam_pos.x / viewport.size.x) * 2.0 - 1.0,
+        1.0 - (cam_pos.y / viewport.size.y) * 2.0,
+        0.0, 1.0
+    );
+    out.uv       = in.uv;
+    out.color    = in.color;
+    out.shadow_v = in.shadow_v;
+    return out;
+}
+@fragment
+fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
+    let center = vec2<f32>(0.5, 0.5);
+    let delta  = in.uv - center;
+    let dist   = length(delta) * 2.0;
+    let falloff = clamp(1.0 - dist, 0.0, 1.0);
+    let intensity = falloff * falloff;
+
+    // Shadow attenuation.
+    var shadow = 1.0;
+    if in.shadow_v >= 0.0 {
+        let angle = atan2(delta.y, delta.x);                     // [-π, π]
+        let u     = (angle + 3.14159265) / (2.0 * 3.14159265);  // [0, 1]
+        let shadow_dist = textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, in.shadow_v)).r;
+        let frag_dist   = dist * 0.5;                            // normalised to radius
+        if frag_dist > shadow_dist {
+            shadow = 0.0;
+        }
+    }
+
+    return vec4<f32>(in.color.rgb * intensity * shadow, 1.0);
+}
+"#;
+
 // ─── GpuRenderer ─────────────────────────────────────────────────────────────
+
+struct LightGpuState {
+    accum_texture: wgpu::Texture,
+    accum_view: wgpu::TextureView,
+    accum_bind_group: wgpu::BindGroup,
+    additive_pipeline: wgpu::RenderPipeline,
+    composite_pipeline: wgpu::RenderPipeline,
+    vertex_buffer: wgpu::Buffer,
+    index_buffer: wgpu::Buffer,
+    /// 1D-per-row shadow atlas.  Width = `SHADOW_MAP_RES`, height = `MAX_SHADOW_LIGHTS`.
+    shadow_atlas_texture: wgpu::Texture,
+    shadow_atlas_view: wgpu::TextureView,
+    shadow_atlas_bind_group: wgpu::BindGroup,
+    width: u32,
+    height: u32,
+}
 
 /// GPU-accelerated renderer that processes `RenderCommand` queues via wgpu.
 ///
@@ -397,6 +501,98 @@ pub struct GpuRenderer {
 
     /// Per-frame rendering statistics from the last completed frame.
     pub render_stats: RenderStats,
+
+    /// Lazily-created GPU resources for the 2D lighting pass.
+    light_gpu: Option<LightGpuState>,
+}
+
+/// Computes a 1D radial shadow map for a single light.
+///
+/// For each angular sample the function casts a ray from the light centre and
+/// finds the nearest occluder edge.  The result is a `Vec<f32>` of length
+/// `SHADOW_MAP_RES` where each element is the **normalised** distance (0–1
+/// relative to `light_radius`) to the closest occluder at that angle.  A value
+/// of 1.0 means no occluder is closer than the light radius.
+fn compute_1d_shadow_map(
+    light_x: f32,
+    light_y: f32,
+    light_radius: f32,
+    shadow_mask: u16,
+    occluders: impl IntoIterator<Item = impl std::borrow::Borrow<crate::light::occluder::Occluder>>,
+) -> Vec<f32> {
+    let mut map = vec![1.0f32; SHADOW_MAP_RES];
+    let inv_res = 1.0 / SHADOW_MAP_RES as f32;
+
+    // Collect occluder edges once so we don't iterate occluders × resolution.
+    struct Edge {
+        ax: f32,
+        ay: f32,
+        sx: f32,
+        sy: f32,
+    }
+    let mut edges: Vec<Edge> = Vec::new();
+
+    for occ_ref in occluders {
+        let occ = occ_ref.borrow();
+        if !occ.enabled {
+            continue;
+        }
+        if occ.light_mask & shadow_mask == 0 {
+            continue;
+        }
+        let verts = occ.get_vertices();
+        let n = verts.len();
+        if n < 2 {
+            continue;
+        }
+        for j in 0..n {
+            let a = verts[j];
+            let b = verts[(j + 1) % n];
+            let ax = a.x + occ.position.x - light_x;
+            let ay = a.y + occ.position.y - light_y;
+            let bx = b.x + occ.position.x - light_x;
+            let by = b.y + occ.position.y - light_y;
+            edges.push(Edge {
+                ax,
+                ay,
+                sx: bx - ax,
+                sy: by - ay,
+            });
+        }
+    }
+
+    if edges.is_empty() {
+        return map;
+    }
+
+    let inv_radius = 1.0 / light_radius;
+
+    for i in 0..SHADOW_MAP_RES {
+        let angle = (i as f32 * inv_res) * std::f32::consts::TAU - PI;
+        let dir_x = angle.cos();
+        let dir_y = angle.sin();
+        let mut min_dist = 1.0f32;
+
+        for e in &edges {
+            let cross_ds = dir_x * e.sy - dir_y * e.sx;
+            if cross_ds.abs() < 1e-8 {
+                continue;
+            }
+            let inv_cross = 1.0 / cross_ds;
+            let t = (e.ax * e.sy - e.ay * e.sx) * inv_cross;
+            let u = (e.ax * dir_y - e.ay * dir_x) * inv_cross;
+
+            if t > 0.0 && (0.0..=1.0).contains(&u) {
+                let norm_dist = t * inv_radius;
+                if norm_dist < min_dist && norm_dist < 1.0 {
+                    min_dist = norm_dist;
+                }
+            }
+        }
+
+        map[i] = min_dist;
+    }
+    map
 }
 
 impl GpuRenderer {
@@ -558,6 +754,7 @@ impl GpuRenderer {
             width,
             height,
             render_stats: RenderStats::default(),
+            light_gpu: None,
         }
     }
 
@@ -582,6 +779,7 @@ impl GpuRenderer {
         self.queue
             .write_buffer(&self.viewport_buffer, 0, bytemuck::bytes_of(&data));
         self.screen_stencil_target = None;
+        self.light_gpu = None;
     }
 
     fn create_sampler(&self, default_filter: &(String, String, u32)) -> wgpu::Sampler {
@@ -868,6 +1066,212 @@ impl GpuRenderer {
         for key in stale_shaders {
             self.shader_cache.remove(key);
         }
+    }
+
+    /// Lazily creates or recreates GPU resources for the 2D lighting pass.
+    fn ensure_light_resources(&mut self) {
+        let needs_recreate = match &self.light_gpu {
+            Some(lg) => lg.width != self.width || lg.height != self.height,
+            None => true,
+        };
+        if !needs_recreate {
+            return;
+        }
+
+        let w = self.width;
+        let h = self.height;
+
+        // ── Light accumulation texture (screen-sized) ──
+        let accum_texture = self.device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("light_accum_texture"),
+            size: wgpu::Extent3d {
+                width: w,
+                height: h,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: self.surface_format,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT | wgpu::TextureUsages::TEXTURE_BINDING,
+            view_formats: &[],
+        });
+        let accum_view = accum_texture.create_view(&wgpu::TextureViewDescriptor::default());
+        let sampler = self.device.create_sampler(&wgpu::SamplerDescriptor {
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            ..Default::default()
+        });
+        let accum_bind_group =
+            self.create_texture_bind_group(&accum_view, &sampler, "light_accum_bg");
+
+        // ── Shadow atlas texture (SHADOW_MAP_RES × MAX_SHADOW_LIGHTS, R32Float) ──
+        let shadow_atlas_texture = self.device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("shadow_atlas_texture"),
+            size: wgpu::Extent3d {
+                width: SHADOW_MAP_RES as u32,
+                height: MAX_SHADOW_LIGHTS as u32,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::R32Float,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+        let shadow_atlas_view =
+            shadow_atlas_texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+        // Shadow atlas bind group layout — unfilterable R32Float.
+        let shadow_bgl = self
+            .device
+            .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+                label: Some("shadow_atlas_bgl"),
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            sample_type: wgpu::TextureSampleType::Float { filterable: false },
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            multisampled: false,
+                        },
+                        count: None,
+                    },
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 1,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::NonFiltering),
+                        count: None,
+                    },
+                ],
+            });
+        let shadow_sampler = self.device.create_sampler(&wgpu::SamplerDescriptor {
+            mag_filter: wgpu::FilterMode::Nearest,
+            min_filter: wgpu::FilterMode::Nearest,
+            ..Default::default()
+        });
+        let shadow_atlas_bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("shadow_atlas_bg"),
+            layout: &shadow_bgl,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(&shadow_atlas_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&shadow_sampler),
+                },
+            ],
+        });
+
+        // ── Light pipeline layout: viewport + shadow atlas ──
+        let light_pipeline_layout =
+            self.device
+                .create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                    label: Some("light_pipeline_layout"),
+                    bind_group_layouts: &[&self.viewport_bind_group_layout, &shadow_bgl],
+                    push_constant_ranges: &[],
+                });
+
+        // ── Light radial-falloff shader ──
+        let light_module = self
+            .device
+            .create_shader_module(wgpu::ShaderModuleDescriptor {
+                label: Some("light_shader"),
+                source: wgpu::ShaderSource::Wgsl(LIGHT_SHADER.into()),
+            });
+
+        // Additive pipeline — renders light quads onto the accumulation texture.
+        // Uses LightVertex with shadow_v attribute.
+        let additive_pipeline =
+            self.device
+                .create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+                    label: Some("light_additive_pipeline"),
+                    layout: Some(&light_pipeline_layout),
+                    vertex: wgpu::VertexState {
+                        module: &light_module,
+                        entry_point: "vs_main",
+                        compilation_options: Default::default(),
+                        buffers: &[wgpu::VertexBufferLayout {
+                            array_stride: std::mem::size_of::<LightVertex>() as wgpu::BufferAddress,
+                            step_mode: wgpu::VertexStepMode::Vertex,
+                            attributes: &wgpu::vertex_attr_array![
+                                0 => Float32x2,
+                                1 => Float32x2,
+                                2 => Float32x4,
+                                3 => Float32
+                            ],
+                        }],
+                    },
+                    fragment: Some(wgpu::FragmentState {
+                        module: &light_module,
+                        entry_point: "fs_main",
+                        compilation_options: Default::default(),
+                        targets: &[Some(wgpu::ColorTargetState {
+                            format: self.surface_format,
+                            blend: Some(blend_state_for(BlendMode::Add)),
+                            write_mask: wgpu::ColorWrites::ALL,
+                        })],
+                    }),
+                    primitive: wgpu::PrimitiveState {
+                        topology: wgpu::PrimitiveTopology::TriangleList,
+                        ..Default::default()
+                    },
+                    depth_stencil: None,
+                    multisample: wgpu::MultisampleState::default(),
+                    multiview: None,
+                    cache: None,
+                });
+
+        // Composite pipeline — draws the accumulation texture over the scene
+        // with multiply blending. Needs depth/stencil to match the screen target.
+        let composite_pipeline = create_render_pipeline(
+            &self.device,
+            self.surface_format,
+            &self.default_texture_layout,
+            &self.default_texture_shader,
+            GeometryKind::Texture,
+            PipelineKey {
+                blend_mode: BlendMode::Multiply,
+                color_mask_bits: color_write_mask_bits((true, true, true, true)),
+                stencil_mode: StencilMode::Disabled,
+            },
+            "fs_main",
+        );
+
+        // ── Vertex / index buffers for light quads + composite quad ──
+        let max_verts = (MAX_LIGHT_QUADS + 1) * 4;
+        let max_idxs = (MAX_LIGHT_QUADS + 1) * 6;
+        let vertex_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("light_vbo"),
+            size: (max_verts * std::mem::size_of::<LightVertex>()) as u64,
+            usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+        let index_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+            label: Some("light_ibo"),
+            size: (max_idxs * std::mem::size_of::<u32>()) as u64,
+            usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+            mapped_at_creation: false,
+        });
+
+        self.light_gpu = Some(LightGpuState {
+            accum_texture,
+            accum_view,
+            accum_bind_group,
+            additive_pipeline,
+            composite_pipeline,
+            vertex_buffer,
+            index_buffer,
+            shadow_atlas_texture,
+            shadow_atlas_view,
+            shadow_atlas_bind_group,
+            width: w,
+            height: h,
+        });
     }
 
     /// Processes a frame: uploads new textures, tessellates commands, renders to surface, presents.
@@ -2298,27 +2702,259 @@ impl GpuRenderer {
         }
 
         // ====== LIGHT RENDERING PASS ======
-        if light_world.enabled {
-            let _pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("light_pass"),
-                color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Load,
-                        store: wgpu::StoreOp::Store,
-                    },
-                })],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.screen_stencil_target.as_ref().unwrap().view,
-                    depth_ops: None,
-                    stencil_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Load,
-                        store: wgpu::StoreOp::Store,
-                    }),
-                }),
-                ..Default::default()
+        if light_world.enabled && !light_world.lights.is_empty() {
+            self.ensure_light_resources();
+
+            // ── Compute 1D shadow maps for shadow-enabled lights ──
+            let mut shadow_row = 0usize;
+            // Pre-collect occluders to avoid borrow issues.
+            let occluder_list: Vec<&crate::light::occluder::Occluder> =
+                light_world.occluders.values().collect();
+
+            // Map from light SlotMap index → shadow atlas row (None = no shadow).
+            let mut light_shadow_rows: Vec<Option<usize>> = Vec::new();
+            // CPU shadow data rows to upload.
+            let mut shadow_rows_data: Vec<(usize, Vec<f32>)> = Vec::new();
+
+            for (_, light) in light_world.lights.iter() {
+                if !light.enabled || light.radius * light.energy <= 0.0 {
+                    light_shadow_rows.push(None);
+                    continue;
+                }
+                if light.shadow_enabled && shadow_row < MAX_SHADOW_LIGHTS {
+                    let map = compute_1d_shadow_map(
+                        light.x,
+                        light.y,
+                        light.radius * light.energy,
+                        light.shadow_mask,
+                        occluder_list.iter().copied(),
+                    );
+                    shadow_rows_data.push((shadow_row, map));
+                    light_shadow_rows.push(Some(shadow_row));
+                    shadow_row += 1;
+                } else {
+                    light_shadow_rows.push(None);
+                }
+            }
+
+            // Upload shadow atlas rows to GPU.
+            if let Some(lg) = self.light_gpu.as_ref() {
+                for (row, data) in &shadow_rows_data {
+                    self.queue.write_texture(
+                        wgpu::ImageCopyTexture {
+                            texture: &lg.shadow_atlas_texture,
+                            mip_level: 0,
+                            origin: wgpu::Origin3d {
+                                x: 0,
+                                y: *row as u32,
+                                z: 0,
+                            },
+                            aspect: wgpu::TextureAspect::All,
+                        },
+                        bytemuck::cast_slice(data),
+                        wgpu::ImageDataLayout {
+                            offset: 0,
+                            bytes_per_row: Some((SHADOW_MAP_RES * 4) as u32),
+                            rows_per_image: None,
+                        },
+                        wgpu::Extent3d {
+                            width: SHADOW_MAP_RES as u32,
+                            height: 1,
+                            depth_or_array_layers: 1,
+                        },
+                    );
+                }
+            }
+
+            // ── Tessellate one quad per enabled light ──
+            let mut light_verts: Vec<LightVertex> = Vec::new();
+            let mut light_idxs: Vec<u32> = Vec::new();
+            let mut light_count = 0usize;
+            let atlas_height = MAX_SHADOW_LIGHTS as f32;
+
+            for ((_, light), shadow_opt) in light_world.lights.iter().zip(light_shadow_rows.iter())
+            {
+                if !light.enabled {
+                    continue;
+                }
+                if light_count >= MAX_LIGHT_QUADS {
+                    break;
+                }
+                let r = light.radius * light.energy;
+                if r <= 0.0 {
+                    continue;
+                }
+                let ci = light.intensity * light.energy;
+                let c = [
+                    light.color.r * ci,
+                    light.color.g * ci,
+                    light.color.b * ci,
+                    1.0,
+                ];
+                let sv = match shadow_opt {
+                    Some(row) => (*row as f32 + 0.5) / atlas_height,
+                    None => -1.0,
+                };
+
+                let base = light_verts.len() as u32;
+                light_verts.push(LightVertex {
+                    position: [light.x - r, light.y - r],
+                    uv: [0.0, 0.0],
+                    color: c,
+                    shadow_v: sv,
+                    _pad: [0.0; 3],
+                });
+                light_verts.push(LightVertex {
+                    position: [light.x + r, light.y - r],
+                    uv: [1.0, 0.0],
+                    color: c,
+                    shadow_v: sv,
+                    _pad: [0.0; 3],
+                });
+                light_verts.push(LightVertex {
+                    position: [light.x + r, light.y + r],
+                    uv: [1.0, 1.0],
+                    color: c,
+                    shadow_v: sv,
+                    _pad: [0.0; 3],
+                });
+                light_verts.push(LightVertex {
+                    position: [light.x - r, light.y + r],
+                    uv: [0.0, 1.0],
+                    color: c,
+                    shadow_v: sv,
+                    _pad: [0.0; 3],
+                });
+                light_idxs.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
+                light_count += 1;
+            }
+
+            // ── Composite full-screen quad (screen-space) ──
+            let composite_base = light_verts.len() as u32;
+            let sw = self.width as f32;
+            let sh = self.height as f32;
+            light_verts.push(LightVertex {
+                position: [0.0, 0.0],
+                uv: [0.0, 0.0],
+                color: [1.0; 4],
+                shadow_v: -1.0,
+                _pad: [0.0; 3],
             });
+            light_verts.push(LightVertex {
+                position: [sw, 0.0],
+                uv: [1.0, 0.0],
+                color: [1.0; 4],
+                shadow_v: -1.0,
+                _pad: [0.0; 3],
+            });
+            light_verts.push(LightVertex {
+                position: [sw, sh],
+                uv: [1.0, 1.0],
+                color: [1.0; 4],
+                shadow_v: -1.0,
+                _pad: [0.0; 3],
+            });
+            light_verts.push(LightVertex {
+                position: [0.0, sh],
+                uv: [0.0, 1.0],
+                color: [1.0; 4],
+                shadow_v: -1.0,
+                _pad: [0.0; 3],
+            });
+            light_idxs.extend_from_slice(&[
+                composite_base,
+                composite_base + 1,
+                composite_base + 2,
+                composite_base,
+                composite_base + 2,
+                composite_base + 3,
+            ]);
+            let composite_idx_start = (light_count * 6) as u32;
+
+            // ── Upload light geometry ──
+            {
+                let lg = self.light_gpu.as_ref().unwrap();
+                self.queue
+                    .write_buffer(&lg.vertex_buffer, 0, bytemuck::cast_slice(&light_verts));
+                self.queue
+                    .write_buffer(&lg.index_buffer, 0, bytemuck::cast_slice(&light_idxs));
+            }
+
+            // ── Pass 1: Accumulate lights onto the light buffer ──
+            // Light positions are in world space — the camera matrix transforms
+            // them to screen space in the vertex shader, just like scene geometry.
+            self.update_viewport_uniform(self.width, self.height, camera_matrix, frame_time);
+            {
+                let lg = self.light_gpu.as_ref().unwrap();
+                let ambient = &light_world.ambient;
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("light_accum_pass"),
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &lg.accum_view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Clear(wgpu::Color {
+                                r: ambient.r as f64,
+                                g: ambient.g as f64,
+                                b: ambient.b as f64,
+                                a: 1.0,
+                            }),
+                            store: wgpu::StoreOp::Store,
+                        },
+                    })],
+                    depth_stencil_attachment: None,
+                    ..Default::default()
+                });
+
+                if light_count > 0 {
+                    pass.set_pipeline(&lg.additive_pipeline);
+                    pass.set_bind_group(0, &self.viewport_bind_group, &[]);
+                    pass.set_bind_group(1, &lg.shadow_atlas_bind_group, &[]);
+                    pass.set_vertex_buffer(0, lg.vertex_buffer.slice(..));
+                    pass.set_index_buffer(lg.index_buffer.slice(..), wgpu::IndexFormat::Uint32);
+                    pass.draw_indexed(0..(light_count * 6) as u32, 0, 0..1);
+                }
+            }
+
+            // ── Pass 2: Composite light buffer over scene (multiply blend) ──
+            // Use identity camera so the full-screen quad maps 1:1 to pixels.
+            self.update_viewport_uniform(self.width, self.height, &Mat3::identity(), frame_time);
+            {
+                let lg = self.light_gpu.as_ref().unwrap();
+                let screen_stencil_view = &self.screen_stencil_target.as_ref().unwrap().view;
+                let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+                    label: Some("light_composite_pass"),
+                    color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+                        view: &view,
+                        resolve_target: None,
+                        ops: wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        },
+                    })],
+                    depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                        view: screen_stencil_view,
+                        depth_ops: None,
+                        stencil_ops: Some(wgpu::Operations {
+                            load: wgpu::LoadOp::Load,
+                            store: wgpu::StoreOp::Store,
+                        }),
+                    }),
+                    ..Default::default()
+                });
+
+                pass.set_pipeline(&lg.composite_pipeline);
+                pass.set_bind_group(0, &self.viewport_bind_group, &[]);
+                pass.set_bind_group(1, &lg.accum_bind_group, &[]);
+                pass.set_vertex_buffer(0, lg.vertex_buffer.slice(..));
+                pass.set_index_buffer(lg.index_buffer.slice(..), wgpu::IndexFormat::Uint32);
+                pass.set_scissor_rect(0, 0, self.width, self.height);
+                pass.set_stencil_reference(0);
+                pass.draw_indexed(composite_idx_start..composite_idx_start + 6, 0, 0..1);
+            }
+
+            // Restore camera viewport for any subsequent passes.
+            self.update_viewport_uniform(self.width, self.height, camera_matrix, frame_time);
         }
         // ==================================
 
@@ -3667,12 +4303,8 @@ fn compare_function(compare: crate::render::renderer::CompareMode) -> wgpu::Comp
 fn stencil_operation(action: crate::render::renderer::StencilAction) -> wgpu::StencilOperation {
     match action {
         crate::render::renderer::StencilAction::Replace => wgpu::StencilOperation::Replace,
-        crate::render::renderer::StencilAction::Increment => {
-            wgpu::StencilOperation::IncrementClamp
-        }
-        crate::render::renderer::StencilAction::Decrement => {
-            wgpu::StencilOperation::DecrementClamp
-        }
+        crate::render::renderer::StencilAction::Increment => wgpu::StencilOperation::IncrementClamp,
+        crate::render::renderer::StencilAction::Decrement => wgpu::StencilOperation::DecrementClamp,
         crate::render::renderer::StencilAction::IncrementWrap => {
             wgpu::StencilOperation::IncrementWrap
         }
@@ -3882,49 +4514,135 @@ fn push_tex_quad_corners(
 /// Each byte represents one row; bits 4..0 are pixels left-to-right.
 fn bitmap_char(ch: char) -> [u8; 7] {
     match ch.to_ascii_uppercase() {
-        'A' => [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
-        'B' => [0b11110, 0b10001, 0b11110, 0b10001, 0b10001, 0b10001, 0b11110],
-        'C' => [0b01110, 0b10001, 0b10000, 0b10000, 0b10000, 0b10001, 0b01110],
-        'D' => [0b11100, 0b10010, 0b10001, 0b10001, 0b10001, 0b10010, 0b11100],
-        'E' => [0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111],
-        'F' => [0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000],
-        'G' => [0b01110, 0b10001, 0b10000, 0b10111, 0b10001, 0b10001, 0b01110],
-        'H' => [0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
-        'I' => [0b01110, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110],
-        'J' => [0b00111, 0b00010, 0b00010, 0b00010, 0b00010, 0b10010, 0b01100],
-        'K' => [0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001],
-        'L' => [0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111],
-        'M' => [0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001],
-        'N' => [0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b10001],
-        'O' => [0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
-        'P' => [0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000],
-        'Q' => [0b01110, 0b10001, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101],
-        'R' => [0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001],
-        'S' => [0b01110, 0b10001, 0b10000, 0b01110, 0b00001, 0b10001, 0b01110],
-        'T' => [0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100],
-        'U' => [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
-        'V' => [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100],
-        'W' => [0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b11011, 0b10001],
-        'X' => [0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001],
-        'Y' => [0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100, 0b00100],
-        'Z' => [0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111],
-        '0' => [0b01110, 0b10011, 0b10101, 0b10101, 0b11001, 0b10001, 0b01110],
-        '1' => [0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110],
-        '2' => [0b01110, 0b10001, 0b00001, 0b00110, 0b01000, 0b10000, 0b11111],
-        '3' => [0b01110, 0b10001, 0b00001, 0b00110, 0b00001, 0b10001, 0b01110],
-        '4' => [0b00010, 0b00110, 0b01010, 0b10010, 0b11111, 0b00010, 0b00010],
-        '5' => [0b11111, 0b10000, 0b11110, 0b00001, 0b00001, 0b10001, 0b01110],
-        '6' => [0b01110, 0b10000, 0b10000, 0b11110, 0b10001, 0b10001, 0b01110],
-        '7' => [0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b01000, 0b01000],
-        '8' => [0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110],
-        '9' => [0b01110, 0b10001, 0b10001, 0b01111, 0b00001, 0b00001, 0b01110],
-        '!' => [0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00100],
-        '.' => [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100],
-        ',' => [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100, 0b01000],
-        ':' => [0b00000, 0b00100, 0b00000, 0b00000, 0b00000, 0b00100, 0b00000],
-        '-' => [0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],
-        '/' => [0b00001, 0b00010, 0b00010, 0b00100, 0b01000, 0b01000, 0b10000],
-        _ => [0b01110, 0b01010, 0b01010, 0b01010, 0b01010, 0b00000, 0b01010],
+        'A' => [
+            0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001,
+        ],
+        'B' => [
+            0b11110, 0b10001, 0b11110, 0b10001, 0b10001, 0b10001, 0b11110,
+        ],
+        'C' => [
+            0b01110, 0b10001, 0b10000, 0b10000, 0b10000, 0b10001, 0b01110,
+        ],
+        'D' => [
+            0b11100, 0b10010, 0b10001, 0b10001, 0b10001, 0b10010, 0b11100,
+        ],
+        'E' => [
+            0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111,
+        ],
+        'F' => [
+            0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000,
+        ],
+        'G' => [
+            0b01110, 0b10001, 0b10000, 0b10111, 0b10001, 0b10001, 0b01110,
+        ],
+        'H' => [
+            0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001,
+        ],
+        'I' => [
+            0b01110, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110,
+        ],
+        'J' => [
+            0b00111, 0b00010, 0b00010, 0b00010, 0b00010, 0b10010, 0b01100,
+        ],
+        'K' => [
+            0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001,
+        ],
+        'L' => [
+            0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111,
+        ],
+        'M' => [
+            0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001,
+        ],
+        'N' => [
+            0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b10001,
+        ],
+        'O' => [
+            0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110,
+        ],
+        'P' => [
+            0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000,
+        ],
+        'Q' => [
+            0b01110, 0b10001, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101,
+        ],
+        'R' => [
+            0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001,
+        ],
+        'S' => [
+            0b01110, 0b10001, 0b10000, 0b01110, 0b00001, 0b10001, 0b01110,
+        ],
+        'T' => [
+            0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100,
+        ],
+        'U' => [
+            0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110,
+        ],
+        'V' => [
+            0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100,
+        ],
+        'W' => [
+            0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b11011, 0b10001,
+        ],
+        'X' => [
+            0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001,
+        ],
+        'Y' => [
+            0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100, 0b00100,
+        ],
+        'Z' => [
+            0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111,
+        ],
+        '0' => [
+            0b01110, 0b10011, 0b10101, 0b10101, 0b11001, 0b10001, 0b01110,
+        ],
+        '1' => [
+            0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110,
+        ],
+        '2' => [
+            0b01110, 0b10001, 0b00001, 0b00110, 0b01000, 0b10000, 0b11111,
+        ],
+        '3' => [
+            0b01110, 0b10001, 0b00001, 0b00110, 0b00001, 0b10001, 0b01110,
+        ],
+        '4' => [
+            0b00010, 0b00110, 0b01010, 0b10010, 0b11111, 0b00010, 0b00010,
+        ],
+        '5' => [
+            0b11111, 0b10000, 0b11110, 0b00001, 0b00001, 0b10001, 0b01110,
+        ],
+        '6' => [
+            0b01110, 0b10000, 0b10000, 0b11110, 0b10001, 0b10001, 0b01110,
+        ],
+        '7' => [
+            0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b01000, 0b01000,
+        ],
+        '8' => [
+            0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110,
+        ],
+        '9' => [
+            0b01110, 0b10001, 0b10001, 0b01111, 0b00001, 0b00001, 0b01110,
+        ],
+        '!' => [
+            0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00000, 0b00100,
+        ],
+        '.' => [
+            0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100,
+        ],
+        ',' => [
+            0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00100, 0b01000,
+        ],
+        ':' => [
+            0b00000, 0b00100, 0b00000, 0b00000, 0b00000, 0b00100, 0b00000,
+        ],
+        '-' => [
+            0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000,
+        ],
+        '/' => [
+            0b00001, 0b00010, 0b00010, 0b00100, 0b01000, 0b01000, 0b10000,
+        ],
+        _ => [
+            0b01110, 0b01010, 0b01010, 0b01010, 0b01010, 0b00000, 0b01010,
+        ],
     }
 }
 

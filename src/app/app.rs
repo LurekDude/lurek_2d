@@ -19,16 +19,16 @@ use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
 
 use super::debug_overlay::DebugOverlay;
 use super::error_screen::ErrorScreen;
+use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
+use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
+use crate::lua_api::create_lua_vm;
+use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
+use crate::render::GpuRenderer;
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::runtime::shared_state::WindowState;
 use crate::runtime::{FullscreenType, SharedState};
-use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
-use crate::render::GpuRenderer;
-use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
-use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
-use crate::lua_api::create_lua_vm;
 use slotmap::SlotMap;
 
 use gilrs::{
@@ -36,6 +36,8 @@ use gilrs::{
     Gilrs,
 };
 
+#[allow(unused_imports)]
+use crate::log_msg;
 use crate::runtime::config::Config;
 use crate::runtime::log_messages::{
     L003_GAME_LOADED, L006_SPLASH_SCREEN, L007_NO_MAIN_LUA, L010_RENDER_ERROR, L011_LUA_ERROR,
@@ -48,8 +50,6 @@ use crate::runtime::log_messages::{
     L076_SCREENSHOT_ENCODE_FAIL, L077_DRAG_HOVER, L078_DRAG_HOVER_CANCEL, L079_DRAG_DROP_IGNORED,
     L080_GAME_DIR, L081_LOG_FILE, L082_LOG_FILE_FAIL,
 };
-#[allow(unused_imports)]
-use crate::log_msg;
 
 /// Recomputes viewport scale and offset based on game and window dimensions.
 ///
@@ -858,7 +858,11 @@ impl LunaApp {
         }
 
         // ── 5. render (main draw pass) ──────────────────────────────────
-        state.borrow_mut().render_commands.clear();
+        {
+            let mut s = state.borrow_mut();
+            s.render_commands.clear();
+            s.raycaster_output = None;
+        }
 
         // ── 5a. Auto-collect: parallax layers (draw order 2 — before game world) ──
         {
@@ -868,16 +872,23 @@ impl LunaApp {
             let screen_w = s.window_state.game_width;
             let screen_h = s.window_state.game_height;
             // Collect strong refs while holding the borrow; drop before borrow_mut below.
-            let layers: Vec<_> = s.auto_parallax_layers.iter()
+            let layers: Vec<_> = s
+                .auto_parallax_layers
+                .iter()
                 .filter_map(|w| w.upgrade())
                 .collect();
             drop(s);
             for rc in &layers {
-                let cmds = rc.borrow().generate_render_commands(cam_x, cam_y, screen_w, screen_h);
+                let cmds = rc
+                    .borrow()
+                    .generate_render_commands(cam_x, cam_y, screen_w, screen_h);
                 state.borrow_mut().render_commands.extend(cmds);
             }
             // Purge stale weak refs once per frame.
-            state.borrow_mut().auto_parallax_layers.retain(|w| w.upgrade().is_some());
+            state
+                .borrow_mut()
+                .auto_parallax_layers
+                .retain(|w| w.upgrade().is_some());
         }
 
         // ── 5b. Auto-collect: tilemaps (draw order 3 — background layers) ──
@@ -887,16 +898,19 @@ impl LunaApp {
             let cam_y = s.camera.position.y;
             let cam_w = s.window_state.game_width;
             let cam_h = s.window_state.game_height;
-            let maps: Vec<_> = s.auto_tilemaps.iter()
-                .filter_map(|w| w.upgrade())
-                .collect();
+            let maps: Vec<_> = s.auto_tilemaps.iter().filter_map(|w| w.upgrade()).collect();
             drop(s);
             for rc in &maps {
-                let cmds = rc.borrow().generate_render_commands(0.0, 0.0, cam_x, cam_y, cam_w, cam_h);
+                let cmds = rc
+                    .borrow()
+                    .generate_render_commands(0.0, 0.0, cam_x, cam_y, cam_w, cam_h);
                 state.borrow_mut().render_commands.extend(cmds);
             }
             // Purge stale weak refs once per frame.
-            state.borrow_mut().auto_tilemaps.retain(|w| w.upgrade().is_some());
+            state
+                .borrow_mut()
+                .auto_tilemaps
+                .retain(|w| w.upgrade().is_some());
         }
 
         // ── 5c. Lua render callback (draw order 4 — game world) ──────────
@@ -905,13 +919,93 @@ impl LunaApp {
             return;
         }
 
-        // ── 5d. Auto-collect: particle systems (draw order 6 — after game world) ─
+        // ── 5d. Auto-collect: raycaster scene (draw order 5 — 3D FPS view) ──
+        // Converts RaycasterScene quads to DrawTexturedQuad commands, depth-sorted
+        // back-to-front so the painter's algorithm renders correctly.
+        {
+            let scene_opt = state.borrow_mut().raycaster_output.take();
+            if let Some(scene) = scene_opt {
+                // Collect all quads with a depth value for back-to-front sorting.
+                struct DepthQuad {
+                    corners: [crate::math::Vec2; 4],
+                    uvs: [crate::math::Vec2; 4],
+                    texture_key: TextureKey,
+                    color: [f32; 4],
+                    depth: f32,
+                }
+                let mut depth_quads: Vec<DepthQuad> = Vec::with_capacity(scene.quad_count());
+
+                for wall in &scene.walls {
+                    if let Some(key) = wall.texture_key {
+                        depth_quads.push(DepthQuad {
+                            corners: wall.corners,
+                            uvs: wall.uvs,
+                            texture_key: key,
+                            color: wall.light,
+                            depth: wall.depth,
+                        });
+                    }
+                }
+                for floor in &scene.floors {
+                    if let Some(key) = floor.texture_key {
+                        depth_quads.push(DepthQuad {
+                            corners: floor.corners,
+                            uvs: floor.uvs,
+                            texture_key: key,
+                            color: floor.light,
+                            depth: floor.depth,
+                        });
+                    }
+                }
+                for ceil in &scene.ceilings {
+                    if let Some(key) = ceil.texture_key {
+                        depth_quads.push(DepthQuad {
+                            corners: ceil.corners,
+                            uvs: ceil.uvs,
+                            texture_key: key,
+                            color: ceil.light,
+                            depth: ceil.depth,
+                        });
+                    }
+                }
+                for sprite in &scene.sprites {
+                    depth_quads.push(DepthQuad {
+                        corners: sprite.corners,
+                        uvs: sprite.uvs,
+                        texture_key: sprite.texture_key,
+                        color: sprite.light,
+                        depth: sprite.depth,
+                    });
+                }
+
+                // Sort back-to-front (largest depth first).
+                depth_quads.sort_by(|a, b| {
+                    b.depth
+                        .partial_cmp(&a.depth)
+                        .unwrap_or(std::cmp::Ordering::Equal)
+                });
+
+                let mut s = state.borrow_mut();
+                for dq in depth_quads {
+                    s.render_commands.push(RenderCommand::DrawTexturedQuad {
+                        corners: dq.corners,
+                        uvs: dq.uvs,
+                        texture_key: dq.texture_key,
+                        color: dq.color,
+                    });
+                }
+            }
+        }
+
+        // ── 5e. Auto-collect: particle systems (draw order 6 — after game world) ─
         // NOTE: Scripts that manually call `system:render()` inside `lurek.render()`
         // will have their particles rendered twice (once by Lua, once here).  Use
         // one approach per particle system: either manual Lua render OR auto-collect.
         {
             let s = state.borrow();
-            let particle_cmds: Vec<_> = s.particle_systems.values()
+            let particle_cmds: Vec<_> = s
+                .particle_systems
+                .values()
                 .flat_map(|ps| ps.generate_render_commands())
                 .collect();
             drop(s);
@@ -926,11 +1020,12 @@ impl LunaApp {
 
         // ── 6a. Auto-collect: GUI context (draw order 9 — after render_ui) ──
         {
-            let ui_cmds: Vec<_> = state.borrow()
+            let ui_cmds: Vec<_> = state
+                .borrow()
                 .auto_ui_ctx
                 .as_ref()
                 .and_then(|w| w.upgrade())
-                .map(|rc| rc.borrow().generate_render_commands())
+                .map(|rc| rc.borrow_mut().generate_render_commands())
                 .unwrap_or_default();
             state.borrow_mut().render_commands.extend(ui_cmds);
         }
