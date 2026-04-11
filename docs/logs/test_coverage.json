@@ -1674,6 +1674,324 @@
         "line": 275
       },
       {
+        "module": "camera",
+        "name": "Camera::new",
+        "file": "src/camera/types.rs",
+        "line": 40
+      },
+      {
+        "module": "camera",
+        "name": "Camera::view_matrix",
+        "file": "src/camera/types.rs",
+        "line": 55
+      },
+      {
+        "module": "camera",
+        "name": "Camera::set_position",
+        "file": "src/camera/types.rs",
+        "line": 66
+      },
+      {
+        "module": "camera",
+        "name": "Camera::set_zoom",
+        "file": "src/camera/types.rs",
+        "line": 74
+      },
+      {
+        "module": "camera",
+        "name": "Camera::set_rotation",
+        "file": "src/camera/types.rs",
+        "line": 82
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::new",
+        "file": "src/camera/types.rs",
+        "line": 168
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_position",
+        "file": "src/camera/types.rs",
+        "line": 194
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_position",
+        "file": "src/camera/types.rs",
+        "line": 202
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_zoom",
+        "file": "src/camera/types.rs",
+        "line": 210
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_zoom",
+        "file": "src/camera/types.rs",
+        "line": 218
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_rotation",
+        "file": "src/camera/types.rs",
+        "line": 226
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_rotation",
+        "file": "src/camera/types.rs",
+        "line": 234
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_viewport",
+        "file": "src/camera/types.rs",
+        "line": 247
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_viewport",
+        "file": "src/camera/types.rs",
+        "line": 255
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_bounds",
+        "file": "src/camera/types.rs",
+        "line": 273
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_bounds",
+        "file": "src/camera/types.rs",
+        "line": 281
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::remove_bounds",
+        "file": "src/camera/types.rs",
+        "line": 286
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::has_bounds",
+        "file": "src/camera/types.rs",
+        "line": 294
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::move_by",
+        "file": "src/camera/types.rs",
+        "line": 305
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::look_at",
+        "file": "src/camera/types.rs",
+        "line": 315
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::to_world_coords",
+        "file": "src/camera/types.rs",
+        "line": 332
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::to_screen_coords",
+        "file": "src/camera/types.rs",
+        "line": 352
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_visible_area",
+        "file": "src/camera/types.rs",
+        "line": 365
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_dead_zone",
+        "file": "src/camera/types.rs",
+        "line": 385
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_dead_zone",
+        "file": "src/camera/types.rs",
+        "line": 393
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_target",
+        "file": "src/camera/types.rs",
+        "line": 402
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_target",
+        "file": "src/camera/types.rs",
+        "line": 410
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::clear_target",
+        "file": "src/camera/types.rs",
+        "line": 415
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_follow_smooth",
+        "file": "src/camera/types.rs",
+        "line": 425
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_follow_smooth",
+        "file": "src/camera/types.rs",
+        "line": 433
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::set_look_ahead",
+        "file": "src/camera/types.rs",
+        "line": 441
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::get_look_ahead",
+        "file": "src/camera/types.rs",
+        "line": 449
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::shake",
+        "file": "src/camera/types.rs",
+        "line": 460
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::update",
+        "file": "src/camera/types.rs",
+        "line": 474
+      },
+      {
+        "module": "camera",
+        "name": "Camera2D::view_matrix",
+        "file": "src/camera/types.rs",
+        "line": 561
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::new",
+        "file": "src/camera/viewport.rs",
+        "line": 73
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::resize",
+        "file": "src/camera/viewport.rs",
+        "line": 90
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::get_scale",
+        "file": "src/camera/viewport.rs",
+        "line": 122
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::get_offset",
+        "file": "src/camera/viewport.rs",
+        "line": 130
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::get_game_dimensions",
+        "file": "src/camera/viewport.rs",
+        "line": 138
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::get_scale_mode",
+        "file": "src/camera/viewport.rs",
+        "line": 146
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::set_scale_mode",
+        "file": "src/camera/viewport.rs",
+        "line": 154
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::to_game",
+        "file": "src/camera/viewport.rs",
+        "line": 166
+      },
+      {
+        "module": "camera",
+        "name": "Viewport::to_screen",
+        "file": "src/camera/viewport.rs",
+        "line": 181
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::new",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 65
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::resize",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 84
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::get_game_dimensions",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 118
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::get_scaled_dimensions",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 126
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::get_offset",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 134
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::get_scale",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 142
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::get_mode",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 150
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::to_game_coords",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 162
+      },
+      {
+        "module": "camera",
+        "name": "ViewportScale::to_screen_coords",
+        "file": "src/camera/viewport_scale.rs",
+        "line": 177
+      },
+      {
         "module": "compute",
         "name": "DataType::parse",
         "file": "src/compute/array.rs",
@@ -3358,6 +3676,378 @@
         "name": "Universe::clear",
         "file": "src/ecs/universe.rs",
         "line": 1129
+      },
+      {
+        "module": "effect",
+        "name": "AmbientState::compute_color_from_time",
+        "file": "src/effect/ambient.rs",
+        "line": 50
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::new",
+        "file": "src/effect/effect.rs",
+        "line": 52
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::new_custom",
+        "file": "src/effect/effect.rs",
+        "line": 74
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::set_parameter",
+        "file": "src/effect/effect.rs",
+        "line": 94
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::get_parameter",
+        "file": "src/effect/effect.rs",
+        "line": 112
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::has_parameter",
+        "file": "src/effect/effect.rs",
+        "line": 128
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::get_parameter_names",
+        "file": "src/effect/effect.rs",
+        "line": 140
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::get_type_name",
+        "file": "src/effect/effect.rs",
+        "line": 154
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::is_built_in",
+        "file": "src/effect/effect.rs",
+        "line": 167
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::new_disabled",
+        "file": "src/effect/effect.rs",
+        "line": 182
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::set_param",
+        "file": "src/effect/effect.rs",
+        "line": 193
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffect::get_param_or",
+        "file": "src/effect/effect.rs",
+        "line": 205
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffectType::from_name",
+        "file": "src/effect/effect_type.rs",
+        "line": 77
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffectType::name",
+        "file": "src/effect/effect_type.rs",
+        "line": 102
+      },
+      {
+        "module": "effect",
+        "name": "PostFxEffectType::default_params",
+        "file": "src/effect/effect_type.rs",
+        "line": 135
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::new",
+        "file": "src/effect/image_effect.rs",
+        "line": 46
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::add_effect",
+        "file": "src/effect/image_effect.rs",
+        "line": 58
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::clear",
+        "file": "src/effect/image_effect.rs",
+        "line": 138
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::effect_count",
+        "file": "src/effect/image_effect.rs",
+        "line": 146
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::new",
+        "file": "src/effect/overlay.rs",
+        "line": 91
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::update",
+        "file": "src/effect/overlay.rs",
+        "line": 127
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::trigger_flash",
+        "file": "src/effect/overlay.rs",
+        "line": 267
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::trigger_shake",
+        "file": "src/effect/overlay.rs",
+        "line": 296
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::trigger_fade",
+        "file": "src/effect/overlay.rs",
+        "line": 326
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::trigger_lightning",
+        "file": "src/effect/overlay.rs",
+        "line": 342
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_shake_offset",
+        "file": "src/effect/overlay.rs",
+        "line": 351
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::is_active",
+        "file": "src/effect/overlay.rs",
+        "line": 365
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::clear",
+        "file": "src/effect/overlay.rs",
+        "line": 387
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::resize",
+        "file": "src/effect/overlay.rs",
+        "line": 412
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_width",
+        "file": "src/effect/overlay.rs",
+        "line": 423
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_height",
+        "file": "src/effect/overlay.rs",
+        "line": 433
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_dimensions",
+        "file": "src/effect/overlay.rs",
+        "line": 443
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_flash_alpha",
+        "file": "src/effect/overlay.rs",
+        "line": 455
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::get_lightning_alpha",
+        "file": "src/effect/overlay.rs",
+        "line": 471
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::build_render_commands",
+        "file": "src/effect/overlay.rs",
+        "line": 487
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::draw_flash_sequence_to_image",
+        "file": "src/effect/overlay.rs",
+        "line": 589
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::draw_shake_trail_to_image",
+        "file": "src/effect/overlay.rs",
+        "line": 637
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::draw_fade_transition_to_image",
+        "file": "src/effect/overlay.rs",
+        "line": 674
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::draw_trigger_panel_to_image",
+        "file": "src/effect/overlay.rs",
+        "line": 706
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::new",
+        "file": "src/effect/stack.rs",
+        "line": 58
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::add",
+        "file": "src/effect/stack.rs",
+        "line": 77
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::remove",
+        "file": "src/effect/stack.rs",
+        "line": 95
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::insert",
+        "file": "src/effect/stack.rs",
+        "line": 115
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::set_enabled",
+        "file": "src/effect/stack.rs",
+        "line": 126
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::is_enabled",
+        "file": "src/effect/stack.rs",
+        "line": 139
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::get_effect_count",
+        "file": "src/effect/stack.rs",
+        "line": 151
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::get_effect",
+        "file": "src/effect/stack.rs",
+        "line": 162
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::enabled_effects",
+        "file": "src/effect/stack.rs",
+        "line": 179
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::resize",
+        "file": "src/effect/stack.rs",
+        "line": 197
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::get_width",
+        "file": "src/effect/stack.rs",
+        "line": 208
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::get_height",
+        "file": "src/effect/stack.rs",
+        "line": 218
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::get_dimensions",
+        "file": "src/effect/stack.rs",
+        "line": 228
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::len",
+        "file": "src/effect/stack.rs",
+        "line": 236
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::is_empty",
+        "file": "src/effect/stack.rs",
+        "line": 244
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::clear",
+        "file": "src/effect/stack.rs",
+        "line": 249
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_info_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 267
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_stack_management_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 357
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_effect_catalog_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 395
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_effect_parameters_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 440
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_effect_types_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 521
+      },
+      {
+        "module": "effect",
+        "name": "WeatherType::from_name",
+        "file": "src/effect/weather.rs",
+        "line": 52
+      },
+      {
+        "module": "effect",
+        "name": "WeatherType::name",
+        "file": "src/effect/weather.rs",
+        "line": 70
       },
       {
         "module": "event",
@@ -5404,6 +6094,486 @@
         "name": "TouchState::get_touch_count",
         "file": "src/input/touch.rs",
         "line": 108
+      },
+      {
+        "module": "light",
+        "name": "Attenuation::new",
+        "file": "src/light/attenuation.rs",
+        "line": 33
+      },
+      {
+        "module": "light",
+        "name": "Attenuation::factor",
+        "file": "src/light/attenuation.rs",
+        "line": 48
+      },
+      {
+        "module": "light",
+        "name": "Attenuation::draw_attenuation_curves_to_image",
+        "file": "src/light/attenuation.rs",
+        "line": 67
+      },
+      {
+        "module": "light",
+        "name": "FlickerConfig::new",
+        "file": "src/light/flicker.rs",
+        "line": 35
+      },
+      {
+        "module": "light",
+        "name": "FlickerConfig::multiplier",
+        "file": "src/light/flicker.rs",
+        "line": 48
+      },
+      {
+        "module": "light",
+        "name": "FlickerConfig::advance",
+        "file": "src/light/flicker.rs",
+        "line": 60
+      },
+      {
+        "module": "light",
+        "name": "Light2D::new",
+        "file": "src/light/light2d.rs",
+        "line": 115
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_position",
+        "file": "src/light/light2d.rs",
+        "line": 149
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_position",
+        "file": "src/light/light2d.rs",
+        "line": 159
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_radius",
+        "file": "src/light/light2d.rs",
+        "line": 167
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_radius",
+        "file": "src/light/light2d.rs",
+        "line": 176
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_color",
+        "file": "src/light/light2d.rs",
+        "line": 184
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_color",
+        "file": "src/light/light2d.rs",
+        "line": 192
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_intensity",
+        "file": "src/light/light2d.rs",
+        "line": 200
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_intensity",
+        "file": "src/light/light2d.rs",
+        "line": 208
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_enabled",
+        "file": "src/light/light2d.rs",
+        "line": 216
+      },
+      {
+        "module": "light",
+        "name": "Light2D::is_enabled",
+        "file": "src/light/light2d.rs",
+        "line": 224
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_energy",
+        "file": "src/light/light2d.rs",
+        "line": 232
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_energy",
+        "file": "src/light/light2d.rs",
+        "line": 240
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_blend_mode",
+        "file": "src/light/light2d.rs",
+        "line": 248
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_blend_mode",
+        "file": "src/light/light2d.rs",
+        "line": 256
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_falloff",
+        "file": "src/light/light2d.rs",
+        "line": 264
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_falloff",
+        "file": "src/light/light2d.rs",
+        "line": 272
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_shadow_enabled",
+        "file": "src/light/light2d.rs",
+        "line": 280
+      },
+      {
+        "module": "light",
+        "name": "Light2D::is_shadow_enabled",
+        "file": "src/light/light2d.rs",
+        "line": 288
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_shadow_color",
+        "file": "src/light/light2d.rs",
+        "line": 296
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_shadow_color",
+        "file": "src/light/light2d.rs",
+        "line": 304
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_shadow_filter",
+        "file": "src/light/light2d.rs",
+        "line": 312
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_shadow_filter",
+        "file": "src/light/light2d.rs",
+        "line": 320
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_shadow_smooth",
+        "file": "src/light/light2d.rs",
+        "line": 328
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_shadow_smooth",
+        "file": "src/light/light2d.rs",
+        "line": 336
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_light_mask",
+        "file": "src/light/light2d.rs",
+        "line": 344
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_light_mask",
+        "file": "src/light/light2d.rs",
+        "line": 352
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_shadow_mask",
+        "file": "src/light/light2d.rs",
+        "line": 360
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_shadow_mask",
+        "file": "src/light/light2d.rs",
+        "line": 368
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_light_type",
+        "file": "src/light/light2d.rs",
+        "line": 376
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_light_type",
+        "file": "src/light/light2d.rs",
+        "line": 384
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_direction",
+        "file": "src/light/light2d.rs",
+        "line": 392
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_direction",
+        "file": "src/light/light2d.rs",
+        "line": 400
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_inner_angle",
+        "file": "src/light/light2d.rs",
+        "line": 408
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_inner_angle",
+        "file": "src/light/light2d.rs",
+        "line": 416
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_outer_angle",
+        "file": "src/light/light2d.rs",
+        "line": 424
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_outer_angle",
+        "file": "src/light/light2d.rs",
+        "line": 432
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_attenuation",
+        "file": "src/light/light2d.rs",
+        "line": 440
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_attenuation",
+        "file": "src/light/light2d.rs",
+        "line": 448
+      },
+      {
+        "module": "light",
+        "name": "Light2D::flicker_mut",
+        "file": "src/light/light2d.rs",
+        "line": 456
+      },
+      {
+        "module": "light",
+        "name": "Light2D::flicker",
+        "file": "src/light/light2d.rs",
+        "line": 464
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_group_id",
+        "file": "src/light/light2d.rs",
+        "line": 472
+      },
+      {
+        "module": "light",
+        "name": "Light2D::get_group_id",
+        "file": "src/light/light2d.rs",
+        "line": 480
+      },
+      {
+        "module": "light",
+        "name": "Light2D::set_volumetric",
+        "file": "src/light/light2d.rs",
+        "line": 488
+      },
+      {
+        "module": "light",
+        "name": "Light2D::is_volumetric",
+        "file": "src/light/light2d.rs",
+        "line": 496
+      },
+      {
+        "module": "light",
+        "name": "Light2D::draw_falloff_comparison_to_image",
+        "file": "src/light/light2d.rs",
+        "line": 679
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::new",
+        "file": "src/light/light_world.rs",
+        "line": 44
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::add_light",
+        "file": "src/light/light_world.rs",
+        "line": 62
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::add_occluder",
+        "file": "src/light/light_world.rs",
+        "line": 77
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::remove_light",
+        "file": "src/light/light_world.rs",
+        "line": 88
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::get_light",
+        "file": "src/light/light_world.rs",
+        "line": 110
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::get_light_mut",
+        "file": "src/light/light_world.rs",
+        "line": 121
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::get_occluder",
+        "file": "src/light/light_world.rs",
+        "line": 132
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::light_count",
+        "file": "src/light/light_world.rs",
+        "line": 151
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::occluder_count",
+        "file": "src/light/light_world.rs",
+        "line": 159
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::clear",
+        "file": "src/light/light_world.rs",
+        "line": 164
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::has_active_lights",
+        "file": "src/light/light_world.rs",
+        "line": 174
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::set_group_enabled",
+        "file": "src/light/light_world.rs",
+        "line": 183
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::set_group_intensity",
+        "file": "src/light/light_world.rs",
+        "line": 196
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::set_group_color",
+        "file": "src/light/light_world.rs",
+        "line": 209
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::group_count",
+        "file": "src/light/light_world.rs",
+        "line": 224
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::advance_flickers",
+        "file": "src/light/light_world.rs",
+        "line": 235
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::draw_to_image",
+        "file": "src/light/light_world.rs",
+        "line": 253
+      },
+      {
+        "module": "light",
+        "name": "Occluder::new",
+        "file": "src/light/occluder.rs",
+        "line": 43
+      },
+      {
+        "module": "light",
+        "name": "Occluder::set_vertices",
+        "file": "src/light/occluder.rs",
+        "line": 65
+      },
+      {
+        "module": "light",
+        "name": "Occluder::get_vertices",
+        "file": "src/light/occluder.rs",
+        "line": 98
+      },
+      {
+        "module": "light",
+        "name": "Occluder::set_position",
+        "file": "src/light/occluder.rs",
+        "line": 106
+      },
+      {
+        "module": "light",
+        "name": "Occluder::get_position",
+        "file": "src/light/occluder.rs",
+        "line": 114
+      },
+      {
+        "module": "light",
+        "name": "Occluder::set_opacity",
+        "file": "src/light/occluder.rs",
+        "line": 122
+      },
+      {
+        "module": "light",
+        "name": "Occluder::get_opacity",
+        "file": "src/light/occluder.rs",
+        "line": 130
+      },
+      {
+        "module": "light",
+        "name": "Occluder::set_light_mask",
+        "file": "src/light/occluder.rs",
+        "line": 138
+      },
+      {
+        "module": "light",
+        "name": "Occluder::get_light_mask",
+        "file": "src/light/occluder.rs",
+        "line": 146
+      },
+      {
+        "module": "light",
+        "name": "Occluder::set_enabled",
+        "file": "src/light/occluder.rs",
+        "line": 154
+      },
+      {
+        "module": "light",
+        "name": "Occluder::is_enabled",
+        "file": "src/light/occluder.rs",
+        "line": 162
       },
       {
         "module": "log",
@@ -9457,324 +10627,6 @@
       },
       {
         "module": "render",
-        "name": "Camera::new",
-        "file": "src/render/camera/types.rs",
-        "line": 40
-      },
-      {
-        "module": "render",
-        "name": "Camera::view_matrix",
-        "file": "src/render/camera/types.rs",
-        "line": 55
-      },
-      {
-        "module": "render",
-        "name": "Camera::set_position",
-        "file": "src/render/camera/types.rs",
-        "line": 66
-      },
-      {
-        "module": "render",
-        "name": "Camera::set_zoom",
-        "file": "src/render/camera/types.rs",
-        "line": 74
-      },
-      {
-        "module": "render",
-        "name": "Camera::set_rotation",
-        "file": "src/render/camera/types.rs",
-        "line": 82
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::new",
-        "file": "src/render/camera/types.rs",
-        "line": 168
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_position",
-        "file": "src/render/camera/types.rs",
-        "line": 194
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_position",
-        "file": "src/render/camera/types.rs",
-        "line": 202
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_zoom",
-        "file": "src/render/camera/types.rs",
-        "line": 210
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_zoom",
-        "file": "src/render/camera/types.rs",
-        "line": 218
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_rotation",
-        "file": "src/render/camera/types.rs",
-        "line": 226
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_rotation",
-        "file": "src/render/camera/types.rs",
-        "line": 234
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_viewport",
-        "file": "src/render/camera/types.rs",
-        "line": 247
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_viewport",
-        "file": "src/render/camera/types.rs",
-        "line": 255
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_bounds",
-        "file": "src/render/camera/types.rs",
-        "line": 273
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_bounds",
-        "file": "src/render/camera/types.rs",
-        "line": 281
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::remove_bounds",
-        "file": "src/render/camera/types.rs",
-        "line": 286
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::has_bounds",
-        "file": "src/render/camera/types.rs",
-        "line": 294
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::move_by",
-        "file": "src/render/camera/types.rs",
-        "line": 305
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::look_at",
-        "file": "src/render/camera/types.rs",
-        "line": 315
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::to_world_coords",
-        "file": "src/render/camera/types.rs",
-        "line": 332
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::to_screen_coords",
-        "file": "src/render/camera/types.rs",
-        "line": 352
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_visible_area",
-        "file": "src/render/camera/types.rs",
-        "line": 365
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_dead_zone",
-        "file": "src/render/camera/types.rs",
-        "line": 385
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_dead_zone",
-        "file": "src/render/camera/types.rs",
-        "line": 393
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_target",
-        "file": "src/render/camera/types.rs",
-        "line": 402
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_target",
-        "file": "src/render/camera/types.rs",
-        "line": 410
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::clear_target",
-        "file": "src/render/camera/types.rs",
-        "line": 415
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_follow_smooth",
-        "file": "src/render/camera/types.rs",
-        "line": 425
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_follow_smooth",
-        "file": "src/render/camera/types.rs",
-        "line": 433
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::set_look_ahead",
-        "file": "src/render/camera/types.rs",
-        "line": 441
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::get_look_ahead",
-        "file": "src/render/camera/types.rs",
-        "line": 449
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::shake",
-        "file": "src/render/camera/types.rs",
-        "line": 460
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::update",
-        "file": "src/render/camera/types.rs",
-        "line": 474
-      },
-      {
-        "module": "render",
-        "name": "Camera2D::view_matrix",
-        "file": "src/render/camera/types.rs",
-        "line": 561
-      },
-      {
-        "module": "render",
-        "name": "Viewport::new",
-        "file": "src/render/camera/viewport.rs",
-        "line": 73
-      },
-      {
-        "module": "render",
-        "name": "Viewport::resize",
-        "file": "src/render/camera/viewport.rs",
-        "line": 90
-      },
-      {
-        "module": "render",
-        "name": "Viewport::get_scale",
-        "file": "src/render/camera/viewport.rs",
-        "line": 122
-      },
-      {
-        "module": "render",
-        "name": "Viewport::get_offset",
-        "file": "src/render/camera/viewport.rs",
-        "line": 130
-      },
-      {
-        "module": "render",
-        "name": "Viewport::get_game_dimensions",
-        "file": "src/render/camera/viewport.rs",
-        "line": 138
-      },
-      {
-        "module": "render",
-        "name": "Viewport::get_scale_mode",
-        "file": "src/render/camera/viewport.rs",
-        "line": 146
-      },
-      {
-        "module": "render",
-        "name": "Viewport::set_scale_mode",
-        "file": "src/render/camera/viewport.rs",
-        "line": 154
-      },
-      {
-        "module": "render",
-        "name": "Viewport::to_game",
-        "file": "src/render/camera/viewport.rs",
-        "line": 166
-      },
-      {
-        "module": "render",
-        "name": "Viewport::to_screen",
-        "file": "src/render/camera/viewport.rs",
-        "line": 181
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::new",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 65
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::resize",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 84
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::get_game_dimensions",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 118
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::get_scaled_dimensions",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 126
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::get_offset",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 134
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::get_scale",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 142
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::get_mode",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 150
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::to_game_coords",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 162
-      },
-      {
-        "module": "render",
-        "name": "ViewportScale::to_screen_coords",
-        "file": "src/render/camera/viewport_scale.rs",
-        "line": 177
-      },
-      {
-        "module": "render",
         "name": "Canvas::new",
         "file": "src/render/canvas.rs",
         "line": 34
@@ -9853,378 +10705,6 @@
       },
       {
         "module": "render",
-        "name": "AmbientState::compute_color_from_time",
-        "file": "src/render/effect/ambient.rs",
-        "line": 50
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::new",
-        "file": "src/render/effect/effect.rs",
-        "line": 52
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::new_custom",
-        "file": "src/render/effect/effect.rs",
-        "line": 74
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::set_parameter",
-        "file": "src/render/effect/effect.rs",
-        "line": 94
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::get_parameter",
-        "file": "src/render/effect/effect.rs",
-        "line": 112
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::has_parameter",
-        "file": "src/render/effect/effect.rs",
-        "line": 128
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::get_parameter_names",
-        "file": "src/render/effect/effect.rs",
-        "line": 140
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::get_type_name",
-        "file": "src/render/effect/effect.rs",
-        "line": 154
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::is_built_in",
-        "file": "src/render/effect/effect.rs",
-        "line": 167
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::new_disabled",
-        "file": "src/render/effect/effect.rs",
-        "line": 182
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::set_param",
-        "file": "src/render/effect/effect.rs",
-        "line": 193
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffect::get_param_or",
-        "file": "src/render/effect/effect.rs",
-        "line": 205
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffectType::from_name",
-        "file": "src/render/effect/effect_type.rs",
-        "line": 77
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffectType::name",
-        "file": "src/render/effect/effect_type.rs",
-        "line": 102
-      },
-      {
-        "module": "render",
-        "name": "PostFxEffectType::default_params",
-        "file": "src/render/effect/effect_type.rs",
-        "line": 135
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::new",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 46
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::add_effect",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 58
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::clear",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 138
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::effect_count",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 146
-      },
-      {
-        "module": "render",
-        "name": "Overlay::new",
-        "file": "src/render/effect/overlay.rs",
-        "line": 91
-      },
-      {
-        "module": "render",
-        "name": "Overlay::update",
-        "file": "src/render/effect/overlay.rs",
-        "line": 127
-      },
-      {
-        "module": "render",
-        "name": "Overlay::trigger_flash",
-        "file": "src/render/effect/overlay.rs",
-        "line": 267
-      },
-      {
-        "module": "render",
-        "name": "Overlay::trigger_shake",
-        "file": "src/render/effect/overlay.rs",
-        "line": 296
-      },
-      {
-        "module": "render",
-        "name": "Overlay::trigger_fade",
-        "file": "src/render/effect/overlay.rs",
-        "line": 326
-      },
-      {
-        "module": "render",
-        "name": "Overlay::trigger_lightning",
-        "file": "src/render/effect/overlay.rs",
-        "line": 342
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_shake_offset",
-        "file": "src/render/effect/overlay.rs",
-        "line": 351
-      },
-      {
-        "module": "render",
-        "name": "Overlay::is_active",
-        "file": "src/render/effect/overlay.rs",
-        "line": 365
-      },
-      {
-        "module": "render",
-        "name": "Overlay::clear",
-        "file": "src/render/effect/overlay.rs",
-        "line": 387
-      },
-      {
-        "module": "render",
-        "name": "Overlay::resize",
-        "file": "src/render/effect/overlay.rs",
-        "line": 412
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_width",
-        "file": "src/render/effect/overlay.rs",
-        "line": 423
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_height",
-        "file": "src/render/effect/overlay.rs",
-        "line": 433
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_dimensions",
-        "file": "src/render/effect/overlay.rs",
-        "line": 443
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_flash_alpha",
-        "file": "src/render/effect/overlay.rs",
-        "line": 455
-      },
-      {
-        "module": "render",
-        "name": "Overlay::get_lightning_alpha",
-        "file": "src/render/effect/overlay.rs",
-        "line": 471
-      },
-      {
-        "module": "render",
-        "name": "Overlay::build_render_commands",
-        "file": "src/render/effect/overlay.rs",
-        "line": 487
-      },
-      {
-        "module": "render",
-        "name": "Overlay::draw_flash_sequence_to_image",
-        "file": "src/render/effect/overlay.rs",
-        "line": 589
-      },
-      {
-        "module": "render",
-        "name": "Overlay::draw_shake_trail_to_image",
-        "file": "src/render/effect/overlay.rs",
-        "line": 637
-      },
-      {
-        "module": "render",
-        "name": "Overlay::draw_fade_transition_to_image",
-        "file": "src/render/effect/overlay.rs",
-        "line": 674
-      },
-      {
-        "module": "render",
-        "name": "Overlay::draw_trigger_panel_to_image",
-        "file": "src/render/effect/overlay.rs",
-        "line": 706
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::new",
-        "file": "src/render/effect/stack.rs",
-        "line": 58
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::add",
-        "file": "src/render/effect/stack.rs",
-        "line": 77
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::remove",
-        "file": "src/render/effect/stack.rs",
-        "line": 95
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::insert",
-        "file": "src/render/effect/stack.rs",
-        "line": 115
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::set_enabled",
-        "file": "src/render/effect/stack.rs",
-        "line": 126
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::is_enabled",
-        "file": "src/render/effect/stack.rs",
-        "line": 139
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::get_effect_count",
-        "file": "src/render/effect/stack.rs",
-        "line": 151
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::get_effect",
-        "file": "src/render/effect/stack.rs",
-        "line": 162
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::enabled_effects",
-        "file": "src/render/effect/stack.rs",
-        "line": 179
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::resize",
-        "file": "src/render/effect/stack.rs",
-        "line": 197
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::get_width",
-        "file": "src/render/effect/stack.rs",
-        "line": 208
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::get_height",
-        "file": "src/render/effect/stack.rs",
-        "line": 218
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::get_dimensions",
-        "file": "src/render/effect/stack.rs",
-        "line": 228
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::len",
-        "file": "src/render/effect/stack.rs",
-        "line": 236
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::is_empty",
-        "file": "src/render/effect/stack.rs",
-        "line": 244
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::clear",
-        "file": "src/render/effect/stack.rs",
-        "line": 249
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_info_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 267
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_stack_management_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 357
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_effect_catalog_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 395
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_effect_parameters_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 440
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_effect_types_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 521
-      },
-      {
-        "module": "render",
-        "name": "WeatherType::from_name",
-        "file": "src/render/effect/weather.rs",
-        "line": 52
-      },
-      {
-        "module": "render",
-        "name": "WeatherType::name",
-        "file": "src/render/effect/weather.rs",
-        "line": 70
-      },
-      {
-        "module": "render",
         "name": "Font::from_png_bytes",
         "file": "src/render/font.rs",
         "line": 112
@@ -10294,486 +10774,6 @@
         "name": "ShaderPassDescriptor::new",
         "file": "src/render/image_effect.rs",
         "line": 41
-      },
-      {
-        "module": "render",
-        "name": "Attenuation::new",
-        "file": "src/render/light/attenuation.rs",
-        "line": 33
-      },
-      {
-        "module": "render",
-        "name": "Attenuation::factor",
-        "file": "src/render/light/attenuation.rs",
-        "line": 48
-      },
-      {
-        "module": "render",
-        "name": "Attenuation::draw_attenuation_curves_to_image",
-        "file": "src/render/light/attenuation.rs",
-        "line": 67
-      },
-      {
-        "module": "render",
-        "name": "FlickerConfig::new",
-        "file": "src/render/light/flicker.rs",
-        "line": 35
-      },
-      {
-        "module": "render",
-        "name": "FlickerConfig::multiplier",
-        "file": "src/render/light/flicker.rs",
-        "line": 48
-      },
-      {
-        "module": "render",
-        "name": "FlickerConfig::advance",
-        "file": "src/render/light/flicker.rs",
-        "line": 60
-      },
-      {
-        "module": "render",
-        "name": "Light2D::new",
-        "file": "src/render/light/light2d.rs",
-        "line": 115
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_position",
-        "file": "src/render/light/light2d.rs",
-        "line": 149
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_position",
-        "file": "src/render/light/light2d.rs",
-        "line": 159
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_radius",
-        "file": "src/render/light/light2d.rs",
-        "line": 167
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_radius",
-        "file": "src/render/light/light2d.rs",
-        "line": 176
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_color",
-        "file": "src/render/light/light2d.rs",
-        "line": 184
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_color",
-        "file": "src/render/light/light2d.rs",
-        "line": 192
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_intensity",
-        "file": "src/render/light/light2d.rs",
-        "line": 200
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_intensity",
-        "file": "src/render/light/light2d.rs",
-        "line": 208
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_enabled",
-        "file": "src/render/light/light2d.rs",
-        "line": 216
-      },
-      {
-        "module": "render",
-        "name": "Light2D::is_enabled",
-        "file": "src/render/light/light2d.rs",
-        "line": 224
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_energy",
-        "file": "src/render/light/light2d.rs",
-        "line": 232
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_energy",
-        "file": "src/render/light/light2d.rs",
-        "line": 240
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_blend_mode",
-        "file": "src/render/light/light2d.rs",
-        "line": 248
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_blend_mode",
-        "file": "src/render/light/light2d.rs",
-        "line": 256
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_falloff",
-        "file": "src/render/light/light2d.rs",
-        "line": 264
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_falloff",
-        "file": "src/render/light/light2d.rs",
-        "line": 272
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_shadow_enabled",
-        "file": "src/render/light/light2d.rs",
-        "line": 280
-      },
-      {
-        "module": "render",
-        "name": "Light2D::is_shadow_enabled",
-        "file": "src/render/light/light2d.rs",
-        "line": 288
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_shadow_color",
-        "file": "src/render/light/light2d.rs",
-        "line": 296
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_shadow_color",
-        "file": "src/render/light/light2d.rs",
-        "line": 304
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_shadow_filter",
-        "file": "src/render/light/light2d.rs",
-        "line": 312
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_shadow_filter",
-        "file": "src/render/light/light2d.rs",
-        "line": 320
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_shadow_smooth",
-        "file": "src/render/light/light2d.rs",
-        "line": 328
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_shadow_smooth",
-        "file": "src/render/light/light2d.rs",
-        "line": 336
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_light_mask",
-        "file": "src/render/light/light2d.rs",
-        "line": 344
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_light_mask",
-        "file": "src/render/light/light2d.rs",
-        "line": 352
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_shadow_mask",
-        "file": "src/render/light/light2d.rs",
-        "line": 360
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_shadow_mask",
-        "file": "src/render/light/light2d.rs",
-        "line": 368
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_light_type",
-        "file": "src/render/light/light2d.rs",
-        "line": 376
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_light_type",
-        "file": "src/render/light/light2d.rs",
-        "line": 384
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_direction",
-        "file": "src/render/light/light2d.rs",
-        "line": 392
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_direction",
-        "file": "src/render/light/light2d.rs",
-        "line": 400
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_inner_angle",
-        "file": "src/render/light/light2d.rs",
-        "line": 408
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_inner_angle",
-        "file": "src/render/light/light2d.rs",
-        "line": 416
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_outer_angle",
-        "file": "src/render/light/light2d.rs",
-        "line": 424
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_outer_angle",
-        "file": "src/render/light/light2d.rs",
-        "line": 432
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_attenuation",
-        "file": "src/render/light/light2d.rs",
-        "line": 440
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_attenuation",
-        "file": "src/render/light/light2d.rs",
-        "line": 448
-      },
-      {
-        "module": "render",
-        "name": "Light2D::flicker_mut",
-        "file": "src/render/light/light2d.rs",
-        "line": 456
-      },
-      {
-        "module": "render",
-        "name": "Light2D::flicker",
-        "file": "src/render/light/light2d.rs",
-        "line": 464
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_group_id",
-        "file": "src/render/light/light2d.rs",
-        "line": 472
-      },
-      {
-        "module": "render",
-        "name": "Light2D::get_group_id",
-        "file": "src/render/light/light2d.rs",
-        "line": 480
-      },
-      {
-        "module": "render",
-        "name": "Light2D::set_volumetric",
-        "file": "src/render/light/light2d.rs",
-        "line": 488
-      },
-      {
-        "module": "render",
-        "name": "Light2D::is_volumetric",
-        "file": "src/render/light/light2d.rs",
-        "line": 496
-      },
-      {
-        "module": "render",
-        "name": "Light2D::draw_falloff_comparison_to_image",
-        "file": "src/render/light/light2d.rs",
-        "line": 679
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::new",
-        "file": "src/render/light/light_world.rs",
-        "line": 44
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::add_light",
-        "file": "src/render/light/light_world.rs",
-        "line": 62
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::add_occluder",
-        "file": "src/render/light/light_world.rs",
-        "line": 77
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::remove_light",
-        "file": "src/render/light/light_world.rs",
-        "line": 88
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::get_light",
-        "file": "src/render/light/light_world.rs",
-        "line": 110
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::get_light_mut",
-        "file": "src/render/light/light_world.rs",
-        "line": 121
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::get_occluder",
-        "file": "src/render/light/light_world.rs",
-        "line": 132
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::light_count",
-        "file": "src/render/light/light_world.rs",
-        "line": 151
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::occluder_count",
-        "file": "src/render/light/light_world.rs",
-        "line": 159
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::clear",
-        "file": "src/render/light/light_world.rs",
-        "line": 164
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::has_active_lights",
-        "file": "src/render/light/light_world.rs",
-        "line": 174
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::set_group_enabled",
-        "file": "src/render/light/light_world.rs",
-        "line": 183
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::set_group_intensity",
-        "file": "src/render/light/light_world.rs",
-        "line": 196
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::set_group_color",
-        "file": "src/render/light/light_world.rs",
-        "line": 209
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::group_count",
-        "file": "src/render/light/light_world.rs",
-        "line": 224
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::advance_flickers",
-        "file": "src/render/light/light_world.rs",
-        "line": 235
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::draw_to_image",
-        "file": "src/render/light/light_world.rs",
-        "line": 253
-      },
-      {
-        "module": "render",
-        "name": "Occluder::new",
-        "file": "src/render/light/occluder.rs",
-        "line": 43
-      },
-      {
-        "module": "render",
-        "name": "Occluder::set_vertices",
-        "file": "src/render/light/occluder.rs",
-        "line": 65
-      },
-      {
-        "module": "render",
-        "name": "Occluder::get_vertices",
-        "file": "src/render/light/occluder.rs",
-        "line": 98
-      },
-      {
-        "module": "render",
-        "name": "Occluder::set_position",
-        "file": "src/render/light/occluder.rs",
-        "line": 106
-      },
-      {
-        "module": "render",
-        "name": "Occluder::get_position",
-        "file": "src/render/light/occluder.rs",
-        "line": 114
-      },
-      {
-        "module": "render",
-        "name": "Occluder::set_opacity",
-        "file": "src/render/light/occluder.rs",
-        "line": 122
-      },
-      {
-        "module": "render",
-        "name": "Occluder::get_opacity",
-        "file": "src/render/light/occluder.rs",
-        "line": 130
-      },
-      {
-        "module": "render",
-        "name": "Occluder::set_light_mask",
-        "file": "src/render/light/occluder.rs",
-        "line": 138
-      },
-      {
-        "module": "render",
-        "name": "Occluder::get_light_mask",
-        "file": "src/render/light/occluder.rs",
-        "line": 146
-      },
-      {
-        "module": "render",
-        "name": "Occluder::set_enabled",
-        "file": "src/render/light/occluder.rs",
-        "line": 154
-      },
-      {
-        "module": "render",
-        "name": "Occluder::is_enabled",
-        "file": "src/render/light/occluder.rs",
-        "line": 162
       },
       {
         "module": "render",
@@ -13119,37 +13119,37 @@
         "module": "tilemap",
         "name": "TileMap::apply_autotile",
         "file": "src/tilemap/tilemap.rs",
-        "line": 689
+        "line": 691
       },
       {
         "module": "tilemap",
         "name": "TileMap::apply_autotile_8",
         "file": "src/tilemap/tilemap.rs",
-        "line": 752
+        "line": 754
       },
       {
         "module": "tilemap",
         "name": "TileMap::draw_to_image",
         "file": "src/tilemap/tilemap.rs",
-        "line": 906
+        "line": 907
       },
       {
         "module": "tilemap",
         "name": "TileMap::build_render_commands",
         "file": "src/tilemap/tilemap.rs",
-        "line": 975
+        "line": 976
       },
       {
         "module": "tilemap",
         "name": "TileMap::draw_with_highlight_to_image",
         "file": "src/tilemap/tilemap.rs",
-        "line": 1067
+        "line": 1068
       },
       {
         "module": "tilemap",
         "name": "TileMap::draw_layers_to_image",
         "file": "src/tilemap/tilemap.rs",
-        "line": 1116
+        "line": 1131
       },
       {
         "module": "tilemap",
@@ -15218,6 +15218,60 @@
         "line": 1179
       },
       {
+        "module": "effect",
+        "name": "ImageEffect::add_effect_rc",
+        "file": "src/effect/image_effect.rs",
+        "line": 71
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::get_effect_by_index",
+        "file": "src/effect/image_effect.rs",
+        "line": 82
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::get_effect_by_name",
+        "file": "src/effect/image_effect.rs",
+        "line": 93
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::remove_by_index",
+        "file": "src/effect/image_effect.rs",
+        "line": 107
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::remove_by_name",
+        "file": "src/effect/image_effect.rs",
+        "line": 123
+      },
+      {
+        "module": "effect",
+        "name": "ImageEffect::to_passes",
+        "file": "src/effect/image_effect.rs",
+        "line": 157
+      },
+      {
+        "module": "effect",
+        "name": "Overlay::draw_state_to_image",
+        "file": "src/effect/overlay.rs",
+        "line": 539
+      },
+      {
+        "module": "effect",
+        "name": "ShakeState::next_random",
+        "file": "src/effect/screen_effects.rs",
+        "line": 97
+      },
+      {
+        "module": "effect",
+        "name": "PostFxStack::draw_effect_type_bars_to_image",
+        "file": "src/effect/stack.rs",
+        "line": 482
+      },
+      {
         "module": "event",
         "name": "EventArg::from_lua_val",
         "file": "src/event/event_queue.rs",
@@ -15557,7 +15611,31 @@
         "module": "root",
         "name": "lurek_run",
         "file": "src/lib.rs",
-        "line": 182
+        "line": 188
+      },
+      {
+        "module": "light",
+        "name": "Light2D::apply_lua_opts",
+        "file": "src/light/light2d.rs",
+        "line": 583
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::remove_occluder",
+        "file": "src/light/light_world.rs",
+        "line": 99
+      },
+      {
+        "module": "light",
+        "name": "LightWorld::get_occluder_mut",
+        "file": "src/light/light_world.rs",
+        "line": 143
+      },
+      {
+        "module": "light",
+        "name": "Occluder::from_flat_coords",
+        "file": "src/light/occluder.rs",
+        "line": 83
       },
       {
         "module": "log",
@@ -16449,60 +16527,6 @@
       },
       {
         "module": "render",
-        "name": "ImageEffect::add_effect_rc",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 71
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::get_effect_by_index",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 82
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::get_effect_by_name",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 93
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::remove_by_index",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 107
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::remove_by_name",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 123
-      },
-      {
-        "module": "render",
-        "name": "ImageEffect::to_passes",
-        "file": "src/render/effect/image_effect.rs",
-        "line": 157
-      },
-      {
-        "module": "render",
-        "name": "Overlay::draw_state_to_image",
-        "file": "src/render/effect/overlay.rs",
-        "line": 539
-      },
-      {
-        "module": "render",
-        "name": "ShakeState::next_random",
-        "file": "src/render/effect/screen_effects.rs",
-        "line": 97
-      },
-      {
-        "module": "render",
-        "name": "PostFxStack::draw_effect_type_bars_to_image",
-        "file": "src/render/effect/stack.rs",
-        "line": 482
-      },
-      {
-        "module": "render",
         "name": "Font::load_all_sizes",
         "file": "src/render/font.rs",
         "line": 137
@@ -16560,30 +16584,6 @@
         "name": "GpuRenderer::render_frame",
         "file": "src/render/gpu_renderer.rs",
         "line": 892
-      },
-      {
-        "module": "render",
-        "name": "Light2D::apply_lua_opts",
-        "file": "src/render/light/light2d.rs",
-        "line": 583
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::remove_occluder",
-        "file": "src/render/light/light_world.rs",
-        "line": 99
-      },
-      {
-        "module": "render",
-        "name": "LightWorld::get_occluder_mut",
-        "file": "src/render/light/light_world.rs",
-        "line": 143
-      },
-      {
-        "module": "render",
-        "name": "Occluder::from_flat_coords",
-        "file": "src/render/light/occluder.rs",
-        "line": 83
       },
       {
         "module": "render",
@@ -17177,13 +17177,13 @@
         "module": "tilemap",
         "name": "TileMap::apply_autotile_at",
         "file": "src/tilemap/tilemap.rs",
-        "line": 718
+        "line": 720
       },
       {
         "module": "tilemap",
         "name": "TileMap::apply_autotile_8_at",
         "file": "src/tilemap/tilemap.rs",
-        "line": 781
+        "line": 783
       },
       {
         "module": "tilemap",

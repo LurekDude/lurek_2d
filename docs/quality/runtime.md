@@ -1,6 +1,6 @@
 # Module Quality Report: `runtime`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 41 ✅ / 3 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 41 ✅ / 4 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,13 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture
 - [ ] **T-01** — Rust test file: No test file found for module 'runtime'
 - [ ] **W-01** — Example file exists: content/examples/runtime.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
 
+- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **SP-05** — Key Types accuracy: Types not in spec: Config, EngineError, ErrorCategory, ErrorInfo, FullscreenType
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 18 pub methods, 0 Rust tests — create test file
@@ -37,8 +37,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\runtime\AGENT.md |
-| **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 462 chars |
+| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 505 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/runtime.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
@@ -49,7 +49,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/runtime.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1890 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
 | **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: Config, EngineError, ErrorCategory, ErrorInfo, FullscreenType |

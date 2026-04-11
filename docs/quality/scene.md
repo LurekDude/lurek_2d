@@ -48,7 +48,7 @@
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/scene.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
 | **SP-03** Summary quality | ✅ PASS | Summary is 1910 chars |
-| **SP-04** Lua API completeness | ✅ PASS | All 27 bound functions in spec |
+| **SP-04** Lua API completeness | ✅ PASS | All 29 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 5 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
@@ -104,7 +104,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **W-01** Example file exists | ✅ PASS | content/examples/scene.lua present |
-| **W-02** API surface coverage | ✅ PASS | All 27 bound functions in example |
+| **W-02** API surface coverage | ✅ PASS | All 29 bound functions in example |
 | **W-03** Example comments | 🔵 MANUAL | Verify content/examples/scene.lua has realistic one-line comments per call |
 | **W-04** Example–spec sync | ✅ PASS | Missing spec or example — other checks cover this |
 | **W-05** Wiki page | ✅ PASS | docs\wiki\Scene-API.md |

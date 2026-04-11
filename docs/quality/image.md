@@ -1,6 +1,6 @@
 # Module Quality Report: `image`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 41 ✅ / 3 ⚠️ / 4 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 42 ✅ / 3 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,15 +8,14 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-04** — Content sync: Files not in Source Files table: visualization.rs
 - [ ] **SP-04** — Lua API completeness: Missing from spec: savePNG — add to ## Lua API in docs/specs/image.md
-- [ ] **R-02** — Dependency direction: compressed: Tier1 imports runtime(unassigned); image_data: Tier1 imports runtime(unassigned); visualization: Tier1 imports animation(tier1); visualization: Tier1 imports render(unassigned)
+- [ ] **R-02** — Dependency direction: compressed: Tier1 imports runtime(unassigned); image_data: Tier1 imports runtime(unassigned); visualization: Tier1 imports animation(tier1); visualization: Tier1 imports camera(tier1); visualization: Tier1 imports animation(tier1)
 - [ ] **W-02** — API surface coverage: Functions absent from content/examples/image.lua: savePNG
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: mod.rs, visualization.rs
 - [ ] **B-04** — No business logic in closures: '<closure@275>' (34 LOC, line 275) — extract body to src/image/ | '<closure@385>' has if/match/for — extract to src/image/
+- [ ] **Q-04** — Error handling: .unwrap() calls: serial:401, serial:408, serial:410, serial:413
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -39,10 +38,10 @@
 | **A-01** AGENT.md exists | ✅ PASS | src\image\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 575 chars |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: visualization.rs |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/image.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: mod.rs, visualization.rs |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -85,7 +84,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier1 |
-| **R-02** Dependency direction | ❌ ERROR | compressed: Tier1 imports runtime(unassigned); image_data: Tier1 imports runtime(unassigned); visualization: Tier1 imports animation(tier1); visualization: Tier1 imports render(unassigned) |
+| **R-02** Dependency direction | ❌ ERROR | compressed: Tier1 imports runtime(unassigned); image_data: Tier1 imports runtime(unassigned); visualization: Tier1 imports animation(tier1); visualization: Tier1 imports camera(tier1); visualization: Tier1 imports animation(tier1) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -120,7 +119,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: serial:401, serial:408, serial:410, serial:413 |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

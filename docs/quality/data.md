@@ -13,7 +13,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **B-04** — No business logic in closures: '<closure@291>' (16 LOC, line 291) — extract body to src/data/
-- [ ] **Q-04** — Error handling: .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more)
+- [ ] **Q-04** — Error handling: .unwrap() calls: bin_pack:600, bin_pack:607, bin_pack:609, encode:87, encode:94 (+6 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -117,7 +117,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: encode:87, encode:94, encode:108, encode:116, hash:92 (+1 more) |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: bin_pack:600, bin_pack:607, bin_pack:609, encode:87, encode:94 (+6 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

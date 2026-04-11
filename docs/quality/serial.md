@@ -1,6 +1,6 @@
 # Module Quality Report: `serial`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 3 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -13,6 +13,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_lua_serial_fromjson_basic, test_lua_serial_tojson_basic, test_lua_serial_fromtoml_basic, test_lua_serial_totoml_basic, test_lua_serial_fromjson_error
+- [ ] **Q-04** — Error handling: .unwrap() calls: csv:162, csv:181, json:98, json:99, json:111 (+6 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -116,7 +117,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: csv:162, csv:181, json:98, json:99, json:111 (+6 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

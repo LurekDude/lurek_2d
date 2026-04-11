@@ -25,7 +25,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (audio_api) |
-| **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (16 logic lines) |
+| **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (23 logic lines) |
 | **S-03** File size limits | ✅ PASS | All files within size limits |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |

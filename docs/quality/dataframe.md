@@ -1,6 +1,6 @@
 # Module Quality Report: `dataframe`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 44 ✅ / 2 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 43 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -14,6 +14,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **B-04** — No business logic in closures: '<closure@801>' (21 LOC, line 801) — extract body to src/dataframe/ | '<closure@868>' has if/match/for — extract to src/dataframe/
+- [ ] **Q-04** — Error handling: .unwrap() calls: serial:861, serial:870, sql:1086, sql:1087, sql:1094 (+1 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -117,7 +118,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ✅ PASS | No bare .unwrap() calls |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: serial:861, serial:870, sql:1086, sql:1087, sql:1094 (+1 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

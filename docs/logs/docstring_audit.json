@@ -1,6 +1,1341 @@
 {
-  "total_violations": 0,
-  "by_type": {},
-  "files_with_violations": 0,
-  "violations": []
+  "total_violations": 133,
+  "by_type": {
+    "missing_return": 2,
+    "missing_param": 122,
+    "missing_description": 9
+  },
+  "files_with_violations": 6,
+  "violations": [
+    {
+      "file": "src/lua_api/debugbridge_api.rs",
+      "line": 116,
+      "module": "debugbridge",
+      "owner": "",
+      "name": "poll",
+      "kind": "function",
+      "violation": "missing_return",
+      "detail": "Rust return: ?"
+    },
+    {
+      "file": "src/lua_api/devtools_api.rs",
+      "line": 256,
+      "module": "devtools",
+      "owner": "",
+      "name": "profilePop",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params:  : string?"
+    },
+    {
+      "file": "src/lua_api/effect_api.rs",
+      "line": 1267,
+      "module": "effect",
+      "owner": "",
+      "name": "newImageEffect",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: args : LuaMultiValue"
+    },
+    {
+      "file": "src/lua_api/render_api.rs",
+      "line": 1580,
+      "module": "render",
+      "owner": "",
+      "name": "draw",
+      "kind": "function",
+      "violation": "missing_return",
+      "detail": "Rust return: ?"
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 42,
+      "module": "thread",
+      "owner": "ThreadHandle",
+      "name": "start",
+      "kind": "method",
+      "violation": "missing_param",
+      "detail": "Rust params: args : LuaMultiValue"
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 139,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "type",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 141,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "typeOf",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 141,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "typeOf",
+      "kind": "method",
+      "violation": "missing_param",
+      "detail": "Rust params: name : string"
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 146,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "push",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 146,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "push",
+      "kind": "method",
+      "violation": "missing_param",
+      "detail": "Rust params: value : any"
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 153,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "pop",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 159,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "peek",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 165,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "demand",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 165,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "demand",
+      "kind": "method",
+      "violation": "missing_param",
+      "detail": "Rust params: timeout : number?"
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 173,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "getCount",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 176,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "clear",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 182,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "supply",
+      "kind": "method",
+      "violation": "missing_description",
+      "detail": ""
+    },
+    {
+      "file": "src/lua_api/thread_api.rs",
+      "line": 182,
+      "module": "thread",
+      "owner": "Channel",
+      "name": "supply",
+      "kind": "method",
+      "violation": "missing_param",
+      "detail": "Rust params: value : any"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 731,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 768,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 804,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 831,
+      "module": "ui",
+      "owner": "",
+      "name": "setPlaceholder",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 857,
+      "module": "ui",
+      "owner": "",
+      "name": "setMaxLength",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: n : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 906,
+      "module": "ui",
+      "owner": "",
+      "name": "setChecked",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: checked : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 932,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 968,
+      "module": "ui",
+      "owner": "",
+      "name": "setValue",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 994,
+      "module": "ui",
+      "owner": "",
+      "name": "setRange",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: min : number, max : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1009,
+      "module": "ui",
+      "owner": "",
+      "name": "setStep",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: step : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1058,
+      "module": "ui",
+      "owner": "",
+      "name": "setValue",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1097,
+      "module": "ui",
+      "owner": "",
+      "name": "setRange",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: min : number, max : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1148,
+      "module": "ui",
+      "owner": "",
+      "name": "addItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1161,
+      "module": "ui",
+      "owner": "",
+      "name": "removeItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1203,
+      "module": "ui",
+      "owner": "",
+      "name": "getItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1222,
+      "module": "ui",
+      "owner": "",
+      "name": "setSelectedIndex",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1273,
+      "module": "ui",
+      "owner": "",
+      "name": "addItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1286,
+      "module": "ui",
+      "owner": "",
+      "name": "removeItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1327,
+      "module": "ui",
+      "owner": "",
+      "name": "getItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1346,
+      "module": "ui",
+      "owner": "",
+      "name": "setSelectedIndex",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1374,
+      "module": "ui",
+      "owner": "",
+      "name": "setItemHeight",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: h : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1397,
+      "module": "ui",
+      "owner": "",
+      "name": "addTab",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: label : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1410,
+      "module": "ui",
+      "owner": "",
+      "name": "removeTab",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1426,
+      "module": "ui",
+      "owner": "",
+      "name": "getTab",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1458,
+      "module": "ui",
+      "owner": "",
+      "name": "setActiveTab",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1496,
+      "module": "ui",
+      "owner": "",
+      "name": "setTitle",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: title : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1522,
+      "module": "ui",
+      "owner": "",
+      "name": "setScrollable",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: scrollable : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1545,
+      "module": "ui",
+      "owner": "",
+      "name": "setDirection",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: dir : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1573,
+      "module": "ui",
+      "owner": "",
+      "name": "setSpacing",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: spacing : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1599,
+      "module": "ui",
+      "owner": "",
+      "name": "setColumns",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: n : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1612,
+      "module": "ui",
+      "owner": "",
+      "name": "setWrap",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: wrap : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1638,
+      "module": "ui",
+      "owner": "",
+      "name": "setAlign",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: align : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1664,
+      "module": "ui",
+      "owner": "",
+      "name": "setJustify",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: justify : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1700,
+      "module": "ui",
+      "owner": "",
+      "name": "setContentSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: w : number, h : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1728,
+      "module": "ui",
+      "owner": "",
+      "name": "setScrollPosition",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: x : number, y : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1769,
+      "module": "ui",
+      "owner": "",
+      "name": "setScrollSpeed",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: speed : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1805,
+      "module": "ui",
+      "owner": "",
+      "name": "setInsets",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: left : integer, top : integer, right : integer, bottom : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1836,
+      "module": "ui",
+      "owner": "",
+      "name": "setImageDimensions",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: w : integer, h : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1902,
+      "module": "ui",
+      "owner": "",
+      "name": "setMessage",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: msg : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1928,
+      "module": "ui",
+      "owner": "",
+      "name": "setDuration",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: d : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 1990,
+      "module": "ui",
+      "owner": "",
+      "name": "setVertical",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2016,
+      "module": "ui",
+      "owner": "",
+      "name": "setThickness",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: thickness : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2052,
+      "module": "ui",
+      "owner": "",
+      "name": "addNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string, parent_index : integer?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2067,
+      "module": "ui",
+      "owner": "",
+      "name": "toggleNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2083,
+      "module": "ui",
+      "owner": "",
+      "name": "isExpanded",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2111,
+      "module": "ui",
+      "owner": "",
+      "name": "removeNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2138,
+      "module": "ui",
+      "owner": "",
+      "name": "getNodeText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2155,
+      "module": "ui",
+      "owner": "",
+      "name": "setNodeText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer, text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2171,
+      "module": "ui",
+      "owner": "",
+      "name": "setNodeIcon",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer, icon : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2187,
+      "module": "ui",
+      "owner": "",
+      "name": "expandNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2201,
+      "module": "ui",
+      "owner": "",
+      "name": "collapseNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2215,
+      "module": "ui",
+      "owner": "",
+      "name": "isNodeExpanded",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2255,
+      "module": "ui",
+      "owner": "",
+      "name": "setSelectedNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2285,
+      "module": "ui",
+      "owner": "",
+      "name": "getChildNodes",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2303,
+      "module": "ui",
+      "owner": "",
+      "name": "getParentNode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2321,
+      "module": "ui",
+      "owner": "",
+      "name": "getNodeDepth",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: index : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2359,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2385,
+      "module": "ui",
+      "owner": "",
+      "name": "setSelected",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2411,
+      "module": "ui",
+      "owner": "",
+      "name": "setGroup",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: group : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2460,
+      "module": "ui",
+      "owner": "",
+      "name": "setScrollPosition",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2486,
+      "module": "ui",
+      "owner": "",
+      "name": "setContentSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2512,
+      "module": "ui",
+      "owner": "",
+      "name": "setViewSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2574,
+      "module": "ui",
+      "owner": "",
+      "name": "setTitle",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: title : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2600,
+      "module": "ui",
+      "owner": "",
+      "name": "setCloseable",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2626,
+      "module": "ui",
+      "owner": "",
+      "name": "setDraggable",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2652,
+      "module": "ui",
+      "owner": "",
+      "name": "setResizable",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2700,
+      "module": "ui",
+      "owner": "",
+      "name": "setOrientation",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2726,
+      "module": "ui",
+      "owner": "",
+      "name": "setSplitPosition",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2752,
+      "module": "ui",
+      "owner": "",
+      "name": "setMinPanelSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2765,
+      "module": "ui",
+      "owner": "",
+      "name": "setFirstChild",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: child_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2778,
+      "module": "ui",
+      "owner": "",
+      "name": "setSecondChild",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: child_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2827,
+      "module": "ui",
+      "owner": "",
+      "name": "dock",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: child_idx : integer, side : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2840,
+      "module": "ui",
+      "owner": "",
+      "name": "undock",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: child_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2866,
+      "module": "ui",
+      "owner": "",
+      "name": "setSplitSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: side : string, size : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2883,
+      "module": "ui",
+      "owner": "",
+      "name": "getSplitSize",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: side : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2923,
+      "module": "ui",
+      "owner": "",
+      "name": "setOrientation",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2936,
+      "module": "ui",
+      "owner": "",
+      "name": "addButton",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: id : string, tooltip : string?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2971,
+      "module": "ui",
+      "owner": "",
+      "name": "getButton",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: id : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 2991,
+      "module": "ui",
+      "owner": "",
+      "name": "setButtonEnabled",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: id : string, enabled : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3004,
+      "module": "ui",
+      "owner": "",
+      "name": "setButtonToggled",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: id : string, toggled : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3017,
+      "module": "ui",
+      "owner": "",
+      "name": "isButtonToggled",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: id : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3040,
+      "module": "ui",
+      "owner": "",
+      "name": "addMenu",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: menu_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3055,
+      "module": "ui",
+      "owner": "",
+      "name": "removeMenu",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: menu_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3120,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3146,
+      "module": "ui",
+      "owner": "",
+      "name": "setShortcut",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: shortcut : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3172,
+      "module": "ui",
+      "owner": "",
+      "name": "setChecked",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3185,
+      "module": "ui",
+      "owner": "",
+      "name": "addSubItem",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: child_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3249,
+      "module": "ui",
+      "owner": "",
+      "name": "setTitle",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: title : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3275,
+      "module": "ui",
+      "owner": "",
+      "name": "setModal",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3343,
+      "module": "ui",
+      "owner": "",
+      "name": "setContent",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: content_idx : integer?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3369,
+      "module": "ui",
+      "owner": "",
+      "name": "addButton",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string, cb : function?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3394,
+      "module": "ui",
+      "owner": "",
+      "name": "addSection",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string, width : number?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3407,
+      "module": "ui",
+      "owner": "",
+      "name": "setSectionText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer, text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3422,
+      "module": "ui",
+      "owner": "",
+      "name": "getSectionText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3454,
+      "module": "ui",
+      "owner": "",
+      "name": "setSectionCount",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: count : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3473,
+      "module": "ui",
+      "owner": "",
+      "name": "setSectionWidget",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer, widget : any"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3493,
+      "module": "ui",
+      "owner": "",
+      "name": "addSection",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: title : string, content_idx : integer?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3523,
+      "module": "ui",
+      "owner": "",
+      "name": "toggleSection",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3545,
+      "module": "ui",
+      "owner": "",
+      "name": "isSectionExpanded",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3575,
+      "module": "ui",
+      "owner": "",
+      "name": "setExclusive",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3588,
+      "module": "ui",
+      "owner": "",
+      "name": "getSectionTitle",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: section_idx : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3630,
+      "module": "ui",
+      "owner": "",
+      "name": "setText",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3656,
+      "module": "ui",
+      "owner": "",
+      "name": "setDelay",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : number"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3682,
+      "module": "ui",
+      "owner": "",
+      "name": "setTarget",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: target : integer?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3719,
+      "module": "ui",
+      "owner": "",
+      "name": "setColor",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: r : number, green : number, b : number, a : number?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3748,
+      "module": "ui",
+      "owner": "",
+      "name": "setShowAlpha",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3774,
+      "module": "ui",
+      "owner": "",
+      "name": "setColorMode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: mode : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3810,
+      "module": "ui",
+      "owner": "",
+      "name": "addColumn",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: header : string, width : number?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3839,
+      "module": "ui",
+      "owner": "",
+      "name": "addRow",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: cells : table"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3865,
+      "module": "ui",
+      "owner": "",
+      "name": "getCell",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: row : integer, col : integer"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3888,
+      "module": "ui",
+      "owner": "",
+      "name": "setCell",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: row : integer, col : integer, text : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3916,
+      "module": "ui",
+      "owner": "",
+      "name": "setSelectedRow",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: row : integer?"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3942,
+      "module": "ui",
+      "owner": "",
+      "name": "setSortable",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: v : boolean"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 3990,
+      "module": "ui",
+      "owner": "",
+      "name": "setScaleMode",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: mode : string"
+    },
+    {
+      "file": "src/lua_api/ui_api.rs",
+      "line": 4016,
+      "module": "ui",
+      "owner": "",
+      "name": "setTint",
+      "kind": "function",
+      "violation": "missing_param",
+      "detail": "Rust params: r : number, green : number, b : number, a : number?"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 # Module Quality Report: `camera`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-09  |  **Score**: 47 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-11  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -9,6 +9,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **T-05** — Test adequacy: 15 tests / 53 pub methods (28%) — low coverage
+- [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
 
@@ -29,7 +30,7 @@
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\camera\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 412 chars |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 410 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/camera.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: tier1) |
@@ -41,7 +42,7 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/camera.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1885 chars |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1895 chars |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | 5 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -130,7 +131,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/engine/config.rs |
+| **I-03** Config integration | ⚠️ WARNING | Module not in src/engine/config.rs — add to ModulesConfig if toggleable |
 
 ### Phase 12 — Localization & Logging
 

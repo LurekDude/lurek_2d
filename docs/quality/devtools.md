@@ -9,7 +9,7 @@
 ### 🟡 Warnings — Should Fix
 
 - [ ] **D-07** — @param/@return annotations: Missing @param/@return before: p50, p95, p99, samples
-- [ ] **B-04** — No business logic in closures: '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ | '<closure@481>' (19 LOC, line 481) — extract body to src/devtools/ | '<closure@595>' (20 LOC, line 595) — extract body to src/devtools/ | '<closure@623>' (56 LOC, line 623) — extract body to src/devtools/ | '<closure@125>' has if/match/for — extract to src/devtools/ | '<closure@289>' has if/match/for — extract to src/devtools/
+- [ ] **B-04** — No business logic in closures: '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ | '<closure@481>' (23 LOC, line 481) — extract body to src/devtools/ | '<closure@601>' (20 LOC, line 601) — extract body to src/devtools/ | '<closure@629>' (56 LOC, line 629) — extract body to src/devtools/ | '<closure@125>' has if/match/for — extract to src/devtools/ | '<closure@289>' has if/match/for — extract to src/devtools/
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -69,7 +69,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/devtools_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ \| '<closure@481>' (19 LOC, line 481) — extract body to src/devtools/ \| '<closure@595>' (20 LOC, line 595) — extract body to src/devtools/ \| '<closure@623>' (56 LOC, line 623) — extract body to src/devtools/ \| '<closure@125>' has if/match/for — extract to src/devtools/ \| '<closure@289>' has if/match/for — extract to src/devtools/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@188>' (18 LOC, line 188) — extract body to src/devtools/ \| '<closure@481>' (23 LOC, line 481) — extract body to src/devtools/ \| '<closure@601>' (20 LOC, line 601) — extract body to src/devtools/ \| '<closure@629>' (56 LOC, line 629) — extract body to src/devtools/ \| '<closure@125>' has if/match/for — extract to src/devtools/ \| '<closure@289>' has if/match/for — extract to src/devtools/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 

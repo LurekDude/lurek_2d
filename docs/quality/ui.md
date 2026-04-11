@@ -1,6 +1,6 @@
 # Module Quality Report: `ui`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 35 ✅ / 8 ⚠️ / 5 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 36 ✅ / 8 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -8,7 +8,6 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-04** — Content sync: Files not in Source Files table: chart.rs
 - [ ] **T-01** — Rust test file: No test file found for module 'ui'
 - [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_ui.lua
 - [ ] **W-01** — Example file exists: content/examples/ui.lua not found — create it
@@ -16,8 +15,8 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: chart.rs
-- [ ] **SP-05** — Key Types accuracy: Types not in spec: AreaChart, AreaLayer, BarCategory, BarChart, ChartConfig
+- [ ] **SP-03** — Summary quality: Summary very long (2393 chars)
+- [ ] **SP-05** — Key Types accuracy: Types not in spec: AreaChart, AreaLayer, BarCategory, BarChart, ChartSeries
 - [ ] **B-04** — No business logic in closures: '<closure@1865>' (23 LOC, line 1865) — extract body to src/ui/ | '<closure@3525>' (16 LOC, line 3525) — extract body to src/ui/ | '<closure@3867>' (17 LOC, line 3867) — extract body to src/ui/ | '<closure@5008>' (33 LOC, line 5008) — extract body to src/ui/ | '<closure@58>' has if/match/for — extract to src/ui/ | '<closure@76>' has if/match/for — extract to src/ui/
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 188 pub methods, 0 Rust tests — create test file
@@ -45,10 +44,10 @@
 | **A-01** AGENT.md exists | ✅ PASS | src\ui\AGENT.md |
 | **A-02** Template structure | ✅ PASS | All sections present |
 | **A-03** Purpose quality | ✅ PASS | Purpose section is 236 chars |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: chart.rs |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/ui.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: chart.rs |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
@@ -56,9 +55,9 @@
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/ui.md exists |
 | **SP-02** Required spec sections | ✅ PASS | All required sections present |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1952 chars |
+| **SP-03** Summary quality | ⚠️ WARNING | Summary very long (2393 chars) |
 | **SP-04** Lua API completeness | ✅ PASS | All 52 bound functions in spec |
-| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AreaChart, AreaLayer, BarCategory, BarChart, ChartConfig |
+| **SP-05** Key Types accuracy | ⚠️ WARNING | Types not in spec: AreaChart, AreaLayer, BarCategory, BarChart, ChartSeries |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings

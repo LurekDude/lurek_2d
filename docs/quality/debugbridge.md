@@ -1,6 +1,6 @@
 # Module Quality Report: `debugbridge`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-11  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -8,8 +8,7 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **D-03** — Structured doc sections: Missing structured sections: bridge::PendingRequest (# Fields), bridge::PendingResponse (# Fields), bridge::PrintEntry (# Fields), bridge::BridgeShared (# Fields)
-- [ ] **B-04** — No business logic in closures: '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ | '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ | '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ | '<closure@75>' has if/match/for — extract to src/debugbridge/ | '<closure@369>' has if/match/for — extract to src/debugbridge/
+- [ ] **B-04** — No business logic in closures: '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ | '<closure@118>' (169 LOC, line 118) — extract body to src/debugbridge/ | '<closure@317>' (22 LOC, line 317) — extract body to src/debugbridge/ | '<closure@75>' has if/match/for — extract to src/debugbridge/ | '<closure@375>' has if/match/for — extract to src/debugbridge/
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -54,7 +53,7 @@
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
 | **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
-| **D-03** Structured doc sections | ⚠️ WARNING | Missing structured sections: bridge::PendingRequest (# Fields), bridge::PendingResponse (# Fields), bridge::PrintEntry (# Fields), bridge::BridgeShared (# Fields) |
+| **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
 | **D-04** Doc quality | ✅ PASS | No stub docs found |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | //! doc comment present |
@@ -69,7 +68,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/debugbridge_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ \| '<closure@118>' (163 LOC, line 118) — extract body to src/debugbridge/ \| '<closure@311>' (22 LOC, line 311) — extract body to src/debugbridge/ \| '<closure@75>' has if/match/for — extract to src/debugbridge/ \| '<closure@369>' has if/match/for — extract to src/debugbridge/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@43>' (25 LOC, line 43) — extract body to src/debugbridge/ \| '<closure@118>' (169 LOC, line 118) — extract body to src/debugbridge/ \| '<closure@317>' (22 LOC, line 317) — extract body to src/debugbridge/ \| '<closure@75>' has if/match/for — extract to src/debugbridge/ \| '<closure@375>' has if/match/for — extract to src/debugbridge/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 

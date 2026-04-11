@@ -20,7 +20,7 @@ argument-hint: "genre, count, features, library modules, resolution, complexity"
 - `conf.toml` resolution variants and module flag conventions
 - `main.lua` canonical section order and mandatory invariants
 - `README.md` 5-section template and accuracy rules
-- `screen.png` generation via `tools/screenshots/gen_demo_screenshots.py`
+- `screen.png` generation via `tools/demos/gen_demo_screenshots.py`
 - `content/demos/README.md` table entry and detail block registration
 - `content/library/` module integration patterns (`dialog`, `item`, `inventory`)
 - Genre-to-API mapping guidance
@@ -221,20 +221,20 @@ After writing all Lua files, generate `screen.png` with the screenshot tool:
 
 ```powershell
 # Single demo
-python tools/screenshots/gen_demo_screenshots.py --demo <name> --overwrite --frames 3
+python tools/demos/gen_demo_screenshots.py --demo <name> --overwrite --frames 3
 
 # Multiple demos at once
-python tools/screenshots/gen_demo_screenshots.py --demo <name1> --demo <name2> --overwrite --frames 3
+python tools/demos/gen_demo_screenshots.py --demo <name1> --demo <name2> --overwrite --frames 3
 
 # All demos missing a screen.png
-python tools/screenshots/gen_demo_screenshots.py --frames 3
+python tools/demos/gen_demo_screenshots.py --frames 3
 ```
 
 Requirements: the release binary must exist (`cargo build --release` or use `--rebuild` flag).
 
 If the binary is fresh:
 ```powershell
-python tools/screenshots/gen_demo_screenshots.py --demo <name> --overwrite --frames 3 --rebuild
+python tools/demos/gen_demo_screenshots.py --demo <name> --overwrite --frames 3 --rebuild
 ```
 
 ### Step 7 — Register in `content/demos/README.md`
@@ -274,7 +274,7 @@ When generating N > 1 demos from a list of genres:
 3. Generate all `README.md` files
 4. Run screenshot tool for all at once:
    ```powershell
-   python tools/screenshots/gen_demo_screenshots.py --demo <n1> --demo <n2> ... --overwrite --frames 3
+   python tools/demos/gen_demo_screenshots.py --demo <n1> --demo <n2> ... --overwrite --frames 3
    ```
 5. Register all demos in `content/demos/README.md` in one edit (alphabetical order)
 

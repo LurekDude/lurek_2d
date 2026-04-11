@@ -8,7 +8,7 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **R-02** — Dependency direction: chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tilemap: Tier2 imports runtime(unassigned); tilemap: Tier2 imports render(unassigned); tileset: Tier2 imports runtime(unassigned)
+- [ ] **R-02** — Dependency direction: chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tileset: Tier2 imports runtime(unassigned); tmx: Tier2 imports runtime(unassigned)
 
 ### 🟡 Warnings — Should Fix
 
@@ -82,7 +82,7 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **R-01** Tier placement | ✅ PASS | Tier label matches: tier2 |
-| **R-02** Dependency direction | ❌ ERROR | chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tilemap: Tier2 imports runtime(unassigned); tilemap: Tier2 imports render(unassigned); tileset: Tier2 imports runtime(unassigned) |
+| **R-02** Dependency direction | ❌ ERROR | chunk: Tier2 imports runtime(unassigned); mapgen: Tier2 imports runtime(unassigned); tileset: Tier2 imports runtime(unassigned); tmx: Tier2 imports runtime(unassigned) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

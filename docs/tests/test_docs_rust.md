@@ -354,6 +354,26 @@
 
 - `Step::vec_from_lua_table` in `src/automation/step.rs:286`
 
+### `camera` — 53/53 (100.0%)
+
+**Test functions:**
+
+- `camera2d_dead_zone_allows_movement_outside_threshold`
+- `camera2d_dead_zone_prevents_movement_within_threshold` — ── Camera2D dead zone ────────────────────────────────────────────────────────
+- `camera2d_instant_snap_when_follow_smooth_is_zero`
+- `camera2d_new_starts_at_origin_with_zoom_one` — ── Camera2D defaults ─────────────────────────────────────────────────────────
+- `camera2d_shake_expires_after_duration_and_coords_return_to_baseline` — ── Camera2D screen shake ─────────────────────────────────────────────────────
+- `camera2d_smooth_follow_advances_toward_target` — ── Camera2D smooth follow ────────────────────────────────────────────────────
+- `camera_default_position_is_zero` — ── Camera::default ───────────────────────────────────────────────────────────
+- `camera_default_view_matrix_acts_as_identity` — ── Camera::view_matrix ───────────────────────────────────────────────────────
+- `camera_default_zoom_is_one_and_rotation_is_zero`
+- `camera_offset_position_shifts_view_by_negative_position`
+- `camera_zoom_two_doubles_view_space_coordinates`
+- `viewport_scale_letterbox_computes_uniform_scale` — ── ViewportScale scale-factor computation ────────────────────────────────────
+- `viewport_scale_pixel_perfect_uses_integer_scale`
+- `viewport_stretch_fills_window_non_uniformly` — ── ScaleMode::Stretch via Viewport ───────────────────────────────────────────
+- `viewport_to_game_and_to_screen_are_inverse` — ── Viewport coordinate round-trip ────────────────────────────────────────────
+
 ### `compute` — 70/84 (83.3%)
 
 **Test functions:**
@@ -769,6 +789,20 @@
 - `Universe::unpack_gen` in `src/ecs/universe.rs:165`
 - `deep_copy_table` in `src/ecs/universe.rs:1179`
 
+### `effect` — 62/71 (87.3%)
+
+**Uncovered public functions** (9):
+
+- `ImageEffect::add_effect_rc` in `src/effect/image_effect.rs:71`
+- `ImageEffect::get_effect_by_index` in `src/effect/image_effect.rs:82`
+- `ImageEffect::get_effect_by_name` in `src/effect/image_effect.rs:93`
+- `ImageEffect::remove_by_index` in `src/effect/image_effect.rs:107`
+- `ImageEffect::remove_by_name` in `src/effect/image_effect.rs:123`
+- `ImageEffect::to_passes` in `src/effect/image_effect.rs:157`
+- `Overlay::draw_state_to_image` in `src/effect/overlay.rs:539`
+- `ShakeState::next_random` in `src/effect/screen_effects.rs:97`
+- `PostFxStack::draw_effect_type_bars_to_image` in `src/effect/stack.rs:482`
+
 ### `event` — 17/19 (89.5%)
 
 **Test functions:**
@@ -1092,6 +1126,82 @@
 - `winit_key_to_string` in `src/input/keyboard.rs:360`
 - `winit_scancode_to_string` in `src/input/keyboard.rs:411`
 - *...and 3 more*
+
+### `light` — 80/84 (95.2%)
+
+**Test functions:**
+
+- `attenuation_default_no_decay` — ── Attenuation ───────────────────────────────────────────────────────────────
+- `attenuation_factor_at_distance`
+- `attenuation_factor_at_zero`
+- `attenuation_factor_zero_denom_returns_one`
+- `attenuation_new_stores_values`
+- `falloff_mode_default_is_linear`
+- `flicker_advance_adds_phase`
+- `flicker_advance_no_op_when_disabled`
+- `flicker_advance_wraps_phase`
+- `flicker_default_disabled` — ── FlickerConfig ─────────────────────────────────────────────────────────────
+- `flicker_multiplier_disabled_is_one`
+- `flicker_multiplier_enabled_at_zero_phase`
+- `flicker_new_enabled`
+- `light2d_flicker_mut_sets_values`
+- `light2d_new_creates_default_values` — ── Light2D Construction ──────────────────────────────────────────────────────
+- `light2d_new_has_default_new_fields` — ── Light2D New Fields ────────────────────────────────────────────────────────
+- `light2d_set_get_attenuation`
+- `light2d_set_get_blend_mode`
+- `light2d_set_get_color`
+- `light2d_set_get_direction`
+- `light2d_set_get_enabled`
+- `light2d_set_get_energy`
+- `light2d_set_get_falloff`
+- `light2d_set_get_group_id`
+- `light2d_set_get_inner_outer_angle`
+- `light2d_set_get_intensity`
+- `light2d_set_get_light_type`
+- `light2d_set_get_masks` — ── Light2D Masks ─────────────────────────────────────────────────────────────
+- `light2d_set_get_position` — ── Light2D Getters/Setters ───────────────────────────────────────────────────
+- `light2d_set_get_radius`
+- `light2d_set_get_shadow_fields`
+- `light2d_set_get_volumetric`
+- `light2d_shadow_defaults` — ── Light2D Shadow Fields ─────────────────────────────────────────────────────
+- `light_blend_mode_default_is_add` — ── Enum Defaults ─────────────────────────────────────────────────────────────
+- `light_type_default_is_point` — ── LightType Enum ────────────────────────────────────────────────────────────
+- `light_type_variants_distinct`
+- `light_world_add_light_returns_key` — ── LightWorld Add/Remove ─────────────────────────────────────────────────────
+- `light_world_add_occluder`
+- `light_world_advance_flickers`
+- `light_world_auto_enables_on_first_light`
+- `light_world_clear_resets_all`
+- `light_world_get_light_mut`
+- `light_world_group_count` — ── LightWorld Group Operations ───────────────────────────────────────────────
+- `light_world_has_active_lights_false_all_disabled`
+- `light_world_has_active_lights_false_empty`
+- `light_world_has_active_lights_true` — ── LightWorld Active Lights ──────────────────────────────────────────────────
+- `light_world_light_count_occluder_count`
+- `light_world_new_defaults` — ── LightWorld Construction ───────────────────────────────────────────────────
+- `light_world_remove_light`
+- `light_world_remove_nonexistent_returns_none`
+- `light_world_set_group_color`
+- `light_world_set_group_enabled`
+- `light_world_set_group_intensity`
+- `occluder_new_max_vertices`
+- `occluder_new_too_few_panics`
+- `occluder_new_too_many_panics`
+- `occluder_new_triangle` — ── Occluder Construction ─────────────────────────────────────────────────────
+- `occluder_set_get_enabled`
+- `occluder_set_get_light_mask`
+- `occluder_set_get_opacity`
+- `occluder_set_get_position`
+- `occluder_set_get_vertices` — ── Occluder Getters/Setters ──────────────────────────────────────────────────
+- `occluder_set_vertices_invalid_panics`
+- `shadow_filter_default_is_none`
+
+**Uncovered public functions** (4):
+
+- `Light2D::apply_lua_opts` in `src/light/light2d.rs:583`
+- `LightWorld::remove_occluder` in `src/light/light_world.rs:99`
+- `LightWorld::get_occluder_mut` in `src/light/light_world.rs:143`
+- `Occluder::from_flat_coords` in `src/light/occluder.rs:83`
 
 ### `log` — 17/18 (94.4%)
 
@@ -1763,20 +1873,11 @@
 - `extract_minimap` in `src/raycaster/minimap_overlay.rs:29`
 - `draw_player_arrow` in `src/raycaster/minimap_overlay.rs:108`
 
-### `render` — 263/302 (87.1%)
+### `render` — 68/94 (72.3%)
 
-**Uncovered public functions** (39):
+**Uncovered public functions** (26):
 
 - `Color::to_rgb_u32` in `src/render/color.rs:123`
-- `ImageEffect::add_effect_rc` in `src/render/effect/image_effect.rs:71`
-- `ImageEffect::get_effect_by_index` in `src/render/effect/image_effect.rs:82`
-- `ImageEffect::get_effect_by_name` in `src/render/effect/image_effect.rs:93`
-- `ImageEffect::remove_by_index` in `src/render/effect/image_effect.rs:107`
-- `ImageEffect::remove_by_name` in `src/render/effect/image_effect.rs:123`
-- `ImageEffect::to_passes` in `src/render/effect/image_effect.rs:157`
-- `Overlay::draw_state_to_image` in `src/render/effect/overlay.rs:539`
-- `ShakeState::next_random` in `src/render/effect/screen_effects.rs:97`
-- `PostFxStack::draw_effect_type_bars_to_image` in `src/render/effect/stack.rs:482`
 - `Font::load_all_sizes` in `src/render/font.rs:137`
 - `Font::nearest_size` in `src/render/font.rs:168`
 - `Font::is_dirty` in `src/render/font.rs:282`
@@ -1787,13 +1888,22 @@
 - `GpuRenderer::upload_texture` in `src/render/gpu_renderer.rs:688`
 - `GpuRenderer::create_canvas` in `src/render/gpu_renderer.rs:728`
 - `GpuRenderer::render_frame` in `src/render/gpu_renderer.rs:892`
-- *...and 19 more*
+- `Mesh::from_vertices` in `src/render/mesh.rs:126`
+- `Mesh::from_vertex_rows` in `src/render/mesh.rs:144`
+- `Mesh::set_vertex` in `src/render/mesh.rs:166`
+- `Mesh::get_vertex` in `src/render/mesh.rs:179`
+- `Mesh::set_vertex_map` in `src/render/mesh.rs:187`
+- `Mesh::set_texture` in `src/render/mesh.rs:203`
+- `Mesh::set_draw_mode` in `src/render/mesh.rs:211`
+- `Shader::has_uniform` in `src/render/shader.rs:128`
+- `Shader::ordered_uniforms` in `src/render/shader.rs:139`
+- *...and 6 more*
 
 ### `root` — 0/1 (0.0%)
 
 **Uncovered public functions** (1):
 
-- `lurek_run` in `src/lib.rs:182`
+- `lurek_run` in `src/lib.rs:188`
 
 ### `runtime` — 13/23 (56.5%)
 

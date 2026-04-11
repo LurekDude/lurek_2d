@@ -201,13 +201,15 @@ All permanent tools live in `tools/` organised by category. See `tools/README.md
 
 | Subfolder | Contains |
 |---|---|
-| `tools/docs/` | Documentation generators (`collect_docs.py`, `gen_all_docs.py`, `gen_docs_lua.py`, `gen_docs_rusta.py`, `gen_docs_rust.py` …) |
+| `tools/docs/` | Documentation generators (`collect_docs.py`, `gen_docs_lua.py`, `gen_docs_rust.py`, `gen_luadoc.py` …) |
 | `tools/audit/` | Quality auditing & coverage analytics (`audit_module.py`, `doc_coverage.py`, `test_coverage.py` …) |
 | `tools/fix/` | Code fixers & docstring improvers (`add_lua_docstrings.py`, `fix_docstrings.py` …) |
 | `tools/validate/` | Schema & structure validators (`cag_validate.py`, `validate_lua_api.py` …) |
 | `tools/assets/` | Artwork source files — edit directly; all assets are maintained manually |
 | `tools/dist/` | Build, package & install (`dist.ps1`, `dist.sh`, `install.ps1`, `install.sh` …) |
-| `tools/github/` | GitHub automation (`ideas_to_github_issues.py` …) |
+| `tools/github/` | GitHub automation (`ideas_to_github_issues.py`) |
+| `tools/demos/` | Demo folder management & screenshot generation (`organize_demos.py`, `gen_demo_screenshots.py`) |
+| `tools/dev/` | Dev helper scripts (`test_fix_loop.py`) |
 
 Key invocations:
 - **Quality sweep**: Load `quality-pipeline` skill for the full audit→fix→verify cycle

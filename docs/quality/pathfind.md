@@ -19,7 +19,7 @@
 - [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 99 pub methods, 0 Rust tests — create test file
 - [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Pathfind-API.md)
-- [ ] **Q-04** — Error handling: .unwrap() calls: grid:259, grid:274, grid:339, grid:354, grid:414 (+16 more)
+- [ ] **Q-04** — Error handling: .unwrap() calls: astar:382, graph_path:343, graph_path:352, grid:259, grid:274 (+19 more)
 - [ ] **I-03** — Config integration: Module not in src/engine/config.rs — add to ModulesConfig if toggleable
 
 ## Full Check Results
@@ -123,7 +123,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: grid:259, grid:274, grid:339, grid:354, grid:414 (+16 more) |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: astar:382, graph_path:343, graph_path:352, grid:259, grid:274 (+19 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

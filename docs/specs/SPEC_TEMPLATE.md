@@ -4,8 +4,8 @@
   TEMPLATE — derived from docs/specs/data.md (golden example).
   Copy this file to docs/specs/<module>.md and fill in every section.
   Required sections: all 10 H2 headers below (Summary through Notes).
-  The render.md antipattern (copy-pasted API prose) is WRONG.
-  The data.md pattern (tables of functions, 1-line descriptions) is RIGHT.
+  Follow the data.md pattern: tables of functions with 1-line descriptions.
+  No size limits — match the module's actual complexity.
 -->
 
 | Property | Value |
@@ -22,7 +22,7 @@
 
 ## Summary
 
-<!-- 3–6 short paragraphs. Purpose, main types, key design decisions, scope boundary.
+<!-- Purpose, main types, key design decisions, scope boundary.
      Use bold for the first mention of each major type.
      End with a "Scope boundary" sentence naming any modules this one does NOT depend on. -->
 
@@ -39,8 +39,7 @@ GPU, audio, or window dependencies.
 ## Architecture
 
 <!-- ASCII box diagram showing data flow through the module.
-     Start from the Lua API line → internal components → external crates.
-     5–20 lines. Required. -->
+     Start from the Lua API line → internal components → external crates. -->
 
 ```
 lurek.<ns>.* (Lua API — src/lua_api/<module>_api.rs)
@@ -56,7 +55,7 @@ src/<module>/mod.rs
 ## Source Files
 
 <!-- One row per .rs file in src/<module>/. 1–2 sentence purpose per file.
-     ~5–15 rows typical. DO NOT list files that don't exist. -->
+     DO NOT list files that don't exist. -->
 
 | File | Purpose |
 |------|---------|
@@ -68,7 +67,7 @@ src/<module>/mod.rs
 
 ## Submodules
 
-<!-- One H3 per .rs file (excluding mod.rs). 2–4 sentences about what the submodule does
+<!-- One H3 per .rs file (excluding mod.rs). Describe what the submodule does
      and how it connects to the rest of the module. Then a bullet list of its public types. -->
 
 ### `<module>::type_a`
@@ -91,7 +90,7 @@ src/<module>/mod.rs
 
 <!-- One H4 per exported Rust type that a developer would touch.
      Cover: what it is, constructors, important methods, relevant fields.
-     ~3–6 sentences per type. DO NOT repeat the Lua API table row description here. -->
+     DO NOT repeat the Lua API table row description here. -->
 
 ### Structs
 
@@ -146,9 +145,9 @@ Exposed under `lurek.<namespace>.*` by `src/lua_api/<module>_api.rs`.
 
 ## Lua Examples
 
-<!-- 1 runnable Lua code block. Cover the primary use case end-to-end.
+<!-- Runnable Lua code block(s). Cover the primary use cases end-to-end.
      Must be syntactically correct and use only real lurek.* functions.
-     10–40 lines. Use comments to label each step. -->
+     Use comments to label each step. -->
 
 ```lua
 -- Create and use a Thing
@@ -193,7 +192,7 @@ end
 ## Notes
 
 <!-- Anything that doesn't fit above: gotchas, known limitations, performance notes,
-     planned changes, migration warnings. 3–8 bullet points. -->
+     planned changes, migration warnings. -->
 
 - **Key gotcha**: …
 - **Performance**: …

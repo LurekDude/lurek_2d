@@ -1,6 +1,6 @@
 # Module Quality Report: `parallax`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 32 ✅ / 7 ⚠️ / 9 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 38 ✅ / 7 ⚠️ / 3 ❌ / 19 🔵
 
 ---
 
@@ -8,21 +8,15 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-02** — Template structure: Missing required sections: Purpose
-- [ ] **A-03** — Purpose quality: No ## Purpose section found
-- [ ] **A-04** — Content sync: Files not in Source Files table: layer.rs
-- [ ] **A-06** — Tier label: No Tier property in AGENT.md header
-- [ ] **SP-02** — Required spec sections: Missing sections: Summary, Architecture, Source Files, Key Types, Lua API
-- [ ] **SP-03** — Summary quality: No ## Summary section
 - [ ] **T-01** — Rust test file: No test file found for module 'parallax'
 - [ ] **W-01** — Example file exists: content/examples/parallax.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **A-04b** — Source Files completeness (incl. subdirs): Nested .rs files not listed in AGENT.md: layer.rs, mod.rs
+- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **B-04** — No business logic in closures: '<closure@555>' (82 LOC, line 555) — extract body to src/parallax/
-- [ ] **R-01** — Tier placement: No **Tier** row in AGENT.md; expected unassigned
+- [ ] **R-01** — Tier placement: Module not in tier registry — verify placement
 - [ ] **T-05** — Test adequacy: 4 pub methods, 0 Rust tests — create test file
 - [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Parallax-API.md)
 - [ ] **Q-04** — Error handling: .unwrap() calls: layer:361, layer:371, layer:380, layer:401
@@ -46,22 +40,22 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\parallax\AGENT.md |
-| **A-02** Template structure | ❌ ERROR | Missing required sections: Purpose |
-| **A-03** Purpose quality | ❌ ERROR | No ## Purpose section found |
-| **A-04** Content sync | ❌ ERROR | Files not in Source Files table: layer.rs |
+| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 419 chars |
+| **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/parallax.md exists |
-| **A-06** Tier label | ❌ ERROR | No Tier property in AGENT.md header |
-| **A-04b** Source Files completeness (incl. subdirs) | ⚠️ WARNING | Nested .rs files not listed in AGENT.md: layer.rs, mod.rs |
+| **A-06** Tier label | ✅ PASS | Tier label present (expected: unassigned) |
+| **A-04b** Source Files completeness (incl. subdirs) | ✅ PASS | All nested .rs files listed in AGENT.md |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/parallax.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Summary, Architecture, Source Files, Key Types, Lua API |
-| **SP-03** Summary quality | ❌ ERROR | No ## Summary section |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Summary is 1590 chars |
 | **SP-04** Lua API completeness | ✅ PASS | No tbl.set() bindings found |
-| **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
+| **SP-05** Key Types accuracy | ✅ PASS | 2 types — spec Key Types in sync |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
 
 ### Phase 4 — Docstrings
@@ -93,7 +87,7 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No **Tier** row in AGENT.md; expected unassigned |
+| **R-01** Tier placement | ⚠️ WARNING | Module not in tier registry — verify placement |
 | **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |

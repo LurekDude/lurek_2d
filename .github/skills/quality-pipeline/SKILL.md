@@ -73,7 +73,6 @@ This orchestrates all doc generators under `tools/docs/`. Always run this before
 | `tools/fix/docstring_fix.py` | Malformed docstrings from audit JSON | `docstring_audit.py` |
 | `tools/fix/fix_docstrings.py` | Missing `# Parameters`/`# Returns` sections | `doc_coverage.py --report-missing` |
 | `tools/fix/improve_lua_docstrings.py` | Low-quality stub `///` descriptions | `docstring_audit.py` |
-| `tools/fix/update_paths.py` | Stale `docs/API/` → `docs/logs/` references | Manual / grep |
 | `tools/fix/format_examples.py` | Example code style | `example_coverage.py` |
 | `tools/fix/expand_examples.py` | Thin examples needing more API usage | `example_coverage.py` |
 | `tools/fix/add_test_markers.py` | Missing `@covers` annotations | `lua_api_test_coverage.py` |

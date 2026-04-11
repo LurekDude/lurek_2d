@@ -1,6 +1,6 @@
 # Module Quality Report: `math`
 
-> **Status**: 🟢 PASS  |  **Date**: 2026-04-11  |  **Score**: 46 ✅ / 2 ⚠️ / 0 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 45 ✅ / 3 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
@@ -8,6 +8,7 @@
 
 ### 🟡 Warnings — Should Fix
 
+- [ ] **A-02** — Template structure: Missing recommended sections: Key Types, Lua API Summary
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more)
 - [ ] **B-04** — No business logic in closures: '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ | '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ | '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ | '<closure@2004>' (21 LOC, line 2004) — extract body to src/math/ | '<closure@955>' has if/match/for — extract to src/math/ | '<closure@1410>' has if/match/for — extract to src/math/
 
@@ -29,8 +30,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **A-01** AGENT.md exists | ✅ PASS | src\math\AGENT.md |
-| **A-02** Template structure | ✅ PASS | All sections present |
-| **A-03** Purpose quality | ✅ PASS | Purpose section is 271 chars |
+| **A-02** Template structure | ⚠️ WARNING | Missing recommended sections: Key Types, Lua API Summary |
+| **A-03** Purpose quality | ✅ PASS | Purpose section is 487 chars |
 | **A-04** Content sync | ✅ PASS | All .rs files listed |
 | **A-05** Spec pointer | ✅ PASS | docs/specs/math.md exists |
 | **A-06** Tier label | ✅ PASS | Tier label present (expected: baseline) |

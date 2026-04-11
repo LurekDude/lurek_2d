@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generated": "2026-04-11T07:00:41.766052+00:00",
+    "generated": "2026-04-11T09:05:57.108909+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "0.7.0",
     "stats": {
-      "rust_items": 1323,
+      "rust_items": 1320,
       "rust_modules": 305,
       "rust_tests": 0,
       "lua_tests": 185
@@ -12,8 +12,8 @@
   },
   "rust_api": {
     "summary": {
-      "total_items": 1323,
-      "documented": 1323,
+      "total_items": 1320,
+      "documented": 1320,
       "modules": 305
     },
     "modules": {
@@ -867,6 +867,86 @@
         "module_doc": "# lurekc — Console-less Lurek2D Launcher  This is an alternative binary entry point for Lurek2D that suppresses the console window on Windows by setting the `windows_subsystem = \"windows\"` attribute. Behavior is otherwise identical to the main `lurek2d` binary.  ## Purpose  When distributing a game to end users on Windows, running via `lurekc.exe` prevents the black terminal window from appearing alongside the game window. This provides a polished, professional feel for released games.  ## Usage  ```sh lurekc path/to/my_game     # Launch game without console window lurekc                     # Splash screen, no console ```  ## Platform Notes  - **Windows**: `windows_subsystem = \"windows\"` hides the console. - **Linux/macOS**: No behavioral difference from the standard binary;   the attribute is ignored on non-Windows platforms.",
         "source_file": "src/bin/lurekc.rs",
         "items": []
+      },
+      "camera": {
+        "module_doc": "This is a Tier 1 engine module. Imports only from `crate::math`.  ## Subsystem inventory - [`camera`] — [`Camera`] and [`Camera2D`] transform types - [`viewport`] — [`Viewport`] virtual-resolution mapping with [`ScaleMode`] - [`viewport_scale`] — [`ViewportScale`] with automatic scaled-dimension tracking  ## Architecture note (Tier 1) `camera` is a Tier 1 engine module. It was extracted from `src/graphics/` during the graphics-module-split session. `SharedState` holds a `Camera` field; see `work/graphics-module-split/reports/camera-decision.md` for the CPD-1 Option C rationale.  ## Typical usage sequence 1. Construct a [`Camera`] or [`Camera2D`] via `new()`. 2. Call `view_matrix()` to obtain the transform applied to draw calls. 3. Use [`Viewport`] or [`ViewportScale`] to map the fixed game resolution onto the window.",
+        "source_file": "src/camera/mod.rs",
+        "items": [
+          {
+            "name": "types",
+            "kind": "mod",
+            "description": "Camera types: [`Camera`] (flat API) and [`Camera2D`] (smooth follow, shake, bounds).",
+            "file": "src/camera/mod.rs",
+            "line": 21
+          },
+          {
+            "name": "viewport",
+            "kind": "mod",
+            "description": "Virtual-resolution viewport with letterbox / stretch / pixel-perfect scaling.",
+            "file": "src/camera/mod.rs",
+            "line": 23
+          },
+          {
+            "name": "viewport_scale",
+            "kind": "mod",
+            "description": "Virtual-resolution viewport that also exposes scaled content dimensions for transform-stack integration.",
+            "file": "src/camera/mod.rs",
+            "line": 25
+          }
+        ]
+      },
+      "camera::types": {
+        "module_doc": "Camera types for 2D viewport control.  Provides the original [`Camera`] (used by `SharedState` for the flat `lurek.gfx.setCamera()` API) and the new Phase 24 [`Camera2D`] with smooth follow, dead zone, bounds clamping, and screen-shake.",
+        "source_file": "src/camera/types.rs",
+        "items": [
+          {
+            "name": "Camera",
+            "kind": "struct",
+            "description": "Basic camera with position, zoom, and rotation.  Used by `SharedState` for the flat `lurek.gfx.setCamera()` API.  # Fields - `position` — World-space centre point the camera is looking at. - `zoom` — Uniform scale factor; `1.0` = natural size, `2.0` = 2x zoom in. - `rotation` — Rotation in radians, applied after zoom.",
+            "file": "src/camera/types.rs",
+            "line": 21
+          },
+          {
+            "name": "Camera2D",
+            "kind": "struct",
+            "description": "Full-featured 2D camera with smooth follow, dead zone, bounds clamping,  # Fields - `position` — `Vec2`. - `zoom` — `f32`. - `rotation` — `f32`. - `viewport` — `Rect`. - `bounds` — `Option<Rect>`. - `target` — `Option<Vec2>`. - `follow_smooth` — `f32`. - `dead_zone` — `Option<(f32, f32)>`. - `look_ahead` — `f32`. and screen-shake.  Create with [`Camera2D::new`], configure follow / bounds / shake, then call [`Camera2D::update`] each frame. Use [`Camera2D::view_matrix`] to obtain the transform for rendering.",
+            "file": "src/camera/types.rs",
+            "line": 118
+          }
+        ]
+      },
+      "camera::viewport": {
+        "module_doc": "Virtual resolution viewport with manual transform application.  Maps a fixed game resolution onto an arbitrary window size using letterboxing, stretching, or pixel-perfect scaling.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for viewport-related operations and data management. Key types exported from this module: `ScaleMode`, `Viewport`. Primary functions: `new()`, `resize()`, `get_scale()`, `get_offset()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
+        "source_file": "src/camera/viewport.rs",
+        "items": [
+          {
+            "name": "ScaleMode",
+            "kind": "enum",
+            "description": "Scale mode for virtual resolution mapping.  # Variants - `Letterbox` — Letterbox variant. - `Stretch` — Stretch variant. - `PixelPerfect` — PixelPerfect variant.",
+            "file": "src/camera/viewport.rs",
+            "line": 21
+          },
+          {
+            "name": "Viewport",
+            "kind": "struct",
+            "description": "Virtual resolution with manual transform application.  # Fields - `game_width` — `f32`. - `game_height` — `f32`. - `scale_mode` — `ScaleMode`. - `scale_x` — `f32`. - `scale_y` — `f32`. - `offset_x` — `f32`. - `offset_y` — `f32`.  Maintains a mapping between a fixed game coordinate space and the actual window pixel dimensions. Call `resize()` whenever the window size changes.",
+            "file": "src/camera/viewport.rs",
+            "line": 44
+          }
+        ]
+      },
+      "camera::viewport_scale": {
+        "module_doc": "Virtual resolution viewport with automatic scaling and transform stack integration.  Like `Viewport`, but also tracks the scaled content dimensions for use with an automatic graphics transform stack.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for viewport scale-related operations and data management. Key types exported from this module: `ViewportScale`. Primary functions: `new()`, `resize()`, `get_game_dimensions()`, `get_scaled_dimensions()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
+        "source_file": "src/camera/viewport_scale.rs",
+        "items": [
+          {
+            "name": "ViewportScale",
+            "kind": "struct",
+            "description": "Virtual resolution with automatic graphics stack management.  # Fields - `game_width` — `f32`. - `game_height` — `f32`. - `mode` — `ScaleMode`. - `scale_x` — `f32`. - `scale_y` — `f32`. - `offset_x` — `f32`. - `offset_y` — `f32`. - `scaled_width` — `f32`. - `scaled_height` — `f32`.  Extends the basic viewport concept by also computing `scaled_width` and `scaled_height`, which represent the game area in window pixels after scaling.",
+            "file": "src/camera/viewport_scale.rs",
+            "line": 32
+          }
+        ]
       },
       "compute::array": {
         "module_doc": "Core NdArray type and DataType enum.  This module is part of Lurek2D's `compute` subsystem and provides the implementation details for array-related operations and data management. Key types exported from this module: `DataType`, `NdArray`. Primary functions: `parse()`, `byte_size()`, `name()`, `new()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
@@ -2162,6 +2242,255 @@
           }
         ]
       },
+      "effect::ambient": {
+        "module_doc": "Ambient lighting state with time-of-day colour cycling.  Provides [`AmbientState`] for gradual ambient colour transitions driven by an in-game clock.",
+        "source_file": "src/effect/ambient.rs",
+        "items": [
+          {
+            "name": "AmbientState",
+            "kind": "struct",
+            "description": "Ambient lighting state with time-of-day colour cycling.  When `enabled` is `true`, `Overlay::update` calls `compute_color_from_time()` each frame and stores the result back into `color`. This means any manual writes to `color` will be overwritten on the next update. To set the tint manually without cycling, set `enabled = false` and write directly to `color`.  # Fields - `enabled` — `bool` — Whether time-of-day colour cycling is active. - `color` — `[f32; 4]` — Current ambient tint (RGBA); auto-computed when enabled. - `time_of_day` — `f32` — Time of day in hours (0.0–24.0); drives `compute_color_from_time`.",
+            "file": "src/effect/ambient.rs",
+            "line": 19
+          }
+        ]
+      },
+      "effect::atmosphere": {
+        "module_doc": "Atmospheric visual effects data models.  Contains data-only structs for clouds, fog, vignette, lightning, film grain, and heat haze — all consumed by the overlay renderer.",
+        "source_file": "src/effect/atmosphere.rs",
+        "items": [
+          {
+            "name": "CloudState",
+            "kind": "struct",
+            "description": "Cloud shadow overlay state.  Renders `count` soft shadow blobs that drift horizontally across the screen. The `offset` field is an internal scroll accumulator that advances by `speed * dt` each frame; the renderer uses it as a UV shift and the value is allowed to grow without bound (the renderer wraps it modulo screen width). Adjust `scale` to change blob size and `opacity` to control how dark the shadows appear.  # Fields - `enabled` — `bool` — Whether cloud shadows are active. - `count` — `u32` — Number of cloud shadow blobs rendered each frame. - `speed` — `f32` — Horizontal scroll speed in pixels per second. - `scale` — `f32` — Relative blob size (1.0 = default). - `opacity` — `f32` — Shadow overlay opacity (0.0–1.0). - `offset` — `f32` — Internal accumulator; used by the renderer as a UV offset.",
+            "file": "src/effect/atmosphere.rs",
+            "line": 23
+          },
+          {
+            "name": "FogState",
+            "kind": "struct",
+            "description": "Atmospheric fog state.  Renders a uniform translucent colour rectangle over the entire scene, simulating thick atmospheric haze. The `density` field maps linearly to the overlay opacity — a `density` of 1.0 fills the screen with the solid `color`; 0.0 is invisible. This is a simple per-frame alpha blend and does not perform any distance-based depth fog calculation. For a subtler ground-level effect, pair it with a low opacity and a grey-blue tint.  # Fields - `enabled` — `bool` — Whether fog is active. - `density` — `f32` — Fog opacity (0.0–1.0); maps directly to blend alpha. - `color` — `[f32; 4]` — Fog tint colour (RGBA).",
+            "file": "src/effect/atmosphere.rs",
+            "line": 66
+          },
+          {
+            "name": "HeatHazeState",
+            "kind": "struct",
+            "description": "Heat haze distortion state.  Provides a UV-space shimmer distortion driven by a slowly-evolving sine wave pattern. The `intensity` field scales the peak UV offset in screen-space pixels — values in the 0.2–2.0 range produce a subtle desert mirage effect; higher values are suitable for extreme heat or magical distortion. The GPU layer in `lua_api` animates the sine phase using the current game time, so no per-frame Lua call is needed.  # Fields - `enabled` — `bool` — Whether heat haze distortion is active. - `intensity` — `f32` — Peak UV displacement in pixels (typical range 0.0–5.0).",
+            "file": "src/effect/atmosphere.rs",
+            "line": 98
+          },
+          {
+            "name": "VignetteState",
+            "kind": "struct",
+            "description": "Vignette screen-edge darkening state.  Applies a smooth radial darkening that grades from transparent at the screen centre to opaque black at the corners. The `strength` value controls how aggressively the edges are darkened: 0.0 produces no visible effect; 0.5 is a gentle film-like border; 1.0 crushes the corners to near-black. The vignette is useful for directing the player's eye toward the centre of the screen and for conveying low-health or tense atmospheric states.  # Fields - `enabled` — `bool` — Whether vignette darkening is active. - `strength` — `f32` — Edge darkening intensity (0.0–1.0; default 0.5).",
+            "file": "src/effect/atmosphere.rs",
+            "line": 128
+          },
+          {
+            "name": "FilmGrainState",
+            "kind": "struct",
+            "description": "Film grain noise overlay state.  Adds randomised per-pixel luminance noise over the rendered scene, simulating the grain of analog film stock. The noise pattern is regenerated every frame by the GPU layer so it does not repeat or flicker in a regular pattern. `intensity` scales the peak noise amplitude: 0.1–0.3 gives a subtle cinematic look; values above 0.5 produce a heavy grain that can obscure fine detail.  # Fields - `enabled` — `bool` — Whether film grain noise is active. - `intensity` — `f32` — Grain amplitude (0.0–1.0; default 0.3).",
+            "file": "src/effect/atmosphere.rs",
+            "line": 157
+          },
+          {
+            "name": "LightningState",
+            "kind": "struct",
+            "description": "Lightning flash state.  A single-shot full-screen hard flash distinct from `FlashState`: lightning uses a very short default duration (0.15 s) and is designed to simulate the brief, intense luminosity of a lightning bolt. Trigger it with `Overlay::trigger_lightning`; the flash is non-repeating and deactivates automatically once `elapsed >= duration`. For sustained ambient flicker, chain repeated `trigger_lightning` calls from Lua with randomised delays.  # Fields - `active` — `bool` — Whether a lightning flash is in progress. - `color` — `[f32; 4]` — Flash colour (RGBA); defaults to pale blue-white. - `elapsed` — `f32` — Time elapsed since the last trigger (seconds). - `duration` — `f32` — Total flash duration in seconds (default 0.15).",
+            "file": "src/effect/atmosphere.rs",
+            "line": 189
+          }
+        ]
+      },
+      "effect::effect": {
+        "module_doc": "Post-processing effect data model.  Defines [`PostFxEffect`] — a single named effect with typed parameters for the post-processing pipeline.",
+        "source_file": "src/effect/effect.rs",
+        "items": [
+          {
+            "name": "PostFxEffect",
+            "kind": "struct",
+            "description": "A single post-processing effect with named float parameters.  Acts as a parameter bag describing one shader pass — it does NOT hold any GPU resource. Parameters are stored in a `HashMap<String, f32>` so that new shader uniforms can be added without changing the struct layout. Use `PostFxEffectType::default_params` to pre-populate sensible defaults, then call `set_parameter` to override individual values. The `enabled` flag lets you temporarily skip the pass within the stack without removing it.  # Fields - `effect_type` — `PostFxEffectType` — Which shader pass to run. - `params` — Named float parameters controlling the shader (e.g., `\"threshold\"`, `\"intensity\"`). - `enabled` — Whether this effect is active within its parent stack. - `shader_id` — Optional custom shader handle; only used for `Custom` effects.",
+            "file": "src/effect/effect.rs",
+            "line": 28
+          }
+        ]
+      },
+      "effect::effect_type": {
+        "module_doc": "Built-in post-processing effect type definitions.  Enumerates all shader passes recognised by the engine's post-processing pipeline and provides parameter presets for each.",
+        "source_file": "src/effect/effect_type.rs",
+        "items": [
+          {
+            "name": "PostFxEffectType",
+            "kind": "enum",
+            "description": "Built-in effect types for the post-processing pipeline.  Each variant maps to a distinct full-screen shader pass implemented in `lua_api`. The `Custom` variant defers to an external shader ID supplied via `PostFxEffect::new_custom`. Use `PostFxEffectType::from_name` to parse effect names from Lua strings, and `PostFxEffect::default_params` to retrieve the canonical starting parameters for each type.  # Variants - `Bloom` — HDR bloom with threshold and intensity parameters. - `Blur` — Gaussian blur with configurable radius and strength. - `Crt` — CRT monitor simulation with scanline strength. - `Godrays` — Light ray / god ray screen-space effect with intensity. - `Vignette` — Screen edge darkening with configurable strength. - `ColourGrade` — Colour grading with brightness, contrast, and saturation. - `Chromatic` — Chromatic aberration with pixel offset. - `Pixelate` — Block pixelation effect with configurable block size. - `Sepia` — Warm sepia tone mapping with configurable strength. - `Grayscale` — Desaturate to greyscale with configurable strength. - `Invert` — Colour inversion with configurable strength. - `Scanlines` — Horizontal scanline bars (CRT-free) with strength and spacing. - `EdgeDetect` — Sobel edge detection outline with configurable strength. - `HueShift` — Hue rotation in degrees. - `Noise` — Random per-pixel noise with configurable strength. - `Custom` — User-provided shader pass created via `newPass()`.",
+            "file": "src/effect/effect_type.rs",
+            "line": 34
+          }
+        ]
+      },
+      "effect::image_effect": {
+        "module_doc": "`ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.  [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them to lightweight [`crate::render::ShaderPassDescriptor`] values via [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted to import from `crate::graphics` (Tier 1).",
+        "source_file": "src/effect/image_effect.rs",
+        "items": [
+          {
+            "name": "ImageEffect",
+            "kind": "struct",
+            "description": "An ordered shader-effect chain to apply when drawing a single image.  Can be attached to a `lurek.graphic.draw` call via the options-table overload (`effect` key). Effects are applied in insertion order through each enabled pass. `to_passes` converts the chain to the lightweight Tier-1 type embedded into `RenderCommand` variants.  Each effect entry is stored as a shared `Rc<RefCell<PostFxEffect>>` so that Lua-side handles returned by `addEffect` or `getEffect` reflect mutations made through the chain itself.  # Fields - `effects` â€” `Vec<Rc<RefCell<PostFxEffect>>>` â€” Ordered list of shader passes. - `name` â€” `String` â€” Optional human-readable label for the chain.",
+            "file": "src/effect/image_effect.rs",
+            "line": 30
+          }
+        ]
+      },
+      "effect": {
+        "module_doc": "Composable visual effects layer — Tier 2 Engine Extension.  The `fx` module provides two families of visual effects as pure CPU data models. GPU application is handled in `lua_api`. All files are flat in this folder.  ## Post-processing effects (image-space pipeline)  | File | Types | |---|---| | `effect_type` | `PostFxEffectType` — enum of all built-in effect kinds | | `effect` | `PostFxEffect` — per-effect parameter bag | | `stack` | `PostFxStack` — ordered pipeline of post-processing passes | | `image_effect` | `ImageEffect` — lightweight per-image effect chain |  ## Screen overlays (world-simulation effects)  | File | Types | |---|---| | `ambient` | `AmbientState` — time-of-day colour cycling | | `atmosphere` | `CloudState`, `FogState`, `HeatHazeState`, `VignetteState`, `FilmGrainState`, `LightningState` | | `screen_effects` | `FlashState`, `ShakeState`, `FadeState` — one-shot screen effects | | `overlay` | `Overlay` — main struct combining all screen subsystems | | `weather` | `WeatherState`, `WeatherParticle`, `WeatherType` — weather simulation |  ## Tier  `fx` is a **Tier 2 — Engine Extension** module. It may import `math`, `engine`, and any Tier 1 module. It must not import other Tier 2 modules.",
+        "source_file": "src/effect/mod.rs",
+        "items": [
+          {
+            "name": "effect",
+            "kind": "mod",
+            "description": "Per-effect parameter bag with builder helpers.",
+            "file": "src/effect/mod.rs",
+            "line": 33
+          },
+          {
+            "name": "effect_type",
+            "kind": "mod",
+            "description": "Enum of all built-in post-processing effect kinds (bloom, blur, CRT, colour grading, …).",
+            "file": "src/effect/mod.rs",
+            "line": 35
+          },
+          {
+            "name": "image_effect",
+            "kind": "mod",
+            "description": "Lightweight per-image effect chain (subset of the full pipeline).",
+            "file": "src/effect/mod.rs",
+            "line": 37
+          },
+          {
+            "name": "stack",
+            "kind": "mod",
+            "description": "Ordered pipeline of post-processing passes applied to the rendered scene.",
+            "file": "src/effect/mod.rs",
+            "line": 39
+          },
+          {
+            "name": "ambient",
+            "kind": "mod",
+            "description": "Ambient lighting state with time-of-day colour cycling (night → dawn → day → dusk).",
+            "file": "src/effect/mod.rs",
+            "line": 44
+          },
+          {
+            "name": "atmosphere",
+            "kind": "mod",
+            "description": "Atmospheric effects: clouds, fog, heat haze, vignette, film grain, lightning.",
+            "file": "src/effect/mod.rs",
+            "line": 46
+          },
+          {
+            "name": "overlay",
+            "kind": "mod",
+            "description": "Main `Overlay` struct combining all screen-effect subsystems into one per-frame controller.",
+            "file": "src/effect/mod.rs",
+            "line": 48
+          },
+          {
+            "name": "screen_effects",
+            "kind": "mod",
+            "description": "One-shot screen effects: flash (colour burst), shake (jitter), fade (alpha transition).",
+            "file": "src/effect/mod.rs",
+            "line": 50
+          },
+          {
+            "name": "weather",
+            "kind": "mod",
+            "description": "Weather simulation: rain, snow, hail, dust, leaves, ash, pollen particles.",
+            "file": "src/effect/mod.rs",
+            "line": 52
+          }
+        ]
+      },
+      "effect::overlay": {
+        "module_doc": "Composable per-frame overlay system.  [`Overlay`] aggregates ambient, atmospheric, weather, and screen effect sub-states and ticks them each frame.",
+        "source_file": "src/effect/overlay.rs",
+        "items": [
+          {
+            "name": "Overlay",
+            "kind": "struct",
+            "description": "Composable per-frame screen-effect overlay managing multiple visual subsystems.  All subsystems start inactive and can be enabled independently. Each frame the game loop should call `update(dt)` to advance the simulation, then use `get_shake_offset`, `get_flash_alpha`, etc. (or the Lua API methods) to read back values for the renderer. No GPU objects are stored here; this struct is a pure data model.  Typical Lua usage: ```lua local o = lurek.effect.newOverlay(800, 600) o:setWeather(\"rain\")   -- enable rain o:setWeatherEnabled(true) o:flash(1, 1, 1)        -- quick white flash -- in lurek.update(dt): o:update(dt) ```  # Fields - `width` ÔÇö `u32` ÔÇö Overlay canvas width in pixels. - `height` ÔÇö `u32` ÔÇö Overlay canvas height in pixels. - `weather` ÔÇö Weather particle subsystem. - `ambient` ÔÇö Ambient lighting with time-of-day colour cycling. - `flash` ÔÇö One-shot screen flash effect. - `shake` ÔÇö Camera-shake effect with decaying PRNG offsets. - `fade` ÔÇö Full-screen colour fade effect. - `clouds` ÔÇö Scrolling cloud shadow overlay. - `fog` ÔÇö Uniform atmospheric fog tint. - `heat_haze` ÔÇö Distortion strength for shimmer effects. - `vignette` ÔÇö Screen-edge darkening. - `film_grain` ÔÇö Per-frame random noise overlay. - `lightning` ÔÇö Hard single-frame lightning flash.",
+            "file": "src/effect/overlay.rs",
+            "line": 47
+          }
+        ]
+      },
+      "effect::screen_effects": {
+        "module_doc": "Full-screen transient effects.  Provides [`FlashState`], [`FadeState`], and [`ShakeState`] for brief screen-wide visual feedback.",
+        "source_file": "src/effect/screen_effects.rs",
+        "items": [
+          {
+            "name": "FlashState",
+            "kind": "struct",
+            "description": "Flash screen effect state.  A flash overlays an opaque colour rectangle on the screen for a short duration. The alpha fades linearly from `color[3]` (at `elapsed = 0`) down to zero (at `elapsed = duration`); the fade is computed on read by `Overlay::get_flash_alpha`. Calling `Overlay::trigger_flash` while a flash is already active restarts it from the beginning with the new colour and duration.  # Fields - `active` — `bool` — Whether a flash is in progress. - `color` — `[f32; 4]` — Flash colour (RGBA); `color[3]` is the initial alpha. - `duration` — `f32` — Total flash duration in seconds. - `elapsed` — `f32` — Time elapsed since flash start.",
+            "file": "src/effect/screen_effects.rs",
+            "line": 21
+          },
+          {
+            "name": "ShakeState",
+            "kind": "struct",
+            "description": "Shake screen effect state.  The shake applies a per-frame pixel offset to the camera or draw origin. Offsets are generated by a simple xorshift PRNG seeded at struct creation, giving a deterministic-ish sequence every run — no heap allocation is needed. The intensity decays linearly with the fraction of elapsed time so the shake diminishes smoothly. Calling `Overlay::trigger_shake` while a shake is already active resets elapsed time to zero and applies the new parameters immediately.  # Fields - `active` — `bool` — Whether a shake is in progress. - `intensity` — `f32` — Peak shake magnitude in pixels. - `duration` — `f32` — Total shake duration in seconds. - `elapsed` — `f32` — Time elapsed since shake start. - `offset_x` — `f32` — Current horizontal pixel offset (read by the renderer). - `offset_y` — `f32` — Current vertical pixel offset (read by the renderer).",
+            "file": "src/effect/screen_effects.rs",
+            "line": 61
+          },
+          {
+            "name": "FadeState",
+            "kind": "struct",
+            "description": "Fade screen effect state.  A fade interpolates `color[3]` (the alpha channel of the fill colour) from `start_alpha` to `target_alpha` over `duration` seconds. `start_alpha` is captured automatically from the current `color[3]` when `Overlay::trigger_fade` is called, so a fade-out can seamlessly continue from wherever the previous fade-in stopped. Calling `trigger_fade` while a fade is already in progress restarts it with the new target and duration from the current alpha.  # Fields - `active` — `bool` — Whether a fade is in progress. - `color` — `[f32; 4]` — Fill colour (RGB) with the animated alpha in `[3]`. - `target_alpha` — `f32` — Alpha value to reach at the end of the fade (0.0–1.0). - `duration` — `f32` — Total fade duration in seconds. - `elapsed` — `f32` — Time elapsed since fade start. - `start_alpha` — `f32` — Alpha at the moment the fade was triggered.",
+            "file": "src/effect/screen_effects.rs",
+            "line": 124
+          }
+        ]
+      },
+      "effect::stack": {
+        "module_doc": "Post-processing effect stack.  [`PostFxStack`] manages an ordered chain of effects that captures and processes the rendered scene each frame.",
+        "source_file": "src/effect/stack.rs",
+        "items": [
+          {
+            "name": "PostFxStack",
+            "kind": "struct",
+            "description": "An ordered chain of effects that captures and processes the rendered scene.  The full lifecycle every draw frame is: 1. Call `beginCapture()` (Lua) — the GPU redirects draw calls to an    internal canvas. 2. Draw the scene normally. 3. Call `endCapture()` (Lua) — stops capture. 4. Call `apply()` (Lua) — runs each enabled effect in insertion order    through ping-pong canvases and blits the final result to the screen.  Effects are referenced by numeric index into the local `effects` vector in `LuaPostFxStack`. The `PostFxStack` itself is agnostic to the concrete effect objects and only tracks indices, enabled states, and canvas dimensions.  # Fields - `effects` — Ordered list of effect indices (referencing external storage). - `enabled` — Per-effect enable flag, parallel to `effects`. - `width` — Internal canvas width in pixels. - `height` — Internal canvas height in pixels.  The stack manages ping-pong canvases internally for multi-pass rendering. During `lurek.draw`, the user calls `beginCapture()` → draws scene → `endCapture()` → `apply()` to render the post-processed result.",
+            "file": "src/effect/stack.rs",
+            "line": 32
+          }
+        ]
+      },
+      "effect::weather": {
+        "module_doc": "Weather particle system data.  Defines [`WeatherType`], [`WeatherParticle`], and [`WeatherState`] for rain, snow, and dust particle overlays.",
+        "source_file": "src/effect/weather.rs",
+        "items": [
+          {
+            "name": "WeatherType",
+            "kind": "enum",
+            "description": "Weather particle types supported by the overlay system.  Each variant changes the visual character of spawned particles: their fall speed, size, and opacity are all tuned per type inside `Overlay::spawn_particle`. The `None` variant disables the spawner without clearing existing particles — call `Overlay::clear` to purge everything at once.  # Variants - `None` — No weather active; spawner is disabled. - `Rain` — Fast, narrow, semi-transparent streaks. - `Snow` — Slow, large, high-opacity dots with gentle drift. - `Hail` — Very fast, opaque, medium-sized pellets. - `Dust` — Very slow, small, low-opacity motes. - `Leaves` — Medium speed, large, high-opacity irregular blobs. - `Ash` — Slow, small, medium-opacity flakes. - `Pollen` — Extremely slow, tiny, low-opacity specks.",
+            "file": "src/effect/weather.rs",
+            "line": 24
+          },
+          {
+            "name": "WeatherParticle",
+            "kind": "struct",
+            "description": "A single weather particle in the overlay's weather system.  Particles are created by `Overlay::spawn_particle` and stored in `WeatherState::particles`. Each frame `Overlay::update_weather` moves every particle by its velocity plus the current wind contribution, then removes any that have scrolled off the screen bounds. Particles are never explicitly recycled — they are simply dropped and re-spawned at the top edge.  # Fields - `x` — `f32` — Horizontal position in screen pixels. - `y` — `f32` — Vertical position in screen pixels. - `vx` — `f32` — Horizontal velocity in pixels per second (base, before wind). - `vy` — `f32` — Vertical velocity in pixels per second (base, before wind). - `size` — `f32` — Particle radius/size in pixels. - `alpha` — `f32` — Particle opacity (0.0–1.0).",
+            "file": "src/effect/weather.rs",
+            "line": 101
+          },
+          {
+            "name": "WeatherState",
+            "kind": "struct",
+            "description": "Weather subsystem state.  Controls the full particle simulation for the current weather. The `intensity` value (0.0–1.0) scales both the maximum live particle count (up to 200) and the spawn rate. `spawn_timer` is an internal accumulator that should not be written to from outside the module — it is managed entirely by `Overlay::update_weather`. Wind affects all particles equally by adding a global velocity offset each frame.  # Fields - `enabled` — `bool` — Whether the weather spawner is active. - `weather_type` — `WeatherType` — Determines particle appearance and base velocity. - `intensity` — `f32` — Particle density (0.0–1.0); scales max count and spawn rate. - `wind_direction` — `f32` — Wind angle in radians; 0 = right, π/2 = down. - `wind_speed` — `f32` — Wind speed in pixels per second. - `particles` — `Vec<WeatherParticle>` — Currently live particles.",
+            "file": "src/effect/weather.rs",
+            "line": 133
+          }
+        ]
+      },
       "event::event_queue": {
         "module_doc": "Event types and FIFO event queue.",
         "source_file": "src/event/event_queue.rs",
@@ -3372,6 +3701,192 @@
         "module_doc": "Lurek2D engine binary entry point.  This crate is a thin wrapper around the `lurek2d` library crate. Its only job is to call [`lurek2d::lurek_run`], which installs the panic hook, parses the command-line game-directory argument, loads `conf.lua`, and enters the main engine loop.  Two binary crates share the same source via `Cargo.toml` feature flags:   - `luna`   — console-attached binary (default, used during development)   - `lurekc`  — no-console binary (Windows release build, no terminal window)  To run a game pass the path to the game directory as the first CLI argument:  ```text luna path/to/my_game ```  If no argument is given, the engine looks for `main.lua` in the current working directory and falls back to the splash screen if none is found.",
         "source_file": "src/main.rs",
         "items": []
+      },
+      "light::attenuation": {
+        "module_doc": "Custom attenuation coefficients for light falloff curves.",
+        "source_file": "src/light/attenuation.rs",
+        "items": [
+          {
+            "name": "Attenuation",
+            "kind": "struct",
+            "description": "Custom attenuation coefficients controlling light intensity decay.  # Fields - `constant` — `f32`. - `linear` — `f32`. - `quadratic` — `f32`.  The effective intensity at distance `d` is: `intensity / (constant + linear * d + quadratic * d * d)`. Defaults: constant = 1.0, linear = 0.0, quadratic = 0.0 (no custom attenuation).",
+            "file": "src/light/attenuation.rs",
+            "line": 14
+          }
+        ]
+      },
+      "light::blend_mode": {
+        "module_doc": "Light blend mode enum for controlling how light color mixes with the scene.",
+        "source_file": "src/light/blend_mode.rs",
+        "items": [
+          {
+            "name": "LightBlendMode",
+            "kind": "enum",
+            "description": "How light color mixes with the scene.  # Variants - `Add` — Add variant. - `Sub` — Sub variant. - `Mix` — Mix variant.",
+            "file": "src/light/blend_mode.rs",
+            "line": 10
+          }
+        ]
+      },
+      "light::falloff": {
+        "module_doc": "Falloff mode enum for controlling how light intensity decays over distance.",
+        "source_file": "src/light/falloff.rs",
+        "items": [
+          {
+            "name": "FalloffMode",
+            "kind": "enum",
+            "description": "How light intensity decays from center to edge.  # Variants - `Linear` — Linear variant. - `Smooth` — Smooth variant. - `Constant` — Constant variant.",
+            "file": "src/light/falloff.rs",
+            "line": 10
+          }
+        ]
+      },
+      "light::flicker": {
+        "module_doc": "Built-in flicker effect configuration for lights.",
+        "source_file": "src/light/flicker.rs",
+        "items": [
+          {
+            "name": "FlickerConfig",
+            "kind": "struct",
+            "description": "Built-in flicker effect that modulates light intensity over time.  # Fields - `enabled` — `bool`. - `speed` — `f32`. - `strength` — `f32`. - `phase` — `f32`.  When enabled, the engine modulates `intensity` each frame by: `intensity * (1.0 + strength * sin(phase))`. The `phase` field auto-advances by `speed * dt` each tick.",
+            "file": "src/light/flicker.rs",
+            "line": 15
+          }
+        ]
+      },
+      "light::light2d": {
+        "module_doc": "2D point light data container for lighting systems.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for light2d-related operations and data management. Key types exported from this module: `Light2D`. Primary functions: `new()`, `set_position()`, `get_position()`, `set_radius()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
+        "source_file": "src/light/light2d.rs",
+        "items": [
+          {
+            "name": "Light2D",
+            "kind": "struct",
+            "description": "2D point light with position, radius, color, intensity, and shadow settings.  # Fields - `x` — `f32`. - `y` — `f32`. - `radius` — `f32`. - `color` — `Color`. - `intensity` — `f32`. - `enabled` — `bool`. - `energy` — `f32`. - `blend_mode` — `LightBlendMode`. - `falloff` — `FalloffMode`. - `shadow_enabled` — `bool`. - `shadow_color` — `Color`. - `shadow_filter` — `ShadowFilter`. - `shadow_smooth` — `f32`. - `light_mask` — `u16`. - `shadow_mask` — `u16`. - `light_type` — `LightType`. - `direction` — `f32`. - `inner_angle` — `f32`. - `outer_angle` — `f32`. - `attenuation` — `Attenuation`. - `flicker` — `FlickerConfig`. - `group_id` — `u16`. - `volumetric` — `bool`.  Stores all parameters needed to describe a circular light source in 2D space: position, reach, tint, brightness, and on/off state, plus energy scaling, blend mode, falloff curve, shadow settings, light geometry type, custom attenuation, flicker effects, and grouping.",
+            "file": "src/light/light2d.rs",
+            "line": 54
+          }
+        ]
+      },
+      "light::light_type": {
+        "module_doc": "Light type enum for point, directional, and spot lights.",
+        "source_file": "src/light/light_type.rs",
+        "items": [
+          {
+            "name": "LightType",
+            "kind": "enum",
+            "description": "The geometric shape of a light source.  # Variants - `Point` — Point variant. - `Directional` — Directional variant. - `Spot` — Spot variant.  `Point` emits equally in all directions from a single position. `Directional` casts parallel rays in a given direction with no positional falloff. `Spot` emits a cone of light defined by inner and outer angles.",
+            "file": "src/light/light_type.rs",
+            "line": 14
+          }
+        ]
+      },
+      "light::light_world": {
+        "module_doc": "Resource pool and state for the 2D lighting system.",
+        "source_file": "src/light/light_world.rs",
+        "items": [
+          {
+            "name": "LightWorld",
+            "kind": "struct",
+            "description": "Resource pool and state for the 2D lighting system.  # Fields - `lights` — `SlotMap<LightKey, Light2D>`. - `occluders` — `SlotMap<OccluderKey, Occluder>`. - `ambient` — `Color`. - `enabled` — `bool`. - `max_lights` — `u16`.  Owns all light sources and shadow occluders. The renderer reads this each frame to produce the lighting pass. `enabled` auto-activates when the first light is added.",
+            "file": "src/light/light_world.rs",
+            "line": 24
+          }
+        ]
+      },
+      "light": {
+        "module_doc": "2D point-light data model — Tier 1 core engine module.  Provides `Light2D`, a pure data container describing a circular point light source in 2D space (position, radius, color, intensity, enabled flag). No GPU resources are stored here; the renderer receives light data via `RenderCommand` variants and performs all GPU work after the Lua callback returns.  Also provides `LightBlendMode`, `FalloffMode`, `ShadowFilter` enums, `LightType` (Point/Directional/Spot), `Attenuation` coefficients, `FlickerConfig` built-in flicker effects, `Occluder` polygon shadow casters, and `LightWorld` resource pool.  ## Tier  `light` is a **Tier 1 — Core Engine** module. It may import only `math` and `engine`. It must not import other Tier 1 modules.",
+        "source_file": "src/light/mod.rs",
+        "items": [
+          {
+            "name": "attenuation",
+            "kind": "mod",
+            "description": "Custom attenuation coefficients for distance falloff.",
+            "file": "src/light/mod.rs",
+            "line": 19
+          },
+          {
+            "name": "blend_mode",
+            "kind": "mod",
+            "description": "How light color mixes with the scene.",
+            "file": "src/light/mod.rs",
+            "line": 21
+          },
+          {
+            "name": "falloff",
+            "kind": "mod",
+            "description": "How light intensity decays from center to edge.",
+            "file": "src/light/mod.rs",
+            "line": 23
+          },
+          {
+            "name": "flicker",
+            "kind": "mod",
+            "description": "Built-in flicker effect configuration.",
+            "file": "src/light/mod.rs",
+            "line": 25
+          },
+          {
+            "name": "light2d",
+            "kind": "mod",
+            "description": "2D point-light data container: position, radius, color, and intensity.",
+            "file": "src/light/mod.rs",
+            "line": 27
+          },
+          {
+            "name": "light_type",
+            "kind": "mod",
+            "description": "Geometric light type: point, directional, or spot.",
+            "file": "src/light/mod.rs",
+            "line": 29
+          },
+          {
+            "name": "light_world",
+            "kind": "mod",
+            "description": "Resource pool and state for the 2D lighting system.",
+            "file": "src/light/mod.rs",
+            "line": 31
+          },
+          {
+            "name": "occluder",
+            "kind": "mod",
+            "description": "Polygon shadow caster that blocks light.",
+            "file": "src/light/mod.rs",
+            "line": 33
+          },
+          {
+            "name": "shadow",
+            "kind": "mod",
+            "description": "Edge quality for shadow boundaries.",
+            "file": "src/light/mod.rs",
+            "line": 35
+          }
+        ]
+      },
+      "light::occluder": {
+        "module_doc": "Polygon shadow caster for the 2D lighting system.",
+        "source_file": "src/light/occluder.rs",
+        "items": [
+          {
+            "name": "Occluder",
+            "kind": "struct",
+            "description": "Polygon shadow caster that blocks light.  # Fields - `vertices` — `Vec<Vec2>`. - `position` — `Vec2`. - `opacity` — `f32`. - `light_mask` — `u16`. - `enabled` — `bool`.  An occluder defines a convex or concave polygon that casts shadows when placed between a light source and the scene. The `light_mask` field controls which lights this occluder interacts with.",
+            "file": "src/light/occluder.rs",
+            "line": 17
+          }
+        ]
+      },
+      "light::shadow": {
+        "module_doc": "Shadow filter enum for controlling edge quality of shadow boundaries.",
+        "source_file": "src/light/shadow.rs",
+        "items": [
+          {
+            "name": "ShadowFilter",
+            "kind": "enum",
+            "description": "Edge quality for shadow boundaries.  # Variants - `None` — None variant. - `Pcf5` — Pcf5 variant. - `Pcf13` — Pcf13 variant.",
+            "file": "src/light/shadow.rs",
+            "line": 10
+          }
+        ]
       },
       "log": {
         "module_doc": "Structured log level management and configurable log sinks for Lurek2D scripts.  Delegates to Rust's `log` crate via `crate::runtime::log_messages`. Log output from game scripts appears alongside engine log output and is controlled by the `RUST_LOG` environment variable.  In addition to the default stderr output, Lua scripts can register extra [`crate::log::sinks::Sink`] destinations (files, in-memory ring buffers) via the `lurek.log.*` API.",
@@ -5920,86 +6435,6 @@
           }
         ]
       },
-      "render::camera": {
-        "module_doc": "This is a Tier 1 engine module. Imports only from `crate::math`.  ## Subsystem inventory - [`camera`] — [`Camera`] and [`Camera2D`] transform types - [`viewport`] — [`Viewport`] virtual-resolution mapping with [`ScaleMode`] - [`viewport_scale`] — [`ViewportScale`] with automatic scaled-dimension tracking  ## Architecture note (Tier 1) `camera` is a Tier 1 engine module. It was extracted from `src/graphics/` during the graphics-module-split session. `SharedState` holds a `Camera` field; see `work/graphics-module-split/reports/camera-decision.md` for the CPD-1 Option C rationale.  ## Typical usage sequence 1. Construct a [`Camera`] or [`Camera2D`] via `new()`. 2. Call `view_matrix()` to obtain the transform applied to draw calls. 3. Use [`Viewport`] or [`ViewportScale`] to map the fixed game resolution onto the window.",
-        "source_file": "src/render/camera/mod.rs",
-        "items": [
-          {
-            "name": "types",
-            "kind": "mod",
-            "description": "Camera types: [`Camera`] (flat API) and [`Camera2D`] (smooth follow, shake, bounds).",
-            "file": "src/render/camera/mod.rs",
-            "line": 21
-          },
-          {
-            "name": "viewport",
-            "kind": "mod",
-            "description": "Virtual-resolution viewport with letterbox / stretch / pixel-perfect scaling.",
-            "file": "src/render/camera/mod.rs",
-            "line": 23
-          },
-          {
-            "name": "viewport_scale",
-            "kind": "mod",
-            "description": "Virtual-resolution viewport that also exposes scaled content dimensions for transform-stack integration.",
-            "file": "src/render/camera/mod.rs",
-            "line": 25
-          }
-        ]
-      },
-      "render::camera::types": {
-        "module_doc": "Camera types for 2D viewport control.  Provides the original [`Camera`] (used by `SharedState` for the flat `lurek.gfx.setCamera()` API) and the new Phase 24 [`Camera2D`] with smooth follow, dead zone, bounds clamping, and screen-shake.",
-        "source_file": "src/render/camera/types.rs",
-        "items": [
-          {
-            "name": "Camera",
-            "kind": "struct",
-            "description": "Basic camera with position, zoom, and rotation.  Used by `SharedState` for the flat `lurek.gfx.setCamera()` API.  # Fields - `position` — World-space centre point the camera is looking at. - `zoom` — Uniform scale factor; `1.0` = natural size, `2.0` = 2x zoom in. - `rotation` — Rotation in radians, applied after zoom.",
-            "file": "src/render/camera/types.rs",
-            "line": 21
-          },
-          {
-            "name": "Camera2D",
-            "kind": "struct",
-            "description": "Full-featured 2D camera with smooth follow, dead zone, bounds clamping,  # Fields - `position` — `Vec2`. - `zoom` — `f32`. - `rotation` — `f32`. - `viewport` — `Rect`. - `bounds` — `Option<Rect>`. - `target` — `Option<Vec2>`. - `follow_smooth` — `f32`. - `dead_zone` — `Option<(f32, f32)>`. - `look_ahead` — `f32`. and screen-shake.  Create with [`Camera2D::new`], configure follow / bounds / shake, then call [`Camera2D::update`] each frame. Use [`Camera2D::view_matrix`] to obtain the transform for rendering.",
-            "file": "src/render/camera/types.rs",
-            "line": 118
-          }
-        ]
-      },
-      "render::camera::viewport": {
-        "module_doc": "Virtual resolution viewport with manual transform application.  Maps a fixed game resolution onto an arbitrary window size using letterboxing, stretching, or pixel-perfect scaling.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for viewport-related operations and data management. Key types exported from this module: `ScaleMode`, `Viewport`. Primary functions: `new()`, `resize()`, `get_scale()`, `get_offset()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
-        "source_file": "src/render/camera/viewport.rs",
-        "items": [
-          {
-            "name": "ScaleMode",
-            "kind": "enum",
-            "description": "Scale mode for virtual resolution mapping.  # Variants - `Letterbox` — Letterbox variant. - `Stretch` — Stretch variant. - `PixelPerfect` — PixelPerfect variant.",
-            "file": "src/render/camera/viewport.rs",
-            "line": 21
-          },
-          {
-            "name": "Viewport",
-            "kind": "struct",
-            "description": "Virtual resolution with manual transform application.  # Fields - `game_width` — `f32`. - `game_height` — `f32`. - `scale_mode` — `ScaleMode`. - `scale_x` — `f32`. - `scale_y` — `f32`. - `offset_x` — `f32`. - `offset_y` — `f32`.  Maintains a mapping between a fixed game coordinate space and the actual window pixel dimensions. Call `resize()` whenever the window size changes.",
-            "file": "src/render/camera/viewport.rs",
-            "line": 44
-          }
-        ]
-      },
-      "render::camera::viewport_scale": {
-        "module_doc": "Virtual resolution viewport with automatic scaling and transform stack integration.  Like `Viewport`, but also tracks the scaled content dimensions for use with an automatic graphics transform stack.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for viewport scale-related operations and data management. Key types exported from this module: `ViewportScale`. Primary functions: `new()`, `resize()`, `get_game_dimensions()`, `get_scaled_dimensions()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
-        "source_file": "src/render/camera/viewport_scale.rs",
-        "items": [
-          {
-            "name": "ViewportScale",
-            "kind": "struct",
-            "description": "Virtual resolution with automatic graphics stack management.  # Fields - `game_width` — `f32`. - `game_height` — `f32`. - `mode` — `ScaleMode`. - `scale_x` — `f32`. - `scale_y` — `f32`. - `offset_x` — `f32`. - `offset_y` — `f32`. - `scaled_width` — `f32`. - `scaled_height` — `f32`.  Extends the basic viewport concept by also computing `scaled_width` and `scaled_height`, which represent the game area in window pixels after scaling.",
-            "file": "src/render/camera/viewport_scale.rs",
-            "line": 32
-          }
-        ]
-      },
       "render::canvas": {
         "module_doc": "Off-screen render targets (canvases) for deferred compositing.  A `Canvas` stores the logical dimensions of an off-screen texture that the GPU renderer can draw to.  After rendering, the canvas can be composited to the screen (or another canvas) as a regular image.",
         "source_file": "src/render/canvas.rs",
@@ -6056,255 +6491,6 @@
             "description": "Z-ordered draw callback queue. Consult the module-level documentation for the broader usage context and preconditions.  Collects entries during the draw phase and flushes them in z-order so that rendering happens back-to-front.  # Fields - `entries` — `Vec<LayerEntry>`. - `next_id` — `usize`.",
             "file": "src/render/draw_layer.rs",
             "line": 34
-          }
-        ]
-      },
-      "render::effect::ambient": {
-        "module_doc": "Ambient lighting state with time-of-day colour cycling.  Provides [`AmbientState`] for gradual ambient colour transitions driven by an in-game clock.",
-        "source_file": "src/render/effect/ambient.rs",
-        "items": [
-          {
-            "name": "AmbientState",
-            "kind": "struct",
-            "description": "Ambient lighting state with time-of-day colour cycling.  When `enabled` is `true`, `Overlay::update` calls `compute_color_from_time()` each frame and stores the result back into `color`. This means any manual writes to `color` will be overwritten on the next update. To set the tint manually without cycling, set `enabled = false` and write directly to `color`.  # Fields - `enabled` — `bool` — Whether time-of-day colour cycling is active. - `color` — `[f32; 4]` — Current ambient tint (RGBA); auto-computed when enabled. - `time_of_day` — `f32` — Time of day in hours (0.0–24.0); drives `compute_color_from_time`.",
-            "file": "src/render/effect/ambient.rs",
-            "line": 19
-          }
-        ]
-      },
-      "render::effect::atmosphere": {
-        "module_doc": "Atmospheric visual effects data models.  Contains data-only structs for clouds, fog, vignette, lightning, film grain, and heat haze — all consumed by the overlay renderer.",
-        "source_file": "src/render/effect/atmosphere.rs",
-        "items": [
-          {
-            "name": "CloudState",
-            "kind": "struct",
-            "description": "Cloud shadow overlay state.  Renders `count` soft shadow blobs that drift horizontally across the screen. The `offset` field is an internal scroll accumulator that advances by `speed * dt` each frame; the renderer uses it as a UV shift and the value is allowed to grow without bound (the renderer wraps it modulo screen width). Adjust `scale` to change blob size and `opacity` to control how dark the shadows appear.  # Fields - `enabled` — `bool` — Whether cloud shadows are active. - `count` — `u32` — Number of cloud shadow blobs rendered each frame. - `speed` — `f32` — Horizontal scroll speed in pixels per second. - `scale` — `f32` — Relative blob size (1.0 = default). - `opacity` — `f32` — Shadow overlay opacity (0.0–1.0). - `offset` — `f32` — Internal accumulator; used by the renderer as a UV offset.",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 23
-          },
-          {
-            "name": "FogState",
-            "kind": "struct",
-            "description": "Atmospheric fog state.  Renders a uniform translucent colour rectangle over the entire scene, simulating thick atmospheric haze. The `density` field maps linearly to the overlay opacity — a `density` of 1.0 fills the screen with the solid `color`; 0.0 is invisible. This is a simple per-frame alpha blend and does not perform any distance-based depth fog calculation. For a subtler ground-level effect, pair it with a low opacity and a grey-blue tint.  # Fields - `enabled` — `bool` — Whether fog is active. - `density` — `f32` — Fog opacity (0.0–1.0); maps directly to blend alpha. - `color` — `[f32; 4]` — Fog tint colour (RGBA).",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 66
-          },
-          {
-            "name": "HeatHazeState",
-            "kind": "struct",
-            "description": "Heat haze distortion state.  Provides a UV-space shimmer distortion driven by a slowly-evolving sine wave pattern. The `intensity` field scales the peak UV offset in screen-space pixels — values in the 0.2–2.0 range produce a subtle desert mirage effect; higher values are suitable for extreme heat or magical distortion. The GPU layer in `lua_api` animates the sine phase using the current game time, so no per-frame Lua call is needed.  # Fields - `enabled` — `bool` — Whether heat haze distortion is active. - `intensity` — `f32` — Peak UV displacement in pixels (typical range 0.0–5.0).",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 98
-          },
-          {
-            "name": "VignetteState",
-            "kind": "struct",
-            "description": "Vignette screen-edge darkening state.  Applies a smooth radial darkening that grades from transparent at the screen centre to opaque black at the corners. The `strength` value controls how aggressively the edges are darkened: 0.0 produces no visible effect; 0.5 is a gentle film-like border; 1.0 crushes the corners to near-black. The vignette is useful for directing the player's eye toward the centre of the screen and for conveying low-health or tense atmospheric states.  # Fields - `enabled` — `bool` — Whether vignette darkening is active. - `strength` — `f32` — Edge darkening intensity (0.0–1.0; default 0.5).",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 128
-          },
-          {
-            "name": "FilmGrainState",
-            "kind": "struct",
-            "description": "Film grain noise overlay state.  Adds randomised per-pixel luminance noise over the rendered scene, simulating the grain of analog film stock. The noise pattern is regenerated every frame by the GPU layer so it does not repeat or flicker in a regular pattern. `intensity` scales the peak noise amplitude: 0.1–0.3 gives a subtle cinematic look; values above 0.5 produce a heavy grain that can obscure fine detail.  # Fields - `enabled` — `bool` — Whether film grain noise is active. - `intensity` — `f32` — Grain amplitude (0.0–1.0; default 0.3).",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 157
-          },
-          {
-            "name": "LightningState",
-            "kind": "struct",
-            "description": "Lightning flash state.  A single-shot full-screen hard flash distinct from `FlashState`: lightning uses a very short default duration (0.15 s) and is designed to simulate the brief, intense luminosity of a lightning bolt. Trigger it with `Overlay::trigger_lightning`; the flash is non-repeating and deactivates automatically once `elapsed >= duration`. For sustained ambient flicker, chain repeated `trigger_lightning` calls from Lua with randomised delays.  # Fields - `active` — `bool` — Whether a lightning flash is in progress. - `color` — `[f32; 4]` — Flash colour (RGBA); defaults to pale blue-white. - `elapsed` — `f32` — Time elapsed since the last trigger (seconds). - `duration` — `f32` — Total flash duration in seconds (default 0.15).",
-            "file": "src/render/effect/atmosphere.rs",
-            "line": 189
-          }
-        ]
-      },
-      "render::effect::effect": {
-        "module_doc": "Post-processing effect data model.  Defines [`PostFxEffect`] — a single named effect with typed parameters for the post-processing pipeline.",
-        "source_file": "src/render/effect/effect.rs",
-        "items": [
-          {
-            "name": "PostFxEffect",
-            "kind": "struct",
-            "description": "A single post-processing effect with named float parameters.  Acts as a parameter bag describing one shader pass — it does NOT hold any GPU resource. Parameters are stored in a `HashMap<String, f32>` so that new shader uniforms can be added without changing the struct layout. Use `PostFxEffectType::default_params` to pre-populate sensible defaults, then call `set_parameter` to override individual values. The `enabled` flag lets you temporarily skip the pass within the stack without removing it.  # Fields - `effect_type` — `PostFxEffectType` — Which shader pass to run. - `params` — Named float parameters controlling the shader (e.g., `\"threshold\"`, `\"intensity\"`). - `enabled` — Whether this effect is active within its parent stack. - `shader_id` — Optional custom shader handle; only used for `Custom` effects.",
-            "file": "src/render/effect/effect.rs",
-            "line": 28
-          }
-        ]
-      },
-      "render::effect::effect_type": {
-        "module_doc": "Built-in post-processing effect type definitions.  Enumerates all shader passes recognised by the engine's post-processing pipeline and provides parameter presets for each.",
-        "source_file": "src/render/effect/effect_type.rs",
-        "items": [
-          {
-            "name": "PostFxEffectType",
-            "kind": "enum",
-            "description": "Built-in effect types for the post-processing pipeline.  Each variant maps to a distinct full-screen shader pass implemented in `lua_api`. The `Custom` variant defers to an external shader ID supplied via `PostFxEffect::new_custom`. Use `PostFxEffectType::from_name` to parse effect names from Lua strings, and `PostFxEffect::default_params` to retrieve the canonical starting parameters for each type.  # Variants - `Bloom` — HDR bloom with threshold and intensity parameters. - `Blur` — Gaussian blur with configurable radius and strength. - `Crt` — CRT monitor simulation with scanline strength. - `Godrays` — Light ray / god ray screen-space effect with intensity. - `Vignette` — Screen edge darkening with configurable strength. - `ColourGrade` — Colour grading with brightness, contrast, and saturation. - `Chromatic` — Chromatic aberration with pixel offset. - `Pixelate` — Block pixelation effect with configurable block size. - `Sepia` — Warm sepia tone mapping with configurable strength. - `Grayscale` — Desaturate to greyscale with configurable strength. - `Invert` — Colour inversion with configurable strength. - `Scanlines` — Horizontal scanline bars (CRT-free) with strength and spacing. - `EdgeDetect` — Sobel edge detection outline with configurable strength. - `HueShift` — Hue rotation in degrees. - `Noise` — Random per-pixel noise with configurable strength. - `Custom` — User-provided shader pass created via `newPass()`.",
-            "file": "src/render/effect/effect_type.rs",
-            "line": 34
-          }
-        ]
-      },
-      "render::effect::image_effect": {
-        "module_doc": "`ImageEffect` â€” an ordered chain of `PostFxEffect` passes for per-image draw calls.  [`ImageEffect`] groups one or more [`PostFxEffect`] entries and converts them to lightweight [`crate::render::ShaderPassDescriptor`] values via [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted to import from `crate::graphics` (Tier 1).",
-        "source_file": "src/render/effect/image_effect.rs",
-        "items": [
-          {
-            "name": "ImageEffect",
-            "kind": "struct",
-            "description": "An ordered shader-effect chain to apply when drawing a single image.  Can be attached to a `lurek.graphic.draw` call via the options-table overload (`effect` key). Effects are applied in insertion order through each enabled pass. `to_passes` converts the chain to the lightweight Tier-1 type embedded into `RenderCommand` variants.  Each effect entry is stored as a shared `Rc<RefCell<PostFxEffect>>` so that Lua-side handles returned by `addEffect` or `getEffect` reflect mutations made through the chain itself.  # Fields - `effects` â€” `Vec<Rc<RefCell<PostFxEffect>>>` â€” Ordered list of shader passes. - `name` â€” `String` â€” Optional human-readable label for the chain.",
-            "file": "src/render/effect/image_effect.rs",
-            "line": 30
-          }
-        ]
-      },
-      "render::effect": {
-        "module_doc": "Composable visual effects layer — Tier 2 Engine Extension.  The `fx` module provides two families of visual effects as pure CPU data models. GPU application is handled in `lua_api`. All files are flat in this folder.  ## Post-processing effects (image-space pipeline)  | File | Types | |---|---| | `effect_type` | `PostFxEffectType` — enum of all built-in effect kinds | | `effect` | `PostFxEffect` — per-effect parameter bag | | `stack` | `PostFxStack` — ordered pipeline of post-processing passes | | `image_effect` | `ImageEffect` — lightweight per-image effect chain |  ## Screen overlays (world-simulation effects)  | File | Types | |---|---| | `ambient` | `AmbientState` — time-of-day colour cycling | | `atmosphere` | `CloudState`, `FogState`, `HeatHazeState`, `VignetteState`, `FilmGrainState`, `LightningState` | | `screen_effects` | `FlashState`, `ShakeState`, `FadeState` — one-shot screen effects | | `overlay` | `Overlay` — main struct combining all screen subsystems | | `weather` | `WeatherState`, `WeatherParticle`, `WeatherType` — weather simulation |  ## Tier  `fx` is a **Tier 2 — Engine Extension** module. It may import `math`, `engine`, and any Tier 1 module. It must not import other Tier 2 modules.",
-        "source_file": "src/render/effect/mod.rs",
-        "items": [
-          {
-            "name": "effect",
-            "kind": "mod",
-            "description": "Per-effect parameter bag with builder helpers.",
-            "file": "src/render/effect/mod.rs",
-            "line": 33
-          },
-          {
-            "name": "effect_type",
-            "kind": "mod",
-            "description": "Enum of all built-in post-processing effect kinds (bloom, blur, CRT, colour grading, …).",
-            "file": "src/render/effect/mod.rs",
-            "line": 35
-          },
-          {
-            "name": "image_effect",
-            "kind": "mod",
-            "description": "Lightweight per-image effect chain (subset of the full pipeline).",
-            "file": "src/render/effect/mod.rs",
-            "line": 37
-          },
-          {
-            "name": "stack",
-            "kind": "mod",
-            "description": "Ordered pipeline of post-processing passes applied to the rendered scene.",
-            "file": "src/render/effect/mod.rs",
-            "line": 39
-          },
-          {
-            "name": "ambient",
-            "kind": "mod",
-            "description": "Ambient lighting state with time-of-day colour cycling (night → dawn → day → dusk).",
-            "file": "src/render/effect/mod.rs",
-            "line": 44
-          },
-          {
-            "name": "atmosphere",
-            "kind": "mod",
-            "description": "Atmospheric effects: clouds, fog, heat haze, vignette, film grain, lightning.",
-            "file": "src/render/effect/mod.rs",
-            "line": 46
-          },
-          {
-            "name": "overlay",
-            "kind": "mod",
-            "description": "Main `Overlay` struct combining all screen-effect subsystems into one per-frame controller.",
-            "file": "src/render/effect/mod.rs",
-            "line": 48
-          },
-          {
-            "name": "screen_effects",
-            "kind": "mod",
-            "description": "One-shot screen effects: flash (colour burst), shake (jitter), fade (alpha transition).",
-            "file": "src/render/effect/mod.rs",
-            "line": 50
-          },
-          {
-            "name": "weather",
-            "kind": "mod",
-            "description": "Weather simulation: rain, snow, hail, dust, leaves, ash, pollen particles.",
-            "file": "src/render/effect/mod.rs",
-            "line": 52
-          }
-        ]
-      },
-      "render::effect::overlay": {
-        "module_doc": "Composable per-frame overlay system.  [`Overlay`] aggregates ambient, atmospheric, weather, and screen effect sub-states and ticks them each frame.",
-        "source_file": "src/render/effect/overlay.rs",
-        "items": [
-          {
-            "name": "Overlay",
-            "kind": "struct",
-            "description": "Composable per-frame screen-effect overlay managing multiple visual subsystems.  All subsystems start inactive and can be enabled independently. Each frame the game loop should call `update(dt)` to advance the simulation, then use `get_shake_offset`, `get_flash_alpha`, etc. (or the Lua API methods) to read back values for the renderer. No GPU objects are stored here; this struct is a pure data model.  Typical Lua usage: ```lua local o = lurek.effect.newOverlay(800, 600) o:setWeather(\"rain\")   -- enable rain o:setWeatherEnabled(true) o:flash(1, 1, 1)        -- quick white flash -- in lurek.update(dt): o:update(dt) ```  # Fields - `width` ÔÇö `u32` ÔÇö Overlay canvas width in pixels. - `height` ÔÇö `u32` ÔÇö Overlay canvas height in pixels. - `weather` ÔÇö Weather particle subsystem. - `ambient` ÔÇö Ambient lighting with time-of-day colour cycling. - `flash` ÔÇö One-shot screen flash effect. - `shake` ÔÇö Camera-shake effect with decaying PRNG offsets. - `fade` ÔÇö Full-screen colour fade effect. - `clouds` ÔÇö Scrolling cloud shadow overlay. - `fog` ÔÇö Uniform atmospheric fog tint. - `heat_haze` ÔÇö Distortion strength for shimmer effects. - `vignette` ÔÇö Screen-edge darkening. - `film_grain` ÔÇö Per-frame random noise overlay. - `lightning` ÔÇö Hard single-frame lightning flash.",
-            "file": "src/render/effect/overlay.rs",
-            "line": 47
-          }
-        ]
-      },
-      "render::effect::screen_effects": {
-        "module_doc": "Full-screen transient effects.  Provides [`FlashState`], [`FadeState`], and [`ShakeState`] for brief screen-wide visual feedback.",
-        "source_file": "src/render/effect/screen_effects.rs",
-        "items": [
-          {
-            "name": "FlashState",
-            "kind": "struct",
-            "description": "Flash screen effect state.  A flash overlays an opaque colour rectangle on the screen for a short duration. The alpha fades linearly from `color[3]` (at `elapsed = 0`) down to zero (at `elapsed = duration`); the fade is computed on read by `Overlay::get_flash_alpha`. Calling `Overlay::trigger_flash` while a flash is already active restarts it from the beginning with the new colour and duration.  # Fields - `active` — `bool` — Whether a flash is in progress. - `color` — `[f32; 4]` — Flash colour (RGBA); `color[3]` is the initial alpha. - `duration` — `f32` — Total flash duration in seconds. - `elapsed` — `f32` — Time elapsed since flash start.",
-            "file": "src/render/effect/screen_effects.rs",
-            "line": 21
-          },
-          {
-            "name": "ShakeState",
-            "kind": "struct",
-            "description": "Shake screen effect state.  The shake applies a per-frame pixel offset to the camera or draw origin. Offsets are generated by a simple xorshift PRNG seeded at struct creation, giving a deterministic-ish sequence every run — no heap allocation is needed. The intensity decays linearly with the fraction of elapsed time so the shake diminishes smoothly. Calling `Overlay::trigger_shake` while a shake is already active resets elapsed time to zero and applies the new parameters immediately.  # Fields - `active` — `bool` — Whether a shake is in progress. - `intensity` — `f32` — Peak shake magnitude in pixels. - `duration` — `f32` — Total shake duration in seconds. - `elapsed` — `f32` — Time elapsed since shake start. - `offset_x` — `f32` — Current horizontal pixel offset (read by the renderer). - `offset_y` — `f32` — Current vertical pixel offset (read by the renderer).",
-            "file": "src/render/effect/screen_effects.rs",
-            "line": 61
-          },
-          {
-            "name": "FadeState",
-            "kind": "struct",
-            "description": "Fade screen effect state.  A fade interpolates `color[3]` (the alpha channel of the fill colour) from `start_alpha` to `target_alpha` over `duration` seconds. `start_alpha` is captured automatically from the current `color[3]` when `Overlay::trigger_fade` is called, so a fade-out can seamlessly continue from wherever the previous fade-in stopped. Calling `trigger_fade` while a fade is already in progress restarts it with the new target and duration from the current alpha.  # Fields - `active` — `bool` — Whether a fade is in progress. - `color` — `[f32; 4]` — Fill colour (RGB) with the animated alpha in `[3]`. - `target_alpha` — `f32` — Alpha value to reach at the end of the fade (0.0–1.0). - `duration` — `f32` — Total fade duration in seconds. - `elapsed` — `f32` — Time elapsed since fade start. - `start_alpha` — `f32` — Alpha at the moment the fade was triggered.",
-            "file": "src/render/effect/screen_effects.rs",
-            "line": 124
-          }
-        ]
-      },
-      "render::effect::stack": {
-        "module_doc": "Post-processing effect stack.  [`PostFxStack`] manages an ordered chain of effects that captures and processes the rendered scene each frame.",
-        "source_file": "src/render/effect/stack.rs",
-        "items": [
-          {
-            "name": "PostFxStack",
-            "kind": "struct",
-            "description": "An ordered chain of effects that captures and processes the rendered scene.  The full lifecycle every draw frame is: 1. Call `beginCapture()` (Lua) — the GPU redirects draw calls to an    internal canvas. 2. Draw the scene normally. 3. Call `endCapture()` (Lua) — stops capture. 4. Call `apply()` (Lua) — runs each enabled effect in insertion order    through ping-pong canvases and blits the final result to the screen.  Effects are referenced by numeric index into the local `effects` vector in `LuaPostFxStack`. The `PostFxStack` itself is agnostic to the concrete effect objects and only tracks indices, enabled states, and canvas dimensions.  # Fields - `effects` — Ordered list of effect indices (referencing external storage). - `enabled` — Per-effect enable flag, parallel to `effects`. - `width` — Internal canvas width in pixels. - `height` — Internal canvas height in pixels.  The stack manages ping-pong canvases internally for multi-pass rendering. During `lurek.draw`, the user calls `beginCapture()` → draws scene → `endCapture()` → `apply()` to render the post-processed result.",
-            "file": "src/render/effect/stack.rs",
-            "line": 32
-          }
-        ]
-      },
-      "render::effect::weather": {
-        "module_doc": "Weather particle system data.  Defines [`WeatherType`], [`WeatherParticle`], and [`WeatherState`] for rain, snow, and dust particle overlays.",
-        "source_file": "src/render/effect/weather.rs",
-        "items": [
-          {
-            "name": "WeatherType",
-            "kind": "enum",
-            "description": "Weather particle types supported by the overlay system.  Each variant changes the visual character of spawned particles: their fall speed, size, and opacity are all tuned per type inside `Overlay::spawn_particle`. The `None` variant disables the spawner without clearing existing particles — call `Overlay::clear` to purge everything at once.  # Variants - `None` — No weather active; spawner is disabled. - `Rain` — Fast, narrow, semi-transparent streaks. - `Snow` — Slow, large, high-opacity dots with gentle drift. - `Hail` — Very fast, opaque, medium-sized pellets. - `Dust` — Very slow, small, low-opacity motes. - `Leaves` — Medium speed, large, high-opacity irregular blobs. - `Ash` — Slow, small, medium-opacity flakes. - `Pollen` — Extremely slow, tiny, low-opacity specks.",
-            "file": "src/render/effect/weather.rs",
-            "line": 24
-          },
-          {
-            "name": "WeatherParticle",
-            "kind": "struct",
-            "description": "A single weather particle in the overlay's weather system.  Particles are created by `Overlay::spawn_particle` and stored in `WeatherState::particles`. Each frame `Overlay::update_weather` moves every particle by its velocity plus the current wind contribution, then removes any that have scrolled off the screen bounds. Particles are never explicitly recycled — they are simply dropped and re-spawned at the top edge.  # Fields - `x` — `f32` — Horizontal position in screen pixels. - `y` — `f32` — Vertical position in screen pixels. - `vx` — `f32` — Horizontal velocity in pixels per second (base, before wind). - `vy` — `f32` — Vertical velocity in pixels per second (base, before wind). - `size` — `f32` — Particle radius/size in pixels. - `alpha` — `f32` — Particle opacity (0.0–1.0).",
-            "file": "src/render/effect/weather.rs",
-            "line": 101
-          },
-          {
-            "name": "WeatherState",
-            "kind": "struct",
-            "description": "Weather subsystem state.  Controls the full particle simulation for the current weather. The `intensity` value (0.0–1.0) scales both the maximum live particle count (up to 200) and the spawn rate. `spawn_timer` is an internal accumulator that should not be written to from outside the module — it is managed entirely by `Overlay::update_weather`. Wind affects all particles equally by adding a global velocity offset each frame.  # Fields - `enabled` — `bool` — Whether the weather spawner is active. - `weather_type` — `WeatherType` — Determines particle appearance and base velocity. - `intensity` — `f32` — Particle density (0.0–1.0); scales max count and spawn rate. - `wind_direction` — `f32` — Wind angle in radians; 0 = right, π/2 = down. - `wind_speed` — `f32` — Wind speed in pixels per second. - `particles` — `Vec<WeatherParticle>` — Currently live particles.",
-            "file": "src/render/effect/weather.rs",
-            "line": 133
           }
         ]
       },
@@ -6372,192 +6558,6 @@
             "description": "One shader pass in a per-image effect chain.  Carries the built-in effect name, a flat float-parameter map, and an enabled flag. The GPU renderer matches `effect_name` against known built-in effect names to select the correct shader pass. Passes with `enabled = false` are skipped during rendering.  # Fields - `effect_name` â€” `String` â€” Built-in effect name (e.g. `\"blur\"`, `\"vignette\"`). - `params` â€” `HashMap<String, f32>` â€” Named float parameters for the shader. - `enabled` â€” `bool` â€” When `false` this pass is skipped by the renderer.",
             "file": "src/render/image_effect.rs",
             "line": 24
-          }
-        ]
-      },
-      "render::light::attenuation": {
-        "module_doc": "Custom attenuation coefficients for light falloff curves.",
-        "source_file": "src/render/light/attenuation.rs",
-        "items": [
-          {
-            "name": "Attenuation",
-            "kind": "struct",
-            "description": "Custom attenuation coefficients controlling light intensity decay.  # Fields - `constant` — `f32`. - `linear` — `f32`. - `quadratic` — `f32`.  The effective intensity at distance `d` is: `intensity / (constant + linear * d + quadratic * d * d)`. Defaults: constant = 1.0, linear = 0.0, quadratic = 0.0 (no custom attenuation).",
-            "file": "src/render/light/attenuation.rs",
-            "line": 14
-          }
-        ]
-      },
-      "render::light::blend_mode": {
-        "module_doc": "Light blend mode enum for controlling how light color mixes with the scene.",
-        "source_file": "src/render/light/blend_mode.rs",
-        "items": [
-          {
-            "name": "LightBlendMode",
-            "kind": "enum",
-            "description": "How light color mixes with the scene.  # Variants - `Add` — Add variant. - `Sub` — Sub variant. - `Mix` — Mix variant.",
-            "file": "src/render/light/blend_mode.rs",
-            "line": 10
-          }
-        ]
-      },
-      "render::light::falloff": {
-        "module_doc": "Falloff mode enum for controlling how light intensity decays over distance.",
-        "source_file": "src/render/light/falloff.rs",
-        "items": [
-          {
-            "name": "FalloffMode",
-            "kind": "enum",
-            "description": "How light intensity decays from center to edge.  # Variants - `Linear` — Linear variant. - `Smooth` — Smooth variant. - `Constant` — Constant variant.",
-            "file": "src/render/light/falloff.rs",
-            "line": 10
-          }
-        ]
-      },
-      "render::light::flicker": {
-        "module_doc": "Built-in flicker effect configuration for lights.",
-        "source_file": "src/render/light/flicker.rs",
-        "items": [
-          {
-            "name": "FlickerConfig",
-            "kind": "struct",
-            "description": "Built-in flicker effect that modulates light intensity over time.  # Fields - `enabled` — `bool`. - `speed` — `f32`. - `strength` — `f32`. - `phase` — `f32`.  When enabled, the engine modulates `intensity` each frame by: `intensity * (1.0 + strength * sin(phase))`. The `phase` field auto-advances by `speed * dt` each tick.",
-            "file": "src/render/light/flicker.rs",
-            "line": 15
-          }
-        ]
-      },
-      "render::light::light2d": {
-        "module_doc": "2D point light data container for lighting systems.  This module is part of Lurek2D's `graphics` subsystem and provides the implementation details for light2d-related operations and data management. Key types exported from this module: `Light2D`. Primary functions: `new()`, `set_position()`, `get_position()`, `set_radius()`.  All public items are documented. See the parent module for architectural context and the `lurek.*` Lua API for the scripting interface.",
-        "source_file": "src/render/light/light2d.rs",
-        "items": [
-          {
-            "name": "Light2D",
-            "kind": "struct",
-            "description": "2D point light with position, radius, color, intensity, and shadow settings.  # Fields - `x` — `f32`. - `y` — `f32`. - `radius` — `f32`. - `color` — `Color`. - `intensity` — `f32`. - `enabled` — `bool`. - `energy` — `f32`. - `blend_mode` — `LightBlendMode`. - `falloff` — `FalloffMode`. - `shadow_enabled` — `bool`. - `shadow_color` — `Color`. - `shadow_filter` — `ShadowFilter`. - `shadow_smooth` — `f32`. - `light_mask` — `u16`. - `shadow_mask` — `u16`. - `light_type` — `LightType`. - `direction` — `f32`. - `inner_angle` — `f32`. - `outer_angle` — `f32`. - `attenuation` — `Attenuation`. - `flicker` — `FlickerConfig`. - `group_id` — `u16`. - `volumetric` — `bool`.  Stores all parameters needed to describe a circular light source in 2D space: position, reach, tint, brightness, and on/off state, plus energy scaling, blend mode, falloff curve, shadow settings, light geometry type, custom attenuation, flicker effects, and grouping.",
-            "file": "src/render/light/light2d.rs",
-            "line": 54
-          }
-        ]
-      },
-      "render::light::light_type": {
-        "module_doc": "Light type enum for point, directional, and spot lights.",
-        "source_file": "src/render/light/light_type.rs",
-        "items": [
-          {
-            "name": "LightType",
-            "kind": "enum",
-            "description": "The geometric shape of a light source.  # Variants - `Point` — Point variant. - `Directional` — Directional variant. - `Spot` — Spot variant.  `Point` emits equally in all directions from a single position. `Directional` casts parallel rays in a given direction with no positional falloff. `Spot` emits a cone of light defined by inner and outer angles.",
-            "file": "src/render/light/light_type.rs",
-            "line": 14
-          }
-        ]
-      },
-      "render::light::light_world": {
-        "module_doc": "Resource pool and state for the 2D lighting system.",
-        "source_file": "src/render/light/light_world.rs",
-        "items": [
-          {
-            "name": "LightWorld",
-            "kind": "struct",
-            "description": "Resource pool and state for the 2D lighting system.  # Fields - `lights` — `SlotMap<LightKey, Light2D>`. - `occluders` — `SlotMap<OccluderKey, Occluder>`. - `ambient` — `Color`. - `enabled` — `bool`. - `max_lights` — `u16`.  Owns all light sources and shadow occluders. The renderer reads this each frame to produce the lighting pass. `enabled` auto-activates when the first light is added.",
-            "file": "src/render/light/light_world.rs",
-            "line": 24
-          }
-        ]
-      },
-      "render::light": {
-        "module_doc": "2D point-light data model — Tier 1 core engine module.  Provides `Light2D`, a pure data container describing a circular point light source in 2D space (position, radius, color, intensity, enabled flag). No GPU resources are stored here; the renderer receives light data via `RenderCommand` variants and performs all GPU work after the Lua callback returns.  Also provides `LightBlendMode`, `FalloffMode`, `ShadowFilter` enums, `LightType` (Point/Directional/Spot), `Attenuation` coefficients, `FlickerConfig` built-in flicker effects, `Occluder` polygon shadow casters, and `LightWorld` resource pool.  ## Tier  `light` is a **Tier 1 — Core Engine** module. It may import only `math` and `engine`. It must not import other Tier 1 modules.",
-        "source_file": "src/render/light/mod.rs",
-        "items": [
-          {
-            "name": "attenuation",
-            "kind": "mod",
-            "description": "Custom attenuation coefficients for distance falloff.",
-            "file": "src/render/light/mod.rs",
-            "line": 19
-          },
-          {
-            "name": "blend_mode",
-            "kind": "mod",
-            "description": "How light color mixes with the scene.",
-            "file": "src/render/light/mod.rs",
-            "line": 21
-          },
-          {
-            "name": "falloff",
-            "kind": "mod",
-            "description": "How light intensity decays from center to edge.",
-            "file": "src/render/light/mod.rs",
-            "line": 23
-          },
-          {
-            "name": "flicker",
-            "kind": "mod",
-            "description": "Built-in flicker effect configuration.",
-            "file": "src/render/light/mod.rs",
-            "line": 25
-          },
-          {
-            "name": "light2d",
-            "kind": "mod",
-            "description": "2D point-light data container: position, radius, color, and intensity.",
-            "file": "src/render/light/mod.rs",
-            "line": 27
-          },
-          {
-            "name": "light_type",
-            "kind": "mod",
-            "description": "Geometric light type: point, directional, or spot.",
-            "file": "src/render/light/mod.rs",
-            "line": 29
-          },
-          {
-            "name": "light_world",
-            "kind": "mod",
-            "description": "Resource pool and state for the 2D lighting system.",
-            "file": "src/render/light/mod.rs",
-            "line": 31
-          },
-          {
-            "name": "occluder",
-            "kind": "mod",
-            "description": "Polygon shadow caster that blocks light.",
-            "file": "src/render/light/mod.rs",
-            "line": 33
-          },
-          {
-            "name": "shadow",
-            "kind": "mod",
-            "description": "Edge quality for shadow boundaries.",
-            "file": "src/render/light/mod.rs",
-            "line": 35
-          }
-        ]
-      },
-      "render::light::occluder": {
-        "module_doc": "Polygon shadow caster for the 2D lighting system.",
-        "source_file": "src/render/light/occluder.rs",
-        "items": [
-          {
-            "name": "Occluder",
-            "kind": "struct",
-            "description": "Polygon shadow caster that blocks light.  # Fields - `vertices` — `Vec<Vec2>`. - `position` — `Vec2`. - `opacity` — `f32`. - `light_mask` — `u16`. - `enabled` — `bool`.  An occluder defines a convex or concave polygon that casts shadows when placed between a light source and the scene. The `light_mask` field controls which lights this occluder interacts with.",
-            "file": "src/render/light/occluder.rs",
-            "line": 17
-          }
-        ]
-      },
-      "render::light::shadow": {
-        "module_doc": "Shadow filter enum for controlling edge quality of shadow boundaries.",
-        "source_file": "src/render/light/shadow.rs",
-        "items": [
-          {
-            "name": "ShadowFilter",
-            "kind": "enum",
-            "description": "Edge quality for shadow boundaries.  # Variants - `None` — None variant. - `Pcf5` — Pcf5 variant. - `Pcf13` — Pcf13 variant.",
-            "file": "src/render/light/shadow.rs",
-            "line": 10
           }
         ]
       },
@@ -6703,27 +6703,6 @@
             "description": "CPU-side bin-packing texture atlas using shelf algorithm.",
             "file": "src/render/mod.rs",
             "line": 40
-          },
-          {
-            "name": "camera",
-            "kind": "mod",
-            "description": "2D camera system: viewport, scaling, zoom, scrolling.",
-            "file": "src/render/mod.rs",
-            "line": 43
-          },
-          {
-            "name": "effect",
-            "kind": "mod",
-            "description": "Visual effects pipeline: post-processing, overlays, weather, atmosphere.",
-            "file": "src/render/mod.rs",
-            "line": 45
-          },
-          {
-            "name": "light",
-            "kind": "mod",
-            "description": "2D lighting system: lights, shadows, occluders, blend modes.",
-            "file": "src/render/mod.rs",
-            "line": 47
           }
         ]
       },
