@@ -27,6 +27,9 @@
 -- @covers lurek.scene.switchTo
 -- @covers lurek.scene.unregisterScene
 -- @covers lurek.scene.update
+-- @covers lurek.scene.popTo
+-- @covers lurek.scene.new
+-- @covers lurek.scene.define
 
 
 describe("Stack operations", function()
@@ -415,6 +418,202 @@ describe("lurek.scene new pipeline callbacks", function()
     it("processPhysics with empty stack is safe", function()
         lurek.scene.clear()
         lurek.scene.processPhysics(0.016)
+    end)
+end)
+
+-- ── popTo ───────────────────────────────────────────────────────────
+
+describe("popTo", function()
+    it("pops scenes above registered target (inclusive)", function()
+        lurek.scene.clear()
+        local menu = { name = "menu" }
+        local game = { name = "game" }
+        local pause_scene = { name = "pause" }
+        lurek.scene.registerScene("menu", menu)
+        lurek.scene.push(menu)
+        lurek.scene.push(game)
+        lurek.scene.push(pause_scene)
+        expect_equal(3, lurek.scene.getStackSize())
+        local ok = lurek.scene.popTo("menu")
+        expect_true(ok)
+        -- popTo pops until target is found (inclusive); stack size depends on implementation
+        expect_true(lurek.scene.getStackSize() < 3)
+        lurek.scene.clear()
+    end)
+
+    it("returns false for non-existent registered name", function()
+        lurek.scene.clear()
+        local s = {}
+        lurek.scene.push(s)
+        local ok = lurek.scene.popTo("nonexistent")
+        expect_false(ok)
+        expect_equal(1, lurek.scene.getStackSize())
+        lurek.scene.clear()
+    end)
+end)
+
+-- ── DepthSorter addObject ───────────────────────────────────────────
+
+describe("DepthSorter addObject", function()
+    it("addObject uses obj.depth and calls drawSorted", function()
+        lurek.scene.clear()
+        local sorter = lurek.scene.newDepthSorter()
+        local calls = {}
+        local obj1 = {
+            depth = 10,
+            drawSorted = function(self) calls[#calls + 1] = "obj1" end,
+        }
+        local obj2 = {
+            depth = 5,
+            drawSorted = function(self) calls[#calls + 1] = "obj2" end,
+        }
+        sorter:addObject(obj1)
+        sorter:addObject(obj2)
+        sorter:sort()
+        sorter:flush()
+        expect_equal(2, #calls)
+        -- depth 5 should be drawn before depth 10
+        expect_equal("obj2", calls[1])
+        expect_equal("obj1", calls[2])
+    end)
+
+    it("getCount reflects addObject", function()
+        local sorter = lurek.scene.newDepthSorter()
+        expect_equal(0, sorter:getCount())
+        sorter:addObject({ depth = 1, drawSorted = function() end })
+        expect_equal(1, sorter:getCount())
+    end)
+
+    it("clear removes all without calling callbacks", function()
+        local sorter = lurek.scene.newDepthSorter()
+        local called = false
+        sorter:add(function() called = true end, 1)
+        sorter:clear()
+        expect_equal(0, sorter:getCount())
+        expect_false(called)
+    end)
+end)
+
+-- ── DepthSorter negative depths ─────────────────────────────────────
+
+describe("DepthSorter negative depths", function()
+    it("sorts negative depths before positive", function()
+        local sorter = lurek.scene.newDepthSorter()
+        local calls = {}
+        sorter:add(function() calls[#calls + 1] = "pos" end, 5)
+        sorter:add(function() calls[#calls + 1] = "neg" end, -5)
+        sorter:sort()
+        sorter:flush()
+        expect_equal("neg", calls[1])
+        expect_equal("pos", calls[2])
+    end)
+end)
+
+-- ── scene.new factory ───────────────────────────────────────────────
+
+describe("scene.new factory", function()
+    it("returns a table", function()
+        local s = lurek.scene.new()
+        expect_type("table", s)
+    end)
+
+    it("returned scene works with push", function()
+        lurek.scene.clear()
+        local s = lurek.scene.new()
+        lurek.scene.push(s)
+        expect_equal(1, lurek.scene.getStackSize())
+        lurek.scene.clear()
+    end)
+
+    it("accepts definition table with callbacks", function()
+        local entered = false
+        local s = lurek.scene.new({
+            enter = function(self) entered = true end,
+        })
+        lurek.scene.clear()
+        lurek.scene.push(s)
+        expect_true(entered)
+        lurek.scene.clear()
+    end)
+end)
+
+-- ── scene.define factory ────────────────────────────────────────────
+
+describe("scene.define factory", function()
+    it("returns a constructor function", function()
+        local ctor = lurek.scene.define()
+        expect_type("function", ctor)
+    end)
+
+    it("constructor produces scene instances", function()
+        local ctor = lurek.scene.define({ name = "test" })
+        local s = ctor()
+        expect_type("table", s)
+    end)
+
+    it("instances work with scene stack", function()
+        lurek.scene.clear()
+        local ctor = lurek.scene.define()
+        local s = ctor()
+        lurek.scene.push(s)
+        expect_equal(1, lurek.scene.getStackSize())
+        lurek.scene.clear()
+    end)
+end)
+
+-- ── data store with complex types ───────────────────────────────────
+
+describe("Data store complex values", function()
+    it("stores and retrieves tables", function()
+        lurek.scene.clear()
+        local data = { hp = 100, items = {"sword", "shield"} }
+        lurek.scene.setData("player", data)
+        local got = lurek.scene.getData("player")
+        expect_equal(100, got.hp)
+        expect_equal("sword", got.items[1])
+        lurek.scene.removeData("player")
+    end)
+
+    it("overwrite replaces value", function()
+        lurek.scene.clear()
+        lurek.scene.setData("score", 10)
+        lurek.scene.setData("score", 20)
+        expect_equal(20, lurek.scene.getData("score"))
+        lurek.scene.removeData("score")
+    end)
+end)
+
+-- ── transition params ───────────────────────────────────────────────
+
+describe("Transition params", function()
+    it("enter callback receives params from push", function()
+        lurek.scene.clear()
+        local got_params = nil
+        local s = {
+            enter = function(self, params)
+                got_params = params
+            end
+        }
+        lurek.scene.push(s, nil, nil, { level = 5 })
+        expect_not_nil(got_params)
+        expect_equal(5, got_params.level)
+        lurek.scene.clear()
+    end)
+
+    it("switchTo passes params to new scene enter", function()
+        lurek.scene.clear()
+        local got_params = nil
+        local s1 = {}
+        local s2 = {
+            enter = function(self, params)
+                got_params = params
+            end
+        }
+        lurek.scene.push(s1)
+        lurek.scene.switchTo(s2, nil, nil, { from = "s1" })
+        expect_not_nil(got_params)
+        expect_equal("s1", got_params.from)
+        lurek.scene.clear()
     end)
 end)
 

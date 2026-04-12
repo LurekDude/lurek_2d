@@ -113,3 +113,24 @@ Every Tester output includes:
 - **Float Equality**: `assert_eq!(0.1 + 0.2, 0.3)` — always use epsilon tolerance
 - **Test Coupling**: Tests depending on execution order or shared mutable state
 - **Missing Lua Layer**: Writing only Rust integration tests for a new `lurek.*` function
+
+## TEST SCOPE DECISION RULES
+
+These rules determine which test layer covers each API:
+
+| API visibility | Test layer | Location |
+|---|---|---|
+| Public `lurek.*` Lua binding | Lua BDD test | `tests/lua/unit/test_<module>.lua` |
+| Private / `pub(crate)` Rust methods | Rust `#[test]` | `tests/rust/unit/` or `#[cfg(test)]` in `src/` |
+| Side-effect producing APIs | Evidence test (content only) | `tests/lua/evidence/` |
+| Deterministic output | Golden test (compare only) | `tests/lua/golden/` |
+
+**Evidence tests** create content only — call the API and produce the side effect. Never add assertions about the content. Think: "does it run without error?"
+
+**Golden tests** compare content only — read or receive output and compare against an expected baseline. Never create or produce content in the golden test. Think: "has output regressed?"
+
+**`@covers` markers** are mandatory at the top of every Lua test file:
+```lua
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.newBody
+```

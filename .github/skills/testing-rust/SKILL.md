@@ -694,3 +694,74 @@ Integration tests live in `tests/lua/integration/` and target two or more **name
 - Do not use this category for single-module lifecycle tests — those belong in `tests/lua/unit/`
 
 Current volume target: **58+ integration tests** (Phase 1: 29 done; Phase 2: 29 planned).
+
+---
+
+## 15. Test Scope Decision Rules
+
+Every public and private API in the Lurek2D engine has an assigned test scope. Follow these rules when deciding where a test belongs:
+
+### Public API → Lua BDD Test
+
+Any `pub fn` that is exposed through the `lurek.*` Lua namespace **must** have at least one Lua BDD test in `tests/lua/unit/test_<module>.lua`. This is the primary coverage layer for the engine API.
+
+- Test the function via Lua calls, not by importing Rust types
+- Use `describe` / `it` BDD structure with `@covers` markers
+- All assertions use `expect_*` helpers — never raw `assert()`
+- Every test file must end with `test_summary()`
+
+### Private / Internal Rust → Rust `#[test]`
+
+Private methods, `pub(crate)` helpers, and internal algorithms that have no `lurek.*` binding **must** be tested in Rust unit tests (`#[cfg(test)]` modules) or integration tests in `tests/rust/`.
+
+- These are implementation details not reachable from Lua
+- Use standard Rust `assert!` / `assert_eq!` patterns
+- Float rule: `assert!((actual - expected).abs() < 1e-5)`
+
+### Evidence Tests — Content Only
+
+Evidence test files (`tests/lua/evidence/`) prove that side-effect-producing APIs actually produce output. Rules:
+
+- **Create content only** — call the API, produce the side effect (file, screenshot, audio output)
+- **Never add assertions** about the content itself — that is the golden test's job
+- Think of evidence tests as "does it run without error and produce something?"
+
+```lua
+-- CORRECT: evidence test creates content
+it("drawCircle produces a canvas with non-zero pixels", function()
+    local canvas = lurek.gfx.newCanvas(64, 64)
+    canvas:renderTo(function()
+        lurek.gfx.circle("fill", 32, 32, 16)
+    end)
+    -- evidence: canvas was created and renderTo ran without error
+end)
+```
+
+### Golden Tests — Compare Only
+
+Golden test files (`tests/lua/golden/`) verify that deterministic output matches an expected baseline. Rules:
+
+- **Compare content only** — read or receive the output and compare against expected
+- **Never create or produce** the content in the golden test itself — that is the evidence test's job
+- Golden tests assert that output hasn't regressed, not that output can be produced
+
+```lua
+-- CORRECT: golden test compares already-produced content
+it("JSON encoding matches baseline", function()
+    local data = { name = "test", value = 42 }
+    local json = lurek.data.encode(data, "json")
+    expect_equal('{"name":"test","value":42}', json)
+end)
+```
+
+### `@covers` Markers — Required
+
+Every Lua test file must declare its coverage at the top of the file using `-- @covers` markers:
+
+```lua
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.step
+```
+
+These markers are consumed by `tools/audit/lua_api_test_coverage.py` and are mandatory for accurate coverage reporting.

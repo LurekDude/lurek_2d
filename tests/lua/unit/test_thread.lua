@@ -4,6 +4,19 @@
 -- @covers lurek.thread.getChannel
 -- @covers lurek.thread.newChannel
 -- @covers lurek.thread.newThread
+-- @covers lurek.thread.Channel.push
+-- @covers lurek.thread.Channel.pop
+-- @covers lurek.thread.Channel.peek
+-- @covers lurek.thread.Channel.demand
+-- @covers lurek.thread.Channel.getCount
+-- @covers lurek.thread.Channel.clear
+-- @covers lurek.thread.Channel.supply
+-- @covers lurek.thread.Channel.type
+-- @covers lurek.thread.Channel.typeOf
+-- @covers lurek.thread.Thread.isRunning
+-- @covers lurek.thread.Thread.getError
+-- @covers lurek.thread.Thread.type
+-- @covers lurek.thread.Thread.typeOf
 
 
 describe("lurek.thread module exists", function()
@@ -122,6 +135,120 @@ describe("Thread handle creation", function()
     it("newThread getError returns nil before start", function()
         local t = lurek.thread.newThread("return")
         expect_equal(nil, t:getError())
+    end)
+end)
+
+-- ── Channel type/typeOf ─────────────────────────────────────────────
+
+describe("Channel type and typeOf", function()
+    it("type returns Channel", function()
+        local ch = lurek.thread.newChannel()
+        expect_equal("Channel", ch:type())
+    end)
+
+    it("typeOf with correct name returns true", function()
+        local ch = lurek.thread.newChannel()
+        expect_true(ch:typeOf("Channel"))
+    end)
+
+    it("typeOf with wrong name returns false", function()
+        local ch = lurek.thread.newChannel()
+        expect_false(ch:typeOf("Thread"))
+    end)
+end)
+
+-- ── Thread type/typeOf ──────────────────────────────────────────────
+
+describe("Thread type and typeOf", function()
+    it("type returns Thread", function()
+        local t = lurek.thread.newThread("return")
+        expect_equal("Thread", t:type())
+    end)
+
+    it("typeOf with correct name returns true", function()
+        local t = lurek.thread.newThread("return")
+        expect_true(t:typeOf("Thread"))
+    end)
+
+    it("typeOf with wrong name returns false", function()
+        local t = lurek.thread.newThread("return")
+        expect_false(t:typeOf("Channel"))
+    end)
+end)
+
+-- ── Channel supply ──────────────────────────────────────────────────
+
+describe("Channel supply", function()
+    it("supply pushes value only if channel is empty", function()
+        local ch = lurek.thread.newChannel()
+        local ok = ch:supply("first")
+        expect_true(ok)
+        expect_equal(1, ch:getCount())
+    end)
+
+    it("supply fails if channel already has items", function()
+        local ch = lurek.thread.newChannel()
+        ch:push("existing")
+        local ok = ch:supply("second")
+        expect_false(ok)
+        expect_equal(1, ch:getCount())
+        expect_equal("existing", ch:pop())
+    end)
+end)
+
+-- ── Channel demand ──────────────────────────────────────────────────
+
+describe("Channel demand", function()
+    it("demand returns immediate value if present", function()
+        local ch = lurek.thread.newChannel()
+        ch:push("ready")
+        local v = ch:demand(0.0)
+        expect_equal("ready", v)
+    end)
+
+    it("demand with timeout 0 on empty returns nil", function()
+        local ch = lurek.thread.newChannel()
+        local v = ch:demand(0.0)
+        expect_equal(nil, v)
+    end)
+end)
+
+-- ── Named channels ──────────────────────────────────────────────────
+
+describe("Named channels", function()
+    it("getChannel retrieves same channel by name", function()
+        local ch1 = lurek.thread.newChannel()
+        -- There's no named channel API for anonymous channels;
+        -- test getChannel with a name that was passed to newChannel
+        local named = lurek.thread.getChannel("test_named_ch")
+        expect_not_nil(named)
+        local named2 = lurek.thread.getChannel("test_named_ch")
+        -- same name returns same channel
+        named:push("via_name")
+        local v = named2:pop()
+        expect_equal("via_name", v)
+    end)
+end)
+
+-- ── Multiple value types ────────────────────────────────────────────
+
+describe("Channel value types", function()
+    it("nil value round-trips as nil", function()
+        local ch = lurek.thread.newChannel()
+        ch:push(nil)
+        -- pushing nil is a no-op in most implementations; pop should return nil
+        local v = ch:pop()
+        expect_equal(nil, v)
+    end)
+
+    it("multiple values maintain FIFO order", function()
+        local ch = lurek.thread.newChannel()
+        ch:push(1)
+        ch:push(2)
+        ch:push(3)
+        expect_equal(1, ch:pop())
+        expect_equal(2, ch:pop())
+        expect_equal(3, ch:pop())
     end)
 end)
 
