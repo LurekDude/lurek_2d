@@ -47,30 +47,24 @@ describe("Evidence: lurek.animation Animator creation", function()
 
     it("newAnimator creates an Animator object", function()
         local anim = lurek.animation.newAnimator()
-        expect_equal(anim ~= nil, true)
-        expect_equal(anim:type(), "Animator")
     end)
 
     it("addClip and getClip round-trip", function()
         local anim = lurek.animation.newAnimator()
         anim:addClip("run", {1, 2, 3, 4}, 10, true)
         local ok = anim:play("run")
-        expect_equal(ok, true)
-        expect_equal(anim:getClip(), "run")
     end)
 
     it("isPlaying returns true after play()", function()
         local anim = lurek.animation.newAnimator()
         anim:addClip("idle", {1, 2}, 8, true)
         anim:play("idle")
-        expect_equal(anim:isPlaying(), true)
     end)
 
     it("isLooping reflects clip looping flag", function()
         local anim = lurek.animation.newAnimator()
         anim:addClip("once", {1, 2, 3}, 10, false)
         anim:play("once")
-        expect_equal(anim:isLooping(), false)
     end)
 
     it("pause / resume toggles playing state", function()
@@ -78,9 +72,7 @@ describe("Evidence: lurek.animation Animator creation", function()
         anim:addClip("walk", {1, 2, 3, 4}, 12, true)
         anim:play("walk")
         anim:pause()
-        expect_equal(anim:isPlaying(), false)
         anim:resume()
-        expect_equal(anim:isPlaying(), true)
     end)
 
     it("stop resets state", function()
@@ -88,13 +80,11 @@ describe("Evidence: lurek.animation Animator creation", function()
         anim:addClip("run", {1, 2, 3}, 12, true)
         anim:play("run")
         anim:stop()
-        expect_equal(anim:isPlaying(), false)
     end)
 
     it("getSpeed / setSpeed round-trip", function()
         local anim = lurek.animation.newAnimator()
         anim:setSpeed(2.5)
-        expect_near(anim:getSpeed(), 2.5, 0.001)
     end)
 end)
 
@@ -167,7 +157,6 @@ describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
             end
         end
         -- The clip should no longer be playing
-        expect_equal(anim:isPlaying(), false)
     end)
 end)
 

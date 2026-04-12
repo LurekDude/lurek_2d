@@ -259,14 +259,20 @@ path = "tests/lua/harness.rs"
 
 ## Rust Test Suites
 
+### Scope Rule
+
+**All public API methods must be tested in Lua** — even when Rust tests would be faster. The Lua layer is the user-facing surface and must be proven correct from the user's perspective.
+
+**Rust tests are for private/internal code only** — struct invariants, internal algorithms, resource lifecycle, and implementation details that have no `lurek.*` surface. If a type or method is `pub` and exposed to Lua, its primary test coverage must be in Lua.
+
 ### Suite Categories
 
 | Category | Path | Scope | Example |
 |---|---|---|---|
-| **Unit** | `tests/rust/unit/` | One engine module, Rust-side invariants | `math_tests.rs`: Vec2 arithmetic |
-| **Stress** | `tests/rust/stress/` | Throughput and allocation pressure | `physics_stress_tests.rs`: 10K body world |
-| **Golden** | `tests/rust/golden/` | Snapshot comparison: graphics, audio, text | Compare PNG byte-for-byte |
-| **Config** | `tests/rust/config/` | Config loading + validation | `config_tests.rs`: TOML parsing |
+| **Integration** | `tests/rust/integration/` | Internal Rust types and private methods not exposed to Lua | `physics_tests.rs`: `BodyShape` enum match, `bounding_box()` |
+| **Stress** | `tests/rust/stress/` | Raw Rust-level throughput (no Lua boundary) | `physics_stress_tests.rs`: 10K body world |
+| **Golden** | `tests/rust/golden/` | Byte-level snapshot comparison at renderer level | Compare PNG byte-for-byte |
+| **Config** | `tests/rust/config/` | TOML config loading + validation | `config_tests.rs`: TOML parsing |
 | **Security** | `tests/rust/security/` | Sandbox audit, path-traversal guards | `security_tests.rs`: GameFS escapes |
 | **Ext** | `tests/rust/ext/` | Cross-module Rust smoke tests | `graphics_ext_tests.rs`: mesh + texture |
 
@@ -466,42 +472,92 @@ You DO NOT need to manually register .lua files in harness.rs.
 
 ## Golden Tests
 
-Golden tests verify deterministic output by comparing actual results against committed expected files. The Rust golden harness covers graphics, audio, and text processing at the byte level.
+Golden tests compare evidence output against committed baseline samples. **Golden tests do NOT create content** — they rely on evidence tests to produce the output, then compare it against a committed golden sample.
 
-### Structure
+### Rules
+
+1. **Golden tests ONLY compare.** They read an evidence file and a golden sample, then assert they match. No content creation.
+2. **Evidence tests must run first.** If the evidence file doesn't exist, the golden test fails with a clear message.
+3. **Golden samples live in `tests/lua/golden/samples/<module>/`** — committed to git, reviewed by humans before acceptance.
+4. **Every golden test uses BDD structure** and the `-- @golden` marker.
+5. **Use `expect_golden_file_match()` for binary comparison** (PNG, WAV) or `expect_golden_text_match()` for text (normalizes whitespace/line endings).
+
+### Directory Structure
+
+```
+tests/lua/golden/
+├── test_math_golden.lua              Golden test script
+├── test_physics_golden.lua           Golden test script
+├── samples/                          Committed baseline files (git-tracked)
+│   ├── math/
+│   │   └── constants.txt
+│   ├── physics/
+│   │   └── draw_debug.png
+│   └── audio/
+│       └── sine_440hz.wav
+```
+
+```
+tests/lua/evidence/output/            Generated during test run (git-ignored)
+├── math/
+│   └── constants.txt
+├── physics/
+│   └── draw_debug.png
+└── audio/
+    └── sine_440hz.wav
+```
+
+### Golden Test Template
+
+```lua
+-- Golden test: <module> <what it compares>
+-- @golden
+-- @covers lurek.<module>.<function>
+
+describe("golden: <module> <description>", function()
+    it("matches golden sample for <artifact>", function()
+        local evidence = evidence_output_dir("<module>") .. "<filename>"
+        local golden = "tests/lua/golden/samples/<module>/<filename>"
+        expect_golden_file_match(evidence, golden)
+    end)
+end)
+
+test_summary()
+```
+
+### Golden Helpers (defined in init.lua)
+
+| Function | Purpose |
+|---|---|
+| `expect_golden_file_match(evidence_path, golden_path)` | Binary-exact comparison |
+| `expect_golden_text_match(evidence_path, golden_path)` | Text comparison (normalizes whitespace/line endings) |
+
+### Updating Golden Samples
+
+When evidence output intentionally changes (e.g., algorithm improvement, font update):
+
+1. Run the evidence test: `cargo test lua_test_evidence_<module>`
+2. Review the new output in `tests/lua/evidence/output/<module>/`
+3. Copy to golden samples: `cp tests/lua/evidence/output/<module>/<file> tests/lua/golden/samples/<module>/<file>`
+4. Commit the updated golden sample with a clear commit message
+
+### Rust Golden Tests
+
+The Rust golden harness (`tests/rust/golden/harness.rs`) covers byte-level comparison for graphics, audio, and text processing at the Rust level. These test internal renderer output, not the Lua API surface.
 
 ```
 tests/rust/golden/
 ├── harness.rs                 Rust harness
 ├── expected/                  Committed reference files
-│   ├── image/                 Expected PNG snapshots (graphics golden)
-│   ├── audio/                 Expected waveform data (audio golden)
-│   ├── text/                  Expected rendered text bitmaps (text processing)
+│   ├── image/                 Expected PNG snapshots
+│   ├── audio/                 Expected waveform data
+│   ├── text/                  Expected rendered text
 │   ├── hash/                  Expected hash digests
 │   ├── encode/                Expected encoded strings
 │   ├── compress/              Expected compressed bytes
 │   └── data/                  Expected binary data
 └── actual/                    Generated during test run (git-ignored)
 ```
-
-### Flow
-
-1. Test generates output (PNG, waveform bytes, rendered text, hash)
-2. Output saved to `tests/rust/golden/actual/`
-3. Compared byte-for-byte against `tests/rust/golden/expected/`
-4. Pass if identical; fail with diff report if different
-
-### Updating Golden Files
-
-When output intentionally changes (e.g., algorithm improvement or font update), manually copy `actual/` to `expected/` and commit. Always review diffs before committing updated golden files — a silent diff here means a rendering regression was silently accepted.
-
-### Priority Domains for Golden Coverage
-
-| Domain | What to snapshot |
-|---|---|
-| Graphics | Rasterised shapes, sprite compositing, draw-layer ordering |
-| Audio | Rendered waveform bytes from rodio mixer |
-| Text | Fontdue glyph rasterisation, layout bounding boxes |
 
 ---
 
@@ -640,16 +696,14 @@ Choose the correct category:
 | High-load / many iterations | **stress** | `tests/lua/stress/test_<topic>_stress.lua` |
 | Nil spam / bad inputs / sandbox | **security** | `tests/lua/security/test_<topic>.lua` |
 | Config file loading | **config** | `tests/lua/config/test_config.lua` |
+| Creating output artifacts (PNG, WAV, text) | **evidence** | `tests/lua/evidence/test_evidence_<module>.lua` |
+| Comparing evidence against golden samples | **golden** | `tests/lua/golden/test_<module>_golden.lua` |
 | A demo in `content/demos/` | **demos** | `tests/lua/content/demos/test_demo_<name>.lua` |
 
 Steps for all categories:
 1. Create the `.lua` file in the correct subdirectory using the template
 2. End the file with `test_summary()`
-3. Add a dispatch entry in `tests/lua/harness.rs`:
-   ```rust
-   #[test]
-   fn lua_test_<category>_<name>() { run_lua_test("<category>/test_<name>.lua"); }
-   ```
+3. The harness auto-discovers test files via `build.rs` — no manual registration needed
 4. Run: `cargo test lua_test_<category>_<name>`
 
 ---
@@ -815,36 +869,48 @@ Output: `docs/logs/lua_api_test_coverage.json`
 
 ## Evidence-Based Testing
 
-Not all API functions can be verified by checking return values alone. Evidence testing uses observable side effects to prove functions work correctly.
+Evidence tests create output artifacts (PNG, WAV, OBJ, text files) that prove an API function produces correct observable results. **Evidence tests do NOT assert values** — they only create files and verify the file was created. A human reviewer or a golden test evaluates the content.
 
-### Three Tiers
+### Rules
 
-| Tier | Method | Requires | Example |
-|---|---|---|---|
-| **Headless State Readback** | Query engine state after API calls | Nothing extra | `getBody():getPosition()` after `applyForce()` |
-| **Canvas Pixel Readback** | `Canvas:renderTo` + `Canvas:getPixel` | Canvas API | Draw red rect → verify red pixel at center |
-| **Runtime Smoke Tests** | Full GPU rendering + screenshot | GPU device, `tests/rust/ext/` | Render scene → `saveScreenshot()` → compare |
+1. **Evidence tests ONLY create files.** No `expect_equal`, `expect_near`, or any value comparison. The only assertion is `expect_evidence_created(path)` which checks the file exists and is non-empty.
+2. **Every evidence test uses BDD structure** (`describe`/`it`) — never a plain script.
+3. **Evidence output goes to `tests/lua/evidence/output/<module>/`** via `evidence_output_dir(category)`.
+4. **Evidence tests use `-- @evidence file` marker** in the header comment.
+5. **Evidence tests end with `test_summary()`** like all other tests.
 
-### Canvas Evidence Pattern (Headless)
+### Evidence Test Template
 
 ```lua
--- Verify that lurek.gfx.rectangle actually draws pixels
-local canvas = lurek.gfx.newCanvas(100, 100)
-canvas:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 100, 100)
+-- Evidence test: <module> <what it produces>
+-- @evidence file
+-- @covers lurek.<module>.<function>
+
+describe("evidence: <module> <description>", function()
+    it("creates <artifact description>", function()
+        ensure_evidence_dir("<module>")
+        local path = evidence_output_dir("<module>") .. "<filename>"
+
+        -- Create content using lurek.* APIs
+        local img = lurek.image.newImageData(256, 256)
+        -- ... populate img ...
+        img:savePNG(path)
+
+        -- Only check file was created — never assert pixel values
+        expect_evidence_created(path)
+    end)
 end)
-local r, g, b, a = canvas:getPixel(50, 50)
-expect_near(1.0, r, 0.01) -- red channel proves rectangle was drawn
-expect_near(0.0, g, 0.01)
-expect_near(0.0, b, 0.01)
+
+test_summary()
 ```
 
-### Priority Modules for Evidence Testing
+### Evidence Helpers (defined in init.lua)
 
-- **P0**: `gfx` (shapes, colors), `light` (illumination), `particle` (emission), `raycaster` (2.5D scene)
-- **P1**: `camera` (viewport), `tilemap` (tile rendering), `entity` (draw components)
-- **P2**: `animation` (frame display), `postfx` (shader effects), `gui` (widget rendering)
+| Function | Purpose |
+|---|---|
+| `evidence_output_dir(category)` | Returns `"tests/lua/evidence/output/<category>/"` |
+| `ensure_evidence_dir(category)` | Creates the evidence output directory if missing |
+| `expect_evidence_created(path)` | Asserts the file exists and is non-empty |
 
 ### Model-Level `draw_to_image()` Evidence (Headless, No GPU)
 
@@ -862,29 +928,11 @@ production render path.
 | `tilemap` | `draw_to_image(map, viewport)` (planned) | CPU-rasterized tile grid for golden tests |
 | `minimap` | `draw_to_image(minimap)` (planned) | CPU-rasterized minimap overview |
 
-#### Raycaster Evidence Pattern
+### Priority Modules for Evidence Testing
 
-```lua
--- Verify raycaster produces correct visual output (headless, no GPU)
-local ray = lurek.raycaster.new(grid, config)
-local scene = ray:buildScene(player_x, player_y, player_angle, fov)
-local img = ray:drawToImage(scene, 320, 240)
-
--- Check that walls are visible (non-black pixels in the middle band)
-local r, g, b, a = img:getPixel(160, 120)
-expect_true(r > 0.0 or g > 0.0 or b > 0.0)
-
--- Save for golden comparison
-img:save("tests/golden/raycaster_basic.png")
-```
-
-**Key property**: `draw_to_image()` is deterministic — given the same grid,
-camera position, and angle, it always produces the same pixel output. This
-makes it ideal for golden image regression tests.
-
-### Known Evidence Gap — Light System
-
-The light module (`lurek.light.*`) currently passes all unit tests by verifying function existence and return types, but **does not validate visual output**. Tests confirm the API accepts calls without errors, but no test verifies that lights actually illuminate the scene or that shadows are drawn. Canvas pixel readback or runtime smoke tests are required to provide evidence of correct light rendering.
+- **P0**: `gfx` (shapes, colors), `light` (illumination), `particle` (emission), `raycaster` (2.5D scene)
+- **P1**: `camera` (viewport), `tilemap` (tile rendering), `entity` (draw components)
+- **P2**: `animation` (frame display), `postfx` (shader effects), `gui` (widget rendering)
 
 ---
 

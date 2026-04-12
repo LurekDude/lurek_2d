@@ -5,7 +5,7 @@
 -- @covers lurek.codec.toJson
 -- @covers lurek.codec.toToml
 
-﻿-- lurek.codec API unit tests
+-- lurek.codec API unit tests
 -- Headless-safe (no window / GPU / audio required).
 
 describe("lurek.codec module exists", function()
@@ -129,6 +129,62 @@ describe("CSV round-trip", function()
         local s = lurek.codec.toCsv(data)
         expect_type("string", s)
         expect_true(#s > 0, "csv string is non-empty")
+    end)
+end)
+
+-- ── CSV options ──────────────────────────────────────────────────────────────
+
+describe("CSV advanced options", function()
+    it("fromCsv with headers creates object-keyed rows", function()
+        local csv = "name,score\nalice,10\nbob,20\n"
+        local rows = lurek.codec.fromCsv(csv, nil, true)
+        expect_true(#rows >= 2)
+        expect_equal("alice", rows[1].name)
+        expect_equal("10", rows[1].score)
+    end)
+
+    it("fromCsv without headers creates numeric keys", function()
+        local csv = "alice,10\nbob,20\n"
+        local rows = lurek.codec.fromCsv(csv, nil, false)
+        expect_true(#rows >= 2)
+        expect_not_nil(rows[1][1])
+    end)
+
+    it("fromCsv with custom delimiter", function()
+        local csv = "name\tscore\nalice\t10\nbob\t20\n"
+        local rows = lurek.codec.fromCsv(csv, "\t", true)
+        expect_true(#rows >= 2)
+        expect_equal("alice", rows[1].name)
+    end)
+
+    it("CSV round-trip preserves data", function()
+        local data = { { name = "test", value = "42" } }
+        local csv = lurek.codec.toCsv(data)
+        local back = lurek.codec.fromCsv(csv)
+        expect_equal("test", back[1].name)
+        expect_equal("42", back[1].value)
+    end)
+end)
+
+-- ── error handling ───────────────────────────────────────────────────────────
+
+describe("codec error handling", function()
+    it("fromJson error on malformed input", function()
+        expect_error(function()
+            lurek.codec.fromJson("{bad: json}")
+        end)
+    end)
+
+    it("fromToml error on malformed input", function()
+        expect_error(function()
+            lurek.codec.fromToml("invalid = [")
+        end)
+    end)
+
+    it("fromJson on empty string errors", function()
+        expect_error(function()
+            lurek.codec.fromJson("")
+        end)
     end)
 end)
 

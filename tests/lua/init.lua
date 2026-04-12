@@ -371,6 +371,113 @@ function expect_canvas_pixel(canvas, x, y, er, eg, eb, ea, tolerance, msg)
     ch("a", ea, a or 0)
 end
 
+-- ══════════════════════════════════════════════════════════════════════════════
+-- Evidence test helpers
+-- ══════════════════════════════════════════════════════════════════════════════
+
+--- Returns the standard evidence output directory for a category.
+--- @param category : string  — e.g. "physics", "animation"
+--- @return string path like "tests/lua/evidence/output/physics/"
+function evidence_output_dir(category)
+    return "tests/lua/evidence/output/" .. category .. "/"
+end
+
+--- Ensures the evidence output directory exists for a category.
+--- Creates intermediate directories as needed.
+--- @param category : string
+function ensure_evidence_dir(category)
+    local dir = evidence_output_dir(category)
+    -- Use os.execute for cross-platform directory creation
+    local sep = package.config:sub(1, 1)
+    if sep == "\\" then
+        os.execute('mkdir "' .. dir:gsub("/", "\\") .. '" 2>NUL')
+    else
+        os.execute('mkdir -p "' .. dir .. '" 2>/dev/null')
+    end
+end
+
+--- Asserts that an evidence file was created at the given path.
+--- Evidence tests use this instead of value assertions — they only check the file exists.
+--- @param path : string — file path to check
+--- @param msg  : string — optional label
+function expect_evidence_created(path, msg)
+    local f = io.open(path, "rb")
+    if f then
+        local size = f:seek("end")
+        f:close()
+        if size == 0 then
+            error(string.format("%s: evidence file is empty at '%s'",
+                msg or "evidence", path), 2)
+        end
+    else
+        error(string.format("%s: evidence file not created at '%s'",
+            msg or "evidence", path), 2)
+    end
+end
+
+-- ══════════════════════════════════════════════════════════════════════════════
+-- Golden test helpers
+-- ══════════════════════════════════════════════════════════════════════════════
+
+--- Reads a file and returns its contents as a string, or nil on failure.
+--- @param path : string
+--- @return string|nil
+local function _read_file_bytes(path)
+    local f = io.open(path, "rb")
+    if not f then return nil end
+    local content = f:read("*a")
+    f:close()
+    return content
+end
+
+--- Compares an evidence file against a golden sample file (binary-exact).
+--- Golden tests use this — they do NOT create content, only compare.
+--- @param evidence_path : string — path to evidence output (created by evidence test)
+--- @param golden_path   : string — path to committed golden sample
+--- @param msg           : string — optional label
+function expect_golden_file_match(evidence_path, golden_path, msg)
+    local evidence = _read_file_bytes(evidence_path)
+    if not evidence then
+        error(string.format("%s: evidence file not found: '%s' — run the evidence test first",
+            msg or "golden", evidence_path), 2)
+    end
+    local golden = _read_file_bytes(golden_path)
+    if not golden then
+        error(string.format("%s: golden sample not found: '%s' — commit a baseline sample",
+            msg or "golden", golden_path), 2)
+    end
+    if evidence ~= golden then
+        error(string.format("%s: evidence does not match golden sample\n  evidence: %s (%d bytes)\n  golden:   %s (%d bytes)",
+            msg or "golden", evidence_path, #evidence, golden_path, #golden), 2)
+    end
+end
+
+--- Compares evidence text against a golden sample, ignoring trailing whitespace per line.
+--- Useful for text-based golden tests where line endings may differ.
+--- @param evidence_path : string — path to evidence output
+--- @param golden_path   : string — path to committed golden sample
+--- @param msg           : string — optional label
+function expect_golden_text_match(evidence_path, golden_path, msg)
+    local evidence = _read_file_bytes(evidence_path)
+    if not evidence then
+        error(string.format("%s: evidence file not found: '%s'",
+            msg or "golden_text", evidence_path), 2)
+    end
+    local golden = _read_file_bytes(golden_path)
+    if not golden then
+        error(string.format("%s: golden sample not found: '%s'",
+            msg or "golden_text", golden_path), 2)
+    end
+    -- Normalize: strip trailing whitespace per line, normalize line endings
+    local function normalize(s)
+        return s:gsub("[ \t]+\n", "\n"):gsub("\r\n", "\n"):gsub("\r", "\n")
+    end
+    if normalize(evidence) ~= normalize(golden) then
+        error(string.format("%s: evidence text does not match golden sample\n  evidence: %s\n  golden:   %s",
+            msg or "golden_text", evidence_path, golden_path), 2)
+    end
+end
+
 -- Print test summary and return pass/fail
 -- Outputs structured lines parseable by tools/parse_test_log.py:
 --   PASS [suite] test

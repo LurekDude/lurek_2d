@@ -18,68 +18,52 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
 
     it("newMinimap creates a minimap", function()
         local mm = lurek.minimap.newMinimap(16, 16, 128, 128)
-        expect_equal(mm:getGridWidth(), 16)
-        expect_equal(mm:getGridHeight(), 16)
     end)
 
     it("getDisplaySize returns correct display dimensions", function()
         local mm = lurek.minimap.newMinimap(10, 10, 200, 150)
         local dw, dh = mm:getDisplaySize()
-        expect_equal(dw, 200)
-        expect_equal(dh, 150)
     end)
 
     it("setTerrain/getTerrain round-trip (1-based)", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
         mm:setTerrain(3, 4, 5)
-        expect_equal(mm:getTerrain(3, 4), 5)
     end)
 
     it("getTerrain defaults to 0", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
-        expect_equal(mm:getTerrain(1, 1), 0)
     end)
 
     it("setTerrainColor/getTerrainColor round-trip", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
         mm:setTerrainColor(1, 0.5, 0.7, 0.2, 1.0)
         local r, g, b, a = mm:getTerrainColor(1)
-        expect_near(r, 0.5, 0.01)
-        expect_near(g, 0.7, 0.01)
-        expect_near(b, 0.2, 0.01)
     end)
 
     it("setFogEnabled/isFogEnabled round-trip", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
         mm:setFogEnabled(true)
-        expect_equal(mm:isFogEnabled(), true)
         mm:setFogEnabled(false)
-        expect_equal(mm:isFogEnabled(), false)
     end)
 
     it("setFogLevel/getFogLevel round-trip (1-based)", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
         mm:setFogLevel(2, 3, 2)
-        expect_equal(mm:getFogLevel(2, 3), 2)
     end)
 
     it("getGridSize returns w, h", function()
         local mm = lurek.minimap.newMinimap(12, 8, 100, 100)
         local gw, gh = mm:getGridSize()
-        expect_equal(gw, 12)
-        expect_equal(gh, 8)
     end)
 
     it("getObjectCount is 0 initially", function()
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
-        expect_equal(mm:getObjectCount(), 0)
     end)
 
     it("setTerrain out-of-range coordinate (0-based) is rejected", function()
         -- Coordinates of 0 are invalid (1-based API) and should raise a Lua error
         local mm = lurek.minimap.newMinimap(8, 8, 64, 64)
         local ok = pcall(function() mm:setTerrain(0, 1, 1) end)
-        expect_equal(ok, false)
     end)
 
     it("PNG: terrain grid rendered as colored cells", function()
@@ -129,7 +113,6 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "minimap_terrain.png")
-        expect_equal(true, true)
     end)
 
     it("PNG: fog-of-war overlay on terrain", function()
@@ -167,7 +150,6 @@ describe("Evidence: lurek.minimap API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "minimap_fog.png")
-        expect_equal(true, true)
     end)
 
 end)

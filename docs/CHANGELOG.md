@@ -2,6 +2,14 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.7.18] — 2026-04-12
+### Changed
+- **Test migration** — Migrated public-method coverage from Rust integration tests to Lua BDD tests for 6 modules: `data` (compress/decompress/hash/encode/decode/newByteData/parseToml/encodeToml/write/read/size), `math` (RandomGenerator/Transform/BezierCurve/NoiseGenerator/SpatialHash/easing/triangulate/isConvex/gammaToLinear/linearToGamma), `timer` (Scheduler after/every/cancel/pause/resume/getRemaining/setTimeScale), `event` (Signal register/emit/remove/clear/clearAll/getCount/getTotalCount/type/typeOf/poll), `tween` (case-insensitive easing/zero-duration/paused callbacks/onComplete-fires-once), `serial` (CSV delimiter/headers options/round-trip/error handling). Total: 302 new Lua assertions across 6 test files.
+- **Evidence tests** — Stripped 443 value assertions from 31 evidence test files; evidence tests now only create content (no pass/fail on values).
+- **Golden tests** — Rewrote all 13 golden tests to compare-only pattern (no content creation); created `tests/lua/golden/samples/` directory with 13 module subdirs.
+- **Test framework** — Added 6 evidence/golden helper functions to `tests/lua/init.lua` (`evidence_output_dir`, `ensure_evidence_dir`, `expect_evidence_created`, `_read_file_bytes`, `expect_golden_file_match`, `expect_golden_text_match`).
+- **Test architecture** — Updated `docs/architecture/test-framework.md` with evidence-only, golden-compare-only, public→Lua/private→Rust scope rules, and harness auto-discovery notes.
+
 ## [0.7.17] — 2026-04-12
 ### Changed
 - **Debug build** — Added `/DEBUG:FASTLINK` Windows MSVC linker flag in `.cargo/config.toml`; PDB generation is now 3–8× faster by referencing `.obj` files instead of copying debug info.

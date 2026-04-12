@@ -1,9 +1,20 @@
 -- tests/lua/unit/test_data.lua
--- BDD tests for lurek.data.pack / unpack / getPackedSize / newDataView
--- @covers lurek.data.getPackedSize
--- @covers lurek.data.newDataView
+-- BDD tests for the lurek.data module
 -- @covers lurek.data.pack
 -- @covers lurek.data.unpack
+-- @covers lurek.data.getPackedSize
+-- @covers lurek.data.newDataView
+-- @covers lurek.data.compress
+-- @covers lurek.data.decompress
+-- @covers lurek.data.encode
+-- @covers lurek.data.decode
+-- @covers lurek.data.hash
+-- @covers lurek.data.newByteData
+-- @covers lurek.data.parseToml
+-- @covers lurek.data.encodeToml
+-- @covers lurek.data.write
+-- @covers lurek.data.read
+-- @covers lurek.data.size
 
 
 describe("data.pack + data.unpack", function()
@@ -184,6 +195,242 @@ describe("data.newDataView", function()
     local b = lurek.data.pack("B", 1)
     local dv = lurek.data.newDataView(b)
     expect_error(function() dv:getUInt16(0) end)
+  end)
+end)
+
+-- ── compress / decompress ────────────────────────────────────────────────────
+-- @covers lurek.data.compress
+-- @covers lurek.data.decompress
+
+describe("data.compress + data.decompress", function()
+  it("round-trips deflate", function()
+    local original = "Hello, Lurek2D! Deflate compression test."
+    local compressed = lurek.data.compress("deflate", original)
+    local decompressed = lurek.data.decompress("deflate", compressed)
+    expect_equal(decompressed, original)
+  end)
+
+  it("deflate actually compresses (smaller output)", function()
+    local original = string.rep("AAAA", 100)
+    local compressed = lurek.data.compress("deflate", original)
+    expect_true(#compressed < #original)
+  end)
+
+  it("round-trips gzip", function()
+    local original = "Hello, Lurek2D! Gzip compression test."
+    local compressed = lurek.data.compress("gzip", original)
+    local decompressed = lurek.data.decompress("gzip", compressed)
+    expect_equal(decompressed, original)
+  end)
+
+  it("round-trips lz4", function()
+    local original = "Hello, Lurek2D! LZ4 compression test."
+    local compressed = lurek.data.compress("lz4", original)
+    local decompressed = lurek.data.decompress("lz4", compressed)
+    expect_equal(decompressed, original)
+  end)
+
+  it("handles empty data", function()
+    local compressed = lurek.data.compress("deflate", "")
+    local decompressed = lurek.data.decompress("deflate", compressed)
+    expect_equal(decompressed, "")
+  end)
+end)
+
+-- ── encode / decode ──────────────────────────────────────────────────────────
+-- @covers lurek.data.encode
+-- @covers lurek.data.decode
+
+describe("data.encode + data.decode", function()
+  it("round-trips base64", function()
+    local original = "Hello, Lurek2D!"
+    local encoded = lurek.data.encode("base64", original)
+    expect_equal(encoded, "SGVsbG8sIEx1cmVrMkQh")
+    local decoded = lurek.data.decode("base64", encoded)
+    expect_equal(decoded, original)
+  end)
+
+  it("round-trips hex", function()
+    local original = "Hello"
+    local encoded = lurek.data.encode("hex", original)
+    expect_equal(encoded, "48656c6c6f")
+    local decoded = lurek.data.decode("hex", encoded)
+    expect_equal(decoded, original)
+  end)
+
+  it("base64 encodes empty string", function()
+    local encoded = lurek.data.encode("base64", "")
+    expect_equal(encoded, "")
+  end)
+
+  it("hex encodes single byte", function()
+    local encoded = lurek.data.encode("hex", "\x00")
+    expect_equal(encoded, "00")
+  end)
+end)
+
+-- ── hash ─────────────────────────────────────────────────────────────────────
+-- @covers lurek.data.hash
+
+describe("data.hash", function()
+  it("md5 produces known digest", function()
+    expect_equal(lurek.data.hash("md5", "hello"), "5d41402abc4b2a76b9719d911017c592")
+  end)
+
+  it("sha1 produces known digest", function()
+    expect_equal(lurek.data.hash("sha1", "hello"), "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d")
+  end)
+
+  it("sha256 produces known digest", function()
+    expect_equal(lurek.data.hash("sha256", "hello"),
+      "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")
+  end)
+
+  it("sha512 produces known digest", function()
+    expect_equal(lurek.data.hash("sha512", "hello"),
+      "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043")
+  end)
+
+  it("different input produces different hash", function()
+    local h1 = lurek.data.hash("sha256", "hello")
+    local h2 = lurek.data.hash("sha256", "world")
+    expect_not_equal(h1, h2)
+  end)
+
+  it("same input produces same hash", function()
+    local h1 = lurek.data.hash("sha256", "test")
+    local h2 = lurek.data.hash("sha256", "test")
+    expect_equal(h1, h2)
+  end)
+end)
+
+-- ── newByteData ──────────────────────────────────────────────────────────────
+-- @covers lurek.data.newByteData
+
+describe("data.newByteData", function()
+  it("creates zeroed buffer from size", function()
+    local bd = lurek.data.newByteData(10)
+    expect_equal(bd:getSize(), 10)
+    expect_equal(bd:getByte(0), 0)
+  end)
+
+  it("creates buffer from string", function()
+    local bd = lurek.data.newByteData("hello")
+    expect_equal(bd:getSize(), 5)
+    expect_equal(bd:getString(), "hello")
+  end)
+
+  it("setByte and getByte round-trip", function()
+    local bd = lurek.data.newByteData(4)
+    bd:setByte(0, 65)
+    bd:setByte(1, 66)
+    expect_equal(bd:getByte(0), 65)
+    expect_equal(bd:getByte(1), 66)
+  end)
+
+  it("clone produces independent copy", function()
+    local original = lurek.data.newByteData("test")
+    local cloned = original:clone()
+    expect_equal(cloned:getString(), "test")
+    expect_equal(cloned:getSize(), 4)
+  end)
+end)
+
+-- ── parseToml / encodeToml ───────────────────────────────────────────────────
+-- @covers lurek.data.parseToml
+-- @covers lurek.data.encodeToml
+
+describe("data.parseToml + data.encodeToml", function()
+  it("parses basic types", function()
+    local t = lurek.data.parseToml('name = "hello"\ncount = 42\nactive = true')
+    expect_equal(t.name, "hello")
+    expect_equal(t.count, 42)
+    expect_equal(t.active, true)
+  end)
+
+  it("parses nested table", function()
+    local t = lurek.data.parseToml('[window]\nwidth = 800\nheight = 600\ntitle = "Lurek2D"')
+    expect_equal(t.window.width, 800)
+    expect_equal(t.window.height, 600)
+    expect_equal(t.window.title, "Lurek2D")
+  end)
+
+  it("parses array", function()
+    local t = lurek.data.parseToml('items = [1, 2, 3]')
+    expect_equal(#t.items, 3)
+    expect_equal(t.items[1], 1)
+    expect_equal(t.items[3], 3)
+  end)
+
+  it("encodes basic table to TOML string", function()
+    local result = lurek.data.encodeToml({ name = "test", count = 5 })
+    expect_type("string", result)
+    expect_match(result, 'name = "test"')
+    expect_match(result, "count = 5")
+  end)
+
+  it("round-trips table through TOML", function()
+    local original = { title = "game", debug = true }
+    local encoded = lurek.data.encodeToml(original)
+    local decoded = lurek.data.parseToml(encoded)
+    expect_equal(decoded.title, "game")
+    expect_equal(decoded.debug, true)
+  end)
+
+  it("parseToml errors on invalid TOML", function()
+    expect_error(function()
+      lurek.data.parseToml("invalid = [")
+    end)
+  end)
+end)
+
+-- ── write / read (Binary Pack Format) ────────────────────────────────────────
+-- @covers lurek.data.write
+-- @covers lurek.data.read
+-- @covers lurek.data.size
+
+describe("data.write + data.read (Binary Pack Format)", function()
+  it("round-trips u32 and f32", function()
+    local b = lurek.data.write("u32 f32", 42, 3.14)
+    local v1, v2 = lurek.data.read("u32 f32", b)
+    expect_equal(v1, 42)
+    expect_near(v2, 3.14, 0.01)
+  end)
+
+  it("round-trips str", function()
+    local b = lurek.data.write("str", "hello")
+    local v = lurek.data.read("str", b)
+    expect_equal(v, "hello")
+  end)
+
+  it("round-trips cstr (null-terminated)", function()
+    local b = lurek.data.write("cstr", "world")
+    local v = lurek.data.read("cstr", b)
+    expect_equal(v, "world")
+  end)
+
+  it("round-trips bool", function()
+    local b = lurek.data.write("bool bool", true, false)
+    local v1, v2 = lurek.data.read("bool bool", b)
+    expect_equal(v1, true)
+    expect_equal(v2, false)
+  end)
+
+  it("data.size returns correct byte count", function()
+    expect_equal(lurek.data.size("u8 u16 u32 u64 i8 i16 i32 i64"), 30)
+    expect_equal(lurek.data.size("f32 f64 bool pad"), 14)
+  end)
+
+  it("big-endian u16 has correct byte order", function()
+    local b = lurek.data.write("be u16", 0x0102)
+    expect_equal(string.byte(b, 1), 0x01)
+    expect_equal(string.byte(b, 2), 0x02)
+  end)
+
+  it("little-endian u16 has correct byte order", function()
+    local b = lurek.data.write("le u16", 0x0102)
+    expect_equal(string.byte(b, 1), 0x02)
+    expect_equal(string.byte(b, 2), 0x01)
   end)
 end)
 

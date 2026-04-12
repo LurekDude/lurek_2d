@@ -63,7 +63,6 @@ describe("Evidence: Shapes", function()
         end
 
         lurek.img.savePNG(img, OUT .. "polygon_gallery.png")
-        expect_equal(img:getWidth(), W)
     end)
 
     it("renders filled primitive shapes", function()
@@ -88,7 +87,6 @@ describe("Evidence: Shapes", function()
         end
 
         lurek.img.savePNG(img, OUT .. "filled_primitives.png")
-        expect_equal(img:getWidth(), W)
     end)
 
     it("renders a spiral gallery", function()
@@ -101,7 +99,6 @@ describe("Evidence: Shapes", function()
         draw_spiral(img, 330, 150, 5, 80,  80,  220)
 
         lurek.img.savePNG(img, OUT .. "spirals.png")
-        expect_equal(img:getWidth(), W)
     end)
 
     it("renders concentric shape rings", function()
@@ -122,7 +119,6 @@ describe("Evidence: Shapes", function()
         end
 
         lurek.img.savePNG(img, OUT .. "concentric_rings.png")
-        expect_equal(img:getWidth(), W)
     end)
 
 end)

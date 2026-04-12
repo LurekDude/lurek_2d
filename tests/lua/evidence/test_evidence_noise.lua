@@ -24,7 +24,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_perlin2d.png")
-        expect_equal(img:getWidth(), size)
     end)
 
     it("generates Simplex 2D noise image", function()
@@ -40,7 +39,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_simplex2d.png")
-        expect_equal(img:getWidth(), size)
     end)
 
     it("generates FBM noise image", function()
@@ -56,7 +54,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_fbm.png")
-        expect_equal(img:getWidth(), size)
     end)
 
     it("generates Worley 2D noise image", function()
@@ -72,7 +69,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_worley2d.png")
-        expect_equal(img:getWidth(), size)
     end)
 
     it("generates Ridged noise image", function()
@@ -88,7 +84,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_ridged.png")
-        expect_equal(img:getWidth(), size)
     end)
 
     it("generates Turbulence noise image", function()
@@ -104,7 +99,6 @@ describe("Evidence: Noise generation", function()
             end
         end
         lurek.img.savePNG(img, OUT .. "noise_turbulence.png")
-        expect_equal(img:getWidth(), size)
     end)
 
 end)

@@ -7,8 +7,9 @@
 -- @covers lurek.time.setPhysicsDelta
 -- @covers lurek.time.sleep
 -- @covers lurek.time.step
+-- @covers lurek.time.newScheduler
 
-﻿-- Lurek2D Timer API Tests
+-- Lurek2D Timer API Tests
 
 describe("lurek.time module exists", function()
     it("lurek.time is a table", function()
@@ -169,6 +170,129 @@ describe("lurek.time physics delta", function()
         lurek.time.setPhysicsDelta(1.0 / 60.0)
         local dt = lurek.time.getPhysicsDelta()
         expect_near(1.0 / 60.0, dt, 1e-6)
+    end)
+end)
+
+-- ── Scheduler ────────────────────────────────────────────────────────────────
+
+describe("lurek.time.newScheduler", function()
+    it("creates a scheduler", function()
+        local sched = lurek.time.newScheduler()
+        expect_not_nil(sched)
+    end)
+
+    it("getCount returns 0 for empty scheduler", function()
+        local sched = lurek.time.newScheduler()
+        expect_equal(sched:getCount(), 0)
+    end)
+
+    it("isEmpty returns true for empty scheduler", function()
+        local sched = lurek.time.newScheduler()
+        expect_true(sched:isEmpty())
+    end)
+
+    it("after creates a one-shot timer", function()
+        local sched = lurek.time.newScheduler()
+        local fired = false
+        sched:after(0.5, function() fired = true end)
+        expect_equal(sched:getCount(), 1)
+        sched:update(0.3)
+        expect_equal(fired, false)
+        sched:update(0.3)
+        expect_equal(fired, true)
+        expect_equal(sched:getCount(), 0)
+    end)
+
+    it("every fires repeatedly", function()
+        local sched = lurek.time.newScheduler()
+        local count = 0
+        sched:every(0.5, function() count = count + 1 end, 3)
+        sched:update(0.5)
+        expect_equal(count, 1)
+        sched:update(0.5)
+        expect_equal(count, 2)
+        sched:update(0.5)
+        expect_equal(count, 3)
+    end)
+
+    it("cancel removes a timer", function()
+        local sched = lurek.time.newScheduler()
+        local id = sched:after(1.0, function() end)
+        expect_equal(sched:getCount(), 1)
+        local ok = sched:cancel(id)
+        expect_true(ok)
+        expect_equal(sched:getCount(), 0)
+    end)
+
+    it("cancel returns false for unknown id", function()
+        local sched = lurek.time.newScheduler()
+        local ok = sched:cancel(9999)
+        expect_equal(ok, false)
+    end)
+
+    it("cancelAll removes all timers", function()
+        local sched = lurek.time.newScheduler()
+        sched:after(1.0, function() end)
+        sched:after(2.0, function() end)
+        sched:every(0.5, function() end)
+        expect_equal(sched:getCount(), 3)
+        sched:cancelAll()
+        expect_equal(sched:getCount(), 0)
+    end)
+
+    it("pause and resume stops and restarts a timer", function()
+        local sched = lurek.time.newScheduler()
+        local fired = false
+        local id = sched:after(1.0, function() fired = true end)
+        sched:update(0.5)
+        sched:pause(id)
+        expect_true(sched:isPaused(id))
+        sched:update(2.0)
+        expect_equal(fired, false)
+        sched:resume(id)
+        expect_equal(sched:isPaused(id), false)
+        sched:update(0.6)
+        expect_equal(fired, true)
+    end)
+
+    it("getRemaining tracks countdown", function()
+        local sched = lurek.time.newScheduler()
+        local id = sched:after(5.0, function() end)
+        expect_near(sched:getRemaining(id), 5.0, 0.0001)
+        sched:update(1.0)
+        expect_near(sched:getRemaining(id), 4.0, 0.0001)
+    end)
+
+    it("getInterval returns timer interval", function()
+        local sched = lurek.time.newScheduler()
+        local id = sched:every(0.25, function() end)
+        expect_near(sched:getInterval(id), 0.25, 0.0001)
+    end)
+
+    it("setInterval changes timer interval", function()
+        local sched = lurek.time.newScheduler()
+        local id = sched:every(0.5, function() end)
+        sched:setInterval(id, 1.0)
+        expect_near(sched:getInterval(id), 1.0, 0.0001)
+    end)
+
+    it("setTimeScale affects update speed", function()
+        local sched = lurek.time.newScheduler()
+        local fired = false
+        sched:after(1.0, function() fired = true end)
+        sched:setTimeScale(2.0)
+        expect_near(sched:getTimeScale(), 2.0, 0.0001)
+        sched:update(0.5) -- 0.5 * 2.0 = 1.0 elapsed
+        expect_equal(fired, true)
+    end)
+
+    it("afterNamed creates named timer that cancelNamed can remove", function()
+        local sched = lurek.time.newScheduler()
+        sched:afterNamed("mytimer", 1.0, function() end)
+        expect_equal(sched:getCount(), 1)
+        local ok = sched:cancelNamed("mytimer")
+        expect_true(ok)
+        expect_equal(sched:getCount(), 0)
     end)
 end)
 

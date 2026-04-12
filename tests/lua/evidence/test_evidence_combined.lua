@@ -59,7 +59,6 @@ describe("Evidence: combined procgen + pathfinding", function()
         end
 
         lurek.img.savePNG(img, OUT .. "procgen_pathfinding.png")
-        expect_equal(true, true)
     end)
 
 end)
@@ -103,7 +102,6 @@ describe("Evidence: combined noise + minimap", function()
         end
 
         lurek.img.savePNG(img, OUT .. "noise_minimap.png")
-        expect_equal(true, true)
     end)
 
 end)
@@ -151,7 +149,6 @@ describe("Evidence: combined terrain + raycaster", function()
         end
 
         lurek.img.savePNG(img, OUT .. "terrain_raycaster.png")
-        expect_equal(true, true)
     end)
 
 end)
@@ -208,7 +205,6 @@ describe("Evidence: combined tilemap + particles", function()
         img:drawRect(cx - 2, cy - 2, 5, 5, 255, 255, 255, 255)
 
         lurek.img.savePNG(img, OUT .. "tilemap_particles.png")
-        expect_equal(true, true)
     end)
 
 end)

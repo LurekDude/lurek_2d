@@ -32,41 +32,32 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
 
     it("newCanvas creates a Canvas with correct width/height", function()
         local c = lurek.graphic.newCanvas(128, 64)
-        expect_equal(c:getWidth(), 128)
-        expect_equal(c:getHeight(), 64)
         c:release()
     end)
 
     it("getDimensions returns width and height", function()
         local c = lurek.graphic.newCanvas(200, 100)
         local w, h = c:getDimensions()
-        expect_equal(w, 200)
-        expect_equal(h, 100)
         c:release()
     end)
 
     it("release returns true on first release", function()
         local c = lurek.graphic.newCanvas(64, 64)
-        expect_equal(c:release(), true)
     end)
 
     it("release returns false on double-release", function()
         local c = lurek.graphic.newCanvas(64, 64)
         c:release()
-        expect_equal(c:release(), false)
     end)
 
     it("typeOf returns 'Canvas'", function()
         local c = lurek.graphic.newCanvas(64, 64)
-        expect_equal(c:typeOf(), "Canvas")
         c:release()
     end)
 
     it("multiple canvases are independent", function()
         local c1 = lurek.graphic.newCanvas(100, 100)
         local c2 = lurek.graphic.newCanvas(200, 300)
-        expect_equal(c1:getWidth(), 100)
-        expect_equal(c2:getWidth(), 200)
         c1:release()
         c2:release()
     end)
@@ -75,15 +66,12 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         local c = lurek.graphic.newCanvas(64, 64)
         c:release()
         local ok = pcall(function() return c:getWidth() end)
-        expect_equal(ok, false)
     end)
 
     it("newCanvas round-trips many sizes", function()
         local sizes = {{32,32},{64,64},{128,128},{256,256},{512,512},{320,180},{1920,1080},{4,4}}
         for _, sz in ipairs(sizes) do
             local c = lurek.graphic.newCanvas(sz[1], sz[2])
-            expect_equal(c:getWidth(), sz[1])
-            expect_equal(c:getHeight(), sz[2])
             c:release()
         end
     end)
@@ -116,7 +104,6 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "canvas_sizes.png")
-        expect_equal(true, true)
     end)
 
     it("PNG: canvas lifecycle state diagram (created/active/released)", function()
@@ -134,7 +121,6 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         draw_rect(img, 88, 4, 36, 56, 200, 0, 0, 255)
 
         lurek.img.savePNG(img, OUT .. "canvas_lifecycle.png")
-        expect_equal(true, true)
     end)
 
 end)

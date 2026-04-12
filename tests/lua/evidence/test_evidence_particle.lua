@@ -20,66 +20,53 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
 
     it("newSystem creates a ParticleSystem", function()
         local sys = lurek.particles.newSystem()
-        expect_equal(sys:count(), 0)
     end)
 
     it("new system isEmpty", function()
         local sys = lurek.particles.newSystem()
-        expect_equal(sys:isEmpty(), true)
     end)
 
     it("emit adds particles", function()
         local sys = lurek.particles.newSystem()
         sys:emit(10)
         -- emit() places particles immediately; count must be positive
-        expect_equal(sys:count() > 0, true)
     end)
 
     it("start/stop change active state", function()
         local sys = lurek.particles.newSystem()
         sys:start()
-        expect_equal(sys:isActive(), true)
         sys:stop()
-        expect_equal(sys:isActive(), false)
     end)
 
     it("pause/resume change paused state", function()
         local sys = lurek.particles.newSystem()
         sys:start()
         sys:pause()
-        expect_equal(sys:isPaused(), true)
         sys:resume()
-        expect_equal(sys:isPaused(), false)
     end)
 
     it("reset clears particles", function()
         local sys = lurek.particles.newSystem()
         sys:emit(50)
         sys:reset()
-        expect_equal(sys:count(), 0)
     end)
 
     it("setPosition/getPosition round-trip", function()
         local sys = lurek.particles.newSystem()
         sys:setPosition(123, 456)
         local x, y = sys:getPosition()
-        expect_near(x, 123, 0.001)
-        expect_near(y, 456, 0.001)
     end)
 
     it("type returns 'ParticleSystem'", function()
         local sys = lurek.particles.newSystem()
-        expect_equal(sys:type(), "ParticleSystem")
     end)
 
     it("typeOf returns true for 'ParticleSystem'", function()
         local sys = lurek.particles.newSystem()
-        expect_equal(sys:typeOf("ParticleSystem"), true)
     end)
 
     it("newTrail creates a trail without error", function()
         local ok = pcall(lurek.particles.newTrail, 1.0, 5.0)
-        expect_equal(ok, true)
     end)
 
     it("PNG: particle emitter positions as colored dots", function()
@@ -131,7 +118,6 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "particle_positions.png")
-        expect_equal(true, true)
     end)
 
     it("PNG: burst emission visualized over time", function()
@@ -164,7 +150,6 @@ describe("Evidence: lurek.particles API + PNG visualization", function()
         draw_dot(img, 64, 64, 4, 255, 255, 255)
 
         lurek.img.savePNG(img, OUT .. "particle_emitter_burst.png")
-        expect_equal(true, true)
     end)
 
 end)

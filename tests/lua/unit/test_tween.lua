@@ -8,7 +8,7 @@
 -- @covers lurek.tween.tween
 -- @covers lurek.tween.update
 
-﻿-- Lurek2D Lua BDD tests for lurek.tween
+-- Lurek2D Lua BDD tests for lurek.tween
 -- Headless: no GPU, no audio, no window.
 -- Tests property tweening: table field animation, sequences, parallels, callbacks.
 
@@ -366,6 +366,53 @@ describe("lurek.tween", function()
             end
             expect_equal(true, found)
         end)
+    end)
+end)
+
+-- ── edge cases from Rust test migration ──────────────────────────────────────
+
+describe("tween edge cases", function()
+    it("easing name is case-insensitive", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        lurek.tween.tween(1.0, obj, { x = 100 }, "LINEAR")
+        lurek.tween.update(0.5)
+        expect_near(obj.x, 50, 2)
+    end)
+
+    it("zero-duration tween completes immediately", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        local completed = false
+        local t = lurek.tween.tween(0.0, obj, { x = 100 })
+        t:onComplete(function() completed = true end)
+        lurek.tween.update(0.001)
+        expect_equal(completed, true)
+    end)
+
+    it("paused tween does not fire onUpdate", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        local updated = false
+        local t = lurek.tween.tween(2.0, obj, { x = 100 })
+        t:onUpdate(function() updated = true end)
+        t:pause()
+        lurek.tween.update(1.0)
+        expect_equal(updated, false)
+    end)
+
+    it("onComplete fires exactly once", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        local count = 0
+        local t = lurek.tween.tween(1.0, obj, { x = 100 })
+        t:onComplete(function() count = count + 1 end)
+        lurek.tween.update(0.5)
+        expect_equal(count, 0)
+        lurek.tween.update(1.0)
+        expect_equal(count, 1)
+        lurek.tween.update(1.0)
+        expect_equal(count, 1)
     end)
 end)
 

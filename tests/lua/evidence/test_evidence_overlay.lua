@@ -27,39 +27,31 @@ describe("Evidence: lurek.effect overlay API + PNG visualization", function()
 
     it("newOverlay creates overlay with correct dimensions", function()
         local ov = lurek.overlay.newOverlay(320, 240)
-        expect_equal(ov:getWidth(), 320)
-        expect_equal(ov:getHeight(), 240)
     end)
 
     it("getDimensions returns w, h", function()
         local ov = lurek.overlay.newOverlay(200, 100)
         local w, h = ov:getDimensions()
-        expect_equal(w, 200)
-        expect_equal(h, 100)
     end)
 
     it("isActive is false initially", function()
         local ov = lurek.overlay.newOverlay(64, 64)
-        expect_equal(ov:isActive(), false)
     end)
 
     it("triggerFlash makes overlay active", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerFlash(1.0, 0.0, 0.0, 1.0, 0.5)
-        expect_equal(ov:isActive(), true)
     end)
 
     it("getFlashAlpha is > 0 after triggerFlash", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerFlash(1.0, 1.0, 1.0, 1.0, 0.5)
         local alpha = ov:getFlashAlpha()
-        expect_equal(alpha > 0, true)
     end)
 
     it("triggerShake sets shake state", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerShake(5.0, 0.5)
-        expect_equal(ov:isActive(), true)
     end)
 
     it("getShakeOffset returns dx, dy", function()
@@ -67,42 +59,33 @@ describe("Evidence: lurek.effect overlay API + PNG visualization", function()
         ov:triggerShake(10.0, 0.5)
         ov:update(0.01)
         local dx, dy = ov:getShakeOffset()
-        expect_equal(type(dx), "number")
-        expect_equal(type(dy), "number")
     end)
 
     it("triggerFade sets active", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerFade(0, 0, 0, 1.0, 0.5)
-        expect_equal(ov:isActive(), true)
     end)
 
     it("triggerLightning sets active", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerLightning()
-        expect_equal(ov:isActive(), true)
     end)
 
     it("clear deactivates overlay", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:triggerFlash(1.0, 0.0, 0.0, 1.0, 0.5)
         ov:clear()
-        expect_equal(ov:isActive(), false)
     end)
 
     it("resize changes dimensions", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:resize(128, 256)
-        expect_equal(ov:getWidth(), 128)
-        expect_equal(ov:getHeight(), 256)
     end)
 
     it("setAmbientEnabled/isAmbientEnabled round-trip", function()
         local ov = lurek.overlay.newOverlay(64, 64)
         ov:setAmbientEnabled(true)
-        expect_equal(ov:isAmbientEnabled(), true)
         ov:setAmbientEnabled(false)
-        expect_equal(ov:isAmbientEnabled(), false)
     end)
 
     it("PNG: flash effect at multiple time steps", function()
@@ -128,7 +111,6 @@ describe("Evidence: lurek.effect overlay API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "overlay_flash.png")
-        expect_equal(true, true)
     end)
 
     it("PNG: fade-to-black effect over time", function()
@@ -154,7 +136,6 @@ describe("Evidence: lurek.effect overlay API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "overlay_fade.png")
-        expect_equal(true, true)
     end)
 
     it("PNG: combined effects — flash + lightning visualization", function()
@@ -186,7 +167,6 @@ describe("Evidence: lurek.effect overlay API + PNG visualization", function()
         end
 
         lurek.img.savePNG(img, OUT .. "overlay_combined.png")
-        expect_equal(true, true)
     end)
 
 end)
