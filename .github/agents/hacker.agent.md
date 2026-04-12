@@ -116,12 +116,12 @@ lurek.gfx.setCanvas(nil)     -- unset without ever setting
 
 ## WORKFLOW
 
-1. **Survey** — Enumerate all `lurek.*` functions registered in `src/lua_api/`
-2. **Categorize** — Group by attack surface: resource handles, file I/O, callbacks, stdlib
-3. **Probe** — Write minimal Lua scripts per attack category
-4. **Execute** — Run against the engine: `cargo run -- work/hack_probes/`
-5. **Classify** — Assign category, severity, and destination agent to each finding
-6. **Report** — Write findings in `work/{session}/reports/hacker-findings.md`
+1. **Context Gathering (Samodzielność)** — Enumerate all `lurek.*` functions and engine APIs registered in `src/lua_api/`. Read the Lua binding boundary natively using codebase search. Do not ask for function lists.
+2. **Analysis & Strategy** — Map the attack surface (e.g. resource handles, I/O, callbacks, stdlib). Formulate adversarial probes targeting these areas.
+3. **Execution (Probing)** — Write minimal Lua scripts per attack category. Focus on edge cases (e.g. `math.maxinteger`, stale handles, path traversal blocks).
+4. **Self-Correction & Quality Judgement** — Critically review your probes. Are they actually targeting boundaries? Is the reproduction script minimal? Make sure you haven't introduced "noise" into the reproduction code.
+5. **Testing & Execution** — Run the scripts using `cargo run -- work/hack_probes/`. Analyze panics, memory usage, or incorrect outcomes.
+6. **Classify & Final Handoff** — Output explicit, actionable findings with severity ratings. Hand off the minimal scripts to Security or Tester.
 
 ## DECISION GATES
 
@@ -151,8 +151,9 @@ lurek.gfx.setCanvas(nil)     -- unset without ever setting
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Unreduced Reports**: Reporting "it crashed with random input" without a deterministic script
-- **Implementation Fixing**: Patching found issues instead of routing to the right agent
+- **Implementation Fixing**: Patching found issues yourself instead of sending to Developer/Security.
 - **Coverage Theatre**: Inflating severity to raise finding counts
 - **Undirected Poking**: Running random Lua without a systematic attack model from the taxonomy
 - **Missing Expected Behaviour**: Reporting a finding without stating what _should_ happen

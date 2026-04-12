@@ -88,11 +88,11 @@ Pure-Lua gameplay libraries that consume public `lurek.*` APIs rather than Rust 
 
 ## WORKFLOW
 
-1. **Survey** — Map current module structure and dependency graph
-2. **Identify** — Find the structural concern (coupling, boundary violation, missing module)
-3. **Design** — Propose module boundaries, public types, and dependency flow
-4. **Document** — Write the design with rationale and migration steps
-5. **Handoff** — Pass to Developer for implementation
+1. **Context Gathering (Samodzielność)** — Map current module structure and dependency graph by reading `Cargo.toml`, `src/lib.rs`, and module `mod.rs` files.
+2. **Analysis & Design** — Identify the structural concern (coupling, boundary violation, missing module). Propose module boundaries, public types, and dependency flow. Ensure the dependency arrow points in a valid direction (no cycles).
+3. **Self-Correction & Quality Judgement** — Critically evaluate your design. Are you making an "Astronaut Architecture" that handles too many hypothetical futures? Are you proposing massive restructures without a clear, step-by-step migration path? Adjust accordingly before passing off the plan.
+4. **Documentation** — Write the design with rationale and a concrete numbered migration path.
+5. **Final Handoff** — Pass to Developer for implementation.
 
 ## DECISION GATES
 

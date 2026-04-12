@@ -4,3 +4,12 @@
 
 [build]
 target-dir = "build"
+
+# ── Windows MSVC: accelerated debug linking ───────────────────────────────────
+# /DEBUG:FASTLINK creates a minimal PDB that references original .obj files
+# instead of copying all debug info into the PDB. This makes the linker step
+# 3–8x faster on large projects at the cost of PDB portability (the .obj files
+# must still exist to resolve symbols — fine for local development).
+# Does not affect release or dist builds (those strip symbols anyway).
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "link-arg=/DEBUG:FASTLINK"]

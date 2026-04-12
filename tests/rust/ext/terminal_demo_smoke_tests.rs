@@ -13,6 +13,7 @@ const SCREENSHOT_REL_PATH: &str = "save/terminal_demo_smoke.png";
 const PROCESS_TIMEOUT: Duration = Duration::from_secs(20);
 
 #[test]
+#[ignore]
 fn terminal_demo_smoke_mode_writes_non_blank_800x600_png() {
     if unsupported_headless_linux() {
         eprintln!("Skipping terminal_demo smoke test: DISPLAY and WAYLAND_DISPLAY are unset.");

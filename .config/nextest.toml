@@ -1,0 +1,53 @@
+# Lurek2D — cargo-nextest configuration
+# Install nextest: cargo install cargo-nextest --locked
+# Run tests:       cargo nextest run
+# Run a subset:    cargo nextest run lua_unit
+#
+# Nextest advantages over `cargo test`:
+#   - Each test runs in its own process (better isolation, parallelism)
+#   - Faster test collection and smarter retry logic
+#   - Colour-coded per-test pass/fail output with timing
+
+[profile.default]
+# Number of test threads.  "num-cpus" uses all logical CPUs; cap at 16 to
+# avoid swamping the I/O subsystem on machines with many cores.
+test-threads = "num-cpus"
+
+# Retry flaky tests up to 1 time before marking them as failures.
+retries = 1
+
+# Show output (stdout/stderr) for failing tests only.
+failure-output = "immediate-final"
+
+# Do NOT show output for passing tests — keeps noise low.
+success-output = "never"
+
+# Print a per-test status line immediately when each test finishes.
+status-level = "pass"
+
+# Slow-test threshold — emit a warning when a test exceeds this duration.
+slow-timeout = { period = "30s", terminate-after = 3 }
+
+# ── Test groups ──────────────────────────────────────────────────────────────
+# Lua stress tests are CPU-heavy; cap them at 4 concurrent to avoid
+# thrashing the scheduler and inflating wall-clock time.
+[[profile.default.overrides]]
+filter = 'test(lua_stress_)'
+test-threads = 4
+
+# Evidence tests write PNG/JSON artefacts to disk — serialise them so they
+# don't race on the output directory.
+[[profile.default.overrides]]
+filter = 'test(lua_evidence_)'
+test-threads = 4
+
+# ── CI profile ───────────────────────────────────────────────────────────────
+# Use on CI: cargo nextest run --profile ci
+[profile.ci]
+# No retries on CI — flaky tests should surface immediately.
+retries = 0
+# Show all output so CI logs capture failures inline.
+failure-output = "immediate-final"
+success-output = "never"
+status-level = "fail"
+slow-timeout = { period = "60s", terminate-after = 2 }

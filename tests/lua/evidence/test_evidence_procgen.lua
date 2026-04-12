@@ -1,7 +1,7 @@
 -- test_evidence_procgen.lua
 -- Evidence test: Procedural generation visualised as images
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/procgen/"
 
 describe("Evidence: Procedural generation", function()
 

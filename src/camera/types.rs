@@ -1,7 +1,7 @@
 //! Camera types for 2D viewport control.
 //!
 //! Provides the original [`Camera`] (used by `SharedState` for the flat
-//! `lurek.gfx.setCamera()` API) and the new Phase 24 [`Camera2D`] with
+//! `lurek.graphic.setCamera()` API) and the new Phase 24 [`Camera2D`] with
 //! smooth follow, dead zone, bounds clamping, and screen-shake.
 
 use crate::math::{Mat3, Rect, Vec2};
@@ -12,7 +12,7 @@ use crate::math::{Mat3, Rect, Vec2};
 
 /// Basic camera with position, zoom, and rotation.
 ///
-/// Used by `SharedState` for the flat `lurek.gfx.setCamera()` API.
+/// Used by `SharedState` for the flat `lurek.graphic.setCamera()` API.
 ///
 /// # Fields
 /// - `position` — World-space centre point the camera is looking at.

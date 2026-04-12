@@ -2,7 +2,7 @@
 -- Evidence test: Canvas creation, dimensions, release + PNG visualization
 -- Produces: canvas_sizes.png, canvas_lifecycle.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/canvas/"
 
 --- Helper: draw a filled rectangle into an ImageData.
 local function draw_rect(img, x0, y0, w, h, r, g, b, a)

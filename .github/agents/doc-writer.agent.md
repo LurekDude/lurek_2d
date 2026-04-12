@@ -58,11 +58,12 @@ Every Doc-Writer output includes:
 
 ## WORKFLOW
 
-1. **Audit** — Compare documentation against current codebase state
-2. **Identify** — Find gaps: undocumented APIs, stale descriptions, missing examples
-3. **Write** — Create or update documentation with verified information
-4. **Verify** — Check that code examples work, API signatures match code
-5. **Cross-Reference** — Link related docs, ensure navigation is coherent
+1. **Context Gathering (Samodzielność)** — Compare existing documentation against the current codebase state by running `python tools/docs/collect_docs.py --report-missing` and searching `src/`. Do not wait for the user to list missing docs.
+2. **Analysis & Planning** — Identify gaps: undocumented APIs, stale descriptions, missing examples. Determine the correct audience tone (tutorial vs reference).
+3. **Execution** — Create or update documentation with verified information. Write runnable Lua snippets for `content/examples/`.
+4. **Self-Correction & Quality Judgement** — Review your newly written docs. Do the Lua snippets actually match the current `lurek.*` signatures? Are you documenting Rust internal details in a user-facing Lua doc? Fix these issues before declaring the task done.
+5. **Validation & Cross-Reference** — Run the validation scripts again to ensure 0 missing docs. Link related docs and ensure navigation is coherent.
+6. **Final Handoff** — Output the list of updated files and confirm that the documentation is fully synchronized with the codebase.
 
 ## DECISION GATES
 
@@ -93,6 +94,7 @@ Every Doc-Writer output includes:
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Stale Docs**: Documentation describing APIs that no longer exist
 - **Code-Free Examples**: Describing functionality without runnable code
 - **Copy-Paste Docs**: Duplicating information across multiple docs

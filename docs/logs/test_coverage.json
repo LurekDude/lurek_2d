@@ -20594,63 +20594,63 @@
         "lua_name": "DataView:getUInt8",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 410
+        "line": 411
       },
       {
         "module": "data",
         "lua_name": "DataView:getUInt16",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 443
+        "line": 444
       },
       {
         "module": "data",
         "lua_name": "DataView:getUInt32",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 465
+        "line": 466
       },
       {
         "module": "data",
         "lua_name": "DataView:getFloat",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 476
+        "line": 477
       },
       {
         "module": "data",
         "lua_name": "DataView:getDouble",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 487
+        "line": 488
       },
       {
         "module": "data",
         "lua_name": "DataView:getSize",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 494
+        "line": 495
       },
       {
         "module": "data",
         "lua_name": "mlua:getSize",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 503
+        "line": 504
       },
       {
         "module": "data",
         "lua_name": "mlua:getString",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 507
+        "line": 508
       },
       {
         "module": "data",
         "lua_name": "mlua:clone",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 540
+        "line": 541
       },
       {
         "module": "dataframe",
@@ -30541,63 +30541,63 @@
         "lua_name": "Channel:type",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 146
+        "line": 147
       },
       {
         "module": "thread",
         "lua_name": "Channel:typeOf",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 150
+        "line": 151
       },
       {
         "module": "thread",
         "lua_name": "Channel:push",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 157
+        "line": 158
       },
       {
         "module": "thread",
         "lua_name": "Channel:pop",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 165
+        "line": 166
       },
       {
         "module": "thread",
         "lua_name": "Channel:peek",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 172
+        "line": 173
       },
       {
         "module": "thread",
         "lua_name": "Channel:demand",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 180
+        "line": 181
       },
       {
         "module": "thread",
         "lua_name": "Channel:getCount",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 189
+        "line": 190
       },
       {
         "module": "thread",
         "lua_name": "Channel:clear",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 193
+        "line": 194
       },
       {
         "module": "thread",
         "lua_name": "Channel:supply",
         "kind": "method",
         "file": "src/lua_api/thread_api.rs",
-        "line": 201
+        "line": 202
       },
       {
         "module": "tilemap",
@@ -31472,70 +31472,70 @@
         "lua_name": "Tween:pause",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 243
+        "line": 244
       },
       {
         "module": "tween",
         "lua_name": "Tween:resume",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 251
+        "line": 252
       },
       {
         "module": "tween",
         "lua_name": "Tween:isActive",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 259
+        "line": 260
       },
       {
         "module": "tween",
         "lua_name": "Tween:getProgress",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 264
+        "line": 265
       },
       {
         "module": "tween",
         "lua_name": "Tween:setRepeat",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 270
+        "line": 271
       },
       {
         "module": "tween",
         "lua_name": "Tween:setYoyo",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 280
+        "line": 281
       },
       {
         "module": "tween",
         "lua_name": "TweenSequence:cancel",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 425
+        "line": 427
       },
       {
         "module": "tween",
         "lua_name": "TweenSequence:isActive",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 433
+        "line": 435
       },
       {
         "module": "tween",
         "lua_name": "TweenParallel:cancel",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 533
+        "line": 536
       },
       {
         "module": "tween",
         "lua_name": "TweenParallel:isActive",
         "kind": "method",
         "file": "src/lua_api/tween_api.rs",
-        "line": 541
+        "line": 544
       },
       {
         "module": "ui",
@@ -34036,35 +34036,35 @@
         "lua_name": "DataView:getInt8",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 421
+        "line": 422
       },
       {
         "module": "data",
         "lua_name": "DataView:getInt16",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 432
+        "line": 433
       },
       {
         "module": "data",
         "lua_name": "DataView:getInt32",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 454
+        "line": 455
       },
       {
         "module": "data",
         "lua_name": "mlua:getByte",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 512
+        "line": 513
       },
       {
         "module": "data",
         "lua_name": "mlua:setByte",
         "kind": "method",
         "file": "src/lua_api/data_api.rs",
-        "line": 526
+        "line": 527
       },
       {
         "module": "devtools",

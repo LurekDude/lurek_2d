@@ -49,11 +49,11 @@ Every Optimizer output includes:
 
 ## WORKFLOW
 
-1. **Baseline** — Understand current performance characteristics and targets
-2. **Profile** — Identify hot paths in the game loop, renderer, and physics
-3. **Analyze** — Measure allocation patterns, cache behavior, and branch prediction
-4. **Rank** — Order optimizations by impact × feasibility
-5. **Report** — Document findings with specific code locations and recommendations
+1. **Context Gathering (Samodzielność)** — Understand the current performance targets. Autonomously read engine subsystems (`src/render`, `src/physics`, etc.) and find the hot paths without waiting for the user.
+2. **Analysis & Profiling** — Profile the game loop. Measure frame budgets, memory allocation patterns, cache behavior, and Lua/Rust boundary crossings.
+3. **Execution (Recommendation)** — Formulate a ranked list of optimizations (impact × feasibility). Provide file paths and specific functions.
+4. **Self-Correction & Quality Judgement** — Review your recommendations critically. Are you falling into the "Premature Optimization" trap? Do you have measurement evidence, or are you just guessing what "might be faster"? Eliminate unverified claims before submitting.
+5. **Final Handoff** — Deliver the specific, evidence-based performance report to Developer or Architect for implementation.
 
 ## DECISION GATES
 
@@ -88,6 +88,7 @@ Every Optimizer output includes:
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Premature Optimization**: Optimizing code without profiling evidence
 - **Micro-Benchmark Trap**: Optimizing isolated code that isn't on the hot path
 - **Allocation Blindness**: Ignoring per-frame allocations in Vec/String operations

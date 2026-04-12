@@ -756,9 +756,6 @@ fn scan_table(
 
 /// Registers the `lurek.docs` namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna_table` — `&LuaTable`.
 pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let docs_tbl = lua.create_table()?;
     let state = Rc::new(RefCell::new(DocsState::new()));

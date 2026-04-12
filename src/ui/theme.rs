@@ -135,7 +135,7 @@ impl Theme {
         let bh = 50i32;
 
         for (idx, (state, label)) in states.iter().enumerate() {
-            let style = self.get_style(WidgetType::Button, state.clone());
+            let style = self.get_style(WidgetType::Button, *state);
             let (fr, fg, fb, br, bg, bb, tr, tg, tb) = if let Some(s) = style {
                 let f = |c: [f32; 4]| ((c[0] * 255.0) as u8, (c[1] * 255.0) as u8, (c[2] * 255.0) as u8);
                 let (fr, fg2, fb) = f(s.bg_color);

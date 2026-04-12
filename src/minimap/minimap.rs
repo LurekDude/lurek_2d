@@ -874,8 +874,8 @@ impl Minimap {
                             let ox = obj.x as u32;
                             let oy = obj.y as u32;
                             // If there are objects with this owner, paint the cell area
-                            if ox / self.grid_width.max(1) == gx / 1
-                                || oy / self.grid_height.max(1) == gy / 1
+                            if ox / self.grid_width.max(1) == gx
+                                || oy / self.grid_height.max(1) == gy
                             {
                                 owner_c = self.get_owner_color(obj.owner);
                                 break;

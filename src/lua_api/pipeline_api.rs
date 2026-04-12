@@ -16,11 +16,6 @@ use crate::pipeline::{ErrorMode, Pipeline, PipelineScheduler, PipelineStep, Step
 
 /// Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 ///
-/// # Fields
-/// - `inner` — `Rc<RefCell<PipelineStep>>`.
-/// - `callback_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `condition_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `on_error_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
 #[derive(Clone)]
 pub struct LuaStep {
     pub(crate) inner: Rc<RefCell<PipelineStep>>,
@@ -371,15 +366,6 @@ impl LuaUserData for LuaStep {
 
 /// Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
 ///
-/// # Fields
-/// - `inner` — `Rc<RefCell<Pipeline>>`.
-/// - `scheduler` — `Rc<RefCell<PipelineScheduler>>`.
-/// - `step_wrappers` — `Rc<RefCell<HashMap<String, LuaStep>>>`.
-/// - `on_complete_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `on_step_complete_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `on_step_error_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `context_key` — `Rc<RefCell<Option<LuaRegistryKey>>>`.
-/// - `is_async` — `Rc<RefCell<bool>>`.
 #[derive(Clone)]
 pub struct LuaPipeline {
     pub(crate) inner: Rc<RefCell<Pipeline>>,
@@ -444,11 +430,7 @@ impl LuaPipeline {
 
 /// Converts a `PipelineResult` to a Lua result table for the `run` return value.
 ///
-/// # Parameters
-/// - `crate` — parameter.
 ///
-/// # Returns
-/// `LuaResult<LuaTable<'lua>>`.
 pub(crate) fn pipeline_result_to_lua<'lua>(
     lua: &'lua Lua,
     result: &crate::pipeline::PipelineResult,
@@ -489,8 +471,6 @@ pub(crate) fn pipeline_result_to_lua<'lua>(
 
 /// Cancels all steps in `order` that are still pending.
 ///
-/// # Parameters
-/// - `crate` — parameter.
 pub(crate) fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order: &[String]) {
     for name in order {
         if let Some(w) = wrappers.get(name) {
@@ -503,8 +483,6 @@ pub(crate) fn cancel_remaining_steps(wrappers: &HashMap<String, LuaStep>, order:
 
 /// Fires the per-step pipeline callbacks based on the step's terminal status.
 ///
-/// # Parameters
-/// - `crate` — parameter.
 pub(crate) fn fire_step_callbacks<'lua>(
     lua: &'lua Lua,
     this: &LuaPipeline,
@@ -534,12 +512,7 @@ pub(crate) fn fire_step_callbacks<'lua>(
 
 /// Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table,
 ///
-/// # Parameters
-/// - `crate` — parameter.
 ///
-/// # Returns
-/// `LuaResult<LuaTable<'lua>>`.
-/// and fires the `on_complete` callback if registered.
 pub(crate) fn finalize_pipeline_result<'lua>(
     lua: &'lua Lua,
     this: &LuaPipeline,
@@ -1040,14 +1013,6 @@ impl LuaUserData for LuaPipeline {
 
 /// Registers the `lurek.pipeline` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

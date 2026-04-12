@@ -1,7 +1,7 @@
 -- test_evidence_easing.lua
 -- Evidence test: All easing curves plotted as images
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/easing/"
 
 local EASINGS = {
     "linear", "inQuad", "outQuad", "inOutQuad",

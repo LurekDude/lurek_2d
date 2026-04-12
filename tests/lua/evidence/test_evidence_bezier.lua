@@ -1,7 +1,7 @@
 -- test_evidence_bezier.lua
 -- Evidence test: BezierCurve creation, evaluation, and visualisation
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/bezier/"
 
 local function plot_point(img, x, y, r, g, b, size)
     size = size or 2

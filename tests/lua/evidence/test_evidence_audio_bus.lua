@@ -2,7 +2,7 @@
 -- Evidence test: lurek.audio Bus API + saves bus-processed audio as WAV
 -- Produces: audio_bus_volume.wav, audio_bus_pitch.wav
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/audio/"
 
 --- Helper: generate a sine wave SoundData
 local function make_sine(freq, duration, rate)

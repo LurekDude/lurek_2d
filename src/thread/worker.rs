@@ -161,7 +161,7 @@ impl LuaThread {
 /// - `lurek.thread.getChannel(name)` — access to named channels
 /// - `arg` — table of arguments passed to `thread:start(...)`
 ///
-/// Worker threads do NOT get: `lurek.gfx`, `lurek.audio`, `lurek.window`,
+/// Worker threads do NOT get: `lurek.graphic`, `lurek.audio`, `lurek.window`,
 /// `lurek.input`, `lurek.physics`, `lurek.particles`, or any module that
 /// touches `SharedState`.
 fn register_thread_safe_modules(

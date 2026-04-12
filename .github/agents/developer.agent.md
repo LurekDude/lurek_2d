@@ -67,12 +67,14 @@ Every Developer output includes:
 
 ## WORKFLOW
 
-1. **Read** — Understand the request. Read affected files and their context.
-2. **Plan** — Identify minimal set of changes. Check module boundaries and dependency direction.
-3. **Implement** — Write the code. Follow Rust conventions from system prompt.
-4. **Verify** — Run `cargo check` (type-check), then `cargo test --test <module>_tests` (scoped). Never run `cargo build` or full `cargo test` during development — they saturate all CPU cores and block parallel work.
-5. **Quality gates** — After every feature implementation, run the post-implementation checklist below.
-6. **Report** — List changed files, what was verified, any caveats.
+1. **Context Gathering (Samodzielność)** — Autonomously explore the workspace. Do not ask the user for file locations if you can find them using `search`, `read`, or `grep`. Identify module boundaries and existing patterns.
+2. **Analysis & Planning** — Formulate a mental plan. Identify the minimal set of changes. Assess potential side effects on dependent modules.
+3. **Pre-Implementation Verification** — Ensure the codebase is currently in a compiling state before making changes (`cargo check`).
+4. **Implementation** — Write the code. Follow Rust conventions from the system prompt. Keep changes strictly within your domain.
+5. **Self-Correction & Quality Judgement** — Critically review your own changes before running tests. Did you add `unwrap()`? Did you skip docstrings? Fix these proactively.
+6. **Testing & Verification** — Run `cargo check` (type-check), then `cargo test --test <module>_tests` (scoped). Fix any compilation or test errors independently without asking the user.
+7. **Quality Gates** — Run the post-implementation quality checklist below.
+8. **Final Handoff** — Summarize changes, prove that tests pass, and cleanly hand off to the next agent or user.
 
 ## POST-IMPLEMENTATION QUALITY CHECKLIST
 
@@ -174,6 +176,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 ```rust
 some_engine_call().map_err(LuaError::external)?
 ```
+
+## BEST PRACTICES
+- **Extreme Autonomy** — Do not give up if the first search fails. Use `rg`, `find`, or read multiple files to construct a mental model.
+- **Micro-Verification** — After every logic change, immediately run a scoped `cargo clippy --lib` or `cargo check`. Catch syntax and borrow checker issues early.
+- **Robust Error Handling** — Ensure all intermediate functions return descriptive `Result` types rather than panicking.
+- **Deep Quality Self-Review** — Before declaring a task "done", simulate a code review. Check names, comments, and side effects. Compare your diff against the original requirement.
+
+## ANTI-PATTERNS
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
+- **Blind Implementation** — Writing massive chunks of code without periodically verifying compilation status.
+- **Shallow Fixes** — Implementing a quick hack to pass a test rather than fixing the structural root cause.
+- **Incomplete Cleanups** — Leaving `todo!()`, warnings, or unused imports in the code.
 
 **Logging** — `log::info!` / `log::debug!` / `log::warn!` / `log::error!` only. Never `println!` in engine code.
 

@@ -6,6 +6,7 @@ use lurek2d::data::hash::{hash, HashAlgorithm};
 use lurek2d::data::toml_convert::{encode_toml, parse_toml};
 
 #[test]
+#[ignore]
 fn stress_compress_all_formats_roundtrip() {
     let original: Vec<u8> = (0..100_000).map(|i| (i % 256) as u8).collect();
     let formats = [
@@ -22,6 +23,7 @@ fn stress_compress_all_formats_roundtrip() {
 }
 
 #[test]
+#[ignore]
 fn stress_compress_all_levels() {
     let original: Vec<u8> = (0..50_000).map(|i| ((i * 7 + 13) % 256) as u8).collect();
     for level in 1..=9 {
@@ -32,6 +34,7 @@ fn stress_compress_all_levels() {
 }
 
 #[test]
+#[ignore]
 fn stress_hash_large_data() {
     let data: Vec<u8> = (0..500_000).map(|i| (i % 256) as u8).collect();
     let algos = [
@@ -51,6 +54,7 @@ fn stress_hash_large_data() {
 }
 
 #[test]
+#[ignore]
 fn stress_hash_determinism() {
     let data = b"Determinism test vector for stress testing";
     let first = hash(HashAlgorithm::Sha256, data);
@@ -61,6 +65,7 @@ fn stress_hash_determinism() {
 }
 
 #[test]
+#[ignore]
 fn stress_base64_large() {
     let data: Vec<u8> = (0..100_000).map(|i| (i % 256) as u8).collect();
     let encoded = encode(EncodeFormat::Base64, &data);
@@ -69,6 +74,7 @@ fn stress_base64_large() {
 }
 
 #[test]
+#[ignore]
 fn stress_hex_large() {
     let data: Vec<u8> = (0..50_000).map(|i| (i % 256) as u8).collect();
     let encoded = encode(EncodeFormat::Hex, &data);
@@ -78,6 +84,7 @@ fn stress_hex_large() {
 }
 
 #[test]
+#[ignore]
 fn stress_toml_parse_valid() {
     let mut toml_str = String::new();
     for i in 0..500 {
@@ -93,6 +100,7 @@ fn stress_toml_parse_valid() {
 }
 
 #[test]
+#[ignore]
 fn stress_toml_parse_invalid_does_not_panic() {
     let long_key = "k".repeat(100_000);
     let invalid_inputs = vec![

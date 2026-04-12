@@ -2,7 +2,7 @@
 -- Evidence test: lurek.minimap API + renders minimap grid to PNG
 -- Produces: minimap_terrain.png, minimap_fog.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/minimap/"
 
 --- Helper: draw filled rect
 local function draw_rect(img, x0, y0, w, h, r, g, b, a)

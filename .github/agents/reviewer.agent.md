@@ -84,11 +84,12 @@ Every Reviewer output includes:
 
 ## WORKFLOW
 
-1. **Scope** — Identify changed files and affected modules
-2. **Read** — Read each changed file, understand the diff
-3. **Check** — Run through the review checklist systematically
-4. **Report** — List findings with severity, location, and remediation
-5. **Verify** — Run `cargo clippy`, `cargo test`, `cargo fmt --check`
+1. **Context Gathering (Samodzielność)** — Identify the modified files, read the related diffs, search for tests associated with those files. Do not wait for the user to hand-feed you the changes.
+2. **Static Analysis & Tooling** — Autonomously run `cargo check`, `cargo fmt --check`, `cargo clippy`, and `cargo test` to gather empirical quality data.
+3. **Deep Structural Review** — Check module dependencies (are they acyclic?), API naming conventions, error handling, and unsafe blocks.
+4. **Self-Correction & Quality Judgement** — Review your own findings. Are you nitpicking? Are you providing context-free feedback? Ensure every finding points to a specific file, line, and provides actionable remediation without rewriting the code for the developer.
+5. **Report Generation** — Classify findings strictly (BLOCKER, WARNING, NOTE). Summarize the required changes clearly.
+6. **Final Handoff** — Route back to the relevant agent (e.g., Developer or Tester) with clear acceptance criteria for approval.
 
 ## DECISION GATES
 

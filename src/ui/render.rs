@@ -234,7 +234,7 @@ impl GuiContext {
             return img;
         };
 
-        let mut stack: Vec<usize> = children.iter().copied().collect();
+        let mut stack: Vec<usize> = children.to_vec();
         while let Some(idx) = stack.pop() {
             let Some(widget) = self.widgets.get(idx) else {
                 continue;

@@ -2,7 +2,7 @@
 -- Evidence test: lurek.audio API + saves generated audio as WAV files
 -- Produces: audio_sine_440hz.wav, audio_chord.wav, audio_sweep.wav
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/audio/"
 
 describe("Evidence: lurek.audio API + WAV output", function()
 
@@ -69,6 +69,14 @@ describe("Evidence: lurek.audio API + WAV output", function()
         expect_equal(peak > 0.5, true)
 
         lurek.audio.saveWAV(sd, OUT .. "audio_sine_440hz.wav")
+
+        local img = lurek.image.newImageData(800, 200)
+        sd:drawWaveform(img, 0, 0, 800, 200, 0, 255, 0, 255)
+        lurek.image.savePNG(img, OUT .. "evidence_audio_sine.png")
+
+        local img = lurek.image.newImageData(800, 200)
+        sd:drawWaveform(img, 0, 0, 800, 200, 255, 128, 0, 255)
+        lurek.image.savePNG(img, OUT .. "evidence_audio_sine.png")
     end)
 
     it("WAV: three-note chord (C4+E4+G4, 2 seconds)", function()
@@ -91,6 +99,10 @@ describe("Evidence: lurek.audio API + WAV output", function()
         end
 
         lurek.audio.saveWAV(sd, OUT .. "audio_chord.wav")
+
+        local img = lurek.image.newImageData(800, 200)
+        sd:drawWaveform(img, 0, 0, 800, 200, 255, 128, 0, 255)
+        lurek.image.savePNG(img, OUT .. "evidence_audio_chord.png")
         expect_equal(sd:getSampleCount(), samples)
     end)
 
@@ -110,6 +122,10 @@ describe("Evidence: lurek.audio API + WAV output", function()
         end
 
         lurek.audio.saveWAV(sd, OUT .. "audio_sweep.wav")
+
+        local img = lurek.image.newImageData(800, 200)
+        sd:drawWaveform(img, 0, 0, 800, 200, 128, 0, 255, 255)
+        lurek.image.savePNG(img, OUT .. "evidence_audio_sweep.png")
         expect_equal(sd:getSampleCount(), samples)
     end)
 
@@ -137,6 +153,10 @@ describe("Evidence: lurek.audio API + WAV output", function()
         end
 
         lurek.audio.saveWAV(sd, OUT .. "audio_stereo_ping.wav")
+
+        local img = lurek.image.newImageData(800, 200)
+        sd:drawWaveform(img, 0, 0, 800, 200, 255, 255, 0, 255)
+        lurek.image.savePNG(img, OUT .. "evidence_audio_stereo_ping.png")
         expect_equal(sd:getChannelCount(), 2)
     end)
 

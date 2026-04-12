@@ -4310,14 +4310,6 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 
 /// Registers the `lurek.ui` API table.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let ctx = Rc::new(RefCell::new(GuiContext::new()));
@@ -5241,6 +5233,411 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- newLineChart --------------------------------------------------------
+    /// Creates a new line chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return LineChart
+    tbl.set("newLineChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaLineChart { inner: crate::ui::chart::LineChart::new(cfg) })
+    })?)?;
+
+    // -- newBarChart ----------------------------------------------------------
+    /// Creates a new bar chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return BarChart
+    tbl.set("newBarChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaBarChart { inner: crate::ui::chart::BarChart::new(cfg) })
+    })?)?;
+
+    // -- newScatterPlot -------------------------------------------------------
+    /// Creates a new scatter plot.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return ScatterPlot
+    tbl.set("newScatterPlot", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(400);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaScatterPlot { inner: crate::ui::chart::ScatterPlot::new(cfg) })
+    })?)?;
+
+    // -- newPieChart ----------------------------------------------------------
+    /// Creates a new pie chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return PieChart
+    tbl.set("newPieChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(400);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaPieChart { inner: crate::ui::chart::PieChart::new(cfg) })
+    })?)?;
+
+    // -- newAreaChart ---------------------------------------------------------
+    /// Creates a new stacked-area chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return AreaChart
+    tbl.set("newAreaChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaAreaChart { inner: crate::ui::chart::AreaChart::new(cfg) })
+    })?)?;
+
+    // -- newLineChart --------------------------------------------------------
+    /// Creates a new line chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return LineChart
+    tbl.set("newLineChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaLineChart { inner: crate::ui::chart::LineChart::new(cfg) })
+    })?)?;
+
+    // -- newBarChart ----------------------------------------------------------
+    /// Creates a new bar chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return BarChart
+    tbl.set("newBarChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaBarChart { inner: crate::ui::chart::BarChart::new(cfg) })
+    })?)?;
+
+    // -- newScatterPlot -------------------------------------------------------
+    /// Creates a new scatter plot.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return ScatterPlot
+    tbl.set("newScatterPlot", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(400);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaScatterPlot { inner: crate::ui::chart::ScatterPlot::new(cfg) })
+    })?)?;
+
+    // -- newPieChart ----------------------------------------------------------
+    /// Creates a new pie chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return PieChart
+    tbl.set("newPieChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(400);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaPieChart { inner: crate::ui::chart::PieChart::new(cfg) })
+    })?)?;
+
+    // -- newAreaChart ---------------------------------------------------------
+    /// Creates a new stacked-area chart.
+    /// @param opts : table  { width?, height?, title? }
+    /// @return AreaChart
+    tbl.set("newAreaChart", lua.create_function(|_, opts: LuaTable| {
+        let width  = opts.get::<_, u32>("width").unwrap_or(400);
+        let height = opts.get::<_, u32>("height").unwrap_or(300);
+        let title  = opts.get::<_, Option<String>>("title").ok().flatten();
+        let cfg = crate::ui::chart::ChartConfig {
+            width,
+            height,
+            title,
+            ..crate::ui::chart::ChartConfig::default()
+        };
+        Ok(LuaAreaChart { inner: crate::ui::chart::AreaChart::new(cfg) })
+    })?)?;
+
     luna.set("ui", tbl)?;
     Ok(())
+}
+
+
+// â”€â”€ LuaLineChart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── LuaLineChart ───────────────────────────────
+
+/// Lua wrapper for a line chart renderer.
+pub struct LuaLineChart {
+    /// Inner Rust `LineChart` instance.
+    pub inner: crate::ui::chart::LineChart,
+}
+
+impl LuaUserData for LuaLineChart {
+    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── addSeries ──────────────────────
+        /// Adds a named data series to the chart.
+        /// @param name : string
+        /// @param points : table  array of {x, y} pairs
+        /// @param r : number  Red 0-1
+        /// @param g : number  Green 0-1
+        /// @param b : number  Blue 0-1
+        /// @return nil
+        methods.add_method_mut("addSeries", |_, this, (name, pts_tbl, r, g, b): (String, LuaTable, f32, f32, f32)| {
+            let mut pts: Vec<(f32, f32)> = Vec::new();
+            for pair in pts_tbl.sequence_values::<LuaTable>() {
+                let p = pair?;
+                let x: f32 = p.get(1).unwrap_or(0.0);
+                let y: f32 = p.get(2).unwrap_or(0.0);
+                pts.push((x, y));
+            }
+            this.inner.add_series(&name, &pts, crate::math::color::Color::new(r, g, b, 1.0));
+            Ok(())
+        });
+        // ── setYMax ────────────────────────
+        /// Sets the maximum Y value for axis scaling.
+        /// @param v : number
+        /// @return nil
+        methods.add_method_mut("setYMax", |_, this, v: f32| { this.inner.y_max = v; Ok(()) });
+        // ── setXMax ────────────────────────
+        /// Sets the maximum X value for axis scaling.
+        /// @param v : number
+        /// @return nil
+        methods.add_method_mut("setXMax", |_, this, v: f32| { this.inner.x_max = v; Ok(()) });
+        // ── drawToImage ─────────────────────
+        /// Renders the line chart into an existing ImageData.
+        /// @param target : ImageData
+        /// @return nil
+        methods.add_method("drawToImage", |_, this, target: mlua::AnyUserData| {
+            let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+            this.inner.draw_to_image(&mut img);
+            Ok(())
+        });
+    }
+}
+
+// ── LuaBarChart ───────────────────────────────
+
+/// Lua wrapper for a grouped bar chart renderer.
+pub struct LuaBarChart {
+    /// Inner Rust `BarChart` instance.
+    pub inner: crate::ui::chart::BarChart,
+}
+
+impl LuaUserData for LuaBarChart {
+    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── addSeries ──────────────────────
+        /// Adds a bar series with a name and colour.
+        /// @param name : string
+        /// @param r : number  Red 0-1
+        /// @param g : number  Green 0-1
+        /// @param b : number  Blue 0-1
+        /// @return nil
+        methods.add_method_mut("addSeries", |_, this, (name, r, g, b): (String, f32, f32, f32)| {
+            this.inner.add_series(&name, crate::math::color::Color::new(r, g, b, 1.0));
+            Ok(())
+        });
+        // ── addCategory ────────────────────
+        /// Adds a category group with per-series values.
+        /// @param label : string
+        /// @param values : table  array of numbers (one per series)
+        /// @return nil
+        methods.add_method_mut("addCategory", |_, this, (label, vals_tbl): (String, LuaTable)| {
+            let mut vals: Vec<f32> = Vec::new();
+            for v in vals_tbl.sequence_values::<f32>() {
+                vals.push(v?);
+            }
+            this.inner.add_category(&label, &vals);
+            Ok(())
+        });
+        // ── drawToImage ─────────────────────
+        /// Renders the bar chart into an existing ImageData.
+        /// @param target : ImageData
+        /// @return nil
+        methods.add_method("drawToImage", |_, this, target: mlua::AnyUserData| {
+            let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+            this.inner.draw_to_image(&mut img);
+            Ok(())
+        });
+    }
+}
+
+// ── LuaScatterPlot ────────────────────────────
+
+/// Lua wrapper for a scatter plot renderer.
+pub struct LuaScatterPlot {
+    /// Inner Rust `ScatterPlot` instance.
+    pub inner: crate::ui::chart::ScatterPlot,
+}
+
+impl LuaUserData for LuaScatterPlot {
+    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── addSeries ──────────────────────
+        /// Adds a named data series.
+        /// @param name : string
+        /// @param points : table  array of {x, y} pairs
+        /// @param r : number  Red 0-1
+        /// @param g : number  Green 0-1
+        /// @param b : number  Blue 0-1
+        /// @return nil
+        methods.add_method_mut("addSeries", |_, this, (name, pts_tbl, r, g, b): (String, LuaTable, f32, f32, f32)| {
+            let mut pts: Vec<(f32, f32)> = Vec::new();
+            for pair in pts_tbl.sequence_values::<LuaTable>() {
+                let p = pair?;
+                let x: f32 = p.get(1).unwrap_or(0.0);
+                let y: f32 = p.get(2).unwrap_or(0.0);
+                pts.push((x, y));
+            }
+            this.inner.add_series(&name, &pts, crate::math::color::Color::new(r, g, b, 1.0));
+            Ok(())
+        });
+        // ── setXRange ──────────────────────
+        /// Sets the X-axis data range.
+        /// @param min : number
+        /// @param max : number
+        /// @return nil
+        methods.add_method_mut("setXRange", |_, this, (mn, mx): (f32, f32)| {
+            this.inner.x_range = (mn, mx);
+            Ok(())
+        });
+        // ── setYRange ──────────────────────
+        /// Sets the Y-axis data range.
+        /// @param min : number
+        /// @param max : number
+        /// @return nil
+        methods.add_method_mut("setYRange", |_, this, (mn, mx): (f32, f32)| {
+            this.inner.y_range = (mn, mx);
+            Ok(())
+        });
+        // ── drawToImage ─────────────────────
+        /// Renders the scatter plot into an existing ImageData.
+        /// @param target : ImageData
+        /// @return nil
+        methods.add_method("drawToImage", |_, this, target: mlua::AnyUserData| {
+            let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+            this.inner.draw_to_image(&mut img);
+            Ok(())
+        });
+    }
+}
+
+// ── LuaPieChart ───────────────────────────────
+
+/// Lua wrapper for a pie chart renderer.
+pub struct LuaPieChart {
+    /// Inner Rust `PieChart` instance.
+    pub inner: crate::ui::chart::PieChart,
+}
+
+impl LuaUserData for LuaPieChart {
+    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── addSegment ─────────────────────
+        /// Adds a labelled pie segment.
+        /// @param label : string
+        /// @param value : number
+        /// @param r : number  Red 0-1
+        /// @param g : number  Green 0-1
+        /// @param b : number  Blue 0-1
+        /// @return nil
+        methods.add_method_mut("addSegment", |_, this, (label, value, r, g, b): (String, f32, f32, f32, f32)| {
+            this.inner.add_segment(&label, value, crate::math::color::Color::new(r, g, b, 1.0));
+            Ok(())
+        });
+        // ── drawToImage ─────────────────────
+        /// Renders the pie chart into an existing ImageData.
+        /// @param target : ImageData
+        /// @return nil
+        methods.add_method("drawToImage", |_, this, target: mlua::AnyUserData| {
+            let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+            this.inner.draw_to_image(&mut img);
+            Ok(())
+        });
+    }
+}
+
+// ── LuaAreaChart ──────────────────────────────
+
+/// Lua wrapper for a stacked area chart renderer.
+pub struct LuaAreaChart {
+    /// Inner Rust `AreaChart` instance.
+    pub inner: crate::ui::chart::AreaChart,
+}
+
+impl LuaUserData for LuaAreaChart {
+    fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── addLayer ───────────────────────
+        /// Adds a stacked layer with values and colour.
+        /// @param name : string
+        /// @param values : table  array of numbers (one per X sample)
+        /// @param r : number  Red 0-1
+        /// @param g : number  Green 0-1
+        /// @param b : number  Blue 0-1
+        /// @return nil
+        methods.add_method_mut("addLayer", |_, this, (name, vals_tbl, r, g, b): (String, LuaTable, f32, f32, f32)| {
+            let mut vals: Vec<f32> = Vec::new();
+            for v in vals_tbl.sequence_values::<f32>() {
+                vals.push(v?);
+            }
+            this.inner.add_layer(&name, &vals, crate::math::color::Color::new(r, g, b, 1.0));
+            Ok(())
+        });
+        // ── setYMax ────────────────────────
+        /// Sets the maximum Y value for axis scaling.
+        /// @param v : number
+        /// @return nil
+        methods.add_method_mut("setYMax", |_, this, v: f32| { this.inner.y_max = v; Ok(()) });
+        // ── drawToImage ─────────────────────
+        /// Renders the area chart into an existing ImageData.
+        /// @param target : ImageData
+        /// @return nil
+        methods.add_method("drawToImage", |_, this, target: mlua::AnyUserData| {
+            let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+            this.inner.draw_to_image(&mut img);
+            Ok(())
+        });
+    }
 }

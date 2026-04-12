@@ -20,14 +20,13 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::tween::{builtin_easing_names, LuaTween, LuaTweenParallel, LuaTweenSequence, ParallelEntry, SequenceStep, TweenEngine, TweenState};
+use crate::tween::{
+    builtin_easing_names, LuaTween, LuaTweenParallel, LuaTweenSequence, ParallelEntry,
+    SequenceStep, TweenEngine, TweenState,
+};
 
 /// Registers the `lurek.tween` property tweening API.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
 ///
 /// Exposes factory functions (`tween`, `sequence`, `parallel`, `delay`), lifecycle
 /// utilities (`update`, `cancelAll`, `getActiveCount`), and easing introspection
@@ -133,27 +132,25 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     let s = engine.clone();
     tbl.set(
         "delay",
-        lua.create_function(
-            move |lua, (seconds, cb): (f64, Option<LuaFunction>)| {
-                use crate::tween::SequenceStep;
-                let callback = if let Some(f) = cb {
-                    Some(lua.create_registry_value(f)?)
-                } else {
-                    None
-                };
-                let mut seq = LuaTweenSequence::new();
-                seq.steps.push(SequenceStep::Delay {
-                    duration: seconds.max(0.0),
-                    elapsed: 0.0,
-                    callback,
-                });
-                seq.active = true;
-                let ud = lua.create_userdata(seq)?;
-                let key = lua.create_registry_value(ud.clone())?;
-                s.borrow_mut().active_seqs.push(key);
-                Ok(ud)
-            },
-        )?,
+        lua.create_function(move |lua, (seconds, cb): (f64, Option<LuaFunction>)| {
+            use crate::tween::SequenceStep;
+            let callback = if let Some(f) = cb {
+                Some(lua.create_registry_value(f)?)
+            } else {
+                None
+            };
+            let mut seq = LuaTweenSequence::new();
+            seq.steps.push(SequenceStep::Delay {
+                duration: seconds.max(0.0),
+                elapsed: 0.0,
+                callback,
+            });
+            seq.active = true;
+            let ud = lua.create_userdata(seq)?;
+            let key = lua.create_registry_value(ud.clone())?;
+            s.borrow_mut().active_seqs.push(key);
+            Ok(ud)
+        })?,
     )?;
 
     // ─── cancelAll ────────────────────────────────────────────────────────
@@ -287,16 +284,19 @@ impl LuaUserData for LuaTween {
         /// Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
         /// @param fn : function
         /// @return Tween
-        methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
-            {
-                let mut tw = ud.borrow_mut::<LuaTween>()?;
-                if let Some(old) = tw.on_complete.take() {
-                    lua.remove_registry_value(old)?;
+        methods.add_function(
+            "onComplete",
+            |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
+                {
+                    let mut tw = ud.borrow_mut::<LuaTween>()?;
+                    if let Some(old) = tw.on_complete.take() {
+                        lua.remove_registry_value(old)?;
+                    }
+                    tw.on_complete = Some(lua.create_registry_value(f)?);
                 }
-                tw.on_complete = Some(lua.create_registry_value(f)?);
-            }
-            Ok(ud)
-        });
+                Ok(ud)
+            },
+        );
 
         // ── onUpdate ──────────────────────────────────────────────────────
         /// Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
@@ -402,16 +402,13 @@ impl LuaUserData for LuaTweenSequence {
         /// Appends an immediate callback step. Returns self.
         /// @param fn : function
         /// @return TweenSequence
-        methods.add_function(
-            "callback",
-            |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
-                let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
-                let key = lua.create_registry_value(f)?;
-                seq.steps.push(SequenceStep::Callback(key));
-                drop(seq);
-                Ok(ud)
-            },
-        );
+        methods.add_function("callback", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
+            let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
+            let key = lua.create_registry_value(f)?;
+            seq.steps.push(SequenceStep::Callback(key));
+            drop(seq);
+            Ok(ud)
+        });
 
         // ── start ─────────────────────────────────────────────────────────
         /// Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
@@ -438,16 +435,19 @@ impl LuaUserData for LuaTweenSequence {
         /// Sets a callback fired when all steps complete. Returns self.
         /// @param fn : function
         /// @return TweenSequence
-        methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
-            {
-                let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
-                if let Some(old) = seq.on_complete.take() {
-                    lua.remove_registry_value(old)?;
+        methods.add_function(
+            "onComplete",
+            |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
+                {
+                    let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
+                    if let Some(old) = seq.on_complete.take() {
+                        lua.remove_registry_value(old)?;
+                    }
+                    seq.on_complete = Some(lua.create_registry_value(f)?);
                 }
-                seq.on_complete = Some(lua.create_registry_value(f)?);
-            }
-            Ok(ud)
-        });
+                Ok(ud)
+            },
+        );
     }
 }
 
@@ -458,27 +458,30 @@ impl LuaUserData for LuaTweenParallel {
         /// Adds an existing LuaTween to the parallel group; marks the tween as owned.
         /// @param tween : Tween
         /// @return nil
-        methods.add_function("add", |lua, (par_ud, tw_ud): (LuaAnyUserData, LuaAnyUserData)| {
-            // Extract tween data into an embedded ParallelEntry, mark original as owned.
-            let entry = {
-                let mut tw = tw_ud.borrow_mut::<LuaTween>()?;
-                tw.owned_by_parent = true;
-                let target_key =
-                    lua.create_registry_value(lua.registry_value::<LuaTable>(&tw.target_key)?)?;
-                let n = tw.fields.len();
-                ParallelEntry {
-                    state: TweenState::new(tw.state.duration, "linear"),
-                    target_key,
-                    fields: tw.fields.clone(),
-                    end_values: tw.end_values.clone(),
-                    start_values: Vec::with_capacity(n),
-                    starts_captured: false,
-                    done: false,
-                }
-            };
-            par_ud.borrow_mut::<LuaTweenParallel>()?.entries.push(entry);
-            Ok(())
-        });
+        methods.add_function(
+            "add",
+            |lua, (par_ud, tw_ud): (LuaAnyUserData, LuaAnyUserData)| {
+                // Extract tween data into an embedded ParallelEntry, mark original as owned.
+                let entry = {
+                    let mut tw = tw_ud.borrow_mut::<LuaTween>()?;
+                    tw.owned_by_parent = true;
+                    let target_key =
+                        lua.create_registry_value(lua.registry_value::<LuaTable>(&tw.target_key)?)?;
+                    let n = tw.fields.len();
+                    ParallelEntry {
+                        state: TweenState::new(tw.state.duration, "linear"),
+                        target_key,
+                        fields: tw.fields.clone(),
+                        end_values: tw.end_values.clone(),
+                        start_values: Vec::with_capacity(n),
+                        starts_captured: false,
+                        done: false,
+                    }
+                };
+                par_ud.borrow_mut::<LuaTweenParallel>()?.entries.push(entry);
+                Ok(())
+            },
+        );
 
         // ── tween ─────────────────────────────────────────────────────────
         /// Creates and adds an inline tween entry to the parallel group. Returns self.
@@ -547,15 +550,18 @@ impl LuaUserData for LuaTweenParallel {
         /// Sets a callback fired when all child tweens finish. Returns self.
         /// @param fn : function
         /// @return TweenParallel
-        methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
-            {
-                let mut par = ud.borrow_mut::<LuaTweenParallel>()?;
-                if let Some(old) = par.on_complete.take() {
-                    lua.remove_registry_value(old)?;
+        methods.add_function(
+            "onComplete",
+            |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
+                {
+                    let mut par = ud.borrow_mut::<LuaTweenParallel>()?;
+                    if let Some(old) = par.on_complete.take() {
+                        lua.remove_registry_value(old)?;
+                    }
+                    par.on_complete = Some(lua.create_registry_value(f)?);
                 }
-                par.on_complete = Some(lua.create_registry_value(f)?);
-            }
-            Ok(ud)
-        });
+                Ok(ud)
+            },
+        );
     }
 }

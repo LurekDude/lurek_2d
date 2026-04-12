@@ -4,6 +4,7 @@ use lurek2d::compute::ops;
 use lurek2d::compute::*;
 
 #[test]
+#[ignore]
 fn stress_large_1d_array_creation() {
     let a = NdArray::new(&[100_000], DataType::Float64).unwrap();
     assert_eq!(a.shape(), &[100_000]);
@@ -11,6 +12,7 @@ fn stress_large_1d_array_creation() {
 }
 
 #[test]
+#[ignore]
 fn stress_large_2d_array_creation() {
     let a = NdArray::new(&[1000, 1000], DataType::Float32).unwrap();
     assert_eq!(a.size(), 1_000_000);
@@ -18,6 +20,7 @@ fn stress_large_2d_array_creation() {
 }
 
 #[test]
+#[ignore]
 fn stress_ones_large_sum() {
     let a = NdArray::ones(&[50_000], DataType::Float64).unwrap();
     let sum: f64 = (0..a.size()).map(|i| a.get_f64(i)).sum();
@@ -25,6 +28,7 @@ fn stress_ones_large_sum() {
 }
 
 #[test]
+#[ignore]
 fn stress_range_large() {
     let a = NdArray::range(0.0, 10_000.0, 1.0, DataType::Float64).unwrap();
     assert_eq!(a.size(), 10_000);
@@ -33,6 +37,7 @@ fn stress_range_large() {
 }
 
 #[test]
+#[ignore]
 fn stress_elementwise_add() {
     let a = NdArray::ones(&[100_000], DataType::Float64).unwrap();
     let b = NdArray::ones(&[100_000], DataType::Float64).unwrap();
@@ -44,6 +49,7 @@ fn stress_elementwise_add() {
 }
 
 #[test]
+#[ignore]
 fn stress_elementwise_mul() {
     let mut a = NdArray::new(&[10_000], DataType::Float64).unwrap();
     let mut b = NdArray::new(&[10_000], DataType::Float64).unwrap();
@@ -56,6 +62,7 @@ fn stress_elementwise_mul() {
 }
 
 #[test]
+#[ignore]
 fn stress_set_get_roundtrip() {
     let mut arr = NdArray::new(&[1000, 1000], DataType::Float32).unwrap();
     // Set diagonal

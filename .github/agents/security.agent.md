@@ -75,11 +75,11 @@ lurek.fs.write("../escape.txt", "x")  -- must fail
 
 ## WORKFLOW
 
-1. **Scope** — Identify modules and attack surfaces to audit
-2. **Audit** — Read code looking for security anti-patterns
-3. **Classify** — Rate each finding by severity and exploitability
-4. **Document** — Write findings with specific code locations and remediation
-5. **Handoff** — Pass findings to Developer for implementation
+1. **Context Gathering (Samodzielność)** — Identify the target modules and attack surfaces to audit (e.g. `GameFS` bounds or `unsafe` blocks). Search the codebase directly.
+2. **Analysis & Auditing** — Read the code looking for anti-patterns: unvalidated Lua input, missing `StdLib::NONE` flags, path traversal flaws, or broad `unsafe` usage. Run the Sandbox Checklist tests.
+3. **Execution (Classification)** — Document each finding with a specific code location, threat model match, and CWE categorization. Provide an actionable remediation recommendation (not the code diff).
+4. **Self-Correction & Quality Judgement** — Review your security findings critically. Are you proposing "Security Theater" changes? Have you checked for `RefCell` double-borrows in your report? Refine your findings before handoff.
+5. **Final Handoff** — Deliver the rated vulnerability report to Developer or Architect.
 
 ## DECISION GATES
 
@@ -110,6 +110,7 @@ lurek.fs.write("../escape.txt", "x")  -- must fail
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Security Theater**: Adding validation that doesn't actually prevent the attack
 - **Trust Lua Input**: Passing Lua values directly to filesystem or system calls
 - **Broad Unsafe**: Large `unsafe` blocks instead of minimal, documented ones

@@ -429,6 +429,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 // ─── GpuRenderer ─────────────────────────────────────────────────────────────
 
 struct LightGpuState {
+    #[allow(dead_code)]
     accum_texture: wgpu::Texture,
     accum_view: wgpu::TextureView,
     accum_bind_group: wgpu::BindGroup,
@@ -438,6 +439,7 @@ struct LightGpuState {
     index_buffer: wgpu::Buffer,
     /// 1D-per-row shadow atlas.  Width = `SHADOW_MAP_RES`, height = `MAX_SHADOW_LIGHTS`.
     shadow_atlas_texture: wgpu::Texture,
+    #[allow(dead_code)]
     shadow_atlas_view: wgpu::TextureView,
     shadow_atlas_bind_group: wgpu::BindGroup,
     width: u32,
@@ -4512,6 +4514,7 @@ fn push_tex_quad_corners(
 
 /// Returns a 5×7 bitmap pattern for the given character.
 /// Each byte represents one row; bits 4..0 are pixels left-to-right.
+#[allow(dead_code)]
 fn bitmap_char(ch: char) -> [u8; 7] {
     match ch.to_ascii_uppercase() {
         'A' => [
@@ -4648,6 +4651,7 @@ fn bitmap_char(ch: char) -> [u8; 7] {
 
 /// Renders debug text using the built-in 5×7 bitmap font.
 /// Pushes colored quads into the vertex/index buffers — no font texture needed.
+#[allow(dead_code)]
 fn render_text(
     cv: &mut Vec<ColorVertex>,
     ci: &mut Vec<u32>,

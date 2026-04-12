@@ -2,7 +2,7 @@
 -- Evidence test: lurek.particles API + renders particle positions to PNG
 -- Produces: particle_positions.png, particle_emitter_burst.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/particle/"
 
 --- Helper: draw a filled circle (dot).
 local function draw_dot(img, cx, cy, radius, r, g, b)

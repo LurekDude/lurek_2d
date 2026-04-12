@@ -2,7 +2,7 @@
 -- Evidence test: lurek.effect overlay API + renders overlay effects to PNG
 -- Produces: overlay_flash.png, overlay_fade.png, overlay_combined.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/overlay/"
 
 --- Helper: draw filled rect
 local function draw_rect(img, x0, y0, w, h, r, g, b, a)

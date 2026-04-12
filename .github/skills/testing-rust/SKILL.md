@@ -184,43 +184,11 @@ end)
 test_summary()
 ```
 
-### 3.2 Register in harness.rs
+### 3.2 Auto-Registration
 
-**Every Lua test file must have exactly one dispatcher entry** in `tests/lua/harness.rs`:
+All Lua testing files (	est_*.lua) placed in 	ests/lua/ or its subdirectories are **automatically discovered and registered by uild.rs**.
 
-```rust
-// Unit test
-#[test]
-fn lua_test_<module>() {
-    run_lua_test("unit/test_<module>.lua");
-}
-
-// Integration test
-#[test]
-fn lua_integration_<a>_<b>() {
-    run_lua_test("integration/test_<a>_<b>.lua");
-}
-
-// Stress test
-#[test]
-fn lua_stress_<name>() {
-    run_lua_test("stress/test_<name>_stress.lua");
-}
-
-// Validation test
-#[test]
-fn lua_validation_<name>() {
-    run_lua_test("validation/test_<name>.lua");
-}
-```
-
-Place the entry in the corresponding section (look for `// === Unit Tests ===`, `// === Stress Tests ===`, etc.)
-
-**Run a single Lua dispatcher:**
-```powershell
-cargo test lua_test_<module>
-cargo test -- --nocapture   # show print() output from Lua tests
-```
+You DO NOT need to edit 	ests/lua/harness.rs. Creating the .lua file is sufficient.
 
 ---
 

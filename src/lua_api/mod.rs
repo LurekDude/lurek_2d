@@ -170,6 +170,23 @@ pub mod lua_types;
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
 
+    // Disable dangerous functions in the sandbox
+    {
+        let globals = lua.globals();
+        globals.set("load", mlua::Value::Nil)?;
+        globals.set("loadfile", mlua::Value::Nil)?;
+        globals.set("dofile", mlua::Value::Nil)?;
+        globals.set("debug", mlua::Value::Nil)?;
+        if let Ok(os) = globals.get::<_, mlua::Table>("os") {
+            os.set("execute", mlua::Value::Nil)?;
+            os.set("getenv", mlua::Value::Nil)?;
+        }
+        if let Ok(io) = globals.get::<_, mlua::Table>("io") {
+            io.set("open", mlua::Value::Nil)?;
+            io.set("popen", mlua::Value::Nil)?;
+        }
+    }
+
     // Create the lurek namespace table and expose it as the `lurek` global immediately.
     // This must happen before any register() call so that inline Lua snippets (e.g.
     // scene_api.rs) can reference `lurek.*` during module registration.

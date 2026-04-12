@@ -58,11 +58,12 @@ Every Lua-Designer output includes:
 
 ## WORKFLOW
 
-1. **Survey** — Read existing `lurek.*` API in `src/lua_api/` and `docs/lua_api_reference.md`
-2. **Design** — Propose function signatures with naming rationale
-3. **Example** — Write a Lua usage example demonstrating the new API
-4. **Document** — Update API reference with the new function
-5. **Handoff** — Pass the spec to Developer for Rust implementation
+1. **Context Gathering (Samodzielność)** — Autonomously search and read the existing `lurek.*` API in `src/lua_api/` and `docs/API/lua-api.md`. Understand the engine patterns before proposing anything.
+2. **Analysis & Design** — Propose function signatures. Ensure zero boolean traps, sensible defaults, and consistency with existing modules.
+3. **Example Generation** — Write a Lua usage example demonstrating the new API. Often this exposes awkward naming before it gets implemented.
+4. **Self-Correction & Quality Judgement** — Review your proposed API. Could a Copilot agent use this without asking questions? Are parameter types consistent? Would this break existing demos? Refine the design critically before offering it up.
+5. **Documentation** — Update the API reference documentation with the new function.
+6. **Final Handoff** — Pass the finalized, reviewed spec to Developer for Rust implementation.
 
 ## DECISION GATES
 

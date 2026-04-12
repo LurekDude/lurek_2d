@@ -2,7 +2,7 @@
 -- Evidence test: lurek.tilemap API + renders tile grid to PNG
 -- Produces: tilemap_grid.png, tilemap_checkerboard.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/tilemap/"
 
 --- Helper: draw filled rect
 local function draw_rect(img, x0, y0, w, h, r, g, b)

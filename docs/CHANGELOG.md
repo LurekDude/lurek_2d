@@ -2,6 +2,14 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.7.17] — 2026-04-12
+### Changed
+- **Debug build** — Added `/DEBUG:FASTLINK` Windows MSVC linker flag in `.cargo/config.toml`; PDB generation is now 3–8× faster by referencing `.obj` files instead of copying debug info.
+- **Debug build** — Added `split-debuginfo = "packed"` to `[profile.dev]`; reduces incremental link-step data movement.
+- **Release binary** — Removed dead `opt-level = "s"` and `lto = "thin"` overrides from `[profile.dist]` that made the `dist` profile produce a larger binary than `release`; `dist` now inherits the full `opt-level = "z"` + fat LTO settings from `release`.
+- **Incremental builds** — Removed the dead auto-harness generator from `build.rs` along with its `cargo:rerun-if-changed=tests/lua` directive; previously any `.lua` file edit triggered a full crate recompile.
+- **Test runner** — Added `.config/nextest.toml`; use `cargo nextest run` for per-process test isolation, colour-coded timing output, stress/evidence thread caps, and a separate CI profile.
+
 ## [0.7.16] — 2026-04-11
 ### Fixed
 - Fixed missing `lurek.animation` methods (`addClip`, `addFramesFromGrid`, `addClipFromGrid`) from generated API docs by correcting rustfmt multiline bindings in `animation_api.rs` to allow parser extraction.

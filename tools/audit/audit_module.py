@@ -41,30 +41,13 @@ WIKI = WORKSPACE / "docs" / "wiki"
 
 # ── Tier assignments (keep in sync with docs/architecture/architecture.md) ──
 
-BASELINE = {"math", "engine"}
-
-# Macros and symbols re-exported at the crate root that are not module names.
-# These are always allowed in any tier without triggering R-02.
-CRATE_ROOT_EXPORTS = {"log_msg"}
-
-TIER1 = {
-    "animation", "audio", "automation", "camera", "compute", "data",
-    "debugbridge", "devtools", "docs", "entity", "event", "filesystem",
-    "graphics", "image", "input", "localization", "log", "patterns",
-    "physics", "thread", "timer", "tween", "window",
-}
-
-TIER2 = {
-    "ai", "dataframe", "fx", "graph", "gui", "light", "minimap", "modding",
-    "network", "overlay", "particle", "pathfinding", "pipeline", "postfx",
-    "procgen", "raycaster", "savegame", "scene", "serial", "spine",
-    "terminal", "tilemap",
-}
-
-# Additional src/ modules not in the official tier table
-EXTRA = set()  # All modules have been assigned to BASELINE, TIER1, or TIER2
-
-ALL_TIERS = BASELINE | TIER1 | TIER2 | EXTRA
+FOUNDATIONS = {'math', 'log', 'data', 'serial', 'compute', 'dataframe', 'graph', 'procgen', 'patterns'}
+CORE_RUNTIME = {'runtime', 'event', 'timer', 'thread', 'network', 'filesystem'}
+PLATFORM_SERVICES = {'render', 'audio', 'physics', 'input', 'image', 'window', 'camera', 'light', 'effect'}
+FEATURE_SYSTEMS = {'ecs', 'scene', 'animation', 'tween', 'particle', 'tilemap', 'parallax', 'minimap', 'raycaster', 'ui', 'terminal', 'ai', 'pathfind', 'save', 'mods', 'i18n', 'automation', 'sprite', 'spine'}
+EDGE_INTEGRATION = {'app', 'lua_api', 'devtools', 'debugbridge', 'docs', 'pipeline', 'bin'}
+CRATE_ROOT_EXPORTS = {'log_msg'}
+ALL_TIERS = FOUNDATIONS | CORE_RUNTIME | PLATFORM_SERVICES | FEATURE_SYSTEMS | EDGE_INTEGRATION
 
 # ── Explicit cross-tier exemptions ────────────────────────────────────────────
 # Format: {(importer_module, imported_module): "reason"}
@@ -80,13 +63,20 @@ CROSS_TIER_EXEMPTIONS: dict = {
 
 
 def get_tier(module: str) -> str:
-    if module in BASELINE:
-        return "baseline"
-    if module in TIER1:
-        return "tier1"
-    if module in TIER2:
-        return "tier2"
-    return "unassigned"
+    if module in FOUNDATIONS: return 'Foundations'
+    if module in CORE_RUNTIME: return 'Core Runtime'
+    if module in PLATFORM_SERVICES: return 'Platform Services'
+    if module in FEATURE_SYSTEMS: return 'Feature Systems'
+    if module in EDGE_INTEGRATION: return 'Edge/Integration'
+    return 'unassigned'
+
+def get_tier_level(module: str) -> int:
+    if module in FOUNDATIONS: return 0
+    if module in CORE_RUNTIME: return 1
+    if module in PLATFORM_SERVICES: return 2
+    if module in FEATURE_SYSTEMS: return 3
+    if module in EDGE_INTEGRATION: return 4
+    return 99
 
 
 # ── Verdict helpers ──
@@ -240,22 +230,20 @@ def _analyze_module_files(module: str) -> ModuleFileAnalysis:
                 analysis.unwrap_hits.append(f"{stem}:{i+1}")
 
         # ── R-02 / R-03: dependency direction ─────────────────────
-        for imp in re.findall(r"use crate::(\w+)", content):
-            if imp == module:
+        for imp in re.findall(r'use crate::(\w+)', content):
+            if imp == module: continue
+            if imp == 'lua_api':
+                analysis.lua_api_imports.append(f'{stem}')
                 continue
-            if imp == "lua_api":
-                analysis.lua_api_imports.append(f"{stem}")
-                continue
-            if imp in CRATE_ROOT_EXPORTS:
-                continue  # crate-root re-exports (macros, helpers) — always allowed
-            if (module, imp) in CROSS_TIER_EXEMPTIONS:
-                continue  # explicitly documented architectural exemption
-            imp_tier = get_tier(imp)
-            if tier == "tier1":
-                if imp_tier not in ("baseline",) and imp not in BASELINE:
-                    analysis.dep_violations.append(f"{stem}: Tier1 imports {imp}({imp_tier})")
+            if imp in CRATE_ROOT_EXPORTS: continue
+
+            imp_level = get_tier_level(imp)
+            mod_level = get_tier_level(module)
+
+            if imp_level > mod_level and imp_level != 99 and mod_level != 99:
+                analysis.dep_violations.append(f"{stem}: {get_tier(module)} imports {imp}({get_tier(imp)})")
             elif tier == "tier2":
-                if imp_tier not in ("baseline", "tier1") and imp not in BASELINE | TIER1:
+                if imp_tier not in ("baseline", "tier1") and imp not in FOUNDATIONS | TIER1:
                     analysis.dep_violations.append(f"{stem}: Tier2 imports {imp}({imp_tier})")
 
     return analysis
@@ -406,9 +394,9 @@ def check_no_lua_api_import(module: str, analysis: ModuleFileAnalysis) -> Check:
     """R-03: Domain modules never import lua_api."""
     if module == "lua_api":
         return Check("R-03", "No lua_api import", PASS, "Module IS lua_api — skip")
-    if module in BASELINE:
+    if module in EDGE_INTEGRATION or module in CORE_RUNTIME:
         return Check("R-03", "No lua_api import", PASS,
-                     "Baseline module — may bootstrap the Lua VM")
+                     "Bootstrapping module — may import lua_api")
     hits = analysis.lua_api_imports
     if hits:
         return Check("R-03", "No lua_api import", ERROR,
@@ -448,9 +436,9 @@ def check_spec_file(module: str) -> List[Check]:
 
     # SP-02: required sections
     REQUIRED_SPEC = ["1. General Info", "2. Summary", "3. Files", "4. Types", "5. Functions", "6. Lua API Reference", "7. References", "8. Notes"]
-    
+
     missing = [s.split(". ")[1] for s in REQUIRED_SPEC if f"## {s.split('. ')[1]}" not in content]
-    
+
     if missing:
         results.append(Check("SP-02", "Required spec sections", ERROR,
                               f"Missing sections: {', '.join(missing)}"))
@@ -849,29 +837,18 @@ def check_lua_bridge(module: str) -> List[Check]:
 
 
 def check_tier_label(module: str) -> Check:
-    """R-01: Tier label in docs/specs matches the tier registry."""
-    expected = get_tier(module)
-    agent_path = WORKSPACE / "docs" / "specs" / f"{module}.md"
-    if not agent_path.exists():
-        return Check("R-01", "Tier placement", WARN, "No docs/specs \u2014 tier label unverifiable")
-    content = read_text(agent_path)
-    m = re.search(r"\*\*Tier\*\*.*?(Baseline|Tier\s*1|Tier\s*2|Unassigned)",
-                  content, re.IGNORECASE)
-    if not m:
-        return Check("R-01", "Tier placement", WARN,
-                      f"No **Tier** row in docs/specs; expected {expected}")
-    found = m.group(1).lower().replace(" ", "")
-    normed = ("baseline" if "baseline" in found
-              else "tier1" if "1" in found
-              else "tier2" if "2" in found
-              else "unknown")
-    if expected == "unassigned":
-        return Check("R-01", "Tier placement", WARN,
-                      "Module not in tier registry \u2014 verify placement")
-    if normed != expected:
-        return Check("R-01", "Tier placement", ERROR,
-                      f"Spec tier '{m.group(1)}' \u2260 registry tier '{expected}'")
-    return Check("R-01", "Tier placement", PASS, f"Tier label matches: {expected}")
+    spec_path = WORKSPACE / 'docs' / 'specs' / f'{module}.md'
+    if not spec_path.exists():
+        return Check('R-01', 'Tier placement', WARN, 'No docs/specs file — cannot verify')
+    content = read_text(spec_path)
+    expected_group = get_tier(module)
+    match = re.search(r'- Module group:\s*(.*)', content)
+    if not match:
+        return Check('R-01', 'Tier placement', ERROR, f"No '- Module group:' row in docs/specs; expected {expected_group}")
+    group = match.group(1).strip()
+    if expected_group.lower() not in group.lower() and expected_group != 'unassigned':
+        return Check('R-01', 'Tier placement', ERROR, f"docs/specs says '{group}', but architecture docs say '{expected_group}'")
+    return Check('R-01', 'Tier placement', PASS, f'Module group {expected_group} verified')
 
 
 # ── Phase 7b: Test Conventions ──
@@ -988,7 +965,7 @@ def check_example_file(module: str) -> List[Check]:
 def check_config_integration(module: str) -> Check:
     """I-03: Module has a config flag in ModulesConfig if it has a Lua API."""
     # Baseline modules (math, engine) are always-on; no config flag expected.
-    if module in BASELINE:
+    if (module in FOUNDATIONS or module in CORE_RUNTIME):
         return Check("I-03", "Config integration", PASS,
                       "Baseline module \u2014 always enabled, no config flag required")
     api_file = LUA_API / f"{module}_api.rs"
@@ -1440,7 +1417,7 @@ def resolve_modules(args: argparse.Namespace) -> List[str]:
                       if m.is_dir() and not m.name.startswith(".")
                       and m.name not in ("bin",))
     if args.tier is not None:
-        tier_map = {0: BASELINE, 1: TIER1, 2: TIER2}
+        tier_map = {0: FOUNDATIONS, 1: TIER1, 2: TIER2}
         return sorted(tier_map.get(args.tier, set()))
     if args.modules:
         return args.modules

@@ -58,12 +58,11 @@ Every Research output is a **research report** containing:
 
 ## WORKFLOW
 
-1. **Parse** — Extract each question from the input. Clarify ambiguous questions before searching.
-2. **Search codebase** — Use `grep_search` and `semantic_search` for internal questions.
-3. **Search web** — Use `fetch_webpage` and web search for external questions. Prefer official docs over blog posts.
-4. **Verify** — Cross-check findings against at least one secondary source when confidence matters.
-5. **Report** — Assemble the structured research report with all five required sections.
-6. **Append log** — Write a JSONL entry to `work/{session}/logs/agent_log.jsonl` before returning.
+1. **Context Gathering (Samodzielność)** — Parse the input to extract the core question. Autonomously read the exact `Cargo.toml` version, grep the codebase for existing patterns, or fetch web pages. Do not ask for permissions to search.
+2. **Analysis & Verification** — Cross-check findings. If you find an API in the official docs, verify that it matches the version used in `Cargo.toml`.
+3. **Execution (Reporting)** — Assemble the structured research report. Ensure every claim has an inline citation pointing to a specific URL or file path.
+4. **Self-Correction & Quality Judgement** — Critically review your report. Are you presenting a guess as a fact? Did you include implementation code when you were just asked for research? Are your sources stale? Fix these before handoff.
+5. **Final Handoff** — Deliver the self-contained report to the receiving agent or user.
 
 ## DECISION GATES
 
@@ -91,6 +90,8 @@ Every Research output is a **research report** containing:
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
+- **"What should I do?" loop**: Endlessly asking the user next steps instead of conducting the research autonomously.
 - **Speculation without citation**: stating "crate X probably supports Y" without a source
 - **Scope creep**: answering questions that weren't asked (affects next agent's context budget)
 - **Implementation smuggling**: adding code snippets that belong in Developer's output

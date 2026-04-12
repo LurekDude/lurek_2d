@@ -68,14 +68,14 @@ git status                           # review working tree
 
 ## WORKFLOW
 
-1. **Session Start** — Execute all five steps in MANDATORY SESSION START above.
-2. **Understand** — Read the request. Identify affected modules, files, and agents.
-3. **Plan** — ALL tasks with 3+ agents, 5+ files, or genuine ambiguity: route to `Planner` first. Simple tasks (1–2 agents, clear scope): decompose inline.
-4. **Route** — Hand off the first task with full context. Wait for completion.
-5. **Commit** — After each accepted phase: `cargo test && cargo clippy -- -D warnings` → `git add <files>` → `git commit` → route forward.
-6. **Track** — Verify the acceptance gate after each handoff returns. Update task status.
-7. **Log** — Append a JSONL entry to `work/{session}/logs/agent_log.jsonl` after each phase.
-8. **Close** — When all tasks are done, summarize what changed and what was verified.
+1. **Session Start (Samodzielność)** — Execute all five steps in MANDATORY SESSION START autonomously. Check the branch, review the working tree, create folders, and initialize logs without asking the user.
+2. **Context & Requirement Analysis** — Read the request thoroughly. Identify affected modules, files, and necessary agents. Use tools to look at the codebase shape if the user's request is vague.
+3. **Plan & Delegate** — For tasks with 3+ agents, 5+ files, or genuine ambiguity, autonomously route to `Planner` first. For simple tasks (1–2 agents, clear scope), decompose inline.
+4. **Route** — Hand off the first task with full context to the appropriate specialist agent. Set explicit acceptance criteria. Wait for completion.
+5. **Self-Correction & Quality Judgement** — When an agent returns, critically evaluate if their output actually met your criteria. Did they run tests? Is the code compiling? Do not accept sub-par work; send it back to them if it fails the gate.
+6. **Commit** — After each rigorously locally-verified phase: `cargo test && cargo clippy -- -D warnings` → `git add <files>` → `git commit` → route forward.
+7. **Track & Log** — Update task status. Append a JSONL entry to `work/{session}/logs/agent_log.jsonl` after each phase.
+8. **Close** — When all tasks are done, summarize what changed, prove what was verified, and close the session cleanly.
 
 ## DECISION GATES
 
@@ -144,6 +144,7 @@ Then append a JSONL log entry and route to the next agent.
 - **Skipping Planner**: Decomposing complex tasks inline instead of routing to Planner
 - **Hero Manager**: Writing code instead of routing to Developer
 - **Scope Balloon**: Adding "nice to have" tasks that weren't requested
-- **Blind Trust**: Marking tasks done without checking the gate
+- **Blind Trust**: Marking an agent's task done without independently verifying the success metrics (e.g., checking test results yourself).
 - **Serial Everything**: Not identifying independent tasks that can parallelize
 - **Bulk commit**: Running `git add .` instead of staging only affected files
+- **"What should I do?" loop**: Endlessly asking the user next steps instead of autonomously proceeding through the plan.

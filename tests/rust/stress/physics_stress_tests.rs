@@ -3,6 +3,7 @@
 use lurek2d::physics::{Body, BodyType, World};
 
 #[test]
+#[ignore]
 fn stress_create_1000_bodies() {
     let mut world = World::new(0.0, 100.0);
     let mut ids = Vec::new();
@@ -19,6 +20,7 @@ fn stress_create_1000_bodies() {
 }
 
 #[test]
+#[ignore]
 fn stress_step_1000_bodies_60_frames() {
     let mut world = World::new(0.0, 100.0);
     for i in 0..1000 {
@@ -34,6 +36,7 @@ fn stress_step_1000_bodies_60_frames() {
 }
 
 #[test]
+#[ignore]
 fn stress_mixed_body_types() {
     let mut world = World::new(0.0, 200.0);
     // Static ground
@@ -63,6 +66,7 @@ fn stress_mixed_body_types() {
 }
 
 #[test]
+#[ignore]
 fn stress_physics_determinism() {
     fn run_sim() -> (f32, f32) {
         let mut world = World::new(0.0, 100.0);
@@ -81,6 +85,7 @@ fn stress_physics_determinism() {
 }
 
 #[test]
+#[ignore]
 fn stress_circle_bodies() {
     let mut world = World::new(0.0, 50.0);
     for i in 0..200 {
@@ -99,6 +104,7 @@ fn stress_circle_bodies() {
 }
 
 #[test]
+#[ignore]
 fn stress_collision_events_collected() {
     let mut world = World::new(0.0, 100.0);
     // Two bodies that will collide

@@ -80,6 +80,7 @@ mod tests {
     use super::*;
     use crate::parallax::layer::ParallaxLayer;
     use crate::runtime::resource_keys::TextureKey;
+    use crate::render::BlendMode;
     use slotmap::KeyData;
 
     fn dummy_key() -> TextureKey {

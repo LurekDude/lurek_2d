@@ -1,7 +1,7 @@
 -- test_evidence_noise.lua
 -- Evidence test: Noise functions visualised as grayscale images
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/noise/"
 
 local function noise_to_byte(v)
     -- Map [-1, 1] → [0, 255]

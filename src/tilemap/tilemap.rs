@@ -14,8 +14,8 @@ use crate::math::{Rect, Vec2};
 
 use super::mapgen::MapOrientation;
 use super::tileset::TileSet;
-use crate::runtime::log_messages::{TM01_TILEMAP_INIT, TM02_TILESET_ADD, TM03_LAYER_ADD};
 use crate::log_msg;
+use crate::runtime::log_messages::{TM01_TILEMAP_INIT, TM02_TILESET_ADD, TM03_LAYER_ADD};
 
 /// A single layer of tiles in a [`TileMap`].
 ///
@@ -1143,7 +1143,7 @@ impl TileMap {
             let (lw, lh) = dims.unwrap_or((0, 0));
             for y in 0..lh {
                 for x in 0..lw {
-                    let gid = self.get_tile(layer_idx, x as u32, y as u32);
+                    let gid = self.get_tile(layer_idx, x, y);
                     if gid == 0 {
                         continue;
                     }

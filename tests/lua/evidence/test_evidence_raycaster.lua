@@ -5,7 +5,7 @@
 -- Tests verify correctness of ray geometry and render results to a PNG
 -- "depth buffer" image so the output can be visually inspected.
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/raycaster/"
 
 describe("Evidence: lurek.raycaster API contracts", function()
 

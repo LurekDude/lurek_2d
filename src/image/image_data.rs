@@ -258,6 +258,25 @@ impl ImageData {
     /// - `b` — `u8`. Blue channel.
     /// - `a` — `u8`. Alpha channel.
     #[allow(clippy::too_many_arguments)]
+    pub fn draw_circle_safe(&mut self, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
+        let w = self.width() as i32;
+        let h = self.height() as i32;
+        let y0 = (cy - r).max(0);
+        let y1 = (cy + r + 1).min(h);
+        let x0 = (cx - r).max(0);
+        let x1 = (cx + r + 1).min(w);
+        let r2 = (r * r) as i64;
+        for py in y0..y1 {
+            let dy = (py - cy) as i64;
+            for px in x0..x1 {
+                let dx = (px - cx) as i64;
+                if dx * dx + dy * dy <= r2 {
+                    self.set_pixel(px as u32, py as u32, red, g, b, a);
+                }
+            }
+        }
+    }
+
     pub fn draw_circle(&mut self, cx: i32, cy: i32, radius: u32, r: u8, g: u8, b: u8, a: u8) {
         let rad = radius as i32;
         let y0 = (cy - rad).max(0) as u32;

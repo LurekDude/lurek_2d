@@ -23,7 +23,7 @@ use crate::camera::Camera2D;
 pub fn draw_animation_frame_grid_to_image(anim: &Animation, cell_w: u32, cell_h: u32) -> ImageData {
     let frame_count = anim.get_frame_count().max(1) as u32;
     let cols = frame_count.min(8);
-    let rows = (frame_count + cols - 1) / cols;
+    let rows = frame_count.div_ceil(cols);
     let width = cols * cell_w;
     let height = rows * cell_h;
     let mut img = ImageData::new(width, height);
@@ -43,8 +43,8 @@ pub fn draw_animation_frame_grid_to_image(anim: &Animation, cell_w: u32, cell_h:
         img.draw_rect(
             (px + 1) as i32,
             (py + 1) as i32,
-            cell_w - 2,
-            cell_h - 2,
+            cell_w.saturating_sub(2).max(1),
+            cell_h.saturating_sub(2).max(1),
             r / 4,
             g / 4,
             b / 4,
@@ -434,7 +434,7 @@ pub fn terrain_elevation_to_image(data: &[f64], width: u32, height: u32) -> Imag
                 let s = (200.0 + v * 55.0).min(255.0) as u8;
                 (s, s, s)
             };
-            img.set_pixel(x as u32, y as u32, r, g, b, 255);
+            img.set_pixel(x, y, r, g, b, 255);
         }
     }
     img
@@ -461,7 +461,7 @@ pub fn easing_gallery_to_image(
     chart_h: u32,
 ) -> ImageData {
     let cols = 4u32;
-    let rows = (curves.len() as u32 + cols - 1) / cols;
+    let rows = (curves.len() as u32).div_ceil(cols);
     let pad = 10u32;
     let img_w = cols * (chart_w + pad) + pad;
     let img_h = rows * (chart_h + pad + 16) + pad;
@@ -948,7 +948,7 @@ pub fn filled_primitives_to_image(width: u32, height: u32) -> ImageData {
         for col in 0u32..16 {
             let x = 20 + col * 22;
             let y = 200 + row * 12;
-            let brightness = ((row * 16 + col) as u32 * 255 / 255).min(255) as u8;
+            let brightness = (((row * 16 + col)) * 255 / 255).min(255) as u8;
             img.set_pixel(x, y, brightness, brightness, brightness, 255);
             img.set_pixel(x + 1, y, brightness, brightness, brightness, 255);
             img.set_pixel(x, y + 1, brightness, brightness, brightness, 255);
@@ -1154,11 +1154,10 @@ pub fn hud_bars_to_image(width: u32, height: u32) -> ImageData {
                     if a < -std::f32::consts::FRAC_PI_2 {
                         a += 2.0 * std::f32::consts::PI;
                     }
-                    if a <= end_angle {
-                        if ix >= 0 && iy >= 0 && (ix as u32) < width && (iy as u32) < height {
+                    if a <= end_angle
+                        && ix >= 0 && iy >= 0 && (ix as u32) < width && (iy as u32) < height {
                             img.set_pixel(ix as u32, iy as u32, cr, cg, cb, 220);
                         }
-                    }
                 }
             }
         }
@@ -1191,7 +1190,7 @@ pub fn camera_rotation_to_image(
     panel_h: u32,
 ) -> ImageData {
     let cols = 3u32;
-    let rows = ((rotations.len() as u32) + cols - 1) / cols;
+    let rows = (rotations.len() as u32).div_ceil(cols);
     let width = panel_w * cols;
     let height = panel_h * rows;
     let mut img = ImageData::new(width, height);
@@ -1863,7 +1862,7 @@ pub fn draw_camera_rotation_grid_to_image(
                 if oy >= 0 {
                     img.set_pixel((ox + bx) as u32, oy.max(0) as u32, 60, 60, 80, 255);
                 }
-                if oy + viewport_h as i32 - 1 < height as i32 && oy + viewport_h as i32 - 1 >= 0 {
+                if oy + viewport_h as i32 - 1 < height as i32 && oy + viewport_h as i32 > 0 {
                     img.set_pixel(
                         (ox + bx) as u32,
                         (oy + viewport_h as i32 - 1) as u32,
@@ -2582,8 +2581,8 @@ pub fn draw_pixel_transform_grid_to_image(col_w: u32, col_h: u32) -> ImageData {
     // Column 1: original red-green gradient
     for y in 0..col_h {
         for x in 0..col_w {
-            let r = (x as u32 * 255 / col_w) as u8;
-            let g = (y as u32 * 255 / col_h) as u8;
+            let r = (x * 255 / col_w) as u8;
+            let g = (y * 255 / col_h) as u8;
             let b = 128u8;
             img.set_pixel(x, y, r, g, b, 255);
         }

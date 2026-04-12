@@ -1,6 +1,6 @@
 # Module Quality Report: `runtime`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 36 ✅ / 2 ⚠️ / 10 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 36 ✅ / 1 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -8,20 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-01** — AGENT.md exists: AGENT.md not found
-- [ ] **A-02** — Template structure: Skipped — no AGENT.md
-- [ ] **A-03** — Purpose quality: Skipped — no AGENT.md
-- [ ] **A-04** — Content sync: Skipped — no AGENT.md
-- [ ] **A-05** — Spec pointer: Skipped — no AGENT.md
-- [ ] **A-06** — Tier label: Skipped — no AGENT.md
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
+- [ ] **R-02** — Dependency direction: shared_state: Core Runtime imports audio(Platform Services); shared_state: Core Runtime imports audio(Platform Services); shared_state: Core Runtime imports camera(Platform Services); shared_state: Core Runtime imports input(Platform Services); shared_state: Core Runtime imports light(Platform Services)
 - [ ] **T-01** — Rust test file: No test file found for module 'runtime'
 - [ ] **W-01** — Example file exists: content/examples/runtime.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **R-01** — Tier placement: No AGENT.md — tier label unverifiable
 - [ ] **T-05** — Test adequacy: 18 pub methods, 0 Rust tests — create test file
 
 ## Full Check Results
@@ -32,30 +25,18 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
-
-### Phase 2 — AGENT.md Quality
-
-| Check | Verdict | Details |
-|-------|---------|---------|
-| **A-01** AGENT.md exists | ❌ ERROR | AGENT.md not found |
-| **A-02** Template structure | ❌ ERROR | Skipped — no AGENT.md |
-| **A-03** Purpose quality | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04** Content sync | ❌ ERROR | Skipped — no AGENT.md |
-| **A-05** Spec pointer | ❌ ERROR | Skipped — no AGENT.md |
-| **A-06** Tier label | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04b** Source Files completeness | ✅ PASS | No AGENT.md — other check handles this |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/runtime.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1311 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -89,9 +70,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No AGENT.md — tier label unverifiable |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
-| **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
+| **R-01** Tier placement | ✅ PASS | Module group Core Runtime verified |
+| **R-02** Dependency direction | ❌ ERROR | shared_state: Core Runtime imports audio(Platform Services); shared_state: Core Runtime imports audio(Platform Services); shared_state: Core Runtime imports camera(Platform Services); shared_state: Core Runtime imports input(Platform Services); shared_state: Core Runtime imports light(Platform Services) |
+| **R-03** No lua_api import | ✅ PASS | Bootstrapping module — may import lua_api |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
 
@@ -144,7 +125,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | No Lua API — config flag not expected |
+| **I-03** Config integration | ✅ PASS | Baseline module — always enabled, no config flag required |
 
 ### Phase 12 — Localization & Logging
 

@@ -73,11 +73,12 @@ Every Renderer output includes:
 
 ## WORKFLOW
 
-1. **Understand** — Read the rendering request and current pipeline state
-2. **Design** — Plan RenderCommand changes, render pipeline operations, or texture handling
-3. **Implement** — Write the graphics code following wgpu patterns
-4. **Test** — Run `cargo test`, verify no regressions in graphics tests
-5. **Profile** — Check that rendering stays within frame budget for typical scenes
+1. **Context Gathering (Samodzielność)** — Read the rendering request, examine existing `RenderCommand` variants, shader files, and the wgpu pipeline state autonomously. Do not ask for files unless they are completely unfindable.
+2. **Design & Planning** — Plan RenderCommand changes, render pipeline operations, or texture handling. Ensure new commands are data-only.
+3. **Execution** — Write the graphics code following wgpu patterns without breaking the rendering queue abstraction.
+4. **Self-Correction & Quality Judgement** — Critically review your WGSL and Rust code. Did you add wgpu calls inside Lua closures? Did you allocate per frame? Fix these before testing.
+5. **Testing & Verification** — Run `cargo check`, then `cargo test --test graphics_tests -- --nocapture`. Fix any borrow-checker or pipeline validation errors independently.
+6. **Final Handoff** — Summarize the implemented pipeline changes and confirm that the frame budget is intact.
 
 ## DECISION GATES
 
@@ -117,6 +118,8 @@ Every Renderer output includes:
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
+- **Blind Implementation** — Writing massive chunks of WGSL or Rust without periodically checking `cargo check`.
 - **Render in Closure**: Executing GPU draw operations inside a Lua callback — must queue `RenderCommand`s
 - **Texture Reload**: Loading the same image file every frame — upload once, cache by `TextureKey`
 - **Camera Leak**: Applying the world-space camera transform to HUD or UI elements

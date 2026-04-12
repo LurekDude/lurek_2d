@@ -57,11 +57,11 @@ Every CAG-Architect output includes:
 
 ## WORKFLOW
 
-1. **Audit** — Check current CAG layer state with `tools/validate/cag_validate.py`
-2. **Identify** — Find gaps, duplications, or stale references
-3. **Edit** — Update the specific CAG file following the template
-4. **Validate** — Run `python tools/validate/cag_validate.py` to check compliance
-5. **Document** — Update `agents/README.md` if agent changes were made
+1. **Context Gathering (Samodzielność)** — Quickly check the current CAG layer state by running `python tools/validate/cag_validate.py`. Identify gaps or missing skills by reading the repository's `.github/` folder.
+2. **Analysis & Update** — Identify duplications, stale references, or missing rules. Update the specific CAG file following the strict templates defined for agents, skills, or prompts.
+3. **Self-Correction & Quality Judgement** — Review your modifications. Did you duplicate a rule between the system prompt and a skill? Did you update `agents/README.md` if an agent changed its mission? Correct yourself before moving onward.
+4. **Validation** — Run `python tools/validate/cag_validate.py` to check compliance. Ensure 0 findings.
+5. **Final Handoff** — Output the updated text and proof that validation passes cleanly.
 
 ## DECISION GATES
 

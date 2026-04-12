@@ -208,6 +208,90 @@ pub struct World {
 }
 
 impl World {
+
+    /// Draw debug physics colliders to an ImageData target.
+    ///
+    /// # Parameters
+    /// - img - The image to draw to.
+    /// - r- Red component [0,255].
+    /// - g - Green component [0,255].
+    /// -  - Blue component [0,255].
+    /// -  - Alpha component [0,255].
+    pub fn draw_debug_to_image(&self, img: &mut crate::image::ImageData, r: u8, g: u8, b: u8, a: u8) {
+        for body in self.bodies.iter() {
+            let cx = body.position.x as i32;
+            let cy = body.position.y as i32;
+            let angle = body.angle;
+
+            if let Some(ref ext) = body.shape_ext {
+                match ext {
+                    crate::physics::shape::Shape::Rect { width, height } => {
+                        let hw = *width / 2.0;
+                        let hh = *height / 2.0;
+                        let p0 = crate::math::Vec2 { x: -hw, y: -hh }.rotate(angle) + body.position;
+                        let p1 = crate::math::Vec2 { x: hw, y: -hh }.rotate(angle) + body.position;
+                        let p2 = crate::math::Vec2 { x: hw, y: hh }.rotate(angle) + body.position;
+                        let p3 = crate::math::Vec2 { x: -hw, y: hh }.rotate(angle) + body.position;
+                        img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                        img.draw_line(p1.x.round() as i32, p1.y.round() as i32, p2.x.round() as i32, p2.y.round() as i32, r, g, b, a);
+                        img.draw_line(p2.x.round() as i32, p2.y.round() as i32, p3.x.round() as i32, p3.y.round() as i32, r, g, b, a);
+                        img.draw_line(p3.x.round() as i32, p3.y.round() as i32, p0.x.round() as i32, p0.y.round() as i32, r, g, b, a);
+                    }
+                    crate::physics::shape::Shape::Circle { radius } => {
+                        img.draw_circle(cx, cy, *radius as u32, r, g, b, a);
+                        let ex = cx + (angle.cos() * radius) as i32;
+                        let ey = cy + (angle.sin() * radius) as i32;
+                        img.draw_line(cx, cy, ex, ey, r, g, b, a);
+                    }
+                    crate::physics::shape::Shape::Polygon { vertices } => {
+                        for i in 0..vertices.len() {
+                            let p0 = vertices[i].rotate(angle) + body.position;
+                            let p1 = vertices[(i + 1) % vertices.len()].rotate(angle) + body.position;
+                            img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                        }
+                    }
+                    crate::physics::shape::Shape::Edge { v1, v2 } => {
+                        let p0 = v1.rotate(angle) + body.position;
+                        let p1 = v2.rotate(angle) + body.position;
+                        img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                    }
+                    crate::physics::shape::Shape::Chain { vertices, closed } => {
+                        for i in 0..vertices.len() - 1 {
+                            let p0 = vertices[i].rotate(angle) + body.position;
+                            let p1 = vertices[i + 1].rotate(angle) + body.position;
+                            img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                        }
+                        if *closed && vertices.len() > 2 {
+                            let p0 = vertices[vertices.len() - 1].rotate(angle) + body.position;
+                            let p1 = vertices[0].rotate(angle) + body.position;
+                            img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                        }
+                    }
+                }
+            } else {
+                match body.shape {
+                    super::body::BodyShape::Rect { width, height } => {
+                        let hw = width / 2.0;
+                        let hh = height / 2.0;
+                        let p0 = crate::math::Vec2 { x: -hw, y: -hh }.rotate(angle) + body.position;
+                        let p1 = crate::math::Vec2 { x: hw, y: -hh }.rotate(angle) + body.position;
+                        let p2 = crate::math::Vec2 { x: hw, y: hh }.rotate(angle) + body.position;
+                        let p3 = crate::math::Vec2 { x: -hw, y: hh }.rotate(angle) + body.position;
+                        img.draw_line(p0.x.round() as i32, p0.y.round() as i32, p1.x.round() as i32, p1.y.round() as i32, r, g, b, a);
+                        img.draw_line(p1.x.round() as i32, p1.y.round() as i32, p2.x.round() as i32, p2.y.round() as i32, r, g, b, a);
+                        img.draw_line(p2.x.round() as i32, p2.y.round() as i32, p3.x.round() as i32, p3.y.round() as i32, r, g, b, a);
+                        img.draw_line(p3.x.round() as i32, p3.y.round() as i32, p0.x.round() as i32, p0.y.round() as i32, r, g, b, a);
+                    }
+                    super::body::BodyShape::Circle { radius } => {
+                        img.draw_circle(cx, cy, radius as u32, r, g, b, a);
+                        let ex = cx + (angle.cos() * radius) as i32;
+                        let ey = cy + (angle.sin() * radius) as i32;
+                        img.draw_line(cx, cy, ex, ey, r, g, b, a);
+                    }
+                }
+            }
+        }
+    }
     /// Creates a new empty physics world with the given gravity vector.
     ///
     /// Positive `gy` means downward in screen-space Y-down coordinates.

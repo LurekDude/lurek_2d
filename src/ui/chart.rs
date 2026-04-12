@@ -219,14 +219,13 @@ impl LineChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn draw_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self, mut img: &mut crate::image::ImageData) {
         let cfg = &self.config;
-        let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
 
         let x_div = self.x_max.ceil() as u32;
-        let (left, right, top, bottom) = draw_grid_and_axes(&mut img, cfg, x_div.max(1), 5);
+        let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, x_div.max(1), 5);
 
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
@@ -255,11 +254,10 @@ impl LineChart {
             for pt in &s.values {
                 let x = left + (pt.0 / self.x_max * chart_w) as i32;
                 let y = bottom - (pt.1 / self.y_max * chart_h) as i32;
-                safe_circle(&mut img, x, y, 3, cr, cg, cb, 255);
+                safe_circle(img, x, y, 3, cr, cg, cb, 255);
             }
         }
 
-        img
     }
 }
 
@@ -346,13 +344,12 @@ impl BarChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn draw_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self, mut img: &mut crate::image::ImageData) {
         let cfg = &self.config;
-        let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
 
-        let (left, right, top, bottom) = draw_grid_and_axes(&mut img, cfg, self.categories.len() as u32, 5);
+        let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, self.categories.len() as u32, 5);
         let chart_h = (bottom - top) as f32;
         let (lr, lg, lb) = cfg.label_color;
 
@@ -380,7 +377,6 @@ impl BarChart {
             img.draw_label(&cat.label, group_x + 8, bottom + 6, lr, lg, lb);
         }
 
-        img
     }
 }
 
@@ -442,13 +438,12 @@ impl ScatterPlot {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn draw_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self, mut img: &mut crate::image::ImageData) {
         let cfg = &self.config;
-        let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
 
-        let (left, right, top, bottom) = draw_grid_and_axes(&mut img, cfg, 5, 5);
+        let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, 5, 5);
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
         let (lr, lg, lb) = cfg.label_color;
@@ -467,11 +462,10 @@ impl ScatterPlot {
             for &(x, y) in &s.values {
                 let px = left + ((x - self.x_range.0) / x_span * chart_w) as i32;
                 let py = bottom - ((y - self.y_range.0) / y_span * chart_h) as i32;
-                safe_circle(&mut img, px, py, 4, cr, cg, cb, 180);
+                safe_circle(img, px, py, 4, cr, cg, cb, 180);
             }
         }
 
-        img
     }
 }
 
@@ -541,17 +535,16 @@ impl PieChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn draw_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
         let w = cfg.width;
         let h = cfg.height;
-        let mut img = ImageData::new(w, h);
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
 
         let total: f32 = self.segments.iter().map(|s| s.value).sum();
         if total <= 0.0 {
-            return img;
+            return;
         }
 
         let cx = (w as f32) * 0.45;
@@ -633,7 +626,6 @@ impl PieChart {
             img.draw_label(title, 10, 10, lr, lg, lb);
         }
 
-        img
     }
 }
 
@@ -707,18 +699,17 @@ impl AreaChart {
     ///
     /// # Returns
     /// `ImageData`.
-    pub fn draw_to_image(&self) -> ImageData {
+    pub fn draw_to_image(&self, img: &mut crate::image::ImageData) {
         let cfg = &self.config;
-        let mut img = ImageData::new(cfg.width, cfg.height);
         let (bgr, bgg, bgb) = cfg.bg_color;
         img.fill(bgr, bgg, bgb, 255);
 
-        let (left, right, top, bottom) = draw_grid_and_axes(&mut img, cfg, 6, 4);
+        let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, 6, 4);
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
 
         if self.layers.is_empty() {
-            return img;
+            return;
         }
 
         let n = self.layers[0].values.len().max(2);
@@ -766,6 +757,5 @@ impl AreaChart {
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
 
-        img
     }
 }

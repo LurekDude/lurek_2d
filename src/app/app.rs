@@ -551,7 +551,7 @@ impl LunaApp {
 
         let state = Rc::new(RefCell::new(shared_state));
 
-        // Load the embedded bitmap default fonts before Lua starts — all lurek.gfx.print()
+        // Load the embedded bitmap default fonts before Lua starts — all lurek.graphic.print()
         // calls without an active font will use these instead of the bitmap fallback.
         state.borrow_mut().load_default_fonts();
 

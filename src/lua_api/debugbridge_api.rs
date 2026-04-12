@@ -19,12 +19,6 @@ use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingRes
 
 /// Registers the `lurek.debugbridge` namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let db = lua.create_table()?;
 

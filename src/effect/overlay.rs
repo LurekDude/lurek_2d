@@ -713,7 +713,7 @@ impl Overlay {
         self.trigger_flash(1.0, 0.0, 0.0, 0.8, 0.5);
         img.draw_rect(2, 2, half_w - 4, half_h - 4, 40, 10, 10, 255);
         img.draw_label("FLASH", 6, 6, 255, 80, 80);
-        for dy in 0..((half_h - 30) as u32) {
+        for dy in 0..(half_h - 30) {
             let t = 1.0 - (dy as f32 / (half_h - 30) as f32);
             let a = (t * 0.8 * 200.0) as u8;
             if a > 20 {
@@ -752,10 +752,10 @@ impl Overlay {
         self.trigger_lightning();
         img.draw_rect(half_w as i32 + 2, half_h as i32 + 2, half_w - 4, half_h - 4, 20, 20, 30, 255);
         img.draw_label("LIGHTNING", half_w as i32 + 6, half_h as i32 + 6, 220, 220, 255);
-        for dy in 0..((half_h - 30) as u32) {
+        for dy in 0..(half_h - 30) {
             for dx in 0..(half_w - 10) {
                 let flash = 200u8.saturating_sub((dy * 2) as u8);
-                img.set_pixel(half_w + 5 + dx, half_h + 22 + dy, flash, flash, 255u8.min(flash + 40), 180);
+                img.set_pixel(half_w + 5 + dx, half_h + 22 + dy, flash, flash, flash + 40, 180);
             }
         }
         self.clear();

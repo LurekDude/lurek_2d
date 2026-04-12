@@ -61,13 +61,12 @@ Every Planner output is a plan document containing:
 
 ## WORKFLOW
 
-1. **Read the request fully** — identify all deliverables, not just the first one
-2. **Map affected modules** — list every `src/` module and `tests/` file touched
-3. **Identify agents** — assign the best-fit specialist to each work unit
-4. **Sequence** — order phases by dependency; mark phases with no dependency as parallelizable
-5. **Gate each phase** — write a binary done-when statement (e.g., "`cargo test physics_tests` passes with new tests")
-6. **Surface risks** — name what could fail, what is unknown, what could block a later phase
-7. **Deliver the plan** — hand it back to Manager or user for execution
+1. **Context Gathering (Samodzielność)** — Read the request fully. Autonomously explore the workspace to map affected `src/` modules and `tests/` files. Do not ask the user for a summary of the codebase if you can `find`, `grep`, and `read`.
+2. **Analysis & Agent Routing** — Identify the best-fit specialist for each work unit. Ensure no cross-domain overlap.
+3. **Sequencing & Parallelism** — Order phases by dependency. Explicitly mark phases that can run concurrently.
+4. **Gating & Risk Assessment** — Write a strict, binary "done-when" gate for every phase. Surface Lurek2D-specific risks and unknowns explicitly.
+5. **Self-Correction & Quality Judgement** — Review your own plan. Are any phases "Mega Phases" that need splitting? Are done-when gates reliably testable? Is the critical path clear? Fix the plan before outputting.
+6. **Final Handoff** — Deliver the concrete, one-screen plan back to the Manager or User for execution without ongoing ambiguity.
 
 ## DECISION GATES
 

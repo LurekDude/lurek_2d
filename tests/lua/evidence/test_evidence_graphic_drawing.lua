@@ -2,7 +2,7 @@
 -- Evidence test: lurek.graphic drawing API — renders each primitive into PNG
 -- Produces: graphic_primitives.png, graphic_color_grid.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/graphics/"
 
 --- Helper: draw filled rect into ImageData
 local function draw_rect(img, x0, y0, w, h, r, g, b, a)

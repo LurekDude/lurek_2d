@@ -113,11 +113,12 @@ App::new(config)
 
 ## WORKFLOW
 
-1. **Read** — Scan `src/runtime/config.rs` for canonical `Config` and sub-structs
-2. **Map** — Match every Rust field to its `conf.lua` table key and type
-3. **Template** — Write a commented `conf.lua` covering all fields with defaults
-4. **Validate** — Run `cargo run -- game_dir` to confirm the template loads correctly
-5. **Document** — Note edge cases, validation traps, and TOML equivalents
+1. **Context Gathering (Samodzielność)** — Autonomously scan `src/runtime/config.rs` for the canonical `Config` and sub-structs without asking the user for file paths.
+2. **Mapping & Design** — Match every Rust field to its `conf.lua` table key and type. Establish explicit defaults.
+3. **Execution** — Write a commented `conf.lua` template covering all fields with defaults.
+4. **Self-Correction & Quality Judgement** — Review your template critically. Did you include `t.identity = "mygame"`? Have you accounted for `minwidth` and `minheight` rules properly? Did you document Cargo feature flag requirements? Fix any anti-patterns before testing.
+5. **Testing & Validation** — Run `cargo run -- <game_dir>` (or a headless test) to confirm the template loads correctly without syntax or type errors.
+6. **Final Handoff** — Output the validated template, mapping, and edge case documentation.
 
 ## DECISION GATES
 
@@ -146,6 +147,7 @@ App::new(config)
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Partial Min Size**: Setting only `minwidth` without `minheight` — silently ignored, frustration ensues
 - **Missing Identity**: Shipping without `t.identity` — save files collide with other Lurek2D games
 - **Hardcoded Resolution**: Fixed `width`/`height` with `resizable = false` and no `minwidth` — unplayable on small screens

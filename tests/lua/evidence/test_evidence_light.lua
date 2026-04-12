@@ -2,7 +2,7 @@
 -- Evidence test: lurek.light API + renders light falloff / multi-light to PNG
 -- Produces: light_single_falloff.png, light_multi_scene.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/light/"
 
 describe("Evidence: lurek.light API + PNG visualization", function()
 

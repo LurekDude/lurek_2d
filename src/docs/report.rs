@@ -7,6 +7,12 @@ use crate::docs::entry::DocEntry;
 
 /// Computes a quality score in `[0.0, 1.0]` for a single doc entry.
 ///
+/// # Parameters
+/// - `entry` — `&DocEntry`.
+///
+/// # Returns
+/// `f64`.
+///
 /// Scores one point each for: non-empty description, non-empty qualified_name,
 /// at least one parameter or return (for non-value kinds), an example, and a
 /// since field.  The final score is the fraction of applicable checks that pass.
@@ -42,6 +48,12 @@ pub fn quality_score(entry: &DocEntry) -> f64 {
 
 /// Converts a quality score into a letter grade.
 ///
+/// # Parameters
+/// - `score` — `f64`.
+///
+/// # Returns
+/// `&'static str`.
+///
 /// A ≥ 0.9, B ≥ 0.7, C ≥ 0.5, D ≥ 0.3, F < 0.3.
 pub fn quality_grade(score: f64) -> &'static str {
     if score >= 0.9 { "A" }
@@ -69,16 +81,25 @@ pub struct ValidationReport {
 
 impl ValidationReport {
     /// Creates an empty validation report.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Returns `true` when the report has no issues.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_clean(&self) -> bool {
         self.missing.is_empty() && self.phantom.is_empty() && self.incomplete.is_empty()
     }
 
     /// Returns the total count of issues across all categories.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn total_issues(&self) -> usize {
         self.missing.len() + self.phantom.len() + self.incomplete.len()
     }
@@ -100,6 +121,12 @@ pub struct QualityReport {
 
 impl QualityReport {
     /// Computes quality scores for every entry in `catalog`.
+    ///
+    /// # Parameters
+    /// - `catalog` — `&Catalog`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn compute(catalog: &Catalog) -> Self {
         let entries: Vec<DocEntry> = catalog.all_entries().to_vec();
 
@@ -126,6 +153,12 @@ impl QualityReport {
     }
 
     /// Returns the letter grade for the given module.
+    ///
+    /// # Parameters
+    /// - `module` — `&str`.
+    ///
+    /// # Returns
+    /// `&'static str`.
     pub fn module_grade(&self, module: &str) -> &'static str {
         quality_grade(self.module_scores.get(module).copied().unwrap_or(0.0))
     }

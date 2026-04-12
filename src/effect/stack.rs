@@ -403,7 +403,7 @@ impl PostFxStack {
 
         let cols = 4u32;
         let cell_w = width / cols;
-        let rows = (entries.len() as u32 + cols - 1) / cols;
+        let rows = (entries.len() as u32).div_ceil(cols);
         let cell_h = if rows > 0 {
             (height - 20) / rows
         } else {
@@ -531,7 +531,7 @@ impl PostFxStack {
             .iter()
             .enumerate()
             .map(|(i, t)| {
-                let effect = super::PostFxEffect::new(t.clone());
+                let effect = super::PostFxEffect::new(*t);
                 let param_count = effect.get_parameter_names().len();
                 let label: &str = match t {
                     super::PostFxEffectType::Vignette => "VIGNETTE",

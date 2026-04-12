@@ -16,14 +16,6 @@ use crate::procgen::{
 
 /// Registers the `lurek.procgen` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -181,11 +173,7 @@ impl CellularOpts {
 impl VoronoiOpts {
 /// from_lua_table.
 ///
-/// # Parameters
-/// - `t` — `&LuaTable`.
 ///
-/// # Returns
-/// `LuaResult<Self>`.
 pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut opts = Self::default();
         if let Ok(v) = t.get::<_, f32>("warp_scale") { opts.warp_scale = v; }

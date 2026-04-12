@@ -71,14 +71,6 @@ fn flatten_lua_table(tbl: &LuaTable, prefix: &str, out: &mut HashMap<String, Str
 
 /// Registers `lurek.localization.*`.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let loc = lua.create_table()?;
     let shared = Rc::new(RefCell::new(LocalizationShared::new()));
@@ -416,7 +408,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             .filter(|w| !w.is_empty())
             .collect();
         if words.is_empty() {
-            return Ok(lua.create_table()?);
+            return lua.create_table();
         }
         // Intersect key lists for each word
         let mut candidate_sets: Vec<std::collections::HashSet<String>> = Vec::new();

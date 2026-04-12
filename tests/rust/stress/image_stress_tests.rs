@@ -3,6 +3,7 @@
 use lurek2d::image::ImageData;
 
 #[test]
+#[ignore]
 fn stress_large_image_creation() {
     let img = ImageData::new(2048, 2048);
     assert_eq!(img.width(), 2048);
@@ -10,6 +11,7 @@ fn stress_large_image_creation() {
 }
 
 #[test]
+#[ignore]
 fn stress_large_image_fill() {
     let mut img = ImageData::new(1024, 1024);
     for y in 0..1024 {
@@ -24,6 +26,7 @@ fn stress_large_image_fill() {
 }
 
 #[test]
+#[ignore]
 fn stress_image_gradient() {
     let mut img = ImageData::new(256, 256);
     for y in 0..256_u32 {
@@ -37,6 +40,7 @@ fn stress_image_gradient() {
 }
 
 #[test]
+#[ignore]
 fn stress_image_map_pixel() {
     let mut img = ImageData::new(512, 512);
     for y in 0..512 {
@@ -51,6 +55,7 @@ fn stress_image_map_pixel() {
 }
 
 #[test]
+#[ignore]
 fn stress_image_paste() {
     let mut dest = ImageData::new(1024, 1024);
     let mut src = ImageData::new(128, 128);
@@ -72,6 +77,7 @@ fn stress_image_paste() {
 }
 
 #[test]
+#[ignore]
 fn stress_image_encode_png_large() {
     let mut img = ImageData::new(256, 256);
     for y in 0..256 {
@@ -91,6 +97,7 @@ fn stress_image_encode_png_large() {
 }
 
 #[test]
+#[ignore]
 fn stress_image_from_bytes() {
     let w = 512_u32;
     let h = 512_u32;

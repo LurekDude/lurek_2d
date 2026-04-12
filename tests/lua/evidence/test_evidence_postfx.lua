@@ -3,7 +3,7 @@
 -- Produces: postfx_grayscale.png, postfx_invert.png, postfx_blur.png,
 --           postfx_sepia.png, postfx_effects_strip.png
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/postfx/"
 
 --- Helper: create a colorful test pattern ImageData.
 local function make_test_pattern(w, h)

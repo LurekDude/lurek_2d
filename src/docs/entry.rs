@@ -22,6 +22,10 @@ pub struct ParamInfo {
 }
 
 /// Metadata about a single return value.
+///
+/// # Fields
+/// - `type_name` — `String`.
+/// - `description` — `String`.
 #[derive(Debug, Clone, Default)]
 pub struct ReturnInfo {
     /// Lua type name of the returned value.
@@ -68,6 +72,14 @@ pub struct DocEntry {
 
 impl DocEntry {
     /// Creates a minimal entry with the given name, module, and kind.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `module` — `&str`.
+    /// - `kind` — `&str`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(name: &str, module: &str, kind: &str) -> Self {
         let qualified_name = format!("lurek.{}.{}", module, name);
         Self {
@@ -80,6 +92,9 @@ impl DocEntry {
     }
 
     /// Returns `true` when the entry has enough information for documentation generation.
+    ///
+    /// # Returns
+    /// `bool`.
     ///
     /// A `"value"` entry is considered complete when it has a name and description.
     /// Other kinds also require at least one parameter or return entry.
@@ -94,6 +109,9 @@ impl DocEntry {
     }
 
     /// Returns the names of fields that are missing or empty.
+    ///
+    /// # Returns
+    /// `Vec<&'static str>`.
     pub fn missing_fields(&self) -> Vec<&'static str> {
         let mut missing = Vec::new();
         if self.name.is_empty() {

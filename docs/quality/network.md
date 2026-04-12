@@ -1,26 +1,14 @@
 # Module Quality Report: `network`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 38 ✅ / 2 ⚠️ / 8 ❌ / 19 🔵
+> **Status**: 🟢 PASS  |  **Date**: 2026-04-12  |  **Score**: 40 ✅ / 1 ⚠️ / 0 ❌ / 19 🔵
 
 ---
 
 ## Action Items
 
-### 🔴 Errors — Must Fix Before Merge
-
-- [ ] **A-01** — AGENT.md exists: AGENT.md not found
-- [ ] **A-02** — Template structure: Skipped — no AGENT.md
-- [ ] **A-03** — Purpose quality: Skipped — no AGENT.md
-- [ ] **A-04** — Content sync: Skipped — no AGENT.md
-- [ ] **A-05** — Spec pointer: Skipped — no AGENT.md
-- [ ] **A-06** — Tier label: Skipped — no AGENT.md
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
-- [ ] **R-02** — Dependency direction: host: Tier2 imports runtime(unassigned)
-
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@377>' (17 LOC, line 377) — extract body to src/network/
-- [ ] **R-01** — Tier placement: No AGENT.md — tier label unverifiable
+- [ ] **B-04** — No business logic in closures: '<closure@375>' (17 LOC, line 375) — extract body to src/network/
 
 ## Full Check Results
 
@@ -30,30 +18,18 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (network_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
-
-### Phase 2 — AGENT.md Quality
-
-| Check | Verdict | Details |
-|-------|---------|---------|
-| **A-01** AGENT.md exists | ❌ ERROR | AGENT.md not found |
-| **A-02** Template structure | ❌ ERROR | Skipped — no AGENT.md |
-| **A-03** Purpose quality | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04** Content sync | ❌ ERROR | Skipped — no AGENT.md |
-| **A-05** Spec pointer | ❌ ERROR | Skipped — no AGENT.md |
-| **A-06** Tier label | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04b** Source Files completeness | ✅ PASS | No AGENT.md — other check handles this |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/network.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1125 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -79,7 +55,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/network_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@377>' (17 LOC, line 377) — extract body to src/network/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@375>' (17 LOC, line 375) — extract body to src/network/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -87,9 +63,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No AGENT.md — tier label unverifiable |
-| **R-02** Dependency direction | ❌ ERROR | host: Tier2 imports runtime(unassigned) |
-| **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
+| **R-01** Tier placement | ✅ PASS | Module group Core Runtime verified |
+| **R-02** Dependency direction | ✅ PASS | All imports follow Core Runtime rules |
+| **R-03** No lua_api import | ✅ PASS | Bootstrapping module — may import lua_api |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
 
@@ -142,7 +118,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/runtime/config.rs |
+| **I-03** Config integration | ✅ PASS | Baseline module — always enabled, no config flag required |
 
 ### Phase 12 — Localization & Logging
 

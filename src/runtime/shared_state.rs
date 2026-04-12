@@ -230,7 +230,7 @@ pub struct ScreenshotRequest {
 /// # Fields
 /// - `render_commands` — Queue of pending `RenderCommand` values, flushed each frame.
 /// - `current_color` — Active RGBA draw color `[r, g, b, a]`.
-/// - `background_color` — Screen clear color set by `lurek.gfx.setBackgroundColor`.
+/// - `background_color` — Screen clear color set by `lurek.graphic.setBackgroundColor`.
 /// - `textures` — Loaded texture pixel data, indexed by `Texture::id`.
 /// - `keys_down` — Set of currently held key name strings.
 /// - `mouse` — Mouse cursor position, button state, scroll, and cursor settings.
@@ -352,11 +352,11 @@ pub struct SharedState {
     pub midi_state: MidiState,
     /// Pending save request for the next fully rendered screen frame.
     ///
-    /// Set by `lurek.gfx.saveScreenshot` and consumed after a successful render.
+    /// Set by `lurek.graphic.saveScreenshot` and consumed after a successful render.
     pub pending_screenshot: Option<ScreenshotRequest>,
-    /// Active stencil mode — written by `lurek.gfx.setStencilMode`, read at render time.
+    /// Active stencil mode — written by `lurek.graphic.setStencilMode`, read at render time.
     pub stencil_mode: StencilMode,
-    /// Active depth test mode and write-enable flag — written by `lurek.gfx.setDepthMode`.
+    /// Active depth test mode and write-enable flag — written by `lurek.graphic.setDepthMode`.
     ///
     /// The first field is the comparison function; the second controls depth writes.
     pub depth_mode: (DepthMode, bool),

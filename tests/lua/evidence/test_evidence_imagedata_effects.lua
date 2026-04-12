@@ -1,7 +1,7 @@
 -- test_evidence_imagedata_effects.lua
 -- Evidence test: ImageData filter/effect methods produce measurable pixel changes
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/image/"
 
 local function solid(w, h, r, g, b, a)
     local img = lurek.img.newImageData(w, h)

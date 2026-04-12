@@ -56,11 +56,12 @@ Every Audio-Eng output includes:
 
 ## WORKFLOW
 
-1. **Understand** — Read the audio request and current mixer/source state
-2. **Design** — Plan the audio feature (new format, playback mode, mixer change)
-3. **Implement** — Write the audio code with proper error handling for I/O
-4. **Test** — Run audio tests (note: audio tests may need `#[ignore]` for CI without audio device)
-5. **Verify** — Run full test suite
+1. **Context Gathering (Samodzielność)** — Read the audio request and independently explore the current mixer/source state using `grep` or `search` in `src/audio/`.
+2. **Strategy & Design** — Plan the audio feature (new format, playback mode, mixer change). Keep threading and I/O constraints in mind.
+3. **Execution** — Write the audio code. Ensure all file I/O flows through GameFS and handles errors gracefully without panicking.
+4. **Self-Correction & Quality Judgement** — Review the implementation. Is the main thread blocking on decode? Are audio sinks leaking without cleanup? Is volume clamped? Refactor proactively.
+5. **Testing & Verification** — Run `cargo test --test audio_tests -- --nocapture`. If tests fail, diagnose whether it's logic or a missing audio device (`#[ignore]` handling), and fix the code autonomously.
+6. **Final Handoff** — Provide a clear summary of the added audio capabilities and test results.
 
 ## DECISION GATES
 

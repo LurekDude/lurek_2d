@@ -1,6 +1,6 @@
 # Module Quality Report: `graph`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 37 ✅ / 3 ⚠️ / 8 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 38 ✅ / 2 ⚠️ / 1 ❌ / 19 🔵
 
 ---
 
@@ -8,18 +8,10 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-01** — AGENT.md exists: AGENT.md not found
-- [ ] **A-02** — Template structure: Skipped — no AGENT.md
-- [ ] **A-03** — Purpose quality: Skipped — no AGENT.md
-- [ ] **A-04** — Content sync: Skipped — no AGENT.md
-- [ ] **A-05** — Spec pointer: Skipped — no AGENT.md
-- [ ] **A-06** — Tier label: Skipped — no AGENT.md
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
-- [ ] **R-02** — Dependency direction: core: Tier2 imports runtime(unassigned); render: Tier2 imports render(unassigned); simulation: Tier2 imports runtime(unassigned)
+- [ ] **R-02** — Dependency direction: core: Foundations imports runtime(Core Runtime); render: Foundations imports render(Platform Services); simulation: Foundations imports runtime(Core Runtime)
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **R-01** — Tier placement: No AGENT.md — tier label unverifiable
 - [ ] **T-03** — Test naming: test_ prefix found — use <subject>_<scenario>_<expected>: test_graph_new_is_empty, test_node_add_increments_count_and_returns_unique_ids, test_node_remove_cleans_connected_edges, test_node_remove_nonexistent_returns_false, test_node_get_ids_matches_count (+43 more)
 - [ ] **Q-04** — Error handling: .unwrap() calls: algorithms:186, algorithms:200, algorithms:201, algorithms:222, algorithms:223 (+122 more)
 
@@ -31,30 +23,18 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (graph_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
-
-### Phase 2 — AGENT.md Quality
-
-| Check | Verdict | Details |
-|-------|---------|---------|
-| **A-01** AGENT.md exists | ❌ ERROR | AGENT.md not found |
-| **A-02** Template structure | ❌ ERROR | Skipped — no AGENT.md |
-| **A-03** Purpose quality | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04** Content sync | ❌ ERROR | Skipped — no AGENT.md |
-| **A-05** Spec pointer | ❌ ERROR | Skipped — no AGENT.md |
-| **A-06** Tier label | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04b** Source Files completeness | ✅ PASS | No AGENT.md — other check handles this |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/graph.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 886 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ✅ PASS | All 1 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -88,8 +68,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No AGENT.md — tier label unverifiable |
-| **R-02** Dependency direction | ❌ ERROR | core: Tier2 imports runtime(unassigned); render: Tier2 imports render(unassigned); simulation: Tier2 imports runtime(unassigned) |
+| **R-01** Tier placement | ✅ PASS | Module group Foundations verified |
+| **R-02** Dependency direction | ❌ ERROR | core: Foundations imports runtime(Core Runtime); render: Foundations imports render(Platform Services); simulation: Foundations imports runtime(Core Runtime) |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -143,7 +123,7 @@
 |-------|---------|---------|
 | **I-01** Lua API usability | 🔵 MANUAL | Review lurek.* conventions compliance |
 | **I-02** Extension panel | 🔵 MANUAL | Check for structured data I/O for vscode-extension |
-| **I-03** Config integration | ✅ PASS | Module referenced in src/runtime/config.rs |
+| **I-03** Config integration | ✅ PASS | Baseline module — always enabled, no config flag required |
 
 ### Phase 12 — Localization & Logging
 

@@ -252,5 +252,302 @@ impl SoundData {
 
         buf
     }
-}
 
+    // ── Procedural waveform generators ──────────────────────────────────────
+
+    /// Generate a mono sine-wave buffer.
+    ///
+    /// # Parameters
+    /// - `freq` — `f32`. Frequency in Hz.
+    /// - `duration` — `f32`. Duration in seconds.
+    /// - `sample_rate` — `u32`. Sample rate in Hz.
+    /// - `amplitude` — `f32`. Peak amplitude in `[0, 1]`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn sine_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
+        let n = (sample_rate as f32 * duration) as usize;
+        let samples = (0..n)
+            .map(|i| {
+                let t = i as f32 / sample_rate as f32;
+                (t * freq * 2.0 * std::f32::consts::PI).sin() * amplitude.clamp(0.0, 1.0)
+            })
+            .collect();
+        Self::from_samples(samples, sample_rate, 1)
+    }
+
+    /// Generate a mono square-wave buffer.
+    ///
+    /// # Parameters
+    /// - `freq` — `f32`. Frequency in Hz.
+    /// - `duration` — `f32`. Duration in seconds.
+    /// - `sample_rate` — `u32`. Sample rate in Hz.
+    /// - `amplitude` — `f32`. Peak amplitude in `[0, 1]`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn square_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
+        let n = (sample_rate as f32 * duration) as usize;
+        let amp = amplitude.clamp(0.0, 1.0);
+        let samples = (0..n)
+            .map(|i| {
+                let phase = (i as f32 / sample_rate as f32 * freq) % 1.0;
+                if phase < 0.5 {
+                    amp
+                } else {
+                    -amp
+                }
+            })
+            .collect();
+        Self::from_samples(samples, sample_rate, 1)
+    }
+
+    /// Generate a mono sawtooth-wave buffer.
+    ///
+    /// # Parameters
+    /// - `freq` — `f32`. Frequency in Hz.
+    /// - `duration` — `f32`. Duration in seconds.
+    /// - `sample_rate` — `u32`. Sample rate in Hz.
+    /// - `amplitude` — `f32`. Peak amplitude in `[0, 1]`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn sawtooth_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
+        let n = (sample_rate as f32 * duration) as usize;
+        let amp = amplitude.clamp(0.0, 1.0);
+        let samples = (0..n)
+            .map(|i| {
+                let phase = (i as f32 / sample_rate as f32 * freq) % 1.0;
+                (phase * 2.0 - 1.0) * amp
+            })
+            .collect();
+        Self::from_samples(samples, sample_rate, 1)
+    }
+
+    /// Generate a mono triangle-wave buffer.
+    ///
+    /// # Parameters
+    /// - `freq` — `f32`. Frequency in Hz.
+    /// - `duration` — `f32`. Duration in seconds.
+    /// - `sample_rate` — `u32`. Sample rate in Hz.
+    /// - `amplitude` — `f32`. Peak amplitude in `[0, 1]`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn triangle_wave(freq: f32, duration: f32, sample_rate: u32, amplitude: f32) -> Self {
+        let n = (sample_rate as f32 * duration) as usize;
+        let amp = amplitude.clamp(0.0, 1.0);
+        let samples = (0..n)
+            .map(|i| {
+                let phase = (i as f32 / sample_rate as f32 * freq) % 1.0;
+                (2.0 * (2.0 * phase - 1.0).abs() - 1.0) * amp
+            })
+            .collect();
+        Self::from_samples(samples, sample_rate, 1)
+    }
+
+    /// Generate a reproducible white-noise buffer using a simple LCG PRNG.
+    ///
+    /// # Parameters
+    /// - `duration` — `f32`. Duration in seconds.
+    /// - `sample_rate` — `u32`. Sample rate in Hz.
+    /// - `amplitude` — `f32`. Peak amplitude in `[0, 1]`.
+    /// - `seed` — `u32`. Seed for the pseudo-random number generator.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn white_noise(duration: f32, sample_rate: u32, amplitude: f32, seed: u32) -> Self {
+        let n = (sample_rate as f32 * duration) as usize;
+        let amp = amplitude.clamp(0.0, 1.0);
+        let mut state: u32 = seed.max(1);
+        let samples = (0..n)
+            .map(|_| {
+                state = state.wrapping_mul(1_103_515_245).wrapping_add(12_345);
+                ((state >> 16) as f32 / 32_768.0 - 1.0) * amp
+            })
+            .collect();
+        Self::from_samples(samples, sample_rate, 1)
+    }
+
+    // ── End of procedural generators ────────────────────────────────────────
+
+    /// Draws the waveform of the audio samples onto an `ImageData` object.
+    ///
+    /// The waveform maps the time domain to the horizontal axis (`w`) and
+    /// the amplitude to the vertical axis (`h`), using the provided color.
+    ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
+    /// - `x` — `i32`.
+    /// - `y` — `i32`.
+    /// - `w` — `u32`.
+    /// - `h` — `u32`.
+    /// - `r` — `u8`.
+    /// - `g` — `u8`.
+    /// - `b` — `u8`.
+    /// - `a` — `u8`.
+    pub fn draw_waveform(
+        &self,
+        img: &mut crate::image::ImageData,
+        x: i32,
+        y: i32,
+        w: u32,
+        h: u32,
+        r: u8,
+        g: u8,
+        b: u8,
+        a: u8,
+    ) {
+        if w == 0 || h == 0 || self.samples.is_empty() {
+            return;
+        }
+
+        let num_frames = self.sample_count();
+        if num_frames == 0 {
+            return;
+        }
+
+        let channels = self.channels as usize;
+        let img_w = img.width() as i32;
+        let img_h = img.height() as i32;
+
+        let half_h = h as f32 / 2.0;
+
+        for px in 0..w {
+            let start_frame = (px as usize * num_frames) / w as usize;
+            let end_frame = ((px + 1) as usize * num_frames) / w as usize;
+
+            let mut min_val = 0.0f32;
+            let mut max_val = 0.0f32;
+
+            if start_frame < end_frame {
+                for frame in start_frame..end_frame {
+                    let mut sum = 0.0;
+                    for ch in 0..channels {
+                        let idx = frame * channels + ch;
+                        if idx < self.samples.len() {
+                            sum += self.samples[idx];
+                        }
+                    }
+                    let avg = sum / channels as f32;
+                    if avg < min_val {
+                        min_val = avg;
+                    }
+                    if avg > max_val {
+                        max_val = avg;
+                    }
+                }
+            } else if start_frame < num_frames {
+                let mut sum = 0.0;
+                for ch in 0..channels {
+                    let idx = start_frame * channels + ch;
+                    if idx < self.samples.len() {
+                        sum += self.samples[idx];
+                    }
+                }
+                let avg = sum / channels as f32;
+                min_val = avg;
+                max_val = avg;
+            }
+
+            let mut y1 = ((y as f32 + half_h) - max_val * half_h).round() as i32;
+            let mut y2 = ((y as f32 + half_h) - min_val * half_h).round() as i32;
+
+            if y1 > y2 {
+                std::mem::swap(&mut y1, &mut y2);
+            }
+
+            let draw_x = x + px as i32;
+            if draw_x >= 0 && draw_x < img_w {
+                for draw_y in y1..=y2 {
+                    if draw_y >= 0 && draw_y < img_h {
+                        img.set_pixel(draw_x as u32, draw_y as u32, r, g, b, a);
+                    }
+                }
+            }
+        }
+    }
+
+    // ── In-place sample-domain DSP filters ──────────────────────────────────
+
+    /// Apply a first-order IIR low-pass filter in-place to the sample buffer.
+    ///
+    /// Uses the bilinear transform: `y[n] = alpha * x[n] + (1 - alpha) * y[n-1]`
+    /// where `alpha = cutoff_hz / (cutoff_hz + sample_rate / (2π))`.
+    ///
+    /// # Parameters
+    /// - `cutoff_hz` — `f32`. Cut-off frequency in Hz.
+    pub fn apply_lowpass(&mut self, cutoff_hz: f32) {
+        if self.samples.is_empty() || cutoff_hz <= 0.0 {
+            return;
+        }
+        let dt = 1.0 / self.sample_rate as f32;
+        let rc = 1.0 / (2.0 * std::f32::consts::PI * cutoff_hz);
+        let alpha = dt / (rc + dt);
+        let mut prev_output = 0.0f32;
+        for s in self.samples.iter_mut() {
+            prev_output = alpha * *s + (1.0 - alpha) * prev_output;
+            *s = prev_output;
+        }
+    }
+
+    /// Apply a first-order IIR high-pass filter in-place to the sample buffer.
+    ///
+    /// `y[n] = alpha * (y[n-1] + x[n] - x[n-1])`
+    ///
+    /// # Parameters
+    /// - `cutoff_hz` — `f32`. Cut-off frequency in Hz.
+    pub fn apply_highpass(&mut self, cutoff_hz: f32) {
+        if self.samples.is_empty() || cutoff_hz <= 0.0 {
+            return;
+        }
+        let dt = 1.0 / self.sample_rate as f32;
+        let rc = 1.0 / (2.0 * std::f32::consts::PI * cutoff_hz);
+        let alpha = rc / (rc + dt);
+        let mut prev_input = 0.0f32;
+        let mut prev_output = 0.0f32;
+        for s in self.samples.iter_mut() {
+            let inp = *s;
+            prev_output = alpha * (prev_output + inp - prev_input);
+            prev_input = inp;
+            *s = prev_output;
+        }
+    }
+
+    /// Apply a simple bandpass filter in-place (lowpass cascaded with highpass).
+    ///
+    /// # Parameters
+    /// - `low_hz` — `f32`. High-pass cut-off frequency in Hz.
+    /// - `high_hz` — `f32`. Low-pass cut-off frequency in Hz.
+    pub fn apply_bandpass(&mut self, low_hz: f32, high_hz: f32) {
+        self.apply_highpass(low_hz);
+        self.apply_lowpass(high_hz);
+    }
+
+    /// Apply gain (amplitude scaling) in-place.
+    ///
+    /// # Parameters
+    /// - `gain` — `f32`. Multiplication factor applied to every sample.
+    pub fn apply_gain(&mut self, gain: f32) {
+        for s in self.samples.iter_mut() {
+            *s = (*s * gain).clamp(-1.0, 1.0);
+        }
+    }
+
+    /// Mix another `SoundData` buffer into this one in-place (additive blend).
+    ///
+    /// Shorter buffers are zero-padded. Result samples are clamped to `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `other` — `&SoundData`.
+    pub fn mix_into(&mut self, other: &SoundData) {
+        let len = self.samples.len().max(other.samples.len());
+        self.samples.resize(len, 0.0);
+        for (i, s) in self.samples.iter_mut().enumerate() {
+            let o = other.samples.get(i).copied().unwrap_or(0.0);
+            *s = (*s + o).clamp(-1.0, 1.0);
+        }
+    }
+
+    // ── End of in-place DSP ──────────────────────────────────────────────────
+}

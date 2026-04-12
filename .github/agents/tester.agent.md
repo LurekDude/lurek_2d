@@ -71,12 +71,13 @@ Every Tester output includes:
 
 ## WORKFLOW
 
-1. **Survey** — Read the module under test and its public API
-2. **Plan** — Identify test cases per layer: happy path, edge cases, error conditions
-3. **Write Rust** — Extend the appropriate registered Rust test binary with descriptive names
-4. **Write Lua** — Create or extend `tests/lua/<category>/test_<feature>.lua` for every new `lurek.*` function or shipped library module
-5. **Run** — Execute `cargo test` and verify all pass
-6. **Report** — List new tests and what scenarios they cover
+1. **Context Gathering (Samodzielność)** — Read the feature specs, recent commits, or the code of the module. Find where it is used and what edge cases might exist. Do not rely on the user to point out every file.
+2. **Strategy & Planning** — Identify test cases per layer: happy path, edge cases, error conditions, boundary constraints. Choose the correct test tier (Rust unit, Rust integration, Lua integration, etc.).
+3. **Execution (Write Rust)** — Extend the appropriate registered Rust test binary with highly descriptive names.
+4. **Execution (Write Lua)** — Create or extend `tests/lua/<category>/test_<feature>.lua` for every new `lurek.*` function or shipped library module.
+5. **Self-Correction & Quality Judgement** — Review the written tests proactively. Do they actually test the requirement? Are you using proper epsilon comparisons for floats? Are they truly headless? Are you making assumptions about execution order? Fix any smells immediately.
+6. **Testing & Verification** — Execute `cargo test`. If tests fail due to your test code, debug and fix the test autonomously. If they fail due to a codebase bug, prepare a report.
+7. **Final Handoff** — Output a clear report with the testing strategy used, the coverage added, and any production bugs discovered.
 
 ## DECISION GATES
 

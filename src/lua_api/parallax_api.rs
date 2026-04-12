@@ -539,10 +539,6 @@ impl LuaUserData for LuaParallaxSet {
 
 /// Registers the `lurek.parallax` sub-table on the given `luna` global.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
 ///
 /// Registers `lurek.parallax` onto the given global table.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
@@ -551,7 +547,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // ── newLayer ──────────────────────────────────────────────────────────────
     /// Creates a new parallax background layer from an options table.
     ///
-    /// Required field — `texture`: a `LuaImage` returned by `lurek.gfx.newImage()`.
+    /// Required field — `texture`: a `LuaImage` returned by `lurek.graphic.newImage()`.
     ///
     /// Optional fields: `scroll_factor_x`, `scroll_factor_y`, `offset_x`, `offset_y`,
     /// `autoscroll_x`, `autoscroll_y`, `repeat_x`, `repeat_y`, `z`, `opacity`,
@@ -573,7 +569,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let (tex_key, tex_w, tex_h) = {
                 let img = img_ud.borrow::<LuaImage>().map_err(|_| {
                     LuaError::RuntimeError(
-                        "lurek.parallax.newLayer: 'texture' must be a valid LuaImage from lurek.gfx.newImage()".into(),
+                        "lurek.parallax.newLayer: 'texture' must be a valid LuaImage from lurek.graphic.newImage()".into(),
                     )
                 })?;
                 let st = s.borrow();

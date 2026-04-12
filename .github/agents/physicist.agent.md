@@ -65,11 +65,12 @@ Every Physicist output includes:
 
 ## WORKFLOW
 
-1. **Understand** — Read the physics request and current body/world/collision state
-2. **Design** — Plan the physics algorithm (collision detection, response, forces)
-3. **Implement** — Write the physics code with correct float handling
-4. **Test** — Write or update physics tests with float tolerance assertions
-5. **Verify** — Run full test suite, check edge cases
+1. **Context Gathering (Samodzielność)** — Read the physics request and autonomously explore the current body/world/collision state in `src/physics/`.
+2. **Strategy & Design** — Plan the physics algorithm (collision detection, response, forces). Ensure total isolation from graphics and audio modules.
+3. **Execution** — Write the physics code. Pay strict attention to float handling, deterministic steps, and the rapier2d synced buffer pattern.
+4. **Self-Correction & Quality Judgement** — Review your physics logic. Did you fire Lua callbacks mid-step instead of accumulating events? Did you inadvertently expose a raw Rapier handle to Lua? Fix these anti-patterns before testing.
+5. **Testing & Verification** — Write or update tests with float epsilon tolerance. Run `cargo test --test physics_tests`. Debug failing assertions unilaterally.
+6. **Final Handoff** — Summarize changes, prove correctness via tests, and confirm no inter-module dependencies were introduced.
 
 ## DECISION GATES
 

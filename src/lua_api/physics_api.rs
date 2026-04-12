@@ -97,6 +97,22 @@ pub struct LuaWorld {
 
 impl LuaUserData for LuaWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── drawDebug ──────────────────────────────────────────────────────────
+        /// Draws physics objects for debugging
+        /// @param target : ImageData
+        /// @param r : number (optional) [default=0]
+        /// @param g : number (optional) [default=255]
+        /// @param b : number (optional) [default=0]
+        /// @param a : number (optional) [default=255]
+        methods.add_method(
+            "drawDebug",
+            |_, this, (target, r, g, b, a): (mlua::AnyUserData, Option<u8>, Option<u8>, Option<u8>, Option<u8>)| {
+                let mut target_ref = target.borrow_mut::<crate::lua_api::render_api::LuaImageData>()?;
+                this.world.borrow().draw_debug_to_image(&mut target_ref.inner, r.unwrap_or(0), g.unwrap_or(255), b.unwrap_or(0), a.unwrap_or(255));
+                Ok(())
+            },
+        );
+
         // -- step --
         /// Advances the physics simulation by dt seconds.
         /// @param dt : number
@@ -1432,14 +1448,6 @@ impl LuaUserData for LuaPhysicsShape {
 
 /// Registers the `lurek.physics` API namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

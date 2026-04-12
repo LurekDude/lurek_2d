@@ -146,9 +146,9 @@ impl LuaUserData for LuaSkeleton {
         /// @param width : integer
         /// @param height : integer
         /// @return ImageData
-        methods.add_method("drawToImage", |_, this, (w, h): (u32, u32)| {
+        methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
-            Ok(LuaImageData { inner: img })
+            lua.create_userdata(img)
         });
 
     }
@@ -160,13 +160,6 @@ impl LuaUserData for LuaSkeleton {
 
 /// Registers the `lurek.spine` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

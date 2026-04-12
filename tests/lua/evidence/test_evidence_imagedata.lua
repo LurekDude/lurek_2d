@@ -94,7 +94,7 @@ describe("Evidence: ImageData creation and pixels", function()
     it("savePNG writes a PNG file to disk", function()
         local img = lurek.img.newImageData(16, 16)
         img:fill(0, 128, 255, 255)
-        lurek.img.savePNG(img, "tests/lua/evidence/output/imagedata_basic.png")
+        lurek.img.savePNG(img, "tests/lua/evidence/output/image/imagedata_basic.png")
         -- If we get here without error, the file was saved
         expect_equal(true, true)
     end)

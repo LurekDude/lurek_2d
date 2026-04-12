@@ -18,9 +18,6 @@ use crate::log_msg;
 
 /// Returns the number of logical processors available.
 ///
-/// # Returns
-/// `usize`.
-/// Logical CPU count; at least 1.
 pub fn get_processor_count() -> usize {
     std::thread::available_parallelism()
         .map(|n| n.get())
@@ -29,9 +26,6 @@ pub fn get_processor_count() -> usize {
 
 /// Returns total system RAM in MiB using the `sysinfo` crate.
 ///
-/// # Returns
-/// `u64`.
-/// Physical memory in MiB (e.g. 16384 for 16┬áGB).
 pub fn get_memory_size() -> u64 {
     use sysinfo::System;
     let sys = System::new_with_specifics(
@@ -42,11 +36,7 @@ pub fn get_memory_size() -> u64 {
 
 /// Opens a URL in the default browser/application.
 ///
-/// # Parameters
-/// - `url` — `&str`.
 ///
-/// # Returns
-/// `bool`.
 ///
 /// Only `http://`, `https://`, and `mailto:` schemes are allowed.
 /// - `url` ÔÇö the URL string to open
@@ -89,9 +79,6 @@ pub fn open_url(url: &str) -> bool {
 
 /// Returns the user's preferred locale strings.
 ///
-/// # Returns
-/// `Vec<String>`.
-/// A `Vec<String>` with at least one locale tag (e.g. `"en_US"`).
 pub fn get_preferred_locales() -> Vec<String> {
     let locales: Vec<String> = sys_locale::get_locales().map(|l| l.to_string()).collect();
     if locales.is_empty() {
@@ -107,12 +94,6 @@ pub fn get_preferred_locales() -> Vec<String> {
 
 /// Power state of the device. Consult the module-level documentation for the broader usage context and preconditions.
 ///
-/// # Variants
-/// - `Unknown` ÔÇö cannot determine power state
-/// - `Battery` ÔÇö running on battery
-/// - `NoBattery` ÔÇö no battery (desktop plugged in)
-/// - `Charging` ÔÇö battery is charging
-/// - `Charged` ÔÇö battery is fully charged
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PowerState {
     /// Cannot determine power state.
@@ -146,8 +127,6 @@ impl PowerState {
 
 /// Returns power/battery information: (state, percent, seconds).
 ///
-/// # Returns
-/// `(PowerState, Option<u32>, Option<u32>)`.
 ///
 /// On desktop platforms this returns `(Unknown, None, None)`.
 /// A tuple of `(PowerState, Option<u32>, Option<u32>)` ÔÇö the power state,
@@ -158,13 +137,6 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 
 /// Registers `lurek.platform.*` platform query functions into the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `lua` ÔÇö The active Lua VM instance.
-/// - `luna` ÔÇö The `luna` global table to attach functions to.
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
 

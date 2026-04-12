@@ -1056,6 +1056,66 @@ fn lua_evidence_image_drawing() {
 }
 
 #[test]
+fn lua_evidence_physics() {
+    run_lua_test("evidence/test_evidence_physics.lua");
+}
+
+#[test]
 fn lua_evidence_bezier() {
     run_lua_test("evidence/test_evidence_bezier.lua");
+}
+
+#[test]
+fn lua_evidence_pathfinding() {
+    run_lua_test("evidence/test_evidence_pathfinding.lua");
+}
+
+#[test]
+fn lua_evidence_animation() {
+    run_lua_test("evidence/test_evidence_animation.lua");
+}
+
+#[test]
+fn lua_evidence_camera() {
+    run_lua_test("evidence/test_evidence_camera.lua");
+}
+
+#[test]
+fn lua_evidence_graph() {
+    run_lua_test("evidence/test_evidence_graph.lua");
+}
+
+#[test]
+fn lua_evidence_audio_dsp() {
+    run_lua_test("evidence/test_evidence_audio_dsp.lua");
+}
+
+#[test]
+fn lua_evidence_audio_waves() {
+    run_lua_test("evidence/test_evidence_audio_waves.lua");
+}
+
+#[test]
+fn lua_evidence_charts() {
+    run_lua_test("evidence/test_evidence_charts.lua");
+}
+
+#[test]
+fn lua_evidence_spine() {
+    run_lua_test("evidence/test_evidence_spine.lua");
+}
+
+#[test]
+fn lua_evidence_layers() {
+    run_lua_test("evidence/test_evidence_layers.lua");
+}
+
+#[test]
+fn lua_evidence_shapes() {
+    run_lua_test("evidence/test_evidence_shapes.lua");
+}
+
+#[test]
+fn lua_evidence_combined() {
+    run_lua_test("evidence/test_evidence_combined.lua");
 }

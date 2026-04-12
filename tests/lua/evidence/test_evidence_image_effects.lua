@@ -1,7 +1,7 @@
 -- test_evidence_image_effects.lua
 -- Evidence test: ImageData filters and effects with before/after PNG output
 
-local OUT = "tests/lua/evidence/output/"
+local OUT = "tests/lua/evidence/output/image/"
 
 -- Create a gradient image with some shapes as a base for testing effects
 local function make_base(w, h)

@@ -1,6 +1,6 @@
 # Module Quality Report: `math`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 35 ✅ / 4 ⚠️ / 2 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 36 ✅ / 3 ⚠️ / 2 ❌ / 19 🔵
 
 ---
 
@@ -8,14 +8,13 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
 - [ ] **SP-04** — Lua API completeness: Missing from spec: tau, huge — add to ## Lua API in docs/specs/math.md
+- [ ] **R-02** — Dependency direction: spatial_hash: Foundations imports runtime(Core Runtime)
 
 ### 🟡 Warnings — Should Fix
 
 - [ ] **D-04** — Doc quality: Stub/placeholder docs found: easing:8, easing:79, easing:95, easing:106, geometry:44 (+24 more)
-- [ ] **B-04** — No business logic in closures: '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ | '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ | '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ | '<closure@2004>' (21 LOC, line 2004) — extract body to src/math/ | '<closure@955>' has if/match/for — extract to src/math/ | '<closure@1410>' has if/match/for — extract to src/math/
-- [ ] **R-01** — Tier placement: No **Tier** row in docs/specs; expected baseline
+- [ ] **B-04** — No business logic in closures: '<closure@1015>' (17 LOC, line 1015) — extract body to src/math/ | '<closure@1372>' (27 LOC, line 1372) — extract body to src/math/ | '<closure@1590>' (21 LOC, line 1590) — extract body to src/math/ | '<closure@2001>' (21 LOC, line 2001) — extract body to src/math/ | '<closure@952>' has if/match/for — extract to src/math/ | '<closure@1407>' has if/match/for — extract to src/math/
 - [ ] **W-04** — Example–spec sync: In example but not spec: huge, tau — add to ## Lua API in docs/specs/math.md
 
 ## Full Check Results
@@ -26,7 +25,7 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (math_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (2 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
@@ -36,8 +35,8 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/math.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1106 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ❌ ERROR | Missing from spec: tau, huge — add to ## Lua API in docs/specs/math.md |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -63,7 +62,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/math_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1018>' (17 LOC, line 1018) — extract body to src/math/ \| '<closure@1375>' (27 LOC, line 1375) — extract body to src/math/ \| '<closure@1593>' (21 LOC, line 1593) — extract body to src/math/ \| '<closure@2004>' (21 LOC, line 2004) — extract body to src/math/ \| '<closure@955>' has if/match/for — extract to src/math/ \| '<closure@1410>' has if/match/for — extract to src/math/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1015>' (17 LOC, line 1015) — extract body to src/math/ \| '<closure@1372>' (27 LOC, line 1372) — extract body to src/math/ \| '<closure@1590>' (21 LOC, line 1590) — extract body to src/math/ \| '<closure@2001>' (21 LOC, line 2001) — extract body to src/math/ \| '<closure@952>' has if/match/for — extract to src/math/ \| '<closure@1407>' has if/match/for — extract to src/math/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -71,9 +70,9 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No **Tier** row in docs/specs; expected baseline |
-| **R-02** Dependency direction | ✅ PASS | All imports follow baseline rules |
-| **R-03** No lua_api import | ✅ PASS | Baseline module — may bootstrap the Lua VM |
+| **R-01** Tier placement | ✅ PASS | Module group Foundations verified |
+| **R-02** Dependency direction | ❌ ERROR | spatial_hash: Foundations imports runtime(Core Runtime) |
+| **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
 

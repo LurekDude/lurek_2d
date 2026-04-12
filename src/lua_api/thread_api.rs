@@ -22,7 +22,6 @@ pub struct LuaThreadHandle {
 
 impl LuaUserData for LuaThreadHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-
         // -- type --
         /// Returns the type name of this object.
         /// @return string
@@ -74,7 +73,6 @@ impl LuaUserData for LuaThreadHandle {
         methods.add_method("getError", |_, this, ()| {
             Ok(this.inner.lock().unwrap().get_error())
         });
-
     }
 }
 
@@ -84,13 +82,6 @@ impl LuaUserData for LuaThreadHandle {
 
 /// Registers the `lurek.thread` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let named_channels: Arc<Mutex<HashMap<String, Arc<Channel>>>> =
@@ -115,7 +106,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @return Channel
     tbl.set(
         "newChannel",
-        lua.create_function(|_, ()| Ok(LuaChannel { inner: Channel::new() }))?,
+        lua.create_function(|_, ()| {
+            Ok(LuaChannel {
+                inner: Channel::new(),
+            })
+        })?,
     )?;
 
     // -- getChannel --

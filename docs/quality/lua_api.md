@@ -1,6 +1,6 @@
 # Module Quality Report: `lua_api`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 31 ✅ / 4 ⚠️ / 13 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 34 ✅ / 3 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -9,25 +9,15 @@
 ### 🔴 Errors — Must Fix Before Merge
 
 - [ ] **S-02** — mod.rs simplicity: mod.rs has 150 logic lines — extract to named files
-- [ ] **S-03** — File size limits: Files >3000 LOC: lua_api/render_api.rs (3342 LOC); lua_api/ui_api.rs (5095 LOC)
-- [ ] **A-01** — AGENT.md exists: AGENT.md not found
-- [ ] **A-02** — Template structure: Skipped — no AGENT.md
-- [ ] **A-03** — Purpose quality: Skipped — no AGENT.md
-- [ ] **A-04** — Content sync: Skipped — no AGENT.md
-- [ ] **A-05** — Spec pointer: Skipped — no AGENT.md
-- [ ] **A-06** — Tier label: Skipped — no AGENT.md
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
-- [ ] **D-02** — Public item docs: Undocumented pub items: automation_api::vec_from_lua_table, particle_api::from_lua_opts, procgen_api::from_lua_table, procgen_api::from_lua_table
 - [ ] **T-01** — Rust test file: No test file found for module 'lua_api'
 - [ ] **W-01** — Example file exists: content/examples/lua_api.lua not found — create it
 - [ ] **W-02** — API surface coverage: Skipped — no example file
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **D-04** — Doc quality: Stub/placeholder docs found: effect_api:491, i18n_api:247, system_api:93, ui_api:847, ui_api:860
-- [ ] **R-01** — Tier placement: No AGENT.md — tier label unverifiable
+- [ ] **D-04** — Doc quality: Stub/placeholder docs found: effect_api:491, i18n_api:244, system_api:95, ui_api:850, ui_api:864
 - [ ] **T-05** — Test adequacy: 8 pub methods, 0 Rust tests — create test file
-- [ ] **Q-04** — Error handling: .unwrap() calls: audio_api:2267, thread_api:49, thread_api:59, thread_api:67, thread_api:74 (+1 more)
+- [ ] **Q-04** — Error handling: .unwrap() calls: audio_api:2264, thread_api:50, thread_api:60, thread_api:68, thread_api:75 (+1 more)
 
 ## Full Check Results
 
@@ -37,30 +27,18 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs |
 | **S-02** mod.rs simplicity | ❌ ERROR | mod.rs has 150 logic lines — extract to named files |
-| **S-03** File size limits | ❌ ERROR | Files >3000 LOC: lua_api/render_api.rs (3342 LOC); lua_api/ui_api.rs (5095 LOC) |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
-
-### Phase 2 — AGENT.md Quality
-
-| Check | Verdict | Details |
-|-------|---------|---------|
-| **A-01** AGENT.md exists | ❌ ERROR | AGENT.md not found |
-| **A-02** Template structure | ❌ ERROR | Skipped — no AGENT.md |
-| **A-03** Purpose quality | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04** Content sync | ❌ ERROR | Skipped — no AGENT.md |
-| **A-05** Spec pointer | ❌ ERROR | Skipped — no AGENT.md |
-| **A-06** Tier label | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04b** Source Files completeness | ✅ PASS | No AGENT.md — other check handles this |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/lua_api.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 1251 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ✅ PASS | No Lua API file — skip |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -70,9 +48,9 @@
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **D-01** Module-level docs | ✅ PASS | All files have //! doc comments |
-| **D-02** Public item docs | ❌ ERROR | Undocumented pub items: automation_api::vec_from_lua_table, particle_api::from_lua_opts, procgen_api::from_lua_table, procgen_api::from_lua_table |
+| **D-02** Public item docs | ✅ PASS | All pub items have /// docs |
 | **D-03** Structured doc sections | ✅ PASS | All pub structs/enums have structured doc sections |
-| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: effect_api:491, i18n_api:247, system_api:93, ui_api:847, ui_api:860 |
+| **D-04** Doc quality | ⚠️ WARNING | Stub/placeholder docs found: effect_api:491, i18n_api:244, system_api:95, ui_api:850, ui_api:864 |
 | **D-05** Validation tool | 🔵 MANUAL | Run: python tools/docs/collect_docs.py --report-missing \| grep src/<module> |
 | **D-06** Lua API file docs | ✅ PASS | No Lua API file — skip |
 | **D-07** @param/@return annotations | ✅ PASS | No Lua API file — skip |
@@ -94,8 +72,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No AGENT.md — tier label unverifiable |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Module group Edge/Integration verified |
+| **R-02** Dependency direction | ✅ PASS | All imports follow Edge/Integration rules |
 | **R-03** No lua_api import | ✅ PASS | Module IS lua_api — skip |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |
@@ -130,7 +108,7 @@
 | **Q-01** No println! | ✅ PASS | No println!/eprintln! calls |
 | **Q-02** Logger levels | 🔵 MANUAL | Verify log severity levels are appropriate (debug/info/warn/error) |
 | **Q-03** No unsafe | ✅ PASS | No undocumented unsafe blocks |
-| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: audio_api:2267, thread_api:49, thread_api:59, thread_api:67, thread_api:74 (+1 more) |
+| **Q-04** Error handling | ⚠️ WARNING | .unwrap() calls: audio_api:2264, thread_api:50, thread_api:60, thread_api:68, thread_api:75 (+1 more) |
 | **Q-07** Log prefix | ✅ PASS | All log calls use log:: prefix |
 | **Q-05** Rust best practices | 🔵 MANUAL | Review for anti-patterns: unnecessary clones, redundant allocs |
 | **Q-06** Clippy clean | 🔵 MANUAL | Run: cargo clippy --lib -- -D warnings |

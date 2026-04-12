@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-11T21:52:58.696970+00:00",
+    "generated": "2026-04-11T21:57:05.996066+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.7.0",
     "stats": {
@@ -8759,7 +8759,7 @@
         ],
         "classes": {
           "DataView": {
-            "description": "",
+            "description": "Access structured binary data efficiently without copying.",
             "methods": [
               {
                 "name": "getUInt8",
@@ -8779,7 +8779,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 410,
+                "line": 411,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8800,7 +8800,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 421,
+                "line": 422,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8821,7 +8821,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 432,
+                "line": 433,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8842,7 +8842,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 443,
+                "line": 444,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8863,7 +8863,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 454,
+                "line": 455,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8884,7 +8884,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 465,
+                "line": 466,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8905,7 +8905,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 476,
+                "line": 477,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8926,7 +8926,7 @@
                   ]
                 ],
                 "inferred_return": "number",
-                "line": 487,
+                "line": 488,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8941,7 +8941,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 494,
+                "line": 495,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -8961,7 +8961,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 503,
+                "line": 504,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8976,7 +8976,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 507,
+                "line": 508,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -8997,7 +8997,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 512,
+                "line": 513,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -9023,7 +9023,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 526,
+                "line": 527,
                 "file": "src/lua_api/data_api.rs"
               },
               {
@@ -9038,7 +9038,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "ByteData",
-                "line": 540,
+                "line": 541,
                 "file": "src/lua_api/data_api.rs"
               }
             ]
@@ -43715,7 +43715,7 @@
             ]
           },
           "Channel": {
-            "description": "",
+            "description": "A synchronized message queue for cross-VM communication.",
             "methods": [
               {
                 "name": "type",
@@ -43729,7 +43729,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string",
-                "line": 146,
+                "line": 147,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43750,7 +43750,7 @@
                   ]
                 ],
                 "inferred_return": "boolean",
-                "line": 150,
+                "line": 151,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43771,7 +43771,7 @@
                   ]
                 ],
                 "inferred_return": "integer",
-                "line": 157,
+                "line": 158,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43786,7 +43786,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 165,
+                "line": 166,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43801,7 +43801,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 172,
+                "line": 173,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43822,7 +43822,7 @@
                   ]
                 ],
                 "inferred_return": "string|number|boolean|table|nil",
-                "line": 180,
+                "line": 181,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43837,7 +43837,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "integer",
-                "line": 189,
+                "line": 190,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43852,7 +43852,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 193,
+                "line": 194,
                 "file": "src/lua_api/thread_api.rs"
               },
               {
@@ -43873,7 +43873,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 201,
+                "line": 202,
                 "file": "src/lua_api/thread_api.rs"
               }
             ]
@@ -47167,7 +47167,7 @@
         ],
         "classes": {
           "Tween": {
-            "description": "",
+            "description": "A managed interpolation from start to end values over time.",
             "methods": [
               {
                 "name": "pause",
@@ -47181,7 +47181,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 243,
+                "line": 244,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47196,7 +47196,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 251,
+                "line": 252,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47211,7 +47211,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 259,
+                "line": 260,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47226,7 +47226,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "number",
-                "line": 264,
+                "line": 265,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47247,7 +47247,7 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 270,
+                "line": 271,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47268,13 +47268,13 @@
                   ]
                 ],
                 "inferred_return": "nil",
-                "line": 280,
+                "line": 281,
                 "file": "src/lua_api/tween_api.rs"
               }
             ]
           },
           "TweenSequence": {
-            "description": "",
+            "description": "A chained sequence of animations that run one after another.",
             "methods": [
               {
                 "name": "cancel",
@@ -47288,7 +47288,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 425,
+                "line": 427,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47303,13 +47303,13 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 433,
+                "line": 435,
                 "file": "src/lua_api/tween_api.rs"
               }
             ]
           },
           "TweenParallel": {
-            "description": "",
+            "description": "A group of animations that run simultaneously over the same duration.",
             "methods": [
               {
                 "name": "cancel",
@@ -47323,7 +47323,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "nil",
-                "line": 533,
+                "line": 536,
                 "file": "src/lua_api/tween_api.rs"
               },
               {
@@ -47338,7 +47338,7 @@
                 "inferred_sig": "()",
                 "typed_params": [],
                 "inferred_return": "boolean",
-                "line": 541,
+                "line": 544,
                 "file": "src/lua_api/tween_api.rs"
               }
             ]

@@ -1,6 +1,6 @@
 # Module Quality Report: `pathfind`
 
-> **Status**: 🔴 FAIL  |  **Date**: 2026-04-11  |  **Score**: 32 ✅ / 5 ⚠️ / 11 ❌ / 19 🔵
+> **Status**: 🔴 FAIL  |  **Date**: 2026-04-12  |  **Score**: 33 ✅ / 4 ⚠️ / 4 ❌ / 19 🔵
 
 ---
 
@@ -8,13 +8,6 @@
 
 ### 🔴 Errors — Must Fix Before Merge
 
-- [ ] **A-01** — AGENT.md exists: AGENT.md not found
-- [ ] **A-02** — Template structure: Skipped — no AGENT.md
-- [ ] **A-03** — Purpose quality: Skipped — no AGENT.md
-- [ ] **A-04** — Content sync: Skipped — no AGENT.md
-- [ ] **A-05** — Spec pointer: Skipped — no AGENT.md
-- [ ] **A-06** — Tier label: Skipped — no AGENT.md
-- [ ] **SP-02** — Required spec sections: Missing sections: Architecture, Source Files, Key Types
 - [ ] **T-01** — Rust test file: No test file found for module 'pathfind'
 - [ ] **T-02** — Lua test file: Module has Lua API but no tests/lua/unit/test_pathfind.lua
 - [ ] **W-01** — Example file exists: content/examples/pathfind.lua not found — create it
@@ -22,8 +15,7 @@
 
 ### 🟡 Warnings — Should Fix
 
-- [ ] **B-04** — No business logic in closures: '<closure@1001>' (30 LOC, line 1001) — extract body to src/pathfind/
-- [ ] **R-01** — Tier placement: No AGENT.md — tier label unverifiable
+- [ ] **B-04** — No business logic in closures: '<closure@998>' (30 LOC, line 998) — extract body to src/pathfind/
 - [ ] **T-05** — Test adequacy: 108 pub methods, 0 Rust tests — create test file
 - [ ] **W-05** — Wiki page: No wiki page found (expected docs/wiki/Pathfind-API.md)
 - [ ] **Q-04** — Error handling: .unwrap() calls: astar:382, graph_path:343, graph_path:352, grid:259, grid:274 (+19 more)
@@ -36,30 +28,18 @@
 |-------|---------|---------|
 | **S-01** lib.rs registration | ✅ PASS | Registered in lib.rs + lua_api (pathfind_api) |
 | **S-02** mod.rs simplicity | ✅ PASS | mod.rs is a thin barrel file (0 logic lines) |
-| **S-03** File size limits | ✅ PASS | All files within size limits |
+| **S-03** File size limits | ✅ PASS | Skipped — file sizes no longer tracked |
 | **S-04** File naming | ✅ PASS | File names follow conventions |
 | **S-05** Module necessity | 🔵 MANUAL | Requires manual review — could this be pure Lua? |
 | **S-06** Large crate deps | 🔵 MANUAL | Requires manual review — check Cargo.toml for heavy crates |
-
-### Phase 2 — AGENT.md Quality
-
-| Check | Verdict | Details |
-|-------|---------|---------|
-| **A-01** AGENT.md exists | ❌ ERROR | AGENT.md not found |
-| **A-02** Template structure | ❌ ERROR | Skipped — no AGENT.md |
-| **A-03** Purpose quality | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04** Content sync | ❌ ERROR | Skipped — no AGENT.md |
-| **A-05** Spec pointer | ❌ ERROR | Skipped — no AGENT.md |
-| **A-06** Tier label | ❌ ERROR | Skipped — no AGENT.md |
-| **A-04b** Source Files completeness | ✅ PASS | No AGENT.md — other check handles this |
 
 ### Phase 3 — Technical Specification
 
 | Check | Verdict | Details |
 |-------|---------|---------|
 | **SP-01** Spec file exists | ✅ PASS | docs/specs/pathfind.md exists |
-| **SP-02** Required spec sections | ❌ ERROR | Missing sections: Architecture, Source Files, Key Types |
-| **SP-03** Summary quality | ✅ PASS | Summary is 940 chars |
+| **SP-02** Required spec sections | ✅ PASS | All required sections present |
+| **SP-03** Summary quality | ✅ PASS | Skipped — summary length no longer tracked |
 | **SP-04** Lua API completeness | ✅ PASS | All 8 bound functions in spec |
 | **SP-05** Key Types accuracy | ✅ PASS | No Key Types section or no public types — skip |
 | **SP-06** Spec quality | ✅ PASS | No stub content |
@@ -85,7 +65,7 @@
 | **B-01** Dedicated API file | ✅ PASS | lua_api/pathfind_api.rs present |
 | **B-02** Registration-only | ✅ PASS | Only register() is pub fn (Lua<X> wrapper structs allowed) |
 | **B-03** impl LuaUserData placement | ✅ PASS | All impl LuaUserData blocks are in lua_api (correct) |
-| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@1001>' (30 LOC, line 1001) — extract body to src/pathfind/ |
+| **B-04** No business logic in closures | ⚠️ WARNING | '<closure@998>' (30 LOC, line 998) — extract body to src/pathfind/ |
 | **B-05** Rc clone pattern | ✅ PASS | Rc clone pattern looks correct |
 | **B-06** Flat registration body | ✅ PASS | All tbl.set() calls are flat statements |
 
@@ -93,8 +73,8 @@
 
 | Check | Verdict | Details |
 |-------|---------|---------|
-| **R-01** Tier placement | ⚠️ WARNING | No AGENT.md — tier label unverifiable |
-| **R-02** Dependency direction | ✅ PASS | All imports follow unassigned rules |
+| **R-01** Tier placement | ✅ PASS | Module group Feature Systems verified |
+| **R-02** Dependency direction | ✅ PASS | All imports follow Feature Systems rules |
 | **R-03** No lua_api import | ✅ PASS | No lua_api imports found |
 | **R-04** Design assumptions | 🔵 MANUAL | Verify against docs/architecture/philosophy.md |
 | **R-05** Module overlap | 🔵 MANUAL | Check for scope duplication with other modules |

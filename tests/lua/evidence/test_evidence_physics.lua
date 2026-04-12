@@ -1,0 +1,34 @@
+local img = lurek.image.newImageData(256, 256)
+img:fill(20, 20, 40, 255)
+
+local world = lurek.physics.newWorld(0, 50)
+
+-- ground
+local ground = world:newBody("STATIC", 128, 200)
+local rect = lurek.physics.newRectShape(200, 20)
+ground:setShape(rect)
+
+-- circle
+local ball = world:newBody("DYNAMIC", 100, 50)
+local circle = lurek.physics.newCircleShape(15)
+ball:setShape(circle)
+ball:setRestitution(0.8)
+
+-- box
+local box = world:newBody("DYNAMIC", 150, 50)
+local box_shape = lurek.physics.newRectShape(20, 20)
+box:setShape(box_shape)
+box:setRestitution(0.3)
+
+-- run physics
+for i = 1, 60 do
+    world:step()
+end
+
+-- draw the world to the image
+world:drawDebug(img, 255, 0, 255, 255)
+
+img:savePNG("tests/lua/evidence/output/physics/draw_debug.png")
+print("Saved tests/rust/golden/evidence/physics/draw_debug.png")
+
+lurek.test_summary()

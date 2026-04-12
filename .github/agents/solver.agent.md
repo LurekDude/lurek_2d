@@ -60,14 +60,11 @@ Every Solver output is a **solution report** containing:
 
 ## WORKFLOW
 
-1. **Understand** — Read the problem statement. If symptoms are incomplete, route to `Debugger` first.
-2. **Gather context** — Read relevant source files. Use `Research` for external knowledge if needed.
-3. **Root cause** — Identify *why* the problem exists at the system level, not just where it manifests.
-4. **Generate alternatives** — Produce 2–4 concrete options. Include at least one conservative option (minimum change).
-5. **Evaluate** — Score each alternative against the stated constraints and the project's architecture rules.
-6. **Recommend** — Select the best option and justify rejection of the others.
-7. **Document** — Write the structured solution report.
-8. **Append log** — Write a JSONL entry to `work/{session}/logs/agent_log.jsonl` before returning.
+1. **Context Gathering (Samodzielność)** — Read the problem statement. Autonomously read relevant source files and grep the codebase to find where symptoms manifest. If symptoms are incomplete, route to `Debugger`.
+2. **Analysis (Root cause & Alternatives)** — Identify *why* the problem exists at the system level. Generate 2–4 concrete options, including at least one conservative minimum-change option. Score each against the project's architecture rules.
+3. **Execution (Recommendation)** — Select the best option and justify the rejection of the others. Write the structured solution report containing the root cause, evaluated alternatives, implementation notes, and specific file locations.
+4. **Self-Correction & Quality Judgement** — Critically review your solution report. Are you presenting only a single option? Is the root cause vague? Are you writing implementation code instead of a decision document? Correct these flaws.
+5. **Final Handoff** — Deliver the decision-ready solution report to the implementing agent (or user/Manager).
 
 ## DECISION GATES
 
@@ -97,6 +94,7 @@ Every Solver output is a **solution report** containing:
 
 ## ANTI-PATTERNS
 
+- **"I don't know where the file is"** — Asking the user for paths instead of searching the workspace yourself.
 - **Single-option report**: presenting only one solution without alternatives — removes human decision authority
 - **Vague root cause**: "the module has issues" is a symptom, not a root cause
 - **Implementation creep**: writing Rust or Lua code instead of producing a decision-ready document

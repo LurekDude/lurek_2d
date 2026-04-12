@@ -754,7 +754,7 @@ impl Raycaster2D {
         frame_h: u32,
     ) -> crate::image::ImageData {
         let cols = 4u32;
-        let rows = (num_frames + cols - 1) / cols;
+        let rows = num_frames.div_ceil(cols);
         let mut img = crate::image::ImageData::new(cols * frame_w, rows * frame_h);
         img.fill(15, 15, 25, 255);
         for frame in 0..num_frames {
@@ -836,7 +836,7 @@ impl Raycaster2D {
             let t = (y - half_h) as f32 / half_h as f32;
             let base_g = (60.0 - t * 30.0) as u8;
             for x in 0..width {
-                let checker = ((x / 40 + (y - half_h) / 20) % 2 == 0) as u8;
+                let checker = (x / 40 + (y - half_h) / 20).is_multiple_of(2) as u8;
                 let r = base_g + 15 + checker * 15;
                 let g2 = base_g + 5 + checker * 10;
                 let b = base_g / 2 + checker * 8;
@@ -876,7 +876,7 @@ impl Raycaster2D {
             1 => {
                 // Brick pattern
                 let brick_y = (frac_y * 4.0) as u32;
-                let offset = if brick_y % 2 == 0 { 0 } else { 4 };
+                let offset = if brick_y.is_multiple_of(2) { 0 } else { 4 };
                 let is_mortar = frac_y * 4.0 % 1.0 < 0.1
                     || (frac_x * 8.0 + offset as f32) % 1.0 < 0.12;
                 if is_mortar { (120, 110, 100) } else { (180, 60, 40) }

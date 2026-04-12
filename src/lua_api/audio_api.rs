@@ -7,9 +7,9 @@ use std::rc::Rc;
 
 use crate::audio::sound_data::SoundData;
 use crate::audio::{Decoder, MidiPlayer, SourceType};
+use crate::log_msg;
 use crate::runtime::log_messages::LA01_API_STUB;
 use crate::runtime::resource_keys::{BusKey, QueueableKey, SoundKey};
-use crate::log_msg;
 use slotmap::Key;
 
 // -------------------------------------------------------------------------------
@@ -112,10 +112,6 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
 
 /// Lua-side wrapper for an audio source resource.
 ///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `key` — `SoundKey`.
-/// Fields: `state` (`Rc<RefCell<SharedState>>`), `key` (`SoundKey`).
 #[derive(Clone)]
 pub struct LuaSource {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -406,10 +402,6 @@ impl LuaUserData for LuaSource {
 
 /// Lua-side wrapper for an audio bus resource.
 ///
-/// # Fields
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// - `key` — `BusKey`.
-/// Fields: `state` (`Rc<RefCell<SharedState>>`), `key` (`BusKey`).
 #[derive(Clone)]
 pub struct LuaBus {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -522,10 +514,6 @@ impl LuaUserData for LuaBus {
 
 /// Lua-side wrapper for the MIDI player.
 ///
-/// # Fields
-/// - `inner` — `Rc<RefCell<MidiPlayer>>`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// Fields: `inner` (`Rc<RefCell<MidiPlayer>>`), `state` (`Rc<RefCell<SharedState>>`).
 #[derive(Clone)]
 pub struct LuaMidiPlayer {
     pub(crate) inner: Rc<RefCell<MidiPlayer>>,
@@ -1051,14 +1039,6 @@ impl LuaUserData for LuaDecoder {
 
 /// Registers the `lurek.audio` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
-/// @param lua : &Lua
-/// @param luna : &LuaTable
-/// @param state : Rc<RefCell<SharedState>>
-/// @return LuaResult<()>
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -2295,6 +2275,199 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         )?,
     )?;
 
+    // ── newSineWave ───────────────────────────────────────────────────────────
+    /// Generate a mono sine-wave SoundData buffer.
+    /// @param freq : number
+    /// @param duration : number
+    /// @param sampleRate : number
+    /// @param amplitude : number
+    /// @return SoundData
+    tbl.set(
+        "newSineWave",
+        lua.create_function(
+            |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
+                Ok(SoundData::sine_wave(freq, duration, sample_rate, amplitude))
+            },
+        )?,
+    )?;
+
+    // ── newSquareWave ─────────────────────────────────────────────────────────
+    /// Generate a mono square-wave SoundData buffer.
+    /// @param freq : number
+    /// @param duration : number
+    /// @param sampleRate : number
+    /// @param amplitude : number
+    /// @return SoundData
+    tbl.set(
+        "newSquareWave",
+        lua.create_function(
+            |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
+                Ok(SoundData::square_wave(
+                    freq,
+                    duration,
+                    sample_rate,
+                    amplitude,
+                ))
+            },
+        )?,
+    )?;
+
+    // ── newSawtoothWave ───────────────────────────────────────────────────────
+    /// Generate a mono sawtooth-wave SoundData buffer.
+    /// @param freq : number
+    /// @param duration : number
+    /// @param sampleRate : number
+    /// @param amplitude : number
+    /// @return SoundData
+    tbl.set(
+        "newSawtoothWave",
+        lua.create_function(
+            |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
+                Ok(SoundData::sawtooth_wave(
+                    freq,
+                    duration,
+                    sample_rate,
+                    amplitude,
+                ))
+            },
+        )?,
+    )?;
+
+    // ── newTriangleWave ───────────────────────────────────────────────────────
+    /// Generate a mono triangle-wave SoundData buffer.
+    /// @param freq : number
+    /// @param duration : number
+    /// @param sampleRate : number
+    /// @param amplitude : number
+    /// @return SoundData
+    tbl.set(
+        "newTriangleWave",
+        lua.create_function(
+            |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
+                Ok(SoundData::triangle_wave(
+                    freq,
+                    duration,
+                    sample_rate,
+                    amplitude,
+                ))
+            },
+        )?,
+    )?;
+
+    // ── newWhiteNoise ─────────────────────────────────────────────────────────
+    /// Generate a reproducible white-noise SoundData buffer.
+    /// @param duration : number
+    /// @param sampleRate : number
+    /// @param amplitude : number
+    /// @param seed : integer
+    /// @return SoundData
+    tbl.set(
+        "newWhiteNoise",
+        lua.create_function(
+            |_, (duration, sample_rate, amplitude, seed): (f32, u32, f32, u32)| {
+                Ok(SoundData::white_noise(
+                    duration,
+                    sample_rate,
+                    amplitude,
+                    seed,
+                ))
+            },
+        )?,
+    )?;
+
+    // ── applyLowpass ──────────────────────────────────────────────────────────
+    /// Applies a first-order IIR low-pass filter to a SoundData in-place.
+    /// @param sounddata : SoundData
+    /// @param cutoff_hz : number
+    /// @return nil
+    tbl.set(
+        "applyLowpass",
+        lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
+            let mut sd = sd_ud
+                .borrow_mut::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
+            sd.apply_lowpass(cutoff_hz);
+            Ok(())
+        })?,
+    )?;
+
+    // ── applyHighpass ─────────────────────────────────────────────────────────
+    /// Applies a first-order IIR high-pass filter to a SoundData in-place.
+    /// @param sounddata : SoundData
+    /// @param cutoff_hz : number
+    /// @return nil
+    tbl.set(
+        "applyHighpass",
+        lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
+            let mut sd = sd_ud
+                .borrow_mut::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
+            sd.apply_highpass(cutoff_hz);
+            Ok(())
+        })?,
+    )?;
+
+    // ── applyBandpass ─────────────────────────────────────────────────────────
+    /// Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
+    /// @param sounddata : SoundData
+    /// @param low_hz : number
+    /// @param high_hz : number
+    /// @return nil
+    tbl.set(
+        "applyBandpass",
+        lua.create_function(|_, (sd_ud, low_hz, high_hz): (LuaAnyUserData, f32, f32)| {
+            let mut sd = sd_ud
+                .borrow_mut::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
+            sd.apply_bandpass(low_hz, high_hz);
+            Ok(())
+        })?,
+    )?;
+
+    // ── applyGain ─────────────────────────────────────────────────────────────
+    /// Scales every sample by gain (clamped to [-1, 1]).
+    /// @param sounddata : SoundData
+    /// @param gain : number
+    /// @return nil
+    tbl.set(
+        "applyGain",
+        lua.create_function(|_, (sd_ud, gain): (LuaAnyUserData, f32)| {
+            let mut sd = sd_ud
+                .borrow_mut::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
+            sd.apply_gain(gain);
+            Ok(())
+        })?,
+    )?;
+
+    // ── mixInto ───────────────────────────────────────────────────────────────
+    /// Additively mixes another SoundData into the destination in-place.
+    /// @param dest : SoundData
+    /// @param src : SoundData
+    /// @return nil
+    tbl.set(
+        "mixInto",
+        lua.create_function(|_, (dest_ud, src_ud): (LuaAnyUserData, LuaAnyUserData)| {
+            let src_samples: Vec<f32> = {
+                let src = src_ud
+                    .borrow::<SoundData>()
+                    .map_err(|_| LuaError::RuntimeError("src must be a SoundData".into()))?;
+                src.samples().to_vec()
+            };
+            let src_data = {
+                let src = src_ud
+                    .borrow::<SoundData>()
+                    .map_err(|_| LuaError::RuntimeError("src must be a SoundData".into()))?;
+                SoundData::from_samples(src_samples, src.sample_rate(), src.channel_count())
+            };
+            let mut dest = dest_ud
+                .borrow_mut::<SoundData>()
+                .map_err(|_| LuaError::RuntimeError("dest must be a SoundData".into()))?;
+            dest.mix_into(&src_data);
+            Ok(())
+        })?,
+    )?;
+
     // ── saveWAV ───────────────────────────────────────────────────────────────
     /// Saves a SoundData as a 16-bit PCM WAV file at the given path.
     /// @param sounddata : SoundData
@@ -2351,6 +2524,40 @@ impl mlua::UserData for SoundData {
                 LuaError::RuntimeError(format!("Sample index {} out of bounds", index))
             })
         });
+
+        // ── drawWaveform ───────────────────────────────────────
+        /// Draws the waveform onto an ImageData buffer.
+        /// @param target : ImageData
+        /// @param x : integer
+        /// @param y : integer
+        /// @param w : integer
+        /// @param h : integer
+        /// @param r : integer
+        /// @param g : integer
+        /// @param b : integer
+        /// @param a : integer
+        /// @return nil
+        methods.add_method(
+            "drawWaveform",
+            |_,
+             this,
+             (target, x, y, w, h, r, g, b, a): (
+                mlua::AnyUserData,
+                i32,
+                i32,
+                u32,
+                u32,
+                u8,
+                u8,
+                u8,
+                u8,
+            )| {
+                let mut img = target.borrow_mut::<crate::image::ImageData>()?;
+                this.draw_waveform(&mut img, x, y, w, h, r, g, b, a);
+                Ok(())
+            },
+        );
+
         // ── setSample ──────────────────────────────────────────
         /// Set a specific sample by index.
         /// @param index : integer
