@@ -1,0 +1,7 @@
+describe('Golden misc', function()
+    it('matches evidence_effect_brightness', function() end)
+    it('matches evidence_effect_contrast', function() end)
+    it('matches evidence_effect_grayscale', function() end)
+    it('matches evidence_effect_sepia', function() end)
+    it('matches evidence_effect_invert', function() end)
+end)

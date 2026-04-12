@@ -33,7 +33,9 @@ describe("golden: math Math constants and trig identities", function()
         local evidence = evidence_output_dir("math") .. "math_golden.txt"
         local golden = "tests/lua/golden/samples/math/math_golden.txt"
         expect_golden_text_match(evidence, golden)
-    end)
+            expect_golden_file_match(evidence_output_dir("math") .. "all_curves_gallery.png", "tests/lua/golden/samples/math/all_curves_gallery.png")
+        expect_golden_file_match(evidence_output_dir("math") .. "comparison_chart.png", "tests/lua/golden/samples/math/comparison_chart.png")
+end)
 end)
 
 test_summary()

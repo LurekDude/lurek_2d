@@ -1128,3 +1128,51 @@ fn lua_evidence_shapes() {
 fn lua_evidence_combined() {
     run_lua_test("evidence/test_evidence_combined.lua");
 }
+
+
+#[test]
+fn lua_evidence_math() {
+    run_lua_test("evidence/test_evidence_math.lua");
+}
+
+#[test]
+fn lua_evidence_pathfind() {
+    run_lua_test("evidence/test_evidence_pathfind.lua");
+}
+
+#[test]
+fn lua_golden_minimap() {
+    run_lua_test("golden/test_minimap_golden.lua");
+}
+
+#[test]
+fn lua_golden_pathfind() {
+    run_lua_test("golden/test_pathfind_golden.lua");
+}
+
+#[test]
+fn lua_golden_raycaster() {
+    run_lua_test("golden/test_raycaster_golden.lua");
+}
+
+#[test]
+fn lua_test_evidence_image() {
+    run_lua_test("tests/lua/evidence/test_evidence_image.lua");
+}
+
+#[test]
+fn lua_test_golden_image() {
+    run_lua_test("tests/lua/golden/test_image_golden.lua");
+}
+
+#[test]
+fn lua_test_evidence_graphics() { run_lua_test("evidence/test_evidence_graphics.lua"); }
+
+#[test]
+fn lua_test_golden_graphics() { run_lua_test("golden/test_graphics_golden.lua"); }
+
+#[test]
+fn lua_test_evidence_misc() { run_lua_test("evidence/test_evidence_misc.lua"); }
+
+#[test]
+fn lua_test_golden_misc() { run_lua_test("golden/test_misc_golden.lua"); }
