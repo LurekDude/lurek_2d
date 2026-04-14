@@ -93,6 +93,10 @@ fn raycast_hit_to_table<'lua>(lua: &'lua Lua, hit: &RaycastHit) -> LuaResult<Lua
 #[derive(Clone)]
 pub struct LuaWorld {
     world: Rc<RefCell<World>>,
+    /// Registry key for the `onBeginContact(a, b)` callback.
+    begin_contact_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    /// Registry key for the `onEndContact(a, b)` callback.
+    end_contact_key: Rc<RefCell<Option<LuaRegistryKey>>>,
 }
 
 impl LuaUserData for LuaWorld {
@@ -114,11 +118,27 @@ impl LuaUserData for LuaWorld {
         );
 
         // -- step --
-        /// Advances the physics simulation by dt seconds.
+        /// Advances the physics simulation by dt seconds, firing onBeginContact /
+        /// onEndContact callbacks for each collision event that occurred.
         /// @param dt : number
         /// @return nil
-        methods.add_method("step", |_, this, dt: f32| {
+        methods.add_method("step", |lua, this, dt: f32| {
             this.world.borrow_mut().step(dt);
+            // Collect events while not holding the borrow.
+            let begins: Vec<(usize, usize)> = this.world.borrow().get_begin_contact_events().to_vec();
+            let ends: Vec<(usize, usize)> = this.world.borrow().get_end_contact_events().to_vec();
+            if let Some(key) = &*this.begin_contact_key.borrow() {
+                let cb: LuaFunction = lua.registry_value(key)?;
+                for (a, b) in begins {
+                    cb.call::<_, ()>((a, b))?;
+                }
+            }
+            if let Some(key) = &*this.end_contact_key.borrow() {
+                let cb: LuaFunction = lua.registry_value(key)?;
+                for (a, b) in ends {
+                    cb.call::<_, ()>((a, b))?;
+                }
+            }
             Ok(())
         });
 
@@ -894,6 +914,171 @@ impl LuaUserData for LuaWorld {
         methods.add_method("getBodyType", |_, this, id: usize| {
             Ok(this.world.borrow().get_body_type_str(id).to_string())
         });
+
+        // ── Phase A/B/C extension methods ──────────────────────────────────────
+
+        // -- setBeginContact --
+        /// Registers a Lua function called with (bodyIdA, bodyIdB) when two
+        /// bodies begin touching.
+        /// @param fn : function
+        /// @return nil
+        methods.add_method("setBeginContact", |lua, this, f: LuaFunction| {
+            *this.begin_contact_key.borrow_mut() = Some(lua.create_registry_value(f)?);
+            Ok(())
+        });
+
+        // -- clearBeginContact --
+        /// Removes the begin-contact callback.
+        /// @return nil
+        methods.add_method("clearBeginContact", |_, this, ()| {
+            *this.begin_contact_key.borrow_mut() = None;
+            Ok(())
+        });
+
+        // -- setEndContact --
+        /// Registers a Lua function called with (bodyIdA, bodyIdB) when two
+        /// bodies stop touching.
+        /// @param fn : function
+        /// @return nil
+        methods.add_method("setEndContact", |lua, this, f: LuaFunction| {
+            *this.end_contact_key.borrow_mut() = Some(lua.create_registry_value(f)?);
+            Ok(())
+        });
+
+        // -- clearEndContact --
+        /// Removes the end-contact callback.
+        /// @return nil
+        methods.add_method("clearEndContact", |_, this, ()| {
+            *this.end_contact_key.borrow_mut() = None;
+            Ok(())
+        });
+
+        // -- setBodyCCD --
+        /// Enables or disables Continuous Collision Detection for a body.
+        /// @param bodyId : integer
+        /// @param enabled : boolean
+        /// @return nil
+        methods.add_method("setBodyCCD", |_, this, (id, enabled): (usize, bool)| {
+            this.world.borrow_mut().set_bullet(id, enabled);
+            Ok(())
+        });
+
+        // -- getBodyCCD --
+        /// Returns whether CCD is enabled for a body.
+        /// @param bodyId : integer
+        /// @return boolean
+        methods.add_method("getBodyCCD", |_, this, id: usize| {
+            Ok(this.world.borrow().is_bullet(id))
+        });
+
+        // -- setBodyOneWay --
+        /// Marks a body as a one-way platform.  Bodies approaching from the
+        /// direction opposite to (nx, ny) pass through without collision.
+        /// @param bodyId : integer
+        /// @param nx : number
+        /// @param ny : number
+        /// @return nil
+        methods.add_method("setBodyOneWay", |_, this, (id, nx, ny): (usize, f32, f32)| {
+            this.world.borrow_mut().set_body_one_way(id, nx, ny);
+            Ok(())
+        });
+
+        // -- clearBodyOneWay --
+        /// Removes the one-way platform flag from a body.
+        /// @param bodyId : integer
+        /// @return nil
+        methods.add_method("clearBodyOneWay", |_, this, id: usize| {
+            this.world.borrow_mut().clear_body_one_way(id);
+            Ok(())
+        });
+
+        // -- getBodyOneWay --
+        /// Returns the one-way normal for a body, or nil if not configured.
+        /// @param bodyId : integer
+        /// @return number, number | nil
+        methods.add_method("getBodyOneWay", |_, this, id: usize| {
+            match this.world.borrow().get_body_one_way(id) {
+                Some((nx, ny)) => Ok((Some(nx), Some(ny))),
+                None => Ok((None, None)),
+            }
+        });
+
+        // -- setJointBreakForce --
+        /// Sets the relative-velocity threshold above which a joint breaks.
+        /// @param jointId : integer
+        /// @param maxForce : number
+        /// @return nil
+        methods.add_method("setJointBreakForce", |_, this, (jid, f): (usize, f32)| {
+            this.world.borrow_mut().set_joint_break_force(jid, f);
+            Ok(())
+        });
+
+        // -- getJointBreakForce --
+        /// Returns the break threshold for a joint, or nil if not set.
+        /// @param jointId : integer
+        /// @return number | nil
+        methods.add_method("getJointBreakForce", |_, this, jid: usize| {
+            Ok(this.world.borrow().get_joint_break_force(jid))
+        });
+
+        // -- isBodySleeping --
+        /// Returns true if a body is currently sleeping (inactive).
+        /// @param bodyId : integer
+        /// @return boolean
+        methods.add_method("isBodySleeping", |_, this, id: usize| {
+            Ok(this.world.borrow().is_body_sleeping(id))
+        });
+
+        // -- wakeUpBody --
+        /// Forcibly wakes up a sleeping body.
+        /// @param bodyId : integer
+        /// @return nil
+        methods.add_method("wakeUpBody", |_, this, id: usize| {
+            this.world.borrow_mut().wake_up_body(id);
+            Ok(())
+        });
+
+        // -- sleepBody --
+        /// Puts a body to sleep immediately.
+        /// @param bodyId : integer
+        /// @return nil
+        methods.add_method("sleepBody", |_, this, id: usize| {
+            this.world.borrow_mut().sleep_body(id);
+            Ok(())
+        });
+
+        // -- setSolverIterations --
+        /// Sets the number of constraint solver iterations per step.
+        /// @param n : integer
+        /// @return nil
+        methods.add_method("setSolverIterations", |_, this, n: usize| {
+            this.world.borrow_mut().set_solver_iterations(n);
+            Ok(())
+        });
+
+        // -- getSolverIterations --
+        /// Returns the current number of solver iterations per step.
+        /// @return integer
+        methods.add_method("getSolverIterations", |_, this, ()| {
+            Ok(this.world.borrow().get_solver_iterations())
+        });
+
+        // -- newBodies --
+        /// Creates multiple bodies in one call.
+        /// @param specs : table  Array of {x, y, bodyType} tables.
+        /// @return table  Array of new body IDs in the same order.
+        methods.add_method("newBodies", |_, this, specs: LuaTable| {
+            let mut pairs: Vec<(f32, f32, BodyType)> = Vec::new();
+            for entry in specs.sequence_values::<LuaTable>() {
+                let t = entry?;
+                let x: f32 = t.get(1)?;
+                let y: f32 = t.get(2)?;
+                let bt_str: String = t.get(3)?;
+                pairs.push((x, y, parse_body_type_lenient(&bt_str)));
+            }
+            let ids = this.world.borrow_mut().add_bodies(pairs);
+            Ok(ids)
+        });
     }
 }
 
@@ -1301,6 +1486,29 @@ impl LuaUserData for LuaBody {
             this.world.borrow_mut().destroy_body(this.id);
             Ok(())
         });
+
+        // -- isSleeping --
+        /// Returns true if this body is currently sleeping (inactive).
+        /// @return boolean
+        methods.add_method("isSleeping", |_, this, ()| {
+            Ok(this.world.borrow().is_body_sleeping(this.id))
+        });
+
+        // -- wakeUp --
+        /// Forcibly wakes up this body.
+        /// @return nil
+        methods.add_method("wakeUp", |_, this, ()| {
+            this.world.borrow_mut().wake_up_body(this.id);
+            Ok(())
+        });
+
+        // -- sleep --
+        /// Puts this body to sleep immediately.
+        /// @return nil
+        methods.add_method("sleep", |_, this, ()| {
+            this.world.borrow_mut().sleep_body(this.id);
+            Ok(())
+        });
     }
 }
 
@@ -1461,6 +1669,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, (gx, gy): (f32, f32)| {
             Ok(LuaWorld {
                 world: Rc::new(RefCell::new(World::new(gx, gy))),
+                begin_contact_key: Rc::new(RefCell::new(None)),
+                end_contact_key: Rc::new(RefCell::new(None)),
             })
         })?,
     )?;
@@ -1735,6 +1945,90 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // ── drawDebugGpu ───────────────────────────────────────────────────────────
+    /// Extracts collider geometry from a World and queues a GPU physics debug
+    /// draw command for the current frame.  Call from `lurek.render` or
+    /// `lurek.render_ui`; the command is consumed by GpuRenderer each frame.
+    /// @param world   : World       — The physics world to visualise.
+    /// @param config  : table|nil   — Optional appearance overrides:
+    ///   bodyColor   [f32;4]  dynamic body colour  (default green)
+    ///   staticColor [f32;4]  static body colour   (default grey)
+    ///   sleepColor  [f32;4]  sleeping body colour (default dark green)
+    ///   sensorColor [f32;4]  sensor colour        (default cyan)
+    ///   lineWidth   f32      outline thickness    (default 1.0)
+    /// @return nil
+    let s = state.clone();
+    tbl.set(
+        "drawDebugGpu",
+        lua.create_function(move |_, (world_ud, config_val): (LuaAnyUserData, LuaValue)| {
+            let world_ref = world_ud.borrow::<LuaWorld>()?;
+            let raw = world_ref.world.borrow().extract_shape_snapshots();
+            let shapes: Vec<crate::render::renderer::PhysicsDebugShape> = raw
+                .into_iter()
+                .map(|s| crate::render::renderer::PhysicsDebugShape {
+                    x: s.x,
+                    y: s.y,
+                    half_w: s.half_w,
+                    half_h: s.half_h,
+                    angle: s.angle,
+                    is_static: s.is_static,
+                    is_sleeping: false,
+                    is_sensor: s.is_sensor,
+                    is_circle: s.is_circle,
+                    hull_verts: s.hull_verts,
+                })
+                .collect();
+
+            let mut cfg = crate::render::renderer::PhysicsDebugConfig::default();
+            if let LuaValue::Table(tbl) = config_val {
+                if let Ok(v) = tbl.get::<_, LuaTable>("bodyColor") {
+                    cfg.body_color = [
+                        v.get::<_, f32>(1).unwrap_or(cfg.body_color[0]),
+                        v.get::<_, f32>(2).unwrap_or(cfg.body_color[1]),
+                        v.get::<_, f32>(3).unwrap_or(cfg.body_color[2]),
+                        v.get::<_, f32>(4).unwrap_or(cfg.body_color[3]),
+                    ];
+                }
+                if let Ok(v) = tbl.get::<_, LuaTable>("staticColor") {
+                    cfg.static_color = [
+                        v.get::<_, f32>(1).unwrap_or(cfg.static_color[0]),
+                        v.get::<_, f32>(2).unwrap_or(cfg.static_color[1]),
+                        v.get::<_, f32>(3).unwrap_or(cfg.static_color[2]),
+                        v.get::<_, f32>(4).unwrap_or(cfg.static_color[3]),
+                    ];
+                }
+                if let Ok(v) = tbl.get::<_, LuaTable>("sleepColor") {
+                    cfg.sleep_color = [
+                        v.get::<_, f32>(1).unwrap_or(cfg.sleep_color[0]),
+                        v.get::<_, f32>(2).unwrap_or(cfg.sleep_color[1]),
+                        v.get::<_, f32>(3).unwrap_or(cfg.sleep_color[2]),
+                        v.get::<_, f32>(4).unwrap_or(cfg.sleep_color[3]),
+                    ];
+                }
+                if let Ok(v) = tbl.get::<_, LuaTable>("sensorColor") {
+                    cfg.sensor_color = [
+                        v.get::<_, f32>(1).unwrap_or(cfg.sensor_color[0]),
+                        v.get::<_, f32>(2).unwrap_or(cfg.sensor_color[1]),
+                        v.get::<_, f32>(3).unwrap_or(cfg.sensor_color[2]),
+                        v.get::<_, f32>(4).unwrap_or(cfg.sensor_color[3]),
+                    ];
+                }
+                if let Ok(w) = tbl.get::<_, f32>("lineWidth") {
+                    cfg.line_width = w;
+                }
+            }
+
+            s.borrow_mut()
+                .render_commands
+                .push(crate::render::renderer::RenderCommand::DrawPhysicsDebug {
+                    shapes,
+                    config: cfg,
+                });
+            Ok(())
+        })?,
+    )?;
+
     luna.set("physics", tbl)?;
     Ok(())
 }
+

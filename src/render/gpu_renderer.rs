@@ -18,7 +18,10 @@ use bytemuck::{Pod, Zeroable};
 use crate::log_msg;
 use crate::math::{Mat3, Vec2};
 use crate::render::mesh::Mesh;
-use crate::render::renderer::{BlendMode, DrawMode, RenderCommand, TextAlign, TextureData};
+use crate::render::renderer::{
+    BevelStyle, BlendMode, DrawMode, GradientDirection, HexOrientation, PathSegment,
+    PhysicsDebugConfig, PhysicsDebugShape, RenderCommand, SpineSlotDraw, TextAlign, TextureData,
+};
 use crate::render::shader::{Shader, ShaderFragmentInput, UniformValue};
 use crate::runtime::log_messages::{
     G002_SCREENSHOT_ZERO_SIZE, G003_SCREENSHOT_MAP_FAIL, G004_SCREENSHOT_RECV_FAIL,
@@ -2469,10 +2472,1077 @@ impl GpuRenderer {
                 RenderCommand::SetShader(shader) => {
                     active_shader = shader.filter(|key| shaders.contains_key(*key));
                 }
-                // DrawShape and DrawParticleSystem are not yet GPU-implemented;
+                // DrawShape is not yet GPU-implemented;
                 // silence non-exhaustive-pattern error until renderer support is added.
                 RenderCommand::DrawShape { .. } => {}
-                RenderCommand::DrawParticleSystem { .. } => {}
+                RenderCommand::DrawParticleSystem { ref particles } => {
+                    if particles.is_empty() {
+                        continue;
+                    }
+                    let t = transform_stack.last().unwrap();
+                    let (target_width, target_height) =
+                        self.target_dimensions(current_target, canvases);
+                    let scissor = normalize_scissor(current_scissor, target_width, target_height);
+                    let mut pverts: Vec<ColorVertex> =
+                        Vec::with_capacity(particles.len() * 6);
+                    let mut pidxs: Vec<u32> = Vec::with_capacity(particles.len() * 12);
+                    use std::f32::consts::PI;
+                    for inst in particles {
+                        let color = [inst.r, inst.g, inst.b, inst.a];
+                        let half = inst.size * 0.5;
+                        match &inst.shape {
+                            ParticleRenderShape::Square
+                            | ParticleRenderShape::Diamond => {
+                                let cos_r = inst.rotation.cos();
+                                let sin_r = inst.rotation.sin();
+                                let corners = [
+                                    (-half, -half),
+                                    (half, -half),
+                                    (half, half),
+                                    (-half, half),
+                                ];
+                                let base = pverts.len() as u32;
+                                for (lx, ly) in corners {
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + lx * cos_r - ly * sin_r,
+                                        inst.y + lx * sin_r + ly * cos_r,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                pidxs.extend_from_slice(&[
+                                    base, base + 1, base + 2, base, base + 2, base + 3,
+                                ]);
+                            }
+                            ParticleRenderShape::Circle => {
+                                self.tess_ellipse(
+                                    &mut pverts,
+                                    &mut pidxs,
+                                    t,
+                                    color,
+                                    &DrawMode::Fill,
+                                    inst.x,
+                                    inst.y,
+                                    half,
+                                    half,
+                                    12,
+                                    0.0,
+                                );
+                            }
+                            ParticleRenderShape::Puff => {
+                                self.tess_ellipse(
+                                    &mut pverts,
+                                    &mut pidxs,
+                                    t,
+                                    color,
+                                    &DrawMode::Fill,
+                                    inst.x,
+                                    inst.y,
+                                    half,
+                                    half,
+                                    24,
+                                    0.0,
+                                );
+                            }
+                            ParticleRenderShape::Triangle => {
+                                let base = pverts.len() as u32;
+                                for i in 0..3u32 {
+                                    let a = inst.rotation - PI * 0.5
+                                        + i as f32 * (2.0 * PI / 3.0);
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + a.cos() * half,
+                                        inst.y + a.sin() * half,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                pidxs.extend_from_slice(&[base, base + 1, base + 2]);
+                            }
+                            ParticleRenderShape::Spark => {
+                                let len = inst.size * 1.5;
+                                let dx = inst.rotation.cos() * len;
+                                let dy = inst.rotation.sin() * len;
+                                push_thick_line(
+                                    &mut pverts,
+                                    &mut pidxs,
+                                    t,
+                                    color,
+                                    inst.x - dx,
+                                    inst.y - dy,
+                                    inst.x + dx,
+                                    inst.y + dy,
+                                    1.5,
+                                );
+                            }
+                            ParticleRenderShape::Shrapnel { edges, seed } => {
+                                let n = (*edges).clamp(3, 12) as usize;
+                                let center_idx = pverts.len() as u32;
+                                let (csx, csy) = apply(t, inst.x, inst.y);
+                                pverts.push(ColorVertex {
+                                    position: [csx, csy],
+                                    color,
+                                });
+                                let mut rng = u64::from(*seed);
+                                for i in 0..n {
+                                    let base_angle = inst.rotation
+                                        + i as f32 * (2.0 * PI / n as f32);
+                                    rng = rng
+                                        .wrapping_mul(6_364_136_223_846_793_005)
+                                        .wrapping_add(1_442_695_040_888_963_407);
+                                    let jitter_a = (rng >> 33) as f32
+                                        / u32::MAX as f32
+                                        * 0.4
+                                        - 0.2;
+                                    rng = rng
+                                        .wrapping_mul(6_364_136_223_846_793_005)
+                                        .wrapping_add(1_442_695_040_888_963_407);
+                                    let jitter_r = 0.5
+                                        + (rng >> 33) as f32 / u32::MAX as f32 * 0.5;
+                                    let angle = base_angle
+                                        + jitter_a * (2.0 * PI / n as f32);
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + angle.cos() * half * jitter_r,
+                                        inst.y + angle.sin() * half * jitter_r,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                for i in 0..n as u32 {
+                                    let c = center_idx;
+                                    let b = center_idx + 1 + i;
+                                    let d = center_idx + 1 + (i + 1) % n as u32;
+                                    pidxs.extend_from_slice(&[c, b, d]);
+                                }
+                            }
+                            ParticleRenderShape::Ray { aspect } => {
+                                let a = if *aspect <= 0.0 { 4.0_f32 } else { *aspect };
+                                let half_len = half * a;
+                                let cos_r = inst.rotation.cos();
+                                let sin_r = inst.rotation.sin();
+                                let corners = [
+                                    (-half_len, -half),
+                                    (half_len, -half),
+                                    (half_len, half),
+                                    (-half_len, half),
+                                ];
+                                let base = pverts.len() as u32;
+                                for (lx, ly) in corners {
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + lx * cos_r - ly * sin_r,
+                                        inst.y + lx * sin_r + ly * cos_r,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                pidxs.extend_from_slice(&[
+                                    base, base + 1, base + 2, base, base + 2, base + 3,
+                                ]);
+                            }
+                            ParticleRenderShape::Ring { thickness } => {
+                                let outer = half;
+                                let inner =
+                                    outer * (1.0 - (*thickness).clamp(0.05, 1.0));
+                                const N: usize = 20;
+                                let base = pverts.len() as u32;
+                                for i in 0..N {
+                                    let angle = i as f32 * (2.0 * PI / N as f32);
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + angle.cos() * outer,
+                                        inst.y + angle.sin() * outer,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + angle.cos() * inner,
+                                        inst.y + angle.sin() * inner,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                for i in 0..N as u32 {
+                                    let j = (i + 1) % N as u32;
+                                    let o0 = base + i * 2;
+                                    let i0 = base + i * 2 + 1;
+                                    let o1 = base + j * 2;
+                                    let i1 = base + j * 2 + 1;
+                                    pidxs.extend_from_slice(&[
+                                        o0, o1, i0, i0, o1, i1,
+                                    ]);
+                                }
+                            }
+                            ParticleRenderShape::Capsule => {
+                                let half_len = half;
+                                let cap_r = half * 0.4;
+                                let cos_r = inst.rotation.cos();
+                                let sin_r = inst.rotation.sin();
+                                // Central rectangle
+                                let corners = [
+                                    (-half_len, -cap_r),
+                                    (half_len, -cap_r),
+                                    (half_len, cap_r),
+                                    (-half_len, cap_r),
+                                ];
+                                let base = pverts.len() as u32;
+                                for (lx, ly) in corners {
+                                    let (sx, sy) = apply(
+                                        t,
+                                        inst.x + lx * cos_r - ly * sin_r,
+                                        inst.y + lx * sin_r + ly * cos_r,
+                                    );
+                                    pverts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color,
+                                    });
+                                }
+                                pidxs.extend_from_slice(&[
+                                    base, base + 1, base + 2, base, base + 2, base + 3,
+                                ]);
+                                // Half-circle caps at each end
+                                const N: usize = 8;
+                                for side in [1.0_f32, -1.0] {
+                                    let cap_cx = inst.x + cos_r * half_len * side;
+                                    let cap_cy = inst.y + sin_r * half_len * side;
+                                    let center_idx = pverts.len() as u32;
+                                    let (csx, csy) = apply(t, cap_cx, cap_cy);
+                                    pverts.push(ColorVertex {
+                                        position: [csx, csy],
+                                        color,
+                                    });
+                                    let start_a = inst.rotation
+                                        + if side > 0.0 { -PI * 0.5 } else { PI * 0.5 };
+                                    for i in 0..=N {
+                                        let a = start_a + i as f32 * PI / N as f32;
+                                        let (sx, sy) = apply(
+                                            t,
+                                            cap_cx + a.cos() * cap_r,
+                                            cap_cy + a.sin() * cap_r,
+                                        );
+                                        pverts.push(ColorVertex {
+                                            position: [sx, sy],
+                                            color,
+                                        });
+                                    }
+                                    for i in 0..N as u32 {
+                                        pidxs.extend_from_slice(&[
+                                            center_idx,
+                                            center_idx + 1 + i,
+                                            center_idx + 1 + i + 1,
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if !pverts.is_empty() {
+                        append_color_draw(
+                            &mut draws,
+                            &mut all_color_verts,
+                            &mut all_color_idxs,
+                            current_target,
+                            current_blend_mode,
+                            scissor,
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            pverts,
+                            pidxs,
+                        );
+                    }
+                }
+                // ── Extended RenderCommand variants ─────────────────────────
+
+                RenderCommand::DrawQuadBezier {
+                    start,
+                    control,
+                    end,
+                    segments,
+                } => {
+                    let n = (*segments).clamp(4, 256) as usize;
+                    let t = transform_stack.last().unwrap();
+                    let mut verts: Vec<ColorVertex> = Vec::new();
+                    let mut idxs: Vec<u32> = Vec::new();
+                    let mut prev = *start;
+                    for i in 1..=n {
+                        let tv = i as f32 / n as f32;
+                        let mt = 1.0 - tv;
+                        let nx =
+                            mt * mt * start.x + 2.0 * mt * tv * control.x + tv * tv * end.x;
+                        let ny =
+                            mt * mt * start.y + 2.0 * mt * tv * control.y + tv * tv * end.y;
+                        push_thick_line(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            current_color,
+                            prev.x,
+                            prev.y,
+                            nx,
+                            ny,
+                            line_width,
+                        );
+                        prev = Vec2::new(nx, ny);
+                    }
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                RenderCommand::DrawCubicBezier {
+                    start,
+                    c1,
+                    c2,
+                    end,
+                    segments,
+                } => {
+                    let n = (*segments).clamp(4, 256) as usize;
+                    let t = transform_stack.last().unwrap();
+                    let mut verts: Vec<ColorVertex> = Vec::new();
+                    let mut idxs: Vec<u32> = Vec::new();
+                    let mut prev = *start;
+                    for i in 1..=n {
+                        let tv = i as f32 / n as f32;
+                        let mt = 1.0 - tv;
+                        let nx = mt * mt * mt * start.x
+                            + 3.0 * mt * mt * tv * c1.x
+                            + 3.0 * mt * tv * tv * c2.x
+                            + tv * tv * tv * end.x;
+                        let ny = mt * mt * mt * start.y
+                            + 3.0 * mt * mt * tv * c1.y
+                            + 3.0 * mt * tv * tv * c2.y
+                            + tv * tv * tv * end.y;
+                        push_thick_line(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            current_color,
+                            prev.x,
+                            prev.y,
+                            nx,
+                            ny,
+                            line_width,
+                        );
+                        prev = Vec2::new(nx, ny);
+                    }
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                RenderCommand::DrawPath {
+                    segments: path_segs,
+                    mode,
+                    close,
+                } => {
+                    let t = transform_stack.last().unwrap();
+                    let mut verts: Vec<ColorVertex> = Vec::new();
+                    let mut idxs: Vec<u32> = Vec::new();
+                    let mut points: Vec<[f32; 2]> = Vec::new();
+                    let mut pen = [0.0f32; 2];
+                    let mut anchor = [0.0f32; 2];
+                    for seg in path_segs {
+                        match seg {
+                            PathSegment::MoveTo { x, y } => {
+                                if !points.is_empty() {
+                                    if *close {
+                                        points.push(anchor);
+                                    }
+                                    for w in points.windows(2) {
+                                        push_thick_line(
+                                            &mut verts,
+                                            &mut idxs,
+                                            t,
+                                            current_color,
+                                            w[0][0],
+                                            w[0][1],
+                                            w[1][0],
+                                            w[1][1],
+                                            line_width,
+                                        );
+                                    }
+                                    points.clear();
+                                }
+                                pen = [*x, *y];
+                                anchor = pen;
+                                points.push(pen);
+                            }
+                            PathSegment::LineTo { x, y } => {
+                                pen = [*x, *y];
+                                points.push(pen);
+                            }
+                            PathSegment::QuadTo { cx, cy, x, y } => {
+                                let s = Vec2::new(pen[0], pen[1]);
+                                let c = Vec2::new(*cx, *cy);
+                                let e = Vec2::new(*x, *y);
+                                for i in 1..=8usize {
+                                    let tv = i as f32 / 8.0;
+                                    let mt = 1.0 - tv;
+                                    let nx = mt * mt * s.x + 2.0 * mt * tv * c.x + tv * tv * e.x;
+                                    let ny = mt * mt * s.y + 2.0 * mt * tv * c.y + tv * tv * e.y;
+                                    points.push([nx, ny]);
+                                }
+                                pen = [*x, *y];
+                            }
+                            PathSegment::CubicTo {
+                                cx1,
+                                cy1,
+                                cx2,
+                                cy2,
+                                x,
+                                y,
+                            } => {
+                                let s = Vec2::new(pen[0], pen[1]);
+                                let cp1 = Vec2::new(*cx1, *cy1);
+                                let cp2 = Vec2::new(*cx2, *cy2);
+                                let ep = Vec2::new(*x, *y);
+                                for i in 1..=8usize {
+                                    let tv = i as f32 / 8.0;
+                                    let mt = 1.0 - tv;
+                                    let nx = mt * mt * mt * s.x
+                                        + 3.0 * mt * mt * tv * cp1.x
+                                        + 3.0 * mt * tv * tv * cp2.x
+                                        + tv * tv * tv * ep.x;
+                                    let ny = mt * mt * mt * s.y
+                                        + 3.0 * mt * mt * tv * cp1.y
+                                        + 3.0 * mt * tv * tv * cp2.y
+                                        + tv * tv * tv * ep.y;
+                                    points.push([nx, ny]);
+                                }
+                                pen = [*x, *y];
+                            }
+                        }
+                    }
+                    if !points.is_empty() {
+                        if *close {
+                            points.push(anchor);
+                        }
+                        match mode {
+                            DrawMode::Line => {
+                                for w in points.windows(2) {
+                                    push_thick_line(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        current_color,
+                                        w[0][0],
+                                        w[0][1],
+                                        w[1][0],
+                                        w[1][1],
+                                        line_width,
+                                    );
+                                }
+                            }
+                            DrawMode::Fill => {
+                                let flat: Vec<f32> =
+                                    points.iter().flat_map(|p| [p[0], p[1]]).collect();
+                                self.tess_polygon(
+                                    &mut verts,
+                                    &mut idxs,
+                                    t,
+                                    current_color,
+                                    &DrawMode::Fill,
+                                    &flat,
+                                    line_width,
+                                );
+                            }
+                        }
+                    }
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                RenderCommand::DrawGradientRect {
+                    x,
+                    y,
+                    w,
+                    h,
+                    color1,
+                    color2,
+                    direction,
+                } => {
+                    let lerp = |a: &[f32; 4], b: &[f32; 4], f: f32| -> [f32; 4] {
+                        [
+                            a[0] + (b[0] - a[0]) * f,
+                            a[1] + (b[1] - a[1]) * f,
+                            a[2] + (b[2] - a[2]) * f,
+                            a[3] + (b[3] - a[3]) * f,
+                        ]
+                    };
+                    // corner order: TL, TR, BR, BL
+                    let corner_colors: [[f32; 4]; 4] = match direction {
+                        GradientDirection::Horizontal => [*color1, *color2, *color2, *color1],
+                        GradientDirection::Vertical => [*color1, *color1, *color2, *color2],
+                        GradientDirection::DiagDown => {
+                            let mid = lerp(color1, color2, 0.5);
+                            [*color1, mid, *color2, mid]
+                        }
+                        GradientDirection::DiagUp => {
+                            let mid = lerp(color1, color2, 0.5);
+                            [mid, *color1, mid, *color2]
+                        }
+                        GradientDirection::Radial => [*color1, *color1, *color2, *color2],
+                    };
+                    let t = transform_stack.last().unwrap();
+                    let corner_pts = [
+                        (*x, *y),
+                        (*x + w, *y),
+                        (*x + w, *y + h),
+                        (*x, *y + h),
+                    ];
+                    let mut verts: Vec<ColorVertex> = Vec::with_capacity(4);
+                    let mut idxs: Vec<u32> = Vec::with_capacity(6);
+                    let base = verts.len() as u32;
+                    for (i, (px, py)) in corner_pts.iter().enumerate() {
+                        let (sx, sy) = apply(t, *px, *py);
+                        verts.push(ColorVertex {
+                            position: [sx, sy],
+                            color: corner_colors[i],
+                        });
+                    }
+                    idxs.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                RenderCommand::DrawColoredPolygon {
+                    vertices,
+                    colors,
+                    mode,
+                } => {
+                    let n = vertices.len() / 2;
+                    if n >= 3 && colors.len() >= n {
+                        let t = transform_stack.last().unwrap();
+                        let mut verts: Vec<ColorVertex> = Vec::with_capacity(n);
+                        let mut idxs: Vec<u32> = Vec::new();
+                        match mode {
+                            DrawMode::Fill => {
+                                let base = verts.len() as u32;
+                                for i in 0..n {
+                                    let (sx, sy) =
+                                        apply(t, vertices[i * 2], vertices[i * 2 + 1]);
+                                    verts.push(ColorVertex {
+                                        position: [sx, sy],
+                                        color: colors[i],
+                                    });
+                                }
+                                for i in 1..(n as u32 - 1) {
+                                    idxs.extend_from_slice(&[base, base + i, base + i + 1]);
+                                }
+                            }
+                            DrawMode::Line => {
+                                for i in 0..n {
+                                    let j = (i + 1) % n;
+                                    push_thick_line(
+                                        &mut verts,
+                                        &mut idxs,
+                                        t,
+                                        colors[i],
+                                        vertices[i * 2],
+                                        vertices[i * 2 + 1],
+                                        vertices[j * 2],
+                                        vertices[j * 2 + 1],
+                                        line_width,
+                                    );
+                                }
+                            }
+                        }
+                        let (tw, th) = self.target_dimensions(current_target, canvases);
+                        append_color_draw(
+                            &mut draws,
+                            &mut all_color_verts,
+                            &mut all_color_idxs,
+                            current_target,
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, tw, th),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
+                    }
+                }
+
+                RenderCommand::DrawIsoCubeTile {
+                    screen_x,
+                    screen_y,
+                    half_w,
+                    half_h,
+                    depth: _,
+                    top_color,
+                    top_texture,
+                    left_color,
+                    left_texture,
+                    right_color,
+                    right_texture,
+                } => {
+                    let t = transform_stack.last().unwrap();
+                    let sx = *screen_x;
+                    let sy = *screen_y;
+                    let hw = *half_w;
+                    let hh = *half_h;
+                    // Face corner sets (clockwise: TL, TR, BR, BL equivalent)
+                    let top_corners = [
+                        Vec2::new(sx, sy - hh),
+                        Vec2::new(sx + hw, sy),
+                        Vec2::new(sx, sy + hh / 2.0),
+                        Vec2::new(sx - hw, sy),
+                    ];
+                    let left_corners = [
+                        Vec2::new(sx - hw, sy),
+                        Vec2::new(sx, sy + hh / 2.0),
+                        Vec2::new(sx, sy + hh * 1.5),
+                        Vec2::new(sx - hw, sy + hh),
+                    ];
+                    let right_corners = [
+                        Vec2::new(sx, sy + hh / 2.0),
+                        Vec2::new(sx + hw, sy),
+                        Vec2::new(sx + hw, sy + hh),
+                        Vec2::new(sx, sy + hh * 1.5),
+                    ];
+                    let full_uvs = [
+                        Vec2::new(0.0, 0.0),
+                        Vec2::new(1.0, 0.0),
+                        Vec2::new(1.0, 1.0),
+                        Vec2::new(0.0, 1.0),
+                    ];
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    let scissor = normalize_scissor(current_scissor, tw, th);
+                    // Draw each face — textured if a key is provided, else colored polygon.
+                    for (corners, color, tex_opt) in [
+                        (&top_corners, top_color, top_texture),
+                        (&left_corners, left_color, left_texture),
+                        (&right_corners, right_color, right_texture),
+                    ] {
+                        if let Some(key) = tex_opt {
+                            if self.gpu_textures.contains_key(*key) {
+                                let mut tv: Vec<TexVertex> = Vec::with_capacity(4);
+                                let mut ti: Vec<u32> = Vec::with_capacity(6);
+                                push_tex_quad_corners(&mut tv, &mut ti, t, *color, corners, &full_uvs);
+                                append_tex_draw(
+                                    &mut draws,
+                                    &mut all_tex_verts,
+                                    &mut all_tex_idxs,
+                                    current_target,
+                                    TexRef::Texture(*key),
+                                    current_blend_mode,
+                                    scissor,
+                                    color_mask_bits,
+                                    active_shader.filter(|key| shaders.contains_key(*key)),
+                                    stencil_mode,
+                                    stencil_reference,
+                                    tv,
+                                    ti,
+                                );
+                            }
+                        } else {
+                            let flat: Vec<f32> =
+                                corners.iter().flat_map(|v| [v.x, v.y]).collect();
+                            let mut cv: Vec<ColorVertex> = Vec::new();
+                            let mut ci: Vec<u32> = Vec::new();
+                            self.tess_polygon(
+                                &mut cv,
+                                &mut ci,
+                                t,
+                                *color,
+                                &DrawMode::Fill,
+                                &flat,
+                                line_width,
+                            );
+                            append_color_draw(
+                                &mut draws,
+                                &mut all_color_verts,
+                                &mut all_color_idxs,
+                                current_target,
+                                current_blend_mode,
+                                scissor,
+                                color_mask_bits,
+                                active_shader.filter(|key| shaders.contains_key(*key)),
+                                stencil_mode,
+                                stencil_reference,
+                                cv,
+                                ci,
+                            );
+                        }
+                    }
+                }
+
+                RenderCommand::DrawHexTile {
+                    cx,
+                    cy,
+                    size,
+                    orientation,
+                    mode,
+                } => {
+                    let t = transform_stack.last().unwrap();
+                    let angle_offset = match orientation {
+                        HexOrientation::PointyTop => PI / 6.0,
+                        HexOrientation::FlatTop => 0.0,
+                    };
+                    let mut flat = Vec::with_capacity(12);
+                    for k in 0..6u32 {
+                        let a = k as f32 * PI / 3.0 + angle_offset;
+                        flat.push(*cx + *size * a.cos());
+                        flat.push(*cy + *size * a.sin());
+                    }
+                    let mut verts: Vec<ColorVertex> = Vec::new();
+                    let mut idxs: Vec<u32> = Vec::new();
+                    self.tess_polygon(
+                        &mut verts,
+                        &mut idxs,
+                        t,
+                        current_color,
+                        mode,
+                        &flat,
+                        line_width,
+                    );
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                // State-machine stubs — sort group tracking is NYI in the GPU renderer.
+                RenderCommand::BeginSortGroup { .. } => {}
+                RenderCommand::PushSortKey(_) => {}
+                RenderCommand::FlushSortGroup { .. } => {}
+
+                RenderCommand::DrawPhysicsDebug { shapes, config } => {
+                    let t = transform_stack.last().unwrap();
+                    let lw = config.line_width;
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    for shape in shapes {
+                        let color = if shape.is_sensor {
+                            config.sensor_color
+                        } else if shape.is_sleeping {
+                            config.sleep_color
+                        } else if shape.is_static {
+                            config.static_color
+                        } else {
+                            config.body_color
+                        };
+                        let mut cv: Vec<ColorVertex> = Vec::new();
+                        let mut ci: Vec<u32> = Vec::new();
+                        if shape.is_circle {
+                            self.tess_ellipse(
+                                &mut cv,
+                                &mut ci,
+                                t,
+                                color,
+                                &DrawMode::Line,
+                                shape.x,
+                                shape.y,
+                                shape.half_w,
+                                shape.half_w,
+                                24,
+                                lw,
+                            );
+                        } else if !shape.hull_verts.is_empty() {
+                            // Transform hull verts (body-local) by the shape's world angle + position.
+                            let cos_a = shape.angle.cos();
+                            let sin_a = shape.angle.sin();
+                            let flat: Vec<f32> = shape
+                                .hull_verts
+                                .iter()
+                                .flat_map(|[lx, ly]| {
+                                    let wx = shape.x + lx * cos_a - ly * sin_a;
+                                    let wy = shape.y + lx * sin_a + ly * cos_a;
+                                    [wx, wy]
+                                })
+                                .collect();
+                            self.tess_polygon(
+                                &mut cv,
+                                &mut ci,
+                                t,
+                                color,
+                                &DrawMode::Line,
+                                &flat,
+                                lw,
+                            );
+                        } else {
+                            // Rotated box: compute 4 corners from half-extents and angle.
+                            let cos_a = shape.angle.cos();
+                            let sin_a = shape.angle.sin();
+                            let corners: [[f32; 2]; 4] = [
+                                [-shape.half_w, -shape.half_h],
+                                [shape.half_w, -shape.half_h],
+                                [shape.half_w, shape.half_h],
+                                [-shape.half_w, shape.half_h],
+                            ];
+                            let flat: Vec<f32> = corners
+                                .iter()
+                                .flat_map(|[lx, ly]| {
+                                    let wx = shape.x + lx * cos_a - ly * sin_a;
+                                    let wy = shape.y + lx * sin_a + ly * cos_a;
+                                    [wx, wy]
+                                })
+                                .collect();
+                            self.tess_polygon(
+                                &mut cv,
+                                &mut ci,
+                                t,
+                                color,
+                                &DrawMode::Line,
+                                &flat,
+                                lw,
+                            );
+                        }
+                        append_color_draw(
+                            &mut draws,
+                            &mut all_color_verts,
+                            &mut all_color_idxs,
+                            current_target,
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, tw, th),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            cv,
+                            ci,
+                        );
+                    }
+                }
+
+                RenderCommand::DrawSpineSkeleton { slots } => {
+                    let t = transform_stack.last().unwrap();
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    let scissor = normalize_scissor(current_scissor, tw, th);
+                    for slot in slots {
+                        if self.gpu_textures.contains_key(slot.texture_key) {
+                            let mut tv: Vec<TexVertex> = Vec::with_capacity(4);
+                            let mut ti: Vec<u32> = Vec::with_capacity(6);
+                            push_tex_quad_corners(
+                                &mut tv,
+                                &mut ti,
+                                t,
+                                slot.color,
+                                &slot.corners,
+                                &slot.uvs,
+                            );
+                            append_tex_draw(
+                                &mut draws,
+                                &mut all_tex_verts,
+                                &mut all_tex_idxs,
+                                current_target,
+                                TexRef::Texture(slot.texture_key),
+                                slot.blend_mode,
+                                scissor,
+                                color_mask_bits,
+                                active_shader.filter(|key| shaders.contains_key(*key)),
+                                stencil_mode,
+                                stencil_reference,
+                                tv,
+                                ti,
+                            );
+                        }
+                    }
+                }
+
+                RenderCommand::DrawBevelRect {
+                    x,
+                    y,
+                    w,
+                    h,
+                    bevel_w,
+                    style,
+                    highlight,
+                    shadow,
+                    fill_color,
+                } => {
+                    let t = transform_stack.last().unwrap();
+                    let bw = *bevel_w;
+                    let ix = *x + bw;
+                    let iy = *y + bw;
+                    let iw = *w - 2.0 * bw;
+                    let ih = *h - 2.0 * bw;
+                    // Determine the highlight/shadow colour for each edge based on style.
+                    let (top_c, left_c, bottom_c, right_c) = match style {
+                        BevelStyle::Raised => (*highlight, *highlight, *shadow, *shadow),
+                        BevelStyle::Sunken => (*shadow, *shadow, *highlight, *highlight),
+                        BevelStyle::Ridge => (*highlight, *highlight, *shadow, *shadow),
+                        BevelStyle::Groove => (*shadow, *shadow, *highlight, *highlight),
+                        BevelStyle::Flat => (*fill_color, *fill_color, *fill_color, *fill_color),
+                    };
+                    let mut verts: Vec<ColorVertex> = Vec::new();
+                    let mut idxs: Vec<u32> = Vec::new();
+                    // Inner fill rectangle.
+                    if iw > 0.0 && ih > 0.0 {
+                        self.tess_rect(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            *fill_color,
+                            &DrawMode::Fill,
+                            ix,
+                            iy,
+                            iw,
+                            ih,
+                            line_width,
+                        );
+                    }
+                    // Helper: push a trapezoid quad with mixed-corner colours.
+                    let push_bevel_quad =
+                        |cv: &mut Vec<ColorVertex>,
+                         ci: &mut Vec<u32>,
+                         pts: &[(f32, f32); 4],
+                         colors: &[[f32; 4]; 4]| {
+                            let base = cv.len() as u32;
+                            for (i, &(px, py)) in pts.iter().enumerate() {
+                                let (sx, sy) = apply(t, px, py);
+                                cv.push(ColorVertex {
+                                    position: [sx, sy],
+                                    color: colors[i],
+                                });
+                            }
+                            ci.extend_from_slice(&[
+                                base,
+                                base + 1,
+                                base + 2,
+                                base,
+                                base + 2,
+                                base + 3,
+                            ]);
+                        };
+                    // Top bevel strip (outer-top-left → outer-top-right → inner-top-right → inner-top-left)
+                    push_bevel_quad(
+                        &mut verts,
+                        &mut idxs,
+                        &[(*x, *y), (*x + *w, *y), (ix + iw, iy), (ix, iy)],
+                        &[top_c, top_c, top_c, top_c],
+                    );
+                    // Bottom bevel strip
+                    push_bevel_quad(
+                        &mut verts,
+                        &mut idxs,
+                        &[
+                            (ix, iy + ih),
+                            (ix + iw, iy + ih),
+                            (*x + *w, *y + *h),
+                            (*x, *y + *h),
+                        ],
+                        &[bottom_c, bottom_c, bottom_c, bottom_c],
+                    );
+                    // Left bevel strip
+                    push_bevel_quad(
+                        &mut verts,
+                        &mut idxs,
+                        &[(*x, *y), (ix, iy), (ix, iy + ih), (*x, *y + *h)],
+                        &[left_c, left_c, left_c, left_c],
+                    );
+                    // Right bevel strip
+                    push_bevel_quad(
+                        &mut verts,
+                        &mut idxs,
+                        &[
+                            (ix + iw, iy),
+                            (*x + *w, *y),
+                            (*x + *w, *y + *h),
+                            (ix + iw, iy + ih),
+                        ],
+                        &[right_c, right_c, right_c, right_c],
+                    );
+                    let (tw, th) = self.target_dimensions(current_target, canvases);
+                    append_color_draw(
+                        &mut draws,
+                        &mut all_color_verts,
+                        &mut all_color_idxs,
+                        current_target,
+                        current_blend_mode,
+                        normalize_scissor(current_scissor, tw, th),
+                        color_mask_bits,
+                        active_shader.filter(|key| shaders.contains_key(*key)),
+                        stencil_mode,
+                        stencil_reference,
+                        verts,
+                        idxs,
+                    );
+                }
+
+                // Compositing layer management is handled at a higher level; stubs only.
+                RenderCommand::PushLayer { .. } => {}
+                RenderCommand::PopLayer { .. } => {}
+
                 // Post-FX capture/apply are managed by the PostFxStack at a higher level;
                 // the GPU renderer acknowledges these commands but does not process them here.
                 RenderCommand::BeginPostFx { .. } => {}

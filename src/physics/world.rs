@@ -1,4 +1,4 @@
-//! Rapier2d-backed physics world with backward-compatible Lurek2D API.
+﻿//! Rapier2d-backed physics world with backward-compatible Lurek2D API.
 //!
 //! Wraps the rapier2d simulation pipeline while exposing the same `Body`-based
 //! interface. The `Body` struct is a sync buffer: mutations via `get_body_mut()`
@@ -119,6 +119,44 @@ pub struct ContactInfo {
     pub is_touching: bool,
 }
 
+// ── PhysicsShapeSnapshot ──────────────────────────────────────────────────────
+
+/// Geometry snapshot of a single physics body for GPU debug rendering.
+///
+/// Returned by [`World::extract_shape_snapshots`] without depending on the
+/// render module. The Lua API layer converts this to a `PhysicsDebugShape`.
+///
+/// # Fields
+/// - `x` — `f32`. Body centre X in world space.
+/// - `y` — `f32`. Body centre Y in world space.
+/// - `half_w` — `f32`. Half-width (box) or radius (circle).
+/// - `half_h` — `f32`. Half-height (box); equals `half_w` for circles.
+/// - `angle` — `f32`. Rotation in radians.
+/// - `is_static` — `bool`. True for Static / Kinematic bodies.
+/// - `is_sensor` — `bool`. True for Sensor bodies.
+/// - `is_circle` — `bool`. True when the shape is a circle.
+/// - `hull_verts` — `Vec<[f32; 2]>`. Local-space polygon vertices (empty for box/circle).
+pub struct PhysicsShapeSnapshot {
+    /// Body centre X in world space.
+    pub x: f32,
+    /// Body centre Y in world space.
+    pub y: f32,
+    /// Half-width (box) or radius (circle) in world units.
+    pub half_w: f32,
+    /// Half-height (box) in world units; equals `half_w` for circles.
+    pub half_h: f32,
+    /// Body rotation in radians.
+    pub angle: f32,
+    /// True for static or kinematic bodies.
+    pub is_static: bool,
+    /// True for sensor (trigger volume) bodies.
+    pub is_sensor: bool,
+    /// True when the shape is a circle (use `half_w` as radius).
+    pub is_circle: bool,
+    /// Local-space polygon vertices; empty for box and circle shapes.
+    pub hull_verts: Vec<[f32; 2]>,
+}
+
 // ── World ─────────────────────────────────────────────────────────────────────
 
 /// Simulates a 2D physics world using rapier2d.
@@ -205,6 +243,15 @@ pub struct World {
 
     // ── Meter scaling ─────────────────────────────────────────────────────────
     pixels_per_meter: f32,
+
+    // ── Phase A/B/C extension fields ──────────────────────────────────────────
+    /// Per-joint break force thresholds (keyed by joint ID).
+    /// Joints without an entry cannot be broken programmatically.
+    joint_break_forces: HashMap<usize, f32>,
+    /// Per-body one-way platform normal.
+    /// When `Some((nx, ny))`, the body only blocks movement coming from the
+    /// direction *opposite* to the normal vector.
+    one_way_normals: Vec<Option<(f32, f32)>>,
 }
 
 impl World {
@@ -292,6 +339,82 @@ impl World {
             }
         }
     }
+
+    /// Returns a snapshot of each body's shape geometry for GPU debug rendering.
+    ///
+    /// The returned data is independent of the render module, allowing the Lua API
+    /// layer to convert it to `PhysicsDebugShape` without creating a physics→render
+    /// crate dependency.
+    ///
+    /// # Returns
+    /// A `Vec<PhysicsShapeSnapshot>` with one entry per body.
+    pub fn extract_shape_snapshots(&self) -> Vec<PhysicsShapeSnapshot> {
+        let mut out = Vec::with_capacity(self.bodies.len());
+        for body in &self.bodies {
+            let is_static = matches!(
+                body.body_type,
+                crate::physics::body::BodyType::Static | crate::physics::body::BodyType::Kinematic
+            );
+            let is_sensor = body.body_type == crate::physics::body::BodyType::Sensor;
+            let angle = body.angle;
+
+            let (is_circle, half_w, half_h, hull_verts) =
+                if let Some(ref ext) = body.shape_ext {
+                    match ext {
+                        crate::physics::shape::Shape::Circle { radius } => {
+                            (true, *radius, *radius, vec![])
+                        }
+                        crate::physics::shape::Shape::Rect { width, height } => {
+                            (false, width / 2.0, height / 2.0, vec![])
+                        }
+                        crate::physics::shape::Shape::Polygon { vertices }
+                        | crate::physics::shape::Shape::Chain { vertices, .. } => {
+                            let verts = vertices
+                                .iter()
+                                .map(|v| [v.x, v.y])
+                                .collect::<Vec<[f32; 2]>>();
+                            let (hw, hh) = if verts.is_empty() {
+                                (8.0, 8.0)
+                            } else {
+                                let max_x = verts.iter().map(|v| v[0].abs()).fold(0.0_f32, f32::max);
+                                let max_y = verts.iter().map(|v| v[1].abs()).fold(0.0_f32, f32::max);
+                                (max_x, max_y)
+                            };
+                            (false, hw, hh, verts)
+                        }
+                        crate::physics::shape::Shape::Edge { v1, v2 } => {
+                            let hw = ((v2.x - v1.x).abs() / 2.0).max(1.0);
+                            let hh = ((v2.y - v1.y).abs() / 2.0).max(1.0);
+                            let verts = vec![[v1.x, v1.y], [v2.x, v2.y]];
+                            (false, hw, hh, verts)
+                        }
+                    }
+                } else {
+                    match body.shape {
+                        super::body::BodyShape::Rect { width, height } => {
+                            (false, width / 2.0, height / 2.0, vec![])
+                        }
+                        super::body::BodyShape::Circle { radius } => {
+                            (true, radius, radius, vec![])
+                        }
+                    }
+                };
+
+            out.push(PhysicsShapeSnapshot {
+                x: body.position.x,
+                y: body.position.y,
+                half_w,
+                half_h,
+                angle,
+                is_static,
+                is_sensor,
+                is_circle,
+                hull_verts,
+            });
+        }
+        out
+    }
+
     /// Creates a new empty physics world with the given gravity vector.
     ///
     /// Positive `gy` means downward in screen-space Y-down coordinates.
@@ -331,6 +454,8 @@ impl World {
             joint_types: Vec::new(),
             mouse_joint_anchors: HashMap::new(),
             pixels_per_meter: 1.0,
+            joint_break_forces: HashMap::new(),
+            one_way_normals: Vec::new(),
         }
     }
 
@@ -474,6 +599,7 @@ impl World {
         self.extra_collider_handles.push(Vec::new());
         self.collider_to_body.insert(collider_handle, id);
         self.bodies.push(body);
+        self.one_way_normals.push(None);
         id
     }
 
@@ -865,6 +991,76 @@ impl World {
                     self.begin_contact_events.push((a, b));
                 } else {
                     self.end_contact_events.push((a, b));
+                }
+            }
+        }
+
+        // ⑥ Destroy joints whose relative-velocity proxy exceeds the break threshold.
+        if !self.joint_break_forces.is_empty() {
+            let breakable: Vec<(usize, ImpulseJointHandle, f32)> = self
+                .joint_handles
+                .iter()
+                .enumerate()
+                .filter_map(|(jid, &handle)| {
+                    let &limit = self.joint_break_forces.get(&jid)?;
+                    Some((jid, handle, limit))
+                })
+                .collect();
+            let to_break: Vec<usize> = breakable
+                .into_iter()
+                .filter_map(|(jid, handle, limit)| {
+                    let joint = self.impulse_joints.get(handle)?;
+                    let rb1 = self.rbodies.get(joint.body1)?;
+                    let rb2 = self.rbodies.get(joint.body2)?;
+                    let v1 = rb1.linvel();
+                    let v2 = rb2.linvel();
+                    let dvx = v1.x - v2.x;
+                    let dvy = v1.y - v2.y;
+                    let rel_mag = (dvx * dvx + dvy * dvy).sqrt();
+                    if rel_mag > limit {
+                        Some(jid)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            for jid in to_break {
+                if let Some(&handle) = self.joint_handles.get(jid) {
+                    self.impulse_joints.remove(handle, true);
+                }
+                self.joint_break_forces.remove(&jid);
+            }
+        }
+
+        // ⑦ One-way platform post-step velocity correction.
+        // For each begin-contact event involving a one-way body, check if the
+        // mover is travelling in the pass-through direction and undo the
+        // blocking impulse that rapier applied.
+        let contact_pairs: Vec<(usize, usize)> = self.begin_contact_events.clone();
+        for (a, b) in contact_pairs {
+            for (platform_id, mover_id) in [(a, b), (b, a)] {
+                if let Some(&Some((nx, ny))) = self.one_way_normals.get(platform_id) {
+                    if let Some(&handle) = self.body_handles.get(mover_id) {
+                        if let Some(rb) = self.rbodies.get_mut(handle) {
+                            let cv = *rb.linvel();
+                            let cdot = cv.x * nx + cv.y * ny;
+                            // Negative dot → mover travelling in pass-through direction.
+                            if cdot < 0.0 {
+                                rb.set_linvel(
+                                    Vector::new(cv.x - cdot * nx, cv.y - cdot * ny),
+                                    true,
+                                );
+                                if let Some(body_mut) = self.bodies.get_mut(mover_id) {
+                                    let rv =
+                                        body_mut.velocity.x * nx + body_mut.velocity.y * ny;
+                                    if rv < 0.0 {
+                                        body_mut.velocity.x -= rv * nx;
+                                        body_mut.velocity.y -= rv * ny;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1335,6 +1531,8 @@ impl World {
         self.islands = IslandManager::new();
         self.broad_phase = BroadPhaseBvh::new();
         self.narrow_phase = NarrowPhase::new();
+        self.joint_break_forces.clear();
+        self.one_way_normals.clear();
     }
 
     // ── Body destruction ──────────────────────────────────────────────────────
@@ -1607,6 +1805,7 @@ impl World {
         if let Some(&handle) = self.joint_handles.get(joint_id) {
             self.impulse_joints.remove(handle, true);
         }
+        self.joint_break_forces.remove(&joint_id);
     }
 
     // ── Enhanced raycasting ───────────────────────────────────────────────────
@@ -2201,6 +2400,146 @@ impl World {
         self.get_contacts()
             .into_iter()
             .filter(|c| c.body_a == body_id || c.body_b == body_id)
+            .collect()
+    }
+
+    // ── Phase A/B/C extension methods ────────────────────────────────────────
+
+    /// Marks body `id` as a one-way platform with outward normal `(nx, ny)`.
+    ///
+    /// Bodies configured as one-way only block movement coming from the
+    /// direction opposite to the normal vector.  For a floor that lets
+    /// characters jump through from below, use `ny = -1.0`.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    /// - `nx` — Pass-through normal X (should be normalised).
+    /// - `ny` — Pass-through normal Y (should be normalised).
+    pub fn set_body_one_way(&mut self, id: usize, nx: f32, ny: f32) {
+        if let Some(v) = self.one_way_normals.get_mut(id) {
+            *v = Some((nx, ny));
+        }
+    }
+
+    /// Clears the one-way configuration for a body, making it fully solid.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    pub fn clear_body_one_way(&mut self, id: usize) {
+        if let Some(v) = self.one_way_normals.get_mut(id) {
+            *v = None;
+        }
+    }
+
+    /// Returns the one-way normal for a body, if configured.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    ///
+    /// # Returns
+    /// `Some((nx, ny))` if one-way, `None` if fully solid.
+    pub fn get_body_one_way(&self, id: usize) -> Option<(f32, f32)> {
+        self.one_way_normals.get(id).copied().flatten()
+    }
+
+    /// Sets the relative-velocity break threshold for a joint.
+    ///
+    /// After each `step`, joints whose connected bodies exceed this
+    /// relative velocity are automatically destroyed.
+    ///
+    /// # Parameters
+    /// - `jid`       — Joint index.
+    /// - `max_force` — Relative-velocity threshold.
+    pub fn set_joint_break_force(&mut self, jid: usize, max_force: f32) {
+        self.joint_break_forces.insert(jid, max_force);
+    }
+
+    /// Returns the break threshold for a joint, if set.
+    ///
+    /// # Parameters
+    /// - `jid` — Joint index.
+    ///
+    /// # Returns
+    /// `Some(limit)` if set, `None` if the joint is indestructible.
+    pub fn get_joint_break_force(&self, jid: usize) -> Option<f32> {
+        self.joint_break_forces.get(&jid).copied()
+    }
+
+    /// Returns whether a body is currently sleeping (inactive).
+    ///
+    /// Static and Kinematic bodies always return `false`.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    ///
+    /// # Returns
+    /// `true` if the body is asleep.
+    pub fn is_body_sleeping(&self, id: usize) -> bool {
+        if let Some(&handle) = self.body_handles.get(id) {
+            if let Some(rb) = self.rbodies.get(handle) {
+                return rb.is_sleeping();
+            }
+        }
+        false
+    }
+
+    /// Forcibly wakes up a sleeping body.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    pub fn wake_up_body(&mut self, id: usize) {
+        if let Some(&handle) = self.body_handles.get(id) {
+            if let Some(rb) = self.rbodies.get_mut(handle) {
+                rb.wake_up(true);
+            }
+        }
+    }
+
+    /// Puts a body to sleep immediately, regardless of velocity.
+    ///
+    /// # Parameters
+    /// - `id` — Body index.
+    pub fn sleep_body(&mut self, id: usize) {
+        if let Some(&handle) = self.body_handles.get(id) {
+            if let Some(rb) = self.rbodies.get_mut(handle) {
+                rb.sleep();
+            }
+        }
+    }
+
+    /// Sets the number of constraint solver iterations per physics step.
+    ///
+    /// Lower values are faster; higher values are more stable.  Default is `4`.
+    /// Values below `1` are clamped to `1`.
+    ///
+    /// # Parameters
+    /// - `n` — Number of solver iterations.
+    pub fn set_solver_iterations(&mut self, n: usize) {
+        self.params.num_solver_iterations = n.max(1);
+    }
+
+    /// Returns the current number of constraint solver iterations per step.
+    ///
+    /// # Returns
+    /// The solver iteration count.
+    pub fn get_solver_iterations(&self) -> usize {
+        self.params.num_solver_iterations
+    }
+
+    /// Creates multiple bodies in a single call.
+    ///
+    /// Each spec is a `(x, y, body_type)` tuple.  Bodies use the same
+    /// defaults as [`World::add_body`].
+    ///
+    /// # Parameters
+    /// - `specs` — Vec of `(x, y, body_type)` tuples.
+    ///
+    /// # Returns
+    /// Vec of new body IDs in `specs` order.
+    pub fn add_bodies(&mut self, specs: Vec<(f32, f32, BodyType)>) -> Vec<usize> {
+        specs
+            .into_iter()
+            .map(|(x, y, bt)| self.add_body(Body::new(x, y, bt)))
             .collect()
     }
 }

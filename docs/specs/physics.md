@@ -254,6 +254,39 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
+## GPU Physics Debug (v0.7.26)
+
+### `PhysicsShapeSnapshot` (src/physics/world.rs)
+
+Geometry-only snapshot of a single physics body. Does not depend on `crate::render`.
+
+| Field | Type | Description |
+|---|---|---|
+| `x`, `y` | `f32` | Body centre in world space. |
+| `half_w`, `half_h` | `f32` | Half-extents (or radius for circles). |
+| `angle` | `f32` | Rotation in radians. |
+| `is_static` | `bool` | True for Static / Kinematic bodies. |
+| `is_sensor` | `bool` | True for Sensor bodies. |
+| `is_circle` | `bool` | True when shape is a circle. |
+| `hull_verts` | `Vec<[f32; 2]>` | Local-space polygon vertices; empty for box / circle. |
+
+`World::extract_shape_snapshots()` returns `Vec<PhysicsShapeSnapshot>` for all bodies.
+
+### `lurek.physics.drawDebugGpu(world, config?)`
+
+Extracts shape snapshots from `world` and queues a `RenderCommand::DrawPhysicsDebug` for the current frame.
+Call from `lurek.render` or `lurek.render_ui`.
+
+**Config table fields** (all optional):
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `bodyColor` | `{f32,f32,f32,f32}` | `{0,1,0,1}` | Dynamic body outline. |
+| `staticColor` | `{f32,f32,f32,f32}` | `{0.5,0.5,0.5,1}` | Static/kinematic outline. |
+| `sleepColor` | `{f32,f32,f32,f32}` | `{0,0.4,0,1}` | Sleeping body outline. |
+| `sensorColor` | `{f32,f32,f32,f32}` | `{0,1,1,0.7}` | Sensor (trigger) outline. |
+| `lineWidth` | `number` | `1.0` | Outline thickness in pixels. |
+
 ## Notes
 
 - Keep this module reference synchronized with `src/physics/` and any matching Lua bindings.

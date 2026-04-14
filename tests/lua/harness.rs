@@ -139,6 +139,21 @@ fn lua_test_physics() {
 }
 
 #[test]
+fn lua_test_physics_ext() {
+    run_lua_test("unit/test_physics_ext.lua");
+}
+
+#[test]
+fn lua_evidence_physics_ext() {
+    run_lua_test("evidence/test_evidence_physics_ext.lua");
+}
+
+#[test]
+fn lua_integration_physics_platformer() {
+    run_lua_test("integration/test_physics_platformer.lua");
+}
+
+#[test]
 fn lua_test_ai() {
     run_lua_test("unit/test_ai.lua");
 }
@@ -628,6 +643,7 @@ fn lua_test_config() {
 }
 
 #[test]
+#[ignore = "tests/lua/examples/ directory has not been created yet"]
 fn lua_test_examples() {
     run_lua_test("examples/test_examples.lua");
 }
@@ -1166,23 +1182,86 @@ fn lua_golden_raycaster() {
 }
 
 #[test]
-fn lua_test_evidence_image() {
-    run_lua_test("tests/lua/evidence/test_evidence_image.lua");
+fn lua_evidence_image() {
+    run_lua_test("evidence/test_evidence_image.lua");
 }
 
 #[test]
-fn lua_test_golden_image() {
-    run_lua_test("tests/lua/golden/test_image_golden.lua");
+fn lua_golden_image() {
+    run_lua_test("golden/test_image_golden.lua");
 }
 
 #[test]
-fn lua_test_evidence_graphics() { run_lua_test("evidence/test_evidence_graphics.lua"); }
+fn lua_evidence_graphics() {
+    run_lua_test("evidence/test_evidence_graphics.lua");
+}
 
 #[test]
-fn lua_test_golden_graphics() { run_lua_test("golden/test_graphics_golden.lua"); }
+fn lua_golden_graphics() {
+    run_lua_test("golden/test_graphics_golden.lua");
+}
 
 #[test]
-fn lua_test_evidence_misc() { run_lua_test("evidence/test_evidence_misc.lua"); }
+fn lua_evidence_misc() {
+    run_lua_test("evidence/test_evidence_misc.lua");
+}
 
 #[test]
-fn lua_test_golden_misc() { run_lua_test("golden/test_misc_golden.lua"); }
+fn lua_golden_misc() {
+    run_lua_test("golden/test_misc_golden.lua");
+}
+
+#[test]
+fn lua_security_fuzz_boundary() {
+    run_lua_test("security/test_fuzz_boundary.lua");
+}
+
+#[test]
+fn lua_evidence_geometry() {
+    run_lua_test("evidence/test_evidence_geometry.lua");
+}
+
+#[test]
+fn lua_evidence_gui() {
+    run_lua_test("evidence/test_evidence_gui.lua");
+}
+
+#[test]
+fn lua_evidence_migrated_15() {
+    run_lua_test("evidence/test_evidence_migrated_15.lua");
+}
+
+#[test]
+fn lua_evidence_migrated_20() {
+    run_lua_test("evidence/test_evidence_migrated_20.lua");
+}
+
+#[test]
+fn lua_golden_migrated_15() {
+    run_lua_test("golden/test_migrated_15_golden.lua");
+}
+
+#[test]
+fn lua_golden_migrated_20() {
+    run_lua_test("golden/test_migrated_20_golden.lua");
+}
+
+#[test]
+fn lua_evidence_scene() {
+    run_lua_test("evidence/test_evidence_scene.lua");
+}
+
+#[test]
+fn lua_evidence_raycaster_ext() {
+    run_lua_test("evidence/test_evidence_raycaster_ext.lua");
+}
+
+#[test]
+fn lua_evidence_physics_debug_gpu() {
+    run_lua_test("evidence/test_evidence_physics_debug_gpu.lua");
+}
+
+#[test]
+fn lua_evidence_graphic_draw_cmds() {
+    run_lua_test("evidence/test_evidence_graphic_draw_cmds.lua");
+}

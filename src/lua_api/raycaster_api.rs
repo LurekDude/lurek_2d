@@ -8,8 +8,8 @@ use std::rc::Rc;
 
 use crate::math::Color;
 use crate::raycaster::{
-    distance_shade, project_column, PointLight, RayHit, Raycaster2D, RaycasterScene,
-    SceneBuildParams, WorldSprite,
+    distance_shade, project_column, DoorDirection, DoorManager, DoorState, HeightMap, PointLight,
+    RayHit, Raycaster2D, RaycasterScene, SceneBuildParams, WorldSprite,
 };
 use crate::runtime::resource_keys::TextureKey;
 
@@ -29,6 +29,237 @@ fn ray_hit_to_table<'lua>(lua: &'lua Lua, hit: &RayHit) -> LuaResult<LuaTable<'l
     t.set("hit_y", hit.hit_y)?;
     t.set("hit", hit.hit)?;
     Ok(t)
+}
+
+// -------------------------------------------------------------------------------
+// LuaDoorManager UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
+pub struct LuaDoorManager {
+    inner: Rc<RefCell<DoorManager>>,
+}
+
+impl LuaUserData for LuaDoorManager {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- addDoor --
+        /// Registers a door at grid position (x, y).
+        /// @param x         : integer        — Grid X.
+        /// @param y         : integer        — Grid Y.
+        /// @param direction : string         — "horizontal" or "vertical".
+        /// @param speed     : number         — Animation speed (units/s).
+        /// @return integer  — Door index for open/close calls.
+        methods.add_method_mut(
+            "addDoor",
+            |_, this, (x, y, dir_str, speed): (u32, u32, String, f32)| {
+                let dir = match dir_str.as_str() {
+                    "vertical" => DoorDirection::Vertical,
+                    _ => DoorDirection::Horizontal,
+                };
+                Ok(this.inner.borrow_mut().add_door(x, y, dir, speed))
+            },
+        );
+
+        // -- openDoor --
+        /// Begins opening the door at the given index.
+        /// @param index : integer
+        /// @return nil
+        methods.add_method_mut("openDoor", |_, this, index: usize| {
+            this.inner.borrow_mut().open_door(index);
+            Ok(())
+        });
+
+        // -- closeDoor --
+        /// Begins closing the door at the given index.
+        /// @param index : integer
+        /// @return nil
+        methods.add_method_mut("closeDoor", |_, this, index: usize| {
+            this.inner.borrow_mut().close_door(index);
+            Ok(())
+        });
+
+        // -- update --
+        /// Advances all door animations by dt seconds.
+        /// @param dt : number
+        /// @return nil
+        methods.add_method_mut("update", |_, this, dt: f32| {
+            this.inner.borrow_mut().update(dt);
+            Ok(())
+        });
+
+        // -- getDoor --
+        /// Returns the state table for door at index, or nil if out of range.
+        /// @param index : integer
+        /// @return table|nil  — {x, y, openAmount, state} or nil.
+        methods.add_method("getDoor", |lua, this, index: usize| {
+            let mgr = this.inner.borrow();
+            if let Some(door) = mgr.doors().get(index) {
+                let tbl = lua.create_table()?;
+                tbl.set("x", door.x)?;
+                tbl.set("y", door.y)?;
+                tbl.set("openAmount", door.open_amount)?;
+                let state_str = match door.state {
+                    DoorState::Closed => "closed",
+                    DoorState::Opening => "opening",
+                    DoorState::Open => "open",
+                    DoorState::Closing => "closing",
+                };
+                tbl.set("state", state_str)?;
+                Ok(LuaValue::Table(tbl))
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- count --
+        /// Returns the number of registered doors.
+        /// @return integer
+        methods.add_method("count", |_, this, ()| Ok(this.inner.borrow().doors().len()));
+
+        // -- type --
+        /// Returns the type string "DoorManager".
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("DoorManager"));
+
+        // -- typeOf --
+        /// Returns the type string "DoorManager".
+        /// @return string
+        methods.add_method("typeOf", |_, _, ()| Ok("DoorManager"));
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaHeightMap UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
+pub struct LuaHeightMap {
+    inner: Rc<RefCell<HeightMap>>,
+}
+
+impl LuaUserData for LuaHeightMap {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setFloor --
+        /// Sets the floor height at (x, y).
+        /// @param x : integer
+        /// @param y : integer
+        /// @param h : number
+        /// @return nil
+        methods.add_method_mut("setFloor", |_, this, (x, y, h): (u32, u32, f32)| {
+            this.inner.borrow_mut().set_floor(x, y, h);
+            Ok(())
+        });
+
+        // -- setCeiling --
+        /// Sets the ceiling height at (x, y).
+        /// @param x : integer
+        /// @param y : integer
+        /// @param h : number
+        /// @return nil
+        methods.add_method_mut("setCeiling", |_, this, (x, y, h): (u32, u32, f32)| {
+            this.inner.borrow_mut().set_ceiling(x, y, h);
+            Ok(())
+        });
+
+        // -- floorAt --
+        /// Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return number
+        methods.add_method("floorAt", |_, this, (x, y): (u32, u32)| {
+            Ok(this.inner.borrow().floor_at(x, y))
+        });
+
+        // -- ceilingAt --
+        /// Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return number
+        methods.add_method("ceilingAt", |_, this, (x, y): (u32, u32)| {
+            Ok(this.inner.borrow().ceiling_at(x, y))
+        });
+
+        // -- type --
+        /// Returns the type string "HeightMap".
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("HeightMap"));
+
+        // -- typeOf --
+        /// Returns the type string "HeightMap".
+        /// @return string
+        methods.add_method("typeOf", |_, _, ()| Ok("HeightMap"));
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaPointLight UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side value wrapper around a raycaster [`PointLight`].
+#[derive(Clone)]
+pub struct LuaPointLight {
+    inner: PointLight,
+}
+
+impl LuaUserData for LuaPointLight {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- x / y --
+        /// Returns the world-space X position.
+        /// @return number
+        methods.add_method("x", |_, this, ()| Ok(this.inner.x));
+        /// Returns the world-space Y position.
+        /// @return number
+        methods.add_method("y", |_, this, ()| Ok(this.inner.y));
+
+        // -- radius --
+        /// Returns the illumination radius.
+        /// @return number
+        methods.add_method("radius", |_, this, ()| Ok(this.inner.radius));
+
+        // -- intensity --
+        /// Returns the intensity multiplier.
+        /// @return number
+        methods.add_method("intensity", |_, this, ()| Ok(this.inner.intensity));
+
+        // -- color --
+        /// Returns the RGB color as three separate values.
+        /// @return number, number, number
+        methods.add_method("color", |_, this, ()| {
+            Ok((this.inner.color[0], this.inner.color[1], this.inner.color[2]))
+        });
+
+        // -- set --
+        /// Updates all light properties at once.
+        /// @param x         : number
+        /// @param y         : number
+        /// @param r         : number  — Red   [0,1]
+        /// @param g         : number  — Green [0,1]
+        /// @param b         : number  — Blue  [0,1]
+        /// @param radius    : number
+        /// @param intensity : number
+        /// @return nil
+        methods.add_method_mut(
+            "set",
+            |_, this, (x, y, r, g, b, radius, intensity): (f32, f32, f32, f32, f32, f32, f32)| {
+                this.inner.x = x;
+                this.inner.y = y;
+                this.inner.color = [r, g, b];
+                this.inner.radius = radius;
+                this.inner.intensity = intensity;
+                Ok(())
+            },
+        );
+
+        // -- type --
+        /// Returns the type string "PointLight".
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("PointLight"));
+
+        // -- typeOf --
+        /// Returns the type string "PointLight".
+        /// @return string
+        methods.add_method("typeOf", |_, _, ()| Ok("PointLight"));
+    }
 }
 
 // -------------------------------------------------------------------------------
@@ -464,6 +695,59 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(|_, (distance, max_distance): (f32, f32)| {
             Ok(distance_shade(distance, max_distance))
         })?,
+    )?;
+
+    // -- newDoorManager --
+    /// Creates a new empty door manager.
+    /// @return DoorManager
+    tbl.set(
+        "newDoorManager",
+        lua.create_function(|_, ()| {
+            Ok(LuaDoorManager {
+                inner: Rc::new(RefCell::new(DoorManager::new())),
+            })
+        })?,
+    )?;
+
+    // -- newHeightMap --
+    /// Creates a new height map with default floor (0.0) and ceiling (1.0) values.
+    /// @param width  : integer
+    /// @param height : integer
+    /// @return HeightMap
+    tbl.set(
+        "newHeightMap",
+        lua.create_function(|_, (w, h): (u32, u32)| {
+            Ok(LuaHeightMap {
+                inner: Rc::new(RefCell::new(HeightMap::new(w, h))),
+            })
+        })?,
+    )?;
+
+    // -- newPointLight --
+    /// Creates a point light for use in raycaster scene lighting.
+    /// @param x         : number   — World-space X.
+    /// @param y         : number   — World-space Y.
+    /// @param r         : number   — Red   [0,1].
+    /// @param g         : number   — Green [0,1].
+    /// @param b         : number   — Blue  [0,1].
+    /// @param radius    : number   — Maximum illumination radius.
+    /// @param intensity : number   — Brightness multiplier.
+    /// @return PointLight
+    tbl.set(
+        "newPointLight",
+        lua.create_function(
+            |_, (x, y, r, g, b, radius, intensity): (f32, f32, f32, f32, f32, f32, f32)| {
+                Ok(LuaPointLight {
+                    inner: PointLight {
+                        x,
+                        y,
+                        radius,
+                        intensity,
+                        color: [r, g, b],
+                    },
+                })
+            },
+        )?,
     )?;
 
     luna.set("raycaster", tbl)?;

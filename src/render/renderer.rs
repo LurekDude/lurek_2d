@@ -561,6 +561,294 @@ pub enum RenderCommand {
         /// Per-quad RGBA tint multiplied against the sampled colour.
         color: [f32; 4],
     },
+    /// Draw a quadratic Bézier curve between `start` and `end` with one control point.
+    ///
+    /// The curve is tessellated into `segments` straight line segments on the CPU before
+    /// submission. The current color and line-width state applies.
+    ///
+    /// # Fields
+    /// - `start` — `Vec2`. Start point.
+    /// - `control` — `Vec2`. Single control point.
+    /// - `end` — `Vec2`. End point.
+    /// - `segments` — `u32`. Tessellation resolution. Clamped to 4–256.
+    DrawQuadBezier {
+        /// Start point.
+        start: Vec2,
+        /// Single control point.
+        control: Vec2,
+        /// End point.
+        end: Vec2,
+        /// Tessellation resolution. Clamped to 4–256.
+        segments: u32,
+    },
+    /// Draw a cubic Bézier curve through four points.
+    ///
+    /// Tessellated into `segments` straight lines on the CPU. Uses current color/line-width.
+    ///
+    /// # Fields
+    /// - `start` — `Vec2`. Start point.
+    /// - `c1` — `Vec2`. First control point.
+    /// - `c2` — `Vec2`. Second control point.
+    /// - `end` — `Vec2`. End point.
+    /// - `segments` — `u32`. Tessellation resolution. Clamped to 4–256.
+    DrawCubicBezier {
+        /// Start point.
+        start: Vec2,
+        /// First control point.
+        c1: Vec2,
+        /// Second control point.
+        c2: Vec2,
+        /// End point.
+        end: Vec2,
+        /// Tessellation resolution. Clamped to 4–256.
+        segments: u32,
+    },
+    /// Draw a multi-segment vector path.
+    ///
+    /// The path is specified as a list of [`PathSegment`] operations. When `close` is true
+    /// the renderer appends a line from the last point back to the first `MoveTo` anchor.
+    /// Fill mode (`DrawMode::Fill`) triangulates the closed contour; `DrawMode::Line` strokes it.
+    ///
+    /// # Fields
+    /// - `segments` — `Vec<PathSegment>`. Ordered path operations.
+    /// - `mode` — `DrawMode`. Fill or stroke mode.
+    /// - `close` — `bool`. Close the path before rendering.
+    DrawPath {
+        /// Ordered path operations.
+        segments: Vec<PathSegment>,
+        /// Fill or stroke mode.
+        mode: DrawMode,
+        /// Close the path before rendering.
+        close: bool,
+    },
+    /// Draw a colour-gradient filled rectangle.
+    ///
+    /// Two RGBA colours are interpolated across the rectangle according to `direction`.
+    /// No texture. Current transform applies.
+    ///
+    /// # Fields
+    /// - `x` — `f32`. Rectangle X.
+    /// - `y` — `f32`. Rectangle Y.
+    /// - `w` — `f32`. Rectangle width.
+    /// - `h` — `f32`. Rectangle height.
+    /// - `color1` — `[f32; 4]`. Start colour `[r, g, b, a]`.
+    /// - `color2` — `[f32; 4]`. End colour `[r, g, b, a]`.
+    /// - `direction` — `GradientDirection`. Direction the gradient flows.
+    DrawGradientRect {
+        /// Rectangle X.
+        x: f32,
+        /// Rectangle Y.
+        y: f32,
+        /// Rectangle width.
+        w: f32,
+        /// Rectangle height.
+        h: f32,
+        /// Start colour `[r, g, b, a]`.
+        color1: [f32; 4],
+        /// End colour `[f32; 4]`.
+        color2: [f32; 4],
+        /// Direction the gradient flows.
+        direction: GradientDirection,
+    },
+    /// Draw a convex polygon with per-vertex colours.
+    ///
+    /// `vertices` is a flat list of `(x, y)` pairs; `colors` has one `[r,g,b,a]` entry per
+    /// vertex. Lengths must match (renderer ignores mismatches silently). Current transform
+    /// applies.
+    ///
+    /// # Fields
+    /// - `vertices` — `Vec<f32>`. Flat vertex list: x0,y0, x1,y1, …
+    /// - `colors` — `Vec<[f32; 4]>`. Per-vertex colour `[r,g,b,a]`.
+    /// - `mode` — `DrawMode`. Fill or stroke.
+    DrawColoredPolygon {
+        /// Flat vertex list: x0,y0, x1,y1, …
+        vertices: Vec<f32>,
+        /// Per-vertex colour `[r,g,b,a]`.
+        colors: Vec<[f32; 4]>,
+        /// Fill or stroke.
+        mode: DrawMode,
+    },
+    /// Draw a three-face isometric cube tile.
+    ///
+    /// The three visible faces (top, left-front, right-front) are each drawn as a
+    /// coloured and/or textured parallelogram quad. A `None` texture key renders the
+    /// face as a flat colour only.
+    ///
+    /// # Fields
+    /// - `screen_x` — `f32`. Screen X of the tile's top-centre anchor point.
+    /// - `screen_y` — `f32`. Screen Y of the tile's top-centre anchor point.
+    /// - `half_w` — `f32`. Half-width of the tile in screen pixels.
+    /// - `half_h` — `f32`. Half-height of one face in screen pixels.
+    /// - `depth` — `f32`. Y-sort depth key.
+    /// - `top_color` — `[f32; 4]`. Top face flat colour tint.
+    /// - `top_texture` — `Option<TextureKey>`. Optional texture for the top face.
+    /// - `left_color` — `[f32; 4]`. Left-front face colour tint.
+    /// - `left_texture` — `Option<TextureKey>`. Optional texture for the left-front face.
+    /// - `right_color` — `[f32; 4]`. Right-front face colour tint.
+    /// - `right_texture` — `Option<TextureKey>`. Optional texture for the right-front face.
+    DrawIsoCubeTile {
+        /// Screen X of the tile's top-centre anchor point.
+        screen_x: f32,
+        /// Screen Y of the tile's top-centre anchor point.
+        screen_y: f32,
+        /// Half-width of the tile in screen pixels (controls the diamond footprint).
+        half_w: f32,
+        /// Half-height of one face in screen pixels.
+        half_h: f32,
+        /// Y-sort depth key. Lower values render behind higher values.
+        depth: f32,
+        /// Top face flat colour tint.
+        top_color: [f32; 4],
+        /// Optional texture key for the top face.
+        top_texture: Option<TextureKey>,
+        /// Left-front face colour tint.
+        left_color: [f32; 4],
+        /// Optional texture key for the left-front face.
+        left_texture: Option<TextureKey>,
+        /// Right-front face colour tint.
+        right_color: [f32; 4],
+        /// Optional texture key for the right-front face.
+        right_texture: Option<TextureKey>,
+    },
+    /// Draw a hexagonal tile outline or fill.
+    ///
+    /// Hexagons are computed from the `cx`/`cy` centre and `size` (circumradius).
+    /// Current color and line-width apply for `DrawMode::Line`; current color fills
+    /// for `DrawMode::Fill`. Current transform applies.
+    ///
+    /// # Fields
+    /// - `cx` — `f32`. Centre X in screen space.
+    /// - `cy` — `f32`. Centre Y in screen space.
+    /// - `size` — `f32`. Circumradius in screen pixels.
+    /// - `orientation` — `HexOrientation`. Hex orientation.
+    /// - `mode` — `DrawMode`. Fill or stroke.
+    DrawHexTile {
+        /// Centre X in screen space.
+        cx: f32,
+        /// Centre Y in screen space.
+        cy: f32,
+        /// Circumradius (centre to vertex) in screen pixels.
+        size: f32,
+        /// Hex orientation.
+        orientation: HexOrientation,
+        /// Fill or stroke.
+        mode: DrawMode,
+    },
+    /// Mark the start of a Y/Z-depth sort group.
+    ///
+    /// All `PushSortKey` commands issued between this and the matching `FlushSortGroup`
+    /// associate draw commands with a depth value. At `FlushSortGroup` the group is
+    /// sorted and flushed in ascending depth order. Groups cannot be nested.
+    ///
+    /// # Fields
+    /// - `group_id` — `u64`. Caller-assigned group identifier (must match `FlushSortGroup`).
+    BeginSortGroup {
+        /// Caller-assigned group identifier (must match `FlushSortGroup`).
+        group_id: u64,
+    },
+    /// Associate the previous draw command with a sort depth within the active group.
+    ///
+    /// Must appear in the render command stream *immediately after* the draw command it
+    /// annotates and between a `BeginSortGroup`/`FlushSortGroup` pair.
+    PushSortKey(f32),
+    /// Sort all draw commands accumulated since `BeginSortGroup` and flush them.
+    ///
+    /// After flushing the sort group is closed; a new `BeginSortGroup` is required
+    /// before the next sort pass.
+    ///
+    /// # Fields
+    /// - `group_id` — `u64`. Must match the `group_id` of the corresponding `BeginSortGroup`.
+    FlushSortGroup {
+        /// Must match the `group_id` of the corresponding `BeginSortGroup`.
+        group_id: u64,
+    },
+    /// Draw GPU-accelerated physics debug shapes extracted from a physics world.
+    ///
+    /// `shapes` contains collider geometry snapshots produced by
+    /// `physics::World::extract_debug_shapes()`. The renderer draws each shape as a coloured
+    /// outline using `config` colours. No textures are used.
+    ///
+    /// # Fields
+    /// - `shapes` — `Vec<PhysicsDebugShape>`. Pre-extracted collider geometry for this frame.
+    /// - `config` — `PhysicsDebugConfig`. Colour and stroke configuration.
+    DrawPhysicsDebug {
+        /// Pre-extracted collider geometry for this frame.
+        shapes: Vec<PhysicsDebugShape>,
+        /// Colour and stroke configuration.
+        config: PhysicsDebugConfig,
+    },
+    /// Draw a Spine 2D skeleton as a set of pre-composited textured slots.
+    ///
+    /// `slots` contains per-slot corner/UV/colour data produced by the spine CPU module.
+    /// The renderer processes each slot independently, applying per-slot blend modes.
+    ///
+    /// # Fields
+    /// - `slots` — `Vec<SpineSlotDraw>`. Ordered list of slot draw calls (back → front).
+    DrawSpineSkeleton {
+        /// Ordered list of slot draw calls (back → front).
+        slots: Vec<SpineSlotDraw>,
+    },
+    /// Draw a 3-D bevel border around a rectangle.
+    ///
+    /// The bevel is drawn as four trapezoid fill quads forming the border. Inner face
+    /// uses `fill_color`; highlight and shadow colours depend on `style`. No texture.
+    ///
+    /// # Fields
+    /// - `x` — `f32`. Rectangle X.
+    /// - `y` — `f32`. Rectangle Y.
+    /// - `w` — `f32`. Rectangle width.
+    /// - `h` — `f32`. Rectangle height.
+    /// - `bevel_w` — `f32`. Bevel border width in pixels.
+    /// - `style` — `BevelStyle`. Visual style of the bevel.
+    /// - `highlight` — `[f32; 4]`. Top/left edge highlight colour.
+    /// - `shadow` — `[f32; 4]`. Bottom/right edge shadow colour.
+    /// - `fill_color` — `[f32; 4]`. Inner fill colour.
+    DrawBevelRect {
+        /// Rectangle X.
+        x: f32,
+        /// Rectangle Y.
+        y: f32,
+        /// Rectangle width.
+        w: f32,
+        /// Rectangle height.
+        h: f32,
+        /// Bevel border width in pixels.
+        bevel_w: f32,
+        /// Visual style of the bevel.
+        style: BevelStyle,
+        /// Top/left edge highlight colour `[r,g,b,a]`.
+        highlight: [f32; 4],
+        /// Bottom/right edge shadow colour `[r,g,b,a]`.
+        shadow: [f32; 4],
+        /// Inner fill colour `[r,g,b,a]`.
+        fill_color: [f32; 4],
+    },
+    /// Begin a named compositing layer.
+    ///
+    /// All draw commands between this and the matching `PopLayer` are composited
+    /// onto an off-screen target, then blended back onto the parent target at `flush` time
+    /// with the layer's `alpha` and `blend` mode applied. Layers can be nested.
+    ///
+    /// # Fields
+    /// - `id` — `u64`. Caller-assigned layer identifier.
+    /// - `alpha` — `f32`. Layer opacity (0 = transparent, 1 = opaque).
+    /// - `blend` — `BlendMode`. Blend mode used when compositing this layer back to its parent.
+    PushLayer {
+        /// Caller-assigned layer identifier.
+        id: u64,
+        /// Layer opacity (0 = transparent, 1 = opaque).
+        alpha: f32,
+        /// Blend mode used when compositing this layer back to its parent.
+        blend: BlendMode,
+    },
+    /// End the current named compositing layer and composite it to the parent.
+    ///
+    /// # Fields
+    /// - `id` — `u64`. Must match the `id` of the corresponding `PushLayer`.
+    PopLayer {
+        /// Must match the `id` of the corresponding `PushLayer`.
+        id: u64,
+    },
 }
 
 /// Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.
@@ -583,11 +871,16 @@ pub struct TextureData {
 /// keeping the Tier-1 `graphics` module free of an upward Tier-2 import.
 ///
 /// # Variants
-/// - `Square` — Square variant.
-/// - `Circle` — Circle variant.
-/// - `Triangle` — Triangle variant.
-/// - `Spark` — Spark variant.
-/// - `Diamond` — Diamond variant.
+/// - `Square` — Axis-aligned filled square.
+/// - `Circle` — Filled circle.
+/// - `Triangle` — Filled equilateral triangle.
+/// - `Spark` — Thin line segment along velocity.
+/// - `Diamond` — Filled diamond (square rotated 45°).
+/// - `Shrapnel` — Random jagged polygon (deterministic per particle). `edges` = vertex count; `seed` = per-particle RNG seed.
+/// - `Ray` — Elongated filled rectangle. `aspect` = length-to-width ratio.
+/// - `Puff` — Soft filled circle (more tessellation segments than `Circle`).
+/// - `Ring` — Hollow ring (annulus). `thickness` = band width as fraction of size.
+/// - `Capsule` — Filled capsule (rectangle + hemispherical caps).
 #[derive(Clone, Debug)]
 pub enum ParticleRenderShape {
     /// Axis-aligned filled square. Size = side length.
@@ -601,6 +894,28 @@ pub enum ParticleRenderShape {
     Spark,
     /// Filled diamond (square rotated 45 degrees). Size = diagonal length.
     Diamond,
+    /// Random jagged polygon with `edges` vertices (3–12). Shape is deterministic from `seed`.
+    Shrapnel {
+        /// Number of polygon vertices (3–12). Values outside range are clamped.
+        edges: u8,
+        /// Per-particle seed for deterministic polygon generation. Set once at spawn.
+        seed: u32,
+    },
+    /// Elongated filled rectangle oriented along particle rotation.
+    /// `aspect` is the length-to-width ratio (e.g. 4.0 = 4× longer than wide).
+    Ray {
+        /// Length-to-width ratio. Values ≤ 0 are treated as 4.0.
+        aspect: f32,
+    },
+    /// Soft filled circle with 24 tessellation segments (smoother than `Circle`'s 12).
+    Puff,
+    /// Hollow ring (annulus). `thickness` is the band width as a fraction of particle size (0–1).
+    Ring {
+        /// Band width relative to particle size (0–1). Clamped to a minimum of 0.05 in the renderer.
+        thickness: f32,
+    },
+    /// Filled capsule (rectangle with hemispherical caps), oriented along particle rotation.
+    Capsule,
 }
 
 /// Per-particle render data for a single frame.
@@ -671,4 +986,182 @@ pub enum DrawableKind {
     SpriteBatch(SpriteBatchKey),
     /// A custom geometry mesh.
     Mesh(MeshKey),
+}
+
+/// A single segment of a vector path, used with `RenderCommand::DrawPath`.
+///
+/// # Variants
+/// - `MoveTo` — Move the pen to an absolute position without drawing.
+/// - `LineTo` — Draw a straight line to the given position.
+/// - `QuadTo` — Draw a quadratic Bézier curve: one control point, one end point.
+/// - `CubicTo` — Draw a cubic Bézier curve: two control points, one end point.
+#[derive(Clone, Debug)]
+pub enum PathSegment {
+    /// Move the pen to an absolute position without drawing.
+    MoveTo { x: f32, y: f32 },
+    /// Draw a straight line to the given position.
+    LineTo { x: f32, y: f32 },
+    /// Draw a quadratic Bézier curve: one control point, one end point.
+    QuadTo { cx: f32, cy: f32, x: f32, y: f32 },
+    /// Draw a cubic Bézier curve: two control points, one end point.
+    CubicTo { cx1: f32, cy1: f32, cx2: f32, cy2: f32, x: f32, y: f32 },
+}
+
+/// Direction for a two-stop linear or radial gradient.
+///
+/// # Variants
+/// - `Horizontal` — Gradient flows left → right.
+/// - `Vertical` — Gradient flows top → bottom.
+/// - `DiagDown` — Gradient flows top-left → bottom-right.
+/// - `DiagUp` — Gradient flows bottom-left → top-right.
+/// - `Radial` — Radial gradient expanding from the rectangle centre outward.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GradientDirection {
+    /// Gradient flows left → right.
+    Horizontal,
+    /// Gradient flows top → bottom.
+    Vertical,
+    /// Gradient flows top-left → bottom-right.
+    DiagDown,
+    /// Gradient flows bottom-left → top-right.
+    DiagUp,
+    /// Radial gradient expanding from the rectangle centre outward.
+    Radial,
+}
+
+/// Orientation for a hexagonal tile cell.
+///
+/// # Variants
+/// - `PointyTop` — Pointy-top hexagon (flat sides left/right).
+/// - `FlatTop` — Flat-top hexagon (flat sides top/bottom).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HexOrientation {
+    /// Pointy-top hexagon (flat sides left/right).
+    PointyTop,
+    /// Flat-top hexagon (flat sides top/bottom).
+    FlatTop,
+}
+
+/// Visual style for a bevelled rectangle.
+///
+/// # Variants
+/// - `Raised` — Raised 3-D appearance (highlight top-left, shadow bottom-right).
+/// - `Sunken` — Sunken 3-D appearance (shadow top-left, highlight bottom-right).
+/// - `Ridge` — Double ridge border on all sides.
+/// - `Groove` — Double groove border on all sides.
+/// - `Flat` — Flat border (same colour all sides).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BevelStyle {
+    /// Raised 3-D appearance (highlight top-left, shadow bottom-right).
+    Raised,
+    /// Sunken 3-D appearance (shadow top-left, highlight bottom-right).
+    Sunken,
+    /// Double ridge border on all sides.
+    Ridge,
+    /// Double groove border on all sides.
+    Groove,
+    /// Flat border (same colour all sides).
+    Flat,
+}
+
+/// Per-collider geometry snapshot extracted from the physics world for GPU debug rendering.
+///
+/// Produced by `physics::World::extract_debug_shapes()` and consumed by
+/// `RenderCommand::DrawPhysicsDebug`. Keeping geometry data in this struct prevents the
+/// renderer from importing the physics crate.
+///
+/// # Fields
+/// - `x` — `f32`. AABB centre or circle/capsule origin in world space (X axis).
+/// - `y` — `f32`. AABB centre or circle/capsule origin in world space (Y axis).
+/// - `half_w` — `f32`. Half-width (box) or radius (circle) in world units.
+/// - `half_h` — `f32`. Half-height (box) in world units; equal to `half_w` for circles.
+/// - `angle` — `f32`. Body rotation in radians.
+/// - `is_static` — `bool`. True when the collider belongs to a static body.
+/// - `is_sleeping` — `bool`. True when the body is sleeping.
+/// - `is_sensor` — `bool`. True when the collider is a sensor (trigger volume).
+/// - `hull_verts` — `Vec<[f32; 2]>`. Convex hull vertices in body-local space (empty for box/circle).
+/// - `is_circle` — `bool`. True when the shape is a circle (use `half_w` as radius).
+#[derive(Clone, Debug)]
+pub struct PhysicsDebugShape {
+    /// AABB centre or circle/capsule origin in world space.
+    pub x: f32,
+    /// AABB centre or circle/capsule origin in world space.
+    pub y: f32,
+    /// Half-width (box) or radius (circle) in world units.
+    pub half_w: f32,
+    /// Half-height (box) in world units; equal to `half_w` for circles.
+    pub half_h: f32,
+    /// Body rotation in radians.
+    pub angle: f32,
+    /// True when the collider belongs to a static body.
+    pub is_static: bool,
+    /// True when the body is sleeping.
+    pub is_sleeping: bool,
+    /// True when the collider is a sensor (trigger volume).
+    pub is_sensor: bool,
+    /// Convex hull vertices in body-local space (empty for box/circle).
+    ///
+    /// When non-empty the renderer draws this polygon instead of a rectangle or circle.
+    pub hull_verts: Vec<[f32; 2]>,
+    /// True when the shape is a circle (use `half_w` as radius).
+    pub is_circle: bool,
+}
+
+/// Appearance parameters for `RenderCommand::DrawPhysicsDebug`.
+///
+/// # Fields
+/// - `body_color` — `[f32; 4]`. Colour for dynamic bodies.
+/// - `static_color` — `[f32; 4]`. Colour for static bodies.
+/// - `sleep_color` — `[f32; 4]`. Colour for sleeping bodies.
+/// - `sensor_color` — `[f32; 4]`. Colour for sensor colliders.
+/// - `line_width` — `f32`. Stroke width in screen pixels.
+#[derive(Clone, Debug)]
+pub struct PhysicsDebugConfig {
+    /// Colour for dynamic bodies `[r, g, b, a]`.
+    pub body_color: [f32; 4],
+    /// Colour for static bodies `[r, g, b, a]`.
+    pub static_color: [f32; 4],
+    /// Colour for sleeping bodies `[r, g, b, a]`.
+    pub sleep_color: [f32; 4],
+    /// Colour for sensor colliders `[r, g, b, a]`.
+    pub sensor_color: [f32; 4],
+    /// Stroke width in screen pixels.
+    pub line_width: f32,
+}
+
+impl Default for PhysicsDebugConfig {
+    fn default() -> Self {
+        Self {
+            body_color:   [0.0, 1.0, 0.0, 0.8],
+            static_color: [0.8, 0.8, 0.8, 0.8],
+            sleep_color:  [0.2, 0.6, 1.0, 0.6],
+            sensor_color: [1.0, 0.8, 0.0, 0.6],
+            line_width:   1.0,
+        }
+    }
+}
+
+/// One textured slot from a Spine skeleton for GPU rendering.
+///
+/// Produced by the spine CPU module and consumed by `RenderCommand::DrawSpineSkeleton`.
+/// Keeps the renderer free of a spine-crate import.
+///
+/// # Fields
+/// - `texture_key` — `TextureKey`. Texture atlas key for this slot's attachment.
+/// - `corners` — `[Vec2; 4]`. Four screen-space corner positions: top-left, top-right, bottom-right, bottom-left.
+/// - `uvs` — `[Vec2; 4]`. Normalised UV coordinates in the same winding order as `corners`.
+/// - `color` — `[f32; 4]`. RGBA tint for this slot.
+/// - `blend_mode` — `BlendMode`. Blend mode for this slot.
+#[derive(Clone, Debug)]
+pub struct SpineSlotDraw {
+    /// Texture atlas key for this slot's attachment.
+    pub texture_key: TextureKey,
+    /// Four screen-space corner positions: top-left, top-right, bottom-right, bottom-left.
+    pub corners: [Vec2; 4],
+    /// Normalised UV coordinates in the same winding order as `corners`.
+    pub uvs: [Vec2; 4],
+    /// RGBA tint for this slot `[r, g, b, a]`.
+    pub color: [f32; 4],
+    /// Blend mode for this slot.
+    pub blend_mode: BlendMode,
 }

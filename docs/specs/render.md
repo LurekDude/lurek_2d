@@ -294,6 +294,59 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `SpriteBatch:typeOf`: Returns the type name of this object.
 - `SpriteBatch:type`: Returns the type name of this object.
 
+### New Draw Commands (v0.7.26)
+
+The following `lurek.graphic.*` functions queue GPU draw commands added in v0.7.26.
+All functions are registered in `src/lua_api/render_api.rs` and processed in `src/render/gpu_renderer.rs`.
+
+#### Bézier Curves
+
+| Function | Description |
+|---|---|
+| `lurek.graphic.drawQuadBezier(x0,y0, cx,cy, x1,y1, color, lw?)` | Quadratic Bézier curve. `color={r,g,b,a}`, `lw` line width (default 1.0). |
+| `lurek.graphic.drawCubicBezier(x0,y0, cx1,cy1, cx2,cy2, x1,y1, color, lw?)` | Cubic Bézier curve with two control points. |
+
+#### Paths
+
+| Function | Description |
+|---|---|
+| `lurek.graphic.drawPath(verts, color, closed?, lw?)` | Polyline/polygon path. `verts` is a flat array `{x1,y1,x2,y2,...}`. `closed` (bool, default false) connects last point to first. |
+
+#### Filled Geometry
+
+| Function | Description |
+|---|---|
+| `lurek.graphic.drawGradientRect(x,y,w,h, c_tl,c_tr,c_br,c_bl)` | Rectangle with per-corner colours. Each colour is `{r,g,b,a}`. |
+| `lurek.graphic.drawColoredPolygon(verts)` | Polygon where each vertex is `{x,y,r,g,b,a}`. |
+| `lurek.graphic.drawIsoCubeTile(x,y, size, top, left, right)` | Isometric cube tile centred at screen position `(x,y)`. Three face colours. |
+| `lurek.graphic.drawHexTile(cx,cy, radius, orient, fill, border?, bw?)` | Hex tile. `orient` is `"flat"` or `"pointy"`. Optional border colour and width. |
+| `lurek.graphic.drawBevelRect(x,y,w,h, bw?, opts?)` | Bevelled rectangle. `opts` table: `fillColor`, `highlight`, `shadow` — each `{r,g,b,a}`. |
+
+#### Depth Sorting
+
+| Function | Description |
+|---|---|
+| `lurek.graphic.beginSortGroup(id)` | Opens a sort group. Id is any integer token. |
+| `lurek.graphic.pushSortKey(depth)` | Tags the next draw call's Z-depth within the active sort group. |
+| `lurek.graphic.flushSortGroup(id)` | Closes and emits the sort group (matched by id). |
+
+#### Compositing Layers
+
+| Function | Description |
+|---|---|
+| `lurek.graphic.pushLayer(blend?, alpha?)` | Pushes a new compositing layer. `blend` is a blend mode string (e.g. `"add"`). `alpha` (default 1.0). |
+| `lurek.graphic.popLayer()` | Pops and composites the current layer. |
+
+#### Support Types (renderer.rs)
+
+- `PathSegment` — `{ x, y, is_move }` — vertex in a draw path.
+- `GradientDirection` — `Horizontal | Vertical | TopLeft | TopRight`.
+- `HexOrientation` — `FlatTop | PointyTop`.
+- `BevelStyle` — `Raised | Sunken | Flat`.
+- `PhysicsDebugShape` — per-body snapshot: position, extents, angle, flags, hull verts.
+- `PhysicsDebugConfig` — appearance config: per-state colours and line width.
+- `SpineSlotDraw` — per-slot Spine rendering data: texture key, UV rect, tint.
+
 ## References
 
 - `light`: Imports or references `light` from `src/light/`.

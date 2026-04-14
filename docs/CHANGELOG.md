@@ -2,6 +2,72 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.7.26] — 2026-05-23
+### Added
+- **15 new `RenderCommand` variants** — `DrawQuadBezier`, `DrawCubicBezier`, `DrawPath`, `DrawGradientRect`, `DrawColoredPolygon`, `DrawIsoCubeTile`, `DrawHexTile`, `BeginSortGroup`, `PushSortKey`, `FlushSortGroup`, `DrawPhysicsDebug`, `DrawSpineSkeleton`, `DrawBevelRect`, `PushLayer`, `PopLayer` added to `src/render/renderer.rs` with 7 new support types: `PathSegment`, `GradientDirection`, `HexOrientation`, `BevelStyle`, `PhysicsDebugShape`, `PhysicsDebugConfig`, `SpineSlotDraw`.
+- **GPU renderer match arms** — `GpuRenderer::render_frame` in `src/render/gpu_renderer.rs` processes all 15 new variants. Bezier/path commands tessellate geometry on the CPU into `ColorVertex` batches; gradient rects use per-corner color vertices; iso cube tiles and hex tiles expand into polygon draws; physics debug iterates `PhysicsDebugShape` entries per shape type.
+- **`lurek.graphic.*` Lua bindings** — 13 new functions registered in `src/lua_api/render_api.rs`: `drawQuadBezier`, `drawCubicBezier`, `drawPath`, `drawGradientRect`, `drawColoredPolygon`, `drawIsoCubeTile`, `drawHexTile`, `beginSortGroup`, `pushSortKey`, `flushSortGroup`, `drawBevelRect`, `pushLayer`, `popLayer`.
+- **`lurek.raycaster` extended factory API** — Three new `UserData` types and factory functions: `lurek.raycaster.newDoorManager()` → `DoorManager`; `lurek.raycaster.newHeightMap(w, h)` → `HeightMap`; `lurek.raycaster.newPointLight(x, y, r, g, b, radius, intensity)` → `PointLight`. Adds `DoorManager` methods: `addDoor`, `openDoor`, `closeDoor`, `update`, `getDoor`, `count`. `HeightMap` methods: `setFloor`, `setCeiling`, `floorAt`, `ceilingAt`. `PointLight` methods: `x`, `y`, `radius`, `intensity`, `color`, `set`.
+- **`PhysicsShapeSnapshot`** — New geometry-snapshot struct in `src/physics/world.rs`, exported via `src/physics/mod.rs`. `World::extract_shape_snapshots()` iterates all bodies and returns `Vec<PhysicsShapeSnapshot>` with no `crate::render` dependency, allowing the Lua API layer to convert without creating a cross-module circular dependency.
+- **`lurek.physics.drawDebugGpu`** — New Lua function in `src/lua_api/physics_api.rs` that extracts body shapes and pushes `RenderCommand::DrawPhysicsDebug` for GPU-accelerated physics debug visualisation. Accepts an optional config table to override `bodyColor`, `staticColor`, `sleepColor`, `sensorColor`, and `lineWidth`.
+- **Evidence tests** — Three new evidence test files: `tests/lua/evidence/test_evidence_raycaster_ext.lua` (8 tests: DoorManager, HeightMap, PointLight); `tests/lua/evidence/test_evidence_physics_debug_gpu.lua` (6 tests); `tests/lua/evidence/test_evidence_graphic_draw_cmds.lua` (18 tests for all new Lua graphic functions). Registered in `tests/lua/harness.rs`.
+
+## [0.7.25] — 2026-05-22
+### Added
+- **Particle system — 5 new shapes** — `Shrapnel { edges: u8 }`, `Ray { aspect: f32 }`, `Puff`, `Ring { thickness: f32 }`, `Capsule` added to `ParticleShape` (domain) and `ParticleRenderShape` (render). All shapes are fully tessellated in the GPU renderer via the `DrawParticleSystem` batch command.
+- **Particle system — GPU batch rendering** — `RenderCommand::DrawParticleSystem` is now fully implemented in `GpuRenderer::render_frame`. Untextured particles are tessellated in one `append_color_draw` call (reducing per-particle draw overhead). `particle_api.rs render()` forwards untextured particles as a `DrawParticleSystem` batch and continues to expand textured particles individually.
+- **Particle system — Attractors** — `Attractor { x, y, strength, radius }` struct added to `src/particle/config.rs`. `ParticleSystem` gains `attractors: Vec<Attractor>` and three methods: `add_attractor(x, y, strength, radius)`, `clear_attractors()`, `attractor_count()`. New Lua methods: `addAttractor`, `clearAttractors`, `getAttractorCount`.
+- **Particle system — Bounce bounds** — `BounceBounds { x_min, x_max, y_min, y_max, restitution }` struct added to `config.rs`. `ParticleSystem` gains `bounce_bounds: Option<BounceBounds>` with `set_bounds(xmin, xmax, ymin, ymax, restitution)` and `clear_bounds()`. New Lua methods: `setBounds`, `clearBounds`.
+- **Particle system — warm_up** — `ParticleSystem::warm_up(seconds: f32)` pre-simulates the system; clamped to 30 s. Exposed as `lurek.particles:warmUp(seconds)`.
+- **Particle system — Sub-emitter death spawning** — `ParticleConfig` gains `death_emitter: Option<Box<ParticleConfig>>` and `death_burst_count: u32`. When particles die, their positions spawn sub-systems. `deathBurstCount` accepted in `lurek.particles.newSystem({})`.
+- **Particle shape config keys** — `shrapnelEdges`, `rayAspect`, `ringThickness` accepted in `lurek.particles.newSystem({})` opts table. Shape strings `"shrapnel"`, `"ray"`, `"puff"`, `"ring"`, `"capsule"` added to `setShape` / `getShape` / `newSystem` config.
+- **`toImage` method alias** — `ParticleSystem:toImage(w, h)` is a convenience alias for `drawToImage`.
+- **Particle system — per-particle shape seed** — `Particle` struct gains `shape_seed: u32` assigned at spawn, used by `Shrapnel` tessellation for deterministic polygon geometry.
+- **Tests** — New describe blocks in `tests/lua/unit/test_particle.lua` for: new shapes, warmUp, attractors, bounce bounds. New evidence tests in `tests/lua/evidence/test_evidence_particle.lua`: shape composite PNG, attractor PNG.
+
+
+### Added
+- **Scene Phase A — DepthSorter performance** — `DepthSorter` gains a **dirty flag** (sort skipped entirely when no entries added since last flush), a **stable mode** (`set_stable(true)` preserves insertion order for equal depths), a **radix sort path** (O(n) via two-pass LSD on integer depths for 256+ entries), and a **parallel sort path** (rayon `par_sort_unstable_by` for 10 000+ entries). New Lua methods: `setStable`, `isStable`. Added `rayon = "1"` to `[dependencies]`.
+- **Scene Phase B — EasingType and new TransitionType variants** — New `EasingType` enum with six curves: `Linear`, `EaseIn`, `EaseOut`, `EaseInOut`, `Bounce`, `Back`. New `TransitionType` variants: `Wipe`, `Iris`, `Zoom`, `CrossFade`. `ActiveTransition` gains `easing` field (defaults to `Linear`), `new_with_easing()` constructor, `progress_eased()`, `set_easing()`, `get_easing()` methods. Lua `push`, `pop`, `switchTo` now accept an optional fourth `easing` string parameter (e.g. `"ease_in"`). New Lua function: `getTransitionProgressEased()`.
+- **Scene Phase C — Overlay mode** — `SceneStack` gains `overlay_ids: HashSet<SceneId>`, `push_overlay()`, `is_overlay()`, `get_active_ids()`, and `get_transition_progress_eased()`. `process`, `processPhysics`, and `processLate` Lua callbacks now iterate ALL active scenes when at least one overlay is present. New Lua functions: `pushOverlay`, `isOverlay`, `getActiveScenes`.
+- **Scene Phase D — Async scene preloading** — New Lua functions: `preload(name, fn)` registers a loader for a named scene; `isPreloaded(name)` checks whether the scene has been loaded; `pushPreloaded(name, transition?, duration?, easing?, params?)` invokes the loader on first use and then pushes the registered scene. `SceneState` gains `preload_callbacks: HashMap<String, LuaRegistryKey>` and `preloaded_names: HashSet<String>`.
+- **Tests** — New `[[test]] name = "scene_tests"` in `Cargo.toml`; `tests/rust/unit/scene_tests.rs` (26 integration tests for DepthSorter, EasingType, TransitionType, ActiveTransition, SceneStack overlay). Added overlay, easing, preload, and DepthSorter `describe` blocks to `tests/lua/unit/test_scene.lua`. New evidence suite `tests/lua/evidence/test_evidence_scene.lua` with `lua_evidence_scene` harness entry.
+
+### Added
+- **SpinBox widget** — New `lurek.ui.newSpinBox(min, max)` factory; domain struct in `src/ui/controls.rs` with `set_value`, `increment`, `decrement`, `set_range`, `set_step`; Lua methods `getValue`, `setValue`, `increment`, `decrement`, `setRange`, `setStep`.
+- **Switch widget** — New `lurek.ui.newSwitch(on?)` factory; domain struct in `src/ui/controls.rs` with `toggle`, `set_on`; Lua methods `isOn`, `setOn`, `toggle`. Mouse-click in `GuiContext::mouse_pressed` emits `GuiEvent::Change`.
+- **Badge widget** — New `lurek.ui.newBadge(count?)` factory; domain struct in `src/ui/extras.rs` with `display_text` (returns `"99+"` format), `set_count`; Lua methods `getCount`, `setCount`, `getDisplayText`.
+- **WidgetStyle shadow, highlight, gradient** — Added five new fields to `WidgetStyle`: `shadow_color`, `shadow_offset`, `highlight_alpha`, `gradient_end`, `text_align`. All default to zero/None.
+- **Theme::default_dark()** — Pre-styled dark theme with 14 widget-type entries (Button, Label, TextInput, CheckBox, RadioButton, Slider, ProgressBar, ComboBox, ListBox, TabBar, Panel, SpinBox, Switch, Badge). Exposed as `lurek.ui.setDefaultTheme()`.
+- **WidgetBase 16px-grid sizes** — `WidgetType::default_size()` now returns per-type sizes on a 16px grid; `WidgetBase::new()` uses these sizes instead of the former 100×30 hardcode.
+- **WidgetType parse helpers** — Added `WidgetType::parse_str(s)` mapping all 34 lowercase variant names, and `WidgetType::default_size()` providing per-type (w, h) pairs.
+- **Dirty flag and viewport on GuiContext** — `GuiContext` now carries `dirty: bool`, `viewport_w: f32`, `viewport_h: f32`; new methods `set_viewport`, `flush_cache`, `set_default_theme` exposed as `lurek.ui.setViewport`, `lurek.ui.flushCache`, `lurek.ui.setDefaultTheme`.
+- **Specialised render emit functions** — `src/ui/render.rs` gains `emit_shadow`, `emit_highlight`, `emit_slider`, `emit_progress_bar`, `emit_checkbox`, `emit_radio_button`, `emit_combo_box_arrow`, `emit_scroll_bar`, `emit_spin_box`, `emit_switch`, `emit_badge`; `render_widget` now dispatches per `WidgetKind` variant.
+- **Rust unit tests** — New `tests/rust/unit/gui_tests.rs` (36 tests) registered as `[[test]] name = "gui_tests"` in `Cargo.toml`.
+- **Lua BDD tests** — `tests/lua/unit/test_gui.lua` extended with SpinBox, Switch, Badge, and helper describe-blocks (172 new lines, 32 new cases).
+
+## [0.7.22] — 2026-05-16
+### Added
+- **Physics extension APIs** — New `lurek.physics` capabilities on `World` and `Body` userdata:
+  - **Breakable joints** — `world:setJointBreakForce(jid, force)` / `world:getJointBreakForce(jid)`: joints exceeding the relative-velocity threshold are automatically destroyed each step.
+  - **One-way platforms** — `world:setBodyOneWay(id, nx, ny)` / `world:clearBodyOneWay(id)` / `world:getBodyOneWay(id)`: post-step velocity correction lets bodies pass through from the specified direction.
+  - **Body sleeping** — `world:isBodySleeping(id)`, `world:wakeUpBody(id)`, `world:sleepBody(id)` (and `body:isSleeping()`, `body:wakeUp()`, `body:sleep()` on the Body userdata).
+  - **Continuous Collision Detection** — `world:setBodyCCD(id, enabled)` / `world:getBodyCCD(id)` (backed by existing `set_bullet` / `is_bullet`).
+  - **Contact callbacks** — `world:setBeginContact(fn)`, `world:clearBeginContact()`, `world:setEndContact(fn)`, `world:clearEndContact()`: fired with `(bodyIdA, bodyIdB)` after each `step`.
+  - **Solver iterations** — `world:setSolverIterations(n)` / `world:getSolverIterations()`.
+  - **Batch body creation** — `world:newBodies(specs)` creates multiple bodies in a single call.
+- **Rust domain methods** — Added `set_body_one_way`, `clear_body_one_way`, `get_body_one_way`, `set_joint_break_force`, `get_joint_break_force`, `is_body_sleeping`, `wake_up_body`, `sleep_body`, `set_solver_iterations`, `get_solver_iterations`, `add_bodies` to `src/physics/world.rs`.
+- **Physics tests** — Added `tests/lua/unit/test_physics_ext.lua`, `tests/lua/evidence/test_evidence_physics_ext.lua`, `tests/lua/integration/test_physics_platformer.lua` with corresponding `#[test]` entries in `tests/lua/harness.rs`.
+- **rapier2d parallel feature** — Enabled `features = ["parallel"]` on `rapier2d = "0.32"` in `Cargo.toml`.
+
+## [0.7.21] — 2026-05-15
+### Fixed
+- **Test harness correctness** — Fixed three critical bugs in `tests/lua/harness.rs`: added `#[ignore]` to `lua_test_examples` (phantom file panicking on every run); removed erroneous `tests/lua/` path prefix from two evidence/golden entries; renamed four functions from the banned `lua_test_*` scheme to the canonical `lua_evidence_*` / `lua_golden_*` scheme.
+- **Harness registrations** — Added seven previously unregistered `#[test]` entries: `lua_security_fuzz_boundary`, `lua_evidence_geometry`, `lua_evidence_gui`, `lua_evidence_migrated_15`, `lua_evidence_migrated_20`, `lua_golden_migrated_15`, `lua_golden_migrated_20`.
+- **assert() anti-pattern** — Replaced 58 raw Lua `assert()` calls across six unit test files and one integration test with typed `expect_*` framework helpers (`expect_true`, `expect_false`, `expect_nil`, `expect_not_nil`, `expect_greater`, `expect_less`, `expect_in_range`); tautological `assert(x ~= nil or x == nil)` in `test_audio.lua` also corrected.
+- **@covers marker ownership** — Moved bulk `@covers` lists off `describe()` containers and onto the `it()` blocks they belong to in `tests/lua/unit/test_math.lua` and `tests/lua/unit/test_physics.lua`.
+- **Rust test naming** — Removed the banned `test_` prefix from all function names in `tests/rust/ext/math_ext_tests.rs` and `tests/rust/ext/graphics_ext_tests.rs`.
+
 ## [0.7.20] — 2026-05-14
 ### Changed
 - **Lua test docstring ownership** — Enforced repository-wide that Lua test file headers stay short prose-only, `describe()` blocks carry only `@description`, and ownership markers such as `@covers`, `@evidence`, and `@golden` belong on `it()` blocks; `tools/audit/lua_test_structure_audit.py` now checks this by default, with `--allow-legacy-describe-markers` available only as a temporary escape hatch.
@@ -73,10 +139,10 @@ All notable changes to Lurek2D are recorded here.
 MAJOR.MINOR.PATCH
 ```
 
-| Segment | Increment when… |
-|---|---|
-| **MAJOR** | Breaking API changes — Lua scripts or engine configuration must be ported |
-| **MINOR** | New backwards-compatible features — new `lurek.*` APIs, new modules, new default configs |
+| Segment   | Increment when…                                                                                    |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| **MAJOR** | Breaking API changes — Lua scripts or engine configuration must be ported                          |
+| **MINOR** | New backwards-compatible features — new `lurek.*` APIs, new modules, new default configs           |
 | **PATCH** | Bug fixes, internal refactors, documentation and tooling changes that do not affect the public API |
 
 Always update this file **in the same commit** as the change. Use the commit type as the section label.

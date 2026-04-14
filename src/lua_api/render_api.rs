@@ -15,6 +15,7 @@ use crate::render::{
     BlendMode, Canvas, CompareMode, DepthMode, DrawMode, Font, Mesh, MeshDrawMode, MeshVertex,
     RenderCommand, Shader, StencilAction, StencilMode, TextAlign, UniformValue,
 };
+use crate::render::renderer::{BevelStyle, GradientDirection, HexOrientation, PathSegment};
 use crate::runtime::resource_keys::*;
 use crate::runtime::ScreenshotRequest;
 use crate::sprite::SpriteBatch;
@@ -771,11 +772,27 @@ fn lua_value_to_uniform(v: &LuaValue) -> LuaResult<UniformValue> {
 }
 
 /// Parses a mode string into DrawMode.
-fn parse_draw_mode(mode: &str) -> DrawMode {
-    if mode == "fill" {
-        DrawMode::Fill
-    } else {
-        DrawMode::Line
+fn parse_draw_mode(mode: &str) -> Result<DrawMode, LuaError> {
+    match mode {
+        "fill" => Ok(DrawMode::Fill),
+        "line" => Ok(DrawMode::Line),
+        other => Err(LuaError::RuntimeError(format!(
+            "unknown draw mode: '{other}'"
+        ))),
+    }
+}
+
+/// Parses a blend mode string into BlendMode.
+fn parse_blend_mode(s: &str) -> Result<BlendMode, LuaError> {
+    match s {
+        "alpha" => Ok(BlendMode::Alpha),
+        "add" | "additive" => Ok(BlendMode::Add),
+        "multiply" => Ok(BlendMode::Multiply),
+        "replace" | "none" => Ok(BlendMode::Replace),
+        "screen" => Ok(BlendMode::Screen),
+        other => Err(LuaError::RuntimeError(format!(
+            "unknown blend mode: '{other}'"
+        ))),
     }
 }
 
@@ -1315,7 +1332,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Option<f32>,
                 Option<f32>,
             )| {
-                let dm = parse_draw_mode(&mode);
+                let dm = parse_draw_mode(&mode)?;
                 match rx {
                     Some(rx_val) => {
                         let ry_val = ry.unwrap_or(rx_val);
@@ -1359,7 +1376,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         "circle",
         lua.create_function(move |_, (mode, x, y, radius): (String, f32, f32, f32)| {
             s.borrow_mut().render_commands.push(RenderCommand::Circle {
-                mode: parse_draw_mode(&mode),
+                mode: parse_draw_mode(&mode)?,
                 x,
                 y,
                 r: radius,
@@ -1381,7 +1398,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(
             move |_, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
                 s.borrow_mut().render_commands.push(RenderCommand::Ellipse {
-                    mode: parse_draw_mode(&mode),
+                    mode: parse_draw_mode(&mode)?,
                     x,
                     y,
                     rx,
@@ -1410,7 +1427,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 s.borrow_mut()
                     .render_commands
                     .push(RenderCommand::Triangle {
-                        mode: parse_draw_mode(&mode),
+                        mode: parse_draw_mode(&mode)?
                         x1,
                         y1,
                         x2,
@@ -1484,7 +1501,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 }
             }
             s.borrow_mut().render_commands.push(RenderCommand::Polygon {
-                mode: parse_draw_mode(&mode_str),
+                mode: parse_draw_mode(&mode_str)?,
                 vertices,
             });
             Ok(())
@@ -1516,7 +1533,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Option<u32>,
             )| {
                 s.borrow_mut().render_commands.push(RenderCommand::Arc {
-                    mode: parse_draw_mode(&mode),
+                    mode: parse_draw_mode(&mode)?,
                     x,
                     y,
                     radius,
