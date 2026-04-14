@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `parallax` module provides CPU-side scrolling background layers for side views, overhead views, and atmospheric scene dressing. It computes how a textured layer should move relative to camera motion, optional autoscroll, tiling, opacity, tint, and blend mode.
+The `parallax` module implements multi-layer scrolling backgrounds with camera-relative scroll factors, autoscroll, tiling, blend modes, z-ordering, and optional clamp boxes. It is a Feature Systems tier module that depends on the render command types and SharedState for camera position.
 
-It exists to keep background-layer math and batching separate from the renderer and from game scripts. Scripts decide which layers exist and when to draw them, while the module turns layer state into concrete draw batches or render commands.
+The central type is `ParallaxLayer`, which stores all visual and scroll parameters for one scrolling background layer: a `TextureKey` for the source image; `scroll_factor (vx, vy)` in the range [0.0, 1.0] relative to camera speed (0 = pinned to screen, 1 = moves fully with camera); `autoscroll_velocity` for time-driven translation independent of camera; `manual_offset` for game-controlled additional displacement; scale, tint color, opacity, `BlendMode`, Z-order, `repeat_x`/`repeat_y` (whether to tile), and an optional `(min_x, min_y, max_x, max_y)` clamp box.
 
-It intentionally does not own texture loading, GPU resources, or camera state itself. Those concerns remain in shared runtime state and in the render pipeline; `parallax` just interprets them to produce scroll-aware draw data.
+The scroll formula applied each frame is: `pixel_offset = camera_pos * scroll_factor + manual_offset + autoscroll_accumulation`. For repeating layers, the tile start position wraps: `start_x = -(pixel_offset_x % texture_width)`. `update(dt)` advances the autoscroll accumulator.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`ParallaxDrawBatch` is the output of `build_draw_calls(cam_x, cam_y)` — a list of tile positions and UV rectangles consumed by the Lua bridge to emit `RenderCommand::DrawImage` entries. `ParallaxSet` groups multiple layers under a shared name for coordinated `update()` and `drawAuto()` calls that read camera position from `SharedState`.
+
+**Scope boundary**: Feature Systems tier. Depends on `render` (command types and BlendMode), `runtime` (SharedState, TextureKey). Lua bridge in `src/lua_api/parallax_api.rs`.
 
 ## Files
 

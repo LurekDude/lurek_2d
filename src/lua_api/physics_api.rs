@@ -2241,6 +2241,11 @@ impl From<crate::physics::PhysicsShapeSnapshot>
 
 /// Registers the `lurek.physics` API namespace.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

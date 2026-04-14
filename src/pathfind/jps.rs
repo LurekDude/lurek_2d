@@ -7,6 +7,10 @@ use std::collections::{BinaryHeap, HashMap};
 use std::cmp::Ordering;
 
 /// A uniform-cost grid optimised for JPS pathfinding.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
 pub struct JpsGrid {
     /// Grid width.
     pub width: u32,
@@ -17,12 +21,24 @@ pub struct JpsGrid {
 
 impl JpsGrid {
     /// Create a new JPS grid. All cells start passable.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(width: u32, height: u32) -> Self {
         let n = (width * height) as usize;
         Self { width, height, blocked: vec![false; n] }
     }
 
     /// Mark or unmark a cell as blocked.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `blocked` — `bool`.
     pub fn set_blocked(&mut self, x: u32, y: u32, blocked: bool) {
         if let Some(i) = self.idx(x, y) {
             self.blocked[i] = blocked;
@@ -30,11 +46,25 @@ impl JpsGrid {
     }
 
     /// Returns `true` if the cell is blocked or out of bounds.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_blocked(&self, x: u32, y: u32) -> bool {
         self.idx(x, y).map_or(true, |i| self.blocked[i])
     }
 
     /// Find a path using Jump Point Search.
+    ///
+    /// # Parameters
+    /// - `from` — `(u32, u32)`.
+    /// - `to` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
     ///
     /// Returns `None` if no path exists. The returned path is the jump-point
     /// skeleton; callers may walk the individual cells between jump points if needed.

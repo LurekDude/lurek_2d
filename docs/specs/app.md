@@ -11,13 +11,15 @@
 
 ## Summary
 
-The app module is the engine composition root. It exists to turn configuration, platform services, shared runtime state, and the Lua VM into a running desktop application with a winit event loop, GPU renderer, input processing, and frame lifecycle callbacks.
+The `app` module is Lurek2D's application entry-point and engine lifecycle orchestrator. It sits at the Edge/Integration tier — the topmost layer of the engine dependency graph — and owns the winit 0.30 event loop, the wgpu surface and device, the Lua VM instance, and the main frame pacing loop.
 
-This is where engine startup policy lives: window creation, renderer initialization, splash behavior when no game is loaded, SharedState ownership, frame pacing, restart or error-screen transitions, and routing of OS events into engine systems. If a change affects the overall boot sequence or the order in which runtime systems come alive, it usually lands here.
+`App::run()` is where everything starts: it creates the OS window via winit, initialises the wgpu renderer, constructs `SharedState`, creates the Lua VM via `lua_api::create_lua_vm()`, and then enters the winit event loop. Each frame the loop dispatches OS events into `SharedState::event_queue`, calls the Lua `lurek.process(dt)` / `lurek.render()` / `lurek.render_ui()` callbacks, then calls `GpuRenderer::render_frame()` to process the accumulated `RenderCommand` queue.
 
-The module intentionally does not own the underlying domain logic for rendering, input, audio, physics, or Lua bindings. It wires those systems together and drives them at runtime, but their actual behavior lives in their own modules. App is orchestration, not a place for subsystem-specific business logic.
+Special startup modes are handled here: if no valid `conf.toml` is found, the engine enters a splash/error mode rendered by `error_screen.rs`; `debug_overlay.rs` provides the lightweight in-engine FPS and draw-call counter overlay that is independent of the full `devtools` system. Gamepad discovery and hot-plug events are routed through the gilrs library and injected into `SharedState::gamepad_states`. File drag-and-drop events and screenshot requests are also handled at this layer.
 
-**Scope boundary**: This module currently depends on `event`, `image`, `input`, `light`, `lua_api`, `math`, `render`, `runtime`, and other adjacent modules. It stays within the Edge/Integration responsibility boundary defined in the architecture docs.
+Because `App` imports from virtually every other module (render, audio, input, lua_api, filesystem, etc.) it is deliberately kept thin — orchestration only, no domain logic. All subsystem behaviour lives in their own modules; `App` just wires them up and drives the frame cycle.
+
+**Scope boundary**: Edge/Integration tier. Imports from all other module groups. Nothing in the engine imports from `app`.
 
 ## Files
 

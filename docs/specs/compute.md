@@ -11,17 +11,19 @@
 
 ## Summary
 
-The `compute` module owns dense numeric array processing for Lurek2D. It provides a CPU-side `NdArray` container plus array math, reductions, comparisons, and 2D spatial operations that are expensive or awkward to express efficiently in plain Lua.
+The `compute` module provides Lurek2D's dense N-dimensional numerical array library, exposed to Lua scripts as `lurek.gpu.*`. Despite the `gpu` Lua namespace, all computation in this module runs on the CPU — the name reflects its intended use for matrix operations, signal processing, and numerical workloads that would otherwise require GPU compute shaders.
 
-This module exists so game scripts can work with structured numeric grids, vectors, and matrices without depending on renderer resources or external scientific-computing crates. Its design is intentionally simple: contiguous row-major storage, a small fixed dtype set, and operations that return new arrays unless an explicitly mutating method is being used.
+The core type is `NdArray`, a row-major array supporting 1D, 2D, and 3D shapes with three element types: `f32`, `f64`, and `i32` (discriminated by the `DataType` enum). Construction: `new(shape, dtype)`, `zeros`, `ones`, `from_flat_data`. Access: `get(indices)`, `set(indices, value)`, `slice(ranges)`. Shape inspection: `shape()`, `ndim()`, `numel()`, `reshape(new_shape)`.
 
-`compute` intentionally does not own GPU dispatch, general tensor features, broadcasting semantics, or named-column analytics. It is a raw numeric array module; for heterogeneous tabular records use `src/dataframe/`, and for binary serialization or byte transport use `src/data/`.
+The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, divide, modulo) and reductions (sum, mean, min, max, argmin, argmax) over full arrays or individual axes. The `spatial` submodule adds 2D convolution, max/average pooling, and distance transforms. The `linalg` submodule provides linear algebra: dot product, matrix multiply, Gaussian elimination solvers, Sobel edge detection kernels, and outer products. The `analytics` submodule covers signal processing (FFT, autocorrelation, moving average), normalization (L1/L2/min-max), and statistical functions (variance, standard deviation, histogram).
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+**Scope boundary**: Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/compute_api.rs`.
 
 ## Files
 
+- `analytics.rs`: Statistical analytics, signal processing, and normalisation for NdArray.
 - `array.rs`: Defines `NdArray`, `DataType`, shape validation, contiguous storage rules, typed element access, and array construction helpers.
+- `linalg.rs`: Linear algebra extensions for NdArray.
 - `mod.rs`: Declares the compute submodules and re-exports the core ndarray surface.
 - `ops.rs`: Implements the bulk of ndarray behavior, including arithmetic, scalar ops, comparisons, masks, reductions, reshaping, transposition, and Int32-only bitwise operations.
 - `spatial.rs`: Adds higher-level 2D spatial and linear algebra helpers such as convolution, morphology, flood fill, region copy, matrix multiply, and vector dot product.
@@ -33,6 +35,16 @@ This module exists so game scripts can work with structured numeric grids, vecto
 
 ## Functions
 
+- `cumsum` (`analytics.rs`): Cumulative sum along a 1D array (or flattened elements if axis is None).
+- `diff` (`analytics.rs`): Discrete difference: `out[i] = a[i+1] - a[i]` (order `n = 1`, 1D or flat).
+- `histogram` (`analytics.rs`): Compute a histogram with `bins` equal-width bins.
+- `percentile` (`analytics.rs`): Compute the `p`-th percentile (0–100) of all elements.
+- `covariance` (`analytics.rs`): Population covariance of two 1D (or flat) arrays of equal size.
+- `pearson_corr` (`analytics.rs`): Pearson correlation coefficient of two 1D (or flat) arrays.
+- `normalize_range` (`analytics.rs`): Linearly rescale all elements to [out_min, out_max].
+- `zscore` (`analytics.rs`): Standardise all elements to zero mean and unit variance (z-score).
+- `convolve1d` (`analytics.rs`): 1D convolution of `signal` with `kernel` (full output length).
+- `correlate1d` (`analytics.rs`): 1D cross-correlation: slide `template` over `signal` (valid output).
 - `DataType::parse` (`array.rs`): Parse a dtype from a string name (`"float32"`, `"float64"`, `"int32"`).
 - `DataType::byte_size` (`array.rs`): Number of bytes per element for this dtype.
 - `DataType::name` (`array.rs`): Human-readable name for this dtype.
@@ -59,6 +71,15 @@ This module exists so game scripts can work with structured numeric grids, vecto
 - `NdArray::set_by_indices` (`array.rs`): Write a value by multi-dimensional indices (0-based), combining flat_index + set_f64.
 - `NdArray::to_f64_vec` (`array.rs`): Return all elements as a `Vec<f64>`.
 - `NdArray::display_string` (`array.rs`): Return a human-readable summary string for debugging.
+- `normalize_vec` (`linalg.rs`): L2-normalise a 1D vector.
+- `cross2d` (`linalg.rs`): 2D cross product (returns signed scalar area of the parallelogram).
+- `outer` (`linalg.rs`): Outer product of two 1D vectors: result shape is [m, n].
+- `rotate2d_matrix` (`linalg.rs`): Build a 2×2 rotation matrix for `angle_rad` radians.
+- `affine2d` (`linalg.rs`): Build a 3×3 homogeneous affine matrix combining translation, rotation, and scale.
+- `transform_points` (`linalg.rs`): Apply a 2×2 or 3×3 (homogeneous) matrix to a list of 2D points.
+- `gaussian_kernel` (`linalg.rs`): Generate a `size × size` Gaussian kernel with the given `sigma`.
+- `sobel` (`linalg.rs`): Apply Sobel edge detection to a 2D Float32/Float64 array.
+- `linsolve` (`linalg.rs`): Solve the linear system A·x = b using Gaussian elimination with partial pivoting.
 - `add` (`ops.rs`): Element-wise addition of two arrays (same shape and dtype).
 - `add_scalar` (`ops.rs`): Add a scalar to every element.
 - `sub` (`ops.rs`): Element-wise subtraction of two arrays (same shape and dtype).
@@ -129,6 +150,9 @@ This module exists so game scripts can work with structured numeric grids, vecto
 - `lurek.compute.ones`: Creates a one-filled array with the given shape and optional dtype.
 - `lurek.compute.range`: Creates a 1D array from start to stop with optional step and dtype.
 - `lurek.compute.fromTable`: Creates an array from a Lua table of numbers with optional shape and dtype.
+- `lurek.compute.gaussianKernel`: Creates a size×size Gaussian kernel array.
+- `lurek.compute.rotate2dMatrix`: Creates a 2×2 rotation matrix for the given angle in radians.
+- `lurek.compute.affine2d`: Creates a 3×3 homogeneous affine matrix.
 
 ### `Array` Methods
 - `Array:getShape`: Returns the shape as a table of dimension sizes.
@@ -169,12 +193,27 @@ This module exists so game scripts can work with structured numeric grids, vecto
 - `Array:convolve2D`: 2D convolution with zero-padding.
 - `Array:dilate`: Morphological dilation with a diamond structuring element.
 - `Array:erode`: Morphological erosion with a diamond structuring element.
+- `Array:cumsum`: Cumulative sum of all elements (flattened).
+- `Array:diff`: Discrete difference applied `order` times.
+- `Array:percentile`: Compute the p-th percentile (0–100).
+- `Array:covariance`: Population covariance with another 1D array.
+- `Array:pearsonCorr`: Pearson correlation coefficient with another 1D array.
+- `Array:normalizeRange`: Linearly rescale values to [out_min, out_max].
+- `Array:zscore`: Standardise values to zero mean and unit variance.
+- `Array:convolve1d`: 1D convolution with a kernel array (full output).
+- `Array:correlate1d`: 1D cross-correlation with a template array (valid output).
+- `Array:normalizeVec`: L2-normalise a 1D vector.
+- `Array:outer`: Outer product of two 1D vectors → 2D array [m, n].
+- `Array:cross2d`: Signed 2D cross product with another length-2 array.
+- `Array:transformPoints`: Apply this 2×2 or 3×3 matrix to an [N,2] points array.
+- `Array:sobel`: Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
+- `Array:linsolve`: Solve A·x = b where this array is A (square [n,n]) and b is a 1D vector.
 - `Array:type`: Returns the type name "Array".
 - `Array:typeOf`: Returns true when the given name matches "Array" or a parent type.
 
 ## References
 
-- `runtime`: Imports or references `runtime` from `src/runtime/`.
+- No top-level `crate::<module>` imports were detected in this module's Rust source files.
 
 ## Notes
 

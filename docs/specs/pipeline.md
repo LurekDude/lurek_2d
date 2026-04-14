@@ -11,13 +11,17 @@
 
 ## Summary
 
-The pipeline module provides a DAG-based workflow engine for Lua and Rust callers that need ordered, dependency-aware multi-step execution. It exists to let games and tools describe work as named steps with dependencies, delays, retry policy, and error policy instead of hand-writing orchestration logic in ad hoc callback chains.
+The `pipeline` module provides Lurek2D's DAG-based workflow orchestration system for composing multi-step data processing sequences. It is a Feature Systems tier module designed for analytics pipelines, automated test sequences, boot initialization with dependency ordering, and complex mod-loading or asset-processing workflows.
 
-The module splits cleanly into data-model and execution-support pieces. Pipeline and PipelineStep describe the graph and per-step state, PipelineScheduler manages time-based readiness for delayed execution, and PipelineResult captures the final outcome of a run. That design keeps validation, scheduling, and result reporting inspectable and testable in isolation.
+`Pipeline` stores `PipelineStep` nodes and directed edges in a DAG. Each step has: a unique name, a `StepStatus` tracking its run state, an `ErrorPolicy` (FailFast — abort on first error; Continue — run all steps and collect errors; Retry(n) — retry up to n times before failing), and an optional timeout duration. Steps reference other steps by name to express dependencies; the DAG must be acyclic.
 
-This module does not own the actual business work performed by each step. Callbacks, I/O, rendering, or gameplay logic belong to the code attached to the pipeline, while pipeline itself only validates the graph, computes execution order, tracks runtime state, and enforces error-handling rules.
+`Pipeline::run()` performs a topological sort, executes independent step groups in dependency order, and returns a `PipelineResult` carrying the final `PipelineStatus` (Success, PartialFailure, or Failed) plus per-step `StepStatus` records. `run_async()` dispatches step groups to a thread pool for parallel execution where dependencies allow.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Edge/Integration responsibility boundary defined in the architecture docs.
+`PipelineScheduler` wraps one or more pipelines with time-based triggering: an interval-based scheduler fires a pipeline repeatedly on a configurable period, and a delay-based scheduler fires once after a specified delay. `tick(dt)` is called each frame by the engine to advance the scheduler.
+
+Step execution logic is provided by Lua callbacks; the pipeline module manages ordering and error handling only.
+
+**Scope boundary**: Feature Systems tier. Depends on `math`, `runtime`. Lua bridge in `src/lua_api/pipeline_api.rs`.
 
 ## Files
 

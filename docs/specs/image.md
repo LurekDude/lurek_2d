@@ -11,13 +11,13 @@
 
 ## Summary
 
-The `image` module owns CPU-side image data and image manipulation. It gives the engine a place to load pixels from disk, construct images procedurally, inspect or edit pixels one by one, compose layered images, and serialize image data without requiring a live GPU resource.
+The `image` module provides Lurek2D's CPU-side pixel buffer type and image manipulation operations. `ImageData` is a heap-allocated RGBA8 pixel buffer (`width * height * 4` bytes) with construction from file, raw bytes, or zeroed allocation; per-pixel get/set with bounds checking; and operations including `resize` (nearest-neighbour), `blit(src, dst_x, dst_y)`, `fill`, `map_pixels(fn)`, `get_region` (crop), `diff(other)` (for golden tests), and `encode_png()`. PNG/JPEG decoding is handled via the `image` external crate.
 
-This module exists so higher-level systems can work with pixels as ordinary Rust data. Animation tooling, procedural generation, screenshot export, asset preprocessing, and Lua scripts can all build or transform images here before those images are turned into renderable textures elsewhere. The `visualization` helpers also let Tier 1 modules expose debug or authoring images without importing GPU code.
+`CompressedImageData` holds DDS/DXT compressed GPU texture data loaded without CPU decompression, ready to upload directly to the GPU. `PaletteLUT` is a color palette lookup table used for shader-based palette swapping effects. `LayeredImage` + `ImageLayer` implement a Porter-Duff compositing stack where each layer contributes to a flattened RGBA output image.
 
-The module intentionally does not own GPU upload, draw submission, swapchain behavior, or shader execution. It can describe data that the renderer will later consume, but actual rendering belongs to `render`, resource lifetime belongs to runtime state and resource keys, and window presentation belongs to `window`.
+The `texture` submodule provides `Texture` (a GPU handle with dimensions, format, and filtering settings) and the `texture_atlas` submodule provides `TextureAtlas` (a named-region index into a single texture for sprite-sheet lookups). The `serial` submodule handles the binary `.lim` format for efficient ImageData/LayeredImage serialization. The `visualization` submodule provides standalone helpers for Tier 1 modules to export debug imagery without import cycles. The `render` submodule generates GPU `RenderCommand` entries from `ImageData` for direct draw calls.
 
-**Scope boundary**: This module currently depends on `animation`, `camera`, `math`, `render`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+**Scope boundary**: Platform Services tier. Depends on the `image` external crate for file decoding. Lua bridge in `src/lua_api/image_api.rs`.
 
 ## Files
 
@@ -75,6 +75,10 @@ The module intentionally does not own GPU upload, draw submission, swapchain beh
 - `ImageData::resize_nearest` (`effects.rs`): Scale the image to new dimensions using nearest-neighbour interpolation.
 - `ImageData::blur` (`effects.rs`): Apply a box blur with the given radius and return the result as a new `ImageData`.
 - `ImageData::sharpen` (`effects.rs`): Apply a 3×3 sharpen kernel and return the result as a new `ImageData`.
+- `ImageData::resize` (`effects.rs`): Scale the image to new dimensions using bilinear interpolation.
+- `ImageData::blit` (`effects.rs`): Blit (composite) `src` onto this image at `(dst_x, dst_y)` using Porter-Duff *over*.
+- `ImageData::get_region` (`effects.rs`): Extract a rectangular sub-region and return it as a new `ImageData`.
+- `ImageData::diff` (`effects.rs`): Compute the total absolute per-channel difference between two images.
 - `ImageData::new` (`image_data.rs`): Create a new blank (transparent black) image.
 - `ImageData::from_file` (`image_data.rs`): Load an image from a file path.
 - `ImageData::from_bytes` (`image_data.rs`): Create from raw RGBA bytes.
@@ -86,12 +90,14 @@ The module intentionally does not own GPU upload, draw submission, swapchain beh
 - `ImageData::paste` (`image_data.rs`): Paste source image onto self at position (dx, dy).
 - `ImageData::map_pixel` (`image_data.rs`): Apply a function to every pixel, replacing each (r,g,b,a) with the return value.
 - `ImageData::draw_rect` (`image_data.rs`): Draw a filled rectangle onto the image.
-- `ImageData::draw_circle` (`image_data.rs`): Draw a filled circle onto the image using the midpoint algorithm.
+- `ImageData::draw_circle_safe` (`image_data.rs`): Draw a filled circle onto the image using the midpoint algorithm.
+- `ImageData::draw_circle` (`image_data.rs`): draw_circle.
 - `ImageData::draw_line` (`image_data.rs`): Draw a line using Bresenham's algorithm.
 - `ImageData::draw_label` (`image_data.rs`): Draw a text label using a built-in 3×5 pixel font.
 - `ImageData::encode_png` (`image_data.rs`): Encode the image as PNG bytes.
 - `ImageData::as_bytes` (`image_data.rs`): Get a reference to the raw pixel bytes.
 - `ImageData::get_string` (`image_data.rs`): Get the raw pixel bytes as a vector (for Lua getString() compatibility).
+- `ImageData::map_pixel_par` (`image_data.rs`): Apply a per-pixel transform in parallel for large images.
 - `ImageLayer::new` (`layers.rs`): Create a new transparent layer with the given canvas dimensions.
 - `LayeredImage::new` (`layers.rs`): Create an empty layer stack with no layers.
 - `LayeredImage::width` (`layers.rs`): Canvas width shared by all layers.
@@ -218,32 +224,35 @@ The module intentionally does not own GPU upload, draw submission, swapchain beh
 - `LayeredImage:save`: Saves the layered image to a LIMG binary file at the given path.
 
 ### `mlua` Methods
-- `mlua:getWidth`: Lua-facing function documented in the binding source.
-- `mlua:getHeight`: Lua-facing function documented in the binding source.
-- `mlua:getDimensions`: Lua-facing function documented in the binding source.
-- `mlua:getPixel`: Lua-facing function documented in the binding source.
-- `mlua:encode`: Lua-facing function documented in the binding source.
-- `mlua:getString`: Lua-facing function documented in the binding source.
-- `mlua:mapPixel`: Lua-facing function documented in the binding source.
-- `mlua:brightness`: Lua-facing function documented in the binding source.
-- `mlua:contrast`: Lua-facing function documented in the binding source.
-- `mlua:saturation`: Lua-facing function documented in the binding source.
-- `mlua:gamma`: Lua-facing function documented in the binding source.
-- `mlua:grayscale`: Lua-facing function documented in the binding source.
-- `mlua:sepia`: Lua-facing function documented in the binding source.
-- `mlua:invert`: Lua-facing function documented in the binding source.
-- `mlua:threshold`: Lua-facing function documented in the binding source.
-- `mlua:posterize`: Lua-facing function documented in the binding source.
-- `mlua:fill`: Lua-facing function documented in the binding source.
-- `mlua:noise`: Lua-facing function documented in the binding source.
-- `mlua:alphaMask`: Lua-facing function documented in the binding source.
-- `mlua:flipHorizontal`: Lua-facing function documented in the binding source.
-- `mlua:flipVertical`: Lua-facing function documented in the binding source.
-- `mlua:rotate90cw`: Lua-facing function documented in the binding source.
-- `mlua:crop`: Lua-facing function documented in the binding source.
-- `mlua:resizeNearest`: Lua-facing function documented in the binding source.
-- `mlua:blur`: Lua-facing function documented in the binding source.
-- `mlua:sharpen`: Lua-facing function documented in the binding source.
+- `mlua:getWidth`: Returns the width.
+- `mlua:getHeight`: Returns the height.
+- `mlua:getDimensions`: Returns the dimensions.
+- `mlua:getPixel`: Returns the pixel.
+- `mlua:encode`: Encode.
+- `mlua:getString`: Returns the string.
+- `mlua:mapPixel`: Map pixel.
+- `mlua:brightness`: Brightness.
+- `mlua:contrast`: Contrast.
+- `mlua:saturation`: Saturation.
+- `mlua:gamma`: Gamma.
+- `mlua:grayscale`: Grayscale.
+- `mlua:sepia`: Sepia.
+- `mlua:invert`: Invert.
+- `mlua:threshold`: Threshold.
+- `mlua:posterize`: Posterize.
+- `mlua:fill`: Fill.
+- `mlua:noise`: Noise.
+- `mlua:alphaMask`: Alpha mask.
+- `mlua:flipHorizontal`: Flip horizontal.
+- `mlua:flipVertical`: Flip vertical.
+- `mlua:rotate90cw`: Rotate90cw.
+- `mlua:crop`: Crop.
+- `mlua:resizeNearest`: Resize nearest.
+- `mlua:blur`: Blur.
+- `mlua:sharpen`: Sharpen.
+- `mlua:resize`: Returns a bilinear-interpolated copy of the image at the given dimensions.
+- `mlua:diff`: Returns the sum of absolute per-channel pixel differences with another ImageData.
+- `mlua:mapPixels`: Applies a function to every pixel in-place.
 
 ## References
 

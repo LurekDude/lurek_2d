@@ -147,6 +147,11 @@ impl LuaUserData for LuaSignal {
 
 /// Registers the `lurek.signal` API table with the Lua VM.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

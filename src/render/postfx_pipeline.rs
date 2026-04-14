@@ -543,6 +543,12 @@ fn fs_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
 // ── Params layout map ─────────────────────────────────────────────────────────
 
 /// Maps a `PostFxEffect` parameter dictionary to the 16-float packed buffer
+///
+/// # Parameters
+/// - `params` — `&HashMap<String, f32>`.
+///
+/// # Returns
+/// `[f32; 16]`.
 /// consumed by every WGSL shader's `PostFxParams` uniform.
 ///
 /// Layout (slot indices into the flat `[f32; 16]` array):
@@ -583,6 +589,10 @@ pub fn params_to_uniform(params: &HashMap<String, f32>) -> [f32; 16] {
 // ── Data types ────────────────────────────────────────────────────────────────
 
 /// Stores a wgpu texture and its default view together for convenience.
+///
+/// # Fields
+/// - `texture` — `wgpu::Texture`.
+/// - `view` — `wgpu::TextureView`.
 pub struct PostFxTexture {
     /// GPU texture object.
     pub texture: wgpu::Texture,
@@ -592,6 +602,9 @@ pub struct PostFxTexture {
 
 impl PostFxTexture {
     /// Create a new `Rgba8UnormSrgb` render-target texture of the requested size.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// # Parameters
     /// - `device` — wgpu logical device.
@@ -631,6 +644,12 @@ impl PostFxTexture {
 
 /// GPU post-processing pipeline.
 ///
+/// # Fields
+/// - `pipelines` — `HashMap<String, wgpu::RenderPipeline>`.
+/// - `sampler` — `wgpu::Sampler`.
+/// - `params_buf` — `wgpu::Buffer`.
+/// - `bind_group_layout` — `wgpu::BindGroupLayout`.
+///
 /// Holds one [`wgpu::RenderPipeline`] per named effect, a shared linear-clamp
 /// sampler, a `params` uniform buffer, and a bind-group layout.
 ///
@@ -651,6 +670,9 @@ pub struct PostFxPipeline {
 
 impl PostFxPipeline {
     /// Instantiate the post-FX pipeline for `surface_format`.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// All built-in WGSL shaders are compiled during this call. Custom-effect
     /// pipelines can be added at runtime via [`PostFxPipeline::register_custom`].

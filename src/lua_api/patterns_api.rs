@@ -2295,6 +2295,11 @@ impl LuaUserData for LuaSet {
 
 /// Registers the `lurek.patterns.*` Lua API namespace.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `_state` — `Rc<RefCell<SharedState>>`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let patterns = lua.create_table()?;
 

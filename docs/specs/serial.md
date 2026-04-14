@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `serial` module owns structured text serialization for Lurek2D. It defines `SerialValue` as a format-neutral intermediate tree and then converts between that tree and concrete text formats such as JSON, TOML, and CSV.
+The `serial` module provides Lurek2D's format-agnostic text serialization and deserialization. Its central type is `SerialValue`, a recursive enum — Null, Bool, Number(f64), Text(String), List(Vec<SerialValue>), Map(IndexMap<String, SerialValue>) — that can represent any hierarchical data.
 
-This module exists so the Lua API can expose one consistent `lurek.codec` namespace instead of making game code learn different crate-specific value models. The module's core design is that each format driver only needs to translate to and from `SerialValue`, while the Lua bridge handles table conversion separately.
+Format modules operate on `SerialValue`, converting to and from format-specific string representations. **TOML** is the preferred human-authored config format (design assumption B-05): `serial::toml::to_string(v)` and `from_str(s)`. **JSON** is provided for external interop: `serial::json::to_string(v)` and `from_str(s)`. **CSV** supports configurable header presence, delimiter character, and quote character via `CsvOptions`: `to_csv(rows, opts)` and `from_csv(text, opts)`. **Lua table notation** emits a Lua-readable table literal for use in generated code. YAML is explicitly absent (design assumption B-05).
 
-`serial` intentionally does not own binary packing, compression, hashing, or raw byte-buffer manipulation; those belong to `src/data/`. It also does not own file I/O, save orchestration, or config loading policy. The `yaml.rs` file remains on disk, but the live module surface excludes YAML by commenting it out in `mod.rs` to respect the repository's TOML-over-YAML rule.
+The module performs no file I/O — callers supply strings, receive strings. File reading and writing is the responsibility of `filesystem`. The `save` module uses `serial::to_toml` and `from_toml` to serialize save collector outputs. The `data/dataframe` serial submodules re-use `serial::CsvOptions` for DataFrame CSV round-trips.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+A `Codec` helper trait provides a unified `encode(value)` / `decode(text)` interface implemented for all four formats, enabling code that needs to switch serialization format at runtime without branching on format names.
+
+**Scope boundary**: Foundations tier. Depends only on external crates (toml, serde_json, csv, indexmap). Lua bridge in `src/lua_api/serial_api.rs` as `lurek.codec.*`.
 
 ## Files
 

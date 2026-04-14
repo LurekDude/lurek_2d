@@ -11,13 +11,13 @@
 
 ## Summary
 
-The bin module holds alternative compiled entry points for the engine. It exists so the project can ship or develop with different binary behaviors while still routing all real startup logic through the shared library crate.
+The `bin` module provides alternative binary entry points for the Lurek2D engine. It is not a library module — it contains only `main()`-bearing source files for building secondary executables alongside the primary `lurek2d` binary.
 
-Right now the important distinction is between the main console-attached launcher and the console-less Windows launcher under src/bin/. The bin module keeps that packaging concern separate from engine startup behavior, which still belongs in lib.rs and app.
+Currently the module contains a single entry point: `lurekc.rs`, the console-less launcher for Windows distribution. On Windows the `#![cfg_attr(windows, windows_subsystem = "windows")]` attribute prevents the black terminal console window from appearing alongside the game window when an end-user launches a distributed game. On Linux and macOS the attribute is ignored and `lurekc` behaves identically to the standard `lurek2d` binary. Both binaries call the same `lurek2d::lurek_run()` entry function.
 
-This module does not own configuration parsing, platform initialization, splash behavior, or the event loop. If a change affects engine boot semantics rather than which binary wrapper calls into them, it belongs somewhere else.
+Game developers use `lurekc.exe` when packaging a release for Windows users to provide a polished, console-free experience. The standard `lurek2d.exe` remains the preferred binary for development because it shows engine log output in the console.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+**Scope boundary**: Edge/Integration tier. A Cargo binary target, not a library module. Contains no domain logic.
 
 ## Files
 

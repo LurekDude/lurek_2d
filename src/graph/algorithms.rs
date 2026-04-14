@@ -175,6 +175,9 @@ impl Graph {
 
     /// Kruskal's Minimum Spanning Tree.
     ///
+    /// # Returns
+    /// `Vec<u64>`.
+    ///
     /// Treats all edges as undirected. Returns a list of edge IDs included in the MST.
     /// Returns an empty vec if the graph is empty or has no edges.
     pub fn mst_kruskal(&self) -> Vec<u64> {
@@ -214,6 +217,14 @@ impl Graph {
     }
 
     /// A* search from `from` to `to` using optional spatial positions for the heuristic.
+    ///
+    /// # Parameters
+    /// - `from` — `u64`.
+    /// - `to` — `u64`.
+    /// - `node_positions` — `&HashMap<u64, (f32, f32)>`.
+    ///
+    /// # Returns
+    /// `Option<Vec<u64>>`.
     ///
     /// `node_positions` maps node IDs to `(x, y)` coordinates. An empty map degrades to
     /// Dijkstra (zero heuristic).

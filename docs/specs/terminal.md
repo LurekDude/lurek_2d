@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `terminal` module provides a character-cell UI surface for consoles, debug overlays, roguelike interfaces, and text-driven tools. It owns the terminal grid, cursor state, terminal-native widgets, and the logic that composites widgets into cells before draw output is generated.
+The `terminal` module provides a character-cell text-mode terminal emulator embedded in the Lurek2D engine. It is designed for roguelikes, text adventures, in-game debug consoles, and retro-style ASCII rendering. All output goes through `RenderCommand::DrawText` to keep GPU access deferred.
 
-It exists to support interfaces that work best as text grids rather than pixel-perfect UI layouts. That keeps terminal behavior, line drawing, widget focus, and cell-level edits separate from the general `ui` module and separate from the renderer's lower-level drawing primitives.
+`Terminal` owns a fixed-size 2D grid of `TCell` values capped at 512×256 cells. Each `TCell` stores a Unicode character, foreground `Color`, background `Color`, and a `CellStyle` bitmask (Bold, Italic, Underline, Strikethrough, Blink, Inverse). Terminal cell coordinates are 1-based for Lua ergonomics.
 
-It intentionally does not own font rasterization, filesystem-backed shells, command parsing, or operating-system terminals. It is an in-engine text surface and widget set, not a platform console abstraction.
+Text operations: `print(x, y, text, fg, bg)` places styled text at a specific grid position; `println(s)` appends with automatic line wrap and scroll; `put_char(x, y, ch, fg, bg)` sets a single cell; `fill(x, y, w, h, ch, fg, bg)` floods a rectangular region; `print_box(x, y, w, h, border_style)` draws a box-drawing character border; `clear()` resets all cells.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`BorderStyle` enum: Single, Double, Round (box-drawing curves), Bold (heavy box), ASCII (`+/-|`) for maximum compatibility, or None. `ColorMode` selects 24-bit true color, 256-color palette, or 16-color classic terminal mode.
+
+`Widget` instances provide reusable interactive TUI controls: each has a `WidgetKind` (Label, Button, TextInput, ProgressBar, SelectList, Border) and manages its own cell region. Input event routing delivers key and mouse events to focused widgets.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/terminal_api.rs`.
 
 ## Files
 

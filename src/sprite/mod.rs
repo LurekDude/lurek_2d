@@ -1,7 +1,18 @@
-//! Sprite handling for Lurek2D.
+//! Sprite and sprite-batch rendering types for Lurek2D.
 //!
-//! Contains sprite, sprite batch, sprite sheet, nine-slice types
-//! extracted from the render module, and the TexturePacker atlas importer.
+//! Provides higher-level game-graphics abstractions above the raw `RenderCommand` queue:
+//! individual sprites, instanced batches, sprite sheets, nine-patch panels, and
+//! TexturePacker atlas imports.
+//!
+//! ## Subsystem inventory
+//! - [`sprite`] — [`Sprite`]: single positioned/rotated/tinted image quad
+//! - [`sprite_batch`] — [`SpriteBatch`]: one-texture instanced batch → single GPU draw call
+//! - [`sprite_sheet`] — [`SpriteSheet`]: named-frame UV map into a sprite sheet texture
+//! - [`atlas`] — [`SpriteAtlas`]: TexturePacker JSON atlas importer with [`AtlasEntry`]
+//! - [`nine_slice`] — [`NineSlice`]: 3×3 scalable patch for resizable UI panels
+//!
+//! Lua bridge: `src/lua_api/sprite_api.rs` as `lurek.sprite.*`.
+
 
 /// TexturePacker JSON atlas importer and named region lookup.
 pub mod atlas;

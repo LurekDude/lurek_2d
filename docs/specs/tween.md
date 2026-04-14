@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `tween` module owns time-based property interpolation for Lua-facing game objects. Its job is to take named numeric fields on Lua tables, apply easing over time, support repeats and yoyo playback, and coordinate single tweens, sequential chains, and parallel groups through a shared update engine.
+The `tween` module provides property animation through interpolated value transitions. It is a Feature Systems tier module designed for smoothly animating Lua table field values (position, color, alpha, scale, etc.) without requiring game scripts to manage linear interpolation manually each frame.
 
-This module exists so scripted gameplay code can animate values declaratively without embedding interpolation logic into every feature module. `TweenState` provides the pure numeric timing and easing core. The handle types carry the Lua registry references and state machines for single tweens, sequences, and parallel groups. `TweenEngine` then advances all active handles each frame and cleans them up when they complete or are cancelled.
+`TweenState` is the pure-Rust timing and easing layer: it stores duration, an easing function (resolved by name string from `math::EasingType` via `resolve_easing()`), accumulated elapsed time, and a pause flag. `tick(dt)` advances the clock and returns `true` when the tween completes. `lerp(start, end)` computes the current interpolated value by evaluating the easing function at the normalized time `t = elapsed / duration` and then lerp-ing between start and end. `TweenState` holds no Lua references or userdata, making it safe to use outside a Lua context.
 
-The module intentionally does not own the main game clock, frame scheduling, scene update order, or any particular animated domain object. It also does not define a generic Rust-side property graph; the target values live in Lua tables and are updated from there. Systems such as camera, animation, UI, and ECS may all be animated by tween, but they retain ownership of their own state and meaning.
+`TweenEngine` is the frame-level driver stored in `SharedState`: on each `tick(dt)` it iterates all registered `LuaTween` instances, advances their `TweenState`, applies the interpolated value back to the target Lua table field, invokes any per-tick callback (`on_step`), and invokes the completion callback (`on_complete`) then removes completed tweens.
 
-**Scope boundary**: This module currently depends on `math`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`LuaTween` is the Lua-facing handle: it wraps `TweenState` alongside the target table, target field name, start value, end value, and callback references. `LuaTweenSequence` chains multiple tweens queue-style (each starts when the previous completes). `LuaTweenParallel` runs multiple tweens simultaneously and fires a shared completion callback when the last one finishes.
+
+**Scope boundary**: Feature Systems tier. Depends on `math` (easing functions), `runtime`. Lua bridge in `src/lua_api/tween_api.rs`.
 
 ## Files
 
@@ -74,7 +76,7 @@ The module intentionally does not own the main game clock, frame scheduling, sce
 - `lurek.tween.getActiveCount`: Returns the number of currently active tween objects (tweens + seqs + pars).
 - `lurek.tween.registerEasing`: Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
 - `lurek.tween.getEasingNames`: Returns a list of all available easing names (built-in + custom).
-- `lurek.tween.newState`: Creates a standalone `TweenState` userdata for custom interpolation and Lua-side timing tests.
+- `lurek.tween.newState`: Creates a standalone tween timing state without registering it with the engine.
 
 ### `Tween` Methods
 - `Tween:pause`: Pauses this tween; time stops advancing but the tween is not cancelled.
@@ -84,14 +86,6 @@ The module intentionally does not own the main game clock, frame scheduling, sce
 - `Tween:setRepeat`: Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
 - `Tween:setYoyo`: Enables or disables yoyo (ping-pong) on each repeat cycle.
 
-### `TweenState` Methods
-- `TweenState:tick`: Advances the tween state by `dt` seconds and returns whether it completed.
-- `TweenState:isComplete`: Returns true if elapsed time has reached the duration.
-- `TweenState:t`: Returns raw 0..1 progress.
-- `TweenState:lerp`: Interpolates between two numeric values using the current eased progress.
-- `TweenState:reset`: Resets progress back to the start.
-- `TweenState.paused`: Boolean field that freezes or resumes `tick()`.
-
 ### `TweenParallel` Methods
 - `TweenParallel:cancel`: Cancels the parallel group immediately.
 - `TweenParallel:isActive`: Returns true if the parallel is running and not yet complete.
@@ -99,6 +93,13 @@ The module intentionally does not own the main game clock, frame scheduling, sce
 ### `TweenSequence` Methods
 - `TweenSequence:cancel`: Cancels the sequence and stops all pending steps.
 - `TweenSequence:isActive`: Returns true if the sequence has been started and has not yet completed.
+
+### `TweenState` Methods
+- `TweenState:tick`: Advances the tween state by `dt` seconds.
+- `TweenState:isComplete`: Returns whether the tween state has completed.
+- `TweenState:t`: Returns the raw 0..1 playback progress.
+- `TweenState:lerp`: Interpolates from `start` to `finish` using the eased tween progress.
+- `TweenState:reset`: Resets the tween state to elapsed time zero.
 
 ## References
 

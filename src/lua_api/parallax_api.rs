@@ -539,6 +539,11 @@ impl LuaUserData for LuaParallaxSet {
 
 /// Registers the `lurek.parallax` sub-table on the given `luna` global.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
 ///
 /// Registers `lurek.parallax` onto the given global table.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {

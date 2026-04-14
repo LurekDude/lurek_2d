@@ -17,6 +17,14 @@ pub struct NameGen {
 impl NameGen {
     /// Build a name generator from training examples.
     ///
+    /// # Parameters
+    /// - `training` — `&[&str]`.
+    /// - `order` — `usize`.
+    /// - `seed` — `u64`.
+    ///
+    /// # Returns
+    /// `Self`.
+    ///
     /// `order` is the length of the context (n-gram prefix). Typical values: 2–3.
     /// `seed` seeds the random number generator for `generate`.
     pub fn new(training: &[&str], order: usize, seed: u64) -> Self {
@@ -43,6 +51,13 @@ impl NameGen {
 
     /// Generate a single name with length in `[min_len, max_len]`.
     ///
+    /// # Parameters
+    /// - `min_len` — `usize`.
+    /// - `max_len` — `usize`.
+    ///
+    /// # Returns
+    /// `String`.
+    ///
     /// Returns an empty string if the model is empty or constraints cannot be met in
     /// a fixed number of tries.
     pub fn generate(&mut self, min_len: usize, max_len: usize) -> String {
@@ -57,6 +72,14 @@ impl NameGen {
     }
 
     /// Generate `n` names.
+    ///
+    /// # Parameters
+    /// - `n` — `usize`.
+    /// - `min_len` — `usize`.
+    /// - `max_len` — `usize`.
+    ///
+    /// # Returns
+    /// `Vec<String>`.
     pub fn generate_n(&mut self, n: usize, min_len: usize, max_len: usize) -> Vec<String> {
         (0..n).map(|_| self.generate(min_len, max_len)).collect()
     }

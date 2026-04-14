@@ -9,6 +9,13 @@ use std::cmp::Ordering;
 use crate::procgen::lcg::Lcg;
 
 /// A region (node) in the world graph.
+///
+/// # Fields
+/// - `id` — `u32`.
+/// - `name` — `String`.
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `tags` — `Vec<String>`.
 #[derive(Debug, Clone)]
 pub struct WorldRegion {
     /// Unique region ID.
@@ -24,6 +31,12 @@ pub struct WorldRegion {
 }
 
 /// An edge connecting two regions.
+///
+/// # Fields
+/// - `from` — `u32`.
+/// - `to` — `u32`.
+/// - `cost` — `f32`.
+/// - `bidirectional` — `bool`.
 #[derive(Debug, Clone)]
 pub struct WorldEdge {
     /// Source region ID.
@@ -37,6 +50,10 @@ pub struct WorldEdge {
 }
 
 /// A world-level topology graph.
+///
+/// # Fields
+/// - `regions` — `Vec<WorldRegion>`.
+/// - `edges` — `Vec<WorldEdge>`.
 #[derive(Debug, Clone, Default)]
 pub struct WorldGraph {
     /// All regions indexed by ID.
@@ -48,11 +65,22 @@ pub struct WorldGraph {
 
 impl WorldGraph {
     /// Create an empty world graph.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Add a region and return its ID.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `x` — `f32`.
+    /// - `y` — `f32`.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn add_region(&mut self, name: &str, x: f32, y: f32) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
@@ -61,11 +89,24 @@ impl WorldGraph {
     }
 
     /// Connect two regions with an edge.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `to` — `u32`.
+    /// - `cost` — `f32`.
+    /// - `bidirectional` — `bool`.
     pub fn add_edge(&mut self, from: u32, to: u32, cost: f32, bidirectional: bool) {
         self.edges.push(WorldEdge { from, to, cost, bidirectional });
     }
 
     /// A* pathfinding using Euclidean distance as the heuristic.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `to` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<Vec<u32>>`.
     ///
     /// Returns the ordered list of region IDs from `from` to `to`, or `None` if unreachable.
     pub fn find_path(&self, from: u32, to: u32) -> Option<Vec<u32>> {
@@ -108,6 +149,13 @@ impl WorldGraph {
     }
 
     /// All regions reachable from `start` within `max_cost` (Dijkstra).
+    ///
+    /// # Parameters
+    /// - `start` — `u32`.
+    /// - `max_cost` — `f32`.
+    ///
+    /// # Returns
+    /// `Vec<u32>`.
     pub fn reachable_from(&self, start: u32, max_cost: f32) -> Vec<u32> {
         let mut dist: HashMap<u32, f32> = HashMap::new();
         let mut heap: BinaryHeap<WNode> = BinaryHeap::new();
@@ -133,6 +181,9 @@ impl WorldGraph {
     }
 
     /// Kruskal's Minimum Spanning Tree.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32, f32)>`.
     ///
     /// Returns edges in the MST as `(from, to, cost)` tuples.
     pub fn mst(&self) -> Vec<(u32, u32, f32)> {
@@ -163,6 +214,9 @@ impl WorldGraph {
     }
 
     /// Returns references to all regions.
+    ///
+    /// # Returns
+    /// `Vec<&WorldRegion>`.
     pub fn to_regions_list(&self) -> Vec<&WorldRegion> {
         self.regions.iter().collect()
     }
@@ -179,6 +233,15 @@ impl WorldGraph {
 }
 
 /// Scatter `region_count` regions randomly in a `width × height` world and connect each to its
+///
+/// # Parameters
+/// - `width` — `f32`.
+/// - `height` — `f32`.
+/// - `region_count` — `u32`.
+/// - `seed` — `u64`.
+///
+/// # Returns
+/// `WorldGraph`.
 /// k-nearest neighbours (k = 3). Returns the fully built [`WorldGraph`].
 pub fn generate_world_graph(width: f32, height: f32, region_count: u32, seed: u64) -> WorldGraph {
     let mut rng = Lcg::new(seed);

@@ -11,21 +11,23 @@
 
 ## Summary
 
-The `patterns` module owns reusable coordination primitives for Lurek2D gameplay code. It gathers small, pure-Rust building blocks such as event buses, state trackers, queues, registries, object pools, throttles, blackboards, and similar logic helpers that can be shared across many higher-level systems.
+The `patterns` module provides twelve classic game-programming design patterns as ready-to-use Rust types exposed to Lua via `lurek.patterns.*`. All pattern types hold only pure-Rust state and logic; callbacks are stored in the Lua API layer (`src/lua_api/patterns_api.rs`).
 
-This module exists so common gameplay-control patterns do not have to be reimplemented ad hoc in Lua or buried inside unrelated engine modules. Most types here intentionally store only the domain-side bookkeeping and metadata, while the Lua API layer adds callback storage, registry keys, and UserData wrappers on top.
+Pattern inventory: `EventBus` — named-event publish-subscribe with priority ordering and subscription management; `ObjectPool` — slot-tracking pool to recycle Lua objects without GC pressure; `CommandStack` — undo/redo history with batch grouping for atomic multi-step operations; `ServiceLocator` — singleton-like named service registry for global access without tight coupling; `Factory` — type-name constructor registry with aliasing for data-driven object creation; `StateMachine` — FSM with guarded transition rules, entry/exit callbacks, and state history; `Blackboard` — hierarchical typed key-value store for AI and game system coordination, shareable between agents; `Observer` — reactive per-key property subscriptions that fire callbacks when watched values change; `Throttle` / `Debounce` — rate-limit and trailing-edge delay for event callbacks; `PriorityQueue` — priority-ordered agenda for turn-based scheduling; `Ring` — fixed-capacity circular history buffer; `Funnel` — time-windowed event aggregator that batches events for deferred processing.
 
-`patterns` intentionally does not own the engine's global event system, ECS state, AI decision policies, or task-graph execution. It provides generic mechanics and containers; feature modules are responsible for deciding when and why to use them.
+Each pattern is a self-contained Rust struct with no heap allocations in steady-state hot paths. The module is a Feature Systems tier module and may import from Tier 1 and Foundations but must not import from `lua_api`.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Foundations layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+**Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/patterns_api.rs`.
 
 ## Files
 
 - `blackboard.rs`: Implements a shared typed key-value board with revision tracking for cross-system facts.
+- `collections.rs`: Fundamental ordered-collection and set ADTs for Lua scripting.
 - `command_stack.rs`: Tracks undo and redo history metadata, including cursor position and batching state.
 - `event_bus.rs`: Implements named event-subscription metadata with priority ordering and one-shot listeners.
 - `factory.rs`: Implements a constructor-name registry with optional alias resolution.
 - `funnel.rs`: Implements a time-windowed event collector that can batch inputs before flushing.
+- `mediator.rs`: Mediator pattern — pub/sub message channels.
 - `mod.rs`: Declares the patterns submodules and re-exports the public helper types.
 - `object_pool.rs`: Implements slot bookkeeping for reusable pooled objects, including idle and active tracking.
 - `observer.rs`: Implements per-key watcher metadata for reactive property changes.
@@ -34,12 +36,15 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `service_locator.rs`: Implements a named-service presence registry used by the Lua layer to store actual values.
 - `simple_state.rs`: Implements a lightweight named-state tracker with a single active state and no validated transition graph.
 - `state_machine.rs`: Implements a fuller finite-state machine with registered states, explicit transition rules, and history.
+- `strategy.rs`: Strategy pattern — named, swappable behaviours.
 - `throttle.rs`: Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting.
 
 ## Types
 
 - `BlackboardValue` (`enum`, `blackboard.rs`): Tagged value enum stored inside a `Blackboard`. It keeps the shared state surface small and predictable.
 - `Blackboard` (`struct`, `blackboard.rs`): Shared fact store for lightweight cross-system coordination. It is useful when multiple systems need to read and write the same named state without a direct dependency.
+- `StackMeta` (`struct`, `collections.rs`): Capacity metadata for a last-in-first-out stack.
+- `QueueMeta` (`struct`, `collections.rs`): Capacity metadata for a first-in-first-out queue.
 - `CommandEntry` (`struct`, `command_stack.rs`): Single recorded command inside a `CommandStack`. It carries the user-visible label and undo capability metadata.
 - `CommandStack` (`struct`, `command_stack.rs`): Undo and redo metadata tracker. The Lua layer attaches the actual callbacks, but this type owns the history rules.
 - `Subscription` (`struct`, `event_bus.rs`): Metadata record for one event-bus listener. It keeps listener identity, target event, and once behavior explicit.
@@ -47,6 +52,7 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `Factory` (`struct`, `factory.rs`): Named constructor registry. It helps scripts instantiate families of objects without hard-coding constructor tables everywhere.
 - `FunnelEntry` (`struct`, `funnel.rs`): Single buffered record inside a `Funnel`.
 - `Funnel` (`struct`, `funnel.rs`): Batch collector that groups time-adjacent events before a flush.
+- `Mediator` (`struct`, `mediator.rs`): Named-channel message broker.
 - `ObjectPool` (`struct`, `object_pool.rs`): Slot manager for reusable objects. It separates active and idle handles so higher-level code can reduce allocation churn.
 - `ObserverEntry` (`struct`, `observer.rs`): Metadata for one observer subscription. It tracks watcher identity, watched key, and once semantics.
 - `Observer` (`struct`, `observer.rs`): Per-key subscription registry for reactive property changes. Use it when changes should be keyed to specific names rather than free-form events.
@@ -58,6 +64,7 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `SimpleState` (`struct`, `simple_state.rs`): Minimal state tracker with one active named state. It is the simpler choice when callers do not need validated transition rules.
 - `TransitionRule` (`struct`, `state_machine.rs`): Declares one allowed transition in a `StateMachine`. It keeps edge validation and optional guard presence explicit.
 - `StateMachine` (`struct`, `state_machine.rs`): Transition-aware finite-state machine with registered states and visit history. Use it when transition structure matters.
+- `Strategy` (`struct`, `strategy.rs`): Registry of named, interchangeable behaviours with a single active selection.
 - `Throttle` (`struct`, `throttle.rs`): Leading-edge rate limiter that decides when a callback is allowed to fire.
 - `Debounce` (`struct`, `throttle.rs`): Trailing-edge idle timer that delays firing until input settles.
 
@@ -76,6 +83,10 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `Blackboard::clear_all` (`blackboard.rs`): Clears all facts and resets the blackboard.
 - `Blackboard::len` (`blackboard.rs`): Returns the number of facts currently stored.
 - `Blackboard::is_empty` (`blackboard.rs`): Returns `true` when no facts are stored.
+- `StackMeta::new` (`collections.rs`): Creates a new [`StackMeta`] with the given capacity.
+- `StackMeta::is_full` (`collections.rs`): Returns `true` if `len` items would exceed the capacity limit.
+- `QueueMeta::new` (`collections.rs`): Creates a new [`QueueMeta`] with the given capacity.
+- `QueueMeta::is_full` (`collections.rs`): Returns `true` if `len` items would exceed the capacity limit.
 - `CommandStack::new` (`command_stack.rs`): Creates a new command stack.
 - `CommandStack::push` (`command_stack.rs`): Records a new command entry, discarding any redo history above the cursor.
 - `CommandStack::peek_undo` (`command_stack.rs`): Returns the entry ID at the undo position (most recently applied command).
@@ -113,6 +124,14 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `Funnel::pending` (`funnel.rs`): Returns the buffered entries without draining them.
 - `Funnel::pending_count` (`funnel.rs`): Number of buffered entries.
 - `Funnel::discard` (`funnel.rs`): Discards all buffered entries without calling a flush callback.
+- `Mediator::new` (`mediator.rs`): Creates a new, empty [`Mediator`].
+- `Mediator::register` (`mediator.rs`): Registers a new handler on `channel` and returns its unique ID.
+- `Mediator::unregister` (`mediator.rs`): Unregisters a handler by ID from `channel`.
+- `Mediator::get_handlers` (`mediator.rs`): Returns all handler IDs registered on `channel`.
+- `Mediator::handler_count` (`mediator.rs`): Returns the number of handlers on `channel`.
+- `Mediator::channel_names` (`mediator.rs`): Returns all registered channel names.
+- `Mediator::remove_channel` (`mediator.rs`): Removes an entire channel and all its handlers.
+- `Mediator::clear` (`mediator.rs`): Clears all channels and resets handler ID allocation to zero.
 - `ObjectPool::new` (`object_pool.rs`): Creates a new pool.
 - `ObjectPool::acquire` (`object_pool.rs`): Acquires an idle slot, returning its handle.
 - `ObjectPool::release` (`object_pool.rs`): Returns a slot handle to the idle pool.
@@ -176,6 +195,15 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `StateMachine::history` (`state_machine.rs`): Returns the state visit history (oldest first).
 - `StateMachine::reachable_from` (`state_machine.rs`): Returns reachable state names from the given state.
 - `StateMachine::has_update_callback` (`state_machine.rs`): Whether the given state has an update callback.
+- `Strategy::new` (`strategy.rs`): Creates a new, empty [`Strategy`] registry.
+- `Strategy::register` (`strategy.rs`): Registers a strategy under `name` and returns its handler ID.
+- `Strategy::set_current` (`strategy.rs`): Sets the active strategy by name.
+- `Strategy::get_current` (`strategy.rs`): Returns the name of the currently active strategy, or `None`.
+- `Strategy::get_current_id` (`strategy.rs`): Returns the handler ID of the currently active strategy, or `None`.
+- `Strategy::has` (`strategy.rs`): Returns `true` if `name` is registered.
+- `Strategy::remove` (`strategy.rs`): Removes a strategy by name.
+- `Strategy::names` (`strategy.rs`): Returns all registered strategy names.
+- `Strategy::clear` (`strategy.rs`): Removes all strategies and clears the active selection.
 - `Throttle::new` (`throttle.rs`): Creates a throttle that fires at most once per `interval` seconds.
 - `Throttle::update` (`throttle.rs`): Advances time by `dt` seconds and returns `true` if the callback should fire.
 - `Throttle::reset` (`throttle.rs`): Resets the elapsed counter forcing the next `update` to not fire (unless interval is 0).
@@ -204,6 +232,13 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `lurek.patterns.newPriorityQueue`: Creates a stable priority-ordered task queue.
 - `lurek.patterns.newRing`: Creates a fixed-capacity circular history buffer.
 - `lurek.patterns.newFunnel`: Creates a time-windowed event aggregator. window=0 means flush on every push.
+- `lurek.patterns.newRelationshipManager`: Creates a new entity relationship manager.
+- `lurek.patterns.newMediator`: Creates a new named-channel message broker.
+- `lurek.patterns.newStrategy`: Creates a new strategy registry.
+- `lurek.patterns.newStack`: Creates a LIFO stack. capacity=0 means unlimited.
+- `lurek.patterns.newQueue`: Creates a FIFO queue. capacity=0 means unlimited.
+- `lurek.patterns.newList`: Creates an ordered, resizable list.
+- `lurek.patterns.newSet`: Creates an unordered set that rejects duplicate values (by string key).
 
 ### `Blackboard` Methods
 - `Blackboard:set`: Sets a fact on the blackboard. Accepts boolean, number, or string values.
@@ -262,6 +297,27 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `Funnel:pendingCount`: Returns the number of buffered entries not yet flushed.
 - `Funnel:getFlushCount`: Returns the total number of flushes performed.
 
+### `List` Methods
+- `List:add`: Appends a value to the end of the list.
+- `List:get`: Returns the value at a 1-based index, or nil.
+- `List:set`: Replaces the value at a 1-based index.
+- `List:remove`: Removes and returns the value at a 1-based index.
+- `List:len`: Returns the number of items in the list.
+- `List:isEmpty`: Returns true if the list is empty.
+- `List:contains`: Returns true if the list contains a value equal to the given Lua value (string/number/boolean).
+- `List:clear`: Removes all values from the list.
+- `List:toArray`: Returns all items as a Lua table.
+
+### `Mediator` Methods
+- `Mediator:on`: Registers a handler callback on a channel; returns handler ID.
+- `Mediator:off`: Unregisters a handler by ID.
+- `Mediator:send`: Dispatches a message to all handlers on a channel.
+- `Mediator:broadcast`: Dispatches a message to all handlers across all channels.
+- `Mediator:handlerCount`: Returns the number of handlers on a channel.
+- `Mediator:channels`: Returns all registered channel names.
+- `Mediator:removeChannel`: Removes a channel and all its handlers.
+- `Mediator:clear`: Removes all channels and handlers.
+
 ### `ObjectPool` Methods
 - `ObjectPool:add`: Inserts a pre-built object into the available pool.
 - `ObjectPool:acquire`: Acquires an available object from the pool; returns nil if empty.
@@ -286,6 +342,28 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `PriorityQueue:isEmpty`: Returns true when the queue has no items.
 - `PriorityQueue:clearAll`: Removes all items from the queue.
 
+### `Queue` Methods
+- `Queue:enqueue`: Adds a value to the back of the queue. Returns false if capacity is full.
+- `Queue:dequeue`: Removes and returns the front value, or nil if empty.
+- `Queue:front`: Returns the front value without removing it, or nil if empty.
+- `Queue:len`: Returns the number of items in the queue.
+- `Queue:isEmpty`: Returns true if the queue is empty.
+- `Queue:isFull`: Returns true if the queue is at its capacity limit.
+- `Queue:clear`: Removes all values from the queue.
+- `Queue:toArray`: Returns all items as a Lua table (front to back).
+
+### `RelationshipManager` Methods
+- `RelationshipManager:defineType`: Defines a relationship type with ordered levels.
+- `RelationshipManager:removeType`: Removes a relationship type definition.
+- `RelationshipManager:typeNames`: Returns all defined relationship type names.
+- `RelationshipManager:setValue`: Sets the numeric relationship value between two entities.
+- `RelationshipManager:getValue`: Returns the numeric relationship value between two entities (default 0.0).
+- `RelationshipManager:adjustValue`: Adjusts the numeric relationship value by a delta.
+- `RelationshipManager:setLevel`: Sets a named level for a typed relationship between two entities.
+- `RelationshipManager:getLevel`: Returns the named level for a typed relationship, or nil.
+- `RelationshipManager:removePair`: Removes all relationship data between two entities.
+- `RelationshipManager:pairCount`: Returns the total number of stored relationship pairs.
+
 ### `Ring` Methods
 - `Ring:push`: Pushes a value (number or string) with an optional tag. Overwrites oldest on overflow.
 - `Ring:latest`: Returns the most recently pushed entry, or nil.
@@ -304,6 +382,17 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `ServiceLocator:getServices`: Returns a table of all registered service names.
 - `ServiceLocator:clearAll`: Removes all registered services.
 
+### `Set` Methods
+- `Set:add`: Adds a string key to the set. Returns true if it was not already present.
+- `Set:remove`: Removes a key from the set. Returns true if it was present.
+- `Set:has`: Returns true if the key is in the set.
+- `Set:len`: Returns the number of distinct keys in the set.
+- `Set:isEmpty`: Returns true if the set is empty.
+- `Set:toArray`: Returns all keys as a Lua table (unordered).
+- `Set:clear`: Removes all keys from the set.
+- `Set:union`: Returns the union of this set and another as a new Set.
+- `Set:intersection`: Returns the intersection of this set and another as a new Set.
+
 ### `SimpleState` Methods
 - `SimpleState:addState`: Registers a named state with optional enter, exit, and update callbacks.
 - `SimpleState:transitionTo`: Transitions to a named state, calling exit/enter callbacks as needed.
@@ -312,6 +401,26 @@ This module exists so common gameplay-control patterns do not have to be reimple
 - `SimpleState:hasState`: Returns true if a state with the given name is registered.
 - `SimpleState:getStates`: Returns a table of all registered state names.
 - `SimpleState:clearAll`: Removes all states and callbacks from this state machine.
+
+### `Stack` Methods
+- `Stack:push`: Pushes a value onto the stack. Returns false if capacity is full.
+- `Stack:pop`: Removes and returns the top value, or nil if empty.
+- `Stack:peek`: Returns the top value without removing it, or nil if empty.
+- `Stack:len`: Returns the number of items on the stack.
+- `Stack:isEmpty`: Returns true if the stack is empty.
+- `Stack:isFull`: Returns true if the stack is at its capacity limit.
+- `Stack:clear`: Removes all values from the stack.
+- `Stack:toArray`: Returns all items as a Lua table (bottom to top).
+
+### `Strategy` Methods
+- `Strategy:register`: Registers a named strategy function.
+- `Strategy:set`: Sets the active strategy by name. Returns false if not registered.
+- `Strategy:execute`: Calls the currently active strategy function with the given arguments.
+- `Strategy:getCurrent`: Returns the name of the active strategy, or nil.
+- `Strategy:has`: Returns true if a strategy with this name is registered.
+- `Strategy:remove`: Removes a strategy by name.
+- `Strategy:names`: Returns all registered strategy names.
+- `Strategy:clear`: Removes all strategies and clears the active selection.
 
 ### `Throttle` Methods
 - `Throttle:onFire`: Sets the callback invoked when the throttle fires.

@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `window` module owns engine-level window state and viewport conversion helpers. Its job is to expose a clean Rust surface for title changes, fullscreen and vsync requests, resizing, position changes, focus queries, DPI conversion, and game-space to pixel-space mapping.
+The `window` module provides Lurek2D's window management API, allowing Lua scripts to control the OS window properties without blocking the winit event loop. All window operations are expressed as deferred writes to `WindowState` fields, which `App::event_loop_iteration()` reads and applies at frame start on the main OS thread — where winit window operations are safe.
 
-This module exists to keep window policy testable and separate from the live OS window handle. Most write operations update `WindowState` pending fields, and the app layer applies those requests on the next frame through `winit`. That split lets Lua and Rust gameplay code request window behavior without importing platform code into unrelated systems.
+Management API: `set_title(s)`, `set_size(w, h)`, `set_position(x, y)`, `set_fullscreen(bool)`, `set_vsync(bool)`, `set_icon(path)` (loads PNG and sets platform window icon), `is_fullscreen()`, `is_minimized()`, `is_maximized()`, `has_focus()`, `minimize()`, `maximize()`, `restore()`, `close()` (requests engine shutdown), `request_attention()` (flashes the taskbar on Windows/macOS), `show_message_box(title, msg, kind)` (platform modal dialog for error reporting).
 
-The module intentionally does not own the actual event loop, swapchain/surface management, or renderer presentation. `engine::app` and the runtime state own the live window object, and `render` owns drawing. The `event_loop` file is currently just a reserved placeholder rather than an active subsystem.
+Viewport API: `to_pixels(world_x, world_y)` converts world coordinates to pixel screen coordinates using the active `Viewport` scale; `from_pixels(px, py)` converts back to world. `get_scale_mode()` / `set_scale_mode(mode)` change the active `ScaleMode` (Expand, FixedWidth, PixelPerfect, Stretch) on the next frame. These are the primary APIs for resolution-independent game layouts.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`WindowInfo` is a value snapshot struct carrying current width, height, scale factor, and position for read-only queries.
+
+**Scope boundary**: Core Runtime tier. Depends on `runtime` (WindowState), `math`. Lua bridge in `src/lua_api/window_api.rs`.
 
 ## Files
 

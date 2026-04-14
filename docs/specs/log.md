@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `log` module owns the engine-facing logging domain that Lua scripts and other code can target without talking directly to the global logging backend. It provides a thin, stable layer for log level control and for dispatching script-originated messages into additional sinks such as files and in-memory ring buffers.
+The `log` module provides Lurek2D's Lua-accessible logging interface and its configurable sink system. It wraps the Rust `log` crate facade so that game scripts can emit structured log messages alongside engine log output, controlled by the `RUST_LOG` environment variable.
 
-This module exists to separate logging policy from Lua registration code. The domain types in `src/log/` define what a sink is, how entries are filtered, and how sink fan-out works, while `src/lua_api/log_api.rs` decides how that functionality is exposed under `lurek.log` for a single VM.
+The public module-level functions (`set_level`, `get_level`, `enabled_for`) delegate to `crate::runtime::log_messages` for global log level management. These are what the `lurek.log.*` Lua API exposes for log filtering.
 
-`log` intentionally does not own engine-wide logger initialization, formatting, `RUST_LOG` parsing, or the general diagnostic UI story. It delegates level storage to `runtime::log_messages`, and it does not replace `devtools` or `debugbridge`, which serve different debugging and capture workflows.
+The `sinks` submodule adds an out-of-band log routing layer on top of the standard `log` crate output. A `Sink` is a trait with a single `write(entry: &MemoryEntry)` method. `SinkRegistry` maintains a list of registered `Sink` implementations. Two built-in sinks are provided: `FileSink` appends formatted log entries to a file path with optional rotation; `MemorySink` keeps a fixed-size ring buffer of the last N `MemoryEntry` records accessible from Lua for in-game debug consoles. Each sink has an independent `SinkLevel` threshold so, for example, the file sink can capture all `debug` output while the in-memory sink captures only `warn` and above.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+Log output from game scripts appears alongside engine log output. The separation between the `log` crate global level (controlled by `RUST_LOG`) and the per-sink `SinkLevel` lets developers have fine-grained control over where different severity messages appear.
+
+**Scope boundary**: Core Runtime tier. Depends on `runtime`. Lua bridge in `src/lua_api/log_api.rs`.
 
 ## Files
 

@@ -6,6 +6,12 @@
 use crate::procgen::lcg::Lcg;
 
 /// A placed room in the dungeon.
+///
+/// # Fields
+/// - `x` — `u32`.
+/// - `y` — `u32`.
+/// - `w` — `u32`.
+/// - `h` — `u32`.
 #[derive(Debug, Clone)]
 pub struct Room {
     /// Left column of the room.
@@ -32,6 +38,14 @@ impl Room {
 }
 
 /// Options for rooms-and-corridors generation.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `max_rooms` — `u32`.
+/// - `min_room_size` — `u32`.
+/// - `max_room_size` — `u32`.
+/// - `seed` — `u64`.
 #[derive(Debug, Clone)]
 pub struct RoomsOpts {
     /// Dungeon width in cells.
@@ -62,6 +76,11 @@ impl Default for RoomsOpts {
 }
 
 /// The result of rooms-and-corridors generation.
+///
+/// # Fields
+/// - `rooms` — `Vec<Room>`.
+/// - `corridors` — `Vec<(u32, u32, u32, u32)>`.
+/// - `grid` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct RoomsDungeon {
     /// All successfully placed rooms.
@@ -73,6 +92,12 @@ pub struct RoomsDungeon {
 }
 
 /// Generate a rooms-and-corridors dungeon.
+///
+/// # Parameters
+/// - `opts` — `&RoomsOpts`.
+///
+/// # Returns
+/// `RoomsDungeon`.
 pub fn rooms_dungeon(opts: &RoomsOpts) -> RoomsDungeon {
     let mut rng = Lcg::new(opts.seed);
     let mut grid = vec![0u8; (opts.width * opts.height) as usize];

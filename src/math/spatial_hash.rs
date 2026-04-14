@@ -4,12 +4,14 @@
 //! The grid partitions space into fixed-size cells for O(1) bucket lookup.
 
 use std::collections::{HashMap, HashSet};
+/// An item stored in the spatial hash, identified by a string ID with an AABB.
+///
 /// # Fields
-/// - `id` — `String`.
-/// - `x` — `f32`.
-/// - `y` — `f32`.
-/// - `w` — `f32`.
-/// - `h` — `f32`.
+/// - `id` — Unique string identifier.
+/// - `x` — Left edge of the bounding box.
+/// - `y` — Top edge of the bounding box.
+/// - `w` — Width of the bounding box.
+/// - `h` — Height of the bounding box.
 #[derive(Debug, Clone)]
 pub struct SpatialItem {
     /// Unique identifier.

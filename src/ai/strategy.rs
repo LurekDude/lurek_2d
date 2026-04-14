@@ -189,6 +189,9 @@ impl StrategyAI {
     }
 
     /// Advances the timer by `dt` and evaluates goals when the interval expires.
+    ///
+    /// # Returns
+    /// `f32,`.
     /// The scorer closure receives each goal's name and should return a utility
     /// in `[0.0, 1.0]`.
     ///
@@ -207,6 +210,9 @@ impl StrategyAI {
     }
 
     /// Forces an immediate re-evaluation outside the normal interval.
+    ///
+    /// # Returns
+    /// `f32,`.
     ///
     /// # Parameters
     /// - `scorer` — `FnMut(&str) -> f32`.

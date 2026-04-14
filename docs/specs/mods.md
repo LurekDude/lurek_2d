@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `mods` module provides the metadata and load-order layer for user-created modifications. It discovers mod manifests, parses their metadata, validates dependency relationships, and computes deterministic ordering so the rest of the engine can decide what to mount or reload.
+The `mods` module provides Lurek2D's mod-loading framework — the system by which user-created content packages can extend or replace a base game without modifying its source. It is a Feature Systems tier module that integrates with `filesystem` for virtual filesystem mounting and with `runtime` for configuration.
 
-It exists to keep mod discovery and dependency reasoning out of filesystem code, asset loading, and script execution. By centralizing manifest parsing and ordering here, the engine has one consistent place to answer which mods exist, which are enabled, and which should load first.
+The core type is `ModManager`, which handles the full mod lifecycle: scanning configured mod search paths for `mod.toml` manifest files; parsing manifests into `ModInfo` records (unique string ID, display name, version semver, author, description, dependency list); resolving load order via topological sort over the dependency graph; detecting circular dependencies and missing dependencies; enabling/disabling individual mods; mounting enabled mod folders into `GameFS` as overlay `MountLayer` entries; and polling mtime for hot-reload detection.
 
-It intentionally does not execute mod scripts, mount assets into the virtual filesystem, or enforce sandboxing. Those responsibilities belong in higher integration layers; this module is the registry and ordering layer.
+Each mod folder must contain a `mod.toml` with at minimum an `id`, `name`, and `version` field. Assets in a mod folder override base game assets at the same virtual path; new assets are simply added to the virtual filesystem. Dependency ordering ensures that if mod B depends on mod A, mod A's assets are mounted first so mod B's overrides take precedence.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+Hot-reload queuing works by recording the mtime of each mounted mod folder at load time and comparing on each `tick()` call. When a change is detected, the mod is queued for reload notification to the Lua callback registered via `lurek.mods.onReload(fn)`.
+
+**Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`. Lua bridge in `src/lua_api/mods_api.rs`.
 
 ## Files
 

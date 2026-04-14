@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `data` module owns in-memory binary data processing for Lurek2D. It gives the engine and Lua scripts a common place for mutable byte buffers, typed read-only byte views, binary packing formats, compression, binary-to-text encoding, and hashing.
+The `data` module provides Lurek2D's binary data manipulation toolkit: raw byte buffers, compression, cryptographic hashing, binary encoding, and structured pack/unpack utilities. It is a Foundations tier module with no engine dependencies, used by game code and engine internals that need to work with binary data at a byte level.
 
-This module exists so scripting-facing systems can move bytes around without depending on platform I/O or renderer-specific types. The central abstractions are `ByteData` for owned mutable buffers and `DataView` for safe typed reads over shared bytes; the surrounding helpers build on those to support serialization, asset preprocessing, save payload handling, and interop with Lua code.
+The core type is `ByteData`, a heap-allocated raw byte buffer with bounds-checked element access. Most operations work by consuming or returning `ByteData` instances rather than modifying them in place.
 
-`data` intentionally does not own filesystem access, streaming I/O, structured tabular analysis, or most human-authored text formats. It does currently include TOML conversion helpers and exposes them through `lurek.data`, but JSON, CSV, YAML, and broader text codec responsibilities live in `src/serial/`.
+Compression (`compress` submodule) supports deflate, gzip, lz4, and zlib via the `CompressFormat` enum. Hashing (`hash`) provides MD5, SHA-1, SHA-256, and SHA-512 via the `HashAlgorithm` enum. Encoding (`encode`) provides base64 and hex via the `EncodeFormat` enum.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Foundations layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+The `pack`/`unpack` functions provide a LÖVE2D-compatible binary pack format using format-string tokens (`b` byte, `i` / `I` signed/unsigned integers in various widths, `f` float, `d` double, `s` length-prefixed string, `z` null-terminated string, `c` fixed-length byte sequence). This API is used by network serialization and save-data encoding. The separate `bin_pack` module implements Lurek2D's own space-separated type-token serialization format for edge cases requiring human-readable binary encoding. `DataView` provides a windowed, read-only view into a byte slice without copying.
+
+Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module under `lurek.codec`.
+
+**Scope boundary**: Foundations tier. Depends only on external crates (deflate, lz4, sha2, base64, etc.). Lua bridge in `src/lua_api/data_api.rs`.
 
 ## Files
 
@@ -118,11 +122,11 @@ This module exists so scripting-facing systems can move bytes around without dep
 - `DataView:getSize`: Returns the size of this view in bytes.
 
 ### `mlua` Methods
-- `mlua:getSize`: Lua-facing function documented in the binding source.
-- `mlua:getString`: Lua-facing function documented in the binding source.
-- `mlua:getByte`: Lua-facing function documented in the binding source.
-- `mlua:setByte`: Lua-facing function documented in the binding source.
-- `mlua:clone`: Lua-facing function documented in the binding source.
+- `mlua:getSize`: Get the size.
+- `mlua:getString`: Get the string representation.
+- `mlua:getByte`: Get a byte at the specified offset.
+- `mlua:setByte`: Set a byte at the specified offset.
+- `mlua:clone`: Clone the ByteData.
 
 ## References
 

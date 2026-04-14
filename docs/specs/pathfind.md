@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `pathfind` module is Lurek2D's navigation algorithm stack. It covers A-star, flow fields, hierarchical pathfinding, influence maps, unit-size-aware path requests, adjacency-graph pathing, and background worker support for expensive searches.
+The `pathfind` module is Lurek2D's comprehensive pathfinding library. It provides grid-based, hex-based, isometric, hierarchical, flow-field, and abstract graph pathfinding for games of any scale and topology. All computation is CPU-only and the module is fully headless for testing.
 
-It exists so movement planning and spatial search stay isolated from AI orchestration, physics, and scene code. Other modules can consume paths, flow directions, or influence values without re-implementing grids, heuristics, smoothing, or asynchronous dispatch.
+`NavGrid` is a 2D walkability and cost grid with per-cell integer weights and four diagonal movement modes. `astar(grid, start, end)` returns a `Vec<(i32, i32)>` optimal path using A\* with an octile heuristic. `flow_field(grid, target)` precomputes a per-cell direction vector grid toward the target, used for crowd steering without per-agent pathfinding. `Dijkstra`-based `RangeMap` computes all cells reachable within a movement budget, used for turn-based movement previews.
 
-It intentionally does not own agent decision-making, movement execution, collision resolution, or rendering beyond optional debug output. It answers where to go and how to evaluate traversability, not how a game object should behave once a path exists.
+`HPA*` clusters the grid into abstract nodes with precomputed inter-cluster edge weights, enabling efficient planning over large maps by first finding an abstract path then refining locally. `HexGrid` provides axial-coordinate hex pathfinding with optional per-cell costs. `IsoGrid` provides isometric pathfinding backed by a flat cost array with walkability masking.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra range queries on abstract `Graph<N, f32>` instances, suitable for province-level and world-graph navigation. `InfluenceMap` is a multi-layer spatial float grid for strategic area analysis (threat maps, resource maps, contested zones). `PathThreadPool` provides background pathfinding via a worker pool for off-thread `NavGrid` queries, keeping pathfinding off the main Lua thread for large scenes.
+
+**Scope boundary**: Feature Systems tier. Depends on `math`, `graph`, `runtime`. Lua bridge in `src/lua_api/pathfind_api.rs`.
 
 ## Files
 
@@ -25,13 +27,18 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `astar.rs`: Implements A-star search, line-of-sight checks, and path smoothing helpers over navigation grids.
 - `async_pool.rs`: Dispatches pathfinding work to background threads with request management and cancellation support.
 - `flow_field.rs`: Implements Dijkstra-based flow fields for crowd steering toward one or more targets.
+- `graph_nav.rs`: Generic graph-based navigation using the `graph` module's [`Graph`] struct.
 - `graph_path.rs`: Implements adjacency-graph pathfinding for province-style or node-link worlds instead of regular grids.
 - `grid.rs`: Defines a standalone grid with generic path search, BFS, Dijkstra, and flow-field generation support.
+- `hex_grid.rs`: Hexagonal grid pathfinding, LOS, FOV, and range-of-movement.
 - `hpa.rs`: Implements hierarchical pathfinding using chunk abstraction and entrance-based higher-level search.
 - `influence_map.rs`: Stores and updates multi-layer spatial influence values for tactical or strategic reasoning.
+- `iso_grid.rs`: Isometric grid pathfinding with diamond topology (4-directional).
+- `jps.rs`: Jump Point Search (JPS) for uniform-cost orthogonal-diagonal grids.
 - `mod.rs`: Declares the pathfinding submodules and re-exports the main grids, algorithms, and support types.
 - `nav_grid.rs`: Defines the main navigation grid with walkability, costs, diagonal rules, and thread-friendly snapshots.
 - `pathgrid.rs`: Provides an alternate path grid with float costs and built-in path operations.
+- `range_map.rs`: Dijkstra-budget range-of-movement and threat-range maps on arbitrary grids.
 - `render.rs`: Generates debug render output for grids, flow fields, and influence maps.
 - `unit_pathfinder.rs`: Wraps pathfinding for unit-sized actors, including caching, partial paths, and nearest-walkable recovery.
 
@@ -44,15 +51,20 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `ProvincePath` (`struct`, `graph_path.rs`): A path through the province adjacency graph.
 - `ProvinceCostFn` (`struct`, `graph_path.rs`): Configurable cost function for province pathfinding.
 - `Grid` (`struct`, `grid.rs`): Standalone generic grid type for search algorithms and support operations.
+- `HexLayout` (`enum`, `hex_grid.rs`): Hex grid layout orientation.
+- `HexGrid` (`struct`, `hex_grid.rs`): A hexagonal grid supporting pathfinding, LOS, FOV, and range queries.
 - `AbstractEdge` (`struct`, `hpa.rs`): An edge in the abstract graph connecting two entrance nodes.
 - `AbstractNode` (`struct`, `hpa.rs`): A node in the abstract graph, representing an entrance point on a chunk boundary.
 - `Chunk` (`struct`, `hpa.rs`): A chunk region of the grid used during abstract graph construction.
 - `AbstractGraph` (`struct`, `hpa.rs`): Higher-level graph abstraction used by hierarchical pathfinding.
 - `InfluenceMap` (`struct`, `influence_map.rs`): Multi-layer float grid for tactical influence, pressure, or ownership analysis.
+- `IsoGrid` (`struct`, `iso_grid.rs`): A 2D isometric grid supporting A* pathfinding and LOS.
+- `JpsGrid` (`struct`, `jps.rs`): A uniform-cost grid optimised for JPS pathfinding.
 - `DiagonalMode` (`enum`, `nav_grid.rs`): Controls how diagonal movement is handled during pathfinding.
 - `NavGrid` (`struct`, `nav_grid.rs`): The main navigation grid used by most search helpers, storing blocked cells, movement costs, and diagonal policy.
 - `Cell` (`struct`, `pathgrid.rs`): Core cell representation used by one of the grid variants.
 - `PathGrid` (`struct`, `pathgrid.rs`): Alternate grid representation with float costs and built-in path utilities.
+- `RangeMap` (`struct`, `range_map.rs`): A precomputed range map: cheapest path costs from a single origin.
 - `Waypoint` (`struct`, `unit_pathfinder.rs`): A waypoint along a computed path.
 - `UnitPathfinder` (`struct`, `unit_pathfinder.rs`): High-level wrapper that adapts pathfinding to unit radius, caching, partial paths, and recovery logic.
 
@@ -85,6 +97,8 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `FlowField::get_height` (`flow_field.rs`): Grid height in cells.
 - `FlowField::steer` (`flow_field.rs`): Convert a world-space position into a velocity vector.
 - `FlowField::draw_to_image` (`flow_field.rs`): Render the flow field to an image with direction arrows.
+- `graph_astar` (`graph_nav.rs`): Find the shortest path between two nodes using A* (or Dijkstra when no heuristic is supplied).
+- `graph_range` (`graph_nav.rs`): Find all nodes within `max_cost` from `start` using Dijkstra.
 - `ProvinceCostFn::new` (`graph_path.rs`): Create a cost function with default cost 1.0 and no overrides.
 - `find_province_path` (`graph_path.rs`): Find a path between two provinces using A* with centroid distance heuristic.
 - `province_reachable` (`graph_path.rs`): Find all provinces reachable from `start` within a cost budget using Dijkstra.
@@ -99,6 +113,16 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `Grid::find_path_dijkstra` (`grid.rs`): Finds a path from `(sx, sy)` to `(gx, gy)` using Dijkstra's algorithm.
 - `Grid::find_path_bfs` (`grid.rs`): Finds a shortest-hop path from `(sx, sy)` to `(gx, gy)` using BFS.
 - `Grid::build_flow_field` (`grid.rs`): Builds a flow field pointing toward `(gx, gy)`.
+- `HexGrid::new` (`hex_grid.rs`): Create a new hex grid of the given size and layout.
+- `HexGrid::set_blocked` (`hex_grid.rs`): Mark or unmark a cell as blocked.
+- `HexGrid::set_cost` (`hex_grid.rs`): Set the movement cost for a cell.
+- `HexGrid::is_blocked` (`hex_grid.rs`): Returns `true` if the cell is blocked or out of bounds.
+- `HexGrid::find_path` (`hex_grid.rs`): A* pathfinding on the hex grid.
+- `HexGrid::line_of_sight` (`hex_grid.rs`): Line-of-sight between two hex cells using hex linear interpolation.
+- `HexGrid::field_of_view` (`hex_grid.rs`): Field of view from `origin` out to `max_range`.
+- `HexGrid::range_of_movement` (`hex_grid.rs`): Range-of-movement: all cells reachable within `budget` using Dijkstra.
+- `HexGrid::neighbors` (`hex_grid.rs`): Returns grid-bounded neighbors for the given cell in offset coordinates.
+- `HexGrid::distance` (`hex_grid.rs`): Hex distance between two cells (cube coordinate distance).
 - `build_abstract` (`hpa.rs`): Build the abstract graph from a `NavGrid`.
 - `hpa_star` (`hpa.rs`): Run HPA★ from `start` to `goal` on the abstract graph, then refine to tiles.
 - `is_reachable` (`hpa.rs`): Check if `goal` is reachable from `start` using the abstract graph.
@@ -121,6 +145,16 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `InfluenceMap::query_rect` (`influence_map.rs`): Sums influence within a world-space rectangle.
 - `InfluenceMap::blend` (`influence_map.rs`): Blends two layers into a destination: dest = wA * A + wB * B.
 - `InfluenceMap::draw_to_image` (`influence_map.rs`): Render the influence map to an image.
+- `IsoGrid::new` (`iso_grid.rs`): Create a new isometric grid of the given size.
+- `IsoGrid::set_blocked` (`iso_grid.rs`): Mark or unmark a cell as blocked.
+- `IsoGrid::set_cost` (`iso_grid.rs`): Set the movement cost for a cell.
+- `IsoGrid::find_path` (`iso_grid.rs`): A* pathfinding on the isometric grid.
+- `IsoGrid::line_of_sight` (`iso_grid.rs`): Bresenham line-of-sight check.
+- `IsoGrid::neighbors` (`iso_grid.rs`): 4-directional diamond neighbors, filtered to passable in-bounds cells.
+- `JpsGrid::new` (`jps.rs`): Create a new JPS grid.
+- `JpsGrid::set_blocked` (`jps.rs`): Mark or unmark a cell as blocked.
+- `JpsGrid::is_blocked` (`jps.rs`): Returns `true` if the cell is blocked or out of bounds.
+- `JpsGrid::find_path` (`jps.rs`): Find a path using Jump Point Search.
 - `DiagonalMode::from_lua_str` (`nav_grid.rs`): Parse a Lua string into a `DiagonalMode`.
 - `DiagonalMode::to_lua_str` (`nav_grid.rs`): Convert to the canonical Lua string representation.
 - `NavGrid::new` (`nav_grid.rs`): Create a new grid where every cell has cost 1 (fully walkable).
@@ -156,6 +190,11 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `PathGrid::find_path` (`pathgrid.rs`): A★ search from (sx,sy) to (gx,gy) in 0-based grid coords.
 - `PathGrid::find_path_smoothed` (`pathgrid.rs`): A★ + string-pulling (greedy LOS post-processing).
 - `PathGrid::cell_center` (`pathgrid.rs`): Returns the world-space center of cell (x, y).
+- `RangeMap::from_grid` (`range_map.rs`): Compute range from `(origin_x, origin_y)` within `budget` on a flat cost grid.
+- `RangeMap::reachable` (`range_map.rs`): Returns `true` if the cell at `(x, y)` was reached within the budget.
+- `RangeMap::cost_to` (`range_map.rs`): Cheapest path cost to reach `(x, y)`, or `None` if unreachable.
+- `RangeMap::reachable_cells` (`range_map.rs`): All reachable cells as `(x, y)` tuples.
+- `RangeMap::reachable_cells_with_cost` (`range_map.rs`): All reachable cells with their movement cost as `(x, y, cost)` tuples.
 - `NavGrid::generate_render_commands` (`render.rs`): Generate debug render commands visualising the navigation grid.
 - `FlowField::generate_render_commands` (`render.rs`): Generate debug render commands visualising flow directions.
 - `InfluenceMap::generate_render_commands` (`render.rs`): Generate debug render commands visualising one influence layer as a heatmap.
@@ -189,6 +228,9 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `lurek.pathfind.setThreadCount`: Sets the background pathfinding thread count (currently a no-op).
 - `lurek.pathfind.getThreadCount`: Returns the background pathfinding thread count (currently always 0).
 - `lurek.pathfind.newNavGridFromTileMap`: Builds a NavGrid from a TileMap layer, treating specified GIDs as blocked (unwalkable).
+- `lurek.pathfind.newHexGrid`: Creates a hex grid for pathfinding, LOS, FOV, and range queries.
+- `lurek.pathfind.newJpsGrid`: Creates a uniform-cost grid optimised for Jump Point Search (orthogonal + diagonal).
+- `lurek.pathfind.rangeMap`: Computes a Dijkstra range-of-movement map from an origin within a movement budget.
 
 ### `AiFlowField` Methods
 - `AiFlowField:getWidth`: Returns the grid width.
@@ -208,6 +250,21 @@ It intentionally does not own agent decision-making, movement execution, collisi
 - `FlowField:getTargets`: Returns the target cells from the most recent computation (1-based coordinates).
 - `FlowField:type`: Returns the type name of this object.
 - `FlowField:typeOf`: Returns true if this object is of the given type.
+
+### `HexGrid` Methods
+- `HexGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
+- `HexGrid:setCost`: Set movement cost for a cell (1-based coordinates).
+- `HexGrid:isBlocked`: Returns true if a cell is blocked (1-based coordinates).
+- `HexGrid:findPath`: Find A* path between two cells (1-based coordinates).
+- `HexGrid:lineOfSight`: Returns true if there is an unobstructed line between two cells (1-based).
+- `HexGrid:fieldOfView`: Returns all cells visible from origin within max_range (1-based coordinates).
+- `HexGrid:rangeOfMovement`: Returns all cells reachable from origin within movement budget (1-based).
+- `HexGrid:distance`: Hex-distance between two cells.
+
+### `JpsGrid` Methods
+- `JpsGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
+- `JpsGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
+- `JpsGrid:findPath`: Find a JPS path between two cells (1-based coordinates).
 
 ### `NavGrid` Methods
 - `NavGrid:getWidth`: Returns the grid width in cells.
@@ -253,6 +310,7 @@ It intentionally does not own agent decision-making, movement execution, collisi
 
 ## References
 
+- `graph`: Imports or references `src/graph/`. Cross-group dependency from ``Feature Systems`` into `Foundations`.
 - `image`: Imports or references `image` from `src/image/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.

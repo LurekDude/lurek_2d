@@ -1,11 +1,26 @@
-//! Mod implementation for the `graphics` subsystem.
+//! GPU rendering layer backed by wgpu 22.
 //!
-//! This module is part of Lurek2D's `graphics` subsystem and provides the implementation
-//! details for mod-related operations and data management.
+//! Implements a deferred `RenderCommand` queue: Lua callbacks push draw commands into
+//! `SharedState::pending_commands` during `lurek.render()` / `lurek.render_ui()`; after all
+//! callbacks return, [`gpu_renderer::GpuRenderer::render_frame()`] processes the queue,
+//! batches compatible draw calls, and presents the swapchain surface. No GPU work is done
+//! inside a Lua closure.
 //!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! ## Subsystem inventory
+//! - [`renderer`] — `RenderCommand` enum, draw enums, and texture data types
+//! - [`gpu_renderer`] — [`GpuRenderer`]: wgpu device, queue, surface, resource pools
+//! - [`canvas`] — [`Canvas`]: off-screen render-to-texture for post-processing
+//! - [`font`] — [`Font`]: fontdue glyph rasterization and GPU atlas management
+//! - [`shader`] — [`Shader`]: user-supplied WGSL with uniform variable table
+//! - [`shape`] — compound vector shape builder for batched drawing
+//! - [`mesh`] — custom vertex geometry with per-vertex position, UV, and color
+//! - [`postfx_pipeline`] — ping-pong texture passes for multi-pass post-processing
+//! - [`draw_layer`] — Z-ordered draw layer for painter's-algorithm sorting
+//! - [`decal_surface`] — persistent surface for accumulated decal stamps
+//! - [`image_effect`] — per-image shader-effect pass descriptor
 //!
+//! All public items are documented. Lua bridge: `src/lua_api/render_api.rs` (registered as `lurek.graphics.*`).
+
 /// Off-screen render targets (canvases) for deferred compositing.
 pub mod canvas;
 /// Persistent surface for stamping decal textures.

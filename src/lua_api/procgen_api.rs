@@ -14,12 +14,7 @@ use crate::procgen::{
 use crate::procgen::heightmap::Heightmap;
 use crate::procgen::lsystem::LSystem;
 use crate::procgen::namegen::NameGen;
-use crate::procgen::world_graph::generate_world_graph   BspOpts, CellularOpts, HeightmapOpts, MapGenOptions, NoiseGenerator, RoomsOpts,
-    VoronoiOpts, WfcOpts, WfcRules, WfcTile,
-};
-use crate::procgen::heightmap::Heightmap;
-use crate::procgen::lsystem::LSystem;
-use crate::procgen::namegen::NameGen;
+use crate::procgen::noise::{simplex_noise_2d, simplex_noise_3d};
 use crate::procgen::world_graph::generate_world_graph;
 
 // -------------------------------------------------------------------------------
@@ -27,6 +22,11 @@ use crate::procgen::world_graph::generate_world_graph;
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.procgen` API table with the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `_state` — `Rc<RefCell<SharedState>>`.
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -879,6 +879,31 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- simplex2d --
+    /// Returns a single Simplex noise value at the given 2-D coordinate.
+    /// @param x : number
+    /// @param y : number
+    /// @return number
+    tbl.set(
+        "simplex2d",
+        lua.create_function(|_, (x, y): (f32, f32)| {
+            Ok(simplex_noise_2d(x, y))
+        })?,
+    )?;
+
+    // -- simplex3d --
+    /// Returns a single Simplex noise value at the given 3-D coordinate.
+    /// @param x : number
+    /// @param y : number
+    /// @param z : number
+    /// @return number
+    tbl.set(
+        "simplex3d",
+        lua.create_function(|_, (x, y, z): (f32, f32, f32)| {
+            Ok(simplex_noise_3d(x, y, z))
+        })?,
+    )?;
+
     luna.set("procgen", tbl)?;
     Ok(())
 }
@@ -904,6 +929,12 @@ impl CellularOpts {
 
 impl VoronoiOpts {
 /// from_lua_table.
+///
+/// # Parameters
+/// - `t` — `&LuaTable`.
+///
+/// # Returns
+/// `LuaResult<Self>`.
 ///
 ///
 pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {

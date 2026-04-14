@@ -8,6 +8,9 @@
 
 /// Capacity metadata for a last-in-first-out stack.
 ///
+/// # Fields
+/// - `capacity` — `usize`.
+///
 /// `capacity == 0` means unlimited.
 #[derive(Debug, Default, Clone)]
 pub struct StackMeta {
@@ -42,6 +45,9 @@ impl StackMeta {
 // ── QueueMeta ─────────────────────────────────────────────────────────────────
 
 /// Capacity metadata for a first-in-first-out queue.
+///
+/// # Fields
+/// - `capacity` — `usize`.
 ///
 /// `capacity == 0` means unlimited.
 #[derive(Debug, Default, Clone)]

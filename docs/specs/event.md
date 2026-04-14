@@ -11,13 +11,17 @@
 
 ## Summary
 
-The event module gives Lurek2D two lightweight messaging primitives: a FIFO event queue for polling named events and a handle-based signal dispatcher for callback-style fan-out. It exists so gameplay code can communicate across systems without introducing direct ownership or import dependencies between those systems.
+The `event` module provides Lurek2D's centralised event queue — the single channel through which OS input, window state changes, custom Lua events, and automation-injected synthetic input flow before being dispatched to Lua callbacks. All modules that raise or consume events route through this module rather than coupling directly to each other.
 
-The queue side is about ordered delivery and explicit consumption. Engine or gameplay code can push named events with primitive payload values, and scripts can poll or wait for them later. The signal side is about local pub-sub: listeners subscribe by name, get handles back, and can be removed or cleared without needing a full feature-rich event bus.
+The core type is `EventQueue`, a double-buffered ring of `Event` values. `App` pushes events during the winit event handler; at the start of each logical-update tick the queue is drained and dispatched to the registered Lua listeners (key-down, key-up, mouse-move, etc.). Double-buffering means that events raised during a tick dispatch do not affect the same tick — they accumulate in the pending buffer and are visible on the next tick. This prevents re-entrant event-handling hazards.
 
-This module intentionally does not own OS input capture, scene transitions, or higher-order event orchestration policies. Hardware events originate in `input` and the app loop, richer callback patterns live under `patterns`, and Lua registry management for callbacks belongs in `src/lua_api/event_api.rs` rather than in the core `event` data structures.
+`Event` is a flat tagged enum that covers: keyboard events (key code, scancode, modifiers, repeat flag), mouse events (button, position, scroll delta), gamepad events (axis, button, device ID), text input (Unicode character), window events (resize, focus, close, file-drop), touch events, and user-defined events (`UserEvent` with a string key and an optional Lua value payload). The user event variant is what `lurek.event.emit(name, data)` uses to implement the publish-subscribe pattern between Lua scripts.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+The `automation` module also injects synthetic events into the queue through the same `push()` path as real hardware events, which is what makes automation playback transparent to downstream callbacks.
+
+Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedState`, it is only safe to access on the main thread. Background threads that need to communicate use `lurek.thread.Channel` instead.
+
+**Scope boundary**: Core Runtime tier. No upstream engine dependencies. Lua bridge handled through `app` dispatch.
 
 ## Files
 

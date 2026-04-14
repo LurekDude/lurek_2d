@@ -21,6 +21,10 @@ fn dispatch(sinks: &Rc<RefCell<SinkRegistry>>, level: SinkLevel, tag: &str, mess
 
 /// Registers the `lurek.log.*` namespace into the shared `luna` table.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     let log_table = lua.create_table()?;
 

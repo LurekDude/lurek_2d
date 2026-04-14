@@ -20,6 +20,9 @@ pub struct Strategy {
 
 impl Strategy {
     /// Creates a new, empty [`Strategy`] registry.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }

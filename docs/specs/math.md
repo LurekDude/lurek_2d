@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `math` module is Lurek2D's shared foundation for numeric types and algorithms that many higher-level systems depend on. It owns the engine's core 2D value types such as vectors, matrices, rectangles, and colors, plus reusable geometric helpers, easing curves, seeded randomness, procedural noise, and broad-phase spatial indexing.
+The `math` module is Lurek2D's foundational mathematics library — the leaf of the engine's dependency graph with zero Lurek2D module dependencies of its own. Every other module that needs 2D math, geometry, or color types imports from here.
 
-This module exists so rendering, physics, animation, UI, pathfinding, and Lua bindings can share one consistent set of primitives instead of re-implementing math logic in each subsystem. Its APIs are mostly pure, lightweight, and allocation-conscious, which makes them safe to use in hot update and render paths.
+Core value types: `Vec2` (2D f32 vector with arithmetic operators, swizzling, dot/cross/normalize/lerp/distance helpers), `Vec3` (3D f32 vector with equivalent ops), `Mat3` (3×3 column-major affine transform matrix supporting translate, rotate, scale application and matrix multiplication), `Transform` (chainable builder wrapping `Mat3`), `Rect` (AABB with contains/overlaps/union/intersection), `Color` (the engine's canonical sRGB `[f32; 4]` type with named constants, `u8` and `f32` constructors, and packed `u32` output — all engine code must use this, not custom color structs).
 
-`math` intentionally does not own engine state, ECS data, resource handles, scene objects, or frame scheduling. It provides building blocks like `Tween`, `Transform`, and `SpatialHash`, but it does not own the higher-level animation system in `src/tween/`, scene transforms, or gameplay orchestration.
+Curve and spline types: `BezierCurve` (De Casteljau evaluation), `CatmullRomSpline` and `HermiteSpline` (smooth interpolating splines for animation paths).
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+Utility types: `RandomGenerator` (seedable deterministic linear congruential RNG for reproducible sequences), `SpatialHash` (grid-based broad-phase AABB collision query), `EasingType` enum with 30+ easing functions as both named functions and an enum for serialization, `geometry` module with ear-clipping triangulation, convex hull, point-in-polygon test, line-segment intersection, and rasterization helpers.
+
+All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold heap allocations except spline control-point vectors.
+
+**Scope boundary**: Foundations tier. Zero Lurek2D dependencies. Lua bridge in `src/lua_api/math_api.rs`.
 
 ## Files
 
@@ -33,9 +37,11 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `random.rs`: Wraps `fastrand` in a deterministic, serializable RNG API that matches engine and Lua expectations.
 - `rect.rs`: Provides axis-aligned rectangles for overlap, containment, and intersection queries used across gameplay and rendering code.
 - `spatial_hash.rs`: Implements a uniform-grid broad-phase index for fast rectangle, circle, and segment spatial queries.
+- `spline.rs`: Interpolating and approximating splines: Catmull-Rom and Hermite.
 - `transform.rs`: Wraps `Mat3` in a mutable 2D transform object with chainable translate, rotate, scale, and shear operations.
 - `tween.rs`: Implements low-level numeric interpolation over one or more values and explicitly stays below the higher-level `src/tween/` feature system.
 - `vec2.rs`: Defines the engine's primary 2D vector type and common arithmetic, direction, interpolation, and geometric helpers.
+- `vec3.rs`: 3D floating-point vector with arithmetic operators and common helpers.
 
 ## Types
 
@@ -51,10 +57,13 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `Rect` (`struct`, `rect.rs`): Axis-aligned rectangle for cheap containment and overlap checks. It is the basic AABB type used by layout and collision-adjacent code.
 - `SpatialItem` (`struct`, `spatial_hash.rs`): Stored record for an object indexed by `SpatialHash`. It keeps the query structure decoupled from any particular gameplay object type.
 - `SpatialHash` (`struct`, `spatial_hash.rs`): Broad-phase query structure for coarse spatial lookup by AABB, circle, or segment. It is a utility index, not a full collision or physics system.
+- `CatmullRomSpline` (`struct`, `spline.rs`): A Catmull-Rom spline through a sequence of control points.
+- `HermiteSpline` (`struct`, `spline.rs`): A cubic Hermite spline segment defined by two endpoints and their tangents.
 - `Transform` (`struct`, `transform.rs`): Mutable 2D transform object that exposes a script-friendly API over `Mat3`. It is the ergonomic surface for composition and point conversion.
 - `TweenValue` (`struct`, `tween.rs`): Holds one start-target numeric pair inside a low-level tween. It is intentionally minimal and exists mainly to support `Tween`.
 - `Tween` (`struct`, `tween.rs`): Low-level multi-channel numeric interpolator driven by easing functions and an internal clock. It does not own callbacks, sequences, or property animation workflows.
 - `Vec2` (`struct`, `vec2.rs`): Core 2D vector used pervasively for positions, directions, offsets, and interpolation. It is the default math currency for most engine subsystems.
+- `Vec3` (`struct`, `vec3.rs`): A 3D floating-point vector.
 
 ## Functions
 
@@ -126,6 +135,8 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `Mat3::from_scale` (`mat3.rs`): Creates a non-uniform scale matrix with the given per-axis factors.
 - `Mat3::inverse` (`mat3.rs`): Compute the inverse of this 3×3 matrix.
 - `Mat3::transform_point` (`mat3.rs`): Applies the matrix transform to a 2D point using homogeneous coordinates.
+- `lerp` (`mod.rs`): Linear interpolation between `a` and `b` by factor `t` in [0, 1].
+- `remap` (`mod.rs`): Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
 - `perlin2d` (`noise_functions.rs`): Generates 2D Perlin noise at the given coordinates.
 - `simplex2d` (`noise_functions.rs`): Generates 2D Simplex noise at the given coordinates.
 - `simplex_noise_2d` (`noise_functions.rs`): Returns 2D simplex noise for the given coordinates using seed 0.
@@ -178,6 +189,13 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `SpatialHash::query_rect` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query rectangle.
 - `SpatialHash::query_circle` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs overlap the query circle.
 - `SpatialHash::query_segment` (`spatial_hash.rs`): Returns the IDs of all items whose AABBs are intersected by a line
+- `CatmullRomSpline::new` (`spline.rs`): Create a spline from the given control points.
+- `CatmullRomSpline::sample` (`spline.rs`): Sample the spline at a global parameter `t` in [0, 1] spanning the whole curve.
+- `CatmullRomSpline::sample_segment` (`spline.rs`): Sample a specific segment by index at local parameter `t` in [0, 1].
+- `CatmullRomSpline::len` (`spline.rs`): Number of control points.
+- `CatmullRomSpline::is_empty` (`spline.rs`): Returns `true` if there are no control points.
+- `HermiteSpline::new` (`spline.rs`): Create a Hermite spline with explicit endpoints and tangents.
+- `HermiteSpline::sample` (`spline.rs`): Evaluate the spline at parameter `t` in [0, 1].
 - `Transform::new` (`transform.rs`): Create an identity transform (no translation, rotation, or scale).
 - `Transform::from_components` (`transform.rs`): Create from full transformation parameters (standard parameter order).
 - `Transform::translate` (`transform.rs`): Apply translation to the transform.
@@ -215,6 +233,18 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `Vec2::rotate` (`vec2.rs`): Returns a copy of this vector rotated by `angle` radians around the origin.
 - `Vec2::perpendicular` (`vec2.rs`): Returns the perpendicular (normal) vector, rotated 90° counter-clockwise.
 - `Vec2::cross` (`vec2.rs`): Returns the 2D cross product (perpendicular dot product) with `other`.
+- `Vec3::new` (`vec3.rs`): Create a new vector with the given components.
+- `Vec3::zero` (`vec3.rs`): The zero vector (0, 0, 0).
+- `Vec3::one` (`vec3.rs`): The unit vector (1, 1, 1).
+- `Vec3::dot` (`vec3.rs`): Dot product of this vector and `other`.
+- `Vec3::cross` (`vec3.rs`): Cross product of this vector and `other`.
+- `Vec3::length` (`vec3.rs`): Euclidean length (magnitude) of this vector.
+- `Vec3::length_squared` (`vec3.rs`): Squared Euclidean length.
+- `Vec3::normalize` (`vec3.rs`): Returns a unit-length version of this vector, or the zero vector if length is zero.
+- `Vec3::lerp` (`vec3.rs`): Linear interpolation between this vector and `other` by factor `t` in [0, 1].
+- `Vec3::distance` (`vec3.rs`): Euclidean distance to `other`.
+- `Vec3::project` (`vec3.rs`): Project this vector onto `onto`.
+- `Vec3::reflect` (`vec3.rs`): Reflect this vector about `normal` (normal must be unit length).
 
 ## Lua API Reference
 
@@ -228,8 +258,6 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `lurek.math.newTween`: Creates a new Tween with the given duration and easing name.
 - `lurek.math.newSpatialHash`: Creates a new SpatialHash with the given cell size.
 - `lurek.math.newNoiseGenerator`: Creates a new seeded noise generator.
-- `lurek.math.vec2`: Creates a Lua `Vec2` userdata with mutable `x`/`y` fields, arithmetic metamethods, and vector helpers.
-- `lurek.math.Vec2`: Compatibility alias for `lurek.math.vec2` used by existing Lua tests and scripts.
 - `lurek.math.perlin2d`: Returns 2D Perlin noise at (x, y) with the given seed.
 - `lurek.math.perlin3d`: Returns 3D Perlin noise at (x, y, z) with the given seed.
 - `lurek.math.simplex2d`: Returns 2D Simplex noise at (x, y) with the given seed.
@@ -303,6 +331,14 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `lurek.math.random`: Returns a pseudo-random number in [0,1) with no args,
 - `lurek.math.randomInt`: Returns a pseudo-random integer in [lo, hi] (inclusive).
 - `lurek.math.simplexNoise`: Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
+- `lurek.math.vec2`: Creates a 2D vector with x and y components.
+- `lurek.math.Vec2`: Compatibility alias for `vec2`.
+- `lurek.math.vec3`: Creates a 3D vector.
+- `lurek.math.Vec3`: Compatibility alias for `vec3`.
+- `lurek.math.catmullRom`: Creates a Catmull-Rom spline through the given control points.
+- `lurek.math.hermite`: Creates a Hermite spline defined by two endpoints and tangents.
+- `lurek.math.lerp`: Linear interpolation between two numbers: a + (b - a) * t.
+- `lurek.math.remap`: Remaps `v` from [in_min, in_max] to [out_min, out_max].
 
 ### `BezierCurve` Methods
 - `BezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
@@ -315,6 +351,14 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `BezierCurve:translate`: Translates all control points by (dx, dy).
 - `BezierCurve:rotate`: Rotates all control points around a pivot by angle radians.
 - `BezierCurve:scale`: Scales all control points around a pivot by factor s.
+
+### `CatmullRom` Methods
+- `CatmullRom:sample`: Sample the spline at global t in [0, 1].
+- `CatmullRom:sampleSegment`: Sample a specific segment at local t in [0, 1].
+- `CatmullRom:len`: Number of control points.
+
+### `Hermite` Methods
+- `Hermite:sample`: Evaluate the spline at parameter t in [0, 1].
 
 ### `NoiseGenerator` Methods
 - `NoiseGenerator:perlin1d`: Returns 1D Perlin noise at x.
@@ -369,9 +413,36 @@ This module exists so rendering, physics, animation, UI, pathfinding, and Lua bi
 - `Tween:set`: Alias for setTime(). Sets the clock to t, clamped to [0, duration].
 - `Tween:addValue`: Adds a start/target value pair. Returns the 1-based index.
 
+### `Vec2` Methods
+- `Vec2:dot`: Returns the dot product with another vector.
+- `Vec2:length`: Returns the Euclidean length of the vector.
+- `Vec2:x`: Returns the horizontal component of the vector.
+- `Vec2:y`: Returns the vertical component of the vector.
+- `Vec2:lengthSquared`: Returns the squared length of the vector (faster than length).
+- `Vec2:normalize`: Returns a unit-length copy of this vector. Returns zero if length is zero.
+- `Vec2:normalized`: Compatibility alias for `normalize`.
+- `Vec2:lerp`: Returns a linearly interpolated vector between this and other at parameter t.
+- `Vec2:distance`: Returns the Euclidean distance from this vector to another.
+- `Vec2:angle`: Returns the angle of this vector in radians (atan2(y, x)).
+- `Vec2:rotate`: Returns a new vector rotated by the given angle in radians.
+- `Vec2:perpendicular`: Returns the perpendicular vector (-y, x).
+- `Vec2:cross`: Returns the 2D cross product (scalar) with another vector.
+
+### `Vec3` Methods
+- `Vec3:length`: Returns the Euclidean length of the vector.
+- `Vec3:lengthSquared`: Returns the squared Euclidean length (avoids sqrt).
+- `Vec3:normalize`: Returns a unit-length version of this vector.
+- `Vec3:dot`: Dot product with another Vec3.
+- `Vec3:cross`: Cross product with another Vec3.
+- `Vec3:lerp`: Linear interpolation towards another Vec3.
+- `Vec3:distance`: Euclidean distance to another Vec3.
+- `Vec3:add`: Add another Vec3 and return the result.
+- `Vec3:sub`: Subtract another Vec3 and return the result.
+- `Vec3:scale`: Scale this vector by a scalar and return the result.
+
 ## References
 
-- `runtime`: Imports or references `runtime` from `src/runtime/`.
+- No top-level `crate::<module>` imports were detected in this module's Rust source files.
 
 ## Notes
 

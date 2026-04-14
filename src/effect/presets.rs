@@ -10,6 +10,11 @@ use super::effect_type::PostFxEffectType;
 use super::stack::PostFxStack;
 
 /// A fully configured preset: an ordered stack of effects with their data.
+///
+/// # Fields
+/// - `name` — `&'static str`.
+/// - `effects` — `Vec<PostFxEffect>`.
+/// - `stack` — `PostFxStack`.
 #[derive(Debug, Clone)]
 pub struct EffectPreset {
     /// Human-readable label (e.g. `"retro_tv"`).

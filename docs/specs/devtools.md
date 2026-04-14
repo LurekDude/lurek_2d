@@ -11,13 +11,17 @@
 
 ## Summary
 
-The devtools module provides runtime diagnostics that are useful while building and debugging games or the engine itself. It exists so developers can inspect logs, frame timing, profiler zones, and watched files from inside the running engine instead of depending entirely on external profilers or raw console output.
+The `devtools` module provides Lurek2D's in-process developer tools: a structured logger, a frame profiler, rolling frame statistics, and a file watcher for hot-reload detection. These tools are exposed to Lua games via `lurek.devtools.*` and are designed to aid game developers during development without shipping GPU overlays or requiring a separate profiler binary.
 
-Its components are intentionally orthogonal. Logger stores in-process diagnostic history, Profiler records nested timing zones, FrameStats computes aggregate and percentile frame metrics, and FileWatcher polls files for change detection. The Lua bridge combines those pieces into the lurek.devtools namespace, but the Rust module itself stays focused on diagnostics primitives.
+`Logger` is a level-filtered, categorised in-process log with a rolling history ring buffer. Messages are tagged with a `LogLevel` (trace/debug/info/warn/error) and an optional category string. The history is accessible from Lua for in-game debug consoles. `Logger` is separate from the engine's Rust `log` crate output — it captures Lua-emitted messages independently.
 
-This module does not own the main engine log facade, the app event loop, or hot-reload policy. It supplements those systems with developer-facing runtime instrumentation and inspection helpers rather than replacing them.
+`Profiler` is a hierarchical zone-based frame profiler. `begin_zone(name)` / `end_zone()` calls bracket sections of game code; the profiler records wall-clock time per zone and builds a tree of `ProfileZone` entries for each completed frame. Results are accessible from Lua for custom in-game overlays.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+`FrameStats` computes rolling FPS and frame-time statistics including mean, min, max, and percentile values (p50/p95/p99) over the last N frames. `FrameSnapshot` captures one frame's complete stat set for display or logging.
+
+`FileWatcher` polls file modification times at a configurable interval. When a watched path's mtime changes, it queues a change notification that Lua code can poll to trigger hot-reload of assets or scripts.
+
+**Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/devtools_api.rs`.
 
 ## Files
 

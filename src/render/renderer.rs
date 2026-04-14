@@ -244,6 +244,71 @@ pub struct PostFxPass {
 }
 
 #[derive(Debug, Clone)]
+/// RenderCommand.
+///
+/// # Variants
+/// - `SetColor` — SetColor variant.
+/// - `Rectangle` — Rectangle variant.
+/// - `RoundedRectangle` — RoundedRectangle variant.
+/// - `Circle` — Circle variant.
+/// - `Ellipse` — Ellipse variant.
+/// - `Triangle` — Triangle variant.
+/// - `Polygon` — Polygon variant.
+/// - `Line` — Line variant.
+/// - `Polyline` — Polyline variant.
+/// - `DrawImage` — DrawImage variant.
+/// - `DrawImageEx` — DrawImageEx variant.
+/// - `DrawQuad` — DrawQuad variant.
+/// - `Print` — Print variant.
+/// - `SetLineWidth` — SetLineWidth variant.
+/// - `PushTransform` — PushTransform variant.
+/// - `PopTransform` — PopTransform variant.
+/// - `Translate` — Translate variant.
+/// - `Rotate` — Rotate variant.
+/// - `Scale` — Scale variant.
+/// - `Shear` — Shear variant.
+/// - `Origin` — Origin variant.
+/// - `ApplyTransform` — ApplyTransform variant.
+/// - `Arc` — Arc variant.
+/// - `DrawBatch` — DrawBatch variant.
+/// - `SetBlendMode` — SetBlendMode variant.
+/// - `SetCanvas` — SetCanvas variant.
+/// - `DrawCanvas` — DrawCanvas variant.
+/// - `RegisterCanvas` — RegisterCanvas variant.
+/// - `Points` — Points variant.
+/// - `SetPointSize` — SetPointSize variant.
+/// - `SetScissor` — SetScissor variant.
+/// - `SetColorMask` — SetColorMask variant.
+/// - `SetWireframe` — SetWireframe variant.
+/// - `PrintFormatted` — PrintFormatted variant.
+/// - `StencilBegin` — StencilBegin variant.
+/// - `StencilEnd` — StencilEnd variant.
+/// - `SetStencilTest` — SetStencilTest variant.
+/// - `SetShader` — SetShader variant.
+/// - `DrawMesh` — DrawMesh variant.
+/// - `SyncMesh` — SyncMesh variant.
+/// - `DrawNineSlice` — DrawNineSlice variant.
+/// - `DrawShape` — DrawShape variant.
+/// - `DrawParticleSystem` — DrawParticleSystem variant.
+/// - `BeginPostFx` — BeginPostFx variant.
+/// - `EndPostFx` — EndPostFx variant.
+/// - `ApplyPostFx` — ApplyPostFx variant.
+/// - `DrawTexturedQuad` — DrawTexturedQuad variant.
+/// - `DrawQuadBezier` — DrawQuadBezier variant.
+/// - `DrawCubicBezier` — DrawCubicBezier variant.
+/// - `DrawPath` — DrawPath variant.
+/// - `DrawGradientRect` — DrawGradientRect variant.
+/// - `DrawColoredPolygon` — DrawColoredPolygon variant.
+/// - `DrawIsoCubeTile` — DrawIsoCubeTile variant.
+/// - `DrawHexTile` — DrawHexTile variant.
+/// - `BeginSortGroup` — BeginSortGroup variant.
+/// - `PushSortKey` — PushSortKey variant.
+/// - `FlushSortGroup` — FlushSortGroup variant.
+/// - `DrawPhysicsDebug` — DrawPhysicsDebug variant.
+/// - `DrawSpineSkeleton` — DrawSpineSkeleton variant.
+/// - `DrawBevelRect` — DrawBevelRect variant.
+/// - `PushLayer` — PushLayer variant.
+/// - `PopLayer` — PopLayer variant.
 pub enum RenderCommand {
     SetColor(f32, f32, f32, f32),
     Rectangle {

@@ -22,6 +22,9 @@ use crate::runtime::messages;
 
 /// Returns the number of logical processors available.
 ///
+/// # Returns
+/// `usize`.
+///
 pub fn get_processor_count() -> usize {
     std::thread::available_parallelism()
         .map(|n| n.get())
@@ -29,6 +32,9 @@ pub fn get_processor_count() -> usize {
 }
 
 /// Returns total system RAM in MiB using the `sysinfo` crate.
+///
+/// # Returns
+/// `u64`.
 ///
 pub fn get_memory_size() -> u64 {
     use sysinfo::System;
@@ -39,6 +45,12 @@ pub fn get_memory_size() -> u64 {
 }
 
 /// Opens a URL in the default browser/application.
+///
+/// # Parameters
+/// - `url` — `&str`.
+///
+/// # Returns
+/// `bool`.
 ///
 ///
 ///
@@ -83,6 +95,9 @@ pub fn open_url(url: &str) -> bool {
 
 /// Returns the user's preferred locale strings.
 ///
+/// # Returns
+/// `Vec<String>`.
+///
 pub fn get_preferred_locales() -> Vec<String> {
     let locales: Vec<String> = sys_locale::get_locales().map(|l| l.to_string()).collect();
     if locales.is_empty() {
@@ -97,6 +112,13 @@ pub fn get_preferred_locales() -> Vec<String> {
 }
 
 /// Power state of the device. Consult the module-level documentation for the broader usage context and preconditions.
+///
+/// # Variants
+/// - `Unknown` — Unknown variant.
+/// - `Battery` — Battery variant.
+/// - `NoBattery` — NoBattery variant.
+/// - `Charging` — Charging variant.
+/// - `Charged` — Charged variant.
 ///
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PowerState {
@@ -131,6 +153,9 @@ impl PowerState {
 
 /// Returns power/battery information: (state, percent, seconds).
 ///
+/// # Returns
+/// `(PowerState, Option<u32>, Option<u32>)`.
+///
 ///
 /// On desktop platforms this returns `(Unknown, None, None)`.
 /// A tuple of `(PowerState, Option<u32>, Option<u32>)` ÔÇö the power state,
@@ -140,6 +165,11 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 }
 
 /// Registers `lurek.platform.*` platform query functions into the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;

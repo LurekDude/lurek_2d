@@ -6,6 +6,12 @@
 use crate::procgen::lcg::Lcg;
 
 /// A room placed within the dungeon.
+///
+/// # Fields
+/// - `x` — `u32`.
+/// - `y` — `u32`.
+/// - `w` — `u32`.
+/// - `h` — `u32`.
 #[derive(Debug, Clone)]
 pub struct BspRoom {
     /// Left edge (column).
@@ -19,6 +25,10 @@ pub struct BspRoom {
 }
 
 /// A generated BSP dungeon.
+///
+/// # Fields
+/// - `rooms` — `Vec<BspRoom>`.
+/// - `corridors` — `Vec<(u32, u32, u32, u32)>`.
 #[derive(Debug, Clone)]
 pub struct BspDungeon {
     /// All rooms placed in leaf nodes.
@@ -28,6 +38,14 @@ pub struct BspDungeon {
 }
 
 /// Options controlling BSP dungeon generation.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `min_size` — `u32`.
+/// - `max_depth` — `u32`.
+/// - `seed` — `u64`.
+/// - `padding` — `u32`.
 #[derive(Debug, Clone)]
 pub struct BspOpts {
     /// Total dungeon width in cells.
@@ -58,6 +76,12 @@ impl Default for BspOpts {
 }
 
 /// Generate a BSP dungeon from the given options.
+///
+/// # Parameters
+/// - `opts` — `&BspOpts`.
+///
+/// # Returns
+/// `BspDungeon`.
 pub fn bsp_dungeon(opts: &BspOpts) -> BspDungeon {
     let mut rng = Lcg::new(opts.seed);
     let mut rooms = Vec::new();

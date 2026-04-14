@@ -159,6 +159,9 @@ impl CellularWorld {
 
     /// Returns the cell material at `(cx, cy)`.
     ///
+    /// # Returns
+    /// `CellType`.
+    ///
     /// Returns `CellType::Air` for out-of-bounds coordinates.
     ///
     /// # Parameters

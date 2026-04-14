@@ -217,6 +217,9 @@ impl LineChart {
 
     /// Renders the line chart to an `ImageData`.
     ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
+    ///
     /// # Returns
     /// `ImageData`.
     pub fn draw_to_image(&self, mut img: &mut crate::image::ImageData) {
@@ -342,6 +345,9 @@ impl BarChart {
 
     /// Renders the bar chart to an `ImageData`.
     ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
+    ///
     /// # Returns
     /// `ImageData`.
     pub fn draw_to_image(&self, mut img: &mut crate::image::ImageData) {
@@ -435,6 +441,9 @@ impl ScatterPlot {
     }
 
     /// Renders the scatter plot to an `ImageData`.
+    ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
     ///
     /// # Returns
     /// `ImageData`.
@@ -532,6 +541,9 @@ impl PieChart {
     }
 
     /// Renders the pie chart to an `ImageData`.
+    ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
     ///
     /// # Returns
     /// `ImageData`.
@@ -696,6 +708,9 @@ impl AreaChart {
     }
 
     /// Renders the stacked area chart to an `ImageData`.
+    ///
+    /// # Parameters
+    /// - `img` — `&mut crate::image::ImageData`.
     ///
     /// # Returns
     /// `ImageData`.

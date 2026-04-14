@@ -4,6 +4,11 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// A 3D floating-point vector.
+///
+/// # Fields
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `z` — `f32`.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec3 {
     /// X component.
@@ -16,26 +21,52 @@ pub struct Vec3 {
 
 impl Vec3 {
     /// Create a new vector with the given components.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`.
+    /// - `y` — `f32`.
+    /// - `z` — `f32`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(x: f32, y: f32, z: f32) -> Self {
         Self { x, y, z }
     }
 
     /// The zero vector (0, 0, 0).
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn zero() -> Self {
         Self::new(0.0, 0.0, 0.0)
     }
 
     /// The unit vector (1, 1, 1).
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn one() -> Self {
         Self::new(1.0, 1.0, 1.0)
     }
 
     /// Dot product of this vector and `other`.
+    ///
+    /// # Parameters
+    /// - `other` — `Vec3`.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn dot(&self, other: Vec3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     /// Cross product of this vector and `other`.
+    ///
+    /// # Parameters
+    /// - `other` — `Vec3`.
+    ///
+    /// # Returns
+    /// `Vec3`.
     pub fn cross(&self, other: Vec3) -> Vec3 {
         Vec3::new(
             self.y * other.z - self.z * other.y,
@@ -45,16 +76,25 @@ impl Vec3 {
     }
 
     /// Euclidean length (magnitude) of this vector.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn length(&self) -> f32 {
         self.length_squared().sqrt()
     }
 
     /// Squared Euclidean length. Avoid the sqrt when only relative comparison is needed.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn length_squared(&self) -> f32 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     /// Returns a unit-length version of this vector, or the zero vector if length is zero.
+    ///
+    /// # Returns
+    /// `Vec3`.
     pub fn normalize(&self) -> Vec3 {
         let len = self.length();
         if len < 1e-7 {
@@ -65,6 +105,13 @@ impl Vec3 {
     }
 
     /// Linear interpolation between this vector and `other` by factor `t` in [0, 1].
+    ///
+    /// # Parameters
+    /// - `other` — `Vec3`.
+    /// - `t` — `f32`.
+    ///
+    /// # Returns
+    /// `Vec3`.
     pub fn lerp(&self, other: Vec3, t: f32) -> Vec3 {
         Vec3::new(
             self.x + t * (other.x - self.x),
@@ -74,11 +121,23 @@ impl Vec3 {
     }
 
     /// Euclidean distance to `other`.
+    ///
+    /// # Parameters
+    /// - `other` — `Vec3`.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn distance(&self, other: Vec3) -> f32 {
         (*self - other).length()
     }
 
     /// Project this vector onto `onto`.
+    ///
+    /// # Parameters
+    /// - `onto` — `Vec3`.
+    ///
+    /// # Returns
+    /// `Vec3`.
     pub fn project(&self, onto: Vec3) -> Vec3 {
         let d = onto.dot(onto);
         if d < 1e-14 {
@@ -89,6 +148,12 @@ impl Vec3 {
     }
 
     /// Reflect this vector about `normal` (normal must be unit length).
+    ///
+    /// # Parameters
+    /// - `normal` — `Vec3`.
+    ///
+    /// # Returns
+    /// `Vec3`.
     pub fn reflect(&self, normal: Vec3) -> Vec3 {
         *self - normal * (2.0 * self.dot(normal))
     }

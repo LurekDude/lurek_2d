@@ -22,6 +22,9 @@ pub struct Mediator {
 
 impl Mediator {
     /// Creates a new, empty [`Mediator`].
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }

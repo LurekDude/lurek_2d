@@ -11,13 +11,15 @@
 
 ## Summary
 
-The input module is Lurek2D's device-state layer for keyboard, mouse, gamepad, and touch input. It stores per-frame snapshots that the rest of the engine and the Lua API can query synchronously instead of forcing scripts to consume raw OS event streams directly.
+The `input` module is Lurek2D's hardware input abstraction layer. It owns the per-frame state snapshots for keyboard, mouse, gamepad, and touch input, translating raw `Event` values — received from winit via the engine's `EventQueue` — into structured, query-friendly state objects that Lua scripts poll each frame.
 
-This module exists to turn noisy platform events into stable gameplay-facing state. `KeyboardState`, `MouseState`, `GamepadState`, and `TouchState` all keep track of what is currently down, what changed this frame, and any additional device-specific state such as scroll deltas, text input, cursor mode, gamepad mappings, or touch pressure.
+`KeyboardState` maintains three collections updated at frame start from the `EventQueue`: `pressed` (keys that went down this frame), `released` (keys that went up this frame), and `held` (keys currently down). Physical scancode-based variants are available for hardware-position-independent queries (e.g. game remapping). `winit_scancode_to_string` converts raw scancodes to stable string names.
 
-It intentionally does not own event dispatch, world-space coordinate transforms, or platform window policy. The app loop receives winit and gilrs events and updates these structs, and the Lua bindings in `src/lua_api/input_api.rs` decide how that state is exposed under `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch`. Input is a snapshot store, not an event bus.
+`MouseState` tracks cursor position (window-relative and world-relative via the active camera transform), delta movement since last frame, scroll wheel delta, and per-button pressed/held/released flags. `SystemCursor` and `CursorHandle` provide cursor shape management (default, hand, crosshair, etc.) through `CursorKind`.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`GamepadState` wraps gilrs gamepad state: per-axis float values with dead-zone filtering applied, per-button flags following the same pressed/held/released model, and a device ID for multi-controller support. `GamepadMappings` provides stable string names for axes and buttons. `TouchState` tracks per-finger `TouchPoint` records (ID, position, phase) using the same pressed/held/released flag model.
+
+**Scope boundary**: Platform Services tier. Depends on `event`, `runtime`, `math`. Lua bridge in `src/lua_api/input_api.rs`.
 
 ## Files
 

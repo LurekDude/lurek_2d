@@ -11,13 +11,17 @@
 
 ## Summary
 
-The filesystem module owns all sandboxed game I/O in Lurek2D. It gives the engine a single virtual filesystem rooted at the game directory, constrains writes to the save area, supports overlay mount layers, and provides both direct file handles and background read requests for scripts that need non-blocking asset loads.
+The `filesystem` module provides Lurek2D's sandboxed virtual filesystem abstraction. It wraps all file-system access behind a `GameFS` type that ensures Lua scripts and engine code can only read and write within the game's allowed directory tree — preventing path traversal attacks that would let a game script escape its sandbox to access arbitrary host paths.
 
-This module exists to keep game scripts productive without giving them unrestricted access to the host filesystem. `GameFS` resolves and validates paths, `FileHandle` exposes buffered read and write operations inside that sandbox, `FileData` packages raw file bytes for Lua consumption, and `AsyncLoader` lets the main thread offload file reads without introducing a general async runtime.
+`GameFS` is initialised with a base directory (the loaded game folder) and an optional save-data directory. Every path passed to any `GameFS` method is resolved against the base directory and checked against a traversal guard: any path component that would escape the base (via `..`, symbolic links, or absolute path prefixes) is rejected with an `EngineError::FsPathTraversal` error before the OS is ever asked to open the file. The check is strict: it resolves the canonical path and confirms the result starts with the base directory prefix.
 
-It intentionally does not own network I/O, archive formats, arbitrary process-wide file access, or rendering-specific asset decoding. If the work is about PNG parsing, audio decoding, or remote data transport, that belongs elsewhere. The Lua API in `src/lua_api/filesystem_api.rs` owns how this sandbox is presented to scripts; the core module owns the actual path safety and file behavior.
+The API covers: `read_string(path)`, `read_bytes(path)`, `write_string(path, content)`, `write_bytes(path, data)`, `list_dir(path)`, `get_info(path)`, `exists(path)`, `create_dir(path)`, and `delete(path)`. `FileHandle` provides an open-file session with cursored reads, sequential writes, and explicit close semantics. `FileInfo` carries file type (`File`, `Directory`, `Symlink`, `Other`), size, modification timestamp, and read-only flag.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+Write operations are always routed to the save-data directory (if configured) rather than the read-only game folder. Read operations can access both. This separation mirrors how LÖVE2D handles the `love.filesystem` split between game content and mutable save state.
+
+The module also provides the `MountPoint` abstraction for overlaying read-only archive or zip mounts on top of the base file system, used by the `mods` module to load mod content packages.
+
+**Scope boundary**: Core Runtime tier. Depends on `runtime` for error types. Lua bridge in `src/lua_api/filesystem_api.rs`.
 
 ## Files
 

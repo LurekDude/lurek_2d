@@ -10,6 +10,10 @@ use std::collections::HashMap;
 use crate::procgen::lcg::Lcg;
 
 /// A weighted tile for WFC generation.
+///
+/// # Fields
+/// - `id` — `u32`.
+/// - `weight` — `f32`.
 #[derive(Debug, Clone)]
 pub struct WfcTile {
     /// Tile identifier.
@@ -19,6 +23,9 @@ pub struct WfcTile {
 }
 
 /// Adjacency rules: maps each tile ID to the set of tile IDs that may appear beside it.
+///
+/// # Fields
+/// - `adjacencies` — `HashMap<u32, Vec<u32>>`.
 #[derive(Debug, Clone, Default)]
 pub struct WfcRules {
     /// `adjacencies[tile_id]` = list of valid neighbour tile IDs.
@@ -26,6 +33,14 @@ pub struct WfcRules {
 }
 
 /// Options for WFC generation.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `tiles` — `Vec<WfcTile>`.
+/// - `rules` — `WfcRules`.
+/// - `seed` — `u64`.
+/// - `max_attempts` — `u32`.
 #[derive(Debug, Clone)]
 pub struct WfcOpts {
     /// Grid width.
@@ -43,6 +58,11 @@ pub struct WfcOpts {
 }
 
 /// The generated grid.  `None` entries indicate cells that could not be resolved.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `cells` — `Vec<Option<u32>>`.
 #[derive(Debug, Clone)]
 pub struct WfcGrid {
     /// Grid width.
@@ -54,6 +74,12 @@ pub struct WfcGrid {
 }
 
 /// Generate a WFC tile grid.
+///
+/// # Parameters
+/// - `opts` — `&WfcOpts`.
+///
+/// # Returns
+/// `WfcGrid`.
 pub fn wfc_generate(opts: &WfcOpts) -> WfcGrid {
     let n = (opts.width * opts.height) as usize;
     if opts.tiles.is_empty() || n == 0 {

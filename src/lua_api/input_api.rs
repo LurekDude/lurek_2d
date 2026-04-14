@@ -45,6 +45,11 @@ impl LuaUserData for LuaCursor {
 
 /// Registers the `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch` API tables.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
 
     // ── lurek.keyboard ─────────────────────────────────────────────────────────

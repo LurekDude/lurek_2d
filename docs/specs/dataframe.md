@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `dataframe` module owns named-column tabular data in Lurek2D. It provides an in-memory `DataFrame` type for structured records, a `Database` catalog for multiple named tables, and the query, serialization, and SQL helpers needed to work with that data from Lua.
+The `dataframe` module provides Lurek2D's in-memory column-major tabular data system, exposed to Lua scripts as `lurek.dataframe.*`. It is a Foundations tier module designed for analytical workloads: game data tables, leaderboard processing, CSV imports, and lightweight SQL-style queries without an external database.
 
-This module exists to cover the part of data processing that raw byte buffers and ndarrays do not solve well: heterogeneous rows with named fields, table joins, grouping, descriptive statistics, and lightweight ad hoc querying. Its storage is column-major so scans, filters, and numeric analytics can work one column at a time without forcing callers to manually reorganize row data.
+The core type is `DataFrame`, a column-major table where each column is a named `Vec<CellValue>`. `CellValue` is a tagged union of Null, Bool, Integer (i64), Float (f64), and Text (String). `ColRef` provides a borrowing window into a single column for iteration without copying. The `Database` type groups multiple named `DataFrame` tables into a catalog that can be queried across tables with JOIN-like operations.
 
-`dataframe` intentionally does not own low-level binary buffer manipulation, compression, or dense numeric tensor math. Use `src/data/` for raw bytes and pack formats, and `src/compute/` for homogeneous numeric arrays and grid operations. It also does not own persistent storage APIs; callers bring strings or tables in, and the filesystem layer handles loading and saving.
+The `query` submodule provides a filter/sort/group-by/aggregate pipeline: `filter(predicate)` returns a row-index mask; `sort_by(col, asc)` produces a sorted copy; `group_by(cols)` returns groups of row indices; `aggregate(col, op)` computes sum, mean, min, max, count. The `sql` submodule parses and executes a small SQL subset (SELECT, WHERE, ORDER BY, GROUP BY, LIMIT, basic JOINs) directly against in-memory `Database` catalogs.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit with configurable delimiter/quote) and JSON round-trip (array-of-objects to `DataFrame` and back). This makes it straightforward to load a `.csv` asset into a `DataFrame`, run queries, and write results back to CSV.
+
+**Scope boundary**: Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/dataframe_api.rs`.
 
 ## Files
 
@@ -33,6 +35,7 @@ This module exists to cover the part of data processing that raw byte buffers an
 - `ColRef` (`enum`, `frame.rs`): Column selector that can resolve either a name or a 1-based index. It gives the Lua bridge and Rust helpers one shared way to address columns.
 - `DataFrame` (`struct`, `frame.rs`): Core column-major table type with named columns and query methods. Most module behavior is expressed as methods on this type.
 - `Database` (`struct`, `frame.rs`): Named collection of DataFrames used for multi-table workflows and SQL joins. It is deliberately small and acts as a query catalog rather than a storage engine.
+- `AggFn` (`enum`, `frame.rs`): Aggregation function variants for group-by and pivot operations.
 
 ## Functions
 
@@ -72,6 +75,7 @@ This module exists to cover the part of data processing that raw byte buffers an
 - `Database::clear` (`frame.rs`): Remove all tables.
 - `Database::merge` (`frame.rs`): Merge all tables from `other` into this database.
 - `Database::clone_db` (`frame.rs`): Deep-clone this Database and all contained DataFrames.
+- `AggFn::parse` (`frame.rs`): Parse a string into an `AggFn`.
 - `DataFrame::filter` (`query.rs`): Filter rows where `col op val` is true.
 - `DataFrame::sort` (`query.rs`): Sort by column, stable sort.
 - `DataFrame::head` (`query.rs`): Return the first `n` rows.
@@ -94,6 +98,25 @@ This module exists to cover the part of data processing that raw byte buffers an
 - `DataFrame::variance` (`query.rs`): Variance of numeric values in a column (population variance, skipping nils).
 - `DataFrame::describe` (`query.rs`): Descriptive statistics for all numeric columns.
 - `DataFrame::fill_nil` (`query.rs`): Replace Nil values in a column with the given value (in-place).
+- `DataFrame::with_rolling_mean` (`query.rs`): Add a new column containing the rolling mean of `col` with `window` rows.
+- `DataFrame::with_rolling_sum` (`query.rs`): Add a new column containing the rolling sum of `col` with `window` rows.
+- `DataFrame::with_rolling_min` (`query.rs`): Add a new column containing the rolling minimum of `col` with `window` rows.
+- `DataFrame::with_rolling_max` (`query.rs`): Add a new column containing the rolling maximum of `col` with `window` rows.
+- `DataFrame::with_rank` (`query.rs`): Add a new column containing the rank of each row's value in `col`.
+- `DataFrame::with_pct_change` (`query.rs`): Add a new column containing the percentage change from the previous row in `col`.
+- `DataFrame::with_cumsum` (`query.rs`): Add a new column containing the cumulative sum of `col`.
+- `DataFrame::group_agg` (`query.rs`): Aggregate `agg_col` grouped by `group_col` using `agg_fn`.
+- `DataFrame::pivot` (`query.rs`): Create a pivot table: rows = unique values of `row_col`, columns = unique values of `col_col`, cells = values of `val_col` (first match per cell).
+- `DataFrame::corr` (`query.rs`): Pearson correlation coefficient between two numeric columns.
+- `DataFrame::correlation_matrix` (`query.rs`): Build a correlation matrix DataFrame for all numeric columns.
+- `DataFrame::zscore_col` (`query.rs`): Add a z-score column for a numeric column.
+- `DataFrame::normalize_col` (`query.rs`): Add a min-max normalised column for a numeric column.
+- `DataFrame::outliers` (`query.rs`): Return a new DataFrame containing only rows where `col` is an outlier.
+- `DataFrame::mode_val` (`query.rs`): Return the most frequent value in a column, or `CellValue::Nil` if empty.
+- `DataFrame::entropy` (`query.rs`): Shannon entropy (bits) of the value distribution in a column.
+- `DataFrame::add_row_batch` (`query.rs`): Add multiple rows at once from a `Vec<Vec<CellValue>>`.
+- `DataFrame::get_column_as_f64` (`query.rs`): Return the numeric values of a column as `Vec<f64>` (nils → NaN).
+- `DataFrame::set_column_from_f64` (`query.rs`): Set all rows of a numeric column from a `Vec<f64>`.
 - `from_csv` (`serial.rs`): Parse a CSV string into a DataFrame.
 - `DataFrame::to_csv` (`serial.rs`): Serialize to CSV string (RFC 4180).
 - `from_json` (`serial.rs`): Parse JSON (array-of-objects) into a DataFrame.
@@ -157,6 +180,12 @@ This module exists to cover the part of data processing that raw byte buffers an
 - `DataFrame:toString`: Returns a formatted string table representation.
 - `DataFrame:query`: Executes a SQL query against this DataFrame.
 - `DataFrame:clone`: Returns a deep copy of this DataFrame.
+- `DataFrame:correlationMatrix`: Compute a correlation matrix for all numeric columns.
+- `DataFrame:modeVal`: Return the most frequent value in a column (nil if empty).
+- `DataFrame:entropy`: Shannon entropy (bits) of the value distribution in a column.
+- `DataFrame:addRowBatch`: Add multiple rows at once from a table of row tables.
+- `DataFrame:getColumnAsF64`: Return a numeric column as a Lua array of numbers (nils → 0/nan).
+- `DataFrame:setColumnFromF64`: Set a numeric column from a Lua array of numbers.
 - `DataFrame:type`: Returns the type name of this object.
 - `DataFrame:typeOf`: Returns true if this object is of the given type.
 
@@ -175,7 +204,7 @@ This module exists to cover the part of data processing that raw byte buffers an
 
 ## References
 
-- `runtime`: Imports or references `runtime` from `src/runtime/`.
+- No top-level `crate::<module>` imports were detected in this module's Rust source files.
 
 ## Notes
 

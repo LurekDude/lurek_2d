@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `tilemap` module is Lurek2D's general-purpose grid world toolkit. It owns orthogonal tile layers, tilesets, autotiling, isometric map data, sparse chunk storage, Tiled TMX import, procedural block-based generation, coordinate helpers, and a few specialized map-side utilities such as polygon regions and first-person tile walking.
+The `tilemap` module is Lurek2D's tile-map authoring and rendering subsystem. It handles everything from simple single-layer grids to complex multi-layer maps with animated tiles, external format imports, automatic tile selection, isometric sorting, and sparse infinite map support.
 
-It exists so scripts can build and query tile-driven worlds without pushing map rules into the renderer or the physics layer. The module focuses on map representation, map math, tile semantics, and CPU-side generation or query work. The Lua bridge exposes the script-facing API, but the actual state and algorithms live here.
+`TileMap` is the top-level container: a multi-layer grid where each `TileLayer` holds a flat row-major array of tile IDs, a name, Z-order, opacity, visibility flag, and per-layer scroll offsets. Tile CRUD: `get_tile(layer, x, y)`, `set_tile(layer, x, y, id)`, `fill_rect(layer, rect, id)`. `sweep_rect(rect)` returns all non-empty tile IDs within a world AABB for broad-phase collision pre-filtering before physics.
 
-It intentionally does not own GPU resources, texture loading, camera policy, scene management, or physics simulation. It can generate render commands and collision-friendly map queries, but rendering stays in `render` and collision resolution stays outside the module.
+`TileSet` stores the source `TextureKey`, tile dimensions (width/height in pixels), tile count, and per-tile properties: `passable` flag, optional animation frames list, custom property `HashMap`, and optional collision shape override. `TileProperties::collision_shape` selects the shape used for physics collider generation.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with object layers, tile properties, image layers, and tileset references; `load_ldtk(path)` parses LDtk JSON exports. Both populate native `TileMap` + `TileSet` structures.
+
+`AutoTileSheet` implements bitmask-based automatic tile selection (RPGMaker or 48-tile atlas layouts) where the displayed tile is chosen based on which of the eight cardinal and diagonal neighbors are the same terrain type. `IsoMap` adds painter's-algorithm isometric depth sorting. `ChunkMap` provides a `HashMap<(i32,i32), Vec<u8>>` sparse infinite map with async chunk loading callbacks.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`, `image`. Lua bridge in `src/lua_api/tilemap_api.rs`.
 
 ## Files
 
@@ -26,6 +30,7 @@ It intentionally does not own GPU resources, texture loading, camera policy, sce
 - `coords.rs`: Provides standalone isometric and hex-grid conversion helpers so scripts and engine code can reason about non-orthogonal tile coordinates without embedding projection math elsewhere.
 - `isomap.rs`: Stores multi-level isometric maps and yields painter-ordered draw items for floor, wall, and object parts per cell.
 - `large_map_renderer.rs`: Tracks chunk visibility, dirty state, viewport, and LOD metadata for large tile worlds that need efficient culling-friendly batching.
+- `ldtk.rs`: LDtk JSON map format importer.
 - `mapgen.rs`: Implements prefab blocks, grouped block libraries, scripted generation steps, and map assembly logic for procedural tilemap authoring.
 - `mod.rs`: Declares the tilemap submodules and re-exports the main map, tileset, generation, TMX, isometric, and utility types as the public module surface.
 - `polygon_map.rs`: Manages named polygon regions with hit testing, labels, highlight state, and bounding-box queries for map overlays or province-style regions.
@@ -159,6 +164,7 @@ It intentionally does not own GPU resources, texture loading, camera policy, sce
 - `LargeMapRenderer::set_lod_thresholds` (`large_map_renderer.rs`): Sets the zoom thresholds at which LOD levels change.
 - `LargeMapRenderer::set_tileset_columns` (`large_map_renderer.rs`): Sets the number of columns in the tileset image.
 - `LargeMapRenderer::get_tileset_columns` (`large_map_renderer.rs`): Returns the number of tileset columns.
+- `load_ldtk` (`ldtk.rs`): Parses an LDtk JSON export string and returns a [`TileMap`].
 - `Edge::from_str` (`mapgen.rs`): Parses an edge from a lowercase string (`"north"`, `"east"`, `"south"`, `"west"`).
 - `Edge::as_str` (`mapgen.rs`): Returns the lowercase string representation of this edge.
 - `MapBlock::new` (`mapgen.rs`): Creates a new map block with the given dimensions.
@@ -307,6 +313,7 @@ It intentionally does not own GPU resources, texture loading, camera policy, sce
 - `TileMap::build_render_commands` (`tilemap.rs`): Generates GPU `RenderCommand`s for the tile map at the given screen offset.
 - `TileMap::draw_with_highlight_to_image` (`tilemap.rs`): Render a coordinate-mapping diagram: draws the tile grid at the given image size with world points marked as coloured circles and highlighted cells.
 - `TileMap::draw_layers_to_image` (`tilemap.rs`): Draw all layers merged with colour-coding per layer.
+- `TileMap::to_nav_grid` (`tilemap.rs`): Converts the given layer into a 2-D navigation grid.
 - `TileSet::new` (`tileset.rs`): Creates a new tile set with the given atlas layout parameters.
 - `TileSet::get_first_gid` (`tileset.rs`): Returns the first global ID assigned to this tileset.
 - `TileSet::get_tile_count` (`tileset.rs`): Returns the total number of tiles in this tileset.
@@ -361,6 +368,8 @@ It intentionally does not own GPU resources, texture loading, camera policy, sce
 - `lurek.tilemap.newMapScript`: Creates a new empty MapScript procedural generation script.
 - `lurek.tilemap.newMapGen`: Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
 - `lurek.tilemap.loadTMX`: Parses a TMX XML string and returns a table with map metadata and layers.
+- `lurek.tilemap.fromLDtk`: Parses an LDtk JSON export string and returns a TileMap.
+- `lurek.tilemap.fromLDtk`: Parses an LDtk JSON export string and returns a TileMap.
 
 ### `AutoTileSheet` Methods
 - `AutoTileSheet:getLayout`: Returns the layout variant as a string.
@@ -450,6 +459,7 @@ It intentionally does not own GPU resources, texture loading, camera policy, sce
 - `TileMap:setOrientation`: Sets the map orientation from a string ("topdown" or "sideview").
 - `TileMap:render`: Renders the tile map to the screen at the given offset.
 - `TileMap:drawToImage`: Renders the tile map to a CPU ImageData using the given tile pixel size.
+- `TileMap:toNavGrid`: Converts the given layer into a 2D navigation grid.
 
 ### `TileSet` Methods
 - `TileSet:getFirstGid`: Returns the first global ID assigned to this tileset.

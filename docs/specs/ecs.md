@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `ecs` module owns Lurek2D's lightweight entity world and related relationship utilities. Its main job is to create and destroy entities safely, store arbitrary component data in Lua-owned tables, track tags and layers, manage parent-child hierarchies, define blueprints, and dispatch registered systems in a controlled order.
+The `ecs` module provides Lurek2D's Entity-Component-System infrastructure. Rather than building a traditional table-per-game-object structure, ECS separates identity (entities) from data (components) and behaviour (systems), which makes it straightforward to add, remove, or mix behaviours on game objects at runtime without subclassing.
 
-This module exists to give Lua game code a flexible property-bag ECS rather than a rigid Rust archetype ECS. `Universe` handles identity, lifecycle, and indexing concerns while leaving component schemas dynamic. That makes it suitable for script-heavy gameplay code where components and systems evolve quickly and where entity data needs to remain easy to inspect and modify from Lua.
+Entities are lightweight integer IDs managed by a `Universe`. The universe owns a generation counter per ID slot, so a stale `EntityId` for a dead entity will not accidentally address a new entity that was allocated to the same slot. New entities are created with `spawn()`, removed with `despawn()`, and checked for liveness with `is_alive()`. The `Universe` also tracks which entity IDs are available for reuse through a free-list.
 
-The module intentionally does not own rendering, physics simulation, scene transitions, or specialized gameplay logic. It can store data for those systems and dispatch systems that act on that data, but it does not define how a sprite, collider, or scene should behave. The separate relationship types also do not model gameplay semantics by themselves; they only provide a reusable container for pairwise relation values and named levels.
+Components are typed data blobs. The `ComponentStore` inside `Universe` uses a `TypeId`-keyed map of boxed trait objects, where each entry is a `HashMap<EntityId, Box<dyn Any + Send + Sync>>`. This is deliberately a simple, maximally flexible design rather than an archetypal or sparse-set layout — the engine targets desktop hardware and game scripts (not millions of entities per frame), so lookup cost from a hash map is acceptable in exchange for API simplicity. Adding a component calls `add_component::<T>(entity, value)`. Querying iterates over all entities that have a specific component type. Removing a component is `remove_component::<T>(entity)`.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+Relationships between entities live in `relationships.rs`, which adds parent-child hierarchies to the universe: `set_parent(child, parent)`, `get_children(parent)`, `get_parent(child)`. This is used by the `scene` module and by Lua scripts that build transform hierarchies for grouped entities.
+
+The ECS module deliberately does not own physics, rendering, or scripting. Systems that process components are implemented as Lua callbacks or Rust code in other modules that query the universe.
+
+**Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/entity_api.rs`.
 
 ## Files
 
@@ -96,10 +100,16 @@ The module intentionally does not own rendering, physics simulation, scene trans
 - `Universe::remove_blueprint` (`universe.rs`): Removes a blueprint definition.
 - `Universe::list_blueprints` (`universe.rs`): Lists all defined blueprint names.
 - `Universe::get_blueprint_components` (`universe.rs`): Returns a deep copy of a blueprint's component table, or Nil if not found.
-- `Universe::add_system` (`universe.rs`): Adds a system (Lua table) to the system list.
+- `Universe::add_system` (`universe.rs`): Adds a system (Lua table) to the system list at the given priority (lower = first).
+- `Universe::get_sorted_system_indices` (`universe.rs`): Returns 1-based system store indices sorted by ascending priority.
 - `Universe::remove_system` (`universe.rs`): Removes a system by pointer identity from the system list.
 - `Universe::get_system_count` (`universe.rs`): Returns the number of registered systems.
 - `Universe::clear` (`universe.rs`): Clears all entities, components, tags, layers, and systems.
+- `take_component_events` (`universe.rs`): Takes and clears all pending component-add and component-remove events.
+- `query_not` (`universe.rs`): Returns alive entities that have ALL `with` components and NONE of the `without` components.
+- `spawn_bulk` (`universe.rs`): Spawns `count` entities from a blueprint, applying the same optional overrides to each.
+- `serialize_to_table` (`universe.rs`): Serializes all alive entities to a Lua table snapshot.
+- `deserialize_from_table` (`universe.rs`): Restores entity state from a snapshot produced by `serialize_to_table`.
 - `deep_copy_table` (`universe.rs`): Deep-copies a Lua table recursively.
 
 ## Lua API Reference
@@ -123,11 +133,11 @@ The module intentionally does not own rendering, physics simulation, scene trans
 - `Universe:each`: Calls callback(id, value) for every entity with the named component.
 - `Universe:getEntities`: Returns all alive entity IDs.
 - `Universe:getEntityCount`: Returns the number of alive entities.
-- `Universe:addSystem`: Adds a system table to the universe.
+- `Universe:addSystem`: Adds a system table to the universe with an optional priority (lower = earlier).
 - `Universe:removeSystem`: Removes a system table from the universe.
-- `Universe:update`: Calls update(system, world, dt) on each registered system.
-- `Universe:render`: Calls render(system, world) on each registered system.
-- `Universe:emit`: Emits a named event to all systems that implement the handler.
+- `Universe:update`: Calls update(system, world, dt) on each registered system in priority order.
+- `Universe:render`: Calls render(system, world) on each registered system in priority order.
+- `Universe:emit`: Emits a named event to all systems that implement the handler, in priority order.
 - `Universe:getSystemCount`: Returns the number of registered systems.
 - `Universe:clear`: Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
 - `Universe:release`: Releases all universe state, equivalent to clear.
@@ -155,6 +165,13 @@ The module intentionally does not own rendering, physics simulation, scene trans
 - `Universe:getParent`: Returns the parent entity ID, or nil if unparented.
 - `Universe:getChildren`: Returns all direct child entity IDs.
 - `Universe:killRecursive`: Kills an entity and all its descendants recursively.
+- `Universe:queryNot`: Returns entity IDs that have all `with` components and none of the `without` components.
+- `Universe:serialize`: Serializes all alive entities to a Lua table snapshot.
+- `Universe:deserialize`: Restores entity state from a snapshot produced by serialize().
+- `Universe:onComponentAdded`: Registers a callback to fire when a component is added to any entity.
+- `Universe:onComponentRemoved`: Registers a callback to fire when a component is removed from any entity.
+- `Universe:flushObservers`: Dispatches all pending component-add and component-remove events to registered callbacks.
+- `Universe:spawnBulk`: Spawns `count` entities from a blueprint, returns an array of entity IDs.
 
 ## References
 

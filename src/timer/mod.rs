@@ -1,11 +1,21 @@
-//! Mod implementation for the `timer` subsystem.
+//! Frame timing and scheduled event system.
 //!
-//! This module is part of Lurek2D's `timer` subsystem and provides the implementation
-//! details for mod-related operations and data management.
+//! Provides two complementary types: [`Clock`] for per-frame delta-time tracking and FPS
+//! measurement, and [`Scheduler`] for deferred and repeating Lua callback execution.
 //!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! ## Subsystem inventory
+//! - [`clock`] — [`Clock`]: `tick()` updates `dt`, smoothed FPS, elapsed time, frame count
+//! - [`scheduler`] — [`Scheduler`]: `schedule(delay, fn)`, `every(interval, fn)`,
+//!   `after_frames(n, fn)` with cancellation handles
 //!
+//! ## Threading constraint
+//! `Scheduler` callbacks run synchronously on the main thread. Errors from callbacks are
+//! caught and forwarded through the engine error channel rather than panicking. The `sleep()`
+//! helper is intended only for worker VM threads — calling it from the main VM stalls
+//! the engine frame loop.
+//!
+//! All public items are documented. Lua bridge: `src/lua_api/timer_api.rs`.
+
 /// Frame-based clock providing delta time, total time, and FPS.
 pub mod clock;
 /// Scheduled event manager for delayed and repeating timed callbacks.

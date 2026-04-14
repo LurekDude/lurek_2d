@@ -4527,6 +4527,11 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 
 /// Registers the `lurek.ui` API table.
 ///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
+///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let ctx = Rc::new(RefCell::new(GuiContext::new()));
@@ -5780,6 +5785,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 // ── LuaLineChart ───────────────────────────────
 
 /// Lua wrapper for a line chart renderer.
+///
+/// # Fields
+/// - `inner` — `crate::ui::chart::LineChart`.
 pub struct LuaLineChart {
     /// Inner Rust `LineChart` instance.
     pub inner: crate::ui::chart::LineChart,
@@ -5841,6 +5849,9 @@ impl LuaUserData for LuaLineChart {
 // ── LuaBarChart ───────────────────────────────
 
 /// Lua wrapper for a grouped bar chart renderer.
+///
+/// # Fields
+/// - `inner` — `crate::ui::chart::BarChart`.
 pub struct LuaBarChart {
     /// Inner Rust `BarChart` instance.
     pub inner: crate::ui::chart::BarChart,
@@ -5894,6 +5905,9 @@ impl LuaUserData for LuaBarChart {
 // ── LuaScatterPlot ────────────────────────────
 
 /// Lua wrapper for a scatter plot renderer.
+///
+/// # Fields
+/// - `inner` — `crate::ui::chart::ScatterPlot`.
 pub struct LuaScatterPlot {
     /// Inner Rust `ScatterPlot` instance.
     pub inner: crate::ui::chart::ScatterPlot,
@@ -5957,6 +5971,9 @@ impl LuaUserData for LuaScatterPlot {
 // ── LuaPieChart ───────────────────────────────
 
 /// Lua wrapper for a pie chart renderer.
+///
+/// # Fields
+/// - `inner` — `crate::ui::chart::PieChart`.
 pub struct LuaPieChart {
     /// Inner Rust `PieChart` instance.
     pub inner: crate::ui::chart::PieChart,
@@ -5995,6 +6012,9 @@ impl LuaUserData for LuaPieChart {
 // ── LuaAreaChart ──────────────────────────────
 
 /// Lua wrapper for a stacked area chart renderer.
+///
+/// # Fields
+/// - `inner` — `crate::ui::chart::AreaChart`.
 pub struct LuaAreaChart {
     /// Inner Rust `AreaChart` instance.
     pub inner: crate::ui::chart::AreaChart,

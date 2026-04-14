@@ -42,10 +42,15 @@ pub use nav_grid::{DiagonalMode, NavGrid};
 pub use pathgrid::{Cell, PathGrid};
 pub use unit_pathfinder::{UnitPathfinder, Waypoint};
 
+/// Graph-based A* and Dijkstra range query for node-edge world graphs.
 pub mod graph_nav;
+/// Hexagonal grid pathfinding with axial coordinate support and optional pathing costs.
 pub mod hex_grid;
+/// Isometric grid pathfinding backed by a flat cost array with walkability masking.
 pub mod iso_grid;
+/// Jump Point Search — faster A* variant optimised for uniform-cost grids.
 pub mod jps;
+/// Precomputed Dijkstra range map for reachability and movement-budget queries.
 pub mod range_map;
 
 pub use graph_nav::{graph_astar, graph_range};

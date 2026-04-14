@@ -6,6 +6,72 @@ luna = {}
 ---@class lurek.ai
 lurek.ai = {}
 
+--- Lua wrapper for [`crate::ai::director::AIDirector`].
+---@class AIDirector
+local AIDirector = {}
+
+--- Returns or performs ambient intensity.
+---@return number
+function AIDirector:ambientIntensity() end
+
+--- Returns or performs loot factor.
+---@return number
+function AIDirector:lootFactor() end
+
+--- Returns or performs phase.
+---@return string
+function AIDirector:phase() end
+
+--- Pushes a gameplay event with the given intensity to the director for awareness analysis.
+---@param intensity any
+function AIDirector:pushEvent(intensity) end
+
+--- Resets or clears the state.
+function AIDirector:reset() end
+
+--- Sets the tension.
+---@param value any
+function AIDirector:setTension(value) end
+
+--- Returns or performs spawn rate factor.
+---@return number
+function AIDirector:spawnRateFactor() end
+
+--- Returns or performs tension.
+---@return number
+function AIDirector:tension() end
+
+--- Advances the simulation by one time step.
+---@param dt any
+function AIDirector:update(dt) end
+
+--- Lua wrapper for [`crate::ai::lod::AILod`].
+---@class AILod
+local AILod = {}
+
+--- Returns or performs should update.
+---@param tier any
+---@param frame any
+---@return boolean
+function AILod:shouldUpdate(tier, frame) end
+
+--- Returns or performs tier count.
+---@return integer
+function AILod:tierCount() end
+
+--- Returns or performs tier for.
+---@param ax any
+---@param ay any
+---@param rx any
+---@param ry any
+---@return integer
+function AILod:tierFor(ax, ay, rx, ry) end
+
+--- Returns or performs tier name.
+---@param tier any
+---@return string
+function AILod:tierName(tier) end
+
 --- Lua-side wrapper around an [`AIWorld`].
 ---@class AIWorld
 local AIWorld = {}
@@ -193,6 +259,34 @@ function BTNode:type() end
 ---@return boolean
 function BTNode:typeOf(name) end
 
+--- Lua wrapper for [`crate::ai::bandit::Bandit`].
+---@class Bandit
+local Bandit = {}
+
+--- Returns or performs arm count.
+---@return integer
+function Bandit:armCount() end
+
+--- Returns or performs best arm.
+---@return integer
+function Bandit:bestArm() end
+
+--- Resets or clears the state.
+function Bandit:reset() end
+
+--- Returns or performs select.
+---@return integer
+function Bandit:select() end
+
+--- Returns or performs total pulls.
+---@return integer
+function Bandit:totalPulls() end
+
+--- Advances the simulation by one time step.
+---@param idx any
+---@param reward any
+function Bandit:update(idx, reward) end
+
 --- Lua-side wrapper around a [`BehaviorTree`].
 ---@class BehaviorTree
 local BehaviorTree = {}
@@ -305,6 +399,93 @@ function CommandQueue:type() end
 ---@return boolean
 function CommandQueue:typeOf(name) end
 
+--- Lua wrapper for [`crate::ai::context_steering::ContextSteering`].
+---@class ContextSteering
+local ContextSteering = {}
+
+--- Adds a avoid bounds.
+---@param min_x any
+---@param min_y any
+---@param max_x any
+---@param max_y any
+---@param margin any
+---@param weight any
+function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
+
+--- Adds a avoid point.
+---@param x any
+---@param y any
+---@param radius any
+---@param weight any
+function ContextSteering:addAvoidPoint(x, y, radius, weight) end
+
+--- Adds a seek target.
+---@param tx any
+---@param ty any
+---@param weight any
+function ContextSteering:addSeekTarget(tx, ty, weight) end
+
+--- Adds a wander behavior with jitter and weight to the context steering evaluator.
+---@param jitter any
+---@param weight any
+function ContextSteering:addWander(jitter, weight) end
+
+--- Returns or performs chosen magnitude.
+---@return number
+function ContextSteering:chosenMagnitude() end
+
+--- Resets or clears the behaviors.
+function ContextSteering:clearBehaviors() end
+
+--- Evaluates and returns the computed result.
+---@param ax any
+---@param ay any
+---@param vx any
+---@param vy any
+---@return number
+function ContextSteering:evaluate(ax, ay, vx, vy) end
+
+--- Returns or performs slot count.
+---@return integer
+function ContextSteering:slotCount() end
+
+--- Lua wrapper for [`crate::ai::emotion::EmotionModel`].
+---@class EmotionModel
+local EmotionModel = {}
+
+--- Adds an emotion category with the given name and initial intensity to the model.
+---@param name any
+---@param rest any
+---@param decay any
+---@param min_vis any
+function EmotionModel:add(name, rest, decay, min_vis) end
+
+--- Returns or performs dominant.
+---@return string|nil
+function EmotionModel:dominant() end
+
+--- Returns the value.
+---@param name any
+---@return number
+function EmotionModel:get(name) end
+
+--- Returns true if active.
+---@param name any
+---@return boolean
+function EmotionModel:isActive(name) end
+
+--- Resets or clears the state.
+function EmotionModel:reset() end
+
+--- Returns or performs trigger.
+---@param name any
+---@param amount any
+function EmotionModel:trigger(name, amount) end
+
+--- Advances the simulation by one time step.
+---@param dt any
+function EmotionModel:update(dt) end
+
 --- Lua-side wrapper around a [`GOAPPlanner`].
 ---@class GOAPPlanner
 local GOAPPlanner = {}
@@ -325,6 +506,61 @@ function GOAPPlanner:type() end
 ---@param name any
 ---@return boolean
 function GOAPPlanner:typeOf(name) end
+
+--- Lua wrapper for [`crate::ai::genetic::GeneticAlgorithm`].
+---@class GeneticAlgorithm
+local GeneticAlgorithm = {}
+
+--- Returns or performs best genes.
+---@return table
+function GeneticAlgorithm:bestGenes() end
+
+--- Runs one generation of the evolutionary algorithm.
+function GeneticAlgorithm:evolve() end
+
+--- Returns or performs generation.
+---@return integer
+function GeneticAlgorithm:generation() end
+
+--- Returns the genes.
+---@param idx any
+---@return table
+function GeneticAlgorithm:getGenes(idx) end
+
+--- Returns or performs pop size.
+---@return integer
+function GeneticAlgorithm:popSize() end
+
+--- Sets the fitness.
+---@param idx any
+---@param fitness any
+function GeneticAlgorithm:setFitness(idx, fitness) end
+
+--- Lua wrapper for [`crate::ai::htn::HTNDomain`].
+---@class HTNDomain
+local HTNDomain = {}
+
+--- Adds a compound.
+---@param comp_name any
+---@param methods_table any
+function HTNDomain:addCompound(comp_name, methods_table) end
+
+--- Adds a primitive.
+---@param name any
+---@param preconds any
+---@param effects any
+---@param clears any
+function HTNDomain:addPrimitive(name, preconds, effects, clears) end
+
+--- Runs planning and returns the resulting action sequence.
+---@param root_task any
+---@param state_table any
+---@return table|nil
+function HTNDomain:plan(root_task, state_table) end
+
+--- Returns or performs task count.
+---@return integer
+function HTNDomain:taskCount() end
 
 --- Lua-side wrapper around an [`InfluenceMap`].
 ---@class InfluenceMap
@@ -385,6 +621,137 @@ function InfluenceMap:type() end
 ---@param name any
 ---@return boolean
 function InfluenceMap:typeOf(name) end
+
+--- Lua wrapper for [`crate::ai::needs::NeedSystem`].
+---@class NeedSystem
+local NeedSystem = {}
+
+--- Registers a new need with the specified name, urgency, and decay rate in the system.
+---@param name any
+---@param decay_rate any
+---@param urgency_threshold any
+---@param urgency_factor any
+function NeedSystem:addNeed(name, decay_rate, urgency_threshold, urgency_factor) end
+
+--- Returns or performs most urgent.
+---@return string|nil
+function NeedSystem:mostUrgent() end
+
+--- Returns or performs satisfy.
+---@param name any
+---@param amount any
+function NeedSystem:satisfy(name, amount) end
+
+--- Advances the simulation by one time step.
+---@param dt any
+function NeedSystem:update(dt) end
+
+--- Returns or performs value of.
+---@param name any
+---@return number
+function NeedSystem:valueOf(name) end
+
+--- Lua wrapper for [`crate::ai::neural_net::NeuralNet`].
+---@class NeuralNet
+local NeuralNet = {}
+
+--- Adds a neural network layer with inputs, outputs, and an activation function.
+---@param inputs any
+---@param outputs any
+---@param activation any
+function NeuralNet:addLayer(inputs, outputs, activation) end
+
+--- Returns or performs forward.
+---@param input any
+---@return table
+function NeuralNet:forward(input) end
+
+--- Returns the weights.
+---@return table
+function NeuralNet:getWeights() end
+
+--- Returns or performs layer count.
+---@return integer
+function NeuralNet:layerCount() end
+
+--- Returns or performs param count.
+---@return integer
+function NeuralNet:paramCount() end
+
+--- Sets the weights.
+---@param weights any
+---@return boolean
+function NeuralNet:setWeights(weights) end
+
+--- Lua wrapper for [`crate::ai::neuroevolution::Neuroevolution`].
+---@class Neuroevolution
+local Neuroevolution = {}
+
+--- Returns or performs best fitness.
+---@return number
+function Neuroevolution:bestFitness() end
+
+--- Returns or performs best network.
+---@return LuaNeuralNet|nil
+function Neuroevolution:bestNetwork() end
+
+--- Returns or performs chromosome to net.
+---@param idx any
+---@return LuaNeuralNet|nil
+function Neuroevolution:chromosomeToNet(idx) end
+
+--- Runs one generation of the evolutionary algorithm.
+function Neuroevolution:evolve() end
+
+--- Returns or performs generation.
+---@return integer
+function Neuroevolution:generation() end
+
+--- Returns or performs pop size.
+---@return integer
+function Neuroevolution:popSize() end
+
+--- Sets the fitness.
+---@param idx any
+---@param fitness any
+function Neuroevolution:setFitness(idx, fitness) end
+
+--- Lua wrapper for [`crate::ai::orca::ORCASolver`].
+---@class ORCASolver
+local ORCASolver = {}
+
+--- Adds an ORCA agent at the given position with radius and max speed to the solver.
+---@param x any
+---@param y any
+---@param radius any
+---@param max_speed any
+---@return integer
+function ORCASolver:addAgent(x, y, radius, max_speed) end
+
+--- Returns or performs agent count.
+---@return integer
+function ORCASolver:agentCount() end
+
+--- Computes and returns the result.
+---@param dt any
+function ORCASolver:compute(dt) end
+
+--- Returns the safe velocity.
+---@param idx any
+---@return number
+function ORCASolver:getSafeVelocity(idx) end
+
+--- Sets the position.
+---@param idx any
+---@param x any
+---@param y any
+function ORCASolver:setPosition(idx, x, y) end
+
+--- Sets the preferred velocity.
+---@param idx any
+---@param pvx any
+---@param pvy any
+function ORCASolver:setPreferredVelocity(idx, pvx, pvy) end
 
 --- Lua-side wrapper around a [`QLearner`].
 ---@class QLearner
@@ -599,6 +966,125 @@ function SteeringManager:type() end
 ---@return boolean
 function SteeringManager:typeOf(name) end
 
+--- Lua wrapper for [`crate::ai::perception::StimulusWorld`].
+---@class StimulusWorld
+local StimulusWorld = {}
+
+--- Adds a auditory.
+---@param x any
+---@param y any
+---@param intensity any
+---@param radius any
+---@param decay_rate any
+---@param tag? any (optional)
+---@return integer
+function StimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
+
+--- Adds a visual stimulus at the specified world position with radius and intensity.
+---@param x any
+---@param y any
+---@param intensity any
+---@param radius any
+---@param tag? any (optional)
+---@return integer
+function StimulusWorld:addVisual(x, y, intensity, radius, tag) end
+
+--- Resets or clears the state.
+function StimulusWorld:clear() end
+
+--- Returns or performs count.
+---@return integer
+function StimulusWorld:count() end
+
+--- Removes the specified item.
+---@param id any
+---@return boolean
+function StimulusWorld:remove(id) end
+
+--- Advances the simulation by one time step.
+---@param dt any
+function StimulusWorld:update(dt) end
+
+--- Lua wrapper for [`crate::ai::strategy::StrategyAI`].
+---@class StrategyAI
+local StrategyAI = {}
+
+--- Returns or performs active goal.
+---@return string|nil
+function StrategyAI:activeGoal() end
+
+--- Adds a strategic goal with priority score to the planner for future evaluation.
+---@param name any
+function StrategyAI:addGoal(name) end
+
+--- Adds a string tag to the strategy AI instance for goal filtering and categorization.
+---@param tag any
+function StrategyAI:addTag(tag) end
+
+--- Returns or performs force evaluate.
+---@param scorer_fn any
+function StrategyAI:forceEvaluate(scorer_fn) end
+
+--- Removes the specified tag.
+---@param tag any
+function StrategyAI:removeTag(tag) end
+
+--- Returns or performs time until next.
+---@return number
+function StrategyAI:timeUntilNext() end
+
+--- Advances the simulation by one time step.
+---@param dt any
+---@param scorer_fn any
+function StrategyAI:update(dt, scorer_fn) end
+
+--- Lua wrapper for [`crate::ai::traits::TraitProfile`].
+---@class TraitProfile
+local TraitProfile = {}
+
+--- Adds a modifier.
+---@param trait_name any
+---@param delta any
+---@param duration? any (optional)
+---@param source any
+function TraitProfile:addModifier(trait_name, delta, duration, source) end
+
+--- Returns or performs archetype.
+---@return string|nil
+function TraitProfile:archetype() end
+
+--- Returns the value.
+---@param name any
+---@return number
+function TraitProfile:get(name) end
+
+--- Returns the base.
+---@param name any
+---@return number
+function TraitProfile:getBase(name) end
+
+--- Returns true if a item is present.
+---@param name any
+---@return boolean
+function TraitProfile:has(name) end
+
+--- Removes the specified modifiers.
+---@param source any
+function TraitProfile:removeModifiers(source) end
+
+--- Sets the value.
+---@param name any
+---@param value any
+function TraitProfile:set(name, value) end
+
+--- Returns or performs trait count.
+---@return number
+function TraitProfile:traitCount() end
+
+--- Advances the simulation by one time step.
+---@param dt any
+function TraitProfile:update(dt) end
+
 --- Lua-side wrapper around a [`UtilityAI`].
 ---@class UtilityAI
 local UtilityAI = {}
@@ -624,10 +1110,26 @@ function UtilityAI:type() end
 ---@return boolean
 function UtilityAI:typeOf(name) end
 
+--- Creates a new AI pacing director with default config.
+---@return AIDirector
+function lurek.ai.newAIDirector() end
+
+--- Creates a new AI LOD controller with default 3-tier config.
+---@return AILod
+function lurek.ai.newAILod() end
+
 --- Creates a BT action leaf with a Lua callback.
 ---@param callback any
 ---@return BTNode
 function lurek.ai.newAction(callback) end
+
+--- Creates a new multi-armed bandit.
+---@param arm_count any
+---@param strategy any
+---@param epsilon any
+---@param seed any
+---@return Bandit
+function lurek.ai.newBandit(arm_count, strategy, epsilon, seed) end
 
 --- Creates a new behavior tree.
 ---@return BehaviorTree
@@ -646,9 +1148,29 @@ function lurek.ai.newCommandQueue() end
 ---@return BTNode
 function lurek.ai.newCondition(callback) end
 
+--- Creates a new context steering controller.
+---@param slots any
+---@return ContextSteering
+function lurek.ai.newContextSteering(slots) end
+
+--- Creates a new affective emotion model.
+---@return EmotionModel
+function lurek.ai.newEmotionModel() end
+
 --- Creates a new GOAP planning solver.
 ---@return GOAPPlanner
 function lurek.ai.newGOAPPlanner() end
+
+--- Creates a new genetic algorithm.
+---@param pop_size any
+---@param gene_count any
+---@param seed any
+---@return GeneticAlgorithm
+function lurek.ai.newGeneticAlgorithm(pop_size, gene_count, seed) end
+
+--- Creates a new Hierarchical Task Network domain.
+---@return HTNDomain
+function lurek.ai.newHTNDomain() end
 
 --- Creates a multi-layer influence map grid.
 ---@param w any
@@ -660,6 +1182,34 @@ function lurek.ai.newInfluenceMap(w, h, cs) end
 --- Creates a BT inverter decorator.
 ---@return BTNode
 function lurek.ai.newInverter() end
+
+--- Creates a new Monte Carlo Tree Search engine.
+---@param iters any
+---@param uct_c any
+---@param depth any
+---@param seed any
+---@return MCTSEngine
+function lurek.ai.newMCTSEngine(iters, uct_c, depth, seed) end
+
+--- Creates a new motivational need system.
+---@return NeedSystem
+function lurek.ai.newNeedSystem() end
+
+--- Creates a new feedforward neural network (inference only).
+---@return NeuralNet
+function lurek.ai.newNeuralNet() end
+
+--- Creates a neuroevolution trainer (GA for neural network weights).
+---@param layer_spec any
+---@param pop_size any
+---@param seed any
+---@return Neuroevolution
+function lurek.ai.newNeuroevolution(layer_spec, pop_size, seed) end
+
+--- Creates a new ORCA crowd avoidance solver.
+---@param time_horizon any
+---@return ORCASolver
+function lurek.ai.newORCASolver(time_horizon) end
 
 --- Creates a BT parallel node with optional policies.
 ---@param sp? any (optional)
@@ -699,9 +1249,22 @@ function lurek.ai.newStateMachine() end
 ---@return SteeringManager
 function lurek.ai.newSteeringManager() end
 
+--- Creates a new stimulus perception world.
+---@return StimulusWorld
+function lurek.ai.newStimulusWorld() end
+
+--- Creates a new throttled strategy AI.
+---@param update_interval any
+---@return StrategyAI
+function lurek.ai.newStrategyAI(update_interval) end
+
 --- Creates a BT succeeder decorator.
 ---@return BTNode
 function lurek.ai.newSucceeder() end
+
+--- Creates a new personality trait profile.
+---@return TraitProfile
+function lurek.ai.newTraitProfile() end
 
 --- Creates a new utility AI evaluator.
 ---@return UtilityAI
@@ -713,6 +1276,28 @@ function lurek.ai.newWorld() end
 
 ---@class lurek.animation
 lurek.animation = {}
+
+--- Lua-side wrapper around an [`AnimStateMachine`] FSM controller.
+---@class AnimStateMachine
+local AnimStateMachine = {}
+
+--- Immediately jumps to the named state, bypassing transition conditions.
+---@param name any
+---@return boolean
+function AnimStateMachine:forceState(name) end
+
+--- Returns the source quad for the current animation frame, or nil.
+---@return table?
+function AnimStateMachine:getQuad() end
+
+--- Returns the name of the currently active state.
+---@return string
+function AnimStateMachine:getState() end
+
+--- Advances the FSM by `dt` seconds, evaluating transitions.
+---@param dt any
+---@return nil
+function AnimStateMachine:update(dt) end
 
 --- Lua-side wrapper around an [`Animation`] controller.
 ---@class Animation
@@ -756,6 +1341,10 @@ function Animation:addFrame(x, y, w, h) end
 ---@param count any
 ---@return integer
 function Animation:addFramesFromGrid(tw, th, fw, fh, start, count) end
+
+--- Returns the two quads and blend factor during a crossfade, or nil when not blending.
+---@return table?
+function Animation:getBlendState() end
 
 --- Returns the name of the currently playing clip, or nil.
 ---@return string?
@@ -825,9 +1414,20 @@ function Animation:stop() end
 ---@return nil
 function Animation:update(dt) end
 
+--- Parses an Aseprite JSON export string and builds an Animation with clips and frames.
+---@param json_str any
+---@return Animation?
+function lurek.animation.fromAseprite(json_str) end
+
 --- Creates a new, empty Animation controller.
 ---@return Animation
 function lurek.animation.new() end
+
+--- Creates an animation FSM from an Animation controller and an initial state name.
+---@param anim_ud any
+---@param initial any
+---@return AnimStateMachine
+function lurek.animation.newStateMachine(anim_ud, initial) end
 
 ---@class lurek.audio
 lurek.audio = {}
@@ -1133,6 +1733,45 @@ function MidiPlayer:unsoloAll() end
 ---@return nil
 function MidiPlayer:useDefaultSoundFont() end
 
+--- Lua-side wrapper for a polyphonic [`crate::audio::SoundPool`].
+---@class SoundPool
+local SoundPool = {}
+
+--- Returns the total number of voices in this pool.
+---@return integer
+function SoundPool:getVoiceCount() end
+
+--- Plays the next available voice and returns its SoundKey as an integer.
+---@return integer
+function SoundPool:play() end
+
+--- Releases all voices from the mixer and invalidates this pool.
+---@return nil
+function SoundPool:release() end
+
+--- Routes all voices through the named bus.
+---@param name any
+---@return nil
+function SoundPool:setBus(name) end
+
+--- Sets the volume for all voices in this pool.
+---@param vol any
+---@return nil
+function SoundPool:setVolume(vol) end
+
+--- Stops all voices in this pool.
+---@return nil
+function SoundPool:stopAll() end
+
+--- Returns the type name of this object.
+---@return string
+function SoundPool:type() end
+
+--- Returns true if the type name matches.
+---@param name any
+---@return boolean
+function SoundPool:typeOf(name) end
+
 --- Lua-side wrapper for an audio source resource.
 ---@class Source
 local Source = {}
@@ -1294,6 +1933,31 @@ function mlua:setSample(index, value) end
 ---@return integer
 function lurek.audio.add_effect(bus_name, effect_type_str, params) end
 
+--- Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
+---@param sd_ud any
+---@param low_hz any
+---@param high_hz any
+---@return nil
+function lurek.audio.applyBandpass(sd_ud, low_hz, high_hz) end
+
+--- Scales every sample by gain (clamped to [-1, 1]).
+---@param sd_ud any
+---@param gain any
+---@return nil
+function lurek.audio.applyGain(sd_ud, gain) end
+
+--- Applies a first-order IIR high-pass filter to a SoundData in-place.
+---@param sd_ud any
+---@param cutoff_hz any
+---@return nil
+function lurek.audio.applyHighpass(sd_ud, cutoff_hz) end
+
+--- Applies a first-order IIR low-pass filter to a SoundData in-place.
+---@param sd_ud any
+---@param cutoff_hz any
+---@return nil
+function lurek.audio.applyLowpass(sd_ud, cutoff_hz) end
+
 --- Removes any active filter from a source.
 ---@param id_val any
 ---@return nil
@@ -1302,6 +1966,11 @@ function lurek.audio.clearFilter(id_val) end
 --- Unloads the active SoundFont.
 ---@return nil
 function lurek.audio.clearMidiSoundFont() end
+
+--- Clears any random pitch range on a source, restoring fixed pitch.
+---@param src_ud any
+---@return nil
+function lurek.audio.clearRandomPitch(src_ud) end
 
 --- Creates an independent copy of a source.
 ---@param id_val any
@@ -1314,6 +1983,13 @@ function lurek.audio.clone(id_val) end
 ---@return nil
 function lurek.audio.create_bus(name, parent_name) end
 
+--- Crossfades from one source to another over a duration.
+---@param from_ud any
+---@param to_ud any
+---@param duration any
+---@return nil
+function lurek.audio.crossfade(from_ud, to_ud, duration) end
+
 --- Fades a source in from silence over the given duration.
 ---@param id_val any
 ---@param dur any
@@ -1323,6 +1999,16 @@ function lurek.audio.fadeIn(id_val, dur) end
 --- Returns the number of currently playing sources.
 ---@return integer
 function lurek.audio.getActiveSourceCount() end
+
+--- Returns the peak signal level of the named bus (stub: always 0.0).
+---@param bus_name any
+---@return number
+function lurek.audio.getBusPeak(bus_name) end
+
+--- Returns the RMS signal level of the named bus (stub: always 0.0).
+---@param bus_name any
+---@return number
+function lurek.audio.getBusRms(bus_name) end
 
 --- Returns the current distance model name.
 ---@return string
@@ -1419,6 +2105,11 @@ function lurek.audio.getSourceCount() end
 ---@return string
 function lurek.audio.getSourceType(id_val) end
 
+--- Returns the current stereo width for a source.
+---@param src_ud any
+---@return number
+function lurek.audio.getStereoWidth(src_ud) end
+
 --- Returns the velocity of a source (x, y, z).
 ---@param id_val any
 ---@return number
@@ -1453,6 +2144,12 @@ function lurek.audio.isPlaying(id_val) end
 ---@return boolean
 function lurek.audio.isStopped(id_val) end
 
+--- Additively mixes another SoundData into the destination in-place.
+---@param dest_ud any
+---@param src_ud any
+---@return nil
+function lurek.audio.mixInto(dest_ud, src_ud) end
+
 --- Creates a named audio bus for grouping sources.
 ---@param name any
 ---@return Bus
@@ -1469,6 +2166,12 @@ function lurek.audio.newDecoder(source, buffersize) end
 ---@return MidiPlayer
 function lurek.audio.newMidiPlayer(path) end
 
+--- Creates a polyphonic sound pool for the given file with N simultaneous voices.
+---@param file_path any
+---@param voice_count any
+---@return SoundPool
+function lurek.audio.newPool(file_path, voice_count) end
+
 --- Creates a queueable source for manual PCM buffering.
 ---@param sample_rate integer
 ---@param bit_depth integer
@@ -1476,6 +2179,22 @@ function lurek.audio.newMidiPlayer(path) end
 ---@param buffer_count integer
 ---@return integer
 function lurek.audio.newQueueableSource(sample_rate, bit_depth, channels, buffer_count) end
+
+--- Generate a mono sawtooth-wave SoundData buffer.
+---@param freq any
+---@param duration any
+---@param sample_rate any
+---@param amplitude any
+---@return SoundData
+function lurek.audio.newSawtoothWave(freq, duration, sample_rate, amplitude) end
+
+--- Generate a mono sine-wave SoundData buffer.
+---@param freq any
+---@param duration any
+---@param sample_rate any
+---@param amplitude any
+---@return SoundData
+function lurek.audio.newSineWave(freq, duration, sample_rate, amplitude) end
 
 --- Creates a SoundData from a file or as a silent buffer.
 ---@param args any
@@ -1486,6 +2205,37 @@ function lurek.audio.newSoundData(args) end
 ---@param args any
 ---@return Source
 function lurek.audio.newSource(args) end
+
+--- Generate a mono square-wave SoundData buffer.
+---@param freq any
+---@param duration any
+---@param sample_rate any
+---@param amplitude any
+---@return SoundData
+function lurek.audio.newSquareWave(freq, duration, sample_rate, amplitude) end
+
+--- Generate a mono triangle-wave SoundData buffer.
+---@param freq any
+---@param duration any
+---@param sample_rate any
+---@param amplitude any
+---@return SoundData
+function lurek.audio.newTriangleWave(freq, duration, sample_rate, amplitude) end
+
+--- Generate a reproducible white-noise SoundData buffer.
+---@param duration any
+---@param sample_rate any
+---@param amplitude any
+---@param seed any
+---@return SoundData
+function lurek.audio.newWhiteNoise(duration, sample_rate, amplitude, seed) end
+
+--- Normalizes a WAV file peak amplitude to target_level and writes output.
+---@param input any
+---@param output any
+---@param target any
+---@return nil
+function lurek.audio.normalizeFile(input, output, target) end
 
 --- Pauses playback at the current position.
 ---@param id_val any
@@ -1511,6 +2261,13 @@ function lurek.audio.playLooping(id_val) end
 ---@param qsource_id any
 ---@return nil
 function lurek.audio.playQueueable(qsource_id) end
+
+--- Applies a DSP effect chain to a WAV file and writes output.
+---@param input any
+---@param output any
+---@param effects_tbl any
+---@return nil
+function lurek.audio.processOffline(input, output, effects_tbl) end
 
 --- Pushes a SoundData buffer into a queueable source.
 ---@param qsource_id any
@@ -1642,11 +2399,24 @@ function lurek.audio.setPlaybackDevice(name) end
 ---@return nil
 function lurek.audio.setPosition(id_val, x, y, z) end
 
+--- Sets a random pitch range applied each time the source is played.
+---@param src_ud any
+---@param min any
+---@param max any
+---@return nil
+function lurek.audio.setRandomPitch(src_ud, min, max) end
+
 --- Assigns a source to a bus.
 ---@param id_val any
 ---@param bus_val any
 ---@return nil
 function lurek.audio.setSourceBus(id_val, bus_val) end
+
+--- Sets the stereo width multiplier for a source (1.0 = normal, 0.0 = mono).
+---@param src_ud any
+---@param width any
+---@return nil
+function lurek.audio.setStereoWidth(src_ud, width) end
 
 --- Sets the velocity of a source for Doppler.
 ---@param id_val any
@@ -1676,6 +2446,14 @@ function lurek.audio.set_bus_volume(name, volume) end
 ---@return boolean
 function lurek.audio.set_effect_param(bus_name, effect_id, param_name, value) end
 
+--- Renders a time-frequency spectrogram of a WAV file to a PNG image.
+---@param input any
+---@param output any
+---@param width any
+---@param height any
+---@return nil
+function lurek.audio.spectrogramToPng(input, output, width, height) end
+
 --- Stops playback and resets seek position.
 ---@param id_val any
 ---@return nil
@@ -1694,6 +2472,14 @@ function lurek.audio.stopQueueable(qsource_id) end
 ---@param id_val any
 ---@return number
 function lurek.audio.tell(id_val) end
+
+--- Renders the waveform of a WAV file to a PNG image.
+---@param input any
+---@param output any
+---@param width any
+---@param height any
+---@return nil
+function lurek.audio.waveformToPng(input, output, width, height) end
 
 ---@class lurek.simulator
 lurek.simulator = {}
@@ -1970,14 +2756,43 @@ function Array:clamp(min, max) end
 ---@return Array
 function Array:clone() end
 
+--- 1D convolution with a kernel array (full output).
+---@param kernel any
+---@return Array
+function Array:convolve1d(kernel) end
+
 --- 2D convolution with zero-padding.
 ---@param kernel any
 ---@return Array
 function Array:convolve2D(kernel) end
 
+--- 1D cross-correlation with a template array (valid output).
+---@param template any
+---@return Array
+function Array:correlate1d(template) end
+
 --- Returns the count of nonzero elements.
 ---@return integer
 function Array:countNonZero() end
+
+--- Population covariance with another 1D array.
+---@param other any
+---@return number
+function Array:covariance(other) end
+
+--- Signed 2D cross product with another length-2 array.
+---@param other any
+---@return number
+function Array:cross2d(other) end
+
+--- Cumulative sum of all elements (flattened).
+---@return Array
+function Array:cumsum() end
+
+--- Discrete difference applied `order` times.
+---@param order? any (optional)
+---@return Array
+function Array:diff(order) end
 
 --- Morphological dilation with a diamond structuring element.
 ---@param radius any
@@ -2024,6 +2839,11 @@ function Array:getSize() end
 ---@return boolean
 function Array:isOnGPU() end
 
+--- Solve A·x = b where this array is A (square [n,n]) and b is a 1D vector.
+---@param b any
+---@return Array
+function Array:linsolve(b) end
+
 --- Matrix multiplication of two 2D arrays.
 ---@param other any
 ---@return Array
@@ -2048,6 +2868,31 @@ function Array:min(axis) end
 ---@return Array
 function Array:neg() end
 
+--- Linearly rescale values to [out_min, out_max].
+---@param lo any
+---@param hi any
+---@return Array
+function Array:normalizeRange(lo, hi) end
+
+--- L2-normalise a 1D vector.
+---@return Array
+function Array:normalizeVec() end
+
+--- Outer product of two 1D vectors → 2D array [m, n].
+---@param other any
+---@return Array
+function Array:outer(other) end
+
+--- Pearson correlation coefficient with another 1D array.
+---@param other any
+---@return number
+function Array:pearsonCorr(other) end
+
+--- Compute the p-th percentile (0–100).
+---@param p any
+---@return number
+function Array:percentile(p) end
+
 --- Raises each element to a scalar exponent.
 ---@param exp any
 ---@return Array
@@ -2062,6 +2907,10 @@ function Array:reshape(shape) end
 ---@param args any
 ---@return nil
 function Array:set(args) end
+
+--- Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
+---@return table
+function Array:sobel() end
 
 --- Element-wise square root.
 ---@return Array
@@ -2081,6 +2930,11 @@ function Array:threshold(val) end
 ---@return table
 function Array:toTable() end
 
+--- Apply this 2×2 or 3×3 matrix to an [N,2] points array.
+---@param pts any
+---@return Array
+function Array:transformPoints(pts) end
+
 --- Returns the transposed 2D array.
 ---@return Array
 function Array:transpose() end
@@ -2094,12 +2948,31 @@ function Array:type() end
 ---@return boolean
 function Array:typeOf(name) end
 
+--- Standardise values to zero mean and unit variance.
+---@return Array
+function Array:zscore() end
+
+--- Creates a 3×3 homogeneous affine matrix.
+---@param tx any
+---@param ty any
+---@param angle_rad any
+---@param sx any
+---@param sy any
+---@return Array
+function lurek.compute.affine2d(tx, ty, angle_rad, sx, sy) end
+
 --- Creates an array from a Lua table of numbers with optional shape and dtype.
 ---@param data any
 ---@param shape? any (optional)
 ---@param dtype? any (optional)
 ---@return Array
 function lurek.compute.fromTable(data, shape, dtype) end
+
+--- Creates a size×size Gaussian kernel array.
+---@param size any
+---@param sigma any
+---@return Array
+function lurek.compute.gaussianKernel(size, sigma) end
 
 --- Creates a zero-initialized array with the given shape and optional dtype.
 ---@param shape any
@@ -2120,6 +2993,11 @@ function lurek.compute.ones(shape, dtype) end
 ---@param dtype? any (optional)
 ---@return Array
 function lurek.compute.range(start, stop, step, dtype) end
+
+--- Creates a 2×2 rotation matrix for the given angle in radians.
+---@param angle_rad any
+---@return Array
+function lurek.compute.rotate2dMatrix(angle_rad) end
 
 --- Creates a zero-filled array with the given shape and optional dtype.
 ---@param shape any
@@ -2304,6 +3182,11 @@ local DataFrame = {}
 ---@return integer
 function DataFrame:addRow(row_tbl) end
 
+--- Add multiple rows at once from a table of row tables.
+---@param rows any
+---@return nil
+function DataFrame:addRowBatch(rows) end
+
 --- Returns a deep copy of this DataFrame.
 ---@return DataFrame
 function DataFrame:clone() end
@@ -2311,6 +3194,10 @@ function DataFrame:clone() end
 --- Returns a table of column names.
 ---@return table
 function DataFrame:columns() end
+
+--- Compute a correlation matrix for all numeric columns.
+---@return DataFrame
+function DataFrame:correlationMatrix() end
 
 --- Returns the row count (alias for nrows).
 ---@return integer
@@ -2330,6 +3217,11 @@ function DataFrame:describe() end
 ---@return DataFrame
 function DataFrame:dropNil(col) end
 
+--- Shannon entropy (bits) of the value distribution in a column.
+---@param col any
+---@return number
+function DataFrame:entropy(col) end
+
 --- Replaces nil values in a column with the given value.
 ---@param col any
 ---@param val any
@@ -2340,6 +3232,11 @@ function DataFrame:fillNil(col, val) end
 ---@param col any
 ---@return table
 function DataFrame:getColumn(col) end
+
+--- Return a numeric column as a Lua array of numbers (nils → 0/nan).
+---@param col any
+---@return table
+function DataFrame:getColumnAsF64(col) end
 
 --- Returns a row as a table of name-value pairs.
 ---@param row any
@@ -2387,6 +3284,11 @@ function DataFrame:merge(other) end
 ---@return number
 function DataFrame:min(col) end
 
+--- Return the most frequent value in a column (nil if empty).
+---@param col any
+---@return any
+function DataFrame:modeVal(col) end
+
 --- Returns the number of columns.
 ---@return integer
 function DataFrame:ncols() end
@@ -2426,6 +3328,12 @@ function DataFrame:sample(n, seed) end
 ---@param cols any
 ---@return DataFrame
 function DataFrame:select(cols) end
+
+--- Set a numeric column from a Lua array of numbers.
+---@param col any
+---@param values any
+---@return nil
+function DataFrame:setColumnFromF64(col, values) end
 
 --- Returns rows from start to end (1-based, inclusive).
 ---@param start any
@@ -3181,10 +4089,11 @@ lurek.ecs = {}
 ---@class Universe
 local Universe = {}
 
---- Adds a system table to the universe.
+--- Adds a system table to the universe with an optional priority (lower = earlier).
 ---@param system any
+---@param opts? any (optional)
 ---@return nil
-function Universe:addSystem(system) end
+function Universe:addSystem(system, opts) end
 
 --- Attaches a string tag to an entity.
 ---@param id any
@@ -3213,16 +4122,25 @@ function Universe:clear() end
 ---@return integer
 function Universe:defineTag(name) end
 
+--- Restores entity state from a snapshot produced by serialize().
+---@param snapshot any
+---@return nil
+function Universe:deserialize(snapshot) end
+
 --- Calls callback(id, value) for every entity with the named component.
 ---@param name any
 ---@param callback any
 ---@return nil
 function Universe:each(name, callback) end
 
---- Emits a named event to all systems that implement the handler.
+--- Emits a named event to all systems that implement the handler, in priority order.
 ---@param args any
 ---@return nil
 function Universe:emit(args) end
+
+--- Dispatches all pending component-add and component-remove events to registered callbacks.
+---@return nil
+function Universe:flushObservers() end
 
 --- Returns the component value for an entity, or nil if missing.
 ---@param id any
@@ -3333,6 +4251,18 @@ function Universe:killRecursive(id) end
 ---@return table
 function Universe:listBlueprints() end
 
+--- Registers a callback to fire when a component is added to any entity.
+---@param name any
+---@param cb any
+---@return nil
+function Universe:onComponentAdded(name, cb) end
+
+--- Registers a callback to fire when a component is removed from any entity.
+---@param name any
+---@param cb any
+---@return nil
+function Universe:onComponentRemoved(name, cb) end
+
 --- Returns entity IDs that have all listed component names.
 ---@param args any
 ---@return table
@@ -3352,6 +4282,12 @@ function Universe:queryBitmapAny(names) end
 ---@param name any
 ---@return table
 function Universe:queryBitmapTag(name) end
+
+--- Returns entity IDs that have all `with` components and none of the `without` components.
+---@param with_tbl any
+---@param without_tbl any
+---@return table
+function Universe:queryNot(with_tbl, without_tbl) end
 
 --- Releases all universe state, equivalent to clear.
 ---@return nil
@@ -3379,9 +4315,13 @@ function Universe:removeSystem(system) end
 ---@return nil
 function Universe:removeTag(id, tag) end
 
---- Calls render(system, world) on each registered system.
+--- Calls render(system, world) on each registered system in priority order.
 ---@return nil
 function Universe:render() end
+
+--- Serializes all alive entities to a Lua table snapshot.
+---@return table
+function Universe:serialize() end
 
 --- Sets a component value on an entity.
 ---@param id any
@@ -3400,7 +4340,14 @@ function Universe:setLayer(id, layer) end
 ---@return integer
 function Universe:spawn() end
 
---- Calls update(system, world, dt) on each registered system.
+--- Spawns `count` entities from a blueprint, returns an array of entity IDs.
+---@param name any
+---@param count any
+---@param overrides? any (optional)
+---@return table
+function Universe:spawnBulk(name, count, overrides) end
+
+--- Calls update(system, world, dt) on each registered system in priority order.
 ---@param dt any
 ---@return nil
 function Universe:update(dt) end
@@ -3556,6 +4503,10 @@ function Overlay:getTimeOfDay() end
 ---@return number
 function Overlay:getVignetteStrength() end
 
+--- Returns a table describing the current water overlay state.
+---@return table
+function Overlay:getWater() end
+
 --- Returns the name of the current weather type.
 ---@return string
 function Overlay:getWeather() end
@@ -3659,6 +4610,11 @@ function Overlay:setCloudShadows(v) end
 ---@param v any
 ---@return nil
 function Overlay:setCloudSpeed(v) end
+
+--- Assigns a custom shader name to the overlay, or clears it when `nil` is passed.
+---@param name? any (optional)
+---@return nil
+function Overlay:setCustomShader(name) end
 
 --- Enables or disables the film-grain noise layer.
 ---@param v any
@@ -3861,9 +4817,21 @@ local PostFxStack = {}
 ---@return nil
 function PostFxStack:add(effect_ud) end
 
+--- Applies all enabled effects in the stack and composites the result to screen.
+---@return nil
+function PostFxStack:apply() end
+
+--- Begins capturing the scene for post-processing.
+---@return nil
+function PostFxStack:beginCapture() end
+
 --- Removes all effects from the pipeline.
 ---@return nil
 function PostFxStack:clear() end
+
+--- Ends scene capture for post-processing.
+---@return nil
+function PostFxStack:endCapture() end
 
 --- Returns width and height of the render target.
 ---@return integer
@@ -3956,6 +4924,13 @@ function lurek.effect.newOverlay(w, h) end
 ---@param shader_id any
 ---@return PostFxEffect
 function lurek.effect.newPass(shader_id) end
+
+--- Creates a pre-configured effect stack from a named preset.
+---@param name any
+---@param w? any (optional)
+---@param h? any (optional)
+---@return PostFxStack
+function lurek.effect.newPresetStack(name, w, h) end
 
 --- Creates a new post-processing pipeline stack.
 ---@param w? any (optional)
@@ -4367,6 +5342,12 @@ function Edge:typeOf(name) end
 ---@class Graph
 local Graph = {}
 
+--- Finds the shortest path between two nodes using A*.
+---@param from_node any
+---@param to_node any
+---@return table?
+function Graph:astar(from_node, to_node) end
+
 --- Returns weakly connected components as a table of tables of Node handles.
 ---@return table
 function Graph:getComponents() end
@@ -4422,6 +5403,10 @@ function Graph:hasItem(item_ud) end
 ---@param node_ud any
 ---@return boolean
 function Graph:hasNode(node_ud) end
+
+--- Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
+---@return table
+function Graph:mst() end
 
 --- Processes all supply/demand declarations and fires event callbacks.
 ---@return nil
@@ -4995,6 +5980,11 @@ function mlua:contrast(factor) end
 ---@param h any
 function mlua:crop(x, y, w, h) end
 
+--- Returns the sum of absolute per-channel pixel differences with another ImageData.
+---@param other_ud any
+---@return integer
+function mlua:diff(other_ud) end
+
 --- Encode.
 ---@param format any
 function mlua:encode(format) end
@@ -5047,6 +6037,11 @@ function mlua:invert() end
 ---@param func any
 function mlua:mapPixel(func) end
 
+--- Applies a function to every pixel in-place.
+---@param func any
+---@return nil
+function mlua:mapPixels(func) end
+
 --- Noise.
 ---@param amount any
 function mlua:noise(amount) end
@@ -5054,6 +6049,12 @@ function mlua:noise(amount) end
 --- Posterize.
 ---@param levels any
 function mlua:posterize(levels) end
+
+--- Returns a bilinear-interpolated copy of the image at the given dimensions.
+---@param w any
+---@param h any
+---@return ImageData?
+function mlua:resize(w, h) end
 
 --- Resize nearest.
 ---@param new_w any
@@ -5877,6 +6878,34 @@ function BezierCurve:scale(s, ox, oy) end
 ---@return nil
 function BezierCurve:translate(dx, dy) end
 
+--- Lua-side wrapper around a [`CatmullRomSpline`].
+---@class CatmullRom
+local CatmullRom = {}
+
+--- Number of control points.
+---@return integer
+function CatmullRom:len() end
+
+--- Sample the spline at global t in [0, 1].
+---@param t any
+---@return number
+function CatmullRom:sample(t) end
+
+--- Sample a specific segment at local t in [0, 1].
+---@param seg any
+---@param t any
+---@return number
+function CatmullRom:sampleSegment(seg, t) end
+
+--- Lua-side wrapper around a [`HermiteSpline`].
+---@class Hermite
+local Hermite = {}
+
+--- Evaluate the spline at parameter t in [0, 1].
+---@param t any
+---@return number
+function Hermite:sample(t) end
+
 --- Lua-side wrapper around a [`NoiseGenerator`].
 ---@class NoiseGenerator
 local NoiseGenerator = {}
@@ -6110,6 +7139,133 @@ function Tween:setTime(t) end
 ---@return boolean
 function Tween:update(dt) end
 
+--- Lua-side wrapper around a [`Vec2`] value type.
+---@class Vec2
+local Vec2 = {}
+
+--- Returns the angle of this vector in radians (atan2(y, x)).
+---@return number
+function Vec2:angle() end
+
+--- Returns the 2D cross product (scalar) with another vector.
+---@param other any
+---@return number
+function Vec2:cross(other) end
+
+--- Returns the Euclidean distance from this vector to another.
+---@param other any
+---@return number
+function Vec2:distance(other) end
+
+--- Returns the dot product with another vector.
+---@param other any
+---@return number
+function Vec2:dot(other) end
+
+--- Returns the Euclidean length of the vector.
+---@return number
+function Vec2:length() end
+
+--- Returns the squared length of the vector (faster than length).
+---@return number
+function Vec2:lengthSquared() end
+
+--- Returns a linearly interpolated vector between this and other at parameter t.
+---@param other any
+---@param t any
+---@return Vec2
+function Vec2:lerp(other, t) end
+
+--- Returns a unit-length copy of this vector. Returns zero if length is zero.
+---@return Vec2
+function Vec2:normalize() end
+
+--- Compatibility alias for `normalize`.
+---@return Vec2
+function Vec2:normalized() end
+
+--- Returns the perpendicular vector (-y, x).
+---@return Vec2
+function Vec2:perpendicular() end
+
+--- Returns a new vector rotated by the given angle in radians.
+---@param angle any
+---@return Vec2
+function Vec2:rotate(angle) end
+
+--- Returns the horizontal component of the vector.
+---@return number
+function Vec2:x() end
+
+--- Returns the vertical component of the vector.
+---@return number
+function Vec2:y() end
+
+--- Lua-side wrapper around a [`Vec3`] value type.
+---@class Vec3
+local Vec3 = {}
+
+--- Add another Vec3 and return the result.
+---@param other any
+---@return Vec3
+function Vec3:add(other) end
+
+--- Cross product with another Vec3.
+---@param other any
+---@return Vec3
+function Vec3:cross(other) end
+
+--- Euclidean distance to another Vec3.
+---@param other any
+---@return number
+function Vec3:distance(other) end
+
+--- Dot product with another Vec3.
+---@param other any
+---@return number
+function Vec3:dot(other) end
+
+--- Returns the Euclidean length of the vector.
+---@return number
+function Vec3:length() end
+
+--- Returns the squared Euclidean length (avoids sqrt).
+---@return number
+function Vec3:lengthSquared() end
+
+--- Linear interpolation towards another Vec3.
+---@param other any
+---@param t any
+---@return Vec3
+function Vec3:lerp(other, t) end
+
+--- Returns a unit-length version of this vector.
+---@return Vec3
+function Vec3:normalize() end
+
+--- Scale this vector by a scalar and return the result.
+---@param s any
+---@return Vec3
+function Vec3:scale(s) end
+
+--- Subtract another Vec3 and return the result.
+---@param other any
+---@return Vec3
+function Vec3:sub(other) end
+
+--- Compatibility alias for `vec2`.
+---@param x any
+---@param y any
+---@return Vec2
+function lurek.math.Vec2(x, y) end
+
+--- Compatibility alias for `vec3`.
+---@param x any
+---@param y any
+---@param z any
+---@return Vec3
+function lurek.math.Vec3(x, y, z) end
+
 --- Returns the absolute value of x.
 ---@param x any
 ---@return number
@@ -6158,6 +7314,11 @@ function lurek.math.atan2(y, x) end
 ---@param y2 any
 ---@return table
 function lurek.math.bresenham(x1, y1, x2, y2) end
+
+--- Creates a Catmull-Rom spline through the given control points.
+---@param points any
+---@return CatmullRomSpline
+function lurek.math.catmullRom(points) end
 
 --- Returns the smallest integer ≥ x.
 ---@param x any
@@ -6289,6 +7450,18 @@ function lurek.math.fmod(x, y) end
 ---@return number
 function lurek.math.gammaToLinear(c) end
 
+--- Creates a Hermite spline defined by two endpoints and tangents.
+---@param p0x any
+---@param p0y any
+---@param p1x any
+---@param p1y any
+---@param m0x any
+---@param m0y any
+---@param m1x any
+---@param m1y any
+---@return HermiteSpline
+function lurek.math.hermite(p0x, p0y, p1x, p1y, m0x, m0y, m1x, m1y) end
+
 --- Back ease-in — overshoots slightly before settling at the target.
 ---@param t any
 ---@return number
@@ -6360,6 +7533,13 @@ function lurek.math.inSine(t) end
 function lurek.math.isConvex(pts) end
 
 --- Linear interpolation between a and b by fraction t.
+---@param a any
+---@param b any
+---@param t any
+---@return number
+function lurek.math.lerp(a, b, t) end
+
+--- Linear interpolation between two numbers: a + (b - a) * t.
 ---@param a any
 ---@param b any
 ---@param t any
@@ -6536,6 +7716,15 @@ function lurek.math.random(a, b) end
 ---@return integer
 function lurek.math.randomInt(lo, hi) end
 
+--- Remaps `v` from [in_min, in_max] to [out_min, out_max].
+---@param v any
+---@param in_min any
+---@param in_max any
+---@param out_min any
+---@param out_max any
+---@return number
+function lurek.math.remap(v, in_min, in_max, out_min, out_max) end
+
 --- Returns x rounded to the nearest integer (half-up).
 ---@param x any
 ---@return number
@@ -6591,6 +7780,19 @@ function lurek.math.tan(x) end
 ---@param pts any
 ---@return table
 function lurek.math.triangulate(pts) end
+
+--- Creates a 2D vector with x and y components.
+---@param x any
+---@param y any
+---@return Vec2
+function lurek.math.vec2(x, y) end
+
+--- Creates a 3D vector.
+---@param x any
+---@param y any
+---@param z any
+---@return Vec3
+function lurek.math.vec3(x, y, z) end
 
 ---@class lurek.minimap
 lurek.minimap = {}
@@ -7060,14 +8262,26 @@ function NetworkHost:getPeerState(peer_id) end
 ---@return table
 function NetworkHost:getPeerStats(peer_id) end
 
+--- Returns the multiplayer role of this host ("server", "client", or "host").
+---@return string
+function NetworkHost:getRole() end
+
 --- Returns the round-trip time estimate for a peer in milliseconds.
 ---@param peer_id any
 ---@return number
 function NetworkHost:getRoundTripTime(peer_id) end
 
+--- Returns true if this host was created as a client.
+---@return boolean
+function NetworkHost:isClient() end
+
 --- Returns true if the host has been destroyed.
 ---@return boolean
 function NetworkHost:isDestroyed() end
+
+--- Returns true if this host was created as a server.
+---@return boolean
+function NetworkHost:isServer() end
 
 --- Sends a ping to a peer to measure round-trip time.
 ---@param peer_id any
@@ -7088,10 +8302,83 @@ function NetworkHost:service() end
 ---@return nil
 function NetworkHost:setChannelLimit(limit) end
 
+--- Lua-side wrapper around [`NetworkRuntime`] for async HTTP/TCP/WebSocket.
+---@class NetworkRuntime
+local NetworkRuntime = {}
+
+--- Sends an HTTP request asynchronously. Poll with `poll()` for the response.
+---@param opts any
+---@return integer
+function NetworkRuntime:httpRequest(opts) end
+
+--- Polls for completed async responses (HTTP, TCP events, WebSocket events).
+---@return table
+function NetworkRuntime:poll() end
+
+--- Shuts down the background network thread.
+---@return nil
+function NetworkRuntime:shutdown() end
+
+--- Closes a TCP connection.
+---@param id any
+---@return nil
+function NetworkRuntime:tcpClose(id) end
+
+--- Opens a TCP connection to a remote address.
+---@param addr any
+---@return integer
+function NetworkRuntime:tcpConnect(addr) end
+
+--- Sends data over a TCP connection.
+---@param id any
+---@param data any
+---@return nil
+function NetworkRuntime:tcpSend(id, data) end
+
+--- Closes a WebSocket connection.
+---@param id any
+---@return nil
+function NetworkRuntime:wsClose(id) end
+
+--- Opens a WebSocket connection.
+---@param url any
+---@return integer
+function NetworkRuntime:wsConnect(url) end
+
+--- Sends a text message over a WebSocket connection.
+---@param id any
+---@param data any
+---@return nil
+function NetworkRuntime:wsSend(id, data) end
+
+--- Creates a client host that connects to a remote server.
+---@param opts any
+---@return NetworkHost
+function lurek.network.newClient(opts) end
+
 --- Creates a new network host bound to the given address.
 ---@param opts any
 ---@return NetworkHost
 function lurek.network.newHost(opts) end
+
+--- Creates a background network runtime for async HTTP, TCP, and WebSocket.
+---@return NetworkRuntime
+function lurek.network.newRuntime() end
+
+--- Creates a server host that binds to a port and accepts connections.
+---@param opts any
+---@return NetworkHost
+function lurek.network.newServer(opts) end
+
+--- Serializes a Lua value to a binary MessagePack string.
+---@param value any
+---@return string
+function lurek.network.pack(value) end
+
+--- Deserializes a MessagePack binary string back to a Lua value.
+---@param data any
+---@return any
+function lurek.network.unpack(data) end
 
 ---@class lurek.parallax
 lurek.parallax = {}
@@ -7293,6 +8580,14 @@ lurek.particle = {}
 ---@class ParticleSystem
 local ParticleSystem = {}
 
+--- Removes all attractors from this particle system.
+---@return nil
+function ParticleSystem:clearAttractors() end
+
+--- Removes the bounding rectangle so particles can move freely.
+---@return nil
+function ParticleSystem:clearBounds() end
+
 --- Creates a copy of this particle system (config only, no live particles).
 ---@return ParticleSystem
 function ParticleSystem:clone() end
@@ -7311,6 +8606,10 @@ function ParticleSystem:drawToImage(w, h) end
 ---@param count any
 ---@return nil
 function ParticleSystem:emit(count) end
+
+--- Returns the number of attractors currently registered on this system.
+---@return integer
+function ParticleSystem:getAttractorCount() end
 
 --- Returns the maximum particle count.
 ---@return integer
@@ -7505,14 +8804,6 @@ function ParticleSystem:setGravity(gx, gy) end
 ---@return nil
 function ParticleSystem:setInsertMode(mode) end
 
---- Sets linear acceleration range.
----@param xmin any
----@param ymin any
----@param xmax any
----@param ymax any
----@return nil
-function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
-
 --- Sets linear damping range.
 ---@param min any
 ---@param max any
@@ -7536,12 +8827,6 @@ function ParticleSystem:setParticleLifetime(min, max) end
 ---@param y any
 ---@return nil
 function ParticleSystem:setPosition(x, y) end
-
---- Sets radial acceleration range.
----@param min any
----@param max any
----@return nil
-function ParticleSystem:setRadialAcceleration(min, max) end
 
 --- Sets whether particle rotation follows velocity direction.
 ---@param v any
@@ -7591,12 +8876,6 @@ function ParticleSystem:setSpinVariation(v) end
 ---@return nil
 function ParticleSystem:setSpread(spread) end
 
---- Sets tangential acceleration range.
----@param min any
----@param max any
----@return nil
-function ParticleSystem:setTangentialAcceleration(min, max) end
-
 --- Starts or restarts particle emission.
 ---@return nil
 function ParticleSystem:start() end
@@ -7604,6 +8883,12 @@ function ParticleSystem:start() end
 --- Stops particle emission immediately.
 ---@return nil
 function ParticleSystem:stop() end
+
+--- Alias for `drawToImage`. Renders all live particles to a CPU ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function ParticleSystem:toImage(w, h) end
 
 --- Returns the type name "ParticleSystem".
 ---@return string
@@ -7618,6 +8903,11 @@ function ParticleSystem:typeOf(name) end
 ---@param dt any
 ---@return nil
 function ParticleSystem:update(dt) end
+
+--- Pre-simulates the particle system for `seconds` so it appears fully
+---@param seconds any
+---@return nil
+function ParticleSystem:warmUp(seconds) end
 
 --- Lua-side wrapper around a [`Trail`] ribbon effect.
 ---@class Trail
@@ -7767,6 +9057,90 @@ function FlowField:type() end
 ---@param name any
 ---@return boolean
 function FlowField:typeOf(name) end
+
+--- Lua-side wrapper around a [`HexGrid`].
+---@class HexGrid
+local HexGrid = {}
+
+--- Hex-distance between two cells.
+---@param c1 any
+---@param r1 any
+---@param c2 any
+---@param r2 any
+---@return integer
+function HexGrid:distance(c1, r1, c2, r2) end
+
+--- Returns all cells visible from origin within max_range (1-based coordinates).
+---@param col any
+---@param row any
+---@param max_range any
+---@return table
+function HexGrid:fieldOfView(col, row, max_range) end
+
+--- Find A* path between two cells (1-based coordinates).
+---@param fc any
+---@param fr any
+---@param tc any
+---@param tr any
+---@return table?
+function HexGrid:findPath(fc, fr, tc, tr) end
+
+--- Returns true if a cell is blocked (1-based coordinates).
+---@param col any
+---@param row any
+---@return boolean
+function HexGrid:isBlocked(col, row) end
+
+--- Returns true if there is an unobstructed line between two cells (1-based).
+---@param fc any
+---@param fr any
+---@param tc any
+---@param tr any
+---@return boolean
+function HexGrid:lineOfSight(fc, fr, tc, tr) end
+
+--- Returns all cells reachable from origin within movement budget (1-based).
+---@param col any
+---@param row any
+---@param budget any
+---@return table
+function HexGrid:rangeOfMovement(col, row, budget) end
+
+--- Mark/unmark a cell as blocked (1-based coordinates).
+---@param col any
+---@param row any
+---@param blocked any
+function HexGrid:setBlocked(col, row, blocked) end
+
+--- Set movement cost for a cell (1-based coordinates).
+---@param col any
+---@param row any
+---@param cost any
+function HexGrid:setCost(col, row, cost) end
+
+--- Lua-side wrapper around a [`JpsGrid`].
+---@class JpsGrid
+local JpsGrid = {}
+
+--- Find a JPS path between two cells (1-based coordinates).
+---@param fx any
+---@param fy any
+---@param tx any
+---@param ty any
+---@return table?
+function JpsGrid:findPath(fx, fy, tx, ty) end
+
+--- Returns true if the cell is blocked (1-based coordinates).
+---@param x any
+---@param y any
+---@return boolean
+function JpsGrid:isBlocked(x, y) end
+
+--- Mark/unmark a cell as blocked (1-based coordinates).
+---@param x any
+---@param y any
+---@param blocked any
+function JpsGrid:setBlocked(x, y, blocked) end
 
 --- Lua-side wrapper around a [`NavGrid`] with optional HPA★ abstract graph.
 ---@class NavGrid
@@ -7965,6 +9339,19 @@ function lurek.pathfind.getThreadCount() end
 ---@return FlowField
 function lurek.pathfind.newFlowField(grid_ud) end
 
+--- Creates a hex grid for pathfinding, LOS, FOV, and range queries.
+---@param width any
+---@param height any
+---@param layout_str? any (optional)
+---@return HexGrid
+function lurek.pathfind.newHexGrid(width, height, layout_str) end
+
+--- Creates a uniform-cost grid optimised for Jump Point Search (orthogonal + diagonal).
+---@param width any
+---@param height any
+---@return JpsGrid
+function lurek.pathfind.newJpsGrid(width, height) end
+
 --- Creates a new NavGrid with all cells walkable.
 ---@param width any
 ---@param height any
@@ -7994,6 +9381,11 @@ function lurek.pathfind.newPathGrid(w, h, cell_size) end
 ---@param grid_ud any
 ---@return UnitPathfinder
 function lurek.pathfind.newPathfinder(grid_ud) end
+
+--- Computes a Dijkstra range-of-movement map from an origin within a movement budget.
+---@param opts any
+---@return table
+function lurek.pathfind.rangeMap(opts) end
 
 --- Sets the background pathfinding thread count (currently a no-op).
 ---@param count any
@@ -8238,6 +9630,96 @@ function Funnel:push(tag, value) end
 ---@return boolean
 function Funnel:update(dt) end
 
+--- Lua wrapper for an ordered, resizable list.
+---@class List
+local List = {}
+
+--- Appends a value to the end of the list.
+---@param value any
+---@return nil
+function List:add(value) end
+
+--- Removes all values from the list.
+---@return nil
+function List:clear() end
+
+--- Returns true if the list contains a value equal to the given Lua value (string/number/boolean).
+---@param value any
+---@return boolean
+function List:contains(value) end
+
+--- Returns the value at a 1-based index, or nil.
+---@param index any
+---@return any
+function List:get(index) end
+
+--- Returns true if the list is empty.
+---@return boolean
+function List:isEmpty() end
+
+--- Returns the number of items in the list.
+---@return integer
+function List:len() end
+
+--- Removes and returns the value at a 1-based index.
+---@param index any
+---@return any
+function List:remove(index) end
+
+--- Replaces the value at a 1-based index.
+---@param index any
+---@param value any
+---@return nil
+function List:set(index, value) end
+
+--- Returns all items as a Lua table.
+---@return table
+function List:toArray() end
+
+--- Lua wrapper for the Mediator pattern.
+---@class Mediator
+local Mediator = {}
+
+--- Dispatches a message to all handlers across all channels.
+---@param args any
+---@return nil
+function Mediator:broadcast(args) end
+
+--- Returns all registered channel names.
+---@return table
+function Mediator:channels() end
+
+--- Removes all channels and handlers.
+---@return nil
+function Mediator:clear() end
+
+--- Returns the number of handlers on a channel.
+---@param channel any
+---@return integer
+function Mediator:handlerCount(channel) end
+
+--- Unregisters a handler by ID.
+---@param channel any
+---@param id any
+---@return nil
+function Mediator:off(channel, id) end
+
+--- Registers a handler callback on a channel; returns handler ID.
+---@param channel any
+---@param callback any
+---@return integer
+function Mediator:on(channel, callback) end
+
+--- Removes a channel and all its handlers.
+---@param channel any
+---@return nil
+function Mediator:removeChannel(channel) end
+
+--- Dispatches a message to all handlers on a channel.
+---@param args any
+---@return nil
+function Mediator:send(args) end
+
 --- Lua wrapper for the ObjectPool pattern.
 ---@class ObjectPool
 local ObjectPool = {}
@@ -8334,6 +9816,108 @@ function PriorityQueue:pop() end
 ---@return integer
 function PriorityQueue:push(priority, value, label) end
 
+--- Lua wrapper for a FIFO queue.
+---@class Queue
+local Queue = {}
+
+--- Removes all values from the queue.
+---@return nil
+function Queue:clear() end
+
+--- Removes and returns the front value, or nil if empty.
+---@return any
+function Queue:dequeue() end
+
+--- Adds a value to the back of the queue. Returns false if capacity is full.
+---@param value any
+---@return boolean
+function Queue:enqueue(value) end
+
+--- Returns the front value without removing it, or nil if empty.
+---@return any
+function Queue:front() end
+
+--- Returns true if the queue is empty.
+---@return boolean
+function Queue:isEmpty() end
+
+--- Returns true if the queue is at its capacity limit.
+---@return boolean
+function Queue:isFull() end
+
+--- Returns the number of items in the queue.
+---@return integer
+function Queue:len() end
+
+--- Returns all items as a Lua table (front to back).
+---@return table
+function Queue:toArray() end
+
+--- Lua wrapper for the RelationshipManager pattern.
+---@class RelationshipManager
+local RelationshipManager = {}
+
+--- Adjusts the numeric relationship value by a delta.
+---@param a any
+---@param b any
+---@param delta any
+---@return nil
+function RelationshipManager:adjustValue(a, b, delta) end
+
+--- Defines a relationship type with ordered levels.
+---@param name any
+---@param levels any
+---@param default_level? any (optional)
+---@return nil
+function RelationshipManager:defineType(name, levels, default_level) end
+
+--- Returns the named level for a typed relationship, or nil.
+---@param a any
+---@param b any
+---@param type_name any
+---@return string?
+function RelationshipManager:getLevel(a, b, type_name) end
+
+--- Returns the numeric relationship value between two entities (default 0.0).
+---@param a any
+---@param b any
+---@return number
+function RelationshipManager:getValue(a, b) end
+
+--- Returns the total number of stored relationship pairs.
+---@return integer
+function RelationshipManager:pairCount() end
+
+--- Removes all relationship data between two entities.
+---@param a any
+---@param b any
+---@return nil
+function RelationshipManager:removePair(a, b) end
+
+--- Removes a relationship type definition.
+---@param name any
+---@return nil
+function RelationshipManager:removeType(name) end
+
+--- Sets a named level for a typed relationship between two entities.
+---@param a any
+---@param b any
+---@param type_name any
+---@param level any
+---@return boolean
+function RelationshipManager:setLevel(a, b, type_name, level) end
+
+--- Sets the numeric relationship value between two entities.
+---@param a any
+---@param b any
+---@param value any
+---@return nil
+function RelationshipManager:setValue(a, b, value) end
+
+--- Returns all defined relationship type names.
+---@return table
+function RelationshipManager:typeNames() end
+
 --- Lua wrapper for the Ring (circular buffer) pattern.
 ---@class Ring
 local Ring = {}
@@ -8405,6 +9989,51 @@ function ServiceLocator:provide(name, value) end
 ---@return nil
 function ServiceLocator:remove(name) end
 
+--- Lua wrapper for an unordered set. Values are keyed by their string representation.
+---@class Set
+local Set = {}
+
+--- Adds a string key to the set. Returns true if it was not already present.
+---@param key any
+---@return boolean
+function Set:add(key) end
+
+--- Removes all keys from the set.
+---@return nil
+function Set:clear() end
+
+--- Returns true if the key is in the set.
+---@param key any
+---@return boolean
+function Set:has(key) end
+
+--- Returns the intersection of this set and another as a new Set.
+---@param other any
+---@return Set
+function Set:intersection(other) end
+
+--- Returns true if the set is empty.
+---@return boolean
+function Set:isEmpty() end
+
+--- Returns the number of distinct keys in the set.
+---@return integer
+function Set:len() end
+
+--- Removes a key from the set. Returns true if it was present.
+---@param key any
+---@return boolean
+function Set:remove(key) end
+
+--- Returns all keys as a Lua table (unordered).
+---@return table
+function Set:toArray() end
+
+--- Returns the union of this set and another as a new Set.
+---@param other any
+---@return Set
+function Set:union(other) end
+
 --- Lua wrapper for the SimpleState finite state machine pattern.
 ---@class SimpleState
 local SimpleState = {}
@@ -8441,6 +10070,85 @@ function SimpleState:transitionTo(name) end
 ---@param dt any
 ---@return nil
 function SimpleState:update(dt) end
+
+--- Lua wrapper for a LIFO stack.
+---@class Stack
+local Stack = {}
+
+--- Removes all values from the stack.
+---@return nil
+function Stack:clear() end
+
+--- Returns true if the stack is empty.
+---@return boolean
+function Stack:isEmpty() end
+
+--- Returns true if the stack is at its capacity limit.
+---@return boolean
+function Stack:isFull() end
+
+--- Returns the number of items on the stack.
+---@return integer
+function Stack:len() end
+
+--- Returns the top value without removing it, or nil if empty.
+---@return any
+function Stack:peek() end
+
+--- Removes and returns the top value, or nil if empty.
+---@return any
+function Stack:pop() end
+
+--- Pushes a value onto the stack. Returns false if capacity is full.
+---@param value any
+---@return boolean
+function Stack:push(value) end
+
+--- Returns all items as a Lua table (bottom to top).
+---@return table
+function Stack:toArray() end
+
+--- Lua wrapper for the Strategy pattern.
+---@class Strategy
+local Strategy = {}
+
+--- Removes all strategies and clears the active selection.
+---@return nil
+function Strategy:clear() end
+
+--- Calls the currently active strategy function with the given arguments.
+---@param args any
+---@return any
+function Strategy:execute(args) end
+
+--- Returns the name of the active strategy, or nil.
+---@return string?
+function Strategy:getCurrent() end
+
+--- Returns true if a strategy with this name is registered.
+---@param name any
+---@return boolean
+function Strategy:has(name) end
+
+--- Returns all registered strategy names.
+---@return table
+function Strategy:names() end
+
+--- Registers a named strategy function.
+---@param name any
+---@param callback any
+---@return nil
+function Strategy:register(name, callback) end
+
+--- Removes a strategy by name.
+---@param name any
+---@return boolean
+function Strategy:remove(name) end
+
+--- Sets the active strategy by name. Returns false if not registered.
+---@param name any
+---@return boolean
+function Strategy:set(name) end
 
 --- Lua wrapper for the Throttle pattern.
 ---@class Throttle
@@ -8504,6 +10212,14 @@ function lurek.patterns.newFactory() end
 ---@return Funnel
 function lurek.patterns.newFunnel(window, max_entries, name) end
 
+--- Creates an ordered, resizable list.
+---@return List
+function lurek.patterns.newList() end
+
+--- Creates a new named-channel message broker.
+---@return Mediator
+function lurek.patterns.newMediator() end
+
 --- Creates a new ObjectPool instance.
 ---@return ObjectPool
 function lurek.patterns.newObjectPool() end
@@ -8518,6 +10234,15 @@ function lurek.patterns.newObserver(name) end
 ---@return PriorityQueue
 function lurek.patterns.newPriorityQueue(name) end
 
+--- Creates a FIFO queue. capacity=0 means unlimited.
+---@param capacity? any (optional)
+---@return Queue
+function lurek.patterns.newQueue(capacity) end
+
+--- Creates a new entity relationship manager.
+---@return RelationshipManager
+function lurek.patterns.newRelationshipManager() end
+
 --- Creates a fixed-capacity circular history buffer.
 ---@param capacity any
 ---@param name? any (optional)
@@ -8528,9 +10253,22 @@ function lurek.patterns.newRing(capacity, name) end
 ---@return ServiceLocator
 function lurek.patterns.newServiceLocator() end
 
+--- Creates an unordered set that rejects duplicate values (by string key).
+---@return Set
+function lurek.patterns.newSet() end
+
 --- Creates a new SimpleState finite state machine instance.
 ---@return SimpleState
 function lurek.patterns.newSimpleState() end
+
+--- Creates a LIFO stack. capacity=0 means unlimited.
+---@param capacity? any (optional)
+---@return Stack
+function lurek.patterns.newStack(capacity) end
+
+--- Creates a new strategy registry.
+---@return Strategy
+function lurek.patterns.newStrategy() end
 
 --- Creates a leading-edge rate limiter that fires at most once per interval seconds.
 ---@param interval any
@@ -8650,6 +10388,10 @@ function Body:isBullet() end
 ---@return boolean
 function Body:isFixedRotation() end
 
+--- Returns true if this body is currently sleeping (inactive).
+---@return boolean
+function Body:isSleeping() end
+
 --- Returns whether the body can sleep.
 ---@return boolean
 function Body:isSleepingAllowed() end
@@ -8736,6 +10478,88 @@ function Body:setType(bt) end
 ---@return nil
 function Body:setVelocity(vx, vy) end
 
+--- Puts this body to sleep immediately.
+---@return nil
+function Body:sleep() end
+
+--- Forcibly wakes up this body.
+---@return nil
+function Body:wakeUp() end
+
+--- Lua-side handle to a falling-sand [`CellularWorld`].
+---@class Cellular
+local Cellular = {}
+
+--- Counts cells of the given material type.
+---@param t any
+---@return integer
+function Cellular:countCells(t) end
+
+--- Fills a circle of cells with the given material.
+---@param cx any
+---@param cy any
+---@param r any
+---@param t any
+---@return nil
+function Cellular:fillCircle(cx, cy, r, t) end
+
+--- Fills a rectangular region of cells with the given material.
+---@param cx0 any
+---@param cy0 any
+---@param cw any
+---@param ch any
+---@param t any
+---@return nil
+function Cellular:fillRect(cx0, cy0, cw, ch, t) end
+
+--- Returns positions of all cells of the given material as an array of `{x, y}` tables.
+---@param t any
+---@return table
+function Cellular:findCells(t) end
+
+--- Returns the material at `(cx, cy)` as an integer constant.
+---@param cx any
+---@param cy any
+---@return integer
+function Cellular:getCell(cx, cy) end
+
+--- Loads grid data from bytes produced by `toBytes`.
+---@param data any
+---@return boolean
+function Cellular:loadFromBytes(data) end
+
+--- Sets the material of a cell.
+---@param cx any
+---@param cy any
+---@param t any
+---@return nil
+function Cellular:setCell(cx, cy, t) end
+
+--- Advances the simulation by one tick.
+---@return nil
+function Cellular:step() end
+
+--- Advances the simulation by `n` ticks.
+---@param n any
+---@return nil
+function Cellular:stepN(n) end
+
+--- Serialises the grid to a byte string.
+---@return string
+function Cellular:toBytes() end
+
+--- Returns the full grid as an RGBA byte string using the default colour palette.
+---@return string
+function Cellular:toImageData() end
+
+--- Returns a sub-region as an RGBA byte string.
+---@param cx0 any
+---@param cy0 any
+---@param cw any
+---@param ch any
+---@return string
+function Cellular:toImageDataRegion(cx0, cy0, cw, ch) end
+
 --- Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 ---@class PhysicsShape
 local PhysicsShape = {}
@@ -8776,13 +10600,115 @@ function PhysicsShape:setRestitution(restitution) end
 ---@return nil
 function PhysicsShape:setSensor(sensor) end
 
+--- Lua-side handle to a destructible [`TerrainMap`].
+---@class Terrain
+local Terrain = {}
+
+--- Removes unsupported cells, returning the number of cells that fell.
+---@return integer
+function Terrain:collapseColumns() end
+
+--- Sets every cell in the grid to `solid`.
+---@param solid any
+---@return nil
+function Terrain:fillAll(solid) end
+
+--- Fills a circle of cells centred at world position `(wx, wy)`.
+---@param wx any
+---@param wy any
+---@param radius any
+---@param solid any
+---@return nil
+function Terrain:fillCircle(wx, wy, radius, solid) end
+
+--- Fills a rectangular region of cells.
+---@param wx any
+---@param wy any
+---@param w any
+---@param h any
+---@param solid any
+---@return nil
+function Terrain:fillRect(wx, wy, w, h, solid) end
+
+--- Rebuilds physics bodies for all dirty chunks.
+---@return nil
+function Terrain:flush() end
+
+--- Returns whether a cell is solid.
+---@param cx any
+---@param cy any
+---@return boolean
+function Terrain:getCell(cx, cy) end
+
+--- Returns `true` when at least one chunk needs flushing.
+---@return boolean
+function Terrain:isDirty() end
+
+--- Loads terrain cell data from bytes produced by `toBytes`.
+---@param data any
+---@return boolean
+function Terrain:loadFromBytes(data) end
+
+--- Sets a single terrain cell to solid or empty.
+---@param cx any
+---@param cy any
+---@param solid any
+---@return nil
+function Terrain:setCell(cx, cy, solid) end
+
+--- Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
+---@return table
+function Terrain:solidPositions() end
+
+--- Spawns dynamic debris bodies at the given positions.
+---@param positions any
+---@param mass any
+---@param restitution any
+---@return table
+function Terrain:spawnDebris(positions, mass, restitution) end
+
+--- Serialises the terrain grid to a byte string for save/load.
+---@return string
+function Terrain:toBytes() end
+
+--- Returns the terrain as an RGBA byte string.
+---@param sr any
+---@param sg any
+---@param sb any
+---@param er any
+---@param eg any
+---@param eb any
+---@return string
+function Terrain:toImageData(sr, sg, sb, er, eg, eb) end
+
 --- Lua-side handle wrapping a physics World.
 ---@class World
 local World = {}
 
+--- Creates a rectangular gravity/damping zone and returns a LuaZone handle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@return LuaZone
+function World:addZone(x, y, w, h) end
+
 --- Resets the world, removing all bodies and joints.
 ---@return nil
 function World:clear() end
+
+--- Removes the begin-contact callback.
+---@return nil
+function World:clearBeginContact() end
+
+--- Removes the one-way platform flag from a body.
+---@param id any
+---@return nil
+function World:clearBodyOneWay(id) end
+
+--- Removes the end-contact callback.
+---@return nil
+function World:clearEndContact() end
 
 --- Removes a body from the world.
 ---@param id any
@@ -8809,6 +10735,11 @@ function World:getBeginContactEvents() end
 ---@return integer|nil
 function World:getBodyAtPoint(x, y) end
 
+--- Returns whether CCD is enabled for a body.
+---@param id any
+---@return boolean
+function World:getBodyCCD(id) end
+
 --- Returns contacts involving a specific body.
 ---@param body_id any
 ---@return table
@@ -8821,6 +10752,11 @@ function World:getBodyCount() end
 --- Returns all body IDs in the world.
 ---@return table
 function World:getBodyIds() end
+
+--- Returns the one-way normal for a body, or nil if not configured.
+---@param id any
+---@return number
+function World:getBodyOneWay(id) end
 
 --- Returns the body type as a string.
 ---@param id any
@@ -8848,6 +10784,11 @@ function World:getGravity() end
 ---@return integer
 function World:getJointBodies(jid) end
 
+--- Returns the break threshold for a joint, or nil if not set.
+---@param jid any
+---@return number
+function World:getJointBreakForce(jid) end
+
 --- Returns all joint IDs.
 ---@return table
 function World:getJointIds() end
@@ -8871,9 +10812,27 @@ function World:getJointType(jid) end
 ---@return number
 function World:getMeter() end
 
+--- Returns the current number of solver iterations per step.
+---@return integer
+function World:getSolverIterations() end
+
+--- Returns zone enter/leave events produced by the most recent step.
+---@return table
+function World:getZoneEvents() end
+
+--- Returns true if a body is currently sleeping (inactive).
+---@param id any
+---@return boolean
+function World:isBodySleeping(id) end
+
 --- Returns the total number of joints.
 ---@return integer
 function World:jointCount() end
+
+--- Creates multiple bodies in one call.
+---@param specs any
+---@return table
+function World:newBodies(specs) end
 
 --- Creates a new rectangular body and adds it to the world.
 ---@param x any
@@ -8882,11 +10841,34 @@ function World:jointCount() end
 ---@return Body
 function World:newBody(x, y, bt) end
 
+--- Registers a Lua function called with (bodyIdA, bodyIdB) when two
+---@param f any
+---@return nil
+function World:setBeginContact(f) end
+
+--- Enables or disables Continuous Collision Detection for a body.
+---@param id any
+---@param enabled any
+---@return nil
+function World:setBodyCCD(id, enabled) end
+
+--- Marks a body as a one-way platform.  Bodies approaching from the
+---@param id any
+---@param nx any
+---@param ny any
+---@return nil
+function World:setBodyOneWay(id, nx, ny) end
+
 --- Changes the body type.
 ---@param id any
 ---@param bt any
 ---@return nil
 function World:setBodyType(id, bt) end
+
+--- Registers a Lua function called with (bodyIdA, bodyIdB) when two
+---@param f any
+---@return nil
+function World:setEndContact(f) end
 
 --- Sets the gravity vector.
 ---@param gx any
@@ -8894,15 +10876,38 @@ function World:setBodyType(id, bt) end
 ---@return nil
 function World:setGravity(gx, gy) end
 
+--- Sets the relative-velocity threshold above which a joint breaks.
+---@param jid any
+---@param f any
+---@return nil
+function World:setJointBreakForce(jid, f) end
+
 --- Sets the pixels-per-meter scaling factor.
 ---@param ppm any
 ---@return nil
 function World:setMeter(ppm) end
 
---- Advances the physics simulation by dt seconds.
+--- Sets the number of constraint solver iterations per step.
+---@param n any
+---@return nil
+function World:setSolverIterations(n) end
+
+--- Puts a body to sleep immediately.
+---@param id any
+---@return nil
+function World:sleepBody(id) end
+
+--- Advances the physics simulation by dt seconds, firing onBeginContact /
 ---@param dt any
 ---@return nil
 function World:step(dt) end
+
+--- Steps the world using a fixed sub-step size to consume accumulated time.
+---@param accum any
+---@param step_dt any
+---@param max_steps any
+---@return number
+function World:stepFixed(accum, step_dt, max_steps) end
 
 --- Converts a pixel value to physics units.
 ---@param px any
@@ -8913,6 +10918,79 @@ function World:toPhysics(px) end
 ---@param m any
 ---@return number
 function World:toPixels(m) end
+
+--- Forcibly wakes up a sleeping body.
+---@param id any
+---@return nil
+function World:wakeUpBody(id) end
+
+--- Lua-side handle to a [`PhysicsZone`] living inside a [`World`].
+---@class Zone
+local Zone = {}
+
+--- Removes the zone from the world.
+---@return nil
+function Zone:destroy() end
+
+--- Returns the zone's integer ID.
+---@return integer
+function Zone:getId() end
+
+--- Sets an optional angular damping override for bodies inside the zone.
+---@param value? any (optional)
+---@return nil
+function Zone:setAngularDampingOverride(value) end
+
+--- Replaces the zone boundary with a circle.
+---@param cx any
+---@param cy any
+---@param radius any
+---@return nil
+function Zone:setCircle(cx, cy, radius) end
+
+--- Enables or disables the zone.
+---@param enabled any
+---@return nil
+function Zone:setEnabled(enabled) end
+
+--- Sets directional gravity inside the zone.
+---@param gx any
+---@param gy any
+---@return nil
+function Zone:setGravityDirectional(gx, gy) end
+
+--- Sets point-attractor gravity inside the zone.
+---@param cx any
+---@param cy any
+---@param strength any
+---@return nil
+function Zone:setGravityPoint(cx, cy, strength) end
+
+--- Sets point-repulsor gravity inside the zone.
+---@param cx any
+---@param cy any
+---@param strength any
+---@return nil
+function Zone:setGravityRepulsor(cx, cy, strength) end
+
+--- Suppresses gravity inside the zone (zero-g pocket).
+---@return nil
+function Zone:setGravityZero() end
+
+--- Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
+---@param mask any
+---@return nil
+function Zone:setLayerMask(mask) end
+
+--- Sets an optional linear damping override for bodies inside the zone.
+---@param value? any (optional)
+---@return nil
+function Zone:setLinearDampingOverride(value) end
+
+--- Sets the zone priority; higher values win over lower when zones overlap.
+---@param priority any
+---@return nil
+function Zone:setPriority(priority) end
 
 --- Attaches a standalone shape to a body as an additional fixture.
 ---@param body_ud any
@@ -8929,6 +11007,12 @@ function lurek.physics.debugDraw(enable) end
 ---@param world_ud any
 ---@return nil
 function lurek.physics.destroyWorld(world_ud) end
+
+--- Extracts collider geometry from a World and queues a GPU physics debug
+---@param world_ud any
+---@param config_val any
+---@return nil
+function lurek.physics.drawDebugGpu(world_ud, config_val) end
 
 --- Returns the position and velocity of a body (x, y, vx, vy).
 ---@param world_ud any
@@ -8954,6 +11038,12 @@ function lurek.physics.isSleepingAllowed(world_ud, body_ud) end
 ---@param bt any
 ---@return Body
 function lurek.physics.newBody(world_ud, x, y, bt) end
+
+--- Creates a falling-sand cellular automaton grid.
+---@param width any
+---@param height any
+---@return LuaCellular
+function lurek.physics.newCellular(width, height) end
 
 --- Creates a chain shape userdata from flat variadic vertex pairs.
 ---@param closed any
@@ -8983,6 +11073,14 @@ function lurek.physics.newPolygonShape() end
 ---@param h any
 ---@return Shape
 function lurek.physics.newRectangleShape(w, h) end
+
+--- Creates a destructible terrain grid.
+---@param width any
+---@param height any
+---@param cell_size any
+---@param world_handle any
+---@return LuaTerrain
+function lurek.physics.newTerrain(width, height, cell_size, world_handle) end
 
 --- Creates a new physics world with the given gravity vector.
 ---@param gx any
@@ -9283,6 +11381,16 @@ function lurek.pipeline.newStep(name, callback) end
 ---@class lurek.procgen
 lurek.procgen = {}
 
+--- Generates a dungeon using Binary Space Partitioning.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.bspDungeon(opts) end
+
+--- Generates a dungeon using Binary Space Partitioning.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.bspDungeon(opts) end
+
 --- Generates a cave-like map using cellular automata.
 ---@param w any
 ---@param h any
@@ -9301,6 +11409,102 @@ function lurek.procgen.cellularAutomata(w, h, opts) end
 ---@return table
 function lurek.procgen.floodFill(data, w, h, sx, sy, threshold, above) end
 
+--- Generates a single procedural name using a Markov chain.
+---@param samples_tbl any
+---@param min_len? any (optional)
+---@param max_len? any (optional)
+---@param seed? any (optional)
+---@return string
+function lurek.procgen.generateName(samples_tbl, min_len, max_len, seed) end
+
+--- Generates a single procedural name using a Markov chain.
+---@param samples_tbl any
+---@param min_len? any (optional)
+---@param max_len? any (optional)
+---@param seed? any (optional)
+---@return string
+function lurek.procgen.generateName(samples_tbl, min_len, max_len, seed) end
+
+--- Generates N procedural names using a Markov chain.
+---@param samples_tbl any
+---@param n any
+---@param min_len? any (optional)
+---@param max_len? any (optional)
+---@param seed? any (optional)
+---@return table
+function lurek.procgen.generateNames(samples_tbl, n, min_len, max_len, seed) end
+
+--- Generates N procedural names using a Markov chain.
+---@param samples_tbl any
+---@param n any
+---@param min_len? any (optional)
+---@param max_len? any (optional)
+---@param seed? any (optional)
+---@return table
+function lurek.procgen.generateNames(samples_tbl, n, min_len, max_len, seed) end
+
+--- Generates a heightmap using fractal noise.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.heightmap(opts) end
+
+--- Generates a heightmap using fractal noise.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.heightmap(opts) end
+
+--- Generates an L-system string.
+---@param opts any
+---@return string
+function lurek.procgen.lsystem(opts) end
+
+--- Generates an L-system string.
+---@param opts any
+---@return string
+function lurek.procgen.lsystem(opts) end
+
+--- Generates L-system line segments for rendering.
+---@param opts any
+---@param angle_deg? any (optional)
+---@param step? any (optional)
+---@return table
+function lurek.procgen.lsystemSegments(opts, angle_deg, step) end
+
+--- Generates L-system line segments for rendering.
+---@param opts any
+---@param angle_deg? any (optional)
+---@param step? any (optional)
+---@return table
+function lurek.procgen.lsystemSegments(opts, angle_deg, step) end
+
+--- Generates a noise map using the configurable NoiseGenerator.
+---@param width any
+---@param height any
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.noiseMap(width, height, opts) end
+
+--- Generates a noise map using the configurable NoiseGenerator.
+---@param width any
+---@param height any
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.noiseMap(width, height, opts) end
+
+--- Generates a noise map using rayon parallel processing.
+---@param width any
+---@param height any
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.noiseMapParallel(width, height, opts) end
+
+--- Generates a noise map using rayon parallel processing.
+---@param width any
+---@param height any
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.noiseMapParallel(width, height, opts) end
+
 --- Evaluates periodic Perlin noise at a point.
 ---@param x any
 ---@param y any
@@ -9318,6 +11522,29 @@ function lurek.procgen.perlinNoise(x, y, px, py) end
 ---@return table
 function lurek.procgen.poissonDisk(w, h, min_dist, max_attempts, seed) end
 
+--- Generates a rooms-and-corridors dungeon.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.roomsDungeon(opts) end
+
+--- Generates a rooms-and-corridors dungeon.
+---@param opts? any (optional)
+---@return table
+function lurek.procgen.roomsDungeon(opts) end
+
+--- Returns a single Simplex noise value at the given 2-D coordinate.
+---@param x any
+---@param y any
+---@return number
+function lurek.procgen.simplex2d(x, y) end
+
+--- Returns a single Simplex noise value at the given 3-D coordinate.
+---@param x any
+---@param y any
+---@param z any
+---@return number
+function lurek.procgen.simplex3d(x, y, z) end
+
 --- Generates a Voronoi diagram for a set of seed points.
 ---@param w any
 ---@param h any
@@ -9326,8 +11553,140 @@ function lurek.procgen.poissonDisk(w, h, min_dist, max_attempts, seed) end
 ---@return table
 function lurek.procgen.voronoi(w, h, pts_tbl, opts_tbl) end
 
+--- Generates a tile grid using Wave Function Collapse.
+---@param opts any
+---@return table
+function lurek.procgen.wfcGenerate(opts) end
+
+--- Generates a tile grid using Wave Function Collapse.
+---@param opts any
+---@return table
+function lurek.procgen.wfcGenerate(opts) end
+
+--- Generates a world graph with scattered regions and edges.
+---@param width any
+---@param height any
+---@param region_count any
+---@param seed? any (optional)
+---@return table
+function lurek.procgen.worldGraph(width, height, region_count, seed) end
+
+--- Generates a world graph with scattered regions and edges.
+---@param width any
+---@param height any
+---@param region_count any
+---@param seed? any (optional)
+---@return table
+function lurek.procgen.worldGraph(width, height, region_count, seed) end
+
 ---@class lurek.raycaster
 lurek.raycaster = {}
+
+--- Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
+---@class DoorManager
+local DoorManager = {}
+
+--- Begins closing the door at the given index.
+---@param index any
+---@return nil
+function DoorManager:closeDoor(index) end
+
+--- Returns the number of registered doors.
+---@return integer
+function DoorManager:count() end
+
+--- Returns the state table for door at index, or nil if out of range.
+---@param index any
+---@return table|nil
+function DoorManager:getDoor(index) end
+
+--- Begins opening the door at the given index.
+---@param index any
+---@return nil
+function DoorManager:openDoor(index) end
+
+--- Returns the type string "DoorManager".
+---@return string
+function DoorManager:type() end
+
+--- Returns the type string "DoorManager".
+---@return string
+function DoorManager:typeOf() end
+
+--- Advances all door animations by dt seconds.
+---@param dt any
+---@return nil
+function DoorManager:update(dt) end
+
+--- Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
+---@class HeightMap
+local HeightMap = {}
+
+--- Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
+---@param x any
+---@param y any
+---@return number
+function HeightMap:ceilingAt(x, y) end
+
+--- Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
+---@param x any
+---@param y any
+---@return number
+function HeightMap:floorAt(x, y) end
+
+--- Sets the ceiling height at (x, y).
+---@param x any
+---@param y any
+---@param h any
+---@return nil
+function HeightMap:setCeiling(x, y, h) end
+
+--- Sets the floor height at (x, y).
+---@param x any
+---@param y any
+---@param h any
+---@return nil
+function HeightMap:setFloor(x, y, h) end
+
+--- Returns the type string "HeightMap".
+---@return string
+function HeightMap:type() end
+
+--- Returns the type string "HeightMap".
+---@return string
+function HeightMap:typeOf() end
+
+--- Lua-side value wrapper around a raycaster [`PointLight`].
+---@class PointLight
+local PointLight = {}
+
+--- Returns the RGB color as three separate values.
+---@return number
+function PointLight:color() end
+
+--- Returns the intensity multiplier.
+---@return number
+function PointLight:intensity() end
+
+--- Returns the illumination radius.
+---@return number
+function PointLight:radius() end
+
+--- Returns the type string "PointLight".
+---@return string
+function PointLight:type() end
+
+--- Returns the type string "PointLight".
+---@return string
+function PointLight:typeOf() end
+
+--- Returns the world-space X position.
+---@return number
+function PointLight:x() end
+
+--- Returns the world-space Y position.
+---@return number
+function PointLight:y() end
 
 --- Lua-side wrapper around a [`Raycaster2D`] grid.
 ---@class Raycaster
@@ -9376,6 +11735,27 @@ function lurek.raycaster.distanceShade(distance, max_distance) end
 ---@param h any
 ---@return Raycaster
 function lurek.raycaster.new(w, h) end
+
+--- Creates a new empty door manager.
+---@return DoorManager
+function lurek.raycaster.newDoorManager() end
+
+--- Creates a new height map with default floor (0.0) and ceiling (1.0) values.
+---@param w any
+---@param h any
+---@return HeightMap
+function lurek.raycaster.newHeightMap(w, h) end
+
+--- Creates a point light for use in raycaster scene lighting.
+---@param x any
+---@param y any
+---@param r any
+---@param g any
+---@param b any
+---@param radius any
+---@param intensity any
+---@return PointLight
+function lurek.raycaster.newPointLight(x, y, r, g, b, radius, intensity) end
 
 --- Projects a wall distance to screen-space drawing parameters.
 ---@param distance any
@@ -9526,6 +11906,11 @@ function Image:typeOf() end
 ---@class ImageData
 local ImageData = {}
 
+--- Returns the sum of absolute per-channel differences between this image and `other`.
+---@param other_ud any
+---@return integer
+function ImageData:diff(other_ud) end
+
 --- Returns the pixel height of this image buffer.
 ---@return integer
 function ImageData:getHeight() end
@@ -9533,6 +11918,17 @@ function ImageData:getHeight() end
 --- Returns the pixel width of this image buffer.
 ---@return integer
 function ImageData:getWidth() end
+
+--- Applies a Lua function to every pixel in-place.
+---@param callback any
+---@return nil
+function ImageData:mapPixels(callback) end
+
+--- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
+---@param w any
+---@param h any
+---@return ImageData?
+function ImageData:resize(w, h) end
 
 --- Returns the type name "ImageData".
 ---@return string
@@ -9727,6 +12123,14 @@ function lurek.render.applyTransform(mat) end
 ---@param segments? integer? (optional)
 function lurek.render.arc(mode, x, y, radius, angle1, angle2, segments) end
 
+--- Begins a Y/Z depth sort group. Draw commands until flushSortGroup are depth-sortable.
+---@param id any
+function lurek.render.beginSortGroup(id) end
+
+--- Begins a Y/Z depth sort group identified by id.
+---@param id any
+function lurek.render.beginSortGroup(id) end
+
 --- Calls the given callback with an ImageData captured from the current frame (stub: creates blank).
 ---@param callback any
 ---@return nil
@@ -9754,6 +12158,114 @@ function lurek.render.clearStencil() end
 ---@return any
 function lurek.render.draw(args) end
 
+--- Queues a beveled border rectangle with inner fill.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param bevelW? number? (optional)
+---@param style? string? (optional)
+---@param opts? table? (optional)
+function lurek.render.drawBevelRect(x, y, w, h, bevelW, style, opts) end
+
+--- Queues a beveled border rectangle.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param bevel_w? any (optional)
+---@param style? any (optional)
+---@param opts? any (optional)
+function lurek.render.drawBevelRect(x, y, w, h, bevel_w, style, opts) end
+
+--- Queues a convex polygon with per-vertex colours.
+---@param vertices any
+---@param colors any
+---@param mode? any (optional)
+function lurek.render.drawColoredPolygon(vertices, colors, mode) end
+
+--- Queues a convex polygon with per-vertex colours.
+---@param vertices any
+---@param colors any
+---@param mode? any (optional)
+function lurek.render.drawColoredPolygon(vertices, colors, mode) end
+
+--- Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+---@param x1 number
+---@param y1 number
+---@param cx1 number
+---@param cy1 number
+---@param cx2 number
+---@param cy2 number
+---@param x2 number
+---@param y2 number
+---@param segments? integer? (optional)
+function lurek.render.drawCubicBezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments) end
+
+--- Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+---@param x1 any
+---@param y1 any
+---@param cx1 any
+---@param cy1 any
+---@param cx2 any
+---@param cy2 any
+---@param x2 any
+---@param y2 any
+---@param segments? any (optional)
+function lurek.render.drawCubicBezier(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments) end
+
+--- Queues a gradient-filled rectangle. color1/color2 are {r,g,b,a} tables.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param color1 table
+---@param color2 table
+---@param direction? string? (optional)
+function lurek.render.drawGradientRect(x, y, w, h, color1, color2, direction) end
+
+--- Queues a gradient-filled rectangle. Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.
+---@param x any
+---@param y any
+---@param w any
+---@param h any
+---@param c1 any
+---@param c2 any
+---@param dir? any (optional)
+function lurek.render.drawGradientRect(x, y, w, h, c1, c2, dir) end
+
+--- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
+---@param cx number
+---@param cy number
+---@param size number
+---@param orientation? string? (optional)
+---@param mode? string? (optional)
+function lurek.render.drawHexTile(cx, cy, size, orientation, mode) end
+
+--- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
+---@param cx any
+---@param cy any
+---@param size any
+---@param orientation? any (optional)
+---@param mode? any (optional)
+function lurek.render.drawHexTile(cx, cy, size, orientation, mode) end
+
+--- Queues a three-face isometric cube tile at screen position (sx, sy).
+---@param sx number
+---@param sy number
+---@param halfW number
+---@param halfH number
+---@param opts? table? (optional)
+function lurek.render.drawIsoCubeTile(sx, sy, halfW, halfH, opts) end
+
+--- Queues a three-face isometric cube tile at screen position (sx, sy).
+---@param sx any
+---@param sy any
+---@param half_w any
+---@param half_h any
+---@param opts? any (optional)
+function lurek.render.drawIsoCubeTile(sx, sy, half_w, half_h, opts) end
+
 --- Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
 ---@param slice any
 ---@param x any
@@ -9762,6 +12274,38 @@ function lurek.render.draw(args) end
 ---@param h any
 ---@return nil
 function lurek.render.drawNineSlice(slice, x, y, w, h) end
+
+--- Queues a multi-segment vector path.
+---@param path any
+---@param mode? any (optional)
+---@param close? any (optional)
+function lurek.render.drawPath(path, mode, close) end
+
+--- Queues a multi-segment vector path.
+---@param path any
+---@param mode? any (optional)
+---@param close? any (optional)
+function lurek.render.drawPath(path, mode, close) end
+
+--- Queues a quadratic Bézier curve from (x1,y1) to (x2,y2) with one control point.
+---@param x1 number
+---@param y1 number
+---@param cx number
+---@param cy number
+---@param x2 number
+---@param y2 number
+---@param segments? integer? (optional)
+function lurek.render.drawQuadBezier(x1, y1, cx, cy, x2, y2, segments) end
+
+--- Must be called inside lurek.render or lurek.render_ui.
+---@param x1 any
+---@param y1 any
+---@param cx any
+---@param cy any
+---@param x2 any
+---@param y2 any
+---@param segments? any (optional)
+function lurek.render.drawQuadBezier(x1, y1, cx, cy, x2, y2, segments) end
 
 --- Draws a portion of an image defined by a Quad.
 ---@param image Image
@@ -9782,6 +12326,14 @@ function lurek.render.drawq(image, quad, x, y, r, sx, sy, ox, oy) end
 ---@param rx any
 ---@param ry any
 function lurek.render.ellipse(mode, x, y, rx, ry) end
+
+--- Sorts and flushes all draw commands in the sort group.
+---@param id any
+function lurek.render.flushSortGroup(id) end
+
+--- Sorts and flushes all draw commands in the sort group.
+---@param id any
+function lurek.render.flushSortGroup(id) end
 
 --- Returns the current background color.
 ---@return number
@@ -9991,6 +12543,14 @@ function lurek.render.polygon(args) end
 --- Pops the transform from the stack.
 function lurek.render.pop() end
 
+--- Ends and composites the named layer back to its parent.
+---@param id any
+function lurek.render.popLayer(id) end
+
+--- Ends and composites the named layer.
+---@param id any
+function lurek.render.popLayer(id) end
+
 --- Draws text at the given position.
 ---@param text any
 ---@param x? any (optional)
@@ -10008,6 +12568,26 @@ function lurek.render.printf(text, x, y, limit, align) end
 
 --- Pushes the current transform onto the stack.
 function lurek.render.push() end
+
+--- Begins a named compositing layer with optional alpha and blend mode.
+---@param id any
+---@param alpha? any (optional)
+---@param blend_mode? any (optional)
+function lurek.render.pushLayer(id, alpha, blend_mode) end
+
+--- Begins a named compositing layer. Provides alpha and blend mode for composite.
+---@param id any
+---@param alpha? any (optional)
+---@param blend_mode? any (optional)
+function lurek.render.pushLayer(id, alpha, blend_mode) end
+
+--- Associates the previous draw command with a depth value within the active sort group.
+---@param depth any
+function lurek.render.pushSortKey(depth) end
+
+--- Associates the previous draw command with a depth value within the active sort group.
+---@param depth any
+function lurek.render.pushSortKey(depth) end
 
 --- Draws a rectangle.
 ---@param mode string
@@ -10257,6 +12837,15 @@ function DepthSorter:flush() end
 ---@return integer
 function DepthSorter:getCount() end
 
+--- Returns true if stable sort mode is enabled.
+---@return boolean
+function DepthSorter:isStable() end
+
+--- Sets whether equal-depth entries preserve insertion order.
+---@param stable any
+---@return nil
+function DepthSorter:setStable(stable) end
+
 --- Sorts all registered callbacks by depth ascending.
 ---@return nil
 function DepthSorter:sort() end
@@ -10270,9 +12859,18 @@ function lurek.scene.clear() end
 ---@return function
 function lurek.scene.define(def) end
 
+--- Restores scene data_refs from a snapshot produced by serializeScene().
+---@param snapshot any
+---@return nil
+function lurek.scene.deserializeScene(snapshot) end
+
 --- Draws all scenes in the stack from bottom to top (legacy name; prefer `render`).
 ---@return nil
 function lurek.scene.draw() end
+
+--- Returns a table array of all active scene tables.
+---@return table
+function lurek.scene.getActiveScenes() end
 
 --- Returns the current top scene table, or nil if the stack is empty.
 ---@return table?
@@ -10300,6 +12898,14 @@ function lurek.scene.getStackSize() end
 ---@return number
 function lurek.scene.getTransitionProgress() end
 
+--- Returns the easing-adjusted transition progress from 0.0 to 1.0.
+---@return number
+function lurek.scene.getTransitionProgressEased() end
+
+--- Returns a table listing all supported transition type strings.
+---@return table
+function lurek.scene.getTransitionTypes() end
+
 --- Returns true if the given key exists in the data store.
 ---@param key any
 ---@return boolean
@@ -10314,6 +12920,15 @@ function lurek.scene.hasRegistered(name) end
 ---@return boolean
 function lurek.scene.isEmpty() end
 
+--- Returns true if the current top scene was pushed as an overlay.
+---@return boolean
+function lurek.scene.isOverlay() end
+
+--- Returns true if the named scene has been preloaded.
+---@param name any
+---@return boolean
+function lurek.scene.isPreloaded(name) end
+
 --- Returns true if a scene transition is currently active.
 ---@return boolean
 function lurek.scene.isTransitioning() end
@@ -10327,39 +12942,65 @@ function lurek.scene.new(def) end
 ---@return DepthSorter
 function lurek.scene.newDepthSorter() end
 
---- Pops the top scene from the stack with an optional transition.
+--- Pops the top scene from the stack with an optional transition and easing.
 ---@param transition? any (optional)
 ---@param duration? any (optional)
+---@param easing? any (optional)
 ---@return nil
-function lurek.scene.pop(transition, duration) end
+function lurek.scene.pop(transition, duration, easing) end
 
 --- Pops scenes until the named scene is on top, calling leave on each removed.
 ---@param name any
 ---@return boolean
 function lurek.scene.popTo(name) end
 
---- Calls `scene:ready(self)` on the top scene if not yet fired, then `scene:process(dt)`.
+--- Registers a loader function for a named scene. The loader is called
+---@param name any
+---@param loader any
+---@return nil
+function lurek.scene.preload(name, loader) end
+
+--- Calls `scene:ready(self)` once per scene on the first tick after enter,
 ---@param dt any
 ---@return nil
 function lurek.scene.process(dt) end
 
---- Calls `scene:process_late(dt)` on the topmost scene (after process, before render).
+--- Calls `scene:process_late(dt)` on all active scenes (after process, before render).
 ---@param dt any
 ---@return nil
 function lurek.scene.processLate(dt) end
 
---- Calls `scene:process_physics(dt)` on the topmost scene (fixed timestep).
+--- Calls `scene:process_physics(dt)` on all active scenes (fixed timestep).
 ---@param dt any
 ---@return nil
 function lurek.scene.processPhysics(dt) end
 
---- Pushes a scene table onto the stack with an optional transition.
+--- Pushes a scene table onto the stack with an optional transition and easing.
 ---@param scene table
 ---@param transition? string? (optional)
 ---@param duration? number? (optional)
+---@param easing? string? (optional)
 ---@param params? table? (optional)
 ---@return nil
-function lurek.scene.push(scene, transition, duration, params) end
+function lurek.scene.push(scene, transition, duration, easing, params) end
+
+--- Pushes a scene as a non-pausing overlay over the current top scene.
+---@param scene table
+---@param transition? string? (optional)
+---@param duration? number? (optional)
+---@param easing? string? (optional)
+---@param params? table? (optional)
+---@return nil
+function lurek.scene.pushOverlay(scene, transition, duration, easing, params) end
+
+--- Pushes a registered scene by name, running its loader if not yet preloaded.
+---@param name string
+---@param transition? string? (optional)
+---@param duration? number? (optional)
+---@param easing? string? (optional)
+---@param params? table? (optional)
+---@return nil
+function lurek.scene.pushPreloaded(name, transition, duration, easing, params) end
 
 --- Registers a scene table by name for later retrieval.
 ---@param name any
@@ -10380,6 +13021,10 @@ function lurek.scene.render() end
 ---@return nil
 function lurek.scene.renderUi() end
 
+--- Returns a snapshot of the scene stack as a Lua table: { stack=[name...], data={key=val} }.
+---@return table
+function lurek.scene.serializeScene() end
+
 --- Stores a value in the inter-scene data store under the given key.
 ---@param key any
 ---@param value any
@@ -10390,9 +13035,10 @@ function lurek.scene.setData(key, value) end
 ---@param scene table
 ---@param transition? string? (optional)
 ---@param duration? number? (optional)
+---@param easing? string? (optional)
 ---@param params? table? (optional)
 ---@return nil
-function lurek.scene.switchTo(scene, transition, duration, params) end
+function lurek.scene.switchTo(scene, transition, duration, easing, params) end
 
 --- Removes a scene from the registry by name.
 ---@param name any
@@ -10449,11 +13095,15 @@ lurek.spine = {}
 ---@class Skeleton
 local Skeleton = {}
 
---- Adds a root bone with optional local transform and returns its index.
+--- Adds a SkeletonAnimation to this skeleton's library.
+---@param anim_ud any
+---@return nil
+function Skeleton:addAnimation(anim_ud) end
+
+--- Registers a new empty skin by name.
 ---@param name any
----@param opts? any (optional)
----@return integer
-function Skeleton:addBone(name, opts) end
+---@return nil
+function Skeleton:addSkin(name) end
 
 --- Returns the total number of bones.
 ---@return integer
@@ -10475,10 +13125,18 @@ function Skeleton:findBone(name) end
 ---@return integer?
 function Skeleton:findSlot(name) end
 
+--- Returns the current playback time in seconds of the active animation.
+---@return number
+function Skeleton:getAnimationTime() end
+
 --- Returns the world-space transform of a bone as a table, or nil if out of range.
 ---@param idx any
 ---@return table?
 function Skeleton:getBoneWorld(idx) end
+
+--- Returns the name of the currently active skin, or nil.
+---@return string?
+function Skeleton:getSkin() end
 
 --- Sets the root bone position and propagates world transforms.
 ---@param x any
@@ -10486,18 +13144,147 @@ function Skeleton:getBoneWorld(idx) end
 ---@return nil
 function Skeleton:setPosition(x, y) end
 
+--- Activates the named skin for attachment lookups.
+---@param name any
+---@return boolean
+function Skeleton:setSkin(name) end
+
 --- Returns the total number of slots.
 ---@return integer
 function Skeleton:slotCount() end
+
+--- Stops the current skeletal animation.
+---@return nil
+function Skeleton:stopAnimation() end
+
+--- Advances the playing animation by `dt` seconds and applies keyframes.
+---@param dt any
+---@return nil
+function Skeleton:updateAnimation(dt) end
 
 --- Propagates local transforms down the bone hierarchy to compute world positions.
 ---@return nil
 function Skeleton:updateWorldTransforms() end
 
+--- Lua-side wrapper around a [`SkeletonAnimation`] keyframe clip.
+---@class SkeletonAnimation
+local SkeletonAnimation = {}
+
+--- Returns the total duration of the animation in seconds.
+---@return number
+function SkeletonAnimation:getDuration() end
+
+--- Returns the number of bone timelines in this animation.
+---@return integer
+function SkeletonAnimation:getTimelineCount() end
+
 --- Creates a new empty skeleton with the given name.
 ---@param name any
 ---@return Skeleton
 function lurek.spine.newSkeleton(name) end
+
+--- Creates a new empty SkeletonAnimation clip with the given name and duration.
+---@param name any
+---@param duration any
+---@return SkeletonAnimation
+function lurek.spine.newSkeletonAnimation(name, duration) end
+
+---@class lurek.sprite
+lurek.sprite = {}
+
+--- Lua-side wrapper around a [`SpriteAtlas`] named-region store.
+---@class SpriteAtlas
+local SpriteAtlas = {}
+
+--- Returns the total number of named regions in the atlas.
+---@return integer
+function SpriteAtlas:entryCount() end
+
+--- Returns a sequential table of all region names.
+---@return table
+function SpriteAtlas:entryNames() end
+
+--- Returns the region at the given 1-based insertion index, or nil.
+---@param index any
+---@return table?
+function SpriteAtlas:getByIndex(index) end
+
+--- Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
+---@param name any
+---@return table?
+function SpriteAtlas:getEntry(name) end
+
+--- Lua-side wrapper around a [`SpriteSheet`] frame-grid calculator.
+---@class SpriteSheet
+local SpriteSheet = {}
+
+--- Renders the sheet grid as a debug view into a new ImageData.
+---@param w any
+---@param h any
+---@return ImageData
+function SpriteSheet:drawToImage(w, h) end
+
+--- Returns a sequential table of quad tables for every frame in the given column.
+---@param col any
+---@return table
+function SpriteSheet:getColumn(col) end
+
+--- Returns the quad for the 0-based frame index, or nil if out of range.
+---@param index any
+---@return table?
+function SpriteSheet:getFrame(index) end
+
+--- Returns the total number of frames in the sheet.
+---@return integer
+function SpriteSheet:getFrameCount() end
+
+--- Returns the width and height of a single frame cell in pixels.
+---@return integer
+function SpriteSheet:getFrameSize() end
+
+--- Returns the number of columns and rows in the grid.
+---@return integer
+function SpriteSheet:getGridSize() end
+
+--- Returns a sequential table of quad tables for the named frame group, or nil.
+---@param name any
+---@return table?
+function SpriteSheet:getGroupFrames(name) end
+
+--- Returns a sequential table of all defined group names.
+---@return table
+function SpriteSheet:getGroupNames() end
+
+--- Returns a sequential table of quad tables for every frame in the given row.
+---@param row any
+---@return table
+function SpriteSheet:getRow(row) end
+
+--- Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
+---@param atlas_ud any
+---@param sw any
+---@param sh any
+---@return SpriteSheet
+function lurek.sprite.newAtlasSheet(atlas_ud, sw, sh) end
+
+--- Creates an RPGMaker VX/Ace character sheet (3 cols × 4 rows) with "down", "left", "right", "up" groups.
+---@param tw any
+---@param th any
+---@return SpriteSheet
+function lurek.sprite.newRPGMakerSheet(tw, th) end
+
+--- Creates a sprite sheet with a uniform grid of `frame_w × frame_h` frames.
+---@param tw any
+---@param th any
+---@param fw any
+---@param fh any
+---@return SpriteSheet
+function lurek.sprite.newSheet(tw, th, fw, fh) end
+
+--- Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
+---@param json_str any
+---@return SpriteAtlas
+function lurek.sprite.parseAtlas(json_str) end
 
 ---@class lurek.system
 lurek.system = {}
@@ -10542,6 +13329,15 @@ function lurek.system.getLogLevel() end
 ---@return integer
 function lurek.system.getMemorySize() end
 
+--- Resolves a stable runtime message ID such as 'L001' to its human-readable text.
+---@param id any
+---@return string
+function lurek.system.getMessage(id) end
+
+--- Returns the total number of message entries loaded into the runtime message catalog.
+---@return integer
+function lurek.system.getMessageCount() end
+
 --- Returns the host operating system name ('Windows', 'Linux', 'macOS').
 ---@return string
 function lurek.system.getOS() end
@@ -10561,6 +13357,11 @@ function lurek.system.getProcessorCount() end
 --- Returns the Lurek2D engine version string.
 ---@return string
 function lurek.system.getVersion() end
+
+--- Returns true when the runtime message catalog contains the given stable message ID.
+---@param id any
+---@return boolean
+function lurek.system.hasMessage(id) end
 
 --- Emit a log message from Lua at the specified level.
 ---@param level any
@@ -11372,6 +14173,12 @@ function TileMap:setOrientation(orientation) end
 ---@return number
 function TileMap:tileToWorld(tx, ty) end
 
+--- Converts the given layer into a 2D navigation grid.
+---@param layer any
+---@param gids_tbl any
+---@return table
+function TileMap:toNavGrid(layer, gids_tbl) end
+
 --- Advances tile animation timers by dt seconds.
 ---@param dt any
 ---@return nil
@@ -11439,6 +14246,18 @@ function TileSet:isSolid(tile_id) end
 ---@param solid any
 ---@return nil
 function TileSet:setSolid(tile_id, solid) end
+
+--- Parses an LDtk JSON export string and returns a TileMap.
+---@param json_str any
+---@param level_name? any (optional)
+---@return TileMap
+function lurek.tilemap.fromLDtk(json_str, level_name) end
+
+--- Parses an LDtk JSON export string and returns a TileMap.
+---@param json_str any
+---@param level_name? any (optional)
+---@return TileMap
+function lurek.tilemap.fromLDtk(json_str, level_name) end
 
 --- Converts screen position back to axial hex coordinates (pointy-top layout).
 ---@param sx any
@@ -11723,6 +14542,10 @@ function lurek.time.getDelta() end
 ---@return number
 function lurek.time.getFPS() end
 
+--- Returns the total number of frames rendered since engine start.
+---@return integer
+function lurek.time.getFrameCount() end
+
 --- Returns the high-resolution elapsed time since engine start in seconds.
 ---@return number
 function lurek.time.getMicroTime() end
@@ -11810,6 +14633,33 @@ function TweenSequence:cancel() end
 ---@return boolean
 function TweenSequence:isActive() end
 
+--- Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
+---@class TweenState
+local TweenState = {}
+
+--- Returns whether the tween state has completed.
+---@return boolean
+function TweenState:isComplete() end
+
+--- Interpolates from `start` to `finish` using the eased tween progress.
+---@param start any
+---@param finish any
+---@return number
+function TweenState:lerp(start, finish) end
+
+--- Resets the tween state to elapsed time zero.
+---@return nil
+function TweenState:reset() end
+
+--- Returns the raw 0..1 playback progress.
+---@return number
+function TweenState:t() end
+
+--- Advances the tween state by `dt` seconds.
+---@param dt any
+---@return boolean
+function TweenState:tick(dt) end
+
 --- Cancels all active tweens, sequences, and parallels immediately.
 ---@return nil
 function lurek.tween.cancelAll() end
@@ -11827,6 +14677,12 @@ function lurek.tween.getActiveCount() end
 --- Returns a list of all available easing names (built-in + custom).
 ---@return table
 function lurek.tween.getEasingNames() end
+
+--- Creates a standalone tween timing state without registering it with the engine.
+---@param duration any
+---@param easing? any (optional)
+---@return TweenState
+function lurek.tween.newState(duration, easing) end
 
 --- Creates an empty TweenParallel. Add entries with :tween() or :add(tween),
 ---@return TweenParallel
@@ -11895,6 +14751,46 @@ function Accordion:setExclusive(v) end
 ---@param section_idx any
 ---@return nil
 function Accordion:toggleSection(section_idx) end
+
+--- Lua wrapper for a stacked area chart renderer.
+---@class AreaChart
+local AreaChart = {}
+
+--- Renders the area chart into an existing ImageData.
+---@param target ImageData
+---@return nil
+function AreaChart:drawToImage(target) end
+
+--- Sets the maximum Y value for axis scaling.
+---@param v any
+---@return nil
+function AreaChart:setYMax(v) end
+
+--- Adds Badge-specific methods to a widget table.
+---@class Badge
+local Badge = {}
+
+--- Returns the raw count of this Badge widget.
+---@return integer
+function Badge:getCount() end
+
+--- Returns the display text of this Badge widget, e.g. "99+" when over the max.
+---@return string
+function Badge:getDisplayText() end
+
+--- Sets the count displayed on this Badge widget.
+---@param count any
+---@return nil
+function Badge:setCount(count) end
+
+--- Lua wrapper for a grouped bar chart renderer.
+---@class BarChart
+local BarChart = {}
+
+--- Renders the bar chart into an existing ImageData.
+---@param target ImageData
+---@return nil
+function BarChart:drawToImage(target) end
 
 --- Adds Button-specific methods to a widget table.
 ---@class Button
@@ -12221,6 +15117,10 @@ function Image_Widget:draw() end
 ---@return ImageData
 function Image_Widget:drawToImage(w, h) end
 
+--- Returns true if the widget tree changed since the last call, then resets the flag.
+---@return boolean
+function Image_Widget:flushCache() end
+
 --- Moves focus to the next focusable widget.
 ---@return nil
 function Image_Widget:focusNext() end
@@ -12286,6 +15186,31 @@ function Image_Widget:mousereleased(x, y, btn) end
 ---@return table
 function Image_Widget:newAccordion() end
 
+--- Creates a new stacked-area chart.
+---@param opts any
+---@return AreaChart
+function Image_Widget:newAreaChart(opts) end
+
+--- Creates a new stacked-area chart.
+---@param opts any
+---@return AreaChart
+function Image_Widget:newAreaChart(opts) end
+
+--- Creates a badge widget displaying a numeric count.
+---@param count? any (optional)
+---@return table
+function Image_Widget:newBadge(count) end
+
+--- Creates a new bar chart.
+---@param opts any
+---@return BarChart
+function Image_Widget:newBarChart(opts) end
+
+--- Creates a new bar chart.
+---@param opts any
+---@return BarChart
+function Image_Widget:newBarChart(opts) end
+
 --- Creates a button widget.
 ---@param text? any (optional)
 ---@return table
@@ -12327,6 +15252,16 @@ function Image_Widget:newLabel(text) end
 ---@return table
 function Image_Widget:newLayout(direction) end
 
+--- Creates a new line chart.
+---@param opts any
+---@return LineChart
+function Image_Widget:newLineChart(opts) end
+
+--- Creates a new line chart.
+---@param opts any
+---@return LineChart
+function Image_Widget:newLineChart(opts) end
+
 --- Creates a selectable list widget.
 ---@return table
 function Image_Widget:newList() end
@@ -12348,6 +15283,16 @@ function Image_Widget:newNinePatch() end
 ---@return table
 function Image_Widget:newPanel() end
 
+--- Creates a new pie chart.
+---@param opts any
+---@return PieChart
+function Image_Widget:newPieChart(opts) end
+
+--- Creates a new pie chart.
+---@param opts any
+---@return PieChart
+function Image_Widget:newPieChart(opts) end
+
 --- Creates a progress bar widget.
 ---@param min? any (optional)
 ---@param max? any (optional)
@@ -12359,6 +15304,16 @@ function Image_Widget:newProgressBar(min, max) end
 ---@param group? any (optional)
 ---@return table
 function Image_Widget:newRadioButton(text, group) end
+
+--- Creates a new scatter plot.
+---@param opts any
+---@return ScatterPlot
+function Image_Widget:newScatterPlot(opts) end
+
+--- Creates a new scatter plot.
+---@param opts any
+---@return ScatterPlot
+function Image_Widget:newScatterPlot(opts) end
 
 --- Creates a scroll bar widget.
 ---@param vertical? any (optional)
@@ -12386,6 +15341,12 @@ function Image_Widget:newSlider(min, max) end
 ---@return table
 function Image_Widget:newSpacer(w, h) end
 
+--- Creates a numeric spin box widget with increment and decrement buttons.
+---@param min? any (optional)
+---@param max? any (optional)
+---@return table
+function Image_Widget:newSpinBox(min, max) end
+
 --- Creates a resizable split panel.
 ---@param orientation? any (optional)
 ---@return table
@@ -12394,6 +15355,11 @@ function Image_Widget:newSplitPanel(orientation) end
 --- Creates a status bar widget.
 ---@return table
 function Image_Widget:newStatusBar() end
+
+--- Creates a toggle switch widget.
+---@param on? any (optional)
+---@return table
+function Image_Widget:newSwitch(on) end
 
 --- Creates a tab bar widget.
 ---@return table
@@ -12436,6 +15402,15 @@ function Image_Widget:newTreeView() end
 ---@return table
 function Image_Widget:newWindow(title) end
 
+--- Parses a widget state string, returning the canonical form or nil if invalid.
+---@param state any
+---@return string?
+function Image_Widget:parseWidgetState(state) end
+
+--- Installs the built-in dark theme as the active GUI theme.
+---@return nil
+function Image_Widget:setDefaultTheme() end
+
 --- Sets keyboard focus to a widget or clears it.
 ---@param widget? any (optional)
 ---@return nil
@@ -12458,6 +15433,12 @@ function Image_Widget:setTheme(theme_ud) end
 ---@param a? any (optional)
 ---@return nil
 function Image_Widget:setTint(r, green, b, a) end
+
+--- Sets the viewport dimensions used for anchor constraints and layout.
+---@param w any
+---@param h any
+---@return nil
+function Image_Widget:setViewport(w, h) end
 
 --- Forwards text input to the focused text input widget.
 ---@param text any
@@ -12541,6 +15522,25 @@ function Layout:setSpacing(spacing) end
 ---@param wrap any
 ---@return nil
 function Layout:setWrap(wrap) end
+
+--- Lua wrapper for a line chart renderer.
+---@class LineChart
+local LineChart = {}
+
+--- Renders the line chart into an existing ImageData.
+---@param target ImageData
+---@return nil
+function LineChart:drawToImage(target) end
+
+--- Sets the maximum X value for axis scaling.
+---@param v any
+---@return nil
+function LineChart:setXMax(v) end
+
+--- Sets the maximum Y value for axis scaling.
+---@param v any
+---@return nil
+function LineChart:setYMax(v) end
 
 --- Adds ListBox-specific methods (1-based indices in Lua).
 ---@class List_Box
@@ -12698,6 +15698,15 @@ function Panel:setScrollable(scrollable) end
 ---@return nil
 function Panel:setTitle(title) end
 
+--- Lua wrapper for a pie chart renderer.
+---@class PieChart
+local PieChart = {}
+
+--- Renders the pie chart into an existing ImageData.
+---@param target ImageData
+---@return nil
+function PieChart:drawToImage(target) end
+
 --- Adds ProgressBar-specific methods to a widget table.
 ---@class Progress_Bar
 local Progress_Bar = {}
@@ -12764,6 +15773,27 @@ function Radio_Button:setSelected(v) end
 ---@param text any
 ---@return nil
 function Radio_Button:setText(text) end
+
+--- Lua wrapper for a scatter plot renderer.
+---@class ScatterPlot
+local ScatterPlot = {}
+
+--- Renders the scatter plot into an existing ImageData.
+---@param target ImageData
+---@return nil
+function ScatterPlot:drawToImage(target) end
+
+--- Sets the X-axis data range.
+---@param mn any
+---@param mx any
+---@return nil
+function ScatterPlot:setXRange(mn, mx) end
+
+--- Sets the Y-axis data range.
+---@param mn any
+---@param mx any
+---@return nil
+function ScatterPlot:setYRange(mn, mx) end
 
 --- Adds ScrollBar-specific methods.
 ---@class Scroll_Bar
@@ -12896,6 +15926,38 @@ function Slider:setStep(step) end
 ---@return nil
 function Slider:setValue(v) end
 
+--- Adds SpinBox-specific methods to a widget table.
+---@class Spin_Box
+local Spin_Box = {}
+
+--- Decrements the value by one step.
+---@return nil
+function Spin_Box:decrement() end
+
+--- Returns the current value of this SpinBox widget.
+---@return number
+function Spin_Box:getValue() end
+
+--- Increments the value by one step.
+---@return nil
+function Spin_Box:increment() end
+
+--- Sets the valid range for this SpinBox widget.
+---@param min any
+---@param max any
+---@return nil
+function Spin_Box:setRange(min, max) end
+
+--- Sets the increment step for this SpinBox widget.
+---@param step any
+---@return nil
+function Spin_Box:setStep(step) end
+
+--- Sets the value for this SpinBox widget.
+---@param v any
+---@return nil
+function Spin_Box:setValue(v) end
+
 --- Adds SplitPanel-specific methods.
 ---@class Split_Panel
 local Split_Panel = {}
@@ -12980,6 +16042,23 @@ function Status_Bar:setSectionText(section_idx, text) end
 ---@param widget any
 ---@return nil
 function Status_Bar:setSectionWidget(section_idx, widget) end
+
+--- Adds Switch-specific methods to a widget table.
+---@class Switch
+local Switch = {}
+
+--- Returns the on/off state of this Switch widget.
+---@return boolean
+function Switch:isOn() end
+
+--- Sets the on/off state of this Switch widget.
+---@param on any
+---@return nil
+function Switch:setOn(on) end
+
+--- Toggles the on/off state of this Switch widget.
+---@return nil
+function Switch:toggle() end
 
 --- Adds TabBar-specific methods (1-based indices in Lua).
 ---@class Tab_Bar
@@ -13279,6 +16358,10 @@ function lurek.ui.findById(id) end
 --- Returns the number of children in this container.
 ---@return number
 function lurek.ui.getChildCount() end
+
+--- Returns this container's children as widget-handle tables.
+---@return table
+function lurek.ui.getChildren() end
 
 --- Returns the flex-grow factor.
 ---@return number

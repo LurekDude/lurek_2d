@@ -11,13 +11,15 @@
 
 ## Summary
 
-The automation module replays scripted input into the engine event queue. It exists so tests, demos, and developer tooling can drive the game exactly as if keys, mouse movement, clicks, wheel events, or text input came from real hardware.
+The `automation` module provides Lurek2D's automated input simulation engine for loading and playing back recorded input sequences. Its primary use-cases are headless integration tests, QA regression replay, speedrun verification, and recorded developer input sessions.
 
-Its core abstraction is a named Script made of timed Step records. A Simulator owns those scripts, advances playback over time, and turns each due Step into a synthetic event for the shared EventQueue. That keeps automation compatible with the rest of the input stack instead of inventing a separate test-only path.
+The central type is `Simulator`, a playback engine that drives named `Script` objects. Each `Script` contains an ordered, time-sorted sequence of `Step` records, each holding an `Action` variant (one of 8 kinds: key-press, key-release, mouse-move, mouse-press, mouse-release, text-input, scroll, and wait) plus a timestamp and a parameters map. Scripts are capped at `MAX_STEPS` entries to prevent unbounded memory use.
 
-This module does not own input state, window events, or general scheduling. Real hardware capture and input state live in input and the app loop, while generic timers and callback scheduling belong in timer. Automation only manages script data, playback state, and event injection.
+During playback, `simulator.update(dt)` advances an internal clock and fires all steps whose timestamp has been reached by injecting synthetic `Event` values into the engine's `EventQueue` through the same `push()` path as real hardware events. This makes automation playback completely transparent to downstream Lua callbacks — they cannot distinguish replayed input from real user input.
 
-**Scope boundary**: This module currently depends on `event`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+Scripts can be loaded programmatically from Lua tables or from serialized TOML files. The `Simulator` tracks playback status (idle, running, paused, complete) and provides `start()`, `stop()`, `pause()`, `resume()`, and `is_complete()` controls.
+
+**Scope boundary**: Core Runtime tier. Depends on `event`, `runtime`. Lua bridge in `src/lua_api/automation_api.rs`.
 
 ## Files
 

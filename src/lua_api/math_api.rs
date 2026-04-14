@@ -28,6 +28,9 @@ use crate::math::{DistType, FractalType, MapGenOptions, NoiseKind};
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around a [`Vec2`] value type.
+///
+/// # Fields
+/// - `inner` — `Vec2`.
 pub struct LuaVec2 {
     pub inner: Vec2,
 }
@@ -174,6 +177,9 @@ impl LuaUserData for LuaVec2 {
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around a [`Vec3`] value type.
+///
+/// # Fields
+/// - `inner` — `Vec3`.
 pub struct LuaVec3 {
     pub inner: Vec3,
 }
@@ -1252,6 +1258,11 @@ impl LuaUserData for LuaNoiseGenerator {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.math` API table with the Lua VM.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `_state` — `Rc<RefCell<SharedState>>`.
 ///
 #[allow(clippy::type_complexity)]
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {

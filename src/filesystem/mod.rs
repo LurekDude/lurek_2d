@@ -1,11 +1,23 @@
-//! Mod implementation for the `filesystem` subsystem.
+//! Sandboxed virtual filesystem for Lurek2D.
 //!
-//! This module is part of Lurek2D's `filesystem` subsystem and provides the implementation
-//! details for mod-related operations and data management.
+//! Provides [`vfs::GameFS`] — the central filesystem abstraction that sandboxes all
+//! file I/O to the game's base directory. Every path is checked against a canonical path
+//! traversal guard before the OS is asked to open the file, preventing Lua scripts from
+//! escaping the sandbox via `..`, absolute paths, or symbolic links.
 //!
-//! All public items are documented. See the parent module for architectural context
-//! and the `lurek.*` Lua API for the scripting interface.
+//! ## Subsystem inventory
+//! - [`vfs`] — [`GameFS`]: sandboxed read/write with virtual mount-point overlay
+//! - [`file_handle`] — [`FileHandle`]: open-file session with cursored read/write
+//! - [`async_loader`] — background asset-loading worker (off main thread)
+//! - [`file_data`] — [`FileData`]: raw byte buffer returned from VFS reads
 //!
+//! ## Sandbox rules
+//! - Reads: base game folder + all mounted mod layers
+//! - Writes: save-data directory only (configured separately from the read-only game folder)
+//! - Any path that resolves outside the base after canonicalization → `EngineError::FsPathTraversal`
+//!
+//! All public items are documented. Lua bridge: `src/lua_api/filesystem_api.rs`.
+
 /// Sandboxed virtual filesystem that restricts I/O to the game directory.
 pub mod vfs;
 

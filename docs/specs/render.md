@@ -11,11 +11,13 @@
 
 ## Summary
 
-The render module owns the engine's core 2D rendering pipeline. It exists so Lua and higher-level systems can describe draw intent through `RenderCommand` values while the engine keeps control of batching, resource uploads, pipeline state, canvas targets, and final frame execution.
+The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fundamental design is a deferred command queue: nothing executes GPU work during Lua callbacks. Instead, scripts push `RenderCommand` enum variants into a `Vec<RenderCommand>` in `SharedState`. After all Lua callbacks return for the frame, `GpuRenderer::render_frame()` processes the queue, batches compatible draw calls, issues wgpu render passes, and presents the swapchain surface.
 
-Its boundary is the command queue and backend needed to consume it: canvases, fonts, shaders, meshes, vector shapes, draw layers, decals, and lightweight effect descriptors live here because they are part of the renderer's own object model. It does not own sprite-domain data now housed under `src/sprite/`, and it does not own separate feature systems that consume rendering such as scene flow or gameplay animation.
+`RenderCommand` is the central enum covering: `DrawImage` (textured quad with position, rotation, scale, color tint, blend mode, UV region), `DrawText` (string with font, size, color, alignment), `DrawShape` (compound vector shapes), `DrawMesh` (custom vertex geometry), `DrawCanvas` (render a Canvas off-screen target as an image), `PostProcess` (WGSL shader pass), `SetCamera` (push/pop camera transform), `SetBlend`, `PushScissor/PopScissor`, `DrawLayer` (Z-ordered batch), and `Clear`.
 
-**Scope boundary**: This module currently depends on `light`, `math`, `runtime`, `sprite`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`GpuRenderer` manages the wgpu `Device`, `Queue`, `Surface`, swapchain configuration, and all resource pools (`SlotMap<TextureKey, Texture>`, `SlotMap<FontKey, Font>`, `SlotMap<ShaderKey, Shader>`, `SlotMap<CanvasKey, Canvas>`, etc.). `Canvas` implements off-screen render-to-texture for post-processing and minimap rendering. `Font` rasterizes glyphs via the fontdue library into a GPU texture atlas with LRU glyph eviction. `Shader` wraps user-supplied WGSL with a uniform variable table updated each frame. `PostFxPipeline` orchestrates ping-pong texture passes for multi-pass post-processing.
+
+**Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `image`, `wgpu`. Lua bridge in `src/lua_api/render_api.rs` (registered as `lurek.graphics.*`).
 
 ## Files
 
@@ -27,6 +29,7 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `image_effect.rs`: Lightweight per-image shader-pass descriptor used by render commands.
 - `mesh.rs`: Custom geometry data structures and mesh draw-mode support.
 - `mod.rs`: Module root and public re-export surface for the active render submodules.
+- `postfx_pipeline.rs`: GPU post-processing pipeline for Lurek2D.
 - `renderer.rs`: Render-command enum plus blend, stencil, depth, text, and texture-side data types.
 - `shader.rs`: Custom WGSL shader objects, validation, and typed uniform values.
 - `shape.rs`: Compound vector-shape builder and the primitive command list it records.
@@ -45,6 +48,8 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `MeshDrawMode` (`enum`, `mesh.rs`): Drawing mode for mesh geometry.
 - `MeshVertex` (`struct`, `mesh.rs`): A single vertex in a mesh.
 - `Mesh` (`struct`, `mesh.rs`): Custom geometry mesh with per-vertex position, UV, and color data.
+- `PostFxTexture` (`struct`, `postfx_pipeline.rs`): Stores a wgpu texture and its default view together for convenience.
+- `PostFxPipeline` (`struct`, `postfx_pipeline.rs`): GPU post-processing pipeline.
 - `CompareMode` (`enum`, `renderer.rs`): Stencil comparison mode for `lurek.gfx.setStencilTest`.
 - `StencilAction` (`enum`, `renderer.rs`): Stencil write action for `lurek.gfx.stencil` and `lurek.gfx.setStencilMode`.
 - `StencilMode` (`struct`, `renderer.rs`): Combined stencil rendering mode stored in `SharedState`.
@@ -52,11 +57,19 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `TextAlign` (`enum`, `renderer.rs`): Text alignment mode for formatted text printing.
 - `DrawMode` (`enum`, `renderer.rs`): Fill-versus-line enum used by vector primitives.
 - `BlendMode` (`enum`, `renderer.rs`): Public blend-policy enum used by queued draw operations.
+- `PostFxPass` (`struct`, `renderer.rs`): A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.
 - `RenderCommand` (`enum`, `renderer.rs`): Central deferred draw-operation enum consumed by the backend.
 - `TextureData` (`struct`, `renderer.rs`): CPU-side pixel container handed off for GPU texture upload.
 - `ParticleRenderShape` (`enum`, `renderer.rs`): Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.
 - `ParticleInstance` (`struct`, `renderer.rs`): Per-particle render data for a single frame.
 - `DrawableKind` (`enum`, `renderer.rs`): Type discriminator for resources that can be passed to lurek.gfx.draw.
+- `PathSegment` (`enum`, `renderer.rs`): A single segment of a vector path, used with `RenderCommand::DrawPath`.
+- `GradientDirection` (`enum`, `renderer.rs`): Direction for a two-stop linear or radial gradient.
+- `HexOrientation` (`enum`, `renderer.rs`): Orientation for a hexagonal tile cell.
+- `BevelStyle` (`enum`, `renderer.rs`): Visual style for a bevelled rectangle.
+- `PhysicsDebugShape` (`struct`, `renderer.rs`): Per-collider geometry snapshot extracted from the physics world for GPU debug rendering.
+- `PhysicsDebugConfig` (`struct`, `renderer.rs`): Appearance parameters for `RenderCommand::DrawPhysicsDebug`.
+- `SpineSlotDraw` (`struct`, `renderer.rs`): One textured slot from a Spine skeleton for GPU rendering.
 - `ShaderFragmentInput` (`enum`, `shader.rs`): Which fragment shader input the user's entry point expects.
 - `Shader` (`struct`, `shader.rs`): Represents a compiled custom shader with its uniform values.
 - `UniformValue` (`enum`, `shader.rs`): A uniform value that can be sent to a shader from Lua.
@@ -107,6 +120,13 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `Mesh::set_texture` (`mesh.rs`): Sets the texture for this mesh.
 - `Mesh::set_draw_mode` (`mesh.rs`): Sets the draw mode.
 - `Mesh::triangulate` (`mesh.rs`): Expands vertices into a list of triangle indices based on the draw mode.
+- `params_to_uniform` (`postfx_pipeline.rs`): Maps a `PostFxEffect` parameter dictionary to the 16-float packed buffer consumed by every WGSL shader's `PostFxParams` uniform.
+- `PostFxTexture::new` (`postfx_pipeline.rs`): Create a new `Rgba8UnormSrgb` render-target texture of the requested size.
+- `PostFxPipeline::new` (`postfx_pipeline.rs`): Instantiate the post-FX pipeline for `surface_format`.
+- `PostFxPipeline::register_custom` (`postfx_pipeline.rs`): Register a custom WGSL fragment shader under `name`.
+- `PostFxPipeline::apply` (`postfx_pipeline.rs`): Execute a sequence of post-FX passes then composite the result onto `target_view`.
+- `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
+- `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
 - `Shader::new` (`shader.rs`): Creates a new shader from WGSL source code.
 - `Shader::send` (`shader.rs`): Sets a uniform value by name.
 - `Shader::has_uniform` (`shader.rs`): Returns whether a uniform with the given name has been set.
@@ -206,6 +226,32 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `lurek.render.drawNineSlice`: Queues a 9-slice draw call inside lurek.render / lurek.render_ui.
 - `lurek.render.newShape`: Creates a new empty [`CompoundShape`] stored in the resource pool.
 - `lurek.render.newDrawLayer`: Creates a new z-ordered draw-call queue.
+- `lurek.render.drawQuadBezier`: Queues a quadratic Bézier curve from (x1,y1) to (x2,y2) with one control point.
+- `lurek.render.drawCubicBezier`: Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+- `lurek.render.drawPath`: Queues a multi-segment vector path.
+- `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle. color1/color2 are {r,g,b,a} tables.
+- `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colours.
+- `lurek.render.drawIsoCubeTile`: Queues a three-face isometric cube tile at screen position (sx, sy).
+- `lurek.render.drawHexTile`: Queues a hexagonal tile at centre (cx, cy) with given circumradius.
+- `lurek.render.beginSortGroup`: Begins a Y/Z depth sort group. Draw commands until flushSortGroup are depth-sortable.
+- `lurek.render.pushSortKey`: Associates the previous draw command with a depth value within the active sort group.
+- `lurek.render.flushSortGroup`: Sorts and flushes all draw commands in the sort group.
+- `lurek.render.drawBevelRect`: Queues a beveled border rectangle with inner fill.
+- `lurek.render.pushLayer`: Begins a named compositing layer with optional alpha and blend mode.
+- `lurek.render.popLayer`: Ends and composites the named layer back to its parent.
+- `lurek.render.drawQuadBezier`: Must be called inside lurek.render or lurek.render_ui.
+- `lurek.render.drawCubicBezier`: Queues a cubic Bézier curve from (x1,y1) to (x2,y2) with two control points.
+- `lurek.render.drawPath`: Queues a multi-segment vector path.
+- `lurek.render.drawGradientRect`: Queues a gradient-filled rectangle. Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.
+- `lurek.render.drawColoredPolygon`: Queues a convex polygon with per-vertex colours.
+- `lurek.render.drawIsoCubeTile`: Queues a three-face isometric cube tile at screen position (sx, sy).
+- `lurek.render.drawHexTile`: Queues a hexagonal tile at centre (cx, cy) with given circumradius.
+- `lurek.render.beginSortGroup`: Begins a Y/Z depth sort group identified by id.
+- `lurek.render.pushSortKey`: Associates the previous draw command with a depth value within the active sort group.
+- `lurek.render.flushSortGroup`: Sorts and flushes all draw commands in the sort group.
+- `lurek.render.drawBevelRect`: Queues a beveled border rectangle.
+- `lurek.render.pushLayer`: Begins a named compositing layer. Provides alpha and blend mode for composite.
+- `lurek.render.popLayer`: Ends and composites the named layer.
 
 ### `Canvas` Methods
 - `Canvas:getWidth`: Returns the width of this canvas in pixels.
@@ -246,6 +292,9 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 ### `ImageData` Methods
 - `ImageData:getWidth`: Returns the pixel width of this image buffer.
 - `ImageData:getHeight`: Returns the pixel height of this image buffer.
+- `ImageData:resize`: Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
+- `ImageData:diff`: Returns the sum of absolute per-channel differences between this image and `other`.
+- `ImageData:mapPixels`: Applies a Lua function to every pixel in-place.
 - `ImageData:type`: Returns the type name "ImageData".
 - `ImageData:typeOf`: Returns true when the given name matches "ImageData" or a parent type.
 
@@ -293,59 +342,6 @@ Its boundary is the command queue and backend needed to consume it: canvases, fo
 - `SpriteBatch:release`: Releases this sprite batch.
 - `SpriteBatch:typeOf`: Returns the type name of this object.
 - `SpriteBatch:type`: Returns the type name of this object.
-
-### New Draw Commands (v0.7.26)
-
-The following `lurek.graphic.*` functions queue GPU draw commands added in v0.7.26.
-All functions are registered in `src/lua_api/render_api.rs` and processed in `src/render/gpu_renderer.rs`.
-
-#### Bézier Curves
-
-| Function                                                                    | Description                                                               |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `lurek.graphic.drawQuadBezier(x0,y0, cx,cy, x1,y1, color, lw?)`             | Quadratic Bézier curve. `color={r,g,b,a}`, `lw` line width (default 1.0). |
-| `lurek.graphic.drawCubicBezier(x0,y0, cx1,cy1, cx2,cy2, x1,y1, color, lw?)` | Cubic Bézier curve with two control points.                               |
-
-#### Paths
-
-| Function                                             | Description                                                                                                                      |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `lurek.graphic.drawPath(verts, color, closed?, lw?)` | Polyline/polygon path. `verts` is a flat array `{x1,y1,x2,y2,...}`. `closed` (bool, default false) connects last point to first. |
-
-#### Filled Geometry
-
-| Function                                                               | Description                                                                              |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `lurek.graphic.drawGradientRect(x,y,w,h, c_tl,c_tr,c_br,c_bl)`         | Rectangle with per-corner colours. Each colour is `{r,g,b,a}`.                           |
-| `lurek.graphic.drawColoredPolygon(verts)`                              | Polygon where each vertex is `{x,y,r,g,b,a}`.                                            |
-| `lurek.graphic.drawIsoCubeTile(x,y, size, top, left, right)`           | Isometric cube tile centred at screen position `(x,y)`. Three face colours.              |
-| `lurek.graphic.drawHexTile(cx,cy, radius, orient, fill, border?, bw?)` | Hex tile. `orient` is `"flat"` or `"pointy"`. Optional border colour and width.          |
-| `lurek.graphic.drawBevelRect(x,y,w,h, bw?, opts?)`                     | Bevelled rectangle. `opts` table: `fillColor`, `highlight`, `shadow` — each `{r,g,b,a}`. |
-
-#### Depth Sorting
-
-| Function                           | Description                                                     |
-| ---------------------------------- | --------------------------------------------------------------- |
-| `lurek.graphic.beginSortGroup(id)` | Opens a sort group. Id is any integer token.                    |
-| `lurek.graphic.pushSortKey(depth)` | Tags the next draw call's Z-depth within the active sort group. |
-| `lurek.graphic.flushSortGroup(id)` | Closes and emits the sort group (matched by id).                |
-
-#### Compositing Layers
-
-| Function                                  | Description                                                                                           |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `lurek.graphic.pushLayer(blend?, alpha?)` | Pushes a new compositing layer. `blend` is a blend mode string (e.g. `"add"`). `alpha` (default 1.0). |
-| `lurek.graphic.popLayer()`                | Pops and composites the current layer.                                                                |
-
-#### Support Types (renderer.rs)
-
-- `PathSegment` — `{ x, y, is_move }` — vertex in a draw path.
-- `GradientDirection` — `Horizontal | Vertical | TopLeft | TopRight`.
-- `HexOrientation` — `FlatTop | PointyTop`.
-- `BevelStyle` — `Raised | Sunken | Flat`.
-- `PhysicsDebugShape` — per-body snapshot: position, extents, angle, flags, hull verts.
-- `PhysicsDebugConfig` — appearance config: per-state colours and line width.
-- `SpineSlotDraw` — per-slot Spine rendering data: texture key, UV rect, tint.
 
 ## References
 

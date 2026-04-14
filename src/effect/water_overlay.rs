@@ -74,6 +74,9 @@ impl Default for WaterOverlayState {
 
 impl WaterOverlayState {
     /// Creates a new disabled `WaterOverlayState` with default wave parameters.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self::default()
     }

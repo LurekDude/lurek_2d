@@ -6,6 +6,16 @@
 use crate::procgen::noise::{FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
 
 /// Options for heightmap generation.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `scale` — `f64`.
+/// - `octaves` — `u32`.
+/// - `lacunarity` — `f64`.
+/// - `persistence` — `f64`.
+/// - `seed` — `u64`.
+/// - `erosion_passes` — `u32`.
 #[derive(Debug, Clone)]
 pub struct HeightmapOpts {
     /// Map width in cells.
@@ -42,6 +52,11 @@ impl Default for HeightmapOpts {
 }
 
 /// A 2D heightmap with float elevation values.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+/// - `cells` — `Vec<f32>`.
 #[derive(Debug, Clone)]
 pub struct Heightmap {
     /// Map width.
@@ -54,6 +69,12 @@ pub struct Heightmap {
 
 impl Heightmap {
     /// Generate a heightmap from the given options.
+    ///
+    /// # Parameters
+    /// - `opts` — `&HeightmapOpts`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn generate(opts: &HeightmapOpts) -> Self {
         let gen = NoiseGenerator::new(opts.seed);
         let map_opts = MapGenOptions {
@@ -81,6 +102,13 @@ impl Heightmap {
     }
 
     /// Get the elevation at `(x, y)`, clamped to valid range.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `f32`.
     pub fn get(&self, x: u32, y: u32) -> f32 {
         let x = x.min(self.width.saturating_sub(1));
         let y = y.min(self.height.saturating_sub(1));
@@ -106,6 +134,9 @@ impl Heightmap {
     }
 
     /// Apply simplified hydraulic erosion: sediment flows from high to low neighbours.
+    ///
+    /// # Parameters
+    /// - `passes` — `u32`.
     ///
     /// Each pass moves a fraction of height from each cell to its lowest neighbor.
     pub fn erode(&mut self, passes: u32) {
@@ -143,6 +174,9 @@ impl Heightmap {
     }
 
     /// Convert the heightmap to RGBA bytes (grayscale: `r = g = b = height * 255`, `a = 255`).
+    ///
+    /// # Returns
+    /// `Vec<u8>`.
     pub fn to_rgba_bytes(&self) -> Vec<u8> {
         let mut out = Vec::with_capacity(self.cells.len() * 4);
         for &v in &self.cells {

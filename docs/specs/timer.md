@@ -11,13 +11,15 @@
 
 ## Summary
 
-The timer module owns Lurek2D's generic notion of time. It provides the frame clock used to derive delta time, total uptime, rolling FPS, and average frame duration, and it provides a standalone scheduler for delayed or repeating callbacks that can run at a caller-controlled time scale.
+The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-event system. It owns two complementary types: `Clock` for frame pacing and elapsed-time tracking, and `Scheduler` for deferred and repeating callback execution.
 
-This module exists so time measurement and timer-driven behavior are consistent across the engine. `SharedState` keeps a `Clock` as the canonical per-frame timing source, while Lua scripts can create independent `Scheduler` instances for gameplay timing without having to implement their own event bookkeeping, repeat counts, pause state, or named timer replacement.
+`Clock` is the frame-timer used by `App` to compute `dt` each frame. `Clock::tick()` measures wall-clock elapsed time since the last tick, clamps it to 0.1s to prevent runaway physics on slow frames, updates a smoothed FPS estimate using an exponential moving average, and increments the frame counter and total elapsed time. Accessors: `dt()`, `fps()`, `elapsed()`, `frame_count()`.
 
-It intentionally does not own interpolation systems, animation state machines, or the engine's overall fixed-step orchestration. Tweening belongs in `tween`, animation playback belongs in `animation`, and the app loop decides when frame and physics callbacks run. The Lua wrapper in `src/lua_api/timer_api.rs` owns callback registry management; the core timer module only manages timing data and event IDs.
+`Scheduler` manages three categories of deferred Lua callbacks: `schedule(delay, fn)` fires once after `delay` seconds; `every(interval, fn)` fires repeatedly every `interval` seconds until explicitly cancelled; `after_frames(n, fn)` fires after exactly `n` rendered frames — frame-precise and unaffected by pausing. All callbacks execute synchronously on the main thread during `Scheduler::tick(dt)`. Lua errors from callbacks are caught and forwarded through the engine's Lua error channel rather than panicking. A cancellation handle is returned from `schedule` and `every` for programmatic cancellation.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+`sleep(seconds)` pauses the calling OS thread and is intended only for worker VM threads (from `lurek.thread`); calling it from the main VM blocks the engine's frame loop and is therefore prohibited in the Lua API documentation.
+
+**Scope boundary**: Core Runtime tier. Depends only on `runtime`. Lua bridge in `src/lua_api/timer_api.rs`.
 
 ## Files
 
@@ -75,7 +77,7 @@ It intentionally does not own interpolation systems, animation state machines, o
 - `lurek.timer.getFPS`: Returns the current frames-per-second measurement.
 - `lurek.timer.getTime`: Returns the total elapsed time since engine start in seconds.
 - `lurek.timer.getAverageDelta`: Returns the rolling-average frame delta time in seconds.
-- `lurek.timer.getFrameCount`: Returns the total number of frames recorded by the engine clock.
+- `lurek.timer.getFrameCount`: Returns the total number of frames rendered since engine start.
 - `lurek.timer.step`: Advances the timer by one frame, returning the delta time.
 - `lurek.timer.getMicroTime`: Returns the high-resolution elapsed time since engine start in seconds.
 - `lurek.timer.getPhysicsDelta`: Returns the fixed timestep used by `process_physics` callbacks (seconds).

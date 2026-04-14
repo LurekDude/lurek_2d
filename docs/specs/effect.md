@@ -11,11 +11,17 @@
 
 ## Summary
 
-The effect module owns CPU-side visual effect state. It covers two adjacent areas: post-processing descriptions such as PostFxEffect, PostFxStack, and ImageEffect, and full-screen overlay state such as ambient tint, weather, fog, flash, shake, fade, and lightning.
+The `effect` module owns Lurek2D's post-processing and image-effect pipeline. Its purpose is to apply full-screen or region-based visual transformations — blur, bloom, distortion, color grading, scanlines, vignette, pixelation, and custom WGSL fragment shaders — on top of the already-rendered game scene by compositing successive passes through CPU-side image buffers or GPU canvas render-to-texture.
 
-This module exists so effect behavior can be configured, updated, and tested without tying the code to a specific GPU implementation. It describes what effects are active and how they evolve over time, while leaving shader execution, render targets, and final compositing to the renderer and Lua bridge.
+The central type is `ImageEffect`, a description of one post-processing pass. An effect holds a `ShaderPassDescriptor` that names the WGSL shader, its bind group layout, and any uniform parameters (floats for intensity, radius, seed, color, etc.). Assembling multiple `ImageEffect` values into an `EffectChain` produces a sorted multi-pass pipeline where each pass reads from the previous pass's output and writes to the next pass's input texture. The final pass writes to the screen.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`presets.rs` registers a library of commonly needed effects — gaussian blur, chromatic aberration, CRT scanlines, color inversion, sepia, and others — as named `ImageEffect` templates that Lua scripts can apply by name without writing WGSL themselves. Custom shader effects are supported by providing an inline WGSL string and a parameter table.
+
+At render time, effects are queued as `RenderCommand::PostProcess` entries. The GPU renderer processes these commands after the main world pass and UI pass, binding each effect's shader and rendering a full-screen textured quad. All WGSL shader sources for built-in presets are embedded statically at compile time.
+
+The effect module does not own scene rendering or sprite drawing. It only describes and manages the post-process layer. Physics, input, audio, and ECS have no coupling to this module.
+
+**Scope boundary**: Platform Services tier. Depends on `render` (command types), `image`, `runtime`. Lua bridge in `src/lua_api/fx_api.rs`.
 
 ## Files
 
@@ -27,9 +33,11 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `image_effect.rs`: Defines ImageEffect, a smaller effect chain attached to individual image draws.
 - `mod.rs`: Declares the effect submodules and re-exports the public post-processing and overlay types.
 - `overlay.rs`: Defines Overlay, the top-level screen-effect controller that aggregates ambient, atmospheric, weather, and transient screen effects.
+- `presets.rs`: Preset effect stacks for common visual styles.
 - `render.rs`: Generates render-command markers for beginning, ending, and applying post-processing capture.
 - `screen_effects.rs`: Defines flash, shake, and fade state.
 - `stack.rs`: Defines PostFxStack, the ordered full-frame post-processing pipeline container.
+- `water_overlay.rs`: Water surface overlay with UV distortion and depth-tint controls.
 - `weather.rs`: Defines weather particle types, live particles, and weather simulation state.
 
 ## Types
@@ -45,10 +53,12 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `PostFxEffectType` (`enum`, `effect_type.rs`): Enum naming the built-in post-processing pass types and their default parameter sets.
 - `ImageEffect` (`struct`, `image_effect.rs`): Ordered per-image effect chain that converts to lightweight shader pass descriptors.
 - `Overlay` (`struct`, `overlay.rs`): Top-level per-frame overlay state that updates ambient, weather, flashes, fades, shake, and atmospheric effects together.
+- `EffectPreset` (`struct`, `presets.rs`): A fully configured preset: an ordered stack of effects with their data.
 - `FlashState` (`struct`, `screen_effects.rs`): Flash screen effect state.
 - `ShakeState` (`struct`, `screen_effects.rs`): Shake screen effect state.
 - `FadeState` (`struct`, `screen_effects.rs`): Fade screen effect state.
 - `PostFxStack` (`struct`, `stack.rs`): Ordered full-frame post-processing pipeline with per-pass enabled flags and capture dimensions.
+- `WaterOverlayState` (`struct`, `water_overlay.rs`): Full-screen water-surface overlay state.
 - `WeatherType` (`enum`, `weather.rs`): Weather particle types supported by the overlay system.
 - `WeatherParticle` (`struct`, `weather.rs`): A single weather particle in the overlay's weather system.
 - `WeatherState` (`struct`, `weather.rs`): Weather particle simulation state including type, wind, intensity, and live particles.
@@ -102,6 +112,8 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `Overlay::draw_shake_trail_to_image` (`overlay.rs`): Render a shake-offset trail as dots on a canvas.
 - `Overlay::draw_fade_transition_to_image` (`overlay.rs`): Render a fade-alpha progression as a horizontal strip of panels.
 - `Overlay::draw_trigger_panel_to_image` (`overlay.rs`): Render a 4-panel trigger visualization (flash, shake, fade, lightning).
+- `preset_names` (`presets.rs`): Returns a list of all available preset names.
+- `build_preset` (`presets.rs`): Builds a named preset stack, returning `None` when the name is unknown.
 - `PostFxStack::begin_capture_command` (`render.rs`): Returns the `BeginPostFx` command that starts scene capture.
 - `PostFxStack::end_capture_command` (`render.rs`): Returns the `EndPostFx` command that stops scene capture.
 - `PostFxStack::apply_command` (`render.rs`): Returns the `ApplyPostFx` command that applies all enabled effects.
@@ -129,6 +141,9 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `PostFxStack::draw_effect_parameters_to_image` (`stack.rs`): Render a parameter showcase grid for PostFx effects.
 - `PostFxStack::draw_effect_type_bars_to_image` (`stack.rs`): Render a bar preview for a small set of PostFx effect types.
 - `PostFxStack::draw_effect_types_to_image` (`stack.rs`): Render a bar preview for a list of PostFx effect types, auto-assigning colours and counting parameters.
+- `WaterOverlayState::new` (`water_overlay.rs`): Creates a new disabled `WaterOverlayState` with default wave parameters.
+- `WaterOverlayState::update` (`water_overlay.rs`): Advances the animation clock by `dt` seconds.
+- `WaterOverlayState::reset` (`water_overlay.rs`): Resets all parameters and the animation clock to their defaults.
 - `WeatherType::from_name` (`weather.rs`): Parses a string name into a weather type.
 - `WeatherType::name` (`weather.rs`): Returns the string name of this weather type.
 
@@ -141,6 +156,7 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `lurek.effect.newEffect`: Creates a new built-in post-processing effect by type name.
 - `lurek.effect.newCustomEffect`: Creates a custom shader post-processing effect.
 - `lurek.effect.newStack`: Creates a new post-processing pipeline stack.
+- `lurek.effect.newPresetStack`: Creates a pre-configured effect stack from a named preset.
 - `lurek.effect.newPass`: Creates a custom-shader post-processing effect (alias for newCustomEffect).
 - `lurek.effect.getEffectTypes`: Returns the list of all built-in effect type names.
 - `lurek.effect.newImageEffect`: Creates a new per-image effect chain. Accepts:
@@ -222,6 +238,8 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `Overlay:isFading`: Returns true while a fade effect is in progress.
 - `Overlay:render`: Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
 - `Overlay:drawToImage`: Renders the overlay state (flash, fade, effects) to a CPU ImageData.
+- `Overlay:setCustomShader`: Assigns a custom shader name to the overlay, or clears it when `nil` is passed.
+- `Overlay:getWater`: Returns a table describing the current water overlay state.
 - `Overlay:type`: Returns the type name of this object ("Overlay").
 - `Overlay:typeOf`: Returns true if this object is of the given type ("Object" or "Overlay").
 
@@ -262,6 +280,9 @@ This module exists so effect behavior can be configured, updated, and tested wit
 - `PostFxStack:isEmpty`: Returns true if the pipeline has no effect slots.
 - `PostFxStack:clear`: Removes all effects from the pipeline.
 - `PostFxStack:isCapturing`: Returns whether the stack is currently capturing the scene.
+- `PostFxStack:beginCapture`: Begins capturing the scene for post-processing.
+- `PostFxStack:endCapture`: Ends scene capture for post-processing.
+- `PostFxStack:apply`: Applies all enabled effects in the stack and composites the result to screen.
 - `PostFxStack:type`: Returns the type name "PostFxStack".
 - `PostFxStack:typeOf`: Returns true when the given name matches "PostFxStack" or a parent type.
 

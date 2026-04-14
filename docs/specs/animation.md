@@ -11,32 +11,50 @@
 
 ## Summary
 
-The animation module owns frame-based sprite playback. It stores reusable frame definitions, named clips, playback state, speed control, and emitted animation events while staying independent from scene ownership, textures, and gameplay rules.
+The `animation` module provides Lurek2D's sprite animation system — the dedicated subsystem for describing how a textured sprite changes its source rectangle over time. It is a Foundations tier module that imports only from `crate::math`, making it usable in tests and non-rendering contexts without importing any platform services.
 
-This module exists to answer one narrow question well: given frames and clips, which frame should be active now and what events should fire as playback advances. Rendering integration lives in helper methods that turn the current frame into render-command data, but the module does not own GPU work, sprite assets, or non-frame-based animation systems such as tweening or skeletal animation.
+The core type is `Animation`, a controller that owns a flat pool of `AnimFrame` entries and any number of named `AnimClip` objects. A frame stores a source rectangle (the UV quad into the sprite sheet) and an optional per-frame duration override. A clip stores an ordered list of frame indices, a default frames-per-second rate, and a looping flag. Game code calls `add_frame` (or `add_frames_from_grid` for regular grids), registers clips with `add_clip`, then calls `play(clip_name)` each time a sprite state changes. On each game tick `update(dt)` advances the frame timer, emits `AnimEvent` notifications through a pending queue (for events like `ClipEnd` or `FrameReached`), and optionally performs crossfade transitions between clips.
 
-**Scope boundary**: This module currently depends on `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+Beyond the basic controller, the module ships: an `AnimStateMachine` for parameter-driven transitions between clips — named `AnimParamValue` parameters and `ConditionOp` comparisons drive `AnimTransition` edges; an Aseprite JSON parser (`aseprite.rs`) that loads Aseprite-exported frames and tags into the engine's native types; and `AnimRenderParams`, a lightweight struct packaging all information the render pipeline needs to draw one animated sprite frame.
+
+The animation module has no knowledge of texture handles, entity IDs, or scene transforms — it works entirely with source rectangles and float timers.
+
+**Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/animation_api.rs`.
 
 ## Files
 
+- `aseprite.rs`: Aseprite JSON export parser for sprite animation data.
 - `clip.rs`: Defines AnimClip, the named sequence of frame indices with clip FPS and looping behavior.
 - `controller.rs`: Defines Animation, the main playback controller for frames, clips, speed, current state, and pending events.
 - `event.rs`: Defines AnimEvent, the event enum emitted for frame changes, loops, and completion.
 - `frame.rs`: Defines AnimFrame plus the AnimationFrame compatibility alias.
 - `mod.rs`: Declares the animation submodules and re-exports the public frame, clip, controller, event, and render parameter types.
 - `render.rs`: Converts the current animation frame into renderer-facing DrawQuad command data.
+- `state_machine.rs`: Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
 
 ## Types
 
+- `AsepriteFrameData` (`struct`, `aseprite.rs`): Pixel-level frame rectangle extracted from an Aseprite JSON export.
+- `AsepriteDirection` (`enum`, `aseprite.rs`): Playback direction of an Aseprite frame tag.
+- `AsepriteTagData` (`struct`, `aseprite.rs`): Frame tag (named clip range) from an Aseprite JSON export.
+- `AsepriteParsed` (`struct`, `aseprite.rs`): Result of parsing an Aseprite JSON export.
 - `AnimClip` (`struct`, `clip.rs`): Named ordered frame sequence with clip-local FPS and looping configuration.
 - `Animation` (`struct`, `controller.rs`): Main playback controller that owns frames, clips, speed, timers, and pending events.
 - `AnimEvent` (`enum`, `event.rs`): Playback event enum used to report frame changes, loops, and finished clips.
 - `AnimFrame` (`struct`, `frame.rs`): One source rectangle plus an optional per-frame duration override.
 - `AnimationFrame` (`type`, `frame.rs`): Backward-compatible alias for [`AnimFrame`].
 - `AnimRenderParams` (`struct`, `render.rs`): Caller-supplied texture and transform bundle used when generating render commands.
+- `AnimParamValue` (`enum`, `state_machine.rs`): Value held by an animation parameter.
+- `ConditionOp` (`enum`, `state_machine.rs`): Comparison operator for a transition condition.
+- `ConditionValue` (`enum`, `state_machine.rs`): Right-hand side value for a transition condition.
+- `TransitionCondition` (`struct`, `state_machine.rs`): A single condition on one named parameter.
+- `AnimTransition` (`struct`, `state_machine.rs`): A directed state transition with a single condition.
+- `AnimStateConfig` (`struct`, `state_machine.rs`): Configuration for a single state in the state machine.
+- `AnimStateMachine` (`struct`, `state_machine.rs`): Parameter-driven finite-state machine for animation control.
 
 ## Functions
 
+- `load_aseprite_json` (`aseprite.rs`): Parses an Aseprite JSON export string into an [`AsepriteParsed`] result.
 - `Animation::new` (`controller.rs`): Creates a new, empty animation with no frames or clips.
 - `Animation::add_frame` (`controller.rs`): Adds a single frame and returns its 0-based index.
 - `Animation::add_frames_from_grid` (`controller.rs`): Slices a sprite-sheet grid into frames and appends them.
@@ -58,10 +76,26 @@ This module exists to answer one narrow question well: given frames and clips, w
 - `Animation::get_clip_count` (`controller.rs`): Returns the number of registered clips.
 - `Animation::drain_events` (`controller.rs`): Returns and clears all pending animation events.
 - `Animation::set_frame` (`controller.rs`): Sets the playback position within the current clip.
+- `Animation::crossfade` (`controller.rs`): Starts a crossfade to another clip over the given duration in seconds.
+- `Animation::get_blend_state` (`controller.rs`): Returns the current crossfade state as `(from_quad, to_quad, blend_weight)`.
+- `Animation::draw_to_image` (`controller.rs`): Renders the current animation frame as a debug image.
+- `Animation::load_from_aseprite` (`controller.rs`): Creates an [`Animation`] from an [`AsepriteParsed`] result.
 - `AnimEvent::type_name` (`event.rs`): Returns the event type as a Lua-friendly string.
 - `AnimEvent::frame_index` (`event.rs`): Returns the frame index for `FrameChanged` events, or `None`.
 - `Animation::generate_render_command` (`render.rs`): Produces a single `DrawQuad` render command for the current frame.
 - `quad_to_draw_command` (`render.rs`): Converts a source quad and render parameters into a `DrawQuad` command.
+- `AnimStateMachine::new` (`state_machine.rs`): Creates a new state machine with an owned animation and a named initial state.
+- `AnimStateMachine::add_state` (`state_machine.rs`): Registers a named state mapping to a clip.
+- `AnimStateMachine::add_transition` (`state_machine.rs`): Adds a transition rule by parsing a condition string.
+- `AnimStateMachine::set_param_float` (`state_machine.rs`): Sets a float parameter.
+- `AnimStateMachine::set_param_bool` (`state_machine.rs`): Sets a boolean parameter.
+- `AnimStateMachine::set_param_int` (`state_machine.rs`): Sets an integer parameter.
+- `AnimStateMachine::get_param` (`state_machine.rs`): Returns a reference to the current value of a named parameter.
+- `AnimStateMachine::update` (`state_machine.rs`): Advances the animation by `dt` seconds and evaluates transitions.
+- `AnimStateMachine::get_state` (`state_machine.rs`): Returns the name of the currently active state.
+- `AnimStateMachine::force_state` (`state_machine.rs`): Forces a transition to the named state, playing the associated clip.
+- `AnimStateMachine::get_animation` (`state_machine.rs`): Returns an immutable reference to the owned animation.
+- `AnimStateMachine::get_animation_mut` (`state_machine.rs`): Returns a mutable reference to the owned animation.
 
 ## Lua API Reference
 
@@ -70,6 +104,14 @@ This module exists to answer one narrow question well: given frames and clips, w
 
 ### Module Functions
 - `lurek.animation.new`: Creates a new, empty Animation controller.
+- `lurek.animation.fromAseprite`: Parses an Aseprite JSON export string and builds an Animation with clips and frames.
+- `lurek.animation.newStateMachine`: Creates an animation FSM from an Animation controller and an initial state name.
+
+### `AnimStateMachine` Methods
+- `AnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
+- `AnimStateMachine:getState`: Returns the name of the currently active state.
+- `AnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
+- `AnimStateMachine:getQuad`: Returns the source quad for the current animation frame, or nil.
 
 ### `Animation` Methods
 - `Animation:addFrame`: Adds a single frame to the frame pool by source rectangle.
@@ -92,9 +134,11 @@ This module exists to answer one narrow question well: given frames and clips, w
 - `Animation:getClipCount`: Returns the number of registered clips.
 - `Animation:getCurrentFrame`: Returns the current position within the active clip (0-based).
 - `Animation:setFrame`: Sets the playback position within the current clip.
+- `Animation:getBlendState`: Returns the two quads and blend factor during a crossfade, or nil when not blending.
 
 ## References
 
+- `image`: Imports or references `src/image/`. Cross-group dependency from ``Feature Systems`` into `Platform Services`.
 - `math`: Imports or references `math` from `src/math/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.

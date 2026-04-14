@@ -277,6 +277,16 @@ impl ImageData {
         }
     }
 
+    /// draw_circle.
+    ///
+    /// # Parameters
+    /// - `cx` — `i32`.
+    /// - `cy` — `i32`.
+    /// - `radius` — `u32`.
+    /// - `r` — `u8`.
+    /// - `g` — `u8`.
+    /// - `b` — `u8`.
+    /// - `a` — `u8`.
     pub fn draw_circle(&mut self, cx: i32, cy: i32, radius: u32, r: u8, g: u8, b: u8, a: u8) {
         let rad = radius as i32;
         let y0 = (cy - rad).max(0) as u32;
@@ -465,6 +475,9 @@ impl ImageData {
     }
 
     /// Apply a per-pixel transform in parallel for large images.
+    ///
+    /// # Returns
+    /// `(u8, u8, u8, u8) + Send + Sync,`.
     ///
     /// Behaves identically to [`map_pixel`] but uses Rayon to spread work across
     /// CPU cores when the image has more than 65 536 pixels. For smaller images

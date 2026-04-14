@@ -11,6 +11,11 @@ use rayon::prelude::*;
 // ── Enums and option types ─────────────────────────────────────────────────
 
 /// Distance metric for Worley (cellular) noise.
+///
+/// # Variants
+/// - `Euclidean` — Euclidean variant.
+/// - `Manhattan` — Manhattan variant.
+/// - `Chebyshev` — Chebyshev variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DistType {
     /// Standard Euclidean distance.
@@ -22,6 +27,10 @@ pub enum DistType {
 }
 
 /// Noise algorithm kind used by fractal combinators.
+///
+/// # Variants
+/// - `Perlin` — Perlin variant.
+/// - `Simplex` — Simplex variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum NoiseKind {
     /// Classic Perlin gradient noise.
@@ -31,6 +40,11 @@ pub enum NoiseKind {
 }
 
 /// Fractal type for multi-octave noise.
+///
+/// # Variants
+/// - `Fbm` — Fbm variant.
+/// - `Ridged` — Ridged variant.
+/// - `Turbulence` — Turbulence variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FractalType {
     /// Fractal Brownian motion — smooth layered noise.
@@ -42,6 +56,17 @@ pub enum FractalType {
 }
 
 /// Options for 2D noise map generation.
+///
+/// # Fields
+/// - `scale_x` — `f64`.
+/// - `scale_y` — `f64`.
+/// - `octaves` — `u32`.
+/// - `lacunarity` — `f64`.
+/// - `persistence` — `f64`.
+/// - `kind` — `NoiseKind`.
+/// - `fractal` — `FractalType`.
+/// - `offset_x` — `f64`.
+/// - `offset_y` — `f64`.
 #[derive(Debug, Clone)]
 pub struct MapGenOptions {
     /// Horizontal scale factor applied to coordinates.
@@ -84,6 +109,14 @@ impl Default for MapGenOptions {
 
 /// Generates 2D Perlin noise at the given coordinates.
 ///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `seed` — `u32`.
+///
+/// # Returns
+/// `f32`.
+///
 /// Returns a value in approximately `[-1.0, 1.0]`.
 pub fn perlin2d(x: f32, y: f32, seed: u32) -> f32 {
     let xi = x.floor() as i32;
@@ -105,6 +138,14 @@ pub fn perlin2d(x: f32, y: f32, seed: u32) -> f32 {
 }
 
 /// Generates 2D Simplex noise at the given coordinates.
+///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `seed` — `u32`.
+///
+/// # Returns
+/// `f32`.
 ///
 /// Returns a value in approximately `[-1.0, 1.0]`.
 pub fn simplex2d(x: f32, y: f32, seed: u32) -> f32 {
@@ -135,6 +176,13 @@ pub fn simplex2d(x: f32, y: f32, seed: u32) -> f32 {
 
 /// Returns 2D simplex noise using a fixed seed of 0.
 ///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+///
+/// # Returns
+/// `f32`.
+///
 /// Convenience wrapper around [`simplex2d`].
 pub fn simplex_noise_2d(x: f32, y: f32) -> f32 {
     simplex2d(x, y, 0)
@@ -142,12 +190,31 @@ pub fn simplex_noise_2d(x: f32, y: f32) -> f32 {
 
 /// Returns 3D simplex noise using a fixed seed of 0.
 ///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `z` — `f32`.
+///
+/// # Returns
+/// `f32`.
+///
 /// Delegates to [`NoiseGenerator::simplex_3d`] with seed `0`.
 pub fn simplex_noise_3d(x: f32, y: f32, z: f32) -> f32 {
     NoiseGenerator::new(0).simplex_3d(x as f64, y as f64, z as f64) as f32
 }
 
 /// Generates fractal Brownian motion noise by layering multiple octaves of Perlin noise.
+///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `seed` — `u32`.
+/// - `octaves` — `u32`.
+/// - `lacunarity` — `f32`.
+/// - `gain` — `f32`.
+///
+/// # Returns
+/// `f32`.
 ///
 /// Returns a value centred around `0.0` in approximately `[-1.0, 1.0]`.
 pub fn fbm(x: f32, y: f32, seed: u32, octaves: u32, lacunarity: f32, gain: f32) -> f32 {
@@ -171,6 +238,15 @@ pub fn fbm(x: f32, y: f32, seed: u32, octaves: u32, lacunarity: f32, gain: f32) 
 }
 
 /// Generates 3D Perlin noise at the given coordinates.
+///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `z` — `f32`.
+/// - `seed` — `u32`.
+///
+/// # Returns
+/// `f32`.
 ///
 /// Returns a value in approximately `[-1.0, 1.0]`.
 pub fn perlin3d(x: f32, y: f32, z: f32, seed: u32) -> f32 {
@@ -203,6 +279,16 @@ pub fn perlin3d(x: f32, y: f32, z: f32, seed: u32) -> f32 {
 }
 
 /// Generates 4D Perlin noise at the given coordinates.
+///
+/// # Parameters
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `z` — `f32`.
+/// - `w` — `f32`.
+/// - `seed` — `u32`.
+///
+/// # Returns
+/// `f32`.
 ///
 /// Returns a value in approximately `[-1.0, 1.0]`.
 pub fn perlin4d(x: f32, y: f32, z: f32, w: f32, seed: u32) -> f32 {
@@ -249,6 +335,14 @@ pub fn perlin4d(x: f32, y: f32, z: f32, w: f32, seed: u32) -> f32 {
 }
 
 /// Generate a noise map in parallel using rayon.
+///
+/// # Parameters
+/// - `w` — `u32`.
+/// - `h` — `u32`.
+/// - `opts` — `&MapGenOptions`.
+///
+/// # Returns
+/// `Vec<f64>`.
 ///
 /// Produces `width * height` values in row-major order using the given `MapGenOptions`.
 /// Significantly faster than [`NoiseGenerator::generate_map`] on multi-core machines.
@@ -406,6 +500,12 @@ pub struct NoiseGenerator {
 
 impl NoiseGenerator {
     /// Creates a new generator with the given seed.
+    ///
+    /// # Parameters
+    /// - `seed` — `u64`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(seed: u64) -> Self {
         let mut gen = Self { seed, perm: [0; 512] };
         gen.build_perm();
@@ -413,12 +513,18 @@ impl NoiseGenerator {
     }
 
     /// Replaces the seed and rebuilds the permutation table.
+    ///
+    /// # Parameters
+    /// - `seed` — `u64`.
     pub fn set_seed(&mut self, seed: u64) {
         self.seed = seed;
         self.build_perm();
     }
 
     /// Returns the current seed.
+    ///
+    /// # Returns
+    /// `u64`.
     pub fn seed(&self) -> u64 {
         self.seed
     }
@@ -512,6 +618,12 @@ impl NoiseGenerator {
     // ── Perlin ─────────────────────────────────────────────────────────
 
     /// 1D Perlin noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn perlin_1d(&self, x: f64) -> f64 {
         let xi = x.floor() as i32;
         let xf = x - x.floor();
@@ -522,6 +634,13 @@ impl NoiseGenerator {
     }
 
     /// 2D Perlin noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn perlin_2d(&self, x: f64, y: f64) -> f64 {
         let xi = x.floor() as i32;
         let yi = y.floor() as i32;
@@ -541,6 +660,14 @@ impl NoiseGenerator {
     }
 
     /// 3D Perlin noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `z` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn perlin_3d(&self, x: f64, y: f64, z: f64) -> f64 {
         let xi = x.floor() as i32;
         let yi = y.floor() as i32;
@@ -573,6 +700,13 @@ impl NoiseGenerator {
     // ── Simplex ────────────────────────────────────────────────────────
 
     /// 2D Simplex noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn simplex_2d(&self, x: f64, y: f64) -> f64 {
         const F2: f64 = 0.366_025_403_784_438_6;
         const G2: f64 = 0.211_324_865_405_187_1;
@@ -602,6 +736,14 @@ impl NoiseGenerator {
     }
 
     /// 3D Simplex noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `z` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn simplex_3d(&self, x: f64, y: f64, z: f64) -> f64 {
         const F3: f64 = 1.0 / 3.0;
         const G3: f64 = 1.0 / 6.0;
@@ -643,6 +785,15 @@ impl NoiseGenerator {
     }
 
     /// 4D Simplex noise. Returns a value in approximately `[-1, 1]`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `z` — `f64`.
+    /// - `w` — `f64`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn simplex_4d(&self, x: f64, y: f64, z: f64, w: f64) -> f64 {
         const F4: f64 = 0.309_016_994_374_947; // (sqrt(5) - 1) / 4
         const G4: f64 = 0.138_196_601_125_011; // (5 - sqrt(5)) / 20
@@ -702,6 +853,15 @@ impl NoiseGenerator {
 
     /// 2D Worley (cellular) noise. Returns distance to nearest feature point.
     ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `dist` — `DistType`.
+    /// - `f2` — `bool`.
+    ///
+    /// # Returns
+    /// `f64`.
+    ///
     /// Set `f2 = true` to get `F2 - F1` for a cell-border pattern.
     pub fn worley_2d(&self, x: f64, y: f64, dist: DistType, f2: bool) -> f64 {
         let ix = x.floor() as i32;
@@ -727,6 +887,16 @@ impl NoiseGenerator {
     }
 
     /// 3D Worley (cellular) noise. Returns distance to nearest feature point.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `z` — `f64`.
+    /// - `dist` — `DistType`.
+    /// - `f2` — `bool`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn worley_3d(&self, x: f64, y: f64, z: f64, dist: DistType, f2: bool) -> f64 {
         let ix = x.floor() as i32;
         let iy = y.floor() as i32;
@@ -763,6 +933,17 @@ impl NoiseGenerator {
     }
 
     /// Fractal Brownian motion over a 2D point.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `octaves` — `u32`.
+    /// - `lac` — `f64`.
+    /// - `pers` — `f64`.
+    /// - `kind` — `NoiseKind`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn fbm(&self, x: f64, y: f64, octaves: u32, lac: f64, pers: f64, kind: NoiseKind) -> f64 {
         let mut total = 0.0;
         let mut amplitude = 1.0;
@@ -778,6 +959,17 @@ impl NoiseGenerator {
     }
 
     /// Ridged multi-fractal over a 2D point.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `octaves` — `u32`.
+    /// - `lac` — `f64`.
+    /// - `pers` — `f64`.
+    /// - `kind` — `NoiseKind`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn ridged(&self, x: f64, y: f64, octaves: u32, lac: f64, pers: f64, kind: NoiseKind) -> f64 {
         let mut total = 0.0;
         let mut amplitude = 1.0;
@@ -794,6 +986,17 @@ impl NoiseGenerator {
     }
 
     /// Turbulence noise over a 2D point.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `octaves` — `u32`.
+    /// - `lac` — `f64`.
+    /// - `pers` — `f64`.
+    /// - `kind` — `NoiseKind`.
+    ///
+    /// # Returns
+    /// `f64`.
     pub fn turbulence(&self, x: f64, y: f64, octaves: u32, lac: f64, pers: f64, kind: NoiseKind) -> f64 {
         let mut total = 0.0;
         let mut amplitude = 1.0;
@@ -811,6 +1014,14 @@ impl NoiseGenerator {
 
     /// Domain warping — offsets input coordinates by noise for organic distortion.
     ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `strength` — `f64`.
+    ///
+    /// # Returns
+    /// `(f64, f64)`.
+    ///
     /// Returns the warped (x, y) pair.
     pub fn warp_domain(&self, x: f64, y: f64, strength: f64) -> (f64, f64) {
         let wx = x + strength * self.perlin_2d(x + 5.2, y + 1.3);
@@ -819,6 +1030,14 @@ impl NoiseGenerator {
     }
 
     /// Generates a 2D noise map of `width * height` values using the given options.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `opts` — `&MapGenOptions`.
+    ///
+    /// # Returns
+    /// `Vec<f64>`.
     ///
     /// Values are stored in row-major order: `map[y * width + x]`.
     pub fn generate_map(&self, width: u32, height: u32, opts: &MapGenOptions) -> Vec<f64> {

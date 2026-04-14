@@ -11,11 +11,15 @@
 
 ## Summary
 
-The light module owns the CPU-side 2D lighting model. It defines individual lights, occluders, attenuation, falloff, flicker, blend behavior, shadow filtering, and the LightWorld container that groups active lighting state into keyed pools for the renderer to consume later.
+The `light` module provides Lurek2D's 2D point-light data model. It is a Foundations tier module — a pure data container with no GPU resources stored in it. The renderer receives light data via `RenderCommand` variants and performs all GPU work after Lua callbacks return.
 
-This module keeps lighting data and rules separate from shader execution. It describes what lights and occluders exist and how they should behave, but it does not perform shadow rendering, final compositing, or scene ownership. That boundary keeps the lighting state testable and lets the renderer decide how to turn these descriptions into an actual lighting pass.
+`Light2D` is the core type, describing one light source with: position (x, y), `LightType` (Point, Spot, or Directional), color, intensity, radius, enabled flag, inner/outer cone angles for spot lights, direction angle, `FalloffMode` (Linear, Quadratic, or Constant), optional `FlickerConfig` for built-in sinusoidal/noise intensity oscillation, and optional polygon shadow casting via `Occluder` geometry. `Attenuation` provides custom falloff coefficients for callers who need finer control than the named `FalloffMode` presets.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`LightWorld` is the resource pool and render interface: it owns all active `Light2D` instances in a `SlotMap<LightKey, Light2D>`, provides CRUD operations, and exposes `build_render_commands()` which converts the active light set into `RenderCommand::Light2D` entries each frame. `LightBlendMode` controls how light color composites with the scene: `Multiply` (shadow darkening), `Additive` (glowing lamp pile-up), or `Screen`. `ShadowFilter` controls edge quality for shadow boundaries.
+
+Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-casting outline. The renderer traces shadow lines from each light's position against all enabled occluders, producing the shadow mask that gates lighting contributions.
+
+**Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/light_api.rs`.
 
 ## Files
 

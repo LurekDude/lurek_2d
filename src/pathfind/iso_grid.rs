@@ -7,6 +7,10 @@ use std::collections::{BinaryHeap, HashMap};
 use std::cmp::Ordering;
 
 /// A 2D isometric grid supporting A* pathfinding and LOS.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
 pub struct IsoGrid {
     /// Grid width in cells.
     pub width: u32,
@@ -18,6 +22,13 @@ pub struct IsoGrid {
 
 impl IsoGrid {
     /// Create a new isometric grid of the given size.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// All cells start unblocked with movement cost `1.0`.
     pub fn new(width: u32, height: u32) -> Self {
@@ -31,6 +42,11 @@ impl IsoGrid {
     }
 
     /// Mark or unmark a cell as blocked.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `blocked` — `bool`.
     pub fn set_blocked(&mut self, x: u32, y: u32, blocked: bool) {
         if let Some(i) = self.index(x, y) {
             self.blocked[i] = blocked;
@@ -38,6 +54,11 @@ impl IsoGrid {
     }
 
     /// Set the movement cost for a cell.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    /// - `cost` — `f32`.
     pub fn set_cost(&mut self, x: u32, y: u32, cost: f32) {
         if let Some(i) = self.index(x, y) {
             self.cost[i] = cost;
@@ -45,6 +66,13 @@ impl IsoGrid {
     }
 
     /// A* pathfinding on the isometric grid.
+    ///
+    /// # Parameters
+    /// - `from` — `(u32, u32)`.
+    /// - `to` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
     ///
     /// Returns `Some(path)` or `None` if no path exists.
     pub fn find_path(&self, from: (u32, u32), to: (u32, u32)) -> Option<Vec<(u32, u32)>> {
@@ -84,6 +112,13 @@ impl IsoGrid {
 
     /// Bresenham line-of-sight check.
     ///
+    /// # Parameters
+    /// - `from` — `(u32, u32)`.
+    /// - `to` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// Returns `true` if no blocked cell lies along the straight line.
     pub fn line_of_sight(&self, from: (u32, u32), to: (u32, u32)) -> bool {
         let mut x = from.0 as i32;
@@ -118,6 +153,13 @@ impl IsoGrid {
     }
 
     /// 4-directional diamond neighbors, filtered to passable in-bounds cells.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`.
     pub fn neighbors(&self, x: u32, y: u32) -> Vec<(u32, u32)> {
         let mut result = Vec::with_capacity(4);
         let dirs: [(i32, i32); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];

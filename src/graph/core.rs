@@ -608,6 +608,9 @@ impl Graph {
 
     /// Serialize the graph to a JSON-compatible `serde_json::Value` map.
     ///
+    /// # Returns
+    /// `HashMap<String, serde_json::Value>`.
+    ///
     /// Schema: `{"nodes": [{id, node_type, capacity}], "edges": [{id, from, to, weight, edge_type, bidirectional}]}`
     pub fn serialize(&self) -> HashMap<String, serde_json::Value> {
         use serde_json::{json, Value};
@@ -631,6 +634,12 @@ impl Graph {
     }
 
     /// Deserialize a graph from a map produced by [`Graph::serialize`].
+    ///
+    /// # Parameters
+    /// - `data` — `&HashMap<String, serde_json::Value>`.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
     ///
     /// Returns an error string if the data is malformed. Items are not restored.
     pub fn deserialize(data: &HashMap<String, serde_json::Value>) -> Result<Self, String> {

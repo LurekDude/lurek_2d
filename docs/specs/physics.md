@@ -11,33 +11,53 @@
 
 ## Summary
 
-The physics module owns the engine's 2D simulation state and the stable, script-facing data model wrapped around rapier2d. It exists so Lua code can work with bodies, shapes, joints, and collision events through stable integer IDs and plain values instead of backend handles.
+The `physics` module provides Lurek2D's rigid-body physics simulation backed by the rapier2d library. It exposes a comprehensive 2D physics API for game scripts while handling all the complexity of the rapier pipeline internally.
 
-Its core boundary is the `World` sync layer: scripts mutate `Body` records, `World::step` mirrors those changes into rapier, advances simulation, then reads the authoritative results back out. The module also owns collision and raycast query results plus CPU-side debug rendering helpers, but it does not own gameplay interpretation of contacts or the Lua registration code itself.
+`World` owns the complete rapier simulation state: rigid body set, collider set, joint set, broad-phase, narrow-phase, integration parameters, and the pipeline. `World::step(dt)` advances the simulation by one time step and collects all collision contact events. `World::get_collision_events()` returns a `Vec<CollisionInfo>` for script-side response each frame. `World::raycast(origin, direction, max_distance, mask)` returns `Option<RaycastHit>` with hit point, normal, and body reference.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`Body` instances are created with `BodyType` (Dynamic, Kinematic, or Static) and `BodyShape` (Rectangle, Circle, Capsule, or compound polygon). Sensor bodies (triggers) detect overlaps without generating impulse responses. Joint types: fixed, revolute (hinge), prismatic (slider), distance, spring, rope, and weld.
+
+Extended features: `PhysicsZone` adds per-region gravity and damping overrides applied before each pipeline step — useful for water, low-gravity zones, and wind fields; `ZoneEvent` fires when bodies enter or leave zones. `TerrainMap` is a destructible terrain system using a bit-grid of solid/empty cells with chunked static colliders that update when cells are modified. `CellularWorld` is a separate falling-sand automaton that is physically independent of rapier, simulating per-cell material gravity and interaction rules.
+
+**Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `rapier2d`. Lua bridge in `src/lua_api/physics_api.rs`.
 
 ## Files
 
 - `body.rs`: Script-facing rigid-body types, constructors, bounding boxes, and local/world point helpers.
+- `cellular.rs`: Cellular automaton simulation: falling-sand, water, fire, and gas.
 - `collision.rs`: Backward-compatible `CollisionInfo` contact record retained on the public API surface.
 - `mod.rs`: Module root and public re-export surface for bodies, shapes, collision records, and the world.
 - `render.rs`: Debug overlay render-command generation and CPU image export for headless inspection.
 - `shape.rs`: Extended collider geometry and reusable standalone fixture descriptors.
+- `terrain.rs`: Destructible terrain: a bitgrid-backed static collider system for Worms-style and Tanks-style terrain deformation.
 - `world.rs`: Simulation owner for rapier sets, body and collider mappings, joints, stepping, events, and spatial queries.
+- `zone.rs`: Physics zone system: gravity areas, attractor/repulsor regions, and zero-gravity pockets.
 
 ## Types
 
 - `BodyType` (`enum`, `body.rs`): Simulation mode selector for static, dynamic, kinematic, and sensor bodies.
 - `BodyShape` (`enum`, `body.rs`): Lightweight common-shape enum for rectangle and circle bodies.
 - `Body` (`struct`, `body.rs`): Lua-friendly rigid-body record mirrored into and out of rapier state.
+- `CellType` (`enum`, `cellular.rs`): The material type of a single cell in a [`CellularWorld`].
+- `CellularWorld` (`struct`, `cellular.rs`): A falling-sand cellular automaton grid.
 - `CollisionInfo` (`struct`, `collision.rs`): Legacy compatibility record still exposed alongside newer contact models.
 - `Shape` (`enum`, `shape.rs`): Extended collider enum for polygons, edges, chains, and the simple primitive cases.
 - `StandaloneShape` (`struct`, `shape.rs`): Reusable shape-plus-fixture descriptor for attaching extra colliders.
+- `ChunkId` (`struct`, `terrain.rs`): Identifies a `CHUNK_SIZE Ã— CHUNK_SIZE` cell block by its position in chunk coordinate space.
+- `TerrainMap` (`struct`, `terrain.rs`): Bitgrid-backed destructible terrain with chunked static physics colliders.
 - `BodyContact` (`struct`, `world.rs`): Stable-ID collision event emitted from simulation results.
 - `RaycastHit` (`struct`, `world.rs`): Query result carrying hit body, hit point, normal, and distance.
 - `ContactInfo` (`struct`, `world.rs`): Narrow-phase contact snapshot for detailed per-pair inspection.
+- `PhysicsShapeSnapshot` (`struct`, `world.rs`): Geometry snapshot of a single physics body for GPU debug rendering.
 - `World` (`struct`, `world.rs`): Central simulation owner for bodies, joints, queries, cached collider state, and event buffers.
+- `ZoneId` (`type`, `zone.rs`): Stable integer handle for a [`PhysicsZone`].
+- `ZonePriority` (`type`, `zone.rs`): Ordering value used when multiple zones overlap the same body.
+- `ZoneGravityMode` (`enum`, `zone.rs`): Describes how a [`PhysicsZone`] overrides world gravity for bodies inside it.
+- `ZoneBoundary` (`enum`, `zone.rs`): Spatial boundary of a [`PhysicsZone`].
+- `ZoneEventKind` (`enum`, `zone.rs`): Direction of a body-zone transition.
+- `ZoneEvent` (`struct`, `zone.rs`): Records a body entering or leaving a [`PhysicsZone`] during a [`World::step`](super::world::World::step).
+- `PhysicsZone` (`struct`, `zone.rs`): A spatial region that overrides gravity and damping for bodies inside it.
+- `ZoneTracker` (`struct`, `zone.rs`): Tracks which zones each body is currently inside and produces [`ZoneEvent`]s when the membership changes.
 
 ## Functions
 
@@ -52,6 +72,21 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `Body::get_type` (`body.rs`): Returns the body type as a static string slice.
 - `Body::get_world_point` (`body.rs`): Transforms a point from body-local coordinates to world coordinates.
 - `Body::get_local_point` (`body.rs`): Transforms a point from world coordinates to body-local coordinates.
+- `CellType::from_u8` (`cellular.rs`): Converts a raw `u8` from serialised data into a `CellType`.
+- `CellularWorld::new` (`cellular.rs`): Creates an empty cellular world filled with `Air`.
+- `CellularWorld::set_cell` (`cellular.rs`): Sets the cell at `(cx, cy)` to the given material.
+- `CellularWorld::get_cell` (`cellular.rs`): Returns the cell material at `(cx, cy)`.
+- `CellularWorld::fill_rect` (`cellular.rs`): Fills a rectangle of cells with a given material.
+- `CellularWorld::fill_circle` (`cellular.rs`): Fills a circle of cells centred at `(cx_c, cy_c)` with radius `r_cells`.
+- `CellularWorld::step` (`cellular.rs`): Advances the simulation by one tick.
+- `CellularWorld::step_n` (`cellular.rs`): Advances the simulation by `n` ticks.
+- `CellularWorld::to_image_data` (`cellular.rs`): Generates an RGBA pixel buffer for the full grid.
+- `CellularWorld::to_image_data_region` (`cellular.rs`): Generates an RGBA pixel buffer for a rectangular sub-region of the grid.
+- `CellularWorld::find_cells` (`cellular.rs`): Returns all cell positions of a given material type.
+- `CellularWorld::count_cells` (`cellular.rs`): Counts the number of cells of a given material.
+- `CellularWorld::to_bytes` (`cellular.rs`): Serialises the cell grid to a byte buffer.
+- `CellularWorld::from_bytes` (`cellular.rs`): Deserialises a cellular world from bytes produced by [`to_bytes`](CellularWorld::to_bytes).
+- `default_palette` (`cellular.rs`): Returns the default RGBA colour for `cell`.
 - `World::generate_render_commands` (`render.rs`): Generate debug render commands for all physics bodies.
 - `World::draw_to_image` (`render.rs`): Render the physics world to a CPU image for headless testing or export.
 - `Shape::to_rapier_collider` (`shape.rs`): Converts this shape into a rapier2d `ColliderBuilder`.
@@ -61,6 +96,23 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `StandaloneShape::get_type` (`shape.rs`): Returns the shape type name.
 - `StandaloneShape::get_radius` (`shape.rs`): Returns the radius for circle shapes.
 - `StandaloneShape::get_bounding_box` (`shape.rs`): Returns an axis-aligned bounding box for this shape as `(min_x, min_y, max_x, max_y)`.
+- `TerrainMap::new` (`terrain.rs`): Creates an empty terrain map (all cells non-solid, no dirty chunks).
+- `TerrainMap::set_cell` (`terrain.rs`): Sets a single cell solid or empty, marking the containing chunk dirty.
+- `TerrainMap::get_cell` (`terrain.rs`): Returns `true` if the cell at `(cx, cy)` is solid.
+- `TerrainMap::fill_circle` (`terrain.rs`): Fills a circle of cells centred at world position `(wx, wy)`.
+- `TerrainMap::fill_rect` (`terrain.rs`): Fills an axis-aligned rectangle of cells whose world extent covers `(wx, wy, w, h)`.
+- `TerrainMap::fill_all` (`terrain.rs`): Sets every cell in the grid to `solid` and marks all chunks dirty.
+- `TerrainMap::is_dirty` (`terrain.rs`): Returns `true` when at least one chunk is dirty and needs flushing.
+- `TerrainMap::flush` (`terrain.rs`): Rebuilds physics bodies for all dirty chunks and clears the dirty set.
+- `TerrainMap::collapse_columns` (`terrain.rs`): Removes unsupported cells, simulating gravity-driven column collapse.
+- `TerrainMap::solid_cell_positions` (`terrain.rs`): Returns the world-space centres of all currently solid cells.
+- `TerrainMap::spawn_debris_at` (`terrain.rs`): Spawns a dynamic debris body at each position in `positions`.
+- `TerrainMap::to_image_data` (`terrain.rs`): Generates an RGBA pixel buffer for the terrain grid.
+- `TerrainMap::to_bytes` (`terrain.rs`): Serialises the terrain to a compact byte buffer.
+- `TerrainMap::from_bytes` (`terrain.rs`): Deserialises a terrain from bytes produced by [`to_bytes`](TerrainMap::to_bytes).
+- `TerrainMap::load_from_bytes` (`terrain.rs`): Replaces this terrain's cell data with data deserialized from `bytes`.
+- `World::draw_debug_to_image` (`world.rs`): Draw debug physics colliders to an ImageData target.
+- `World::extract_shape_snapshots` (`world.rs`): Returns a snapshot of each body's shape geometry for GPU debug rendering.
 - `World::new` (`world.rs`): Creates a new empty physics world with the given gravity vector.
 - `World::add_body` (`world.rs`): Adds a `body` to the world and returns its stable integer id.
 - `World::add_fixture` (`world.rs`): Adds an extra fixture (collider) to an existing body.
@@ -78,6 +130,12 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `World::get_collision_events` (`world.rs`): Returns all collision events that occurred during the last `step()` call.
 - `World::get_begin_contact_events` (`world.rs`): Returns begin-contact events from the last `step()`.
 - `World::get_end_contact_events` (`world.rs`): Returns end-contact events from the last `step()`.
+- `World::add_zone` (`world.rs`): Registers a new gravity/damping zone and returns its stable `ZoneId`.
+- `World::remove_zone` (`world.rs`): Removes a zone by ID.
+- `World::zone_mut` (`world.rs`): Returns a mutable reference to the zone with the given ID, if it exists.
+- `World::get_zone_events` (`world.rs`): Returns all zone enter/leave events from the most recent `step`.
+- `World::apply_zone_forces` (`world.rs`): Applies zone gravity and damping overrides to all dynamic bodies.
+- `World::step_fixed` (`world.rs`): Steps the simulation a variable number of fixed sub-steps to consume an accumulated time delta without accumulating spiral-of-death lag.
 - `World::set_body_position` (`world.rs`): Teleports a body to a new position.
 - `World::apply_force` (`world.rs`): Applies a continuous force to a body (accumulated over the next step).
 - `World::apply_torque` (`world.rs`): Applies a torque (rotational force) to a body.
@@ -139,6 +197,29 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `World::to_pixels` (`world.rs`): Converts a physics-unit value to pixels.
 - `World::get_contacts` (`world.rs`): Returns all contact pairs from the narrow phase.
 - `World::get_body_contacts` (`world.rs`): Returns contacts involving a specific body.
+- `World::set_body_one_way` (`world.rs`): Marks body `id` as a one-way platform with outward normal `(nx, ny)`.
+- `World::clear_body_one_way` (`world.rs`): Clears the one-way configuration for a body, making it fully solid.
+- `World::get_body_one_way` (`world.rs`): Returns the one-way normal for a body, if configured.
+- `World::set_joint_break_force` (`world.rs`): Sets the relative-velocity break threshold for a joint.
+- `World::get_joint_break_force` (`world.rs`): Returns the break threshold for a joint, if set.
+- `World::is_body_sleeping` (`world.rs`): Returns whether a body is currently sleeping (inactive).
+- `World::wake_up_body` (`world.rs`): Forcibly wakes up a sleeping body.
+- `World::sleep_body` (`world.rs`): Puts a body to sleep immediately, regardless of velocity.
+- `World::set_solver_iterations` (`world.rs`): Sets the number of constraint solver iterations per physics step.
+- `World::get_solver_iterations` (`world.rs`): Returns the current number of constraint solver iterations per step.
+- `World::add_bodies` (`world.rs`): Creates multiple bodies in a single call.
+- `ZoneBoundary::contains` (`zone.rs`): Returns `true` when `(px, py)` lies inside this boundary.
+- `PhysicsZone::new_rect` (`zone.rs`): Creates a new rectangular zone with zero-gravity mode, affecting all layers.
+- `PhysicsZone::set_circle` (`zone.rs`): Replaces the zone boundary with a circle.
+- `PhysicsZone::set_gravity_directional` (`zone.rs`): Sets directional gravity inside the zone.
+- `PhysicsZone::set_gravity_point` (`zone.rs`): Sets point-attractor gravity inside the zone.
+- `PhysicsZone::set_gravity_repulsor` (`zone.rs`): Sets point-repulsor gravity inside the zone.
+- `PhysicsZone::set_gravity_zero` (`zone.rs`): Sets the zone to suppress gravity (zero-gravity pocket).
+- `PhysicsZone::contains` (`zone.rs`): Returns `true` when position `(px, py)` lies inside the zone boundary.
+- `ZoneTracker::new` (`zone.rs`): Creates an empty tracker.
+- `ZoneTracker::update` (`zone.rs`): Updates membership for `body_id` and returns any enter/leave events.
+- `ZoneTracker::remove_body` (`zone.rs`): Removes all tracking state for a body.
+- `ZoneTracker::clear` (`zone.rs`): Purges all tracking state.
 
 ## Lua API Reference
 
@@ -162,6 +243,9 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `lurek.physics.attachShape`: Attaches a standalone shape to a body as an additional fixture.
 - `lurek.physics.getCollisions`: Returns all collision events from the last simulation step.
 - `lurek.physics.debugDraw`: Enables or disables the physics debug overlay (AABB boxes and velocity vectors).
+- `lurek.physics.drawDebugGpu`: Extracts collider geometry from a World and queues a GPU physics debug
+- `lurek.physics.newTerrain`: Creates a destructible terrain grid.
+- `lurek.physics.newCellular`: Creates a falling-sand cellular automaton grid.
 
 ### `Body` Methods
 - `Body:getId`: Returns the body's integer ID.
@@ -206,6 +290,23 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `Body:isSleepingAllowed`: Returns whether the body can sleep.
 - `Body:setSleepingAllowed`: Sets whether the body can sleep.
 - `Body:destroy`: Removes this body from the world.
+- `Body:isSleeping`: Returns true if this body is currently sleeping (inactive).
+- `Body:wakeUp`: Forcibly wakes up this body.
+- `Body:sleep`: Puts this body to sleep immediately.
+
+### `Cellular` Methods
+- `Cellular:setCell`: Sets the material of a cell.
+- `Cellular:getCell`: Returns the material at `(cx, cy)` as an integer constant.
+- `Cellular:fillRect`: Fills a rectangular region of cells with the given material.
+- `Cellular:fillCircle`: Fills a circle of cells with the given material.
+- `Cellular:step`: Advances the simulation by one tick.
+- `Cellular:stepN`: Advances the simulation by `n` ticks.
+- `Cellular:toImageData`: Returns the full grid as an RGBA byte string using the default colour palette.
+- `Cellular:toImageDataRegion`: Returns a sub-region as an RGBA byte string.
+- `Cellular:countCells`: Counts cells of the given material type.
+- `Cellular:findCells`: Returns positions of all cells of the given material as an array of `{x, y}` tables.
+- `Cellular:toBytes`: Serialises the grid to a byte string.
+- `Cellular:loadFromBytes`: Loads grid data from bytes produced by `toBytes`.
 
 ### `PhysicsShape` Methods
 - `PhysicsShape:getType`: Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain".
@@ -217,8 +318,23 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `PhysicsShape:setSensor`: Sets whether this shape is a sensor (non-colliding trigger).
 - `PhysicsShape:destroy`: Releases this shape handle (GC handles cleanup).
 
+### `Terrain` Methods
+- `Terrain:setCell`: Sets a single terrain cell to solid or empty.
+- `Terrain:getCell`: Returns whether a cell is solid.
+- `Terrain:fillCircle`: Fills a circle of cells centred at world position `(wx, wy)`.
+- `Terrain:fillRect`: Fills a rectangular region of cells.
+- `Terrain:fillAll`: Sets every cell in the grid to `solid`.
+- `Terrain:flush`: Rebuilds physics bodies for all dirty chunks.
+- `Terrain:isDirty`: Returns `true` when at least one chunk needs flushing.
+- `Terrain:collapseColumns`: Removes unsupported cells, returning the number of cells that fell.
+- `Terrain:solidPositions`: Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
+- `Terrain:spawnDebris`: Spawns dynamic debris bodies at the given positions.
+- `Terrain:toImageData`: Returns the terrain as an RGBA byte string.
+- `Terrain:toBytes`: Serialises the terrain grid to a byte string for save/load.
+- `Terrain:loadFromBytes`: Loads terrain cell data from bytes produced by `toBytes`.
+
 ### `World` Methods
-- `World:step`: Advances the physics simulation by dt seconds.
+- `World:step`: Advances the physics simulation by dt seconds, firing onBeginContact /
 - `World:clear`: Resets the world, removing all bodies and joints.
 - `World:getGravity`: Returns the gravity vector (gx, gy).
 - `World:setGravity`: Sets the gravity vector.
@@ -246,55 +362,40 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `World:getBodyContacts`: Returns contacts involving a specific body.
 - `World:setBodyType`: Changes the body type.
 - `World:getBodyType`: Returns the body type as a string.
-- `World:addZone(x, y, w, h)`: Creates a rectangular gravity/damping zone and returns a `LuaZone` handle.
-- `World:getZoneEvents()`: Returns zone enter/leave events from the last step as `{zone_id, body_id, kind}` tables.
-- `World:stepFixed(accum, step_dt, max_steps)`: Fixed-timestep accumulator; returns unconsumed remainder.
+- `World:setBeginContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
+- `World:clearBeginContact`: Removes the begin-contact callback.
+- `World:setEndContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
+- `World:clearEndContact`: Removes the end-contact callback.
+- `World:setBodyCCD`: Enables or disables Continuous Collision Detection for a body.
+- `World:getBodyCCD`: Returns whether CCD is enabled for a body.
+- `World:setBodyOneWay`: Marks a body as a one-way platform.  Bodies approaching from the
+- `World:clearBodyOneWay`: Removes the one-way platform flag from a body.
+- `World:getBodyOneWay`: Returns the one-way normal for a body, or nil if not configured.
+- `World:setJointBreakForce`: Sets the relative-velocity threshold above which a joint breaks.
+- `World:getJointBreakForce`: Returns the break threshold for a joint, or nil if not set.
+- `World:isBodySleeping`: Returns true if a body is currently sleeping (inactive).
+- `World:wakeUpBody`: Forcibly wakes up a sleeping body.
+- `World:sleepBody`: Puts a body to sleep immediately.
+- `World:setSolverIterations`: Sets the number of constraint solver iterations per step.
+- `World:getSolverIterations`: Returns the current number of solver iterations per step.
+- `World:newBodies`: Creates multiple bodies in one call.
+- `World:stepFixed`: Steps the world using a fixed sub-step size to consume accumulated time.
+- `World:addZone`: Creates a rectangular gravity/damping zone and returns a LuaZone handle.
+- `World:getZoneEvents`: Returns zone enter/leave events produced by the most recent step.
 
-### `Zone` Methods (`lurek.physics.addZone`)
-- `Zone:getId()`: Returns the zone's integer ID.
-- `Zone:setEnabled(bool)`: Enables or disables the zone.
-- `Zone:setPriority(int)`: Sets priority (higher wins when zones overlap).
-- `Zone:setLayerMask(int)`: Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
-- `Zone:setCircle(cx, cy, radius)`: Replaces the zone boundary with a circle.
-- `Zone:setGravityDirectional(gx, gy)`: Sets directional gravity.
-- `Zone:setGravityPoint(cx, cy, strength)`: Sets point-attractor gravity (F = k / r²).
-- `Zone:setGravityRepulsor(cx, cy, strength)`: Sets point-repulsor gravity.
-- `Zone:setGravityZero()`: Suppresses all gravity inside the zone.
-- `Zone:setLinearDampingOverride(value|nil)`: Per-zone linear damping; pass `nil` to clear.
-- `Zone:setAngularDampingOverride(value|nil)`: Per-zone angular damping; pass `nil` to clear.
-- `Zone:destroy()`: Removes the zone from the world.
-
-### Terrain API (`lurek.physics.newTerrain`)
-- `lurek.physics.newTerrain(width, height, cell_size, world)`: Creates a destructible terrain grid.
-- `Terrain:setCell(cx, cy, solid)`: Sets a single cell to solid or empty.
-- `Terrain:getCell(cx, cy)`: Returns whether a cell is solid.
-- `Terrain:fillCircle(wx, wy, radius, solid)`: Fills a circle of cells.
-- `Terrain:fillRect(wx, wy, w, h, solid)`: Fills a rectangular region of cells.
-- `Terrain:fillAll(solid)`: Sets every cell.
-- `Terrain:flush()`: Rebuilds physics bodies for all dirty chunks.
-- `Terrain:isDirty()`: Returns true when any chunk needs flushing.
-- `Terrain:collapseColumns()`: Removes unsupported cells; returns count.
-- `Terrain:solidPositions()`: Returns `{x, y}` world-space centres of all solid cells.
-- `Terrain:spawnDebris(positions, mass, restitution)`: Spawns dynamic debris bodies; returns body ID array.
-- `Terrain:toImageData(sr, sg, sb, er, eg, eb)`: Returns RGBA pixel bytes.
-- `Terrain:toBytes()`: Serialises the grid.
-- `Terrain:loadFromBytes(data)`: Loads grid from bytes (returns bool).
-
-### Cellular API (`lurek.physics.newCellular`)
-- `lurek.physics.newCellular(width, height)`: Creates a falling-sand cellular automaton.
-- Constants: `CELL_AIR=0`, `CELL_SAND=1`, `CELL_WATER=2`, `CELL_ROCK=3`, `CELL_FIRE=4`, `CELL_GAS=5`.
-- `Cellular:setCell(cx, cy, cell_type)`: Sets a cell's material.
-- `Cellular:getCell(cx, cy)`: Returns the material integer at a cell.
-- `Cellular:fillRect(cx0, cy0, cw, ch, cell_type)`: Fills a rectangular region.
-- `Cellular:fillCircle(cx_c, cy_c, r_cells, cell_type)`: Fills a circle of cells.
-- `Cellular:step()`: Advances the simulation by one tick.
-- `Cellular:stepN(n)`: Advances the simulation by n ticks.
-- `Cellular:toImageData()`: Returns full RGBA pixel bytes using the default palette.
-- `Cellular:toImageDataRegion(cx0, cy0, cw, ch)`: Returns a sub-region as RGBA bytes.
-- `Cellular:countCells(cell_type)`: Counts cells of the given material.
-- `Cellular:findCells(cell_type)`: Returns `{x, y}` positions of all matching cells.
-- `Cellular:toBytes()`: Serialises the grid.
-- `Cellular:loadFromBytes(data)`: Loads grid from bytes (returns bool).
+### `Zone` Methods
+- `Zone:getId`: Returns the zone's integer ID.
+- `Zone:setEnabled`: Enables or disables the zone.
+- `Zone:setPriority`: Sets the zone priority; higher values win over lower when zones overlap.
+- `Zone:setLayerMask`: Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
+- `Zone:setCircle`: Replaces the zone boundary with a circle.
+- `Zone:setGravityDirectional`: Sets directional gravity inside the zone.
+- `Zone:setGravityPoint`: Sets point-attractor gravity inside the zone.
+- `Zone:setGravityRepulsor`: Sets point-repulsor gravity inside the zone.
+- `Zone:setGravityZero`: Suppresses gravity inside the zone (zero-g pocket).
+- `Zone:setLinearDampingOverride`: Sets an optional linear damping override for bodies inside the zone.
+- `Zone:setAngularDampingOverride`: Sets an optional angular damping override for bodies inside the zone.
+- `Zone:destroy`: Removes the zone from the world.
 
 ## References
 
@@ -302,39 +403,6 @@ Its core boundary is the `World` sync layer: scripts mutate `Body` records, `Wor
 - `math`: Imports or references `math` from `src/math/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
-
-## GPU Physics Debug (v0.7.26)
-
-### `PhysicsShapeSnapshot` (src/physics/world.rs)
-
-Geometry-only snapshot of a single physics body. Does not depend on `crate::render`.
-
-| Field              | Type            | Description                                           |
-| ------------------ | --------------- | ----------------------------------------------------- |
-| `x`, `y`           | `f32`           | Body centre in world space.                           |
-| `half_w`, `half_h` | `f32`           | Half-extents (or radius for circles).                 |
-| `angle`            | `f32`           | Rotation in radians.                                  |
-| `is_static`        | `bool`          | True for Static / Kinematic bodies.                   |
-| `is_sensor`        | `bool`          | True for Sensor bodies.                               |
-| `is_circle`        | `bool`          | True when shape is a circle.                          |
-| `hull_verts`       | `Vec<[f32; 2]>` | Local-space polygon vertices; empty for box / circle. |
-
-`World::extract_shape_snapshots()` returns `Vec<PhysicsShapeSnapshot>` for all bodies.
-
-### `lurek.physics.drawDebugGpu(world, config?)`
-
-Extracts shape snapshots from `world` and queues a `RenderCommand::DrawPhysicsDebug` for the current frame.
-Call from `lurek.render` or `lurek.render_ui`.
-
-**Config table fields** (all optional):
-
-| Key           | Type                | Default           | Description                  |
-| ------------- | ------------------- | ----------------- | ---------------------------- |
-| `bodyColor`   | `{f32,f32,f32,f32}` | `{0,1,0,1}`       | Dynamic body outline.        |
-| `staticColor` | `{f32,f32,f32,f32}` | `{0.5,0.5,0.5,1}` | Static/kinematic outline.    |
-| `sleepColor`  | `{f32,f32,f32,f32}` | `{0,0.4,0,1}`     | Sleeping body outline.       |
-| `sensorColor` | `{f32,f32,f32,f32}` | `{0,1,1,0.7}`     | Sensor (trigger) outline.    |
-| `lineWidth`   | `number`            | `1.0`             | Outline thickness in pixels. |
 
 ## Notes
 

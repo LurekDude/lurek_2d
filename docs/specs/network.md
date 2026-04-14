@@ -11,17 +11,15 @@
 
 ## Summary
 
-The network module is Lurek2D's full networking toolkit organised in three layers:
+The `network` module provides Lurek2D's multiplayer networking stack, covering four transport layers: ENet reliable-UDP for peer-to-peer game traffic, raw TCP for custom protocols, asynchronous HTTP for REST APIs and leaderboards, and WebSocket for live chat and event streaming.
 
-**Layer 1 — Transport (Rust)**: ENet reliable UDP (`host.rs`), HTTP client (`http.rs`), non-blocking TCP (`tcp.rs`), WebSocket client (`websocket.rs`), and MessagePack serialization (`message.rs`). Each transport is a standalone Rust module with no Lua dependency.
+`NetworkHost` wraps `rusty_enet::Host<UdpSocket>` and can act as both server and client simultaneously: binding to a port enables incoming connections, while `connect(addr)` creates outgoing ones. The single `service(timeout)` call drives all UDP I/O — it processes all queued packets, fires connection/disconnect/receive events, and sends outgoing data. ENet provides ordered reliable delivery, sequenced unreliable delivery, and unsequenced unreliable modes selectable per-packet.
 
-**Layer 2 — Game Protocol (Rust + Lua binding)**: `NetworkRuntime` (`net_thread.rs`) runs all async I/O on a dedicated `std::thread` with `mpsc` bridge. The Lua API (`network_api.rs`) exposes `newServer`, `newClient`, `newRuntime`, `pack`, `unpack`, and typed event polling. `HostRole` (Server/Client/Host) assigns a semantic role to ENet hosts.
+HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS thread with `mpsc` request/response channels. The main engine thread submits requests (non-blocking) and polls completed responses once per frame before `lurek.process(dt)` fires — keeping transport I/O fully non-blocking from the Lua VM's perspective.
 
-**Layer 3 — Lunasome Libraries (pure Lua)**: `content/library/rpc/` (remote procedure calls), `content/library/lobby/` (room management), `content/library/netstate/` (state sync + turn-based). These consume only the `lurek.network` public API.
+`message.rs` implements MessagePack serialization for compact binary network transport: `encode_table(lua_table)` converts a Lua table to a byte vector, `decode_table(bytes, lua)` reconstructs a Lua table. This round-trip is the recommended format for application-level game messages.
 
-The module depends on `rusty_enet` (ENet UDP), `ureq` (HTTP), `tungstenite` (WebSocket), and `rmp-serde` (MessagePack). All non-ENet I/O runs on the background thread — the Lua VM never blocks.
-
-**Scope boundary**: This module depends on `runtime`. It stays within the Core Runtime responsibility boundary. Matchmaking, rollback, prediction, and NAT traversal belong in higher-level Lua code or future modules.
+**Scope boundary**: Core Runtime tier. No Platform Services or Feature Systems imports. Lua bridge in `src/lua_api/network_api.rs`.
 
 ## Files
 
@@ -38,146 +36,134 @@ The module depends on `rusty_enet` (ENet UDP), `ureq` (HTTP), `tungstenite` (Web
 ## Types
 
 - `NetworkError` (`enum`, `error.rs`): Errors for ENet, HTTP, TCP, WebSocket, serialization, and threading.
-- `NetworkHost` (`struct`, `host.rs`): Wraps `rusty_enet::Host<UdpSocket>` with role and limit enforcement.
 - `HostRole` (`enum`, `host.rs`): Server, Client, or Host (peer-to-peer).
+- `NetworkHost` (`struct`, `host.rs`): Wraps `rusty_enet::Host<UdpSocket>` with role and limit enforcement.
 - `NetworkEvent` (`enum`, `host.rs`): Result of a single `NetworkHost::service` call.
 - `PeerStats` (`struct`, `host.rs`): Per-peer statistics snapshot.
 - `HttpResponse` (`struct`, `http.rs`): HTTP response with status, body, headers, error.
 - `NetValue` (`enum`, `message.rs`): Nil, Bool, Integer, Float, String, Array, Map — serializable Lua values.
-- `NetworkRuntime` (`struct`, `net_thread.rs`): Background I/O thread with mpsc channel bridge.
 - `NetworkRequest` (`enum`, `net_thread.rs`): HttpRequest, TcpConnect, TcpSend, TcpClose, WsConnect, WsSend, WsClose, Shutdown.
 - `NetworkResponse` (`enum`, `net_thread.rs`): HttpResponse, TcpEvent, WebSocketEvent.
 - `TcpEvent` (`enum`, `net_thread.rs`): Connected, Data, Disconnected, Error.
 - `WsEvent` (`enum`, `net_thread.rs`): Open, Text, Binary, Close, Error.
+- `NetworkRuntime` (`struct`, `net_thread.rs`): Background I/O thread with mpsc channel bridge.
 - `TcpConnectionManager` (`struct`, `tcp.rs`): Manages multiple non-blocking TCP connections.
 - `WebSocketManager` (`struct`, `websocket.rs`): Manages multiple WebSocket connections.
 
 ## Functions
 
-### host.rs
-- `NetworkHost::new`: Create a new ENet host bound to `bind_addr`.
-- `NetworkHost::create_server`: Create a host bound to port with HostRole::Server.
-- `NetworkHost::create_client`: Create a host, connect, and set HostRole::Client.
-- `NetworkHost::role`: Get the current HostRole.
-- `NetworkHost::set_role`: Override the HostRole.
-- `NetworkHost::service`: Poll for one network event.
-- `NetworkHost::connect`: Initiate a connection to a remote host.
-- `NetworkHost::send` / `send_bytes`: Send data to a specific peer.
-- `NetworkHost::broadcast` / `broadcast_bytes`: Broadcast to all connected peers.
-- `NetworkHost::flush`: Flush all queued packets.
-- `NetworkHost::disconnect` / `disconnect_now` / `disconnect_later` / `reset_peer`: Peer disconnect variants.
-- `NetworkHost::ping` / `round_trip_time` / `peer_state` / `peer_address`: Peer inspection.
-- `NetworkHost::local_address` / `peer_limit` / `channel_limit` / `set_channel_limit`: Host config.
-- `NetworkHost::bandwidth_limit` / `set_bandwidth_limit` / `connected_peer_count` / `connected_peer_ids` / `peer_stats`: Stats and limits.
-- `NetworkHost::destroy` / `is_destroyed`: Lifecycle.
-
-### message.rs
-- `pack(value: &NetValue) → Result<Vec<u8>>`: Serialize to MessagePack bytes.
-- `unpack(data: &[u8]) → Result<NetValue>`: Deserialize from MessagePack bytes.
-- `estimate_size(value: &NetValue) → usize`: Estimate serialized size.
-
-### net_thread.rs
-- `NetworkRuntime::new() → Result<Self, String>`: Spawn background I/O thread.
-- `NetworkRuntime::send(request)`: Queue a request to the background thread.
-- `NetworkRuntime::poll() → Vec<NetworkResponse>`: Drain completed responses.
-- `NetworkRuntime::shutdown()`: Signal thread to stop and join.
-- Convenience: `http_request`, `tcp_connect`, `tcp_send`, `tcp_close`, `ws_connect`, `ws_send`, `ws_close`.
-
-### http.rs
-- `execute_request(method, url, headers, body, timeout_secs) → HttpResponse`: Blocking HTTP call (runs on network thread).
-
-### tcp.rs
-- `TcpConnectionManager::connect` / `send` / `close` / `poll_all` / `close_all`: TCP connection management.
-
-### websocket.rs
-- `WebSocketManager::connect` / `send` / `close` / `poll_all` / `close_all`: WebSocket connection management.
+- `NetworkHost::new` (`host.rs`): Create a new ENet host bound to `bind_addr`.
+- `NetworkHost::service` (`host.rs`): Poll for one network event.
+- `NetworkHost::connect` (`host.rs`): Initiate a connection to a remote host.
+- `NetworkHost::send` (`host.rs`): Send a packet to a specific peer.
+- `NetworkHost::send_bytes` (`host.rs`): Send raw bytes to a specific peer with a reliability flag.
+- `NetworkHost::broadcast` (`host.rs`): Broadcast a packet to all connected peers.
+- `NetworkHost::broadcast_bytes` (`host.rs`): Broadcast raw bytes to all connected peers with a reliability flag.
+- `NetworkHost::flush` (`host.rs`): Flush all queued packets without waiting for the next `service()`.
+- `NetworkHost::disconnect` (`host.rs`): Request graceful disconnection from a peer.
+- `NetworkHost::disconnect_now` (`host.rs`): Immediately disconnect a peer without handshake.
+- `NetworkHost::disconnect_later` (`host.rs`): Disconnect a peer after all queued packets have been sent.
+- `NetworkHost::reset_peer` (`host.rs`): Reset a peer connection immediately without notifying the remote side.
+- `NetworkHost::ping` (`host.rs`): Send a ping to a peer to measure RTT.
+- `NetworkHost::round_trip_time` (`host.rs`): Get the round-trip time estimate for a peer.
+- `NetworkHost::peer_state` (`host.rs`): Get the connection state of a peer as a string.
+- `NetworkHost::peer_address` (`host.rs`): Get the remote address of a peer.
+- `NetworkHost::local_address` (`host.rs`): Get the local bind address.
+- `NetworkHost::peer_limit` (`host.rs`): Get the number of allocated peer slots.
+- `NetworkHost::channel_limit` (`host.rs`): Get the channel limit.
+- `NetworkHost::set_channel_limit` (`host.rs`): Set the channel limit for future connections.
+- `NetworkHost::bandwidth_limit` (`host.rs`): Get the bandwidth limits.
+- `NetworkHost::set_bandwidth_limit` (`host.rs`): Set bandwidth limits.
+- `NetworkHost::connected_peer_count` (`host.rs`): Get the number of currently connected peers.
+- `NetworkHost::destroy` (`host.rs`): Destroy the host, closing the underlying socket.
+- `NetworkHost::is_destroyed` (`host.rs`): Returns `true` if the host has been destroyed.
+- `NetworkHost::connected_peer_ids` (`host.rs`): Get the IDs of all currently connected peers.
+- `NetworkHost::create_server` (`host.rs`): Create a server host that binds to a port and accepts connections.
+- `NetworkHost::create_client` (`host.rs`): Create a client host that connects to a remote server.
+- `NetworkHost::role` (`host.rs`): Get the multiplayer role of this host.
+- `NetworkHost::set_role` (`host.rs`): Set the multiplayer role of this host.
+- `NetworkHost::peer_stats` (`host.rs`): Get per-peer statistics.
+- `execute_request` (`http.rs`): Execute an HTTP request synchronously (called from the network thread).
+- `pack` (`message.rs`): Serialize a [`NetValue`] to MessagePack bytes.
+- `unpack` (`message.rs`): Deserialize MessagePack bytes into a [`NetValue`].
+- `estimate_size` (`message.rs`): Estimate the serialized size of a [`NetValue`] without allocating.
+- `NetworkRuntime::new` (`net_thread.rs`): Create a new `NetworkRuntime`, spawning the background I/O thread.
+- `NetworkRuntime::next_request_id` (`net_thread.rs`): Generate the next unique request ID.
+- `NetworkRuntime::send` (`net_thread.rs`): Send a request to the network thread.
+- `NetworkRuntime::poll` (`net_thread.rs`): Drain all completed responses from the network thread.
+- `NetworkRuntime::shutdown` (`net_thread.rs`): Shut down the network thread gracefully.
+- `NetworkRuntime::is_running` (`net_thread.rs`): Returns `true` if the background thread is still alive.
+- `NetworkRuntime::http_request` (`net_thread.rs`): Send an HTTP request to the network thread.
+- `NetworkRuntime::tcp_connect` (`net_thread.rs`): Open a TCP connection on the network thread.
+- `NetworkRuntime::tcp_send` (`net_thread.rs`): Send data on a TCP connection.
+- `NetworkRuntime::tcp_close` (`net_thread.rs`): Close a TCP connection.
+- `NetworkRuntime::ws_connect` (`net_thread.rs`): Open a WebSocket connection on the network thread.
+- `NetworkRuntime::ws_send` (`net_thread.rs`): Send a text message on a WebSocket connection.
+- `NetworkRuntime::ws_close` (`net_thread.rs`): Close a WebSocket connection.
+- `TcpConnectionManager::new` (`tcp.rs`): Create a new empty connection manager.
+- `TcpConnectionManager::connect` (`tcp.rs`): Open a new TCP connection to the given address.
+- `TcpConnectionManager::send` (`tcp.rs`): Send data on an existing TCP connection.
+- `TcpConnectionManager::close` (`tcp.rs`): Close a TCP connection.
+- `TcpConnectionManager::poll_all` (`tcp.rs`): Poll all active connections for incoming data.
+- `TcpConnectionManager::close_all` (`tcp.rs`): Close all active TCP connections.
+- `WebSocketManager::new` (`websocket.rs`): Create a new empty WebSocket manager.
+- `WebSocketManager::connect` (`websocket.rs`): Open a new WebSocket connection.
+- `WebSocketManager::send` (`websocket.rs`): Send data on an existing WebSocket connection.
+- `WebSocketManager::close` (`websocket.rs`): Close a WebSocket connection with a close frame.
+- `WebSocketManager::poll_all` (`websocket.rs`): Poll all active WebSocket connections for incoming messages.
+- `WebSocketManager::close_all` (`websocket.rs`): Close all active WebSocket connections.
 
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/network_api.rs`
 - Namespace: `lurek.network`
 
-### Module Functions & Constants
-- `lurek.network.MAX_PEERS`: Maximum supported peer slots (4096).
-- `lurek.network.DEFAULT_PEERS`: Default peer-slot count (16).
-- `lurek.network.MAX_CHANNELS`: Maximum ENet channels (255).
-- `lurek.network.DEFAULT_CHANNELS`: Default channel count (2).
-- `lurek.network.newHost(opts)`: Creates a raw ENet host.
-- `lurek.network.newServer(opts)`: Creates a server host (role = "server"). `opts.port` required.
-- `lurek.network.newClient(opts)`: Creates a client host (role = "client"). `opts.addr` required.
-- `lurek.network.newRuntime()`: Creates a background I/O runtime with HTTP, TCP, WebSocket.
-- `lurek.network.pack(value)`: Serialize a Lua value to MessagePack binary string.
-- `lurek.network.unpack(data)`: Deserialize a MessagePack binary string to a Lua value.
+### Module Functions
+- `lurek.network.newHost`: Creates a new network host bound to the given address.
+- `lurek.network.newServer`: Creates a server host that binds to a port and accepts connections.
+- `lurek.network.newClient`: Creates a client host that connects to a remote server.
+- `lurek.network.newRuntime`: Creates a background network runtime for async HTTP, TCP, and WebSocket.
+- `lurek.network.pack`: Serializes a Lua value to a binary MessagePack string.
+- `lurek.network.unpack`: Deserializes a MessagePack binary string back to a Lua value.
 
 ### `NetworkHost` Methods
-- `:service()` → event table or nil
-- `:connect(addr, channels?, data?) → peer_id`
-- `:send(peer_id, channel, data, reliable?)`
-- `:broadcast(channel, data, reliable?)`
-- `:flush()`
-- `:disconnect(peer_id, data?)`
-- `:disconnectNow(peer_id, data?)`
-- `:disconnectLater(peer_id, data?)`
-- `:resetPeer(peer_id)`
-- `:ping(peer_id)`
-- `:getRoundTripTime(peer_id) → ms`
-- `:getPeerState(peer_id) → string`
-- `:getPeerAddress(peer_id) → string|nil`
-- `:getAddress() → string`
-- `:getPeerLimit() → number`
-- `:getChannelLimit() → number`
-- `:setChannelLimit(n)`
-- `:getBandwidthLimit() → {incoming, outgoing}`
-- `:setBandwidthLimit(in?, out?)`
-- `:getConnectedPeerCount() → number`
-- `:getConnectedPeerIds() → table`
-- `:getPeerStats(peer_id) → table`
-- `:getRole() → "server"|"client"|"host"`
-- `:isServer() → bool`
-- `:isClient() → bool`
-- `:destroy()`
-- `:isDestroyed() → bool`
+- `NetworkHost:service`: Polls the network for one event, returning an event table or nil.
+- `NetworkHost:flush`: Flushes all pending sends immediately.
+- `NetworkHost:disconnect`: Gracefully disconnects a peer.
+- `NetworkHost:disconnectNow`: Immediately disconnects a peer without handshake.
+- `NetworkHost:resetPeer`: Resets a peer connection immediately without notifying the remote side.
+- `NetworkHost:ping`: Sends a ping to a peer to measure round-trip time.
+- `NetworkHost:getRoundTripTime`: Returns the round-trip time estimate for a peer in milliseconds.
+- `NetworkHost:getPeerState`: Returns the connection state of a peer as a string.
+- `NetworkHost:getPeerAddress`: Returns the remote address of a peer, or nil if unavailable.
+- `NetworkHost:getAddress`: Returns the local bind address as a string.
+- `NetworkHost:getPeerLimit`: Returns the maximum number of peer slots.
+- `NetworkHost:getChannelLimit`: Returns the maximum number of channels per connection.
+- `NetworkHost:setChannelLimit`: Sets the channel limit for future connections.
+- `NetworkHost:getBandwidthLimit`: Returns the bandwidth limits as a table with incoming and outgoing fields.
+- `NetworkHost:getConnectedPeerCount`: Returns the number of currently connected peers.
+- `NetworkHost:getConnectedPeerIds`: Returns a table of connected peer IDs.
+- `NetworkHost:getPeerStats`: Returns a statistics table for a peer.
+- `NetworkHost:destroy`: Destroys the host, closing the underlying socket.
+- `NetworkHost:isDestroyed`: Returns true if the host has been destroyed.
+- `NetworkHost:getRole`: Returns the multiplayer role of this host ("server", "client", or "host").
+- `NetworkHost:isServer`: Returns true if this host was created as a server.
+- `NetworkHost:isClient`: Returns true if this host was created as a client.
 
 ### `NetworkRuntime` Methods
-- `:httpGet(url, headers?) → request_id`
-- `:httpPost(url, body, headers?) → request_id`
-- `:httpRequest(opts) → request_id` — opts: method, url, headers, body, timeout
-- `:tcpConnect(addr) → connection_id`
-- `:tcpSend(id, data)`
-- `:tcpClose(id)`
-- `:wsConnect(url) → connection_id`
-- `:wsSend(id, data)`
-- `:wsClose(id)`
-- `:poll() → table` — array of event tables
-- `:shutdown()`
-
-### Poll Event Shapes
-```lua
--- HTTP
-{ type="http", request_id=1, status=200, body="...", headers={}, error=nil }
-
--- TCP
-{ type="tcp", id=1, event="connected"|"data"|"disconnected"|"error", data="..." }
-
--- WebSocket
-{ type="websocket", id=1, event="open"|"text"|"binary"|"close"|"error", data="..." }
-```
-
-## Lunasome Libraries
-
-Three pure-Lua libraries in `content/library/` build on `lurek.network`:
-
-- **`rpc`** — Remote procedure calls with register/call/notify/broadcast and request/response pattern.
-- **`lobby`** — Room management with create/join/leave, player tracking, ready-check coordination.
-- **`netstate`** — Authority-based state synchronization with change callbacks, delta sync, and turn-based game support.
+- `NetworkRuntime:httpRequest`: Sends an HTTP request asynchronously. Poll with `poll()` for the response.
+- `NetworkRuntime:tcpConnect`: Opens a TCP connection to a remote address.
+- `NetworkRuntime:tcpSend`: Sends data over a TCP connection.
+- `NetworkRuntime:tcpClose`: Closes a TCP connection.
+- `NetworkRuntime:wsConnect`: Opens a WebSocket connection.
+- `NetworkRuntime:wsSend`: Sends a text message over a WebSocket connection.
+- `NetworkRuntime:wsClose`: Closes a WebSocket connection.
+- `NetworkRuntime:poll`: Polls for completed async responses (HTTP, TCP events, WebSocket events).
+- `NetworkRuntime:shutdown`: Shuts down the background network thread.
 
 ## References
 
 - `runtime`: Imports runtime config from `src/runtime/`.
-- `rusty_enet`: ENet reliable UDP transport (Cargo dep).
-- `ureq`: HTTP client (Cargo dep).
-- `tungstenite`: WebSocket client (Cargo dep).
-- `rmp-serde`: MessagePack serialization (Cargo dep).
 
 ## Notes
 

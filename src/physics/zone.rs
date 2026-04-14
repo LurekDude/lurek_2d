@@ -143,6 +143,9 @@ pub enum ZoneBoundary {
 impl ZoneBoundary {
     /// Returns `true` when `(px, py)` lies inside this boundary.
     ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// # Parameters
     /// - `px` — Point X (world pixels).
     /// - `py` — Point Y (world pixels).
@@ -328,6 +331,9 @@ impl PhysicsZone {
 
     /// Returns `true` when position `(px, py)` lies inside the zone boundary.
     ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// # Parameters
     /// - `px` — Query X (world pixels).
     /// - `py` — Query Y (world pixels).
@@ -355,6 +361,9 @@ pub struct ZoneTracker {
 
 impl ZoneTracker {
     /// Creates an empty tracker.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new() -> Self {
         Self {
             body_zones: HashMap::new(),

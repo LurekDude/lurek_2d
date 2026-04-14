@@ -19,11 +19,6 @@
 
 ## Summary
 
-Write several paragraphs of plain text covering the module's overall purpose,
-scope boundary, and why its current responsibilities belong here. Start from
-the old AGENT.md purpose text when migrating, then expand it manually using the
-actual source code for this module.
-
 ## Files
 
 - `mod.rs`: Module root and re-export surface.

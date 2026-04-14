@@ -4,21 +4,28 @@
 
 - Module group: `Feature Systems.`
 - Source path: `src/sprite/`
-- Lua API path(s): None direct
-- Primary Lua namespace: None direct
+- Lua API path(s): `src/lua_api/sprite_api.rs`
+- Primary Lua namespace: `lurek.sprite`
 - Rust test path(s): none found in the workspace
 - Lua test path(s): none found in the workspace
 
 ## Summary
 
-The sprite module owns the engine's sprite-domain data types without taking ownership of the GPU backend. It exists so gameplay, UI, animation, and render-facing code can share a stable set of structs for single sprites, sprite batches, sprite sheets, and scalable nine-slice panels.
+The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. It is a Feature Systems tier module sitting above the `render` command queue, providing higher-level game-graphics abstractions rather than raw draw calls.
 
-Its boundary is deliberately CPU-side: these types hold transforms, atlas regions, batch entries, and patch geometry, but they do not issue draw calls themselves. Rendering, texture loading, and shader execution stay in other modules, while `src/sprite/` remains the place to change sprite layout rules and batching data contracts.
+`Sprite` is an individually positioned, scaled, rotated, and tinted image quad. It wraps a `TextureKey`, `Rect` source region, position, rotation, scale, tint color, blend mode, and Z-order. Calling `draw()` pushes a `RenderCommand::DrawImage` into `SharedState`'s pending draw list.
 
-**Scope boundary**: This module currently depends on `math`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`SpriteBatch` groups sprites sharing one texture into a single GPU draw call, essential for rendering large numbers of similar game objects (bullets, particles, crowd NPCs) efficiently. Instances are added via `batch:add(x, y, src, opts)`, accumulating in a pre-allocated `Vec<SpriteInstance>`. The batch emits one `RenderCommand::DrawSpriteBatch` per flush, which `GpuRenderer` handles as a single instanced draw call. The instance list is cleared at the start of each frame.
+
+`SpriteSheet` maps named string frames to UV rectangles within a single texture, loaded from a JSON manifest. `SpriteAtlas` imports TexturePacker-format JSON exports with `AtlasEntry` records (trimmed bounds, source size, pivot point, nine-patch flags) for packed atlas sheets with per-sprite metadata.
+
+`NineSlice` renders scalable nine-patch textures — partitioning a source texture into a 3×3 grid of corner, edge, and center regions — for resizable UI panels and dialog boxes without visible stretch artifacts.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/sprite_api.rs`.
 
 ## Files
 
+- `atlas.rs`: TexturePacker JSON atlas importer and named region lookup.
 - `mod.rs`: Module root and re-export surface for the public sprite-related types.
 - `nine_slice.rs`: Nine-slice descriptor and patch computation for scalable UI panels and borders.
 - `sprite.rs`: Single sprite data with transform and tint information around a texture identifier.
@@ -27,6 +34,8 @@ Its boundary is deliberately CPU-side: these types hold transforms, atlas region
 
 ## Types
 
+- `AtlasEntry` (`struct`, `atlas.rs`): A single named region within a sprite atlas.
+- `SpriteAtlas` (`struct`, `atlas.rs`): In-memory sprite atlas built from a TexturePacker JSON export.
 - `Patch` (`type`, `nine_slice.rs`): One computed source/destination rectangle tuple produced by a nine-slice layout.
 - `NineSlice` (`struct`, `nine_slice.rs`): Scalable panel descriptor built from one texture plus four insets.
 - `Sprite` (`struct`, `sprite.rs`): Smallest textured sprite unit with position, scale, rotation, and tint.
@@ -38,6 +47,13 @@ Its boundary is deliberately CPU-side: these types hold transforms, atlas region
 
 ## Functions
 
+- `SpriteAtlas::new` (`atlas.rs`): Creates an empty atlas.
+- `SpriteAtlas::add_entry` (`atlas.rs`): Adds a region to the atlas.
+- `SpriteAtlas::get_entry` (`atlas.rs`): Returns the region with the given name, or `None`.
+- `SpriteAtlas::get_by_index` (`atlas.rs`): Returns the region at the given index, or `None`.
+- `SpriteAtlas::entry_count` (`atlas.rs`): Returns the number of regions in the atlas.
+- `SpriteAtlas::entry_names` (`atlas.rs`): Returns all region names in insertion order.
+- `parse_texturepacker_json` (`atlas.rs`): Parses a TexturePacker JSON export string and returns a [`SpriteAtlas`].
 - `NineSlice::new` (`nine_slice.rs`): Creates a new nine-slice definition.
 - `NineSlice::patches` (`nine_slice.rs`): Returns the 9 source and destination rectangles for rendering.
 - `Sprite::new` (`sprite.rs`): Creates a new `Sprite` at `position` using the texture identified by `texture_id`.
@@ -66,13 +82,41 @@ Its boundary is deliberately CPU-side: these types hold transforms, atlas region
 - `SpriteSheet::get_group_names` (`sprite_sheet.rs`): Return the names of all defined groups.
 - `SpriteSheet::set_directions` (`sprite_sheet.rs`): Set the directional mode (4 or 8 directions) and layout.
 - `SpriteSheet::get_direction_frames` (`sprite_sheet.rs`): Return the frame quads for a 0-based direction index.
+- `SpriteSheet::draw_to_image` (`sprite_sheet.rs`): Renders the sprite-sheet grid into a new `ImageData` as a colour-coded debug view.
+- `SpriteSheet::from_rpgmaker` (`sprite_sheet.rs`): Builds an RPGMaker VX/Ace-style 3-column × 4-row character sprite sheet.
+- `SpriteSheet::from_atlas` (`sprite_sheet.rs`): Builds a sprite sheet whose frame quads are sourced from named entries in a [`SpriteAtlas`].
 
 ## Lua API Reference
 
-- No dedicated direct `lurek.*` namespace is exposed by this module.
+- Binding path(s): `src/lua_api/sprite_api.rs`
+- Namespace: `lurek.sprite`
+
+### Module Functions
+- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w × frame_h` frames.
+- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols × 4 rows) with "down", "left", "right", "up" groups.
+- `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
+- `lurek.sprite.newAtlasSheet`: Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
+
+### `SpriteAtlas` Methods
+- `SpriteAtlas:getEntry`: Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
+- `SpriteAtlas:getByIndex`: Returns the region at the given 1-based insertion index, or nil.
+- `SpriteAtlas:entryCount`: Returns the total number of named regions in the atlas.
+- `SpriteAtlas:entryNames`: Returns a sequential table of all region names.
+
+### `SpriteSheet` Methods
+- `SpriteSheet:getFrame`: Returns the quad for the 0-based frame index, or nil if out of range.
+- `SpriteSheet:getFrameCount`: Returns the total number of frames in the sheet.
+- `SpriteSheet:getRow`: Returns a sequential table of quad tables for every frame in the given row.
+- `SpriteSheet:getColumn`: Returns a sequential table of quad tables for every frame in the given column.
+- `SpriteSheet:getGroupFrames`: Returns a sequential table of quad tables for the named frame group, or nil.
+- `SpriteSheet:getGroupNames`: Returns a sequential table of all defined group names.
+- `SpriteSheet:getFrameSize`: Returns the width and height of a single frame cell in pixels.
+- `SpriteSheet:getGridSize`: Returns the number of columns and rows in the grid.
+- `SpriteSheet:drawToImage`: Renders the sheet grid as a debug view into a new ImageData.
 
 ## References
 
+- `image`: Imports or references `src/image/`. Cross-group dependency from ``Feature Systems.`` into `Platform Services`.
 - `math`: Imports or references `math` from `src/math/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 

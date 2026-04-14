@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `raycaster` module provides Lurek2D's retro first-person and dungeon-view geometry stack. It owns DDA grid traversal, segment ray tests, visibility computation, billboard projection, per-column depth information, optional lighting and door helpers, and scene construction for textured-quad output.
+The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenstein-style first-person dungeon-crawler and retro FPS games. It provides all the building blocks for rendering a 3D-looking scene from a 2D grid using textured wall columns, billboard sprites, lighting, doors, floor/ceiling variation, and screen-space visibility.
 
-It exists so scripts can build Wolfenstein-style or dungeon-crawler views using deterministic CPU-side math instead of relying on a full 3D engine. The module focuses on spatial queries and projection results that can later be rendered by the Lua bridge or the render system.
+`Raycaster2D` is the core DDA (Digital Differential Analyzer) traversal type. Given a player position, direction, and a 2D grid of tile IDs, it casts a horizontal array of rays — one per screen column — and returns a `Vec<RayHit>`, where each `RayHit` carries the grid cell coordinates, the struck face (North/South/East/West), the hit offset along the face (for texture UV mapping), and the perpendicular distance from the camera plane.
 
-It intentionally does not own GPU setup, camera input policy, texture management, or general scene orchestration. It produces hits, projected columns, and scene quads; rendering those results remains outside the module.
+`DepthBuffer` records perpendicular depth per screen column for sprite occlusion testing. `project_column(dist, height)` converts a perpendicular distance into a projected wall column pixel height with a `distance_shade` falloff factor. `ColumnBatch` assembles the per-column draw data into instanced-quad render commands for a single GPU draw call.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`SpriteProjection` projects billboarded textured sprites into screen space with depth buffer clipping. `DoorManager` manages sliding door states (open, closed, opening, closing) for grid-blocking interactive geometry. `HeightMap` adds variable floor and ceiling heights for stepped or multi-level environments. `visibility.rs` computes a 2D visibility polygon via endpoint raycasting for field-of-view shadows. The `segment` submodule provides `Segment` and a general `cast_ray_2d` line-segment intersection test.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/raycaster_api.rs`.
 
 ## Files
 
@@ -139,6 +141,35 @@ It intentionally does not own GPU setup, camera input policy, texture management
 - `lurek.raycaster.new`: Creates a new raycaster grid of the given dimensions.
 - `lurek.raycaster.projectColumn`: Projects a wall distance to screen-space drawing parameters.
 - `lurek.raycaster.distanceShade`: Returns distance-based brightness in [0, 1].
+- `lurek.raycaster.newDoorManager`: Creates a new empty door manager.
+- `lurek.raycaster.newHeightMap`: Creates a new height map with default floor (0.0) and ceiling (1.0) values.
+- `lurek.raycaster.newPointLight`: Creates a point light for use in raycaster scene lighting.
+
+### `DoorManager` Methods
+- `DoorManager:openDoor`: Begins opening the door at the given index.
+- `DoorManager:closeDoor`: Begins closing the door at the given index.
+- `DoorManager:update`: Advances all door animations by dt seconds.
+- `DoorManager:getDoor`: Returns the state table for door at index, or nil if out of range.
+- `DoorManager:count`: Returns the number of registered doors.
+- `DoorManager:type`: Returns the type string "DoorManager".
+- `DoorManager:typeOf`: Returns the type string "DoorManager".
+
+### `HeightMap` Methods
+- `HeightMap:setFloor`: Sets the floor height at (x, y).
+- `HeightMap:setCeiling`: Sets the ceiling height at (x, y).
+- `HeightMap:floorAt`: Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
+- `HeightMap:ceilingAt`: Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
+- `HeightMap:type`: Returns the type string "HeightMap".
+- `HeightMap:typeOf`: Returns the type string "HeightMap".
+
+### `PointLight` Methods
+- `PointLight:x`: Returns the world-space X position.
+- `PointLight:y`: Returns the world-space Y position.
+- `PointLight:radius`: Returns the illumination radius.
+- `PointLight:intensity`: Returns the intensity multiplier.
+- `PointLight:color`: Returns the RGB color as three separate values.
+- `PointLight:type`: Returns the type string "PointLight".
+- `PointLight:typeOf`: Returns the type string "PointLight".
 
 ### `Raycaster` Methods
 - `Raycaster:setCell`: Sets the cell value at grid position (x, y).
@@ -154,46 +185,6 @@ It intentionally does not own GPU setup, camera input policy, texture management
 - `math`: Imports or references `math` from `src/math/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
-
-## Extended Lua Factory API (v0.7.26)
-
-Three new factory functions and `UserData` types added to `lurek.raycaster` in v0.7.26.
-
-### DoorManager
-
-`lurek.raycaster.newDoorManager()` → `DoorManager` userdata.
-
-| Method      | Signature                      | Description                                                                |
-| ----------- | ------------------------------ | -------------------------------------------------------------------------- |
-| `addDoor`   | `(x, y, dir, speed) → integer` | Register a door. `dir` = `"horizontal"` or `"vertical"`. Returns an index. |
-| `openDoor`  | `(index)`                      | Begin opening door at index.                                               |
-| `closeDoor` | `(index)`                      | Begin closing door at index.                                               |
-| `update`    | `(dt)`                         | Advance all door animations by `dt` seconds.                               |
-| `getDoor`   | `(index) → table\|nil`         | Returns `{x, y, openAmount, state}` or nil if out of range.                |
-| `count`     | `() → integer`                 | Number of registered doors.                                                |
-
-### HeightMap
-
-`lurek.raycaster.newHeightMap(width, height)` → `HeightMap` userdata.
-
-| Method       | Signature         | Description                                         |
-| ------------ | ----------------- | --------------------------------------------------- |
-| `setFloor`   | `(x, y, h)`       | Set floor height at grid cell (x, y).               |
-| `setCeiling` | `(x, y, h)`       | Set ceiling height at grid cell (x, y).             |
-| `floorAt`    | `(x, y) → number` | Read floor height. Returns 0.0 for out-of-bounds.   |
-| `ceilingAt`  | `(x, y) → number` | Read ceiling height. Returns 1.0 for out-of-bounds. |
-
-### PointLight
-
-`lurek.raycaster.newPointLight(x, y, r, g, b, radius, intensity)` → `PointLight` userdata.
-
-| Method                                  | Description                       |
-| --------------------------------------- | --------------------------------- |
-| `x()`, `y()`                            | World-space position.             |
-| `radius()`                              | Maximum illumination radius.      |
-| `intensity()`                           | Brightness multiplier.            |
-| `color()`                               | Returns `r, g, b` (three values). |
-| `set(x, y, r, g, b, radius, intensity)` | Update all fields at once.        |
 
 ## Notes
 

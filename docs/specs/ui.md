@@ -11,13 +11,15 @@
 
 ## Summary
 
-The `ui` module provides Lurek2D's retained-mode widget system for in-game menus, HUD panels, tool windows, dialogs, forms, data displays, and other 2D interface work. It stores widgets as CPU-side data, applies theme styling, manages focus and widget relationships, and produces render commands for the actual draw layer.
+The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game developers to build full user interfaces from a rich library of composed widgets without writing draw calls manually. All rendering is deferred through the `RenderCommand` queue.
 
-It exists so interface logic, widget composition, and layout behavior stay decoupled from game scripts and from the renderer. Scripts can assemble and drive UI state through the Lua bridge, while the Rust module owns the widget model, type-erased context, theme lookup, and shared behavior.
+`GuiContext` is the root container: it owns the root `Panel`, manages keyboard focus tracking, routes input events to the focused widget, and processes a toast notification queue. All widgets inherit `WidgetBase`, which stores position, size, visibility, enabled state, Z-order, padding, margin, anchor constraints, and flexbox layout properties.
 
-It intentionally does not own native OS widgets, window management, or raw input capture from the platform layer. It also does not rasterize fonts itself beyond delegating draw output; input events are routed into it by higher layers.
+**Containers**: `Panel` (generic layout container), `ScrollPanel` (scrollable content with scrollbar), `DockPanel` (edge-docked child layout), `SplitPanel` (resizable split), `GUIWindow` (moveable, closeable dialog frame). **Controls**: `Button`, `Label`, `TextInput` (with placeholder, cursor, selection), `CheckBox`, `RadioButton`, `Slider`, `ProgressBar`, `ComboBox`, `ListBox`, `TabBar`, `SpinBox`, `Switch`, `ScrollBar`. **Additional widgets**: `Toast` (auto-dismissing notification banner), `TreeView` + `TreeNode` (collapsible hierarchy), `Dialog` (modal dialog with buttons), `MenuBar` + `MenuItem` (top bar dropdowns), `ColorPicker`, `Badge` (count overlay), `Accordion` (collapsible sections), `Toolbar`, `StatusBar`, `Tooltip`, `GUITable` (editable data grid), `ImageWidget`.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`Theme` drives visual appearance: it maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records (background color, foreground color, font key, font size, border color, corner radius, padding). The `chart` submodule adds `GraphRenderer` for inline data visualizations (line charts, bar charts, pie charts) within the UI tree.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/ui_api.rs`.
 
 ## Files
 
@@ -68,6 +70,8 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `TabBar` (`struct`, `controls.rs`): Tabbed page selector widget.
 - `RadioButton` (`struct`, `controls.rs`): A grouped radio button with mutually exclusive selection.
 - `ScrollBar` (`struct`, `controls.rs`): A scroll bar for scrollable content areas.
+- `SpinBox` (`struct`, `controls.rs`): A numeric spin box: a text field with increment and decrement buttons.
+- `Switch` (`struct`, `controls.rs`): A binary toggle switch rendered as a pill with a sliding thumb.
 - `GraphSeries` (`enum`, `data_graph_renderer.rs`): A data series that can be added to a [`GraphRenderer`].
 - `GraphRenderer` (`struct`, `data_graph_renderer.rs`): Data visualization helper for graph and series rendering.
 - `Toast` (`struct`, `extras.rs`): Timed transient notification.
@@ -88,16 +92,12 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `TableColumn` (`struct`, `extras.rs`): A single column in a [`GUITable`].
 - `GUITable` (`struct`, `extras.rs`): A data table widget with sortable columns and selectable rows.
 - `ImageWidget` (`struct`, `extras.rs`): An image display widget.
+- `Badge` (`struct`, `extras.rs`): A notification badge displaying a numeric count or short label.
 - `WidgetStyle` (`struct`, `theme.rs`): A concrete set of colors, borders, radius, and font-size values used by theme lookup.
 - `Theme` (`struct`, `theme.rs`): Stores widget styles keyed by widget type and state so the same UI tree can be skinned consistently.
 - `WidgetState` (`enum`, `widget.rs`): Encodes common UI states such as normal, hovered, pressed, focused, and disabled.
 - `WidgetType` (`enum`, `widget.rs`): Identifies the broad widget class for styling and state-dependent behavior.
 - `WidgetBase` (`struct`, `widget.rs`): Shared geometry, visibility, spacing, anchoring, and flex-like metadata embedded in every widget.
-
-## Lua API Reference Additions
-
-- `lurek.ui.parseWidgetState`: Parses a widget state string and returns the canonical lowercase state name or `nil` for invalid input.
-- `widget:getChildren`: Returns a table of child widget-handle tables for container-style widgets.
 
 ## Functions
 
@@ -169,6 +169,12 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `GuiContext::add_color_picker` (`context.rs`): Add a color picker and return its pool index.
 - `GuiContext::add_gui_table` (`context.rs`): Add a GUI table and return its pool index.
 - `GuiContext::add_image_widget` (`context.rs`): Add an image widget and return its pool index.
+- `GuiContext::add_spin_box` (`context.rs`): Add a spin box and return its pool index.
+- `GuiContext::add_switch` (`context.rs`): Add a toggle switch and return its pool index.
+- `GuiContext::add_badge` (`context.rs`): Add a badge and return its pool index.
+- `GuiContext::set_default_theme` (`context.rs`): Install the built-in dark theme as the active theme.
+- `GuiContext::set_viewport` (`context.rs`): Set the logical viewport size (used for anchoring and relative layout).
+- `GuiContext::flush_cache` (`context.rs`): Mark the render cache as clean and return `true` if the context was dirty.
 - `GuiContext::add_child` (`context.rs`): Add `child_idx` as a child of the container at `parent_idx`.
 - `GuiContext::remove_child` (`context.rs`): Remove `child_idx` from the container at `parent_idx`.
 - `GuiContext::child_count` (`context.rs`): Count the children of a container widget.
@@ -210,6 +216,14 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `TabBar::remove_tab` (`controls.rs`): Remove a tab at the given 0-based index.
 - `RadioButton::new` (`controls.rs`): Create a new radio button.
 - `ScrollBar::new` (`controls.rs`): Create a new scroll bar.
+- `SpinBox::new` (`controls.rs`): Create a new spin box with the given range.
+- `SpinBox::set_value` (`controls.rs`): Set the value, clamping to `[min, max]` and snapping to `step`.
+- `SpinBox::increment` (`controls.rs`): Increment the value by one step (clamped).
+- `SpinBox::decrement` (`controls.rs`): Decrement the value by one step (clamped).
+- `SpinBox::set_range` (`controls.rs`): Update the range, re-clamping the current value.
+- `Switch::new` (`controls.rs`): Create a new switch.
+- `Switch::toggle` (`controls.rs`): Toggle the switch state.
+- `Switch::set_on` (`controls.rs`): Set the switch state explicitly.
 - `GraphSeries::name` (`data_graph_renderer.rs`): Returns the series name regardless of variant.
 - `GraphRenderer::new` (`data_graph_renderer.rs`): Creates a new `GraphRenderer` with sensible defaults.
 - `GraphRenderer::set_viewport` (`data_graph_renderer.rs`): Sets the screen-pixel viewport for chart rendering.
@@ -280,6 +294,9 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `ColorPicker::new` (`extras.rs`): Create a new color picker.
 - `GUITable::new` (`extras.rs`): Create a new data table.
 - `ImageWidget::new` (`extras.rs`): Create a new image widget.
+- `Badge::new` (`extras.rs`): Create a new badge.
+- `Badge::display_text` (`extras.rs`): Return the text that should be rendered inside the badge.
+- `Badge::set_count` (`extras.rs`): Set the count.
 - `GuiContext::build_render_commands` (`render.rs`): Generate a flat list of [`RenderCommand`]s for the entire widget tree.
 - `GuiContext::generate_render_commands` (`render.rs`): Generate render commands using the default font key.
 - `GuiContext::draw_to_image` (`render.rs`): Render the widget tree to a CPU image for headless layout testing.
@@ -287,9 +304,12 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Theme::set_style` (`theme.rs`): Insert or replace a style entry for the given widget type and state.
 - `Theme::get_style` (`theme.rs`): Look up the style for a widget type and state.
 - `Theme::draw_button_states_to_image` (`theme.rs`): Renders a row of button states (Normal, Hovered, Pressed, Disabled) as styled boxes to an `ImageData` for evidence testing.
+- `Theme::default_dark` (`theme.rs`): Create a dark theme pre-loaded with styled entries for all standard widget types.
 - `WidgetState::parse_str` (`widget.rs`): Parse a state name string into a [`WidgetState`].
 - `WidgetState::as_str` (`widget.rs`): Return the lowercase name of this state.
 - `WidgetType::as_str` (`widget.rs`): Return the lowercase Lua-facing name of this widget type.
+- `WidgetType::parse_str` (`widget.rs`): Parse a lowercase widget-type name into a [`WidgetType`].
+- `WidgetType::default_size` (`widget.rs`): Return the default size `(width, height)` for this widget type on a 16 px grid.
 - `WidgetBase::new` (`widget.rs`): Create a new `WidgetBase` with default values for the given widget type.
 - `WidgetBase::contains_point` (`widget.rs`): Test whether a point `(px, py)` lies within this widget's bounding rectangle.
 - `WidgetBase::clear_anchors` (`widget.rs`): Clear all anchor constraints.
@@ -317,6 +337,7 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `lurek.ui.addChild`: Adds a child widget to this container.
 - `lurek.ui.removeChild`: Removes a child widget from this container.
 - `lurek.ui.getChildCount`: Returns the number of children in this container.
+- `lurek.ui.getChildren`: Returns this container's children as widget-handle tables.
 - `lurek.ui.findById`: Recursively searches for a widget by id starting from this widget.
 - `lurek.ui.setOnClick`: Registers a callback invoked when this widget is clicked.
 - `lurek.ui.setOnChange`: Registers a callback invoked when this widget's value changes.
@@ -348,6 +369,18 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Accordion:isExclusive`: Returns true if exclusive is enabled for this Accordion widget.
 - `Accordion:setExclusive`: Sets the exclusive for this Accordion widget.
 - `Accordion:getSectionTitle`: Returns the section title of this Accordion widget.
+
+### `AreaChart` Methods
+- `AreaChart:setYMax`: Sets the maximum Y value for axis scaling.
+- `AreaChart:drawToImage`: Renders the area chart into an existing ImageData.
+
+### `Badge` Methods
+- `Badge:setCount`: Sets the count displayed on this Badge widget.
+- `Badge:getCount`: Returns the raw count of this Badge widget.
+- `Badge:getDisplayText`: Returns the display text of this Badge widget, e.g. "99+" when over the max.
+
+### `BarChart` Methods
+- `BarChart:drawToImage`: Renders the bar chart into an existing ImageData.
 
 ### `Button` Methods
 - `Button:setText`: Sets the text for this Button widget.
@@ -480,6 +513,23 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Image_Widget:draw`: Headless compatibility stub for GUI draw.
 - `Image_Widget:getWidgetCount`: Returns the total widget count in the context.
 - `Image_Widget:drawToImage`: Renders the UI widget tree to a CPU ImageData at the given resolution.
+- `Image_Widget:newLineChart`: Creates a new line chart.
+- `Image_Widget:newBarChart`: Creates a new bar chart.
+- `Image_Widget:newScatterPlot`: Creates a new scatter plot.
+- `Image_Widget:newPieChart`: Creates a new pie chart.
+- `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
+- `Image_Widget:newLineChart`: Creates a new line chart.
+- `Image_Widget:newBarChart`: Creates a new bar chart.
+- `Image_Widget:newScatterPlot`: Creates a new scatter plot.
+- `Image_Widget:newPieChart`: Creates a new pie chart.
+- `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
+- `Image_Widget:parseWidgetState`: Parses a widget state string, returning the canonical form or nil if invalid.
+- `Image_Widget:newSpinBox`: Creates a numeric spin box widget with increment and decrement buttons.
+- `Image_Widget:newSwitch`: Creates a toggle switch widget.
+- `Image_Widget:newBadge`: Creates a badge widget displaying a numeric count.
+- `Image_Widget:setDefaultTheme`: Installs the built-in dark theme as the active GUI theme.
+- `Image_Widget:setViewport`: Sets the viewport dimensions used for anchor constraints and layout.
+- `Image_Widget:flushCache`: Returns true if the widget tree changed since the last call, then resets the flag.
 
 ### `Label` Methods
 - `Label:setText`: Sets the text for this Label widget.
@@ -497,6 +547,11 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Layout:getAlign`: Returns the align of this Layout widget.
 - `Layout:setJustify`: Sets the justify for this Layout widget.
 - `Layout:getJustify`: Returns the justify of this Layout widget.
+
+### `LineChart` Methods
+- `LineChart:setYMax`: Sets the maximum Y value for axis scaling.
+- `LineChart:setXMax`: Sets the maximum X value for axis scaling.
+- `LineChart:drawToImage`: Renders the line chart into an existing ImageData.
 
 ### `List_Box` Methods
 - `List_Box:addItem`: Adds a item entry to this List_Box widget.
@@ -537,6 +592,9 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Panel:getTitle`: Returns the title of this Panel widget.
 - `Panel:setScrollable`: Sets the scrollable for this Panel widget.
 
+### `PieChart` Methods
+- `PieChart:drawToImage`: Renders the pie chart into an existing ImageData.
+
 ### `Progress_Bar` Methods
 - `Progress_Bar:setValue`: Sets the value for this Progress_Bar widget.
 - `Progress_Bar:getValue`: Returns the value of this Progress_Bar widget.
@@ -553,6 +611,11 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Radio_Button:getGroup`: Returns the group of this Radio_Button widget.
 - `Radio_Button:setGroup`: Sets the group for this Radio_Button widget.
 - `Radio_Button:setOnChange`: Registers a callback invoked when this widget's value changes.
+
+### `ScatterPlot` Methods
+- `ScatterPlot:setXRange`: Sets the X-axis data range.
+- `ScatterPlot:setYRange`: Sets the Y-axis data range.
+- `ScatterPlot:drawToImage`: Renders the scatter plot into an existing ImageData.
 
 ### `Scroll_Bar` Methods
 - `Scroll_Bar:getScrollPosition`: Returns the scroll position of this Scroll_Bar widget.
@@ -587,6 +650,14 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Slider:getMin`: Returns the min of this Slider widget.
 - `Slider:getMax`: Returns the max of this Slider widget.
 
+### `Spin_Box` Methods
+- `Spin_Box:setValue`: Sets the value for this SpinBox widget.
+- `Spin_Box:getValue`: Returns the current value of this SpinBox widget.
+- `Spin_Box:increment`: Increments the value by one step.
+- `Spin_Box:decrement`: Decrements the value by one step.
+- `Spin_Box:setRange`: Sets the valid range for this SpinBox widget.
+- `Spin_Box:setStep`: Sets the increment step for this SpinBox widget.
+
 ### `Split_Panel` Methods
 - `Split_Panel:getOrientation`: Returns the orientation of this Split_Panel widget.
 - `Split_Panel:setOrientation`: Sets the orientation for this Split_Panel widget.
@@ -606,6 +677,11 @@ It intentionally does not own native OS widgets, window management, or raw input
 - `Status_Bar:getSectionCount`: Returns the section count of this Status_Bar widget.
 - `Status_Bar:setSectionCount`: Resizes the section list for this Status_Bar widget.
 - `Status_Bar:setSectionWidget`: Compatibility shim for assigning a widget to a section.
+
+### `Switch` Methods
+- `Switch:setOn`: Sets the on/off state of this Switch widget.
+- `Switch:isOn`: Returns the on/off state of this Switch widget.
+- `Switch:toggle`: Toggles the on/off state of this Switch widget.
 
 ### `Tab_Bar` Methods
 - `Tab_Bar:addTab`: Adds a tab entry to this Tab_Bar widget.

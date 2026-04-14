@@ -11,11 +11,15 @@
 
 ## Summary
 
-The particle module owns emitter-driven 2D particles and trail ribbons. It defines emitter configuration, particle spawning rules, lifetime interpolation, motion updates, trail point aging, and the render-command payloads that describe how those effects should be drawn.
+The `particle` module implements emitter-based 2D particle systems. A `ParticleSystem` manages a bounded pool of short-lived `Particle` instances, advancing position, velocity, lifetime, rotation, and visual properties each frame with Euler integration, and recycling dead particles to keep memory allocation bounded at `ParticleConfig::max_particles`.
 
-This module exists so transient visual effects can be expressed as reusable CPU simulations instead of one-off draw code. It decides how particles spawn, move, age, and fade, but it does not own gameplay triggers, scene membership, or GPU execution. The renderer consumes the batched particle and trail command data after this module has already produced the effect state.
+`ParticleConfig` (~50 fields) controls all emission and simulation parameters: particles-per-second rate, `EmissionShape` (Point, Circle, Ring, Line, Box, or Polygon), `AreaDistribution` (uniform, center-weighted, or edge-only), velocity spread (min/max speed and angle), rotation (initial range, angular velocity range), linear damping, radial and tangential acceleration, lifetime range (min/max seconds), and multi-stop gradient interpolation for size, color, and alpha over each particle's normalized life. `InsertMode` (OldestFirst or Absorb) determines behavior when the pool is full.
 
-**Scope boundary**: This module currently depends on `image`, `math`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`EmitterState` tracks whether the emitter is active, paused, or one-shot. `RelativeMode` selects whether particles move in world space or follow the emitter's position after spawn. Texture support: the `ParticleSystem` holds an optional `TextureKey`; particles are rendered as textured quads aligned to their velocity vector or at a fixed rotation.
+
+`ParticleShape` is an enum of five geometric render primitives (Square, Circle, Triangle, Spark, Diamond) for texture-free particle rendering. `Trail` adds a ribbon effect as a `Vec<TrailPoint>` history attached to each particle for smoke, laser, and motion-blur effects.
+
+**Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/particle_api.rs`.
 
 ## Files
 
@@ -36,9 +40,9 @@ This module exists so transient visual effects can be expressed as reusable CPU 
 - `EmitterState` (`enum`, `config.rs`): Enum tracking whether an emitter is active, paused, or stopped.
 - `EmissionShape` (`enum`, `config.rs`): Enum controlling where particles spawn relative to the emitter.
 - `RelativeMode` (`enum`, `config.rs`): Enum controlling whether particles remain in world space or move with the emitter.
-- `ParticleConfig` (`struct`, `config.rs`): Main emitter configuration object controlling spawn rate, lifetime, forces, interpolation curves, rendering shape, and batching limits. Fields added: `death_emitter: Option<Box<ParticleConfig>>`, `death_burst_count: u32`, `shrapnel_edges: u8`, `ray_aspect: f32`, `ring_thickness: f32`.
 - `Attractor` (`struct`, `config.rs`): Gravity well applied to live particles. Fields: `x: f32`, `y: f32`, `strength: f32`, `radius: f32`. Positive strength pulls; negative repels.
 - `BounceBounds` (`struct`, `config.rs`): Axis-aligned bounding rectangle. Particles that cross a wall have their velocity component reversed and scaled by `restitution`. Fields: `x_min`, `x_max`, `y_min`, `y_max`, `restitution: f32`.
+- `ParticleConfig` (`struct`, `config.rs`): Main emitter configuration object controlling spawn rate, lifetime, forces, interpolation curves, rendering shape, and batching limits. Fields added: `death_emitter: Option<Box<ParticleConfig>>`, `death_burst_count: u32`, `shrapnel_edges: u8`, `ray_aspect: f32`, `ring_thickness: f32`.
 - `ParticleSystem` (`struct`, `emitter.rs`): Main emitter simulation that owns the live particle pool and advances it each frame. Fields added: `attractors: Vec<Attractor>`, `bounce_bounds: Option<BounceBounds>`, `sub_systems: Vec<ParticleSystem>`.
 - `Particle` (`struct`, `particle.rs`): Per-particle runtime state including position, velocity, lifetime, rotation, and acceleration terms. Field added: `shape_seed: u32` — assigned at spawn for deterministic `Shrapnel` polygon generation.
 - `ParticleShape` (`enum`, `shapes.rs`): Enum selecting the geometric primitive used for untextured particles. Variants: `Square`, `Circle`, `Triangle`, `Spark`, `Diamond`, `Shrapnel { edges: u8 }`, `Ray { aspect: f32 }`, `Puff`, `Ring { thickness: f32 }`, `Capsule`.
@@ -50,13 +54,7 @@ This module exists so transient visual effects can be expressed as reusable CPU 
 - `emission_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the config's area distribution.
 - `emission_shape_offset` (`emission.rs`): Compute an emission offset `(dx, dy)` based on the emission shape.
 - `ParticleSystem::new` (`emitter.rs`): Creates a new particle system with the given configuration positioned at `(0, 0)`.
-- `ParticleSystem::update` (`emitter.rs`): Updates the particle system by `dt` seconds, applying attractor forces, propagating bounce bounds, calling sub-system updates, and spawning death sub-emitters when particles expire.
-- `ParticleSystem::warm_up` (`emitter.rs`): Pre-simulates the system for the given number of seconds (clamped to 30 s) so it appears fully populated on first render.
-- `ParticleSystem::add_attractor` (`emitter.rs`): Appends an attractor to the system.
-- `ParticleSystem::clear_attractors` (`emitter.rs`): Removes all attractors.
-- `ParticleSystem::attractor_count` (`emitter.rs`): Returns the number of registered attractors.
-- `ParticleSystem::set_bounds` (`emitter.rs`): Installs a `BounceBounds` wall rectangle.
-- `ParticleSystem::clear_bounds` (`emitter.rs`): Removes the bounding rectangle.
+- `ParticleSystem::update` (`emitter.rs`): Updates the particle system by `dt` seconds.
 - `ParticleSystem::emit` (`emitter.rs`): Emits a burst of `count` particles immediately, respecting the max_particles cap.
 - `ParticleSystem::count` (`emitter.rs`): Returns the number of live particles.
 - `ParticleSystem::reset` (`emitter.rs`): Resets the system, killing all particles and zeroing the accumulator and emitter age.
@@ -72,7 +70,13 @@ This module exists so transient visual effects can be expressed as reusable CPU 
 - `ParticleSystem::is_empty` (`emitter.rs`): Returns `true` if there are no live particles.
 - `ParticleSystem::is_full` (`emitter.rs`): Returns `true` if the particle count has reached `max_particles`.
 - `ParticleSystem::build_render_commands` (`emitter.rs`): Generates `RenderCommand`s for rendering all live particles.
-- `ParticleSystem::draw_to_image` (`emitter.rs`): Render all live particles to an image as colored circles.
+- `ParticleSystem::warm_up` (`emitter.rs`): Runs the particle system forward by `seconds` in fixed 0.05 s steps to pre-populate particles.
+- `ParticleSystem::add_attractor` (`emitter.rs`): Adds a point attractor (or repeller) to this system.
+- `ParticleSystem::clear_attractors` (`emitter.rs`): Removes all attractors from this system.
+- `ParticleSystem::attractor_count` (`emitter.rs`): Returns the number of attractors currently attached to this system.
+- `ParticleSystem::set_bounds` (`emitter.rs`): Sets axis-aligned bounce boundaries with a restitution coefficient.
+- `ParticleSystem::clear_bounds` (`emitter.rs`): Removes the bounce boundaries from this system.
+- `ParticleSystem::draw_to_image` (`emitter.rs`): Each particle is drawn with its color interpolated from age.
 - `ParticleSystem::draw_explosion_to_image` (`emitter.rs`): Render an explosion burst: particles radiate from center with age-based red-to-yellow coloring.
 - `ParticleSystem::draw_rain_to_image` (`emitter.rs`): Render particles styled as falling rain streaks.
 - `ParticleSystem::draw_spark_trail_to_image` (`emitter.rs`): Render particles as hot orange sparks with short trails.
@@ -144,11 +148,8 @@ This module exists so transient visual effects can be expressed as reusable CPU 
 - `ParticleSystem:getDirection`: Returns emission direction in radians.
 - `ParticleSystem:setSpread`: Sets emission spread (half-angle cone) in radians.
 - `ParticleSystem:getSpread`: Returns emission spread.
-- `ParticleSystem:setLinearAcceleration`: Sets linear acceleration range.
 - `ParticleSystem:getLinearAcceleration`: Returns linear acceleration range.
-- `ParticleSystem:setRadialAcceleration`: Sets radial acceleration range.
 - `ParticleSystem:getRadialAcceleration`: Returns radial acceleration range.
-- `ParticleSystem:setTangentialAcceleration`: Sets tangential acceleration range.
 - `ParticleSystem:getTangentialAcceleration`: Returns tangential acceleration range.
 - `ParticleSystem:setLinearDamping`: Sets linear damping range.
 - `ParticleSystem:getLinearDamping`: Returns linear damping range.
@@ -174,20 +175,18 @@ This module exists so transient visual effects can be expressed as reusable CPU 
 - `ParticleSystem:getBufferSize`: Returns the maximum particle count.
 - `ParticleSystem:setEmissionArea`: Sets emission area distribution and size.
 - `ParticleSystem:getEmissionArea`: Returns emission area: dist-string, w, h.
-- `ParticleSystem:setShape`: Sets the particle draw shape. Accepts: `"square"`, `"circle"`, `"triangle"`, `"spark"`, `"diamond"`, `"shrapnel"`, `"ray"`, `"puff"`, `"ring"`, `"capsule"`.
+- `ParticleSystem:setShape`: Sets the particle draw shape.
 - `ParticleSystem:getShape`: Returns the particle draw shape as a string.
 - `ParticleSystem:getGravity`: Returns gravity (x, y).
 - `ParticleSystem:setGravity`: Sets gravity (x, y).
-- `ParticleSystem:render`: Renders all live particles to the GPU command queue. Textured particles expand to DrawQuad/DrawImageEx; untextured particles are forwarded as a single DrawParticleSystem batch command.
+- `ParticleSystem:render`: Renders all live particles to the GPU command queue.
 - `ParticleSystem:clone`: Creates a copy of this particle system (config only, no live particles).
 - `ParticleSystem:drawToImage`: Renders all live particles to a CPU ImageData.
-- `ParticleSystem:toImage`: Alias for `drawToImage`.
-- `ParticleSystem:warmUp`: Pre-simulates the system for `seconds` (clamped 30 s) so it appears fully populated on first render.
-- `ParticleSystem:addAttractor`: Adds a gravity well at (x, y) with the given strength and radius.
-- `ParticleSystem:clearAttractors`: Removes all attractors.
-- `ParticleSystem:getAttractorCount`: Returns the number of registered attractors.
-- `ParticleSystem:setBounds`: Installs a bounce wall rectangle (xmin, xmax, ymin, ymax, restitution).
-- `ParticleSystem:clearBounds`: Removes the bounding rectangle.
+- `ParticleSystem:toImage`: Alias for `drawToImage`. Renders all live particles to a CPU ImageData.
+- `ParticleSystem:warmUp`: Pre-simulates the particle system for `seconds` so it appears fully
+- `ParticleSystem:clearAttractors`: Removes all attractors from this particle system.
+- `ParticleSystem:getAttractorCount`: Returns the number of attractors currently registered on this system.
+- `ParticleSystem:clearBounds`: Removes the bounding rectangle so particles can move freely.
 
 ### `Trail` Methods
 - `Trail:pushPoint`: Appends a new point to the trail head.

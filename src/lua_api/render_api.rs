@@ -30,6 +30,9 @@ use crate::sprite::SpriteBatch;
 
 /// Lua-side handle to a loaded texture stored in SharedState.
 ///
+/// # Fields
+/// - `inner` — `ImageData`.
+///
 ///
 /// Lua-side wrapper around a raw [`ImageData`] pixel buffer (e.g. from `captureScreenshot`).
 pub struct LuaImageData {
@@ -44,15 +47,6 @@ impl LuaUserData for LuaImageData {
         /// Returns the pixel height of this image buffer.
         /// @return integer
         methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
-        /// Returns the type name "ImageData".
-        /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ImageData"));
-        /// Returns the type name "ImageData".
-        /// @return string
-        methods.add_method("typeOf", |_, _, ()| Ok("ImageData"));
-    }
-}
-
         // -- resize --
         /// Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
         ///
@@ -159,6 +153,10 @@ impl LuaUserData for LuaImageData {
 }
 
 /// Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `TextureKey`.
 ///
 #[derive(Clone)]
 pub struct LuaImage {
@@ -276,6 +274,10 @@ impl LuaUserData for LuaImage {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a loaded font stored in SharedState.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `FontKey`.
 ///
 #[derive(Clone)]
 pub struct LuaFont {
@@ -412,6 +414,10 @@ impl LuaUserData for LuaFont {
 
 /// Lua-side handle to an off-screen render target stored in SharedState.
 ///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `CanvasKey`.
+///
 #[derive(Clone)]
 pub struct LuaCanvas {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -486,6 +492,10 @@ impl LuaUserData for LuaCanvas {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a sprite batch stored in SharedState.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `SpriteBatchKey`.
 ///
 #[derive(Clone)]
 pub struct LuaSpriteBatch {
@@ -593,6 +603,10 @@ impl LuaUserData for LuaSpriteBatch {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a mesh stored in SharedState.
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `MeshKey`.
 ///
 #[derive(Clone)]
 pub struct LuaMesh {
@@ -703,6 +717,10 @@ impl LuaUserData for LuaMesh {
 
 /// Lua-side handle to a compiled shader stored in SharedState.
 ///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `ShaderKey`.
+///
 #[derive(Clone)]
 pub struct LuaShader {
     pub(crate) state: Rc<RefCell<SharedState>>,
@@ -770,6 +788,14 @@ impl LuaUserData for LuaShader {
 // -------------------------------------------------------------------------------
 
 /// Lua-side quad viewport into a texture.
+///
+/// # Fields
+/// - `x` — `f32`.
+/// - `y` — `f32`.
+/// - `w` — `f32`.
+/// - `h` — `f32`.
+/// - `sw` — `f32`.
+/// - `sh` — `f32`.
 ///
 #[derive(Clone)]
 pub struct LuaQuad {
@@ -903,6 +929,10 @@ fn parse_blend_mode(s: &str) -> Result<BlendMode, LuaError> {
 // -------------------------------------------------------------------------------
 
 /// Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
+///
+/// # Fields
+/// - `state` — `Rc<RefCell<SharedState>>`.
+/// - `key` — `ShapeKey`.
 ///
 ///
 /// Created via `lurek.graphic.newShape()`. Builder methods accumulate draw commands
@@ -1337,6 +1367,11 @@ impl LuaUserData for LuaDrawLayer {
 // ===============================================================================
 
 /// Registers the `lurek.graphic` namespace on the given Lua table.
+///
+/// # Parameters
+/// - `lua` — `&Lua`.
+/// - `luna` — `&LuaTable`.
+/// - `state` — `Rc<RefCell<SharedState>>`.
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let graphics = lua.create_table()?;

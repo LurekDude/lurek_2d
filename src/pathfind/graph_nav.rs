@@ -10,6 +10,15 @@ use crate::graph::core::Graph;
 
 /// Find the shortest path between two nodes using A* (or Dijkstra when no heuristic is supplied).
 ///
+/// # Parameters
+/// - `graph` — `&Graph`.
+/// - `from` — `u64`.
+/// - `to` — `u64`.
+/// - `heuristic` — `Option<fn(u64, u64) -> f32>,`.
+///
+/// # Returns
+/// `f32>, ) -> Option<Vec<u64>>`.
+///
 /// `from` and `to` are node IDs. If `heuristic` is provided it should return an estimated
 /// remaining cost from a node ID to the goal. Pass `None` for pure Dijkstra behaviour.
 ///
@@ -68,6 +77,14 @@ pub fn graph_astar(
 }
 
 /// Find all nodes within `max_cost` from `start` using Dijkstra.
+///
+/// # Parameters
+/// - `graph` — `&Graph`.
+/// - `start` — `u64`.
+/// - `max_cost` — `f32`.
+///
+/// # Returns
+/// `Vec<(u64, f32)>`.
 ///
 /// Returns a list of `(node_id, path_cost)` pairs for all reachable nodes within budget.
 pub fn graph_range(graph: &Graph, start: u64, max_cost: f32) -> Vec<(u64, f32)> {

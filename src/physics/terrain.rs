@@ -136,6 +136,9 @@ impl TerrainMap {
 
     /// Returns `true` if the cell at `(cx, cy)` is solid.
     ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// Returns `false` for out-of-bounds coordinates.
     ///
     /// # Parameters
@@ -228,6 +231,9 @@ impl TerrainMap {
     // â”€â”€ Dirty state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Returns `true` when at least one chunk is dirty and needs flushing.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_dirty(&self) -> bool {
         !self.dirty_chunks.is_empty()
     }

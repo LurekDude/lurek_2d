@@ -11,13 +11,15 @@
 
 ## Summary
 
-The audio module is Lurek2D's playback and mixing backend. It owns sound loading and decoding, per-source playback state, bus routing, master volume, spatial audio state, queueable PCM playback, and the DSP chain used to apply filters and other real-time effects to audio sources and buses.
+The `audio` module provides Lurek2D's sound loading, playback, and volume management. It wraps the `rodio` audio library behind a `Mixer` type that manages all loaded sounds, their playback state, volume, pitch, pan, looping, and fade effects. Game code accesses everything through the `lurek.audio.*` Lua bindings, which delegate to `Mixer` and `Bus` instances stored in `SharedState`.
 
-This module exists so gameplay code can treat sound as engine-managed resources instead of juggling raw backend handles. `Mixer` is the operational center, `Bus` provides grouped control over multiple sources, `SoundData` exposes editable PCM data to Lua, and the DSP types make effect updates safe to push from the main thread while playback continues on the audio thread.
+The `Mixer` is the central controller: it owns a `SlotMap<SoundKey, AudioSource>` for O(1) handle lookup and safe invalidation on release, and uses a rodio `OutputStream` + `OutputStreamHandle` for PCM output. Sounds may be loaded as `Static` (fully decoded into memory, suitable for short SFX) or `Stream` (incrementally decoded from disk, suitable for music). Pitch, volume, and pan are applied per-source; fade effects interpolate volume over time.
 
-It intentionally does not own filesystem sandboxing, frame timing, or scripting registration. Audio files still come through `filesystem`, the app loop decides when scripts call playback functions, and `src/lua_api/audio_api.rs` decides how the audio surface is exposed to Lua. It also does not currently provide a full multi-device backend or a finished MIDI pipeline; MIDI support is partially present in code but currently constrained by missing parsing dependencies.
+`Bus` is a named group for applying shared volume and pause state to all sources assigned to it, e.g. a `"music"` bus or `"sfx"` bus. Buses are pure data containers; the mixer multiplies source volume/pitch by bus values on every `set_volume` or `update` call.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+Additional features: `SpatialState` for 2D positional audio with distance falloff; `Decoder` for chunked streaming PCM; `SoundData` for decoded in-memory PCM with per-sample read/write access; and `MidiPlayer`, a software MIDI synthesizer with sine-additive PCM rendering that requires no external MIDI device.
+
+**Scope boundary**: Platform Services tier. Depends on `runtime` (SoundKey, SharedState). Lua bridge in `src/lua_api/audio_api.rs`.
 
 ## Files
 
@@ -28,8 +30,11 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `midi_player.rs`: Software MIDI synthesizer: parses MIDI with `midly`, renders to PCM via sine-additive synthesis, and plays through a rodio `Sink`.
 - `mixer.rs`: Core audio mixer that owns every loaded sound and drives playback through rodio.
 - `mod.rs`: Audio subsystem for Lurek2D games.
+- `offline.rs`: Offline audio processing utilities.
+- `pool.rs`: Polyphonic sound pool for round-robin voice allocation.
 - `sound_data.rs`: Decoded PCM audio sample buffer with per-sample read/write access.
 - `source.rs`: Audio source type and playback state enums for the audio subsystem.
+- `visualizer.rs`: Audio visualisation utilities — waveform and spectrogram PNG export.
 
 ## Types
 
@@ -48,6 +53,8 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `PlayState` (`enum`, `mixer.rs`): Playback state of an audio source.
 - `QueueableSource` (`struct`, `mixer.rs`): A manually-fed streaming audio source that accepts raw f32 PCM data pushed buffer-by-buffer.
 - `Mixer` (`struct`, `mixer.rs`): The `Mixer` is the single point of entry for all audio operations in Lurek2D.
+- `OfflineEffect` (`struct`, `offline.rs`): Descriptor for a single DSP effect used in offline processing.
+- `SoundPool` (`struct`, `pool.rs`): A round-robin voice pool for polyphonic playback of a single audio file.
 - `SoundData` (`struct`, `sound_data.rs`): Decoded audio samples in f32 PCM format.
 - `SpatialState` (`struct`, `source.rs`): 3D spatial audio state for an audio source.
 - `AudioSource` (`struct`, `source.rs`): Handle for a loaded audio asset (legacy compatibility shim).
@@ -203,9 +210,30 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `Mixer::play_queueable` (`mixer.rs`): Marks a queueable source as playing (state bookkeeping only; actual PCM playback is driven by game code dequeuing buffers via `queue_buffer`).
 - `Mixer::stop_queueable` (`mixer.rs`): Stops a queueable source, draining all queued buffers.
 - `Mixer::release_queueable` (`mixer.rs`): Releases a queueable source, removing it from the slot-map.
+- `Mixer::set_stereo_width` (`mixer.rs`): Sets the stereo width multiplier for a source.
+- `Mixer::get_stereo_width` (`mixer.rs`): Returns the current stereo width for a source.
+- `Mixer::set_random_pitch` (`mixer.rs`): Sets a random pitch range applied on each call to `play`.
+- `Mixer::clear_random_pitch` (`mixer.rs`): Clears any random pitch range set on a source, restoring fixed pitch.
+- `Mixer::crossfade` (`mixer.rs`): Crossfades from `from_key` to `to_key` over `duration_secs`.
+- `Mixer::get_bus_peak` (`mixer.rs`): Returns the peak signal level for the named bus.
+- `Mixer::get_bus_rms` (`mixer.rs`): Returns the RMS signal level for the named bus.
+- `Mixer::new_pool` (`mixer.rs`): Loads `voice_count` copies of the file at `file_path` and returns a [`crate::audio::SoundPool`].
 - `get_playback_devices` (`mod.rs`): Returns the names of all available audio output devices.
 - `get_playback_device` (`mod.rs`): Returns the name of the currently active audio output device.
 - `set_playback_device` (`mod.rs`): Selects the audio output device by name.
+- `process_offline` (`offline.rs`): Decodes `input_path`, applies `effects` in series, and writes the result to `output_path`.
+- `normalize_file` (`offline.rs`): Normalises the peak amplitude of `input_path` to `target_level` and writes to `output_path`.
+- `SoundPool::new` (`pool.rs`): Creates a new `SoundPool` from a set of pre-loaded voice keys.
+- `SoundPool::voice_count` (`pool.rs`): Returns the number of voices in the pool.
+- `SoundPool::file_path` (`pool.rs`): Returns the source path originally used to create this pool.
+- `SoundPool::volume` (`pool.rs`): Returns the shared volume applied to all voices.
+- `SoundPool::set_volume` (`pool.rs`): Sets the shared volume for all future plays.
+- `SoundPool::bus_name` (`pool.rs`): Returns the bus assignment for all voices, if any.
+- `SoundPool::set_bus` (`pool.rs`): Sets the named audio bus that all voices will be routed to.
+- `SoundPool::clear_bus` (`pool.rs`): Clears the bus assignment.
+- `SoundPool::next_voice` (`pool.rs`): Advances the cursor and returns the next voice key for playback.
+- `SoundPool::all_keys` (`pool.rs`): Returns a slice of all voice keys.
+- `SoundPool::is_valid` (`pool.rs`): Returns `true` if the pool was created with at least one voice.
 - `SoundData::new` (`sound_data.rs`): Create a silent buffer with the given number of samples.
 - `SoundData::from_samples` (`sound_data.rs`): Create a `SoundData` from an existing f32 sample buffer.
 - `SoundData::from_lua_args` (`sound_data.rs`): Creates `SoundData` from Lua-originated arguments, supporting both file loading and silent buffer creation.
@@ -220,7 +248,20 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `SoundData::duration` (`sound_data.rs`): Get the duration in seconds.
 - `SoundData::as_samples` (`sound_data.rs`): Get a reference to the raw samples.
 - `SoundData::encode_wav` (`sound_data.rs`): Encode the audio data as a WAV byte buffer (16-bit PCM).
+- `SoundData::sine_wave` (`sound_data.rs`): Generate a mono sine-wave buffer.
+- `SoundData::square_wave` (`sound_data.rs`): Generate a mono square-wave buffer.
+- `SoundData::sawtooth_wave` (`sound_data.rs`): Generate a mono sawtooth-wave buffer.
+- `SoundData::triangle_wave` (`sound_data.rs`): Generate a mono triangle-wave buffer.
+- `SoundData::white_noise` (`sound_data.rs`): Generate a reproducible white-noise buffer using a simple LCG PRNG.
+- `SoundData::draw_waveform` (`sound_data.rs`): Draws the waveform of the audio samples onto an `ImageData` object.
+- `SoundData::apply_lowpass` (`sound_data.rs`): Apply a first-order IIR low-pass filter in-place to the sample buffer.
+- `SoundData::apply_highpass` (`sound_data.rs`): Apply a first-order IIR high-pass filter in-place to the sample buffer.
+- `SoundData::apply_bandpass` (`sound_data.rs`): Apply a simple bandpass filter in-place (lowpass cascaded with highpass).
+- `SoundData::apply_gain` (`sound_data.rs`): Apply gain (amplitude scaling) in-place.
+- `SoundData::mix_into` (`sound_data.rs`): Mix another `SoundData` buffer into this one in-place (additive blend).
 - `AudioSource::new` (`source.rs`): Creates a new `AudioSource` with default volume (1.0) and looping disabled.
+- `waveform_to_png` (`visualizer.rs`): Renders the amplitude waveform of `input_wav` to a PNG file at `output_png`.
+- `spectrogram_to_png` (`visualizer.rs`): Renders a time–frequency spectrogram of `input_wav` to a PNG file at `output_png`.
 
 ## Lua API Reference
 
@@ -304,7 +345,29 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `lurek.audio.add_effect`: Adds a DSP effect to a bus.
 - `lurek.audio.remove_effect`: Removes a DSP effect from a bus.
 - `lurek.audio.set_effect_param`: Sets a parameter on a DSP effect.
+- `lurek.audio.newSineWave`: Generate a mono sine-wave SoundData buffer.
+- `lurek.audio.newSquareWave`: Generate a mono square-wave SoundData buffer.
+- `lurek.audio.newSawtoothWave`: Generate a mono sawtooth-wave SoundData buffer.
+- `lurek.audio.newTriangleWave`: Generate a mono triangle-wave SoundData buffer.
+- `lurek.audio.newWhiteNoise`: Generate a reproducible white-noise SoundData buffer.
+- `lurek.audio.applyLowpass`: Applies a first-order IIR low-pass filter to a SoundData in-place.
+- `lurek.audio.applyHighpass`: Applies a first-order IIR high-pass filter to a SoundData in-place.
+- `lurek.audio.applyBandpass`: Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
+- `lurek.audio.applyGain`: Scales every sample by gain (clamped to [-1, 1]).
+- `lurek.audio.mixInto`: Additively mixes another SoundData into the destination in-place.
 - `lurek.audio.saveWAV`: Saves a SoundData as a 16-bit PCM WAV file at the given path.
+- `lurek.audio.setStereoWidth`: Sets the stereo width multiplier for a source (1.0 = normal, 0.0 = mono).
+- `lurek.audio.getStereoWidth`: Returns the current stereo width for a source.
+- `lurek.audio.setRandomPitch`: Sets a random pitch range applied each time the source is played.
+- `lurek.audio.clearRandomPitch`: Clears any random pitch range on a source, restoring fixed pitch.
+- `lurek.audio.crossfade`: Crossfades from one source to another over a duration.
+- `lurek.audio.getBusPeak`: Returns the peak signal level of the named bus (stub: always 0.0).
+- `lurek.audio.getBusRms`: Returns the RMS signal level of the named bus (stub: always 0.0).
+- `lurek.audio.newPool`: Creates a polyphonic sound pool for the given file with N simultaneous voices.
+- `lurek.audio.processOffline`: Applies a DSP effect chain to a WAV file and writes output.
+- `lurek.audio.normalizeFile`: Normalizes a WAV file peak amplitude to target_level and writes output.
+- `lurek.audio.waveformToPng`: Renders the waveform of a WAV file to a PNG image.
+- `lurek.audio.spectrogramToPng`: Renders a time-frequency spectrogram of a WAV file to a PNG image.
 
 ### `Bus` Methods
 - `Bus:getName`: Returns the bus name.
@@ -377,6 +440,16 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `MidiPlayer:type`: Returns the type name of this object.
 - `MidiPlayer:typeOf`: Returns true if this object is of the given type.
 
+### `SoundPool` Methods
+- `SoundPool:play`: Plays the next available voice and returns its SoundKey as an integer.
+- `SoundPool:stopAll`: Stops all voices in this pool.
+- `SoundPool:setVolume`: Sets the volume for all voices in this pool.
+- `SoundPool:setBus`: Routes all voices through the named bus.
+- `SoundPool:release`: Releases all voices from the mixer and invalidates this pool.
+- `SoundPool:getVoiceCount`: Returns the total number of voices in this pool.
+- `SoundPool:type`: Returns the type name of this object.
+- `SoundPool:typeOf`: Returns true if the type name matches.
+
 ### `Source` Methods
 - `Source:play`: Starts or resumes playback.
 - `Source:stop`: Stops playback and resets seek position.
@@ -407,16 +480,17 @@ It intentionally does not own filesystem sandboxing, frame timing, or scripting 
 - `Source:getFadeIn`: Returns the current fade-in duration in seconds.
 
 ### `mlua` Methods
-- `mlua:getSampleCount`: Lua-facing function documented in the binding source.
-- `mlua:getSampleRate`: Lua-facing function documented in the binding source.
-- `mlua:getChannelCount`: Lua-facing function documented in the binding source.
-- `mlua:getDuration`: Lua-facing function documented in the binding source.
-- `mlua:getBitDepth`: Lua-facing function documented in the binding source.
-- `mlua:getSample`: Lua-facing function documented in the binding source.
-- `mlua:setSample`: Lua-facing function documented in the binding source.
+- `mlua:getSampleCount`: Get the total number of samples.
+- `mlua:getSampleRate`: Get the sample rate.
+- `mlua:getChannelCount`: Get the number of channels.
+- `mlua:getDuration`: Get the audio duration in seconds.
+- `mlua:getBitDepth`: Get the bit depth.
+- `mlua:getSample`: Get a specific sample by index.
+- `mlua:setSample`: Set a specific sample by index.
 
 ## References
 
+- `image`: Imports or references `src/image/`. Cross-group dependency from ``Platform Services`` into `Platform Services`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 
 ## Notes

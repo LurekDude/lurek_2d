@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `save` module provides slot-based savegame coordination for Lua-driven games. It tracks registered save collectors, restore callbacks, schema versions, dirty state, auto-save timing, and slot metadata while keeping the actual save payload in a Lua-serializable value model.
+The `save` module provides Lurek2D's game save/load orchestration system. It focuses on lifecycle management — coordinating when and what to save, handling schema versioning, running migrations, and driving auto-save — rather than on byte serialization (that responsibility belongs to `serial`).
 
-It exists so save orchestration, migration bookkeeping, and slot metadata do not get scattered across gameplay modules. Systems can register what they need to persist, and the save manager provides a stable place to coordinate schema upgrades and slot lifecycle.
+`SaveManager` is the core type: it maintains a registry of named collector module names (Lua callbacks that gather/restore game state), a current schema version integer, a dirty flag that becomes true when save data has changed, an optional `AutoSaveConfig` (interval in seconds + slot name), and a list of migration version checkpoints. `SlotMeta` describes one save slot: name string, Unix timestamp, schema version when saved, and a user-readable summary string.
 
-It intentionally does not own general filesystem policy, encryption, cloud sync, binary serialization, or rollback history. The module focuses on save structure and coordination; higher layers decide when and where files are read or written.
+Save operations work through the collector pattern: `SaveManager::collect_all()` calls each registered Lua collector's `gather()` function and serializes its return value via `serial::to_toml`. `load_all()` calls each collector's `restore(data)` function with the deserialized save data. Collectors are responsible for their own data shape.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+Schema versioning: when a save slot is loaded, `SaveManager` compares its metadata version against the current schema version. If outdated, it runs all registered migration functions in ascending version order to bring the data forward before handing it to collectors.
+
+Auto-save: `tick(dt)` is called each frame; when the accumulated time since last save exceeds the configured interval (and the dirty flag is set), a save to the configured slot is triggered automatically.
+
+**Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`, `serial`. Lua bridge in `src/lua_api/save_api.rs`.
 
 ## Files
 
@@ -52,7 +56,7 @@ It intentionally does not own general filesystem policy, encryption, cloud sync,
 - `SaveManager::update` (`save_data.rs`): Advance the auto-save timer.
 - `SaveManager::reset` (`save_data.rs`): Reset all state.
 - `serialize_table` (`save_data.rs`): Serialize a simple Lua-compatible value hierarchy into a `return { ...
-- `serialize_value` (`save_data.rs`): Serializes a single Lua value into the TOML-compatible wire format.
+- `serialize_value` (`save_data.rs`): Serialize a single value.
 - `SaveManager::new` (`save_manager.rs`): Create a new empty SaveManager.
 - `SaveManager::register` (`save_manager.rs`): Register a named collector module.
 - `SaveManager::unregister` (`save_manager.rs`): Unregister a collector by name.

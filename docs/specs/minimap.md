@@ -11,13 +11,17 @@
 
 ## Summary
 
-The `minimap` module provides a compact overhead representation of a larger game world. It stores terrain cells, fog-of-war state, tracked objects, temporary pings, persistent markers, and the current viewport rectangle so scripts can present navigational context without rebuilding that logic every frame.
+The `minimap` module provides a grid-based minimap data model for overhead map displays with fog of war, tracked game objects, pings, persistent markers, and a viewport rectangle overlay. It is a Feature Systems tier module that is pure CPU — it has no direct GPU dependencies and produces `RenderCommand` entries for the renderer each frame.
 
-It exists to centralize minimap state and coordinate conversion in one CPU-side system. That keeps world-to-minimap math, visibility bookkeeping, and ping or marker lifecycle out of UI code and out of unrelated gameplay modules.
+`Minimap` is the main data container: a 2D grid of cells, each storing a terrain color, optional `FogLevel` (Hidden/Explored/Visible), and an impassable flag. Fog is used for classic fog-of-war: hidden cells render fully opaque, explored cells render semi-transparent, visible cells render clearly. `ColorMode` controls whether the minimap renders terrain colors directly or blends them with a configurable fog tint.
 
-It intentionally does not own input handling, camera control, or texture-backed rendering. The module produces draw-ready data and render commands, but the actual UI composition and event routing stay elsewhere.
+`MinimapObject` entries represent tracked game entities: each carries world position, `MinimapObjectType` (Player/Enemy/Ally/Item/Poi), a display color, and an optional icon texture key. `update_object(id, world_x, world_y)` keeps tracked entities current as they move. A `SlotMap<ObjectKey, MinimapObject>` manages the pool with safe stale-handle detection.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Feature Systems responsibility boundary defined in the architecture docs.
+`MinimapPing` provides temporary pulsing markers at a world position for events like alerts or waypoints. `MinimapMarker` adds persistent named icons for points of interest. The viewport rectangle overlay uses the current `Camera` bounds from `SharedState` to draw a rectangle on the minimap showing which part of the world is currently visible on screen.
+
+The `render` submodule converts the `Minimap` state into a series of `RenderCommand::DrawShape` and `RenderCommand::DrawImage` entries each frame.
+
+**Scope boundary**: Feature Systems tier. Depends on `render` (command types), `math`, `runtime`. Lua bridge in `src/lua_api/minimap_api.rs`.
 
 ## Files
 

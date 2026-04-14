@@ -11,13 +11,15 @@
 
 ## Summary
 
-The docs module provides runtime documentation and schema data structures for the lurek.* API surface. It exists so the engine, VS Code extension, documentation generators, and Lua-side tooling can work from a structured catalog of API entries, quality metrics, and lightweight validation rules instead of relying only on free-form markdown.
+The `docs` module is Lurek2D's in-engine API documentation catalog and data-validation schema system. It serves two distinct but related purposes: providing a structured, queryable database of `lurek.*` API metadata at runtime, and offering a lightweight schema validation mechanism for arbitrary structured game data such as config files, save data, and mod manifests.
 
-At the center of the module is DocEntry metadata collected into a Catalog, along with reporting helpers that measure completeness and quality. The schema layer complements that by validating Lua data against explicit field rules, which makes the module useful for config, manifest, and documentation-related tooling as well as reflection.
+The documentation catalog side is built around three types. `DocEntry` is a description of a single documented API item — function, method, value, or type — carrying its qualified name, module, kind, a human-readable description, ordered `ParamInfo` parameters, and `ReturnInfo` return descriptors. A `Catalog` is an in-memory collection of `DocEntry` records with query methods for searching by name, filtering by module, and building completion lists. A `QualityReport` computes a quality score for each module's documentation coverage, surfacing missing descriptions, missing parameter type hints, and missing return information. These types are populated at engine boot by iterating over the bound API and serve the VS Code extension's IntelliSense completions, the `lurek.docs` Lua API, and the debug bridge's hover-information queries.
 
-This module does not parse Rust source files directly and it does not replace the generated docs pipeline under tools and docs/. It provides the runtime-facing structures and export helpers that other systems can populate, query, validate, and serialize.
+The schema validation side lives in the `schema` submodule. A `Schema` is a map of field names to `FieldRule` entries, each specifying required vs optional presence, a `FieldType` constraint (Number, Text, Bool, Table, Any), and an optional default value. Calling `schema.validate(table)` returns a `SchemaResult` enumerating any missing required fields or type mismatches. Game code uses this for validating plugin manifests, validated config sections, and structured save-data before passing values deeper into the engine.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+Neither the catalog nor the schema validator has rendering, audio, or physics dependencies. The module is headless and fully testable without a window or GPU.
+
+**Scope boundary**: Foundations tier. No engine module imports. Lua bridge in `src/lua_api/docs_api.rs`.
 
 ## Files
 

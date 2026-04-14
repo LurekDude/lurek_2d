@@ -8,6 +8,10 @@ use std::cmp::Ordering;
 
 /// A precomputed range map: cheapest path costs from a single origin.
 ///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+///
 /// `None` entries indicate unreachable cells.
 pub struct RangeMap {
     /// Grid width.
@@ -19,6 +23,19 @@ pub struct RangeMap {
 
 impl RangeMap {
     /// Compute range from `(origin_x, origin_y)` within `budget` on a flat cost grid.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `costs` — `&[f32]`.
+    /// - `blocked` — `&[bool]`.
+    /// - `origin_x` — `u32`.
+    /// - `origin_y` — `u32`.
+    /// - `budget` — `f32`.
+    /// - `diagonal` — `bool`.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// `costs` is a row-major slice of movement costs per cell; `0.0` or negative means blocked.
     /// `blocked` is a parallel bool slice (`true` = impassable regardless of cost).
@@ -93,11 +110,25 @@ impl RangeMap {
     }
 
     /// Returns `true` if the cell at `(x, y)` was reached within the budget.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn reachable(&self, x: u32, y: u32) -> bool {
         self.cost_to(x, y).is_some()
     }
 
     /// Cheapest path cost to reach `(x, y)`, or `None` if unreachable.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `Option<f32>`.
     pub fn cost_to(&self, x: u32, y: u32) -> Option<f32> {
         if x >= self.width || y >= self.height {
             return None;
@@ -106,6 +137,9 @@ impl RangeMap {
     }
 
     /// All reachable cells as `(x, y)` tuples.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`.
     pub fn reachable_cells(&self) -> Vec<(u32, u32)> {
         self.costs
             .iter()
@@ -121,6 +155,9 @@ impl RangeMap {
     }
 
     /// All reachable cells with their movement cost as `(x, y, cost)` tuples.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32, f32)>`.
     pub fn reachable_cells_with_cost(&self) -> Vec<(u32, u32, f32)> {
         self.costs
             .iter()

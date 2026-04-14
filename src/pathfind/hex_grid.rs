@@ -7,6 +7,10 @@ use std::collections::{BinaryHeap, HashMap};
 use std::cmp::Ordering;
 
 /// Hex grid layout orientation.
+///
+/// # Variants
+/// - `FlatTop` — FlatTop variant.
+/// - `PointyTop` — PointyTop variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HexLayout {
     /// Flat-top hexagons (pointy sides on left/right).
@@ -16,6 +20,10 @@ pub enum HexLayout {
 }
 
 /// A hexagonal grid supporting pathfinding, LOS, FOV, and range queries.
+///
+/// # Fields
+/// - `width` — `u32`.
+/// - `height` — `u32`.
 pub struct HexGrid {
     /// Width in columns.
     pub width: u32,
@@ -28,6 +36,14 @@ pub struct HexGrid {
 
 impl HexGrid {
     /// Create a new hex grid of the given size and layout.
+    ///
+    /// # Parameters
+    /// - `width` — `u32`.
+    /// - `height` — `u32`.
+    /// - `layout` — `HexLayout`.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// All cells start unblocked with cost `1.0`.
     pub fn new(width: u32, height: u32, layout: HexLayout) -> Self {
@@ -42,6 +58,11 @@ impl HexGrid {
     }
 
     /// Mark or unmark a cell as blocked.
+    ///
+    /// # Parameters
+    /// - `col` — `u32`.
+    /// - `row` — `u32`.
+    /// - `blocked` — `bool`.
     pub fn set_blocked(&mut self, col: u32, row: u32, blocked: bool) {
         if let Some(idx) = self.index(col, row) {
             self.blocked[idx] = blocked;
@@ -49,6 +70,11 @@ impl HexGrid {
     }
 
     /// Set the movement cost for a cell. Zero cost means impassable.
+    ///
+    /// # Parameters
+    /// - `col` — `u32`.
+    /// - `row` — `u32`.
+    /// - `cost` — `f32`.
     pub fn set_cost(&mut self, col: u32, row: u32, cost: f32) {
         if let Some(idx) = self.index(col, row) {
             self.cost[idx] = cost;
@@ -56,11 +82,25 @@ impl HexGrid {
     }
 
     /// Returns `true` if the cell is blocked or out of bounds.
+    ///
+    /// # Parameters
+    /// - `col` — `u32`.
+    /// - `row` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_blocked(&self, col: u32, row: u32) -> bool {
         self.index(col, row).map_or(true, |i| self.blocked[i])
     }
 
     /// A* pathfinding on the hex grid.
+    ///
+    /// # Parameters
+    /// - `from` — `(u32, u32)`.
+    /// - `to` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `Option<Vec<(u32, u32)>>`.
     ///
     /// Returns `Some(path)` as a vec of `(col, row)` tuples, or `None` if unreachable.
     pub fn find_path(&self, from: (u32, u32), to: (u32, u32)) -> Option<Vec<(u32, u32)>> {
@@ -102,6 +142,13 @@ impl HexGrid {
 
     /// Line-of-sight between two hex cells using hex linear interpolation.
     ///
+    /// # Parameters
+    /// - `from` — `(u32, u32)`.
+    /// - `to` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `bool`.
+    ///
     /// Returns `true` if no blocked cell lies along the line.
     pub fn line_of_sight(&self, from: (u32, u32), to: (u32, u32)) -> bool {
         let line = self.hex_line(from, to);
@@ -114,6 +161,13 @@ impl HexGrid {
     }
 
     /// Field of view from `origin` out to `max_range`.
+    ///
+    /// # Parameters
+    /// - `origin` — `(u32, u32)`.
+    /// - `max_range` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`.
     ///
     /// Returns all cells visible from the origin within range (shadow-casting approximation).
     pub fn field_of_view(&self, origin: (u32, u32), max_range: u32) -> Vec<(u32, u32)> {
@@ -130,6 +184,13 @@ impl HexGrid {
     }
 
     /// Range-of-movement: all cells reachable within `budget` using Dijkstra.
+    ///
+    /// # Parameters
+    /// - `origin` — `(u32, u32)`.
+    /// - `budget` — `f32`.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`.
     pub fn range_of_movement(&self, origin: (u32, u32), budget: f32) -> Vec<(u32, u32)> {
         let mut cost_map: HashMap<(u32, u32), f32> = HashMap::new();
         let mut heap: BinaryHeap<AStarNode> = BinaryHeap::new();
@@ -158,6 +219,13 @@ impl HexGrid {
     }
 
     /// Returns grid-bounded neighbors for the given cell in offset coordinates.
+    ///
+    /// # Parameters
+    /// - `col` — `u32`.
+    /// - `row` — `u32`.
+    ///
+    /// # Returns
+    /// `Vec<(u32, u32)>`.
     pub fn neighbors(&self, col: u32, row: u32) -> Vec<(u32, u32)> {
         let dirs = self.neighbor_dirs(row);
         let mut result = Vec::with_capacity(6);
@@ -176,6 +244,13 @@ impl HexGrid {
     }
 
     /// Hex distance between two cells (cube coordinate distance).
+    ///
+    /// # Parameters
+    /// - `a` — `(u32, u32)`.
+    /// - `b` — `(u32, u32)`.
+    ///
+    /// # Returns
+    /// `u32`.
     pub fn distance(&self, a: (u32, u32), b: (u32, u32)) -> u32 {
         let (ax, ay, az) = self.to_cube(a);
         let (bx, by, bz) = self.to_cube(b);

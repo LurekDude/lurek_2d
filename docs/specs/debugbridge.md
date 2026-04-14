@@ -11,13 +11,15 @@
 
 ## Summary
 
-The debugbridge module exposes a local TCP bridge so external tools can inspect and interact with a running Lurek2D game. It exists primarily to support editor integration, remote diagnostics, eval-style tooling, and light runtime telemetry without embedding those tool protocols throughout the rest of the engine.
+The `debugbridge` module provides Lurek2D's TCP debug bridge — a JSON-over-TCP server bound to `127.0.0.1` that external tools such as the VS Code extension and MCP server can connect to for runtime inspection and game control while the engine is running.
 
-The module is built around a strict thread boundary. A background server thread accepts newline-delimited JSON requests from local clients, handles the background-safe methods immediately, and queues main-thread work for Lua-facing operations such as eval or stack inspection. Shared bridge state then carries pending requests, pending responses, print history, broadcast messages, and rolling performance samples between the two sides.
+The bridge exposes a command protocol over TCP. Each JSON message from a connected client carries a command name and parameters; the bridge dispatches it to the appropriate handler. Supported commands include: querying current log output, evaluating arbitrary Lua expressions, reading/writing `SharedState` fields, listing loaded modules, profiling frame time, and injecting synthetic input via the automation system.
 
-This module does not own the engine's scripting model, screenshot rendering, or general logging infrastructure. It transports tool requests and responses safely, but the actual work is still performed by the main thread, the Lua VM, or other engine modules.
+Network I/O runs on a dedicate background OS thread (`server_thread`) that accepts TCP connections and sends/receives JSON. Operations that require Lua VM access (Lua eval, state reads) cannot run directly on the background thread because LuaJIT VMs are single-threaded. Instead, these are queued as `PendingRequest` entries in `BridgeShared` (protected by a `Mutex`). The main engine thread calls `bridge.poll()` once per frame to drain pending requests, execute them on the main thread, and push `PendingResponse` results back to the client channel.
 
-**Scope boundary**: This module currently acts as a mostly self-contained part of the Edge/Integration layer. Cross-module behavior should remain anchored to the top-level source files and Lua bindings listed below.
+`SharedBridge` is an `Arc<Mutex<BridgeShared>>` shared between the main thread and the server background thread, providing the synchronization boundary. `PrintEntry` records log messages captured for the debug bridge's log-stream endpoint.
+
+**Scope boundary**: Edge/Integration tier. Depends on `runtime`, `lua_api` (indirectly via poll dispatch). Lua bridge not applicable (this module IS the bridge).
 
 ## Files
 

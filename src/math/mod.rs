@@ -55,11 +55,29 @@ pub use tween::{Tween, TweenValue};
 pub use vec2::Vec2;
 
 /// Linear interpolation between `a` and `b` by factor `t` in [0, 1].
+///
+/// # Parameters
+/// - `a` — `f32`.
+/// - `b` — `f32`.
+/// - `t` — `f32`.
+///
+/// # Returns
+/// `f32`.
 pub fn lerp(a: f32, b: f32, t: f32) -> f32 {
     a + t * (b - a)
 }
 
 /// Remap `v` from `[in_min, in_max]` to `[out_min, out_max]`.
+///
+/// # Parameters
+/// - `v` — `f32`.
+/// - `in_min` — `f32`.
+/// - `in_max` — `f32`.
+/// - `out_min` — `f32`.
+/// - `out_max` — `f32`.
+///
+/// # Returns
+/// `f32`.
 pub fn remap(v: f32, in_min: f32, in_max: f32, out_min: f32, out_max: f32) -> f32 {
     let t = if (in_max - in_min).abs() < 1e-7 { 0.0 } else { (v - in_min) / (in_max - in_min) };
     out_min + t * (out_max - out_min)

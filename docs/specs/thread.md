@@ -11,13 +11,15 @@
 
 ## Summary
 
-The thread module provides Lurek2D's explicit concurrency boundary. It lets scripts spawn background Lua workers and exchange simple values through thread-safe channels without sharing a Lua VM or the engine's central runtime state.
+The `thread` module provides Lurek2D's background threading infrastructure for game scripts, allowing CPU-intensive work to run off the main Lua VM thread. Because LuaJIT VMs cannot be shared across OS threads (design constraint B-04), each background thread runs an isolated VM with its own script load.
 
-This module exists to enforce the repository's concurrency rule: Rust threads may run in parallel, but Lua state must stay isolated per VM. The module therefore centers on two primitives only: `Channel`, which moves primitive values across threads, and `LuaThread`, which owns an isolated worker VM with a tightly restricted API surface.
+`Channel` is the cross-thread communication primitive: an MPSC queue backed by `Mutex<VecDeque<ChannelValue>>` plus a `Condvar` for blocking waits. `ChannelValue` is deliberately restricted to Nil, Bool, Number(f64), and String — Lua tables, UserData, and functions cannot cross thread boundaries safely. Operations: `push(v)` (non-blocking, always succeeds unless the channel is closed), `pop()` (non-blocking, returns nil if empty), `demand()` (blocking, waits until a value is available). Channels can be named and retrieved globally by name for pub-sub patterns.
 
-It intentionally does not own async runtimes, shared-memory game objects, or cross-thread access to rendering, input, physics, or audio state. If a design needs full engine APIs inside a worker, it is pushing against a deliberate boundary. The Lua wrapper in `src/lua_api/thread_api.rs` is also part of the safety story because it decides what worker threads can see and how named channels are shared.
+`Worker` wraps an OS thread running an isolated LuaJIT VM: it loads a specified script file, then loops pulling tasks from an input `Channel`, executing the script's registered callback function with the task payload, and sending results to an output `Channel`. Workers can be paused, resumed, and terminated gracefully. Uncaught errors are captured in an error slot accessible from the main thread via `worker:get_error()`.
 
-**Scope boundary**: This module currently depends on `runtime`. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+The `thread_pool` submodule provides a managed pool of workers for the common case of running many short tasks in parallel (e.g. `PathThreadPool` for background pathfinding).
+
+**Scope boundary**: Core Runtime tier. Depends on `runtime`. Lua bridge in `src/lua_api/thread_api.rs`.
 
 ## Files
 
@@ -64,15 +66,15 @@ It intentionally does not own async runtimes, shared-memory game objects, or cro
 - `lurek.thread.getChannel`: Gets or creates a named global channel shared across threads.
 
 ### `Channel` Methods
-- `Channel:type`: Lua-facing function documented in the binding source.
-- `Channel:typeOf`: Lua-facing function documented in the binding source.
-- `Channel:push`: Lua-facing function documented in the binding source.
-- `Channel:pop`: Lua-facing function documented in the binding source.
-- `Channel:peek`: Lua-facing function documented in the binding source.
-- `Channel:demand`: Lua-facing function documented in the binding source.
-- `Channel:getCount`: Lua-facing function documented in the binding source.
-- `Channel:clear`: Lua-facing function documented in the binding source.
-- `Channel:supply`: Lua-facing function documented in the binding source.
+- `Channel:type`: Returns the type of the object.
+- `Channel:typeOf`: Checks if the object is of the specified type.
+- `Channel:push`: Pushes a value to the channel.
+- `Channel:pop`: Retrieves and removes a value from the channel.
+- `Channel:peek`: Retrieves the value from the channel without removing it.
+- `Channel:demand`: Blocks until a value is available or the timeout expires, then removes and returns it.
+- `Channel:getCount`: Returns the number of items in the channel.
+- `Channel:clear`: Clears all items from the channel.
+- `Channel:supply`: Blocks until the channel has space, then adds the value.
 
 ### `ThreadHandle` Methods
 - `ThreadHandle:type`: Returns the type name of this object.

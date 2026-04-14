@@ -11,11 +11,15 @@
 
 ## Summary
 
-The camera module owns 2D camera math and virtual viewport mapping. It provides the simple Camera type used for view transforms, the richer Camera2D type used for follow behavior and coordinate conversion, and the viewport helpers that map a logical game resolution onto an actual window.
+The `camera` module provides Lurek2D's camera and viewport types for 2D rendering. It is a Foundations tier module that imports only from `crate::math`, so it can be used in tests and non-rendering contexts without any platform dependencies.
 
-This module stays on the CPU side of the engine. It can produce transform-stack render commands and screen-to-world conversions, but it does not own live window state, renderer internals, or scene logic. Other systems decide what the camera follows and when it moves; camera is responsible for the math and state needed to express that behavior cleanly.
+Two camera types are provided. `Camera` is the flat API variant: it holds a 2D position, zoom level, and rotation angle, and exposes `view_matrix()` to compute the `Mat3` transform applied to all world-space draw commands. `Camera2D` extends `Camera` with smooth-follow behaviour (spring-based lerp toward a target entity position), screen-shake (time-decaying offset with configurable magnitude and frequency), and axis-locked follow bounds (a dead zone rectangle the target must leave before the camera begins moving).
 
-**Scope boundary**: This module currently depends on `math`, `render`. It stays within the Platform Services responsibility boundary defined in the architecture docs.
+`Viewport` maps the fixed game resolution onto the physical window size through a configurable `ScaleMode`: `Expand` (the game canvas grows with the window), `FixedWidth` (height grows, width is fixed), `PixelPerfect` (integer scaling only), and `Stretch` (the game canvas is always stretched to fill the window with no aspect-ratio preservation). `ViewportScale` extends `Viewport` with automatic scaled-dimension tracking for integration with the render transform stack, emitting content width/height alongside the computed scale factor.
+
+`SharedState` holds a single `Camera` field; the `lua_api/camera_api.rs` bridge exposes the full `Camera2D` method set to Lua scripts as `lurek.camera.*`.
+
+**Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/camera_api.rs`.
 
 ## Files
 

@@ -11,12 +11,24 @@ pub struct CatmullRomSpline {
 impl CatmullRomSpline {
     /// Create a spline from the given control points.
     ///
+    /// # Parameters
+    /// - `points` — `Vec<(f32, f32)>`.
+    ///
+    /// # Returns
+    /// `Self`.
+    ///
     /// At least 2 points are required; fewer than 4 will give degenerate results.
     pub fn new(points: Vec<(f32, f32)>) -> Self {
         Self { control_points: points }
     }
 
     /// Sample the spline at a global parameter `t` in [0, 1] spanning the whole curve.
+    ///
+    /// # Parameters
+    /// - `t` — `f32`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
     ///
     /// Maps `t` to the appropriate segment and evaluates it.
     pub fn sample(&self, t: f32) -> (f32, f32) {
@@ -32,6 +44,13 @@ impl CatmullRomSpline {
     }
 
     /// Sample a specific segment by index at local parameter `t` in [0, 1].
+    ///
+    /// # Parameters
+    /// - `seg` — `usize`.
+    /// - `t` — `f32`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
     ///
     /// Clamps out-of-bounds segment indices. Uses phantom endpoints for the boundary segments.
     pub fn sample_segment(&self, seg: usize, t: f32) -> (f32, f32) {
@@ -64,11 +83,17 @@ impl CatmullRomSpline {
     }
 
     /// Number of control points.
+    ///
+    /// # Returns
+    /// `usize`.
     pub fn len(&self) -> usize {
         self.control_points.len()
     }
 
     /// Returns `true` if there are no control points.
+    ///
+    /// # Returns
+    /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.control_points.is_empty()
     }
@@ -88,11 +113,26 @@ pub struct HermiteSpline {
 
 impl HermiteSpline {
     /// Create a Hermite spline with explicit endpoints and tangents.
+    ///
+    /// # Parameters
+    /// - `p0` — `(f32, f32)`.
+    /// - `p1` — `(f32, f32)`.
+    /// - `m0` — `(f32, f32)`.
+    /// - `m1` — `(f32, f32)`.
+    ///
+    /// # Returns
+    /// `Self`.
     pub fn new(p0: (f32, f32), p1: (f32, f32), m0: (f32, f32), m1: (f32, f32)) -> Self {
         Self { p0, p1, m0, m1 }
     }
 
     /// Evaluate the spline at parameter `t` in [0, 1].
+    ///
+    /// # Parameters
+    /// - `t` — `f32`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
     pub fn sample(&self, t: f32) -> (f32, f32) {
         let t2 = t * t;
         let t3 = t2 * t;

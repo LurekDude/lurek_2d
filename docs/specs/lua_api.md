@@ -5,19 +5,21 @@
 - Module group: `Edge/Integration`
 - Source path: `src/lua_api/`
 - Lua API path(s): None direct
-- Primary Lua namespace: None direct
+- Primary Lua namespace: `lurek.ai`
 - Rust test path(s): tests/rust/unit/; tests/rust/ext/
 - Lua test path(s): tests/lua/harness.rs; tests/lua/unit/; tests/lua/integration/; tests/lua/security/; tests/lua/stress/; tests/lua/golden/
 
 ## Summary
 
-The lua_api module is the one-way bridge from Rust engine systems into the public lurek.* scripting surface. It exists so game code can use a stable, sandboxed Lua API while the underlying Rust modules remain free to evolve internally behind thin binding layers and typed resource handles.
+The `lua_api` module is the Lua scripting bridge for Lurek2D. Its only responsibility is binding: collecting all `lurek.*` API sub-modules, creating the `lurek` global table, sandboxing the Lua environment, and registering every sub-API when the VM boots. It sits at the Edge/Integration tier — nothing in the engine may import from `lua_api`.
 
-The module owns Lua VM creation, standard-library allowlisting, dangerous-global removal, module-by-module registration, LuaUserData wrappers, and the small translation layer that turns Lua values into Rust calls and Rust results back into Lua values. The design rule here is thin wrappers: public binding code lives in lua_api, while domain logic stays in the engine modules below it.
+The primary entry point is `create_lua_vm(state, modules)`, which constructs a fresh LuaJIT VM, creates the `lurek` global table, removes dangerous standard library functions (`load`, `loadfile`, `dofile`, `debug`, `os.execute`, `os.getenv`, `io.open`, `io.popen`) from the sandbox, and then calls each sub-API module's `register(lua, luna, state)` function in sequence. Sub-APIs are gated by `ModulesConfig` flags from `conf.toml`, except for the mandatory group (`event`, `timer`, `math`, `log`) which is always registered.
 
-This module does not own renderer logic, physics logic, file-system semantics, AI behavior, or any other domain behavior itself. If a change starts to look like business logic instead of registration, validation, conversion, or wrapper glue, it probably belongs in another module and should only be exposed here.
+Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn register()` + Lua wrapper structs + `impl LuaUserData` with `add_method` / `add_method_mut` calls. Domain modules in `src/<module>/` contain only pure-Rust types. From the engine's perspective, `SharedState` and `WindowState` are re-exported here from `crate::runtime` for sub-module convenience, meaning all binding code imports from `lua_api` rather than from `runtime` directly.
 
-**Scope boundary**: This module currently depends on `ai`, `animation`, `audio`, `automation`, `camera`, `compute`, `data`, `dataframe`, and other adjacent modules. It stays within the Edge/Integration responsibility boundary defined in the architecture docs.
+`lua_types.rs` provides the `LunaType` trait and `add_type_methods` helper used by sub-APIs for consistent UserData method registration patterns.
+
+**Scope boundary**: Edge/Integration tier. Imports from all other module groups. Nothing imports from `lua_api`.
 
 ## Files
 
@@ -61,6 +63,7 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `scene_api.rs`: Registers lurek.scene and bridges scene stack and transition management.
 - `serial_api.rs`: Registers lurek.codec and exposes JSON, TOML, and CSV serialization helpers.
 - `spine_api.rs`: Registers lurek.spine and wraps skeletal animation types and operations.
+- `sprite_api.rs`: `lurek.sprite` — Sprite-sheet UV layout, named frame groups, atlas parsing, and RPGMaker character-sheet helpers.
 - `system_api.rs`: Registers lurek.platform and exposes OS and platform query helpers.
 - `terminal_api.rs`: Registers lurek.terminal and exposes terminal-style UI and grid features.
 - `thread_api.rs`: Registers lurek.thread and bridges background worker threads and channels.
@@ -73,9 +76,11 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 ## Types
 
 - `LuaAnimation` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`Animation`] controller.
+- `LuaAnimStateMachine` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`AnimStateMachine`] FSM controller.
 - `LuaSource` (`struct`, `audio_api.rs`): Lua-side wrapper for an audio source resource.
 - `LuaBus` (`struct`, `audio_api.rs`): Lua-side wrapper for an audio bus resource.
 - `LuaMidiPlayer` (`struct`, `audio_api.rs`): Lua-side wrapper for the MIDI player.
+- `LuaSoundPool` (`struct`, `audio_api.rs`): Lua-side wrapper for a polyphonic [`crate::audio::SoundPool`].
 - `LuaDecoder` (`struct`, `audio_api.rs`): Lua-side wrapper for a streaming audio decoder.
 - `LuaCamera2D` (`struct`, `camera_api.rs`): Lua-side wrapper around a [`Camera2D`] instance.
 - `LuaArray` (`struct`, `compute_api.rs`): Lua-side wrapper around [`NdArray`].
@@ -95,6 +100,10 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `LuaLight` (`struct`, `light_api.rs`): Lua-side handle to a light resource stored in [`LightWorld`].
 - `LuaOccluder` (`struct`, `light_api.rs`): Lua-side handle to an occluder resource stored in [`LightWorld`].
 - `LunaType` (`trait`, `lua_types.rs`): Shared trait for LuaUserData wrappers that need consistent runtime type metadata, type hierarchies, and stringification behavior. If wrapper behavior should feel uniform across modules, start here.
+- `LuaVec2` (`struct`, `math_api.rs`): Lua-side wrapper around a [`Vec2`] value type.
+- `LuaVec3` (`struct`, `math_api.rs`): Lua-side wrapper around a [`Vec3`] value type.
+- `LuaCatmullRom` (`struct`, `math_api.rs`): Lua-side wrapper around a [`CatmullRomSpline`].
+- `LuaHermite` (`struct`, `math_api.rs`): Lua-side wrapper around a [`HermiteSpline`].
 - `LuaRandomGenerator` (`struct`, `math_api.rs`): Lua-side wrapper around a [`RandomGenerator`].
 - `LuaTransform` (`struct`, `math_api.rs`): Lua-side wrapper around a [`Transform`].
 - `LuaBezierCurve` (`struct`, `math_api.rs`): Lua-side wrapper around a [`BezierCurve`].
@@ -105,6 +114,7 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `LuaMod` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 - `LuaModManager` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModManager`].
 - `LuaNetworkHost` (`struct`, `network_api.rs`): Lua-side wrapper around [`NetworkHost`].
+- `LuaNetworkRuntime` (`struct`, `network_api.rs`): Lua-side wrapper around [`NetworkRuntime`] for async HTTP/TCP/WebSocket.
 - `LuaParallaxLayer` (`struct`, `parallax_api.rs`): Lua-side handle to a single parallax background layer.
 - `LuaParallaxSet` (`struct`, `parallax_api.rs`): Lua-side container that groups `LuaParallaxLayer` objects for scene-level management.
 - `LuaParticleSystem` (`struct`, `particle_api.rs`): Lua-side handle to a particle system stored in SharedState.
@@ -114,11 +124,19 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `LuaFlowField` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`FlowField`].
 - `LuaPathGrid` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`PathGrid`] (A★ weighted grid with per-cell cost).
 - `LuaAiFlowField` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a PathGrid-based [`AiFlowField`].
+- `LuaHexGrid` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`HexGrid`].
+- `LuaJpsGrid` (`struct`, `pathfind_api.rs`): Lua-side wrapper around a [`JpsGrid`].
 - `LuaWorld` (`struct`, `physics_api.rs`): Lua-side handle wrapping a physics World.
+- `LuaZone` (`struct`, `physics_api.rs`): Lua-side handle to a [`PhysicsZone`] living inside a [`World`].
+- `LuaTerrain` (`struct`, `physics_api.rs`): Lua-side handle to a destructible [`TerrainMap`].
+- `LuaCellular` (`struct`, `physics_api.rs`): Lua-side handle to a falling-sand [`CellularWorld`].
 - `LuaBody` (`struct`, `physics_api.rs`): Lua-side handle to a physics body accessed through its world.
 - `LuaPhysicsShape` (`struct`, `physics_api.rs`): Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 - `LuaStep` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 - `LuaPipeline` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
+- `LuaDoorManager` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
+- `LuaHeightMap` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
+- `LuaPointLight` (`struct`, `raycaster_api.rs`): Lua-side value wrapper around a raycaster [`PointLight`].
 - `LuaRaycaster` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`Raycaster2D`] grid.
 - `LuaImageData` (`struct`, `render_api.rs`): Lua-side handle to a loaded texture stored in SharedState.
 - `LuaImage` (`struct`, `render_api.rs`): Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
@@ -133,6 +151,9 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `LuaSaveManager` (`struct`, `save_api.rs`): Lua-side wrapper around [`SaveManager`] with per-module callback storage.
 - `LuaDepthSorter` (`struct`, `scene_api.rs`): Lua-side wrapper around a [`DepthSorter`] with registry-stored callbacks.
 - `LuaSkeleton` (`struct`, `spine_api.rs`): Lua-side wrapper around a [`Skeleton`].
+- `LuaSkeletonAnimation` (`struct`, `spine_api.rs`): Lua-side wrapper around a [`SkeletonAnimation`] keyframe clip.
+- `LuaSpriteSheet` (`struct`, `sprite_api.rs`): Lua-side wrapper around a [`SpriteSheet`] frame-grid calculator.
+- `LuaSpriteAtlas` (`struct`, `sprite_api.rs`): Lua-side wrapper around a [`SpriteAtlas`] named-region store.
 - `PowerState` (`enum`, `system_api.rs`): Power state of the device.
 - `LuaThreadHandle` (`struct`, `thread_api.rs`): Lua-side wrapper around a background [`LuaThread`].
 - `LuaTileSet` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`TileSet`].
@@ -145,46 +166,52 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `LuaMapScript` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`MapScript`] procedural generation script.
 - `LuaMapGen` (`struct`, `tilemap_api.rs`): Lua-side wrapper for a map generator (size preset or explicit dimensions).
 - `LuaScheduler` (`struct`, `timer_api.rs`): Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
+- `LuaTweenState` (`struct`, `tween_api.rs`): Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
+- `LuaLineChart` (`struct`, `ui_api.rs`): Lua wrapper for a line chart renderer.
+- `LuaBarChart` (`struct`, `ui_api.rs`): Lua wrapper for a grouped bar chart renderer.
+- `LuaScatterPlot` (`struct`, `ui_api.rs`): Lua wrapper for a scatter plot renderer.
+- `LuaPieChart` (`struct`, `ui_api.rs`): Lua wrapper for a pie chart renderer.
+- `LuaAreaChart` (`struct`, `ui_api.rs`): Lua wrapper for a stacked area chart renderer.
 
 ## Functions
 
-- `register` (`ai_api.rs`): Registers the `lurek.ai` API table with the Lua VM.
-- `register` (`animation_api.rs`): Registers the `lurek.animation` API table with the Lua VM.
-- `register` (`audio_api.rs`): Registers the `lurek.audio` API table with the Lua VM.
-- `register` (`automation_api.rs`): Registers the `lurek.simulator` API table with the Lua VM.
-- `Step::vec_from_lua_table` (`automation_api.rs`): Public function or method declared in `automation_api.rs`.
-- `register` (`camera_api.rs`): Registers the `lurek.camera` API table with the Lua VM.
-- `register` (`compute_api.rs`): Registers the `lurek.compute` API table with the Lua VM.
-- `register` (`data_api.rs`): Registers the `lurek.data` API table with the Lua VM.
-- `register` (`dataframe_api.rs`): Registers the `lurek.dataframe` API table with the Lua VM.
-- `register` (`debugbridge_api.rs`): Registers the `lurek.debugbridge` namespace.
-- `register` (`devtools_api.rs`): Registers `lurek.devtools.*`.
-- `register` (`docs_api.rs`): Registers the `lurek.docs` namespace.
-- `register` (`ecs_api.rs`): Registers the `lurek.entity` API table with the Lua VM.
-- `register` (`effect_api.rs`): Registers the `lurek.effect` API table with the Lua VM.
-- `register` (`event_api.rs`): Registers the `lurek.signal` API table with the Lua VM.
-- `register` (`filesystem_api.rs`): Registers the `lurek.fs` API table with the Lua VM.
-- `register` (`graph_api.rs`): Registers the `lurek.graph` API namespace.
-- `register` (`i18n_api.rs`): Registers `lurek.localization.*`.
-- `register` (`image_api.rs`): Registers the `lurek.img` API table with the Lua VM.
-- `register` (`input_api.rs`): Registers the `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch` API tables.
-- `register` (`light_api.rs`): Registers the `lurek.light` API table with the Lua VM.
-- `register` (`log_api.rs`): Registers the `lurek.log.*` namespace into the shared `luna` table.
+- `register` (`ai_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`animation_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`audio_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`automation_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `Step::vec_from_lua_table` (`automation_api.rs`): vec_from_lua_table.
+- `register` (`camera_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`compute_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`data_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`dataframe_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`debugbridge_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`devtools_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`docs_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`ecs_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`effect_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`event_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`filesystem_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`graph_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`i18n_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`image_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`input_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`light_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`log_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `add_type_methods` (`lua_types.rs`): Adds the standard `type()`, `typeOf(typeName)`, and `__tostring` methods to any [`LuaUserData`] type that also implements [`LunaType`].
-- `register` (`math_api.rs`): Registers the `lurek.math` API table with the Lua VM.
-- `register` (`minimap_api.rs`): Registers the `lurek.minimap` API table with the Lua VM.
+- `register` (`math_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`minimap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `create_lua_vm` (`mod.rs`): Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the provided module flags, and returns the ready `Lua` instance.
 - `create_test_vm` (`mod.rs`): Creates a test Lua VM with the BDD test framework loaded and all available API modules registered.
 - `LuaMod::new` (`mods_api.rs`): Creates a new [`LuaMod`] from a [`ModInfo`].
 - `LuaModManager::new` (`mods_api.rs`): Creates a new empty [`LuaModManager`].
-- `register` (`mods_api.rs`): Registers the `lurek.modding` API table with the Lua VM.
-- `register` (`network_api.rs`): Registers the `lurek.network` API table with the Lua VM.
-- `register` (`parallax_api.rs`): Registers the `lurek.parallax` sub-table on the given `luna` global.
-- `register` (`particle_api.rs`): Registers the `lurek.particles` API table with the Lua VM.
-- `ParticleConfig::from_lua_opts` (`particle_api.rs`): Public function or method declared in `particle_api.rs`.
-- `register` (`pathfind_api.rs`): Registers the `lurek.pathfinding` API table with the Lua VM.
-- `register` (`patterns_api.rs`): Registers the `lurek.patterns.*` Lua API namespace.
-- `register` (`physics_api.rs`): Registers the `lurek.physics` API namespace.
+- `register` (`mods_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`network_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`parallax_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`particle_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `ParticleConfig::from_lua_opts` (`particle_api.rs`): from_lua_opts.
+- `register` (`pathfind_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`patterns_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`physics_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `LuaStep::new` (`pipeline_api.rs`): Creates a new [`LuaStep`] wrapping the given [`PipelineStep`].
 - `LuaStep::execute_sync` (`pipeline_api.rs`): Executes this step's callback synchronously, handling retries and status transitions.
 - `LuaPipeline::new` (`pipeline_api.rs`): Creates a new [`LuaPipeline`] wrapping the given [`Pipeline`].
@@ -193,35 +220,36 @@ This module does not own renderer logic, physics logic, file-system semantics, A
 - `cancel_remaining_steps` (`pipeline_api.rs`): Cancels all steps in `order` that are still pending.
 - `fire_step_callbacks` (`pipeline_api.rs`): Fires the per-step pipeline callbacks based on the step's terminal status.
 - `finalize_pipeline_result` (`pipeline_api.rs`): Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table, and fires the `on_complete` callback if registered.
-- `register` (`pipeline_api.rs`): Registers the `lurek.pipeline` API table with the Lua VM.
-- `register` (`procgen_api.rs`): Registers the `lurek.procgen` API table with the Lua VM.
-- `CellularOpts::from_lua_table` (`procgen_api.rs`): Public function or method declared in `procgen_api.rs`.
-- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): Public function or method declared in `procgen_api.rs`.
-- `register` (`raycaster_api.rs`): Registers the `lurek.raycaster` API table with the Lua VM.
-- `register` (`render_api.rs`): Registers the `lurek.graphic` namespace on the given Lua table.
+- `register` (`pipeline_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`procgen_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `CellularOpts::from_lua_table` (`procgen_api.rs`): from_lua_table.
+- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): from_lua_table.
+- `register` (`raycaster_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`render_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `LuaSaveManager::new` (`save_api.rs`): Creates a new empty save manager wrapper.
-- `register` (`save_api.rs`): Registers the `lurek.savegame` API table with the Lua VM.
-- `register` (`scene_api.rs`): Registers the `lurek.scene` API table with the Lua VM.
-- `register` (`serial_api.rs`): Registers the `lurek.codec` API table with the Lua VM.
-- `register` (`spine_api.rs`): Registers the `lurek.spine` API table with the Lua VM.
+- `register` (`save_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`scene_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`serial_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`spine_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`sprite_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `get_processor_count` (`system_api.rs`): Returns the number of logical processors available.
 - `get_memory_size` (`system_api.rs`): Returns total system RAM in MiB using the `sysinfo` crate.
 - `open_url` (`system_api.rs`): Opens a URL in the default browser/application.
 - `get_preferred_locales` (`system_api.rs`): Returns the user's preferred locale strings.
 - `PowerState::as_str` (`system_api.rs`): Returns the string representation used in Lua.
 - `get_power_info` (`system_api.rs`): Returns power/battery information: (state, percent, seconds).
-- `register` (`system_api.rs`): Registers `lurek.platform.*` platform query functions into the Lua VM.
-- `register` (`terminal_api.rs`): Registers the `lurek.terminal` API table with the Lua VM.
-- `register` (`thread_api.rs`): Registers the `lurek.thread` API table with the Lua VM.
-- `register` (`tilemap_api.rs`): Registers the `lurek.tilemap` API table with the Lua VM.
-- `register` (`timer_api.rs`): Registers the `lurek.time` API table with the Lua VM.
-- `register` (`tween_api.rs`): Registers the `lurek.tween` property tweening API.
-- `register` (`ui_api.rs`): Registers the `lurek.ui` API table.
+- `register` (`system_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`terminal_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`thread_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`tilemap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`timer_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`tween_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`ui_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`window_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 
 ## Lua API Reference
 
-- No dedicated direct `lurek.*` namespace is exposed by this module.
+- Namespace: `lurek.ai`
 
 ## References
 

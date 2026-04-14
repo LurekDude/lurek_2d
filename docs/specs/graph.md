@@ -11,11 +11,17 @@
 
 ## Summary
 
-The graph module owns directed node-edge-item networks plus the algorithms needed to simulate flow through them. It combines CRUD-style graph storage with routing, connected-component and cycle analysis, item transit, conversion rules, queueing, and supply-demand fulfillment.
+The `graph` module provides Lurek2D's directed flow-simulation graph system — a simulation substrate where typed items flow through a network of nodes connected by directed edges. Unlike a simple data-structure graph, this module models quantity transport: items accumulate in nodes, flow through edges at controlled rates, decay over time, and undergo conversion reactions at nodes. It is a Foundations tier module with no engine dependencies.
 
-This module exists for systems whose logic is relational rather than spatial, such as logistics networks, production chains, dependency graphs, or abstract game-economy flows. It is intentionally not a renderer or a world-space pathfinding system. The small render helper is only for debug visualization, and the legacy graph.rs and traversal.rs files are older on-disk copies rather than the active public surface declared by mod.rs.
+The core container is `Graph`, owning a `SlotMap` of `Node` instances and a `SlotMap` of `Edge` instances. `Node` stores the accumulated item inventory (a `Vec<Item>` with typed quantities), conversion rules (`ConversionRule` maps input item types to output types at a ratio), overflow policy (cap, spill, or reject), and flow mode (push vs pull). `Edge` stores capacity (max items per tick), cooldown timer, and type-filtering that restricts which `ItemType` values may traverse it.
 
-**Scope boundary**: This module currently depends on `image`, `render`, `runtime`. It stays within the Foundations responsibility boundary defined in the architecture docs.
+Simulation is step-driven: `Graph::step(dt)` applies item decay (all items lose a configured fraction per second), processes pending conversions at nodes, applies push/pull flow across edges respecting capacity and cooldowns, and delivers queued items to their destination nodes. Supply/demand processing queries which nodes can provide items and which nodes need them, then resolves transfers.
+
+`Item` and `ItemType` describe the cargo: `ItemType` is a user-defined string tag; `Item` carries a type and a quantity float. `FlowResult` reports the per-step simulation outcome (items moved, conversions fired, overflow events).
+
+Graph algorithms from the `algorithms` submodule cover: connected component analysis, cycle detection, topological sort. `pathfinding` submodule provides Dijkstra shortest-path. The `render` submodule outputs `RenderCommand` entries for debug visualization of node/edge state.
+
+**Scope boundary**: Foundations tier. No engine module imports. Lua bridge in `src/lua_api/graph_api.rs`.
 
 ## Files
 
@@ -56,6 +62,8 @@ This module exists for systems whose logic is relational rather than spatial, su
 - `Graph::get_components` (`algorithms.rs`): Find weakly connected components (treating all edges as undirected).
 - `Graph::has_cycle` (`algorithms.rs`): Detect whether the directed graph contains a cycle (DFS-based).
 - `Graph::topological_sort` (`algorithms.rs`): Topological sort using Kahn's algorithm.
+- `Graph::mst_kruskal` (`algorithms.rs`): Kruskal's Minimum Spanning Tree.
+- `Graph::astar_graph` (`algorithms.rs`): A* search from `from` to `to` using optional spatial positions for the heuristic.
 - `Graph::new` (`core.rs`): Create an empty graph.
 - `Graph::add_node` (`core.rs`): Add a node with the given type and capacity.
 - `Graph::remove_node` (`core.rs`): Remove a node and all connected edges.
@@ -80,6 +88,8 @@ This module exists for systems whose logic is relational rather than spatial, su
 - `Graph::get_incoming_edges` (`core.rs`): Get IDs of edges arriving at a node.
 - `Graph::get_edges_by_direction` (`core.rs`): Returns edge IDs for a node filtered by direction string.
 - `Graph::draw_to_image` (`core.rs`): Render the graph to an image with circular node layout.
+- `Graph::serialize` (`core.rs`): Serialize the graph to a JSON-compatible `serde_json::Value` map.
+- `Graph::deserialize` (`core.rs`): Deserialize a graph from a map produced by [`Graph::serialize`].
 - `Edge::new` (`edge.rs`): Create a new edge with defaults.
 - `Edge::get_type` (`edge.rs`): Get the edge type.
 - `Edge::set_type` (`edge.rs`): Set the edge type.
@@ -224,6 +234,8 @@ This module exists for systems whose logic is relational rather than spatial, su
 - `Graph:getComponents`: Returns weakly connected components as a table of tables of Node handles.
 - `Graph:hasCycle`: Returns true if the graph contains a directed cycle.
 - `Graph:topologicalSort`: Returns a topologically sorted table of Node handles, or nil if a cycle exists.
+- `Graph:mst`: Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
+- `Graph:astar`: Finds the shortest path between two nodes using A*.
 - `Graph:processDemand`: Processes all supply/demand declarations and fires event callbacks.
 - `Graph:getStats`: Returns a statistics snapshot table.
 - `Graph:type`: Returns the type name of this object.

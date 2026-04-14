@@ -5,19 +5,21 @@
 - Module group: `Core Runtime`
 - Source path: `src/runtime/`
 - Lua API path(s): None direct
-- Primary Lua namespace: None direct
+- Primary Lua namespace: `lurek.platform.setLogLevel`
 - Rust test path(s): tests/rust/unit/window_tests.rs, tests/rust/ext/graphics_runtime_smoke_tests.rs, plus runtime-focused unit coverage embedded in src/runtime/messages.rs
 - Lua test path(s): tests/lua/config/test_config.lua, tests/lua/harness.rs
 
 ## Summary
 
-The runtime module is the engine's shared substrate. It defines startup configuration, the canonical engine error type, stable log message IDs, the embedded human-readable message catalog, and the central `SharedState` object that all Lua bindings and the main loop mutate through `Rc<RefCell<_>>`.
+The `runtime` module is the foundational layer of Lurek2D — every other Rust module imports from it. It provides the central shared state, engine configuration, error handling, resource key types, and the structured log message catalog. Nothing in the engine imports from `runtime`'s upstream; it is the dependency tree's root.
 
-This module exists so the rest of Lurek2D can agree on a single source of truth for engine-wide state and identifiers. Rendering, input, audio, events, timers, filesystem access, and many higher-level systems all meet here through typed resource pools, per-frame timing fields, the event queue, and pending runtime actions such as restart, quit, async loads, and screenshots.
+`SharedState` is the engine's central mutable context, passed as `Rc<RefCell<SharedState>>` to every subsystem and Lua binding. It holds: the `EventQueue` for the current frame, all input state objects (`KeyboardState`, `MouseState`, `GamepadState`, `TouchState`), the active `Camera`, `LightWorld`, audio `Mixer`, `Clock`, `GameFS`, `GuiContext`, active `ParticleSystem`s, `TileMap`s, and the pending `Vec<RenderCommand>` for the frame. `WindowState` tracks window dimensions, fullscreen mode, and deferred window-management commands. `FullscreenType` discriminates borderless vs exclusive fullscreen. `RendererStats` carries per-frame draw call counts and timing.
 
-It intentionally does not own subsystem behavior. Rendering logic lives in `render`, audio mixing in `audio`, input device state machines in `input`, sandboxed path policy in `filesystem`, and Lua-facing registration in `src/lua_api/`. If a change is about how a subsystem behaves rather than how global state is stored or shared, that change usually belongs outside `runtime`.
+`Config` is loaded from `conf.toml` at boot and covers window settings (`width`, `height`, `fps_cap`, `vsync`), audio defaults, and `ModulesConfig` — per-module feature flags that gate which `lurek.*` sub-APIs are registered. `EngineError` is a flat enum covering config, filesystem, Lua, rendering, audio, and physics error categories. `EngineResult<T>` is the global `Result<T, EngineError>` alias used across all modules.
 
-**Scope boundary**: This module currently depends on `audio`, `camera`, `event`, `filesystem`, `input`, `light`, `parallax`, `particle`, and other adjacent modules. It stays within the Core Runtime responsibility boundary defined in the architecture docs.
+Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`, `SpriteBatchKey`, `ParticleKey`, `SoundKey`) are newtyped `slotmap::DefaultKey` values for typed SlotMap pools. Log message IDs are stable four-character codes defined in `log_messages.rs`.
+
+**Scope boundary**: Foundations tier. Imports only from external crates. Everything else imports from `runtime`.
 
 ## Files
 
@@ -79,6 +81,9 @@ It intentionally does not own subsystem behavior. Rendering logic lives in `rend
 - `MessageCatalog::is_empty` (`messages.rs`): Returns `true` if the catalog contains no entries.
 - `init` (`messages.rs`): Initialise the global message catalog from the embedded TOML.
 - `get_message` (`messages.rs`): Resolve a stable message ID to its human-readable text.
+- `resolve_message` (`messages.rs`): Resolve an arbitrary message ID to its human-readable text.
+- `has_message` (`messages.rs`): Returns `true` if the global message catalog contains the given ID.
+- `message_count` (`messages.rs`): Number of entries currently registered in the global message catalog.
 - `catalog` (`messages.rs`): Returns a reference to the global [`MessageCatalog`], or `None` if [`init`] has not been called yet.
 - `SharedState::new` (`shared_state.rs`): Creates a new `SharedState` with the given window dimensions, title, and game directory.
 - `SharedState::step_timer` (`shared_state.rs`): Advances the clock by one tick and syncs `delta_time`, `total_time`, and `fps`.
@@ -89,7 +94,7 @@ It intentionally does not own subsystem behavior. Rendering logic lives in `rend
 
 ## Lua API Reference
 
-- No dedicated direct `lurek.*` namespace is exposed by this module.
+- Namespace: `lurek.platform.setLogLevel`
 
 ## References
 

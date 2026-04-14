@@ -7,6 +7,11 @@
 use std::collections::HashMap;
 
 /// An L-system with an axiom, rewriting rules, and an iteration count.
+///
+/// # Fields
+/// - `axiom` — `String`.
+/// - `rules` — `HashMap<char, String>`.
+/// - `iterations` — `u32`.
 pub struct LSystem {
     /// The initial symbol string.
     pub axiom: String,
@@ -19,6 +24,14 @@ pub struct LSystem {
 impl LSystem {
     /// Create a new L-system.
     ///
+    /// # Parameters
+    /// - `axiom` — `&str`.
+    /// - `rules` — `Vec<(char, &str)>`.
+    /// - `iterations` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
+    ///
     /// `rules` is a list of `(symbol, replacement)` pairs.
     pub fn new(axiom: &str, rules: Vec<(char, &str)>, iterations: u32) -> Self {
         Self {
@@ -29,6 +42,14 @@ impl LSystem {
     }
 
     /// Create a new L-system from owned-string rule pairs.
+    ///
+    /// # Parameters
+    /// - `axiom` — `&str`.
+    /// - `rules` — `&[(char, String)]`.
+    /// - `iterations` — `u32`.
+    ///
+    /// # Returns
+    /// `Self`.
     ///
     /// Convenience constructor for callers that hold `String` values (e.g. Lua bindings).
     /// `rules` is a list of `(symbol, replacement)` pairs.
@@ -41,6 +62,9 @@ impl LSystem {
     }
 
     /// Run the rewriting rules for `self.iterations` steps and return the resulting string.
+    ///
+    /// # Returns
+    /// `String`.
     pub fn generate(&self) -> String {
         let mut current = self.axiom.clone();
         for _ in 0..self.iterations {
@@ -58,6 +82,13 @@ impl LSystem {
     }
 
     /// Interpret the generated string as turtle-graphics commands and return line segments.
+    ///
+    /// # Parameters
+    /// - `angle_deg` — `f32`.
+    /// - `step` — `f32`.
+    ///
+    /// # Returns
+    /// `Vec<(f32, f32, f32, f32)>`.
     ///
     /// The turtle starts at the origin facing up. Recognised commands:
     /// - `F` / `G` — move forward by `step`, drawing a line segment.

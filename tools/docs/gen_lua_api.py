@@ -219,7 +219,7 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
 
     # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority — struct-level docs)
     for i, line in enumerate(lines):
-        m = re.match(r"\s*(?:pub\s+)?struct (Lua\w+)", line)
+        m = re.match(r"\s*(?:pub(?:\([^)]*\))?\s+)?struct (Lua\w+)", line)
         if not m:
             continue
         struct_name = m.group(1)

@@ -101,6 +101,32 @@ _INTERNAL_MODULES = {
     "pathfind::hpa",
     "save::save_data",
     "save::save_manager",
+    # Aseprite JSON parser — called internally by lurek.animation.loadAnimation
+    "animation::aseprite",
+    # compute::analytics functions are exposed as Array instance methods (Array:histogram() etc.)
+    "compute::analytics",
+    # effect::presets — internal helper; presets accessible through lurek.effect API
+    "effect::presets",
+    # Network transport layer — called from network runtime thread, not Lua surface
+    "network::http",
+    "network::message",
+    # physics::cellular palette — internal color helper for cellular automaton rendering
+    "physics::cellular",
+    # procgen noise primitives — already wrapped as lurek.procgen.noiseMap / noiseMapParallel
+    "procgen::noise",
+    # procgen world_graph — already wrapped as lurek.procgen.worldGraph
+    "procgen::world_graph",
+    # graph_nav — A* / Dijkstra on Graph structs; LuaGraph is private in graph_api,
+    # graph traversal should use lurek.graph node/edge iteration
+    "pathfind::graph_nav",
+    # wgpu uniform mapping — internal GPU pipeline helper
+    "render::postfx_pipeline",
+    # Engine message resolution — internal human-readable error lookup
+    "runtime::messages",
+    # Sprite atlas JSON parser — called internally by lurek.render loadSplineAtlas
+    "sprite::atlas",
+    # LDtk file format parser — called internally by lurek.tilemap.loadLdtk
+    "tilemap::ldtk",
 }
 
 # Minimum description length to be considered "documented"
