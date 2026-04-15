@@ -20,9 +20,11 @@ use crate::log_msg;
 /// - `Bool` — Bool variant.
 /// - `Number` — Number variant.
 /// - `String` — String variant.
+/// - `Table` — Table variant.
+/// - `Bytes` — Bytes variant.
 ///
-/// Only Lua-native primitive types are supported; UserData, tables, and
-/// functions cannot cross thread boundaries.
+/// Primitive types, serialized tables, and raw byte blobs can cross thread
+/// boundaries. UserData and functions cannot.
 #[derive(Debug, Clone)]
 pub enum ChannelValue {
     /// Lua `nil`.
@@ -33,6 +35,10 @@ pub enum ChannelValue {
     Number(f64),
     /// Lua string.
     String(String),
+    /// Serialized Lua table as key-value pairs, suitable for cross-thread transmission.
+    Table(Vec<(ChannelValue, ChannelValue)>),
+    /// Raw binary data blob.
+    Bytes(Vec<u8>),
 }
 
 /// Thread-safe MPMC channel for Lua inter-thread communication.
@@ -227,8 +233,8 @@ pub struct LuaChannel {
 /// # Returns
 /// `LuaResult<ChannelValue>`.
 ///
-/// Only nil, boolean, number (integer or float), and string are supported.
-/// Returns a Lua runtime error for unsupported types.
+/// Supports nil, boolean, number, string, and recursively-serialized tables.
+/// Returns a Lua runtime error for unsupported types (UserData, functions, etc.).
 pub fn lua_to_channel_value(value: LuaValue) -> LuaResult<ChannelValue> {
     match value {
         LuaValue::Nil => Ok(ChannelValue::Nil),
@@ -236,8 +242,18 @@ pub fn lua_to_channel_value(value: LuaValue) -> LuaResult<ChannelValue> {
         LuaValue::Integer(n) => Ok(ChannelValue::Number(n as f64)),
         LuaValue::Number(n) => Ok(ChannelValue::Number(n)),
         LuaValue::String(s) => Ok(ChannelValue::String(s.to_str()?.to_string())),
+        LuaValue::Table(t) => {
+            let mut pairs = Vec::new();
+            for pair in t.pairs::<LuaValue, LuaValue>() {
+                let (k, v) = pair?;
+                let ck = lua_to_channel_value(k)?;
+                let cv = lua_to_channel_value(v)?;
+                pairs.push((ck, cv));
+            }
+            Ok(ChannelValue::Table(pairs))
+        }
         _ => Err(LuaError::RuntimeError(
-            "Channel can only transfer nil, boolean, number, and string values".into(),
+            "Channel can only transfer nil, boolean, number, string, and table values".into(),
         )),
     }
 }
@@ -256,5 +272,15 @@ pub fn channel_value_to_lua(lua: &Lua, value: ChannelValue) -> LuaResult<LuaValu
         ChannelValue::Bool(b) => Ok(LuaValue::Boolean(b)),
         ChannelValue::Number(n) => Ok(LuaValue::Number(n)),
         ChannelValue::String(s) => Ok(LuaValue::String(lua.create_string(&s)?)),
+        ChannelValue::Table(pairs) => {
+            let tbl = lua.create_table()?;
+            for (k, v) in pairs {
+                let lk = channel_value_to_lua(lua, k)?;
+                let lv = channel_value_to_lua(lua, v)?;
+                tbl.set(lk, lv)?;
+            }
+            Ok(LuaValue::Table(tbl))
+        }
+        ChannelValue::Bytes(b) => Ok(LuaValue::String(lua.create_string(&b)?)),
     }
 }

@@ -10,3 +10,7 @@
 pub mod channel;
 /// Worker sub-module.
 pub mod worker;
+/// Thread pool sub-module.
+pub mod pool;
+/// Promise / future sub-module.
+pub mod promise;

@@ -189,7 +189,41 @@ fn register_thread_safe_modules(
     )?;
     luna.set("thread", thread_table)?;
 
+    // ── lurek.fs (read-only, workers only) ──────────────────────────────────
+    // Workers get a minimal filesystem API limited to reading files.
+    // Path traversal via ".." is blocked. Full GameFS sandbox is not available
+    // in worker threads; paths are resolved relative to the process working dir.
+    let fs_table = lua.create_table()?;
+    fs_table.set(
+        "read",
+        lua.create_function(|lua_ctx, path: String| {
+            if path.contains("..") {
+                return Err(mlua::Error::RuntimeError(
+                    "lurek.fs.read: path traversal not allowed".to_string(),
+                ));
+            }
+            match std::fs::read_to_string(&path) {
+                Ok(content) => Ok(mlua::Value::String(lua_ctx.create_string(&content)?)),
+                Err(e) => Err(mlua::Error::RuntimeError(format!("fs.read: {}", e))),
+            }
+        })?,
+    )?;
+    luna.set("fs", fs_table)?;
+
     lua.globals().set("lurek", luna)?;
+
+    // ── package.path — module search path for require() ─────────────────────
+    // Workers can require Lua modules relative to the process working directory.
+    // The game path is not injected here; pass it through channel args if needed.
+    if let Ok(package) = lua.globals().get::<_, mlua::Table>("package") {
+        let current: String = package.get("path").unwrap_or_default();
+        let new_path = if current.is_empty() {
+            "./?.lua;./?/init.lua".to_string()
+        } else {
+            format!("{}:./?.lua:./?.lua/init.lua", current)
+        };
+        let _ = package.set("path", new_path);
+    }
 
     // Set up arg table from passed arguments
     let arg_table = lua.create_table()?;

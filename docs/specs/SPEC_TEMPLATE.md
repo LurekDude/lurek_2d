@@ -19,6 +19,9 @@
 
 ## Summary
 
+- Several sentences describing the module's purpose, design, and public interface.
+- Describe the module's scope boundary and how it interacts with other modules.
+
 ## Files
 
 - `mod.rs`: Module root and re-export surface.

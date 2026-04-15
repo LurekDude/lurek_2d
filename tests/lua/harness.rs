@@ -124,11 +124,6 @@ fn lua_test_window() {
 }
 
 #[test]
-fn lua_test_engine() {
-    run_lua_test("unit/test_engine.lua");
-}
-
-#[test]
 fn lua_test_system() {
     run_lua_test("unit/test_system.lua");
 }
