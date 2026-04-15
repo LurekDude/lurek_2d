@@ -28,14 +28,15 @@ use crate::tween::handle::{LuaTween, LuaTweenParallel, LuaTweenSequence};
 
 /// Active-object pool and frame-tick driver for the `lurek.tween` system.
 ///
-/// Tracks all live `LuaTween`, `LuaTweenSequence`, and `LuaTweenParallel` objects
-/// via `LuaRegistryKey` handles, preventing premature garbage collection. Each frame,
-/// `update()` drives every active object and removes those that finish or cancel.
+/// Tracks all live `LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`, and `LuaSpring`
+/// objects via `LuaRegistryKey` handles, preventing premature garbage collection.
+/// Each frame, `update()` drives every tween object and the Lua API layer ticks springs.
 ///
 /// # Fields
 /// - `active_tweens` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTween`.
 /// - `active_seqs` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTweenSequence`.
 /// - `active_pars` — `Vec<LuaRegistryKey>`. Registry references to live `LuaTweenParallel`.
+/// - `active_springs` — `Vec<LuaRegistryKey>`. Registry references to live `LuaSpring`.
 /// - `custom_easings` — `HashMap<String, LuaRegistryKey>`. Name → Lua easing function.
 pub struct TweenEngine {
     /// Registry references to all currently tracked `LuaTween` objects.
@@ -44,6 +45,8 @@ pub struct TweenEngine {
     pub active_seqs: Vec<LuaRegistryKey>,
     /// Registry references to all currently tracked `LuaTweenParallel` objects.
     pub active_pars: Vec<LuaRegistryKey>,
+    /// Registry references to all currently tracked `LuaSpring` objects.
+    pub active_springs: Vec<LuaRegistryKey>,
     /// User-registered easing functions: name → registry key for the Lua function.
     pub custom_easings: HashMap<String, LuaRegistryKey>,
 }
@@ -58,6 +61,7 @@ impl TweenEngine {
             active_tweens: Vec::new(),
             active_seqs: Vec::new(),
             active_pars: Vec::new(),
+            active_springs: Vec::new(),
             custom_easings: HashMap::new(),
         }
     }
@@ -199,12 +203,15 @@ impl TweenEngine {
         Ok(())
     }
 
-    /// Returns the total number of currently tracked objects (tweens + seqs + pars).
+    /// Returns the total number of currently tracked objects (tweens + seqs + pars + springs).
     ///
     /// # Returns
     /// `usize`.
     pub fn active_count(&self) -> usize {
-        self.active_tweens.len() + self.active_seqs.len() + self.active_pars.len()
+        self.active_tweens.len()
+            + self.active_seqs.len()
+            + self.active_pars.len()
+            + self.active_springs.len()
     }
 }
 

@@ -57,11 +57,22 @@ cam:setParallaxFactor("clouds", 0.1)
 
 ---
 
-### ❌ TODO — Extended Camera Effects (Zoom Pulse, Sway, Breathing)
+### ✅ DONE — Extended Camera Effects (Zoom Pulse, Sway, Breathing)
 **Source**: features/camera.md — Feature Gaps #3
 
-Only screen shake implemented. Cinematic effects like zoom pulse, camera sway, and breathing
-are not present. These are commonly needed for juice/feel in action games.
+Three cinematic effects added to `Camera2D` in `src/camera/effects.rs`:
+
+- **Zoom Pulse** (`cam:zoomPulse(amplitude, duration)`) — brief sine-envelope zoom-in that
+  decays back to the base zoom. Great for hit impacts.
+- **Sway** (`cam:startSway(amp_x, amp_y, frequency, decay?)` / `cam:stopSway()`) —
+  sinusoidal x/y offset oscillation with optional amplitude decay. Useful for boat rocking
+  or underwater environments.
+- **Breathing** (`cam:startBreathing(amplitude?, rate?)` / `cam:stopBreathing()`) — subtle
+  periodic zoom oscillation for a "living camera" feel.
+
+Query helpers: `cam:getEffectiveZoom()` returns base zoom + pulse + breathing deltas;
+`cam:getEffectOffset()` returns the current sway `dx, dy`. State predicates:
+`cam:isSway()`, `cam:isBreathing()`.
 
 ---
 

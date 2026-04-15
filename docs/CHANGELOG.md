@@ -2,6 +2,21 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.13.0] — 2026-04-16
+### Added
+- **data**: `lurek.data.newRingBuffer(capacity)` — fixed-capacity circular ring buffer UserData. Methods: `:push(value)`, `:pop()`, `:peek()`, `:peekNewest()`, `:len()`, `:capacity()`, `:isEmpty()`, `:isFull()`, `:clear()`, `:toTable()`. Accepts any Lua value via `LuaRegistryKey` storage.
+- **math**: `lurek.math.aabbTree()` — dynamic axis-aligned bounding box tree (BVH) UserData with Box2D-style best-first sibling selection. Methods: `:insert(id, min_x, min_y, max_x, max_y)`, `:remove(id)`, `:query(...)`, `:queryPoint(x, y)`, `:update(...)`, `:contains(id)`, `:len()`, `:isEmpty()`, `:clear()`.
+- **tween**: `lurek.tween.spring(target_table, fields_table, opts?)` — physics-based spring interpolation UserData. `opts` accepts `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001). Methods: `:update(dt)`, `:isSettled()`, `:setTarget(fields)`, `:setStiffness(v)`, `:setDamping(v)`, `:cancel()`, `:getPosition(field)`. Auto-ticked by `lurek.tween.update(dt)`.
+- **log**: `lurek.log.struct(level, message, fields_table)` — structured logging with key-value fields. Stored in memory sink `fields` map; formatted as `msg { k1=v1, k2=v2 }` in file/console sinks.
+- **log**: `lurek.log.debug_fields`, `info_fields`, `warn_fields`, `error_fields` — shorthand structured log helpers at each severity level.
+- **log**: Memory sink entries now carry a `fields` key (table or nil) for structured field retrieval via `getSinkEntries`.
+- **camera**: `cam:zoomPulse(amplitude, duration)` — brief zoom-in pulse that decays back using a sine envelope.
+- **camera**: `cam:startSway(amplitude_x, amplitude_y, frequency, decay?)` / `:stopSway()` / `:isSway()` — sinusoidal x/y camera offset oscillation with optional per-second decay.
+- **camera**: `cam:startBreathing(amplitude?, rate?)` / `:stopBreathing()` / `:isBreathing()` — subtle periodic zoom oscillation for "alive camera" feel.
+- **camera**: `cam:getEffectiveZoom()` / `:getEffectOffset()` — query current zoom/offset including all active effects.
+- **window**: `lurek.window.setIcon(path)` — request a runtime window icon change by storing the icon path in `WindowState.pending_icon_path` for the event loop to apply.
+- **input**: `lurek.input.newCombo(steps, opts?)` — combo/sequence detector UserData. `steps` is an array of key-name strings or `{key, gap}` tables. Methods: `:feed(key)`, `:tick(dt)`, `:reset()`, `:progress()`, `:totalSteps()`, `:isInProgress()`, `:getStep(i)`.
+
 ## [0.12.0] — 2026-04-15
 ### Added
 - **raycaster**: `Raycaster2D::wall_alphas` — per-tile opacity map (`HashMap<u8, f32>`). `set_wall_alpha(tile_type, alpha)` / `get_wall_alpha(tile_type)` domain methods. Alpha is clamped to `[0.0, 1.0]`.

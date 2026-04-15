@@ -39,12 +39,13 @@ dependencies.
 
 ## Gaps / Ideas
 
-### ❌ TODO — Expose Key Types to Lua
+### ✅ DONE — Expose Key Types to Lua
 **Source**: General API completeness
 
-`Blackboard`, `RingBuffer`, and `CommandStack` are useful from Lua game scripts.
-An `exposeBlackboard()` or `exposeCommandStack()` binding in `lua_api/patterns_api.rs`
-would remove the need for duplicate Lua implementations of these common patterns.
+✅ DONE (2026-04-16) — Verified: `Blackboard`, `Ring`, and `CommandStack` are all exposed
+as `LuaUserData` via `lurek.patterns.newBlackboard()`, `lurek.patterns.newRing(capacity)`,
+and `lurek.patterns.newCommandStack()` in `src/lua_api/patterns_api.rs`. Each type has
+comprehensive methods registered. No further work needed.
 
 ---
 

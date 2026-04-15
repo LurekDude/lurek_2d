@@ -41,11 +41,14 @@ but MessagePack provides standard interoperability.
 
 ---
 
-### ❌ TODO — Ring Buffer
+### ✅ DONE — Ring Buffer
 **Source**: features/data.md — Feature Gaps #4 / Suggestions #5
 
-No circular/ring buffer in `src/data/`. Useful for streaming audio, network receive buffers,
-and rolling history tracking patterns.
+`RingBuffer<T>` in `src/data/ring_buffer.rs` (pure Rust, `Clone` bound, O(1) push/pop).
+`LuaRingBuffer` in `src/lua_api/data_api.rs` stores values via `LuaRegistryKey` so the Lua
+GC cannot collect elements held by the buffer.  Exposed as `lurek.data.newRingBuffer(capacity)`
+with methods: `push`, `pop`, `peek`, `peekNewest`, `len`, `capacity`, `isEmpty`, `isFull`,
+`clear`, `toTable`.
 
 ---
 

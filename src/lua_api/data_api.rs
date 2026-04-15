@@ -3,6 +3,7 @@
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
+use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::Arc;
 
@@ -79,6 +80,119 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
             BinValue::Bytes(b) => lua.create_string(&b[..]).map(LuaValue::String),
         })
         .collect()
+}
+
+// -------------------------------------------------------------------------------
+// LuaRingBuffer UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side fixed-capacity ring buffer that holds any Lua value.
+///
+/// Values are stored via Lua registry keys so the garbage collector cannot
+/// collect them while the buffer holds a reference.
+///
+/// # Fields
+/// - `inner` — Ordered queue of `LuaRegistryKey` references (front = oldest).
+/// - `capacity` — Maximum number of elements before oldest is overwritten.
+pub struct LuaRingBuffer {
+    inner: VecDeque<LuaRegistryKey>,
+    capacity: usize,
+}
+
+impl LuaUserData for LuaRingBuffer {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- push --
+        /// Pushes a value onto the ring buffer.
+        /// Returns false if the buffer was full and the oldest element was overwritten,
+        /// true if there was space available.
+        /// @param value : any
+        /// @return boolean
+        methods.add_method_mut("push", |lua, this, value: LuaValue| {
+            let key = lua.create_registry_value(value)?;
+            let was_full = this.inner.len() >= this.capacity;
+            if was_full {
+                if let Some(old_key) = this.inner.pop_front() {
+                    lua.remove_registry_value(old_key)?;
+                }
+            }
+            this.inner.push_back(key);
+            // Return true if overwrote oldest (was full), false if there was space.
+            Ok(was_full)
+        });
+
+        // -- pop --
+        /// Removes and returns the oldest element, or nil if the buffer is empty.
+        /// @return any
+        methods.add_method_mut("pop", |lua, this, ()| {
+            match this.inner.pop_front() {
+                Some(key) => {
+                    let v: LuaValue = lua.registry_value(&key)?;
+                    lua.remove_registry_value(key)?;
+                    Ok(v)
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- peek --
+        /// Returns the oldest element without removing it, or nil if empty.
+        /// @return any
+        methods.add_method("peek", |lua, this, ()| match this.inner.front() {
+            Some(key) => lua.registry_value::<LuaValue>(key),
+            None => Ok(LuaValue::Nil),
+        });
+
+        // -- peekNewest --
+        /// Returns the newest element without removing it, or nil if empty.
+        /// @return any
+        methods.add_method("peekNewest", |lua, this, ()| match this.inner.back() {
+            Some(key) => lua.registry_value::<LuaValue>(key),
+            None => Ok(LuaValue::Nil),
+        });
+
+        // -- len --
+        /// Returns the number of elements currently in the buffer.
+        /// @return integer
+        methods.add_method("len", |_, this, ()| Ok(this.inner.len() as i64));
+
+        // -- capacity --
+        /// Returns the maximum number of elements the buffer can hold.
+        /// @return integer
+        methods.add_method("capacity", |_, this, ()| Ok(this.capacity as i64));
+
+        // -- isEmpty --
+        /// Returns true if the buffer contains no elements.
+        /// @return boolean
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.is_empty()));
+
+        // -- isFull --
+        /// Returns true if the buffer has reached its capacity.
+        /// @return boolean
+        methods.add_method("isFull", |_, this, ()| {
+            Ok(this.inner.len() >= this.capacity)
+        });
+
+        // -- clear --
+        /// Removes all elements from the buffer, releasing their registry entries.
+        methods.add_method_mut("clear", |lua, this, ()| {
+            while let Some(key) = this.inner.pop_front() {
+                lua.remove_registry_value(key)?;
+            }
+            Ok(())
+        });
+
+        // -- toTable --
+        /// Returns all elements as an array table ordered oldest-first.
+        /// @return table
+        methods.add_method("toTable", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, key) in this.inner.iter().enumerate() {
+                let v: LuaValue = lua.registry_value(key)?;
+                t.set(i + 1, v)?;
+            }
+            Ok(t)
+        });
+    }
 }
 
 // -------------------------------------------------------------------------------
@@ -395,6 +509,26 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|_, tbl: LuaTable| {
             let value = lua_table_to_toml_value(&LuaValue::Table(tbl))?;
             toml_convert::encode_toml(&value).map_err(LuaError::RuntimeError)
+        })?,
+    )?;
+
+    // -- newRingBuffer --
+    /// Creates a fixed-capacity ring buffer that can store any Lua value.
+    /// When the buffer is full, pushing a new value overwrites the oldest.
+    /// @param capacity : integer
+    /// @return RingBuffer
+    tbl.set(
+        "newRingBuffer",
+        lua.create_function(|_, capacity: usize| {
+            if capacity == 0 {
+                return Err(LuaError::RuntimeError(
+                    "newRingBuffer: capacity must be greater than 0".to_string(),
+                ));
+            }
+            Ok(LuaRingBuffer {
+                inner: VecDeque::with_capacity(capacity),
+                capacity,
+            })
         })?,
     )?;
 

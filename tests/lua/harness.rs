@@ -1687,3 +1687,40 @@ fn lua_test_unit_scene_serialization() {
 fn lua_stress_scene_depth_sort() {
     run_lua_test("stress/test_scene_depth_sort.lua");
 }
+
+// ── New IDEA.md features – 2026-04-16 ────────────────────────────────────────
+
+#[test]
+fn lua_test_unit_data_ring_buffer() {
+    run_lua_test("unit/test_data_ring_buffer.lua");
+}
+
+#[test]
+fn lua_test_unit_math_aabb_tree() {
+    run_lua_test("unit/test_math_aabb_tree.lua");
+}
+
+#[test]
+fn lua_test_unit_tween_spring() {
+    run_lua_test("unit/test_tween_spring.lua");
+}
+
+#[test]
+fn lua_test_unit_log_structured() {
+    run_lua_test("unit/test_log_structured.lua");
+}
+
+#[test]
+fn lua_test_unit_camera_effects() {
+    run_lua_test("unit/test_camera_effects.lua");
+}
+
+#[test]
+fn lua_test_unit_window_icon() {
+    run_lua_test("unit/test_window_icon.lua");
+}
+
+#[test]
+fn lua_test_unit_input_combo() {
+    run_lua_test("unit/test_input_combo.lua");
+}

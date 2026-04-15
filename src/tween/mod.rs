@@ -32,9 +32,12 @@
 pub mod engine;
 /// Lua-side handle types for individual tweens, parallels, and sequences.
 pub mod handle;
+/// Physics-based spring interpolation: `SpringAxis` and `SpringSystem`.
+pub mod spring;
 /// Core tween state: timing, easing, and numeric interpolation.
 pub mod state;
 
 pub use engine::TweenEngine;
 pub use handle::{LuaTween, LuaTweenParallel, LuaTweenSequence, ParallelEntry, SequenceStep};
+pub use spring::{SpringAxis, SpringSystem};
 pub use state::{builtin_easing_names, resolve_easing, TweenState};

@@ -19,6 +19,8 @@
 
 /// Camera types: [`Camera`] (flat API) and [`Camera2D`] (smooth follow, shake, bounds).
 pub mod types;
+/// Cinematic camera effects: zoom pulse, sway, and breathing.
+pub mod effects;
 /// Virtual-resolution viewport with letterbox / stretch / pixel-perfect scaling.
 pub mod viewport;
 /// Virtual-resolution viewport that also exposes scaled content dimensions for transform-stack integration.
@@ -29,6 +31,7 @@ pub mod render;
 pub mod path;
 
 pub use types::{Camera, Camera2D};
+pub use effects::{CameraBreathing, CameraSway, ZoomPulse};
 pub use path::{CameraPath, ZoomTween};
 pub use viewport::{ScaleMode, Viewport};
 pub use viewport_scale::ViewportScale;

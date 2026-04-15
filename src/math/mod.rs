@@ -28,6 +28,8 @@ pub mod spline;
 /// Polygon utilities: ear-clipping triangulation and convexity testing.
 pub mod polygon;
 
+/// Dynamic AABB tree for efficient broad-phase overlap queries.
+pub mod aabb_tree;
 /// Seedable random number generator for reproducible sequences.
 pub mod random;
 /// Axis-aligned rectangle with intersection and containment queries.
@@ -41,6 +43,7 @@ pub mod tween;
 /// 2D floating-point vector with arithmetic operators and common helpers.
 pub mod vec2;
 
+pub use aabb_tree::AabbTree;
 pub use bezier::BezierCurve;
 pub use color::{gamma_to_linear, linear_to_gamma, Color};
 pub use geometry::*;

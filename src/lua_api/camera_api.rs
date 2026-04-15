@@ -340,6 +340,94 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
+        // ── Camera effects ──────────────────────────────────────────────
+
+        // -- zoomPulse --
+        /// Triggers a momentary zoom-in that decays back via a sine envelope.
+        /// Replaces any currently active pulse.
+        /// @param amplitude : number
+        /// @param duration : number
+        /// @return nil
+        methods.add_method("zoomPulse", |_, this, (amplitude, duration): (f32, f32)| {
+            this.inner.borrow_mut().zoom_pulse.trigger(amplitude, duration);
+            Ok(())
+        });
+
+        // -- startSway --
+        /// Starts a sinusoidal x/y offset oscillation (e.g., boat rocking).
+        /// @param amplitude_x : number
+        /// @param amplitude_y : number
+        /// @param frequency : number
+        /// @param decay : number?
+        /// @return nil
+        methods.add_method(
+            "startSway",
+            |_, this, (amplitude_x, amplitude_y, frequency, decay): (f32, f32, f32, Option<f32>)| {
+                let decay = decay.unwrap_or(1.0);
+                this.inner
+                    .borrow_mut()
+                    .sway
+                    .start(amplitude_x, amplitude_y, frequency, decay);
+                Ok(())
+            },
+        );
+
+        // -- stopSway --
+        /// Stops the active sway effect immediately.
+        /// @return nil
+        methods.add_method("stopSway", |_, this, ()| {
+            this.inner.borrow_mut().sway.stop();
+            Ok(())
+        });
+
+        // -- isSway --
+        /// Returns true if the sway effect is currently active.
+        /// @return boolean
+        methods.add_method("isSway", |_, this, ()| {
+            Ok(this.inner.borrow().sway.is_active())
+        });
+
+        // -- startBreathing --
+        /// Starts a subtle periodic zoom oscillation for a "living camera" feel.
+        /// @param amplitude : number?
+        /// @param rate : number?
+        /// @return nil
+        methods.add_method("startBreathing", |_, this, (amplitude, rate): (Option<f32>, Option<f32>)| {
+            let amplitude = amplitude.unwrap_or(0.005);
+            let rate = rate.unwrap_or(0.2);
+            this.inner.borrow_mut().breathing.start(amplitude, rate);
+            Ok(())
+        });
+
+        // -- stopBreathing --
+        /// Stops the active breathing effect.
+        /// @return nil
+        methods.add_method("stopBreathing", |_, this, ()| {
+            this.inner.borrow_mut().breathing.stop();
+            Ok(())
+        });
+
+        // -- isBreathing --
+        /// Returns true if the breathing effect is currently active.
+        /// @return boolean
+        methods.add_method("isBreathing", |_, this, ()| {
+            Ok(this.inner.borrow().breathing.is_active())
+        });
+
+        // -- getEffectiveZoom --
+        /// Returns the current zoom level including zoom pulse and breathing deltas.
+        /// @return number
+        methods.add_method("getEffectiveZoom", |_, this, ()| {
+            Ok(this.inner.borrow().effective_zoom())
+        });
+
+        // -- getEffectOffset --
+        /// Returns the current sway x, y world-space offset.
+        /// @return number, number
+        methods.add_method("getEffectOffset", |_, this, ()| {
+            Ok(this.inner.borrow().effect_offset())
+        });
+
     }
 }
 

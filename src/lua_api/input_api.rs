@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
+use crate::input::combo::{ComboDetector, ComboStep};
 use crate::input::keyboard::{get_key_from_scancode, get_scancode_from_key};
 use crate::input::mouse::{is_cursor_supported, CursorKind, SystemCursor};
 
@@ -35,6 +36,103 @@ impl LuaUserData for LuaCursor {
                 CursorKind::System(_) => "system",
                 CursorKind::Custom { .. } => "custom",
             })
+        });
+
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaCombo UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper for a [`ComboDetector`] with an integrated millisecond clock.
+struct LuaCombo {
+    /// The underlying combo detector instance.
+    detector: ComboDetector,
+    /// Running millisecond accumulator used to supply `elapsed_ms` to the detector.
+    total_elapsed_ms: u64,
+}
+
+impl LuaUserData for LuaCombo {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+
+        // -- feed --
+        /// Feed a key-press event into the combo detector.
+        /// Time elapsed since the last `feed` or `tick` call is taken from the internal clock.
+        /// @param key : string
+        /// @return string  "idle"|"advanced"|"completed"|"broken"
+        methods.add_method_mut("feed", |_, this, key: String| {
+            let progress = this.detector.feed(&key, 0);
+            this.total_elapsed_ms = 0;
+            let result = match progress {
+                crate::input::combo::ComboProgress::Completed => "completed",
+                crate::input::combo::ComboProgress::Advanced { .. } => "advanced",
+                crate::input::combo::ComboProgress::Broken => "broken",
+                crate::input::combo::ComboProgress::Idle => "idle",
+            };
+            Ok(result)
+        });
+
+        // -- tick --
+        /// Advance the internal clock by `dt` seconds and check for timeouts.
+        /// Call once per frame with the frame delta even when no key is pressed.
+        /// @param dt : number   frame delta in seconds
+        /// @return string  "expired" if a running combo just timed out; "in_progress" or "idle" otherwise
+        methods.add_method_mut("tick", |_, this, dt: f64| {
+            let elapsed_ms = (dt * 1000.0).round() as u64;
+            this.total_elapsed_ms += elapsed_ms;
+            let progress = this.detector.tick(elapsed_ms);
+            let result = match progress {
+                crate::input::combo::ComboProgress::Broken => "expired",
+                crate::input::combo::ComboProgress::Advanced { .. } => "in_progress",
+                _ => "idle",
+            };
+            Ok(result)
+        });
+
+        // -- reset --
+        /// Reset the detector to its initial idle state, cancelling any in-progress sequence.
+        /// @return nil
+        methods.add_method_mut("reset", |_, this, ()| {
+            this.detector.reset();
+            this.total_elapsed_ms = 0;
+            Ok(())
+        });
+
+        // -- progress --
+        /// Returns the number of steps matched so far (0 when idle).
+        /// @return integer
+        methods.add_method("progress", |_, this, ()| {
+            Ok(this.detector.progress() as i64)
+        });
+
+        // -- totalSteps --
+        /// Returns the total number of steps in the combo sequence.
+        /// @return integer
+        methods.add_method("totalSteps", |_, this, ()| {
+            Ok(this.detector.len() as i64)
+        });
+
+        // -- isInProgress --
+        /// Returns true if the detector is currently mid-sequence.
+        /// @return boolean
+        methods.add_method("isInProgress", |_, this, ()| {
+            Ok(this.detector.is_in_progress())
+        });
+
+        // -- getStep --
+        /// Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
+        /// @param index : integer   1-based
+        /// @return table | nil
+        methods.add_method("getStep", |lua, this, index: usize| {
+            if index == 0 || index > this.detector.steps.len() {
+                return Ok(LuaValue::Nil);
+            }
+            let step = &this.detector.steps[index - 1];
+            let tbl = lua.create_table()?;
+            tbl.set("key", step.key.clone())?;
+            tbl.set("gap_ms", step.max_gap_ms)?;
+            Ok(LuaValue::Table(tbl))
         });
 
     }
@@ -907,6 +1005,67 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 return Ok(current.saturating_sub(pressed_at) <= frames);
             }
             Ok(false)
+        })?,
+    )?;
+
+    // -- newCombo --
+    /// Creates a new combo detector from an ordered list of steps.
+    ///
+    /// Each step can be a plain string (key name) or a table `{key="a", gap=500}`.
+    /// When a plain string is given, the per-step gap defaults to 500 ms.
+    ///
+    /// `opts` is an optional table that may contain:
+    ///   `total_gap` (integer, ms) — budget for the entire sequence (default 2000 ms).
+    ///
+    /// @param steps : table   array of strings or `{key,gap}` tables
+    /// @param opts  : table?  `{total_gap=integer?}`
+    /// @return Combo
+    input_tbl.set(
+        "newCombo",
+        lua.create_function(|_lua, (steps_val, opts): (LuaTable, Option<LuaTable>)| {
+            let total_gap_ms: u64 = opts
+                .as_ref()
+                .and_then(|t| t.get::<_, Option<u64>>("total_gap").ok().flatten())
+                .unwrap_or(2000);
+
+            let mut steps: Vec<ComboStep> = Vec::new();
+            for pair in steps_val.sequence_values::<LuaValue>() {
+                let val = pair?;
+                match val {
+                    LuaValue::String(s) => {
+                        let key = s
+                            .to_str()
+                            .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                            .to_string();
+                        steps.push(ComboStep { key, max_gap_ms: 500 });
+                    }
+                    LuaValue::Table(t) => {
+                        let key: String = t.get("key").map_err(|_| {
+                            LuaError::RuntimeError(
+                                "input.newCombo: each step table must have a 'key' field".into(),
+                            )
+                        })?;
+                        let gap: u64 = t.get::<_, Option<u64>>("gap")?.unwrap_or(500);
+                        steps.push(ComboStep { key, max_gap_ms: gap });
+                    }
+                    _ => {
+                        return Err(LuaError::RuntimeError(
+                            "input.newCombo: steps must be strings or tables".into(),
+                        ))
+                    }
+                }
+            }
+
+            if steps.is_empty() {
+                return Err(LuaError::RuntimeError(
+                    "input.newCombo: steps table must not be empty".into(),
+                ));
+            }
+
+            Ok(LuaCombo {
+                detector: ComboDetector::new(steps, total_gap_ms),
+                total_elapsed_ms: 0,
+            })
         })?,
     )?;
 

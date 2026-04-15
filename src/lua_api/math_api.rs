@@ -11,6 +11,7 @@ use crate::math::easing;
 use crate::math::geometry;
 use crate::math::noise_functions;
 use crate::math::polygon;
+use crate::math::AabbTree;
 use crate::math::BezierCurve;
 use crate::math::NoiseGenerator;
 use crate::math::RandomGenerator;
@@ -1256,6 +1257,117 @@ impl LuaUserData for LuaNoiseGenerator {
 // -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------
+// LuaAabbTree UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around an [`AabbTree`].
+///
+/// # Fields
+/// - `inner` — The underlying AABB tree.
+pub struct LuaAabbTree {
+    inner: AabbTree,
+}
+
+impl LuaUserData for LuaAabbTree {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- insert --
+        /// Inserts an entry with the given AABB into the tree.
+        /// If the id already exists the AABB is updated.
+        /// @param id : integer
+        /// @param min_x : number
+        /// @param min_y : number
+        /// @param max_x : number
+        /// @param max_y : number
+        methods.add_method_mut(
+            "insert",
+            |_, this, (id, min_x, min_y, max_x, max_y): (u64, f32, f32, f32, f32)| {
+                this.inner.insert(id, min_x, min_y, max_x, max_y);
+                Ok(())
+            },
+        );
+
+        // -- remove --
+        /// Removes the entry with the given id.
+        /// Returns true if the entry was found, false otherwise.
+        /// @param id : integer
+        /// @return boolean
+        methods.add_method_mut("remove", |_, this, id: u64| Ok(this.inner.remove(id)));
+
+        // -- query --
+        /// Returns the ids of all entries whose AABBs overlap the query rectangle.
+        /// @param min_x : number
+        /// @param min_y : number
+        /// @param max_x : number
+        /// @param max_y : number
+        /// @return table
+        methods.add_method(
+            "query",
+            |lua, this, (min_x, min_y, max_x, max_y): (f32, f32, f32, f32)| {
+                let ids = this.inner.query(min_x, min_y, max_x, max_y);
+                let t = lua.create_table()?;
+                for (i, id) in ids.iter().enumerate() {
+                    t.set(i + 1, *id)?;
+                }
+                Ok(t)
+            },
+        );
+
+        // -- queryPoint --
+        /// Returns the ids of all entries whose AABBs contain the given point.
+        /// @param x : number
+        /// @param y : number
+        /// @return table
+        methods.add_method("queryPoint", |lua, this, (x, y): (f32, f32)| {
+            let ids = this.inner.query_point(x, y);
+            let t = lua.create_table()?;
+            for (i, id) in ids.iter().enumerate() {
+                t.set(i + 1, *id)?;
+            }
+            Ok(t)
+        });
+
+        // -- update --
+        /// Updates the AABB for an existing entry.
+        /// Returns true if the entry was found and updated, false otherwise.
+        /// @param id : integer
+        /// @param min_x : number
+        /// @param min_y : number
+        /// @param max_x : number
+        /// @param max_y : number
+        /// @return boolean
+        methods.add_method_mut(
+            "update",
+            |_, this, (id, min_x, min_y, max_x, max_y): (u64, f32, f32, f32, f32)| {
+                Ok(this.inner.update(id, min_x, min_y, max_x, max_y))
+            },
+        );
+
+        // -- contains --
+        /// Returns true if an entry with the given id exists in the tree.
+        /// @param id : integer
+        /// @return boolean
+        methods.add_method("contains", |_, this, id: u64| Ok(this.inner.contains(id)));
+
+        // -- len --
+        /// Returns the number of entries in the tree.
+        /// @return integer
+        methods.add_method("len", |_, this, ()| Ok(this.inner.len() as i64));
+
+        // -- isEmpty --
+        /// Returns true if the tree contains no entries.
+        /// @return boolean
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.inner.is_empty()));
+
+        // -- clear --
+        /// Removes all entries from the tree.
+        methods.add_method_mut("clear", |_, this, ()| {
+            this.inner.clear();
+            Ok(())
+        });
+    }
+}
 
 /// Registers the `lurek.math` API table with the Lua VM.
 ///
@@ -2528,6 +2640,14 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             }
             Ok(result)
         })?,
+    )?;
+
+    // -- aabbTree --
+    /// Creates a new empty AABB tree for efficient broad-phase overlap queries.
+    /// @return AabbTree
+    tbl.set(
+        "aabbTree",
+        lua.create_function(|lua, ()| lua.create_userdata(LuaAabbTree { inner: AabbTree::new() }))?,
     )?;
 
     luna.set("math", tbl)?;

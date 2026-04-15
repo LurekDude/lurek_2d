@@ -60,11 +60,14 @@ support (may need to check winit 0.30 capabilities).
 
 ---
 
-### ❌ TODO — Combo / Sequence Detection
+### ✅ DONE — Combo / Sequence Detection
 **Source**: features/input.md — Feature Gaps #2
 
-No combo detection (e.g., fighting game inputs `↓↘→ + A`). Implement as a helper in the
-`automation` module or as a sub-namespace `lurek.input_combo`.
+✅ DONE (2026-04-16) — New `src/input/combo.rs` with `ComboDetector`, `ComboStep`, and
+`ComboProgress`. Exposed via `lurek.input.newCombo(steps, opts?)` in `src/lua_api/input_api.rs`
+as `LuaCombo` UserData. Supports per-step gap timeouts, total-combo budget, and methods
+`:feed(key)`, `:tick(dt)`, `:reset()`, `:progress()`, `:totalSteps()`, `:isInProgress()`,
+`:getStep(index)`.
 
 ---
 

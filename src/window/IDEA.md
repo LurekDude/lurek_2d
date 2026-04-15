@@ -56,10 +56,14 @@ DPI, no callback fires and scaling mode doesn't adjust. Important for multi-moni
 
 ---
 
-### ❌ TODO — Runtime Window Icon
+### ✅ DONE — Runtime Window Icon
 **Source**: features/window.md — Suggestions #2
 
-Icon set at build time only (embedded binary). No `lurek.window.setIcon(imageData)` at runtime.
+`lurek.window.setIcon(path)` schedules a window icon change for the next frame.
+The path must refer to an existing file in the game's virtual filesystem; a descriptive
+`LuaError` is raised for empty paths or files that do not exist. The pixel loading and
+`winit::window::Window::set_window_icon()` call are handled by `App` on the next event-loop
+iteration.
 
 ---
 

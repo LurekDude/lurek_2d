@@ -48,12 +48,13 @@ primitive (`voronoi_from_delaunay()`). Move or duplicate algorithmic core here.
 
 ---
 
-### ❌ TODO — AABB Tree
+### ✅ DONE — AABB Tree
 **Source**: features/math.md — Feature Gaps #7
 
-`SpatialHash` is grid-based (uniform cell sizes). An AABB tree handles variable-size objects
-more efficiently. Low priority unless physics or rendering hot-paths show SpatialHash
-as the bottleneck.
+`AabbTree` in `src/math/aabb_tree.rs` — dynamic BVH using the Box2D "best first"
+surface-area heuristic for sibling selection.  Handles insert, remove, query, queryPoint,
+update, contains, len, clear.  `LuaAabbTree` wrapper in `src/lua_api/math_api.rs`.
+Exposed as `lurek.math.aabbTree()` with full method set.
 
 ---
 

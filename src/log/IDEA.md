@@ -59,11 +59,20 @@ Invalid `setLevel` values return a descriptive `LuaError`.
 
 ---
 
-### ❌ TODO — Structured Log Fields
-**Source**: General observability
+### ✅ DONE — Structured Log Fields
+**Source**: General observability — Added 2026-04-16
 
-All log messages are plain strings. No structured key/value fields for machine-readable
-analysis (e.g., `log::info!("frame"; "draw_calls" => 42, "fps" => 60.0)`).
+`lurek.log.struct(level, msg, fields_table)` emits a structured log entry.
+Memory sinks store the raw `BTreeMap<String, String>` fields in `MemoryEntry.fields`.
+File/rotating sinks format as `"msg { k1=v1, k2=v2 }"`.
+
+Convenience shorthands: `lurek.log.debug_fields`, `info_fields`, `warn_fields`, `error_fields`.
+
+`lurek.log.readMemory(id)` rows now include a `fields` table (or `nil` for plain entries).
+
+**Rust API**: `crate::log::log_structured(level, tag, msg, fields)` +
+`SinkRegistry::dispatch_structured` + `Sink::write_structured`.
+`LogFields = BTreeMap<String, String>` type alias in `src/log/mod.rs`.
 
 ---
 

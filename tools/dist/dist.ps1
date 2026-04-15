@@ -41,7 +41,7 @@ $ErrorActionPreference = 'Stop'
 $WorkspaceRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (-not $OutDir) { $OutDir = Join-Path $WorkspaceRoot 'dist' }
 
-$Version       = "0.12.0"
+$Version       = "0.13.0"
 $ArchName      = "lurek2d-windows-x86_64"
 $PackageDir    = Join-Path $OutDir $ArchName
 $ZipPath       = Join-Path $OutDir "$ArchName.zip"

@@ -4,6 +4,7 @@
 //! `lurek.graphic.setCamera()` API) and the new Phase 24 [`Camera2D`] with
 //! smooth follow, dead zone, bounds clamping, and screen-shake.
 
+use crate::camera::effects::{CameraBreathing, CameraSway, ZoomPulse};
 use crate::math::{Mat3, Rect, Vec2};
 
 // ═════════════════════════════════════════════════════════════════════════
@@ -153,6 +154,14 @@ pub struct Camera2D {
     // ── Internal ────────────────────────────────────────────────────────
     /// Previous target for velocity estimation (look-ahead).
     prev_target: Option<Vec2>,
+
+    // ── Effects ──────────────────────────────────────────────────────────
+    /// Zoom pulse: brief zoom-in with sine envelope decay.
+    pub zoom_pulse: ZoomPulse,
+    /// Camera sway: sinusoidal x/y offset oscillation.
+    pub sway: CameraSway,
+    /// Camera breathing: subtle periodic zoom oscillation.
+    pub breathing: CameraBreathing,
 }
 
 impl Camera2D {
@@ -181,6 +190,9 @@ impl Camera2D {
             shake_timer: 0.0,
             shake_offset: Vec2::ZERO,
             prev_target: None,
+            zoom_pulse: ZoomPulse::new(),
+            sway: CameraSway::new(),
+            breathing: CameraBreathing::new(),
         }
     }
 
@@ -550,6 +562,35 @@ impl Camera2D {
                 self.shake_offset = Vec2::new(ox, oy);
             }
         }
+
+        // ── 7. Camera effects ────────────────────────────────────────────
+        self.zoom_pulse.update(dt);
+        self.sway.update(dt);
+        self.breathing.update(dt);
+    }
+
+    /// Returns the effective zoom level, combining the base zoom with active
+    /// zoom pulse and breathing effect deltas.
+    ///
+    /// Use this instead of [`Self::zoom`] when generating the view transform
+    /// so that effects are reflected in the rendered output.
+    ///
+    /// # Returns
+    /// `f32`
+    pub fn effective_zoom(&self) -> f32 {
+        self.zoom + self.zoom_pulse.current_delta() + self.breathing.current_delta()
+    }
+
+    /// Returns the current world-space position offset contributed by the
+    /// active sway effect as `(dx, dy)`.
+    ///
+    /// Add this to the camera position when building the view transform to
+    /// include sway in the rendered output.
+    ///
+    /// # Returns
+    /// `(f32, f32)`
+    pub fn effect_offset(&self) -> (f32, f32) {
+        self.sway.current_offset()
     }
 
     /// Computes the view matrix including the shake offset.

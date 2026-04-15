@@ -7,6 +7,7 @@
 //! module handlers.
 
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::rc::Rc;
 
 use mlua::prelude::*;
@@ -14,9 +15,38 @@ use mlua::prelude::*;
 use crate::log as log_domain;
 use crate::log::sinks::{Sink, SinkLevel, SinkRegistry};
 
-// Helper: dispatch a message to the given sinks registry.
+// Helper: dispatch a plain message to the given sinks registry.
 fn dispatch(sinks: &Rc<RefCell<SinkRegistry>>, level: SinkLevel, tag: &str, message: &str) {
     sinks.borrow().dispatch(level, tag, message);
+}
+
+// Helper: dispatch a structured message with key-value fields to sinks.
+fn dispatch_structured(
+    sinks: &Rc<RefCell<SinkRegistry>>,
+    level: SinkLevel,
+    tag: &str,
+    message: &str,
+    fields: &BTreeMap<String, String>,
+) {
+    sinks.borrow().dispatch_structured(level, tag, message, fields);
+}
+
+// Helper: convert a Lua table of mixed values to a BTreeMap<String, String>.
+fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
+    let mut fields = BTreeMap::new();
+    for pair in tbl.pairs::<String, LuaValue>() {
+        let (k, v) = pair?;
+        let vs = match v {
+            LuaValue::String(s) => s.to_str().unwrap_or("").to_string(),
+            LuaValue::Integer(i) => i.to_string(),
+            LuaValue::Number(n) => format!("{n}"),
+            LuaValue::Boolean(b) => b.to_string(),
+            LuaValue::Nil => "nil".to_string(),
+            _ => "(complex)".to_string(),
+        };
+        fields.insert(k, vs);
+    }
+    Ok(fields)
 }
 
 /// Registers the `lurek.log.*` namespace into the shared `luna` table.
@@ -224,6 +254,13 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
                     et.set("level", entry.level.as_str())?;
                     et.set("tag", entry.tag.as_str())?;
                     et.set("message", entry.message.as_str())?;
+                    if let Some(ref fields) = entry.fields {
+                        let ft = lua.create_table()?;
+                        for (k, v) in fields {
+                            ft.set(k.as_str(), v.as_str())?;
+                        }
+                        et.set("fields", ft)?;
+                    }
                     tbl.set(i + 1, et)?;
                 }
                 Ok(LuaValue::Table(tbl))
@@ -241,6 +278,85 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
         if let Some(sink) = s.borrow().get(id) {
             sink.flush();
         }
+        Ok(())
+    })?)?;
+
+    // ── struct ────────────────────────────────────────────────────────────
+    /// Emits a structured log message with key-value fields.
+    /// `fields_table` values are converted to strings (string/number/bool/nil supported).
+    /// @param level : string
+    /// @param message : string
+    /// @param fields_table : table
+    let s = sinks.clone();
+    /// @return nil
+    log_table.set("struct", lua.create_function(move |_, (level_str, message, fields_tbl): (String, String, LuaTable)| {
+        let t = "Lua";
+        let fields = lua_table_to_fields(fields_tbl)?;
+        let sink_level = SinkLevel::from_str(&level_str);
+        let log_level = match sink_level {
+            SinkLevel::Error => ::log::Level::Error,
+            SinkLevel::Warn  => ::log::Level::Warn,
+            SinkLevel::Info  => ::log::Level::Info,
+            SinkLevel::Debug => ::log::Level::Debug,
+        };
+        log_domain::log_structured(log_level, Some(t), &message, &fields);
+        dispatch_structured(&s, sink_level, t, &message, &fields);
+        Ok(())
+    })?)?;
+
+    // ── debug_fields ──────────────────────────────────────────────────────
+    /// Emits a debug structured log message. Shorthand for `struct("debug", ...)`.
+    /// @param message : string
+    /// @param fields_table : table
+    let s = sinks.clone();
+    /// @return nil
+    log_table.set("debug_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        let t = "Lua";
+        let fields = lua_table_to_fields(fields_tbl)?;
+        log_domain::log_structured(::log::Level::Debug, Some(t), &message, &fields);
+        dispatch_structured(&s, SinkLevel::Debug, t, &message, &fields);
+        Ok(())
+    })?)?;
+
+    // ── info_fields ───────────────────────────────────────────────────────
+    /// Emits an info structured log message. Shorthand for `struct("info", ...)`.
+    /// @param message : string
+    /// @param fields_table : table
+    let s = sinks.clone();
+    /// @return nil
+    log_table.set("info_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        let t = "Lua";
+        let fields = lua_table_to_fields(fields_tbl)?;
+        log_domain::log_structured(::log::Level::Info, Some(t), &message, &fields);
+        dispatch_structured(&s, SinkLevel::Info, t, &message, &fields);
+        Ok(())
+    })?)?;
+
+    // ── warn_fields ───────────────────────────────────────────────────────
+    /// Emits a warn structured log message. Shorthand for `struct("warn", ...)`.
+    /// @param message : string
+    /// @param fields_table : table
+    let s = sinks.clone();
+    /// @return nil
+    log_table.set("warn_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        let t = "Lua";
+        let fields = lua_table_to_fields(fields_tbl)?;
+        log_domain::log_structured(::log::Level::Warn, Some(t), &message, &fields);
+        dispatch_structured(&s, SinkLevel::Warn, t, &message, &fields);
+        Ok(())
+    })?)?;
+
+    // ── error_fields ──────────────────────────────────────────────────────
+    /// Emits an error structured log message. Shorthand for `struct("error", ...)`.
+    /// @param message : string
+    /// @param fields_table : table
+    let s = sinks.clone();
+    /// @return nil
+    log_table.set("error_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        let t = "Lua";
+        let fields = lua_table_to_fields(fields_tbl)?;
+        log_domain::log_structured(::log::Level::Error, Some(t), &message, &fields);
+        dispatch_structured(&s, SinkLevel::Error, t, &message, &fields);
         Ok(())
     })?)?;
 

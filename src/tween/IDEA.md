@@ -81,6 +81,34 @@ Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 
+### ✅ DONE — Springs (`lurek.tween.spring(target, fields, opts?)`)
+**Source**: Added 2026-04-16
+
+Physics-based spring interpolation driven by the damped harmonic oscillator equations.
+Returns a `LuaSpring` handle.
+
+`opts`: `stiffness` (default 100), `damping` (default 10), `precision` (default 0.001).
+Critically damped ≈ `2 * sqrt(stiffness)`.
+
+```lua
+local pos = {x = 0, y = 0}
+local sp = lurek.tween.spring(pos, {x = 200, y = 100}, {stiffness = 120, damping = 22})
+-- each frame:
+sp:update(dt)
+```
+
+Spring handle methods: `:update(dt)` → bool, `:isSettled()` → bool, `:isActive()` → bool,
+`:setTarget(fields)`, `:setStiffness(n)`, `:setDamping(n)`, `:cancel()`,
+`:getPosition(field)` → number?.
+
+Auto-ticked by `lurek.tween.update(dt)` via `TweenEngine.active_springs`.
+
+**Files**: `src/tween/spring.rs` (`SpringAxis`, `SpringSystem`),
+`src/lua_api/tween_api.rs` (`LuaSpring`, `impl LuaUserData for LuaSpring`),
+`src/tween/engine.rs` (`active_springs` field).
+
+---
+
 ### ✅ DONE — `tween.to(target, props, duration, easing)` — Object Property Sugar
 **Source**: features/animation.md — Tween section / Suggestions
 

@@ -20,6 +20,8 @@ pub mod encode;
 pub mod hash;
 /// Binary pack/unpack utilities compatible with the LÖVE2D `data.pack` API.
 pub mod pack;
+/// Fixed-capacity circular ring buffer for any `Clone` element type.
+pub mod ring_buffer;
 /// TOML value parsing and encoding utilities.
 pub mod toml_convert;
 pub use bin_pack::{
@@ -31,3 +33,4 @@ pub use dataview::{DataView, LuaDataView};
 pub use encode::{decode, encode, EncodeFormat};
 pub use hash::{hash, HashAlgorithm};
 pub use pack::{get_packed_size, pack, unpack, PackValue};
+pub use ring_buffer::RingBuffer;

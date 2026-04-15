@@ -18,6 +18,8 @@
 //!
 //! All public items are documented. Lua bridge: `src/lua_api/input_api.rs`.
 
+/// Combo and input-sequence detection for ordered key/button input chains.
+pub mod combo;
 /// Gamepad button and axis state for a single controller.
 pub mod gamepad;
 /// Keyboard state tracking pressed, held, and released keys.
@@ -27,6 +29,7 @@ pub mod mouse;
 /// Touch input state tracking for touchscreens.
 pub mod touch;
 
+pub use combo::{ComboDetector, ComboProgress, ComboStep};
 pub use gamepad::gilrs_axis_to_string;
 pub use gamepad::gilrs_button_to_string;
 pub use gamepad::GamepadMappings;

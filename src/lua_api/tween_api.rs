@@ -22,7 +22,7 @@ use std::rc::Rc;
 
 use crate::tween::{
     builtin_easing_names, LuaTween, LuaTweenParallel, LuaTweenSequence, ParallelEntry,
-    SequenceStep, TweenEngine, TweenState,
+    SequenceStep, SpringSystem, TweenEngine, TweenState,
 };
 
 /// Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
@@ -75,6 +75,63 @@ impl LuaUserData for LuaTweenState {
     }
 }
 
+/// Lua-side spring handle: wraps [`SpringSystem`] and a registry reference to the target table.
+///
+/// Created via `lurek.tween.spring(target_table, fields_table, opts?)`. The handle drives
+/// per-axis spring simulation and writes updated positions back to the Lua target table
+/// on every update call.
+///
+/// # Fields
+/// - `system` — `SpringSystem`. The multi-axis damped spring simulation.
+/// - `target_table_key` — `Option<LuaRegistryKey>`. Registry key for the animated Lua table.
+/// - `on_settle_key` — `Option<LuaRegistryKey>`. Optional callback fired when all axes settle.
+/// - `field_names` — `Vec<String>`. Ordered list of field names being animated.
+/// - `active` — `bool`. `false` once settled or cancelled.
+pub struct LuaSpring {
+    /// The multi-axis spring simulation.
+    pub system: SpringSystem,
+    /// Registry key for the Lua table being animated.
+    pub target_table_key: Option<LuaRegistryKey>,
+    /// Optional callback fired when all axes settle.
+    pub on_settle_key: Option<LuaRegistryKey>,
+    /// Field names animated by this spring.
+    pub field_names: Vec<String>,
+    /// Whether the spring is still active.
+    pub active: bool,
+}
+
+impl LuaSpring {
+    /// Advances the spring by `dt` seconds, writes positions to the target table,
+    /// fires the settle callback if all axes converge, and returns `true` when done.
+    ///
+    /// # Parameters
+    /// - `lua` — `&Lua`.
+    /// - `dt` — `f64` — Delta-time in seconds.
+    ///
+    /// # Returns
+    /// `LuaResult<bool>` — `true` when settled / done, `false` while still moving.
+    pub fn tick_with(&mut self, lua: &Lua, dt: f64) -> LuaResult<bool> {
+        self.system.update(dt as f32);
+        if let Some(ref tgt_key) = self.target_table_key {
+            let tbl: LuaTable = lua.registry_value(tgt_key)?;
+            for (name, axis) in &self.system.axes {
+                tbl.set(name.as_str(), axis.position as f64)?;
+            }
+        }
+        if self.system.is_settled() {
+            if let Some(k) = self.on_settle_key.take() {
+                let f: LuaFunction = lua.registry_value(&k)?;
+                let _ = f.call::<_, ()>(());
+                lua.remove_registry_value(k)?;
+            }
+            self.active = false;
+            Ok(true)
+        } else {
+            Ok(false)
+        }
+    }
+}
+
 /// Registers the `lurek.tween` property tweening API.
 ///
 /// # Parameters
@@ -105,7 +162,30 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // ─── Bindings ─────────────────────────────────────────────────────────────────
     tbl.set(
         "update",
-        lua.create_function(move |lua, dt: f64| TweenEngine::update(&s, lua, dt))?,
+        lua.create_function(move |lua, dt: f64| {
+            TweenEngine::update(&s, lua, dt)?;
+            // ── springs ──────────────────────────────────────────────────────────
+            let spring_keys = std::mem::take(&mut s.borrow_mut().active_springs);
+            let mut still_active = Vec::with_capacity(spring_keys.len());
+            for key in spring_keys {
+                let ud: LuaAnyUserData = lua.registry_value(&key)?;
+                let done = {
+                    let mut sp = ud.borrow_mut::<LuaSpring>()?;
+                    if !sp.active {
+                        true
+                    } else {
+                        sp.tick_with(lua, dt)?
+                    }
+                };
+                if done {
+                    lua.remove_registry_value(key)?;
+                } else {
+                    still_active.push(key);
+                }
+            }
+            s.borrow_mut().active_springs = still_active;
+            Ok(())
+        })?,
     )?;
 
     // ─── tween ────────────────────────────────────────────────────────────
@@ -209,12 +289,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // ─── cancelAll ────────────────────────────────────────────────────────
-    /// Cancels all active tweens, sequences, and parallels immediately.
+    /// Cancels all active tweens, sequences, parallels, and springs immediately.
     /// @return nil
     let s = engine.clone();
     tbl.set(
         "cancelAll",
-        lua.create_function(move |lua, ()| TweenEngine::cancel_all(&s, lua))?,
+        lua.create_function(move |lua, ()| {
+            TweenEngine::cancel_all(&s, lua)?;
+            let spring_keys = std::mem::take(&mut s.borrow_mut().active_springs);
+            for key in spring_keys {
+                let ud: LuaAnyUserData = lua.registry_value(&key)?;
+                {
+                    let mut sp = ud.borrow_mut::<LuaSpring>()?;
+                    sp.active = false;
+                    if let Some(k) = sp.on_settle_key.take() {
+                        lua.remove_registry_value(k)?;
+                    }
+                }
+                lua.remove_registry_value(key)?;
+            }
+            Ok(())
+        })?,
     )?;
 
     // ─── getActiveCount ───────────────────────────────────────────────────
@@ -314,6 +409,62 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                 let ud = lua.create_userdata(tw)?;
                 let key = lua.create_registry_value(ud.clone())?;
                 s.borrow_mut().active_tweens.push(key);
+                Ok(ud)
+            },
+        )?,
+    )?;
+
+    // ─── spring ────────────────────────────────────────────────────────────
+    /// Creates a physics-based spring animation that drives named fields on `target_table`
+    /// toward the values in `fields_table`. Current field values are read immediately as
+    /// starting positions. Tick via `:update(dt)` or `lurek.tween.update(dt)`.
+    ///
+    /// `opts` may contain: `stiffness` (default 100), `damping` (default 10),
+    /// `precision` (default 0.001).
+    /// @param target_table : table
+    /// @param fields_table : table
+    /// @param opts : table?
+    /// @return Spring
+    let s = engine.clone();
+    tbl.set(
+        "spring",
+        lua.create_function(
+            move |lua, (target_tbl, fields_tbl, opts): (LuaTable, LuaTable, Option<LuaTable>)| {
+                let stiffness: f32 = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, f32>("stiffness").ok())
+                    .unwrap_or(100.0);
+                let damping: f32 = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, f32>("damping").ok())
+                    .unwrap_or(10.0);
+                let precision: f32 = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, f32>("precision").ok())
+                    .unwrap_or(0.001);
+
+                let mut system = SpringSystem::new(stiffness, damping, precision);
+                let mut field_names = Vec::new();
+
+                for pair in fields_tbl.pairs::<String, f64>() {
+                    let (name, target_val) = pair?;
+                    let current: f64 = target_tbl.get(name.as_str()).unwrap_or(0.0);
+                    system.add_axis(name.clone(), current as f32, target_val as f32);
+                    field_names.push(name);
+                }
+
+                let target_table_key = lua.create_registry_value(target_tbl)?;
+                let sp = LuaSpring {
+                    system,
+                    target_table_key: Some(target_table_key),
+                    on_settle_key: None,
+                    field_names,
+                    active: true,
+                };
+
+                let ud = lua.create_userdata(sp)?;
+                let key = lua.create_registry_value(ud.clone())?;
+                s.borrow_mut().active_springs.push(key);
                 Ok(ud)
             },
         )?,
@@ -669,5 +820,92 @@ impl LuaUserData for LuaTweenParallel {
                 Ok(ud)
             },
         );
+    }
+}
+
+/// A physics-based spring animation handle.
+impl LuaUserData for LuaSpring {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // ── update ────────────────────────────────────────────────────────
+        /// Advances the spring by `dt` seconds and writes positions to the target table.
+        /// Returns `true` while still moving, `false` when settled.
+        /// @param dt : number
+        /// @return boolean
+        methods.add_method_mut("update", |lua, this, dt: f64| {
+            if !this.active {
+                return Ok(false);
+            }
+            // tick_with returns true=done; invert for "still moving"
+            this.tick_with(lua, dt).map(|done| !done)
+        });
+
+        // ── isSettled ─────────────────────────────────────────────────────
+        /// Returns `true` when all spring axes have converged within `precision`.
+        /// @return boolean
+        methods.add_method("isSettled", |_, this, ()| Ok(this.system.is_settled()));
+
+        // ── isActive ──────────────────────────────────────────────────────
+        /// Returns `true` if the spring has not been cancelled or settled.
+        /// @return boolean
+        methods.add_method("isActive", |_, this, ()| Ok(this.active));
+
+        // ── setTarget ─────────────────────────────────────────────────────
+        /// Updates target values for all fields present in `fields_table`.
+        /// Clears the settled flag so the spring responds to the new targets.
+        /// @param fields_table : table
+        /// @return nil
+        methods.add_method_mut("setTarget", |_, this, fields_tbl: LuaTable| {
+            for pair in fields_tbl.pairs::<String, f64>() {
+                let (k, v) = pair?;
+                this.system.set_target(&k, v as f32);
+            }
+            if !this.system.is_settled() {
+                this.active = true;
+            }
+            Ok(())
+        });
+
+        // ── setStiffness ──────────────────────────────────────────────────
+        /// Updates the stiffness constant on all axes.
+        /// @param value : number
+        /// @return nil
+        methods.add_method_mut("setStiffness", |_, this, value: f32| {
+            this.system.stiffness = value;
+            for axis in this.system.axes.values_mut() {
+                axis.stiffness = value;
+            }
+            Ok(())
+        });
+
+        // ── setDamping ────────────────────────────────────────────────────
+        /// Updates the damping coefficient on all axes.
+        /// @param value : number
+        /// @return nil
+        methods.add_method_mut("setDamping", |_, this, value: f32| {
+            this.system.damping = value;
+            for axis in this.system.axes.values_mut() {
+                axis.damping = value;
+            }
+            Ok(())
+        });
+
+        // ── cancel ────────────────────────────────────────────────────────
+        /// Stops the spring. The engine will drop it on the next `update(dt)` call.
+        /// @return nil
+        methods.add_method_mut("cancel", |lua, this, ()| {
+            this.active = false;
+            if let Some(k) = this.on_settle_key.take() {
+                lua.remove_registry_value(k)?;
+            }
+            Ok(())
+        });
+
+        // ── getPosition ───────────────────────────────────────────────────
+        /// Returns the current interpolated position for the named field, or `nil`.
+        /// @param field : string
+        /// @return number?
+        methods.add_method("getPosition", |_, this, field: String| {
+            Ok(this.system.get_position(&field).map(|p| p as f64))
+        });
     }
 }

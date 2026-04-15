@@ -13,7 +13,41 @@ pub mod sinks;
 
 pub use sinks::{MemoryEntry, RotatingFileSink, Sink, SinkLevel, SinkRegistry};
 
+use std::collections::BTreeMap;
 use crate::runtime::log_messages;
+
+/// Sorted map of structured key-value log fields.
+///
+/// Used with [`log_structured`] to attach machine-readable context to a log message.
+pub type LogFields = BTreeMap<String, String>;
+
+/// Emits a structured log message with key-value `fields` through the Rust `log` crate.
+///
+/// The formatted message sent to the logger is `"msg { k1=v1, k2=v2 }"`.
+/// Sink dispatch (file / memory ring buffers) must be done separately by the caller
+/// via [`SinkRegistry::dispatch_structured`] because sinks are VM-local.
+///
+/// # Parameters
+/// - `level` — `log::Level`.
+/// - `tag` — `Option<&str>`. Defaults to `"Lua"` when `None`.
+/// - `msg` — `&str`.
+/// - `fields` — `&LogFields`.
+pub fn log_structured(level: ::log::Level, tag: Option<&str>, msg: &str, fields: &LogFields) {
+    let t = tag.unwrap_or("Lua");
+    let body = if fields.is_empty() {
+        msg.to_string()
+    } else {
+        let kvs: Vec<String> = fields.iter().map(|(k, v)| format!("{k}={v}")).collect();
+        format!("{} {{ {} }}", msg, kvs.join(", "))
+    };
+    match level {
+        ::log::Level::Error => log::error!("[{}] {}", t, body),
+        ::log::Level::Warn  => log::warn!("[{}] {}", t, body),
+        ::log::Level::Info  => log::info!("[{}] {}", t, body),
+        ::log::Level::Debug => log::debug!("[{}] {}", t, body),
+        ::log::Level::Trace => log::trace!("[{}] {}", t, body),
+    }
+}
 
 /// Sets the active log level to the named value.
 ///

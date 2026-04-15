@@ -12,6 +12,7 @@
 //! | `Memory` | Retains entries in a bounded ring buffer for Lua inspection. |
 //! | `RotatingFile` | Appends to a file and rotates by size, keeping N backup copies. |
 
+use std::collections::BTreeMap;
 use std::collections::VecDeque;
 use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
@@ -79,6 +80,7 @@ impl SinkLevel {
 /// - `level` — `SinkLevel`.
 /// - `message` — `String`.
 /// - `tag` — `String`.
+/// - `fields` — `Option<BTreeMap<String, String>>`. Structured key-value pairs (None for plain entries).
 #[derive(Debug, Clone)]
 pub struct MemoryEntry {
     /// Level of the log entry.
@@ -87,6 +89,8 @@ pub struct MemoryEntry {
     pub message: String,
     /// Source tag (caller-provided category).
     pub tag: String,
+    /// Structured key-value fields; `None` for plain log entries.
+    pub fields: Option<BTreeMap<String, String>>,
 }
 
 // ── RotatingFileSink ─────────────────────────────────────────────────────
@@ -411,12 +415,71 @@ impl Sink {
                         level,
                         message: message.to_string(),
                         tag: tag.to_string(),
+                        fields: None,
                     });
                 }
             }
             SinkKind::RotatingFile { sink, .. } => {
                 let mut text = String::new();
                 let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, message);
+                if let Ok(mut guard) = sink.lock() {
+                    guard.write_with_rotation(&text);
+                }
+            }
+        }
+    }
+
+    /// Dispatches a structured log entry with key-value `fields` to this sink.
+    ///
+    /// File and rotating sinks receive a formatted plain-text line:
+    /// `msg { key1=val1, key2=val2 }`.  Memory sinks store the raw `fields` map
+    /// in the [`MemoryEntry`].
+    ///
+    /// # Parameters
+    /// - `level` — `SinkLevel`.
+    /// - `tag` — `&str`.
+    /// - `message` — `&str`.
+    /// - `fields` — `&BTreeMap<String, String>`.
+    pub fn write_structured(
+        &self,
+        level: SinkLevel,
+        tag: &str,
+        message: &str,
+        fields: &BTreeMap<String, String>,
+    ) {
+        if level < self.min_level {
+            return;
+        }
+        let plain = if fields.is_empty() {
+            message.to_string()
+        } else {
+            let kvs: Vec<String> = fields.iter().map(|(k, v)| format!("{k}={v}")).collect();
+            format!("{} {{ {} }}", message, kvs.join(", "))
+        };
+        match &self.kind {
+            SinkKind::File { file, .. } => {
+                let mut text = String::new();
+                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, plain);
+                if let Ok(mut guard) = file.lock() {
+                    let _ = guard.write_all(text.as_bytes());
+                }
+            }
+            SinkKind::Memory { entries, capacity } => {
+                if let Ok(mut q) = entries.lock() {
+                    if q.len() >= *capacity {
+                        q.pop_front();
+                    }
+                    q.push_back(MemoryEntry {
+                        level,
+                        message: plain,
+                        tag: tag.to_string(),
+                        fields: Some(fields.clone()),
+                    });
+                }
+            }
+            SinkKind::RotatingFile { sink, .. } => {
+                let mut text = String::new();
+                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, plain);
                 if let Ok(mut guard) = sink.lock() {
                     guard.write_with_rotation(&text);
                 }
@@ -559,6 +622,25 @@ impl SinkRegistry {
     pub fn dispatch(&self, level: SinkLevel, tag: &str, message: &str) {
         for sink in &self.sinks {
             sink.write(level, tag, message);
+        }
+    }
+
+    /// Dispatches a structured log entry to all registered sinks.
+    ///
+    /// # Parameters
+    /// - `level` — `SinkLevel`.
+    /// - `tag` — `&str`.
+    /// - `message` — `&str`.
+    /// - `fields` — `&BTreeMap<String, String>`.
+    pub fn dispatch_structured(
+        &self,
+        level: SinkLevel,
+        tag: &str,
+        message: &str,
+        fields: &BTreeMap<String, String>,
+    ) {
+        for sink in &self.sinks {
+            sink.write_structured(level, tag, message, fields);
         }
     }
 

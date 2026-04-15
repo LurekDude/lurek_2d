@@ -312,12 +312,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- setIcon --
     /// Sets the window icon from a file path.
+    /// The file must exist in the game directory; the change is applied on the
+    /// next frame. Raises a runtime error if the path is empty or not found.
     /// @param path : string
     /// @return nil
     let s = state.clone();
     tbl.set(
         "setIcon",
         lua.create_function(move |_, path: String| {
+            if path.is_empty() {
+                return Err(LuaError::RuntimeError(
+                    "setIcon: path must not be empty".to_string(),
+                ));
+            }
+            if !s.borrow().fs.exists(&path) {
+                return Err(LuaError::RuntimeError(format!(
+                    "setIcon: file not found: {path}"
+                )));
+            }
             window::set_icon(&mut s.borrow_mut().window_state, &path);
             Ok(())
         })?,
