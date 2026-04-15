@@ -9,8 +9,9 @@
 //! - [`array`] — [`NdArray`]: storage, shape, slice, reshape, element access
 //! - [`ops`] — element-wise arithmetic and axis reductions (sum, mean, min, max)
 //! - [`spatial`] — 2D convolution, max/average pooling, distance transforms
-//! - [`analytics`] — FFT, autocorrelation, moving average, normalization, histogram
-//! - [`linalg`] — dot/matmul, Gaussian solver, Sobel kernels, outer product
+//! - [`analytics`] — autocorrelation, moving average, normalization, histogram
+//! - [`linalg`] — dot/matmul, Gaussian solver, LU decomposition, eigenvalue (power iteration)
+//! - [`fft`] — iterative Cooley-Tukey radix-2 FFT and inverse FFT
 //!
 //! Lua bridge: `src/lua_api/compute_api.rs` as `lurek.gpu.*`.
 
@@ -23,7 +24,10 @@ pub mod ops;
 pub mod spatial;
 /// Statistical analytics, signal processing, and normalisation.
 pub mod analytics;
-/// Linear algebra: solvers, kernels, transforms, Sobel, outer products.
+/// Linear algebra: solvers, kernels, transforms, Sobel, LU decomp, eigenvalue.
 pub mod linalg;
+/// Fast Fourier Transform and inverse FFT (iterative Cooley-Tukey radix-2).
+pub mod fft;
 
 pub use array::{DataType, NdArray};
+pub use fft::{fft, fft_magnitude, ifft};

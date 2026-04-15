@@ -809,6 +809,61 @@ impl LuaUserData for LuaArray {
             lua.create_userdata(LuaArray { inner: r })
         });
 
+        // -- luDecompose --
+        /// Decomposes this square matrix into L and U factors with partial pivoting.
+        ///
+        /// Returns a table `{perm = table, det_sign = int, n = int, lu_data = table}`.
+        /// `perm` is a 1-indexed Lua array of row permutation indices.
+        /// `lu_data` is a flat 1-indexed array of the combined LU buffer (row-major).
+        /// @return table
+        methods.add_method("luDecompose", |lua, this, ()| {
+            let decomp = crate::compute::linalg::lu_decompose(&this.inner)
+                .map_err(LuaError::RuntimeError)?;
+            let result = lua.create_table()?;
+            result.set("n", decomp.n as i64)?;
+            result.set("det_sign", decomp.det_sign as i64)?;
+            let perm_tbl = lua.create_table()?;
+            for (i, &p) in decomp.perm.iter().enumerate() {
+                perm_tbl.set(i + 1, p as i64 + 1)?; // 1-indexed for Lua
+            }
+            result.set("perm", perm_tbl)?;
+            let lu_tbl = lua.create_table()?;
+            for (i, &v) in decomp.lu_data.iter().enumerate() {
+                lu_tbl.set(i + 1, v)?;
+            }
+            result.set("lu_data", lu_tbl)?;
+            Ok(result)
+        });
+
+        // -- eigenPower --
+        /// Computes the dominant eigenvalue and its eigenvector using power iteration.
+        ///
+        /// Returns a table `{value = f64, vector = table}` where `vector` is a
+        /// 1-indexed Lua array of the L2-normalised dominant eigenvector.
+        ///
+        /// @param max_iter : int?   (default 1000)
+        /// @param tol      : number? (default 1e-10)
+        /// @return table
+        methods.add_method(
+            "eigenPower",
+            |lua, this, (max_iter, tol): (Option<u32>, Option<f64>)| {
+                let (eigenvalue, vec) = crate::compute::linalg::eigenvalue_power(
+                    &this.inner,
+                    max_iter.unwrap_or(0),
+                    tol.unwrap_or(0.0),
+                )
+                .map_err(LuaError::RuntimeError)?;
+                let result = lua.create_table()?;
+                result.set("value", eigenvalue)?;
+                let v_tbl = lua.create_table()?;
+                for (i, &x) in vec.iter().enumerate() {
+                    v_tbl.set(i + 1, x)?;
+                }
+                result.set("vector", v_tbl)?;
+                Ok(result)
+            },
+        );
+
         // ── Identity ─────────────────────────────────────────────────────
 
         // -- type --
@@ -967,6 +1022,80 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|lua, (tx, ty, angle_rad, sx, sy): (f64, f64, f64, f64, f64)| {
             let m = linalg::affine2d(tx, ty, angle_rad, sx, sy).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: m })
+        })?,
+    )?;
+
+    // -- fft --
+    /// Computes the discrete Fourier transform of a 1D real-valued sample array.
+    ///
+    /// The input is zero-padded to the next power of two. Returns an array of
+    /// `{re = number, im = number}` tables — one per frequency bin.
+    ///
+    /// @param samples : table
+    /// @return table
+    tbl.set(
+        "fft",
+        lua.create_function(|lua, samples: LuaTable| {
+            let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
+            let output = crate::compute::fft::fft(&data);
+            let t = lua.create_table()?;
+            for (i, (re, im)) in output.iter().enumerate() {
+                let pair = lua.create_table()?;
+                pair.set("re", *re)?;
+                pair.set("im", *im)?;
+                t.set(i + 1, pair)?;
+            }
+            Ok(t)
+        })?,
+    )?;
+
+    // -- ifft --
+    /// Computes the inverse discrete Fourier transform.
+    ///
+    /// Accepts a table of `{re, im}` complex-coefficient tables (as returned by
+    /// `lurek.compute.fft`) and returns the reconstructed real-valued time-domain samples.
+    ///
+    /// @param freqs : table
+    /// @return table
+    tbl.set(
+        "ifft",
+        lua.create_function(|lua, freqs: LuaTable| {
+            let pairs: Vec<(f64, f64)> = freqs
+                .sequence_values::<LuaTable>()
+                .flatten()
+                .map(|entry| {
+                    let re: f64 = entry.get("re").unwrap_or(0.0);
+                    let im: f64 = entry.get("im").unwrap_or(0.0);
+                    (re, im)
+                })
+                .collect();
+            let output = crate::compute::fft::ifft(&pairs);
+            let t = lua.create_table()?;
+            for (i, v) in output.iter().enumerate() {
+                t.set(i + 1, *v)?;
+            }
+            Ok(t)
+        })?,
+    )?;
+
+    // -- fftMagnitude --
+    /// Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
+    ///
+    /// Equivalent to calling `fft` and computing the L2 norm of each complex
+    /// coefficient. Useful for audio-amplitude analysis.
+    ///
+    /// @param samples : table
+    /// @return table
+    tbl.set(
+        "fftMagnitude",
+        lua.create_function(|lua, samples: LuaTable| {
+            let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
+            let mag = crate::compute::fft::fft_magnitude(&data);
+            let t = lua.create_table()?;
+            for (i, v) in mag.iter().enumerate() {
+                t.set(i + 1, *v)?;
+            }
+            Ok(t)
         })?,
     )?;
 

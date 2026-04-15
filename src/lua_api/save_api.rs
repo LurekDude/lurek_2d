@@ -6,6 +6,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use std::collections::HashMap;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use crate::data::compress::{compress, decompress, CompressFormat};
 use crate::filesystem::vfs::GameFS;
 use crate::save::{serialize_table, SaveManager, SaveValue};
 
@@ -37,6 +39,12 @@ pub struct LuaSaveManager {
     collectors: HashMap<String, LuaRegistryKey>,
     restorers: HashMap<String, LuaRegistryKey>,
     migrations: HashMap<i32, LuaRegistryKey>,
+    /// Whether to compress save data with LZ4 + base64 encoding.
+    compress: bool,
+    /// Optional callback fired before every save. Receives the slot name.
+    before_save: Option<LuaRegistryKey>,
+    /// Optional callback fired after every successful load. Receives the slot name.
+    after_load: Option<LuaRegistryKey>,
 }
 
 impl LuaSaveManager {
@@ -51,6 +59,9 @@ impl LuaSaveManager {
             collectors: HashMap::new(),
             restorers: HashMap::new(),
             migrations: HashMap::new(),
+            compress: false,
+            before_save: None,
+            after_load: None,
         }
     }
 
@@ -145,7 +156,21 @@ impl LuaSaveManager {
 
     /// Saves collected data to a slot file.
     fn save_to_slot(&mut self, lua: &Lua, slot: &str) -> LuaResult<()> {
-        let content = self.serialize_collected(lua)?;
+        // Fire onBeforeSave hook.
+        if let Some(ref key) = self.before_save {
+            let func = lua.registry_value::<LuaFunction>(key)?;
+            func.call::<_, ()>(slot)?;
+        }
+        let plain = self.serialize_collected(lua)?;
+        let content = if self.compress {
+            let bytes = plain.as_bytes();
+            let compressed = compress(bytes, CompressFormat::Lz4, 1)
+                .map_err(LuaError::RuntimeError)?;
+            let encoded = BASE64.encode(&compressed);
+            format!("--[[COMPRESSED]]\nreturn \"{}\"\n", encoded)
+        } else {
+            plain
+        };
         let path = SaveManager::slot_path(slot);
         let game_dir = self.state.borrow().game_dir.clone();
         GameFS::new(game_dir)
@@ -158,12 +183,38 @@ impl LuaSaveManager {
     /// Loads data from a slot file, applies migrations, and restores.
     fn load_from_slot(&mut self, lua: &Lua, slot: &str) -> LuaResult<(bool, Option<String>)> {
         let path = SaveManager::slot_path(slot);
-        let content = {
+        let raw = {
             let game_dir = self.state.borrow().game_dir.clone();
             match GameFS::new(game_dir).read_string(&path) {
                 Ok(c) => c,
                 Err(e) => return Ok((false, Some(format!("lurek.savegame:load: {}", e)))),
             }
+        };
+        // Handle compressed saves.
+        let content: String = if raw.starts_with("--[[COMPRESSED]]") {
+            let encoded = raw
+                .lines()
+                .nth(1)
+                .and_then(|line| line.strip_prefix("return \""))
+                .and_then(|s| s.strip_suffix('"'))
+                .unwrap_or_default();
+            let compressed = match BASE64.decode(encoded) {
+                Ok(b) => b,
+                Err(e) => {
+                    return Ok((false, Some(format!("lurek.savegame:load: base64 decode: {}", e))))
+                }
+            };
+            match decompress(&compressed, CompressFormat::Lz4) {
+                Ok(bytes) => match String::from_utf8(bytes) {
+                    Ok(s) => s,
+                    Err(e) => {
+                        return Ok((false, Some(format!("lurek.savegame:load: utf8: {}", e))))
+                    }
+                },
+                Err(e) => return Ok((false, Some(format!("lurek.savegame:load: decompress: {}", e)))),
+            }
+        } else {
+            raw
         };
         let data: LuaTable = match eval_save_content(lua, &content) {
             Ok(t) => t,
@@ -175,6 +226,11 @@ impl LuaSaveManager {
             }
         };
         self.restore_from_table(lua, data)?;
+        // Fire onAfterLoad hook.
+        if let Some(ref key) = self.after_load {
+            let func = lua.registry_value::<LuaFunction>(key)?;
+            func.call::<_, ()>(slot)?;
+        }
         Ok((true, None))
     }
 
@@ -406,7 +462,65 @@ impl LuaUserData for LuaSaveManager {
             for (_, key) in this.migrations.drain() {
                 lua.remove_registry_value(key)?;
             }
+            if let Some(key) = this.before_save.take() {
+                lua.remove_registry_value(key)?;
+            }
+            if let Some(key) = this.after_load.take() {
+                lua.remove_registry_value(key)?;
+            }
+            this.compress = false;
             this.manager.reset();
+            Ok(())
+        });
+
+        // -- setCompress --
+        /// Enables or disables LZ4 compression for saved data.
+        ///
+        /// When enabled, save files are written as base64-encoded LZ4 compressed
+        /// data. The engine automatically detects and decompresses on load.
+        /// @param enabled : boolean
+        /// @return nil
+        methods.add_method_mut("setCompress", |_, this, enabled: bool| {
+            this.compress = enabled;
+            Ok(())
+        });
+
+        // -- isCompressed --
+        /// Returns whether compression is currently enabled.
+        /// @return boolean
+        methods.add_method("isCompressed", |_, this, ()| Ok(this.compress));
+
+        // -- onBeforeSave --
+        /// Registers a callback that fires before every save operation.
+        ///
+        /// The callback receives the slot name as its first argument. Pass `nil`
+        /// to remove an existing callback.
+        /// @param func : function?
+        /// @return nil
+        methods.add_method_mut("onBeforeSave", |lua, this, func: LuaValue| {
+            if let Some(key) = this.before_save.take() {
+                lua.remove_registry_value(key)?;
+            }
+            if let LuaValue::Function(f) = func {
+                this.before_save = Some(lua.create_registry_value(f)?);
+            }
+            Ok(())
+        });
+
+        // -- onAfterLoad --
+        /// Registers a callback that fires after every successful load operation.
+        ///
+        /// The callback receives the slot name as its first argument. Pass `nil`
+        /// to remove an existing callback.
+        /// @param func : function?
+        /// @return nil
+        methods.add_method_mut("onAfterLoad", |lua, this, func: LuaValue| {
+            if let Some(key) = this.after_load.take() {
+                lua.remove_registry_value(key)?;
+            }
+            if let LuaValue::Function(f) = func {
+                this.after_load = Some(lua.create_registry_value(f)?);
+            }
             Ok(())
         });
 

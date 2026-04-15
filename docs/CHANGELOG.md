@@ -2,47 +2,33 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.11.0] — 2026-04-17
+## [0.10.0] — 2026-04-15
 ### Added
-- `lurek.signal`: `once(name, fn)` — auto-disconnects after first invocation.
-- `lurek.signal`: `registerWithFilter(name, fn, predicate)` — only fires handler when `predicate(args)` returns truthy.
-- `lurek.signal`: `pushDeferred(name, ...)` / `flushDeferred()` — enqueue events for next-frame dispatch to prevent re-entrant emission chains.
-- `lurek.signal`: `enableHistory(max)` / `getHistory()` / `clearHistory()` — rolling debug event log.
-- `lurek.time` (Scheduler): `pauseNamed(name)` / `resumeNamed(name)` / `isPausedNamed(name)` — pause/resume a named timer without canceling it.
-- `lurek.time`: `chain(...)` — sequential delayed calls with accumulated durations without callback nesting.
-- `lurek.time`: `afterReal(delay, fn)` / `tickRealTimers()` — wall-clock timers that ignore `timeScale`; required for UI during game pause.
-- `lurek.time`: `setSmoothingFactor(alpha)` / `getSmoothedDelta()` — EMA-smoothed delta to prevent entity teleport on frame hitches.
-- `lurek.input` — new action-mapping namespace: `bind(action, keys)`, `unbind(action)`, `clearBindings()`, `getBindings()`, `isActionDown(action)`, `wasActionPressed(action)`, `wasActionReleased(action)`, `wasActionPressedWithin(action, frames)`.
-- `lurek.tween.to(target, fields, duration, easing?)` — LÖVE2-style object property sugar; interpolates table fields in place.
-- `lurek.window.onDpiChange(fn)` / `pollDpiChange()` — DPI-change callback for multi-monitor setups.
-- `lurek.window.openFileDialog(opts?)` — native file-picker dialog via `rfd`; supports `title`, `filters`, `multiple`, `defaultPath`.
-- `lurek.devtools.profilerReport()` — returns accumulated profiler zone stats (`name`, `calls`, `total_ms`, `avg_ms`, `min_ms`, `max_ms`, `self_ms`) as a Lua table.
-- `lurek.devtools.newFileWatcher(path)` — per-path file-watcher userdata with `onChanged(fn)`, `check()`, `getPath()`, `cancel()`.
-- `lurek.engine` — new read-only introspection namespace: `getVersion()`, `getFrameBudget()`, `memoryUsage()`, `platform()`, `uptime()`, `fps()`, `frameCount()`, `isDebug()`.
-### Tests
-- Lua BDD tests added/extended for all new APIs: `test_event.lua`, `test_timer.lua`, `test_input.lua`, `test_tween.lua`, `test_window.lua`, `test_devtools.lua`.
-- New `tests/lua/unit/test_engine.lua` covering the full `lurek.engine.*` namespace.
-- `tests/lua/harness.rs`: added `lua_test_engine` entry.
-### Docs
-- IDEA.md files updated for `event`, `timer`, `input`, `window`, `tween`, `devtools`, `runtime` — newly implemented items marked `✅ DONE`.
-
-## [0.10.0] — 2026-04-16
-### Added
-- `lurek.simulator.saveMacro(name, script_name)` / `playMacro(name)` / `hasMacro(name)` / `listMacros()` — named reusable input-playback macros stored in `Simulator`.
-- `lurek.simulator.setPlaybackSpeed(factor)` / `getPlaybackSpeed()` — scales the automation clock for slow-motion (0.5×) or fast-forward (2×) replay.
-- `lurek.simulator.waitUntil(predicate, timeout)` — suspends the automation clock until a predicate function returns true, with an optional timeout in seconds.
-- `Pipeline:addConditional(name, deps, fn, when_fn)` — adds a pipeline step with a runtime condition guard; the step is skipped when `when_fn()` returns false.
-- `Pipeline:onProgress(fn)` — registers a callback invoked after every step with `(step_name, status_string)`.
-- `Pipeline:toAscii()` — returns a multi-line ASCII string visualising the pipeline DAG (parallel levels and dependencies).
-- `Pipeline:to_ascii_diagram()` (Rust) — the underlying DAG method in `src/pipeline/dag.rs`.
-- `ParticleSystem:addSubEmitter(config_tbl, burst_count?)` — attaches a sub-emitter that bursts secondary particles when a particle dies.
-- `ParticleSystem:setFlipbook(cols, rows, fps)` — configures sprite-sheet flipbook animation by auto-computing UV quads from a cols×rows grid.
-- `ParticleSystem:getFlipbook()` — returns `(cols, rows, fps)` for the current flipbook, or `(nil, nil, nil)` when not set.
-- `ParticleConfig::from_lua_opts` now recognises the `deathEmitter` key to configure sub-emitters directly from the constructor table.
-### Docs
-- All four IDEA.md files updated: marked completed features as `✅ DONE` with implementation notes.
-- `docs/specs/automation.md`, `docs/specs/pipeline.md`, `docs/specs/particle.md`, `docs/specs/pathfind.md` updated with new Lua API entries.
-- `content/examples/automation.lua`, `content/examples/pipeline.lua`, `content/examples/particle.lua`, `content/examples/pathfinding.lua` updated with idiomatic usage examples.
+- `lurek.modding.checkApiVersion(mod, host_version)` — returns `(bool, msg?)` for MAJOR/MINOR compatibility gating.
+- `ModInfo.api_version` — optional `"MAJOR.MINOR"` string; via `mod:getApiVersion()` / `mod:setApiVersion()`.
+- `ModInfo.capabilities` — `Vec<String>` permission list; via `mod:getCapabilities()` / `mod:setCapabilities()`.
+- `ModInfo.config_schema` — `Vec<(key, type_hint, default)>` declarative mod settings; via `mod:getConfigSchema()` / `mod:setConfigSchema()`.
+- `lurek.savegame` compression — `saveManager:setCompress(bool)` / `isCompressed()`: slot data is LZ4-compressed + base64-encoded when enabled; auto-detected on load.
+- `lurek.savegame.onBeforeSave(fn?)` / `onAfterLoad(fn?)` — lifecycle hooks fired with the slot name; pass `nil` to clear.
+- `lurek.compute.fft(samples)` — Cooley-Tukey iterative radix-2 FFT; returns `{{re, im}, ...}` array.
+- `lurek.compute.ifft(freqs)` — IFFT with 1/N normalisation; returns real-part array.
+- `lurek.compute.fftMagnitude(samples)` — `|X[k]|` per bin.
+- `ndarray:luDecompose()` — Doolittle LU with partial pivoting; returns `{n, det_sign, perm, lu_data}`.
+- `ndarray:eigenPower(max_iter?, tol?)` — power-iteration dominant eigenvalue; returns `{value, vector}`.
+- `bt:getDebugState()` — BehaviorTree snapshot: `{ node_count, last_status }`.
+- `steering:setSpatialHashCellSize(size)` — cell size for spatial-hash neighbour bucketing (default 64.0).
+- `steering:enableSpatialHash(enabled)` — toggle spatial-hash mode on `SteeringManager`.
+- `lurek.network.createLobby(name, port, player_count?, max_players?)` — LAN UDP lobby broadcast.
+- `lurek.network.discoverLobbies(timeout_ms?)` — collects LAN lobby announcements; returns array of tables.
+- `lurek.network.syncEntity(host, entity_id, data, channel?, reliable?)` — packs + broadcasts entity snapshot to peers.
+- `tools/mods/mod_init.py` — CLI scaffold: generates `mod.toml`, `main.lua`, `README.md` for a new mod.
+### Changed
+- `src/procgen/IDEA.md` — all 6 TODO/FIXME items marked done.
+- `src/mods/IDEA.md` — api_version/capabilities/config_schema/CLI tool marked done; hot-reload/save-tracking deferred.
+- `src/save/IDEA.md` — compression and event hooks marked done; entity bridge/screenshot/delta-saves deferred.
+- `src/compute/IDEA.md` — FFT and advanced linalg marked done; sparse/imagedata/rayon deferred.
+- `src/ai/IDEA.md` — BT debug state and steering spatial hash marked done; GOAP parallel/rayon steering deferred.
+- `src/network/IDEA.md` — lobby and syncEntity marked done; NAT punchthrough/rollback deferred.
 
 ## [0.9.5] — 2026-04-15
 ### Added

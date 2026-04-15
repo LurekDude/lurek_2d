@@ -629,6 +629,18 @@ impl LuaUserData for LuaBehaviorTree {
             Ok(this.inner.borrow().last_status.as_str().to_string())
         });
 
+        // -- getDebugState --
+        /// Returns a diagnostic snapshot of this behavior tree.
+        /// Fields: node_count (integer), last_status (string).
+        /// @return table
+        methods.add_method("getDebugState", |lua, this, ()| {
+            let dbg = this.inner.borrow().debug_state();
+            let t = lua.create_table()?;
+            t.set("node_count", dbg.node_count as u32)?;
+            t.set("last_status", dbg.last_status)?;
+            Ok(t)
+        });
+
         // -- type --
         /// Returns the type name of this object.
         /// @return string
@@ -1005,6 +1017,25 @@ impl LuaUserData for LuaSteeringManager {
         /// @param name : string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "SteeringManager" || name == "Object"));
+
+        // -- setSpatialHashCellSize --
+        /// Sets the cell size used by the spatial-hash neighbourhood search.
+        /// Smaller cells yield finer buckets; larger cells cover more ground per lookup.
+        /// @param size : number
+        /// @return nil
+        methods.add_method_mut("setSpatialHashCellSize", |_, this, size: f32| {
+            this.inner.borrow_mut().set_cell_size(size);
+            Ok(())
+        });
+
+        // -- enableSpatialHash --
+        /// Enables or disables spatial-hash bucketing for neighbourhood queries.
+        /// @param enabled : boolean
+        /// @return nil
+        methods.add_method_mut("enableSpatialHash", |_, this, enabled: bool| {
+            this.inner.borrow_mut().set_use_spatial_hash(enabled);
+            Ok(())
+        });
 
     }
 }

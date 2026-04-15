@@ -21,7 +21,26 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
         .get::<_, LuaTable>("dependencies")
         .map(|deps| deps.sequence_values::<String>().flatten().collect())
         .unwrap_or_default();
-    Ok(ModInfo::from_parts(
+    let capabilities = tbl
+        .get::<_, LuaTable>("capabilities")
+        .map(|caps| caps.sequence_values::<String>().flatten().collect())
+        .unwrap_or_default();
+    let config_schema = tbl
+        .get::<_, LuaTable>("config_schema")
+        .map(|schema| {
+            schema
+                .sequence_values::<LuaTable>()
+                .flatten()
+                .filter_map(|entry| {
+                    let key: String = entry.get("key").ok()?;
+                    let type_hint: String = entry.get("type").unwrap_or_else(|_| "any".into());
+                    let default: String = entry.get("default").unwrap_or_default();
+                    Some((key, type_hint, default))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut info = ModInfo::from_parts(
         id,
         tbl.get::<_, String>("name").ok(),
         tbl.get::<_, String>("version").ok(),
@@ -29,7 +48,11 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
         tbl.get::<_, String>("description").ok(),
         tbl.get::<_, i32>("priority").ok(),
         dependencies,
-    ))
+    );
+    info.api_version = tbl.get::<_, String>("api_version").ok();
+    info.capabilities = capabilities;
+    info.config_schema = config_schema;
+    Ok(info)
 }
 
 /// Writes a [`ModInfo`] to a Lua table.
@@ -46,6 +69,29 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
     if let Some(ref p) = info.path {
         t.set("path", p.as_str() as &str)?;
     }
+    if let Some(ref av) = info.api_version {
+        t.set("api_version", av.as_str())?;
+    }
+    let caps = {
+        let c = lua.create_table()?;
+        for (i, cap) in info.capabilities.iter().enumerate() {
+            c.set(i + 1, cap.as_str())?;
+        }
+        c
+    };
+    t.set("capabilities", caps)?;
+    let schema = {
+        let s = lua.create_table()?;
+        for (i, (key, type_hint, default)) in info.config_schema.iter().enumerate() {
+            let entry = lua.create_table()?;
+            entry.set("key", key.as_str())?;
+            entry.set("type", type_hint.as_str())?;
+            entry.set("default", default.as_str())?;
+            s.set(i + 1, entry)?;
+        }
+        s
+    };
+    t.set("config_schema", schema)?;
     let deps = lua.create_table()?;
     for (i, dep) in info.dependencies.iter().enumerate() {
         deps.set(i + 1, dep.as_str() as &str)?;
@@ -166,6 +212,71 @@ impl LuaUserData for LuaMod {
         /// Returns whether the mod has been loaded.
         /// @return boolean
         methods.add_method("isLoaded", |_, this, ()| Ok(this.inner.loaded));
+
+        // -- getApiVersion --
+        /// Returns the required engine API version string, or nil if not set.
+        /// @return string?
+        methods.add_method("getApiVersion", |_, this, ()| {
+            Ok(this.inner.api_version.clone())
+        });
+
+        // -- setApiVersion --
+        /// Sets the required engine API version string.
+        /// @param api_version : string
+        /// @return nil
+        methods.add_method_mut("setApiVersion", |_, this, api_version: String| {
+            this.inner.api_version = Some(api_version);
+            Ok(())
+        });
+
+        // -- getCapabilities --
+        /// Returns an array of declared capability flags.
+        /// @return table
+        methods.add_method("getCapabilities", |lua, this, ()| {
+            string_slice_to_table(lua, &this.inner.capabilities)
+        });
+
+        // -- setCapabilities --
+        /// Replaces the capability list with the given array of strings.
+        /// @param caps : table
+        /// @return nil
+        methods.add_method_mut("setCapabilities", |_, this, caps: LuaTable| {
+            this.inner.capabilities = caps.sequence_values::<String>().flatten().collect();
+            Ok(())
+        });
+
+        // -- getConfigSchema --
+        /// Returns the config schema as an array of `{key, type, default}` tables.
+        /// @return table
+        methods.add_method("getConfigSchema", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (key, type_hint, default)) in this.inner.config_schema.iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("key", key.as_str())?;
+                entry.set("type", type_hint.as_str())?;
+                entry.set("default", default.as_str())?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+
+        // -- setConfigSchema --
+        /// Replaces the config schema with the given array of `{key, type, default}` tables.
+        /// @param schema : table
+        /// @return nil
+        methods.add_method_mut("setConfigSchema", |_, this, schema: LuaTable| {
+            this.inner.config_schema = schema
+                .sequence_values::<LuaTable>()
+                .flatten()
+                .filter_map(|entry| {
+                    let key: String = entry.get("key").ok()?;
+                    let type_hint: String = entry.get("type").unwrap_or_else(|_| "any".into());
+                    let default: String = entry.get("default").unwrap_or_default();
+                    Some((key, type_hint, default))
+                })
+                .collect();
+            Ok(())
+        });
 
         // -- setHook --
         /// Registers a named hook callback, replacing any existing one.
@@ -450,6 +561,94 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "newModManager",
         lua.create_function(|lua, ()| lua.create_userdata(LuaModManager::new()))?,
+    )?;
+
+    // -- checkApiVersion --
+    /// Checks whether a mod's required `api_version` is compatible with the given `host_version`.
+    ///
+    /// Both version strings must be of the form "MAJOR.MINOR.PATCH". A mod is
+    /// compatible when its MAJOR equals the host MAJOR and its MINOR ≤ the host
+    /// MINOR. Returns `true` if compatible, `false` otherwise. Always returns
+    /// `true` when the mod has no `api_version` set.
+    ///
+    /// @param mod_ud : Mod
+    /// @param host_version : string
+    /// @return boolean, string?
+    tbl.set(
+        "checkApiVersion",
+        lua.create_function(|_, (mod_ud, host_version): (LuaAnyUserData, String)| {
+            let api_ver = {
+                let m = mod_ud.borrow::<LuaMod>()?;
+                m.inner.api_version.clone()
+            };
+            let required = match api_ver {
+                None => return Ok((true, LuaValue::Nil)),
+                Some(v) => v,
+            };
+            let parse = |s: &str| -> Option<(u32, u32, u32)> {
+                let mut parts = s.splitn(3, '.');
+                let maj = parts.next()?.parse::<u32>().ok()?;
+                let min = parts.next()?.parse::<u32>().ok()?;
+                let pat = parts.next().and_then(|p| p.parse::<u32>().ok()).unwrap_or(0);
+                Some((maj, min, pat))
+            };
+            let (req_maj, req_min, _) = match parse(&required) {
+                Some(v) => v,
+                None => {
+                    return Ok((
+                        false,
+                        LuaValue::String(
+                            lua.create_string(format!(
+                                "mod api_version '{}' is not a valid semver",
+                                required
+                            ).as_bytes())?,
+                        ),
+                    ))
+                }
+            };
+            let (host_maj, host_min, _) = match parse(&host_version) {
+                Some(v) => v,
+                None => {
+                    return Ok((
+                        false,
+                        LuaValue::String(
+                            lua.create_string(
+                                format!(
+                                    "host api_version '{}' is not a valid semver",
+                                    host_version
+                                )
+                                .as_bytes(),
+                            )?,
+                        ),
+                    ))
+                }
+            };
+            if req_maj != host_maj {
+                return Ok((
+                    false,
+                    LuaValue::String(lua.create_string(
+                        format!(
+                            "mod requires API {}.x but host provides {}.x",
+                            req_maj, host_maj
+                        )
+                        .as_bytes(),
+                    )?),
+                ));
+            }
+            if req_min > host_min {
+                return Ok((
+                    false,
+                    LuaValue::String(lua.create_string(
+                        format!(
+                            "mod requires API {}.{}.x but host provides {}.{}.x",
+                            req_maj, req_min, host_maj, host_min
+                        )
+                        .as_bytes(),
+                    )?),
+                ));
+            }
+            Ok((true, LuaValue::Nil))
+        })?,
     )?;
 
     luna.set("modding", tbl)?;

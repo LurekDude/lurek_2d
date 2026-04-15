@@ -393,6 +393,196 @@ pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
 }
 
 // ---------------------------------------------------------------------------
+// LU Decomposition
+// ---------------------------------------------------------------------------
+
+/// Result of an LU decomposition with partial pivoting.
+///
+/// Stores the combined L and U factors as a flat row-major n×n buffer:
+/// - the unit lower-triangular factor L occupies the strictly lower triangle,
+/// - the upper-triangular factor U occupies the upper triangle and diagonal.
+///
+/// # Fields
+/// - `lu_data` — flat n×n combined LU buffer.
+/// - `perm` — row permutation applied during pivoting.
+/// - `n` — dimension of the square matrix.
+/// - `det_sign` — sign of the determinant (+1 or −1).
+#[derive(Debug, Clone)]
+pub struct LuDecomp {
+    /// Combined L/U flat buffer (row-major, n×n).
+    pub lu_data: Vec<f64>,
+    /// Row permutation from partial pivoting.
+    pub perm: Vec<usize>,
+    /// Matrix dimension (n).
+    pub n: usize,
+    /// Sign of the determinant produced by the pivot sequence (+1 or −1).
+    pub det_sign: i32,
+}
+
+/// Decomposes a square matrix `a` into P·A = L·U using partial pivoting.
+///
+/// The unit lower-triangular factor L (diagonal 1s, not stored) and upper-
+/// triangular factor U are written into a single n×n buffer returned inside
+/// [`LuDecomp`].
+///
+/// # Parameters
+/// - `a` — a square 2D [`NdArray`] of shape `[n, n]`.
+///
+/// # Returns
+/// `Result<LuDecomp, String>`.
+///
+/// # Design Rationale
+/// Partial pivoting ensures numerical stability for near-singular matrices
+/// that can realistically appear in game AI or physics calculations. The
+/// combined LU buffer avoids two separate allocations.
+pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
+    let shape = a.shape();
+    if shape.len() != 2 || shape[0] != shape[1] {
+        return Err(format!(
+            "lu_decompose: expected square 2D matrix, got shape {:?}",
+            shape
+        ));
+    }
+    let n = shape[0];
+    if n == 0 {
+        return Ok(LuDecomp {
+            lu_data: vec![],
+            perm: vec![],
+            n: 0,
+            det_sign: 1,
+        });
+    }
+
+    // Copy A into a mutable flat row-major buffer.
+    let mut buf: Vec<f64> = (0..n * n).map(|i| a.get_f64(i)).collect();
+    let mut perm: Vec<usize> = (0..n).collect();
+    let mut det_sign = 1i32;
+
+    for col in 0..n {
+        // Find pivot (max absolute value in this column, rows col..n).
+        let pivot_row = (col..n)
+            .max_by(|&r1, &r2| {
+                buf[r1 * n + col]
+                    .abs()
+                    .partial_cmp(&buf[r2 * n + col].abs())
+                    .unwrap_or(std::cmp::Ordering::Equal)
+            })
+            .unwrap();
+
+        if pivot_row != col {
+            // Swap rows.
+            for k in 0..n {
+                buf.swap(pivot_row * n + k, col * n + k);
+            }
+            perm.swap(pivot_row, col);
+            det_sign = -det_sign;
+        }
+
+        let pivot = buf[col * n + col];
+        if pivot.abs() < 1e-14 {
+            // Singular — continue anyway (det will be ~0).
+            continue;
+        }
+
+        // Eliminate below pivot.
+        for row in (col + 1)..n {
+            let factor = buf[row * n + col] / pivot;
+            buf[row * n + col] = factor; // Store L multiplier in lower triangle.
+            for k in (col + 1)..n {
+                buf[row * n + k] -= factor * buf[col * n + k];
+            }
+        }
+    }
+
+    Ok(LuDecomp {
+        lu_data: buf,
+        perm,
+        n,
+        det_sign,
+    })
+}
+
+// ---------------------------------------------------------------------------
+// Power-Iteration Eigenvalue
+// ---------------------------------------------------------------------------
+
+/// Computes the dominant eigenvalue and its eigenvector of a square matrix
+/// using the power-iteration method.
+///
+/// Converges to the eigenvalue with the largest absolute value. The returned
+/// eigenvector is L2-normalised.
+///
+/// # Parameters
+/// - `a`        — square 2D [`NdArray`] of shape `[n, n]`.
+/// - `max_iter` — maximum iterations (default 1000 if 0).
+/// - `tol`      — convergence tolerance (default 1e-10 if 0.0).
+///
+/// # Returns
+/// `Result<(f64, Vec<f64>), String>` — dominant eigenvalue and eigenvector.
+///
+/// # Design Rationale
+/// Power iteration is simple, allocation-efficient, and good enough for
+/// game AI influence maps and graph centrality — which rarely need more
+/// than the dominant mode. The caller controls iteration budget via
+/// `max_iter` and `tol`.
+pub fn eigenvalue_power(
+    a: &NdArray,
+    max_iter: u32,
+    tol: f64,
+) -> Result<(f64, Vec<f64>), String> {
+    let shape = a.shape();
+    if shape.len() != 2 || shape[0] != shape[1] {
+        return Err(format!(
+            "eigenvalue_power: expected square 2D matrix, got shape {:?}",
+            shape
+        ));
+    }
+    let n = shape[0];
+    if n == 0 {
+        return Err("eigenvalue_power: matrix is empty".to_string());
+    }
+
+    let iters = if max_iter == 0 { 1000 } else { max_iter };
+    let epsilon = if tol <= 0.0 { 1e-10 } else { tol };
+
+    // Start with unit vector v = [1, 0, 0, …].
+    let mut v: Vec<f64> = (0..n).map(|i| if i == 0 { 1.0 } else { 0.0 }).collect();
+    let mut eigenvalue = 0.0_f64;
+
+    for _ in 0..iters {
+        // w = A · v
+        let mut w = vec![0.0_f64; n];
+        for row in 0..n {
+            for col in 0..n {
+                w[row] += a.get_f64(row * n + col) * v[col];
+            }
+        }
+
+        // λ = v^T w  (Rayleigh quotient)
+        let new_lambda: f64 = v.iter().zip(w.iter()).map(|(vi, wi)| vi * wi).sum();
+
+        // Normalise w.
+        let norm: f64 = w.iter().map(|x| x * x).sum::<f64>().sqrt();
+        if norm < 1e-14 {
+            break; // Zero vector — all eigenvalues ≈ 0.
+        }
+        for x in w.iter_mut() {
+            *x /= norm;
+        }
+
+        let delta = (new_lambda - eigenvalue).abs();
+        eigenvalue = new_lambda;
+        v = w;
+
+        if delta < epsilon {
+            break;
+        }
+    }
+
+    Ok((eigenvalue, v))
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 

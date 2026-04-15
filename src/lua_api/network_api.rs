@@ -856,6 +856,109 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- createLobby --
+    /// Creates a LobbyInfo record and broadcasts it once on the local network.
+    /// Other machines on the same subnet can discover it via lurek.network.discoverLobbies().
+    /// @param name : string
+    /// @param port : integer
+    /// @param player_count : integer?
+    /// @param max_players : integer?
+    /// @return table  { name, host, port, player_count, max_players }
+    tbl.set(
+        "createLobby",
+        lua.create_function(
+            |lua, (name, port, player_count, max_players): (String, u16, Option<u32>, Option<u32>)| {
+                let info = crate::network::lobby::LobbyInfo {
+                    name,
+                    host: "0.0.0.0".to_string(),
+                    port,
+                    player_count: player_count.unwrap_or(1),
+                    max_players: max_players.unwrap_or(8),
+                };
+                crate::network::lobby::broadcast_lobby(&info).map_err(LuaError::external)?;
+                let t = lua.create_table()?;
+                t.set("name", info.name.clone())?;
+                t.set("host", info.host.clone())?;
+                t.set("port", info.port)?;
+                t.set("player_count", info.player_count)?;
+                t.set("max_players", info.max_players)?;
+                Ok(t)
+            },
+        )?,
+    )?;
+
+    // -- discoverLobbies --
+    /// Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
+    /// Returns an array of lobby tables: { name, host, port, player_count, max_players }.
+    /// @param timeout_ms : integer?
+    /// @return table  array of lobby tables
+    tbl.set(
+        "discoverLobbies",
+        lua.create_function(|lua, timeout_ms: Option<u64>| {
+            let lobbies =
+                crate::network::lobby::discover_lobbies(timeout_ms.unwrap_or(500));
+            let arr = lua.create_table()?;
+            for (i, info) in lobbies.iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set("name", info.name.clone())?;
+                t.set("host", info.host.clone())?;
+                t.set("port", info.port)?;
+                t.set("player_count", info.player_count)?;
+                t.set("max_players", info.max_players)?;
+                arr.set(i + 1, t)?;
+            }
+            Ok(arr)
+        })?,
+    )?;
+
+    // -- syncEntity --
+    /// Convenience helper: packs an entity snapshot and broadcasts it to all peers.
+    /// The data table may contain any MessagePack-serializable values.
+    /// Wraps the data in { id = entity_id, data = data } before serialization.
+    /// @param host : NetworkHost
+    /// @param entity_id : integer
+    /// @param data : table
+    /// @param channel : integer?   (default 0)
+    /// @param reliable : boolean?  (default false)
+    /// @return nil
+    tbl.set(
+        "syncEntity",
+        lua.create_function(
+            |_lua,
+             (host_ud, entity_id, data_tbl, channel, reliable): (
+                LuaAnyUserData,
+                u32,
+                LuaTable,
+                Option<u8>,
+                Option<bool>,
+            )| {
+                let mut host = host_ud.borrow_mut::<LuaNetworkHost>()?;
+                // Build envelope: { id = entity_id, data = <table fields> }
+                let mut fields: Vec<(String, NetValue)> = Vec::new();
+                for pair in data_tbl.pairs::<LuaValue, LuaValue>() {
+                    let (k, v) = pair?;
+                    let key = match &k {
+                        LuaValue::String(s) => s.to_str()?.to_string(),
+                        LuaValue::Integer(i) => i.to_string(),
+                        _ => continue,
+                    };
+                    fields.push((key, lua_to_netvalue(&v)?));
+                }
+                let envelope = vec![
+                    ("id".to_string(), NetValue::Integer(entity_id as i64)),
+                    ("data".to_string(), NetValue::Map(fields)),
+                ];
+                let payload = crate::network::message::pack(&NetValue::Map(envelope))
+                    .map_err(LuaError::external)?;
+                host.inner
+                    .borrow_mut()
+                    .broadcast_bytes(channel.unwrap_or(0), &payload, reliable.unwrap_or(false))
+                    .map_err(LuaError::external)?;
+                Ok(())
+            },
+        )?,
+    )?;
+
     luna.set("network", tbl)?;
     Ok(())
 }

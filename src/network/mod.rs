@@ -81,3 +81,6 @@ pub mod tcp;
 
 /// WebSocket client connections managed on the network thread.
 pub mod websocket;
+
+/// LAN lobby broadcast and discovery via UDP.
+pub mod lobby;

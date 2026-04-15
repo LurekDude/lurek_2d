@@ -28,6 +28,9 @@ use std::collections::{HashMap, HashSet};
 /// - `enabled` — `bool`.
 /// - `loaded` — `bool`.
 /// - `path` — `Option<String>`.
+/// - `api_version` — `Option<String>`.
+/// - `capabilities` — `Vec<String>`.
+/// - `config_schema` — `Vec<(String, String, String)>`.
 #[derive(Debug, Clone)]
 pub struct ModInfo {
     /// Unique mod identifier.
@@ -50,6 +53,15 @@ pub struct ModInfo {
     pub loaded: bool,
     /// Filesystem path to the mod root folder, if known.
     pub path: Option<String>,
+    /// Required engine API version string (e.g. `"0.5.0"`). When set, the engine
+    /// warns or refuses to load this mod if its own API version is incompatible.
+    pub api_version: Option<String>,
+    /// Declared capability flags (e.g. `["filesystem", "network"]`). The engine
+    /// may check these before allowing access to sandboxed subsystems.
+    pub capabilities: Vec<String>,
+    /// Config schema: list of `(key, type_hint, default_value)` triples declared
+    /// in the `[config]` section of `mod.toml`. Used for validation and tooling.
+    pub config_schema: Vec<(String, String, String)>,
 }
 
 impl ModInfo {
@@ -74,6 +86,9 @@ impl ModInfo {
             enabled: true,
             loaded: false,
             path: None,
+            api_version: None,
+            capabilities: Vec::new(),
+            config_schema: Vec::new(),
         }
     }
 

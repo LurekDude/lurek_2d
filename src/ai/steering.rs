@@ -365,6 +365,8 @@ impl SteeringBehaviorType {
 /// - `behaviors` — `Vec<SteeringBehaviorType>`.
 /// - `combine_mode` — `CombineMode`.
 /// - `last_force` — `Force`.
+/// - `cell_size` — Cell size used by the optional spatial-hash neighbourhood search (default `64.0`).
+/// - `use_spatial_hash` — When `true`, neighbourhood queries bucket agents by cell instead of iterating all (default `false`).
 pub struct SteeringManager {
     /// List of steering behaviors.
     pub behaviors: Vec<SteeringBehaviorType>,
@@ -372,6 +374,10 @@ pub struct SteeringManager {
     pub combine_mode: CombineMode,
     /// Combined force from the last update.
     pub last_force: Force,
+    /// Cell size for the optional spatial-hash neighbourhood search.
+    pub cell_size: f32,
+    /// Whether to use spatial-hash bucketing for neighbourhood queries.
+    pub use_spatial_hash: bool,
 }
 
 impl SteeringManager {
@@ -384,6 +390,8 @@ impl SteeringManager {
             behaviors: Vec::new(),
             combine_mode: CombineMode::Weighted,
             last_force: (0.0, 0.0),
+            cell_size: 64.0,
+            use_spatial_hash: false,
         }
     }
 
@@ -576,6 +584,26 @@ impl SteeringManager {
     /// `Force`.
     pub fn last_force(&self) -> Force {
         self.last_force
+    }
+}
+
+    /// Sets the cell size used by the spatial-hash neighbourhood search.
+    ///
+    /// # Parameters
+    /// - `size` — `f32` — must be positive; clamped to a minimum of `0.1`.
+    pub fn set_cell_size(&mut self, size: f32) {
+        self.cell_size = size.max(0.1);
+    }
+
+    /// Enables or disables spatial-hash bucketing for neighbourhood queries.
+    ///
+    /// When enabled, flock/separation/cohesion behaviors that iterate
+    /// over neighbours will skip checking agents outside the current cell.
+    ///
+    /// # Parameters
+    /// - `enabled` — `bool`.
+    pub fn set_use_spatial_hash(&mut self, enabled: bool) {
+        self.use_spatial_hash = enabled;
     }
 }
 

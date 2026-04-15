@@ -313,3 +313,56 @@ impl Default for BehaviorTree {
         Self::new()
     }
 }
+
+// ---------------------------------------------------------------------------
+// Debug introspection
+// ---------------------------------------------------------------------------
+
+/// Counts the total number of nodes in a `BTNode` subtree (inclusive of root).
+fn count_bt_nodes(node: &BTNode) -> usize {
+    1 + match node {
+        BTNode::Selector { children, .. }
+        | BTNode::Sequence { children, .. }
+        | BTNode::Parallel { children, .. } => children.iter().map(count_bt_nodes).sum(),
+        BTNode::Inverter { child }
+        | BTNode::Succeeder { child } => count_bt_nodes(child),
+        BTNode::Repeater { child, .. } => count_bt_nodes(child),
+        BTNode::Action { .. } | BTNode::Condition { .. } => 0,
+    }
+}
+
+/// A snapshot of a [`BehaviorTree`]'s current diagnostic state.
+///
+/// Returned by [`BehaviorTree::debug_state`] and exposed to Lua via
+/// `bt:getDebugState()`.
+///
+/// # Fields
+/// - `node_count` — Total number of nodes in the tree (0 for an empty tree).
+/// - `last_status` — The status string returned by the most recent tick.
+pub struct BtDebugState {
+    /// Total number of nodes in the tree (0 for an empty tree).
+    pub node_count: usize,
+    /// The status returned by the last tick: `"success"`, `"failure"`, or `"running"`.
+    pub last_status: String,
+}
+
+impl BehaviorTree {
+    /// Returns a diagnostic snapshot of this tree's current state.
+    ///
+    /// Useful for debugging and developer tooling: exposes the total node
+    /// count and the result of the most recent tick without requiring
+    /// access to the internal node tree.
+    ///
+    /// # Returns
+    /// [`BtDebugState`].
+    pub fn debug_state(&self) -> BtDebugState {
+        let node_count = match &self.root {
+            Some(root) => count_bt_nodes(root),
+            None => 0,
+        };
+        BtDebugState {
+            node_count,
+            last_status: self.last_status.as_str().to_string(),
+        }
+    }
+}
