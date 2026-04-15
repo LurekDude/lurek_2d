@@ -176,6 +176,30 @@ impl LuaUserData for LuaScheduler {
             Ok(this.scheduler.is_paused(id))
         });
 
+        // -- pauseNamed --
+        /// Pauses a scheduled event by its string name.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method_mut("pauseNamed", |_, this, name: String| {
+            Ok(this.scheduler.pause_named(&name))
+        });
+
+        // -- resumeNamed --
+        /// Resumes a paused event by its string name.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method_mut("resumeNamed", |_, this, name: String| {
+            Ok(this.scheduler.resume_named(&name))
+        });
+
+        // -- isPausedNamed --
+        /// Returns whether the named event is currently paused.
+        /// @param name : string
+        /// @return boolean
+        methods.add_method("isPausedNamed", |_, this, name: String| {
+            Ok(this.scheduler.is_paused_named(&name))
+        });
+
         // -- getRemaining --
         /// Returns the seconds remaining until the next fire for an event, or nil.
         /// @param id : integer
@@ -392,6 +416,125 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "newScheduler",
         lua.create_function(|lua, ()| lua.create_userdata(LuaScheduler::new()))?,
+    )?;
+
+    // -- chain --
+    /// Creates a new Scheduler loaded with a sequenced one-shot chain.
+    /// Each step fires after the previous step's delay has elapsed (additive).
+    /// Returns the scheduler so the caller can drive it with `:update(dt)`.
+    /// @param steps : table   array of `{delay: number, func: function}` entries
+    /// @return Scheduler
+    tbl.set(
+        "chain",
+        lua.create_function(|lua, steps: LuaTable| {
+            let mut sched = LuaScheduler::new();
+            let mut accumulated: f64 = 0.0;
+            let len = steps.raw_len();
+            for i in 1..=len {
+                let step: LuaTable = steps.raw_get(i)?;
+                let delay: f64 = step.get("delay").unwrap_or(0.0);
+                let func: Option<LuaFunction> = step.get("func")?;
+                accumulated += delay.max(0.0);
+                if let Some(f) = func {
+                    let key = lua.create_registry_value(f)?;
+                    let id = sched.scheduler.after(accumulated);
+                    sched.callbacks.insert(id, key);
+                }
+            }
+            lua.create_userdata(sched)
+        })?,
+    )?;
+
+    // Real-clock timer list: (deadline_instant, callback_key).
+    let real_timers: Rc<RefCell<Vec<(std::time::Instant, LuaRegistryKey)>>> =
+        Rc::new(RefCell::new(Vec::new()));
+
+    // -- afterReal --
+    /// Schedules a one-shot callback that fires after `delay` wall-clock seconds,
+    /// unaffected by engine time scale. Call `lurek.time.tickRealTimers()` once
+    /// per frame to poll for expired timers.
+    /// @param delay : number   wall-clock seconds to wait
+    /// @param func : function
+    /// @return nil
+    let rt = real_timers.clone();
+    tbl.set(
+        "afterReal",
+        lua.create_function(move |lua, (delay, func): (f64, LuaFunction)| {
+            let deadline = std::time::Instant::now()
+                + std::time::Duration::from_secs_f64(delay.max(0.0));
+            let key = lua.create_registry_value(func)?;
+            rt.borrow_mut().push((deadline, key));
+            Ok(())
+        })?,
+    )?;
+
+    // -- tickRealTimers --
+    /// Fires and removes all real-clock timers whose wall-clock deadline has passed.
+    /// Call once per frame inside `lurek.process` to drain expired timers.
+    /// @return integer  number of callbacks fired
+    let rt = real_timers;
+    tbl.set(
+        "tickRealTimers",
+        lua.create_function(move |lua, ()| {
+            let now = std::time::Instant::now();
+            let mut timers = rt.borrow_mut();
+            let mut fired = 0u32;
+            let mut remaining = Vec::new();
+            for (deadline, key) in timers.drain(..) {
+                if now >= deadline {
+                    if let Ok(func) = lua.registry_value::<LuaFunction>(&key) {
+                        let _ = func.call::<_, ()>(());
+                    }
+                    lua.remove_registry_value(key)?;
+                    fired += 1;
+                } else {
+                    remaining.push((deadline, key));
+                }
+            }
+            *timers = remaining;
+            Ok(fired)
+        })?,
+    )?;
+
+    // Smoothed-delta state — exponential moving average of frame deltas.
+    let smoothed: Rc<RefCell<f64>> = Rc::new(RefCell::new(0.0));
+    let smooth_alpha: Rc<RefCell<f64>> = Rc::new(RefCell::new(0.1));
+
+    // -- setSmoothingFactor --
+    /// Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0].
+    /// Lower values smooth more aggressively; 1.0 disables smoothing.
+    /// @param alpha : number
+    /// @return nil
+    let sa = smooth_alpha.clone();
+    tbl.set(
+        "setSmoothingFactor",
+        lua.create_function(move |_, alpha: f64| {
+            *sa.borrow_mut() = alpha.clamp(0.01, 1.0);
+            Ok(())
+        })?,
+    )?;
+
+    // -- getSmoothedDelta --
+    /// Returns the exponential moving-average of frame deltas in seconds.
+    /// Call once per frame to update the average; the first call seeds from the
+    /// current raw delta.
+    /// @return number
+    let s = state.clone();
+    let smoothed_ref = smoothed.clone();
+    let alpha_ref = smooth_alpha.clone();
+    tbl.set(
+        "getSmoothedDelta",
+        lua.create_function(move |_, ()| {
+            let dt = s.borrow().delta_time;
+            let alpha = *alpha_ref.borrow();
+            let mut sm = smoothed_ref.borrow_mut();
+            if *sm == 0.0 {
+                *sm = dt;
+            } else {
+                *sm = alpha * dt + (1.0 - alpha) * *sm;
+            }
+            Ok(*sm)
+        })?,
     )?;
 
     luna.set("time", tbl)?;

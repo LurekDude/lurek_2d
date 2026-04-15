@@ -283,6 +283,42 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // ─── to ──────────────────────────────────────────────────────────────
+    /// Sugar for `tween()` with `target` first — natural read order.
+    /// Equivalent to `lurek.tween.tween(duration, target, fields, easing)`.
+    /// @param target : table
+    /// @param fields : table
+    /// @param duration : number
+    /// @param easing : string?
+    /// @return Tween
+    let s = engine.clone();
+    tbl.set(
+        "to",
+        lua.create_function(
+            move |lua,
+                  (target, fields_tbl, duration, easing): (
+                LuaTable,
+                LuaTable,
+                f64,
+                Option<String>,
+            )| {
+                let easing_name = easing.as_deref().unwrap_or("linear");
+                let mut fields = Vec::new();
+                let mut end_values = Vec::new();
+                for pair in fields_tbl.pairs::<String, f64>() {
+                    let (k, v) = pair?;
+                    fields.push(k);
+                    end_values.push(v);
+                }
+                let tw = LuaTween::new(lua, duration, target, fields, end_values, easing_name)?;
+                let ud = lua.create_userdata(tw)?;
+                let key = lua.create_registry_value(ud.clone())?;
+                s.borrow_mut().active_tweens.push(key);
+                Ok(ud)
+            },
+        )?,
+    )?;
+
     luna.set("tween", tbl)?;
     Ok(())
 }

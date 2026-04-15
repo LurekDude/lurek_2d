@@ -446,4 +446,65 @@ describe("Cursor.getType / Cursor.release", function()
         expect_no_error(function() cursor:release() end)
     end)
 end)
+
+-- @description Tests for the new lurek.input action-mapping namespace.
+describe("lurek.input action mapping", function()
+  -- @covers lurek.input.bind
+  -- @covers lurek.input.getBindings
+  -- @description Binds an action to keys and verifies getBindings returns a non-empty table.
+  it("bind registers an action", function()
+    lurek.input.bind("jump", {"space", "up"})
+    local bindings = lurek.input.getBindings()
+    expect_equal(type(bindings), "table")
+    expect_equal(type(bindings["jump"]), "table")
+    expect_equal(#bindings["jump"], 2)
+  end)
+
+  -- @covers lurek.input.unbind
+  -- @description After unbind, the action should no longer appear in getBindings.
+  it("unbind removes an action", function()
+    lurek.input.bind("fire", "ctrl")
+    local removed = lurek.input.unbind("fire")
+    expect_equal(removed, true)
+    local b = lurek.input.getBindings()
+    expect_equal(b["fire"], nil)
+  end)
+
+  -- @covers lurek.input.clearBindings
+  -- @description clearBindings leaves getBindings returning an empty table.
+  it("clearBindings empties all mappings", function()
+    lurek.input.bind("run", "shift")
+    lurek.input.clearBindings()
+    local b = lurek.input.getBindings()
+    local count = 0
+    for _ in pairs(b) do count = count + 1 end
+    expect_equal(count, 0)
+  end)
+
+  -- @covers lurek.input.isActionDown
+  -- @description isActionDown on an unbound action returns false.
+  it("isActionDown is false for an unmapped action", function()
+    lurek.input.clearBindings()
+    expect_equal(lurek.input.isActionDown("nosuchaction"), false)
+  end)
+
+  -- @covers lurek.input.wasActionPressed
+  -- @description wasActionPressed on an unbound action returns false.
+  it("wasActionPressed is false for an unmapped action", function()
+    expect_equal(lurek.input.wasActionPressed("nosuchaction"), false)
+  end)
+
+  -- @covers lurek.input.wasActionReleased
+  -- @description wasActionReleased on an unbound action returns false.
+  it("wasActionReleased is false for an unmapped action", function()
+    expect_equal(lurek.input.wasActionReleased("nosuchaction"), false)
+  end)
+
+  -- @covers lurek.input.wasActionPressedWithin
+  -- @description wasActionPressedWithin returns false for an action that was never pressed.
+  it("wasActionPressedWithin is false for an action never pressed", function()
+    expect_equal(lurek.input.wasActionPressedWithin("nosuchaction", 10), false)
+  end)
+end)
+
 test_summary()

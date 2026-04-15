@@ -2,6 +2,30 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.11.0] — 2026-04-17
+### Added
+- `lurek.signal`: `once(name, fn)` — auto-disconnects after first invocation.
+- `lurek.signal`: `registerWithFilter(name, fn, predicate)` — only fires handler when `predicate(args)` returns truthy.
+- `lurek.signal`: `pushDeferred(name, ...)` / `flushDeferred()` — enqueue events for next-frame dispatch to prevent re-entrant emission chains.
+- `lurek.signal`: `enableHistory(max)` / `getHistory()` / `clearHistory()` — rolling debug event log.
+- `lurek.time` (Scheduler): `pauseNamed(name)` / `resumeNamed(name)` / `isPausedNamed(name)` — pause/resume a named timer without canceling it.
+- `lurek.time`: `chain(...)` — sequential delayed calls with accumulated durations without callback nesting.
+- `lurek.time`: `afterReal(delay, fn)` / `tickRealTimers()` — wall-clock timers that ignore `timeScale`; required for UI during game pause.
+- `lurek.time`: `setSmoothingFactor(alpha)` / `getSmoothedDelta()` — EMA-smoothed delta to prevent entity teleport on frame hitches.
+- `lurek.input` — new action-mapping namespace: `bind(action, keys)`, `unbind(action)`, `clearBindings()`, `getBindings()`, `isActionDown(action)`, `wasActionPressed(action)`, `wasActionReleased(action)`, `wasActionPressedWithin(action, frames)`.
+- `lurek.tween.to(target, fields, duration, easing?)` — LÖVE2-style object property sugar; interpolates table fields in place.
+- `lurek.window.onDpiChange(fn)` / `pollDpiChange()` — DPI-change callback for multi-monitor setups.
+- `lurek.window.openFileDialog(opts?)` — native file-picker dialog via `rfd`; supports `title`, `filters`, `multiple`, `defaultPath`.
+- `lurek.devtools.profilerReport()` — returns accumulated profiler zone stats (`name`, `calls`, `total_ms`, `avg_ms`, `min_ms`, `max_ms`, `self_ms`) as a Lua table.
+- `lurek.devtools.newFileWatcher(path)` — per-path file-watcher userdata with `onChanged(fn)`, `check()`, `getPath()`, `cancel()`.
+- `lurek.engine` — new read-only introspection namespace: `getVersion()`, `getFrameBudget()`, `memoryUsage()`, `platform()`, `uptime()`, `fps()`, `frameCount()`, `isDebug()`.
+### Tests
+- Lua BDD tests added/extended for all new APIs: `test_event.lua`, `test_timer.lua`, `test_input.lua`, `test_tween.lua`, `test_window.lua`, `test_devtools.lua`.
+- New `tests/lua/unit/test_engine.lua` covering the full `lurek.engine.*` namespace.
+- `tests/lua/harness.rs`: added `lua_test_engine` entry.
+### Docs
+- IDEA.md files updated for `event`, `timer`, `input`, `window`, `tween`, `devtools`, `runtime` — newly implemented items marked `✅ DONE`.
+
 ## [0.10.0] — 2026-04-16
 ### Added
 - `lurek.simulator.saveMacro(name, script_name)` / `playMacro(name)` / `hasMacro(name)` / `listMacros()` — named reusable input-playback macros stored in `Simulator`.

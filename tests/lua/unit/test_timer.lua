@@ -365,4 +365,67 @@ describe("lurek.time.getFrameCount", function()
         expect_true(count == math.floor(count), "frame count must be an integer")
     end)
 end)
+
+-- @description Tests for new timer features: scheduler.pauseNamed/resumeNamed, chain(), tickRealTimers(), getSmoothedDelta.
+describe("lurek.time new scheduler features", function()
+  -- @covers lurek.time.newScheduler
+  -- @description Creates a scheduler, schedules a named event, pauses it, advances time, confirms it did not fire, then resumes and confirms it fires.
+  it("pauseNamed and resumeNamed block and allow events", function()
+    local s = lurek.time.newScheduler()
+    local fired = false
+    s:everyNamed(0.1, "mytimer", function() fired = true end)
+    s:pauseNamed("mytimer")
+    s:update(0.2)
+    expect_equal(fired, false)
+    s:resumeNamed("mytimer")
+    s:update(0.1)
+    expect_equal(fired, true)
+  end)
+
+  -- @covers lurek.time.chain
+  -- @description Creates a two-step chain; confirms second step fires after both delays have elapsed.
+  it("chain fires steps in sequence", function()
+    local results = {}
+    local chain_sched = lurek.time.chain({
+      { delay = 0.1, func = function() table.insert(results, 1) end },
+      { delay = 0.2, func = function() table.insert(results, 2) end },
+    })
+    chain_sched:update(0.15)
+    expect_equal(#results, 1)
+    chain_sched:update(0.2)
+    expect_equal(#results, 2)
+  end)
+
+  -- @covers lurek.time.afterReal
+  -- @covers lurek.time.tickRealTimers
+  -- @description Schedules a near-zero real-clock timer; confirms it fires after tickRealTimers() is called with sufficient elapsed time.
+  it("afterReal fires via tickRealTimers", function()
+    local fired = false
+    lurek.time.afterReal(0.0, function() fired = true end)
+    lurek.time.tickRealTimers()
+    expect_equal(fired, true)
+  end)
+
+  -- @covers lurek.time.setSmoothingFactor
+  -- @covers lurek.time.getSmoothedDelta
+  -- @description Confirms getSmoothedDelta returns a positive number after calling it once.
+  it("getSmoothedDelta returns a positive number", function()
+    lurek.time.setSmoothingFactor(0.5)
+    local dt = lurek.time.getSmoothedDelta()
+    expect_true(type(dt) == "number" and dt >= 0, "smoothed delta must be non-negative")
+  end)
+
+  -- @covers lurek.time.newScheduler
+  -- @description Verifies isPausedNamed returns correct booleans.
+  it("isPausedNamed reflects pause state", function()
+    local s = lurek.time.newScheduler()
+    s:everyNamed(1.0, "ticker", function() end)
+    expect_equal(s:isPausedNamed("ticker"), false)
+    s:pauseNamed("ticker")
+    expect_equal(s:isPausedNamed("ticker"), true)
+    s:resumeNamed("ticker")
+    expect_equal(s:isPausedNamed("ticker"), false)
+  end)
+end)
+
 test_summary()

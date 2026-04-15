@@ -723,4 +723,29 @@ describe("easing resolution (RS parity)", function()
         lurek.tween.cancelAll()
     end)
 end)
+
+-- @description Tests for lurek.tween.to() sugar function.
+describe("lurek.tween.to sugar", function()
+  -- @covers lurek.tween.to
+  -- @description tween.to(target, fields, duration) should animate target to the desired values by the end of the duration.
+  it("tween.to animates properties forward", function()
+    local obj = { x = 0.0, y = 0.0 }
+    lurek.tween.to(obj, { x = 100.0, y = 50.0 }, 1.0)
+    lurek.tween.update(1.0)
+    expect_near(obj.x, 100.0, 1.0)
+    expect_near(obj.y, 50.0, 1.0)
+    lurek.tween.cancelAll()
+  end)
+
+  -- @covers lurek.tween.to
+  -- @description tween.to should accept an optional easing name without error.
+  it("tween.to accepts optional easing parameter without error", function()
+    local obj = { alpha = 1.0 }
+    expect_no_error(function()
+      lurek.tween.to(obj, { alpha = 0.0 }, 0.5, "linear")
+      lurek.tween.cancelAll()
+    end)
+  end)
+end)
+
 test_summary()

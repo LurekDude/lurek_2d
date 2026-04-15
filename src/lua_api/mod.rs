@@ -150,6 +150,9 @@ pub mod i18n_api;
 /// Registers the `lurek.log.*` structured log level API.
 pub mod log_api;
 
+/// Registers the `lurek.engine.*` runtime engine metadata API.
+pub mod engine_api;
+
 /// Registers the `lurek.docs.*` documentation management API.
 pub mod docs_api;
 
@@ -265,6 +268,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // log: lurek.log (always registered — no config flag)
     log_api::register(&lua, &luna)?;
+    engine_api::register(&lua, &luna, state.clone())?;
 
     // data: lurek.data (always registered — no config flag)
     data_api::register(&lua, &luna, state.clone())?;

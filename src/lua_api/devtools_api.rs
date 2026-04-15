@@ -89,6 +89,73 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
 /// - `luna` — `&LuaTable`.
 /// - `_state` — `Rc<RefCell<SharedState>>`.
 ///
+
+// ---------------------------------------------------------------------------
+// LuaFileWatcher — standalone per-path file-change watcher userdata
+// ---------------------------------------------------------------------------
+
+/// Lua-side handle for a per-path file watcher.
+///
+/// Created by `lurek.devtools.newFileWatcher(path)`. Call `:check()` once per
+/// frame from within `lurek.process` to poll for changes.
+struct LuaFileWatcher {
+    /// Domain watcher watching a single path.
+    watcher: FileWatcher,
+    /// Watched path (informational).
+    path: String,
+    /// Optional Lua callback fired when the path changes.
+    callback: Rc<RefCell<Option<LuaRegistryKey>>>,
+}
+
+impl LuaUserData for LuaFileWatcher {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- onChanged --
+        /// Registers a callback invoked (with no arguments) when the watched path changes.
+        /// @param fn : function
+        /// @return nil
+        methods.add_method_mut("onChanged", |lua, this, func: LuaFunction| {
+            let key = lua.create_registry_value(func)?;
+            if let Some(old) = this.callback.borrow_mut().replace(key) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        });
+
+        // -- check --
+        /// Polls the watcher. If the file has changed since the last call, fires the
+        /// `onChanged` callback (if set) and returns `true`.
+        /// @return boolean
+        methods.add_method_mut("check", |lua, this, ()| {
+            let changed = this.watcher.poll();
+            if !changed.is_empty() {
+                if let Some(key) = this.callback.borrow().as_ref() {
+                    if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
+                        func.call::<_, ()>(())?;
+                    }
+                }
+                return Ok(true);
+            }
+            Ok(false)
+        });
+
+        // -- getPath --
+        /// Returns the watched path string.
+        /// @return string
+        methods.add_method("getPath", |_, this, ()| Ok(this.path.clone()));
+
+        // -- cancel --
+        /// Removes the stored `onChanged` callback and stops future notifications.
+        /// @return nil
+        methods.add_method_mut("cancel", |lua, this, ()| {
+            this.watcher.clear();
+            if let Some(key) = this.callback.borrow_mut().take() {
+                lua.remove_registry_value(key)?;
+            }
+            Ok(())
+        });
+    }
+}
+
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let shared = Rc::new(RefCell::new(DevtoolsShared::new()));
@@ -688,6 +755,84 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
             snap.set("watchCount", st.watches.len())?;
             Ok(snap)
+        })?,
+    )?;
+
+    // -- profilerReport --
+    /// Returns a flat summary table of all recorded profiler zones across all stored
+    /// frames. Each entry is `{name, calls, total_ms, avg_ms, min_ms, max_ms, self_ms}`.
+    /// Useful for CSV export or performance dashboards.
+    /// @return table
+    let s = shared.clone();
+    dt.set(
+        "profilerReport",
+        lua.create_function(move |lua, ()| {
+            let mut aggregated: std::collections::HashMap<
+                String,
+                (f64, u32, f64, f64, f64),
+            > = Default::default();
+            let st = s.borrow();
+            for frame in &st.profiler.frames {
+                for zone in frame.iter() {
+                    for z in zone.flatten() {
+                        let dur = z.total_time() * 1000.0;
+                        let self_dur = z.self_time() * 1000.0;
+                        let e = aggregated
+                            .entry(z.name.clone())
+                            .or_insert((0.0, 0, f64::MAX, 0.0_f64, 0.0));
+                        e.0 += dur;
+                        e.1 += 1;
+                        e.2 = e.2.min(dur);
+                        e.3 = e.3.max(dur);
+                        e.4 += self_dur;
+                    }
+                }
+            }
+            let out = lua.create_table()?;
+            for (i, (name, (total, calls, min, max, self_ms))) in
+                aggregated.iter().enumerate()
+            {
+                let row = lua.create_table()?;
+                row.set("name", name.clone())?;
+                row.set("calls", *calls)?;
+                row.set("total_ms", *total)?;
+                row.set(
+                    "avg_ms",
+                    if *calls > 0 {
+                        total / (*calls as f64)
+                    } else {
+                        0.0
+                    },
+                )?;
+                row.set("min_ms", if *min == f64::MAX { 0.0 } else { *min })?;
+                row.set("max_ms", *max)?;
+                row.set("self_ms", *self_ms)?;
+                out.set(i + 1, row)?;
+            }
+            Ok(out)
+        })?,
+    )?;
+
+    // -- newFileWatcher --
+    /// Creates a standalone per-path file watcher. Call `:check()` once per frame
+    /// to poll for changes.
+    ///
+    /// Methods on the returned userdata:
+    /// - `onChanged(fn)` — register a no-arg callback fired when the file changes
+    /// - `check()` → boolean — polls and fires callback if changed; returns `true` if changed
+    /// - `cancel()` — removes the stored callback
+    /// @param path : string   file or directory path to watch
+    /// @return FileWatcher
+    dt.set(
+        "newFileWatcher",
+        lua.create_function(|lua, path: String| {
+            let mut fw = LuaFileWatcher {
+                watcher: FileWatcher::new(),
+                path: path.clone(),
+                callback: Rc::new(RefCell::new(None)),
+            };
+            fw.watcher.watch(&path);
+            lua.create_userdata(fw)
         })?,
     )?;
 

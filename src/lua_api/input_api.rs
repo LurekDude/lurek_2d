@@ -4,6 +4,7 @@ use super::SharedState;
 use mlua::prelude::*;
 use mlua::Variadic;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::input::keyboard::{get_key_from_scancode, get_scancode_from_key};
@@ -727,6 +728,189 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     luna.set("touch", touch)?;
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // lurek.input  — Action-mapping layer on top of keyboard/mouse/gamepad state
+    // ─────────────────────────────────────────────────────────────────────────
+    let input_tbl = lua.create_table()?;
+
+    // action_map: action_name -> list of key/button names
+    let action_map: Rc<RefCell<HashMap<String, Vec<String>>>> =
+        Rc::new(RefCell::new(HashMap::new()));
+    // Tracks the frame count at which each action was last pressed.
+    let last_pressed_frame: Rc<RefCell<HashMap<String, u64>>> =
+        Rc::new(RefCell::new(HashMap::new()));
+
+    // -- bind --
+    /// Maps an action name to one or more key/button names.
+    /// Multiple `bind` calls for the same action append to its key list.
+    /// @param action : string
+    /// @param keys : string | table   one key name or an array of key names
+    /// @return nil
+    let am = action_map.clone();
+    input_tbl.set(
+        "bind",
+        lua.create_function(move |_, (action, keys): (String, LuaValue)| {
+            let mut map = am.borrow_mut();
+            let entry = map.entry(action).or_default();
+            match keys {
+                LuaValue::String(s) => {
+                    let k = s
+                        .to_str()
+                        .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                        .to_string();
+                    if !entry.contains(&k) {
+                        entry.push(k);
+                    }
+                }
+                LuaValue::Table(t) => {
+                    for pair in t.sequence_values::<String>() {
+                        let k = pair?;
+                        if !entry.contains(&k) {
+                            entry.push(k);
+                        }
+                    }
+                }
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "input.bind: keys must be a string or array of strings".into(),
+                    ))
+                }
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- unbind --
+    /// Removes all key bindings for the given action name.
+    /// @param action : string
+    /// @return boolean  true if the action existed
+    let am = action_map.clone();
+    input_tbl.set(
+        "unbind",
+        lua.create_function(move |_, action: String| {
+            Ok(am.borrow_mut().remove(&action).is_some())
+        })?,
+    )?;
+
+    // -- clearBindings --
+    /// Removes all action bindings.
+    /// @return nil
+    let am = action_map.clone();
+    input_tbl.set(
+        "clearBindings",
+        lua.create_function(move |_, ()| {
+            am.borrow_mut().clear();
+            Ok(())
+        })?,
+    )?;
+
+    // -- getBindings --
+    /// Returns a table mapping each action name to its bound keys.
+    /// @return table
+    let am = action_map.clone();
+    input_tbl.set(
+        "getBindings",
+        lua.create_function(move |lua, ()| {
+            let map = am.borrow();
+            let out = lua.create_table()?;
+            for (action, keys) in map.iter() {
+                let kt = lua.create_table()?;
+                for (i, k) in keys.iter().enumerate() {
+                    kt.set(i + 1, k.clone())?;
+                }
+                out.set(action.clone(), kt)?;
+            }
+            Ok(out)
+        })?,
+    )?;
+
+    // -- isActionDown --
+    /// Returns true if any key bound to the action is currently held down.
+    /// @param action : string
+    /// @return boolean
+    let am = action_map.clone();
+    let s = state.clone();
+    input_tbl.set(
+        "isActionDown",
+        lua.create_function(move |_, action: String| {
+            let map = am.borrow();
+            if let Some(keys) = map.get(&action) {
+                let st = s.borrow();
+                for k in keys {
+                    if st.keyboard.is_down(k) {
+                        return Ok(true);
+                    }
+                }
+            }
+            Ok(false)
+        })?,
+    )?;
+
+    // -- wasActionPressed --
+    /// Returns true if any key bound to the action was pressed this frame.
+    /// Also records the frame number for use with `wasActionPressedWithin`.
+    /// @param action : string
+    /// @return boolean
+    let am = action_map.clone();
+    let lpf = last_pressed_frame.clone();
+    let s = state.clone();
+    input_tbl.set(
+        "wasActionPressed",
+        lua.create_function(move |_, action: String| {
+            let map = am.borrow();
+            if let Some(keys) = map.get(&action) {
+                let st = s.borrow();
+                let was_pressed = keys.iter().any(|k| st.keyboard.get_pressed().contains(k));
+                if was_pressed {
+                    let frame = st.clock.frame_count();
+                    lpf.borrow_mut().insert(action, frame);
+                    return Ok(true);
+                }
+            }
+            Ok(false)
+        })?,
+    )?;
+
+    // -- wasActionReleased --
+    /// Returns true if any key bound to the action was released this frame.
+    /// @param action : string
+    /// @return boolean
+    let am = action_map.clone();
+    let s = state.clone();
+    input_tbl.set(
+        "wasActionReleased",
+        lua.create_function(move |_, action: String| {
+            let map = am.borrow();
+            if let Some(keys) = map.get(&action) {
+                let st = s.borrow();
+                return Ok(keys.iter().any(|k| st.keyboard.get_released().contains(k)));
+            }
+            Ok(false)
+        })?,
+    )?;
+
+    // -- wasActionPressedWithin --
+    /// Returns true if the action was pressed within the last `frames` frames.
+    /// Requires `wasActionPressed` to have been called at least once per frame;
+    /// it is the mechanism that records the last-press frame number.
+    /// @param action : string
+    /// @param frames : integer
+    /// @return boolean
+    let lpf = last_pressed_frame;
+    let s = state.clone();
+    input_tbl.set(
+        "wasActionPressedWithin",
+        lua.create_function(move |_, (action, frames): (String, u64)| {
+            if let Some(&pressed_at) = lpf.borrow().get(&action) {
+                let current = s.borrow().clock.frame_count();
+                return Ok(current.saturating_sub(pressed_at) <= frames);
+            }
+            Ok(false)
+        })?,
+    )?;
+
+    luna.set("input", input_tbl)?;
 
     Ok(())
 }

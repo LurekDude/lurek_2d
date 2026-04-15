@@ -285,4 +285,73 @@ describe("lurek.signal.poll", function()
     expect_equal(count, 0)
   end)
 end)
+
+-- @description New-feature tests: once, registerWithFilter, pushDeferred/flushDeferred, history.
+describe("lurek.signal once and filter", function()
+  -- @covers lurek.signal.newSignal
+  -- @description Creates a signal and registers a once-listener; after emitting once the listener must not fire again.
+  it("once callback fires exactly one time", function()
+    local sig = lurek.signal.newSignal()
+    local count = 0
+    sig:once("bang", function() count = count + 1 end)
+    sig:emit("bang")
+    sig:emit("bang")
+    expect_equal(count, 1)
+  end)
+
+  -- @covers lurek.signal.newSignal
+  -- @description Registers a once and a permanent listener on the same event; confirms once fires once and permanent fires twice.
+  it("once and permanent listener coexist correctly", function()
+    local sig = lurek.signal.newSignal()
+    local once_count  = 0
+    local perm_count  = 0
+    sig:once("tick", function() once_count = once_count + 1 end)
+    sig:register("tick", function() perm_count = perm_count + 1 end)
+    sig:emit("tick")
+    sig:emit("tick")
+    expect_equal(once_count, 1)
+    expect_equal(perm_count, 2)
+  end)
+
+  -- @covers lurek.signal.newSignal
+  -- @description Registers registerWithFilter with a predicate that passes only numbers > 5; confirms callback fires selectively.
+  it("registerWithFilter respects the predicate", function()
+    local sig = lurek.signal.newSignal()
+    local fired = 0
+    sig:registerWithFilter("val", function(v) fired = fired + 1 end, function(v) return v > 5 end)
+    sig:emit("val", 3)   -- blocked
+    sig:emit("val", 10)  -- allowed
+    expect_equal(fired, 1)
+  end)
+end)
+
+describe("lurek.signal pushDeferred and history", function()
+  -- @covers lurek.signal.pushDeferred
+  -- @covers lurek.signal.flushDeferred
+  -- @description Pushes two deferred events, confirms flushDeferred reports count and events appear in the queue.
+  it("pushDeferred/flushDeferred works", function()
+    lurek.signal.pushDeferred("deferA")
+    lurek.signal.pushDeferred("deferB")
+    local count = lurek.signal.flushDeferred()
+    expect_equal(count, 2)
+  end)
+
+  -- @covers lurek.signal.enableHistory
+  -- @covers lurek.signal.getHistory
+  -- @covers lurek.signal.clearHistory
+  -- @description Enables history, pushes two events, verifies getHistory returns both, then clearHistory empties it.
+  it("history records pushed events", function()
+    lurek.signal.enableHistory(10)
+    lurek.signal.push("histA")
+    lurek.signal.push("histB")
+    local h = lurek.signal.getHistory()
+    expect_equal(type(h), "table")
+    expect_equal(#h >= 2, true)
+    lurek.signal.clearHistory()
+    local h2 = lurek.signal.getHistory()
+    expect_equal(#h2, 0)
+    lurek.signal.enableHistory(0)
+  end)
+end)
+
 test_summary()

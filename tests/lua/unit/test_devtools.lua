@@ -357,4 +357,48 @@ describe("lurek.devtools console", function()
         expect_equal(true, lurek.devtools.isConsoleOpen())
     end)
 end)
+
+-- @description Tests for new devtools features: profilerReport and newFileWatcher.
+describe("lurek.devtools new features", function()
+  -- @covers lurek.devtools.profilerReport
+  -- @description profilerReport returns a table (may be empty if no frames recorded).
+  it("profilerReport returns a table", function()
+    local report = lurek.devtools.profilerReport()
+    expect_equal(type(report), "table")
+  end)
+
+  -- @covers lurek.devtools.newFileWatcher
+  -- @description newFileWatcher returns a userdata with check(), onChanged() and getPath() methods.
+  it("newFileWatcher returns a userdata with expected methods", function()
+    local watcher = lurek.devtools.newFileWatcher(".")
+    expect_true(watcher ~= nil, "watcher must not be nil")
+    expect_equal(type(watcher.check), "function")
+    expect_equal(type(watcher.onChanged), "function")
+    expect_equal(type(watcher.getPath), "function")
+    expect_equal(type(watcher.cancel), "function")
+  end)
+
+  -- @covers lurek.devtools.newFileWatcher
+  -- @description getPath returns the path passed to newFileWatcher.
+  it("newFileWatcher getPath returns the watched path", function()
+    local watcher = lurek.devtools.newFileWatcher("content")
+    expect_equal(watcher:getPath(), "content")
+  end)
+
+  -- @covers lurek.devtools.newFileWatcher
+  -- @description check() runs without error on a valid path.
+  it("newFileWatcher check does not error on valid path", function()
+    local watcher = lurek.devtools.newFileWatcher(".")
+    expect_no_error(function() watcher:check() end)
+  end)
+
+  -- @covers lurek.devtools.newFileWatcher
+  -- @description cancel() removes the callback without error.
+  it("newFileWatcher cancel does not error", function()
+    local watcher = lurek.devtools.newFileWatcher(".")
+    watcher:onChanged(function() end)
+    expect_no_error(function() watcher:cancel() end)
+  end)
+end)
+
 test_summary()

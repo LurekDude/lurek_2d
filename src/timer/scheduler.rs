@@ -305,6 +305,65 @@ impl Scheduler {
             .unwrap_or(false)
     }
 
+    /// Pauses a scheduled event by its string name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    ///
+    /// Returns `true` if an event with that name was found.
+    pub fn pause_named(&mut self, name: &str) -> bool {
+        if let Some(ev) = self
+            .events
+            .iter_mut()
+            .find(|e| e.name.as_deref() == Some(name))
+        {
+            ev.paused = true;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Resumes a previously paused event by its string name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    ///
+    /// Returns `true` if an event with that name was found.
+    pub fn resume_named(&mut self, name: &str) -> bool {
+        if let Some(ev) = self
+            .events
+            .iter_mut()
+            .find(|e| e.name.as_deref() == Some(name))
+        {
+            ev.paused = false;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Returns `true` if the named event is currently paused.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn is_paused_named(&self, name: &str) -> bool {
+        self.events
+            .iter()
+            .find(|e| e.name.as_deref() == Some(name))
+            .map(|e| e.paused)
+            .unwrap_or(false)
+    }
+
     // ── Queries ───────────────────────────────────────────────────────────
 
     /// Returns the time remaining until the next fire for event `id`, or `None` if not found.

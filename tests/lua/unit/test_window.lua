@@ -497,4 +497,31 @@ describe("lurek.window missing surface (Phase 17)", function()
         expect_type("boolean", lurek.window.isHighDPIAllowed())
     end)
 end)
+
+-- @description Tests for new window features: onDpiChange, pollDpiChange, openFileDialog.
+describe("lurek.window DPI and dialog", function()
+  -- @covers lurek.window.onDpiChange
+  -- @description Registers an onDpiChange callback without error.
+  it("onDpiChange registers a callback without error", function()
+    expect_no_error(function()
+      lurek.window.onDpiChange(function(scale) end)
+    end)
+  end)
+
+  -- @covers lurek.window.pollDpiChange
+  -- @description pollDpiChange returns the current DPI scale without error.
+  it("pollDpiChange returns a positive number", function()
+    local scale = lurek.window.pollDpiChange()
+    expect_equal(type(scale), "number")
+    expect_true(scale > 0, "DPI scale must be positive")
+  end)
+
+  -- @covers lurek.window.openFileDialog
+  -- @description openFileDialog function exists and is callable; in test mode the dialog is expected to return nil (no UI).
+  it("openFileDialog is callable and returns nil or string in headless mode", function()
+    local result = lurek.window.openFileDialog({ title = "Test", multiple = false })
+    expect_true(result == nil or type(result) == "string", "result must be nil or string")
+  end)
+end)
+
 test_summary()

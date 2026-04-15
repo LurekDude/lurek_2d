@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::window;
-
+use rfd;
 // -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
@@ -631,6 +631,122 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 .as_ref()
                 .map(|w| w.is_resizable())
                 .unwrap_or(false))
+        })?,
+    )?;
+
+    // ─── onDpiChange ──────────────────────────────────────────────────────
+    // DPI-change callback stored locally keyed to this register() call.
+    let dpi_callback: Rc<RefCell<Option<LuaRegistryKey>>> = Rc::new(RefCell::new(None));
+    let prev_dpi: Rc<RefCell<f64>> = Rc::new(RefCell::new(1.0));
+
+    // -- onDpiChange --
+    /// Registers a callback invoked (with the new scale factor) when the display
+    /// DPI changes. Call `lurek.window.pollDpiChange()` once per frame to check.
+    /// @param fn : function
+    /// @return nil
+    let dc = dpi_callback.clone();
+    tbl.set(
+        "onDpiChange",
+        lua.create_function(move |lua, func: LuaFunction| {
+            let key = lua.create_registry_value(func)?;
+            if let Some(old) = dc.borrow_mut().replace(key) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- pollDpiChange --
+    /// Checks whether the DPI scale has changed since the last call and fires
+    /// the `onDpiChange` callback if so. Call once per frame in `lurek.process`.
+    /// @return number  current DPI scale (fires callback only if changed)
+    let dc = dpi_callback;
+    let pd = prev_dpi;
+    let s = state.clone();
+    tbl.set(
+        "pollDpiChange",
+        lua.create_function(move |lua, ()| {
+            let current = s.borrow().dpi_scale;
+            let prev = *pd.borrow();
+            if (current - prev).abs() > f64::EPSILON {
+                *pd.borrow_mut() = current;
+                if let Some(key) = dc.borrow().as_ref() {
+                    if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
+                        func.call::<_, ()>(current)?;
+                    }
+                }
+            }
+            Ok(current)
+        })?,
+    )?;
+
+    // ─── openFileDialog ───────────────────────────────────────────────────
+    /// Opens a blocking native file-open dialog. Returns the chosen path string
+    /// or `nil` if the user cancelled.
+    ///
+    /// Options table (all optional):
+    /// - `title`        : string   dialog window title
+    /// - `filters`      : table    array of `{name=string, extensions={...}}` entries
+    /// - `multiple`     : boolean  allow multi-select (returns table of paths)
+    /// - `defaultPath`  : string   initial directory
+    /// @param opts : table?
+    /// @return string | table | nil
+    tbl.set(
+        "openFileDialog",
+        lua.create_function(move |lua, opts: Option<LuaTable>| {
+            let mut dialog = rfd::FileDialog::new();
+            let mut multi = false;
+
+            if let Some(t) = &opts {
+                if let Ok(title) = t.get::<_, String>("title") {
+                    dialog = dialog.set_title(title);
+                }
+                if let Ok(dp) = t.get::<_, String>("defaultPath") {
+                    dialog = dialog.set_directory(dp);
+                }
+                if let Ok(m) = t.get::<_, bool>("multiple") {
+                    multi = m;
+                }
+                if let Ok(filters) = t.get::<_, LuaTable>("filters") {
+                    for pair in filters.sequence_values::<LuaTable>() {
+                        let ft = pair?;
+                        let name: String = ft.get("name").unwrap_or_default();
+                        let exts: Vec<String> = ft
+                            .get::<_, LuaTable>("extensions")
+                            .map(|tbl| {
+                                tbl.sequence_values::<String>()
+                                    .filter_map(|r| r.ok())
+                                    .collect()
+                            })
+                            .unwrap_or_default();
+                        let ext_refs: Vec<&str> = exts.iter().map(|s| s.as_str()).collect();
+                        dialog = dialog.add_filter(&name, &ext_refs);
+                    }
+                }
+            }
+
+            if multi {
+                match dialog.pick_files() {
+                    Some(paths) => {
+                        let tbl = lua.create_table()?;
+                        for (i, p) in paths.iter().enumerate() {
+                            tbl.set(
+                                i + 1,
+                                p.to_string_lossy().to_string(),
+                            )?;
+                        }
+                        Ok(LuaValue::Table(tbl))
+                    }
+                    None => Ok(LuaValue::Nil),
+                }
+            } else {
+                match dialog.pick_file() {
+                    Some(path) => Ok(LuaValue::String(
+                        lua.create_string(path.to_string_lossy().as_ref())?,
+                    )),
+                    None => Ok(LuaValue::Nil),
+                }
+            }
         })?,
     )?;
 
