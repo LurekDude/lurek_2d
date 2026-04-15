@@ -48,12 +48,14 @@ Log messages routed to both stdout and the in-game console pipeline.
 
 ---
 
-### ❌ TODO — Lua `lurek.log.*` Namespace
+### ✅ DONE — Lua `lurek.log.*` Namespace
 **Source**: General completeness
 
-No `lurek.log.info(msg)` / `.warn()` / `.error()` in Lua. Lua scripts must use
-`print()` or `lurek.devtools.log()` workarounds. A proper `lurek.log.*` binding
-would route Lua script log messages through the same structured log pipeline.
+`lurek.log.debug/info/warn/error(msg, tag?)`, `lurek.log.print(level, msg, tag?)`,
+`lurek.log.setLevel(level)` / `lurek.log.getLevel()`, plus configurable sinks
+(`addSink`, `removeSink`, `clearSinks`, `listSinks`, `readMemory`, `flushFile`).
+All log calls routed through Rust `log` crate macros with a `[Lua]` prefix tag.
+Invalid `setLevel` values return a descriptive `LuaError`.
 
 ---
 
@@ -65,11 +67,13 @@ analysis (e.g., `log::info!("frame"; "draw_calls" => 42, "fps" => 60.0)`).
 
 ---
 
-### ❌ TODO — Log File Rotation
+### ✅ DONE — Log File Rotation
 **Source**: Long-running game session support
 
-No log file rotation by size or by session. Logs grow unbounded. A max-size rotate +
-keep-N-files policy would prevent runaway log disk usage.
+`RotatingFileSink` in `src/log/sinks.rs`: configurable `max_bytes` (default 10 MiB)
+and `keep_files` (default 3). Rotation renames `.log` → `.log.1` → `.log.2` … and
+deletes the oldest backup when count would exceed `keep_files`. Exposed to Lua via
+`lurek.log.addSink({ type="rotating", path=..., max_bytes=..., keep_files=... })`.
 
 ---
 

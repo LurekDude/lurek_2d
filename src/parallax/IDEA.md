@@ -37,27 +37,30 @@
 
 ---
 
-### ❌ TODO — Infinite Tiling (Seamless Wrap)
+### ✅ DONE — Infinite Tiling (Seamless Wrap)
 **Source**: features/graphics.md implied by parallax context
 
-No explicit API for ensuring seamless horizontal/vertical tiling when layer texture
-does not fill the screen. Must manually tile using multiple draw calls.
+`layer:setTiling(true/false)` enables seamless tiling on both axes simultaneously.
+`layer:setTileSize(w, h)` overrides the tile dimensions (defaults to scaled texture size).
+`layer:getTiling()` returns the current enabled state.
 
 ---
 
-### ❌ TODO — Depth-Sorted Layer Rendering via Named Groups
+### ✅ DONE — Depth-Sorted Layer Rendering via Named Groups
 **Source**: features/graphics.md — Feature Gaps #4 (render layers)
 
-No named depth ordering within `ParallaxSet`. Layers render in insertion order only.
-A `layer:setDepth(z)` or explicit sort step would allow reordering without rebuilding the set.
+`layer:setDepth(z)` / `layer:getDepth()` exposes a `depth: f32` field alongside
+the existing integer `z`. Complements `setZ`/`getZ` for fractional ordering.
 
 ---
 
-### ❌ TODO — Per-Layer Blend Mode at Creation Time
+### ✅ DONE — Per-Layer Blend Mode at Creation Time
 **Source**: features/graphics.md — general
 
-Blend mode must be specified per draw call. A layer-level default blend mode
-(additive, multiply) for layered atmospheric effects would be useful.
+Blend mode is stored per-layer as `blend_mode: BlendMode`.  Canonical string names
+are `"normal"` (alpha), `"additive"`, `"multiply"`, `"replace"`, `"screen"`.
+Legacy aliases `"alpha"` and `"add"` are accepted as inputs.
+`setBlendMode` errors on unrecognised strings.
 
 ---
 

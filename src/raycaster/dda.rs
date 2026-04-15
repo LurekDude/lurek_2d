@@ -4,6 +4,8 @@
 //! retro FPS and dungeon-crawler style games. Supports single and multi-ray
 //! casting, line-of-sight checks, flat data output, and sprite projection.
 
+use std::collections::HashMap;
+
 use super::ray_hit::RayHit;
 use super::sprite_projection::SpriteProjection;
 use crate::runtime::log_messages::RC01;
@@ -18,10 +20,14 @@ use crate::log_msg;
 /// - `width` — `u32`.
 /// - `height` — `u32`.
 /// - `cells` — `Vec<u32>`.
+/// - `wall_alphas` — `HashMap<u8, f32>`. Per-tile alpha override for translucent walls.
 pub struct Raycaster2D {
     width: u32,
     height: u32,
     cells: Vec<u32>,
+    /// Per-tile opacity map. Keys are tile type values (as `u8`); values are
+    /// alpha in `[0.0, 1.0]`. Tiles absent from the map default to `1.0` (opaque).
+    wall_alphas: HashMap<u8, f32>,
 }
 
 impl Raycaster2D {
@@ -39,6 +45,7 @@ impl Raycaster2D {
             width,
             height,
             cells: vec![0; (width * height) as usize],
+            wall_alphas: HashMap::new(),
         }
     }
 
@@ -114,6 +121,32 @@ impl Raycaster2D {
     /// `&[u32]`.
     pub fn cells(&self) -> &[u32] {
         &self.cells
+    }
+
+    /// Sets the opacity for a wall tile type. Alpha is clamped to `[0.0, 1.0]`.
+    ///
+    /// A tile with alpha < 1.0 is treated as translucent: rays continue through
+    /// it when [`cast_ray_multi`] is used, collecting up to `max_hits` layers.
+    ///
+    /// # Parameters
+    /// - `tile_type` — `u8`. Wall type value stored in the cell grid.
+    /// - `alpha` — `f32`. Opacity in `[0.0, 1.0]`.
+    pub fn set_wall_alpha(&mut self, tile_type: u8, alpha: f32) {
+        self.wall_alphas.insert(tile_type, alpha.clamp(0.0, 1.0));
+    }
+
+    /// Returns the opacity for a wall tile type.
+    ///
+    /// Returns `1.0` (fully opaque) for tile types not registered via
+    /// [`set_wall_alpha`].
+    ///
+    /// # Parameters
+    /// - `tile_type` — `u8`.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_wall_alpha(&self, tile_type: u8) -> f32 {
+        self.wall_alphas.get(&tile_type).copied().unwrap_or(1.0)
     }
 
     /// Casts a single ray from (ox, oy) at the given angle using the DDA algorithm.
@@ -202,11 +235,13 @@ impl Raycaster2D {
                 };
 
                 let raw_distance = perp_dist; // same when single ray
+                let alpha = self.wall_alphas.get(&(cell as u8)).copied().unwrap_or(1.0);
 
                 return Some(RayHit {
                     distance: perp_dist,
                     raw_distance,
                     cell_value: cell,
+                    alpha,
                     side,
                     tex_u,
                     hit_x,
@@ -215,6 +250,92 @@ impl Raycaster2D {
                 });
             }
         }
+    }
+
+    /// Casts a ray and collects up to `max_hits` wall hits, continuing through
+    /// translucent walls (alpha < 1.0) registered via [`set_wall_alpha`].
+    ///
+    /// Opaque walls (alpha == 1.0) stop the ray immediately. Translucent walls
+    /// are recorded and the ray continues. The returned vector is ordered nearest
+    /// to farthest.
+    ///
+    /// # Parameters
+    /// - `ox` — `f32`.
+    /// - `oy` — `f32`.
+    /// - `angle` — `f32`.
+    /// - `max_dist` — `f32`.
+    /// - `max_hits` — `u32`. Maximum wall layers to collect (capped at 8).
+    ///
+    /// # Returns
+    /// `Vec<RayHit>`.
+    pub fn cast_ray_multi(
+        &self,
+        ox: f32,
+        oy: f32,
+        angle: f32,
+        max_dist: f32,
+        max_hits: u32,
+    ) -> Vec<RayHit> {
+        let cap = (max_hits as usize).min(8);
+        let mut hits: Vec<RayHit> = Vec::with_capacity(cap);
+
+        let dir_x = angle.cos();
+        let dir_y = angle.sin();
+
+        let mut map_x = ox.floor() as i32;
+        let mut map_y = oy.floor() as i32;
+
+        let delta_dist_x = if dir_x.abs() < 1e-10 { f32::MAX } else { (1.0 / dir_x).abs() };
+        let delta_dist_y = if dir_y.abs() < 1e-10 { f32::MAX } else { (1.0 / dir_y).abs() };
+
+        let (step_x, mut side_dist_x) = if dir_x < 0.0 {
+            (-1, (ox - map_x as f32) * delta_dist_x)
+        } else {
+            (1, (map_x as f32 + 1.0 - ox) * delta_dist_x)
+        };
+        let (step_y, mut side_dist_y) = if dir_y < 0.0 {
+            (-1, (oy - map_y as f32) * delta_dist_y)
+        } else {
+            (1, (map_y as f32 + 1.0 - oy) * delta_dist_y)
+        };
+
+        loop {
+            if side_dist_x < side_dist_y {
+                side_dist_x += delta_dist_x;
+                map_x += step_x;
+                let perp_dist = side_dist_x - delta_dist_x;
+                if perp_dist > max_dist { break; }
+                if map_x < 0 || map_x >= self.width as i32
+                    || map_y < 0 || map_y >= self.height as i32 { break; }
+                let cell = self.cells[(map_y as u32 * self.width + map_x as u32) as usize];
+                if cell > 0 {
+                    let alpha = self.wall_alphas.get(&(cell as u8)).copied().unwrap_or(1.0);
+                    let hit_x = ox + dir_x * perp_dist;
+                    let hit_y = oy + dir_y * perp_dist;
+                    let tex_u = (hit_y - hit_y.floor()).abs();
+                    hits.push(RayHit { distance: perp_dist, raw_distance: perp_dist, cell_value: cell, alpha, side: 0, tex_u, hit_x, hit_y, hit: true });
+                    if alpha >= 1.0 || hits.len() >= cap { break; }
+                }
+            } else {
+                side_dist_y += delta_dist_y;
+                map_y += step_y;
+                let perp_dist = side_dist_y - delta_dist_y;
+                if perp_dist > max_dist { break; }
+                if map_y < 0 || map_y >= self.height as i32
+                    || map_x < 0 || map_x >= self.width as i32 { break; }
+                let cell = self.cells[(map_y as u32 * self.width + map_x as u32) as usize];
+                if cell > 0 {
+                    let alpha = self.wall_alphas.get(&(cell as u8)).copied().unwrap_or(1.0);
+                    let hit_x = ox + dir_x * perp_dist;
+                    let hit_y = oy + dir_y * perp_dist;
+                    let tex_u = (hit_x - hit_x.floor()).abs();
+                    hits.push(RayHit { distance: perp_dist, raw_distance: perp_dist, cell_value: cell, alpha, side: 1, tex_u, hit_x, hit_y, hit: true });
+                    if alpha >= 1.0 || hits.len() >= cap { break; }
+                }
+            }
+        }
+
+        hits
     }
 
     /// Casts multiple rays spread across a field of view.
@@ -264,6 +385,7 @@ impl Raycaster2D {
                         distance: max_dist,
                         raw_distance: max_dist,
                         cell_value: 0,
+                        alpha: 1.0,
                         side: 0,
                         tex_u: 0.0,
                         hit_x: ox + ray_angle.cos() * max_dist,

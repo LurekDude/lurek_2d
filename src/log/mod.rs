@@ -11,7 +11,7 @@
 /// Configurable log sink registry for file and in-memory log destinations.
 pub mod sinks;
 
-pub use sinks::{MemoryEntry, Sink, SinkLevel, SinkRegistry};
+pub use sinks::{MemoryEntry, RotatingFileSink, Sink, SinkLevel, SinkRegistry};
 
 use crate::runtime::log_messages;
 

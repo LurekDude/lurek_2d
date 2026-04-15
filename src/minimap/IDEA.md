@@ -23,35 +23,38 @@ longer tilemap-only — arbitrary world-space markers are supported.
 
 ---
 
-### ❌ TODO — Custom Geometry Overlay
+### ✅ DONE — Custom Geometry Overlay
 **Source**: features/minimap.md — Feature Gaps #5 / Suggestions #3
 
-No `minimap:drawLine(x1, y1, x2, y2, color)` or `drawRect()` found. Needed for trade
-routes, territorial borders, and areas of influence overlays.
+`minimap:drawLine(x1, y1, x2, y2, color)`, `minimap:drawRect(x, y, w, h, color)`, and
+`minimap:clearOverlay()` implemented in `minimap_api.rs`. Shapes stored in
+`Vec<OverlayShape>` on the `Minimap` struct.
 
 ---
 
-### ❌ TODO — Icon Animation (Blink, Pulse, Rotate)
+### ✅ DONE — Icon Animation (Blink, Pulse, Rotate)
 **Source**: features/minimap.md — Feature Gaps #2 / Suggestions #4
 
-No `setIconAnimation(entity, "blink", speed)` found. Blinking icons are standard UI
-feedback for alerts, quest markers, and danger indicators.
+`minimap:setMarkerAnimation(id, anim_type, speed)` and `minimap:clearMarkerAnimation(id)`
+implemented. Animation state stored in `MinimapMarker.animation: Option<MarkerAnimation>`.
+Phases advanced on each `minimap:update(dt)` call.
 
 ---
 
-### ❌ TODO — Path Visualization Overlay
+### ✅ DONE — Path Visualization Overlay
 **Source**: features/minimap.md — Feature Gaps #4 / Suggestions #6
 
-No `showPath(pathPoints, color)` found. Overlaying pathfinding routes on the minimap would
-help both debugging and game UI (show enemy patrol routes).
+`minimap:showPath(points, color)` → returns path ID; `minimap:clearPath()` / `minimap:clearPath(id)`
+implemented. Paths stored in `Vec<OverlayPath>` on the `Minimap` struct.
 
 ---
 
-### ❌ TODO — Multi-Layer Minimap (Underground / Surface Toggle)
+### ✅ DONE — Multi-Layer Minimap (Underground / Surface Toggle)
 **Source**: features/minimap.md — Feature Gaps #6
 
-No layer toggle found. Games with underground areas need to switch which tilemap layer the
-minimap renders.
+`minimap:setLayer(index)`, `minimap:getLayer()`, and `minimap:setLayerData(layer, data)`
+implemented. Layer data stored in `Vec<LayerData>`; `active_layer: usize` tracks the
+current render layer.
 
 ---
 

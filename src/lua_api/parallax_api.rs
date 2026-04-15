@@ -17,23 +17,27 @@ use crate::lua_api::render_api::LuaImage;
 // Helpers
 // ===============================================================================
 
-fn blend_from_str(s: &str) -> BlendMode {
+fn blend_from_str(s: &str) -> LuaResult<BlendMode> {
     match s {
-        "add" => BlendMode::Add,
-        "multiply" => BlendMode::Multiply,
-        "replace" => BlendMode::Replace,
-        "screen" => BlendMode::Screen,
-        _ => BlendMode::Alpha,
+        "normal" | "alpha" => Ok(BlendMode::Alpha),
+        "additive" | "add" => Ok(BlendMode::Add),
+        "multiply" => Ok(BlendMode::Multiply),
+        "replace" => Ok(BlendMode::Replace),
+        "screen" => Ok(BlendMode::Screen),
+        other => Err(LuaError::RuntimeError(format!(
+            "lurek.parallax: unknown blend mode '{}'; valid modes are: normal, additive, multiply, replace, screen",
+            other
+        ))),
     }
 }
 
 fn blend_to_str(bm: BlendMode) -> &'static str {
     match bm {
-        BlendMode::Add => "add",
+        BlendMode::Add => "additive",
         BlendMode::Multiply => "multiply",
         BlendMode::Replace => "replace",
         BlendMode::Screen => "screen",
-        BlendMode::Alpha => "alpha",
+        BlendMode::Alpha => "normal",
     }
 }
 
@@ -307,11 +311,13 @@ impl LuaUserData for LuaParallaxLayer {
         // ── setBlendMode ──────────────────────────────────────────────────────
         /// Sets the GPU blend mode for this layer.
         ///
-        /// Valid modes: `"alpha"` (default), `"add"`, `"multiply"`, `"replace"`, `"screen"`.
+        /// Valid modes: `"normal"` (default), `"additive"`, `"multiply"`, `"replace"`, `"screen"`.
+        /// The legacy aliases `"alpha"` and `"add"` are also accepted.
+        /// Returns an error for unrecognised mode strings.
         /// @param mode : string
         /// @return nil
         methods.add_method("setBlendMode", |_, this, mode: String| {
-            this.layer.borrow_mut().blend_mode = blend_from_str(&mode);
+            this.layer.borrow_mut().blend_mode = blend_from_str(&mode)?;
             Ok(())
         });
 
@@ -363,6 +369,54 @@ impl LuaUserData for LuaParallaxLayer {
             l.clamp_min = None;
             l.clamp_max = None;
             Ok(())
+        });
+        // ── setTiling ─────────────────────────────────────────────────────
+        /// Enables or disables seamless infinite tiling on both axes simultaneously.
+        ///
+        /// When `true`, the layer tiles in both X and Y regardless of the
+        /// per-axis `setRepeat` flags set on this layer.
+        /// @param enabled : boolean
+        /// @return nil
+        methods.add_method("setTiling", |_, this, enabled: bool| {
+            this.layer.borrow_mut().set_tiling(enabled);
+            Ok(())
+        });
+
+        // ── getTiling ─────────────────────────────────────────────────────
+        /// Returns `true` if seamless infinite tiling is enabled.
+        /// @return boolean
+        methods.add_method("getTiling", |_, this, ()| {
+            Ok(this.layer.borrow().get_tiling())
+        });
+
+        // ── setTileSize ──────────────────────────────────────────────────
+        /// Sets explicit tile dimensions in logical pixels, overriding the default
+        /// scaled-texture size.  Values ≤ 0 reset to the default texture-based size.
+        /// @param w : number
+        /// @param h : number
+        /// @return nil
+        methods.add_method("setTileSize", |_, this, (w, h): (f32, f32)| {
+            this.layer.borrow_mut().set_tile_size(w, h);
+            Ok(())
+        });
+
+        // ── setDepth ─────────────────────────────────────────────────────
+        /// Sets the floating-point draw depth for fine-grained layer ordering.
+        ///
+        /// Lower values render first (further back).  Works alongside `setZ` for
+        /// cases where integer ordering is insufficient.
+        /// @param z : number
+        /// @return nil
+        methods.add_method("setDepth", |_, this, z: f32| {
+            this.layer.borrow_mut().set_depth(z);
+            Ok(())
+        });
+
+        // ── getDepth ─────────────────────────────────────────────────────
+        /// Returns the current floating-point depth.
+        /// @return number
+        methods.add_method("getDepth", |_, this, ()| {
+            Ok(this.layer.borrow().get_depth())
         });
     }
 }
@@ -632,7 +686,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 layer.tint[3] = a;
             }
             if let Ok(v) = opts.get::<_, String>("blend_mode") {
-                layer.blend_mode = blend_from_str(&v);
+                layer.blend_mode = blend_from_str(&v)?;
             }
             if let Ok(Some(v)) = opts.get::<_, Option<bool>>("visible") {
                 layer.visible = v;

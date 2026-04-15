@@ -5,7 +5,8 @@ use crate::runtime::log_messages::MM01_MINIMAP_INIT;
 use std::collections::HashMap;
 
 use super::types::{
-    ColorMode, FogLevel, MinimapMarker, MinimapObject, MinimapObjectType, MinimapPing,
+    ColorMode, FogLevel, LayerData, MarkerAnimation, MinimapMarker, MinimapObject,
+    MinimapObjectType, MinimapPing, OverlayPath, OverlayShape,
 };
 
 /// A grid-based minimap with terrain, fog-of-war, objects, pings, markers, and navigation state.
@@ -34,6 +35,10 @@ use super::types::{
 /// - `markers` — `HashMap<u32, MinimapMarker>`.
 /// - `anti_alias` — `bool`.
 /// - `clickable` — `bool`.
+/// - `overlay_shapes` — `Vec<OverlayShape>`.
+/// - `paths` — `Vec<OverlayPath>`.
+/// - `layers` — `Vec<LayerData>`.
+/// - `active_layer` — `usize`.
 #[derive(Debug, Clone)]
 pub struct Minimap {
     // ── Grid dimensions ──
@@ -78,6 +83,15 @@ pub struct Minimap {
     // ── Rendering options ──
     anti_alias: bool,
     clickable: bool,
+
+    // ── Geometry overlay ──
+    overlay_shapes: Vec<OverlayShape>,
+    paths: Vec<OverlayPath>,
+    next_path_id: u32,
+
+    // ── Multi-layer ──
+    layers: Vec<LayerData>,
+    active_layer: usize,
 }
 
 impl Minimap {
@@ -126,6 +140,11 @@ impl Minimap {
             next_marker_id: 1,
             anti_alias: false,
             clickable: true,
+            overlay_shapes: Vec::new(),
+            paths: Vec::new(),
+            next_path_id: 1,
+            layers: Vec::new(),
+            active_layer: 0,
         }
     }
 
@@ -658,6 +677,7 @@ impl Minimap {
                 y,
                 description,
                 color,
+                animation: None,
             },
         );
         id
@@ -702,6 +722,168 @@ impl Minimap {
     /// `usize`.
     pub fn marker_count(&self) -> usize {
         self.markers.len()
+    }
+
+    // ── Marker animation ──
+
+    /// Attach an animation to a marker. Does nothing if `id` does not exist.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    /// - `anim` — `MarkerAnimation`.
+    pub fn set_marker_animation(&mut self, id: u32, anim: MarkerAnimation) {
+        if let Some(marker) = self.markers.get_mut(&id) {
+            marker.animation = Some(anim);
+        }
+    }
+
+    /// Remove the animation from a marker, reverting it to static. Does nothing if `id`
+    /// does not exist or has no animation.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    pub fn clear_marker_animation(&mut self, id: u32) {
+        if let Some(marker) = self.markers.get_mut(&id) {
+            marker.animation = None;
+        }
+    }
+
+    // ── Geometry overlay ──
+
+    /// Push a line segment onto the overlay layer.
+    ///
+    /// # Parameters
+    /// - `x1` — `f32`.
+    /// - `y1` — `f32`.
+    /// - `x2` — `f32`.
+    /// - `y2` — `f32`.
+    /// - `color` — `[u8; 4]`.
+    pub fn draw_line(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, color: [u8; 4]) {
+        self.overlay_shapes
+            .push(OverlayShape::Line { x1, y1, x2, y2, color });
+    }
+
+    /// Push a rectangle onto the overlay layer.
+    ///
+    /// # Parameters
+    /// - `x` — `f32`.
+    /// - `y` — `f32`.
+    /// - `w` — `f32`.
+    /// - `h` — `f32`.
+    /// - `color` — `[u8; 4]`.
+    pub fn draw_rect(&mut self, x: f32, y: f32, w: f32, h: f32, color: [u8; 4]) {
+        self.overlay_shapes
+            .push(OverlayShape::Rect { x, y, w, h, color });
+    }
+
+    /// Remove all custom geometry from the overlay layer.
+    pub fn clear_overlay(&mut self) {
+        self.overlay_shapes.clear();
+    }
+
+    /// Return a slice of all overlay shapes for the current frame.
+    ///
+    /// # Returns
+    /// `&[OverlayShape]`.
+    pub fn overlay_shapes(&self) -> &[OverlayShape] {
+        &self.overlay_shapes
+    }
+
+    // ── Path overlay ──
+
+    /// Display a pathfinding route on the minimap and return its auto-assigned ID.
+    ///
+    /// If a path with the same ID already exists it is replaced.
+    ///
+    /// # Parameters
+    /// - `points` — `Vec<(f32, f32)>`.
+    /// - `color` — `[u8; 4]`.
+    ///
+    /// # Returns
+    /// `u32` — the path ID, which can be passed to [`clear_path`].
+    pub fn show_path(&mut self, points: Vec<(f32, f32)>, color: [u8; 4]) -> u32 {
+        let id = self.next_path_id;
+        self.next_path_id += 1;
+        self.paths.push(OverlayPath { id, points, color });
+        id
+    }
+
+    /// Remove a displayed path.
+    ///
+    /// When `id` is `Some(n)` only the path with that ID is removed.
+    /// When `id` is `None` all paths are removed.
+    ///
+    /// # Parameters
+    /// - `id` — `Option<u32>`.
+    pub fn clear_path(&mut self, id: Option<u32>) {
+        match id {
+            Some(n) => self.paths.retain(|p| p.id != n),
+            None => self.paths.clear(),
+        }
+    }
+
+    /// Return a slice of all active path overlays.
+    ///
+    /// # Returns
+    /// `&[OverlayPath]`.
+    pub fn paths(&self) -> &[OverlayPath] {
+        &self.paths
+    }
+
+    // ── Multi-layer ──
+
+    /// Switch the minimap's active render layer.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    pub fn set_layer(&mut self, layer: usize) {
+        self.active_layer = layer;
+    }
+
+    /// Return the index of the currently active render layer.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_layer(&self) -> usize {
+        self.active_layer
+    }
+
+    /// Store tile/cell data for a specific layer index.
+    ///
+    /// If `layer` is beyond the current end of the layer list the list is extended
+    /// with empty sentinel entries.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    /// - `data` — `LayerData`.
+    pub fn set_layer_data(&mut self, layer: usize, data: LayerData) {
+        if layer >= self.layers.len() {
+            self.layers.resize_with(layer + 1, || LayerData {
+                cells: Vec::new(),
+                width: 0,
+                height: 0,
+            });
+        }
+        self.layers[layer] = data;
+    }
+
+    /// Return the layer data for the given index, if it exists.
+    ///
+    /// # Parameters
+    /// - `layer` — `usize`.
+    ///
+    /// # Returns
+    /// `Option<&LayerData>`.
+    pub fn layer_data(&self, layer: usize) -> Option<&LayerData> {
+        self.layers.get(layer)
+    }
+
+    /// Return the number of stored layers.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn layer_count(&self) -> usize {
+        self.layers.len()
     }
 
     // ── Rendering options ──
@@ -829,7 +1011,8 @@ impl Minimap {
 
     // ── Update ──
 
-    /// Advance time-based effects: decrement ping timers and remove expired pings.
+    /// Advance time-based effects: decrement ping timers and remove expired pings,
+    /// and advance animation phases on all animated markers.
     ///
     /// # Parameters
     /// - `dt` — `f32`.
@@ -838,6 +1021,19 @@ impl Minimap {
             ping.remaining -= dt;
             ping.remaining > 0.0
         });
+        for marker in self.markers.values_mut() {
+            if let Some(ref mut anim) = marker.animation {
+                match anim {
+                    MarkerAnimation::Blink { speed, phase }
+                    | MarkerAnimation::Pulse { speed, phase } => {
+                        *phase = (*phase + dt * *speed).rem_euclid(1.0);
+                    }
+                    MarkerAnimation::Rotate { speed, angle } => {
+                        *angle = (*angle + dt * *speed).rem_euclid(std::f32::consts::TAU);
+                    }
+                }
+            }
+        }
     }
 
     // ── CPU rendering ──

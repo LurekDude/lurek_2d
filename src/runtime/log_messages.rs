@@ -479,6 +479,16 @@ pub const SR01_JSON_OK: &str = "SR01";
 pub const SR02_JSON_ERR: &str = "SR02";
 /// Stable ID for "JSON encoded".
 pub const SR03_JSON_ENC: &str = "SR03";
+/// Stable ID for "MessagePack decoded".
+pub const SR04_MSGPACK_DEC: &str = "SR04";
+/// Stable ID for "MessagePack encoded".
+pub const SR05_MSGPACK_ENC: &str = "SR05";
+/// Stable ID for "XML parsed".
+pub const SR06_XML_OK: &str = "SR06";
+/// Stable ID for "schema validation passed".
+pub const SR07_SCHEMA_PASS: &str = "SR07";
+/// Stable ID for "schema validation failed".
+pub const SR08_SCHEMA_FAIL: &str = "SR08";
 
 // ── GUI ──────────────────────────────────────────────────────────────────────
 /// Stable ID for "GuiContext created".

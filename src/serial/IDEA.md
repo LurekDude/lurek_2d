@@ -29,11 +29,14 @@
 
 ---
 
-### ❌ TODO — MessagePack Encode / Decode (HIGH PRIORITY)
+### ✅ DONE — MessagePack Encode / Decode (HIGH PRIORITY)
 **Source**: features/serial.md — Feature Gaps #1 / Suggestions #1
 
-No binary MessagePack. Required for compact save data, efficient network payloads,
-and large dataset exchange. Much smaller and faster to parse than JSON.
+`src/serial/msgpack.rs` — domain module using `rmp-serde 1`.
+`lurek.codec.encodeMsgPack(tbl)` → binary string.
+`lurek.codec.decodeMsgPack(bytes)` → Lua table.
+Round-trips via `MsgValue` serde mirror. Registered in `src/lua_api/serial_api.rs`.
+Tests: `tests/lua/unit/test_serial_msgpack.lua`.
 
 ```lua
 local bytes = lurek.codec.encodeMsgPack(tbl)
@@ -42,11 +45,13 @@ local tbl   = lurek.codec.decodeMsgPack(bytes)
 
 ---
 
-### ❌ TODO — XML Decode (Read-Only)
+### ✅ DONE — XML Decode (Read-Only)
 **Source**: features/serial.md — Feature Gaps #3 / Suggestions #2
 
-No XML parsing. Required for Tiled TMX map import and third-party tool interop.
-Encoding XML is lower priority — read-only decode covers most game use cases.
+`src/serial/xml.rs` — domain module using `roxmltree 0.20` (already in Cargo.toml).
+`lurek.codec.decodeXml(str)` → nested Lua table with keys `tag`, `attrs`, `text`, `children`.
+Registered in `src/lua_api/serial_api.rs`.
+Tests: `tests/lua/unit/test_serial_xml.lua`.
 
 ```lua
 local tbl = lurek.codec.decodeXml(str)
@@ -54,11 +59,14 @@ local tbl = lurek.codec.decodeXml(str)
 
 ---
 
-### ❌ TODO — Schema Validation
+### ✅ DONE — Schema Validation
 **Source**: features/serial.md — Feature Gaps #5 / Suggestions #3
 
-No `lurek.codec.validate(tbl, schema)`. Useful for validating decoded save data
-against expected structure during migration and for network protocol safety.
+`src/serial/schema.rs` — pure Rust, no external crates.
+`lurek.codec.validate(tbl, schema)` → `(true, nil)` or `(false, error_string)`.
+Schema fields: `type`, `required`, `min`, `max`, `minlen`, `maxlen`, `fields`, `items`.
+Registered in `src/lua_api/serial_api.rs`.
+Tests: `tests/lua/unit/test_serial_schema.lua`.
 
 ---
 

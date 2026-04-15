@@ -2,6 +2,7 @@
 
 use mlua::prelude::*;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::rc::Rc;
 
 use super::SharedState;
@@ -97,6 +98,8 @@ pub struct LuaWorld {
     begin_contact_key: Rc<RefCell<Option<LuaRegistryKey>>>,
     /// Registry key for the `onEndContact(a, b)` callback.
     end_contact_key: Rc<RefCell<Option<LuaRegistryKey>>>,
+    /// Per-body arbitrary Lua data, keyed by body ID.
+    body_data: Rc<RefCell<HashMap<usize, LuaRegistryKey>>>,
 }
 
 impl LuaUserData for LuaWorld {
@@ -950,6 +953,44 @@ impl LuaUserData for LuaWorld {
         /// @return nil
         methods.add_method("clearEndContact", |_, this, ()| {
             *this.end_contact_key.borrow_mut() = None;
+            Ok(())
+        });
+
+        // -- setBodyData --
+        /// Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
+        ///
+        /// Any Lua value is accepted (table, string, number, etc.).
+        /// Calling again on the same body ID overwrites the previous value.
+        /// @param bodyId : integer
+        /// @param data : any
+        /// @return nil
+        methods.add_method("setBodyData", |lua, this, (id, value): (usize, LuaValue)| {
+            let key = lua.create_registry_value(value)?;
+            this.body_data.borrow_mut().insert(id, key);
+            Ok(())
+        });
+
+        // -- getBodyData --
+        /// Returns the Lua data previously attached to a body, or nil if none is set.
+        /// @param bodyId : integer
+        /// @return any | nil
+        methods.add_method("getBodyData", |lua, this, id: usize| {
+            let map = this.body_data.borrow();
+            match map.get(&id) {
+                Some(key) => lua.registry_value::<LuaValue>(key),
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- clearBodyData --
+        /// Removes the Lua data attached to a body.
+        /// @param bodyId : integer
+        /// @return nil
+        methods.add_method("clearBodyData", |lua, this, id: usize| {
+            let removed = this.body_data.borrow_mut().remove(&id);
+            if let Some(key) = removed {
+                lua.remove_registry_value(key)?;
+            }
             Ok(())
         });
 
@@ -2261,6 +2302,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 world: Rc::new(RefCell::new(World::new(gx, gy))),
                 begin_contact_key: Rc::new(RefCell::new(None)),
                 end_contact_key: Rc::new(RefCell::new(None)),
+                body_data: Rc::new(RefCell::new(HashMap::new())),
             })
         })?,
     )?;

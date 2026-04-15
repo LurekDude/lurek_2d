@@ -196,4 +196,83 @@ minimap:setClickable(false)  -- Sets whether this minimap responds to click hit-
 minimap:setViewportVisible(false)  -- Sets whether the viewport rectangle is visible
 local minimap_type = minimap:type()  -- "Minimap"
 local minimap_is_type = minimap:typeOf("Minimap")  -- Returns true if this object is of the given type
-minimap:update(1.0)  -- Advances time-based effects by dt seconds (expires pings)
+minimap:update(1.0)  -- Advances time-based effects by dt seconds (expires pings and animation phases)
+
+-- ── Geometry Overlay ──────────────────────────────────────────────────────────
+
+-- drawLine(x1, y1, x2, y2, color)
+-- Draw a custom line segment on the minimap in grid coordinates.
+-- color is {r, g, b, a} with each channel 0-255.
+minimap:drawLine(0, 0, 32, 32, {255, 128, 0, 255})   -- orange diagonal (e.g. trade route)
+minimap:drawLine(10, 5, 54, 5,  {255,   0, 0, 200})   -- red horizontal border
+
+-- drawRect(x, y, w, h, color)
+-- Draw a filled-border rectangle overlay in grid coordinates.
+minimap:drawRect(20, 20, 10, 8, {0, 200, 255, 180})  -- teal territory highlight
+
+-- clearOverlay()  — remove all custom geometry
+minimap:clearOverlay()
+
+-- ── Path Visualization ────────────────────────────────────────────────────────
+
+-- showPath(points, color) → path_id
+-- Display a pathfinding route as a connected polyline.
+-- points is a table of {x, y} pairs in grid coordinates.
+-- Returns a unique integer ID so you can remove this specific path later.
+local patrol_path = minimap:showPath(
+    {{5, 5}, {15, 5}, {15, 20}, {5, 20}, {5, 5}},
+    {255, 255, 0, 200}   -- yellow patrol loop
+)
+
+local attack_path = minimap:showPath(
+    {{32, 32}, {40, 25}, {55, 10}},
+    {255, 50, 50, 220}   -- red attack vector
+)
+
+-- clearPath()         — remove all paths
+-- clearPath(path_id)  — remove a specific path by its ID
+minimap:clearPath(attack_path)  -- remove only the attack vector
+minimap:clearPath()             -- remove all remaining paths
+
+-- ── Multi-Layer Minimap ───────────────────────────────────────────────────────
+
+-- setLayer(index) / getLayer() → index
+-- Switch which layer the minimap renders (0 = surface, 1 = underground, 2 = sky…)
+minimap:setLayer(0)              -- surface
+local current_layer = minimap:getLayer()  -- 0
+
+minimap:setLayer(1)              -- switch to underground layer
+-- getLayer() → 1
+
+-- setLayerData(layer_index, data)
+-- Store a flat 1-based table of terrain type IDs for a given layer.
+-- The data length should equal gridW × gridH (same as the main terrain grid).
+local underground_terrain = {}
+for i = 1, 64*64 do
+    underground_terrain[i] = (i % 3 == 0) and 3 or 0   -- stone and grass mix
+end
+minimap:setLayerData(1, underground_terrain)  -- store underground tile data
+
+-- Switch back to surface for normal rendering
+minimap:setLayer(0)
+
+-- ── Marker Animation ─────────────────────────────────────────────────────────
+
+-- setMarkerAnimation(id, anim_type, speed)
+-- Attach an animation to an existing marker.
+--   anim_type: "blink" | "pulse" | "rotate"
+--   speed:     cycles/s for blink/pulse; radians/s for rotate
+local quest_marker = minimap:addMarker(45, 22, "Quest: Lost Artefact")
+local alert_marker = minimap:addMarker(10, 55, "Danger!")
+local boss_marker  = minimap:addMarker(32, 32, "Boss room")
+
+minimap:setMarkerAnimation(quest_marker, "pulse",  1.5)   -- slow peaceful pulse
+minimap:setMarkerAnimation(alert_marker, "blink",  4.0)   -- fast urgent blink
+minimap:setMarkerAnimation(boss_marker,  "rotate", 2.0)   -- spinning skull icon
+
+-- clearMarkerAnimation(id)  — revert marker to static
+minimap:clearMarkerAnimation(alert_marker)
+
+-- Animations are advanced automatically by update(dt):
+minimap:update(0.016)  -- call once per frame with the frame delta time
+

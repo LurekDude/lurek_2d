@@ -121,6 +121,71 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
+    // -- encodeMsgPack --
+    /// Encodes a Lua table to a binary MessagePack string.
+    /// @param value : table
+    /// @return string
+    tbl.set(
+        "encodeMsgPack",
+        lua.create_function(|lua, value: LuaValue| {
+            if !matches!(value, LuaValue::Table(_)) {
+                return Err(LuaError::RuntimeError(
+                    "encodeMsgPack: argument must be a table".to_string(),
+                ));
+            }
+            let val = from_lua(&value)?;
+            let bytes = crate::serial::to_msgpack(&val).map_err(LuaError::RuntimeError)?;
+            lua.create_string(&bytes)
+        })?,
+    )?;
+
+    // -- decodeMsgPack --
+    /// Decodes a binary MessagePack string into a Lua table.
+    /// @param bytes : string
+    /// @return table
+    tbl.set(
+        "decodeMsgPack",
+        lua.create_function(|lua, bytes: mlua::String| {
+            let val = crate::serial::from_msgpack(bytes.as_bytes())
+                .map_err(LuaError::RuntimeError)?;
+            crate::serial::lua_table::to_lua(lua, &val)
+        })?,
+    )?;
+
+    // -- decodeXml --
+    /// Parses an XML string and returns a nested Lua table.
+    ///
+    /// Each element becomes a table with keys: `tag` (string), `attrs` (table, optional),
+    /// `text` (string, optional), `children` (sequence, optional).
+    /// @param s : string
+    /// @return table
+    tbl.set(
+        "decodeXml",
+        lua.create_function(|lua, s: String| {
+            let val = crate::serial::from_xml(&s).map_err(LuaError::RuntimeError)?;
+            crate::serial::lua_table::to_lua(lua, &val)
+        })?,
+    )?;
+
+    // -- validate --
+    /// Validates a Lua table against a schema table.
+    ///
+    /// Returns `true` on success, or `false` plus an error message string on failure.
+    /// @param value  : table
+    /// @param schema : table
+    /// @return boolean, string?
+    tbl.set(
+        "validate",
+        lua.create_function(|_, (value, schema): (LuaValue, LuaValue)| {
+            let val = from_lua(&value)?;
+            let sch = from_lua(&schema)?;
+            match crate::serial::validate_schema(&val, &sch) {
+                Ok(()) => Ok((true, None::<String>)),
+                Err(msg) => Ok((false, Some(msg))),
+            }
+        })?,
+    )?;
+
     luna.set("codec", tbl)?;
     Ok(())
 }

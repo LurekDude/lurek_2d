@@ -50,33 +50,49 @@ Data table passed between scenes on push/switch.
 
 ---
 
-### ❌ TODO — Parallel Scene Updates (Overlay Mode)
+### ✅ DONE — Parallel Scene Updates (Overlay Mode)
 **Source**: features/scene.md — Feature Gaps #1 / Suggestions #2
 
-Top scene only receives update/draw. A pause overlay can't let the background world
-continue running. Suggested API:
-```lua
-lurek.scene.pushOverlay(pauseScene)
--- paused scene still calls update, draws underneath
-```
+`lurek.scene.pushOverlay(scene)` implemented.  The background scene continues to
+receive `process`, `process_physics`, `process_late`, and `render` callbacks every
+frame.  `pause` / `resume` are NOT called on the underlying scene.
+`lurek.scene.isOverlay()` returns `true` when the top scene is an overlay.
+`lurek.scene.getActiveScenes()` returns all active scene tables (all when overlays
+are present, top-only otherwise).
+
+Domain: `src/scene/stack.rs` — `push_overlay()`, `is_overlay()`, `get_active_ids()`.
+Lua API: `src/lua_api/scene_api.rs` — `pushOverlay`, `isOverlay`, `getActiveScenes`.
+Tests: `tests/lua/unit/test_scene_overlay.lua`.
 
 ---
 
-### ❌ TODO — Built-In Transition Library
+### ✅ DONE — Built-In Transition Library
 **Source**: features/scene.md — Feature Gaps #2 / Suggestions #3
 
-No pre-built transition effects. Must implement manually. Suggested:
-`lurek.scene.transitions.fade`, `.slide`, `.wipe`, `.iris`
+`lurek.scene.transitions` subtable added with four factory functions:
+- `lurek.scene.transitions.fade(duration?)` — cross-dissolve
+- `lurek.scene.transitions.slide(direction?, duration?)` — directional slide
+- `lurek.scene.transitions.wipe(duration?)` — wipe/curtain
+- `lurek.scene.transitions.iris(duration?)` — circular iris reveal
+
+Each factory returns `{type: string, duration: number}` compatible with the
+existing `push`/`switchTo`/`pop` transition parameters.
+
+Lua API: `src/lua_api/scene_api.rs` — `transitions` subtable.
+Tests: `tests/lua/unit/test_scene_transitions.lua`.
 
 ---
 
-### ❌ TODO — Scene Preloading
+### ✅ DONE — Scene Preloading
 **Source**: features/scene.md — Feature Gaps #4 / Suggestions #4
 
-No async resource loading before scene enters. Potential loading hitch on heavy scenes.
-```lua
-lurek.scene.preload(sceneName, function() lurek.gfx.newImage("big_map.png") end)
-```
+`lurek.scene.preload(name, fn)` registers a loader function for a named scene.
+The loader is called once (lazily) when `lurek.scene.pushPreloaded(name)` is
+first invoked for that name, reducing startup hitch.
+`lurek.scene.isPreloaded(name)` returns `true` once the loader has been called.
+
+Lua API: `src/lua_api/scene_api.rs` — `preload`, `isPreloaded`, `pushPreloaded`.
+Tests: `tests/lua/unit/test_scene_preload.lua`.
 
 ---
 

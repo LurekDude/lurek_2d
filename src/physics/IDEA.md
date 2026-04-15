@@ -50,20 +50,24 @@ Note: Verify `onCollisionEnd` callback also exists.
 
 ---
 
-### ❌ TODO — Lightweight Collision Helper (No World)
+### ✅ DONE — Lightweight Collision Helper (No World)
 **Source**: features/physics.md — Feature Gaps #5 / Suggestions #5
 
-No `lurek.collision.testAABB(a, b)` / `testCircles(...)` without requiring a full
-`PhysicsWorld`. Many games (RPG, puzzle, visual novel) only need simple overlap detection,
-not rigid-body simulation. Creating a PhysicsWorld when you just need AABB checks is heavy.
+New namespace `lurek.collision` registered in `src/lua_api/collision_api.rs`.
+Domain logic in `src/physics/collision_helpers.rs`.
+Four helpers: `testAABB`, `testCircles`, `testPoint`, `testCircleAABB`.
+Lua tests: `tests/lua/unit/test_collision_helpers.lua`.
+Example: `content/examples/collision.lua`.
 
 ---
 
-### ❌ TODO — Trigger Volume Data Attachment
+### ✅ DONE — Trigger Volume Data Attachment
 **Source**: features/physics.md — Feature Gaps #4
 
-Sensor bodies exist but no way to attach arbitrary Lua data to a body that surfaces with
-collision events. Pattern `event.data = myData` must be emulated via a side table currently.
+`body_data: Rc<RefCell<HashMap<usize, LuaRegistryKey>>>` added to `LuaPhysicsWorld` in
+`src/lua_api/physics_api.rs`. Methods `setBodyData(id, data)`, `getBodyData(id)`,
+`clearBodyData(id)` registered on the `LuaWorld` userdata.
+Lua tests: `tests/lua/unit/test_physics_body_data.lua`.
 
 ---
 

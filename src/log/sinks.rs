@@ -10,11 +10,13 @@
 //! |---|---|
 //! | `File` | Writes every entry to a UTF-8 text file (append mode). |
 //! | `Memory` | Retains entries in a bounded ring buffer for Lua inspection. |
+//! | `RotatingFile` | Appends to a file and rotates by size, keeping N backup copies. |
 
 use std::collections::VecDeque;
 use std::fmt::Write as FmtWrite;
-use std::fs::{File, OpenOptions};
+use std::fs::{self, File, OpenOptions};
 use std::io::Write as IoWrite;
+use std::path::{Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
 // ── LogLevel ──────────────────────────────────────────────────────────────
@@ -87,6 +89,169 @@ pub struct MemoryEntry {
     pub tag: String,
 }
 
+// ── RotatingFileSink ─────────────────────────────────────────────────────
+
+/// A file sink that rotates the log file when it exceeds a maximum size.
+///
+/// Files are named `<basename>`, `<basename>.1`, `<basename>.2`, … up to `keep_files`
+/// backup copies.  When the active file grows beyond `max_bytes` the sink renames
+/// each backup one position higher, opens a fresh file at the base path, and deletes
+/// the oldest backup when the count exceeds `keep_files`.
+///
+/// # Fields
+/// - `path` — `PathBuf` — Base file path (e.g. `"lurek2d.log"`).
+/// - `max_bytes` — `u64` — Maximum file size before rotation (default 10 MiB).
+/// - `keep_files` — `usize` — Number of rotated backup files to keep (default 3).
+/// - `current_size` — `u64` — Bytes written to the current active file.
+pub struct RotatingFileSink {
+    /// Base log file path.
+    pub path: PathBuf,
+    /// Maximum bytes before rotating.
+    pub max_bytes: u64,
+    /// Number of old files to retain.
+    pub keep_files: usize,
+    current_size: u64,
+    /// The open file handle; `None` only momentarily after a rotation.
+    file: Option<File>,
+}
+
+impl RotatingFileSink {
+    /// Opens or creates a rotating file sink at `path`.
+    ///
+    /// # Parameters
+    /// - `path` — `&str` — Base log file path.
+    /// - `max_bytes` — `u64` — Rotation threshold.  Pass `0` to use the default (10 MiB).
+    /// - `keep_files` — `usize` — Backups to retain.  Pass `0` to use the default (3).
+    ///
+    /// # Returns
+    /// `Result<Self, String>`
+    pub fn open(path: &str, max_bytes: u64, keep_files: usize) -> Result<Self, String> {
+        let path_buf = PathBuf::from(path);
+        let effective_max = if max_bytes == 0 { 10 * 1024 * 1024 } else { max_bytes };
+        let effective_keep = if keep_files == 0 { 3 } else { keep_files };
+        let file = OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&path_buf)
+            .map_err(|e| format!("cannot open rotating log '{path}': {e}"))?;
+        let current_size = file
+            .metadata()
+            .map(|m| m.len())
+            .unwrap_or(0);
+        Ok(Self {
+            path: path_buf,
+            max_bytes: effective_max,
+            keep_files: effective_keep,
+            current_size,
+            file: Some(file),
+        })
+    }
+
+    /// Appends `message` to the active log file, rotating if the size threshold is exceeded.
+    ///
+    /// Rotation renames existing backups one index higher, opens a fresh base file, and
+    /// removes the oldest backup when the count would exceed `keep_files`.
+    ///
+    /// # Parameters
+    /// - `message` — `&str`
+    pub fn write_with_rotation(&mut self, message: &str) {
+        // Lazy-open if the handle was closed during a previous rotation.
+        if self.file.is_none() {
+            if let Ok(f) = OpenOptions::new().create(true).append(true).open(&self.path) {
+                self.current_size = f.metadata().map(|m| m.len()).unwrap_or(0);
+                self.file = Some(f);
+            } else {
+                return;
+            }
+        }
+
+        let bytes = message.as_bytes();
+        if let Some(ref mut f) = self.file {
+            if f.write_all(bytes).is_err() {
+                return;
+            }
+        }
+        self.current_size += bytes.len() as u64;
+
+        if self.current_size >= self.max_bytes {
+            self.rotate();
+        }
+    }
+
+    /// Flushes the underlying OS write buffer.
+    pub fn flush(&mut self) {
+        if let Some(ref mut f) = self.file {
+            let _ = f.flush();
+        }
+    }
+
+    /// Performs the rotation: closes the current file, renames backups, opens a new base file.
+    fn rotate(&mut self) {
+        // Close the current file handle by dropping it before any rename.
+        // This is required on Windows where open files cannot be renamed.
+        self.file = None;
+
+        // Delete the oldest backup so the shift does not overflow `keep_files`.
+        Self::delete_oldest_if_needed(&self.path, self.keep_files);
+
+        // Shift backups upward: .N-1 → .N, …, .1 → .2
+        for i in (1..self.keep_files).rev() {
+            let from = Self::backup_path(&self.path, i);
+            let to = Self::backup_path(&self.path, i + 1);
+            if from.exists() {
+                let _ = fs::rename(&from, &to);
+            }
+        }
+
+        // Rename base → .1
+        if self.path.exists() {
+            let backup_1 = Self::backup_path(&self.path, 1);
+            let _ = fs::rename(&self.path, &backup_1);
+        }
+
+        // Open a fresh base file; `file` remains `None` on failure and will be
+        // retried lazily on the next `write_with_rotation` call.
+        match OpenOptions::new().create(true).write(true).truncate(true).open(&self.path) {
+            Ok(f) => {
+                self.file = Some(f);
+                self.current_size = 0;
+            }
+            Err(_) => {
+                self.current_size = 0;
+            }
+        }
+    }
+
+    /// Returns the path for backup number `n` (e.g. `lurek2d.log.2`).
+    fn backup_path(base: &Path, n: usize) -> PathBuf {
+        let name = base
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or("lurek2d.log");
+        let dir = base.parent().unwrap_or_else(|| Path::new("."));
+        dir.join(format!("{name}.{n}"))
+    }
+
+    /// Deletes the oldest backup file (index = `keep_files`) if it exists.
+    fn delete_oldest_if_needed(base: &Path, keep_files: usize) {
+        let oldest = Self::backup_path(base, keep_files);
+        if oldest.exists() {
+            let _ = fs::remove_file(&oldest);
+        }
+    }
+}
+
+// Manual Debug — File does not implement Debug.
+impl std::fmt::Debug for RotatingFileSink {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "RotatingFileSink {{ path: {:?}, max_bytes: {}, keep_files: {}, current_size: {} }}",
+            self.path, self.max_bytes, self.keep_files, self.current_size
+        )
+    }
+}
+
 // ── SinkKind ─────────────────────────────────────────────────────────────
 
 /// The dispatching strategy for a registered sink.
@@ -94,6 +259,7 @@ pub struct MemoryEntry {
 /// # Variants
 /// - `File` — File variant.
 /// - `Memory` — Memory variant.
+/// - `RotatingFile` — RotatingFile variant.
 pub enum SinkKind {
     /// Writes entries to a file.
     File {
@@ -109,6 +275,13 @@ pub enum SinkKind {
         /// Maximum retained entries.
         capacity: usize,
     },
+    /// Appends entries to a file with automatic rotation by size.
+    RotatingFile {
+        /// The mutex-guarded rotating file sink.
+        sink: Mutex<RotatingFileSink>,
+        /// Filesystem path for display.
+        path: String,
+    },
 }
 
 impl std::fmt::Debug for SinkKind {
@@ -116,6 +289,7 @@ impl std::fmt::Debug for SinkKind {
         match self {
             SinkKind::File { path, .. } => write!(f, "File({path})"),
             SinkKind::Memory { capacity, .. } => write!(f, "Memory({capacity})"),
+            SinkKind::RotatingFile { path, .. } => write!(f, "RotatingFile({path})"),
         }
     }
 }
@@ -181,6 +355,35 @@ impl Sink {
         }
     }
 
+    /// Creates a rotating file sink that rotates at `max_bytes` and keeps `keep_files` backups.
+    ///
+    /// # Parameters
+    /// - `id` — `u64`.
+    /// - `path` — `&str` — Base log file path (e.g. `"lurek2d.log"`).
+    /// - `min_level` — `SinkLevel`.
+    /// - `max_bytes` — `u64` — Rotation threshold; `0` uses the default (10 MiB).
+    /// - `keep_files` — `usize` — Backup count; `0` uses the default (3).
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
+    pub fn rotating_file(
+        id: u64,
+        path: &str,
+        min_level: SinkLevel,
+        max_bytes: u64,
+        keep_files: usize,
+    ) -> Result<Self, String> {
+        let inner = RotatingFileSink::open(path, max_bytes, keep_files)?;
+        Ok(Self {
+            id,
+            min_level,
+            kind: SinkKind::RotatingFile {
+                sink: Mutex::new(inner),
+                path: path.to_string(),
+            },
+        })
+    }
+
     /// Dispatches a log entry to this sink (no-op when below `min_level`).
     ///
     /// # Parameters
@@ -211,6 +414,13 @@ impl Sink {
                     });
                 }
             }
+            SinkKind::RotatingFile { sink, .. } => {
+                let mut text = String::new();
+                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, message);
+                if let Ok(mut guard) = sink.lock() {
+                    guard.write_with_rotation(&text);
+                }
+            }
         }
     }
 
@@ -222,6 +432,7 @@ impl Sink {
         match &self.kind {
             SinkKind::File { .. } => "file",
             SinkKind::Memory { .. } => "memory",
+            SinkKind::RotatingFile { .. } => "rotating",
         }
     }
 
@@ -233,6 +444,7 @@ impl Sink {
         match &self.kind {
             SinkKind::File { path, .. } => Some(path),
             SinkKind::Memory { .. } => None,
+            SinkKind::RotatingFile { path, .. } => Some(path),
         }
     }
 
@@ -264,12 +476,20 @@ impl Sink {
 
     /// Flushes a file sink (no-op on memory sinks).
     pub fn flush(&self) {
-        if let SinkKind::File { file, .. } = &self.kind {
-            if let Ok(guard) = file.lock() {
-                // File implements Flush but we can only access via MutexGuard;
-                // the underlying OS buffer is flushed by the drop of the guard.
-                drop(guard as MutexGuard<File>);
+        match &self.kind {
+            SinkKind::File { file, .. } => {
+                if let Ok(guard) = file.lock() {
+                    // File implements Flush but we can only access via MutexGuard;
+                    // the underlying OS buffer is flushed by the drop of the guard.
+                    drop(guard as MutexGuard<File>);
+                }
             }
+            SinkKind::RotatingFile { sink, .. } => {
+                if let Ok(mut guard) = sink.lock() {
+                    guard.flush();
+                }
+            }
+            SinkKind::Memory { .. } => {}
         }
     }
 }

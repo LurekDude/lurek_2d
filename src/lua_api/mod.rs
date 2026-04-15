@@ -132,6 +132,9 @@ pub mod math_api;
 /// Registers the `lurek.physics.*` rigid-body physics API.
 pub mod physics_api;
 
+/// Registers the `lurek.collision.*` stateless geometric overlap helpers.
+pub mod collision_api;
+
 /// Registers the `lurek.graphic.*` rendering and drawing API.
 pub mod render_api;
 
@@ -405,6 +408,9 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     if modules.physics {
         physics_api::register(&lua, &luna, state.clone())?;
     }
+
+    // collision: lurek.collision (always on — pure math, no world needed)
+    collision_api::register(&lua, &luna, state.clone())?;
 
     // graphics: lurek.graphic
     if modules.graphics {

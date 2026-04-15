@@ -11,18 +11,20 @@ use crate::raycaster::{
     distance_shade, project_column, DoorDirection, DoorManager, DoorState, HeightMap, PointLight,
     RayHit, Raycaster2D, RaycasterScene, SceneBuildParams, WorldSprite,
 };
+use crate::raycaster::sprite_manager::SpriteManager;
 use crate::runtime::resource_keys::TextureKey;
 
 // -------------------------------------------------------------------------------
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Converts a [`RayHit`] to a Lua table with distance, cell, side, and hit fields.
+/// Converts a [`RayHit`] to a Lua table with distance, cell, side, alpha, and hit fields.
 fn ray_hit_to_table<'lua>(lua: &'lua Lua, hit: &RayHit) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     t.set("distance", hit.distance)?;
     t.set("raw_distance", hit.raw_distance)?;
     t.set("cell_value", hit.cell_value)?;
+    t.set("alpha", hit.alpha)?;
     t.set("side", hit.side)?;
     t.set("tex_u", hit.tex_u)?;
     t.set("hit_x", hit.hit_x)?;
@@ -397,6 +399,51 @@ impl LuaUserData for LuaRaycaster {
             },
         );
 
+        // -- setWallAlpha --
+        /// Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
+        /// Tiles with alpha < 1.0 are treated as translucent by castRayMulti.
+        /// @param tile_type : integer
+        /// @param alpha     : number
+        /// @return nil
+        methods.add_method_mut(
+            "setWallAlpha",
+            |_, this, (tile_type, alpha): (u8, f32)| {
+                this.inner.set_wall_alpha(tile_type, alpha);
+                Ok(())
+            },
+        );
+
+        // -- getWallAlpha --
+        /// Returns the opacity for a wall tile type. Returns 1.0 if not set.
+        /// @param tile_type : integer
+        /// @return number
+        methods.add_method("getWallAlpha", |_, this, tile_type: u8| {
+            Ok(this.inner.get_wall_alpha(tile_type))
+        });
+
+        // -- castRayMulti --
+        /// Casts a ray collecting up to max_hits wall layers, continuing through
+        /// translucent walls (alpha < 1.0). Returns an array of hit tables ordered
+        /// nearest to farthest. Useful for glass, fences, and layered effects.
+        /// @param ox       : number
+        /// @param oy       : number
+        /// @param angle    : number
+        /// @param max_dist : number
+        /// @param max_hits : integer  — layers to collect (default 4, max 8)
+        /// @return table
+        methods.add_method(
+            "castRayMulti",
+            |lua, this, (ox, oy, angle, max_dist, max_hits): (f32, f32, f32, f32, Option<u32>)| {
+                let cap = max_hits.unwrap_or(4).min(8);
+                let hits = this.inner.cast_ray_multi(ox, oy, angle, max_dist, cap);
+                let tbl = lua.create_table()?;
+                for (i, hit) in hits.iter().enumerate() {
+                    tbl.set(i + 1, ray_hit_to_table(lua, hit)?)?;
+                }
+                Ok(tbl)
+            },
+        );
+
         // -- projectSprite --
         /// Projects a world-space sprite onto screen space.
         /// @param sx : number
@@ -648,6 +695,111 @@ impl LuaUserData for LuaRaycaster {
 }
 
 // -------------------------------------------------------------------------------
+// LuaSpriteManager UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a [`SpriteManager`] for batch depth-sorted sprite projection.
+pub struct LuaSpriteManager {
+    inner: SpriteManager,
+}
+
+impl LuaUserData for LuaSpriteManager {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- add --
+        /// Adds a sprite at world position (x, y) and returns its unique id.
+        /// @param x       : number
+        /// @param y       : number
+        /// @param texture : string
+        /// @param scale   : number  (optional, default 1.0)
+        /// @return integer
+        methods.add_method_mut(
+            "add",
+            |_, this, (x, y, texture, scale): (f32, f32, String, Option<f32>)| {
+                Ok(this.inner.add(x, y, &texture, scale.unwrap_or(1.0)))
+            },
+        );
+
+        // -- remove --
+        /// Removes the sprite with the given id. No-op if not found.
+        /// @param id : integer
+        /// @return nil
+        methods.add_method_mut("remove", |_, this, id: u32| {
+            this.inner.remove(id);
+            Ok(())
+        });
+
+        // -- setPosition --
+        /// Moves the sprite with the given id to world (x, y).
+        /// @param id : integer
+        /// @param x  : number
+        /// @param y  : number
+        /// @return nil
+        methods.add_method_mut("setPosition", |_, this, (id, x, y): (u32, f32, f32)| {
+            this.inner.set_position(id, x, y);
+            Ok(())
+        });
+
+        // -- setVisible --
+        /// Shows or hides the sprite with the given id.
+        /// @param id      : integer
+        /// @param visible : boolean
+        /// @return nil
+        methods.add_method_mut("setVisible", |_, this, (id, visible): (u32, bool)| {
+            this.inner.set_visible(id, visible);
+            Ok(())
+        });
+
+        // -- clear --
+        /// Removes all sprites from the manager.
+        /// @return nil
+        methods.add_method_mut("clear", |_, this, ()| {
+            this.inner.clear();
+            Ok(())
+        });
+
+        // -- sortAndProject --
+        /// Returns an array of visible sprites sorted back-to-front from camera position.
+        /// Each entry: { id, x, y, texture, scale, distance }.
+        /// cam_angle is accepted for API symmetry but not used for 2D sorting.
+        /// @param cam_x     : number
+        /// @param cam_y     : number
+        /// @param cam_angle : number
+        /// @return table
+        methods.add_method(
+            "sortAndProject",
+            |lua, this, (cam_x, cam_y, _cam_angle): (f32, f32, f32)| {
+                let sorted = this.inner.sort_by_distance(cam_x, cam_y);
+                let tbl = lua.create_table()?;
+                for (i, s) in sorted.iter().enumerate() {
+                    let dx = s.x - cam_x;
+                    let dy = s.y - cam_y;
+                    let dist = (dx * dx + dy * dy).sqrt();
+                    let entry = lua.create_table()?;
+                    entry.set("id", s.id)?;
+                    entry.set("x", s.x)?;
+                    entry.set("y", s.y)?;
+                    entry.set("texture", s.texture.clone())?;
+                    entry.set("scale", s.scale)?;
+                    entry.set("distance", dist)?;
+                    tbl.set(i + 1, entry)?;
+                }
+                Ok(tbl)
+            },
+        );
+
+        // -- type --
+        /// Returns the type string "SpriteManager".
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("SpriteManager"));
+
+        // -- typeOf --
+        /// Returns the type string "SpriteManager".
+        /// @return string
+        methods.add_method("typeOf", |_, _, ()| Ok("SpriteManager"));
+    }
+}
+
+// -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
 
@@ -669,6 +821,22 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let s = state.clone();
     tbl.set(
         "new",
+        lua.create_function(move |_, (w, h): (u32, u32)| {
+            Ok(LuaRaycaster {
+                inner: Raycaster2D::new(w, h),
+                state: s.clone(),
+            })
+        })?,
+    )?;
+
+    // -- newMap --
+    /// Alias for `new`. Creates a new raycaster grid of the given dimensions.
+    /// @param width : integer
+    /// @param height : integer
+    /// @return Raycaster
+    let s = state.clone();
+    tbl.set(
+        "newMap",
         lua.create_function(move |_, (w, h): (u32, u32)| {
             Ok(LuaRaycaster {
                 inner: Raycaster2D::new(w, h),
@@ -753,6 +921,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 })
             },
         )?,
+    )?;
+
+    // -- newSpriteManager --
+    /// Creates a new empty batch sprite manager for depth-sorted projection.
+    /// @return SpriteManager
+    tbl.set(
+        "newSpriteManager",
+        lua.create_function(|_, ()| {
+            Ok(LuaSpriteManager {
+                inner: SpriteManager::new(),
+            })
+        })?,
     )?;
 
     luna.set("raycaster", tbl)?;

@@ -169,6 +169,16 @@ fn lua_test_physics_step_fixed() {
 }
 
 #[test]
+fn lua_test_collision_helpers() {
+    run_lua_test("unit/test_collision_helpers.lua");
+}
+
+#[test]
+fn lua_test_physics_body_data() {
+    run_lua_test("unit/test_physics_body_data.lua");
+}
+
+#[test]
 fn lua_evidence_physics_ext() {
     run_lua_test("evidence/test_evidence_physics_ext.lua");
 }
@@ -406,6 +416,11 @@ fn lua_test_log() {
     run_lua_test("unit/test_log.lua");
 }
 
+#[test]
+fn lua_test_unit_log_api() {
+    run_lua_test("unit/test_log_api.lua");
+}
+
 // === lurek.gfx.newShape / CompoundShape tests ===
 
 #[test]
@@ -470,6 +485,21 @@ fn lua_test_gui() {
 #[test]
 fn lua_test_serial() {
     run_lua_test("unit/test_serial.lua");
+}
+
+#[test]
+fn lua_test_unit_serial_msgpack() {
+    run_lua_test("unit/test_serial_msgpack.lua");
+}
+
+#[test]
+fn lua_test_unit_serial_xml() {
+    run_lua_test("unit/test_serial_xml.lua");
+}
+
+#[test]
+fn lua_test_unit_serial_schema() {
+    run_lua_test("unit/test_serial_schema.lua");
 }
 
 #[test]
@@ -590,6 +620,21 @@ fn lua_test_minimap() {
 }
 
 #[test]
+fn lua_test_unit_minimap_overlay() {
+    run_lua_test("unit/test_minimap_overlay.lua");
+}
+
+#[test]
+fn lua_test_unit_minimap_path() {
+    run_lua_test("unit/test_minimap_path.lua");
+}
+
+#[test]
+fn lua_test_unit_minimap_layers() {
+    run_lua_test("unit/test_minimap_layers.lua");
+}
+
+#[test]
 fn lua_test_particle() {
     run_lua_test("unit/test_particle.lua");
 }
@@ -597,6 +642,21 @@ fn lua_test_particle() {
 #[test]
 fn lua_test_parallax() {
     run_lua_test("unit/test_parallax.lua");
+}
+
+#[test]
+fn lua_test_parallax_tiling() {
+    run_lua_test("unit/test_parallax_tiling.lua");
+}
+
+#[test]
+fn lua_test_parallax_depth() {
+    run_lua_test("unit/test_parallax_depth.lua");
+}
+
+#[test]
+fn lua_test_parallax_blend() {
+    run_lua_test("unit/test_parallax_blend.lua");
 }
 
 #[test]
@@ -769,6 +829,14 @@ fn lua_test_procgen() {
 #[test]
 fn lua_test_raycaster() {
     run_lua_test("unit/test_raycaster.lua");
+}
+#[test]
+fn lua_test_raycaster_transparent() {
+    run_lua_test("unit/test_raycaster_transparent.lua");
+}
+#[test]
+fn lua_test_raycaster_sprite_manager() {
+    run_lua_test("unit/test_raycaster_sprite_manager.lua");
 }
 #[test]
 fn lua_test_spine() {
@@ -1589,6 +1657,21 @@ fn lua_test_unit_patterns_collections() {
 }
 
 // ── Scene extensions ─────────────────────────────────────────────────────────
+
+#[test]
+fn lua_test_unit_scene_overlay() {
+    run_lua_test("unit/test_scene_overlay.lua");
+}
+
+#[test]
+fn lua_test_unit_scene_transitions() {
+    run_lua_test("unit/test_scene_transitions.lua");
+}
+
+#[test]
+fn lua_test_unit_scene_preload() {
+    run_lua_test("unit/test_scene_preload.lua");
+}
 
 #[test]
 fn lua_test_unit_scene_transitions_extended() {

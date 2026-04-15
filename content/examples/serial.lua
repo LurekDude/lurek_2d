@@ -124,3 +124,82 @@ local scores = {
 }
 lurek.fs.write("save/scores.csv", lurek.codec.toCsv(scores))
 ]]
+
+-- ── MessagePack ───────────────────────────────────────────────────────────────
+
+-- encodeMsgPack(value) → string (binary)
+-- Encodes a Lua table to a compact binary MessagePack payload.
+local save_data = { level = 3, hp = 80, items = { "sword", "shield" } }
+local packed = lurek.codec.encodeMsgPack(save_data)
+print(type(packed))   -- "string"  (binary bytes)
+print(#packed)        -- smaller than equivalent JSON
+
+-- decodeMsgPack(bytes) → table
+-- Decodes a MessagePack binary string back to a Lua table.
+local unpacked = lurek.codec.decodeMsgPack(packed)
+print(unpacked.level)      -- 3
+print(unpacked.items[1])   -- "sword"
+
+-- Round-trip
+assert(unpacked.hp == save_data.hp)
+
+-- ── XML decode ────────────────────────────────────────────────────────────────
+
+-- decodeXml(s) → table
+-- Parses XML into a nested Lua table.
+-- Each element → { tag=..., attrs={...}, text=..., children={...} }
+-- attrs/text/children are omitted when absent.
+
+local xml_str = [[
+<map version="1" orientation="orthogonal">
+  <layer name="ground" width="10" height="10">
+    <tile id="3"/>
+    <tile id="7"/>
+  </layer>
+</map>
+]]
+
+local map_tbl = lurek.codec.decodeXml(xml_str)
+print(map_tbl.tag)                          -- "map"
+print(map_tbl.attrs.version)               -- "1"
+local layer = map_tbl.children[1]
+print(layer.attrs.name)                    -- "ground"
+print(layer.children[1].attrs.id)         -- "3"
+
+-- ── Schema Validation ─────────────────────────────────────────────────────────
+
+-- validate(value, schema) → boolean, string?
+-- Returns true (+ nil) when valid, or false + error_message when invalid.
+-- Schema keys: type, required, min, max, minlen, maxlen, fields, items.
+
+local hero_schema = {
+  type = "table",
+  fields = {
+    name  = { type = "string",  required = true, minlen = 1, maxlen = 32 },
+    level = { type = "number",  required = true, min = 1, max = 100 },
+    alive = { type = "boolean" },
+    items = { type = "table",   items = { type = "string" } },
+  }
+}
+
+-- Valid hero: passes
+local ok, err = lurek.codec.validate(
+  { name = "Aria", level = 12, alive = true, items = { "bow", "quiver" } },
+  hero_schema
+)
+print(ok, err)   -- true   nil
+
+-- Missing required field: fails
+local ok2, err2 = lurek.codec.validate(
+  { level = 12 },
+  hero_schema
+)
+print(ok2, err2)  -- false   "name: required field is nil"
+
+-- Level out of range: fails
+local ok3, err3 = lurek.codec.validate(
+  { name = "Aria", level = 200 },
+  hero_schema
+)
+print(ok3, err3)  -- false   "level: value 200 is greater than max 100"
+

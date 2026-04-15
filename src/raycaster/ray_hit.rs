@@ -12,6 +12,7 @@
 /// - `distance` — `f32`.
 /// - `raw_distance` — `f32`.
 /// - `cell_value` — `u32`.
+/// - `alpha` — `f32`.
 /// - `side` — `u8`.
 /// - `tex_u` — `f32`.
 /// - `hit_x` — `f32`.
@@ -25,6 +26,10 @@ pub struct RayHit {
     pub raw_distance: f32,
     /// Wall type (>0 = wall).
     pub cell_value: u32,
+    /// Opacity of this wall [0.0 = transparent, 1.0 = fully opaque].
+    ///
+    /// Set from [`super::Raycaster2D::wall_alphas`]. Defaults to 1.0.
+    pub alpha: f32,
     /// 0 = horizontal hit, 1 = vertical hit.
     pub side: u8,
     /// Texture U coordinate in [0, 1].

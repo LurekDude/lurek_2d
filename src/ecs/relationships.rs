@@ -115,6 +115,8 @@ impl Relationship {
 pub struct RelationshipManager {
     types: HashMap<String, RelationType>,
     relations: HashMap<(u32, u32), Relationship>,
+    /// Directed named links: `(from_entity, relation_name)` → target entity IDs.
+    directed: HashMap<(u32, String), Vec<u32>>,
 }
 
 /// Normalize a pair so the lower ID is always first.
@@ -346,5 +348,75 @@ impl RelationshipManager {
     /// `usize`.
     pub fn relation_count(&self) -> usize {
         self.relations.len()
+    }
+
+    // ── Directed named links ─────────────────────────────────────────────────
+
+    /// Add a directed named link from `from` to `to`.
+    ///
+    /// Duplicates are silently ignored — calling `add_link(a, "owns", b)` twice
+    /// results in a single entry.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `name` — `&str`.
+    /// - `to` — `u32`.
+    pub fn add_link(&mut self, from: u32, name: &str, to: u32) {
+        let targets = self.directed.entry((from, name.to_string())).or_default();
+        if !targets.contains(&to) {
+            targets.push(to);
+        }
+    }
+
+    /// Return all targets reachable from `from` via the named directed link.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `&[u32]` — empty slice when no links of this name exist.
+    pub fn get_links(&self, from: u32, name: &str) -> &[u32] {
+        self.directed
+            .get(&(from, name.to_string()))
+            .map(|v| v.as_slice())
+            .unwrap_or(&[])
+    }
+
+    /// Remove the directed link from `from` to `to`.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `name` — `&str`.
+    /// - `to` — `u32`.
+    pub fn remove_link(&mut self, from: u32, name: &str, to: u32) {
+        if let Some(targets) = self.directed.get_mut(&(from, name.to_string())) {
+            targets.retain(|&id| id != to);
+        }
+    }
+
+    /// Remove all directed links of the given name originating from `from`.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `name` — `&str`.
+    pub fn clear_links(&mut self, from: u32, name: &str) {
+        self.directed.remove(&(from, name.to_string()));
+    }
+
+    /// Return `true` if a directed link from `from` to `to` via `name` exists.
+    ///
+    /// # Parameters
+    /// - `from` — `u32`.
+    /// - `name` — `&str`.
+    /// - `to` — `u32`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn has_link(&self, from: u32, name: &str, to: u32) -> bool {
+        self.directed
+            .get(&(from, name.to_string()))
+            .map(|v| v.contains(&to))
+            .unwrap_or(false)
     }
 }

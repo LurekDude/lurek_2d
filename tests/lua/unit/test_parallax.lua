@@ -162,9 +162,9 @@ describe("lurek.parallax.newLayer", function()
     it("accepts blend_mode string", function()
         local layer = lurek.parallax.newLayer({
             texture = load_image(),
-            blend_mode = "add",
+            blend_mode = "additive",
         })
-        expect_equal("add", layer:getBlendMode())
+        expect_equal("additive", layer:getBlendMode())
     end)
 
     -- @covers lurek.parallax.newLayer
@@ -224,10 +224,10 @@ describe("LuaParallaxLayer defaults", function()
 
     -- @covers lurek.parallax.newLayer
     -- @covers LuaParallaxLayer.getBlendMode
-    -- @description Verifies new layers default to alpha blending.
-    it("blend mode defaults to 'alpha'", function()
+    -- @description Verifies new layers default to normal (alpha) blending.
+    it("blend mode defaults to 'normal'", function()
         layer = lurek.parallax.newLayer({ texture = load_image() })
-        expect_equal("alpha", layer:getBlendMode())
+        expect_equal("normal", layer:getBlendMode())
     end)
 
     -- @covers lurek.parallax.newLayer
@@ -335,7 +335,7 @@ describe("LuaParallaxLayer setters and getters", function()
     -- @description Iterates through each supported blend mode and verifies the currently configured mode round-trips.
     it("setBlendMode / getBlendMode round-trip for each mode", function()
         local layer = lurek.parallax.newLayer({ texture = load_image() })
-        local modes = { "alpha", "add", "multiply", "replace", "screen" }
+        local modes = { "normal", "additive", "multiply", "replace", "screen" }
         for _, mode in ipairs(modes) do
             layer:setBlendMode(mode)
             expect_equal(mode, layer:getBlendMode())
@@ -344,11 +344,10 @@ describe("LuaParallaxLayer setters and getters", function()
 
     -- @covers LuaParallaxLayer.setBlendMode
     -- @covers LuaParallaxLayer.getBlendMode
-    -- @description Verifies an invalid blend mode falls back to alpha blending.
-    it("unrecognised blend mode falls back to alpha", function()
+    -- @description Verifies an unrecognised blend mode string raises an error.
+    it("unrecognised blend mode raises an error", function()
         local layer = lurek.parallax.newLayer({ texture = load_image() })
-        layer:setBlendMode("bogus")
-        expect_equal("alpha", layer:getBlendMode())
+        expect_error(function() layer:setBlendMode("bogus") end)
     end)
 
     -- @covers LuaParallaxLayer.setVisible

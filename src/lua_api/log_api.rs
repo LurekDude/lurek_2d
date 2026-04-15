@@ -105,11 +105,20 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
 
     // ── setLevel ────────────────────────────────────────────────────────
     /// Sets the minimum severity level for the default log channel.
+    /// Accepted values: "error", "warn", "info", "debug", "trace", "off".
+    /// Returns a LuaError when an unrecognised level is supplied.
     /// @param level : string
     /// @return nil
     log_table.set("setLevel", lua.create_function(|_, level: String| {
-        log_domain::set_level(&level);
-        Ok(())
+        match level.to_lowercase().as_str() {
+            "error" | "warn" | "warning" | "info" | "debug" | "trace" | "off" | "none" => {
+                log_domain::set_level(&level);
+                Ok(())
+            }
+            _ => Err(LuaError::RuntimeError(format!(
+                "lurek.log.setLevel: unknown level '{level}'; expected error/warn/info/debug/trace/off"
+            ))),
+        }
     })?)?;
 
     // ── getLevel ────────────────────────────────────────────────────────
@@ -121,10 +130,12 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// Registers a new output sink. Returns its numeric id.
     ///
     /// Config fields:
-    ///   type      : "file" | "memory"
-    ///   path      : string   (required for type="file")
-    ///   capacity  : integer  (for type="memory", default 1000)
-    ///   level     : string   (min level, default "debug")
+    ///   type       : "file" | "memory" | "rotating"
+    ///   path       : string   (required for type="file" or "rotating")
+    ///   capacity   : integer  (for type="memory", default 1000)
+    ///   level      : string   (min level, default "debug")
+    ///   max_bytes  : integer  (for type="rotating", default 10_485_760 = 10 MiB)
+    ///   keep_files : integer  (for type="rotating", default 3)
     ///
     /// @param config : table
     let s = sinks.clone();
@@ -143,6 +154,15 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
             "memory" => {
                 let cap: usize = config.get("capacity").unwrap_or(1000);
                 s.borrow_mut().add(Sink::memory(0, cap, min_level))
+            }
+            "rotating" => {
+                let path: String = config.get("path")
+                    .map_err(|_| LuaError::external("addSink: path required for type='rotating'"))?;
+                let max_bytes: u64 = config.get("max_bytes").unwrap_or(0);
+                let keep_files: usize = config.get("keep_files").unwrap_or(0);
+                let sink = Sink::rotating_file(0, &path, min_level, max_bytes, keep_files)
+                    .map_err(LuaError::external)?;
+                s.borrow_mut().add(sink)
             }
             _ => return Err(LuaError::external(format!("addSink: unknown type '{kind}'"))),
         };

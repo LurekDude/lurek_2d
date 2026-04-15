@@ -618,6 +618,64 @@ impl LuaUserData for LuaUniverse {
             this.inner.borrow_mut().spawn_bulk(lua, &name, count, overrides)
         });
 
+        // -- addRelation --
+        /// Adds a directed named relationship from entity `from` to entity `to`.
+        /// Duplicates are silently ignored.
+        /// @param from : integer
+        /// @param name : string
+        /// @param to : integer
+        /// @return nil
+        methods.add_method("addRelation", |_, this, (from, name, to): (u32, String, u32)| {
+            this.inner.borrow_mut().relationships.add_link(from, &name, to);
+            Ok(())
+        });
+
+        // -- getRelated --
+        /// Returns all entity IDs reachable from `from` via the named relationship.
+        /// @param from : integer
+        /// @param name : string
+        /// @return table
+        methods.add_method("getRelated", |lua, this, (from, name): (u32, String)| {
+            let inner = this.inner.borrow();
+            let ids = inner.relationships.get_links(from, &name);
+            let tbl = lua.create_table()?;
+            for (i, id) in ids.iter().enumerate() {
+                tbl.set(i + 1, *id)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- removeRelation --
+        /// Removes the directed named relationship from entity `from` to entity `to`.
+        /// @param from : integer
+        /// @param name : string
+        /// @param to : integer
+        /// @return nil
+        methods.add_method("removeRelation", |_, this, (from, name, to): (u32, String, u32)| {
+            this.inner.borrow_mut().relationships.remove_link(from, &name, to);
+            Ok(())
+        });
+
+        // -- clearRelations --
+        /// Removes all directed named relationships of type `name` from entity `from`.
+        /// @param from : integer
+        /// @param name : string
+        /// @return nil
+        methods.add_method("clearRelations", |_, this, (from, name): (u32, String)| {
+            this.inner.borrow_mut().relationships.clear_links(from, &name);
+            Ok(())
+        });
+
+        // -- hasRelation --
+        /// Returns true if a directed named relationship from `from` to `to` exists.
+        /// @param from : integer
+        /// @param name : string
+        /// @param to : integer
+        /// @return boolean
+        methods.add_method("hasRelation", |_, this, (from, name, to): (u32, String, u32)| {
+            Ok(this.inner.borrow().relationships.has_link(from, &name, to))
+        });
+
     }
 }
 

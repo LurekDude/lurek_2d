@@ -25,6 +25,8 @@ pub mod terrain;
 pub mod world;
 /// Gravity and damping zones applied before each rapier pipeline step.
 pub mod zone;
+/// Lightweight stateless geometric overlap helpers. No physics world required.
+pub mod collision_helpers;
 
 pub use body::{Body, BodyShape, BodyType};
 pub use cellular::{default_palette, CellType, CellularWorld};
@@ -35,3 +37,4 @@ pub use terrain::TerrainMap;
 pub use world::BodyContact as CollisionEvent;
 pub use world::{ContactInfo, PhysicsShapeSnapshot, RaycastHit, World};
 pub use zone::{PhysicsZone, ZoneBoundary, ZoneEvent, ZoneEventKind, ZoneGravityMode};
+pub use collision_helpers::{test_aabb, test_circles, test_point_aabb, test_circle_aabb};

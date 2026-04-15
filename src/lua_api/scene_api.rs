@@ -543,6 +543,16 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |_, ()| Ok(st.borrow().stack.get_stack_size()))?,
     )?;
 
+    // -- depth --
+    /// Returns the number of scenes on the stack.
+    /// Alias for `getStackSize`; provided for ergonomic use in game scripts.
+    /// @return integer
+    let st = state.clone();
+    tbl.set(
+        "depth",
+        lua.create_function(move |_, ()| Ok(st.borrow().stack.get_stack_size()))?,
+    )?;
+
     // -- isEmpty --
     /// Returns true if the scene stack is empty.
     /// @return boolean
@@ -1051,6 +1061,80 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+
+    // ── Built-in Transition Library ──────────────────────────────────────────────
+
+    // -- transitions --
+    /// Pre-built named transition factory functions.  Each function accepts optional
+    /// configuration arguments and returns a table with `type` and `duration` fields
+    /// compatible with the existing push/switchTo/pop transition parameters.
+    ///
+    /// Example:
+    ///   local cfg = lurek.scene.transitions.fade(0.5)
+    ///   lurek.scene.push(myScene, cfg.type, cfg.duration)
+    let trans_tbl = lua.create_table()?;
+
+    // transitions.fade(duration?) → {type="fade", duration=0.5}
+    /// Returns a fade cross-dissolve transition config table.
+    /// @param duration : number?  — default 0.5
+    /// @return table  — { type : string, duration : number }
+    trans_tbl.set(
+        "fade",
+        lua.create_function(|lua, duration: Option<f32>| {
+            let t = lua.create_table()?;
+            t.set("type", "fade")?;
+            t.set("duration", duration.unwrap_or(0.5))?;
+            Ok(t)
+        })?,
+    )?;
+
+    // transitions.slide(direction?, duration?) → {type=direction, duration=0.4}
+    /// Returns a directional slide transition config table.
+    /// @param direction : string?  — "left" | "right" | "up" | "down" (default "left")
+    /// @param duration  : number?  — default 0.4
+    /// @return table  — { type : string, duration : number }
+    trans_tbl.set(
+        "slide",
+        lua.create_function(
+            |lua, (direction, duration): (Option<String>, Option<f32>)| {
+                let t = lua.create_table()?;
+                let dir = direction.as_deref().unwrap_or("left").to_string();
+                t.set("type", dir)?;
+                t.set("duration", duration.unwrap_or(0.4))?;
+                Ok(t)
+            },
+        )?,
+    )?;
+
+    // transitions.wipe(duration?) → {type="wipe", duration=0.5}
+    /// Returns a wipe/curtain transition config table.
+    /// @param duration : number?  — default 0.5
+    /// @return table  — { type : string, duration : number }
+    trans_tbl.set(
+        "wipe",
+        lua.create_function(|lua, duration: Option<f32>| {
+            let t = lua.create_table()?;
+            t.set("type", "wipe")?;
+            t.set("duration", duration.unwrap_or(0.5))?;
+            Ok(t)
+        })?,
+    )?;
+
+    // transitions.iris(duration?) → {type="iris", duration=0.6}
+    /// Returns an iris in/out (circular reveal) transition config table.
+    /// @param duration : number?  — default 0.6
+    /// @return table  — { type : string, duration : number }
+    trans_tbl.set(
+        "iris",
+        lua.create_function(|lua, duration: Option<f32>| {
+            let t = lua.create_table()?;
+            t.set("type", "iris")?;
+            t.set("duration", duration.unwrap_or(0.6))?;
+            Ok(t)
+        })?,
+    )?;
+
+    tbl.set("transitions", trans_tbl)?;
 
     Ok(())
 }

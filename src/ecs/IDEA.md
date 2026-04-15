@@ -48,20 +48,26 @@ implemented in `ecs_api.rs` (lines ~431, ~445). `spawnBulk` with overrides also 
 
 ---
 
-### ❌ TODO — Relationship Manager Lua Exposure
+### ✅ DONE — Relationship Manager Lua Exposure
 **Source**: features/entity.md — Feature Gaps #4
 
-`src/ecs/relationships.rs` exists but no `addRelation`, `getRelated`, or similar API found
-in `ecs_api.rs`. Relationships (ownership, social graphs, formations) are usable only from
-Rust. Expose to Lua.
+Directed named relationship links (`addRelation`, `getRelated`, `removeRelation`,
+`clearRelations`, `hasRelation`) added to `RelationshipManager` in
+`src/ecs/relationships.rs` (field `directed: HashMap<(u32, String), Vec<u32>>`,
+methods `add_link` / `get_links` / `remove_link` / `clear_links` / `has_link`).
+`Universe` gained a `pub relationships: RelationshipManager` field.
+Lua bindings registered in `src/lua_api/ecs_api.rs` on `LuaUniverse`.
+Tests extended in `tests/lua/unit/test_entity_relationships.lua`.
 
 ---
 
-### ❌ TODO — Component Removed Observer
+### ✅ DONE — Component Removed Observer
 **Source**: features/entity.md — Feature Gaps #2 (partial)
 
-`remove_observers` field exists in `ecs_api.rs` but no `onComponentRemoved()` Lua binding
-was found. Check whether it is registered and document, or implement.
+`onComponentRemoved(name, cb)` is registered in `src/lua_api/ecs_api.rs` alongside
+`onComponentAdded`. Callbacks fire via `flushObservers()` using the deferred
+`remove_events` queue in `Universe`. Tested in
+`tests/lua/unit/test_entity_observers.lua`.
 
 ---
 

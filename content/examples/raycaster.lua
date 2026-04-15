@@ -183,3 +183,81 @@ function lurek.render()
     end
 end
 ]]
+
+-- ── Transparent / Translucent Walls ──────────────────────────────────────────
+
+-- Use newMap() as an alias for new() — identical behaviour.
+local MAP_W, MAP_H = 32, 32
+local rc2 = lurek.raycaster.newMap(MAP_W, MAP_H)
+
+-- Mark tile type 3 as semi-transparent glass (50% opaque).
+-- setWallAlpha(tile_type, alpha)   — alpha clamped to [0.0, 1.0]
+rc2:setWallAlpha(3, 0.5)
+
+-- getWallAlpha(tile_type) → number  — returns 1.0 if not set
+local glass_alpha = rc2:getWallAlpha(3)   -- 0.5
+local wall_alpha  = rc2:getWallAlpha(1)   -- 1.0 (default)
+
+-- All standard castRay / castRays hit tables now include an `alpha` field.
+-- For opaque walls alpha == 1.0; for translucent walls alpha < 1.0.
+local hit = rc2:castRay(16.5, 16.5, 0.0, 20.0)
+if hit then
+    -- hit.alpha  — opacity [0, 1]; multiply against wall color / texture tint
+    local r = hit.alpha   -- opaque walls → 1.0, glass wall type 3 → 0.5
+end
+
+-- castRayMulti(ox, oy, angle, max_dist [, max_hits]) → table of hit tables
+-- Continues through translucent walls and collects up to max_hits layers.
+-- Hits are ordered nearest to farthest.  max_hits defaults to 4 (max 8).
+local layers = rc2:castRayMulti(16.5, 16.5, 0.0, 20.0, 4)
+for i, layer in ipairs(layers) do
+    -- layer.alpha      — opacity of this wall layer
+    -- layer.cell_value — wall tile type
+    -- layer.distance   — perpendicular distance for column height
+    -- layer.tex_u      — UV coordinate along the wall face
+    if i == 1 then
+        -- nearest hit — always draw
+    else
+        -- additional layers — blend using layer.alpha
+    end
+end
+
+-- ── Batch Sprite Manager with Depth Sorting ───────────────────────────────────
+
+-- newSpriteManager() → SpriteManager userdata
+local sm = lurek.raycaster.newSpriteManager()
+
+-- add(x, y, texture [, scale]) → id
+-- Returns a unique integer id for later manipulation.
+local barrel_id = sm:add(18.5, 16.5, "barrel.png")
+local guard_id  = sm:add(20.0, 14.0, "guard.png", 1.2)
+
+-- setPosition(id, x, y)  — move a sprite
+sm:setPosition(guard_id, 21.0, 14.0)
+
+-- setVisible(id, visible)  — hide/show without removing
+sm:setVisible(barrel_id, false)   -- barrel no longer projected
+
+-- remove(id)  — delete a sprite entirely
+-- sm:remove(guard_id)
+
+-- clear()  — delete all sprites
+-- sm:clear()
+
+-- sortAndProject(cam_x, cam_y, cam_angle)
+-- → indexed table { {id, x, y, texture, scale, distance}, ... }
+-- Sprites are sorted back-to-front (farthest first) — painter-order safe.
+-- cam_angle is accepted for API symmetry but sorting is 2D-distance-only.
+local px, py = 16.5, 16.5
+local projected = sm:sortAndProject(px, py, 0.0)
+
+local SCREEN_W, SCREEN_H = 320, 240
+for i, sp in ipairs(projected) do
+    -- sp.distance  — Euclidean distance from camera
+    -- sp.scale     — sprite scale factor
+    -- sp.texture   — texture name passed to add()
+    local _, col_h, _ = lurek.raycaster.projectColumn(sp.distance, math.pi / 2, SCREEN_H)
+    local sprite_h = col_h * sp.scale
+    -- ... draw sp.texture centred at screen position ...
+    _ = sprite_h  -- suppress unused warning in example
+end

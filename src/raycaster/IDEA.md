@@ -65,20 +65,28 @@ Methods: `setFloor`, `setCeiling`, `floorAt`, `ceilingAt`.
 
 ---
 
-### ❌ TODO — Transparent / Translucent Walls
+### ✅ DONE — Transparent / Translucent Walls
 **Source**: features/raycaster.md — Feature Gaps #3
 
-All walls are fully opaque. Transparent walls require ray continuation after hit.
-Useful for windows, force fields, and glass surfaces.
+`Raycaster2D::wall_alphas: HashMap<u8, f32>` added to domain (`src/raycaster/dda.rs`).
+`set_wall_alpha(tile_type, alpha)` / `get_wall_alpha(tile_type)` domain methods.
+`RayHit.alpha: f32` field added; all constructors default to `1.0`.
+`cast_ray_multi(ox, oy, angle, max_dist, max_hits)` continues through translucent hits.
+Lua API: `m:setWallAlpha(tile_type, alpha)`, `m:getWallAlpha(tile_type)`, `m:castRayMulti(…)`.
+All existing `castRay` / `castRays` hits expose `.alpha` in their returned table.
+Tests: `tests/lua/unit/test_raycaster_transparent.lua`.
 
 ---
 
-### ❌ TODO — Batch Sprite Manager with Depth Sorting
+### ✅ DONE — Batch Sprite Manager with Depth Sorting
 **Source**: features/raycaster.md — Feature Gaps #4
 
-`projectSprite()` projects a single sprite. No batch sprite management with automatic
-depth sorting and screen-space clipping. For dungeons with many actors, a dedicated
-sprite manager with Z-buffered projection would improve ergonomics.
+`src/raycaster/sprite_manager.rs` — `WorldSprite` and `SpriteManager` domain types.
+`SpriteManager::sort_by_distance(cam_x, cam_y)` returns `Vec<&WorldSprite>` back-to-front.
+Lua API: `lurek.raycaster.newSpriteManager()` → `LuaSpriteManager` userdata.
+Methods: `add`, `remove`, `setPosition`, `setVisible`, `clear`, `sortAndProject`.
+`sortAndProject(cam_x, cam_y, cam_angle)` returns indexed table `{id, x, y, texture, scale, distance}`.
+Tests: `tests/lua/unit/test_raycaster_sprite_manager.lua`.
 
 ---
 

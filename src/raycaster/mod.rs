@@ -32,8 +32,10 @@ pub mod render;
 pub mod scene;
 /// Line segment definition and ray-segment intersection testing.
 pub mod segment;
-/// Sprite screen-space projection for billboard rendering.
+/// Sprite projection for billboard rendering.
 pub mod sprite_projection;
+/// Batch sprite manager with depth-sorted projection for raycaster worlds.
+pub mod sprite_manager;
 /// Visibility polygon via endpoint raycasting.
 pub mod visibility;
 
@@ -51,4 +53,5 @@ pub use ray_hit::RayHit;
 pub use scene::{BillboardSprite, CeilingQuad, FloorQuad, RaycasterScene, WallQuad};
 pub use segment::{cast_ray_2d, Segment};
 pub use sprite_projection::SpriteProjection;
+pub use sprite_manager::{SpriteManager, WorldSprite as ManagedSprite};
 pub use visibility::field_of_view;

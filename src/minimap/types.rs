@@ -139,6 +139,7 @@ pub struct MinimapPing {
 /// - `y` — `f32`.
 /// - `description` — `String`.
 /// - `color` — `[f32; 4]`.
+/// - `animation` — `Option<MarkerAnimation>`.
 #[derive(Debug, Clone)]
 pub struct MinimapMarker {
     /// Grid X position.
@@ -149,4 +150,104 @@ pub struct MinimapMarker {
     pub description: String,
     /// Display color (RGBA).
     pub color: [f32; 4],
+    /// Optional animation applied to this marker each frame.
+    pub animation: Option<MarkerAnimation>,
+}
+
+/// Animation applied to a minimap marker icon.
+///
+/// # Variants
+/// - `Blink` — Alternates between visible and hidden at `speed` cycles per second.
+/// - `Pulse` — Scales up and down at `speed` cycles per second.
+/// - `Rotate` — Spins continuously at `speed` radians per second.
+#[derive(Debug, Clone)]
+pub enum MarkerAnimation {
+    /// Blinking visibility animation.
+    Blink {
+        /// Cycles per second.
+        speed: f32,
+        /// Current phase in `[0.0, 1.0)`, advanced each `update(dt)` call.
+        phase: f32,
+    },
+    /// Pulsing scale animation.
+    Pulse {
+        /// Cycles per second.
+        speed: f32,
+        /// Current phase in `[0.0, 1.0)`, advanced each `update(dt)` call.
+        phase: f32,
+    },
+    /// Continuous rotation animation.
+    Rotate {
+        /// Rotation speed in radians per second.
+        speed: f32,
+        /// Current rotation angle in radians, advanced each `update(dt)` call.
+        angle: f32,
+    },
+}
+
+/// A custom geometric shape drawn on top of the minimap in grid space.
+///
+/// # Variants
+/// - `Line` — A line segment between two grid-space coordinates.
+/// - `Rect` — An axis-aligned rectangle in grid-space coordinates.
+#[derive(Debug, Clone)]
+pub enum OverlayShape {
+    /// A line segment from `(x1, y1)` to `(x2, y2)`.
+    Line {
+        /// Start X in grid coordinates.
+        x1: f32,
+        /// Start Y in grid coordinates.
+        y1: f32,
+        /// End X in grid coordinates.
+        x2: f32,
+        /// End Y in grid coordinates.
+        y2: f32,
+        /// RGBA color (0–255 per channel).
+        color: [u8; 4],
+    },
+    /// An axis-aligned rectangle in grid coordinates.
+    Rect {
+        /// Left edge in grid coordinates.
+        x: f32,
+        /// Top edge in grid coordinates.
+        y: f32,
+        /// Width in grid cells.
+        w: f32,
+        /// Height in grid cells.
+        h: f32,
+        /// RGBA color (0–255 per channel).
+        color: [u8; 4],
+    },
+}
+
+/// A pathfinding route overlay displayed on the minimap.
+///
+/// # Fields
+/// - `id` — `u32`.
+/// - `points` — `Vec<(f32, f32)>`.
+/// - `color` — `[u8; 4]`.
+#[derive(Debug, Clone)]
+pub struct OverlayPath {
+    /// Unique identifier for this path (used to remove it later).
+    pub id: u32,
+    /// Ordered list of grid-space waypoints forming the route.
+    pub points: Vec<(f32, f32)>,
+    /// RGBA color (0–255 per channel).
+    pub color: [u8; 4],
+}
+
+/// Per-layer terrain data for multi-layer minimap rendering.
+///
+/// # Fields
+/// - `cells` — `Vec<u8>`.
+/// - `width` — `u32`.
+/// - `height` — `u32`.
+#[derive(Debug, Clone)]
+pub struct LayerData {
+    /// Flat row-major array of terrain type IDs for this layer.
+    pub cells: Vec<u8>,
+    /// Layer grid width in cells.
+    pub width: u32,
+    /// Layer grid height in cells.
+    pub height: u32,
 }

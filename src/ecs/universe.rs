@@ -12,6 +12,7 @@ use crate::runtime::log_messages::{EN01_UNIVERSE_INIT, EN02_ENTITY_SPAWN};
 use crate::log_msg;
 use mlua::{Function, Lua, RegistryKey, Result as LuaResult, Table, Value as LuaValue};
 use std::collections::{HashMap, HashSet};
+use super::relationships::RelationshipManager;
 
 /// Maximum number of bitmap tag definitions per Universe.
 const MAX_BITMAP_TAGS: usize = 63;
@@ -60,6 +61,8 @@ pub struct Universe {
     add_events: Vec<(u32, String)>,
     /// Pending component-removed events for observer dispatch.
     remove_events: Vec<(u32, String)>,
+    /// Directed named relationship links between entities.
+    pub relationships: RelationshipManager,
 }
 
 impl Universe {
@@ -87,6 +90,7 @@ impl Universe {
             system_priorities: Vec::new(),
             add_events: Vec::new(),
             remove_events: Vec::new(),
+            relationships: RelationshipManager::new(),
         }
     }
 

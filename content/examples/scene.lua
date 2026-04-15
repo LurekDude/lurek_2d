@@ -211,3 +211,76 @@ lurek.scene.processLate(1.0)  -- Calls `scene:process_late(dt)` on the topmost s
 lurek.scene.processPhysics(1.0)  -- Calls `scene:process_physics(dt)` on the topmost scene (fixed timestep)
 lurek.scene.render()  -- Draws all scenes in the stack from bottom to top
 lurek.scene.renderUi()  -- Draws UI overlay for all scenes in the stack from bottom to top
+
+-- ── Overlay Mode ──────────────────────────────────────────────────────────────
+
+-- pushOverlay(scene, transition?, duration?, easing?, params?)
+-- Pushes a scene that renders ON TOP of the current scene.
+-- Unlike push(), the background scene CONTINUES to receive process and render calls.
+-- pause()/resume() are NOT called on the underlying scene.
+local PauseScene = lurek.scene.define({
+    render = function(self)
+        lurek.gfx.print("PAUSED", 300, 280)
+    end,
+    process = function(self, dt)
+        if lurek.keyboard.isDown("escape") then
+            lurek.scene.pop()
+        end
+    end,
+})
+lurek.scene.pushOverlay(PauseScene())   -- GameScene below still updates and draws
+
+-- isOverlay() → boolean — true if the current top was pushed with pushOverlay
+local overlay_active = lurek.scene.isOverlay()
+
+-- getActiveScenes() → table — all currently active scene tables
+-- (top-only when no overlays; all scenes when at least one overlay is present)
+local active = lurek.scene.getActiveScenes()
+
+-- depth() → integer — alias for getStackSize(), convenient in game scripts
+local n = lurek.scene.depth()
+
+-- ── Built-in Transition Library ───────────────────────────────────────────────
+
+-- lurek.scene.transitions.<name>(...) → {type: string, duration: number}
+-- Use the returned table fields with push/switchTo/pop.
+
+-- transitions.fade(duration?) — cross-dissolve, default 0.5 s
+local fade_cfg = lurek.scene.transitions.fade()        -- {type="fade", duration=0.5}
+local fade_1s  = lurek.scene.transitions.fade(1.0)    -- {type="fade", duration=1.0}
+
+-- transitions.slide(direction?, duration?) — directional slide, default "left" / 0.4 s
+local slide_cfg  = lurek.scene.transitions.slide()            -- {type="left",  duration=0.4}
+local slide_right= lurek.scene.transitions.slide("right")     -- {type="right", duration=0.4}
+local slide_fast = lurek.scene.transitions.slide("up", 0.2)   -- {type="up",    duration=0.2}
+
+-- transitions.wipe(duration?) — curtain wipe, default 0.5 s
+local wipe_cfg = lurek.scene.transitions.wipe()
+
+-- transitions.iris(duration?) — circular iris reveal, default 0.6 s
+local iris_cfg = lurek.scene.transitions.iris(0.8)
+
+-- Pass config fields directly to push/switchTo:
+local cfg = lurek.scene.transitions.fade(0.4)
+lurek.scene.push(GameScene(), cfg.type, cfg.duration)
+
+-- ── Scene Preloading ──────────────────────────────────────────────────────────
+
+-- preload(name, loader_fn)
+-- Registers a loader function keyed to 'name'. The loader runs once when
+-- pushPreloaded(name) is first called, reducing hitches on scene entry.
+lurek.scene.registerScene("level2", GameScene())
+lurek.scene.preload("level2", function()
+    -- load heavy assets during any active transition or idle time
+    -- lurek.gfx.newImage("big_map.png")
+    print("level2 assets loaded")
+end)
+
+-- isPreloaded(name) → boolean — true after the loader has been called
+local loaded = lurek.scene.isPreloaded("level2")  -- false until first pushPreloaded
+
+-- pushPreloaded(name, transition?, duration?, easing?, params?)
+-- Calls the loader once if not yet preloaded, then pushes the registered scene.
+lurek.scene.pushPreloaded("level2", "fade", 0.5)
+-- isPreloaded("level2") is now true; subsequent pushPreloaded skips the loader.
+

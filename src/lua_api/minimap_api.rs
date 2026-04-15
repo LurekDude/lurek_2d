@@ -5,7 +5,22 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::minimap::{ColorMode, FogLevel, Minimap};
+use crate::minimap::{ColorMode, FogLevel, LayerData, MarkerAnimation, Minimap};
+
+// -------------------------------------------------------------------------------
+// Helpers
+// -------------------------------------------------------------------------------
+
+/// Parse a Lua table `{r, g, b, a}` (integers 0–255) into a `[u8; 4]` color array.
+///
+/// Missing channels default to 255.
+fn parse_color_table(tbl: LuaTable) -> LuaResult<[u8; 4]> {
+    let r: u8 = tbl.get(1).unwrap_or(255);
+    let g: u8 = tbl.get(2).unwrap_or(255);
+    let b: u8 = tbl.get(3).unwrap_or(255);
+    let a: u8 = tbl.get(4).unwrap_or(255);
+    Ok([r, g, b, a])
+}
 
 // -------------------------------------------------------------------------------
 // LuaMinimap UserData
@@ -641,6 +656,157 @@ impl LuaUserData for LuaMinimap {
         methods.add_method("getMarkerCount", |_, this, ()| {
             Ok(this.inner.marker_count())
         });
+
+        // ── Marker animation ──
+
+        // -- setMarkerAnimation --
+        /// Attaches an animation to a marker. Does nothing if the ID does not exist.
+        /// @param id : integer
+        /// @param anim_type : string  -- "blink", "pulse", or "rotate"
+        /// @param speed : number
+        /// @return nil
+        methods.add_method_mut(
+            "setMarkerAnimation",
+            |_, this, (id, anim_type, speed): (u32, String, f32)| {
+                let anim = match anim_type.as_str() {
+                    "blink" => MarkerAnimation::Blink { speed, phase: 0.0 },
+                    "pulse" => MarkerAnimation::Pulse { speed, phase: 0.0 },
+                    "rotate" => MarkerAnimation::Rotate { speed, angle: 0.0 },
+                    other => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "lurek.minimap: unknown animation type '{}', \
+                             expected 'blink', 'pulse', or 'rotate'",
+                            other
+                        )))
+                    }
+                };
+                this.inner.set_marker_animation(id, anim);
+                Ok(())
+            },
+        );
+
+        // -- clearMarkerAnimation --
+        /// Removes the animation from a marker, reverting it to static.
+        /// @param id : integer
+        /// @return nil
+        methods.add_method_mut("clearMarkerAnimation", |_, this, id: u32| {
+            this.inner.clear_marker_animation(id);
+            Ok(())
+        });
+
+        // ── Geometry overlay ──
+
+        // -- drawLine --
+        /// Draws a custom line segment on the minimap overlay.
+        /// @param x1 : number
+        /// @param y1 : number
+        /// @param x2 : number
+        /// @param y2 : number
+        /// @param color : table  -- {r, g, b, a} integers 0-255
+        /// @return nil
+        methods.add_method_mut(
+            "drawLine",
+            |_, this, (x1, y1, x2, y2, color_tbl): (f32, f32, f32, f32, LuaTable)| {
+                let color = parse_color_table(color_tbl)?;
+                this.inner.draw_line(x1, y1, x2, y2, color);
+                Ok(())
+            },
+        );
+
+        // -- drawRect --
+        /// Draws a custom rectangle on the minimap overlay.
+        /// @param x : number
+        /// @param y : number
+        /// @param w : number
+        /// @param h : number
+        /// @param color : table  -- {r, g, b, a} integers 0-255
+        /// @return nil
+        methods.add_method_mut(
+            "drawRect",
+            |_, this, (x, y, w, h, color_tbl): (f32, f32, f32, f32, LuaTable)| {
+                let color = parse_color_table(color_tbl)?;
+                this.inner.draw_rect(x, y, w, h, color);
+                Ok(())
+            },
+        );
+
+        // -- clearOverlay --
+        /// Removes all custom geometry from the minimap overlay.
+        /// @return nil
+        methods.add_method_mut("clearOverlay", |_, this, ()| {
+            this.inner.clear_overlay();
+            Ok(())
+        });
+
+        // ── Path overlay ──
+
+        // -- showPath --
+        /// Displays a pathfinding route on the minimap and returns its path ID.
+        /// @param points : table  -- {{ x, y }, { x, y }, ... }
+        /// @param color : table   -- { r, g, b, a } integers 0-255
+        /// @return integer  -- path ID (pass to clearPath to remove it)
+        methods.add_method_mut(
+            "showPath",
+            |_, this, (points_tbl, color_tbl): (LuaTable, LuaTable)| {
+                let color = parse_color_table(color_tbl)?;
+                let len = points_tbl.len()? as usize;
+                let mut points = Vec::with_capacity(len);
+                for i in 1..=len {
+                    let pt: LuaTable = points_tbl.get(i)?;
+                    let x: f32 = pt.get(1)?;
+                    let y: f32 = pt.get(2)?;
+                    points.push((x, y));
+                }
+                let id = this.inner.show_path(points, color);
+                Ok(id)
+            },
+        );
+
+        // -- clearPath --
+        /// Removes a displayed path. If id is nil, all paths are removed.
+        /// @param id : integer?
+        /// @return nil
+        methods.add_method_mut("clearPath", |_, this, id: Option<u32>| {
+            this.inner.clear_path(id);
+            Ok(())
+        });
+
+        // ── Multi-layer ──
+
+        // -- setLayer --
+        /// Switches the minimap's active render layer (0-based index).
+        /// @param layer : integer
+        /// @return nil
+        methods.add_method_mut("setLayer", |_, this, layer: usize| {
+            this.inner.set_layer(layer);
+            Ok(())
+        });
+
+        // -- getLayer --
+        /// Returns the index of the currently active render layer.
+        /// @return integer
+        methods.add_method("getLayer", |_, this, ()| Ok(this.inner.get_layer()));
+
+        // -- setLayerData --
+        /// Stores tile data for a specific layer index.
+        /// @param layer : integer
+        /// @param data : table  -- flat 1-based table of terrain type integers
+        /// @return nil
+        methods.add_method_mut(
+            "setLayerData",
+            |_, this, (layer, data_tbl): (usize, LuaTable)| {
+                let len = data_tbl.len()? as usize;
+                let mut cells = Vec::with_capacity(len);
+                for i in 1..=len {
+                    let v: u8 = data_tbl.get(i)?;
+                    cells.push(v);
+                }
+                let w = this.inner.grid_width();
+                let h = this.inner.grid_height();
+                this.inner.set_layer_data(layer, LayerData { cells, width: w, height: h });
+                Ok(())
+            },
+        );
 
         // ── Rendering options ──
 

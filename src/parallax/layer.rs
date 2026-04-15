@@ -60,6 +60,10 @@ pub struct ParallaxDrawBatch {
 /// - `blend_mode` — GPU blend mode for compositing.
 /// - `visible` — Whether this layer is drawn.
 /// - `scale` — Texture display scale `[sx, sy]`.
+/// - `tiling` — Whether seamless infinite tiling is enabled on both axes.
+/// - `tile_w` — Optional tile width override (defaults to scaled texture width).
+/// - `tile_h` — Optional tile height override (defaults to scaled texture height).
+/// - `depth` — Floating-point draw depth for fine-grained ordering (default 0.0).
 pub struct ParallaxLayer {
     // --- Texture resource ---
     /// GPU texture to draw for this layer.
@@ -117,13 +121,41 @@ pub struct ParallaxLayer {
     /// Values > 1 zoom in (fewer, larger tiles); values < 1 zoom out (more,
     /// smaller tiles show more of the texture world).
     pub scale: [f32; 2],
+
+    // --- Tiling ---
+    /// Whether seamless infinite tiling is enabled on both axes simultaneously.
+    ///
+    /// When `true`, both `repeat_x` and `repeat_y` are effectively overridden to
+    /// `true` in the draw-call builder.  Setting this to `false` reverts to the
+    /// individual `repeat_x`/`repeat_y` flags.
+    pub tiling: bool,
+
+    /// Optional tile width override in scaled pixels.
+    ///
+    /// When `Some(w)`, the tile width used for repeat math is `w` instead of
+    /// `texture_width * scale[0]`.  Useful for sub-region tiling.
+    pub tile_w: Option<f32>,
+
+    /// Optional tile height override in scaled pixels.
+    ///
+    /// When `Some(h)`, the tile height used for repeat math is `h` instead of
+    /// `texture_height * scale[1]`.
+    pub tile_h: Option<f32>,
+
+    // --- Float depth ---
+    /// Floating-point draw depth for fine-grained Z ordering.
+    ///
+    /// Complements `z: i32` for cases where fractional ordering is needed.
+    /// Lower values render first (further back).  Default is `0.0`.
+    pub depth: f32,
 }
 
 impl ParallaxLayer {
     /// Creates a new `ParallaxLayer` with sensible defaults.
     ///
     /// Defaults: `scroll_factor = [1.0, 0.0]`, `opacity = 1.0`, `tint = white`,
-    /// `blend_mode = Alpha`, `repeat_x = true`, `repeat_y = false`, `scale = [1.0, 1.0]`.
+    /// `blend_mode = Alpha`, `repeat_x = true`, `repeat_y = false`, `scale = [1.0, 1.0]`,
+    /// `tiling = false`, `tile_w = None`, `tile_h = None`, `depth = 0.0`.
     ///
     /// # Parameters
     /// - `texture_key` — `TextureKey`.
@@ -151,6 +183,10 @@ impl ParallaxLayer {
             blend_mode: BlendMode::Alpha,
             visible: true,
             scale: [1.0, 1.0],
+            tiling: false,
+            tile_w: None,
+            tile_h: None,
+            depth: 0.0,
         }
     }
 
@@ -296,6 +332,57 @@ impl ParallaxLayer {
     /// the beginning.
     pub fn reset_autoscroll(&mut self) {
         self.autoscroll_accum = [0.0, 0.0];
+    }
+
+    /// Enables or disables seamless infinite tiling on both axes.
+    ///
+    /// When `true`, the layer tiles in both X and Y regardless of the
+    /// individual `repeat_x`/`repeat_y` flags.
+    ///
+    /// # Parameters
+    /// - `enabled` — `bool`.
+    pub fn set_tiling(&mut self, enabled: bool) {
+        self.tiling = enabled;
+    }
+
+    /// Returns `true` if seamless infinite tiling is enabled.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn get_tiling(&self) -> bool {
+        self.tiling
+    }
+
+    /// Sets an explicit tile size override, bypassing the scaled texture dimensions.
+    ///
+    /// Pass the width and height in logical pixels.  Both values must be positive;
+    /// non-positive values are silently clamped to the scaled texture size.
+    ///
+    /// # Parameters
+    /// - `w` — `f32` — tile width in pixels.
+    /// - `h` — `f32` — tile height in pixels.
+    pub fn set_tile_size(&mut self, w: f32, h: f32) {
+        self.tile_w = if w > 0.0 { Some(w) } else { None };
+        self.tile_h = if h > 0.0 { Some(h) } else { None };
+    }
+
+    /// Sets the floating-point draw depth for this layer.
+    ///
+    /// Lower values render first (further back).  Works alongside `z: i32`
+    /// for cases where fractional ordering is required.
+    ///
+    /// # Parameters
+    /// - `z` — `f32`.
+    pub fn set_depth(&mut self, z: f32) {
+        self.depth = z;
+    }
+
+    /// Returns the floating-point draw depth.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_depth(&self) -> f32 {
+        self.depth
     }
 }
 

@@ -4,6 +4,24 @@ All notable changes to Lurek2D are recorded here.
 
 ## [0.12.0] — 2026-04-15
 ### Added
+- **raycaster**: `Raycaster2D::wall_alphas` — per-tile opacity map (`HashMap<u8, f32>`). `set_wall_alpha(tile_type, alpha)` / `get_wall_alpha(tile_type)` domain methods. Alpha is clamped to `[0.0, 1.0]`.
+- **raycaster**: `RayHit.alpha: f32` field — all hit tables returned by `castRay`, `castRays`, and `castRayMulti` expose `.alpha`. Defaults to `1.0` for opaque walls.
+- **raycaster**: `cast_ray_multi(ox, oy, angle, max_dist, max_hits)` — Lua: `m:castRayMulti(…)` — continues through translucent walls (alpha < 1.0) collecting up to `max_hits` (≤ 8) wall layers ordered nearest-to-farthest. Perfect for glass, bars, and force fields.
+- **raycaster**: `m:setWallAlpha(tile_type, alpha)` / `m:getWallAlpha(tile_type)` Lua bindings on the Raycaster userdata.
+- **raycaster**: `lurek.raycaster.newMap(w, h)` — alias for `lurek.raycaster.new(w, h)`.
+- **raycaster**: `src/raycaster/sprite_manager.rs` — `SpriteManager` domain type with `WorldSprite { id, x, y, texture, scale, visible }`. Methods: `add`, `remove`, `set_position`, `set_visible`, `clear`, `sort_by_distance`.
+- **raycaster**: `lurek.raycaster.newSpriteManager()` — `LuaSpriteManager` userdata. Lua methods: `add`, `remove`, `setPosition`, `setVisible`, `clear`, `sortAndProject`. `sortAndProject(cam_x, cam_y, cam_angle)` returns indexed table `{id, x, y, texture, scale, distance}` sorted back-to-front.
+- **parallax**: `layer:setTiling(enabled)` / `layer:getTiling()` — enable seamless infinite tiling on both axes simultaneously; supersedes per-axis `setRepeat` for the common case.
+- **parallax**: `layer:setTileSize(w, h)` — override tile dimensions in logical pixels (defaults to scaled texture size); `setTileSize(0, 0)` resets to texture-based sizing.
+- **parallax**: `layer:setDepth(z)` / `layer:getDepth()` — floating-point draw depth for fine-grained Z ordering, independent of the existing integer `setZ`.
+- **parallax**: `setBlendMode` now accepts canonical mode strings `"normal"` (default, replaces `"alpha"`) and `"additive"` (replaces `"add"`); legacy aliases `"alpha"` and `"add"` remain valid inputs but `getBlendMode` returns the new canonical names.
+- **parallax**: `setBlendMode` now returns an error for unrecognised mode strings instead of silently falling back to alpha.
+- **scene**: `lurek.scene.transitions` subtable with four built-in transition factory functions: `fade(duration?)`, `slide(direction?, duration?)`, `wipe(duration?)`, `iris(duration?)`. Each returns `{type, duration}` compatible with `push`/`switchTo`/`pop` parameters.
+- **scene**: `lurek.scene.depth()` — alias for `getStackSize()`; returns the number of scenes currently on the stack.
+- **ecs**: `universe:addRelation(from, name, to)` / `universe:getRelated(from, name)` / `universe:removeRelation(from, name, to)` / `universe:clearRelations(from, name)` / `universe:hasRelation(from, name, to)` — directed named relationship links on `Universe`. Domain: `RelationshipManager.add_link` / `get_links` / `remove_link` / `clear_links` / `has_link` backed by `HashMap<(u32, String), Vec<u32>>`. Lua bindings in `src/lua_api/ecs_api.rs`.
+- **serial**: `lurek.codec.encodeMsgPack(tbl)` / `lurek.codec.decodeMsgPack(bytes)` — binary MessagePack encode/decode via `rmp-serde`. Compact binary payloads for save data and network messages.
+- **serial**: `lurek.codec.decodeXml(str)` — read-only XML parsing via `roxmltree`. Returns a nested Lua table: `{tag, attrs, text, children}`. Required for Tiled TMX map imports and third-party tool interop.
+- **serial**: `lurek.codec.validate(tbl, schema)` — schema validation. Returns `(true, nil)` on success or `(false, error_message)` on failure. Schema supports `type`, `required`, `min`, `max`, `minlen`, `maxlen`, `fields`, and `items`.
 - **event**: `Signal:connect(pattern, fn)` — wildcard glob subscriptions. Patterns containing `*` or `?` match all emitted event names that satisfy the glob rule (`*` = any sequence, `?` = one char). Returns a disconnect handle.
 - **patterns**: `Trie` — string-key prefix-index trie with `insert`, `search`, `starts_with`, `prefix_search`, `remove`, `len`, `is_empty`. Foundations tier; no Lua binding.
 - **patterns**: `BiMap<K, V>` — bidirectional HashMap with `insert` (bijection-enforced), `get_by_key`, `get_by_value`, forward/reverse remove, `len`, `is_empty`, `clear`. Foundations tier; no Lua binding.
