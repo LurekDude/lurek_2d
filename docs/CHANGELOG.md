@@ -2,6 +2,30 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.11.0] — 2026-04-15
+### Added
+- **render**: `lurek.graphic.printRich(spans, x, y)` — draws a sequence of individually-styled text `TextSpan` objects at a common baseline position. Each span carries its own `r/g/b/a` colour and `scale` multiplier.
+- **spine**: `LuaSkeletonAnimation:addEventKey(time, name, value?)` — adds a timed named event marker to an animation clip. Events are sorted automatically.
+- **spine**: `LuaSkeletonAnimation:getEvents(from, to)` — returns `{name, value}` pairs for all event markers whose timestamps fall in `(from, to]`.
+- **spine**: `LuaSkeleton:blendAnimation(anim, time, blend_weight?)` — evaluates a second animation and linearly blends it into the skeleton's current bone pose. Enables cross-fades between clips.
+- **ui**: `Widget:bind(key)` / `Widget:unbind()` — registers/removes a data-binding key on any widget.
+- **ui**: `Widget:setAlpha(a)` / `Widget:getAlpha()` — per-widget alpha transparency control.
+- **ui**: `Widget:fadeIn()` / `Widget:fadeOut()` — instantly show/hide a widget via alpha + visibility toggle.
+- **ui**: `Widget:slideIn(x, y)` / `Widget:slideOut(x, y)` — instantly move a widget to a position and show/hide it.
+- **ui**: `Widget:attachToEntity(entity_id)` / `Widget:detachFromEntity()` — anchors a widget's position to a world-space entity ID.
+- **ui**: `lurek.ui.update_bindings(data)` — batch-updates all widgets that have a binding key registered, matching `data[key]` to widget value/text.
+- **app**: `fixedUpdate(dt)` Lua callback — a second fixed-timestep callback separate from `process_physics`. Enabled by setting `performance.fixed_update_tick_rate` in `conf.toml`.
+- **app**: Frame budget warning — when `performance.frame_budget_warn_ms` is set in `conf.toml`, emits a `warn!` log entry whenever a frame exceeds the threshold.
+- **dataframe**: `DataFrame:withEval(col_name, expr)` — returns a new `DataFrame` with an additional computed column derived from a simple arithmetic expression referencing existing columns (supports `+`, `-`, `*`, `/`).
+- **pipeline**: `Pipeline:addSubPipeline(sub, alias, outer_deps?)` — inlines all steps from `sub` into this pipeline with a `alias/` name prefix. Entry-point steps gain dependencies on `outer_deps`.
+- **content/examples/pipeline.lua** — comprehensive pipeline API example covering steps, sub-pipelines, conditionals, and progress callbacks.
+### Changed
+- `WidgetBase` gained three new fields (`alpha`, `entity_attachment`, `bind_key`) — all default to backwards-compatible values (`1.0`, `None`, `None`).
+- `SkeletonAnimation` gained an `events: Vec<EventKeyframe>` field (default empty).
+- `PerformanceConfig` gained two new optional fields (`fixed_update_tick_rate`, `frame_budget_warn_ms`) with serde defaults of `None`.
+- `SharedState` gained `fixed_update_dt: f64` (default `0.0`).
+- `Pipeline` now derives `Clone` (required for `addSubPipeline`).
+
 ## [0.10.2] — 2026-04-17
 ### Added
 - **graph**: `graph:colorGraph()` — greedy graph coloring; returns `{node_id → color_int}` table using minimum colors.

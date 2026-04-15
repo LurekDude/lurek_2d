@@ -1087,6 +1087,50 @@ impl LuaUserData for LuaPipeline {
             Ok(this.inner.borrow().to_ascii_diagram())
         });
 
+        // -- addSubPipeline --
+        /// Inlines all steps from `sub_pipeline` into this pipeline, prefixing
+        /// their names with `alias/`.  Entry-point steps in the sub-pipeline
+        /// (those with no sub-pipeline-internal dependencies) are made to depend
+        /// on every step name listed in `outer_deps`.
+        ///
+        /// This lets you compose large init or loading sequences from reusable
+        /// named sub-pipelines without manually cross-wiring every boundary step.
+        ///
+        /// # Usage
+        /// ```lua
+        /// -- Build a sub-pipeline for audio loading.
+        /// local audio_pl = lurek.pipeline.new("audio")
+        /// audio_pl:addStep("init_mixer")
+        /// audio_pl:addStep("load_tracks", { deps = {"init_mixer"} })
+        ///
+        /// -- Inline into a main pipeline, running after "boot".
+        /// main_pl:addSubPipeline(audio_pl, "audio", { "boot" })
+        /// -- Results in steps named "audio/init_mixer" (dep: "boot")
+        /// --   and "audio/load_tracks" (dep: "audio/init_mixer")
+        /// ```
+        /// @param sub_pipeline : Pipeline
+        /// @param alias : string
+        /// @param outer_deps : table?  — Array of step names in this pipeline to depend on.
+        methods.add_method(
+            "addSubPipeline",
+            |_, this, (sub_ud, alias, deps_tbl): (mlua::AnyUserData, String, Option<mlua::Table>)| {
+                let sub_ref = sub_ud.borrow::<LuaPipeline>().map_err(mlua::Error::external)?;
+                let sub_clone = sub_ref.inner.borrow().clone();
+                let outer_deps: Vec<String> = if let Some(tbl) = deps_tbl {
+                    tbl.pairs::<mlua::Value, String>()
+                        .filter_map(|r| r.ok().map(|(_, v)| v))
+                        .collect()
+                } else {
+                    Vec::new()
+                };
+                this.inner
+                    .borrow_mut()
+                    .add_sub_pipeline(sub_clone, &alias, outer_deps)
+                    .map_err(mlua::Error::external)?;
+                Ok(())
+            },
+        );
+
         // -- typeOf --
         /// @param name : string
         /// @return boolean

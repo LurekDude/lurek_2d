@@ -186,14 +186,53 @@ impl BoneTimeline {
     }
 }
 
+// ── EventKeyframe ─────────────────────────────────────────────────────────────
+
+/// A timed event marker inside a [`SkeletonAnimation`].
+///
+/// Event keyframes fire a named event when the animation's playhead crosses
+/// their timestamp.  Listeners can react to events (e.g. play a footstep sound
+/// at a precise animation frame) without polling the playback time.
+///
+/// # Fields
+/// - `time` — `f32`.  Position on the timeline in seconds (0.0 … clip duration).
+/// - `name` — `String`.  Logical event label (e.g. `"footstep"`, `"attack"`).
+/// - `value` — `f32`.  Optional numeric payload (default `0.0`).
+#[derive(Debug, Clone)]
+pub struct EventKeyframe {
+    /// Timestamp in seconds at which the event fires.
+    pub time: f32,
+    /// Logical event label, e.g. `"footstep"`.
+    pub name: String,
+    /// Optional numeric payload carried by the event (default `0.0`).
+    pub value: f32,
+}
+
+impl EventKeyframe {
+    /// Creates a new event keyframe.
+    ///
+    /// # Parameters
+    /// - `time` — `f32`. Timestamp in seconds.
+    /// - `name` — `impl Into<String>`. Event label.
+    /// - `value` — `f32`. Numeric payload.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn new(time: f32, name: impl Into<String>, value: f32) -> Self {
+        Self { time, name: name.into(), value }
+    }
+}
+
 // ── SkeletonAnimation ─────────────────────────────────────────────────────────
 
-/// Named animation clip for a skeleton: contains timelines for multiple bones.
+/// Named animation clip for a skeleton: contains timelines for multiple bones
+/// and optional event keyframes.
 ///
 /// # Fields
 /// - `name` — `String`. Clip name.
 /// - `duration` — `f32`. Total duration in seconds.
 /// - `timelines` — `Vec<BoneTimeline>`.
+/// - `events` — `Vec<EventKeyframe>`.  Timed event markers in the clip.
 #[derive(Debug, Clone)]
 pub struct SkeletonAnimation {
     /// Human-readable animation name.
@@ -202,6 +241,8 @@ pub struct SkeletonAnimation {
     pub duration: f32,
     /// Timelines for individual bone properties.
     pub timelines: Vec<BoneTimeline>,
+    /// Timed event markers (fire-and-forget callbacks).
+    pub events: Vec<EventKeyframe>,
 }
 
 impl SkeletonAnimation {
@@ -214,7 +255,7 @@ impl SkeletonAnimation {
     /// # Returns
     /// `Self`.
     pub fn new(name: impl Into<String>, duration: f32) -> Self {
-        Self { name: name.into(), duration, timelines: Vec::new() }
+        Self { name: name.into(), duration, timelines: Vec::new(), events: Vec::new() }
     }
 
     /// Appends a bone timeline.
@@ -223,6 +264,38 @@ impl SkeletonAnimation {
     /// - `timeline` — [`BoneTimeline`].
     pub fn add_timeline(&mut self, timeline: BoneTimeline) {
         self.timelines.push(timeline);
+    }
+
+    /// Adds an event keyframe to the clip.
+    ///
+    /// Events are sorted by time automatically so their insertion order does
+    /// not matter — `collect_events` always returns them in chronological order.
+    ///
+    /// # Parameters
+    /// - `time` — `f32`. Timestamp in seconds.
+    /// - `name` — `impl Into<String>`. Event label.
+    /// - `value` — `f32`. Numeric payload (pass `0.0` if unused).
+    pub fn add_event_key(&mut self, time: f32, name: impl Into<String>, value: f32) {
+        self.events.push(EventKeyframe::new(time, name, value));
+        self.events.sort_by(|a, b| a.time.partial_cmp(&b.time).unwrap_or(std::cmp::Ordering::Equal));
+    }
+
+    /// Returns the names of all events whose timestamps fall in `(from, to]`.
+    ///
+    /// Used each frame to detect which events were crossed since the last update.
+    ///
+    /// # Parameters
+    /// - `from` — `f32`. Exclusive lower bound (previous playback time).
+    /// - `to` — `f32`. Inclusive upper bound (current playback time).
+    ///
+    /// # Returns
+    /// `Vec<(String, f32)>` — (event name, payload value) pairs in chronological order.
+    pub fn collect_events(&self, from: f32, to: f32) -> Vec<(String, f32)> {
+        self.events
+            .iter()
+            .filter(|e| e.time > from && e.time <= to)
+            .map(|e| (e.name.clone(), e.value))
+            .collect()
     }
 
     /// Evaluates all timelines at `time` and writes results into the skeleton's bones.
@@ -240,6 +313,37 @@ impl SkeletonAnimation {
             }
         }
     }
+
+    /// Evaluates all timelines at `time` and **blends** the results with the
+    /// skeleton's current bone values using `blend_weight`.
+    ///
+    /// A `blend_weight` of `1.0` is equivalent to [`apply_to_skeleton`].
+    /// A value of `0.0` leaves the skeleton unchanged.
+    /// Intermediate values linearly interpolate between the current pose and
+    /// the clip pose, enabling smooth cross-fades between animations.
+    ///
+    /// # Parameters
+    /// - `skeleton` — `&mut super::skeleton::Skeleton`. Skeleton to modify.
+    /// - `time` — `f32`. Playback time in seconds.
+    /// - `blend_weight` — `f32`. Blend factor in `[0.0, 1.0]`.  Clamped to that range.
+    ///
+    /// [`apply_to_skeleton`]: Self::apply_to_skeleton
+    pub fn apply_to_skeleton_blended(
+        &self,
+        skeleton: &mut super::skeleton::Skeleton,
+        time: f32,
+        blend_weight: f32,
+    ) {
+        let w = blend_weight.clamp(0.0, 1.0);
+        for tl in &self.timelines {
+            let target = tl.evaluate(time);
+            if let Some(bone) = skeleton.bones.get_mut(tl.bone_idx) {
+                let current = current_bone_property(bone, &tl.property);
+                let blended = current + (target - current) * w;
+                apply_bone_property(bone, &tl.property, blended);
+            }
+        }
+    }
 }
 
 /// Writes `value` to the named local property of a bone.
@@ -250,5 +354,18 @@ fn apply_bone_property(bone: &mut Bone, prop: &BoneProperty, value: f32) {
         BoneProperty::Rotation => bone.local_rotation = value,
         BoneProperty::ScaleX => bone.local_scale_x = value,
         BoneProperty::ScaleY => bone.local_scale_y = value,
+    }
+}
+
+/// Reads the current local property value of a bone.
+///
+/// Used by the blend path to fetch the starting value for interpolation.
+fn current_bone_property(bone: &Bone, prop: &BoneProperty) -> f32 {
+    match prop {
+        BoneProperty::X => bone.local_x,
+        BoneProperty::Y => bone.local_y,
+        BoneProperty::Rotation => bone.local_rotation,
+        BoneProperty::ScaleX => bone.local_scale_x,
+        BoneProperty::ScaleY => bone.local_scale_y,
     }
 }

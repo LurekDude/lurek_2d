@@ -162,6 +162,11 @@ struct LunaApp {
     ready_fired: bool,
     /// Accumulator for fixed-timestep `process_physics` callbacks (seconds).
     physics_accumulator: f64,
+    /// Accumulator for fixed-timestep `fixedUpdate` Lua callbacks (seconds).
+    ///
+    /// Driven by `PerformanceConfig::fixed_update_tick_rate`.  Remains `0.0`
+    /// when the fixed-update loop is disabled.
+    fixed_update_accumulator: f64,
 
     // Input tracking for keypressed / keyreleased callbacks.
     prev_mouse: [bool; 5],
@@ -256,6 +261,7 @@ impl LunaApp {
             last_frame: Instant::now(),
             ready_fired: false,
             physics_accumulator: 0.0,
+            fixed_update_accumulator: 0.0,
             prev_mouse: [false; 5],
             mouse_x: 0.0,
             mouse_y: 0.0,
@@ -503,6 +509,7 @@ impl LunaApp {
         // Reset per-game pipeline state.
         self.ready_fired = false;
         self.physics_accumulator = 0.0;
+        self.fixed_update_accumulator = 0.0;
 
         // Show conf.lua error if present
         if let Some(conf_err) = self.conf_error.take() {
@@ -530,6 +537,10 @@ impl LunaApp {
         shared_state.window = self.window.as_ref().map(Arc::clone);
         shared_state.physics_fixed_dt =
             1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
+        shared_state.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
+            Some(rate) if rate > 0 => 1.0 / rate as f64,
+            _ => 0.0,
+        };
 
         // Initialize viewport state from config.
         {
@@ -841,6 +852,25 @@ impl LunaApp {
                 if let Err(e) = call_lua_callback_checked(lua, "process_physics", fixed_dt) {
                     self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                     return;
+                }
+            }
+        }
+
+        // ── 2b. fixedUpdate (independent fixed timestep, may fire 0..N times) ──
+        {
+            let fixed_dt = state.borrow().fixed_update_dt;
+            if fixed_dt > 0.0 {
+                self.fixed_update_accumulator += dt;
+                // Safety cap: max 8 fixedUpdate steps per frame.
+                let max_steps = 8;
+                let mut steps = 0;
+                while self.fixed_update_accumulator >= fixed_dt && steps < max_steps {
+                    self.fixed_update_accumulator -= fixed_dt;
+                    steps += 1;
+                    if let Err(e) = call_lua_callback_checked(lua, "fixedUpdate", fixed_dt) {
+                        self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
+                        return;
+                    }
                 }
             }
         }
@@ -1252,6 +1282,18 @@ impl LunaApp {
                 }
                 self.auto_screenshot_done = true;
                 state.borrow_mut().quit_requested = true;
+            }
+        }
+
+        // ── Frame budget warning ─────────────────────────────────────────
+        if let Some(budget_ms) = self.config.performance.frame_budget_warn_ms {
+            let elapsed_ms = self.last_frame.elapsed().as_secs_f64() * 1000.0;
+            if elapsed_ms > budget_ms as f64 {
+                log::warn!(
+                    "frame budget exceeded: {:.2}ms > {}ms threshold",
+                    elapsed_ms,
+                    budget_ms
+                );
             }
         }
     }

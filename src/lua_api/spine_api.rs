@@ -289,6 +289,28 @@ impl LuaUserData for LuaSkeleton {
                 Ok(())
             },
         );
+
+        // -- blendAnimation --
+        /// Evaluates `anim` at `time` and blends the result into this skeleton
+        /// with the given `blend_weight` (`0.0` = no effect, `1.0` = full override).
+        ///
+        /// Useful for cross-fading between two animations:
+        /// ```lua
+        /// skeleton:updateAnimation(dt)           -- advance primary clip
+        /// skeleton:blendAnimation(overlay, t, 0.4) -- blend in secondary
+        /// ```
+        /// @param anim : SkeletonAnimation
+        /// @param time : number
+        /// @param blend_weight : number?
+        methods.add_method_mut(
+            "blendAnimation",
+            |_, this, (anim_ud, time, blend_weight): (mlua::AnyUserData, f32, Option<f32>)| {
+                let anim_ref = anim_ud.borrow::<LuaSkeletonAnimation>().map_err(mlua::Error::external)?;
+                let w = blend_weight.unwrap_or(1.0);
+                anim_ref.inner.apply_to_skeleton_blended(&mut this.inner, time, w);
+                Ok(())
+            },
+        );
     }
 }
 
@@ -358,6 +380,44 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Returns the total duration of the animation in seconds.
         /// @return number
         methods.add_method("getDuration", |_, this, ()| Ok(this.inner.duration));
+
+        // -- addEventKey --
+        /// Adds a named event marker at `time` seconds in the animation.
+        ///
+        /// Registered Lua callbacks receive these events when the playhead crosses
+        /// each marker.  Events are sorted by time automatically.
+        /// @param time : number
+        /// @param name : string
+        /// @param value : number?
+        methods.add_method_mut(
+            "addEventKey",
+            |_, this, (time, name, value): (f32, String, Option<f32>)| {
+                this.inner.add_event_key(time, name, value.unwrap_or(0.0));
+                Ok(())
+            },
+        );
+
+        // -- getEvents --
+        /// Returns a list of event names that fall in the half-open interval `(from, to]`.
+        ///
+        /// Useful for polling events after each `updateAnimation` call.
+        /// @param from : number
+        /// @param to : number
+        /// @return table  — Array of `{name: string, value: number}` tables.
+        methods.add_method(
+            "getEvents",
+            |lua, this, (from, to): (f32, f32)| {
+                let pairs = this.inner.collect_events(from, to);
+                let tbl = lua.create_table()?;
+                for (i, (name, value)) in pairs.into_iter().enumerate() {
+                    let entry = lua.create_table()?;
+                    entry.set("name", name)?;
+                    entry.set("value", value)?;
+                    tbl.set(i + 1, entry)?;
+                }
+                Ok(tbl)
+            },
+        );
 
         // -- getTimelineCount --
         /// Returns the number of bone timelines in this animation.

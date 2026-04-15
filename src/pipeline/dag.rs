@@ -63,6 +63,7 @@ impl ErrorMode {
 /// # Fields
 /// - `name` — `String`.
 /// - `error_mode` — `ErrorMode`.
+#[derive(Debug, Clone)]
 pub struct Pipeline {
     /// Human-readable name for this pipeline.
     pub name: String,
@@ -463,6 +464,67 @@ impl Pipeline {
             Err(e) => lines.push(format!("  (cycle detected: {})", e)),
         }
         lines.join("\n")
+    }
+
+    /// Merges all steps from a sub-pipeline into this pipeline with a name prefix.
+    ///
+    /// Every step name in `sub` is prefixed with `"{alias}/"` to avoid conflicts.
+    /// Steps in `sub` that have no dependencies become dependent on every step
+    /// listed in `outer_deps` (which must already exist in `self`).
+    ///
+    /// This lets you express a multi-phase init pipeline as a composition of
+    /// smaller named pipelines without manually cross-wiring each step.
+    ///
+    /// Returns `Err` if any name in `outer_deps` does not exist in `self`, or
+    /// if the resulting pipeline would contain a cycle.
+    ///
+    /// # Parameters
+    /// - `sub` — `Pipeline`. The pipeline to inline.
+    /// - `alias` — `&str`. Prefix applied to every step name from `sub`.
+    /// - `outer_deps` — `Vec<String>`. Steps in `self` that the sub-pipeline's
+    ///   entry points should depend on.
+    ///
+    /// # Returns
+    /// `Result<(), String>`.
+    pub fn add_sub_pipeline(
+        &mut self,
+        sub: Pipeline,
+        alias: &str,
+        outer_deps: Vec<String>,
+    ) -> Result<(), String> {
+        // Validate outer_deps all exist in self.
+        for dep in &outer_deps {
+            if !self.steps.contains_key(dep.as_str()) {
+                return Err(format!(
+                    "add_sub_pipeline: outer dependency '{}' does not exist in pipeline '{}'",
+                    dep, self.name
+                ));
+            }
+        }
+        // Determine entry points of the sub-pipeline (steps with no sub-pipeline-internal deps).
+        let sub_entry_points: HashSet<String> = sub
+            .steps
+            .values()
+            .filter(|s| s.deps.is_empty())
+            .map(|s| s.name.clone())
+            .collect();
+        // Import every step from sub with prefixed names.
+        for mut step in sub.steps.into_values() {
+            let prefixed_name = format!("{}/{}", alias, step.name);
+            // Prefix all dep references.
+            step.deps = step
+                .deps
+                .into_iter()
+                .map(|d| format!("{}/{}", alias, d))
+                .collect();
+            // For entry points, also add outer_deps.
+            if sub_entry_points.contains(&step.name) {
+                step.deps.extend(outer_deps.clone());
+            }
+            step.name = prefixed_name;
+            self.add_step(step)?;
+        }
+        Ok(())
     }
 
     // ---------------------------------------------------------------------------

@@ -415,6 +415,22 @@ pub struct WidgetBase {
     pub flex_grow: f32,
     /// Flexbox shrink factor.
     pub flex_shrink: f32,
+    /// Alpha transparency for this widget (`0.0` = fully transparent, `1.0` = fully opaque).
+    ///
+    /// Passed to the render command for the widget and applied as a multiplier on draw-time
+    /// colour alpha.  Enables smooth fadeIn/fadeOut transitions.
+    pub alpha: f32,
+    /// Entity ID this widget is anchored to in world space, if any.
+    ///
+    /// When set, the UI layout system overrides (x, y) each frame using the
+    /// entity's world-space position projected to screen coordinates.
+    /// `None` means the widget is layed out normally.
+    pub entity_attachment: Option<u64>,
+    /// Data-binding key for `update_bindings`.
+    ///
+    /// When set, `lurek.ui.update_bindings(data)` will look for this key in
+    /// the `data` table and update the widget's value/text automatically.
+    pub bind_key: Option<String>,
     /// Computed screen-space rectangle after layout. Written by `run_layout_pass()`.
     pub computed_rect: crate::math::Rect,
     /// Whether this widget is visible after layout (not clipped by parent).
@@ -461,6 +477,9 @@ impl WidgetBase {
             anchor_center_y: None,
             flex_grow: 0.0,
             flex_shrink: 0.0,
+            alpha: 1.0,
+            entity_attachment: None,
+            bind_key: None,
             computed_rect: crate::math::Rect::new(0.0, 0.0, 0.0, 0.0),
             is_visible: true,
         }

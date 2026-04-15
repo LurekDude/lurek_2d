@@ -586,6 +586,155 @@ impl DataFrame {
 
         DataFrame { column_names, data }
     }
+
+    /// Creates a new `DataFrame` with an extra computed column.
+    ///
+    /// `expr` is a simple arithmetic expression referencing column names and
+    /// numeric literals, supporting `+`, `-`, `*`, `/`.  Column names must
+    /// match exactly (case-sensitive).  Column values are accessed row-by-row;
+    /// non-numeric cells are treated as `0.0`.
+    ///
+    /// # Parameters
+    /// - `col_name` — `&str`. Name for the new computed column.
+    /// - `expr` — `&str`. Expression, e.g. `"health + bonus * 0.5"`.
+    ///
+    /// # Returns
+    /// `Result<DataFrame, String>`.  Returns `Err` if the expression is
+    /// syntactically invalid or references an unknown column.
+    ///
+    /// # Examples
+    /// ```ignore
+    /// let df2 = df.with_eval("total", "health + armor")?;
+    /// ```
+    pub fn with_eval(&self, col_name: &str, expr: &str) -> Result<DataFrame, String> {
+        let tokens = tokenize_expr(expr)?;
+        // Validate all column references exist.
+        for tok in &tokens {
+            if let ExprToken::ColRef(name) = tok {
+                if !self.column_names.contains(name) {
+                    return Err(format!("with_eval: unknown column '{name}' in expression"));
+                }
+            }
+        }
+        let n_rows = if self.data.is_empty() { 0 } else { self.data[0].len() };
+        let mut computed: Vec<CellValue> = Vec::with_capacity(n_rows);
+        for row_idx in 0..n_rows {
+            let val = eval_expr_row(&tokens, self, row_idx)?;
+            computed.push(CellValue::Float(val));
+        }
+        let mut result = self.clone();
+        result.column_names.push(col_name.to_string());
+        result.data.push(computed);
+        Ok(result)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Expression evaluator (internal helpers for with_eval)
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone)]
+enum ExprToken {
+    Num(f64),
+    ColRef(String),
+    Op(char),
+    LParen,
+    RParen,
+}
+
+/// Tokenises an arithmetic expression string.
+fn tokenize_expr(expr: &str) -> Result<Vec<ExprToken>, String> {
+    let mut tokens = Vec::new();
+    let mut chars = expr.chars().peekable();
+    while let Some(&c) = chars.peek() {
+        match c {
+            ' ' | '\t' => { chars.next(); }
+            '+' | '-' | '*' | '/' => { tokens.push(ExprToken::Op(c)); chars.next(); }
+            '(' => { tokens.push(ExprToken::LParen); chars.next(); }
+            ')' => { tokens.push(ExprToken::RParen); chars.next(); }
+            '0'..='9' | '.' => {
+                let mut s = String::new();
+                while let Some(&d) = chars.peek() {
+                    if d.is_ascii_digit() || d == '.' { s.push(d); chars.next(); } else { break; }
+                }
+                let v: f64 = s.parse().map_err(|_| format!("with_eval: invalid number '{s}'"))?;
+                tokens.push(ExprToken::Num(v));
+            }
+            'a'..='z' | 'A'..='Z' | '_' => {
+                let mut s = String::new();
+                while let Some(&d) = chars.peek() {
+                    if d.is_alphanumeric() || d == '_' { s.push(d); chars.next(); } else { break; }
+                }
+                tokens.push(ExprToken::ColRef(s));
+            }
+            other => return Err(format!("with_eval: unexpected character '{other}'")),
+        }
+    }
+    Ok(tokens)
+}
+
+/// Evaluates a flat (no parentheses) token sequence for a single row using
+/// standard operator precedence (`*` `/` before `+` `-`).
+fn eval_expr_row(tokens: &[ExprToken], df: &DataFrame, row_idx: usize) -> Result<f64, String> {
+    // Convert tokens to values, resolving column references.
+    let mut values: Vec<f64> = Vec::new();
+    let mut ops: Vec<char> = Vec::new();
+    let mut expect_value = true;
+    for tok in tokens {
+        match tok {
+            ExprToken::Num(v) => {
+                if !expect_value { return Err("with_eval: unexpected number".to_string()); }
+                values.push(*v);
+                expect_value = false;
+            }
+            ExprToken::ColRef(name) => {
+                if !expect_value { return Err(format!("with_eval: unexpected column '{name}'")); }
+                let col_idx = df.column_names.iter().position(|c| c == name)
+                    .ok_or_else(|| format!("with_eval: column '{name}' not found"))?;
+                let v = match df.data[col_idx].get(row_idx) {
+                    Some(CellValue::Float(f)) => *f,
+                    Some(CellValue::Int(i)) => *i as f64,
+                    _ => 0.0,
+                };
+                values.push(v);
+                expect_value = false;
+            }
+            ExprToken::Op(op) => {
+                if expect_value && *op == '-' {
+                    // Unary minus: push a -1 multiplier
+                    values.push(-1.0);
+                    ops.push('*');
+                } else {
+                    if expect_value { return Err(format!("with_eval: unexpected operator '{op}'")); }
+                    ops.push(*op);
+                    expect_value = true;
+                }
+            }
+            ExprToken::LParen | ExprToken::RParen => {
+                // Parentheses not yet supported in the simple evaluator.
+                return Err("with_eval: parentheses are not supported".to_string());
+            }
+        }
+    }
+    if expect_value { return Err("with_eval: expression ends with operator".to_string()); }
+    // Apply * and / first.
+    let mut i = 0;
+    while i < ops.len() {
+        if ops[i] == '*' || ops[i] == '/' {
+            let r = if ops[i] == '*' { values[i] * values[i + 1] }
+                    else if values[i + 1] == 0.0 { return Err("with_eval: division by zero".to_string()); }
+                    else { values[i] / values[i + 1] };
+            values[i] = r;
+            values.remove(i + 1);
+            ops.remove(i);
+        } else { i += 1; }
+    }
+    // Apply + and -.
+    let mut result = values[0];
+    for (op, &v) in ops.iter().zip(values[1..].iter()) {
+        match op { '+' => result += v, '-' => result -= v, _ => {} }
+    }
+    Ok(result)
 }
 
 impl Default for DataFrame {

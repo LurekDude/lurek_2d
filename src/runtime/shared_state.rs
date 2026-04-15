@@ -364,6 +364,11 @@ pub struct SharedState {
     pub light_world: LightWorld,
     /// Fixed time-step for `process_physics` callback, in seconds (default 1/60).
     pub physics_fixed_dt: f64,
+    /// Fixed time-step for the `fixedUpdate` Lua callback, in seconds.
+    ///
+    /// `0.0` means the fixed-update loop is disabled.  Set from
+    /// `PerformanceConfig::fixed_update_tick_rate` during `init_lua`.
+    pub fixed_update_dt: f64,
     /// Whether the physics debug overlay (AABB + velocity vectors) is enabled.
     ///
     /// Set via `lurek.physics.debugDraw(true)`.  When `true` the engine appends
@@ -471,6 +476,7 @@ impl SharedState {
             depth_mode: (DepthMode::Always, false),
             light_world: LightWorld::new(),
             physics_fixed_dt: 1.0 / 60.0,
+            fixed_update_dt: 0.0,
             physics_debug_draw: false,
             auto_parallax_layers: Vec::new(),
             auto_tilemaps: Vec::new(),

@@ -273,11 +273,19 @@ impl ModulesConfig {
 /// # Fields
 /// - `target_fps` — Desired frames per second for the game loop.
 /// - `physics_tick_rate` — Fixed tick rate for `process_physics` callback (Hz, default 60).
+/// - `fixed_update_tick_rate` — Optional fixed tick rate for the `fixedUpdate` Lua callback (Hz).  `None` disables fixed update.
+/// - `frame_budget_warn_ms` — If set, emit a `warn!` log when a frame exceeds this many milliseconds.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerformanceConfig {
     pub target_fps: u32,
     /// Fixed tick rate in Hz for the `process_physics` callback (default 60).
     pub physics_tick_rate: u32,
+    /// Optional fixed tick rate in Hz for the `fixedUpdate` Lua callback.  `None` = disabled.
+    #[serde(default)]
+    pub fixed_update_tick_rate: Option<u32>,
+    /// Frame time threshold in milliseconds before a `warn!` is emitted.  `None` = no warning.
+    #[serde(default)]
+    pub frame_budget_warn_ms: Option<f32>,
 }
 
 impl Default for Config {
@@ -349,6 +357,8 @@ impl Default for Config {
             performance: PerformanceConfig {
                 target_fps: 60,
                 physics_tick_rate: 60,
+                fixed_update_tick_rate: None,
+                frame_budget_warn_ms: None,
             },
             identity: None,
             version: None,

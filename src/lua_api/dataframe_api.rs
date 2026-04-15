@@ -954,6 +954,28 @@ impl LuaUserData for LuaDataFrame {
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "DataFrame" || name == "Object"));
 
+        // -- withEval --
+        /// Returns a new DataFrame with an additional computed column named `col_name`.
+        ///
+        /// `expr` is a simple arithmetic expression referencing existing column names and
+        /// numeric literals, supporting `+`, `-`, `*`, `/`.  For example:
+        /// `"health + bonus * 0.5"` or `"speed - friction"`.
+        ///
+        /// Non-numeric cell values in referenced columns are treated as `0.0`.
+        ///
+        /// # Usage
+        /// ```lua
+        /// local df2 = df:withEval("total", "attack + bonus * 1.5")
+        /// ```
+        /// @param col_name : string
+        /// @param expr : string
+        /// @return DataFrame
+        methods.add_method("withEval", |lua, this, (col_name, expr): (String, String)| {
+            let result = this.inner.with_eval(&col_name, &expr)
+                .map_err(|e| LuaError::RuntimeError(e))?;
+            lua.create_userdata(LuaDataFrame { inner: result })
+        });
+
     }
 }
 

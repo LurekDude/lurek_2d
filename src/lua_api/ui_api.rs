@@ -744,12 +744,186 @@ fn create_widget_table<'a>(
     /// Returns the flex-shrink factor.
     /// @return number
     let c = ctx.clone();
-    /// @return table
     t.set(
         "getFlexShrink",
         lua.create_function(move |_, ()| {
             let g = c.borrow();
             Ok(g.widgets.get(idx).map_or(0.0, |w| w.base().flex_shrink))
+        })?,
+    )?;
+
+    // -- bind --
+    /// Registers a data-binding key on this widget.
+    ///
+    /// When `lurek.ui.update_bindings(data)` is called with a table, any widget
+    /// whose binding key exists in `data` will have its value/text automatically
+    /// updated.  This lets you separate UI layout from data updates.
+    ///
+    /// # Usage
+    /// ```lua
+    /// health_bar:bind("player.health")
+    /// -- Later:
+    /// lurek.ui.update_bindings({ ["player.health"] = 80 })
+    /// ```
+    /// @param key : string  — Data key to observe.
+    let c = ctx.clone();
+    t.set(
+        "bind",
+        lua.create_function(move |_, key: String| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().bind_key = Some(key);
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- unbind --
+    /// Removes the data-binding key from this widget.
+    /// @return nil
+    let c = ctx.clone();
+    t.set(
+        "unbind",
+        lua.create_function(move |_, ()| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().bind_key = None;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- setAlpha --
+    /// Sets the widget's alpha transparency (`0.0` fully transparent, `1.0` opaque).
+    /// @param alpha : number
+    let c = ctx.clone();
+    t.set(
+        "setAlpha",
+        lua.create_function(move |_, alpha: f32| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().alpha = alpha.clamp(0.0, 1.0);
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- getAlpha --
+    /// Returns the widget's current alpha transparency.
+    /// @return number
+    let c = ctx.clone();
+    t.set(
+        "getAlpha",
+        lua.create_function(move |_, ()| {
+            let g = c.borrow();
+            Ok(g.widgets.get(idx).map_or(1.0, |w| w.base().alpha))
+        })?,
+    )?;
+
+    // -- fadeIn --
+    /// Instantly fades the widget in (sets alpha to `1.0`).
+    ///
+    /// For animated fades, update `setAlpha` each frame via `lurek.process`.
+    /// @return nil
+    let c = ctx.clone();
+    t.set(
+        "fadeIn",
+        lua.create_function(move |_, ()| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().alpha = 1.0;
+                w.base_mut().visible = true;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- fadeOut --
+    /// Instantly fades the widget out (sets alpha to `0.0` and hides it).
+    ///
+    /// For animated fades, update `setAlpha` each frame via `lurek.process`.
+    /// @return nil
+    let c = ctx.clone();
+    t.set(
+        "fadeOut",
+        lua.create_function(move |_, ()| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().alpha = 0.0;
+                w.base_mut().visible = false;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- slideIn --
+    /// Instantly moves the widget to `(x, y)` and makes it visible.
+    ///
+    /// For animated slides, interpolate position each frame via `lurek.process`.
+    /// @param x : number  — Target X position.
+    /// @param y : number  — Target Y position.
+    let c = ctx.clone();
+    t.set(
+        "slideIn",
+        lua.create_function(move |_, (x, y): (f32, f32)| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().x = x;
+                w.base_mut().y = y;
+                w.base_mut().visible = true;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- slideOut --
+    /// Instantly moves the widget to the off-screen position `(x, y)` and hides it.
+    /// @param x : number  — Off-screen X position.
+    /// @param y : number  — Off-screen Y position.
+    let c = ctx.clone();
+    t.set(
+        "slideOut",
+        lua.create_function(move |_, (x, y): (f32, f32)| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().x = x;
+                w.base_mut().y = y;
+                w.base_mut().visible = false;
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- attachToEntity --
+    /// Anchors this widget to a world-space entity by its numeric ID.
+    ///
+    /// Each frame the layout system projects the entity's world position to
+    /// screen coordinates and overrides the widget's (x, y).
+    /// @param entity_id : integer
+    let c = ctx.clone();
+    t.set(
+        "attachToEntity",
+        lua.create_function(move |_, entity_id: u64| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().entity_attachment = Some(entity_id);
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- detachFromEntity --
+    /// Removes the entity anchor from this widget, restoring normal layout positioning.
+    /// @return nil
+    let c = ctx.clone();
+    t.set(
+        "detachFromEntity",
+        lua.create_function(move |_, ()| {
+            let mut g = c.borrow_mut();
+            if let Some(w) = g.widgets.get_mut(idx) {
+                w.base_mut().entity_attachment = None;
+            }
+            Ok(())
         })?,
     )?;
 
@@ -5775,6 +5949,60 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "flushCache",
         lua.create_function(move |_, ()| Ok(c.borrow_mut().flush_cache()))?,
+    )?;
+
+    // -- update_bindings --
+    /// Updates all widgets that have a data-binding key registered via `:bind(key)`.
+    ///
+    /// For each entry in `data`, any widget whose binding key matches will have
+    /// its value/text updated automatically:
+    /// - Number → `Slider` value, `ProgressBar` value
+    /// - String → `Label` text, `Button` text
+    ///
+    /// # Usage
+    /// ```lua
+    /// lurek.ui.update_bindings({ ["player.health"] = 80, ["player.name"] = "Anya" })
+    /// ```
+    /// @param data : table
+    let c = ctx.clone();
+    tbl.set(
+        "update_bindings",
+        lua.create_function(move |_, data: mlua::Table| {
+            use crate::ui::context::WidgetKind;
+            let mut g = c.borrow_mut();
+            for w in g.widgets.iter_mut() {
+                let key_opt = w.base().bind_key.clone();
+                let Some(key) = key_opt else { continue; };
+                let val: mlua::Value = match data.get(key.as_str()) {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                match val {
+                    mlua::Value::Number(n) => match w {
+                        WidgetKind::Slider(sl) => sl.value = n as f32,
+                        WidgetKind::ProgressBar(pb) => pb.value = n as f32,
+                        _ => {}
+                    },
+                    mlua::Value::String(s) => {
+                        if let Ok(text) = s.to_str() {
+                            let text = text.to_string();
+                            match w {
+                                WidgetKind::Label(lbl) => lbl.text = text,
+                                WidgetKind::Button(btn) => btn.text = text,
+                                _ => {}
+                            }
+                        }
+                    }
+                    mlua::Value::Integer(n) => match w {
+                        WidgetKind::Slider(sl) => sl.value = n as f32,
+                        WidgetKind::ProgressBar(pb) => pb.value = n as f32,
+                        _ => {}
+                    },
+                    _ => {}
+                }
+            }
+            Ok(())
+        })?,
     )?;
 
     luna.set("ui", tbl)?;

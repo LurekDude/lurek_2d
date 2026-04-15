@@ -46,10 +46,26 @@ workers would unlock stages that wait for I/O without blocking.
 
 ---
 
-### ❌ TODO — Pipeline Composition (Nested / Merge)
+### ✅ DONE — Pipeline Composition (Nested / Merge)
 **Source**: features/pipeline.md — Feature Gaps #7
 
-No pipeline nesting. Can't reuse a pipeline as a single stage in another pipeline.
+`Pipeline::add_sub_pipeline(sub, alias, outer_deps)` added to `src/pipeline/dag.rs`.
+`Pipeline` now derives `Clone` (required for passing a sub-pipeline by value to the method).
+`LuaPipeline:addSubPipeline(sub, alias, outer_deps?)` registered in `src/lua_api/pipeline_api.rs`.
+
+Every step in `sub` gets prefixed with `alias/`.  Entry-point steps gain dependencies listed in `outer_deps`.
+
+```lua
+local audio = lurek.pipeline.newPipeline("audio")
+audio:addStep(lurek.pipeline.newStep("init_mixer",   fn_init_mixer))
+audio:addStep(lurek.pipeline.newStep("load_banks",   fn_load_banks, { "init_mixer" }))
+
+main:addSubPipeline(audio, "audio", { "boot" })
+-- creates: "audio/init_mixer" (depends on "boot")
+--          "audio/load_banks"  (depends on "audio/init_mixer")
+```
+
+Implemented: 2026-04-15
 
 ---
 
@@ -72,8 +88,15 @@ Fired from `fire_step_callbacks` after both the Completed and Failed branches.
 
 ---
 
-### ❌ TODO — Documented Use Cases and Examples
+### ✅ DONE — Documented Use Cases and Examples
 **Source**: features/pipeline.md — Suggestions #5
 
-No examples demonstrating real game use cases: asset loading pipeline, mod loading
-order, game initialization order. Without examples, users won't discover the module.
+`content/examples/pipeline.lua` created with a comprehensive walkthrough covering:
+- `addStep` with dependencies
+- `addSubPipeline` for reusable sub-pipelines
+- `addConditional` for environment-gated steps
+- `onProgress` callbacks for loading screens
+- `toAscii()` DAG visualization
+- `getExecutionOrder()` and `getParallelGroups()` inspection helpers
+
+Implemented: 2026-04-15

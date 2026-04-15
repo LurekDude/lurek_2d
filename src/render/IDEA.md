@@ -87,13 +87,21 @@ High visual impact for health bars, backgrounds, vignettes, sky gradients.
 
 ---
 
-### ❌ TODO — Rich Text (Mixed Fonts / Colors / Sizes)
+### ✅ DONE — Rich Text (Mixed Fonts / Colors / Sizes)
 **Source**: features/graphics.md — Feature Gaps #3 / Suggestions #4
 
-No BBCode-style or markup text. Single-color, single-font text only.
+`TextSpan` struct + `RenderCommand::DrawRichText` added to `src/render/renderer.rs`.
+`lurek.graphic.printRich(spans, x, y)` registered in `src/lua_api/render_api.rs`.
+Each span carries independent `r/g/b/a` colour and `scale` multiplier.
+
 ```lua
-lurek.gfx.drawRichText("[color=#ff0000]HP:[/color] 100", x, y)
+lurek.graphic.printRich({
+  { text = "HP: ",  r=255, g=255, b=255, a=255, scale=1.0 },
+  { text = "100",   r=80,  g=200, b=80,  a=255, scale=1.0 },
+}, 10, 10)
 ```
+
+Implemented: 2026-04-15
 
 ---
 

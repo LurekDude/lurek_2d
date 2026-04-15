@@ -309,6 +309,48 @@ pub struct PostFxPass {
 /// - `DrawBevelRect` — DrawBevelRect variant.
 /// - `PushLayer` — PushLayer variant.
 /// - `PopLayer` — PopLayer variant.
+/// - `DrawRichText` — DrawRichText variant.
+
+/// One styled segment inside a [`RenderCommand::DrawRichText`] command.
+///
+/// Each span can carry its own colour and scale, while the command as a
+/// whole provides the default font and the baseline origin.
+///
+/// # Fields
+/// - `text` — `String`. UTF-8 text content of this span.
+/// - `r`, `g`, `b`, `a` — `u8`. RGBA colour override (0–255).
+/// - `scale` — `f32`. Font scale multiplier (1.0 = default size).
+#[derive(Debug, Clone)]
+pub struct TextSpan {
+    /// UTF-8 text content of this span.
+    pub text: String,
+    /// Red channel (0–255).
+    pub r: u8,
+    /// Green channel (0–255).
+    pub g: u8,
+    /// Blue channel (0–255).
+    pub b: u8,
+    /// Alpha channel (0–255, 255 = fully opaque).
+    pub a: u8,
+    /// Scale multiplier applied to the default font size.
+    pub scale: f32,
+}
+
+impl TextSpan {
+    /// Creates a new span with the given text, RGBA colour, and scale.
+    ///
+    /// # Parameters
+    /// - `text` — `impl Into<String>`. Text content.
+    /// - `r`, `g`, `b`, `a` — `u8`. RGBA components.
+    /// - `scale` — `f32`. Font scale multiplier.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn new(text: impl Into<String>, r: u8, g: u8, b: u8, a: u8, scale: f32) -> Self {
+        Self { text: text.into(), r, g, b, a, scale }
+    }
+}
+
 pub enum RenderCommand {
     SetColor(f32, f32, f32, f32),
     Rectangle {
@@ -411,6 +453,16 @@ pub enum RenderCommand {
         x: f32,
         y: f32,
         scale: f32,
+    },
+    /// Draw a sequence of individually-styled text spans at a common baseline.
+    ///
+    /// Each span in `spans` can carry its own colour and scale, allowing
+    /// mixed-style rich text to be drawn in a single command.
+    DrawRichText {
+        font_key: FontKey,
+        spans: Vec<TextSpan>,
+        x: f32,
+        y: f32,
     },
     SetLineWidth(f32),
     // ── Feature 1: Transform stack ──────────────────────────────────────────

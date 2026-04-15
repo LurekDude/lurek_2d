@@ -1986,11 +1986,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                     Some("justify") => TextAlign::Justify,
                     _ => TextAlign::Left,
                 };
-                let active_font = s
-                    .borrow()
-                    .active_font
-                    .or(s.borrow().default_font)
-                    .or(s.borrow().default_font);
+                let active_font = {
+                    let st = s.borrow();
+                    st.active_font.or(st.default_font)
+                };
                 if let Some(font_key) = active_font {
                     s.borrow_mut()
                         .render_commands
@@ -2007,6 +2006,60 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 Ok(())
             },
         )?,
+    )?;
+
+    // -- printRich --
+    /// Draws a sequence of individually-styled text spans at `(x, y)`.
+    ///
+    /// `spans` is a list of tables, each with:
+    ///   - `text`  — string content
+    ///   - `r`, `g`, `b`, `a` — colour components as integers in `0..255`
+    ///   - `scale` — font scale multiplier (default `1.0`)
+    ///
+    /// All spans share the font set by the last `lurek.graphic.setFont()` call.
+    ///
+    /// # Usage
+    /// ```lua
+    /// lurek.graphic.printRich(spans, x, y)
+    /// lurek.graphic.printRich({{ text="Hello ", r=255, g=255, b=255, a=255, scale=1 },
+    ///                          { text="world",  r=255, g=100, b=100, a=255, scale=1.2 }}, 10, 10)
+    /// ```
+    /// @param spans : table[]
+    /// @param x : number
+    /// @param y : number
+    let s = state.clone();
+    graphics.set(
+        "printRich",
+        lua.create_function(move |_, (spans_table, x, y): (mlua::Table, f32, f32)| {
+            use crate::render::renderer::TextSpan;
+            let font_key_opt = {
+                let st = s.borrow();
+                st.active_font.or(st.default_font)
+            };
+            let Some(font_key) = font_key_opt else {
+                return Ok(());
+            };
+            let mut spans: Vec<TextSpan> = Vec::new();
+            for pair in spans_table.pairs::<mlua::Value, mlua::Table>() {
+                let (_, span_tbl) = pair.map_err(mlua::Error::external)?;
+                let text: String = span_tbl.get::<_, String>("text").unwrap_or_default();
+                let r: u8 = span_tbl.get::<_, u8>("r").unwrap_or(255);
+                let g: u8 = span_tbl.get::<_, u8>("g").unwrap_or(255);
+                let b: u8 = span_tbl.get::<_, u8>("b").unwrap_or(255);
+                let a: u8 = span_tbl.get::<_, u8>("a").unwrap_or(255);
+                let scale: f32 = span_tbl.get::<_, f32>("scale").unwrap_or(1.0);
+                spans.push(TextSpan::new(text, r, g, b, a, scale));
+            }
+            s.borrow_mut()
+                .render_commands
+                .push(crate::render::renderer::RenderCommand::DrawRichText {
+                    font_key,
+                    spans,
+                    x,
+                    y,
+                });
+            Ok(())
+        })?,
     )?;
 
     // ── Clear ────────────────────────────────────────────────────────────────

@@ -270,3 +270,31 @@ print(p2:toAscii())
 -- L0: [init]
 -- L1: [load <-- init] || [validate <-- init]
 -- L2: [start <-- load,validate]
+
+-- ─── Sub-Pipeline Composition (addSubPipeline) ────────────────────────────────
+-- addSubPipeline(sub_pipeline, alias, outer_deps?) → nil
+--   Inlines every step from sub_pipeline into this pipeline, prefix-naming them
+--   as "alias/step_name".  Entry-point steps of the sub-pipeline depend on any
+--   names listed in outer_deps (which must already exist in this pipeline).
+
+local main = lurek.pipeline.newPipeline("main")
+main:addStep("boot")
+main:addStep("load_config", { deps = {"boot"} })
+
+-- Build a sub-pipeline for audio loading.
+local audio_sub = lurek.pipeline.newPipeline("audio")
+local a1 = lurek.pipeline.newStep("init_mixer",   function() print("mixer up") end)
+local a2 = lurek.pipeline.newStep("load_banks",   function() print("banks loaded") end)
+a2:dependsOn("init_mixer")
+audio_sub:addStep(a1):addStep(a2)
+
+-- Inline into main: entry-point "init_mixer" depends on "load_config"
+-- Resulting names: "audio/init_mixer", "audio/load_banks"
+main:addSubPipeline(audio_sub, "audio", { "load_config" })
+
+print("Main + audio sub-pipeline:")
+print(main:toAscii())
+
+-- Run it all at once
+local ok2, err2 = main:run()
+print("Compose run:", ok2, err2)
