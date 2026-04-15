@@ -497,11 +497,63 @@ describe("data.write + data.read (Binary Pack Format)", function()
     expect_equal(string.byte(b, 2), 0x02)
   end)
 
-  -- @description Verifies that writing a little-endian u16 value 0x0102 stores bytes in the order 0x02 then 0x01.
+  -- @description Writes the little-endian u16 value 0x0102 and confirms bytes are 0x02 then 0x01.
   it("little-endian u16 has correct byte order", function()
     local b = lurek.data.write("le u16", 0x0102)
     expect_equal(string.byte(b, 1), 0x02)
     expect_equal(string.byte(b, 2), 0x01)
   end)
 end)
+
+-- ── ByteData bit operations ──────────────────────────────────────────────────
+
+-- @description Verifies individual bit set/get round-trips, bit clearing, single-byte and cross-byte readBits, and out-of-range error handling.
+describe("data.newByteData bit operations", function()
+  -- @covers lurek.data.newByteData
+  -- @description Creates a 2-byte buffer, sets bit 3 of byte 0, reads it back as true; confirms adjacent bit 2 is still false.
+  it("bytedata_setBit_and_getBit_round_trip", function()
+    local bd = lurek.data.newByteData(2)
+    bd:setBit(0, 3, true)
+    expect_true(bd:getBit(0, 3), "bit 3 should be true after setBit")
+    expect_false(bd:getBit(0, 2), "bit 2 should remain false")
+  end)
+
+  -- @covers lurek.data.newByteData
+  -- @description Sets bit 3, then clears it with setBit(false); confirms getBit returns false.
+  it("bytedata_setBit_clear_sets_false", function()
+    local bd = lurek.data.newByteData(2)
+    bd:setBit(0, 3, true)
+    bd:setBit(0, 3, false)
+    expect_false(bd:getBit(0, 3), "bit should be false after clearing")
+  end)
+
+  -- @covers lurek.data.newByteData
+  -- @description Writes 0xFF into byte 0; readBits(0, 0, 8) must return 255.
+  it("bytedata_readBits_single_byte", function()
+    local bd = lurek.data.newByteData(2)
+    bd:setByte(0, 0xFF)
+    local val = bd:readBits(0, 0, 8)
+    expect_equal(val, 255, "reading all 8 bits of 0xFF should give 255")
+  end)
+
+  -- @covers lurek.data.newByteData
+  -- @description Writes 0xFF into byte 0 and 0x01 into byte 1; readBits(0, 4, 8) reads 4 high bits from byte 0 (0xF) then 4 low bits from byte 1 (0x1) → 0x1F = 31.
+  it("bytedata_readBits_spanning_bytes", function()
+    local bd = lurek.data.newByteData(2)
+    bd:setByte(0, 0xFF)
+    bd:setByte(1, 0x01)
+    local val = bd:readBits(0, 4, 8)
+    expect_equal(val, 31, "spanning read of 0xFF / 0x01 from bit 4 should yield 0x1F = 31")
+  end)
+
+  -- @covers lurek.data.newByteData
+  -- @description Calls setBit with bit_offset=8 (out of valid 0..7 range); expects an error.
+  it("bytedata_setBit_out_of_range_raises_error", function()
+    local bd = lurek.data.newByteData(2)
+    expect_error(function()
+      bd:setBit(0, 8, true)
+    end)
+  end)
+end)
+
 test_summary()

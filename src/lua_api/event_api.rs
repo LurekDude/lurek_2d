@@ -90,6 +90,18 @@ impl LuaUserData for LuaSignal {
                     }
                 }
             }
+            // Fire wildcard callbacks.
+            let wildcard_handles = this.inner.borrow().get_wildcard_handles(&name);
+            {
+                let callbacks = this.callbacks.borrow();
+                for handle in &wildcard_handles {
+                    if let Some(key) = callbacks.get(handle) {
+                        if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
+                            let _ = func.call::<_, ()>(LuaMultiValue::from_vec(extra_args.clone()));
+                        }
+                    }
+                }
+            }
             // Auto-remove once handles after emit.
             for handle in to_remove {
                 this.inner.borrow_mut().remove(handle);
@@ -192,6 +204,28 @@ impl LuaUserData for LuaSignal {
                 let handle = this.inner.borrow_mut().subscribe(&name);
                 this.callbacks.borrow_mut().insert(handle, cb_key);
                 this.filter_fns.borrow_mut().insert(handle, filter_key);
+                Ok(handle)
+            },
+        );
+
+        // -- connect --
+        /// Subscribes to an event name or wildcard pattern. When the pattern contains
+        /// `*` or `?`, uses glob matching against all emitted event names. Otherwise
+        /// behaves identically to `register`. Returns a numeric handle for later removal.
+        ///
+        /// @param name : string   event name or glob pattern (e.g. "damage.*")
+        /// @param func : function callback invoked with (...) args from emit
+        /// @return integer        handle for later `remove`
+        methods.add_method(
+            "connect",
+            |lua, this, (name, func): (String, LuaFunction)| {
+                let key = lua.create_registry_value(func)?;
+                let handle = if Signal::is_wildcard(&name) {
+                    this.inner.borrow_mut().subscribe_wildcard(&name)
+                } else {
+                    this.inner.borrow_mut().subscribe(&name)
+                };
+                this.callbacks.borrow_mut().insert(handle, key);
                 Ok(handle)
             },
         );

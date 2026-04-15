@@ -66,15 +66,18 @@ Must call `lurek.tween.update(dt)` from `lurek.process`. Engine does not auto-st
 
 ---
 
-### ❌ TODO — onComplete Callback on Tween Object
+### ✅ DONE — onComplete Callback on Tween Object
 **Source**: features/animation.md — Tween section
 
-No per-tween `onComplete` callback found in the API from Lua. Must use sequences with
-side-effect tweens or manual polling (`tween:isDone()`).
+`LuaTween:onComplete(fn)` registered in `src/lua_api/tween_api.rs` (line ~394). Callback fires
+once when the tween finishes. Supported on sequences and parallels too. Returns `self` for chaining.
+`on_complete: Option<LuaRegistryKey>` in `src/tween/handle.rs`.
 
 ```lua
 t:onComplete(function() print("done") end)
 ```
+
+Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 
@@ -90,10 +93,13 @@ lurek.tween.to(player, {x = 200, y = 300}, 0.5, "easeInOut")
 
 ---
 
-### ❌ TODO — yoyo / pingpong Loop Mode
+### ✅ DONE — yoyo / pingpong Loop Mode
 **Source**: features/animation.md — Tween section
 
-No reverse-direction alternation on repeat. Must build manually with two tweens.
+`LuaTween:setYoyo(true)` registered in `src/lua_api/tween_api.rs` (line ~384). Uses `yoyo: bool`
+and `yoyo_reversed: bool` in `src/tween/handle.rs` to reverse direction on alternate repeat cycles.
+
+Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 

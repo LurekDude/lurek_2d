@@ -49,23 +49,10 @@ lurek.time.setSmoothingFactor(5)  -- average over 5 frames
 
 ---
 
-### ❌ TODO — Coroutine Wait Support
+### ✅ DONE — Coroutine Wait Support
 **Source**: features/timer.md — Feature Gaps #1 / Suggestions #2
 
-No `waitSeconds(t)` / `waitFrames(n)` that yields current coroutine.
-Without this, all sequential delayed logic requires nested callbacks.
-
-```lua
--- With coroutine wait:
-function lurek.ready()
-  coroutine.wrap(function()
-    lurek.time.waitSeconds(1.0)  -- yields, resumes after 1s
-    spawn_enemy()
-    lurek.time.waitSeconds(2.0)
-    spawn_enemy()
-  end)()
-end
-```
+✅ DONE (2026-04-15) — Added waitSeconds(t), waitFrames(n) (both yield current coroutine), and tickWaits() (resumes expired waits) to lurek.time. Uses wall-clock Instant + frame_count for deadlines.
 
 ---
 

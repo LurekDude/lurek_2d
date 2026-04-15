@@ -428,4 +428,55 @@ describe("lurek.time new scheduler features", function()
   end)
 end)
 
+-- ── Coroutine wait support ───────────────────────────────────────────────────
+
+-- @description Verifies coroutine wait/tick APIs: tickWaits is callable, waitFrames yields and resumes, waitSeconds completes after tick.
+describe("lurek.time coroutine wait support", function()
+    -- @covers lurek.time.tickWaits
+    -- @description Calls tickWaits with no pending waits; expects no error.
+    it("timer_tickWaits_is_callable", function()
+        lurek.time.tickWaits()
+        expect_true(true, "tickWaits should not error when there are no pending waits")
+    end)
+
+    -- @covers lurek.time.waitFrames
+    -- @description Creates a coroutine that calls waitFrames(1); confirms it yields (status remains "suspended") after the first resume.
+    it("timer_waitFrames_inside_coroutine_yields", function()
+        local co = coroutine.create(function()
+            lurek.time.waitFrames(1)
+        end)
+        coroutine.resume(co)
+        expect_equal(coroutine.status(co), "suspended",
+            "coroutine should still be suspended after waitFrames(1)")
+    end)
+
+    -- @covers lurek.time.waitFrames
+    -- @covers lurek.time.tickWaits
+    -- @description Same setup as above; after one tickWaits() call the frame count reaches 1 so the coroutine is resumed to completion.
+    it("timer_waitFrames_resumes_after_tick", function()
+        local co = coroutine.create(function()
+            lurek.time.waitFrames(1)
+        end)
+        coroutine.resume(co)
+        -- Coroutine is suspended waiting for 1 frame tick
+        lurek.time.tickWaits()
+        -- After tick the scheduler should have resumed the coroutine
+        expect_equal(coroutine.status(co), "dead",
+            "coroutine should be dead after waitFrames(1) + tickWaits()")
+    end)
+
+    -- @covers lurek.time.waitSeconds
+    -- @covers lurek.time.tickWaits
+    -- @description Creates a coroutine calling waitSeconds(0); after resume + tick it should reach completion because 0-second deadline is already expired.
+    it("timer_waitSeconds_inside_coroutine_yields", function()
+        local co = coroutine.create(function()
+            lurek.time.waitSeconds(0)
+        end)
+        coroutine.resume(co)
+        lurek.time.tickWaits()
+        expect_equal(coroutine.status(co), "dead",
+            "coroutine should be dead after waitSeconds(0) + tickWaits()")
+    end)
+end)
+
 test_summary()

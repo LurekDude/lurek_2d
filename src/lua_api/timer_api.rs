@@ -537,6 +537,139 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // Coroutine wait lists.
+    // Each entry: (LuaRegistryKey holding the LuaThread, deadline Instant)
+    let wait_secs: Rc<RefCell<Vec<(LuaRegistryKey, std::time::Instant)>>> =
+        Rc::new(RefCell::new(Vec::new()));
+
+    // Coroutine frame-wait list.
+    // Each entry: (LuaRegistryKey holding the LuaThread, target frame_count)
+    let wait_frames: Rc<RefCell<Vec<(LuaRegistryKey, u64)>>> =
+        Rc::new(RefCell::new(Vec::new()));
+
+    // -- waitSeconds --
+    /// Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
+    /// Must be called from within a `coroutine.wrap`'d or `coroutine.create`'d
+    /// function. Call `lurek.time.tickWaits()` once per frame in `lurek.process`
+    /// to resume expired waits.
+    ///
+    /// @param seconds : number
+    /// @return nil
+    let ws = wait_secs.clone();
+    tbl.set(
+        "waitSeconds",
+        lua.create_function(move |lua, seconds: f64| {
+            let deadline = std::time::Instant::now()
+                + std::time::Duration::from_secs_f64(seconds.max(0.0));
+            let co_tbl: LuaTable = lua.globals().get("coroutine")?;
+            let running_fn: LuaFunction = co_tbl.get("running")?;
+            let thread_val: LuaValue = running_fn.call(())?;
+            if matches!(thread_val, LuaValue::Nil) {
+                return Err(LuaError::RuntimeError(
+                    "lurek.time.waitSeconds: must be called from within a coroutine".into(),
+                ));
+            }
+            let key = lua.create_registry_value(thread_val)?;
+            ws.borrow_mut().push((key, deadline));
+            let yield_fn: LuaFunction = co_tbl.get("yield")?;
+            yield_fn.call::<_, ()>(())?;
+            Ok(())
+        })?,
+    )?;
+
+    // -- waitFrames --
+    /// Yields the current Lua coroutine for at least `frames` engine frames.
+    /// Must be called from within a coroutine. Call `lurek.time.tickWaits()` once
+    /// per frame to resume expired waits.
+    ///
+    /// @param frames : integer
+    /// @return nil
+    let wf = wait_frames.clone();
+    let s_wf = state.clone();
+    tbl.set(
+        "waitFrames",
+        lua.create_function(move |lua, frames: u64| {
+            let target = s_wf.borrow().clock.frame_count() + frames;
+            let co_tbl: LuaTable = lua.globals().get("coroutine")?;
+            let running_fn: LuaFunction = co_tbl.get("running")?;
+            let thread_val: LuaValue = running_fn.call(())?;
+            if matches!(thread_val, LuaValue::Nil) {
+                return Err(LuaError::RuntimeError(
+                    "lurek.time.waitFrames: must be called from within a coroutine".into(),
+                ));
+            }
+            let key = lua.create_registry_value(thread_val)?;
+            wf.borrow_mut().push((key, target));
+            let yield_fn: LuaFunction = co_tbl.get("yield")?;
+            yield_fn.call::<_, ()>(())?;
+            Ok(())
+        })?,
+    )?;
+
+    // -- tickWaits --
+    /// Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose
+    /// deadline or frame target has been reached. Call once per frame inside
+    /// `lurek.process` alongside `lurek.time.tickRealTimers()`.
+    ///
+    /// @return integer  number of coroutines resumed
+    let ws_tick = wait_secs;
+    let wf_tick = wait_frames;
+    let s_tick = state.clone();
+    tbl.set(
+        "tickWaits",
+        lua.create_function(move |lua, ()| {
+            let now = std::time::Instant::now();
+            let current_frame = s_tick.borrow().clock.frame_count();
+            let mut resumed = 0u32;
+
+            // Time-based waits.
+            let mut pending_s = ws_tick.borrow_mut();
+            let mut still_s: Vec<(LuaRegistryKey, std::time::Instant)> = Vec::new();
+            let mut ready_s: Vec<LuaRegistryKey> = Vec::new();
+            for (key, deadline) in pending_s.drain(..) {
+                if now >= deadline {
+                    ready_s.push(key);
+                } else {
+                    still_s.push((key, deadline));
+                }
+            }
+            *pending_s = still_s;
+            drop(pending_s);
+
+            for key in ready_s {
+                if let Ok(LuaValue::Thread(thread)) = lua.registry_value::<LuaValue>(&key) {
+                    let _ = thread.resume::<_, ()>(());
+                    resumed += 1;
+                }
+                lua.remove_registry_value(key)?;
+            }
+
+            // Frame-based waits.
+            let mut pending_f = wf_tick.borrow_mut();
+            let mut still_f: Vec<(LuaRegistryKey, u64)> = Vec::new();
+            let mut ready_f: Vec<LuaRegistryKey> = Vec::new();
+            for (key, target) in pending_f.drain(..) {
+                if current_frame >= target {
+                    ready_f.push(key);
+                } else {
+                    still_f.push((key, target));
+                }
+            }
+            *pending_f = still_f;
+            drop(pending_f);
+
+            for key in ready_f {
+                if let Ok(LuaValue::Thread(thread)) = lua.registry_value::<LuaValue>(&key) {
+                    let _ = thread.resume::<_, ()>(());
+                    resumed += 1;
+                }
+                lua.remove_registry_value(key)?;
+            }
+
+            Ok(resumed)
+        })?,
+    )?;
+
     luna.set("time", tbl)?;
     Ok(())
 }

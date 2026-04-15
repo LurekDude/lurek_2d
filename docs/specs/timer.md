@@ -84,6 +84,9 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 - `lurek.timer.setPhysicsDelta`: Sets the fixed timestep for `process_physics` callbacks (seconds).
 - `lurek.timer.sleep`: Suspends execution for the given number of seconds.
 - `lurek.timer.newScheduler`: Creates a new independent Scheduler for managing timed callbacks.
+- `lurek.time.waitSeconds`: Yields the running coroutine for `seconds` seconds. Must be called from inside a coroutine; requires `lurek.time.tickWaits()` to be called each frame to drive resumption.
+- `lurek.time.waitFrames`: Yields the running coroutine for `n` engine frames. Same coroutine and tick requirements as `waitSeconds`.
+- `lurek.time.tickWaits`: Resumes all coroutines whose wait deadline has passed. Call once per frame from `lurek.process`.
 
 ### `Scheduler` Methods
 - `Scheduler:after`: Schedules a callback to fire once after a delay.

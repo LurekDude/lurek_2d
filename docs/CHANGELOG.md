@@ -2,6 +2,17 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.12.0] — 2026-04-15
+### Added
+- **event**: `Signal:connect(pattern, fn)` — wildcard glob subscriptions. Patterns containing `*` or `?` match all emitted event names that satisfy the glob rule (`*` = any sequence, `?` = one char). Returns a disconnect handle.
+- **patterns**: `Trie` — string-key prefix-index trie with `insert`, `search`, `starts_with`, `prefix_search`, `remove`, `len`, `is_empty`. Foundations tier; no Lua binding.
+- **patterns**: `BiMap<K, V>` — bidirectional HashMap with `insert` (bijection-enforced), `get_by_key`, `get_by_value`, forward/reverse remove, `len`, `is_empty`, `clear`. Foundations tier; no Lua binding.
+- **data**: `ByteData:setBit(byte_offset, bit_offset, value)` — set or clear a single bit (bit_offset 0–7); errors if out of range.
+- **data**: `ByteData:getBit(byte_offset, bit_offset)` — read a single bit as a boolean.
+- **data**: `ByteData:readBits(byte_offset, bit_offset, count)` — read up to 32 bits LSB-first across byte boundaries into an integer.
+- **timer**: `lurek.time.waitSeconds(s)` / `lurek.time.waitFrames(n)` — yield the running coroutine until a wall-clock or frame-count deadline.
+- **timer**: `lurek.time.tickWaits()` — drives coroutine resumption; call once per frame from `lurek.process`.
+
 ## [0.11.0] — 2026-04-15
 ### Added
 - **render**: `lurek.graphic.printRich(spans, x, y)` — draws a sequence of individually-styled text `TextSpan` objects at a common baseline position. Each span carries its own `r/g/b/a` colour and `scale` multiplier.

@@ -70,7 +70,12 @@ pub mod mediator;
 pub mod strategy;
 /// Fundamental ordered-collection and set ADTs (Stack, Queue metadata).
 pub mod collections;
+/// Bidirectional key–value map for two-way lookups.
+pub mod bimap;
+/// String prefix-index trie for autocomplete and tag filtering.
+pub mod trie;
 
+pub use bimap::BiMap;
 pub use blackboard::{Blackboard, BlackboardValue};
 pub use collections::{QueueMeta, StackMeta};
 pub use command_stack::{CommandEntry, CommandStack};
@@ -87,3 +92,4 @@ pub use simple_state::SimpleState;
 pub use state_machine::{StateMachine, TransitionRule};
 pub use strategy::Strategy;
 pub use throttle::{Debounce, Throttle};
+pub use trie::Trie;

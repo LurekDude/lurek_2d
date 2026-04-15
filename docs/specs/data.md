@@ -121,12 +121,15 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `DataView:getDouble`: Reads a 64-bit float at the given offset.
 - `DataView:getSize`: Returns the size of this view in bytes.
 
-### `mlua` Methods
-- `mlua:getSize`: Get the size.
-- `mlua:getString`: Get the string representation.
-- `mlua:getByte`: Get a byte at the specified offset.
-- `mlua:setByte`: Set a byte at the specified offset.
-- `mlua:clone`: Clone the ByteData.
+### `ByteData` Methods
+- `ByteData:getSize`: Get the size.
+- `ByteData:getString`: Get the string representation.
+- `ByteData:getByte`: Get a byte at the specified offset.
+- `ByteData:setByte`: Set a byte at the specified offset.
+- `ByteData:clone`: Clone the ByteData.
+- `ByteData:setBit`: Sets or clears a single bit. Args: `byte_offset: integer, bit_offset: integer (0–7), value: boolean`. Errors if `bit_offset > 7`.
+- `ByteData:getBit`: Returns the boolean value of a single bit. Args: `byte_offset: integer, bit_offset: integer (0–7)`.
+- `ByteData:readBits`: Reads `count` bits (up to 32) starting at `bit_offset` of `byte_offset`, LSB-first, spanning byte boundaries. Returns an `integer`.
 
 ## References
 

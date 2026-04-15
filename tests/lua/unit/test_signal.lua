@@ -241,4 +241,54 @@ describe("Multiple Signal instances", function()
         expect_equal(0, count2, "sig2 callback not fired by sig1 emit")
     end)
 end)
+
+-- ============================================================
+-- Wildcard subscriptions
+-- ============================================================
+-- @description Covers suite: Signal wildcard connect/disconnect via lurek.signal.new().
+describe("Signal wildcard subscriptions", function()
+    -- @covers lurek.signal.new
+    -- @description Connects with pattern "player.*", emits "player.move"; verifies callback fires.
+    it("wildcard_star_matches_prefix", function()
+        local sig = lurek.signal.new()
+        local fired = false
+        sig:connect("player.*", function() fired = true end)
+        sig:emit("player.move")
+        expect_true(fired, "callback should fire when name matches 'player.*'")
+    end)
+
+    -- @covers lurek.signal.new
+    -- @description Connects with pattern "player.*", emits "enemy.move"; verifies callback does NOT fire.
+    it("wildcard_no_match_does_not_fire", function()
+        local sig = lurek.signal.new()
+        local fired = false
+        sig:connect("player.*", function() fired = true end)
+        sig:emit("enemy.move")
+        expect_false(fired, "callback must not fire when name does not match the pattern")
+    end)
+
+    -- @covers lurek.signal.new
+    -- @description Connects with pattern "item_?"; emits "item_A" (fires) and "item_AB" (does NOT fire).
+    it("wildcard_question_mark_matches_single_char", function()
+        local sig = lurek.signal.new()
+        local count = 0
+        sig:connect("item_?", function() count = count + 1 end)
+        sig:emit("item_A")
+        expect_equal(1, count, "single-char match should fire once")
+        sig:emit("item_AB")
+        expect_equal(1, count, "two-char suffix must not match '?' wildcard")
+    end)
+
+    -- @covers lurek.signal.new
+    -- @description Connects as wildcard, disconnects the returned handle, emits; verifies callback is NOT called.
+    it("wildcard_disconnect_stops_firing", function()
+        local sig = lurek.signal.new()
+        local fired = false
+        local handle = sig:connect("player.*", function() fired = true end)
+        sig:disconnect(handle)
+        sig:emit("player.move")
+        expect_false(fired, "disconnected wildcard callback must not fire")
+    end)
+end)
+
 test_summary()

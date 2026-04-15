@@ -29,32 +29,39 @@
 
 ---
 
-### ❌ TODO — Animation Timelines (CRITICAL)
+### ✅ DONE — Animation Timelines
 **Source**: features/spine.md — Feature Gaps #2 / Suggestions #1
 
-No built-in keyframe animation for bone transforms over time. Without timelines,
-the module is a data structure only — must update every bone every frame from Lua manually.
+`BoneTimeline`, `Keyframe`, `SkeletonAnimation` in `src/spine/timeline.rs`. `LuaSkeletonAnimation`
+registered in `src/lua_api/spine_api.rs`. Supports `addAnimation`, `updateAnimation(dt)`, and
+`playAnimation(name, loop?)`. Lerp/step interpolation per bone property per keyframe.
 
 ```lua
-skeleton:addAnimation("walk", {
-  boneFrames = {
-    { bone = "leg_l", keyframes = {{t=0, rx=0}, {t=0.3, rx=30}, {t=0.6, rx=0}} }
-  }
-})
-skeleton:play("walk")
+local anim = lurek.spine.newAnimation()
+anim:addBoneKeyframe("leg_l", 0.0, {rx=0})
+anim:addBoneKeyframe("leg_l", 0.3, {rx=30})
+skeleton:addAnimation(anim)
+skeleton:playAnimation(anim, true)
 ```
+
+Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 
-### ❌ TODO — IK Solver (Inverse Kinematics)
+### ✅ DONE — IK Solver (Inverse Kinematics)
 **Source**: features/spine.md — Feature Gaps #1 / Suggestions #2
 
-Forward kinematics only. No IK for limb targeting (foot placement, arm reach, look-at).
-Two-bone IK would cover the majority of use cases.
+Two-bone analytic IK in `src/spine/ik.rs` (`IKConstraint` struct with `apply_ik_two_bone`).
+`LuaSkeleton:addIKConstraint(name, target_bone_name, chain_length?)` and `setIKTarget(name, x, y)`
+registered in `src/lua_api/spine_api.rs`. Applied per-frame via `applyIKConstraints()`.
 
 ```lua
-skeleton:addIKConstraint("arm", targetBone, chainLength=2)
+skeleton:addIKConstraint("arm", "hand_target", 2)
+skeleton:setIKTarget("arm", mx, my)
+skeleton:applyIKConstraints()
 ```
+
+Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 
@@ -74,14 +81,20 @@ Implemented: 2026-04-15
 
 ---
 
-### ❌ TODO — Skin / Attachment Swapping
+### ✅ DONE — Skin / Attachment Swapping
 **Source**: features/spine.md — Feature Gaps #6 / Suggestions #7
 
-No skin system for swapping character outfits, weapon visuals, or color variants.
+`add_skin`, `set_skin`, `get_skin`, `set_skin_mapping`, `get_slot_attachment` in `src/spine/skeleton.rs`.
+`LuaSkeleton:addSkin(name)`, `setSkin(name)`, `getSkin()`, `setSkinMapping(slot, skin, texture_key)` all
+registered in `src/lua_api/spine_api.rs`. Skin mapping overrides slot attachments per skin.
 
 ```lua
+skeleton:addSkin("heavy_armor")
+skeleton:setSkinMapping("chest_slot", "heavy_armor", chest_tex)
 skeleton:setSkin("heavy_armor")
 ```
+
+Implemented: source already present when IDEA.md was reviewed 2026-04-15
 
 ---
 

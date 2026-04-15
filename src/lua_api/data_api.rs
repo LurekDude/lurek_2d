@@ -542,5 +542,107 @@ impl mlua::UserData for ByteData {
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(this.clone_data())
         });
+
+        // -- setBit --
+        /// Sets or clears a single bit within the buffer.
+        /// `byte_offset` is 0-based byte index, `bit_offset` is 0-7 (0 = LSB).
+        /// Returns an error if indices are out of range.
+        ///
+        /// @param byte_offset : integer   0-based byte index
+        /// @param bit_offset  : integer   bit index within byte [0..7], 0 = LSB
+        /// @param value       : boolean   true = set, false = clear
+        /// @return nil
+        methods.add_method_mut(
+            "setBit",
+            |_, this, (byte_offset, bit_offset, value): (usize, u8, bool)| {
+                if byte_offset >= this.len() {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.data: setBit byte_offset {} out of range (size={})",
+                        byte_offset,
+                        this.len()
+                    )));
+                }
+                if bit_offset > 7 {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.data: setBit bit_offset {} out of range [0..7]",
+                        bit_offset
+                    )));
+                }
+                let current = this.get_byte(byte_offset).unwrap();
+                let new_val = if value {
+                    current | (1u8 << bit_offset)
+                } else {
+                    current & !(1u8 << bit_offset)
+                };
+                this.set_byte(byte_offset, new_val);
+                Ok(())
+            },
+        );
+
+        // -- getBit --
+        /// Returns the value of a single bit within the buffer.
+        /// `byte_offset` is 0-based, `bit_offset` is 0–7 (0 = LSB).
+        ///
+        /// @param byte_offset : integer   0-based byte index
+        /// @param bit_offset  : integer   bit index within byte [0..7]
+        /// @return boolean
+        methods.add_method(
+            "getBit",
+            |_, this, (byte_offset, bit_offset): (usize, u8)| {
+                if byte_offset >= this.len() {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.data: getBit byte_offset {} out of range (size={})",
+                        byte_offset,
+                        this.len()
+                    )));
+                }
+                if bit_offset > 7 {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.data: getBit bit_offset {} out of range [0..7]",
+                        bit_offset
+                    )));
+                }
+                let byte = this.get_byte(byte_offset).unwrap();
+                Ok((byte >> bit_offset) & 1 == 1)
+            },
+        );
+
+        // -- readBits --
+        /// Reads `count` consecutive bits starting at `byte_offset`/`bit_offset`
+        /// and returns them packed into a u32 (LSB-first, so first bit = bit 0 of result).
+        /// `count` must be in [1..32]. Reading across byte boundaries is supported.
+        ///
+        /// @param byte_offset : integer   0-based starting byte index
+        /// @param bit_offset  : integer   starting bit within starting byte [0..7]
+        /// @param count       : integer   number of bits to read [1..32]
+        /// @return integer    uint32 with bits packed LSB-first
+        methods.add_method(
+            "readBits",
+            |_, this, (byte_offset, bit_offset, count): (usize, u8, u8)| {
+                if count == 0 || count > 32 {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.data: readBits count {} out of range [1..32]",
+                        count
+                    )));
+                }
+                let mut result: u32 = 0;
+                for i in 0..count {
+                    let total_bit = bit_offset as usize + i as usize;
+                    let b = byte_offset + total_bit / 8;
+                    let bit = (total_bit % 8) as u8;
+                    if b >= this.len() {
+                        return Err(LuaError::RuntimeError(format!(
+                            "lurek.data: readBits reads beyond buffer end (size={})",
+                            this.len()
+                        )));
+                    }
+                    let byte = this.get_byte(b).unwrap();
+                    if (byte >> bit) & 1 == 1 {
+                        result |= 1u32 << i;
+                    }
+                }
+                Ok(result)
+            },
+        );
     }
 }

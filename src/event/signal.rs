@@ -33,6 +33,7 @@ pub struct Subscription {
 /// - `next_handle` — `u64`.
 /// - `subscriptions` — `HashMap<String`.
 /// - `handle_to_name` — `HashMap<u64`.
+/// - `wildcard_subs` — `Vec<(String, u64)>`.
 #[derive(Debug)]
 pub struct Signal {
     /// Next handle ID to assign (monotonically increasing).
@@ -41,6 +42,8 @@ pub struct Signal {
     subscriptions: HashMap<String, Vec<u64>>,
     /// Maps handle IDs to their event name (for removal by handle).
     handle_to_name: HashMap<u64, String>,
+    /// Ordered wildcard pattern subscriptions: `(pattern, handle)`.
+    wildcard_subs: Vec<(String, u64)>,
 }
 
 impl Signal {
@@ -54,6 +57,7 @@ impl Signal {
             next_handle: 1,
             subscriptions: HashMap::new(),
             handle_to_name: HashMap::new(),
+            wildcard_subs: Vec::new(),
         }
     }
 
@@ -95,6 +99,7 @@ impl Signal {
                     self.subscriptions.remove(&name);
                 }
             }
+            self.wildcard_subs.retain(|(_, h)| *h != handle);
             true
         } else {
             false
@@ -132,6 +137,7 @@ impl Signal {
         let count = self.handle_to_name.len();
         self.subscriptions.clear();
         self.handle_to_name.clear();
+        self.wildcard_subs.clear();
         count
     }
 
@@ -166,12 +172,86 @@ impl Signal {
     pub fn get_total_count(&self) -> usize {
         self.handle_to_name.len()
     }
+
+    /// Registers a wildcard pattern subscription.
+    ///
+    /// Supports `*` (any sequence of bytes) and `?` (any single byte).
+    /// Example: `"damage.*"` matches `"damage.fire"` and `"damage.ice"`.
+    ///
+    /// # Parameters
+    /// - `pattern` — `&str`.
+    ///
+    /// # Returns
+    /// `u64` — unique handle ID for later removal.
+    pub fn subscribe_wildcard(&mut self, pattern: &str) -> u64 {
+        let handle = self.next_handle;
+        self.next_handle += 1;
+        self.wildcard_subs.push((pattern.to_string(), handle));
+        self.handle_to_name.insert(handle, pattern.to_string());
+        handle
+    }
+
+    /// Returns all wildcard handles whose pattern matches the given event name.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<u64>`.
+    pub fn get_wildcard_handles(&self, name: &str) -> Vec<u64> {
+        self.wildcard_subs
+            .iter()
+            .filter(|(pat, _)| glob_match(pat, name))
+            .map(|(_, h)| *h)
+            .collect()
+    }
+
+    /// Returns `true` if `pattern` contains glob metacharacters (`*` or `?`).
+    ///
+    /// # Parameters
+    /// - `pattern` — `&str`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn is_wildcard(pattern: &str) -> bool {
+        pattern.contains('*') || pattern.contains('?')
+    }
 }
 
 impl Default for Signal {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Simple glob match: `*` matches any sequence of bytes, `?` matches exactly one.
+fn glob_match(pattern: &str, name: &str) -> bool {
+    let p = pattern.as_bytes();
+    let n = name.as_bytes();
+    let mut pi = 0usize;
+    let mut ni = 0usize;
+    let mut star_pi = usize::MAX;
+    let mut star_ni = 0usize;
+    while ni < n.len() {
+        if pi < p.len() && (p[pi] == b'?' || p[pi] == n[ni]) {
+            pi += 1;
+            ni += 1;
+        } else if pi < p.len() && p[pi] == b'*' {
+            star_pi = pi;
+            star_ni = ni;
+            pi += 1;
+        } else if star_pi != usize::MAX {
+            pi = star_pi + 1;
+            star_ni += 1;
+            ni = star_ni;
+        } else {
+            return false;
+        }
+    }
+    while pi < p.len() && p[pi] == b'*' {
+        pi += 1;
+    }
+    pi == p.len()
 }
 
 #[cfg(test)]

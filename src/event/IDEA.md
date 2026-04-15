@@ -31,11 +31,10 @@ debugging of event-driven bugs. Should be disabled in release builds.
 
 ---
 
-### ❌ TODO — Wildcard Signal Subscriptions
+### ✅ DONE — Wildcard Signal Subscriptions
 **Source**: features/event.md — Feature Gaps #7 / Suggestions #5
 
-No pattern-based subscriptions (e.g., `signal:connect("damage.*", fn)`). Low priority but
-useful for catch-all logging and test harnesses.
+✅ DONE (2026-04-15) — Added `subscribe_wildcard` + `get_wildcard_handles` to Signal, `connect` method on LuaSignal in event_api.rs. Glob matching via internal `glob_match` function.
 
 ---
 

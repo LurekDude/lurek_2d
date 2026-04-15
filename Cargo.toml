@@ -1,6 +1,6 @@
 [package]
 name = "lurek2d"
-version = "0.11.0"
+version = "0.12.0"
 edition = "2021"
 description = "Lurek2D — A cross-platform 2D game engine powered by Rust and Lua"
 license = "MIT"
@@ -218,4 +218,8 @@ path = "tests/lua/harness.rs"
 [[test]]
 name = "scene_tests"
 path = "tests/rust/unit/scene_tests.rs"
+
+[[test]]
+name = "patterns_tests"
+path = "tests/rust/unit/patterns_tests.rs"
 

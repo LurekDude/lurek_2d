@@ -27,7 +27,7 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 
 - `event_queue.rs`: Event types and FIFO event queue.
 - `mod.rs`: Event queue for polling system and custom events.
-- `signal.rs`: Handle-based pub-sub signal system.
+- `signal.rs`: Handle-based pub-sub signal system with exact-name and glob-wildcard subscriptions.
 
 ## Types
 
@@ -58,6 +58,9 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 - `Signal::get_handles` (`signal.rs`): Returns the handles registered for the given event name (in registration order).
 - `Signal::get_count` (`signal.rs`): Returns the number of subscriptions for the given event name.
 - `Signal::get_total_count` (`signal.rs`): Returns the total number of subscriptions across all event names.
+- `Signal::subscribe_wildcard` (`signal.rs`): Registers a wildcard subscription for a glob pattern (may contain `*` or `?`) and returns a handle ID.
+- `Signal::get_wildcard_handles` (`signal.rs`): Returns the wildcard handles whose pattern matches the given event name.
+- `Signal::is_wildcard` (`signal.rs`): Returns `true` when the given pattern string contains a glob character (`*` or `?`).
 
 ## Lua API Reference
 
@@ -76,6 +79,7 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 - `lurek.event.quit`: Alias for `exit()` — requests the engine to stop at the end of the current frame.
 
 ### `Signal` Methods
+- `Signal:connect`: Subscribes a callback. If `name` contains `*` or `?` it is treated as a glob wildcard pattern matched on each `emit` call. Returns a handle for `disconnect`.
 - `Signal:emit`: Emits the named event, calling all registered callbacks with extra arguments.
 - `Signal:remove`: Removes a subscription by handle ID.
 - `Signal:clear`: Removes all callbacks for the named event.
@@ -93,3 +97,4 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 
 - Keep this module reference synchronized with `src/event/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+- **Wildcard semantics**: `*` matches any sequence of characters (excluding `/`); `?` matches exactly one character. Wildcard patterns are stored separately in `wildcard_subs: Vec<(String, u64)>` and evaluated via `glob_match` on every `emit` call after the exact-name callbacks have fired.

@@ -38,6 +38,8 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `state_machine.rs`: Implements a fuller finite-state machine with registered states, explicit transition rules, and history.
 - `strategy.rs`: Strategy pattern — named, swappable behaviours.
 - `throttle.rs`: Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting.
+- `trie.rs`: Trie: string-key prefix index with DFS `prefix_search` and recursive `remove`.
+- `bimap.rs`: BiMap: bidirectional HashMap with bijection enforcement on `insert`.
 
 ## Types
 
@@ -67,6 +69,8 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `Strategy` (`struct`, `strategy.rs`): Registry of named, interchangeable behaviours with a single active selection.
 - `Throttle` (`struct`, `throttle.rs`): Leading-edge rate limiter that decides when a callback is allowed to fire.
 - `Debounce` (`struct`, `throttle.rs`): Trailing-edge idle timer that delays firing until input settles.
+- `Trie` (`struct`, `trie.rs`): Prefix-index trie keyed on `String`; supports `insert`, `search` (exact), `starts_with` (prefix Boolean), `prefix_search` (collect all matching keys), `remove` (prunes dead nodes). Foundations tier — no Lua binding.
+- `BiMap<K, V>` (`struct`, `bimap.rs`): Bidirectional `HashMap`; `insert` removes stale forward/reverse entries to maintain the one-to-one mapping invariant. Foundations tier — no Lua binding.
 
 ## Functions
 
@@ -212,6 +216,25 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `Debounce::trigger` (`throttle.rs`): Records an input event, resetting the idle timer.
 - `Debounce::update` (`throttle.rs`): Advances time by `dt` seconds.
 - `Debounce::cancel` (`throttle.rs`): Cancels any pending trigger without firing.
+- `Trie::new` (`trie.rs`): Creates an empty trie.
+- `Trie::insert` (`trie.rs`): Inserts a string key into the trie.
+- `Trie::search` (`trie.rs`): Returns `true` if the exact key exists.
+- `Trie::starts_with` (`trie.rs`): Returns `true` if any stored key begins with the given prefix.
+- `Trie::prefix_search` (`trie.rs`): Returns all stored keys that begin with the given prefix.
+- `Trie::remove` (`trie.rs`): Removes the key and prunes any nodes that became dead (leaf, non-terminal).
+- `Trie::len` (`trie.rs`): Returns the number of keys stored in the trie.
+- `Trie::is_empty` (`trie.rs`): Returns `true` when no keys are stored.
+- `BiMap::new` (`bimap.rs`): Creates an empty bidirectional map.
+- `BiMap::insert` (`bimap.rs`): Inserts a key-value pair, removing any stale entries that would break the bijection invariant.
+- `BiMap::get_by_key` (`bimap.rs`): Looks up the value associated with a key.
+- `BiMap::get_by_value` (`bimap.rs`): Looks up the key associated with a value.
+- `BiMap::contains_key` (`bimap.rs`): Returns `true` if the key is present.
+- `BiMap::contains_value` (`bimap.rs`): Returns `true` if the value is present.
+- `BiMap::remove_by_key` (`bimap.rs`): Removes the pair identified by key, and its reverse entry.
+- `BiMap::remove_by_value` (`bimap.rs`): Removes the pair identified by value, and its forward entry.
+- `BiMap::len` (`bimap.rs`): Returns the number of pairs in the map.
+- `BiMap::is_empty` (`bimap.rs`): Returns `true` when the map contains no pairs.
+- `BiMap::clear` (`bimap.rs`): Removes all pairs from the map.
 
 ## Lua API Reference
 
@@ -438,3 +461,4 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 
 - Keep this module reference synchronized with `src/patterns/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+- `Trie` and `BiMap` are **Foundations tier** utility types. Neither is exposed to Lua (`lurek.patterns.*`). They are re-exported from `src/patterns/mod.rs` for use by other engine modules.
