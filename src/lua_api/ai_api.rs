@@ -541,7 +541,7 @@ impl LuaUserData for LuaStateMachine {
         );
 
         // -- setInitialState --
-        /// Sets the initial state.
+        /// Sets the FSM's initial state; must be called before the first update.
         /// @param name : string
         /// @return nil
         methods.add_method("setInitialState", |_, this, name: String| {
@@ -1609,7 +1609,7 @@ impl LuaUserData for LuaInfluenceMap {
         });
 
         // -- clearAll --
-        /// Clears all layers.
+        /// Removes all influence values from every layer in the map.
         /// @return nil
         methods.add_method("clearAll", |_, this, ()| {
             this.inner.borrow_mut().clear_all();
@@ -1664,14 +1664,14 @@ impl LuaUserData for LuaInfluenceMap {
         );
 
         // -- getWidth --
-        /// Returns the grid width.
+        /// Returns the influence map width in grid cells.
         /// @return integer
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().width)
         });
 
         // -- getHeight --
-        /// Returns the grid height.
+        /// Returns the influence map height in grid cells.
         /// @return integer
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().height)
@@ -1712,7 +1712,7 @@ impl LuaUserData for LuaSquad {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
 
         // -- getName --
-        /// Returns the squad name.
+        /// Returns the unique name string assigned to this squad.
         /// @return string
         methods.add_method("getName", |_, this, ()| {
             Ok(this.inner.borrow().name.clone())
@@ -1986,7 +1986,7 @@ struct LuaTraitProfile {
 
 impl LuaUserData for LuaTraitProfile {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Sets the value.
+        /// Sets the base value of this trait, replacing any previous base.
         /// @param name : string
         /// @param value : number
         methods.add_method_mut("set", |_, this, (name, value): (String, f32)| {
@@ -1994,21 +1994,21 @@ impl LuaUserData for LuaTraitProfile {
             Ok(())
         });
 
-        /// Returns the value.
+        /// Returns the current float value of this emotion dimension.
         /// @param name : string
         /// @return number
         methods.add_method("get", |_, this, name: String| {
             Ok(this.inner.borrow().get(&name))
         });
 
-        /// Returns the base.
+        /// Returns the unmodified base value of this trait before modifiers.
         /// @param name : string
         /// @return number
         methods.add_method("getBase", |_, this, name: String| {
             Ok(this.inner.borrow().get_base(&name))
         });
 
-        /// Adds a modifier.
+        /// Adds a named modifier that adjusts the trait value by a delta.
         /// @param trait_name : string
         /// @param delta : number
         /// @param duration : number|nil
@@ -2074,7 +2074,7 @@ impl LuaUserData for LuaStimulusWorld {
             Ok(this.inner.borrow_mut().add_visual(x, y, intensity, radius, tag) as i64)
         });
 
-        /// Adds a auditory.
+        /// Registers an auditory stimulus at a world-space position.
         /// @param x : number
         /// @param y : number
         /// @param intensity : number
@@ -2124,7 +2124,7 @@ struct LuaContextSteering {
 
 impl LuaUserData for LuaContextSteering {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Adds a seek target.
+        /// Adds a world-space target that this agent steers towards.
         /// @param tx : number
         /// @param ty : number
         /// @param weight : number
@@ -2141,7 +2141,7 @@ impl LuaUserData for LuaContextSteering {
             Ok(())
         });
 
-        /// Adds a avoid point.
+        /// Adds a world-space point that this agent steers away from.
         /// @param x : number
         /// @param y : number
         /// @param radius : number
@@ -2151,7 +2151,7 @@ impl LuaUserData for LuaContextSteering {
             Ok(())
         });
 
-        /// Adds a avoid bounds.
+        /// Registers a rectangular region this agent must avoid.
         /// @param min_x : number
         /// @param min_y : number
         /// @param max_x : number
@@ -2298,7 +2298,7 @@ impl LuaUserData for LuaAIDirector {
             Ok(this.inner.borrow().ambient_intensity())
         });
 
-        /// Sets the tension.
+        /// Sets the global narrative tension level (0–1 scale).
         /// @param value : number
         methods.add_method_mut("setTension", |_, this, value: f32| {
             this.inner.borrow_mut().set_tension(value);
@@ -2323,7 +2323,7 @@ struct LuaHTNDomain {
 
 impl LuaUserData for LuaHTNDomain {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Adds a primitive.
+        /// Registers a primitive HTN task with a direct operator function.
         /// @param name : string
         /// @param preconditions : table
         /// @param effects : table
@@ -2336,7 +2336,7 @@ impl LuaUserData for LuaHTNDomain {
             Ok(())
         });
 
-        /// Adds a compound.
+        /// Registers a compound HTN task that decomposes into sub-tasks.
         /// @param compound_name : string
         /// @param methods : table  -- array of {preconditions=[], sub_tasks=[]}
         methods.add_method_mut("addCompound", |lua, this, (comp_name, methods_table): (String, LuaTable)| {
@@ -2450,7 +2450,7 @@ impl LuaUserData for LuaEmotionModel {
             Ok(())
         });
 
-        /// Returns the value.
+        /// Returns the current float value of this emotion dimension.
         /// @param name : string
         /// @return number
         methods.add_method("get", |_, this, name: String| {
@@ -2463,7 +2463,7 @@ impl LuaUserData for LuaEmotionModel {
             Ok(this.inner.borrow().dominant().map(|s| s.to_string()))
         });
 
-        /// Returns true if active.
+        /// Returns `true` if the emotion dimension is currently active and above threshold.
         /// @param name : string
         /// @return boolean
         methods.add_method("isActive", |_, this, name: String| {
@@ -2516,7 +2516,7 @@ impl LuaUserData for LuaORCASolver {
             Ok(())
         });
 
-        /// Sets the position.
+        /// Sets the agent's current world-space position for ORCA velocity computation.
         /// @param index : integer
         /// @param x : number
         /// @param y : number
@@ -2585,14 +2585,14 @@ impl LuaUserData for LuaNeuralNet {
             Ok(t)
         });
 
-        /// Sets the weights.
+        /// Overwrites all connection weights with values from a flat table.
         /// @param weights : table
         /// @return boolean
         methods.add_method_mut("setWeights", |_, this, weights: Vec<f32>| {
             Ok(this.inner.borrow_mut().set_weights(&weights))
         });
 
-        /// Returns the weights.
+        /// Returns a flat table of all connection weight values in the network.
         /// @return table
         methods.add_method("getWeights", |lua, this, ()| {
             let w = this.inner.borrow().get_weights();
@@ -2645,7 +2645,7 @@ impl LuaUserData for LuaGeneticAlgorithm {
             Ok(this.inner.borrow().pop_size() as i64)
         });
 
-        /// Sets the fitness.
+        /// Sets the fitness score used by the genetic algorithm selection step.
         /// @param index : integer
         /// @param fitness : number
         methods.add_method_mut("setFitness", |_, this, (idx, fitness): (usize, f32)| {
@@ -2655,7 +2655,7 @@ impl LuaUserData for LuaGeneticAlgorithm {
             Ok(())
         });
 
-        /// Returns the genes.
+        /// Returns the chromosome as an ordered table of gene values.
         /// @param index : integer
         /// @return table
         methods.add_method("getGenes", |lua, this, idx: usize| {
@@ -2750,7 +2750,7 @@ impl LuaUserData for LuaNeuroevolution {
             Ok(())
         });
 
-        /// Sets the fitness.
+        /// Sets the fitness score used by the genetic algorithm selection step.
         /// @param index : integer
         /// @param fitness : number
         methods.add_method_mut("setFitness", |_, this, (idx, fitness): (usize, f32)| {

@@ -161,7 +161,7 @@ impl LuaUserData for LuaWorld {
         });
 
         // -- setGravity --
-        /// Sets the gravity vector.
+        /// Sets the world gravity vector; default is `(0, 9.81)` (downward).
         /// @param gx : number
         /// @param gy : number
         /// @return nil
@@ -626,7 +626,7 @@ impl LuaUserData for LuaWorld {
         });
 
         // -- getJointIds --
-        /// Returns all joint IDs.
+        /// Returns a table of integer IDs for every joint attached to this world.
         /// @return table
         methods.add_method("getJointIds", |_, this, ()| {
             Ok(this.world.borrow().get_joint_ids())
@@ -900,7 +900,7 @@ impl LuaUserData for LuaWorld {
         });
 
         // -- setBodyType --
-        /// Changes the body type.
+        /// Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
         /// @param bodyId : integer
         /// @param bodyType : string
         /// @return nil
@@ -1715,7 +1715,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- setPosition --
-        /// Sets the body position.
+        /// Teleports the body to the given world-space position, bypassing collision.
         /// @param x : number
         /// @param y : number
         /// @return nil
@@ -1752,7 +1752,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- setVelocity --
-        /// Sets the body velocity.
+        /// Sets the body's linear velocity in world units per second.
         /// @param vx : number
         /// @param vy : number
         /// @return nil
@@ -1798,14 +1798,14 @@ impl LuaUserData for LuaBody {
         });
 
         // -- getMass --
-        /// Returns the body mass.
+        /// Returns the body mass in kilograms used for force and impulse calculations.
         /// @return number
         methods.add_method("getMass", |_, this, ()| {
             Ok(this.world.borrow().get_body_mass(this.id))
         });
 
         // -- setMass --
-        /// Sets the body mass.
+        /// Sets the body mass; affects how forces and impulses change velocity.
         /// @param mass : number
         /// @return nil
         methods.add_method("setMass", |_, this, mass: f32| {
@@ -1821,7 +1821,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- setType --
-        /// Sets the body type.
+        /// Changes the body type: `"dynamic"`, `"static"`, or `"kinematic"`.
         /// @param bodyType : string
         /// @return nil
         methods.add_method("setType", |_, this, bt: String| {
@@ -1831,7 +1831,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- getWidth --
-        /// Returns the body width.
+        /// Returns the width of this body's primary collider shape in world units.
         /// @return number
         methods.add_method("getWidth", |_, this, ()| {
             let w = this.world.borrow();
@@ -1839,7 +1839,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- getHeight --
-        /// Returns the body height.
+        /// Returns the height of this body's primary collider shape in world units.
         /// @return number
         methods.add_method("getHeight", |_, this, ()| {
             let w = this.world.borrow();
@@ -2056,7 +2056,7 @@ impl LuaUserData for LuaBody {
         });
 
         // -- setBullet --
-        /// Enables or disables CCD.
+        /// Enables or disables continuous collision detection (CCD) for fast-moving bodies.
         /// @param bullet : boolean
         /// @return nil
         methods.add_method("setBullet", |_, this, bullet: bool| {

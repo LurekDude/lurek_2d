@@ -499,6 +499,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let s = state.clone();
     let hist_p = history_buf;
     let cap_p = history_cap;
+    /// Adds an event item to the end of the event queue for processing.
+    ///
+    /// @param args : MultiValue
     tbl.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {

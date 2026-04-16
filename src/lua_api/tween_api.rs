@@ -501,7 +501,7 @@ impl LuaUserData for LuaTween {
         });
 
         // ── resume ────────────────────────────────────────────────────────
-        /// Resumes a paused tween.
+        /// Resumes a paused tween, continuing from the position where it was paused.
         /// @return nil
         methods.add_method_mut("resume", |_, this, ()| {
             this.paused = false;

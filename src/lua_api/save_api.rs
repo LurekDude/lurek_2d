@@ -418,7 +418,7 @@ impl LuaUserData for LuaSaveManager {
         );
 
         // -- disableAutoSave --
-        /// Disables auto-save.
+        /// Disables automatic periodic saving; manual `write()` calls still work.
         /// @return nil
         methods.add_method_mut("disableAutoSave", |_, this, ()| {
             this.manager.disable_auto_save();

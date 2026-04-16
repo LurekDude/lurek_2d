@@ -351,6 +351,7 @@ impl TextSpan {
     }
 }
 
+/// Enqueues a typed draw or state command into the per-frame GPU render queue.
 pub enum RenderCommand {
     SetColor(f32, f32, f32, f32),
     Rectangle {

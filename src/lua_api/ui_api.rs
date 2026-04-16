@@ -85,7 +85,7 @@ fn create_widget_table<'a>(
     )?;
 
     // -- setSize --
-    /// Sets the widget size.
+    /// Sets the width and height of the widget in UI pixels.
     /// @param w : number
     /// @param h : number
     let c = ctx.clone();
@@ -104,7 +104,7 @@ fn create_widget_table<'a>(
     )?;
 
     // -- getSize --
-    /// Returns the widget size.
+    /// Returns the current width and height of the widget in UI pixels.
     /// @return number, number
     let c = ctx.clone();
     /// @return nil
@@ -139,7 +139,7 @@ fn create_widget_table<'a>(
     )?;
 
     // -- setVisible --
-    /// Sets widget visibility.
+    /// Shows or hides the widget; hidden widgets are not rendered or interactive.
     /// @param visible : boolean
     let c = ctx.clone();
     /// @return nil
@@ -4714,7 +4714,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     state.borrow_mut().auto_ui_ctx = Some(Rc::downgrade(&ctx));
 
     // -- newButton --
-    /// Creates a button widget.
+    /// Creates and returns a new interactive button widget as a child of this widget.
     /// @param text : string
     /// @return table
     let c = ctx.clone();
@@ -5119,7 +5119,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- newDockPanel --
-    /// Creates a dock panel.
+    /// Creates and returns a new docking panel that arranges children along its edges.
     /// @return table
     let c = ctx.clone();
     let cbs = callbacks.clone();
@@ -5430,7 +5430,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- clearFocus --
-    /// Clears keyboard focus.
+    /// Removes keyboard focus from this widget so key events go to the next focusable.
     let c = ctx.clone();
     let _cbs = callbacks.clone();
     /// @return nil
@@ -5652,7 +5652,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- newBarChart ----------------------------------------------------------
-    /// Creates a new bar chart.
+    /// Creates and returns a new bar chart widget attached to this image widget.
     /// @param opts : table  { width?, height?, title? }
     /// @return BarChart
     tbl.set(
@@ -5696,7 +5696,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- newPieChart ----------------------------------------------------------
-    /// Creates a new pie chart.
+    /// Creates and returns a new pie chart widget attached to this image widget.
     /// @param opts : table  { width?, height?, title? }
     /// @return PieChart
     tbl.set(
@@ -5762,7 +5762,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- newBarChart ----------------------------------------------------------
-    /// Creates a new bar chart.
+    /// Creates and returns a new bar chart widget attached to this image widget.
     /// @param opts : table  { width?, height?, title? }
     /// @return BarChart
     tbl.set(
@@ -5806,7 +5806,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- newPieChart ----------------------------------------------------------
-    /// Creates a new pie chart.
+    /// Creates and returns a new pie chart widget attached to this image widget.
     /// @param opts : table  { width?, height?, title? }
     /// @return PieChart
     tbl.set(

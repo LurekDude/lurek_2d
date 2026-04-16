@@ -1132,6 +1132,8 @@ impl LuaUserData for LuaPipeline {
         );
 
         // -- typeOf --
+        /// Returns the type identifier string of this pipeline stage object.
+        ///
         /// @param name : string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| Ok(name == "Pipeline" || name == "Object"));

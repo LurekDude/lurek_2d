@@ -1,4 +1,4 @@
-//! Minimap data structures for overhead map displays (Tier 2).
+//! Minimap — real-time overhead map with configurable markers and region tracking. data structures for overhead map displays (Tier 2).
 //!
 //! Provides a grid-based minimap with terrain coloring, fog of war,
 //! tracked objects, pings, markers, and viewport rectangle overlay.
@@ -8,7 +8,7 @@
 //! Sub-files: types.rs for supporting enums/structs;
 //! minimap.rs for the Minimap data model.
 
-/// Core Minimap data model.
+/// Core Minimap data model holding region bounds, markers, and camera viewport.
 #[allow(clippy::module_inception)]
 pub mod minimap;
 /// GPU render-command generation for the minimap overlay.

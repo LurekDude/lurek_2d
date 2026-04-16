@@ -1463,13 +1463,21 @@ impl mlua::UserData for LuaScreenTransition {
             Ok(())
         });
 
+        /// Type.
+        ///
+        /// @return any
         methods.add_method("type", |_, _, ()| Ok("ScreenTransition"));
+        /// Type of.
+        ///
+        /// @param name : string
+        /// @return any
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ScreenTransition" || name == "Object")
         });
     }
 }
 
+/// Registers the `lurek.effect` Lua API table into the engine namespace.
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 

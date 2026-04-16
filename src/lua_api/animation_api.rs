@@ -519,6 +519,7 @@ impl LuaUserData for LuaBlendLayerSet {
 // register()
 // -------------------------------------------------------------------------------
 
+/// Registers the `lurek.animation` Lua API table into the engine namespace.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -697,7 +698,7 @@ impl LuaUserData for LuaAnimCurve {
         });
 
         // -- clear --
-        /// Removes all keyframes.
+        /// Removes all keyframes from this animation curve, resetting it to empty.
         ///
         /// @return nil
         methods.add_method_mut("clear", |_, this, ()| {

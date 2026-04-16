@@ -6,11 +6,11 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-/// Channel sub-module.
+/// Lock-free inter-VM message channel for cross-thread Lua communication.
 pub mod channel;
-/// Worker sub-module.
+/// Sandboxed LuaJIT worker thread that runs a Lua script in isolation.
 pub mod worker;
-/// Thread pool sub-module.
+/// Thread pool that queues and executes tasks across multiple worker threads.
 pub mod pool;
 /// Promise / future sub-module.
 pub mod promise;

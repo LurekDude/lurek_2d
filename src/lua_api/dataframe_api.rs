@@ -138,7 +138,7 @@ impl LuaUserData for LuaDataFrame {
         });
 
         // -- rename --
-        /// Renames a column.
+        /// Renames the column `old_name` to `new_name` in this DataFrame.
         /// @param col : string|integer
         /// @param new_name : string
         /// @return nil
@@ -1147,7 +1147,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         // -- removeTable --
-        /// Removes a table by name.
+        /// Drops the named table from this in-memory database if it exists.
         /// @param name : string
         /// @return nil
         methods.add_method("removeTable", |_, this, name: String| {
@@ -1186,7 +1186,7 @@ impl LuaUserData for LuaDatabase {
         });
 
         // -- clear --
-        /// Removes all tables.
+        /// Drops every table from this in-memory database, leaving it empty.
         /// @return nil
         methods.add_method("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();

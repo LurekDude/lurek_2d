@@ -494,6 +494,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Call once per frame inside `lurek.process` to drain expired timers.
     /// @return integer  number of callbacks fired
     let rt = real_timers;
+    /// Advances all real-time timers by one tick; called automatically each frame.
+    ///
+    /// @return any
     tbl.set(
         "tickRealTimers",
         lua.create_function(move |lua, ()| {
@@ -636,6 +639,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let ws_tick = wait_secs;
     let wf_tick = wait_frames;
     let s_tick = state.clone();
+    /// Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
+    ///
+    /// @return any
     tbl.set(
         "tickWaits",
         lua.create_function(move |lua, ()| {

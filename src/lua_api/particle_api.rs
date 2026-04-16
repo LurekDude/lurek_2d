@@ -80,7 +80,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- pause --
-        /// Pauses the emitter.
+        /// Pauses particle emission; existing particles continue to simulate.
         /// @return nil
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
@@ -391,7 +391,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- getSpread --
-        /// Returns emission spread.
+        /// Returns the half-angle spread in radians for the emission cone.
         /// @return number
         methods.add_method("getSpread", |_, this, ()| {
             let st = this.state.borrow();
@@ -583,7 +583,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- getSizeVariation --
-        /// Returns size variation.
+        /// Returns the maximum random size variation applied to newly emitted particles.
         /// @return number
         methods.add_method("getSizeVariation", |_, this, ()| {
             let st = this.state.borrow();
@@ -662,7 +662,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- getSpinVariation --
-        /// Returns spin variation.
+        /// Returns the maximum random angular velocity variation for new particles.
         /// @return number
         methods.add_method("getSpinVariation", |_, this, ()| {
             let st = this.state.borrow();
@@ -934,7 +934,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- getGravity --
-        /// Returns gravity (x, y).
+        /// Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
         /// @return number, number
         methods.add_method("getGravity", |_, this, ()| {
             let st = this.state.borrow();
@@ -948,7 +948,7 @@ impl LuaUserData for LuaParticleSystem {
         });
 
         // -- setGravity --
-        /// Sets gravity (x, y).
+        /// Sets the gravity acceleration applied to all active particles each frame.
         /// @param gx : number
         /// @param gy : number
         /// @return nil

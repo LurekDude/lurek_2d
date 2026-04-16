@@ -8,7 +8,7 @@ showing three categories of issues:
   1. Rust methods that exist publicly but are NOT exposed to Lua (no matching entry in
      lua_api_data.json). This highlights functionality that game developers cannot access.
 
-  2. Rust public items with missing or very short docstrings (< 15 chars). These will
+  2. Rust public items with missing or very short docstrings (< 25 chars). These will
      produce "(undocumented)" entries in rust-api.md.
 
   3. Lua API functions and classes with missing descriptions. These will appear without
@@ -130,7 +130,7 @@ _INTERNAL_MODULES = {
 }
 
 # Minimum description length to be considered "documented"
-_MIN_DESC_LENGTH = 15
+_MIN_DESC_LENGTH = 25
 
 
 def _collect_lua_names(lua_data: dict) -> set[str]:

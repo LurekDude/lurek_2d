@@ -107,7 +107,7 @@ impl LuaUserData for LuaSchema {
             Ok(())
         });
 
-        /// Returns the schema name.
+        /// Returns the name identifier of this API schema group.
         /// @return string
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
 
@@ -136,7 +136,7 @@ struct DocEntry(docs::DocEntry);
 /// Wraps a single doc entry for Lua access.
 impl LuaUserData for DocEntry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns the name.
+        /// Returns the symbol name for this documentation entry.
         /// @return string
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
 
@@ -146,15 +146,15 @@ impl LuaUserData for DocEntry {
             Ok(this.0.qualified_name.clone())
         });
 
-        /// Returns the module.
+        /// Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
         /// @return string
         methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
 
-        /// Returns the kind.
+        /// Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
         /// @return string
         methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
 
-        /// Returns the description.
+        /// Returns the human-readable description text for this documentation entry.
         /// @return string
         methods.add_method("getDescription", |_, this, ()| {
             Ok(this.0.description.clone())

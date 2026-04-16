@@ -847,14 +847,14 @@ pub struct LuaAiFlowField {
 impl LuaUserData for LuaAiFlowField {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getWidth --
-        /// Returns the grid width.
+        /// Returns the flow field grid width in cells.
         /// @return integer
         methods.add_method("getWidth", |_, this, ()| {
             Ok(this.inner.borrow().width as u32)
         });
 
         // -- getHeight --
-        /// Returns the grid height.
+        /// Returns the flow field grid height in cells.
         /// @return integer
         methods.add_method("getHeight", |_, this, ()| {
             Ok(this.inner.borrow().height as u32)

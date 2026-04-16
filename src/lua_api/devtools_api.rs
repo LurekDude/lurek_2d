@@ -156,6 +156,7 @@ impl LuaUserData for LuaFileWatcher {
     }
 }
 
+/// Registers the `lurek.devtools` Lua API table into the engine namespace.
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let dt = lua.create_table()?;
     let shared = Rc::new(RefCell::new(DevtoolsShared::new()));
@@ -278,7 +279,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    /// Clears all log history.
+    /// Discards all accumulated log entries from the in-memory devtools log buffer.
     let s = shared.clone();
     /// @return nil
     dt.set(

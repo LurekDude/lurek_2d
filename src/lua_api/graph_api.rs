@@ -227,7 +227,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         // -- kill --
-        /// Marks the item as dead.
+        /// Marks this graph item as dead so it is removed on the next cleanup pass.
         /// @return nil
         methods.add_method("kill", |_, this, ()| {
             with_item_mut!(this, g, item, {
@@ -244,7 +244,7 @@ impl LuaUserData for LuaGraphItem {
         });
 
         // -- setPriority --
-        /// Sets the item priority.
+        /// Sets the scheduling priority; higher values are processed before lower ones.
         /// @param p : integer
         /// @return nil
         methods.add_method("setPriority", |_, this, p: i32| {
@@ -942,7 +942,7 @@ impl LuaUserData for LuaNode {
         // ---- Tags ----
 
         // -- addTag --
-        /// Adds a tag to this node.
+        /// Attaches a string tag to this node for fast group queries.
         /// @param tag : string
         /// @return nil
         methods.add_method("addTag", |_, this, tag: String| {

@@ -1134,6 +1134,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    /// Built-in transition presets table with `fade`, `slide`, and `iris` entries.
     tbl.set("transitions", trans_tbl)?;
 
     Ok(())

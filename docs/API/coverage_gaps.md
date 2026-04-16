@@ -10,18 +10,50 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (0 items)
+## 1. Rust→Lua Gaps (10 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-*All public Rust functions appear to be exposed to Lua.*
+### `compute::fft`
+
+- `next_power_of_two` — Returns the smallest power of two ≥ `n`. `src/compute/fft.rs:89`
+
+### `compute::linalg`
+
+- `eigenvalue_power` — Computes the dominant eigenvalue and its eigenvector of a sq `src/compute/linalg.rs:528`
+
+### `math::voronoi`
+
+- `voronoi_from_points` — Compute the Voronoi diagram for `points`.  One [`VoronoiCell `src/math/voronoi.rs:184`
+
+### `network::lobby`
+
+- `broadcast_lobby` — Broadcasts a lobby announcement to the subnet once.  Binds a `src/network/lobby.rs:110`
+
+### `pathfind::bidir`
+
+- `bidirectional_astar` — Run bidirectional A★ search on `grid` from `start` to `goal` `src/pathfind/bidir.rs:169`
+
+### `physics::collision_helpers`
+
+- `test_point_aabb` — Returns `true` when point `(px, py)` lies inside the AABB at `src/physics/collision_helpers.rs:39`
+
+### `terminal::ansi`
+
+- `parse_ansi_spans` — Tokenises `text` into [`AnsiSpan`] records, each with plain  `src/terminal/ansi.rs:116`
+- `strip_ansi_codes` — Removes all ANSI escape sequences from `text` and returns th `src/terminal/ansi.rs:82`
+
+### `ui::layout_loader`
+
+- `load_layout_def` — Recursively build a widget tree inside `ctx` from a `WidgetD `src/ui/layout_loader.rs:186`
+- `load_layout_toml` — Parse TOML source text conforming to the `LayoutDef` schema  `src/ui/layout_loader.rs:214`
 
 ---
 
 ## 2. Rust Docstring Issues (0 items)
 
-Public Rust items with missing or very short descriptions (< 15 chars).
+Public Rust items with missing or very short descriptions (< 25 chars).
 These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 *All public Rust items have adequate docstrings.*
@@ -30,7 +62,7 @@ These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 ## 3. Lua Docstring Issues (0 items)
 
-Lua API items with missing or very short descriptions (< 15 chars).
+Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
 *All Lua API items have adequate descriptions.*

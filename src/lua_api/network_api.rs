@@ -570,7 +570,7 @@ impl LuaUserData for LuaNetworkRuntime {
         });
 
         // -- tcpClose --
-        /// Closes a TCP connection.
+        /// Closes the TCP connection identified by the given connection handle.
         /// @param id : integer — connection ID
         /// @return nil
         methods.add_method("tcpClose", |_, this, id: u64| {

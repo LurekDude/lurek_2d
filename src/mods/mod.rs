@@ -9,6 +9,6 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-/// Mod Manager sub-module.
+/// Mod Manager: discovers, loads, and manages runtime extension mods.
 pub mod mod_manager;
 pub use mod_manager::*;

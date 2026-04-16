@@ -36,35 +36,7 @@ pub mod constants;
 /// Network-specific error types.
 pub mod error;
 
-/// ENet host wrapper.
-pub mod host;
-
-/// HTTP client for async web requests on the network thread.
-pub mod http;
-
-/// Binary message serialization via MessagePack.
-pub mod message;
-
-/// Dedicated network I/O thread with mpsc bridge to the main engine thread.
-pub mod net_thread;
-
-/// Non-blocking TCP client connections managed on the network thread.
-pub mod tcp;
-
-/// WebSocket client connections managed on the network thread.
-pub mod websockesocket`] — WebSocket client via `tungstenite` on the network thread.
-//! - [`message`] — MessagePack serialization (Lua table ↔ compact binary).
-//! - [`net_thread`] — Dedicated I/O thread with `mpsc` request/response channels.
-//! - [`error`] — `NetworkError` enum covering all transport types.
-//! - [`constants`] — Compile-time limits and defaults.
-
-/// Compile-time limits and defaults for the networking subsystem.
-pub mod constants;
-
-/// Network-specific error types.
-pub mod error;
-
-/// ENet host wrapper.
+/// ENet UDP host that manages peers, connections, and reliable packet dispatch.
 pub mod host;
 
 /// HTTP client for async web requests on the network thread.

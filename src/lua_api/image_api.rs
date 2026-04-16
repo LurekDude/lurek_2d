@@ -206,7 +206,7 @@ impl LuaUserData for LuaLayeredImage {
         });
 
         // -- setName --
-        /// Renames a layer.
+        /// Renames the layer at the given index to the new name string.
         /// @param index : integer
         /// @param name : string
         /// @return boolean

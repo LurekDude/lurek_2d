@@ -675,6 +675,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     let dc = dpi_callback;
     let pd = prev_dpi;
     let s = state.clone();
+    /// Polls for a pending DPI change event and returns the new scale factor if any.
+    ///
+    /// @return any
     tbl.set(
         "pollDpiChange",
         lua.create_function(move |lua, ()| {

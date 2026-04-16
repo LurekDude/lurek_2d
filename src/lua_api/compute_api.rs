@@ -291,7 +291,7 @@ impl LuaUserData for LuaArray {
         });
 
         // -- neg --
-        /// Element-wise negation.
+        /// Returns a new Array with every element negated (multiplied by −1).
         /// @return Array
         methods.add_method("neg", |lua, this, ()| {
             let result = ops::neg(&this.inner).map_err(LuaError::RuntimeError)?;

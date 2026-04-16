@@ -171,7 +171,7 @@ impl LuaUserData for LuaMod {
         methods.add_method("getVersion", |_, this, ()| Ok(this.inner.version.clone()));
 
         // -- getAuthor --
-        /// Returns the author name.
+        /// Returns the author name string from this mod's metadata manifest.
         /// @return string
         methods.add_method("getAuthor", |_, this, ()| Ok(this.inner.author.clone()));
 
@@ -200,7 +200,7 @@ impl LuaUserData for LuaMod {
         methods.add_method("isEnabled", |_, this, ()| Ok(this.inner.enabled));
 
         // -- setEnabled --
-        /// Sets the enabled state.
+        /// Enables or disables this mod; disabled mods are skipped during loading.
         /// @param enabled : boolean
         /// @return nil
         methods.add_method_mut("setEnabled", |_, this, enabled: bool| {

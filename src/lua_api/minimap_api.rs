@@ -627,7 +627,7 @@ impl LuaUserData for LuaMinimap {
         );
 
         // -- removeMarker --
-        /// Removes a marker by ID.
+        /// Removes the minimap marker with the given integer ID, if present.
         /// @param id : integer
         /// @return boolean
         methods.add_method_mut("removeMarker", |_, this, id: u32| {

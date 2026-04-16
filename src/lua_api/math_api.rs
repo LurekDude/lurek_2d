@@ -462,7 +462,7 @@ impl LuaUserData for LuaTransform {
         });
 
         // -- shear --
-        /// Applies shear factors.
+        /// Applies horizontal and vertical shear factors to this transform matrix.
         /// @param kx : number
         /// @param ky : number
         /// @return nil
@@ -734,7 +734,7 @@ impl LuaUserData for LuaTween {
         methods.add_method_mut("update", |_, this, dt: f64| Ok(this.inner.update(dt)));
 
         // -- reset --
-        /// Resets the clock to 0.
+        /// Resets the tween elapsed time to zero, restarting the animation.
         /// @return nil
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
@@ -887,7 +887,7 @@ impl LuaUserData for LuaSpatialHash {
         });
 
         // -- clear --
-        /// Removes all items.
+        /// Removes all registered items from this spatial hash, leaving it empty.
         /// @return nil
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
@@ -932,7 +932,7 @@ impl LuaUserData for LuaSpatialHash {
         );
 
         // -- getCellSize --
-        /// Returns the cell size.
+        /// Returns the cell size used to partition the spatial hash grid.
         /// @return number
         methods.add_method("getCellSize", |_, this, ()| Ok(this.inner.cell_size()));
 
@@ -1611,7 +1611,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inQuad --
-    /// Quadratic ease-in.
+    /// Quadratic ease-in — acceleration that starts at zero and increases.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1620,7 +1620,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outQuad --
-    /// Quadratic ease-out.
+    /// Quadratic ease-out — deceleration that starts fast and ends at zero.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1629,7 +1629,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inOutQuad --
-    /// Quadratic ease-in-out.
+    /// Quadratic ease-in-out — slow start, fast middle, slow end.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1647,7 +1647,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outCubic --
-    /// Cubic ease-out.
+    /// Cubic ease-out — rapid deceleration using a cubic power curve.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1656,7 +1656,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inOutCubic --
-    /// Cubic ease-in-out.
+    /// Cubic ease-in-out — slow start and end with fast cubic middle.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1665,7 +1665,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inQuart --
-    /// Quartic ease-in.
+    /// Quartic ease-in — strongly delayed acceleration using a power-of-4 curve.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1674,7 +1674,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outQuart --
-    /// Quartic ease-out.
+    /// Quartic ease-out — rapid deceleration using a power-of-4 curve.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1683,7 +1683,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inOutQuart --
-    /// Quartic ease-in-out.
+    /// Quartic ease-in-out — very slow start and end with a sharp middle peak.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1692,7 +1692,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inSine --
-    /// Sinusoidal ease-in.
+    /// Sinusoidal ease-in — gentle acceleration based on a sine curve.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1701,7 +1701,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outSine --
-    /// Sinusoidal ease-out.
+    /// Sinusoidal ease-out — gentle deceleration based on a cosine curve.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1710,7 +1710,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inOutSine --
-    /// Sinusoidal ease-in-out.
+    /// Sinusoidal ease-in-out — smooth S-curve based on cosine interpolation.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1719,7 +1719,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inExpo --
-    /// Exponential ease-in.
+    /// Exponential ease-in — very slow start that accelerates sharply near the end.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1728,7 +1728,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outExpo --
-    /// Exponential ease-out.
+    /// Exponential ease-out — sharp initial speed that decelerates exponentially.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1737,7 +1737,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inOutExpo --
-    /// Exponential ease-in-out.
+    /// Exponential ease-in-out — very slow start and end with an exponential surge.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1746,7 +1746,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inElastic --
-    /// Elastic ease-in.
+    /// Elastic ease-in — spring-like overshoot at the beginning of the motion.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1755,7 +1755,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outElastic --
-    /// Elastic ease-out.
+    /// Elastic ease-out — spring-like oscillation that settles at the target.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1764,7 +1764,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- outBounce --
-    /// Bounce ease-out.
+    /// Bounce ease-out — simulates a ball bouncing against the target value.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -1773,7 +1773,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- inBounce --
-    /// Bounce ease-in.
+    /// Bounce ease-in — reverse bounce effect that accelerates into the motion.
     /// @param t : number
     /// @return number
     tbl.set(
@@ -2517,7 +2517,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- vec3 --
-    /// Creates a 3D vector.
+    /// Creates a 3D vector `{x, y, z}` table with numeric components.
     /// @param x : number
     /// @param y : number
     /// @param z : number

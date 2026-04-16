@@ -3,7 +3,14 @@
 All notable changes to Lurek2D are recorded here.
 
 ## [0.17.0] — 2026-04-29
-### Added
+### Changed
+- **docs/quality**: Raised minimum description length requirement from 15 to **25 characters** in `tools/audit/gen_coverage_gaps.py` (now `_MIN_DESC_LENGTH = 25`) and `tools/validate/cag_validate.py` (both short-desc thresholds updated from `< 20` / `< 10` to `< 25`).
+- **docstrings**: Fixed 116 short `///` Lua API descriptions across `ai_api.rs`, `audio_api.rs`, `compute_api.rs`, `dataframe_api.rs`, `devtools_api.rs`, `docs_api.rs`, `graph_api.rs`, `image_api.rs`, `math_api.rs`, `minimap_api.rs`, `mods_api.rs`, `network_api.rs`, `particle_api.rs`, `pathfind_api.rs`, `physics_api.rs`, `graphic_api.rs`, `save_api.rs`, `tween_api.rs`, `ui_api.rs`, `animation_api.rs`, `event_api.rs`, `pipeline_api.rs`, `timer_api.rs`, `window_api.rs` — all now meet the 25-char minimum.
+- **docstrings**: Fixed 3 short `///` Rust sub-module docstrings (`thread::channel`, `thread::worker`, `thread::pool`; `network::host`; `minimap::mod_minimap`; `mods::mod_manager`).
+- **docstrings**: Added missing `///` to `animation_api::register`, `devtools_api::register`, `effect_api::register`; added `///` to `renderer::RenderCommand` enum; added `///` to `CELL_SAND/WATER/ROCK/FIRE/GAS` constants in `physics_api`; added `///` to `scene_api` transitions table.
+- **bug fix**: Removed accidental duplicate `pub mod` block in `src/network/mod.rs` that was inserted by a previous session; restored correct single-declaration structure.
+- **pipeline_api**: Fixed `typeOf` docstring tag ordering — description now precedes `@param`/`@return` annotations.
+
 - **image**: `ProvinceGrid` — new Rust type (`src/image/province_grid.rs`). Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB pixel is assigned a sequential province ID; pure-black becomes background (ID 0). Includes single-pass adjacency detection with per-pair border-pixel counts.
 - **image**: `lurek.img.newProvinceGrid(filename)` — load a province-colour PNG and get an O(1) coordinate-lookup + adjacency index. Replaces 2–8 s Lua hash-table construction with ~15–30 ms Rust scan for 2400×1200 / 3000-province maps.
 - **image**: `ProvinceGrid` Lua userdata methods: `getWidth()`, `getHeight()`, `getAt(x, y)`, `provinceCount()`, `adjacencies()` (returns array of `{province_a, province_b, border_pixels}` tables).

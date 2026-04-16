@@ -107,7 +107,7 @@ def _check_agent(path: Path, text: str, fm: dict[str, str]) -> list[Finding]:
 
     # description should not be very short
     desc = fm.get("description", "")
-    if desc and len(desc) < 20:
+    if desc and len(desc) < 25:
         findings.append(Finding("WARN", path, f"frontmatter `description` is very short ({len(desc)} chars)"))
 
     # tools should look like a list
@@ -152,7 +152,7 @@ def _check_prompt(path: Path, text: str, fm: dict[str, str]) -> list[Finding]:
         findings.append(Finding("ERROR", path, "Missing required frontmatter field: `description`"))
     elif not fm["description"].strip():
         findings.append(Finding("WARN", path, "Frontmatter `description` is empty"))
-    elif len(fm["description"]) < 10:
+    elif len(fm["description"]) < 25:
         findings.append(Finding("WARN", path, f"Frontmatter `description` is very short ({len(fm['description'])} chars)"))
 
     body = body_after_frontmatter(text)

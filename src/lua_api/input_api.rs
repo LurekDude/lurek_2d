@@ -1073,6 +1073,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @return boolean
     let lpf = last_pressed_frame;
     let s = state.clone();
+    /// Was action pressed within.
+    ///
+    /// @param action : string
+    /// @param frames : integer
+    /// @return boolean
     input_tbl.set(
         "wasActionPressedWithin",
         lua.create_function(move |_, (action, frames): (String, u64)| {

@@ -692,7 +692,7 @@ impl LuaUserData for LuaMesh {
         });
 
         // -- release --
-        /// Releases this mesh.
+        /// Releases the GPU mesh resource, freeing VRAM immediately.
         /// @return boolean
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
@@ -757,7 +757,7 @@ impl LuaUserData for LuaShader {
         });
 
         // -- release --
-        /// Releases this shader.
+        /// Releases the compiled GPU shader, freeing VRAM and shader slots.
         /// @return boolean
         methods.add_method("release", |_, this, ()| {
             let mut st = this.state.borrow_mut();
@@ -1349,7 +1349,7 @@ impl LuaUserData for LuaDrawLayer {
         /// @return number
         methods.add_method("getCount", |_, this, ()| Ok(this.entries.len() as i64));
 
-        /// Returns the type name.
+        /// Returns the string type identifier of this draw layer (e.g. `'sprite'`).
         /// @return string
         methods.add_method("type", |_, _, ()| Ok("DrawLayer"));
 
@@ -1447,7 +1447,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // ── Shape Drawing ────────────────────────────────────────────────────────
 
     // -- rectangle --
-    /// Draws a rectangle.
+    /// Draws a filled or outlined axis-aligned rectangle at the given position.
     /// @param mode : string
     /// @param x : number
     /// @param y : number
@@ -1503,7 +1503,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- circle --
-    /// Draws a circle.
+    /// Draws a filled or outlined circle at the given world-space position.
     /// @param mode : string
     /// @param x : number
     /// @param y : number
@@ -1523,7 +1523,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- ellipse --
-    /// Draws an ellipse.
+    /// Draws a filled or outlined ellipse with independent x/y radii.
     /// @param mode : string
     /// @param x : number
     /// @param y : number
@@ -1547,7 +1547,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- triangle --
-    /// Draws a triangle.
+    /// Draws a filled or outlined triangle connecting three world-space vertices.
     /// @param mode : string
     /// @param x1 : number
     /// @param y1 : number
@@ -1684,7 +1684,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     // -- points --
-    /// Draws a list of points.
+    /// Draws a batch of individual points at the specified world-space coordinates.
     /// @param ... : number|table
     let s = state.clone();
     graphics.set(

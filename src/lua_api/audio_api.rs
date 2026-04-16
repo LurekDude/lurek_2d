@@ -423,7 +423,7 @@ pub struct LuaBus {
 impl LuaUserData for LuaBus {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getName --
-        /// Returns the bus name.
+        /// Returns the unique name string assigned to this audio bus.
         /// @return string
         methods.add_method("getName", |_, this, ()| {
             let st = this.state.borrow();
@@ -448,7 +448,7 @@ impl LuaUserData for LuaBus {
         });
 
         // -- getVolume --
-        /// Returns the bus volume.
+        /// Returns the current volume multiplier applied to all sources on this bus.
         /// @return number
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
@@ -643,7 +643,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
 
         // -- play --
-        /// Starts MIDI playback.
+        /// Starts or resumes MIDI sequence playback from the current position.
         /// @return nil
         methods.add_method("play", |_, this, ()| {
             let st = this.state.borrow();
@@ -654,7 +654,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
 
         // -- pause --
-        /// Pauses MIDI playback.
+        /// Pauses the MIDI sequence at the current position; resume with `play()`.
         /// @return nil
         methods.add_method("pause", |_, this, ()| {
             this.inner.borrow_mut().pause();
@@ -662,7 +662,7 @@ impl LuaUserData for LuaMidiPlayer {
         });
 
         // -- stop --
-        /// Stops MIDI playback.
+        /// Stops MIDI playback and resets the playhead to the beginning.
         /// @return nil
         methods.add_method("stop", |_, this, ()| {
             this.inner.borrow_mut().stop();
@@ -1179,7 +1179,7 @@ impl LuaUserData for LuaDecoder {
         });
 
         // -- getBitDepth --
-        /// Returns the bit depth.
+        /// Returns the per-sample bit depth of this decoded audio stream.
         /// @return integer
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.inner.bit_depth as u32));
 
