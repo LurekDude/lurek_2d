@@ -44,3 +44,7 @@ pub mod texture_atlas;
 
 pub use texture::Texture;
 pub use texture_atlas::TextureAtlas;
+
+/// Province pixel grid: O(1) coordinate lookup and single-pass adjacency detection.
+pub mod province_grid;
+pub use province_grid::{AdjacencyPair, ProvinceGrid};

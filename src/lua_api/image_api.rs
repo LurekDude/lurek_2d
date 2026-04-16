@@ -6,7 +6,59 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::image::serial;
-use crate::image::{CompressedImageData, ImageData, LayeredImage};
+use crate::image::{CompressedImageData, ImageData, LayeredImage, ProvinceGrid};
+
+// -------------------------------------------------------------------------------
+// LuaProvinceGrid UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around [`ProvinceGrid`].
+pub struct LuaProvinceGrid {
+    inner: ProvinceGrid,
+}
+
+impl LuaUserData for LuaProvinceGrid {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getWidth --
+        /// Returns the grid width in pixels.
+        /// @return integer
+        methods.add_method("getWidth", |_, this, ()| Ok(this.inner.width()));
+
+        // -- getHeight --
+        /// Returns the grid height in pixels.
+        /// @return integer
+        methods.add_method("getHeight", |_, this, ()| Ok(this.inner.height()));
+
+        // -- getAt --
+        /// Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
+        /// @param x : integer
+        /// @param y : integer
+        /// @return integer
+        methods.add_method("getAt", |_, this, (x, y): (u32, u32)| {
+            Ok(this.inner.get_at(x, y))
+        });
+
+        // -- provinceCount --
+        /// Returns the number of unique non-zero province IDs detected in the map.
+        /// @return integer
+        methods.add_method("provinceCount", |_, this, ()| Ok(this.inner.province_count()));
+
+        // -- adjacencies --
+        /// Returns an array of adjacency records. Each record is {province_a, province_b, border_pixels}.
+        /// @return table
+        methods.add_method("adjacencies", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, &(a, b, bp)) in this.inner.adjacencies().iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("province_a", a)?;
+                entry.set("province_b", b)?;
+                entry.set("border_pixels", bp)?;
+                t.set(i + 1, entry)?;
+            }
+            Ok(t)
+        });
+    }
+}
 
 // -------------------------------------------------------------------------------
 // LuaLayeredImage UserData
@@ -444,7 +496,24 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             })
         })?,
     )?;
-
+    // ── newProvinceGrid ───────────────────────────────────────────────
+    /// Loads a province map PNG and builds an O(1) spatial index with adjacency data.
+    /// Each unique RGB color in the PNG is assigned a sequential province ID (1..n).
+    /// Black pixels (0,0,0) are treated as background and return ID 0.
+    /// @param filename : string
+    /// @return ProvinceGrid
+    let s = state.clone();
+    tbl.set(
+        "newProvinceGrid",
+        lua.create_function(move |lua, filename: String| {
+            let path = s.borrow().game_dir.join(&filename);
+            let path_str = path
+                .to_str()
+                .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
+            let grid = ProvinceGrid::from_file(path_str).map_err(LuaError::RuntimeError)?;
+            lua.create_userdata(LuaProvinceGrid { inner: grid })
+        })?,
+    )?;
     luna.set("img", tbl)?;
     Ok(())
 }

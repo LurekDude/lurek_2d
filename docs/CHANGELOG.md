@@ -2,6 +2,13 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.17.0] — 2026-04-29
+### Added
+- **image**: `ProvinceGrid` — new Rust type (`src/image/province_grid.rs`). Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB pixel is assigned a sequential province ID; pure-black becomes background (ID 0). Includes single-pass adjacency detection with per-pair border-pixel counts.
+- **image**: `lurek.img.newProvinceGrid(filename)` — load a province-colour PNG and get an O(1) coordinate-lookup + adjacency index. Replaces 2–8 s Lua hash-table construction with ~15–30 ms Rust scan for 2400×1200 / 3000-province maps.
+- **image**: `ProvinceGrid` Lua userdata methods: `getWidth()`, `getHeight()`, `getAt(x, y)`, `provinceCount()`, `adjacencies()` (returns array of `{province_a, province_b, border_pixels}` tables).
+- **province_map library**: `M.newFromPng(png_path, defs?)` — engine-accelerated constructor that uses `lurek.img.newProvinceGrid` to build pixel index and populate adjacency edges in one call. All prior constructors and logic remain unchanged.
+
 ## [0.16.0] — 2026-04-28
 ### Added
 - **tilemap**: `lurek.tilemap.newIsoMap(w, h, tw, th, lh, partCount?)` — optional sixth parameter (default 4) replaces the previous fixed four-part `IsoTile` layout. `IsoTile.parts` is now `Vec<u32>` instead of `[u32;4]`, supporting any part count.

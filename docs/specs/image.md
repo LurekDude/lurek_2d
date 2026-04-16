@@ -31,6 +31,7 @@ The `texture` submodule provides `Texture` (a GPU handle with dimensions, format
 - `serial.rs`: Implements the `.lim` binary format for saving and loading flat and layered images.
 - `texture.rs`: Defines a lightweight texture handle and CPU-to-renderer texture creation helpers.
 - `texture_atlas.rs`: Packs named rectangular regions into a fixed atlas layout for sprite-sheet style use cases.
+- `province_grid.rs`: Defines `ProvinceGrid`, a flat `Vec<u32>` spatial index built from a province-colour PNG. Provides O(1) coordinate lookup and single-pass O(w×h) adjacency detection with border-pixel counts.
 - `visualization.rs`: Produces `ImageData` visualizations for other systems such as animation playback, camera debugging, noise, terrain, and easing curves.
 
 ## Types
@@ -44,6 +45,8 @@ The `texture` submodule provides `Texture` (a GPU handle with dimensions, format
 - `Texture` (`struct`, `texture.rs`): A lightweight texture handle and metadata wrapper used when CPU image data is inserted into renderer-owned texture storage.
 - `AtlasRegion` (`struct`, `texture_atlas.rs`): Describes the packed rectangle for one atlas entry.# `image` — Agent Reference
 - `TextureAtlas` (`struct`, `texture_atlas.rs`): Owns atlas dimensions and packed regions for named sub-images that share one backing texture.
+- `AdjacencyPair` (`struct`, `province_grid.rs`): Records that `province_a` and `province_b` share a border of `border_pixels` length (public fields).
+- `ProvinceGrid` (`struct`, `province_grid.rs`): Flat `Vec<u32>` spatial index for province-colour maps. Built from an `ImageData` in a single O(w×h) scan; each unique non-black RGB is assigned a sequential province ID (1..n).
 
 ## Functions
 
@@ -98,6 +101,11 @@ The `texture` submodule provides `Texture` (a GPU handle with dimensions, format
 - `ImageData::as_bytes` (`image_data.rs`): Get a reference to the raw pixel bytes.
 - `ImageData::get_string` (`image_data.rs`): Get the raw pixel bytes as a vector (for Lua getString() compatibility).
 - `ImageData::map_pixel_par` (`image_data.rs`): Apply a per-pixel transform in parallel for large images.
+- `ProvinceGrid::from_image` (`province_grid.rs`): Build a grid from an existing `ImageData` reference; single scan, no extra allocations beyond the flat `Vec<u32>`.
+- `ProvinceGrid::from_file` (`province_grid.rs`): Load a PNG from disk and build the grid in one call.
+- `ProvinceGrid::get_at` (`province_grid.rs`): Return the province ID at pixel `(x, y)`; returns 0 for out-of-bounds or background.
+- `ProvinceGrid::province_count` (`province_grid.rs`): Return the highest assigned province ID (= number of distinct provinces).
+- `ProvinceGrid::adjacencies` (`province_grid.rs`): Return the slice of `AdjacencyPair` values detected during construction.
 - `ImageLayer::new` (`layers.rs`): Create a new transparent layer with the given canvas dimensions.
 - `LayeredImage::new` (`layers.rs`): Create an empty layer stack with no layers.
 - `LayeredImage::width` (`layers.rs`): Canvas width shared by all layers.
@@ -189,6 +197,16 @@ The `texture` submodule provides `Texture` (a GPU handle with dimensions, format
 - Binding path(s): `src/lua_api/image_api.rs`
 - Namespace: `lurek.image`
 
+### `lurek.img` Functions (province / spatial index sub-namespace)
+- `lurek.img.newProvinceGrid(filename)`: Load a province-colour PNG and build an O(1) spatial index with adjacency data. Returns a `ProvinceGrid` userdata. Each unique non-black RGB pixel is assigned a sequential province ID (1..n); pure-black is background (ID 0). For a 2400×1200 map with 3000 provinces the scan completes in ~15–30 ms.
+
+### `ProvinceGrid` Methods
+- `ProvinceGrid:getWidth()` → `number` — pixel width of the source PNG.
+- `ProvinceGrid:getHeight()` → `number` — pixel height of the source PNG.
+- `ProvinceGrid:getAt(x, y)` → `number` — province ID at 0-based pixel coordinate; 0 for background or out-of-bounds.
+- `ProvinceGrid:provinceCount()` → `number` — total number of distinct provinces (highest sequential ID).
+- `ProvinceGrid:adjacencies()` → `table` — array of `{province_a, province_b, border_pixels}` tables for every detected province pair.
+
 ### Module Functions
 - `lurek.image.newImageData`: Creates a new blank ImageData or loads one from a file.
 - `lurek.image.newCompressedData`: Loads compressed texture data from a DDS file.
@@ -266,7 +284,11 @@ The `texture` submodule provides `Texture` (a GPU handle with dimensions, format
 
 - Keep this module reference synchronized with `src/image/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+### New in 0.14.2
 
+- `ProvinceGrid` — new type in `province_grid.rs`. Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Replaces the 2–8 s Lua `pixel_lookup` hash construction with ~15–30 ms Rust scan for 2400×1200 maps.
+- `lurek.img.newProvinceGrid(filename)` — registered in `image_api.rs`, returns `LuaProvinceGrid` userdata with `getWidth`, `getHeight`, `getAt`, `provinceCount`, `adjacencies` methods.
+- `content/library/province_map`: new `M.newFromPng(png_path, defs)` constructor uses `lurek.img.newProvinceGrid` when available; all prior constructors and logic unchanged.
 ### New in 0.14.1
 
 - 11 pixel transforms now use `map_pixel_par` (rayon, 65 536-pixel threshold): `brightness`, `contrast`, `saturation`, `gamma`, `tint`, `grayscale`, `sepia`, `invert`, `threshold`, `posterize`, `fill`.

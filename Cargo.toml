@@ -1,6 +1,6 @@
 [package]
 name = "lurek2d"
-version = "0.16.0"
+version = "0.17.0"
 edition = "2021"
 description = "Lurek2D — A cross-platform 2D game engine powered by Rust and Lua"
 license = "MIT"
