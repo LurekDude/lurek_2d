@@ -2691,10 +2691,15 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // ── Cell-type constants ───────────────────────────────────────────────────
     tbl.set("CELL_AIR",   CellType::Air   as u8)?;
+    /// Sand cell type constant for the cellular automaton simulation.
     tbl.set("CELL_SAND",  CellType::Sand  as u8)?;
+    /// Water cell type constant; flows and spreads horizontally in the simulation.
     tbl.set("CELL_WATER", CellType::Water as u8)?;
+    /// Immovable rock cell type constant; acts as a solid obstacle.
     tbl.set("CELL_ROCK",  CellType::Rock  as u8)?;
+    /// Fire cell type constant; spreads upward and ignites nearby flammable cells.
     tbl.set("CELL_FIRE",  CellType::Fire  as u8)?;
+    /// Gas cell type constant; rises and disperses across the simulation grid.
     tbl.set("CELL_GAS",   CellType::Gas   as u8)?;
 
     luna.set("physics", tbl)?;

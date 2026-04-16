@@ -127,6 +127,30 @@ _INTERNAL_MODULES = {
     "sprite::atlas",
     # LDtk file format parser — called internally by lurek.tilemap.loadLdtk
     "tilemap::ldtk",
+    # FFT algorithm helpers — next_power_of_two, fft, ifft, fft_magnitude are called
+    # inside lurek.compute.fft / .ifft / .fftMagnitude closures in compute_api.rs
+    "compute::fft",
+    # Linear algebra algorithm helpers — eigenvalue_power is called inside
+    # lurek.compute.eigenvalues in compute_api.rs; not a standalone Lua API
+    "compute::linalg",
+    # Voronoi algorithm — voronoi_from_points is called inside lurek.math.voronoi
+    # in math_api.rs (re-exported via crate::math::voronoi_from_points)
+    "math::voronoi",
+    # Lobby UDP broadcast helper — broadcast_lobby is called inside lurek.network.createLobby
+    # and discover_lobbies in network_api.rs; not a standalone Lua function
+    "network::lobby",
+    # Bidirectional A★ algorithm — bidirectional_astar is called inside
+    # lurek.pathfinding.findPathBidirectional in pathfind_api.rs
+    "pathfind::bidir",
+    # Collision geometry primitives — test_point_aabb is an internal AABB check
+    # used inside physics_api.rs closures; not exposed as a standalone Lua function
+    "physics::collision_helpers",
+    # ANSI escape code helpers — parse_ansi_spans and strip_ansi_codes are called
+    # inside lurek.terminal.stripAnsi / .parseAnsi in terminal_api.rs
+    "terminal::ansi",
+    # Widget tree builder helpers — load_layout_def / load_layout_toml are called
+    # inside lurek.ui.loadLayout / .loadLayoutToml closures in ui_api.rs
+    "ui::layout_loader",
 }
 
 # Minimum description length to be considered "documented"

@@ -11,7 +11,12 @@ All notable changes to Lurek2D are recorded here.
 - **bug fix**: Removed accidental duplicate `pub mod` block in `src/network/mod.rs` that was inserted by a previous session; restored correct single-declaration structure.
 - **pipeline_api**: Fixed `typeOf` docstring tag ordering — description now precedes `@param`/`@return` annotations.
 
-- **image**: `ProvinceGrid` — new Rust type (`src/image/province_grid.rs`). Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB pixel is assigned a sequential province ID; pure-black becomes background (ID 0). Includes single-pass adjacency detection with per-pair border-pixel counts.
+### Changed (continued — quality sweep #2)
+- **docs/quality**: Added 8 internal helper modules (`compute::fft`, `compute::linalg`, `math::voronoi`, `network::lobby`, `pathfind::bidir`, `physics::collision_helpers`, `terminal::ansi`, `ui::layout_loader`) to `_INTERNAL_MODULES` in `gen_coverage_gaps.py`. These functions were already called inside Lua API closures but triggered false-positive Rust→Lua gap alerts. Gap count: 10 → **0**.
+- **docstrings**: Added `///` doc comments to `CELL_SAND`, `CELL_WATER`, `CELL_ROCK`, `CELL_FIRE`, `CELL_GAS` constants in `physics_api.rs` — `doc_coverage.py` now reports **100%** on all Lua API items (was 89.8%).
+- All API reference files regenerated: `docs/API/lua-api.md`, `rust-api.md`, `coverage_gaps.md`, `docs/logs/lua_api_data.json`, `rust_api_data.json`.
+
+ Flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB pixel is assigned a sequential province ID; pure-black becomes background (ID 0). Includes single-pass adjacency detection with per-pair border-pixel counts.
 - **image**: `lurek.img.newProvinceGrid(filename)` — load a province-colour PNG and get an O(1) coordinate-lookup + adjacency index. Replaces 2–8 s Lua hash-table construction with ~15–30 ms Rust scan for 2400×1200 / 3000-province maps.
 - **image**: `ProvinceGrid` Lua userdata methods: `getWidth()`, `getHeight()`, `getAt(x, y)`, `provinceCount()`, `adjacencies()` (returns array of `{province_a, province_b, border_pixels}` tables).
 - **province_map library**: `M.newFromPng(png_path, defs?)` — engine-accelerated constructor that uses `lurek.img.newProvinceGrid` to build pixel index and populate adjacency edges in one call. All prior constructors and logic remain unchanged.

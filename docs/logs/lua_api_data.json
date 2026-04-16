@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-16T11:00:25.146202+00:00",
+    "generated": "2026-04-16T11:09:56.673162+00:00",
     "generator": "tools/gen_lua_api_data.py",
     "version": "0.17.0",
     "stats": {
@@ -50274,7 +50274,7 @@
                 "kind": "method",
                 "owner_type": "Pipeline",
                 "description": "Returns the type identifier string of this pipeline stage object.",
-                "full_doc": "@param name : string\nReturns the type identifier string of this pipeline stage object.\n\n@return boolean",
+                "full_doc": "Returns the type identifier string of this pipeline stage object.\n\n@param name : string\n@return boolean",
                 "params_doc": "",
                 "returns_doc": "",
                 "inferred_sig": "(name)",
