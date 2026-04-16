@@ -117,7 +117,7 @@ impl LuaUserData for LuaThreadPool {
         // -- collect --
         /// Retrieves the next result from the pool's output channel (non-blocking).
         /// Returns nil if no result is available yet.
-        /// @return any
+        /// @return table|nil
         methods.add_method("collect", |lua, this, ()| {
             match this.inner.lock().unwrap().collect() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -188,7 +188,7 @@ impl LuaUserData for LuaPromise {
 
         // -- result --
         /// Pops and returns the promise result, or nil if not yet ready.
-        /// @return any
+        /// @return table|nil
         methods.add_method("result", |lua, this, ()| {
             match this.inner.lock().unwrap().result() {
                 Some(cv) => channel_value_to_lua(lua, cv),
@@ -211,10 +211,9 @@ impl LuaUserData for LuaPromise {
 
 /// Registers the `lurek.thread` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

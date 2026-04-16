@@ -257,7 +257,8 @@ impl LuaUserData for LuaGraphItem {
         // -- getPosition --
         /// Returns the item position: node userdata if at a node, (edge, progress)
         /// if in transit, or nothing if unplaced.
-        /// @return Node|Edge|nil
+        /// Node|Edge|nil
+        /// @return nil
         methods.add_method("getPosition", |lua, this, ()| -> LuaResult<LuaMultiValue> {
             let graph = this.graph.borrow();
             let item = graph
@@ -898,6 +899,7 @@ impl LuaUserData for LuaNode {
         /// @param out_type : string
         /// @param in_count : integer?
         /// @param out_count : integer?
+        /// @return nil
         methods.add_method(
             "setConversion",
             |_,
@@ -1035,6 +1037,7 @@ impl LuaUserData for LuaNode {
         /// @param item_type : string
         /// @param quantity : integer
         /// @param priority : integer?
+        /// @return nil
         methods.add_method(
             "addDemand",
             |_, this, (item_type, quantity, priority): (String, i32, Option<i32>)| {
@@ -1077,7 +1080,8 @@ impl LuaUserData for LuaNode {
 
         // -- dequeue --
         /// Pops the next item from the node queue, or nil if empty.
-        /// @return GraphItem?
+        /// GraphItem?
+        /// @return nil
         methods.add_method("dequeue", |_, this, ()| {
             let mut graph = this.graph.borrow_mut();
             let node = graph
@@ -1261,7 +1265,8 @@ impl LuaUserData for LuaGraph {
         /// Returns the edge between two nodes, or nil if none exists.
         /// @param from_ud : Node
         /// @param to_ud : Node
-        /// @return Edge?
+        /// @return nil
+        /// Edge?
         methods.add_method(
             "getEdgeBetween",
             |_, this, (from_ud, to_ud): (LuaAnyUserData, LuaAnyUserData)| {
@@ -1665,6 +1670,7 @@ impl LuaUserData for LuaGraph {
         /// Registers a callback for a graph simulation event.
         /// @param event_name : string
         /// @param func : function
+        /// @return nil
         methods.add_method(
             "on",
             |lua, this, (event_name, func): (String, LuaFunction)| {
@@ -1883,10 +1889,9 @@ fn dispatch_events(
 
 /// Registers the `lurek.graph` API namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

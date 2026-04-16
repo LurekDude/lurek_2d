@@ -472,7 +472,8 @@ impl LuaUserData for LuaNetworkRuntime {
         // -- httpRequest --
         /// Sends an HTTP request asynchronously. Poll with `poll()` for the response.
         /// @param opts : table — { method, url, headers?, body?, timeout? }
-        /// @return integer — request ID
+        /// @return nil
+        /// integer — request ID
         methods.add_method("httpRequest", |_, this, opts: LuaTable| {
             let method: String = opts.get("method").unwrap_or_else(|_| "GET".into());
             let url: String = opts.get("url").map_err(|_| {
@@ -503,7 +504,8 @@ impl LuaUserData for LuaNetworkRuntime {
         /// Convenience: sends an HTTP GET request.
         /// @param url : string
         /// @param headers : table?
-        /// @return integer — request ID
+        /// @return nil
+        /// integer — request ID
         methods.add_method(
             "httpGet",
             |_, this, (url, headers): (String, Option<LuaTable>)| {
@@ -526,7 +528,8 @@ impl LuaUserData for LuaNetworkRuntime {
         /// @param url : string
         /// @param body : string
         /// @param headers : table?
-        /// @return integer — request ID
+        /// @return nil
+        /// integer — request ID
         methods.add_method(
             "httpPost",
             |_, this, (url, body, headers): (String, String, Option<LuaTable>)| {
@@ -547,7 +550,8 @@ impl LuaUserData for LuaNetworkRuntime {
         // -- tcpConnect --
         /// Opens a TCP connection to a remote address.
         /// @param addr : string — "host:port"
-        /// @return integer — connection ID
+        /// @return nil
+        /// integer — connection ID
         methods.add_method("tcpConnect", |_, this, addr: String| {
             let id = this
                 .inner
@@ -583,7 +587,8 @@ impl LuaUserData for LuaNetworkRuntime {
         // -- wsConnect --
         /// Opens a WebSocket connection.
         /// @param url : string — "ws://host:port/path" or "wss://..."
-        /// @return integer — connection ID
+        /// @return nil
+        /// integer — connection ID
         methods.add_method("wsConnect", |_, this, url: String| {
             let id = this
                 .inner
@@ -726,10 +731,9 @@ impl LuaUserData for LuaNetworkRuntime {
 
 /// Registers the `lurek.network` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -862,7 +866,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- unpack --
     /// Deserializes a MessagePack binary string back to a Lua value.
     /// @param data : string
-    /// @return any
+    /// @return table|nil
     tbl.set(
         "unpack",
         lua.create_function(|lua, data: LuaString| {
@@ -874,12 +878,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- createLobby --
     /// Creates a LobbyInfo record and broadcasts it once on the local network.
+    /// @return table|nil
     /// Other machines on the same subnet can discover it via lurek.network.discoverLobbies().
     /// @param name : string
     /// @param port : integer
     /// @param player_count : integer?
     /// @param max_players : integer?
-    /// @return table  { name, host, port, player_count, max_players }
+    /// table  { name, host, port, player_count, max_players }
     tbl.set(
         "createLobby",
         lua.create_function(
@@ -905,9 +910,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- discoverLobbies --
     /// Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
+    /// @return table|nil
     /// Returns an array of lobby tables: { name, host, port, player_count, max_players }.
     /// @param timeout_ms : integer?
-    /// @return table  array of lobby tables
+    /// table  array of lobby tables
     tbl.set(
         "discoverLobbies",
         lua.create_function(|lua, timeout_ms: Option<u64>| {

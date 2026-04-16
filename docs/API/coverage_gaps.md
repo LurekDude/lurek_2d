@@ -28,12 +28,14 @@ These appear as `// (undocumented)` in `docs/API/rust-api.md`.
 
 ---
 
-## 3. Lua Docstring Issues (0 items)
+## 3. Lua Docstring Issues (1 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/API/lua-api.md` and IntelliSense.
 
-*All Lua API items have adequate descriptions.*
+### `mods`
+
+- `method` **`Mod:getName`** — *"Returns the display name"* (too short)
 
 ---
 

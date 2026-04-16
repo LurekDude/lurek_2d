@@ -88,14 +88,16 @@ impl LuaUserData for LuaVec2 {
 
         // -- normalize --
         /// Returns a unit-length copy of this vector. Returns zero if length is zero.
-        /// @return Vec2
+        /// Vec2
+        /// @return nil
         methods.add_method("normalize", |lua, this, ()| {
             lua.create_userdata(LuaVec2 { inner: this.inner.normalize() })
         });
 
         // -- normalized --
         /// Compatibility alias for `normalize`.
-        /// @return Vec2
+        /// Vec2
+        /// @return nil
         methods.add_method("normalized", |lua, this, ()| {
             lua.create_userdata(LuaVec2 { inner: this.inner.normalize() })
         });
@@ -104,7 +106,8 @@ impl LuaUserData for LuaVec2 {
         /// Returns a linearly interpolated vector between this and other at parameter t.
         /// @param other : Vec2
         /// @param t : number
-        /// @return Vec2
+        /// @return nil
+        /// Vec2
         methods.add_method("lerp", |lua, this, (other, t): (LuaAnyUserData, f64)| {
             let o = other.borrow::<LuaVec2>()?;
             lua.create_userdata(LuaVec2 { inner: this.inner.lerp(o.inner, t as f32) })
@@ -127,14 +130,16 @@ impl LuaUserData for LuaVec2 {
         // -- rotate --
         /// Returns a new vector rotated by the given angle in radians.
         /// @param angle : number
-        /// @return Vec2
+        /// @return nil
+        /// Vec2
         methods.add_method("rotate", |lua, this, angle: f64| {
             lua.create_userdata(LuaVec2 { inner: this.inner.rotate(angle as f32) })
         });
 
         // -- perpendicular --
         /// Returns the perpendicular vector (-y, x).
-        /// @return Vec2
+        /// Vec2
+        /// @return nil
         methods.add_method("perpendicular", |lua, this, ()| {
             lua.create_userdata(LuaVec2 { inner: this.inner.perpendicular() })
         });
@@ -214,7 +219,8 @@ impl LuaUserData for LuaVec3 {
 
         // -- normalize --
         /// Returns a unit-length version of this vector.
-        /// @return Vec3
+        /// Vec3
+        /// @return nil
         methods.add_method("normalize", |lua, this, ()| {
             lua.create_userdata(LuaVec3 { inner: this.inner.normalize() })
         });
@@ -231,7 +237,8 @@ impl LuaUserData for LuaVec3 {
         // -- cross --
         /// Cross product with another Vec3.
         /// @param other : Vec3
-        /// @return Vec3
+        /// @return nil
+        /// Vec3
         methods.add_method("cross", |lua, this, other: LuaAnyUserData| {
             let v = other.borrow::<LuaVec3>()?;
             lua.create_userdata(LuaVec3 { inner: this.inner.cross(v.inner) })
@@ -241,7 +248,8 @@ impl LuaUserData for LuaVec3 {
         /// Linear interpolation towards another Vec3.
         /// @param other : Vec3
         /// @param t : number
-        /// @return Vec3
+        /// @return nil
+        /// Vec3
         methods.add_method("lerp", |lua, this, (other, t): (LuaAnyUserData, f32)| {
             let v = other.borrow::<LuaVec3>()?;
             lua.create_userdata(LuaVec3 { inner: this.inner.lerp(v.inner, t) })
@@ -259,7 +267,8 @@ impl LuaUserData for LuaVec3 {
         // -- add --
         /// Add another Vec3 and return the result.
         /// @param other : Vec3
-        /// @return Vec3
+        /// @return nil
+        /// Vec3
         methods.add_method("add", |lua, this, other: LuaAnyUserData| {
             let v = other.borrow::<LuaVec3>()?;
             lua.create_userdata(LuaVec3 { inner: this.inner + v.inner })
@@ -268,7 +277,8 @@ impl LuaUserData for LuaVec3 {
         // -- sub --
         /// Subtract another Vec3 and return the result.
         /// @param other : Vec3
-        /// @return Vec3
+        /// @return nil
+        /// Vec3
         methods.add_method("sub", |lua, this, other: LuaAnyUserData| {
             let v = other.borrow::<LuaVec3>()?;
             lua.create_userdata(LuaVec3 { inner: this.inner - v.inner })
@@ -277,7 +287,8 @@ impl LuaUserData for LuaVec3 {
         // -- scale --
         /// Scale this vector by a scalar and return the result.
         /// @param s : number
-        /// @return Vec3
+        /// @return nil
+        /// Vec3
         methods.add_method("scale", |lua, this, s: f32| {
             lua.create_userdata(LuaVec3 { inner: this.inner * s })
         });
@@ -618,7 +629,8 @@ impl LuaUserData for LuaBezierCurve {
         // -- getControlPoint --
         /// Returns the control point at 1-based index as (x, y), or nil.
         /// @param index : integer
-        /// @return number?, number?
+        /// @return nil
+        /// number?, number?
         methods.add_method("getControlPoint", |_, this, index: usize| {
             if index == 0 {
                 return Ok((None, None));
@@ -650,6 +662,7 @@ impl LuaUserData for LuaBezierCurve {
         /// @param x : number
         /// @param y : number
         /// @param index : integer?
+        /// @return nil
         methods.add_method_mut(
             "insertControlPoint",
             |_, this, (x, y, index): (f32, f32, Option<usize>)| {
@@ -745,7 +758,8 @@ impl LuaUserData for LuaTween {
         /// Returns the interpolated value at 1-based index, or all values as a
         /// table when called with no argument.
         /// @param index : integer | nil
-        /// @return number | table
+        /// @return nil
+        /// number | table
         methods.add_method("getValue", |lua, this, index: Option<usize>| match index {
             Some(i) => {
                 if i == 0 {
@@ -854,6 +868,7 @@ impl LuaUserData for LuaSpatialHash {
         /// @param y : number
         /// @param w : number
         /// @param h : number
+        /// @return nil
         methods.add_method_mut(
             "insert",
             |_, this, (id, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -869,6 +884,7 @@ impl LuaUserData for LuaSpatialHash {
         /// @param y : number
         /// @param w : number
         /// @param h : number
+        /// @return nil
         methods.add_method_mut(
             "update",
             |_, this, (id, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -1280,6 +1296,7 @@ impl LuaUserData for LuaAabbTree {
         /// @param min_y : number
         /// @param max_x : number
         /// @param max_y : number
+        /// @return nil
         methods.add_method_mut(
             "insert",
             |_, this, (id, min_x, min_y, max_x, max_y): (u64, f32, f32, f32, f32)| {
@@ -1362,6 +1379,7 @@ impl LuaUserData for LuaAabbTree {
 
         // -- clear --
         /// Removes all entries from the tree.
+        /// @return nil
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -1371,10 +1389,9 @@ impl LuaUserData for LuaAabbTree {
 
 /// Registers the `lurek.math` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 #[allow(clippy::type_complexity)]
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
@@ -1929,6 +1946,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- circleIntersectsLine --
     /// Tests an infinite line against a circle. Returns hit, then two optional hit-point pairs.
+    /// @return table
     /// @param cx : number
     /// @param cy : number
     /// @param r : number
@@ -1936,7 +1954,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param ly1 : number
     /// @param lx2 : number
     /// @param ly2 : number
-    /// @return boolean, number?, number?, number?, number?
+    /// boolean, number?, number?, number?, number?
     tbl.set(
         "circleIntersectsLine",
         lua.create_function(
@@ -1955,6 +1973,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- circleIntersectsSegment --
     /// Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
+    /// @return table
     /// @param cx : number
     /// @param cy : number
     /// @param r : number
@@ -1962,7 +1981,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param sy1 : number
     /// @param sx2 : number
     /// @param sy2 : number
-    /// @return boolean, number?, number?, number?, number?
+    /// boolean, number?, number?, number?, number?
     tbl.set(
         "circleIntersectsSegment",
         lua.create_function(
@@ -2051,6 +2070,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- lineIntersect --
     /// Infinite line intersection. Returns (x, y) or (nil, nil) if lines are parallel.
+    /// @return table
     /// @param x1 : number
     /// @param y1 : number
     /// @param x2 : number
@@ -2059,7 +2079,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param y3 : number
     /// @param x4 : number
     /// @param y4 : number
-    /// @return number?, number?
+    /// number?, number?
     tbl.set(
         "lineIntersect",
         lua.create_function(
@@ -2127,6 +2147,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- segmentIntersectsSegment --
     /// Tests if two line segments intersect. Returns (hit, ix?, iy?).
+    /// @return table
     /// @param x1 : number
     /// @param y1 : number
     /// @param x2 : number
@@ -2135,7 +2156,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param y3 : number
     /// @param x4 : number
     /// @param y4 : number
-    /// @return boolean, number?, number?
+    /// boolean, number?, number?
     tbl.set(
         "segmentIntersectsSegment",
         lua.create_function(
@@ -2496,7 +2517,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Creates a 2D vector with x and y components.
     /// @param x : number
     /// @param y : number
-    /// @return Vec2
+    /// Vec2
     tbl.set(
         "vec2",
         lua.create_function(|lua, (x, y): (f64, f64)| {
@@ -2508,7 +2529,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Compatibility alias for `vec2`.
     /// @param x : number
     /// @param y : number
-    /// @return Vec2
+    /// Vec2
     tbl.set(
         "Vec2",
         lua.create_function(|lua, (x, y): (f64, f64)| {
@@ -2521,7 +2542,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param x : number
     /// @param y : number
     /// @param z : number
-    /// @return Vec3
+    /// Vec3
     tbl.set(
         "vec3",
         lua.create_function(|lua, (x, y, z): (f32, f32, f32)| {
@@ -2534,7 +2555,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param x : number
     /// @param y : number
     /// @param z : number
-    /// @return Vec3
+    /// Vec3
     tbl.set(
         "Vec3",
         lua.create_function(|lua, (x, y, z): (f32, f32, f32)| {
@@ -2608,6 +2629,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- polygonClip --
     /// Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
+    /// @return table
     ///
     /// The inside half-plane is where `nx * x + ny * y >= d`.
     /// The polygon is supplied as a flat `{x1, y1, x2, y2, ...}` table.
@@ -2616,7 +2638,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param nx : number
     /// @param ny : number
     /// @param d : number
-    /// @return table  flat {x1, y1, ...} of clipped vertices, or empty table if fully clipped
+    /// table  flat {x1, y1, ...} of clipped vertices, or empty table if fully clipped
     tbl.set(
         "polygonClip",
         lua.create_function(|lua, (pts, nx, ny, d): (LuaTable, f32, f32, f32)| {
@@ -2704,6 +2726,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- voronoi --
     /// Computes the Voronoi diagram for a list of 2-D seed points.
+    /// @return table
     ///
     /// Each cell in the result has `site = {x, y}` (the input point) and
     /// `vertices = {{x, y}, …}` (circumcenters of adjacent Delaunay triangles,
@@ -2711,7 +2734,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// open (no infinite rays).
     ///
     /// @param points : table -- array of `{x, y}` tables
-    /// @return table -- array of `{site={x,y}, vertices={{x,y},…}}` tables
+    /// table -- array of `{site={x,y}, vertices={{x,y},…}}` tables
     tbl.set(
         "voronoi",
         lua.create_function(|lua, points: LuaTable| {

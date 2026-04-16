@@ -123,7 +123,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- pop --
         /// Removes and returns the oldest element, or nil if the buffer is empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method_mut("pop", |lua, this, ()| {
             match this.inner.pop_front() {
                 Some(key) => {
@@ -137,7 +137,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- peek --
         /// Returns the oldest element without removing it, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("peek", |lua, this, ()| match this.inner.front() {
             Some(key) => lua.registry_value::<LuaValue>(key),
             None => Ok(LuaValue::Nil),
@@ -145,7 +145,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- peekNewest --
         /// Returns the newest element without removing it, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("peekNewest", |lua, this, ()| match this.inner.back() {
             Some(key) => lua.registry_value::<LuaValue>(key),
             None => Ok(LuaValue::Nil),
@@ -175,6 +175,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- clear --
         /// Removes all elements from the buffer, releasing their registry entries.
+        /// @return nil
         methods.add_method_mut("clear", |lua, this, ()| {
             while let Some(key) = this.inner.pop_front() {
                 lua.remove_registry_value(key)?;
@@ -275,10 +276,9 @@ fn lua_table_to_toml_value(value: &LuaValue) -> LuaResult<toml::Value> {
 
 /// Registers the `lurek.data` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -298,10 +298,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- unpack --
     /// Unpacks values from a binary byte string, returning values followed by next offset.
+    /// @return table|nil
     /// @param format : string
     /// @param data : string
     /// @param offset : integer?
-    /// @return ...
+    /// ...
     tbl.set(
         "unpack",
         lua.create_function(
@@ -462,10 +463,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- read --
     /// Reads values using the Lurek2D Binary Pack Format.
+    /// @return table|nil
     /// @param format : string
     /// @param data : string
     /// @param offset : integer?
-    /// @return ...
+    /// ...
     tbl.set(
         "read",
         lua.create_function(
@@ -553,7 +555,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- fromMsgPack --
     /// Deserializes a MessagePack binary string back into a Lua value.
     /// @param bytes : string
-    /// @return any
+    /// @return table|nil
     tbl.set(
         "fromMsgPack",
         lua.create_function(|lua, bytes: LuaString| {
@@ -839,7 +841,8 @@ impl mlua::UserData for ByteData {
         /// @param byte_offset : integer   0-based starting byte index
         /// @param bit_offset  : integer   starting bit within starting byte [0..7]
         /// @param count       : integer   number of bits to read [1..32]
-        /// @return integer    uint32 with bits packed LSB-first
+        /// @return nil
+        /// integer    uint32 with bits packed LSB-first
         methods.add_method(
             "readBits",
             |_, this, (byte_offset, bit_offset, count): (usize, u8, u8)| {

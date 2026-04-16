@@ -383,10 +383,9 @@ impl LuaUserData for LuaAnimStateMachine {
 
 /// Registers the `lurek.animation` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 // -------------------------------------------------------------------------------
 // LuaBlendLayerSet UserData
@@ -537,9 +536,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── fromAseprite ─────────────────────────────────────────────────────────
     /// Parses an Aseprite JSON export string and builds an Animation with clips and frames.
+    /// @return table|nil
     /// Returns nil and an error message on parse failure.
     /// @param json_str : string
-    /// @return Animation?
+    /// Animation?
     tbl.set(
         "fromAseprite",
         lua.create_function(|lua, json_str: String| {

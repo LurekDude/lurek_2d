@@ -24,13 +24,16 @@ function AIDirector:phase() end
 
 --- Pushes a gameplay event with the given intensity to the director for awareness analysis.
 ---@param intensity any
+---@return nil
 function AIDirector:pushEvent(intensity) end
 
 --- Resets or clears the state.
+---@return nil
 function AIDirector:reset() end
 
 --- Sets the global narrative tension level (0–1 scale).
 ---@param value any
+---@return nil
 function AIDirector:setTension(value) end
 
 --- Returns or performs spawn rate factor.
@@ -43,6 +46,7 @@ function AIDirector:tension() end
 
 --- Advances the simulation by one time step.
 ---@param dt any
+---@return nil
 function AIDirector:update(dt) end
 
 --- Lua wrapper for [`crate::ai::lod::AILod`].
@@ -83,7 +87,7 @@ function AIWorld:addAgent(name) end
 
 --- Returns the agent handle for the given name, or nil.
 ---@param name any
----@return Agent?
+---@return nil
 function AIWorld:getAgent(name) end
 
 --- Returns the number of registered agents.
@@ -272,6 +276,7 @@ function Bandit:armCount() end
 function Bandit:bestArm() end
 
 --- Resets or clears the state.
+---@return nil
 function Bandit:reset() end
 
 --- Returns or performs select.
@@ -285,6 +290,7 @@ function Bandit:totalPulls() end
 --- Advances the simulation by one time step.
 ---@param idx any
 ---@param reward any
+---@return nil
 function Bandit:update(idx, reward) end
 
 --- Lua-side wrapper around a [`BehaviorTree`].
@@ -414,6 +420,7 @@ local ContextSteering = {}
 ---@param max_y any
 ---@param margin any
 ---@param weight any
+---@return nil
 function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
 
 --- Adds a world-space point that this agent steers away from.
@@ -421,17 +428,20 @@ function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weig
 ---@param y any
 ---@param radius any
 ---@param weight any
+---@return nil
 function ContextSteering:addAvoidPoint(x, y, radius, weight) end
 
 --- Adds a world-space target that this agent steers towards.
 ---@param tx any
 ---@param ty any
 ---@param weight any
+---@return nil
 function ContextSteering:addSeekTarget(tx, ty, weight) end
 
 --- Adds a wander behavior with jitter and weight to the context steering evaluator.
 ---@param jitter any
 ---@param weight any
+---@return nil
 function ContextSteering:addWander(jitter, weight) end
 
 --- Returns or performs chosen magnitude.
@@ -439,6 +449,7 @@ function ContextSteering:addWander(jitter, weight) end
 function ContextSteering:chosenMagnitude() end
 
 --- Resets or clears the behaviors.
+---@return nil
 function ContextSteering:clearBehaviors() end
 
 --- Evaluates and returns the computed result.
@@ -462,6 +473,7 @@ local EmotionModel = {}
 ---@param rest any
 ---@param decay any
 ---@param min_vis any
+---@return nil
 function EmotionModel:add(name, rest, decay, min_vis) end
 
 --- Returns or performs dominant.
@@ -479,15 +491,18 @@ function EmotionModel:get(name) end
 function EmotionModel:isActive(name) end
 
 --- Resets or clears the state.
+---@return nil
 function EmotionModel:reset() end
 
 --- Returns or performs trigger.
 ---@param name any
 ---@param amount any
+---@return nil
 function EmotionModel:trigger(name, amount) end
 
 --- Advances the simulation by one time step.
 ---@param dt any
+---@return nil
 function EmotionModel:update(dt) end
 
 --- Lua-side wrapper around a [`GOAPPlanner`].
@@ -508,6 +523,7 @@ function GOAPPlanner:getMaxIterations() end
 
 --- Sets the maximum A* planning iterations (0 = unlimited).
 ---@param n any
+---@return nil
 function GOAPPlanner:setMaxIterations(n) end
 
 --- Returns the type name of this object.
@@ -528,6 +544,7 @@ local GeneticAlgorithm = {}
 function GeneticAlgorithm:bestGenes() end
 
 --- Runs one generation of the evolutionary algorithm.
+---@return nil
 function GeneticAlgorithm:evolve() end
 
 --- Returns or performs generation.
@@ -546,6 +563,7 @@ function GeneticAlgorithm:popSize() end
 --- Sets the fitness score used by the genetic algorithm selection step.
 ---@param idx any
 ---@param fitness any
+---@return nil
 function GeneticAlgorithm:setFitness(idx, fitness) end
 
 --- Lua wrapper for [`crate::ai::htn::HTNDomain`].
@@ -555,6 +573,7 @@ local HTNDomain = {}
 --- Registers a compound HTN task that decomposes into sub-tasks.
 ---@param comp_name any
 ---@param methods_table any
+---@return nil
 function HTNDomain:addCompound(comp_name, methods_table) end
 
 --- Registers a primitive HTN task with a direct operator function.
@@ -562,6 +581,7 @@ function HTNDomain:addCompound(comp_name, methods_table) end
 ---@param preconds any
 ---@param effects any
 ---@param clears any
+---@return nil
 function HTNDomain:addPrimitive(name, preconds, effects, clears) end
 
 --- Runs planning and returns the resulting action sequence.
@@ -643,6 +663,7 @@ local NeedSystem = {}
 ---@param decay_rate any
 ---@param urgency_threshold any
 ---@param urgency_factor any
+---@return nil
 function NeedSystem:addNeed(name, decay_rate, urgency_threshold, urgency_factor) end
 
 --- Returns or performs most urgent.
@@ -652,10 +673,12 @@ function NeedSystem:mostUrgent() end
 --- Returns or performs satisfy.
 ---@param name any
 ---@param amount any
+---@return nil
 function NeedSystem:satisfy(name, amount) end
 
 --- Advances the simulation by one time step.
 ---@param dt any
+---@return nil
 function NeedSystem:update(dt) end
 
 --- Returns or performs value of.
@@ -671,6 +694,7 @@ local NeuralNet = {}
 ---@param inputs any
 ---@param outputs any
 ---@param activation any
+---@return nil
 function NeuralNet:addLayer(inputs, outputs, activation) end
 
 --- Returns or performs forward.
@@ -704,15 +728,16 @@ local Neuroevolution = {}
 function Neuroevolution:bestFitness() end
 
 --- Returns or performs best network.
----@return LuaNeuralNet|nil
+---@return nil
 function Neuroevolution:bestNetwork() end
 
 --- Returns or performs chromosome to net.
 ---@param idx any
----@return LuaNeuralNet|nil
+---@return nil
 function Neuroevolution:chromosomeToNet(idx) end
 
 --- Runs one generation of the evolutionary algorithm.
+---@return nil
 function Neuroevolution:evolve() end
 
 --- Returns or performs generation.
@@ -726,6 +751,7 @@ function Neuroevolution:popSize() end
 --- Sets the fitness score used by the genetic algorithm selection step.
 ---@param idx any
 ---@param fitness any
+---@return nil
 function Neuroevolution:setFitness(idx, fitness) end
 
 --- Lua wrapper for [`crate::ai::orca::ORCASolver`].
@@ -746,6 +772,7 @@ function ORCASolver:agentCount() end
 
 --- Computes and returns the result.
 ---@param dt any
+---@return nil
 function ORCASolver:compute(dt) end
 
 --- Returns the safe velocity.
@@ -757,12 +784,14 @@ function ORCASolver:getSafeVelocity(idx) end
 ---@param idx any
 ---@param x any
 ---@param y any
+---@return nil
 function ORCASolver:setPosition(idx, x, y) end
 
 --- Sets the preferred velocity.
 ---@param idx any
 ---@param pvx any
 ---@param pvy any
+---@return nil
 function ORCASolver:setPreferredVelocity(idx, pvx, pvy) end
 
 --- Lua-side wrapper around a [`QLearner`].
@@ -1012,6 +1041,7 @@ function StimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
 function StimulusWorld:addVisual(x, y, intensity, radius, tag) end
 
 --- Resets or clears the state.
+---@return nil
 function StimulusWorld:clear() end
 
 --- Returns or performs count.
@@ -1025,6 +1055,7 @@ function StimulusWorld:remove(id) end
 
 --- Advances the simulation by one time step.
 ---@param dt any
+---@return nil
 function StimulusWorld:update(dt) end
 
 --- Lua wrapper for [`crate::ai::strategy::StrategyAI`].
@@ -1037,18 +1068,22 @@ function StrategyAI:activeGoal() end
 
 --- Adds a strategic goal with priority score to the planner for future evaluation.
 ---@param name any
+---@return nil
 function StrategyAI:addGoal(name) end
 
 --- Adds a string tag to the strategy AI instance for goal filtering and categorization.
 ---@param tag any
+---@return nil
 function StrategyAI:addTag(tag) end
 
 --- Returns or performs force evaluate.
 ---@param scorer_fn any
+---@return nil
 function StrategyAI:forceEvaluate(scorer_fn) end
 
 --- Removes the specified tag.
 ---@param tag any
+---@return nil
 function StrategyAI:removeTag(tag) end
 
 --- Returns or performs time until next.
@@ -1058,6 +1093,7 @@ function StrategyAI:timeUntilNext() end
 --- Advances the simulation by one time step.
 ---@param dt any
 ---@param scorer_fn any
+---@return nil
 function StrategyAI:update(dt, scorer_fn) end
 
 --- Lua wrapper for [`crate::ai::traits::TraitProfile`].
@@ -1069,6 +1105,7 @@ local TraitProfile = {}
 ---@param delta any
 ---@param duration? any (optional)
 ---@param source any
+---@return nil
 function TraitProfile:addModifier(trait_name, delta, duration, source) end
 
 --- Returns or performs archetype.
@@ -1092,11 +1129,13 @@ function TraitProfile:has(name) end
 
 --- Removes the specified modifiers.
 ---@param source any
+---@return nil
 function TraitProfile:removeModifiers(source) end
 
 --- Sets the base value of this trait, replacing any previous base.
 ---@param name any
 ---@param value any
+---@return nil
 function TraitProfile:set(name, value) end
 
 --- Returns or performs trait count.
@@ -1105,6 +1144,7 @@ function TraitProfile:traitCount() end
 
 --- Advances the simulation by one time step.
 ---@param dt any
+---@return nil
 function TraitProfile:update(dt) end
 
 --- Lua-side wrapper around a [`UtilityAI`].
@@ -1522,7 +1562,7 @@ function BlendLayerSet:setWeight(name, weight) end
 
 --- Parses an Aseprite JSON export string and builds an Animation with clips and frames.
 ---@param json_str any
----@return Animation?
+---@return table|nil
 function lurek.animation.fromAseprite(json_str) end
 
 --- Creates a new, empty Animation controller.
@@ -1563,7 +1603,7 @@ function Bus:clearDuck() end
 function Bus:getName() end
 
 --- Returns the average peak amplitude of all sources currently on this bus.
----@return number
+---@return nil
 function Bus:getPeak() end
 
 --- Returns the bus pitch multiplier.
@@ -1793,6 +1833,7 @@ function MidiPlayer:setChannelVolume(ch, vol) end
 
 --- Sets the PCM output channel count (clamped 1–2).
 ---@param channels any
+---@return nil
 function MidiPlayer:setChannels(channels) end
 
 --- Enables or disables looping.
@@ -1817,6 +1858,7 @@ function MidiPlayer:setOnNoteOn(cb) end
 
 --- Sets the PCM output sample rate in Hz (clamped 8000–192000).
 ---@param rate any
+---@return nil
 function MidiPlayer:setSampleRate(rate) end
 
 --- Loads a SoundFont file into this player (stub).
@@ -2202,12 +2244,12 @@ function lurek.audio.getMasterVolume() end
 function lurek.audio.getMaxSources() end
 
 --- Returns the stored master peak meter level.
----@return number
+---@return table|nil
 function lurek.audio.getMeter() end
 
 --- Returns the 6-component orientation of a source.
 ---@param id_val any
----@return number
+---@return table|nil
 function lurek.audio.getOrientation(id_val) end
 
 --- Returns the source stereo panning.
@@ -2969,7 +3011,6 @@ function Camera2D:zoomTo(target_zoom, duration) end
 --- Creates a new Camera2D with the given viewport dimensions.
 ---@param vw any
 ---@param vh any
----@return Camera2D
 function lurek.camera.new(vw, vh) end
 
 ---@class lurek.collision
@@ -3183,17 +3224,17 @@ function Array:matmul(other) end
 
 --- Maximum of all elements, or along an axis (1-based).
 ---@param axis? any (optional)
----@return number|Array
+---@return nil
 function Array:max(axis) end
 
 --- Mean of all elements, or along an axis (1-based).
 ---@param axis? any (optional)
----@return number|Array
+---@return nil
 function Array:mean(axis) end
 
 --- Minimum of all elements, or along an axis (1-based).
 ---@param axis? any (optional)
----@return number|Array
+---@return nil
 function Array:min(axis) end
 
 --- Returns a new Array with every element negated (multiplied by −1).
@@ -3250,7 +3291,7 @@ function Array:sqrt() end
 
 --- Sum of all elements, or along an axis (1-based).
 ---@param axis? any (optional)
----@return number|Array
+---@return nil
 function Array:sum(axis) end
 
 --- Returns a mask array with 1.0 where elements >= val, else 0.0.
@@ -3412,6 +3453,7 @@ local RingBuffer = {}
 function RingBuffer:capacity() end
 
 --- Removes all elements from the buffer, releasing their registry entries.
+---@return nil
 function RingBuffer:clear() end
 
 --- Returns true if the buffer contains no elements.
@@ -3427,15 +3469,15 @@ function RingBuffer:isFull() end
 function RingBuffer:len() end
 
 --- Returns the oldest element without removing it, or nil if empty.
----@return any
+---@return table|nil
 function RingBuffer:peek() end
 
 --- Returns the newest element without removing it, or nil if empty.
----@return any
+---@return table|nil
 function RingBuffer:peekNewest() end
 
 --- Removes and returns the oldest element, or nil if the buffer is empty.
----@return any
+---@return table|nil
 function RingBuffer:pop() end
 
 --- Pushes a value onto the ring buffer.
@@ -3505,7 +3547,7 @@ function lurek.data.encodeToml(tbl) end
 
 --- Deserializes a MessagePack binary string back into a Lua value.
 ---@param bytes any
----@return any
+---@return table|nil
 function lurek.data.fromMsgPack(bytes) end
 
 --- Returns the number of bytes the given format and values would occupy.
@@ -3552,6 +3594,7 @@ function lurek.data.parseToml(text) end
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
+---@return table|nil
 function lurek.data.read(fmt, raw, offset) end
 
 --- Returns the byte size of a Lurek2D Binary Pack Format string.
@@ -3568,6 +3611,7 @@ function lurek.data.toMsgPack(value) end
 ---@param fmt any
 ---@param raw any
 ---@param offset? any (optional)
+---@return table|nil
 function lurek.data.unpack(fmt, raw, offset) end
 
 --- Writes values using the Lurek2D Binary Pack Format.
@@ -3692,7 +3736,7 @@ function DataFrame:min(col) end
 
 --- Return the most frequent value in a column (nil if empty).
 ---@param col any
----@return any
+---@return table|nil
 function DataFrame:modeVal(col) end
 
 --- Returns the number of columns.
@@ -3818,7 +3862,7 @@ function Database:clear() end
 
 --- Returns a copy of a table by name, or nil if not found.
 ---@param name any
----@return DataFrame?
+---@return nil
 function Database:getTable(name) end
 
 --- Returns true if a table with the given name exists.
@@ -3940,7 +3984,7 @@ function lurek.debugbridge.isRunning() end
 function lurek.debugbridge.isScreenshotRequested() end
 
 --- Poll for pending Lua-dependent requests from TCP clients.
----@return any
+---@return table|nil
 function lurek.debugbridge.poll() end
 
 --- Flags a screenshot request for the next frame.
@@ -4210,7 +4254,7 @@ function ApiCatalog:getEntries(module) end
 
 --- Returns a single entry by qualified name, or nil.
 ---@param qualified_name any
----@return DocEntry?
+---@return nil
 function ApiCatalog:getEntry(qualified_name) end
 
 --- Returns a sorted list of module names present in the catalog.
@@ -4376,7 +4420,7 @@ function Schema:getName() end
 
 --- Validates a Lua table against the schema.
 ---@param data any
----@return boolean
+---@return nil
 function Schema:validate(data) end
 
 --- Wraps a validation report for Lua access.
@@ -4887,7 +4931,7 @@ function ImageEffect:effectCount() end
 
 --- Returns the effect at the given 1-based index or with the given type name.
 ---@param key any
----@return PostFxEffect|nil
+---@return nil
 function ImageEffect:getEffect(key) end
 
 --- Returns the number of effects in the chain (alias for effectCount).
@@ -5335,7 +5379,7 @@ function PostFxStack:clear() end
 function PostFxStack:clearFeedback() end
 
 --- Removes duplicate effects from the pipeline, keeping the first occurrence
----@return integer
+---@return nil
 function PostFxStack:dedup() end
 
 --- Ends scene capture for post-processing.
@@ -5348,7 +5392,7 @@ function PostFxStack:getDimensions() end
 
 --- Returns the effect at the given 1-based position, or nil.
 ---@param index any
----@return PostFxEffect?
+---@return nil
 function PostFxStack:getEffect(index) end
 
 --- Returns the number of effects in the pipeline.
@@ -5450,12 +5494,12 @@ function mlua:reverse() end
 function mlua:setColor(color) end
 
 --- Type.
----@return any
+---@return table|nil
 function mlua:type() end
 
 --- Type of.
 ---@param name any
----@return any
+---@return table|nil
 function mlua:typeOf(name) end
 
 --- Advances the transition by `dt` seconds. Returns `true` while
@@ -5537,6 +5581,10 @@ function lurek.engine.frameCount() end
 ---@return number
 function lurek.engine.getFrameBudget() end
 
+--- Returns a table with resident resource memory statistics.
+---@return table
+function lurek.engine.getResourceStats() end
+
 --- Returns the engine version string (from `Cargo.toml`).
 ---@return string
 function lurek.engine.getVersion() end
@@ -5552,6 +5600,10 @@ function lurek.engine.memoryUsage() end
 --- Returns a string identifying the host operating system:
 ---@return string
 function lurek.engine.platform() end
+
+--- Sets the maximum resident texture memory budget in bytes.
+---@param budget_bytes any
+function lurek.engine.setResourceBudget(budget_bytes) end
 
 --- Returns the total engine uptime in seconds (sum of all processed deltas).
 ---@return number
@@ -5620,7 +5672,7 @@ function lurek.signal.enableHistory(capacity) end
 function lurek.signal.exit(code) end
 
 --- Moves all buffered deferred events into the main event queue and clears the buffer.
----@return integer
+---@return table|nil
 function lurek.signal.flushDeferred() end
 
 --- Returns an array of recent events as `{name, args}` tables.
@@ -5857,7 +5909,7 @@ function lurek.filesystem.openFile(path, mode) end
 
 --- Polls an async load handle, returning status and optional data.
 ---@param handle_id any
----@return string
+---@return string|nil
 function lurek.filesystem.pollAsync(handle_id) end
 
 --- Polls all watched paths and returns an array of paths that changed since the
@@ -6175,7 +6227,7 @@ local GraphItem = {}
 function GraphItem:getDecayTime() end
 
 --- Returns the item position: node userdata if at a node, (edge, progress)
----@return Node|Edge|nil
+---@return nil
 function GraphItem:getPosition() end
 
 --- Returns the item priority.
@@ -6253,7 +6305,7 @@ function Node:clearSupplies() end
 function Node:clearTags() end
 
 --- Pops the next item from the node queue, or nil if empty.
----@return GraphItem?
+---@return nil
 function Node:dequeue() end
 
 --- Pushes an item into the node queue.
@@ -6737,6 +6789,7 @@ local mlua = {}
 
 --- Alpha mask.
 ---@param factor any
+---@return nil
 function mlua:alphaMask(factor) end
 
 --- Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
@@ -6746,14 +6799,17 @@ function mlua:applyPaletteLut(lut_ud) end
 
 --- Blur.
 ---@param radius any
+---@return nil
 function mlua:blur(radius) end
 
 --- Brightness.
 ---@param factor any
+---@return nil
 function mlua:brightness(factor) end
 
 --- Contrast.
 ---@param factor any
+---@return nil
 function mlua:contrast(factor) end
 
 --- Crop.
@@ -6761,6 +6817,7 @@ function mlua:contrast(factor) end
 ---@param y any
 ---@param w any
 ---@param h any
+---@return nil
 function mlua:crop(x, y, w, h) end
 
 --- Returns the sum of absolute per-channel pixel differences with another ImageData.
@@ -6770,6 +6827,7 @@ function mlua:diff(other_ud) end
 
 --- Encode.
 ---@param format any
+---@return nil
 function mlua:encode(format) end
 
 --- Fill.
@@ -6777,47 +6835,55 @@ function mlua:encode(format) end
 ---@param g any
 ---@param b any
 ---@param a any
+---@return nil
 function mlua:fill(r, g, b, a) end
 
 --- Flip horizontal.
+---@return nil
 function mlua:flipHorizontal() end
 
 --- Flip vertical.
+---@return nil
 function mlua:flipVertical() end
 
 --- Gamma.
 ---@param gamma any
+---@return nil
 function mlua:gamma(gamma) end
 
 --- Returns the dimensions.
----@return any
+---@return table|nil
 function mlua:getDimensions() end
 
 --- Returns the height.
----@return any
+---@return table|nil
 function mlua:getHeight() end
 
 --- Returns the pixel.
 ---@param x any
 ---@param y any
+---@return nil
 function mlua:getPixel(x, y) end
 
 --- Returns the string.
----@return any
+---@return table|nil
 function mlua:getString() end
 
 --- Returns the width.
----@return any
+---@return table|nil
 function mlua:getWidth() end
 
 --- Grayscale.
+---@return nil
 function mlua:grayscale() end
 
 --- Invert.
+---@return nil
 function mlua:invert() end
 
 --- Map pixel.
 ---@param func any
+---@return nil
 function mlua:mapPixel(func) end
 
 --- Applies a function to every pixel in-place.
@@ -6827,38 +6893,46 @@ function mlua:mapPixels(func) end
 
 --- Noise.
 ---@param amount any
+---@return nil
 function mlua:noise(amount) end
 
 --- Posterize.
 ---@param levels any
+---@return nil
 function mlua:posterize(levels) end
 
 --- Returns a bilinear-interpolated copy of the image at the given dimensions.
 ---@param w any
 ---@param h any
----@return ImageData?
+---@return nil
 function mlua:resize(w, h) end
 
 --- Resize nearest.
 ---@param new_w any
 ---@param new_h any
+---@return nil
 function mlua:resizeNearest(new_w, new_h) end
 
 --- Rotate90cw.
+---@return nil
 function mlua:rotate90cw() end
 
 --- Saturation.
 ---@param factor any
+---@return nil
 function mlua:saturation(factor) end
 
 --- Sepia.
+---@return nil
 function mlua:sepia() end
 
 --- Sharpen.
+---@return nil
 function mlua:sharpen() end
 
 --- Threshold.
 ---@param value any
+---@return nil
 function mlua:threshold(value) end
 
 --- Returns true if the file at the given path is a DDS file.
@@ -6922,12 +6996,12 @@ local Combo = {}
 
 --- Feed a key-press event into the combo detector.
 ---@param key any
----@return string
+---@return nil
 function Combo:feed(key) end
 
 --- Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
 ---@param index any
----@return table
+---@return nil
 function Combo:getStep(index) end
 
 --- Returns true if the detector is currently mid-sequence.
@@ -6944,7 +7018,7 @@ function Combo:reset() end
 
 --- Advance the internal clock by `dt` seconds and check for timeouts.
 ---@param dt any
----@return string
+---@return nil
 function Combo:tick(dt) end
 
 --- Returns the total number of steps in the combo sequence.
@@ -7280,7 +7354,7 @@ function lurek.input.startRecording() end
 function lurek.input.stopPlayback() end
 
 --- Stops recording and returns an `InputRecording` userdata, or nil if not recording.
----@return InputRecording|nil
+---@return table|nil
 function lurek.input.stopRecording() end
 
 --- Removes all key bindings for the given action name.
@@ -7839,6 +7913,7 @@ lurek.math = {}
 local AabbTree = {}
 
 --- Removes all entries from the tree.
+---@return nil
 function AabbTree:clear() end
 
 --- Returns true if an entry with the given id exists in the tree.
@@ -7876,7 +7951,7 @@ function BezierCurve:evaluate(t) end
 
 --- Returns the control point at 1-based index as (x, y), or nil.
 ---@param index any
----@return number?
+---@return nil
 function BezierCurve:getControlPoint(index) end
 
 --- Returns the number of control points.
@@ -8152,7 +8227,7 @@ function Tween:getTime() end
 
 --- Returns the interpolated value at 1-based index, or all values as a
 ---@param index? any (optional)
----@return number
+---@return nil
 function Tween:getValue(index) end
 
 --- Returns the number of values in this tween.
@@ -8216,24 +8291,24 @@ function Vec2:lengthSquared() end
 --- Returns a linearly interpolated vector between this and other at parameter t.
 ---@param other any
 ---@param t any
----@return Vec2
+---@return nil
 function Vec2:lerp(other, t) end
 
 --- Returns a unit-length copy of this vector. Returns zero if length is zero.
----@return Vec2
+---@return nil
 function Vec2:normalize() end
 
 --- Compatibility alias for `normalize`.
----@return Vec2
+---@return nil
 function Vec2:normalized() end
 
 --- Returns the perpendicular vector (-y, x).
----@return Vec2
+---@return nil
 function Vec2:perpendicular() end
 
 --- Returns a new vector rotated by the given angle in radians.
 ---@param angle any
----@return Vec2
+---@return nil
 function Vec2:rotate(angle) end
 
 --- Returns the horizontal component of the vector.
@@ -8250,12 +8325,12 @@ local Vec3 = {}
 
 --- Add another Vec3 and return the result.
 ---@param other any
----@return Vec3
+---@return nil
 function Vec3:add(other) end
 
 --- Cross product with another Vec3.
 ---@param other any
----@return Vec3
+---@return nil
 function Vec3:cross(other) end
 
 --- Euclidean distance to another Vec3.
@@ -8279,34 +8354,32 @@ function Vec3:lengthSquared() end
 --- Linear interpolation towards another Vec3.
 ---@param other any
 ---@param t any
----@return Vec3
+---@return nil
 function Vec3:lerp(other, t) end
 
 --- Returns a unit-length version of this vector.
----@return Vec3
+---@return nil
 function Vec3:normalize() end
 
 --- Scale this vector by a scalar and return the result.
 ---@param s any
----@return Vec3
+---@return nil
 function Vec3:scale(s) end
 
 --- Subtract another Vec3 and return the result.
 ---@param other any
----@return Vec3
+---@return nil
 function Vec3:sub(other) end
 
 --- Compatibility alias for `vec2`.
 ---@param x any
 ---@param y any
----@return Vec2
 function lurek.math.Vec2(x, y) end
 
 --- Compatibility alias for `vec3`.
 ---@param x any
 ---@param y any
 ---@param z any
----@return Vec3
 function lurek.math.Vec3(x, y, z) end
 
 --- Creates a new empty AABB tree for efficient broad-phase overlap queries.
@@ -8399,7 +8472,7 @@ function lurek.math.circleIntersectsCircle(x1, y1, r1, x2, y2, r2) end
 ---@param ly1 any
 ---@param lx2 any
 ---@param ly2 any
----@return boolean
+---@return table
 function lurek.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
 
 --- Tests a line segment against a circle. Returns hit, then two optional hit-point pairs.
@@ -8410,7 +8483,7 @@ function lurek.math.circleIntersectsLine(cx, cy, r, lx1, ly1, lx2, ly2) end
 ---@param sy1 any
 ---@param sx2 any
 ---@param sy2 any
----@return boolean
+---@return table
 function lurek.math.circleIntersectsSegment(cx, cy, r, sx1, sy1, sx2, sy2) end
 
 --- Returns x clamped to [lo, hi].
@@ -8602,7 +8675,7 @@ function lurek.math.lerp(a, b, t) end
 ---@param y3 any
 ---@param x4 any
 ---@param y4 any
----@return number?
+---@return table
 function lurek.math.lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Linear easing (identity).
@@ -8812,7 +8885,7 @@ function lurek.math.round(x) end
 ---@param y3 any
 ---@param x4 any
 ---@param y4 any
----@return boolean
+---@return table
 function lurek.math.segmentIntersectsSegment(x1, y1, x2, y2, x3, y3, x4, y4) end
 
 --- Returns -1, 0, or 1 depending on the sign of x.
@@ -8857,14 +8930,12 @@ function lurek.math.triangulate(pts) end
 --- Creates a 2D vector with x and y components.
 ---@param x any
 ---@param y any
----@return Vec2
 function lurek.math.vec2(x, y) end
 
 --- Creates a 3D vector `{x, y, z}` table with numeric components.
 ---@param x any
 ---@param y any
 ---@param z any
----@return Vec3
 function lurek.math.vec3(x, y, z) end
 
 --- Computes the Voronoi diagram for a list of 2-D seed points.
@@ -9007,7 +9078,7 @@ function Minimap:getTileDescription(type_id) end
 function Minimap:getViewportColor() end
 
 --- Returns the viewport rectangle as x, y, w, h or nil if not set.
----@return number?
+---@return nil
 function Minimap:getViewportRect() end
 
 --- Returns the current zoom level.
@@ -9149,19 +9220,19 @@ lurek.mods = {}
 ---@class Mod
 local Mod = {}
 
---- Returns the required engine API version string, or nil if not set.
+--- Returns the required engine API version string, or nil if not set
 ---@return string?
 function Mod:getApiVersion() end
 
---- Returns the author name string from this mod's metadata manifest.
+--- Returns the author name string from this mod's metadata manifest
 ---@return string
 function Mod:getAuthor() end
 
---- Returns an array of declared capability flags.
+--- Returns an array of declared capability flags
 ---@return table
 function Mod:getCapabilities() end
 
---- Returns the stored config value, or nil.
+--- Returns the stored config value, or nil
 ---@return table?
 function Mod:getConfig() end
 
@@ -9169,67 +9240,67 @@ function Mod:getConfig() end
 ---@return table
 function Mod:getConfigSchema() end
 
---- Returns the list of required mod IDs.
+--- Returns the list of required mod IDs
 ---@return table
 function Mod:getDependencies() end
 
---- Returns the mod description.
+--- Returns the mod description
 ---@return string
 function Mod:getDescription() end
 
---- Returns the hook function for the given name, or nil.
+--- Returns the hook function for the given name, or nil
 ---@param name any
 ---@return function?
 function Mod:getHook(name) end
 
---- Returns an array of registered hook names.
+--- Returns an array of registered hook names
 ---@return table
 function Mod:getHookNames() end
 
---- Returns the unique mod identifier.
+--- Returns the unique mod identifier
 ---@return string
 function Mod:getId() end
 
---- Returns the display name.
+--- Returns the display name
 ---@return string
 function Mod:getName() end
 
---- Returns the load-order priority.
+--- Returns the load-order priority
 ---@return integer
 function Mod:getPriority() end
 
---- Returns the version string.
+--- Returns the version string
 ---@return string
 function Mod:getVersion() end
 
---- Returns whether a hook with the given name exists.
+--- Returns whether a hook with the given name exists
 ---@param name any
 ---@return boolean
 function Mod:hasHook(name) end
 
---- Returns whether the mod is enabled.
+--- Returns whether the mod is enabled
 ---@return boolean
 function Mod:isEnabled() end
 
---- Returns whether the mod has been loaded.
+--- Returns whether the mod has been loaded
 ---@return boolean
 function Mod:isLoaded() end
 
---- Releases all hook and config registry references.
+--- Releases all hook and config registry references
 ---@return nil
 function Mod:releaseRefs() end
 
---- Sets the required engine API version string.
+--- Sets the required engine API version string
 ---@param api_version any
 ---@return nil
 function Mod:setApiVersion(api_version) end
 
---- Replaces the capability list with the given array of strings.
+--- Replaces the capability list with the given array of strings
 ---@param caps any
 ---@return nil
 function Mod:setCapabilities(caps) end
 
---- Stores an arbitrary config value for this mod.
+--- Stores an arbitrary config value for this mod
 ---@param value any
 ---@return nil
 function Mod:setConfig(value) end
@@ -9239,7 +9310,7 @@ function Mod:setConfig(value) end
 ---@return nil
 function Mod:setConfigSchema(schema) end
 
---- Enables or disables this mod; disabled mods are skipped during loading.
+--- Enables or disables this mod; disabled mods are skipped during loading
 ---@param enabled any
 ---@return nil
 function Mod:setEnabled(enabled) end
@@ -9248,77 +9319,77 @@ function Mod:setEnabled(enabled) end
 ---@class ModManager
 local ModManager = {}
 
---- Clears the custom load order, reverting to priority-based sorting.
+--- Clears the custom load order, reverting to priority-based sorting
 ---@return nil
 function ModManager:clearLoadOrder() end
 
---- Clears the reload queue without reloading.
+--- Clears the reload queue without reloading
 ---@return nil
 function ModManager:clearReloadQueue() end
 
---- Returns an array of info tables for all registered mods.
+--- Returns an array of info tables for all registered mods
 ---@return table
 function ModManager:getAllMods() end
 
---- Returns an array of info tables in effective load order.
+--- Returns an array of info tables in effective load order
 ---@return table
 function ModManager:getLoadOrder() end
 
---- Returns the number of registered mods.
+--- Returns the number of registered mods
 ---@return integer
 function ModManager:getModCount() end
 
---- Returns the filesystem path of a registered mod, or nil.
+--- Returns the filesystem path of a registered mod, or nil
 ---@param mod_id any
 ---@return string?
 function ModManager:getModPath(mod_id) end
 
---- Returns the array of mod IDs pending hot-reload.
+--- Returns the array of mod IDs pending hot-reload
 ---@return table
 function ModManager:getReloadQueue() end
 
---- Returns whether any circular dependency cycles exist.
+--- Returns whether any circular dependency cycles exist
 ---@return boolean
 function ModManager:hasCircularDependencies() end
 
---- Returns whether a mod with the given ID is registered.
+--- Returns whether a mod with the given ID is registered
 ---@param mod_id any
 ---@return boolean
 function ModManager:hasMod(mod_id) end
 
---- Marks a registered mod for hot-reload.
+--- Marks a registered mod for hot-reload
 ---@param mod_id any
 ---@return boolean
 function ModManager:markForReload(mod_id) end
 
---- Registers a mod from its Mod userdata.
+--- Registers a mod from its Mod userdata
 ---@param ud any
 ---@return nil
 function ModManager:registerMod(ud) end
 
---- Scans a directory for mods with mod.toml and registers them.
+--- Scans a directory for mods with mod.toml and registers them
 ---@param path any
 ---@return table
 function ModManager:scanFolder(path) end
 
---- Sets an explicit load order from an array of mod ID strings.
+--- Sets an explicit load order from an array of mod ID strings
 ---@param order_table any
 ---@return nil
 function ModManager:setLoadOrder(order_table) end
 
---- Removes a mod by ID and returns whether it was found.
+--- Removes a mod by ID and returns whether it was found
 ---@param mod_id any
 ---@return boolean
 function ModManager:unregisterMod(mod_id) end
 
---- Returns an array of mod IDs with missing dependencies.
+--- Returns an array of mod IDs with missing dependencies
 ---@return table
 function ModManager:validateDependencies() end
 
 --- Checks whether a mod's required `api_version` is compatible with the given `host_version`.
 ---@param mod_ud any
 ---@param host_version any
----@return boolean
+---@return table|nil
 function lurek.mods.checkApiVersion(mod_ud, host_version) end
 
 --- Creates a new Mod from an info table with at least an `id` field.
@@ -9442,7 +9513,7 @@ local NetworkRuntime = {}
 
 --- Sends an HTTP request asynchronously. Poll with `poll()` for the response.
 ---@param opts any
----@return integer
+---@return nil
 function NetworkRuntime:httpRequest(opts) end
 
 --- Polls for completed async responses (HTTP, TCP events, WebSocket events).
@@ -9460,7 +9531,7 @@ function NetworkRuntime:tcpClose(id) end
 
 --- Opens a TCP connection to a remote address.
 ---@param addr any
----@return integer
+---@return nil
 function NetworkRuntime:tcpConnect(addr) end
 
 --- Sends data over a TCP connection.
@@ -9476,7 +9547,7 @@ function NetworkRuntime:wsClose(id) end
 
 --- Opens a WebSocket connection.
 ---@param url any
----@return integer
+---@return nil
 function NetworkRuntime:wsConnect(url) end
 
 --- Sends a text message over a WebSocket connection.
@@ -9490,12 +9561,12 @@ function NetworkRuntime:wsSend(id, data) end
 ---@param port any
 ---@param player_count? any (optional)
 ---@param max_players? any (optional)
----@return table
+---@return table|nil
 function lurek.network.createLobby(name, port, player_count, max_players) end
 
 --- Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
 ---@param timeout_ms? any (optional)
----@return table
+---@return table|nil
 function lurek.network.discoverLobbies(timeout_ms) end
 
 --- Creates a client host that connects to a remote server.
@@ -9533,7 +9604,7 @@ function lurek.network.syncEntity(host, entity_id, data, channel, reliable) end
 
 --- Deserializes a MessagePack binary string back to a Lua value.
 ---@param data any
----@return any
+---@return table|nil
 function lurek.network.unpack(data) end
 
 ---@class lurek.parallax
@@ -9814,7 +9885,7 @@ function ParticleSystem:getCount() end
 function ParticleSystem:getDirection() end
 
 --- Returns emission area: dist-string, w, h.
----@return string
+---@return nil
 function ParticleSystem:getEmissionArea() end
 
 --- Returns particles emitted per second.
@@ -9826,7 +9897,7 @@ function ParticleSystem:getEmissionRate() end
 function ParticleSystem:getEmitterLifetime() end
 
 --- Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
----@return number?
+---@return nil
 function ParticleSystem:getFlipbook() end
 
 --- Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
@@ -10307,12 +10378,14 @@ function HexGrid:rangeOfMovement(col, row, budget) end
 ---@param col any
 ---@param row any
 ---@param blocked any
+---@return nil
 function HexGrid:setBlocked(col, row, blocked) end
 
 --- Set movement cost for a cell (1-based coordinates).
 ---@param col any
 ---@param row any
 ---@param cost any
+---@return nil
 function HexGrid:setCost(col, row, cost) end
 
 --- Lua-side wrapper around a [`JpsGrid`].
@@ -10337,6 +10410,7 @@ function JpsGrid:isBlocked(x, y) end
 ---@param x any
 ---@param y any
 ---@param blocked any
+---@return nil
 function JpsGrid:setBlocked(x, y, blocked) end
 
 --- Lua-side wrapper around a [`NavGrid`] with optional HPA★ abstract graph.
@@ -10847,7 +10921,7 @@ function List:contains(value) end
 
 --- Returns the value at a 1-based index, or nil.
 ---@param index any
----@return any
+---@return table|nil
 function List:get(index) end
 
 --- Returns true if the list is empty.
@@ -10860,7 +10934,7 @@ function List:len() end
 
 --- Removes and returns the value at a 1-based index.
 ---@param index any
----@return any
+---@return table|nil
 function List:remove(index) end
 
 --- Replaces the value at a 1-based index.
@@ -11022,7 +11096,7 @@ local Queue = {}
 function Queue:clear() end
 
 --- Removes and returns the front value, or nil if empty.
----@return any
+---@return table|nil
 function Queue:dequeue() end
 
 --- Adds a value to the back of the queue. Returns false if capacity is full.
@@ -11031,7 +11105,7 @@ function Queue:dequeue() end
 function Queue:enqueue(value) end
 
 --- Returns the front value without removing it, or nil if empty.
----@return any
+---@return table|nil
 function Queue:front() end
 
 --- Returns true if the queue is empty.
@@ -11289,11 +11363,11 @@ function Stack:isFull() end
 function Stack:len() end
 
 --- Returns the top value without removing it, or nil if empty.
----@return any
+---@return table|nil
 function Stack:peek() end
 
 --- Removes and returns the top value, or nil if empty.
----@return any
+---@return table|nil
 function Stack:pop() end
 
 --- Pushes a value onto the stack. Returns false if capacity is full.
@@ -11315,7 +11389,7 @@ function Strategy:clear() end
 
 --- Calls the currently active strategy function with the given arguments.
 ---@param args any
----@return any
+---@return table|nil
 function Strategy:execute(args) end
 
 --- Returns the name of the active strategy, or nil.
@@ -11722,7 +11796,7 @@ function Cellular:getCell(cx, cy) end
 
 --- Loads grid data from bytes produced by `toBytes`.
 ---@param data any
----@return boolean
+---@return nil
 function Cellular:loadFromBytes(data) end
 
 --- Sets the material of a cell.
@@ -11746,7 +11820,7 @@ function Cellular:stepN(n) end
 function Cellular:toBytes() end
 
 --- Returns the full grid as an RGBA byte string using the default colour palette.
----@return string
+---@return nil
 function Cellular:toImageData() end
 
 --- Returns a sub-region as an RGBA byte string.
@@ -11754,7 +11828,7 @@ function Cellular:toImageData() end
 ---@param cy0 any
 ---@param cw any
 ---@param ch any
----@return string
+---@return nil
 function Cellular:toImageDataRegion(cx0, cy0, cw, ch) end
 
 --- Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
@@ -11802,7 +11876,7 @@ function PhysicsShape:setSensor(sensor) end
 local Terrain = {}
 
 --- Removes unsupported cells, returning the number of cells that fell.
----@return integer
+---@return nil
 function Terrain:collapseColumns() end
 
 --- Sets every cell in the grid to `solid`.
@@ -11843,7 +11917,7 @@ function Terrain:isDirty() end
 
 --- Loads terrain cell data from bytes produced by `toBytes`.
 ---@param data any
----@return boolean
+---@return nil
 function Terrain:loadFromBytes(data) end
 
 --- Sets a single terrain cell to solid or empty.
@@ -11861,7 +11935,7 @@ function Terrain:solidPositions() end
 ---@param positions any
 ---@param mass any
 ---@param restitution any
----@return table
+---@return nil
 function Terrain:spawnDebris(positions, mass, restitution) end
 
 --- Serialises the terrain grid to a byte string for save/load.
@@ -11875,7 +11949,7 @@ function Terrain:toBytes() end
 ---@param er any
 ---@param eg any
 ---@param eb any
----@return string
+---@return nil
 function Terrain:toImageData(sr, sg, sb, er, eg, eb) end
 
 --- Lua-side handle wrapping a physics World.
@@ -11953,7 +12027,7 @@ function World:getBodyCount() end
 
 --- Returns the Lua data previously attached to a body, or nil if none is set.
 ---@param id any
----@return any
+---@return nil
 function World:getBodyData(id) end
 
 --- Returns all body IDs in the world.
@@ -11962,7 +12036,7 @@ function World:getBodyIds() end
 
 --- Returns the one-way normal for a body, or nil if not configured.
 ---@param id any
----@return number
+---@return nil
 function World:getBodyOneWay(id) end
 
 --- Returns the body type as a string.
@@ -11993,7 +12067,7 @@ function World:getJointBodies(jid) end
 
 --- Returns the break threshold for a joint, or nil if not set.
 ---@param jid any
----@return number
+---@return nil
 function World:getJointBreakForce(jid) end
 
 --- Returns a table of integer IDs for every joint attached to this world.
@@ -12024,7 +12098,7 @@ function World:getMeter() end
 function World:getSolverIterations() end
 
 --- Returns zone enter/leave events produced by the most recent step.
----@return table
+---@return nil
 function World:getZoneEvents() end
 
 --- Returns true if a body is currently sleeping (inactive).
@@ -12038,7 +12112,7 @@ function World:jointCount() end
 
 --- Creates multiple bodies in one call.
 ---@param specs any
----@return table
+---@return nil
 function World:newBodies(specs) end
 
 --- Creates a new rectangular body and adds it to the world.
@@ -12119,7 +12193,7 @@ function World:step(dt) end
 ---@param accum any
 ---@param step_dt any
 ---@param max_steps any
----@return number
+---@return nil
 function World:stepFixed(accum, step_dt, max_steps) end
 
 --- Converts a pixel value to physics units.
@@ -12359,7 +12433,7 @@ function Pipeline:getContext() end
 function Pipeline:getErrorMode() end
 
 --- Returns the topological execution order as an array of step names.
----@return table?
+---@return nil
 function Pipeline:getExecutionOrder() end
 
 --- Returns the pipeline's name.
@@ -12367,7 +12441,7 @@ function Pipeline:getExecutionOrder() end
 function Pipeline:getName() end
 
 --- Returns parallel execution groups as a nested array of step name arrays.
----@return table?
+---@return nil
 function Pipeline:getParallelGroups() end
 
 --- Returns the current result table built from step states, or nil.
@@ -12376,7 +12450,7 @@ function Pipeline:getResult() end
 
 --- Returns the LuaStep wrapper for the named step, or nil.
 ---@param name any
----@return PipelineStep?
+---@return nil
 function Pipeline:getStep(name) end
 
 --- Returns the total number of steps.
@@ -12467,127 +12541,127 @@ function Pipeline:typeOf(name) end
 function Pipeline:update(dt) end
 
 --- Validates the pipeline DAG. Returns (ok, error_array).
----@return boolean
+---@return nil
 function Pipeline:validate() end
 
 --- Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 ---@class Step
 local Step = {}
 
---- Adds a dependency on another step by name or PipelineStep. Returns self for chaining.
+--- Adds a dependency on another step by name or PipelineStep. Returns self for chaining
 ---@param dep any
 ---@return PipelineStep
 function Step:dependsOn(dep) end
 
---- Returns the number of execution attempts so far.
+--- Returns the number of execution attempts so far
 ---@return integer
 function Step:getAttempt() end
 
---- Retrieves a metadata value by key, returning nil if not found.
+--- Retrieves a metadata value by key, returning nil if not found
 ---@param key any
 ---@return string?
 function Step:getData(key) end
 
---- Returns the configured delay in seconds.
+--- Returns the configured delay in seconds
 ---@return number
 function Step:getDelay() end
 
---- Returns the list of dependency step names.
+--- Returns the list of dependency step names
 ---@return table
 function Step:getDependencies() end
 
---- Returns the number of declared dependencies.
+--- Returns the number of declared dependencies
 ---@return integer
 function Step:getDependencyCount() end
 
---- Returns total seconds spent executing this step.
+--- Returns total seconds spent executing this step
 ---@return number
 function Step:getDuration() end
 
---- Returns the error message from the last failed attempt, or nil.
+--- Returns the error message from the last failed attempt, or nil
 ---@return string?
 function Step:getError() end
 
---- Returns the unique name of this step.
+--- Returns the unique name of this step
 ---@return string
 function Step:getName() end
 
---- Returns the configured retry count.
+--- Returns the configured retry count
 ---@return integer
 function Step:getRetryCount() end
 
---- Returns the current execution status as a string.
+--- Returns the current execution status as a string
 ---@return string
 function Step:getStatus() end
 
---- Returns the tag on this step, or nil if unset.
+--- Returns the tag on this step, or nil if unset
 ---@return string?
 function Step:getTag() end
 
---- Returns the timeout stored in metadata, or 0.0 if unset.
+--- Returns the timeout stored in metadata, or 0.0 if unset
 ---@return number
 function Step:getTimeout() end
 
---- Returns whether this step is marked as optional.
+--- Returns whether this step is marked as optional
 ---@return boolean
 function Step:isOptional() end
 
---- Stores a Lua function as the execute callback for this step.
+--- Stores a Lua function as the execute callback for this step
 ---@param cb any
 ---@return nil
 function Step:setCallback(cb) end
 
---- Stores a Lua function (or nil) as the run-condition for this step.
+--- Stores a Lua function (or nil) as the run-condition for this step
 ---@param cond? any (optional)
 ---@return nil
 function Step:setCondition(cond) end
 
---- Stores an arbitrary string value under the given key in step metadata.
+--- Stores an arbitrary string value under the given key in step metadata
 ---@param key any
 ---@param value any
 ---@return nil
 function Step:setData(key, value) end
 
---- Sets the delay in seconds to wait after dependencies finish.
+--- Sets the delay in seconds to wait after dependencies finish
 ---@param seconds any
 ---@return nil
 function Step:setDelay(seconds) end
 
---- Stores a Lua function (or nil) to call if this step fails.
+--- Stores a Lua function (or nil) to call if this step fails
 ---@param cb? any (optional)
 ---@return nil
 function Step:setOnError(cb) end
 
---- Marks whether this step is optional (downstream steps continue on failure).
+--- Marks whether this step is optional (downstream steps continue on failure)
 ---@param optional any
 ---@return nil
 function Step:setOptional(optional) end
 
---- Sets the maximum number of retry attempts on failure.
+--- Sets the maximum number of retry attempts on failure
 ---@param count any
 ---@return nil
 function Step:setRetryCount(count) end
 
---- Sets the delay in seconds between retry attempts.
+--- Sets the delay in seconds between retry attempts
 ---@param seconds any
 ---@return nil
 function Step:setRetryDelay(seconds) end
 
---- Sets the tag on this step for grouping and filtering.
+--- Sets the tag on this step for grouping and filtering
 ---@param tag any
 ---@return nil
 function Step:setTag(tag) end
 
---- Stores a timeout in seconds in the step's metadata.
+--- Stores a timeout in seconds in the step's metadata
 ---@param seconds any
 ---@return nil
 function Step:setTimeout(seconds) end
 
---- Returns the type name "PipelineStep".
+--- Returns the type name "PipelineStep"
 ---@return string
 function Step:type() end
 
---- Returns true when the given name matches "PipelineStep" or a parent type.
+--- Returns true when the given name matches "PipelineStep" or a parent type
 ---@param name any
 ---@return boolean
 function Step:typeOf(name) end
@@ -12827,7 +12901,7 @@ function DoorManager:count() end
 
 --- Returns the state table for door at index, or nil if out of range.
 ---@param index any
----@return table|nil
+---@return nil
 function DoorManager:getDoor(index) end
 
 --- Begins opening the door at the given index.
@@ -13133,7 +13207,7 @@ function Font:getWidth(text) end
 --- Wraps text to the given width and returns the lines.
 ---@param text any
 ---@param limit any
----@return table
+---@return nil
 function Font:getWrap(text, limit) end
 
 --- Releases this font and frees its atlas memory.
@@ -13206,7 +13280,7 @@ function ImageData:mapPixels(callback) end
 --- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
 ---@param w any
 ---@param h any
----@return ImageData?
+---@return nil
 function ImageData:resize(w, h) end
 
 --- Returns the type name "ImageData".
@@ -13224,7 +13298,7 @@ local Mesh = {}
 
 --- Returns vertex data at the given 1-based index.
 ---@param index any
----@return number
+---@return nil
 function Mesh:getVertex(index) end
 
 --- Returns the number of vertices in this mesh.
@@ -13438,7 +13512,7 @@ function lurek.render.currentLayer() end
 
 --- Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
 ---@param args any
----@return any
+---@return table|nil
 function lurek.render.draw(args) end
 
 --- Queues a beveled border rectangle with inner fill.
@@ -13627,7 +13701,7 @@ function lurek.render.getBackgroundColor() end
 function lurek.render.getBlendMode() end
 
 --- Returns the current canvas, or nil if drawing to screen.
----@return Canvas?
+---@return table|nil
 function lurek.render.getCanvas() end
 
 --- Returns the dimensions of a canvas.
@@ -13640,11 +13714,10 @@ function lurek.render.getCanvasSize(ud) end
 function lurek.render.getColor() end
 
 --- Returns the current color mask.
----@return boolean
 function lurek.render.getColorMask() end
 
 --- Returns the default texture filter mode.
----@return string
+---@return table|nil
 function lurek.render.getDefaultFilter() end
 
 --- Returns a built-in font by pixel height (snaps to nearest available size).
@@ -13653,7 +13726,7 @@ function lurek.render.getDefaultFilter() end
 function lurek.render.getDefaultFont(pixel_height) end
 
 --- Returns the current depth mode as (mode, write).
----@return string
+---@return table|nil
 function lurek.render.getDepthMode() end
 
 --- Returns window width and height.
@@ -13661,7 +13734,7 @@ function lurek.render.getDepthMode() end
 function lurek.render.getDimensions() end
 
 --- Returns the currently active font, or nil.
----@return Font?
+---@return table|nil
 function lurek.render.getFont() end
 
 --- Returns the ascent of the given font.
@@ -13702,7 +13775,7 @@ function lurek.render.getFontWidth(ud, text) end
 --- Returns wrapped lines and the maximum line width.
 ---@param text any
 ---@param limit any
----@return table
+---@return table|nil
 function lurek.render.getFontWrap(text, limit) end
 
 --- Returns the window height in pixels.
@@ -13723,11 +13796,11 @@ function lurek.render.getLineWidth() end
 function lurek.render.getPointSize() end
 
 --- Returns the active scissor rectangle, or nothing.
----@return number?
+---@return table|nil
 function lurek.render.getScissor() end
 
 --- Returns the active shader, or nil.
----@return Shader?
+---@return table|nil
 function lurek.render.getShader() end
 
 --- Returns a table of renderer statistics.
@@ -13735,7 +13808,7 @@ function lurek.render.getShader() end
 function lurek.render.getStats() end
 
 --- Returns the current stencil mode as (action, compare, value).
----@return string
+---@return table|nil
 function lurek.render.getStencilMode() end
 
 --- Returns the window width in pixels.
@@ -14043,7 +14116,7 @@ lurek.save = {}
 ---@class SaveManager
 local SaveManager = {}
 
---- Collects data from all registered collectors into a table with metadata.
+--- Collects data from all registered collectors into a table with metadata
 ---@return table
 function SaveManager:collect() end
 
@@ -14061,7 +14134,7 @@ function SaveManager:disableAutoSave() end
 ---@return boolean
 function SaveManager:exists(slot) end
 
---- Returns the current schema version.
+--- Returns the current schema version
 ---@return integer
 function SaveManager:getSchemaVersion() end
 
@@ -14074,7 +14147,7 @@ function SaveManager:getSlotInfo(slot) end
 ---@return table
 function SaveManager:getSlots() end
 
---- Returns the current summary string.
+--- Returns the current summary string
 ---@return string
 function SaveManager:getSummary() end
 
@@ -14082,16 +14155,16 @@ function SaveManager:getSummary() end
 ---@return boolean
 function SaveManager:isCompressed() end
 
---- Returns whether data has been modified since the last save or load.
+--- Returns whether data has been modified since the last save or load
 ---@return boolean
 function SaveManager:isDirty() end
 
 --- Loads data from a slot file, applies migrations, and restores.
 ---@param slot any
----@return boolean
+---@return nil
 function SaveManager:load(slot) end
 
---- Marks data as modified since the last save or load.
+--- Marks data as modified since the last save or load
 ---@return nil
 function SaveManager:markDirty() end
 
@@ -14105,11 +14178,11 @@ function SaveManager:onAfterLoad(func) end
 ---@return nil
 function SaveManager:onBeforeSave(func) end
 
---- Resets all state, removing callbacks and clearing the manager.
+--- Resets all state, removing callbacks and clearing the manager
 ---@return nil
 function SaveManager:reset() end
 
---- Restores data from a table, applying migrations and calling restorers.
+--- Restores data from a table, applying migrations and calling restorers
 ---@param data any
 ---@return nil
 function SaveManager:restore(data) end
@@ -14119,27 +14192,27 @@ function SaveManager:restore(data) end
 ---@return nil
 function SaveManager:save(slot) end
 
---- Enables or disables LZ4 compression for saved data.
+--- Enables or disables LZ4 compression for saved data
 ---@param enabled any
 ---@return nil
 function SaveManager:setCompress(enabled) end
 
---- Sets the current schema version for new saves.
+--- Sets the current schema version for new saves
 ---@param version any
 ---@return nil
 function SaveManager:setSchemaVersion(version) end
 
---- Sets the summary string included in save metadata.
+--- Sets the summary string included in save metadata
 ---@param summary any
 ---@return nil
 function SaveManager:setSummary(summary) end
 
---- Removes a named module and its callbacks.
+--- Removes a named module and its callbacks
 ---@param name any
 ---@return nil
 function SaveManager:unregister(name) end
 
---- Advances the auto-save timer, returning the slot name if a save should trigger.
+--- Advances the auto-save timer, returning the slot name if a save should trigger
 ---@param dt any
 ---@return string?
 function SaveManager:update(dt) end
@@ -14215,7 +14288,7 @@ function lurek.scene.draw() end
 
 --- Returns a fade cross-dissolve transition config table.
 ---@param duration? any (optional)
----@return table
+---@return table|nil
 function lurek.scene.fade(duration) end
 
 --- Returns a table array of all active scene tables.
@@ -14268,7 +14341,7 @@ function lurek.scene.hasRegistered(name) end
 
 --- Returns an iris in/out (circular reveal) transition config table.
 ---@param duration? any (optional)
----@return table
+---@return table|nil
 function lurek.scene.iris(duration) end
 
 --- Returns true if the scene stack is empty.
@@ -14389,7 +14462,7 @@ function lurek.scene.setData(key, value) end
 --- Returns a directional slide transition config table.
 ---@param direction? any (optional)
 ---@param duration? any (optional)
----@return table
+---@return table|nil
 function lurek.scene.slide(direction, duration) end
 
 --- Replaces the top scene with a new one, calling leave and enter callbacks.
@@ -14413,7 +14486,7 @@ function lurek.scene.update(dt) end
 
 --- Returns a wipe/curtain transition config table.
 ---@param duration? any (optional)
----@return table
+---@return table|nil
 function lurek.scene.wipe(duration) end
 
 ---@class lurek.serial
@@ -14472,7 +14545,6 @@ function lurek.serial.toToml(value) end
 --- Validates a Lua table against a schema table.
 ---@param value any
 ---@param schema any
----@return boolean
 function lurek.serial.validate(value, schema) end
 
 ---@class lurek.spine
@@ -14735,7 +14807,7 @@ function lurek.system.getMessageCount() end
 function lurek.system.getOS() end
 
 --- Returns battery state, percentage charged, and estimated time remaining.
----@return string
+---@return table
 function lurek.system.getPowerInfo() end
 
 --- Returns an ordered list of the user's preferred locale strings (e.g. 'en-US').
@@ -14815,7 +14887,7 @@ function Terminal:clearWidgets() end
 --- Returns the cell data at 1-based coordinates.
 ---@param col any
 ---@param row any
----@return integer
+---@return nil
 function Terminal:get(col, row) end
 
 --- Returns the current cell size in pixels derived from the active font.
@@ -14831,7 +14903,7 @@ function Terminal:getCellSize() end
 function Terminal:getDimensions() end
 
 --- Returns the currently focused widget, or nil.
----@return Widget?
+---@return nil
 function Terminal:getFocused() end
 
 --- Returns the number of attached widgets.
@@ -14908,7 +14980,7 @@ function Widget:clearItems() end
 
 --- Returns a child widget from a panel by 1-based index, or nil.
 ---@param index any
----@return Widget?
+---@return nil
 function Widget:getChild(index) end
 
 --- Returns the number of children in a panel widget.
@@ -15087,7 +15159,7 @@ function lurek.terminal.getMaxRows() end
 ---@param term_ud any
 ---@param offset any
 ---@param count any
----@return table
+---@return table|nil
 function lurek.terminal.getScrollback(term_ud, offset, count) end
 
 --- Creates a new decorative border widget at 1-based coordinates.
@@ -15155,7 +15227,7 @@ function lurek.terminal.nextCompletion(prefix) end
 
 --- Parses `text` into coloured spans.  Returns an array of tables, each with
 ---@param text any
----@return table
+---@return table|nil
 function lurek.terminal.parseAnsi(text) end
 
 --- Steps one entry back in command history (toward older commands).
@@ -15295,7 +15367,7 @@ function Promise:getError() end
 function Promise:isDone() end
 
 --- Pops and returns the promise result, or nil if not yet ready.
----@return any
+---@return table|nil
 function Promise:result() end
 
 --- Returns the type name of this object.
@@ -15342,7 +15414,7 @@ function ThreadHandle:wait() end
 local ThreadPool = {}
 
 --- Retrieves the next result from the pool's output channel (non-blocking).
----@return any
+---@return table|nil
 function ThreadPool:collect() end
 
 --- Returns the shared input Channel (main → workers).
@@ -15849,7 +15921,7 @@ function TileMap:getTileHeight() end
 
 --- Returns a tileset by 1-based index, or nil if out of range.
 ---@param idx any
----@return TileSet?
+---@return nil
 function TileMap:getTileSet(idx) end
 
 --- Returns the number of tilesets attached to this map.
@@ -15928,7 +16000,7 @@ function TileSet:getMargin() end
 
 --- Computes the atlas source rectangle for a 1-based local tile ID.
 ---@param tile_id any
----@return table
+---@return nil
 function TileSet:getQuad(tile_id) end
 
 --- Returns the spacing in pixels between tiles in the atlas.
@@ -16068,7 +16140,7 @@ function lurek.tilemap.isoRotate(direction, steps) end
 
 --- Parses a TMX XML string and returns a table with map metadata and layers.
 ---@param xml any
----@return table
+---@return table|nil
 function lurek.tilemap.loadTMX(xml) end
 
 --- Creates a new AutoTileSheet with the given tile dimensions and layout.
@@ -16336,11 +16408,11 @@ function lurek.time.sleep(seconds) end
 function lurek.time.step() end
 
 --- Advances all real-time timers by one tick; called automatically each frame.
----@return any
+---@return table|nil
 function lurek.time.tickRealTimers() end
 
 --- Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
----@return any
+---@return table|nil
 function lurek.time.tickWaits() end
 
 --- Yields the current Lua coroutine for at least `frames` engine frames.
@@ -18599,11 +18671,11 @@ function lurek.window.onDpiChange(func) end
 
 --- Opens a blocking native file-open dialog. Returns the chosen path string
 ---@param opts? any (optional)
----@return string
+---@return string|nil
 function lurek.window.openFileDialog(opts) end
 
 --- Polls for a pending DPI change event and returns the new scale factor if any.
----@return any
+---@return table|nil
 function lurek.window.pollDpiChange() end
 
 --- Flashes the window in the taskbar to request user attention.

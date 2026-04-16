@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-16T11:10:00.619638+00:00",
+  "generated_at": "2026-04-16T12:36:55.871671+00:00",
   "summary": {
     "rust": {
-      "total": 5032,
-      "covered": 5032,
+      "total": 5037,
+      "covered": 5037,
       "missing": 0,
       "pct": 100.0
     },
@@ -14,8 +14,8 @@
       "pct": 100.0
     },
     "total": {
-      "total": 5081,
-      "covered": 5081,
+      "total": 5086,
+      "covered": 5086,
       "missing": 0,
       "pct": 100.0
     }
@@ -4094,7 +4094,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2457,
+      "line": 2544,
       "kind": "struct",
       "name": "App",
       "has_doc": true
@@ -4103,7 +4103,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2472,
+      "line": 2559,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -4112,7 +4112,7 @@
       "source": "rust",
       "module": "app",
       "file": "src/app/app.rs",
-      "line": 2483,
+      "line": 2570,
       "kind": "fn",
       "name": "run",
       "has_doc": true
@@ -18710,7 +18710,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ai_api.rs",
-      "line": 2914,
+      "line": 2956,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18737,7 +18737,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/animation_api.rs",
-      "line": 396,
+      "line": 395,
       "kind": "struct",
       "name": "LuaBlendLayerSet",
       "has_doc": true
@@ -18746,7 +18746,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/animation_api.rs",
-      "line": 523,
+      "line": 522,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18791,7 +18791,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 580,
+      "line": 581,
       "kind": "struct",
       "name": "LuaMidiPlayer",
       "has_doc": true
@@ -18800,7 +18800,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 1060,
+      "line": 1063,
       "kind": "struct",
       "name": "LuaSoundPool",
       "has_doc": true
@@ -18809,7 +18809,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 1155,
+      "line": 1158,
       "kind": "struct",
       "name": "LuaDecoder",
       "has_doc": true
@@ -18818,7 +18818,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 1241,
+      "line": 1243,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18827,7 +18827,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/automation_api.rs",
-      "line": 22,
+      "line": 21,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18836,7 +18836,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/automation_api.rs",
-      "line": 407,
+      "line": 403,
       "kind": "fn",
       "name": "vec_from_lua_table",
       "has_doc": true
@@ -18854,7 +18854,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/camera_api.rs",
-      "line": 445,
+      "line": 444,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18881,7 +18881,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/compute_api.rs",
-      "line": 894,
+      "line": 897,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18935,7 +18935,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/debugbridge_api.rs",
-      "line": 26,
+      "line": 25,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18944,7 +18944,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/devtools_api.rs",
-      "line": 160,
+      "line": 159,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18953,7 +18953,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/devtools_api.rs",
-      "line": 878,
+      "line": 877,
       "kind": "struct",
       "name": "LuaReplConsole",
       "has_doc": true
@@ -18962,7 +18962,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 763,
+      "line": 764,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -18980,7 +18980,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ecs_api.rs",
-      "line": 693,
+      "line": 692,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19007,7 +19007,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/effect_api.rs",
-      "line": 539,
+      "line": 541,
       "kind": "struct",
       "name": "LuaImageEffect",
       "has_doc": true
@@ -19016,7 +19016,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/effect_api.rs",
-      "line": 675,
+      "line": 678,
       "kind": "struct",
       "name": "LuaOverlay",
       "has_doc": true
@@ -19025,7 +19025,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/effect_api.rs",
-      "line": 1393,
+      "line": 1395,
       "kind": "struct",
       "name": "LuaScreenTransition",
       "has_doc": true
@@ -19034,7 +19034,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/effect_api.rs",
-      "line": 1481,
+      "line": 1483,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19043,7 +19043,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/engine_api.rs",
-      "line": 17,
+      "line": 16,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19088,7 +19088,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/filesystem_api.rs",
-      "line": 196,
+      "line": 195,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19097,7 +19097,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graph_api.rs",
-      "line": 1891,
+      "line": 1896,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19106,7 +19106,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/i18n_api.rs",
-      "line": 184,
+      "line": 183,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19142,7 +19142,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/image_api.rs",
-      "line": 319,
+      "line": 318,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19151,7 +19151,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/image_api.rs",
-      "line": 951,
+      "line": 977,
       "kind": "struct",
       "name": "LuaPaletteLUT",
       "has_doc": true
@@ -19169,7 +19169,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/input_api.rs",
-      "line": 189,
+      "line": 191,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19196,7 +19196,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/light_api.rs",
-      "line": 1012,
+      "line": 1011,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19205,7 +19205,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/log_api.rs",
-      "line": 58,
+      "line": 57,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19223,7 +19223,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/lua_types.rs",
-      "line": 44,
+      "line": 43,
       "kind": "fn",
       "name": "add_type_methods",
       "has_doc": true
@@ -19241,7 +19241,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 184,
+      "line": 189,
       "kind": "struct",
       "name": "LuaVec3",
       "has_doc": true
@@ -19250,7 +19250,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 292,
+      "line": 303,
       "kind": "struct",
       "name": "LuaCatmullRom",
       "has_doc": true
@@ -19259,7 +19259,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 329,
+      "line": 340,
       "kind": "struct",
       "name": "LuaHermite",
       "has_doc": true
@@ -19268,7 +19268,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 351,
+      "line": 362,
       "kind": "struct",
       "name": "LuaRandomGenerator",
       "has_doc": true
@@ -19277,7 +19277,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 429,
+      "line": 440,
       "kind": "struct",
       "name": "LuaTransform",
       "has_doc": true
@@ -19286,7 +19286,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 581,
+      "line": 592,
       "kind": "struct",
       "name": "LuaBezierCurve",
       "has_doc": true
@@ -19295,7 +19295,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 724,
+      "line": 737,
       "kind": "struct",
       "name": "LuaTween",
       "has_doc": true
@@ -19304,7 +19304,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 844,
+      "line": 858,
       "kind": "struct",
       "name": "LuaSpatialHash",
       "has_doc": true
@@ -19313,7 +19313,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 951,
+      "line": 967,
       "kind": "struct",
       "name": "LuaNoiseGenerator",
       "has_doc": true
@@ -19322,7 +19322,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1269,
+      "line": 1285,
       "kind": "struct",
       "name": "LuaAabbTree",
       "has_doc": true
@@ -19331,7 +19331,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 1380,
+      "line": 1397,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19349,7 +19349,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/minimap_api.rs",
-      "line": 951,
+      "line": 952,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19358,7 +19358,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mod.rs",
-      "line": 179,
+      "line": 177,
       "kind": "fn",
       "name": "create_lua_vm",
       "has_doc": true
@@ -19367,7 +19367,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mod.rs",
-      "line": 454,
+      "line": 450,
       "kind": "fn",
       "name": "create_test_vm",
       "has_doc": true
@@ -19385,7 +19385,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mods_api.rs",
-      "line": 147,
+      "line": 145,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -19394,7 +19394,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mods_api.rs",
-      "line": 381,
+      "line": 419,
       "kind": "struct",
       "name": "LuaModManager",
       "has_doc": true
@@ -19403,7 +19403,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mods_api.rs",
-      "line": 390,
+      "line": 426,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -19412,7 +19412,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/mods_api.rs",
-      "line": 543,
+      "line": 607,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19439,7 +19439,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 734,
+      "line": 738,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19457,7 +19457,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/parallax_api.rs",
-      "line": 434,
+      "line": 435,
       "kind": "struct",
       "name": "LuaParallaxSet",
       "has_doc": true
@@ -19484,7 +19484,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 1259,
+      "line": 1261,
       "kind": "struct",
       "name": "LuaTrail",
       "has_doc": true
@@ -19493,7 +19493,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 1395,
+      "line": 1396,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19502,7 +19502,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/particle_api.rs",
-      "line": 1539,
+      "line": 1538,
       "kind": "fn",
       "name": "from_lua_opts",
       "has_doc": true
@@ -19529,7 +19529,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 570,
+      "line": 572,
       "kind": "struct",
       "name": "LuaFlowField",
       "has_doc": true
@@ -19538,7 +19538,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 697,
+      "line": 699,
       "kind": "struct",
       "name": "LuaPathGrid",
       "has_doc": true
@@ -19547,7 +19547,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 843,
+      "line": 845,
       "kind": "struct",
       "name": "LuaAiFlowField",
       "has_doc": true
@@ -19556,7 +19556,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 933,
+      "line": 936,
       "kind": "struct",
       "name": "LuaHexGrid",
       "has_doc": true
@@ -19565,7 +19565,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 1056,
+      "line": 1061,
       "kind": "struct",
       "name": "LuaJpsGrid",
       "has_doc": true
@@ -19574,7 +19574,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pathfind_api.rs",
-      "line": 1117,
+      "line": 1122,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19583,7 +19583,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/patterns_api.rs",
-      "line": 2303,
+      "line": 2302,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19601,7 +19601,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1188,
+      "line": 1202,
       "kind": "struct",
       "name": "LuaZone",
       "has_doc": true
@@ -19610,7 +19610,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1357,
+      "line": 1371,
       "kind": "struct",
       "name": "LuaTerrain",
       "has_doc": true
@@ -19619,7 +19619,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1545,
+      "line": 1563,
       "kind": "struct",
       "name": "LuaCellular",
       "has_doc": true
@@ -19628,7 +19628,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 1694,
+      "line": 1715,
       "kind": "struct",
       "name": "LuaBody",
       "has_doc": true
@@ -19637,7 +19637,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2136,
+      "line": 2158,
       "kind": "struct",
       "name": "LuaPhysicsShape",
       "has_doc": true
@@ -19646,7 +19646,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2290,
+      "line": 2311,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19664,7 +19664,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 41,
+      "line": 39,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -19673,7 +19673,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 57,
+      "line": 52,
       "kind": "fn",
       "name": "execute_sync",
       "has_doc": true
@@ -19682,7 +19682,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 386,
+      "line": 432,
       "kind": "struct",
       "name": "LuaPipeline",
       "has_doc": true
@@ -19691,7 +19691,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 407,
+      "line": 451,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -19700,7 +19700,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 429,
+      "line": 470,
       "kind": "fn",
       "name": "from_parts",
       "has_doc": true
@@ -19709,7 +19709,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 460,
+      "line": 497,
       "kind": "fn",
       "name": "pipeline_result_to_lua",
       "has_doc": true
@@ -19718,7 +19718,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 503,
+      "line": 539,
       "kind": "fn",
       "name": "cancel_remaining_steps",
       "has_doc": true
@@ -19727,7 +19727,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 518,
+      "line": 553,
       "kind": "fn",
       "name": "fire_step_callbacks",
       "has_doc": true
@@ -19736,7 +19736,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 562,
+      "line": 594,
       "kind": "fn",
       "name": "finalize_pipeline_result",
       "has_doc": true
@@ -19745,7 +19745,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/pipeline_api.rs",
-      "line": 1155,
+      "line": 1191,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19754,7 +19754,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/procgen_api.rs",
-      "line": 31,
+      "line": 30,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19763,7 +19763,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/procgen_api.rs",
-      "line": 919,
+      "line": 917,
       "kind": "fn",
       "name": "from_lua_table",
       "has_doc": true
@@ -19772,7 +19772,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/procgen_api.rs",
-      "line": 940,
+      "line": 934,
       "kind": "fn",
       "name": "from_lua_table",
       "has_doc": true
@@ -19790,7 +19790,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 138,
+      "line": 140,
       "kind": "struct",
       "name": "LuaHeightMap",
       "has_doc": true
@@ -19799,7 +19799,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 202,
+      "line": 204,
       "kind": "struct",
       "name": "LuaPointLight",
       "has_doc": true
@@ -19808,7 +19808,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 272,
+      "line": 274,
       "kind": "struct",
       "name": "LuaRaycaster",
       "has_doc": true
@@ -19817,7 +19817,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 756,
+      "line": 759,
       "kind": "struct",
       "name": "LuaSpriteManager",
       "has_doc": true
@@ -19826,7 +19826,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/raycaster_api.rs",
-      "line": 867,
+      "line": 869,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19844,7 +19844,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 162,
+      "line": 164,
       "kind": "struct",
       "name": "LuaImage",
       "has_doc": true
@@ -19853,7 +19853,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 171,
+      "line": 173,
       "kind": "struct",
       "name": "LuaNineSlice",
       "has_doc": true
@@ -19862,7 +19862,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 283,
+      "line": 285,
       "kind": "struct",
       "name": "LuaFont",
       "has_doc": true
@@ -19871,7 +19871,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 422,
+      "line": 425,
       "kind": "struct",
       "name": "LuaCanvas",
       "has_doc": true
@@ -19880,7 +19880,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 501,
+      "line": 504,
       "kind": "struct",
       "name": "LuaSpriteBatch",
       "has_doc": true
@@ -19889,7 +19889,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 612,
+      "line": 615,
       "kind": "struct",
       "name": "LuaMesh",
       "has_doc": true
@@ -19898,7 +19898,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 725,
+      "line": 729,
       "kind": "struct",
       "name": "LuaShader",
       "has_doc": true
@@ -19907,7 +19907,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 801,
+      "line": 805,
       "kind": "struct",
       "name": "LuaQuad",
       "has_doc": true
@@ -19916,7 +19916,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 941,
+      "line": 945,
       "kind": "struct",
       "name": "LuaShape",
       "has_doc": true
@@ -19925,7 +19925,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/render_api.rs",
-      "line": 1376,
+      "line": 1388,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19943,7 +19943,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/save_api.rs",
-      "line": 55,
+      "line": 54,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -19952,7 +19952,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/save_api.rs",
-      "line": 591,
+      "line": 613,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19970,7 +19970,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 178,
+      "line": 177,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19979,7 +19979,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/serial_api.rs",
-      "line": 32,
+      "line": 31,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -19997,7 +19997,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/spine_api.rs",
-      "line": 322,
+      "line": 323,
       "kind": "struct",
       "name": "LuaSkeletonAnimation",
       "has_doc": true
@@ -20006,7 +20006,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/spine_api.rs",
-      "line": 442,
+      "line": 444,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20033,7 +20033,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/sprite_api.rs",
-      "line": 249,
+      "line": 248,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20042,7 +20042,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 28,
+      "line": 26,
       "kind": "fn",
       "name": "get_processor_count",
       "has_doc": true
@@ -20051,7 +20051,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 39,
+      "line": 35,
       "kind": "fn",
       "name": "get_memory_size",
       "has_doc": true
@@ -20060,7 +20060,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 61,
+      "line": 54,
       "kind": "fn",
       "name": "open_url",
       "has_doc": true
@@ -20069,7 +20069,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 101,
+      "line": 92,
       "kind": "fn",
       "name": "get_preferred_locales",
       "has_doc": true
@@ -20078,7 +20078,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 124,
+      "line": 115,
       "kind": "enum",
       "name": "PowerState",
       "has_doc": true
@@ -20087,7 +20087,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 143,
+      "line": 133,
       "kind": "fn",
       "name": "as_str",
       "has_doc": true
@@ -20096,7 +20096,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 163,
+      "line": 150,
       "kind": "fn",
       "name": "get_power_info",
       "has_doc": true
@@ -20105,7 +20105,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 174,
+      "line": 160,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20114,7 +20114,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/terminal_api.rs",
-      "line": 1276,
+      "line": 1278,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20150,7 +20150,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/thread_api.rs",
-      "line": 219,
+      "line": 218,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20168,7 +20168,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 285,
+      "line": 288,
       "kind": "struct",
       "name": "LuaTileMap",
       "has_doc": true
@@ -20177,7 +20177,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 850,
+      "line": 866,
       "kind": "struct",
       "name": "LuaAutoTileSheet",
       "has_doc": true
@@ -20186,7 +20186,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 954,
+      "line": 971,
       "kind": "struct",
       "name": "LuaChunkMap",
       "has_doc": true
@@ -20195,7 +20195,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1095,
+      "line": 1113,
       "kind": "struct",
       "name": "LuaLargeMapRenderer",
       "has_doc": true
@@ -20204,7 +20204,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1271,
+      "line": 1289,
       "kind": "struct",
       "name": "LuaIsoMap",
       "has_doc": true
@@ -20213,7 +20213,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1451,
+      "line": 1470,
       "kind": "struct",
       "name": "LuaMapBlock",
       "has_doc": true
@@ -20222,7 +20222,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1599,
+      "line": 1620,
       "kind": "struct",
       "name": "LuaMapGroup",
       "has_doc": true
@@ -20231,7 +20231,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1667,
+      "line": 1688,
       "kind": "struct",
       "name": "LuaMapScript",
       "has_doc": true
@@ -20240,7 +20240,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1763,
+      "line": 1784,
       "kind": "struct",
       "name": "LuaMapGen",
       "has_doc": true
@@ -20249,7 +20249,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 1810,
+      "line": 1830,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20267,7 +20267,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/timer_api.rs",
-      "line": 311,
+      "line": 310,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20294,7 +20294,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tween_api.rs",
-      "line": 113,
+      "line": 111,
       "kind": "fn",
       "name": "tick_with",
       "has_doc": true
@@ -20303,7 +20303,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/tween_api.rs",
-      "line": 152,
+      "line": 148,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20312,7 +20312,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 4709,
+      "line": 4708,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -20321,7 +20321,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 6343,
+      "line": 6336,
       "kind": "struct",
       "name": "LuaLineChart",
       "has_doc": true
@@ -20330,7 +20330,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 6407,
+      "line": 6400,
       "kind": "struct",
       "name": "LuaBarChart",
       "has_doc": true
@@ -20339,7 +20339,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 6463,
+      "line": 6456,
       "kind": "struct",
       "name": "LuaScatterPlot",
       "has_doc": true
@@ -20348,7 +20348,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 6529,
+      "line": 6522,
       "kind": "struct",
       "name": "LuaPieChart",
       "has_doc": true
@@ -20357,7 +20357,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 6570,
+      "line": 6563,
       "kind": "struct",
       "name": "LuaAreaChart",
       "has_doc": true
@@ -20366,7 +20366,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/window_api.rs",
-      "line": 21,
+      "line": 20,
       "kind": "fn",
       "name": "register",
       "has_doc": true
@@ -32264,7 +32264,7 @@
       "source": "rust",
       "module": "render",
       "file": "src/render/gpu_renderer.rs",
-      "line": 1308,
+      "line": 1371,
       "kind": "fn",
       "name": "render_frame",
       "has_doc": true
@@ -33650,9 +33650,18 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 335,
+      "line": 330,
       "kind": "const",
-      "name": "G006_ATLAS_MAX_SIZE",
+      "name": "L083_DROP_ARCHIVE",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 332,
+      "kind": "const",
+      "name": "L084_DROP_ARCHIVE_FAIL",
       "has_doc": true
     },
     {
@@ -33661,16 +33670,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 339,
       "kind": "const",
-      "name": "FS01_GAMEFS_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 341,
-      "kind": "const",
-      "name": "FS02_FILE_READ",
+      "name": "G006_ATLAS_MAX_SIZE",
       "has_doc": true
     },
     {
@@ -33679,7 +33679,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 343,
       "kind": "const",
-      "name": "FS03_FILE_WRITE",
+      "name": "FS01_GAMEFS_INIT",
       "has_doc": true
     },
     {
@@ -33688,7 +33688,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 345,
       "kind": "const",
-      "name": "FS04_PATH_TRAVERSAL",
+      "name": "FS02_FILE_READ",
       "has_doc": true
     },
     {
@@ -33697,7 +33697,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 347,
       "kind": "const",
-      "name": "FS05_VFS_MOUNT",
+      "name": "FS03_FILE_WRITE",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 349,
+      "kind": "const",
+      "name": "FS04_PATH_TRAVERSAL",
       "has_doc": true
     },
     {
@@ -33706,16 +33715,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 351,
       "kind": "const",
-      "name": "AN01_ANIM_CTRL_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 353,
-      "kind": "const",
-      "name": "AN02_CLIP_ADDED",
+      "name": "FS05_VFS_MOUNT",
       "has_doc": true
     },
     {
@@ -33724,7 +33724,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 355,
       "kind": "const",
-      "name": "AN03_CLIP_NOT_FOUND",
+      "name": "AN01_ANIM_CTRL_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 357,
+      "kind": "const",
+      "name": "AN02_CLIP_ADDED",
       "has_doc": true
     },
     {
@@ -33733,16 +33742,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 359,
       "kind": "const",
-      "name": "EN01_UNIVERSE_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 361,
-      "kind": "const",
-      "name": "EN02_ENTITY_SPAWN",
+      "name": "AN03_CLIP_NOT_FOUND",
       "has_doc": true
     },
     {
@@ -33751,7 +33751,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 363,
       "kind": "const",
-      "name": "EN03_ENTITY_LOW",
+      "name": "EN01_UNIVERSE_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 365,
+      "kind": "const",
+      "name": "EN02_ENTITY_SPAWN",
       "has_doc": true
     },
     {
@@ -33760,16 +33769,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 367,
       "kind": "const",
-      "name": "TM01_TILEMAP_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 369,
-      "kind": "const",
-      "name": "TM02_TILESET_ADD",
+      "name": "EN03_ENTITY_LOW",
       "has_doc": true
     },
     {
@@ -33778,7 +33778,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 371,
       "kind": "const",
-      "name": "TM03_LAYER_ADD",
+      "name": "TM01_TILEMAP_INIT",
       "has_doc": true
     },
     {
@@ -33787,7 +33787,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 373,
       "kind": "const",
-      "name": "TM04_TMX_FAIL",
+      "name": "TM02_TILESET_ADD",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 375,
+      "kind": "const",
+      "name": "TM03_LAYER_ADD",
       "has_doc": true
     },
     {
@@ -33796,16 +33805,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 377,
       "kind": "const",
-      "name": "SV01_SAVE_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 379,
-      "kind": "const",
-      "name": "SV02_SAVE_WRITE",
+      "name": "TM04_TMX_FAIL",
       "has_doc": true
     },
     {
@@ -33814,7 +33814,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 381,
       "kind": "const",
-      "name": "SV03_SAVE_LOAD",
+      "name": "SV01_SAVE_INIT",
       "has_doc": true
     },
     {
@@ -33823,7 +33823,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 383,
       "kind": "const",
-      "name": "SV04_SAVE_ERROR",
+      "name": "SV02_SAVE_WRITE",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 385,
+      "kind": "const",
+      "name": "SV03_SAVE_LOAD",
       "has_doc": true
     },
     {
@@ -33832,16 +33841,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 387,
       "kind": "const",
-      "name": "SC01_STACK_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 389,
-      "kind": "const",
-      "name": "SC02_SCENE_PUSH",
+      "name": "SV04_SAVE_ERROR",
       "has_doc": true
     },
     {
@@ -33850,7 +33850,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 391,
       "kind": "const",
-      "name": "SC03_SCENE_POP",
+      "name": "SC01_STACK_INIT",
       "has_doc": true
     },
     {
@@ -33859,7 +33859,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 393,
       "kind": "const",
-      "name": "SC04_STACK_CLEAR",
+      "name": "SC02_SCENE_PUSH",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 395,
+      "kind": "const",
+      "name": "SC03_SCENE_POP",
       "has_doc": true
     },
     {
@@ -33868,16 +33877,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 397,
       "kind": "const",
-      "name": "TH01_WORKER_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 399,
-      "kind": "const",
-      "name": "TH02_WORKER_START",
+      "name": "SC04_STACK_CLEAR",
       "has_doc": true
     },
     {
@@ -33886,7 +33886,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 401,
       "kind": "const",
-      "name": "TH03_WORKER_DONE",
+      "name": "TH01_WORKER_INIT",
       "has_doc": true
     },
     {
@@ -33895,7 +33895,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 403,
       "kind": "const",
-      "name": "TH04_WORKER_ERROR",
+      "name": "TH02_WORKER_START",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 405,
+      "kind": "const",
+      "name": "TH03_WORKER_DONE",
       "has_doc": true
     },
     {
@@ -33904,16 +33913,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 407,
       "kind": "const",
-      "name": "PF01_GRID_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 409,
-      "kind": "const",
-      "name": "PF02_PATH_FOUND",
+      "name": "TH04_WORKER_ERROR",
       "has_doc": true
     },
     {
@@ -33922,7 +33922,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 411,
       "kind": "const",
-      "name": "PF03_NO_PATH",
+      "name": "PF01_GRID_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 413,
+      "kind": "const",
+      "name": "PF02_PATH_FOUND",
       "has_doc": true
     },
     {
@@ -33931,16 +33940,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 415,
       "kind": "const",
-      "name": "MD01_MGR_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 417,
-      "kind": "const",
-      "name": "MD02_MOD_REG",
+      "name": "PF03_NO_PATH",
       "has_doc": true
     },
     {
@@ -33949,7 +33949,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 419,
       "kind": "const",
-      "name": "MD03_MOD_FAIL",
+      "name": "MD01_MGR_INIT",
       "has_doc": true
     },
     {
@@ -33958,7 +33958,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 421,
       "kind": "const",
-      "name": "MD04_ORDER_OK",
+      "name": "MD02_MOD_REG",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 423,
+      "kind": "const",
+      "name": "MD03_MOD_FAIL",
       "has_doc": true
     },
     {
@@ -33967,16 +33976,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 425,
       "kind": "const",
-      "name": "NW01_HOST_BIND",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 427,
-      "kind": "const",
-      "name": "NW02_PEER_CONN",
+      "name": "MD04_ORDER_OK",
       "has_doc": true
     },
     {
@@ -33985,7 +33985,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 429,
       "kind": "const",
-      "name": "NW03_PEER_DISC",
+      "name": "NW01_HOST_BIND",
       "has_doc": true
     },
     {
@@ -33994,7 +33994,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 431,
       "kind": "const",
-      "name": "NW04_NET_ERROR",
+      "name": "NW02_PEER_CONN",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 433,
+      "kind": "const",
+      "name": "NW03_PEER_DISC",
       "has_doc": true
     },
     {
@@ -34003,16 +34012,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 435,
       "kind": "const",
-      "name": "PL01_PIPELINE_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 437,
-      "kind": "const",
-      "name": "PL02_STEP_ADD",
+      "name": "NW04_NET_ERROR",
       "has_doc": true
     },
     {
@@ -34021,7 +34021,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 439,
       "kind": "const",
-      "name": "PL03_EXEC",
+      "name": "PL01_PIPELINE_INIT",
       "has_doc": true
     },
     {
@@ -34030,7 +34030,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 441,
       "kind": "const",
-      "name": "PL04_CYCLE",
+      "name": "PL02_STEP_ADD",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 443,
+      "kind": "const",
+      "name": "PL03_EXEC",
       "has_doc": true
     },
     {
@@ -34039,16 +34048,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 445,
       "kind": "const",
-      "name": "AT01_SIM_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 447,
-      "kind": "const",
-      "name": "AT02_SCRIPT_LOAD",
+      "name": "PL04_CYCLE",
       "has_doc": true
     },
     {
@@ -34057,7 +34057,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 449,
       "kind": "const",
-      "name": "AT03_STEP_WARN",
+      "name": "AT01_SIM_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 451,
+      "kind": "const",
+      "name": "AT02_SCRIPT_LOAD",
       "has_doc": true
     },
     {
@@ -34066,16 +34075,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 453,
       "kind": "const",
-      "name": "AD01_AUDIO_DECODED",
+      "name": "AT03_STEP_WARN",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 455,
+      "line": 457,
       "kind": "const",
-      "name": "AD02_AUDIO_ERROR",
+      "name": "AD01_AUDIO_DECODED",
       "has_doc": true
     },
     {
@@ -34084,16 +34093,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 459,
       "kind": "const",
-      "name": "CP01_NDARRAY_ALLOC",
+      "name": "AD02_AUDIO_ERROR",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 461,
+      "line": 463,
       "kind": "const",
-      "name": "CP02_NDARRAY_LARGE",
+      "name": "CP01_NDARRAY_ALLOC",
       "has_doc": true
     },
     {
@@ -34102,16 +34111,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 465,
       "kind": "const",
-      "name": "MM01_MINIMAP_INIT",
+      "name": "CP02_NDARRAY_LARGE",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 467,
+      "line": 469,
       "kind": "const",
-      "name": "MM02_TERRAIN_REBUILD",
+      "name": "MM01_MINIMAP_INIT",
       "has_doc": true
     },
     {
@@ -34120,16 +34129,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 471,
       "kind": "const",
-      "name": "PG01_CELLULAR_START",
+      "name": "MM02_TERRAIN_REBUILD",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 473,
+      "line": 475,
       "kind": "const",
-      "name": "PG02_CELLULAR_DONE",
+      "name": "PG01_CELLULAR_START",
       "has_doc": true
     },
     {
@@ -34138,16 +34147,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 477,
       "kind": "const",
-      "name": "SR01_JSON_OK",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 479,
-      "kind": "const",
-      "name": "SR02_JSON_ERR",
+      "name": "PG02_CELLULAR_DONE",
       "has_doc": true
     },
     {
@@ -34156,7 +34156,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 481,
       "kind": "const",
-      "name": "SR03_JSON_ENC",
+      "name": "SR01_JSON_OK",
       "has_doc": true
     },
     {
@@ -34165,7 +34165,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 483,
       "kind": "const",
-      "name": "SR04_MSGPACK_DEC",
+      "name": "SR02_JSON_ERR",
       "has_doc": true
     },
     {
@@ -34174,7 +34174,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 485,
       "kind": "const",
-      "name": "SR05_MSGPACK_ENC",
+      "name": "SR03_JSON_ENC",
       "has_doc": true
     },
     {
@@ -34183,7 +34183,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 487,
       "kind": "const",
-      "name": "SR06_XML_OK",
+      "name": "SR04_MSGPACK_DEC",
       "has_doc": true
     },
     {
@@ -34192,7 +34192,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 489,
       "kind": "const",
-      "name": "SR07_SCHEMA_PASS",
+      "name": "SR05_MSGPACK_ENC",
       "has_doc": true
     },
     {
@@ -34201,7 +34201,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 491,
       "kind": "const",
-      "name": "SR08_SCHEMA_FAIL",
+      "name": "SR06_XML_OK",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 493,
+      "kind": "const",
+      "name": "SR07_SCHEMA_PASS",
       "has_doc": true
     },
     {
@@ -34210,16 +34219,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 495,
       "kind": "const",
-      "name": "GU01_CTX_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 497,
-      "kind": "const",
-      "name": "GU02_WIDGET_ADD",
+      "name": "SR08_SCHEMA_FAIL",
       "has_doc": true
     },
     {
@@ -34228,7 +34228,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 499,
       "kind": "const",
-      "name": "GU03_CTX_RESET",
+      "name": "GU01_CTX_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 501,
+      "kind": "const",
+      "name": "GU02_WIDGET_ADD",
       "has_doc": true
     },
     {
@@ -34237,16 +34246,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 503,
       "kind": "const",
-      "name": "TX01_TEX_DECODED",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 505,
-      "kind": "const",
-      "name": "TX02_TEX_LARGE",
+      "name": "GU03_CTX_RESET",
       "has_doc": true
     },
     {
@@ -34255,7 +34255,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 507,
       "kind": "const",
-      "name": "TX03_TEX_ERROR",
+      "name": "TX01_TEX_DECODED",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 509,
+      "kind": "const",
+      "name": "TX02_TEX_LARGE",
       "has_doc": true
     },
     {
@@ -34264,16 +34273,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 511,
       "kind": "const",
-      "name": "SH01_SHADER_OK",
+      "name": "TX03_TEX_ERROR",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 513,
+      "line": 515,
       "kind": "const",
-      "name": "SH02_SHADER_ERR",
+      "name": "SH01_SHADER_OK",
       "has_doc": true
     },
     {
@@ -34282,16 +34291,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 517,
       "kind": "const",
-      "name": "LW01_LIGHT_WORLD_INIT",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 519,
-      "kind": "const",
-      "name": "LW02_LIGHT_ADD",
+      "name": "SH02_SHADER_ERR",
       "has_doc": true
     },
     {
@@ -34300,7 +34300,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 521,
       "kind": "const",
-      "name": "LW03_LIGHT_MAX",
+      "name": "LW01_LIGHT_WORLD_INIT",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 523,
+      "kind": "const",
+      "name": "LW02_LIGHT_ADD",
       "has_doc": true
     },
     {
@@ -34309,16 +34318,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 525,
       "kind": "const",
-      "name": "SP01_SKEL_LOADED",
+      "name": "LW03_LIGHT_MAX",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 527,
+      "line": 529,
       "kind": "const",
-      "name": "SP02_SKEL_ANIM_MISS",
+      "name": "SP01_SKEL_LOADED",
       "has_doc": true
     },
     {
@@ -34327,16 +34336,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 531,
       "kind": "const",
-      "name": "IM01_IMAGE_LOADED",
+      "name": "SP02_SKEL_ANIM_MISS",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 533,
+      "line": 535,
       "kind": "const",
-      "name": "IM02_IMAGE_MISMATCH",
+      "name": "IM01_IMAGE_LOADED",
       "has_doc": true
     },
     {
@@ -34345,7 +34354,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 537,
       "kind": "const",
-      "name": "AS01",
+      "name": "IM02_IMAGE_MISMATCH",
       "has_doc": true
     },
     {
@@ -34354,16 +34363,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 541,
       "kind": "const",
-      "name": "BU01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 543,
-      "kind": "const",
-      "name": "BU02",
+      "name": "AS01",
       "has_doc": true
     },
     {
@@ -34372,7 +34372,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 545,
       "kind": "const",
-      "name": "BU03",
+      "name": "BU01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 547,
+      "kind": "const",
+      "name": "BU02",
       "has_doc": true
     },
     {
@@ -34381,16 +34390,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 549,
       "kind": "const",
-      "name": "PE01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 551,
-      "kind": "const",
-      "name": "PE02",
+      "name": "BU03",
       "has_doc": true
     },
     {
@@ -34399,7 +34399,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 553,
       "kind": "const",
-      "name": "PE03",
+      "name": "PE01",
       "has_doc": true
     },
     {
@@ -34408,7 +34408,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 555,
       "kind": "const",
-      "name": "PE04",
+      "name": "PE02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 557,
+      "kind": "const",
+      "name": "PE03",
       "has_doc": true
     },
     {
@@ -34417,16 +34426,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 559,
       "kind": "const",
-      "name": "BD01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 561,
-      "kind": "const",
-      "name": "BD02",
+      "name": "PE04",
       "has_doc": true
     },
     {
@@ -34435,7 +34435,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 563,
       "kind": "const",
-      "name": "BD03",
+      "name": "BD01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 565,
+      "kind": "const",
+      "name": "BD02",
       "has_doc": true
     },
     {
@@ -34444,16 +34453,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 567,
       "kind": "const",
-      "name": "TI01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 569,
-      "kind": "const",
-      "name": "TI02",
+      "name": "BD03",
       "has_doc": true
     },
     {
@@ -34462,7 +34462,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 571,
       "kind": "const",
-      "name": "TI03",
+      "name": "TI01",
       "has_doc": true
     },
     {
@@ -34471,7 +34471,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 573,
       "kind": "const",
-      "name": "TI04",
+      "name": "TI02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 575,
+      "kind": "const",
+      "name": "TI03",
       "has_doc": true
     },
     {
@@ -34480,16 +34489,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 577,
       "kind": "const",
-      "name": "FN01",
+      "name": "TI04",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 579,
+      "line": 581,
       "kind": "const",
-      "name": "FN02",
+      "name": "FN01",
       "has_doc": true
     },
     {
@@ -34498,16 +34507,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 583,
       "kind": "const",
-      "name": "GP01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 585,
-      "kind": "const",
-      "name": "GP02",
+      "name": "FN02",
       "has_doc": true
     },
     {
@@ -34516,7 +34516,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 587,
       "kind": "const",
-      "name": "GP03",
+      "name": "GP01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 589,
+      "kind": "const",
+      "name": "GP02",
       "has_doc": true
     },
     {
@@ -34525,16 +34534,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 591,
       "kind": "const",
-      "name": "FF01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 593,
-      "kind": "const",
-      "name": "FF02",
+      "name": "GP03",
       "has_doc": true
     },
     {
@@ -34543,7 +34543,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 595,
       "kind": "const",
-      "name": "FF03",
+      "name": "FF01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 597,
+      "kind": "const",
+      "name": "FF02",
       "has_doc": true
     },
     {
@@ -34552,16 +34561,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 599,
       "kind": "const",
-      "name": "HP01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 601,
-      "kind": "const",
-      "name": "HP02",
+      "name": "FF03",
       "has_doc": true
     },
     {
@@ -34570,7 +34570,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 603,
       "kind": "const",
-      "name": "HP03",
+      "name": "HP01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 605,
+      "kind": "const",
+      "name": "HP02",
       "has_doc": true
     },
     {
@@ -34579,16 +34588,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 607,
       "kind": "const",
-      "name": "TR01",
+      "name": "HP03",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 609,
+      "line": 611,
       "kind": "const",
-      "name": "TR02",
+      "name": "TR01",
       "has_doc": true
     },
     {
@@ -34597,16 +34606,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 613,
       "kind": "const",
-      "name": "GR01",
+      "name": "TR02",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 615,
+      "line": 617,
       "kind": "const",
-      "name": "GR02",
+      "name": "GR01",
       "has_doc": true
     },
     {
@@ -34615,7 +34624,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 619,
       "kind": "const",
-      "name": "CV01",
+      "name": "GR02",
       "has_doc": true
     },
     {
@@ -34624,16 +34633,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 623,
       "kind": "const",
-      "name": "MS01",
+      "name": "CV01",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 625,
+      "line": 627,
       "kind": "const",
-      "name": "MS02",
+      "name": "MS01",
       "has_doc": true
     },
     {
@@ -34642,7 +34651,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 629,
       "kind": "const",
-      "name": "RC01",
+      "name": "MS02",
       "has_doc": true
     },
     {
@@ -34651,16 +34660,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 633,
       "kind": "const",
-      "name": "FX01",
+      "name": "RC01",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 635,
+      "line": 637,
       "kind": "const",
-      "name": "FX02",
+      "name": "FX01",
       "has_doc": true
     },
     {
@@ -34669,7 +34678,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 639,
       "kind": "const",
-      "name": "DF01",
+      "name": "FX02",
       "has_doc": true
     },
     {
@@ -34678,16 +34687,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 643,
       "kind": "const",
-      "name": "SG01",
+      "name": "DF01",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 645,
+      "line": 647,
       "kind": "const",
-      "name": "SG02",
+      "name": "SG01",
       "has_doc": true
     },
     {
@@ -34696,16 +34705,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 649,
       "kind": "const",
-      "name": "MG01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 651,
-      "kind": "const",
-      "name": "MG02",
+      "name": "SG02",
       "has_doc": true
     },
     {
@@ -34714,7 +34714,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 653,
       "kind": "const",
-      "name": "MG03",
+      "name": "MG01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 655,
+      "kind": "const",
+      "name": "MG02",
       "has_doc": true
     },
     {
@@ -34723,16 +34732,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 657,
       "kind": "const",
-      "name": "AT01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 659,
-      "kind": "const",
-      "name": "AT02",
+      "name": "MG03",
       "has_doc": true
     },
     {
@@ -34741,7 +34741,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 661,
       "kind": "const",
-      "name": "AT03",
+      "name": "AT01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 663,
+      "kind": "const",
+      "name": "AT02",
       "has_doc": true
     },
     {
@@ -34750,16 +34759,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 665,
       "kind": "const",
-      "name": "TL01",
+      "name": "AT03",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 667,
+      "line": 669,
       "kind": "const",
-      "name": "TL02",
+      "name": "TL01",
       "has_doc": true
     },
     {
@@ -34768,16 +34777,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 671,
       "kind": "const",
-      "name": "VR01",
+      "name": "TL02",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 673,
+      "line": 675,
       "kind": "const",
-      "name": "VR02",
+      "name": "VR01",
       "has_doc": true
     },
     {
@@ -34786,16 +34795,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 677,
       "kind": "const",
-      "name": "SV01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 679,
-      "kind": "const",
-      "name": "SV02",
+      "name": "VR02",
       "has_doc": true
     },
     {
@@ -34804,7 +34804,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 681,
       "kind": "const",
-      "name": "SV03",
+      "name": "SV01",
       "has_doc": true
     },
     {
@@ -34813,7 +34813,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 683,
       "kind": "const",
-      "name": "SV04",
+      "name": "SV02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 685,
+      "kind": "const",
+      "name": "SV03",
       "has_doc": true
     },
     {
@@ -34822,16 +34831,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 687,
       "kind": "const",
-      "name": "CH01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 689,
-      "kind": "const",
-      "name": "CH02",
+      "name": "SV04",
       "has_doc": true
     },
     {
@@ -34840,7 +34840,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 691,
       "kind": "const",
-      "name": "CH03",
+      "name": "CH01",
       "has_doc": true
     },
     {
@@ -34849,7 +34849,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 693,
       "kind": "const",
-      "name": "CH04",
+      "name": "CH02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 695,
+      "kind": "const",
+      "name": "CH03",
       "has_doc": true
     },
     {
@@ -34858,16 +34867,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 697,
       "kind": "const",
-      "name": "LT01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 699,
-      "kind": "const",
-      "name": "LT02",
+      "name": "CH04",
       "has_doc": true
     },
     {
@@ -34876,7 +34876,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 701,
       "kind": "const",
-      "name": "LT03",
+      "name": "LT01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 703,
+      "kind": "const",
+      "name": "LT02",
       "has_doc": true
     },
     {
@@ -34885,16 +34894,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 705,
       "kind": "const",
-      "name": "RL01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 707,
-      "kind": "const",
-      "name": "RL02",
+      "name": "LT03",
       "has_doc": true
     },
     {
@@ -34903,7 +34903,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 709,
       "kind": "const",
-      "name": "RL03",
+      "name": "RL01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 711,
+      "kind": "const",
+      "name": "RL02",
       "has_doc": true
     },
     {
@@ -34912,16 +34921,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 713,
       "kind": "const",
-      "name": "GC01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 715,
-      "kind": "const",
-      "name": "GC02",
+      "name": "RL03",
       "has_doc": true
     },
     {
@@ -34930,7 +34930,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 717,
       "kind": "const",
-      "name": "GC03",
+      "name": "GC01",
       "has_doc": true
     },
     {
@@ -34939,7 +34939,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 719,
       "kind": "const",
-      "name": "GC04",
+      "name": "GC02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 721,
+      "kind": "const",
+      "name": "GC03",
       "has_doc": true
     },
     {
@@ -34948,16 +34957,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 723,
       "kind": "const",
-      "name": "CQ01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 725,
-      "kind": "const",
-      "name": "CQ02",
+      "name": "GC04",
       "has_doc": true
     },
     {
@@ -34966,7 +34966,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 727,
       "kind": "const",
-      "name": "CQ03",
+      "name": "CQ01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 729,
+      "kind": "const",
+      "name": "CQ02",
       "has_doc": true
     },
     {
@@ -34975,16 +34984,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 731,
       "kind": "const",
-      "name": "UP01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 733,
-      "kind": "const",
-      "name": "UP02",
+      "name": "CQ03",
       "has_doc": true
     },
     {
@@ -34993,7 +34993,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 735,
       "kind": "const",
-      "name": "UP03",
+      "name": "UP01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 737,
+      "kind": "const",
+      "name": "UP02",
       "has_doc": true
     },
     {
@@ -35002,16 +35011,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 739,
       "kind": "const",
-      "name": "OV01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 741,
-      "kind": "const",
-      "name": "OV02",
+      "name": "UP03",
       "has_doc": true
     },
     {
@@ -35020,7 +35020,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 743,
       "kind": "const",
-      "name": "OV03",
+      "name": "OV01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 745,
+      "kind": "const",
+      "name": "OV02",
       "has_doc": true
     },
     {
@@ -35029,16 +35038,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 747,
       "kind": "const",
-      "name": "FE01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 749,
-      "kind": "const",
-      "name": "FE02",
+      "name": "OV03",
       "has_doc": true
     },
     {
@@ -35047,7 +35047,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 751,
       "kind": "const",
-      "name": "FE03",
+      "name": "FE01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 753,
+      "kind": "const",
+      "name": "FE02",
       "has_doc": true
     },
     {
@@ -35056,16 +35065,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 755,
       "kind": "const",
-      "name": "CB01",
+      "name": "FE03",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 757,
+      "line": 759,
       "kind": "const",
-      "name": "CB02",
+      "name": "CB01",
       "has_doc": true
     },
     {
@@ -35074,16 +35083,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 761,
       "kind": "const",
-      "name": "TS01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 763,
-      "kind": "const",
-      "name": "TS02",
+      "name": "CB02",
       "has_doc": true
     },
     {
@@ -35092,7 +35092,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 765,
       "kind": "const",
-      "name": "TS03",
+      "name": "TS01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 767,
+      "kind": "const",
+      "name": "TS02",
       "has_doc": true
     },
     {
@@ -35101,16 +35110,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 769,
       "kind": "const",
-      "name": "GD01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 771,
-      "kind": "const",
-      "name": "GD02",
+      "name": "TS03",
       "has_doc": true
     },
     {
@@ -35119,7 +35119,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 773,
       "kind": "const",
-      "name": "GD03",
+      "name": "GD01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 775,
+      "kind": "const",
+      "name": "GD02",
       "has_doc": true
     },
     {
@@ -35128,16 +35137,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 777,
       "kind": "const",
-      "name": "DP01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 779,
-      "kind": "const",
-      "name": "DP02",
+      "name": "GD03",
       "has_doc": true
     },
     {
@@ -35146,7 +35146,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 781,
       "kind": "const",
-      "name": "DP03",
+      "name": "DP01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 783,
+      "kind": "const",
+      "name": "DP02",
       "has_doc": true
     },
     {
@@ -35155,16 +35164,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 785,
       "kind": "const",
-      "name": "BB01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 787,
-      "kind": "const",
-      "name": "BB02",
+      "name": "DP03",
       "has_doc": true
     },
     {
@@ -35173,7 +35173,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 789,
       "kind": "const",
-      "name": "BB03",
+      "name": "BB01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 791,
+      "kind": "const",
+      "name": "BB02",
       "has_doc": true
     },
     {
@@ -35182,16 +35191,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 793,
       "kind": "const",
-      "name": "CK01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 795,
-      "kind": "const",
-      "name": "CK02",
+      "name": "BB03",
       "has_doc": true
     },
     {
@@ -35200,7 +35200,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 797,
       "kind": "const",
-      "name": "CK03",
+      "name": "CK01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 799,
+      "kind": "const",
+      "name": "CK02",
       "has_doc": true
     },
     {
@@ -35209,16 +35218,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 801,
       "kind": "const",
-      "name": "IE01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 803,
-      "kind": "const",
-      "name": "IE02",
+      "name": "CK03",
       "has_doc": true
     },
     {
@@ -35227,7 +35227,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 805,
       "kind": "const",
-      "name": "IE03",
+      "name": "IE01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 807,
+      "kind": "const",
+      "name": "IE02",
       "has_doc": true
     },
     {
@@ -35236,16 +35245,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 809,
       "kind": "const",
-      "name": "NG01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 811,
-      "kind": "const",
-      "name": "NG02",
+      "name": "IE03",
       "has_doc": true
     },
     {
@@ -35254,7 +35254,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 813,
       "kind": "const",
-      "name": "NG03",
+      "name": "NG01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 815,
+      "kind": "const",
+      "name": "NG02",
       "has_doc": true
     },
     {
@@ -35263,16 +35272,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 817,
       "kind": "const",
-      "name": "SS01",
+      "name": "NG03",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 819,
+      "line": 821,
       "kind": "const",
-      "name": "SS02",
+      "name": "SS01",
       "has_doc": true
     },
     {
@@ -35281,16 +35290,7 @@
       "file": "src/runtime/log_messages.rs",
       "line": 823,
       "kind": "const",
-      "name": "IF01",
-      "has_doc": true
-    },
-    {
-      "source": "rust",
-      "module": "runtime",
-      "file": "src/runtime/log_messages.rs",
-      "line": 825,
-      "kind": "const",
-      "name": "IF02",
+      "name": "SS02",
       "has_doc": true
     },
     {
@@ -35299,7 +35299,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 827,
       "kind": "const",
-      "name": "IF03",
+      "name": "IF01",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 829,
+      "kind": "const",
+      "name": "IF02",
       "has_doc": true
     },
     {
@@ -35308,16 +35317,16 @@
       "file": "src/runtime/log_messages.rs",
       "line": 831,
       "kind": "const",
-      "name": "HX01",
+      "name": "IF03",
       "has_doc": true
     },
     {
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 833,
+      "line": 835,
       "kind": "const",
-      "name": "HX02",
+      "name": "HX01",
       "has_doc": true
     },
     {
@@ -35326,6 +35335,15 @@
       "file": "src/runtime/log_messages.rs",
       "line": 837,
       "kind": "const",
+      "name": "HX02",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/log_messages.rs",
+      "line": 841,
+      "kind": "const",
       "name": "BI01",
       "has_doc": true
     },
@@ -35333,7 +35351,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 839,
+      "line": 843,
       "kind": "const",
       "name": "BI02",
       "has_doc": true
@@ -35342,7 +35360,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/log_messages.rs",
-      "line": 841,
+      "line": 845,
       "kind": "const",
       "name": "BI03",
       "has_doc": true
@@ -35621,7 +35639,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 420,
+      "line": 433,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -35630,7 +35648,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 497,
+      "line": 513,
       "kind": "fn",
       "name": "step_timer",
       "has_doc": true
@@ -35639,7 +35657,34 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 512,
+      "line": 533,
+      "kind": "fn",
+      "name": "touch_texture",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/shared_state.rs",
+      "line": 548,
+      "kind": "fn",
+      "name": "evict_lru_resources",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/shared_state.rs",
+      "line": 589,
+      "kind": "fn",
+      "name": "resource_memory_stats",
+      "has_doc": true
+    },
+    {
+      "source": "rust",
+      "module": "runtime",
+      "file": "src/runtime/shared_state.rs",
+      "line": 605,
       "kind": "fn",
       "name": "request_async_load",
       "has_doc": true
@@ -35648,7 +35693,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 529,
+      "line": 622,
       "kind": "fn",
       "name": "load_default_fonts",
       "has_doc": true
@@ -35657,7 +35702,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 552,
+      "line": 645,
       "kind": "fn",
       "name": "poll_async_load",
       "has_doc": true
@@ -35666,7 +35711,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 577,
+      "line": 670,
       "kind": "struct",
       "name": "RendererStats",
       "has_doc": true
@@ -35675,7 +35720,7 @@
       "source": "rust",
       "module": "runtime",
       "file": "src/runtime/shared_state.rs",
-      "line": 595,
+      "line": 688,
       "kind": "fn",
       "name": "compute_stats",
       "has_doc": true
@@ -45314,7 +45359,7 @@
       "source": "lua_api",
       "module": "audio_api",
       "file": "src/lua_api/audio_api.rs",
-      "line": 1737,
+      "line": 1739,
       "kind": "fn",
       "name": "getMaxSources",
       "has_doc": true
@@ -45368,7 +45413,7 @@
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 542,
+      "line": 544,
       "kind": "fn",
       "name": "incomplete",
       "has_doc": true
@@ -45377,7 +45422,7 @@
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 1115,
+      "line": 1116,
       "kind": "fn",
       "name": "stale",
       "has_doc": true
@@ -45386,7 +45431,7 @@
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 1117,
+      "line": 1118,
       "kind": "fn",
       "name": "current",
       "has_doc": true
@@ -45395,7 +45440,7 @@
       "source": "lua_api",
       "module": "docs_api",
       "file": "src/lua_api/docs_api.rs",
-      "line": 1119,
+      "line": 1120,
       "kind": "fn",
       "name": "missing",
       "has_doc": true
@@ -45404,7 +45449,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2178,
+      "line": 2199,
       "kind": "fn",
       "name": "pi",
       "has_doc": true
@@ -45413,7 +45458,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2183,
+      "line": 2204,
       "kind": "fn",
       "name": "tau",
       "has_doc": true
@@ -45422,7 +45467,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2188,
+      "line": 2209,
       "kind": "fn",
       "name": "huge",
       "has_doc": true
@@ -45431,7 +45476,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2212,
+      "line": 2233,
       "kind": "fn",
       "name": "sin",
       "has_doc": true
@@ -45440,7 +45485,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2218,
+      "line": 2239,
       "kind": "fn",
       "name": "cos",
       "has_doc": true
@@ -45449,7 +45494,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2224,
+      "line": 2245,
       "kind": "fn",
       "name": "tan",
       "has_doc": true
@@ -45458,7 +45503,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2230,
+      "line": 2251,
       "kind": "fn",
       "name": "asin",
       "has_doc": true
@@ -45467,7 +45512,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2236,
+      "line": 2257,
       "kind": "fn",
       "name": "acos",
       "has_doc": true
@@ -45476,7 +45521,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2267,
+      "line": 2288,
       "kind": "fn",
       "name": "sqrt",
       "has_doc": true
@@ -45485,7 +45530,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2273,
+      "line": 2294,
       "kind": "fn",
       "name": "abs",
       "has_doc": true
@@ -45494,7 +45539,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2279,
+      "line": 2300,
       "kind": "fn",
       "name": "floor",
       "has_doc": true
@@ -45503,7 +45548,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2285,
+      "line": 2306,
       "kind": "fn",
       "name": "ceil",
       "has_doc": true
@@ -45512,7 +45557,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2291,
+      "line": 2312,
       "kind": "fn",
       "name": "round",
       "has_doc": true
@@ -45521,7 +45566,7 @@
       "source": "lua_api",
       "module": "math_api",
       "file": "src/lua_api/math_api.rs",
-      "line": 2297,
+      "line": 2318,
       "kind": "fn",
       "name": "exp",
       "has_doc": true
@@ -45530,7 +45575,7 @@
       "source": "lua_api",
       "module": "mod",
       "file": "src/lua_api/mod.rs",
-      "line": 424,
+      "line": 422,
       "kind": "fn",
       "name": "conf",
       "has_doc": true
@@ -45539,7 +45584,7 @@
       "source": "lua_api",
       "module": "network_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 739,
+      "line": 743,
       "kind": "fn",
       "name": "MAX_PEERS",
       "has_doc": true
@@ -45548,7 +45593,7 @@
       "source": "lua_api",
       "module": "network_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 743,
+      "line": 747,
       "kind": "fn",
       "name": "DEFAULT_PEERS",
       "has_doc": true
@@ -45557,7 +45602,7 @@
       "source": "lua_api",
       "module": "network_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 747,
+      "line": 751,
       "kind": "fn",
       "name": "MAX_CHANNELS",
       "has_doc": true
@@ -45566,7 +45611,7 @@
       "source": "lua_api",
       "module": "network_api",
       "file": "src/lua_api/network_api.rs",
-      "line": 751,
+      "line": 755,
       "kind": "fn",
       "name": "DEFAULT_CHANNELS",
       "has_doc": true
@@ -45575,7 +45620,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2693,
+      "line": 2714,
       "kind": "fn",
       "name": "CELL_AIR",
       "has_doc": true
@@ -45584,7 +45629,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2695,
+      "line": 2716,
       "kind": "fn",
       "name": "CELL_SAND",
       "has_doc": true
@@ -45593,7 +45638,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2697,
+      "line": 2718,
       "kind": "fn",
       "name": "CELL_WATER",
       "has_doc": true
@@ -45602,7 +45647,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2699,
+      "line": 2720,
       "kind": "fn",
       "name": "CELL_ROCK",
       "has_doc": true
@@ -45611,7 +45656,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2701,
+      "line": 2722,
       "kind": "fn",
       "name": "CELL_FIRE",
       "has_doc": true
@@ -45620,7 +45665,7 @@
       "source": "lua_api",
       "module": "physics_api",
       "file": "src/lua_api/physics_api.rs",
-      "line": 2703,
+      "line": 2724,
       "kind": "fn",
       "name": "CELL_GAS",
       "has_doc": true
@@ -45629,7 +45674,7 @@
       "source": "lua_api",
       "module": "scene_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 759,
+      "line": 758,
       "kind": "fn",
       "name": "new",
       "has_doc": true
@@ -45638,7 +45683,7 @@
       "source": "lua_api",
       "module": "scene_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 776,
+      "line": 775,
       "kind": "fn",
       "name": "define",
       "has_doc": true
@@ -45647,7 +45692,7 @@
       "source": "lua_api",
       "module": "scene_api",
       "file": "src/lua_api/scene_api.rs",
-      "line": 1138,
+      "line": 1141,
       "kind": "fn",
       "name": "transitions",
       "has_doc": true
@@ -45656,7 +45701,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 440,
+      "line": 427,
       "kind": "fn",
       "name": "message",
       "has_doc": true
@@ -45665,7 +45710,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 442,
+      "line": 429,
       "kind": "fn",
       "name": "code",
       "has_doc": true
@@ -45674,7 +45719,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 444,
+      "line": 431,
       "kind": "fn",
       "name": "category",
       "has_doc": true
@@ -45683,7 +45728,7 @@
       "source": "lua_api",
       "module": "system_api",
       "file": "src/lua_api/system_api.rs",
-      "line": 447,
+      "line": 434,
       "kind": "fn",
       "name": "hint",
       "has_doc": true
@@ -45692,7 +45737,7 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 2245,
+      "line": 2265,
       "kind": "fn",
       "name": "FLOOR",
       "has_doc": true
@@ -45701,7 +45746,7 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 2247,
+      "line": 2267,
       "kind": "fn",
       "name": "NORTH_WALL",
       "has_doc": true
@@ -45710,7 +45755,7 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 2249,
+      "line": 2269,
       "kind": "fn",
       "name": "WEST_WALL",
       "has_doc": true
@@ -45719,7 +45764,7 @@
       "source": "lua_api",
       "module": "tilemap_api",
       "file": "src/lua_api/tilemap_api.rs",
-      "line": 2251,
+      "line": 2271,
       "kind": "fn",
       "name": "OBJECT",
       "has_doc": true
@@ -45728,7 +45773,7 @@
       "source": "lua_api",
       "module": "ui_api",
       "file": "src/lua_api/ui_api.rs",
-      "line": 5605,
+      "line": 5604,
       "kind": "fn",
       "name": "draw",
       "has_doc": true
@@ -45746,7 +45791,7 @@
       "source": "lua_api",
       "module": "window_api",
       "file": "src/lua_api/window_api.rs",
-      "line": 499,
+      "line": 500,
       "kind": "fn",
       "name": "focus",
       "has_doc": true

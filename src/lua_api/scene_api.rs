@@ -170,10 +170,9 @@ impl LuaUserData for LuaDepthSorter {
 
 /// Registers the `lurek.scene` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -1076,8 +1075,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // transitions.fade(duration?) → {type="fade", duration=0.5}
     /// Returns a fade cross-dissolve transition config table.
+    /// @return table|nil
     /// @param duration : number?  — default 0.5
-    /// @return table  — { type : string, duration : number }
+    /// table  — { type : string, duration : number }
     trans_tbl.set(
         "fade",
         lua.create_function(|lua, duration: Option<f32>| {
@@ -1090,9 +1090,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // transitions.slide(direction?, duration?) → {type=direction, duration=0.4}
     /// Returns a directional slide transition config table.
+    /// @return table|nil
     /// @param direction : string?  — "left" | "right" | "up" | "down" (default "left")
     /// @param duration  : number?  — default 0.4
-    /// @return table  — { type : string, duration : number }
+    /// table  — { type : string, duration : number }
     trans_tbl.set(
         "slide",
         lua.create_function(
@@ -1108,8 +1109,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // transitions.wipe(duration?) → {type="wipe", duration=0.5}
     /// Returns a wipe/curtain transition config table.
+    /// @return table|nil
     /// @param duration : number?  — default 0.5
-    /// @return table  — { type : string, duration : number }
+    /// table  — { type : string, duration : number }
     trans_tbl.set(
         "wipe",
         lua.create_function(|lua, duration: Option<f32>| {
@@ -1122,8 +1124,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // transitions.iris(duration?) → {type="iris", duration=0.6}
     /// Returns an iris in/out (circular reveal) transition config table.
+    /// @return table|nil
     /// @param duration : number?  — default 0.6
-    /// @return table  — { type : string, duration : number }
+    /// table  — { type : string, duration : number }
     trans_tbl.set(
         "iris",
         lua.create_function(|lua, duration: Option<f32>| {

@@ -54,7 +54,8 @@ impl LuaUserData for LuaImageData {
         ///
         /// @param width : integer
         /// @param height : integer
-        /// @return ImageData?
+        /// @return nil
+        /// ImageData?
         methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
             match this.inner.resize(w, h) {
                 Some(img) => Ok(LuaValue::UserData(lua.create_userdata(LuaImageData {
@@ -91,7 +92,8 @@ impl LuaUserData for LuaImageData {
         /// @param y : integer
         /// @param width : integer
         /// @param height : integer
-        /// @return ImageData?
+        /// @return nil
+        /// ImageData?
         methods.add_method(
             "getRegion",
             |lua, this, (x, y, w, h): (u32, u32, u32, u32)| {
@@ -360,7 +362,8 @@ impl LuaUserData for LuaFont {
         /// Wraps text to the given width and returns the lines.
         /// @param text : string
         /// @param limit : number
-        /// @return table, number
+        /// @return nil
+        /// table, number
         methods.add_method("getWrap", |lua, this, (text, limit): (String, f32)| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -630,7 +633,8 @@ impl LuaUserData for LuaMesh {
         // -- getVertex --
         /// Returns vertex data at the given 1-based index.
         /// @param index : integer
-        /// @return number, number, number, number, number, number, number, number
+        /// @return nil
+        /// number, number, number, number, number, number, number, number
         methods.add_method("getVertex", |_, this, index: usize| {
             let st = this.state.borrow();
             let mesh = st.meshes.get(this.key).ok_or_else(|| {
@@ -974,6 +978,7 @@ impl LuaUserData for LuaShape {
         /// @param g : number   green [0,1]
         /// @param b : number   blue [0,1]
         /// @param a : number?  alpha [0,1], default 1
+        /// @return nil
         methods.add_method(
             "setColor",
             |_, this, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
@@ -1006,6 +1011,7 @@ impl LuaUserData for LuaShape {
         /// @param y    : number
         /// @param w    : number
         /// @param h    : number
+        /// @return nil
         methods.add_method(
             "rectangle",
             |_, this, (mode, x, y, w, h): (String, f32, f32, f32, f32)| {
@@ -1038,6 +1044,7 @@ impl LuaUserData for LuaShape {
         /// @param h    : number
         /// @param rx   : number  horizontal corner radius
         /// @param ry   : number?  vertical corner radius (default = rx)
+        /// @return nil
         methods.add_method(
             "roundedRectangle",
             |_, this, (mode, x, y, w, h, rx, ry): (String, f32, f32, f32, f32, f32, Option<f32>)| {
@@ -1058,6 +1065,7 @@ impl LuaUserData for LuaShape {
         /// @param x    : number  centre X
         /// @param y    : number  centre Y
         /// @param r    : number  radius
+        /// @return nil
         methods.add_method(
             "circle",
             |_, this, (mode, x, y, r): (String, f32, f32, f32)| {
@@ -1082,6 +1090,7 @@ impl LuaUserData for LuaShape {
         /// @param y    : number  centre Y
         /// @param rx   : number  horizontal radius
         /// @param ry   : number  vertical radius
+        /// @return nil
         methods.add_method(
             "ellipse",
             |_, this, (mode, x, y, rx, ry): (String, f32, f32, f32, f32)| {
@@ -1114,6 +1123,7 @@ impl LuaUserData for LuaShape {
         /// @param y2   : number
         /// @param x3   : number
         /// @param y3   : number
+        /// @return nil
         methods.add_method(
             "triangle",
             |_, this, (mode, x1, y1, x2, y2, x3, y3): (String, f32, f32, f32, f32, f32, f32)| {
@@ -1143,6 +1153,7 @@ impl LuaUserData for LuaShape {
         /// Queues a polygon command from variadic (x, y) coordinate pairs.
         /// @param mode : string   "fill" or "line"
         /// @param ...  : number   flat x1, y1, x2, y2, … (minimum 6 numbers = 3 vertices)
+        /// @return nil
         methods.add_method(
             "polygon",
             |_, this, (mode, coords): (String, mlua::Variadic<f32>)| {
@@ -1210,6 +1221,7 @@ impl LuaUserData for LuaShape {
         /// @param astart   : number   start angle in radians
         /// @param aend     : number   end angle in radians
         /// @param segments : integer?  curve resolution (default 32)
+        /// @return nil
         methods.add_method(
             "arc",
             |_,
@@ -1256,6 +1268,7 @@ impl LuaUserData for LuaShape {
         /// @param sy       : number?  vertical scale, default 1
         /// @param ox       : number?  origin X (object space), default 0
         /// @param oy       : number?  origin Y (object space), default 0
+        /// @return nil
         methods.add_method(
             "draw",
             |_,
@@ -1368,10 +1381,9 @@ impl LuaUserData for LuaDrawLayer {
 
 /// Registers the `lurek.graphic` namespace on the given Lua table.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let graphics = lua.create_table()?;
@@ -1736,7 +1748,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param oy : number?
     let s = state.clone();
     #[allow(clippy::type_complexity)]
-    /// @return any
+    /// @return table|nil
     graphics.set(
         "draw",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -2291,8 +2303,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getFont --
     /// Returns the currently active font, or nil.
-    /// @return Font?
+    /// Font?
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getFont",
         lua.create_function(move |_, ()| {
@@ -2486,8 +2499,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns wrapped lines and the maximum line width.
     /// @param text : string
     /// @param limit : number
-    /// @return table, number
+    /// table, number
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getFontWrap",
         lua.create_function(move |lua, (text, limit): (String, f32)| {
@@ -2630,8 +2644,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getCanvas --
     /// Returns the current canvas, or nil if drawing to screen.
-    /// @return Canvas?
+    /// Canvas?
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getCanvas",
         lua.create_function(move |_, ()| {
@@ -2797,8 +2812,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getShader --
     /// Returns the active shader, or nil.
-    /// @return Shader?
+    /// Shader?
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getShader",
         lua.create_function(move |_, ()| {
@@ -2989,8 +3005,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getScissor --
     /// Returns the active scissor rectangle, or nothing.
-    /// @return number?, number?, number?, number?
+    /// number?, number?, number?, number?
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getScissor",
         lua.create_function(move |_, ()| {
@@ -3064,7 +3081,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getColorMask --
     /// Returns the current color mask.
-    /// @return boolean, boolean, boolean, boolean
+    /// boolean, boolean, boolean, boolean
     let s = state.clone();
     graphics.set(
         "getColorMask",
@@ -3212,8 +3229,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getStencilMode --
     /// Returns the current stencil mode as (action, compare, value).
-    /// @return string, string, integer
+    /// string, string, integer
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getStencilMode",
         lua.create_function(move |_, ()| {
@@ -3285,8 +3303,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getDepthMode --
     /// Returns the current depth mode as (mode, write).
-    /// @return string, boolean
+    /// string, boolean
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getDepthMode",
         lua.create_function(move |_, ()| {
@@ -3358,8 +3377,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getDefaultFilter --
     /// Returns the default texture filter mode.
-    /// @return string, string, integer
+    /// string, string, integer
     let s = state.clone();
+    /// @return table|nil
     graphics.set(
         "getDefaultFilter",
         lua.create_function(move |_, ()| {

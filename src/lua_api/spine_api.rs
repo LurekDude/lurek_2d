@@ -302,6 +302,7 @@ impl LuaUserData for LuaSkeleton {
         /// @param anim : SkeletonAnimation
         /// @param time : number
         /// @param blend_weight : number?
+        /// @return nil
         methods.add_method_mut(
             "blendAnimation",
             |_, this, (anim_ud, time, blend_weight): (mlua::AnyUserData, f32, Option<f32>)| {
@@ -389,6 +390,7 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @param time : number
         /// @param name : string
         /// @param value : number?
+        /// @return nil
         methods.add_method_mut(
             "addEventKey",
             |_, this, (time, name, value): (f32, String, Option<f32>)| {
@@ -403,7 +405,8 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// Useful for polling events after each `updateAnimation` call.
         /// @param from : number
         /// @param to : number
-        /// @return table  — Array of `{name: string, value: number}` tables.
+        /// @return nil
+        /// table  — Array of `{name: string, value: number}` tables.
         methods.add_method(
             "getEvents",
             |lua, this, (from, to): (f32, f32)| {
@@ -434,10 +437,9 @@ impl LuaUserData for LuaSkeletonAnimation {
 
 /// Registers the `lurek.spine` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

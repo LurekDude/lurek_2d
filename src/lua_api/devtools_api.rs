@@ -84,10 +84,9 @@ fn zone_to_table<'a>(lua: &'a Lua, zone: &ProfileZone) -> LuaResult<LuaTable<'a>
 
 /// Registers `lurek.devtools.*`.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 
 // ---------------------------------------------------------------------------
@@ -326,8 +325,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     /// Closes the most recent profiling zone.
     let s = shared.clone();
-    /// @return nil
     /// @param  : string?
+    /// @return nil
     dt.set(
         "profilePop",
         lua.create_function(move |_, _: Option<String>| {

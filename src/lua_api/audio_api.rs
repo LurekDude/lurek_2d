@@ -558,7 +558,8 @@ impl LuaUserData for LuaBus {
         /// Peak values are stored per-source via `AudioSource:setMeter()` and
         /// averaged across all sources assigned to this bus.
         ///
-        /// @return number   value in \[0, 1\]
+        /// number   value in \[0, 1\]
+        /// @return nil
         methods.add_method("getPeak", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.bus_peak(this.key))
@@ -1010,6 +1011,7 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setSampleRate --
         /// Sets the PCM output sample rate in Hz (clamped 8000–192000).
         /// @param rate : integer
+        /// @return nil
         methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
             this.inner.borrow_mut().set_output_sample_rate(rate);
             Ok(())
@@ -1025,6 +1027,7 @@ impl LuaUserData for LuaMidiPlayer {
         // -- setChannels --
         /// Sets the PCM output channel count (clamped 1–2).
         /// @param channels : integer
+        /// @return nil
         methods.add_method_mut("setChannels", |_, this, channels: u32| {
             this.inner.borrow_mut().set_output_channels(channels as u16);
             Ok(())
@@ -1233,10 +1236,9 @@ impl LuaUserData for LuaDecoder {
 
 /// Registers the `lurek.audio` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -2038,8 +2040,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // ── getOrientation ────────────────────────────────────────────────────────
     /// Returns the 6-component orientation of a source.
     /// @param source : Source
-    /// @return number, number, number, number, number, number
+    /// number, number, number, number, number, number
     let s = state.clone();
+    /// @return table|nil
     tbl.set(
         "getOrientation",
         lua.create_function(move |_, id_val: LuaValue| {
@@ -2112,8 +2115,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // ── getMeter ──────────────────────────────────────────────────────────────
     /// Returns the stored master peak meter level.
-    /// @return number   value in [0, 1] set by the last `setMeter` call
+    /// number   value in [0, 1] set by the last `setMeter` call
     let s = state.clone();
+    /// @return table|nil
     tbl.set(
         "getMeter",
         lua.create_function(move |_, ()| Ok(s.borrow().mixer.master_peak))?,

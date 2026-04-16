@@ -417,7 +417,8 @@ impl LuaUserData for LuaArray {
         // -- sum --
         /// Sum of all elements, or along an axis (1-based).
         /// @param axis : integer?
-        /// @return number|Array
+        /// @return nil
+        /// number|Array
         methods.add_method("sum", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::sum(&this.inner))),
             Some(a) => {
@@ -432,7 +433,8 @@ impl LuaUserData for LuaArray {
         // -- mean --
         /// Mean of all elements, or along an axis (1-based).
         /// @param axis : integer?
-        /// @return number|Array
+        /// @return nil
+        /// number|Array
         methods.add_method("mean", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::mean(&this.inner))),
             Some(a) => {
@@ -447,7 +449,8 @@ impl LuaUserData for LuaArray {
         // -- min --
         /// Minimum of all elements, or along an axis (1-based).
         /// @param axis : integer?
-        /// @return number|Array
+        /// @return nil
+        /// number|Array
         methods.add_method("min", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::min_val(&this.inner))),
             Some(a) => {
@@ -462,7 +465,8 @@ impl LuaUserData for LuaArray {
         // -- max --
         /// Maximum of all elements, or along an axis (1-based).
         /// @param axis : integer?
-        /// @return number|Array
+        /// @return nil
+        /// number|Array
         methods.add_method("max", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::max_val(&this.inner))),
             Some(a) => {
@@ -886,10 +890,9 @@ impl LuaUserData for LuaArray {
 
 /// Registers the `lurek.compute` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

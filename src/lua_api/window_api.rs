@@ -13,10 +13,9 @@ use rfd;
 
 /// Registers the `lurek.window` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -93,8 +92,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getFullscreen --
     /// Returns the fullscreen state and type string.
-    /// @return boolean, string
+    /// boolean, string
     let s = state.clone();
+    /// @return boolean, string
     tbl.set(
         "getFullscreen",
         lua.create_function(move |_, ()| {
@@ -364,8 +364,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- getMode --
     /// Returns the window dimensions and mode flags as width, height, flags.
-    /// @return integer, integer, table
+    /// integer, integer, table
     let s = state.clone();
+    /// @return integer, integer, table
     tbl.set(
         "getMode",
         lua.create_function(move |lua, ()| {
@@ -671,13 +672,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- pollDpiChange --
     /// Checks whether the DPI scale has changed since the last call and fires
     /// the `onDpiChange` callback if so. Call once per frame in `lurek.process`.
-    /// @return number  current DPI scale (fires callback only if changed)
+    /// number  current DPI scale (fires callback only if changed)
     let dc = dpi_callback;
     let pd = prev_dpi;
     let s = state.clone();
     /// Polls for a pending DPI change event and returns the new scale factor if any.
     ///
-    /// @return any
+    /// @return table|nil
     tbl.set(
         "pollDpiChange",
         lua.create_function(move |lua, ()| {
@@ -697,6 +698,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // ─── openFileDialog ───────────────────────────────────────────────────
     /// Opens a blocking native file-open dialog. Returns the chosen path string
+    /// @return string|nil
     /// or `nil` if the user cancelled.
     ///
     /// Options table (all optional):
@@ -705,7 +707,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// - `multiple`     : boolean  allow multi-select (returns table of paths)
     /// - `defaultPath`  : string   initial directory
     /// @param opts : table?
-    /// @return string | table | nil
+    /// string | table | nil
     tbl.set(
         "openFileDialog",
         lua.create_function(move |lua, opts: Option<LuaTable>| {

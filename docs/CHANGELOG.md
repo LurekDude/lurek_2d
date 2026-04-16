@@ -2,6 +2,11 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.18.1] — 2026-05-15
+### Fixed
+- **lua_api (all 49 files)**: Fixed all `validate_lua_api.py` compliance errors — converted forbidden `/// # Parameters` / `/// # Returns` rustdoc headers to `@param`/`@return` inline annotations; fixed `@param`/`@return` ordering violations (param must precede return); injected missing `@return nil` on `add_method_mut` setters; replaced all vague `@return any` annotations with specific Lua types (`table`, `table|nil`, `string|nil`, `boolean, string`, `integer, integer, table`, etc.). All 49 files now report 0 errors.
+- **render/gpu_renderer.rs**: Added missing `///` docstring to `fn render_frame` (was only public item without documentation).
+
 ## [0.18.0] — 2026-05-15
 ### Added
 - **render**: Automatic viewport culling (`aabb_visible_2d`) in `GpuRenderer::render_frame` for `Rectangle`, `RoundedRectangle`, `Circle`, `Ellipse`, `DrawImage`, and `DrawImageEx` commands. Off-screen primitives are skipped before tessellation when the render target is the screen. A 4 px margin prevents pop-in at edges. Canvas render-to-texture draws are not culled.

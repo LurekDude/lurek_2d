@@ -50,7 +50,8 @@ impl LuaUserData for LuaDoorManager {
         /// @param y         : integer        — Grid Y.
         /// @param direction : string         — "horizontal" or "vertical".
         /// @param speed     : number         — Animation speed (units/s).
-        /// @return integer  — Door index for open/close calls.
+        /// @return nil
+        /// integer  — Door index for open/close calls.
         methods.add_method_mut(
             "addDoor",
             |_, this, (x, y, dir_str, speed): (u32, u32, String, f32)| {
@@ -92,7 +93,8 @@ impl LuaUserData for LuaDoorManager {
         // -- getDoor --
         /// Returns the state table for door at index, or nil if out of range.
         /// @param index : integer
-        /// @return table|nil  — {x, y, openAmount, state} or nil.
+        /// @return nil
+        /// table|nil  — {x, y, openAmount, state} or nil.
         methods.add_method("getDoor", |lua, this, index: usize| {
             let mgr = this.inner.borrow();
             if let Some(door) = mgr.doors().get(index) {
@@ -632,7 +634,8 @@ impl LuaUserData for LuaRaycaster {
         /// @param lights : table|nil — array of { x, y, radius, r, g, b, intensity }
         /// @param sprites : table|nil — array of { x, y, texture, size }
         /// @param wall_textures : table|nil — { [cell_value] = TextureKey }
-        /// @return integer — quad count
+        /// @return nil
+        /// integer — quad count
         methods.add_method(
             "buildScene",
             |_,
@@ -859,10 +862,9 @@ impl LuaUserData for LuaSpriteManager {
 
 /// Registers the `lurek.raycaster` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

@@ -351,6 +351,7 @@ impl LuaUserData for LuaParallaxLayer {
         /// @param min_y : number
         /// @param max_x : number
         /// @param max_y : number
+        /// @return nil
         methods.add_method(
             "setClamp",
             |_, this, (min_x, min_y, max_x, max_y): (f32, f32, f32, f32)| {
@@ -593,10 +594,9 @@ impl LuaUserData for LuaParallaxSet {
 
 /// Registers the `lurek.parallax` sub-table on the given `luna` global.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 ///
 /// Registers `lurek.parallax` onto the given global table.

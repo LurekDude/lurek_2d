@@ -24,7 +24,8 @@ impl LuaUserData for LuaSchema {
         /// Validates a Lua table against the schema.
         /// Returns (ok: boolean, errors: {field, message}[]).
         /// @param data : table
-        /// @return boolean, table
+        /// @return nil
+        /// boolean, table
         methods.add_method("validate", |lua, this, data: LuaTable| {
             // Serialise table fields to (name, type_str, value_str) tuples.
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
@@ -291,7 +292,8 @@ impl LuaUserData for ApiCatalog {
 
         /// Returns a single entry by qualified name, or nil.
         /// @param qualified_name : string
-        /// @return DocEntry?
+        /// @return nil
+        /// DocEntry?
         methods.add_method("getEntry", |_, this, qualified_name: String| {
             Ok(this.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
         });
@@ -756,9 +758,8 @@ fn scan_table(
 
 /// Registers the `lurek.docs` namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna_table` — `&LuaTable`.
+/// @param lua : &Lua
+/// @param luna_table : &LuaTable
 ///
 pub fn register(lua: &Lua, luna_table: &LuaTable) -> LuaResult<()> {
     let docs_tbl = lua.create_table()?;

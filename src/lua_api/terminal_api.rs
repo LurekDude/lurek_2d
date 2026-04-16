@@ -452,7 +452,8 @@ impl LuaUserData for LuaTerminal {
         /// Returns the cell data at 1-based coordinates.
         /// @param col : integer
         /// @param row : integer
-        /// @return integer, number, number, number, number, number, number, number, number
+        /// @return nil
+        /// integer, number, number, number, number, number, number, number, number
         methods.add_method("get", |_, this, (col, row): (usize, usize)| {
             let cell = this.binding.terminal.borrow().get(col, row);
             Ok((
@@ -543,7 +544,8 @@ impl LuaUserData for LuaTerminal {
 
         // -- getFocused --
         /// Returns the currently focused widget, or nil.
-        /// @return Widget?
+        /// Widget?
+        /// @return nil
         methods.add_method("getFocused", |lua: &Lua, this, ()| {
             let focused = this.binding.terminal.borrow().get_focused();
             match focused.and_then(|index| widget_handle_for_index(&this.binding, index)) {
@@ -1211,7 +1213,8 @@ impl LuaUserData for LuaWidget {
         // -- getChild --
         /// Returns a child widget from a panel by 1-based index, or nil.
         /// @param index : integer
-        /// @return Widget?
+        /// @return nil
+        /// Widget?
         methods.add_method("getChild", |lua: &Lua, this, index: usize| {
             with_widget(&this.binding, "Widget:getChild", |widget| {
                 if !widget.is_panel() {
@@ -1268,10 +1271,9 @@ impl LuaUserData for LuaWidget {
 
 /// Registers the `lurek.terminal` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -1455,8 +1457,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param terminal : Terminal
     /// @param offset : integer   0 = bottom (most recent)
     /// @param count : integer    maximum number of lines to return
-    /// @return table  array of strings
+    /// table  array of strings
     let s = state.clone();
+    /// @return table|nil
     tbl.set(
         "getScrollback",
         lua.create_function(
@@ -1737,9 +1740,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     )?;
 
     /// Parses `text` into coloured spans.  Returns an array of tables, each with
+    /// @return table|nil
     /// `text`, `bold`, and optional `fg`/`bg` sub-tables `{r,g,b}`.
     /// @param text : string
-    /// @return table   array of span tables
+    /// table   array of span tables
     tbl.set(
         "parseAnsi",
         lua.create_function(|lua, text: String| {

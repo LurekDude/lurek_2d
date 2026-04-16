@@ -4701,10 +4701,9 @@ fn parse_widget_style(t: &LuaTable) -> LuaResult<WidgetStyle> {
 
 /// Registers the `lurek.ui` API table.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -6118,11 +6117,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 /// fields are optional. A `children` key, if present, must be an array table
 /// of nested definition tables which are each converted recursively.
 ///
-/// # Parameters
 ///
 /// - `table` — `&mlua::Table`. Lua definition table.
-///
-/// # Returns
 ///
 /// `LuaResult<WidgetDef>` — the converted definition, or a `LuaError` if a
 /// child table cannot be read.
@@ -6280,11 +6276,8 @@ fn lua_table_to_widget_def(table: &mlua::Table) -> mlua::Result<crate::ui::Widge
 /// fields are optional. A `children` key, if present, must be an array table
 /// of nested definition tables which are each converted recursively.
 ///
-/// # Parameters
 ///
 /// - `table` — `&mlua::Table`. Lua definition table.
-///
-/// # Returns
 ///
 /// `LuaResult<WidgetDef>` — the converted definition, or a `LuaError` if a
 /// child table cannot be read.

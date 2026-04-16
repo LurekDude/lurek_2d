@@ -104,11 +104,9 @@ impl LuaSpring {
     /// Advances the spring by `dt` seconds, writes positions to the target table,
     /// fires the settle callback if all axes converge, and returns `true` when done.
     ///
-    /// # Parameters
-    /// - `lua` — `&Lua`.
+    /// @param lua : &Lua
     /// - `dt` — `f64` — Delta-time in seconds.
     ///
-    /// # Returns
     /// `LuaResult<bool>` — `true` when settled / done, `false` while still moving.
     pub fn tick_with(&mut self, lua: &Lua, dt: f64) -> LuaResult<bool> {
         self.system.update(dt as f32);
@@ -133,11 +131,9 @@ impl LuaSpring {
 }
 
 /// Registers the `lurek.tween` property tweening API.
-///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 ///
 /// Exposes factory functions (`tween`, `sequence`, `parallel`, `delay`), lifecycle

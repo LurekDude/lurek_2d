@@ -91,7 +91,8 @@ impl LuaUserData for LuaTileSet {
         // -- getQuad --
         /// Computes the atlas source rectangle for a 1-based local tile ID.
         /// @param tileId : integer
-        /// @return table  {x, y, width, height}
+        /// @return nil
+        /// table  {x, y, width, height}
         methods.add_method("getQuad", |lua, this, tile_id: u32| {
             if tile_id == 0 {
                 return Err(LuaError::RuntimeError(
@@ -203,6 +204,7 @@ impl LuaUserData for LuaTileSet {
         /// @param typeName : string
         /// @param bitmask : integer
         /// @param tileId : integer
+        /// @return nil
         methods.add_method(
             "setAutoTileRule",
             |_, this, (type_name, bitmask, tile_id): (String, u8, u32)| {
@@ -239,6 +241,7 @@ impl LuaUserData for LuaTileSet {
         /// @param typeName : string
         /// @param bitmask : integer
         /// @param tileId : integer
+        /// @return nil
         methods.add_method(
             "setAutoTileRule8",
             |_, this, (type_name, bitmask, tile_id): (String, u16, u32)| {
@@ -312,7 +315,8 @@ impl LuaUserData for LuaTileMap {
         // -- getTileSet --
         /// Returns a tileset by 1-based index, or nil if out of range.
         /// @param idx : integer
-        /// @return TileSet?
+        /// @return nil
+        /// TileSet?
         methods.add_method("getTileSet", |_, this, idx: usize| {
             if idx == 0 {
                 return Err(LuaError::RuntimeError(
@@ -362,6 +366,7 @@ impl LuaUserData for LuaTileMap {
         /// Sets layer visibility.
         /// @param idx : integer
         /// @param visible : boolean
+        /// @return nil
         methods.add_method(
             "setLayerVisible",
             |_, this, (idx, visible): (usize, bool)| {
@@ -385,6 +390,7 @@ impl LuaUserData for LuaTileMap {
         /// @param g : number
         /// @param b : number
         /// @param a : number
+        /// @return nil
         methods.add_method(
             "setLayerColor",
             |_, this, (idx, r, g, b, a): (usize, f32, f32, f32, f32)| {
@@ -407,6 +413,7 @@ impl LuaUserData for LuaTileMap {
         /// @param idx : integer
         /// @param ox : number
         /// @param oy : number
+        /// @return nil
         methods.add_method(
             "setLayerOffset",
             |_, this, (idx, ox, oy): (usize, f32, f32)| {
@@ -429,6 +436,7 @@ impl LuaUserData for LuaTileMap {
         /// @param idx : integer
         /// @param px : number
         /// @param py : number
+        /// @return nil
         methods.add_method(
             "setLayerParallax",
             |_, this, (idx, px, py): (usize, f32, f32)| {
@@ -452,6 +460,7 @@ impl LuaUserData for LuaTileMap {
         /// @param x : integer
         /// @param y : integer
         /// @param gid : integer
+        /// @return nil
         methods.add_method(
             "setTile",
             |_, this, (layer, x, y, gid): (usize, u32, u32, u32)| {
@@ -499,6 +508,7 @@ impl LuaUserData for LuaTileMap {
         /// @param y : number
         /// @param w : number
         /// @param h : number
+        /// @return nil
         methods.add_method(
             "setViewport",
             |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
@@ -589,6 +599,7 @@ impl LuaUserData for LuaTileMap {
         /// Applies 4-bit cardinal autotile rules to every tile on layer (1-based).
         /// @param layer : integer
         /// @param typeName : string
+        /// @return nil
         methods.add_method(
             "applyAutoTile",
             |_, this, (layer, type_name): (usize, String)| {
@@ -605,6 +616,7 @@ impl LuaUserData for LuaTileMap {
         /// @param x : integer
         /// @param y : integer
         /// @param typeName : string
+        /// @return nil
         methods.add_method(
             "applyAutoTileAt",
             |_, this, (layer, x, y, type_name): (usize, u32, u32, String)| {
@@ -619,6 +631,7 @@ impl LuaUserData for LuaTileMap {
         /// Applies 8-bit directional autotile rules to every tile on layer (1-based).
         /// @param layer : integer
         /// @param typeName : string
+        /// @return nil
         methods.add_method(
             "applyAutoTile8",
             |_, this, (layer, type_name): (usize, String)| {
@@ -635,6 +648,7 @@ impl LuaUserData for LuaTileMap {
         /// @param x : integer
         /// @param y : integer
         /// @param typeName : string
+        /// @return nil
         methods.add_method(
             "applyAutoTile8At",
             |_, this, (layer, x, y, type_name): (usize, u32, u32, String)| {
@@ -674,7 +688,8 @@ impl LuaUserData for LuaTileMap {
         /// @param h : number
         /// @param dx : number
         /// @param dy : number
-        /// @return number, number, number, number, number, number
+        /// @return nil
+        /// number, number, number, number, number, number
         methods.add_method(
             "sweepRect",
             |_, this, (layer, x, y, w, h, dx, dy): (usize, f32, f32, f32, f32, f32, f32)| match this
@@ -734,6 +749,7 @@ impl LuaUserData for LuaTileMap {
         /// @param g : number
         /// @param b : number
         /// @param a : number
+        /// @return nil
         methods.add_method(
             "setTileTint",
             |_, this, (layer, x, y, r, g, b, a): (usize, u32, u32, f32, f32, f32, f32)| {
@@ -891,6 +907,7 @@ impl LuaUserData for LuaAutoTileSheet {
         /// @param tileset : TileSet
         /// @param typeName : string
         /// @param startGid : integer?
+        /// @return nil
         methods.add_method(
             "applyToTileSet",
             |_, this, (ts_ud, type_name, start_gid): (LuaAnyUserData, String, Option<u32>)| {
@@ -994,6 +1011,7 @@ impl LuaUserData for LuaChunkMap {
         /// @param x1 : integer
         /// @param y1 : integer
         /// @param gid : integer
+        /// @return nil
         methods.add_method(
             "fillRect",
             |_, this, (x0, y0, x1, y1, gid): (i32, i32, i32, i32, u32)| {
@@ -1314,6 +1332,7 @@ impl LuaUserData for LuaIsoMap {
         /// @param y : integer
         /// @param part : integer
         /// @param gid : integer
+        /// @return nil
         methods.add_method(
             "setTilePart",
             |_, this, (z, x, y, part, gid): (usize, u32, u32, u32, u32)| {
@@ -1460,6 +1479,7 @@ impl LuaUserData for LuaMapBlock {
         /// @param x : integer
         /// @param y : integer
         /// @param gid : integer
+        /// @return nil
         methods.add_method(
             "setTile",
             |_, this, (layer, x, y, gid): (u32, u32, u32, u32)| {
@@ -1485,6 +1505,7 @@ impl LuaUserData for LuaMapBlock {
         /// @param edge : string
         /// @param segment : integer
         /// @param sideId : integer
+        /// @return nil
         methods.add_method(
             "setSide",
             |_, this, (edge_str, segment, side_id): (String, u32, u32)| {
@@ -1802,10 +1823,9 @@ impl LuaUserData for LuaMapGen {
 
 /// Registers the `lurek.tilemap` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -2391,8 +2411,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- loadTMX --
     /// Parses a TMX XML string and returns a table with map metadata and layers.
+    /// @return table|nil
     /// @param xml : string
-    /// @return table, string?  — (result_table, nil) on success; (nil, error_message) on failure
+    /// table, string?  — (result_table, nil) on success; (nil, error_message) on failure
     tbl.set(
         "loadTMX",
         lua.create_function(|lua, xml: String| {

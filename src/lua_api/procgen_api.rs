@@ -23,10 +23,9 @@ use crate::procgen::world_graph::generate_world_graph;
 
 /// Registers the `lurek.procgen` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -128,11 +127,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- voronoi --
     /// Generates a Voronoi diagram for a set of seed points.
+    /// @return table
     /// @param w : integer
     /// @param h : integer
     /// @param pts : table
     /// @param opts : table?
-    /// @return table, table, table
+    /// table, table, table
     tbl.set(
         "voronoi",
         lua.create_function(
@@ -911,11 +911,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 impl CellularOpts {
     /// from_lua_table.
     ///
-    /// # Parameters
-    /// - `t` — `&LuaTable`.
+    /// @param t : &LuaTable
     ///
-    /// # Returns
-    /// `LuaResult<Self>`.
+    /// @return LuaResult<Self>
     pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut opts = Self::default();
         if let Ok(v) = t.get::<_, f32>("fill") { opts.fill = v; }
@@ -928,14 +926,10 @@ impl CellularOpts {
 }
 
 impl VoronoiOpts {
-/// from_lua_table.
+/// from_lua_table
+/// @param t : &LuaTable
 ///
-/// # Parameters
-/// - `t` — `&LuaTable`.
-///
-/// # Returns
-/// `LuaResult<Self>`.
-///
+/// @return LuaResult<Self>
 ///
 pub fn from_lua_table(t: &LuaTable) -> LuaResult<Self> {
         let mut opts = Self::default();

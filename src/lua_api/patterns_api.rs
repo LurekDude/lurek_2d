@@ -1764,7 +1764,7 @@ impl LuaUserData for LuaStrategy {
         // -- execute --
         /// Calls the currently active strategy function with the given arguments.
         /// @param args : MultiValue
-        /// @return any
+        /// @return table|nil
         methods.add_method("execute", |lua, this, args: LuaMultiValue| {
             let id = match this.strategy.borrow().get_current_id() {
                 Some(id) => id,
@@ -1873,7 +1873,7 @@ impl LuaUserData for LuaStack {
 
         // -- pop --
         /// Removes and returns the top value, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("pop", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -1886,7 +1886,7 @@ impl LuaUserData for LuaStack {
 
         // -- peek --
         /// Returns the top value without removing it, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("peek", |lua, this, ()| {
             if let Some(key) = this.items.borrow().last() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -1978,7 +1978,7 @@ impl LuaUserData for LuaQueue {
 
         // -- dequeue --
         /// Removes and returns the front value, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("dequeue", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop_front() {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -1991,7 +1991,7 @@ impl LuaUserData for LuaQueue {
 
         // -- front --
         /// Returns the front value without removing it, or nil if empty.
-        /// @return any
+        /// @return table|nil
         methods.add_method("front", |lua, this, ()| {
             if let Some(key) = this.items.borrow().front() {
                 let v: LuaValue = lua.registry_value(key)?;
@@ -2079,7 +2079,7 @@ impl LuaUserData for LuaList {
         // -- get --
         /// Returns the value at a 1-based index, or nil.
         /// @param index : integer
-        /// @return any
+        /// @return table|nil
         methods.add_method("get", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -2114,7 +2114,7 @@ impl LuaUserData for LuaList {
         // -- remove --
         /// Removes and returns the value at a 1-based index.
         /// @param index : integer
-        /// @return any
+        /// @return table|nil
         methods.add_method("remove", |lua, this, index: usize| {
             if index == 0 {
                 return Ok(LuaValue::Nil);
@@ -2295,10 +2295,9 @@ impl LuaUserData for LuaSet {
 
 /// Registers the `lurek.patterns.*` Lua API namespace.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let patterns = lua.create_table()?;

@@ -311,10 +311,9 @@ impl LuaUserData for LuaCompressedImageData {
 
 /// Registers the `lurek.img` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -522,15 +521,15 @@ impl mlua::UserData for ImageData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the width.
         ///
-        /// @return any
+        /// @return table|nil
         methods.add_method("getWidth", |_, this, ()| Ok(this.width()));
         /// Returns the height.
         ///
-        /// @return any
+        /// @return table|nil
         methods.add_method("getHeight", |_, this, ()| Ok(this.height()));
         /// Returns the dimensions.
         ///
-        /// @return any
+        /// @return table|nil
         methods.add_method("getDimensions", |_, this, ()| {
             let (w, h) = this.dimensions();
             Ok((w, h))
@@ -539,6 +538,7 @@ impl mlua::UserData for ImageData {
         ///
         /// @param x : integer
         /// @param y : integer
+        /// @return nil
         methods.add_method("getPixel", |_, this, (x, y): (u32, u32)| {
             this.get_pixel(x, y).ok_or_else(|| {
                 LuaError::RuntimeError(format!(
@@ -569,6 +569,7 @@ impl mlua::UserData for ImageData {
         /// Encode.
         ///
         /// @param format : string
+        /// @return nil
         methods.add_method("encode", |_, this, format: String| match format.as_str() {
             "png" => this.encode_png().map_err(LuaError::RuntimeError),
             _ => Err(LuaError::RuntimeError(format!(
@@ -578,12 +579,13 @@ impl mlua::UserData for ImageData {
         });
         /// Returns the string.
         ///
-        /// @return any
+        /// @return table|nil
         methods.add_method("getString", |_, this, ()| Ok(this.get_string()));
 
         /// Map pixel.
         ///
         /// @param func : function
+        /// @return nil
         methods.add_method_mut("mapPixel", |_, this, func: LuaFunction| {
             let w = this.width();
             let h = this.height();
@@ -605,6 +607,7 @@ impl mlua::UserData for ImageData {
         /// Brightness.
         ///
         /// @param factor : number
+        /// @return nil
         methods.add_method_mut("brightness", |_, this, factor: f32| {
             this.brightness(factor);
             Ok(())
@@ -613,6 +616,7 @@ impl mlua::UserData for ImageData {
         /// Contrast.
         ///
         /// @param factor : number
+        /// @return nil
         methods.add_method_mut("contrast", |_, this, factor: f32| {
             this.contrast(factor);
             Ok(())
@@ -621,6 +625,7 @@ impl mlua::UserData for ImageData {
         /// Saturation.
         ///
         /// @param factor : number
+        /// @return nil
         methods.add_method_mut("saturation", |_, this, factor: f32| {
             this.saturation(factor);
             Ok(())
@@ -629,6 +634,7 @@ impl mlua::UserData for ImageData {
         /// Gamma.
         ///
         /// @param gamma : number
+        /// @return nil
         methods.add_method_mut("gamma", |_, this, gamma: f32| {
             this.gamma(gamma);
             Ok(())
@@ -644,6 +650,7 @@ impl mlua::UserData for ImageData {
         // -- grayscale --
         /// Grayscale.
         ///
+        /// @return nil
         methods.add_method_mut("grayscale", |_, this, ()| {
             this.grayscale();
             Ok(())
@@ -651,6 +658,7 @@ impl mlua::UserData for ImageData {
         // -- sepia --
         /// Sepia.
         ///
+        /// @return nil
         methods.add_method_mut("sepia", |_, this, ()| {
             this.sepia();
             Ok(())
@@ -658,6 +666,7 @@ impl mlua::UserData for ImageData {
         // -- invert --
         /// Invert.
         ///
+        /// @return nil
         methods.add_method_mut("invert", |_, this, ()| {
             this.invert();
             Ok(())
@@ -666,6 +675,7 @@ impl mlua::UserData for ImageData {
         /// Threshold.
         ///
         /// @param value : u8
+        /// @return nil
         methods.add_method_mut("threshold", |_, this, value: u8| {
             this.threshold(value);
             Ok(())
@@ -674,6 +684,7 @@ impl mlua::UserData for ImageData {
         /// Posterize.
         ///
         /// @param levels : u8
+        /// @return nil
         methods.add_method_mut("posterize", |_, this, levels: u8| {
             this.posterize(levels);
             Ok(())
@@ -685,6 +696,7 @@ impl mlua::UserData for ImageData {
         /// @param g : u8
         /// @param b : u8
         /// @param a : u8
+        /// @return nil
         methods.add_method_mut("fill", |_, this, (r, g, b, a): (u8, u8, u8, u8)| {
             this.fill(r, g, b, a);
             Ok(())
@@ -693,6 +705,7 @@ impl mlua::UserData for ImageData {
         /// Noise.
         ///
         /// @param amount : u8
+        /// @return nil
         methods.add_method_mut("noise", |_, this, amount: u8| {
             this.noise(amount);
             Ok(())
@@ -701,6 +714,7 @@ impl mlua::UserData for ImageData {
         /// Alpha mask.
         ///
         /// @param factor : number
+        /// @return nil
         methods.add_method_mut("alphaMask", |_, this, factor: f32| {
             this.alpha_mask(factor);
             Ok(())
@@ -708,6 +722,7 @@ impl mlua::UserData for ImageData {
         // -- flipHorizontal --
         /// Flip horizontal.
         ///
+        /// @return nil
         methods.add_method_mut("flipHorizontal", |_, this, ()| {
             this.flip_horizontal();
             Ok(())
@@ -715,6 +730,7 @@ impl mlua::UserData for ImageData {
         // -- flipVertical --
         /// Flip vertical.
         ///
+        /// @return nil
         methods.add_method_mut("flipVertical", |_, this, ()| {
             this.flip_vertical();
             Ok(())
@@ -722,6 +738,7 @@ impl mlua::UserData for ImageData {
         // -- rotate90cw --
         /// Rotate90cw.
         ///
+        /// @return nil
         methods.add_method("rotate90cw", |lua, this, ()| {
             lua.create_userdata(this.rotate_90_cw())
         });
@@ -732,6 +749,7 @@ impl mlua::UserData for ImageData {
         /// @param y : integer
         /// @param w : integer
         /// @param h : integer
+        /// @return nil
         methods.add_method("crop", |lua, this, (x, y, w, h): (u32, u32, u32, u32)| {
             this.crop(x, y, w, h)
                 .ok_or_else(|| {
@@ -752,6 +770,7 @@ impl mlua::UserData for ImageData {
         ///
         /// @param new_w : integer
         /// @param new_h : integer
+        /// @return nil
         methods.add_method("resizeNearest", |lua, this, (new_w, new_h): (u32, u32)| {
             lua.create_userdata(this.resize_nearest(new_w, new_h))
         });
@@ -759,12 +778,14 @@ impl mlua::UserData for ImageData {
         /// Blur.
         ///
         /// @param radius : integer
+        /// @return nil
         methods.add_method("blur", |lua, this, radius: u32| {
             lua.create_userdata(this.blur(radius))
         });
         // -- sharpen --
         /// Sharpen.
         ///
+        /// @return nil
         methods.add_method("sharpen", |lua, this, ()| {
             lua.create_userdata(this.sharpen())
         });
@@ -778,6 +799,7 @@ impl mlua::UserData for ImageData {
         /// @param g : integer
         /// @param b : integer
         /// @param a : integer
+        /// @return nil
         methods.add_method_mut(
             "drawRect",
             |_, this, (x, y, w, h, r, g, b, a): (i32, i32, u32, u32, u8, u8, u8, u8)| {
@@ -794,6 +816,7 @@ impl mlua::UserData for ImageData {
         /// @param g : integer
         /// @param b : integer
         /// @param a : integer
+        /// @return nil
         methods.add_method_mut(
             "drawCircle",
             |_, this, (cx, cy, radius, r, g, b, a): (i32, i32, u32, u8, u8, u8, u8)| {
@@ -811,6 +834,7 @@ impl mlua::UserData for ImageData {
         /// @param g : integer
         /// @param b : integer
         /// @param a : integer
+        /// @return nil
         methods.add_method_mut(
             "drawLine",
             |_, this, (x0, y0, x1, y1, r, g, b, a): (i32, i32, i32, i32, u8, u8, u8, u8)| {
@@ -826,7 +850,8 @@ impl mlua::UserData for ImageData {
         ///
         /// @param width : integer
         /// @param height : integer
-        /// @return ImageData?
+        /// @return nil
+        /// ImageData?
         methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
             match this.resize(w, h) {
                 Some(img) => Ok(LuaValue::UserData(lua.create_userdata(img)?)),
@@ -861,7 +886,8 @@ impl mlua::UserData for ImageData {
         /// @param y : integer
         /// @param width : integer
         /// @param height : integer
-        /// @return ImageData?
+        /// @return nil
+        /// ImageData?
         methods.add_method(
             "getRegion",
             |lua, this, (x, y, w, h): (u32, u32, u32, u32)| {

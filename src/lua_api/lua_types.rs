@@ -27,8 +27,7 @@ pub trait LunaType {
 
 /// Adds the standard `type()`, `typeOf(typeName)`, and `__tostring` methods to
 ///
-/// # Parameters
-/// - `methods` — `&mut M`.
+/// @param methods : &mut M
 /// any [`LuaUserData`] type that also implements [`LunaType`].
 ///
 /// Call this as the **first** statement inside `add_methods`:

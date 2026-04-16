@@ -215,7 +215,8 @@ impl LuaUserData for LuaSignal {
         ///
         /// @param name : string   event name or glob pattern (e.g. "damage.*")
         /// @param func : function callback invoked with (...) args from emit
-        /// @return integer        handle for later `remove`
+        /// @return nil
+        /// integer        handle for later `remove`
         methods.add_method(
             "connect",
             |lua, this, (name, func): (String, LuaFunction)| {
@@ -251,10 +252,9 @@ impl LuaUserData for LuaSignal {
 
 /// Registers the `lurek.signal` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -409,9 +409,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // -- flushDeferred --
     /// Moves all buffered deferred events into the main event queue and clears the buffer.
-    /// @return integer  number of events flushed
+    /// integer  number of events flushed
     let deferred = deferred_queue.clone();
     let s = state.clone();
+    /// @return table|nil
     tbl.set(
         "flushDeferred",
         lua.create_function(move |_, ()| {

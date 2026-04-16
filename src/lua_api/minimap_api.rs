@@ -500,7 +500,8 @@ impl LuaUserData for LuaMinimap {
 
         // -- getViewportRect --
         /// Returns the viewport rectangle as x, y, w, h or nil if not set.
-        /// @return number?, number?, number?, number?
+        /// number?, number?, number?, number?
+        /// @return nil
         methods.add_method("getViewportRect", |_, this, ()| {
             match this.inner.viewport_rect() {
                 Some((x, y, w, h)) => Ok((Some(x), Some(y), Some(w), Some(h))),
@@ -744,7 +745,8 @@ impl LuaUserData for LuaMinimap {
         /// Displays a pathfinding route on the minimap and returns its path ID.
         /// @param points : table  -- {{ x, y }, { x, y }, ... }
         /// @param color : table   -- { r, g, b, a } integers 0-255
-        /// @return integer  -- path ID (pass to clearPath to remove it)
+        /// @return nil
+        /// integer  -- path ID (pass to clearPath to remove it)
         methods.add_method_mut(
             "showPath",
             |_, this, (points_tbl, color_tbl): (LuaTable, LuaTable)| {
@@ -943,10 +945,9 @@ impl LuaUserData for LuaMinimap {
 
 /// Registers the `lurek.minimap` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

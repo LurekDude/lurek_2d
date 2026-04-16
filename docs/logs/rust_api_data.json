@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generated": "2026-04-16T11:09:54.454897+00:00",
+    "generated": "2026-04-16T12:36:52.251789+00:00",
     "generator": "tools/gen_rust_api_data.py",
-    "version": "0.17.0",
+    "version": "0.18.0",
     "stats": {
-      "rust_items": 1740,
+      "rust_items": 1742,
       "rust_modules": 416,
       "rust_tests": 0,
       "lua_tests": 337
@@ -12,8 +12,8 @@
   },
   "rust_api": {
     "summary": {
-      "total_items": 1740,
-      "documented": 1740,
+      "total_items": 1742,
+      "documented": 1742,
       "modules": 416
     },
     "modules": {
@@ -1190,7 +1190,7 @@
             "kind": "struct",
             "description": "Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` — `Config`. - `conf_error` — `Option<String>`.",
             "file": "src/app/app.rs",
-            "line": 2457
+            "line": 2544
           }
         ]
       },
@@ -10456,1327 +10456,1341 @@
             "line": 328
           },
           {
+            "name": "L083_DROP_ARCHIVE",
+            "kind": "const",
+            "description": "Log message: a `.lurek` / `.luna` archive was dropped — extracting and loading.",
+            "file": "src/runtime/log_messages.rs",
+            "line": 330
+          },
+          {
+            "name": "L084_DROP_ARCHIVE_FAIL",
+            "kind": "const",
+            "description": "Log message: failed to extract a dropped `.lurek` / `.luna` archive.",
+            "file": "src/runtime/log_messages.rs",
+            "line": 332
+          },
+          {
             "name": "G006_ATLAS_MAX_SIZE",
             "kind": "const",
             "description": "Log message: font atlas has reached the maximum size and cannot grow.",
             "file": "src/runtime/log_messages.rs",
-            "line": 335
+            "line": 339
           },
           {
             "name": "FS01_GAMEFS_INIT",
             "kind": "const",
             "description": "Stable ID for \"GameFS initialised\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 339
+            "line": 343
           },
           {
             "name": "FS02_FILE_READ",
             "kind": "const",
             "description": "Stable ID for \"file read\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 341
+            "line": 345
           },
           {
             "name": "FS03_FILE_WRITE",
             "kind": "const",
             "description": "Stable ID for \"file write\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 343
+            "line": 347
           },
           {
             "name": "FS04_PATH_TRAVERSAL",
             "kind": "const",
             "description": "Stable ID for \"path traversal rejected\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 345
+            "line": 349
           },
           {
             "name": "FS05_VFS_MOUNT",
             "kind": "const",
             "description": "Stable ID for \"VirtualFS path mounted\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 347
+            "line": 351
           },
           {
             "name": "AN01_ANIM_CTRL_INIT",
             "kind": "const",
             "description": "Stable ID for \"AnimationController created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 351
+            "line": 355
           },
           {
             "name": "AN02_CLIP_ADDED",
             "kind": "const",
             "description": "Stable ID for \"animation clip added\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 353
+            "line": 357
           },
           {
             "name": "AN03_CLIP_NOT_FOUND",
             "kind": "const",
             "description": "Stable ID for \"animation clip not found\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 355
+            "line": 359
           },
           {
             "name": "EN01_UNIVERSE_INIT",
             "kind": "const",
             "description": "Stable ID for \"Universe created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 359
+            "line": 363
           },
           {
             "name": "EN02_ENTITY_SPAWN",
             "kind": "const",
             "description": "Stable ID for \"entity spawned\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 361
+            "line": 365
           },
           {
             "name": "EN03_ENTITY_LOW",
             "kind": "const",
             "description": "Stable ID for \"entity pool running low\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 363
+            "line": 367
           },
           {
             "name": "TM01_TILEMAP_INIT",
             "kind": "const",
             "description": "Stable ID for \"TileMap created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 367
+            "line": 371
           },
           {
             "name": "TM02_TILESET_ADD",
             "kind": "const",
             "description": "Stable ID for \"tileset added to map\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 369
+            "line": 373
           },
           {
             "name": "TM03_LAYER_ADD",
             "kind": "const",
             "description": "Stable ID for \"tile layer added\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 371
+            "line": 375
           },
           {
             "name": "TM04_TMX_FAIL",
             "kind": "const",
             "description": "Stable ID for \"TMX parse failed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 373
+            "line": 377
           },
           {
             "name": "SV01_SAVE_INIT",
             "kind": "const",
             "description": "Stable ID for \"SaveManager created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 377
+            "line": 381
           },
           {
             "name": "SV02_SAVE_WRITE",
             "kind": "const",
             "description": "Stable ID for \"save write started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 379
+            "line": 383
           },
           {
             "name": "SV03_SAVE_LOAD",
             "kind": "const",
             "description": "Stable ID for \"save load started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 381
+            "line": 385
           },
           {
             "name": "SV04_SAVE_ERROR",
             "kind": "const",
             "description": "Stable ID for \"save write error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 383
+            "line": 387
           },
           {
             "name": "SC01_STACK_INIT",
             "kind": "const",
             "description": "Stable ID for \"SceneStack created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 387
+            "line": 391
           },
           {
             "name": "SC02_SCENE_PUSH",
             "kind": "const",
             "description": "Stable ID for \"scene pushed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 389
+            "line": 393
           },
           {
             "name": "SC03_SCENE_POP",
             "kind": "const",
             "description": "Stable ID for \"scene popped\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 391
+            "line": 395
           },
           {
             "name": "SC04_STACK_CLEAR",
             "kind": "const",
             "description": "Stable ID for \"scene stack cleared\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 393
+            "line": 397
           },
           {
             "name": "TH01_WORKER_INIT",
             "kind": "const",
             "description": "Stable ID for \"Worker created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 397
+            "line": 401
           },
           {
             "name": "TH02_WORKER_START",
             "kind": "const",
             "description": "Stable ID for \"worker thread started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 399
+            "line": 403
           },
           {
             "name": "TH03_WORKER_DONE",
             "kind": "const",
             "description": "Stable ID for \"worker thread finished\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 401
+            "line": 405
           },
           {
             "name": "TH04_WORKER_ERROR",
             "kind": "const",
             "description": "Stable ID for \"worker thread error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 403
+            "line": 407
           },
           {
             "name": "PF01_GRID_INIT",
             "kind": "const",
             "description": "Stable ID for \"pathfinding Grid created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 407
+            "line": 411
           },
           {
             "name": "PF02_PATH_FOUND",
             "kind": "const",
             "description": "Stable ID for \"path found\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 409
+            "line": 413
           },
           {
             "name": "PF03_NO_PATH",
             "kind": "const",
             "description": "Stable ID for \"no path to target\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 411
+            "line": 415
           },
           {
             "name": "MD01_MGR_INIT",
             "kind": "const",
             "description": "Stable ID for \"ModManager created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 415
+            "line": 419
           },
           {
             "name": "MD02_MOD_REG",
             "kind": "const",
             "description": "Stable ID for \"mod entry registered\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 417
+            "line": 421
           },
           {
             "name": "MD03_MOD_FAIL",
             "kind": "const",
             "description": "Stable ID for \"mod load failed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 419
+            "line": 423
           },
           {
             "name": "MD04_ORDER_OK",
             "kind": "const",
             "description": "Stable ID for \"load order resolved\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 421
+            "line": 425
           },
           {
             "name": "NW01_HOST_BIND",
             "kind": "const",
             "description": "Stable ID for \"network host bound\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 425
+            "line": 429
           },
           {
             "name": "NW02_PEER_CONN",
             "kind": "const",
             "description": "Stable ID for \"peer connected\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 427
+            "line": 431
           },
           {
             "name": "NW03_PEER_DISC",
             "kind": "const",
             "description": "Stable ID for \"peer disconnected\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 429
+            "line": 433
           },
           {
             "name": "NW04_NET_ERROR",
             "kind": "const",
             "description": "Stable ID for \"network error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 431
+            "line": 435
           },
           {
             "name": "PL01_PIPELINE_INIT",
             "kind": "const",
             "description": "Stable ID for \"Pipeline created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 435
+            "line": 439
           },
           {
             "name": "PL02_STEP_ADD",
             "kind": "const",
             "description": "Stable ID for \"pipeline step added\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 437
+            "line": 441
           },
           {
             "name": "PL03_EXEC",
             "kind": "const",
             "description": "Stable ID for \"pipeline executed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 439
+            "line": 443
           },
           {
             "name": "PL04_CYCLE",
             "kind": "const",
             "description": "Stable ID for \"pipeline cycle detected\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 441
+            "line": 445
           },
           {
             "name": "AT01_SIM_INIT",
             "kind": "const",
             "description": "Stable ID for \"Simulator created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 445
+            "line": 449
           },
           {
             "name": "AT02_SCRIPT_LOAD",
             "kind": "const",
             "description": "Stable ID for \"automation script loaded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 447
+            "line": 451
           },
           {
             "name": "AT03_STEP_WARN",
             "kind": "const",
             "description": "Stable ID for \"simulation step warn\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 449
+            "line": 453
           },
           {
             "name": "AD01_AUDIO_DECODED",
             "kind": "const",
             "description": "Stable ID for \"audio file decoded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 453
+            "line": 457
           },
           {
             "name": "AD02_AUDIO_ERROR",
             "kind": "const",
             "description": "Stable ID for \"audio decode error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 455
+            "line": 459
           },
           {
             "name": "CP01_NDARRAY_ALLOC",
             "kind": "const",
             "description": "Stable ID for \"NdArray allocated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 459
+            "line": 463
           },
           {
             "name": "CP02_NDARRAY_LARGE",
             "kind": "const",
             "description": "Stable ID for \"NdArray exceeds recommended size\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 461
+            "line": 465
           },
           {
             "name": "MM01_MINIMAP_INIT",
             "kind": "const",
             "description": "Stable ID for \"Minimap created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 465
+            "line": 469
           },
           {
             "name": "MM02_TERRAIN_REBUILD",
             "kind": "const",
             "description": "Stable ID for \"minimap terrain rebuilt\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 467
+            "line": 471
           },
           {
             "name": "PG01_CELLULAR_START",
             "kind": "const",
             "description": "Stable ID for \"cellular automata started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 471
+            "line": 475
           },
           {
             "name": "PG02_CELLULAR_DONE",
             "kind": "const",
             "description": "Stable ID for \"cellular automata done\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 473
+            "line": 477
           },
           {
             "name": "SR01_JSON_OK",
             "kind": "const",
             "description": "Stable ID for \"JSON parsed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 477
+            "line": 481
           },
           {
             "name": "SR02_JSON_ERR",
             "kind": "const",
             "description": "Stable ID for \"JSON parse error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 479
+            "line": 483
           },
           {
             "name": "SR03_JSON_ENC",
             "kind": "const",
             "description": "Stable ID for \"JSON encoded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 481
+            "line": 485
           },
           {
             "name": "SR04_MSGPACK_DEC",
             "kind": "const",
             "description": "Stable ID for \"MessagePack decoded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 483
+            "line": 487
           },
           {
             "name": "SR05_MSGPACK_ENC",
             "kind": "const",
             "description": "Stable ID for \"MessagePack encoded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 485
+            "line": 489
           },
           {
             "name": "SR06_XML_OK",
             "kind": "const",
             "description": "Stable ID for \"XML parsed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 487
+            "line": 491
           },
           {
             "name": "SR07_SCHEMA_PASS",
             "kind": "const",
             "description": "Stable ID for \"schema validation passed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 489
+            "line": 493
           },
           {
             "name": "SR08_SCHEMA_FAIL",
             "kind": "const",
             "description": "Stable ID for \"schema validation failed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 491
+            "line": 495
           },
           {
             "name": "GU01_CTX_INIT",
             "kind": "const",
             "description": "Stable ID for \"GuiContext created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 495
+            "line": 499
           },
           {
             "name": "GU02_WIDGET_ADD",
             "kind": "const",
             "description": "Stable ID for \"widget added to context\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 497
+            "line": 501
           },
           {
             "name": "GU03_CTX_RESET",
             "kind": "const",
             "description": "Stable ID for \"GuiContext reset\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 499
+            "line": 503
           },
           {
             "name": "TX01_TEX_DECODED",
             "kind": "const",
             "description": "Stable ID for \"texture decoded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 503
+            "line": 507
           },
           {
             "name": "TX02_TEX_LARGE",
             "kind": "const",
             "description": "Stable ID for \"large texture warning\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 505
+            "line": 509
           },
           {
             "name": "TX03_TEX_ERROR",
             "kind": "const",
             "description": "Stable ID for \"texture decode error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 507
+            "line": 511
           },
           {
             "name": "SH01_SHADER_OK",
             "kind": "const",
             "description": "Stable ID for \"shader created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 511
+            "line": 515
           },
           {
             "name": "SH02_SHADER_ERR",
             "kind": "const",
             "description": "Stable ID for \"shader compile error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 513
+            "line": 517
           },
           {
             "name": "LW01_LIGHT_WORLD_INIT",
             "kind": "const",
             "description": "Stable ID for \"LightWorld created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 517
+            "line": 521
           },
           {
             "name": "LW02_LIGHT_ADD",
             "kind": "const",
             "description": "Stable ID for \"light source added\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 519
+            "line": 523
           },
           {
             "name": "LW03_LIGHT_MAX",
             "kind": "const",
             "description": "Stable ID for \"max lights reached\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 521
+            "line": 525
           },
           {
             "name": "SP01_SKEL_LOADED",
             "kind": "const",
             "description": "Stable ID for \"Skeleton loaded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 525
+            "line": 529
           },
           {
             "name": "SP02_SKEL_ANIM_MISS",
             "kind": "const",
             "description": "Stable ID for \"skeleton animation not found\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 527
+            "line": 531
           },
           {
             "name": "IM01_IMAGE_LOADED",
             "kind": "const",
             "description": "Stable ID for \"ImageData loaded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 531
+            "line": 535
           },
           {
             "name": "IM02_IMAGE_MISMATCH",
             "kind": "const",
             "description": "Stable ID for \"ImageData byte size mismatch\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 533
+            "line": 537
           },
           {
             "name": "AS01",
             "kind": "const",
             "description": "Stable ID for \"audio source created with file path\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 537
+            "line": 541
           },
           {
             "name": "BU01",
             "kind": "const",
             "description": "Stable ID for \"audio bus created with name\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 541
+            "line": 545
           },
           {
             "name": "BU02",
             "kind": "const",
             "description": "Stable ID for \"audio bus paused\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 543
+            "line": 547
           },
           {
             "name": "BU03",
             "kind": "const",
             "description": "Stable ID for \"audio bus resumed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 545
+            "line": 549
           },
           {
             "name": "PE01",
             "kind": "const",
             "description": "Stable ID for \"particle system created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 549
+            "line": 553
           },
           {
             "name": "PE02",
             "kind": "const",
             "description": "Stable ID for \"particle emitter activated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 551
+            "line": 555
           },
           {
             "name": "PE03",
             "kind": "const",
             "description": "Stable ID for \"particle emitter stopped\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 553
+            "line": 557
           },
           {
             "name": "PE04",
             "kind": "const",
             "description": "Stable ID for \"particle system reset, all active particles cleared\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 555
+            "line": 559
           },
           {
             "name": "BD01",
             "kind": "const",
             "description": "Stable ID for \"rectangular physics body created at position\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 559
+            "line": 563
           },
           {
             "name": "BD02",
             "kind": "const",
             "description": "Stable ID for \"circular physics body created at position with radius\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 561
+            "line": 565
           },
           {
             "name": "BD03",
             "kind": "const",
             "description": "Stable ID for \"polygon physics body created at position\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 563
+            "line": 567
           },
           {
             "name": "TI01",
             "kind": "const",
             "description": "Stable ID for \"scheduler instance created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 567
+            "line": 571
           },
           {
             "name": "TI02",
             "kind": "const",
             "description": "Stable ID for \"one-shot callback scheduled with delay\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 569
+            "line": 573
           },
           {
             "name": "TI03",
             "kind": "const",
             "description": "Stable ID for \"repeating callback scheduled with interval\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 571
+            "line": 575
           },
           {
             "name": "TI04",
             "kind": "const",
             "description": "Stable ID for \"all scheduled callbacks cancelled\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 573
+            "line": 577
           },
           {
             "name": "FN01",
             "kind": "const",
             "description": "Stable ID for \"FSM state transition initiated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 577
+            "line": 581
           },
           {
             "name": "FN02",
             "kind": "const",
             "description": "Stable ID for \"FSM state transition completed or error condition triggered\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 579
+            "line": 583
           },
           {
             "name": "GP01",
             "kind": "const",
             "description": "Stable ID for \"GOAP plan computation started with action set\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 583
+            "line": 587
           },
           {
             "name": "GP02",
             "kind": "const",
             "description": "Stable ID for \"GOAP plan action execution step\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 585
+            "line": 589
           },
           {
             "name": "GP03",
             "kind": "const",
             "description": "Stable ID for \"GOAP planning failed — no valid plan found for goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 587
+            "line": 591
           },
           {
             "name": "FF01",
             "kind": "const",
             "description": "Stable ID for \"flow field created at grid dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 591
+            "line": 595
           },
           {
             "name": "FF02",
             "kind": "const",
             "description": "Stable ID for \"flow field computed for goal cell\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 593
+            "line": 597
           },
           {
             "name": "FF03",
             "kind": "const",
             "description": "Stable ID for \"flow field cleared\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 595
+            "line": 599
           },
           {
             "name": "HP01",
             "kind": "const",
             "description": "Stable ID for \"HPA* abstract graph built from NavGrid\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 599
+            "line": 603
           },
           {
             "name": "HP02",
             "kind": "const",
             "description": "Stable ID for \"HPA* path not found between start and goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 601
+            "line": 605
           },
           {
             "name": "HP03",
             "kind": "const",
             "description": "Stable ID for \"HPA* path found between start and goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 603
+            "line": 607
           },
           {
             "name": "TR01",
             "kind": "const",
             "description": "Stable ID for \"scene transition started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 607
+            "line": 611
           },
           {
             "name": "TR02",
             "kind": "const",
             "description": "Stable ID for \"scene transition completed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 609
+            "line": 613
           },
           {
             "name": "GR01",
             "kind": "const",
             "description": "Stable ID for \"graph simulation step executed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 613
+            "line": 617
           },
           {
             "name": "GR02",
             "kind": "const",
             "description": "Stable ID for \"graph simulation events processed this step\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 615
+            "line": 619
           },
           {
             "name": "CV01",
             "kind": "const",
             "description": "Stable ID for \"canvas render target created at pixel dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 619
+            "line": 623
           },
           {
             "name": "MS01",
             "kind": "const",
             "description": "Stable ID for \"GPU mesh created with vertex and index buffers\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 623
+            "line": 627
           },
           {
             "name": "MS02",
             "kind": "const",
             "description": "Stable ID for \"GPU mesh geometry updated with new vertex data\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 625
+            "line": 629
           },
           {
             "name": "RC01",
             "kind": "const",
             "description": "Stable ID for \"raycaster world initialized at grid dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 629
+            "line": 633
           },
           {
             "name": "FX01",
             "kind": "const",
             "description": "Stable ID for \"post-processing effect added to FX stack\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 633
+            "line": 637
           },
           {
             "name": "FX02",
             "kind": "const",
             "description": "Stable ID for \"post-processing FX stack rendered to output target\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 635
+            "line": 639
           },
           {
             "name": "DF01",
             "kind": "const",
             "description": "Stable ID for \"DataFrame operation logged (mutation, creation, or query)\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 639
+            "line": 643
           },
           {
             "name": "SG01",
             "kind": "const",
             "description": "Stable ID for \"signal emitted to registered handlers\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 643
+            "line": 647
           },
           {
             "name": "SG02",
             "kind": "const",
             "description": "Stable ID for \"signal handler registered for event\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 645
+            "line": 649
           },
           {
             "name": "MG01",
             "kind": "const",
             "description": "Stable ID for \"procedural map generation started at grid dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 649
+            "line": 653
           },
           {
             "name": "MG02",
             "kind": "const",
             "description": "Stable ID for \"map generation layer added to output\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 651
+            "line": 655
           },
           {
             "name": "MG03",
             "kind": "const",
             "description": "Stable ID for \"procedural map generation completed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 653
+            "line": 657
           },
           {
             "name": "AT01",
             "kind": "const",
             "description": "Stable ID for \"A* pathfinding search started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 657
+            "line": 661
           },
           {
             "name": "AT02",
             "kind": "const",
             "description": "Stable ID for \"A* path found between start and goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 659
+            "line": 663
           },
           {
             "name": "AT03",
             "kind": "const",
             "description": "Stable ID for \"A* search exhausted — no path found between start and goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 661
+            "line": 665
           },
           {
             "name": "TL01",
             "kind": "const",
             "description": "Stable ID for \"TMX tilemap file parse started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 665
+            "line": 669
           },
           {
             "name": "TL02",
             "kind": "const",
             "description": "Stable ID for \"TMX tilemap file parsed successfully at tile dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 667
+            "line": 671
           },
           {
             "name": "VR01",
             "kind": "const",
             "description": "Stable ID for \"Voronoi diagram computed from seed points\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 671
+            "line": 675
           },
           {
             "name": "VR02",
             "kind": "const",
             "description": "Stable ID for \"Voronoi region processing step completed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 673
+            "line": 677
           },
           {
             "name": "SV01",
             "kind": "const",
             "description": "Stable ID for \"save slot initialized for write\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 677
+            "line": 681
           },
           {
             "name": "SV02",
             "kind": "const",
             "description": "Stable ID for \"save data written to slot\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 679
+            "line": 683
           },
           {
             "name": "SV03",
             "kind": "const",
             "description": "Stable ID for \"save data loaded from slot\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 681
+            "line": 685
           },
           {
             "name": "SV04",
             "kind": "const",
             "description": "Stable ID for \"save operation failed with error\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 683
+            "line": 687
           },
           {
             "name": "CH01",
             "kind": "const",
             "description": "Stable ID for \"anonymous thread channel created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 687
+            "line": 691
           },
           {
             "name": "CH02",
             "kind": "const",
             "description": "Stable ID for \"named thread channel created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 689
+            "line": 693
           },
           {
             "name": "CH03",
             "kind": "const",
             "description": "Stable ID for \"value pushed onto channel queue\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 691
+            "line": 695
           },
           {
             "name": "CH04",
             "kind": "const",
             "description": "Stable ID for \"channel queue drained and cleared\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 693
+            "line": 697
           },
           {
             "name": "LT01",
             "kind": "const",
             "description": "Stable ID for \"point light source added at position with radius\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 697
+            "line": 701
           },
           {
             "name": "LT02",
             "kind": "const",
             "description": "Stable ID for \"light source position updated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 699
+            "line": 703
           },
           {
             "name": "LT03",
             "kind": "const",
             "description": "Stable ID for \"light source radius changed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 701
+            "line": 705
           },
           {
             "name": "RL01",
             "kind": "const",
             "description": "Stable ID for \"relationship type registered with hierarchy depth\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 705
+            "line": 709
           },
           {
             "name": "RL02",
             "kind": "const",
             "description": "Stable ID for \"relationship created between two entities\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 707
+            "line": 711
           },
           {
             "name": "RL03",
             "kind": "const",
             "description": "Stable ID for \"relationship lookup executed for entity pair\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 709
+            "line": 713
           },
           {
             "name": "GC01",
             "kind": "const",
             "description": "Stable ID for \"graph node added with type identifier\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 713
+            "line": 717
           },
           {
             "name": "GC02",
             "kind": "const",
             "description": "Stable ID for \"graph node removed by ID\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 715
+            "line": 719
           },
           {
             "name": "GC03",
             "kind": "const",
             "description": "Stable ID for \"directed edge added between graph nodes\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 717
+            "line": 721
           },
           {
             "name": "GC04",
             "kind": "const",
             "description": "Stable ID for \"edge removed from graph by ID\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 719
+            "line": 723
           },
           {
             "name": "CQ01",
             "kind": "const",
             "description": "Stable ID for \"command queue created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 723
+            "line": 727
           },
           {
             "name": "CQ02",
             "kind": "const",
             "description": "Stable ID for \"command queue flushed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 725
+            "line": 729
           },
           {
             "name": "CQ03",
             "kind": "const",
             "description": "Stable ID for \"commands dispatched from queue\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 727
+            "line": 731
           },
           {
             "name": "UP01",
             "kind": "const",
             "description": "Stable ID for \"unit pathfinder initialized\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 731
+            "line": 735
           },
           {
             "name": "UP02",
             "kind": "const",
             "description": "Stable ID for \"path found for unit between grid positions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 733
+            "line": 737
           },
           {
             "name": "UP03",
             "kind": "const",
             "description": "Stable ID for \"unit pathfinding failed between grid positions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 735
+            "line": 739
           },
           {
             "name": "OV01",
             "kind": "const",
             "description": "Stable ID for \"screen overlay created at pixel dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 739
+            "line": 743
           },
           {
             "name": "OV02",
             "kind": "const",
             "description": "Stable ID for \"overlay color fade animation started\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 741
+            "line": 745
           },
           {
             "name": "OV03",
             "kind": "const",
             "description": "Stable ID for \"overlay flash effect started with intensity and duration\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 743
+            "line": 747
           },
           {
             "name": "FE01",
             "kind": "const",
             "description": "Stable ID for \"post-FX effect pass created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 747
+            "line": 751
           },
           {
             "name": "FE02",
             "kind": "const",
             "description": "Stable ID for \"post-FX effect linked to shader\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 749
+            "line": 753
           },
           {
             "name": "FE03",
             "kind": "const",
             "description": "Stable ID for \"post-FX effect uniform parameter set\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 751
+            "line": 755
           },
           {
             "name": "CB01",
             "kind": "const",
             "description": "Stable ID for \"raycaster column batch created with column count\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 755
+            "line": 759
           },
           {
             "name": "CB02",
             "kind": "const",
             "description": "Stable ID for \"raycaster column cell value computed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 757
+            "line": 761
           },
           {
             "name": "TS01",
             "kind": "const",
             "description": "Stable ID for \"tileset loaded with first GID and tile count\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 761
+            "line": 765
           },
           {
             "name": "TS02",
             "kind": "const",
             "description": "Stable ID for \"animated tile registered with frame count\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 763
+            "line": 767
           },
           {
             "name": "TS03",
             "kind": "const",
             "description": "Stable ID for \"tile collision flag assigned\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 765
+            "line": 769
           },
           {
             "name": "GD01",
             "kind": "const",
             "description": "Stable ID for \"gamepad device connected with ID\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 769
+            "line": 773
           },
           {
             "name": "GD02",
             "kind": "const",
             "description": "Stable ID for \"gamepad button state changed\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 771
+            "line": 775
           },
           {
             "name": "GD03",
             "kind": "const",
             "description": "Stable ID for \"gamepad axis value updated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 773
+            "line": 777
           },
           {
             "name": "DP01",
             "kind": "const",
             "description": "Stable ID for \"DSP effect added to audio graph with ID\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 777
+            "line": 781
           },
           {
             "name": "DP02",
             "kind": "const",
             "description": "Stable ID for \"DSP audio source initialized with sample rate and channels\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 779
+            "line": 783
           },
           {
             "name": "DP03",
             "kind": "const",
             "description": "Stable ID for \"DSP effect graph processed one audio frame\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 781
+            "line": 785
           },
           {
             "name": "BB01",
             "kind": "const",
             "description": "Stable ID for \"AI blackboard created\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 785
+            "line": 789
           },
           {
             "name": "BB02",
             "kind": "const",
             "description": "Stable ID for \"blackboard value read by key\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 787
+            "line": 791
           },
           {
             "name": "BB03",
             "kind": "const",
             "description": "Stable ID for \"blackboard entries cleared\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 789
+            "line": 793
           },
           {
             "name": "CK01",
             "kind": "const",
             "description": "Stable ID for \"chunk map initialized with chunk side length\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 793
+            "line": 797
           },
           {
             "name": "CK02",
             "kind": "const",
             "description": "Stable ID for \"tile chunk loaded at chunk coordinates\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 795
+            "line": 799
           },
           {
             "name": "CK03",
             "kind": "const",
             "description": "Stable ID for \"tile chunk unloaded at chunk coordinates\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 797
+            "line": 801
           },
           {
             "name": "IE01",
             "kind": "const",
             "description": "Stable ID for \"image effect shader registered by name\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 801
+            "line": 805
           },
           {
             "name": "IE02",
             "kind": "const",
             "description": "Stable ID for \"image effect applied to pixel buffer\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 803
+            "line": 807
           },
           {
             "name": "IE03",
             "kind": "const",
             "description": "Stable ID for \"image effect removed by name\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 805
+            "line": 809
           },
           {
             "name": "NG01",
             "kind": "const",
             "description": "Stable ID for \"navigation grid created at tile dimensions\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 809
+            "line": 813
           },
           {
             "name": "NG02",
             "kind": "const",
             "description": "Stable ID for \"navigation grid cost map reloaded\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 811
+            "line": 815
           },
           {
             "name": "NG03",
             "kind": "const",
             "description": "Stable ID for \"navigation cell cost value updated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 813
+            "line": 817
           },
           {
             "name": "SS01",
             "kind": "const",
             "description": "Stable ID for \"sprite sheet parsed with total frame count\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 817
+            "line": 821
           },
           {
             "name": "SS02",
             "kind": "const",
             "description": "Stable ID for \"sprite animation clip registered with frame range\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 819
+            "line": 823
           },
           {
             "name": "IF01",
             "kind": "const",
             "description": "Stable ID for \"influence map created at grid dimensions with cell size\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 823
+            "line": 827
           },
           {
             "name": "IF02",
             "kind": "const",
             "description": "Stable ID for \"influence layer added by name\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 825
+            "line": 829
           },
           {
             "name": "IF03",
             "kind": "const",
             "description": "Stable ID for \"influence map layer values propagated\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 827
+            "line": 831
           },
           {
             "name": "HX01",
             "kind": "const",
             "description": "Stable ID for \"spatial hash grid created with cell size\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 831
+            "line": 835
           },
           {
             "name": "HX02",
             "kind": "const",
             "description": "Stable ID for \"spatial hash rebuilt with entity count\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 833
+            "line": 837
           },
           {
             "name": "BI01",
             "kind": "const",
             "description": "Stable ID for \"bidirectional A* start or goal not walkable\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 837
+            "line": 841
           },
           {
             "name": "BI02",
             "kind": "const",
             "description": "Stable ID for \"bidirectional A* start equals goal\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 839
+            "line": 843
           },
           {
             "name": "BI03",
             "kind": "const",
             "description": "Stable ID for \"bidirectional A* meeting point found\".",
             "file": "src/runtime/log_messages.rs",
-            "line": 841
+            "line": 845
           }
         ]
       },
@@ -11932,7 +11946,7 @@
             "kind": "struct",
             "description": "Snapshot of renderer statistics for a single frame.  # Fields - `draw_calls` — `usize`. - `textures` — `usize`. - `fonts` — `usize`. - `canvases` — `usize`. - `texture_memory` — `usize`. RGBA byte estimate.",
             "file": "src/runtime/shared_state.rs",
-            "line": 577
+            "line": 670
           }
         ]
       },

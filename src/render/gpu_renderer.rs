@@ -1366,6 +1366,7 @@ impl GpuRenderer {
             && min_y <= vp_h + MARGIN
     }
 
+    /// Executes one complete GPU render pass, processing the full `RenderCommand` queue into the wgpu surface.
     #[allow(clippy::too_many_arguments)]
     pub fn render_frame(
         &mut self,

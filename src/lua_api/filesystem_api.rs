@@ -188,10 +188,9 @@ impl LuaUserData for LuaZipMount {
 // -------------------------------------------------------------------------------
 /// Registers the `lurek.fs` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -242,8 +241,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     let wrc = watcher_rc.clone();
     /// Polls all watched paths and returns an array of paths that changed since the
+    /// @return table
     /// last call.  Call once per second or per slow-update tick for hot reload.
-    /// @return table   array of changed path strings
+    /// table   array of changed path strings
     tbl.set(
         "pollWatchers",
         lua.create_function(move |lua, ()| {
@@ -500,8 +500,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- pollAsync --
     /// Polls an async load handle, returning status and optional data.
     /// @param handle : integer
-    /// @return string, string?
+    /// string, string?
     let s = state.clone();
+    /// @return string|nil
     tbl.set(
         "pollAsync",
         lua.create_function(move |_, handle_id: u64| {
@@ -618,8 +619,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Example: `lurek.fs.glob("save/*.json")`
     ///
     /// @param pattern : string
-    /// @return table  array of matching relative paths
+    /// table  array of matching relative paths
     let s = state.clone();
+    /// @return table
     tbl.set(
         "glob",
         lua.create_function(move |lua, pattern: String| {

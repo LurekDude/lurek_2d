@@ -307,7 +307,8 @@ impl LuaUserData for LuaPostFxStack {
         // -- getEffect --
         /// Returns the effect at the given 1-based position, or nil.
         /// @param index : integer
-        /// @return PostFxEffect?
+        /// @return nil
+        /// PostFxEffect?
         methods.add_method("getEffect", |lua, this, index: usize| {
             let idx = index.saturating_sub(1);
             match this.effects.get(idx) {
@@ -389,7 +390,8 @@ impl LuaUserData for LuaPostFxStack {
         /// This is useful after dynamically composing a pipeline to avoid redundant
         /// GPU shader passes.
         ///
-        /// @return integer   number of slots removed
+        /// integer   number of slots removed
+        /// @return nil
         methods.add_method_mut("dedup", |_, this, ()| {
             // Dedup by Rc pointer identity in the effects vec, keeping first seen.
             let mut seen_ptrs: Vec<*const ()> = Vec::new();
@@ -557,7 +559,8 @@ impl LuaUserData for LuaImageEffect {
         // -- getEffect --
         /// Returns the effect at the given 1-based index or with the given type name.
         /// @param key : integer|string
-        /// @return PostFxEffect|nil
+        /// @return nil
+        /// PostFxEffect|nil
         methods.add_method("getEffect", |lua, this, key: LuaValue| {
             let rc_opt = match &key {
                 LuaValue::Integer(i) => this
@@ -1379,10 +1382,9 @@ impl LuaUserData for LuaOverlay {
 
 /// Registers the `lurek.effect` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 
 // ── LuaScreenTransition ─────────────────────────────────────────────────────
@@ -1465,12 +1467,12 @@ impl mlua::UserData for LuaScreenTransition {
 
         /// Type.
         ///
-        /// @return any
+        /// @return table|nil
         methods.add_method("type", |_, _, ()| Ok("ScreenTransition"));
         /// Type of.
         ///
         /// @param name : string
-        /// @return any
+        /// @return table|nil
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ScreenTransition" || name == "Object")
         });

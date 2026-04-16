@@ -863,7 +863,7 @@ impl LuaUserData for LuaDataFrame {
         // -- modeVal --
         /// Return the most frequent value in a column (nil if empty).
         /// @param col : string|integer
-        /// @return any
+        /// @return table|nil
         methods.add_method("modeVal", |lua, this, col: LuaValue| {
             let col_ref = lua_to_col_ref(col)?;
             let val = this
@@ -1137,7 +1137,8 @@ impl LuaUserData for LuaDatabase {
         // -- getTable --
         /// Returns a copy of a table by name, or nil if not found.
         /// @param name : string
-        /// @return DataFrame?
+        /// @return nil
+        /// DataFrame?
         methods.add_method("getTable", |_, this, name: String| {
             let db = this.inner.borrow();
             match db.get_table(&name) {
@@ -1242,10 +1243,9 @@ impl LuaUserData for LuaDatabase {
 
 /// Registers the `lurek.dataframe` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;

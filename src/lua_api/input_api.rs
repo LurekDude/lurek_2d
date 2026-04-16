@@ -60,7 +60,8 @@ impl LuaUserData for LuaCombo {
         /// Feed a key-press event into the combo detector.
         /// Time elapsed since the last `feed` or `tick` call is taken from the internal clock.
         /// @param key : string
-        /// @return string  "idle"|"advanced"|"completed"|"broken"
+        /// @return nil
+        /// string  "idle"|"advanced"|"completed"|"broken"
         methods.add_method_mut("feed", |_, this, key: String| {
             let progress = this.detector.feed(&key, 0);
             this.total_elapsed_ms = 0;
@@ -77,7 +78,8 @@ impl LuaUserData for LuaCombo {
         /// Advance the internal clock by `dt` seconds and check for timeouts.
         /// Call once per frame with the frame delta even when no key is pressed.
         /// @param dt : number   frame delta in seconds
-        /// @return string  "expired" if a running combo just timed out; "in_progress" or "idle" otherwise
+        /// @return nil
+        /// string  "expired" if a running combo just timed out; "in_progress" or "idle" otherwise
         methods.add_method_mut("tick", |_, this, dt: f64| {
             let elapsed_ms = (dt * 1000.0).round() as u64;
             this.total_elapsed_ms += elapsed_ms;
@@ -123,7 +125,8 @@ impl LuaUserData for LuaCombo {
         // -- getStep --
         /// Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
         /// @param index : integer   1-based
-        /// @return table | nil
+        /// @return nil
+        /// table | nil
         methods.add_method("getStep", |lua, this, index: usize| {
             if index == 0 || index > this.detector.steps.len() {
                 return Ok(LuaValue::Nil);
@@ -181,10 +184,9 @@ impl LuaUserData for LuaInputRecording {
 
 /// Registers the `lurek.keyboard`, `lurek.mouse`, `lurek.gamepad`, and `lurek.touch` API tables.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
 
@@ -958,8 +960,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- unbind --
     /// Removes all key bindings for the given action name.
     /// @param action : string
-    /// @return boolean  true if the action existed
+    /// boolean  true if the action existed
     let am = action_map.clone();
+    /// @return boolean
     input_tbl.set(
         "unbind",
         lua.create_function(move |_, action: String| {
@@ -1167,7 +1170,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     let rc = rec_rc.clone();
     /// Stops recording and returns an `InputRecording` userdata, or nil if not recording.
-    /// @return InputRecording|nil
+    /// @return table|nil
+    /// InputRecording|nil
     input_tbl.set(
         "stopRecording",
         lua.create_function(move |lua, ()| {

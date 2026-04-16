@@ -303,10 +303,9 @@ impl LuaUserData for LuaScheduler {
 
 /// Registers the `lurek.time` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -492,11 +491,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     // -- tickRealTimers --
     /// Fires and removes all real-clock timers whose wall-clock deadline has passed.
     /// Call once per frame inside `lurek.process` to drain expired timers.
-    /// @return integer  number of callbacks fired
+    /// integer  number of callbacks fired
     let rt = real_timers;
     /// Advances all real-time timers by one tick; called automatically each frame.
     ///
-    /// @return any
+    /// @return table|nil
     tbl.set(
         "tickRealTimers",
         lua.create_function(move |lua, ()| {
@@ -635,13 +634,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// deadline or frame target has been reached. Call once per frame inside
     /// `lurek.process` alongside `lurek.time.tickRealTimers()`.
     ///
-    /// @return integer  number of coroutines resumed
+    /// integer  number of coroutines resumed
     let ws_tick = wait_secs;
     let wf_tick = wait_frames;
     let s_tick = state.clone();
     /// Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
     ///
-    /// @return any
+    /// @return table|nil
     tbl.set(
         "tickWaits",
         lua.create_function(move |lua, ()| {

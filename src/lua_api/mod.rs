@@ -168,14 +168,12 @@ pub mod lua_types;
 /// Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the
 /// provided module flags, and returns the ready `Lua` instance.
 ///
-/// # Parameters
 /// - `state` — Shared engine state passed (via `Rc<RefCell>` clone) to every Lua closure.
 /// - `modules` — Module enable/disable flags read from `conf.lua`. Mandatory APIs
 ///   (`math`, `log`, `event`) are always registered regardless of flags.
 ///
-/// # Returns
 /// `LuaResult<Lua>` — A configured Lua VM with `lurek.*` as a global, or a Lua error if
-/// any sub-API fails to register.
+/// any sub-API fails to register
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
 
@@ -447,10 +445,8 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     Ok(lua)
 }
 
-/// Creates a test Lua VM with the BDD test framework loaded and all available API modules registered.
-///
-/// # Returns
-/// `LuaResult<Lua>`.
+/// Creates a test Lua VM with the BDD test framework loaded and all available API modules registered
+/// @return LuaResult<Lua>
 pub fn create_test_vm() -> LuaResult<Lua> {
     use crate::runtime::config::Config;
     use std::path::PathBuf;

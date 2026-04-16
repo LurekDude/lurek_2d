@@ -22,9 +22,7 @@ use crate::runtime::messages;
 
 /// Returns the number of logical processors available.
 ///
-/// # Returns
-/// `usize`.
-///
+/// @return usize
 pub fn get_processor_count() -> usize {
     std::thread::available_parallelism()
         .map(|n| n.get())
@@ -33,9 +31,7 @@ pub fn get_processor_count() -> usize {
 
 /// Returns total system RAM in MiB using the `sysinfo` crate.
 ///
-/// # Returns
-/// `u64`.
-///
+/// u64
 pub fn get_memory_size() -> u64 {
     use sysinfo::System;
     let sys = System::new_with_specifics(
@@ -46,12 +42,9 @@ pub fn get_memory_size() -> u64 {
 
 /// Opens a URL in the default browser/application.
 ///
-/// # Parameters
-/// - `url` — `&str`.
+/// @param url : &str
 ///
-/// # Returns
-/// `bool`.
-///
+/// @return bool
 ///
 ///
 /// Only `http://`, `https://`, and `mailto:` schemes are allowed.
@@ -95,9 +88,7 @@ pub fn open_url(url: &str) -> bool {
 
 /// Returns the user's preferred locale strings.
 ///
-/// # Returns
-/// `Vec<String>`.
-///
+/// @return Vec<String>
 pub fn get_preferred_locales() -> Vec<String> {
     let locales: Vec<String> = sys_locale::get_locales().map(|l| l.to_string()).collect();
     if locales.is_empty() {
@@ -137,8 +128,7 @@ pub enum PowerState {
 impl PowerState {
     /// Returns the string representation used in Lua.
     ///
-    /// # Returns
-    /// `&'static str`.
+    /// &'static str
     /// One of `"unknown"`, `"battery"`, `"nobattery"`, `"charging"`, or `"charged"`.
     pub fn as_str(&self) -> &'static str {
         match self {
@@ -151,11 +141,8 @@ impl PowerState {
     }
 }
 
-/// Returns power/battery information: (state, percent, seconds).
-///
-/// # Returns
-/// `(PowerState, Option<u32>, Option<u32>)`.
-///
+/// Returns power/battery information: (state, percent, seconds)
+/// @return (PowerState, Option<u32>, Option<u32>)
 ///
 /// On desktop platforms this returns `(Unknown, None, None)`.
 /// A tuple of `(PowerState, Option<u32>, Option<u32>)` ÔÇö the power state,
@@ -166,10 +153,9 @@ pub fn get_power_info() -> (PowerState, Option<u32>, Option<u32>) {
 
 /// Registers `lurek.platform.*` platform query functions into the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let system = lua.create_table()?;
@@ -241,7 +227,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 
     // lurek.platform.getPowerInfo() -> state, percent_or_nil, seconds_or_nil
     /// Returns battery state, percentage charged, and estimated time remaining.
-    /// @return string, integer?, integer?
+    /// @return table
+    /// string, integer?, integer?
     /// Table with fields state ('battery','charging','charged','unknown'), percent, and seconds.
     system.set(
         "getPowerInfo",

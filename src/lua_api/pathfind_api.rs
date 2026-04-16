@@ -337,7 +337,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param y2 : integer
         /// @param unitSize : integer?
         /// @param maxNodes : integer?
-        /// @return table?, boolean
+        /// @return nil
+        /// table?, boolean
         methods.add_method(
             "findPathBidirectional",
             |lua,
@@ -431,7 +432,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param y : integer
         /// @param maxRadius : integer
         /// @param unitSize : integer?
-        /// @return integer?, integer?
+        /// @return nil
+        /// integer?, integer?
         methods.add_method(
             "findNearestWalkable",
             |_, this, (x, y, max_radius, unit_size): (u32, u32, u32, Option<u32>)| match this
@@ -879,7 +881,8 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- getGoal --
         /// Returns the goal cell (1-based coordinates) or nil if unset.
-        /// @return integer?, integer?
+        /// integer?, integer?
+        /// @return nil
         methods.add_method(
             "getGoal",
             |_, this, ()| -> LuaResult<(LuaValue, LuaValue)> {
@@ -941,6 +944,7 @@ impl LuaUserData for LuaHexGrid {
         /// @param col : integer
         /// @param row : integer
         /// @param blocked : boolean
+        /// @return nil
         methods.add_method_mut("setBlocked", |_, this, (col, row, blocked): (u32, u32, bool)| {
             this.inner.borrow_mut().set_blocked(col - 1, row - 1, blocked);
             Ok(())
@@ -951,6 +955,7 @@ impl LuaUserData for LuaHexGrid {
         /// @param col : integer
         /// @param row : integer
         /// @param cost : number
+        /// @return nil
         methods.add_method_mut("setCost", |_, this, (col, row, cost): (u32, u32, f32)| {
             this.inner.borrow_mut().set_cost(col - 1, row - 1, cost);
             Ok(())
@@ -1064,6 +1069,7 @@ impl LuaUserData for LuaJpsGrid {
         /// @param x : integer
         /// @param y : integer
         /// @param blocked : boolean
+        /// @return nil
         methods.add_method_mut("setBlocked", |_, this, (x, y, blocked): (u32, u32, bool)| {
             this.inner.borrow_mut().set_blocked(x - 1, y - 1, blocked);
             Ok(())
@@ -1109,10 +1115,9 @@ impl LuaUserData for LuaJpsGrid {
 
 /// Registers the `lurek.pathfinding` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -1291,8 +1296,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // -- rangeMap --
     /// Computes a Dijkstra range-of-movement map from an origin within a movement budget.
+    /// @return table
     /// @param opts : table  {width, height, costs, blocked, origin_x, origin_y, budget, diagonal?}
-    /// @return table  {cells = [{x, y, cost},...], width, height}
+    /// table  {cells = [{x, y, cost},...], width, height}
     tbl.set(
         "rangeMap",
         lua.create_function(|lua, opts: LuaTable| {

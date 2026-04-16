@@ -176,10 +176,9 @@ fn month_name_tables() -> ([&'static str; 12], [&'static str; 12]) {
 
 /// Registers `lurek.localization.*`.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let loc = lua.create_table()?;
@@ -563,11 +562,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     })?)?;
 
     // -- formatNumber --
+    let s = shared.clone();
     /// Formats a number with locale-aware decimal and thousands separators.
     /// @param n : number
     /// @param opts? : table  { decimals : integer = 2 }
     /// @return string
-    let s = shared.clone();
     loc.set("formatNumber", lua.create_function(move |_, (n, opts): (f64, Option<LuaTable>)| {
         let decimals = opts
             .and_then(|t| t.get::<_, Option<u32>>("decimals").ok().flatten())
@@ -578,11 +577,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     })?)?;
 
     // -- formatDate --
+    let s = shared.clone();
     /// Formats a Unix timestamp according to the active locale's date order.
     /// @param timestamp : integer  Unix seconds (UTC)
     /// @param fmt? : string  "short" | "long" | "iso"  (default "short")
     /// @return string
-    let s = shared.clone();
     loc.set("formatDate", lua.create_function(move |_, (timestamp, fmt): (i64, Option<String>)| {
         let locale = s.borrow().catalog.locale.clone();
         let fmt = fmt.as_deref().unwrap_or("short");
@@ -590,13 +589,13 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     })?)?;
 
     // -- tGender --
+    let s = shared.clone();
     /// Looks up a translation key augmented with a gender suffix.
     /// Falls back to the base key if the gender-specific key is absent.
     /// @param key : string
     /// @param gender : string  "masculine" | "feminine" | "neutral"
     /// @param vars? : table   placeholder substitutions passed to `t`
     /// @return string
-    let s = shared.clone();
     loc.set("tGender", lua.create_function(move |_, (key, gender, vars): (String, String, Option<LuaTable>)| {
         let gendered_key = format!("{}.{}", key, gender.to_lowercase());
         let borrowed = s.borrow();
@@ -622,9 +621,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     })?)?;
 
     // -- getLoadedLocales --
-    /// Returns an array of all currently loaded locale codes.
-    /// @return table  array of string
     let s = shared.clone();
+    /// Returns an array of all currently loaded locale codes.
+    /// @return table  -- array of locale code strings
     loc.set("getLoadedLocales", lua.create_function(move |lua, ()| {
         let locales = s.borrow().catalog.locales();
         let tbl = lua.create_table()?;

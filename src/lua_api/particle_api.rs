@@ -858,7 +858,8 @@ impl LuaUserData for LuaParticleSystem {
 
         // -- getEmissionArea --
         /// Returns emission area: dist-string, w, h.
-        /// @return string, number, number
+        /// string, number, number
+        /// @return nil
         methods.add_method("getEmissionArea", |_, this, ()| {
             use crate::particle::AreaDistribution;
             let st = this.state.borrow();
@@ -1232,7 +1233,8 @@ impl LuaUserData for LuaParticleSystem {
 
         // -- getFlipbook --
         /// Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
-        /// @return number?, number?, number?
+        /// number?, number?, number?
+        /// @return nil
         methods.add_method("getFlipbook", |_, this, ()| {
             let st = this.state.borrow();
             let ps = st.particle_systems.get(this.key).ok_or_else(|| {
@@ -1384,10 +1386,9 @@ impl LuaUserData for LuaTrail {
 
 /// Registers the `lurek.particles` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param state : Rc<RefCell<SharedState>>
 /// @param lua : &Lua
 /// @param luna : &LuaTable
 /// @param state : Rc<RefCell<SharedState>>
@@ -1531,11 +1532,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
 impl ParticleConfig {
     /// from_lua_opts.
     ///
-    /// # Parameters
-    /// - `t` — `&LuaTable`.
+    /// @param t : &LuaTable
     ///
-    /// # Returns
-    /// `LuaResult<Self>`.
+    /// @return LuaResult<Self>
     pub fn from_lua_opts(t: &LuaTable) -> LuaResult<Self> {
         let mut c = ParticleConfig::default();
         if let Ok(v) = t.get::<_, u32>("maxParticles") {

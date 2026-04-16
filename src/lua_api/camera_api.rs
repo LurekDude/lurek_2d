@@ -437,10 +437,9 @@ impl LuaUserData for LuaCamera2D {
 
 /// Registers the `lurek.camera` API table with the Lua VM.
 ///
-/// # Parameters
-/// - `lua` — `&Lua`.
-/// - `luna` — `&LuaTable`.
-/// - `_state` — `Rc<RefCell<SharedState>>`.
+/// @param lua : &Lua
+/// @param luna : &LuaTable
+/// @param _state : Rc<RefCell<SharedState>>
 ///
 pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
@@ -449,7 +448,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Creates a new Camera2D with the given viewport dimensions.
     /// @param viewport_w : number
     /// @param viewport_h : number
-    /// @return Camera2D
+    /// Camera2D
     tbl.set(
         "new",
         lua.create_function(|lua, (vw, vh): (f32, f32)| {
