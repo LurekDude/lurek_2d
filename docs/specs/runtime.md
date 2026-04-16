@@ -87,6 +87,9 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 - `catalog` (`messages.rs`): Returns a reference to the global [`MessageCatalog`], or `None` if [`init`] has not been called yet.
 - `SharedState::new` (`shared_state.rs`): Creates a new `SharedState` with the given window dimensions, title, and game directory.
 - `SharedState::step_timer` (`shared_state.rs`): Advances the clock by one tick and syncs `delta_time`, `total_time`, and `fps`.
+- `SharedState::touch_texture` (`shared_state.rs`): Records that a texture was used on the current frame.
+- `SharedState::evict_lru_resources` (`shared_state.rs`): Evicts least-recently-used textures until resident size is within budget.
+- `SharedState::resource_memory_stats` (`shared_state.rs`): Returns a summary of resident resource memory usage.
 - `SharedState::request_async_load` (`shared_state.rs`): Submits a background file-read request, lazily creating the async loader.
 - `SharedState::load_default_fonts` (`shared_state.rs`): Loads all 6 embedded bitmap fonts into `fonts` and stores their keys in `default_fonts`.
 - `SharedState::poll_async_load` (`shared_state.rs`): Polls a pending async load and returns the status and optional data.
@@ -95,8 +98,6 @@ Resource key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`
 ## Lua API Reference
 
 - Namespace: `lurek.platform.setLogLevel`
-- **`lurek.engine.setResourceBudget(bytes)`** — Sets the maximum resident texture memory in bytes. Pass `0` for unlimited (default). When exceeded the engine evicts the least-recently-used textures each frame tick.
-- **`lurek.engine.getResourceStats()`** — Returns `{texture_bytes, budget_bytes, texture_count}`. Useful for memory profiling and adaptive quality settings.
 
 ## References
 

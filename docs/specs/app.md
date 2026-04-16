@@ -54,8 +54,6 @@ Because `App` imports from virtually every other module (render, audio, input, l
 
 ## Lua API Reference
 
-- **`.lurek` / `.luna` archive loading**: The engine accepts `.lurek` or `.luna` ZIP archives both on the CLI (`cargo run -- game.lurek`) and via drag-and-drop onto the window. The archive is extracted to a temporary directory for the session duration. Archive paths must not escape the ZIP root (zip-slip protection enforced). The temporary directory is cleaned up when the session ends or a restart is triggered.
-
 - No dedicated direct `lurek.*` namespace is exposed by this module.
 
 ## References

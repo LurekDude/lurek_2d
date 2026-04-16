@@ -67,45 +67,45 @@ The new `registry.rs` file introduces `ModRegistry`, a typed name-to-value store
 - `lurek.mods.checkApiVersion`: Checks whether a mod's required `api_version` is compatible with the given `host_version`.
 
 ### `Mod` Methods
-- `Mod:getId`: Returns the unique mod identifier.
-- `Mod:getName`: Returns the display name.
-- `Mod:getVersion`: Returns the version string.
-- `Mod:getAuthor`: Returns the author name string from this mod's metadata manifest.
-- `Mod:getDescription`: Returns the mod description.
-- `Mod:getDependencies`: Returns the list of required mod IDs.
-- `Mod:getPriority`: Returns the load-order priority.
-- `Mod:isEnabled`: Returns whether the mod is enabled.
-- `Mod:setEnabled`: Enables or disables this mod; disabled mods are skipped during loading.
-- `Mod:isLoaded`: Returns whether the mod has been loaded.
-- `Mod:getApiVersion`: Returns the required engine API version string, or nil if not set.
-- `Mod:setApiVersion`: Sets the required engine API version string.
-- `Mod:getCapabilities`: Returns an array of declared capability flags.
-- `Mod:setCapabilities`: Replaces the capability list with the given array of strings.
+- `Mod:getId`: Returns the unique mod identifier
+- `Mod:getName`: Returns the display name
+- `Mod:getVersion`: Returns the version string
+- `Mod:getAuthor`: Returns the author name string from this mod's metadata manifest
+- `Mod:getDescription`: Returns the mod description
+- `Mod:getDependencies`: Returns the list of required mod IDs
+- `Mod:getPriority`: Returns the load-order priority
+- `Mod:isEnabled`: Returns whether the mod is enabled
+- `Mod:setEnabled`: Enables or disables this mod; disabled mods are skipped during loading
+- `Mod:isLoaded`: Returns whether the mod has been loaded
+- `Mod:getApiVersion`: Returns the required engine API version string, or nil if not set
+- `Mod:setApiVersion`: Sets the required engine API version string
+- `Mod:getCapabilities`: Returns an array of declared capability flags
+- `Mod:setCapabilities`: Replaces the capability list with the given array of strings
 - `Mod:getConfigSchema`: Returns the config schema as an array of `{key, type, default}` tables.
 - `Mod:setConfigSchema`: Replaces the config schema with the given array of `{key, type, default}` tables.
-- `Mod:getHook`: Returns the hook function for the given name, or nil.
-- `Mod:hasHook`: Returns whether a hook with the given name exists.
-- `Mod:getHookNames`: Returns an array of registered hook names.
-- `Mod:setConfig`: Stores an arbitrary config value for this mod.
-- `Mod:getConfig`: Returns the stored config value, or nil.
-- `Mod:releaseRefs`: Releases all hook and config registry references.
+- `Mod:getHook`: Returns the hook function for the given name, or nil
+- `Mod:hasHook`: Returns whether a hook with the given name exists
+- `Mod:getHookNames`: Returns an array of registered hook names
+- `Mod:setConfig`: Stores an arbitrary config value for this mod
+- `Mod:getConfig`: Returns the stored config value, or nil
+- `Mod:releaseRefs`: Releases all hook and config registry references
 
 ### `ModManager` Methods
-- `ModManager:registerMod`: Registers a mod from its Mod userdata.
-- `ModManager:unregisterMod`: Removes a mod by ID and returns whether it was found.
-- `ModManager:hasMod`: Returns whether a mod with the given ID is registered.
-- `ModManager:getModCount`: Returns the number of registered mods.
-- `ModManager:getAllMods`: Returns an array of info tables for all registered mods.
-- `ModManager:getLoadOrder`: Returns an array of info tables in effective load order.
-- `ModManager:validateDependencies`: Returns an array of mod IDs with missing dependencies.
-- `ModManager:hasCircularDependencies`: Returns whether any circular dependency cycles exist.
-- `ModManager:setLoadOrder`: Sets an explicit load order from an array of mod ID strings.
-- `ModManager:clearLoadOrder`: Clears the custom load order, reverting to priority-based sorting.
-- `ModManager:scanFolder`: Scans a directory for mods with mod.toml and registers them.
-- `ModManager:getModPath`: Returns the filesystem path of a registered mod, or nil.
-- `ModManager:markForReload`: Marks a registered mod for hot-reload.
-- `ModManager:getReloadQueue`: Returns the array of mod IDs pending hot-reload.
-- `ModManager:clearReloadQueue`: Clears the reload queue without reloading.
+- `ModManager:registerMod`: Registers a mod from its Mod userdata
+- `ModManager:unregisterMod`: Removes a mod by ID and returns whether it was found
+- `ModManager:hasMod`: Returns whether a mod with the given ID is registered
+- `ModManager:getModCount`: Returns the number of registered mods
+- `ModManager:getAllMods`: Returns an array of info tables for all registered mods
+- `ModManager:getLoadOrder`: Returns an array of info tables in effective load order
+- `ModManager:validateDependencies`: Returns an array of mod IDs with missing dependencies
+- `ModManager:hasCircularDependencies`: Returns whether any circular dependency cycles exist
+- `ModManager:setLoadOrder`: Sets an explicit load order from an array of mod ID strings
+- `ModManager:clearLoadOrder`: Clears the custom load order, reverting to priority-based sorting
+- `ModManager:scanFolder`: Scans a directory for mods with mod.toml and registers them
+- `ModManager:getModPath`: Returns the filesystem path of a registered mod, or nil
+- `ModManager:markForReload`: Marks a registered mod for hot-reload
+- `ModManager:getReloadQueue`: Returns the array of mod IDs pending hot-reload
+- `ModManager:clearReloadQueue`: Clears the reload queue without reloading
 
 ## References
 

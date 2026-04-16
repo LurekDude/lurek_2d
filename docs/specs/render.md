@@ -111,7 +111,7 @@ Additional `RenderCommand` variants have been added to the central enum, expandi
 - `GpuRenderer::resize` (`gpu_renderer.rs`): Updates the viewport uniform after a window resize.
 - `GpuRenderer::upload_texture` (`gpu_renderer.rs`): Uploads raw RGBA8 pixel data as a new GPU texture stored under the given key.
 - `GpuRenderer::create_canvas` (`gpu_renderer.rs`): Creates an off-screen GPU canvas texture stored under the given key.
-- `GpuRenderer::render_frame` (`gpu_renderer.rs`): Processes a frame: uploads new textures, tessellates commands, renders to surface, presents.
+- `GpuRenderer::render_frame` (`gpu_renderer.rs`): Executes one complete GPU render pass, processing the full `RenderCommand` queue into the wgpu surface.
 - `ShaderPassDescriptor::new` (`image_effect.rs`): Creates a new enabled pass with the given effect name and an empty parameter map.
 - `Mesh::new` (`mesh.rs`): Creates a new empty mesh with the specified vertex count and draw mode.
 - `Mesh::from_vertices` (`mesh.rs`): Creates a mesh from a vector of vertices.

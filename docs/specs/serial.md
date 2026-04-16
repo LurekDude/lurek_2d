@@ -50,7 +50,7 @@ The new `rle.rs` source file adds `RleEncoder` and `RleDecoder`, a run-length en
 - `to_lua` (`lua_table.rs`): Converts a `SerialValue` tree into a Lua value tree.
 - `from_lua` (`lua_table.rs`): Converts a Lua value tree into a `SerialValue` tree.
 - `encode` (`msgpack.rs`): Encode a `SerialValue` tree to MessagePack bytes.
-- `decode` (`msgpack.rs`): Decode MessagePack bytes into a `SerialValue` tree.
+- `decode` (`msgpack.rs`): Parse an XML string into a `SerialValue` tree.
 - `validate` (`schema.rs`): Validate a `SerialValue` tree against a schema.
 - `from_toml` (`toml.rs`): Parse a TOML string into a `SerialValue`.
 - `to_toml` (`toml.rs`): Serialize a `SerialValue` to a TOML string.

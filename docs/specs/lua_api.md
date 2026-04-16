@@ -231,7 +231,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `register` (`patterns_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`physics_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `LuaStep::new` (`pipeline_api.rs`): Creates a new [`LuaStep`] wrapping the given [`PipelineStep`].
-- `LuaStep::execute_sync` (`pipeline_api.rs`): Executes this step's callback synchronously, handling retries and status transitions.
+- `LuaStep::execute_sync` (`pipeline_api.rs`): Executes this step's callback synchronously, handling retries and status transitions @param crate : parameter @return LuaResult<bool>
 - `LuaPipeline::new` (`pipeline_api.rs`): Creates a new [`LuaPipeline`] wrapping the given [`Pipeline`].
 - `LuaPipeline::from_parts` (`pipeline_api.rs`): Creates a [`LuaPipeline`] from pre-built pipeline and wrapper maps (used by deserialisers).
 - `pipeline_result_to_lua` (`pipeline_api.rs`): Converts a `PipelineResult` to a Lua result table for the `run` return value.
@@ -241,7 +241,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `register` (`pipeline_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`procgen_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `CellularOpts::from_lua_table` (`procgen_api.rs`): from_lua_table.
-- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): from_lua_table.
+- `VoronoiOpts::from_lua_table` (`procgen_api.rs`): from_lua_table @param t : &LuaTable @return LuaResult<Self>
 - `register` (`raycaster_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`render_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `LuaSaveManager::new` (`save_api.rs`): Creates a new empty save manager wrapper.

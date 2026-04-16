@@ -91,19 +91,19 @@ Minor serialisation additions have been made to the save pipeline, improving rou
 - `lurek.save.newSaveManager`: Creates a new SaveManager for slot-based save/load operations.
 
 ### `SaveManager` Methods
-- `SaveManager:unregister`: Removes a named module and its callbacks.
-- `SaveManager:setSchemaVersion`: Sets the current schema version for new saves.
-- `SaveManager:getSchemaVersion`: Returns the current schema version.
-- `SaveManager:collect`: Collects data from all registered collectors into a table with metadata.
-- `SaveManager:restore`: Restores data from a table, applying migrations and calling restorers.
-- `SaveManager:markDirty`: Marks data as modified since the last save or load.
-- `SaveManager:isDirty`: Returns whether data has been modified since the last save or load.
+- `SaveManager:unregister`: Removes a named module and its callbacks
+- `SaveManager:setSchemaVersion`: Sets the current schema version for new saves
+- `SaveManager:getSchemaVersion`: Returns the current schema version
+- `SaveManager:collect`: Collects data from all registered collectors into a table with metadata
+- `SaveManager:restore`: Restores data from a table, applying migrations and calling restorers
+- `SaveManager:markDirty`: Marks data as modified since the last save or load
+- `SaveManager:isDirty`: Returns whether data has been modified since the last save or load
 - `SaveManager:disableAutoSave`: Disables automatic periodic saving; manual `write()` calls still work.
-- `SaveManager:update`: Advances the auto-save timer, returning the slot name if a save should trigger.
-- `SaveManager:setSummary`: Sets the summary string included in save metadata.
-- `SaveManager:getSummary`: Returns the current summary string.
-- `SaveManager:reset`: Resets all state, removing callbacks and clearing the manager.
-- `SaveManager:setCompress`: Enables or disables LZ4 compression for saved data.
+- `SaveManager:update`: Advances the auto-save timer, returning the slot name if a save should trigger
+- `SaveManager:setSummary`: Sets the summary string included in save metadata
+- `SaveManager:getSummary`: Returns the current summary string
+- `SaveManager:reset`: Resets all state, removing callbacks and clearing the manager
+- `SaveManager:setCompress`: Enables or disables LZ4 compression for saved data
 - `SaveManager:isCompressed`: Returns whether compression is currently enabled.
 - `SaveManager:onBeforeSave`: Registers a callback that fires before every save operation.
 - `SaveManager:onAfterLoad`: Registers a callback that fires after every successful load operation.

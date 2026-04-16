@@ -118,32 +118,32 @@ Step execution logic is provided by Lua callbacks; the pipeline module manages o
 - `Pipeline:typeOf`: Returns the type identifier string of this pipeline stage object.
 
 ### `Step` Methods
-- `Step:getName`: Returns the unique name of this step.
-- `Step:setCallback`: Stores a Lua function as the execute callback for this step.
-- `Step:setCondition`: Stores a Lua function (or nil) as the run-condition for this step.
-- `Step:setDelay`: Sets the delay in seconds to wait after dependencies finish.
-- `Step:getDelay`: Returns the configured delay in seconds.
-- `Step:setTimeout`: Stores a timeout in seconds in the step's metadata.
-- `Step:getTimeout`: Returns the timeout stored in metadata, or 0.0 if unset.
-- `Step:setRetryCount`: Sets the maximum number of retry attempts on failure.
-- `Step:getRetryCount`: Returns the configured retry count.
-- `Step:setRetryDelay`: Sets the delay in seconds between retry attempts.
-- `Step:setOptional`: Marks whether this step is optional (downstream steps continue on failure).
-- `Step:isOptional`: Returns whether this step is marked as optional.
-- `Step:setOnError`: Stores a Lua function (or nil) to call if this step fails.
-- `Step:setData`: Stores an arbitrary string value under the given key in step metadata.
-- `Step:getData`: Retrieves a metadata value by key, returning nil if not found.
-- `Step:setTag`: Sets the tag on this step for grouping and filtering.
-- `Step:getTag`: Returns the tag on this step, or nil if unset.
-- `Step:dependsOn`: Adds a dependency on another step by name or PipelineStep. Returns self for chaining.
-- `Step:getDependencies`: Returns the list of dependency step names.
-- `Step:getDependencyCount`: Returns the number of declared dependencies.
-- `Step:getStatus`: Returns the current execution status as a string.
-- `Step:getError`: Returns the error message from the last failed attempt, or nil.
-- `Step:getDuration`: Returns total seconds spent executing this step.
-- `Step:getAttempt`: Returns the number of execution attempts so far.
-- `Step:type`: Returns the type name "PipelineStep".
-- `Step:typeOf`: Returns true when the given name matches "PipelineStep" or a parent type.
+- `Step:getName`: Returns the unique name of this step
+- `Step:setCallback`: Stores a Lua function as the execute callback for this step
+- `Step:setCondition`: Stores a Lua function (or nil) as the run-condition for this step
+- `Step:setDelay`: Sets the delay in seconds to wait after dependencies finish
+- `Step:getDelay`: Returns the configured delay in seconds
+- `Step:setTimeout`: Stores a timeout in seconds in the step's metadata
+- `Step:getTimeout`: Returns the timeout stored in metadata, or 0.0 if unset
+- `Step:setRetryCount`: Sets the maximum number of retry attempts on failure
+- `Step:getRetryCount`: Returns the configured retry count
+- `Step:setRetryDelay`: Sets the delay in seconds between retry attempts
+- `Step:setOptional`: Marks whether this step is optional (downstream steps continue on failure)
+- `Step:isOptional`: Returns whether this step is marked as optional
+- `Step:setOnError`: Stores a Lua function (or nil) to call if this step fails
+- `Step:setData`: Stores an arbitrary string value under the given key in step metadata
+- `Step:getData`: Retrieves a metadata value by key, returning nil if not found
+- `Step:setTag`: Sets the tag on this step for grouping and filtering
+- `Step:getTag`: Returns the tag on this step, or nil if unset
+- `Step:dependsOn`: Adds a dependency on another step by name or PipelineStep. Returns self for chaining
+- `Step:getDependencies`: Returns the list of dependency step names
+- `Step:getDependencyCount`: Returns the number of declared dependencies
+- `Step:getStatus`: Returns the current execution status as a string
+- `Step:getError`: Returns the error message from the last failed attempt, or nil
+- `Step:getDuration`: Returns total seconds spent executing this step
+- `Step:getAttempt`: Returns the number of execution attempts so far
+- `Step:type`: Returns the type name "PipelineStep"
+- `Step:typeOf`: Returns true when the given name matches "PipelineStep" or a parent type
 
 ## References
 
