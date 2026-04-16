@@ -1874,6 +1874,26 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- getMaxCols --
+    /// Returns the maximum number of columns a Terminal can be constructed with.
+    /// @return integer
+    tbl.set(
+        "getMaxCols",
+        lua.create_function(|_, ()| {
+            Ok(crate::terminal::terminal_state::MAX_COLS as u32)
+        })?,
+    )?;
+
+    // -- getMaxRows --
+    /// Returns the maximum number of rows a Terminal can be constructed with.
+    /// @return integer
+    tbl.set(
+        "getMaxRows",
+        lua.create_function(|_, ()| {
+            Ok(crate::terminal::terminal_state::MAX_ROWS as u32)
+        })?,
+    )?;
+
     luna.set("terminal", tbl)?;
     Ok(())
 }

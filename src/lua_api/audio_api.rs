@@ -96,7 +96,11 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
     let rate = match it.next() {
         Some(LuaValue::Integer(n)) => n as u32,
         Some(LuaValue::Number(n)) => n as u32,
-        _ => 44100,
+        _ => {
+            return Err(LuaError::RuntimeError(
+                "newSoundData: sample rate must be a number (e.g. 44100, 48000)".into(),
+            ))
+        }
     };
     let channels = match it.next() {
         Some(LuaValue::Integer(n)) => n as u16,
@@ -993,6 +997,36 @@ impl LuaUserData for LuaMidiPlayer {
         /// @return nil
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
+            Ok(())
+        });
+
+        // -- getSampleRate --
+        /// Returns the PCM output sample rate in Hz.
+        /// @return integer
+        methods.add_method("getSampleRate", |_, this, ()| {
+            Ok(this.inner.borrow().get_output_sample_rate())
+        });
+
+        // -- setSampleRate --
+        /// Sets the PCM output sample rate in Hz (clamped 8000–192000).
+        /// @param rate : integer
+        methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
+            this.inner.borrow_mut().set_output_sample_rate(rate);
+            Ok(())
+        });
+
+        // -- getChannels --
+        /// Returns the PCM output channel count (1 = mono, 2 = stereo).
+        /// @return integer
+        methods.add_method("getChannels", |_, this, ()| {
+            Ok(this.inner.borrow().get_output_channels() as u32)
+        });
+
+        // -- setChannels --
+        /// Sets the PCM output channel count (clamped 1–2).
+        /// @param channels : integer
+        methods.add_method_mut("setChannels", |_, this, channels: u32| {
+            this.inner.borrow_mut().set_output_channels(channels as u16);
             Ok(())
         });
 

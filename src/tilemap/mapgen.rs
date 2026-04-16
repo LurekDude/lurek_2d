@@ -694,12 +694,18 @@ impl MapScript {
 /// # Variants
 /// - `TopDown` — TopDown variant.
 /// - `SideView` — SideView variant.
+/// - `Isometric` — Isometric variant.
+/// - `Hexagonal` — Hexagonal variant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MapOrientation {
-    /// Standard top-down orthogonal.
+    /// Standard top-down orthogonal view.
     TopDown,
-    /// Side-scrolling view.
+    /// Side-scrolling platform view.
     SideView,
+    /// Isometric projection (staggered).
+    Isometric,
+    /// Hexagonal grid layout.
+    Hexagonal,
 }
 
 /// How layers are managed during generation.

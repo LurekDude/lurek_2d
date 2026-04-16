@@ -11,13 +11,13 @@
 
 use super::{Action, Step};
 
-/// Maximum number of steps permitted per script.
+/// Hard upper bound on [`Script`] steps. See also [`Script::step_limit`].
 ///
 /// Steps beyond this limit are silently truncated during [`Script::new`].
 /// The cap prevents unbounded memory allocation from oversized or adversarial
 /// script files (CSF-010 allocation guard). 100 000 steps at ~120 bytes each
 /// is roughly 12 MB per script — a deliberate upper bound.
-const MAX_STEPS: usize = 100_000;
+pub(crate) const MAX_STEPS: usize = 100_000;
 
 /// A named simulation script containing an ordered sequence of timed steps.
 ///
@@ -34,6 +34,7 @@ const MAX_STEPS: usize = 100_000;
 /// - `name` — `String`.
 /// - `description` — `Option<String>`.
 /// - `steps` — `Vec<Step>`.
+/// - `step_limit` — `usize`. Per-instance step cap (default [`MAX_STEPS`]).
 #[derive(Debug, Clone)]
 pub struct Script {
     /// Script name used for lookup in the [`Simulator`](super::Simulator).
@@ -53,6 +54,10 @@ pub struct Script {
     /// [`Simulator`](super::Simulator) scans left-to-right, dispatching each
     /// step when `elapsed >= step.time`.
     pub steps: Vec<Step>,
+    /// Maximum number of steps this script accepts (default [`MAX_STEPS`], max [`MAX_STEPS`]).
+    ///
+    /// Set via [`Script::set_step_limit`]. Clamped to `1..=MAX_STEPS`.
+    step_limit: usize,
 }
 
 impl Script {
@@ -79,6 +84,7 @@ impl Script {
             name: name.into(),
             description: None,
             steps,
+            step_limit: MAX_STEPS,
         }
     }
 
@@ -114,6 +120,26 @@ impl Script {
     /// `usize`.
     pub fn step_count(&self) -> usize {
         self.steps.len()
+    }
+
+    /// Sets the maximum step count for this script (clamped to `1..=MAX_STEPS`).
+    ///
+    /// Immediately truncates `steps` if the new limit is lower than the
+    /// current step count.
+    ///
+    /// # Parameters
+    /// - `limit` — New maximum step count (1 to MAX_STEPS inclusive).
+    pub fn set_step_limit(&mut self, limit: usize) {
+        self.step_limit = limit.clamp(1, MAX_STEPS);
+        self.steps.truncate(self.step_limit);
+    }
+
+    /// Returns the active step limit for this script.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_step_limit(&self) -> usize {
+        self.step_limit
     }
 
     /// Parse a Script from a TOML string.

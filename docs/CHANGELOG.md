@@ -2,6 +2,23 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.16.0] — 2026-04-28
+### Added
+- **tilemap**: `lurek.tilemap.newIsoMap(w, h, tw, th, lh, partCount?)` — optional sixth parameter (default 4) replaces the previous fixed four-part `IsoTile` layout. `IsoTile.parts` is now `Vec<u32>` instead of `[u32;4]`, supporting any part count.
+- **tilemap**: `isomap:getPartCount()`, `isomap:getPartOrder()`, `isomap:setPartOrder(t)` — query and override the per-tile draw order from Lua.
+- **tilemap**: `LargeMapRenderer::new()` now initialises `viewport_w`/`viewport_h` to `0.0`; `visible_chunk_range()` returns the full map extent when the viewport dimensions are zero (safe default for headless tests).
+- **tilemap**: `mapgen.MapOrientation` gains two new variants — `Isometric` and `Hexagonal`. `tilemap:setOrientation("isometric")` / `"hexagonal"` are now accepted; `getOrientation` returns the matching string.
+- **tilemap**: `script:addStep(def)` now maps all eight `StepType` variants: `fillRandom`, `placeBlock`, `placeRandom`, `placeLine`, `floodFill`, `fillArea`, `drawPath`, `fillRect`. Extra step fields `direction`, `pathWidth`, `repeatCount`, `count`, `groupIndex`, `blockIndex`, `tileLayer` are read from the Lua table.
+- **timer**: `lurek.time.setPhysicsMaxSteps(n)` / `getPhysicsMaxSteps()` — configure the per-frame physics sub-step cap (clamped 1–64, default 8). The engine loop reads `SharedState.physics_max_steps` instead of the previous `let max_steps = 8` literal.
+- **audio**: `MidiPlayer:setSampleRate(n)` / `getSampleRate()` — configurable PCM output sample rate (clamped 8 000–192 000 Hz, default 44 100).
+- **audio**: `MidiPlayer:setChannels(n)` / `getChannels()` — configurable PCM output channel count (clamped 1–2, default 2). `SamplesBuffer` construction now uses both fields instead of hardcoded literals.
+- **ai**: `GOAPPlanner:setMaxIterations(n)` / `getMaxIterations()` — configure the A* planning search cap (default 10 000; `0` = unlimited). Replaces the previous `let max_iterations = 10_000` local.
+- **terminal**: `lurek.terminal.getMaxCols()` / `getMaxRows()` — query the hard column and row limits (`512` / `256`) without needing access to Rust constants.
+- **automation**: `lurek.simulator.setStepLimit(name, n)` / `getStepLimit(name)` — configure the per-script step ceiling at runtime (clamped 1–`MAX_STEPS`, default `MAX_STEPS`). `Script.step_limit` replaces the previous module-wide `MAX_STEPS` cap inside `new()`.
+### Changed
+- **audio**: `lurek.audio.newSoundData` now returns a `LuaError` on an unrecognised sample-rate argument instead of silently falling through to `44100`.
+- **render**: GPU geometry buffers emit `log::warn!` at ≥ 90 % capacity for `color_vertex_buffer`, `color_index_buffer`, `tex_vertex_buffer`, and `tex_index_buffer`.
+
 ## [0.15.0] — 2026-04-25
 ### Added
 - **ui**: `src/ui/layout_loader.rs` — new domain module `layout_loader` with three public functions:

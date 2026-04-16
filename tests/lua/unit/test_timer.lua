@@ -479,4 +479,56 @@ describe("lurek.time coroutine wait support", function()
     end)
 end)
 
-test_summary()
+-- =========================================================================
+-- physicsMaxSteps configurability (PR-4)
+-- =========================================================================
+
+-- @description Covers suite: lurek.time physics max steps configurability.
+describe("lurek.time physicsMaxSteps configurability", function()
+    -- @covers lurek.time.getPhysicsMaxSteps
+    -- @description Verifies getPhysicsMaxSteps is exported as a callable function.
+    it("getPhysicsMaxSteps is a function", function()
+        expect_type("function", lurek.time.getPhysicsMaxSteps)
+    end)
+
+    -- @covers lurek.time.setPhysicsMaxSteps
+    -- @description Verifies setPhysicsMaxSteps is exported as a callable function.
+    it("setPhysicsMaxSteps is a function", function()
+        expect_type("function", lurek.time.setPhysicsMaxSteps)
+    end)
+
+    -- @covers lurek.time.getPhysicsMaxSteps
+    -- @description Confirms the default physics max steps value is 8 on a fresh VM.
+    it("getPhysicsMaxSteps_default_is_8", function()
+        local steps = lurek.time.getPhysicsMaxSteps()
+        expect_equal(8, steps)
+    end)
+
+    -- @covers lurek.time.setPhysicsMaxSteps
+    -- @covers lurek.time.getPhysicsMaxSteps
+    -- @description Sets a new physics max steps value and reads it back to verify round-trip fidelity.
+    it("setPhysicsMaxSteps_roundtrips_value", function()
+        lurek.time.setPhysicsMaxSteps(16)
+        expect_equal(16, lurek.time.getPhysicsMaxSteps())
+        lurek.time.setPhysicsMaxSteps(8) -- restore default
+    end)
+
+    -- @covers lurek.time.setPhysicsMaxSteps
+    -- @covers lurek.time.getPhysicsMaxSteps
+    -- @description Passes 0 (below minimum); the engine must clamp the stored value to 1.
+    it("setPhysicsMaxSteps_clamps_below_minimum_to_1", function()
+        lurek.time.setPhysicsMaxSteps(0)
+        expect_equal(1, lurek.time.getPhysicsMaxSteps())
+        lurek.time.setPhysicsMaxSteps(8) -- restore default
+    end)
+
+    -- @covers lurek.time.setPhysicsMaxSteps
+    -- @covers lurek.time.getPhysicsMaxSteps
+    -- @description Passes 999 (above maximum); the engine must clamp the stored value to 64.
+    it("setPhysicsMaxSteps_clamps_above_maximum_to_64", function()
+        lurek.time.setPhysicsMaxSteps(999)
+        expect_equal(64, lurek.time.getPhysicsMaxSteps())
+        lurek.time.setPhysicsMaxSteps(8) -- restore default
+    end)
+end)
+

@@ -1423,6 +1423,231 @@ describe("lurek.tilemap.newIsoMap", function()
 end)
 
 -- =========================================================================
+-- IsoMap partCount configurability (PR-1)
+-- =========================================================================
+
+-- @description Covers suite: lurek.tilemap IsoMap partCount configurability.
+describe("lurek.tilemap IsoMap partCount configurability", function()
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:getPartCount
+    -- @description Creates an IsoMap without the optional 6th argument; getPartCount must return the default of 4.
+    it("isomap_default_partCount_is_4", function()
+        local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
+        expect_equal(4, iso:getPartCount())
+    end)
+
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:getPartCount
+    -- @description Creates an IsoMap with an explicit partCount of 3 and verifies getPartCount returns 3.
+    it("isomap_explicit_partCount_is_stored", function()
+        local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24, 3)
+        expect_equal(3, iso:getPartCount())
+    end)
+
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:getPartOrder
+    -- @description Verifies getPartOrder returns a Lua table for an IsoMap with the default part count.
+    it("isomap_getPartOrder_returns_table", function()
+        local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
+        local order = iso:getPartOrder()
+        expect_type("table", order)
+    end)
+
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:getPartCount
+    -- @covers IsoMap:getPartOrder
+    -- @description Confirms the length of the table returned by getPartOrder equals getPartCount.
+    it("isomap_getPartOrder_length_equals_partCount", function()
+        local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
+        local order = iso:getPartOrder()
+        expect_equal(iso:getPartCount(), #order)
+    end)
+
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:setPartOrder
+    -- @covers IsoMap:getPartOrder
+    -- @description Sets a custom draw order and verifies the first element reflects the new ordering.
+    it("isomap_setPartOrder_reorders_draw_order", function()
+        local iso = lurek.tilemap.newIsoMap(8, 8, 64, 32, 24)
+        iso:setPartOrder({4, 3, 2, 1})
+        local order = iso:getPartOrder()
+        expect_equal(4, order[1])
+        expect_equal(1, order[4])
+    end)
+
+    -- @covers lurek.tilemap.newIsoMap
+    -- @covers IsoMap:getPartCount
+    -- @covers IsoMap:getPartOrder
+    -- @description Creates an IsoMap with partCount=2 and confirms getPartOrder returns a 2-element table.
+    it("isomap_partCount_2_gives_order_of_length_2", function()
+        local iso = lurek.tilemap.newIsoMap(4, 4, 64, 32, 24, 2)
+        local order = iso:getPartOrder()
+        expect_equal(2, #order)
+    end)
+end)
+
+-- =========================================================================
+-- TileMap orientation (PR-2)
+-- =========================================================================
+
+-- @description Covers suite: lurek.tilemap TileMap orientation configurability.
+describe("lurek.tilemap TileMap orientation", function()
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:getOrientation
+    -- @description Verifies a freshly-created TileMap reports the default orientation as "topdown".
+    it("tilemap_default_orientation_is_topdown", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        expect_equal("topdown", tm:getOrientation())
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:setOrientation
+    -- @covers TileMap:getOrientation
+    -- @description Sets orientation to "topdown" and reads it back.
+    it("tilemap_setOrientation_topdown_roundtrips", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        tm:setOrientation("topdown")
+        expect_equal("topdown", tm:getOrientation())
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:setOrientation
+    -- @covers TileMap:getOrientation
+    -- @description Sets orientation to "sideview" and reads it back.
+    it("tilemap_setOrientation_sideview_roundtrips", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        tm:setOrientation("sideview")
+        expect_equal("sideview", tm:getOrientation())
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:setOrientation
+    -- @covers TileMap:getOrientation
+    -- @description Sets orientation to "isometric" and reads it back.
+    it("tilemap_setOrientation_isometric_roundtrips", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        tm:setOrientation("isometric")
+        expect_equal("isometric", tm:getOrientation())
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:setOrientation
+    -- @covers TileMap:getOrientation
+    -- @description Sets orientation to "hexagonal" and reads it back.
+    it("tilemap_setOrientation_hexagonal_roundtrips", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        tm:setOrientation("hexagonal")
+        expect_equal("hexagonal", tm:getOrientation())
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:setOrientation
+    -- @description Passes an unknown orientation string; the engine must return an error.
+    it("tilemap_setOrientation_unknown_errors", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        expect_error(function()
+            tm:setOrientation("diagonal")
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers TileMap:getOrientation
+    -- @description Confirms getOrientation returns a string type.
+    it("tilemap_getOrientation_returns_string", function()
+        local tm = lurek.tilemap.newTileMap(32, 32)
+        expect_type("string", tm:getOrientation())
+    end)
+end)
+
+-- =========================================================================
+-- MapScript addStep type coverage (PR-3)
+-- =========================================================================
+
+-- @description Covers suite: lurek.tilemap MapScript addStep type coverage.
+describe("lurek.tilemap MapScript addStep type coverage", function()
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Verifies addStep accepts the "placeRandom" step type without error.
+    it("addStep_placeRandom_does_not_error", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_no_error(function()
+            script:addStep({type = "placeRandom", gid = 1, count = 5})
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Verifies addStep accepts the "placeLine" step type without error.
+    it("addStep_placeLine_does_not_error", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_no_error(function()
+            script:addStep({type = "placeLine", gid = 1, x1 = 0, y1 = 0, x2 = 3, y2 = 3})
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Verifies addStep accepts the "floodFill" step type without error.
+    it("addStep_floodFill_does_not_error", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_no_error(function()
+            script:addStep({type = "floodFill", gid = 2, x = 0, y = 0})
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Verifies addStep accepts the "drawPath" step type without error.
+    it("addStep_drawPath_does_not_error", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_no_error(function()
+            script:addStep({type = "drawPath", gid = 1, points = {{0,0},{1,1}}})
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Verifies addStep accepts the "fillRect" step type without error.
+    it("addStep_fillRect_does_not_error", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_no_error(function()
+            script:addStep({type = "fillRect", gid = 3, x = 0, y = 0, w = 4, h = 4})
+        end)
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Confirms all 8 documented step types can be added; the step count must reach 8.
+    it("addStep_all_8_types_accepted", function()
+        local script = lurek.tilemap.newMapScript()
+        local types = {
+            {type = "fillRandom",  gid = 1, chance = 0.5},
+            {type = "placeBlock",  x = 0, y = 0},
+            {type = "placeRandom", gid = 1, count = 3},
+            {type = "placeLine",   gid = 1, x1 = 0, y1 = 0, x2 = 2, y2 = 2},
+            {type = "floodFill",   gid = 2, x = 0, y = 0},
+            {type = "fillArea",    gid = 1, x = 0, y = 0, w = 2, h = 2},
+            {type = "drawPath",    gid = 1, points = {{0,0},{1,1}}},
+            {type = "fillRect",    gid = 1, x = 0, y = 0, w = 2, h = 2},
+        }
+        for _, step in ipairs(types) do
+            script:addStep(step)
+        end
+        expect_equal(8, script:getStepCount())
+    end)
+
+    -- @covers lurek.tilemap.newMapScript
+    -- @covers MapScript:addStep
+    -- @description Passes an unknown step type string; the engine must return an error.
+    it("addStep_unknown_type_errors", function()
+        local script = lurek.tilemap.newMapScript()
+        expect_error(function()
+            script:addStep({type = "teleport", gid = 1})
+        end)
+    end)
+end)
+
+-- =========================================================================
 -- Map Generation
 -- =========================================================================
 

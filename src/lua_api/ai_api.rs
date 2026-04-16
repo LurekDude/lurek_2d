@@ -1456,6 +1456,21 @@ impl LuaUserData for LuaGOAPPlanner {
             Ok(this.inner.borrow().goals.len())
         });
 
+        // -- getMaxIterations --
+        /// Returns the maximum A* planning iterations.
+        /// @return integer
+        methods.add_method("getMaxIterations", |_, this, ()| {
+            Ok(this.inner.borrow().get_max_iterations() as u64)
+        });
+
+        // -- setMaxIterations --
+        /// Sets the maximum A* planning iterations (0 = unlimited).
+        /// @param n : integer
+        methods.add_method_mut("setMaxIterations", |_, this, n: u64| {
+            this.inner.borrow_mut().set_max_iterations(n as usize);
+            Ok(())
+        });
+
         // -- type --
         /// Returns the type name of this object.
         /// @return string

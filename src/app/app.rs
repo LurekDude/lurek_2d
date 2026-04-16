@@ -843,8 +843,8 @@ impl LunaApp {
         {
             let fixed_dt = state.borrow().physics_fixed_dt;
             self.physics_accumulator += dt;
-            // Safety cap: max 8 physics steps per frame to avoid spiral of death.
-            let max_steps = 8;
+            // Safety cap: read from shared state, defaults to 8.
+            let max_steps = state.borrow().physics_max_steps as usize;
             let mut steps = 0;
             while self.physics_accumulator >= fixed_dt && steps < max_steps {
                 self.physics_accumulator -= fixed_dt;

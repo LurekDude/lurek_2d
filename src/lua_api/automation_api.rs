@@ -251,6 +251,32 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // ── getStepLimit ─────────────────────────────────────────────────────────
+    /// Returns the step limit for the named script, or nil if not found.
+    /// @param name : string
+    /// @return integer?
+    let sim = simulator.clone();
+    tbl.set(
+        "getStepLimit",
+        lua.create_function(move |_, name: String| {
+            Ok(sim.borrow().get_script_step_limit(&name).map(|v| v as u64))
+        })?,
+    )?;
+
+    // ── setStepLimit ─────────────────────────────────────────────────────────
+    /// Sets the step limit for the named script (clamped to 1..MAX_STEPS).
+    /// Returns true if the script was found, false otherwise.
+    /// @param name : string
+    /// @param n : integer
+    /// @return boolean
+    let sim = simulator.clone();
+    tbl.set(
+        "setStepLimit",
+        lua.create_function(move |_, (name, n): (String, u64)| {
+            Ok(sim.borrow_mut().set_script_step_limit(&name, n as usize))
+        })?,
+    )?;
+
     // ── saveMacro ─────────────────────────────────────────────────────────────────────────
     /// Saves a currently-loaded script under a macro name for fast replay.
     /// The script must already be loaded via `load` or `loadFromToml`.

@@ -364,6 +364,10 @@ pub struct SharedState {
     pub light_world: LightWorld,
     /// Fixed time-step for `process_physics` callback, in seconds (default 1/60).
     pub physics_fixed_dt: f64,
+    /// Maximum physics sub-steps per frame (spiral-of-death guard). Default 8.
+    ///
+    /// Clamped to the range 1–64 when set via the Lua API.
+    pub physics_max_steps: u32,
     /// Fixed time-step for the `fixedUpdate` Lua callback, in seconds.
     ///
     /// `0.0` means the fixed-update loop is disabled.  Set from
@@ -476,6 +480,7 @@ impl SharedState {
             depth_mode: (DepthMode::Always, false),
             light_world: LightWorld::new(),
             physics_fixed_dt: 1.0 / 60.0,
+            physics_max_steps: 8,
             fixed_update_dt: 0.0,
             physics_debug_draw: false,
             auto_parallax_layers: Vec::new(),

@@ -3619,6 +3619,38 @@ impl GpuRenderer {
             draws = merged;
         }
 
+        // ── Buffer saturation diagnostics (warn at ≥90% capacity) ───────────────────────────────
+        {
+            let color_v_pct = all_color_verts.len() * 100 / MAX_COLOR_VERTS as usize;
+            if color_v_pct >= 90 {
+                log::warn!(
+                    "[G003] color vertex buffer at {}% capacity ({}/{}) — consider reducing draw calls or increasing MAX_COLOR_VERTS",
+                    color_v_pct, all_color_verts.len(), MAX_COLOR_VERTS
+                );
+            }
+            let color_i_pct = all_color_idxs.len() * 100 / MAX_COLOR_IDXS as usize;
+            if color_i_pct >= 90 {
+                log::warn!(
+                    "[G003] color index buffer at {}% capacity ({}/{}) — consider reducing draw calls or increasing MAX_COLOR_IDXS",
+                    color_i_pct, all_color_idxs.len(), MAX_COLOR_IDXS
+                );
+            }
+            let tex_v_pct = all_tex_verts.len() * 100 / MAX_TEX_VERTS as usize;
+            if tex_v_pct >= 90 {
+                log::warn!(
+                    "[G003] tex vertex buffer at {}% capacity ({}/{}) — consider reducing sprite draws or increasing MAX_TEX_VERTS",
+                    tex_v_pct, all_tex_verts.len(), MAX_TEX_VERTS
+                );
+            }
+            let tex_i_pct = all_tex_idxs.len() * 100 / MAX_TEX_IDXS as usize;
+            if tex_i_pct >= 90 {
+                log::warn!(
+                    "[G003] tex index buffer at {}% capacity ({}/{}) — consider reducing sprite draws or increasing MAX_TEX_IDXS",
+                    tex_i_pct, all_tex_idxs.len(), MAX_TEX_IDXS
+                );
+            }
+        }
+
         // Write geometry data to GPU buffers.
         if !all_color_verts.is_empty() {
             self.queue.write_buffer(

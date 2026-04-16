@@ -640,4 +640,48 @@ describe("terminal widget lookup helpers (RS parity)", function()
         expect_false(r)
     end)
 end)
+
+-- =========================================================================
+-- terminal max dimensions (PR-7)
+-- =========================================================================
+
+-- @description Covers suite: lurek.terminal queryable max dimensions.
+describe("lurek.terminal max dimensions", function()
+    -- @covers lurek.terminal.getMaxCols
+    -- @description Verifies getMaxCols is exported as a callable function on the terminal namespace.
+    it("getMaxCols_is_a_function", function()
+        expect_type("function", lurek.terminal.getMaxCols)
+    end)
+
+    -- @covers lurek.terminal.getMaxRows
+    -- @description Verifies getMaxRows is exported as a callable function on the terminal namespace.
+    it("getMaxRows_is_a_function", function()
+        expect_type("function", lurek.terminal.getMaxRows)
+    end)
+
+    -- @covers lurek.terminal.getMaxCols
+    -- @description Confirms the engine-wide maximum column count constant is 512.
+    it("getMaxCols_returns_512", function()
+        expect_equal(512, lurek.terminal.getMaxCols())
+    end)
+
+    -- @covers lurek.terminal.getMaxRows
+    -- @description Confirms the engine-wide maximum row count constant is 256.
+    it("getMaxRows_returns_256", function()
+        expect_equal(256, lurek.terminal.getMaxRows())
+    end)
+
+    -- @covers lurek.terminal.getMaxCols
+    -- @description Confirms getMaxCols returns a number type.
+    it("getMaxCols_return_type_is_number", function()
+        expect_type("number", lurek.terminal.getMaxCols())
+    end)
+
+    -- @covers lurek.terminal.getMaxRows
+    -- @description Confirms getMaxRows returns a number type.
+    it("getMaxRows_return_type_is_number", function()
+        expect_type("number", lurek.terminal.getMaxRows())
+    end)
+end)
+
 test_summary()

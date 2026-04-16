@@ -87,6 +87,12 @@ pub struct MidiPlayer {
     sink: Option<rodio::Sink>,
     play_state: PlayState,
     bus_key: Option<BusKey>,
+    /// PCM output sample rate in Hz. Default 44100.
+    ///
+    /// Clamped to 8000–192000 by `set_output_sample_rate`.
+    output_sample_rate: u32,
+    /// PCM output channel count. Default 2 (stereo). Range: 1–2.
+    output_channels: u16,
 }
 
 impl Default for MidiPlayer {
@@ -117,6 +123,8 @@ impl MidiPlayer {
             sink: None,
             play_state: PlayState::Stopped,
             bus_key: None,
+            output_sample_rate: 44100,
+            output_channels: 2,
         }
     }
 
@@ -192,7 +200,7 @@ impl MidiPlayer {
             return;
         }
 
-        let buffer = rodio::buffer::SamplesBuffer::new(2, 44100, pcm);
+        let buffer = rodio::buffer::SamplesBuffer::new(self.output_channels, self.output_sample_rate, pcm);
 
         if let Ok(sink) = rodio::Sink::try_new(stream_handle) {
             sink.set_volume(self.volume);
@@ -520,7 +528,39 @@ impl MidiPlayer {
         self.play_state
     }
 
-    /// Renders the loaded MIDI to a stereo 16-bit PCM buffer at 44100 Hz.
+    /// Returns the PCM output sample rate in Hz.
+    ///
+    /// # Returns
+    /// `u32`.
+    pub fn get_output_sample_rate(&self) -> u32 {
+        self.output_sample_rate
+    }
+
+    /// Sets the PCM output sample rate in Hz (clamped to 8000–192000).
+    ///
+    /// # Parameters
+    /// - `rate` — `u32`.
+    pub fn set_output_sample_rate(&mut self, rate: u32) {
+        self.output_sample_rate = rate.clamp(8000, 192_000);
+    }
+
+    /// Returns the PCM output channel count (1 = mono, 2 = stereo).
+    ///
+    /// # Returns
+    /// `u16`.
+    pub fn get_output_channels(&self) -> u16 {
+        self.output_channels
+    }
+
+    /// Sets the PCM output channel count (clamped to 1–2).
+    ///
+    /// # Parameters
+    /// - `channels` — `u16`.
+    pub fn set_output_channels(&mut self, channels: u16) {
+        self.output_channels = channels.clamp(1, 2);
+    }
+
+    /// Renders the loaded MIDI to a PCM buffer at the configured output sample rate and channel count.
     ///
     /// Uses sine-additive synthesis: each active note generates a sine wave
     /// at the MIDI note frequency, amplitude scaled by `velocity/127` and channel volume.

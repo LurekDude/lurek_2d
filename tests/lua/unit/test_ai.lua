@@ -1712,5 +1712,50 @@ describe("lurek.ai type system", function()
     end)
 end)
 
+-- =========================================================================
+-- GOAPPlanner maxIterations configurability (PR-10)
+-- =========================================================================
+
+-- @description Covers suite: lurek.ai GOAPPlanner maxIterations configurability.
+describe("lurek.ai GOAPPlanner maxIterations configurability", function()
+    -- @covers lurek.ai.newGOAPPlanner
+    -- @covers GOAPPlanner:getMaxIterations
+    -- @description Confirms the default A* iteration cap for a freshly-created GOAP planner is 10000.
+    it("goap_getMaxIterations_default_is_10000", function()
+        local g = lurek.ai.newGOAPPlanner()
+        expect_equal(10000, g:getMaxIterations())
+    end)
+
+    -- @covers lurek.ai.newGOAPPlanner
+    -- @covers GOAPPlanner:setMaxIterations
+    -- @covers GOAPPlanner:getMaxIterations
+    -- @description Sets a new iteration cap and reads it back to verify round-trip fidelity.
+    it("goap_setMaxIterations_roundtrips_value", function()
+        local g = lurek.ai.newGOAPPlanner()
+        g:setMaxIterations(500)
+        expect_equal(500, g:getMaxIterations())
+    end)
+
+    -- @covers lurek.ai.newGOAPPlanner
+    -- @covers GOAPPlanner:setMaxIterations
+    -- @covers GOAPPlanner:getMaxIterations
+    -- @description Sets the iteration cap to 1 to verify extreme low values are accepted.
+    it("goap_setMaxIterations_accepts_small_value", function()
+        local g = lurek.ai.newGOAPPlanner()
+        g:setMaxIterations(1)
+        expect_equal(1, g:getMaxIterations())
+    end)
+
+    -- @covers lurek.ai.newGOAPPlanner
+    -- @covers GOAPPlanner:setMaxIterations
+    -- @covers GOAPPlanner:getMaxIterations
+    -- @description Sets a very large iteration cap to confirm there is no hard upper bound that silently truncates.
+    it("goap_setMaxIterations_accepts_large_value", function()
+        local g = lurek.ai.newGOAPPlanner()
+        g:setMaxIterations(100000)
+        expect_equal(100000, g:getMaxIterations())
+    end)
+end)
+
 -- Print summary
 test_summary()

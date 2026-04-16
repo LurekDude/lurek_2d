@@ -398,6 +398,27 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         })?,
     )?;
 
+    // -- getPhysicsMaxSteps --
+    /// Returns the maximum number of physics sub-steps allowed per frame.
+    /// @return integer
+    let s = state.clone();
+    tbl.set(
+        "getPhysicsMaxSteps",
+        lua.create_function(move |_, ()| Ok(s.borrow().physics_max_steps))?,
+    )?;
+
+    // -- setPhysicsMaxSteps --
+    /// Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64).
+    /// @param n : integer
+    let s = state.clone();
+    tbl.set(
+        "setPhysicsMaxSteps",
+        lua.create_function(move |_, n: u32| {
+            s.borrow_mut().physics_max_steps = n.clamp(1, 64);
+            Ok(())
+        })?,
+    )?;
+
     // -- sleep --
     /// Suspends execution for the given number of seconds.
     /// @param seconds : number

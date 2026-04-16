@@ -365,6 +365,38 @@ impl Simulator {
         self.scripts.get(name).cloned()
     }
 
+    /// Return the step limit for the named script.
+    ///
+    /// Returns `None` if no script with that name is registered.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    ///
+    /// # Returns
+    /// `Option<usize>`.
+    pub fn get_script_step_limit(&self, name: &str) -> Option<usize> {
+        self.scripts.get(name).map(|s| s.get_step_limit())
+    }
+
+    /// Set the step limit for the named script (clamped to `1..=MAX_STEPS`).
+    ///
+    /// Returns `false` if no script with that name is registered.
+    ///
+    /// # Parameters
+    /// - `name` — `&str`.
+    /// - `limit` — `usize`.
+    ///
+    /// # Returns
+    /// `bool`.
+    pub fn set_script_step_limit(&mut self, name: &str, limit: usize) -> bool {
+        if let Some(script) = self.scripts.get_mut(name) {
+            script.set_step_limit(limit);
+            true
+        } else {
+            false
+        }
+    }
+
     /// Save a [`Script`] under a named macro key for later replay.
     ///
     /// The macro is stored separately from the main script registry. Calling

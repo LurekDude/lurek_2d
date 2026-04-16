@@ -569,4 +569,125 @@ describe("Bus UserData", function()
         expect_false(bus:typeOf("Source"))
     end)
 end)
+
+-- =========================================================================
+-- newSoundData guard (PR-4)
+-- =========================================================================
+
+-- @description Covers suite: lurek.audio newSoundData input validation guard.
+describe("lurek.audio newSoundData guard", function()
+    -- @covers lurek.audio.newSoundData
+    -- @description Passing a string literal for sample rate must now return an error instead of silently defaulting to 44100.
+    it("newSoundData_invalid_sample_rate_string_errors", function()
+        expect_error(function()
+            lurek.audio.newSoundData(64, "invalid")
+        end)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @description Passing a boolean for sample rate must also trigger the validation error.
+    it("newSoundData_boolean_sample_rate_errors", function()
+        expect_error(function()
+            lurek.audio.newSoundData(64, true)
+        end)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @description A valid integer count and numeric sample rate must succeed without error.
+    it("newSoundData_valid_args_succeeds", function()
+        expect_no_error(function()
+            lurek.audio.newSoundData(64, 44100, 1)
+        end)
+    end)
+end)
+
+-- =========================================================================
+-- MidiPlayer sample rate and channels (PR-5)
+-- =========================================================================
+
+-- @description Covers suite: lurek.audio MidiPlayer rate and channels configurability.
+describe("lurek.audio MidiPlayer rate and channels", function()
+    -- @covers lurek.audio.newMidiPlayer
+    -- @description Confirms the MidiPlayer factory is exported as a callable function.
+    it("newMidiPlayer is a function", function()
+        expect_type("function", lurek.audio.newMidiPlayer)
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:getSampleRate
+    -- @description Verifies the default output sample rate of a freshly-created MidiPlayer is 44100 Hz.
+    it("midi_getSampleRate_default_is_44100", function()
+        local midi = lurek.audio.newMidiPlayer()
+        expect_equal(44100, midi:getSampleRate())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
+    -- @description Sets a sample rate within the valid range and reads it back to confirm round-trip fidelity.
+    it("midi_setSampleRate_roundtrips_value", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setSampleRate(48000)
+        expect_equal(48000, midi:getSampleRate())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
+    -- @description Passes a value below 8000; the engine must clamp it to 8000.
+    it("midi_setSampleRate_clamps_below_8000_to_8000", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setSampleRate(100)
+        expect_equal(8000, midi:getSampleRate())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
+    -- @description Passes a value above 192000; the engine must clamp it to 192000.
+    it("midi_setSampleRate_clamps_above_192000_to_192000", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setSampleRate(999999)
+        expect_equal(192000, midi:getSampleRate())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:getChannels
+    -- @description Confirms the default output channel count of a freshly-created MidiPlayer is 2 (stereo).
+    it("midi_getChannels_default_is_2", function()
+        local midi = lurek.audio.newMidiPlayer()
+        expect_equal(2, midi:getChannels())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
+    -- @description Sets the channel count to 1 (mono) and verifies it is stored correctly.
+    it("midi_setChannels_accepts_1_mono", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setChannels(1)
+        expect_equal(1, midi:getChannels())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
+    -- @description Sets the channel count to 2 (stereo) and verifies it is stored correctly.
+    it("midi_setChannels_accepts_2_stereo", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setChannels(2)
+        expect_equal(2, midi:getChannels())
+    end)
+
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
+    -- @description Passes 5 (above the maximum of 2); the engine must clamp it to 2.
+    it("midi_setChannels_clamps_above_2_to_2", function()
+        local midi = lurek.audio.newMidiPlayer()
+        midi:setChannels(5)
+        expect_equal(2, midi:getChannels())
+    end)
+end)
+
 test_summary()

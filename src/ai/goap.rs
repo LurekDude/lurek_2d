@@ -144,6 +144,10 @@ pub struct GOAPPlanner {
     pub actions: Vec<GOAPAction>,
     /// Goals the planner can target, selected by highest priority.
     pub goals: Vec<GOAPGoal>,
+    /// Maximum A* iterations per planning call. Default 10 000. Zero is treated as unlimited.
+    ///
+    /// Set via `set_max_iterations`. Used in `plan_for_goal` to cap the search loop.
+    pub max_iterations: usize,
 }
 
 impl GOAPPlanner {
@@ -156,6 +160,7 @@ impl GOAPPlanner {
         Self {
             actions: Vec::new(),
             goals: Vec::new(),
+            max_iterations: 10_000,
         }
     }
 
@@ -222,7 +227,7 @@ impl GOAPPlanner {
         });
 
         let mut iterations = 0;
-        let max_iterations = 10_000;
+        let max_iterations = self.max_iterations;
 
         while let Some(current) = open.pop() {
             iterations += 1;
@@ -346,6 +351,22 @@ impl GOAPPlanner {
         if let Some(g) = self.goals.iter_mut().find(|g| g.name == goal_name) {
             g.state.insert(key, value);
         }
+    }
+
+    /// Returns the maximum A* planning iterations.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn get_max_iterations(&self) -> usize {
+        self.max_iterations
+    }
+
+    /// Sets the maximum A* planning iterations. A value of `0` means unlimited.
+    ///
+    /// # Parameters
+    /// - `n` — `usize`.
+    pub fn set_max_iterations(&mut self, n: usize) {
+        self.max_iterations = n;
     }
 }
 

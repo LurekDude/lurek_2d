@@ -755,4 +755,66 @@ describe("lurek.simulator waitUntil", function()
     end)
 end)
 
-test_summary()
+-- =========================================================================
+-- simulator step limit (PR-8)
+-- =========================================================================
+
+-- @description Covers suite: lurek.simulator step limit configurability.
+describe("lurek.simulator step limit", function()
+    -- @covers lurek.simulator.getStepLimit
+    -- @description Verifies getStepLimit is exported as a callable function on the simulator namespace.
+    it("getStepLimit_is_a_function", function()
+        expect_type("function", lurek.simulator.getStepLimit)
+    end)
+
+    -- @covers lurek.simulator.setStepLimit
+    -- @description Verifies setStepLimit is exported as a callable function on the simulator namespace.
+    it("setStepLimit_is_a_function", function()
+        expect_type("function", lurek.simulator.setStepLimit)
+    end)
+
+    -- @covers lurek.simulator.getStepLimit
+    -- @description Returns nil for a script name that has not been registered.
+    it("getStepLimit_returns_nil_for_unregistered_script", function()
+        local result = lurek.simulator.getStepLimit("nonexistent_script_xyz")
+        expect_nil(result)
+    end)
+
+    -- @covers lurek.simulator.load
+    -- @covers lurek.simulator.setStepLimit
+    -- @covers lurek.simulator.getStepLimit
+    -- @covers lurek.simulator.unload
+    -- @description Loads a script, sets its step limit, and reads it back to verify round-trip fidelity.
+    it("setStepLimit_registers_on_a_loaded_script", function()
+        lurek.simulator.load("step_limit_test", {
+            steps = { { action = "key", key = "a", time = 0.01 } }
+        })
+        local ok = lurek.simulator.setStepLimit("step_limit_test", 50)
+        expect_true(ok)
+        expect_equal(50, lurek.simulator.getStepLimit("step_limit_test"))
+        lurek.simulator.unload("step_limit_test")
+    end)
+
+    -- @covers lurek.simulator.setStepLimit
+    -- @description Returns false when the named script is not found.
+    it("setStepLimit_returns_false_for_unknown_script", function()
+        local ok = lurek.simulator.setStepLimit("no_such_script", 10)
+        expect_false(ok)
+    end)
+
+    -- @covers lurek.simulator.load
+    -- @covers lurek.simulator.setStepLimit
+    -- @covers lurek.simulator.getStepLimit
+    -- @covers lurek.simulator.unload
+    -- @description Overwrites an existing step limit with a new value and verifies the stored value updates.
+    it("setStepLimit_overwrites_previous_value", function()
+        lurek.simulator.load("sl_overwrite", {
+            steps = { { action = "key", key = "b", time = 0.01 } }
+        })
+        lurek.simulator.setStepLimit("sl_overwrite", 25)
+        lurek.simulator.setStepLimit("sl_overwrite", 99)
+        expect_equal(99, lurek.simulator.getStepLimit("sl_overwrite"))
+        lurek.simulator.unload("sl_overwrite")
+    end)
+end)
+

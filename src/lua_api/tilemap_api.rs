@@ -695,24 +695,31 @@ impl LuaUserData for LuaTileMap {
         );
 
         // -- getOrientation --
-        /// Returns the map orientation as a string ("topdown" or "sideview").
+        /// Returns the map orientation as a string ("topdown", "sideview", "isometric", or "hexagonal").
         /// @return string
         methods.add_method("getOrientation", |_, this, ()| {
             let o = this.inner.borrow().get_orientation();
             Ok(match o {
-                MapOrientation::TopDown => "topdown",
-                MapOrientation::SideView => "sideview",
+                MapOrientation::TopDown   => "topdown",
+                MapOrientation::SideView  => "sideview",
+                MapOrientation::Isometric => "isometric",
+                MapOrientation::Hexagonal => "hexagonal",
             })
         });
 
         // -- setOrientation --
-        /// Sets the map orientation from a string ("topdown" or "sideview").
+        /// Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
         /// @param orientation : string
         /// @return nil
         methods.add_method("setOrientation", |_, this, orientation: String| {
             let o = match orientation.as_str() {
-                "sideview" => MapOrientation::SideView,
-                _ => MapOrientation::TopDown,
+                "topdown"    => MapOrientation::TopDown,
+                "sideview"   => MapOrientation::SideView,
+                "isometric"  => MapOrientation::Isometric,
+                "hexagonal"  => MapOrientation::Hexagonal,
+                other => return Err(LuaError::RuntimeError(format!(
+                    "setOrientation: unknown '{}' (valid: topdown, sideview, isometric, hexagonal)", other
+                ))),
             };
             this.inner.borrow_mut().set_orientation(o);
             Ok(())
@@ -1401,6 +1408,37 @@ impl LuaUserData for LuaIsoMap {
             let (tx, ty) = this.inner.borrow().screen_to_tile(sx, sy);
             Ok((tx, ty))
         });
+
+        // -- getPartCount --
+        /// Returns the number of GID slots per tile.
+        /// @return integer
+        methods.add_method("getPartCount", |_, this, ()| {
+            Ok(this.inner.borrow().get_part_count())
+        });
+
+        // -- getPartOrder --
+        /// Returns the current draw-order array (0-based part slot indices).
+        /// @return table
+        methods.add_method("getPartOrder", |lua, this, ()| {
+            let order = this.inner.borrow().get_part_order().to_vec();
+            let tbl = lua.create_table()?;
+            for (i, &idx) in order.iter().enumerate() {
+                tbl.set(i + 1, idx)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- setPartOrder --
+        /// Overrides the draw order for this IsoMap. Length must equal partCount.
+        /// Each value is a 0-based part slot index.
+        /// @param order : table
+        /// @return nil
+        methods.add_method_mut("setPartOrder", |_, this, order: Vec<u32>| {
+            this.inner
+                .borrow_mut()
+                .set_part_order(order)
+                .map_err(LuaError::external)
+        });
     }
 }
 
@@ -1641,18 +1679,24 @@ impl LuaUserData for LuaMapScript {
 
         // -- addStep --
         /// Appends a generation step from a step-definition table.
-        /// Accepted type strings: "fillRandom", "placeBlock", "fillArea".
-        /// @param stepDef : table  {type, x?, y?, w?, h?, gid?, chance?}
+        /// Accepted type strings: "fillRandom", "placeBlock", "placeRandom", "placeLine",
+        /// "floodFill", "fillArea", "drawPath", "fillRect".
+        /// @param stepDef : table  {type, x?, y?, w?, h?, gid?, chance?, direction?, pathWidth?, repeatCount?, count?, groupIndex?, blockIndex?, tileLayer?}
         /// @return nil
         methods.add_method("addStep", |_, this, step_def: LuaTable| {
             let step_type_str: String = step_def.get("type")?;
             let st = match step_type_str.as_str() {
-                "fillRandom" => StepType::FillRandom,
-                "placeBlock" => StepType::PlaceBlock,
-                "fillArea" => StepType::FillArea,
+                "fillRandom"  => StepType::FillRandom,
+                "placeBlock"  => StepType::PlaceBlock,
+                "placeRandom" => StepType::PlaceRandom,
+                "placeLine"   => StepType::PlaceLine,
+                "floodFill"   => StepType::FloodFill,
+                "fillArea"    => StepType::FillArea,
+                "drawPath"    => StepType::DrawPath,
+                "fillRect"    => StepType::FillRect,
                 other => {
                     return Err(LuaError::RuntimeError(format!(
-                        "addStep: unknown step type '{}'",
+                        "addStep: unknown step type '{}'; valid: fillRandom, placeBlock, placeRandom, placeLine, floodFill, fillArea, drawPath, fillRect",
                         other
                     )))
                 }
@@ -1671,6 +1715,13 @@ impl LuaUserData for LuaMapScript {
                     _ => 1.0,
                 }
             };
+            let get_i32_field = |tbl: &LuaTable, key: &str, default: i32| -> i32 {
+                match tbl.get::<_, LuaValue>(key) {
+                    Ok(LuaValue::Integer(n)) => n as i32,
+                    Ok(LuaValue::Number(n)) => n as i32,
+                    _ => default,
+                }
+            };
             let step = ScriptStep {
                 step_type: st,
                 x: get_u32_field(&step_def, "x"),
@@ -1679,6 +1730,22 @@ impl LuaUserData for LuaMapScript {
                 height: get_u32_field(&step_def, "h"),
                 tile_id: get_u32_field(&step_def, "gid"),
                 chance: get_f32_field(&step_def, "chance"),
+                direction: get_u32_field(&step_def, "direction"),
+                path_width: {
+                    let v = get_u32_field(&step_def, "pathWidth");
+                    if v == 0 { 1 } else { v }
+                },
+                repeat_count: {
+                    let v = get_u32_field(&step_def, "repeatCount");
+                    if v == 0 { 1 } else { v }
+                },
+                count: {
+                    let v = get_u32_field(&step_def, "count");
+                    if v == 0 { 1 } else { v }
+                },
+                group_index: get_i32_field(&step_def, "groupIndex", -1),
+                block_index: get_i32_field(&step_def, "blockIndex", -1),
+                tile_layer: get_u32_field(&step_def, "tileLayer"),
                 ..Default::default()
             };
             this.inner.borrow_mut().add_step(step);
@@ -1858,11 +1925,12 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param tileW : integer
     /// @param tileH : integer
     /// @param levelHeight : integer
+    /// @param partCount : integer?   (default 4)
     /// @return IsoMap
     tbl.set(
         "newIsoMap",
         lua.create_function(
-            |lua, (width, height, tile_w, tile_h, level_height): (u32, u32, u32, u32, u32)| {
+            |lua, (width, height, tile_w, tile_h, level_height, part_count): (u32, u32, u32, u32, u32, Option<u32>)| {
                 lua.create_userdata(LuaIsoMap {
                     inner: Rc::new(RefCell::new(IsoMap::new(
                         width,
@@ -1870,6 +1938,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                         tile_w,
                         tile_h,
                         level_height,
+                        part_count.unwrap_or(4),
                     ))),
                 })
             },
