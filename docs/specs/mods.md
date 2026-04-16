@@ -19,6 +19,8 @@ Each mod folder must contain a `mod.toml` with at minimum an `id`, `name`, and `
 
 Hot-reload queuing works by recording the mtime of each mounted mod folder at load time and comparing on each `tick()` call. When a change is detected, the mod is queued for reload notification to the Lua callback registered via `lurek.mods.onReload(fn)`.
 
+The new `registry.rs` file introduces `ModRegistry`, a typed name-to-value store for mod-contributed content such as custom item definitions, ability data, or configuration overrides. Lua scripts access it through the `lurek.mods.registry.*` namespace, allowing mods to register their content contributions into a shared catalog that the base game and other mods can discover by name without tight coupling between mod scripts.
+
 **Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`. Lua bridge in `src/lua_api/mods_api.rs`.
 
 ## Files
@@ -62,18 +64,25 @@ Hot-reload queuing works by recording the mtime of each mounted mod folder at lo
 ### Module Functions
 - `lurek.mods.newMod`: Creates a new Mod from an info table with at least an `id` field.
 - `lurek.mods.newModManager`: Creates a new empty ModManager.
+- `lurek.mods.checkApiVersion`: Checks whether a mod's required `api_version` is compatible with the given `host_version`.
 
 ### `Mod` Methods
 - `Mod:getId`: Returns the unique mod identifier.
 - `Mod:getName`: Returns the display name.
 - `Mod:getVersion`: Returns the version string.
-- `Mod:getAuthor`: Returns the author name.
+- `Mod:getAuthor`: Returns the author name string from this mod's metadata manifest.
 - `Mod:getDescription`: Returns the mod description.
 - `Mod:getDependencies`: Returns the list of required mod IDs.
 - `Mod:getPriority`: Returns the load-order priority.
 - `Mod:isEnabled`: Returns whether the mod is enabled.
-- `Mod:setEnabled`: Sets the enabled state.
+- `Mod:setEnabled`: Enables or disables this mod; disabled mods are skipped during loading.
 - `Mod:isLoaded`: Returns whether the mod has been loaded.
+- `Mod:getApiVersion`: Returns the required engine API version string, or nil if not set.
+- `Mod:setApiVersion`: Sets the required engine API version string.
+- `Mod:getCapabilities`: Returns an array of declared capability flags.
+- `Mod:setCapabilities`: Replaces the capability list with the given array of strings.
+- `Mod:getConfigSchema`: Returns the config schema as an array of `{key, type, default}` tables.
+- `Mod:setConfigSchema`: Replaces the config schema with the given array of `{key, type, default}` tables.
 - `Mod:getHook`: Returns the hook function for the given name, or nil.
 - `Mod:hasHook`: Returns whether a hook with the given name exists.
 - `Mod:getHookNames`: Returns an array of registered hook names.

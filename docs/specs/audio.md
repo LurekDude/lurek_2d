@@ -19,6 +19,8 @@ The `Mixer` is the central controller: it owns a `SlotMap<SoundKey, AudioSource>
 
 Additional features: `SpatialState` for 2D positional audio with distance falloff; `Decoder` for chunked streaming PCM; `SoundData` for decoded in-memory PCM with per-sample read/write access; and `MidiPlayer`, a software MIDI synthesizer with sine-additive PCM rendering that requires no external MIDI device.
 
+The `Bus` type has been extended with duck-target support: `set_duck_target` and `clear_duck_target` allow a bus to automatically lower its volume when a designated priority bus is active, enabling dialogue-over-music ducking without manual scripting. The `MidiPlayer` now exposes `get/set_output_sample_rate` and `get/set_output_channels` for fine-grained PCM output control alongside Lua-accessible `play`, `pause`, and `stop` lifecycle methods. The `Mixer` gains `set/get_peak` and `bus_peak` for real-time VU meter data. Lua scripts access these additions via `lurek.audio.setMeter/getMeter`, `Bus:getName/getVolume/clearDuck/getPeak`, and `Decoder:getBitDepth`.
+
 **Scope boundary**: Platform Services tier. Depends on `runtime` (SoundKey, SharedState). Lua bridge in `src/lua_api/audio_api.rs`.
 
 ## Files
@@ -72,6 +74,8 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `Bus::is_paused` (`bus.rs`): Returns whether the bus is paused.
 - `Bus::add_effect` (`bus.rs`): Adds a DSP effect to this audio bus.
 - `Bus::remove_effect` (`bus.rs`): Removes a DSP effect from this audio bus by ID.
+- `Bus::set_duck_target` (`bus.rs`): Sets the ducking target for this bus.
+- `Bus::clear_duck_target` (`bus.rs`): Clears the ducking target, disabling ducking for this bus.
 - `Decoder::from_file` (`decoder.rs`): Load an audio file and prepare it for chunked decoding.
 - `Decoder::decode` (`decoder.rs`): Return the next chunk of samples, or `None` at EOF.
 - `Decoder::get_duration` (`decoder.rs`): Return the total duration in seconds.
@@ -134,6 +138,10 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `MidiPlayer::set_bus_key` (`midi_player.rs`): Sets the audio bus key for mixer routing.
 - `MidiPlayer::bus_key` (`midi_player.rs`): Returns the audio bus key, if assigned.
 - `MidiPlayer::play_state` (`midi_player.rs`): Returns the current playback state.
+- `MidiPlayer::get_output_sample_rate` (`midi_player.rs`): Returns the PCM output sample rate in Hz.
+- `MidiPlayer::set_output_sample_rate` (`midi_player.rs`): Sets the PCM output sample rate in Hz (clamped to 8000–192000).
+- `MidiPlayer::get_output_channels` (`midi_player.rs`): Returns the PCM output channel count (1 = mono, 2 = stereo).
+- `MidiPlayer::set_output_channels` (`midi_player.rs`): Sets the PCM output channel count (clamped to 1–2).
 - `QueueableSource::new` (`mixer.rs`): Creates a new `QueueableSource` with all buffer slots free.
 - `QueueableSource::queue_buffer` (`mixer.rs`): Pushes a buffer of f32 PCM samples into the queue.
 - `QueueableSource::free_buffer_count` (`mixer.rs`): Returns the number of buffer slots currently available.
@@ -169,6 +177,9 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `Mixer::resume_all` (`mixer.rs`): Resumes all paused sources.
 - `Mixer::clone_source` (`mixer.rs`): Clones a source, sharing cached decoded data (for static sources).
 - `Mixer::release` (`mixer.rs`): Stops and removes the audio source identified by `key`.
+- `Mixer::set_peak` (`mixer.rs`): Sets the peak amplitude for a source (0.0–1.0).
+- `Mixer::get_peak` (`mixer.rs`): Returns the stored peak amplitude for a source, or `0.0` if the source does not exist.
+- `Mixer::bus_peak` (`mixer.rs`): Returns the average peak amplitude of all sources currently assigned to the given bus.
 - `Mixer::new_bus` (`mixer.rs`): Creates a new named bus and returns its key.
 - `Mixer::get_bus_by_name` (`mixer.rs`): Returns an immutable reference to the bus, if it exists.
 - `Mixer::get_bus` (`mixer.rs`): Gets a bus by key.
@@ -324,8 +335,8 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `lurek.audio.getDopplerScale`: Returns the current Doppler scale.
 - `lurek.audio.setDistanceModel`: Sets the distance attenuation model.
 - `lurek.audio.getDistanceModel`: Returns the current distance model name.
-- `lurek.audio.setMeter`: Sets the metering scale (stub).
-- `lurek.audio.getMeter`: Returns the current peak level (stub).
+- `lurek.audio.setMeter`: Sets the master peak meter level (0.0–1.0).
+- `lurek.audio.getMeter`: Returns the stored master peak meter level.
 - `lurek.audio.newMidiPlayer`: Creates a MIDI player, optionally loading a file.
 - `lurek.audio.newSoundData`: Creates a SoundData from a file or as a silent buffer.
 - `lurek.audio.setMidiSoundFont`: Sets the global SoundFont for MIDI synthesis.
@@ -370,9 +381,9 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `lurek.audio.spectrogramToPng`: Renders a time-frequency spectrogram of a WAV file to a PNG image.
 
 ### `Bus` Methods
-- `Bus:getName`: Returns the bus name.
+- `Bus:getName`: Returns the unique name string assigned to this audio bus.
 - `Bus:setVolume`: Sets the volume for all sources on this bus.
-- `Bus:getVolume`: Returns the bus volume.
+- `Bus:getVolume`: Returns the current volume multiplier applied to all sources on this bus.
 - `Bus:setPitch`: Sets the pitch multiplier for all sources on this bus.
 - `Bus:getPitch`: Returns the bus pitch multiplier.
 - `Bus:pause`: Pauses all sources on this bus.
@@ -380,11 +391,13 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `Bus:isPaused`: Returns true if this bus is paused.
 - `Bus:type`: Returns the type name of this object.
 - `Bus:typeOf`: Returns true if this object is of the given type.
+- `Bus:clearDuck`: Removes the ducking target from this bus, restoring the target bus
+- `Bus:getPeak`: Returns the average peak amplitude of all sources currently on this bus.
 
 ### `Decoder` Methods
 - `Decoder:decode`: Decodes the next chunk of samples, or nil at EOF.
 - `Decoder:getChannelCount`: Returns the number of audio channels.
-- `Decoder:getBitDepth`: Returns the bit depth.
+- `Decoder:getBitDepth`: Returns the per-sample bit depth of this decoded audio stream.
 - `Decoder:getSampleRate`: Returns the sample rate in Hz.
 - `Decoder:getDuration`: Returns the total duration in seconds.
 - `Decoder:seek`: Seeks to a time offset in seconds.
@@ -401,9 +414,9 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `MidiPlayer:setSoundFont`: Loads a SoundFont file into this player (stub).
 - `MidiPlayer:getSoundFontPath`: Returns the SoundFont file path, or nil (stub).
 - `MidiPlayer:useDefaultSoundFont`: Reverts to the built-in default SoundFont (stub).
-- `MidiPlayer:play`: Starts MIDI playback.
-- `MidiPlayer:pause`: Pauses MIDI playback.
-- `MidiPlayer:stop`: Stops MIDI playback.
+- `MidiPlayer:play`: Starts or resumes MIDI sequence playback from the current position.
+- `MidiPlayer:pause`: Pauses the MIDI sequence at the current position; resume with `play()`.
+- `MidiPlayer:stop`: Stops MIDI playback and resets the playhead to the beginning.
 - `MidiPlayer:isPlaying`: Returns true if MIDI is currently playing.
 - `MidiPlayer:isPaused`: Returns true if MIDI playback is paused.
 - `MidiPlayer:seek`: Seeks to a time position in seconds.
@@ -437,6 +450,10 @@ Additional features: `SpatialState` for 2D positional audio with distance fallof
 - `MidiPlayer:setOnNoteOn`: Registers a note-on callback (stub).
 - `MidiPlayer:setOnNoteOff`: Registers a note-off callback (stub).
 - `MidiPlayer:setOnEnd`: Registers a playback-end callback (stub).
+- `MidiPlayer:getSampleRate`: Returns the PCM output sample rate in Hz.
+- `MidiPlayer:setSampleRate`: Sets the PCM output sample rate in Hz (clamped 8000–192000).
+- `MidiPlayer:getChannels`: Returns the PCM output channel count (1 = mono, 2 = stereo).
+- `MidiPlayer:setChannels`: Sets the PCM output channel count (clamped 1–2).
 - `MidiPlayer:type`: Returns the type name of this object.
 - `MidiPlayer:typeOf`: Returns true if this object is of the given type.
 

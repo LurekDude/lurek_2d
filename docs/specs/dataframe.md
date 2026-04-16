@@ -19,6 +19,8 @@ The `query` submodule provides a filter/sort/group-by/aggregate pipeline: `filte
 
 The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit with configurable delimiter/quote) and JSON round-trip (array-of-objects to `DataFrame` and back). This makes it straightforward to load a `.csv` asset into a `DataFrame`, run queries, and write results back to CSV.
 
+Additional column-operation methods have been added to `DataFrame`, expanding the analytical surface available to Lua scripts through `lurek.dataframe.*`. These additions cover extended numeric transformations, type-casting helpers, and per-column derived statistics, making in-game data analysis workflows more expressive without requiring callers to drop to the lower-level `compute` array layer.
+
 **Scope boundary**: Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/dataframe_api.rs`.
 
 ## Files
@@ -64,6 +66,11 @@ The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit
 - `DataFrame::from_raw` (`frame.rs`): Create a DataFrame from raw column names and column-major data.
 - `DataFrame::raw_data` (`frame.rs`): Get a reference to the underlying column-major data.
 - `DataFrame::random` (`frame.rs`): Generate a DataFrame with random data.
+- `DataFrame::with_eval` (`frame.rs`): Creates a new `DataFrame` with an extra computed column.
+- `DataFrame::pivot_table` (`frame.rs`): Reshapes this DataFrame from long to wide format (pivot table).
+- `DataFrame::rolling_mean` (`frame.rs`): Appends a rolling mean column to a copy of this DataFrame.
+- `DataFrame::rolling_sum` (`frame.rs`): Appends a rolling sum column to a copy of this DataFrame.
+- `DataFrame::rank_column` (`frame.rs`): Appends a dense-rank column to a copy of this DataFrame.
 - `Database::new` (`frame.rs`): Create an empty database.
 - `Database::add_table` (`frame.rs`): Add or replace a table.
 - `Database::get_table` (`frame.rs`): Get a shared reference to a table by name.
@@ -148,7 +155,7 @@ The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit
 - `DataFrame:columns`: Returns a table of column names.
 - `DataFrame:count`: Returns the row count (alias for nrows).
 - `DataFrame:removeColumn`: Removes a column by name or index.
-- `DataFrame:rename`: Renames a column.
+- `DataFrame:rename`: Renames the column `old_name` to `new_name` in this DataFrame.
 - `DataFrame:getColumn`: Returns all values in a column as a table.
 - `DataFrame:addRow`: Adds a row from an optional table of name-value pairs, returns 1-based index.
 - `DataFrame:removeRow`: Removes a row by 1-based index.
@@ -188,14 +195,15 @@ The `serial` submodule handles CSV round-trip (parse headers + typed cells, emit
 - `DataFrame:setColumnFromF64`: Set a numeric column from a Lua array of numbers.
 - `DataFrame:type`: Returns the type name of this object.
 - `DataFrame:typeOf`: Returns true if this object is of the given type.
+- `DataFrame:withEval`: Returns a new DataFrame with an additional computed column named `col_name`.
 
 ### `Database` Methods
 - `Database:getTable`: Returns a copy of a table by name, or nil if not found.
-- `Database:removeTable`: Removes a table by name.
+- `Database:removeTable`: Drops the named table from this in-memory database if it exists.
 - `Database:hasTable`: Returns true if a table with the given name exists.
 - `Database:listTables`: Returns a table of all table names.
 - `Database:tableCount`: Returns the number of tables.
-- `Database:clear`: Removes all tables.
+- `Database:clear`: Drops every table from this in-memory database, leaving it empty.
 - `Database:merge`: Merges all tables from another Database into this one.
 - `Database:toJSON`: Serializes all tables to a JSON object string.
 - `Database:query`: Executes a SQL query against the database tables.

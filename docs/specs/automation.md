@@ -19,6 +19,8 @@ During playback, `simulator.update(dt)` advances an internal clock and fires all
 
 Scripts can be loaded programmatically from Lua tables or from serialized TOML files. The `Simulator` tracks playback status (idle, running, paused, complete) and provides `start()`, `stop()`, `pause()`, `resume()`, and `is_complete()` controls.
 
+Individual scripts can now carry per-script step limits via `Script::set_step_limit` and `Script::get_step_limit`, independent of the module-wide `MAX_STEPS` cap. The `Simulator` has been significantly extended with macro management (`save_macro`, `play_macro`, `has_macro`, `list_macros`), time-scaled playback (`get/set_playback_speed`), and visual-feedback replay via `set/is_highlight_mode`. The Lua surface gains `lurek.automation.getStepLimit/setStepLimit`, the full macro API, speed controls, and `waitUntil(predicate)` — a synchronization primitive that blocks the simulation step until a Lua condition is satisfied.
+
 **Scope boundary**: Core Runtime tier. Depends on `event`, `runtime`. Lua bridge in `src/lua_api/automation_api.rs`.
 
 ## Files
@@ -40,6 +42,8 @@ Scripts can be loaded programmatically from Lua tables or from serialized TOML f
 - `Script::new` (`script.rs`): Create a new script with the given name and steps.
 - `Script::with_description` (`script.rs`): Create a script with an explicit description string.
 - `Script::step_count` (`script.rs`): Return the number of steps in this script.
+- `Script::set_step_limit` (`script.rs`): Sets the maximum step count for this script (clamped to `1..=MAX_STEPS`).
+- `Script::get_step_limit` (`script.rs`): Returns the active step limit for this script.
 - `Script::from_toml` (`script.rs`): Parse a Script from a TOML string.
 - `Simulator::new` (`simulator.rs`): Create a new `Simulator` with an empty script registry.
 - `Simulator::load` (`simulator.rs`): Load a script into the simulator, replacing any script with the same name.
@@ -57,6 +61,17 @@ Scripts can be loaded programmatically from Lua tables or from serialized TOML f
 - `Simulator::step_count` (`simulator.rs`): Return the total number of steps in the active script.
 - `Simulator::current_script` (`simulator.rs`): Return the name of the currently active script.
 - `Simulator::elapsed_time` (`simulator.rs`): Return the seconds elapsed since playback started.
+- `Simulator::get_script` (`simulator.rs`): Return a clone of the named script from the registry, if it is loaded.
+- `Simulator::get_script_step_limit` (`simulator.rs`): Return the step limit for the named script.
+- `Simulator::set_script_step_limit` (`simulator.rs`): Set the step limit for the named script (clamped to `1..=MAX_STEPS`).
+- `Simulator::save_macro` (`simulator.rs`): Save a [`Script`] under a named macro key for later replay.
+- `Simulator::play_macro` (`simulator.rs`): Play a saved macro by loading it into the script registry and starting playback.
+- `Simulator::has_macro` (`simulator.rs`): Return `true` if a macro with the given name has been saved.
+- `Simulator::list_macros` (`simulator.rs`): Return the names of all saved macros.
+- `Simulator::set_playback_speed` (`simulator.rs`): Set the playback speed multiplier applied to `dt` on each [`Simulator::update`].
+- `Simulator::get_playback_speed` (`simulator.rs`): Return the current playback speed multiplier.
+- `Simulator::set_highlight_mode` (`simulator.rs`): Enable or disable the visual highlight overlay hint.
+- `Simulator::is_highlight_mode` (`simulator.rs`): Return whether the highlight overlay hint is active.
 - `Simulator::update` (`simulator.rs`): Advance the playback clock by `dt` seconds and dispatch all due steps.
 - `Action::parse_action` (`step.rs`): Parse an action string into the corresponding variant.
 - `Action::as_str` (`step.rs`): Return the canonical lowercase string representation of this action.
@@ -77,7 +92,7 @@ Scripts can be loaded programmatically from Lua tables or from serialized TOML f
 - `lurek.automation.stop`: Stops playback and resets the simulator to idle.
 - `lurek.automation.pause`: Pauses playback at the current step position.
 - `lurek.automation.resume`: Resumes playback from a paused position.
-- `lurek.automation.update`: Advances the playback clock by dt seconds, dispatching due steps.
+- `lurek.automation.update`: Advances the playback clock by `dt` seconds, dispatching due steps.
 - `lurek.automation.isRunning`: Returns true if the simulator is actively playing a script.
 - `lurek.automation.isPaused`: Returns true if playback is currently paused.
 - `lurek.automation.isComplete`: Returns true if all steps in the active script have been dispatched.
@@ -86,13 +101,17 @@ Scripts can be loaded programmatically from Lua tables or from serialized TOML f
 - `lurek.automation.getCurrentScript`: Returns the name of the active script, or nil if idle.
 - `lurek.automation.getElapsedTime`: Returns seconds elapsed since playback started.
 - `lurek.automation.loadFromToml`: Parses a TOML string and registers it as a named script.
-- `lurek.automation.saveMacro`: Stores the current (or named) script under a macro name for later replay.
-- `lurek.automation.playMacro`: Loads and starts playback of a previously saved macro by name.
-- `lurek.automation.hasMacro`: Returns true if a macro with the given name exists.
-- `lurek.automation.listMacros`: Returns an array-table of all registered macro names.
-- `lurek.automation.setPlaybackSpeed`: Sets the playback speed multiplier (e.g. 0.5 = half, 2.0 = double).
-- `lurek.automation.getPlaybackSpeed`: Returns the current playback speed multiplier.
-- `lurek.automation.waitUntil`: Suspends the automation clock until a predicate function returns true, with optional timeout.
+- `lurek.automation.getStepLimit`: Returns the step limit for the named script, or nil if not found.
+- `lurek.automation.setStepLimit`: Sets the step limit for the named script (clamped to 1..MAX_STEPS).
+- `lurek.automation.saveMacro`: Saves a currently-loaded script under a macro name for fast replay.
+- `lurek.automation.playMacro`: Loads and starts playback of a previously saved macro.
+- `lurek.automation.hasMacro`: Returns true if a macro with the given name has been saved.
+- `lurek.automation.listMacros`: Returns an array of all saved macro names.
+- `lurek.automation.setPlaybackSpeed`: Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double).
+- `lurek.automation.getPlaybackSpeed`: Returns the current playback speed multiplier (default 1.0).
+- `lurek.automation.setHighlightMode`: Enables or disables the highlight overlay hint.
+- `lurek.automation.isHighlightMode`: Returns whether the highlight overlay hint is active.
+- `lurek.automation.waitUntil`: Pauses playback advancement until predicate() returns true or timeout seconds elapse.
 
 ## References
 

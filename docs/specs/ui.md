@@ -19,6 +19,8 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 
 `Theme` drives visual appearance: it maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records (background color, foreground color, font key, font size, border color, corner radius, padding). The `chart` submodule adds `GraphRenderer` for inline data visualizations (line charts, bar charts, pie charts) within the UI tree.
 
+Three new widget types complete the toolkit. The existing `chart.rs` chart renderer has been augmented with `ChartWidget`, a retained-mode widget node that integrates directly into the `GuiContext` tree and responds to layout constraints like other widgets, accessible via `lurek.ui.newChart()`. `rich_text.rs` introduces `RichText`, a text widget supporting inline color, bold, italic, and icon spans via a tag-based markup language, accessible via `lurek.ui.newRichText()`. `tooltip.rs` introduces `Tooltip`, a hover-triggered overlay widget with configurable delay and position anchoring, accessible via `lurek.ui.newTooltip()`. All three integrate with the existing `Theme` system for consistent visual styling.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/ui_api.rs`.
 
 ## Files
@@ -94,6 +96,8 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `GUITable` (`struct`, `extras.rs`): A data table widget with sortable columns and selectable rows.
 - `ImageWidget` (`struct`, `extras.rs`): An image display widget.
 - `Badge` (`struct`, `extras.rs`): A notification badge displaying a numeric count or short label.
+- `WidgetDef` (`struct`, `layout_loader.rs`): Tree node describing a single widget and its optional children.
+- `LayoutDef` (`struct`, `layout_loader.rs`): Top-level TOML layout descriptor.
 - `WidgetStyle` (`struct`, `theme.rs`): A concrete set of colors, borders, radius, and font-size values used by theme lookup.
 - `Theme` (`struct`, `theme.rs`): Stores widget styles keyed by widget type and state so the same UI tree can be skinned consistently.
 - `WidgetState` (`enum`, `widget.rs`): Encodes common UI states such as normal, hovered, pressed, focused, and disabled.
@@ -298,6 +302,9 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Badge::new` (`extras.rs`): Create a new badge.
 - `Badge::display_text` (`extras.rs`): Return the text that should be rendered inside the badge.
 - `Badge::set_count` (`extras.rs`): Set the count.
+- `load_layout_def` (`layout_loader.rs`): Recursively build a widget tree from a `WidgetDef` into a `GuiContext`. Returns the pool index of the created root widget.
+- `load_layout_toml` (`layout_loader.rs`): Parse a TOML source string into a `LayoutDef` then delegate to `load_layout_def`. Returns the pool index of the created root widget.
+- `render_to_image` (`layout_loader.rs`): Run the layout pass, software-rasterise each visible widget rectangle in a representative colour, and save the result as a PNG. Headless-safe.
 - `GuiContext::build_render_commands` (`render.rs`): Generate a flat list of [`RenderCommand`]s for the entire widget tree.
 - `GuiContext::generate_render_commands` (`render.rs`): Generate render commands using the default font key.
 - `GuiContext::draw_to_image` (`render.rs`): Render the widget tree to a CPU image for headless layout testing.
@@ -314,29 +321,19 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `WidgetBase::new` (`widget.rs`): Create a new `WidgetBase` with default values for the given widget type.
 - `WidgetBase::contains_point` (`widget.rs`): Test whether a point `(px, py)` lies within this widget's bounding rectangle.
 - `WidgetBase::clear_anchors` (`widget.rs`): Clear all anchor constraints.
-- `WidgetDef` (`struct`, `layout_loader.rs`): Serde-deserializable widget definition. All fields except `widget_type` are optional; `children` is a recursive `Vec<WidgetDef>`.
-- `LayoutDef` (`struct`, `layout_loader.rs`): Top-level TOML layout schema — wraps a single `root: WidgetDef` under the `[root]` TOML section.
-- `load_layout_def` (`fn`, `layout_loader.rs`): Recursively build a widget tree from a `WidgetDef` into a `GuiContext`. Returns the pool index of the created root widget.
-- `load_layout_toml` (`fn`, `layout_loader.rs`): Parse a TOML source string into a `LayoutDef` then delegate to `load_layout_def`. Returns the pool index of the created root widget.
-- `render_to_image` (`fn`, `layout_loader.rs`): Run the layout pass, software-rasterise each visible widget rectangle in a representative colour, and save the result as a PNG. Headless-safe.
 
 ## Lua API Reference
 
 - Binding path(s): `src/lua_api/ui_api.rs`
 - Namespace: `lurek.ui`
 
-### Layout Loader Functions
-- `lurek.ui.loadLayout(def)`: Load a widget tree from a Lua table definition (`def`) and attach it to the UI root. Returns the pool index of the created root widget as a number.
-- `lurek.ui.loadLayoutFile(path)`: Load a widget tree from a TOML layout file at `path` and attach it to the UI root. Returns the pool index of the created root widget as a number.
-- `lurek.ui.renderToImage(width, height, path)`: Run the layout pass and software-rasterise the current widget tree to a PNG file at `path`. Headless-safe; intended for evidence and golden tests.
-
 ### Module Functions
 - `lurek.ui.setPosition`: Sets the widget position.
 - `lurek.ui.getPosition`: Returns the widget position.
-- `lurek.ui.setSize`: Sets the widget size.
-- `lurek.ui.getSize`: Returns the widget size.
+- `lurek.ui.setSize`: Sets the width and height of the widget in UI pixels.
+- `lurek.ui.getSize`: Returns the current width and height of the widget in UI pixels.
 - `lurek.ui.getRect`: Returns the computed screen-space rectangle after layout.
-- `lurek.ui.setVisible`: Sets widget visibility.
+- `lurek.ui.setVisible`: Shows or hides the widget; hidden widgets are not rendered or interactive.
 - `lurek.ui.isVisible`: Returns whether the widget is visible.
 - `lurek.ui.setEnabled`: Sets whether the widget is enabled.
 - `lurek.ui.isEnabled`: Returns whether the widget is enabled.
@@ -371,6 +368,16 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `lurek.ui.getFlexGrow`: Returns the flex-grow factor.
 - `lurek.ui.setFlexShrink`: Sets the flex-shrink factor.
 - `lurek.ui.getFlexShrink`: Returns the flex-shrink factor.
+- `lurek.ui.bind`: Registers a data-binding key on this widget.
+- `lurek.ui.unbind`: Removes the data-binding key from this widget.
+- `lurek.ui.setAlpha`: Sets the widget's alpha transparency (`0.0` fully transparent, `1.0` opaque).
+- `lurek.ui.getAlpha`: Returns the widget's current alpha transparency.
+- `lurek.ui.fadeIn`: Instantly fades the widget in (sets alpha to `1.0`).
+- `lurek.ui.fadeOut`: Instantly fades the widget out (sets alpha to `0.0` and hides it).
+- `lurek.ui.slideIn`: Instantly moves the widget to `(x, y)` and makes it visible.
+- `lurek.ui.slideOut`: Instantly moves the widget to the off-screen position `(x, y)` and hides it.
+- `lurek.ui.attachToEntity`: Anchors this widget to a world-space entity by its numeric ID.
+- `lurek.ui.detachFromEntity`: Removes the entity anchor from this widget, restoring normal layout positioning.
 
 ### `Accordion` Methods
 - `Accordion:addSection`: Adds a section entry to this Accordion widget.
@@ -471,7 +478,7 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Image_Widget:setScaleMode`: Sets the scale mode for this Image_Widget widget.
 - `Image_Widget:getTint`: Returns the tint of this Image_Widget widget.
 - `Image_Widget:setTint`: Sets the tint for this Image_Widget widget.
-- `Image_Widget:newButton`: Creates a button widget.
+- `Image_Widget:newButton`: Creates and returns a new interactive button widget as a child of this widget.
 - `Image_Widget:newLabel`: Creates a text label widget.
 - `Image_Widget:newTextInput`: Creates a text input widget.
 - `Image_Widget:newCheckbox`: Creates a checkbox widget.
@@ -492,7 +499,7 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Image_Widget:newScrollBar`: Creates a scroll bar widget.
 - `Image_Widget:newWindow`: Creates a draggable window widget.
 - `Image_Widget:newSplitPanel`: Creates a resizable split panel.
-- `Image_Widget:newDockPanel`: Creates a dock panel.
+- `Image_Widget:newDockPanel`: Creates and returns a new docking panel that arranges children along its edges.
 - `Image_Widget:newToolbar`: Creates a toolbar widget.
 - `Image_Widget:newMenuBar`: Creates a menu bar widget.
 - `Image_Widget:newMenuItem`: Creates a menu item widget.
@@ -511,7 +518,7 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Image_Widget:getFocus`: Returns the focused widget index or nil.
 - `Image_Widget:focusNext`: Moves focus to the next focusable widget.
 - `Image_Widget:focusPrev`: Moves focus to the previous focusable widget.
-- `Image_Widget:clearFocus`: Clears keyboard focus.
+- `Image_Widget:clearFocus`: Removes keyboard focus from this widget so key events go to the next focusable.
 - `Image_Widget:addToast`: Queues a toast notification from a table.
 - `Image_Widget:getToastCount`: Returns the number of active toasts.
 - `Image_Widget:mousepressed`: Forwards a mouse press event to the GUI.
@@ -525,14 +532,14 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Image_Widget:getWidgetCount`: Returns the total widget count in the context.
 - `Image_Widget:drawToImage`: Renders the UI widget tree to a CPU ImageData at the given resolution.
 - `Image_Widget:newLineChart`: Creates a new line chart.
-- `Image_Widget:newBarChart`: Creates a new bar chart.
+- `Image_Widget:newBarChart`: Creates and returns a new bar chart widget attached to this image widget.
 - `Image_Widget:newScatterPlot`: Creates a new scatter plot.
-- `Image_Widget:newPieChart`: Creates a new pie chart.
+- `Image_Widget:newPieChart`: Creates and returns a new pie chart widget attached to this image widget.
 - `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
 - `Image_Widget:newLineChart`: Creates a new line chart.
-- `Image_Widget:newBarChart`: Creates a new bar chart.
+- `Image_Widget:newBarChart`: Creates and returns a new bar chart widget attached to this image widget.
 - `Image_Widget:newScatterPlot`: Creates a new scatter plot.
-- `Image_Widget:newPieChart`: Creates a new pie chart.
+- `Image_Widget:newPieChart`: Creates and returns a new pie chart widget attached to this image widget.
 - `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
 - `Image_Widget:parseWidgetState`: Parses a widget state string, returning the canonical form or nil if invalid.
 - `Image_Widget:newSpinBox`: Creates a numeric spin box widget with increment and decrement buttons.
@@ -541,6 +548,13 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - `Image_Widget:setDefaultTheme`: Installs the built-in dark theme as the active GUI theme.
 - `Image_Widget:setViewport`: Sets the viewport dimensions used for anchor constraints and layout.
 - `Image_Widget:flushCache`: Returns true if the widget tree changed since the last call, then resets the flag.
+- `Image_Widget:update_bindings`: Updates all widgets that have a data-binding key registered via `:bind(key)`.
+- `Image_Widget:loadLayout`: Load a widget tree from a Lua table definition and attach it to the UI
+- `Image_Widget:loadLayoutFile`: Load a widget tree from a TOML layout file and attach it to the UI root.
+- `Image_Widget:renderToImage`: Render the current UI widget tree to a PNG file for testing purposes.
+- `Image_Widget:loadLayout`: Load a widget tree from a Lua table definition and attach it to the UI
+- `Image_Widget:loadLayoutFile`: Load a widget tree from a TOML layout file and attach it to the UI root.
+- `Image_Widget:renderToImage`: Render the current UI widget tree to a PNG file for testing purposes.
 
 ### `Label` Methods
 - `Label:setText`: Sets the text for this Label widget.

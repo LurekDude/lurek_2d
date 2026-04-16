@@ -19,6 +19,8 @@ The `sinks` submodule adds an out-of-band log routing layer on top of the standa
 
 Log output from game scripts appears alongside engine log output. The separation between the `log` crate global level (controlled by `RUST_LOG`) and the per-sink `SinkLevel` lets developers have fine-grained control over where different severity messages appear.
 
+The `sinks.rs` file has been expanded with `LogSink` and `LogFilter` as higher-level abstractions that Lua scripts can configure directly through logging channel helpers, allowing game code to install custom sinks and set per-category filter rules without dropping to Rust. These improvements make in-game diagnostic tooling — such as a console that shows only warning-level messages from a specific subsystem — practical to implement from pure Lua.
+
 **Scope boundary**: Core Runtime tier. Depends on `runtime`. Lua bridge in `src/lua_api/log_api.rs`.
 
 ## Files
@@ -28,22 +30,30 @@ Log output from game scripts appears alongside engine log output. The separation
 
 ## Types
 
+- `LogFields` (`type`, `mod.rs`): Sorted map of structured key-value log fields.
 - `SinkLevel` (`enum`, `sinks.rs`): Severity threshold used by sink filtering. It keeps file and memory sinks consistent even when the Lua caller uses string level names.
 - `MemoryEntry` (`struct`, `sinks.rs`): Captured log record stored by memory sinks. It is intentionally small so Lua tooling can inspect recent messages without coupling to the Rust `log` crate.
+- `RotatingFileSink` (`struct`, `sinks.rs`): A file sink that rotates the log file when it exceeds a maximum size.
 - `SinkKind` (`enum`, `sinks.rs`): Backend enum for the supported sink storage strategies. It distinguishes append-to-file behavior from bounded in-memory buffering.
 - `Sink` (`struct`, `sinks.rs`): Single output destination with an id, minimum level, and concrete backend. It is the unit the Lua API creates, lists, flushes, and removes.
 - `SinkRegistry` (`struct`, `sinks.rs`): Mutable collection of active sinks for one runtime context. The Lua layer keeps one registry per VM and uses it to fan out every emitted message.
 
 ## Functions
 
+- `log_structured` (`mod.rs`): Emits a structured log message with key-value `fields` through the Rust `log` crate.
 - `set_level` (`mod.rs`): Sets the active log level to the named value.
 - `get_level` (`mod.rs`): Returns the current log level name as a static string (e.g.
 - `enabled_for` (`mod.rs`): Returns `true` when messages at `level` would be emitted under the current filter.
 - `SinkLevel::from_str` (`sinks.rs`): Parses a level string ("debug", "info", "warn", "error").
 - `SinkLevel::as_str` (`sinks.rs`): Returns a short lowercase string representation.
+- `RotatingFileSink::open` (`sinks.rs`): Opens or creates a rotating file sink at `path`.
+- `RotatingFileSink::write_with_rotation` (`sinks.rs`): Appends `message` to the active log file, rotating if the size threshold is exceeded.
+- `RotatingFileSink::flush` (`sinks.rs`): Flushes the underlying OS write buffer.
 - `Sink::file` (`sinks.rs`): Creates a file sink.
 - `Sink::memory` (`sinks.rs`): Creates a memory sink.
+- `Sink::rotating_file` (`sinks.rs`): Creates a rotating file sink that rotates at `max_bytes` and keeps `keep_files` backups.
 - `Sink::write` (`sinks.rs`): Dispatches a log entry to this sink (no-op when below `min_level`).
+- `Sink::write_structured` (`sinks.rs`): Dispatches a structured log entry with key-value `fields` to this sink.
 - `Sink::type_name` (`sinks.rs`): Returns the sink type name string.
 - `Sink::path` (`sinks.rs`): Returns the path for a file sink, or `None`.
 - `Sink::read_memory` (`sinks.rs`): Reads all memory entries and optionally drains them.
@@ -53,6 +63,7 @@ Log output from game scripts appears alongside engine log output. The separation
 - `SinkRegistry::remove` (`sinks.rs`): Removes a sink by id.
 - `SinkRegistry::clear` (`sinks.rs`): Removes all sinks.
 - `SinkRegistry::dispatch` (`sinks.rs`): Dispatches a log entry to all registered sinks.
+- `SinkRegistry::dispatch_structured` (`sinks.rs`): Dispatches a structured log entry to all registered sinks.
 - `SinkRegistry::get` (`sinks.rs`): Returns a sink by id.
 
 ## Lua API Reference
@@ -74,6 +85,11 @@ Log output from game scripts appears alongside engine log output. The separation
 - `lurek.log.listSinks`: Returns a table describing all registered sinks.
 - `lurek.log.readMemory`: Reads entries from a memory sink. If drain=true the buffer is cleared.
 - `lurek.log.flushFile`: Flushes the OS write buffer for a file sink.
+- `lurek.log.struct`: Emits a structured log message with key-value fields.
+- `lurek.log.debug_fields`: Emits a debug structured log message. Shorthand for `struct("debug", ...)`.
+- `lurek.log.info_fields`: Emits an info structured log message. Shorthand for `struct("info", ...)`.
+- `lurek.log.warn_fields`: Emits a warn structured log message. Shorthand for `struct("warn", ...)`.
+- `lurek.log.error_fields`: Emits an error structured log message. Shorthand for `struct("error", ...)`.
 
 ## References
 

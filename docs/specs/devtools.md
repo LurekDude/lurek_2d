@@ -21,6 +21,8 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 
 `FileWatcher` polls file modification times at a configurable interval. When a watched path's mtime changes, it queues a change notification that Lua code can poll to trigger hot-reload of assets or scripts.
 
+The `repl.rs` source file adds `ReplConsole`, an interactive Lua REPL with a bounded input history buffer that can be embedded in a running game session without spawning a separate process. Lua scripts drive it through `lurek.devtools.repl:eval(code)` for expression execution, `repl:history()` and `repl:historySize()` for browsing past inputs, and `repl:clearHistory()` to reset the buffer — enabling in-game developer consoles that evaluate live Lua without external tooling.
+
 **Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/devtools_api.rs`.
 
 ## Files
@@ -29,6 +31,7 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 - `logger.rs`: Defines LogLevel, LogEntry, and Logger for runtime log capture and filtering. This is the place to inspect when diagnostic history, severity filtering, or category tagging changes.
 - `mod.rs`: Module root that re-exports the public devtools surface. It keeps the module easy to import without exposing internal file layout.
 - `profiler.rs`: Defines ProfileZone and Profiler for nested CPU timing zones recorded across frames. It owns the push or pop profiler model and the retained per-frame profiling history.
+- `repl.rs`: REPL console for interactive Lua evaluation inside a running game session.
 - `watcher.rs`: Defines FileWatcher for lightweight path polling based on modification time. It is the module's file-change detection primitive for developer workflows.
 
 ## Types
@@ -40,6 +43,7 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 - `Logger` (`struct`, `logger.rs`): In-memory logging surface with severity filtering and bounded history. It is the right place to look when runtime diagnostics need to be retained, filtered, or surfaced in tools.
 - `ProfileZone` (`struct`, `profiler.rs`): One timed scope inside the profiler tree. It is useful when debugging incorrect nesting, missing pops, or self-time calculations.
 - `Profiler` (`struct`, `profiler.rs`): Frame-by-frame nested timing recorder built around push or pop zones. It exists for CPU-cost inspection, not for GPU profiling or OS-level tracing.
+- `ReplConsole` (`struct`, `repl.rs`): Interactive Lua REPL with a bounded input history buffer.
 - `FileWatcher` (`struct`, `watcher.rs`): Polling watcher for individual file paths. It is intentionally simple and should be treated as a developer convenience tool, not a full file-system event subsystem.
 
 ## Functions
@@ -66,6 +70,12 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 - `Profiler::end_frame` (`profiler.rs`): Seals the current frame and stores the collected zones.
 - `Profiler::get_frame` (`profiler.rs`): Returns zone data for the frame at offset `idx` (0 = most recent, negative = relative).
 - `Profiler::reset` (`profiler.rs`): Clears all captured profiling data and resets the zone stack.
+- `ReplConsole::new` (`repl.rs`): Creates a new REPL console with the given history limit.
+- `ReplConsole::eval` (`repl.rs`): Evaluates a Lua snippet and records the input in history.
+- `ReplConsole::history` (`repl.rs`): Returns a read-only slice of the history buffer (oldest first).
+- `ReplConsole::clear` (`repl.rs`): Clears the history buffer.
+- `ReplConsole::len` (`repl.rs`): Returns the current number of history entries.
+- `ReplConsole::is_empty` (`repl.rs`): Returns `true` if the history is empty.
 - `FileWatcher::new` (`watcher.rs`): Creates a new empty watcher.
 - `FileWatcher::watch` (`watcher.rs`): Adds a path to the watch list.
 - `FileWatcher::unwatch` (`watcher.rs`): Removes a path from the watch list.
@@ -87,7 +97,7 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 - `lurek.devtools.setLogFile`: Sets the log file path (empty string disables file output).
 - `lurek.devtools.getLogFile`: Returns the current log file path.
 - `lurek.devtools.getLogHistory`: Returns recent log entries as an array of tables.
-- `lurek.devtools.clearLog`: Clears all log history.
+- `lurek.devtools.clearLog`: Discards all accumulated log entries from the in-memory devtools log buffer.
 - `lurek.devtools.setProfilingEnabled`: Enables or disables the profiler.
 - `lurek.devtools.isProfilingEnabled`: Returns whether the profiler is enabled.
 - `lurek.devtools.profilePush`: Opens a named profiling zone on the stack.
@@ -116,6 +126,21 @@ The `devtools` module provides Lurek2D's in-process developer tools: a structure
 - `lurek.devtools.removeWatch`: Removes a watch by the id returned from exposeWatch. Returns true if removed.
 - `lurek.devtools.getWatches`: Calls all registered watch getters and returns a table of {name, category, value} records.
 - `lurek.devtools.snapshot`: Takes a structured snapshot of all watches + frame stats + last profile frame.
+- `lurek.devtools.profilerReport`: Returns a flat summary table of all recorded profiler zones across all stored
+- `lurek.devtools.newFileWatcher`: Creates a standalone per-path file watcher. Call `:check()` once per frame
+- `lurek.devtools.newRepl`: Creates an interactive Lua REPL console with a bounded history buffer.
+
+### `FileWatcher` Methods
+- `FileWatcher:onChanged`: Registers a callback invoked (with no arguments) when the watched path changes.
+- `FileWatcher:check`: Polls the watcher. If the file has changed since the last call, fires the
+- `FileWatcher:getPath`: Returns the watched path string.
+- `FileWatcher:cancel`: Removes the stored `onChanged` callback and stops future notifications.
+
+### `ReplConsole` Methods
+- `ReplConsole:eval`: Evaluates a Lua snippet and records the input in history.
+- `ReplConsole:history`: Returns an ordered array of past inputs (oldest first).
+- `ReplConsole:clear`: Clears the REPL history buffer.
+- `ReplConsole:len`: Returns the number of history entries.
 
 ## References
 

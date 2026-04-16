@@ -19,6 +19,8 @@ The `scene` module implements Lurek2D's scene management system for organizing t
 
 `DepthSorter` is a supplemental utility that accumulates `RenderedObject` records carrying `RenderCommand` entries with Z-values and emits them sorted lowest-to-highest Z when `flush()` is called. This provides a straightforward painter's-algorithm sort for mixed-depth 2D scenes.
 
+New scene transition helper methods have been added to `SceneStack`, making common transition patterns available from Lua without requiring game scripts to manage transition progress directly. These additions cover queued transition chaining — triggering one transition after another completes — and instant-swap shortcuts accessible via `lurek.scene.*` for cleaner scene flow code.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `runtime`, `math`. Lua bridge in `src/lua_api/scene_api.rs`.
 
 ## Files
@@ -120,6 +122,7 @@ The `scene` module implements Lurek2D's scene management system for organizing t
 - `lurek.scene.render`: Draws all scenes in the stack from bottom to top.
 - `lurek.scene.renderUi`: Draws UI overlay for all scenes in the stack from bottom to top.
 - `lurek.scene.getStackSize`: Returns the number of scenes on the stack.
+- `lurek.scene.depth`: Returns the number of scenes on the stack.
 - `lurek.scene.isEmpty`: Returns true if the scene stack is empty.
 - `lurek.scene.getCurrent`: Returns the current top scene table, or nil if the stack is empty.
 - `lurek.scene.isTransitioning`: Returns true if a scene transition is currently active.
@@ -146,6 +149,10 @@ The `scene` module implements Lurek2D's scene management system for organizing t
 - `lurek.scene.getTransitionTypes`: Returns a table listing all supported transition type strings.
 - `lurek.scene.serializeScene`: Returns a snapshot of the scene stack as a Lua table: { stack=[name...], data={key=val} }.
 - `lurek.scene.deserializeScene`: Restores scene data_refs from a snapshot produced by serializeScene().
+- `lurek.scene.fade`: Returns a fade cross-dissolve transition config table.
+- `lurek.scene.slide`: Returns a directional slide transition config table.
+- `lurek.scene.wipe`: Returns a wipe/curtain transition config table.
+- `lurek.scene.iris`: Returns an iris in/out (circular reveal) transition config table.
 
 ### `DepthSorter` Methods
 - `DepthSorter:add`: Registers a draw callback at the given depth layer.

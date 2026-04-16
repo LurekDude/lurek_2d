@@ -21,10 +21,13 @@ Utility types: `RandomGenerator` (seedable deterministic linear congruential RNG
 
 All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold heap allocations except spline control-point vectors.
 
+Three new source files add major computational capabilities. `voronoi.rs` introduces `VoronoiDiagram` for Fortune’s sweep-line Voronoi tessellation with site iteration and cell neighbour queries, useful for procedural territory generation and spatial partitioning. `noise.rs` introduces `NoiseField`, a higher-level noise generator wrapping the existing functions with configurable octaves, frequency, and persistence into a single queryable object. `transform.rs` introduces `Transform2D`, a mutable 2D transform wrapper around `Mat3` with chainable translate, rotate, scale, and shear operations plus world-to-local and local-to-world point conversion. Lua callers gain a large set of new `lurek.math.*` functions covering Voronoi generation, noise fields, transform algebra, and extended geometric utilities.
+
 **Scope boundary**: Foundations tier. Zero Lurek2D dependencies. Lua bridge in `src/lua_api/math_api.rs`.
 
 ## Files
 
+- `aabb_tree.rs`: Dynamic axis-aligned bounding box (AABB) tree for broad-phase queries.
 - `bezier.rs`: Implements arbitrary-order Bezier curves with evaluation, derivative, editing, rendering, and transform helpers.
 - `color.rs`: Defines the shared RGBA value type plus byte conversion, packed RGB output, HSV conversion, and gamma helpers.
 - `easing.rs`: Houses the named easing curve functions and the string-based dispatcher used by tweening code and Lua bindings.
@@ -42,9 +45,12 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `tween.rs`: Implements low-level numeric interpolation over one or more values and explicitly stays below the higher-level `src/tween/` feature system.
 - `vec2.rs`: Defines the engine's primary 2D vector type and common arithmetic, direction, interpolation, and geometric helpers.
 - `vec3.rs`: 3D floating-point vector with arithmetic operators and common helpers.
+- `voronoi.rs`: Voronoi tessellation from a set of 2-D seed points.
 
 ## Types
 
+- `AabbEntry` (`struct`, `aabb_tree.rs`): A single entry stored at a leaf node of the AABB tree.
+- `AabbTree` (`struct`, `aabb_tree.rs`): A dynamic bounding-volume hierarchy for efficient AABB overlap queries.
 - `BezierCurve` (`struct`, `bezier.rs`): Editable Bezier curve object for path sampling, tangents, and authorable curve manipulation. It supports both math-heavy tooling and Lua scripting use cases.
 - `Color` (`struct`, `color.rs`): Shared RGBA value type for color transport across rendering-facing APIs. It keeps color conversion logic out of renderer-specific code.
 - `Mat3` (`struct`, `mat3.rs`): Affine 2D matrix for transform composition and point mapping. Higher-level transform code builds on this instead of rolling custom matrix math.
@@ -64,9 +70,20 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `Tween` (`struct`, `tween.rs`): Low-level multi-channel numeric interpolator driven by easing functions and an internal clock. It does not own callbacks, sequences, or property animation workflows.
 - `Vec2` (`struct`, `vec2.rs`): Core 2D vector used pervasively for positions, directions, offsets, and interpolation. It is the default math currency for most engine subsystems.
 - `Vec3` (`struct`, `vec3.rs`): A 3D floating-point vector.
+- `VoronoiCell` (`struct`, `voronoi.rs`): One cell of a Voronoi diagram.
 
 ## Functions
 
+- `AabbTree::new` (`aabb_tree.rs`): Creates an empty AABB tree.
+- `AabbTree::insert` (`aabb_tree.rs`): Inserts an entry with the given AABB into the tree.
+- `AabbTree::remove` (`aabb_tree.rs`): Removes the entry with the given `id` from the tree.
+- `AabbTree::query` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs overlap the query rectangle.
+- `AabbTree::query_point` (`aabb_tree.rs`): Returns the ids of all entries whose AABBs contain the point `(x, y)`.
+- `AabbTree::update` (`aabb_tree.rs`): Updates the AABB for an existing entry.
+- `AabbTree::contains` (`aabb_tree.rs`): Returns `true` if an entry with the given `id` exists in the tree.
+- `AabbTree::len` (`aabb_tree.rs`): Returns the number of entries currently in the tree.
+- `AabbTree::is_empty` (`aabb_tree.rs`): Returns `true` if the tree contains no entries.
+- `AabbTree::clear` (`aabb_tree.rs`): Removes all entries and resets the tree to the empty state.
 - `BezierCurve::new` (`bezier.rs`): Create a new Bezier curve from control points.
 - `BezierCurve::evaluate` (`bezier.rs`): Evaluate the curve at parameter `t` using De Casteljau's algorithm.
 - `BezierCurve::render` (`bezier.rs`): Render the curve as a polyline with the given number of segments.
@@ -163,6 +180,10 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `NoiseGenerator::generate_map` (`noise_generator.rs`): Generates a 2D noise map of `width * height` values using the given options.
 - `triangulate` (`polygon.rs`): Triangulate a simple polygon using the ear-clipping algorithm.
 - `is_convex` (`polygon.rs`): Check if a polygon is convex.
+- `polygon_clip` (`polygon.rs`): Clip a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
+- `polygon_intersection` (`polygon.rs`): Clips polygon `subject` against the convex polygon `clip` using the Sutherland-Hodgman algorithm and returns the intersection region.
+- `polygon_union` (`polygon.rs`): Returns an approximation of the union of two convex polygons by computing the convex hull of all their vertices.
+- `polygon_difference` (`polygon.rs`): Returns an approximation of the difference `A - B` by clipping `A` against the **reversed** edges of `B` (i.e.
 - `RandomGenerator::new` (`random.rs`): Create a new generator with a random seed.
 - `RandomGenerator::with_seed` (`random.rs`): Create with a specific seed for deterministic sequences.
 - `RandomGenerator::random` (`random.rs`): Sample a uniform random value in `[0.0, 1.0)`.
@@ -245,6 +266,7 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `Vec3::distance` (`vec3.rs`): Euclidean distance to `other`.
 - `Vec3::project` (`vec3.rs`): Project this vector onto `onto`.
 - `Vec3::reflect` (`vec3.rs`): Reflect this vector about `normal` (normal must be unit length).
+- `voronoi_from_points` (`voronoi.rs`): Compute the Voronoi diagram for `points`.
 
 ## Lua API Reference
 
@@ -264,25 +286,25 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `lurek.math.fbm`: Returns fractal Brownian motion noise at (x, y).
 - `lurek.math.applyEasing`: Applies a named easing function to progress value t.
 - `lurek.math.linear`: Linear easing (identity).
-- `lurek.math.inQuad`: Quadratic ease-in.
-- `lurek.math.outQuad`: Quadratic ease-out.
-- `lurek.math.inOutQuad`: Quadratic ease-in-out.
+- `lurek.math.inQuad`: Quadratic ease-in — acceleration that starts at zero and increases.
+- `lurek.math.outQuad`: Quadratic ease-out — deceleration that starts fast and ends at zero.
+- `lurek.math.inOutQuad`: Quadratic ease-in-out — slow start, fast middle, slow end.
 - `lurek.math.inCubic`: Cubic ease-in — acceleration starts slowly then increases sharply.
-- `lurek.math.outCubic`: Cubic ease-out.
-- `lurek.math.inOutCubic`: Cubic ease-in-out.
-- `lurek.math.inQuart`: Quartic ease-in.
-- `lurek.math.outQuart`: Quartic ease-out.
-- `lurek.math.inOutQuart`: Quartic ease-in-out.
-- `lurek.math.inSine`: Sinusoidal ease-in.
-- `lurek.math.outSine`: Sinusoidal ease-out.
-- `lurek.math.inOutSine`: Sinusoidal ease-in-out.
-- `lurek.math.inExpo`: Exponential ease-in.
-- `lurek.math.outExpo`: Exponential ease-out.
-- `lurek.math.inOutExpo`: Exponential ease-in-out.
-- `lurek.math.inElastic`: Elastic ease-in.
-- `lurek.math.outElastic`: Elastic ease-out.
-- `lurek.math.outBounce`: Bounce ease-out.
-- `lurek.math.inBounce`: Bounce ease-in.
+- `lurek.math.outCubic`: Cubic ease-out — rapid deceleration using a cubic power curve.
+- `lurek.math.inOutCubic`: Cubic ease-in-out — slow start and end with fast cubic middle.
+- `lurek.math.inQuart`: Quartic ease-in — strongly delayed acceleration using a power-of-4 curve.
+- `lurek.math.outQuart`: Quartic ease-out — rapid deceleration using a power-of-4 curve.
+- `lurek.math.inOutQuart`: Quartic ease-in-out — very slow start and end with a sharp middle peak.
+- `lurek.math.inSine`: Sinusoidal ease-in — gentle acceleration based on a sine curve.
+- `lurek.math.outSine`: Sinusoidal ease-out — gentle deceleration based on a cosine curve.
+- `lurek.math.inOutSine`: Sinusoidal ease-in-out — smooth S-curve based on cosine interpolation.
+- `lurek.math.inExpo`: Exponential ease-in — very slow start that accelerates sharply near the end.
+- `lurek.math.outExpo`: Exponential ease-out — sharp initial speed that decelerates exponentially.
+- `lurek.math.inOutExpo`: Exponential ease-in-out — very slow start and end with an exponential surge.
+- `lurek.math.inElastic`: Elastic ease-in — spring-like overshoot at the beginning of the motion.
+- `lurek.math.outElastic`: Elastic ease-out — spring-like oscillation that settles at the target.
+- `lurek.math.outBounce`: Bounce ease-out — simulates a ball bouncing against the target value.
+- `lurek.math.inBounce`: Bounce ease-in — reverse bounce effect that accelerates into the motion.
 - `lurek.math.inBack`: Back ease-in — overshoots slightly before settling at the target.
 - `lurek.math.outBack`: Back ease-out — overshoots the target then snaps back into place.
 - `lurek.math.triangulate`: Triangulates a simple polygon given as a flat table {x1,y1, x2,y2, ...}.
@@ -333,12 +355,26 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 - `lurek.math.simplexNoise`: Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
 - `lurek.math.vec2`: Creates a 2D vector with x and y components.
 - `lurek.math.Vec2`: Compatibility alias for `vec2`.
-- `lurek.math.vec3`: Creates a 3D vector.
+- `lurek.math.vec3`: Creates a 3D vector `{x, y, z}` table with numeric components.
 - `lurek.math.Vec3`: Compatibility alias for `vec3`.
 - `lurek.math.catmullRom`: Creates a Catmull-Rom spline through the given control points.
 - `lurek.math.hermite`: Creates a Hermite spline defined by two endpoints and tangents.
 - `lurek.math.lerp`: Linear interpolation between two numbers: a + (b - a) * t.
 - `lurek.math.remap`: Remaps `v` from [in_min, in_max] to [out_min, out_max].
+- `lurek.math.polygonClip`: Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
+- `lurek.math.aabbTree`: Creates a new empty AABB tree for efficient broad-phase overlap queries.
+- `lurek.math.polygonIntersection`: Computes the intersection of two convex polygons using the Sutherland-Hodgman
+- `lurek.math.polygonUnion`: Computes the approximate union of two convex polygons as the convex hull of
+- `lurek.math.polygonDifference`: Computes the approximate difference `A - B` (the part of A not covered by B).
+- `lurek.math.voronoi`: Computes the Voronoi diagram for a list of 2-D seed points.
+
+### `AabbTree` Methods
+- `AabbTree:remove`: Removes the entry with the given id.
+- `AabbTree:queryPoint`: Returns the ids of all entries whose AABBs contain the given point.
+- `AabbTree:contains`: Returns true if an entry with the given id exists in the tree.
+- `AabbTree:len`: Returns the number of entries in the tree.
+- `AabbTree:isEmpty`: Returns true if the tree contains no entries.
+- `AabbTree:clear`: Removes all entries from the tree.
 
 ### `BezierCurve` Methods
 - `BezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
@@ -382,15 +418,15 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 
 ### `SpatialHash` Methods
 - `SpatialHash:remove`: Removes an item by its ID.
-- `SpatialHash:clear`: Removes all items.
-- `SpatialHash:getCellSize`: Returns the cell size.
+- `SpatialHash:clear`: Removes all registered items from this spatial hash, leaving it empty.
+- `SpatialHash:getCellSize`: Returns the cell size used to partition the spatial hash grid.
 - `SpatialHash:getItemCount`: Returns the number of items in the hash.
 
 ### `Transform` Methods
 - `Transform:translate`: Applies translation to the transform.
 - `Transform:rotate`: Applies a rotation in radians.
 - `Transform:scale`: Applies non-uniform scaling.
-- `Transform:shear`: Applies shear factors.
+- `Transform:shear`: Applies horizontal and vertical shear factors to this transform matrix.
 - `Transform:reset`: Resets the transform to identity.
 - `Transform:transformPoint`: Transforms a point from local space to world space.
 - `Transform:inverseTransformPoint`: Transforms a point from world space back to local space.
@@ -400,7 +436,7 @@ All types are plain-old data with `#[derive(Debug, Clone, Copy)]`; none hold hea
 
 ### `Tween` Methods
 - `Tween:update`: Advances the clock by dt seconds. Returns true when complete.
-- `Tween:reset`: Resets the clock to 0.
+- `Tween:reset`: Resets the tween elapsed time to zero, restarting the animation.
 - `Tween:getValue`: Returns the interpolated value at 1-based index, or all values as a
 - `Tween:getAllValues`: Returns all interpolated values as a table.
 - `Tween:isComplete`: Returns true if the tween has finished.

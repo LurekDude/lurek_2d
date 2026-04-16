@@ -19,6 +19,8 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 
 `ParticleShape` is an enum of five geometric render primitives (Square, Circle, Triangle, Spark, Diamond) for texture-free particle rendering. `Trail` adds a ribbon effect as a `Vec<TrailPoint>` history attached to each particle for smoke, laser, and motion-blur effects.
 
+Additional emitter control methods have been added to `ParticleSystem`, enabling finer runtime manipulation of active emitter state through the Lua API. These updates extend the `ParticleConfig` parameter set with new shape and physics modifiers that game scripts can adjust mid-flight, including updated support for shrapnel emission patterns, ring-thickness control, and ray-aspect particle rendering.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/particle_api.rs`.
 
 ## Files
@@ -120,7 +122,7 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 - `ParticleSystem:emit`: Emits a burst of the given number of particles.
 - `ParticleSystem:start`: Starts or restarts particle emission.
 - `ParticleSystem:stop`: Stops particle emission immediately.
-- `ParticleSystem:pause`: Pauses the emitter.
+- `ParticleSystem:pause`: Pauses particle emission; existing particles continue to simulate.
 - `ParticleSystem:resume`: Resumes a paused emitter.
 - `ParticleSystem:reset`: Removes all particles and resets the emitter.
 - `ParticleSystem:moveTo`: Moves the emitter to the given world position.
@@ -147,7 +149,7 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 - `ParticleSystem:setDirection`: Sets emission direction in radians.
 - `ParticleSystem:getDirection`: Returns emission direction in radians.
 - `ParticleSystem:setSpread`: Sets emission spread (half-angle cone) in radians.
-- `ParticleSystem:getSpread`: Returns emission spread.
+- `ParticleSystem:getSpread`: Returns the half-angle spread in radians for the emission cone.
 - `ParticleSystem:getLinearAcceleration`: Returns linear acceleration range.
 - `ParticleSystem:getRadialAcceleration`: Returns radial acceleration range.
 - `ParticleSystem:getTangentialAcceleration`: Returns tangential acceleration range.
@@ -156,13 +158,13 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 - `ParticleSystem:setSizes`: Sets size keyframes (varargs: each number is one keyframe).
 - `ParticleSystem:getSizes`: Returns size keyframes as a Lua table.
 - `ParticleSystem:setSizeVariation`: Sets size variation (0–1).
-- `ParticleSystem:getSizeVariation`: Returns size variation.
+- `ParticleSystem:getSizeVariation`: Returns the maximum random size variation applied to newly emitted particles.
 - `ParticleSystem:setRotation`: Sets initial rotation range in radians.
 - `ParticleSystem:getRotation`: Returns initial rotation range.
 - `ParticleSystem:setSpin`: Sets angular velocity range.
 - `ParticleSystem:getSpin`: Returns angular velocity range.
 - `ParticleSystem:setSpinVariation`: Sets spin variation (0–1).
-- `ParticleSystem:getSpinVariation`: Returns spin variation.
+- `ParticleSystem:getSpinVariation`: Returns the maximum random angular velocity variation for new particles.
 - `ParticleSystem:setRelativeRotation`: Sets whether particle rotation follows velocity direction.
 - `ParticleSystem:hasRelativeRotation`: Returns whether relative rotation is enabled.
 - `ParticleSystem:setColors`: Sets color keyframes. Each arg is a table {r, g, b, a}.
@@ -177,8 +179,8 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 - `ParticleSystem:getEmissionArea`: Returns emission area: dist-string, w, h.
 - `ParticleSystem:setShape`: Sets the particle draw shape.
 - `ParticleSystem:getShape`: Returns the particle draw shape as a string.
-- `ParticleSystem:getGravity`: Returns gravity (x, y).
-- `ParticleSystem:setGravity`: Sets gravity (x, y).
+- `ParticleSystem:getGravity`: Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
+- `ParticleSystem:setGravity`: Sets the gravity acceleration applied to all active particles each frame.
 - `ParticleSystem:render`: Renders all live particles to the GPU command queue.
 - `ParticleSystem:clone`: Creates a copy of this particle system (config only, no live particles).
 - `ParticleSystem:drawToImage`: Renders all live particles to a CPU ImageData.
@@ -187,9 +189,9 @@ The `particle` module implements emitter-based 2D particle systems. A `ParticleS
 - `ParticleSystem:clearAttractors`: Removes all attractors from this particle system.
 - `ParticleSystem:getAttractorCount`: Returns the number of attractors currently registered on this system.
 - `ParticleSystem:clearBounds`: Removes the bounding rectangle so particles can move freely.
-- `ParticleSystem:addSubEmitter`: Attaches a sub-emitter that bursts when a particle dies; accepts a config table and optional burst count.
-- `ParticleSystem:setFlipbook`: Configures sprite-sheet flipbook animation by dividing the texture into a cols×rows grid at the given FPS.
-- `ParticleSystem:getFlipbook`: Returns the current flipbook configuration as `(cols, rows, fps)`, or `(nil, nil, nil)` if not set.
+- `ParticleSystem:addSubEmitter`: Attaches a sub-emitter that bursts when a particle dies.
+- `ParticleSystem:setFlipbook`: Configures sprite-sheet flipbook animation by dividing the texture into a grid.
+- `ParticleSystem:getFlipbook`: Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
 
 ### `Trail` Methods
 - `Trail:pushPoint`: Appends a new point to the trail head.

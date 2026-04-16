@@ -21,6 +21,8 @@ Write operations are always routed to the save-data directory (if configured) ra
 
 The module also provides the `MountPoint` abstraction for overlaying read-only archive or zip mounts on top of the base file system, used by the `mods` module to load mod content packages.
 
+Two additional types expand the runtime I/O surface. `FileWatcher` (from `watcher.rs`) is a polling-based change detector that Lua scripts can use to react to file modifications at development time, created via `lurek.fs.newWatcher()`. `ZipArchive` adds first-class ZIP archive support: files inside a `.zip` can be listed and read without extracting them to disk, created via `lurek.fs.newZip()`. Both types expose full Lua method sets through `lurek.filesystem.*`.
+
 **Scope boundary**: Core Runtime tier. Depends on `runtime` for error types. Lua bridge in `src/lua_api/filesystem_api.rs`.
 
 ## Files
@@ -30,6 +32,8 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - `file_handle.rs`: File handle with buffered read/write and sandboxed path resolution.
 - `mod.rs`: Mod implementation for the `filesystem` subsystem.
 - `vfs.rs`: Vfs implementation for the `filesystem` subsystem.
+- `watcher.rs`: Polling-based file watcher for development hot-reload workflows.
+- `zip_mount.rs`: ZIP archive mounting — read-only virtual filesystem layer backed by a `.zip` file.
 
 ## Types
 
@@ -44,6 +48,8 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - `FileType` (`enum`, `vfs.rs`): File type classification for `FileInfo`.
 - `MountLayer` (`struct`, `vfs.rs`): A virtual filesystem mount layer overlaid on top of the game directory.
 - `GameFS` (`struct`, `vfs.rs`): Sandboxed filesystem rooted at the game directory; prevents path-traversal attacks.
+- `FileWatcher` (`struct`, `watcher.rs`): Polling file watcher that detects modification-time changes.
+- `ZipMount` (`struct`, `zip_mount.rs`): A read-only mount backed by a `.zip` file.
 
 ## Functions
 
@@ -100,6 +106,21 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - `GameFS::resolve_save_path` (`vfs.rs`): Resolve a logical path to an absolute path for writing.
 - `GameFS::read_lines` (`vfs.rs`): Reads a text file and returns its contents split into lines.
 - `GameFS::open_file` (`vfs.rs`): Opens a file handle by parsing the mode string and delegating to `FileHandle::open`.
+- `GameFS::copy_file` (`vfs.rs`): Copies a file within the sandbox.
+- `GameFS::move_file` (`vfs.rs`): Moves (renames) a file within the `save/` directory.
+- `GameFS::remove_dir` (`vfs.rs`): Recursively removes a directory and all its contents within the `save/` directory.
+- `GameFS::glob` (`vfs.rs`): Returns a list of paths inside the game root that match a simple glob pattern.
+- `FileWatcher::new` (`watcher.rs`): Creates an empty [`FileWatcher`] with no watched paths.
+- `FileWatcher::watch` (`watcher.rs`): Adds `path` to the watch list.
+- `FileWatcher::unwatch` (`watcher.rs`): Removes `path` from the watch list.
+- `FileWatcher::is_watching` (`watcher.rs`): Returns `true` if `path` is currently on the watch list.
+- `FileWatcher::poll` (`watcher.rs`): Polls all watched paths and returns a sorted list of paths whose modification time has changed since the last call to `poll()` (or since `watch()` for newly added paths).
+- `FileWatcher::len` (`watcher.rs`): Returns the number of paths currently being watched.
+- `FileWatcher::is_empty` (`watcher.rs`): Returns `true` if no paths are being watched.
+- `ZipMount::new` (`zip_mount.rs`): Opens a ZIP archive at `archive_path` and builds the entry index.
+- `ZipMount::read_file` (`zip_mount.rs`): Reads the contents of `virtual_path` from the ZIP.
+- `ZipMount::contains` (`zip_mount.rs`): Returns `true` if `virtual_path` exists in this ZIP mount.
+- `ZipMount::list_files` (`zip_mount.rs`): Returns a sorted list of all virtual file paths exposed by this mount.
 
 ## Lua API Reference
 
@@ -107,6 +128,10 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - Namespace: `lurek.filesystem`
 
 ### Module Functions
+- `lurek.filesystem.mountZip`: Mounts a ZIP archive at a virtual path prefix, making its contents readable
+- `lurek.filesystem.watchPath`: Adds `path` to the polled file-watch list.
+- `lurek.filesystem.unwatchPath`: Removes `path` from the polled file-watch list.  No-op if not watched.
+- `lurek.filesystem.pollWatchers`: Polls all watched paths and returns an array of paths that changed since the
 - `lurek.filesystem.read`: Reads a text file and returns its contents as a string.
 - `lurek.filesystem.write`: Writes a string to a file in the save directory.
 - `lurek.filesystem.exists`: Returns whether the given file or directory exists.
@@ -131,6 +156,10 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - `lurek.filesystem.unmount`: Removes a virtual mount layer by mountpoint.
 - `lurek.filesystem.load`: Loads and compiles a Lua file from the VFS, returning it as a callable function.
 - `lurek.filesystem.newFileData`: Loads a file from the VFS into a FileData buffer.
+- `lurek.filesystem.copy`: Copies a file within the sandbox.
+- `lurek.filesystem.move`: Moves (renames) a file within the `save/` directory.
+- `lurek.filesystem.removeDir`: Recursively deletes a directory and all its contents within `save/`.
+- `lurek.filesystem.glob`: Returns a sorted list of paths matching a simple wildcard pattern.
 
 ### `FileData` Methods
 - `FileData:getSize`: Returns the file size in bytes.
@@ -148,6 +177,12 @@ The module also provides the `MountPoint` abstraction for overlaying read-only a
 - `FileHandle:flush`: Flushes all buffered writes to disk without closing the handle.
 - `FileHandle:close`: Flushes any pending writes and closes the file handle.
 - `FileHandle:isEOF`: Returns whether the read cursor has reached the end of the file.
+
+### `ZipMount` Methods
+- `ZipMount:readFile`: Reads a file from the ZIP and returns it as a string of bytes.
+- `ZipMount:contains`: Returns true if `virtual_path` exists inside this ZIP mount.
+- `ZipMount:listFiles`: Returns a sorted array of all virtual paths exposed by this ZIP mount.
+- `ZipMount:prefix`: Returns the virtual path prefix this archive was mounted under.
 
 ## References
 

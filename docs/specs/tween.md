@@ -19,6 +19,8 @@ The `tween` module provides property animation through interpolated value transi
 
 `LuaTween` is the Lua-facing handle: it wraps `TweenState` alongside the target table, target field name, start value, end value, and callback references. `LuaTweenSequence` chains multiple tweens queue-style (each starts when the previous completes). `LuaTweenParallel` runs multiple tweens simultaneously and fires a shared completion callback when the last one finishes.
 
+The new `chain.rs` source file introduces `TweenChain`, a higher-level sequencer that links multiple tweens end-to-end as a named, reusable animation script. Unlike `LuaTweenSequence` (which is fire-and-forget), `TweenChain` supports named-step access, partial replay from a named step, and chain-level looping. Lua scripts create chains via `lurek.tween.newChain()` and configure them with a fluent method API, making complex multi-property animation sequences — such as a UI panel that slides in, bounces, then fades — expressible in a few lines.
+
 **Scope boundary**: Feature Systems tier. Depends on `math` (easing functions), `runtime`. Lua bridge in `src/lua_api/tween_api.rs`.
 
 ## Files
@@ -26,6 +28,7 @@ The `tween` module provides property animation through interpolated value transi
 - `engine.rs`: Defines `TweenEngine`, the active-object pool that ticks live tween handles and releases them when done.
 - `handle.rs`: Defines the Lua-backed domain handle types for single tweens, sequences, parallel groups, and their step or entry records.
 - `mod.rs`: Declares the tween submodules and re-exports the core timing state, handle types, and engine.
+- `spring.rs`: Physics-based spring interpolation for the `lurek.tween` system.
 - `state.rs`: Defines `TweenState` plus built-in easing lookup and easing-name enumeration.
 
 ## Types
@@ -36,6 +39,8 @@ The `tween` module provides property animation through interpolated value transi
 - `LuaTweenSequence` (`struct`, `handle.rs`): The ordered step runner that executes tween, delay, and callback steps one after another.
 - `ParallelEntry` (`struct`, `handle.rs`): The per-arm tween record stored inside a parallel group.
 - `LuaTweenParallel` (`struct`, `handle.rs`): The grouped runner that executes multiple tween entries at the same time.
+- `SpringAxis` (`struct`, `spring.rs`): Single-axis spring simulation driven by a damped differential equation.
+- `SpringSystem` (`struct`, `spring.rs`): Named collection of [`SpringAxis`] values that all share the same parameters.
 - `TweenState` (`struct`, `state.rs`): The pure timing and easing core that tracks elapsed time, completion, and interpolation progress without Lua dependencies.
 
 ## Functions
@@ -43,7 +48,7 @@ The `tween` module provides property animation through interpolated value transi
 - `TweenEngine::new` (`engine.rs`): Creates an empty `TweenEngine` with no active objects.
 - `TweenEngine::update` (`engine.rs`): Advances all active tweens, sequences, and parallels by `dt` seconds.
 - `TweenEngine::cancel_all` (`engine.rs`): Cancels and removes all active tweens, sequences, and parallels.
-- `TweenEngine::active_count` (`engine.rs`): Returns the total number of currently tracked objects (tweens + seqs + pars).
+- `TweenEngine::active_count` (`engine.rs`): Returns the total number of currently tracked objects (tweens + seqs + pars + springs).
 - `LuaTween::new` (`handle.rs`): Creates a `LuaTween` that animates named fields of a Lua table.
 - `LuaTween::tick_with` (`handle.rs`): Advances the tween by `dt` seconds, writing interpolated values to the target table.
 - `LuaTween::fire_on_complete` (`handle.rs`): Fires the `on_complete` callback if one is set, then frees the registry key.
@@ -51,6 +56,17 @@ The `tween` module provides property animation through interpolated value transi
 - `LuaTweenSequence::tick_with` (`handle.rs`): Advances the sequence by `dt` seconds.
 - `LuaTweenParallel::new` (`handle.rs`): Creates an empty, inactive `LuaTweenParallel`.
 - `LuaTweenParallel::tick_with` (`handle.rs`): Advances all child entries by `dt` seconds.
+- `SpringAxis::new` (`spring.rs`): Creates a `SpringAxis` with the given initial position and target.
+- `SpringAxis::update` (`spring.rs`): Advances the spring simulation by `dt` seconds.
+- `SpringAxis::is_settled` (`spring.rs`): Returns `true` when the axis has settled within `precision` of the target.
+- `SpringAxis::reset` (`spring.rs`): Teleports to a new position and target, clearing velocity and the settled flag.
+- `SpringAxis::set_target` (`spring.rs`): Updates the target without resetting velocity or position.
+- `SpringSystem::new` (`spring.rs`): Creates an empty `SpringSystem` with the given parameters.
+- `SpringSystem::add_axis` (`spring.rs`): Adds a named axis with the given starting position and target.
+- `SpringSystem::update` (`spring.rs`): Advances all axes by `dt` seconds.
+- `SpringSystem::is_settled` (`spring.rs`): Returns `true` when every axis has settled.
+- `SpringSystem::set_target` (`spring.rs`): Sets the target for a named axis without resetting velocity.
+- `SpringSystem::get_position` (`spring.rs`): Returns the current position of a named axis, or `None` if not found.
 - `TweenState::new` (`state.rs`): Creates a new tween state with the given duration and easing name.
 - `TweenState::tick` (`state.rs`): Advances the elapsed time by `dt` seconds.
 - `TweenState::reset` (`state.rs`): Resets elapsed time to 0 so the tween plays from the beginning.
@@ -72,15 +88,27 @@ The `tween` module provides property animation through interpolated value transi
 - `lurek.tween.sequence`: Creates an empty TweenSequence. Add steps with :tween(), :delay(), :callback(),
 - `lurek.tween.parallel`: Creates an empty TweenParallel. Add entries with :tween() or :add(tween),
 - `lurek.tween.delay`: Creates a no-op tween that waits `seconds`, then optionally calls `callback`.
-- `lurek.tween.cancelAll`: Cancels all active tweens, sequences, and parallels immediately.
+- `lurek.tween.cancelAll`: Cancels all active tweens, sequences, parallels, and springs immediately.
 - `lurek.tween.getActiveCount`: Returns the number of currently active tween objects (tweens + seqs + pars).
 - `lurek.tween.registerEasing`: Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
 - `lurek.tween.getEasingNames`: Returns a list of all available easing names (built-in + custom).
 - `lurek.tween.newState`: Creates a standalone tween timing state without registering it with the engine.
+- `lurek.tween.to`: Sugar for `tween()` with `target` first — natural read order.
+- `lurek.tween.spring`: Creates a physics-based spring animation that drives named fields on `target_table`
+
+### `Spring` Methods
+- `Spring:update`: Advances the spring by `dt` seconds and writes positions to the target table.
+- `Spring:isSettled`: Returns `true` when all spring axes have converged within `precision`.
+- `Spring:isActive`: Returns `true` if the spring has not been cancelled or settled.
+- `Spring:setTarget`: Updates target values for all fields present in `fields_table`.
+- `Spring:setStiffness`: Updates the stiffness constant on all axes.
+- `Spring:setDamping`: Updates the damping coefficient on all axes.
+- `Spring:cancel`: Stops the spring. The engine will drop it on the next `update(dt)` call.
+- `Spring:getPosition`: Returns the current interpolated position for the named field, or `nil`.
 
 ### `Tween` Methods
 - `Tween:pause`: Pauses this tween; time stops advancing but the tween is not cancelled.
-- `Tween:resume`: Resumes a paused tween.
+- `Tween:resume`: Resumes a paused tween, continuing from the position where it was paused.
 - `Tween:isActive`: Returns true if the tween is still running (not completed or cancelled).
 - `Tween:getProgress`: Returns raw 0..1 playback progress (not eased, not accounting for yoyo).
 - `Tween:setRepeat`: Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).

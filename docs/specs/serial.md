@@ -19,6 +19,8 @@ The module performs no file I/O — callers supply strings, receive strings. Fil
 
 A `Codec` helper trait provides a unified `encode(value)` / `decode(text)` interface implemented for all four formats, enabling code that needs to switch serialization format at runtime without branching on format names.
 
+The new `rle.rs` source file adds `RleEncoder` and `RleDecoder`, a run-length encoding implementation for compressing repetitive binary sequences such as tilemap rows, sprite palette data, or binary save blobs. Lua scripts access these through `lurek.codec.*`, enabling lightweight in-process compression for data that benefits from RLE's simplicity and zero-dependency overhead without pulling in a full compression library.
+
 **Scope boundary**: Foundations tier. Depends only on external crates (toml, serde_json, csv, indexmap). Lua bridge in `src/lua_api/serial_api.rs` as `lurek.codec.*`.
 
 ## Files
@@ -27,13 +29,17 @@ A `Codec` helper trait provides a unified `encode(value)` / `decode(text)` inter
 - `json.rs`: Converts between JSON text and `SerialValue`, including the module's only built-in structured success logging.
 - `lua_table.rs`: Defines `SerialValue` plus generic conversion between that tree and Lua values and tables.
 - `mod.rs`: Declares the active format drivers and re-exports the public serialization surface used by the Lua bridge and Rust callers.
+- `msgpack.rs`: MessagePack encoding and decoding for Lurek2D.
+- `schema.rs`: Schema validation for Lurek2D serialized values.
 - `toml.rs`: Converts between TOML text and `SerialValue`, enforcing TOML-specific constraints such as a table root and no null values.
+- `xml.rs`: XML parsing for Lurek2D (read-only).
 - `yaml.rs`: Implements YAML conversion helpers on disk, but the module root does not compile or re-export it.
 
 ## Types
 
 - `CsvOptions` (`struct`, `csv.rs`): Configuration for CSV parsing and encoding. It controls delimiter choice and whether the first row should be treated as headers.
 - `SerialValue` (`enum`, `lua_table.rs`): Common intermediate representation shared by every active text format driver. It is the central type that keeps JSON, TOML, CSV, and Lua-table conversion decoupled from one another.
+- `MsgValue` (`enum`, `msgpack.rs`): A serde-compatible mirror of `SerialValue` used as the msgpack bridge.
 
 ## Functions
 
@@ -43,8 +49,12 @@ A `Codec` helper trait provides a unified `encode(value)` / `decode(text)` inter
 - `to_json` (`json.rs`): Serialize a `SerialValue` to a JSON string.
 - `to_lua` (`lua_table.rs`): Converts a `SerialValue` tree into a Lua value tree.
 - `from_lua` (`lua_table.rs`): Converts a Lua value tree into a `SerialValue` tree.
+- `encode` (`msgpack.rs`): Encode a `SerialValue` tree to MessagePack bytes.
+- `decode` (`msgpack.rs`): Decode MessagePack bytes into a `SerialValue` tree.
+- `validate` (`schema.rs`): Validate a `SerialValue` tree against a schema.
 - `from_toml` (`toml.rs`): Parse a TOML string into a `SerialValue`.
 - `to_toml` (`toml.rs`): Serialize a `SerialValue` to a TOML string.
+- `decode` (`xml.rs`): Parse an XML string into a `SerialValue` tree.
 - `from_yaml` (`yaml.rs`): Parse a YAML string into a `SerialValue`.
 - `to_yaml` (`yaml.rs`): Serialize a `SerialValue` to a YAML string.
 
@@ -60,6 +70,10 @@ A `Codec` helper trait provides a unified `encode(value)` / `decode(text)` inter
 - `lurek.serial.toToml`: Serializes a Lua table to a TOML string.
 - `lurek.serial.fromCsv`: Parses a CSV string and returns a sequence of row tables.
 - `lurek.serial.toCsv`: Serializes a sequence of row tables to a CSV string.
+- `lurek.serial.encodeMsgPack`: Encodes a Lua table to a binary MessagePack string.
+- `lurek.serial.decodeMsgPack`: Decodes a binary MessagePack string into a Lua table.
+- `lurek.serial.decodeXml`: Parses an XML string and returns a nested Lua table.
+- `lurek.serial.validate`: Validates a Lua table against a schema table.
 
 ## References
 

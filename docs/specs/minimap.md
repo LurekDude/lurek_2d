@@ -21,6 +21,8 @@ The `minimap` module provides a grid-based minimap data model for overhead map d
 
 The `render` submodule converts the `Minimap` state into a series of `RenderCommand::DrawShape` and `RenderCommand::DrawImage` entries each frame.
 
+New overlay management methods have been added to `Minimap`, expanding the surface available to Lua scripts for custom map annotations. These additions allow game code to add, remove, and query overlay shapes and paths programmatically through `lurek.minimap.*`, making it straightforward to display pathfinding routes, territory borders, or event zones directly on the minimap without custom rendering code.
+
 **Scope boundary**: Feature Systems tier. Depends on `render` (command types), `math`, `runtime`. Lua bridge in `src/lua_api/minimap_api.rs`.
 
 ## Files
@@ -39,6 +41,10 @@ The `render` submodule converts the `Minimap` state into a series of `RenderComm
 - `MinimapObject` (`struct`, `types.rs`): A tracked world object projected onto the minimap with position, type, and owner metadata.
 - `MinimapPing` (`struct`, `types.rs`): A temporary animated alert marker used for events or attention cues.
 - `MinimapMarker` (`struct`, `types.rs`): A persistent named marker with descriptive text for locations of interest.
+- `MarkerAnimation` (`enum`, `types.rs`): Animation applied to a minimap marker icon.
+- `OverlayShape` (`enum`, `types.rs`): A custom geometric shape drawn on top of the minimap in grid space.
+- `OverlayPath` (`struct`, `types.rs`): A pathfinding route overlay displayed on the minimap.
+- `LayerData` (`struct`, `types.rs`): Per-layer terrain data for multi-layer minimap rendering.
 
 ## Functions
 
@@ -96,6 +102,20 @@ The `render` submodule converts the `Minimap` state into a series of `RenderComm
 - `Minimap::has_marker` (`minimap.rs`): Check if a marker with the given ID exists.
 - `Minimap::get_marker_description` (`minimap.rs`): Get the description of a marker, if it exists.
 - `Minimap::marker_count` (`minimap.rs`): Get the number of markers.
+- `Minimap::set_marker_animation` (`minimap.rs`): Attach an animation to a marker.
+- `Minimap::clear_marker_animation` (`minimap.rs`): Remove the animation from a marker, reverting it to static.
+- `Minimap::draw_line` (`minimap.rs`): Push a line segment onto the overlay layer.
+- `Minimap::draw_rect` (`minimap.rs`): Push a rectangle onto the overlay layer.
+- `Minimap::clear_overlay` (`minimap.rs`): Remove all custom geometry from the overlay layer.
+- `Minimap::overlay_shapes` (`minimap.rs`): Return a slice of all overlay shapes for the current frame.
+- `Minimap::show_path` (`minimap.rs`): Display a pathfinding route on the minimap and return its auto-assigned ID.
+- `Minimap::clear_path` (`minimap.rs`): Remove a displayed path.
+- `Minimap::paths` (`minimap.rs`): Return a slice of all active path overlays.
+- `Minimap::set_layer` (`minimap.rs`): Switch the minimap's active render layer.
+- `Minimap::get_layer` (`minimap.rs`): Return the index of the currently active render layer.
+- `Minimap::set_layer_data` (`minimap.rs`): Store tile/cell data for a specific layer index.
+- `Minimap::layer_data` (`minimap.rs`): Return the layer data for the given index, if it exists.
+- `Minimap::layer_count` (`minimap.rs`): Return the number of stored layers.
 - `Minimap::set_anti_alias` (`minimap.rs`): Set whether anti-aliasing is enabled.
 - `Minimap::anti_alias` (`minimap.rs`): Returns whether anti-aliasing is enabled.
 - `Minimap::set_clickable` (`minimap.rs`): Set whether this minimap responds to click hit-testing.
@@ -103,7 +123,7 @@ The `render` submodule converts the `Minimap` state into a series of `RenderComm
 - `Minimap::screen_to_grid` (`minimap.rs`): Convert screen coordinates to grid coordinates.
 - `Minimap::grid_to_screen` (`minimap.rs`): Convert grid coordinates to screen coordinates.
 - `Minimap::get_hover_info` (`minimap.rs`): Get hover tooltip text for the element under the given screen coordinates.
-- `Minimap::update` (`minimap.rs`): Advance time-based effects: decrement ping timers and remove expired pings.
+- `Minimap::update` (`minimap.rs`): Advance time-based effects: decrement ping timers and remove expired pings, and advance animation phases on all animated markers.
 - `Minimap::draw_to_image` (`minimap.rs`): Renders the minimap to an `ImageData` for evidence/testing.
 - `Minimap::build_render_commands` (`minimap.rs`): Generates GPU `RenderCommand`s for the minimap at the given screen position.
 - `Minimap::generate_render_commands` (`render.rs`): Generate render commands to draw the minimap overlay at the given screen position.
@@ -157,10 +177,15 @@ The `render` submodule converts the `Minimap` state into a series of `RenderComm
 - `Minimap:isViewportVisible`: Returns whether the viewport rectangle is visible.
 - `Minimap:getViewportColor`: Returns the viewport rectangle color as r, g, b, a.
 - `Minimap:getPingCount`: Returns the number of active pings.
-- `Minimap:removeMarker`: Removes a marker by ID.
+- `Minimap:removeMarker`: Removes the minimap marker with the given integer ID, if present.
 - `Minimap:hasMarker`: Returns whether a marker with the given ID exists.
 - `Minimap:getMarkerDescription`: Returns the description of a marker, or nil.
 - `Minimap:getMarkerCount`: Returns the number of markers.
+- `Minimap:clearMarkerAnimation`: Removes the animation from a marker, reverting it to static.
+- `Minimap:clearOverlay`: Removes all custom geometry from the minimap overlay.
+- `Minimap:clearPath`: Removes a displayed path. If id is nil, all paths are removed.
+- `Minimap:setLayer`: Switches the minimap's active render layer (0-based index).
+- `Minimap:getLayer`: Returns the index of the currently active render layer.
 - `Minimap:setAntiAlias`: Sets whether anti-aliasing is enabled.
 - `Minimap:isAntiAlias`: Returns whether anti-aliasing is enabled.
 - `Minimap:setClickable`: Sets whether this minimap responds to click hit-testing.

@@ -19,6 +19,8 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 
 `SpriteProjection` projects billboarded textured sprites into screen space with depth buffer clipping. `DoorManager` manages sliding door states (open, closed, opening, closing) for grid-blocking interactive geometry. `HeightMap` adds variable floor and ceiling heights for stepped or multi-level environments. `visibility.rs` computes a 2D visibility polygon via endpoint raycasting for field-of-view shadows. The `segment` submodule provides `Segment` and a general `cast_ray_2d` line-segment intersection test.
 
+The new `floor_uv.rs` source file adds support for floor and ceiling UV texture mapping, enabling fully textured floor and ceiling surfaces in raycaster scenes rather than flat-colored fills. Lua scripts configure per-cell floor and ceiling texture UVs through the extended `lurek.raycaster.*` API, completing the visual feature set needed for Wolfenstein- and Doom-style environments where floor and ceiling textures are as important as wall textures.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/raycaster_api.rs`.
 
 ## Files
@@ -38,6 +40,7 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `render.rs`: Converts a `RaycasterScene` into `RenderCommand` output for textured-quad rendering.
 - `scene.rs`: Defines the high-level scene model of walls, floors, ceilings, and billboard sprites used after geometric casting.
 - `segment.rs`: Implements raycasting against arbitrary 2D segments instead of a grid.
+- `sprite_manager.rs`: Batch sprite manager with depth-sorted projection for raycaster scenes.
 - `sprite_projection.rs`: Projects billboard sprites into screen space with depth and size data.
 - `visibility.rs`: Builds visibility polygons and related field-of-view data from 2D geometry.
 
@@ -63,6 +66,8 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `BillboardSprite` (`struct`, `scene.rs`): A sprite projected into the raycast view that still faces the camera.
 - `RaycasterScene` (`struct`, `scene.rs`): A render-ready scene assembled from raycast results, carrying quads for walls, floors, ceilings, and sprites.
 - `Segment` (`struct`, `segment.rs`): A line segment for raycasting.
+- `WorldSprite` (`struct`, `sprite_manager.rs`): A world-space sprite for scene building.
+- `SpriteManager` (`struct`, `sprite_manager.rs`): Manages a collection of [`WorldSprite`] objects with depth-sorted projection.
 - `SpriteProjection` (`struct`, `sprite_projection.rs`): Sprite projection result.
 
 ## Functions
@@ -87,7 +92,10 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `Raycaster2D::width` (`dda.rs`): Returns the grid width.
 - `Raycaster2D::height` (`dda.rs`): Returns the grid height.
 - `Raycaster2D::cells` (`dda.rs`): Returns a reference to the internal cell data.
+- `Raycaster2D::set_wall_alpha` (`dda.rs`): Sets the opacity for a wall tile type.
+- `Raycaster2D::get_wall_alpha` (`dda.rs`): Returns the opacity for a wall tile type.
 - `Raycaster2D::cast_ray` (`dda.rs`): Casts a single ray from (ox, oy) at the given angle using the DDA algorithm.
+- `Raycaster2D::cast_ray_multi` (`dda.rs`): Casts a ray and collects up to `max_hits` wall hits, continuing through translucent walls (alpha < 1.0) registered via [`set_wall_alpha`].
 - `Raycaster2D::cast_rays` (`dda.rs`): Casts multiple rays spread across a field of view.
 - `Raycaster2D::cast_rays_flat` (`dda.rs`): Casts multiple rays and returns a flat `Vec<f32>` with 5 values per ray.
 - `Raycaster2D::line_of_sight` (`dda.rs`): Checks line of sight between two points using DDA traversal.
@@ -98,6 +106,7 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `Raycaster2D::draw_line_of_sight_to_image` (`dda.rs`): Render a line-of-sight test between two points overlaid on the grid.
 - `Raycaster2D::draw_camera_sweep_to_image` (`dda.rs`): Render a mosaic of first-person views from evenly-spaced angles.
 - `Raycaster2D::draw_textured_view_to_image` (`dda.rs`): Draw a first-person textured raycaster view with procedural textures.
+- `Raycaster2D::cast_floor_row` (`dda.rs`): Computes floor (or ceiling) texture coordinates for one horizontal screen row.
 - `DepthBuffer::new` (`depth_buffer.rs`): Creates a new depth buffer with the given width, initialized to `f32::MAX`.
 - `DepthBuffer::clear` (`depth_buffer.rs`): Clears all depth values to `f32::MAX`.
 - `DepthBuffer::set` (`depth_buffer.rs`): Sets the depth for a specific column.
@@ -130,6 +139,13 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `RaycasterScene::quad_count` (`scene.rs`): Returns the total number of quads in the scene.
 - `RaycasterScene::is_empty` (`scene.rs`): Returns `true` when the scene has no visible geometry.
 - `cast_ray_2d` (`segment.rs`): Casts a ray from (ox, oy) in direction (dx, dy) against a list of segments.
+- `SpriteManager::new` (`sprite_manager.rs`): Creates an empty sprite manager.
+- `SpriteManager::add` (`sprite_manager.rs`): Adds a sprite at the given world position and returns its unique id.
+- `SpriteManager::remove` (`sprite_manager.rs`): Removes the sprite with the given id.
+- `SpriteManager::set_position` (`sprite_manager.rs`): Moves the sprite with the given id to a new world position.
+- `SpriteManager::set_visible` (`sprite_manager.rs`): Sets visibility for the sprite with the given id.
+- `SpriteManager::clear` (`sprite_manager.rs`): Removes all sprites from the manager.
+- `SpriteManager::sort_by_distance` (`sprite_manager.rs`): Returns references to visible sprites sorted back-to-front (farthest first).
 - `field_of_view` (`visibility.rs`): Computes a visibility polygon by casting rays at segment endpoints.
 
 ## Lua API Reference
@@ -139,11 +155,13 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 
 ### Module Functions
 - `lurek.raycaster.new`: Creates a new raycaster grid of the given dimensions.
+- `lurek.raycaster.newMap`: Alias for `new`. Creates a new raycaster grid of the given dimensions.
 - `lurek.raycaster.projectColumn`: Projects a wall distance to screen-space drawing parameters.
 - `lurek.raycaster.distanceShade`: Returns distance-based brightness in [0, 1].
 - `lurek.raycaster.newDoorManager`: Creates a new empty door manager.
 - `lurek.raycaster.newHeightMap`: Creates a new height map with default floor (0.0) and ceiling (1.0) values.
 - `lurek.raycaster.newPointLight`: Creates a point light for use in raycaster scene lighting.
+- `lurek.raycaster.newSpriteManager`: Creates a new empty batch sprite manager for depth-sorted projection.
 
 ### `DoorManager` Methods
 - `DoorManager:openDoor`: Begins opening the door at the given index.
@@ -178,6 +196,15 @@ The `raycaster` module implements a grid-based 2D raycaster engine for Wolfenste
 - `Raycaster:isBlocked`: Returns true when the cell at (x, y) is a wall (value > 0).
 - `Raycaster:width`: Returns the grid width in cells.
 - `Raycaster:height`: Returns the grid height in cells.
+- `Raycaster:getWallAlpha`: Returns the opacity for a wall tile type. Returns 1.0 if not set.
+
+### `SpriteManager` Methods
+- `SpriteManager:remove`: Removes the sprite with the given id. No-op if not found.
+- `SpriteManager:setPosition`: Moves the sprite with the given id to world (x, y).
+- `SpriteManager:setVisible`: Shows or hides the sprite with the given id.
+- `SpriteManager:clear`: Removes all sprites from the manager.
+- `SpriteManager:type`: Returns the type string "SpriteManager".
+- `SpriteManager:typeOf`: Returns the type string "SpriteManager".
 
 ## References
 

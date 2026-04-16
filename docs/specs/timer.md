@@ -19,6 +19,8 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 
 `sleep(seconds)` pauses the calling OS thread and is intended only for worker VM threads (from `lurek.thread`); calling it from the main VM blocks the engine's frame loop and is therefore prohibited in the Lua API documentation.
 
+The timer module has been extended with physics step controls: `setPhysicsMaxSteps` and `getPhysicsMaxSteps` allow game scripts to configure the maximum number of physics sub-steps the engine processes in a single frame, preventing spiral-of-death behavior when frame time spikes. Schedule improvements to `lurek.time.schedule` provide more expressive deferred callback registration patterns for scripts that need fine-grained timing control.
+
 **Scope boundary**: Core Runtime tier. Depends only on `runtime`. Lua bridge in `src/lua_api/timer_api.rs`.
 
 ## Files
@@ -55,6 +57,9 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 - `Scheduler::pause` (`scheduler.rs`): Pause a single event by ID.
 - `Scheduler::resume` (`scheduler.rs`): Resume a previously paused event by ID.
 - `Scheduler::is_paused` (`scheduler.rs`): Returns `true` if the event with `id` is currently paused.
+- `Scheduler::pause_named` (`scheduler.rs`): Pauses a scheduled event by its string name.
+- `Scheduler::resume_named` (`scheduler.rs`): Resumes a previously paused event by its string name.
+- `Scheduler::is_paused_named` (`scheduler.rs`): Returns `true` if the named event is currently paused.
 - `Scheduler::get_remaining` (`scheduler.rs`): Returns the time remaining until the next fire for event `id`, or `None` if not found.
 - `Scheduler::get_interval` (`scheduler.rs`): Returns the base interval for event `id`, or `None` if not found.
 - `Scheduler::get_repeat_count` (`scheduler.rs`): Returns the repeat count remaining for event `id` (-1 = infinite), or `None` if not found.
@@ -82,11 +87,18 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 - `lurek.timer.getMicroTime`: Returns the high-resolution elapsed time since engine start in seconds.
 - `lurek.timer.getPhysicsDelta`: Returns the fixed timestep used by `process_physics` callbacks (seconds).
 - `lurek.timer.setPhysicsDelta`: Sets the fixed timestep for `process_physics` callbacks (seconds).
+- `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics sub-steps allowed per frame.
+- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics sub-steps allowed per frame (clamped 1–64).
 - `lurek.timer.sleep`: Suspends execution for the given number of seconds.
 - `lurek.timer.newScheduler`: Creates a new independent Scheduler for managing timed callbacks.
-- `lurek.time.waitSeconds`: Yields the running coroutine for `seconds` seconds. Must be called from inside a coroutine; requires `lurek.time.tickWaits()` to be called each frame to drive resumption.
-- `lurek.time.waitFrames`: Yields the running coroutine for `n` engine frames. Same coroutine and tick requirements as `waitSeconds`.
-- `lurek.time.tickWaits`: Resumes all coroutines whose wait deadline has passed. Call once per frame from `lurek.process`.
+- `lurek.timer.chain`: Creates a new Scheduler loaded with a sequenced one-shot chain.
+- `lurek.timer.afterReal`: Schedules a one-shot callback that fires after `delay` wall-clock seconds,
+- `lurek.timer.tickRealTimers`: Advances all real-time timers by one tick; called automatically each frame.
+- `lurek.timer.setSmoothingFactor`: Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0].
+- `lurek.timer.getSmoothedDelta`: Returns the exponential moving-average of frame deltas in seconds.
+- `lurek.timer.waitSeconds`: Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
+- `lurek.timer.waitFrames`: Yields the current Lua coroutine for at least `frames` engine frames.
+- `lurek.timer.tickWaits`: Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
 
 ### `Scheduler` Methods
 - `Scheduler:after`: Schedules a callback to fire once after a delay.
@@ -96,6 +108,9 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 - `Scheduler:pause`: Pauses a scheduled event by its ID.
 - `Scheduler:resume`: Resumes a paused event by its ID.
 - `Scheduler:isPaused`: Returns whether the given event is currently paused.
+- `Scheduler:pauseNamed`: Pauses a scheduled event by its string name.
+- `Scheduler:resumeNamed`: Resumes a paused event by its string name.
+- `Scheduler:isPausedNamed`: Returns whether the named event is currently paused.
 - `Scheduler:getRemaining`: Returns the seconds remaining until the next fire for an event, or nil.
 - `Scheduler:getInterval`: Returns the base interval in seconds for an event, or nil.
 - `Scheduler:getRepeatCount`: Returns the repeat count remaining for an event, or nil.

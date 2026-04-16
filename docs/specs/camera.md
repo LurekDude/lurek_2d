@@ -19,11 +19,15 @@ Two camera types are provided. `Camera` is the flat API variant: it holds a 2D p
 
 `SharedState` holds a single `Camera` field; the `lua_api/camera_api.rs` bridge exposes the full `Camera2D` method set to Lua scripts as `lurek.camera.*`.
 
+Two new source files add cinematic camera capabilities. `effects.rs` provides `ZoomPulse` (a brief zoom-in that decays via a sine envelope), `CameraSway` (sinusoidal x/y offset oscillation for underwater or rocking effects), and `CameraBreathing` (subtle periodic zoom for a living-camera feel). `path.rs` provides `CameraPath` for smooth world-space waypoint-following over a fixed duration and `ZoomTween` for linear zoom transitions. `Camera2D` gains the computed properties `effective_zoom` and `effect_offset`. The Lua surface adds `followPath/stopPath/updatePath/pathProgress` for path-following control, `zoomTo/stopZoom/updateZoom` for zoom animation, `setParallaxFactor/getParallaxFactor/clearParallaxFactors` for per-camera parallax scaling, and `zoomPulse`, `stopSway/isSway`, and `startBreathing/stopBreathing/isBreathing` for the cinematic effect bindings.
+
 **Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/camera_api.rs`.
 
 ## Files
 
+- `effects.rs`: Cinematic camera effects: zoom pulse, sway, and breathing.
 - `mod.rs`: Declares the camera submodules and re-exports the public camera and viewport surface.
+- `path.rs`: Camera path follower and smooth-zoom tween for [`super::Camera2D`].
 - `render.rs`: Converts Camera and Camera2D state into push, translate, rotate, scale, and pop render commands.
 - `types.rs`: Defines Camera and Camera2D, including transforms, follow logic, bounds, shake, and coordinate conversion.
 - `viewport.rs`: Defines ScaleMode and Viewport for logical-resolution scaling and coordinate mapping.
@@ -31,6 +35,11 @@ Two camera types are provided. `Camera` is the flat API variant: it holds a 2D p
 
 ## Types
 
+- `ZoomPulse` (`struct`, `effects.rs`): Zoom pulse effect — brief zoom-in that decays back to the original zoom via a sine envelope.
+- `CameraSway` (`struct`, `effects.rs`): Camera sway — sinusoidal x/y offset oscillation for rocking or underwater effects.
+- `CameraBreathing` (`struct`, `effects.rs`): Camera breathing — subtle periodic zoom oscillation for a "living camera" feel.
+- `CameraPath` (`struct`, `path.rs`): Animates a camera along a series of world-space waypoints over a fixed duration using linear interpolation between consecutive points.
+- `ZoomTween` (`struct`, `path.rs`): Smoothly transitions a camera zoom level from a start value to a target value over a fixed duration (linear interpolation).
 - `Camera` (`struct`, `types.rs`): Lightweight camera state with position, zoom, rotation, and view-matrix generation.
 - `Camera2D` (`struct`, `types.rs`): Gameplay-facing 2D camera with follow targets, dead zones, look-ahead, bounds clamping, shake, and coordinate helpers.
 - `ScaleMode` (`enum`, `viewport.rs`): Enum selecting letterbox, stretch, or pixel-perfect viewport behavior.
@@ -39,6 +48,30 @@ Two camera types are provided. `Camera` is the flat API variant: it holds a 2D p
 
 ## Functions
 
+- `ZoomPulse::new` (`effects.rs`): Creates a new, inactive `ZoomPulse`.
+- `ZoomPulse::trigger` (`effects.rs`): Triggers a new zoom pulse, replacing any active one.
+- `ZoomPulse::update` (`effects.rs`): Advances the pulse by `dt` seconds and returns the current zoom delta.
+- `ZoomPulse::current_delta` (`effects.rs`): Returns the current zoom delta without advancing time.
+- `ZoomPulse::is_active` (`effects.rs`): Returns `true` if the pulse is currently active.
+- `CameraSway::new` (`effects.rs`): Creates a new, inactive `CameraSway`.
+- `CameraSway::start` (`effects.rs`): Starts or restarts the sway effect.
+- `CameraSway::stop` (`effects.rs`): Stops the sway effect immediately.
+- `CameraSway::update` (`effects.rs`): Advances sway by `dt` seconds and returns the `(dx, dy)` world-space offset.
+- `CameraSway::current_offset` (`effects.rs`): Returns the current `(dx, dy)` sway offset without advancing time.
+- `CameraSway::is_active` (`effects.rs`): Returns `true` if sway is currently active.
+- `CameraBreathing::new` (`effects.rs`): Creates a new, inactive `CameraBreathing` with default parameters (`amplitude=0.005`, `rate=0.2`).
+- `CameraBreathing::start` (`effects.rs`): Starts or restarts the breathing effect.
+- `CameraBreathing::stop` (`effects.rs`): Stops the breathing effect.
+- `CameraBreathing::update` (`effects.rs`): Advances breathing by `dt` seconds and returns the current zoom delta.
+- `CameraBreathing::current_delta` (`effects.rs`): Returns the current zoom delta without advancing time.
+- `CameraBreathing::is_active` (`effects.rs`): Returns `true` if breathing is currently active.
+- `CameraPath::new` (`path.rs`): Creates a new `CameraPath`.
+- `CameraPath::update` (`path.rs`): Advances the path by `dt` seconds and returns the current position, or `None` when the path has completed.
+- `CameraPath::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the path.
+- `CameraPath::reset` (`path.rs`): Resets the path back to the beginning.
+- `ZoomTween::new` (`path.rs`): Creates a new `ZoomTween`.
+- `ZoomTween::update` (`path.rs`): Advances the tween by `dt` seconds and returns the current zoom, or `None` when the tween has completed.
+- `ZoomTween::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the tween.
 - `Camera::begin_render_commands` (`render.rs`): Produces transform-stack render commands for this camera.
 - `Camera::end_render_command` (`render.rs`): Returns the `PopTransform` command that closes the camera scope.
 - `Camera::generate_render_commands` (`render.rs`): Wrap `scene_commands` in the camera's transform scope.
@@ -79,6 +112,8 @@ Two camera types are provided. `Camera` is the flat API variant: it holds a 2D p
 - `Camera2D::get_look_ahead` (`types.rs`): Returns the look-ahead multiplier.
 - `Camera2D::shake` (`types.rs`): Starts a camera shake effect.
 - `Camera2D::update` (`types.rs`): Processes smooth follow, camera shake, and bounds clamping.
+- `Camera2D::effective_zoom` (`types.rs`): Returns the effective zoom level, combining the base zoom with active zoom pulse and breathing effect deltas.
+- `Camera2D::effect_offset` (`types.rs`): Returns the current world-space position offset contributed by the active sway effect as `(dx, dy)`.
 - `Camera2D::view_matrix` (`types.rs`): Computes the view matrix including the shake offset.
 - `Viewport::new` (`viewport.rs`): Create a viewport with the given game dimensions and scale mode.
 - `Viewport::resize` (`viewport.rs`): Recompute scale and offset based on the current window size.
@@ -130,6 +165,24 @@ Two camera types are provided. `Camera` is the flat API variant: it holds a 2D p
 - `Camera2D:getVisibleArea`: Returns the visible world area as x, y, w, h.
 - `Camera2D:lookAt`: Instantly moves the camera to look at the given position.
 - `Camera2D:move`: Translates the camera by dx, dy in world space.
+- `Camera2D:followPath`: Animates the camera along a sequence of world-space waypoints over
+- `Camera2D:stopPath`: Cancels the active camera path animation.
+- `Camera2D:updatePath`: Advances the path animation by `dt` seconds and applies the
+- `Camera2D:pathProgress`: Returns the fractional progress `[0, 1]` of the active path, or
+- `Camera2D:zoomTo`: Smoothly tweens the camera zoom from its current level to
+- `Camera2D:stopZoom`: Cancels the active zoom tween.
+- `Camera2D:updateZoom`: Advances the zoom tween by `dt` seconds and applies the resulting
+- `Camera2D:setParallaxFactor`: Sets the parallax scroll factor for the named render layer.
+- `Camera2D:getParallaxFactor`: Returns the parallax factor for the named layer, or `1.0` if unset.
+- `Camera2D:clearParallaxFactors`: Removes all parallax factor overrides.
+- `Camera2D:zoomPulse`: Triggers a momentary zoom-in that decays back via a sine envelope.
+- `Camera2D:stopSway`: Stops the active sway effect immediately.
+- `Camera2D:isSway`: Returns true if the sway effect is currently active.
+- `Camera2D:startBreathing`: Starts a subtle periodic zoom oscillation for a "living camera" feel.
+- `Camera2D:stopBreathing`: Stops the active breathing effect.
+- `Camera2D:isBreathing`: Returns true if the breathing effect is currently active.
+- `Camera2D:getEffectiveZoom`: Returns the current zoom level including zoom pulse and breathing deltas.
+- `Camera2D:getEffectOffset`: Returns the current sway x, y world-space offset.
 
 ## References
 

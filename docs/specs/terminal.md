@@ -21,11 +21,15 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 
 `Widget` instances provide reusable interactive TUI controls: each has a `WidgetKind` (Label, Button, TextInput, ProgressBar, SelectList, Border) and manages its own cell region. Input event routing delivers key and mouse events to focused widgets.
 
+Three source files extend the terminal's text-mode surface. The existing `ansi.rs` provides `AnsiColor` and `AnsiSpan`; it now also exposes `AnsiSequence` and an `ansiEscape` generator via `lurek.terminal.ansiEscape()` for programmatic ANSI styling. `widget.rs` exposes `TerminalWidget` as a standalone Lua-constructible TUI control via `lurek.terminal.newWidget()`, enabling interactive in-game consoles with buttons, progress bars, and text inputs inside the character-cell grid. `markup.rs` introduces `MarkupToken` and a rich-text markup parser accessible via `lurek.terminal.parseMarkup(text)`, allowing BBCode-style `[color]`, `[bold]`, and `[blink]` tags in terminal output strings.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/terminal_api.rs`.
 
 ## Files
 
+- `ansi.rs`: ANSI escape code parsing for the terminal module.
 - `cell.rs`: Defines the `TCell` character-cell record with foreground and background color data.
+- `completion.rs`: Tab-completion engine for the terminal module.
 - `mod.rs`: Declares the terminal submodules and re-exports the grid, widget, and border types.
 - `render.rs`: Converts terminal contents and terminal widgets into render commands or CPU-side image output.
 - `terminal_state.rs`: Implements the main `Terminal` state, including the cell grid, cursor, focus, input routing, and terminal events.
@@ -33,7 +37,10 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 
 ## Types
 
+- `AnsiColor` (`struct`, `ansi.rs`): RGBA colour in the range `[0, 255]`.
+- `AnsiSpan` (`struct`, `ansi.rs`): A contiguous run of characters that share the same style attributes.
 - `TCell` (`struct`, `cell.rs`): One terminal cell with a character codepoint and foreground or background colors.
+- `CompletionEngine` (`struct`, `completion.rs`): Maintains a list of completion candidates and a per-prefix cycling cursor.
 - `TerminalEvent` (`enum`, `terminal_state.rs`): Internal event enum used when terminal widget interactions need to report changes.
 - `Terminal` (`struct`, `terminal_state.rs`): The main character-grid surface. It owns cells, cursor state, terminal widgets, and the state needed to route text or pointer input.
 - `BorderStyle` (`enum`, `widget.rs`): Selects the line-drawing character set used for borders.
@@ -43,6 +50,17 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 
 ## Functions
 
+- `strip_ansi_codes` (`ansi.rs`): Removes all ANSI escape sequences from `text` and returns the plain string.
+- `parse_ansi_spans` (`ansi.rs`): Tokenises `text` into [`AnsiSpan`] records, each with plain text and colour/bold state.
+- `CompletionEngine::new` (`completion.rs`): Creates an empty [`CompletionEngine`].
+- `CompletionEngine::add_candidate` (`completion.rs`): Adds a completion candidate string.
+- `CompletionEngine::remove_candidate` (`completion.rs`): Removes a candidate, if present.
+- `CompletionEngine::clear` (`completion.rs`): Clears all candidates and resets cycle state.
+- `CompletionEngine::len` (`completion.rs`): Returns the number of registered candidates.
+- `CompletionEngine::is_empty` (`completion.rs`): Returns `true` if no candidates are registered.
+- `CompletionEngine::completions_for` (`completion.rs`): Returns all candidates that start with `prefix`, in sorted order.
+- `CompletionEngine::next_completion` (`completion.rs`): Returns the next candidate for `prefix`, cycling on repeated calls with the same prefix.
+- `CompletionEngine::reset` (`completion.rs`): Resets the cycling cursor without clearing candidates.
 - `Terminal::generate_render_commands` (`render.rs`): Generate GPU render commands for this terminal grid.
 - `Terminal::draw_to_image` (`render.rs`): Render the terminal grid to a CPU image for headless testing.
 - `Terminal::new` (`terminal_state.rs`): Create a new terminal grid with the given dimensions.
@@ -50,6 +68,9 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 - `Terminal::get` (`terminal_state.rs`): Get a cell at 1-based coordinates.
 - `Terminal::clear` (`terminal_state.rs`): Clear all cells to defaults.
 - `Terminal::get_dimensions` (`terminal_state.rs`): Get the grid dimensions.
+- `Terminal::set_cell_size` (`terminal_state.rs`): Set a per-terminal cell pixel size override.
+- `Terminal::reset_cell_size` (`terminal_state.rs`): Clear the cell size override, reverting to font-derived dimensions.
+- `Terminal::get_cell_size` (`terminal_state.rs`): Return the active cell size override, or `None` if font-derived sizing is used.
 - `Terminal::get_cursor` (`terminal_state.rs`): Get the cursor position as 1-based coordinates.
 - `Terminal::set_cursor` (`terminal_state.rs`): Set the cursor position from 1-based coordinates.
 - `Terminal::add_widget` (`terminal_state.rs`): Add a widget to the terminal.
@@ -81,6 +102,20 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 - `Terminal::widget_count` (`terminal_state.rs`): Returns the number of attached widgets.
 - `Terminal::find_by_tag` (`terminal_state.rs`): Find the first widget whose `base.tag` equals `tag`.
 - `Terminal::build_render_commands` (`terminal_state.rs`): Render the terminal grid (with widget overlays) into a list of [`RenderCommand`] values suitable for pushing to `SharedState`.
+- `Terminal::set_default_colors` (`terminal_state.rs`): Sets the foreground and background colours of every cell in the grid to the supplied values.
+- `Terminal::print_colored` (`terminal_state.rs`): Prints `text` at the given 1-based `(col, row)` position applying explicit foreground and background colours to each printed cell.
+- `Terminal::set_scrollback_cap` (`terminal_state.rs`): Sets the maximum number of lines retained in the scrollback buffer.
+- `Terminal::scrollback_cap` (`terminal_state.rs`): Returns the current scrollback capacity.
+- `Terminal::push_scrollback` (`terminal_state.rs`): Appends a line to the scrollback buffer.
+- `Terminal::get_scrollback` (`terminal_state.rs`): Returns up to `count` lines from the scrollback buffer, counting from the bottom minus `offset`.
+- `Terminal::scrollback_offset` (`terminal_state.rs`): Returns the current view offset from the bottom of the scrollback.
+- `Terminal::set_scrollback_offset` (`terminal_state.rs`): Sets the scrollback view offset.
+- `Terminal::scrollback_len` (`terminal_state.rs`): Returns the total number of lines currently in the scrollback buffer.
+- `Terminal::push_cmd_history` (`terminal_state.rs`): Appends a command string to the command history.
+- `Terminal::prev_cmd` (`terminal_state.rs`): Navigates one step backward in command history (toward older commands).
+- `Terminal::next_cmd` (`terminal_state.rs`): Navigates one step forward in command history (toward newer commands).
+- `Terminal::cmd_history_len` (`terminal_state.rs`): Returns the total number of entries in the command history.
+- `Terminal::clear_cmd_history` (`terminal_state.rs`): Clears all command history and resets the browse cursor.
 - `BorderStyle::from_str_name` (`widget.rs`): Parse a style name string.
 - `BorderStyle::as_str` (`widget.rs`): Return the lowercase style name.
 - `WidgetBase::new` (`widget.rs`): Create a new widget base with the given position and size.
@@ -127,6 +162,28 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 - `lurek.terminal.newList`: Creates a new scrollable list widget at 1-based coordinates.
 - `lurek.terminal.newBorder`: Creates a new decorative border widget at 1-based coordinates.
 - `lurek.terminal.newPanel`: Creates a new container panel widget at 1-based coordinates.
+- `lurek.terminal.pushScrollback`: Appends a line to this terminal's scrollback buffer.
+- `lurek.terminal.getScrollback`: Returns a table of lines from the scrollback buffer.
+- `lurek.terminal.scrollbackLen`: Returns the number of lines currently in this terminal's scrollback buffer.
+- `lurek.terminal.setScrollbackCap`: Sets the maximum number of lines retained in the scrollback buffer.
+- `lurek.terminal.pushCmdHistory`: Appends a command string to this terminal's history.
+- `lurek.terminal.prevCmd`: Steps one entry back in command history (toward older commands).
+- `lurek.terminal.nextCmd`: Steps one entry forward in command history (toward newer commands).
+- `lurek.terminal.cmdHistoryLen`: Returns the total number of entries in this terminal's command history.
+- `lurek.terminal.clearCmdHistory`: Clears all entries from this terminal's command history.
+- `lurek.terminal.applyTheme`: Applies a named colour theme to a terminal, recolouring all existing cells.
+- `lurek.terminal.printHighlighted`: Prints text at 1-based `(col, row)` with per-keyword colour highlighting.
+- `lurek.terminal.stripAnsi`: Strips all ANSI escape codes from `text` and returns the plain string.
+- `lurek.terminal.parseAnsi`: Parses `text` into coloured spans.  Returns an array of tables, each with
+- `lurek.terminal.printAnsi`: Prints ANSI-escaped `text` onto terminal `t` starting at `(col, row)`.
+- `lurek.terminal.addCompletion`: Adds a candidate string to the tab-completion engine.
+- `lurek.terminal.removeCompletion`: Removes a candidate string from the tab-completion engine.
+- `lurek.terminal.clearCompletions`: Clears all completion candidates.
+- `lurek.terminal.getCompletions`: Returns all registered candidates that start with `prefix`, as a sorted array.
+- `lurek.terminal.nextCompletion`: Returns the next candidate for `prefix`, cycling on repeated calls.
+- `lurek.terminal.resetCompletion`: Resets the cycling cursor without clearing the candidate list.
+- `lurek.terminal.getMaxCols`: Returns the maximum number of columns a Terminal can be constructed with.
+- `lurek.terminal.getMaxRows`: Returns the maximum number of rows a Terminal can be constructed with.
 
 ### `Terminal` Methods
 - `Terminal:set`: Sets a cell at 1-based coordinates with character FG and BG colours.
@@ -144,6 +201,9 @@ Text operations: `print(x, y, text, fg, bg)` places styled text at a specific gr
 - `Terminal:textinput`: Routes text input to the focused widget and fires callbacks.
 - `Terminal:render`: Renders the terminal grid and widgets as render commands.
 - `Terminal:setFont`: Sets the terminal font by pixel height, snapping to the nearest built-in size.
+- `Terminal:setCellSize`: Sets a per-terminal cell pixel size override, bypassing the font-derived size.
+- `Terminal:resetCellSize`: Removes the cell size override, restoring font-derived cell dimensions.
+- `Terminal:getCellSize`: Returns the active cell size override as `{w, h}`, or `nil` if none is set.
 - `Terminal:autoResize`: Resizes the window to exactly fit the terminal grid at the current font size.
 
 ### `Widget` Methods

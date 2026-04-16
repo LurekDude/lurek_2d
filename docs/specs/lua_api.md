@@ -28,6 +28,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `audio_api.rs`: Registers lurek.audio and wraps mixer, source, bus, and related audio-facing objects.
 - `automation_api.rs`: Registers lurek.simulator and bridges scripted input playback into the automation module.
 - `camera_api.rs`: Registers lurek.camera and exposes camera creation and manipulation.
+- `collision_api.rs`: `lurek.collision` — Lightweight stateless geometric collision helpers.
 - `compute_api.rs`: Registers lurek.compute and bridges array or compute-oriented operations into Lua.
 - `data_api.rs`: Registers lurek.data and exposes binary, encoding, hashing, and related data utilities.
 - `dataframe_api.rs`: Registers lurek.dataframe and wraps tabular data operations for Lua.
@@ -36,6 +37,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `docs_api.rs`: Registers lurek.docs and exposes runtime documentation catalogs, schema validation, and export helpers.
 - `ecs_api.rs`: Registers lurek.entity and bridges ECS world and entity operations.
 - `effect_api.rs`: Registers effect-related Lua APIs for post-processing and visual effects.
+- `engine_api.rs`: `lurek.engine` — Runtime engine metadata and introspection.
 - `event_api.rs`: Registers lurek.signal and exposes event queue and signal-style communication helpers.
 - `filesystem_api.rs`: Registers lurek.fs and enforces sandboxed file-system operations at the Lua boundary.
 - `graph_api.rs`: Registers lurek.graph and bridges graph construction and traversal features.
@@ -77,6 +79,9 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 
 - `LuaAnimation` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`Animation`] controller.
 - `LuaAnimStateMachine` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`AnimStateMachine`] FSM controller.
+- `LuaBlendLayerSet` (`struct`, `animation_api.rs`): Lua-side wrapper around a [`BlendLayerSet`] blend layer compositor.
+- `LuaAnimCurve` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`AnimCurve`].
+- `LuaAnimSyncGroup` (`struct`, `animation_api.rs`): Lua-side wrapper around an [`AnimSyncGroup`].
 - `LuaSource` (`struct`, `audio_api.rs`): Lua-side wrapper for an audio source resource.
 - `LuaBus` (`struct`, `audio_api.rs`): Lua-side wrapper for an audio bus resource.
 - `LuaMidiPlayer` (`struct`, `audio_api.rs`): Lua-side wrapper for the MIDI player.
@@ -84,18 +89,23 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `LuaDecoder` (`struct`, `audio_api.rs`): Lua-side wrapper for a streaming audio decoder.
 - `LuaCamera2D` (`struct`, `camera_api.rs`): Lua-side wrapper around a [`Camera2D`] instance.
 - `LuaArray` (`struct`, `compute_api.rs`): Lua-side wrapper around [`NdArray`].
+- `LuaRingBuffer` (`struct`, `data_api.rs`): Lua-side fixed-capacity ring buffer that holds any Lua value.
 - `LuaDataFrame` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`DataFrame`].
 - `LuaDatabase` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`Database`].
+- `LuaReplConsole` (`struct`, `devtools_api.rs`): Lua-side wrapper around a [`ReplConsole`] interactive evaluator.
 - `LuaUniverse` (`struct`, `ecs_api.rs`): Lua-side wrapper around a [`Universe`] ECS world.
 - `LuaPostFxEffect` (`struct`, `effect_api.rs`): Lua-side wrapper around [`PostFxEffect`].
 - `LuaPostFxStack` (`struct`, `effect_api.rs`): Lua-side wrapper around [`PostFxStack`].
 - `LuaImageEffect` (`struct`, `effect_api.rs`): Lua-side wrapper around [`ImageEffect`].
 - `LuaOverlay` (`struct`, `effect_api.rs`): Lua-side wrapper around [`Overlay`].
+- `LuaScreenTransition` (`struct`, `effect_api.rs`): Lua-side wrapper around a [`crate::effect::ScreenTransition`].
 - `LuaSignal` (`struct`, `event_api.rs`): Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
 - `LuaFileData` (`struct`, `filesystem_api.rs`): Lua-side wrapper around a [`FileData`] buffer.
 - `LuaFileHandle` (`struct`, `filesystem_api.rs`): Lua-side wrapper around a [`FileHandle`] with interior mutability.
+- `LuaProvinceGrid` (`struct`, `image_api.rs`): Lua-side wrapper around [`ProvinceGrid`].
 - `LuaLayeredImage` (`struct`, `image_api.rs`): Lua-side wrapper around [`LayeredImage`].
 - `LuaCompressedImageData` (`struct`, `image_api.rs`): Lua-side wrapper around [`CompressedImageData`].
+- `LuaPaletteLUT` (`struct`, `image_api.rs`): Lua-side wrapper around [`PaletteLUT`].
 - `LuaCursor` (`struct`, `input_api.rs`): Lua-side wrapper around a mouse cursor handle.
 - `LuaLight` (`struct`, `light_api.rs`): Lua-side handle to a light resource stored in [`LightWorld`].
 - `LuaOccluder` (`struct`, `light_api.rs`): Lua-side handle to an occluder resource stored in [`LightWorld`].
@@ -110,6 +120,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `LuaTween` (`struct`, `math_api.rs`): Lua-side wrapper around a [`Tween`].
 - `LuaSpatialHash` (`struct`, `math_api.rs`): Lua-side wrapper around a [`SpatialHash`].
 - `LuaNoiseGenerator` (`struct`, `math_api.rs`): Lua-side wrapper around a [`NoiseGenerator`].
+- `LuaAabbTree` (`struct`, `math_api.rs`): Lua-side wrapper around an [`AabbTree`].
 - `LuaMinimap` (`struct`, `minimap_api.rs`): Lua-side wrapper around a [`Minimap`].
 - `LuaMod` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 - `LuaModManager` (`struct`, `mods_api.rs`): Lua-side wrapper around [`ModManager`].
@@ -138,6 +149,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `LuaHeightMap` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
 - `LuaPointLight` (`struct`, `raycaster_api.rs`): Lua-side value wrapper around a raycaster [`PointLight`].
 - `LuaRaycaster` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`Raycaster2D`] grid.
+- `LuaSpriteManager` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`SpriteManager`] for batch depth-sorted sprite projection.
 - `LuaImageData` (`struct`, `render_api.rs`): Lua-side handle to a loaded texture stored in SharedState.
 - `LuaImage` (`struct`, `render_api.rs`): Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
 - `LuaNineSlice` (`struct`, `render_api.rs`): Lua-side 9-slice descriptor.
@@ -156,10 +168,13 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `LuaSpriteAtlas` (`struct`, `sprite_api.rs`): Lua-side wrapper around a [`SpriteAtlas`] named-region store.
 - `PowerState` (`enum`, `system_api.rs`): Power state of the device.
 - `LuaThreadHandle` (`struct`, `thread_api.rs`): Lua-side wrapper around a background [`LuaThread`].
+- `LuaThreadPool` (`struct`, `thread_api.rs`): Lua-side wrapper around a [`ThreadPool`].
+- `LuaPromise` (`struct`, `thread_api.rs`): Lua-side wrapper around a one-shot [`Promise`].
 - `LuaTileSet` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`TileSet`].
 - `LuaTileMap` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`TileMap`].
 - `LuaAutoTileSheet` (`struct`, `tilemap_api.rs`): Lua-side wrapper around an [`AutoTileSheet`].
 - `LuaChunkMap` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`ChunkMap`].
+- `LuaLargeMapRenderer` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`LargeMapRenderer`] for chunk-level occlusion culling on large worlds.
 - `LuaIsoMap` (`struct`, `tilemap_api.rs`): Lua-side wrapper around an [`IsoMap`].
 - `LuaMapBlock` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`MapBlock`].
 - `LuaMapGroup` (`struct`, `tilemap_api.rs`): Lua-side wrapper around a [`MapGroup`].
@@ -167,6 +182,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `LuaMapGen` (`struct`, `tilemap_api.rs`): Lua-side wrapper for a map generator (size preset or explicit dimensions).
 - `LuaScheduler` (`struct`, `timer_api.rs`): Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
 - `LuaTweenState` (`struct`, `tween_api.rs`): Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
+- `LuaSpring` (`struct`, `tween_api.rs`): Lua-side spring handle: wraps [`SpringSystem`] and a registry reference to the target table.
 - `LuaLineChart` (`struct`, `ui_api.rs`): Lua wrapper for a line chart renderer.
 - `LuaBarChart` (`struct`, `ui_api.rs`): Lua wrapper for a grouped bar chart renderer.
 - `LuaScatterPlot` (`struct`, `ui_api.rs`): Lua wrapper for a scatter plot renderer.
@@ -181,6 +197,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `register` (`automation_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `Step::vec_from_lua_table` (`automation_api.rs`): vec_from_lua_table.
 - `register` (`camera_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`collision_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`compute_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`data_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`dataframe_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -189,6 +206,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `register` (`docs_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`ecs_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`effect_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`engine_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`event_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`filesystem_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`graph_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -243,6 +261,7 @@ Every sub-API file under `src/lua_api/` follows the Thin Wrapper Rule: `pub fn r
 - `register` (`thread_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`tilemap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`timer_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `LuaSpring::tick_with` (`tween_api.rs`): Advances the spring by `dt` seconds, writes positions to the target table, fires the settle callback if all axes converge, and returns `true` when done.
 - `register` (`tween_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`ui_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`window_api.rs`): Registers the `lurek.window` API table with the Lua VM.

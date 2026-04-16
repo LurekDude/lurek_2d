@@ -21,6 +21,8 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 
 `AutoTileSheet` implements bitmask-based automatic tile selection (RPGMaker or 48-tile atlas layouts) where the displayed tile is chosen based on which of the eight cardinal and diagonal neighbors are the same terrain type. `IsoMap` adds painter's-algorithm isometric depth sorting. `ChunkMap` provides a `HashMap<(i32,i32), Vec<u8>>` sparse infinite map with async chunk loading callbacks.
 
+The new `iso.rs` source file introduces `IsoRenderer`, a dedicated isometric rendering type that handles depth-sorted painter's-algorithm draw calls for isometric tile maps. Lua scripts construct isometric renderers via `lurek.tilemap.newIsoRenderer()` and drive rendering through its method set, replacing manual draw-call sorting for isometric scenes. This complements the existing `IsoMap` data container and `coords.rs` coordinate helpers with a complete rendering pipeline that integrates with the same `RenderCommand` queue as the rest of the engine.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`, `image`. Lua bridge in `src/lua_api/tilemap_api.rs`.
 
 ## Files
@@ -145,6 +147,9 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 - `IsoMap::tile_to_screen` (`isomap.rs`): Projects isometric tile coordinates `(tx, ty, tz)` to screen pixels.
 - `IsoMap::screen_to_tile` (`isomap.rs`): Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
 - `IsoMap::draw_iter` (`isomap.rs`): Returns all draw items in painter's algorithm order for rendering up to
+- `IsoMap::get_part_count` (`isomap.rs`): Returns the number of GID slots per tile.
+- `IsoMap::get_part_order` (`isomap.rs`): Returns the current draw order as a slice of part slot indices.
+- `IsoMap::set_part_order` (`isomap.rs`): Sets the draw order for tile parts.
 - `LargeMapRenderer::new` (`large_map_renderer.rs`): Creates a new `LargeMapRenderer` with the given tile dimensions.
 - `LargeMapRenderer::set_map_data` (`large_map_renderer.rs`): Sets the entire map tile data and rebuilds all chunks.
 - `LargeMapRenderer::set_tile` (`large_map_renderer.rs`): Sets a single tile at `(x, y)` (0-based) and marks the enclosing chunk dirty.
@@ -369,7 +374,7 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 - `lurek.tilemap.newMapGen`: Creates a MapGen from a MapGroup, a preset name or dimensions, and a segment size.
 - `lurek.tilemap.loadTMX`: Parses a TMX XML string and returns a table with map metadata and layers.
 - `lurek.tilemap.fromLDtk`: Parses an LDtk JSON export string and returns a TileMap.
-- `lurek.tilemap.newLargeMapRenderer`: Creates a new LargeMapRenderer for chunk-level occlusion culling on large tilemaps.
+- `lurek.tilemap.newLargeMapRenderer`: Creates a LargeMapRenderer for chunk-level occlusion culling on maps > 200×200 tiles.
 
 ### `AutoTileSheet` Methods
 - `AutoTileSheet:getLayout`: Returns the layout variant as a string.
@@ -404,6 +409,27 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 - `IsoMap:getLevelHeight`: Returns the vertical pixel offset between consecutive Z-levels.
 - `IsoMap:tileToScreen`: Projects isometric tile coordinates (tx, ty, tz) to screen pixels.
 - `IsoMap:screenToTile`: Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
+- `IsoMap:getPartCount`: Returns the number of GID slots per tile.
+- `IsoMap:getPartOrder`: Returns the current draw-order array (0-based part slot indices).
+- `IsoMap:setPartOrder`: Overrides the draw order for this IsoMap. Length must equal partCount.
+
+### `LargeMapRenderer` Methods
+- `LargeMapRenderer:setTile`: Sets a single tile ID at (x, y).  Coordinates are 0-based.
+- `LargeMapRenderer:getTile`: Returns the tile ID at (x, y), or nil if out of bounds.
+- `LargeMapRenderer:getMapSize`: Returns the map dimensions as (width, height) in tiles.
+- `LargeMapRenderer:setChunkSize`: Sets the chunk size used for culling (default 16).
+- `LargeMapRenderer:getChunkSize`: Returns the current chunk size.
+- `LargeMapRenderer:invalidateChunk`: Marks a chunk at chunk-grid coordinates (cx, cy) as dirty,
+- `LargeMapRenderer:invalidateAll`: Marks every chunk as dirty.
+- `LargeMapRenderer:getVisibleChunks`: Returns the number of chunks currently within the camera viewport.
+- `LargeMapRenderer:getTotalChunks`: Returns the total number of chunks that cover the loaded map.
+- `LargeMapRenderer:setCamera`: Updates the camera position and zoom used for visibility culling.
+- `LargeMapRenderer:setViewport`: Sets the viewport dimensions in pixels used for visibility culling.
+- `LargeMapRenderer:setLodEnabled`: Enables or disables level-of-detail rendering for distant chunks.
+- `LargeMapRenderer:isLodEnabled`: Returns whether LOD rendering is currently enabled.
+- `LargeMapRenderer:setLodThresholds`: Sets the distance thresholds (in tile units) at which each LOD level activates.
+- `LargeMapRenderer:setTilesetColumns`: Sets the number of tile columns in the atlas texture used for UV calculation.
+- `LargeMapRenderer:getTilesetColumns`: Returns the number of tileset atlas columns.
 
 ### `MapBlock` Methods
 - `MapBlock:getTile`: Returns the GID of the tile at (x, y) on the given layer (1-based).
@@ -455,8 +481,8 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 - `TileMap:getTileDimensions`: Returns tile dimensions as (width, height).
 - `TileMap:getChunkSize`: Returns the chunk size used for spatial partitioning.
 - `TileMap:isSolid`: Returns true if the tile at (x, y) on layer is solid (1-based).
-- `TileMap:getOrientation`: Returns the map orientation as a string ("topdown" or "sideview").
-- `TileMap:setOrientation`: Sets the map orientation from a string ("topdown" or "sideview").
+- `TileMap:getOrientation`: Returns the map orientation as a string ("topdown", "sideview", "isometric", or "hexagonal").
+- `TileMap:setOrientation`: Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
 - `TileMap:render`: Renders the tile map to the screen at the given offset.
 - `TileMap:drawToImage`: Renders the tile map to a CPU ImageData using the given tile pixel size.
 - `TileMap:toNavGrid`: Converts the given layer into a 2D navigation grid.
@@ -474,25 +500,6 @@ External format parsers: `load_tmx(path)` parses Tiled `.tmx` XML exports with o
 - `TileSet:getAnimation`: Returns the animation frames for a 1-based local tile ID as a table of {tileid, duration}, or nil.
 - `TileSet:setSolid`: Sets whether a 1-based local tile ID is solid for collision purposes.
 - `TileSet:isSolid`: Returns whether a 1-based local tile ID is solid.
-
-### `LargeMapRenderer` Methods
-- `LargeMapRenderer:setMapData`: Loads a flat row-major tile-ID array covering width × height tiles.
-- `LargeMapRenderer:setTile`: Sets a single tile ID at 0-based (x, y).
-- `LargeMapRenderer:getTile`: Returns the tile ID at 0-based (x, y), or nil if out of bounds.
-- `LargeMapRenderer:getMapSize`: Returns the map dimensions as (width, height) in tiles.
-- `LargeMapRenderer:setChunkSize`: Sets the culling chunk size in tiles (default 16).
-- `LargeMapRenderer:getChunkSize`: Returns the current chunk size.
-- `LargeMapRenderer:invalidateChunk`: Marks a single chunk at chunk-grid (cx, cy) as dirty.
-- `LargeMapRenderer:invalidateAll`: Marks all chunks dirty.
-- `LargeMapRenderer:getVisibleChunks`: Returns the number of chunks within the camera viewport.
-- `LargeMapRenderer:getTotalChunks`: Returns the total number of chunks that cover the map.
-- `LargeMapRenderer:setCamera`: Updates the camera position and zoom used for visibility culling.
-- `LargeMapRenderer:setViewport`: Sets the viewport dimensions in pixels.
-- `LargeMapRenderer:setLodEnabled`: Enables or disables LOD rendering for distant chunks.
-- `LargeMapRenderer:isLodEnabled`: Returns whether LOD is currently enabled.
-- `LargeMapRenderer:setLodThresholds`: Sets the distance thresholds at which LOD levels activate.
-- `LargeMapRenderer:setTilesetColumns`: Sets the number of atlas columns for UV calculation.
-- `LargeMapRenderer:getTilesetColumns`: Returns the current tileset atlas column count.
 
 ## References
 

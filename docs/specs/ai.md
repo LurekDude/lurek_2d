@@ -19,6 +19,8 @@ Available AI subsystems: `fsm` — finite state machine with priority-ordered gu
 
 Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-exported directly from `crate::pathfind`, so `lurek.ai.*` provides a unified scripting surface without requiring callers to import PathFind separately.
 
+Diagnostic support has been expanded with `BtDebugState`, a snapshot of a behaviour tree's current execution state accessible from Lua via `BehaviorTree:getDebugState()`. The `GOAPPlanner` now exposes `get_max_iterations` and `set_max_iterations` to cap the A* planning search. `SteeringManager` gains spatial-hash neighbourhood bucketing through `setSpatialHashCellSize` and `enableSpatialHash` for efficient flocking at scale. The Lua surface has been further enriched with `AIDirector:setTension` for narrative tension control, `ContextSteering:addSeekTarget/addAvoidPoint/addAvoidBounds` for dynamic context-map editing, `EmotionModel:get/isActive`, `GeneticAlgorithm:setFitness/getGenes`, `HTNDomain:addPrimitive/addCompound`, `InfluenceMap:clearAll/getWidth/getHeight`, `NeuralNet:setWeights/getWeights`, `ORCASolver:setPosition`, `Squad:getName`, `StateMachine:setInitialState`, `StimulusWorld:addAuditory`, and a complete `TraitProfile` get/set/getBase/addModifier API.
+
 **Scope boundary**: Feature Systems tier. Depends on `math`, `pathfind`, `runtime`. Lua bridge in `src/lua_api/ai_api.rs`.
 
 ## Files
@@ -63,6 +65,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `ParallelPolicy` (`enum`, `behavior_tree.rs`): Defines how parallel behavior-tree nodes determine success or failure.
 - `BTNode` (`enum`, `behavior_tree.rs`): The behavior-tree node enum describing the actual tree shape.
 - `BehaviorTree` (`struct`, `behavior_tree.rs`): Hierarchical decision structure for composite, decorator, and leaf AI behavior.
+- `BtDebugState` (`struct`, `behavior_tree.rs`): A snapshot of a [`BehaviorTree`]'s current diagnostic state.
 - `BlackboardValue` (`enum`, `blackboard.rs`): The value enum stored in a `Blackboard`.
 - `Blackboard` (`struct`, `blackboard.rs`): Hierarchical key-value state store used for AI coordination and memory.
 - `Command` (`struct`, `command_queue.rs`): One queued AI command with priority and callback information.
@@ -144,6 +147,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `BTNode::reset` (`behavior_tree.rs`): Recursively resets all running-child memos and repeater counters.
 - `BTNode::child_count` (`behavior_tree.rs`): Returns the number of direct children this node has.
 - `BehaviorTree::new` (`behavior_tree.rs`): Creates a new behavior tree with no root node.
+- `BehaviorTree::debug_state` (`behavior_tree.rs`): Returns a diagnostic snapshot of this tree's current state.
 - `Blackboard::new` (`blackboard.rs`): Creates an empty Blackboard with no parent.
 - `Blackboard::set_number` (`blackboard.rs`): Sets a number value in the local store.
 - `Blackboard::get_number` (`blackboard.rs`): Gets a number value, walking the parent chain.
@@ -237,6 +241,8 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `GOAPPlanner::add_effect` (`goap.rs`): Adds a boolean effect to the named action.
 - `GOAPPlanner::add_goal` (`goap.rs`): Adds a goal with the given name and priority.
 - `GOAPPlanner::set_goal_state` (`goap.rs`): Sets a boolean condition on the named goal.
+- `GOAPPlanner::get_max_iterations` (`goap.rs`): Returns the maximum A* planning iterations.
+- `GOAPPlanner::set_max_iterations` (`goap.rs`): Sets the maximum A* planning iterations.
 - `HTNTask::name` (`htn.rs`): Returns the name of this task.
 - `HTNTask::is_primitive` (`htn.rs`): Returns `true` if this is a primitive task.
 - `HTNTask::preconditions_met` (`htn.rs`): Checks whether a primitive's preconditions are satisfied in the given state.
@@ -362,6 +368,8 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `SteeringManager::add_flock` (`steering.rs`): Adds a Flock behavior for group movement among named neighbors.
 - `SteeringManager::set_combine_mode_str` (`steering.rs`): Sets the combination mode from a Lua string (`"weighted"` or `"priority"`).
 - `SteeringManager::last_force` (`steering.rs`): Returns the force vector computed during the last `calculate()` call.
+- `set_cell_size` (`steering.rs`): Sets the cell size used by the spatial-hash neighbourhood search.
+- `set_use_spatial_hash` (`steering.rs`): Enables or disables spatial-hash bucketing for neighbourhood queries.
 - `StrategicGoal::new` (`strategy.rs`): Creates a new goal with full priority and no preconditions.
 - `StrategicGoal::require_tag` (`strategy.rs`): Adds a precondition tag requirement.
 - `StrategicGoal::is_eligible` (`strategy.rs`): Returns `true` if all precondition tags are present in `active_tags`.
@@ -462,7 +470,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `AIDirector:spawnRateFactor`: Returns or performs spawn rate factor.
 - `AIDirector:lootFactor`: Returns or performs loot factor.
 - `AIDirector:ambientIntensity`: Returns or performs ambient intensity.
-- `AIDirector:setTension`: Sets the tension.
+- `AIDirector:setTension`: Sets the global narrative tension level (0–1 scale).
 - `AIDirector:reset`: Resets or clears the state.
 
 ### `AILod` Methods
@@ -526,6 +534,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 ### `BehaviorTree` Methods
 - `BehaviorTree:setRoot`: Sets the root node of this behavior tree.
 - `BehaviorTree:getLastStatus`: Returns the status from the last tick.
+- `BehaviorTree:getDebugState`: Returns a diagnostic snapshot of this behavior tree.
 - `BehaviorTree:type`: Returns the type name of this object.
 - `BehaviorTree:typeOf`: Returns true if this object is of the given type.
 
@@ -552,10 +561,10 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `CommandQueue:typeOf`: Returns true if this object is of the given type.
 
 ### `ContextSteering` Methods
-- `ContextSteering:addSeekTarget`: Adds a seek target.
+- `ContextSteering:addSeekTarget`: Adds a world-space target that this agent steers towards.
 - `ContextSteering:addWander`: Adds a wander behavior with jitter and weight to the context steering evaluator.
-- `ContextSteering:addAvoidPoint`: Adds a avoid point.
-- `ContextSteering:addAvoidBounds`: Adds a avoid bounds.
+- `ContextSteering:addAvoidPoint`: Adds a world-space point that this agent steers away from.
+- `ContextSteering:addAvoidBounds`: Registers a rectangular region this agent must avoid.
 - `ContextSteering:clearBehaviors`: Resets or clears the behaviors.
 - `ContextSteering:evaluate`: Evaluates and returns the computed result.
 - `ContextSteering:chosenMagnitude`: Returns or performs chosen magnitude.
@@ -564,15 +573,17 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 ### `EmotionModel` Methods
 - `EmotionModel:add`: Adds an emotion category with the given name and initial intensity to the model.
 - `EmotionModel:trigger`: Returns or performs trigger.
-- `EmotionModel:get`: Returns the value.
+- `EmotionModel:get`: Returns the current float value of this emotion dimension.
 - `EmotionModel:dominant`: Returns or performs dominant.
-- `EmotionModel:isActive`: Returns true if active.
+- `EmotionModel:isActive`: Returns `true` if the emotion dimension is currently active and above threshold.
 - `EmotionModel:update`: Advances the simulation by one time step.
 - `EmotionModel:reset`: Resets or clears the state.
 
 ### `GOAPPlanner` Methods
 - `GOAPPlanner:getActionCount`: Returns the number of registered actions.
 - `GOAPPlanner:getGoalCount`: Returns the number of registered goals.
+- `GOAPPlanner:getMaxIterations`: Returns the maximum A* planning iterations.
+- `GOAPPlanner:setMaxIterations`: Sets the maximum A* planning iterations (0 = unlimited).
 - `GOAPPlanner:type`: Returns the type name of this object.
 - `GOAPPlanner:typeOf`: Returns true if this object is of the given type.
 
@@ -580,13 +591,13 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `GeneticAlgorithm:evolve`: Runs one generation of the evolutionary algorithm.
 - `GeneticAlgorithm:generation`: Returns or performs generation.
 - `GeneticAlgorithm:popSize`: Returns or performs pop size.
-- `GeneticAlgorithm:setFitness`: Sets the fitness.
-- `GeneticAlgorithm:getGenes`: Returns the genes.
+- `GeneticAlgorithm:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
+- `GeneticAlgorithm:getGenes`: Returns the chromosome as an ordered table of gene values.
 - `GeneticAlgorithm:bestGenes`: Returns or performs best genes.
 
 ### `HTNDomain` Methods
-- `HTNDomain:addPrimitive`: Adds a primitive.
-- `HTNDomain:addCompound`: Adds a compound.
+- `HTNDomain:addPrimitive`: Registers a primitive HTN task with a direct operator function.
+- `HTNDomain:addCompound`: Registers a compound HTN task that decomposes into sub-tasks.
 - `HTNDomain:plan`: Runs planning and returns the resulting action sequence.
 - `HTNDomain:taskCount`: Returns or performs task count.
 
@@ -595,11 +606,11 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `InfluenceMap:hasLayer`: Returns true if the named layer exists.
 - `InfluenceMap:decay`: Multiplies all influences by a decay factor.
 - `InfluenceMap:clearLayer`: Clears all influence in a layer.
-- `InfluenceMap:clearAll`: Clears all layers.
+- `InfluenceMap:clearAll`: Removes all influence values from every layer in the map.
 - `InfluenceMap:getMaxPosition`: Returns the world-space position of the maximum value.
 - `InfluenceMap:getMinPosition`: Returns the world-space position of the minimum value.
-- `InfluenceMap:getWidth`: Returns the grid width.
-- `InfluenceMap:getHeight`: Returns the grid height.
+- `InfluenceMap:getWidth`: Returns the influence map width in grid cells.
+- `InfluenceMap:getHeight`: Returns the influence map height in grid cells.
 - `InfluenceMap:getCellSize`: Returns the cell size in world units.
 - `InfluenceMap:type`: Returns the type name of this object.
 - `InfluenceMap:typeOf`: Returns true if this object is of the given type.
@@ -614,14 +625,14 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 ### `NeuralNet` Methods
 - `NeuralNet:addLayer`: Adds a neural network layer with inputs, outputs, and an activation function.
 - `NeuralNet:forward`: Returns or performs forward.
-- `NeuralNet:setWeights`: Sets the weights.
-- `NeuralNet:getWeights`: Returns the weights.
+- `NeuralNet:setWeights`: Overwrites all connection weights with values from a flat table.
+- `NeuralNet:getWeights`: Returns a flat table of all connection weight values in the network.
 - `NeuralNet:paramCount`: Returns or performs param count.
 - `NeuralNet:layerCount`: Returns or performs layer count.
 
 ### `Neuroevolution` Methods
 - `Neuroevolution:evolve`: Runs one generation of the evolutionary algorithm.
-- `Neuroevolution:setFitness`: Sets the fitness.
+- `Neuroevolution:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
 - `Neuroevolution:chromosomeToNet`: Returns or performs chromosome to net.
 - `Neuroevolution:bestNetwork`: Returns or performs best network.
 - `Neuroevolution:bestFitness`: Returns or performs best fitness.
@@ -631,7 +642,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 ### `ORCASolver` Methods
 - `ORCASolver:addAgent`: Adds an ORCA agent at the given position with radius and max speed to the solver.
 - `ORCASolver:setPreferredVelocity`: Sets the preferred velocity.
-- `ORCASolver:setPosition`: Sets the position.
+- `ORCASolver:setPosition`: Sets the agent's current world-space position for ORCA velocity computation.
 - `ORCASolver:compute`: Computes and returns the result.
 - `ORCASolver:getSafeVelocity`: Returns the safe velocity.
 - `ORCASolver:agentCount`: Returns or performs agent count.
@@ -658,7 +669,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `QLearner:typeOf`: Returns true if this object is of the given type.
 
 ### `Squad` Methods
-- `Squad:getName`: Returns the squad name.
+- `Squad:getName`: Returns the unique name string assigned to this squad.
 - `Squad:addMember`: Adds an agent by name to this squad.
 - `Squad:removeMember`: Removes an agent by name from this squad.
 - `Squad:getMemberCount`: Returns the number of squad members.
@@ -673,7 +684,7 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 
 ### `StateMachine` Methods
 - `StateMachine:addState`: Registers a named state with optional lifecycle callbacks.
-- `StateMachine:setInitialState`: Sets the initial state.
+- `StateMachine:setInitialState`: Sets the FSM's initial state; must be called before the first update.
 - `StateMachine:getCurrentState`: Returns the current state name, or nil.
 - `StateMachine:forceState`: Forces a transition to the named state.
 - `StateMachine:getTimeInState`: Returns seconds spent in the current state.
@@ -687,10 +698,12 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `SteeringManager:getLastSteering`: Returns the last computed steering force.
 - `SteeringManager:type`: Returns the type name of this object.
 - `SteeringManager:typeOf`: Returns true if this object is of the given type.
+- `SteeringManager:setSpatialHashCellSize`: Sets the cell size used by the spatial-hash neighbourhood search.
+- `SteeringManager:enableSpatialHash`: Enables or disables spatial-hash bucketing for neighbourhood queries.
 
 ### `StimulusWorld` Methods
 - `StimulusWorld:addVisual`: Adds a visual stimulus at the specified world position with radius and intensity.
-- `StimulusWorld:addAuditory`: Adds a auditory.
+- `StimulusWorld:addAuditory`: Registers an auditory stimulus at a world-space position.
 - `StimulusWorld:remove`: Removes the specified item.
 - `StimulusWorld:update`: Advances the simulation by one time step.
 - `StimulusWorld:count`: Returns or performs count.
@@ -706,10 +719,10 @@ Flow-field and grid pathfinding types (`FlowField`, `Cell`, `PathGrid`) are re-e
 - `StrategyAI:timeUntilNext`: Returns or performs time until next.
 
 ### `TraitProfile` Methods
-- `TraitProfile:set`: Sets the value.
-- `TraitProfile:get`: Returns the value.
-- `TraitProfile:getBase`: Returns the base.
-- `TraitProfile:addModifier`: Adds a modifier.
+- `TraitProfile:set`: Sets the base value of this trait, replacing any previous base.
+- `TraitProfile:get`: Returns the current float value of this emotion dimension.
+- `TraitProfile:getBase`: Returns the unmodified base value of this trait before modifiers.
+- `TraitProfile:addModifier`: Adds a named modifier that adjusts the trait value by a delta.
 - `TraitProfile:removeModifiers`: Removes the specified modifiers.
 - `TraitProfile:update`: Advances the simulation by one time step.
 - `TraitProfile:has`: Returns true if a item is present.

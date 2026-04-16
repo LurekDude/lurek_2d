@@ -19,12 +19,16 @@ The `thread` module provides Lurek2D's background threading infrastructure for g
 
 The `thread_pool` submodule provides a managed pool of workers for the common case of running many short tasks in parallel (e.g. `PathThreadPool` for background pathfinding).
 
+Three new source files add coordination primitives for advanced threading scenarios. `semaphore.rs` introduces `ThreadSemaphore` for rate-limiting concurrent workers, accessible from Lua via `lurek.thread.newSemaphore(n)`. `barrier.rs` introduces `ThreadBarrier` for synchronizing a group of threads at a rendezvous point before any proceed, accessible via `lurek.thread.newBarrier(count)`. `pool.rs` introduces the Lua-accessible `ThreadPool` factory via `lurek.thread.newPool(n)`, making it straightforward to create and manage a worker pool from game scripts without manually constructing individual `Worker` instances.
+
 **Scope boundary**: Core Runtime tier. Depends on `runtime`. Lua bridge in `src/lua_api/thread_api.rs`.
 
 ## Files
 
 - `channel.rs`: `ChannelValue` enum, `Channel` MPMC queue, `LuaChannel` UserData, conversion functions
 - `mod.rs`: Module root — re-exports `channel` and `worker` submodules
+- `pool.rs`: Thread pool of reusable worker Lua VMs.
+- `promise.rs`: Single-result future for one-shot background computation.
 - `worker.rs`: `ThreadState` enum, `LuaThread` struct, worker VM registration
 
 ## Types
@@ -32,6 +36,9 @@ The `thread_pool` submodule provides a managed pool of workers for the common ca
 - `ChannelValue` (`enum`, `channel.rs`): Serializable values that can be sent between threads.
 - `Channel` (`struct`, `channel.rs`): Thread-safe MPMC channel for Lua inter-thread communication.
 - `LuaChannel` (`struct`, `channel.rs`): Lua UserData wrapper for a thread-safe channel.
+- `ThreadPool` (`struct`, `pool.rs`): A pool of N persistent worker threads that accept tasks from a shared input channel and send results to a shared output channel.
+- `PromiseState` (`enum`, `promise.rs`): Execution state of a [`Promise`].
+- `Promise` (`struct`, `promise.rs`): A one-shot async computation that produces a single `ChannelValue` result.
 - `ThreadState` (`enum`, `worker.rs`): Execution state of a background Lua thread.
 - `LuaThread` (`struct`, `worker.rs`): A background Lua thread running its own VM.
 
@@ -49,6 +56,15 @@ The `thread_pool` submodule provides a managed pool of workers for the common ca
 - `Channel::name` (`channel.rs`): Get the channel name, if it is a named channel.
 - `lua_to_channel_value` (`channel.rs`): Convert a Lua value into a `ChannelValue` for cross-thread transfer.
 - `channel_value_to_lua` (`channel.rs`): Convert a `ChannelValue` back into a Lua value.
+- `ThreadPool::new` (`pool.rs`): Create a pool of `size` workers, all executing `code`.
+- `ThreadPool::submit` (`pool.rs`): Submit a value to the pool input channel.
+- `ThreadPool::collect` (`pool.rs`): Collect a result from the pool output channel (non-blocking).
+- `ThreadPool::join` (`pool.rs`): Block until all workers have finished execution.
+- `ThreadPool::size` (`pool.rs`): Returns the number of workers in this pool.
+- `Promise::new` (`promise.rs`): Create and immediately start a promise executing `code`.
+- `Promise::is_done` (`promise.rs`): Check if the promise has a result ready, without blocking.
+- `Promise::result` (`promise.rs`): Retrieve the result value if ready.
+- `Promise::get_error` (`promise.rs`): Returns the error string if the worker thread failed, otherwise `None`.
 - `LuaThread::new` (`worker.rs`): Create a new thread that will execute the given Lua code.
 - `LuaThread::start` (`worker.rs`): Start the thread, spawning a new OS thread with its own Lua VM.
 - `LuaThread::wait` (`worker.rs`): Block until the thread finishes execution.
@@ -64,8 +80,8 @@ The `thread_pool` submodule provides a managed pool of workers for the common ca
 - `lurek.thread.newThread`: Creates a new background thread from a Lua code string.
 - `lurek.thread.newChannel`: Creates an unnamed thread-safe channel for inter-thread communication.
 - `lurek.thread.getChannel`: Gets or creates a named global channel shared across threads.
-- `lurek.thread.newPool`: Creates a pool of `n` pre-spawned worker VMs all running the same Lua code string.
-- `lurek.thread.async`: Runs a Lua code string in a background thread and returns a `Promise` handle.
+- `lurek.thread.newPool`: Creates a thread pool of N workers all running the same Lua code.
+- `lurek.thread.async`: Starts a one-shot background computation and returns a Promise.
 
 ### `Channel` Methods
 - `Channel:type`: Returns the type of the object.
@@ -77,29 +93,35 @@ The `thread_pool` submodule provides a managed pool of workers for the common ca
 - `Channel:getCount`: Returns the number of items in the channel.
 - `Channel:clear`: Clears all items from the channel.
 - `Channel:supply`: Blocks until the channel has space, then adds the value.
-- `Channel:pushTable`: Serialises a Lua table (supports nested tables) and pushes it to the channel.
-- `Channel:popTable`: Pops and deserialises a table value from the channel, returning a Lua table.
-- `Channel:pushBytes`: Pushes a raw byte string to the channel as a `Bytes` value.
-- `Channel:popBytes`: Pops a `Bytes` value from the channel, returning it as a Lua string.
-
-### `ThreadPool` Methods
-- `ThreadPool:submit`: Pushes a value to the pool's input channel for a worker to process.
-- `ThreadPool:collect`: Pops one result from the pool's output channel, or returns nil if none ready.
-- `ThreadPool:join`: Waits for all submitted tasks to complete.
-- `ThreadPool:size`: Returns the number of worker threads in the pool.
-- `ThreadPool:getInputChannel`: Returns the pool's shared input `Channel`.
-- `ThreadPool:getOutputChannel`: Returns the pool's shared output `Channel`.
+- `Channel:pushTable`: Serializes a Lua table and pushes it to the channel.
+- `Channel:popTable`: Pops a value from the channel expecting a table.
+- `Channel:pushBytes`: Pushes raw binary data (a Lua string treated as a byte array) to the channel.
+- `Channel:popBytes`: Pops a bytes value from the channel and returns it as a Lua string.
 
 ### `Promise` Methods
-- `Promise:isDone`: Returns true if the background computation has finished (success or error).
-- `Promise:result`: Returns the result value when done, or nil if still running.
-- `Promise:getError`: Returns the error message if the computation failed, or nil.
+- `Promise:type`: Returns the type name of this object.
+- `Promise:typeOf`: Returns whether this object is of the given type.
+- `Promise:isDone`: Returns true if the promise has a result or has errored (non-blocking).
+- `Promise:result`: Pops and returns the promise result, or nil if not yet ready.
+- `Promise:getError`: Returns the worker error string if the promise failed, otherwise nil.
+
+### `ThreadHandle` Methods
 - `ThreadHandle:type`: Returns the type name of this object.
 - `ThreadHandle:typeOf`: Returns whether this object is of the given type.
 - `ThreadHandle:start`: Launches the background thread, passing optional arguments via varargs.
 - `ThreadHandle:wait`: Blocks the calling thread until the background thread finishes.
 - `ThreadHandle:isRunning`: Returns whether the thread is currently executing.
 - `ThreadHandle:getError`: Returns the error message if the thread failed, or nil.
+
+### `ThreadPool` Methods
+- `ThreadPool:type`: Returns the type name of this object.
+- `ThreadPool:typeOf`: Returns whether this object is of the given type.
+- `ThreadPool:submit`: Submits a value to the pool's input channel for processing by a worker.
+- `ThreadPool:collect`: Retrieves the next result from the pool's output channel (non-blocking).
+- `ThreadPool:size`: Returns the number of workers in this pool.
+- `ThreadPool:join`: Blocks until all workers in the pool have finished execution.
+- `ThreadPool:getInputChannel`: Returns the shared input Channel (main → workers).
+- `ThreadPool:getOutputChannel`: Returns the shared output Channel (workers → main).
 
 ## References
 

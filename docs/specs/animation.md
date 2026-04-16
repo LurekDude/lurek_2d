@@ -19,18 +19,23 @@ Beyond the basic controller, the module ships: an `AnimStateMachine` for paramet
 
 The animation module has no knowledge of texture handles, entity IDs, or scene transforms — it works entirely with source rectangles and float timers.
 
+Three new source files extend the module's capabilities. `blend.rs` introduces `BlendMask`, `BlendLayer`, and `BlendLayerSet` for compositing multiple animation clips on a single sprite with per-layer blend weights and optional bone-subset masks. `curve.rs` introduces `AnimCurve` and `EasingKind` for keyframe-based procedural animation curves with per-segment interpolation modes. `sync_group.rs` introduces `AnimSyncGroup` for coordinating playback timing across multiple animation instances, ensuring that separate sprites advance in lock-step. Lua callers access these through `lurek.animation.newCurve()`, `lurek.animation.newSyncGroup()`, and `lurek.animation.newBlendLayerSet()`, each returning a fully scriptable userdata with its own method set.
+
 **Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/animation_api.rs`.
 
 ## Files
 
 - `aseprite.rs`: Aseprite JSON export parser for sprite animation data.
+- `blend.rs`: Blend-layer system for compositing multiple animation clips on a single sprite.
 - `clip.rs`: Defines AnimClip, the named sequence of frame indices with clip FPS and looping behavior.
 - `controller.rs`: Defines Animation, the main playback controller for frames, clips, speed, current state, and pending events.
+- `curve.rs`: Keyframe-based animation curves with per-segment easing.
 - `event.rs`: Defines AnimEvent, the event enum emitted for frame changes, loops, and completion.
 - `frame.rs`: Defines AnimFrame plus the AnimationFrame compatibility alias.
 - `mod.rs`: Declares the animation submodules and re-exports the public frame, clip, controller, event, and render parameter types.
 - `render.rs`: Converts the current animation frame into renderer-facing DrawQuad command data.
 - `state_machine.rs`: Finite-state machine for sprite animation: states, transitions, and parameter-driven switching.
+- `sync_group.rs`: Named animation synchronisation groups.
 
 ## Types
 
@@ -38,8 +43,13 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `AsepriteDirection` (`enum`, `aseprite.rs`): Playback direction of an Aseprite frame tag.
 - `AsepriteTagData` (`struct`, `aseprite.rs`): Frame tag (named clip range) from an Aseprite JSON export.
 - `AsepriteParsed` (`struct`, `aseprite.rs`): Result of parsing an Aseprite JSON export.
+- `BlendMask` (`struct`, `blend.rs`): Restricts a [`BlendLayer`] to a named subset of bone or joint identifiers.
+- `BlendLayer` (`struct`, `blend.rs`): One layer in a [`BlendLayerSet`]: a named clip at a given blend weight.
+- `BlendLayerSet` (`struct`, `blend.rs`): Ordered set of blend layers for a single sprite's animation.
 - `AnimClip` (`struct`, `clip.rs`): Named ordered frame sequence with clip-local FPS and looping configuration.
 - `Animation` (`struct`, `controller.rs`): Main playback controller that owns frames, clips, speed, timers, and pending events.
+- `EasingKind` (`enum`, `curve.rs`): Interpolation mode applied between each pair of consecutive keyframes.
+- `AnimCurve` (`struct`, `curve.rs`): A keyframe-based animation curve.
 - `AnimEvent` (`enum`, `event.rs`): Playback event enum used to report frame changes, loops, and finished clips.
 - `AnimFrame` (`struct`, `frame.rs`): One source rectangle plus an optional per-frame duration override.
 - `AnimationFrame` (`type`, `frame.rs`): Backward-compatible alias for [`AnimFrame`].
@@ -51,10 +61,25 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `AnimTransition` (`struct`, `state_machine.rs`): A directed state transition with a single condition.
 - `AnimStateConfig` (`struct`, `state_machine.rs`): Configuration for a single state in the state machine.
 - `AnimStateMachine` (`struct`, `state_machine.rs`): Parameter-driven finite-state machine for animation control.
+- `AnimSyncGroup` (`struct`, `sync_group.rs`): A named set of animation keys that advance in lock-step.
 
 ## Functions
 
 - `load_aseprite_json` (`aseprite.rs`): Parses an Aseprite JSON export string into an [`AsepriteParsed`] result.
+- `BlendMask::all` (`blend.rs`): Creates a mask that affects all bones (no filtering).
+- `BlendMask::from_bones` (`blend.rs`): Creates a mask restricted to the given bone names.
+- `BlendMask::includes` (`blend.rs`): Returns `true` if this mask applies to the given bone name.
+- `BlendLayer::new` (`blend.rs`): Creates a new blend layer.
+- `BlendLayerSet::new` (`blend.rs`): Creates an empty blend layer set.
+- `BlendLayerSet::len` (`blend.rs`): Returns the number of layers currently in the set.
+- `BlendLayerSet::is_empty` (`blend.rs`): Returns `true` if the set contains no layers.
+- `BlendLayerSet::add_layer` (`blend.rs`): Appends a new layer.
+- `BlendLayerSet::remove_layer` (`blend.rs`): Removes a layer by name.
+- `BlendLayerSet::set_weight` (`blend.rs`): Sets the blend weight of a layer.
+- `BlendLayerSet::get_weight` (`blend.rs`): Returns the current weight of a layer, or `None` if not found.
+- `BlendLayerSet::set_mask` (`blend.rs`): Replaces the bone mask of a layer.
+- `BlendLayerSet::layers` (`blend.rs`): Returns a reference to the ordered layer list.
+- `BlendLayerSet::get_layer` (`blend.rs`): Returns an immutable reference to a named layer, or `None`.
 - `Animation::new` (`controller.rs`): Creates a new, empty animation with no frames or clips.
 - `Animation::add_frame` (`controller.rs`): Adds a single frame and returns its 0-based index.
 - `Animation::add_frames_from_grid` (`controller.rs`): Slices a sprite-sheet grid into frames and appends them.
@@ -80,6 +105,12 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `Animation::get_blend_state` (`controller.rs`): Returns the current crossfade state as `(from_quad, to_quad, blend_weight)`.
 - `Animation::draw_to_image` (`controller.rs`): Renders the current animation frame as a debug image.
 - `Animation::load_from_aseprite` (`controller.rs`): Creates an [`Animation`] from an [`AsepriteParsed`] result.
+- `AnimCurve::new` (`curve.rs`): Creates an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
+- `AnimCurve::with_easing` (`curve.rs`): Creates an empty `AnimCurve` with the given easing kind.
+- `AnimCurve::add_keyframe` (`curve.rs`): Adds a keyframe, keeping the internal list sorted by time.
+- `AnimCurve::keyframe_count` (`curve.rs`): Returns the number of keyframes.
+- `AnimCurve::clear` (`curve.rs`): Removes all keyframes.
+- `AnimCurve::eval` (`curve.rs`): Evaluates the curve at the given time.
 - `AnimEvent::type_name` (`event.rs`): Returns the event type as a Lua-friendly string.
 - `AnimEvent::frame_index` (`event.rs`): Returns the frame index for `FrameChanged` events, or `None`.
 - `Animation::generate_render_command` (`render.rs`): Produces a single `DrawQuad` render command for the current frame.
@@ -96,6 +127,12 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `AnimStateMachine::force_state` (`state_machine.rs`): Forces a transition to the named state, playing the associated clip.
 - `AnimStateMachine::get_animation` (`state_machine.rs`): Returns an immutable reference to the owned animation.
 - `AnimStateMachine::get_animation_mut` (`state_machine.rs`): Returns a mutable reference to the owned animation.
+- `AnimSyncGroup::new` (`sync_group.rs`): Creates an empty `AnimSyncGroup`.
+- `AnimSyncGroup::add` (`sync_group.rs`): Adds an animation key to the group.
+- `AnimSyncGroup::remove` (`sync_group.rs`): Removes an animation key from the group.
+- `AnimSyncGroup::clear` (`sync_group.rs`): Removes all members from the group.
+- `AnimSyncGroup::member_count` (`sync_group.rs`): Returns the number of animation keys currently in the group.
+- `AnimSyncGroup::members` (`sync_group.rs`): Returns a reference to the member key slice.
 
 ## Lua API Reference
 
@@ -106,12 +143,28 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `lurek.animation.new`: Creates a new, empty Animation controller.
 - `lurek.animation.fromAseprite`: Parses an Aseprite JSON export string and builds an Animation with clips and frames.
 - `lurek.animation.newStateMachine`: Creates an animation FSM from an Animation controller and an initial state name.
+- `lurek.animation.newCurve`: Creates a new empty [`AnimCurve`] with linear interpolation.
+- `lurek.animation.newSyncGroup`: Creates a new empty [`AnimSyncGroup`].
+- `lurek.animation.newBlendLayerSet`: Creates a new empty [`BlendLayerSet`] for compositing multiple animation clips.
+
+### `AnimCurve` Methods
+- `AnimCurve:addKeyframe`: Inserts a keyframe at the given time. If a keyframe at the same time already
+- `AnimCurve:eval`: Returns the interpolated value at the given time using the curve's easing.
+- `AnimCurve:setEasing`: Sets the easing kind applied between all keyframe segments.
+- `AnimCurve:keyframeCount`: Returns the number of keyframes currently stored.
+- `AnimCurve:clear`: Removes all keyframes from this animation curve, resetting it to empty.
 
 ### `AnimStateMachine` Methods
 - `AnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
 - `AnimStateMachine:getState`: Returns the name of the currently active state.
 - `AnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
 - `AnimStateMachine:getQuad`: Returns the source quad for the current animation frame, or nil.
+
+### `AnimSyncGroup` Methods
+- `AnimSyncGroup:add`: Adds an animation handle to the group.
+- `AnimSyncGroup:remove`: Removes an animation handle from the group.
+- `AnimSyncGroup:clear`: Removes all animation handles from the group.
+- `AnimSyncGroup:memberCount`: Returns the number of animations currently in the group.
 
 ### `Animation` Methods
 - `Animation:addFrame`: Adds a single frame to the frame pool by source rectangle.
@@ -135,6 +188,14 @@ The animation module has no knowledge of texture handles, entity IDs, or scene t
 - `Animation:getCurrentFrame`: Returns the current position within the active clip (0-based).
 - `Animation:setFrame`: Sets the playback position within the current clip.
 - `Animation:getBlendState`: Returns the two quads and blend factor during a crossfade, or nil when not blending.
+
+### `BlendLayerSet` Methods
+- `BlendLayerSet:removeLayer`: Removes a blend layer by name.
+- `BlendLayerSet:setWeight`: Sets the blend weight of a named layer (clamped to [0, 1]).
+- `BlendLayerSet:getWeight`: Returns the blend weight of a named layer, or nil if not found.
+- `BlendLayerSet:setMask`: Replaces the bone mask of a layer.
+- `BlendLayerSet:listLayers`: Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
+- `BlendLayerSet:len`: Returns the number of blend layers.
 
 ## References
 

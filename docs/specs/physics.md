@@ -19,6 +19,8 @@ The `physics` module provides Lurek2D's rigid-body physics simulation backed by 
 
 Extended features: `PhysicsZone` adds per-region gravity and damping overrides applied before each pipeline step — useful for water, low-gravity zones, and wind fields; `ZoneEvent` fires when bodies enter or leave zones. `TerrainMap` is a destructible terrain system using a bit-grid of solid/empty cells with chunked static colliders that update when cells are modified. `CellularWorld` is a separate falling-sand automaton that is physically independent of rapier, simulating per-cell material gravity and interaction rules.
 
+The new `collision_helpers.rs` source file provides lightweight stateless geometric collision utilities that complement the full rapier pipeline — useful for scripted pre-checks without spawning physics bodies. The `CellularWorld` falling-sand automaton has been expanded with documented `CELL_*` material constants and new cellular interaction methods accessible from Lua. Together these additions make the physics module a more self-contained toolkit for games that mix rapier rigid-body simulation with cellular automaton effects.
+
 **Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `rapier2d`. Lua bridge in `src/lua_api/physics_api.rs`.
 
 ## Files
@@ -26,6 +28,7 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `body.rs`: Script-facing rigid-body types, constructors, bounding boxes, and local/world point helpers.
 - `cellular.rs`: Cellular automaton simulation: falling-sand, water, fire, and gas.
 - `collision.rs`: Backward-compatible `CollisionInfo` contact record retained on the public API surface.
+- `collision_helpers.rs`: Lightweight stateless geometric collision helpers.
 - `mod.rs`: Module root and public re-export surface for bodies, shapes, collision records, and the world.
 - `render.rs`: Debug overlay render-command generation and CPU image export for headless inspection.
 - `shape.rs`: Extended collider geometry and reusable standalone fixture descriptors.
@@ -87,6 +90,10 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `CellularWorld::to_bytes` (`cellular.rs`): Serialises the cell grid to a byte buffer.
 - `CellularWorld::from_bytes` (`cellular.rs`): Deserialises a cellular world from bytes produced by [`to_bytes`](CellularWorld::to_bytes).
 - `default_palette` (`cellular.rs`): Returns the default RGBA colour for `cell`.
+- `test_aabb` (`collision_helpers.rs`): Returns `true` when two axis-aligned bounding boxes overlap.
+- `test_circles` (`collision_helpers.rs`): Returns `true` when two circles overlap.
+- `test_point_aabb` (`collision_helpers.rs`): Returns `true` when point `(px, py)` lies inside the AABB at origin `(ax, ay)` with size `(aw, ah)`.
+- `test_circle_aabb` (`collision_helpers.rs`): Returns `true` when a circle (centre `(cx, cy)`, radius `cr`) overlaps the AABB.
 - `World::generate_render_commands` (`render.rs`): Generate debug render commands for all physics bodies.
 - `World::draw_to_image` (`render.rs`): Render the physics world to a CPU image for headless testing or export.
 - `Shape::to_rapier_collider` (`shape.rs`): Converts this shape into a rapier2d `ColliderBuilder`.
@@ -250,21 +257,21 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 ### `Body` Methods
 - `Body:getId`: Returns the body's integer ID.
 - `Body:getPosition`: Returns the body position (x, y).
-- `Body:setPosition`: Sets the body position.
+- `Body:setPosition`: Teleports the body to the given world-space position, bypassing collision.
 - `Body:getX`: Returns the body X position.
 - `Body:getY`: Returns the body Y position.
 - `Body:getVelocity`: Returns the body velocity (vx, vy).
-- `Body:setVelocity`: Sets the body velocity.
+- `Body:setVelocity`: Sets the body's linear velocity in world units per second.
 - `Body:getAngle`: Returns the body angle in radians.
 - `Body:setAngle`: Sets the body angle in radians.
 - `Body:getAngularVelocity`: Returns the angular velocity in radians/s.
 - `Body:setAngularVelocity`: Sets the angular velocity.
-- `Body:getMass`: Returns the body mass.
-- `Body:setMass`: Sets the body mass.
+- `Body:getMass`: Returns the body mass in kilograms used for force and impulse calculations.
+- `Body:setMass`: Sets the body mass; affects how forces and impulses change velocity.
 - `Body:getType`: Returns the body type as a string.
-- `Body:setType`: Sets the body type.
-- `Body:getWidth`: Returns the body width.
-- `Body:getHeight`: Returns the body height.
+- `Body:setType`: Changes the body type: `"dynamic"`, `"static"`, or `"kinematic"`.
+- `Body:getWidth`: Returns the width of this body's primary collider shape in world units.
+- `Body:getHeight`: Returns the height of this body's primary collider shape in world units.
 - `Body:getFriction`: Returns the body friction coefficient.
 - `Body:setFriction`: Sets the body friction coefficient.
 - `Body:getRestitution`: Returns the body restitution (bounciness).
@@ -286,7 +293,7 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `Body:getAngularDamping`: Returns the angular damping coefficient.
 - `Body:setAngularDamping`: Sets the angular damping coefficient.
 - `Body:isBullet`: Returns whether CCD is enabled.
-- `Body:setBullet`: Enables or disables CCD.
+- `Body:setBullet`: Enables or disables continuous collision detection (CCD) for fast-moving bodies.
 - `Body:isSleepingAllowed`: Returns whether the body can sleep.
 - `Body:setSleepingAllowed`: Sets whether the body can sleep.
 - `Body:destroy`: Removes this body from the world.
@@ -337,7 +344,7 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `World:step`: Advances the physics simulation by dt seconds, firing onBeginContact /
 - `World:clear`: Resets the world, removing all bodies and joints.
 - `World:getGravity`: Returns the gravity vector (gx, gy).
-- `World:setGravity`: Sets the gravity vector.
+- `World:setGravity`: Sets the world gravity vector; default is `(0, 9.81)` (downward).
 - `World:setMeter`: Sets the pixels-per-meter scaling factor.
 - `World:getMeter`: Returns the pixels-per-meter scaling factor.
 - `World:toPhysics`: Converts a pixel value to physics units.
@@ -348,7 +355,7 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `World:newBody`: Creates a new rectangular body and adds it to the world.
 - `World:fixtureCount`: Returns the number of fixtures on a body.
 - `World:jointCount`: Returns the total number of joints.
-- `World:getJointIds`: Returns all joint IDs.
+- `World:getJointIds`: Returns a table of integer IDs for every joint attached to this world.
 - `World:getJointBodies`: Returns the two body IDs connected by a joint.
 - `World:destroyJoint`: Removes a joint from the world.
 - `World:getJointType`: Returns the type name of a joint.
@@ -360,12 +367,15 @@ Extended features: `PhysicsZone` adds per-region gravity and damping overrides a
 - `World:getEndContactEvents`: Returns end-contact events from the last step.
 - `World:getContacts`: Returns all contact pairs from the narrow phase.
 - `World:getBodyContacts`: Returns contacts involving a specific body.
-- `World:setBodyType`: Changes the body type.
+- `World:setBodyType`: Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
 - `World:getBodyType`: Returns the body type as a string.
 - `World:setBeginContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
 - `World:clearBeginContact`: Removes the begin-contact callback.
 - `World:setEndContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
 - `World:clearEndContact`: Removes the end-contact callback.
+- `World:setBodyData`: Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
+- `World:getBodyData`: Returns the Lua data previously attached to a body, or nil if none is set.
+- `World:clearBodyData`: Removes the Lua data attached to a body.
 - `World:setBodyCCD`: Enables or disables Continuous Collision Detection for a body.
 - `World:getBodyCCD`: Returns whether CCD is enabled for a body.
 - `World:setBodyOneWay`: Marks a body as a one-way platform.  Bodies approaching from the

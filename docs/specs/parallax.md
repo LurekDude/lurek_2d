@@ -19,6 +19,8 @@ The scroll formula applied each frame is: `pixel_offset = camera_pos * scroll_fa
 
 `ParallaxDrawBatch` is the output of `build_draw_calls(cam_x, cam_y)` — a list of tile positions and UV rectangles consumed by the Lua bridge to emit `RenderCommand::DrawImage` entries. `ParallaxSet` groups multiple layers under a shared name for coordinated `update()` and `drawAuto()` calls that read camera position from `SharedState`.
 
+New layer management methods have been added to `ParallaxLayer`, extending the Lua API surface for dynamic scroll configurations. These additions allow Lua scripts to adjust scroll factors, clamp bounds, and autoscroll velocities on existing layers at runtime through `lurek.parallax.*` without reconstructing the layer object — enabling responsive parallax effects that react to game state, such as a background layer that accelerates during a sprint sequence.
+
 **Scope boundary**: Feature Systems tier. Depends on `render` (command types and BlendMode), `runtime` (SharedState, TextureKey). Lua bridge in `src/lua_api/parallax_api.rs`.
 
 ## Files
@@ -40,6 +42,11 @@ The scroll formula applied each frame is: `pixel_offset = camera_pos * scroll_fa
 - `ParallaxLayer::update` (`layer.rs`): Advances the autonomous scroll accumulator by `dt` seconds.
 - `ParallaxLayer::build_draw_calls` (`layer.rs`): Builds the draw tile batch for this layer.
 - `ParallaxLayer::reset_autoscroll` (`layer.rs`): Resets the autoscroll accumulator to zero.
+- `ParallaxLayer::set_tiling` (`layer.rs`): Enables or disables seamless infinite tiling on both axes.
+- `ParallaxLayer::get_tiling` (`layer.rs`): Returns `true` if seamless infinite tiling is enabled.
+- `ParallaxLayer::set_tile_size` (`layer.rs`): Sets an explicit tile size override, bypassing the scaled texture dimensions.
+- `ParallaxLayer::set_depth` (`layer.rs`): Sets the floating-point draw depth for this layer.
+- `ParallaxLayer::get_depth` (`layer.rs`): Returns the floating-point draw depth.
 - `ParallaxLayer::generate_render_commands` (`render.rs`): Produces render commands for this layer given the current camera and screen.
 - `batch_to_render_commands` (`render.rs`): Converts a pre-computed [`ParallaxDrawBatch`] into render commands.
 
@@ -77,6 +84,11 @@ The scroll formula applied each frame is: `pixel_offset = camera_pos * scroll_fa
 - `ParallaxLayer:setVisible`: Shows or hides this layer.
 - `ParallaxLayer:isVisible`: Returns `true` if the layer is currently visible.
 - `ParallaxLayer:clearClamp`: Removes scroll clamping so the layer scrolls freely.
+- `ParallaxLayer:setTiling`: Enables or disables seamless infinite tiling on both axes simultaneously.
+- `ParallaxLayer:getTiling`: Returns `true` if seamless infinite tiling is enabled.
+- `ParallaxLayer:setTileSize`: Sets explicit tile dimensions in logical pixels, overriding the default
+- `ParallaxLayer:setDepth`: Sets the floating-point draw depth for fine-grained layer ordering.
+- `ParallaxLayer:getDepth`: Returns the current floating-point depth.
 
 ### `ParallaxSet` Methods
 - `ParallaxSet:type`: Returns the type name of this object.

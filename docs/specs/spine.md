@@ -19,6 +19,8 @@ The `spine` module provides Lurek2D's hierarchical skeletal animation system for
 
 `BoneTimeline` and `Keyframe` provide keyframe-driven animation: each keyframe carries a time offset, a target transform value, and an `EasingType` for the segment. `SkeletonAnimation` is a named clip with per-bone `BoneTimeline` entries. `AnimationSet` groups named animations for a skeleton. `IKConstraint` solves two-bone IK chains (upper/lower limb) using the law of cosines for inverse kinematics targeting.
 
+Updated spine animation methods expand the Lua-accessible surface for runtime skeleton manipulation. New methods on `Skeleton` and `SkeletonAnimation` allow Lua scripts to query current pose state, blend between animation clips, and attach or detach slot resources dynamically through `lurek.spine.*`, reducing the boilerplate needed for common game-character workflows like equipment swaps and procedural pose blending.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/spine_api.rs`.
 
 ## Files
@@ -42,6 +44,7 @@ The `spine` module provides Lurek2D's hierarchical skeletal animation system for
 - `BoneProperty` (`enum`, `timeline.rs`): Bone local-transform property that a timeline can animate.
 - `Keyframe` (`struct`, `timeline.rs`): A single timed value sample on a bone timeline.
 - `BoneTimeline` (`struct`, `timeline.rs`): Sequence of keyframes that animate a single property of a single bone.
+- `EventKeyframe` (`struct`, `timeline.rs`): A timed event marker inside a [`SkeletonAnimation`].
 - `SkeletonAnimation` (`struct`, `timeline.rs`): Named animation clip for a skeleton: contains timelines for multiple bones.
 
 ## Functions
@@ -85,9 +88,13 @@ The `spine` module provides Lurek2D's hierarchical skeletal animation system for
 - `BoneTimeline::new` (`timeline.rs`): Creates a new empty timeline for the given bone and property.
 - `BoneTimeline::add_key` (`timeline.rs`): Appends a keyframe at `time` with `value` and the given easing.
 - `BoneTimeline::evaluate` (`timeline.rs`): Evaluates the timeline at `time`, interpolating between surrounding keyframes.
+- `EventKeyframe::new` (`timeline.rs`): Creates a new event keyframe.
 - `SkeletonAnimation::new` (`timeline.rs`): Creates a new empty skeleton animation clip.
 - `SkeletonAnimation::add_timeline` (`timeline.rs`): Appends a bone timeline.
+- `SkeletonAnimation::add_event_key` (`timeline.rs`): Adds an event keyframe to the clip.
+- `SkeletonAnimation::collect_events` (`timeline.rs`): Returns the names of all events whose timestamps fall in `(from, to]`.
 - `SkeletonAnimation::apply_to_skeleton` (`timeline.rs`): Evaluates all timelines at `time` and writes results into the skeleton's bones.
+- `SkeletonAnimation::apply_to_skeleton_blended` (`timeline.rs`): Evaluates all timelines at `time` and **blends** the results with the skeleton's current bone values using `blend_weight`.
 
 ## Lua API Reference
 
@@ -99,34 +106,23 @@ The `spine` module provides Lurek2D's hierarchical skeletal animation system for
 - `lurek.spine.newSkeletonAnimation`: Creates a new empty SkeletonAnimation clip with the given name and duration.
 
 ### `Skeleton` Methods
-- `Skeleton:addBone`: Adds a root bone with optional local transform (`{x,y,rotation,scale_x,scale_y}`) and returns its index.
-- `Skeleton:addChildBone`: Adds a child bone attached to a parent bone index and returns its index.
-- `Skeleton:addSlot`: Adds a slot bound to a bone index with an optional attachment name and returns its index.
 - `Skeleton:findBone`: Returns the index of the named bone, or nil if not found.
 - `Skeleton:findSlot`: Returns the index of the named slot, or nil if not found.
 - `Skeleton:updateWorldTransforms`: Propagates local transforms down the bone hierarchy to compute world positions.
-- `Skeleton:getBoneWorld`: Returns the world-space transform of a bone as a table `{x,y,rotation,scale_x,scale_y}`, or nil if out of range.
+- `Skeleton:getBoneWorld`: Returns the world-space transform of a bone as a table, or nil if out of range.
 - `Skeleton:setPosition`: Sets the root bone position and propagates world transforms.
 - `Skeleton:boneCount`: Returns the total number of bones.
 - `Skeleton:slotCount`: Returns the total number of slots.
 - `Skeleton:drawToImage`: Renders the skeleton as a stick-figure debug view into a new ImageData.
-- `Skeleton:addAnimation`: Adds a SkeletonAnimation to this skeleton's library (consumes the userdata).
-- `Skeleton:playAnimation`: Starts playback of the named clip. Optional second arg `looping` (default true). Returns boolean success.
 - `Skeleton:stopAnimation`: Stops the current skeletal animation.
 - `Skeleton:updateAnimation`: Advances the playing animation by `dt` seconds and applies keyframes.
 - `Skeleton:getAnimationTime`: Returns the current playback time in seconds of the active animation.
-- `Skeleton:blendAnimation`: Evaluates `anim` at `time` and blends it into this skeleton at `blend_weight` (0..1, default 1).
-- `Skeleton:addIKConstraint`: Adds a two-bone IK constraint. Args: `name, bone_chain_table, bend_positive?`. Returns constraint index.
-- `Skeleton:setIKTarget`: Sets the world-space target `(x, y)` for the named IK constraint. Returns boolean success.
+- `Skeleton:addAnimation`: Adds a SkeletonAnimation to this skeleton's library.
 - `Skeleton:addSkin`: Registers a new empty skin by name.
-- `Skeleton:setSkin`: Activates the named skin for attachment lookups. Returns boolean success.
+- `Skeleton:setSkin`: Activates the named skin for attachment lookups.
 - `Skeleton:getSkin`: Returns the name of the currently active skin, or nil.
-- `Skeleton:setSkinMapping`: Maps a slot name to an attachment string in the named skin. Args: `skin, slot, attachment`.
 
 ### `SkeletonAnimation` Methods
-- `SkeletonAnimation:addKeyframe`: Adds a keyframe to a bone timeline. Args: `bone_idx, property, time, value, easing?`. Property: `"x"|"y"|"rotation"|"scale_x"|"scale_y"`. Easing: `"linear"|"ease_in"|"ease_out"|"ease_in_out"|"step"`.
-- `SkeletonAnimation:addEventKey`: Adds a named event marker at `time` seconds with an optional `value` number.
-- `SkeletonAnimation:getEvents`: Returns `{name, value}` tables for events in the half-open interval `(from, to]`.
 - `SkeletonAnimation:getDuration`: Returns the total duration of the animation in seconds.
 - `SkeletonAnimation:getTimelineCount`: Returns the number of bone timelines in this animation.
 

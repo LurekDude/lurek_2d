@@ -19,6 +19,8 @@ The `pathfind` module is Lurek2D's comprehensive pathfinding library. It provide
 
 For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra range queries on abstract `Graph<N, f32>` instances, suitable for province-level and world-graph navigation. `InfluenceMap` is a multi-layer spatial float grid for strategic area analysis (threat maps, resource maps, contested zones). `PathThreadPool` provides background pathfinding via a worker pool for off-thread `NavGrid` queries, keeping pathfinding off the main Lua thread for large scenes.
 
+The new `bidir.rs` source file introduces `BidirSearch`, a bidirectional A* implementation that searches simultaneously from start and goal, halving the effective search space on large navigation grids. Lua path query methods have been extended with new filtering and cost-annotation helpers accessible through `lurek.pathfind.*`, making multi-constraint pathfinding — avoid certain tile types, prefer low-cost corridors — practical from game scripts without modifying grid weights globally.
+
 **Scope boundary**: Feature Systems tier. Depends on `math`, `graph`, `runtime`. Lua bridge in `src/lua_api/pathfind_api.rs`.
 
 ## Files
@@ -26,6 +28,7 @@ For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra ra
 - `ai_flow_field.rs`: Provides a simpler BFS-style flow-field implementation used for lightweight AI movement support.
 - `astar.rs`: Implements A-star search, line-of-sight checks, and path smoothing helpers over navigation grids.
 - `async_pool.rs`: Dispatches pathfinding work to background threads with request management and cancellation support.
+- `bidir.rs`: Bidirectional A★ for halved search space on large navigation grids.
 - `flow_field.rs`: Implements Dijkstra-based flow fields for crowd steering toward one or more targets.
 - `graph_nav.rs`: Generic graph-based navigation using the `graph` module's [`Graph`] struct.
 - `graph_path.rs`: Implements adjacency-graph pathfinding for province-style or node-link worlds instead of regular grids.
@@ -85,6 +88,7 @@ For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra ra
 - `PathThreadPool::pending_count` (`async_pool.rs`): Number of requests submitted but not yet returned via [`poll`].
 - `PathThreadPool::set_thread_count` (`async_pool.rs`): Update the thread count.
 - `PathThreadPool::get_thread_count` (`async_pool.rs`): Current configured thread count.
+- `bidirectional_astar` (`bidir.rs`): Run bidirectional A★ search on `grid` from `start` to `goal`.
 - `FlowField::new` (`flow_field.rs`): Create an empty flow field backed by `grid`.
 - `FlowField::calculate` (`flow_field.rs`): Compute the flow field toward a single target cell.
 - `FlowField::calculate_multi` (`flow_field.rs`): Compute the flow field toward multiple target cells simultaneously.
@@ -233,8 +237,8 @@ For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra ra
 - `lurek.pathfind.rangeMap`: Computes a Dijkstra range-of-movement map from an origin within a movement budget.
 
 ### `AiFlowField` Methods
-- `AiFlowField:getWidth`: Returns the grid width.
-- `AiFlowField:getHeight`: Returns the grid height.
+- `AiFlowField:getWidth`: Returns the flow field grid width in cells.
+- `AiFlowField:getHeight`: Returns the flow field grid height in cells.
 - `AiFlowField:hasGoal`: Returns true if a goal has been set.
 - `AiFlowField:setGoal`: Sets the goal cell and triggers BFS recomputation (1-based coordinates).
 - `AiFlowField:getDirection`: Returns the normalised direction toward the goal (1-based coordinates).
@@ -307,7 +311,6 @@ For non-grid navigation: `graph_astar` and `graph_range` run A\* and Dijkstra ra
 - `UnitPathfinder:setCacheMaxSize`: Sets the maximum number of cached path entries.
 - `UnitPathfinder:type`: Returns the type name of this object.
 - `UnitPathfinder:typeOf`: Returns true if this object is of the given type.
-- `UnitPathfinder:findPathSmooth`: Finds a path and post-processes it with Theta* (Bresenham line-of-sight pruning) to produce any-angle straight-line segments.
 
 ## References
 

@@ -19,6 +19,8 @@ Viewport API: `to_pixels(world_x, world_y)` converts world coordinates to pixel 
 
 `WindowInfo` is a value snapshot struct carrying current width, height, scale factor, and position for read-only queries.
 
+Minor additions to the window management API have extended the set of window properties accessible from Lua scripts through `lurek.window.*`. These additions cover additional window state queries and deferred property setters that were previously absent, improving compatibility with common game menu and settings-screen patterns.
+
 **Scope boundary**: Core Runtime tier. Depends on `runtime` (WindowState), `math`. Lua bridge in `src/lua_api/window_api.rs`.
 
 ## Files
@@ -125,6 +127,9 @@ Viewport API: `to_pixels(world_x, world_y)` converts world coordinates to pixel 
 - `lurek.window.getGameHeight`: Returns the logical game height in virtual pixels.
 - `lurek.window.isFullscreen`: Returns whether the window is in fullscreen mode.
 - `lurek.window.isResizable`: Returns whether the window can be resized by the user.
+- `lurek.window.onDpiChange`: Registers a callback invoked (with the new scale factor) when the display
+- `lurek.window.pollDpiChange`: Polls for a pending DPI change event and returns the new scale factor if any.
+- `lurek.window.openFileDialog`: Opens a blocking native file-open dialog. Returns the chosen path string
 
 ## References
 

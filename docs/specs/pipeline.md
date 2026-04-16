@@ -60,6 +60,8 @@ Step execution logic is provided by Lua callbacks; the pipeline module manages o
 - `Pipeline::reset` (`dag.rs`): Resets the runtime state of every step in the pipeline.
 - `Pipeline::are_deps_satisfied` (`dag.rs`): Checks whether all declared dependencies of `step_name` have reached a terminal-success state.
 - `Pipeline::collect_result` (`dag.rs`): Aggregates per-step runtime data into a `PipelineResult` summary.
+- `Pipeline::to_ascii_diagram` (`dag.rs`): Returns a multi-line ASCII string that visualises the pipeline DAG.
+- `Pipeline::add_sub_pipeline` (`dag.rs`): Merges all steps from a sub-pipeline into this pipeline with a name prefix.
 - `PipelineResult::new` (`result.rs`): Creates a new `PipelineResult` in the `Pending` state with all counters zeroed.
 - `PipelineResult::is_success` (`result.rs`): Returns `true` if no steps failed.
 - `PipelineResult::summary` (`result.rs`): Returns a human-readable one-line summary of this result.
@@ -109,11 +111,11 @@ Step execution logic is provided by Lua callbacks; the pipeline module manages o
 - `Pipeline:getName`: Returns the pipeline's name.
 - `Pipeline:setName`: Sets the pipeline's name.
 - `Pipeline:toTable`: Serialises the pipeline definition to a Lua table (no callbacks).
-- `Pipeline:addConditional`: Adds a step with a runtime condition guard in one call; skipped when the condition function returns false.
-- `Pipeline:onProgress`: Registers a callback invoked after every step with `(step_name, status_string)`.
-- `Pipeline:toAscii`: Returns a multi-line ASCII string visualising the pipeline DAG (parallel levels and dependencies).
 - `Pipeline:type`: Returns the type name of this object.
-- `Pipeline:typeOf`: Returns true if this object is of the given type.
+- `Pipeline:addConditional`: Adds a step with a runtime condition guard: the step is skipped when `when_fn()` returns false.
+- `Pipeline:onProgress`: Registers a callback invoked after every step with `(step_name, status)`.
+- `Pipeline:toAscii`: Returns a multi-line ASCII string visualising the pipeline DAG.
+- `Pipeline:typeOf`: Returns the type identifier string of this pipeline stage object.
 
 ### `Step` Methods
 - `Step:getName`: Returns the unique name of this step.

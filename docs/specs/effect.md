@@ -21,6 +21,8 @@ At render time, effects are queued as `RenderCommand::PostProcess` entries. The 
 
 The effect module does not own scene rendering or sprite drawing. It only describes and manages the post-process layer. Physics, input, audio, and ECS have no coupling to this module.
 
+Three new source files add dedicated post-processing presets as first-class types. `color_grade.rs` introduces `ColorGrade`, a configurable color-grading pass with separate shadow, midtone, and highlight tint controls. `lens_distort.rs` introduces `LensDistort` for barrel and pincushion optical lens distortion. `scanline.rs` introduces `Scanline` for CRT-style horizontal scanline overlays. Each type is constructed from Lua via `lurek.effect.newColorGrade()`, `lurek.effect.newLensDistort()`, and `lurek.effect.newScanline()`, with their full parameter sets exposed as Lua method chains on the returned userdata.
+
 **Scope boundary**: Platform Services tier. Depends on `render` (command types), `image`, `runtime`. Lua bridge in `src/lua_api/fx_api.rs`.
 
 ## Files
@@ -37,6 +39,7 @@ The effect module does not own scene rendering or sprite drawing. It only descri
 - `render.rs`: Generates render-command markers for beginning, ending, and applying post-processing capture.
 - `screen_effects.rs`: Defines flash, shake, and fade state.
 - `stack.rs`: Defines PostFxStack, the ordered full-frame post-processing pipeline container.
+- `transition.rs`: Screen-transition effect data model for [`super::PostFxStack`].
 - `water_overlay.rs`: Water surface overlay with UV distortion and depth-tint controls.
 - `weather.rs`: Defines weather particle types, live particles, and weather simulation state.
 
@@ -58,6 +61,8 @@ The effect module does not own scene rendering or sprite drawing. It only descri
 - `ShakeState` (`struct`, `screen_effects.rs`): Shake screen effect state.
 - `FadeState` (`struct`, `screen_effects.rs`): Fade screen effect state.
 - `PostFxStack` (`struct`, `stack.rs`): Ordered full-frame post-processing pipeline with per-pass enabled flags and capture dimensions.
+- `TransitionKind` (`enum`, `transition.rs`): The visual style of a screen transition.
+- `ScreenTransition` (`struct`, `transition.rs`): Frame-by-frame state machine for a screen transition.
 - `WaterOverlayState` (`struct`, `water_overlay.rs`): Full-screen water-surface overlay state.
 - `WeatherType` (`enum`, `weather.rs`): Weather particle types supported by the overlay system.
 - `WeatherParticle` (`struct`, `weather.rs`): A single weather particle in the overlay's weather system.
@@ -135,12 +140,22 @@ The effect module does not own scene rendering or sprite drawing. It only descri
 - `PostFxStack::len` (`stack.rs`): Returns the number of effects currently in the chain.
 - `PostFxStack::is_empty` (`stack.rs`): Returns `true` if the chain contains no effects.
 - `PostFxStack::clear` (`stack.rs`): Removes all effects from the chain.
+- `PostFxStack::dedup_indices` (`stack.rs`): Removes duplicate effect indices from the chain, keeping the first occurrence of each index and discarding subsequent duplicates.
 - `PostFxStack::draw_info_to_image` (`stack.rs`): Renders a diagnostic image showing the effect stack layout.
 - `PostFxStack::draw_stack_management_to_image` (`stack.rs`): Render the stack state as two side-by-side column layouts.
 - `PostFxStack::draw_effect_catalog_to_image` (`stack.rs`): Render a catalog grid of effect types with representative visual patterns.
 - `PostFxStack::draw_effect_parameters_to_image` (`stack.rs`): Render a parameter showcase grid for PostFx effects.
 - `PostFxStack::draw_effect_type_bars_to_image` (`stack.rs`): Render a bar preview for a small set of PostFx effect types.
 - `PostFxStack::draw_effect_types_to_image` (`stack.rs`): Render a bar preview for a list of PostFx effect types, auto-assigning colours and counting parameters.
+- `TransitionKind::from_str` (`transition.rs`): Parses the kind from a Lua string.
+- `TransitionKind::name` (`transition.rs`): Returns the canonical lower-case name of this kind.
+- `ScreenTransition::new` (`transition.rs`): Creates a new `ScreenTransition`.
+- `ScreenTransition::play` (`transition.rs`): Starts the transition playing forward (hides the scene).
+- `ScreenTransition::reverse` (`transition.rs`): Starts the transition playing in reverse (reveals the scene).
+- `ScreenTransition::update` (`transition.rs`): Advances the transition by `dt` seconds.
+- `ScreenTransition::progress` (`transition.rs`): Returns the fractional progress `[0, 1]` of the transition.
+- `ScreenTransition::is_active` (`transition.rs`): Returns `true` if the transition is currently running.
+- `ScreenTransition::is_done` (`transition.rs`): Returns `true` if the transition has completed.
 - `WaterOverlayState::new` (`water_overlay.rs`): Creates a new disabled `WaterOverlayState` with default wave parameters.
 - `WaterOverlayState::update` (`water_overlay.rs`): Advances the animation clock by `dt` seconds.
 - `WaterOverlayState::reset` (`water_overlay.rs`): Resets all parameters and the animation clock to their defaults.
@@ -161,6 +176,9 @@ The effect module does not own scene rendering or sprite drawing. It only descri
 - `lurek.effect.getEffectTypes`: Returns the list of all built-in effect type names.
 - `lurek.effect.newImageEffect`: Creates a new per-image effect chain. Accepts:
 - `lurek.effect.newOverlay`: Creates a new screen overlay controller for weather, flash, shake, and fade effects.
+- `lurek.effect.newTransition`: Creates a new screen-transition controller. `kind` is one of:
+- `lurek.effect.setShaderErrorDisplay`: Enables or disables the overlay that renders shader compile errors as red text
+- `lurek.effect.getShaderErrorDisplay`: Returns whether shader error display is currently enabled.
 
 ### `ImageEffect` Methods
 - `ImageEffect:addEffect`: Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
@@ -279,12 +297,29 @@ The effect module does not own scene rendering or sprite drawing. It only descri
 - `PostFxStack:len`: Returns the total number of effect slots in the pipeline.
 - `PostFxStack:isEmpty`: Returns true if the pipeline has no effect slots.
 - `PostFxStack:clear`: Removes all effects from the pipeline.
+- `PostFxStack:dedup`: Removes duplicate effects from the pipeline, keeping the first occurrence
 - `PostFxStack:isCapturing`: Returns whether the stack is currently capturing the scene.
 - `PostFxStack:beginCapture`: Begins capturing the scene for post-processing.
 - `PostFxStack:endCapture`: Ends scene capture for post-processing.
 - `PostFxStack:apply`: Applies all enabled effects in the stack and composites the result to screen.
 - `PostFxStack:type`: Returns the type name "PostFxStack".
 - `PostFxStack:typeOf`: Returns true when the given name matches "PostFxStack" or a parent type.
+- `PostFxStack:setFeedback`: Sets the feedback loop intensity. At `0.0` (default) there is no
+- `PostFxStack:getFeedback`: Returns the current feedback loop intensity `[0.0, 1.0]`.
+- `PostFxStack:clearFeedback`: Resets the feedback intensity to `0.0` (disables feedback).
+
+### `mlua` Methods
+- `mlua:play`: Starts the transition playing forward (scene fades/wipes out).
+- `mlua:reverse`: Starts the transition in reverse (scene fades/wipes in).
+- `mlua:update`: Advances the transition by `dt` seconds. Returns `true` while
+- `mlua:progress`: Returns the fractional progress `[0, 1]` of the transition, taking
+- `mlua:isActive`: Returns `true` while the transition is running.
+- `mlua:isDone`: Returns `true` after the transition has completed.
+- `mlua:kind`: Returns the transition kind name (`"fade"`, `"wipe"`, `"iris_wipe"`,
+- `mlua:color`: Returns the fill color as four numbers: `r, g, b, a`.
+- `mlua:setColor`: Updates the fill color from `{r, g, b, a?}`.
+- `mlua:type`: Type.
+- `mlua:typeOf`: Type of.
 
 ## References
 

@@ -17,12 +17,15 @@ The core type is `NdArray`, a row-major array supporting 1D, 2D, and 3D shapes w
 
 The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, divide, modulo) and reductions (sum, mean, min, max, argmin, argmax) over full arrays or individual axes. The `spatial` submodule adds 2D convolution, max/average pooling, and distance transforms. The `linalg` submodule provides linear algebra: dot product, matrix multiply, Gaussian elimination solvers, Sobel edge detection kernels, and outer products. The `analytics` submodule covers signal processing (FFT, autocorrelation, moving average), normalization (L1/L2/min-max), and statistical functions (variance, standard deviation, histogram).
 
+The new `fft.rs` submodule adds a dedicated Fast Fourier Transform implementation alongside its inverse, complementing the existing `analytics` signal-processing helpers with a first-class FFT type optimized for power-of-two sequences. Lua scripts access these directly via `lurek.compute.fft(array)` and `lurek.compute.ifft(array)`, receiving a new `NdArray` containing the complex spectrum or the reconstructed time-domain signal.
+
 **Scope boundary**: Foundations tier. No Lurek2D module imports. Lua bridge in `src/lua_api/compute_api.rs`.
 
 ## Files
 
 - `analytics.rs`: Statistical analytics, signal processing, and normalisation for NdArray.
 - `array.rs`: Defines `NdArray`, `DataType`, shape validation, contiguous storage rules, typed element access, and array construction helpers.
+- `fft.rs`: Fast Fourier Transform (FFT) and Inverse FFT for the compute subsystem.
 - `linalg.rs`: Linear algebra extensions for NdArray.
 - `mod.rs`: Declares the compute submodules and re-exports the core ndarray surface.
 - `ops.rs`: Implements the bulk of ndarray behavior, including arithmetic, scalar ops, comparisons, masks, reductions, reshaping, transposition, and Int32-only bitwise operations.
@@ -32,6 +35,7 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 
 - `DataType` (`enum`, `array.rs`): Declares the supported element representations: `Float32`, `Float64`, and `Int32`. The restricted dtype set keeps the implementation small and predictable for Lua callers.
 - `NdArray` (`struct`, `array.rs`): Core dense numeric array type. It owns the contiguous row-major buffer and is the foundation every compute operation works against.
+- `LuDecomp` (`struct`, `linalg.rs`): Result of an LU decomposition with partial pivoting.
 
 ## Functions
 
@@ -71,6 +75,10 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 - `NdArray::set_by_indices` (`array.rs`): Write a value by multi-dimensional indices (0-based), combining flat_index + set_f64.
 - `NdArray::to_f64_vec` (`array.rs`): Return all elements as a `Vec<f64>`.
 - `NdArray::display_string` (`array.rs`): Return a human-readable summary string for debugging.
+- `next_power_of_two` (`fft.rs`): Returns the smallest power of two ≥ `n`.
+- `fft` (`fft.rs`): Computes the discrete Fourier transform (DFT) of `data`.
+- `ifft` (`fft.rs`): Computes the inverse discrete Fourier transform.
+- `fft_magnitude` (`fft.rs`): Returns the magnitude spectrum of `data` as `|X[k]|` values.
 - `normalize_vec` (`linalg.rs`): L2-normalise a 1D vector.
 - `cross2d` (`linalg.rs`): 2D cross product (returns signed scalar area of the parallelogram).
 - `outer` (`linalg.rs`): Outer product of two 1D vectors: result shape is [m, n].
@@ -80,6 +88,8 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 - `gaussian_kernel` (`linalg.rs`): Generate a `size × size` Gaussian kernel with the given `sigma`.
 - `sobel` (`linalg.rs`): Apply Sobel edge detection to a 2D Float32/Float64 array.
 - `linsolve` (`linalg.rs`): Solve the linear system A·x = b using Gaussian elimination with partial pivoting.
+- `lu_decompose` (`linalg.rs`): Decomposes a square matrix `a` into P·A = L·U using partial pivoting.
+- `eigenvalue_power` (`linalg.rs`): Computes the dominant eigenvalue and its eigenvector of a square matrix using the power-iteration method.
 - `add` (`ops.rs`): Element-wise addition of two arrays (same shape and dtype).
 - `add_scalar` (`ops.rs`): Add a scalar to every element.
 - `sub` (`ops.rs`): Element-wise subtraction of two arrays (same shape and dtype).
@@ -153,6 +163,9 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 - `lurek.compute.gaussianKernel`: Creates a size×size Gaussian kernel array.
 - `lurek.compute.rotate2dMatrix`: Creates a 2×2 rotation matrix for the given angle in radians.
 - `lurek.compute.affine2d`: Creates a 3×3 homogeneous affine matrix.
+- `lurek.compute.fft`: Computes the discrete Fourier transform of a 1D real-valued sample array.
+- `lurek.compute.ifft`: Computes the inverse discrete Fourier transform.
+- `lurek.compute.fftMagnitude`: Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
 
 ### `Array` Methods
 - `Array:getShape`: Returns the shape as a table of dimension sizes.
@@ -170,7 +183,7 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 - `Array:pow`: Raises each element to a scalar exponent.
 - `Array:sqrt`: Element-wise square root.
 - `Array:abs`: Element-wise absolute value.
-- `Array:neg`: Element-wise negation.
+- `Array:neg`: Returns a new Array with every element negated (multiplied by −1).
 - `Array:clamp`: Clamps each element to the given range.
 - `Array:threshold`: Returns a mask array with 1.0 where elements >= val, else 0.0.
 - `Array:countNonZero`: Returns the count of nonzero elements.
@@ -208,6 +221,7 @@ The `ops` submodule provides element-wise arithmetic (add, subtract, multiply, d
 - `Array:transformPoints`: Apply this 2×2 or 3×3 matrix to an [N,2] points array.
 - `Array:sobel`: Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
 - `Array:linsolve`: Solve A·x = b where this array is A (square [n,n]) and b is a 1D vector.
+- `Array:luDecompose`: Decomposes this square matrix into L and U factors with partial pivoting.
 - `Array:type`: Returns the type name "Array".
 - `Array:typeOf`: Returns true when the given name matches "Array" or a parent type.
 

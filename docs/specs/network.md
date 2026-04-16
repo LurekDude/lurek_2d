@@ -19,6 +19,8 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 
 `message.rs` implements MessagePack serialization for compact binary network transport: `encode_table(lua_table)` converts a Lua table to a byte vector, `decode_table(bytes, lua)` reconstructs a Lua table. This round-trip is the recommended format for application-level game messages.
 
+The `lobby.rs` source file introduces `NetworkLobby`, a LAN lobby discovery type that uses UDP broadcast to advertise and enumerate local game sessions. Lua scripts access the full lobby API through `lurek.net.lobby.*`, enabling game menus to list nearby games and join them without requiring a dedicated matchmaking server. `LobbyInfo` carries the session name, current player count, maximum capacity, and host address.
+
 **Scope boundary**: Core Runtime tier. No Platform Services or Feature Systems imports. Lua bridge in `src/lua_api/network_api.rs`.
 
 ## Files
@@ -27,6 +29,7 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 - `error.rs`: `NetworkError` enum with variants: ConnectionFailed, SendFailed, InvalidPeer, InvalidAddress, Http, WebSocket, Tcp, Serialization, Thread.
 - `host.rs`: ENet host wrapper with `HostRole` enum; factory methods `create_server`, `create_client`.
 - `http.rs`: HTTP client via `ureq`. `HttpResponse` struct, `execute_request` function.
+- `lobby.rs`: LAN lobby discovery via UDP broadcast.
 - `message.rs`: MessagePack serialization. `NetValue` enum, `pack`/`unpack` functions.
 - `mod.rs`: Module root — declares all 8 sub-modules.
 - `net_thread.rs`: Background I/O thread. `NetworkRuntime`, `NetworkRequest`, `NetworkResponse`, `TcpEvent`, `WsEvent`.
@@ -41,6 +44,7 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 - `NetworkEvent` (`enum`, `host.rs`): Result of a single `NetworkHost::service` call.
 - `PeerStats` (`struct`, `host.rs`): Per-peer statistics snapshot.
 - `HttpResponse` (`struct`, `http.rs`): HTTP response with status, body, headers, error.
+- `LobbyInfo` (`struct`, `lobby.rs`): Metadata about a discoverable game lobby.
 - `NetValue` (`enum`, `message.rs`): Nil, Bool, Integer, Float, String, Array, Map — serializable Lua values.
 - `NetworkRequest` (`enum`, `net_thread.rs`): HttpRequest, TcpConnect, TcpSend, TcpClose, WsConnect, WsSend, WsClose, Shutdown.
 - `NetworkResponse` (`enum`, `net_thread.rs`): HttpResponse, TcpEvent, WebSocketEvent.
@@ -84,6 +88,10 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 - `NetworkHost::set_role` (`host.rs`): Set the multiplayer role of this host.
 - `NetworkHost::peer_stats` (`host.rs`): Get per-peer statistics.
 - `execute_request` (`http.rs`): Execute an HTTP request synchronously (called from the network thread).
+- `LobbyInfo::to_wire` (`lobby.rs`): Serialises this lobby record into the wire format.
+- `LobbyInfo::from_wire` (`lobby.rs`): Parses a lobby record from the wire format.
+- `broadcast_lobby` (`lobby.rs`): Broadcasts a lobby announcement to the subnet once.
+- `discover_lobbies` (`lobby.rs`): Listens for lobby announcements on [`LOBBY_PORT`] for `timeout_ms` milliseconds.
 - `pack` (`message.rs`): Serialize a [`NetValue`] to MessagePack bytes.
 - `unpack` (`message.rs`): Deserialize MessagePack bytes into a [`NetValue`].
 - `estimate_size` (`message.rs`): Estimate the serialized size of a [`NetValue`] without allocating.
@@ -125,6 +133,9 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 - `lurek.network.newRuntime`: Creates a background network runtime for async HTTP, TCP, and WebSocket.
 - `lurek.network.pack`: Serializes a Lua value to a binary MessagePack string.
 - `lurek.network.unpack`: Deserializes a MessagePack binary string back to a Lua value.
+- `lurek.network.createLobby`: Creates a LobbyInfo record and broadcasts it once on the local network.
+- `lurek.network.discoverLobbies`: Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
+- `lurek.network.syncEntity`: Convenience helper: packs an entity snapshot and broadcasts it to all peers.
 
 ### `NetworkHost` Methods
 - `NetworkHost:service`: Polls the network for one event, returning an event table or nil.
@@ -154,7 +165,7 @@ HTTP, TCP, and WebSocket operations run on the `NetworkRuntime` background OS th
 - `NetworkRuntime:httpRequest`: Sends an HTTP request asynchronously. Poll with `poll()` for the response.
 - `NetworkRuntime:tcpConnect`: Opens a TCP connection to a remote address.
 - `NetworkRuntime:tcpSend`: Sends data over a TCP connection.
-- `NetworkRuntime:tcpClose`: Closes a TCP connection.
+- `NetworkRuntime:tcpClose`: Closes the TCP connection identified by the given connection handle.
 - `NetworkRuntime:wsConnect`: Opens a WebSocket connection.
 - `NetworkRuntime:wsSend`: Sends a text message over a WebSocket connection.
 - `NetworkRuntime:wsClose`: Closes a WebSocket connection.

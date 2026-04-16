@@ -21,6 +21,8 @@ The `automation` module also injects synthetic events into the queue through the
 
 Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedState`, it is only safe to access on the main thread. Background threads that need to communicate use `lurek.thread.Channel` instead.
 
+The `EventBus` has been extended with deferred-dispatch support: `push_deferred(event)` enqueues an event into a pending buffer that is only merged into the main queue on an explicit `flush()` call, and `drain()` consumes all pending deferred events without dispatching them. Lua scripts access these through `lurek.event.pushDeferred(name, data)` and `lurek.event.flush()`, enabling batched event delivery patterns where multiple events should be committed as a group or discarded atomically.
+
 **Scope boundary**: Core Runtime tier. No upstream engine dependencies. Lua bridge handled through `app` dispatch.
 
 ## Files
@@ -58,9 +60,9 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 - `Signal::get_handles` (`signal.rs`): Returns the handles registered for the given event name (in registration order).
 - `Signal::get_count` (`signal.rs`): Returns the number of subscriptions for the given event name.
 - `Signal::get_total_count` (`signal.rs`): Returns the total number of subscriptions across all event names.
-- `Signal::subscribe_wildcard` (`signal.rs`): Registers a wildcard subscription for a glob pattern (may contain `*` or `?`) and returns a handle ID.
-- `Signal::get_wildcard_handles` (`signal.rs`): Returns the wildcard handles whose pattern matches the given event name.
-- `Signal::is_wildcard` (`signal.rs`): Returns `true` when the given pattern string contains a glob character (`*` or `?`).
+- `Signal::subscribe_wildcard` (`signal.rs`): Registers a wildcard pattern subscription.
+- `Signal::get_wildcard_handles` (`signal.rs`): Returns all wildcard handles whose pattern matches the given event name.
+- `Signal::is_wildcard` (`signal.rs`): Returns `true` if `pattern` contains glob metacharacters (`*` or `?`).
 
 ## Lua API Reference
 
@@ -69,7 +71,6 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 
 ### Module Functions
 - `lurek.event.exit`: Pushes an exit event, requesting the engine to stop.
-- `lurek.event.push`: Pushes a custom event onto the event queue.
 - `lurek.event.poll`: Returns an iterator function that pops events from the queue.
 - `lurek.event.clear`: Discards all pending events in the queue.
 - `lurek.event.newSignal`: Creates a new pub-sub Signal dispatcher.
@@ -77,9 +78,14 @@ Because the event queue is shared via `Rc<RefCell<EventQueue>>` inside `SharedSt
 - `lurek.event.wait`: Blocks until the next event arrives or the optional timeout elapses.
 - `lurek.event.restart`: Requests that the engine restart at the beginning of the next frame.
 - `lurek.event.quit`: Alias for `exit()` — requests the engine to stop at the end of the current frame.
+- `lurek.event.pushDeferred`: Pushes a named event to the deferred buffer; it will not reach the main queue
+- `lurek.event.flushDeferred`: Moves all buffered deferred events into the main event queue and clears the buffer.
+- `lurek.event.enableHistory`: Enables event history recording, keeping the last `capacity` pushed events.
+- `lurek.event.getHistory`: Returns an array of recent events as `{name, args}` tables.
+- `lurek.event.clearHistory`: Clears all recorded event history.
+- `lurek.event.push`: Adds an event item to the end of the event queue for processing.
 
 ### `Signal` Methods
-- `Signal:connect`: Subscribes a callback. If `name` contains `*` or `?` it is treated as a glob wildcard pattern matched on each `emit` call. Returns a handle for `disconnect`.
 - `Signal:emit`: Emits the named event, calling all registered callbacks with extra arguments.
 - `Signal:remove`: Removes a subscription by handle ID.
 - `Signal:clear`: Removes all callbacks for the named event.

@@ -19,6 +19,8 @@ The `light` module provides Lurek2D's 2D point-light data model. It is a Foundat
 
 Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-casting outline. The renderer traces shadow lines from each light's position against all enabled occluders, producing the shadow mask that gates lighting contributions.
 
+The `shadow.rs` source file introduces `ShadowCaster` as a dedicated first-class type for shadow-casting geometry. Rather than embedding occluder polygons directly in `Light2D`, game code can create standalone `ShadowCaster` instances via `lurek.light.newShadowCaster()` and assign them independently of specific lights, enabling scenes where one occluder interacts with multiple light sources without data duplication.
+
 **Scope boundary**: Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/light_api.rs`.
 
 ## Files
@@ -33,6 +35,7 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `mod.rs`: Declares the lighting submodules and re-exports the public light types.
 - `occluder.rs`: Defines Occluder, a polygon shadow caster with transform, opacity, mask, and enabled state.
 - `shadow.rs`: Defines the shadow edge-filter enum.
+- `transition.rs`: Smooth linear transition for light color, intensity, and radius.
 
 ## Types
 
@@ -45,6 +48,7 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `LightWorld` (`struct`, `light_world.rs`): Owner of the light and occluder pools, ambient settings, limits, and group operations.
 - `Occluder` (`struct`, `occluder.rs`): Polygon shadow caster with vertices, transform, opacity, mask, and enabled state.
 - `ShadowFilter` (`enum`, `shadow.rs`): Enum selecting the shadow edge filtering quality.
+- `LightTransition` (`struct`, `transition.rs`): Linearly interpolates a [`super::Light2D`]'s color, intensity, and radius from their current values to target values over a fixed duration.
 
 ## Functions
 
@@ -120,6 +124,8 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `LightWorld::group_count` (`light_world.rs`): Returns the number of lights in the given group.
 - `LightWorld::advance_flickers` (`light_world.rs`): Advances flicker phase for all lights with flicker enabled.
 - `LightWorld::draw_to_image` (`light_world.rs`): Render the accumulated lightmap to an image.
+- `LightWorld::ambient_color_hint` (`light_world.rs`): Returns the current ambient colour as an RGBA tuple in `[0.0, 1.0]`.
+- `LightWorld::directional_light_hints` (`light_world.rs`): Returns a list of position and direction hints for all enabled directional lights.
 - `Occluder::new` (`occluder.rs`): Creates a new occluder from the given polygon vertices.
 - `Occluder::set_vertices` (`occluder.rs`): Sets the polygon vertices.
 - `Occluder::from_flat_coords` (`occluder.rs`): Creates an `Occluder` from a flat `{x1, y1, x2, y2, ...}` coordinate sequence.
@@ -132,6 +138,9 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `Occluder::get_light_mask` (`occluder.rs`): Returns the light interaction bitmask.
 - `Occluder::set_enabled` (`occluder.rs`): Sets whether this occluder is active.
 - `Occluder::is_enabled` (`occluder.rs`): Returns whether this occluder is active.
+- `LightTransition::new` (`transition.rs`): Creates a new `LightTransition` starting from the given snapshot of the light's current state.
+- `LightTransition::update` (`transition.rs`): Advances the transition by `dt` seconds and returns the current `(color, intensity, radius)` snapshot, or `None` when the transition has completed.
+- `LightTransition::progress` (`transition.rs`): Returns the fractional progress `[0, 1]` of the transition.
 
 ## Lua API Reference
 
@@ -155,6 +164,8 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `lurek.light.setGroupColor`: Sets the color for all lights in the given group.
 - `lurek.light.getGroupCount`: Returns the number of lights in the given group.
 - `lurek.light.advanceFlickers`: Advances flicker phase for all lights with flicker enabled.
+- `lurek.light.syncAmbient`: Returns the current ambient light colour as (r, g, b, a).
+- `lurek.light.getGodRayHints`: Returns a list of directional light hints for god-ray rendering.
 
 ### `Light` Methods
 - `Light:setPosition`: Sets the light's world-space position.
@@ -218,6 +229,14 @@ Occluder polygons are expressed as lists of `Vec2` vertices defining the shadow-
 - `Occluder:isEnabled`: Returns whether this occluder is active.
 - `Occluder:remove`: Removes this occluder from the world.
 - `Occluder:isValid`: Returns whether this occluder handle is still valid.
+- `Occluder:addFlicker`: Convenience method to set a flicker effect using amplitude range and
+- `Occluder:transitionTo`: Begins a smooth linear transition of the light's color, intensity,
+- `Occluder:updateTransition`: Advances the active transition by `dt` seconds and applies the
+- `Occluder:stopTransition`: Cancels the active light transition.
+- `Occluder:transitionProgress`: Returns the fractional progress `[0, 1]` of the active transition,
+- `Occluder:setCookie`: Sets the texture path used as a light cookie (mask) for projection.
+- `Occluder:getCookie`: Returns the current cookie texture path, or `nil` if unset.
+- `Occluder:clearCookie`: Removes the cookie texture assignment.
 
 ## References
 

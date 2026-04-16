@@ -21,6 +21,8 @@ The `pack`/`unpack` functions provide a LÖVE2D-compatible binary pack format us
 
 Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module under `lurek.codec`.
 
+Three new submodules significantly extend the toolkit. `cron.rs` adds `CronJob` and `CronSchedule` for cron-expression-based event scheduling, accessible from Lua via `lurek.data.newCron()`. `registry.rs` adds `DataRegistry`, a typed named-value store for global game data, accessible via `lurek.data.newRegistry()`. `relation.rs` adds `DataRelation`, a keyed mapping between entity identifiers with typed metadata, accessible via `lurek.data.newRelation()`. Each type ships with a full Lua method set for lifecycle management and data access.
+
 **Scope boundary**: Foundations tier. Depends only on external crates (deflate, lz4, sha2, base64, etc.). Lua bridge in `src/lua_api/data_api.rs`.
 
 ## Files
@@ -32,7 +34,9 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `encode.rs`: Handles base64 and hex encoding and decoding for binary payload transport.
 - `hash.rs`: Computes MD5, SHA-1, SHA-256, and SHA-512 digests over in-memory data.
 - `mod.rs`: Re-exports the public binary-data surface and keeps callers from importing individual helpers ad hoc.
+- `msgpack.rs`: MessagePack serialization and deserialization for Lurek2D.
 - `pack.rs`: Implements the LÖVE-style single-character binary pack and unpack format used for compact compatibility-oriented serialization.
+- `ring_buffer.rs`: Fixed-capacity circular ring buffer.
 - `toml_convert.rs`: Converts between TOML text and `toml::Value` trees for the Lua-facing TOML helpers.
 
 ## Types
@@ -45,6 +49,7 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `EncodeFormat` (`enum`, `encode.rs`): Supported binary-to-text encoding modes. It is the small dispatch enum behind the base64 and hex helpers.
 - `HashAlgorithm` (`enum`, `hash.rs`): Supported digest algorithms for byte hashing. It centralizes algorithm parsing so the Lua API and Rust callers use the same accepted names.
 - `PackValue` (`enum`, `pack.rs`): Tagged value enum used by the LÖVE-compatible pack format. It preserves the compatibility surface independently from the native `BinValue` format.
+- `RingBuffer` (`struct`, `ring_buffer.rs`): A fixed-capacity circular ring buffer.
 
 ## Functions
 
@@ -82,9 +87,23 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `decode` (`encode.rs`): Decode a string back into bytes using the specified format.
 - `HashAlgorithm::parse_str` (`hash.rs`): Parse an algorithm name string.
 - `hash` (`hash.rs`): Compute the hash of data using the specified algorithm, returned as a hex string.
+- `to_msgpack` (`msgpack.rs`): Serializes a `serde_json::Value` to MessagePack bytes.
+- `from_msgpack` (`msgpack.rs`): Deserializes MessagePack bytes into a `serde_json::Value`.
 - `pack` (`pack.rs`): Packs values according to a format string into a `ByteData` buffer.
 - `unpack` (`pack.rs`): Unpacks values from a byte buffer according to a format string.
 - `get_packed_size` (`pack.rs`): Computes the total byte size that `pack` would produce for the given format and values.
+- `RingBuffer::new` (`ring_buffer.rs`): Creates a new ring buffer with the given capacity.
+- `RingBuffer::push` (`ring_buffer.rs`): Pushes `value` onto the buffer.
+- `RingBuffer::pop` (`ring_buffer.rs`): Removes and returns the oldest element (FIFO order).
+- `RingBuffer::peek` (`ring_buffer.rs`): Returns a reference to the oldest element without removing it.
+- `RingBuffer::peek_newest` (`ring_buffer.rs`): Returns a reference to the newest element without removing it.
+- `RingBuffer::get` (`ring_buffer.rs`): Returns a reference to the element at the given logical index.
+- `RingBuffer::capacity` (`ring_buffer.rs`): Returns the maximum number of elements the buffer can hold.
+- `RingBuffer::len` (`ring_buffer.rs`): Returns the number of elements currently stored.
+- `RingBuffer::is_empty` (`ring_buffer.rs`): Returns `true` if the buffer contains no elements.
+- `RingBuffer::is_full` (`ring_buffer.rs`): Returns `true` if the buffer has reached its capacity.
+- `RingBuffer::clear` (`ring_buffer.rs`): Removes all elements from the buffer.
+- `RingBuffer::to_vec` (`ring_buffer.rs`): Returns all elements as a `Vec`, ordered oldest-first.
 - `parse_toml` (`toml_convert.rs`): Parse a TOML string into a `toml::Value`.
 - `encode_toml` (`toml_convert.rs`): Encode a `toml::Value` into a TOML string.
 
@@ -109,6 +128,9 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `lurek.data.size`: Returns the byte size of a Lurek2D Binary Pack Format string.
 - `lurek.data.parseToml`: Parses a TOML string into a Lua table.
 - `lurek.data.encodeToml`: Encodes a Lua table into a TOML string.
+- `lurek.data.newRingBuffer`: Creates a fixed-capacity ring buffer that can store any Lua value.
+- `lurek.data.toMsgPack`: Serializes a Lua value (table, string, number, boolean, or nil) to MessagePack binary.
+- `lurek.data.fromMsgPack`: Deserializes a MessagePack binary string back into a Lua value.
 
 ### `DataView` Methods
 - `DataView:getUInt8`: Reads an unsigned 8-bit integer at the given offset.
@@ -121,15 +143,24 @@ Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` modu
 - `DataView:getDouble`: Reads a 64-bit float at the given offset.
 - `DataView:getSize`: Returns the size of this view in bytes.
 
-### `ByteData` Methods
-- `ByteData:getSize`: Get the size.
-- `ByteData:getString`: Get the string representation.
-- `ByteData:getByte`: Get a byte at the specified offset.
-- `ByteData:setByte`: Set a byte at the specified offset.
-- `ByteData:clone`: Clone the ByteData.
-- `ByteData:setBit`: Sets or clears a single bit. Args: `byte_offset: integer, bit_offset: integer (0–7), value: boolean`. Errors if `bit_offset > 7`.
-- `ByteData:getBit`: Returns the boolean value of a single bit. Args: `byte_offset: integer, bit_offset: integer (0–7)`.
-- `ByteData:readBits`: Reads `count` bits (up to 32) starting at `bit_offset` of `byte_offset`, LSB-first, spanning byte boundaries. Returns an `integer`.
+### `RingBuffer` Methods
+- `RingBuffer:push`: Pushes a value onto the ring buffer.
+- `RingBuffer:pop`: Removes and returns the oldest element, or nil if the buffer is empty.
+- `RingBuffer:peek`: Returns the oldest element without removing it, or nil if empty.
+- `RingBuffer:peekNewest`: Returns the newest element without removing it, or nil if empty.
+- `RingBuffer:len`: Returns the number of elements currently in the buffer.
+- `RingBuffer:capacity`: Returns the maximum number of elements the buffer can hold.
+- `RingBuffer:isEmpty`: Returns true if the buffer contains no elements.
+- `RingBuffer:isFull`: Returns true if the buffer has reached its capacity.
+- `RingBuffer:clear`: Removes all elements from the buffer, releasing their registry entries.
+- `RingBuffer:toTable`: Returns all elements as an array table ordered oldest-first.
+
+### `mlua` Methods
+- `mlua:getSize`: Get the size.
+- `mlua:getString`: Get the string representation.
+- `mlua:getByte`: Get a byte at the specified offset.
+- `mlua:setByte`: Set a byte at the specified offset.
+- `mlua:clone`: Clone the ByteData.
 
 ## References
 

@@ -21,6 +21,8 @@ Relationships between entities live in `relationships.rs`, which adds parent-chi
 
 The ECS module deliberately does not own physics, rendering, or scripting. Systems that process components are implemented as Lua callbacks or Rust code in other modules that query the universe.
 
+Additional query and filter methods have been added to `Universe`, expanding the expressiveness of component queries available to both Rust systems and Lua scripts via `lurek.ecs.*`. New filter predicates allow narrowing entity sets by tag intersection, component presence, and layer mask simultaneously, reducing the boilerplate required for common game-loop queries such as “all visible enemies with a health component”.
+
 **Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/entity_api.rs`.
 
 ## Files
@@ -55,6 +57,11 @@ The ECS module deliberately does not own physics, rendering, or scripting. Syste
 - `RelationshipManager::all_relations_for` (`relationships.rs`): Get all relationships involving a given entity.
 - `RelationshipManager::all_relations` (`relationships.rs`): Get all relationships as an iterator.
 - `RelationshipManager::relation_count` (`relationships.rs`): Get the total number of relationship records.
+- `RelationshipManager::add_link` (`relationships.rs`): Add a directed named link from `from` to `to`.
+- `RelationshipManager::get_links` (`relationships.rs`): Return all targets reachable from `from` via the named directed link.
+- `RelationshipManager::remove_link` (`relationships.rs`): Remove the directed link from `from` to `to`.
+- `RelationshipManager::clear_links` (`relationships.rs`): Remove all directed links of the given name originating from `from`.
+- `RelationshipManager::has_link` (`relationships.rs`): Return `true` if a directed link from `from` to `to` via `name` exists.
 - `Universe::new` (`universe.rs`): Creates a new empty Universe.
 - `Universe::get_system_store` (`universe.rs`): get_system_store.
 - `Universe::pack_id` (`universe.rs`): Packs a slot and generation counter into a single entity ID.
@@ -172,6 +179,11 @@ The ECS module deliberately does not own physics, rendering, or scripting. Syste
 - `Universe:onComponentRemoved`: Registers a callback to fire when a component is removed from any entity.
 - `Universe:flushObservers`: Dispatches all pending component-add and component-remove events to registered callbacks.
 - `Universe:spawnBulk`: Spawns `count` entities from a blueprint, returns an array of entity IDs.
+- `Universe:addRelation`: Adds a directed named relationship from entity `from` to entity `to`.
+- `Universe:getRelated`: Returns all entity IDs reachable from `from` via the named relationship.
+- `Universe:removeRelation`: Removes the directed named relationship from entity `from` to entity `to`.
+- `Universe:clearRelations`: Removes all directed named relationships of type `name` from entity `from`.
+- `Universe:hasRelation`: Returns true if a directed named relationship from `from` to `to` exists.
 
 ## References
 

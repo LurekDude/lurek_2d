@@ -21,6 +21,8 @@ Schema versioning: when a save slot is loaded, `SaveManager` compares its metada
 
 Auto-save: `tick(dt)` is called each frame; when the accumulated time since last save exceeds the configured interval (and the dirty flag is set), a save to the configured slot is triggered automatically.
 
+Minor serialisation additions have been made to the save pipeline, improving round-trip fidelity for edge-case data types that previously required manual workarounds in save collector callbacks. Lua scripts using the `lurek.save.*` API benefit transparently from these changes without needing to update existing collector implementations.
+
 **Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`, `serial`. Lua bridge in `src/lua_api/save_api.rs`.
 
 ## Files
@@ -96,11 +98,15 @@ Auto-save: `tick(dt)` is called each frame; when the accumulated time since last
 - `SaveManager:restore`: Restores data from a table, applying migrations and calling restorers.
 - `SaveManager:markDirty`: Marks data as modified since the last save or load.
 - `SaveManager:isDirty`: Returns whether data has been modified since the last save or load.
-- `SaveManager:disableAutoSave`: Disables auto-save.
+- `SaveManager:disableAutoSave`: Disables automatic periodic saving; manual `write()` calls still work.
 - `SaveManager:update`: Advances the auto-save timer, returning the slot name if a save should trigger.
 - `SaveManager:setSummary`: Sets the summary string included in save metadata.
 - `SaveManager:getSummary`: Returns the current summary string.
 - `SaveManager:reset`: Resets all state, removing callbacks and clearing the manager.
+- `SaveManager:setCompress`: Enables or disables LZ4 compression for saved data.
+- `SaveManager:isCompressed`: Returns whether compression is currently enabled.
+- `SaveManager:onBeforeSave`: Registers a callback that fires before every save operation.
+- `SaveManager:onAfterLoad`: Registers a callback that fires after every successful load operation.
 - `SaveManager:save`: Collects data and writes it to a slot file.
 - `SaveManager:load`: Loads data from a slot file, applies migrations, and restores.
 - `SaveManager:delete`: Deletes a save file for the given slot.

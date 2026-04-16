@@ -19,18 +19,25 @@ The `input` module is Lurek2D's hardware input abstraction layer. It owns the pe
 
 `GamepadState` wraps gilrs gamepad state: per-axis float values with dead-zone filtering applied, per-button flags following the same pressed/held/released model, and a device ID for multi-controller support. `GamepadMappings` provides stable string names for axes and buttons. `TouchState` tracks per-finger `TouchPoint` records (ID, position, phase) using the same pressed/held/released flag model.
 
+Three new source files extend the hardware input surface. `gamepad.rs` consolidates gamepad state management into a dedicated `GamepadState` type with dead-zone filtering and multi-controller device ID support, now exposed via `lurek.input.newGamepad()`. `gesture.rs` introduces `GestureDetector` for recognizing swipe, pinch, and tap gestures from touch events, exposed via `lurek.input.newGesture()`. `rumble.rs` introduces `RumbleEffect` for gamepad force-feedback with configurable intensity and duration, applied via `lurek.input.setRumble()`.
+
 **Scope boundary**: Platform Services tier. Depends on `event`, `runtime`, `math`. Lua bridge in `src/lua_api/input_api.rs`.
 
 ## Files
 
+- `combo.rs`: Combo and input-sequence detection for ordered key/button input chains.
 - `gamepad.rs`: Gamepad implementation for the `input` subsystem.
 - `keyboard.rs`: Keyboard implementation for the `input` subsystem.
 - `mod.rs`: Mod implementation for the `input` subsystem.
 - `mouse.rs`: Mouse implementation for the `input` subsystem.
+- `recorder.rs`: Input recording and playback for Lurek2D.
 - `touch.rs`: Touch input state tracking for Lurek2D.
 
 ## Types
 
+- `ComboStep` (`struct`, `combo.rs`): A single step in an input combo sequence.
+- `ComboProgress` (`enum`, `combo.rs`): Result returned after advancing a [`ComboDetector`].
+- `ComboDetector` (`struct`, `combo.rs`): A combo detector that tracks an ordered sequence of named inputs within time windows.
 - `GamepadState` (`struct`, `gamepad.rs`): Holds the current button and axis state for a single gamepad identified by its id.
 - `GamepadMappings` (`struct`, `gamepad.rs`): Stores SDL2 GameControllerDB-format mapping strings keyed by GUID.
 - `KeyboardState` (`struct`, `keyboard.rs`): Tracks which keyboard keys are currently down, just pressed, or just released.
@@ -38,11 +45,23 @@ The `input` module is Lurek2D's hardware input abstraction layer. It owns the pe
 - `MouseState` (`struct`, `mouse.rs`): Tracks mouse cursor position and per-button pressed/down/released state.
 - `CursorKind` (`enum`, `mouse.rs`): The cursor type — either a named system icon or user-supplied pixel data.
 - `CursorHandle` (`struct`, `mouse.rs`): A held cursor — either a system cursor icon or custom pixel-data cursor.
+- `InputEvent` (`struct`, `recorder.rs`): A single key or button event captured within one frame.
+- `RecordedFrame` (`struct`, `recorder.rs`): A snapshot of all input events that occurred during a single game frame.
+- `InputRecording` (`struct`, `recorder.rs`): A complete input recording consisting of one or more [`RecordedFrame`] snapshots.
+- `InputRecorder` (`struct`, `recorder.rs`): Records input events frame-by-frame and replays them on demand.
 - `TouchPoint` (`struct`, `touch.rs`): Snapshot of one active touch point with its screen-space position and pressure.
 - `TouchState` (`struct`, `touch.rs`): Tracks all active touch points by their winit-assigned finger ID.
 
 ## Functions
 
+- `ComboDetector::new` (`combo.rs`): Creates a new combo detector from a list of [`ComboStep`] values.
+- `ComboDetector::feed` (`combo.rs`): Feed a new input event (a key that was just pressed) and advance time.
+- `ComboDetector::tick` (`combo.rs`): Advance time without feeding an input event.
+- `ComboDetector::reset` (`combo.rs`): Reset the detector to its initial idle state.
+- `ComboDetector::is_in_progress` (`combo.rs`): Returns `true` if the combo is currently partway through a sequence.
+- `ComboDetector::progress` (`combo.rs`): Returns how many steps have been successfully matched so far (0 when idle).
+- `ComboDetector::len` (`combo.rs`): Returns the total number of steps in the combo sequence.
+- `ComboDetector::is_empty` (`combo.rs`): Returns `true` if the combo has no steps.
 - `GamepadState::new` (`gamepad.rs`): Creates a new, empty `GamepadState` for the gamepad with the given `id`.
 - `GamepadState::update_button` (`gamepad.rs`): Updates the pressed state for a specific button.
 - `GamepadState::update_axis` (`gamepad.rs`): Updates the value for a specific analog axis.
@@ -107,6 +126,19 @@ The `input` module is Lurek2D's hardware input abstraction layer. It owns the pe
 - `MouseState::get_cursor` (`mouse.rs`): Returns the current system cursor shape.
 - `MouseState::take_pending_position` (`mouse.rs`): Returns and clears the next backend cursor-position request.
 - `is_cursor_supported` (`mouse.rs`): Returns whether cursor customisation is supported on this platform.
+- `InputRecording::to_json` (`recorder.rs`): Serializes this recording to a JSON string.
+- `InputRecording::from_json` (`recorder.rs`): Deserializes an [`InputRecording`] from a JSON string.
+- `InputRecorder::new` (`recorder.rs`): Creates a new, idle [`InputRecorder`].
+- `InputRecorder::start_recording` (`recorder.rs`): Starts capturing input events.
+- `InputRecorder::record_frame` (`recorder.rs`): Appends one frame of input data to the current recording.
+- `InputRecorder::stop_recording` (`recorder.rs`): Stops recording and returns the completed [`InputRecording`].
+- `InputRecorder::is_recording` (`recorder.rs`): Returns `true` if recording is currently active.
+- `InputRecorder::load` (`recorder.rs`): Loads an [`InputRecording`] and prepares it for playback.
+- `InputRecorder::start_playback` (`recorder.rs`): Starts playback from the beginning of the loaded recording.
+- `InputRecorder::stop_playback` (`recorder.rs`): Stops playback immediately.
+- `InputRecorder::is_playing_back` (`recorder.rs`): Returns `true` if playback is currently active.
+- `InputRecorder::playback_frame_index` (`recorder.rs`): Returns the current playback frame index (0-based).
+- `InputRecorder::playback_frame` (`recorder.rs`): Returns the events recorded for the current playback frame and advances the internal frame counter by one.
 - `TouchState::new` (`touch.rs`): Creates a new empty touch state.
 - `TouchState::touch_start` (`touch.rs`): Inserts a new touch start or updates the position and pressure of an ongoing touch.
 - `TouchState::touch_move` (`touch.rs`): Updates the position of an existing touch point.
@@ -158,6 +190,7 @@ The `input` module is Lurek2D's hardware input abstraction layer. It owns the pe
 - `lurek.input.isDown`: Returns whether the given button on the gamepad is currently held.
 - `lurek.input.getAxis`: Returns the current value (-1 to 1) of a gamepad analog axis.
 - `lurek.input.isVibrationSupported`: Returns whether the gamepad supports haptic vibration.
+- `lurek.input.vibrate`: Requests haptic vibration on a gamepad.
 - `lurek.input.getGUID`: Returns the hardware GUID string of the gamepad.
 - `lurek.input.getHat`: Returns the direction string of a hat switch on the gamepad.
 - `lurek.input.setVibration`: Triggers haptic rumble (currently a no-op stub).
@@ -171,10 +204,42 @@ The `input` module is Lurek2D's hardware input abstraction layer. It owns the pe
 - `lurek.input.getPosition`: Returns the position (x, y) of the touch with the given ID.
 - `lurek.input.getPressure`: Returns the pressure (0-1) of the touch with the given ID.
 - `lurek.input.getTouchCount`: Returns the number of currently active touch points.
+- `lurek.input.bind`: Maps an action name to one or more key/button names.
+- `lurek.input.unbind`: Removes all key bindings for the given action name.
+- `lurek.input.clearBindings`: Removes all action bindings.
+- `lurek.input.getBindings`: Returns a table mapping each action name to its bound keys.
+- `lurek.input.isActionDown`: Returns true if any key bound to the action is currently held down.
+- `lurek.input.wasActionPressed`: Returns true if any key bound to the action was pressed this frame.
+- `lurek.input.wasActionReleased`: Returns true if any key bound to the action was released this frame.
+- `lurek.input.wasActionPressedWithin`: Was action pressed within.
+- `lurek.input.newCombo`: Creates a new combo detector from an ordered list of steps.
+- `lurek.input.startRecording`: Starts capturing input events frame-by-frame.  Clears any previous recording.
+- `lurek.input.stopRecording`: Stops recording and returns an `InputRecording` userdata, or nil if not recording.
+- `lurek.input.loadRecording`: Loads a JSON-encoded recording string for playback.
+- `lurek.input.startPlayback`: Starts playback from the beginning of the loaded recording.
+- `lurek.input.stopPlayback`: Stops playback immediately.
+- `lurek.input.isRecording`: Returns true if input recording is currently active.
+- `lurek.input.isPlayingBack`: Returns true if input playback is currently active.
+- `lurek.input.getPlaybackFrame`: Returns the current playback frame index (0-based).  Returns 0 when not playing.
+- `lurek.input.advancePlayback`: Advances playback by one frame and returns an array of key/button events for that
+
+### `Combo` Methods
+- `Combo:feed`: Feed a key-press event into the combo detector.
+- `Combo:tick`: Advance the internal clock by `dt` seconds and check for timeouts.
+- `Combo:reset`: Reset the detector to its initial idle state, cancelling any in-progress sequence.
+- `Combo:progress`: Returns the number of steps matched so far (0 when idle).
+- `Combo:totalSteps`: Returns the total number of steps in the combo sequence.
+- `Combo:isInProgress`: Returns true if the detector is currently mid-sequence.
+- `Combo:getStep`: Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
 
 ### `Cursor` Methods
 - `Cursor:release`: Releases the cursor resource (no-op on desktop).
 - `Cursor:getType`: Returns the cursor type as "system" or "custom".
+
+### `InputRecording` Methods
+- `InputRecording:toJson`: Serializes this recording to a JSON string for saving to disk.
+- `InputRecording:totalFrames`: Returns the total frame count when recording was stopped.
+- `InputRecording:frameCount`: Returns the number of sparse event frames stored in this recording.
 
 ## References
 

@@ -21,6 +21,8 @@ Simulation is step-driven: `Graph::step(dt)` applies item decay (all items lose 
 
 Graph algorithms from the `algorithms` submodule cover: connected component analysis, cycle detection, topological sort. `pathfinding` submodule provides Dijkstra shortest-path. The `render` submodule outputs `RenderCommand` entries for debug visualization of node/edge state.
 
+The graph traversal surface has been enriched with explicit BFS and DFS iteration methods on `Graph`, allowing scripts to walk the node topology in breadth-first or depth-first order without extracting an adjacency list first. Lua callers can now drive custom graph traversals directly through `lurek.graph.*` methods, simplifying dialogue tree walks, dependency resolution, and flow-network analysis.
+
 **Scope boundary**: Foundations tier. No engine module imports. Lua bridge in `src/lua_api/graph_api.rs`.
 
 ## Files
@@ -63,6 +65,8 @@ Graph algorithms from the `algorithms` submodule cover: connected component anal
 - `Graph::has_cycle` (`algorithms.rs`): Detect whether the directed graph contains a cycle (DFS-based).
 - `Graph::topological_sort` (`algorithms.rs`): Topological sort using Kahn's algorithm.
 - `Graph::mst_kruskal` (`algorithms.rs`): Kruskal's Minimum Spanning Tree.
+- `Graph::color_graph` (`algorithms.rs`): Greedy graph colouring (node-colouring, not edge-colouring).
+- `Graph::is_bipartite` (`algorithms.rs`): Bipartite check via 2-colouring BFS.
 - `Graph::astar_graph` (`algorithms.rs`): A* search from `from` to `to` using optional spatial positions for the heuristic.
 - `Graph::new` (`core.rs`): Create an empty graph.
 - `Graph::add_node` (`core.rs`): Add a node with the given type and capacity.
@@ -170,6 +174,7 @@ Graph algorithms from the `algorithms` submodule cover: connected component anal
 - `Graph::generate_render_commands` (`render.rs`): Generate debug render commands for the graph using a circular node layout.
 - `Graph::update` (`simulation.rs`): Advance the simulation by `dt` seconds.
 - `Graph::step` (`simulation.rs`): One discrete simulation step (equivalent to `update(1.0)`).
+- `Graph::update_parallel` (`simulation.rs`): Advance the simulation by `dt` seconds with a parallelised decay phase.
 - `Graph::process_demand` (`supply_demand.rs`): Processes all demand/supply declarations, routing items from supply nodes to demand nodes.
 - `Graph::find_path` (`traversal.rs`): Find the shortest path from `from` to `to` using Dijkstra's algorithm.
 - `Graph::find_path_for_item` (`traversal.rs`): Find a path that only uses edges the given item can traverse.
@@ -230,11 +235,14 @@ Graph algorithms from the `algorithms` submodule cover: connected component anal
 - `Graph:getItemCount`: Returns the number of items in the graph.
 - `Graph:update`: Advances simulation by dt seconds and fires event callbacks.
 - `Graph:step`: Runs one discrete simulation step and fires event callbacks.
+- `Graph:tickParallel`: Advances simulation by dt seconds using a parallelised decay phase.
 - `Graph:getNeighbors`: Returns a table of direct neighbor Node handles.
 - `Graph:getComponents`: Returns weakly connected components as a table of tables of Node handles.
 - `Graph:hasCycle`: Returns true if the graph contains a directed cycle.
 - `Graph:topologicalSort`: Returns a topologically sorted table of Node handles, or nil if a cycle exists.
 - `Graph:mst`: Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
+- `Graph:colorGraph`: Assigns each node the smallest non-negative integer colour not shared with any
+- `Graph:isBipartite`: Returns `true` when the graph can be 2-coloured (bipartite check via BFS).
 - `Graph:astar`: Finds the shortest path between two nodes using A*.
 - `Graph:processDemand`: Processes all supply/demand declarations and fires event callbacks.
 - `Graph:getStats`: Returns a statistics snapshot table.
@@ -248,9 +256,9 @@ Graph algorithms from the `algorithms` submodule cover: connected component anal
 - `GraphItem:setDecayTime`: Sets the decay time in seconds (-1 = immortal).
 - `GraphItem:getRemainingLife`: Returns the remaining life in seconds.
 - `GraphItem:isAlive`: Returns true if the item is alive.
-- `GraphItem:kill`: Marks the item as dead.
+- `GraphItem:kill`: Marks this graph item as dead so it is removed on the next cleanup pass.
 - `GraphItem:getPriority`: Returns the item priority.
-- `GraphItem:setPriority`: Sets the item priority.
+- `GraphItem:setPriority`: Sets the scheduling priority; higher values are processed before lower ones.
 - `GraphItem:getPosition`: Returns the item position: node userdata if at a node, (edge, progress)
 - `GraphItem:type`: Returns the type name of this object.
 - `GraphItem:typeOf`: Returns true if this object is of the given type.
@@ -287,7 +295,7 @@ Graph algorithms from the `algorithms` submodule cover: connected component anal
 - `Node:getEdges`: Returns a table of Edge handles connected to this node.
 - `Node:clearConversion`: Removes the conversion rule for the given input type.
 - `Node:clearAllConversions`: Removes all conversion rules from this node.
-- `Node:addTag`: Adds a tag to this node.
+- `Node:addTag`: Attaches a string tag to this node for fast group queries.
 - `Node:removeTag`: Removes a tag from this node.
 - `Node:hasTag`: Returns true if this node has the given tag.
 - `Node:clearTags`: Removes all tags from this node.

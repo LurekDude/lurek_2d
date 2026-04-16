@@ -21,6 +21,8 @@ The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. 
 
 `NineSlice` renders scalable nine-patch textures — partitioning a source texture into a 3×3 grid of corner, edge, and center regions — for resizable UI panels and dialog boxes without visible stretch artifacts.
 
+Minor additions to sprite and sprite-batch types have refined the Lua API surface for common workflows, including updated tint and blend mode accessors and improved batch-state introspection through `lurek.sprite.*`.
+
 **Scope boundary**: Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/sprite_api.rs`.
 
 ## Files
@@ -47,6 +49,7 @@ The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. 
 
 ## Functions
 
+- `AtlasEntry::get_flipped` (`atlas.rs`): Returns a copy of this entry with the requested flip flags applied.
 - `SpriteAtlas::new` (`atlas.rs`): Creates an empty atlas.
 - `SpriteAtlas::add_entry` (`atlas.rs`): Adds a region to the atlas.
 - `SpriteAtlas::get_entry` (`atlas.rs`): Returns the region with the given name, or `None`.
@@ -54,6 +57,7 @@ The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. 
 - `SpriteAtlas::entry_count` (`atlas.rs`): Returns the number of regions in the atlas.
 - `SpriteAtlas::entry_names` (`atlas.rs`): Returns all region names in insertion order.
 - `parse_texturepacker_json` (`atlas.rs`): Parses a TexturePacker JSON export string and returns a [`SpriteAtlas`].
+- `parse_aseprite_json` (`atlas.rs`): Parses an Aseprite JSON export and returns a [`SpriteAtlas`].
 - `NineSlice::new` (`nine_slice.rs`): Creates a new nine-slice definition.
 - `NineSlice::patches` (`nine_slice.rs`): Returns the 9 source and destination rectangles for rendering.
 - `Sprite::new` (`sprite.rs`): Creates a new `Sprite` at `position` using the texture identified by `texture_id`.
@@ -96,6 +100,7 @@ The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types. 
 - `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols × 4 rows) with "down", "left", "right", "up" groups.
 - `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
 - `lurek.sprite.newAtlasSheet`: Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
+- `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON export string and returns a `SpriteAtlas`.
 
 ### `SpriteAtlas` Methods
 - `SpriteAtlas:getEntry`: Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.

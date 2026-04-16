@@ -17,10 +17,13 @@ Pattern inventory: `EventBus` — named-event publish-subscribe with priority or
 
 Each pattern is a self-contained Rust struct with no heap allocations in steady-state hot paths. The module is a Feature Systems tier module and may import from Tier 1 and Foundations but must not import from `lua_api`.
 
+Updated pattern type methods expand the scripting surface for several patterns. `StateMachine`, `EventBus`, `Blackboard`, and `PriorityQueue` have all received additional accessor and mutation methods through the Lua bridge, covering use-cases such as state introspection, conditional subscriber management, typed blackboard iteration, and priority re-ordering that previously required workarounds in game scripts.
+
 **Scope boundary**: Feature Systems tier. Depends on `runtime`. Lua bridge in `src/lua_api/patterns_api.rs`.
 
 ## Files
 
+- `bimap.rs`: BiMap: bidirectional HashMap with bijection enforcement on `insert`.
 - `blackboard.rs`: Implements a shared typed key-value board with revision tracking for cross-system facts.
 - `collections.rs`: Fundamental ordered-collection and set ADTs for Lua scripting.
 - `command_stack.rs`: Tracks undo and redo history metadata, including cursor position and batching state.
@@ -39,10 +42,10 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `strategy.rs`: Strategy pattern — named, swappable behaviours.
 - `throttle.rs`: Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting.
 - `trie.rs`: Trie: string-key prefix index with DFS `prefix_search` and recursive `remove`.
-- `bimap.rs`: BiMap: bidirectional HashMap with bijection enforcement on `insert`.
 
 ## Types
 
+- `BiMap` (`struct`, `bimap.rs`): Bidirectional key–value map where look-ups can be made from either side.
 - `BlackboardValue` (`enum`, `blackboard.rs`): Tagged value enum stored inside a `Blackboard`. It keeps the shared state surface small and predictable.
 - `Blackboard` (`struct`, `blackboard.rs`): Shared fact store for lightweight cross-system coordination. It is useful when multiple systems need to read and write the same named state without a direct dependency.
 - `StackMeta` (`struct`, `collections.rs`): Capacity metadata for a last-in-first-out stack.
@@ -70,10 +73,20 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `Throttle` (`struct`, `throttle.rs`): Leading-edge rate limiter that decides when a callback is allowed to fire.
 - `Debounce` (`struct`, `throttle.rs`): Trailing-edge idle timer that delays firing until input settles.
 - `Trie` (`struct`, `trie.rs`): Prefix-index trie keyed on `String`; supports `insert`, `search` (exact), `starts_with` (prefix Boolean), `prefix_search` (collect all matching keys), `remove` (prunes dead nodes). Foundations tier — no Lua binding.
-- `BiMap<K, V>` (`struct`, `bimap.rs`): Bidirectional `HashMap`; `insert` removes stale forward/reverse entries to maintain the one-to-one mapping invariant. Foundations tier — no Lua binding.
 
 ## Functions
 
+- `BiMap::new` (`bimap.rs`): Creates a new empty bidirectional map.
+- `BiMap::insert` (`bimap.rs`): Inserts a key–value pair.
+- `BiMap::get_by_key` (`bimap.rs`): Returns the value mapped to `key`, if any.
+- `BiMap::get_by_value` (`bimap.rs`): Returns the key mapped to `value`, if any.
+- `BiMap::contains_key` (`bimap.rs`): Returns `true` if `key` is present in the forward map.
+- `BiMap::contains_value` (`bimap.rs`): Returns `true` if `value` is present in the reverse map.
+- `BiMap::remove_by_key` (`bimap.rs`): Removes the entry associated with `key` (and its reverse entry).
+- `BiMap::remove_by_value` (`bimap.rs`): Removes the entry associated with `value` (and its forward entry).
+- `BiMap::len` (`bimap.rs`): Returns the number of key–value pairs.
+- `BiMap::is_empty` (`bimap.rs`): Returns `true` if the map contains no entries.
+- `BiMap::clear` (`bimap.rs`): Removes all entries.
 - `Blackboard::new` (`blackboard.rs`): Creates an empty blackboard with the given name.
 - `Blackboard::set_bool` (`blackboard.rs`): Sets a boolean fact.
 - `Blackboard::set_number` (`blackboard.rs`): Sets a numeric fact.
@@ -216,25 +229,14 @@ Each pattern is a self-contained Rust struct with no heap allocations in steady-
 - `Debounce::trigger` (`throttle.rs`): Records an input event, resetting the idle timer.
 - `Debounce::update` (`throttle.rs`): Advances time by `dt` seconds.
 - `Debounce::cancel` (`throttle.rs`): Cancels any pending trigger without firing.
-- `Trie::new` (`trie.rs`): Creates an empty trie.
-- `Trie::insert` (`trie.rs`): Inserts a string key into the trie.
-- `Trie::search` (`trie.rs`): Returns `true` if the exact key exists.
-- `Trie::starts_with` (`trie.rs`): Returns `true` if any stored key begins with the given prefix.
-- `Trie::prefix_search` (`trie.rs`): Returns all stored keys that begin with the given prefix.
-- `Trie::remove` (`trie.rs`): Removes the key and prunes any nodes that became dead (leaf, non-terminal).
+- `Trie::new` (`trie.rs`): Creates a new empty trie.
+- `Trie::insert` (`trie.rs`): Inserts a key into the trie.
+- `Trie::search` (`trie.rs`): Returns `true` if `key` was previously inserted (exact match).
+- `Trie::starts_with` (`trie.rs`): Returns `true` if any stored key starts with `prefix`.
+- `Trie::prefix_search` (`trie.rs`): Returns all stored keys that start with `prefix`.
+- `Trie::remove` (`trie.rs`): Removes a key from the trie.
 - `Trie::len` (`trie.rs`): Returns the number of keys stored in the trie.
-- `Trie::is_empty` (`trie.rs`): Returns `true` when no keys are stored.
-- `BiMap::new` (`bimap.rs`): Creates an empty bidirectional map.
-- `BiMap::insert` (`bimap.rs`): Inserts a key-value pair, removing any stale entries that would break the bijection invariant.
-- `BiMap::get_by_key` (`bimap.rs`): Looks up the value associated with a key.
-- `BiMap::get_by_value` (`bimap.rs`): Looks up the key associated with a value.
-- `BiMap::contains_key` (`bimap.rs`): Returns `true` if the key is present.
-- `BiMap::contains_value` (`bimap.rs`): Returns `true` if the value is present.
-- `BiMap::remove_by_key` (`bimap.rs`): Removes the pair identified by key, and its reverse entry.
-- `BiMap::remove_by_value` (`bimap.rs`): Removes the pair identified by value, and its forward entry.
-- `BiMap::len` (`bimap.rs`): Returns the number of pairs in the map.
-- `BiMap::is_empty` (`bimap.rs`): Returns `true` when the map contains no pairs.
-- `BiMap::clear` (`bimap.rs`): Removes all pairs from the map.
+- `Trie::is_empty` (`trie.rs`): Returns `true` if the trie contains no keys.
 
 ## Lua API Reference
 

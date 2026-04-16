@@ -125,11 +125,11 @@ Neither the catalog nor the schema validator has rendering, audio, or physics de
 - `ApiCatalog:toJSON`: Serialises the catalog to a pretty-printed JSON string.
 
 ### `DocEntry` Methods
-- `DocEntry:getName`: Returns the name.
+- `DocEntry:getName`: Returns the symbol name for this documentation entry.
 - `DocEntry:getQualifiedName`: Returns the qualified name.
-- `DocEntry:getModule`: Returns the module.
-- `DocEntry:getKind`: Returns the kind.
-- `DocEntry:getDescription`: Returns the description.
+- `DocEntry:getModule`: Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
+- `DocEntry:getKind`: Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
+- `DocEntry:getDescription`: Returns the human-readable description text for this documentation entry.
 - `DocEntry:getParameters`: Returns the parameters as a table of `{name, type, description, optional, default?}` records.
 - `DocEntry:getReturns`: Returns the return values as a table of `{type, description}` records.
 - `DocEntry:getExample`: Returns the example snippet, or nil.
@@ -156,7 +156,7 @@ Neither the catalog nor the schema validator has rendering, audio, or physics de
 - `Schema:validate`: Validates a Lua table against the schema.
 - `Schema:check`: Returns true when the data passes all schema rules.
 - `Schema:assert`: Validates data and throws a Lua error on failure with all error messages joined.
-- `Schema:getName`: Returns the schema name.
+- `Schema:getName`: Returns the name identifier of this API schema group.
 - `Schema:getFields`: Returns a table of declared field names.
 
 ### `ValidationReport` Methods

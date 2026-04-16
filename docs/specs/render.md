@@ -17,6 +17,8 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 
 `GpuRenderer` manages the wgpu `Device`, `Queue`, `Surface`, swapchain configuration, and all resource pools (`SlotMap<TextureKey, Texture>`, `SlotMap<FontKey, Font>`, `SlotMap<ShaderKey, Shader>`, `SlotMap<CanvasKey, Canvas>`, etc.). `Canvas` implements off-screen render-to-texture for post-processing and minimap rendering. `Font` rasterizes glyphs via the fontdue library into a GPU texture atlas with LRU glyph eviction. `Shader` wraps user-supplied WGSL with a uniform variable table updated each frame. `PostFxPipeline` orchestrates ping-pong texture passes for multi-pass post-processing.
 
+Additional `RenderCommand` variants have been added to the central enum, expanding the draw call surface for specialized rendering workloads. Blend mode options have been extended with new compositing modes accessible from Lua scripts via `lurek.graphic.*`, giving game developers finer control over how translucent sprites, UI layers, and post-processing effects composite together.
+
 **Scope boundary**: Platform Services tier. Depends on `math`, `runtime`, `image`, `wgpu`. Lua bridge in `src/lua_api/render_api.rs` (registered as `lurek.graphics.*`).
 
 ## Files
@@ -58,6 +60,7 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `DrawMode` (`enum`, `renderer.rs`): Fill-versus-line enum used by vector primitives.
 - `BlendMode` (`enum`, `renderer.rs`): Public blend-policy enum used by queued draw operations.
 - `PostFxPass` (`struct`, `renderer.rs`): A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.
+- `TextSpan` (`struct`, `renderer.rs`): RenderCommand.
 - `RenderCommand` (`enum`, `renderer.rs`): Central deferred draw-operation enum consumed by the backend.
 - `TextureData` (`struct`, `renderer.rs`): CPU-side pixel container handed off for GPU texture upload.
 - `ParticleRenderShape` (`enum`, `renderer.rs`): Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.
@@ -127,6 +130,7 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `PostFxPipeline::apply` (`postfx_pipeline.rs`): Execute a sequence of post-FX passes then composite the result onto `target_view`.
 - `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
 - `apply` (`postfx_pipeline.rs`): The function allocates (or reuses) two ping-pong textures, dispatches each pass, then does a final copy pass to `target_view`.
+- `TextSpan::new` (`renderer.rs`): Creates a new span with the given text, RGBA colour, and scale.
 - `Shader::new` (`shader.rs`): Creates a new shader from WGSL source code.
 - `Shader::send` (`shader.rs`): Sets a uniform value by name.
 - `Shader::has_uniform` (`shader.rs`): Returns whether a uniform with the given name has been set.
@@ -149,18 +153,19 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `lurek.render.getColor`: Returns the current drawing color.
 - `lurek.render.setBackgroundColor`: Sets the background clear color.
 - `lurek.render.getBackgroundColor`: Returns the current background color.
-- `lurek.render.rectangle`: Draws a rectangle.
-- `lurek.render.circle`: Draws a circle.
-- `lurek.render.ellipse`: Draws an ellipse.
-- `lurek.render.triangle`: Draws a triangle.
+- `lurek.render.rectangle`: Draws a filled or outlined axis-aligned rectangle at the given position.
+- `lurek.render.circle`: Draws a filled or outlined circle at the given world-space position.
+- `lurek.render.ellipse`: Draws a filled or outlined ellipse with independent x/y radii.
+- `lurek.render.triangle`: Draws a filled or outlined triangle connecting three world-space vertices.
 - `lurek.render.line`: Draws a line between two points.
 - `lurek.render.polygon`: Draws a polygon from a list of vertices.
 - `lurek.render.arc`: Draws a partial circle arc at the given position with specified radius and angle range.
-- `lurek.render.points`: Draws a list of points.
+- `lurek.render.points`: Draws a batch of individual points at the specified world-space coordinates.
 - `lurek.render.draw`: Draws a drawable (Image, Canvas, SpriteBatch, Mesh) at the given position.
 - `lurek.render.drawq`: Draws a portion of an image defined by a Quad.
 - `lurek.render.print`: Draws text at the given position.
 - `lurek.render.printf`: Draws word-wrapped text within a given width.
+- `lurek.render.printRich`: Draws a sequence of individually-styled text spans at `(x, y)`.
 - `lurek.render.clear`: Clears the draw command queue (resets the screen).
 - `lurek.render.setLineWidth`: Sets the line width for outline drawing.
 - `lurek.render.getLineWidth`: Returns the current line width.
@@ -252,6 +257,13 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `lurek.render.drawBevelRect`: Queues a beveled border rectangle.
 - `lurek.render.pushLayer`: Begins a named compositing layer. Provides alpha and blend mode for composite.
 - `lurek.render.popLayer`: Ends and composites the named layer.
+- `lurek.render.newLayer`: Registers a named render layer with an optional z-order (default 0).
+- `lurek.render.setLayer`: Sets the active named layer. Draw calls made after this will be
+- `lurek.render.currentLayer`: Returns the name of the currently active named layer.
+- `lurek.render.setLayerVisible`: Shows or hides the named layer. Hidden layers are excluded from
+- `lurek.render.isLayerVisible`: Returns `true` if the named layer is visible (default: `true`).
+- `lurek.render.getLayerZOrder`: Returns the z-order of the named layer, or `0` if unregistered.
+- `lurek.render.setLayerZOrder`: Updates the z-order of the named layer. Auto-creates the layer if
 
 ### `Canvas` Methods
 - `Canvas:getWidth`: Returns the width of this canvas in pixels.
@@ -266,7 +278,7 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `DrawLayer:flush`: Sorts and calls all queued callbacks, then empties the queue.
 - `DrawLayer:clear`: Removes all queued callbacks without calling them.
 - `DrawLayer:getCount`: Returns the number of queued callbacks.
-- `DrawLayer:type`: Returns the type name.
+- `DrawLayer:type`: Returns the string type identifier of this draw layer (e.g. `'sprite'`).
 - `DrawLayer:typeOf`: Returns true if this object is an instance of the given type name.
 
 ### `Font` Methods
@@ -303,7 +315,7 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 - `Mesh:getVertex`: Returns vertex data at the given 1-based index.
 - `Mesh:setVertex`: Sets vertex data at the given 1-based index.
 - `Mesh:setTexture`: Assigns a texture to this mesh.
-- `Mesh:release`: Releases this mesh.
+- `Mesh:release`: Releases the GPU mesh resource, freeing VRAM immediately.
 - `Mesh:typeOf`: Returns the type name of this object.
 - `Mesh:type`: Returns the type name of this object.
 
@@ -322,7 +334,7 @@ The `render` module is Lurek2D's GPU rendering layer, backed by wgpu 22. Its fun
 ### `Shader` Methods
 - `Shader:send`: Sends a uniform value to this shader.
 - `Shader:hasUniform`: Returns whether this shader has a uniform with the given name.
-- `Shader:release`: Releases this shader.
+- `Shader:release`: Releases the compiled GPU shader, freeing VRAM and shader slots.
 - `Shader:typeOf`: Returns the type name of this object.
 - `Shader:type`: Returns the type name of this object.
 
