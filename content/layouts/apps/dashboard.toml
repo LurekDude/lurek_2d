@@ -1,0 +1,372 @@
+# dashboard.toml — Analytics / admin dashboard
+# Viewport: 1200 × 720
+# Contains: header bar, 4 KPI stat cards, 2 chart placeholder panels,
+#           recent-activity table area, quick-action buttons
+
+[root]
+widget_type = "panel"
+id          = "dashboard_root"
+x = 0.0
+y = 0.0
+w = 1200.0
+h = 720.0
+
+# ── Header bar ────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1200.0
+h = 56.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "dash_title"
+text = "Analytics Overview"
+x = 24.0
+y = 16.0
+w = 304.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "date_label"
+text = "Mon 6 May 2025"
+x = 464.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "date_range"
+x = 824.0
+y = 16.0
+w = 160.0
+h = 32.0
+text = "Last 30 days|Last 7 days|Last 90 days|Custom"
+tooltip = "Select date range"
+
+[[root.children.children]]
+widget_type = "button"
+id = "export_btn"
+text = "Export"
+x = 992.0
+y = 16.0
+w = 88.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "refresh_btn"
+text = "⟳"
+x = 1088.0
+y = 16.0
+w = 40.0
+h = 32.0
+tooltip = "Refresh data"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "user_avatar"
+x = 1144.0
+y = 16.0
+w = 40.0
+h = 32.0
+tooltip = "User menu"
+
+# ── KPI card row ──────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "kpi_total_users"
+x = 24.0
+y = 72.0
+w = 272.0
+h = 112.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Total Users"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_users_val"
+text = "24,831"
+x = 16.0
+y = 40.0
+w = 200.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_users_trend"
+text = "▲ 12.4% vs last period"
+x = 16.0
+y = 80.0
+w = 232.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "kpi_active_sessions"
+x = 312.0
+y = 72.0
+w = 272.0
+h = 112.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Active Sessions"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_sessions_val"
+text = "1,492"
+x = 16.0
+y = 40.0
+w = 200.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_sessions_trend"
+text = "▼ 3.1% vs last period"
+x = 16.0
+y = 80.0
+w = 232.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "kpi_revenue"
+x = 600.0
+y = 72.0
+w = 272.0
+h = 112.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Revenue"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_revenue_val"
+text = "$89,204"
+x = 16.0
+y = 40.0
+w = 200.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_revenue_trend"
+text = "▲ 7.8% vs last period"
+x = 16.0
+y = 80.0
+w = 232.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "kpi_churn"
+x = 888.0
+y = 72.0
+w = 288.0
+h = 112.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Churn Rate"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_churn_val"
+text = "2.3 %"
+x = 16.0
+y = 40.0
+w = 200.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "kpi_churn_trend"
+text = "▼ 0.4 pp — good"
+x = 16.0
+y = 80.0
+w = 232.0
+h = 24.0
+
+# ── Chart panels ─────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "chart_line"
+x = 24.0
+y = 200.0
+w = 704.0
+h = 280.0
+tooltip = "Line chart — Daily active users"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Daily Active Users"
+x = 16.0
+y = 16.0
+w = 344.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "chart_metric"
+x = 480.0
+y = 8.0
+w = 200.0
+h = 32.0
+text = "Daily Active Users|Page Views|New Signups"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "chart_line_canvas"
+x = 16.0
+y = 48.0
+w = 672.0
+h = 224.0
+tooltip = "Chart area"
+
+[[root.children]]
+widget_type = "panel"
+id = "chart_donut"
+x = 744.0
+y = 200.0
+w = 440.0
+h = 280.0
+tooltip = "Donut chart — Traffic sources"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Traffic Sources"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "chart_donut_canvas"
+x = 16.0
+y = 48.0
+w = 200.0
+h = 224.0
+tooltip = "Donut chart area"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Organic Search"
+x = 224.0
+y = 64.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "src_organic"
+x = 224.0
+y = 88.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Direct"
+x = 224.0
+y = 104.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "src_direct"
+x = 224.0
+y = 128.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 28.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Social Media"
+x = 224.0
+y = 152.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "src_social"
+x = 224.0
+y = 176.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 24.0
+
+# ── Recent activity table area ────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "activity_panel"
+x = 24.0
+y = 496.0
+w = 1160.0
+h = 208.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Recent Activity"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "view_all_btn"
+text = "View All"
+x = 1064.0
+y = 8.0
+w = 80.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "activity_scroll"
+x = 0.0
+y = 48.0
+w = 1160.0
+h = 160.0
+tooltip = "Activity log list"

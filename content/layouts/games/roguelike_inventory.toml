@@ -1,0 +1,433 @@
+
+[root]
+widget_type = "panel"
+id = "inventory_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "gold_label"
+x = 240.0
+y = 16.0
+w = 184.0
+h = 24.0
+tooltip = "Carried gold"
+
+[[root.children.children]]
+widget_type = "label"
+id = "weight_label"
+x = 440.0
+y = 16.0
+w = 304.0
+h = 24.0
+tooltip = "Current / max carry weight"
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "weight_bar"
+x = 760.0
+y = 16.0
+w = 304.0
+h = 16.0
+min = 0.0
+max = 50.0
+value = 28.0
+tooltip = "Encumbrance"
+
+[[root.children.children]]
+widget_type = "button"
+id = "close_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+[[root.children]]
+widget_type = "panel"
+id = "tabs_row"
+x = 0.0
+y = 48.0
+w = 720.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "tab_all"
+x = 0.0
+y = 0.0
+w = 184.0
+h = 40.0
+tooltip = "All items"
+
+[[root.children.children]]
+widget_type = "button"
+id = "tab_weapons"
+x = 184.0
+y = 0.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "tab_armor"
+x = 368.0
+y = 0.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "tab_consumables"
+x = 552.0
+y = 0.0
+w = 184.0
+h = 40.0
+
+[[root.children]]
+widget_type = "panel"
+id = "filter_row"
+x = 0.0
+y = 88.0
+w = 720.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "sort_combobox"
+x = 8.0
+y = 8.0
+w = 224.0
+h = 32.0
+text = "Name|Weight|Value|Equipped|Type"
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "item_search"
+x = 232.0
+y = 8.0
+w = 344.0
+h = 32.0
+placeholder = "Search items…"
+
+[[root.children.children]]
+widget_type = "checkbox"
+id = "show_identified"
+x = 584.0
+y = 8.0
+w = 128.0
+h = 24.0
+text = "Identified only"
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "item_grid"
+x = 0.0
+y = 128.0
+w = 720.0
+h = 600.0
+tooltip = "Inventory grid — click to select"
+
+[[root.children]]
+widget_type = "panel"
+id = "item_detail_panel"
+x = 720.0
+y = 48.0
+w = 304.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_name"
+x = 8.0
+y = 8.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "item_image"
+x = 8.0
+y = 40.0
+w = 288.0
+h = 144.0
+tooltip = "Item sprite"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "item_type_badge"
+x = 8.0
+y = 192.0
+w = 104.0
+h = 32.0
+tooltip = "Item category"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "curse_badge"
+x = 120.0
+y = 192.0
+w = 80.0
+h = 32.0
+tooltip = "Cursed / blessed / normal"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "id_badge"
+x = 208.0
+y = 192.0
+w = 80.0
+h = 32.0
+tooltip = "Identified / unidentified"
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_weight"
+x = 8.0
+y = 224.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_value"
+x = 8.0
+y = 248.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_modifiers_title"
+x = 8.0
+y = 280.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "stat_modifiers"
+x = 8.0
+y = 304.0
+w = 296.0
+h = 120.0
+tooltip = "Stat modifiers"
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_lore"
+x = 8.0
+y = 432.0
+w = 288.0
+h = 80.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "equip_btn"
+x = 8.0
+y = 528.0
+w = 136.0
+h = 40.0
+tooltip = "Equip / wield"
+
+[[root.children.children]]
+widget_type = "button"
+id = "use_btn"
+x = 152.0
+y = 528.0
+w = 136.0
+h = 40.0
+tooltip = "Use / consume"
+
+[[root.children.children]]
+widget_type = "button"
+id = "identify_btn"
+x = 8.0
+y = 568.0
+w = 136.0
+h = 40.0
+tooltip = "Identify item"
+
+[[root.children.children]]
+widget_type = "button"
+id = "throw_btn"
+x = 152.0
+y = 568.0
+w = 136.0
+h = 40.0
+tooltip = "Throw at enemy"
+
+[[root.children.children]]
+widget_type = "button"
+id = "drop_btn"
+x = 8.0
+y = 608.0
+w = 136.0
+h = 40.0
+tooltip = "Drop to floor"
+
+[[root.children.children]]
+widget_type = "button"
+id = "stash_btn"
+x = 152.0
+y = 608.0
+w = 136.0
+h = 40.0
+tooltip = "Move to stash chest"
+
+[[root.children]]
+widget_type = "panel"
+id = "equipped_panel"
+x = 1024.0
+y = 48.0
+w = 264.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "equipped_title"
+x = 8.0
+y = 8.0
+w = 248.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_weapon"
+x = 8.0
+y = 40.0
+w = 248.0
+h = 48.0
+tooltip = "Weapon slot"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_offhand"
+x = 8.0
+y = 88.0
+w = 248.0
+h = 48.0
+tooltip = "Off-hand slot"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_head"
+x = 8.0
+y = 144.0
+w = 120.0
+h = 48.0
+tooltip = "Head"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_neck"
+x = 136.0
+y = 144.0
+w = 120.0
+h = 48.0
+tooltip = "Neck"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_body"
+x = 8.0
+y = 200.0
+w = 248.0
+h = 48.0
+tooltip = "Body armour"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_cloak"
+x = 8.0
+y = 256.0
+w = 120.0
+h = 48.0
+tooltip = "Back / cloak"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_gloves"
+x = 136.0
+y = 256.0
+w = 120.0
+h = 48.0
+tooltip = "Gloves"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_boots"
+x = 8.0
+y = 304.0
+w = 120.0
+h = 48.0
+tooltip = "Boots"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_ring_l"
+x = 136.0
+y = 304.0
+w = 56.0
+h = 48.0
+tooltip = "Left ring"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "eq_ring_r"
+x = 200.0
+y = 304.0
+w = 56.0
+h = 48.0
+tooltip = "Right ring"
+
+[[root.children.children]]
+widget_type = "label"
+id = "total_stats_title"
+x = 8.0
+y = 368.0
+w = 248.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "total_stats"
+x = 8.0
+y = 392.0
+w = 256.0
+h = 200.0
+tooltip = "Aggregate equipment stat bonuses"
+
+[[root.children.children]]
+widget_type = "label"
+id = "armor_class_label"
+x = 8.0
+y = 600.0
+w = 248.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "carrying_cap_label"
+x = 8.0
+y = 624.0
+w = 248.0
+h = 24.0

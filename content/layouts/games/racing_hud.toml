@@ -1,0 +1,157 @@
+
+[root]
+widget_type = "panel"
+id = "racing_hud_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "label"
+id = "speed_label"
+text = "Speed"
+x = 24.0
+y = 616.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+id = "speed_value"
+text = "187"
+x = 24.0
+y = 640.0
+w = 80.0
+h = 40.0
+tooltip = "km/h"
+
+[[root.children]]
+widget_type = "label"
+id = "speed_unit"
+text = "km/h"
+x = 104.0
+y = 664.0
+w = 48.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "gear_label"
+text = "Gear"
+x = 168.0
+y = 616.0
+w = 48.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+id = "gear_value"
+text = "4"
+x = 168.0
+y = 640.0
+w = 48.0
+h = 40.0
+
+[[root.children]]
+widget_type = "label"
+text = "RPM"
+x = 24.0
+y = 688.0
+w = 40.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "rpm_bar"
+x = 64.0
+y = 688.0
+w = 200.0
+h = 16.0
+min = 0.0
+max = 8000.0
+value = 5400.0
+tooltip = "Engine RPM"
+
+[[root.children]]
+widget_type = "label"
+id = "lap_counter"
+text = "LAP  2 / 3"
+x = 504.0
+y = 24.0
+w = 280.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "lap_time"
+text = "Lap:  1:23.456"
+x = 504.0
+y = 56.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "best_lap"
+text = "Best: 1:20.112"
+x = 504.0
+y = 88.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "total_time"
+text = "Total: 2:47.008"
+x = 504.0
+y = 120.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "race_position"
+x = 1160.0
+y = 24.0
+w = 80.0
+h = 64.0
+tooltip = "Current race position"
+
+[[root.children]]
+widget_type = "label"
+id = "position_label"
+text = "P3 / 8"
+x = 1144.0
+y = 88.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "minimap_frame"
+x = 1080.0
+y = 512.0
+w = 184.0
+h = 184.0
+tooltip = "Track map"
+
+[[root.children]]
+widget_type = "label"
+text = "Car"
+x = 1080.0
+y = 696.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "car_health"
+x = 1128.0
+y = 696.0
+w = 136.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 78.0
+tooltip = "Car condition"

@@ -1,0 +1,132 @@
+# game_over.toml — Game over / death screen
+# Viewport: 1280 × 720
+# Contains: "GAME OVER" heading, final score, high score, run stats, restart / main menu buttons
+
+[root]
+widget_type = "panel"
+id          = "game_over_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "label"
+id = "game_over_heading"
+text = "GAME OVER"
+x = 440.0
+y = 144.0
+w = 400.0
+h = 64.0
+
+[[root.children]]
+widget_type = "label"
+id = "death_message"
+text = "You were slain by a Void Wraith in the Sunken Ruins."
+x = 344.0
+y = 208.0
+w = 600.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Final Score"
+x = 440.0
+y = 272.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "final_score"
+text = "48,320"
+x = 624.0
+y = 272.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "High Score"
+x = 440.0
+y = 304.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "high_score"
+text = "62,100"
+x = 624.0
+y = 304.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Level Reached"
+x = 440.0
+y = 360.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_level"
+text = "12"
+x = 624.0
+y = 360.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Enemies Defeated"
+x = 440.0
+y = 384.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_kills"
+text = "247"
+x = 624.0
+y = 384.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Play Time"
+x = 440.0
+y = 416.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_time"
+text = "1h 34m"
+x = 624.0
+y = 416.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "restart_btn"
+text = "Restart"
+x = 440.0
+y = 480.0
+w = 184.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "main_menu_btn"
+text = "Main Menu"
+x = 664.0
+y = 480.0
+w = 184.0
+h = 48.0

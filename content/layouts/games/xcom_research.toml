@@ -1,0 +1,264 @@
+# xcom_research.toml — XCOM research lab screen
+# Viewport: 1280 × 720
+# Contains: research queue, available projects list, scientists allocation,
+#           selected project detail panel, estimated time, research log
+
+[root]
+widget_type = "panel"
+id = "research_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Header bar ────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "free_scientists"
+x = 504.0
+y = 16.0
+w = 304.0
+h = 24.0
+tooltip = "Scientists available for new projects"
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+tooltip = "Return to base"
+
+# ── Available projects list ───────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "available_panel"
+x = 0.0
+y = 48.0
+w = 360.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "available_title"
+x = 8.0
+y = 8.0
+w = 240.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "project_search"
+x = 8.0
+y = 32.0
+w = 344.0
+h = 32.0
+placeholder = "Filter projects…"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "available_list"
+x = 8.0
+y = 72.0
+w = 344.0
+h = 600.0
+tooltip = "Click a project to view details"
+
+# ── Project detail panel ──────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "project_detail"
+x = 360.0
+y = 48.0
+w = 560.0
+h = 480.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "project_name"
+x = 16.0
+y = 16.0
+w = 536.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "project_image"
+x = 16.0
+y = 48.0
+w = 200.0
+h = 160.0
+tooltip = "Project image / alien artefact"
+
+[[root.children.children]]
+widget_type = "label"
+id = "project_desc"
+x = 224.0
+y = 48.0
+w = 328.0
+h = 160.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "prerequisites_label"
+x = 16.0
+y = 216.0
+w = 536.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "unlocks_label"
+x = 16.0
+y = 240.0
+w = 536.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "scientists_label"
+x = 16.0
+y = 280.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "spinbox"
+id = "scientists_spinbox"
+x = 224.0
+y = 280.0
+w = 120.0
+h = 32.0
+min = 1.0
+max = 50.0
+value = 10.0
+tooltip = "Assign scientists to project"
+
+[[root.children.children]]
+widget_type = "label"
+id = "eta_label"
+x = 16.0
+y = 320.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "project_progress"
+x = 16.0
+y = 344.0
+w = 536.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Research progress"
+
+[[root.children.children]]
+widget_type = "button"
+id = "start_research_btn"
+x = 16.0
+y = 376.0
+w = 264.0
+h = 40.0
+tooltip = "Begin / resume research"
+
+[[root.children.children]]
+widget_type = "button"
+id = "cancel_project_btn"
+x = 288.0
+y = 376.0
+w = 264.0
+h = 40.0
+tooltip = "Cancel / pause research"
+
+[[root.children.children]]
+widget_type = "label"
+id = "research_help"
+x = 16.0
+y = 432.0
+w = 536.0
+h = 40.0
+
+# ── Active queue panel ────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "queue_panel"
+x = 360.0
+y = 528.0
+w = 560.0
+h = 192.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "queue_title"
+x = 8.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "queue_list"
+x = 8.0
+y = 32.0
+w = 544.0
+h = 152.0
+tooltip = "Active research queue"
+
+# ── Discovered tech log ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "tech_log_panel"
+x = 920.0
+y = 48.0
+w = 360.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "log_title"
+x = 8.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "log_filter"
+x = 8.0
+y = 32.0
+w = 344.0
+h = 32.0
+text = "All|Weapons|Armor|Alien Biology|Craft|Misc"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "tech_log_list"
+x = 8.0
+y = 72.0
+w = 344.0
+h = 600.0
+tooltip = "All completed research topics"

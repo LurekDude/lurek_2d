@@ -1,0 +1,177 @@
+# xcom_ufopaedia.toml — XCOM Ufopaedia / tech database screen
+# Viewport: 1280 × 720
+# Contains: category tree (left), entry list (centre-left),
+#           article viewer (right — title / image / body / stats table)
+
+[root]
+widget_type = "panel"
+id = "ufopaedia_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "search_bar"
+x = 400.0
+y = 8.0
+w = 400.0
+h = 32.0
+placeholder = "Search Ufopaedia…"
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Category tree
+[[root.children]]
+widget_type = "panel"
+id = "category_panel"
+x = 0.0
+y = 48.0
+w = 224.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "treeview"
+id = "category_tree"
+x = 8.0
+y = 8.0
+w = 216.0
+h = 664.0
+tooltip = "Ufopaedia categories"
+
+# Entry list
+[[root.children]]
+widget_type = "panel"
+id = "entry_list_panel"
+x = 224.0
+y = 48.0
+w = 280.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "category_heading"
+x = 8.0
+y = 8.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "entry_list"
+x = 8.0
+y = 32.0
+w = 272.0
+h = 632.0
+tooltip = "Articles in this category"
+
+# Article viewer
+[[root.children]]
+widget_type = "panel"
+id = "article_viewer"
+x = 504.0
+y = 48.0
+w = 784.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "article_title"
+x = 16.0
+y = 16.0
+w = 760.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "article_image"
+x = 16.0
+y = 48.0
+w = 264.0
+h = 200.0
+tooltip = "Article illustration"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "article_body"
+x = 280.0
+y = 48.0
+w = 488.0
+h = 400.0
+tooltip = "Article text"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "stats_table"
+x = 16.0
+y = 264.0
+w = 264.0
+h = 192.0
+tooltip = "Technical statistics table"
+
+[[root.children.children]]
+widget_type = "label"
+id = "see_also_label"
+x = 16.0
+y = 472.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "see_also_links"
+x = 16.0
+y = 496.0
+w = 760.0
+h = 40.0
+tooltip = "Related articles"
+
+[[root.children.children]]
+widget_type = "button"
+id = "prev_article_btn"
+x = 16.0
+y = 544.0
+w = 120.0
+h = 32.0
+tooltip = "Previous entry"
+
+[[root.children.children]]
+widget_type = "button"
+id = "next_article_btn"
+x = 144.0
+y = 544.0
+w = 120.0
+h = 32.0
+tooltip = "Next entry"
+
+[[root.children.children]]
+widget_type = "button"
+id = "bookmark_btn"
+x = 648.0
+y = 544.0
+w = 120.0
+h = 32.0
+tooltip = "Bookmark this article"

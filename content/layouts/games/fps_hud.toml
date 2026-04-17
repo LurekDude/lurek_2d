@@ -1,0 +1,256 @@
+# fps_hud.toml — First-person shooter in-game HUD
+# Viewport: 1280 × 720
+# Contains: HP/armour bars, ammo counter, grenade count, ability cooldowns,
+#           crosshair slot, compass bar, kill feed area, objective marker
+
+[root]
+widget_type = "panel"
+id          = "fps_hud_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Health & armour (bottom-left) ────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "HP"
+x = 24.0
+y = 648.0
+w = 32.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "hp_bar"
+x = 56.0
+y = 648.0
+w = 200.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 72.0
+tooltip = "Health: 72 / 100"
+
+[[root.children]]
+widget_type = "label"
+id = "hp_value"
+text = "72"
+x = 264.0
+y = 648.0
+w = 40.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+text = "AR"
+x = 24.0
+y = 672.0
+w = 32.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "armour_bar"
+x = 56.0
+y = 672.0
+w = 200.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 50.0
+tooltip = "Armour: 50 / 100"
+
+[[root.children]]
+widget_type = "label"
+id = "armour_value"
+text = "50"
+x = 264.0
+y = 672.0
+w = 40.0
+h = 16.0
+
+# ── Ammo (bottom-right) ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "ammo_mag"
+text = "24"
+x = 1080.0
+y = 648.0
+w = 80.0
+h = 40.0
+tooltip = "Rounds in magazine"
+
+[[root.children]]
+widget_type = "label"
+text = "/"
+x = 1168.0
+y = 664.0
+w = 16.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "ammo_reserve"
+text = "90"
+x = 1184.0
+y = 664.0
+w = 80.0
+h = 24.0
+tooltip = "Reserve ammo"
+
+[[root.children]]
+widget_type = "label"
+id = "weapon_name"
+text = "Assault Rifle"
+x = 1064.0
+y = 688.0
+w = 200.0
+h = 24.0
+
+# ── Grenades ─────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "badge"
+id = "grenade_count"
+x = 24.0
+y = 704.0
+w = 40.0
+h = 32.0
+tooltip = "Grenades remaining"
+
+[[root.children]]
+widget_type = "label"
+id = "grenade_label"
+text = "× 3 grenades"
+x = 64.0
+y = 704.0
+w = 120.0
+h = 24.0
+
+# ── Ability cooldowns ─────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Q"
+x = 488.0
+y = 688.0
+w = 24.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "ability_q_cd"
+x = 512.0
+y = 696.0
+w = 80.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 60.0
+tooltip = "Ability Q cooldown"
+
+[[root.children]]
+widget_type = "label"
+text = "E"
+x = 608.0
+y = 688.0
+w = 24.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "ability_e_cd"
+x = 632.0
+y = 696.0
+w = 80.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip = "Ability E cooldown"
+
+[[root.children]]
+widget_type = "label"
+text = "F"
+x = 720.0
+y = 688.0
+w = 24.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "ability_f_cd"
+x = 744.0
+y = 696.0
+w = 80.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Ability F — recharging"
+
+# ── Compass bar (top-centre) ──────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "progressbar"
+id = "compass_bar"
+x = 440.0
+y = 24.0
+w = 400.0
+h = 16.0
+min = 0.0
+max = 360.0
+value = 245.0
+tooltip = "Compass heading (SW)"
+
+[[root.children]]
+widget_type = "label"
+id = "compass_label"
+text = "SW"
+x = 616.0
+y = 40.0
+w = 48.0
+h = 16.0
+
+# ── Objective (top-left) ──────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "objective_text"
+text = "▶ Capture point B — 42m"
+x = 24.0
+y = 24.0
+w = 344.0
+h = 24.0
+
+# ── Kill feed (top-right) ─────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "killfeed_0"
+text = "Ghost ✕ Reaper"
+x = 944.0
+y = 24.0
+w = 320.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "killfeed_1"
+text = "You ✕ Viper"
+x = 944.0
+y = 48.0
+w = 320.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "killfeed_2"
+text = "Phoenix ✕ Sage"
+x = 944.0
+y = 72.0
+w = 320.0
+h = 24.0

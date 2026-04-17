@@ -1,0 +1,294 @@
+
+[root]
+widget_type = "panel"
+id = "wizard_root"
+x = 0.0
+y = 0.0
+w = 680.0
+h = 584.0
+
+[[root.children]]
+widget_type = "panel"
+id = "step_progress_bar_row"
+x = 0.0
+y = 0.0
+w = 680.0
+h = 64.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "step_1_dot"
+text = "1"
+x = 56.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Account"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Account"
+x = 24.0
+y = 48.0
+w = 88.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "step_seg_1"
+x = 88.0
+y = 32.0
+w = 88.0
+h = 8.0
+min = 0.0
+max = 1.0
+value = 1.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "step_2_dot"
+text = "2"
+x = 176.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Profile"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Profile"
+x = 152.0
+y = 48.0
+w = 80.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "step_seg_2"
+x = 208.0
+y = 32.0
+w = 88.0
+h = 8.0
+min = 0.0
+max = 1.0
+value = 1.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "step_3_dot"
+text = "3"
+x = 296.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Preferences"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Preferences"
+x = 272.0
+y = 48.0
+w = 96.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "step_seg_3"
+x = 328.0
+y = 32.0
+w = 88.0
+h = 8.0
+min = 0.0
+max = 1.0
+value = 0.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "step_4_dot"
+text = "4"
+x = 424.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Plan"
+enabled = false
+
+[[root.children.children]]
+widget_type = "label"
+text = "Plan"
+x = 408.0
+y = 48.0
+w = 64.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "step_seg_4"
+x = 456.0
+y = 32.0
+w = 88.0
+h = 8.0
+min = 0.0
+max = 1.0
+value = 0.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "step_5_dot"
+text = "5"
+x = 544.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Confirm"
+enabled = false
+
+[[root.children.children]]
+widget_type = "label"
+text = "Confirm"
+x = 520.0
+y = 48.0
+w = 80.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+id = "step_title"
+text = "Step 3 of 5 — Your Preferences"
+x = 40.0
+y = 88.0
+w = 424.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "step_subtitle"
+text = "Tell us how you'd like to use the app."
+x = 40.0
+y = 120.0
+w = 504.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "What best describes you?"
+x = 40.0
+y = 160.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "radiobutton"
+id = "role_dev"
+text = "Developer"
+group = "role"
+x = 40.0
+y = 184.0
+w = 200.0
+h = 32.0
+checked = true
+
+[[root.children]]
+widget_type = "radiobutton"
+id = "role_designer"
+text = "Designer"
+group = "role"
+x = 40.0
+y = 224.0
+w = 200.0
+h = 32.0
+
+[[root.children]]
+widget_type = "radiobutton"
+id = "role_manager"
+text = "Product Manager"
+group = "role"
+x = 40.0
+y = 256.0
+w = 224.0
+h = 32.0
+
+[[root.children]]
+widget_type = "radiobutton"
+id = "role_other"
+text = "Other"
+group = "role"
+x = 40.0
+y = 288.0
+w = 200.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Which features interest you? (select all that apply)"
+x = 40.0
+y = 344.0
+w = 504.0
+h = 24.0
+
+[[root.children]]
+widget_type = "checkbox"
+id = "feat_collab"
+text = "Team collaboration"
+x = 40.0
+y = 368.0
+w = 264.0
+h = 24.0
+checked = true
+
+[[root.children]]
+widget_type = "checkbox"
+id = "feat_automation"
+text = "Automation & workflows"
+x = 40.0
+y = 400.0
+w = 264.0
+h = 24.0
+checked = false
+
+[[root.children]]
+widget_type = "checkbox"
+id = "feat_analytics"
+text = "Analytics & reporting"
+x = 40.0
+y = 432.0
+w = 264.0
+h = 24.0
+checked = true
+
+[[root.children]]
+widget_type = "checkbox"
+id = "feat_api"
+text = "API & integrations"
+x = 40.0
+y = 464.0
+w = 264.0
+h = 24.0
+checked = false
+
+[[root.children]]
+widget_type = "button"
+id = "prev_btn"
+text = "← Previous"
+x = 40.0
+y = 520.0
+w = 144.0
+h = 48.0
+
+[[root.children]]
+widget_type = "label"
+id = "step_counter"
+text = "3 of 5"
+x = 296.0
+y = 528.0
+w = 88.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "next_btn"
+text = "Next →"
+x = 504.0
+y = 520.0
+w = 144.0
+h = 48.0

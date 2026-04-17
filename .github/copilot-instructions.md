@@ -78,7 +78,7 @@ Lurek2D organises its Rust source into **five responsibility groups**. The one b
 **Load order**: System Prompt → `docs/specs/<module>.md` (merged module reference) → relevant skill files → agent
 
 **Skill catalog** — all skills live in `.github/skills/`. Load the relevant `SKILL.md` before working in that domain.
-`agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `quality-pipeline` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `visual-effects` · `vscode-extension`
+`agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `demo-creation` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `quality-pipeline` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `ui-layout` · `visual-effects` · `vscode-extension`
 
 **Agent roster** — full definitions in `.github/agents/`:
 

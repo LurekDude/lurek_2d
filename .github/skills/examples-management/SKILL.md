@@ -97,11 +97,51 @@ end
 
 | Quality | Description |
 |---------|-------------|
-| **One concept** | Demonstrates exactly one API namespace or one gameplay pattern |
+| **Scenario-driven** | Each section is a named game task ("schedule bullet despawn"), not a function name |
 | **Self-contained** | Runs with `cargo run -- content/examples/<file>` without extra setup |
-| **Commented** | Every section explains what it demonstrates and why |
-| **Minimal** | Strip everything that isn't directly demonstrating the concept |
-| **AI-readable** | An AI agent should be able to learn the full API surface from reading it |
+| **Answers WHY** | The reader understands when and why they would reach for each function |
+| **Game values** | All arguments are realistic: `hp=100`, `"hero_walk.png"`, not `0`, `""`, `nil` |
+| **Coverage + clarity** | `example_coverage.py` passing is the floor, not the ceiling |
+
+### The scenario pattern — ALWAYS write this way
+
+```lua
+-- ---- Scenario: schedule bullet auto-despawn -------------------------------------
+-- Bullets in a shoot-em-up should self-destruct after 3 seconds unless they hit
+-- something. lurek.timer.newScheduler + after() handles this; cancel() aborts early.
+
+local sched = lurek.timer.newScheduler()
+local id = sched:after(3.0, function()
+    print("bullet removed from world after 3 seconds")
+end)
+sched:update(1.0)
+print("timers still pending: " .. sched:count())
+
+local hit_enemy = true
+if hit_enemy then
+    local ok = sched:cancel(id)
+    print("early despawn cancelled: " .. tostring(ok))
+end
+```
+
+### FORBIDDEN patterns — never write these
+
+```lua
+-- FORBIDDEN: function-name scenario (teaches what, not why or when)
+-- lurek.timer.after
+-- Schedules a callback.
+local id = sched:after(2.0, function() end)
+
+-- FORBIDDEN: lone constructor with trivial method chain
+local sig2 = lurek.event.newSignal()
+print("type: " .. sig2:type())   -- sig2 exists only to demonstrate :type()
+
+-- FORBIDDEN: nil / zero args for meaningful parameters
+lurek.physics.newBody(nil, 0, 0)
+```
+
+The test: "if I showed this to a developer who has never heard of this engine, would they
+understand what game problem this solves?" If NO, rewrite it as a scenario.
 
 ## Adding a New Example (Checklist)
 

@@ -1,0 +1,337 @@
+# chat_app.toml — Messaging / chat application
+# Viewport: 1200 × 700
+# Contains: server/channel list (left), messages area (centre), member list
+#           (right), message compose bar at bottom
+
+[root]
+widget_type = "panel"
+id          = "chat_root"
+x = 0.0
+y = 0.0
+w = 1200.0
+h = 704.0
+
+# ── Server list (far left) ────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "server_list"
+x = 0.0
+y = 0.0
+w = 64.0
+h = 704.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "sv_home"
+text = "🏠"
+x = 8.0
+y = 8.0
+w = 48.0
+h = 48.0
+tooltip = "Home"
+
+[[root.children.children]]
+widget_type = "button"
+id = "sv_1"
+text = "G"
+x = 8.0
+y = 64.0
+w = 48.0
+h = 48.0
+tooltip = "Game Dev Hub"
+
+[[root.children.children]]
+widget_type = "button"
+id = "sv_2"
+text = "A"
+x = 8.0
+y = 120.0
+w = 48.0
+h = 48.0
+tooltip = "Art Circle"
+
+[[root.children.children]]
+widget_type = "button"
+id = "sv_3"
+text = "+"
+x = 8.0
+y = 176.0
+w = 48.0
+h = 48.0
+tooltip = "Add Server"
+
+# ── Channel sidebar ───────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "channel_sidebar"
+x = 64.0
+y = 0.0
+w = 208.0
+h = 704.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Game Dev Hub"
+x = 16.0
+y = 16.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "badge"
+id = "online_badge"
+x = 160.0
+y = 8.0
+w = 48.0
+h = 32.0
+tooltip = "Members online"
+
+[[root.children.children]]
+widget_type = "label"
+text = "# TEXT CHANNELS"
+x = 16.0
+y = 48.0
+w = 184.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "ch_general"
+text = "# general"
+x = 8.0
+y = 72.0
+w = 200.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "ch_announce"
+text = "# announcements"
+x = 8.0
+y = 104.0
+w = 200.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "ch_random"
+text = "# random"
+x = 8.0
+y = 136.0
+w = 200.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "ch_showcase"
+text = "# showcase"
+x = 8.0
+y = 176.0
+w = 200.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "# VOICE CHANNELS"
+x = 16.0
+y = 216.0
+w = 184.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "vc_lounge"
+text = "🔊 Lounge"
+x = 8.0
+y = 240.0
+w = 200.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "vc_gaming"
+text = "🔊 Gaming"
+x = 8.0
+y = 272.0
+w = 200.0
+h = 32.0
+
+# User profile strip at bottom of sidebar
+
+[[root.children.children]]
+widget_type = "panel"
+id = "user_profile_strip"
+x = 0.0
+y = 648.0
+w = 208.0
+h = 56.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "self_name"
+text = "TomB#0042"
+x = 56.0
+y = 664.0
+w = 112.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "mute_btn"
+text = "🎙"
+x = 168.0
+y = 656.0
+w = 32.0
+h = 32.0
+tooltip = "Mute microphone"
+
+[[root.children.children]]
+widget_type = "button"
+id = "deafen_btn"
+text = "🎧"
+x = 176.0
+y = 664.0
+w = 32.0
+h = 32.0
+tooltip = "Deafen"
+
+# ── Message area ──────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "message_area"
+x = 272.0
+y = 0.0
+w = 712.0
+h = 704.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "channel_header"
+text = "# general"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "channel_topic"
+text = "Welcome! Share your work, ask questions."
+x = 16.0
+y = 40.0
+w = 600.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "messages_scroll"
+x = 0.0
+y = 64.0
+w = 712.0
+h = 568.0
+tooltip = "Message history"
+
+# Compose bar
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "compose_input"
+x = 8.0
+y = 648.0
+w = 608.0
+h = 40.0
+placeholder = "Message #general"
+
+[[root.children.children]]
+widget_type = "button"
+id = "send_btn"
+text = "Send"
+x = 624.0
+y = 648.0
+w = 80.0
+h = 40.0
+
+# ── Member list (right) ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "member_list"
+x = 984.0
+y = 0.0
+w = 216.0
+h = 704.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Members — 128 online"
+x = 16.0
+y = 16.0
+w = 192.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "ADMINS"
+x = 16.0
+y = 48.0
+w = 192.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "🟢 Alice"
+x = 8.0
+y = 64.0
+w = 208.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "MEMBERS"
+x = 16.0
+y = 104.0
+w = 192.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "🟢 Bob"
+x = 8.0
+y = 128.0
+w = 208.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "🟡 Charlie"
+x = 8.0
+y = 160.0
+w = 208.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "⚪ Dana"
+x = 8.0
+y = 192.0
+w = 208.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "🟢 Evan"
+x = 8.0
+y = 232.0
+w = 208.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "🔴 Fiona"
+x = 8.0
+y = 264.0
+w = 208.0
+h = 32.0

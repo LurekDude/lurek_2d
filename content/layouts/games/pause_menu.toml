@@ -1,0 +1,82 @@
+# pause_menu.toml — In-game pause menu overlay
+# Viewport: 1280 × 720 (centred overlay panel, backdrop behind)
+# Contains: "PAUSED" heading, 5 action buttons, save slot indicator
+
+[root]
+widget_type = "panel"
+id          = "pause_backdrop"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "pause_panel"
+x = 440.0
+y = 160.0
+w = 400.0
+h = 400.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "pause_heading"
+text = "PAUSED"
+x = 120.0
+y = 24.0
+w = 160.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "btn_resume"
+text = "Resume"
+x = 48.0
+y = 88.0
+w = 304.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "btn_save"
+text = "Save Game"
+x = 48.0
+y = 144.0
+w = 304.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "btn_load_pause"
+text = "Load Game"
+x = 48.0
+y = 200.0
+w = 304.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "btn_settings_pause"
+text = "Settings"
+x = 48.0
+y = 248.0
+w = 304.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "btn_main_menu"
+text = "Quit to Main Menu"
+x = 48.0
+y = 304.0
+w = 304.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "save_slot_info"
+text = "Last save: Slot 2 — 14m ago"
+x = 48.0
+y = 360.0
+w = 304.0
+h = 24.0

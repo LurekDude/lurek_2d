@@ -1,0 +1,325 @@
+
+[root]
+widget_type = "panel"
+id = "notif_root"
+x = 0.0
+y = 0.0
+w = 424.0
+h = 640.0
+
+[[root.children]]
+widget_type = "label"
+id = "panel_title"
+text = "Notifications"
+x = 16.0
+y = 16.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "unread_count"
+x = 224.0
+y = 16.0
+w = 40.0
+h = 32.0
+tooltip = "Unread notifications"
+
+[[root.children]]
+widget_type = "button"
+id = "mark_all_read_btn"
+text = "Mark all read"
+x = 224.0
+y = 56.0
+w = 128.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "notif_settings_btn"
+text = "⚙"
+x = 376.0
+y = 16.0
+w = 32.0
+h = 32.0
+tooltip = "Notification settings"
+
+[[root.children]]
+widget_type = "panel"
+id = "notif_0"
+x = 0.0
+y = 56.0
+w = 424.0
+h = 88.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "notif_0_icon"
+x = 16.0
+y = 16.0
+w = 48.0
+h = 48.0
+tooltip = "App icon"
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_0_title"
+text = "New message from Alice"
+x = 72.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_0_body"
+text = "Hey! Are you free for a call later today?"
+x = 72.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_0_time"
+text = "2 min ago"
+x = 72.0
+y = 64.0
+w = 120.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "notif_0_action"
+text = "Reply"
+x = 320.0
+y = 64.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "notif_1"
+x = 0.0
+y = 152.0
+w = 424.0
+h = 88.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "notif_1_icon"
+x = 16.0
+y = 16.0
+w = 48.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_1_title"
+text = "Build succeeded — lurek2d main"
+x = 72.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_1_body"
+text = "CI pipeline passed all 142 tests in 3m 17s"
+x = 72.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_1_time"
+text = "15 min ago"
+x = 72.0
+y = 64.0
+w = 120.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "notif_1_action"
+text = "View"
+x = 320.0
+y = 64.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "notif_2"
+x = 0.0
+y = 240.0
+w = 424.0
+h = 88.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "notif_2_icon"
+x = 16.0
+y = 16.0
+w = 48.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_2_title"
+text = "PR review requested"
+x = 72.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_2_body"
+text = "Bob requested your review on #142: UI layout loader"
+x = 72.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_2_time"
+text = "1 hour ago"
+x = 72.0
+y = 64.0
+w = 120.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "notif_2_action"
+text = "Review"
+x = 320.0
+y = 64.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "notif_3"
+x = 0.0
+y = 328.0
+w = 424.0
+h = 88.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "notif_3_icon"
+x = 16.0
+y = 16.0
+w = 48.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_3_title"
+text = "Storage usage warning"
+x = 72.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_3_body"
+text = "You have used 90 % of your 10 GB quota."
+x = 72.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_3_time"
+text = "3 hours ago"
+x = 72.0
+y = 64.0
+w = 120.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "notif_3_action"
+text = "Manage"
+x = 320.0
+y = 64.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "notif_4"
+x = 0.0
+y = 416.0
+w = 424.0
+h = 88.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "notif_4_icon"
+x = 16.0
+y = 16.0
+w = 48.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_4_title"
+text = "Weekly digest ready"
+x = 72.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_4_body"
+text = "Your project summary for 28 Apr – 4 May is available."
+x = 72.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "notif_4_time"
+text = "Yesterday"
+x = 72.0
+y = 64.0
+w = 120.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "notif_4_action"
+text = "Open"
+x = 320.0
+y = 64.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "clear_all_btn"
+text = "Clear All Notifications"
+x = 16.0
+y = 520.0
+w = 240.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "view_history_btn"
+text = "History"
+x = 272.0
+y = 520.0
+w = 136.0
+h = 40.0
+tooltip = "View notification history"

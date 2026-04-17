@@ -1,0 +1,184 @@
+# rpg_hud.toml — Classic top-down RPG in-game HUD
+# Viewport: 1280 × 720
+# Contains: HP / MP / SP progress bars, XP bar, 6-slot hotbar,
+#           gold + level display, minimap frame (top-right)
+
+[root]
+widget_type = "panel"
+id          = "hud_root"
+x           = 0.0
+y           = 0.0
+w           = 1280.0
+h           = 720.0
+
+# ── Stat bars (top-left) ──────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id          = "hp_label"
+text        = "HP"
+x = 24.0
+y = 24.0
+w = 32.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id          = "hp_bar"
+x = 56.0
+y = 24.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 85.0
+tooltip     = "Hit Points: 85 / 100"
+
+[[root.children]]
+widget_type = "label"
+id          = "mp_label"
+text        = "MP"
+x = 24.0
+y = 48.0
+w = 32.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id          = "mp_bar"
+x = 56.0
+y = 48.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 60.0
+tooltip     = "Mana Points: 60 / 100"
+
+[[root.children]]
+widget_type = "label"
+id          = "sp_label"
+text        = "SP"
+x = 24.0
+y = 72.0
+w = 32.0
+h = 16.0
+
+[[root.children]]
+widget_type = "progressbar"
+id          = "sp_bar"
+x = 56.0
+y = 72.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip     = "Stamina: 100 / 100"
+
+# ── Player info row ───────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id          = "level_display"
+text        = "Lv. 12"
+x = 24.0
+y = 96.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id          = "gold_display"
+text        = "Gold: 1,240"
+x = 88.0
+y = 96.0
+w = 152.0
+h = 24.0
+
+# ── XP bar (bottom-left) ──────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "progressbar"
+id          = "xp_bar"
+x = 24.0
+y = 696.0
+w = 440.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 42.0
+tooltip     = "Experience: 42 / 100"
+
+# ── Hotbar (bottom-centre, 6 slots × 48 px) ──────────────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot1"
+text = "1"
+x = 496.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 1 (press 1)"
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot2"
+text = "2"
+x = 544.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 2 (press 2)"
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot3"
+text = "3"
+x = 600.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 3 (press 3)"
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot4"
+text = "4"
+x = 656.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 4 (press 4)"
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot5"
+text = "5"
+x = 712.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 5 (press 5)"
+
+[[root.children]]
+widget_type = "button"
+id = "hotbar_slot6"
+text = "6"
+x = 760.0
+y = 672.0
+w = 48.0
+h = 48.0
+tooltip = "Slot 6 (press 6)"
+
+# ── Mini-map frame (top-right) ────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id          = "minimap_frame"
+x = 1080.0
+y = 16.0
+w = 184.0
+h = 184.0
+tooltip     = "Mini-map (press M to toggle)"

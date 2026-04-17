@@ -1,0 +1,276 @@
+# skill_tree.toml — Character skill / ability unlock screen
+# Viewport: 900 × 640  (overlay window)
+# Contains: available points display, 8 skill rows (icon + name + desc + unlock btn),
+#           total cost preview, reset & confirm buttons
+
+[root]
+widget_type = "window"
+id          = "skill_tree_window"
+text        = "Skill Tree"
+x = 192.0
+y = 40.0
+w = 904.0
+h = 640.0
+
+[[root.children]]
+widget_type = "label"
+text = "Available Skill Points:"
+x = 24.0
+y = 56.0
+w = 224.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "points_available"
+text = "5"
+x = 248.0
+y = 56.0
+w = 64.0
+h = 24.0
+
+# ── Skills (label | name | description | cost badge | unlock button) ──────────
+
+[[root.children]]
+widget_type = "label"
+id = "skill0_name"
+text = "Rapid Strike"
+x = 24.0
+y = 96.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill0_desc"
+text = "Increases attack speed by 15%."
+x = 208.0
+y = 96.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "skill0_cost"
+x = 664.0
+y = 96.0
+w = 40.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill0_btn"
+text = "Unlock (2 pts)"
+x = 712.0
+y = 88.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill1_name"
+text = "Power Shot"
+x = 24.0
+y = 144.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill1_desc"
+text = "Ranged attack deals +30% damage."
+x = 208.0
+y = 144.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill1_btn"
+text = "Unlock (2 pts)"
+x = 712.0
+y = 136.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill2_name"
+text = "Shadow Step"
+x = 24.0
+y = 192.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill2_desc"
+text = "Teleport 5 m behind the target."
+x = 208.0
+y = 192.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill2_btn"
+text = "Unlock (3 pts)"
+x = 712.0
+y = 184.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill3_name"
+text = "Fortify"
+x = 24.0
+y = 240.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill3_desc"
+text = "Passively reduces incoming damage by 10%."
+x = 208.0
+y = 240.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill3_btn"
+text = "Unlock (2 pts)"
+x = 712.0
+y = 232.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill4_name"
+text = "Battle Cry"
+x = 24.0
+y = 288.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill4_desc"
+text = "Boost ally attack by 20% for 5 turns."
+x = 208.0
+y = 288.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill4_btn"
+text = "Unlock (3 pts)"
+x = 712.0
+y = 280.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill5_name"
+text = "Eagle Eye"
+x = 24.0
+y = 336.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill5_desc"
+text = "Increases critical hit chance by 8%."
+x = 208.0
+y = 336.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill5_btn"
+text = "Unlock (1 pt)"
+x = 712.0
+y = 328.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill6_name"
+text = "Mana Shield"
+x = 24.0
+y = 384.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill6_desc"
+text = "Convert 20% incoming damage to mana loss."
+x = 208.0
+y = 384.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill6_btn"
+text = "Unlock (3 pts)"
+x = 712.0
+y = 376.0
+w = 144.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill7_name"
+text = "Last Stand"
+x = 24.0
+y = 432.0
+w = 184.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "skill7_desc"
+text = "Deal +50% damage when HP < 25%."
+x = 208.0
+y = 432.0
+w = 400.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "skill7_btn"
+text = "Unlock (4 pts)"
+x = 712.0
+y = 424.0
+w = 144.0
+h = 32.0
+
+# ── Footer ────────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "reset_skills_btn"
+text = "Reset All (cost: 500g)"
+x = 24.0
+y = 592.0
+w = 200.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "close_skill_btn"
+text = "Done"
+x = 760.0
+y = 592.0
+w = 120.0
+h = 40.0

@@ -1,0 +1,457 @@
+
+[root]
+widget_type = "panel"
+id = "intercept_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "chase_panel"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 120.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "intercept_title"
+x = 16.0
+y = 8.0
+w = 400.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "range_label"
+x = 504.0
+y = 8.0
+w = 200.0
+h = 24.0
+tooltip = "Current distance to UFO (km)"
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "distance_bar"
+x = 16.0
+y = 48.0
+w = 1248.0
+h = 32.0
+min = 0.0
+max = 1000.0
+value = 620.0
+tooltip = "Distance from intercept base to UFO"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "interceptor_icon"
+x = 16.0
+y = 80.0
+w = 40.0
+h = 32.0
+tooltip = "Interceptor position"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "ufo_icon"
+x = 1224.0
+y = 80.0
+w = 40.0
+h = 32.0
+tooltip = "UFO position"
+
+[[root.children.children]]
+widget_type = "label"
+id = "weapon_range_label"
+x = 504.0
+y = 88.0
+w = 304.0
+h = 24.0
+tooltip = "Weapon effective range"
+
+[[root.children]]
+widget_type = "panel"
+id = "interceptor_1_panel"
+x = 0.0
+y = 120.0
+w = 400.0
+h = 400.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "craft_1_image"
+x = 8.0
+y = 8.0
+w = 184.0
+h = 120.0
+tooltip = "Interceptor 1 image"
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_1_name"
+x = 8.0
+y = 136.0
+w = 384.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_1_damage"
+x = 8.0
+y = 160.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "craft_1_hp_bar"
+x = 8.0
+y = 184.0
+w = 384.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip = "Craft hull integrity"
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_1_fuel"
+x = 8.0
+y = 200.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "craft_1_fuel_bar"
+x = 8.0
+y = 224.0
+w = 384.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 78.0
+tooltip = "Fuel level"
+
+[[root.children.children]]
+widget_type = "label"
+id = "w1_slot_a_label"
+x = 8.0
+y = 248.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "w1_slot_a_ammo"
+x = 8.0
+y = 272.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 40.0
+tooltip = "Weapon 1 ammo"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fire_w1_a_btn"
+x = 200.0
+y = 256.0
+w = 88.0
+h = 32.0
+tooltip = "Fire weapon A"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fire_w1_b_btn"
+x = 296.0
+y = 256.0
+w = 88.0
+h = 32.0
+tooltip = "Fire weapon B"
+
+[[root.children.children]]
+widget_type = "label"
+id = "w1_slot_b_label"
+x = 8.0
+y = 296.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "w1_slot_b_ammo"
+x = 8.0
+y = 320.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 30.0
+value = 20.0
+tooltip = "Weapon 2 ammo"
+
+[[root.children.children]]
+widget_type = "button"
+id = "disengage_1_btn"
+x = 8.0
+y = 344.0
+w = 184.0
+h = 32.0
+tooltip = "Disengage and return to base"
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "approach_speed_1"
+x = 200.0
+y = 344.0
+w = 200.0
+h = 32.0
+text = "Stand Off|Cautious|Standard|Aggressive|Attack Run"
+tooltip = "Approach speed setting"
+
+[[root.children]]
+widget_type = "panel"
+id = "ufo_info_panel"
+x = 400.0
+y = 120.0
+w = 480.0
+h = 400.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "ufo_image"
+x = 8.0
+y = 8.0
+w = 200.0
+h = 144.0
+tooltip = "UFO silhouette"
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_type"
+x = 216.0
+y = 8.0
+w = 256.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_mission"
+x = 216.0
+y = 40.0
+w = 256.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_speed"
+x = 216.0
+y = 64.0
+w = 256.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_altitude"
+x = 216.0
+y = 88.0
+w = 256.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_heading"
+x = 216.0
+y = 112.0
+w = 256.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_hp_label"
+x = 8.0
+y = 160.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "ufo_hp_bar"
+x = 8.0
+y = 184.0
+w = 464.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip = "UFO hull damage"
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_armor_label"
+x = 8.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "ufo_shield_bar"
+x = 8.0
+y = 232.0
+w = 464.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 80.0
+tooltip = "UFO shield"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "ufo_fire_indicator"
+x = 8.0
+y = 264.0
+w = 464.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_fire_label"
+x = 8.0
+y = 272.0
+w = 464.0
+h = 24.0
+tooltip = "UFO weapon discharge status"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "intercept_log"
+x = 8.0
+y = 312.0
+w = 464.0
+h = 80.0
+tooltip = "Combat event log"
+
+[[root.children]]
+widget_type = "panel"
+id = "interceptor_2_panel"
+x = 880.0
+y = 120.0
+w = 400.0
+h = 400.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "craft_2_image"
+x = 8.0
+y = 8.0
+w = 184.0
+h = 120.0
+tooltip = "Interceptor 2 image"
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_2_name"
+x = 8.0
+y = 136.0
+w = 384.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "craft_2_hp_bar"
+x = 8.0
+y = 160.0
+w = 384.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 60.0
+tooltip = "Craft hull integrity"
+
+[[root.children.children]]
+widget_type = "button"
+id = "send_second_craft_btn"
+x = 8.0
+y = 184.0
+w = 384.0
+h = 40.0
+tooltip = "Send second interceptor"
+
+[[root.children.children]]
+widget_type = "button"
+id = "disengage_2_btn"
+x = 8.0
+y = 224.0
+w = 184.0
+h = 32.0
+tooltip = "Disengage craft 2"
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "approach_speed_2"
+x = 200.0
+y = 224.0
+w = 200.0
+h = 32.0
+text = "Stand Off|Cautious|Standard|Aggressive|Attack Run"
+
+[[root.children]]
+widget_type = "panel"
+id = "bottom_bar"
+x = 0.0
+y = 520.0
+w = 1280.0
+h = 200.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "continue_to_craft_btn"
+x = 8.0
+y = 64.0
+w = 384.0
+h = 48.0
+tooltip = "UFO grounded — send Skyranger"
+
+[[root.children.children]]
+widget_type = "button"
+id = "abort_intercept_btn"
+x = 400.0
+y = 64.0
+w = 384.0
+h = 48.0
+tooltip = "Abort interception"
+
+[[root.children.children]]
+widget_type = "button"
+id = "review_craft_btn"
+x = 800.0
+y = 64.0
+w = 384.0
+h = 48.0
+tooltip = "Assign different craft"
+
+[[root.children.children]]
+widget_type = "label"
+id = "engagement_timer"
+x = 8.0
+y = 128.0
+w = 400.0
+h = 24.0
+tooltip = "Time since engagement started"
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "fuel_burn_bar"
+x = 424.0
+y = 136.0
+w = 440.0
+h = 24.0
+min = 0.0
+max = 100.0
+value = 22.0
+tooltip = "Fuel consumed in this intercept"

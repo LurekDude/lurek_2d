@@ -7,57 +7,57 @@ coverage — producing reports that tell you what still needs work.
 
 ### Master dashboards — aggregate multiple sub-tools
 
-| Script | Purpose | Sub-tools called | Output |
-|---|---|---|---|
-| `quality_report.py` | Overall quality dashboard (PASS/FAIL) | `doc_audit`, `test_coverage`, `module_audit`, `validate_game` | stdout / JSON |
-| `doc_audit.py` | Documentation audit (Rust + Lua combined) | `collect_docs`, `gen_lua_api_data` | stdout / JSON |
+| Script              | Purpose                                   | Sub-tools called                                              | Output        |
+| ------------------- | ----------------------------------------- | ------------------------------------------------------------- | ------------- |
+| `quality_report.py` | Overall quality dashboard (PASS/FAIL)     | `doc_audit`, `test_coverage`, `module_audit`, `validate_game` | stdout / JSON |
+| `doc_audit.py`      | Documentation audit (Rust + Lua combined) | `collect_docs`, `gen_lua_api_data`                            | stdout / JSON |
 
 ### Docstring coverage — measure and report docstring completeness
 
-| Script | Purpose | Output |
-|---|---|---|
-| `doc_coverage.py` | Rust + Lua `///` docstring coverage metrics | `docs/logs/doc_coverage.json` |
-| `docstring_audit.py` | Per-file Lua API docstring quality audit | `docs/logs/docstring_audit.json` |
-| `count_gaps.py` | Count missing-doc items per `lurek.*` module | stdout |
+| Script               | Purpose                                      | Output                           |
+| -------------------- | -------------------------------------------- | -------------------------------- |
+| `doc_coverage.py`    | Rust + Lua `///` docstring coverage metrics  | `docs/logs/doc_coverage.json`    |
+| `docstring_audit.py` | Per-file Lua API docstring quality audit     | `docs/logs/docstring_audit.json` |
+| `count_gaps.py`      | Count missing-doc items per `lurek.*` module | stdout                           |
 
 ### Test coverage — measure test completeness
 
-| Script | Purpose | Output |
-|---|---|---|
-| `test_coverage.py` | Cross-reference `pub` items vs test files | `docs/logs/test_coverage.json` |
-| `lua_api_test_coverage.py` | Lua API test coverage (via `@covers` markers) | `docs/logs/lua_api_test_coverage.json` |
-| `lua_test_structure_audit.py` | Lua test structure audit: `@description` placement, legacy markers, and `test_summary()` ending | stdout / JSON |
-| `lua_evidence_golden_contract_audit.py` | Evidence/golden contract audit: mixed prechecks, missing `@evidence`, and golden generation logic | stdout / JSON |
-| `unit_test_api_coverage.py` | Unit test API coverage metrics | stdout |
-| `example_coverage.py` | Cross-reference `content/examples/` vs Lua API; exits 1 if any gaps (`--report` for CI) | stdout / JSON |
-| `example_add_missing.py` | Append stub blocks for uncovered API items to example files; use with `flesh-out-example.prompt.md` | patches `.lua` files |
-| `integration_coverage.py` | Integration test module-pair heat map | stdout / JSON |
+| Script                                  | Purpose                                                                                             | Output                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `test_coverage.py`                      | Cross-reference `pub` items vs test files                                                           | `docs/logs/test_coverage.json`         |
+| `lua_api_test_coverage.py`              | Lua API test coverage (via `@covers` markers)                                                       | `docs/logs/lua_api_test_coverage.json` |
+| `lua_test_structure_audit.py`           | Lua test structure audit: `@description` placement, legacy markers, and `test_summary()` ending     | stdout / JSON                          |
+| `lua_evidence_golden_contract_audit.py` | Evidence/golden contract audit: mixed prechecks, missing `@evidence`, and golden generation logic   | stdout / JSON                          |
+| `unit_test_api_coverage.py`             | Unit test API coverage metrics                                                                      | stdout                                 |
+| `example_coverage.py`                   | Cross-reference `content/examples/` vs Lua API; exits 1 if any gaps (`--report` for CI)             | stdout / JSON                          |
+| `example_add_missing.py`                | Append stub blocks for uncovered API items to example files; use with `flesh-out-example.prompt.md` | patches `.lua` files                   |
+| `integration_coverage.py`               | Integration test module-pair heat map                                                               | stdout / JSON                          |
 
 ### Module quality — end-to-end module audits
 
-| Script | Purpose | Output |
-|---|---|---|
-| `audit_module.py` | 12-phase module quality audit (PASS/WARN/ERROR) | `docs/quality/<module>.md` / JSON |
-| `validate_agent_md.py` | Validate merged docs/specs module references (legacy script name) | stdout / JSON |
-| `module_audit.py` | Module restructuring & reference audit | stdout / JSON |
+| Script                 | Purpose                                                           | Output                            |
+| ---------------------- | ----------------------------------------------------------------- | --------------------------------- |
+| `audit_module.py`      | 12-phase module quality audit (PASS/WARN/ERROR)                   | `docs/quality/<module>.md` / JSON |
+| `validate_agent_md.py` | Validate merged docs/specs module references (legacy script name) | stdout / JSON                     |
+| `module_audit.py`      | Module restructuring & reference audit                            | stdout / JSON                     |
 
 ### Specialised audits
 
-| Script | Purpose | Output |
-|---|---|---|
+| Script                 | Purpose                          | Output                      |
+| ---------------------- | -------------------------------- | --------------------------- |
 | `gen_coverage_gaps.py` | Rust→Lua API coverage gap report | `docs/API/coverage_gaps.md` |
-| `golden_test.py` | Deterministic output diff tests | stdout / JSON |
-| `stress_report.py` | Stress test timing report | stdout / JSON |
-| `test_analytics.py` | Test execution trend analysis | stdout |
+| `golden_test.py`       | Deterministic output diff tests  | stdout / JSON               |
+| `stress_report.py`     | Stress test timing report        | stdout / JSON               |
+| `test_analytics.py`    | Test execution trend analysis    | stdout                      |
 
 ### Internal helpers
 
-| Script | Purpose |
-|---|---|
-| `annotate_tests.py` | Add annotation metadata to test files |
-| `lua_test_structure_audit.py` | Audit/fix Lua BDD comment and `test_summary()` structure |
-| `lua_evidence_golden_contract_audit.py` | Audit/fix Lua evidence and golden contract markers |
-| `parse_test_log.py` | Parse Rust test execution logs |
+| Script                                  | Purpose                                                  |
+| --------------------------------------- | -------------------------------------------------------- |
+| `annotate_tests.py`                     | Add annotation metadata to test files                    |
+| `lua_test_structure_audit.py`           | Audit/fix Lua BDD comment and `test_summary()` structure |
+| `lua_evidence_golden_contract_audit.py` | Audit/fix Lua evidence and golden contract markers       |
+| `parse_test_log.py`                     | Parse Rust test execution logs                           |
 
 ## Common usage
 

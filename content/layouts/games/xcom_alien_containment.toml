@@ -1,0 +1,263 @@
+# xcom_alien_containment.toml — XCOM alien containment / prison management
+# Viewport: 1280 × 720
+
+[root]
+widget_type = "panel"
+id = "containment_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 400.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "base_label"
+x = 600.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Containment capacity
+[[root.children]]
+widget_type = "panel"
+id = "capacity_panel"
+x = 0.0
+y = 48.0
+w = 1280.0
+h = 64.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "capacity_label"
+x = 16.0
+y = 8.0
+w = 224.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "capacity_bar"
+x = 240.0
+y = 16.0
+w = 600.0
+h = 24.0
+min = 0.0
+max = 50.0
+value = 18.0
+tooltip = "Live alien units in containment / max capacity"
+
+[[root.children.children]]
+widget_type = "label"
+id = "capacity_count"
+x = 856.0
+y = 8.0
+w = 120.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "badge"
+id = "overflow_warning"
+x = 992.0
+y = 16.0
+w = 144.0
+h = 32.0
+tooltip = "ALERT: containment at capacity — research or execute"
+
+# Main alien list
+[[root.children]]
+widget_type = "panel"
+id = "alien_list_panel"
+x = 0.0
+y = 112.0
+w = 760.0
+h = 616.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "list_title"
+x = 8.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "guitable"
+id = "alien_table"
+x = 8.0
+y = 32.0
+w = 752.0
+h = 464.0
+tooltip = "Captured aliens: species / rank / count / state"
+
+[[root.children.children]]
+widget_type = "button"
+id = "interrogate_btn"
+x = 8.0
+y = 504.0
+w = 184.0
+h = 40.0
+tooltip = "Request research to interrogate selected alien"
+
+[[root.children.children]]
+widget_type = "button"
+id = "transfer_btn"
+x = 200.0
+y = 504.0
+w = 184.0
+h = 40.0
+tooltip = "Transfer alien to another base"
+
+[[root.children.children]]
+widget_type = "button"
+id = "execute_btn"
+x = 384.0
+y = 504.0
+w = 184.0
+h = 40.0
+tooltip = "Execute selected alien (free a containment slot)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "release_btn"
+x = 576.0
+y = 504.0
+w = 184.0
+h = 40.0
+tooltip = "Release (dangerous — increases panic)"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "alien_log"
+x = 8.0
+y = 560.0
+w = 752.0
+h = 48.0
+tooltip = "Recent containment events"
+
+# Alien detail panel
+[[root.children]]
+widget_type = "panel"
+id = "alien_detail_panel"
+x = 760.0
+y = 112.0
+w = 520.0
+h = 616.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "alien_name"
+x = 16.0
+y = 16.0
+w = 496.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "alien_image"
+x = 16.0
+y = 48.0
+w = 200.0
+h = 200.0
+tooltip = "Alien sprite / portrait"
+
+[[root.children.children]]
+widget_type = "label"
+id = "alien_rank"
+x = 224.0
+y = 48.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "alien_health"
+x = 224.0
+y = 72.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "alien_health_bar"
+x = 224.0
+y = 96.0
+w = 288.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 80.0
+tooltip = "Alien health / stability"
+
+[[root.children.children]]
+widget_type = "label"
+id = "alien_captured_mission"
+x = 224.0
+y = 112.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "alien_interrogated"
+x = 224.0
+y = 136.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "intel_unlocked_title"
+x = 16.0
+y = 256.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "intel_list"
+x = 8.0
+y = 280.0
+w = 504.0
+h = 184.0
+tooltip = "Intelligence data unlocked from this species"
+
+[[root.children.children]]
+widget_type = "label"
+id = "research_prereq_title"
+x = 16.0
+y = 472.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "research_prereq_list"
+x = 8.0
+y = 496.0
+w = 504.0
+h = 104.0
+tooltip = "Research topics requiring this alien specimen"

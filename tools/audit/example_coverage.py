@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """Cross-reference content/examples/ scripts against the lurek.* Lua API.
 
-Reports which API functions are covered by an example and which are not.
-Reads the pre-built docs/logs/lua_api_data.json (run gen_all_docs.py first).
+Coverage is reported in two tiers:
+  - "real"  — the API item is called in hand-written scenario code
+  - "stub"  — the item is present only as an auto-generated --@api-stub: block
+              (created by example_add_missing.py; must be replaced before commit)
+
+Use --stubs to see which modules still have unfinished stub blocks.
 
 Usage:
     python tools/audit/example_coverage.py                  # summary table
     python tools/audit/example_coverage.py --missing        # list uncovered items
+    python tools/audit/example_coverage.py --stubs          # list modules with stub blocks remaining
     python tools/audit/example_coverage.py --module timer   # one module
     python tools/audit/example_coverage.py --json           # machine-readable
     python tools/audit/example_coverage.py --report         # exit 1 if any gap (CI gate)
 
 Exit codes:
-    0 — all examples 100% covered
-    1 — one or more gaps exist (or --report flag set with gaps)
+    0 — all examples 100% covered (stubs are OK for --report unless --no-stubs passed)
+    1 — one or more gaps exist
 """
 from __future__ import annotations
 import argparse, json, re, sys
@@ -24,8 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 API_JSON = ROOT / 'docs' / 'logs' / 'lua_api_data.json'
 EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
-# Maps JSON module key  →  content/examples/<file>.lua
-# JSON keys come from src/lua_api/<module>_api.rs luna.set("namespace", tbl)
+# filename = module name exactly (src/render/ -> render.lua, src/ecs/ -> ecs.lua)
 MODULE_TO_EXAMPLE: dict[str, str] = {
     'ai':          'ai.lua',
     'animation':   'animation.lua',
@@ -39,63 +43,97 @@ MODULE_TO_EXAMPLE: dict[str, str] = {
     'debugbridge': 'debugbridge.lua',
     'devtools':    'devtools.lua',
     'docs':        'docs.lua',
-    'ecs':         'entity.lua',       # lurek.entity
-    'effect':      'fx.lua',           # lurek.overlay
+    'ecs':         'ecs.lua',
+    'effect':      'effect.lua',
     'engine':      'engine.lua',
     'event':       'event.lua',
-    'filesystem':  'filesystem.lua',   # lurek.fs
+    'filesystem':  'filesystem.lua',
     'graph':       'graph.lua',
-    'i18n':        'localization.lua', # lurek.localization
-    'image':       'image.lua',        # lurek.img
-    'input':       'input.lua',        # lurek.keyboard
+    'i18n':        'i18n.lua',
+    'image':       'image.lua',
+    'input':       'input.lua',
     'light':       'light.lua',
     'log':         'log.lua',
     'math':        'math.lua',
     'minimap':     'minimap.lua',
-    'mods':        'modding.lua',      # lurek.modding
+    'mods':        'mods.lua',
     'network':     'network.lua',
     'parallax':    'parallax.lua',
-    'particle':    'particle.lua',     # lurek.particles
-    'pathfind':    'pathfinding.lua',  # lurek.pathfinding
+    'particle':    'particle.lua',
+    'pathfind':    'pathfind.lua',
     'patterns':    'patterns.lua',
     'physics':     'physics.lua',
     'pipeline':    'pipeline.lua',
     'procgen':     'procgen.lua',
     'raycaster':   'raycaster.lua',
-    'render':      'graphics.lua',     # lurek.graphic
-    'save':        'savegame.lua',     # lurek.savegame
+    'render':      'render.lua',
+    'save':        'save.lua',
     'scene':       'scene.lua',
-    'serial':      'serial.lua',       # lurek.codec
+    'serial':      'serial.lua',
     'spine':       'spine.lua',
-    'sprite':      'sprite.lua',       # may not exist yet — shows as missing
-    'system':      'system.lua',       # lurek.platform — may not exist yet
+    'sprite':      'sprite.lua',
+    'system':      'system.lua',
     'terminal':    'terminal.lua',
     'thread':      'thread.lua',
     'tilemap':     'tilemap.lua',
-    'timer':       'timer.lua',        # lurek.time
+    'timer':       'timer.lua',
     'tween':       'tween.lua',
-    'ui':          'gui.lua',          # lurek.ui
+    'ui':          'ui.lua',
     'window':      'window.lua',
 }
 
 # Maps JSON module key  →  lurek.* namespace used in example files
+# Namespace = src/ folder name exactly (e.g. src/render/ -> lurek.render)
 NAMESPACE_MAP: dict[str, str] = {
-    'ai': 'ai', 'animation': 'animation', 'audio': 'audio',
-    'automation': 'simulator', 'camera': 'camera', 'collision': 'collision',
-    'compute': 'compute', 'data': 'data', 'dataframe': 'dataframe',
-    'debugbridge': 'debugbridge', 'devtools': 'devtools', 'docs': 'docs',
-    'ecs': 'entity', 'effect': 'overlay', 'engine': 'engine',
-    'event': 'signal', 'filesystem': 'fs', 'graph': 'graph',
-    'i18n': 'localization', 'image': 'img', 'input': 'keyboard',
-    'light': 'light', 'log': 'log', 'math': 'math', 'minimap': 'minimap',
-    'mods': 'modding', 'network': 'network', 'parallax': 'parallax',
-    'particle': 'particles', 'pathfind': 'pathfinding', 'patterns': 'patterns',
-    'physics': 'physics', 'pipeline': 'pipeline', 'procgen': 'procgen',
-    'raycaster': 'raycaster', 'render': 'graphic', 'save': 'savegame',
-    'scene': 'scene', 'serial': 'codec', 'spine': 'spine', 'sprite': 'sprite',
-    'system': 'platform', 'terminal': 'terminal', 'thread': 'thread',
-    'tilemap': 'tilemap', 'timer': 'time', 'tween': 'tween',
-    'ui': 'ui', 'window': 'window',
+    'ai':          'ai',
+    'animation':   'animation',
+    'audio':       'audio',
+    'automation':  'automation',
+    'camera':      'camera',
+    'collision':   'collision',
+    'compute':     'compute',
+    'data':        'data',
+    'dataframe':   'dataframe',
+    'debugbridge': 'debugbridge',
+    'devtools':    'devtools',
+    'docs':        'docs',
+    'ecs':         'ecs',
+    'effect':      'effect',
+    'engine':      'engine',
+    'event':       'event',
+    'filesystem':  'filesystem',
+    'graph':       'graph',
+    'i18n':        'i18n',
+    'image':       'image',
+    'input':       'input',
+    'light':       'light',
+    'log':         'log',
+    'math':        'math',
+    'minimap':     'minimap',
+    'mods':        'mods',
+    'network':     'network',
+    'parallax':    'parallax',
+    'particle':    'particle',
+    'pathfind':    'pathfind',
+    'patterns':    'patterns',
+    'physics':     'physics',
+    'pipeline':    'pipeline',
+    'procgen':     'procgen',
+    'raycaster':   'raycaster',
+    'render':      'render',
+    'save':        'save',
+    'scene':       'scene',
+    'serial':      'serial',
+    'spine':       'spine',
+    'sprite':      'sprite',
+    'system':      'system',
+    'terminal':    'terminal',
+    'thread':      'thread',
+    'tilemap':     'tilemap',
+    'timer':       'timer',
+    'tween':       'tween',
+    'ui':          'ui',
+    'window':      'window',
 }
 
 
@@ -116,12 +154,18 @@ class ModuleCov:
     example_file: str
     namespace: str = ''
     total: int = 0
-    covered: int = 0
+    covered: int = 0        # hand-written real code coverage
+    stub_covered: int = 0   # covered only by an auto-generated --@api-stub: block
     missing: list = field(default_factory=list)
+    stub_items: list = field(default_factory=list)  # items present only as stubs
 
     @property
     def pct(self) -> float:
         return (self.covered / self.total * 100) if self.total else 100.0
+
+    @property
+    def pct_with_stubs(self) -> float:
+        return ((self.covered + self.stub_covered) / self.total * 100) if self.total else 100.0
 
 
 def load_entries(jp: Path) -> list[ApiEntry]:
@@ -148,18 +192,40 @@ def load_entries(jp: Path) -> list[ApiEntry]:
     return out
 
 
-def load_texts(d: Path) -> dict[str, str]:
-    """Load all .lua files, stripping comment lines for matching."""
-    out: dict[str, str] = {}
+def load_texts(d: Path) -> dict[str, tuple[str, str]]:
+    """Load all .lua files.
+
+    Returns a dict of filename -> (real_code, stub_markers) where:
+      - real_code: non-comment lines only (for real coverage matching)
+      - stub_markers: the set of api-stub marker names found (--@api-stub: X)
+    """
+    out: dict[str, tuple[str, str]] = {}
     for p in d.glob('*.lua'):
         raw = p.read_text(encoding='utf-8', errors='replace')
-        # Keep only non-comment lines for coverage matching
-        code_lines = [ln for ln in raw.splitlines() if not ln.lstrip().startswith('--')]
-        out[p.name] = '\n'.join(code_lines)
+        code_lines = []
+        stub_ids: set[str] = set()
+        for ln in raw.splitlines():
+            stripped = ln.lstrip()
+            if stripped.startswith('--@api-stub:'):
+                # Extract the api id: --@api-stub: Owner:name  or  lurek.ns.name
+                marker = stripped[len('--@api-stub:'):].strip()
+                stub_ids.add(marker)
+            elif not stripped.startswith('--'):
+                code_lines.append(ln)
+        out[p.name] = ('\n'.join(code_lines), stub_ids)
     return out
 
 
-def build_cov(entries: list[ApiEntry], texts: dict[str, str]) -> dict[str, ModuleCov]:
+def _match_name(entry: 'ApiEntry', text: str) -> bool:
+    """Return True if entry is called in hand-written code."""
+    if entry.is_method:
+        pat = r':' + re.escape(entry.name) + r'\s*\('
+    else:
+        pat = r'\b' + re.escape(entry.name) + r'\s*\('
+    return bool(re.search(pat, text))
+
+
+def build_cov(entries: list[ApiEntry], texts: dict[str, tuple[str, set]]) -> dict[str, ModuleCov]:
     bk: dict[str, ModuleCov] = {}
     for e in entries:
         key = e.module
@@ -171,60 +237,94 @@ def build_cov(entries: list[ApiEntry], texts: dict[str, str]) -> dict[str, Modul
             )
         mc = bk[key]
         mc.total += 1
-        text = texts.get(mc.example_file, '')
-        if not text:
+
+        pair = texts.get(mc.example_file)
+        if not pair:
             mc.missing.append(e.name)
             continue
-        # Methods: :methodName(   Functions: word-boundary match (catches aliases)
+
+        real_code, stub_ids = pair
+
+        # Build the stub marker id for this entry
         if e.is_method:
-            pat = r':' + re.escape(e.name) + r'\s*\('
+            stub_id = f'{e.owner_type}:{e.name}'
         else:
-            pat = r'\b' + re.escape(e.name) + r'\s*\('
-        if re.search(pat, text):
+            stub_id = f'lurek.{NAMESPACE_MAP.get(key, key)}.{e.name}'
+
+        if _match_name(e, real_code):
             mc.covered += 1
+        elif stub_id in stub_ids:
+            mc.stub_covered += 1
+            mc.stub_items.append(e.name)
         else:
             mc.missing.append(e.name)
     return bk
 
 
 def print_summary(bk: dict[str, ModuleCov], filt: str | None = None) -> None:
-    print(f"\n{'Module':<18} {'Namespace':<18} {'Example':<22} {'Cov':>4} {'Tot':>4} {'%':>5}")
-    print('-' * 76)
-    tc = ta = 0
+    print(f"\n{'Module':<18} {'Namespace':<18} {'Example':<22} {'Cov':>4} {'Stub':>4} {'Tot':>4} {'%':>5}")
+    print('-' * 80)
+    tc = ts = ta = 0
     for k, mc in sorted(bk.items()):
         if filt and filt.lower() not in k.lower():
             continue
         flag = ' MISSING' if not (EXAMPLES_DIR / mc.example_file).exists() else ''
+        stub_flag = ' [STUBS]' if mc.stub_items else ''
         ns = f"lurek.{mc.namespace}"
-        print(f'{k:<18} {ns:<18} {mc.example_file:<22} {mc.covered:>4} {mc.total:>4} {mc.pct:>4.0f}%{flag}')
+        print(f'{k:<18} {ns:<18} {mc.example_file:<22} {mc.covered:>4} {mc.stub_covered:>4} {mc.total:>4} {mc.pct_with_stubs:>4.0f}%{flag}{stub_flag}')
         tc += mc.covered
+        ts += mc.stub_covered
         ta += mc.total
-    print('-' * 76)
-    total_pct = (tc / ta * 100) if ta else 100.0
-    print(f"{'TOTAL':<58} {tc:>4} {ta:>4} {total_pct:>4.0f}%")
+    print('-' * 80)
+    total_pct = ((tc + ts) / ta * 100) if ta else 100.0
+    print(f"{'TOTAL':<62} {tc:>4} {ts:>4} {ta:>4} {total_pct:>4.0f}%")
+    if ts:
+        print(f"\n  NOTE: {ts} item(s) covered only by auto-stubs (--@api-stub: markers).")
+        print(f"        Run --stubs to see which modules need fleshing out.")
+
+
+def print_stubs(bk: dict[str, ModuleCov], filt: str | None = None) -> None:
+    """Show modules that still have --@api-stub: blocks remaining."""
+    found = False
+    for k, mc in sorted(bk.items()):
+        if filt and filt.lower() not in k.lower():
+            continue
+        if not mc.stub_items:
+            continue
+        found = True
+        print(f'\n[{k}] lurek.{mc.namespace} -> {mc.example_file}: {len(mc.stub_items)} stub(s) remaining')
+        for fn in sorted(mc.stub_items):
+            print(f'  --@api-stub: {fn}')
+    if not found:
+        print('No stub blocks remaining. All modules have real scenario code.')
 
 
 def print_missing(bk: dict[str, ModuleCov], filt: str | None = None) -> None:
     for k, mc in sorted(bk.items()):
         if filt and filt.lower() not in k.lower():
             continue
-        if not mc.missing:
+        if not mc.missing and not mc.stub_items:
             continue
         exists = (EXAMPLES_DIR / mc.example_file).exists()
         status = '' if exists else ' (FILE MISSING)'
-        print(f'\n[{k}] lurek.{mc.namespace} -> {mc.example_file}{status} ({mc.pct:.0f}%)')
+        real_pct = mc.pct
+        print(f'\n[{k}] lurek.{mc.namespace} -> {mc.example_file}{status} ({real_pct:.0f}% real, {mc.stub_covered} stub)')
         for fn in sorted(mc.missing):
-            print(f'  - {fn}')
+            print(f'  - {fn}  [NOT COVERED]')
+        for fn in sorted(mc.stub_items):
+            print(f'  ~ {fn}  [stub only -- needs real scenario]')
 
 
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--json',    action='store_true', help='Machine-readable JSON output')
-    p.add_argument('--missing', action='store_true', help='Show only missing items per module')
-    p.add_argument('--summary', action='store_true', help='Show summary table (default)')
-    p.add_argument('--report',  action='store_true', help='CI gate: exit 1 if any gaps exist')
-    p.add_argument('--module',  metavar='NAME',      help='Filter to one module')
+    p.add_argument('--json',      action='store_true', help='Machine-readable JSON output')
+    p.add_argument('--missing',   action='store_true', help='Show only missing items per module')
+    p.add_argument('--stubs',     action='store_true', help='Show modules with --@api-stub: blocks remaining')
+    p.add_argument('--summary',   action='store_true', help='Show summary table (default)')
+    p.add_argument('--report',    action='store_true', help='CI gate: exit 1 if any gaps exist')
+    p.add_argument('--no-stubs',  action='store_true', help='With --report: also fail if any stub blocks remain')
+    p.add_argument('--module',    metavar='NAME',      help='Filter to one module')
     args = p.parse_args()
 
     if not API_JSON.exists():
@@ -238,7 +338,8 @@ def main() -> int:
     if args.module:
         bk = {k: v for k, v in bk.items() if args.module.lower() in k.lower()}
 
-    has_gaps = any(mc.pct < 100.0 for mc in bk.values())
+    has_gaps  = any(len(mc.missing) > 0 for mc in bk.values())
+    has_stubs = any(len(mc.stub_items) > 0 for mc in bk.values())
 
     if args.json:
         print(json.dumps({
@@ -247,21 +348,33 @@ def main() -> int:
                 'example_file': mc.example_file,
                 'file_exists':  (EXAMPLES_DIR / mc.example_file).exists(),
                 'covered':      mc.covered,
+                'stub_covered': mc.stub_covered,
                 'total':        mc.total,
-                'pct':          round(mc.pct, 1),
+                'pct':          round(mc.pct_with_stubs, 1),
                 'missing':      sorted(mc.missing),
+                'stub_items':   sorted(mc.stub_items),
             }
             for k, mc in sorted(bk.items())
         }, indent=2))
     elif args.missing:
-        print_missing(bk)
+        print_missing(bk, filt=args.module)
+    elif args.stubs:
+        print_stubs(bk, filt=args.module)
     else:
         print_summary(bk, filt=args.module)
 
-    if args.report and has_gaps:
-        gaps = sum(1 for mc in bk.values() if mc.pct < 100.0)
-        print(f'\n[REPORT] {gaps} module(s) below 100% example coverage.')
-        return 1
+    if args.report:
+        failures = []
+        if has_gaps:
+            gaps = sum(1 for mc in bk.values() if mc.missing)
+            failures.append(f'{gaps} module(s) have uncovered API items (not even stub).')
+        if args.no_stubs and has_stubs:
+            stubs = sum(1 for mc in bk.values() if mc.stub_items)
+            failures.append(f'{stubs} module(s) still have --@api-stub: blocks (not real scenarios).')
+        if failures:
+            for f in failures:
+                print(f'\n[REPORT] {f}')
+            return 1
 
     return 1 if has_gaps else 0
 

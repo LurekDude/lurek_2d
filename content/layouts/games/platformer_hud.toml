@@ -1,0 +1,165 @@
+# platformer_hud.toml — 2D platformer in-game HUD
+# Viewport: 1280 × 720
+# Contains: lives badge, coin counter, countdown timer, score display,
+#           power-up slot, boss HP bar (shown when boss is present)
+
+[root]
+widget_type = "panel"
+id          = "platformer_hud_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Lives (top-left) ──────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "♥"
+x = 24.0
+y = 16.0
+w = 24.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "lives_badge"
+x = 48.0
+y = 16.0
+w = 40.0
+h = 40.0
+tooltip = "Lives remaining"
+
+[[root.children]]
+widget_type = "label"
+id = "lives_val"
+text = "× 3"
+x = 88.0
+y = 24.0
+w = 40.0
+h = 24.0
+
+# ── Coin counter ──────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "●"
+x = 152.0
+y = 16.0
+w = 24.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "coin_val"
+text = "× 47"
+x = 176.0
+y = 16.0
+w = 64.0
+h = 24.0
+tooltip = "Coins collected"
+
+# ── Score (top-centre) ────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Score"
+x = 552.0
+y = 16.0
+w = 80.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+id = "score_val"
+text = "00023450"
+x = 512.0
+y = 32.0
+w = 160.0
+h = 24.0
+
+# ── Timer (top-right) ────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Time"
+x = 1112.0
+y = 16.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "label"
+id = "timer_val"
+text = "298"
+x = 1112.0
+y = 32.0
+w = 80.0
+h = 24.0
+tooltip = "Seconds remaining"
+
+# ── Power-up slot ────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Power-up"
+x = 24.0
+y = 64.0
+w = 80.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "powerup_slot"
+text = ""
+x = 24.0
+y = 80.0
+w = 48.0
+h = 48.0
+tooltip = "Active power-up (press X to activate)"
+
+[[root.children]]
+widget_type = "label"
+id = "powerup_name"
+text = "Fire Flower"
+x = 72.0
+y = 96.0
+w = 120.0
+h = 24.0
+
+# ── World / stage label ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "stage_label"
+text = "World 3-2"
+x = 544.0
+y = 16.0
+w = 200.0
+h = 16.0
+visible = false
+
+# ── Boss HP bar (hidden until boss fight) ────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "boss_name_label"
+text = "King Bone Dragon"
+x = 392.0
+y = 664.0
+w = 504.0
+h = 24.0
+visible = false
+
+[[root.children]]
+widget_type = "progressbar"
+id = "boss_hp_bar"
+x = 392.0
+y = 688.0
+w = 504.0
+h = 24.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip = "Boss HP"
+visible = false

@@ -1,0 +1,225 @@
+# settings_menu.toml — Game settings screen (Video / Audio / Controls tabs)
+# Viewport: 900 × 640 (overlay window)
+# Contains: tab bar, video settings (resolution, fullscreen, vsync, gamma),
+#           audio settings (master/music/sfx/voice sliders), Apply / Cancel
+
+[root]
+widget_type = "window"
+id          = "settings_window"
+text        = "Settings"
+x = 192.0
+y = 40.0
+w = 904.0
+h = 640.0
+
+[[root.children]]
+widget_type = "tabbar"
+id = "settings_tabs"
+x = 24.0
+y = 56.0
+w = 864.0
+h = 32.0
+text = "Video|Audio|Controls|Keybinds"
+
+# ── Video settings ────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Resolution"
+x = 40.0
+y = 104.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "combobox"
+id = "res_combo"
+x = 192.0
+y = 104.0
+w = 224.0
+h = 32.0
+text = "1920×1080|1280×720|2560×1440|3840×2160"
+tooltip = "Display resolution"
+
+[[root.children]]
+widget_type = "label"
+text = "Fullscreen"
+x = 40.0
+y = 152.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "checkbox"
+id = "fullscreen_cb"
+text = "Enable fullscreen"
+x = 192.0
+y = 144.0
+w = 224.0
+h = 32.0
+checked = true
+
+[[root.children]]
+widget_type = "label"
+text = "VSync"
+x = 40.0
+y = 192.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "checkbox"
+id = "vsync_cb"
+text = "Enable VSync"
+x = 192.0
+y = 192.0
+w = 224.0
+h = 32.0
+checked = true
+
+[[root.children]]
+widget_type = "label"
+text = "Gamma"
+x = 40.0
+y = 240.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "gamma_slider"
+x = 192.0
+y = 232.0
+w = 304.0
+h = 32.0
+min = 0.5
+max = 2.0
+value = 1.0
+tooltip = "Display gamma (default: 1.0)"
+
+[[root.children]]
+widget_type = "label"
+text = "Render Scale"
+x = 40.0
+y = 280.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "render_scale"
+x = 192.0
+y = 280.0
+w = 304.0
+h = 32.0
+min = 50.0
+max = 200.0
+value = 100.0
+tooltip = "Internal render resolution as % of display (100 = native)"
+
+# ── Audio settings ────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Master Volume"
+x = 40.0
+y = 344.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "vol_master"
+x = 192.0
+y = 344.0
+w = 304.0
+h = 32.0
+min = 0.0
+max = 100.0
+value = 80.0
+
+[[root.children]]
+widget_type = "label"
+text = "Music"
+x = 40.0
+y = 392.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "vol_music"
+x = 192.0
+y = 384.0
+w = 304.0
+h = 32.0
+min = 0.0
+max = 100.0
+value = 70.0
+
+[[root.children]]
+widget_type = "label"
+text = "Sound Effects"
+x = 40.0
+y = 432.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "vol_sfx"
+x = 192.0
+y = 432.0
+w = 304.0
+h = 32.0
+min = 0.0
+max = 100.0
+value = 90.0
+
+[[root.children]]
+widget_type = "label"
+text = "Voice"
+x = 40.0
+y = 480.0
+w = 144.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "vol_voice"
+x = 192.0
+y = 472.0
+w = 304.0
+h = 32.0
+min = 0.0
+max = 100.0
+value = 100.0
+
+# ── Footer buttons ────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "apply_btn"
+text = "Apply"
+x = 624.0
+y = 592.0
+w = 120.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "cancel_btn"
+text = "Cancel"
+x = 752.0
+y = 592.0
+w = 120.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "defaults_btn"
+text = "Restore Defaults"
+x = 40.0
+y = 592.0
+w = 160.0
+h = 40.0

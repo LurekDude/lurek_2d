@@ -1,0 +1,169 @@
+
+[root]
+widget_type = "panel"
+id = "profile_card_root"
+x = 0.0
+y = 0.0
+w = 400.0
+h = 560.0
+
+[[root.children]]
+widget_type = "panel"
+id = "cover_photo"
+x = 0.0
+y = 0.0
+w = 400.0
+h = 120.0
+tooltip = "Cover photo"
+
+[[root.children]]
+widget_type = "panel"
+id = "avatar_slot"
+x = 24.0
+y = 72.0
+w = 96.0
+h = 96.0
+tooltip = "Profile avatar"
+
+[[root.children]]
+widget_type = "button"
+id = "edit_profile_btn"
+text = "Edit Profile"
+x = 264.0
+y = 128.0
+w = 120.0
+h = 32.0
+tooltip = "Edit your profile"
+
+[[root.children]]
+widget_type = "label"
+id = "display_name"
+text = "Tomasz Błądkowski"
+x = 24.0
+y = 176.0
+w = 352.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "username"
+text = "@tomaszb"
+x = 24.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "user_title"
+text = "Game Engine Developer · Lurek2D"
+x = 24.0
+y = 232.0
+w = 352.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "location"
+text = "📍 Kraków, Poland"
+x = 24.0
+y = 256.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "join_date"
+text = "🗓 Joined January 2020"
+x = 24.0
+y = 280.0
+w = 232.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "bio_text"
+text = "Building Lurek2D — a 2D engine in Rust + Lua. Open source enthusiast, coffee-driven developer."
+x = 24.0
+y = 312.0
+w = 352.0
+h = 56.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_posts_val"
+text = "142"
+x = 24.0
+y = 376.0
+w = 80.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Posts"
+x = 24.0
+y = 408.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_followers_val"
+text = "2.4K"
+x = 144.0
+y = 376.0
+w = 80.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Followers"
+x = 144.0
+y = 408.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "stat_following_val"
+text = "318"
+x = 280.0
+y = 376.0
+w = 80.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Following"
+x = 280.0
+y = 408.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "follow_btn"
+text = "Follow"
+x = 24.0
+y = 448.0
+w = 160.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "message_btn"
+text = "Message"
+x = 200.0
+y = 448.0
+w = 160.0
+h = 40.0
+
+[[root.children]]
+widget_type = "button"
+id = "share_btn"
+text = "Share Profile"
+x = 24.0
+y = 496.0
+w = 336.0
+h = 40.0
+tooltip = "Copy profile link to clipboard"

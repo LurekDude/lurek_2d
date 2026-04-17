@@ -125,14 +125,20 @@ pub struct WidgetDef {
 /// Top-level TOML layout descriptor.
 ///
 /// A TOML layout file must contain a `[root]` section holding a `WidgetDef`.
+/// The optional `resolution` key declares the canvas size as `[width, height]`.
+/// When absent the canvas defaults to `root.w` × `root.h`, then falls back to
+/// 1280 × 720. The `resolution` field is used by the headless PNG renderer
+/// (`tools/ui/render_layout.py`) to set the output image size.
 ///
 /// # Example
 ///
 /// ```toml
+/// resolution = [1280, 720]
+///
 /// [root]
 /// widget_type = "panel"
-/// w = 800.0
-/// h = 600.0
+/// w = 1280.0
+/// h = 720.0
 ///
 /// [[root.children]]
 /// widget_type = "label"
@@ -155,9 +161,14 @@ pub struct WidgetDef {
 ///
 /// # Fields
 ///
+/// - `resolution` — `[u32; 2]`. Optional `[width, height]` canvas size in pixels.
+///   Overrides `root.w` / `root.h` for the PNG render pass.
 /// - `root` — `WidgetDef`. Root widget definition.
 #[derive(Debug, Deserialize)]
 pub struct LayoutDef {
+    /// Optional explicit canvas resolution `[width, height]` in pixels.
+    /// Used by `tools/ui/render_layout.py` and `render_to_image`.
+    pub resolution: Option<[u32; 2]>,
     /// Root widget definition for the layout.
     pub root: WidgetDef,
 }

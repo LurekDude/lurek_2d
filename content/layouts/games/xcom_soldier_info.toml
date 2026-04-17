@@ -1,0 +1,452 @@
+# xcom_soldier_info.toml — XCOM individual soldier statistics screen
+# Viewport: 1280 × 720
+
+[root]
+widget_type = "panel"
+id = "soldier_info_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "prev_soldier_btn"
+x = 904.0
+y = 8.0
+w = 104.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "next_soldier_btn"
+x = 1008.0
+y = 8.0
+w = 104.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Portrait + identity
+[[root.children]]
+widget_type = "panel"
+id = "portrait_panel"
+x = 0.0
+y = 48.0
+w = 320.0
+h = 400.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "portrait_image"
+x = 64.0
+y = 16.0
+w = 200.0
+h = 224.0
+tooltip = "Soldier portrait"
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldier_rank"
+x = 16.0
+y = 248.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "soldier_name_input"
+x = 16.0
+y = 280.0
+w = 288.0
+h = 32.0
+tooltip = "Rename soldier"
+
+[[root.children.children]]
+widget_type = "label"
+id = "nationality"
+x = 16.0
+y = 320.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "missions_kills"
+x = 16.0
+y = 344.0
+w = 288.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "armor_equipped"
+x = 16.0
+y = 368.0
+w = 288.0
+h = 24.0
+
+# Stats block
+[[root.children]]
+widget_type = "panel"
+id = "stats_panel"
+x = 320.0
+y = 48.0
+w = 520.0
+h = 504.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stats_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+# Each stat: label + current/max label + progressbar
+[[root.children.children]]
+widget_type = "label"
+id = "stat_tu_lbl"
+x = 16.0
+y = 40.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_tu_bar"
+x = 184.0
+y = 40.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 80.0
+value = 60.0
+tooltip = "Time Units"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_stamina_lbl"
+x = 16.0
+y = 64.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_stamina_bar"
+x = 184.0
+y = 72.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 75.0
+tooltip = "Stamina / Energy"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_health_lbl"
+x = 16.0
+y = 96.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_health_bar"
+x = 184.0
+y = 96.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 60.0
+value = 55.0
+tooltip = "Max health"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_bravery_lbl"
+x = 16.0
+y = 120.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_bravery_bar"
+x = 184.0
+y = 120.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 110.0
+value = 70.0
+tooltip = "Bravery / Morale resistance"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_reactions_lbl"
+x = 16.0
+y = 144.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_reactions_bar"
+x = 184.0
+y = 144.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 80.0
+value = 45.0
+tooltip = "Reaction speed"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_firing_lbl"
+x = 16.0
+y = 168.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_firing_bar"
+x = 184.0
+y = 176.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 65.0
+tooltip = "Firing accuracy"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_throwing_lbl"
+x = 16.0
+y = 200.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_throwing_bar"
+x = 184.0
+y = 200.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 50.0
+tooltip = "Throwing accuracy"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_strength_lbl"
+x = 16.0
+y = 224.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_strength_bar"
+x = 184.0
+y = 224.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 60.0
+value = 30.0
+tooltip = "Strength (carry weight)"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_psistrength_lbl"
+x = 16.0
+y = 248.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_psistrength_bar"
+x = 184.0
+y = 248.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Psi strength (hidden until trained)"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_psiskill_lbl"
+x = 16.0
+y = 272.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stat_psiskill_bar"
+x = 184.0
+y = 280.0
+w = 320.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Psi skill (hidden until trained)"
+
+[[root.children.children]]
+widget_type = "label"
+id = "wound_status_lbl"
+x = 16.0
+y = 312.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "recovery_bar"
+x = 16.0
+y = 336.0
+w = 496.0
+h = 16.0
+min = 0.0
+max = 30.0
+value = 14.0
+tooltip = "Recovery days remaining"
+
+[[root.children.children]]
+widget_type = "label"
+id = "recovery_eta"
+x = 16.0
+y = 360.0
+w = 304.0
+h = 24.0
+
+# Actions
+[[root.children.children]]
+widget_type = "button"
+id = "promote_btn"
+x = 16.0
+y = 392.0
+w = 160.0
+h = 40.0
+tooltip = "Promote (if eligible)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "transfer_btn"
+x = 184.0
+y = 392.0
+w = 160.0
+h = 40.0
+tooltip = "Transfer to another base"
+
+[[root.children.children]]
+widget_type = "button"
+id = "dismiss_btn"
+x = 352.0
+y = 392.0
+w = 152.0
+h = 40.0
+tooltip = "Dismiss soldier"
+
+# Soldier list sidebar
+[[root.children]]
+widget_type = "panel"
+id = "soldier_list_panel"
+x = 840.0
+y = 48.0
+w = 440.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "list_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "sort_by"
+x = 16.0
+y = 32.0
+w = 280.0
+h = 32.0
+text = "Name|Rank|Missions|TU|HP|Firing Acc"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "soldiers_list"
+x = 8.0
+y = 72.0
+w = 432.0
+h = 600.0
+tooltip = "All soldiers at this base"
+
+# Footer — action outcomes
+[[root.children]]
+widget_type = "panel"
+id = "footer"
+x = 0.0
+y = 552.0
+w = 840.0
+h = 176.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "base_soldiers_count"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "available_for_duty"
+x = 16.0
+y = 40.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "promoted_msg"
+x = 16.0
+y = 72.0
+w = 600.0
+h = 24.0
+tooltip = "Promotion result message"

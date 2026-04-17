@@ -1,0 +1,215 @@
+# card_game_hand.toml — Card game hand / play area HUD
+# Viewport: 1280 × 720
+# Contains: 5-card hand at the bottom, mana crystals, deck/discard counters,
+#           opponent HP, player HP, turn indicator, end-turn button
+
+[root]
+widget_type = "panel"
+id          = "card_game_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Opponent info (top) ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "opp_name"
+text = "Opponent"
+x = 488.0
+y = 24.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "opp_hp_bar"
+x = 400.0
+y = 48.0
+w = 480.0
+h = 24.0
+min = 0.0
+max = 30.0
+value = 24.0
+tooltip = "Opponent HP: 24 / 30"
+
+[[root.children]]
+widget_type = "label"
+id = "opp_hp_val"
+text = "24 / 30"
+x = 888.0
+y = 48.0
+w = 80.0
+h = 24.0
+
+# ── Deck / discard piles (top-right) ─────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Deck"
+x = 1144.0
+y = 24.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "deck_count"
+x = 1144.0
+y = 48.0
+w = 56.0
+h = 56.0
+tooltip = "Cards remaining in deck"
+
+[[root.children]]
+widget_type = "label"
+text = "Discard"
+x = 1064.0
+y = 24.0
+w = 72.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "discard_count"
+x = 1064.0
+y = 48.0
+w = 56.0
+h = 56.0
+tooltip = "Cards in discard pile"
+
+# ── Play area label ───────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "turn_indicator"
+text = "Your Turn"
+x = 528.0
+y = 328.0
+w = 224.0
+h = 32.0
+
+# ── Mana crystals (bottom-left) ───────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Mana"
+x = 24.0
+y = 600.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "mana_bar"
+x = 24.0
+y = 624.0
+w = 144.0
+h = 24.0
+min = 0.0
+max = 10.0
+value = 6.0
+tooltip = "Mana crystals: 6 / 10"
+
+[[root.children]]
+widget_type = "label"
+id = "mana_val"
+text = "6 / 10"
+x = 168.0
+y = 624.0
+w = 72.0
+h = 24.0
+
+# ── 5-card hand slots (bottom-centre) ────────────────────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "card_hand_0"
+text = "Card 1"
+x = 248.0
+y = 592.0
+w = 104.0
+h = 128.0
+tooltip = "Hand: slot 1"
+
+[[root.children]]
+widget_type = "button"
+id = "card_hand_1"
+text = "Card 2"
+x = 360.0
+y = 592.0
+w = 104.0
+h = 128.0
+tooltip = "Hand: slot 2"
+
+[[root.children]]
+widget_type = "button"
+id = "card_hand_2"
+text = "Card 3"
+x = 472.0
+y = 592.0
+w = 104.0
+h = 128.0
+tooltip = "Hand: slot 3"
+
+[[root.children]]
+widget_type = "button"
+id = "card_hand_3"
+text = "Card 4"
+x = 584.0
+y = 592.0
+w = 104.0
+h = 128.0
+tooltip = "Hand: slot 4"
+
+[[root.children]]
+widget_type = "button"
+id = "card_hand_4"
+text = "Card 5"
+x = 688.0
+y = 592.0
+w = 104.0
+h = 128.0
+tooltip = "Hand: slot 5"
+
+# ── Player HP & end-turn (bottom-right) ───────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "player_name"
+text = "You"
+x = 904.0
+y = 600.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "player_hp_bar"
+x = 904.0
+y = 624.0
+w = 200.0
+h = 24.0
+min = 0.0
+max = 30.0
+value = 18.0
+tooltip = "Your HP: 18 / 30"
+
+[[root.children]]
+widget_type = "label"
+id = "player_hp_val"
+text = "18 / 30"
+x = 1112.0
+y = 624.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "end_turn_btn"
+text = "End Turn"
+x = 1104.0
+y = 664.0
+w = 160.0
+h = 48.0

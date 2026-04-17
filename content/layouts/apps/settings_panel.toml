@@ -1,0 +1,259 @@
+# settings_panel.toml — Application settings side-panel
+# Viewport: 800 × 600
+# Contains: category list (left), settings area (right) with toggles, sliders,
+#           comboboxes, and action buttons
+
+[root]
+widget_type = "panel"
+id          = "settings_root"
+x = 0.0
+y = 0.0
+w = 800.0
+h = 600.0
+
+# ── Category sidebar ─────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "category_sidebar"
+x = 0.0
+y = 0.0
+w = 200.0
+h = 600.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Settings"
+x = 16.0
+y = 16.0
+w = 168.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_profile"
+text = "Profile"
+x = 8.0
+y = 56.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_account"
+text = "Account"
+x = 8.0
+y = 96.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_appearance"
+text = "Appearance"
+x = 8.0
+y = 136.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_notifications"
+text = "Notifications"
+x = 8.0
+y = 176.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_privacy"
+text = "Privacy"
+x = 8.0
+y = 224.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_security"
+text = "Security"
+x = 8.0
+y = 264.0
+w = 184.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "cat_about"
+text = "About"
+x = 8.0
+y = 304.0
+w = 184.0
+h = 40.0
+
+# ── Settings content area ─────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "content_area"
+x = 200.0
+y = 0.0
+w = 600.0
+h = 600.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "section_heading"
+text = "Notifications"
+x = 24.0
+y = 24.0
+w = 304.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Push Notifications"
+x = 24.0
+y = 72.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "switch"
+id = "push_notif_toggle"
+x = 480.0
+y = 64.0
+w = 64.0
+h = 32.0
+on = true
+tooltip = "Enable / disable push notifications"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Email Digest"
+x = 24.0
+y = 112.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "switch"
+id = "email_digest_toggle"
+x = 480.0
+y = 104.0
+w = 64.0
+h = 32.0
+on = false
+
+[[root.children.children]]
+widget_type = "label"
+text = "Notification Sound"
+x = 24.0
+y = 152.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "slider"
+id = "notif_volume"
+x = 312.0
+y = 152.0
+w = 232.0
+h = 32.0
+min = 0.0
+max = 100.0
+value = 70.0
+tooltip = "Notification volume"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Quiet Hours Start"
+x = 24.0
+y = 200.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "quiet_start"
+x = 312.0
+y = 192.0
+w = 160.0
+h = 32.0
+text = "10:00 PM|9:00 PM|11:00 PM|Midnight"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Quiet Hours End"
+x = 24.0
+y = 240.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "quiet_end"
+x = 312.0
+y = 240.0
+w = 160.0
+h = 32.0
+text = "7:00 AM|6:00 AM|8:00 AM|9:00 AM"
+
+[[root.children.children]]
+widget_type = "label"
+text = "Notify for:"
+x = 24.0
+y = 304.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "checkbox"
+id = "notif_mentions"
+text = "Mentions"
+x = 24.0
+y = 328.0
+w = 184.0
+h = 24.0
+checked = true
+
+[[root.children.children]]
+widget_type = "checkbox"
+id = "notif_messages"
+text = "Direct Messages"
+x = 24.0
+y = 360.0
+w = 200.0
+h = 24.0
+checked = true
+
+[[root.children.children]]
+widget_type = "checkbox"
+id = "notif_updates"
+text = "Product Updates"
+x = 24.0
+y = 392.0
+w = 200.0
+h = 24.0
+checked = false
+
+# ── Footer actions ────────────────────────────────────────────────────────────
+
+[[root.children.children]]
+widget_type = "button"
+id = "save_btn"
+text = "Save Changes"
+x = 392.0
+y = 552.0
+w = 160.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "discard_btn"
+text = "Discard"
+x = 256.0
+y = 552.0
+w = 120.0
+h = 40.0

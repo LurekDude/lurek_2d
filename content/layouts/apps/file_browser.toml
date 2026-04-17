@@ -1,0 +1,304 @@
+# file_browser.toml — Filesystem browser UI
+# Viewport: 1000 × 700
+# Contains: toolbar (nav buttons, path bar, search), file/folder list panel,
+#           status bar with item count and selection info
+
+[root]
+widget_type = "panel"
+id          = "file_browser_root"
+x = 0.0
+y = 0.0
+w = 1000.0
+h = 704.0
+
+# ── Toolbar ───────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "toolbar"
+x = 0.0
+y = 0.0
+w = 1000.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "nav_back"
+text = "←"
+x = 8.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Back"
+
+[[root.children.children]]
+widget_type = "button"
+id = "nav_forward"
+text = "→"
+x = 48.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Forward"
+
+[[root.children.children]]
+widget_type = "button"
+id = "nav_up"
+text = "↑"
+x = 96.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Up one level"
+
+[[root.children.children]]
+widget_type = "button"
+id = "nav_home"
+text = "⌂"
+x = 136.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Go to Home"
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "path_bar"
+x = 176.0
+y = 8.0
+w = 520.0
+h = 32.0
+text = "/home/user/Documents"
+tooltip = "Current path — edit to navigate"
+
+[[root.children.children]]
+widget_type = "button"
+id = "path_go"
+text = "Go"
+x = 704.0
+y = 8.0
+w = 40.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "search_bar"
+x = 752.0
+y = 8.0
+w = 200.0
+h = 32.0
+placeholder = "Search files…"
+
+[[root.children.children]]
+widget_type = "button"
+id = "search_btn"
+text = "🔍"
+x = 960.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Run search"
+
+# ── Second toolbar row (actions) ──────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "action_bar"
+x = 0.0
+y = 48.0
+w = 1000.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_new_folder"
+text = "New Folder"
+x = 8.0
+y = 8.0
+w = 104.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_upload"
+text = "Upload"
+x = 112.0
+y = 8.0
+w = 80.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_cut"
+text = "Cut"
+x = 200.0
+y = 8.0
+w = 64.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_copy"
+text = "Copy"
+x = 264.0
+y = 8.0
+w = 64.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_paste"
+text = "Paste"
+x = 336.0
+y = 8.0
+w = 64.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_rename"
+text = "Rename"
+x = 400.0
+y = 8.0
+w = 80.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_delete"
+text = "Delete"
+x = 488.0
+y = 8.0
+w = 72.0
+h = 32.0
+tooltip = "Move selected to trash"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_properties"
+text = "Properties"
+x = 560.0
+y = 8.0
+w = 88.0
+h = 32.0
+
+# ── Sidebar + file list ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "sidebar"
+x = 0.0
+y = 88.0
+w = 184.0
+h = 584.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Bookmarks"
+x = 16.0
+y = 8.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Desktop"
+x = 8.0
+y = 32.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Documents"
+x = 8.0
+y = 64.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Downloads"
+x = 8.0
+y = 96.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Pictures"
+x = 8.0
+y = 128.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Music"
+x = 8.0
+y = 160.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Videos"
+x = 8.0
+y = 192.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+text = "Devices"
+x = 16.0
+y = 248.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "Local Disk (C:)"
+x = 8.0
+y = 272.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+text = "USB Drive (D:)"
+x = 8.0
+y = 304.0
+w = 176.0
+h = 32.0
+
+# ── File list area ─────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "file_list"
+x = 184.0
+y = 88.0
+w = 824.0
+h = 584.0
+tooltip = "File listing area"
+
+# ── Status bar ────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "status_bar"
+text = "42 items  |  Selected: report.pdf (1.4 MB)"
+x = 8.0
+y = 680.0
+w = 840.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "disk_free"
+text = "Free space: 64.3 GB"
+x = 824.0
+y = 680.0
+w = 184.0
+h = 24.0

@@ -1,0 +1,423 @@
+# xcom_craft_equipment.toml — XCOM Skyranger/Firestorm loadout screen
+# Viewport: 1280 × 720
+# Contains: craft overview, weapon hardpoints, fuel/hull bars,
+#           soldier manifest, equipment cargo grid
+
+[root]
+widget_type = "panel"
+id = "craft_equip_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 400.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "craft_selector"
+x = 504.0
+y = 8.0
+w = 280.0
+h = 32.0
+text = "Skyranger-1|Skyranger-2|Firestorm-1"
+tooltip = "Select craft to equip"
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Craft overview panel
+[[root.children]]
+widget_type = "panel"
+id = "craft_overview"
+x = 0.0
+y = 48.0
+w = 480.0
+h = 304.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "craft_image"
+x = 8.0
+y = 8.0
+w = 224.0
+h = 184.0
+tooltip = "Craft silhouette"
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_name"
+x = 240.0
+y = 8.0
+w = 240.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_type"
+x = 240.0
+y = 40.0
+w = 240.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "craft_status"
+x = 240.0
+y = 64.0
+w = 240.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "hull_label"
+x = 240.0
+y = 88.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hull_bar"
+x = 240.0
+y = 112.0
+w = 240.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 100.0
+tooltip = "Hull integrity"
+
+[[root.children.children]]
+widget_type = "label"
+id = "fuel_label"
+x = 240.0
+y = 136.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "fuel_bar"
+x = 240.0
+y = 160.0
+w = 240.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 80.0
+tooltip = "Fuel"
+
+[[root.children.children]]
+widget_type = "label"
+id = "range_label"
+x = 8.0
+y = 200.0
+w = 464.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "speed_label"
+x = 8.0
+y = 224.0
+w = 464.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldiers_capacity"
+x = 8.0
+y = 248.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cargo_capacity"
+x = 8.0
+y = 272.0
+w = 304.0
+h = 24.0
+
+# Weapon hardpoints
+[[root.children]]
+widget_type = "panel"
+id = "hardpoints_panel"
+x = 480.0
+y = 48.0
+w = 360.0
+h = 304.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "hardpoints_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "hardpoint_left"
+x = 16.0
+y = 40.0
+w = 160.0
+h = 120.0
+tooltip = "Left weapon hardpoint"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "hardpoint_right"
+x = 184.0
+y = 40.0
+w = 160.0
+h = 120.0
+tooltip = "Right weapon hardpoint"
+
+[[root.children.children]]
+widget_type = "label"
+id = "hp_left_name"
+x = 16.0
+y = 160.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hp_left_ammo"
+x = 16.0
+y = 184.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 40.0
+tooltip = "Left weapon ammo"
+
+[[root.children.children]]
+widget_type = "label"
+id = "hp_right_name"
+x = 184.0
+y = 160.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hp_right_ammo"
+x = 184.0
+y = 184.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 20.0
+tooltip = "Right weapon ammo"
+
+[[root.children.children]]
+widget_type = "button"
+id = "change_weapon_left_btn"
+x = 16.0
+y = 208.0
+w = 160.0
+h = 32.0
+tooltip = "Change left weapon"
+
+[[root.children.children]]
+widget_type = "button"
+id = "change_weapon_right_btn"
+x = 184.0
+y = 208.0
+w = 160.0
+h = 32.0
+tooltip = "Change right weapon"
+
+[[root.children.children]]
+widget_type = "button"
+id = "rearm_btn"
+x = 16.0
+y = 248.0
+w = 336.0
+h = 32.0
+tooltip = "Rearm all weapons from stores"
+
+# Soldier manifest
+[[root.children]]
+widget_type = "panel"
+id = "soldier_manifest_panel"
+x = 840.0
+y = 48.0
+w = 440.0
+h = 304.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "manifest_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "manifest_count"
+x = 320.0
+y = 8.0
+w = 112.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "manifest_list"
+x = 8.0
+y = 32.0
+w = 432.0
+h = 200.0
+tooltip = "Soldiers assigned to this mission"
+
+[[root.children.children]]
+widget_type = "button"
+id = "add_soldier_btn"
+x = 8.0
+y = 240.0
+w = 216.0
+h = 32.0
+tooltip = "Add soldier to manifest"
+
+[[root.children.children]]
+widget_type = "button"
+id = "remove_soldier_btn"
+x = 224.0
+y = 240.0
+w = 216.0
+h = 32.0
+tooltip = "Remove selected soldier"
+
+# Equipment cargo grid
+[[root.children]]
+widget_type = "panel"
+id = "cargo_panel"
+x = 0.0
+y = 352.0
+w = 840.0
+h = 376.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cargo_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "cargo_bar"
+x = 320.0
+y = 16.0
+w = 304.0
+h = 16.0
+min = 0.0
+max = 80.0
+value = 44.0
+tooltip = "Cargo space used / max"
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "cargo_filter"
+x = 632.0
+y = 8.0
+w = 200.0
+h = 32.0
+text = "All|Weapons|Ammo|Grenades|Medkits|Armor"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "cargo_grid"
+x = 8.0
+y = 40.0
+w = 832.0
+h = 304.0
+tooltip = "Mission cargo — drag items to add or remove"
+
+[[root.children.children]]
+widget_type = "button"
+id = "load_standard_btn"
+x = 8.0
+y = 352.0
+w = 200.0
+h = 32.0
+tooltip = "Load standard loadout preset"
+
+[[root.children.children]]
+widget_type = "button"
+id = "unload_all_btn"
+x = 216.0
+y = 352.0
+w = 200.0
+h = 32.0
+tooltip = "Remove all cargo"
+
+# Right info / SHQ panel
+[[root.children]]
+widget_type = "panel"
+id = "shq_panel"
+x = 840.0
+y = 352.0
+w = 440.0
+h = 376.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "shq_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "available_soldiers"
+x = 8.0
+y = 32.0
+w = 432.0
+h = 224.0
+tooltip = "Soldiers available at base (not assigned)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "deploy_btn"
+x = 8.0
+y = 272.0
+w = 432.0
+h = 48.0
+tooltip = "Deploy craft to mission"
+
+[[root.children.children]]
+widget_type = "label"
+id = "eta_label"
+x = 8.0
+y = 328.0
+w = 432.0
+h = 24.0
+tooltip = "Travel time to target"

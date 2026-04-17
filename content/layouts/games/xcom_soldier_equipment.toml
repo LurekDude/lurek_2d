@@ -1,0 +1,453 @@
+
+[root]
+widget_type = "panel"
+id = "equip_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "soldier_view"
+x = 0.0
+y = 0.0
+w = 320.0
+h = 464.0
+tooltip = "Soldier 3D equipment view"
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldier_name"
+x = 8.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldier_rank"
+x = 8.0
+y = 32.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "soldier_3d_canvas"
+x = 96.0
+y = 56.0
+w = 200.0
+h = 384.0
+tooltip = "Equipment preview"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_head"
+x = 112.0
+y = 64.0
+w = 104.0
+h = 64.0
+tooltip = "Head armour / helmet"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_torso"
+x = 96.0
+y = 144.0
+w = 128.0
+h = 104.0
+tooltip = "Torso armour"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_right_hand"
+x = 8.0
+y = 152.0
+w = 88.0
+h = 80.0
+tooltip = "Right hand"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_left_hand"
+x = 232.0
+y = 152.0
+w = 88.0
+h = 80.0
+tooltip = "Left hand"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_legs"
+x = 96.0
+y = 256.0
+w = 128.0
+h = 80.0
+tooltip = "Legs armour"
+
+[[root.children.children]]
+widget_type = "label"
+id = "belt_label"
+x = 8.0
+y = 376.0
+w = 64.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_0"
+x = 8.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 1"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_1"
+x = 48.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 2"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_2"
+x = 88.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 3"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_3"
+x = 128.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 4"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_4"
+x = 168.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 5"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_5"
+x = 208.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 6"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_6"
+x = 248.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 7"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "belt_slot_7"
+x = 296.0
+y = 392.0
+w = 40.0
+h = 40.0
+tooltip = "Belt slot 8"
+
+[[root.children]]
+widget_type = "panel"
+id = "backpack_panel"
+x = 0.0
+y = 464.0
+w = 320.0
+h = 264.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "backpack_label"
+x = 8.0
+y = 8.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "guitable"
+id = "backpack_grid"
+x = 8.0
+y = 32.0
+w = 304.0
+h = 224.0
+tooltip = "4×5 backpack grid"
+
+[[root.children]]
+widget_type = "panel"
+id = "ground_panel"
+x = 320.0
+y = 0.0
+w = 640.0
+h = 720.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "ground_label"
+x = 8.0
+y = 8.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "ground_search"
+x = 8.0
+y = 32.0
+w = 400.0
+h = 32.0
+placeholder = "Filter items…"
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "ground_category"
+x = 416.0
+y = 32.0
+w = 208.0
+h = 32.0
+text = "All|Weapons|Ammo|Grenades|Armor|Medkits|Misc"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "ground_grid"
+x = 8.0
+y = 72.0
+w = 624.0
+h = 600.0
+tooltip = "All available ground items — drag to equip"
+
+[[root.children.children]]
+widget_type = "label"
+id = "weight_label"
+x = 8.0
+y = 680.0
+w = 304.0
+h = 24.0
+tooltip = "Soldier carry weight"
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "weight_bar"
+x = 8.0
+y = 704.0
+w = 304.0
+h = 16.0
+min = 0.0
+max = 80.0
+value = 44.0
+tooltip = "Encumbrance (affects TU penalty)"
+
+[[root.children]]
+widget_type = "panel"
+id = "item_info_panel"
+x = 960.0
+y = 0.0
+w = 320.0
+h = 560.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_name"
+x = 8.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "item_image"
+x = 8.0
+y = 32.0
+w = 304.0
+h = 160.0
+tooltip = "Item sprite"
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_category"
+x = 8.0
+y = 200.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_weight"
+x = 8.0
+y = 224.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_accuracy"
+x = 8.0
+y = 248.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_damage"
+x = 8.0
+y = 272.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_tu_cost"
+x = 8.0
+y = 296.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_ammo"
+x = 8.0
+y = 320.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_desc"
+x = 8.0
+y = 344.0
+w = 304.0
+h = 80.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "use_item_btn"
+x = 8.0
+y = 432.0
+w = 144.0
+h = 32.0
+tooltip = "Equip to selected slot"
+
+[[root.children.children]]
+widget_type = "button"
+id = "drop_item_btn"
+x = 160.0
+y = 432.0
+w = 144.0
+h = 32.0
+tooltip = "Drop to ground"
+
+[[root.children]]
+widget_type = "panel"
+id = "soldier_stats_panel"
+x = 960.0
+y = 560.0
+w = 320.0
+h = 160.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stats_title"
+x = 8.0
+y = 8.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_tu"
+x = 8.0
+y = 32.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_str"
+x = 160.0
+y = 32.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_hp"
+x = 8.0
+y = 56.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_bravery"
+x = 160.0
+y = 56.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_reactions"
+x = 8.0
+y = 80.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_firing"
+x = 160.0
+y = 80.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_throwing"
+x = 8.0
+y = 104.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "stat_psistrength"
+x = 160.0
+y = 104.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "auto_equip_btn"
+x = 8.0
+y = 128.0
+w = 144.0
+h = 32.0
+tooltip = "Auto-equip optimal loadout"
+
+[[root.children.children]]
+widget_type = "button"
+id = "ok_btn"
+x = 160.0
+y = 128.0
+w = 144.0
+h = 32.0
+tooltip = "Confirm and close"

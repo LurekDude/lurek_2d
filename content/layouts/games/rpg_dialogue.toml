@@ -1,0 +1,75 @@
+# rpg_dialogue.toml — NPC dialogue box with portrait and choice buttons
+# Viewport: 1280 × 720 (box anchored to bottom of screen)
+# Contains: portrait frame, speaker name, dialogue text, 3 choice buttons, skip
+
+[root]
+widget_type = "panel"
+id          = "dialogue_root"
+x = 0.0
+y = 480.0
+w = 1280.0
+h = 240.0
+
+[[root.children]]
+widget_type = "panel"
+id = "portrait_frame"
+x = 24.0
+y = 24.0
+w = 160.0
+h = 200.0
+tooltip = "Speaker portrait"
+
+[[root.children]]
+widget_type = "label"
+id = "speaker_name"
+text = "Elder Miryn"
+x = 200.0
+y = 24.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "dialogue_text"
+text = "Brave traveller, the ancient ruins to the north hold secrets best left undisturbed. Will you heed my warning?"
+x = 200.0
+y = 56.0
+w = 840.0
+h = 80.0
+
+[[root.children]]
+widget_type = "button"
+id = "choice_1"
+text = "I will explore the ruins regardless."
+x = 200.0
+y = 152.0
+w = 360.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "choice_2"
+text = "Tell me more about the ruins."
+x = 568.0
+y = 152.0
+w = 280.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "choice_3"
+text = "I will stay away."
+x = 856.0
+y = 152.0
+w = 200.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "skip_btn"
+text = "Skip"
+x = 1224.0
+y = 200.0
+w = 48.0
+h = 24.0
+tooltip = "Skip dialogue (press Escape)"

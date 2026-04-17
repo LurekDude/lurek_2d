@@ -1,0 +1,385 @@
+# rpg_inventory.toml — Character inventory & equipment screen
+# Viewport: 880 × 620  (overlay window over the game world)
+# Contains: 7 equipment slots, 3 × 5 item grid, detail panel, weight bar
+
+[root]
+widget_type = "window"
+id          = "inventory_window"
+text        = "Inventory"
+x = 200.0
+y = 48.0
+w = 880.0
+h = 624.0
+
+# ── Equipment slots (left column) ────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Head"
+x = 24.0
+y = 64.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_head"
+text = ""
+x = 88.0
+y = 56.0
+w = 56.0
+h = 56.0
+tooltip = "Head slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Chest"
+x = 24.0
+y = 120.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_chest"
+text = ""
+x = 88.0
+y = 120.0
+w = 56.0
+h = 56.0
+tooltip = "Chest slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Legs"
+x = 24.0
+y = 184.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_legs"
+text = ""
+x = 88.0
+y = 184.0
+w = 56.0
+h = 56.0
+tooltip = "Legs slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Boots"
+x = 24.0
+y = 248.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_boots"
+text = ""
+x = 88.0
+y = 240.0
+w = 56.0
+h = 56.0
+tooltip = "Boots slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Weapon"
+x = 24.0
+y = 312.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_weapon"
+text = ""
+x = 88.0
+y = 304.0
+w = 56.0
+h = 56.0
+tooltip = "Main-hand weapon slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Shield"
+x = 24.0
+y = 368.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_shield"
+text = ""
+x = 88.0
+y = 368.0
+w = 56.0
+h = 56.0
+tooltip = "Off-hand / shield slot"
+
+[[root.children]]
+widget_type = "label"
+text = "Ring"
+x = 24.0
+y = 432.0
+w = 64.0
+h = 16.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_ring"
+text = ""
+x = 88.0
+y = 432.0
+w = 56.0
+h = 56.0
+tooltip = "Ring slot"
+
+# ── Item grid  3 rows × 5 cols (56 px slots, 6 px gap) ───────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "bag_title"
+text = "Bag"
+x = 184.0
+y = 56.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_0_0"
+text = ""
+x = 184.0
+y = 80.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_0_1"
+text = ""
+x = 240.0
+y = 80.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_0_2"
+text = ""
+x = 304.0
+y = 80.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_0_3"
+text = ""
+x = 368.0
+y = 80.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_0_4"
+text = ""
+x = 432.0
+y = 80.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_1_0"
+text = ""
+x = 184.0
+y = 144.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_1_1"
+text = ""
+x = 240.0
+y = 144.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_1_2"
+text = ""
+x = 304.0
+y = 144.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_1_3"
+text = ""
+x = 368.0
+y = 144.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_1_4"
+text = ""
+x = 432.0
+y = 144.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_2_0"
+text = ""
+x = 184.0
+y = 200.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_2_1"
+text = ""
+x = 240.0
+y = 200.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_2_2"
+text = ""
+x = 304.0
+y = 200.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_2_3"
+text = ""
+x = 368.0
+y = 200.0
+w = 56.0
+h = 56.0
+
+[[root.children]]
+widget_type = "button"
+id = "item_2_4"
+text = ""
+x = 432.0
+y = 200.0
+w = 56.0
+h = 56.0
+
+# ── Item detail panel (right column) ─────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "item_name"
+text = "(select an item)"
+x = 520.0
+y = 80.0
+w = 320.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_type_tag"
+text = ""
+x = 520.0
+y = 112.0
+w = 160.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_desc"
+text = "Click an item slot to view details."
+x = 520.0
+y = 136.0
+w = 320.0
+h = 80.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_stats"
+text = ""
+x = 520.0
+y = 224.0
+w = 320.0
+h = 64.0
+
+[[root.children]]
+widget_type = "button"
+id = "equip_btn"
+text = "Equip"
+x = 520.0
+y = 296.0
+w = 104.0
+h = 32.0
+enabled = false
+
+[[root.children]]
+widget_type = "button"
+id = "use_btn"
+text = "Use"
+x = 632.0
+y = 296.0
+w = 104.0
+h = 32.0
+enabled = false
+
+[[root.children]]
+widget_type = "button"
+id = "drop_btn"
+text = "Drop"
+x = 736.0
+y = 296.0
+w = 104.0
+h = 32.0
+enabled = false
+
+# ── Carry-weight bar & gold (bottom) ─────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Weight"
+x = 24.0
+y = 576.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "weight_bar"
+x = 88.0
+y = 576.0
+w = 320.0
+h = 24.0
+min = 0.0
+max = 100.0
+value = 35.0
+tooltip = "Carry weight: 35 / 100 kg"
+
+[[root.children]]
+widget_type = "label"
+id = "gold_display"
+text = "Gold: 1,240"
+x = 704.0
+y = 576.0
+w = 160.0
+h = 24.0

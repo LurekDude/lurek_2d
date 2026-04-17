@@ -1,0 +1,305 @@
+
+[root]
+widget_type = "window"
+id = "char_sheet"
+text = "Character Sheet"
+x = 344.0
+y = 72.0
+w = 600.0
+h = 584.0
+
+[[root.children]]
+widget_type = "label"
+id = "char_name"
+text = "Aelindra Stormveil"
+x = 24.0
+y = 56.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "char_class"
+text = "Ranger  ·  Level 12"
+x = 24.0
+y = 80.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "panel"
+id = "portrait_slot"
+x = 320.0
+y = 48.0
+w = 104.0
+h = 120.0
+
+[[root.children]]
+widget_type = "label"
+id = "points_avail"
+text = "Points available: 5"
+x = 24.0
+y = 120.0
+w = 240.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "STR"
+x = 24.0
+y = 160.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "str_slider"
+x = 64.0
+y = 168.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 14.0
+tooltip = "Strength: affects melee damage and carry weight"
+
+[[root.children]]
+widget_type = "label"
+id = "str_val"
+text = "14"
+x = 376.0
+y = 168.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "DEX"
+x = 24.0
+y = 184.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "dex_slider"
+x = 64.0
+y = 192.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 18.0
+tooltip = "Dexterity: affects ranged damage, dodge, and initiative"
+
+[[root.children]]
+widget_type = "label"
+id = "dex_val"
+text = "18"
+x = 376.0
+y = 192.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "CON"
+x = 24.0
+y = 216.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "con_slider"
+x = 64.0
+y = 216.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 12.0
+tooltip = "Constitution: affects max HP and poison resistance"
+
+[[root.children]]
+widget_type = "label"
+id = "con_val"
+text = "12"
+x = 376.0
+y = 216.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "INT"
+x = 24.0
+y = 240.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "int_slider"
+x = 64.0
+y = 240.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 10.0
+tooltip = "Intelligence: affects spell power and lore checks"
+
+[[root.children]]
+widget_type = "label"
+id = "int_val"
+text = "10"
+x = 376.0
+y = 240.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "WIS"
+x = 24.0
+y = 272.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "wis_slider"
+x = 64.0
+y = 272.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 13.0
+tooltip = "Wisdom: affects perception and survival"
+
+[[root.children]]
+widget_type = "label"
+id = "wis_val"
+text = "13"
+x = 376.0
+y = 272.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "CHA"
+x = 24.0
+y = 296.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "slider"
+id = "cha_slider"
+x = 64.0
+y = 296.0
+w = 304.0
+h = 24.0
+min = 1.0
+max = 20.0
+value = 8.0
+tooltip = "Charisma: affects dialogue options and trader prices"
+
+[[root.children]]
+widget_type = "label"
+id = "cha_val"
+text = "8"
+x = 376.0
+y = 296.0
+w = 40.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Max HP"
+x = 24.0
+y = 344.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "derived_hp"
+text = "86"
+x = 144.0
+y = 344.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Initiative"
+x = 240.0
+y = 344.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "derived_init"
+text = "+4"
+x = 360.0
+y = 344.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "AC"
+x = 24.0
+y = 376.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "derived_ac"
+text = "15"
+x = 144.0
+y = 376.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Speed"
+x = 240.0
+y = 376.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "derived_spd"
+text = "35 ft"
+x = 360.0
+y = 376.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "confirm_btn"
+text = "Confirm"
+x = 384.0
+y = 528.0
+w = 104.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "reset_btn"
+text = "Reset"
+x = 488.0
+y = 528.0
+w = 80.0
+h = 32.0
+tooltip = "Refund all attribute points"

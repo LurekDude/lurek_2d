@@ -1,0 +1,364 @@
+# roguelike_dungeon_hud.toml — Roguelike in-game HUD (Nethack/DCSS style)
+# Viewport: 1280 × 720
+# Contains: play field, sidebar (stats, equipment slots, status effects),
+#           message log strip at bottom
+
+[root]
+widget_type = "panel"
+id = "roguelike_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Play field ────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "dungeon_map"
+x = 0.0
+y = 0.0
+w = 904.0
+h = 584.0
+tooltip = "Dungeon tile map"
+
+# ── Right sidebar ─────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "sidebar"
+x = 904.0
+y = 0.0
+w = 384.0
+h = 720.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "player_name"
+x = 8.0
+y = 8.0
+w = 368.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "class_race"
+x = 8.0
+y = 32.0
+w = 368.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "level_xp"
+x = 8.0
+y = 56.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "xp_bar"
+x = 8.0
+y = 80.0
+w = 368.0
+h = 16.0
+min = 0.0
+max = 1000.0
+value = 340.0
+tooltip = "XP to next level"
+
+[[root.children.children]]
+widget_type = "label"
+id = "hp_label"
+x = 8.0
+y = 112.0
+w = 80.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hp_bar"
+x = 96.0
+y = 112.0
+w = 280.0
+h = 16.0
+min = 0.0
+max = 80.0
+value = 62.0
+tooltip = "Hit points"
+
+[[root.children.children]]
+widget_type = "label"
+id = "mp_label"
+x = 8.0
+y = 136.0
+w = 80.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "mp_bar"
+x = 96.0
+y = 136.0
+w = 280.0
+h = 16.0
+min = 0.0
+max = 60.0
+value = 48.0
+tooltip = "Magic points"
+
+[[root.children.children]]
+widget_type = "label"
+id = "hunger_label"
+x = 8.0
+y = 160.0
+w = 80.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hunger_bar"
+x = 96.0
+y = 160.0
+w = 280.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 72.0
+tooltip = "Satiation"
+
+[[root.children.children]]
+widget_type = "label"
+id = "weight_label"
+x = 8.0
+y = 184.0
+w = 80.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "weight_bar"
+x = 96.0
+y = 184.0
+w = 280.0
+h = 16.0
+min = 0.0
+max = 50.0
+value = 28.0
+tooltip = "Carried weight"
+
+[[root.children.children]]
+widget_type = "label"
+id = "equip_title"
+x = 8.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_weapon"
+x = 8.0
+y = 232.0
+w = 176.0
+h = 40.0
+tooltip = "Weapon (main hand)"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_offhand"
+x = 192.0
+y = 232.0
+w = 176.0
+h = 40.0
+tooltip = "Off hand / shield"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_helmet"
+x = 8.0
+y = 280.0
+w = 80.0
+h = 40.0
+tooltip = "Head slot"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_body"
+x = 96.0
+y = 280.0
+w = 80.0
+h = 40.0
+tooltip = "Body armour"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_cloak"
+x = 184.0
+y = 280.0
+w = 80.0
+h = 40.0
+tooltip = "Cloak slot"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_ring_l"
+x = 8.0
+y = 320.0
+w = 80.0
+h = 40.0
+tooltip = "Left ring"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_ring_r"
+x = 96.0
+y = 320.0
+w = 80.0
+h = 40.0
+tooltip = "Right ring"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_amulet"
+x = 184.0
+y = 320.0
+w = 80.0
+h = 40.0
+tooltip = "Amulet"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "slot_boots"
+x = 272.0
+y = 320.0
+w = 80.0
+h = 40.0
+tooltip = "Boots"
+
+[[root.children.children]]
+widget_type = "label"
+id = "status_title"
+x = 8.0
+y = 376.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "status_effects_row"
+x = 8.0
+y = 400.0
+w = 368.0
+h = 40.0
+tooltip = "Active status effects (badges)"
+
+[[root.children.children]]
+widget_type = "label"
+id = "floor_label"
+x = 8.0
+y = 448.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "gold_label"
+x = 200.0
+y = 448.0
+w = 160.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "turn_label"
+x = 8.0
+y = 472.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "auto_explore_btn"
+x = 8.0
+y = 512.0
+w = 176.0
+h = 32.0
+tooltip = "Auto-explore nearest unexplored tile"
+
+[[root.children.children]]
+widget_type = "button"
+id = "rest_btn"
+x = 192.0
+y = 512.0
+w = 176.0
+h = 32.0
+tooltip = "Rest until healed"
+
+[[root.children.children]]
+widget_type = "button"
+id = "inventory_btn"
+x = 8.0
+y = 552.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "spellbook_btn"
+x = 192.0
+y = 552.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "skills_btn"
+x = 8.0
+y = 592.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "prayer_btn"
+x = 192.0
+y = 592.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "save_btn"
+x = 8.0
+y = 632.0
+w = 176.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "quit_btn"
+x = 192.0
+y = 632.0
+w = 176.0
+h = 32.0
+
+# ── Message log strip ─────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "message_log_panel"
+x = 0.0
+y = 584.0
+w = 904.0
+h = 144.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "message_log"
+x = 8.0
+y = 8.0
+w = 896.0
+h = 136.0
+tooltip = "Turn-by-turn event messages"

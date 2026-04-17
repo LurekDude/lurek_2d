@@ -1,0 +1,332 @@
+# xcom_geoscape.toml — UFO: Enemy Unknown / XCOM world map screen
+# Viewport: 1280 × 720
+# Contains: world map panel, base markers (5 bases), radar range overlay,
+#           detected UFO list, interceptor scramble panel, time controls,
+#           funding/score bar, month/date display, alert log
+
+[root]
+widget_type = "panel"
+id = "geoscape_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── World map ─────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "world_map"
+x = 0.0
+y = 0.0
+w = 904.0
+h = 680.0
+tooltip = "Geoscape — world map"
+
+# Base markers on map (illustrative positions)
+[[root.children.children]]
+widget_type = "badge"
+id = "base_1_marker"
+x = 224.0
+y = 224.0
+w = 32.0
+h = 32.0
+tooltip = "Base Alpha — North America"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "base_2_marker"
+x = 464.0
+y = 200.0
+w = 32.0
+h = 32.0
+tooltip = "Base Bravo — Europe"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "base_3_marker"
+x = 640.0
+y = 304.0
+w = 32.0
+h = 32.0
+tooltip = "Base Charlie — Asia"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "ufo_1_marker"
+x = 352.0
+y = 248.0
+w = 24.0
+h = 24.0
+tooltip = "UFO-001 — HARVESTER — moving NW"
+
+[[root.children.children]]
+widget_type = "badge"
+id = "ufo_2_marker"
+x = 584.0
+y = 184.0
+w = 24.0
+h = 24.0
+tooltip = "UFO-002 — SCOUT — high altitude"
+
+[[root.children.children]]
+widget_type = "label"
+id = "map_coords"
+x = 8.0
+y = 656.0
+w = 240.0
+h = 16.0
+tooltip = "Mouse cursor grid coordinates"
+
+# ── Right sidebar ─────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "right_sidebar"
+x = 904.0
+y = 0.0
+w = 384.0
+h = 720.0
+
+# Date / time
+[[root.children.children]]
+widget_type = "panel"
+id = "datetime_panel"
+x = 8.0
+y = 8.0
+w = 368.0
+h = 64.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "date_label"
+x = 16.0
+y = 16.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "time_label"
+x = 200.0
+y = 16.0
+w = 160.0
+h = 24.0
+
+# Time speed controls
+[[root.children.children]]
+widget_type = "button"
+id = "speed_pause"
+x = 16.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "Pause time"
+
+[[root.children.children]]
+widget_type = "button"
+id = "speed_5s"
+x = 72.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "5 seconds per tick"
+
+[[root.children.children]]
+widget_type = "button"
+id = "speed_30s"
+x = 128.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "30 seconds per tick"
+
+[[root.children.children]]
+widget_type = "button"
+id = "speed_5m"
+x = 176.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "5 minutes per tick"
+
+[[root.children.children]]
+widget_type = "button"
+id = "speed_1h"
+x = 232.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "1 hour per tick"
+
+[[root.children.children]]
+widget_type = "button"
+id = "speed_1d"
+x = 288.0
+y = 40.0
+w = 48.0
+h = 24.0
+tooltip = "1 day per tick"
+
+# Detected UFOs list
+[[root.children.children]]
+widget_type = "label"
+id = "ufo_list_title"
+x = 8.0
+y = 80.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "ufo_list"
+x = 8.0
+y = 104.0
+w = 368.0
+h = 200.0
+tooltip = "Detected UFOs"
+
+# Intercept button
+[[root.children.children]]
+widget_type = "button"
+id = "intercept_btn"
+x = 8.0
+y = 312.0
+w = 184.0
+h = 40.0
+tooltip = "Scramble interceptor"
+
+[[root.children.children]]
+widget_type = "button"
+id = "ignore_btn"
+x = 200.0
+y = 312.0
+w = 176.0
+h = 40.0
+tooltip = "Ignore contact"
+
+# Base list
+[[root.children.children]]
+widget_type = "label"
+id = "bases_title"
+x = 8.0
+y = 360.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "base_1_btn"
+x = 8.0
+y = 384.0
+w = 368.0
+h = 32.0
+tooltip = "Manage Base Alpha"
+
+[[root.children.children]]
+widget_type = "button"
+id = "base_2_btn"
+x = 8.0
+y = 416.0
+w = 368.0
+h = 32.0
+tooltip = "Manage Base Bravo"
+
+[[root.children.children]]
+widget_type = "button"
+id = "base_3_btn"
+x = 8.0
+y = 448.0
+w = 368.0
+h = 32.0
+tooltip = "Manage Base Charlie"
+
+[[root.children.children]]
+widget_type = "button"
+id = "new_base_btn"
+x = 8.0
+y = 480.0
+w = 368.0
+h = 32.0
+tooltip = "Build new base"
+
+# Bottom actions
+[[root.children.children]]
+widget_type = "button"
+id = "research_btn"
+x = 8.0
+y = 536.0
+w = 176.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "manufacture_btn"
+x = 192.0
+y = 536.0
+w = 176.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "ufopaedia_btn"
+x = 8.0
+y = 576.0
+w = 176.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "options_btn"
+x = 192.0
+y = 576.0
+w = 176.0
+h = 40.0
+
+# Funding / alert bar
+[[root.children.children]]
+widget_type = "panel"
+id = "funding_bar"
+x = 8.0
+y = 624.0
+w = 368.0
+h = 56.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "funds_label"
+x = 16.0
+y = 632.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "score_label"
+x = 16.0
+y = 656.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "panic_bar"
+x = 224.0
+y = 632.0
+w = 144.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 34.0
+tooltip = "Global panic level"
+
+# ── Bottom alert log ──────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "alert_log"
+x = 0.0
+y = 680.0
+w = 904.0
+h = 40.0
+tooltip = "Alert messages"

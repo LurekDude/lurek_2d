@@ -1,0 +1,255 @@
+# strategy_tech_tree.toml — 4X tech tree / research tree viewer
+# Viewport: 1280 × 720
+# Contains: scrollable tech graph canvas, era columns, selected tech
+#           detail panel, research queue, filter bar
+
+[root]
+widget_type = "panel"
+id = "tech_tree_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "tech_search"
+x = 360.0
+y = 8.0
+w = 344.0
+h = 32.0
+placeholder = "Search technologies…"
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "filter_category"
+x = 712.0
+y = 8.0
+w = 200.0
+h = 32.0
+text = "All|Military|Science|Economy|Culture|Diplomacy|Religion"
+
+[[root.children.children]]
+widget_type = "checkbox"
+id = "show_completed"
+x = 920.0
+y = 16.0
+w = 184.0
+h = 24.0
+text = "Show completed"
+
+[[root.children.children]]
+widget_type = "button"
+id = "close_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Era column labels strip
+[[root.children]]
+widget_type = "panel"
+id = "era_header"
+x = 0.0
+y = 48.0
+w = 960.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_ancient"
+x = 0.0
+y = 8.0
+w = 192.0
+h = 24.0
+tooltip = "Ancient era (3000 BC – 500 AD)"
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_medieval"
+x = 192.0
+y = 8.0
+w = 192.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_renaissance"
+x = 384.0
+y = 8.0
+w = 192.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_industrial"
+x = 576.0
+y = 8.0
+w = 192.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_modern"
+x = 768.0
+y = 8.0
+w = 192.0
+h = 24.0
+
+# Tech graph canvas
+[[root.children]]
+widget_type = "scrollpanel"
+id = "tech_graph_canvas"
+x = 0.0
+y = 80.0
+w = 960.0
+h = 640.0
+tooltip = "Scrollable tech tree — click node to select"
+
+# Right: selected tech detail
+[[root.children]]
+widget_type = "panel"
+id = "tech_detail_panel"
+x = 960.0
+y = 48.0
+w = 320.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "tech_name"
+x = 16.0
+y = 16.0
+w = 296.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "tech_image"
+x = 16.0
+y = 48.0
+w = 296.0
+h = 120.0
+tooltip = "Tech icon"
+
+[[root.children.children]]
+widget_type = "label"
+id = "tech_era"
+x = 16.0
+y = 176.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "tech_cost"
+x = 16.0
+y = 200.0
+w = 200.0
+h = 24.0
+tooltip = "Science beakers required"
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "tech_progress_bar"
+x = 16.0
+y = 224.0
+w = 296.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Research progress"
+
+[[root.children.children]]
+widget_type = "label"
+id = "tech_turns"
+x = 16.0
+y = 240.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "prereqs_title"
+x = 16.0
+y = 272.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "prereqs_list"
+x = 8.0
+y = 296.0
+w = 304.0
+h = 80.0
+tooltip = "Required prerequisites"
+
+[[root.children.children]]
+widget_type = "label"
+id = "unlocks_title"
+x = 16.0
+y = 384.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "unlocks_list"
+x = 8.0
+y = 408.0
+w = 304.0
+h = 80.0
+tooltip = "Units, buildings, or policies unlocked"
+
+[[root.children.children]]
+widget_type = "label"
+id = "effects_title"
+x = 16.0
+y = 496.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "effects_list"
+x = 8.0
+y = 520.0
+w = 304.0
+h = 80.0
+tooltip = "Yield / gameplay effects"
+
+[[root.children.children]]
+widget_type = "button"
+id = "research_btn"
+x = 8.0
+y = 616.0
+w = 200.0
+h = 40.0
+tooltip = "Set this as current research"
+
+[[root.children.children]]
+widget_type = "button"
+id = "queue_btn"
+x = 216.0
+y = 616.0
+w = 96.0
+h = 40.0
+tooltip = "Add to research queue"

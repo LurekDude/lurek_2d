@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """Append stub sections to content/examples/ for uncovered lurek.* API items.
 
-For each module with <100% coverage, reads the matching example file and appends
-a commented stub block for every missing function or method.  The stubs are
-intentionally minimal — run `.github/prompts/flesh-out-example.md` to ask an AI
-to expand each stub into a real working example.
+Each stub emits:
+  1. A machine-readable marker line:   --@api-stub: Owner.functionName
+  2. A one-line description comment
+  3. Real (minimal) executable Lua code that calls the API — NOT pseudocode.
+
+The marker format allows example_coverage.py to distinguish hand-written scenario
+code from auto-generated stubs.  Run flesh-out-example.prompt.md to replace every
+stub block with a proper scenario; the final committed file must contain ZERO
+--@api-stub: lines.
 
 Usage:
     python tools/audit/example_add_missing.py                  # patch all modules
@@ -25,7 +30,7 @@ ROOT = Path(__file__).resolve().parents[2]
 API_JSON = ROOT / 'docs' / 'logs' / 'lua_api_data.json'
 EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
-# Canonical mapping: JSON module key → content/examples/<file>.lua
+# filename = module name exactly (src/render/ -> render.lua, src/ecs/ -> ecs.lua)
 MODULE_TO_EXAMPLE: dict[str, str] = {
     'ai':          'ai.lua',
     'animation':   'animation.lua',
@@ -39,31 +44,31 @@ MODULE_TO_EXAMPLE: dict[str, str] = {
     'debugbridge': 'debugbridge.lua',
     'devtools':    'devtools.lua',
     'docs':        'docs.lua',
-    'ecs':         'entity.lua',
-    'effect':      'fx.lua',
+    'ecs':         'ecs.lua',
+    'effect':      'effect.lua',
     'engine':      'engine.lua',
     'event':       'event.lua',
     'filesystem':  'filesystem.lua',
     'graph':       'graph.lua',
-    'i18n':        'localization.lua',
+    'i18n':        'i18n.lua',
     'image':       'image.lua',
     'input':       'input.lua',
     'light':       'light.lua',
     'log':         'log.lua',
     'math':        'math.lua',
     'minimap':     'minimap.lua',
-    'mods':        'modding.lua',
+    'mods':        'mods.lua',
     'network':     'network.lua',
     'parallax':    'parallax.lua',
     'particle':    'particle.lua',
-    'pathfind':    'pathfinding.lua',
+    'pathfind':    'pathfind.lua',
     'patterns':    'patterns.lua',
     'physics':     'physics.lua',
     'pipeline':    'pipeline.lua',
     'procgen':     'procgen.lua',
     'raycaster':   'raycaster.lua',
-    'render':      'graphics.lua',
-    'save':        'savegame.lua',
+    'render':      'render.lua',
+    'save':        'save.lua',
     'scene':       'scene.lua',
     'serial':      'serial.lua',
     'spine':       'spine.lua',
@@ -74,30 +79,64 @@ MODULE_TO_EXAMPLE: dict[str, str] = {
     'tilemap':     'tilemap.lua',
     'timer':       'timer.lua',
     'tween':       'tween.lua',
-    'ui':          'gui.lua',
+    'ui':          'ui.lua',
     'window':      'window.lua',
 }
 
+# Namespace = src/ folder name exactly (e.g. src/render/ -> lurek.render)
 NAMESPACE_MAP: dict[str, str] = {
-    'ai': 'ai', 'animation': 'animation', 'audio': 'audio',
-    'automation': 'simulator', 'camera': 'camera', 'collision': 'collision',
-    'compute': 'compute', 'data': 'data', 'dataframe': 'dataframe',
-    'debugbridge': 'debugbridge', 'devtools': 'devtools', 'docs': 'docs',
-    'ecs': 'entity', 'effect': 'overlay', 'engine': 'engine',
-    'event': 'signal', 'filesystem': 'fs', 'graph': 'graph',
-    'i18n': 'localization', 'image': 'img', 'input': 'keyboard',
-    'light': 'light', 'log': 'log', 'math': 'math', 'minimap': 'minimap',
-    'mods': 'modding', 'network': 'network', 'parallax': 'parallax',
-    'particle': 'particles', 'pathfind': 'pathfinding', 'patterns': 'patterns',
-    'physics': 'physics', 'pipeline': 'pipeline', 'procgen': 'procgen',
-    'raycaster': 'raycaster', 'render': 'graphic', 'save': 'savegame',
-    'scene': 'scene', 'serial': 'codec', 'spine': 'spine', 'sprite': 'sprite',
-    'system': 'platform', 'terminal': 'terminal', 'thread': 'thread',
-    'tilemap': 'tilemap', 'timer': 'time', 'tween': 'tween',
-    'ui': 'ui', 'window': 'window',
+    'ai':          'ai',
+    'animation':   'animation',
+    'audio':       'audio',
+    'automation':  'automation',
+    'camera':      'camera',
+    'collision':   'collision',
+    'compute':     'compute',
+    'data':        'data',
+    'dataframe':   'dataframe',
+    'debugbridge': 'debugbridge',
+    'devtools':    'devtools',
+    'docs':        'docs',
+    'ecs':         'ecs',
+    'effect':      'effect',
+    'engine':      'engine',
+    'event':       'event',
+    'filesystem':  'filesystem',
+    'graph':       'graph',
+    'i18n':        'i18n',
+    'image':       'image',
+    'input':       'input',
+    'light':       'light',
+    'log':         'log',
+    'math':        'math',
+    'minimap':     'minimap',
+    'mods':        'mods',
+    'network':     'network',
+    'parallax':    'parallax',
+    'particle':    'particle',
+    'pathfind':    'pathfind',
+    'patterns':    'patterns',
+    'physics':     'physics',
+    'pipeline':    'pipeline',
+    'procgen':     'procgen',
+    'raycaster':   'raycaster',
+    'render':      'render',
+    'save':        'save',
+    'scene':       'scene',
+    'serial':      'serial',
+    'spine':       'spine',
+    'sprite':      'sprite',
+    'system':      'system',
+    'terminal':    'terminal',
+    'thread':      'thread',
+    'tilemap':     'tilemap',
+    'timer':       'timer',
+    'tween':       'tween',
+    'ui':          'ui',
+    'window':      'window',
 }
 
-_LINE = '─' * 77
+_LINE = '-' * 77
 
 
 @dataclass
@@ -148,24 +187,75 @@ def is_covered(entry: Entry, code_text: str) -> bool:
     return bool(re.search(pat, code_text))
 
 
-def _ruler(label: str) -> str:
-    pad = max(0, 77 - len(label) - 4)
-    return f'-- ── {label} ' + '─' * pad
+def _make_call_args(sig: str) -> str:
+    """Convert an inferred signature like '(x, y, w, h)' into placeholder args."""
+    sig = sig.strip()
+    if sig in ('()', ''):
+        return '()'
+    inner = sig[1:-1].strip()
+    if not inner:
+        return '()'
+    parts = [p.strip().split(':')[0].strip() for p in inner.split(',')]
+    # Replace bare param names with domain-flavoured literals
+    _DOMAIN = {
+        'x': '0.0', 'y': '0.0', 'w': '64.0', 'h': '64.0',
+        'width': '256', 'height': '256',
+        'dt': '0.016', 'delta': '0.016',
+        'name': '"hero"', 'key': '"player_score"', 'id': '1',
+        'text': '"Hello, world!"', 'msg': '"level_complete"',
+        'r': '1.0', 'g': '0.8', 'b': '0.2', 'a': '1.0',
+        'angle': '0.0', 'rotation': '0.0',
+        'scale': '1.0', 'sx': '1.0', 'sy': '1.0',
+        'fn': 'function() end', 'callback': 'function() end',
+        'value': '42', 'v': '1.0',
+        'path': '"assets/hero.png"', 'file': '"save_slot1"',
+        'slot': '"slot1"', 'tag': '"enemy"',
+        'index': '1', 'idx': '1', 'i': '1',
+        'count': '10', 'n': '5',
+        'speed': '120.0', 'radius': '24.0',
+        'layer': '1', 'z': '0',
+        'enabled': 'true', 'flag': 'true', 'visible': 'true',
+    }
+    result = []
+    for p in parts:
+        result.append(_DOMAIN.get(p, p if p else '"TODO"'))
+    return '(' + ', '.join(result) + ')'
 
 
 def build_stub_block(entry: Entry, ns: str) -> str:
-    """Return the Lua comment block for one missing API item."""
-    lines: list[str] = []
-    lines.append(_ruler(f'lurek.{ns}.{entry.name}' if not entry.is_method
-                        else f'{entry.owner_type}:{entry.name}'))
-    if entry.description:
-        lines.append(f'-- {entry.description}')
-    ret_hint = f'  -- -> {entry.inferred_return}' if entry.inferred_return and entry.inferred_return != 'nil' else ''
+    """Return a stub block for one missing API item.
+
+    Format:
+        -- ---- Stub: Owner.name ---------------------------------------------------
+        -- @api-stub: Owner.name
+        -- <description>
+        -- TODO: replace this stub with a real scenario example.
+        <real minimal Lua call that actually invokes the API>
+    """
     if entry.is_method:
-        lines.append(f'-- local obj = ...  -- replace with your {entry.owner_type} instance')
-        lines.append(f'-- obj:{entry.name}{entry.inferred_sig}{ret_hint}')
+        api_id = f'{entry.owner_type}:{entry.name}'
     else:
-        lines.append(f'-- lurek.{ns}.{entry.name}{entry.inferred_sig}{ret_hint}')
+        api_id = f'lurek.{ns}.{entry.name}'
+
+    sep = '-- ---- Stub: ' + api_id + ' ' + '-' * max(0, 77 - len('-- ---- Stub: ' + api_id) - 1)
+    desc_line = f'-- {entry.description}' if entry.description else '-- (no description)'
+    marker = f'--@api-stub: {api_id}'
+    todo = '-- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md'
+    ret_hint = f'  -- -> {entry.inferred_return}' if entry.inferred_return and entry.inferred_return != 'nil' else ''
+
+    call_args = _make_call_args(entry.inferred_sig)
+
+    if entry.is_method:
+        var_name = entry.owner_type[0].lower() + entry.owner_type[1:] + '_stub'
+        call_line = f'-- {var_name}:{entry.name}{call_args}{ret_hint}'
+        code_line = f'-- (replace {var_name} with your real {entry.owner_type} instance above)'
+    else:
+        call_line = f'lurek.{ns}.{entry.name}{call_args}{ret_hint}'
+        code_line = ''
+
+    lines = [sep, marker, desc_line, todo, call_line]
+    if code_line:
+        lines.append(code_line)
     return '\n'.join(lines)
 
 
@@ -209,11 +299,13 @@ def patch_example(
 
     new_lines: list[str] = [
         '',
-        f'-- {"═" * 77}',
+        f'-- ' + '=' * 77,
         f'-- STUBS: {len(missing)} uncovered lurek.{ns} API item(s)',
         f'-- Generated by tools/audit/example_add_missing.py',
-        f'-- Run .github/prompts/flesh-out-example.md to expand each stub.',
-        f'-- {"═" * 77}',
+        f'-- REQUIRED: replace every --@api-stub: block below with a real scenario.',
+        f'-- Run .github/prompts/flesh-out-example.prompt.md for instructions.',
+        f'-- The final committed file must contain ZERO --@api-stub: lines.',
+        f'-- ' + '=' * 77,
     ]
 
     for e in fn_entries:
@@ -222,9 +314,9 @@ def patch_example(
 
     for owner, methods in sorted(method_groups.items()):
         new_lines.append('')
-        new_lines.append(f'-- {"─" * 77}')
+        new_lines.append(f'-- ' + '-' * 77)
         new_lines.append(f'-- {owner} methods')
-        new_lines.append(f'-- {"─" * 77}')
+        new_lines.append(f'-- ' + '-' * 77)
         for e in methods:
             new_lines.append('')
             new_lines.append(build_stub_block(e, ns))

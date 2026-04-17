@@ -1,0 +1,119 @@
+# login_form.toml — User login screen
+# Viewport: 480 × 520  (centred modal)
+# Contains: app logo slot, email input, password input, remember-me checkbox,
+#           login button, forgot-password button, register link
+
+[root]
+widget_type = "panel"
+id          = "login_root"
+x = 400.0
+y = 104.0
+w = 480.0
+h = 520.0
+
+[[root.children]]
+widget_type = "panel"
+id = "logo_slot"
+x = 192.0
+y = 24.0
+w = 104.0
+h = 80.0
+tooltip = "App logo"
+
+[[root.children]]
+widget_type = "label"
+id = "app_name"
+text = "MyApp"
+x = 144.0
+y = 112.0
+w = 200.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+text = "Sign in to your account"
+x = 104.0
+y = 152.0
+w = 280.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+text = "Email"
+x = 40.0
+y = 200.0
+w = 80.0
+h = 24.0
+
+[[root.children]]
+widget_type = "textinput"
+id = "email_input"
+x = 40.0
+y = 224.0
+w = 400.0
+h = 40.0
+placeholder = "you@example.com"
+
+[[root.children]]
+widget_type = "label"
+text = "Password"
+x = 40.0
+y = 272.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "textinput"
+id = "password_input"
+x = 40.0
+y = 296.0
+w = 400.0
+h = 40.0
+placeholder = "••••••••"
+tooltip = "Enter your password"
+
+[[root.children]]
+widget_type = "checkbox"
+id = "remember_me"
+text = "Remember me"
+x = 40.0
+y = 344.0
+w = 184.0
+h = 24.0
+checked = false
+
+[[root.children]]
+widget_type = "button"
+id = "forgot_btn"
+text = "Forgot password?"
+x = 280.0
+y = 344.0
+w = 160.0
+h = 24.0
+tooltip = "Send password reset email"
+
+[[root.children]]
+widget_type = "button"
+id = "login_btn"
+text = "Sign In"
+x = 40.0
+y = 384.0
+w = 400.0
+h = 48.0
+
+[[root.children]]
+widget_type = "label"
+text = "Don't have an account?"
+x = 80.0
+y = 456.0
+w = 224.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "register_btn"
+text = "Create Account"
+x = 304.0
+y = 448.0
+w = 144.0
+h = 32.0

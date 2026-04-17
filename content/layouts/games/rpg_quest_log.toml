@@ -1,0 +1,208 @@
+# rpg_quest_log.toml — Quest log panel with quest list and detail view
+# Viewport: 800 × 600  (overlay)
+# Contains: quest list (5 items), quest detail (title, description, objectives, rewards)
+
+[root]
+widget_type = "window"
+id          = "quest_log"
+text        = "Quest Log"
+x = 240.0
+y = 64.0
+w = 800.0
+h = 600.0
+
+# ── Quest list (left column) ──────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Active Quests"
+x = 24.0
+y = 56.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "quest_btn_0"
+text = "The Lost Artefact"
+x = 24.0
+y = 80.0
+w = 224.0
+h = 32.0
+tooltip = "Main quest"
+
+[[root.children]]
+widget_type = "button"
+id = "quest_btn_1"
+text = "Merchant's Request"
+x = 24.0
+y = 120.0
+w = 224.0
+h = 32.0
+tooltip = "Side quest"
+
+[[root.children]]
+widget_type = "button"
+id = "quest_btn_2"
+text = "Clear the Bandit Camp"
+x = 24.0
+y = 152.0
+w = 224.0
+h = 32.0
+tooltip = "Bounty"
+
+[[root.children]]
+widget_type = "button"
+id = "quest_btn_3"
+text = "Herb Gathering"
+x = 24.0
+y = 192.0
+w = 224.0
+h = 32.0
+tooltip = "Collection quest"
+
+[[root.children]]
+widget_type = "button"
+id = "quest_btn_4"
+text = "The Forgotten Tomb"
+x = 24.0
+y = 232.0
+w = 224.0
+h = 32.0
+tooltip = "Dungeon quest"
+
+# ── Quest detail (right column) ───────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "quest_title"
+text = "The Lost Artefact"
+x = 272.0
+y = 56.0
+w = 480.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "quest_type_tag"
+text = "Main Quest"
+x = 272.0
+y = 88.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "quest_desc"
+text = "The high council has tasked you with recovering the Orb of Aeons from the ruins beneath Stonehallow. The orb was stolen three decades ago and its power grows unstable."
+x = 272.0
+y = 112.0
+w = 480.0
+h = 80.0
+
+[[root.children]]
+widget_type = "label"
+text = "Objectives"
+x = 272.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "checkbox"
+id = "obj_0"
+text = "Reach Stonehallow"
+x = 272.0
+y = 240.0
+w = 400.0
+h = 24.0
+checked = true
+enabled = false
+
+[[root.children]]
+widget_type = "checkbox"
+id = "obj_1"
+text = "Enter the underground ruins"
+x = 272.0
+y = 272.0
+w = 400.0
+h = 24.0
+checked = false
+enabled = false
+
+[[root.children]]
+widget_type = "checkbox"
+id = "obj_2"
+text = "Find the Orb of Aeons"
+x = 272.0
+y = 296.0
+w = 400.0
+h = 24.0
+checked = false
+enabled = false
+
+[[root.children]]
+widget_type = "checkbox"
+id = "obj_3"
+text = "Return to the High Council"
+x = 272.0
+y = 328.0
+w = 400.0
+h = 24.0
+checked = false
+enabled = false
+
+[[root.children]]
+widget_type = "label"
+text = "Rewards"
+x = 272.0
+y = 376.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "reward_xp"
+text = "2,500 XP"
+x = 272.0
+y = 400.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "reward_gold"
+text = "500 Gold"
+x = 272.0
+y = 424.0
+w = 200.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "reward_item"
+text = "Council Signet Ring"
+x = 272.0
+y = 448.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "track_btn"
+text = "Track"
+x = 272.0
+y = 528.0
+w = 104.0
+h = 32.0
+tooltip = "Show quest marker on mini-map"
+
+[[root.children]]
+widget_type = "button"
+id = "abandon_btn"
+text = "Abandon"
+x = 384.0
+y = 528.0
+w = 104.0
+h = 32.0
+tooltip = "Give up this quest (cannot be undone)"

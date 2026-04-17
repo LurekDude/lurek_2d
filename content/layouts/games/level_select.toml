@@ -1,0 +1,181 @@
+# level_select.toml — World / level selection screen
+# Viewport: 1280 × 720
+# Contains: world name, 12 level buttons in a 4 × 3 grid,
+#           star rating labels, locked indicator, back button
+
+[root]
+widget_type = "panel"
+id          = "level_select_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "button"
+id = "back_btn"
+text = "← Back"
+x = 24.0
+y = 24.0
+w = 104.0
+h = 40.0
+
+[[root.children]]
+widget_type = "label"
+id = "world_name"
+text = "World 1 — The Verdant Plains"
+x = 392.0
+y = 24.0
+w = 504.0
+h = 32.0
+
+# ── Level grid  (4 columns × 3 rows, 200 × 160 cells) ────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "level_1"
+text = "1\n★★★"
+x = 88.0
+y = 120.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_2"
+text = "2\n★★☆"
+x = 312.0
+y = 120.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_3"
+text = "3\n★☆☆"
+x = 528.0
+y = 120.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_4"
+text = "4\n★★☆"
+x = 752.0
+y = 120.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_5"
+text = "5\n★★★"
+x = 968.0
+y = 120.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_6"
+text = "6\n★★☆"
+x = 88.0
+y = 264.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_7"
+text = "7\n☆☆☆"
+x = 312.0
+y = 264.0
+w = 200.0
+h = 120.0
+
+[[root.children]]
+widget_type = "button"
+id = "level_8"
+text = "8\n🔒"
+x = 528.0
+y = 264.0
+w = 200.0
+h = 120.0
+enabled = false
+tooltip = "Complete level 7 first"
+
+[[root.children]]
+widget_type = "button"
+id = "level_9"
+text = "9\n🔒"
+x = 752.0
+y = 264.0
+w = 200.0
+h = 120.0
+enabled = false
+tooltip = "Locked"
+
+[[root.children]]
+widget_type = "button"
+id = "level_10"
+text = "10\n🔒"
+x = 968.0
+y = 264.0
+w = 200.0
+h = 120.0
+enabled = false
+tooltip = "Locked"
+
+[[root.children]]
+widget_type = "button"
+id = "level_11"
+text = "11\n🔒"
+x = 88.0
+y = 400.0
+w = 200.0
+h = 120.0
+enabled = false
+tooltip = "Locked"
+
+[[root.children]]
+widget_type = "button"
+id = "level_12_boss"
+text = "BOSS\n🔒"
+x = 312.0
+y = 400.0
+w = 200.0
+h = 120.0
+enabled = false
+tooltip = "Locked — clear all levels first"
+
+# ── Total stars / progress bar ────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Total Stars:"
+x = 88.0
+y = 560.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "star_progress"
+x = 224.0
+y = 560.0
+w = 400.0
+h = 32.0
+min = 0.0
+max = 36.0
+value = 14.0
+tooltip = "14 / 36 stars collected"
+
+[[root.children]]
+widget_type = "label"
+id = "star_count"
+text = "14 / 36"
+x = 632.0
+y = 560.0
+w = 104.0
+h = 24.0

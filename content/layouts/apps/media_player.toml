@@ -1,0 +1,195 @@
+
+[root]
+widget_type = "panel"
+id = "media_player_root"
+x = 0.0
+y = 0.0
+w = 504.0
+h = 360.0
+
+[[root.children]]
+widget_type = "panel"
+id = "album_art"
+x = 24.0
+y = 24.0
+w = 144.0
+h = 144.0
+tooltip = "Album art"
+
+[[root.children]]
+widget_type = "label"
+id = "track_title"
+text = "Midnight Drive"
+x = 176.0
+y = 24.0
+w = 304.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "artist_name"
+text = "Synthwave Artist"
+x = 176.0
+y = 64.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "album_name"
+text = "Neon City Nights (2024)"
+x = 176.0
+y = 88.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "badge"
+id = "quality_badge"
+x = 176.0
+y = 112.0
+w = 64.0
+h = 24.0
+tooltip = "FLAC 24-bit / 96 kHz"
+
+[[root.children]]
+widget_type = "button"
+id = "like_btn"
+text = "♡"
+x = 448.0
+y = 24.0
+w = 40.0
+h = 40.0
+tooltip = "Add to favourites"
+
+[[root.children]]
+widget_type = "slider"
+id = "seek_bar"
+x = 24.0
+y = 184.0
+w = 464.0
+h = 24.0
+min = 0.0
+max = 100.0
+value = 37.0
+tooltip = "Track position"
+
+[[root.children]]
+widget_type = "label"
+id = "time_current"
+text = "1:26"
+x = 24.0
+y = 208.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "time_total"
+text = "3:52"
+x = 424.0
+y = 208.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_shuffle"
+text = "⇄"
+x = 120.0
+y = 248.0
+w = 40.0
+h = 40.0
+tooltip = "Shuffle"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_prev"
+text = "⏮"
+x = 168.0
+y = 248.0
+w = 48.0
+h = 40.0
+tooltip = "Previous track"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_play_pause"
+text = "⏸"
+x = 224.0
+y = 240.0
+w = 56.0
+h = 48.0
+tooltip = "Play / Pause"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_next"
+text = "⏭"
+x = 288.0
+y = 248.0
+w = 48.0
+h = 40.0
+tooltip = "Next track"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_repeat"
+text = "↺"
+x = 344.0
+y = 248.0
+w = 40.0
+h = 40.0
+tooltip = "Repeat: Off"
+
+[[root.children]]
+widget_type = "button"
+id = "vol_icon"
+text = "🔊"
+x = 24.0
+y = 312.0
+w = 32.0
+h = 32.0
+tooltip = "Mute / unmute"
+
+[[root.children]]
+widget_type = "slider"
+id = "volume_slider"
+x = 56.0
+y = 312.0
+w = 160.0
+h = 24.0
+min = 0.0
+max = 100.0
+value = 75.0
+tooltip = "Volume"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_playlist"
+text = "☰"
+x = 368.0
+y = 312.0
+w = 40.0
+h = 40.0
+tooltip = "Show playlist"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_equalizer"
+text = "≋"
+x = 416.0
+y = 312.0
+w = 40.0
+h = 40.0
+tooltip = "Equalizer"
+
+[[root.children]]
+widget_type = "button"
+id = "btn_mini_mode"
+text = "⊡"
+x = 456.0
+y = 312.0
+w = 40.0
+h = 40.0
+tooltip = "Mini player mode"

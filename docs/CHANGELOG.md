@@ -2,6 +2,21 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.18.3] — 2026-04-17
+### Added
+- **tools/ui/render_layout.py**: New standalone Python tool — renders Lurek2D TOML UI layout
+  files to PNG wireframe previews without the game engine.  Each widget is drawn as a
+  colour-coded filled rectangle with label (`widget_type [id] "text"`).  Canvas size is
+  determined by `resolution = [w, h]` in the TOML, falling back to `root.w × root.h` then
+  1280 × 720.  CLI: single file, `--all <dir>`, `--recursive`, `--dry-run`.  Requires Pillow.
+- **tools/ui/README.md**: Documentation for `tools/ui/`, colour legend, and usage examples.
+- **content/demos/ui_demo/hud.layout.toml**: Rich 1280 × 720 example layout (HUD + inventory
+  window + settings dialog + minimap) to test the render tool and showcase layout features.
+### Changed
+- **src/ui/layout_loader.rs** (`LayoutDef`): Added optional `resolution: Option<[u32; 2]>`
+  field so layout files can declare their intended render resolution directly.
+- **tools/README.md**: Added `tools/ui/` row to the directory index.
+
 ## [0.18.2] — 2026-04-16
 ### Added
 - **tools/audit/example_add_missing.py**: New tool that appends commented stub blocks to

@@ -1,0 +1,92 @@
+# main_menu.toml — Game main menu screen
+# Viewport: 1280 × 720
+# Contains: game title, tagline, 5 nav buttons, version label
+
+[root]
+widget_type = "panel"
+id          = "main_menu_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "label"
+id = "game_title"
+text = "CHRONICLES OF THE VOID"
+x = 392.0
+y = 144.0
+w = 504.0
+h = 56.0
+
+[[root.children]]
+widget_type = "label"
+id = "game_tagline"
+text = "An epic adventure awaits"
+x = 440.0
+y = 200.0
+w = 400.0
+h = 32.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_new_game"
+text = "New Game"
+x = 488.0
+y = 304.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_continue"
+text = "Continue"
+x = 488.0
+y = 360.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_load"
+text = "Load Game"
+x = 488.0
+y = 416.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_settings"
+text = "Settings"
+x = 488.0
+y = 472.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_credits"
+text = "Credits"
+x = 488.0
+y = 536.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "button"
+id = "btn_quit"
+text = "Quit"
+x = 488.0
+y = 592.0
+w = 304.0
+h = 48.0
+
+[[root.children]]
+widget_type = "label"
+id = "version_label"
+text = "v1.0.0"
+x = 24.0
+y = 696.0
+w = 80.0
+h = 16.0

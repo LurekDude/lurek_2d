@@ -1,0 +1,569 @@
+
+[root]
+widget_type = "panel"
+id = "battlescape_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "battle_map"
+x = 200.0
+y = 0.0
+w = 880.0
+h = 680.0
+tooltip = "Isometric battle grid"
+
+[[root.children]]
+widget_type = "panel"
+id = "action_sidebar"
+x = 0.0
+y = 0.0
+w = 200.0
+h = 720.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "soldier_portrait"
+x = 8.0
+y = 8.0
+w = 184.0
+h = 120.0
+tooltip = "Selected unit portrait"
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldier_name"
+x = 8.0
+y = 136.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "soldier_rank"
+x = 8.0
+y = 160.0
+w = 104.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "tu_label"
+x = 8.0
+y = 176.0
+w = 80.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "tu_bar"
+x = 8.0
+y = 200.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 72.0
+tooltip = "Time Units remaining"
+
+[[root.children.children]]
+widget_type = "label"
+id = "tu_value"
+x = 144.0
+y = 176.0
+w = 56.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "hp_label"
+x = 8.0
+y = 216.0
+w = 80.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "hp_bar"
+x = 8.0
+y = 240.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 40.0
+value = 28.0
+tooltip = "Health"
+
+[[root.children.children]]
+widget_type = "label"
+id = "morale_label"
+x = 8.0
+y = 256.0
+w = 80.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "morale_bar"
+x = 8.0
+y = 280.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 85.0
+tooltip = "Morale"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stamina_label"
+x = 8.0
+y = 296.0
+w = 80.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stamina_bar"
+x = 8.0
+y = 320.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 70.0
+value = 60.0
+tooltip = "Stamina / Energy"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_walk"
+x = 8.0
+y = 344.0
+w = 56.0
+h = 48.0
+tooltip = "Walk / Move"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_run"
+x = 72.0
+y = 344.0
+w = 56.0
+h = 48.0
+tooltip = "Run (costs 2× TU)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_strafe"
+x = 136.0
+y = 344.0
+w = 64.0
+h = 48.0
+tooltip = "Strafe step"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_kneel"
+x = 8.0
+y = 392.0
+w = 56.0
+h = 48.0
+tooltip = "Kneel / Crouch"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_fire"
+x = 72.0
+y = 392.0
+w = 56.0
+h = 48.0
+tooltip = "Fire weapon"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_aim"
+x = 136.0
+y = 392.0
+w = 64.0
+h = 48.0
+tooltip = "Aimed shot"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_throw"
+x = 8.0
+y = 440.0
+w = 56.0
+h = 48.0
+tooltip = "Throw grenade / item"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_prime"
+x = 72.0
+y = 440.0
+w = 56.0
+h = 48.0
+tooltip = "Prime grenade"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_use"
+x = 136.0
+y = 440.0
+w = 64.0
+h = 48.0
+tooltip = "Use medkit / item"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_inventory"
+x = 8.0
+y = 488.0
+w = 56.0
+h = 48.0
+tooltip = "Open inventory"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_scan"
+x = 72.0
+y = 488.0
+w = 56.0
+h = 48.0
+tooltip = "Motion scanner"
+
+[[root.children.children]]
+widget_type = "button"
+id = "act_melee"
+x = 136.0
+y = 488.0
+w = 64.0
+h = 48.0
+tooltip = "Melee attack"
+
+[[root.children.children]]
+widget_type = "button"
+id = "end_turn_btn"
+x = 8.0
+y = 544.0
+w = 184.0
+h = 48.0
+tooltip = "End player turn"
+
+[[root.children.children]]
+widget_type = "label"
+id = "reserve_label"
+x = 8.0
+y = 600.0
+w = 104.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "reserve_snap"
+x = 8.0
+y = 616.0
+w = 56.0
+h = 32.0
+tooltip = "Reserve TU for snap shot"
+
+[[root.children.children]]
+widget_type = "button"
+id = "reserve_aimed"
+x = 72.0
+y = 616.0
+w = 56.0
+h = 32.0
+tooltip = "Reserve TU for aimed shot"
+
+[[root.children.children]]
+widget_type = "button"
+id = "reserve_auto"
+x = 136.0
+y = 616.0
+w = 64.0
+h = 32.0
+tooltip = "Reserve TU for auto shot"
+
+[[root.children.children]]
+widget_type = "button"
+id = "reserve_off"
+x = 8.0
+y = 648.0
+w = 184.0
+h = 32.0
+tooltip = "Don't reserve TU"
+
+[[root.children]]
+widget_type = "panel"
+id = "weapon_panel"
+x = 1080.0
+y = 0.0
+w = 200.0
+h = 440.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "weapon_panel_title"
+x = 8.0
+y = 8.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "right_hand_slot"
+x = 8.0
+y = 32.0
+w = 184.0
+h = 104.0
+tooltip = "Right hand — weapon"
+
+[[root.children.children]]
+widget_type = "label"
+id = "rh_weapon_name"
+x = 8.0
+y = 136.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "rh_ammo_bar"
+x = 8.0
+y = 160.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 30.0
+value = 22.0
+tooltip = "Ammo in clip"
+
+[[root.children.children]]
+widget_type = "label"
+id = "rh_ammo_val"
+x = 8.0
+y = 176.0
+w = 104.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "left_hand_slot"
+x = 8.0
+y = 200.0
+w = 184.0
+h = 104.0
+tooltip = "Left hand — weapon / equipment"
+
+[[root.children.children]]
+widget_type = "label"
+id = "lh_weapon_name"
+x = 8.0
+y = 304.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "lh_ammo_bar"
+x = 8.0
+y = 328.0
+w = 184.0
+h = 16.0
+min = 0.0
+max = 4.0
+value = 3.0
+tooltip = "Grenades / charges remaining"
+
+[[root.children.children]]
+widget_type = "button"
+id = "reload_btn"
+x = 8.0
+y = 352.0
+w = 88.0
+h = 32.0
+tooltip = "Reload weapon"
+
+[[root.children.children]]
+widget_type = "button"
+id = "switch_hands_btn"
+x = 104.0
+y = 352.0
+w = 88.0
+h = 32.0
+tooltip = "Swap hands"
+
+[[root.children.children]]
+widget_type = "button"
+id = "drop_item_btn"
+x = 8.0
+y = 384.0
+w = 184.0
+h = 32.0
+tooltip = "Drop held item"
+
+[[root.children]]
+widget_type = "panel"
+id = "soldier_roster"
+x = 200.0
+y = 680.0
+w = 880.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_0"
+x = 8.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 1"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_1"
+x = 88.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 2"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_2"
+x = 176.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 3"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_3"
+x = 256.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 4"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_4"
+x = 344.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 5"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_5"
+x = 424.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 6"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_6"
+x = 512.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 7"
+
+[[root.children.children]]
+widget_type = "button"
+id = "slt_7"
+x = 592.0
+y = 8.0
+w = 80.0
+h = 32.0
+tooltip = "Soldier 8"
+
+[[root.children]]
+widget_type = "panel"
+id = "minimap"
+x = 1080.0
+y = 440.0
+w = 200.0
+h = 200.0
+tooltip = "Tactical minimap"
+
+[[root.children.children]]
+widget_type = "label"
+id = "minimap_title"
+x = 8.0
+y = 8.0
+w = 104.0
+h = 16.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "floor_up_btn"
+x = 112.0
+y = 8.0
+w = 40.0
+h = 24.0
+tooltip = "One floor up"
+
+[[root.children.children]]
+widget_type = "button"
+id = "floor_dn_btn"
+x = 152.0
+y = 8.0
+w = 40.0
+h = 24.0
+tooltip = "One floor down"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "minimap_canvas"
+x = 8.0
+y = 32.0
+w = 192.0
+h = 168.0
+tooltip = "Minimap view"
+
+[[root.children]]
+widget_type = "panel"
+id = "floor_panel"
+x = 1080.0
+y = 640.0
+w = 200.0
+h = 80.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "floor_label"
+x = 8.0
+y = 8.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "spinbox"
+id = "floor_spinbox"
+x = 112.0
+y = 8.0
+w = 80.0
+h = 32.0
+min = 0.0
+max = 4.0
+value = 0.0
+tooltip = "Current map level"
+
+[[root.children.children]]
+widget_type = "button"
+id = "abort_mission_btn"
+x = 8.0
+y = 48.0
+w = 184.0
+h = 32.0
+tooltip = "Abort mission — evac soldiers"

@@ -1,0 +1,357 @@
+# text_editor_toolbar.toml — Text / code editor toolbar layout
+# Viewport: 1280 × 720
+# Contains: menu bar (File/Edit/View/Format/Tools/Help), format toolbar
+#           (bold/italic/underline/strikethrough, font combobox, size spinbox,
+#           align buttons, colour button), bottom status bar
+
+[root]
+widget_type = "panel"
+id          = "editor_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Menu bar ──────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "menu_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_file"
+text = "File"
+x = 8.0
+y = 0.0
+w = 48.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_edit"
+text = "Edit"
+x = 56.0
+y = 0.0
+w = 48.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_view"
+text = "View"
+x = 112.0
+y = 0.0
+w = 48.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_format"
+text = "Format"
+x = 168.0
+y = 0.0
+w = 64.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_tools"
+text = "Tools"
+x = 232.0
+y = 0.0
+w = 56.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "menu_help"
+text = "Help"
+x = 296.0
+y = 0.0
+w = 48.0
+h = 24.0
+
+# ── Quick actions (right of menu bar) ────────────────────────────────────────
+
+[[root.children.children]]
+widget_type = "button"
+id = "new_btn"
+text = "New"
+x = 1000.0
+y = 0.0
+w = 48.0
+h = 24.0
+tooltip = "New file (Ctrl+N)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "open_btn"
+text = "Open"
+x = 1056.0
+y = 0.0
+w = 56.0
+h = 24.0
+tooltip = "Open file (Ctrl+O)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "save_btn"
+text = "Save"
+x = 1112.0
+y = 0.0
+w = 56.0
+h = 24.0
+tooltip = "Save (Ctrl+S)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "saveas_btn"
+text = "Save As"
+x = 1176.0
+y = 0.0
+w = 80.0
+h = 24.0
+tooltip = "Save As (Ctrl+Shift+S)"
+
+# ── Format toolbar ────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "format_toolbar"
+x = 0.0
+y = 32.0
+w = 1280.0
+h = 40.0
+
+# Font family & size
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "font_family"
+x = 8.0
+y = 8.0
+w = 200.0
+h = 32.0
+text = "Arial|Times New Roman|Courier New|Verdana|Georgia"
+tooltip = "Font family"
+
+[[root.children.children]]
+widget_type = "spinbox"
+id = "font_size"
+x = 216.0
+y = 8.0
+w = 72.0
+h = 32.0
+min = 6.0
+max = 144.0
+value = 14.0
+tooltip = "Font size (pt)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_bold"
+text = "B"
+x = 296.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Bold (Ctrl+B)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_italic"
+text = "I"
+x = 336.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Italic (Ctrl+I)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_underline"
+text = "U"
+x = 368.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Underline (Ctrl+U)"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_strikethrough"
+text = "S̶"
+x = 408.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Strikethrough"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_superscript"
+text = "Xˢ"
+x = 440.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Superscript"
+
+[[root.children.children]]
+widget_type = "button"
+id = "fmt_subscript"
+text = "Xᵢ"
+x = 480.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Subscript"
+
+[[root.children.children]]
+widget_type = "button"
+id = "align_left"
+text = "⬛▌"
+x = 528.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Align left"
+
+[[root.children.children]]
+widget_type = "button"
+id = "align_centre"
+text = "▌⬛▐"
+x = 560.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Align centre"
+
+[[root.children.children]]
+widget_type = "button"
+id = "align_right"
+text = "▐⬛"
+x = 600.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Align right"
+
+[[root.children.children]]
+widget_type = "button"
+id = "align_justify"
+text = "≡"
+x = 632.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Justify"
+
+[[root.children.children]]
+widget_type = "button"
+id = "text_colour"
+text = "A▉"
+x = 680.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Text colour"
+
+[[root.children.children]]
+widget_type = "button"
+id = "highlight_colour"
+text = "H▉"
+x = 720.0
+y = 8.0
+w = 40.0
+h = 32.0
+tooltip = "Highlight colour"
+
+[[root.children.children]]
+widget_type = "button"
+id = "list_bullet"
+text = "•≡"
+x = 776.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Unordered list"
+
+[[root.children.children]]
+widget_type = "button"
+id = "list_numbered"
+text = "1≡"
+x = 816.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Ordered list"
+
+[[root.children.children]]
+widget_type = "button"
+id = "indent_decrease"
+text = "◀≡"
+x = 848.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Decrease indent"
+
+[[root.children.children]]
+widget_type = "button"
+id = "indent_increase"
+text = "▶≡"
+x = 888.0
+y = 8.0
+w = 32.0
+h = 32.0
+tooltip = "Increase indent"
+
+# ── Editor body placeholder ───────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "editor_body"
+x = 0.0
+y = 72.0
+w = 1280.0
+h = 624.0
+tooltip = "Text editing area"
+
+# ── Status bar ────────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "status_left"
+text = "Ln 1, Col 1 · UTF-8 · LF · Plain Text"
+x = 8.0
+y = 704.0
+w = 600.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "word_count"
+text = "Words: 0 · Characters: 0"
+x = 800.0
+y = 704.0
+w = 304.0
+h = 24.0
+
+[[root.children]]
+widget_type = "progressbar"
+id = "autosave_bar"
+x = 1104.0
+y = 704.0
+w = 160.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 0.0
+tooltip = "Auto-save progress"
+visible = false

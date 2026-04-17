@@ -1,0 +1,358 @@
+# xcom_manufacturing.toml — XCOM manufacturing screen
+# Viewport: 1280 × 720
+# Contains: item selector, order queue, engineer allocation,
+#           cost/time breakdown, storage capacity bars
+
+[root]
+widget_type = "panel"
+id = "mfg_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+[[root.children]]
+widget_type = "panel"
+id = "header_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 48.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "screen_title"
+x = 16.0
+y = 16.0
+w = 400.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "base_name"
+x = 704.0
+y = 16.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "back_btn"
+x = 1200.0
+y = 8.0
+w = 72.0
+h = 32.0
+
+# Available items list
+[[root.children]]
+widget_type = "panel"
+id = "item_selector_panel"
+x = 0.0
+y = 48.0
+w = 360.0
+h = 672.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "items_title"
+x = 8.0
+y = 8.0
+w = 264.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "item_category"
+x = 8.0
+y = 32.0
+w = 344.0
+h = 32.0
+text = "All|Weapons|Ammo|Armor|Craft|UFO Components|Alien Alloys"
+
+[[root.children.children]]
+widget_type = "textinput"
+id = "item_search"
+x = 8.0
+y = 72.0
+w = 344.0
+h = 32.0
+placeholder = "Search…"
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "item_list"
+x = 8.0
+y = 104.0
+w = 352.0
+h = 568.0
+tooltip = "Manufacturable items"
+
+# Item detail
+[[root.children]]
+widget_type = "panel"
+id = "item_detail_panel"
+x = 360.0
+y = 48.0
+w = 440.0
+h = 360.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_name"
+x = 16.0
+y = 16.0
+w = 416.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "panel"
+id = "item_image"
+x = 16.0
+y = 48.0
+w = 160.0
+h = 120.0
+tooltip = "Item sprite"
+
+[[root.children.children]]
+widget_type = "label"
+id = "item_desc"
+x = 184.0
+y = 48.0
+w = 256.0
+h = 120.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cost_title"
+x = 16.0
+y = 184.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cost_money"
+x = 16.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cost_engineer_hours"
+x = 16.0
+y = 232.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cost_materials"
+x = 224.0
+y = 208.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cost_workspace"
+x = 224.0
+y = 232.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "units_label"
+x = 16.0
+y = 264.0
+w = 160.0
+h = 24.0
+tooltip = "How many to produce"
+
+[[root.children.children]]
+widget_type = "spinbox"
+id = "units_spinbox"
+x = 184.0
+y = 264.0
+w = 104.0
+h = 32.0
+min = 1.0
+max = 99.0
+value = 1.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "engineers_label"
+x = 16.0
+y = 296.0
+w = 160.0
+h = 24.0
+tooltip = "Engineers assigned to this project"
+
+[[root.children.children]]
+widget_type = "spinbox"
+id = "engineers_spinbox"
+x = 184.0
+y = 296.0
+w = 104.0
+h = 32.0
+min = 1.0
+max = 50.0
+value = 10.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "eta_label"
+x = 16.0
+y = 328.0
+w = 416.0
+h = 24.0
+tooltip = "Estimated completion time"
+
+[[root.children.children]]
+widget_type = "button"
+id = "start_production_btn"
+x = 16.0
+y = 352.0
+w = 200.0
+h = 32.0
+tooltip = "Add to production queue"
+
+# Production queue
+[[root.children]]
+widget_type = "panel"
+id = "production_queue_panel"
+x = 360.0
+y = 408.0
+w = 440.0
+h = 312.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "queue_title"
+x = 16.0
+y = 8.0
+w = 304.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "production_queue"
+x = 8.0
+y = 32.0
+w = 432.0
+h = 232.0
+tooltip = "Active production orders"
+
+[[root.children.children]]
+widget_type = "button"
+id = "cancel_order_btn"
+x = 8.0
+y = 272.0
+w = 200.0
+h = 32.0
+tooltip = "Cancel selected order"
+
+[[root.children.children]]
+widget_type = "button"
+id = "sell_on_complete_chk"
+x = 224.0
+y = 272.0
+w = 216.0
+h = 32.0
+tooltip = "Toggle: sell items on completion"
+
+# Capacity / storage / workforce panels
+[[root.children]]
+widget_type = "panel"
+id = "capacity_panel"
+x = 800.0
+y = 48.0
+w = 480.0
+h = 720.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "capacity_title"
+x = 16.0
+y = 8.0
+w = 280.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "engineers_free"
+x = 16.0
+y = 40.0
+w = 280.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "engineers_bar"
+x = 16.0
+y = 64.0
+w = 456.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 55.0
+tooltip = "Engineers in use / total"
+
+[[root.children.children]]
+widget_type = "label"
+id = "workspace_free"
+x = 16.0
+y = 88.0
+w = 280.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "workspace_bar"
+x = 16.0
+y = 112.0
+w = 456.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 70.0
+tooltip = "Workshop bays in use / total"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stores_title"
+x = 16.0
+y = 144.0
+w = 280.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "guitable"
+id = "stores_table"
+x = 8.0
+y = 168.0
+w = 464.0
+h = 352.0
+tooltip = "Current materials in stores"
+
+[[root.children.children]]
+widget_type = "label"
+id = "stores_capacity"
+x = 16.0
+y = 528.0
+w = 280.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "stores_capacity_bar"
+x = 16.0
+y = 552.0
+w = 456.0
+h = 16.0
+min = 0.0
+max = 1000.0
+value = 480.0
+tooltip = "Store items used / total capacity"

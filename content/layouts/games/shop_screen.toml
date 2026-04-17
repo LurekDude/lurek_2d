@@ -1,0 +1,212 @@
+# shop_screen.toml — In-game merchant / shop screen
+# Viewport: 1000 × 640  (overlay window)
+# Contains: merchant name, 8 item buttons, item detail panel, player gold,
+#           buy / sell buttons, close button
+
+[root]
+widget_type = "window"
+id          = "shop_window"
+text        = "Mireva's Emporium"
+x = 144.0
+y = 40.0
+w = 1000.0
+h = 640.0
+
+[[root.children]]
+widget_type = "label"
+id = "merchant_greeting"
+text = "Welcome, adventurer! Browse my wares."
+x = 24.0
+y = 56.0
+w = 504.0
+h = 24.0
+
+# ── Shop item grid (2 × 4) ────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_0"
+text = "Iron Sword\n40g"
+x = 24.0
+y = 88.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_1"
+text = "Leather Shield\n28g"
+x = 192.0
+y = 88.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_2"
+text = "Health Potion\n15g"
+x = 360.0
+y = 88.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_3"
+text = "Mana Potion\n15g"
+x = 528.0
+y = 88.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_4"
+text = "Chain Armour\n120g"
+x = 24.0
+y = 176.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_5"
+text = "Magic Rope\n8g"
+x = 192.0
+y = 176.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_6"
+text = "Torch × 5\n5g"
+x = 360.0
+y = 176.0
+w = 160.0
+h = 72.0
+
+[[root.children]]
+widget_type = "button"
+id = "shop_item_7"
+text = "Elixir of Swiftness\n200g"
+x = 528.0
+y = 176.0
+w = 160.0
+h = 72.0
+
+# ── Item detail panel ─────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+id = "item_name"
+text = "(select an item)"
+x = 736.0
+y = 56.0
+w = 248.0
+h = 32.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_type"
+text = ""
+x = 736.0
+y = 88.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_desc"
+text = "Click an item to view its description and stats."
+x = 736.0
+y = 112.0
+w = 248.0
+h = 80.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_stats"
+text = ""
+x = 736.0
+y = 200.0
+w = 248.0
+h = 64.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_price_label"
+text = "Price:"
+x = 736.0
+y = 272.0
+w = 64.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "item_price"
+text = "—"
+x = 808.0
+y = 272.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "spinbox"
+id = "qty_box"
+x = 736.0
+y = 304.0
+w = 104.0
+h = 32.0
+min = 1.0
+max = 99.0
+value = 1.0
+tooltip = "Quantity to purchase"
+
+[[root.children]]
+widget_type = "button"
+id = "buy_btn"
+text = "Buy"
+x = 736.0
+y = 344.0
+w = 112.0
+h = 40.0
+enabled = false
+
+[[root.children]]
+widget_type = "button"
+id = "sell_btn"
+text = "Sell Item"
+x = 856.0
+y = 344.0
+w = 112.0
+h = 40.0
+enabled = false
+
+# ── Player gold & close ───────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "label"
+text = "Your Gold:"
+x = 24.0
+y = 592.0
+w = 104.0
+h = 24.0
+
+[[root.children]]
+widget_type = "label"
+id = "player_gold"
+text = "1,240 g"
+x = 128.0
+y = 592.0
+w = 120.0
+h = 24.0
+
+[[root.children]]
+widget_type = "button"
+id = "close_btn"
+text = "Leave Shop"
+x = 800.0
+y = 592.0
+w = 160.0
+h = 40.0

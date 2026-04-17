@@ -1,0 +1,330 @@
+# strategy_empire_overview.toml — 4X strategy empire overview (Civ-style)
+# Viewport: 1280 × 720
+# Contains: main world map, resource panel, action queue, city list,
+#           technology / era indicator, diplomacy status row, minimap
+
+[root]
+widget_type = "panel"
+id = "empire_root"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 720.0
+
+# ── Top resource bar ──────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "resource_bar"
+x = 0.0
+y = 0.0
+w = 1280.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "badge"
+id = "empire_icon"
+x = 8.0
+y = 8.0
+w = 32.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "empire_name"
+x = 40.0
+y = 8.0
+w = 144.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_gold"
+x = 200.0
+y = 8.0
+w = 104.0
+h = 24.0
+tooltip = "Gold per turn"
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_science"
+x = 312.0
+y = 8.0
+w = 104.0
+h = 24.0
+tooltip = "Science per turn"
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_culture"
+x = 424.0
+y = 8.0
+w = 104.0
+h = 24.0
+tooltip = "Culture per turn"
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_faith"
+x = 528.0
+y = 8.0
+w = 104.0
+h = 24.0
+tooltip = "Faith per turn"
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_production"
+x = 640.0
+y = 8.0
+w = 104.0
+h = 24.0
+tooltip = "Total production"
+
+[[root.children.children]]
+widget_type = "label"
+id = "res_food"
+x = 752.0
+y = 8.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "turn_counter"
+x = 904.0
+y = 8.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "year_label"
+x = 1008.0
+y = 8.0
+w = 104.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "combobox"
+id = "game_speed"
+x = 1120.0
+y = 8.0
+w = 104.0
+h = 32.0
+text = "Standard|Quick|Epic|Marathon"
+
+[[root.children.children]]
+widget_type = "button"
+id = "end_turn_btn"
+x = 1232.0
+y = 8.0
+w = 48.0
+h = 32.0
+tooltip = "End turn"
+
+# ── Main map area ─────────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "scrollpanel"
+id = "world_map"
+x = 240.0
+y = 40.0
+w = 840.0
+h = 544.0
+tooltip = "Hex-tile world map"
+
+# ── Technology ribbon ─────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "tech_ribbon"
+x = 0.0
+y = 584.0
+w = 1080.0
+h = 64.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "era_label"
+x = 8.0
+y = 8.0
+w = 120.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "progressbar"
+id = "tech_progress_bar"
+x = 128.0
+y = 16.0
+w = 304.0
+h = 16.0
+min = 0.0
+max = 100.0
+value = 67.0
+tooltip = "Research progress on current tech"
+
+[[root.children.children]]
+widget_type = "label"
+id = "current_research"
+x = 440.0
+y = 8.0
+w = 240.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "choose_research_btn"
+x = 688.0
+y = 8.0
+w = 160.0
+h = 32.0
+tooltip = "Choose or change research"
+
+[[root.children.children]]
+widget_type = "label"
+id = "culture_next"
+x = 856.0
+y = 8.0
+w = 224.0
+h = 24.0
+
+# ── Left city panel ───────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "city_panel"
+x = 0.0
+y = 40.0
+w = 240.0
+h = 544.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "cities_title"
+x = 8.0
+y = 8.0
+w = 200.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "city_list"
+x = 8.0
+y = 32.0
+w = 232.0
+h = 504.0
+tooltip = "All owned cities"
+
+# ── Right action panel ────────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "action_panel"
+x = 1080.0
+y = 40.0
+w = 200.0
+h = 544.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "actions_title"
+x = 8.0
+y = 8.0
+w = 184.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "scrollpanel"
+id = "action_queue"
+x = 8.0
+y = 32.0
+w = 192.0
+h = 304.0
+tooltip = "Unit / city action notifications"
+
+[[root.children.children]]
+widget_type = "button"
+id = "next_action_btn"
+x = 8.0
+y = 344.0
+w = 192.0
+h = 40.0
+tooltip = "Go to next action item"
+
+[[root.children.children]]
+widget_type = "button"
+id = "policies_btn"
+x = 8.0
+y = 384.0
+w = 192.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "diplomacy_btn"
+x = 8.0
+y = 424.0
+w = 192.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "religion_btn"
+x = 8.0
+y = 464.0
+w = 192.0
+h = 32.0
+
+[[root.children.children]]
+widget_type = "button"
+id = "victory_btn"
+x = 8.0
+y = 504.0
+w = 192.0
+h = 32.0
+
+# ── Minimap + bottom strip ────────────────────────────────────────────────────
+
+[[root.children]]
+widget_type = "panel"
+id = "minimap_panel"
+x = 1080.0
+y = 584.0
+w = 200.0
+h = 144.0
+tooltip = "World minimap"
+
+[[root.children.children]]
+widget_type = "panel"
+id = "minimap_canvas"
+x = 8.0
+y = 8.0
+w = 192.0
+h = 136.0
+
+[[root.children]]
+widget_type = "panel"
+id = "status_bar"
+x = 0.0
+y = 680.0
+w = 1080.0
+h = 40.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "selected_unit_info"
+x = 8.0
+y = 8.0
+w = 600.0
+h = 24.0
+
+[[root.children.children]]
+widget_type = "label"
+id = "tile_info"
+x = 624.0
+y = 8.0
+w = 448.0
+h = 24.0
+tooltip = "Tile under cursor"
