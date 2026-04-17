@@ -54,7 +54,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Colony Sim")
-    lurek.gfx.setBackgroundColor(0.12, 0.15, 0.1)
+    lurek.render.setBackgroundColor(0.12, 0.15, 0.1)
 
     colonists = {}
     buildings = {}
@@ -224,26 +224,26 @@ function lurek.render()
     end
 
     -- grid
-    lurek.gfx.setColor(0.18, 0.2, 0.15, 0.3)
+    lurek.render.setColor(0.18, 0.2, 0.15, 0.3)
     for r = 0, ROWS do
-        lurek.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
+        lurek.render.line(0, r * TILE, COLS * TILE, r * TILE)
     end
     for c = 0, COLS do
-        lurek.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
+        lurek.render.line(c * TILE, 0, c * TILE, ROWS * TILE)
     end
 
     -- buildings
     for _, b in ipairs(buildings) do
         local col = BUILD_COLORS[b.type]
-        lurek.gfx.setColor(col[1], col[2], col[3], 0.8)
-        lurek.gfx.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
-        lurek.gfx.setColor(1, 1, 1, 0.4)
-        lurek.gfx.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        lurek.render.setColor(col[1], col[2], col[3], 0.8)
+        lurek.render.rectangle("fill", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
+        lurek.render.setColor(1, 1, 1, 0.4)
+        lurek.render.rectangle("line", (b.x - 0.5) * TILE, (b.y - 0.5) * TILE, TILE, TILE)
 
         -- label
-        lurek.gfx.setColor(1, 1, 1, 0.6)
+        lurek.render.setColor(1, 1, 1, 0.6)
         local tag = ({ "F", "B", "R" })[b.type]
-        lurek.gfx.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
+        lurek.render.print(tag, (b.x - 0.3) * TILE, (b.y - 0.35) * TILE, 0.7)
     end
 
     -- colonists
@@ -253,21 +253,21 @@ function lurek.render()
         if c.state == "working" then cr, cg, cb = 0.2, 0.9, 0.3 end
         if c.hunger < 20 or c.energy < 15 then cr, cg, cb = 1, 0.3, 0.2 end
 
-        lurek.gfx.setColor(cr, cg, cb, 1)
-        lurek.gfx.circle("fill", c.x * TILE, c.y * TILE, 5)
+        lurek.render.setColor(cr, cg, cb, 1)
+        lurek.render.circle("fill", c.x * TILE, c.y * TILE, 5)
 
         -- need indicators (tiny bars)
         local bx = c.x * TILE - 6
         local by = c.y * TILE - 10
         -- hunger (red)
-        lurek.gfx.setColor(0.8, 0.2, 0.2, 0.7)
-        lurek.gfx.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
+        lurek.render.setColor(0.8, 0.2, 0.2, 0.7)
+        lurek.render.rectangle("fill", bx, by, 12 * (c.hunger / 100), 2)
         -- energy (blue)
-        lurek.gfx.setColor(0.2, 0.4, 0.9, 0.7)
-        lurek.gfx.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
+        lurek.render.setColor(0.2, 0.4, 0.9, 0.7)
+        lurek.render.rectangle("fill", bx, by + 3, 12 * (c.energy / 100), 2)
         -- happiness (yellow)
-        lurek.gfx.setColor(0.9, 0.8, 0.2, 0.7)
-        lurek.gfx.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
+        lurek.render.setColor(0.9, 0.8, 0.2, 0.7)
+        lurek.render.rectangle("fill", bx, by + 6, 12 * (c.happiness / 100), 2)
     end
 
     -- placement ghost
@@ -276,24 +276,24 @@ function lurek.render()
     local gr = math.floor(my / TILE) + 0.5
     if gr <= ROWS then
         local col = BUILD_COLORS[place_type]
-        lurek.gfx.setColor(col[1], col[2], col[3], 0.3)
-        lurek.gfx.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
+        lurek.render.setColor(col[1], col[2], col[3], 0.3)
+        lurek.render.rectangle("fill", (gc - 0.5) * TILE, (gr - 0.5) * TILE, TILE, TILE)
     end
 
     -- night overlay
     if night_alpha > 0 then
-        lurek.gfx.setColor(0.02, 0.02, 0.08, night_alpha)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0.02, 0.02, 0.08, night_alpha)
+        lurek.render.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD background
     local hud_y = ROWS * TILE
-    lurek.gfx.setColor(0.1, 0.1, 0.12, 0.9)
-    lurek.gfx.rectangle("fill", 0, hud_y, W, H - hud_y)
+    lurek.render.setColor(0.1, 0.1, 0.12, 0.9)
+    lurek.render.rectangle("fill", 0, hud_y, W, H - hud_y)
 
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     local time_str = is_night() and "Night" or "Day"
-    lurek.gfx.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
+    lurek.render.print(string.format("Day %d (%s)  |  Food: %d  Materials: %d  Colonists: %d  |  Placing: %s (1/2/3 to switch)",
         day_count, time_str, food_store, materials, #colonists, BUILD_NAMES[place_type]),
         10, hud_y + 6, 0.8)
 
@@ -305,11 +305,11 @@ function lurek.render()
                 math.floor(c.hunger), math.floor(c.energy), math.floor(c.happiness))
         end
     end
-    lurek.gfx.setColor(0.8, 0.8, 0.8, 0.7)
-    lurek.gfx.print(detail, 10, hud_y + 24, 0.65)
+    lurek.render.setColor(0.8, 0.8, 0.8, 0.7)
+    lurek.render.print(detail, 10, hud_y + 24, 0.65)
 
-    lurek.gfx.setColor(1, 1, 1, 0.4)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 70, hud_y + 6, 0.7)
+    lurek.render.setColor(1, 1, 1, 0.4)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 70, hud_y + 6, 0.7)
 end
 
 function lurek.mousepressed(x, y, button)

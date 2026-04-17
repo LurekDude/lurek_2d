@@ -151,40 +151,40 @@ end
 
 function lurek.render()
     -- Draw game world background
-    lurek.gfx.setBackgroundColor(0.15, 0.15, 0.2)
-    lurek.gfx.clear(0.15, 0.15, 0.2)
+    lurek.render.setBackgroundColor(0.15, 0.15, 0.2)
+    lurek.render.clear(0.15, 0.15, 0.2)
 
     -- Draw simple game world representation
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Game World", 10, 10)
-    lurek.gfx.print(string.format("Player: %.0f, %.0f", playerX, playerY), 10, 30)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Game World", 10, 10)
+    lurek.render.print(string.format("Player: %.0f, %.0f", playerX, playerY), 10, 30)
 
     -- Draw player indicator in game world
     local wx = playerX * 5
     local wy = playerY * 4 + 60
-    lurek.gfx.setColor(0, 1, 0)
-    lurek.gfx.circle("fill", wx, wy, 6)
+    lurek.render.setColor(0, 1, 0)
+    lurek.render.circle("fill", wx, wy, 6)
 
     -- Draw minimap background (top-right corner)
     local mx, my = 580, 10
-    lurek.gfx.setColor(0.1, 0.1, 0.1, 0.8)
-    lurek.gfx.rectangle("fill", mx - 2, my - 2, 204, 204)
+    lurek.render.setColor(0.1, 0.1, 0.1, 0.8)
+    lurek.render.rectangle("fill", mx - 2, my - 2, 204, 204)
 
     -- Draw minimap border
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.rectangle("line", mx - 2, my - 2, 204, 204)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.rectangle("line", mx - 2, my - 2, 204, 204)
 
     -- Draw HUD text
-    lurek.gfx.setColor(1, 1, 1, 0.8)
-    lurek.gfx.print("Controls:", 10, 520)
-    lurek.gfx.print("Arrows=Move  P=Ping  M=Mode  F=Fog  Z=Zoom", 10, 540)
-    lurek.gfx.print(string.format("Mode: %s | Fog: %s | Zoom: %.1fx | Pings: %d",
+    lurek.render.setColor(1, 1, 1, 0.8)
+    lurek.render.print("Controls:", 10, 520)
+    lurek.render.print("Arrows=Move  P=Ping  M=Mode  F=Fog  Z=Zoom", 10, 540)
+    lurek.render.print(string.format("Mode: %s | Fog: %s | Zoom: %.1fx | Pings: %d",
         minimap:getColorMode(),
         minimap:isFogEnabled() and "ON" or "OFF",
         minimap:getZoom(),
         minimap:getPingCount()),
         10, 560)
-    lurek.gfx.print(string.format("Objects: %d | Markers: %d",
+    lurek.render.print(string.format("Objects: %d | Markers: %d",
         minimap:getObjectCount(),
         minimap:getMarkerCount()),
         10, 580)

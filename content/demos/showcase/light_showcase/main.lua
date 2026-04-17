@@ -258,84 +258,84 @@ end
 
 function lurek.render()
     -- Background
-    lurek.gfx.clear(0.02, 0.02, 0.04)
+    lurek.render.clear(0.02, 0.02, 0.04)
 
     -- Draw a simple grid floor
-    lurek.gfx.setColor(0.15, 0.15, 0.2, 1.0)
+    lurek.render.setColor(0.15, 0.15, 0.2, 1.0)
     for x = 0, W, 64 do
-        lurek.gfx.line(x, 0, x, H)
+        lurek.render.line(x, 0, x, H)
     end
     for y = 0, H, 64 do
-        lurek.gfx.line(0, y, W, y)
+        lurek.render.line(0, y, W, y)
     end
 
     -- Draw occluder outlines (screen 7)
     if screen == 7 then
-        lurek.gfx.setColor(0.4, 0.4, 0.5, 1.0)
-        lurek.gfx.rectangle("fill", 280, 280, 40, 140)
-        lurek.gfx.rectangle("fill", 580, 280, 40, 140)
-        lurek.gfx.rectangle("fill", 880, 280, 40, 140)
+        lurek.render.setColor(0.4, 0.4, 0.5, 1.0)
+        lurek.render.rectangle("fill", 280, 280, 40, 140)
+        lurek.render.rectangle("fill", 580, 280, 40, 140)
+        lurek.render.rectangle("fill", 880, 280, 40, 140)
     end
 
     -- Draw player dot
-    lurek.gfx.setColor(1.0, 1.0, 0.8, 0.8)
-    lurek.gfx.circle("fill", player_x, player_y, 6)
+    lurek.render.setColor(1.0, 1.0, 0.8, 0.8)
+    lurek.render.circle("fill", player_x, player_y, 6)
 
     -- HUD — screen title and description
-    lurek.gfx.setColor(1.0, 1.0, 1.0, 1.0)
+    lurek.render.setColor(1.0, 1.0, 1.0, 1.0)
     local s = screens[screen]
-    lurek.gfx.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
-    lurek.gfx.setColor(0.7, 0.7, 0.8, 1.0)
-    lurek.gfx.print(s.desc, 20, 45)
+    lurek.render.print("Screen " .. screen .. "/" .. NUM_SCREENS .. ": " .. s.title, 20, 20)
+    lurek.render.setColor(0.7, 0.7, 0.8, 1.0)
+    lurek.render.print(s.desc, 20, 45)
 
     -- Controls
-    lurek.gfx.setColor(0.5, 0.5, 0.6, 1.0)
-    lurek.gfx.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
+    lurek.render.setColor(0.5, 0.5, 0.6, 1.0)
+    lurek.render.print("Keys 1-8: switch screen  |  WASD: move light", 20, H - 30)
     if screen == 6 then
         local state_str = group1_on and "ON" or "OFF"
-        lurek.gfx.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
+        lurek.render.print("G: toggle torch group (" .. state_str .. ")", 20, H - 55)
     end
 
     -- Per-screen labels
     if screen == 1 then
         -- Labels for each light
-        lurek.gfx.setColor(1.0, 0.6, 0.2, 0.7)
-        lurek.gfx.print("Warm orange", 160, 230)
-        lurek.gfx.setColor(0.3, 0.5, 1.0, 0.7)
-        lurek.gfx.print("Cool blue", 460, 130)
-        lurek.gfx.setColor(0.2, 1.0, 0.3, 0.7)
-        lurek.gfx.print("Green", 720, 430)
-        lurek.gfx.setColor(0.8, 0.2, 1.0, 0.7)
-        lurek.gfx.print("Purple", 310, 480)
+        lurek.render.setColor(1.0, 0.6, 0.2, 0.7)
+        lurek.render.print("Warm orange", 160, 230)
+        lurek.render.setColor(0.3, 0.5, 1.0, 0.7)
+        lurek.render.print("Cool blue", 460, 130)
+        lurek.render.setColor(0.2, 1.0, 0.3, 0.7)
+        lurek.render.print("Green", 720, 430)
+        lurek.render.setColor(0.8, 0.2, 1.0, 0.7)
+        lurek.render.print("Purple", 310, 480)
     elseif screen == 2 then
-        lurek.gfx.setColor(1.0, 0.9, 0.5, 0.7)
-        lurek.gfx.print("Narrow cone ->", 50, 320)
-        lurek.gfx.setColor(0.5, 0.8, 1.0, 0.7)
-        lurek.gfx.print("Wide cone v", 450, 60)
-        lurek.gfx.setColor(1.0, 0.3, 0.3, 0.7)
-        lurek.gfx.print("Tight cone", 750, 560)
+        lurek.render.setColor(1.0, 0.9, 0.5, 0.7)
+        lurek.render.print("Narrow cone ->", 50, 320)
+        lurek.render.setColor(0.5, 0.8, 1.0, 0.7)
+        lurek.render.print("Wide cone v", 450, 60)
+        lurek.render.setColor(1.0, 0.3, 0.3, 0.7)
+        lurek.render.print("Tight cone", 750, 560)
     elseif screen == 4 then
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        lurek.gfx.print("Slow candle", 155, 270)
-        lurek.gfx.print("Medium torch", 395, 270)
-        lurek.gfx.print("Fast campfire", 640, 270)
-        lurek.gfx.print("Strobe", 870, 140)
+        lurek.render.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.render.print("Slow candle", 155, 270)
+        lurek.render.print("Medium torch", 395, 270)
+        lurek.render.print("Fast campfire", 640, 270)
+        lurek.render.print("Strobe", 870, 140)
     elseif screen == 5 then
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        lurek.gfx.print("Default (none)", 140, 270)
-        lurek.gfx.print("Linear", 410, 270)
-        lurek.gfx.print("Quadratic", 650, 270)
-        lurek.gfx.print("Mixed", 910, 270)
+        lurek.render.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.render.print("Default (none)", 140, 270)
+        lurek.render.print("Linear", 410, 270)
+        lurek.render.print("Quadratic", 650, 270)
+        lurek.render.print("Mixed", 910, 270)
     elseif screen == 7 then
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        lurek.gfx.print("No filter", 155, 230)
-        lurek.gfx.print("PCF5", 470, 230)
-        lurek.gfx.print("PCF13", 760, 230)
+        lurek.render.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.render.print("No filter", 155, 230)
+        lurek.render.print("PCF5", 470, 230)
+        lurek.render.print("PCF13", 760, 230)
     elseif screen == 8 then
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 0.6)
-        lurek.gfx.print("Add (brighten)", 140, 270)
-        lurek.gfx.print("Sub (darken)", 445, 270)
-        lurek.gfx.print("Mix (tint)", 750, 270)
+        lurek.render.setColor(0.8, 0.8, 0.8, 0.6)
+        lurek.render.print("Add (brighten)", 140, 270)
+        lurek.render.print("Sub (darken)", 445, 270)
+        lurek.render.print("Mix (tint)", 750, 270)
     end
 end
 

@@ -28,7 +28,7 @@ end
 local title = {}
 
 function title.enter()
-    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.18)
+    lurek.render.setBackgroundColor(0.08, 0.05, 0.18)
 end
 
 function title.update(dt)
@@ -37,20 +37,20 @@ function title.update(dt)
 end
 
 function title.draw()
-    local w = lurek.gfx.getWidth()
-    local h = lurek.gfx.getHeight()
+    local w = lurek.render.getWidth()
+    local h = lurek.render.getHeight()
 
     -- Title text
     local pulse = math.sin((title.pulse or 0) * 2) * 0.15 + 0.85
-    lurek.gfx.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
-    lurek.gfx.print("LUREK2D", w / 2 - 100, h / 3, 5)
+    lurek.render.setColor(0.3 * pulse, 0.6 * pulse, 1.0 * pulse)
+    lurek.render.print("LUREK2D", w / 2 - 100, h / 3, 5)
 
-    lurek.gfx.setColor(0.7, 0.7, 0.7)
-    lurek.gfx.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
+    lurek.render.setColor(0.7, 0.7, 0.7)
+    lurek.render.print("Scene Management Demo", w / 2 - 120, h / 3 + 70, 2)
 
     -- Instructions
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.print("Press ENTER to start", w / 2 - 100, h * 0.7, 2)
 end
 
 function title.keypressed(key)
@@ -66,7 +66,7 @@ local player = { x = 400, y = 300, speed = 200, score = 0 }
 local coins = {}
 
 function gameplay.enter()
-    lurek.gfx.setBackgroundColor(0.05, 0.1, 0.05)
+    lurek.render.setBackgroundColor(0.05, 0.1, 0.05)
     player.x = 400
     player.y = 300
     player.score = 0
@@ -120,22 +120,22 @@ function gameplay.draw()
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
-            lurek.gfx.setColor(1.0, 0.85, 0.0)
-            lurek.gfx.circle("fill", coin.x, coin.y, 10)
-            lurek.gfx.setColor(0.8, 0.65, 0.0)
-            lurek.gfx.circle("line", coin.x, coin.y, 10)
+            lurek.render.setColor(1.0, 0.85, 0.0)
+            lurek.render.circle("fill", coin.x, coin.y, 10)
+            lurek.render.setColor(0.8, 0.65, 0.0)
+            lurek.render.circle("line", coin.x, coin.y, 10)
         end
     end
 
     -- Draw player
-    lurek.gfx.setColor(0.3, 0.8, 1.0)
-    lurek.gfx.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
+    lurek.render.setColor(0.3, 0.8, 1.0)
+    lurek.render.rectangle("fill", player.x - 15, player.y - 15, 30, 30)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.print("WASD to move | ESC for title", 10, 570, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Score: " .. tostring(player.score) .. " / 5", 10, 10, 2)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.print("WASD to move | ESC for title", 10, 570, 1.5)
 end
 
 function gameplay.keypressed(key)
@@ -149,7 +149,7 @@ end
 local gameover = {}
 
 function gameover.enter()
-    lurek.gfx.setBackgroundColor(0.15, 0.05, 0.05)
+    lurek.render.setBackgroundColor(0.15, 0.05, 0.05)
     gameover.timer = 0
 end
 
@@ -158,18 +158,18 @@ function gameover.update(dt)
 end
 
 function gameover.draw()
-    local w = lurek.gfx.getWidth()
-    local h = lurek.gfx.getHeight()
+    local w = lurek.render.getWidth()
+    local h = lurek.render.getHeight()
 
-    lurek.gfx.setColor(0.2, 1.0, 0.3)
-    lurek.gfx.print("YOU WIN!", w / 2 - 80, h / 3, 4)
+    lurek.render.setColor(0.2, 1.0, 0.3)
+    lurek.render.print("YOU WIN!", w / 2 - 80, h / 3, 4)
 
-    lurek.gfx.setColor(0.7, 0.7, 0.7)
-    lurek.gfx.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
+    lurek.render.setColor(0.7, 0.7, 0.7)
+    lurek.render.print("All coins collected!", w / 2 - 100, h / 3 + 60, 2)
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
-    lurek.gfx.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.print("Press ENTER to play again", w / 2 - 120, h * 0.7, 2)
+    lurek.render.print("Press ESC to return to title", w / 2 - 130, h * 0.7 + 30, 2)
 end
 
 function gameover.keypressed(key)

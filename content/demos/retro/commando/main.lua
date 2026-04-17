@@ -57,7 +57,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.08, 0.18, 0.05)
+    lurek.render.setBackgroundColor(0.08, 0.18, 0.05)
     score = 0; lives = 3; grenades_left = 3
     reset()
 end
@@ -232,92 +232,92 @@ function lurek.render()
     -- Background jungle tiles (scroll with world)
     for _, t in ipairs(tiles) do
         local sy = (t.y + world_y) % (H + 200) - 50
-        lurek.gfx.setColor(t.c[1], t.c[2], t.c[3])
-        lurek.gfx.rectangle("fill", t.x, sy, t.w, t.h)
+        lurek.render.setColor(t.c[1], t.c[2], t.c[3])
+        lurek.render.rectangle("fill", t.x, sy, t.w, t.h)
     end
 
     -- Road stripe
-    lurek.gfx.setColor(0.4, 0.35, 0.2, 0.3)
+    lurek.render.setColor(0.4, 0.35, 0.2, 0.3)
     local roffset = world_y % 60
     for ry = -roffset, H, 60 do
-        lurek.gfx.rectangle("fill", W/2 - 20, ry, 40, 30)
+        lurek.render.rectangle("fill", W/2 - 20, ry, 40, 30)
     end
 
     -- POWs
     for _, p in ipairs(pows) do
         if p.alive then
-            lurek.gfx.setColor(1, 0.8, 0.1)
-            lurek.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
-            lurek.gfx.setColor(0, 0, 0)
-            lurek.gfx.print("POW", p.x + 1, p.y + 6, 1.1)
+            lurek.render.setColor(1, 0.8, 0.1)
+            lurek.render.rectangle("fill", p.x, p.y, p.w, p.h)
+            lurek.render.setColor(0, 0, 0)
+            lurek.render.print("POW", p.x + 1, p.y + 6, 1.1)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        lurek.gfx.setColor(0.6, 0.2, 0.1)
-        lurek.gfx.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
-        lurek.gfx.setColor(0.75, 0.55, 0.35)
-        lurek.gfx.circle("fill", e.x + e.w/2, e.y + 8, 9)
-        lurek.gfx.setColor(0.4, 0.2, 0)
-        lurek.gfx.rectangle("fill", e.x, e.y, e.w, 7)
+        lurek.render.setColor(0.6, 0.2, 0.1)
+        lurek.render.rectangle("fill", e.x + 2, e.y + 8, e.w - 4, e.h - 8)
+        lurek.render.setColor(0.75, 0.55, 0.35)
+        lurek.render.circle("fill", e.x + e.w/2, e.y + 8, 9)
+        lurek.render.setColor(0.4, 0.2, 0)
+        lurek.render.rectangle("fill", e.x, e.y, e.w, 7)
     end
 
     -- Enemy bullets
-    lurek.gfx.setColor(1, 0.4, 0.1)
+    lurek.render.setColor(1, 0.4, 0.1)
     for _, b in ipairs(bullets) do
         if b.enemy then
-            lurek.gfx.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
+            lurek.render.rectangle("fill", b.x - 2, b.y - 4, b.w, b.h)
         end
     end
 
     -- Player
-    lurek.gfx.setColor(0.2, 0.35, 0.7)
-    lurek.gfx.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
-    lurek.gfx.setColor(0.85, 0.65, 0.4)
-    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 10, 11)
-    lurek.gfx.setColor(0.3, 0.3, 0.1)
-    lurek.gfx.rectangle("fill", player.x, player.y, player.w, 8)
+    lurek.render.setColor(0.2, 0.35, 0.7)
+    lurek.render.rectangle("fill", player.x + 4, player.y + 10, player.w - 8, player.h - 10)
+    lurek.render.setColor(0.85, 0.65, 0.4)
+    lurek.render.circle("fill", player.x + player.w/2, player.y + 10, 11)
+    lurek.render.setColor(0.3, 0.3, 0.1)
+    lurek.render.rectangle("fill", player.x, player.y, player.w, 8)
     -- Gun
-    lurek.gfx.setColor(0.4, 0.4, 0.4)
-    lurek.gfx.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.rectangle("fill", player.x + player.w/2 - 2, player.y - 10, 4, 14)
 
     -- Player bullets
-    lurek.gfx.setColor(1, 1, 0.4)
+    lurek.render.setColor(1, 1, 0.4)
     for _, b in ipairs(bullets) do
         if not b.enemy then
-            lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
+            lurek.render.rectangle("fill", b.x - 2, b.y, 4, 12)
         end
     end
 
     -- Grenades
-    lurek.gfx.setColor(0, 0.8, 0.1)
+    lurek.render.setColor(0, 0.8, 0.1)
     for _, g in ipairs(grenades) do
-        lurek.gfx.circle("fill", g.x, g.y, 8)
+        lurek.render.circle("fill", g.x, g.y, 8)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.55)
-    lurek.gfx.rectangle("fill", 0, 0, W, 28)
-    lurek.gfx.setColor(0.9, 0.8, 0.2)
-    lurek.gfx.print("COMMANDO", 8, 5, 1.8)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: " .. score, W/2 - 50, 5, 1.6)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
-    lurek.gfx.setColor(0.4, 1, 0.4)
-    lurek.gfx.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
+    lurek.render.setColor(0, 0, 0, 0.55)
+    lurek.render.rectangle("fill", 0, 0, W, 28)
+    lurek.render.setColor(0.9, 0.8, 0.2)
+    lurek.render.print("COMMANDO", 8, 5, 1.8)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Score: " .. score, W/2 - 50, 5, 1.6)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("Lives: " .. lives, W - 100, 5, 1.5)
+    lurek.render.setColor(0.4, 1, 0.4)
+    lurek.render.print("Grenades: " .. grenades_left, W/2 + 60, 5, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.72)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.render.setColor(0, 0, 0, 0.72)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("MISSION FAILED", W/2 - 110, H/2 - 25, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

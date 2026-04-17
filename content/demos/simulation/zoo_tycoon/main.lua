@@ -242,34 +242,34 @@ local cell_colors = {
 }
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.1, 0.12, 0.08)
+    lurek.render.setBackgroundColor(0.1, 0.12, 0.08)
 
     -- UI header
-    lurek.gfx.setColor(1, 0.9, 0.4, 1)
-    lurek.gfx.print("Zoo Tycoon", 10, 5, 1.2)
-    lurek.gfx.setColor(1, 1, 0.6, 1)
-    lurek.gfx.print("Gold: " .. gold, 160, 8, 0.9)
-    lurek.gfx.print("Day: " .. day, 300, 8, 0.9)
-    lurek.gfx.print("Guests: " .. #guests, 400, 8, 0.9)
-    lurek.gfx.print("Happy: " .. math.floor(happiness) .. "%", 520, 8, 0.9)
+    lurek.render.setColor(1, 0.9, 0.4, 1)
+    lurek.render.print("Zoo Tycoon", 10, 5, 1.2)
+    lurek.render.setColor(1, 1, 0.6, 1)
+    lurek.render.print("Gold: " .. gold, 160, 8, 0.9)
+    lurek.render.print("Day: " .. day, 300, 8, 0.9)
+    lurek.render.print("Guests: " .. #guests, 400, 8, 0.9)
+    lurek.render.print("Happy: " .. math.floor(happiness) .. "%", 520, 8, 0.9)
 
     -- Tool bar
-    lurek.gfx.setColor(0.7, 0.7, 0.6, 1)
-    lurek.gfx.print("Tool: " .. selected_tool, 10, 30, 0.75)
-    lurek.gfx.print("Tab=cycle | 1-4=animals | Click=place", 150, 30, 0.65)
+    lurek.render.setColor(0.7, 0.7, 0.6, 1)
+    lurek.render.print("Tool: " .. selected_tool, 10, 30, 0.75)
+    lurek.render.print("Tab=cycle | 1-4=animals | Click=place", 150, 30, 0.65)
 
     -- Grid
     for y = 1, GRID_H do
         for x = 1, GRID_W do
             local c = cell_colors[grid[y][x]] or {0.3, 0.3, 0.3}
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
-            lurek.gfx.rectangle("fill", OX + (x - 1) * CELL, OY + (y - 1) * CELL, CELL - 1, CELL - 1)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
+            lurek.render.rectangle("fill", OX + (x - 1) * CELL, OY + (y - 1) * CELL, CELL - 1, CELL - 1)
         end
     end
 
     -- Gate label
-    lurek.gfx.setColor(0, 0, 0, 1)
-    lurek.gfx.print("G", OX + 6, OY + (GRID_H - 1) * CELL + 6, 0.7)
+    lurek.render.setColor(0, 0, 0, 1)
+    lurek.render.print("G", OX + 6, OY + (GRID_H - 1) * CELL + 6, 0.7)
 
     -- Animals
     for _, a in ipairs(animals) do
@@ -278,65 +278,65 @@ function lurek.render()
         local ay = OY + (a.gy - 1) * CELL + 2
         -- Happiness indicator
         if a.happy then
-            lurek.gfx.setColor(0.2, 0.8, 0.2, 0.4)
+            lurek.render.setColor(0.2, 0.8, 0.2, 0.4)
         else
-            lurek.gfx.setColor(0.8, 0.2, 0.2, 0.4)
+            lurek.render.setColor(0.8, 0.2, 0.2, 0.4)
         end
-        lurek.gfx.rectangle("fill", ax, ay, CELL - 3, CELL - 3)
+        lurek.render.rectangle("fill", ax, ay, CELL - 3, CELL - 3)
         -- Icon
-        lurek.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
-        lurek.gfx.print(at.icon, ax + 6, ay + 4, 1)
+        lurek.render.setColor(at.color[1], at.color[2], at.color[3], 1)
+        lurek.render.print(at.icon, ax + 6, ay + 4, 1)
     end
 
     -- Guests
-    lurek.gfx.setColor(1, 0.9, 0.7, 1)
+    lurek.render.setColor(1, 0.9, 0.7, 1)
     for _, g in ipairs(guests) do
-        lurek.gfx.circle("fill", g.x, g.y, 4)
+        lurek.render.circle("fill", g.x, g.y, 4)
     end
 
     -- Day timer bar
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL, 8)
-    lurek.gfx.setColor(0.4, 0.7, 1, 1)
-    lurek.gfx.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL * (day_timer / DAY_LENGTH), 8)
+    lurek.render.setColor(0.2, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL, 8)
+    lurek.render.setColor(0.4, 0.7, 1, 1)
+    lurek.render.rectangle("fill", OX, OY + GRID_H * CELL + 5, GRID_W * CELL * (day_timer / DAY_LENGTH), 8)
 
     -- Legend
     local lx = OX + GRID_W * CELL + 10
-    lurek.gfx.setColor(0.9, 0.85, 0.6, 1)
-    lurek.gfx.print("Legend:", lx, OY, 0.8)
+    lurek.render.setColor(0.9, 0.85, 0.6, 1)
+    lurek.render.print("Legend:", lx, OY, 0.8)
     local legend = { {"Path",0.6,0.55,0.4}, {"Fence",0.5,0.35,0.15}, {"Water",0.2,0.4,0.8},
                      {"Tree",0.1,0.6,0.1}, {"Food",0.9,0.6,0.2}, {"Gift",0.8,0.3,0.7} }
     for i, l in ipairs(legend) do
-        lurek.gfx.setColor(l[2], l[3], l[4], 1)
-        lurek.gfx.rectangle("fill", lx, OY + 18 + (i - 1) * 20, 12, 12)
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
-        lurek.gfx.print(l[1], lx + 16, OY + 16 + (i - 1) * 20, 0.65)
+        lurek.render.setColor(l[2], l[3], l[4], 1)
+        lurek.render.rectangle("fill", lx, OY + 18 + (i - 1) * 20, 12, 12)
+        lurek.render.setColor(0.8, 0.8, 0.8, 1)
+        lurek.render.print(l[1], lx + 16, OY + 16 + (i - 1) * 20, 0.65)
     end
 
     -- Animal key
-    lurek.gfx.setColor(0.9, 0.85, 0.6, 1)
-    lurek.gfx.print("Animals:", lx, OY + 150, 0.8)
+    lurek.render.setColor(0.9, 0.85, 0.6, 1)
+    lurek.render.print("Animals:", lx, OY + 150, 0.8)
     for i, at in ipairs(animal_types) do
-        lurek.gfx.setColor(at.color[1], at.color[2], at.color[3], 1)
-        lurek.gfx.print(i .. "=" .. at.name, lx, OY + 170 + (i - 1) * 18, 0.65)
+        lurek.render.setColor(at.color[1], at.color[2], at.color[3], 1)
+        lurek.render.print(i .. "=" .. at.name, lx, OY + 170 + (i - 1) * 18, 0.65)
     end
 
     -- Message
     if msg_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0.7, clamp(msg_timer, 0, 1))
-        lurek.gfx.print(message, OX, OY + GRID_H * CELL + 20, 0.85)
+        lurek.render.setColor(1, 1, 0.7, clamp(msg_timer, 0, 1))
+        lurek.render.print(message, OX, OY + GRID_H * CELL + 20, 0.85)
     end
 
     -- Day report overlay
     if show_report then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", 100, 100, 400, 220)
-        lurek.gfx.setColor(1, 0.9, 0.4, 1)
-        lurek.gfx.print(last_report, 120, 120, 1)
-        lurek.gfx.setColor(0.5, 1, 0.5, 1)
-        lurek.gfx.print("Press ENTER to continue", 180, 290, 0.9)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 100, 100, 400, 220)
+        lurek.render.setColor(1, 0.9, 0.4, 1)
+        lurek.render.print(last_report, 120, 120, 1)
+        lurek.render.setColor(0.5, 1, 0.5, 1)
+        lurek.render.print("Press ENTER to continue", 180, 290, 0.9)
     end
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 5, 0.6)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 5, 0.6)
 end

@@ -59,7 +59,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.55, 0.75, 0.92)
+    lurek.render.setBackgroundColor(0.55, 0.75, 0.92)
     reset()
 end
 
@@ -121,80 +121,80 @@ end
 -- ── Draw ──────────────────────────────────────────────────────────────────
 
 local function draw_skier(x, y, angle, crouching)
-    lurek.gfx.setColor(0.1, 0.2, 0.7)
+    lurek.render.setColor(0.1, 0.2, 0.7)
     -- Body
     local bx = x + math.cos(angle) * 6
     local by = y + math.sin(angle) * 6
     if crouching then
-        lurek.gfx.rectangle("fill", x - 5, y - 6, 10, 10)
+        lurek.render.rectangle("fill", x - 5, y - 6, 10, 10)
     else
-        lurek.gfx.rectangle("fill", x - 5, y - 14, 10, 16)
+        lurek.render.rectangle("fill", x - 5, y - 14, 10, 16)
     end
     -- Head
-    lurek.gfx.setColor(0.9, 0.6, 0.3)
-    lurek.gfx.circle("fill", x, crouching and y - 10 or y - 18, 7)
+    lurek.render.setColor(0.9, 0.6, 0.3)
+    lurek.render.circle("fill", x, crouching and y - 10 or y - 18, 7)
     -- Skis
-    lurek.gfx.setColor(0.9, 0.1, 0.1)
-    lurek.gfx.rectangle("fill", x - 14, y, 28, 4)
+    lurek.render.setColor(0.9, 0.1, 0.1)
+    lurek.render.rectangle("fill", x - 14, y, 28, 4)
 end
 
 local function draw_ramp()
     -- Fill
-    lurek.gfx.setColor(0.88, 0.94, 1)
+    lurek.render.setColor(0.88, 0.94, 1)
     local pts_x, pts_y = {}, {}
     for _, p in ipairs(RAMP) do pts_x[#pts_x+1] = p.x; pts_y[#pts_y+1] = p.y end
     -- Draw ramp as thick segments
-    lurek.gfx.setColor(0.88, 0.94, 1)
+    lurek.render.setColor(0.88, 0.94, 1)
     for i = 1, #RAMP - 1 do
         local a, b = RAMP[i], RAMP[i+1]
-        lurek.gfx.line(a.x, a.y, b.x, b.y)
+        lurek.render.line(a.x, a.y, b.x, b.y)
     end
     -- Draw outline
-    lurek.gfx.setColor(0.6, 0.75, 0.95)
+    lurek.render.setColor(0.6, 0.75, 0.95)
     for i = 1, #RAMP - 1 do
         local a, b = RAMP[i], RAMP[i+1]
-        lurek.gfx.rectangle("fill", a.x - 5, a.y - 5, b.x - a.x + 10, 10)
+        lurek.render.rectangle("fill", a.x - 5, a.y - 5, b.x - a.x + 10, 10)
     end
 end
 
 local function draw_landing_slope()
     -- Slope continues from takeoff point
-    lurek.gfx.setColor(0.88, 0.94, 1)
+    lurek.render.setColor(0.88, 0.94, 1)
     for xi = LANDING_X, W - 10, 10 do
         local ya = TAKEOFF_Y + (xi - LANDING_X) * LANDING_SLOPE
         local yb = TAKEOFF_Y + (xi + 10 - LANDING_X) * LANDING_SLOPE
-        lurek.gfx.line(xi, ya, xi + 10, yb)
+        lurek.render.line(xi, ya, xi + 10, yb)
     end
     -- Slope fill
-    lurek.gfx.setColor(0.72, 0.88, 0.98)
+    lurek.render.setColor(0.72, 0.88, 0.98)
     for xi = LANDING_X, W - 20, 20 do
         local sy = TAKEOFF_Y + (xi - LANDING_X) * LANDING_SLOPE
-        lurek.gfx.rectangle("fill", xi, sy, 20, 12)
+        lurek.render.rectangle("fill", xi, sy, 20, 12)
     end
     -- Distance markers (every ~30m)
     for m = 30, 120, 30 do
         local mx = LANDING_X + m * 3.5
         local my = TAKEOFF_Y + (mx - LANDING_X) * LANDING_SLOPE - 10
         if mx < W then
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 0.8)
-            lurek.gfx.line(mx, my, mx, my + 10)
-            lurek.gfx.setColor(0.2, 0.2, 0.2)
-            lurek.gfx.print(tostring(m), mx - 8, my - 14, 1.2)
+            lurek.render.setColor(0.4, 0.4, 0.4, 0.8)
+            lurek.render.line(mx, my, mx, my + 10)
+            lurek.render.setColor(0.2, 0.2, 0.2)
+            lurek.render.print(tostring(m), mx - 8, my - 14, 1.2)
         end
     end
 end
 
 function lurek.render()
     -- Background
-    lurek.gfx.setColor(0.55, 0.75, 0.92)
-    lurek.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.render.setColor(0.55, 0.75, 0.92)
+    lurek.render.rectangle("fill", 0, 0, W, H)
     -- Mountains
-    lurek.gfx.setColor(0.8, 0.88, 0.96)
-    lurek.gfx.rectangle("fill", 0, H - 150, W, 150)
-    lurek.gfx.setColor(0.92, 0.96, 1)
+    lurek.render.setColor(0.8, 0.88, 0.96)
+    lurek.render.rectangle("fill", 0, H - 150, W, 150)
+    lurek.render.setColor(0.92, 0.96, 1)
     for i = 0, 6 do
         local mx = 60 + i * 110
-        lurek.gfx.rectangle("fill", mx - 50, H - 200 - (i%3)*40, 100, 100)
+        lurek.render.rectangle("fill", mx - 50, H - 200 - (i%3)*40, 100, 100)
     end
 
     draw_landing_slope()
@@ -205,76 +205,76 @@ function lurek.render()
     draw_skier(skier.x, skier.y, phase == "airborne" and skier.angle or 0, crouching)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, W, 50)
-    lurek.gfx.setColor(1, 0.9, 0.3)
-    lurek.gfx.print("SKI JUMP", 14, 8, 2.5)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, W, 50)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.print("SKI JUMP", 14, 8, 2.5)
 
     -- Scores
     for i = 1, 3 do
-        lurek.gfx.setColor(i <= attempt and 1 or 0.5, i <= attempt and 1 or 0.5, 0.5)
+        lurek.render.setColor(i <= attempt and 1 or 0.5, i <= attempt and 1 or 0.5, 0.5)
         local s = scores[i] and (scores[i] .. "m") or "—"
-        lurek.gfx.print("Jump " .. i .. ": " .. s, W/2 + (i-2)*140 - 50, 12, 1.6)
+        lurek.render.print("Jump " .. i .. ": " .. s, W/2 + (i-2)*140 - 50, 12, 1.6)
     end
-    lurek.gfx.setColor(0.4, 1, 0.6)
-    lurek.gfx.print("Best: " .. best .. "m", W - 130, 12, 1.8)
+    lurek.render.setColor(0.4, 1, 0.6)
+    lurek.render.print("Best: " .. best .. "m", W - 130, 12, 1.8)
 
     -- Phase instruction
     if phase == "slide" then
-        lurek.gfx.setColor(1, 1, 0.6, 0.9)
-        lurek.gfx.print("Hold SPACE to crouch low on the ramp!", 14, H - 24, 1.6)
+        lurek.render.setColor(1, 1, 0.6, 0.9)
+        lurek.render.print("Hold SPACE to crouch low on the ramp!", 14, H - 24, 1.6)
         -- Crouch indicator
         local cb = lurek.input.isKeyDown("space") and 1 or 0.3
-        lurek.gfx.setColor(cb, cb * 0.7, 0)
-        lurek.gfx.print("[HOLD SPACE] = Crouch", 14, H - 46, 1.4)
+        lurek.render.setColor(cb, cb * 0.7, 0)
+        lurek.render.print("[HOLD SPACE] = Crouch", 14, H - 46, 1.4)
     elseif phase == "airborne" then
-        lurek.gfx.setColor(1, 1, 0.6, 0.9)
-        lurek.gfx.print("A = Lean back   D = Lean forward   (neutral = straight arms)", 14, H - 24, 1.4)
+        lurek.render.setColor(1, 1, 0.6, 0.9)
+        lurek.render.print("A = Lean back   D = Lean forward   (neutral = straight arms)", 14, H - 24, 1.4)
         -- Lean bar
-        lurek.gfx.setColor(0.3, 0.3, 0.3)
-        lurek.gfx.rectangle("fill", W - 150, H - 55, 130, 20)
-        lurek.gfx.setColor(0.1, 0.8, 0.3)
-        lurek.gfx.rectangle("fill", W - 85, H - 55, lean * 60, 20)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.line(W - 85, H - 60, W - 85, H - 30)
-        lurek.gfx.print("LEAN", W - 152, H - 55, 1.2)
+        lurek.render.setColor(0.3, 0.3, 0.3)
+        lurek.render.rectangle("fill", W - 150, H - 55, 130, 20)
+        lurek.render.setColor(0.1, 0.8, 0.3)
+        lurek.render.rectangle("fill", W - 85, H - 55, lean * 60, 20)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.line(W - 85, H - 60, W - 85, H - 30)
+        lurek.render.print("LEAN", W - 152, H - 55, 1.2)
     elseif phase == "landing" then
-        lurek.gfx.setColor(0.5, 0.9, 1, 0.9)
-        lurek.gfx.print("Landing...", 14, H - 24, 2)
+        lurek.render.setColor(0.5, 0.9, 1, 0.9)
+        lurek.render.print("Landing...", 14, H - 24, 2)
     end
 
     -- Score overlay
     if phase == "score" then
-        lurek.gfx.setColor(0, 0, 0, 0.65)
-        lurek.gfx.rectangle("fill", W/2 - 160, H/2 - 50, 320, 100)
-        lurek.gfx.setColor(1, 1, 0.3)
-        lurek.gfx.print("JUMP " .. attempt .. ":", W/2 - 50, H/2 - 42, 1.8)
-        lurek.gfx.setColor(0.3, 1, 0.3)
-        lurek.gfx.print(land_dist .. " m", W/2 - 30, H/2 - 10, 3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
+        lurek.render.setColor(0, 0, 0, 0.65)
+        lurek.render.rectangle("fill", W/2 - 160, H/2 - 50, 320, 100)
+        lurek.render.setColor(1, 1, 0.3)
+        lurek.render.print("JUMP " .. attempt .. ":", W/2 - 50, H/2 - 42, 1.8)
+        lurek.render.setColor(0.3, 1, 0.3)
+        lurek.render.print(land_dist .. " m", W/2 - 30, H/2 - 10, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
         if attempt < 3 then
-            lurek.gfx.print("Press SPACE for attempt " .. (attempt+1), W/2 - 110, H/2 + 38, 1.5)
+            lurek.render.print("Press SPACE for attempt " .. (attempt+1), W/2 - 110, H/2 + 38, 1.5)
         else
-            lurek.gfx.print("Press SPACE to see final", W/2 - 110, H/2 + 38, 1.5)
+            lurek.render.print("Press SPACE to see final", W/2 - 110, H/2 + 38, 1.5)
         end
     end
 
     -- Game over
     if phase == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.8)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.9, 0.2)
-        lurek.gfx.print("COMPETITION OVER", W/2 - 130, H/2 - 60, 2.8)
+        lurek.render.setColor(0, 0, 0, 0.8)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.9, 0.2)
+        lurek.render.print("COMPETITION OVER", W/2 - 130, H/2 - 60, 2.8)
         local golds = {}
         for i = 1, 3 do golds[i] = scores[i] and (scores[i] .. " m") or "—" end
-        lurek.gfx.setColor(1, 1, 1)
+        lurek.render.setColor(1, 1, 1)
         for i = 1, 3 do
-            lurek.gfx.print("Jump " .. i .. ": " .. golds[i], W/2 - 60, H/2 - 10 + i*30, 2)
+            lurek.render.print("Jump " .. i .. ": " .. golds[i], W/2 - 60, H/2 - 10 + i*30, 2)
         end
-        lurek.gfx.setColor(0.3, 1, 0.5)
-        lurek.gfx.print("BEST: " .. best .. " m", W/2 - 55, H/2 + 110, 2.5)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to compete again", W/2 - 120, H/2 + 145, 1.8)
+        lurek.render.setColor(0.3, 1, 0.5)
+        lurek.render.print("BEST: " .. best .. " m", W/2 - 55, H/2 + 110, 2.5)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to compete again", W/2 - 120, H/2 + 145, 1.8)
     end
 end
 

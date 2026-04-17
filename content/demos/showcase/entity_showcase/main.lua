@@ -33,10 +33,10 @@ local draw_sys = {
                 local p = world:get(id, "pos")
                 local c = world:get(id, "col")
                 local r = world:has(id, "sz") and world:get(id, "sz") or 9
-                lurek.gfx.setColor(c[1], c[2], c[3], 0.88)
-                lurek.gfx.circle("fill", p.x, p.y, r)
-                lurek.gfx.setColor(c[1] * 0.5, c[2] * 0.5, c[3] * 0.5, 0.5)
-                lurek.gfx.circle("line", p.x, p.y, r)
+                lurek.render.setColor(c[1], c[2], c[3], 0.88)
+                lurek.render.circle("fill", p.x, p.y, r)
+                lurek.render.setColor(c[1] * 0.5, c[2] * 0.5, c[3] * 0.5, 0.5)
+                lurek.render.circle("line", p.x, p.y, r)
             end
         end
     end,
@@ -295,7 +295,7 @@ end
 -- ── load ──────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Entity Showcase")
-    lurek.gfx.setBackgroundColor(0.06, 0.06, 0.12)
+    lurek.render.setBackgroundColor(0.06, 0.06, 0.12)
     reset()
 end
 
@@ -309,10 +309,10 @@ end
 -- ── draw ──────────────────────────────────────────────────────
 function lurek.render()
     -- simulation area backdrop
-    lurek.gfx.setColor(0.08, 0.08, 0.18)
-    lurek.gfx.rectangle("fill", 10, 212, 780, 354)
-    lurek.gfx.setColor(0.12, 0.12, 0.28)
-    lurek.gfx.rectangle("line", 10, 212, 780, 354)
+    lurek.render.setColor(0.08, 0.08, 0.18)
+    lurek.render.rectangle("fill", 10, 212, 780, 354)
+    lurek.render.setColor(0.12, 0.12, 0.28)
+    lurek.render.rectangle("line", 10, 212, 780, 354)
 
     -- ECS entities via draw_sys
     if chapter > 0 then
@@ -320,35 +320,35 @@ function lurek.render()
     end
 
     -- top header bar
-    lurek.gfx.setColor(0.10, 0.10, 0.22)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 28)
-    lurek.gfx.setColor(0.45, 0.82, 1.0)
-    lurek.gfx.print("Entity Showcase — lurek.entity Universe API", 10, 7)
+    lurek.render.setColor(0.10, 0.10, 0.22)
+    lurek.render.rectangle("fill", 0, 0, 800, 28)
+    lurek.render.setColor(0.45, 0.82, 1.0)
+    lurek.render.print("Entity Showcase — lurek.entity Universe API", 10, 7)
 
     -- chapter title
-    lurek.gfx.setColor(1.0, 0.85, 0.3)
-    lurek.gfx.print(chapter_name, 10, 33)
+    lurek.render.setColor(1.0, 0.85, 0.3)
+    lurek.render.print(chapter_name, 10, 33)
 
     -- controls hint
-    lurek.gfx.setColor(0.48, 0.48, 0.60)
-    lurek.gfx.print("SPACE: next chapter    R: reset    ESC: quit", 10, 51)
+    lurek.render.setColor(0.48, 0.48, 0.60)
+    lurek.render.print("SPACE: next chapter    R: reset    ESC: quit", 10, 51)
 
     -- divider
-    lurek.gfx.setColor(0.18, 0.18, 0.36)
-    lurek.gfx.line(10, 68, 790, 68)
+    lurek.render.setColor(0.18, 0.18, 0.36)
+    lurek.render.line(10, 68, 790, 68)
 
     -- API call log
-    lurek.gfx.setColor(0.75, 0.95, 0.70)
+    lurek.render.setColor(0.75, 0.95, 0.70)
     for i, line in ipairs(log) do
-        lurek.gfx.print(line, 16, 72 + (i - 1) * 14)
+        lurek.render.print(line, 16, 72 + (i - 1) * 14)
     end
 
     -- status bar
-    lurek.gfx.setColor(0.08, 0.08, 0.20)
-    lurek.gfx.rectangle("fill", 0, 573, 800, 27)
+    lurek.render.setColor(0.08, 0.08, 0.20)
+    lurek.render.rectangle("fill", 0, 573, 800, 27)
     if chapter > 0 then
-        lurek.gfx.setColor(0.40, 0.65, 0.40)
-        lurek.gfx.print(
+        lurek.render.setColor(0.40, 0.65, 0.40)
+        lurek.render.print(
             "entities: " .. ecs:getEntityCount() ..
             "  systems: " .. ecs:getSystemCount() ..
             "  chapter: " .. chapter .. "/7" ..
@@ -356,8 +356,8 @@ function lurek.render()
             10, 579
         )
     else
-        lurek.gfx.setColor(0.40, 0.50, 0.40)
-        lurek.gfx.print("Press SPACE to begin the entity showcase", 10, 579)
+        lurek.render.setColor(0.40, 0.50, 0.40)
+        lurek.render.print("Press SPACE to begin the entity showcase", 10, 579)
     end
 end
 

@@ -107,7 +107,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.3, 0.5, 0.9)
+    lurek.render.setBackgroundColor(0.3, 0.5, 0.9)
     score = 0; lives = 3; level = 1
     init_level()
 end
@@ -200,10 +200,10 @@ function lurek.render()
             local sx = (col - 1) * TILE - cam
             local sy = (row - 1) * TILE
             if ch == "1" then
-                lurek.gfx.setColor(0.55, 0.38, 0.15)
-                lurek.gfx.rectangle("fill", sx, sy, TILE, TILE)
-                lurek.gfx.setColor(0.7, 0.5, 0.25)
-                lurek.gfx.rectangle("line", sx, sy, TILE, TILE)
+                lurek.render.setColor(0.55, 0.38, 0.15)
+                lurek.render.rectangle("fill", sx, sy, TILE, TILE)
+                lurek.render.setColor(0.7, 0.5, 0.25)
+                lurek.render.rectangle("line", sx, sy, TILE, TILE)
             end
         end
     end
@@ -211,19 +211,19 @@ function lurek.render()
     -- Exit
     if exit_tile.x then
         local sx = exit_tile.x - cam
-        lurek.gfx.setColor(0.1, 0.9, 0.3)
-        lurek.gfx.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
-        lurek.gfx.setColor(0, 0, 0)
-        lurek.gfx.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
+        lurek.render.setColor(0.1, 0.9, 0.3)
+        lurek.render.rectangle("fill", sx, exit_tile.y, exit_tile.w, exit_tile.h)
+        lurek.render.setColor(0, 0, 0)
+        lurek.render.print("EXIT", sx + 3, exit_tile.y + 8, 1.2)
     end
 
     -- Gems
     for _, g in ipairs(gems) do
         if g.alive then
-            lurek.gfx.setColor(1, 0.2, 0.8)
-            lurek.gfx.circle("fill", g.x - cam + 8, g.y + 8, 8)
-            lurek.gfx.setColor(1, 0.7, 1)
-            lurek.gfx.circle("fill", g.x - cam + 5, g.y + 5, 3)
+            lurek.render.setColor(1, 0.2, 0.8)
+            lurek.render.circle("fill", g.x - cam + 8, g.y + 8, 8)
+            lurek.render.setColor(1, 0.7, 1)
+            lurek.render.circle("fill", g.x - cam + 5, g.y + 5, 3)
         end
     end
 
@@ -231,43 +231,43 @@ function lurek.render()
     for _, e in ipairs(enemies) do
         if e.alive then
             local sx = e.x - cam
-            lurek.gfx.setColor(0.9, 0.3, 0.1)
-            lurek.gfx.rectangle("fill", sx + 2, e.y + 2, e.w - 4, e.h - 4)
-            lurek.gfx.setColor(1, 1, 1)
-            lurek.gfx.circle("fill", sx + (e.vx > 0 and e.w - 8 or 8), e.y + 8, 5)
+            lurek.render.setColor(0.9, 0.3, 0.1)
+            lurek.render.rectangle("fill", sx + 2, e.y + 2, e.w - 4, e.h - 4)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.circle("fill", sx + (e.vx > 0 and e.w - 8 or 8), e.y + 8, 5)
         end
     end
 
     -- Player
     local px = player.x - cam
-    lurek.gfx.setColor(0.2, 0.2, 0.8)
-    lurek.gfx.rectangle("fill", px + 2, player.y + player.h/3, player.w - 4, player.h * 2/3)
-    lurek.gfx.setColor(0.9, 0.7, 0.5)
-    lurek.gfx.circle("fill", px + player.w/2, player.y + 14, 12)
+    lurek.render.setColor(0.2, 0.2, 0.8)
+    lurek.render.rectangle("fill", px + 2, player.y + player.h/3, player.w - 4, player.h * 2/3)
+    lurek.render.setColor(0.9, 0.7, 0.5)
+    lurek.render.circle("fill", px + player.w/2, player.y + 14, 12)
     -- Hair / hat
-    lurek.gfx.setColor(1, 0.8, 0.1)
-    lurek.gfx.rectangle("fill", px + 2, player.y - 4, player.w - 4, 10)
+    lurek.render.setColor(1, 0.8, 0.1)
+    lurek.render.rectangle("fill", px + 2, player.y - 4, player.w - 4, 10)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.5)
-    lurek.gfx.rectangle("fill", 0, 0, W, 28)
-    lurek.gfx.setColor(1, 1, 0)
-    lurek.gfx.print("GIANA  Score: " .. score, 8, 5, 1.5)
-    lurek.gfx.setColor(1, 0.5, 0.5)
-    lurek.gfx.print("Lives: " .. lives, W - 100, 5, 1.5)
-    lurek.gfx.setColor(0.5, 1, 0.5)
-    lurek.gfx.print("Level " .. level, W/2 - 30, 5, 1.5)
+    lurek.render.setColor(0, 0, 0, 0.5)
+    lurek.render.rectangle("fill", 0, 0, W, 28)
+    lurek.render.setColor(1, 1, 0)
+    lurek.render.print("GIANA  Score: " .. score, 8, 5, 1.5)
+    lurek.render.setColor(1, 0.5, 0.5)
+    lurek.render.print("Lives: " .. lives, W - 100, 5, 1.5)
+    lurek.render.setColor(0.5, 1, 0.5)
+    lurek.render.print("Level " .. level, W/2 - 30, 5, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

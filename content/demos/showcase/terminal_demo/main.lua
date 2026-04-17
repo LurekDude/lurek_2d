@@ -33,7 +33,7 @@ end
 
 function lurek.init()
     initSmokeMode()
-    lurek.gfx.setBackgroundColor(0, 0, 0)
+    lurek.render.setBackgroundColor(0, 0, 0)
 
     -- Create an 80×25 terminal grid
     term = lurek.terminal.newTerminal(80, 25)
@@ -171,11 +171,11 @@ function lurek.render()
     term:render(0, 0)
 
     -- Draw a small hint below the terminal
-    lurek.gfx.setColor(0.4, 0.4, 0.4)
-    lurek.gfx.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.print("Terminal Demo  |  Tab = cycle focus  |  ESC = quit", 10, 580, 1)
 
     if smokeMode and not smokeRequested then
-        lurek.gfx.saveScreenshot(smokeScreenshotPath)
+        lurek.render.saveScreenshot(smokeScreenshotPath)
         smokeRequested = true
         smokeQuitNextFrame = true
     end

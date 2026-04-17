@@ -131,8 +131,8 @@ local function drawStars()
         local sx = (i * 137 + math.floor(t * 10)) % 800
         local sy = (i * 91) % 300
         local brightness = 0.3 + 0.3 * math.sin(t * 2 + i)
-        lurek.gfx.setColor(1, 1, 1, brightness)
-        lurek.gfx.circle("fill", sx, sy, 1)
+        lurek.render.setColor(1, 1, 1, brightness)
+        lurek.render.circle("fill", sx, sy, 1)
     end
 end
 
@@ -188,45 +188,45 @@ end
 
 function lurek.render()
     local sky = getSkyColor()
-    lurek.gfx.setBackgroundColor(sky[1], sky[2], sky[3])
+    lurek.render.setBackgroundColor(sky[1], sky[2], sky[3])
 
     drawStars()
 
     -- Draw ground
     local groundY = BASE_Y + BLOCK_H - scrollY
-    lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
-    lurek.gfx.rectangle("fill", 0, groundY, 800, 200)
+    lurek.render.setColor(0.3, 0.25, 0.2, 1)
+    lurek.render.rectangle("fill", 0, groundY, 800, 200)
 
     -- Foundation
-    lurek.gfx.setColor(0.5, 0.5, 0.55, 1)
-    lurek.gfx.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
+    lurek.render.setColor(0.5, 0.5, 0.55, 1)
+    lurek.render.rectangle("fill", BASE_X, groundY - BLOCK_H, BASE_W, BLOCK_H)
 
     -- Placed blocks
     for i, b in ipairs(blocks) do
         local r, g, bl = getBlockColor(i)
-        lurek.gfx.setColor(r, g, bl, 1)
+        lurek.render.setColor(r, g, bl, 1)
         local by = groundY - (i + 1) * BLOCK_H
-        lurek.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+        lurek.render.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
 
         -- Perfect indicator
         if b.perfect then
-            lurek.gfx.setColor(1, 1, 1, 0.4)
-            lurek.gfx.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
+            lurek.render.setColor(1, 1, 1, 0.4)
+            lurek.render.rectangle("fill", b.x, by, b.w, BLOCK_H - 1)
         end
 
         -- Edge outlines
-        lurek.gfx.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
-        lurek.gfx.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
+        lurek.render.setColor(r * 0.7, g * 0.7, bl * 0.7, 1)
+        lurek.render.rectangle("line", b.x, by, b.w, BLOCK_H - 1)
     end
 
     -- Pending block (swinging)
     if pendingBlock and not gameOver then
         local pendingIdx = #blocks + 1
         local r, g, bl = getBlockColor(pendingIdx)
-        lurek.gfx.setColor(r, g, bl, 0.85)
+        lurek.render.setColor(r, g, bl, 0.85)
         local px = swingX + 400 - pendingBlock.w / 2
         local py = groundY - (pendingIdx + 1) * BLOCK_H
-        lurek.gfx.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
+        lurek.render.rectangle("fill", px, py, pendingBlock.w, BLOCK_H - 1)
 
         -- Guide line from previous block
         local prevX, prevW
@@ -235,61 +235,61 @@ function lurek.render()
         else
             prevX, prevW = blocks[#blocks].x, blocks[#blocks].w
         end
-        lurek.gfx.setColor(1, 1, 1, 0.15)
-        lurek.gfx.setLineWidth(1)
-        lurek.gfx.line(prevX, py, prevX, py + BLOCK_H)
-        lurek.gfx.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
+        lurek.render.setColor(1, 1, 1, 0.15)
+        lurek.render.setLineWidth(1)
+        lurek.render.line(prevX, py, prevX, py + BLOCK_H)
+        lurek.render.line(prevX + prevW, py, prevX + prevW, py + BLOCK_H)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 50)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, 800, 50)
 
     -- Score
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Height: " .. score, 20, 5, 1.5)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Height: " .. score, 20, 5, 1.5)
 
     -- High score
-    lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
-    lurek.gfx.print("Best: " .. highScore, 200, 10)
+    lurek.render.setColor(0.8, 0.8, 0.5, 1)
+    lurek.render.print("Best: " .. highScore, 200, 10)
 
     -- Combo
     if combo > 0 then
         local comboAlpha = clamp(1, 0.5, 1)
-        lurek.gfx.setColor(1, 0.8, 0.2, comboAlpha)
-        lurek.gfx.print("COMBO x" .. combo, 350, 8, 1.3)
+        lurek.render.setColor(1, 0.8, 0.2, comboAlpha)
+        lurek.render.print("COMBO x" .. combo, 350, 8, 1.3)
     end
 
     -- Floor indicator
     local floor = math.floor(score / 10)
     local floorNames = {"Sky", "Clouds", "Twilight", "Night", "Space"}
     local fi = clamp(floor + 1, 1, #floorNames)
-    lurek.gfx.setColor(0.6, 0.6, 0.8, 1)
-    lurek.gfx.print("Zone: " .. floorNames[fi], 600, 10)
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("Best combo: " .. bestCombo, 600, 30)
+    lurek.render.setColor(0.6, 0.6, 0.8, 1)
+    lurek.render.print("Zone: " .. floorNames[fi], 600, 10)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("Best combo: " .. bestCombo, 600, 30)
 
     -- Controls hint
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.8)
-    lurek.gfx.print("Click or Space to place block", 250, 35)
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.8)
+    lurek.render.print("Click or Space to place block", 250, 35)
 
     -- Game over overlay
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 200, 200, 400, 160)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 200, 200, 400, 160)
 
-        lurek.gfx.setColor(1, 0.4, 0.3, 1)
-        lurek.gfx.print("GAME OVER", 310, 215, 1.8)
+        lurek.render.setColor(1, 0.4, 0.3, 1)
+        lurek.render.print("GAME OVER", 310, 215, 1.8)
 
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Final Height: " .. score, 310, 270)
-        lurek.gfx.print("Best Combo: " .. bestCombo, 310, 295)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Final Height: " .. score, 310, 270)
+        lurek.render.print("Best Combo: " .. bestCombo, 310, 295)
         if score >= highScore and score > 0 then
-            lurek.gfx.setColor(1, 1, 0, 1)
-            lurek.gfx.print("NEW HIGH SCORE!", 310, 320)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.print("NEW HIGH SCORE!", 310, 320)
         else
-            lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-            lurek.gfx.print("Click or Space to retry", 310, 320)
+            lurek.render.setColor(0.7, 0.7, 0.7, 1)
+            lurek.render.print("Click or Space to retry", 310, 320)
         end
     end
 end

@@ -225,111 +225,111 @@ end
 
 function lurek.render()
     if mode == "build" then
-        lurek.gfx.setBackgroundColor(0.12, 0.12, 0.15)
+        lurek.render.setBackgroundColor(0.12, 0.12, 0.15)
 
         -- Track preview (top half)
-        lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
-        lurek.gfx.rectangle("fill", 0, 0, 800, 300)
-        lurek.gfx.setColor(0.3, 0.5, 0.3, 1)
-        lurek.gfx.rectangle("fill", 0, 280, 800, 20)
-        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-        lurek.gfx.print("TRACK PREVIEW (press T to test)", 280, 140)
+        lurek.render.setColor(0.2, 0.2, 0.25, 1)
+        lurek.render.rectangle("fill", 0, 0, 800, 300)
+        lurek.render.setColor(0.3, 0.5, 0.3, 1)
+        lurek.render.rectangle("fill", 0, 280, 800, 20)
+        lurek.render.setColor(0.6, 0.6, 0.6, 1)
+        lurek.render.print("TRACK PREVIEW (press T to test)", 280, 140)
 
         -- Ramps in preview
-        lurek.gfx.setColor(0.5, 0.4, 0.2, 1)
+        lurek.render.setColor(0.5, 0.4, 0.2, 1)
         for _, r in ipairs(ramps) do
             local rx = r.x * 0.2 + 50
             if rx < 800 then
-                lurek.gfx.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
+                lurek.render.rectangle("fill", rx, 280 - r.h * 0.5, r.w * 0.3, r.h * 0.5)
             end
         end
 
         -- Build grid
-        lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
+        lurek.render.setColor(0.2, 0.2, 0.25, 1)
         for gy = 0, BUILD_H - 1 do
             for gx = 0, BUILD_W - 1 do
-                lurek.gfx.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
+                lurek.render.rectangle("line", BUILD_OX + gx * GRID, BUILD_OY + gy * GRID, GRID, GRID)
             end
         end
 
         -- Parts
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
             if p.type == "wheel" then
-                lurek.gfx.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
+                lurek.render.circle("fill", BUILD_OX + p.gx * GRID + GRID/2, BUILD_OY + p.gy * GRID + GRID/2, GRID/2 - 1)
             else
-                lurek.gfx.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
+                lurek.render.rectangle("fill", BUILD_OX + p.gx * GRID + 1, BUILD_OY + p.gy * GRID + 1, GRID - 2, GRID - 2)
             end
             -- Label
-            lurek.gfx.setColor(1, 1, 1, 0.7)
+            lurek.render.setColor(1, 1, 1, 0.7)
             local label = p.type:sub(1, 1):upper()
-            lurek.gfx.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
+            lurek.render.print(label, BUILD_OX + p.gx * GRID + 5, BUILD_OY + p.gy * GRID + 3)
         end
 
         -- Center of mass
         if #parts > 0 then
             local cx, cy = getCenterOfMass()
-            lurek.gfx.setColor(1, 1, 0, 1)
-            lurek.gfx.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
-            lurek.gfx.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.circle("fill", BUILD_OX + cx * GRID + GRID/2, BUILD_OY + cy * GRID + GRID/2, 4)
+            lurek.render.print("CoM", BUILD_OX + cx * GRID + GRID/2 + 6, BUILD_OY + cy * GRID + GRID/2 - 6)
         end
 
         -- HUD
-        lurek.gfx.setColor(0, 0, 0, 0.8)
-        lurek.gfx.rectangle("fill", 0, 560, 800, 40)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
-        lurek.gfx.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
-        lurek.gfx.setColor(0.5, 1, 0.5, 1)
-        lurek.gfx.print("Selected: " .. selectedPart, 10, 548)
-        lurek.gfx.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
+        lurek.render.setColor(0, 0, 0, 0.8)
+        lurek.render.rectangle("fill", 0, 560, 800, 40)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Budget: $" .. (budget - getTotalCost()) .. "/" .. budget, 10, 568)
+        lurek.render.print("[1]Chassis($20) [2]Wheel($50) [3]Engine($80) [4]Wing($40)", 200, 568)
+        lurek.render.setColor(0.5, 1, 0.5, 1)
+        lurek.render.print("Selected: " .. selectedPart, 10, 548)
+        lurek.render.print("[T]Test [C]Clear [RClick]Remove", 500, 548)
 
     else
         -- Test mode
-        lurek.gfx.setBackgroundColor(0.3, 0.5, 0.8)
+        lurek.render.setBackgroundColor(0.3, 0.5, 0.8)
 
         local sx = -trackScroll
 
         -- Ground
-        lurek.gfx.setColor(0.3, 0.5, 0.3, 1)
-        lurek.gfx.rectangle("fill", sx, 280, 8000, 40)
+        lurek.render.setColor(0.3, 0.5, 0.3, 1)
+        lurek.render.rectangle("fill", sx, 280, 8000, 40)
 
         -- Ramps
-        lurek.gfx.setColor(0.6, 0.5, 0.2, 1)
+        lurek.render.setColor(0.6, 0.5, 0.2, 1)
         for _, r in ipairs(ramps) do
-            lurek.gfx.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
+            lurek.render.rectangle("fill", r.x + sx, 280 - r.h, r.w, r.h)
         end
 
         -- Obstacles
-        lurek.gfx.setColor(0.5, 0.3, 0.3, 1)
+        lurek.render.setColor(0.5, 0.3, 0.3, 1)
         for _, o in ipairs(obstacles) do
-            lurek.gfx.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
+            lurek.render.rectangle("fill", o.x + sx, 290 - o.h, o.w, o.h)
         end
 
         -- Vehicle
         for _, p in ipairs(parts) do
             local c = partColors[p.type]
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
             local px = testX + p.gx * GRID - 40 + sx
             local py = testY + p.gy * GRID - 60
             if p.type == "wheel" then
-                lurek.gfx.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
+                lurek.render.circle("fill", px + GRID/2, py + GRID/2, GRID/2)
             else
-                lurek.gfx.rectangle("fill", px, py, GRID, GRID)
+                lurek.render.rectangle("fill", px, py, GRID, GRID)
             end
         end
 
         -- HUD
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, 800, 30)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, 800, 30)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Distance: " .. testScore .. "m   [R] Return to build   [Left/Right] Brake/Accel", 10, 6)
     end
 
     -- Messages
     if testMsgTimer > 0 then
-        lurek.gfx.setColor(1, 1, 0.5, 1)
-        lurek.gfx.print(testMsg, 250, 150, 1.3)
+        lurek.render.setColor(1, 1, 0.5, 1)
+        lurek.render.print(testMsg, 250, 150, 1.3)
     end
 end

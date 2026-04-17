@@ -79,7 +79,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.04, 0.03, 0.01)
+    lurek.render.setBackgroundColor(0.04, 0.03, 0.01)
     score = 0; lives = 3; level = 1
     gen_level()
 end
@@ -164,17 +164,17 @@ local function cell_px(cx, cy) return cx * CELL, cy * CELL + 40 end
 
 function lurek.render()
     -- HUD
-    lurek.gfx.setColor(0, 0, 0)
-    lurek.gfx.rectangle("fill", 0, 0, W, 40)
-    lurek.gfx.setColor(0.9, 0.7, 0.2)
-    lurek.gfx.print("BOULDER DASH", 8, 6, 1.6)
-    lurek.gfx.setColor(0.3, 0.8, 1)
-    lurek.gfx.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
+    lurek.render.setColor(0, 0, 0)
+    lurek.render.rectangle("fill", 0, 0, W, 40)
+    lurek.render.setColor(0.9, 0.7, 0.2)
+    lurek.render.print("BOULDER DASH", 8, 6, 1.6)
+    lurek.render.setColor(0.3, 0.8, 1)
+    lurek.render.print("Dia: " .. diamonds_got .. "/" .. diamonds_needed, W/2 - 60, 8, 1.5)
+    lurek.render.setColor(1, 0.4, 0.4)
     local tsec = math.max(0, math.floor(time_left))
-    lurek.gfx.print("Time: " .. tsec, W - 120, 8, 1.5)
-    lurek.gfx.setColor(0.7, 0.9, 0.7)
-    lurek.gfx.print("Score: " .. score, W/2 + 80, 8, 1.5)
+    lurek.render.print("Time: " .. tsec, W - 120, 8, 1.5)
+    lurek.render.setColor(0.7, 0.9, 0.7)
+    lurek.render.print("Score: " .. score, W/2 + 80, 8, 1.5)
 
     -- Map cells
     for y = 0, MAP_H - 1 do
@@ -183,20 +183,20 @@ function lurek.render()
             if c ~= EMPTY then
                 local col = COLORS[c] or {1, 0, 1}
                 local px, py = cell_px(x, y)
-                lurek.gfx.setColor(col[1], col[2], col[3])
+                lurek.render.setColor(col[1], col[2], col[3])
                 if c == BOULDER then
-                    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+                    lurek.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
                 elseif c == DIAMOND then
                     -- Diamond shape
-                    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
-                    lurek.gfx.setColor(0.7, 1, 1)
-                    lurek.gfx.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
+                    lurek.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 2)
+                    lurek.render.setColor(0.7, 1, 1)
+                    lurek.render.circle("fill", px + CELL/2 - 2, py + CELL/2 - 2, 3)
                 elseif c == EXIT then
                     local open = diamonds_got >= diamonds_needed
-                    lurek.gfx.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
-                    lurek.gfx.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
+                    lurek.render.setColor(open and 0.1 or 0.5, open and 0.9 or 0.5, open and 0.3 or 0.5)
+                    lurek.render.rectangle("fill", px + 2, py + 2, CELL - 4, CELL - 4)
                 else
-                    lurek.gfx.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
+                    lurek.render.rectangle("fill", px + 1, py + 1, CELL - 2, CELL - 2)
                 end
             end
         end
@@ -204,22 +204,22 @@ function lurek.render()
 
     -- Player
     local px, py = cell_px(player_x, player_y)
-    lurek.gfx.setColor(1, 0.9, 0.3)
-    lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
-    lurek.gfx.setColor(0.2, 0.1, 0)
-    lurek.gfx.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
-    lurek.gfx.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.circle("fill", px + CELL/2, py + CELL/2, CELL/2 - 1)
+    lurek.render.setColor(0.2, 0.1, 0)
+    lurek.render.circle("fill", px + CELL/2 - 3, py + CELL/2 - 2, 2)
+    lurek.render.circle("fill", px + CELL/2 + 3, py + CELL/2 - 2, 2)
 
     -- Game-over overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.3, 0.1)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.3, 0.1)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 55, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

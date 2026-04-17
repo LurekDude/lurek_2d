@@ -64,7 +64,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Physics Puzzle")
-    lurek.gfx.setBackgroundColor(0.12, 0.12, 0.18)
+    lurek.render.setBackgroundColor(0.12, 0.12, 0.18)
     loadLevel(1)
 end
 
@@ -119,73 +119,73 @@ end
 
 function lurek.render()
     -- goal zone
-    lurek.gfx.setColor(0.2, 0.8, 0.2, 0.4)
-    lurek.gfx.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
-    lurek.gfx.setColor(0.2, 1, 0.2, 1)
-    lurek.gfx.rectangle("line", goal.x, goal.y, goal.w, goal.h)
-    lurek.gfx.print("GOAL", goal.x + 14, goal.y + 12)
+    lurek.render.setColor(0.2, 0.8, 0.2, 0.4)
+    lurek.render.rectangle("fill", goal.x, goal.y, goal.w, goal.h)
+    lurek.render.setColor(0.2, 1, 0.2, 1)
+    lurek.render.rectangle("line", goal.x, goal.y, goal.w, goal.h)
+    lurek.render.print("GOAL", goal.x + 14, goal.y + 12)
 
     -- static platforms
     for _, s in ipairs(staticBodies) do
-        lurek.gfx.setColor(0.5, 0.45, 0.4, 1)
-        lurek.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
+        lurek.render.setColor(0.5, 0.45, 0.4, 1)
+        lurek.render.rectangle("fill", s.x, s.y, s.w, s.h)
     end
 
     -- placed pieces
     for _, p in ipairs(placedPieces) do
-        lurek.gfx.setColor(0.3, 0.5, 0.8, 0.9)
+        lurek.render.setColor(0.3, 0.5, 0.8, 0.9)
         if p.mode == "circle" then
-            lurek.gfx.circle("fill", p.x, p.y, p.r)
-            lurek.gfx.setColor(0.4, 0.6, 1, 1)
-            lurek.gfx.circle("line", p.x, p.y, p.r)
+            lurek.render.circle("fill", p.x, p.y, p.r)
+            lurek.render.setColor(0.4, 0.6, 1, 1)
+            lurek.render.circle("line", p.x, p.y, p.r)
         else
-            lurek.gfx.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
-            lurek.gfx.setColor(0.4, 0.6, 1, 1)
-            lurek.gfx.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            lurek.render.rectangle("fill", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
+            lurek.render.setColor(0.4, 0.6, 1, 1)
+            lurek.render.rectangle("line", p.x - p.w / 2, p.y - p.h / 2, p.w, p.h)
         end
     end
 
     -- ball
     local bx, by = ballBody:getPosition()
-    lurek.gfx.setColor(1, 0.4, 0.2, 1)
-    lurek.gfx.circle("fill", bx, by, 12)
-    lurek.gfx.setColor(1, 0.6, 0.3, 1)
-    lurek.gfx.circle("line", bx, by, 12)
+    lurek.render.setColor(1, 0.4, 0.2, 1)
+    lurek.render.circle("fill", bx, by, 12)
+    lurek.render.setColor(1, 0.6, 0.3, 1)
+    lurek.render.circle("line", bx, by, 12)
 
     -- cursor preview
     if not won then
         local mx, my = lurek.mouse.getPosition()
-        lurek.gfx.setColor(0.3, 0.5, 0.8, 0.3)
+        lurek.render.setColor(0.3, 0.5, 0.8, 0.3)
         if placeMode == "circle" then
-            lurek.gfx.circle("line", mx, my, placeRadius)
+            lurek.render.circle("line", mx, my, placeRadius)
         else
-            lurek.gfx.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
+            lurek.render.rectangle("line", mx - placeW / 2, my - placeH / 2, placeW, placeH)
         end
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Level: " .. level, 10, 10)
-    lurek.gfx.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
-    lurek.gfx.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
-    lurek.gfx.print("Click to place | R: Reset | N: Next level", 10, 575)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Level: " .. level, 10, 10)
+    lurek.render.print("Pieces: " .. (maxPieces - #placedPieces) .. "/" .. maxPieces, 10, 30)
+    lurek.render.print("Mode: " .. placeMode .. "  [1] Circle  [2] Rect", 10, 50)
+    lurek.render.print("Click to place | R: Reset | N: Next level", 10, 575)
 
     -- message
     if messageTimer > 0 then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 200, 270, 400, 40)
-        lurek.gfx.setColor(1, 1, 0.5, 1)
-        lurek.gfx.print(message, 220, 280)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 200, 270, 400, 40)
+        lurek.render.setColor(1, 1, 0.5, 1)
+        lurek.render.print(message, 220, 280)
     end
 
     -- won overlay
     if won then
-        lurek.gfx.setColor(0, 0, 0, 0.5)
-        lurek.gfx.rectangle("fill", 250, 240, 300, 80)
-        lurek.gfx.setColor(0.2, 1, 0.4, 1)
-        lurek.gfx.print("LEVEL COMPLETE!", 310, 255, 1.3)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Press N for next level", 315, 290)
+        lurek.render.setColor(0, 0, 0, 0.5)
+        lurek.render.rectangle("fill", 250, 240, 300, 80)
+        lurek.render.setColor(0.2, 1, 0.4, 1)
+        lurek.render.print("LEVEL COMPLETE!", 310, 255, 1.3)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Press N for next level", 315, 290)
     end
 end
 

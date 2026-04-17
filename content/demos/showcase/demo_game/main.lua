@@ -49,7 +49,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Shooting Gallery -- Lurek2D")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.15)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.15)
     init_world()
 end
 
@@ -116,9 +116,9 @@ function lurek.render()
     local mx, my = lurek.mouse.getPosition()
 
     -- Walls (visual borders)
-    lurek.gfx.setColor(0.15, 0.25, 0.45)
-    lurek.gfx.rectangle("fill", 0, 0, W, 10)
-    lurek.gfx.rectangle("fill", 0, H - 10, W, 10)
+    lurek.render.setColor(0.15, 0.25, 0.45)
+    lurek.render.rectangle("fill", 0, 0, W, 10)
+    lurek.render.rectangle("fill", 0, H - 10, W, 10)
 
     -- Aim ray (raycast from cannon toward mouse)
     local dx = mx - CANNON_X
@@ -128,16 +128,16 @@ function lurek.render()
         local ux, uy = dx / dist, dy / dist
         local ex = CANNON_X + ux * 900
         local ey = CANNON_Y + uy * 900
-        lurek.gfx.setLineWidth(1)
+        lurek.render.setLineWidth(1)
         local hit = world_id:raycast(CANNON_X, CANNON_Y, ex, ey)
         if hit then
-            lurek.gfx.setColor(1.0, 1.0, 0.2, 0.55)
-            lurek.gfx.line(CANNON_X, CANNON_Y, hit.x, hit.y)
-            lurek.gfx.setColor(1.0, 0.6, 0.0)
-            lurek.gfx.circle("fill", hit.x, hit.y, 5)
+            lurek.render.setColor(1.0, 1.0, 0.2, 0.55)
+            lurek.render.line(CANNON_X, CANNON_Y, hit.x, hit.y)
+            lurek.render.setColor(1.0, 0.6, 0.0)
+            lurek.render.circle("fill", hit.x, hit.y, 5)
         else
-            lurek.gfx.setColor(1.0, 1.0, 0.2, 0.2)
-            lurek.gfx.line(CANNON_X, CANNON_Y, ex, ey)
+            lurek.render.setColor(1.0, 1.0, 0.2, 0.2)
+            lurek.render.line(CANNON_X, CANNON_Y, ex, ey)
         end
     end
 
@@ -145,51 +145,51 @@ function lurek.render()
     for _, t in ipairs(targets) do
         local tx, ty = t.id:getPosition()
         if t.alive then
-            lurek.gfx.setColor(0.85, 0.18, 0.18)
-            lurek.gfx.rectangle("fill", tx - 15, ty - 35, 30, 70)
-            lurek.gfx.setColor(1.0, 0.5, 0.5)
-            lurek.gfx.rectangle("line", tx - 15, ty - 35, 30, 70)
+            lurek.render.setColor(0.85, 0.18, 0.18)
+            lurek.render.rectangle("fill", tx - 15, ty - 35, 30, 70)
+            lurek.render.setColor(1.0, 0.5, 0.5)
+            lurek.render.rectangle("line", tx - 15, ty - 35, 30, 70)
         else
-            lurek.gfx.setColor(0.22, 0.22, 0.22)
-            lurek.gfx.rectangle("fill", tx - 15, ty - 35, 30, 70)
+            lurek.render.setColor(0.22, 0.22, 0.22)
+            lurek.render.rectangle("fill", tx - 15, ty - 35, 30, 70)
         end
     end
 
     -- Fired balls
     for _, bid in ipairs(balls) do
         local bx, by = bid:getPosition()
-        lurek.gfx.setColor(0.3, 0.65, 1.0)
-        lurek.gfx.circle("fill", bx, by, 12)
-        lurek.gfx.setColor(0.65, 0.9, 1.0)
-        lurek.gfx.circle("line", bx, by, 12)
+        lurek.render.setColor(0.3, 0.65, 1.0)
+        lurek.render.circle("fill", bx, by, 12)
+        lurek.render.setColor(0.65, 0.9, 1.0)
+        lurek.render.circle("line", bx, by, 12)
     end
 
     -- Cannon body
-    lurek.gfx.setColor(0.55, 0.55, 0.65)
-    lurek.gfx.rectangle("fill", CANNON_X - 22, CANNON_Y - 16, 44, 32)
-    lurek.gfx.setColor(0.75, 0.75, 0.85)
-    lurek.gfx.rectangle("line", CANNON_X - 22, CANNON_Y - 16, 44, 32)
+    lurek.render.setColor(0.55, 0.55, 0.65)
+    lurek.render.rectangle("fill", CANNON_X - 22, CANNON_Y - 16, 44, 32)
+    lurek.render.setColor(0.75, 0.75, 0.85)
+    lurek.render.rectangle("line", CANNON_X - 22, CANNON_Y - 16, 44, 32)
     -- Barrel pointing at mouse
     if dist > 1 then
-        lurek.gfx.setLineWidth(5)
-        lurek.gfx.setColor(0.45, 0.45, 0.55)
-        lurek.gfx.line(CANNON_X, CANNON_Y,
+        lurek.render.setLineWidth(5)
+        lurek.render.setColor(0.45, 0.45, 0.55)
+        lurek.render.line(CANNON_X, CANNON_Y,
             CANNON_X + (dx / dist) * 32,
             CANNON_Y + (dy / dist) * 32)
-        lurek.gfx.setLineWidth(1)
+        lurek.render.setLineWidth(1)
     end
 
     -- Mouse crosshair
-    lurek.gfx.setColor(1.0, 1.0, 1.0, 0.7)
-    lurek.gfx.line(mx - 12, my, mx + 12, my)
-    lurek.gfx.line(mx, my - 12, mx, my + 12)
+    lurek.render.setColor(1.0, 1.0, 1.0, 0.7)
+    lurek.render.line(mx - 12, my, mx + 12, my)
+    lurek.render.line(mx, my - 12, mx, my + 12)
 
     -- HUD
-    lurek.gfx.setColor(1.0, 1.0, 1.0)
-    lurek.gfx.print("Score: " .. score .. " / 5", 10, 18, 2)
+    lurek.render.setColor(1.0, 1.0, 1.0)
+    lurek.render.print("Score: " .. score .. " / 5", 10, 18, 2)
 
-    lurek.gfx.setColor(0.55, 0.65, 0.75)
-    lurek.gfx.print("Click = Fire    SPACE = Reset    ESC = Quit", 10, H - 28, 2)
+    lurek.render.setColor(0.55, 0.65, 0.75)
+    lurek.render.print("Click = Fire    SPACE = Reset    ESC = Quit", 10, H - 28, 2)
 
     -- Win banner
     local all_dead = true
@@ -197,11 +197,11 @@ function lurek.render()
         if t.alive then all_dead = false; break end
     end
     if all_dead then
-        lurek.gfx.setColor(0.0, 0.0, 0.0, 0.55)
-        lurek.gfx.rectangle("fill", 160, 240, 480, 90)
-        lurek.gfx.setColor(1.0, 0.9, 0.1)
-        lurek.gfx.print("YOU WIN!", 270, 255, 4)
-        lurek.gfx.setColor(0.8, 0.8, 0.9)
-        lurek.gfx.print("Press SPACE to play again", 220, 300, 2)
+        lurek.render.setColor(0.0, 0.0, 0.0, 0.55)
+        lurek.render.rectangle("fill", 160, 240, 480, 90)
+        lurek.render.setColor(1.0, 0.9, 0.1)
+        lurek.render.print("YOU WIN!", 270, 255, 4)
+        lurek.render.setColor(0.8, 0.8, 0.9)
+        lurek.render.print("Press SPACE to play again", 220, 300, 2)
     end
 end

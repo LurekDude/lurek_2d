@@ -2,8 +2,8 @@
 -- Run with: cargo run -- content/demos/showcase/postfx_demo
 if not lurek.postfx then
     function lurek.init()
-        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        lurek.gfx.print("lurek.postfx is not available - use lurek.postfx instead", 180, 270)
+        lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.render.print("lurek.postfx is not available - use lurek.postfx instead", 180, 270)
     end
     return
 end
@@ -24,7 +24,7 @@ local active = {}  -- tracks which effects are active in the stack
 
 function lurek.init()
     lurek.window.setTitle("PostFX Demo - Lurek2D")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
 
     -- Create a stack at window resolution
     stack = lurek.postfx.newStack(800, 600)
@@ -50,35 +50,35 @@ function lurek.render()
 
     -- Draw a colourful scene to show effects on
     -- Background shapes
-    lurek.gfx.setColor(0.2, 0.1, 0.4)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(0.2, 0.1, 0.4)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
 
     -- Bright circles (good for bloom)
-    lurek.gfx.setColor(1.0, 0.8, 0.2)
-    lurek.gfx.circle("fill", 200, 200, 60)
+    lurek.render.setColor(1.0, 0.8, 0.2)
+    lurek.render.circle("fill", 200, 200, 60)
 
-    lurek.gfx.setColor(0.2, 0.8, 1.0)
-    lurek.gfx.circle("fill", 500, 300, 80)
+    lurek.render.setColor(0.2, 0.8, 1.0)
+    lurek.render.circle("fill", 500, 300, 80)
 
-    lurek.gfx.setColor(1.0, 0.3, 0.5)
-    lurek.gfx.circle("fill", 350, 450, 50)
+    lurek.render.setColor(1.0, 0.3, 0.5)
+    lurek.render.circle("fill", 350, 450, 50)
 
     -- Grid lines (good for CRT / chromatic aberration)
-    lurek.gfx.setColor(0.3, 0.3, 0.5)
+    lurek.render.setColor(0.3, 0.3, 0.5)
     for x = 0, 800, 50 do
-        lurek.gfx.line(x, 0, x, 600)
+        lurek.render.line(x, 0, x, 600)
     end
     for y = 0, 600, 50 do
-        lurek.gfx.line(0, y, 800, y)
+        lurek.render.line(0, y, 800, y)
     end
 
     -- Bright star pattern (good for godrays)
-    lurek.gfx.setColor(1.0, 1.0, 0.9)
+    lurek.render.setColor(1.0, 1.0, 0.9)
     for angle = 0, 360, 30 do
         local rad = math.rad(angle)
         local cx, cy = 400, 300
         local len = 100
-        lurek.gfx.line(cx, cy, cx + math.cos(rad) * len, cy + math.sin(rad) * len)
+        lurek.render.line(cx, cy, cx + math.cos(rad) * len, cy + math.sin(rad) * len)
     end
 
     -- HUD — drawn after apply() so it renders on top of the post-processed scene
@@ -86,24 +86,24 @@ function lurek.render()
     stack:apply()
 
     -- HUD — show effect info
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("PostFX Demo", 10, 10, 2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("PostFX Demo", 10, 10, 2)
 
     local fps = math.floor(lurek.time.getFPS())
-    lurek.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
+    lurek.render.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     -- Show effect list
     local y = 50
     for i, name in ipairs(effect_names) do
         if i == current_effect then
-            lurek.gfx.setColor(1, 1, 0)
-            lurek.gfx.print("> ", 10, y, 1.5)
+            lurek.render.setColor(1, 1, 0)
+            lurek.render.print("> ", 10, y, 1.5)
         else
-            lurek.gfx.setColor(0.6, 0.6, 0.6)
+            lurek.render.setColor(0.6, 0.6, 0.6)
         end
 
         local status = active[i] and "[ON]" or "[off]"
-        lurek.gfx.print(name .. " " .. status, 30, y, 1.5)
+        lurek.render.print(name .. " " .. status, 30, y, 1.5)
 
         -- Show key parameters for the current effect
         if i == current_effect then
@@ -114,8 +114,8 @@ function lurek.render()
                 param_str = param_str .. pname .. "=" .. string.format("%.2f", val) .. " "
             end
             if #param_str > 0 then
-                lurek.gfx.setColor(0.5, 0.8, 1.0)
-                lurek.gfx.print("  " .. param_str, 30, y + 18, 1)
+                lurek.render.setColor(0.5, 0.8, 1.0)
+                lurek.render.print("  " .. param_str, 30, y + 18, 1)
             end
         end
 
@@ -123,12 +123,12 @@ function lurek.render()
     end
 
     -- Controls
-    lurek.gfx.setColor(0.7, 0.7, 0.7)
-    lurek.gfx.print("Controls:", 500, 50, 1.5)
-    lurek.gfx.print("Up/Down = select effect", 500, 75, 1)
-    lurek.gfx.print("Space = toggle effect on/off", 500, 95, 1)
-    lurek.gfx.print("Left/Right = adjust first parameter", 500, 115, 1)
-    lurek.gfx.print("Stack effects: " .. stack:getEffectCount(), 500, 140, 1.2)
+    lurek.render.setColor(0.7, 0.7, 0.7)
+    lurek.render.print("Controls:", 500, 50, 1.5)
+    lurek.render.print("Up/Down = select effect", 500, 75, 1)
+    lurek.render.print("Space = toggle effect on/off", 500, 95, 1)
+    lurek.render.print("Left/Right = adjust first parameter", 500, 115, 1)
+    lurek.render.print("Stack effects: " .. stack:getEffectCount(), 500, 140, 1.2)
 end
 
 function lurek.keypressed(key)

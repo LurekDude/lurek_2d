@@ -181,101 +181,101 @@ function lurek.keyreleased(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.15, 0.2, 0.35)
+    lurek.render.setBackgroundColor(0.15, 0.2, 0.35)
 
     -- sky gradient bands
     for i = 0, 5 do
         local t = i / 5
-        lurek.gfx.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
-        lurek.gfx.rectangle("fill", 0, i * 60, W, 60)
+        lurek.render.setColor(0.15 + t * 0.1, 0.2 + t * 0.15, 0.35 + t * 0.15, 1)
+        lurek.render.rectangle("fill", 0, i * 60, W, 60)
     end
 
     -- terrain fill
-    lurek.gfx.setColor(0.2, 0.5, 0.2, 1)
+    lurek.render.setColor(0.2, 0.5, 0.2, 1)
     for i = 1, #terrain - 1 do
         local a, b = terrain[i], terrain[i + 1]
-        lurek.gfx.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
+        lurek.render.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
     end
 
     -- terrain outline
-    lurek.gfx.setColor(0.3, 0.65, 0.3, 1)
-    lurek.gfx.setLineWidth(2)
+    lurek.render.setColor(0.3, 0.65, 0.3, 1)
+    lurek.render.setLineWidth(2)
     for i = 1, #terrain - 1 do
-        lurek.gfx.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
+        lurek.render.line(terrain[i].x, terrain[i].y, terrain[i + 1].x, terrain[i + 1].y)
     end
 
     -- hole/target
     local hole = holes[state.current_hole]
     if hole then
-        lurek.gfx.setColor(0.1, 0.1, 0.1, 1)
-        lurek.gfx.circle("fill", hole.x, hole.y, hole.radius)
-        lurek.gfx.setColor(1, 0.8, 0, 1)
-        lurek.gfx.circle("line", hole.x, hole.y, hole.radius)
+        lurek.render.setColor(0.1, 0.1, 0.1, 1)
+        lurek.render.circle("fill", hole.x, hole.y, hole.radius)
+        lurek.render.setColor(1, 0.8, 0, 1)
+        lurek.render.circle("line", hole.x, hole.y, hole.radius)
         -- flag
-        lurek.gfx.setColor(1, 0.2, 0.2, 1)
-        lurek.gfx.line(hole.x, hole.y - 30, hole.x, hole.y)
-        lurek.gfx.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.line(hole.x, hole.y - 30, hole.x, hole.y)
+        lurek.render.polygon("fill", { hole.x, hole.y - 30, hole.x + 15, hole.y - 22, hole.x, hole.y - 14 })
     end
 
     -- skid marks
-    lurek.gfx.setColor(0.15, 0.35, 0.15, 0.6)
+    lurek.render.setColor(0.15, 0.35, 0.15, 0.6)
     for _, s in ipairs(skid_trails) do
-        lurek.gfx.circle("fill", s.x, s.y, 2)
+        lurek.render.circle("fill", s.x, s.y, 2)
     end
 
     -- ball
     if not state.hole_complete then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.circle("fill", ball.x, ball.y, ball.radius)
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
-        lurek.gfx.circle("line", ball.x, ball.y, ball.radius)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.circle("fill", ball.x, ball.y, ball.radius)
+        lurek.render.setColor(0.8, 0.8, 0.8, 1)
+        lurek.render.circle("line", ball.x, ball.y, ball.radius)
     end
 
     -- aim line
     if not ball.moving and not state.hole_complete and not state.game_over then
         local mx, my = lurek.mouse.getPosition()
-        lurek.gfx.setColor(1, 1, 1, 0.4)
-        lurek.gfx.setLineWidth(1)
-        lurek.gfx.line(ball.x, ball.y, mx, my)
+        lurek.render.setColor(1, 1, 1, 0.4)
+        lurek.render.setLineWidth(1)
+        lurek.render.line(ball.x, ball.y, mx, my)
     end
 
     -- power bar
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-    lurek.gfx.rectangle("fill", 20, 20, 160, 20)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+    lurek.render.rectangle("fill", 20, 20, 160, 20)
     local pf = state.power / 500
     local pr = clamp(pf * 2, 0, 1)
     local pg = clamp(2 - pf * 2, 0, 1)
-    lurek.gfx.setColor(pr, pg, 0, 1)
-    lurek.gfx.rectangle("fill", 22, 22, 156 * pf, 16)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Power", 70, 22)
+    lurek.render.setColor(pr, pg, 0, 1)
+    lurek.render.rectangle("fill", 22, 22, 156 * pf, 16)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Power", 70, 22)
 
     -- wind arrow
     local wind_str = "Wind: "
     if state.wind > 0 then wind_str = wind_str .. ">>>" else wind_str = wind_str .. "<<<" end
-    lurek.gfx.setColor(0.7, 0.9, 1, 1)
-    lurek.gfx.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
+    lurek.render.setColor(0.7, 0.9, 1, 1)
+    lurek.render.print(wind_str .. " " .. math.floor(math.abs(state.wind)), 20, 50)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
-    lurek.gfx.print("Strokes: " .. state.hole_strokes, 20, 95)
-    lurek.gfx.print("Total: " .. state.strokes, 20, 115)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Hole: " .. state.current_hole .. "/" .. state.total_holes, 20, 75)
+    lurek.render.print("Strokes: " .. state.hole_strokes, 20, 95)
+    lurek.render.print("Total: " .. state.strokes, 20, 115)
 
     -- distance to hole
     if hole and not state.hole_complete then
         local dist = math.floor(math.abs(ball.x - hole.x))
-        lurek.gfx.print("Distance: " .. dist .. "px", 20, 135)
+        lurek.render.print("Distance: " .. dist .. "px", 20, 135)
     end
 
     -- message
     if state.message ~= "" and (state.hole_complete or state.game_over) then
-        lurek.gfx.setColor(1, 1, 0.3, 1)
-        lurek.gfx.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
+        lurek.render.setColor(1, 1, 0.3, 1)
+        lurek.render.print(state.message, W / 2 - 100, H / 2 - 20, 1.5)
     end
 
     -- controls
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.6)
-    lurek.gfx.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 80, 10)
+    lurek.render.setColor(0.6, 0.6, 0.6, 0.6)
+    lurek.render.print("Aim: Mouse | Power: Hold Space | R: Restart", 200, H - 25)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 80, 10)
 end

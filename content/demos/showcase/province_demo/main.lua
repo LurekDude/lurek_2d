@@ -2,8 +2,8 @@
 -- Run with: cargo run -- content/demos/showcase/province_demo
 if not lurek.province then
     function lurek.init()
-        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        lurek.gfx.print("lurek.province is not available in this build", 180, 270)
+        lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.render.print("lurek.province is not available in this build", 180, 270)
     end
     return
 end
@@ -84,67 +84,67 @@ function lurek.render()
 
     local w = map:getWidth()
     local h = map:getHeight()
-    local sw = lurek.gfx.getWidth()
-    local sh = lurek.gfx.getHeight()
+    local sw = lurek.render.getWidth()
+    local sh = lurek.render.getHeight()
 
     -- Scale the province map to fill the window
     local sx = sw / w
     local sy = sh / h
     local scale = math.min(sx, sy)
 
-    lurek.gfx.push()
-    lurek.gfx.scale(scale, scale)
+    lurek.render.push()
+    lurek.render.scale(scale, scale)
 
     -- Draw province colour buffer
     local ids = map:getProvinceIds()
     for _, pid in ipairs(ids) do
         local r, g, b = map:getProvinceColor(pid)
-        lurek.gfx.setColor(r / 255, g / 255, b / 255)
+        lurek.render.setColor(r / 255, g / 255, b / 255)
 
         -- Approximate: draw a small rect at centroid (real rendering would
         -- use the full pixel buffer, but this gives a visual indication)
         local cx, cy = map:getCentroid(pid)
         local area = map:getArea(pid)
         local side = math.sqrt(area)
-        lurek.gfx.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
+        lurek.render.rectangle("fill", cx - side / 2, cy - side / 2, side, side)
     end
 
     -- Highlight selected province
     if selected then
-        lurek.gfx.setColor(1, 1, 0, 0.5)
+        lurek.render.setColor(1, 1, 0, 0.5)
         local cx, cy = map:getCentroid(selected)
-        lurek.gfx.circle("fill", cx, cy, 5)
+        lurek.render.circle("fill", cx, cy, 5)
     end
 
     -- Draw path
     if path_ids then
-        lurek.gfx.setColor(0, 1, 0)
+        lurek.render.setColor(0, 1, 0)
         for i = 1, #path_ids - 1 do
             local ax, ay = map:getCentroid(path_ids[i])
             local bx, by = map:getCentroid(path_ids[i + 1])
-            lurek.gfx.line(ax, ay, bx, by)
+            lurek.render.line(ax, ay, bx, by)
         end
     end
 
-    lurek.gfx.pop()
+    lurek.render.pop()
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Province Demo -- click to select, right-click to path", 10, 10)
-    lurek.gfx.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
-    lurek.gfx.print("Provinces: " .. map:getProvinceCount(), 10, 50)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Province Demo -- click to select, right-click to path", 10, 10)
+    lurek.render.print("Mode: " .. mode_names[mode_idx] .. "  [M] to cycle", 10, 30)
+    lurek.render.print("Provinces: " .. map:getProvinceCount(), 10, 50)
     if selected then
         local terrain = data:getProperty(selected, "terrain") or "unknown"
         local owner = data:getProperty(selected, "owner") or 0
-        lurek.gfx.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
+        lurek.render.print("Selected: " .. selected .. "  terrain=" .. tostring(terrain) .. "  owner=" .. tostring(owner), 10, 70)
     end
 end
 
 function lurek.mousepressed(x, y, button)
     if not map then return end
 
-    local sw = lurek.gfx.getWidth()
-    local sh = lurek.gfx.getHeight()
+    local sw = lurek.render.getWidth()
+    local sh = lurek.render.getHeight()
     local w = map:getWidth()
     local h = map:getHeight()
     local scale = math.min(sw / w, sh / h)

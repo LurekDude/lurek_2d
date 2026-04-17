@@ -57,7 +57,7 @@ local function drawHex(cx, cy, size, mode)
         table.insert(verts, cx + size * math.cos(angle))
         table.insert(verts, cy + size * math.sin(angle))
     end
-    lurek.gfx.polygon(mode, verts)
+    lurek.render.polygon(mode, verts)
 end
 
 local function getRandomTerrain(q, r)
@@ -74,7 +74,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Hex Strategy")
-    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.12)
     -- Generate hex map
     for q = -MAP_RADIUS, MAP_RADIUS do
         for r = -MAP_RADIUS, MAP_RADIUS do
@@ -125,45 +125,45 @@ function lurek.render()
     for _, h in pairs(hexes) do
         local px, py = hexToPixel(h.q, h.r)
         local t = TERRAIN[h.terrain]
-        lurek.gfx.setColor(t.r, t.g, t.b, 1)
+        lurek.render.setColor(t.r, t.g, t.b, 1)
         drawHex(px, py, HEX_SIZE - 1, "fill")
-        lurek.gfx.setColor(0.1, 0.1, 0.1, 0.5)
+        lurek.render.setColor(0.1, 0.1, 0.1, 0.5)
         drawHex(px, py, HEX_SIZE - 1, "line")
 
         -- City marker
         if h.hasCity then
-            lurek.gfx.setColor(1, 0.85, 0.2, 1)
-            lurek.gfx.rectangle("fill", px - 8, py - 10, 16, 14)
-            lurek.gfx.setColor(0.9, 0.6, 0.1, 1)
-            lurek.gfx.polygon("fill", { px - 10, py - 10, px, py - 18, px + 10, py - 10 })
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("C", px - 4, py - 8)
+            lurek.render.setColor(1, 0.85, 0.2, 1)
+            lurek.render.rectangle("fill", px - 8, py - 10, 16, 14)
+            lurek.render.setColor(0.9, 0.6, 0.1, 1)
+            lurek.render.polygon("fill", { px - 10, py - 10, px, py - 18, px + 10, py - 10 })
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("C", px - 4, py - 8)
         end
     end
 
     -- Selection highlight
     if selected then
         local px, py = hexToPixel(selected.q, selected.r)
-        lurek.gfx.setColor(1, 1, 0, 0.7)
-        lurek.gfx.setLineWidth(3)
+        lurek.render.setColor(1, 1, 0, 0.7)
+        lurek.render.setLineWidth(3)
         drawHex(px, py, HEX_SIZE, "line")
-        lurek.gfx.setLineWidth(1)
+        lurek.render.setLineWidth(1)
     end
 
     -- HUD panel
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, 0, 220, 130)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Turn: " .. turnNum, 10, 10)
-    lurek.gfx.setColor(1, 0.85, 0.2, 1)
-    lurek.gfx.print("Gold: " .. resources.gold, 10, 30)
-    lurek.gfx.setColor(0.5, 0.35, 0.15, 1)
-    lurek.gfx.print("Wood: " .. resources.wood, 10, 50)
-    lurek.gfx.setColor(0.4, 0.85, 0.3, 1)
-    lurek.gfx.print("Food: " .. resources.food, 10, 70)
-    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
-    lurek.gfx.print("Cities: " .. #cities, 10, 90)
-    lurek.gfx.print("[N] Next Turn  [C] Place City", 10, 110)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, 0, 220, 130)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Turn: " .. turnNum, 10, 10)
+    lurek.render.setColor(1, 0.85, 0.2, 1)
+    lurek.render.print("Gold: " .. resources.gold, 10, 30)
+    lurek.render.setColor(0.5, 0.35, 0.15, 1)
+    lurek.render.print("Wood: " .. resources.wood, 10, 50)
+    lurek.render.setColor(0.4, 0.85, 0.3, 1)
+    lurek.render.print("Food: " .. resources.food, 10, 70)
+    lurek.render.setColor(0.8, 0.8, 0.8, 1)
+    lurek.render.print("Cities: " .. #cities, 10, 90)
+    lurek.render.print("[N] Next Turn  [C] Place City", 10, 110)
 
     -- Info panel for selected hex
     if selected then
@@ -171,21 +171,21 @@ function lurek.render()
         local h = hexes[key]
         if h then
             local t = TERRAIN[h.terrain]
-            lurek.gfx.setColor(0, 0, 0, 0.7)
-            lurek.gfx.rectangle("fill", 580, 0, 220, 110)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("Hex (" .. h.q .. "," .. h.r .. ")", 590, 10)
-            lurek.gfx.print("Terrain: " .. h.terrain, 590, 30)
-            lurek.gfx.print("Gold/turn: " .. t.gold, 590, 50)
-            lurek.gfx.print("Wood/turn: " .. t.wood, 590, 70)
-            lurek.gfx.print("Food/turn: " .. t.food, 590, 90)
+            lurek.render.setColor(0, 0, 0, 0.7)
+            lurek.render.rectangle("fill", 580, 0, 220, 110)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("Hex (" .. h.q .. "," .. h.r .. ")", 590, 10)
+            lurek.render.print("Terrain: " .. h.terrain, 590, 30)
+            lurek.render.print("Gold/turn: " .. t.gold, 590, 50)
+            lurek.render.print("Wood/turn: " .. t.wood, 590, 70)
+            lurek.render.print("Food/turn: " .. t.food, 590, 90)
         end
     end
 
     -- Info text
     if infoText ~= "" then
-        lurek.gfx.setColor(1, 1, 0.5, 1)
-        lurek.gfx.print(infoText, 240, 570)
+        lurek.render.setColor(1, 1, 0.5, 1)
+        lurek.render.print(infoText, 240, 570)
     end
 end
 

@@ -39,7 +39,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.05)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.05)
     ball_reset(1)
 end
 
@@ -96,42 +96,42 @@ end
 
 function lurek.render()
     -- Center dashed line
-    lurek.gfx.setColor(0.25, 0.25, 0.25)
+    lurek.render.setColor(0.25, 0.25, 0.25)
     for i = 0, H, 24 do
-        lurek.gfx.rectangle("fill", W/2 - 2, i, 4, 12)
+        lurek.render.rectangle("fill", W/2 - 2, i, 4, 12)
     end
 
     -- Paddles
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
-    lurek.gfx.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.rectangle("fill", p1.x, p1.y, PADDLE_W, PADDLE_H)
+    lurek.render.rectangle("fill", p2.x, p2.y, PADDLE_W, PADDLE_H)
 
     -- Ball (flash white/yellow after score)
     if flash_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0)
+        lurek.render.setColor(1, 1, 0)
     else
-        lurek.gfx.setColor(1, 1, 1)
+        lurek.render.setColor(1, 1, 1)
     end
-    lurek.gfx.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
+    lurek.render.rectangle("fill", ball.x, ball.y, BALL_SIZE, BALL_SIZE)
 
     -- Scores
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(tostring(p1.score), W/2 - 70, 18, 4)
-    lurek.gfx.print(tostring(p2.score), W/2 + 38, 18, 4)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(tostring(p1.score), W/2 - 70, 18, 4)
+    lurek.render.print(tostring(p2.score), W/2 + 38, 18, 4)
 
     -- Controls hint
-    lurek.gfx.setColor(0.4, 0.4, 0.4)
-    lurek.gfx.print("P1: W/S", 8, H - 18, 1)
-    lurek.gfx.print("P2: Up/Down", W - 112, H - 18, 1)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.print("P1: W/S", 8, H - 18, 1)
+    lurek.render.print("P2: Up/Down", W - 112, H - 18, 1)
 
     -- Game-over overlay
     if game_over then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.9, 0.1)
-        lurek.gfx.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.9, 0.1)
+        lurek.render.print("Player " .. winner .. " Wins!", W/2 - 130, H/2 - 30, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     end
 end
 

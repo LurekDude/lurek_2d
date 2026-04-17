@@ -58,66 +58,66 @@ end
 
 function lurek.render()
     -- Background
-    lurek.gfx.setBackgroundColor(0.12, 0.12, 0.18, 1)
+    lurek.render.setBackgroundColor(0.12, 0.12, 0.18, 1)
 
     -- Title
-    lurek.gfx.setColor(0.6, 0.8, 1.0, 1)
-    lurek.gfx.print("Dialog Demo", 20, 15)
-    lurek.gfx.setColor(0.5, 0.5, 0.6, 1)
-    lurek.gfx.print("Space=advance  1-9=choose  S=skip  R=restart", 20, 40)
+    lurek.render.setColor(0.6, 0.8, 1.0, 1)
+    lurek.render.print("Dialog Demo", 20, 15)
+    lurek.render.setColor(0.5, 0.5, 0.6, 1)
+    lurek.render.print("Space=advance  1-9=choose  S=skip  R=restart", 20, 40)
 
     -- Dialog box
     local bx, by, bw, bh = 40, 80, 720, 160
-    lurek.gfx.setColor(0.15, 0.15, 0.22, 0.95)
-    lurek.gfx.rectangle("fill", bx, by, bw, bh)
-    lurek.gfx.setColor(0.4, 0.5, 0.7, 1)
-    lurek.gfx.rectangle("line", bx, by, bw, bh)
+    lurek.render.setColor(0.15, 0.15, 0.22, 0.95)
+    lurek.render.rectangle("fill", bx, by, bw, bh)
+    lurek.render.setColor(0.4, 0.5, 0.7, 1)
+    lurek.render.rectangle("line", bx, by, bw, bh)
 
     if seq then
         local state = seq:getState()
 
         -- Speaker name
         if state == "typing" or state == "waiting" then
-            lurek.gfx.setColor(1, 0.85, 0.3, 1)
-            lurek.gfx.print(seq:currentSpeaker(), bx + 15, by + 10)
+            lurek.render.setColor(1, 0.85, 0.3, 1)
+            lurek.render.print(seq:currentSpeaker(), bx + 15, by + 10)
             -- Revealed text
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(seq:revealedText(), bx + 15, by + 40)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(seq:revealedText(), bx + 15, by + 40)
             -- State indicator
-            lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
+            lurek.render.setColor(0.5, 0.5, 0.5, 1)
             if state == "typing" then
-                lurek.gfx.print("...", bx + bw - 40, by + bh - 25)
+                lurek.render.print("...", bx + bw - 40, by + bh - 25)
             else
-                lurek.gfx.print("[Space to continue]", bx + bw - 180, by + bh - 25)
+                lurek.render.print("[Space to continue]", bx + bw - 180, by + bh - 25)
             end
         elseif state == "choice" then
-            lurek.gfx.setColor(1, 0.85, 0.3, 1)
-            lurek.gfx.print(seq:getChoiceText(), bx + 15, by + 10)
+            lurek.render.setColor(1, 0.85, 0.3, 1)
+            lurek.render.print(seq:getChoiceText(), bx + 15, by + 10)
             local labels = seq:getChoiceLabels()
             for i, label in ipairs(labels) do
-                lurek.gfx.setColor(0.7, 0.9, 1, 1)
-                lurek.gfx.print(i .. ". " .. label, bx + 30, by + 30 + i * 25)
+                lurek.render.setColor(0.7, 0.9, 1, 1)
+                lurek.render.print(i .. ". " .. label, bx + 30, by + 30 + i * 25)
             end
         elseif state == "paused" then
-            lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-            lurek.gfx.print("(waiting...)", bx + 15, by + 40)
+            lurek.render.setColor(0.7, 0.7, 0.7, 1)
+            lurek.render.print("(waiting...)", bx + 15, by + 40)
         elseif state == "done" then
-            lurek.gfx.setColor(0.5, 0.7, 0.5, 1)
-            lurek.gfx.print("Dialog complete. Press R to restart.", bx + 15, by + 40)
+            lurek.render.setColor(0.5, 0.7, 0.5, 1)
+            lurek.render.print("Dialog complete. Press R to restart.", bx + 15, by + 40)
         elseif state == "idle" then
-            lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-            lurek.gfx.print("Press Space to start.", bx + 15, by + 40)
+            lurek.render.setColor(0.5, 0.5, 0.5, 1)
+            lurek.render.print("Press Space to start.", bx + 15, by + 40)
         end
     end
 
     -- Event log
-    lurek.gfx.setColor(0.3, 0.3, 0.4, 1)
-    lurek.gfx.rectangle("fill", 40, 260, 720, 310)
-    lurek.gfx.setColor(0.5, 0.5, 0.6, 1)
-    lurek.gfx.print("Event Log:", 50, 265)
-    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+    lurek.render.setColor(0.3, 0.3, 0.4, 1)
+    lurek.render.rectangle("fill", 40, 260, 720, 310)
+    lurek.render.setColor(0.5, 0.5, 0.6, 1)
+    lurek.render.print("Event Log:", 50, 265)
+    lurek.render.setColor(0.8, 0.8, 0.8, 1)
     for i, line in ipairs(log_lines) do
-        lurek.gfx.print(line, 50, 280 + i * 20)
+        lurek.render.print(line, 50, 280 + i * 20)
     end
 end
 

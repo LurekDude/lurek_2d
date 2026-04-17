@@ -210,113 +210,113 @@ function lurek.mousepressed(mx, my, btn)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.15)
+    lurek.render.setBackgroundColor(0.12, 0.1, 0.15)
 
     -- Title and gold
-    lurek.gfx.setColor(1, 0.85, 0.4, 1)
-    lurek.gfx.print("~ Alchemy Workshop ~", 220, 10, 1.3)
-    lurek.gfx.setColor(1, 1, 0.5, 1)
-    lurek.gfx.print("Gold: " .. gold, 620, 15, 1)
+    lurek.render.setColor(1, 0.85, 0.4, 1)
+    lurek.render.print("~ Alchemy Workshop ~", 220, 10, 1.3)
+    lurek.render.setColor(1, 1, 0.5, 1)
+    lurek.render.print("Gold: " .. gold, 620, 15, 1)
 
     -- Ingredient shelf
-    lurek.gfx.setColor(0.7, 0.6, 0.4, 1)
-    lurek.gfx.print("Ingredients:", SHELF_X, SHELF_Y - 20, 1)
+    lurek.render.setColor(0.7, 0.6, 0.4, 1)
+    lurek.render.print("Ingredients:", SHELF_X, SHELF_Y - 20, 1)
     for i, ing in ipairs(ingredients) do
         local iy = SHELF_Y + (i - 1) * 30
         local c = ing.color
-        lurek.gfx.setColor(c[1], c[2], c[3], 1)
-        lurek.gfx.rectangle("fill", SHELF_X, iy, 14, 14)
-        lurek.gfx.setColor(0.9, 0.9, 0.8, 1)
-        lurek.gfx.print(ing.name .. " x" .. ing.owned, SHELF_X + 20, iy, 0.8)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.rectangle("fill", SHELF_X, iy, 14, 14)
+        lurek.render.setColor(0.9, 0.9, 0.8, 1)
+        lurek.render.print(ing.name .. " x" .. ing.owned, SHELF_X + 20, iy, 0.8)
     end
 
     -- Mortar
-    lurek.gfx.setColor(0.5, 0.4, 0.3, 1)
-    lurek.gfx.rectangle("fill", MORTAR_X - 30, MORTAR_Y - 20, 60, 40)
-    lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
-    lurek.gfx.rectangle("fill", MORTAR_X - 25, MORTAR_Y - 15, 50, 30)
-    lurek.gfx.setColor(0.9, 0.85, 0.7, 1)
-    lurek.gfx.print("Mortar", MORTAR_X - 20, MORTAR_Y - 40, 0.8)
+    lurek.render.setColor(0.5, 0.4, 0.3, 1)
+    lurek.render.rectangle("fill", MORTAR_X - 30, MORTAR_Y - 20, 60, 40)
+    lurek.render.setColor(0.3, 0.25, 0.2, 1)
+    lurek.render.rectangle("fill", MORTAR_X - 25, MORTAR_Y - 15, 50, 30)
+    lurek.render.setColor(0.9, 0.85, 0.7, 1)
+    lurek.render.print("Mortar", MORTAR_X - 20, MORTAR_Y - 40, 0.8)
     if #mortar.items > 0 then
         local mc = mix_color(mortar.items)
-        lurek.gfx.setColor(mc[1], mc[2], mc[3], 1)
+        lurek.render.setColor(mc[1], mc[2], mc[3], 1)
         local sz = mortar.ground and 20 or 12
-        lurek.gfx.circle("fill", MORTAR_X, MORTAR_Y, sz)
+        lurek.render.circle("fill", MORTAR_X, MORTAR_Y, sz)
         if mortar.grinding > 0 then
-            lurek.gfx.setColor(1, 1, 1, 0.7)
-            lurek.gfx.print("Grinding...", MORTAR_X - 25, MORTAR_Y + 25, 0.7)
+            lurek.render.setColor(1, 1, 1, 0.7)
+            lurek.render.print("Grinding...", MORTAR_X - 25, MORTAR_Y + 25, 0.7)
         elseif mortar.ground then
-            lurek.gfx.setColor(0.5, 1, 0.5, 1)
-            lurek.gfx.print("Ground!", MORTAR_X - 20, MORTAR_Y + 25, 0.7)
+            lurek.render.setColor(0.5, 1, 0.5, 1)
+            lurek.render.print("Ground!", MORTAR_X - 20, MORTAR_Y + 25, 0.7)
         end
     end
 
     -- Cauldron
-    lurek.gfx.setColor(0.3, 0.3, 0.35, 1)
-    lurek.gfx.circle("fill", CAULDRON_X, CAULDRON_Y, 38)
-    lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
-    lurek.gfx.circle("fill", CAULDRON_X, CAULDRON_Y, 30)
-    lurek.gfx.setColor(0.9, 0.85, 0.7, 1)
-    lurek.gfx.print("Cauldron", CAULDRON_X - 25, CAULDRON_Y - 55, 0.8)
+    lurek.render.setColor(0.3, 0.3, 0.35, 1)
+    lurek.render.circle("fill", CAULDRON_X, CAULDRON_Y, 38)
+    lurek.render.setColor(0.15, 0.15, 0.2, 1)
+    lurek.render.circle("fill", CAULDRON_X, CAULDRON_Y, 30)
+    lurek.render.setColor(0.9, 0.85, 0.7, 1)
+    lurek.render.print("Cauldron", CAULDRON_X - 25, CAULDRON_Y - 55, 0.8)
     if #cauldron.items > 0 then
         local cc = cauldron.result and cauldron.result.color or mix_color(cauldron.items)
-        lurek.gfx.setColor(cc[1], cc[2], cc[3], 0.8)
-        lurek.gfx.circle("fill", CAULDRON_X, CAULDRON_Y, 25)
+        lurek.render.setColor(cc[1], cc[2], cc[3], 0.8)
+        lurek.render.circle("fill", CAULDRON_X, CAULDRON_Y, 25)
     end
     -- Temperature bar
     if #cauldron.items > 0 then
-        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-        lurek.gfx.rectangle("fill", CAULDRON_X - 5, CAULDRON_Y + 42, 70, 12)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", CAULDRON_X - 5, CAULDRON_Y + 42, 70, 12)
         local tr = cauldron.temperature / 100
         local tg = 1 - tr
-        lurek.gfx.setColor(tr, tg, 0.1, 1)
-        lurek.gfx.rectangle("fill", CAULDRON_X - 5, CAULDRON_Y + 42, 70 * (cauldron.temperature / 100), 12)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(cauldron.temperature .. "C", CAULDRON_X + 68, CAULDRON_Y + 42, 0.7)
+        lurek.render.setColor(tr, tg, 0.1, 1)
+        lurek.render.rectangle("fill", CAULDRON_X - 5, CAULDRON_Y + 42, 70 * (cauldron.temperature / 100), 12)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(cauldron.temperature .. "C", CAULDRON_X + 68, CAULDRON_Y + 42, 0.7)
     end
 
     -- Bottle
-    lurek.gfx.setColor(0.6, 0.8, 0.9, 0.5)
-    lurek.gfx.rectangle("fill", BOTTLE_X - 12, BOTTLE_Y - 35, 24, 50)
-    lurek.gfx.rectangle("fill", BOTTLE_X - 5, BOTTLE_Y - 42, 10, 10)
-    lurek.gfx.setColor(0.9, 0.85, 0.7, 1)
-    lurek.gfx.print("Bottle", BOTTLE_X - 18, BOTTLE_Y - 58, 0.8)
+    lurek.render.setColor(0.6, 0.8, 0.9, 0.5)
+    lurek.render.rectangle("fill", BOTTLE_X - 12, BOTTLE_Y - 35, 24, 50)
+    lurek.render.rectangle("fill", BOTTLE_X - 5, BOTTLE_Y - 42, 10, 10)
+    lurek.render.setColor(0.9, 0.85, 0.7, 1)
+    lurek.render.print("Bottle", BOTTLE_X - 18, BOTTLE_Y - 58, 0.8)
     if bottle.potion then
         local pc = bottle.potion.color
-        lurek.gfx.setColor(pc[1], pc[2], pc[3], 0.9)
-        lurek.gfx.rectangle("fill", BOTTLE_X - 10, BOTTLE_Y - 20, 20, 30)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(bottle.potion.name, BOTTLE_X - 40, BOTTLE_Y + 20, 0.7)
+        lurek.render.setColor(pc[1], pc[2], pc[3], 0.9)
+        lurek.render.rectangle("fill", BOTTLE_X - 10, BOTTLE_Y - 20, 20, 30)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(bottle.potion.name, BOTTLE_X - 40, BOTTLE_Y + 20, 0.7)
     end
 
     -- Recipe book
-    lurek.gfx.setColor(0.8, 0.7, 0.5, 1)
-    lurek.gfx.print("Recipes:", 600, 80, 1)
+    lurek.render.setColor(0.8, 0.7, 0.5, 1)
+    lurek.render.print("Recipes:", 600, 80, 1)
     for i, recipe in ipairs(recipes) do
         local ry = 105 + (i - 1) * 22
         if discovered[recipe.name] then
             local rc = recipe.color
-            lurek.gfx.setColor(rc[1], rc[2], rc[3], 1)
-            lurek.gfx.rectangle("fill", 600, ry + 2, 10, 10)
-            lurek.gfx.setColor(0.9, 0.9, 0.8, 1)
-            lurek.gfx.print(recipe.name .. " (" .. recipe.value .. "g)", 615, ry, 0.7)
+            lurek.render.setColor(rc[1], rc[2], rc[3], 1)
+            lurek.render.rectangle("fill", 600, ry + 2, 10, 10)
+            lurek.render.setColor(0.9, 0.9, 0.8, 1)
+            lurek.render.print(recipe.name .. " (" .. recipe.value .. "g)", 615, ry, 0.7)
         else
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-            lurek.gfx.print("???", 615, ry, 0.7)
+            lurek.render.setColor(0.4, 0.4, 0.4, 1)
+            lurek.render.print("???", 615, ry, 0.7)
         end
     end
 
     -- Controls
-    lurek.gfx.setColor(0.6, 0.6, 0.5, 1)
-    lurek.gfx.print("Click shelf=add | Click mortar=grind | Click cauldron=transfer", 30, 420, 0.65)
-    lurek.gfx.print("Up/Down=heat | Space=brew | B=bottle | S=sell | R=reset | Esc=quit", 30, 438, 0.65)
+    lurek.render.setColor(0.6, 0.6, 0.5, 1)
+    lurek.render.print("Click shelf=add | Click mortar=grind | Click cauldron=transfer", 30, 420, 0.65)
+    lurek.render.print("Up/Down=heat | Space=brew | B=bottle | S=sell | R=reset | Esc=quit", 30, 438, 0.65)
 
     -- Message
     if message_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0.7, message_timer)
-        lurek.gfx.print(message, 200, 460, 1)
+        lurek.render.setColor(1, 1, 0.7, message_timer)
+        lurek.render.print(message, 200, 460, 1)
     end
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 5, 5, 0.6)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 5, 5, 0.6)
 end

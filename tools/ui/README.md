@@ -80,20 +80,20 @@ python tools/ui/render_layout.py content/demos/my_game/hud.layout.toml
 
 ### Widget colour legend
 
-| Widget type     | Colour        |
-|-----------------|---------------|
-| button          | Blue          |
-| label           | Green         |
-| panel           | Dark blue     |
-| textinput       | Light grey    |
-| checkbox        | Gold          |
-| slider          | Green         |
-| progressbar     | Teal          |
-| combobox        | Purple        |
-| listbox         | Blue-grey     |
-| layout          | Very dark     |
-| guiwindow       | Dark blue     |
-| dialog          | Dark blue     |
-| menubar/statusbar | Very dark   |
-| badge           | Red           |
-| *unknown*       | Mid grey      |
+| Widget type       | Colour     |
+| ----------------- | ---------- |
+| button            | Blue       |
+| label             | Green      |
+| panel             | Dark blue  |
+| textinput         | Light grey |
+| checkbox          | Gold       |
+| slider            | Green      |
+| progressbar       | Teal       |
+| combobox          | Purple     |
+| listbox           | Blue-grey  |
+| layout            | Very dark  |
+| guiwindow         | Dark blue  |
+| dialog            | Dark blue  |
+| menubar/statusbar | Very dark  |
+| badge             | Red        |
+| *unknown*         | Mid grey   |

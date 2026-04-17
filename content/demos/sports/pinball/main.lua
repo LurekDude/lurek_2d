@@ -45,7 +45,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Pinball")
-    lurek.gfx.setBackgroundColor(0.05, 0.06, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.06, 0.1)
 
     world = lurek.physics.newWorld(0, 300)
     walls = {}
@@ -171,94 +171,94 @@ end
 
 function lurek.render()
     -- walls
-    lurek.gfx.setColor(0.4, 0.45, 0.6, 1)
-    lurek.gfx.setLineWidth(3)
+    lurek.render.setColor(0.4, 0.45, 0.6, 1)
+    lurek.render.setLineWidth(3)
     for _, w in ipairs(walls) do
-        lurek.gfx.line(w.x1, w.y1, w.x2, w.y2)
+        lurek.render.line(w.x1, w.y1, w.x2, w.y2)
     end
-    lurek.gfx.setLineWidth(1)
+    lurek.render.setLineWidth(1)
 
     -- bumpers
     for _, bump in ipairs(bumpers) do
         if bump.flash > 0 then
-            lurek.gfx.setColor(1, 0.9, 0.3, 1)
+            lurek.render.setColor(1, 0.9, 0.3, 1)
         else
-            lurek.gfx.setColor(0.8, 0.3, 0.3, 1)
+            lurek.render.setColor(0.8, 0.3, 0.3, 1)
         end
-        lurek.gfx.circle("fill", bump.x, bump.y, bump.r)
-        lurek.gfx.setColor(1, 1, 1, 0.3)
-        lurek.gfx.circle("line", bump.x, bump.y, bump.r)
+        lurek.render.circle("fill", bump.x, bump.y, bump.r)
+        lurek.render.setColor(1, 1, 1, 0.3)
+        lurek.render.circle("line", bump.x, bump.y, bump.r)
     end
 
     -- targets
     for _, tgt in ipairs(targets) do
         if tgt.hit then
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+            lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         elseif tgt.flash > 0 then
-            lurek.gfx.setColor(1, 1, 0.2, 1)
+            lurek.render.setColor(1, 1, 0.2, 1)
         else
-            lurek.gfx.setColor(0.2, 0.8, 0.4, 1)
+            lurek.render.setColor(0.2, 0.8, 0.4, 1)
         end
-        lurek.gfx.rectangle("fill", tgt.x - 10, tgt.y - 4, 20, 8)
+        lurek.render.rectangle("fill", tgt.x - 10, tgt.y - 4, 20, 8)
     end
 
     -- flippers
     local left_active = lurek.keyboard.isDown("left") or lurek.keyboard.isDown("z")
     local right_active = lurek.keyboard.isDown("right") or lurek.keyboard.isDown("/")
 
-    lurek.gfx.setColor(0.6, 0.7, 0.9, 1)
+    lurek.render.setColor(0.6, 0.7, 0.9, 1)
     -- left flipper
     local la = left_active and -0.4 or 0.3
     local lx1 = flippers.left.x - 10
     local lx2 = flippers.left.x + FLIPPER_LEN / 2
     local ly = flippers.left.y + la * 20
-    lurek.gfx.line(lx1, flippers.left.y, lx2, ly)
-    lurek.gfx.circle("fill", lx1, flippers.left.y, 6)
-    lurek.gfx.circle("fill", lx2, ly, 5)
+    lurek.render.line(lx1, flippers.left.y, lx2, ly)
+    lurek.render.circle("fill", lx1, flippers.left.y, 6)
+    lurek.render.circle("fill", lx2, ly, 5)
 
     -- right flipper
     local ra = right_active and -0.4 or 0.3
     local rx1 = flippers.right.x + 10
     local rx2 = flippers.right.x - FLIPPER_LEN / 2
     local ry = flippers.right.y + ra * 20
-    lurek.gfx.line(rx1, flippers.right.y, rx2, ry)
-    lurek.gfx.circle("fill", rx1, flippers.right.y, 6)
-    lurek.gfx.circle("fill", rx2, ry, 5)
+    lurek.render.line(rx1, flippers.right.y, rx2, ry)
+    lurek.render.circle("fill", rx1, flippers.right.y, 6)
+    lurek.render.circle("fill", rx2, ry, 5)
 
     -- ball
     if state ~= "dead" then
         local bx, by = ball_body:getPosition()
-        lurek.gfx.setColor(0.9, 0.9, 0.95, 1)
-        lurek.gfx.circle("fill", bx, by, ball_r)
-        lurek.gfx.setColor(1, 1, 1, 0.4)
-        lurek.gfx.circle("fill", bx - 2, by - 2, 3)
+        lurek.render.setColor(0.9, 0.9, 0.95, 1)
+        lurek.render.circle("fill", bx, by, ball_r)
+        lurek.render.setColor(1, 1, 1, 0.4)
+        lurek.render.circle("fill", bx - 2, by - 2, 3)
     end
 
     -- launcher power bar
     if state == "launch" then
-        lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-        lurek.gfx.rectangle("fill", W - 28, H - 200, 16, 150)
-        lurek.gfx.setColor(1, 0.4, 0.1, 1)
+        lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+        lurek.render.rectangle("fill", W - 28, H - 200, 16, 150)
+        lurek.render.setColor(1, 0.4, 0.1, 1)
         local barH = (launch_power / 600) * 150
-        lurek.gfx.rectangle("fill", W - 28, H - 200 + 150 - barH, 16, barH)
-        lurek.gfx.setColor(1, 1, 1, 0.7)
-        lurek.gfx.print("SPACE", W - 32, H - 215, 0.6)
+        lurek.render.rectangle("fill", W - 28, H - 200 + 150 - barH, 16, barH)
+        lurek.render.setColor(1, 1, 1, 0.7)
+        lurek.render.print("SPACE", W - 32, H - 215, 0.6)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("SCORE: " .. score, 20, 20, 1.3)
-    lurek.gfx.print("BALLS: " .. balls_left, 20, 50)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 20, 70, 0.8)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("SCORE: " .. score, 20, 20, 1.3)
+    lurek.render.print("BALLS: " .. balls_left, 20, 50)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 20, 70, 0.8)
 
     -- game over
     if state == "dead" then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
-        lurek.gfx.print("GAME OVER", 130, 280, 3)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Final Score: " .. score, 180, 350, 1.5)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
+        lurek.render.print("GAME OVER", 130, 280, 3)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Final Score: " .. score, 180, 350, 1.5)
     end
 end
 

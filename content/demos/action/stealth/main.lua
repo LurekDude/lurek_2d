@@ -65,7 +65,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Stealth Action")
-    lurek.gfx.setBackgroundColor(0.1, 0.12, 0.1)
+    lurek.render.setBackgroundColor(0.1, 0.12, 0.1)
 
     -- walls
     walls = {
@@ -216,24 +216,24 @@ end
 function lurek.render()
     -- hide spots
     for _, hs in ipairs(hideSpots) do
-        lurek.gfx.setColor(0.05, 0.08, 0.05, 1)
-        lurek.gfx.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
-        lurek.gfx.setColor(0.2, 0.3, 0.2, 1)
-        lurek.gfx.rectangle("line", hs.x, hs.y, hs.w, hs.h)
+        lurek.render.setColor(0.05, 0.08, 0.05, 1)
+        lurek.render.rectangle("fill", hs.x, hs.y, hs.w, hs.h)
+        lurek.render.setColor(0.2, 0.3, 0.2, 1)
+        lurek.render.rectangle("line", hs.x, hs.y, hs.w, hs.h)
     end
 
     -- walls
     for _, w in ipairs(walls) do
-        lurek.gfx.setColor(0.35, 0.3, 0.25, 1)
-        lurek.gfx.rectangle("fill", w.x, w.y, w.w, w.h)
+        lurek.render.setColor(0.35, 0.3, 0.25, 1)
+        lurek.render.rectangle("fill", w.x, w.y, w.w, w.h)
     end
 
     -- exit zone
-    lurek.gfx.setColor(0.2, 0.8, 0.2, 0.5)
-    lurek.gfx.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    lurek.gfx.setColor(0.2, 1, 0.2, 1)
-    lurek.gfx.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
-    lurek.gfx.print("EXIT", exitZone.x + 8, exitZone.y + 20)
+    lurek.render.setColor(0.2, 0.8, 0.2, 0.5)
+    lurek.render.rectangle("fill", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    lurek.render.setColor(0.2, 1, 0.2, 1)
+    lurek.render.rectangle("line", exitZone.x, exitZone.y, exitZone.w, exitZone.h)
+    lurek.render.print("EXIT", exitZone.x + 8, exitZone.y + 20)
 
     -- guard vision cones
     for _, g in ipairs(guards) do
@@ -243,7 +243,7 @@ function lurek.render()
         local a = 0.12
         if g.state == "chase" then r, gr, b, a = 1, 0, 0, 0.2
         elseif g.suspicion > 0.5 then r, gr, b, a = 1, 0.5, 0, 0.15 end
-        lurek.gfx.setColor(r, gr, b, a)
+        lurek.render.setColor(r, gr, b, a)
         for i = 0, segments - 1 do
             local a1 = g.angle - g.fov + step * i
             local a2 = g.angle - g.fov + step * (i + 1)
@@ -252,63 +252,63 @@ function lurek.render()
                 g.x + math.cos(a1) * g.viewDist, g.y + math.sin(a1) * g.viewDist,
                 g.x + math.cos(a2) * g.viewDist, g.y + math.sin(a2) * g.viewDist,
             }
-            lurek.gfx.polygon("fill", verts)
+            lurek.render.polygon("fill", verts)
         end
     end
 
     -- noise ripples
     for _, nr in ipairs(noiseRipples) do
-        lurek.gfx.setColor(1, 1, 0.5, nr.alpha * 0.3)
-        lurek.gfx.circle("line", nr.x, nr.y, nr.r)
+        lurek.render.setColor(1, 1, 0.5, nr.alpha * 0.3)
+        lurek.render.circle("line", nr.x, nr.y, nr.r)
     end
 
     -- guards
     for _, g in ipairs(guards) do
         if g.state == "chase" then
-            lurek.gfx.setColor(1, 0.1, 0.1, 1)
+            lurek.render.setColor(1, 0.1, 0.1, 1)
         elseif g.suspicion > 0.5 then
-            lurek.gfx.setColor(1, 0.6, 0.1, 1)
+            lurek.render.setColor(1, 0.6, 0.1, 1)
         else
-            lurek.gfx.setColor(0.8, 0.8, 0.2, 1)
+            lurek.render.setColor(0.8, 0.8, 0.2, 1)
         end
-        lurek.gfx.circle("fill", g.x, g.y, 10)
+        lurek.render.circle("fill", g.x, g.y, 10)
         -- direction indicator
-        lurek.gfx.setColor(1, 1, 1, 0.8)
-        lurek.gfx.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.line(g.x, g.y, g.x + math.cos(g.angle) * 14, g.y + math.sin(g.angle) * 14)
     end
 
     -- player
     local pa = player.hidden and 0.4 or 1
     local pr = player.crouching and 5 or player.r
-    lurek.gfx.setColor(0.2, 0.6, 1, pa)
-    lurek.gfx.circle("fill", player.x, player.y, pr)
+    lurek.render.setColor(0.2, 0.6, 1, pa)
+    lurek.render.circle("fill", player.x, player.y, pr)
     if player.crouching then
-        lurek.gfx.setColor(0.4, 0.8, 1, 0.3)
-        lurek.gfx.circle("line", player.x, player.y, 12)
+        lurek.render.setColor(0.4, 0.8, 1, 0.3)
+        lurek.render.circle("line", player.x, player.y, 12)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(player.crouching and "CROUCHING" or "STANDING", 10, 10)
     if player.hidden then
-        lurek.gfx.setColor(0.3, 1, 0.3, 1)
-        lurek.gfx.print("HIDDEN", 10, 30)
+        lurek.render.setColor(0.3, 1, 0.3, 1)
+        lurek.render.print("HIDDEN", 10, 30)
     end
-    lurek.gfx.setColor(1, 1, 1, 0.5)
-    lurek.gfx.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
+    lurek.render.setColor(1, 1, 1, 0.5)
+    lurek.render.print("WASD: Move  |  LShift: Crouch  |  R: Reset", 10, 575)
 
     -- game over / win
     if player.caught then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
-        lurek.gfx.setColor(1, 0.2, 0.2, 1)
-        lurek.gfx.print("CAUGHT! Press R to retry", 290, 280, 1.2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 250, 250, 300, 80)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.print("CAUGHT! Press R to retry", 290, 280, 1.2)
     end
     if player.won then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
-        lurek.gfx.setColor(0.2, 1, 0.2, 1)
-        lurek.gfx.print("ESCAPED! Press R to replay", 285, 280, 1.2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 250, 250, 300, 80)
+        lurek.render.setColor(0.2, 1, 0.2, 1)
+        lurek.render.print("ESCAPED! Press R to replay", 285, 280, 1.2)
     end
 end
 

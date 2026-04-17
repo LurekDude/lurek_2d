@@ -72,7 +72,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.05, 0.12)
     reset()
 end
 
@@ -193,72 +193,72 @@ local function draw_boxer(bx, col, facing, is_blocking, is_punching, hp_pct)
     local flash = bx.hit_flash > 0
 
     -- Shadow
-    lurek.gfx.setColor(0, 0, 0, 0.3)
-    lurek.gfx.circle("fill", x + bx.w/2, FLOOR_Y + 5, 18)
+    lurek.render.setColor(0, 0, 0, 0.3)
+    lurek.render.circle("fill", x + bx.w/2, FLOOR_Y + 5, 18)
 
     -- Body
     local r, g, b = col[1], col[2], col[3]
     if flash then r, g, b = 1, 0.3, 0.3 end
-    lurek.gfx.setColor(r, g, b)
-    lurek.gfx.rectangle("fill", x + 5, y + 18, bx.w - 10, bx.h - 30)
+    lurek.render.setColor(r, g, b)
+    lurek.render.rectangle("fill", x + 5, y + 18, bx.w - 10, bx.h - 30)
 
     -- Shorts
-    lurek.gfx.setColor(col[1] * 0.4, col[2] * 0.4, col[3] * 0.4)
-    lurek.gfx.rectangle("fill", x + 5, y + 36, bx.w - 10, 14)
+    lurek.render.setColor(col[1] * 0.4, col[2] * 0.4, col[3] * 0.4)
+    lurek.render.rectangle("fill", x + 5, y + 36, bx.w - 10, 14)
 
     -- Head
-    lurek.gfx.setColor(0.85, 0.65, 0.4)
-    lurek.gfx.circle("fill", x + bx.w/2, y + 12, 11)
+    lurek.render.setColor(0.85, 0.65, 0.4)
+    lurek.render.circle("fill", x + bx.w/2, y + 12, 11)
     -- Gloves
     local gx = x + (facing > 0 and bx.w - 2 or -8)
     local jgx = x + (facing > 0 and bx.w + 10 or -20)
-    lurek.gfx.setColor(col[1] * 1.2, col[2] * 0.5, col[3] * 0.5)
+    lurek.render.setColor(col[1] * 1.2, col[2] * 0.5, col[3] * 0.5)
     if is_punching then
-        lurek.gfx.circle("fill", jgx, y + 18, 9)
+        lurek.render.circle("fill", jgx, y + 18, 9)
     else
-        lurek.gfx.circle("fill", gx, y + 22, 9)
+        lurek.render.circle("fill", gx, y + 22, 9)
     end
     -- Block stance
     if is_blocking then
-        lurek.gfx.setColor(col[1], col[2], col[3], 0.5)
-        lurek.gfx.rectangle("fill", x - 3, y + 5, bx.w + 6, 28)
+        lurek.render.setColor(col[1], col[2], col[3], 0.5)
+        lurek.render.rectangle("fill", x - 3, y + 5, bx.w + 6, 28)
     end
 end
 
 local function draw_hpbar(x, y, vals, total, col, label)
     local bw = 200
-    lurek.gfx.setColor(0.2, 0.2, 0.2)
-    lurek.gfx.rectangle("fill", x, y, bw, 18)
+    lurek.render.setColor(0.2, 0.2, 0.2)
+    lurek.render.rectangle("fill", x, y, bw, 18)
     local pct = math.max(0, vals) / total
     local r = pct < 0.3 and 1 or (pct < 0.6 and 0.9 or col[1])
     local g = pct < 0.3 and 0.1 or (pct < 0.6 and 0.7 or col[2])
-    lurek.gfx.setColor(r, g, col[3])
-    lurek.gfx.rectangle("fill", x, y, bw * pct, 18)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(label .. ": " .. vals, x + 4, y + 1, 1.4)
+    lurek.render.setColor(r, g, col[3])
+    lurek.render.rectangle("fill", x, y, bw * pct, 18)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(label .. ": " .. vals, x + 4, y + 1, 1.4)
 end
 
 function lurek.render()
     -- Ring floor
-    lurek.gfx.setColor(0.7, 0.65, 0.5)
-    lurek.gfx.rectangle("fill", RING_X, RING_Y, RING_W, RING_H)
+    lurek.render.setColor(0.7, 0.65, 0.5)
+    lurek.render.rectangle("fill", RING_X, RING_Y, RING_W, RING_H)
     -- Ring canvas
-    lurek.gfx.setColor(0.75, 0.7, 0.55)
-    lurek.gfx.rectangle("fill", RING_X + 20, RING_Y + 20, RING_W - 40, RING_H - 40)
+    lurek.render.setColor(0.75, 0.7, 0.55)
+    lurek.render.rectangle("fill", RING_X + 20, RING_Y + 20, RING_W - 40, RING_H - 40)
     -- Ropes
     for i = 1, 3 do
         local ry = RING_Y + i * (RING_H / 4)
-        lurek.gfx.setColor(1, 0.1, 0.1)
-        lurek.gfx.line(RING_X, ry, RING_X + RING_W, ry)
+        lurek.render.setColor(1, 0.1, 0.1)
+        lurek.render.line(RING_X, ry, RING_X + RING_W, ry)
     end
     -- Corner posts
-    lurek.gfx.setColor(0.5, 0.1, 0.1)
+    lurek.render.setColor(0.5, 0.1, 0.1)
     for _, cx in ipairs({RING_X, RING_X + RING_W}) do
-        lurek.gfx.rectangle("fill", cx - 5, RING_Y - 10, 10, RING_H + 20)
+        lurek.render.rectangle("fill", cx - 5, RING_Y - 10, 10, RING_H + 20)
     end
     -- Center line
-    lurek.gfx.setColor(0.6, 0.55, 0.4, 0.5)
-    lurek.gfx.line(RING_X + RING_W/2, FLOOR_Y - 80, RING_X + RING_W/2, FLOOR_Y + 20)
+    lurek.render.setColor(0.6, 0.55, 0.4, 0.5)
+    lurek.render.line(RING_X + RING_W/2, FLOOR_Y - 80, RING_X + RING_W/2, FLOOR_Y + 20)
 
     -- Fighters
     local pl_punch  = pl.jab_cd > 0.25 or pl.hook_cd > 0.55
@@ -267,49 +267,49 @@ function lurek.render()
     draw_boxer(cpu, {0.9, 0.3, 0.2}, cpu.facing, cpu.block, cpu_punch, cpu.hp/HP_MAX)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, 0, W, 95)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, 0, W, 95)
     draw_hpbar(14, 12, pl.hp,  HP_MAX, {0.3, 0.5, 1}, "YOU")
     draw_hpbar(W - 214, 12, cpu.hp, HP_MAX, {1, 0.4, 0.3}, "CPU")
 
     -- Round / timer
-    lurek.gfx.setColor(1, 0.9, 0.3)
-    lurek.gfx.print("ROUND " .. round .. "/" .. ROUNDS, W/2 - 55, 8, 2.2)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.print("ROUND " .. round .. "/" .. ROUNDS, W/2 - 55, 8, 2.2)
     local secs = math.ceil(round_timer)
     local tc = secs <= 10 and {1, 0.2, 0.2} or {1, 1, 1}
-    lurek.gfx.setColor(tc[1], tc[2], tc[3])
-    lurek.gfx.print(string.format("%d:%02d", math.floor(secs/60), secs%60), W/2 - 22, 32, 2.5)
+    lurek.render.setColor(tc[1], tc[2], tc[3])
+    lurek.render.print(string.format("%d:%02d", math.floor(secs/60), secs%60), W/2 - 22, 32, 2.5)
 
     -- Score
-    lurek.gfx.setColor(0.4, 0.7, 1)
-    lurek.gfx.print("YOU: " .. score_pl, W/2 - 110, 56, 1.8)
-    lurek.gfx.setColor(1, 0.5, 0.4)
-    lurek.gfx.print("CPU: " .. score_cpu, W/2 + 30, 56, 1.8)
+    lurek.render.setColor(0.4, 0.7, 1)
+    lurek.render.print("YOU: " .. score_pl, W/2 - 110, 56, 1.8)
+    lurek.render.setColor(1, 0.5, 0.4)
+    lurek.render.print("CPU: " .. score_cpu, W/2 + 30, 56, 1.8)
 
     -- Controls reminder
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 22, W, 22)
-    lurek.gfx.setColor(0.8, 0.9, 1, 0.9)
-    lurek.gfx.print("[A/D] Move  [Space] Jab  [Z] Hook  [X] Block", 14, H - 18, 1.4)
+    lurek.render.setColor(0.6, 0.6, 0.6, 0.7)
+    lurek.render.rectangle("fill", 0, H - 22, W, 22)
+    lurek.render.setColor(0.8, 0.9, 1, 0.9)
+    lurek.render.print("[A/D] Move  [Space] Jab  [Z] Hook  [X] Block", 14, H - 18, 1.4)
 
     -- Float message
     if msg_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0.3, math.min(1, msg_timer))
-        lurek.gfx.print(msg, W/2 - #msg * 7, H/2 - 10, 3)
+        lurek.render.setColor(1, 1, 0.3, math.min(1, msg_timer))
+        lurek.render.print(msg, W/2 - #msg * 7, H/2 - 10, 3)
     end
 
     -- Game over
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.8)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 0, 0, 0.8)
+        lurek.render.rectangle("fill", 0, 0, W, H)
         local winner = score_pl > score_cpu and "YOU WIN!" or (score_pl == score_cpu and "DRAW!" or "CPU WINS!")
         local col = score_pl > score_cpu and {0.3, 1, 0.4} or (score_pl == score_cpu and {1,1,0.3} or {1,0.3,0.3})
-        lurek.gfx.setColor(col[1], col[2], col[3])
-        lurek.gfx.print(winner, W/2 - #winner * 9, H/2 - 35, 3)
-        lurek.gfx.setColor(0.5, 0.8, 1)
-        lurek.gfx.print("You: " .. score_pl .. "   CPU: " .. score_cpu, W/2 - 80, H/2 + 15, 2.2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to fight again", W/2 - 110, H/2 + 55, 2)
+        lurek.render.setColor(col[1], col[2], col[3])
+        lurek.render.print(winner, W/2 - #winner * 9, H/2 - 35, 3)
+        lurek.render.setColor(0.5, 0.8, 1)
+        lurek.render.print("You: " .. score_pl .. "   CPU: " .. score_cpu, W/2 - 80, H/2 + 15, 2.2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to fight again", W/2 - 110, H/2 + 55, 2)
     end
 end
 

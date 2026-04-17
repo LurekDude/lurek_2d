@@ -182,7 +182,7 @@ function lurek.keypressed(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
 
     local pgx = math.floor(player.x) + 1
     local pgy = math.floor(player.y) + 1
@@ -199,8 +199,8 @@ function lurek.render()
                 local light = clamp(1.0 - dist / 12, 0.1, 1.0)
                 if t == SKY then light = 1.0 end
                 local c = tile_colors[t]
-                lurek.gfx.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
-                lurek.gfx.rectangle("fill",
+                lurek.render.setColor(c[1] * light, c[2] * light, c[3] * light, 1)
+                lurek.render.rectangle("fill",
                     (x - 1) * TILE_SIZE,
                     (y - 1) * TILE_SIZE - camera_y,
                     TILE_SIZE, TILE_SIZE)
@@ -213,23 +213,23 @@ function lurek.render()
         local mx = (mining.tx - 1) * TILE_SIZE
         local my = (mining.ty - 1) * TILE_SIZE - camera_y
         local pct = mining.progress / mining.required
-        lurek.gfx.setColor(1, 1, 0, 0.8)
-        lurek.gfx.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
+        lurek.render.setColor(1, 1, 0, 0.8)
+        lurek.render.rectangle("fill", mx, my - 4, TILE_SIZE * pct, 3)
     end
 
     -- Player
     local sx = player.x * TILE_SIZE
     local sy = player.y * TILE_SIZE - camera_y
-    lurek.gfx.setColor(0.2, 0.9, 0.3, 1)
-    lurek.gfx.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
+    lurek.render.setColor(0.2, 0.9, 0.3, 1)
+    lurek.render.rectangle("fill", sx, sy, TILE_SIZE, TILE_SIZE)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     local depth = math.floor(player.y - SURFACE_Y)
     if depth < 0 then depth = 0 end
-    lurek.gfx.print("Depth: " .. depth .. "m", 10, 10)
-    lurek.gfx.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
+    lurek.render.print("Depth: " .. depth .. "m", 10, 10)
+    lurek.render.print("Dirt:" .. inventory.dirt .. " Stone:" .. inventory.stone ..
         " Ore:" .. inventory.ore .. " Gem:" .. inventory.gem, 10, 28)
-    lurek.gfx.print("WASD:move  Click:mine  L:ladder", 10, 46)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 10)
+    lurek.render.print("WASD:move  Click:mine  L:ladder", 10, 46)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 10)
 end

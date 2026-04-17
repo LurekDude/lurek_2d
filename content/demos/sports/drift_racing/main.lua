@@ -264,53 +264,53 @@ local function draw_car(c)
         c.x - cos_a * hw + sin_a * hh, c.y - sin_a * hw - cos_a * hh,
         c.x - cos_a * hw - sin_a * hh, c.y - sin_a * hw + cos_a * hh
     }
-    lurek.gfx.setColor(c.r, c.g, c.b, 1)
-    lurek.gfx.polygon("fill", corners)
-    lurek.gfx.setColor(1, 1, 1, 0.5)
-    lurek.gfx.polygon("line", corners)
+    lurek.render.setColor(c.r, c.g, c.b, 1)
+    lurek.render.polygon("fill", corners)
+    lurek.render.setColor(1, 1, 1, 0.5)
+    lurek.render.polygon("line", corners)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.15, 0.18, 0.12)
+    lurek.render.setBackgroundColor(0.15, 0.18, 0.12)
 
     -- draw track road
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
     for i = 1, #track_outer - 1 do
         local a = track_outer[i]; local b = track_outer[i + 1]
         local c = track_inner[i + 1]; local d = track_inner[i]
-        lurek.gfx.polygon("fill", { a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y })
+        lurek.render.polygon("fill", { a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y })
     end
 
     -- track edges
-    lurek.gfx.setColor(1, 1, 1, 0.3)
-    lurek.gfx.setLineWidth(2)
+    lurek.render.setColor(1, 1, 1, 0.3)
+    lurek.render.setLineWidth(2)
     for i = 1, #track_outer - 1 do
-        lurek.gfx.line(track_outer[i].x, track_outer[i].y, track_outer[i + 1].x, track_outer[i + 1].y)
-        lurek.gfx.line(track_inner[i].x, track_inner[i].y, track_inner[i + 1].x, track_inner[i + 1].y)
+        lurek.render.line(track_outer[i].x, track_outer[i].y, track_outer[i + 1].x, track_outer[i + 1].y)
+        lurek.render.line(track_inner[i].x, track_inner[i].y, track_inner[i + 1].x, track_inner[i + 1].y)
     end
 
     -- boost zones
     for _, bz in ipairs(boost_zones) do
         if bz.active then
-            lurek.gfx.setColor(0, 1, 1, 0.4)
-            lurek.gfx.circle("fill", bz.x, bz.y, bz.radius)
-            lurek.gfx.setColor(0, 1, 1, 0.8)
-            lurek.gfx.circle("line", bz.x, bz.y, bz.radius)
+            lurek.render.setColor(0, 1, 1, 0.4)
+            lurek.render.circle("fill", bz.x, bz.y, bz.radius)
+            lurek.render.setColor(0, 1, 1, 0.8)
+            lurek.render.circle("line", bz.x, bz.y, bz.radius)
         end
     end
 
     -- checkpoints
     for i, cp in ipairs(checkpoints) do
-        lurek.gfx.setColor(1, 1, 0, 0.3)
-        lurek.gfx.circle("fill", cp.x, cp.y, 10)
-        lurek.gfx.setColor(1, 1, 0, 0.7)
-        lurek.gfx.print(tostring(i), cp.x - 3, cp.y - 6)
+        lurek.render.setColor(1, 1, 0, 0.3)
+        lurek.render.circle("fill", cp.x, cp.y, 10)
+        lurek.render.setColor(1, 1, 0, 0.7)
+        lurek.render.print(tostring(i), cp.x - 3, cp.y - 6)
     end
 
     -- skid marks
-    lurek.gfx.setColor(0.15, 0.15, 0.15, 0.5)
+    lurek.render.setColor(0.15, 0.15, 0.15, 0.5)
     for _, s in ipairs(skid_marks) do
-        lurek.gfx.circle("fill", s.x, s.y, 2)
+        lurek.render.circle("fill", s.x, s.y, 2)
     end
 
     -- AI cars
@@ -319,46 +319,46 @@ function lurek.render()
     -- player car
     draw_car(car)
     if car.boost > 0 then
-        lurek.gfx.setColor(0, 1, 1, 0.6)
-        lurek.gfx.circle("fill", car.x, car.y, 15)
+        lurek.render.setColor(0, 1, 1, 0.6)
+        lurek.render.circle("fill", car.x, car.y, 15)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Speed: " .. math.floor(car.speed), 10, 10)
-    lurek.gfx.print("Lap: " .. car.lap .. "/" .. state.laps_to_win, 10, 30)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Speed: " .. math.floor(car.speed), 10, 10)
+    lurek.render.print("Lap: " .. car.lap .. "/" .. state.laps_to_win, 10, 30)
     local lt = math.floor(car.lap_time * 10) / 10
-    lurek.gfx.print("Lap Time: " .. lt .. "s", 10, 50)
-    lurek.gfx.print("Drift: " .. math.floor(car.drift), 10, 70)
+    lurek.render.print("Lap Time: " .. lt .. "s", 10, 50)
+    lurek.render.print("Drift: " .. math.floor(car.drift), 10, 70)
 
     if car.boost > 0 then
-        lurek.gfx.setColor(0, 1, 1, 1)
-        lurek.gfx.print("BOOST!", 10, 90)
+        lurek.render.setColor(0, 1, 1, 1)
+        lurek.render.print("BOOST!", 10, 90)
     end
 
     -- mini map
     local mx, my, ms = W - 110, 10, 0.12
-    lurek.gfx.setColor(0, 0, 0, 0.5)
-    lurek.gfx.rectangle("fill", mx - 5, my - 5, 110, 85)
-    lurek.gfx.setColor(0.4, 0.4, 0.4, 0.8)
+    lurek.render.setColor(0, 0, 0, 0.5)
+    lurek.render.rectangle("fill", mx - 5, my - 5, 110, 85)
+    lurek.render.setColor(0.4, 0.4, 0.4, 0.8)
     for i = 1, #track_pts - 1 do
         local a, b = track_pts[i], track_pts[i + 1]
-        lurek.gfx.line(mx + a.x * ms, my + a.y * ms, mx + b.x * ms, my + b.y * ms)
+        lurek.render.line(mx + a.x * ms, my + a.y * ms, mx + b.x * ms, my + b.y * ms)
     end
-    lurek.gfx.setColor(0, 0.8, 1, 1)
-    lurek.gfx.circle("fill", mx + car.x * ms, my + car.y * ms, 3)
+    lurek.render.setColor(0, 0.8, 1, 1)
+    lurek.render.circle("fill", mx + car.x * ms, my + car.y * ms, 3)
     for _, ai in ipairs(ai_cars) do
-        lurek.gfx.setColor(ai.r, ai.g, ai.b, 1)
-        lurek.gfx.circle("fill", mx + ai.x * ms, my + ai.y * ms, 2)
+        lurek.render.setColor(ai.r, ai.g, ai.b, 1)
+        lurek.render.circle("fill", mx + ai.x * ms, my + ai.y * ms, 2)
     end
 
     -- finished message
     if state.finished then
-        lurek.gfx.setColor(1, 1, 0.3, 1)
-        lurek.gfx.print(state.message, W / 2 - 120, H / 2 - 15, 1.5)
+        lurek.render.setColor(1, 1, 0.3, 1)
+        lurek.render.print(state.message, W / 2 - 120, H / 2 - 15, 1.5)
     end
 
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 0.5)
-    lurek.gfx.print("WASD: Drive | R: Restart", W / 2 - 80, H - 20)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 80, H - 20)
+    lurek.render.setColor(0.6, 0.6, 0.6, 0.5)
+    lurek.render.print("WASD: Drive | R: Restart", W / 2 - 80, H - 20)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 80, H - 20)
 end

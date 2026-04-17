@@ -160,57 +160,57 @@ function lurek.keypressed(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.12)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.12)
 
     -- Ground
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 0, SCREEN_H - 20, SCREEN_W, 20)
 
     -- Joints
-    lurek.gfx.setLineWidth(2)
+    lurek.render.setLineWidth(2)
     for _, j in ipairs(joints) do
         local ax, ay = j.a.body:getPosition()
         local bx, by = j.b.body:getPosition()
-        lurek.gfx.setColor(0.6, 0.9, 0.3, 0.7)
-        lurek.gfx.line(ax, ay, bx, by)
+        lurek.render.setColor(0.6, 0.9, 0.3, 0.7)
+        lurek.render.line(ax, ay, bx, by)
     end
-    lurek.gfx.setLineWidth(1)
+    lurek.render.setLineWidth(1)
 
     -- Objects
     for _, o in ipairs(objects) do
         local ox, oy = o.body:getPosition()
 
         local cr, cg, cb = o.color[1], o.color[2], o.color[3]
-        lurek.gfx.setColor(cr, cg, cb, 1)
+        lurek.render.setColor(cr, cg, cb, 1)
 
         if o.kind == "circle" then
-            lurek.gfx.circle("fill", ox, oy, o.size)
-            lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            lurek.gfx.circle("line", ox, oy, o.size)
+            lurek.render.circle("fill", ox, oy, o.size)
+            lurek.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            lurek.render.circle("line", ox, oy, o.size)
         else
-            lurek.gfx.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
-            lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
-            lurek.gfx.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            lurek.render.rectangle("fill", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
+            lurek.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+            lurek.render.rectangle("line", ox - o.size, oy - o.size, o.size * 2, o.size * 2)
         end
     end
 
     -- Joint mode indicator
     if joint_mode then
-        lurek.gfx.setColor(0.3, 1, 0.3, 0.5)
+        lurek.render.setColor(0.3, 1, 0.3, 0.5)
         if joint_first then
             local ax, ay = joint_first.body:getPosition()
             local mx, my = lurek.mouse.getPosition()
-            lurek.gfx.line(ax, ay, mx, my)
+            lurek.render.line(ax, ay, mx, my)
         end
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Objects: " .. #objects .. "  FPS: " .. lurek.time.getFPS(), 10, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Objects: " .. #objects .. "  FPS: " .. lurek.time.getFPS(), 10, 10)
 
     -- Mode display
     local mode_text = "Mode: " .. spawn_mode:upper() .. "  Size: " .. spawn_size .. "  Bounce: " .. (math.floor(bounciness * 100)) .. "%"
-    lurek.gfx.print(mode_text, 10, 30)
+    lurek.render.print(mode_text, 10, 30)
 
     -- Status flags
     local flags = {}
@@ -218,10 +218,10 @@ function lurek.render()
     if wind_on then flags[#flags + 1] = "WIND" end
     if paused then flags[#flags + 1] = "PAUSED" end
     if joint_mode then flags[#flags + 1] = "JOINT" end
-    lurek.gfx.setColor(0.8, 0.8, 0.3, 1)
-    lurek.gfx.print(table.concat(flags, " | "), 10, 50)
+    lurek.render.setColor(0.8, 0.8, 0.3, 1)
+    lurek.render.print(table.concat(flags, " | "), 10, 50)
 
     -- Controls
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("C/R:shape G:gravity W:wind Space:pause Del:clear J:joint B:bounce +/-:size", 10, SCREEN_H - 24)
 end

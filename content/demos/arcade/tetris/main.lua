@@ -102,7 +102,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
     new_board()
     score = 0; lines_cleared = 0; level = 1
     drop_interval = 0.5
@@ -143,22 +143,22 @@ end
 local function draw_cell(x, y, color, alpha)
     local px = BOARD_X + x * CELL
     local py = BOARD_Y + y * CELL
-    lurek.gfx.setColor(color[1], color[2], color[3], alpha or 1)
-    lurek.gfx.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
-    lurek.gfx.setColor(color[1]*1.4, color[2]*1.4, color[3]*1.4, alpha or 1)
-    lurek.gfx.rectangle("line", px+1, py+1, CELL-2, CELL-2)
+    lurek.render.setColor(color[1], color[2], color[3], alpha or 1)
+    lurek.render.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
+    lurek.render.setColor(color[1]*1.4, color[2]*1.4, color[3]*1.4, alpha or 1)
+    lurek.render.rectangle("line", px+1, py+1, CELL-2, CELL-2)
 end
 
 function lurek.render()
     -- Board border
-    lurek.gfx.setColor(0.3, 0.3, 0.5)
-    lurek.gfx.rectangle("line", BOARD_X - 1, BOARD_Y - 1, COLS * CELL + 2, ROWS * CELL + 2)
+    lurek.render.setColor(0.3, 0.3, 0.5)
+    lurek.render.rectangle("line", BOARD_X - 1, BOARD_Y - 1, COLS * CELL + 2, ROWS * CELL + 2)
 
     -- Grid ghost
-    lurek.gfx.setColor(0.12, 0.12, 0.18)
+    lurek.render.setColor(0.12, 0.12, 0.18)
     for y = 0, ROWS - 1 do
         for x = 0, COLS - 1 do
-            lurek.gfx.rectangle("line", BOARD_X + x*CELL + 1, BOARD_Y + y*CELL + 1, CELL - 2, CELL - 2)
+            lurek.render.rectangle("line", BOARD_X + x*CELL + 1, BOARD_Y + y*CELL + 1, CELL - 2, CELL - 2)
         end
     end
 
@@ -189,20 +189,20 @@ function lurek.render()
 
     -- Sidebar info
     local sx = BOARD_X + COLS * CELL + 20
-    lurek.gfx.setColor(0.7, 0.7, 0.9)
-    lurek.gfx.print("SCORE",  sx, BOARD_Y + 10, 1.5)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(tostring(score), sx, BOARD_Y + 28, 1.8)
-    lurek.gfx.setColor(0.7, 0.7, 0.9)
-    lurek.gfx.print("LEVEL", sx, BOARD_Y + 65, 1.5)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(tostring(level), sx, BOARD_Y + 82, 2)
-    lurek.gfx.setColor(0.7, 0.7, 0.9)
-    lurek.gfx.print("LINES", sx, BOARD_Y + 115, 1.5)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(tostring(lines_cleared), sx, BOARD_Y + 132, 2)
-    lurek.gfx.setColor(0.7, 0.7, 0.9)
-    lurek.gfx.print("NEXT",  sx, BOARD_Y + 165, 1.5)
+    lurek.render.setColor(0.7, 0.7, 0.9)
+    lurek.render.print("SCORE",  sx, BOARD_Y + 10, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(tostring(score), sx, BOARD_Y + 28, 1.8)
+    lurek.render.setColor(0.7, 0.7, 0.9)
+    lurek.render.print("LEVEL", sx, BOARD_Y + 65, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(tostring(level), sx, BOARD_Y + 82, 2)
+    lurek.render.setColor(0.7, 0.7, 0.9)
+    lurek.render.print("LINES", sx, BOARD_Y + 115, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(tostring(lines_cleared), sx, BOARD_Y + 132, 2)
+    lurek.render.setColor(0.7, 0.7, 0.9)
+    lurek.render.print("NEXT",  sx, BOARD_Y + 165, 1.5)
     if next_piece then
         for _, c in ipairs(next_piece.cells) do
             draw_cell(-1 + c[1] + math.floor((COLS + 12.5) / CELL), c[2] + 11, next_piece.color)
@@ -210,28 +210,28 @@ function lurek.render()
         for _, c in ipairs(next_piece.cells) do
             local px2 = sx + c[1] * CELL
             local py2 = BOARD_Y + 180 + c[2] * CELL
-            lurek.gfx.setColor(next_piece.color[1], next_piece.color[2], next_piece.color[3])
-            lurek.gfx.rectangle("fill", px2+1, py2+1, CELL-2, CELL-2)
+            lurek.render.setColor(next_piece.color[1], next_piece.color[2], next_piece.color[3])
+            lurek.render.rectangle("fill", px2+1, py2+1, CELL-2, CELL-2)
         end
     end
 
     -- Controls
-    lurek.gfx.setColor(0.4, 0.4, 0.5)
-    lurek.gfx.print("←→  Move",   sx, H - 110, 1.2)
-    lurek.gfx.print("↑   Rotate", sx, H - 95,  1.2)
-    lurek.gfx.print("↓   Soft",   sx, H - 80,  1.2)
-    lurek.gfx.print("SPC Hard",   sx, H - 65,  1.2)
-    lurek.gfx.print("ESC Quit",   sx, H - 50,  1.2)
+    lurek.render.setColor(0.4, 0.4, 0.5)
+    lurek.render.print("←→  Move",   sx, H - 110, 1.2)
+    lurek.render.print("↑   Rotate", sx, H - 95,  1.2)
+    lurek.render.print("↓   Soft",   sx, H - 80,  1.2)
+    lurek.render.print("SPC Hard",   sx, H - 65,  1.2)
+    lurek.render.print("ESC Quit",   sx, H - 50,  1.2)
 
     -- Game over overlay
     if game_over then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 50, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 20, 2)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 50, 2)
     end
 end
 

@@ -42,7 +42,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Platform Fighter")
-    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.18)
+    lurek.render.setBackgroundColor(0.12, 0.1, 0.18)
     reset_match()
 end
 
@@ -147,54 +147,54 @@ end
 local function draw_player(p, label)
     if p.stocks <= 0 then return end
     local alpha = (p.invuln > 0 and math.sin(lurek.time.getTime() * 20) > 0) and 0.3 or 1.0
-    lurek.gfx.setColor(p.cr, p.cg, p.cb, alpha)
-    lurek.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
+    lurek.render.setColor(p.cr, p.cg, p.cb, alpha)
+    lurek.render.rectangle("fill", p.x, p.y, p.w, p.h)
     -- eyes
-    lurek.gfx.setColor(1, 1, 1, alpha)
+    lurek.render.setColor(1, 1, 1, alpha)
     local ex = (p.dir == 1) and (p.x + 18) or (p.x + 6)
-    lurek.gfx.rectangle("fill", ex, p.y + 10, 6, 6)
+    lurek.render.rectangle("fill", ex, p.y + 10, 6, 6)
     -- attack flash
     if p.attacking then
-        lurek.gfx.setColor(1, 1, 0, 0.6)
+        lurek.render.setColor(1, 1, 0, 0.6)
         local reach = (p.atk_type == "smash") and 50 or 35
         local ax = (p.dir == 1) and (p.x + p.w) or (p.x - reach)
-        lurek.gfx.rectangle("fill", ax, p.y + 5, reach, p.h - 10)
+        lurek.render.rectangle("fill", ax, p.y + 5, reach, p.h - 10)
     end
 end
 
 local function draw_hud(p, x_base, label)
-    lurek.gfx.setColor(p.cr, p.cg, p.cb, 1)
-    lurek.gfx.print(label, x_base, 10, 1.2)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(tostring(math.floor(p.damage)) .. "%", x_base, 35, 1.8)
+    lurek.render.setColor(p.cr, p.cg, p.cb, 1)
+    lurek.render.print(label, x_base, 10, 1.2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(tostring(math.floor(p.damage)) .. "%", x_base, 35, 1.8)
     for i = 1, 3 do
         if i <= p.stocks then
-            lurek.gfx.setColor(p.cr, p.cg, p.cb, 1)
-            lurek.gfx.circle("fill", x_base + (i - 1) * 20 + 8, 75, 7)
+            lurek.render.setColor(p.cr, p.cg, p.cb, 1)
+            lurek.render.circle("fill", x_base + (i - 1) * 20 + 8, 75, 7)
         else
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-            lurek.gfx.circle("line", x_base + (i - 1) * 20 + 8, 75, 7)
+            lurek.render.setColor(0.3, 0.3, 0.3, 1)
+            lurek.render.circle("line", x_base + (i - 1) * 20 + 8, 75, 7)
         end
     end
 end
 
 function lurek.render()
     -- ground
-    lurek.gfx.setColor(0.25, 0.22, 0.3, 1)
-    lurek.gfx.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
+    lurek.render.setColor(0.25, 0.22, 0.3, 1)
+    lurek.render.rectangle("fill", 0, GROUND_Y, W, H - GROUND_Y)
     -- platforms
-    lurek.gfx.setColor(0.35, 0.3, 0.45, 1)
+    lurek.render.setColor(0.35, 0.3, 0.45, 1)
     for _, plat in ipairs(platforms) do
-        lurek.gfx.rectangle("fill", plat.x, plat.y, plat.w, plat.h)
+        lurek.render.rectangle("fill", plat.x, plat.y, plat.w, plat.h)
     end
     draw_player(p1, "P1")
     draw_player(p2, "P2")
     draw_hud(p1, 30, "P1")
     draw_hud(p2, W - 120, "P2")
     if match_over then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("PLAYER " .. winner .. " WINS!", W / 2 - 80, H / 2 - 20, 2)
-        lurek.gfx.print("Press R to rematch", W / 2 - 70, H / 2 + 20, 1)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("PLAYER " .. winner .. " WINS!", W / 2 - 80, H / 2 - 20, 2)
+        lurek.render.print("Press R to rematch", W / 2 - 70, H / 2 + 20, 1)
     end
 end
 

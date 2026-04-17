@@ -27,8 +27,8 @@ function lurek.init()
 end
 
 function lurek.render()
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(mod_greeting, 20, 20)
-    lurek.gfx.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
-    lurek.gfx.print("lurek.fs.mount / unmount / load demo", 20, 80)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(mod_greeting, 20, 20)
+    lurek.render.print("init.lua executed: " .. tostring(mod_init_ran), 20, 50)
+    lurek.render.print("lurek.fs.mount / unmount / load demo", 20, 80)
 end

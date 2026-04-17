@@ -345,21 +345,21 @@ function lurek.keypressed(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.18)
+    lurek.render.setBackgroundColor(0.12, 0.1, 0.18)
 
     -- Title and score
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("MATCH-3", GRID_X, 10, 2)
-    lurek.gfx.print("Score: " .. score, GRID_X + 250, 15, 1.5)
-    lurek.gfx.print("Moves: " .. moves, GRID_X + 250, 38)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("MATCH-3", GRID_X, 10, 2)
+    lurek.render.print("Score: " .. score, GRID_X + 250, 15, 1.5)
+    lurek.render.print("Moves: " .. moves, GRID_X + 250, 38)
     if combo > 1 then
-        lurek.gfx.setColor(1, 0.8, 0.1, 1)
-        lurek.gfx.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
+        lurek.render.setColor(1, 0.8, 0.1, 1)
+        lurek.render.print("COMBO x" .. combo, GRID_X + 420, 15, 1.5)
     end
 
     -- Grid background
-    lurek.gfx.setColor(0.18, 0.16, 0.22, 1)
-    lurek.gfx.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
+    lurek.render.setColor(0.18, 0.16, 0.22, 1)
+    lurek.render.rectangle("fill", GRID_X - 4, GRID_Y - 4, GRID_SIZE * CELL + 8, GRID_SIZE * CELL + 8)
 
     -- Gems
     for r = 1, GRID_SIZE do
@@ -371,27 +371,27 @@ function lurek.render()
                 local pad = 3
 
                 -- Cell background
-                lurek.gfx.setColor(0.14, 0.12, 0.18, 1)
-                lurek.gfx.rectangle("fill", x, y, CELL, CELL)
+                lurek.render.setColor(0.14, 0.12, 0.18, 1)
+                lurek.render.rectangle("fill", x, y, CELL, CELL)
 
                 -- Gem
                 local clr = gem_colors[g.color]
-                lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
-                lurek.gfx.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
+                lurek.render.setColor(clr[1], clr[2], clr[3], 1)
+                lurek.render.circle("fill", x + CELL / 2, y + CELL / 2, CELL / 2 - pad)
 
                 -- Highlight for specials
                 if g.special == "bomb" then
-                    lurek.gfx.setColor(1, 1, 1, 0.5)
-                    lurek.gfx.circle("fill", x + CELL / 2, y + CELL / 2, 8)
+                    lurek.render.setColor(1, 1, 1, 0.5)
+                    lurek.render.circle("fill", x + CELL / 2, y + CELL / 2, 8)
                 elseif g.special == "wiper" then
-                    lurek.gfx.setColor(1, 1, 1, 0.4)
-                    lurek.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
-                    lurek.gfx.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
+                    lurek.render.setColor(1, 1, 1, 0.4)
+                    lurek.render.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 3)
+                    lurek.render.circle("line", x + CELL / 2, y + CELL / 2, CELL / 2 - pad - 6)
                 end
 
                 -- Shine
-                lurek.gfx.setColor(1, 1, 1, 0.15)
-                lurek.gfx.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
+                lurek.render.setColor(1, 1, 1, 0.15)
+                lurek.render.circle("fill", x + CELL / 2 - 6, y + CELL / 2 - 8, 6)
             end
         end
     end
@@ -400,14 +400,14 @@ function lurek.render()
     if selected then
         local sx = GRID_X + (selected.c - 1) * CELL
         local sy = GRID_Y + (selected.r - 1) * CELL
-        lurek.gfx.setColor(1, 1, 1, 0.5)
-        lurek.gfx.setLineWidth(3)
-        lurek.gfx.rectangle("line", sx, sy, CELL, CELL)
-        lurek.gfx.setLineWidth(1)
+        lurek.render.setColor(1, 1, 1, 0.5)
+        lurek.render.setLineWidth(3)
+        lurek.render.rectangle("line", sx, sy, CELL, CELL)
+        lurek.render.setLineWidth(1)
     end
 
     -- Controls
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), SCREEN_W - 90, 10)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("Click gems to swap | R: restart | ESC: quit", GRID_X, SCREEN_H - 28)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), SCREEN_W - 90, 10)
 end

@@ -5,14 +5,14 @@
 -- lurek.docs is not yet implemented in this build
 if not lurek.docs then
     function lurek.init()
-        lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+        lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
     end
     function lurek.render()
-        lurek.gfx.setColor(1, 0.6, 0.2)
-        lurek.gfx.print("Docs API Demo", 20, 20)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("lurek.docs is not available in this build.", 20, 60)
-        lurek.gfx.print("(API not yet implemented)", 20, 85)
+        lurek.render.setColor(1, 0.6, 0.2)
+        lurek.render.print("Docs API Demo", 20, 20)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("lurek.docs is not available in this build.", 20, 60)
+        lurek.render.print("(API not yet implemented)", 20, 85)
     end
     return
 end
@@ -27,14 +27,14 @@ function lurek.init()
 
     -- Describe a few entries for quality demo
     lurek.docs.resetCatalog()
-    lurek.docs.describe("lurek.gfx.circle", "Draw a circle on screen")
-    lurek.docs.setParamInfo("lurek.gfx.circle", {
+    lurek.docs.describe("lurek.render.circle", "Draw a circle on screen")
+    lurek.docs.setParamInfo("lurek.render.circle", {
         { name = "mode", type = "string", description = "Draw mode: 'fill' or 'line'" },
         { name = "x", type = "number", description = "Center X position" },
         { name = "y", type = "number", description = "Center Y position" },
         { name = "radius", type = "number", description = "Circle radius" },
     })
-    lurek.docs.setReturnInfo("lurek.gfx.circle", {
+    lurek.docs.setReturnInfo("lurek.render.circle", {
         { type = "nil", description = "No return value" },
     })
     internalCat = lurek.docs.getCatalog()
@@ -48,55 +48,55 @@ function lurek.init()
 end
 
 function lurek.render()
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("=== lurek.docs Demo ===", 20, 20)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("=== lurek.docs Demo ===", 20, 20)
 
     local y = 60
 
     -- Module list
-    lurek.gfx.print("Discovered modules:", 20, y)
+    lurek.render.print("Discovered modules:", 20, y)
     y = y + 25
     local moduleList = table.concat(modules, ", ")
-    lurek.gfx.print("  " .. moduleList, 20, y)
+    lurek.render.print("  " .. moduleList, 20, y)
     y = y + 40
 
     -- Entry count
-    lurek.gfx.print("Total API entries found: " .. catalog:entryCount(), 20, y)
+    lurek.render.print("Total API entries found: " .. catalog:entryCount(), 20, y)
     y = y + 25
 
     -- Coverage
-    lurek.gfx.print(string.format("Coverage: %d / %d (%.1f%%)", documented, total, (documented / math.max(total, 1)) * 100), 20, y)
+    lurek.render.print(string.format("Coverage: %d / %d (%.1f%%)", documented, total, (documented / math.max(total, 1)) * 100), 20, y)
     y = y + 40
 
     -- Quality report
-    lurek.gfx.setColor(0.5, 1, 0.5)
-    lurek.gfx.print("Quality Report (internal catalog):", 20, y)
+    lurek.render.setColor(0.5, 1, 0.5)
+    lurek.render.print("Quality Report (internal catalog):", 20, y)
     y = y + 25
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(string.format("  Overall: %s (%.0f%%)", qualityReport:getGrade(), qualityReport:getOverallScore() * 100), 20, y)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(string.format("  Overall: %s (%.0f%%)", qualityReport:getGrade(), qualityReport:getOverallScore() * 100), 20, y)
     y = y + 40
 
     -- Validation summary
-    lurek.gfx.setColor(1, 0.5, 0.5)
-    lurek.gfx.print("Validation Report:", 20, y)
+    lurek.render.setColor(1, 0.5, 0.5)
+    lurek.render.print("Validation Report:", 20, y)
     y = y + 25
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("  " .. validationReport:getSummary(), 20, y)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("  " .. validationReport:getSummary(), 20, y)
     y = y + 40
 
     -- Search results
-    lurek.gfx.setColor(0.5, 0.8, 1)
-    lurek.gfx.print("Search for 'circle':", 20, y)
+    lurek.render.setColor(0.5, 0.8, 1)
+    lurek.render.print("Search for 'circle':", 20, y)
     y = y + 25
-    lurek.gfx.setColor(1, 1, 1)
+    lurek.render.setColor(1, 1, 1)
     for i = 1, math.min(#searchResults, 5) do
-        lurek.gfx.print("  " .. searchResults[i]:getQualifiedName(), 20, y)
+        lurek.render.print("  " .. searchResults[i]:getQualifiedName(), 20, y)
         y = y + 20
     end
     y = y + 20
 
-    lurek.gfx.setColor(0.7, 0.7, 0.7)
-    lurek.gfx.print("Press ESC to exit", 20, y)
+    lurek.render.setColor(0.7, 0.7, 0.7)
+    lurek.render.print("Press ESC to exit", 20, y)
 end
 
 function lurek.keypressed(key)

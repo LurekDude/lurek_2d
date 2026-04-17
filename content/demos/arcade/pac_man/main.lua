@@ -123,7 +123,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0)
+    lurek.render.setBackgroundColor(0, 0, 0)
     build_map()
     pac = { x = 10*CELL, y = 15*CELL, dx = 0, dy = 0, next_dx = 1, next_dy = 0, speed = 130 }
     ghosts = {}
@@ -205,12 +205,12 @@ end
 
 function lurek.render()
     -- Header bar
-    lurek.gfx.setColor(0, 0, 0.3)
-    lurek.gfx.rectangle("fill", 0, 0, W, 30)
-    lurek.gfx.setColor(1, 1, 0)
-    lurek.gfx.print("Score: " .. score, 4, 6, 1.5)
-    lurek.gfx.setColor(1, 0.3, 0.3)
-    lurek.gfx.print("Lives: " .. lives, W - 90, 6, 1.5)
+    lurek.render.setColor(0, 0, 0.3)
+    lurek.render.rectangle("fill", 0, 0, W, 30)
+    lurek.render.setColor(1, 1, 0)
+    lurek.render.print("Score: " .. score, 4, 6, 1.5)
+    lurek.render.setColor(1, 0.3, 0.3)
+    lurek.render.print("Lives: " .. lives, W - 90, 6, 1.5)
 
     -- Map
     for y = 1, ROWS do
@@ -219,57 +219,57 @@ function lurek.render()
             local px = (x-1)*CELL
             local py = (y-1)*CELL + 30
             if c == 1 then
-                lurek.gfx.setColor(0.1, 0.2, 0.8)
-                lurek.gfx.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
+                lurek.render.setColor(0.1, 0.2, 0.8)
+                lurek.render.rectangle("fill", px+1, py+1, CELL-2, CELL-2)
             elseif c == 0 then
-                lurek.gfx.setColor(1, 0.9, 0.6)
-                lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, 2)
+                lurek.render.setColor(1, 0.9, 0.6)
+                lurek.render.circle("fill", px + CELL/2, py + CELL/2, 2)
             elseif c == 2 then
-                lurek.gfx.setColor(1, 1, 0)
-                lurek.gfx.circle("fill", px + CELL/2, py + CELL/2, 5)
+                lurek.render.setColor(1, 1, 0)
+                lurek.render.circle("fill", px + CELL/2, py + CELL/2, 5)
             end
         end
     end
 
     -- Pac-Man
     local pac_color = (game_state == "dead") and {1,0,0} or {1,1,0}
-    lurek.gfx.setColor(pac_color[1], pac_color[2], pac_color[3])
-    lurek.gfx.circle("fill", pac.x + CELL/2, pac.y + CELL/2 + 30, CELL/2 - 1)
+    lurek.render.setColor(pac_color[1], pac_color[2], pac_color[3])
+    lurek.render.circle("fill", pac.x + CELL/2, pac.y + CELL/2 + 30, CELL/2 - 1)
 
     -- Ghosts
     for i, g in ipairs(ghosts) do
         if power_timer > 0 then
-            lurek.gfx.setColor(0.1, 0.1, 0.8)
+            lurek.render.setColor(0.1, 0.1, 0.8)
         else
             local c = GHOST_COLORS[i]
-            lurek.gfx.setColor(c[1], c[2], c[3])
+            lurek.render.setColor(c[1], c[2], c[3])
         end
         local gx = g.x + CELL/2
         local gy = g.y + CELL/2 + 30
-        lurek.gfx.circle("fill", gx, gy - 2, CELL/2 - 1)
-        lurek.gfx.rectangle("fill", g.x + 1, gy - 2, CELL - 2, CELL/2)
+        lurek.render.circle("fill", gx, gy - 2, CELL/2 - 1)
+        lurek.render.rectangle("fill", g.x + 1, gy - 2, CELL - 2, CELL/2)
     end
 
     -- Overlays
     if game_state == "win" then
-        lurek.gfx.setColor(0, 0, 0, 0.65)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 0)
-        lurek.gfx.print("LEVEL CLEAR!", W/2 - 90, H/2 - 20, 3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        lurek.render.setColor(0, 0, 0, 0.65)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 0)
+        lurek.render.print("LEVEL CLEAR!", W/2 - 90, H/2 - 20, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     elseif game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.65)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
+        lurek.render.setColor(0, 0, 0, 0.65)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 20, 3)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 20, 2)
     end
 
     if power_timer > 0 then
-        lurek.gfx.setColor(0.5, 0.5, 1)
-        lurek.gfx.print("POWER! " .. string.format("%.1f", power_timer), W/2 - 50, H - 20, 1.5)
+        lurek.render.setColor(0.5, 0.5, 1)
+        lurek.render.print("POWER! " .. string.format("%.1f", power_timer), W/2 - 50, H - 20, 1.5)
     end
 end
 

@@ -1,5 +1,5 @@
 -- examples/overlay_demo/main.lua
--- Demonstrates lurek.overlay for composable screen effects.
+-- Demonstrates lurek.postfx for composable screen effects.
 -- Press F to flash, S to shake, L for lightning, D to fade, C to clear.
 -- Press 1-8 to cycle weather types, V to toggle vignette, G to toggle fog.
 -- Run with: cargo run -- content/demos/showcase/overlay_demo
@@ -10,7 +10,7 @@ local weather_types = {"none", "rain", "snow", "hail", "dust", "leaves", "ash", 
 local current_weather = 2  -- start with rain
 
 function lurek.init()
-    overlay = lurek.overlay.newOverlay(800, 600)
+    overlay = lurek.postfx.newOverlay(800, 600)
 
     -- Enable a moody rainy-night scene
     overlay:setWeatherEnabled(true)
@@ -52,53 +52,53 @@ end
 function lurek.render()
     -- Background gradient (simulated with two rectangles)
     local r, g, b = overlay:getAmbientColor()
-    lurek.gfx.setColor(r * 0.3, g * 0.3, b * 0.3, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 300)
-    lurek.gfx.setColor(r * 0.15, g * 0.15, b * 0.15, 1)
-    lurek.gfx.rectangle("fill", 0, 300, 800, 300)
+    lurek.render.setColor(r * 0.3, g * 0.3, b * 0.3, 1)
+    lurek.render.rectangle("fill", 0, 0, 800, 300)
+    lurek.render.setColor(r * 0.15, g * 0.15, b * 0.15, 1)
+    lurek.render.rectangle("fill", 0, 300, 800, 300)
 
     -- Ground
-    lurek.gfx.setColor(0.15, 0.2, 0.1, 1)
-    lurek.gfx.rectangle("fill", 0, 450, 800, 150)
+    lurek.render.setColor(0.15, 0.2, 0.1, 1)
+    lurek.render.rectangle("fill", 0, 450, 800, 150)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Overlay Demo — Screen Effects", 20, 20)
-    lurek.gfx.print(string.format("Time: %.1fh  Weather: %s  Active: %s",
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Overlay Demo — Screen Effects", 20, 20)
+    lurek.render.print(string.format("Time: %.1fh  Weather: %s  Active: %s",
         overlay:getTimeOfDay(),
         overlay:getWeather(),
         tostring(overlay:isActive())), 20, 45)
-    lurek.gfx.print("F=Flash  S=Shake  L=Lightning  D=Fade  C=Clear", 20, 70)
-    lurek.gfx.print("1-8=Weather  V=Vignette  G=Fog  H=HeatHaze  N=FilmGrain", 20, 95)
-    lurek.gfx.print(string.format("+/- = Time speed (%.1fx)", time_speed), 20, 120)
+    lurek.render.print("F=Flash  S=Shake  L=Lightning  D=Fade  C=Clear", 20, 70)
+    lurek.render.print("1-8=Weather  V=Vignette  G=Fog  H=HeatHaze  N=FilmGrain", 20, 95)
+    lurek.render.print(string.format("+/- = Time speed (%.1fx)", time_speed), 20, 120)
 
     -- Show active effect indicators
     local y = 150
     if overlay:isFlashing() then
-        lurek.gfx.setColor(1, 1, 0, 1)
-        lurek.gfx.print("[FLASH]", 20, y)
+        lurek.render.setColor(1, 1, 0, 1)
+        lurek.render.print("[FLASH]", 20, y)
         y = y + 20
     end
     if overlay:isShaking() then
         local ox, oy = overlay:getShakeOffset()
-        lurek.gfx.setColor(1, 0.5, 0, 1)
-        lurek.gfx.print(string.format("[SHAKE] offset: %.1f, %.1f", ox, oy), 20, y)
+        lurek.render.setColor(1, 0.5, 0, 1)
+        lurek.render.print(string.format("[SHAKE] offset: %.1f, %.1f", ox, oy), 20, y)
         y = y + 20
     end
     if overlay:isFading() then
-        lurek.gfx.setColor(0.5, 0.5, 1, 1)
-        lurek.gfx.print("[FADING]", 20, y)
+        lurek.render.setColor(0.5, 0.5, 1, 1)
+        lurek.render.print("[FADING]", 20, y)
         y = y + 20
     end
     if overlay:isFogEnabled() then
         local density = overlay:getFogDensity()
-        lurek.gfx.setColor(0.7, 0.7, 0.8, 1)
-        lurek.gfx.print(string.format("[FOG] density: %.2f", density), 20, y)
+        lurek.render.setColor(0.7, 0.7, 0.8, 1)
+        lurek.render.print(string.format("[FOG] density: %.2f", density), 20, y)
         y = y + 20
     end
     if overlay:isVignetteEnabled() then
-        lurek.gfx.setColor(0.6, 0.4, 0.6, 1)
-        lurek.gfx.print(string.format("[VIGNETTE] strength: %.2f", overlay:getVignetteStrength()), 20, y)
+        lurek.render.setColor(0.6, 0.4, 0.6, 1)
+        lurek.render.print(string.format("[VIGNETTE] strength: %.2f", overlay:getVignetteStrength()), 20, y)
         y = y + 20
     end
 

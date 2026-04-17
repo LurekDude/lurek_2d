@@ -67,7 +67,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.04, 0.06, 0.04)
+    lurek.render.setBackgroundColor(0.04, 0.06, 0.04)
     reset()
 end
 
@@ -132,36 +132,36 @@ end
 
 function lurek.render()
     -- Header
-    lurek.gfx.setColor(0.08, 0.12, 0.08)
-    lurek.gfx.rectangle("fill", 0, 0, W, 40)
-    lurek.gfx.setColor(0.4, 0.9, 0.4)
-    lurek.gfx.print("SNAKE", 8, 8, 2)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: " .. score, W/2 - 50, 10, 1.8)
-    lurek.gfx.setColor(0.6, 0.8, 0.6)
-    lurek.gfx.print("Best: " .. high_score, W - 100, 10, 1.5)
+    lurek.render.setColor(0.08, 0.12, 0.08)
+    lurek.render.rectangle("fill", 0, 0, W, 40)
+    lurek.render.setColor(0.4, 0.9, 0.4)
+    lurek.render.print("SNAKE", 8, 8, 2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Score: " .. score, W/2 - 50, 10, 1.8)
+    lurek.render.setColor(0.6, 0.8, 0.6)
+    lurek.render.print("Best: " .. high_score, W - 100, 10, 1.5)
 
     -- Grid background
-    lurek.gfx.setColor(0.06, 0.08, 0.06)
-    lurek.gfx.rectangle("fill", 0, 40, W, ROWS * CELL)
+    lurek.render.setColor(0.06, 0.08, 0.06)
+    lurek.render.rectangle("fill", 0, 40, W, ROWS * CELL)
 
     -- Subtle grid lines
-    lurek.gfx.setColor(0.09, 0.12, 0.09)
+    lurek.render.setColor(0.09, 0.12, 0.09)
     for gx = 0, COLS do
-        lurek.gfx.line(gx * CELL, 40, gx * CELL, 40 + ROWS * CELL)
+        lurek.render.line(gx * CELL, 40, gx * CELL, 40 + ROWS * CELL)
     end
     for gy = 0, ROWS do
-        lurek.gfx.line(0, 40 + gy * CELL, W, 40 + gy * CELL)
+        lurek.render.line(0, 40 + gy * CELL, W, 40 + gy * CELL)
     end
 
     -- Food
     for _, f in ipairs(food) do
         local fx = f[1] * CELL + 3
         local fy = f[2] * CELL + 40 + 3
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.circle("fill", f[1] * CELL + CELL/2, f[2] * CELL + 40 + CELL/2, CELL/2 - 3)
-        lurek.gfx.setColor(0.2, 0.8, 0.2)
-        lurek.gfx.rectangle("fill", f[1] * CELL + CELL/2 - 1, f[2] * CELL + 40 + 2, 3, 5)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.circle("fill", f[1] * CELL + CELL/2, f[2] * CELL + 40 + CELL/2, CELL/2 - 3)
+        lurek.render.setColor(0.2, 0.8, 0.2)
+        lurek.render.rectangle("fill", f[1] * CELL + CELL/2 - 1, f[2] * CELL + 40 + 2, 3, 5)
     end
 
     -- Snake body
@@ -172,29 +172,29 @@ function lurek.render()
         local gb = 0.3 + t * 0.2
         if i == #snake then
             -- Head: brighter
-            lurek.gfx.setColor(0.4, 1.0, 0.4)
-            lurek.gfx.rectangle("fill", seg[1]*CELL + 1, seg[2]*CELL + 40 + 1, CELL - 2, CELL - 2)
+            lurek.render.setColor(0.4, 1.0, 0.4)
+            lurek.render.rectangle("fill", seg[1]*CELL + 1, seg[2]*CELL + 40 + 1, CELL - 2, CELL - 2)
             -- Eyes
-            lurek.gfx.setColor(0, 0, 0)
+            lurek.render.setColor(0, 0, 0)
             local ex = seg[1]*CELL + (dir[1] == 1 and CELL - 5 or (dir[1] == -1 and 3 or CELL/2 - 3))
             local ey = seg[2]*CELL + 40 + (dir[2] == 1 and CELL - 5 or (dir[2] == -1 and 3 or CELL/2 - 3))
-            lurek.gfx.circle("fill", ex, ey, 2)
+            lurek.render.circle("fill", ex, ey, 2)
         else
-            lurek.gfx.setColor(gr, gg, gb)
-            lurek.gfx.rectangle("fill", seg[1]*CELL + 2, seg[2]*CELL + 40 + 2, CELL - 4, CELL - 4)
+            lurek.render.setColor(gr, gg, gb)
+            lurek.render.rectangle("fill", seg[1]*CELL + 2, seg[2]*CELL + 40 + 2, CELL - 4, CELL - 4)
         end
     end
 
     -- Game over overlay
     if game_state == "dead" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.3, 0.3)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 45, H/2 + 10, 2)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 40, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.3, 0.3)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 45, H/2 + 10, 2)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 40, 2)
     end
 end
 

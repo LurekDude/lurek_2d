@@ -6,6 +6,7 @@
 -- Run with: cargo run -- content/demos/showcase/pipeline_showcase
 
 local W, H = 800, 600
+local _prev_mx, _prev_my = 0, 0  -- for mouse-move polling in process()
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- ── MENU SCENE ─────────────────────────────────────────────────════════════
@@ -15,7 +16,7 @@ local W, H = 800, 600
 local MenuScene = lurek.scene.define({})
 
 function MenuScene:enter()
-    lurek.gfx.setBackgroundColor(0.07, 0.08, 0.14)
+    lurek.render.setBackgroundColor(0.07, 0.08, 0.14)
 
     self.btn_start = lurek.ui.newButton("▶ Start Simulation")
     self.btn_start:setPosition(W / 2 - 110, H / 2 - 30)
@@ -46,11 +47,11 @@ function MenuScene:render()
     local cx    = W / 2
     local pulse = math.sin((self.title_t or 0) * 1.4) * 0.1 + 0.9
 
-    lurek.gfx.setColor(0.4 * pulse, 0.7 * pulse, 1.0)
-    lurek.gfx.print("PIPELINE SHOWCASE", cx - 148, H * 0.22, 3)
+    lurek.render.setColor(0.4 * pulse, 0.7 * pulse, 1.0)
+    lurek.render.print("PIPELINE SHOWCASE", cx - 148, H * 0.22, 3)
 
-    lurek.gfx.setColor(0.55, 0.55, 0.75)
-    lurek.gfx.print("lurek.scene.define · lurek.entity · lurek.ui", cx - 148, H * 0.22 + 48, 1.3)
+    lurek.render.setColor(0.55, 0.55, 0.75)
+    lurek.render.print("lurek.scene.define · lurek.entity · lurek.ui", cx - 148, H * 0.22 + 48, 1.3)
 end
 
 function MenuScene:render_ui()
@@ -71,7 +72,7 @@ local SimScene = lurek.scene.define({})
 local MAX_PARTICLES = 120
 
 function SimScene:enter()
-    lurek.gfx.setBackgroundColor(0.04, 0.06, 0.10)
+    lurek.render.setBackgroundColor(0.04, 0.06, 0.10)
 end
 
 function SimScene:ready()
@@ -162,9 +163,9 @@ function SimScene:render()
         local radius = self.world:get(id, "radius") or 4
         local color  = self.world:get(id, "color")
         if pos and color then
-            lurek.gfx.setColor(color.r, color.g, color.b, 0.85)
+            lurek.render.setColor(color.r, color.g, color.b, 0.85)
             local d = radius * 2
-            lurek.gfx.rect("fill", pos.x - radius, pos.y - radius, d, d)
+            lurek.render.rect("fill", pos.x - radius, pos.y - radius, d, d)
         end
     end
 end
@@ -172,15 +173,15 @@ end
 -- ── render_ui: HUD overlay ──────────────────────────────────────────────────
 
 function SimScene:render_ui()
-    lurek.gfx.setColor(0.2, 0.4, 0.8, 0.9)
-    lurek.gfx.rect("fill", 0, 0, W, 44)
-    lurek.gfx.setColor(0.85, 0.9, 1.0)
-    lurek.gfx.print("Simulation Scene — ECS particles via process_physics", 10, 12, 1.1)
+    lurek.render.setColor(0.2, 0.4, 0.8, 0.9)
+    lurek.render.rect("fill", 0, 0, W, 44)
+    lurek.render.setColor(0.85, 0.9, 1.0)
+    lurek.render.print("Simulation Scene — ECS particles via process_physics", 10, 12, 1.1)
 
-    lurek.gfx.setColor(0.3, 0.6, 0.3, 0.85)
-    lurek.gfx.rect("fill", 0, H - 44, W, 44)
-    lurek.gfx.setColor(0.8, 1.0, 0.8)
-    lurek.gfx.print(
+    lurek.render.setColor(0.3, 0.6, 0.3, 0.85)
+    lurek.render.rect("fill", 0, H - 44, W, 44)
+    lurek.render.setColor(0.8, 1.0, 0.8)
+    lurek.render.print(
         "process  →  process_physics (×N)  →  process_late  →  render  →  render_ui",
         10, H - 34, 0.95
     )
@@ -218,7 +219,17 @@ end
 
 -- Dispatch pipeline callbacks to the active scene
 function lurek.process_physics(dt) lurek.scene.processPhysics(dt) end
-function lurek.process(dt)         lurek.scene.process(dt)        end
+function lurek.process(dt)
+    -- Poll mouse position and dispatch mousemoved to the active scene
+    -- (lurek.mousemoved is not an engine callback)
+    local mx, my = lurek.mouse.getPosition()
+    if mx ~= _prev_mx or my ~= _prev_my then
+        local scene = lurek.scene.getCurrent()
+        if scene and scene.mousemoved then scene:mousemoved(mx, my) end
+        _prev_mx, _prev_my = mx, my
+    end
+    lurek.scene.process(dt)
+end
 function lurek.process_late(dt)    lurek.scene.processLate(dt)    end
 function lurek.render()            lurek.scene.render()           end
 function lurek.render_ui()         lurek.scene.renderUi()         end
@@ -241,7 +252,4 @@ function lurek.mousereleased(x, y, btn)
     if scene and scene.mousereleased then scene:mousereleased(x, y, btn) end
 end
 
-function lurek.mousemoved(x, y, dx, dy)
-    local scene = lurek.scene.getCurrent()
-    if scene and scene.mousemoved then scene:mousemoved(x, y) end
-end
+

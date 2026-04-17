@@ -62,7 +62,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.18, 0.55, 0.18)
+    lurek.render.setBackgroundColor(0.18, 0.55, 0.18)
     reset()
 end
 
@@ -164,146 +164,146 @@ end
 
 function lurek.render()
     -- Fairway
-    lurek.gfx.setColor(0.18, 0.55, 0.18)
-    lurek.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.render.setColor(0.18, 0.55, 0.18)
+    lurek.render.rectangle("fill", 0, 0, W, H)
 
     local h = COURSE[hole_idx]
 
     -- Rough border
-    lurek.gfx.setColor(0.1, 0.4, 0.1)
-    lurek.gfx.rectangle("fill", 0, 0, W, 50)
-    lurek.gfx.rectangle("fill", 0, H-50, W, 50)
-    lurek.gfx.rectangle("fill", 0, 0, 50, H)
-    lurek.gfx.rectangle("fill", W-50, 0, 50, H)
+    lurek.render.setColor(0.1, 0.4, 0.1)
+    lurek.render.rectangle("fill", 0, 0, W, 50)
+    lurek.render.rectangle("fill", 0, H-50, W, 50)
+    lurek.render.rectangle("fill", 0, 0, 50, H)
+    lurek.render.rectangle("fill", W-50, 0, 50, H)
 
     -- Obstacles
     for _, obs in ipairs(h.obs) do
         if obs.type == "water" then
-            lurek.gfx.setColor(0.1, 0.3, 0.8, 0.8)
+            lurek.render.setColor(0.1, 0.3, 0.8, 0.8)
         elseif obs.type == "bunker" then
-            lurek.gfx.setColor(0.88, 0.8, 0.55, 0.9)
+            lurek.render.setColor(0.88, 0.8, 0.55, 0.9)
         else  -- tree
-            lurek.gfx.setColor(0.05, 0.25, 0.05)
+            lurek.render.setColor(0.05, 0.25, 0.05)
         end
         if obs.type == "tree" then
-            lurek.gfx.rectangle("fill", obs.x - 2, obs.y, 4, obs.h)
-            lurek.gfx.circle("fill", obs.x, obs.y, obs.w/2)
+            lurek.render.rectangle("fill", obs.x - 2, obs.y, 4, obs.h)
+            lurek.render.circle("fill", obs.x, obs.y, obs.w/2)
         else
-            lurek.gfx.rectangle("fill", obs.x, obs.y, obs.w, obs.h)
+            lurek.render.rectangle("fill", obs.x, obs.y, obs.w, obs.h)
         end
     end
 
     -- Tee
-    lurek.gfx.setColor(0.65, 0.55, 0.3)
-    lurek.gfx.circle("fill", h.tee[1], h.tee[2], 12)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("T", h.tee[1] - 5, h.tee[2] - 8, 1.5)
+    lurek.render.setColor(0.65, 0.55, 0.3)
+    lurek.render.circle("fill", h.tee[1], h.tee[2], 12)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("T", h.tee[1] - 5, h.tee[2] - 8, 1.5)
 
     -- Cup / hole
-    lurek.gfx.setColor(0.05, 0.05, 0.05)
-    lurek.gfx.circle("fill", h.cup[1], h.cup[2], 10)
-    lurek.gfx.setColor(1, 0.2, 0)
-    lurek.gfx.rectangle("fill", h.cup[1], h.cup[2] - 28, 3, 28)  -- flag pole
-    lurek.gfx.rectangle("fill", h.cup[1] + 3, h.cup[2] - 28, 14, 10)  -- flag
+    lurek.render.setColor(0.05, 0.05, 0.05)
+    lurek.render.circle("fill", h.cup[1], h.cup[2], 10)
+    lurek.render.setColor(1, 0.2, 0)
+    lurek.render.rectangle("fill", h.cup[1], h.cup[2] - 28, 3, 28)  -- flag pole
+    lurek.render.rectangle("fill", h.cup[1] + 3, h.cup[2] - 28, 14, 10)  -- flag
 
     -- Ball trail
     for i, pt in ipairs(ball_trail) do
         local a = i / #ball_trail * 0.6
-        lurek.gfx.setColor(1, 1, 1, a * 0.5)
-        lurek.gfx.circle("fill", pt.x, pt.y, 2)
+        lurek.render.setColor(1, 1, 1, a * 0.5)
+        lurek.render.circle("fill", pt.x, pt.y, 2)
     end
 
     -- Ball
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.circle("fill", ball.x, ball.y, 7)
-    lurek.gfx.setColor(0.4, 0.4, 0.4)
-    lurek.gfx.circle("line", ball.x, ball.y, 7)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.circle("fill", ball.x, ball.y, 7)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.circle("line", ball.x, ball.y, 7)
 
     -- Aim arrow
     if game_state == "aim" then
         local wind = h.wind
         local wx = wind[1]; local wy = wind[2]
         local len = 50
-        lurek.gfx.setColor(1, 0.9, 0, 0.8)
-        lurek.gfx.line(ball.x, ball.y, ball.x + math.cos(aim_angle)*len, ball.y + math.sin(aim_angle)*len)
+        lurek.render.setColor(1, 0.9, 0, 0.8)
+        lurek.render.line(ball.x, ball.y, ball.x + math.cos(aim_angle)*len, ball.y + math.sin(aim_angle)*len)
         -- Wind arrow (top right)
         local wlen = math.sqrt(wx^2 + wy^2) * 60
         if wlen > 2 then
             local wangle = math.atan(wy, wx)
-            lurek.gfx.setColor(0.5, 0.8, 1, 0.8)
-            lurek.gfx.line(W - 70, 70, W - 70 + math.cos(wangle)*wlen, 70 + math.sin(wangle)*wlen)
-            lurek.gfx.circle("fill", W - 70 + math.cos(wangle)*wlen, 70 + math.sin(wangle)*wlen, 5)
+            lurek.render.setColor(0.5, 0.8, 1, 0.8)
+            lurek.render.line(W - 70, 70, W - 70 + math.cos(wangle)*wlen, 70 + math.sin(wangle)*wlen)
+            lurek.render.circle("fill", W - 70 + math.cos(wangle)*wlen, 70 + math.sin(wangle)*wlen, 5)
         end
     end
 
     -- Power bar
     if game_state == "swing" then
-        lurek.gfx.setColor(0.2, 0.2, 0.2)
-        lurek.gfx.rectangle("fill", W/2 - 80, H - 30, 160, 18)
+        lurek.render.setColor(0.2, 0.2, 0.2)
+        lurek.render.rectangle("fill", W/2 - 80, H - 30, 160, 18)
         local pct = power / MAX_POWER
         local r = pct > 0.7 and 1 or (pct > 0.4 and 0.9 or 0.2)
         local g = pct < 0.4 and 0.9 or (pct < 0.7 and 0.7 or 0.1)
-        lurek.gfx.setColor(r, g, 0.1)
-        lurek.gfx.rectangle("fill", W/2 - 80, H - 30, 160 * pct, 18)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("POWER — Release SPACE", W/2 - 80, H - 48, 1.4)
+        lurek.render.setColor(r, g, 0.1)
+        lurek.render.rectangle("fill", W/2 - 80, H - 30, 160 * pct, 18)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("POWER — Release SPACE", W/2 - 80, H - 48, 1.4)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.65)
-    lurek.gfx.rectangle("fill", 0, 0, W, 46)
-    lurek.gfx.setColor(1, 0.9, 0.3)
-    lurek.gfx.print("HOLE " .. hole_idx .. "/" .. HOLES .. "  PAR " .. h.par, 14, 8, 2.2)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Shots: " .. shot_count, 260, 8, 2)
+    lurek.render.setColor(0, 0, 0, 0.65)
+    lurek.render.rectangle("fill", 0, 0, W, 46)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.print("HOLE " .. hole_idx .. "/" .. HOLES .. "  PAR " .. h.par, 14, 8, 2.2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Shots: " .. shot_count, 260, 8, 2)
     local scorestr = total_score == 0 and "E" or (total_score > 0 and "+" .. total_score or tostring(total_score))
     local sc = total_score < 0 and {0.3, 1, 0.3} or (total_score == 0 and {1,1,0.3} or {1,0.4,0.4})
-    lurek.gfx.setColor(sc[1], sc[2], sc[3])
-    lurek.gfx.print("Score: " .. scorestr, 440, 8, 2)
-    lurek.gfx.setColor(0.6, 0.8, 1, 0.7)
-    lurek.gfx.print("Wind →", W - 90, 8, 1.4)
+    lurek.render.setColor(sc[1], sc[2], sc[3])
+    lurek.render.print("Score: " .. scorestr, 440, 8, 2)
+    lurek.render.setColor(0.6, 0.8, 1, 0.7)
+    lurek.render.print("Wind →", W - 90, 8, 1.4)
 
-    lurek.gfx.setColor(0.7, 0.9, 0.7, 0.7)
+    lurek.render.setColor(0.7, 0.9, 0.7, 0.7)
     local hint = game_state == "aim" and "[A/D] Aim  [Space] Start swing" or
                  game_state == "swing" and "Power cycling — release [Space] to hit!" or
                  game_state == "rolling" and "Ball rolling..." or ""
-    lurek.gfx.print(hint, 14, H - 18, 1.4)
+    lurek.render.print(hint, 14, H - 18, 1.4)
 
     -- Message
     if msg_timer > 0 then
         local alpha = math.min(1, msg_timer)
-        lurek.gfx.setColor(0, 0, 0, alpha * 0.7)
-        lurek.gfx.rectangle("fill", W/2 - 200, H/2 - 25, 400, 50)
-        lurek.gfx.setColor(1, 1, 0.3, alpha)
-        lurek.gfx.print(msg, W/2 - #msg * 7, H/2 - 20, 2)
+        lurek.render.setColor(0, 0, 0, alpha * 0.7)
+        lurek.render.rectangle("fill", W/2 - 200, H/2 - 25, 400, 50)
+        lurek.render.setColor(1, 1, 0.3, alpha)
+        lurek.render.print(msg, W/2 - #msg * 7, H/2 - 20, 2)
     end
 
     -- Hole transition
     if game_state == "holed" then
-        lurek.gfx.setColor(0.5, 0.9, 0.5, 0.7)
-        lurek.gfx.print("Press SPACE for next hole", W/2 - 130, H - 20, 2)
+        lurek.render.setColor(0.5, 0.9, 0.5, 0.7)
+        lurek.render.print("Press SPACE for next hole", W/2 - 130, H - 20, 2)
     end
 
     -- Game over
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.82)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.9, 0.2)
-        lurek.gfx.print("ROUND COMPLETE!", W/2 - 105, 60, 2.8)
+        lurek.render.setColor(0, 0, 0, 0.82)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.9, 0.2)
+        lurek.render.print("ROUND COMPLETE!", W/2 - 105, 60, 2.8)
         for i = 1, HOLES do
             local par_i = COURSE[i].par
             local s_i = scores[i] or 0
             local d = s_i - par_i
             local cl = d < 0 and {0.3,1,0.3} or (d == 0 and {1,1,0.3} or {1,0.4,0.4})
-            lurek.gfx.setColor(cl[1], cl[2], cl[3])
+            lurek.render.setColor(cl[1], cl[2], cl[3])
             local xs = 70 + ((i-1) % 5) * 135
             local ys = 130 + math.floor((i-1)/5) * 55
-            lurek.gfx.print("H" .. i .. ": " .. (s_i > 0 and s_i or "—"), xs, ys, 1.8)
+            lurek.render.print("H" .. i .. ": " .. (s_i > 0 and s_i or "—"), xs, ys, 1.8)
         end
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("TOTAL: " .. (total_score > 0 and "+" or "") .. total_score, W/2 - 60, 360, 3)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to play again", W/2 - 110, 420, 2)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("TOTAL: " .. (total_score > 0 and "+" or "") .. total_score, W/2 - 60, 360, 3)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to play again", W/2 - 110, 420, 2)
     end
 end
 

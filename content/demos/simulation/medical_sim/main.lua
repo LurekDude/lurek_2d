@@ -126,73 +126,73 @@ function lurek.keypressed(key)
 end
 
 local function draw_vitals(p)
-    lurek.gfx.setColor(1,1,1,1)
-    lurek.gfx.print("Heart Rate: " .. math.floor(p.heart_rate), 20, 420, 1)
+    lurek.render.setColor(1,1,1,1)
+    lurek.render.print("Heart Rate: " .. math.floor(p.heart_rate), 20, 420, 1)
     local hr_pct = clamp((p.heart_rate - 30) / 70, 0, 1)
-    lurek.gfx.setColor(0.3,0.3,0.3,1)
-    lurek.gfx.rectangle("fill", 20, 440, 160, 14)
-    lurek.gfx.setColor(1 - hr_pct, hr_pct, 0.2, 1)
-    lurek.gfx.rectangle("fill", 20, 440, 160 * hr_pct, 14)
+    lurek.render.setColor(0.3,0.3,0.3,1)
+    lurek.render.rectangle("fill", 20, 440, 160, 14)
+    lurek.render.setColor(1 - hr_pct, hr_pct, 0.2, 1)
+    lurek.render.rectangle("fill", 20, 440, 160 * hr_pct, 14)
 
-    lurek.gfx.setColor(1,1,1,1)
-    lurek.gfx.print("Blood Pressure: " .. math.floor(p.blood_pressure), 20, 465, 1)
+    lurek.render.setColor(1,1,1,1)
+    lurek.render.print("Blood Pressure: " .. math.floor(p.blood_pressure), 20, 465, 1)
     local bp_pct = clamp((p.blood_pressure - 60) / 80, 0, 1)
-    lurek.gfx.setColor(0.3,0.3,0.3,1)
-    lurek.gfx.rectangle("fill", 20, 485, 160, 14)
-    lurek.gfx.setColor(1 - bp_pct, bp_pct, 0.2, 1)
-    lurek.gfx.rectangle("fill", 20, 485, 160 * bp_pct, 14)
+    lurek.render.setColor(0.3,0.3,0.3,1)
+    lurek.render.rectangle("fill", 20, 485, 160, 14)
+    lurek.render.setColor(1 - bp_pct, bp_pct, 0.2, 1)
+    lurek.render.rectangle("fill", 20, 485, 160 * bp_pct, 14)
 end
 
 local function draw_patient(p)
     -- table
-    lurek.gfx.setColor(0.4,0.35,0.3,1)
-    lurek.gfx.rectangle("fill", 200, 360, 400, 40)
+    lurek.render.setColor(0.4,0.35,0.3,1)
+    lurek.render.rectangle("fill", 200, 360, 400, 40)
     -- body outline
-    lurek.gfx.setColor(0.9,0.75,0.65,1)
+    lurek.render.setColor(0.9,0.75,0.65,1)
     if p.layers.skin then
-        lurek.gfx.rectangle("fill", 250, 200, 300, 160)
+        lurek.render.rectangle("fill", 250, 200, 300, 160)
     end
     if not p.layers.skin and p.layers.muscle then
-        lurek.gfx.setColor(0.7,0.25,0.2,1)
-        lurek.gfx.rectangle("fill", 250, 200, 300, 160)
+        lurek.render.setColor(0.7,0.25,0.2,1)
+        lurek.render.rectangle("fill", 250, 200, 300, 160)
     end
     if not p.layers.skin and not p.layers.muscle then
-        lurek.gfx.setColor(0.8,0.4,0.4,1)
-        lurek.gfx.rectangle("fill", 250, 200, 300, 160)
+        lurek.render.setColor(0.8,0.4,0.4,1)
+        lurek.render.rectangle("fill", 250, 200, 300, 160)
         -- problem zone
         if not p.repaired then
-            lurek.gfx.setColor(1,0.1,0.1, 0.5 + 0.3 * math.sin(lurek.time.getTime() * 5))
-            lurek.gfx.circle("fill", p.problem_x, p.problem_y, 20)
+            lurek.render.setColor(1,0.1,0.1, 0.5 + 0.3 * math.sin(lurek.time.getTime() * 5))
+            lurek.render.circle("fill", p.problem_x, p.problem_y, 20)
         else
-            lurek.gfx.setColor(0.2,1,0.2,0.6)
-            lurek.gfx.circle("fill", p.problem_x, p.problem_y, 20)
+            lurek.render.setColor(0.2,1,0.2,0.6)
+            lurek.render.circle("fill", p.problem_x, p.problem_y, 20)
         end
     end
     -- body outline
-    lurek.gfx.setColor(0.2,0.2,0.2,1)
-    lurek.gfx.rectangle("line", 250, 200, 300, 160)
+    lurek.render.setColor(0.2,0.2,0.2,1)
+    lurek.render.rectangle("line", 250, 200, 300, 160)
     -- step label
     local steps = {"1: Clean area","2: Cut skin","3: Cut muscle","4: Remove/repair","5: Suture","6: Clean wound","Done!"}
-    lurek.gfx.setColor(1,1,0.6,1)
-    lurek.gfx.print("Step: " .. (steps[p.step] or "Done!"), 250, 185, 1)
+    lurek.render.setColor(1,1,0.6,1)
+    lurek.render.print("Step: " .. (steps[p.step] or "Done!"), 250, 185, 1)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.15,0.18,0.22)
+    lurek.render.setBackgroundColor(0.15,0.18,0.22)
 
     if game_over then
-        lurek.gfx.setColor(1,1,1,1)
-        lurek.gfx.print("ALL PATIENTS COMPLETE", 260, 220, 1.5)
-        lurek.gfx.print("Score: " .. score, 320, 270, 1.4)
-        lurek.gfx.print("Time: " .. math.floor(total_time) .. "s", 320, 310, 1)
-        lurek.gfx.print("Press R to restart", 300, 370, 1)
+        lurek.render.setColor(1,1,1,1)
+        lurek.render.print("ALL PATIENTS COMPLETE", 260, 220, 1.5)
+        lurek.render.print("Score: " .. score, 320, 270, 1.4)
+        lurek.render.print("Time: " .. math.floor(total_time) .. "s", 320, 310, 1)
+        lurek.render.print("Press R to restart", 300, 370, 1)
         return
     end
 
-    lurek.gfx.setColor(1,1,1,1)
-    lurek.gfx.print("MEDICAL SIM — Patient " .. current_patient .. "/5", 20, 10, 1.2)
-    lurek.gfx.print("Score: " .. score, 20, 40, 1)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 10, 0.8)
+    lurek.render.setColor(1,1,1,1)
+    lurek.render.print("MEDICAL SIM — Patient " .. current_patient .. "/5", 20, 10, 1.2)
+    lurek.render.print("Score: " .. score, 20, 40, 1)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 10, 0.8)
 
     local p = patients[current_patient]
     if p then
@@ -201,29 +201,29 @@ function lurek.render()
     end
 
     -- tool palette
-    lurek.gfx.setColor(0.2,0.2,0.25,1)
-    lurek.gfx.rectangle("fill", 630, 170, 160, 320)
-    lurek.gfx.setColor(1,1,1,1)
-    lurek.gfx.print("TOOLS", 680, 155, 1)
+    lurek.render.setColor(0.2,0.2,0.25,1)
+    lurek.render.rectangle("fill", 630, 170, 160, 320)
+    lurek.render.setColor(1,1,1,1)
+    lurek.render.print("TOOLS", 680, 155, 1)
     for i, t in ipairs(tools) do
         local ty = 180 + (i-1) * 60
         local c = tool_colors[t]
         if selected_tool == t then
-            lurek.gfx.setColor(1,1,0.3,0.4)
-            lurek.gfx.rectangle("fill", 640, ty, 140, 50)
+            lurek.render.setColor(1,1,0.3,0.4)
+            lurek.render.rectangle("fill", 640, ty, 140, 50)
         end
-        lurek.gfx.setColor(c[1],c[2],c[3],1)
-        lurek.gfx.rectangle("fill", 645, ty + 5, 40, 40)
-        lurek.gfx.setColor(1,1,1,1)
-        lurek.gfx.print(t, 690, ty + 15, 0.9)
+        lurek.render.setColor(c[1],c[2],c[3],1)
+        lurek.render.rectangle("fill", 645, ty + 5, 40, 40)
+        lurek.render.setColor(1,1,1,1)
+        lurek.render.print(t, 690, ty + 15, 0.9)
     end
 
     -- message
     if message and msg_timer > 0 then
-        lurek.gfx.setColor(1,1,0.5,1)
-        lurek.gfx.print(message, 220, 520, 1)
+        lurek.render.setColor(1,1,0.5,1)
+        lurek.render.print(message, 220, 520, 1)
     end
 
-    lurek.gfx.setColor(0.6,0.6,0.6,1)
-    lurek.gfx.print("[R] Restart   [ESC] Quit", 20, 570, 0.8)
+    lurek.render.setColor(0.6,0.6,0.6,1)
+    lurek.render.print("[R] Restart   [ESC] Quit", 20, 570, 0.8)
 end

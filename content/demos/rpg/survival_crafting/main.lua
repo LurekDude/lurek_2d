@@ -69,7 +69,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Survival Crafting")
-    lurek.gfx.setBackgroundColor(0.1, 0.1, 0.15)
+    lurek.render.setBackgroundColor(0.1, 0.1, 0.15)
     genMap()
 end
 
@@ -161,56 +161,56 @@ function lurek.render()
         for x = 1, COLS do
             local t = map[y][x]
             local c = tileColors[t] or tileColors.grass
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
-            lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
+            lurek.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- enemies
-    lurek.gfx.setColor(0.9, 0.15, 0.15, 1)
+    lurek.render.setColor(0.9, 0.15, 0.15, 1)
     for _, e in ipairs(enemies) do
-        lurek.gfx.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
+        lurek.render.rectangle("fill", (e.gx - 1) * TILE + 4, (e.gy - 1) * TILE + 4, TILE - 8, TILE - 8)
     end
 
     -- player
-    lurek.gfx.setColor(0.2, 0.5, 1, 1)
-    lurek.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+    lurek.render.setColor(0.2, 0.5, 1, 1)
+    lurek.render.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
     -- mining bar
     if mining.active then
         local bx = (mining.gx - 1) * TILE
         local by = (mining.gy - 1) * TILE - 8
-        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-        lurek.gfx.rectangle("fill", bx, by, TILE, 6)
-        lurek.gfx.setColor(0, 1, 0.3, 1)
-        lurek.gfx.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", bx, by, TILE, 6)
+        lurek.render.setColor(0, 1, 0.3, 1)
+        lurek.render.rectangle("fill", bx, by, TILE * (mining.progress / mining.needed), 6)
     end
 
     -- night overlay
     if nightAlpha > 0 then
-        lurek.gfx.setColor(0, 0, 0.05, nightAlpha)
-        lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+        lurek.render.setColor(0, 0, 0.05, nightAlpha)
+        lurek.render.rectangle("fill", 0, 0, 800, 600)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, ROWS * TILE, 800, 40)
+    lurek.render.setColor(1, 1, 1, 1)
     local dayStr = isNight() and "NIGHT" or "Day"
-    lurek.gfx.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
-    lurek.gfx.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
+    lurek.render.print(dayStr .. " " .. dayNum .. "  HP:" .. math.floor(player.hp) .. "  Hunger:" .. math.floor(player.hunger), 10, ROWS * TILE + 5)
+    lurek.render.print("Wood:" .. inventory.wood .. " Stone:" .. inventory.stone .. " Berry:" .. inventory.berry .. " Pick:" .. inventory.pickaxe .. " Wall:" .. inventory.wall, 10, ROWS * TILE + 22)
 
     -- craft menu
     if craftOpen then
-        lurek.gfx.setColor(0, 0, 0, 0.8)
-        lurek.gfx.rectangle("fill", 250, 150, 300, 200)
-        lurek.gfx.setColor(1, 1, 0.6, 1)
-        lurek.gfx.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
+        lurek.render.setColor(0, 0, 0, 0.8)
+        lurek.render.rectangle("fill", 250, 150, 300, 200)
+        lurek.render.setColor(1, 1, 0.6, 1)
+        lurek.render.print("CRAFTING (1-2 to craft, C to close)", 260, 160)
         for i, r in ipairs(recipes) do
             local parts = {}
             for k, v in pairs(r.needs) do parts[#parts + 1] = k .. "x" .. v end
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(i .. ") " .. r.name .. " = " .. table.concat(parts, " + "), 270, 185 + i * 22)
         end
     end
 end

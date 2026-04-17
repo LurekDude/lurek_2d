@@ -181,25 +181,25 @@ end
 
 -- ── lurek.render ─────────────────────────────────────────────────────────────
 local function panel(x, y, w, h, title)
-    lurek.gfx.setColor(0.10, 0.08, 0.20, 0.92)
-    lurek.gfx.rectangle("fill", x, y, w, h)
-    lurek.gfx.setColor(0.55, 0.45, 0.80, 1)
-    lurek.gfx.rectangle("line", x, y, w, h)
-    lurek.gfx.setColor(0.95, 0.90, 1.00, 1)
-    lurek.gfx.print(title, x + 8, y + 6)
+    lurek.render.setColor(0.10, 0.08, 0.20, 0.92)
+    lurek.render.rectangle("fill", x, y, w, h)
+    lurek.render.setColor(0.55, 0.45, 0.80, 1)
+    lurek.render.rectangle("line", x, y, w, h)
+    lurek.render.setColor(0.95, 0.90, 1.00, 1)
+    lurek.render.print(title, x + 8, y + 6)
 end
 
 function lurek.render()
     -- Background
-    lurek.gfx.setColor(0.06, 0.04, 0.12, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(0.06, 0.04, 0.12, 1)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
 
     -- ── Gold + weight ─────────────────────────────────────────────────────
     panel(20, 20, 220, 80, "PLAYER")
-    lurek.gfx.setColor(1.0, 0.85, 0.2, 1)
-    lurek.gfx.print(string.format("Gold: %dg", player_gold), 30, 48)
-    lurek.gfx.setColor(0.6, 0.8, 0.6, 1)
-    lurek.gfx.print(string.format("Bag: %.1f / 30.0 kg", player_bag:getCurrentWeight()), 30, 68)
+    lurek.render.setColor(1.0, 0.85, 0.2, 1)
+    lurek.render.print(string.format("Gold: %dg", player_gold), 30, 48)
+    lurek.render.setColor(0.6, 0.8, 0.6, 1)
+    lurek.render.print(string.format("Bag: %.1f / 30.0 kg", player_bag:getCurrentWeight()), 30, 68)
 
     -- ── Shelf ─────────────────────────────────────────────────────────────
     panel(260, 20, 520, 220, "MERCHANT SHELF  [1-6] to buy")
@@ -218,11 +218,11 @@ function lurek.render()
             end
         end
         if qty > 0 then
-            lurek.gfx.setColor(0.9, 0.85, 0.5, 1)
+            lurek.render.setColor(0.9, 0.85, 0.5, 1)
         else
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+            lurek.render.setColor(0.4, 0.4, 0.4, 1)
         end
-        lurek.gfx.print(string.format("[%d] %-16s  %3dg  x%d   %s", i, type_name, price, qty, stats), 270, sy)
+        lurek.render.print(string.format("[%d] %-16s  %3dg  x%d   %s", i, type_name, price, qty, stats), 270, sy)
         sy = sy + 28
     end
 
@@ -235,16 +235,16 @@ function lurek.render()
         if not slot:isEmpty() and shown < 6 then
             local st = slot:getStack()
             if st then
-                lurek.gfx.setColor(0.85, 0.85, 0.85, 1)
-                lurek.gfx.print("• "..st:getItem():getType(), 30, bag_y)
+                lurek.render.setColor(0.85, 0.85, 0.85, 1)
+                lurek.render.print("• "..st:getItem():getType(), 30, bag_y)
                 bag_y = bag_y + 20
                 shown = shown + 1
             end
         end
     end
     if shown == 0 then
-        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-        lurek.gfx.print("(empty)", 30, 146)
+        lurek.render.setColor(0.4, 0.4, 0.4, 1)
+        lurek.render.print("(empty)", 30, 146)
     end
 
     -- ── Sales ledger ──────────────────────────────────────────────────────
@@ -255,21 +255,21 @@ function lurek.render()
     for i = start, #entries do
         local e = entries[i]
         if e then
-            lurek.gfx.setColor(0.7, 0.9, 0.7, 1)
-            lurek.gfx.print(string.format("#%d  sold %s  (remaining: %d)", i, e.label, e.size_after), 30, log_y)
+            lurek.render.setColor(0.7, 0.9, 0.7, 1)
+            lurek.render.print(string.format("#%d  sold %s  (remaining: %d)", i, e.label, e.size_after), 30, log_y)
             log_y = log_y + 24
         end
     end
 
     -- ── Controls hint ─────────────────────────────────────────────────────
     panel(20, 496, 760, 40, "")
-    lurek.gfx.setColor(0.6, 0.6, 0.8, 1)
-    lurek.gfx.print("[1-6] buy item   [A] auto-buy best value   [R] restock merchant", 30, 506)
+    lurek.render.setColor(0.6, 0.6, 0.8, 1)
+    lurek.render.print("[1-6] buy item   [A] auto-buy best value   [R] restock merchant", 30, 506)
 
     -- ── Flash message ─────────────────────────────────────────────────────
     if message_timer > 0 then
         local alpha = math.min(1.0, message_timer / 0.4)
-        lurek.gfx.setColor(1.0, 0.9, 0.3, alpha)
-        lurek.gfx.print(message, 260, 256)
+        lurek.render.setColor(1.0, 0.9, 0.3, alpha)
+        lurek.render.print(message, 260, 256)
     end
 end

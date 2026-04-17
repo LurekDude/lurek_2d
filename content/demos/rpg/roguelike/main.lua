@@ -185,7 +185,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Roguelike Dungeon")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
     generateDungeon()
     updateFOV()
     addMsg("Find the stairs (>) to descend. Arrow keys to move.")
@@ -206,23 +206,23 @@ function lurek.render()
                 local bright = visible and 1.0 or 0.35
                 local t = map[y][x]
                 if t == WALL then
-                    lurek.gfx.setColor(0.25 * bright, 0.22 * bright, 0.3 * bright)
-                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.render.setColor(0.25 * bright, 0.22 * bright, 0.3 * bright)
+                    lurek.render.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
                 elseif t == FLOOR then
-                    lurek.gfx.setColor(0.12 * bright, 0.12 * bright, 0.15 * bright)
-                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.render.setColor(0.12 * bright, 0.12 * bright, 0.15 * bright)
+                    lurek.render.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
                 elseif t == STAIRS and visible then
-                    lurek.gfx.setColor(0.1, 0.1, 0.15)
-                    lurek.gfx.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
-                    lurek.gfx.setColor(1, 0.9, 0.3)
-                    lurek.gfx.print(">", offsetX + (x - 1) * TILE_SIZE + 6, offsetY + (y - 1) * TILE_SIZE + 4)
+                    lurek.render.setColor(0.1, 0.1, 0.15)
+                    lurek.render.rectangle("fill", offsetX + (x - 1) * TILE_SIZE, offsetY + (y - 1) * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1)
+                    lurek.render.setColor(1, 0.9, 0.3)
+                    lurek.render.print(">", offsetX + (x - 1) * TILE_SIZE + 6, offsetY + (y - 1) * TILE_SIZE + 4)
                 end
                 -- Pickups
                 if visible then
                     for _, p in ipairs(pickups) do
                         if p.x == x and p.y == y then
-                            lurek.gfx.setColor(0.2, 0.9, 0.3)
-                            lurek.gfx.circle("fill", offsetX + (x - 1) * TILE_SIZE + TILE_SIZE / 2, offsetY + (y - 1) * TILE_SIZE + TILE_SIZE / 2, 5)
+                            lurek.render.setColor(0.2, 0.9, 0.3)
+                            lurek.render.circle("fill", offsetX + (x - 1) * TILE_SIZE + TILE_SIZE / 2, offsetY + (y - 1) * TILE_SIZE + TILE_SIZE / 2, 5)
                         end
                     end
                 end
@@ -233,34 +233,34 @@ function lurek.render()
     for _, e in ipairs(enemies) do
         local dx = e.x - player.x; local dy = e.y - player.y
         if math.sqrt(dx * dx + dy * dy) <= VIEW_RADIUS then
-            lurek.gfx.setColor(0.9, 0.2, 0.2)
-            lurek.gfx.rectangle("fill", offsetX + (e.x - 1) * TILE_SIZE + 3, offsetY + (e.y - 1) * TILE_SIZE + 3, TILE_SIZE - 7, TILE_SIZE - 7)
-            lurek.gfx.setColor(1, 1, 1)
-            lurek.gfx.print("E", offsetX + (e.x - 1) * TILE_SIZE + 6, offsetY + (e.y - 1) * TILE_SIZE + 4)
+            lurek.render.setColor(0.9, 0.2, 0.2)
+            lurek.render.rectangle("fill", offsetX + (e.x - 1) * TILE_SIZE + 3, offsetY + (e.y - 1) * TILE_SIZE + 3, TILE_SIZE - 7, TILE_SIZE - 7)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.print("E", offsetX + (e.x - 1) * TILE_SIZE + 6, offsetY + (e.y - 1) * TILE_SIZE + 4)
         end
     end
     -- Draw player
-    lurek.gfx.setColor(0.3, 0.7, 1)
-    lurek.gfx.rectangle("fill", offsetX + (player.x - 1) * TILE_SIZE + 2, offsetY + (player.y - 1) * TILE_SIZE + 2, TILE_SIZE - 5, TILE_SIZE - 5)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("@", offsetX + (player.x - 1) * TILE_SIZE + 6, offsetY + (player.y - 1) * TILE_SIZE + 4)
+    lurek.render.setColor(0.3, 0.7, 1)
+    lurek.render.rectangle("fill", offsetX + (player.x - 1) * TILE_SIZE + 2, offsetY + (player.y - 1) * TILE_SIZE + 2, TILE_SIZE - 5, TILE_SIZE - 5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("@", offsetX + (player.x - 1) * TILE_SIZE + 6, offsetY + (player.y - 1) * TILE_SIZE + 4)
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7); lurek.gfx.rectangle("fill", 0, 0, 800, 30)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp .. "  Floor: " .. floor_num .. "  Kills: " .. player.kills .. "  Turn: " .. turnCount, 10, 8)
+    lurek.render.setColor(0, 0, 0, 0.7); lurek.render.rectangle("fill", 0, 0, 800, 30)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("HP: " .. player.hp .. "/" .. player.maxHp .. "  Floor: " .. floor_num .. "  Kills: " .. player.kills .. "  Turn: " .. turnCount, 10, 8)
     -- HP bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3); lurek.gfx.rectangle("fill", 600, 8, 120, 14)
-    lurek.gfx.setColor(0.8, 0.2, 0.2); lurek.gfx.rectangle("fill", 600, 8, 120 * (player.hp / player.maxHp), 14)
+    lurek.render.setColor(0.3, 0.3, 0.3); lurek.render.rectangle("fill", 600, 8, 120, 14)
+    lurek.render.setColor(0.8, 0.2, 0.2); lurek.render.rectangle("fill", 600, 8, 120 * (player.hp / player.maxHp), 14)
     -- Messages
     for i, msg in ipairs(messages) do
-        lurek.gfx.setColor(1, 1, 0.8, 1.0 - (i - 1) * 0.2)
-        lurek.gfx.print(msg, 10, 560 - (i - 1) * 16)
+        lurek.render.setColor(1, 1, 0.8, 1.0 - (i - 1) * 0.2)
+        lurek.render.print(msg, 10, 560 - (i - 1) * 16)
     end
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.75); lurek.gfx.rectangle("fill", 200, 220, 400, 120)
-        lurek.gfx.setColor(1, 0.2, 0.2); lurek.gfx.print("YOU DIED", 330, 240, 2)
-        lurek.gfx.setColor(1, 1, 1); lurek.gfx.print("Floor " .. floor_num .. " | Kills: " .. player.kills .. " | Turns: " .. turnCount, 280, 290)
-        lurek.gfx.print("Press R to restart", 330, 315)
+        lurek.render.setColor(0, 0, 0, 0.75); lurek.render.rectangle("fill", 200, 220, 400, 120)
+        lurek.render.setColor(1, 0.2, 0.2); lurek.render.print("YOU DIED", 330, 240, 2)
+        lurek.render.setColor(1, 1, 1); lurek.render.print("Floor " .. floor_num .. " | Kills: " .. player.kills .. " | Turns: " .. turnCount, 280, 290)
+        lurek.render.print("Press R to restart", 330, 315)
     end
 end
 

@@ -137,14 +137,14 @@ function lurek.keypressed(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.1, 0.08, 0.15)
+    lurek.render.setBackgroundColor(0.1, 0.08, 0.15)
 
     -- Coins display
-    lurek.gfx.setColor(1, 0.85, 0.1, 1)
-    lurek.gfx.print(format_num(coins) .. " coins", 60, 20, 2.5)
-    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-    lurek.gfx.print(format_num(get_cps()) .. " per second", 60, 65)
-    lurek.gfx.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
+    lurek.render.setColor(1, 0.85, 0.1, 1)
+    lurek.render.print(format_num(coins) .. " coins", 60, 20, 2.5)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print(format_num(get_cps()) .. " per second", 60, 65)
+    lurek.render.print("Click power: " .. format_num(click_power * prestige_mult), 60, 85)
 
     -- Big button
     local s = 1.0 + math.sin(pulse) * 0.03
@@ -152,75 +152,75 @@ function lurek.render()
     local by = big_button.y + big_button.h / 2
     local hw = big_button.w / 2 * s
     local hh = big_button.h / 2 * s
-    lurek.gfx.setColor(0.9, 0.7, 0.1, 1)
-    lurek.gfx.circle("fill", bx, by, hw)
-    lurek.gfx.setColor(1, 0.85, 0.2, 1)
-    lurek.gfx.circle("fill", bx, by, hw - 6)
-    lurek.gfx.setColor(0.3, 0.2, 0, 1)
-    lurek.gfx.print("CLICK", bx - 30, by - 10, 1.5)
+    lurek.render.setColor(0.9, 0.7, 0.1, 1)
+    lurek.render.circle("fill", bx, by, hw)
+    lurek.render.setColor(1, 0.85, 0.2, 1)
+    lurek.render.circle("fill", bx, by, hw - 6)
+    lurek.render.setColor(0.3, 0.2, 0, 1)
+    lurek.render.print("CLICK", bx - 30, by - 10, 1.5)
 
     -- Click particles
     for _, p in ipairs(click_particles) do
-        lurek.gfx.setColor(1, 1, 0.3, p.life)
-        lurek.gfx.print(p.text, p.x, p.y, 1.2)
+        lurek.render.setColor(1, 1, 0.3, p.life)
+        lurek.render.print(p.text, p.x, p.y, 1.2)
     end
 
     -- Generator panel
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("GENERATORS", 350, 95, 1.2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("GENERATORS", 350, 95, 1.2)
     for i, g in ipairs(generators) do
         local by = 120 + (i - 1) * 52
         local affordable = coins >= g.cost
         if affordable then
-            lurek.gfx.setColor(0.15, 0.3, 0.15, 1)
+            lurek.render.setColor(0.15, 0.3, 0.15, 1)
         else
-            lurek.gfx.setColor(0.2, 0.15, 0.15, 1)
+            lurek.render.setColor(0.2, 0.15, 0.15, 1)
         end
-        lurek.gfx.rectangle("fill", 320, by, 240, 44)
-        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-        lurek.gfx.rectangle("line", 320, by, 240, 44)
-        lurek.gfx.setColor(1, 1, 1, affordable and 1 or 0.4)
-        lurek.gfx.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
-        lurek.gfx.setColor(0.7, 0.7, 0.5, 1)
-        lurek.gfx.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
+        lurek.render.rectangle("fill", 320, by, 240, 44)
+        lurek.render.setColor(0.4, 0.4, 0.4, 1)
+        lurek.render.rectangle("line", 320, by, 240, 44)
+        lurek.render.setColor(1, 1, 1, affordable and 1 or 0.4)
+        lurek.render.print(g.name .. " (" .. g.count .. ")", 328, by + 4)
+        lurek.render.setColor(0.7, 0.7, 0.5, 1)
+        lurek.render.print("Cost: " .. format_num(g.cost) .. "  +" .. format_num(g.cps * prestige_mult) .. "/s", 328, by + 22)
     end
 
     -- Upgrades panel
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("UPGRADES", 640, 95, 1.2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("UPGRADES", 640, 95, 1.2)
     for i, u in ipairs(upgrades) do
         local by = 120 + (i - 1) * 42
         if u.bought then
-            lurek.gfx.setColor(0.15, 0.15, 0.25, 1)
+            lurek.render.setColor(0.15, 0.15, 0.25, 1)
         elseif coins >= u.cost then
-            lurek.gfx.setColor(0.15, 0.25, 0.35, 1)
+            lurek.render.setColor(0.15, 0.25, 0.35, 1)
         else
-            lurek.gfx.setColor(0.15, 0.12, 0.12, 1)
+            lurek.render.setColor(0.15, 0.12, 0.12, 1)
         end
-        lurek.gfx.rectangle("fill", 590, by, 200, 34)
-        lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-        lurek.gfx.rectangle("line", 590, by, 200, 34)
+        lurek.render.rectangle("fill", 590, by, 200, 34)
+        lurek.render.setColor(0.4, 0.4, 0.4, 1)
+        lurek.render.rectangle("line", 590, by, 200, 34)
         if u.bought then
-            lurek.gfx.setColor(0.4, 0.7, 0.4, 1)
-            lurek.gfx.print(u.name .. " [OWNED]", 598, by + 4)
+            lurek.render.setColor(0.4, 0.7, 0.4, 1)
+            lurek.render.print(u.name .. " [OWNED]", 598, by + 4)
         else
-            lurek.gfx.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
-            lurek.gfx.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
+            lurek.render.setColor(1, 1, 1, coins >= u.cost and 1 or 0.4)
+            lurek.render.print(u.name .. " - " .. format_num(u.cost), 598, by + 4)
         end
-        lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-        lurek.gfx.print(u.desc, 598, by + 18)
+        lurek.render.setColor(0.6, 0.6, 0.6, 1)
+        lurek.render.print(u.desc, 598, by + 18)
     end
 
     -- Prestige button
-    lurek.gfx.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
-    lurek.gfx.rectangle("fill", 60, 500, 200, 40)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("PRESTIGE (10K req)", 75, 508)
+    lurek.render.setColor(0.5, 0.2, 0.6, total_earned >= 10000 and 1 or 0.3)
+    lurek.render.rectangle("fill", 60, 500, 200, 40)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("PRESTIGE (10K req)", 75, 508)
 
     -- Stats
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-    lurek.gfx.print("Total earned: " .. format_num(total_earned), 60, 400)
-    lurek.gfx.print("Total clicks: " .. total_clicked, 60, 418)
-    lurek.gfx.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 60, 460)
+    lurek.render.setColor(0.6, 0.6, 0.6, 1)
+    lurek.render.print("Total earned: " .. format_num(total_earned), 60, 400)
+    lurek.render.print("Total clicks: " .. total_clicked, 60, 418)
+    lurek.render.print("Prestige: x" .. prestige_mult .. " (" .. prestige_count .. ")", 60, 436)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 60, 460)
 end

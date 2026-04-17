@@ -43,9 +43,9 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Tween Demo — Easing Curves", 20, 15)
-    lurek.gfx.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Tween Demo — Easing Curves", 20, 15)
+    lurek.render.print("R = reset   SPACE = " .. (paused and "resume" or "pause"), 20, 38)
 
     local y = 80
     local row_h = 48
@@ -55,21 +55,21 @@ function lurek.render()
         local x = entry.tween:getValue(1)
 
         -- Label
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-        lurek.gfx.print(entry.easing, 10, y + 2)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.print(entry.easing, 10, y + 2)
 
         -- Track line
-        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-        lurek.gfx.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", start_x, y + ball_r - 1, end_x - start_x, 2)
 
         -- Ball
         local complete = entry.tween:isComplete()
         if complete then
-            lurek.gfx.setColor(0.2, 0.9, 0.2, 1)
+            lurek.render.setColor(0.2, 0.9, 0.2, 1)
         else
-            lurek.gfx.setColor(1, 0.5, 0.1, 1)
+            lurek.render.setColor(1, 0.5, 0.1, 1)
         end
-        lurek.gfx.circle("fill", x, y + ball_r, ball_r)
+        lurek.render.circle("fill", x, y + ball_r, ball_r)
 
         y = y + row_h
     end

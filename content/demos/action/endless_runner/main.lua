@@ -56,7 +56,7 @@ local coinTimer = 0
 
 function lurek.init()
     lurek.window.setTitle("Endless Runner")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.12)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.12)
     highScore = 0
     resetGame()
 end
@@ -153,61 +153,61 @@ end
 function lurek.render()
     -- parallax bg
     for _, l in ipairs(bgLayers) do
-        lurek.gfx.setColor(l.color[1], l.color[2], l.color[3], 1)
+        lurek.render.setColor(l.color[1], l.color[2], l.color[3], 1)
         for ox = 0, 1 do
-            lurek.gfx.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
+            lurek.render.rectangle("fill", l.x + ox * 800, l.y, 810, l.h)
         end
     end
 
     -- ground
-    lurek.gfx.setColor(0.25, 0.55, 0.2, 1)
-    lurek.gfx.rectangle("fill", 0, groundY, 800, 100)
+    lurek.render.setColor(0.25, 0.55, 0.2, 1)
+    lurek.render.rectangle("fill", 0, groundY, 800, 100)
 
     -- obstacles
     for _, o in ipairs(obstacles) do
         if o.kind == "tall" then
-            lurek.gfx.setColor(0.7, 0.2, 0.2, 1)
+            lurek.render.setColor(0.7, 0.2, 0.2, 1)
         else
-            lurek.gfx.setColor(0.6, 0.4, 0.1, 1)
+            lurek.render.setColor(0.6, 0.4, 0.1, 1)
         end
-        lurek.gfx.rectangle("fill", o.x, o.y, o.w, o.h)
+        lurek.render.rectangle("fill", o.x, o.y, o.w, o.h)
     end
 
     -- coins
-    lurek.gfx.setColor(1, 0.85, 0.1, 1)
+    lurek.render.setColor(1, 0.85, 0.1, 1)
     for _, c in ipairs(coins) do
-        lurek.gfx.circle("fill", c.x, c.y, c.r)
+        lurek.render.circle("fill", c.x, c.y, c.r)
     end
 
     -- player
     local ph = player.sliding and 25 or 50
     local py = player.sliding and (groundY - 25) or (groundY - 50)
-    lurek.gfx.setColor(0.2, 0.6, 1, 1)
-    lurek.gfx.rectangle("fill", player.x, py, player.w, ph)
+    lurek.render.setColor(0.2, 0.6, 1, 1)
+    lurek.render.rectangle("fill", player.x, py, player.w, ph)
     -- eye
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.circle("fill", player.x + 22, py + 10, 4)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.circle("fill", player.x + 22, py + 10, 4)
 
     -- particles
     for _, p in ipairs(particles) do
-        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2)
-        lurek.gfx.circle("fill", p.x, p.y, 3)
+        lurek.render.setColor(p.r, p.g, p.b, p.life * 2)
+        lurek.render.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 10, 10)
-    lurek.gfx.print("High: " .. highScore, 10, 30)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. score, 10, 10)
+    lurek.render.print("High: " .. highScore, 10, 30)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 10)
 
     if gameState == "dead" then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 200, 220, 400, 120)
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
-        lurek.gfx.print("GAME OVER", 310, 240, 1.5)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Score: " .. score, 340, 280)
-        lurek.gfx.print("Press SPACE to restart", 290, 310)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 200, 220, 400, 120)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
+        lurek.render.print("GAME OVER", 310, 240, 1.5)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Score: " .. score, 340, 280)
+        lurek.render.print("Press SPACE to restart", 290, 310)
     end
 end
 

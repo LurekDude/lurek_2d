@@ -102,7 +102,7 @@ local function makeBrickTex(bH, bW)
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- Pattern 2: large stone blocks
@@ -131,7 +131,7 @@ local function makeStoneTex(bH, bW)
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- Pattern 3: rough cracked stone
@@ -154,7 +154,7 @@ local function makeCrackedTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- Pattern 4: mossy surface (dark with lighter patches)
@@ -174,7 +174,7 @@ local function makeMossyTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- Floor texture: stone tiles with grout lines
@@ -197,7 +197,7 @@ local function makeFloorTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- Ceiling texture: rough dark stone
@@ -215,7 +215,7 @@ local function makeCeilTex()
             d:setPixel(px_, py_, v, v, v, 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- �� helpers ���������������������������������������������������
@@ -244,7 +244,7 @@ end
 -- �� load ������������������������������������������������������
 function lurek.init()
     lurek.window.setTitle("Raycaster FPS")
-    lurek.gfx.setBackgroundColor(0.02, 0.02, 0.04)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.04)
 
     -- Build raycaster grid (items are open cells here)
     rc = lurek.raycaster.new(MAP_W, MAP_H)
@@ -269,11 +269,11 @@ function lurek.init()
 
     -- Build shared quads (one per texture column 0..TEX_W-1)
     for s = 0, TEX_W - 1 do
-        shared_quads[s] = lurek.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
+        shared_quads[s] = lurek.render.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
     end
 
     -- Low-res render canvas
-    view_canvas = lurek.gfx.newCanvas(RW, RH)
+    view_canvas = lurek.render.newCanvas(RW, RH)
 
     -- Default weather
     weather = "rain"
@@ -344,7 +344,7 @@ end
 
 -- �� draw ������������������������������������������������������
 function lurek.render()
-    lurek.gfx.setCanvas(view_canvas)
+    lurek.render.setCanvas(view_canvas)
 
     -- �� Ceiling bands (horizon�top: lighter�darker) ������������
     local half_h = math.floor(RH / 2)
@@ -356,8 +356,8 @@ function lurek.render()
         -- Sample ceiling texture column (repeating tile effect per band)
         local tex_row = math.floor(t * (TEX_H - 1))
         local tv = noise2(b * 3, 0) * 0.025
-        lurek.gfx.setColor(br + tv, br + tv, br * 1.1 + tv)
-        lurek.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
+        lurek.render.setColor(br + tv, br + tv, br * 1.1 + tv)
+        lurek.render.rectangle("fill", 0, strip_y, RW, band_h + 1)
     end
 
     -- �� Floor bands (horizon�bottom: darker�lighter) �����������
@@ -366,8 +366,8 @@ function lurek.render()
         local br = 0.05 + t * 0.15          -- darker at horizon, lighter near player
         local checker = (b % 2 == 0) and 1.0 or 0.88    -- checkerboard illusion
         local strip_y = half_h + b * band_h
-        lurek.gfx.setColor(br * 0.95 * checker, br * 0.85 * checker, br * 0.68 * checker)
-        lurek.gfx.rectangle("fill", 0, strip_y, RW, band_h + 1)
+        lurek.render.setColor(br * 0.95 * checker, br * 0.85 * checker, br * 0.68 * checker)
+        lurek.render.rectangle("fill", 0, strip_y, RW, band_h + 1)
     end
 
     -- �� Cast all rays ������������������������������������������
@@ -395,7 +395,7 @@ function lurek.render()
             -- Wall color tint
             local wt = WALL_TINT[cv] or {0.55, 0.55, 0.55}
 
-            lurek.gfx.setColor(
+            lurek.render.setColor(
                 wt[1] * bright,
                 wt[2] * bright,
                 wt[3] * bright
@@ -407,7 +407,7 @@ function lurek.render()
             local tex   = wall_textures[cv] or wall_textures[1]
             local wy    = wall_h / TEX_H    -- vertical scale
 
-            lurek.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wy)
+            lurek.render.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wy)
         end
     end
 
@@ -422,12 +422,12 @@ function lurek.render()
                     local bd = lurek.raycaster.distanceShade(proj.distance, MAX_DIST)
                     local sy = math.floor(RH / 2 - sz / 2)
                     -- Gold orb body
-                    lurek.gfx.setColor(1.0 * bd, 0.82 * bd, 0.08 * bd)
-                    lurek.gfx.rectangle("fill", col - math.floor(sz/2), sy, sz, sz)
+                    lurek.render.setColor(1.0 * bd, 0.82 * bd, 0.08 * bd)
+                    lurek.render.rectangle("fill", col - math.floor(sz/2), sy, sz, sz)
                     -- Orb highlight
-                    lurek.gfx.setColor(1.0, 1.0, 0.6, 0.7)
+                    lurek.render.setColor(1.0, 1.0, 0.6, 0.7)
                     local hi = math.max(1, math.floor(sz * 0.25))
-                    lurek.gfx.rectangle("fill",
+                    lurek.render.rectangle("fill",
                         col - math.floor(sz/2) + hi, sy + hi, hi * 2, hi * 2)
                 end
             end
@@ -436,38 +436,38 @@ function lurek.render()
 
     -- �� Weather overlay ����������������������������������������
     if weather == "rain" then
-        lurek.gfx.setColor(0.55, 0.70, 0.90, 0.50)
+        lurek.render.setColor(0.55, 0.70, 0.90, 0.50)
         for _, p in ipairs(particles) do
-            lurek.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y),
+            lurek.render.rectangle("fill", math.floor(p.x), math.floor(p.y),
                                1, math.floor(p.len))
         end
     elseif weather == "snow" then
-        lurek.gfx.setColor(0.95, 0.97, 1.0, 0.75)
+        lurek.render.setColor(0.95, 0.97, 1.0, 0.75)
         for _, p in ipairs(particles) do
-            lurek.gfx.rectangle("fill", math.floor(p.x), math.floor(p.y), 2, 2)
+            lurek.render.rectangle("fill", math.floor(p.x), math.floor(p.y), 2, 2)
         end
     end
 
     -- �� Fog vignette (darkens screen edges) �������������������
-    lurek.gfx.setColor(0, 0, 0, 0.40)
-    lurek.gfx.rectangle("fill", 0,        0,   RW, RH / 6)
-    lurek.gfx.rectangle("fill", 0, RH * 5/6,   RW, RH / 6)
+    lurek.render.setColor(0, 0, 0, 0.40)
+    lurek.render.rectangle("fill", 0,        0,   RW, RH / 6)
+    lurek.render.rectangle("fill", 0, RH * 5/6,   RW, RH / 6)
 
-    lurek.gfx.setCanvas(nil)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setCanvas(nil)
+    lurek.render.setColor(1, 1, 1, 1)
 
     -- Upscale low-res canvas to full window
-    lurek.gfx.draw(view_canvas, 0, 0, 0, SW / RW, SH / RH)
+    lurek.render.draw(view_canvas, 0, 0, 0, SW / RW, SH / RH)
 
     -- �� HUD ���������������������������������������������������
-    lurek.gfx.setColor(0.9, 0.9, 0.9)
-    lurek.gfx.print("Score: " .. score, 12, 12)
-    lurek.gfx.print("Weather [" .. weather .. "]  F1=none  F2=rain  F3=snow", 12, 32)
-    lurek.gfx.print("WASD move   Q/E rotate   Escape quit", 12, 52)
+    lurek.render.setColor(0.9, 0.9, 0.9)
+    lurek.render.print("Score: " .. score, 12, 12)
+    lurek.render.print("Weather [" .. weather .. "]  F1=none  F2=rain  F3=snow", 12, 32)
+    lurek.render.print("WASD move   Q/E rotate   Escape quit", 12, 52)
 
     if msg_timer > 0 then
-        lurek.gfx.setColor(1.0, 0.85, 0.1)
-        lurek.gfx.print("+ 100  ITEM COLLECTED!", SW / 2 - 90, SH / 2 - 20)
+        lurek.render.setColor(1.0, 0.85, 0.1)
+        lurek.render.print("+ 100  ITEM COLLECTED!", SW / 2 - 90, SH / 2 - 20)
     end
 end
 

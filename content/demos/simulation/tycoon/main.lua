@@ -60,7 +60,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Restaurant Tycoon")
-    lurek.gfx.setBackgroundColor(0.12, 0.1, 0.08)
+    lurek.render.setBackgroundColor(0.12, 0.1, 0.08)
     initGrid()
 end
 
@@ -163,32 +163,32 @@ function lurek.render()
         for x = 1, COLS do
             local t = grid[y][x]
             if t == "wall" then
-                lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
+                lurek.render.setColor(0.3, 0.25, 0.2, 1)
             elseif t == "door" then
-                lurek.gfx.setColor(0.5, 0.4, 0.15, 1)
+                lurek.render.setColor(0.5, 0.4, 0.15, 1)
             elseif t == "counter" then
-                lurek.gfx.setColor(0.7, 0.5, 0.2, 1)
+                lurek.render.setColor(0.7, 0.5, 0.2, 1)
             elseif t == "table" then
-                lurek.gfx.setColor(0.5, 0.35, 0.2, 1)
+                lurek.render.setColor(0.5, 0.35, 0.2, 1)
             elseif t == "kitchen" then
-                lurek.gfx.setColor(0.6, 0.2, 0.2, 1)
+                lurek.render.setColor(0.6, 0.2, 0.2, 1)
             else
-                lurek.gfx.setColor(0.2, 0.18, 0.15, 1)
+                lurek.render.setColor(0.2, 0.18, 0.15, 1)
             end
-            lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- customers
     for _, c in ipairs(customers) do
         if c.state == "order" then
-            lurek.gfx.setColor(1, 0.8, 0.2, 1)
+            lurek.render.setColor(1, 0.8, 0.2, 1)
         elseif c.state == "eat" then
-            lurek.gfx.setColor(0.3, 0.9, 0.3, 1)
+            lurek.render.setColor(0.3, 0.9, 0.3, 1)
         else
-            lurek.gfx.setColor(0.3, 0.6, 1, 1)
+            lurek.render.setColor(0.3, 0.6, 1, 1)
         end
-        lurek.gfx.circle("fill", c.x, c.y, 10)
+        lurek.render.circle("fill", c.x, c.y, 10)
     end
 
     -- build cursor
@@ -198,39 +198,39 @@ function lurek.render()
         local gy = math.floor(my / TILE) + 1
         if gx >= 2 and gx <= COLS - 1 and gy >= 2 and gy <= ROWS - 1 then
             local b = buildings[buildType]
-            lurek.gfx.setColor(b.color[1], b.color[2], b.color[3], 0.4)
-            lurek.gfx.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
+            lurek.render.setColor(b.color[1], b.color[2], b.color[3], 0.4)
+            lurek.render.rectangle("fill", (gx - 1) * TILE, (gy - 1) * TILE, TILE - 1, TILE - 1)
         end
     end
 
     -- RIGHT PANEL
     local px = COLS * TILE + 10
-    lurek.gfx.setColor(0, 0, 0, 0.5)
-    lurek.gfx.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
+    lurek.render.setColor(0, 0, 0, 0.5)
+    lurek.render.rectangle("fill", COLS * TILE, 0, 200, ROWS * TILE)
 
-    lurek.gfx.setColor(1, 0.85, 0.2, 1)
-    lurek.gfx.print("$" .. money, px, 10, 1.3)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Day " .. day, px, 40)
-    lurek.gfx.print("Served: " .. customersServed, px, 60)
-    lurek.gfx.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
-    lurek.gfx.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
-    lurek.gfx.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
+    lurek.render.setColor(1, 0.85, 0.2, 1)
+    lurek.render.print("$" .. money, px, 10, 1.3)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Day " .. day, px, 40)
+    lurek.render.print("Served: " .. customersServed, px, 60)
+    lurek.render.print("Satisfaction: " .. math.floor(satisfaction) .. "%", px, 80)
+    lurek.render.print("Cooks: " .. staff.cooks .. " ($" .. staffCost.cook .. "/d)", px, 110)
+    lurek.render.print("Waiters: " .. staff.waiters .. " ($" .. staffCost.waiter .. "/d)", px, 130)
 
     -- build panel
-    lurek.gfx.setColor(0.6, 0.8, 1, 1)
-    lurek.gfx.print("BUILD (B toggle):", px, 170)
+    lurek.render.setColor(0.6, 0.8, 1, 1)
+    lurek.render.print("BUILD (B toggle):", px, 170)
     for i, b in ipairs(buildings) do
         local sel = (buildMode and i == buildType) and "> " or "  "
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(sel .. i .. ") " .. b.name .. " $" .. b.cost, px, 190 + i * 18)
     end
 
-    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-    lurek.gfx.print("H=Hire Cook", px, 280)
-    lurek.gfx.print("J=Hire Waiter", px, 298)
-    lurek.gfx.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), px, 360)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print("H=Hire Cook", px, 280)
+    lurek.render.print("J=Hire Waiter", px, 298)
+    lurek.render.print("Day: " .. math.floor(dayTimer) .. "/" .. dayLength, px, 330)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), px, 360)
 end
 
 function lurek.keypressed(key)

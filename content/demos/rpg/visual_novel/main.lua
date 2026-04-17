@@ -221,7 +221,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Visual Novel")
-    lurek.gfx.setBackgroundColor(0.1, 0.15, 0.1)
+    lurek.render.setBackgroundColor(0.1, 0.15, 0.1)
     build_scenes()
     go_to_scene("intro")
 end
@@ -261,30 +261,30 @@ local function draw_portrait(speaker, side)
     local px = (side == "left") and 60 or (W - 120)
     local py = H - 260
     -- body
-    lurek.gfx.setColor(c[1], c[2], c[3], 0.9)
-    lurek.gfx.rectangle("fill", px, py + 40, 60, 80)
+    lurek.render.setColor(c[1], c[2], c[3], 0.9)
+    lurek.render.rectangle("fill", px, py + 40, 60, 80)
     -- head
-    lurek.gfx.circle("fill", px + 30, py + 20, 25)
+    lurek.render.circle("fill", px + 30, py + 20, 25)
     -- eyes
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.circle("fill", px + 22, py + 16, 4)
-    lurek.gfx.circle("fill", px + 38, py + 16, 4)
-    lurek.gfx.setColor(0, 0, 0, 1)
-    lurek.gfx.circle("fill", px + 23, py + 17, 2)
-    lurek.gfx.circle("fill", px + 39, py + 17, 2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.circle("fill", px + 22, py + 16, 4)
+    lurek.render.circle("fill", px + 38, py + 16, 4)
+    lurek.render.setColor(0, 0, 0, 1)
+    lurek.render.circle("fill", px + 23, py + 17, 2)
+    lurek.render.circle("fill", px + 39, py + 17, 2)
 end
 
 function lurek.render()
     -- background
     local bg = get_current_bg()
-    lurek.gfx.setColor(bg[1], bg[2], bg[3], 1)
-    lurek.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.render.setColor(bg[1], bg[2], bg[3], 1)
+    lurek.render.rectangle("fill", 0, 0, W, H)
 
     if ending_text then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(ending_text, W / 2 - 180, H / 2 - 40, 1.1)
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-        lurek.gfx.print("Press R to replay", W / 2 - 60, H / 2 + 60, 1)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(ending_text, W / 2 - 180, H / 2 - 40, 1.1)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.print("Press R to replay", W / 2 - 60, H / 2 + 60, 1)
         return
     end
 
@@ -298,23 +298,23 @@ function lurek.render()
     draw_portrait(entry.speaker, side)
 
     -- dialog box
-    lurek.gfx.setColor(0, 0, 0, 0.75)
-    lurek.gfx.rectangle("fill", 30, H - 160, W - 60, 130)
-    lurek.gfx.setColor(0.5, 0.5, 0.7, 1)
-    lurek.gfx.rectangle("line", 30, H - 160, W - 60, 130)
+    lurek.render.setColor(0, 0, 0, 0.75)
+    lurek.render.rectangle("fill", 30, H - 160, W - 60, 130)
+    lurek.render.setColor(0.5, 0.5, 0.7, 1)
+    lurek.render.rectangle("line", 30, H - 160, W - 60, 130)
 
     -- speaker name
     local name = CHAR_NAMES[entry.speaker] or ""
     if name ~= "" then
         local nc = CHAR_COLORS[entry.speaker] or { 1, 1, 1 }
-        lurek.gfx.setColor(nc[1], nc[2], nc[3], 1)
-        lurek.gfx.print(name, 50, H - 155, 1.1)
+        lurek.render.setColor(nc[1], nc[2], nc[3], 1)
+        lurek.render.print(name, 50, H - 155, 1.1)
     end
 
     -- text (typewriter)
     local shown = string.sub(entry.text, 1, char_index)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(shown, 50, H - 130, 1)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(shown, 50, H - 130, 1)
 
     -- choices
     if choices_visible and entry.choices then
@@ -324,29 +324,29 @@ function lurek.render()
             local mx, my = lurek.mouse.getPosition()
             local hover = mx > 60 and mx < 500 and my > cy and my < cy + 32
             if hover then
-                lurek.gfx.setColor(0.3, 0.3, 0.5, 0.9)
+                lurek.render.setColor(0.3, 0.3, 0.5, 0.9)
             else
-                lurek.gfx.setColor(0.15, 0.15, 0.25, 0.9)
+                lurek.render.setColor(0.15, 0.15, 0.25, 0.9)
             end
-            lurek.gfx.rectangle("fill", 60, cy, 440, 32)
-            lurek.gfx.setColor(1, 1, 0.8, 1)
-            lurek.gfx.print(i .. ". " .. ch.text, 75, cy + 6, 1)
+            lurek.render.rectangle("fill", 60, cy, 440, 32)
+            lurek.render.setColor(1, 1, 0.8, 1)
+            lurek.render.print(i .. ". " .. ch.text, 75, cy + 6, 1)
         end
     end
 
     -- controls hint
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.6)
-    lurek.gfx.print("Space=Advance  Tab=Skip  Click=Choose", 10, 10, 0.8)
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
+    lurek.render.print("Space=Advance  Tab=Skip  Click=Choose", 10, 10, 0.8)
 
     -- affection display
     local ay = 10
     for _, key in ipairs({"luna_char", "sol", "nova"}) do
         if affection[key] > 0 then
             local nc = CHAR_COLORS[key]
-            lurek.gfx.setColor(nc[1], nc[2], nc[3], 0.7)
+            lurek.render.setColor(nc[1], nc[2], nc[3], 0.7)
             local hearts = ""
             for h = 1, clamp(affection[key], 0, 5) do hearts = hearts .. "<3 " end
-            lurek.gfx.print(CHAR_NAMES[key] .. ": " .. hearts, W - 200, ay, 0.8)
+            lurek.render.print(CHAR_NAMES[key] .. ": " .. hearts, W - 200, ay, 0.8)
             ay = ay + 18
         end
     end

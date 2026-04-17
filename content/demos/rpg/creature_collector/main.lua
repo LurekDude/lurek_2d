@@ -98,7 +98,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Creature Collector")
-    lurek.gfx.setBackgroundColor(0.05, 0.08, 0.05)
+    lurek.render.setBackgroundColor(0.05, 0.08, 0.05)
     genMap()
     -- starter creature
     party[1] = makeCreature(creatureDB[1], 3)
@@ -140,90 +140,90 @@ function lurek.render()
             for x = 1, COLS do
                 local t = map[y][x]
                 local c = tileColors[t] or tileColors.grass
-                lurek.gfx.setColor(c[1], c[2], c[3], 1)
-                lurek.gfx.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
+                lurek.render.setColor(c[1], c[2], c[3], 1)
+                lurek.render.rectangle("fill", (x - 1) * TILE, (y - 1) * TILE, TILE - 1, TILE - 1)
             end
         end
 
         -- player
-        lurek.gfx.setColor(1, 0.85, 0.2, 1)
-        lurek.gfx.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
+        lurek.render.setColor(1, 0.85, 0.2, 1)
+        lurek.render.circle("fill", (player.gx - 0.5) * TILE, (player.gy - 0.5) * TILE, 12)
 
         -- HUD
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 0, ROWS * TILE, 800, 40)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, ROWS * TILE, 800, 40)
+        lurek.render.setColor(1, 1, 1, 1)
         local partyStr = "Party: "
         for i, c in ipairs(party) do
             partyStr = partyStr .. c.name .. "(HP:" .. c.hp .. "/" .. c.maxHp .. ") "
         end
-        lurek.gfx.print(partyStr, 10, ROWS * TILE + 5)
-        lurek.gfx.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
+        lurek.render.print(partyStr, 10, ROWS * TILE + 5)
+        lurek.render.print("Steps to encounter: ~" .. (encounterRate - stepCount), 10, ROWS * TILE + 22)
 
     elseif state == "battle" then
         local active = party[battle.activeIdx]
         local wild = battle.wild
 
         -- background
-        lurek.gfx.setColor(0.1, 0.15, 0.1, 1)
-        lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+        lurek.render.setColor(0.1, 0.15, 0.1, 1)
+        lurek.render.rectangle("fill", 0, 0, 800, 600)
 
         -- wild creature (right)
-        lurek.gfx.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
-        lurek.gfx.circle("fill", 580, 180, 45)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
+        lurek.render.setColor(wild.color[1], wild.color[2], wild.color[3], 1)
+        lurek.render.circle("fill", 580, 180, 45)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(wild.name .. " Lv" .. wild.level .. " [" .. wild.type .. "]", 500, 100)
         -- hp bar
-        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-        lurek.gfx.rectangle("fill", 500, 130, 160, 12)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", 500, 130, 160, 12)
         local whp = clamp(wild.hp / wild.maxHp, 0, 1)
-        lurek.gfx.setColor(1 - whp, whp, 0.1, 1)
-        lurek.gfx.rectangle("fill", 500, 130, 160 * whp, 12)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
+        lurek.render.setColor(1 - whp, whp, 0.1, 1)
+        lurek.render.rectangle("fill", 500, 130, 160 * whp, 12)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(wild.hp .. "/" .. wild.maxHp, 520, 145)
 
         -- player creature (left)
         if active then
-            lurek.gfx.setColor(active.color[1], active.color[2], active.color[3], 1)
-            lurek.gfx.circle("fill", 200, 350, 45)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-            lurek.gfx.rectangle("fill", 100, 300, 160, 12)
+            lurek.render.setColor(active.color[1], active.color[2], active.color[3], 1)
+            lurek.render.circle("fill", 200, 350, 45)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(active.name .. " Lv" .. active.level .. " [" .. active.type .. "]", 100, 270)
+            lurek.render.setColor(0.3, 0.3, 0.3, 1)
+            lurek.render.rectangle("fill", 100, 300, 160, 12)
             local php = clamp(active.hp / active.maxHp, 0, 1)
-            lurek.gfx.setColor(1 - php, php, 0.1, 1)
-            lurek.gfx.rectangle("fill", 100, 300, 160 * php, 12)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(active.hp .. "/" .. active.maxHp, 120, 315)
+            lurek.render.setColor(1 - php, php, 0.1, 1)
+            lurek.render.rectangle("fill", 100, 300, 160 * php, 12)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(active.hp .. "/" .. active.maxHp, 120, 315)
         end
 
         -- battle log
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 20, 440, 760, 50)
-        lurek.gfx.setColor(1, 1, 0.7, 1)
-        lurek.gfx.print(battleLog, 30, 450)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 20, 440, 760, 50)
+        lurek.render.setColor(1, 1, 0.7, 1)
+        lurek.render.print(battleLog, 30, 450)
 
         -- menu
         if battle.turn == "player" then
             local opts = { "Attack", "Capture", "Run" }
-            lurek.gfx.setColor(0, 0, 0, 0.8)
-            lurek.gfx.rectangle("fill", 20, 500, 760, 90)
+            lurek.render.setColor(0, 0, 0, 0.8)
+            lurek.render.rectangle("fill", 20, 500, 760, 90)
             for i, opt in ipairs(opts) do
                 if i == battleChoice then
-                    lurek.gfx.setColor(1, 1, 0.3, 1)
-                    lurek.gfx.print("> " .. opt, 30 + (i - 1) * 200, 530)
+                    lurek.render.setColor(1, 1, 0.3, 1)
+                    lurek.render.print("> " .. opt, 30 + (i - 1) * 200, 530)
                 else
-                    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-                    lurek.gfx.print("  " .. opt, 30 + (i - 1) * 200, 530)
+                    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+                    lurek.render.print("  " .. opt, 30 + (i - 1) * 200, 530)
                 end
             end
         elseif battle.turn == "result" then
-            lurek.gfx.setColor(0, 0, 0, 0.8)
-            lurek.gfx.rectangle("fill", 20, 500, 760, 90)
-            lurek.gfx.setColor(0.3, 1, 0.5, 1)
-            lurek.gfx.print(battle.result, 30, 520)
-            lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-            lurek.gfx.print("Press SPACE to continue", 30, 550)
+            lurek.render.setColor(0, 0, 0, 0.8)
+            lurek.render.rectangle("fill", 20, 500, 760, 90)
+            lurek.render.setColor(0.3, 1, 0.5, 1)
+            lurek.render.print(battle.result, 30, 520)
+            lurek.render.setColor(0.7, 0.7, 0.7, 1)
+            lurek.render.print("Press SPACE to continue", 30, 550)
         end
     end
 end

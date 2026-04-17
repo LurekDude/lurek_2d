@@ -94,7 +94,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Platformer Demo - Lurek2D")
-    lurek.gfx.setBackgroundColor(0.05, 0.07, 0.15)
+    lurek.render.setBackgroundColor(0.05, 0.07, 0.15)
     generate_level()
 
     -- Phase 4: load optional footstep sound for spatial audio demo
@@ -205,73 +205,73 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.push()
-    lurek.gfx.translate(-camera_x, 0)
+    lurek.render.push()
+    lurek.render.translate(-camera_x, 0)
 
     -- Draw sky gradient (simple horizontal bands)
     for i = 0, 5 do
         local shade = 0.05 + i * 0.02
-        lurek.gfx.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
-        lurek.gfx.rectangle("fill", camera_x, i * 100, 800, 100)
+        lurek.render.setColor(shade * 0.5, shade * 0.7, shade * 1.5)
+        lurek.render.rectangle("fill", camera_x, i * 100, 800, 100)
     end
 
     -- Draw platforms
     for _, p in ipairs(platforms) do
-        lurek.gfx.setColor(p.color[1], p.color[2], p.color[3])
-        lurek.gfx.rectangle("fill", p.x, p.y, p.w, p.h)
+        lurek.render.setColor(p.color[1], p.color[2], p.color[3])
+        lurek.render.rectangle("fill", p.x, p.y, p.w, p.h)
         -- Platform top highlight
-        lurek.gfx.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
-        lurek.gfx.rectangle("fill", p.x, p.y, p.w, 3)
+        lurek.render.setColor(p.color[1] + 0.1, p.color[2] + 0.1, p.color[3] + 0.1)
+        lurek.render.rectangle("fill", p.x, p.y, p.w, 3)
     end
 
     -- Draw coins
     for _, coin in ipairs(coins) do
         if not coin.collected then
             local bob_y = math.sin(coin.bob * 3) * 5
-            lurek.gfx.setColor(1.0, 0.85, 0.0)
-            lurek.gfx.circle("fill", coin.x, coin.y + bob_y, 8)
-            lurek.gfx.setColor(1.0, 0.95, 0.5)
-            lurek.gfx.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
+            lurek.render.setColor(1.0, 0.85, 0.0)
+            lurek.render.circle("fill", coin.x, coin.y + bob_y, 8)
+            lurek.render.setColor(1.0, 0.95, 0.5)
+            lurek.render.circle("fill", coin.x - 2, coin.y + bob_y - 2, 3)
         end
     end
 
     -- Draw particles
     for _, p in ipairs(particles) do
         local alpha = p.life / p.max_life
-        lurek.gfx.setColor(p.r, p.g, p.b, alpha)
-        lurek.gfx.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
+        lurek.render.setColor(p.r, p.g, p.b, alpha)
+        lurek.render.rectangle("fill", p.x - p.size / 2, p.y - p.size / 2, p.size, p.size)
     end
 
     -- Draw player
     if player.alive then
         -- Body
-        lurek.gfx.setColor(0.3, 0.6, 1.0)
-        lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+        lurek.render.setColor(0.3, 0.6, 1.0)
+        lurek.render.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
         local eye_x = player.x + (player.facing > 0 and 16 or 4)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.rectangle("fill", eye_x, player.y + 8, 6, 6)
-        lurek.gfx.setColor(0, 0, 0)
-        lurek.gfx.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.rectangle("fill", eye_x, player.y + 8, 6, 6)
+        lurek.render.setColor(0, 0, 0)
+        lurek.render.rectangle("fill", eye_x + (player.facing > 0 and 2 or 0), player.y + 10, 3, 3)
     end
 
-    lurek.gfx.pop()
+    lurek.render.pop()
 
     -- HUD (not affected by camera)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Coins: " .. tostring(player.score), 10, 10, 2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Coins: " .. tostring(player.score), 10, 10, 2)
 
     local fps = math.floor(lurek.time.getFPS())
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.print("FPS: " .. tostring(fps), 700, 10, 1.5)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.print("FPS: " .. tostring(fps), 700, 10, 1.5)
 
     if not player.alive then
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER - Press R to restart", 200, 280, 2.5)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER - Press R to restart", 200, 280, 2.5)
     end
 
-    lurek.gfx.setColor(0.4, 0.4, 0.4)
-    lurek.gfx.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
+    lurek.render.setColor(0.4, 0.4, 0.4)
+    lurek.render.print("Arrows/WASD + SPACE to jump", 10, 575, 1.5)
 end
 
 function lurek.keypressed(key)

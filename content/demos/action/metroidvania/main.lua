@@ -118,7 +118,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Metroidvania Exploration")
-    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.12)
     camera = lurek.camera.new(800, 600)
     camera:setZoom(2.5)
     loadRoom(0, 0)
@@ -186,12 +186,12 @@ end
 local function camera_apply()
     local x, y = camera:getPosition()
     local z    = camera:getZoom()
-    lurek.gfx.push()
-    lurek.gfx.scale(z, z)
-    lurek.gfx.translate(-x, -y)
+    lurek.render.push()
+    lurek.render.scale(z, z)
+    lurek.render.translate(-x, -y)
 end
 local function camera_reset()
-    lurek.gfx.pop()
+    lurek.render.pop()
 end
 
 function lurek.render()
@@ -204,11 +204,11 @@ function lurek.render()
             for col = 1, #rd.tiles[row] do
                 local v = rd.tiles[row][col]
                 local tx, ty = (col - 1) * tileSize, (row - 1) * tileSize
-                if v == 1 then lurek.gfx.setColor(0.3, 0.25, 0.4); lurek.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
-                elseif v == 2 then lurek.gfx.setColor(0.4, 0.5, 0.3); lurek.gfx.rectangle("fill", tx, ty, tileSize, 4)
+                if v == 1 then lurek.render.setColor(0.3, 0.25, 0.4); lurek.render.rectangle("fill", tx, ty, tileSize, tileSize)
+                elseif v == 2 then lurek.render.setColor(0.4, 0.5, 0.3); lurek.render.rectangle("fill", tx, ty, tileSize, 4)
                 elseif v == 3 then
-                    if player.hasDash then lurek.gfx.setColor(0.2, 0.2, 0.2, 0.3) else lurek.gfx.setColor(0.8, 0.2, 0.2) end
-                    lurek.gfx.rectangle("fill", tx, ty, tileSize, tileSize)
+                    if player.hasDash then lurek.render.setColor(0.2, 0.2, 0.2, 0.3) else lurek.render.setColor(0.8, 0.2, 0.2) end
+                    lurek.render.rectangle("fill", tx, ty, tileSize, tileSize)
                 end
             end
         end
@@ -216,47 +216,47 @@ function lurek.render()
     -- Items
     for _, it in ipairs(items) do
         if it.alive then
-            if it.kind == "dash" then lurek.gfx.setColor(0.2, 0.8, 1) else lurek.gfx.setColor(0, 1, 0.4) end
-            lurek.gfx.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
+            if it.kind == "dash" then lurek.render.setColor(0.2, 0.8, 1) else lurek.render.setColor(0, 1, 0.4) end
+            lurek.render.rectangle("fill", it.x + 2, it.y + 2, it.w, it.h)
         end
     end
     -- Enemies
     for _, e in ipairs(enemies) do
-        if e.alive then lurek.gfx.setColor(0.9, 0.2, 0.2); lurek.gfx.rectangle("fill", e.x, e.y, e.w, e.h) end
+        if e.alive then lurek.render.setColor(0.9, 0.2, 0.2); lurek.render.rectangle("fill", e.x, e.y, e.w, e.h) end
     end
     -- Player
     local blink = player.invincible > 0 and math.sin(lurek.time.getTime() * 20) > 0
     if not blink then
-        if player.dashing then lurek.gfx.setColor(0.5, 0.8, 1) else lurek.gfx.setColor(0.3, 0.9, 0.4) end
-        lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+        if player.dashing then lurek.render.setColor(0.5, 0.8, 1) else lurek.render.setColor(0.3, 0.9, 0.4) end
+        lurek.render.rectangle("fill", player.x, player.y, player.w, player.h)
         -- Eyes
-        lurek.gfx.setColor(1, 1, 1)
+        lurek.render.setColor(1, 1, 1)
         local ex = player.facing > 0 and player.x + 9 or player.x + 3
-        lurek.gfx.rectangle("fill", ex, player.y + 5, 4, 4)
+        lurek.render.rectangle("fill", ex, player.y + 5, 4, 4)
     end
     camera_reset()
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
-    lurek.gfx.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
-    lurek.gfx.print("Score: " .. score, 10, 42)
-    if player.hasDash then lurek.gfx.setColor(0.2, 0.8, 1); lurek.gfx.print("[DASH]", 10, 58) end
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("HP: " .. player.hp .. "/" .. player.maxHp, 10, 10)
+    lurek.render.print("Room: " .. currentRoom.x .. "," .. currentRoom.y, 10, 26)
+    lurek.render.print("Score: " .. score, 10, 42)
+    if player.hasDash then lurek.render.setColor(0.2, 0.8, 1); lurek.render.print("[DASH]", 10, 58) end
     -- Minimap
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 700, 10, 80, 80)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 700, 10, 80, 80)
     for key, _ in pairs(visited) do
         local parts = {}; for p in key:gmatch("[^,]+") do parts[#parts + 1] = tonumber(p) end
         local mx = 740 + parts[1] * 18
         local my = 50 + parts[2] * 18
-        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then lurek.gfx.setColor(0.3, 0.9, 0.4)
-        else lurek.gfx.setColor(0.5, 0.5, 0.6) end
-        lurek.gfx.rectangle("fill", mx, my, 14, 14)
+        if parts[1] == currentRoom.x and parts[2] == currentRoom.y then lurek.render.setColor(0.3, 0.9, 0.4)
+        else lurek.render.setColor(0.5, 0.5, 0.6) end
+        lurek.render.rectangle("fill", mx, my, 14, 14)
     end
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.7); lurek.gfx.rectangle("fill", 0, 0, 800, 600)
-        lurek.gfx.setColor(1, 0.2, 0.2); lurek.gfx.print("GAME OVER - Press R to restart", 260, 280, 1.5)
+        lurek.render.setColor(0, 0, 0, 0.7); lurek.render.rectangle("fill", 0, 0, 800, 600)
+        lurek.render.setColor(1, 0.2, 0.2); lurek.render.print("GAME OVER - Press R to restart", 260, 280, 1.5)
     end
-    lurek.gfx.setColor(0.5, 0.5, 0.5); lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 580)
+    lurek.render.setColor(0.5, 0.5, 0.5); lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 580)
 end
 
 function lurek.keypressed(key)

@@ -40,7 +40,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Party Games")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.15)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.15)
 end
 
 function lurek.process(dt)
@@ -117,35 +117,35 @@ end
 
 function lurek.render()
     if state == "menu" then
-        lurek.gfx.setColor(1, 0.85, 0.3, 1)
-        lurek.gfx.print("PARTY GAMES", 300, 60, 1.8)
+        lurek.render.setColor(1, 0.85, 0.3, 1)
+        lurek.render.print("PARTY GAMES", 300, 60, 1.8)
         for i, name in ipairs(gameNames) do
-            lurek.gfx.setColor(0.4, 0.6, 1, 1)
-            lurek.gfx.rectangle("fill", 280, 140 + i * 70, 240, 50)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(i .. ") " .. name, 310, 155 + i * 70, 1.2)
+            lurek.render.setColor(0.4, 0.6, 1, 1)
+            lurek.render.rectangle("fill", 280, 140 + i * 70, 240, 50)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(i .. ") " .. name, 310, 155 + i * 70, 1.2)
         end
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-        lurek.gfx.print("Total Score: " .. totalScore, 310, 500)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.print("Total Score: " .. totalScore, 310, 500)
 
     elseif state == "quickdraw" then
         if qd.phase == "wait" then
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("Wait for GREEN...", 290, 280, 1.3)
-            lurek.gfx.setColor(0.8, 0.2, 0.2, 1)
-            lurek.gfx.circle("fill", 400, 200, 60)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("Wait for GREEN...", 290, 280, 1.3)
+            lurek.render.setColor(0.8, 0.2, 0.2, 1)
+            lurek.render.circle("fill", 400, 200, 60)
         elseif qd.phase == "go" then
-            lurek.gfx.setColor(0.1, 0.9, 0.1, 1)
-            lurek.gfx.circle("fill", 400, 200, 60)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("PRESS SPACE NOW!", 280, 300, 1.5)
+            lurek.render.setColor(0.1, 0.9, 0.1, 1)
+            lurek.render.circle("fill", 400, 200, 60)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("PRESS SPACE NOW!", 280, 300, 1.5)
         elseif qd.phase == "done" then
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(qd.result, 260, 250, 1.2)
-            lurek.gfx.print("Score: +" .. qd.roundScore, 330, 300)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(qd.result, 260, 250, 1.2)
+            lurek.render.print("Score: +" .. qd.roundScore, 330, 300)
         elseif qd.phase == "early" then
-            lurek.gfx.setColor(1, 0.3, 0.3, 1)
-            lurek.gfx.print("TOO EARLY! Press Space to retry", 230, 280, 1.1)
+            lurek.render.setColor(1, 0.3, 0.3, 1)
+            lurek.render.print("TOO EARLY! Press Space to retry", 230, 280, 1.1)
         end
 
     elseif state == "memory" then
@@ -154,57 +154,57 @@ function lurek.render()
             local cx = ((i - 1) % cols) * 90 + 220
             local cy = math.floor((i - 1) / cols) * 90 + 100
             if c.matched then
-                lurek.gfx.setColor(0.15, 0.15, 0.15, 1)
+                lurek.render.setColor(0.15, 0.15, 0.15, 1)
             elseif c.revealed then
-                lurek.gfx.setColor(c.color[1], c.color[2], c.color[3], 1)
+                lurek.render.setColor(c.color[1], c.color[2], c.color[3], 1)
             else
-                lurek.gfx.setColor(0.35, 0.35, 0.5, 1)
+                lurek.render.setColor(0.35, 0.35, 0.5, 1)
             end
-            lurek.gfx.rectangle("fill", cx, cy, 75, 75)
+            lurek.render.rectangle("fill", cx, cy, 75, 75)
         end
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Moves: " .. mm.moves .. "  Pairs: " .. mm.pairs .. "/8", 10, 10)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Moves: " .. mm.moves .. "  Pairs: " .. mm.pairs .. "/8", 10, 10)
         if mm.done then
-            lurek.gfx.setColor(0, 1, 0.4, 1)
-            lurek.gfx.print("COMPLETE! Press M for menu", 260, 520)
+            lurek.render.setColor(0, 1, 0.4, 1)
+            lurek.render.print("COMPLETE! Press M for menu", 260, 520)
         end
 
     elseif state == "dodge" then
         -- player
-        lurek.gfx.setColor(0.2, 0.7, 1, 1)
-        lurek.gfx.circle("fill", db.px, 560, 14)
+        lurek.render.setColor(0.2, 0.7, 1, 1)
+        lurek.render.circle("fill", db.px, 560, 14)
         -- balls
-        lurek.gfx.setColor(1, 0.3, 0.2, 1)
+        lurek.render.setColor(1, 0.3, 0.2, 1)
         for _, b in ipairs(db.balls) do
-            lurek.gfx.circle("fill", b.x, b.y, b.r)
+            lurek.render.circle("fill", b.x, b.y, b.r)
         end
         -- HUD
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Time: " .. math.floor(db.timer) .. "  Dodged: " .. db.dodged, 10, 10)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Time: " .. math.floor(db.timer) .. "  Dodged: " .. db.dodged, 10, 10)
         if not db.alive then
-            lurek.gfx.setColor(1, 0.3, 0.3, 1)
-            lurek.gfx.print(db.timer <= 0 and "TIME UP!" or "HIT!", 360, 300, 1.5)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("Press M for menu", 320, 350)
+            lurek.render.setColor(1, 0.3, 0.3, 1)
+            lurek.render.print(db.timer <= 0 and "TIME UP!" or "HIT!", 360, 300, 1.5)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("Press M for menu", 320, 350)
         end
 
     elseif state == "scores" then
-        lurek.gfx.setColor(1, 0.9, 0.3, 1)
-        lurek.gfx.print("SCOREBOARD", 310, 80, 1.5)
+        lurek.render.setColor(1, 0.9, 0.3, 1)
+        lurek.render.print("SCOREBOARD", 310, 80, 1.5)
         for i, name in ipairs(gameNames) do
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(name .. ": " .. gameScores[i], 280, 140 + i * 40)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(name .. ": " .. gameScores[i], 280, 140 + i * 40)
         end
         totalScore = gameScores[1] + gameScores[2] + gameScores[3]
-        lurek.gfx.setColor(0.3, 1, 0.5, 1)
-        lurek.gfx.print("Total: " .. totalScore, 320, 360, 1.3)
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-        lurek.gfx.print("Press M for menu", 310, 440)
+        lurek.render.setColor(0.3, 1, 0.5, 1)
+        lurek.render.print("Total: " .. totalScore, 320, 360, 1.3)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.print("Press M for menu", 310, 440)
     end
 
     -- global nav
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("M=Menu  ESC=Quit", 600, 580)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("M=Menu  ESC=Quit", 600, 580)
 end
 
 function lurek.keypressed(key)

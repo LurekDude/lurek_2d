@@ -75,7 +75,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Tower Defense")
-    lurek.gfx.setBackgroundColor(0.12, 0.15, 0.1)
+    lurek.render.setBackgroundColor(0.12, 0.15, 0.1)
     -- Mark path tiles
     for gx = 0, COLS - 1 do
         for gy = 0, ROWS - 1 do
@@ -213,75 +213,75 @@ function lurek.render()
             local cell = grid[key]
             local px, py = gx * TILE, gy * TILE
             if cell and cell.path then
-                lurek.gfx.setColor(0.3, 0.28, 0.2, 1)
+                lurek.render.setColor(0.3, 0.28, 0.2, 1)
             else
-                lurek.gfx.setColor(0.18, 0.22, 0.14, 1)
+                lurek.render.setColor(0.18, 0.22, 0.14, 1)
             end
-            lurek.gfx.rectangle("fill", px, py, TILE, TILE)
-            lurek.gfx.setColor(0.1, 0.12, 0.08, 0.3)
-            lurek.gfx.rectangle("line", px, py, TILE, TILE)
+            lurek.render.rectangle("fill", px, py, TILE, TILE)
+            lurek.render.setColor(0.1, 0.12, 0.08, 0.3)
+            lurek.render.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Towers
     for _, tw in ipairs(towers) do
         if tw.kind == "basic" then
-            lurek.gfx.setColor(0.3, 0.7, 0.9, 1)
+            lurek.render.setColor(0.3, 0.7, 0.9, 1)
         else
-            lurek.gfx.setColor(0.8, 0.4, 0.2, 1)
+            lurek.render.setColor(0.8, 0.4, 0.2, 1)
         end
-        lurek.gfx.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
-        lurek.gfx.setColor(0.1, 0.1, 0.1, 1)
-        lurek.gfx.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
+        lurek.render.rectangle("fill", tw.x - 12, tw.y - 12, 24, 24)
+        lurek.render.setColor(0.1, 0.1, 0.1, 1)
+        lurek.render.rectangle("line", tw.x - 12, tw.y - 12, 24, 24)
         -- Range indicator on hover
         local mx, my = lurek.mouse.getPosition()
         if distXY(mx, my, tw.x, tw.y) < 18 then
-            lurek.gfx.setColor(1, 1, 1, 0.1)
-            lurek.gfx.circle("line", tw.x, tw.y, tw.range)
+            lurek.render.setColor(1, 1, 1, 0.1)
+            lurek.render.circle("line", tw.x, tw.y, tw.range)
         end
     end
 
     -- Enemies
     for _, e in ipairs(enemies) do
-        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
-        lurek.gfx.circle("fill", e.x, e.y, 8)
+        lurek.render.setColor(0.9, 0.2, 0.2, 1)
+        lurek.render.circle("fill", e.x, e.y, 8)
         -- HP bar
-        lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-        lurek.gfx.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
-        lurek.gfx.setColor(0.1, 0.9, 0.1, 1)
-        lurek.gfx.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
+        lurek.render.setColor(0.2, 0.2, 0.2, 1)
+        lurek.render.rectangle("fill", e.x - 10, e.y - 14, 20, 4)
+        lurek.render.setColor(0.1, 0.9, 0.1, 1)
+        lurek.render.rectangle("fill", e.x - 10, e.y - 14, 20 * (e.hp / e.maxHp), 4)
     end
 
     -- Projectiles
-    lurek.gfx.setColor(1, 1, 0.6, 1)
+    lurek.render.setColor(1, 1, 0.6, 1)
     for _, p in ipairs(projectiles) do
-        lurek.gfx.circle("fill", p.x, p.y, 3)
+        lurek.render.circle("fill", p.x, p.y, 3)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2.5)
-        lurek.gfx.circle("fill", p.x, p.y, 3)
+        lurek.render.setColor(p.r, p.g, p.b, p.life * 2.5)
+        lurek.render.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 30, W, 30)
-    lurek.gfx.setColor(1, 0.85, 0.2, 1)
-    lurek.gfx.print("Gold: " .. cash, 10, H - 24)
-    lurek.gfx.setColor(1, 0.3, 0.3, 1)
-    lurek.gfx.print("Lives: " .. lives, 120, H - 24)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Wave: " .. wave, 230, H - 24)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, H - 30, W, 30)
+    lurek.render.setColor(1, 0.85, 0.2, 1)
+    lurek.render.print("Gold: " .. cash, 10, H - 24)
+    lurek.render.setColor(1, 0.3, 0.3, 1)
+    lurek.render.print("Lives: " .. lives, 120, H - 24)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Wave: " .. wave, 230, H - 24)
     local tInfo = towerType == "basic" and "[1]Basic(20g)" or "[2]Cannon(40g)"
-    lurek.gfx.print(tInfo .. "  [N]NextWave", 340, H - 24)
-    lurek.gfx.print("FPS:" .. lurek.time.getFPS(), W - 70, H - 24)
+    lurek.render.print(tInfo .. "  [N]NextWave", 340, H - 24)
+    lurek.render.print("FPS:" .. lurek.time.getFPS(), W - 70, H - 24)
 
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 250, 260, 300, 60)
-        lurek.gfx.setColor(1, 0.2, 0.2, 1)
-        lurek.gfx.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 250, 260, 300, 60)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.print("GAME OVER — Wave " .. wave, 280, 275, 1.5)
     end
 end
 

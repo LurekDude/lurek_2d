@@ -72,7 +72,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Social Deduction")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     init_game()
 end
 
@@ -227,14 +227,14 @@ local function draw_task_phase()
         if not t.done then
             local visible = dist(me, t) < VISION_RADIUS
             if visible then
-                lurek.gfx.setColor(1, 1, 0.3, 0.8)
-                lurek.gfx.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
-                lurek.gfx.setColor(0, 0, 0, 1)
-                lurek.gfx.print("!", t.x - 3, t.y - 8, 1)
+                lurek.render.setColor(1, 1, 0.3, 0.8)
+                lurek.render.rectangle("fill", t.x - 10, t.y - 10, 20, 20)
+                lurek.render.setColor(0, 0, 0, 1)
+                lurek.render.print("!", t.x - 3, t.y - 8, 1)
             end
         else
-            lurek.gfx.setColor(0.2, 0.5, 0.2, 0.5)
-            lurek.gfx.rectangle("line", t.x - 10, t.y - 10, 20, 20)
+            lurek.render.setColor(0.2, 0.5, 0.2, 0.5)
+            lurek.render.rectangle("line", t.x - 10, t.y - 10, 20, 20)
         end
     end
 
@@ -245,63 +245,63 @@ local function draw_task_phase()
             local visible = (i == player_id) or (dist(me, p) < VISION_RADIUS)
             if visible then
                 local c = COLORS[i]
-                lurek.gfx.setColor(c[1], c[2], c[3], 1)
-                lurek.gfx.circle("fill", p.x, p.y, 14)
-                lurek.gfx.setColor(1, 1, 1, 0.9)
-                lurek.gfx.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
+                lurek.render.setColor(c[1], c[2], c[3], 1)
+                lurek.render.circle("fill", p.x, p.y, 14)
+                lurek.render.setColor(1, 1, 1, 0.9)
+                lurek.render.print(NAMES[i], p.x - 10, p.y - 28, 0.7)
             end
         end
     end
 
     -- vision circle
-    lurek.gfx.setColor(1, 1, 1, 0.08)
-    lurek.gfx.circle("line", me.x, me.y, VISION_RADIUS)
+    lurek.render.setColor(1, 1, 1, 0.08)
+    lurek.render.circle("line", me.x, me.y, VISION_RADIUS)
 
     -- HUD
-    lurek.gfx.setColor(0.2, 0.2, 0.3, 0.8)
-    lurek.gfx.rectangle("fill", 0, 0, W, 36)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
+    lurek.render.setColor(0.2, 0.2, 0.3, 0.8)
+    lurek.render.rectangle("fill", 0, 0, W, 36)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Tasks: " .. progress .. "/" .. TASK_COUNT, 10, 8, 1)
     -- progress bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 200, 10, 200, 16)
-    lurek.gfx.setColor(0.2, 0.9, 0.3, 1)
-    lurek.gfx.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 200, 10, 200, 16)
+    lurek.render.setColor(0.2, 0.9, 0.3, 1)
+    lurek.render.rectangle("fill", 200, 10, 200 * (progress / TASK_COUNT), 16)
 
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     local role = (player_id == traitor_id) and "TRAITOR" or "CREW"
-    lurek.gfx.print("Role: " .. role, 500, 8, 1)
-    lurek.gfx.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
+    lurek.render.print("Role: " .. role, 500, 8, 1)
+    lurek.render.print("M=Meeting  WASD=Move", 10, H - 22, 0.8)
     if player_id == traitor_id then
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
-        lurek.gfx.print("S=Sabotage", 680, 8, 1)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
+        lurek.render.print("S=Sabotage", 680, 8, 1)
     end
 end
 
 local function draw_meeting()
-    lurek.gfx.setColor(0.15, 0.15, 0.25, 1)
-    lurek.gfx.rectangle("fill", 50, 50, W - 100, H - 100)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
-    lurek.gfx.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
-    lurek.gfx.print("Click a name to vote", W / 2 - 65, 120, 0.9)
+    lurek.render.setColor(0.15, 0.15, 0.25, 1)
+    lurek.render.rectangle("fill", 50, 50, W - 100, H - 100)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("EMERGENCY MEETING", W / 2 - 90, 70, 1.5)
+    lurek.render.print("Time: " .. math.floor(meeting_timer), W / 2 - 20, 100, 1)
+    lurek.render.print("Click a name to vote", W / 2 - 65, 120, 0.9)
 
     local y = 160
     for i = 1, 6 do
         local p = players[i]
         local c = COLORS[i]
         if p.alive then
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
-            lurek.gfx.circle("fill", 120, y + 10, 12)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print(NAMES[i], 145, y, 1.2)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
+            lurek.render.circle("fill", 120, y + 10, 12)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print(NAMES[i], 145, y, 1.2)
             if meeting_votes[player_id] == i then
-                lurek.gfx.setColor(1, 1, 0, 1)
-                lurek.gfx.print(" <-- YOUR VOTE", 260, y, 1)
+                lurek.render.setColor(1, 1, 0, 1)
+                lurek.render.print(" <-- YOUR VOTE", 260, y, 1)
             end
         else
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-            lurek.gfx.print(NAMES[i] .. " (eliminated)", 145, y, 1)
+            lurek.render.setColor(0.4, 0.4, 0.4, 1)
+            lurek.render.print(NAMES[i] .. " (eliminated)", 145, y, 1)
         end
         y = y + 45
     end
@@ -309,9 +309,9 @@ end
 
 function lurek.render()
     if game_over then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
-        lurek.gfx.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(game_result, W / 2 - 140, H / 2 - 20, 1.3)
+        lurek.render.print("Press R to restart", W / 2 - 60, H / 2 + 20, 1)
         return
     end
     if phase == "task" then
@@ -320,8 +320,8 @@ function lurek.render()
         draw_meeting()
     end
     if message and msg_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
-        lurek.gfx.print(message, W / 2 - 120, H / 2, 1)
+        lurek.render.setColor(1, 1, 0.5, clamp(msg_timer, 0, 1))
+        lurek.render.print(message, W / 2 - 120, H / 2, 1)
     end
 end
 

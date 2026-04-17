@@ -89,7 +89,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Tactical Battle")
-    lurek.gfx.setBackgroundColor(0.15, 0.12, 0.1)
+    lurek.render.setBackgroundColor(0.15, 0.12, 0.1)
     -- Player units (blue)
     table.insert(units, makeUnit(1, 5, "player", "knight"))
     table.insert(units, makeUnit(1, 2, "player", "knight"))
@@ -176,26 +176,26 @@ function lurek.render()
         for gy = 0, GRID - 1 do
             local px, py = OX + gx * TILE, OY + gy * TILE
             if (gx + gy) % 2 == 0 then
-                lurek.gfx.setColor(0.25, 0.22, 0.18, 1)
+                lurek.render.setColor(0.25, 0.22, 0.18, 1)
             else
-                lurek.gfx.setColor(0.3, 0.27, 0.22, 1)
+                lurek.render.setColor(0.3, 0.27, 0.22, 1)
             end
-            lurek.gfx.rectangle("fill", px, py, TILE, TILE)
-            lurek.gfx.setColor(0.15, 0.12, 0.1, 1)
-            lurek.gfx.rectangle("line", px, py, TILE, TILE)
+            lurek.render.rectangle("fill", px, py, TILE, TILE)
+            lurek.render.setColor(0.15, 0.12, 0.1, 1)
+            lurek.render.rectangle("line", px, py, TILE, TILE)
         end
     end
 
     -- Reachable tiles
-    lurek.gfx.setColor(0.2, 0.5, 0.9, 0.25)
+    lurek.render.setColor(0.2, 0.5, 0.9, 0.25)
     for _, r in ipairs(reachable) do
-        lurek.gfx.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
+        lurek.render.rectangle("fill", OX + r.x * TILE, OY + r.y * TILE, TILE, TILE)
     end
 
     -- Attackable highlights
-    lurek.gfx.setColor(0.9, 0.2, 0.2, 0.3)
+    lurek.render.setColor(0.9, 0.2, 0.2, 0.3)
     for _, a in ipairs(attackable) do
-        lurek.gfx.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
+        lurek.render.rectangle("fill", OX + a.gx * TILE, OY + a.gy * TILE, TILE, TILE)
     end
 
     -- Units
@@ -205,55 +205,55 @@ function lurek.render()
             local py = OY + u.gy * TILE + TILE / 2
             -- Team color
             if u.team == "player" then
-                lurek.gfx.setColor(0.2, 0.4, 0.9, 1)
+                lurek.render.setColor(0.2, 0.4, 0.9, 1)
             else
-                lurek.gfx.setColor(0.9, 0.25, 0.2, 1)
+                lurek.render.setColor(0.9, 0.25, 0.2, 1)
             end
             if u.class == "knight" then
-                lurek.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
+                lurek.render.rectangle("fill", px - 14, py - 14, 28, 28)
             else
-                lurek.gfx.circle("fill", px, py, 14)
+                lurek.render.circle("fill", px, py, 14)
             end
             -- Selection ring
             if selected == i then
-                lurek.gfx.setColor(1, 1, 0, 1)
-                lurek.gfx.setLineWidth(2)
-                lurek.gfx.circle("line", px, py, 20)
-                lurek.gfx.setLineWidth(1)
+                lurek.render.setColor(1, 1, 0, 1)
+                lurek.render.setLineWidth(2)
+                lurek.render.circle("line", px, py, 20)
+                lurek.render.setLineWidth(1)
             end
             -- HP bar
             local hpFrac = u.hp / u.maxHp
-            lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-            lurek.gfx.rectangle("fill", px - 14, py + 18, 28, 4)
-            lurek.gfx.setColor(0.1, 0.9, 0.2, 1)
-            lurek.gfx.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
+            lurek.render.setColor(0.2, 0.2, 0.2, 1)
+            lurek.render.rectangle("fill", px - 14, py + 18, 28, 4)
+            lurek.render.setColor(0.1, 0.9, 0.2, 1)
+            lurek.render.rectangle("fill", px - 14, py + 18, 28 * hpFrac, 4)
             -- Label
-            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.render.setColor(1, 1, 1, 1)
             local label = u.class == "knight" and "K" or "A"
-            lurek.gfx.print(label, px - 4, py - 6)
+            lurek.render.print(label, px - 4, py - 6)
             -- Moved indicator
             if u.moved then
-                lurek.gfx.setColor(0.5, 0.5, 0.5, 0.5)
-                lurek.gfx.rectangle("fill", px - 14, py - 14, 28, 28)
+                lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
+                lurek.render.rectangle("fill", px - 14, py - 14, 28, 28)
             end
         end
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Turn: " .. turn, 10, 10)
-    lurek.gfx.print("[Enter] End Turn", 10, 30)
-    lurek.gfx.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Turn: " .. turn, 10, 10)
+    lurek.render.print("[Enter] End Turn", 10, 30)
+    lurek.render.print("K=Knight(melee)  A=Archer(ranged)", 10, 560)
 
     -- Message
     if msgTimer > 0 then
-        lurek.gfx.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
-        lurek.gfx.print(gameMessage, 240, 10, 1.2)
+        lurek.render.setColor(1, 1, 0.5, clamp(msgTimer, 0, 1))
+        lurek.render.print(gameMessage, 240, 10, 1.2)
     end
 
     if gameOver then
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(gameMessage, 300, 280, 2)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(gameMessage, 300, 280, 2)
     end
 end
 

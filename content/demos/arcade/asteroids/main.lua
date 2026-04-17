@@ -95,7 +95,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0.02)
+    lurek.render.setBackgroundColor(0, 0, 0.02)
     score = 0; lives = 3; wave = 1
     reset_ship()
     init_wave()
@@ -214,9 +214,9 @@ local function draw_ship(sx, sy, angle)
     local x1, y1 = rot(16, 0)
     local x2, y2 = rot(-10, -9)
     local x3, y3 = rot(-10, 9)
-    lurek.gfx.line(x1, y1, x2, y2)
-    lurek.gfx.line(x2, y2, x3, y3)
-    lurek.gfx.line(x3, y3, x1, y1)
+    lurek.render.line(x1, y1, x2, y2)
+    lurek.render.line(x2, y2, x3, y3)
+    lurek.render.line(x3, y3, x1, y1)
 end
 
 local star_seed = 7
@@ -225,30 +225,30 @@ function lurek.render()
     math.randomseed(star_seed)
     for i = 1, 90 do
         local alpha = 0.3 + math.random() * 0.5
-        lurek.gfx.setColor(alpha, alpha, alpha)
-        lurek.gfx.circle("fill", math.random(W), math.random(H), 1)
+        lurek.render.setColor(alpha, alpha, alpha)
+        lurek.render.circle("fill", math.random(W), math.random(H), 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("ASTEROIDS", W/2 - 55, 5, 2)
-    lurek.gfx.setColor(0.8, 0.9, 1)
-    lurek.gfx.print("Score: " .. score, 8, 8, 1.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("Lives: " .. lives, W - 100, 8, 1.5)
-    lurek.gfx.setColor(0.5, 0.6, 0.8)
-    lurek.gfx.print("Wave " .. wave, W - 70, H - 20, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("ASTEROIDS", W/2 - 55, 5, 2)
+    lurek.render.setColor(0.8, 0.9, 1)
+    lurek.render.print("Score: " .. score, 8, 8, 1.5)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("Lives: " .. lives, W - 100, 8, 1.5)
+    lurek.render.setColor(0.5, 0.6, 0.8)
+    lurek.render.print("Wave " .. wave, W - 70, H - 20, 1.5)
 
     -- Particles
     for _, p in ipairs(particles) do
         local t = p.life / p.max_life
-        lurek.gfx.setColor(1, 0.6 * t + 0.2, 0.1, t)
-        lurek.gfx.circle("fill", p.x, p.y, p.size * t)
+        lurek.render.setColor(1, 0.6 * t + 0.2, 0.1, t)
+        lurek.render.circle("fill", p.x, p.y, p.size * t)
     end
 
     -- Asteroids
-    lurek.gfx.setColor(0.8, 0.75, 0.65)
+    lurek.render.setColor(0.8, 0.75, 0.65)
     for _, a in ipairs(asteroids) do
         local rad = deg2rad(a.angle)
         local cos_a, sin_a = math.cos(rad), math.sin(rad)
@@ -260,14 +260,14 @@ function lurek.render()
                 local y1 = a.y + v1[1] * sin_a + v1[2] * cos_a
                 local x2 = a.x + v2[1] * cos_a - v2[2] * sin_a
                 local y2 = a.y + v2[1] * sin_a + v2[2] * cos_a
-                lurek.gfx.line(x1, y1, x2, y2)
+                lurek.render.line(x1, y1, x2, y2)
             end
         end
     end
 
     -- Ship (blink when invincible)
     if game_state == "playing" and (invincible <= 0 or math.floor(invincible * 8) % 2 == 0) then
-        lurek.gfx.setColor(0.4, 0.9, 1.0)
+        lurek.render.setColor(0.4, 0.9, 1.0)
         draw_ship(ship.x, ship.y, ship.angle)
         -- Thrust flame
         if ship.thrusting then
@@ -275,27 +275,27 @@ function lurek.render()
             local cos_a, sin_a = math.cos(rad), math.sin(rad)
             local fx = ship.x + math.cos(deg2rad(ship.angle)) * (-12)
             local fy = ship.y + math.sin(deg2rad(ship.angle)) * (-12)
-            lurek.gfx.setColor(1, 0.5, 0.1, 0.8)
-            lurek.gfx.circle("fill", fx, fy, 5 + math.random() * 4)
+            lurek.render.setColor(1, 0.5, 0.1, 0.8)
+            lurek.render.circle("fill", fx, fy, 5 + math.random() * 4)
         end
     end
 
     -- Bullets
-    lurek.gfx.setColor(1, 1, 0.6)
+    lurek.render.setColor(1, 1, 0.6)
     for _, b in ipairs(bullets) do
-        lurek.gfx.circle("fill", b.x, b.y, 3)
+        lurek.render.circle("fill", b.x, b.y, 3)
     end
 
     -- Overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.3, 0.3)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.3, 0.3)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

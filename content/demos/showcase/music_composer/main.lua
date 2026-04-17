@@ -171,14 +171,14 @@ local function draw_waveform()
     local ww = GRID_COLS * CELL_W
     local wh = 40
 
-    lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
-    lurek.gfx.rectangle("fill", wx, wy, ww, wh)
+    lurek.render.setColor(0.15, 0.15, 0.2, 1)
+    lurek.render.rectangle("fill", wx, wy, ww, wh)
 
     local time = lurek.time.getTime()
     for t = 1, 3 do
         if not track_muted[t] then
             local tc = track_colors[t]
-            lurek.gfx.setColor(tc[1], tc[2], tc[3], 0.6)
+            lurek.render.setColor(tc[1], tc[2], tc[3], 0.6)
             local beat = math.floor(play_cursor) + 1
             local active = 0
             if beat >= 1 and beat <= GRID_COLS then
@@ -188,56 +188,56 @@ local function draw_waveform()
             end
             -- Draw sine-like wave scaled by active notes
             local amp = active * 6
-            lurek.gfx.setLineWidth(1.5)
+            lurek.render.setLineWidth(1.5)
             for px = 0, ww - 2 do
                 local phase = (px / ww) * 12 + time * (3 + t) + t * 2
                 local y1 = wy + wh / 2 + math.sin(phase) * amp
                 local y2 = wy + wh / 2 + math.sin(phase + 0.1) * amp
-                lurek.gfx.line(wx + px, y1, wx + px + 1, y2)
+                lurek.render.line(wx + px, y1, wx + px + 1, y2)
             end
         end
     end
-    lurek.gfx.setLineWidth(1)
+    lurek.render.setLineWidth(1)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
 
     -- Title bar
-    lurek.gfx.setColor(0.9, 0.7, 1, 1)
-    lurek.gfx.print("Music Composer", 10, 5, 1.2)
-    lurek.gfx.setColor(0.7, 0.7, 0.8, 1)
-    lurek.gfx.print("Track: " .. track_names[current_track], 200, 8, 0.85)
-    lurek.gfx.print("BPM: " .. bpm, 370, 8, 0.85)
-    lurek.gfx.print(playing and "PLAYING" or "STOPPED", 460, 8, 0.85)
-    lurek.gfx.print(looping and "[LOOP]" or "", 560, 8, 0.85)
+    lurek.render.setColor(0.9, 0.7, 1, 1)
+    lurek.render.print("Music Composer", 10, 5, 1.2)
+    lurek.render.setColor(0.7, 0.7, 0.8, 1)
+    lurek.render.print("Track: " .. track_names[current_track], 200, 8, 0.85)
+    lurek.render.print("BPM: " .. bpm, 370, 8, 0.85)
+    lurek.render.print(playing and "PLAYING" or "STOPPED", 460, 8, 0.85)
+    lurek.render.print(looping and "[LOOP]" or "", 560, 8, 0.85)
 
     -- Controls
-    lurek.gfx.setColor(0.5, 0.5, 0.55, 1)
-    lurek.gfx.print("Space=play/stop | 1/2/3=track | Up/Down=BPM | L=loop | C=clear | M=mute | E=export | Esc=quit", 10, 30, 0.55)
-    lurek.gfx.print("Left-click=toggle note | Right-click=long note (2-4 beats)", 10, 42, 0.55)
+    lurek.render.setColor(0.5, 0.5, 0.55, 1)
+    lurek.render.print("Space=play/stop | 1/2/3=track | Up/Down=BPM | L=loop | C=clear | M=mute | E=export | Esc=quit", 10, 30, 0.55)
+    lurek.render.print("Left-click=toggle note | Right-click=long note (2-4 beats)", 10, 42, 0.55)
 
     -- Note labels (left side)
     for r = 1, GRID_ROWS do
         local label = note_label(r)
         local sharp = is_sharp(r)
         if sharp then
-            lurek.gfx.setColor(0.6, 0.5, 0.7, 1)
+            lurek.render.setColor(0.6, 0.5, 0.7, 1)
         else
-            lurek.gfx.setColor(0.7, 0.7, 0.75, 1)
+            lurek.render.setColor(0.7, 0.7, 0.75, 1)
         end
-        lurek.gfx.print(label, OX - 40, OY + (r - 1) * CELL_H + 1, 0.55)
+        lurek.render.print(label, OX - 40, OY + (r - 1) * CELL_H + 1, 0.55)
     end
 
     -- Beat numbers (top)
     for c = 1, GRID_COLS do
         local is_measure = (c - 1) % 4 == 0
         if is_measure then
-            lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
+            lurek.render.setColor(0.8, 0.8, 0.5, 1)
         else
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
+            lurek.render.setColor(0.4, 0.4, 0.4, 1)
         end
-        lurek.gfx.print(tostring(c), OX + (c - 1) * CELL_W + 4, OY - 14, 0.5)
+        lurek.render.print(tostring(c), OX + (c - 1) * CELL_W + 4, OY - 14, 0.5)
     end
 
     -- Grid
@@ -250,16 +250,16 @@ function lurek.render()
             local sharp = is_sharp(r)
             local is_measure_line = (c - 1) % 4 == 0
             if sharp then
-                lurek.gfx.setColor(0.12, 0.12, 0.16, 1)
+                lurek.render.setColor(0.12, 0.12, 0.16, 1)
             else
-                lurek.gfx.setColor(0.14, 0.14, 0.18, 1)
+                lurek.render.setColor(0.14, 0.14, 0.18, 1)
             end
-            lurek.gfx.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
+            lurek.render.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
 
             -- Measure lines
             if is_measure_line then
-                lurek.gfx.setColor(0.3, 0.3, 0.35, 0.6)
-                lurek.gfx.line(gx, gy, gx, gy + CELL_H)
+                lurek.render.setColor(0.3, 0.3, 0.35, 0.6)
+                lurek.render.line(gx, gy, gx, gy + CELL_H)
             end
 
             -- Draw notes from all visible tracks (current track on top)
@@ -268,8 +268,8 @@ function lurek.render()
                     local tc = track_colors[t]
                     local alpha = (t == current_track) and 0.9 or 0.35
                     if track_muted[t] then alpha = alpha * 0.3 end
-                    lurek.gfx.setColor(tc[1], tc[2], tc[3], alpha)
-                    lurek.gfx.rectangle("fill", gx + 1, gy + 1, CELL_W - 3, CELL_H - 3)
+                    lurek.render.setColor(tc[1], tc[2], tc[3], alpha)
+                    lurek.render.rectangle("fill", gx + 1, gy + 1, CELL_W - 3, CELL_H - 3)
                 end
             end
         end
@@ -278,10 +278,10 @@ function lurek.render()
     -- Play cursor
     if playing then
         local cx = OX + play_cursor * CELL_W
-        lurek.gfx.setColor(1, 1, 1, 0.7)
-        lurek.gfx.setLineWidth(2)
-        lurek.gfx.line(cx, OY, cx, OY + GRID_ROWS * CELL_H)
-        lurek.gfx.setLineWidth(1)
+        lurek.render.setColor(1, 1, 1, 0.7)
+        lurek.render.setLineWidth(2)
+        lurek.render.line(cx, OY, cx, OY + GRID_ROWS * CELL_H)
+        lurek.render.setLineWidth(1)
 
         -- Highlight active notes
         local beat = math.floor(play_cursor) + 1
@@ -292,8 +292,8 @@ function lurek.render()
                         if tracks[t][r][beat] then
                             local gx = OX + (beat - 1) * CELL_W
                             local gy = OY + (r - 1) * CELL_H
-                            lurek.gfx.setColor(1, 1, 1, 0.4)
-                            lurek.gfx.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
+                            lurek.render.setColor(1, 1, 1, 0.4)
+                            lurek.render.rectangle("fill", gx, gy, CELL_W - 1, CELL_H - 1)
                         end
                     end
                 end
@@ -303,51 +303,51 @@ function lurek.render()
 
     -- Track status panel
     local px = OX + GRID_COLS * CELL_W + 15
-    lurek.gfx.setColor(0.8, 0.75, 0.9, 1)
-    lurek.gfx.print("Tracks:", px, OY, 0.85)
+    lurek.render.setColor(0.8, 0.75, 0.9, 1)
+    lurek.render.print("Tracks:", px, OY, 0.85)
     for t = 1, 3 do
         local ty = OY + 22 + (t - 1) * 30
         local tc = track_colors[t]
         if t == current_track then
-            lurek.gfx.setColor(tc[1], tc[2], tc[3], 1)
-            lurek.gfx.rectangle("fill", px, ty, 10, 14)
-            lurek.gfx.setColor(1, 1, 1, 1)
+            lurek.render.setColor(tc[1], tc[2], tc[3], 1)
+            lurek.render.rectangle("fill", px, ty, 10, 14)
+            lurek.render.setColor(1, 1, 1, 1)
         else
-            lurek.gfx.setColor(tc[1], tc[2], tc[3], 0.5)
-            lurek.gfx.rectangle("fill", px, ty, 10, 14)
-            lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
+            lurek.render.setColor(tc[1], tc[2], tc[3], 0.5)
+            lurek.render.rectangle("fill", px, ty, 10, 14)
+            lurek.render.setColor(0.6, 0.6, 0.6, 1)
         end
         local mute_txt = track_muted[t] and " [M]" or ""
-        lurek.gfx.print(t .. " " .. track_names[t] .. mute_txt, px + 14, ty, 0.7)
+        lurek.render.print(t .. " " .. track_names[t] .. mute_txt, px + 14, ty, 0.7)
     end
 
     -- Time signature and info
-    lurek.gfx.setColor(0.6, 0.6, 0.7, 1)
-    lurek.gfx.print("4/4 time", px, OY + 120, 0.7)
-    lurek.gfx.print(GRID_COLS .. " beats", px, OY + 138, 0.7)
-    lurek.gfx.print(math.floor(GRID_COLS / 4) .. " measures", px, OY + 156, 0.7)
+    lurek.render.setColor(0.6, 0.6, 0.7, 1)
+    lurek.render.print("4/4 time", px, OY + 120, 0.7)
+    lurek.render.print(GRID_COLS .. " beats", px, OY + 138, 0.7)
+    lurek.render.print(math.floor(GRID_COLS / 4) .. " measures", px, OY + 156, 0.7)
 
     -- Waveform
     draw_waveform()
 
     -- Export overlay
     if show_export then
-        lurek.gfx.setColor(0, 0, 0, 0.85)
-        lurek.gfx.rectangle("fill", 40, 40, 700, 400)
-        lurek.gfx.setColor(0.4, 0.4, 0.6, 1)
-        lurek.gfx.rectangle("line", 40, 40, 700, 400)
-        lurek.gfx.setColor(1, 0.9, 0.5, 1)
-        lurek.gfx.print("Note Export (press E or Esc to close)", 60, 50, 1)
-        lurek.gfx.setColor(0.85, 0.85, 0.9, 1)
+        lurek.render.setColor(0, 0, 0, 0.85)
+        lurek.render.rectangle("fill", 40, 40, 700, 400)
+        lurek.render.setColor(0.4, 0.4, 0.6, 1)
+        lurek.render.rectangle("line", 40, 40, 700, 400)
+        lurek.render.setColor(1, 0.9, 0.5, 1)
+        lurek.render.print("Note Export (press E or Esc to close)", 60, 50, 1)
+        lurek.render.setColor(0.85, 0.85, 0.9, 1)
         -- Print export text line by line
         local line_y = 80
         for line in export_text:gmatch("[^\n]+") do
-            lurek.gfx.print(line, 60, line_y, 0.65)
+            lurek.render.print(line, 60, line_y, 0.65)
             line_y = line_y + 16
             if line_y > 420 then break end
         end
     end
 
-    lurek.gfx.setColor(0.4, 0.4, 0.4, 1)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 730, 5, 0.6)
+    lurek.render.setColor(0.4, 0.4, 0.4, 1)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 730, 5, 0.6)
 end

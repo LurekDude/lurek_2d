@@ -105,7 +105,7 @@ local function makeBrickTex(bH, bW)
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 local function makeStoneTex(bH, bW)
@@ -125,7 +125,7 @@ local function makeStoneTex(bH, bW)
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 local function makeMossyTex()
@@ -141,7 +141,7 @@ local function makeMossyTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 local function makeMagicTex()
@@ -157,7 +157,7 @@ local function makeMagicTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 local function makeFloorTex()
@@ -173,7 +173,7 @@ local function makeFloorTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 local function makeCeilTex()
@@ -187,7 +187,7 @@ local function makeCeilTex()
             d:setPixel(px_, py_, math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), math.max(0,math.min(255,v)), 255)
         end
     end
-    return lurek.gfx.newImage(d)
+    return lurek.render.newImage(d)
 end
 
 -- �� helpers ���������������������������������������������������
@@ -237,7 +237,7 @@ end
 -- �� load ������������������������������������������������������
 function lurek.init()
     lurek.window.setTitle("Dungeon Crawler")
-    lurek.gfx.setBackgroundColor(0.02, 0.02, 0.04)
+    lurek.render.setBackgroundColor(0.02, 0.02, 0.04)
 
     -- Build raycaster
     rc = lurek.raycaster.new(MAP_W, MAP_H)
@@ -267,10 +267,10 @@ function lurek.init()
 
     -- Build shared quads
     for s = 0, TEX_W - 1 do
-        shared_quads[s] = lurek.gfx.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
+        shared_quads[s] = lurek.render.newQuad(s, 0, 1, TEX_H, TEX_W, TEX_H)
     end
 
-    view_canvas = lurek.gfx.newCanvas(VW, VH)
+    view_canvas = lurek.render.newCanvas(VW, VH)
     vis_x = gx + 0.5
     vis_y = gy + 0.5
     visual_angle = 0.0
@@ -317,7 +317,7 @@ end
 
 -- �� draw ������������������������������������������������������
 function lurek.render()
-    lurek.gfx.setCanvas(view_canvas)
+    lurek.render.setCanvas(view_canvas)
 
     -- �� Ceiling bands �����������������������������������������
     local ceil_h  = math.floor(VH / 2)
@@ -326,8 +326,8 @@ function lurek.render()
         local t_ = b / NBANDS        -- 0=top 1=horizon
         local br = 0.03 + t_ * 0.05
         local nv = noise2(b * 5, 0) * 0.015
-        lurek.gfx.setColor(br + nv, br + nv, br * 1.1 + nv)
-        lurek.gfx.rectangle("fill", 0, b * band_px, VW, band_px + 1)
+        lurek.render.setColor(br + nv, br + nv, br * 1.1 + nv)
+        lurek.render.rectangle("fill", 0, b * band_px, VW, band_px + 1)
     end
 
     -- �� Floor bands �������������������������������������������
@@ -335,12 +335,12 @@ function lurek.render()
         local t_ = b / NBANDS        -- 0=horizon 1=bottom
         local br = 0.04 + t_ * 0.14
         local checker = (b % 2 == 0) and 1.0 or 0.88
-        lurek.gfx.setColor(
+        lurek.render.setColor(
             br * 0.92 * checker,
             br * 0.82 * checker,
             br * 0.66 * checker
         )
-        lurek.gfx.rectangle("fill", 0, ceil_h + b * band_px, VW, band_px + 1)
+        lurek.render.rectangle("fill", 0, ceil_h + b * band_px, VW, band_px + 1)
     end
 
     -- �� Cast rays ���������������������������������������������
@@ -382,7 +382,7 @@ function lurek.render()
             torch_add = math.min(0.60, torch_add)
 
             local wt = WALL_TINT[cv] or {0.55, 0.55, 0.55}
-            lurek.gfx.setColor(
+            lurek.render.setColor(
                 math.min(1.0, wt[1] * bright + torch_add * 0.90),
                 math.min(1.0, wt[2] * bright + torch_add * 0.48),
                 math.min(1.0, wt[3] * bright + torch_add * 0.08)
@@ -391,7 +391,7 @@ function lurek.render()
             local strip = math.max(0, math.min(TEX_W-1, math.floor(tex_u * TEX_W)))
             local q     = shared_quads[strip]
             local tex   = wall_textures[cv] or wall_textures[1]
-            lurek.gfx.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wall_h / TEX_H)
+            lurek.render.drawq(tex, q, col - 1, math.floor(draw_start), 0, 1, wall_h / TEX_H)
         end
     end
 
@@ -411,12 +411,12 @@ function lurek.render()
                     local rate = (env_mode == "wind") and 38 or 24
                     flk = 0.68 + 0.32 * math.sin(flicker_t * rate + torch.x * 5.3)
                 end
-                lurek.gfx.setColor(1.0*bd*flk, 0.52*bd*flk, 0.04*bd)
-                lurek.gfx.rectangle("fill", sx, sy, sz, math.floor(sz * 1.6))
+                lurek.render.setColor(1.0*bd*flk, 0.52*bd*flk, 0.04*bd)
+                lurek.render.rectangle("fill", sx, sy, sz, math.floor(sz * 1.6))
                 -- Glow halo
-                lurek.gfx.setColor(1.0*bd*flk, 0.40*bd*flk, 0.02, 0.35)
+                lurek.render.setColor(1.0*bd*flk, 0.40*bd*flk, 0.02, 0.35)
                 local halo = math.floor(sz * 2.2)
-                lurek.gfx.rectangle("fill", col - math.floor(halo/2),
+                lurek.render.rectangle("fill", col - math.floor(halo/2),
                     sy - math.floor(sz*0.3), halo, math.floor(sz*2))
             end
         end
@@ -436,11 +436,11 @@ function lurek.render()
                     local bd = lurek.raycaster.distanceShade(proj.distance, MAX_DIST)
                     -- Pulsing cyan orb
                     local pulse = 0.8 + 0.2 * math.sin(flicker_t * 3.5 + it.x)
-                    lurek.gfx.setColor(0.5*bd*pulse, 0.92*bd*pulse, 1.0*bd*pulse)
-                    lurek.gfx.rectangle("fill", sx, sy, sz, sz)
-                    lurek.gfx.setColor(0.85*pulse, 1.0*pulse, 1.0*pulse, 0.75)
+                    lurek.render.setColor(0.5*bd*pulse, 0.92*bd*pulse, 1.0*bd*pulse)
+                    lurek.render.rectangle("fill", sx, sy, sz, sz)
+                    lurek.render.setColor(0.85*pulse, 1.0*pulse, 1.0*pulse, 0.75)
                     local hi = math.max(1, math.floor(sz*0.22))
-                    lurek.gfx.rectangle("fill", sx+hi, sy+hi, hi*2, hi*2)
+                    lurek.render.rectangle("fill", sx+hi, sy+hi, hi*2, hi*2)
                 end
             end
         end
@@ -448,40 +448,40 @@ function lurek.render()
 
     -- �� Rain drips ��������������������������������������������
     if env_mode == "rain" then
-        lurek.gfx.setColor(0.50, 0.62, 0.85, 0.30)
+        lurek.render.setColor(0.50, 0.62, 0.85, 0.30)
         for i = 1, 18 do
             local rx = (i * 19 + math.floor(flicker_t * 60)) % VW
             local ry = (i * 31 + math.floor(flicker_t * 90)) % VH
-            lurek.gfx.rectangle("fill", rx, ry, 1, 5)
+            lurek.render.rectangle("fill", rx, ry, 1, 5)
         end
     end
 
     -- �� Edge fog ����������������������������������������������
-    lurek.gfx.setColor(0, 0, 0, 0.30)
-    lurek.gfx.rectangle("fill", 0, 0,      VW, VH / 7)
-    lurek.gfx.rectangle("fill", 0, VH*6/7, VW, VH / 7)
+    lurek.render.setColor(0, 0, 0, 0.30)
+    lurek.render.rectangle("fill", 0, 0,      VW, VH / 7)
+    lurek.render.rectangle("fill", 0, VH*6/7, VW, VH / 7)
 
-    lurek.gfx.setCanvas(nil)
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setCanvas(nil)
+    lurek.render.setColor(1, 1, 1, 1)
 
     -- Blit 3D view to left 60% of screen
     local scx = (SW * 0.60) / VW
     local scy = SH / VH
-    lurek.gfx.draw(view_canvas, 0, 0, 0, scx, scy)
+    lurek.render.draw(view_canvas, 0, 0, 0, scx, scy)
 
     -- �� Right panel HUD ���������������������������������������
     local hx = math.floor(SW * 0.61)
 
-    lurek.gfx.setColor(0.10, 0.09, 0.12)
-    lurek.gfx.rectangle("fill", hx, 0, SW - hx, SH)
+    lurek.render.setColor(0.10, 0.09, 0.12)
+    lurek.render.rectangle("fill", hx, 0, SW - hx, SH)
 
-    lurek.gfx.setColor(0.85, 0.75, 0.48)
-    lurek.gfx.print("=== DUNGEON ===", hx + 6, 14)
-    lurek.gfx.setColor(0.80, 0.80, 0.80)
-    lurek.gfx.print("Facing : " .. FACE_NAME[facing],  hx + 6, 40)
-    lurek.gfx.print("Pos    : " .. gx .. ", " .. gy,   hx + 6, 58)
-    lurek.gfx.print("Score  : " .. score,               hx + 6, 76)
-    lurek.gfx.print("Env    : " .. env_mode,            hx + 6, 94)
+    lurek.render.setColor(0.85, 0.75, 0.48)
+    lurek.render.print("=== DUNGEON ===", hx + 6, 14)
+    lurek.render.setColor(0.80, 0.80, 0.80)
+    lurek.render.print("Facing : " .. FACE_NAME[facing],  hx + 6, 40)
+    lurek.render.print("Pos    : " .. gx .. ", " .. gy,   hx + 6, 58)
+    lurek.render.print("Score  : " .. score,               hx + 6, 76)
+    lurek.render.print("Env    : " .. env_mode,            hx + 6, 94)
 
     -- Minimap
     local mm_x  = hx + 6
@@ -491,32 +491,32 @@ function lurek.render()
         for cx = 1, MAP_W do
             local v = mapCell(cx, cy)
             if v > 0 then
-                lurek.gfx.setColor(0.38, 0.36, 0.34)
+                lurek.render.setColor(0.38, 0.36, 0.34)
             else
-                lurek.gfx.setColor(0.13, 0.12, 0.14)
+                lurek.render.setColor(0.13, 0.12, 0.14)
             end
-            lurek.gfx.rectangle("fill",
+            lurek.render.rectangle("fill",
                 mm_x + (cx-1)*mc, mm_y + (cy-1)*mc, mc-1, mc-1)
         end
     end
     -- Player marker
-    lurek.gfx.setColor(0.95, 0.78, 0.20)
-    lurek.gfx.rectangle("fill",
+    lurek.render.setColor(0.95, 0.78, 0.20)
+    lurek.render.rectangle("fill",
         mm_x + (gx-1)*mc + 3, mm_y + (gy-1)*mc + 3, mc-5, mc-5)
 
     -- Log
     local log_y = mm_y + MAP_H * mc + 10
-    lurek.gfx.setColor(0.52, 0.72, 0.52)
-    lurek.gfx.print("�� Events ��", mm_x, log_y)
-    lurek.gfx.setColor(0.70, 0.82, 0.70)
+    lurek.render.setColor(0.52, 0.72, 0.52)
+    lurek.render.print("�� Events ��", mm_x, log_y)
+    lurek.render.setColor(0.70, 0.82, 0.70)
     for i, line in ipairs(log_lines) do
-        lurek.gfx.print(line, mm_x, log_y + i * 19)
+        lurek.render.print(line, mm_x, log_y + i * 19)
     end
 
     -- Controls
-    lurek.gfx.setColor(0.42, 0.42, 0.42)
-    lurek.gfx.print("W/S move  Q/E turn", mm_x, SH - 40)
-    lurek.gfx.print("F1 clear F2 wind F3 rain", mm_x, SH - 22)
+    lurek.render.setColor(0.42, 0.42, 0.42)
+    lurek.render.print("W/S move  Q/E turn", mm_x, SH - 40)
+    lurek.render.print("F1 clear F2 wind F3 rain", mm_x, SH - 22)
 end
 
 -- �� keypressed ������������������������������������������������

@@ -85,7 +85,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0)
+    lurek.render.setBackgroundColor(0, 0, 0)
     score = 0; lives = 3; wave = 1
     init()
 end
@@ -232,87 +232,87 @@ local ANIM_PERIOD = 0.5
 function lurek.render()
     -- Stars background
     math.randomseed(42)
-    lurek.gfx.setColor(0.9, 0.9, 0.9, 0.4)
+    lurek.render.setColor(0.9, 0.9, 0.9, 0.4)
     for i = 1, 80 do
         local sx = math.random(W)
         local sy = math.random(H)
-        lurek.gfx.circle("fill", sx, sy, 1)
+        lurek.render.circle("fill", sx, sy, 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    lurek.gfx.setColor(0.8, 1, 0.8)
-    lurek.gfx.print("SCORE: " .. score, 10, 8, 1.5)
-    lurek.gfx.print("WAVE: " .. wave, W/2 - 40, 8, 1.5)
-    lurek.gfx.setColor(1, 0.3, 0.3)
-    lurek.gfx.print("LIVES: " .. lives, W - 100, 8, 1.5)
+    lurek.render.setColor(0.8, 1, 0.8)
+    lurek.render.print("SCORE: " .. score, 10, 8, 1.5)
+    lurek.render.print("WAVE: " .. wave, W/2 - 40, 8, 1.5)
+    lurek.render.setColor(1, 0.3, 0.3)
+    lurek.render.print("LIVES: " .. lives, W - 100, 8, 1.5)
 
     -- Ground line
-    lurek.gfx.setColor(0.4, 0.8, 0.4)
-    lurek.gfx.line(0, H - 30, W, H - 30)
+    lurek.render.setColor(0.4, 0.8, 0.4)
+    lurek.render.line(0, H - 30, W, H - 30)
 
     -- Barriers
     for _, blk in ipairs(barriers) do
         if blk.hp > 0 then
             local alpha = blk.hp / 3
-            lurek.gfx.setColor(0.2, 0.9, 0.2, alpha)
-            lurek.gfx.rectangle("fill", blk.x, blk.y, BARRIER_CELL, BARRIER_CELL)
+            lurek.render.setColor(0.2, 0.9, 0.2, alpha)
+            lurek.render.rectangle("fill", blk.x, blk.y, BARRIER_CELL, BARRIER_CELL)
         end
     end
 
     -- Player ship (simple polygon)
-    lurek.gfx.setColor(0.4, 0.8, 1.0)
-    lurek.gfx.rectangle("fill", player.x + player.w/2 - 4, player.y - 10, 8, 10)
-    lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+    lurek.render.setColor(0.4, 0.8, 1.0)
+    lurek.render.rectangle("fill", player.x + player.w/2 - 4, player.y - 10, 8, 10)
+    lurek.render.rectangle("fill", player.x, player.y, player.w, player.h)
 
     -- Invaders
     local frame = math.floor(anim_timer / ANIM_PERIOD) % 2
     for _, inv in ipairs(invaders) do
         if inv.alive then
             local row_hue = (inv.row - 1) / (INVADER_ROWS - 1)
-            lurek.gfx.setColor(0.2 + row_hue * 0.8, 1.0 - row_hue * 0.5, 0.2)
+            lurek.render.setColor(0.2 + row_hue * 0.8, 1.0 - row_hue * 0.5, 0.2)
             local ix = inv.x + (frame == 1 and 3 or 0)
             -- Body
-            lurek.gfx.rectangle("fill", ix + 5, inv.y + 4, INVADER_W - 10, INVADER_H - 10)
+            lurek.render.rectangle("fill", ix + 5, inv.y + 4, INVADER_W - 10, INVADER_H - 10)
             -- Head bumps
-            lurek.gfx.rectangle("fill", ix + 8, inv.y, INVADER_W - 16, 8)
+            lurek.render.rectangle("fill", ix + 8, inv.y, INVADER_W - 16, 8)
             -- Legs (alternate frame)
             if frame == 0 then
-                lurek.gfx.rectangle("fill", ix + 2, inv.y + INVADER_H - 8, 6, 8)
-                lurek.gfx.rectangle("fill", ix + INVADER_W - 8, inv.y + INVADER_H - 8, 6, 8)
+                lurek.render.rectangle("fill", ix + 2, inv.y + INVADER_H - 8, 6, 8)
+                lurek.render.rectangle("fill", ix + INVADER_W - 8, inv.y + INVADER_H - 8, 6, 8)
             else
-                lurek.gfx.rectangle("fill", ix + 6, inv.y + INVADER_H - 8, 6, 8)
-                lurek.gfx.rectangle("fill", ix + INVADER_W - 12, inv.y + INVADER_H - 8, 6, 8)
+                lurek.render.rectangle("fill", ix + 6, inv.y + INVADER_H - 8, 6, 8)
+                lurek.render.rectangle("fill", ix + INVADER_W - 12, inv.y + INVADER_H - 8, 6, 8)
             end
             -- Eyes
-            lurek.gfx.setColor(0, 0, 0)
-            lurek.gfx.circle("fill", ix + INVADER_W/2 - 5, inv.y + 8, 3)
-            lurek.gfx.circle("fill", ix + INVADER_W/2 + 5, inv.y + 8, 3)
+            lurek.render.setColor(0, 0, 0)
+            lurek.render.circle("fill", ix + INVADER_W/2 - 5, inv.y + 8, 3)
+            lurek.render.circle("fill", ix + INVADER_W/2 + 5, inv.y + 8, 3)
         end
     end
 
     -- Player bullets
-    lurek.gfx.setColor(1, 1, 0.5)
+    lurek.render.setColor(1, 1, 0.5)
     for _, b in ipairs(bullets) do
-        lurek.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
+        lurek.render.rectangle("fill", b.x, b.y, b.w, b.h)
     end
 
     -- Invader bullets
-    lurek.gfx.setColor(1, 0.3, 0.3)
+    lurek.render.setColor(1, 0.3, 0.3)
     for _, b in ipairs(inv_bullets) do
-        lurek.gfx.rectangle("fill", b.x, b.y, b.w, b.h)
+        lurek.render.rectangle("fill", b.x, b.y, b.w, b.h)
     end
 
     -- Overlays
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 

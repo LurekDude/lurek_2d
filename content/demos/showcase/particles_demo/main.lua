@@ -206,7 +206,7 @@ local preset_defs = {
 -- ── lurek.init ──────────────────────────────────────────────────────────────
 function lurek.init()
     lurek.window.setTitle("Lurek2D — Particles Demo")
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.08)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.08)
 
     for i, def in ipairs(preset_defs) do
         presets[i]       = def.make()
@@ -244,6 +244,8 @@ end
 
 -- ── lurek.process ────────────────────────────────────────────────────────────
 function lurek.process(dt)
+    -- Poll mouse position (lurek.mousemoved is not an engine callback)
+    mouse_x, mouse_y = lurek.mouse.getPosition()
     local ps = presets[active]
     -- Non-snow presets follow the mouse
     if active ~= 6 then
@@ -261,42 +263,42 @@ function lurek.render()
     local pg  = preset_gravity[active]
 
     -- Particle systems render automatically via the engine render loop.
-    -- (lurek.gfx.draw does not accept ParticleSystem userdata)
+    -- (lurek.render.draw does not accept ParticleSystem userdata)
 
     -- ── HUD bottom strip ─────────────────────────────────────────────────
-    lurek.gfx.setColor(0.0, 0.0, 0.0, 0.6)
-    lurek.gfx.rectangle("fill", 0, H - 84, W, 84)
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.6)
+    lurek.render.rectangle("fill", 0, H - 84, W, 84)
 
     -- Preset name
-    lurek.gfx.setColor(1.0, 0.88, 0.25)
-    lurek.gfx.print(def.name, 14, H - 76, 3)
+    lurek.render.setColor(1.0, 0.88, 0.25)
+    lurek.render.print(def.name, 14, H - 76, 3)
 
     -- Shape label
-    lurek.gfx.setColor(0.65, 0.80, 1.0)
-    lurek.gfx.print("Shape: " .. def.shape, 14, H - 46, 1.5)
+    lurek.render.setColor(0.65, 0.80, 1.0)
+    lurek.render.print("Shape: " .. def.shape, 14, H - 46, 1.5)
 
     -- Particle count
-    lurek.gfx.setColor(0.65, 0.80, 1.0)
-    lurek.gfx.print("Particles: " .. tostring(cnt), 14, H - 28, 1.5)
+    lurek.render.setColor(0.65, 0.80, 1.0)
+    lurek.render.print("Particles: " .. tostring(cnt), 14, H - 28, 1.5)
 
     -- FPS (right side)
-    lurek.gfx.setColor(0.45, 0.90, 0.50)
-    lurek.gfx.print("FPS: " .. tostring(fps), W - 115, H - 46, 1.5)
+    lurek.render.setColor(0.45, 0.90, 0.50)
+    lurek.render.print("FPS: " .. tostring(fps), W - 115, H - 46, 1.5)
 
     -- Gravity state indicator
     if pg.on then
-        lurek.gfx.setColor(0.30, 1.0, 0.45)
-        lurek.gfx.print("Gravity: ON", W - 150, H - 28, 1.5)
+        lurek.render.setColor(0.30, 1.0, 0.45)
+        lurek.render.print("Gravity: ON", W - 150, H - 28, 1.5)
     else
-        lurek.gfx.setColor(1.0, 0.40, 0.35)
-        lurek.gfx.print("Gravity: OFF", W - 160, H - 28, 1.5)
+        lurek.render.setColor(1.0, 0.40, 0.35)
+        lurek.render.print("Gravity: OFF", W - 160, H - 28, 1.5)
     end
 
     -- ── Controls hint (top bar) ───────────────────────────────────────────
-    lurek.gfx.setColor(0.0, 0.0, 0.0, 0.45)
-    lurek.gfx.rectangle("fill", 0, 0, W, 22)
-    lurek.gfx.setColor(0.38, 0.38, 0.48)
-    lurek.gfx.print(
+    lurek.render.setColor(0.0, 0.0, 0.0, 0.45)
+    lurek.render.rectangle("fill", 0, 0, W, 22)
+    lurek.render.setColor(0.38, 0.38, 0.48)
+    lurek.render.print(
         "1-6 / \xE2\x86\x90\xE2\x86\x92 : switch preset   SPACE : burst   G : toggle gravity",
         8, 4, 1.2
     )
@@ -307,19 +309,13 @@ function lurek.render()
     for i = 1, #presets do
         local dx = dot_x0 + (i - 1) * 20
         if i == active then
-            lurek.gfx.setColor(1.0, 0.88, 0.25)
-            lurek.gfx.circle("fill", dx, dot_y, 5)
+            lurek.render.setColor(1.0, 0.88, 0.25)
+            lurek.render.circle("fill", dx, dot_y, 5)
         else
-            lurek.gfx.setColor(0.28, 0.28, 0.38)
-            lurek.gfx.circle("fill", dx, dot_y, 4)
+            lurek.render.setColor(0.28, 0.28, 0.38)
+            lurek.render.circle("fill", dx, dot_y, 4)
         end
     end
-end
-
--- ── lurek.mousemoved ────────────────────────────────────────────────────────
-function lurek.mousemoved(x, y, dx, dy)
-    mouse_x = x
-    mouse_y = y
 end
 
 -- ── lurek.keypressed ────────────────────────────────────────────────────────

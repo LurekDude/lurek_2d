@@ -90,7 +90,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
     score = 0; lives = 3; level = 1
     reset()
 end
@@ -242,7 +242,7 @@ end
 
 function lurek.render()
     -- Platforms
-    lurek.gfx.setColor(0.5, 0.35, 0.2)
+    lurek.render.setColor(0.5, 0.35, 0.2)
     for _, p in ipairs(PLATFORMS) do
         local y1 = platform_y_at(p, p.x1)
         local y2 = platform_y_at(p, p.x2)
@@ -254,44 +254,44 @@ function lurek.render()
             local lx = p.x1 + t1 * (p.x2 - p.x1)
             local ly = y1 + t1 * (y2 - y1)
             local rw = (p.x2 - p.x1) / steps
-            lurek.gfx.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
+            lurek.render.rectangle("fill", lx, ly, rw + 1, FLOOR_H)
         end
     end
 
     -- Ladders
-    lurek.gfx.setColor(0.8, 0.65, 0.2)
+    lurek.render.setColor(0.8, 0.65, 0.2)
     for _, lad in ipairs(LADDERS) do
-        lurek.gfx.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
+        lurek.render.rectangle("fill", lad.x - 3, lad.y_top, 6, lad.y_bot - lad.y_top)
         -- Rungs
         local num_rungs = math.floor((lad.y_bot - lad.y_top) / 20)
         for r = 0, num_rungs do
             local ry = lad.y_top + r * 20
-            lurek.gfx.rectangle("fill", lad.x - 12, ry, 24, 4)
+            lurek.render.rectangle("fill", lad.x - 12, ry, 24, 4)
         end
     end
 
     -- Pauline (goal) at top
-    lurek.gfx.setColor(1, 0.6, 0.6)
-    lurek.gfx.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
-    lurek.gfx.circle("fill", W - 190, H - 440 - 48, 12)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
+    lurek.render.setColor(1, 0.6, 0.6)
+    lurek.render.rectangle("fill", W - 200, H - 440 - 40, 20, 40)
+    lurek.render.circle("fill", W - 190, H - 440 - 48, 12)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("PAULINE!", W - 230, H - 440 - 60, 1.4)
 
     -- Donkey Kong at top
-    lurek.gfx.setColor(0.45, 0.25, 0.1)
-    lurek.gfx.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
-    lurek.gfx.circle("fill", W - 275, H - 440 - 60, 18)
+    lurek.render.setColor(0.45, 0.25, 0.1)
+    lurek.render.rectangle("fill", W - 300, H - 440 - 50, 50, 50)
+    lurek.render.circle("fill", W - 275, H - 440 - 60, 18)
     -- DK arms
-    lurek.gfx.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
-    lurek.gfx.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
+    lurek.render.rectangle("fill", W - 330, H - 440 - 40, 30, 14)
+    lurek.render.rectangle("fill", W - 250, H - 440 - 40, 30, 14)
 
     -- Barrels
     for _, b in ipairs(barrels) do
         local roll = math.sin(b.roll_anim) * 5
-        lurek.gfx.setColor(0.6, 0.35, 0.1)
-        lurek.gfx.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
-        lurek.gfx.setColor(0.8, 0.55, 0.2)
-        lurek.gfx.line(
+        lurek.render.setColor(0.6, 0.35, 0.1)
+        lurek.render.circle("fill", b.x + b.w/2, b.y + b.h/2, b.w/2)
+        lurek.render.setColor(0.8, 0.55, 0.2)
+        lurek.render.line(
             b.x + b.w/2 + math.cos(b.roll_anim) * b.w/2 * 0.7,
             b.y + b.h/2 + math.sin(b.roll_anim) * b.h/2 * 0.7,
             b.x + b.w/2 - math.cos(b.roll_anim) * b.w/2 * 0.7,
@@ -300,42 +300,42 @@ function lurek.render()
     end
 
     -- Player
-    lurek.gfx.setColor(0.9, 0.2, 0.2)
-    lurek.gfx.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
-    lurek.gfx.setColor(0.9, 0.7, 0.4)
-    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 12, 12)
+    lurek.render.setColor(0.9, 0.2, 0.2)
+    lurek.render.rectangle("fill", player.x, player.y + player.h * 0.4, player.w, player.h * 0.6)
+    lurek.render.setColor(0.9, 0.7, 0.4)
+    lurek.render.circle("fill", player.x + player.w/2, player.y + 12, 12)
     -- Hat
-    lurek.gfx.setColor(0.6, 0.15, 0.1)
-    lurek.gfx.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
-    lurek.gfx.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
+    lurek.render.setColor(0.6, 0.15, 0.1)
+    lurek.render.rectangle("fill", player.x + 2, player.y, player.w - 4, 10)
+    lurek.render.rectangle("fill", player.x - 2, player.y + 6, player.w + 4, 5)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 0)
-    lurek.gfx.print("DONKEY KONG", 10, 8, 2)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 10, 30, 1.5)
-    lurek.gfx.setColor(1, 0.3, 0.3)
-    lurek.gfx.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
-    lurek.gfx.setColor(0.6, 0.8, 1)
-    lurek.gfx.print("Level " .. level, W - 90, 8, 1.5)
+    lurek.render.setColor(1, 1, 0)
+    lurek.render.print("DONKEY KONG", 10, 8, 2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Score: " .. score, 10, 30, 1.5)
+    lurek.render.setColor(1, 0.3, 0.3)
+    lurek.render.print("Lives: " .. lives, W/2 - 50, 8, 1.5)
+    lurek.render.setColor(0.6, 0.8, 1)
+    lurek.render.print("Level " .. level, W - 90, 8, 1.5)
 
     -- Win overlay
     if game_state == "win" then
-        lurek.gfx.setColor(0, 0, 0, 0.5)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
-        lurek.gfx.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
+        lurek.render.setColor(0, 0, 0, 0.5)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 0, math.abs(math.sin(win_flash * 4)))
+        lurek.render.print("YOU SAVED PAULINE!", W/2 - 140, H/2 - 20, 3)
     end
     -- Game over overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 48, 2)
     end
 end
 

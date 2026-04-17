@@ -223,8 +223,8 @@ function lurek.render()
         for x = sx + 1, ex do
             if biomes[y] and biomes[y][x] then
                 local c = BIOME_COLORS[biomes[y][x]]
-                lurek.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
-                lurek.gfx.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
+                lurek.render.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, 1)
+                lurek.render.rectangle("fill", (x-1)*TILE - ox, (y-1)*TILE - oy, TILE, TILE)
             end
         end
     end
@@ -237,15 +237,15 @@ function lurek.render()
             local c = a.species.color
             local alpha = 1
             if a.state == "sleep" then alpha = 0.6 end
-            lurek.gfx.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
-            lurek.gfx.circle("fill", ax, ay, a.species.size)
+            lurek.render.setColor(c[1]*visibility, c[2]*visibility, c[3]*visibility, alpha)
+            lurek.render.circle("fill", ax, ay, a.species.size)
             -- state indicator
             if a.state == "sleep" then
-                lurek.gfx.setColor(1,1,1,0.5*visibility)
-                lurek.gfx.print("z", ax+6, ay-10, 0.7)
+                lurek.render.setColor(1,1,1,0.5*visibility)
+                lurek.render.print("z", ax+6, ay-10, 0.7)
             elseif a.state == "flee" then
-                lurek.gfx.setColor(1,0.3,0.3,0.7)
-                lurek.gfx.print("!", ax+6, ay-10, 0.7)
+                lurek.render.setColor(1,0.3,0.3,0.7)
+                lurek.render.print("!", ax+6, ay-10, 0.7)
             end
         end
     end
@@ -253,69 +253,69 @@ function lurek.render()
     -- player
     local px, py = W / 2, H / 2
     local pr = player.crouching and 5 or 7
-    lurek.gfx.setColor(0.9, 0.85, 0.3, 1)
-    lurek.gfx.circle("fill", px, py, pr)
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-    lurek.gfx.circle("line", px, py, pr)
+    lurek.render.setColor(0.9, 0.85, 0.3, 1)
+    lurek.render.circle("fill", px, py, pr)
+    lurek.render.setColor(0.2, 0.2, 0.2, 1)
+    lurek.render.circle("line", px, py, pr)
 
     -- camera mode crosshair
     if camera_mode then
         local mx, my = lurek.mouse.getPosition()
-        lurek.gfx.setColor(1, 1, 1, 0.8)
-        lurek.gfx.line(mx - 15, my, mx + 15, my)
-        lurek.gfx.line(mx, my - 15, mx, my + 15)
-        lurek.gfx.circle("line", mx, my, 25)
-        lurek.gfx.setColor(1,0.3,0.3,0.6)
-        lurek.gfx.print("CAMERA", mx + 20, my - 8, 0.8)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.line(mx - 15, my, mx + 15, my)
+        lurek.render.line(mx, my - 15, mx, my + 15)
+        lurek.render.circle("line", mx, my, 25)
+        lurek.render.setColor(1,0.3,0.3,0.6)
+        lurek.render.print("CAMERA", mx + 20, my - 8, 0.8)
     end
 
     -- night overlay
     if visibility < 0.9 then
-        lurek.gfx.setColor(0, 0, 0.05, 1 - visibility)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 0, 0.05, 1 - visibility)
+        lurek.render.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, W, 28)
-    lurek.gfx.setColor(1,1,1,1)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, W, 28)
+    lurek.render.setColor(1,1,1,1)
     local discovered = 0
     for _ in pairs(encyclopedia) do discovered = discovered + 1 end
-    lurek.gfx.print("Photos: " .. #photos .. "  Best: " .. best_score
+    lurek.render.print("Photos: " .. #photos .. "  Best: " .. best_score
         .. "  Species: " .. discovered .. "/" .. #SPECIES, 10, 5, 0.9)
-    lurek.gfx.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
-    lurek.gfx.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 740, 5, 0.7)
+    lurek.render.print(camera_mode and "[CAMERA ON]" or "[C] Camera", 500, 5, 0.9)
+    lurek.render.print(player.crouching and "Crouching" or "Standing", 630, 5, 0.9)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 740, 5, 0.7)
 
     -- noise meter
-    lurek.gfx.setColor(0.3,0.3,0.3,0.7)
-    lurek.gfx.rectangle("fill", 10, H-22, 80, 12)
+    lurek.render.setColor(0.3,0.3,0.3,0.7)
+    lurek.render.rectangle("fill", 10, H-22, 80, 12)
     local np = noise_level / 100
-    lurek.gfx.setColor(np, 1-np, 0, 0.8)
-    lurek.gfx.rectangle("fill", 10, H-22, 80*np, 12)
-    lurek.gfx.setColor(1,1,1,0.7)
-    lurek.gfx.print("Noise", 14, H-24, 0.7)
+    lurek.render.setColor(np, 1-np, 0, 0.8)
+    lurek.render.rectangle("fill", 10, H-22, 80*np, 12)
+    lurek.render.setColor(1,1,1,0.7)
+    lurek.render.print("Noise", 14, H-24, 0.7)
 
     -- photo log (last 5)
     if #photos > 0 then
-        lurek.gfx.setColor(0,0,0,0.5)
-        lurek.gfx.rectangle("fill", W-160, H-110, 155, 105)
-        lurek.gfx.setColor(1,1,1,0.9)
-        lurek.gfx.print("Recent Photos:", W-155, H-108, 0.7)
+        lurek.render.setColor(0,0,0,0.5)
+        lurek.render.rectangle("fill", W-160, H-110, 155, 105)
+        lurek.render.setColor(1,1,1,0.9)
+        lurek.render.print("Recent Photos:", W-155, H-108, 0.7)
         local start = clamp(#photos - 4, 1, #photos)
         for i = start, #photos do
             local p = photos[i]
             local yi = (i - start) * 16 + (H - 92)
-            lurek.gfx.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
+            lurek.render.print(p.species .. ": " .. p.score .. "pts", W-150, yi, 0.7)
         end
     end
 
     -- message
     if message and msg_timer > 0 then
-        lurek.gfx.setColor(1,1,0.4,1)
-        lurek.gfx.print(message, 200, 50, 1.1)
+        lurek.render.setColor(1,1,0.4,1)
+        lurek.render.print(message, 200, 50, 1.1)
     end
 
-    lurek.gfx.setColor(0.6,0.6,0.6,0.7)
-    lurek.gfx.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
+    lurek.render.setColor(0.6,0.6,0.6,0.7)
+    lurek.render.print("[WASD] Move  [Shift] Crouch  [C] Camera  [Space] Photo  [R] Restart", 100, H-14, 0.65)
 end

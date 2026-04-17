@@ -34,7 +34,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Fighting Game")
-    lurek.gfx.setBackgroundColor(0.08, 0.05, 0.15)
+    lurek.render.setBackgroundColor(0.08, 0.05, 0.15)
     resetRound()
 end
 
@@ -224,13 +224,13 @@ local function drawFighter(f, r, g, b)
     local by = f.y - f.h + shakeY
 
     -- body
-    lurek.gfx.setColor(r, g, b, 1)
-    lurek.gfx.rectangle("fill", bx, by, f.w, f.h)
+    lurek.render.setColor(r, g, b, 1)
+    lurek.render.rectangle("fill", bx, by, f.w, f.h)
 
     -- blocking indicator
     if f.blocking then
-        lurek.gfx.setColor(0.5, 0.5, 1, 0.4)
-        lurek.gfx.rectangle("fill", bx - 4, by - 4, f.w + 8, f.h + 8)
+        lurek.render.setColor(0.5, 0.5, 1, 0.4)
+        lurek.render.rectangle("fill", bx - 4, by - 4, f.w + 8, f.h + 8)
     end
 
     -- attack hitbox
@@ -239,36 +239,36 @@ local function drawFighter(f, r, g, b)
         local ax = f.x + ab.ox - ab.w / 2 + shakeX
         local ay = f.y + ab.oy - ab.h / 2 + shakeY
         if f.state == "super" then
-            lurek.gfx.setColor(1, 1, 0, 0.6)
+            lurek.render.setColor(1, 1, 0, 0.6)
         else
-            lurek.gfx.setColor(1, 0.3, 0.3, 0.4)
+            lurek.render.setColor(1, 0.3, 0.3, 0.4)
         end
-        lurek.gfx.rectangle("fill", ax, ay, ab.w, ab.h)
+        lurek.render.rectangle("fill", ax, ay, ab.w, ab.h)
     end
 end
 
 local function drawHealthBar(x, y, w, hp, maxHp, r, g, b)
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", x, y, w, 18)
+    lurek.render.setColor(0.2, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", x, y, w, 18)
     local ratio = hp / maxHp
-    lurek.gfx.setColor(r, g, b, 1)
-    lurek.gfx.rectangle("fill", x, y, w * ratio, 18)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.rectangle("line", x, y, w, 18)
+    lurek.render.setColor(r, g, b, 1)
+    lurek.render.rectangle("fill", x, y, w * ratio, 18)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.rectangle("line", x, y, w, 18)
 end
 
 local function drawSuperBar(x, y, w, s, maxS)
-    lurek.gfx.setColor(0.15, 0.15, 0.15, 1)
-    lurek.gfx.rectangle("fill", x, y, w, 8)
+    lurek.render.setColor(0.15, 0.15, 0.15, 1)
+    lurek.render.rectangle("fill", x, y, w, 8)
     local ratio = s / maxS
-    lurek.gfx.setColor(1, 1, 0, 1)
-    lurek.gfx.rectangle("fill", x, y, w * ratio, 8)
+    lurek.render.setColor(1, 1, 0, 1)
+    lurek.render.rectangle("fill", x, y, w * ratio, 8)
 end
 
 function lurek.render()
     -- stage floor
-    lurek.gfx.setColor(0.25, 0.2, 0.3, 1)
-    lurek.gfx.rectangle("fill", 0, stageFloor + shakeY, 800, 80)
+    lurek.render.setColor(0.25, 0.2, 0.3, 1)
+    lurek.render.rectangle("fill", 0, stageFloor + shakeY, 800, 80)
 
     -- fighters
     drawFighter(P1, 0.2, 0.5, 1)
@@ -281,45 +281,45 @@ function lurek.render()
     drawSuperBar(470, 42, 300, P2.super, P2.maxSuper)
 
     -- round wins
-    lurek.gfx.setColor(1, 1, 1, 1)
+    lurek.render.setColor(1, 1, 1, 1)
     for i = 1, P1.wins do
-        lurek.gfx.circle("fill", 340 - i * 20, 28, 6)
+        lurek.render.circle("fill", 340 - i * 20, 28, 6)
     end
     for i = 1, P2.wins do
-        lurek.gfx.circle("fill", 460 + i * 20, 28, 6)
+        lurek.render.circle("fill", 460 + i * 20, 28, 6)
     end
 
     -- labels
-    lurek.gfx.setColor(0.5, 0.7, 1, 1)
-    lurek.gfx.print("P1", 30, 5)
-    lurek.gfx.setColor(1, 0.5, 0.4, 1)
-    lurek.gfx.print("AI", 740, 5)
-    lurek.gfx.setColor(1, 1, 1, 0.6)
-    lurek.gfx.print("VS", 390, 5)
+    lurek.render.setColor(0.5, 0.7, 1, 1)
+    lurek.render.print("P1", 30, 5)
+    lurek.render.setColor(1, 0.5, 0.4, 1)
+    lurek.render.print("AI", 740, 5)
+    lurek.render.setColor(1, 1, 1, 0.6)
+    lurek.render.print("VS", 390, 5)
 
     -- combo texts
     for _, ct in ipairs(comboTexts) do
-        lurek.gfx.setColor(1, 1, 0, clamp(ct.timer, 0, 1))
-        lurek.gfx.print(ct.text, ct.x - 20 + shakeX, ct.y + shakeY, 1.3)
+        lurek.render.setColor(1, 1, 0, clamp(ct.timer, 0, 1))
+        lurek.render.print(ct.text, ct.x - 20 + shakeX, ct.y + shakeY, 1.3)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 0.5)
-    lurek.gfx.print("WASD: Move | F: Punch | G: Kick | H: Block | V: Super (when full)", 120, 575)
+    lurek.render.setColor(1, 1, 1, 0.5)
+    lurek.render.print("WASD: Move | F: Punch | G: Kick | H: Block | V: Super (when full)", 120, 575)
 
     -- round start / game over
     if roundDelay > 0 then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 250, 250, 300, 80)
+        lurek.render.setColor(1, 1, 1, 1)
         if P1.wins >= roundsToWin then
-            lurek.gfx.print("P1 WINS THE MATCH!", 300, 270, 1.3)
-            lurek.gfx.print("Press R to rematch", 320, 300)
+            lurek.render.print("P1 WINS THE MATCH!", 300, 270, 1.3)
+            lurek.render.print("Press R to rematch", 320, 300)
         elseif P2.wins >= roundsToWin then
-            lurek.gfx.print("AI WINS THE MATCH!", 300, 270, 1.3)
-            lurek.gfx.print("Press R to rematch", 320, 300)
+            lurek.render.print("AI WINS THE MATCH!", 300, 270, 1.3)
+            lurek.render.print("Press R to rematch", 320, 300)
         else
-            lurek.gfx.print("ROUND " .. (P1.wins + P2.wins + 1), 340, 275, 1.5)
+            lurek.render.print("ROUND " .. (P1.wins + P2.wins + 1), 340, 275, 1.5)
         end
     end
 end

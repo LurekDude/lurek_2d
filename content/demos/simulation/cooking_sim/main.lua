@@ -140,7 +140,7 @@ local function interact()
 end
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.2, 0.18, 0.15)
+    lurek.render.setBackgroundColor(0.2, 0.18, 0.15)
     newOrder()
     newOrder()
 end
@@ -210,11 +210,11 @@ local function drawStation(s)
         serve = {0.2, 0.7, 0.3},
     }
     local c = colors[s.type]
-    lurek.gfx.setColor(c[1], c[2], c[3], 1)
-    lurek.gfx.rectangle("fill", s.x, s.y, s.w, s.h)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.rectangle("line", s.x, s.y, s.w, s.h)
-    lurek.gfx.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
+    lurek.render.setColor(c[1], c[2], c[3], 1)
+    lurek.render.rectangle("fill", s.x, s.y, s.w, s.h)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.rectangle("line", s.x, s.y, s.w, s.h)
+    lurek.render.print(s.label, s.x + 5, s.y + s.h + 4, 0.8)
 end
 
 function lurek.render()
@@ -222,16 +222,16 @@ function lurek.render()
     for _, s in ipairs(stations) do drawStation(s) end
 
     -- Shelf ingredient list
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Ingredients (1-" .. #INGREDIENTS .. "):", 10, 220, 0.8)
     for i, name in ipairs(INGREDIENTS) do
         local c = INGR_COLORS[name]
         if i == shelfSelect then
-            lurek.gfx.setColor(1, 1, 0, 1)
-            lurek.gfx.print("> ", 10, 240 + (i - 1) * 18, 0.8)
+            lurek.render.setColor(1, 1, 0, 1)
+            lurek.render.print("> ", 10, 240 + (i - 1) * 18, 0.8)
         end
-        lurek.gfx.setColor(c[1], c[2], c[3], 1)
-        lurek.gfx.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.print(i .. ". " .. name, 25, 240 + (i - 1) * 18, 0.8)
     end
 
     -- Stove item
@@ -239,75 +239,75 @@ function lurek.render()
         local sx = stations[3].x + 10
         local sy = stations[3].y + 10
         local c = INGR_COLORS[stoveItem.name] or {1, 1, 1}
-        lurek.gfx.setColor(c[1], c[2], c[3], 1)
-        lurek.gfx.circle("fill", sx + 20, sy + 15, 12)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.circle("fill", sx + 20, sy + 15, 12)
+        lurek.render.setColor(1, 1, 1, 1)
         local pct = clamp(stoveTimer / COOK_TIME, 0, 1)
-        lurek.gfx.rectangle("fill", sx, sy + 35, pct * 60, 6)
+        lurek.render.rectangle("fill", sx, sy + 35, pct * 60, 6)
         if stoveItem.state == "burnt" then
-            lurek.gfx.setColor(1, 0, 0, 1)
-            lurek.gfx.print("BURNT!", sx, sy + 44, 0.7)
+            lurek.render.setColor(1, 0, 0, 1)
+            lurek.render.print("BURNT!", sx, sy + 44, 0.7)
         elseif stoveItem.state == "cooked" then
-            lurek.gfx.setColor(0, 1, 0, 1)
-            lurek.gfx.print("DONE!", sx, sy + 44, 0.7)
+            lurek.render.setColor(0, 1, 0, 1)
+            lurek.render.print("DONE!", sx, sy + 44, 0.7)
         end
     end
 
     -- Chop progress
     if chopProgress > 0 then
         local cx = stations[2].x
-        lurek.gfx.setColor(0, 1, 0, 1)
-        lurek.gfx.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
+        lurek.render.setColor(0, 1, 0, 1)
+        lurek.render.rectangle("fill", cx, stations[2].y - 10, chopProgress * 80, 6)
     end
 
     -- Plate contents
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Plate:", stations[4].x, stations[4].y + stations[4].h + 20, 0.7)
     for i, item in ipairs(plate) do
-        lurek.gfx.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
+        lurek.render.print("- " .. item, stations[4].x, stations[4].y + stations[4].h + 35 + (i - 1) * 14, 0.65)
     end
 
     -- Chef
-    lurek.gfx.setColor(1, 0.9, 0.7, 1)
-    lurek.gfx.circle("fill", chef.x, chef.y, chef.size)
-    lurek.gfx.setColor(0.3, 0.3, 0.8, 1)
-    lurek.gfx.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
+    lurek.render.setColor(1, 0.9, 0.7, 1)
+    lurek.render.circle("fill", chef.x, chef.y, chef.size)
+    lurek.render.setColor(0.3, 0.3, 0.8, 1)
+    lurek.render.rectangle("fill", chef.x - 12, chef.y - 5, 24, 20)
     -- Holding indicator
     if chef.holding then
         local c = INGR_COLORS[chef.holding.name] or {1, 1, 1}
-        lurek.gfx.setColor(c[1], c[2], c[3], 1)
-        lurek.gfx.circle("fill", chef.x, chef.y - 30, 8)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.circle("fill", chef.x, chef.y - 30, 8)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(chef.holding.name .. "(" .. chef.holding.state .. ")", chef.x - 30, chef.y - 48, 0.6)
     end
 
     -- Orders
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 0, 0, W, 70)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("ORDERS:", 10, 5, 1)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 0, 0, W, 70)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("ORDERS:", 10, 5, 1)
     for i, order in ipairs(orders) do
         local ox = 10 + (i - 1) * 195
         local urgency = order.timer < 10 and {1, 0.3, 0.3} or {1, 1, 1}
-        lurek.gfx.setColor(urgency[1], urgency[2], urgency[3], 1)
-        lurek.gfx.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
-        lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+        lurek.render.setColor(urgency[1], urgency[2], urgency[3], 1)
+        lurek.render.print(order.recipe.name .. " ($" .. order.recipe.reward .. ")", ox, 25, 0.8)
+        lurek.render.setColor(0.7, 0.7, 0.7, 1)
         local ingStr = table.concat(order.recipe.ingredients, ", ")
-        lurek.gfx.print(ingStr, ox, 40, 0.55)
-        lurek.gfx.setColor(1, 0.8, 0, 1)
-        lurek.gfx.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
+        lurek.render.print(ingStr, ox, 40, 0.55)
+        lurek.render.setColor(1, 0.8, 0, 1)
+        lurek.render.print(math.floor(order.timer) .. "s", ox + 150, 25, 0.7)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 30, W, 30)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, H - 30, W, 30)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. score .. "  Money: $" .. money .. "  |  WASD move, Space/E interact, 1-6 select ingredient", 10, H - 25, 0.8)
 
     -- Message
     if msgTimer > 0 then
-        lurek.gfx.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
-        lurek.gfx.print(message, W / 2 - 80, H / 2, 1.2)
+        lurek.render.setColor(1, 1, 0, clamp(msgTimer, 0, 1))
+        lurek.render.print(message, W / 2 - 80, H / 2, 1.2)
     end
 end
 

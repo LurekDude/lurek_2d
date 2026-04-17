@@ -102,7 +102,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.4, 0.6, 0.9)
+    lurek.render.setBackgroundColor(0.4, 0.6, 0.9)
     build_terrain()
     lemmings = {}; spawned = 0; saved = 0; dead = 0; spawn_timer = 0
     skill_counts = { blocker = 3, digger = 5, builder = 4, basher = 3 }
@@ -238,8 +238,8 @@ end
 
 function lurek.render()
     -- Background sky gradient (simplified)
-    lurek.gfx.setColor(0.45, 0.65, 0.95)
-    lurek.gfx.rectangle("fill", 0, 0, W, H)
+    lurek.render.setColor(0.45, 0.65, 0.95)
+    lurek.render.rectangle("fill", 0, 0, W, H)
 
     -- Terrain
     for x = 1, COLS do
@@ -247,95 +247,95 @@ function lurek.render()
             if terrain[x] and terrain[x][y] then
                 local wx, wy = t2w(x, y)
                 local ratio = y / ROWS
-                lurek.gfx.setColor(0.35 - ratio*0.1, 0.55 - ratio*0.1, 0.15)
-                lurek.gfx.rectangle("fill", wx, wy, TILE, TILE)
+                lurek.render.setColor(0.35 - ratio*0.1, 0.55 - ratio*0.1, 0.15)
+                lurek.render.rectangle("fill", wx, wy, TILE, TILE)
                 -- Top edge highlight
                 if not (terrain[x] and terrain[x][y-1]) then
-                    lurek.gfx.setColor(0.5, 0.8, 0.25)
-                    lurek.gfx.rectangle("fill", wx, wy, TILE, 3)
+                    lurek.render.setColor(0.5, 0.8, 0.25)
+                    lurek.render.rectangle("fill", wx, wy, TILE, 3)
                 end
             end
         end
     end
 
     -- Exit door
-    lurek.gfx.setColor(0.9, 0.7, 0.1)
-    lurek.gfx.rectangle("fill", EXIT_X, EXIT_Y - 20, TILE * 2, TILE * 2 + 20)
-    lurek.gfx.setColor(0, 0, 0)
-    lurek.gfx.print("EXIT", EXIT_X + 3, EXIT_Y - 16, 1.1)
+    lurek.render.setColor(0.9, 0.7, 0.1)
+    lurek.render.rectangle("fill", EXIT_X, EXIT_Y - 20, TILE * 2, TILE * 2 + 20)
+    lurek.render.setColor(0, 0, 0)
+    lurek.render.print("EXIT", EXIT_X + 3, EXIT_Y - 16, 1.1)
 
     -- Spawn hatch
-    lurek.gfx.setColor(0.8, 0.5, 0.2)
-    lurek.gfx.rectangle("fill", SPAWN_X - 5, SPAWN_Y - 14, TILE * 2 + 10, TILE)
+    lurek.render.setColor(0.8, 0.5, 0.2)
+    lurek.render.rectangle("fill", SPAWN_X - 5, SPAWN_Y - 14, TILE * 2 + 10, TILE)
     local bounce = 0.5 + 0.5 * math.sin(anim * 8)
-    lurek.gfx.setColor(1, 0.8, 0.1)
-    lurek.gfx.rectangle("fill", SPAWN_X + 2, SPAWN_Y - 12 - bounce * 3, TILE + 6, 6)
+    lurek.render.setColor(1, 0.8, 0.1)
+    lurek.render.rectangle("fill", SPAWN_X + 2, SPAWN_Y - 12 - bounce * 3, TILE + 6, 6)
 
     -- Lemmings
     for _, lem in ipairs(lemmings) do
         if lem.alive then
             local jc = JOB_COLORS[lem.job] or JOB_COLORS.none
-            lurek.gfx.setColor(jc[1], jc[2], jc[3])
-            lurek.gfx.rectangle("fill", lem.x, lem.y, LSIZE, LSIZE)
+            lurek.render.setColor(jc[1], jc[2], jc[3])
+            lurek.render.rectangle("fill", lem.x, lem.y, LSIZE, LSIZE)
             -- Head
-            lurek.gfx.setColor(0.9, 0.75, 0.6)
-            lurek.gfx.circle("fill", lem.x + LSIZE/2, lem.y - 3, 5)
+            lurek.render.setColor(0.9, 0.75, 0.6)
+            lurek.render.circle("fill", lem.x + LSIZE/2, lem.y - 3, 5)
             -- Blue hat
-            lurek.gfx.setColor(0.2, 0.2, 0.9)
-            lurek.gfx.rectangle("fill", lem.x + 1, lem.y - 8, LSIZE - 2, 6)
+            lurek.render.setColor(0.2, 0.2, 0.9)
+            lurek.render.rectangle("fill", lem.x + 1, lem.y - 8, LSIZE - 2, 6)
             -- Walking legs
             local leg = math.floor(anim * 8) % 2 == 0
             if lem.on_ground and lem.job == "none" then
-                lurek.gfx.setColor(jc[1] * 0.7, jc[2] * 0.7, jc[3] * 0.7)
-                lurek.gfx.rectangle("fill", lem.x + (leg and 1 or 5), lem.y + LSIZE, 3, 4)
-                lurek.gfx.rectangle("fill", lem.x + (leg and 5 or 1), lem.y + LSIZE, 3, 4)
+                lurek.render.setColor(jc[1] * 0.7, jc[2] * 0.7, jc[3] * 0.7)
+                lurek.render.rectangle("fill", lem.x + (leg and 1 or 5), lem.y + LSIZE, 3, 4)
+                lurek.render.rectangle("fill", lem.x + (leg and 5 or 1), lem.y + LSIZE, 3, 4)
             end
         end
     end
 
     -- HUD panel
-    lurek.gfx.setColor(0.1, 0.1, 0.15, 0.85)
-    lurek.gfx.rectangle("fill", 0, H - 42, W, 42)
-    lurek.gfx.setColor(0.5, 1, 0.3)
-    lurek.gfx.print("Saved: " .. saved .. "/" .. LEVEL_NEED, 8, H - 37, 1.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("Dead: " .. dead, 170, H - 37, 1.5)
-    lurek.gfx.setColor(1, 0.8, 0.2)
-    lurek.gfx.print("Left: " .. (LEVEL_TOTAL - spawned), 290, H - 37, 1.5)
+    lurek.render.setColor(0.1, 0.1, 0.15, 0.85)
+    lurek.render.rectangle("fill", 0, H - 42, W, 42)
+    lurek.render.setColor(0.5, 1, 0.3)
+    lurek.render.print("Saved: " .. saved .. "/" .. LEVEL_NEED, 8, H - 37, 1.5)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("Dead: " .. dead, 170, H - 37, 1.5)
+    lurek.render.setColor(1, 0.8, 0.2)
+    lurek.render.print("Left: " .. (LEVEL_TOTAL - spawned), 290, H - 37, 1.5)
 
     -- Job buttons
     local jobs_row = {"blocker","digger","builder","basher"}
     for i, j in ipairs(jobs_row) do
         local bx = 380 + (i-1) * 100
         local sel = selected_job == j
-        lurek.gfx.setColor(sel and 0.3 or 0.2, sel and 0.5 or 0.3, sel and 0.9 or 0.5)
-        lurek.gfx.rectangle("fill", bx, H - 40, 94, 36)
+        lurek.render.setColor(sel and 0.3 or 0.2, sel and 0.5 or 0.3, sel and 0.9 or 0.5)
+        lurek.render.rectangle("fill", bx, H - 40, 94, 36)
         if sel then
-            lurek.gfx.setColor(1, 1, 0.2)
-            lurek.gfx.rectangle("line", bx, H - 40, 94, 36)
+            lurek.render.setColor(1, 1, 0.2)
+            lurek.render.rectangle("line", bx, H - 40, 94, 36)
         end
         local jc = JOB_COLORS[j]
-        lurek.gfx.setColor(jc[1], jc[2], jc[3])
-        lurek.gfx.print(j:upper() .. " " .. (skill_counts[j] or 0), bx + 4, H - 30, 1.2)
+        lurek.render.setColor(jc[1], jc[2], jc[3])
+        lurek.render.print(j:upper() .. " " .. (skill_counts[j] or 0), bx + 4, H - 30, 1.2)
     end
 
     -- Overlay
     if game_state ~= "playing" then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 0, 0, W, H)
         if game_state == "win" then
-            lurek.gfx.setColor(0.2, 1, 0.4)
-            lurek.gfx.print("LEVEL COMPLETE!", W/2 - 110, H/2 - 25, 3)
-            lurek.gfx.setColor(1, 1, 1)
-            lurek.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
+            lurek.render.setColor(0.2, 1, 0.4)
+            lurek.render.print("LEVEL COMPLETE!", W/2 - 110, H/2 - 25, 3)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
         else
-            lurek.gfx.setColor(1, 0.2, 0.2)
-            lurek.gfx.print("LEVEL FAILED", W/2 - 94, H/2 - 25, 3)
-            lurek.gfx.setColor(1, 1, 1)
-            lurek.gfx.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
+            lurek.render.setColor(1, 0.2, 0.2)
+            lurek.render.print("LEVEL FAILED", W/2 - 94, H/2 - 25, 3)
+            lurek.render.setColor(1, 1, 1)
+            lurek.render.print("Saved: " .. saved .. " / " .. LEVEL_NEED, W/2 - 90, H/2 + 20, 2)
         end
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to retry", W/2 - 88, H/2 + 58, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to retry", W/2 - 88, H/2 + 58, 2)
     end
 end
 

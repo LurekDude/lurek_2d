@@ -218,181 +218,181 @@ function lurek.keypressed(key)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.55, 0.75, 0.9)
+    lurek.render.setBackgroundColor(0.55, 0.75, 0.9)
 
     -- sky gradient
     for i = 0, 5 do
         local t = i / 5
-        lurek.gfx.setColor(0.45 + t * 0.15, 0.65 + t * 0.1, 0.85 + t * 0.05, 1)
-        lurek.gfx.rectangle("fill", 0, i * 60, W, 60)
+        lurek.render.setColor(0.45 + t * 0.15, 0.65 + t * 0.1, 0.85 + t * 0.05, 1)
+        lurek.render.rectangle("fill", 0, i * 60, W, 60)
     end
 
     -- distant mountains
-    lurek.gfx.setColor(0.35, 0.45, 0.55, 0.5)
+    lurek.render.setColor(0.35, 0.45, 0.55, 0.5)
     for i = 0, 20 do
         local x = i * 40
         local mh = 80 + math.sin(i * 0.8) * 40
-        lurek.gfx.polygon("fill", { x, H - 100 - mh, x + 20, H - 100 - mh - 30, x + 40, H - 100 - mh, x + 40, H - 60, x, H - 60 })
+        lurek.render.polygon("fill", { x, H - 100 - mh, x + 20, H - 100 - mh - 30, x + 40, H - 100 - mh, x + 40, H - 60, x, H - 60 })
     end
 
     -- terrain fill
-    lurek.gfx.setColor(0.25, 0.45, 0.2, 1)
+    lurek.render.setColor(0.25, 0.45, 0.2, 1)
     for i = 1, #terrain_pts - 1 do
         local a, b = terrain_pts[i], terrain_pts[i + 1]
-        lurek.gfx.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
+        lurek.render.polygon("fill", { a.x, a.y, b.x, b.y, b.x, H, a.x, H })
     end
-    lurek.gfx.setColor(0.35, 0.55, 0.3, 1)
-    lurek.gfx.setLineWidth(2)
+    lurek.render.setColor(0.35, 0.55, 0.3, 1)
+    lurek.render.setLineWidth(2)
     for i = 1, #terrain_pts - 1 do
-        lurek.gfx.line(terrain_pts[i].x, terrain_pts[i].y, terrain_pts[i + 1].x, terrain_pts[i + 1].y)
+        lurek.render.line(terrain_pts[i].x, terrain_pts[i].y, terrain_pts[i + 1].x, terrain_pts[i + 1].y)
     end
 
     -- targets
     for _, tgt in ipairs(targets) do
         if tgt.hit then
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+            lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         else
             -- body
-            lurek.gfx.setColor(0.6, 0.3, 0.2, 1)
+            lurek.render.setColor(0.6, 0.3, 0.2, 1)
         end
-        lurek.gfx.rectangle("fill", tgt.x - tgt.body_w / 2, tgt.y - tgt.body_h, tgt.body_w, tgt.body_h)
+        lurek.render.rectangle("fill", tgt.x - tgt.body_w / 2, tgt.y - tgt.body_h, tgt.body_w, tgt.body_h)
         -- head
         if tgt.hit and tgt.headshot then
-            lurek.gfx.setColor(1, 0.3, 0.1, 0.7)
+            lurek.render.setColor(1, 0.3, 0.1, 0.7)
         elseif tgt.hit then
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+            lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         else
-            lurek.gfx.setColor(0.8, 0.6, 0.5, 1)
+            lurek.render.setColor(0.8, 0.6, 0.5, 1)
         end
-        lurek.gfx.circle("fill", tgt.x, tgt.head_y, tgt.head_r)
+        lurek.render.circle("fill", tgt.x, tgt.head_y, tgt.head_r)
         -- hit marker
         if tgt.hit then
-            lurek.gfx.setColor(1, 0, 0, 0.8)
-            lurek.gfx.setLineWidth(2)
-            lurek.gfx.line(tgt.x - 8, tgt.head_y - 8, tgt.x + 8, tgt.head_y + 8)
-            lurek.gfx.line(tgt.x + 8, tgt.head_y - 8, tgt.x - 8, tgt.head_y + 8)
+            lurek.render.setColor(1, 0, 0, 0.8)
+            lurek.render.setLineWidth(2)
+            lurek.render.line(tgt.x - 8, tgt.head_y - 8, tgt.x + 8, tgt.head_y + 8)
+            lurek.render.line(tgt.x + 8, tgt.head_y - 8, tgt.x - 8, tgt.head_y + 8)
         end
     end
 
     -- shooter position
-    lurek.gfx.setColor(0.2, 0.3, 0.2, 1)
-    lurek.gfx.rectangle("fill", 10, H - 110, 30, 50)
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.line(25, H - 100, 60, H - 95)
+    lurek.render.setColor(0.2, 0.3, 0.2, 1)
+    lurek.render.rectangle("fill", 10, H - 110, 30, 50)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.line(25, H - 100, 60, H - 95)
 
     -- bullet trail
-    lurek.gfx.setColor(1, 0.8, 0.2, 0.6)
-    lurek.gfx.setLineWidth(1)
+    lurek.render.setColor(1, 0.8, 0.2, 0.6)
+    lurek.render.setLineWidth(1)
     for i = 1, #bullet_trail - 1, 3 do
         local a, b = bullet_trail[i], bullet_trail[i + 1]
         if a and b then
-            lurek.gfx.setColor(1, 0.8, 0.2, 0.3 + (i / #bullet_trail) * 0.4)
-            lurek.gfx.circle("fill", a.x, a.y, 1.5)
+            lurek.render.setColor(1, 0.8, 0.2, 0.3 + (i / #bullet_trail) * 0.4)
+            lurek.render.circle("fill", a.x, a.y, 1.5)
         end
     end
 
     -- bullet
     if bullet.active then
-        lurek.gfx.setColor(1, 1, 0.3, 1)
-        lurek.gfx.circle("fill", bullet.x, bullet.y, 3)
+        lurek.render.setColor(1, 1, 0.3, 1)
+        lurek.render.circle("fill", bullet.x, bullet.y, 3)
     end
 
     -- scope overlay (zoomed circle)
     if state.phase == "aiming" then
         local sr = scope.radius
         -- scope ring
-        lurek.gfx.setColor(0, 0, 0, 0.15)
-        lurek.gfx.circle("fill", scope.x, scope.y, sr)
-        lurek.gfx.setColor(0.1, 0.1, 0.1, 0.8)
-        lurek.gfx.setLineWidth(2)
-        lurek.gfx.circle("line", scope.x, scope.y, sr)
+        lurek.render.setColor(0, 0, 0, 0.15)
+        lurek.render.circle("fill", scope.x, scope.y, sr)
+        lurek.render.setColor(0.1, 0.1, 0.1, 0.8)
+        lurek.render.setLineWidth(2)
+        lurek.render.circle("line", scope.x, scope.y, sr)
 
         -- crosshair
-        lurek.gfx.setColor(1, 0.2, 0.2, 0.8)
-        lurek.gfx.setLineWidth(1)
-        lurek.gfx.line(scope.x - sr, scope.y, scope.x - 5, scope.y)
-        lurek.gfx.line(scope.x + 5, scope.y, scope.x + sr, scope.y)
-        lurek.gfx.line(scope.x, scope.y - sr, scope.x, scope.y - 5)
-        lurek.gfx.line(scope.x, scope.y + 5, scope.x, scope.y + sr)
+        lurek.render.setColor(1, 0.2, 0.2, 0.8)
+        lurek.render.setLineWidth(1)
+        lurek.render.line(scope.x - sr, scope.y, scope.x - 5, scope.y)
+        lurek.render.line(scope.x + 5, scope.y, scope.x + sr, scope.y)
+        lurek.render.line(scope.x, scope.y - sr, scope.x, scope.y - 5)
+        lurek.render.line(scope.x, scope.y + 5, scope.x, scope.y + sr)
 
         -- mil dots
         for i = 1, 3 do
             local offset = i * 15
-            lurek.gfx.circle("fill", scope.x, scope.y + offset, 2)
-            lurek.gfx.circle("fill", scope.x + offset, scope.y, 2)
-            lurek.gfx.circle("fill", scope.x - offset, scope.y, 2)
+            lurek.render.circle("fill", scope.x, scope.y + offset, 2)
+            lurek.render.circle("fill", scope.x + offset, scope.y, 2)
+            lurek.render.circle("fill", scope.x - offset, scope.y, 2)
         end
     end
 
     -- HUD panel
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, W, 45)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, W, 45)
 
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. state.score, 10, 5)
-    lurek.gfx.print("Round: " .. state.round .. "/" .. state.total_rounds, 10, 22)
-    lurek.gfx.print("Shots: " .. state.shots_left .. "/5", 180, 5)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. state.score, 10, 5)
+    lurek.render.print("Round: " .. state.round .. "/" .. state.total_rounds, 10, 22)
+    lurek.render.print("Shots: " .. state.shots_left .. "/5", 180, 5)
 
     -- wind indicator
-    lurek.gfx.setColor(0.7, 0.9, 1, 1)
+    lurek.render.setColor(0.7, 0.9, 1, 1)
     local wind_label = "Wind: "
     if state.wind > 0 then wind_label = wind_label .. ">>> "
     elseif state.wind < 0 then wind_label = wind_label .. "<<< "
     else wind_label = wind_label .. "--- " end
     wind_label = wind_label .. math.floor(math.abs(state.wind))
-    lurek.gfx.print(wind_label, 180, 22)
+    lurek.render.print(wind_label, 180, 22)
 
     -- breath indicator
     local breath = math.sin(state.breath_phase) * 0.5 + 0.5
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 0.7)
-    lurek.gfx.rectangle("fill", 380, 8, 80, 10)
-    lurek.gfx.setColor(0.2, 0.8, 0.3, 1)
-    lurek.gfx.rectangle("fill", 382, 10, 76 * breath, 6)
-    lurek.gfx.setColor(1, 1, 1, 0.8)
-    lurek.gfx.print("Breath", 380, 22)
+    lurek.render.setColor(0.3, 0.3, 0.3, 0.7)
+    lurek.render.rectangle("fill", 380, 8, 80, 10)
+    lurek.render.setColor(0.2, 0.8, 0.3, 1)
+    lurek.render.rectangle("fill", 382, 10, 76 * breath, 6)
+    lurek.render.setColor(1, 1, 1, 0.8)
+    lurek.render.print("Breath", 380, 22)
 
     -- steady aim hint
     if lurek.keyboard.isDown("lshift") or lurek.keyboard.isDown("rshift") then
-        lurek.gfx.setColor(0.3, 1, 0.5, 1)
-        lurek.gfx.print("STEADY", 470, 8)
+        lurek.render.setColor(0.3, 1, 0.5, 1)
+        lurek.render.print("STEADY", 470, 8)
     else
-        lurek.gfx.setColor(0.6, 0.6, 0.6, 0.5)
-        lurek.gfx.print("[Shift] Steady", 470, 8)
+        lurek.render.setColor(0.6, 0.6, 0.6, 0.5)
+        lurek.render.print("[Shift] Steady", 470, 8)
     end
 
     -- targets hit count
     local hit_count = 0
     for _, t in ipairs(targets) do if t.hit then hit_count = hit_count + 1 end end
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Targets: " .. hit_count .. "/" .. #targets, 600, 5)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Targets: " .. hit_count .. "/" .. #targets, 600, 5)
 
     -- message
     if state.message_timer > 0 then
         local a = clamp(state.message_timer, 0, 1)
-        lurek.gfx.setColor(1, 1, 0.3, a)
-        lurek.gfx.print(state.message, W / 2 - 60, H / 2 - 40, 1.5)
+        lurek.render.setColor(1, 1, 0.3, a)
+        lurek.render.print(state.message, W / 2 - 60, H / 2 - 40, 1.5)
     end
 
     -- round end / game over overlay
     if state.phase == "round_end" then
-        lurek.gfx.setColor(0, 0, 0, 0.5)
-        lurek.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
-        lurek.gfx.setColor(1, 1, 0.5, 1)
-        lurek.gfx.print("Round Complete! Score: " .. state.score, W / 2 - 100, H / 2 - 25, 1.3)
-        lurek.gfx.setColor(1, 1, 1, 0.8)
-        lurek.gfx.print("Press Enter for next round", W / 2 - 80, H / 2 + 15)
+        lurek.render.setColor(0, 0, 0, 0.5)
+        lurek.render.rectangle("fill", 0, H / 2 - 40, W, 80)
+        lurek.render.setColor(1, 1, 0.5, 1)
+        lurek.render.print("Round Complete! Score: " .. state.score, W / 2 - 100, H / 2 - 25, 1.3)
+        lurek.render.setColor(1, 1, 1, 0.8)
+        lurek.render.print("Press Enter for next round", W / 2 - 80, H / 2 + 15)
     end
     if state.phase == "game_over" then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 0, H / 2 - 50, W, 100)
-        lurek.gfx.setColor(1, 0.8, 0.2, 1)
-        lurek.gfx.print("FINAL SCORE: " .. state.score, W / 2 - 80, H / 2 - 35, 1.5)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, H / 2 - 50, W, 100)
+        lurek.render.setColor(1, 0.8, 0.2, 1)
+        lurek.render.print("FINAL SCORE: " .. state.score, W / 2 - 80, H / 2 - 35, 1.5)
         local headshots = 0
         for _, t in ipairs(targets) do if t.headshot then headshots = headshots + 1 end end
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Headshots: " .. headshots .. "  |  Press Enter to play again", W / 2 - 120, H / 2 + 15)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Headshots: " .. headshots .. "  |  Press Enter to play again", W / 2 - 120, H / 2 + 15)
     end
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.4)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 70, H - 18)
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.4)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 70, H - 18)
 end

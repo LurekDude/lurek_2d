@@ -102,7 +102,7 @@ local function startHack(doorR, doorC)
 end
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.05, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.05, 0.1)
     initMap()
     player.x = 1.5 * TILE
     player.y = 13.5 * TILE
@@ -304,108 +304,108 @@ function lurek.render()
             local x, y = (c - 1) * TILE, (r - 1) * TILE
             local v = map[r][c]
             if v == 0 then
-                lurek.gfx.setColor(0.12, 0.12, 0.18, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0.12, 0.12, 0.18, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             elseif v == 1 then
-                lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0.2, 0.2, 0.25, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             elseif v >= 2 and v <= 4 then
                 local clr = DOOR_COLORS[v]
-                lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
-                lurek.gfx.setColor(1, 1, 1, 0.7)
-                lurek.gfx.print(DOOR_NAMES[v], x + 2, y + 12, 0.5)
+                lurek.render.setColor(clr[1], clr[2], clr[3], 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(1, 1, 1, 0.7)
+                lurek.render.print(DOOR_NAMES[v], x + 2, y + 12, 0.5)
             elseif v == 5 then
-                lurek.gfx.setColor(0.2, 0.2, 0.25, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
-                lurek.gfx.setColor(0, 0.8, 0, 1)
-                lurek.gfx.print(">_", x + 8, y + 10, 1)
+                lurek.render.setColor(0.2, 0.2, 0.25, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0, 0.8, 0, 1)
+                lurek.render.print(">_", x + 8, y + 10, 1)
             elseif v == 6 then
-                lurek.gfx.setColor(0.6, 0.5, 0.1, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
-                lurek.gfx.setColor(1, 1, 1, 1)
-                lurek.gfx.print("VAULT", x + 2, y + 12, 0.5)
+                lurek.render.setColor(0.6, 0.5, 0.1, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(1, 1, 1, 1)
+                lurek.render.print("VAULT", x + 2, y + 12, 0.5)
             elseif v == 7 then
-                lurek.gfx.setColor(0.1, 0.5, 0.1, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
-                lurek.gfx.setColor(1, 1, 1, 1)
-                lurek.gfx.print("EXIT", x + 4, y + 12, 0.55)
+                lurek.render.setColor(0.1, 0.5, 0.1, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(1, 1, 1, 1)
+                lurek.render.print("EXIT", x + 4, y + 12, 0.55)
             end
         end
     end
 
     -- Grid lines
-    lurek.gfx.setColor(0.15, 0.15, 0.2, 0.5)
+    lurek.render.setColor(0.15, 0.15, 0.2, 0.5)
     for r = 0, ROWS do
-        lurek.gfx.line(0, r * TILE, COLS * TILE, r * TILE)
+        lurek.render.line(0, r * TILE, COLS * TILE, r * TILE)
     end
     for c = 0, COLS do
-        lurek.gfx.line(c * TILE, 0, c * TILE, ROWS * TILE)
+        lurek.render.line(c * TILE, 0, c * TILE, ROWS * TILE)
     end
 
     -- Cameras
     for i, cam in ipairs(cameras) do
         local disabled = isCamDisabled(i)
         if disabled then
-            lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+            lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
         else
-            lurek.gfx.setColor(1, 0, 0, 0.2)
+            lurek.render.setColor(1, 0, 0, 0.2)
             -- Vision cone
             local cx1 = cam.x + math.cos(cam.angle - cam.coneWidth) * cam.range
             local cy1 = cam.y + math.sin(cam.angle - cam.coneWidth) * cam.range
             local cx2 = cam.x + math.cos(cam.angle + cam.coneWidth) * cam.range
             local cy2 = cam.y + math.sin(cam.angle + cam.coneWidth) * cam.range
-            lurek.gfx.polygon("fill", {cam.x, cam.y, cx1, cy1, cx2, cy2})
+            lurek.render.polygon("fill", {cam.x, cam.y, cx1, cy1, cx2, cy2})
         end
-        lurek.gfx.setColor(disabled and 0.4 or 1, 0, 0, 1)
-        lurek.gfx.circle("fill", cam.x, cam.y, 6)
+        lurek.render.setColor(disabled and 0.4 or 1, 0, 0, 1)
+        lurek.render.circle("fill", cam.x, cam.y, 6)
     end
 
     -- Player
-    lurek.gfx.setColor(0, 0.8, 1, 1)
-    lurek.gfx.circle("fill", player.x, player.y, 10)
-    lurek.gfx.setColor(0, 0.5, 0.8, 1)
-    lurek.gfx.circle("line", player.x, player.y, 12)
+    lurek.render.setColor(0, 0.8, 1, 1)
+    lurek.render.circle("fill", player.x, player.y, 10)
+    lurek.render.setColor(0, 0.5, 0.8, 1)
+    lurek.render.circle("line", player.x, player.y, 12)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 0, 0, W, 35)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 0, 0, W, 35)
     -- Alert bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 10, 5, 150, 12)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 10, 5, 150, 12)
     local alertPct = alertLevel / maxAlert
     local ar = lerp(0.2, 1, alertPct)
-    lurek.gfx.setColor(ar, 0.1, 0.1, 1)
-    lurek.gfx.rectangle("fill", 10, 5, alertPct * 150, 12)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Alert", 165, 3, 0.75)
+    lurek.render.setColor(ar, 0.1, 0.1, 1)
+    lurek.render.rectangle("fill", 10, 5, alertPct * 150, 12)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Alert", 165, 3, 0.75)
     -- Timer
     local mins = math.floor(missionTimer / 60)
     local secs = math.floor(missionTimer % 60)
     local timeStr = mins .. ":" .. (secs < 10 and "0" or "") .. secs
-    lurek.gfx.setColor(missionTimer < 30 and 1 or 0.8, missionTimer < 30 and 0.3 or 0.8, missionTimer < 30 and 0.3 or 0.8, 1)
-    lurek.gfx.print("Time: " .. timeStr, 220, 5, 0.9)
+    lurek.render.setColor(missionTimer < 30 and 1 or 0.8, missionTimer < 30 and 0.3 or 0.8, missionTimer < 30 and 0.3 or 0.8, 1)
+    lurek.render.print("Time: " .. timeStr, 220, 5, 0.9)
     -- Gadgets
-    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-    lurek.gfx.print("Keycards:" .. gadgets.keycard .. " EMP(Q):" .. gadgets.emp .. " Picks:" .. gadgets.lockpick, 350, 5, 0.75)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print("Keycards:" .. gadgets.keycard .. " EMP(Q):" .. gadgets.emp .. " Picks:" .. gadgets.lockpick, 350, 5, 0.75)
     -- Data
-    lurek.gfx.setColor(hasData and 0 or 0.5, hasData and 1 or 0.5, hasData and 0 or 0.5, 1)
-    lurek.gfx.print(hasData and "DATA ACQUIRED" or "No Data", 650, 5, 0.8)
+    lurek.render.setColor(hasData and 0 or 0.5, hasData and 1 or 0.5, hasData and 0 or 0.5, 1)
+    lurek.render.print(hasData and "DATA ACQUIRED" or "No Data", 650, 5, 0.8)
 
     -- Bottom HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 25, W, 25)
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-    lurek.gfx.print("WASD move | E interact with doors/terminals | Q EMP | Get to vault, steal data, reach exit", 10, H - 22, 0.7)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, H - 25, W, 25)
+    lurek.render.setColor(0.6, 0.6, 0.6, 1)
+    lurek.render.print("WASD move | E interact with doors/terminals | Q EMP | Get to vault, steal data, reach exit", 10, H - 22, 0.7)
 
     -- Hack overlay
     if gameState == "hacking" and hackState then
-        lurek.gfx.setColor(0, 0, 0, 0.9)
-        lurek.gfx.rectangle("fill", W / 2 - 200, H / 2 - 120, 400, 240)
-        lurek.gfx.setColor(0, 1, 0, 1)
-        lurek.gfx.print("HACK TERMINAL", W / 2 - 70, H / 2 - 110, 1)
-        lurek.gfx.print("Match wires: press 1-4 in correct order", W / 2 - 150, H / 2 - 85, 0.75)
-        lurek.gfx.print("Time: " .. math.floor(hackState.timer) .. "s | Q to cancel", W / 2 - 100, H / 2 - 65, 0.7)
+        lurek.render.setColor(0, 0, 0, 0.9)
+        lurek.render.rectangle("fill", W / 2 - 200, H / 2 - 120, 400, 240)
+        lurek.render.setColor(0, 1, 0, 1)
+        lurek.render.print("HACK TERMINAL", W / 2 - 70, H / 2 - 110, 1)
+        lurek.render.print("Match wires: press 1-4 in correct order", W / 2 - 150, H / 2 - 85, 0.75)
+        lurek.render.print("Time: " .. math.floor(hackState.timer) .. "s | Q to cancel", W / 2 - 100, H / 2 - 65, 0.7)
 
         local wireColors = {{1, 0, 0}, {0, 1, 0}, {0, 0.5, 1}, {1, 1, 0}}
         for i = 1, 4 do
@@ -414,44 +414,44 @@ function lurek.render()
             local wy = H / 2 - 30 + (i - 1) * 40
             -- Left side (source)
             local c = wireColors[wire.id]
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
-            lurek.gfx.circle("fill", wx, wy, 10)
-            lurek.gfx.print("Wire " .. wire.id, wx + 15, wy - 7, 0.7)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
+            lurek.render.circle("fill", wx, wy, 10)
+            lurek.render.print("Wire " .. wire.id, wx + 15, wy - 7, 0.7)
             -- Right side (target)
             local tc = wireColors[wire.target]
-            lurek.gfx.setColor(tc[1], tc[2], tc[3], 1)
-            lurek.gfx.circle("fill", wx + 280, wy, 10)
-            lurek.gfx.print("Port " .. wire.target, wx + 220, wy - 7, 0.7)
+            lurek.render.setColor(tc[1], tc[2], tc[3], 1)
+            lurek.render.circle("fill", wx + 280, wy, 10)
+            lurek.render.print("Port " .. wire.target, wx + 220, wy - 7, 0.7)
 
             if wire.connected then
-                lurek.gfx.setColor(0, 1, 0, 0.8)
-                lurek.gfx.line(wx + 10, wy, wx + 270, wy)
+                lurek.render.setColor(0, 1, 0, 0.8)
+                lurek.render.line(wx + 10, wy, wx + 270, wy)
             end
             if i == hackState.nextWire then
-                lurek.gfx.setColor(1, 1, 1, 0.5 + math.sin(lurek.time.getTime() * 6) * 0.5)
-                lurek.gfx.circle("line", wx, wy, 14)
+                lurek.render.setColor(1, 1, 1, 0.5 + math.sin(lurek.time.getTime() * 6) * 0.5)
+                lurek.render.circle("line", wx, wy, 14)
             end
         end
     end
 
     -- Message
     if msgTimer > 0 then
-        lurek.gfx.setColor(0, 1, 0.5, clamp(msgTimer, 0, 1))
-        lurek.gfx.print(message, W / 2 - 120, H / 2 + 80, 1)
+        lurek.render.setColor(0, 1, 0.5, clamp(msgTimer, 0, 1))
+        lurek.render.print(message, W / 2 - 120, H / 2 + 80, 1)
     end
 
     -- Game over / win
     if gameState == "caught" then
-        lurek.gfx.setColor(0.5, 0, 0, 0.85)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("MISSION FAILED", W / 2 - 100, H / 2 - 20, 1.5)
-        lurek.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
+        lurek.render.setColor(0.5, 0, 0, 0.85)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("MISSION FAILED", W / 2 - 100, H / 2 - 20, 1.5)
+        lurek.render.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
     elseif gameState == "won" then
-        lurek.gfx.setColor(0, 0.2, 0.1, 0.85)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(0, 1, 0.5, 1)
-        lurek.gfx.print("MISSION COMPLETE", W / 2 - 110, H / 2 - 20, 1.5)
-        lurek.gfx.print("Press R to replay", W / 2 - 65, H / 2 + 20, 0.9)
+        lurek.render.setColor(0, 0.2, 0.1, 0.85)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 1, 0.5, 1)
+        lurek.render.print("MISSION COMPLETE", W / 2 - 110, H / 2 - 20, 1.5)
+        lurek.render.print("Press R to replay", W / 2 - 65, H / 2 + 20, 0.9)
     end
 end

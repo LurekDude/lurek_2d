@@ -213,46 +213,46 @@ function lurek.mousepressed(mx, my, btn)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.1, 0.12, 0.18)
+    lurek.render.setBackgroundColor(0.1, 0.12, 0.18)
 
     -- Draw ground
-    lurek.gfx.setColor(0.3, 0.25, 0.2, 1)
-    lurek.gfx.rectangle("fill", 0, LOBBY_Y + scrollY, 800, 200)
+    lurek.render.setColor(0.3, 0.25, 0.2, 1)
+    lurek.render.rectangle("fill", 0, LOBBY_Y + scrollY, 800, 200)
 
     -- Draw elevator shaft
-    lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
-    lurek.gfx.rectangle("fill", ELEVATOR_X, LOBBY_Y - #hotel * FLOOR_H + scrollY, 40, #hotel * FLOOR_H)
+    lurek.render.setColor(0.15, 0.15, 0.2, 1)
+    lurek.render.rectangle("fill", ELEVATOR_X, LOBBY_Y - #hotel * FLOOR_H + scrollY, 40, #hotel * FLOOR_H)
 
     -- Draw floors
     for fi = 1, #hotel do
         local fy = getFloorY(fi)
         -- Floor platform
-        lurek.gfx.setColor(0.25, 0.25, 0.3, 1)
-        lurek.gfx.rectangle("fill", 30, fy + FLOOR_H - 4, 740, 4)
+        lurek.render.setColor(0.25, 0.25, 0.3, 1)
+        lurek.render.rectangle("fill", 30, fy + FLOOR_H - 4, 740, 4)
 
         -- Floor number
-        lurek.gfx.setColor(0.5, 0.5, 0.6, 1)
-        lurek.gfx.print(tostring(fi), 10, fy + 12)
+        lurek.render.setColor(0.5, 0.5, 0.6, 1)
+        lurek.render.print(tostring(fi), 10, fy + 12)
 
         -- Rooms
         for ri = 1, ROOMS_PER_FLOOR do
             local rx = getRoomX(ri)
             local rt = hotel[fi][ri]
             local c = roomTypes[rt].color
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
-            lurek.gfx.rectangle("fill", rx, fy + 2, ROOM_W - 4, FLOOR_H - 6)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
+            lurek.render.rectangle("fill", rx, fy + 2, ROOM_W - 4, FLOOR_H - 6)
 
             if rt > 1 then
                 -- Occupancy indicator
                 if occupancy[fi][ri] then
-                    lurek.gfx.setColor(0, 1, 0, 0.6)
-                    lurek.gfx.circle("fill", rx + ROOM_W - 12, fy + 10, 4)
+                    lurek.render.setColor(0, 1, 0, 0.6)
+                    lurek.render.circle("fill", rx + ROOM_W - 12, fy + 10, 4)
                 else
-                    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.6)
-                    lurek.gfx.circle("fill", rx + ROOM_W - 12, fy + 10, 4)
+                    lurek.render.setColor(0.5, 0.5, 0.5, 0.6)
+                    lurek.render.circle("fill", rx + ROOM_W - 12, fy + 10, 4)
                 end
-                lurek.gfx.setColor(1, 1, 1, 0.8)
-                lurek.gfx.print(roomTypes[rt].icon, rx + 4, fy + 10)
+                lurek.render.setColor(1, 1, 1, 0.8)
+                lurek.render.print(roomTypes[rt].icon, rx + 4, fy + 10)
             end
         end
     end
@@ -261,48 +261,48 @@ function lurek.render()
     local elevFloor = math.floor(lurek.time.getTime() * 0.5 % clamp(#hotel, 1, 20)) + 1
     if elevFloor <= #hotel then
         local ey = getFloorY(elevFloor)
-        lurek.gfx.setColor(0.8, 0.8, 0.2, 1)
-        lurek.gfx.rectangle("fill", ELEVATOR_X + 5, ey + 5, 30, FLOOR_H - 12)
+        lurek.render.setColor(0.8, 0.8, 0.2, 1)
+        lurek.render.rectangle("fill", ELEVATOR_X + 5, ey + 5, 30, FLOOR_H - 12)
     end
 
     -- HUD background
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 60)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 0, 0, 800, 60)
 
     -- Stats
-    lurek.gfx.setColor(0.2, 1, 0.3, 1)
-    lurek.gfx.print("$" .. money, 10, 8, 1.2)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Day " .. day, 140, 10)
-    lurek.gfx.print("Rev: $" .. dailyRevenue .. "/day", 240, 10)
-    lurek.gfx.print("Exp: $" .. dailyExpense .. "/day", 420, 10)
-    lurek.gfx.print("Occ: " .. getOccupancyRate() .. "%", 600, 10)
+    lurek.render.setColor(0.2, 1, 0.3, 1)
+    lurek.render.print("$" .. money, 10, 8, 1.2)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Day " .. day, 140, 10)
+    lurek.render.print("Rev: $" .. dailyRevenue .. "/day", 240, 10)
+    lurek.render.print("Exp: $" .. dailyExpense .. "/day", 420, 10)
+    lurek.render.print("Occ: " .. getOccupancyRate() .. "%", 600, 10)
 
     local satColor = satisfaction > 60 and {0.2, 1, 0.3} or (satisfaction > 30 and {1, 0.8, 0.2} or {1, 0.2, 0.2})
-    lurek.gfx.setColor(satColor[1], satColor[2], satColor[3], 1)
-    lurek.gfx.print("Satisfaction: " .. satisfaction .. "%", 600, 30)
+    lurek.render.setColor(satColor[1], satColor[2], satColor[3], 1)
+    lurek.render.print("Satisfaction: " .. satisfaction .. "%", 600, 30)
 
     -- Day progress bar
-    lurek.gfx.setColor(0.3, 0.3, 0.4, 1)
-    lurek.gfx.rectangle("fill", 140, 30, 200, 10)
-    lurek.gfx.setColor(1, 0.8, 0.2, 1)
-    lurek.gfx.rectangle("fill", 140, 30, 200 * (dayTimer / DAY_LENGTH), 10)
+    lurek.render.setColor(0.3, 0.3, 0.4, 1)
+    lurek.render.rectangle("fill", 140, 30, 200, 10)
+    lurek.render.setColor(1, 0.8, 0.2, 1)
+    lurek.render.rectangle("fill", 140, 30, 200 * (dayTimer / DAY_LENGTH), 10)
 
     -- Build controls
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, 565, 800, 35)
-    lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
-    lurek.gfx.print("[B] Build floor ($" .. floorCost(#hotel + 1) .. ")", 10, 572)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, 565, 800, 35)
+    lurek.render.setColor(0.8, 0.8, 0.8, 1)
+    lurek.render.print("[B] Build floor ($" .. floorCost(#hotel + 1) .. ")", 10, 572)
     for i = 2, 5 do
         local sel = (selectedType == i) and "> " or "  "
         local c = roomTypes[i].color
-        lurek.gfx.setColor(c[1], c[2], c[3], 1)
-        lurek.gfx.print(sel .. "[" .. (i - 1) .. "] " .. roomTypes[i].name .. " $" .. roomTypes[i].cost, 200 + (i - 2) * 150, 572)
+        lurek.render.setColor(c[1], c[2], c[3], 1)
+        lurek.render.print(sel .. "[" .. (i - 1) .. "] " .. roomTypes[i].name .. " $" .. roomTypes[i].cost, 200 + (i - 2) * 150, 572)
     end
 
     -- Message
     if messageTimer > 0 then
-        lurek.gfx.setColor(1, 1, 0.5, messageTimer)
-        lurek.gfx.print(message, 300, 45)
+        lurek.render.setColor(1, 1, 0.5, messageTimer)
+        lurek.render.print(message, 300, 45)
     end
 end

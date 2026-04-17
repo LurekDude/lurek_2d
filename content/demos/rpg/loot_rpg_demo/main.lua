@@ -191,74 +191,74 @@ end
 
 -- ── lurek.render ─────────────────────────────────────────────────────────────
 local function draw_panel(x, y, w, h, title)
-    lurek.gfx.setColor(0.15, 0.12, 0.30, 0.9)
-    lurek.gfx.rectangle("fill", x, y, w, h)
-    lurek.gfx.setColor(0.6, 0.5, 0.9, 1)
-    lurek.gfx.rectangle("line", x, y, w, h)
-    lurek.gfx.setColor(0.9, 0.85, 1.0, 1)
-    lurek.gfx.print(title, x + 8, y + 6)
+    lurek.render.setColor(0.15, 0.12, 0.30, 0.9)
+    lurek.render.rectangle("fill", x, y, w, h)
+    lurek.render.setColor(0.6, 0.5, 0.9, 1)
+    lurek.render.rectangle("line", x, y, w, h)
+    lurek.render.setColor(0.9, 0.85, 1.0, 1)
+    lurek.render.print(title, x + 8, y + 6)
 end
 
 function lurek.render()
-    lurek.gfx.setColor(0.08, 0.06, 0.15, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 600)
+    lurek.render.setColor(0.08, 0.06, 0.15, 1)
+    lurek.render.rectangle("fill", 0, 0, 800, 600)
 
     -- ── Player stats panel ────────────────────────────────────────────────
     draw_panel(20, 20, 220, 130, "PLAYER")
-    lurek.gfx.setColor(0.8, 1.0, 0.8, 1)
-    lurek.gfx.print(string.format("HP:  %d / %d", player.hp, player.max_hp),     30, 48)
-    lurek.gfx.print(string.format("ATK: %d  DEF: %d", player.equipped_dmg, player.equipped_def), 30, 68)
-    lurek.gfx.print(string.format("Coins: %d", player.coins),                    30, 88)
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-    lurek.gfx.print("Bag weight: "..string.format("%.1f", player_bag:getCurrentWeight()).." / "..BAG_WEIGHT_LIMIT, 30, 108)
+    lurek.render.setColor(0.8, 1.0, 0.8, 1)
+    lurek.render.print(string.format("HP:  %d / %d", player.hp, player.max_hp),     30, 48)
+    lurek.render.print(string.format("ATK: %d  DEF: %d", player.equipped_dmg, player.equipped_def), 30, 68)
+    lurek.render.print(string.format("Coins: %d", player.coins),                    30, 88)
+    lurek.render.setColor(0.6, 0.6, 0.6, 1)
+    lurek.render.print("Bag weight: "..string.format("%.1f", player_bag:getCurrentWeight()).." / "..BAG_WEIGHT_LIMIT, 30, 108)
 
     -- ── Inventory panel ───────────────────────────────────────────────────
     draw_panel(260, 20, 250, 200, "BACKPACK")
     local slots = player_bag:getSlots()
-    lurek.gfx.setColor(0.85, 0.85, 0.85, 1)
+    lurek.render.setColor(0.85, 0.85, 0.85, 1)
     local y_off = 48
     local shown = 0
     for _, slot in ipairs(slots) do
         if not slot:isEmpty() and shown < 7 then
             local st = slot:getStack()
             if st then
-                lurek.gfx.print("• "..st:getItem():getType(), 270, y_off)
+                lurek.render.print("• "..st:getItem():getType(), 270, y_off)
                 y_off  = y_off + 20
                 shown  = shown + 1
             end
         end
     end
     if shown == 0 then
-        lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-        lurek.gfx.print("(empty)", 270, 48)
+        lurek.render.setColor(0.5, 0.5, 0.5, 1)
+        lurek.render.print("(empty)", 270, 48)
     end
 
     -- ── Shop panel ────────────────────────────────────────────────────────
     draw_panel(530, 20, 240, 80, "SHOP")
     local remaining = shop:getStack("potions"):size()
-    lurek.gfx.setColor(0.85, 0.85, 0.85, 1)
-    lurek.gfx.print(string.format("Potion x%d  (5 coins)", remaining), 540, 48)
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("[B] buy  [H] use potion", 540, 68)
+    lurek.render.setColor(0.85, 0.85, 0.85, 1)
+    lurek.render.print(string.format("Potion x%d  (5 coins)", remaining), 540, 48)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("[B] buy  [H] use potion", 540, 68)
 
     -- ── Pickup log panel ──────────────────────────────────────────────────
     draw_panel(20, 170, 720, 150, "RECENT PICKUPS")
     local entries = pickup_log:entries()
     local start   = math.max(1, #entries - 5)
-    lurek.gfx.setColor(0.75, 0.95, 0.75, 1)
+    lurek.render.setColor(0.75, 0.95, 0.75, 1)
     local log_y = 196
     for i = start, #entries do
         local e = entries[i]
         if e then
-            lurek.gfx.print(string.format("[%d] %s  (bag size: %d)", i, e.label, e.size_after), 30, log_y)
+            lurek.render.print(string.format("[%d] %s  (bag size: %d)", i, e.label, e.size_after), 30, log_y)
             log_y = log_y + 20
         end
     end
 
     -- ── Controls ──────────────────────────────────────────────────────────
     draw_panel(20, 340, 760, 60, "CONTROLS")
-    lurek.gfx.setColor(0.7, 0.7, 0.9, 1)
-    lurek.gfx.print("[SPACE] clear room  [E] auto-equip best gear  [B] buy potion (5c)  [H] use potion", 30, 366)
+    lurek.render.setColor(0.7, 0.7, 0.9, 1)
+    lurek.render.print("[SPACE] clear room  [E] auto-equip best gear  [B] buy potion (5c)  [H] use potion", 30, 366)
 
     -- ── Item type catalog panel ───────────────────────────────────────────
     draw_panel(20, 420, 760, 160, "ITEM CATALOG  (item.getTypeNames)")
@@ -272,10 +272,10 @@ function lurek.render()
             for k, v in pairs(def.base_stats or {}) do
                 stats_str = stats_str..k.."="..tostring(v).." "
             end
-            lurek.gfx.setColor(0.9, 0.85, 0.6, 1)
-            lurek.gfx.print(name, col_x, cat_y)
-            lurek.gfx.setColor(0.6, 0.75, 0.6, 1)
-            lurek.gfx.print(stats_str, col_x + 80, cat_y)
+            lurek.render.setColor(0.9, 0.85, 0.6, 1)
+            lurek.render.print(name, col_x, cat_y)
+            lurek.render.setColor(0.6, 0.75, 0.6, 1)
+            lurek.render.print(stats_str, col_x + 80, cat_y)
             cat_y = cat_y + 20
             if i == 4 then col_x = 400; cat_y = 446 end
         end

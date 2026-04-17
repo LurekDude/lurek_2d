@@ -105,7 +105,7 @@ local function placeKeys()
 end
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0)
+    lurek.render.setBackgroundColor(0, 0, 0)
     initMap()
     -- Player start
     player.x = 1.5 * TILE
@@ -315,18 +315,18 @@ function lurek.render()
             local cy = y + TILE / 2
             local vis = visibility(cx, cy)
             if map[r][c] == 0 then
-                lurek.gfx.setColor(0.08 * vis, 0.08 * vis, 0.12 * vis, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0.08 * vis, 0.08 * vis, 0.12 * vis, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             elseif map[r][c] == 2 then
-                lurek.gfx.setColor(0.1 * vis, 0.4 * vis, 0.5 * vis, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0.1 * vis, 0.4 * vis, 0.5 * vis, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             elseif map[r][c] == 3 then
                 local g = keysFound >= KEYS_NEEDED and 0.8 or 0.3
-                lurek.gfx.setColor(g * vis, 0.2 * vis, 0.2 * vis, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(g * vis, 0.2 * vis, 0.2 * vis, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             else
-                lurek.gfx.setColor(0.25 * vis, 0.22 * vis, 0.2 * vis, 1)
-                lurek.gfx.rectangle("fill", x, y, TILE, TILE)
+                lurek.render.setColor(0.25 * vis, 0.22 * vis, 0.2 * vis, 1)
+                lurek.render.rectangle("fill", x, y, TILE, TILE)
             end
         end
     end
@@ -335,16 +335,16 @@ function lurek.render()
     for _, f in ipairs(footsteps) do
         local a = f.life / f.maxLife * 0.3
         local r = (1 - f.life / f.maxLife) * 20
-        lurek.gfx.setColor(0.5, 0.5, 0.5, a)
-        lurek.gfx.circle("line", f.x + shx, f.y + shy, r)
+        lurek.render.setColor(0.5, 0.5, 0.5, a)
+        lurek.render.circle("line", f.x + shx, f.y + shy, r)
     end
 
     -- Keys
     for _, k in ipairs(keys) do
         if not k.found then
             local vis = visibility(k.x, k.y)
-            lurek.gfx.setColor(1 * vis, 0.9 * vis, 0.2 * vis, 1)
-            lurek.gfx.circle("fill", k.x + shx, k.y + shy, 5)
+            lurek.render.setColor(1 * vis, 0.9 * vis, 0.2 * vis, 1)
+            lurek.render.circle("fill", k.x + shx, k.y + shy, 5)
         end
     end
 
@@ -352,35 +352,35 @@ function lurek.render()
     for _, n in ipairs(notes) do
         if not n.read then
             local vis = visibility(n.x, n.y)
-            lurek.gfx.setColor(0.9 * vis, 0.9 * vis, 0.8 * vis, 1)
-            lurek.gfx.rectangle("fill", n.x - 5 + shx, n.y - 5 + shy, 10, 10)
+            lurek.render.setColor(0.9 * vis, 0.9 * vis, 0.8 * vis, 1)
+            lurek.render.rectangle("fill", n.x - 5 + shx, n.y - 5 + shy, 10, 10)
         end
     end
 
     -- Scare events
     for _, ev in ipairs(events) do
         local vis = visibility(ev.x, ev.y)
-        lurek.gfx.setColor(0.5 * vis, 0, 0, ev.life)
-        lurek.gfx.circle("fill", ev.x + shx, ev.y + shy, 15)
+        lurek.render.setColor(0.5 * vis, 0, 0, ev.life)
+        lurek.render.circle("fill", ev.x + shx, ev.y + shy, 15)
     end
 
     -- Enemy
     local eVis = visibility(enemy.x, enemy.y)
     if eVis > 0.05 then
-        lurek.gfx.setColor(0.8 * eVis, 0.1, 0.1, eVis)
-        lurek.gfx.circle("fill", enemy.x + shx, enemy.y + shy, 12)
+        lurek.render.setColor(0.8 * eVis, 0.1, 0.1, eVis)
+        lurek.render.circle("fill", enemy.x + shx, enemy.y + shy, 12)
         -- Vision cone
-        lurek.gfx.setColor(0.5, 0, 0, 0.15 * eVis)
+        lurek.render.setColor(0.5, 0, 0, 0.15 * eVis)
         local ex1 = enemy.x + math.cos(enemy.angle - 0.4) * 60
         local ey1 = enemy.y + math.sin(enemy.angle - 0.4) * 60
         local ex2 = enemy.x + math.cos(enemy.angle + 0.4) * 60
         local ey2 = enemy.y + math.sin(enemy.angle + 0.4) * 60
-        lurek.gfx.polygon("fill", {enemy.x + shx, enemy.y + shy, ex1 + shx, ey1 + shy, ex2 + shx, ey2 + shy})
+        lurek.render.polygon("fill", {enemy.x + shx, enemy.y + shy, ex1 + shx, ey1 + shy, ex2 + shx, ey2 + shy})
     end
 
     -- Player
-    lurek.gfx.setColor(0.9, 0.8, 0.6, 1)
-    lurek.gfx.circle("fill", player.x + shx, player.y + shy, 8)
+    lurek.render.setColor(0.9, 0.8, 0.6, 1)
+    lurek.render.circle("fill", player.x + shx, player.y + shy, 8)
 
     -- Flashlight cone visualization
     if flashlight.on and flashlight.battery > 0 then
@@ -389,63 +389,63 @@ function lurek.render()
         local fy1 = player.y + math.sin(player.angle - flashlight.cone) * flashlight.range
         local fx2 = player.x + math.cos(player.angle + flashlight.cone) * flashlight.range
         local fy2 = player.y + math.sin(player.angle + flashlight.cone) * flashlight.range
-        lurek.gfx.setColor(1, 1, 0.8, intensity)
-        lurek.gfx.polygon("fill", {player.x + shx, player.y + shy, fx1 + shx, fy1 + shy, fx2 + shx, fy2 + shy})
+        lurek.render.setColor(1, 1, 0.8, intensity)
+        lurek.render.polygon("fill", {player.x + shx, player.y + shy, fx1 + shx, fy1 + shy, fx2 + shx, fy2 + shy})
     end
 
     -- Distortion overlay (low sanity)
     if distortion > 0.3 then
         local a = (distortion - 0.3) * 0.5
         local r = 0.3 + math.sin(lurek.time.getTime() * 5) * 0.2
-        lurek.gfx.setColor(r, 0, 0.1, a)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(r, 0, 0.1, a)
+        lurek.render.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, 0, W, 30)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, 0, W, 30)
     -- Battery bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 10, 5, 100, 12)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 10, 5, 100, 12)
     local bc = flashlight.battery / flashlight.maxBattery
-    lurek.gfx.setColor(bc, bc, 0.2, 1)
-    lurek.gfx.rectangle("fill", 10, 5, bc * 100, 12)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Battery", 115, 4, 0.7)
+    lurek.render.setColor(bc, bc, 0.2, 1)
+    lurek.render.rectangle("fill", 10, 5, bc * 100, 12)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Battery", 115, 4, 0.7)
     -- Sanity bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 200, 5, 100, 12)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 200, 5, 100, 12)
     local sc = sanity.value / sanity.max
-    lurek.gfx.setColor(0.2, sc * 0.8, sc, 1)
-    lurek.gfx.rectangle("fill", 200, 5, sc * 100, 12)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Sanity", 305, 4, 0.7)
+    lurek.render.setColor(0.2, sc * 0.8, sc, 1)
+    lurek.render.rectangle("fill", 200, 5, sc * 100, 12)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Sanity", 305, 4, 0.7)
     -- Keys
-    lurek.gfx.setColor(1, 0.9, 0.2, 1)
-    lurek.gfx.print("Keys: " .. keysFound .. "/" .. KEYS_NEEDED, 400, 5, 0.9)
-    lurek.gfx.setColor(0.6, 0.6, 0.6, 1)
-    lurek.gfx.print("WASD move | F flashlight | Find 5 keys, reach exit", 520, 6, 0.65)
+    lurek.render.setColor(1, 0.9, 0.2, 1)
+    lurek.render.print("Keys: " .. keysFound .. "/" .. KEYS_NEEDED, 400, 5, 0.9)
+    lurek.render.setColor(0.6, 0.6, 0.6, 1)
+    lurek.render.print("WASD move | F flashlight | Find 5 keys, reach exit", 520, 6, 0.65)
 
     -- Note display
     if noteDisplay and noteTimer > 0 then
-        lurek.gfx.setColor(0, 0, 0, 0.85)
-        lurek.gfx.rectangle("fill", W / 2 - 200, H / 2 - 40, 400, 80)
-        lurek.gfx.setColor(0.9, 0.85, 0.7, 1)
-        lurek.gfx.print(noteDisplay, W / 2 - 180, H / 2 - 20, 0.9)
+        lurek.render.setColor(0, 0, 0, 0.85)
+        lurek.render.rectangle("fill", W / 2 - 200, H / 2 - 40, 400, 80)
+        lurek.render.setColor(0.9, 0.85, 0.7, 1)
+        lurek.render.print(noteDisplay, W / 2 - 180, H / 2 - 20, 0.9)
     end
 
     -- Game over / win
     if gameState == "dead" then
-        lurek.gfx.setColor(0.5, 0, 0, 0.8)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("YOUR MIND IS LOST", W / 2 - 120, H / 2 - 20, 1.5)
-        lurek.gfx.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
+        lurek.render.setColor(0.5, 0, 0, 0.8)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("YOUR MIND IS LOST", W / 2 - 120, H / 2 - 20, 1.5)
+        lurek.render.print("Press R to retry", W / 2 - 60, H / 2 + 20, 0.9)
     elseif gameState == "won" then
-        lurek.gfx.setColor(0, 0.2, 0, 0.8)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("YOU ESCAPED!", W / 2 - 80, H / 2 - 20, 1.5)
-        lurek.gfx.print("Press R to play again", W / 2 - 70, H / 2 + 20, 0.9)
+        lurek.render.setColor(0, 0.2, 0, 0.8)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("YOU ESCAPED!", W / 2 - 80, H / 2 - 20, 1.5)
+        lurek.render.print("Press R to play again", W / 2 - 70, H / 2 + 20, 0.9)
     end
 end

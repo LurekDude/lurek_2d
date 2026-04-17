@@ -122,7 +122,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Point-and-Click Adventure")
-    lurek.gfx.setBackgroundColor(0.15, 0.15, 0.2)
+    lurek.render.setBackgroundColor(0.15, 0.15, 0.2)
     defineRooms()
     showDialog("You wake up in your bedroom. Something feels different tonight...")
 end
@@ -158,72 +158,72 @@ function lurek.render()
     if not room then return end
 
     -- room background
-    lurek.gfx.setBackgroundColor(room.bg[1], room.bg[2], room.bg[3])
+    lurek.render.setBackgroundColor(room.bg[1], room.bg[2], room.bg[3])
 
     -- floor
-    lurek.gfx.setColor(room.bg[1] * 0.7, room.bg[2] * 0.7, room.bg[3] * 0.7, 1)
-    lurek.gfx.rectangle("fill", 0, 460, 800, 40)
+    lurek.render.setColor(room.bg[1] * 0.7, room.bg[2] * 0.7, room.bg[3] * 0.7, 1)
+    lurek.render.rectangle("fill", 0, 460, 800, 40)
 
     -- objects
     for _, obj in ipairs(room.objects) do
         local c = obj.color
         local hover = (hoverObj == obj)
         if hover then
-            lurek.gfx.setColor(c[1] + 0.2, c[2] + 0.2, c[3] + 0.2, 1)
+            lurek.render.setColor(c[1] + 0.2, c[2] + 0.2, c[3] + 0.2, 1)
         else
-            lurek.gfx.setColor(c[1], c[2], c[3], 1)
+            lurek.render.setColor(c[1], c[2], c[3], 1)
         end
-        lurek.gfx.rectangle("fill", obj.x, obj.y, obj.w, obj.h)
+        lurek.render.rectangle("fill", obj.x, obj.y, obj.w, obj.h)
         if hover then
-            lurek.gfx.setColor(1, 1, 0.5, 1)
-            lurek.gfx.rectangle("line", obj.x - 1, obj.y - 1, obj.w + 2, obj.h + 2)
+            lurek.render.setColor(1, 1, 0.5, 1)
+            lurek.render.rectangle("line", obj.x - 1, obj.y - 1, obj.w + 2, obj.h + 2)
         end
     end
 
     -- hover label
     if hoverObj then
         local mx, my = lurek.mouse.getPosition()
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", mx + 10, my - 22, #hoverObj.label * 8 + 10, 20)
-        lurek.gfx.setColor(1, 1, 0.8, 1)
-        lurek.gfx.print(hoverObj.label, mx + 15, my - 20)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", mx + 10, my - 22, #hoverObj.label * 8 + 10, 20)
+        lurek.render.setColor(1, 1, 0.8, 1)
+        lurek.render.print(hoverObj.label, mx + 15, my - 20)
     end
 
     -- inventory bar
-    lurek.gfx.setColor(0.1, 0.1, 0.12, 0.9)
-    lurek.gfx.rectangle("fill", 0, 520, 800, 80)
-    lurek.gfx.setColor(0.3, 0.3, 0.35, 1)
-    lurek.gfx.line(0, 520, 800, 520)
-    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-    lurek.gfx.print("Inventory:", 10, 530)
+    lurek.render.setColor(0.1, 0.1, 0.12, 0.9)
+    lurek.render.rectangle("fill", 0, 520, 800, 80)
+    lurek.render.setColor(0.3, 0.3, 0.35, 1)
+    lurek.render.line(0, 520, 800, 520)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print("Inventory:", 10, 530)
     for i, item in ipairs(inventory) do
         local ix = 20 + (i - 1) * 90
-        lurek.gfx.setColor(0.25, 0.25, 0.3, 1)
-        lurek.gfx.rectangle("fill", ix, 550, 80, 30)
-        lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
-        lurek.gfx.rectangle("line", ix, 550, 80, 30)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(item, ix + 8, 557)
+        lurek.render.setColor(0.25, 0.25, 0.3, 1)
+        lurek.render.rectangle("fill", ix, 550, 80, 30)
+        lurek.render.setColor(0.8, 0.8, 0.5, 1)
+        lurek.render.rectangle("line", ix, 550, 80, 30)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(item, ix + 8, 557)
     end
 
     -- dialog box
     if #dialogText > 0 then
-        lurek.gfx.setColor(0, 0, 0, 0.85)
-        lurek.gfx.rectangle("fill", 50, 460, 700, 50)
-        lurek.gfx.setColor(0.8, 0.8, 0.6, 1)
-        lurek.gfx.rectangle("line", 50, 460, 700, 50)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(dialogText, 65, 475)
+        lurek.render.setColor(0, 0, 0, 0.85)
+        lurek.render.rectangle("fill", 50, 460, 700, 50)
+        lurek.render.setColor(0.8, 0.8, 0.6, 1)
+        lurek.render.rectangle("line", 50, 460, 700, 50)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(dialogText, 65, 475)
     end
 
     -- room name
-    lurek.gfx.setColor(1, 1, 1, 0.4)
-    lurek.gfx.print(string.upper(currentRoom), 700, 10)
+    lurek.render.setColor(1, 1, 1, 0.4)
+    lurek.render.print(string.upper(currentRoom), 700, 10)
 
     -- cursor
     local mx, my = lurek.mouse.getPosition()
-    lurek.gfx.setColor(1, 1, 1, 0.6)
-    lurek.gfx.circle("line", mx, my, 6)
+    lurek.render.setColor(1, 1, 1, 0.6)
+    lurek.render.circle("line", mx, my, 6)
 end
 
 -- ── Click handler ───────────────────────────────────────────────

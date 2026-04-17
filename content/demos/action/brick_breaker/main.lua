@@ -259,93 +259,93 @@ local function brick_color(hp)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.14)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.14)
 
     -- bricks
     for _, brick in ipairs(bricks) do
         if brick.alive then
             local r, g, b = brick_color(brick.hp)
-            lurek.gfx.setColor(r, g, b, 1)
-            lurek.gfx.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
-            lurek.gfx.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
-            lurek.gfx.rectangle("line", brick.x, brick.y, brick.w, brick.h)
+            lurek.render.setColor(r, g, b, 1)
+            lurek.render.rectangle("fill", brick.x, brick.y, brick.w, brick.h)
+            lurek.render.setColor(r * 0.6, g * 0.6, b * 0.6, 1)
+            lurek.render.rectangle("line", brick.x, brick.y, brick.w, brick.h)
         end
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life * 3, 0, 1)
-        lurek.gfx.setColor(p.r, p.g, p.b, a)
-        lurek.gfx.circle("fill", p.x, p.y, 3)
+        lurek.render.setColor(p.r, p.g, p.b, a)
+        lurek.render.circle("fill", p.x, p.y, 3)
     end
 
     -- powerups
     for _, pu in ipairs(powerups) do
-        if pu.type == "wide" then lurek.gfx.setColor(0.2, 0.6, 1, 1)
-        elseif pu.type == "multi" then lurek.gfx.setColor(1, 0.4, 1, 1)
-        else lurek.gfx.setColor(0.4, 1, 0.4, 1) end
-        lurek.gfx.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
-        lurek.gfx.setColor(1, 1, 1, 0.8)
+        if pu.type == "wide" then lurek.render.setColor(0.2, 0.6, 1, 1)
+        elseif pu.type == "multi" then lurek.render.setColor(1, 0.4, 1, 1)
+        else lurek.render.setColor(0.4, 1, 0.4, 1) end
+        lurek.render.rectangle("fill", pu.x - pu.w / 2, pu.y, pu.w, pu.h)
+        lurek.render.setColor(1, 1, 1, 0.8)
         local label = pu.type:sub(1, 1):upper()
-        lurek.gfx.print(label, pu.x - 3, pu.y)
+        lurek.render.print(label, pu.x - 3, pu.y)
     end
 
     -- paddle
-    lurek.gfx.setColor(0.3, 0.5, 1, 1)
-    lurek.gfx.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
+    lurek.render.setColor(0.3, 0.5, 1, 1)
+    lurek.render.rectangle("fill", paddle.x, paddle.y, paddle.w, paddle.h)
     if state.wide_timer > 0 then
-        lurek.gfx.setColor(0.5, 0.8, 1, 0.4)
-        lurek.gfx.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
+        lurek.render.setColor(0.5, 0.8, 1, 0.4)
+        lurek.render.rectangle("fill", paddle.x - 2, paddle.y - 2, paddle.w + 4, paddle.h + 4)
     end
 
     -- balls
     for _, ball in ipairs(balls) do
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.circle("fill", ball.x, ball.y, ball.radius)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.circle("fill", ball.x, ball.y, ball.radius)
         if state.slow_timer > 0 then
-            lurek.gfx.setColor(0.4, 1, 0.4, 0.3)
-            lurek.gfx.circle("fill", ball.x, ball.y, ball.radius + 3)
+            lurek.render.setColor(0.4, 1, 0.4, 0.3)
+            lurek.render.circle("fill", ball.x, ball.y, ball.radius + 3)
         end
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. state.score, 10, 10)
-    lurek.gfx.print("Level: " .. state.level, 10, 30)
-    lurek.gfx.print("Combo: x" .. state.combo, W / 2 - 30, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. state.score, 10, 10)
+    lurek.render.print("Level: " .. state.level, 10, 30)
+    lurek.render.print("Combo: x" .. state.combo, W / 2 - 30, 10)
 
     -- lives
-    lurek.gfx.setColor(1, 0.3, 0.3, 1)
+    lurek.render.setColor(1, 0.3, 0.3, 1)
     for i = 1, state.lives do
-        lurek.gfx.circle("fill", W - 20 * i, 20, 7)
+        lurek.render.circle("fill", W - 20 * i, 20, 7)
     end
 
     -- serving prompt
     if state.serving and not state.game_over then
-        lurek.gfx.setColor(1, 1, 0.5, 0.7 + math.sin(lurek.time.getTime() * 5) * 0.3)
-        lurek.gfx.print("Click or press Space to launch!", W / 2 - 100, H / 2)
+        lurek.render.setColor(1, 1, 0.5, 0.7 + math.sin(lurek.time.getTime() * 5) * 0.3)
+        lurek.render.print("Click or press Space to launch!", W / 2 - 100, H / 2)
     end
 
     -- active effects
     if state.wide_timer > 0 then
-        lurek.gfx.setColor(0.2, 0.6, 1, 0.8)
-        lurek.gfx.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
+        lurek.render.setColor(0.2, 0.6, 1, 0.8)
+        lurek.render.print("Wide: " .. math.floor(state.wide_timer) .. "s", W - 100, 40)
     end
     if state.slow_timer > 0 then
-        lurek.gfx.setColor(0.4, 1, 0.4, 0.8)
-        lurek.gfx.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
+        lurek.render.setColor(0.4, 1, 0.4, 0.8)
+        lurek.render.print("Slow: " .. math.floor(state.slow_timer) .. "s", W - 100, 55)
     end
 
     -- game over
     if state.game_over then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 0, H / 2 - 40, W, 80)
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
-        lurek.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 0, H / 2 - 40, W, 80)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
+        lurek.render.print("GAME OVER", W / 2 - 60, H / 2 - 25, 2)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Score: " .. state.score .. "  |  R to restart", W / 2 - 80, H / 2 + 15)
     end
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 0.5)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 70, H - 20)
+    lurek.render.setColor(0.5, 0.5, 0.5, 0.5)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 70, H - 20)
 end

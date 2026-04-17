@@ -64,7 +64,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0.05)
+    lurek.render.setBackgroundColor(0, 0, 0.05)
     reset()
 end
 
@@ -196,35 +196,35 @@ function lurek.render()
     math.randomseed(99)
     for i = 1, 100 do
         local blink = (math.sin(anim_timer * 3 + i) + 1) / 2
-        lurek.gfx.setColor(blink, blink, blink, 0.5)
-        lurek.gfx.circle("fill", math.random(W), math.random(H), 1)
+        lurek.render.setColor(blink, blink, blink, 0.5)
+        lurek.render.circle("fill", math.random(W), math.random(H), 1)
     end
     math.randomseed(os.time())
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("GALAGA", W/2 - 35, 5, 2)
-    lurek.gfx.setColor(0.8, 0.9, 1)
-    lurek.gfx.print("Score: " .. score, 8, 8, 1.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("Lives: " .. lives, W - 100, 8, 1.5)
-    lurek.gfx.setColor(0.6, 0.6, 0.8)
-    lurek.gfx.print("Wave " .. wave, W - 80, H - 20, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("GALAGA", W/2 - 35, 5, 2)
+    lurek.render.setColor(0.8, 0.9, 1)
+    lurek.render.print("Score: " .. score, 8, 8, 1.5)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("Lives: " .. lives, W - 100, 8, 1.5)
+    lurek.render.setColor(0.6, 0.6, 0.8)
+    lurek.render.print("Wave " .. wave, W - 80, H - 20, 1.5)
 
     -- Player ship
-    lurek.gfx.setColor(0.4, 0.8, 1.0)
+    lurek.render.setColor(0.4, 0.8, 1.0)
     -- Fuselage
-    lurek.gfx.rectangle("fill", player.x + 10, player.y, 12, player.h)
+    lurek.render.rectangle("fill", player.x + 10, player.y, 12, player.h)
     -- Wings
-    lurek.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
+    lurek.render.rectangle("fill", player.x, player.y + 10, player.w, 10)
     -- Cockpit
-    lurek.gfx.setColor(0.8, 1.0, 1.0)
-    lurek.gfx.circle("fill", player.x + player.w/2, player.y + 6, 5)
+    lurek.render.setColor(0.8, 1.0, 1.0)
+    lurek.render.circle("fill", player.x + player.w/2, player.y + 6, 5)
 
     -- Enemy bullets
-    lurek.gfx.setColor(1, 0.5, 0.1)
+    lurek.render.setColor(1, 0.5, 0.1)
     for _, eb in ipairs(enemy_bullets) do
-        lurek.gfx.rectangle("fill", eb.x, eb.y, eb.w, eb.h)
+        lurek.render.rectangle("fill", eb.x, eb.y, eb.w, eb.h)
     end
 
     -- Enemies
@@ -232,37 +232,37 @@ function lurek.render()
         if e.alive then
             local pulsate = 0.7 + math.sin(anim_timer * 4 + e.home_x) * 0.3
             if e.row == 1 then
-                lurek.gfx.setColor(0.9 * pulsate, 0.2, 0.8 * pulsate)
+                lurek.render.setColor(0.9 * pulsate, 0.2, 0.8 * pulsate)
             elseif e.row == 2 then
-                lurek.gfx.setColor(0.1, 0.8 * pulsate, 0.9 * pulsate)
+                lurek.render.setColor(0.1, 0.8 * pulsate, 0.9 * pulsate)
             else
-                lurek.gfx.setColor(0.8 * pulsate, 0.8 * pulsate, 0.1)
+                lurek.render.setColor(0.8 * pulsate, 0.8 * pulsate, 0.1)
             end
             -- Wing/body shape
-            lurek.gfx.rectangle("fill", e.x + 4, e.y + 6, ENEMY_W - 8, ENEMY_H - 12)
-            lurek.gfx.rectangle("fill", e.x, e.y + 14, ENEMY_W, 10)
+            lurek.render.rectangle("fill", e.x + 4, e.y + 6, ENEMY_W - 8, ENEMY_H - 12)
+            lurek.render.rectangle("fill", e.x, e.y + 14, ENEMY_W, 10)
             -- Antennae
-            lurek.gfx.line(e.x + ENEMY_W/2 - 6, e.y + 6, e.x + ENEMY_W/2 - 12, e.y)
-            lurek.gfx.line(e.x + ENEMY_W/2 + 6, e.y + 6, e.x + ENEMY_W/2 + 12, e.y)
+            lurek.render.line(e.x + ENEMY_W/2 - 6, e.y + 6, e.x + ENEMY_W/2 - 12, e.y)
+            lurek.render.line(e.x + ENEMY_W/2 + 6, e.y + 6, e.x + ENEMY_W/2 + 12, e.y)
         end
     end
 
     -- Player bullets
-    lurek.gfx.setColor(0.9, 1, 0.5)
+    lurek.render.setColor(0.9, 1, 0.5)
     for _, b in ipairs(bullets) do
-        lurek.gfx.rectangle("fill", b.x, b.y, 4, 14)
+        lurek.render.rectangle("fill", b.x, b.y, 4, 14)
     end
 
     -- Overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 10, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 30, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 10, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 

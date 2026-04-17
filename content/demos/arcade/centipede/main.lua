@@ -70,7 +70,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0, 0, 0.04)
+    lurek.render.setBackgroundColor(0, 0, 0.04)
     score = 0; lives = 3; wave = 1
     reset()
 end
@@ -230,8 +230,8 @@ function lurek.render()
         if mushrooms[col] then
             for row, hp in pairs(mushrooms[col]) do
                 local t = hp / MUSHROOM_HP
-                lurek.gfx.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
-                lurek.gfx.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
+                lurek.render.setColor(0.2 + t * 0.4, 0.6 * t, 0.1)
+                lurek.render.circle("fill", col * CELL + CELL/2, row * CELL + CELL/2, CELL/2 - 1)
             end
         end
     end
@@ -239,64 +239,64 @@ function lurek.render()
     -- Centipede
     for _, seg in ipairs(segments) do
         if seg.head then
-            lurek.gfx.setColor(0.9, 0.3, 0.8)
+            lurek.render.setColor(0.9, 0.3, 0.8)
         else
-            lurek.gfx.setColor(0.2, 0.8, 0.3)
+            lurek.render.setColor(0.2, 0.8, 0.3)
         end
-        lurek.gfx.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
+        lurek.render.circle("fill", seg.px + CELL/2, seg.py + CELL/2, CELL/2 - 1)
         -- Eyes on head
         if seg.head then
-            lurek.gfx.setColor(1, 1, 0)
-            lurek.gfx.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
-            lurek.gfx.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
+            lurek.render.setColor(1, 1, 0)
+            lurek.render.circle("fill", seg.px + CELL/2 - 3, seg.py + CELL/2 - 3, 2)
+            lurek.render.circle("fill", seg.px + CELL/2 + 3, seg.py + CELL/2 - 3, 2)
         end
     end
 
     -- Spiders
-    lurek.gfx.setColor(1, 0.6, 0.1)
+    lurek.render.setColor(1, 0.6, 0.1)
     for _, sp in ipairs(spiders) do
-        lurek.gfx.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
+        lurek.render.circle("fill", sp.x + CELL/2, sp.y + CELL/2, CELL/2 - 1)
         -- Legs
         for li = 0, 3 do
             local ang = li * math.pi / 2
-            lurek.gfx.line(sp.x + CELL/2, sp.y + CELL/2,
+            lurek.render.line(sp.x + CELL/2, sp.y + CELL/2,
                 sp.x + CELL/2 + math.cos(ang) * CELL, sp.y + CELL/2 + math.sin(ang) * CELL)
         end
     end
 
     -- Player
-    lurek.gfx.setColor(0.4, 0.7, 1.0)
-    lurek.gfx.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
-    lurek.gfx.rectangle("fill", player.x, player.y + 10, player.w, 10)
+    lurek.render.setColor(0.4, 0.7, 1.0)
+    lurek.render.rectangle("fill", player.x + 5, player.y, player.w - 10, player.h)
+    lurek.render.rectangle("fill", player.x, player.y + 10, player.w, 10)
 
     -- Bullets
-    lurek.gfx.setColor(1, 1, 0.5)
+    lurek.render.setColor(1, 1, 0.5)
     for _, b in ipairs(bullets) do
-        lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 12)
+        lurek.render.rectangle("fill", b.x - 2, b.y, 4, 12)
     end
 
     -- Player zone separator line
-    lurek.gfx.setColor(0.2, 0.2, 0.4)
-    lurek.gfx.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
+    lurek.render.setColor(0.2, 0.2, 0.4)
+    lurek.render.line(0, PLAYER_ZONE_TOP * CELL, W, PLAYER_ZONE_TOP * CELL)
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 8, 4, 1.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("Lives: " .. lives, W - 95, 4, 1.5)
-    lurek.gfx.setColor(0.5, 0.7, 0.5)
-    lurek.gfx.print("Wave " .. wave, W/2 - 30, 4, 1.5)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Score: " .. score, 8, 4, 1.5)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("Lives: " .. lives, W - 95, 4, 1.5)
+    lurek.render.setColor(0.5, 0.7, 0.5)
+    lurek.render.print("Wave " .. wave, W/2 - 30, 4, 1.5)
 
     -- Overlay
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 0.2, 0.2)
-        lurek.gfx.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 0.2, 0.2)
+        lurek.render.print("GAME OVER", W/2 - 80, H/2 - 25, 3)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print("Score: " .. score, W/2 - 50, H/2 + 15, 2)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 45, 2)
     end
 end
 

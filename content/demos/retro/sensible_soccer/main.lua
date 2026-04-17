@@ -100,7 +100,7 @@ end
 -- ── Load ─────────────────────────────────────────────────────────────────
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.2, 0.55, 0.15)
+    lurek.render.setBackgroundColor(0.2, 0.55, 0.15)
     reset()
 end
 
@@ -205,95 +205,95 @@ end
 
 function lurek.render()
     -- Pitch
-    lurek.gfx.setColor(0.16, 0.52, 0.12)
-    lurek.gfx.rectangle("fill", PX, PY, PW, PH)
+    lurek.render.setColor(0.16, 0.52, 0.12)
+    lurek.render.rectangle("fill", PX, PY, PW, PH)
     -- Striped grass
     for i = 0, 9 do
         if i % 2 == 0 then
-            lurek.gfx.setColor(0.2, 0.56, 0.15, 0.4)
-            lurek.gfx.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
+            lurek.render.setColor(0.2, 0.56, 0.15, 0.4)
+            lurek.render.rectangle("fill", PX + i * (PW/10), PY, PW/10, PH)
         end
     end
     -- Lines
-    lurek.gfx.setColor(1, 1, 1, 0.8)
-    lurek.gfx.rectangle("line", PX, PY, PW, PH)
-    lurek.gfx.line(PX + PW/2, PY, PX + PW/2, PY + PH)
-    lurek.gfx.circle("line", PX + PW/2, PY + PH/2, 50)
+    lurek.render.setColor(1, 1, 1, 0.8)
+    lurek.render.rectangle("line", PX, PY, PW, PH)
+    lurek.render.line(PX + PW/2, PY, PX + PW/2, PY + PH)
+    lurek.render.circle("line", PX + PW/2, PY + PH/2, 50)
     -- Goals
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
-    lurek.gfx.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.rectangle("line", PX - GOAL_W, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
+    lurek.render.rectangle("line", PX + PW, PY + PH/2 - GOAL_H/2, GOAL_W, GOAL_H)
     -- Penalty areas
-    lurek.gfx.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
-    lurek.gfx.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
+    lurek.render.rectangle("line", PX, PY + PH/2 - 90, 70, 180)
+    lurek.render.rectangle("line", PX + PW - 70, PY + PH/2 - 90, 70, 180)
 
     -- CPU team (red)
     for i, cp in ipairs(cpu) do
-        lurek.gfx.setColor(0.85, 0.15, 0.15)
-        lurek.gfx.circle("fill", cp.x, cp.y, 9)
-        lurek.gfx.setColor(0, 0, 0)
-        lurek.gfx.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
+        lurek.render.setColor(0.85, 0.15, 0.15)
+        lurek.render.circle("fill", cp.x, cp.y, 9)
+        lurek.render.setColor(0, 0, 0)
+        lurek.render.print(tostring(i), cp.x - 4, cp.y - 6, 1.1)
     end
 
     -- Player team (blue)
     for i, p in ipairs(team) do
         local sel = i == controlled
-        lurek.gfx.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
-        lurek.gfx.circle("fill", p.x, p.y, 9)
+        lurek.render.setColor(sel and 0.9 or 0.2, sel and 0.9 or 0.4, sel and 0.2 or 0.9)
+        lurek.render.circle("fill", p.x, p.y, 9)
         if sel then
-            lurek.gfx.setColor(1, 1, 0)
-            lurek.gfx.circle("line", p.x, p.y, 12)
+            lurek.render.setColor(1, 1, 0)
+            lurek.render.circle("line", p.x, p.y, 12)
         end
-        lurek.gfx.setColor(0, 0, 0)
-        lurek.gfx.print(tostring(i), p.x - 4, p.y - 6, 1.1)
+        lurek.render.setColor(0, 0, 0)
+        lurek.render.print(tostring(i), p.x - 4, p.y - 6, 1.1)
     end
 
     -- Ball
     local bs = 0.6 + 0.4 * math.sin(anim * 10)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.circle("fill", ball.x, ball.y, 7)
-    lurek.gfx.setColor(0, 0, 0)
-    lurek.gfx.circle("line", ball.x, ball.y, 7)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.circle("fill", ball.x, ball.y, 7)
+    lurek.render.setColor(0, 0, 0)
+    lurek.render.circle("line", ball.x, ball.y, 7)
     -- Spinning pattern
-    lurek.gfx.setColor(0.2, 0.2, 0.2)
-    lurek.gfx.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
+    lurek.render.setColor(0.2, 0.2, 0.2)
+    lurek.render.rectangle("fill", ball.x - 2, ball.y - 2, 4, 4)
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, 0, W, 42)
-    lurek.gfx.setColor(0.4, 0.6, 1)
-    lurek.gfx.print("YOU", 20, 5, 2)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
-    lurek.gfx.setColor(1, 0.4, 0.4)
-    lurek.gfx.print("CPU", W - 70, 5, 2)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, 0, W, 42)
+    lurek.render.setColor(0.4, 0.6, 1)
+    lurek.render.print("YOU", 20, 5, 2)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print(scores.player .. " — " .. scores.cpu, W/2 - 30, 5, 2.5)
+    lurek.render.setColor(1, 0.4, 0.4)
+    lurek.render.print("CPU", W - 70, 5, 2)
     local mins = math.floor(time_left / 60)
     local secs = math.floor(time_left % 60)
-    lurek.gfx.setColor(1, 0.9, 0.3)
-    lurek.gfx.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
+    lurek.render.setColor(1, 0.9, 0.3)
+    lurek.render.print(string.format("%d:%02d", mins, secs), W/2 - 20, H - 25, 1.8)
 
-    lurek.gfx.setColor(0.6, 0.8, 0.6, 0.6)
-    lurek.gfx.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
+    lurek.render.setColor(0.6, 0.8, 0.6, 0.6)
+    lurek.render.print("[WASD/Arrows] Move  [Space] Kick  [Tab] Switch player", 10, H - 20, 1.3)
 
     -- Kickoff flash
     if kickoff_timer > 0 then
-        lurek.gfx.setColor(1, 1, 0.3, kickoff_timer)
-        lurek.gfx.print("GOAL!", W/2 - 35, H/2 - 15, 4)
+        lurek.render.setColor(1, 1, 0.3, kickoff_timer)
+        lurek.render.print("GOAL!", W/2 - 35, H/2 - 15, 4)
     end
 
     if game_state == "gameover" then
-        lurek.gfx.setColor(0, 0, 0, 0.75)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 0, 0, 0.75)
+        lurek.render.rectangle("fill", 0, 0, W, H)
         local msg = scores.player > scores.cpu and "YOU WIN!" or
                     scores.player < scores.cpu and "CPU WINS" or "DRAW!"
         local col = scores.player > scores.cpu and {0.3,1,0.4} or
                     scores.player < scores.cpu and {1,0.3,0.3} or {1,1,0.4}
-        lurek.gfx.setColor(col[1], col[2], col[3])
-        lurek.gfx.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
-        lurek.gfx.setColor(1, 1, 1)
-        lurek.gfx.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
-        lurek.gfx.setColor(0.6, 0.6, 0.6)
-        lurek.gfx.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
+        lurek.render.setColor(col[1], col[2], col[3])
+        lurek.render.print(msg, W/2 - #msg * 14, H/2 - 25, 4)
+        lurek.render.setColor(1, 1, 1)
+        lurek.render.print(scores.player .. " — " .. scores.cpu, W/2 - 30, H/2 + 20, 3)
+        lurek.render.setColor(0.6, 0.6, 0.6)
+        lurek.render.print("Press R to restart", W/2 - 100, H/2 + 65, 2)
     end
 end
 

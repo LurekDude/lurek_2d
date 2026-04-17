@@ -245,76 +245,76 @@ function lurek.render()
         for x = 1, COLS do
             local c = TERRAIN_COLORS[world[y][x]]
             local bright = is_night and 0.4 or 1
-            lurek.gfx.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
-            lurek.gfx.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
+            lurek.render.setColor(c[1]*bright, c[2]*bright, c[3]*bright, 1)
+            lurek.render.rectangle("fill", (x-1)*TILE, (y-1)*TILE, TILE, TILE)
         end
     end
 
     -- temples
     for _, tp in ipairs(temples) do
-        lurek.gfx.setColor(1,0.85,0.3,1)
+        lurek.render.setColor(1,0.85,0.3,1)
         local verts = {tp.x, tp.y-12, tp.x-8, tp.y+6, tp.x+8, tp.y+6}
-        lurek.gfx.polygon("fill", verts)
+        lurek.render.polygon("fill", verts)
     end
 
     -- prey (deer)
-    lurek.gfx.setColor(0.6,0.45,0.2,1)
-    for _, pr in ipairs(prey) do lurek.gfx.circle("fill", pr.x, pr.y, 4) end
+    lurek.render.setColor(0.6,0.45,0.2,1)
+    for _, pr in ipairs(prey) do lurek.render.circle("fill", pr.x, pr.y, 4) end
 
     -- predators (wolves)
-    lurek.gfx.setColor(0.5,0.1,0.1,1)
-    for _, p in ipairs(predators) do lurek.gfx.circle("fill", p.x, p.y, 5) end
+    lurek.render.setColor(0.5,0.1,0.1,1)
+    for _, p in ipairs(predators) do lurek.render.circle("fill", p.x, p.y, 5) end
 
     -- tribes
     for _, t in ipairs(tribes) do
         local g = t.hp / 100
-        lurek.gfx.setColor(0.2, 0.2 + g * 0.6, 1, 1)
-        lurek.gfx.circle("fill", t.x, t.y, 5)
+        lurek.render.setColor(0.2, 0.2 + g * 0.6, 1, 1)
+        lurek.render.circle("fill", t.x, t.y, 5)
     end
 
     -- storms
     for _, s in ipairs(storms) do
-        lurek.gfx.setColor(0.7,0.7,1, 0.3)
-        lurek.gfx.circle("fill", s.x, s.y, s.r)
-        lurek.gfx.setColor(1,1,0.5,0.8)
-        lurek.gfx.line(s.x, s.y - 20, s.x + 5, s.y + 10)
+        lurek.render.setColor(0.7,0.7,1, 0.3)
+        lurek.render.circle("fill", s.x, s.y, s.r)
+        lurek.render.setColor(1,1,0.5,0.8)
+        lurek.render.line(s.x, s.y - 20, s.x + 5, s.y + 10)
     end
 
     -- night overlay
     if is_night then
-        lurek.gfx.setColor(0, 0, 0.1, 0.35)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0, 0, 0.1, 0.35)
+        lurek.render.rectangle("fill", 0, 0, W, H)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.6)
-    lurek.gfx.rectangle("fill", 0, 0, W, 30)
-    lurek.gfx.setColor(1,1,1,1)
-    lurek.gfx.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
-    lurek.gfx.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
-    lurek.gfx.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
-    lurek.gfx.print("Pop: " .. #tribes, 400, 5, 0.9)
-    lurek.gfx.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 720, 5, 0.8)
+    lurek.render.setColor(0, 0, 0, 0.6)
+    lurek.render.rectangle("fill", 0, 0, W, 30)
+    lurek.render.setColor(1,1,1,1)
+    lurek.render.print("Day " .. day_count .. (is_night and " (Night)" or ""), 10, 5, 0.9)
+    lurek.render.print("Faith: " .. math.floor(faith), 150, 5, 0.9)
+    lurek.render.print("Food: " .. math.floor(food_supply), 290, 5, 0.9)
+    lurek.render.print("Pop: " .. #tribes, 400, 5, 0.9)
+    lurek.render.print("Wolves: " .. #predators .. "  Deer: " .. #prey, 490, 5, 0.9)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 720, 5, 0.8)
 
     -- miracle bar
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 40, W, 40)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, H - 40, W, 40)
     for i, m in ipairs(MIRACLES) do
         local bx = 10 + (i-1) * 100
         if i == selected_miracle then
-            lurek.gfx.setColor(1,1,0.3,0.4)
-            lurek.gfx.rectangle("fill", bx, H-35, 90, 30)
+            lurek.render.setColor(1,1,0.3,0.4)
+            lurek.render.rectangle("fill", bx, H-35, 90, 30)
         end
-        lurek.gfx.setColor(1,1,1,1)
-        lurek.gfx.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
+        lurek.render.setColor(1,1,1,1)
+        lurek.render.print(m .. "(" .. MIRACLE_COST[m] .. ")", bx+5, H-28, 0.8)
     end
-    lurek.gfx.setColor(0.7,0.7,0.7,1)
-    lurek.gfx.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
+    lurek.render.setColor(0.7,0.7,0.7,1)
+    lurek.render.print("[T+click] Build Temple(30)  [1-4] Select  [R] Restart", 420, H-28, 0.7)
 
     -- message
     if message and msg_timer > 0 then
-        lurek.gfx.setColor(1,1,0.5,1)
-        lurek.gfx.print(message, 300, 50, 1.1)
+        lurek.render.setColor(1,1,0.5,1)
+        lurek.render.print(message, 300, 50, 1.1)
     end
 end

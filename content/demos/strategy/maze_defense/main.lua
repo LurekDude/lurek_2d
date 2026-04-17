@@ -280,7 +280,7 @@ function lurek.mousepressed(mx, my, btn)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.08, 0.1, 0.08)
+    lurek.render.setBackgroundColor(0.08, 0.1, 0.08)
 
     -- Grid
     for y = 1, GRID_H do
@@ -288,38 +288,38 @@ function lurek.render()
             local px = OX + (x - 1) * CELL
             local py = OY + (y - 1) * CELL
             if grid[y][x] == 0 then
-                lurek.gfx.setColor(0.15, 0.18, 0.15, 1)
+                lurek.render.setColor(0.15, 0.18, 0.15, 1)
             elseif grid[y][x] == 1 then
-                lurek.gfx.setColor(0.4, 0.35, 0.25, 1)
+                lurek.render.setColor(0.4, 0.35, 0.25, 1)
             elseif grid[y][x] == 2 then
-                lurek.gfx.setColor(0.2, 0.3, 0.6, 1)
+                lurek.render.setColor(0.2, 0.3, 0.6, 1)
             end
-            lurek.gfx.rectangle("fill", px, py, CELL - 1, CELL - 1)
+            lurek.render.rectangle("fill", px, py, CELL - 1, CELL - 1)
         end
     end
 
     -- Spawn and exit markers
-    lurek.gfx.setColor(0, 1, 0, 1)
-    lurek.gfx.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
+    lurek.render.setColor(0, 1, 0, 1)
+    lurek.render.rectangle("fill", OX + (SPAWN[1]-1)*CELL, OY + (SPAWN[2]-1)*CELL, CELL-1, CELL-1)
+    lurek.render.setColor(1, 0, 0, 1)
+    lurek.render.rectangle("fill", OX + (EXIT[1]-1)*CELL, OY + (EXIT[2]-1)*CELL, CELL-1, CELL-1)
 
     -- Path visualization
-    lurek.gfx.setColor(0.3, 0.8, 0.3, 0.3)
+    lurek.render.setColor(0.3, 0.8, 0.3, 0.3)
     for _, p in ipairs(path) do
         if grid[p[2]][p[1]] == 0 then
-            lurek.gfx.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
+            lurek.render.rectangle("fill", OX + (p[1]-1)*CELL + 8, OY + (p[2]-1)*CELL + 8, CELL - 17, CELL - 17)
         end
     end
 
     -- Tower range indicators
-    lurek.gfx.setColor(0.3, 0.4, 0.8, 0.15)
+    lurek.render.setColor(0.3, 0.4, 0.8, 0.15)
     for y = 1, GRID_H do
         for x = 1, GRID_W do
             if grid[y][x] == 2 then
                 local tx = (x - 0.5) * CELL + OX
                 local ty = (y - 0.5) * CELL + OY
-                lurek.gfx.circle("fill", tx, ty, CELL * 3)
+                lurek.render.circle("fill", tx, ty, CELL * 3)
             end
         end
     end
@@ -327,38 +327,38 @@ function lurek.render()
     -- Enemies
     for _, e in ipairs(enemies) do
         -- HP bar
-        lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-        lurek.gfx.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
-        lurek.gfx.setColor(1, 0.2, 0.2, 1)
-        lurek.gfx.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
+        lurek.render.setColor(0.3, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", e.x - 8, e.y - 14, 16, 3)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.rectangle("fill", e.x - 8, e.y - 14, 16 * (e.hp / e.maxHp), 3)
         -- Body
-        lurek.gfx.setColor(0.9, 0.3, 0.3, 1)
-        lurek.gfx.circle("fill", e.x, e.y, 6)
+        lurek.render.setColor(0.9, 0.3, 0.3, 1)
+        lurek.render.circle("fill", e.x, e.y, 6)
     end
 
     -- Bullets
-    lurek.gfx.setColor(1, 1, 0.4, 1)
+    lurek.render.setColor(1, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        lurek.gfx.circle("fill", b.x, b.y, 3)
+        lurek.render.circle("fill", b.x, b.y, 3)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.8)
-    lurek.gfx.rectangle("fill", 0, 0, 800, 18)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
+    lurek.render.setColor(0, 0, 0, 0.8)
+    lurek.render.rectangle("fill", 0, 0, 800, 18)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Wave: " .. wave .. "  Gold: " .. gold .. "  Lives: " .. lives .. "  Score: " .. score, 10, 2)
     local modeText = buildMode == "wall" and "[1]>WALL($5)" or "  [1] Wall($5)"
     local modeText2 = buildMode == "tower" and " [2]>TOWER($20)" or " [2] Tower($20)"
-    lurek.gfx.setColor(0.8, 0.8, 0.5, 1)
-    lurek.gfx.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
+    lurek.render.setColor(0.8, 0.8, 0.5, 1)
+    lurek.render.print(modeText .. modeText2 .. "  RClick=Remove", 400, 2)
 
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 250, 250, 300, 80)
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
-        lurek.gfx.print("GAME OVER", 330, 265, 1.5)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
-        lurek.gfx.print("Press R to restart", 320, 318)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 250, 250, 300, 80)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
+        lurek.render.print("GAME OVER", 330, 265, 1.5)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Score: " .. score .. "  Wave: " .. wave, 320, 300)
+        lurek.render.print("Press R to restart", 320, 318)
     end
 end

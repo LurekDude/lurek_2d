@@ -21,7 +21,7 @@ local W, H = 800, 600
 
 function lurek.init()
     lurek.window.setTitle("Bullet Hell")
-    lurek.gfx.setBackgroundColor(0.05, 0.02, 0.1)
+    lurek.render.setBackgroundColor(0.05, 0.02, 0.1)
     player.x = W / 2
     player.y = H - 60
     player.w = 20
@@ -173,17 +173,17 @@ end
 
 function lurek.render()
     -- Stars background
-    lurek.gfx.setColor(0.3, 0.3, 0.4, 0.6)
+    lurek.render.setColor(0.3, 0.3, 0.4, 0.6)
     for i = 1, 60 do
         local sx = (i * 137) % W
         local sy = ((i * 251) + lurek.time.getTime() * (20 + i % 3 * 10)) % H
-        lurek.gfx.rectangle("fill", sx, sy, 2, 2)
+        lurek.render.rectangle("fill", sx, sy, 2, 2)
     end
 
     -- Player
     if not gameOver then
-        lurek.gfx.setColor(0.3, 0.7, 1, 1)
-        lurek.gfx.polygon("fill", {
+        lurek.render.setColor(0.3, 0.7, 1, 1)
+        lurek.render.polygon("fill", {
             player.x, player.y - 14,
             player.x - 10, player.y + 10,
             player.x + 10, player.y + 10
@@ -191,44 +191,44 @@ function lurek.render()
     end
 
     -- Player bullets
-    lurek.gfx.setColor(0.4, 1, 0.4, 1)
+    lurek.render.setColor(0.4, 1, 0.4, 1)
     for _, b in ipairs(bullets) do
-        lurek.gfx.rectangle("fill", b.x - 2, b.y, 4, 10)
+        lurek.render.rectangle("fill", b.x - 2, b.y, 4, 10)
     end
 
     -- Enemies
-    lurek.gfx.setColor(1, 0.3, 0.3, 1)
+    lurek.render.setColor(1, 0.3, 0.3, 1)
     for _, e in ipairs(enemies) do
-        lurek.gfx.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
-        lurek.gfx.setColor(1, 0.6, 0, 1)
-        lurek.gfx.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
-        lurek.gfx.setColor(1, 0.3, 0.3, 1)
+        lurek.render.rectangle("fill", e.x - e.w / 2, e.y - e.h / 2, e.w, e.h)
+        lurek.render.setColor(1, 0.6, 0, 1)
+        lurek.render.rectangle("fill", e.x - 4, e.y - 4, 8, 8)
+        lurek.render.setColor(1, 0.3, 0.3, 1)
     end
 
     -- Enemy bullets
-    lurek.gfx.setColor(1, 1, 0.2, 1)
+    lurek.render.setColor(1, 1, 0.2, 1)
     for _, b in ipairs(enemyBullets) do
-        lurek.gfx.circle("fill", b.x, b.y, 4)
+        lurek.render.circle("fill", b.x, b.y, 4)
     end
 
     -- Particles
     for _, p in ipairs(particles) do
-        lurek.gfx.setColor(p.r, p.g, p.b, p.life * 2)
-        lurek.gfx.circle("fill", p.x, p.y, 3)
+        lurek.render.setColor(p.r, p.g, p.b, p.life * 2)
+        lurek.render.circle("fill", p.x, p.y, 3)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Score: " .. score, 10, 10)
-    lurek.gfx.print("Lives: " .. lives, 10, 30)
-    lurek.gfx.print("Wave: " .. wave, 10, 50)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), W - 90, 10)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Score: " .. score, 10, 10)
+    lurek.render.print("Lives: " .. lives, 10, 30)
+    lurek.render.print("Wave: " .. wave, 10, 50)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), W - 90, 10)
 
     if gameOver then
-        lurek.gfx.setColor(1, 0.2, 0.2, 1)
-        lurek.gfx.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
+        lurek.render.setColor(1, 0.2, 0.2, 1)
+        lurek.render.print("GAME OVER", W / 2 - 60, H / 2 - 20, 2)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Final Score: " .. score, W / 2 - 55, H / 2 + 20)
     end
 end
 

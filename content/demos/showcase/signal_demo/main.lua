@@ -49,15 +49,15 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
-    lurek.gfx.print("Score: " .. score, 20, 50)
-    lurek.gfx.print("Combo: " .. combo, 20, 70)
-    lurek.gfx.print("Listeners: " .. events:getTotalCount(), 20, 90)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Signal Demo — Press SPACE for hit, R to reset", 20, 20)
+    lurek.render.print("Score: " .. score, 20, 50)
+    lurek.render.print("Combo: " .. combo, 20, 70)
+    lurek.render.print("Listeners: " .. events:getTotalCount(), 20, 90)
 
-    lurek.gfx.setColor(0.7, 0.9, 0.7)
+    lurek.render.setColor(0.7, 0.9, 0.7)
     for i, msg in ipairs(log) do
-        lurek.gfx.print(msg, 30, 110 + (i - 1) * 18)
+        lurek.render.print(msg, 30, 110 + (i - 1) * 18)
     end
 end
 

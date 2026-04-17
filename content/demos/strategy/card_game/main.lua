@@ -62,7 +62,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Card Game")
-    lurek.gfx.setBackgroundColor(0.1, 0.08, 0.15)
+    lurek.render.setBackgroundColor(0.1, 0.08, 0.15)
     player = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     enemy  = { hp = 30, maxHp = 30, mana = 0, maxMana = 1, shield = 0, deck = makeDeck(), hand = {} }
     turnNum = 0
@@ -143,71 +143,71 @@ local function drawCard(c, x, y, hovered)
     local cr, cg, cb = c.color[1], c.color[2], c.color[3]
     -- Card bg
     if hovered then
-        lurek.gfx.setColor(cr, cg, cb, 1)
+        lurek.render.setColor(cr, cg, cb, 1)
     else
-        lurek.gfx.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
+        lurek.render.setColor(cr * 0.6, cg * 0.6, cb * 0.6, 1)
     end
-    lurek.gfx.rectangle("fill", x, y, CARD_W, CARD_H)
-    lurek.gfx.setColor(0.9, 0.9, 0.8, 1)
-    lurek.gfx.rectangle("line", x, y, CARD_W, CARD_H)
+    lurek.render.rectangle("fill", x, y, CARD_W, CARD_H)
+    lurek.render.setColor(0.9, 0.9, 0.8, 1)
+    lurek.render.rectangle("line", x, y, CARD_W, CARD_H)
     -- Name
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(c.name, x + 4, y + 6)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(c.name, x + 4, y + 6)
     -- Cost
-    lurek.gfx.setColor(0.3, 0.5, 1, 1)
-    lurek.gfx.circle("fill", x + CARD_W - 14, y + 14, 12)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(c.cost, x + CARD_W - 18, y + 7)
+    lurek.render.setColor(0.3, 0.5, 1, 1)
+    lurek.render.circle("fill", x + CARD_W - 14, y + 14, 12)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(c.cost, x + CARD_W - 18, y + 7)
     -- Stats
-    lurek.gfx.setColor(1, 0.9, 0.7, 1)
+    lurek.render.setColor(1, 0.9, 0.7, 1)
     if c.kind == "attack" or c.kind == "drain" then
-        lurek.gfx.print("ATK:" .. c.atk, x + 6, y + 50)
+        lurek.render.print("ATK:" .. c.atk, x + 6, y + 50)
     end
-    lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
-    lurek.gfx.print(c.kind, x + 6, y + 80)
+    lurek.render.setColor(0.7, 0.7, 0.7, 1)
+    lurek.render.print(c.kind, x + 6, y + 80)
 end
 
 function lurek.render()
     local mx, my = lurek.mouse.getPosition()
 
     -- Enemy area
-    lurek.gfx.setColor(0.15, 0.1, 0.1, 1)
-    lurek.gfx.rectangle("fill", 50, 20, 700, 80)
-    lurek.gfx.setColor(0.9, 0.3, 0.3, 1)
-    lurek.gfx.print("ENEMY", 60, 26)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
-    lurek.gfx.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
-    lurek.gfx.print("Shield: " .. enemy.shield, 200, 46)
-    lurek.gfx.print("Cards: " .. #enemy.hand, 200, 66)
+    lurek.render.setColor(0.15, 0.1, 0.1, 1)
+    lurek.render.rectangle("fill", 50, 20, 700, 80)
+    lurek.render.setColor(0.9, 0.3, 0.3, 1)
+    lurek.render.print("ENEMY", 60, 26)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("HP: " .. enemy.hp .. "/" .. enemy.maxHp, 60, 46)
+    lurek.render.print("Mana: " .. enemy.mana .. "/" .. enemy.maxMana, 60, 66)
+    lurek.render.print("Shield: " .. enemy.shield, 200, 46)
+    lurek.render.print("Cards: " .. #enemy.hand, 200, 66)
     -- Enemy HP bar
-    lurek.gfx.setColor(0.3, 0.1, 0.1, 1)
-    lurek.gfx.rectangle("fill", 340, 40, 200, 16)
-    lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
+    lurek.render.setColor(0.3, 0.1, 0.1, 1)
+    lurek.render.rectangle("fill", 340, 40, 200, 16)
+    lurek.render.setColor(0.9, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", 340, 40, 200 * (enemy.hp / enemy.maxHp), 16)
 
     -- Player area
-    lurek.gfx.setColor(0.1, 0.1, 0.15, 1)
-    lurek.gfx.rectangle("fill", 50, 110, 700, 80)
-    lurek.gfx.setColor(0.3, 0.5, 1, 1)
-    lurek.gfx.print("YOU", 60, 116)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
-    lurek.gfx.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
-    lurek.gfx.print("Shield: " .. player.shield, 200, 136)
-    lurek.gfx.print("Deck: " .. #player.deck, 200, 156)
+    lurek.render.setColor(0.1, 0.1, 0.15, 1)
+    lurek.render.rectangle("fill", 50, 110, 700, 80)
+    lurek.render.setColor(0.3, 0.5, 1, 1)
+    lurek.render.print("YOU", 60, 116)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("HP: " .. player.hp .. "/" .. player.maxHp, 60, 136)
+    lurek.render.print("Mana: " .. player.mana .. "/" .. player.maxMana, 60, 156)
+    lurek.render.print("Shield: " .. player.shield, 200, 136)
+    lurek.render.print("Deck: " .. #player.deck, 200, 156)
     -- Player HP bar
-    lurek.gfx.setColor(0.1, 0.1, 0.3, 1)
-    lurek.gfx.rectangle("fill", 340, 130, 200, 16)
-    lurek.gfx.setColor(0.2, 0.5, 1, 1)
-    lurek.gfx.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
+    lurek.render.setColor(0.1, 0.1, 0.3, 1)
+    lurek.render.rectangle("fill", 340, 130, 200, 16)
+    lurek.render.setColor(0.2, 0.5, 1, 1)
+    lurek.render.rectangle("fill", 340, 130, 200 * (player.hp / player.maxHp), 16)
 
     -- Log
-    lurek.gfx.setColor(0, 0, 0, 0.5)
-    lurek.gfx.rectangle("fill", 50, 200, 300, 120)
+    lurek.render.setColor(0, 0, 0, 0.5)
+    lurek.render.rectangle("fill", 50, 200, 300, 120)
     for i, msg in ipairs(log) do
-        lurek.gfx.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
-        lurek.gfx.print(msg, 58, 200 + (i - 1) * 18)
+        lurek.render.setColor(0.8, 0.8, 0.7, clamp(1.2 - i * 0.15, 0.3, 1))
+        lurek.render.print(msg, 58, 200 + (i - 1) * 18)
     end
 
     -- Player hand
@@ -220,7 +220,7 @@ function lurek.render()
         if hovered then cy = cy - 12 end
         local canPlay = c.cost <= player.mana and phase == "play" and turn == "player"
         if not canPlay then
-            lurek.gfx.setColor(0.4, 0.4, 0.4, 0.4)
+            lurek.render.setColor(0.4, 0.4, 0.4, 0.4)
             drawCard(c, cx, cy, false)
         else
             drawCard(c, cx, cy, hovered)
@@ -228,15 +228,15 @@ function lurek.render()
     end
 
     -- Phase info
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Turn " .. turnNum .. "  [Enter] End Turn", 400, 200)
 
     if gameOver then
-        lurek.gfx.setColor(0, 0, 0, 0.6)
-        lurek.gfx.rectangle("fill", 200, 250, 400, 80)
-        lurek.gfx.setColor(1, 1, 0.3, 1)
+        lurek.render.setColor(0, 0, 0, 0.6)
+        lurek.render.rectangle("fill", 200, 250, 400, 80)
+        lurek.render.setColor(1, 1, 0.3, 1)
         local msg = enemy.hp <= 0 and "YOU WIN!" or "YOU LOSE!"
-        lurek.gfx.print(msg, 330, 270, 2)
+        lurek.render.print(msg, 330, 270, 2)
     end
 end
 

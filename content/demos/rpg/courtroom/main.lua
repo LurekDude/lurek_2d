@@ -245,66 +245,66 @@ function lurek.keypressed(key)
 end
 
 local function draw_bar(label, x, y, w, h, value, max, r, g, b)
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", x, y, w, h)
+    lurek.render.setColor(0.2, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", x, y, w, h)
     local pct = clamp(value / max, 0, 1)
-    lurek.gfx.setColor(r, g, b, 1)
-    lurek.gfx.rectangle("fill", x, y, w * pct, h)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print(label .. ": " .. math.floor(value) .. "/" .. max, x, y - 16, 0.7)
+    lurek.render.setColor(r, g, b, 1)
+    lurek.render.rectangle("fill", x, y, w * pct, h)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print(label .. ": " .. math.floor(value) .. "/" .. max, x, y - 16, 0.7)
 end
 
 function lurek.render()
-    lurek.gfx.setBackgroundColor(0.08, 0.06, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.06, 0.12)
 
     if state == "title" then
-        lurek.gfx.setColor(1, 0.85, 0.3, 1)
-        lurek.gfx.print("COURTROOM DRAMA", 200, 120, 2)
-        lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
-        lurek.gfx.print("Present evidence. Cross-examine witnesses.", 200, 200, 1)
-        lurek.gfx.print("Win 3 cases to become a legendary attorney!", 200, 230, 1)
-        lurek.gfx.setColor(0.6, 1, 0.6, 1)
-        lurek.gfx.print("Press ENTER to begin", 260, 320, 1.2)
+        lurek.render.setColor(1, 0.85, 0.3, 1)
+        lurek.render.print("COURTROOM DRAMA", 200, 120, 2)
+        lurek.render.setColor(0.8, 0.8, 0.8, 1)
+        lurek.render.print("Present evidence. Cross-examine witnesses.", 200, 200, 1)
+        lurek.render.print("Win 3 cases to become a legendary attorney!", 200, 230, 1)
+        lurek.render.setColor(0.6, 1, 0.6, 1)
+        lurek.render.print("Press ENTER to begin", 260, 320, 1.2)
         return
     end
 
     local c = cases[current_case]
 
     if state == "case_intro" then
-        lurek.gfx.setColor(1, 0.8, 0.3, 1)
-        lurek.gfx.print("Case " .. current_case .. ": " .. c.title, 150, 100, 1.5)
-        lurek.gfx.setColor(0.9, 0.9, 0.9, 1)
-        lurek.gfx.print(c.intro, 150, 180, 1)
-        lurek.gfx.setColor(0.8, 0.8, 0.6, 1)
-        lurek.gfx.print("Witness: " .. c.witness, 150, 260, 1)
-        lurek.gfx.setColor(0.5, 1, 0.5, 1)
-        lurek.gfx.print("Press ENTER to start cross-examination", 150, 340, 1)
+        lurek.render.setColor(1, 0.8, 0.3, 1)
+        lurek.render.print("Case " .. current_case .. ": " .. c.title, 150, 100, 1.5)
+        lurek.render.setColor(0.9, 0.9, 0.9, 1)
+        lurek.render.print(c.intro, 150, 180, 1)
+        lurek.render.setColor(0.8, 0.8, 0.6, 1)
+        lurek.render.print("Witness: " .. c.witness, 150, 260, 1)
+        lurek.render.setColor(0.5, 1, 0.5, 1)
+        lurek.render.print("Press ENTER to start cross-examination", 150, 340, 1)
         return
     end
 
     if state == "result" then
-        lurek.gfx.setColor(1, 1, 0.5, 1)
-        lurek.gfx.print("VERDICT", 300, 100, 2)
-        lurek.gfx.setColor(0.9, 0.9, 0.9, 1)
-        lurek.gfx.print(result_msg, 150, 200, 1.2)
-        lurek.gfx.print("Score: " .. score .. " / " .. #cases, 150, 260, 1)
-        lurek.gfx.setColor(0.5, 1, 0.5, 1)
-        lurek.gfx.print("Press ENTER to continue", 220, 340, 1)
+        lurek.render.setColor(1, 1, 0.5, 1)
+        lurek.render.print("VERDICT", 300, 100, 2)
+        lurek.render.setColor(0.9, 0.9, 0.9, 1)
+        lurek.render.print(result_msg, 150, 200, 1.2)
+        lurek.render.print("Score: " .. score .. " / " .. #cases, 150, 260, 1)
+        lurek.render.setColor(0.5, 1, 0.5, 1)
+        lurek.render.print("Press ENTER to continue", 220, 340, 1)
         return
     end
 
     -- Courtroom scene
     -- Judge bench
-    lurek.gfx.setColor(0.35, 0.2, 0.1, 1)
-    lurek.gfx.rectangle("fill", 250, 20, 300, 50)
-    lurek.gfx.setColor(1, 0.9, 0.7, 1)
-    lurek.gfx.print("JUDGE", 370, 30, 1)
+    lurek.render.setColor(0.35, 0.2, 0.1, 1)
+    lurek.render.rectangle("fill", 250, 20, 300, 50)
+    lurek.render.setColor(1, 0.9, 0.7, 1)
+    lurek.render.print("JUDGE", 370, 30, 1)
 
     -- Witness stand
-    lurek.gfx.setColor(0.3, 0.25, 0.15, 1)
-    lurek.gfx.rectangle("fill", 550, 90, 120, 40)
-    lurek.gfx.setColor(0.9, 0.8, 0.6, 1)
-    lurek.gfx.print(c.witness, 560, 100, 0.7)
+    lurek.render.setColor(0.3, 0.25, 0.15, 1)
+    lurek.render.rectangle("fill", 550, 90, 120, 40)
+    lurek.render.setColor(0.9, 0.8, 0.6, 1)
+    lurek.render.print(c.witness, 560, 100, 0.7)
 
     -- Bars
     draw_bar("Credibility", 20, 30, 180, 14, credibility, 100, 0.2, 0.7, 1)
@@ -314,72 +314,72 @@ function lurek.render()
     if state == "testimony" then
         local t = current_testimony()
         if t then
-            lurek.gfx.setColor(0.15, 0.12, 0.2, 1)
-            lurek.gfx.rectangle("fill", 30, 150, 540, 80)
-            lurek.gfx.setColor(0.25, 0.2, 0.3, 1)
-            lurek.gfx.rectangle("line", 30, 150, 540, 80)
-            lurek.gfx.setColor(1, 0.9, 0.7, 1)
-            lurek.gfx.print(c.witness .. " (" .. testimony_idx .. "/" .. #c.testimony .. "):", 40, 155, 0.8)
+            lurek.render.setColor(0.15, 0.12, 0.2, 1)
+            lurek.render.rectangle("fill", 30, 150, 540, 80)
+            lurek.render.setColor(0.25, 0.2, 0.3, 1)
+            lurek.render.rectangle("line", 30, 150, 540, 80)
+            lurek.render.setColor(1, 0.9, 0.7, 1)
+            lurek.render.print(c.witness .. " (" .. testimony_idx .. "/" .. #c.testimony .. "):", 40, 155, 0.8)
             local visible = string.sub(t.text, 1, math.floor(text_progress))
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print('"' .. visible .. '"', 40, 180, 0.9)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print('"' .. visible .. '"', 40, 180, 0.9)
         end
     end
 
     -- Evidence panel
     if show_evidence_panel and state == "testimony" then
-        lurek.gfx.setColor(0.1, 0.1, 0.18, 0.95)
-        lurek.gfx.rectangle("fill", 20, 250, 300, 150)
-        lurek.gfx.setColor(0.4, 0.4, 0.6, 1)
-        lurek.gfx.rectangle("line", 20, 250, 300, 150)
-        lurek.gfx.setColor(1, 0.85, 0.4, 1)
-        lurek.gfx.print("Evidence (Up/Down, Enter to present):", 30, 255, 0.75)
+        lurek.render.setColor(0.1, 0.1, 0.18, 0.95)
+        lurek.render.rectangle("fill", 20, 250, 300, 150)
+        lurek.render.setColor(0.4, 0.4, 0.6, 1)
+        lurek.render.rectangle("line", 20, 250, 300, 150)
+        lurek.render.setColor(1, 0.85, 0.4, 1)
+        lurek.render.print("Evidence (Up/Down, Enter to present):", 30, 255, 0.75)
         for i, ev in ipairs(c.evidence) do
             local ey = 275 + (i - 1) * 28
             if i == selected_evidence then
-                lurek.gfx.setColor(0.3, 0.3, 0.5, 1)
-                lurek.gfx.rectangle("fill", 25, ey - 2, 290, 24)
-                lurek.gfx.setColor(1, 1, 0.6, 1)
+                lurek.render.setColor(0.3, 0.3, 0.5, 1)
+                lurek.render.rectangle("fill", 25, ey - 2, 290, 24)
+                lurek.render.setColor(1, 1, 0.6, 1)
             else
-                lurek.gfx.setColor(0.7, 0.7, 0.7, 1)
+                lurek.render.setColor(0.7, 0.7, 0.7, 1)
             end
-            lurek.gfx.print(i .. ". " .. ev.name .. " — " .. ev.desc, 35, ey, 0.65)
+            lurek.render.print(i .. ". " .. ev.name .. " — " .. ev.desc, 35, ey, 0.65)
         end
     end
 
     -- Question menu
     if state == "question" then
-        lurek.gfx.setColor(0.1, 0.1, 0.18, 0.95)
-        lurek.gfx.rectangle("fill", 20, 250, 500, 130)
-        lurek.gfx.setColor(1, 0.85, 0.4, 1)
-        lurek.gfx.print("Cross-examine (Up/Down, Enter):", 30, 255, 0.8)
+        lurek.render.setColor(0.1, 0.1, 0.18, 0.95)
+        lurek.render.rectangle("fill", 20, 250, 500, 130)
+        lurek.render.setColor(1, 0.85, 0.4, 1)
+        lurek.render.print("Cross-examine (Up/Down, Enter):", 30, 255, 0.8)
         for i, q in ipairs(c.questions) do
             local qy = 280 + (i - 1) * 30
             if i == selected_question then
-                lurek.gfx.setColor(0.3, 0.3, 0.5, 1)
-                lurek.gfx.rectangle("fill", 25, qy - 2, 490, 26)
-                lurek.gfx.setColor(1, 1, 0.6, 1)
+                lurek.render.setColor(0.3, 0.3, 0.5, 1)
+                lurek.render.rectangle("fill", 25, qy - 2, 490, 26)
+                lurek.render.setColor(1, 1, 0.6, 1)
             else
-                lurek.gfx.setColor(0.8, 0.8, 0.8, 1)
+                lurek.render.setColor(0.8, 0.8, 0.8, 1)
             end
-            lurek.gfx.print(q.text, 35, qy, 0.8)
+            lurek.render.print(q.text, 35, qy, 0.8)
         end
     end
 
     -- Controls
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("E=evidence | P=press | Q=question | Enter=next | Esc=quit", 30, 450, 0.65)
-    lurek.gfx.print("Case " .. current_case .. "/" .. #cases .. "  |  Testimony " .. testimony_idx .. "/" .. #c.testimony, 30, 435, 0.65)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("E=evidence | P=press | Q=question | Enter=next | Esc=quit", 30, 450, 0.65)
+    lurek.render.print("Case " .. current_case .. "/" .. #cases .. "  |  Testimony " .. testimony_idx .. "/" .. #c.testimony, 30, 435, 0.65)
 
     -- Flash
     if flash_timer > 0 then
         local a = clamp(flash_timer, 0, 1)
-        lurek.gfx.setColor(0, 0, 0, 0.7 * a)
-        lurek.gfx.rectangle("fill", 50, 400, 700, 35)
-        lurek.gfx.setColor(flash_color[1], flash_color[2], flash_color[3], a)
-        lurek.gfx.print(flash_text, 60, 405, 0.85)
+        lurek.render.setColor(0, 0, 0, 0.7 * a)
+        lurek.render.rectangle("fill", 50, 400, 700, 35)
+        lurek.render.setColor(flash_color[1], flash_color[2], flash_color[3], a)
+        lurek.render.print(flash_text, 60, 405, 0.85)
     end
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5, 1)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 700, 5, 0.6)
+    lurek.render.setColor(0.5, 0.5, 0.5, 1)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 700, 5, 0.6)
 end

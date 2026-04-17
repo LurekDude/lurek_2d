@@ -108,7 +108,7 @@ local function spawnTrain(stationIdx)
 end
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.15, 0.2, 0.15)
+    lurek.render.setBackgroundColor(0.15, 0.2, 0.15)
     initGrid()
     addStation(3, 4, "Lumber", "wood", "food")
     addStation(22, 4, "Forge", "iron", "wood")
@@ -229,34 +229,34 @@ end
 local function drawTrack(col, row, t)
     local x, y = (col - 1) * TILE, (row - 1) * TILE
     local cx, cy = x + TILE / 2, y + TILE / 2
-    lurek.gfx.setColor(0.6, 0.6, 0.5, 1)
-    lurek.gfx.setLineWidth(3)
+    lurek.render.setColor(0.6, 0.6, 0.5, 1)
+    lurek.render.setLineWidth(3)
     if t == 1 then
-        lurek.gfx.line(x, cy, x + TILE, cy)
+        lurek.render.line(x, cy, x + TILE, cy)
     elseif t == 2 then
-        lurek.gfx.line(cx, y, cx, y + TILE)
+        lurek.render.line(cx, y, cx, y + TILE)
     elseif t == 3 then
-        lurek.gfx.line(cx, cy, x + TILE, cy)
-        lurek.gfx.line(cx, cy, cx, y)
+        lurek.render.line(cx, cy, x + TILE, cy)
+        lurek.render.line(cx, cy, cx, y)
     elseif t == 4 then
-        lurek.gfx.line(cx, cy, x + TILE, cy)
-        lurek.gfx.line(cx, cy, cx, y + TILE)
+        lurek.render.line(cx, cy, x + TILE, cy)
+        lurek.render.line(cx, cy, cx, y + TILE)
     elseif t == 5 then
-        lurek.gfx.line(cx, cy, x, cy)
-        lurek.gfx.line(cx, cy, cx, y + TILE)
+        lurek.render.line(cx, cy, x, cy)
+        lurek.render.line(cx, cy, cx, y + TILE)
     elseif t == 6 then
-        lurek.gfx.line(cx, cy, x, cy)
-        lurek.gfx.line(cx, cy, cx, y)
+        lurek.render.line(cx, cy, x, cy)
+        lurek.render.line(cx, cy, cx, y)
     end
-    lurek.gfx.setLineWidth(1)
+    lurek.render.setLineWidth(1)
 end
 
 function lurek.render()
     -- Grid
-    lurek.gfx.setColor(0.2, 0.25, 0.2, 1)
+    lurek.render.setColor(0.2, 0.25, 0.2, 1)
     for r = 1, ROWS do
         for c = 1, COLS do
-            lurek.gfx.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
+            lurek.render.rectangle("line", (c - 1) * TILE, (r - 1) * TILE, TILE, TILE)
         end
     end
 
@@ -271,32 +271,32 @@ function lurek.render()
     for _, st in ipairs(stations) do
         local x, y = (st.col - 1) * TILE, (st.row - 1) * TILE
         local clr = CARGO_COLORS[st.produces]
-        lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
-        lurek.gfx.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print(st.name, x, y - 14, 0.8)
-        lurek.gfx.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
+        lurek.render.setColor(clr[1], clr[2], clr[3], 1)
+        lurek.render.rectangle("fill", x + 2, y + 2, TILE - 4, TILE - 4)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print(st.name, x, y - 14, 0.8)
+        lurek.render.print("Stock:" .. st.stock, x, y + TILE + 2, 0.7)
     end
 
     -- Trains
     for _, tr in ipairs(trains) do
         local clr = CARGO_COLORS[tr.cargo] or {1, 1, 0}
-        lurek.gfx.setColor(clr[1], clr[2], clr[3], 1)
-        lurek.gfx.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
-        lurek.gfx.setColor(0, 0, 0, 1)
-        lurek.gfx.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
+        lurek.render.setColor(clr[1], clr[2], clr[3], 1)
+        lurek.render.rectangle("fill", tr.px - 8, tr.py - 8, 16, 16)
+        lurek.render.setColor(0, 0, 0, 1)
+        lurek.render.rectangle("line", tr.px - 8, tr.py - 8, 16, 16)
     end
 
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7)
-    lurek.gfx.rectangle("fill", 0, H - 60, W, 60)
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
-    lurek.gfx.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
+    lurek.render.setColor(0, 0, 0, 0.7)
+    lurek.render.rectangle("fill", 0, H - 60, W, 60)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Day " .. day .. "  Revenue: $" .. revenue .. "  Track: " .. TRACK_NAMES[selectedTrack] .. " (1-6/Tab)", 10, H - 55, 1)
+    lurek.render.print("Left-click: place track | Right-click: cycle/remove | Trains auto-spawn from stations", 10, H - 35, 0.8)
 
     -- Revenue mini-graph
     if #revenueHistory > 1 then
-        lurek.gfx.setColor(0.2, 0.8, 0.2, 1)
+        lurek.render.setColor(0.2, 0.8, 0.2, 1)
         local gx, gy, gw, gh = W - 160, H - 55, 150, 45
         local maxR = 1
         for _, v in ipairs(revenueHistory) do if v > maxR then maxR = v end end
@@ -305,14 +305,14 @@ function lurek.render()
             local x2 = gx + (i - 1) / (#revenueHistory - 1) * gw
             local y1 = gy + gh - (revenueHistory[i - 1] / maxR) * gh
             local y2 = gy + gh - (revenueHistory[i] / maxR) * gh
-            lurek.gfx.line(x1, y1, x2, y2)
+            lurek.render.line(x1, y1, x2, y2)
         end
     end
 
     -- Message
     if msgTimer > 0 then
-        lurek.gfx.setColor(0, 1, 0.5, msgTimer / 2)
-        lurek.gfx.print(message, W / 2 - 100, 20, 1)
+        lurek.render.setColor(0, 1, 0.5, msgTimer / 2)
+        lurek.render.print(message, W / 2 - 100, 20, 1)
     end
 
     -- Mouse hover preview
@@ -320,7 +320,7 @@ function lurek.render()
     local hc = math.floor(mx / TILE) + 1
     local hr = math.floor(my / TILE) + 1
     if hc >= 1 and hc <= COLS and hr >= 1 and hr <= ROWS and grid[hr] and grid[hr][hc] == 0 then
-        lurek.gfx.setColor(1, 1, 0, 0.3)
-        lurek.gfx.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
+        lurek.render.setColor(1, 1, 0, 0.3)
+        lurek.render.rectangle("fill", (hc - 1) * TILE, (hr - 1) * TILE, TILE, TILE)
     end
 end

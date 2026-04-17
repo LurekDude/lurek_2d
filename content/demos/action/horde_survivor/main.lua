@@ -73,7 +73,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Horde Survivor")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     player = { x = ARENA.w / 2, y = ARENA.h / 2, r = 12, speed = 160, hp = 100, max_hp = 100,
                proj_count = 3, proj_dmg = 5, orbit_r = 50, orbit_speed = 3, proj_pierce = 1, angle = 0 }
     enemies = {}; projectiles = {}; xp_gems = {}; particles = {}
@@ -189,86 +189,86 @@ function lurek.render()
     local ox, oy = -cam.x, -cam.y
 
     -- arena border
-    lurek.gfx.setColor(0.2, 0.2, 0.3, 1)
-    lurek.gfx.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
+    lurek.render.setColor(0.2, 0.2, 0.3, 1)
+    lurek.render.rectangle("line", ARENA.x + ox, ARENA.y + oy, ARENA.w, ARENA.h)
 
     -- xp gems
-    lurek.gfx.setColor(0.2, 1, 0.4, 1)
+    lurek.render.setColor(0.2, 1, 0.4, 1)
     for _, g in ipairs(xp_gems) do
-        lurek.gfx.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
+        lurek.render.rectangle("fill", g.x + ox - 3, g.y + oy - 3, 6, 6)
     end
 
     -- particles
     for _, p in ipairs(particles) do
         local a = clamp(p.life / 0.4, 0, 1)
-        lurek.gfx.setColor(1, 0.6, 0.1, a)
-        lurek.gfx.circle("fill", p.x + ox, p.y + oy, 3)
+        lurek.render.setColor(1, 0.6, 0.1, a)
+        lurek.render.circle("fill", p.x + ox, p.y + oy, 3)
     end
 
     -- enemies
     for _, e in ipairs(enemies) do
-        lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
-        lurek.gfx.circle("fill", e.x + ox, e.y + oy, e.r)
+        lurek.render.setColor(0.9, 0.2, 0.2, 1)
+        lurek.render.circle("fill", e.x + ox, e.y + oy, e.r)
         -- hp bar
-        lurek.gfx.setColor(0.2, 0.2, 0.2, 0.8)
-        lurek.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
-        lurek.gfx.setColor(0, 1, 0, 0.8)
-        lurek.gfx.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
+        lurek.render.setColor(0.2, 0.2, 0.2, 0.8)
+        lurek.render.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20, 3)
+        lurek.render.setColor(0, 1, 0, 0.8)
+        lurek.render.rectangle("fill", e.x + ox - 10, e.y + oy - e.r - 6, 20 * (e.hp / e.max_hp), 3)
     end
 
     -- projectiles
-    lurek.gfx.setColor(0.4, 0.8, 1, 1)
+    lurek.render.setColor(0.4, 0.8, 1, 1)
     for _, p in ipairs(projectiles) do
-        lurek.gfx.circle("fill", p.x + ox, p.y + oy, p.r)
+        lurek.render.circle("fill", p.x + ox, p.y + oy, p.r)
     end
 
     -- player
-    lurek.gfx.setColor(0.3, 0.9, 0.3, 1)
-    lurek.gfx.circle("fill", player.x + ox, player.y + oy, player.r)
+    lurek.render.setColor(0.3, 0.9, 0.3, 1)
+    lurek.render.circle("fill", player.x + ox, player.y + oy, player.r)
 
     -- HUD
-    lurek.gfx.setColor(0.2, 0.2, 0.2, 0.7)
-    lurek.gfx.rectangle("fill", 0, 0, W, 36)
+    lurek.render.setColor(0.2, 0.2, 0.2, 0.7)
+    lurek.render.rectangle("fill", 0, 0, W, 36)
 
     -- HP bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 10, 8, 150, 14)
-    lurek.gfx.setColor(0.9, 0.2, 0.2, 1)
-    lurek.gfx.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 10, 8, 150, 14)
+    lurek.render.setColor(0.9, 0.2, 0.2, 1)
+    lurek.render.rectangle("fill", 10, 8, 150 * (player.hp / player.max_hp), 14)
 
     -- XP bar
-    lurek.gfx.setColor(0.3, 0.3, 0.3, 1)
-    lurek.gfx.rectangle("fill", 170, 8, 100, 14)
-    lurek.gfx.setColor(0.2, 0.8, 1, 1)
-    lurek.gfx.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
+    lurek.render.setColor(0.3, 0.3, 0.3, 1)
+    lurek.render.rectangle("fill", 170, 8, 100, 14)
+    lurek.render.setColor(0.2, 0.8, 1, 1)
+    lurek.render.rectangle("fill", 170, 8, 100 * (xp / xp_next), 14)
 
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("Lv " .. level, 280, 8)
-    lurek.gfx.print("Kills: " .. kills, 340, 8)
-    lurek.gfx.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 600, 8)
-    lurek.gfx.print("Enemies: " .. #enemies, 680, 8)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("Lv " .. level, 280, 8)
+    lurek.render.print("Kills: " .. kills, 340, 8)
+    lurek.render.print(string.format("Time: %d:%02d", math.floor(game_time / 60), math.floor(game_time) % 60), 460, 8)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 600, 8)
+    lurek.render.print("Enemies: " .. #enemies, 680, 8)
 
     -- upgrade menu
     if paused and upgrade_choices then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(1, 1, 0.3, 1)
-        lurek.gfx.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(1, 1, 0.3, 1)
+        lurek.render.print("LEVEL UP! Choose an upgrade:", 240, 180, 1.5)
         for i, u in ipairs(upgrade_choices) do
-            lurek.gfx.setColor(0.15, 0.15, 0.25, 0.9)
-            lurek.gfx.rectangle("fill", 200, 220 + i * 60, 400, 45)
-            lurek.gfx.setColor(1, 1, 1, 1)
-            lurek.gfx.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
+            lurek.render.setColor(0.15, 0.15, 0.25, 0.9)
+            lurek.render.rectangle("fill", 200, 220 + i * 60, 400, 45)
+            lurek.render.setColor(1, 1, 1, 1)
+            lurek.render.print("[" .. i .. "] " .. u.name, 220, 232 + i * 60, 1.2)
         end
     elseif paused then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 0, 0, W, H)
-        lurek.gfx.setColor(0.9, 0.15, 0.15, 1)
-        lurek.gfx.print("YOU DIED", 280, 240, 3)
-        lurek.gfx.setColor(1, 1, 1, 1)
-        lurek.gfx.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
-        lurek.gfx.print("Press R to restart", 300, 370)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 0, 0, W, H)
+        lurek.render.setColor(0.9, 0.15, 0.15, 1)
+        lurek.render.print("YOU DIED", 280, 240, 3)
+        lurek.render.setColor(1, 1, 1, 1)
+        lurek.render.print("Kills: " .. kills .. "  Score: " .. score .. "  Time: " .. math.floor(game_time) .. "s", 220, 320, 1.2)
+        lurek.render.print("Press R to restart", 300, 370)
     end
 end
 

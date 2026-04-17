@@ -7,14 +7,14 @@
 
 if not lurek.debugbridge then
     function lurek.init()
-        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     end
     function lurek.render()
-        lurek.gfx.setColor(1, 0.6, 0.2)
-        lurek.gfx.print("Debug Bridge Demo", 20, 20)
-        lurek.gfx.setColor(0.7, 0.7, 0.7)
-        lurek.gfx.print("lurek.debugbridge is not available in this build.", 20, 60)
-        lurek.gfx.print("(API not yet implemented)", 20, 85)
+        lurek.render.setColor(1, 0.6, 0.2)
+        lurek.render.print("Debug Bridge Demo", 20, 20)
+        lurek.render.setColor(0.7, 0.7, 0.7)
+        lurek.render.print("lurek.debugbridge is not available in this build.", 20, 60)
+        lurek.render.print("(API not yet implemented)", 20, 85)
     end
     return
 end
@@ -24,7 +24,7 @@ local frame_count = 0
 local server_started = false
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
 
     -- Start the debug bridge server
     server_started = db.start(19740)
@@ -49,51 +49,51 @@ end
 function lurek.render()
     local y = 20
 
-    lurek.gfx.setColor(1, 1, 0.6)
-    lurek.gfx.print("Debug Bridge Demo", 20, y)
+    lurek.render.setColor(1, 1, 0.6)
+    lurek.render.print("Debug Bridge Demo", 20, y)
     y = y + 30
 
     -- Server status
-    lurek.gfx.setColor(0.7, 1, 0.7)
-    lurek.gfx.print("Server running: " .. tostring(db.isRunning()), 20, y)
+    lurek.render.setColor(0.7, 1, 0.7)
+    lurek.render.print("Server running: " .. tostring(db.isRunning()), 20, y)
     y = y + 20
-    lurek.gfx.print("Port: " .. db.getPort(), 20, y)
+    lurek.render.print("Port: " .. db.getPort(), 20, y)
     y = y + 20
-    lurek.gfx.print("Connected clients: " .. db.getClientCount(), 20, y)
+    lurek.render.print("Connected clients: " .. db.getClientCount(), 20, y)
     y = y + 30
 
     -- Performance
     local perf = db.getPerformance()
-    lurek.gfx.setColor(0.7, 0.8, 1)
-    lurek.gfx.print(string.format("FPS: %.1f  |  avg dt: %.3fms", perf.fps or 0, (perf.avgDt or 0) * 1000), 20, y)
+    lurek.render.setColor(0.7, 0.8, 1)
+    lurek.render.print(string.format("FPS: %.1f  |  avg dt: %.3fms", perf.fps or 0, (perf.avgDt or 0) * 1000), 20, y)
     y = y + 30
 
     -- Print history (last 5)
-    lurek.gfx.setColor(1, 0.8, 0.6)
-    lurek.gfx.print("Print history (last 5):", 20, y)
+    lurek.render.setColor(1, 0.8, 0.6)
+    lurek.render.print("Print history (last 5):", 20, y)
     y = y + 20
 
     local history = db.getPrintHistory(5)
     for i = 1, #history do
-        lurek.gfx.setColor(0.8, 0.8, 0.8)
-        lurek.gfx.print(history[i].message, 30, y)
+        lurek.render.setColor(0.8, 0.8, 0.8)
+        lurek.render.print(history[i].message, 30, y)
         y = y + 16
     end
     y = y + 20
 
     -- Instructions
-    lurek.gfx.setColor(0.5, 0.6, 0.5)
-    lurek.gfx.print("Connect via TCP to interact:", 20, y)
+    lurek.render.setColor(0.5, 0.6, 0.5)
+    lurek.render.print("Connect via TCP to interact:", 20, y)
     y = y + 18
-    lurek.gfx.print('  {"id":1,"method":"ping"}', 30, y)
+    lurek.render.print('  {"id":1,"method":"ping"}', 30, y)
     y = y + 18
-    lurek.gfx.print('  {"id":2,"method":"eval","params":{"code":"return 2+2"}}', 30, y)
+    lurek.render.print('  {"id":2,"method":"eval","params":{"code":"return 2+2"}}', 30, y)
     y = y + 18
-    lurek.gfx.print('  {"id":3,"method":"getPerformance"}', 30, y)
+    lurek.render.print('  {"id":3,"method":"getPerformance"}', 30, y)
     y = y + 30
 
-    lurek.gfx.setColor(0.5, 0.5, 0.5)
-    lurek.gfx.print("Press ESC to quit", 20, y)
+    lurek.render.setColor(0.5, 0.5, 0.5)
+    lurek.render.print("Press ESC to quit", 20, y)
 end
 
 function lurek.keypressed(key)

@@ -7,6 +7,7 @@
 local status = "idle"
 local log = {}
 local maxLog = 20
+local prev_mx, prev_my = 0, 0   -- for detecting mouse movement in process()
 
 -- Helper to add a log entry
 local function addLog(msg)
@@ -17,7 +18,7 @@ local function addLog(msg)
 end
 
 function lurek.init()
-    lurek.gfx.setBackgroundColor(0.15, 0.15, 0.2)
+    lurek.render.setBackgroundColor(0.15, 0.15, 0.2)
 
     -- Load a demo script with mixed input events
     lurek.simulator.load("demo_sequence", {
@@ -57,6 +58,14 @@ function lurek.process(dt)
     -- Update the simulator (dispatches events into the engine queue)
     lurek.simulator.update(dt)
 
+    -- Poll mouse position and log significant moves (lurek.mousemoved is not an engine callback)
+    local mx, my = lurek.mouse.getPosition()
+    local dx, dy = mx - prev_mx, my - prev_my
+    if math.abs(dx) > 5 or math.abs(dy) > 5 then
+        addLog(string.format("Mouse move: (%d,%d) d=(%d,%d)", mx, my, math.floor(dx), math.floor(dy)))
+        prev_mx, prev_my = mx, my
+    end
+
     -- Update status display
     if lurek.simulator.isRunning() then
         local name = lurek.simulator.getCurrentScript() or "?"
@@ -75,36 +84,36 @@ end
 
 function lurek.render()
     -- Title
-    lurek.gfx.setColor(1, 1, 0.6)
-    lurek.gfx.print("Automation Demo", 20, 20)
+    lurek.render.setColor(1, 1, 0.6)
+    lurek.render.print("Automation Demo", 20, 20)
 
     -- Status
-    lurek.gfx.setColor(0.6, 1, 0.6)
-    lurek.gfx.print("Status: " .. status, 20, 50)
+    lurek.render.setColor(0.6, 1, 0.6)
+    lurek.render.print("Status: " .. status, 20, 50)
 
     -- Scripts loaded
-    lurek.gfx.setColor(0.8, 0.8, 0.8)
+    lurek.render.setColor(0.8, 0.8, 0.8)
     local scripts = lurek.simulator.getScripts()
-    lurek.gfx.print("Scripts loaded: " .. #scripts, 20, 80)
+    lurek.render.print("Scripts loaded: " .. #scripts, 20, 80)
     for i, name in ipairs(scripts) do
-        lurek.gfx.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
+        lurek.render.print("  " .. i .. ". " .. name, 30, 80 + i * 20)
     end
 
     -- Controls
-    lurek.gfx.setColor(0.6, 0.8, 1)
+    lurek.render.setColor(0.6, 0.8, 1)
     local y = 180
-    lurek.gfx.print("Controls:", 20, y)
-    lurek.gfx.print("  1 = Play demo_sequence", 30, y + 20)
-    lurek.gfx.print("  2 = Play toml_script", 30, y + 40)
-    lurek.gfx.print("  P = Pause / Resume", 30, y + 60)
-    lurek.gfx.print("  S = Stop", 30, y + 80)
+    lurek.render.print("Controls:", 20, y)
+    lurek.render.print("  1 = Play demo_sequence", 30, y + 20)
+    lurek.render.print("  2 = Play toml_script", 30, y + 40)
+    lurek.render.print("  P = Pause / Resume", 30, y + 60)
+    lurek.render.print("  S = Stop", 30, y + 80)
 
     -- Log
-    lurek.gfx.setColor(0.7, 0.7, 0.7)
+    lurek.render.setColor(0.7, 0.7, 0.7)
     local logY = y + 120
-    lurek.gfx.print("Log:", 20, logY)
+    lurek.render.print("Log:", 20, logY)
     for i, entry in ipairs(log) do
-        lurek.gfx.print(entry, 30, logY + i * 18)
+        lurek.render.print(entry, 30, logY + i * 18)
     end
 end
 
@@ -137,13 +146,6 @@ end
 
 function lurek.mousereleased(x, y, button)
     addLog(string.format("Mouse release: (%d,%d) btn=%d", x, y, button))
-end
-
-function lurek.mousemoved(x, y, dx, dy)
-    -- Only log simulated moves (large dx/dy)
-    if math.abs(dx) > 5 or math.abs(dy) > 5 then
-        addLog(string.format("Mouse move: (%d,%d) d=(%d,%d)", x, y, dx, dy))
-    end
 end
 
 function lurek.textinput(text)

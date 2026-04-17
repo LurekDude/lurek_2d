@@ -1,6 +1,6 @@
 -- Sprites example for Lurek2D
 -- Move a rectangle with arrow keys
--- Demonstrates lurek.gfx.draw() polymorphic dispatch
+-- Demonstrates lurek.render.draw() polymorphic dispatch
 -- Run with: cargo run -- content/demos/showcase/sprites
 
 local x, y = 400, 300
@@ -44,14 +44,14 @@ local function createIcon()
         end
     end
 
-    return lurek.gfx.newImage(imageData)
+    return lurek.render.newImage(imageData)
 end
 
 function lurek.init()
     initSmokeMode()
     lurek.window.setTitle("Movement Demo - Lurek2D")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.18)
-    -- Create a small sprite image locally; lurek.gfx.draw() dispatches based on type
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.18)
+    -- Create a small sprite image locally; lurek.render.draw() dispatches based on type
     icon = createIcon()
 end
 
@@ -75,8 +75,8 @@ function lurek.process(dt)
     end
 
     -- Keep in bounds
-    local w = lurek.gfx.getWidth()
-    local h = lurek.gfx.getHeight()
+    local w = lurek.render.getWidth()
+    local h = lurek.render.getHeight()
     if x < 0 then x = 0 end
     if y < 0 then y = 0 end
     if x > w - size then x = w - size end
@@ -85,32 +85,32 @@ end
 
 function lurek.render()
     -- Trail circles
-    lurek.gfx.setColor(0.2, 0.3, 0.6, 0.5)
-    lurek.gfx.circle("fill", x + size/2, y + size/2, size)
+    lurek.render.setColor(0.2, 0.3, 0.6, 0.5)
+    lurek.render.circle("fill", x + size/2, y + size/2, size)
 
     -- Player square
-    lurek.gfx.setColor(0.3, 0.8, 1.0)
-    lurek.gfx.rectangle("fill", x, y, size, size)
+    lurek.render.setColor(0.3, 0.8, 1.0)
+    lurek.render.rectangle("fill", x, y, size, size)
 
-    -- Draw icon using polymorphic lurek.gfx.draw(drawable, x, y)
-    lurek.gfx.setColor(1, 1, 1)
+    -- Draw icon using polymorphic lurek.render.draw(drawable, x, y)
+    lurek.render.setColor(1, 1, 1)
     if icon then
-        lurek.gfx.draw(icon, x + size + 4, y)
+        lurek.render.draw(icon, x + size + 4, y)
     end
 
     -- Outline
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.rectangle("line", x, y, size, size)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.rectangle("line", x, y, size, size)
 
     -- Instructions
-    lurek.gfx.setColor(0.6, 0.6, 0.6)
-    lurek.gfx.print("WASD or Arrow Keys to move", 250, 20, 2)
+    lurek.render.setColor(0.6, 0.6, 0.6)
+    lurek.render.print("WASD or Arrow Keys to move", 250, 20, 2)
 
     -- Position info
-    lurek.gfx.print("X:" .. tostring(math.floor(x)) .. " Y:" .. tostring(math.floor(y)), 10, 570, 2)
+    lurek.render.print("X:" .. tostring(math.floor(x)) .. " Y:" .. tostring(math.floor(y)), 10, 570, 2)
 
     if smokeMode and not smokeRequested then
-        lurek.gfx.saveScreenshot(smokeScreenshotPath)
+        lurek.render.saveScreenshot(smokeScreenshotPath)
         smokeRequested = true
         smokeQuitNextFrame = true
     end

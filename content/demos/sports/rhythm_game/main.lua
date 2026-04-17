@@ -78,7 +78,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Rhythm Game")
-    lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
+    lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
     local screenW = 800
     local totalWidth = #lanes * laneWidth
     local startX = (screenW - totalWidth) / 2
@@ -186,23 +186,23 @@ end
 function lurek.render()
     -- draw lanes
     for i, lane in ipairs(lanes) do
-        lurek.gfx.setColor(0.15, 0.15, 0.2, 1)
-        lurek.gfx.rectangle("fill", lane.x, 0, laneWidth, 600)
-        lurek.gfx.setColor(0.25, 0.25, 0.35, 1)
-        lurek.gfx.rectangle("line", lane.x, 0, laneWidth, 600)
+        lurek.render.setColor(0.15, 0.15, 0.2, 1)
+        lurek.render.rectangle("fill", lane.x, 0, laneWidth, 600)
+        lurek.render.setColor(0.25, 0.25, 0.35, 1)
+        lurek.render.rectangle("line", lane.x, 0, laneWidth, 600)
     end
 
     -- hit zone
-    lurek.gfx.setColor(1, 1, 1, 0.3)
+    lurek.render.setColor(1, 1, 1, 0.3)
     for _, lane in ipairs(lanes) do
-        lurek.gfx.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
+        lurek.render.rectangle("fill", lane.x, hitY - 10, laneWidth, noteHeight + 20)
     end
 
     -- draw flashes
     for _, fl in ipairs(flashes) do
         local a = clamp(fl.alpha, 0, 1)
-        lurek.gfx.setColor(fl.r, fl.g, fl.b, a * 0.5)
-        lurek.gfx.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
+        lurek.render.setColor(fl.r, fl.g, fl.b, a * 0.5)
+        lurek.render.rectangle("fill", lanes[fl.lane].x, 0, laneWidth, 600)
     end
 
     -- draw notes
@@ -210,52 +210,52 @@ function lurek.render()
         if not n.hit then
             local c = lanes[n.lane].color
             if n.missed then
-                lurek.gfx.setColor(0.3, 0.3, 0.3, 0.5)
+                lurek.render.setColor(0.3, 0.3, 0.3, 0.5)
             else
-                lurek.gfx.setColor(c[1], c[2], c[3], 1)
+                lurek.render.setColor(c[1], c[2], c[3], 1)
             end
-            lurek.gfx.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
+            lurek.render.rectangle("fill", lanes[n.lane].x + 4, n.y, laneWidth - 8, noteHeight)
         end
     end
 
     -- key labels
-    lurek.gfx.setColor(1, 1, 1, 0.8)
+    lurek.render.setColor(1, 1, 1, 0.8)
     for i, lane in ipairs(lanes) do
-        lurek.gfx.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
+        lurek.render.print(string.upper(lane.key), lane.x + laneWidth / 2 - 6, hitY + 30)
     end
 
     -- feedbacks
     for _, fb in ipairs(feedbacks) do
         local a = clamp(fb.alpha, 0, 1)
-        lurek.gfx.setColor(fb.r, fb.g, fb.b, a)
-        lurek.gfx.print(fb.text, fb.x - 20, fb.y)
+        lurek.render.setColor(fb.r, fb.g, fb.b, a)
+        lurek.render.print(fb.text, fb.x - 20, fb.y)
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1, 1)
-    lurek.gfx.print("SCORE: " .. score, 10, 10)
-    lurek.gfx.print("COMBO: " .. combo, 10, 30)
+    lurek.render.setColor(1, 1, 1, 1)
+    lurek.render.print("SCORE: " .. score, 10, 10)
+    lurek.render.print("COMBO: " .. combo, 10, 30)
     local mult = clamp(math.floor(combo / 10) + 1, 1, 4)
-    lurek.gfx.print("x" .. mult, 10, 50)
-    lurek.gfx.print("BPM: " .. bpm, 680, 10)
+    lurek.render.print("x" .. mult, 10, 50)
+    lurek.render.print("BPM: " .. bpm, 680, 10)
     local accuracy = 0
     if totalNotes > 0 then
         accuracy = math.floor((hitNotes / totalNotes) * 100)
     end
-    lurek.gfx.print("ACC: " .. accuracy .. "%", 680, 30)
-    lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 680, 50)
+    lurek.render.print("ACC: " .. accuracy .. "%", 680, 30)
+    lurek.render.print("FPS: " .. lurek.time.getFPS(), 680, 50)
 
     if not started then
-        lurek.gfx.setColor(0, 0, 0, 0.7)
-        lurek.gfx.rectangle("fill", 200, 220, 400, 180)
-        lurek.gfx.setColor(1, 1, 1, 1)
+        lurek.render.setColor(0, 0, 0, 0.7)
+        lurek.render.rectangle("fill", 200, 220, 400, 180)
+        lurek.render.setColor(1, 1, 1, 1)
         if gameTime > 0 then
-            lurek.gfx.print("SONG COMPLETE!", 310, 240, 1.5)
-            lurek.gfx.print("Score: " .. score, 320, 280)
-            lurek.gfx.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
-            lurek.gfx.print("Max Combo: " .. maxCombo, 320, 340)
+            lurek.render.print("SONG COMPLETE!", 310, 240, 1.5)
+            lurek.render.print("Score: " .. score, 320, 280)
+            lurek.render.print("Perfect: " .. perfectHits .. "  Good: " .. goodHits .. "  Miss: " .. misses, 260, 310)
+            lurek.render.print("Max Combo: " .. maxCombo, 320, 340)
         end
-        lurek.gfx.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
+        lurek.render.print("[SPACE] to " .. (gameTime > 0 and "restart" or "start"), 310, 370)
     end
 end
 

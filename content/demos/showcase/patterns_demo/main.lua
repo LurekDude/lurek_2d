@@ -2,8 +2,8 @@
 -- Run with: cargo run -- content/demos/showcase/patterns_demo
 if not lurek.patterns then
     function lurek.init()
-        lurek.gfx.setBackgroundColor(0.08, 0.08, 0.12)
-        lurek.gfx.print("lurek.patterns is not available in this build", 180, 270)
+        lurek.render.setBackgroundColor(0.08, 0.08, 0.12)
+        lurek.render.print("lurek.patterns is not available in this build", 180, 270)
     end
     return
 end
@@ -83,21 +83,21 @@ function lurek.process(dt)
 end
 
 function lurek.render()
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("Patterns Demo", 20, 20)
-    lurek.gfx.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
-    lurek.gfx.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
-    lurek.gfx.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("Patterns Demo", 20, 20)
+    lurek.render.print("State: " .. (fsm:getCurrent() or "none"), 20, 40)
+    lurek.render.print("[1] Spawn enemy  [2] Acquire bullet  [3] Move +10", 20, 60)
+    lurek.render.print("[U] Undo  [R] Redo  [SPACE] Toggle play/menu  [G] Game over", 20, 78)
 
     local score = loc:locate("score")
-    lurek.gfx.print("Score: " .. (score and score.value or 0), 20, 100)
-    lurek.gfx.print("x = " .. x, 200, 100)
-    lurek.gfx.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
-    lurek.gfx.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
+    lurek.render.print("Score: " .. (score and score.value or 0), 20, 100)
+    lurek.render.print("x = " .. x, 200, 100)
+    lurek.render.print("Pool: " .. pool:getAvailableCount() .. " avail / " .. pool:getActiveCount() .. " active", 20, 118)
+    lurek.render.print("History: " .. cmds:getHistorySize() .. " cmds", 300, 118)
 
-    lurek.gfx.setColor(0.7, 0.85, 1)
+    lurek.render.setColor(0.7, 0.85, 1)
     for i, msg in ipairs(log) do
-        lurek.gfx.print(msg, 30, 140 + (i - 1) * 18)
+        lurek.render.print(msg, 30, 140 + (i - 1) * 18)
     end
 end
 

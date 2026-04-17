@@ -91,7 +91,7 @@ end
 
 function lurek.init()
     lurek.window.setTitle("Roguelite Action")
-    lurek.gfx.setBackgroundColor(0.06, 0.05, 0.1)
+    lurek.render.setBackgroundColor(0.06, 0.05, 0.1)
     startRoom()
 end
 
@@ -194,70 +194,70 @@ end
 
 function lurek.render()
     -- Arena
-    lurek.gfx.setColor(0.1, 0.1, 0.15)
-    lurek.gfx.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
-    lurek.gfx.setColor(0.3, 0.25, 0.4)
-    lurek.gfx.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    lurek.render.setColor(0.1, 0.1, 0.15)
+    lurek.render.rectangle("fill", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
+    lurek.render.setColor(0.3, 0.25, 0.4)
+    lurek.render.rectangle("line", ARENA_X, ARENA_Y, ARENA_W, ARENA_H)
     -- Door indicator
     if roomCleared then
-        lurek.gfx.setColor(0.2, 0.8, 0.3, 0.7 + 0.3 * math.sin(lurek.time.getTime() * 4))
-        lurek.gfx.rectangle("fill", ARENA_X + ARENA_W / 2 - 15, ARENA_Y - 8, 30, 10)
+        lurek.render.setColor(0.2, 0.8, 0.3, 0.7 + 0.3 * math.sin(lurek.time.getTime() * 4))
+        lurek.render.rectangle("fill", ARENA_X + ARENA_W / 2 - 15, ARENA_Y - 8, 30, 10)
     end
     -- Enemies
     for _, e in ipairs(enemies) do
-        if e.hitTimer > 0 then lurek.gfx.setColor(1, 1, 1)
-        elseif e.kind == "boss" then lurek.gfx.setColor(0.8, 0.1, 0.6)
-        elseif e.kind == "fast" then lurek.gfx.setColor(1, 0.6, 0.1)
-        else lurek.gfx.setColor(0.9, 0.2, 0.2) end
-        lurek.gfx.rectangle("fill", e.x, e.y, e.w, e.h)
+        if e.hitTimer > 0 then lurek.render.setColor(1, 1, 1)
+        elseif e.kind == "boss" then lurek.render.setColor(0.8, 0.1, 0.6)
+        elseif e.kind == "fast" then lurek.render.setColor(1, 0.6, 0.1)
+        else lurek.render.setColor(0.9, 0.2, 0.2) end
+        lurek.render.rectangle("fill", e.x, e.y, e.w, e.h)
         -- HP bar
-        lurek.gfx.setColor(0.3, 0.3, 0.3); lurek.gfx.rectangle("fill", e.x, e.y - 6, e.w, 3)
-        lurek.gfx.setColor(0.9, 0.2, 0.2); lurek.gfx.rectangle("fill", e.x, e.y - 6, e.w * (e.hp / e.maxHp), 3)
+        lurek.render.setColor(0.3, 0.3, 0.3); lurek.render.rectangle("fill", e.x, e.y - 6, e.w, 3)
+        lurek.render.setColor(0.9, 0.2, 0.2); lurek.render.rectangle("fill", e.x, e.y - 6, e.w * (e.hp / e.maxHp), 3)
     end
     -- Player
     local blink = player.iframes > 0 and math.sin(lurek.time.getTime() * 25) > 0
     if not blink then
-        if player.dashing then lurek.gfx.setColor(0.5, 0.8, 1, 0.7)
-        else lurek.gfx.setColor(0.3, 0.8, 1) end
-        lurek.gfx.rectangle("fill", player.x, player.y, player.w, player.h)
+        if player.dashing then lurek.render.setColor(0.5, 0.8, 1, 0.7)
+        else lurek.render.setColor(0.3, 0.8, 1) end
+        lurek.render.rectangle("fill", player.x, player.y, player.w, player.h)
     end
     -- Attack arc
     if player.atkDuration > 0 then
-        lurek.gfx.setColor(1, 1, 0.5, 0.6)
+        lurek.render.setColor(1, 1, 0.5, 0.6)
         local ax = player.x + player.w / 2 + math.cos(player.atkAngle) * 20
         local ay = player.y + player.h / 2 + math.sin(player.atkAngle) * 20
-        lurek.gfx.circle("fill", ax, ay, player.atkRange * 0.6)
+        lurek.render.circle("fill", ax, ay, player.atkRange * 0.6)
     end
     -- HUD
-    lurek.gfx.setColor(0, 0, 0, 0.7); lurek.gfx.rectangle("fill", 0, 0, 800, 28)
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.print("HP: " .. math.floor(player.hp) .. "/" .. player.maxHp .. "  Room: " .. roomNum .. "  Score: " .. score .. "  Kills: " .. killCount, 10, 6)
+    lurek.render.setColor(0, 0, 0, 0.7); lurek.render.rectangle("fill", 0, 0, 800, 28)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.print("HP: " .. math.floor(player.hp) .. "/" .. player.maxHp .. "  Room: " .. roomNum .. "  Score: " .. score .. "  Kills: " .. killCount, 10, 6)
     -- HP bar
-    lurek.gfx.setColor(0.2, 0.2, 0.2); lurek.gfx.rectangle("fill", 580, 6, 150, 16)
-    lurek.gfx.setColor(0.1, 0.7, 0.3); lurek.gfx.rectangle("fill", 580, 6, 150 * clamp(player.hp / player.maxHp, 0, 1), 16)
+    lurek.render.setColor(0.2, 0.2, 0.2); lurek.render.rectangle("fill", 580, 6, 150, 16)
+    lurek.render.setColor(0.1, 0.7, 0.3); lurek.render.rectangle("fill", 580, 6, 150 * clamp(player.hp / player.maxHp, 0, 1), 16)
     -- Room info
     if bossRoom and #enemies > 0 then
-        lurek.gfx.setColor(1, 0.3, 0.6); lurek.gfx.print("!! BOSS !!", 370, 35, 1.5)
+        lurek.render.setColor(1, 0.3, 0.6); lurek.render.print("!! BOSS !!", 370, 35, 1.5)
     end
     -- Perk selection
     if state == "perkSelect" then
-        lurek.gfx.setColor(0, 0, 0, 0.8); lurek.gfx.rectangle("fill", 150, 180, 500, 220)
-        lurek.gfx.setColor(1, 0.9, 0.3); lurek.gfx.print("ROOM CLEARED! Choose a perk:", 250, 200, 1.2)
+        lurek.render.setColor(0, 0, 0, 0.8); lurek.render.rectangle("fill", 150, 180, 500, 220)
+        lurek.render.setColor(1, 0.9, 0.3); lurek.render.print("ROOM CLEARED! Choose a perk:", 250, 200, 1.2)
         for i, p in ipairs(perkOptions) do
             local bx, by = 180, 230 + (i - 1) * 50
-            lurek.gfx.setColor(0.2, 0.2, 0.3); lurek.gfx.rectangle("fill", bx, by, 440, 40)
-            lurek.gfx.setColor(0.3, 0.4, 0.6); lurek.gfx.rectangle("line", bx, by, 440, 40)
-            lurek.gfx.setColor(1, 1, 1); lurek.gfx.print("[" .. i .. "] " .. p.name, bx + 15, by + 12)
+            lurek.render.setColor(0.2, 0.2, 0.3); lurek.render.rectangle("fill", bx, by, 440, 40)
+            lurek.render.setColor(0.3, 0.4, 0.6); lurek.render.rectangle("line", bx, by, 440, 40)
+            lurek.render.setColor(1, 1, 1); lurek.render.print("[" .. i .. "] " .. p.name, bx + 15, by + 12)
         end
     end
     -- Game over
     if state == "gameOver" then
-        lurek.gfx.setColor(0, 0, 0, 0.85); lurek.gfx.rectangle("fill", 0, 0, 800, 600)
-        lurek.gfx.setColor(1, 0.2, 0.2); lurek.gfx.print("GAME OVER", 300, 220, 2.5)
-        lurek.gfx.setColor(1, 1, 1); lurek.gfx.print("Score: " .. score .. "  |  Best: " .. bestScore .. "  |  Rooms: " .. roomNum, 240, 310, 1.2)
-        lurek.gfx.print("Press R to restart", 320, 360)
+        lurek.render.setColor(0, 0, 0, 0.85); lurek.render.rectangle("fill", 0, 0, 800, 600)
+        lurek.render.setColor(1, 0.2, 0.2); lurek.render.print("GAME OVER", 300, 220, 2.5)
+        lurek.render.setColor(1, 1, 1); lurek.render.print("Score: " .. score .. "  |  Best: " .. bestScore .. "  |  Rooms: " .. roomNum, 240, 310, 1.2)
+        lurek.render.print("Press R to restart", 320, 360)
     end
-    lurek.gfx.setColor(0.5, 0.5, 0.5); lurek.gfx.print("FPS: " .. lurek.time.getFPS(), 730, 580)
+    lurek.render.setColor(0.5, 0.5, 0.5); lurek.render.print("FPS: " .. lurek.time.getFPS(), 730, 580)
 end
 
 function lurek.keypressed(key)

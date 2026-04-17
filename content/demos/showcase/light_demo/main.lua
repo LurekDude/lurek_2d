@@ -119,48 +119,48 @@ end
 -- ── Draw ───────────────────────────────────────────────────────────────────
 function lurek.render()
     -- Dark background
-    lurek.gfx.clear(0.02, 0.02, 0.03)
+    lurek.render.clear(0.02, 0.02, 0.03)
 
     -- Draw walls as dark rectangles
-    lurek.gfx.setColor(0.15, 0.12, 0.1)
+    lurek.render.setColor(0.15, 0.12, 0.1)
     -- Pillar 1
-    lurek.gfx.rectangle("fill", 250, 180, 30, 200)
+    lurek.render.rectangle("fill", 250, 180, 30, 200)
     -- Pillar 2
-    lurek.gfx.rectangle("fill", 620, 180, 30, 200)
+    lurek.render.rectangle("fill", 620, 180, 30, 200)
     -- Horizontal wall
-    lurek.gfx.rectangle("fill", 350, 250, 150, 20)
+    lurek.render.rectangle("fill", 350, 250, 150, 20)
     -- L-shape
-    lurek.gfx.rectangle("fill", 150, 300, 50, 20)
-    lurek.gfx.rectangle("fill", 180, 320, 20, 100)
+    lurek.render.rectangle("fill", 150, 300, 50, 20)
+    lurek.render.rectangle("fill", 180, 320, 20, 100)
     -- Diamond obstacle
-    lurek.gfx.polygon("fill", 700, 300, 730, 280, 760, 300, 730, 320)
+    lurek.render.polygon("fill", 700, 300, 730, 280, 760, 300, 730, 320)
 
     -- Draw player marker
-    lurek.gfx.setColor(1, 1, 1)
-    lurek.gfx.circle("fill", player_x, player_y, 8)
+    lurek.render.setColor(1, 1, 1)
+    lurek.render.circle("fill", player_x, player_y, 8)
 
     -- Draw torch markers
-    lurek.gfx.setColor(1, 0.6, 0.2)
+    lurek.render.setColor(1, 0.6, 0.2)
     for _, t in ipairs(torch_lights) do
         if t.light:isValid() then
             local tx, ty = t.light:getPosition()
-            lurek.gfx.circle("fill", tx, ty, 5)
+            lurek.render.circle("fill", tx, ty, 5)
         end
     end
 
     -- HUD
-    lurek.gfx.setColor(1, 1, 1)
+    lurek.render.setColor(1, 1, 1)
     local blend = player_light and player_light:isValid() and player_light:getBlendMode() or "?"
     local falloff = player_light and player_light:isValid() and player_light:getFalloff() or "?"
     local shadows = player_light and player_light:isValid() and player_light:isShadowEnabled()
     local lights_count = lurek.light.getLightCount()
     local occluder_count = lurek.light.getOccluderCount()
 
-    lurek.gfx.print("Lurek2D Light Demo", 10, 10)
-    lurek.gfx.print(string.format("Lights: %d  Occluders: %d", lights_count, occluder_count), 10, 30)
-    lurek.gfx.print(string.format("Blend: %s  Falloff: %s  Shadows: %s", blend, falloff, tostring(shadows)), 10, 50)
-    lurek.gfx.print(string.format("Ambient: %.2f", ambient_level), 10, 70)
-    lurek.gfx.print("WASD=move  1/2/3=blend  F/G/H=falloff  SPACE=shadows  +/-=ambient  T=torches  C=clear", 10, H - 25)
+    lurek.render.print("Lurek2D Light Demo", 10, 10)
+    lurek.render.print(string.format("Lights: %d  Occluders: %d", lights_count, occluder_count), 10, 30)
+    lurek.render.print(string.format("Blend: %s  Falloff: %s  Shadows: %s", blend, falloff, tostring(shadows)), 10, 50)
+    lurek.render.print(string.format("Ambient: %.2f", ambient_level), 10, 70)
+    lurek.render.print("WASD=move  1/2/3=blend  F/G/H=falloff  SPACE=shadows  +/-=ambient  T=torches  C=clear", 10, H - 25)
 end
 
 -- ── Key handling ───────────────────────────────────────────────────────────
