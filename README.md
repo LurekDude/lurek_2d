@@ -160,6 +160,8 @@ Baseline           ← math (leaf, no deps) · engine (lifecycle, SharedState)
 
 **Boot**: `conf.lua` → `Config` → winit window + wgpu device + rodio mixer → LuaJIT VM → `main.lua` → event loop.
 
+**AI-first contributor workflow**: this repo is built by humans prompting agents. The CAG layer (`.github/`) defines the agents, skills, and prompts that drive that work — see [docs/architecture/cag-system.md](docs/architecture/cag-system.md) for the full reference.
+
 ---
 
 ## What Ships
