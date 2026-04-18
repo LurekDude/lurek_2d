@@ -5,6 +5,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Identity](#1-identity)
+2. [Activation](#2-activation)
+3. [Source Layout](#3-source-layout)
+4. [Core Architecture](#4-core-architecture)
+5. [Data Flow](#5-data-flow)
+6. [Key Data Types](#6-key-data-types)
+7. [Build and Packaging](#7-build-and-packaging)
+8. [Configuration Settings](#8-configuration-settings)
+9. [Contributed Extension Points (`package.json`)](#9-contributed-extension-points-packagejson)
+10. [Protocol: Debug Bridge](#10-protocol-debug-bridge)
+11. [Protocol: MCP Server](#11-protocol-mcp-server)
+
+---
+
 ## 1. Identity
 
 | Field | Value |

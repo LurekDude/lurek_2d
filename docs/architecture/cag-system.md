@@ -7,6 +7,19 @@ The **CAG layer** (Context Augmented Guidance) is everything under [.github/](..
 
 ---
 
+## Table of Contents
+
+1. [Philosophy](#1-philosophy)
+2. [File-Type Catalog](#2-file-type-catalog)
+3. [Discovery Flow](#3-discovery-flow)
+4. [Six-Persona Model](#4-six-persona-model)
+5. [Validator & Tooling](#5-validator--tooling)
+6. [Authoring Guides](#6-authoring-guides)
+7. [End-of-Session CAG Sweep Contract](#7-end-of-session-cag-sweep-contract)
+8. [Glossary](#8-glossary)
+
+---
+
 ## 1. Philosophy
 
 Lurek2D is built **AI-first**. The engine itself has no embedded visual editor (binding constraint **A-01**); games, levels, scripts, assets, tests, and even the engine's own source are produced by humans **prompting agents** that write code, edit files, and run tools. The CAG layer is the contract that makes those agents predictable.
@@ -285,7 +298,9 @@ Any "yes" without remediation is a session-level blocker. The sweep records its 
 - **Prompt** — A user-invocable task playbook under `.github/prompts/`, typically launched via `/<name>`.
 - **System prompt** — `.github/copilot-instructions.md`; the only CAG file always in context.
 - **Persona** — One of six target user profiles served by the engine and CAG layer (EngDev, GameDev, Modder, Player, GameTest, EngTest).
+- **Plugin** — A Lurek2D Rust crate (or Cargo feature) that provides an optional engine subsystem with a `lurek.<namespace>` Lua surface. Tiered as CORE-KEEP / TIER-1-PLUGIN / TIER-2-PLUGIN / THIRD-PARTY-PLUGIN per `docs/architecture/plugins.md`. Pure-Lua libraries under `content/library/` are NOT plugins in this sense.
 - **Handover** — A structured packet (bullets in a routing-table row) passed between agents at a routing boundary.
+- **Handbook** — Contributor and game-author onboarding manual at `docs/handbook.md`. Pair with `docs/architecture/README.md` for navigation; pair with `docs/specs/` for module-level reference.
 - **Routing** — The decision an agent makes to delegate the next step to another agent via its `routes_to` field.
 - **Gate** — A binary check (e.g. `cargo test`, `cag_validate.py`) that must pass before a phase or commit is accepted.
 - **Sweep** — The end-of-session CAG-Architect review (§7).

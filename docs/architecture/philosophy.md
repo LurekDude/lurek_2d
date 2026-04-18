@@ -33,15 +33,15 @@ Do not fight horizontal imports — fight cycles. The module import graph is a D
 
 ### 2. Composition Root Is One-Way
 
-`app` and `scripting` can know everything. Nothing below them imports `app` or any binding module.
+`app` and `lua_api` can know everything. Nothing below them imports `app` or any binding module.
 
 ### 3. Depend on Contracts, Not Backends
 
 A Feature Systems module may depend on the `render` facade. It must never depend on backend GPU details. Platform Services expose pure-Rust contracts — the backend is an implementation detail.
 
-### 4. Core Stays Boring
+### 4. Runtime Stays Boring
 
-`core` owns errors, config, IDs, commands, and traits. It does not know about the event loop, VM boot, or debug overlays. If it starts getting interesting, something is leaking in.
+`runtime` owns errors, config, IDs, commands, and traits. It does not know about the event loop, VM boot, or debug overlays. If it starts getting interesting, something is leaking in.
 
 ### 5. World Is a Registry, Not a God Brain
 
@@ -141,6 +141,9 @@ These are **active, binding decisions**. All code must comply. Do not propose ch
 | **A-02** | Active | **Desktop only** — Windows / Linux / macOS, x86_64 + ARM. Mobile (iOS / Android) and WASM are out of scope. |
 | **A-03** | Active | **2D graphics only** — no 3D scene graph, no perspective projection pipeline. Raycasting columns and isometric rendering are acceptable because they use 2D draw calls. |
 | **A-04** | Active | No distribution platform SDK integration (Steam, Epic, itch.io store APIs) in the core engine binary. Platform wrappers live outside the five-group module stack entirely — constraint T-08. |
+| **A-05** | Proposed | **A-05 (Proposed)** — Core binary stays ≤ 15 MB stripped on desktop targets. Optional subsystems ship as plugins; plugin size is additional and unbudgeted. |
+
+> **A-05 status note**: Currently *Proposed* (not yet binding). It becomes Active when the plugin system described in [plugins.md](plugins.md) is accepted and a baseline stripped-binary measurement is recorded.
 
 ---
 
@@ -163,9 +166,9 @@ These constraints formalize the [module group model](engine-architecture.md#modu
 | ID | Status | Constraint |
 |---|---|---|
 | **T-01** | Active | The active module structure uses **five responsibility groups**: Foundations, Core Runtime, Platform Services, Feature Systems, and Edge/Integration. See [engine-architecture.md](engine-architecture.md) § Module Group Model. |
-| **T-02** | Active | `lua_api` (`scripting`) is the **binding layer** that registers `lurek.*`. It sits in the Edge/Integration group. It may import all Rust groups. No domain module may import `lua_api`. |
+| **T-02** | Active | `lua_api` (`src/lua_api/`) is the **binding layer** that registers `lurek.*`. It sits in the Edge/Integration group. It may import all Rust groups. No domain module may import `lua_api`. |
 | **T-03** | Active | **No cycles, ever.** The module import graph must remain a DAG. Same-group imports are allowed provided they are acyclic and stable. See Rule 1 and Rule 6 above. |
-| **T-04** | Active | **Composition root is one-way.** `app` and `scripting` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module. |
+| **T-04** | Active | **Composition root is one-way.** `app` and `lua_api` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module. |
 | **T-05** | Active | **Lunasome** (`content/library/`) is the pure-Lua standard library. It consumes public `lurek.*` APIs only — no Rust engine internals, no `require` of engine source files. |
 | **T-06** | Active | **Foundations group modules** (`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`) must never import render, audio, input, physics, or Lua APIs. See Rule 9. |
 | **T-07** | Active | **Edge/Integration group modules** (`devtools`, `debugbridge`, `automation`) are never imported by domain modules. They are optional components compiled only for development builds. |

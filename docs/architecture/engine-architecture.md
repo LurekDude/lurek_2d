@@ -19,30 +19,77 @@
 
 ## Table of Contents
 
-1.  [Overview](#overview)
-2.  [Module Group Model](#module-group-model)
-3.  [Module Group Dependency Rules](#module-group-dependency-rules)
-4.  [Complete Module Inventory](#complete-module-inventory)
-5.  [Module Internal File Structure Standard](#module-internal-file-structure-standard)
-6.  [Boot Sequence](#boot-sequence)
-7.  [Game Loop and Frame Model](#game-loop-and-frame-model)
-8.  [Callback Contract](#callback-contract)
-9.  [State Architecture](#state-architecture)
-10. [Resource Management](#resource-management)
-11. [Rendering Pipeline](#rendering-pipeline)
-12. [Lua Binding Architecture](#lua-binding-architecture)
-13. [Input Pipeline](#input-pipeline)
-14. [Audio Pipeline](#audio-pipeline)
-15. [Physics Pipeline](#physics-pipeline)
-16. [Threading Model](#threading-model)
-17. [Filesystem and Virtual FS](#filesystem-and-virtual-fs)
-18. [Window Management](#window-management)
-19. [Configuration System](#configuration-system)
-20. [Error Handling and Recovery](#error-handling-and-recovery)
-21. [Quality Gates](#quality-gates)
-22. [Technology Stack](#technology-stack)
-23. [Repository File Structure](#repository-file-structure)
-24. [Planned Build Variants](#planned-build-variants)
+- [Lurek2D — Engine Architecture](#lurek2d--engine-architecture)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Module Group Model](#module-group-model)
+    - [Group Responsibilities](#group-responsibilities)
+  - [Module Group Dependency Rules](#module-group-dependency-rules)
+  - [Complete Module Inventory](#complete-module-inventory)
+    - [Foundations](#foundations)
+    - [Core Runtime](#core-runtime)
+    - [Platform Services](#platform-services)
+    - [Feature Systems](#feature-systems)
+    - [Edge / Integration](#edge--integration)
+    - [Lunasome (content/library/)](#lunasome-contentlibrary)
+  - [Module Internal File Structure Standard](#module-internal-file-structure-standard)
+    - [Required Files](#required-files)
+    - [Standard Optional Files](#standard-optional-files)
+    - [Key Rules](#key-rules)
+    - [mod.rs — The Thin Declaration Rule](#modrs--the-thin-declaration-rule)
+    - [Anti-Patterns](#anti-patterns)
+  - [Boot Sequence](#boot-sequence)
+    - [Boot Invariants](#boot-invariants)
+  - [Game Loop and Frame Model](#game-loop-and-frame-model)
+    - [Timing](#timing)
+  - [Callback Contract](#callback-contract)
+    - [Callback Ordering Within a Frame](#callback-ordering-within-a-frame)
+  - [State Architecture](#state-architecture)
+    - [Design Rules (from Zen Rule 10)](#design-rules-from-zen-rule-10)
+    - [SharedState Contents](#sharedstate-contents)
+    - [Access Pattern](#access-pattern)
+  - [Resource Management](#resource-management)
+    - [Resource Key Types](#resource-key-types)
+    - [Lifecycle](#lifecycle)
+    - [Stale Key Safety](#stale-key-safety)
+  - [Rendering Pipeline](#rendering-pipeline)
+    - [Summary: Three-Layer Model](#summary-three-layer-model)
+    - [Key Facts](#key-facts)
+    - [Render Module Refactoring (Planned)](#render-module-refactoring-planned)
+  - [Lua Binding Architecture](#lua-binding-architecture)
+    - [Design Rules (from Zen Rule 12, constraints C-01 through C-05)](#design-rules-from-zen-rule-12-constraints-c-01-through-c-05)
+    - [File Organisation](#file-organisation)
+    - [Thin Wrapper Pattern](#thin-wrapper-pattern)
+    - [Registration Flow](#registration-flow)
+    - [Lua API Docstring Format](#lua-api-docstring-format)
+  - [Input Pipeline](#input-pipeline)
+  - [Audio Pipeline](#audio-pipeline)
+    - [Key Concepts](#key-concepts)
+  - [Physics Pipeline](#physics-pipeline)
+    - [Frame Integration](#frame-integration)
+    - [Key Concepts](#key-concepts-1)
+  - [Threading Model](#threading-model)
+    - [Rules (from constraint B-04)](#rules-from-constraint-b-04)
+  - [Filesystem and Virtual FS](#filesystem-and-virtual-fs)
+    - [Security (path traversal guards)](#security-path-traversal-guards)
+    - [Lua API](#lua-api)
+  - [Window Management](#window-management)
+    - [Scale Modes (Camera)](#scale-modes-camera)
+  - [Configuration System](#configuration-system)
+    - [conf.toml / conf.lua (game-authored configuration)](#conftoml--conflua-game-authored-configuration)
+    - [Config Struct](#config-struct)
+    - [Fallback](#fallback)
+    - [Format Rule (B-05)](#format-rule-b-05)
+  - [Error Handling and Recovery](#error-handling-and-recovery)
+    - [Error Types](#error-types)
+    - [Error Flow](#error-flow)
+    - [Rules](#rules)
+  - [Quality Gates](#quality-gates)
+    - [Full Quality Gate Command](#full-quality-gate-command)
+  - [Technology Stack](#technology-stack)
+    - [Cargo Feature Flags](#cargo-feature-flags)
+  - [Repository File Structure](#repository-file-structure)
+  - [Planned Build Variants](#planned-build-variants)
 
 ---
 
@@ -132,19 +179,13 @@ acyclic (Zen Rule 6).
 
 ## Module Group Dependency Rules
 
-These are **binding constraints** defined in [philosophy.md](philosophy.md)
-§ Active Module Group Constraints:
-
-| ID | Rule |
-|---|---|
-| **T-01** | Five responsibility groups: Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration. |
-| **T-02** | `lua_api` (scripting bridge) sits in Edge/Integration. It may import all Rust groups. No domain module may import `lua_api`. |
-| **T-03** | **No cycles, ever.** The module import graph must remain a DAG. Same-group imports allowed if acyclic. |
-| **T-04** | **Composition root is one-way.** `app` and `lua_api` may depend on any module below them. No module below them may import `app` or any `lua_api` binding module. |
-| **T-05** | **Lunasome** (`content/library/`) consumes public `lurek.*` APIs only — no Rust engine internals. |
-| **T-06** | **Foundations** must never import render, audio, input, physics, or Lua APIs. |
-| **T-07** | **Edge/Integration devtools** (`devtools`, `debugbridge`, `automation`) are never imported by domain modules. |
-| **T-08** | Platform SDK wrappers (Steam, Epic) live entirely outside the five-group module stack. |
+The binding dependency constraints **T-01 through T-08** are defined in
+[philosophy.md § Active Module Group Constraints](philosophy.md#active-module-group-constraints).
+They are the source of truth for import direction between the five groups
+(Foundations → Core Runtime → Platform Services → Feature Systems → Edge/Integration),
+for `lua_api` placement, for the no-cycles-ever rule, and for the Lunasome
+and Steam-SDK boundaries. Consult philosophy.md directly — this document
+does not restate them.
 
 ---
 
@@ -239,42 +280,86 @@ Pure-Lua gameplay libraries. Each consumes only public `lurek.*` APIs:
 
 ## Module Internal File Structure Standard
 
-Every `src/<module>/` directory follows a standard internal structure.
-Consistency across all modules is a **binding requirement**.
+Every `src/<module>/` directory in Lurek2D follows a standard internal
+structure. Consistency across all modules is a **binding requirement** —
+not a suggestion. This standard flows from Philosophy Rules 7 (split by
+reason to change), 12 (bindings are thin), 13 (tests follow responsibility),
+and 15 (optimise for readability). This document is the canonical home;
+render-command-architecture.md links here for render-module specifics.
 
-→ **Full specification**: [render-command-architecture.md §12 — Module
-Internal File Structure Standard](render-command-architecture.md#module-internal-file-structure-standard)
+### Required Files
 
-### Summary
+Every module MUST have:
 
 | File | Purpose | Rule |
 |---|---|---|
-| `mod.rs` | Module declaration + re-exports | **THIN** — ≤30 lines, declarations only. No functions, no types, no logic. |
-| `AGENT.md` | AI agent overview | Lists source files, purpose, pointer to `docs/specs/<module>.md`. |
-| `<primary>.rs` | Main logic | Named after the primary concept (e.g., `emitter.rs`, `dda.rs`). |
-| `types.rs` | Public data types | When module exports 5+ types. |
-| `draw.rs` | `draw_to_image()` utilities | CPU pixel rendering for testing/evidence only. NOT production render path. |
-| `builder.rs` | Builder pattern | When primary type has 5+ fields with defaults. |
+| `mod.rs` | Module declaration + re-exports | **THIN** — only `pub mod`, `pub use`, and `//!` module-level doc comment. No functions, no struct definitions, no logic. Target: ≤30 lines. |
+| `AGENT.md` *(retired — see note below)* | Historical AI agent overview | Retired; per-module context lives in [docs/specs/<module>.md](../specs/). |
+
+> **Note:** `AGENT.md` files under `src/<module>/` are retired. Module
+> context now lives in [docs/specs/<module>.md](../specs/). The validator
+> `tools/validate/validate_module_coverage.py` flags any remaining
+> `AGENT.md` as a legacy failure.
+
+### Standard Optional Files
+
+Use these names when needed. The file name is **standardised** — do not
+invent alternatives (`helpers.rs`, `utils.rs`, `misc.rs` are banned).
+
+| File | Purpose | When to Use |
+|---|---|---|
+| `<primary>.rs` | Main logic — algorithms, state, methods | Always, unless `mod.rs` alone is sufficient (leaf modules with one type). Named after the module's primary concept (e.g. `emitter.rs`, `dda.rs`, `widget.rs`). |
+| `types.rs` | Public data types (structs, enums, traits) | When the module exports 5+ public types. Fewer → define in `<primary>.rs`. |
+| `draw.rs` | `draw_to_image()` debug/test CPU pixel utilities | Only for modules that need CPU-side pixel rendering for testing or evidence. May import `crate::image::ImageData`. NOT the production render path. |
+| `builder.rs` | Builder pattern for complex construction | When a primary type has 5+ fields with defaults. |
 
 ### Key Rules
 
-1. **mod.rs is a switchboard, not a workshop** — only `pub mod`, `pub use`, `//!` doc
-2. **No `impl LuaUserData` in domain modules** — all Lua bindings in `src/lua_api/`
-3. **No `use wgpu::*` in domain modules** — only `src/render/gpu_renderer.rs` and `src/render/shader.rs` touch wgpu
-4. **Every `pub` item has a `///` doc comment** — verified by `python tools/docs/collect_docs.py --report-missing`
-5. **Private helpers tested inline** — `#[cfg(test)] mod tests { ... }` in the source file
-6. **Integration/contract tests in `tests/`** — not inside the module
+1. **mod.rs is a switchboard, not a workshop** — only `pub mod`, `pub use`, `//!` doc.
+2. **No `impl LuaUserData` in domain modules** — all Lua bindings live in `src/lua_api/`.
+3. **No `use wgpu::*` in domain modules** — only `src/render/gpu_renderer.rs` and `src/render/shader.rs` touch wgpu.
+4. **Every `pub` item has a `///` doc comment** — verified by `python tools/docs/collect_docs.py --report-missing` (constraint Q-05).
+5. **Private helpers tested inline** — `#[cfg(test)] mod tests { ... }` in the source file where the helper is defined.
+6. **Integration/contract tests in `tests/`** — not inside the module.
+
+### mod.rs — The Thin Declaration Rule
+
+**Correct** `mod.rs`:
+
+```rust
+//! Particle system — CPU-side emitter simulation and instance generation.
+
+pub mod emitter;
+
+pub use emitter::{ParticleSystem, ParticleInstance, ParticleShape};
+```
+
+**Wrong** `mod.rs`:
+
+```rust
+pub mod emitter;
+
+// ❌ logic in mod.rs
+pub fn default_particle_color() -> Color {
+    Color::new(1.0, 1.0, 1.0, 1.0)
+}
+
+// ❌ struct definition in mod.rs
+pub struct ParticleConfig {
+    pub max_count: usize,
+}
+```
 
 ### Anti-Patterns
 
 | Problem | Fix |
 |---|---|
-| Fat mod.rs (functions, structs, >30 lines) | Move to `<primary>.rs`, keep mod.rs as re-export |
-| Business logic in lua_api | Extract to domain module, call from lua_api |
-| `impl LuaUserData` in `src/<module>/` | Move to `src/lua_api/<module>_api.rs` |
-| Missing docstrings | Add `///` — violation of Q-05 |
-| `use wgpu::*` in non-render module | Domain modules are GPU-free (Zen Rule 3/9) |
-| Invented file names (`helpers.rs`, `utils.rs`) | Use standard names: `types.rs`, `draw.rs`, `builder.rs` |
+| Fat `mod.rs` (functions, structs, >30 lines) | Move to `<primary>.rs`, keep `mod.rs` as re-export. |
+| Business logic in `lua_api` (>10 lines per method) | Extract to domain module, call from `lua_api`. |
+| `impl LuaUserData` in `src/<module>/` | Move to `src/lua_api/<module>_api.rs`. |
+| Missing docstrings | Add `///` — violation of Q-05. |
+| `use wgpu::*` in non-render module | Domain modules are GPU-free (Zen Rules 3, 9). |
+| Invented file names (`helpers.rs`, `utils.rs`) | Use standard names: `types.rs`, `draw.rs`, `builder.rs`. |
 
 ---
 
