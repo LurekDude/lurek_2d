@@ -1,297 +1,75 @@
 # Lurek2D Engine — System Prompt
 
-Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts.
-This file is the always-on backbone for AI-assisted development in the Lurek2D repository.
+## Engine Identity
 
-- **CAG load order**: System Prompt → `docs/specs/<module>.md` (merged module reference) → Skills (on-demand) → Prompts → Agents
-- **Module knowledge single-source system**: `docs/specs/<module>.md` is the canonical merged module reference for each engine module. It now carries the old overview facts plus the deeper technical detail, so load the spec directly when you need module context.
-- **Tech baseline**: Rust stable ≥1.78 | LuaJIT vendored via mlua 0.9 (`lua54` feature = non-shipping fallback) | wgpu 22 | winit 0.30 | rapier2d 0.32 | rodio 0.17 | fontdue 0.9
-- **Sources of truth**: `docs/architecture/philosophy.md` (binding constraints) · `docs/architecture/engine-architecture.md` (module structure, tier system) · `docs/architecture/test-framework.md` (test suite). Consult all three before implementing any feature.
-- **API namespace**: All Lua bindings live under `lurek.*` — never external engine prefixes, never bare globals
-- **License**: MIT — no platform SDKs, no monetisation features
+Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts via LuaJIT (`mlua` 0.9; `lua54` is a non-shipping fallback). Tech baseline: Rust stable ≥1.78, wgpu 22, winit 0.30, rapier2d 0.32, rodio 0.17, fontdue 0.9. Public API namespace is `lurek.*`. Desktop only (Windows / Linux / macOS, x86_64 + ARM). MIT licensed. Single-binary distribution; no embedded editor.
 
-## Write Style
+## Binding Constraints
 
-- Lead with Lurek2D-specific facts, not generic Rust advice
-- One canonical place for each rule; reference, don't duplicate
-- When designing an API, ask: "could a Copilot agent use this correctly without a clarifying question?" If no, redesign.
+Verbatim from `docs/architecture/philosophy.md`. Do not propose changes without a design-assumption update.
 
-## Design Constraints
+- **A-01** Runtime only — no embedded visual editor or IDE.
+- **A-02** Desktop only — Windows / Linux / macOS, x86_64 + ARM. No mobile, no WASM.
+- **A-03** 2D graphics only — raycasting (textured-quad 2.5D) and isometric use 2D draw calls.
+- **A-04** No distribution platform SDKs (Steam, Epic) in the core binary.
+- **B-01** LuaJIT is the primary runtime; `lua54` Cargo feature is a non-shipping fallback.
+- **B-02** wgpu 22 is the only renderer backend (Vulkan / DX12 / Metal); no OpenGL path.
+- **B-03** 60 FPS at 1080p target on integrated GPUs (Intel UHD, AMD APU).
+- **B-04** Concurrency in Rust threads; LuaJIT VMs cannot share state — use `Channel` for cross-VM comms.
+- **B-05** TOML for human-authored config; JSON for external interop only; no YAML.
 
-Active binding decisions from `docs/architecture/philosophy.md` — do not propose changes without a design-assumption update:
+## Cross-Artifact Sync
 
-- **A-01** Runtime only — no embedded visual editor or IDE
-- **A-02** Desktop only — Windows/Linux/macOS x86_64 + ARM. No mobile, no WASM
-- **A-03** 2D graphics only — no 3D scene graph. Raycasting (textured-quad 2.5D) and isometric rendering use 2D draw calls and are acceptable
-- **A-04** No distribution platform SDKs (Steam, Epic) in the core binary — lives outside the five-group module stack (T-08)
-- **B-01** LuaJIT is the primary runtime; `lua54` Cargo feature is a non-shipping development fallback
-- **B-02** wgpu 22 is the only renderer backend (Vulkan / DX12 / Metal) — no OpenGL path
-- **B-03** Games must run acceptably on integrated GPUs (Intel UHD, AMD APU) — 60 FPS at 1080p target
-- **B-04** Concurrency in Rust threads; LuaJIT VMs cannot share state; use `Channel` for cross-VM comms
-- **B-05** TOML is the human-authored config format. JSON for external interop only. No YAML
+When you change one of these, you MUST update the others in the same commit.
 
-## Quick Start
+| Changed                                      | Also update                                                              |
+|----------------------------------------------|--------------------------------------------------------------------------|
+| `src/<module>/*.rs`                          | `docs/specs/<module>.md`                                                 |
+| `src/lua_api/<module>_api.rs`                | `docs/specs/<module>.md` · `docs/API/lua-api.md`                         |
+| `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `content/library/` modules |
+| New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
+| `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/API/library-docs.md` via `tools/docs/gen_lib_docs.py` |
+| Any change                                   | `docs/CHANGELOG.md`                                                      |
 
-**Tool directory policy**: Permanent CLI scripts go in `tools/`. Session-scoped scripts go in `work/{session}/scripts/` — never in `tools/`. See `tools/README.md` for the full index.
+Regenerate API references with `python tools/gen_all_docs.py` whenever Rust or Lua API surface changes.
 
-**CAG validation** (run after every `.github/` edit):
-```powershell
-python tools/validate/cag_validate.py                              # Full validation
-python tools/validate/cag_validate.py --type agent|skill|prompt    # One family
-python tools/validate/cag_validate.py --file <path>                # Single file
-```
+## Discovery Directives
 
-**Commit quality gate**:
-```powershell
-cargo test && cargo clippy -- -D warnings
-```
+This system prompt is a discovery index, not a manual. Find specialised context on demand:
 
-## Architecture
+- **Skills** live in `.github/skills/<name>/SKILL.md`. Match the user's task domain to a skill's `description` frontmatter — every description is shaped "Load this skill when X. Skip it for Y." Load all that apply (a single task may need several).
+- **Agents** live in `.github/agents/<name>.agent.md`. Match the task type to the `mission` frontmatter; chain via the `routes_to` field. For multi-agent work spanning ≥3 agents or ≥5 files, route to `Manager` first — Manager will engage `Planner` before any implementation begins.
+- **Prompts** live in `.github/prompts/<verb>-<noun>.prompt.md`. Each is a parameterised user-selected entrypoint; the `expected_agent` frontmatter names the runner.
+- **Tools** are catalogued in `tools/README.md` with one `README.md` per subfolder under `tools/`.
+- **Module specs** live in `docs/specs/<module>.md` — load directly when you need the canonical reference for a Rust module, its Lua bindings, types, and functions.
+- **Sessions** must create `work/<session-name>/` with subfolders `scripts/`, `handovers/`, `reports/`, `data/`, `examples/`, `other/`, `temp/`, `logs/`. Append one JSONL entry per completed phase to `logs/agent_log.jsonl`; never overwrite. Move completed sessions to `work/archive/`.
+- **API namespace** is `lurek.*` exclusively — never bare globals or external prefixes. The Thin Wrapper Rule binds: `src/lua_api/<module>_api.rs` owns ALL `impl LuaUserData` and `mlua` imports; domain modules under `src/<module>/` stay pure-Rust.
+- **Lua-first testing rule**: behaviour observable through `lurek.*` MUST be tested in Lua under `tests/lua/`. Rust unit tests under `tests/rust/unit/` are reserved for non-Lua-reachable internals.
 
-Lurek2D organises its Rust source into **five responsibility groups**. The one binding invariant is **no cycles, ever** — the module import graph must be a DAG. See `docs/architecture/philosophy.md` (Zen of Lurek 2.0) and `docs/architecture/engine-architecture.md` for the authoritative rules.
+**Full CAG system documentation:** [docs/architecture/cag-system.md](../docs/architecture/cag-system.md).
 
-**Foundations** — pure algorithms and data, no render/audio/input/Lua deps:
-`math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns`
+## Quality Gates
 
-**Core Runtime** — engine lifecycle, timing, events, threading, networking, sandboxed I/O:
-`runtime`, `event`, `timer`, `thread`, `network`, `filesystem`
+Minimum before any commit:
 
-**Platform Services** — OS-facing backends, each behind a pure-Rust contract:
-`render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect`, `camera`, `light`, `effect`
+- Rust: `cargo test && cargo clippy -- -D warnings`.
+- CAG layer: `python tools/validate/cag_validate.py` (use `--baseline` to gate against regressions).
+- Docs coverage: `python tools/audit/doc_coverage.py` and `python tools/audit/test_coverage.py`.
+- Generated API references: `python tools/gen_all_docs.py` after any public-API change.
+- `docs/CHANGELOG.md`: every commit adds or extends an entry under the current version. Versioning is MAJOR.MINOR.PATCH per the CHANGELOG header; bumping MAJOR or MINOR also updates `Cargo.toml`.
+- Confirm branch with `git rev-parse --abbrev-ref HEAD` and stage only files you changed — never `git add .`.
+- Commit format: `type(scope): description` where `type` ∈ {`feat`, `fix`, `refactor`, `test`, `docs`, `chore`}. One logical change per commit.
 
-**Feature Systems** — game-domain services; same-group imports allowed when acyclic:
-`ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine`
-
-**Edge/Integration** — composition root and scripting bridge; nothing below imports these:
-`app` (boot + event loop), `lua_api` (registers `lurek.*`), `devtools`, `debugbridge`, `docs`, `pipeline`, `bin`
-
-**Lunasome** (`content/library/`) — Pure-Lua standard libraries that consume only the public `lurek.*` API. No Rust engine internals. Includes `battle`, `cardgame`, `combat`, `crafting`, `dialog`, `doll`, `economy`, `inventory`, `item`, `province_map`, `quest`, `stats`.
-
-**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After each callback returns, `GpuRenderer::render_frame()` processes the queue in wgpu render passes. No GPU calls inside Lua closures.
-
-**State**: `Rc<RefCell<SharedState>>` is shared between Lua closures and the engine loop. All resources (textures, fonts, meshes, etc.) live in typed `SlotMap<TypedKey, Resource>` pools — see `src/runtime/resource_keys.rs`.
-
-**Boot**: CLI args → `Config::load()` (conf.toml preferred; conf.lua legacy fallback) → `App::new()` (winit, wgpu, rodio, GameFS) → `create_lua_vm()` (LuaJIT, 35+ API modules) → `main.lua` → `lurek.init()` / `lurek.ready()` → winit event loop.
-
-## CAG Routing
-
-**Load order**: System Prompt → `docs/specs/<module>.md` (merged module reference) → relevant skill files → agent
-
-**Skill catalog** — all skills live in `.github/skills/`. Load the relevant `SKILL.md` before working in that domain.
-`agent-md` · `analytics` · `asset-pipeline` · `build-system` · `cag-workflow` · `ci-cd-pipeline` · `cross-platform` · `demo-creation` · `dev-debugging` · `documentation` · `error-handling` · `examples-management` · `game-ai` · `github-workflow` · `gpu-programming` · `logging` · `lua-api-design` · `lua-rust-bridge` · `lua-runtime` · `lua-scripting` · `module-architecture` · `module-audit` · `performance-profiling` · `quality-pipeline` · `roadmap-planning` · `rust-coding` · `testing-rust` · `threading` · `tools-cag-validation` · `ui-layout` · `visual-effects` · `vscode-extension`
-
-**Agent roster** — full definitions in `.github/agents/`:
-
-| Agent | Mission |
-|---|---|
-| `Manager` | Starts every multi-agent session, creates the work folder, confirms the branch, decomposes requests into agent handoffs with measurable acceptance gates, and tracks overall progress |
-| `Planner` | Accepts complex or multi-file tasks from Manager and produces a phased execution plan with sequencing rules, parallelism analysis, and done-when gates before any implementation begins |
-| `Research` | Finds accurate, cited information from the web, official docs, or the codebase and returns a structured findings report with source citations — never implementation code |
-| `Solver` | Performs structured root-cause analysis when no obvious solution exists, evaluates alternatives against binding constraints, and delivers a decision-ready recommendation with trade-off analysis |
-| `Developer` | Implements Rust engine features, fixes bugs, adds new source modules, and maintains non-specialised Rust subsystem code across all tiers |
-| `Lua-Designer` | Designs and evolves the `lurek.*` Lua API surface, enforcing naming conventions, parameter patterns, sensible defaults, and API consistency across all binding modules |
-| `Renderer` | Owns the wgpu GPU pipeline: device and surface setup, `RenderCommand` queue processing, texture management, WGSL shaders, blend modes, and canvas render-to-texture |
-| `Physicist` | Owns the `src/physics/` rapier2d integration: rigid bodies, colliders, shapes, joints, raycasting, collision events, and the `lurek.physics.*` Lua API |
-| `Audio-Eng` | Owns the `src/audio/` rodio integration: mixer, audio buses, static and streaming sources, volume/pitch/pan, and the `lurek.audio.*` Lua API |
-| `Tester` | Writes and maintains all tests — Rust integration tests in `tests/`, Lua BDD tests in `tests/lua/`, golden snapshot tests, and stress tests |
-| `Reviewer` | Reviews code for compliance with conventions, module boundary rules, tier direction, test coverage, and quality gates — reports findings, must not rewrite code |
-| `Debugger` | Diagnoses runtime bugs, crashes, and unexpected behaviour using RUST_LOG, borrow traces, and engine error paths — delivers root cause, does not implement fixes |
-| `Optimizer` | Profiles frame time, heap allocations, and hot paths; delivers a prioritised optimisation report with measured evidence before Developer implements changes |
-| `Architect` | Makes module boundary decisions, assigns tiers to new modules, designs the dependency graph, and enforces the DAG invariant across the codebase |
-| `Doc-Writer` | Writes and maintains all documentation in `docs/`, ensures `///` coverage on public items, runs the doc pipeline, and keeps `content/demos/README.md` current |
-| `Security` | Audits the Lua sandbox, GameFS path-traversal guards, Lua input validation, and `unsafe` blocks — reports findings to Developer, never implements fixes directly |
-| `CAG-Architect` | Maintains the `.github/` CAG layer — agents, skills, prompts, and the system prompt — and always runs `tools/validate/cag_validate.py` after every edit |
-| `Configurator` | Authors, validates, and documents `conf.lua` and `conf.toml` templates against the `Config` struct in `src/runtime/config.rs` — does not modify engine Rust code |
-| `Hacker` | Performs adversarial probing of the `lurek.*` API and sandbox — stale keys, path traversal, double-release, nil spam, resource exhaustion — and feeds findings to Security and Tester |
-| `Player` | Reviews demos and API proposals through named user personas; provides subjective fun ratings and friction reports to Lua-Designer and Doc-Writer — never performs correctness checks |
-
-## Critical Rules
-
-### Rust Conventions
-
-Lurek2D-specific rules only — common Rust idioms apply without repetition:
-
-- `unsafe` requires a `// SAFETY:` comment explaining the invariant; never use raw pointers for state sharing
-- Per-frame code must not allocate on the heap — grow draw-call buffers at startup, not per frame
-- Engine resources live in `SlotMap<TypedKey, Resource>` — see `src/runtime/resource_keys.rs` for all key types (`TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`, `SpriteBatchKey`, `ParticleKey`)
-- Use `log::info!` / `log::warn!` / `log::error!` / `log::debug!` — never `println!` in engine code
-- Convert errors to `LuaError` at the Lua API boundary with `.map_err(LuaError::external)`
-
-### Lua API Conventions
-
-- All bindings under `lurek.*` — never external prefixes or bare globals
-- Every API file signature: `pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()>`
-- Clone `Rc` before moving into closures: `let state = state.clone();` then `move |...| { let s = state.borrow(); ... }`
-- Sensible defaults — never require a parameter a beginner would always pass the same value
-- All callbacks (`lurek.init`, `lurek.ready`, `lurek.process`, `lurek.process_physics`, `lurek.process_late`, `lurek.render`, `lurek.render_ui`, and all event callbacks) are optional — blank `main.lua` is valid
-- Lua API is synchronous from the script's perspective — async work in Rust threads via `Channel`
-- Validate inputs at the Lua boundary — return descriptive `LuaError`, never panic
-- Full callback reference: `docs/architecture/engine-architecture.md` § Callback Contract
-
-**MANDATORY — Thin Wrapper Rule**: `src/lua_api/<module>_api.rs` owns ALL Lua-facing registration. This includes: `pub fn register()`, Lua wrapper structs (`Lua<X>`), `impl LuaUserData` blocks, and all `add_method` / `add_method_mut` calls. Domain modules (`src/<module>/`) contain ONLY pure-Rust business logic, algorithms, and data types — they must never contain `impl LuaUserData` or any mlua import. Violating this rule is a blocking code review defect. **`impl LuaUserData` in a domain module is always wrong — move it to `src/lua_api/<module>_api.rs`.**
-
-### Testing Framework
-
-Lurek2D has a two-layer test system. Both layers run **headless** — no window, GPU, or audio device required.
-
-**Rust tests** (`tests/rust/unit/`, `tests/rust/stress/`, `tests/rust/golden/`, `tests/rust/config/`, `tests/rust/security/`, `tests/rust/ext/`): naming `<subject>_<scenario>_<expected>`, no `test_` prefix. Float comparisons must use `assert!((val - expected).abs() < 1e-5)`, never `assert_eq!` on floats. All test binaries must be registered in `Cargo.toml`. **`tests/rust/game/` is retired** — game systems are now Lua libraries tested in `tests/lua/content/library/`.
-
-**Lua BDD tests** (`tests/lua/`): `tests/lua/harness.rs` dispatches one `#[test]` function per `.lua` file. `tests/lua/init.lua` provides `describe`/`it`/`expect_equal`/`expect_near`/`expect_error` etc. Every Lua test file must end with `test_summary()`. New `.lua` file → add corresponding `#[test] fn lua_test_<category>_<name>()` entry to `tests/lua/harness.rs`.
-
-**Lua test categories**: `unit/` (one per engine module), `content/library/` (one per `content/library/` Lunasome module), `integration/` (tests between ≥2 modules — both namespaces must appear), `stress/` (throughput/allocation from Lua), `security/` (sandbox, nil spam, path traversal), `evidence/` (PNG/audio/text output proving a module API works), `golden/` (comparison-only: compares evidence output against committed reference samples), `config/` (config loading), `content/demos/` (one per demo in `content/demos/`).
-
-**Evidence test contract**: Evidence tests (`tests/lua/evidence/`) prove a `lurek.*` module works by (1) creating a module object via `lurek.*` API, (2) configuring it, (3) running it, (4) dumping its output to a PNG/audio/text file. An evidence test that manually draws shapes without calling the domain module's API is **invalid** — it proves nothing. The litmus test: "If this module's code was deleted, would the output file look different?" If NO, rewrite the test. See `docs/architecture/test-framework.md` § Evidence Test Contract.
-
-**Golden test contract**: Golden tests (`tests/lua/golden/`) are comparison-only harnesses. They MUST NOT call `lurek.*` APIs to produce content — that is the evidence test's job. A golden test loads an evidence output file and compares it against a committed reference sample in `tests/lua/golden/samples/<module>/`. If a golden test contains content-creation logic, move it to the evidence test immediately.
-
-**Examples vs Demos**: `content/examples/` are documentation — no tests required. `content/demos/` are functional showcases — every demo must have a test in `tests/lua/content/demos/test_demo_<name>.lua`.
-
-**VM helpers**: `create_test_vm()` returns a full Lua VM with BDD framework loaded. `make_vm()` returns `(Rc<RefCell<SharedState>>, Lua)` for stateful Rust-side tests.
-
-**Constraints**: Lua tests must not call GPU, audio, or window APIs. New `lurek.*` functions require at least one Lua test before merge. Bug fixes require a regression test first.
-
-**Lua-first testing rule** — If behaviour can be observed through the `lurek.*` Lua API, it **must** be tested in Lua (`tests/lua/`), never in a Rust unit test. Rust unit tests (`tests/rust/unit/`) are reserved **exclusively** for private internals that are not reachable from Lua: internal `struct` field defaults, non-public helper functions, pure-Rust algorithms with no Lua binding, and invariants that cannot survive the Lua call boundary (e.g. zero-copy buffer layout). Duplicating a Lua-testable assertion in a Rust unit test is a blocking defect — delete the Rust test and keep the Lua one.
-
-### Docstrings
-
-Every `pub` Rust item needs `///`. Every module (`mod.rs`, `lib.rs`) needs `//!`. Format: one-sentence summary, optional detail paragraph. Verify: `python tools/docs/collect_docs.py --report-missing` (exits 1 if any missing).
-
-**Lua API files** (`src/lua_api/`) use inline `@param name : type` and `@return type` annotations — **never** `# Parameters` / `# Returns` rustdoc sections. Gold standard: `src/lua_api/timer_api.rs`.
-
-### Work Sessions (Mandatory)
-
-Every session that produces artifacts must:
-1. Confirm branch: `git rev-parse --abbrev-ref HEAD` → write to `work/branch.txt`
-2. Create `work/{session-name}/` with 8 subfolders: `scripts/` `handovers/` `reports/` `data/` `content/demos/` `other/` `temp/` `logs/`
-3. Create `logs/agent_log.jsonl` — append one JSONL entry per completed phase, never overwrite
-4. Route to `Planner` before any work if the task spans 3+ agents or 5+ files
-
-Log entry format: `{"timestamp":"ISO8601","agent":"Name","session":"...","phase":"...","skills_used":[],"tools_used":[],"commands_run":[],"result":"PASS|FAIL|PARTIAL","findings":[],"handover_to":"..."}`
-
-Completed session folders move to `work/archive/` — never delete.
-
-### Changelog (docs/CHANGELOG.md) — MANDATORY FOR ALL AGENTS
-
-`docs/CHANGELOG.md` is the canonical version history. **Every agent** must update it in the same commit as any code, API, or tooling change. This is not optional.
-
-**Versioning scheme — `MAJOR.MINOR.PATCH`**
-
-| Segment | Increment when… |
-|---|---|
-| **MAJOR** | Breaking API changes — Lua scripts or engine config must be ported |
-| **MINOR** | New backwards-compatible features — new `lurek.*` APIs, new modules, new defaults |
-| **PATCH** | Bug fixes, internal refactors, doc/tooling changes that do not affect the public API |
-
-Format for a new entry:
-```markdown
-## [X.Y.Z] — YYYY-MM-DD
-### Added / Changed / Fixed / Removed
-- Describe the change in one line.
-```
-
-- Current version lives in `Cargo.toml` → `[package] version`.
-- When bumping MAJOR or MINOR: also update `Cargo.toml` version and any `!define APP_VERSION` in `tools/dist/installer.nsi` + `$Version` in `tools/dist/dist.ps1`.
-- PATCH fixes: update CHANGELOG only (Cargo.toml version is optional unless publishing).
-
-### Git Rules
-
-- Never stash git to check if previous changes are relevant !!! Always check `git status` and `git diff` to confirm exactly which files are staged for commit`
-- Never `git add .` — stage only files directly changed by the current task
-- Commit format: `type(scope): description` — types: `feat` `fix` `refactor` `test` `docs` `chore`
-- One logical change per commit — one accepted phase = one commit
-- Confirm branch before committing: `git rev-parse --abbrev-ref HEAD`
-- **Update `docs/CHANGELOG.md` before every commit** — add or extend the entry for the current version
-
-### CLI Tools (tools/)
-
-All permanent tools live in `tools/` organised by category. See `tools/README.md` for the full index. Each subfolder has its own `README.md`.
-
-| Subfolder | Contains |
-|---|---|
-| `tools/docs/` | Documentation generators (`collect_docs.py`, `gen_docs_lua.py`, `gen_docs_rust.py`, `gen_luadoc.py` …) |
-| `tools/audit/` | Quality auditing & coverage analytics (`audit_module.py`, `doc_coverage.py`, `test_coverage.py`, `example_coverage.py`, `example_add_missing.py` …) |
-| `tools/fix/` | Code fixers & docstring improvers (`add_lua_docstrings.py`, `fix_docstrings.py` …) |
-| `tools/validate/` | Schema & structure validators (`cag_validate.py`, `validate_lua_api.py` …) |
-| `tools/assets/` | Artwork source files — edit directly; all assets are maintained manually |
-| `tools/dist/` | Build, package & install (`dist.ps1`, `dist.sh`, `install.ps1`, `install.sh` …) |
-| `tools/github/` | GitHub automation (`ideas_to_github_issues.py`) |
-| `tools/demos/` | Demo folder management & screenshot generation (`organize_demos.py`, `gen_demo_screenshots.py`) |
-| `tools/dev/` | Dev helper scripts (`test_fix_loop.py`) |
-
-Key invocations:
-- **Quality sweep**: Load `quality-pipeline` skill for the full audit→fix→verify cycle
-- **CAG**: `python tools/validate/cag_validate.py [--type agent|skill|prompt] [--file <path>]`
-- **Docs**: `python tools/gen_all_docs.py` · `python tools/docs/collect_docs.py [--report-missing|--suggest]`
-- **Coverage**: `python tools/audit/doc_coverage.py` · `python tools/audit/test_coverage.py [--suggest]`
-- **Example coverage**: `python tools/audit/example_coverage.py [--missing|--module <name>|--report]` · `python tools/audit/example_add_missing.py [--module <name>|--dry-run]`
-- **Audit**: `python tools/audit/audit_module.py <name>` · `python tools/audit/quality_report.py`
-- **Lua API**: `python tools/docs/gen_lua_api_skeleton.py [--all|--module <name>|--list]`
-- **API refs**: `docs/API/lua-api.md` (Lua) · `docs/API/rust-api.md` (Rust) · run `gen_all_docs.py` to regenerate
-- **Assets**: All artwork in `assets/` is maintained manually. Do not run Python generators.
-- **Distribution**: `powershell tools/dist/dist.ps1` / `bash tools/dist/dist.sh`
-
-### Logging
-
-| Level | Use for |
-|---|---|
-| `error!` | Unrecoverable — aborts the frame or session |
-| `warn!` | Recoverable — degraded behaviour expected |
-| `info!` | Lifecycle events: startup, shutdown, script load |
-| `debug!` | Per-frame detail — disabled in release builds |
-
-Control: `RUST_LOG=lurek2d=debug cargo run -- content/demos/hello_world`. Never use `println!` in engine code.
-
-### Test Diagnostics
-
-| What | Command |
-|---|---|
-| Type-check only | `cargo check` |
-| One Rust test suite | `cargo test --test <module>_tests -- --nocapture` |
-| One Lua test | `cargo test lua_test_<category>_<name> -- --nocapture` |
-| Debug log in tests | `$env:RUST_LOG="debug"; cargo test --test <module>_tests -- --nocapture` |
-| Lint library only | `cargo clippy --lib` |
-| Full quality gate | `cargo test && cargo clippy -- -D warnings` |
-
-Use scoped `--test <module>` during development. Full `cargo test` only at commit time.
-
-### Repository Layout
+## Repository Layout
 
 ```
-src/              Rust source — Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration
-docs/specs/       Full technical specifications for every src/<module>/ (one <module>.md per module)
-content/library/          Lunasome — pure-Lua libraries (no Rust engine internals)
-content/demos/            Playable Lua game demos — each has main.lua and optional conf.toml
-content/examples/         Single-file Lua API usage scripts — one per lurek.* module
-tests/            Rust + Lua test suites (rust/unit/, rust/stress/, rust/golden/, rust/config/, rust/security/, rust/ext/, lua/unit/, lua/content/library/, lua/integration/, lua/content/demos/)
-docs/             Architecture docs, generated API refs (docs/API/), performance notes
-tools/            Permanent CLI scripts only
-.github/          CAG layer — agents, skills, prompts, system prompt
-extensions/vscode/ First-party VS Code extension (MCP server, IntelliSense, webview panels)
-work/             Session folders — current and work/archive/
-assets/           Engine assets: splash screen, window icon, embedded fonts
+src/         Rust engine source (Foundations · Core Runtime · Platform Services · Feature Systems · Edge/Integration)
+tests/       Rust + Lua test suites — tests/rust/{unit,golden,ext,fixtures} and tests/lua/
+docs/        Architecture, module specs, generated API references, CHANGELOG
+tools/       Permanent CLI scripts — validate/, audit/, fix/, docs/, dev/, demos/, dist/, github/, assets/
+content/     Lua content — games/, examples/, library/, layouts/, plugins/
+.github/     CAG layer — copilot-instructions.md, agents/, skills/, prompts/
+extensions/  First-party VS Code extension (extensions/vscode/)
+work/        Active session folders and work/archive/
+assets/      Engine assets: splash, window icon, embedded fonts
 ```
-
-### Game Code and Libraries
-
-- **`content/demos/`** — Run any demo with `cargo run -- content/demos/<name>`. Use as reference for complete, idiomatic game structures built on the `lurek.*` API.
-- **`content/examples/`** — Focused single-file API usage scripts (e.g. `physics.lua`, `tilemap.lua`). Use when you need to understand a specific `lurek.*` namespace in isolation.
-- **`content/library/`** -api.md`** — Compact `lurek.*` API reference generated by `tools/docs/gen_docs_lua.py`. Run `python tools/gen_all_docs.py` to regenerate. Do not hand-edit.
-- **`docs/API/rust-api.md`** — Rust public API reference generated by `tools/docs/gen_docs_rust.py`. Run `python tools/gen_all_docs.py` to regenerate. D from library code.
-- **`docs/API/lua-api.md`** — Compact `lurek.*` API reference generated by `tools/docs/gen_docs_lua.py`. Run `python tools/gen_all_docs.py` to regenerate. Do not hand-edit.
-- **`docs/API/rust-api.md`** — Rust public API reference generated by `tools/docs/gen_docs_rust.py`. Run `python tools/gen_all_docs.py` to regenerate. Do not hand-edit.
-- **`docs/specs/`** — One `<module>.md` per engine module. These are the merged module references: general info, summary, files, types, functions, Lua API details, references, and notes. See `docs/specs/README.md` for the sync contract.
-
-### Cross-Artifact Sync Contract
-
-Every time you add a feature, fix a bug, or change the API, you **must** update all of the following in the same commit:
-
-| Changed artifact | Files that must also change |
-|---|---|-api.md` (run `python tools/gen_all_docs
-| Rust source `src/<module>/*.rs` | `docs/specs/<module>.md` |
-| Lua binding `src/lua_api/<module>_api.rs` | `docs/specs/<module>.md` · `docs/API/lua-api.md` (run `python tools/gen_all_docs.py`) |
-| `lurek.*` API added/renamed/removed | `content/examples/<module>.lua` · any `content/demos/` that use the API · `content/library/` modules that depend on it · run `python tools/audit/example_coverage.py --module <module>` to verify; run `python tools/audit/example_add_missing.py --module <module>` to append stubs for new items |
-| New module created | New `docs/specs/<module>.md` · entry in `docs/specs/README.md` |
-
-This list is the canonical sync requirement. Never commit a code change without checking every row.
-
-| Any change at all | `docs/CHANGELOG.md` — add entry under current version |
