@@ -1,0 +1,2005 @@
+{
+  "edges": [
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "docs/CHANGELOG.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/gen_all_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/doc_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/example_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/example_add_missing.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/audit_module.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/audit/quality_report.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/docs/gen_lua_api_skeleton.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/dist/dist.ps1",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/dist/dist.sh",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "docs/API/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": "tools/gen_all_docs",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/audit/doc_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/gen_all_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/docs/gen_lua_api_skeleton.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": "tools/docs/gen_wiki_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": "docs/lua_api_reference.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": "docs/API",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/agent-md/SKILL.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/agent-md/SKILL.md",
+      "to": "tools/audit/validate_agent_md.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/agent-md/SKILL.md",
+      "to": "tools/docs/gen_module_specs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/analytics/SKILL.md",
+      "to": "tools/session_analysis.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/build-system/SKILL.md",
+      "to": "tools/dist/dist.ps1",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/build-system/SKILL.md",
+      "to": "tools/dist/dist.sh",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/build-system/SKILL.md",
+      "to": "tools/dist/installer.nsi",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/build-system/SKILL.md",
+      "to": "tools/dist/install.ps1",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/build-system/SKILL.md",
+      "to": "tools/dist/install.sh",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/cag-workflow/SKILL.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/cag-workflow/SKILL.md",
+      "to": ".github/skills/",
+      "type": "skill-mention"
+    },
+    {
+      "from": ".github/skills/cag-workflow/SKILL.md",
+      "to": ".github/prompts/",
+      "type": "prompt-mention"
+    },
+    {
+      "from": ".github/skills/cag-workflow/SKILL.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/cag-workflow/SKILL.md",
+      "to": ".github/skills/my-skill/SKILL.md",
+      "type": "skill-mention"
+    },
+    {
+      "from": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/demo-creation/SKILL.md",
+      "to": ".github/skills/demo-creation/references/library-integration.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/skills/demo-creation/SKILL.md",
+      "to": ".github/skills/demo-creation/references/conf-templates.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/skills/demo-creation/SKILL.md",
+      "to": ".github/skills/demo-creation/references/genre-patterns.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/skills/demo-creation/SKILL.md",
+      "to": "tools/demos/gen_demo_screenshots.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/examples-management/SKILL.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/examples-management/SKILL.md",
+      "to": "tools/audit/example_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/examples-management/SKILL.md",
+      "to": "tools/audit/example_add_missing.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/examples-management/SKILL.md",
+      "to": "docs/specs/timer.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/examples-management/SKILL.md",
+      "to": ".github/prompts/flesh-out-example.prompt.md",
+      "type": "prompt-mention"
+    },
+    {
+      "from": ".github/skills/game-ai/SKILL.md",
+      "to": "docs/specs/ai.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/game-ai/SKILL.md",
+      "to": "docs/specs/pathfind.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/github-workflow/SKILL.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/lua-api-design/SKILL.md",
+      "to": "tools/validate/validate_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/lua-rust-bridge/SKILL.md",
+      "to": "docs/specs",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/lua-rust-bridge/SKILL.md",
+      "to": "tools/docs/gen_lua_api_data.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": ".github/docs/specs/<module>.md",
+      "type": "cag-link"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "tools/audit/audit_module.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "docs/quality/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "docs/quality/timer.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "docs/quality/physics.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/module-audit/SKILL.md",
+      "to": "docs/quality/audio.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/gen_all_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/quality_report.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/audit_module.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/validate_agent_md.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/validate/validate_module_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/validate/validate_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/doc_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/docstring_audit.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/doc_audit.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/lua_api_test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/quality-pipeline/SKILL.md",
+      "to": "tools/audit/example_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/lua_test_structure_audit.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "docs/logs/test_coverage.json",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/integration_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/quality_report.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/lua_api_test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/test_analytics.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/testing-rust/SKILL.md",
+      "to": "tools/audit/lua_evidence_golden_contract_audit.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/threading/SKILL.md",
+      "to": "docs/specs/thread.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/skills/tools-cag-validation/SKILL.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/ui-layout/SKILL.md",
+      "to": "tools/ui/snap_to_grid.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/ui-layout/SKILL.md",
+      "to": "tools/ui/render_layout.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/skills/ui-layout/SKILL.md",
+      "to": "tools/ui/fix_layouts.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/analyze-roadmap-phase.prompt.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": ".github/skills/module-audit/SKILL.md",
+      "type": "skill-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": ".github/skills/examples-management/SKILL.md",
+      "type": "skill-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": "tools/validate/validate_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": "tools/audit/audit_module.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/audit-module.prompt.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": ".github/skills/demo-creation/references/genre-patterns.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": ".github/skills/demo-creation/references/library-integration.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": ".github/skills/demo-creation/references/conf-templates.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": ".github/skills/demo-creation/SKILL.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "docs/API/lua-api.md",
+      "type": "doc-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/examples",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/demos/hello_world/main.lua",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/demos/platformer/main.lua",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/demos/roguelike/main.lua",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/demos/dialog_demo/main.lua",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "content/demos/loot_rpg_demo/main.lua",
+      "type": "other-link"
+    },
+    {
+      "from": ".github/prompts/create-demo.prompt.md",
+      "to": "tools/screenshots/gen_demo_screenshots.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/create-roadmap-phase.prompt.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/create-tilemap-feature.prompt.md",
+      "to": "tools/docs/gen_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/doc-api-reference.prompt.md",
+      "to": "docs/API/lua_api_reference_generated.md",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/prompts/flesh-out-example.prompt.md",
+      "to": "tools/audit/example_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/flesh-out-example.prompt.md",
+      "to": "docs/specs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/prompts/implement-lua-api-module.prompt.md",
+      "to": "tools/validate/validate_lua_api.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/implement-roadmap-phase.prompt.md",
+      "to": "docs/",
+      "type": "doc-mention"
+    },
+    {
+      "from": ".github/prompts/run-cag-validation.prompt.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/audit/audit_module.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/docs/collect_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/audit/validate_agent_md.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/audit/test_coverage.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/docs/gen_docs_lua.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-feature-development.prompt.md",
+      "to": "tools/gen_all_docs.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/prompts/workflow-release-check.prompt.md",
+      "to": "tools/validate/cag_validate.py",
+      "type": "tool-mention"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/agent-md/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/analytics/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/asset-pipeline/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/build-system/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/cag-workflow/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/ci-cd-pipeline/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/cross-platform/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/demo-creation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/dev-debugging/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/examples-management/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/game-ai/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/github-workflow/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/gpu-programming/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/logging/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/lua-runtime/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/module-audit/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/quality-pipeline/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/roadmap-planning/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/threading/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/tools-cag-validation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/ui-layout/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/visual-effects/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/skills/vscode-extension/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/skills/asset-pipeline/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/skills/tools-cag-validation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/skills/asset-pipeline/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/skills/dev-debugging/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/skills/logging/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/skills/logging/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/skills/gpu-programming/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/skills/examples-management/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/skills/lua-runtime/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/skills/tools-cag-validation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/optimizer.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/optimizer.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/optimizer.agent.md",
+      "to": ".github/skills/gpu-programming/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/skills/examples-management/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/skills/gpu-programming/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/skills/visual-effects/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/skills/lua-rust-bridge/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/skills/documentation/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/skills/lua-api-design/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/module-architecture/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/performance-profiling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/lua-scripting/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/skills/gpu-programming/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/skills/testing-rust/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/skills/rust-coding/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/skills/error-handling/SKILL.md",
+      "type": "skill-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/planner.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/research.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/solver.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/renderer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/physicist.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/audio-eng.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/cag-architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/configurator.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/hacker.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/copilot-instructions.md",
+      "to": ".github/agents/player.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/architect.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/audio-eng.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/cag-architect.agent.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/configurator.agent.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/debugger.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/renderer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/physicist.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/audio-eng.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/developer.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/doc-writer.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/hacker.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/lua-designer.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/planner.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/research.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/solver.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/renderer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/physicist.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/audio-eng.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/cag-architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/configurator.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/hacker.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/manager.agent.md",
+      "to": ".github/agents/player.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/physicist.agent.md",
+      "to": ".github/agents/renderer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/planner.agent.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/player.agent.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/planner.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/research.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/solver.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/renderer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/physicist.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/audio-eng.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/cag-architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/configurator.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/hacker.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/README.md",
+      "to": ".github/agents/player.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/agents/lua-designer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/renderer.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/research.agent.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/agents/security.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/reviewer.agent.md",
+      "to": ".github/agents/doc-writer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/security.agent.md",
+      "to": ".github/agents/reviewer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/tester.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/manager.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/debugger.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/solver.agent.md",
+      "to": ".github/agents/research.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/agents/developer.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/agents/architect.agent.md",
+      "type": "agent-name-ref"
+    },
+    {
+      "from": ".github/agents/tester.agent.md",
+      "to": ".github/agents/optimizer.agent.md",
+      "type": "agent-name-ref"
+    }
+  ],
+  "orphans": {
+    "skills_with_no_inbound_refs": [],
+    "agents_with_no_inbound_refs": [],
+    "prompts_with_broken_link_targets": [
+      {
+        "file": ".github/copilot-instructions.md",
+        "broken_target": "tools/gen_all_docs"
+      },
+      {
+        "file": ".github/agents/planner.agent.md",
+        "broken_target": "docs/lua_api_reference.md"
+      },
+      {
+        "file": ".github/skills/agent-md/SKILL.md",
+        "broken_target": "tools/audit/validate_agent_md.py"
+      },
+      {
+        "file": ".github/skills/analytics/SKILL.md",
+        "broken_target": "tools/session_analysis.py"
+      },
+      {
+        "file": ".github/skills/cag-workflow/SKILL.md",
+        "broken_target": ".github/skills/my-skill/SKILL.md"
+      },
+      {
+        "file": ".github/skills/module-audit/SKILL.md",
+        "broken_target": ".github/docs/specs/<module>.md"
+      },
+      {
+        "file": ".github/skills/quality-pipeline/SKILL.md",
+        "broken_target": "tools/audit/validate_agent_md.py"
+      },
+      {
+        "file": ".github/prompts/doc-api-reference.prompt.md",
+        "broken_target": "docs/API/lua_api_reference_generated.md"
+      },
+      {
+        "file": ".github/prompts/workflow-feature-development.prompt.md",
+        "broken_target": "tools/audit/validate_agent_md.py"
+      }
+    ]
+  },
+  "stats": {
+    "edges_total": 388,
+    "by_type": {
+      "tool-mention": 90,
+      "doc-mention": 22,
+      "skill-mention": 5,
+      "prompt-mention": 2,
+      "skill-link": 8,
+      "cag-link": 1,
+      "doc-link": 1,
+      "other-link": 6,
+      "skill-name-ref": 118,
+      "agent-name-ref": 135
+    },
+    "agents": 20,
+    "skills": 32,
+    "prompts": 45,
+    "broken_targets_total": 9
+  }
+}
