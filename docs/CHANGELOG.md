@@ -2,8 +2,29 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.19.0] — 2026-04-18
+## [0.20.0] — 2026-04-18
+
 ### Changed
+- **CAG System Overhaul (P0–P11)** — full refactor of `.github/` copilot-instructions / agents / skills / prompts to a discovery-driven, validator-enforced structure. See [docs/architecture/cag-system.md](architecture/cag-system.md).
+  - System prompt: 297 → 57 lines, 25 KB → 6.3 KB (discovery directives replace inline rosters).
+  - 33 skills: zero fenced code blocks; 250 extracted companion files under `examples/` / `templates/` / `snippets/`.
+  - 20 agents: YAML frontmatter, 6-persona taxonomy, explicit workflow + routing + anti-patterns; Hacker vs Security and Player vs Reviewer boundaries documented.
+  - 56 prompts: Claude-Code-aligned template; 11 new prompts fill orphan-skill coverage.
+  - Added `docs/architecture/cag-system.md` (full authoritative reference).
+
+### Added
+- `tools/validate/cag_validate.py` (strict + baseline modes, 18 rule IDs).
+- `tools/audit/cag_link_check.py`, `tools/audit/cag_coverage.py`, `tools/audit/cag_persona_matrix.py`.
+- `tools/validate/cag_validate.baseline.json` (regression gate).
+- `tests/python/test_cag_tools.py` (27 self-tests).
+- Tools-awareness sweep: docstrings + subfolder READMEs + "Discovery for Agents" section in `tools/README.md`.
+
+### Validation
+- `python tools/validate/cag_validate.py` (strict): 0 errors / 0 warnings.
+- `cag_coverage.py`: 100% on all required sections / frontmatter.
+- `cag_persona_matrix.py`: all 6 personas served; all 20 agents ≥1 persona.
+
+### Phase history (consolidated)
 - **CAG P8 — Workflow enforcement**: All 20 `.github/agents/*.agent.md` workflows now carry the five universal orchestration steps (branch confirmation via `git rev-parse --abbrev-ref HEAD`, `work/<session>/{reports,data,scripts,handovers,logs}/` artifact discipline, JSONL log append to `agent_log.jsonl`, scoped `git add` + `type(scope): description` commit, `docs/CHANGELOG.md` bullet) plus end-of-session handoff. `manager` adds Planner-routing rule (3+ agents OR 5+ files) and final `CAG-Architect` sweep step linking [docs/architecture/cag-system.md § 7](architecture/cag-system.md#7-end-of-session-cag-sweep-contract); `planner` adds Persona-coverage step (EngDev/GameDev/Modder/Player/GameTest/EngTest); `cag-architect` adds explicit End-of-Session Sweep checks (frontmatter / validator exit-0 / missing skills+prompts / persona impact). `.github/agents/README.md` gained pointer to `docs/architecture/cag-system.md` and the canonical work-folder layout reminder. Audit + patch scripts under `work/cag-system-overhaul-20260418/scripts/`. Baseline validator still 0 errors / 0 warnings.
 - **CAG P9 — Architecture documentation**: `docs/architecture/cag-system.md` rewritten from placeholder to the full authoritative reference (~330 lines / ~2,400 words). Covers all 8 required sections — Philosophy, File-Type Catalog, Discovery Flow, Six-Persona Model (with embedded `cag_persona_matrix.py` output), Validator & Tooling (full E001–W306 rule index), Authoring Guides for agents/skills/prompts/tools, End-of-Session CAG Sweep contract with JSONL log shape, and Glossary. Linked from `README.md` Architecture section. Audience: human contributors and AI agents.
 - **CAG P6 — System prompt slim-down**: `.github/copilot-instructions.md` rewritten to the discovery-driven template — 298 lines / 26,344 bytes → 75 lines / 6,302 bytes. Inline agent roster (20 entries) and skill catalog (33 entries) removed in favour of a `Discovery Directives` section pointing at the per-file frontmatter. All 7 required sections present in order; all 12 W005 broken refs eliminated (`content/demos/` → `content/games/`; stripped non-existent `tests/rust/{stress,config,security,game}/` paths). Baseline validator now reports 0 errors / 0 warnings across the entire CAG layer (system_prompt=1, agents=20, skills=33, prompts=56). Created `docs/architecture/cag-system.md` placeholder (full content in P9).
