@@ -1,0 +1,8 @@
+describe("<name> contract", function()
+    it("rejects invalid argument type", function()
+        expect_error(function()
+            lurek.<module>.<fn>("not_a_number")
+        end)
+    end)
+end)
+test_summary()

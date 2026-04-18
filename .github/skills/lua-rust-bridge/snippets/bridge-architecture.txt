@@ -1,0 +1,8 @@
+Game Script (Lua)
+  └── lurek.<module>.<func>(args)
+        ↓ mlua dispatch
+  src/lua_api/<module>_api.rs
+        ↓ Rc<RefCell<SharedState>>
+  src/<module>/        [domain logic — pure Rust]
+        ↓
+  SharedState::resource_pool → SlotMap<TypedKey, Resource>

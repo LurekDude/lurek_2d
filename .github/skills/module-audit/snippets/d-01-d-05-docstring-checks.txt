@@ -1,0 +1,7 @@
+1. Run: python tools/docs/collect_docs.py --report-missing 2>&1 | grep "src/<module>"
+2. If any output: ERROR (D-02, D-05)
+3. For each .rs file, check first line for //! comment (D-01)
+4. For structs: check for `# Fields` section (D-03)
+5. For enums: check for `# Variants` section (D-03)
+6. For fns: check for `# Parameters` / `# Returns` (D-03)
+7. Search for "TODO", "Consult the module-level" stub text (D-04)

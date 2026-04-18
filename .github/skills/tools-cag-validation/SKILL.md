@@ -1,40 +1,48 @@
 ---
 name: tools-cag-validation
 description: "Load this skill when validating, debugging, or maintaining the CAG layer files. It owns the cag_validate.py script usage, validation rules, severity model, and CAG quality standards. Skip it for engine code or game scripts."
+companion_files:
+  examples: []
+  templates: []
+  snippets: []
+related_skills: []
 ---
+
+# tools-cag-validation
+
+## Mission
 
 # CAG Validation Tools — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Running `tools/validate/cag_validate.py` to check CAG file compliance
 - Debugging validation errors in agents, skills, prompts, or instructions
 - Adding new validation rules
 - Auditing CAG layer quality
 
-## Owns
+## When To Skip
 
+- Engine code quality → use `rust-coding` skill
+- CAG content authoring → use `CAG-Architect` agent
+- CI/CD pipeline for validation → use `ci-cd-pipeline` skill
+
+## Domain Knowledge
+
+### Owns
 - `tools/validate/cag_validate.py` usage and CLI interface
 - CAG validation rules and severity model
 - Frontmatter format validation
 - Required section checking
 - Naming convention enforcement
 
-## Does Not Cover
-
-- Engine code quality → use `rust-coding` skill
-- CAG content authoring → use `CAG-Architect` agent
-- CI/CD pipeline for validation → use `ci-cd-pipeline` skill
-
-## Live Repository Contracts
-
+### Live Repository Contracts
 - `tools/validate/cag_validate.py` — validation script with `--help` documentation
 - `.github/agents/*.agent.md` — agent files to validate
 - `.github/skills/*/SKILL.md` — skill files to validate
 - `.github/prompts/*.prompt.md` — prompt files to validate
 
-## Decision Rules
-
+### Decision Rules
 - **Run before commit**: Always validate after editing any `.github/` file
 - **Zero errors required**: All CAG files must pass validation with 0 errors
 - **Severity model**: ERROR (must fix), WARNING (should fix), INFO (suggestion)
@@ -44,8 +52,7 @@ description: "Load this skill when validating, debugging, or maintaining the CAG
 - **CLI usage**: `python tools/validate/cag_validate.py --type <agent|skill|prompt>` or `--file <path>`
 - **Full validation**: `python tools/validate/cag_validate.py` checks everything
 
-## Tools Script Requirements
-
+### Tools Script Requirements
 These rules apply to all scripts in `tools/` — new scripts must follow them:
 
 ### Required Interface
@@ -80,3 +87,11 @@ These rules apply to all scripts in `tools/` — new scripts must follow them:
 - Requiring a virtualenv or `pip install` step not documented in `tools/README.md`
 - Writing to `src/` or `.github/` from a validator
 - Silently ignoring parse errors — parse errors should emit `[WARN]` or `[ERROR]` and exit 1
+
+## Companion File Index
+
+- (no companion files extracted)
+
+## References
+
+- See related skills in `.github/skills/`.

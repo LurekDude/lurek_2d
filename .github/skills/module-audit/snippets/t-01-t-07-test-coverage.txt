@@ -1,0 +1,12 @@
+Test file locations (in order of precedence):
+- tests/rust/unit/<module>_tests.rs (most modules)
+- tests/rust/ext/<module>_ext_tests.rs (extended tests)
+- tests/rust/game/<module>_tests.rs (game system tests)
+- tests/rust/stress/<module>_stress_tests.rs (stress tests)
+- tests/lua/unit/test_<module>.lua (Lua BDD tests)
+
+Verification:
+1. Check Cargo.toml for [[test]] entry matching module name
+2. Check tests/lua/harness.rs for lua_test_<module> function
+3. Run: cargo test --test <module>_tests -- --nocapture (scoped, fast)
+4. Run: cargo test lua_test_<module> (if Lua tests exist)

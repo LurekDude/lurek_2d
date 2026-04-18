@@ -1,12 +1,36 @@
 ---
 name: agent-md
 description: "Load this skill when creating or maintaining merged module reference specs in docs/specs/<module>.md. It owns the required section structure, sync contract, and scaffold+validate workflow after the retirement of src/<module>/AGENT.md. Skip it for writing production Rust code, tests, or Lua scripts."
+companion_files:
+  examples: []
+  templates: []
+  snippets: [snippets/extended-notes.md]
+related_skills: []
 ---
+
+# agent-md
+
+## Mission
 
 # Module Reference Authoring and Maintenance Skill
 
-## Single-Source System
+## When To Load
 
+- Creating a new `docs/specs/<module>.md` for a new engine module
+- Updating a module reference after changing source files, public types, public functions, or Lua bindings
+- Running `tools/audit/validate_agent_md.py` to validate the merged module reference format
+- Running `tools/docs/gen_module_specs.py` to regenerate the collected sections from source
+- Reviewing whether a module reference still matches its Rust source and Lua wrapper
+
+## When To Skip
+
+- Writing production Rust code → use `rust-coding` skill
+- Writing or reviewing Lua API Rust bindings → use `lua-api-design` or `lua-rust-bridge`
+- End-to-end module quality audits → use `module-audit` skill
+
+## Domain Knowledge
+
+### Single-Source System
 Every engine module now uses one canonical documentation file:
 
 | File | Purpose | Content |
@@ -15,29 +39,13 @@ Every engine module now uses one canonical documentation file:
 
 `src/<module>/AGENT.md` has been retired. Agents should load `docs/specs/<module>.md` directly when they need module context.
 
-## Load When
-
-- Creating a new `docs/specs/<module>.md` for a new engine module
-- Updating a module reference after changing source files, public types, public functions, or Lua bindings
-- Running `tools/audit/validate_agent_md.py` to validate the merged module reference format
-- Running `tools/docs/gen_module_specs.py` to regenerate the collected sections from source
-- Reviewing whether a module reference still matches its Rust source and Lua wrapper
-
-## Owns
-
+### Owns
 - Required section structure for `docs/specs/<module>.md`
 - `tools/docs/gen_module_specs.py` generation workflow
 - `tools/audit/validate_agent_md.py` validation workflow
 - Sync contract between module specs, Rust source, docstrings, and `src/lua_api/<module>_api.rs`
 
-## Does Not Cover
-
-- Writing production Rust code → use `rust-coding` skill
-- Writing or reviewing Lua API Rust bindings → use `lua-api-design` or `lua-rust-bridge`
-- End-to-end module quality audits → use `module-audit` skill
-
-## Purpose
-
+### Purpose
 The merged spec is the canonical module reference an agent reads before working in a module. It combines the old overview content and the former deep spec content in one file so agents no longer need to chase two documentation layers.
 
 Scripts may scaffold and refresh the source-derived sections, but the Summary and Notes remain manual prose. The goal is a reference that stays accurate enough for automated checks while still carrying module-specific design context that only a human or focused agent can write well.
@@ -45,8 +53,7 @@ Scripts may scaffold and refresh the source-derived sections, but the Summary an
 Validate with: `python tools/audit/validate_agent_md.py --module <name>`
 Regenerate with: `python tools/docs/gen_module_specs.py --module <name>`
 
-## Required Format (`docs/specs/<module>.md`)
-
+### Required Format (`docs/specs/<module>.md`)
 The merged module reference must contain these sections in order:
 
 1. `# <module>`
@@ -97,49 +104,13 @@ Keep this short and factual. Minimum fields:
 ### `## Lua API Reference`
 
 - Include binding path(s) and namespace when present
-- List module functions and UserData methods as bullets
-- Must stay aligned with `src/lua_api/<module>_api.rs`
 
-### `## References`
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
-- One bullet per module dependency or closely related module
-- Explain relationship and separation of duties
-- Source-derived list can be regenerated, but the notes may need manual refinement
+## Companion File Index
 
-### `## Notes`
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-Capture anything important that does not fit above:
-- External crate constraints
-- Hardware or OS-specific behavior
-- Known omissions or sharp edges
-- Migration warnings
-- Practices future editors should not infer from the generated sections alone
+## References
 
-## Sync Contract
-
-Keep `docs/specs/<module>.md` synchronized with:
-
-| What changes | What to update |
-|--------------|----------------|
-| New `.rs` file added | `## Files` |
-| Public type added/removed | `## Types` |
-| Public function added/removed | `## Functions` |
-| Lua binding added/renamed/removed | `## Lua API Reference` |
-| Dependency added/removed | `## References` and, if behavior changes, `## Summary` or `## Notes` |
-| Scope boundary changed | `## Summary` and `## Notes` |
-| Tests moved or renamed | `## General Info` |
-
-## Scaffolding vs Manual Prose
-
-`tools/docs/gen_module_specs.py` refreshes the source-derived sections and preserves manual Summary and Notes text when it already exists.
-
-The Summary should not be treated as boilerplate. It must be reviewed and expanded module by module using the actual source code. The generated structure is only the starting point.
-
-## Anti-Patterns
-
-- Reintroducing `src/<module>/AGENT.md` as a second source of truth
-- Leaving Summary as one generic sentence after regeneration
-- Listing files, types, or functions that no longer exist
-- Copying Lua API descriptions without checking `src/lua_api/<module>_api.rs`
-- Treating the generated sections as a substitute for Notes when important caveats exist
-- Leaving `TODO:` placeholders in committed module references
+- See related skills in `.github/skills/`.

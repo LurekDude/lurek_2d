@@ -1,0 +1,4 @@
+SetCanvas(Some(key))  → end screen pass, begin canvas render pass to CanvasKey texture
+(draw calls render to canvas)
+SetCanvas(None)       → end canvas pass, resume screen pass
+DrawCanvas(key, ...)  → sample canvas texture as a quad

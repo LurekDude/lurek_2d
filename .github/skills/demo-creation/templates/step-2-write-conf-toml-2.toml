@@ -1,0 +1,3 @@
+[modules]
+physics = true   # only if lurek.physics.* is used
+audio   = false  # suppress audio init if demo is silent

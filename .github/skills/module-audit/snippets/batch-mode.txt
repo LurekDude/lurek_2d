@@ -1,0 +1,8 @@
+════════════════════════════════════════════════════════
+  BATCH AUDIT SUMMARY (46 modules)
+════════════════════════════════════════════════════════
+
+  PASS:   timer, math, input, ...
+  FAIL:   physics, audio, animation, ...
+
+  PASS: 12 / 46 modules

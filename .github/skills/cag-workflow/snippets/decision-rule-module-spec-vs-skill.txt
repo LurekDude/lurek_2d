@@ -1,0 +1,8 @@
+Is the knowledge MODULE-SPECIFIC (types, patterns, invariants for one src/ module)?
+  → Module spec in docs/specs/<module>.md
+
+Is it a REUSABLE WORKFLOW or domain pattern used across multiple files/modules?
+  → Skill in .github/skills/<name>/SKILL.md
+
+Is it a COMPLETE TASK PLAYBOOK (series of steps to accomplish a deliverable)?
+  → Prompt in .github/prompts/<verb>-<noun>.prompt.md

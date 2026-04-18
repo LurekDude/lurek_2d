@@ -1,0 +1,6 @@
+1. Read src/lib.rs
+2. Search for `pub mod <module>;`
+3. If module has Lua API:
+   a. Search src/lua_api/mod.rs for `pub mod <module>_api;`
+   b. Search src/lua_api/mod.rs `create_lua_vm()` for registration call
+4. PASS if all found, ERROR if any missing

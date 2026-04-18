@@ -1,0 +1,10 @@
+describe("Body:applyForce", function()
+    it("changes velocity after step", function()
+        local world = lurek.physics.newWorld(0, 0)  -- no gravity
+        local body = lurek.physics.newBody(world, 0, 0, "dynamic")
+        body:applyForce(100, 0)
+        lurek.physics.step(world, 1.0 / 60)
+        local vx, vy = body:getLinearVelocity()
+        expect_greater(vx, 0, "force must produce positive x velocity")
+    end)
+end)

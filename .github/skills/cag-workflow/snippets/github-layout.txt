@@ -1,0 +1,7 @@
+.github/
+├── copilot-instructions.md    — system prompt (always-on backbone)
+├── agents/                    — specialist agent roles (.agent.md)
+│   └── README.md              — index listing every agent with mission summary
+├── skills/                    — reusable domain knowledge (.../SKILL.md)
+│   └── <name>/SKILL.md
+└── prompts/                   — task-driven playbooks (.prompt.md)

@@ -1,0 +1,3 @@
+#file:content/examples/timer.lua  #file:docs/specs/timer.md
+Expand every -- ── stub section into working Lua code following the rules in
+.github/prompts/flesh-out-example.prompt.md

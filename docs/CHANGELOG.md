@@ -2,6 +2,32 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [0.19.0] — 2026-04-18
+### Changed
+- **CAG P3 — Skills refactor**: All 33 `.github/skills/*/SKILL.md` files restructured to the standard 6-section template (`Mission`, `When To Load`, `When To Skip`, `Domain Knowledge`, `Companion File Index`, `References`) with full YAML frontmatter (`name`, `description`, `companion_files`, `related_skills`). Extracted 222 fenced code blocks into 244 companion files under `examples/` (123), `templates/` (11), and `snippets/` (110). Skill-scope validator errors dropped from 850 → 0; E201 (forbidden fences) 450 → 0; E205 (missing sections) 190 → 0. Refactor performed by `work/cag-system-overhaul-20260418/scripts/p3_skills_refactor.py`.
+
+### Added
+- 5 new Lunasome libraries: `library.loot` (Walker–Vose alias RNG + drop DSL), `library.narrative` (Ink-flavoured branching narrative interpreter), `library.roguelike` (FOV + energy scheduler + Dijkstra goal-maps), `library.cinematic` (multi-track scrubbable cutscene timeline), `library.rhythm` (BPM-locked event sequencer over `lurek.audio`).
+- 5 cross-module integration tests under `tests/lua/integration/` pairing libraries with `lurek.event`, `lurek.codec`, `lurek.time`, `lurek.physics`, `lurek.tween`.
+- `example.lua` for every Lunasome library (21 total).
+- New `library-authoring` skill in `.github/skills/`.
+- `tools/docs/gen_lib_docs.py` extended (+394 LOC) with 6 new LDoc tags (`@field`, `@tparam`, `@return`, `@see`, `@raise`, `@within`), `--check` mode, and aggregate output `docs/API/library-docs.md` (1,310 functions, 22 sections).
+- VS Code task `Docs: Generate Library API`.
+### Changed
+- All 16 existing Lunasome libraries refactored: LDoc docstrings, `@see` cross-links, runtime `lurek.*` namespace usage (img/codec/savegame/time/entity/localization/graphic/particles/postfx/fs/pathfinding/modding/platform).
+- `library.patterns` deprecated and renamed to `library.scheduler`; `patterns` is now a proxy stub.
+- `content/library/README.md` rewritten with current 21-library table.
+- System prompt library catalogue expanded from 12 to 22 entries; Cross-Artifact Sync table gained a library row; integration-test naming convention added.
+### Fixed
+- `crafting/init.lua`: 5 silently-overwriting factory redefinitions removed.
+- `item/init.lua`: `newStack` and `newStackBuilder` duplicate redefinitions removed.
+- `doll/init.lua:405`: broken `lurek.gfx` reference fixed.
+- `rpc/init.lua`: bare `unpack(...)` replaced with `(table.unpack or unpack)` for `lua54` Cargo feature compatibility.
+- `province_map` README mislabelled "✨ Proxy" — corrected.
+### Notes
+- Local Rust toolchain was unavailable; full `cargo test`/`cargo clippy` verification is deferred to a follow-up Rust-capable session.
+- 15 Lua-to-Rust lift candidates documented in `work/library-overhaul-20260418/reports/P4_lift_candidates.md` for future engine work.
+
 ## [0.18.3] — 2026-04-17
 ### Changed
 - **tests/lua/unit/test_gui.lua**: Added 5 migrated behavioral tests — `SpinBox` increment with

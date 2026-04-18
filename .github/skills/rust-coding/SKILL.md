@@ -1,40 +1,48 @@
 ---
 name: rust-coding
 description: "Load this skill when writing or reviewing Rust code in the Lurek2D engine. It owns safe Rust conventions, error handling patterns, module structure, and idiomatic Rust for game engine development. Skip it for Lua scripting, CAG files, or documentation."
+companion_files:
+  examples: [examples/module-group-system.rs]
+  templates: []
+  snippets: []
+related_skills: []
 ---
+
+# rust-coding
+
+## Mission
 
 # Rust Coding — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Writing new Rust code in any `src/` module
 - Reviewing Rust code for convention compliance
 - Fixing Rust compilation errors or clippy warnings
 - Refactoring Rust code for clarity or safety
 
-## Owns
-
-- Safe Rust coding conventions for Lurek2D
-- Error handling with `Result<T>` and `EngineError`
-- `Rc<RefCell<SharedState>>` usage patterns
-- Module visibility rules (`pub` vs `pub(crate)`)
-- Import style (absolute paths)
-
-## Does Not Cover
+## When To Skip
 
 - Lua scripting patterns → use `lua-scripting` skill
 - Graphics pipeline specifics → use `gpu-programming` skill
 - Physics algorithms → use `physics-engine` skill
 - Performance optimization → use `performance-profiling` skill
 
-## Live Repository Contracts
+## Domain Knowledge
 
+### Owns
+- Safe Rust coding conventions for Lurek2D
+- Error handling with `Result<T>` and `EngineError`
+- `Rc<RefCell<SharedState>>` usage patterns
+- Module visibility rules (`pub` vs `pub(crate)`)
+- Import style (absolute paths)
+
+### Live Repository Contracts
 - `src/lib.rs` — all module re-exports via `pub mod`
 - `src/runtime/error.rs` — `EngineError` enum definition
 - `src/lua_api/mod.rs` — `SharedState` struct and `create_lua_vm()` function
 
-## Decision Rules
-
+### Decision Rules
 - **No `unsafe`** unless absolutely necessary — document with `// SAFETY:` comment
 - **Error propagation**: Use `?` operator, never `.unwrap()` in production paths
 - **Visibility**: Default to `pub(crate)`, use `pub` only for cross-crate API
@@ -46,8 +54,7 @@ description: "Load this skill when writing or reviewing Rust code in the Lurek2D
 - **Testing**: Every public function should have at least one test
 - **Naming**: Types are `PascalCase`, functions are `snake_case`, constants are `SCREAMING_SNAKE_CASE`
 
-## Module Group System
-
+### Module Group System
 Lurek2D source is organized in five responsibility groups — no cycles, ever:
 
 | Group | Modules | May import |
@@ -60,23 +67,11 @@ Lurek2D source is organized in five responsibility groups — no cycles, ever:
 | Lunasome | `content/library/` (pure Lua) | Public `lurek.*` API only |
 
 **Forbidden import patterns:**
-```rust
-// WRONG — same-group cross-import (Platform Services)
-use crate::render::GpuRenderer;    // from inside src/audio/
-use crate::audio::Mixer;           // from inside src/render/ — FORBIDDEN (same-group Platform Services cross-import)
-
-// WRONG — domain module importing lua_api
-use crate::lua_api::something;     // from inside src/physics/
-
-// CORRECT — importing from a lower group
-use crate::runtime::SharedState;   // Platform Services importing Core Runtime
-use crate::math::Vec2;             // any group importing Foundations
-```
+> See [examples/module-group-system.rs](examples/module-group-system.rs) for the example.
 
 **Rule**: Before adding a `use crate::` statement, check whether it crosses group boundaries upward. If it does, refactor — never add an exception.
 
-## Build Commands Reference
-
+### Build Commands Reference
 Use scoped commands during development. Full `cargo test` only at commit time:
 
 | When | Command |
@@ -89,11 +84,18 @@ Use scoped commands during development. Full `cargo test` only at commit time:
 
 **Never run `cargo build` or full `cargo test` during development** — they rebuild the entire engine (~4 min cold) and block parallel work.
 
-## Avoid
-
+### Avoid
 - `String::from(...)` or `.to_string()` in hot paths (per-frame code) — pre-allocate or use `&str`
 - Unnecessary `.clone()` — pass references or redesign ownership if you find yourself cloning in a loop
 - `println!` in engine code — always use `log::info!`, `log::warn!`, `log::error!`, `log::debug!`
 - `let _ = result;` — silently discarding errors; use `?` or explicitly handle
 - Lua game logic inside `src/lua_api/` rust closures — keep lua_api thin; business logic belongs in domain modules
 - `.unwrap()` and `.expect()` outside of tests and CLI tooling
+
+## Companion File Index
+
+- [examples/module-group-system.rs](examples/module-group-system.rs) — Module Group System
+
+## References
+
+- See related skills in `.github/skills/`.

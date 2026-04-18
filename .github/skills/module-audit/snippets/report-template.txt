@@ -1,0 +1,21 @@
+════════════════════════════════════════════════════════
+  LUREK2D MODULE AUDIT: <module> -- FAIL
+════════════════════════════════════════════════════════
+
+  Phase 1 - Structure & Registration
+    [+] PASS     S-01  lib.rs registration
+    [!] WARNING  S-02  mod.rs simplicity — 45 lines of logic
+    [+] PASS     S-03  File size limits
+    ...
+
+  Phase 2 - AGENT.md Quality
+    [+] PASS     A-01  AGENT.md exists
+    [X] ERROR    A-02  Template structure — missing Key Types section
+    ...
+
+════════════════════════════════════════════════════════
+  SCORE: 32 PASS / 6 WARNING / 5 ERROR / 21 MANUAL -> FAIL
+════════════════════════════════════════════════════════
+
+  REQUIRED ACTIONS (ERRORs):
+    1. A-02: Add Key Types section to AGENT.md

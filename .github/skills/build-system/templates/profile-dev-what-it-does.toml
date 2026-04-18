@@ -1,0 +1,6 @@
+opt-level = 1          # fast enough for smooth iteration; game code is debuggable
+incremental = true     # incremental compilation — much faster rebuilds
+debug = "line-tables-only"  # file+line info for backtraces; no full DWARF (saves ~20MB)
+
+[profile.dev.package."*"]
+opt-level = 3          # all dependencies at full speed even in dev

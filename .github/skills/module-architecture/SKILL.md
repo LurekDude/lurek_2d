@@ -1,38 +1,46 @@
 ---
 name: module-architecture
 description: "Load this skill when designing module boundaries, dependency direction, or crate organization for Lurek2D. It owns the dependency graph, module responsibility rules, and visibility patterns. Skip it for code implementation or API naming."
+companion_files:
+  examples: []
+  templates: []
+  snippets: []
+related_skills: []
 ---
+
+# module-architecture
+
+## Mission
 
 # Module Architecture — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Creating a new module in `src/`
 - Evaluating dependency direction between modules
 - Refactoring module boundaries
 - Checking for dependency violations
 
-## Owns
+## When To Skip
 
+- Code implementation → use `rust-coding` skill
+- Lua API naming → use `lua-api-design` skill
+- Performance structure → use `performance-profiling` skill
+
+## Domain Knowledge
+
+### Owns
 - Module dependency graph and direction rules
 - Module responsibility assignments
 - `pub` vs `pub(crate)` visibility decisions
 - `lib.rs` module registration
 - New module creation checklist
 
-## Does Not Cover
-
-- Code implementation → use `rust-coding` skill
-- Lua API naming → use `lua-api-design` skill
-- Performance structure → use `performance-profiling` skill
-
-## Live Repository Contracts
-
+### Live Repository Contracts
 - `src/lib.rs` — module re-exports (`pub mod`)
 - All `src/*/mod.rs` files — module structure and exports
 
-## Decision Rules
-
+### Decision Rules
 - **Five-group responsibility model** (strict — see `docs/architecture/engine-architecture.md`):
   - **Foundations**: `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` — pure algorithms and data, no render/audio/input/Lua deps
   - **Core Runtime**: `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` — engine lifecycle, timing, events, threading
@@ -46,3 +54,11 @@ description: "Load this skill when designing module boundaries, dependency direc
 - **Visibility**: Default to `pub(crate)`; use `pub` only for types used by `tests/` or external consumers
 - **New module checklist**: Create directory, add `mod.rs`, add `pub mod` to `lib.rs` when it belongs in the Rust crate surface, and add tests in the correct registered test family
 - **Math is special**: `Vec2`, `Mat3`, `Rect` are foundational — all modules may depend on `math`
+
+## Companion File Index
+
+- (no companion files extracted)
+
+## References
+
+- See related skills in `.github/skills/`.

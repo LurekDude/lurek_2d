@@ -1,11 +1,20 @@
 ---
 name: testing-rust
 description: "Load this skill when writing or organizing tests for the Lurek2D engine. It owns test patterns, float comparison strategies, test naming, and integration test architecture for both Rust and Lua BDD tests. Skip it for writing production code."
+companion_files:
+  examples: [examples/2-adding-a-new-rust-integration.rs, examples/3-1-create-the-lua-file.lua, examples/3-1-create-the-lua-file-2.lua, examples/3-1-create-the-lua-file-3.lua, examples/3-1-create-the-lua-file-4.lua, examples/3-2-harness-registration.rs, examples/test-structure.lua, examples/performance-and-golden-helpers.lua, examples/6-test-vm-helpers-rust-side.rs, examples/lua-golden-tests-compare-only-files.lua, examples/syntax.lua, examples/syntax-2.lua, examples/tier-1-headless-state-readback-preferred.lua, examples/tier-2-canvas-pixel-readback-headless.lua, examples/tier-3-runtime-smoke-tests-gpu.rs, examples/syntax-4.lua, examples/canvas-pixel-readback-headless.lua, examples/file-evidence.lua, examples/runtime-smoke-tests-gpu-required.rs, examples/lua-golden-tests.lua, examples/stress-test-output-format.lua, examples/recognized-patterns.lua, examples/example-well-named-describe-blocks.lua, examples/evidence-tests-file-output-required.lua, examples/golden-tests-compare-only.lua, examples/covers-markers-required.lua]
+  templates: []
+  snippets: [snippets/1-test-architecture-overview.txt, snippets/2-adding-a-new-rust-integration-2.ps1, snippets/running-quality-gates.ps1, snippets/analytics-tools.ps1, snippets/adding-missing-docs.ps1, snippets/rust-golden-tests-byte-level.ps1, snippets/syntax-3.ps1, snippets/coverage-scanner.ps1, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# testing-rust
+
+## Mission
 
 # Testing — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Writing new tests in `tests/` or `tests/lua/`
 - Adding a Lua test registration entry to `tests/lua/harness.rs`
@@ -14,8 +23,17 @@ description: "Load this skill when writing or organizing tests for the Lurek2D e
 - Organizing or auditing test structure
 - Running quality gates before a commit
 
-## Owns
+## When To Skip
 
+- Fixing production bugs found by tests → route to Developer
+- Performance benchmarking → `performance-profiling` skill
+- CI/CD pipeline setup → `ci-cd-pipeline` skill
+- Lua API design → `lua-api-design` skill
+---
+
+## Domain Knowledge
+
+### Owns
 - Rust integration test patterns (`tests/<module>_tests.rs`)
 - Lua BDD test patterns and framework API (`tests/lua/*/test_*.lua`)
 - Harness registration (`tests/lua/harness.rs`)
@@ -23,17 +41,7 @@ description: "Load this skill when writing or organizing tests for the Lurek2D e
 - Test naming conventions
 - Coverage tools
 
-## Does Not Cover
-
-- Fixing production bugs found by tests → route to Developer
-- Performance benchmarking → `performance-profiling` skill
-- CI/CD pipeline setup → `ci-cd-pipeline` skill
-- Lua API design → `lua-api-design` skill
-
----
-
-## 1. Test Architecture Overview
-
+### 1. Test Architecture Overview
 Lurek2D has a **two-layer test system** that runs entirely via `cargo test`:
 
 | Layer | Location | Runner |
@@ -46,780 +54,63 @@ Lurek2D has a **two-layer test system** that runs entirely via `cargo test`:
 | Lua BDD (stress) | `tests/lua/stress/test_<name>_stress.lua` | `tests/lua/harness.rs` via `cargo test` |
 | Lua BDD (validation) | `tests/lua/validation/test_<name>.lua` | `tests/lua/harness.rs` via `cargo test` |
 
-```
-tests/
-├── *.rs                      ← Rust integration tests (auto-discovered)
-├── golden_tests.rs           ← golden binary comparison harness
-├── stress/                   ← slow Rust benchmarks (Cargo.toml [[test]])
-├── lua/
-│   ├── init.lua              ← BDD framework (describe/it/expect_* globals)
-│   ├── harness.rs            ← Rust dispatcher — 1 #[test] per Lua file
-│   ├── unit/                 ← test_<module>.lua
-│   ├── integration/          ← test_<a>_<b>.lua
-│   ├── stress/               ← test_<name>_stress.lua
-│   ├── validation/           ← test_<name>.lua
-│   └── golden/               ← deterministic golden output tests
-└── golden/
-    ├── expected/             ← committed baseline artifacts
-    └── actual/               ← runtime output (.gitignore-d)
-```
+> See [snippets/1-test-architecture-overview.txt](snippets/1-test-architecture-overview.txt) for the example.
 
 ---
 
-## 2. Adding a New Rust Integration Test File
-
+### 2. Adding a New Rust Integration Test File
 **Step 1 — Create the file** at `tests/<module>_tests.rs`. Cargo discovers all `tests/*.rs` automatically; no Cargo.toml entry needed.
 
 **Step 2 — Skeleton:**
-```rust
-//! Integration tests for luna2d::<module>.
-
-use luna2d::<module>::SomeType;
-
-// ── Basic Construction ────────────────────────────────────────────────────────
-
-#[test]
-fn new_creates_default_state() {
-    let t = SomeType::new();
-    assert_eq!(t.count(), 0);
-}
-
-// ── Boundary Conditions ───────────────────────────────────────────────────────
-
-#[test]
-fn zero_input_returns_identity() {
-    let result = SomeType::transform(0.0, 0.0);
-    assert!((result - 0.0).abs() < 1e-5);
-}
-```
+> See [examples/2-adding-a-new-rust-integration.rs](examples/2-adding-a-new-rust-integration.rs) for the example.
 
 **Step 3 — Run:**
-```powershell
-cargo test --test <module>_tests
-```
+> See [snippets/2-adding-a-new-rust-integration-2.ps1](snippets/2-adding-a-new-rust-integration-2.ps1) for the example.
 
 **Naming rules:**
 - Function name: `<subject>_<scenario>_<expected>` — e.g., `body_zero_velocity_stays_still`
 - No `test_` prefix — redundant; hurts `cargo test` output readability
-- Section headers: `// ── Category ───────────...` for grouping
 
-**Float rule:** `assert!((actual - expected).abs() < 1e-5)` — NEVER `assert_eq!` on `f32`/`f64`.
-
-**Boundary conditions required:**
-- Zero values
-- Negative values
-- Large values
-- Empty collections
-- Single-element collections
-
----
-
-## 3. Adding a New Lua Test File
-
-### 3.1 Create the Lua file
-
-**Unit test** — tests one `lurek.*` module in isolation:
-
-```lua
--- tests/lua/unit/test_<module>.lua
--- Lurek2D <Module> API Tests
--- Covers namespace surface, constructors, and representative edge cases.
-
--- @description Groups module-level surface checks for lurek.<module>.
-describe("lurek.<module> module exists", function()
-    -- @description Verifies the module namespace is present as a Lua table.
-    it("is a table", function()
-        expect_type("table", lurek.<module>)
-    end)
-end)
-
--- @description Covers one concrete function family in the module.
-describe("lurek.<module>.<function>", function()
-    -- @description Verifies the function returns a non-nil numeric result for valid input.
-    it("returns expected type", function()
-        local result = lurek.<module>.<function>(...)
-        expect_not_nil(result)
-        expect_type("number", result)
-    end)
-
-    -- @description Verifies the numeric result matches the expected value within tolerance.
-    it("numeric results match within tolerance", function()
-        expect_near(3.14159, lurek.<module>.pi, 0.0001)
-    end)
-end)
-
-test_summary()  -- REQUIRED: must be last line in every Lua test file
-```
-
-**Integration test** — crosses two modules (`tests/lua/integration/test_<a>_<b>.lua`):
-```lua
-describe("<a> + <b> integration", function()
-    it("uses <a> output as <b> input", function()
-        local world_id = lurek.physics.newWorld(0, 100)
-        local body_id = lurek.physics.newBody(world_id, 50, 50, "dynamic")
-        local x, y = body_id:getPosition()
-        expect_near(50, x, 0.1)
-        lurek.physics.destroyWorld(world_id)
-    end)
-end)
-test_summary()
-```
-
-**Stress test** (`tests/lua/stress/test_<name>_stress.lua`):
-```lua
-describe("<name> stress", function()
-    it("handles N iterations without error", function()
-        for i = 1, 10000 do
-            -- exercise the hot path
-        end
-        expect_true(true, "completed without error")
-    end)
-end)
-test_summary()
-```
-
-**Validation test** (`tests/lua/validation/test_<name>.lua`):
-```lua
-describe("<name> contract", function()
-    it("rejects invalid argument type", function()
-        expect_error(function()
-            lurek.<module>.<fn>("not_a_number")
-        end)
-    end)
-end)
-test_summary()
-```
-
-### 3.2 Harness Registration
-
-Lua test files are **not** auto-discovered in this repository. After creating a new `.lua` file, add the matching `#[test]` entry to `tests/lua/harness.rs`.
-
-Required pattern:
-```rust
-#[test]
-fn lua_test_<name>() {
-    run_lua_test("unit/test_<name>.lua");
-}
-```
-
----
-
-## 4. Lua BDD Framework API Reference
-
-The framework is provided by `tests/lua/init.lua` and loaded automatically. Do not require/import it.
-
-### Test structure
-```lua
--- Plain file header prose lives here. Do not use @description for file headers.
-
--- @description Suite summary for the describe block below.
-describe("suite name", function()
-    -- @covers lurek.modulename.someFunction
-    -- @description Exact behavior asserted by the test case below.
-    it("description of one behaviour", function()
-        -- assertions here
-    end)
-end)
-test_summary()
-```
-
-- `describe(name, fn)` — defines a test suite; errors in setup are caught and reported
-- `it(name, fn)` — defines one test case; failure is recorded but execution continues
-- `test_summary()` — prints pass/fail totals; must be the last call in every test file
-
-### Lua test documentation standard
-
-- Top-of-file comments are plain prose only. They explain what the file tests and any headless or evidence constraints.
-- Do **not** use `-- @description` as a file-level banner.
-- Keep the file header short. It is plain prose, not a docstring block.
-- Every `describe()` block requires exactly one `-- @description <text>` line immediately above it.
-- The `describe()` comment block owns only that `@description` line. Do not attach `@covers`, `@evidence`, `@golden`, or other markers to `describe()`.
-- Every `it()` block requires exactly one `-- @description <text>` line immediately above it.
-- Place ownership markers such as `@covers`, `@evidence`, `@golden`, and similar metadata on the `it()` block that actually asserts or produces the behavior.
-- Use `-- @description <text>` without a colon. `-- @description:` is legacy and should be normalized.
-- `-- @category: ...` markers are not part of the standard and must not be added.
-- Nested `describe()` blocks are allowed when they express a real API grouping. Keep nesting shallow; prefer at most two levels.
-- `test_summary()` must be the last non-empty line in the file. Never write `return test_summary()`.
-- Audit and normalize with `python tools/audit/lua_test_structure_audit.py` and `python tools/audit/lua_test_structure_audit.py --fix`. The default audit now enforces the marker-ownership rule; use `--allow-legacy-describe-markers` only as a temporary escape hatch while repairing older files.
-
-### Assertions
-
-| Function | Use for |
-|---|---|
-| `expect_equal(expected, actual, msg)` | Strings, integers, booleans — exact match |
-| `expect_not_equal(a, b, msg)` | Assert values differ |
-| `expect_near(expected, actual, tol, msg)` | All floats; `tol` default `0.0001` |
-| `expect_true(val, msg)` | Value is truthy (non-false, non-nil) |
-| `expect_false(val, msg)` | Value is falsy |
-| `expect_nil(val, msg)` | Value is nil |
-| `expect_not_nil(val, msg)` | Value is not nil |
-| `expect_type(type_str, val, msg)` | `type(val) == type_str` (e.g., `"table"`, `"function"`, `"number"`) |
-| `expect_error(fn, msg)` | `fn()` must raise a Lua error |
-| `expect_no_error(fn, msg)` | `fn()` must not raise a Lua error |
-| `expect_greater(a, b, msg)` | Assert `a > b` |
-| `expect_less(a, b, msg)` | Assert `a < b` |
-| `expect_in_range(val, min, max, msg)` | Assert `min <= val <= max` |
-| `expect_contains(tbl, value, msg)` | Assert `value` appears in table |
-| `expect_match(str, pattern, msg)` | Assert Lua string pattern matches |
-| `expect_length(tbl, n, msg)` | Assert `#tbl == n` |
-| `expect_deep_equal(expected, actual, msg)` | Recursive table equality |
-
-**Never use `assert()` directly** — it aborts the suite rather than recording a failure.
-
-### Performance and Golden helpers
-
-```lua
--- measure(name, count, fn) — wraps fn(), prints [PERF] line, returns elapsed, ops_per_sec
-local elapsed, ops = measure("ecs_create", 10000, function()
-    for i = 1, 10000 do lurek.ecs.newEntity() end
-end)
-expect_less(elapsed, 1.0, "10k ECS entity creates must finish under 1s")
-
--- expect_golden(name, data, expected) — deterministic inline comparison
-expect_golden("path_result", lurek.pathfinding.findPath(...), "[(1,1),(2,1),(3,1)]")
-
--- expect_canvas_pixel(canvas, x, y, r, g, b, a, tolerance, msg)
--- Reads canvas:getPixel(x, y) and checks each RGBA channel within tolerance
-local canvas = lurek.gfx.newCanvas(64, 64)
-canvas:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 64, 64)
-end)
-expect_canvas_pixel(canvas, 32, 32, 1.0, 0.0, 0.0, 1.0, 0.05, "center pixel must be red")
-```
-
----
-
-## 5. Headless VM — What Is / Is Not Available
-
-`harness.rs` creates the VM via `create_test_vm()`, which is a full Lurek2D VM but **without a window, GPU, or audio device**. All `lurek.*` API tables are registered.
-
-| Available in Lua tests | Not available |
-|---|---|
-| `lurek.math.*` | `lurek.gfx.draw*` (no GPU) |
-| `lurek.physics.*` | `lurek.audio.newSource` (no audio device) |
-| `lurek.time.*` | Any API that calls `winit` window methods |
-| `lurek.input.*` (state, no events) | `lurek.window.setSize` |
-| `lurek.ecs.*` | Rendering commands |
-| `lurek.data.*`, `lurek.savegame.*` | — |
-| `lurek.tilemap.*`, `lurek.ai.*` | — |
-| Built-in Lua: `math.*`, `string.*`, `table.*` | — |
-
-**Important:** Use built-in `math.rad()` / `math.abs()` for pure math operations in tests — not `lurek.math.*` — to avoid introducing test dependencies on the math binding.
-
----
-
-## 6. Test VM Helpers (Rust Side)
-
-Both helpers are defined in `tests/lua/harness.rs` and reused across all Lua-dispatching test suites.
-
-```rust
-// Full VM with test framework loaded — use for Lua test files
-fn create_test_vm() -> mlua::Lua { ... }
-
-// Returns (Rc<RefCell<SharedState>>, Lua) for stateful Rust-side tests
-fn make_vm() -> (Rc<RefCell<SharedState>>, mlua::Lua) { ... }
-```
-
-For Rust-only integration tests that need a Lua VM call a variant from the appropriate test file's own helpers (e.g., `make_audio_vm()` in `audio_tests.rs`).
-
----
-
-## 7. Coverage and Quality Tools
-
-### Running quality gates
-```powershell
-cargo test                          # all tests — must exit 0
-cargo test --test <module>_tests    # one Rust file
-cargo test lua_test_<module>        # one Lua unit test dispatch
-cargo clippy -- -D warnings         # lint — must exit 0
-cargo fmt --check                   # format check
-```
-
-### Analytics tools
-```powershell
-python tools/audit/test_coverage.py                  # coverage metrics → docs/logs/test_coverage.json
-python tools/audit/integration_coverage.py           # Lua integration coverage map
-python tools/docs/collect_docs.py --report-missing  # undocumented public items (exit 1 if any)
-python tools/audit/quality_report.py                 # combined quality snapshot
-python tools/audit/lua_api_test_coverage.py          # per-function API coverage (marker + heuristic)
-python tools/audit/test_analytics.py --worst 10     # 10 lowest-scoring modules (planned)
-```
-
-### Adding missing docs
-```powershell
-python tools/docs/collect_docs.py --suggest         # starter /// lines for undocumented items
-```
-
-### What "covered" means
-- **Rust module covered**: `tests/<module>_tests.rs` exists AND has ≥1 `#[test]` for every `pub fn`
-- **Lua module covered**: `tests/lua/unit/test_<module>.lua` exists AND is registered in `harness.rs`
-- **New API covered**: at least one test added in the same PR/commit that adds the API
-
----
-
-## 8. Golden Tests
-
-### Rust golden tests (byte-level)
-
-Rust golden tests compare deterministic engine-internal output against a committed baseline file.
-
-**Baseline files:** `tests/rust/golden/expected/<category>/<name>.<ext>`
-**Runtime output:** `tests/rust/golden/actual/<category>/` (git-ignored)
-
-Categories now focus on renderer/internal artifacts, for example `image/` and `raycaster/`.
-
-**To add a new Rust golden test:**
-1. Add expected file to `tests/rust/golden/expected/<category>/`
-2. Add a `#[test]` in `tests/rust/golden/harness.rs` using `assert_golden("category/name.ext", ...)`
-3. Run once to confirm match: `cargo test --test golden_tests`
-
-**To update a baseline** (when intentional output change):
-```powershell
-cargo test --test golden_tests -- --nocapture
-# copy tests/rust/golden/actual/<file> to tests/rust/golden/expected/<file>
-```
-
-### Lua golden tests (compare-only files)
-
-Lua golden tests compare an evidence file against a committed sample under `tests/lua/golden/samples/`. They do **not** create content inline.
-
-```lua
--- tests/lua/golden/test_data_golden.lua
--- Golden tests compare pre-generated evidence only.
-
-describe("data TOML round-trip golden", function()
-    it("matches the committed TOML sample", function()
-        expect_golden_text_match(
-            "save/golden_text/migrated_rust/data/toml_roundtrip.toml",
-            "tests/lua/golden/samples/migrated_rust/data/toml_roundtrip.toml"
-        )
-    end)
-end)
-
-test_summary()
-```
-
-**Rules for Lua golden tests:**
-- Golden files compare only; they must not call `lurek.*`, `savePNG`, `saveWAV`, or write files.
-- The evidence artifact must already exist from an evidence test.
-- Samples live in `tests/lua/golden/samples/<module>/` or `tests/lua/golden/samples/migrated_rust/`.
-- All Lua golden test files live in `tests/lua/golden/test_<module>_golden.lua`.
-- Use `expect_golden_text_match()` or `expect_golden_file_match()` from `tests/lua/init.lua`.
-
----
-
-## 9. Marker Annotations — `@covers`
-
-Lua test files declare which API functions they verify using `-- @covers` markers. The coverage scanner (`tools/audit/lua_api_test_coverage.py`) reads these for accurate per-function tracking.
-
-### Syntax
-
-```lua
--- @covers lurek.physics.newWorld
--- @covers lurek.physics.newBody
--- @covers Body:applyForce
-describe("lurek.physics world creation", function()
-    it("creates a world with gravity", function()
-        local world = lurek.physics.newWorld(0, 980)
-        expect_not_nil(world)
-    end)
-end)
-```
-
-**Placement rules:**
-- One `-- @covers` line per API function
-- Place the block **before** the `describe` or `it` that tests the function
-- Module functions: `-- @covers lurek.<module>.<function>`
-- UserData methods: `-- @covers <ClassName>:<method>`
-- The scanner regex: `^--\s*@covers\s+(lurek\.\w+\.\w+|\w+:\w+)\s*$`
-
-**Describe-block naming as implicit coverage:**
-
-Name every `describe()` block after the exact API function it tests. The scanner extracts these as secondary coverage Evidence:
-
-```lua
-describe("lurek.audio.newBus", function()  -- module function
-    it("creates bus with given name", ...)
-    it("rejects empty name", ...)           -- error path earns a bonus score point
-end)
-
-describe("AudioBus:setVolume", function()  -- UserData method
-    it("stores volume", ...)
-    it("clamps to [0,1]", ...)
-end)
-```
-
-**Running the scanner:**
-```powershell
-python tools/audit/lua_api_test_coverage.py                # per-module coverage bars
-python tools/audit/lua_api_test_coverage.py --json         # JSON output
-python tools/audit/lua_api_test_coverage.py --markdown     # Markdown report
-python tools/audit/lua_api_test_coverage.py --suggest      # suggest missing markers
-python tools/audit/lua_api_test_coverage.py --strict --threshold 40  # exit 1 if below 40%
-```
-
----
-
-## 10. Evidence-Based Testing
-
-Some API functions can only be proven correct through observable side effects. Evidence testing provides three tiers.
-
-### Tier 1 — Headless State Readback (preferred)
-
-Query engine state after API calls. Works in the headless test VM without GPU or audio.
-
-```lua
-describe("Body:applyForce", function()
-    it("changes velocity after step", function()
-        local world = lurek.physics.newWorld(0, 0)  -- no gravity
-        local body = lurek.physics.newBody(world, 0, 0, "dynamic")
-        body:applyForce(100, 0)
-        lurek.physics.step(world, 1.0 / 60)
-        local vx, vy = body:getLinearVelocity()
-        expect_greater(vx, 0, "force must produce positive x velocity")
-    end)
-end)
-```
-
-### Tier 2 — Canvas Pixel Readback (headless GPU simulation)
-
-Draw to a Canvas and read pixels back. Proves rendering functions produce output.
-
-```lua
--- @covers lurek.gfx.rectangle
--- @evidence pixel
-describe("lurek.gfx.rectangle", function()
-    it("fills rectangle region with current color", function()
-        local canvas = lurek.gfx.newCanvas(64, 64)
-        canvas:renderTo(function()
-            lurek.gfx.setColor(1, 0, 0, 1)
-            lurek.gfx.rectangle("fill", 0, 0, 64, 64)
-        end)
-        expect_canvas_pixel(canvas, 32, 32, 1.0, 0.0, 0.0, 1.0, 0.05,
-            "center pixel must be red after filled rectangle")
-    end)
-end)
-```
-
-### Tier 3 — Runtime Smoke Tests (GPU required)
-
-Full rendering pipeline with screenshot. Lives in `tests/rust/ext/` only — not callable from headless Lua tests.
-
-```rust
-// tests/rust/ext/graphics_runtime_smoke_tests.rs
-#[test]
-fn rectangle_render_smoke() {
-    // Launch game process, render one frame, save screenshot, compare pixel
-}
-```
-
-### Evidence Tags in Test Files
-
-| Tag | Purpose |
-|---|---|
-| `-- @evidence pixel` | Test uses Canvas pixel readback for visual proof |
-| `-- @evidence file` | Test writes an output file as evidence |
-| `-- @stress` | Test measures throughput performance |
-| `-- @golden` | Test compares against a golden baseline |
-
----
-
-## 9. Checklist — New Test Before Merge
-
-- [ ] Every new public `fn`/`struct` has at least one test
-- [ ] New Rust test does not use `assert_eq!` on `f32`/`f64`
-- [ ] New Lua test file ends with `test_summary()`
-- [ ] New Lua test file is registered in `tests/lua/harness.rs`
-- [ ] `cargo test` exits 0 locally
-- [ ] `cargo clippy -- -D warnings` exits 0 locally
-- [ ] No `#[ignore]` without a comment
-- [ ] No disk I/O outside `tests/rust/golden/actual/` or a temp dir
-- [ ] `#[should_panic]` includes `expected = "..."` with the expected panic substring
-- [ ] No `std::thread::sleep` — use deterministic `clock.tick()` with fixed dt instead
-- [ ] No network I/O of any kind
-- [ ] Integration tests do not call private functions — use `pub(crate)` or `#[cfg(test)]` inline modules for test-only access
-- [ ] Test is independently runnable — does not depend on execution order or shared mutable globals
-
----
-
-## 10. API Coverage Markers (`-- @covers`)
-
-When writing Lua tests, annotate which API functions are covered using `-- @covers` markers. This enables the coverage scanner to track per-function coverage accurately.
-
-### Syntax
-
-```lua
--- @covers lurek.physics.newWorld
--- @covers lurek.physics.newBody
-describe("lurek.physics world creation", function()
-    it("creates a world", function()
-        local world = lurek.physics.newWorld(0, 980)
-        expect_not_nil(world)
-    end)
-end)
-
--- @covers Body:getPosition
--- @covers Body:applyForce
-describe("Body methods", function()
-    it("gets position after force", function()
-        -- ...
-    end)
-end)
-```
-
-### Rules
-
-- One `-- @covers` per line, placed **before** the `describe` or `it` block
-- Prefer the closest block that actually owns the assertion rather than a broad file-global list.
-- Module functions: `-- @covers lurek.<module>.<function>`
-- UserData methods: `-- @covers <ClassName>:<method>`
-- The scanner regex: `^--\s*@covers\s+((?:lurek\.\w+\.\w+)|(?:\w+:\w+))\s*$`
-- Coverage without markers still works via heuristic fallback, but markers are preferred
-
-### Coverage Scanner
-
-```powershell
-python tools/audit/lua_api_test_coverage.py              # summary with per-module bars
-python tools/audit/lua_api_test_coverage.py --json        # JSON output
-python tools/audit/lua_api_test_coverage.py --markdown    # markdown report
-python tools/audit/lua_api_test_coverage.py --suggest     # show uncovered functions
-python tools/audit/lua_api_test_coverage.py --strict --threshold 40  # CI gate
-```
-
----
-
-## 11. Evidence-Based Testing Patterns
-
-Some API functions cannot be verified by return values alone. Use these patterns to produce observable evidence:
-
-### Canvas Pixel Readback (Headless)
-
-```lua
--- Verify drawing actually produces pixels
-local canvas = lurek.gfx.newCanvas(100, 100)
-canvas:renderTo(function()
-    lurek.gfx.setColor(1, 0, 0, 1)
-    lurek.gfx.rectangle("fill", 0, 0, 100, 100)
-end)
-local r, g, b, a = canvas:getPixel(50, 50)
-expect_near(1.0, r, 0.01)  -- proves rectangle was drawn
-```
-
-### File Evidence
-
-```lua
--- Verify file I/O by writing and reading back
-lurek.filesystem.write("test_output.txt", "hello")
-local content = lurek.filesystem.read("test_output.txt")
-expect_equal("hello", content)
-```
-
-### Runtime Smoke Tests (GPU Required)
-
-For tests requiring actual GPU rendering, use `tests/rust/ext/` with the smoke test infrastructure:
-```rust
-// tests/rust/ext/light_smoke_tests.rs
-#[test]
-fn light_illumination_visible() {
-    // Launch example with --smoke flag
-    // Capture screenshot via lurek.gfx.saveScreenshot()
-    // Verify pixel values in the saved PNG
-}
-```
-
----
-
-## 12. Golden Test Conventions
-
-### Lua Golden Tests
-
-Write golden tests in `tests/lua/golden/` for deterministic operations:
-
-```lua
--- tests/lua/golden/test_data_golden.lua
-describe("JSON round-trip golden", function()
-    it("encodes table to expected JSON string", function()
-        local data = { name = "test", value = 42 }
-        local json = lurek.data.encode(data, "json")
-        local expected = '{"name":"test","value":42}'
-        expect_equal(expected, json)
-    end)
-end)
-test_summary()
-```
-
-### Key Rules
-
-- Use fixed seeds for any random/procedural operations
-- Use `string.format("%.6f", val)` for float formatting
-- Compare against committed sample files, not inline literals.
-- If a Lua-facing contract can be expressed as an artifact, prefer Lua evidence + Lua golden.
-- Keep Rust golden tests for engine-internal renderer/output checks that are not Lua API contracts.
-- Run `python tools/audit/lua_evidence_golden_contract_audit.py` after evidence/golden edits.
-
-### Stress Test Output Format
-
-All stress tests should print `[PERF]` lines for parseable performance data:
-
-```lua
-print(string.format("[PERF] %s: %d ops in %.3fs (%.0f ops/sec)",
-    name, count, elapsed, count / elapsed))
-```
-
----
-
-## 13. Describe-Block Coverage Naming
-
-Name every `describe()` block that targets a specific API function after that function. This enables the coverage scanner to extract per-method test counts without requiring explicit `-- @covers` annotations.
-
-### Recognized Patterns
-
-```lua
-describe("lurek.<module>.<function>", function()  -- module-level function
-    ...
-end)
-
-describe("<ClassName>:<method>", function()        -- UserData method
-    ...
-end)
-
-describe("lurek.<module> error handling", function() -- module-scoped group
-    ...
-end)
-```
-
-### Example: Well-Named Describe Blocks
-
-```lua
-describe("lurek.audio.newBus", function()     -- scanner recognizes pattern
-    it("creates bus with given name", ...)
-    it("bus is retrievable by name", ...)
-    it("rejects empty name", function()
-        expect_error(function() lurek.audio.newBus("") end)
-    end)
-    it("rejects duplicate name", ...)
-end)
-
-describe("AudioBus:setVolume", function()     -- UserData method pattern
-    it("stores value correctly", ...)
-    it("clamps to [0,1]", ...)
-end)
-```
-
-### Coverage Score Per Method (0–4)
-
-- +1 if ≥1 `it()` calls
-- +1 if ≥3 `it()` calls
-- +1 if any `it()` contains `expect_error` or `pcall`
-- +1 if the describe block has a `-- @evidence` annotation
-
-Use this system to prioritize which modules to improve: a module averaging <2/4 needs more error tests or evidence.
-
----
-
-## 14. Integration Test Rules
-
-Integration tests live in `tests/lua/integration/` and target two or more **named modules** in one scenario. Rules:
-
-- Both module namespaces must appear in the file (`lurek.physics.*` AND `lurek.timer.*`, for example)
-- Name the file `test_<module1>_<module2>[_<module3>].lua`
-- Register a corresponding `#[test] fn lua_test_integration_<name>()` in harness.rs
-- Three-way integrations (three modules) are high-value — prioritize those over simple two-way repeats
-- Do not use this category for single-module lifecycle tests — those belong in `tests/lua/unit/`
-
-Current volume target: **58+ integration tests** (Phase 1: 29 done; Phase 2: 29 planned).
-
----
-
-## 15. Test Scope Decision Rules
-
-Every public and private API in the Lurek2D engine has an assigned test scope. Follow these rules when deciding where a test belongs:
-
-### Public API → Lua BDD Test
-
-Any `pub fn` that is exposed through the `lurek.*` Lua namespace **must** have at least one Lua BDD test in `tests/lua/unit/test_<module>.lua`. This is the primary coverage layer for the engine API.
-
-- Test the function via Lua calls, not by importing Rust types
-- Use `describe` / `it` BDD structure with `@covers` markers
-- All assertions use `expect_*` helpers — never raw `assert()`
-- Every test file must end with `test_summary()`
-
-### Private / Internal Rust → Rust `#[test]`
-
-Private methods, `pub(crate)` helpers, and internal algorithms that have no `lurek.*` binding **must** be tested in Rust unit tests (`#[cfg(test)]` modules) or integration tests in `tests/rust/`.
-
-- These are implementation details not reachable from Lua
-- Use standard Rust `assert!` / `assert_eq!` patterns
-- Float rule: `assert!((actual - expected).abs() < 1e-5)`
-
-### Evidence Tests — File Output Required
-
-Evidence test files (`tests/lua/evidence/`) prove that side-effect-producing APIs produce real, inspectable output on disk. Rules:
-
-- **MUST save a file** — every evidence test MUST produce at least one actual file (PNG, audio, text, .obj, .json). An evidence test that does not write a file is **invalid**.
-- The `it()` block passes if the file was created at the expected path without errors; fails if the write threw an error.
-- **Never add value assertions** about the content — no `expect_equal`, no pixel checks, no format inspection. That is the golden test's job.
-- Evidence tests are for human-in-the-loop review (open the PNGs, listen to the audio) and as source material for golden tests.
-- Each evidence test writes to `tests/lua/evidence/output/<module>/` and the directory must exist before the test runs (create it at the top of the file or in a setup block).- **MUST use the module's `lurek.*` API** — The output content MUST be produced by calling the `lurek.*` module under test. An evidence test that draws shapes manually using only `setPixel` / `fill` / `drawRect` without exercising any meaningful domain module API is **invalid** and must be rewritten or deleted.
-- **Litmus test (read before writing any evidence test):** "If the module's Lua API was removed, would the output PNG/file look different?" If NO — the test is invalid. It only tests `newImageData`, not the module.
-- **Four mandatory steps:** (1) CREATE — instantiate the module object via `lurek.*` API; (2) CONFIGURE — call API methods to set module state; (3) EXECUTE — run the module to produce output (update loop, findPath, etc.); (4) DUMP — save what the module produced to a file. Steps 1–3 must touch the module being evidenced.
-```lua
--- CORRECT: evidence test creates a real file
-local OUT = "tests/lua/evidence/output/particle/"
-
-it("emitter generates particles and saves PNG evidence", function()
-    local em = lurek.particle.newEmitter({ rate = 10, lifetime = 1.0 })
-    for _ = 1, 60 do em:update(1/60) end
-    local img = em:toImageData(256, 256)
-    lurek.image.savePNG(img, OUT .. "emitter_basic.png")
-    -- Pass: file was saved without error
-end)
-
--- WRONG: no file written → invalid evidence test
-it("emitter runs without crashing", function()
-    local em = lurek.particle.newEmitter({ rate = 10, lifetime = 1.0 })
-    em:update(0.016)
-    -- No file saved → this is NOT an evidence test, it is a unit test
-end)
-```
-
-### Golden Tests — Compare Only
-
-Golden test files (`tests/lua/golden/`) verify that deterministic evidence output matches a saved reference baseline.
-
-**Golden Test Contract — MANDATORY:**
-- A golden test is a **comparison harness only**. It must NEVER contain logic that creates content.
-- **Never call `lurek.*` module API to produce new output** in a golden test — that belongs in the evidence test.
-- **Never write new files** in a golden test — evidence tests do the writing; golden tests only compare.
-- Every `it()` block in a golden test must call a comparison helper (`expect_files_equal`, `expect_png_near`, `expect_text_equal`, etc.) and nothing else.
-- Reference sample files live in `tests/lua/golden/samples/<module>/` — committed once, never changed except to intentionally update a baseline.
-- **If a golden test contains content-creation code, move it** to the corresponding evidence test immediately.
-
-Golden tests fail when output diverges from the baseline. They do NOT produce output themselves.
-
-```lua
--- CORRECT: golden test re-runs algorithm and compares against baseline
-it("perlin noise value is stable across engine versions", function()
-    local v = lurek.procgen.perlinNoise(0.5, 0.5, 8.0, 8.0)
-    expect_near(0.0, v, 0.5)   -- value within expected range
-    -- For regression: compare v against a stored snapshot value
-end)
-
--- WRONG: golden test writes a file → should be in evidence test
-it("golden generates PNG", function()
-    lurek.image.savePNG(img, "tests/lua/golden/samples/particle/emitter.png")  -- WRONG
-end)
-```
-
-### `@covers` Markers — Required
-
-Every Lua test file must declare its coverage at the top of the file using `-- @covers` markers:
-
-```lua
--- @covers lurek.physics.newWorld
--- @covers lurek.physics.newBody
--- @covers lurek.physics.step
-```
-
-These markers are consumed by `tools/audit/lua_api_test_coverage.py` and are mandatory for accurate coverage reporting.
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
+
+## Companion File Index
+
+- [snippets/1-test-architecture-overview.txt](snippets/1-test-architecture-overview.txt) — 1. Test Architecture Overview
+- [examples/2-adding-a-new-rust-integration.rs](examples/2-adding-a-new-rust-integration.rs) — 2. Adding a New Rust Integration Test File
+- [snippets/2-adding-a-new-rust-integration-2.ps1](snippets/2-adding-a-new-rust-integration-2.ps1) — 2. Adding a New Rust Integration Test File
+- [examples/3-1-create-the-lua-file.lua](examples/3-1-create-the-lua-file.lua) — 3.1 Create the Lua file
+- [examples/3-1-create-the-lua-file-2.lua](examples/3-1-create-the-lua-file-2.lua) — 3.1 Create the Lua file
+- [examples/3-1-create-the-lua-file-3.lua](examples/3-1-create-the-lua-file-3.lua) — 3.1 Create the Lua file
+- [examples/3-1-create-the-lua-file-4.lua](examples/3-1-create-the-lua-file-4.lua) — 3.1 Create the Lua file
+- [examples/3-2-harness-registration.rs](examples/3-2-harness-registration.rs) — 3.2 Harness Registration
+- [examples/test-structure.lua](examples/test-structure.lua) — Test structure
+- [examples/performance-and-golden-helpers.lua](examples/performance-and-golden-helpers.lua) — Performance and Golden helpers
+- [examples/6-test-vm-helpers-rust-side.rs](examples/6-test-vm-helpers-rust-side.rs) — 6. Test VM Helpers (Rust Side)
+- [snippets/running-quality-gates.ps1](snippets/running-quality-gates.ps1) — Running quality gates
+- [snippets/analytics-tools.ps1](snippets/analytics-tools.ps1) — Analytics tools
+- [snippets/adding-missing-docs.ps1](snippets/adding-missing-docs.ps1) — Adding missing docs
+- [snippets/rust-golden-tests-byte-level.ps1](snippets/rust-golden-tests-byte-level.ps1) — Rust golden tests (byte-level)
+- [examples/lua-golden-tests-compare-only-files.lua](examples/lua-golden-tests-compare-only-files.lua) — Lua golden tests (compare-only files)
+- [examples/syntax.lua](examples/syntax.lua) — Syntax
+- [examples/syntax-2.lua](examples/syntax-2.lua) — Syntax
+- [snippets/syntax-3.ps1](snippets/syntax-3.ps1) — Syntax
+- [examples/tier-1-headless-state-readback-preferred.lua](examples/tier-1-headless-state-readback-preferred.lua) — Tier 1 — Headless State Readback (preferred)
+- [examples/tier-2-canvas-pixel-readback-headless.lua](examples/tier-2-canvas-pixel-readback-headless.lua) — Tier 2 — Canvas Pixel Readback (headless GPU simulation)
+- [examples/tier-3-runtime-smoke-tests-gpu.rs](examples/tier-3-runtime-smoke-tests-gpu.rs) — Tier 3 — Runtime Smoke Tests (GPU required)
+- [examples/syntax-4.lua](examples/syntax-4.lua) — Syntax
+- [snippets/coverage-scanner.ps1](snippets/coverage-scanner.ps1) — Coverage Scanner
+- [examples/canvas-pixel-readback-headless.lua](examples/canvas-pixel-readback-headless.lua) — Canvas Pixel Readback (Headless)
+- [examples/file-evidence.lua](examples/file-evidence.lua) — File Evidence
+- [examples/runtime-smoke-tests-gpu-required.rs](examples/runtime-smoke-tests-gpu-required.rs) — Runtime Smoke Tests (GPU Required)
+- [examples/lua-golden-tests.lua](examples/lua-golden-tests.lua) — Lua Golden Tests
+- [examples/stress-test-output-format.lua](examples/stress-test-output-format.lua) — Stress Test Output Format
+- [examples/recognized-patterns.lua](examples/recognized-patterns.lua) — Recognized Patterns
+- [examples/example-well-named-describe-blocks.lua](examples/example-well-named-describe-blocks.lua) — Example: Well-Named Describe Blocks
+- [examples/evidence-tests-file-output-required.lua](examples/evidence-tests-file-output-required.lua) — Evidence Tests — File Output Required
+- [examples/golden-tests-compare-only.lua](examples/golden-tests-compare-only.lua) — Golden Tests — Compare Only
+- [examples/covers-markers-required.lua](examples/covers-markers-required.lua) — `@covers` Markers — Required
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
+
+## References
+
+- See related skills in `.github/skills/`.

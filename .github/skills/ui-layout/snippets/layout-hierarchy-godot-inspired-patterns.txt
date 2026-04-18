@@ -1,0 +1,11 @@
+root (panel — full viewport)
+  ├── header_bar (panel, full-width, 40–48 px tall)
+  │     ├── title (label)
+  │     └── close_btn (button)
+  ├── content_area (panel or splitpanel, fills remaining height)
+  │     ├── left_panel (panel, fixed width sidebar)
+  │     │     └── ... widgets
+  │     └── right_panel (panel, fills rest)
+  │           └── ... widgets
+  └── footer (panel, full-width, 40–48 px tall)
+        └── ok_btn (button)

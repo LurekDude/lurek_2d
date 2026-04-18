@@ -1,0 +1,3 @@
+-- @covers lurek.physics.newWorld
+-- @covers lurek.physics.newBody
+-- @covers lurek.physics.step

@@ -1,0 +1,15 @@
+tests/
+├── *.rs                      ← Rust integration tests (auto-discovered)
+├── golden_tests.rs           ← golden binary comparison harness
+├── stress/                   ← slow Rust benchmarks (Cargo.toml [[test]])
+├── lua/
+│   ├── init.lua              ← BDD framework (describe/it/expect_* globals)
+│   ├── harness.rs            ← Rust dispatcher — 1 #[test] per Lua file
+│   ├── unit/                 ← test_<module>.lua
+│   ├── integration/          ← test_<a>_<b>.lua
+│   ├── stress/               ← test_<name>_stress.lua
+│   ├── validation/           ← test_<name>.lua
+│   └── golden/               ← deterministic golden output tests
+└── golden/
+    ├── expected/             ← committed baseline artifacts
+    └── actual/               ← runtime output (.gitignore-d)

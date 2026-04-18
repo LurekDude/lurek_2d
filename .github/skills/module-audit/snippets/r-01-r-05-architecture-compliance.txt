@@ -1,0 +1,10 @@
+1. Read `docs/architecture/engine-architecture.md` for group assignment
+2. Grep `src/<module>/**/*.rs` for `use crate::` imports
+3. Verify each import is from an allowed lower group:
+   - Foundations: `math` has no deps; other Foundations modules may import only Foundations
+   - Core Runtime: may import Foundations only
+   - Platform Services: may import Foundations + Core Runtime
+   - Feature Systems: may import below groups; same-group OK when acyclic
+   - Edge/Integration: may import all groups
+4. Verify no `use crate::lua_api` in domain module
+5. Cross-reference with other modules for scope overlap

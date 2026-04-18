@@ -1,0 +1,5 @@
+1. For each .rs file in src/<module>/:
+   a. Count total lines
+   b. If >2000 and no justification in AGENT.md: ERROR
+   c. If >1500: WARNING
+2. PASS if no violations

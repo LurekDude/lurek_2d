@@ -1,11 +1,20 @@
 ---
 name: performance-profiling
 description: "Load this skill when analyzing or optimizing Lurek2D performance: frame time, allocations, hot paths, rendering throughput, or Lua/Rust boundary overhead. Skip it for correctness bugs or feature implementation."
+companion_files:
+  examples: [examples/1-std-time-instant-built-in.rs, examples/2-lua-side-timing.lua, examples/4-debug-overlay.lua, examples/spritebatch-most-important.lua, examples/lua-gc-pressure-reduction.lua, examples/lua-gc-pressure-reduction-2.lua]
+  templates: []
+  snippets: [snippets/3-cargo-flamegraph-install-once.ps1, snippets/3-cargo-flamegraph-install-once-2.ps1, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# performance-profiling
+
+## Mission
 
 # Performance Profiling — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Investigating frame rate drops or slow performance
 - Analyzing per-frame memory allocations
@@ -13,29 +22,28 @@ description: "Load this skill when analyzing or optimizing Lurek2D performance: 
 - Measuring Lua/Rust boundary crossing overhead
 - Reducing rendering or physics step time
 
-## Owns
+## When To Skip
 
+- Correctness bugs → use `dev-debugging` skill
+- Algorithm design → use the relevant domain skill
+- Architecture redesign → use `module-architecture` skill
+
+## Domain Knowledge
+
+### Owns
 - Frame budget analysis (16.6ms at 60fps)
 - Per-frame allocation identification and reduction
 - Hot path identification in game loop
 - Lua/Rust interop overhead measurement
 - Rendering throughput optimization strategies
 
-## Does Not Cover
-
-- Correctness bugs → use `dev-debugging` skill
-- Algorithm design → use the relevant domain skill
-- Architecture redesign → use `module-architecture` skill
-
-## Live Repository Contracts
-
+### Live Repository Contracts
 - `src/app/app.rs` — main game loop (hot path)
 - `src/render/renderer.rs` — draw command processing (hot path)
 - `src/physics/world.rs` — world step, collision detection (hot path)
 - `src/timer/clock.rs` — frame timing measurement
 
-## Decision Rules
-
+### Decision Rules
 - **Measure first**: Never optimize without profiling evidence
 - **Frame budget**: 16.6ms total for input + update + draw + present at 60fps
 - **Zero-alloc hot path**: Avoid `Vec::new()`, `String::from()`, `clone()` in per-frame code
@@ -48,8 +56,7 @@ description: "Load this skill when analyzing or optimizing Lurek2D performance: 
 
 ---
 
-## Frame Budget
-
+### Frame Budget
 At 60 FPS the total frame budget is **16.6ms**. Approximate targets for integrated GPU (Intel UHD 620):
 
 | Phase | Budget |
@@ -64,147 +71,46 @@ At 60 FPS the total frame budget is **16.6ms**. Approximate targets for integrat
 
 ---
 
-## Profiling Tools
-
+### Profiling Tools
 ### 1. `std::time::Instant` (built-in, no install)
 
 Inline timing in Rust hot paths:
 
-```rust
-let t = std::time::Instant::now();
-// ... code to measure ...
-log::debug!("phase took {}µs", t.elapsed().as_micros());
-```
+> See [examples/1-std-time-instant-built-in.rs](examples/1-std-time-instant-built-in.rs) for the example.
 
 Control visibility with `RUST_LOG=lurek2d=debug`.
 
 ### 2. Lua-side timing
 
-```lua
-local t = lurek.time.getTime()
-doExpensiveThing()
-print(string.format("%.2f ms", (lurek.time.getTime() - t) * 1000))
-```
+> See [examples/2-lua-side-timing.lua](examples/2-lua-side-timing.lua) for the example.
 
 ### 3. `cargo flamegraph` (install once)
 
-```powershell
-cargo install flamegraph       # one-time install
-
-# Record a flame graph while running a demo:
-cargo flamegraph -- content/demos/hello_world
-
-# Output: flamegraph.svg — open in browser to navigate hot paths
-```
+> See [snippets/3-cargo-flamegraph-install-once.ps1](snippets/3-cargo-flamegraph-install-once.ps1) for the example.
 
 Requires `perf` on Linux or `dtrace` on macOS. On Windows use:
 
-```powershell
-# Windows: use Visual Studio Performance Profiler or Superluminal
-# Then run: cargo build --release && build/release/lurek2d.exe content/demos/hello_world
-```
+> See [snippets/3-cargo-flamegraph-install-once-2.ps1](snippets/3-cargo-flamegraph-install-once-2.ps1) for the example.
 
 ### 4. Debug overlay
 
 Enable the built-in FPS + draw call counter:
 
-```lua
--- conf.toml
-function lurek.conf(t)
-    t.debug.overlay = true   -- shows FPS, draw calls, frame time in top-left
-end
-```
 
-The overlay shows per-frame draw call count — the primary signal for render performance.
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
----
+## Companion File Index
 
-## Lurek2D-Specific Hot Paths
+- [examples/1-std-time-instant-built-in.rs](examples/1-std-time-instant-built-in.rs) — 1. `std::time::Instant` (built-in, no install)
+- [examples/2-lua-side-timing.lua](examples/2-lua-side-timing.lua) — 2. Lua-side timing
+- [snippets/3-cargo-flamegraph-install-once.ps1](snippets/3-cargo-flamegraph-install-once.ps1) — 3. `cargo flamegraph` (install once)
+- [snippets/3-cargo-flamegraph-install-once-2.ps1](snippets/3-cargo-flamegraph-install-once-2.ps1) — 3. `cargo flamegraph` (install once)
+- [examples/4-debug-overlay.lua](examples/4-debug-overlay.lua) — 4. Debug overlay
+- [examples/spritebatch-most-important.lua](examples/spritebatch-most-important.lua) — SpriteBatch (most important)
+- [examples/lua-gc-pressure-reduction.lua](examples/lua-gc-pressure-reduction.lua) — Lua GC Pressure Reduction
+- [examples/lua-gc-pressure-reduction-2.lua](examples/lua-gc-pressure-reduction-2.lua) — Lua GC Pressure Reduction
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-| Hot Path | Location | Bottleneck |
-|----------|----------|------------|
-| RenderCommand processing | `src/render/gpu_renderer.rs` | Draw call count, state changes |
-| Sprite batch flush | `src/render/sprite_batch.rs` | Vertex buffer upload size |
-| Physics world step | `src/physics/world.rs` | Body + collider count |
-| Lua `lurek.update()` | `src/app/app.rs` | Lua computation + GC |
-| Particle system update | `src/particle/mod.rs` | Active particle count |
-| Font glyph rasterization | `src/render/font.rs` | First-time cache miss only |
-| Texture decompression | `src/render/texture.rs` | Load time, not per-frame |
+## References
 
----
-
-## Draw Call Reduction
-
-Draw call count is the primary render budget variable on integrated GPUs.
-
-**Target: ≤ 200 draw calls per frame.**
-
-### SpriteBatch (most important)
-
-```lua
--- BAD: O(N) draw calls — one per sprite
-for _, e in ipairs(entities) do
-    lurek.gfx.draw(e.image, e.x, e.y)   -- 1 draw call each
-end
-
--- GOOD: 1 draw call for all sprites using the same texture
-local batch = lurek.gfx.newSpriteBatch(atlas_image, 1000)
-function lurek.process(dt)
-    batch:clear()
-    for _, e in ipairs(entities) do
-        batch:add(e.quad, e.x, e.y)
-    end
-end
-function lurek.render()
-    lurek.gfx.draw(batch, 0, 0)  -- 1 draw call
-end
-```
-
-### Texture atlas
-
-Pack small sprites into a single large texture. Use `lurek.gfx.newQuad()` to define sub-regions. This keeps SpriteBatch at exactly 1 draw call regardless of sprite count.
-
----
-
-## Lua GC Pressure Reduction
-
-The LuaJIT GC runs incrementally. Excessive allocation causes visible micro-stalls.
-
-**Detect GC pressure:**
-
-```lua
-local before = collectgarbage("count")
-doFrame()
-local after = collectgarbage("count")
-if after - before > 50 then   -- >50KB allocated this frame
-    print("GC pressure: " .. (after - before) .. " KB")
-end
-```
-
-**Patterns:**
-
-```lua
--- BAD: per-frame table allocation
-function lurek.process(dt)
-    local pos = vector(player.x, player.y)   -- new table every frame
-end
-
--- GOOD: pre-allocate, reuse
-local _pos = { x = 0, y = 0 }
-function lurek.process(dt)
-    _pos.x = player.x
-    _pos.y = player.y
-    -- use _pos
-end
-```
-
----
-
-## Physics Performance
-
-- `world:step()` cost scales with **body count × collider complexity**
-- **50+ dynamic bodies**: enable broadphase stats to confirm bottleneck
-- Circle colliders are 3-5× faster than polygon colliders in narrow phase
-- Use **sensors** (no collision response) for trigger zones — negligible cost
-- Disable sleeping: `body:setSleepingAllowed(false)` increases cost; leave default (true)
-- Destroy unused bodies immediately: `world:destroyBody(body)` — stale bodies still cost broadphase time
+- See related skills in `.github/skills/`.

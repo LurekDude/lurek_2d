@@ -1,0 +1,8 @@
+[[...children]]
+widget_type = "button"     # 1. type first
+id          = "foo_btn"    # 2. id second
+x = 0.0                    # 3. geometry block (x y w h together)
+y = 0.0
+w = 120.0
+h = 40.0
+tooltip = "…"              # 4. optional semantics last

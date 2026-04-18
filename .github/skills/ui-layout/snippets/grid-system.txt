@@ -1,0 +1,5 @@
+# Snap a single file to 8px grid:
+python tools/ui/snap_to_grid.py content/layouts/games/my_hud.toml --grid 8
+
+# Snap everything at once:
+python tools/ui/snap_to_grid.py content/layouts/ --grid 8 --recursive

@@ -1,11 +1,20 @@
 ---
 name: build-system
 description: "Load this skill when working with the Lurek2D build system: Cargo profiles, debug vs release builds, binary size and speed optimisation, the build/ output directory override, feature flags (lua-jit / lua54), or packaging for distribution via installer scripts. Use for: cargo build, cargo check, cargo run, profile tuning, dist.ps1/dist.sh, NSIS installer. Skip it for CI/CD pipeline setup (use ci-cd-pipeline skill) or writing Rust code."
+companion_files:
+  examples: []
+  templates: [templates/output-directory-override.toml, templates/profile-dev-what-it-does.toml, templates/profile-release-what-it-does.toml, templates/profile-dist-what-it-does.toml, templates/feature-flags-lua-backend.toml]
+  snippets: [snippets/development-loop-commands.ps1, snippets/windows-zip-folder.ps1, snippets/linux-macos-tar-gz.sh, snippets/windows-installer-nsis.ps1, snippets/local-install-uninstall.ps1, snippets/local-install-uninstall-2.sh, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# build-system
+
+## Mission
 
 # Build System — Lurek2D
 
-## Load When
+## When To Load
 
 - Building or running the engine locally for the first time
 - Choosing between `cargo build`, `cargo check`, `cargo build --release`, or `cargo build --profile dist`
@@ -15,8 +24,13 @@ description: "Load this skill when working with the Lurek2D build system: Cargo 
 - Building an NSIS Windows installer with `tools/dist/installer.nsi`
 - Switching between the LuaJIT and Lua 5.4 scripting backends
 
-## Owns
+## When To Skip
 
+- Skip it for CI/CD pipeline setup (use ci-cd-pipeline skill) or writing Rust code.
+
+## Domain Knowledge
+
+### Owns
 - Cargo profile definitions (`dev`, `release`, `dist`) and their trade-offs
 - `build/` output directory override (`.cargo/config.toml`)
 - Feature flags: `lua-jit` (default) vs `lua54`
@@ -26,15 +40,10 @@ description: "Load this skill when working with the Lurek2D build system: Cargo 
 
 ---
 
-## Output Directory Override
-
+### Output Directory Override
 Lurek2D redirects Cargo output from the default `target/` to **`build/`** via `.cargo/config.toml`:
 
-```toml
-# .cargo/config.toml
-[build]
-target-dir = "build"
-```
+> See [templates/output-directory-override.toml](templates/output-directory-override.toml) for the example.
 
 | Binary | Path |
 |--------|------|
@@ -46,8 +55,7 @@ target-dir = "build"
 
 ---
 
-## Cargo Profiles
-
+### Cargo Profiles
 Three profiles are defined in `Cargo.toml`. Use the right one for the task:
 
 | Profile | Command | Use When |
@@ -58,204 +66,51 @@ Three profiles are defined in `Cargo.toml`. Use the right one for the task:
 
 ### `[profile.dev]` — what it does
 
-```toml
-opt-level = 1          # fast enough for smooth iteration; game code is debuggable
-incremental = true     # incremental compilation — much faster rebuilds
-debug = "line-tables-only"  # file+line info for backtraces; no full DWARF (saves ~20MB)
-
-[profile.dev.package."*"]
-opt-level = 3          # all dependencies at full speed even in dev
-```
+> See [templates/profile-dev-what-it-does.toml](templates/profile-dev-what-it-does.toml) for the example.
 
 - `debug = true` locally when you need to inspect variables in a debugger (heavier binary)
 - Dependencies at `opt-level = 3` = wgpu/rapier/rodio run fast even in dev builds
 
 ### `[profile.release]` — what it does
 
-```toml
-opt-level = "z"          # size-first (avoids vectorisation, limits inlining)
-lto = true               # thin LTO: cross-crate dead code elimination
-codegen-units = 1        # single codegen unit: best dead-code elimination
-strip = "symbols"        # strip debug symbols from binary
-panic = "abort"          # removes unwinder (~500KB saving)
-overflow-checks = false  # speed: debug build already catches overflows
-```
+> See [templates/profile-release-what-it-does.toml](templates/profile-release-what-it-does.toml) for the example.
 
 - Produces a small, fast binary suitable for end-user runs
 - Do NOT use `release` to debug panics — symbols are stripped
 
 ### `[profile.dist]` — what it does
 
-```toml
-inherits = "release"
-opt-level = "z"   # size-optimised (same as release)
-lto = true        # fat LTO: full cross-crate analysis (better than thin for binary size)
-```
+> See [templates/profile-dist-what-it-does.toml](templates/profile-dist-what-it-does.toml) for the example.
 
 - Use for installer/ZIP packages where download size matters
 - Build time is longer than release (fat LTO link) — acceptable for one-shot packaging
 
 ---
 
-## Feature Flags — Lua Backend
-
+### Feature Flags — Lua Backend
 Lurek2D ships two Lua runtime backends. Select at build time with a Cargo feature flag.
 
 | Feature | Command | Backend | Platform |
 |---------|---------|---------|----------|
 | `lua-jit` *(default)* | `cargo build` | LuaJIT (vendored) | Windows/Linux/macOS x86_64 + ARM |
-| `lua54` | `cargo build --no-default-features --features lua54` | Lua 5.4 (vendored) | Fallback / CI |
 
-```toml
-# Cargo.toml features section
-default = ["lua-jit"]
-lua-jit = ["mlua/luajit", "mlua/vendored"]   # primary; JIT compilation
-lua54   = ["mlua/lua54",  "mlua/vendored"]   # fallback; pure interpreter
-```
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
-**Rule**: Ship with `lua-jit`. Use `lua54` only in CI environments where LuaJIT is unavailable or when explicitly testing Lua 5.4 compatibility.
+## Companion File Index
 
----
+- [templates/output-directory-override.toml](templates/output-directory-override.toml) — Output Directory Override
+- [templates/profile-dev-what-it-does.toml](templates/profile-dev-what-it-does.toml) — `[profile.dev]` — what it does
+- [templates/profile-release-what-it-does.toml](templates/profile-release-what-it-does.toml) — `[profile.release]` — what it does
+- [templates/profile-dist-what-it-does.toml](templates/profile-dist-what-it-does.toml) — `[profile.dist]` — what it does
+- [templates/feature-flags-lua-backend.toml](templates/feature-flags-lua-backend.toml) — Feature Flags — Lua Backend
+- [snippets/development-loop-commands.ps1](snippets/development-loop-commands.ps1) — Development Loop Commands
+- [snippets/windows-zip-folder.ps1](snippets/windows-zip-folder.ps1) — Windows — ZIP + Folder
+- [snippets/linux-macos-tar-gz.sh](snippets/linux-macos-tar-gz.sh) — Linux / macOS — TAR.GZ
+- [snippets/windows-installer-nsis.ps1](snippets/windows-installer-nsis.ps1) — Windows Installer (NSIS)
+- [snippets/local-install-uninstall.ps1](snippets/local-install-uninstall.ps1) — Local Install / Uninstall
+- [snippets/local-install-uninstall-2.sh](snippets/local-install-uninstall-2.sh) — Local Install / Uninstall
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-## Development Loop Commands
+## References
 
-```powershell
-# FASTEST: type-check only — no compilation, ~2-5s incremental
-cargo check
-
-# Build debug binary (incremental, ~5-15s after first build)
-cargo build
-
-# Run a demo directly (builds if needed)
-cargo run -- content/demos/hello_world
-
-# Build release binary (full optimisation, ~60-120s first build)
-cargo build --release
-
-# Run release binary
-cargo run --release -- content/demos/hello_world
-
-# Build distribution binary (fat LTO, ~90-180s)
-cargo build --profile dist
-```
-
-**Rule**: Use `cargo check` during implementation. Never run `cargo build` just to validate types — it compiles everything including link step.
-
----
-
-## Distribution Packaging
-
-### Windows — ZIP + Folder
-
-```powershell
-# Full release build + package → dist/lurek2d-windows-x86_64/
-powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1
-
-# Skip cargo build (repackage already-built binary)
-powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild
-```
-
-Output: `dist/lurek2d-windows-x86_64/lurek2d.exe` + demos + `dist/lurek2d-windows-x86_64.zip`
-
-### Linux / macOS — TAR.GZ
-
-```bash
-bash tools/dist/dist.sh
-```
-
-Output: `dist/lurek2d-<os>-<arch>/` + `.tar.gz`
-
-### Windows Installer (NSIS)
-
-```powershell
-# Requires NSIS 3.x on PATH
-makensis tools/dist/installer.nsi
-```
-
-Output: `dist/lurek2d-<version>-setup.exe`
-
----
-
-## Local Install / Uninstall
-
-```powershell
-# Install lurek2d.exe to PATH (Windows)
-powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1
-
-# Uninstall
-powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1 --uninstall
-```
-
-```bash
-# Install (Linux/macOS)
-bash tools/dist/install.sh
-```
-
-After install: `luna content/demos/hello_world` works from any directory.
-
----
-
-## VS Code Task Shortcuts
-
-These tasks are in `.vscode/tasks.json` (Ctrl+Shift+B or Terminal → Run Task):
-
-| Task | Equivalent command |
-|------|--------------------|
-| `Build: Debug` | `cargo build` |
-| `Build: Release` | `cargo build --release` |
-| `Build: Check (fast)` | `cargo check` |
-| `Run Debug: Pick Example` | `cargo run -- content/demos/<pick>` |
-| `Run Release: Pick Example` | `cargo run --release -- content/demos/<pick>` |
-| `Dist: Package Windows` | `tools/dist/dist.ps1` |
-| `Dist: Package Windows (skip build)` | `tools/dist/dist.ps1 -SkipBuild` |
-| `Dist: NSIS Installer (Windows)` | `makensis tools/dist/installer.nsi` |
-
----
-
-## Common Build Issues
-
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `error: could not find lua.h` | Missing vendored flag | Ensure feature includes `mlua/vendored` |
-| `LINK : fatal error LNK1181` | Incremental build artifact corruption | `Remove-Item build/debug -Recurse; cargo build` |
-| Binary at `target/` instead of `build/` | `.cargo/config.toml` not present | Verify `.cargo/config.toml` has `target-dir = "build"` |
-| Huge binary in dev (>200MB) | `debug = true` with full DWARF | Use `debug = "line-tables-only"` in `[profile.dev]` |
-| `wgpu` validation spew on first run | Missing env filter | Set `RUST_LOG=lurek2d=info` to silence wgpu noise |
-
----
-
-## Cargo.toml Conventions
-
-### Canonical Dependency Set
-
-| Crate | Version | Purpose | Required features |
-|-------|---------|---------|-------------------|
-| `winit` | `0.30` | Windowing and input | none |
-| `wgpu` | `22` | GPU-accelerated 2D rendering | `bytemuck`, `pollster` |
-| `mlua` | `0.9` | Lua scripting (vendored) | `lua54`, `vendored` |
-| `image` | `0.24` | PNG/JPEG texture loading | none |
-| `rodio` | `0.17` | Audio playback | none |
-| `log` | `0.4` | Logging facade | none |
-| `env_logger` | `0.10` | Log configuration | none |
-
-### Cargo.toml Invariants
-
-- `[[bin]] name = "lurek2d"` — binary name must stay `lurek2d`
-- `[lib] name = "lurek2d"` — library name must stay `lurek2d` (integration tests import it)
-- `edition = "2021"` — do not downgrade to 2018
-
-### Semver Pinning
-
-Use exact minor versions (`"0.30"`, `"0.9"`) — not `"*"` or `">= 0.9"` wildcards. Only bump versions deliberately.
-
-`mlua` must **always** include `vendored` in its features list — never depend on a system Lua installation.
-
-Run `cargo audit` before adding any new crate.
-
-### Avoid
-
-- Adding `serde` unless a feature genuinely requires serialization (e.g., save files)
-- Adding `tokio` or `async-std` — the engine is synchronous by design
-- Duplicate decoders: if `rodio` can handle a format, do not add another audio decoder crate
-- `[patch.crates-io]` entries without a documented reason in a comment
-- Dev-dependency accidentally leaking into the library build
+- See related skills in `.github/skills/`.

@@ -1,39 +1,47 @@
 ---
 name: dev-debugging
 description: "Load this skill when diagnosing runtime bugs, crashes, or unexpected behavior in Lurek2D. It owns diagnostic techniques, error tracing, and root cause analysis patterns. Skip it for feature implementation or test writing."
+companion_files:
+  examples: [examples/custom-error-handler.lua, examples/pcall-for-recoverable-errors.lua, examples/refcell-borrow-diagnosis-2.rs, examples/refcell-borrow-diagnosis-3.rs, examples/diagnostic-log-placement.rs]
+  templates: []
+  snippets: [snippets/environment-variables-for-diagnosis.ps1, snippets/tracing-lua-rust-errors.txt, snippets/refcell-borrow-diagnosis.txt, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# dev-debugging
+
+## Mission
 
 # Development Debugging — Lurek2D Engine
 
-## Load When
+## When To Load
 
 - Investigating a crash or panic in the engine
 - Tracing unexpected behavior in game scripts or engine code
 - Analyzing error messages or stack traces
 - Debugging RefCell borrow panics or type errors
 
-## Owns
+## When To Skip
 
+- Writing fixes → route to Developer agent
+- Performance analysis → use `performance-profiling` skill
+- Test writing → use `testing-rust` skill
+
+## Domain Knowledge
+
+### Owns
 - Rust panic and error trace analysis
 - RefCell borrow conflict diagnosis
 - Lua/Rust boundary error tracing
 - Game loop state diagnosis
 - Data flow tracing through SharedState
 
-## Does Not Cover
-
-- Writing fixes → route to Developer agent
-- Performance analysis → use `performance-profiling` skill
-- Test writing → use `testing-rust` skill
-
-## Live Repository Contracts
-
+### Live Repository Contracts
 - `src/lua_api/mod.rs` — SharedState borrow patterns (common source of bugs)
 - `src/app/app.rs` — main loop where errors surface
 - `src/runtime/error.rs` — EngineError types for error classification
 
-## Decision Rules
-
+### Decision Rules
 - **Read the panic message**: Rust panics include file, line, and message — start there
 - **RefCell panics**: "already borrowed" means two closures are borrowing SharedState simultaneously
 - **Lua errors**: Check `LuaError` variant — usually type mismatch or missing function
@@ -46,39 +54,14 @@ description: "Load this skill when diagnosing runtime bugs, crashes, or unexpect
 
 ---
 
-## Environment Variables for Diagnosis
-
+### Environment Variables for Diagnosis
 Set these before launching to get more diagnostic output:
 
-```powershell
-# Show all Lurek2D log output (info + debug + trace)
-$env:RUST_LOG = "lurek2d=debug"
-cargo run -- content/demos/hello_world
-
-# Show only engine startup/shutdown lifecycle events
-$env:RUST_LOG = "lurek2d=info"
-
-# Show wgpu validation errors (GPU-related crashes)
-$env:RUST_LOG = "wgpu_core=warn,wgpu_hal=warn,lurek2d=debug"
-
-# Full panic backtrace (file + line for every frame)
-$env:RUST_BACKTRACE = "1"
-
-# Full backtrace WITH source lines (requires debug symbols)
-$env:RUST_BACKTRACE = "full"
-
-# Force a specific GPU backend (useful to isolate driver bugs)
-$env:WGPU_BACKEND = "vulkan"   # or "dx12", "metal", "gl"
-$env:WGPU_ADAPTER_NAME = "Intel"   # prefer Intel iGPU when multiple adapters present
-
-# Disable JIT compilation (fall back to LuaJIT interpreter — slower but stable)
-# Set inside Lua: jit.off()
-```
+> See [snippets/environment-variables-for-diagnosis.ps1](snippets/environment-variables-for-diagnosis.ps1) for the example.
 
 ---
 
-## Common Error Patterns
-
+### Common Error Patterns
 | Symptom | Root Cause | Fix |
 |---------|-----------|-----|
 | `already borrowed: BorrowMutError` | Two closures both `borrow_mut()` SharedState simultaneously | Restructure: do not hold a borrow across a Lua callback |
@@ -93,88 +76,41 @@ $env:WGPU_ADAPTER_NAME = "Intel"   # prefer Intel iGPU when multiple adapters pr
 
 ---
 
-## Lua Error Debugging
-
+### Lua Error Debugging
 ### Custom error handler
 
-```lua
--- main.lua: catch all unhandled errors before the engine error screen
-function lurek.errorhandler(msg)
-    -- Log to file + console before showing error screen
-    print("UNHANDLED ERROR: " .. tostring(msg))
-    lurek.fs.append("errors.log", msg .. "\n")
-    return msg   -- return the message to display on error screen
-end
-```
+> See [examples/custom-error-handler.lua](examples/custom-error-handler.lua) for the example.
 
 ### pcall for recoverable errors
 
-```lua
--- Wrap risky code in pcall to handle errors without crashing
-local ok, err = pcall(function()
-    lurek.gfx.newImage("missing.png")
-end)
-if not ok then
-    print("Failed to load image: " .. tostring(err))
-    -- use fallback image
-end
-```
+> See [examples/pcall-for-recoverable-errors.lua](examples/pcall-for-recoverable-errors.lua) for the example.
 
 ### Tracing Lua→Rust errors
 
 When a `LuaError` originates in Rust and surfaces in Lua, the error message includes the Rust source location if `LuaError::external(e)` was used:
 
-```
-RuntimeError("luna2d::graphics: texture file not found: player.png")
-```
+> See [snippets/tracing-lua-rust-errors.txt](snippets/tracing-lua-rust-errors.txt) for the example.
 
 The prefix `luna2d::<module>:` is the Rust source. Search `src/<module>/` for the error string.
 
 ---
 
-## RefCell Borrow Diagnosis
+### RefCell Borrow Diagnosis
 
-The most common engine crash. When you see:
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
-```
-thread 'main' panicked at 'already borrowed: BorrowMutError'
-  src/lua_api/render_api.rs:42
-```
+## Companion File Index
 
-**Pattern**: Two code paths are simultaneously active that both borrow SharedState.
+- [snippets/environment-variables-for-diagnosis.ps1](snippets/environment-variables-for-diagnosis.ps1) — Environment Variables for Diagnosis
+- [examples/custom-error-handler.lua](examples/custom-error-handler.lua) — Custom error handler
+- [examples/pcall-for-recoverable-errors.lua](examples/pcall-for-recoverable-errors.lua) — pcall for recoverable errors
+- [snippets/tracing-lua-rust-errors.txt](snippets/tracing-lua-rust-errors.txt) — Tracing Lua→Rust errors
+- [snippets/refcell-borrow-diagnosis.txt](snippets/refcell-borrow-diagnosis.txt) — RefCell Borrow Diagnosis
+- [examples/refcell-borrow-diagnosis-2.rs](examples/refcell-borrow-diagnosis-2.rs) — RefCell Borrow Diagnosis
+- [examples/refcell-borrow-diagnosis-3.rs](examples/refcell-borrow-diagnosis-3.rs) — RefCell Borrow Diagnosis
+- [examples/diagnostic-log-placement.rs](examples/diagnostic-log-placement.rs) — Diagnostic Log Placement
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-**Typical cause**: A Lua callback is invoked WHILE SharedState is already borrowed by the caller:
+## References
 
-```rust
-// BAD: borrow held across a Lua call that also borrows
-let state = self.state.borrow();      // borrow 1 starts
-let val = state.something;
-lua.call_function("callback", val)?;  // callback may also borrow_mut → PANIC
-drop(state);                          // borrow 1 never reached
-```
-
-**Fix**: Release the borrow before invoking any Lua callback:
-
-```rust
-// GOOD: clone the value out, release borrow, then call Lua
-let val = {
-    let state = self.state.borrow();   // borrow starts
-    state.something.clone()             // extract value
-};                                      // borrow ends HERE
-lua.call_function("callback", val)?;   // safe — no active borrow
-```
-
----
-
-## Diagnostic Log Placement
-
-```rust
-// Temporary diagnostic: add to a hot path to trace data flow
-log::debug!("[DEBUG] value at {} = {:?}", line!(), my_value);
-
-// Remove before commit. Use RUST_LOG=lurek2d=debug to see debug! output.
-// Never leave log::debug! in production hot paths (per-frame).
-```
-
-**Rule**: `log::debug!` calls have near-zero cost when the log level is above debug (which is the default). Safe to leave in code as long as they don't format complex values.
-
+- See related skills in `.github/skills/`.

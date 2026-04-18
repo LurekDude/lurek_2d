@@ -1,0 +1,5 @@
+1. grep -r "println!" src/<module>/ → ERROR if found
+2. grep -r "eprintln!" src/<module>/ → ERROR if found
+3. grep -rn "unsafe" src/<module>/ → check for // SAFETY: comment
+4. grep -rn "\.unwrap()" src/<module>/ → WARNING for each (except test code)
+5. cargo clippy --lib -- -D warnings → filter for module files

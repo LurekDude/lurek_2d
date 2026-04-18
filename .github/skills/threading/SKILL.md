@@ -1,11 +1,20 @@
 ---
 name: threading
 description: "Load this skill when designing or implementing multi-threaded Lua behaviour in Lurek2D using the lurek.thread API: spawning worker threads, using Channel for inter-VM communication, handling errors in background threads, or understanding which lurek.* modules are safe to use in worker VMs. Use for: background computation, async file I/O in workers, producer-consumer patterns, parallel data processing. Skip it for Rust-side thread management internals (see docs/specs/thread.md), or for general game scripting (use lua-scripting)."
+companion_files:
+  examples: [examples/spawning-a-thread.lua, examples/creating-a-channel.lua, examples/starting-a-thread.lua, examples/channel-operations.lua, examples/channelvalue-constraint.lua, examples/error-handling-in-workers.lua, examples/error-handling-in-workers-2.lua, examples/work-queue.lua, examples/background-save.lua]
+  templates: []
+  snippets: [snippets/threading-model.txt, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# threading
+
+## Mission
 
 # Threading — Lurek2D
 
-## Load When
+## When To Load
 
 - Adding background computation or I/O to a game via `lurek.thread.newThread()`
 - Designing a producer-consumer or work-queue pattern with `Channel`
@@ -13,8 +22,13 @@ description: "Load this skill when designing or implementing multi-threaded Lua 
 - Handling errors thrown in a background thread
 - Explaining the threading model to a new contributor
 
-## Owns
+## When To Skip
 
+- Skip it for Rust-side thread management internals (see docs/specs/thread.
+
+## Domain Knowledge
+
+### Owns
 - Lurek2D threading model: one Lua VM per thread, no shared state
 - `lurek.thread.*` Lua API patterns
 - `Channel` communication patterns (push / pop / demand)
@@ -24,79 +38,35 @@ description: "Load this skill when designing or implementing multi-threaded Lua 
 
 ---
 
-## Threading Model
-
+### Threading Model
 Lurek2D uses **one Lua VM per thread**. Worker threads cannot share `SharedState` with the main game thread. This eliminates data races at the cost of requiring explicit message passing for all cross-thread communication.
 
-```
-Main Game Thread
-├── Lua VM (full lurek.* API)
-├── SharedState (Rc<RefCell<>>)
-├── GpuRenderer, Mixer, Physics
-└── lurek.update() / lurek.draw()
-
-Worker Thread N
-├── Separate Lua VM (restricted API)
-├── No SharedState access
-└── Channel ◄────────► Main Thread Channel
-```
+> See [snippets/threading-model.txt](snippets/threading-model.txt) for the example.
 
 **Key consequence**: The main thread is the only thread that can call `lurek.gfx.*`, `lurek.audio.*`, `lurek.physics.*`, and `lurek.input.*`. Workers send results back via `Channel` and the main thread applies them.
 
 ---
 
-## Core API
-
+### Core API
 ### Spawning a thread
 
-```lua
--- lurek.thread.newThread(code: string) -> Thread
--- code is a complete Lua script string; it runs in an isolated VM
-local worker = lurek.thread.newThread([[
-    local inbox  = ...   -- first argument via thread:start()
-    local outbox = ...   -- second argument
-
-    while true do
-        local task = inbox:demand()   -- blocking: wait for work
-        if task == "quit" then break end
-
-        local result = task * 2  -- do work
-        outbox:push(result)
-    end
-]])
-```
+> See [examples/spawning-a-thread.lua](examples/spawning-a-thread.lua) for the example.
 
 ### Creating a channel
 
-```lua
--- lurek.thread.newChannel() -> Channel
--- Channels are MPMC (many producer, many consumer), thread-safe
-local inbox  = lurek.thread.newChannel()
-local outbox = lurek.thread.newChannel()
-```
+> See [examples/creating-a-channel.lua](examples/creating-a-channel.lua) for the example.
 
 ### Starting a thread
 
-```lua
--- thread:start(arg1, arg2, ...) -- args become the `...` vararg in the worker script
-worker:start(inbox, outbox)
-```
+> See [examples/starting-a-thread.lua](examples/starting-a-thread.lua) for the example.
 
 ### Channel operations
 
-```lua
-ch:push(value)        -- non-blocking send; value: nil|bool|number|string
-ch:pop()              -- non-blocking receive; returns nil if empty
-ch:demand()           -- BLOCKING receive; use in workers, NOT in lurek.update()
-ch:peek()             -- non-destructive peek at front; returns nil if empty
-ch:getCount()         -- number of items waiting
-ch:clear()            -- drain all items
-```
+> See [examples/channel-operations.lua](examples/channel-operations.lua) for the example.
 
 ---
 
-## ChannelValue Constraint
-
+### ChannelValue Constraint
 **Channels carry only these Lua types:**
 
 | Lua type | Transmitted as |
@@ -109,19 +79,11 @@ ch:clear()            -- drain all items
 | table | **NOT supported** — serialize to string first |
 
 To pass structured data:
-```lua
--- Serialize a table: JSON or comma-separated string
-local data = lurek.data.toJSON({ x = 10, y = 20 })
-channel:push(data)
-
--- On the other side:
-local result = lurek.data.fromJSON(channel:pop())
-```
+> See [examples/channelvalue-constraint.lua](examples/channelvalue-constraint.lua) for the example.
 
 ---
 
-## Worker VM — Safe Modules
-
+### Worker VM — Safe Modules
 Worker threads get an isolated VM with only these `lurek.*` modules available:
 
 | Module | Available in worker? | Notes |
@@ -132,107 +94,23 @@ Worker threads get an isolated VM with only these `lurek.*` modules available:
 | `lurek.fs` | ✅ Read-only | File reads only; no write |
 | `lurek.platform` | ✅ Read-only | OS info, `getProcessorCount()` |
 | `lurek.gfx` | ❌ | GPU resources are main-thread only |
-| `lurek.audio` | ❌ | Audio is main-thread only |
-| `lurek.physics` | ❌ | Physics world is main-thread only |
-| `lurek.input` | ❌ | Input state is main-thread only |
-| `lurek.data` | ✅ Full | Compression, hashing, encoding |
-| `lurek.img` | ✅ Full | CPU-side pixel data only |
-| Standard libs | Subset | No `os`, `io`, `loadfile`, `dofile` |
 
----
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
-## Error Handling in Workers
+## Companion File Index
 
-Errors in the worker VM do **not** propagate to the main thread automatically. Wrap worker code in `pcall` and send errors back via channel:
+- [snippets/threading-model.txt](snippets/threading-model.txt) — Threading Model
+- [examples/spawning-a-thread.lua](examples/spawning-a-thread.lua) — Spawning a thread
+- [examples/creating-a-channel.lua](examples/creating-a-channel.lua) — Creating a channel
+- [examples/starting-a-thread.lua](examples/starting-a-thread.lua) — Starting a thread
+- [examples/channel-operations.lua](examples/channel-operations.lua) — Channel operations
+- [examples/channelvalue-constraint.lua](examples/channelvalue-constraint.lua) — ChannelValue Constraint
+- [examples/error-handling-in-workers.lua](examples/error-handling-in-workers.lua) — Error Handling in Workers
+- [examples/error-handling-in-workers-2.lua](examples/error-handling-in-workers-2.lua) — Error Handling in Workers
+- [examples/work-queue.lua](examples/work-queue.lua) — Work Queue
+- [examples/background-save.lua](examples/background-save.lua) — Background Save
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-```lua
--- Worker script:
-local inbox  = ...
-local outbox = ...
-local errors = ...  -- error channel
+## References
 
-while true do
-    local task = inbox:demand()
-    if task == "quit" then break end
-
-    local ok, result = pcall(function()
-        return processTask(task)
-    end)
-
-    if ok then
-        outbox:push(result)
-    else
-        errors:push("worker error: " .. tostring(result))
-    end
-end
-```
-
-```lua
--- Main thread checks error channel each frame:
-function lurek.process(dt)
-    local err = errors:pop()
-    if err then
-        print("Background error: " .. err)
-    end
-    -- ...
-end
-```
-
----
-
-## Patterns
-
-### Work Queue
-
-```lua
-local queue   = lurek.thread.newChannel()
-local results = lurek.thread.newChannel()
-
-local worker  = lurek.thread.newThread([[
-    local q, r = ...
-    while true do
-        local item = q:demand()
-        if item == nil then break end
-        r:push(expensiveCompute(item))
-    end
-]])
-worker:start(queue, results)
-
--- Main thread: post work
-queue:push(42)
-
--- Main thread: collect results each frame (non-blocking)
-function lurek.process(dt)
-    local result = results:pop()
-    if result then applyResult(result) end
-end
-```
-
-### Background Save
-
-```lua
-local saveChannel = lurek.thread.newChannel()
-
-local saver = lurek.thread.newThread([[
-    local ch = ...
-    while true do
-        local json = ch:demand()
-        if json == nil then break end
-        lurek.fs.write("save.json", json)
-    end
-]])
-saver:start(saveChannel)
-
--- Trigger save from main thread (non-blocking):
-saveChannel:push(lurek.data.toJSON(gameState))
-```
-
----
-
-## Rules
-
-- **Never call `channel:demand()` in `lurek.update()`.** It blocks the game loop. Use `channel:pop()` (non-blocking) in `lurek.update()` and `channel:demand()` in workers.
-- **Threads do not auto-stop** when the main thread exits a scope. Send a `"quit"` message as the shutdown signal.
-- **No shared mutable state.** If two pieces of code need to share a Lua value, use a Channel.
-- **Each `lurek.thread.newThread()` call creates a new Lua VM.** Startup cost is small but non-zero — create workers at load time, not inside `lurek.update()`.
-- **Resource keys (TextureKey, etc.) cannot cross threads** — they are opaque IDs for main-thread resources.
+- See related skills in `.github/skills/`.

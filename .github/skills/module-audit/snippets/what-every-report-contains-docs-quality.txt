@@ -1,0 +1,25 @@
+# Module Quality Report: `<module>`
+> Status: 🔴 FAIL | Score: X ✅ / Y ⚠️ / Z ❌ / N 🔵
+
+## Action Items
+### 🔴 Errors — Must Fix Before Merge
+- [ ] B-03 — impl LuaUserData placement:
+       Move impl LuaUserData for LuaFoo from lua_api/<m>_api.rs → src/<m>/foo.rs
+- [ ] B-02 — Registration-only:
+       struct definitions (move to src/<m>/): LuaFoo
+- [ ] SP-04 — Lua API completeness:
+       Missing from spec: load, unload (+2 more) — add to ## Lua API in docs/specs/<m>.md
+       Stale in spec (not in code): oldFn — remove from spec
+- [ ] W-02 — API surface coverage:
+       Missing in content/examples/<m>.lua: load, unload — add with use-case comment
+- [ ] T-04 — Float comparisons:
+       assert_eq! with floats at: foo_tests.rs:117, foo_tests.rs:119
+...
+
+### 🟡 Warnings — Should Fix
+- [ ] B-04 — No business logic in closures:
+       'load' (28 LOC, line 42) — extract body to src/<m>/
+       'save' has if/match/for — extract to src/<m>/
+
+## Full Check Results
+[Phase-by-phase table with all verdicts]

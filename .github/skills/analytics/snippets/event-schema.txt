@@ -1,0 +1,3 @@
+-- Each line in game.log is a TOML-style event:
+-- timestamp=12.34 event="player_died" x=320 y=128 cause="spike" level=3
+-- timestamp=45.67 event="level_complete" level=3 attempts=2 duration=93.4

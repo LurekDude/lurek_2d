@@ -1,0 +1,19 @@
+
+**Rules:**
+- `## What It Demonstrates` must list `lurek.*` calls actually present in `main.lua`
+- Controls table must match `lurek.keypressed` handler exactly
+- `## Notes` section is optional — omit if nothing non-obvious to say
+
+### Step 6 — Generate `screen.png`
+
+After writing all Lua files, generate `screen.png` with the screenshot tool:
+
+```powershell
+# Single demo
+python tools/demos/gen_demo_screenshots.py --demo <name> --overwrite --frames 3
+
+# Multiple demos at once
+python tools/demos/gen_demo_screenshots.py --demo <name1> --demo <name2> --overwrite --frames 3
+
+# All demos missing a screen.png
+python tools/demos/gen_demo_screenshots.py --frames 3

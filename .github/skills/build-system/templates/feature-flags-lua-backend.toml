@@ -1,0 +1,4 @@
+# Cargo.toml features section
+default = ["lua-jit"]
+lua-jit = ["mlua/luajit", "mlua/vendored"]   # primary; JIT compilation
+lua54   = ["mlua/lua54",  "mlua/vendored"]   # fallback; pure interpreter

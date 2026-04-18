@@ -1,19 +1,20 @@
 ---
 name: quality-pipeline
 description: "Load this skill when running quality checks, interpreting audit/coverage results, or remediating issues found by Lurek2D's Python analysis tools. Covers the full audit→diagnose→fix→verify cycle: which tools to run, what their output means, which agent or fixer script handles each issue type, and how to compose tools into a quality sweep. Skip it for implementing features, writing game scripts, or CAG file editing."
+companion_files:
+  examples: []
+  templates: []
+  snippets: [snippets/1-generators-produce-reference-docs-run.ps1, snippets/quick-check-before-any-commit.ps1, snippets/standard-pre-commit-sweep.ps1, snippets/single-module-deep-audit.ps1, snippets/full-project-quality-sweep.ps1, snippets/extended-notes.md]
+related_skills: []
 ---
+
+# quality-pipeline
+
+## Mission
 
 # Quality Pipeline Skill
 
-## Owns
-
-- The audit→diagnose→fix→verify quality cycle for Lurek2D
-- Knowing which Python tool to run for each quality concern
-- Interpreting tool output and mapping issues to the correct fixer or agent
-- Composing multi-tool quality sweeps at different granularities (single module → full project)
-- Quality pipeline integration with the commit quality gate
-
-## Load When
+## When To Load
 
 - Running quality checks before a commit or code review
 - Interpreting output from audit, coverage, or validation tools
@@ -21,21 +22,30 @@ description: "Load this skill when running quality checks, interpreting audit/co
 - Planning a quality sweep across the project
 - Investigating why `quality_report.py` shows a FAIL verdict
 
-## Do Not Own
+## When To Skip
 
+- Skip it for implementing features, writing game scripts, or CAG file editing.
+
+## Domain Knowledge
+
+### Owns
+- The audit→diagnose→fix→verify quality cycle for Lurek2D
+- Knowing which Python tool to run for each quality concern
+- Interpreting tool output and mapping issues to the correct fixer or agent
+- Composing multi-tool quality sweeps at different granularities (single module → full project)
+- Quality pipeline integration with the commit quality gate
+
+### Do Not Own
 - Individual tool internals — see `tools/README.md` and subfolder READMEs
 - CAG validation — see `tools-cag-validation` skill
 - Module-specific audit deep-dives — see `module-audit` skill
 - Test writing — see `testing-rust` skill
 - Docstring writing — see `documentation` skill
 
-## Tool Categories
-
+### Tool Categories
 ### 1. Generators — produce reference docs (run first)
 
-```powershell
-python tools/gen_all_docs.py
-```
+> See [snippets/1-generators-produce-reference-docs-run.ps1](snippets/1-generators-produce-reference-docs-run.ps1) for the example.
 
 This orchestrates all doc generators under `tools/docs/`. Always run this before auditing — auditors read generated output.
 
@@ -79,8 +89,7 @@ This orchestrates all doc generators under `tools/docs/`. Always run this before
 | `tools/fix/expand_examples.py` | Thin examples needing more API usage | `example_coverage.py` |
 | `tools/fix/add_test_markers.py` | Missing `@covers` annotations | `lua_api_test_coverage.py` |
 
-## Issue → Fix Routing
-
+### Issue → Fix Routing
 When a tool reports an issue, use this table to determine the remediation path:
 
 | Issue type | Detected by | Automated fix | Agent if manual |
@@ -90,104 +99,18 @@ When a tool reports an issue, use this table to determine the remediation path:
 | Missing `# Parameters`/`# Returns` | `doc_coverage.py --report-missing` | `fix_docstrings.py` | `Doc-Writer` |
 | Malformed docstring | `docstring_audit.py` | `docstring_fix.py` | `Doc-Writer` |
 | Missing AGENT.md | `validate_agent_md.py`, `audit_module.py` | — | `Developer` (load `agent-md` skill) |
-| AGENT.md structural error | `validate_agent_md.py` | — | `Developer` (load `agent-md` skill) |
-| Missing `docs/specs/*.md` | `validate_module_coverage.py` | — | `Doc-Writer` |
-| Missing test coverage | `test_coverage.py`, `lua_api_test_coverage.py` | — | `Tester` |
-| Lua test structure violation | `lua_test_structure_audit.py` | `lua_test_structure_audit.py --fix` for safe cases | `Tester` |
-| Evidence/golden contract violation | `lua_evidence_golden_contract_audit.py` | `lua_evidence_golden_contract_audit.py --fix` for missing markers | `Tester` |
-| Missing `@covers` markers | `lua_api_test_coverage.py` | `add_test_markers.py` | `Tester` |
-| Missing example script | `example_coverage.py` | — | `Doc-Writer` (load `examples-management` skill) |
-| Thin example | `example_coverage.py` | `expand_examples.py` | `Doc-Writer` |
-| Game/demo structure error | `validate_game.py` | — | `Developer` (load `demo-creation` skill) |
-| CAG schema violation | `cag_validate.py` | — | `CAG-Architect` |
-| Lua API contract violation | `validate_lua_api.py` | — | `Developer` (load `lua-rust-bridge` skill) |
-| Module architecture violation | `audit_module.py` | — | `Architect` |
 
-## Quality Sweep Recipes
+> See [snippets/extended-notes.md](snippets/extended-notes.md) for additional notes.
 
-### Quick check (before any commit)
+## Companion File Index
 
-```powershell
-cargo test ; cargo clippy -- -D warnings
-```
+- [snippets/1-generators-produce-reference-docs-run.ps1](snippets/1-generators-produce-reference-docs-run.ps1) — 1. Generators — produce reference docs (run first)
+- [snippets/quick-check-before-any-commit.ps1](snippets/quick-check-before-any-commit.ps1) — Quick check (before any commit)
+- [snippets/standard-pre-commit-sweep.ps1](snippets/standard-pre-commit-sweep.ps1) — Standard pre-commit sweep
+- [snippets/single-module-deep-audit.ps1](snippets/single-module-deep-audit.ps1) — Single module deep audit
+- [snippets/full-project-quality-sweep.ps1](snippets/full-project-quality-sweep.ps1) — Full project quality sweep
+- [snippets/extended-notes.md](snippets/extended-notes.md) — extended notes (overflow)
 
-### Standard pre-commit sweep
+## References
 
-```powershell
-python tools/gen_all_docs.py
-python tools/audit/quality_report.py
-python tools/validate/cag_validate.py
-cargo test ; cargo clippy -- -D warnings
-```
-
-### Single module deep audit
-
-```powershell
-python tools/audit/audit_module.py <module> --docs-quality
-python tools/audit/validate_agent_md.py --module <module>
-python tools/audit/test_coverage.py --suggest
-```
-
-### Full project quality sweep
-
-```powershell
-# 1. Generate all docs (so auditors read fresh data)
-python tools/gen_all_docs.py
-
-# 2. Structural validators
-python tools/validate/cag_validate.py
-python tools/validate/validate_module_coverage.py
-python tools/validate/validate_lua_api.py src/lua_api/
-
-# 3. Documentation coverage
-python tools/audit/doc_coverage.py
-python tools/audit/docstring_audit.py
-python tools/audit/doc_audit.py
-
-# 4. Test coverage
-python tools/audit/test_coverage.py
-python tools/audit/lua_api_test_coverage.py --report
-python tools/audit/example_coverage.py
-
-# 5. Module audits
-python tools/audit/audit_module.py --all --docs-quality
-python tools/audit/validate_agent_md.py --all
-
-# 6. Master dashboard (reads cached output from steps 3-5)
-python tools/audit/quality_report.py
-
-# 7. Quality gate
-cargo test ; cargo clippy -- -D warnings
-```
-
-### Remediation loop
-
-After a quality sweep, fix issues in priority order:
-
-1. **Validators** (FAIL = blocking): fix structural violations first
-2. **Audit ERRORs**: fix items that cause module FAIL verdicts
-3. **Audit WARNINGs**: fix if count ≥ 3 for a module (triggers FAIL)
-4. **Coverage gaps**: add missing tests, docstrings, examples
-5. Re-run the sweep to verify all fixes
-
-## Interpreting quality_report.py Output
-
-The master dashboard shows four sections:
-
-| Section | Source tool | PASS threshold |
-|---|---|---|
-| Rust doc coverage | `doc_audit.py` → `doc_coverage.py` | ≥ 95% |
-| Lua doc coverage | `doc_audit.py` → `gen_lua_api_data.py` | ≥ 95% |
-| Rust test coverage | `test_coverage.py` | ≥ 80% |
-| Lua test coverage | `test_coverage.py` | ≥ 80% |
-
-Overall verdict is **PASS** only when all four sections pass their thresholds.
-
-## Integration with Commit Workflow
-
-The system prompt mandates `cargo test && cargo clippy -- -D warnings` before every commit. This skill adds the Python quality tools as a recommended pre-commit layer:
-
-1. Run `python tools/gen_all_docs.py` (regenerate docs)
-2. Run `python tools/audit/quality_report.py` (check quality dashboard)
-3. If PASS → proceed to `cargo test && cargo clippy`
-4. If FAIL → use the Issue → Fix Routing table to remediate, then re-check
+- See related skills in `.github/skills/`.

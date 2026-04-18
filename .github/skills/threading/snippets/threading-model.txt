@@ -1,0 +1,10 @@
+Main Game Thread
+├── Lua VM (full lurek.* API)
+├── SharedState (Rc<RefCell<>>)
+├── GpuRenderer, Mixer, Physics
+└── lurek.update() / lurek.draw()
+
+Worker Thread N
+├── Separate Lua VM (restricted API)
+├── No SharedState access
+└── Channel ◄────────► Main Thread Channel

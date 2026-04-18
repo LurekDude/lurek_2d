@@ -1,0 +1,3 @@
+let t = std::time::Instant::now();
+// ... code to measure ...
+log::debug!("phase took {}µs", t.elapsed().as_micros());

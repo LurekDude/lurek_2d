@@ -1,0 +1,9 @@
+User WGSL source
+  └── Engine prepends standard header:
+        @group(0) @binding(0) var<uniform> luna_ScreenSize: vec2<f32>;
+        @group(0) @binding(1) var<uniform> luna_Time: f32;
+        @group(1) @binding(0) var luna_texture: texture_2d<f32>;
+        @group(1) @binding(1) var luna_sampler: sampler;
+  └── Validate with naga (bundled in wgpu)
+  └── Create dedicated wgpu::RenderPipeline
+  └── Store as ShaderKey in SharedState

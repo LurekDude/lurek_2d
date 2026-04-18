@@ -1,0 +1,6 @@
+winit Window (Arc<Window>)
+  └── wgpu::Instance
+        └── wgpu::Adapter (auto-select: Vulkan → DX12 → Metal → fallback)
+              └── wgpu::Device + Queue
+                    └── wgpu::Surface (swapchain)
+                          └── GpuRenderer::render_frame()

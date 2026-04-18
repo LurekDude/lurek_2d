@@ -1,0 +1,18 @@
+# Search for existing issues before creating
+mcp_github_search_issues: query="lurek2d shadow physics", owner="...", repo="lurek2d"
+
+# Create an issue with labels
+mcp_github_issue_write: title, body, labels=["type:feature","module:graphics"], milestone=4
+
+# Read a PR or issue
+mcp_github_pull_request_read: owner, repo, pull_number
+mcp_github_issue_read: owner, repo, issue_number
+
+# List open issues for a milestone
+mcp_github_list_issues: state="open", milestone=4, labels="status:ready"
+
+# Add a comment
+mcp_github_add_issue_comment: owner, repo, issue_number, body
+
+# Merge a PR (only after quality gates pass)
+mcp_github_merge_pull_request: owner, repo, pull_number, merge_method="squash"

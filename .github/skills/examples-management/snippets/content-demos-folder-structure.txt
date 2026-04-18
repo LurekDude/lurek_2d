@@ -1,0 +1,5 @@
+content/demos/<name>/
+├── main.lua      — required; game entry point
+├── conf.toml     — optional; custom window/module settings
+├── README.md     — optional; what the demo shows
+└── assets/       — optional; sprites, sounds, maps

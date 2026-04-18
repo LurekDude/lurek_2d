@@ -1,0 +1,14 @@
+extensions/vscode/
+├── package.json           — manifest: commands, contributes, activationEvents
+├── src/
+│   ├── extension.ts       — activate() entry point
+│   ├── mcp/server.ts      — MCP server (methods, responses)
+│   ├── services/
+│   │   └── apiData.ts     — loads api_data.json / lua_api_reference_generated.md
+│   └── providers/
+│       ├── completionProvider.ts   — lurek.* completions
+│       ├── hoverProvider.ts        — hover docs
+│       ├── luacatsProvider.ts      — LuaCATS ---@class / ---@param parsing
+│       └── diagnosticsProvider.ts — inline errors
+├── assets/                — extension icons, media
+└── out/                   — compiled JS (git-ignored)

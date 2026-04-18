@@ -1,11 +1,20 @@
 ---
 name: vscode-extension
 description: "Load this skill when building, debugging, or extending the Lurek2D VS Code extension in extensions/vscode/. Use for: adding IntelliSense completions, MCP server endpoints, webview panels, new commands, extension configuration, or publishing. Skip it for engine Rust code, game scripting, or documentation outside the extension."
+companion_files:
+  examples: []
+  templates: []
+  snippets: [snippets/extension-layout.txt, snippets/development-loop.ps1, snippets/build-and-package.ps1, snippets/testing-the-extension.ps1]
+related_skills: []
 ---
+
+# vscode-extension
+
+## Mission
 
 # VS Code Extension — Lurek2D
 
-## Load When
+## When To Load
 
 - Adding IntelliSense completions for `lurek.*` API functions
 - Implementing new MCP server endpoints or tools
@@ -14,57 +23,31 @@ description: "Load this skill when building, debugging, or extending the Lurek2D
 - Debugging extension activation or provider errors
 - Publishing the extension or updating the manifest
 
-## Owns
+## When To Skip
 
+- Skip it for engine Rust code, game scripting, or documentation outside the extension.
+
+## Domain Knowledge
+
+### Owns
 - VS Code extension activation and command registration
 - IntelliSense provider architecture (`completionProvider`, `hoverProvider`, `luacatsProvider`)
 - MCP server implementation (`extensions/vscode/src/mcp/server.ts`)
 - Extension packaging, testing, and publishing workflow
 
-## Extension Layout
+### Extension Layout
+> See [snippets/extension-layout.txt](snippets/extension-layout.txt) for the example.
 
-```
-extensions/vscode/
-├── package.json           — manifest: commands, contributes, activationEvents
-├── src/
-│   ├── extension.ts       — activate() entry point
-│   ├── mcp/server.ts      — MCP server (methods, responses)
-│   ├── services/
-│   │   └── apiData.ts     — loads api_data.json / lua_api_reference_generated.md
-│   └── providers/
-│       ├── completionProvider.ts   — lurek.* completions
-│       ├── hoverProvider.ts        — hover docs
-│       ├── luacatsProvider.ts      — LuaCATS ---@class / ---@param parsing
-│       └── diagnosticsProvider.ts — inline errors
-├── assets/                — extension icons, media
-└── out/                   — compiled JS (git-ignored)
-```
-
-## IntelliSense Architecture
-
+### IntelliSense Architecture
 - **User-defined class completions**: parsed from LuaCATS annotations (`---@class`, `---@param`, `---@return`, `---@field`) in game Lua files via `luacatsProvider.ts`
 
-## Development Loop
+### Development Loop
+> See [snippets/development-loop.ps1](snippets/development-loop.ps1) for the example.
 
-```powershell
-cd vscode-extension
-npm install           # install dependencies
-npm run compile       # TypeScript → JS (out/)
-# Press F5 in VS Code to launch Extension Development Host
-# Make changes → Ctrl+Shift+P → "Developer: Reload Window" to apply
-```
+### Build and Package
+> See [snippets/build-and-package.ps1](snippets/build-and-package.ps1) for the example.
 
-## Build and Package
-
-```powershell
-cd vscode-extension
-npm run package       # creates .vsix file for manual install
-# or
-vsce publish          # publish to VS Code Marketplace (requires auth token)
-```
-
-## MCP Server
-
+### MCP Server
 The MCP server exposes Lurek2D engine capabilities to AI agents:
 
 - Defined in `extensions/vscode/src/mcp/server.ts`
@@ -72,30 +55,35 @@ The MCP server exposes Lurek2D engine capabilities to AI agents:
 - Add new MCP tools by registering handler functions in `extensions/vscode/src/mcp/server.ts`
 - Reference `docs/API/` and `docs/API/lua_api_data.json` for available API surface
 
-## Adding a New Command
-
+### Adding a New Command
 1. Register in `package.json` under `contributes.commands`
 2. Add activation in `activationEvents` if needed
 3. Implement handler in `extension.ts` — `vscode.commands.registerCommand("lurek2d.yourCmd", () => { ... })`
 4. Test in Extension Development Host (F5)
 
-## Adding a New Completion Source
-
+### Adding a New Completion Source
 1. Parse source data in `services/apiData.ts`
 2. Return `vscode.CompletionItem[]` from `completionProvider.ts`
 3. Register the provider in `extension.ts` with correct trigger characters and language selector (`lua`)
 
-## Testing the Extension
-
-```powershell
-npm run test          # runs vscode test runner (headless, separate process)
-```
+### Testing the Extension
+> See [snippets/testing-the-extension.ps1](snippets/testing-the-extension.ps1) for the example.
 
 - Tests run via `npm run test` (vscode test runner)
 - Use `@vscode/test-electron` for integration tests against real VS Code API
 
-## Anti-Patterns
-
+### Anti-Patterns
 - **Hard-coding lurek.* lists**: Always derive completions from `docs/API/lua_api_data.json` — never maintain a hand-written list alongside the generated source
 - **Blocking the main thread**: Use `async/await` for file I/O in providers — VS Code providers are called synchronously but can return `Promise`
 - **Skipping activation guards**: Check `context.subscriptions` and dispose providers on deactivation to prevent memory leaks
+
+## Companion File Index
+
+- [snippets/extension-layout.txt](snippets/extension-layout.txt) — Extension Layout
+- [snippets/development-loop.ps1](snippets/development-loop.ps1) — Development Loop
+- [snippets/build-and-package.ps1](snippets/build-and-package.ps1) — Build and Package
+- [snippets/testing-the-extension.ps1](snippets/testing-the-extension.ps1) — Testing the Extension
+
+## References
+
+- See related skills in `.github/skills/`.

@@ -1,0 +1,6 @@
+opt-level = "z"          # size-first (avoids vectorisation, limits inlining)
+lto = true               # thin LTO: cross-crate dead code elimination
+codegen-units = 1        # single codegen unit: best dead-code elimination
+strip = "symbols"        # strip debug symbols from binary
+panic = "abort"          # removes unwinder (~500KB saving)
+overflow-checks = false  # speed: debug build already catches overflows

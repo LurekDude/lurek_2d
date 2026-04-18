@@ -1,0 +1,5 @@
+1. Read src/<module>/mod.rs
+2. Count non-empty, non-comment, non-`pub mod`, non-`pub use` lines
+3. If count > 100: ERROR ("mod.rs has business logic — extract to named files")
+4. If count > 30: WARNING ("mod.rs has substantial logic — consider extracting")
+5. Else: PASS

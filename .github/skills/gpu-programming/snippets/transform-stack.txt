@@ -1,0 +1,5 @@
+PushTransform      → push copy of current matrix onto stack
+Translate(dx, dy)  → matrix = matrix * translate(dx, dy)
+Rotate(angle)      → matrix = matrix * rotate(angle)
+Scale(sx, sy)      → matrix = matrix * scale(sx, sy)
+PopTransform       → restore previous matrix from stack
