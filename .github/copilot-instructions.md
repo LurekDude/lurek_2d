@@ -29,6 +29,8 @@ When you change one of these, you MUST update the others in the same commit.
 | `lurek.*` API added / renamed / removed      | `content/examples/<module>.lua` · affected `content/games/` · dependent `content/library/` modules |
 | New module created                           | New `docs/specs/<module>.md` · `docs/specs/README.md`                    |
 | `content/library/<name>/init.lua` changed    | `content/library/<name>/example.lua` · `tests/lua/library/test_library_<name>.lua` · `tests/lua/harness.rs` · regen `docs/API/library-docs.md` via `tools/docs/gen_lib_docs.py` |
+| Plugin candidacy note in `docs/specs/<module>.md` changed | `docs/architecture/plugins.md` §5 candidate table                       |
+| Contributor onboarding flow changes (build steps, first-game tutorial, quality gates) | `docs/handbook.md` (relevant section) · `CONTRIBUTING.md` if needed |
 | Any change                                   | `docs/CHANGELOG.md`                                                      |
 
 Regenerate API references with `python tools/gen_all_docs.py` whenever Rust or Lua API surface changes.
