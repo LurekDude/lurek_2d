@@ -1,8 +1,23 @@
 ﻿--- @module library.economy
 --- @description Pure-Lua resource economy system with named resources, overflow policies,
 --- flow/decay/interest simulation, conversion rules with modifiers, and a ResourceManager.
+--- Optional: uses `lurek.log.debug()` / `lurek.log.info()` when available for transaction tracing.
 --- Port of the Rust src/economy/ module.
 local M = {}
+
+---------------------------------------------------------------------------
+-- Logging helper (optional — works outside Lurek2D too)
+---------------------------------------------------------------------------
+
+--- Internal: log a message via lurek.log if available.
+--- @tparam string level  One of "debug", "info", "warn", "error".
+--- @tparam string msg
+local function _log(level, msg)
+    if type(lurek) == "table" and type(lurek.log) == "table"
+       and type(lurek.log[level]) == "function" then
+        lurek.log[level]("[economy] " .. msg)
+    end
+end
 
 ---------------------------------------------------------------------------
 -- OverflowPolicy helpers
@@ -11,8 +26,12 @@ local M = {}
 local OVERFLOW_POLICIES = { clamp = true, lose = true, wrap = true }
 
 --- Validate an overflow-policy string; defaults to "clamp".
---- @tparam string s
---- @treturn string
+--- Overflow policies control what happens when a resource exceeds capacity:
+---  - **"clamp"** (default): value is capped at capacity; excess is returned.
+---  - **"lose"**: the entire addition is rejected if it would exceed capacity.
+---  - **"wrap"**: value wraps around through [minimum, capacity) range.
+--- @tparam string s  Candidate policy name.
+--- @treturn string  Validated policy ("clamp" if invalid).
 local function validate_overflow(s)
     if OVERFLOW_POLICIES[s] then return s end
     return "clamp"
@@ -26,14 +45,17 @@ local Resource = {}
 Resource.__index = Resource
 
 --- Create a new named resource.
---- @tparam string name   Resource name.
---- @tparam number capacity   Maximum value (-1 = unlimited).
+--- @tparam string name   Resource name (must be a non-empty string).
+--- @tparam number capacity   Maximum value (-1 = unlimited, must be >= -1).
 --- @treturn Resource
 function M.newResource(name, capacity)
+    assert(type(name) == "string" and #name > 0, "resource name must be a non-empty string")
+    local cap = capacity or -1
+    assert(type(cap) == "number" and cap >= -1, "capacity must be a number >= -1")
     local r = setmetatable({}, Resource)
-    r.name        = name or "resource"
+    r.name        = name
     r.value       = 0
-    r.capacity    = capacity or -1
+    r.capacity    = cap
     r.minimum     = 0
     r.flow_rate   = 0
     r.decay_rate  = 0
@@ -72,8 +94,9 @@ end
 function Resource:getCapacity() return self.capacity end
 
 --- Set maximum capacity. Re-clamps value.
---- @tparam number c
+--- @tparam number c  New capacity (>= -1; -1 = unlimited).
 function Resource:setCapacity(c)
+    assert(type(c) == "number" and c >= -1, "capacity must be a number >= -1")
     self.capacity = c
     self.value = self:_clamp(self.value)
 end
@@ -82,8 +105,9 @@ end
 function Resource:getMinimum() return self.minimum end
 
 --- Set minimum value. Re-clamps value.
---- @tparam number m
+--- @tparam number m  New minimum.
 function Resource:setMinimum(m)
+    assert(type(m) == "number", "minimum must be a number")
     self.minimum = m
     self.value = self:_clamp(self.value)
 end
@@ -165,17 +189,24 @@ function Resource:getReserved() return self.reserved end
 function Resource:getAvailable() return self.value - self.reserved end
 
 --- Net rate per tick (flow - decay - upkeep + interest - proportional_decay).
+--- The result is clamped so that applying it for one second will not drive
+--- the resource below its minimum.
 --- @treturn number
 function Resource:getNetRate()
-    return self.flow_rate - self.decay_rate - self.upkeep
-           + (self.value * self.interest_rate)
-           - (self.value * self.decay_percent)
+    local raw = self.flow_rate - self.decay_rate - self.upkeep
+              + (self.value * self.interest_rate)
+              - (self.value * self.decay_percent)
+    -- Clamp: net rate cannot push value below minimum in one tick
+    local max_loss = -(self.value - self.minimum)
+    if raw < max_loss then raw = max_loss end
+    return raw
 end
 
 --- Add amount to the resource. Returns the excess.
---- @tparam number amount
---- @treturn number excess
+--- @tparam number amount  Amount to add (must be non-negative).
+--- @treturn number excess  Amount that did not fit.
 function Resource:add(amount)
+    assert(type(amount) == "number" and amount >= 0, "add amount must be a non-negative number")
     if self.locked then return amount end
     local new = self.value + amount
     if self.overflow == "lose" then
@@ -183,6 +214,7 @@ function Resource:add(amount)
             return amount -- entire addition rejected
         end
         self.value = self:_clamp(new)
+        _log("debug", self.name .. ": add " .. amount .. " (lose) -> " .. self.value)
         return 0
     elseif self.overflow == "wrap" then
         if self.capacity >= 0 and new > self.capacity then
@@ -190,28 +222,33 @@ function Resource:add(amount)
             if range > 0 then
                 self.value = self.minimum + ((new - self.minimum) % range)
             else
-                self.value = self.minimum
+                -- Degenerate: capacity <= minimum — clamp to safe value
+                self.value = self:_clamp(self.minimum)
             end
         else
             self.value = self:_clamp(new)
         end
+        _log("debug", self.name .. ": add " .. amount .. " (wrap) -> " .. self.value)
         return 0
     else -- "clamp"
         local clamped = self:_clamp(new)
         local excess = new - clamped
         if excess < 0 then excess = 0 end
         self.value = clamped
+        _log("debug", self.name .. ": add " .. amount .. " (clamp) -> " .. self.value .. " excess=" .. excess)
         return excess
     end
 end
 
 --- Spend an amount if available. Returns true on success.
---- @tparam number amount
---- @treturn boolean
+--- @tparam number amount  Amount to spend (must be non-negative).
+--- @treturn boolean  True if the spend succeeded.
 function Resource:spend(amount)
+    assert(type(amount) == "number" and amount >= 0, "spend amount must be a non-negative number")
     if self.locked then return false end
     if self:getAvailable() < amount then return false end
     self.value = self.value - amount
+    _log("debug", self.name .. ": spend " .. amount .. " -> " .. self.value)
     return true
 end
 
@@ -223,23 +260,35 @@ function Resource:canAfford(amount)
 end
 
 --- Reserve an amount (reduces available without changing value).
---- @tparam number amount
+--- Reserved is clamped so it cannot exceed the current value.
+--- @tparam number amount  Amount to reserve (must be non-negative).
 function Resource:reserve(amount)
+    assert(type(amount) == "number" and amount >= 0, "reserve amount must be a non-negative number")
     self.reserved = self.reserved + amount
+    -- Clamp: reserved cannot exceed value
+    if self.reserved > self.value then self.reserved = self.value end
+    _log("debug", self.name .. ": reserve " .. amount .. " -> reserved=" .. self.reserved)
 end
 
---- Release a reservation.
---- @tparam number amount
+--- Release a reservation. Clamped to [0, value].
+--- @tparam number amount  Amount to unreserve (must be non-negative).
 function Resource:unreserve(amount)
+    assert(type(amount) == "number" and amount >= 0, "unreserve amount must be a non-negative number")
     self.reserved = self.reserved - amount
     if self.reserved < 0 then self.reserved = 0 end
+    if self.reserved > self.value then self.reserved = self.value end
+    _log("debug", self.name .. ": unreserve " .. amount .. " -> reserved=" .. self.reserved)
 end
 
 --- Advance the resource by dt seconds (flow, decay, interest, proportional decay).
---- @tparam number dt
+--- @tparam number dt  Elapsed seconds (must be non-negative).
 function Resource:tick(dt)
     if not self.enabled then return end
+    local old = self.value
     self.value = self:_clamp(self.value + self:getNetRate() * dt)
+    if self.value ~= old then
+        _log("debug", self.name .. ": tick dt=" .. dt .. " " .. old .. " -> " .. self.value)
+    end
 end
 
 ---------------------------------------------------------------------------
@@ -261,12 +310,14 @@ local Modifier = {}
 Modifier.__index = Modifier
 
 --- Create a new modifier.
---- @tparam string mod_type  "multiply", "add", or "set".
+--- @tparam string mod_type  "multiply", "add", or "set" (defaults to "multiply" if invalid).
 --- @tparam number value     Modifier value.
---- @tparam number duration  Duration (<= 0 = permanent).
---- @tparam string source    Source tag.
+--- @tparam number duration  Duration in seconds (<= 0 = permanent).
+--- @tparam string source    Source tag for identifying the modifier origin.
 --- @treturn Modifier
 function M.newModifier(mod_type, value, duration, source)
+    assert(value == nil or type(value) == "number", "modifier value must be a number")
+    assert(duration == nil or type(duration) == "number", "modifier duration must be a number")
     local m = setmetatable({}, Modifier)
     m.mod_type  = validate_mod_type(mod_type or "multiply")
     m.value     = value or 0
@@ -274,6 +325,7 @@ function M.newModifier(mod_type, value, duration, source)
     m.remaining = (m.duration > 0) and m.duration or 0
     m.source    = source or ""
     m.target    = ""
+    _log("debug", "modifier created: type=" .. m.mod_type .. " value=" .. m.value .. " source=" .. m.source)
     return m
 end
 
@@ -338,11 +390,14 @@ local ConversionRule = {}
 ConversionRule.__index = ConversionRule
 
 --- Create a conversion rule.
---- @tparam string from      Source resource name.
---- @tparam string to        Target resource name.
---- @tparam number rate      Conversion rate.
+--- @tparam string from      Source resource name (non-empty string).
+--- @tparam string to        Target resource name (non-empty string).
+--- @tparam number rate      Conversion rate (defaults to 1).
 --- @treturn ConversionRule
 function M.newConversionRule(from, to, rate)
+    assert(type(from) == "string" and #from > 0, "conversion 'from' must be a non-empty string")
+    assert(type(to) == "string" and #to > 0, "conversion 'to' must be a non-empty string")
+    assert(rate == nil or type(rate) == "number", "conversion rate must be a number")
     local r = setmetatable({}, ConversionRule)
     r.from              = from
     r.to                = to
@@ -458,24 +513,32 @@ function ConversionRule:clearModifiers()
 end
 
 --- Compute effective conversion rate after applying modifiers.
---- @treturn number
+--- Modifier application order: if any non-expired "set" modifier exists,
+--- the last one wins immediately (short-circuits add/multiply computation).
+--- Otherwise: additive modifiers sum onto the base rate, then multiplicative
+--- modifiers scale the result.
+--- @treturn number  Effective rate after modifiers.
 function ConversionRule:effectiveRate()
+    -- Pass 1: scan for last non-expired set modifier (always wins)
+    local set_val = nil
+    for _, m in ipairs(self.modifiers) do
+        if not m:isExpired() and m.mod_type == "set" then
+            set_val = m.value
+        end
+    end
+    if set_val ~= nil then return set_val end
+
+    -- Pass 2: no set modifier — accumulate add + multiply
     local add_total = 0
     local mul_total = 1
-    local set_val   = nil
     for _, m in ipairs(self.modifiers) do
         if not m:isExpired() then
             if m.mod_type == "add" then
                 add_total = add_total + m.value
             elseif m.mod_type == "multiply" then
                 mul_total = mul_total * m.value
-            elseif m.mod_type == "set" then
-                set_val = m.value -- last wins
             end
         end
-    end
-    if set_val ~= nil then
-        return set_val
     end
     return (self.rate + add_total) * mul_total
 end
@@ -593,6 +656,7 @@ function ResourceManager:convert(from, to, amount)
     src:spend(total_cost)
     dst:add(output)
     rule:startCooldown()
+    _log("info", "convert " .. from .. " -> " .. to .. ": spent " .. total_cost .. " produced " .. output)
     return true
 end
 

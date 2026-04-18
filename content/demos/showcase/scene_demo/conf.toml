@@ -1,9 +1,0 @@
-# conf.toml — engine configuration for scene_demo
-
-[window]
-title = "Scene Manager Demo"
-width = 800
-height = 600
-
-[performance]
-target_fps = 60

@@ -820,6 +820,22 @@ fn lua_test_library_doll() {
     run_lua_test("library/test_library_doll.lua");
 }
 #[test]
+fn lua_test_library_lobby() {
+    run_lua_test("library/test_library_lobby.lua");
+}
+#[test]
+fn lua_test_library_netstate() {
+    run_lua_test("library/test_library_netstate.lua");
+}
+#[test]
+fn lua_test_library_rpc() {
+    run_lua_test("library/test_library_rpc.lua");
+}
+#[test]
+fn lua_test_library_patterns() {
+    run_lua_test("library/test_library_patterns.lua");
+}
+#[test]
 fn lua_test_animation() {
     run_lua_test("unit/test_animation.lua");
 }

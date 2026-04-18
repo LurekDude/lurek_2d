@@ -1,9 +1,0 @@
-# conf.toml — engine configuration for the Trajectory Sports demo
-
-[window]
-title = "Trajectory Sports"
-width = 800
-height = 600
-
-[performance]
-target_fps = 60

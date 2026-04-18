@@ -3,6 +3,11 @@
 -- A pure-Lua coroutine scheduler that integrates with the engine's update loop.
 -- No engine dependencies; works in headless test VMs.
 --
+-- Tasks are coroutine bodies that receive a `yield(seconds)` helper. Calling
+-- `yield(n)` suspends the task for `n` seconds of game time. When the wait
+-- elapses the scheduler resumes the coroutine. Tasks that return (or error)
+-- are automatically removed on the next `update()`.
+--
 -- Usage:
 --   local patterns = require("library.patterns")
 --   local sched = patterns.newScheduler()
@@ -18,9 +23,31 @@
 
 local M = {}
 
+--- Default maximum coroutine resumes per single `update()` call.
+-- Prevents an infinite loop when a task yields 0 repeatedly.
+M.DEFAULT_MAX_ITERATIONS = 1000
+
+-- ── Optional logging ──────────────────────────────────────────────────────────
+
+--- @local
+--- Try to load lurek.log; falls back to a no-op if unavailable (headless tests).
+local log_ok, _log = pcall(function()
+    return lurek and lurek.log
+end)
+if not log_ok or not _log then
+    _log = {
+        debug = function() end,
+        warn  = function() end,
+        error = function() end,
+    }
+end
+
 -- ── Internal helpers ──────────────────────────────────────────────────────────
 
----@local
+--- @local
+--- Wrap a callable into a task descriptor.
+-- @tparam function fn  Coroutine body.
+-- @treturn table  Task record.
 local function wrap_task(fn)
     local co = coroutine.create(fn)
     return {
@@ -28,67 +55,96 @@ local function wrap_task(fn)
         wait    = 0.0,
         paused  = false,
         done    = false,
+        started = false,        -- true after the first resume
         id      = nil,          -- assigned by scheduler
+        error   = nil,          -- captured error message (if any)
     }
 end
 
 -- ── Scheduler ─────────────────────────────────────────────────────────────────
 
 --- Create a new coroutine scheduler.
--- Manages a pool of coroutine tasks; each task can yield(seconds) to pause itself.
+-- Manages a pool of coroutine tasks; each task can `yield(seconds)` to pause
+-- itself. Completed, errored, and removed tasks are cleaned up automatically.
 --
--- @return Scheduler — schedulerhandle
-function M.newScheduler()
+-- @tparam[opt] table opts  Options table.
+-- @tparam[opt=1000] number opts.max_iterations  Max coroutine resumes per `update()`.
+-- @treturn Scheduler  A new scheduler handle.
+function M.newScheduler(opts)
+    opts = opts or {}
 
     ---@class Scheduler
     local sched = {
-        _tasks   = {},
-        _next_id = 1,
+        _tasks          = {},
+        _next_id        = 1,
+        _max_iterations = opts.max_iterations or M.DEFAULT_MAX_ITERATIONS,
+        _errors         = {},   -- list of {id=, msg=} for tasks that errored
     }
 
     --- Add a new task function to the scheduler.
     -- The task receives a `yield` function as its first argument.
-    -- Call `yield(seconds)` inside the task to pause for that long.
+    -- Call `yield(seconds)` inside the task to pause for that many seconds.
     --
-    -- @param fn function — coroutine body: `function(yield) ... end`
-    -- @return number — task id
-    function sched:add(fn)
+    -- @tparam function fn  Coroutine body: `function(yield) ... end`.
+    -- @tparam[opt] string name  Optional human-readable name for logging.
+    -- @treturn number  Task id.
+    function sched:add(fn, name)
+        if type(fn) ~= "function" then
+            error("patterns.Scheduler:add() — first argument must be a function, got " .. type(fn), 2)
+        end
+
         local task = wrap_task(fn)
-        task.id = self._next_id
+        task.id   = self._next_id
+        task.name = name or ("task_" .. task.id)
         self._next_id = self._next_id + 1
         table.insert(self._tasks, task)
-        -- Kick off: run until the first yield or return
-        -- Pass the yield helper to the coroutine
+
+        _log.debug("[patterns] add task #" .. task.id .. " '" .. task.name .. "'")
+
+        -- Kick off: run until the first yield or return.
         local yield_fn = function(seconds)
             coroutine.yield(seconds or 0)
         end
-        local ok, wait = coroutine.resume(task.co, yield_fn)
+        local ok, wait_or_err = coroutine.resume(task.co, yield_fn)
+        task.started = true
         if not ok then
-            task.done = true
+            task.done  = true
+            task.error = tostring(wait_or_err)
+            _log.error("[patterns] task #" .. task.id .. " error on start: " .. task.error)
+            table.insert(self._errors, { id = task.id, msg = task.error })
         elseif coroutine.status(task.co) == "dead" then
             task.done = true
+            _log.debug("[patterns] task #" .. task.id .. " completed immediately")
         else
-            task.wait = type(wait) == "number" and wait or 0
+            task.wait = type(wait_or_err) == "number" and wait_or_err or 0
         end
         return task.id
     end
 
     --- Remove a task by id.
-    -- @param id number — task id returned by add()
-    -- @return boolean — true if a task was removed
+    -- @tparam number id  Task id returned by `add()`.
+    -- @treturn boolean  True if a task was removed.
     function sched:remove(id)
+        if type(id) ~= "number" then
+            error("patterns.Scheduler:remove() — id must be a number, got " .. type(id), 2)
+        end
         for i, t in ipairs(self._tasks) do
             if t.id == id then
                 table.remove(self._tasks, i)
+                _log.debug("[patterns] removed task #" .. id)
                 return true
             end
         end
         return false
     end
 
-    --- Pause a task by id.
-    -- @param id number
+    --- Pause a task by id.  Paused tasks keep their remaining wait time but are
+    -- not ticked until resumed.
+    -- @tparam number id  Task id.
     function sched:pause(id)
+        if type(id) ~= "number" then
+            error("patterns.Scheduler:pause() — id must be a number, got " .. type(id), 2)
+        end
         for _, t in ipairs(self._tasks) do
             if t.id == id then
                 t.paused = true
@@ -98,8 +154,11 @@ function M.newScheduler()
     end
 
     --- Resume a paused task by id.
-    -- @param id number
+    -- @tparam number id  Task id.
     function sched:resume(id)
+        if type(id) ~= "number" then
+            error("patterns.Scheduler:resume() — id must be a number, got " .. type(id), 2)
+        end
         for _, t in ipairs(self._tasks) do
             if t.id == id then
                 t.paused = false
@@ -108,13 +167,53 @@ function M.newScheduler()
         end
     end
 
+    --- Return the status of a task.
+    -- @tparam number id  Task id.
+    -- @treturn string|nil  One of `"running"`, `"paused"`, `"done"`, `"error"`, or `nil` if not found.
+    -- @treturn string|nil  Error message if status is `"error"`.
+    function sched:getStatus(id)
+        if type(id) ~= "number" then
+            error("patterns.Scheduler:getStatus() — id must be a number, got " .. type(id), 2)
+        end
+        for _, t in ipairs(self._tasks) do
+            if t.id == id then
+                if t.error then
+                    return "error", t.error
+                elseif t.done then
+                    return "done"
+                elseif t.paused then
+                    return "paused"
+                else
+                    return "running"
+                end
+            end
+        end
+        return nil
+    end
+
     --- Step all active tasks by dt seconds.
-    -- Tasks whose wait time has elapsed are resumed once per update call.
+    -- Tasks whose wait time has elapsed are resumed. A per-call iteration guard
+    -- prevents infinite loops when a task yields 0 repeatedly.
     --
-    -- @param dt number — delta time in seconds
+    -- @tparam number dt  Delta time in seconds (must be >= 0).
+    -- @treturn number  Number of coroutine resumes performed this call.
     function sched:update(dt)
+        if type(dt) ~= "number" then
+            error("patterns.Scheduler:update() — dt must be a number, got " .. type(dt), 2)
+        end
+        if dt < 0 then
+            error("patterns.Scheduler:update() — dt must be >= 0, got " .. dt, 2)
+        end
+
+        local iterations = 0
+        local max_iter   = self._max_iterations
         local i = 1
         while i <= #self._tasks do
+            if iterations >= max_iter then
+                _log.warn("[patterns] update() hit max iterations (" .. max_iter .. "), breaking")
+                break
+            end
+
             local t = self._tasks[i]
             if t.done then
                 table.remove(self._tasks, i)
@@ -122,13 +221,22 @@ function M.newScheduler()
             elseif not t.paused then
                 t.wait = t.wait - dt
                 if t.wait <= 0 then
-                    local ok, wait = coroutine.resume(t.co)
-                    if not ok or coroutine.status(t.co) == "dead" then
+                    iterations = iterations + 1
+                    local ok, wait_or_err = coroutine.resume(t.co)
+                    if not ok then
+                        t.done  = true
+                        t.error = tostring(wait_or_err)
+                        _log.error("[patterns] task #" .. t.id .. " error: " .. t.error)
+                        table.insert(self._errors, { id = t.id, msg = t.error })
+                        table.remove(self._tasks, i)
+                        -- do not increment i
+                    elseif coroutine.status(t.co) == "dead" then
                         t.done = true
+                        _log.debug("[patterns] task #" .. t.id .. " completed")
                         table.remove(self._tasks, i)
                         -- do not increment i
                     else
-                        t.wait = type(wait) == "number" and wait or 0
+                        t.wait = type(wait_or_err) == "number" and wait_or_err or 0
                         i = i + 1
                     end
                 else
@@ -138,17 +246,31 @@ function M.newScheduler()
                 i = i + 1
             end
         end
+        return iterations
     end
 
     --- Return the number of active (non-done) tasks.
-    -- @return number
+    -- @treturn number  Count of tasks still in the scheduler.
     function sched:getCount()
         return #self._tasks
+    end
+
+    --- Return the list of errors captured since creation (or last `clearErrors()`).
+    -- Each entry is `{ id = number, msg = string }`.
+    -- @treturn table  Array of error records.
+    function sched:getErrors()
+        return self._errors
+    end
+
+    --- Clear the captured error list.
+    function sched:clearErrors()
+        self._errors = {}
     end
 
     --- Remove all tasks immediately.
     function sched:clear()
         self._tasks = {}
+        _log.debug("[patterns] cleared all tasks")
     end
 
     return sched

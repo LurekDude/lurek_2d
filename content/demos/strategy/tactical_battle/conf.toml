@@ -1,9 +1,0 @@
-# conf.toml — engine configuration for the Tactical Battle demo
-
-[window]
-title = "Tactical Battle"
-width = 800
-height = 680
-
-[performance]
-target_fps = 60

@@ -893,4 +893,195 @@ describe("StatsRegistry", function()
         expect_equal(mage_pos < rogue_pos, true)
     end)
 end)
+
+-- ── Buff formula correctness ────────────────────────────────────
+
+-- @description Validates the corrected buff formula: base * mul_prod + add_sum.
+describe("Buff formula", function()
+    -- @covers library.stats.newSheet
+    -- @description Verifies that a zero multiplier zeroes only the base, not the additive bonuses.
+    it("zero multiplier preserves additive buffs", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 5, 0, -1, "nullify")
+        -- Formula: 10 * 0 + 5 = 5 (NOT (10+5)*0 = 0)
+        expect_equal(s:get("str"), 5)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description Verifies combined additive and multiplicative buffs use base*mul+add formula.
+    it("combined add and mul uses correct order", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 5, 2, -1, "combo")
+        -- Formula: 10 * 2 + 5 = 25 (NOT (10+5)*2 = 30)
+        expect_equal(s:get("str"), 25)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description Checks multiple buffs stack correctly with the new formula.
+    it("multiple buffs stack correctly", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 3, 1, -1, "a")
+        s:addBuff("str", 2, 1.5, -1, "b")
+        -- add_sum = 3+2 = 5, mul_prod = 1*1.5 = 1.5
+        -- Formula: 10 * 1.5 + 5 = 20
+        expect_near(s:get("str"), 20, 0.01)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description Verifies pure multiplicative buff without additive component.
+    it("pure multiplicative only", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 0, 3, -1, "triple")
+        expect_equal(s:get("str"), 30)
+    end)
+end)
+
+-- ── Stack mode enforcement ──────────────────────────────────────
+
+-- @description Tests that StackMode is enforced when adding duplicate buffs.
+describe("Buff stack modes", function()
+    -- @covers library.stats.newSheet
+    -- @description StackMode.None rejects a duplicate buff with the same stat+source.
+    it("None rejects duplicate", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        local h1 = s:addBuff("str", 5, 1, -1, "aura", Stats.StackMode.None)
+        expect_equal(h1 ~= nil, true)
+        local h2 = s:addBuff("str", 5, 1, -1, "aura", Stats.StackMode.None)
+        expect_equal(h2, nil)
+        expect_equal(s:getBuffCount("str"), 1)
+        expect_equal(s:get("str"), 15)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description StackMode.Duration extends the remaining time of an existing duplicate buff.
+    it("Duration extends existing buff", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        local h1 = s:addBuff("str", 5, 1, 10, "potion", Stats.StackMode.Duration)
+        local h2 = s:addBuff("str", 5, 1, 5, "potion", Stats.StackMode.Duration)
+        -- Should return the same handle
+        expect_equal(h1, h2)
+        -- Should still be one buff
+        expect_equal(s:getBuffCount("str"), 1)
+        -- Duration should be extended
+        local buffs = s:getBuffs("str")
+        expect_equal(buffs[1].duration, 15) -- 10 + 5
+        expect_equal(buffs[1].remaining, 15) -- 10 + 5
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description StackMode.Intensity increases the additive value of an existing duplicate buff.
+    it("Intensity increases add value", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        local h1 = s:addBuff("str", 5, 1, -1, "rune", Stats.StackMode.Intensity)
+        local h2 = s:addBuff("str", 3, 1, -1, "rune", Stats.StackMode.Intensity)
+        -- Should return the same handle
+        expect_equal(h1, h2)
+        -- Should still be one buff
+        expect_equal(s:getBuffCount("str"), 1)
+        -- Effective: 10 * 1 + 8 = 18
+        expect_equal(s:get("str"), 18)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description Without stack_mode, duplicate buffs are always added (backward compat).
+    it("nil stack_mode allows duplicates", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 5, 1, -1, "aura")
+        s:addBuff("str", 5, 1, -1, "aura")
+        expect_equal(s:getBuffCount("str"), 2)
+        expect_equal(s:get("str"), 20)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description Stack mode only matches same stat AND source; different sources always add.
+    it("different sources bypass stack mode", function()
+        local s = Stats.newSheet()
+        s:define("str", 10)
+        s:addBuff("str", 5, 1, -1, "aura_a", Stats.StackMode.None)
+        s:addBuff("str", 5, 1, -1, "aura_b", Stats.StackMode.None)
+        expect_equal(s:getBuffCount("str"), 2)
+    end)
+end)
+
+-- ── Encumbrance update ──────────────────────────────────────────
+
+-- @description Tests that the update tick auto-manages the 'encumbered' flag based on weight.
+describe("Encumbrance update", function()
+    -- @covers library.stats.newSheet
+    -- @description update() sets the 'encumbered' flag when current weight exceeds capacity.
+    it("sets encumbered flag when over limit", function()
+        local s = Stats.newSheet()
+        s:setEncumbrance(150, 100)
+        s:update(0)
+        expect_equal(s:hasFlag("encumbered"), true)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description update() clears the 'encumbered' flag when weight is within capacity.
+    it("clears encumbered flag when under limit", function()
+        local s = Stats.newSheet()
+        s:setEncumbrance(150, 100)
+        s:update(0)
+        expect_equal(s:hasFlag("encumbered"), true)
+        s:setEncumbrance(50, 100)
+        s:update(0)
+        expect_equal(s:hasFlag("encumbered"), false)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description No encumbrance set means no flag changes.
+    it("no encumbrance means no flag", function()
+        local s = Stats.newSheet()
+        s:update(0)
+        expect_equal(s:hasFlag("encumbered"), false)
+    end)
+end)
+
+-- ── Input validation ────────────────────────────────────────────
+
+-- @description Tests input validation at public function boundaries.
+describe("Input validation", function()
+    -- @covers library.stats.newSheet
+    -- @description define() silently ignores non-string stat names.
+    it("define ignores nil name", function()
+        local s = Stats.newSheet()
+        s:define(nil, 10)
+        expect_equal(#s:getStatNames(), 0)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description addBuff returns nil for non-string stat names.
+    it("addBuff returns nil for nil stat", function()
+        local s = Stats.newSheet()
+        local h = s:addBuff(nil, 5, 1, -1, "x")
+        expect_equal(h, nil)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description addXP rejects negative amounts and returns 0 levels gained.
+    it("addXP rejects negative amount", function()
+        local s = Stats.newSheet()
+        local gained = s:addXP(-100)
+        expect_equal(gained, 0)
+        expect_equal(s:getXP(), 0)
+    end)
+
+    -- @covers library.stats.newSheet
+    -- @description addXP handles nil amount gracefully (treats as 0).
+    it("addXP handles nil amount", function()
+        local s = Stats.newSheet()
+        local gained = s:addXP(nil)
+        expect_equal(gained, 0)
+        expect_equal(s:getXP(), 0)
+    end)
+end)
+
 test_summary()

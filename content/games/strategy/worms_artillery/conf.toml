@@ -1,0 +1,7 @@
+[window]
+title      = "Worms Artillery — Lurek2D"
+width      = 960
+height     = 540  # 16:9 for wide terrain view
+
+[performance]
+target_fps = 60

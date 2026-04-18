@@ -293,11 +293,11 @@ describe("ItemPool", function()
         expect_equal(drawn:getType(), "gold")
     end)
 
-    -- @description Verifies case: draw returns unknown item when empty.
-    it("draw returns unknown item when empty", function()
+    -- @description Verifies case: draw returns nil when empty.
+    it("draw returns nil when empty", function()
         local pool = item.newItemPool()
         local drawn = pool:draw()
-        expect_equal(drawn:getType(), "unknown")
+        expect_equal(drawn, nil)
     end)
 
     -- @description Verifies case: size returns entry count.
@@ -1159,6 +1159,207 @@ describe("sortedIndicesByStat descending", function()
         end
         local idx = item.sortedIndicesByStat(items, "v")
         expect_equal(idx[1], 2)  -- 3 first
+    end)
+end)
+
+-- ─── Bug fix: clearTypes does not affect existing items ───────────────────────
+
+-- @description Verifies that items created before clearTypes retain their stats, tags, and category.
+describe("clearTypes isolation", function()
+    -- @description Verifies case: existing items keep stats after clearTypes.
+    it("existing items keep stats after clearTypes", function()
+        item.clearTypes()
+        item.defineType("sword", { category="weapon", base_stats={dmg=10}, base_tags={"sharp"} })
+        local it = item.newItem("sword")
+        item.clearTypes()
+        -- item still has its stats and tags from creation time
+        expect_equal(it:getStat("dmg"), 10)
+        expect_equal(it:hasTag("sharp"), true)
+        expect_equal(it:getCategory(), "weapon")
+        expect_equal(it:getType(), "sword")
+    end)
+
+    -- @description Verifies case: new items after clearTypes get defaults.
+    it("new items after clearTypes get defaults", function()
+        item.clearTypes()
+        item.defineType("sword", { category="weapon", base_stats={dmg=10}, base_tags={} })
+        item.clearTypes()
+        -- type no longer registered, newItem gives defaults
+        local it = item.newItem("sword")
+        expect_equal(it:getStat("dmg"), nil)
+        expect_equal(it:getCategory(), "misc")
+    end)
+end)
+
+-- ─── Bug fix: pool draw edge cases ───────────────────────────────────────────
+
+-- @description Verifies pool draw behavior under empty, nil-return, and unique-type-clamping edge cases.
+describe("Pool draw edge cases", function()
+    -- @description Verifies case: draw returns nil on empty pool.
+    it("draw returns nil on empty pool", function()
+        local pool = item.newItemPool()
+        expect_equal(pool:draw(), nil)
+    end)
+
+    -- @description Verifies case: drawTypes on empty pool returns array with nils.
+    it("drawTypes on empty pool returns nils", function()
+        local pool = item.newItemPool()
+        local drawn = pool:drawTypes(3)
+        expect_equal(drawn[1], nil)
+        expect_equal(drawn[2], nil)
+        expect_equal(drawn[3], nil)
+    end)
+
+    -- @description Verifies case: drawUniqueTypes clamps to available unique types.
+    it("drawUniqueTypes clamps to available unique types", function()
+        item.clearTypes()
+        item.defineType("a", { category="misc", base_stats={}, base_tags={} })
+        item.defineType("b", { category="misc", base_stats={}, base_tags={} })
+        local pool = item.newItemPool()
+        pool:addType("a", 1)
+        pool:addType("b", 1)
+        -- request 10 unique types but only 2 exist
+        local drawn = pool:drawUniqueTypes(10)
+        expect_equal(#drawn, 2)
+        local seen = {}
+        for _, it in ipairs(drawn) do seen[it:getType()] = true end
+        expect_equal(seen["a"], true)
+        expect_equal(seen["b"], true)
+    end)
+
+    -- @description Verifies case: drawUniqueTypes with n=0 returns empty.
+    it("drawUniqueTypes with n=0 returns empty", function()
+        local pool = item.newItemPool()
+        pool:addType("x", 1)
+        local drawn = pool:drawUniqueTypes(0)
+        expect_equal(#drawn, 0)
+    end)
+
+    -- @description Verifies case: addType rejects zero weight.
+    it("addType rejects zero weight", function()
+        local pool = item.newItemPool()
+        expect_error(function()
+            pool:addType("bad", 0)
+        end)
+    end)
+
+    -- @description Verifies case: addType rejects negative weight.
+    it("addType rejects negative weight", function()
+        local pool = item.newItemPool()
+        expect_error(function()
+            pool:addType("bad", -5)
+        end)
+    end)
+
+    -- @description Verifies case: setWeight rejects zero weight.
+    it("setWeight rejects zero weight", function()
+        local pool = item.newItemPool()
+        pool:addType("x", 1)
+        expect_error(function()
+            pool:setWeight("x", 0)
+        end)
+    end)
+end)
+
+-- ─── Bug fix: undefined type items ───────────────────────────────────────────
+
+-- @description Verifies that creating items with unregistered types uses safe defaults.
+describe("Undefined type items", function()
+    -- @description Verifies case: newItem with unregistered type uses misc defaults.
+    it("newItem with unregistered type uses misc defaults", function()
+        item.clearTypes()
+        local it = item.newItem("nonexistent_type")
+        expect_equal(it:getType(), "nonexistent_type")
+        expect_equal(it:getCategory(), "misc")
+        expect_equal(it:getStat("anything"), nil)
+    end)
+
+    -- @description Verifies case: newItem with empty string errors.
+    it("newItem with empty string errors", function()
+        expect_error(function()
+            item.newItem("")
+        end)
+    end)
+
+    -- @description Verifies case: newItem with nil errors.
+    it("newItem with nil errors", function()
+        expect_error(function()
+            item.newItem(nil)
+        end)
+    end)
+end)
+
+-- ─── Input validation ────────────────────────────────────────────────────────
+
+-- @description Verifies that input validation rejects invalid arguments with descriptive errors.
+describe("Input validation", function()
+    -- @description Verifies case: defineType rejects nil name.
+    it("defineType rejects nil name", function()
+        expect_error(function()
+            item.defineType(nil, {})
+        end)
+    end)
+
+    -- @description Verifies case: defineType rejects empty string name.
+    it("defineType rejects empty string name", function()
+        expect_error(function()
+            item.defineType("", {})
+        end)
+    end)
+
+    -- @description Verifies case: defineType rejects non-table def.
+    it("defineType rejects non-table def", function()
+        expect_error(function()
+            item.defineType("valid", "not a table")
+        end)
+    end)
+
+    -- @description Verifies case: newStack rejects empty name.
+    it("newStack rejects empty name", function()
+        expect_error(function()
+            item.newStack("")
+        end)
+    end)
+
+    -- @description Verifies case: newStack rejects negative capacity.
+    it("newStack rejects negative capacity", function()
+        expect_error(function()
+            item.newStack("test", -1)
+        end)
+    end)
+
+    -- @description Verifies case: setStat rejects empty key.
+    it("setStat rejects empty key", function()
+        item.clearTypes()
+        local it = item.newItem("thing")
+        expect_error(function()
+            it:setStat("", 5)
+        end)
+    end)
+
+    -- @description Verifies case: addStat rejects empty key.
+    it("addStat rejects empty key", function()
+        item.clearTypes()
+        local it = item.newItem("thing")
+        expect_error(function()
+            it:addStat("", 5)
+        end)
+    end)
+
+    -- @description Verifies case: pool addType rejects empty type_name.
+    it("pool addType rejects empty type_name", function()
+        local pool = item.newItemPool()
+        expect_error(function()
+            pool:addType("", 1)
+        end)
+    end)
+
+    -- @description Verifies case: pool addType rejects non-number weight.
+    it("pool addType rejects non-number weight", function()
+        local pool = item.newItemPool()
+        expect_error(function()
+            pool:addType("x", "heavy")
+        end)
     end)
 end)
 test_summary()

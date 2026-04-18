@@ -1,9 +1,0 @@
-# conf.toml — Raycaster FPS demo
-
-[window]
-title = "Raycaster FPS"
-width = 960
-height = 540
-
-[performance]
-target_fps = 60

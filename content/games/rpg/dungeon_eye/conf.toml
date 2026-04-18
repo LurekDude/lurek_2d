@@ -1,0 +1,7 @@
+[window]
+title      = "Dungeon Eye — Lurek2D"
+width      = 800
+height     = 640  # taller for status strip
+
+[performance]
+target_fps = 60

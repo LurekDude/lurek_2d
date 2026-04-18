@@ -6,6 +6,16 @@
 
 local M = {}
 
+--- Optional debug logging via lurek.log when running inside the engine.
+--- Falls back to a no-op when lurek is unavailable (e.g. in tests).
+local _log_debug = function() end
+if rawget(_G, 'lurek') and lurek.log and type(lurek.log.debug) == 'function' then
+    _log_debug = function(msg) lurek.log.debug('[combat] ' .. msg) end
+end
+
+local DEFAULT_POOL_SIZE = 64
+M.DEFAULT_POOL_SIZE = DEFAULT_POOL_SIZE
+
 -- ÔöÇÔöÇ ProjectileType enum ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 M.ProjectileType = {
@@ -42,16 +52,21 @@ function M.newCollisionGroupSet()
 end
 
 --- Defines a named group and returns its power-of-two category bit.
--- Returns nil plus an error string if the name is taken or the 16-group
--- maximum has been reached.
--- @param name string Unique group name.
--- @return number|nil Category bit, or nil on error.
--- @return string|nil Error message when first return is nil.
+--- Returns nil plus an error string if the name is empty, taken, or the 16-group
+--- limit has been reached (bitmask overflow protection).
+-- @tparam string name Unique group name (non-empty).
+-- @treturn number|nil Category bit, or nil on error.
+-- @treturn string|nil Error message when first return is nil.
 function CollisionGroupSet:defineGroup(name)
+    if type(name) ~= 'string' or name == '' then
+        return nil, 'group name must be a non-empty string'
+    end
     for _, g in ipairs(self.groups) do
         if g.name == name then return nil, 'group already defined: ' .. name end
     end
-    if #self.groups >= MAX_GROUPS then return nil, 'max groups reached' end
+    if #self.groups >= MAX_GROUPS then
+        return nil, 'max collision groups reached (limit: ' .. MAX_GROUPS .. '); bitmask would overflow'
+    end
     local bit = self._next_bit
     self._next_bit = self._next_bit * 2
     self.groups[#self.groups+1] = { name = name, bit = bit }
@@ -143,12 +158,15 @@ end
 -- ÔöÇÔöÇ MountSlot ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Creates a new turret or weapon mount slot.
--- @param id         string Unique slot identifier.
--- @param x          number Local X offset from chassis centre (default 0).
--- @param y          number Local Y offset from chassis centre (default 0).
--- @param size_class string Size class: 'small', 'medium', or 'large' (default 'medium').
--- @return table MountSlot with arc_min=-pi, arc_max=pi defaults.
+-- @tparam string id Unique slot identifier (non-empty).
+-- @tparam number x Local X offset from chassis centre (default 0).
+-- @tparam number y Local Y offset from chassis centre (default 0).
+-- @tparam string size_class Size class: 'small', 'medium', or 'large' (default 'medium').
+-- @treturn table MountSlot with arc_min=-pi, arc_max=pi defaults.
 function M.newMountSlot(id, x, y, size_class)
+    if type(id) ~= 'string' or id == '' then
+        error('newMountSlot: id must be a non-empty string', 2)
+    end
     return {
         id         = id,
         x          = x or 0,
@@ -165,10 +183,16 @@ local Chassis = {}
 Chassis.__index = Chassis
 
 --- Creates a new chassis with the given physics body ID and maximum hit points.
--- @param body_id number Physics body ID.
--- @param max_hp  number Maximum hit points (HP starts at max_hp).
--- @return Chassis New chassis instance.
+-- @tparam number body_id Physics body ID.
+-- @tparam number max_hp Maximum hit points (must be >= 0; HP starts at max_hp).
+-- @treturn Chassis New chassis instance.
 function M.newChassis(body_id, max_hp)
+    if type(body_id) ~= 'number' then
+        error('newChassis: body_id must be a number', 2)
+    end
+    if type(max_hp) ~= 'number' or max_hp < 0 then
+        error('newChassis: max_hp must be a non-negative number', 2)
+    end
     return setmetatable({
         body_id    = body_id,
         team       = '',
@@ -199,13 +223,17 @@ end
 function Chassis:getSlots() return self.slots end
 
 --- Applies damage to the chassis, clamping HP to zero.
--- Sets destroyed=true if HP reaches zero.
--- @param amount number Damage to apply.
--- @return number Actual damage dealt.
+--- Sets destroyed=true if HP reaches zero.
+-- @tparam number amount Damage to apply (must be >= 0).
+-- @treturn number Actual damage dealt.
 function Chassis:takeDamage(amount)
+    if type(amount) ~= 'number' or amount < 0 then
+        error('takeDamage: amount must be a non-negative number', 2)
+    end
     local actual = math.min(amount, self.hp)
     self.hp = self.hp - actual
     if self.hp <= 0 then self.hp = 0; self.destroyed = true end
+    _log_debug('damage dealt: ' .. actual .. ' (hp: ' .. self.hp .. '/' .. self.max_hp .. ')')
     return actual
 end
 
@@ -236,10 +264,16 @@ local Turret = {}
 Turret.__index = Turret
 
 --- Creates a new turret with the given physics body and joint IDs.
--- @param body_id  number Physics body ID for the turret plate.
--- @param joint_id number Revolute joint ID connecting turret to chassis.
--- @return Turret New turret with default arc [-pi, pi].
+-- @tparam number body_id Physics body ID for the turret plate.
+-- @tparam number joint_id Revolute joint ID connecting turret to chassis.
+-- @treturn Turret New turret with default arc [-pi, pi].
 function M.newTurret(body_id, joint_id)
+    if type(body_id) ~= 'number' then
+        error('newTurret: body_id must be a number', 2)
+    end
+    if type(joint_id) ~= 'number' then
+        error('newTurret: joint_id must be a number', 2)
+    end
     return setmetatable({
         body_id      = body_id,
         joint_id     = joint_id,
@@ -254,14 +288,17 @@ function M.newTurret(body_id, joint_id)
     }, Turret)
 end
 
---- Updates the turret toward its target angle.
--- Returns the desired angular velocity, or nil if no target is set.
--- @param dt            number Delta time in seconds.
--- @param current_angle number Current turret angle in radians.
--- @return number|nil Angular velocity or nil.
+--- Updates the turret toward its target angle, snapping to the closest arc
+--- boundary when the target lies outside [arc_min, arc_max].
+--- Returns the desired angular velocity, or nil if no target is set.
+-- @tparam number dt Delta time in seconds.
+-- @tparam number current_angle Current turret angle in radians.
+-- @treturn number|nil Angular velocity or nil.
 function Turret:update(dt, current_angle)
     if not self.target_angle then return nil end
-    local diff = self.target_angle - current_angle
+    -- Snap to closest arc boundary when target is outside the arc
+    local effective = self:clampToArc(self.target_angle)
+    local diff = effective - current_angle
     -- normalize to [-pi, pi]
     while diff > math.pi do diff = diff - 2*math.pi end
     while diff < -math.pi do diff = diff + 2*math.pi end
@@ -271,8 +308,11 @@ function Turret:update(dt, current_angle)
 end
 
 --- Sets the desired target angle for the turret.
--- @param angle number Target angle in radians.
-function Turret:aimAtAngle(angle) self.target_angle = angle end
+-- @tparam number angle Target angle in radians.
+function Turret:aimAtAngle(angle)
+    self.target_angle = angle
+    _log_debug('turret aim: ' .. tostring(angle) .. ' rad')
+end
 
 --- Returns true if the target angle is within the turret arc and tolerance.
 -- Mirrors Rust: checks whether clamp_to_arc(target) Ôëł target.
@@ -298,11 +338,14 @@ local Weapon = {}
 Weapon.__index = Weapon
 
 --- Creates a new weapon with default values.
--- Defaults: fire_rate=1, ammo=-1 (infinite), damage_amount=10, range=500,
---           projectile_speed=300, burst_size=1.
--- @param name string Weapon display name.
--- @return Weapon New weapon instance.
+--- Defaults: fire_rate=1, ammo=-1 (infinite), damage_amount=10, range=500,
+---           projectile_speed=300, burst_size=1.
+-- @tparam string name Weapon display name (non-empty).
+-- @treturn Weapon New weapon instance.
 function M.newWeapon(name)
+    if type(name) ~= 'string' or name == '' then
+        error('newWeapon: name must be a non-empty string', 2)
+    end
     return setmetatable({
         name               = name,
         fire_rate          = 1.0,
@@ -330,15 +373,22 @@ function Weapon:canFire()
 end
 
 --- Attempts to fire the weapon. Returns true if a shot was produced.
--- Consumes one ammo token, applies cooldown, and manages burst state.
--- @param dt number Delta time (unused; kept for API parity with Rust).
--- @return boolean True if a shot was fired.
+--- Consumes one ammo token, applies cooldown, and manages burst state.
+--- Intra-burst shots use burst_delay; after the last burst shot, inter-burst
+--- cooldown (1/fire_rate) is applied.
+-- @tparam number dt Delta time (unused; kept for API parity with Rust).
+-- @treturn boolean True if a shot was fired.
 function Weapon:fire(dt)
     if not self:canFire() then return false end
     if self.ammo > 0 then self.ammo = self.ammo - 1 end
     if self.burst_remaining > 0 then
         self.burst_remaining = self.burst_remaining - 1
-        self.cooldown_remaining = self.burst_delay
+        if self.burst_remaining > 0 then
+            self.cooldown_remaining = self.burst_delay
+        else
+            -- Last shot in burst: apply inter-burst cooldown (fire_rate)
+            self.cooldown_remaining = self.fire_rate > 0 and (1.0 / self.fire_rate) or 0
+        end
     else
         self.burst_remaining = math.max(0, self.burst_size - 1)
         if self.burst_remaining > 0 then
@@ -347,6 +397,7 @@ function Weapon:fire(dt)
             self.cooldown_remaining = self.fire_rate > 0 and (1.0 / self.fire_rate) or 0
         end
     end
+    _log_debug('weapon fired: ' .. self.name .. ' (ammo: ' .. self.ammo .. ', burst_remaining: ' .. self.burst_remaining .. ')')
     return true
 end
 
@@ -446,12 +497,16 @@ M.MAX_POOL_SIZE = MAX_POOL_SIZE
 local ProjectilePool = {}
 ProjectilePool.__index = ProjectilePool
 
---- Creates a new projectile pool with the given capacity (capped at MAX_POOL_SIZE).
--- @param pool_size       number Pool capacity (default 64, capped at 1024).
--- @param projectile_type string ProjectileType for this pool (default Ballistic).
--- @return ProjectilePool New pool with all slots free.
+--- Creates a new projectile pool with the given capacity.
+--- Defaults to DEFAULT_POOL_SIZE (64) when pool_size is nil; capped at MAX_POOL_SIZE (1024).
+-- @tparam number pool_size Pool capacity (default 64, max 1024).
+-- @tparam string projectile_type ProjectileType for this pool (default Ballistic).
+-- @treturn ProjectilePool New pool with all slots free.
 function M.newProjectilePool(pool_size, projectile_type)
-    pool_size = math.min(pool_size or 64, MAX_POOL_SIZE)
+    pool_size = math.min(pool_size or DEFAULT_POOL_SIZE, MAX_POOL_SIZE)
+    if pool_size < 1 then
+        error('newProjectilePool: pool_size must be >= 1', 2)
+    end
     local projectiles = {}
     local free = {}
     for i = 1, pool_size do
@@ -489,6 +544,7 @@ function ProjectilePool:spawn(x, y, angle, speed, damage, damage_type, range)
     p.lifetime = 0
     p.distance_traveled = 0
     p.projectile_type = self.projectile_type
+    _log_debug('projectile spawned: idx=' .. idx .. ' speed=' .. speed .. ' damage=' .. damage)
     return idx
 end
 

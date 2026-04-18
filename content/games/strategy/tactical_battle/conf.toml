@@ -1,0 +1,8 @@
+[window]
+title = "Tactical Battle — Lurek2D"
+width = 740
+height = 580
+vsync = true
+
+[engine]
+target_fps = 60

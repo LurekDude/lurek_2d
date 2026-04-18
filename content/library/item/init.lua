@@ -16,19 +16,46 @@
 
 local M = {}
 
+-- ─── Optional logging (guarded) ───────────────────────────────────────────────
+
+local _log_debug, _log_warn
+do
+    local ok = type(lurek) == "table" and type(lurek.log) == "table"
+    if ok and type(lurek.log.debug) == "function" then
+        _log_debug = function(msg) lurek.log.debug(msg) end
+    else
+        _log_debug = function() end
+    end
+    if ok and type(lurek.log.warn) == "function" then
+        _log_warn = function(msg) lurek.log.warn(msg) end
+    else
+        _log_warn = function() end
+    end
+end
+
 -- ─── Type registry ────────────────────────────────────────────────────────────
 
 local _types = {}  -- name -> { category, base_stats, base_tags }
 
 --- Clear all registered item types (useful between tests).
+-- **Note**: Already-created Item objects retain their stats, tags, and category
+-- from the definition that existed at creation time.  Clearing the registry does
+-- NOT retroactively change existing items.
+-- @treturn nil
 function M.clearTypes()
     _types = {}
 end
 
 --- Register a new item type definition.
--- @param name string Unique type name (e.g. "sword").
--- @param def table { name="", category="", base_stats={}, base_tags={}, metadata={} }
+-- @tparam string name Unique type name (e.g. "sword").
+-- @tparam table def Definition table: `{ name="", category="", base_stats={}, base_tags={}, metadata={} }`.
 function M.defineType(name, def)
+    if type(name) ~= "string" or name == "" then
+        error("defineType: 'name' must be a non-empty string, got: " .. tostring(name), 2)
+    end
+    if type(def) ~= "table" then
+        error("defineType: 'def' must be a table, got: " .. type(def), 2)
+    end
     _types[name] = {
         name       = def.name       or name,
         category   = def.category   or "misc",
@@ -36,10 +63,11 @@ function M.defineType(name, def)
         base_tags  = def.base_tags  or {},
         metadata   = def.metadata   or {},
     }
+    _log_debug("item.defineType: registered '" .. name .. "'")
 end
 
 --- Retrieve a registered type definition, or nil.
--- @param name string
+-- @tparam string name
 -- @treturn table|nil
 function M.getType(name)
     return _types[name]
@@ -58,10 +86,20 @@ end
 
 --- Create a new item instance.
 -- Stats and tags are copied from the type definition; modifications are per-instance.
--- @param type_name string Registered type name (or any string for ad-hoc items).
+-- If `type_name` is not registered, a warning is logged and the item receives
+-- default `misc` category with empty stats/tags.
+-- @tparam string type_name Registered type name (or any string for ad-hoc items).
 -- @treturn table Item object.
 function M.newItem(type_name)
-    local def = _types[type_name] or { category="misc", base_stats={}, base_tags={} }
+    if type(type_name) ~= "string" or type_name == "" then
+        error("newItem: 'type_name' must be a non-empty string, got: " .. tostring(type_name), 2)
+    end
+    local def = _types[type_name]
+    if not def then
+        _log_warn("item.newItem: type '" .. type_name .. "' is not registered; using defaults")
+        def = { category="misc", base_stats={}, base_tags={} }
+    end
+    _log_debug("item.newItem: created '" .. type_name .. "'")
 
     local _stats = {}
     for k, v in pairs(def.base_stats) do _stats[k] = v end
@@ -87,22 +125,32 @@ function M.newItem(type_name)
     -- ── Stats ──────────────────────────────────────────────────────────────
 
     --- Return the value of a stat, or nil if not set.
-    -- @param key string
+    -- @tparam string key
     -- @treturn number|nil
     function it:getStat(key)    return _stats[key] end
 
     --- Set or override a stat value.
-    -- @param key string
-    -- @param val number
-    function it:setStat(key, val) _stats[key] = val end
+    -- @tparam string key
+    -- @tparam number val
+    function it:setStat(key, val)
+        if type(key) ~= "string" or key == "" then
+            error("setStat: 'key' must be a non-empty string, got: " .. tostring(key), 2)
+        end
+        _stats[key] = val
+    end
 
     --- Add delta to an existing stat (creates stat at delta if absent).
-    -- @param key string
-    -- @param delta number
-    function it:addStat(key, delta) _stats[key] = (_stats[key] or 0) + delta end
+    -- @tparam string key
+    -- @tparam number delta
+    function it:addStat(key, delta)
+        if type(key) ~= "string" or key == "" then
+            error("addStat: 'key' must be a non-empty string, got: " .. tostring(key), 2)
+        end
+        _stats[key] = (_stats[key] or 0) + delta
+    end
 
     --- Remove a stat entirely.
-    -- @param key string
+    -- @tparam string key
     function it:removeStat(key)    _stats[key] = nil end
 
     --- Return all current stats as a shallow copy.
@@ -116,16 +164,16 @@ function M.newItem(type_name)
     -- ── Tags ──────────────────────────────────────────────────────────────
 
     --- Return true if this item has the given tag.
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn boolean
     function it:hasTag(tag)     return _tags[tag] == true end
 
     --- Add a tag (no-op if already present).
-    -- @param tag string
+    -- @tparam string tag
     function it:addTag(tag)     _tags[tag] = true end
 
     --- Remove a tag. Returns true if tag existed.
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn boolean
     function it:removeTag(tag)
         if _tags[tag] then _tags[tag] = nil; return true end
@@ -144,12 +192,12 @@ function M.newItem(type_name)
     -- ── Metadata ──────────────────────────────────────────────────────────
 
     --- Set a metadata value.
-    -- @param key string
+    -- @tparam string key
     -- @param val any
     function it:setMeta(key, val)  _meta[key] = val end
 
     --- Get a metadata value, or nil.
-    -- @param key string
+    -- @tparam string key
     -- @treturn any
     function it:getMeta(key)       return _meta[key] end
 
@@ -170,7 +218,7 @@ function M.newItem(type_name)
     function it:getName()       return _name end
 
     --- Set the display name.
-    -- @param n string
+    -- @tparam string n
     function it:setName(n)      _name = n end
 
     --- Return the current slot/position name.
@@ -178,24 +226,24 @@ function M.newItem(type_name)
     function it:getSlot()       return _slot end
 
     --- Set the slot/position name.
-    -- @param s string
+    -- @tparam string s
     function it:setSlot(s)      _slot = s end
 
     -- ── Counters ──────────────────────────────────────────────────────────
 
     --- Get a named integer counter (0 if not set).
-    -- @param key string
+    -- @tparam string key
     -- @treturn number
     function it:getCounter(key)      return _counters[key] or 0 end
 
     --- Set a named integer counter.
-    -- @param key string
-    -- @param val number
+    -- @tparam string key
+    -- @tparam number val
     function it:setCounter(key, val) _counters[key] = val end
 
     --- Add delta to a named counter and return the new value.
-    -- @param key string
-    -- @param delta number
+    -- @tparam string key
+    -- @tparam number delta
     -- @treturn number
     function it:addCounter(key, delta)
         _counters[key] = (_counters[key] or 0) + delta
@@ -203,7 +251,7 @@ function M.newItem(type_name)
     end
 
     --- Remove a named counter entry.
-    -- @param key string
+    -- @tparam string key
     function it:removeCounter(key)   _counters[key] = nil end
 
     --- Return all counters as a shallow copy.
@@ -236,10 +284,16 @@ end
 
 --- Create a named stack with optional capacity limit.
 -- Acts as both a LIFO stack and a positional list.
--- @param name string Identifier for debugging.
--- @param capacity number Max item count. 0 = unlimited.
+-- @tparam string name Identifier for debugging.
+-- @tparam[opt=0] number capacity Max item count. 0 = unlimited.
 -- @treturn table Stack object.
 function M.newStack(name, capacity)
+    if type(name) ~= "string" or name == "" then
+        error("newStack: 'name' must be a non-empty string, got: " .. tostring(name), 2)
+    end
+    if capacity ~= nil and (type(capacity) ~= "number" or capacity < 0) then
+        error("newStack: 'capacity' must be a non-negative number, got: " .. tostring(capacity), 2)
+    end
     local _items = {}   -- index 1 = bottom, #_items = top
     local _cap   = capacity or 0
 
@@ -258,7 +312,7 @@ function M.newStack(name, capacity)
     function stack:getCapacity() return _cap end
 
     --- Set or update capacity (0 = unlimited).
-    -- @param n number
+    -- @tparam number n
     function stack:setCapacity(n) _cap = n or 0 end
 
     --- Return true if at capacity.
@@ -272,8 +326,8 @@ function M.newStack(name, capacity)
 
     -- ── Push / Pop (LIFO top) ──────────────────────────────────────────────
 
-    --- Push item onto top (nil if capacity full, returns item if failed).
-    -- @param it table
+    --- Push item onto top (returns false if capacity full).
+    -- @tparam table it Item object.
     -- @treturn boolean
     function stack:push(it)
         if _cap > 0 and #_items >= _cap then return false end
@@ -282,7 +336,7 @@ function M.newStack(name, capacity)
     end
 
     --- Push item onto bottom. Returns false if full.
-    -- @param it table
+    -- @tparam table it Item object.
     -- @treturn boolean
     function stack:pushBottom(it)
         if _cap > 0 and #_items >= _cap then return false end
@@ -315,12 +369,12 @@ function M.newStack(name, capacity)
     function stack:getItem()    return _items[#_items] end
 
     --- Peek at item at 1-based index without removing. Returns nil if out of range.
-    -- @param idx number 1-based
+    -- @tparam number idx 1-based.
     -- @treturn table|nil
     function stack:peekAt(idx)  return _items[idx] end
 
     --- Remove and return item at 1-based index. Returns nil if out of range.
-    -- @param idx number
+    -- @tparam number idx
     -- @treturn table|nil
     function stack:removeAt(idx)
         if idx < 1 or idx > #_items then return nil end
@@ -328,8 +382,8 @@ function M.newStack(name, capacity)
     end
 
     --- Insert item at 1-based position. Returns false if full or index invalid.
-    -- @param idx number Position (1 = bottom, #items+1 = top).
-    -- @param it table
+    -- @tparam number idx Position (1 = bottom, #items+1 = top).
+    -- @tparam table it Item object.
     -- @treturn boolean
     function stack:insertAt(idx, it)
         if _cap > 0 and #_items >= _cap then return false end
@@ -339,7 +393,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return the first item for which predicate(item) is true. Nil if none.
-    -- @param pred function
+    -- @tparam function pred
     -- @treturn table|nil
     function stack:findFirst(pred)
         for _, it in ipairs(_items) do
@@ -393,18 +447,28 @@ function M.newItemPool()
     end
 
     --- Add a type with a given weight. If type already present, adds another entry.
-    -- @param type_name string
-    -- @param weight number
+    -- @tparam string type_name
+    -- @tparam number weight Must be > 0.
     function pool:addType(type_name, weight)
+        if type(type_name) ~= "string" or type_name == "" then
+            error("pool:addType: 'type_name' must be a non-empty string, got: " .. tostring(type_name), 2)
+        end
+        if type(weight) ~= "number" or weight <= 0 then
+            error("pool:addType: 'weight' must be a positive number, got: " .. tostring(weight), 2)
+        end
         table.insert(_entries, { type_name = type_name, weight = weight })
         _total = _total + weight
+        _log_debug("pool:addType: added '" .. type_name .. "' weight=" .. weight)
     end
 
     --- Update the weight of the first matching entry. Returns false if not found.
-    -- @param type_name string
-    -- @param weight number
+    -- @tparam string type_name
+    -- @tparam number weight Must be > 0.
     -- @treturn boolean
     function pool:setWeight(type_name, weight)
+        if type(weight) ~= "number" or weight <= 0 then
+            error("pool:setWeight: 'weight' must be a positive number, got: " .. tostring(weight), 2)
+        end
         for _, e in ipairs(_entries) do
             if e.type_name == type_name then
                 _total = _total - e.weight + weight
@@ -416,7 +480,7 @@ function M.newItemPool()
     end
 
     --- Remove the first entry of type_name. Returns false if not found.
-    -- @param type_name string
+    -- @tparam string type_name
     -- @treturn boolean
     function pool:remove(type_name)
         for i, e in ipairs(_entries) do
@@ -429,22 +493,28 @@ function M.newItemPool()
         return false
     end
 
-    --- Draw one random item (weighted). Returns "unknown" item if pool empty.
-    -- @treturn table Item object
+    --- Draw one random item (weighted). Returns nil if pool is empty or total weight is zero.
+    -- @treturn table|nil Item object, or nil on empty/zero-weight pool.
     function pool:draw()
-        if #_entries == 0 or _total == 0 then return M.newItem("unknown") end
+        if #_entries == 0 or _total <= 0 then
+            _log_warn("pool:draw: pool is empty or has zero total weight")
+            return nil
+        end
         local r = math.random() * _total
         local cum = 0
         for _, e in ipairs(_entries) do
             cum = cum + e.weight
-            if r <= cum then return M.newItem(e.type_name) end
+            if r <= cum then
+                _log_debug("pool:draw: drew '" .. e.type_name .. "'")
+                return M.newItem(e.type_name)
+            end
         end
         return M.newItem(_entries[#_entries].type_name)
     end
 
-    --- Draw n items (with replacement).
-    -- @param n number
-    -- @treturn table Array of Item objects
+    --- Draw n items (with replacement). Entries from an empty pool are skipped (nil).
+    -- @tparam number n
+    -- @treturn table Array of Item objects (may contain nil entries if pool is empty).
     function pool:drawTypes(n)
         local out = {}
         for _ = 1, n do table.insert(out, self:draw()) end
@@ -452,8 +522,9 @@ function M.newItemPool()
     end
 
     --- Draw up to n unique type names (no type drawn twice), returns array of Items.
-    -- @param n number
-    -- @treturn table
+    -- If n exceeds the number of distinct types in the pool, returns all distinct types.
+    -- @tparam number n Maximum unique types to draw.
+    -- @treturn table Array of Item objects (length <= n).
     function pool:drawUniqueTypes(n)
         local seen = {}
         local out  = {}
@@ -489,14 +560,14 @@ function M.newStackBuilder()
     local builder = {}
 
     --- Add items of a type to the recipe.
-    -- @param type_name string
-    -- @param count number
+    -- @tparam string type_name
+    -- @tparam number count
     function builder:add(type_name, count)
         table.insert(_recipe, { type_name = type_name, count = count or 1 })
     end
 
     --- Build the stack from the current recipe.
-    -- @param name string Stack name.
+    -- @tparam string name Stack name.
     -- @treturn table Stack
     function builder:build(name)
         local s = M.newStack(name)
@@ -522,7 +593,7 @@ M.HistoryAction = {
 }
 
 --- Create a bounded event history for stack operations.
--- @param max_entries number Maximum entries to retain (default 50).
+-- @tparam[opt=50] number max_entries Maximum entries to retain.
 -- @treturn table StackHistory object.
 function M.newStackHistory(max_entries)
     local _log   = {}
@@ -536,31 +607,31 @@ function M.newStackHistory(max_entries)
     end
 
     --- Record a push action.
-    -- @param source string Stack name or label.
-    -- @param item_type string Type name of pushed item.
-    -- @param size_after number Stack size after the push.
+    -- @tparam string source Stack name or label.
+    -- @tparam string item_type Type name of pushed item.
+    -- @tparam number size_after Stack size after the push.
     function history:recordPush(source, item_type, size_after)
         push_entry({ action=M.HistoryAction.Push, source=source, item_type=item_type, size_after=size_after or 0 })
     end
 
     --- Record a pop action.
-    -- @param source string
-    -- @param item_type string
-    -- @param size_after number
+    -- @tparam string source
+    -- @tparam string item_type
+    -- @tparam number size_after
     function history:recordPop(source, item_type, size_after)
         push_entry({ action=M.HistoryAction.Pop, source=source, item_type=item_type, size_after=size_after or 0 })
     end
 
     --- Record a clear action.
-    -- @param source string
+    -- @tparam string source
     function history:recordClear(source)
         push_entry({ action=M.HistoryAction.Clear, source=source, item_type="", size_after=0 })
     end
 
     --- Record a custom event.
-    -- @param source string
-    -- @param label string
-    -- @param size_after number
+    -- @tparam string source
+    -- @tparam string label
+    -- @tparam number size_after
     function history:recordCustom(source, label, size_after)
         push_entry({ action=M.HistoryAction.Custom, source=source, item_type=label, size_after=size_after or 0 })
     end
@@ -575,7 +646,7 @@ function M.newStackHistory(max_entries)
     end
 
     --- Return the last n entries, or all if n > count.
-    -- @param n number
+    -- @tparam number n
     -- @treturn table
     function history:getLastN(n)
         local out = {}
@@ -600,7 +671,7 @@ function M.newStackHistory(max_entries)
     function history:last()    return _log[#_log] end
 
     --- Return all entries matching a specific source name.
-    -- @param source string
+    -- @tparam string source
     -- @treturn table
     function history:entriesFor(source)
         local out = {}
@@ -623,17 +694,17 @@ function M.newStackManager()
     local manager = {}
 
     --- Register a stack.
-    -- @param name string
-    -- @param stack table
+    -- @tparam string name
+    -- @tparam table stack
     function manager:addStack(name, stack)   _stacks[name] = stack end
 
     --- Retrieve a stack by name.
-    -- @param name string
+    -- @tparam string name
     -- @treturn table|nil
     function manager:getStack(name)          return _stacks[name] end
 
     --- Remove a stack. Returns true if existed.
-    -- @param name string
+    -- @tparam string name
     -- @treturn boolean
     function manager:removeStack(name)
         if not _stacks[name] then return false end
@@ -651,19 +722,19 @@ function M.newStackManager()
     end
 
     --- Return true if a stack with this name exists.
-    -- @param name string
+    -- @tparam string name
     -- @treturn boolean
     function manager:hasStack(name) return _stacks[name] ~= nil end
 
     --- Create and register a new empty unlimited stack.
-    -- @param name string
+    -- @tparam string name
     function manager:createStack(name)
         _stacks[name] = M.newStack(name)
     end
 
     --- Create and register a new empty stack with a capacity limit.
-    -- @param name string
-    -- @param capacity number
+    -- @tparam string name
+    -- @tparam number capacity
     function manager:createStackCapped(name, capacity)
         _stacks[name] = M.newStack(name, capacity)
     end
@@ -678,9 +749,9 @@ function M.newStackManager()
 
     --- Move item at 1-based index from one stack to the top of another.
     -- Returns the moved item on success, or nil plus an error string on failure.
-    -- @param from string Source stack name.
-    -- @param index number 1-based index.
-    -- @param to string Destination stack name.
+    -- @tparam string from Source stack name.
+    -- @tparam number index 1-based index.
+    -- @tparam string to Destination stack name.
     -- @treturn table|nil
     -- @treturn string|nil
     function manager:moveItem(from, index, to)
@@ -697,9 +768,9 @@ function M.newStackManager()
 
     --- Move the first item of a given type from one stack to the top of another.
     -- Returns the moved item on success, or nil plus an error string on failure.
-    -- @param from string Source stack name.
-    -- @param item_type string Type name to search for.
-    -- @param to string Destination stack name.
+    -- @tparam string from Source stack name.
+    -- @tparam string item_type Type name to search for.
+    -- @tparam string to Destination stack name.
     -- @treturn table|nil
     -- @treturn string|nil
     function manager:moveItemByType(from, item_type, to)
@@ -715,8 +786,8 @@ function M.newStackManager()
 
     --- Move the top item from one stack to the top of another.
     -- Returns the moved item on success, or nil plus an error string on failure.
-    -- @param from string
-    -- @param to string
+    -- @tparam string from
+    -- @tparam string to
     -- @treturn table|nil
     -- @treturn string|nil
     function manager:moveTop(from, to)
@@ -733,8 +804,8 @@ end
 
 --- Create a named slot with optional capacity limit.
 -- A slot is a bounded named position that holds zero or more items.
--- @param name string Identifier for this slot.
--- @param capacity number Max item count; nil or 0 = unlimited.
+-- @tparam string name Identifier for this slot.
+-- @tparam[opt=0] number capacity Max item count; nil or 0 = unlimited.
 -- @treturn table Slot object.
 function M.newSlot(name, capacity)
     local _items = {}
@@ -763,11 +834,11 @@ function M.newSlot(name, capacity)
     function slot:getCapacity() return _cap end
 
     --- Set or update capacity (0 = unlimited).
-    -- @param n number
+    -- @tparam number n
     function slot:setCapacity(n) _cap = n or 0 end
 
     --- Add an item to the slot. Returns true on success, false if at capacity.
-    -- @param it table Item object.
+    -- @tparam table it Item object.
     -- @treturn boolean
     function slot:push(it)
         if _cap > 0 and #_items >= _cap then return false end
@@ -780,7 +851,7 @@ function M.newSlot(name, capacity)
     function slot:pop()         return table.remove(_items) end
 
     --- Remove and return the item at 1-based index, or nil if out of range.
-    -- @param index number
+    -- @tparam number index
     -- @treturn table|nil
     function slot:removeAt(index)
         if index < 1 or index > #_items then return nil end
@@ -792,7 +863,7 @@ function M.newSlot(name, capacity)
     function slot:peek()        return _items[#_items] end
 
     --- Peek at item at 1-based index without removing it.
-    -- @param index number
+    -- @tparam number index
     -- @treturn table|nil
     function slot:peekAt(index) return _items[index] end
 
@@ -814,7 +885,7 @@ function M.newSlot(name, capacity)
     end
 
     --- Return true if any item has the given tag.
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn boolean
     function slot:hasItemWithTag(tag)
         for _, it in ipairs(_items) do
@@ -824,7 +895,7 @@ function M.newSlot(name, capacity)
     end
 
     --- Return true if any item is of the given type.
-    -- @param item_type string
+    -- @tparam string item_type
     -- @treturn boolean
     function slot:hasItemOfType(item_type)
         for _, it in ipairs(_items) do
@@ -839,9 +910,9 @@ end
 -- ─── Stat ranking ─────────────────────────────────────────────────────────────
 
 --- Return 0-based indices of the top N items ranked by a stat (descending).
--- @param items table Array of Item objects.
--- @param stat string Stat name.
--- @param n number How many to return.
+-- @tparam table items Array of Item objects.
+-- @tparam string stat Stat name.
+-- @tparam number n How many to return.
 -- @treturn table Array of 0-based integer indices.
 function M.findNOfStat(items, stat, n)
     local scored = {}
@@ -858,8 +929,8 @@ end
 
 --- Group items by a stat value. Returns map {value -> array of Items}.
 -- Items without the stat are grouped under the key false.
--- @param items table Array of Item objects.
--- @param stat_key string
+-- @tparam table items Array of Item objects.
+-- @tparam string stat_key
 -- @treturn table
 function M.groupByStat(items, stat_key)
     local out = {}
@@ -875,8 +946,8 @@ end
 --- Group items by tag prefix. Returns map {prefix_value -> array of Items}.
 -- A tag matches if it starts with `prefix` (e.g. prefix "tier:" matches "tier:1", "tier:2").
 -- Items with no matching tag go under key "".
--- @param items table Array of Item objects.
--- @param prefix string Tag prefix to filter on.
+-- @tparam table items Array of Item objects.
+-- @tparam string prefix Tag prefix to filter on.
 -- @treturn table
 function M.groupByTagPrefix(items, prefix)
     local out = {}
@@ -893,8 +964,8 @@ end
 
 --- Find runs (consecutive sequences) of items sharing the same stat value.
 -- Returns array of {value, start_idx, length} (1-based start_idx).
--- @param items table Array of Item objects.
--- @param stat_key string
+-- @tparam table items Array of Item objects.
+-- @tparam string stat_key
 -- @treturn table
 function M.findSequences(items, stat_key)
     local out = {}
@@ -942,7 +1013,7 @@ function M.newStack(name, capacity)
     end
 
     --- Pop n items from the top. Returns array of items (may be shorter if stack runs out).
-    -- @param n number
+    -- @tparam number n
     -- @treturn table
     function stack:popMany(n)
         local out = {}
@@ -955,8 +1026,8 @@ function M.newStack(name, capacity)
     end
 
     --- Move item at index `from` to index `to` (both 1-based). Returns false if invalid.
-    -- @param from number
-    -- @param to   number
+    -- @tparam number from
+    -- @tparam number to
     -- @treturn boolean
     function stack:moveWithin(from, to)
         local items = self:getItems()
@@ -970,7 +1041,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return all items whose type matches. Uses item:getType().
-    -- @param type_name string
+    -- @tparam string type_name
     -- @treturn table
     function stack:searchByType(type_name)
         local out = {}
@@ -981,7 +1052,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return all items that have the given tag.
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn table
     function stack:searchByTag(tag)
         local out = {}
@@ -992,7 +1063,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return all items in the given category.
-    -- @param cat string
+    -- @tparam string cat
     -- @treturn table
     function stack:searchByCategory(cat)
         local out = {}
@@ -1003,7 +1074,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return first item with the given type (or nil).
-    -- @param type_name string
+    -- @tparam string type_name
     -- @treturn table|nil
     function stack:findByType(type_name)
         for _, it in ipairs(self:getItems()) do
@@ -1013,7 +1084,7 @@ function M.newStack(name, capacity)
     end
 
     --- Return first item with the given tag (or nil).
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn table|nil
     function stack:findByTag(tag)
         for _, it in ipairs(self:getItems()) do
@@ -1023,7 +1094,7 @@ function M.newStack(name, capacity)
     end
 
     --- Count items with the given type.
-    -- @param type_name string
+    -- @tparam string type_name
     -- @treturn number
     function stack:countByType(type_name)
         local n = 0
@@ -1034,7 +1105,7 @@ function M.newStack(name, capacity)
     end
 
     --- Count items in the given category.
-    -- @param cat string
+    -- @tparam string cat
     -- @treturn number
     function stack:countByCategory(cat)
         local n = 0
@@ -1045,7 +1116,7 @@ function M.newStack(name, capacity)
     end
 
     --- Count items with the given tag.
-    -- @param tag string
+    -- @tparam string tag
     -- @treturn number
     function stack:countByTag(tag)
         local n = 0
@@ -1056,7 +1127,7 @@ function M.newStack(name, capacity)
     end
 
     --- Sort items ascending by a numeric stat. Items without the stat sort last.
-    -- @param stat string
+    -- @tparam string stat
     function stack:sortByStat(stat)
         local items = self:getItems()
         table.sort(items, function(a, b)
@@ -1069,7 +1140,7 @@ function M.newStack(name, capacity)
     end
 
     --- Sort items descending by a numeric stat.
-    -- @param stat string
+    -- @tparam string stat
     function stack:sortByStatDesc(stat)
         local items = self:getItems()
         table.sort(items, function(a, b)
@@ -1117,8 +1188,8 @@ function M.newStack(name, capacity)
     end
 
     --- Return the type names of the top n items (without removing).
-    -- @param n number
-    -- @treturn table  type name strings, top-first
+    -- @tparam number n
+    -- @treturn table type name strings, top-first
     function stack:peekTopNTypes(n)
         local items = self:getItems()
         local out = {}
@@ -1146,10 +1217,10 @@ function M.newStackBuilder()
 
     --- Add items with per-item stat overrides and extra tags.
     -- Unlike add(), overrides are applied immediately to pre-built item instances.
-    -- @param type_name string
-    -- @param count number
-    -- @param stat_overrides table|nil  key->value stat map
-    -- @param extra_tags table|nil  list of tag strings
+    -- @tparam string type_name
+    -- @tparam number count
+    -- @tparam[opt] table stat_overrides key->value stat map.
+    -- @tparam[opt] table extra_tags list of tag strings.
     function builder:addWith(type_name, count, stat_overrides, extra_tags)
         for _ = 1, (count or 1) do
             local it = M.newItem(type_name)
@@ -1160,32 +1231,32 @@ function M.newStackBuilder()
     end
 
     --- Enable or disable Fisher-Yates shuffle after build.
-    -- @param enabled boolean
+    -- @tparam boolean enabled
     function builder:setShuffleOnBuild(enabled)
         _shuffle = enabled == true
     end
 
     --- Require that a specific type appears at least once.
-    -- @param type_name string
+    -- @tparam string type_name
     function builder:requireType(type_name)
         _required[type_name] = true
     end
 
     --- Ban a specific type from appearing.
-    -- @param type_name string
+    -- @tparam string type_name
     function builder:banType(type_name)
         _banned[type_name] = true
     end
 
     --- Remove a ban on a type.
-    -- @param type_name string
+    -- @tparam string type_name
     function builder:removeBannedType(type_name)
         _banned[type_name] = nil
     end
 
     --- Build the stack from recipe entries plus addWith items.
     -- Applies shuffleOnBuild if enabled.
-    -- @param name string Stack name.
+    -- @tparam string name Stack name.
     -- @treturn table Stack
     function builder:build(name)
         local s = _base_build(self, name)
@@ -1204,7 +1275,7 @@ function M.newStackBuilder()
 
     --- Validate a pre-built stack against required/banned constraints.
     -- Returns nil on success, or an error string on failure.
-    -- @param stack table
+    -- @tparam table stack
     -- @treturn string|nil
     function builder:validateStack(stack)
         for _, it in ipairs(stack:getItems()) do
@@ -1218,7 +1289,7 @@ function M.newStackBuilder()
     end
 
     --- Build the stack with a custom name (alias for build).
-    -- @param name string
+    -- @tparam string name
     -- @treturn table Stack
     function builder:buildNamed(name)
         return self:build(name)
@@ -1237,7 +1308,7 @@ M.HistoryAction.Built   = "built"
 -- ── Module-level free functions ────────────────────────────────────────
 
 --- Group items by category. Returns table: category -> {Item, ...}.
--- @param items table  list of Item objects
+-- @tparam table items list of Item objects.
 -- @treturn table
 function M.groupByCategory(items)
     local out = {}
@@ -1250,9 +1321,9 @@ function M.groupByCategory(items)
 end
 
 --- Return items where getStat(stat) >= n.
--- @param items table
--- @param stat  string
--- @param n     number
+-- @tparam table items
+-- @tparam string stat
+-- @tparam number n
 -- @treturn table
 function M.findAtLeastNOfStat(items, stat, n)
     local out = {}
@@ -1265,8 +1336,8 @@ end
 
 --- Group items by shared tag prefix. Returns table: prefix -> {Item, ...}.
 -- A "tag group" is a set of items that share at least one tag.
--- @param items table
--- @treturn table  tag -> {Item, ...}
+-- @tparam table items
+-- @treturn table tag -> {Item, ...}
 function M.findTagGroups(items)
     local out = {}
     for _, it in ipairs(items) do
@@ -1281,10 +1352,10 @@ function M.findTagGroups(items)
 end
 
 --- Return 1-based indices sorted by a stat.
--- @param items table
--- @param stat  string
--- @param ascending boolean  true = lowest first (default), false = highest first
--- @treturn table  indices
+-- @tparam table items
+-- @tparam string stat
+-- @tparam boolean ascending true = lowest first (default), false = highest first.
+-- @treturn table indices
 function M.sortedIndicesByStat(items, stat, ascending)
     if ascending == nil then ascending = true end
     local indices = {}
@@ -1299,8 +1370,8 @@ function M.sortedIndicesByStat(items, stat, ascending)
 end
 
 --- Return 1-based indices sorted by category (alphabetical).
--- @param items table
--- @treturn table  indices
+-- @tparam table items
+-- @treturn table indices
 function M.sortedIndicesByCategory(items)
     local indices = {}
     for i = 1, #items do indices[#indices+1] = i end

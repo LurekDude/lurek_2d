@@ -1,0 +1,7 @@
+[window]
+title      = "Settlers Rise — Lurek2D"
+width      = 1024
+height     = 768  # larger canvas for settlement overview
+
+[performance]
+target_fps = 60

@@ -862,6 +862,42 @@ describe("scene easing transitions", function()
         expect_true(p >= 0.0 and p <= 1.0)
     end)
 
+    -- @covers lurek.scene.getTransitionProgressEased
+    -- @covers lurek.scene.getTransitionProgress
+    -- @description With "linear" easing the eased progress matches raw progress mid-transition.
+    -- Migrated from Rust active_transition_progress_eased_linear_matches_progress
+    -- and scene_stack_get_transition_progress_eased_linear_matches.
+    it("linear easing: eased progress matches raw progress", function()
+        lurek.scene.clear()
+        local scene_a = {}
+        lurek.scene.push(scene_a, "fade", 2.0, "linear")
+        lurek.scene.update(1.0)  -- advance to t = 0.5
+        local raw   = lurek.scene.getTransitionProgress()
+        local eased = lurek.scene.getTransitionProgressEased()
+        expect_true(type(raw)   == "number")
+        expect_true(type(eased) == "number")
+        expect_near(raw, eased, 0.005)
+        lurek.scene.clear()
+    end)
+
+    -- @covers lurek.scene.getTransitionProgressEased
+    -- @covers lurek.scene.getTransitionProgress
+    -- @description With "ease_in" easing the eased value is less than raw progress
+    -- before the midpoint (t² < t for 0 < t < 1).
+    -- Migrated from Rust active_transition_progress_eased_ease_in_less_before_midpoint.
+    it("ease_in easing: eased progress is less than raw before midpoint", function()
+        lurek.scene.clear()
+        local scene_a = {}
+        lurek.scene.push(scene_a, "fade", 2.0, "ease_in")
+        lurek.scene.update(0.5)  -- advance to t = 0.25 (raw progress)
+        local raw   = lurek.scene.getTransitionProgress()
+        local eased = lurek.scene.getTransitionProgressEased()
+        -- For ease_in: eased = t² < t when 0 < t < 1
+        expect_true(raw > 0.0)
+        expect_true(eased < raw)
+        lurek.scene.clear()
+    end)
+
     -- @covers lurek.scene.pop
     -- @description pop with an easing param runs without error.
     it("pop with easing param runs without error", function()

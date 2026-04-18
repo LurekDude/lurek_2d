@@ -1,9 +1,0 @@
-# conf.toml — engine configuration for loot_rpg_demo
-
-[window]
-title = "Loot RPG Demo"
-width = 1024
-height = 768
-
-[performance]
-target_fps = 60

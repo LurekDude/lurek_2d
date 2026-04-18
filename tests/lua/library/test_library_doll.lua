@@ -595,4 +595,261 @@ describe("Doll hot-swap", function()
         expect_equal(bow, d:getPartAt("weapon"))
     end)
 end)
+
+-- ── Input Validation ──────────────────────────────────────────────────────────
+
+-- @description Verifies input validation for socket names, scale values, and draw orders.
+describe("Input Validation", function()
+    -- @description Verifies case: addSocket returns false for duplicate name.
+    it("addSocket returns false for duplicate name", function()
+        local t = doll.newTemplate("val")
+        local ok1 = t:addSocket("head", "", 0, 0)
+        expect_true(ok1, "first add succeeds")
+        local ok2, msg = t:addSocket("head", "", 5, 5)
+        expect_false(ok2, "duplicate returns false")
+        expect_not_nil(msg, "returns error message")
+    end)
+
+    -- @description Verifies case: addSocket returns true on success.
+    it("addSocket returns true on success", function()
+        local t = doll.newTemplate("val2")
+        local ok = t:addSocket("arm", "limb", 5, 10, 0.1, 3)
+        expect_true(ok, "valid add returns true")
+    end)
+
+    -- @description Verifies case: addSocket returns false for empty name.
+    it("addSocket returns false for empty name", function()
+        local t = doll.newTemplate("val3")
+        local ok, msg = t:addSocket("", "", 0, 0)
+        expect_false(ok, "empty name returns false")
+        expect_not_nil(msg, "returns error message")
+    end)
+
+    -- @description Verifies case: setScale rejects non-number.
+    it("setScale rejects non-number", function()
+        local p = doll.newPart()
+        local ok = pcall(function() p:setScale("big") end)
+        expect_false(ok, "string scale rejected")
+    end)
+
+    -- @description Verifies case: setDrawOrder rejects non-number.
+    it("setDrawOrder rejects non-number", function()
+        local p = doll.newPart()
+        local ok = pcall(function() p:setDrawOrder("high") end)
+        expect_false(ok, "string drawOrder rejected")
+    end)
+
+    -- @description Verifies case: attach rejects empty string socketName.
+    it("attach rejects empty string socketName", function()
+        local t = doll.newTemplate("valatt")
+        t:addSocket("s", "", 0, 0)
+        local d = doll.newDoll(t)
+        local part = doll.newPart()
+        expect_false(d:attach("", part), "empty socket name rejected")
+    end)
+end)
+
+-- ── Part:getAbsoluteScale ─────────────────────────────────────────────────────
+
+-- @description Verifies getAbsoluteScale returns positive magnitude regardless of flip or negative scale.
+describe("Part:getAbsoluteScale", function()
+    -- @description Verifies case: positive scale unaffected by flip flags.
+    it("returns positive scale regardless of flip", function()
+        local p = doll.newPart()
+        p:setScale(3, 4)
+        p:setFlip(true, true)
+        local asx, asy = p:getAbsoluteScale()
+        expect_equal(3, asx, "absolute scaleX")
+        expect_equal(4, asy, "absolute scaleY")
+    end)
+
+    -- @description Verifies case: absolute of negative scale values.
+    it("returns absolute of negative scale values", function()
+        local p = doll.newPart()
+        p:setScale(-2, -5)
+        local asx, asy = p:getAbsoluteScale()
+        expect_equal(2, asx)
+        expect_equal(5, asy)
+    end)
+end)
+
+-- ── Part:getAttributes ────────────────────────────────────────────────────────
+
+-- @description Verifies getAttributes returns a shallow copy of all stored key-value attributes.
+describe("Part:getAttributes", function()
+    -- @description Verifies case: empty attributes.
+    it("returns empty table when no attributes set", function()
+        local p = doll.newPart()
+        local attrs = p:getAttributes()
+        expect_equal(0, #p:getAttributeKeys())
+        -- attrs table exists but is empty
+        local count = 0
+        for _ in pairs(attrs) do count = count + 1 end
+        expect_equal(0, count)
+    end)
+
+    -- @description Verifies case: returns shallow copy; mutation does not affect original.
+    it("returns shallow copy of all attributes", function()
+        local p = doll.newPart()
+        p:setAttribute("color", "red")
+        p:setAttribute("weight", 10)
+        local attrs = p:getAttributes()
+        expect_equal("red", attrs.color)
+        expect_equal(10, attrs.weight)
+        -- modifying copy does not affect original
+        attrs.color = "blue"
+        expect_equal("red", p:getAttribute("color"))
+    end)
+end)
+
+-- ── doll.getAbsoluteScale (module function) ───────────────────────────────────
+
+-- @description Verifies the module-level getAbsoluteScale helper strips flip sign from draw-list entries.
+describe("doll.getAbsoluteScale", function()
+    -- @description Verifies case: positive magnitude from flipped draw entry.
+    it("returns positive magnitude from flipped draw entry", function()
+        local t = doll.newTemplate("abs")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+        d:setScale(2, 3)
+
+        local part = doll.newPart()
+        part:setFlip(true, false)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        local asx, asy = doll.getAbsoluteScale(dl[1])
+        expect_near(2, asx, 0.01, "abs scaleX = 2")
+        expect_near(3, asy, 0.01, "abs scaleY = 3")
+    end)
+
+    -- @description Verifies case: compound part+doll scale with flip.
+    it("compounds doll+part scale with flip correctly", function()
+        local t = doll.newTemplate("abs2")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+        d:setScale(2)
+
+        local part = doll.newPart()
+        part:setScale(3)
+        part:setFlip(true, true)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        -- worldSX = 2 * 3 * -1 = -6, worldSY = 2 * 3 * -1 = -6
+        expect_near(-6, dl[1].scaleX, 0.01)
+        expect_near(-6, dl[1].scaleY, 0.01)
+        local asx, asy = doll.getAbsoluteScale(dl[1])
+        expect_near(6, asx, 0.01, "absolute = 6")
+        expect_near(6, asy, 0.01, "absolute = 6")
+    end)
+end)
+
+-- ── Socket rotation transforms ────────────────────────────────────────────────
+
+-- @description Verifies part offset is rotated by socket rotation in the draw list.
+describe("Socket rotation transforms", function()
+    -- @description Verifies case: part offset rotated by socket rotation.
+    it("rotates part offset by socket rotation", function()
+        local t = doll.newTemplate("sockrot")
+        -- socket at (0,0) rotated 90 degrees
+        t:addSocket("s", "", 0, 0, math.pi / 2, 0)
+        local d = doll.newDoll(t)
+        d:setPosition(100, 100)
+
+        local part = doll.newPart()
+        part:setOffset(10, 0)  -- 10px to the right in socket space
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        -- After 90 deg socket rotation, offset (10,0) becomes ~(0,10)
+        expect_near(100, dl[1].x, 0.01, "x unchanged")
+        expect_near(110, dl[1].y, 0.01, "y shifted by rotated offset")
+    end)
+
+    -- @description Verifies case: draw list includes part origin fields.
+    it("draw list includes part origin", function()
+        local t = doll.newTemplate("origin")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+
+        local part = doll.newPart()
+        part:setOrigin(16, 32)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        expect_equal(16, dl[1].originX, "originX in draw entry")
+        expect_equal(32, dl[1].originY, "originY in draw entry")
+    end)
+
+    -- @description Verifies case: default origin is (0,0) in draw list.
+    it("default origin is zero in draw list", function()
+        local t = doll.newTemplate("deforigin")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+
+        local part = doll.newPart()
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        expect_equal(0, dl[1].originX)
+        expect_equal(0, dl[1].originY)
+    end)
+end)
+
+-- ── Flip behaviour ────────────────────────────────────────────────────────────
+
+-- @description Verifies flip flags produce correct negative scale values in the draw list.
+describe("Flip behaviour", function()
+    -- @description Verifies case: both flipX and flipY negate corresponding scales.
+    it("flipX + flipY both negate corresponding scales", function()
+        local t = doll.newTemplate("flip2")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+        d:setScale(2, 3)
+
+        local part = doll.newPart()
+        part:setFlip(true, true)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        expect_near(-2, dl[1].scaleX, 0.01, "flipX negates")
+        expect_near(-3, dl[1].scaleY, 0.01, "flipY negates")
+    end)
+
+    -- @description Verifies case: flip with part scale compounds correctly.
+    it("flip with part scale compounds correctly", function()
+        local t = doll.newTemplate("flipscale")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+        d:setScale(2)
+
+        local part = doll.newPart()
+        part:setScale(3)
+        part:setFlip(true, false)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        -- worldSX = dollScale * partScale * flipSign = 2 * 3 * -1 = -6
+        expect_near(-6, dl[1].scaleX, 0.01, "compound flip+scale X")
+        expect_near(6,  dl[1].scaleY, 0.01, "no flip on Y")
+    end)
+
+    -- @description Verifies case: no flip means positive scale.
+    it("no flip means positive scale", function()
+        local t = doll.newTemplate("noflip")
+        t:addSocket("s", "", 0, 0, 0, 0)
+        local d = doll.newDoll(t)
+        d:setScale(2)
+
+        local part = doll.newPart()
+        part:setScale(3)
+        d:attach("s", part)
+
+        local dl = d:getDrawList()
+        expect_near(6, dl[1].scaleX, 0.01, "positive scaleX")
+        expect_near(6, dl[1].scaleY, 0.01, "positive scaleY")
+    end)
+end)
+
 test_summary()

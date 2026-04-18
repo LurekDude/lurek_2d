@@ -695,4 +695,189 @@ describe("Enums", function()
         expect_equal(combat.ArmorZone.Side, "side")
     end)
 end)
+
+-- ── Bug fix: collision group overflow error message ──────────────────────────
+
+describe("CollisionGroupSet overflow", function()
+    -- @covers library.combat.newCollisionGroupSet
+    -- @description Verifies that exceeding the 16-group limit returns a descriptive error mentioning bitmask overflow.
+    it("returns descriptive error when exceeding 16 groups", function()
+        local cgs = combat.newCollisionGroupSet()
+        for i = 1, 16 do
+            local b, err = cgs:defineGroup("g" .. i)
+            expect_equal(b ~= nil, true)
+        end
+        local b, err = cgs:defineGroup("g17")
+        expect_equal(b, nil)
+        expect_equal(type(err), "string")
+        -- Error should mention limit and overflow
+        expect_equal(err:find("16") ~= nil, true)
+        expect_equal(err:find("overflow") ~= nil, true)
+    end)
+
+    -- @covers library.combat.newCollisionGroupSet
+    -- @description Verifies empty group name is rejected with a descriptive error.
+    it("rejects empty group name", function()
+        local cgs = combat.newCollisionGroupSet()
+        local b, err = cgs:defineGroup("")
+        expect_equal(b, nil)
+        expect_equal(err:find("non%-empty") ~= nil, true)
+    end)
+end)
+
+-- ── Bug fix: turret arc snapping ─────────────────────────────────────────────
+
+describe("Turret arc snapping", function()
+    -- @covers library.combat.newTurret
+    -- @description Verifies turret update snaps to arc_max when target is above the arc.
+    it("update snaps to arc_max when target exceeds arc", function()
+        local t = combat.newTurret(1, 2)
+        t.turn_speed = 10.0
+        t.arc_min = -1.0
+        t.arc_max = 1.0
+        -- Target at 2.0 rad is outside arc; effective target should be 1.0
+        t:aimAtAngle(2.0)
+        -- current_angle = 0.0, effective target = 1.0, diff = 1.0
+        local vel = t:update(0.01, 0.0)
+        -- diff=1.0, max_step=0.1, so vel = turn_speed = 10.0
+        expect_equal(vel, 10.0)
+    end)
+
+    -- @covers library.combat.newTurret
+    -- @description Verifies turret update snaps to arc_min when target is below the arc.
+    it("update snaps to arc_min when target is below arc", function()
+        local t = combat.newTurret(1, 2)
+        t.turn_speed = 10.0
+        t.arc_min = -1.0
+        t.arc_max = 1.0
+        -- Target at -3.0 is outside arc; effective = -1.0
+        t:aimAtAngle(-3.0)
+        local vel = t:update(0.01, 0.0)
+        -- diff=-1.0, max_step=0.1, vel = -turn_speed = -10.0
+        expect_equal(vel, -10.0)
+    end)
+
+    -- @covers library.combat.newTurret
+    -- @description When current_angle is already at the clamped target, velocity is small (snap).
+    it("update reaches clamped boundary exactly", function()
+        local t = combat.newTurret(1, 2)
+        t.turn_speed = 10.0
+        t.arc_min = -1.0
+        t.arc_max = 1.0
+        t:aimAtAngle(5.0)  -- outside arc; effective = 1.0
+        -- current_angle is already at 1.0 → diff = 0, vel = 0
+        local vel = t:update(0.1, 1.0)
+        expect_near(vel, 0.0, 0.01)
+    end)
+end)
+
+-- ── Bug fix: weapon burst inter-burst cooldown ───────────────────────────────
+
+describe("Weapon burst cooldown", function()
+    -- @covers library.combat.newWeapon
+    -- @description After the last burst shot, cooldown should be 1/fire_rate (inter-burst), not burst_delay.
+    it("last burst shot applies fire_rate cooldown, not burst_delay", function()
+        local w = combat.newWeapon("BurstGun")
+        w.burst_size = 3
+        w.burst_delay = 0.05
+        w.fire_rate = 2.0  -- inter-burst cooldown = 1/2 = 0.5s
+
+        -- Shot 1: starts new burst, burst_remaining = 2, cooldown = burst_delay
+        expect_equal(w:fire(0), true)
+        expect_equal(w.burst_remaining, 2)
+        expect_near(w.cooldown_remaining, 0.05, 0.001)
+
+        -- Expire cooldown
+        w:updateCooldown(0.05)
+
+        -- Shot 2: burst_remaining 2→1, cooldown = burst_delay (still mid-burst)
+        expect_equal(w:fire(0), true)
+        expect_equal(w.burst_remaining, 1)
+        expect_near(w.cooldown_remaining, 0.05, 0.001)
+
+        -- Expire cooldown
+        w:updateCooldown(0.05)
+
+        -- Shot 3 (last in burst): burst_remaining 1→0, cooldown = 1/fire_rate = 0.5
+        expect_equal(w:fire(0), true)
+        expect_equal(w.burst_remaining, 0)
+        expect_near(w.cooldown_remaining, 0.5, 0.001)
+    end)
+
+    -- @covers library.combat.newWeapon
+    -- @description Single-shot weapon (burst_size=1) still uses fire_rate cooldown.
+    it("burst_size=1 always uses fire_rate cooldown", function()
+        local w = combat.newWeapon("SingleShot")
+        w.burst_size = 1
+        w.fire_rate = 4.0  -- 1/4 = 0.25s cooldown
+        expect_equal(w:fire(0), true)
+        expect_near(w.cooldown_remaining, 0.25, 0.001)
+    end)
+end)
+
+-- ── Input validation ─────────────────────────────────────────────────────────
+
+describe("Input validation", function()
+    -- @covers library.combat.newWeapon
+    -- @description Verifies newWeapon rejects nil and empty names.
+    it("newWeapon rejects empty name", function()
+        expect_error(function() combat.newWeapon("") end)
+    end)
+
+    -- @covers library.combat.newWeapon
+    -- @description Verifies newWeapon rejects nil name.
+    it("newWeapon rejects nil name", function()
+        expect_error(function() combat.newWeapon(nil) end)
+    end)
+
+    -- @covers library.combat.newChassis
+    -- @description Verifies newChassis rejects negative HP.
+    it("newChassis rejects negative max_hp", function()
+        expect_error(function() combat.newChassis(1, -10) end)
+    end)
+
+    -- @covers library.combat.newChassis
+    -- @description Verifies newChassis rejects non-number body_id.
+    it("newChassis rejects non-number body_id", function()
+        expect_error(function() combat.newChassis("bad", 100) end)
+    end)
+
+    -- @covers library.combat.newTurret
+    -- @description Verifies newTurret rejects non-number arguments.
+    it("newTurret rejects non-number body_id", function()
+        expect_error(function() combat.newTurret(nil, 2) end)
+    end)
+
+    -- @covers library.combat.newMountSlot
+    -- @description Verifies newMountSlot rejects empty id.
+    it("newMountSlot rejects empty id", function()
+        expect_error(function() combat.newMountSlot("") end)
+    end)
+
+    -- @covers library.combat.newChassis
+    -- @description Verifies takeDamage rejects negative amounts.
+    it("takeDamage rejects negative amount", function()
+        local c = combat.newChassis(1, 100)
+        expect_error(function() c:takeDamage(-5) end)
+    end)
+
+    -- @covers library.combat.newProjectilePool
+    -- @description Verifies pool rejects size < 1.
+    it("newProjectilePool rejects zero pool_size", function()
+        expect_error(function() combat.newProjectilePool(0) end)
+    end)
+end)
+
+-- ── Pool exhaustion and DEFAULT_POOL_SIZE ────────────────────────────────────
+
+describe("ProjectilePool defaults", function()
+    -- @covers library.combat.newProjectilePool
+    -- @description Verifies DEFAULT_POOL_SIZE is exported and used when pool_size is nil.
+    it("DEFAULT_POOL_SIZE is 64 and used when pool_size is nil", function()
+        expect_equal(combat.DEFAULT_POOL_SIZE, 64)
+        local pool = combat.newProjectilePool()
+        expect_equal(pool.pool_size, 64)
+    end)
+end)
+
 test_summary()

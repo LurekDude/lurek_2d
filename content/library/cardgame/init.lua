@@ -6,6 +6,18 @@
 
 local M = {}
 
+--- Optional logging (uses lurek.log when running inside Lurek2D).
+local function _log_info(msg)
+    if lurek and lurek.log and lurek.log.info then
+        lurek.log.info("[cardgame] " .. msg)
+    end
+end
+local function _log_debug(msg)
+    if lurek and lurek.log and lurek.log.debug then
+        lurek.log.debug("[cardgame] " .. msg)
+    end
+end
+
 -- ÔöÇÔöÇ ID counter ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 local _next_id = 1
@@ -14,12 +26,28 @@ local _next_id = 1
 
 local _card_types = {}
 
+--- Return the current value of the internal ID counter (next ID to assign).
+--- Lua doubles are exact up to 2^53 (9007199254740992).
+--- @treturn number  Current counter value.
+function M.getIdCounter() return _next_id end
+
+--- Reset the ID counter to 1.  Call between game sessions to reclaim the
+--- integer range.  Does NOT invalidate already-created cards — callers must
+--- ensure no stale references remain.
+function M.resetIdCounter()
+    _next_id = 1
+    _log_info("ID counter reset to 1")
+end
+
 --- Register or overwrite a card type definition.
---- @param name string  Type name used as registry key.
---- @param def table  CardTypeDef table to store.
+--- @tparam string name  Type name used as registry key (must be non-empty).
+--- @tparam table def  CardTypeDef table to store.
 function M.defineCardType(name, def)
+    assert(type(name) == "string" and #name > 0, "defineCardType: name must be a non-empty string")
+    assert(type(def) == "table", "defineCardType: def must be a table")
     def.name = name
     _card_types[name] = def
+    _log_info("registered card type '" .. name .. "'")
 end
 
 --- Look up a card type by name; returns nil if not found.
@@ -42,9 +70,21 @@ function M.clearCardTypes() _card_types = {} end
 -- ÔöÇÔöÇ CardTypeDef ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Create a new card type definition (blueprint).
---- @param name string Type name.
+---
+--- CardTypeDef fields:
+--- @tfield string name       Type name (set automatically on registration).
+--- @tfield string category   Card category (e.g. "creature", "spell").
+--- @tfield string subtype    Optional subtype within category.
+--- @tfield string rarity     Rarity tier (e.g. "common", "rare", "legendary").
+--- @tfield table base_stats  Default stat values copied to new cards {[stat_name]=number}.
+--- @tfield table base_tags   Default tags copied to new cards (array of strings).
+--- @tfield table metadata    Arbitrary key-value metadata {[string]=string}.
+--- @tfield number|nil max_per_deck  Maximum copies allowed per deck (nil = unlimited).
+---
+--- @tparam string name Type name (must be non-empty).
 --- @treturn table CardTypeDef.
 function M.newCardTypeDef(name)
+    assert(type(name) == "string" and #name > 0, "newCardTypeDef: name must be a non-empty string")
     return {
         name         = name,
         category     = '',
@@ -62,12 +102,37 @@ end
 local Card = {}
 Card.__index = Card
 
---- Create a new card instance. Seeds fields from registry if type is defined.
---- @param card_type string Registered type name.
+--- Create a new card instance.  Seeds fields from the registry if the type
+--- is defined.  Each card receives a unique auto-incrementing integer ID.
+---
+--- Card fields:
+--- @tfield number id         Unique card identifier (auto-assigned).
+--- @tfield string card_type  Registered type name.
+--- @tfield string name       Display name (defaults to card_type).
+--- @tfield string category   Card category (e.g. "creature", "spell").
+--- @tfield string subtype    Optional subtype within category.
+--- @tfield string rarity     Rarity tier string.
+--- @tfield table stats       Per-instance stat overrides {[stat_name]=number}.
+--- @tfield table tags        Array of tag strings.
+--- @tfield table counters    Named counters {[string]=number}.
+--- @tfield table metadata    Arbitrary key-value metadata {[string]=string}.
+--- @tfield string owner      Owner identifier.
+--- @tfield string controller Current controller identifier.
+--- @tfield string slot       Slot assignment name.
+--- @tfield boolean face_up   Whether the card is face-up (default false).
+--- @tfield boolean tapped    Whether the card is tapped/exhausted (default false).
+--- @tfield number tile_x     Board grid X position (default 0).
+--- @tfield number tile_y     Board grid Y position (default 0).
+--- @tfield number tile_w     Board grid width in cells (default 1).
+--- @tfield number tile_h     Board grid height in cells (default 1).
+---
+--- @tparam string card_type  Registered type name.
 --- @treturn Card
 function M.newCard(card_type)
+    assert(type(card_type) == "string", "newCard: card_type must be a string")
     local id = _next_id
     _next_id = _next_id + 1
+    _log_debug("created card #" .. id .. " type='" .. card_type .. "'")
     local c = setmetatable({
         id         = id,
         card_type  = card_type,
@@ -214,9 +279,17 @@ local Stack = {}
 Stack.__index = Stack
 
 --- Create a new unbounded Stack.
---- @param name string  Stack name.
+---
+--- Stack fields:
+--- @tfield string name     Stack display name.
+--- @tfield table cards     Internal card array (use methods to access).
+--- @tfield boolean ordered Whether the stack preserves insertion order (default true).
+--- @tfield boolean public  Whether the stack contents are publicly visible (default false).
+---
+--- @tparam string name  Stack name.
 --- @treturn Stack
 function M.newStack(name)
+    assert(type(name) == "string" and #name > 0, "newStack: name must be a non-empty string")
     return setmetatable({
         name     = name,
         cards    = {},
@@ -226,7 +299,12 @@ function M.newStack(name)
     }, Stack)
 end
 
+--- Create a new Stack with a fixed capacity limit.
+--- @tparam string name  Stack name.
+--- @tparam number cap  Maximum card count (must be >= 1).
+--- @treturn Stack
 function M.newStackWithCapacity(name, cap)
+    assert(type(cap) == "number" and cap >= 1, "newStackWithCapacity: cap must be >= 1")
     local s = M.newStack(name)
     s._cap = cap
     return s
@@ -376,11 +454,19 @@ function Stack:findByCategoryAll(cat)
     return out
 end
 --- Return all Card objects with the given type name.
---- @param type_name string
+--- @tparam string type_name
 --- @treturn table  Array of Card objects.
 function Stack:findByTypeAll(type_name)
     local out = {}
     for _, c in ipairs(self.cards) do if c.card_type == type_name then out[#out+1] = c end end
+    return out
+end
+--- Return all Card objects that have the given tag.
+--- @tparam string tag
+--- @treturn table  Array of Card objects.
+function Stack:findByTagAll(tag)
+    local out = {}
+    for _, c in ipairs(self.cards) do if c:hasTag(tag) then out[#out+1] = c end end
     return out
 end
 --- Remove and return the Card with the given id, or nil if not found.
@@ -451,6 +537,7 @@ function Stack:shuffle()
         local j = math.random(1, i)
         self.cards[i], self.cards[j] = self.cards[j], self.cards[i]
     end
+    _log_debug("shuffled stack '" .. self.name .. "' (" .. n .. " cards)")
 end
 
 --- Return the raw card array (by reference).
@@ -501,16 +588,23 @@ local Slot = {}
 Slot.__index = Slot
 
 --- Create a new unbounded Slot.
---- @param name string  Slot name.
+---
+--- Slot fields:
+--- @tfield string name  Slot display name.
+--- @tfield table items  Internal item array (use methods to access).
+---
+--- @tparam string name  Slot name.
 --- @treturn Slot
 function M.newSlot(name)
+    assert(type(name) == "string" and #name > 0, "newSlot: name must be a non-empty string")
     return setmetatable({ name = name, _cap = nil, items = {} }, Slot)
 end
 --- Create a new Slot with a fixed capacity limit.
---- @param name string
---- @param cap number  Maximum item count.
+--- @tparam string name  Slot name.
+--- @tparam number cap  Maximum item count (must be >= 1).
 --- @treturn Slot
 function M.newSlotWithCapacity(name, cap)
+    assert(type(cap) == "number" and cap >= 1, "newSlotWithCapacity: cap must be >= 1")
     local s = M.newSlot(name)
     s._cap = cap
     return s
@@ -593,16 +687,25 @@ local CardPool = {}
 CardPool.__index = CardPool
 
 --- Create a new empty CardPool.
---- @param name string  Pool name.
+---
+--- CardPool fields:
+--- @tfield string name            Pool display name.
+--- @tfield table entries          Internal weighted entry list.
+--- @tfield table rarity_weights   Per-rarity draw weights for drawByRarity.
+---
+--- @tparam string name  Pool name.
 --- @treturn CardPool
 function M.newCardPool(name)
+    assert(type(name) == "string" and #name > 0, "newCardPool: name must be a non-empty string")
     return setmetatable({ name = name, entries = {}, rarity_weights = {} }, CardPool)
 end
 
 --- Add a type with a draw weight (minimum 1).
---- @param type_name string
---- @param weight number
+--- @tparam string type_name  Card type name (must be non-empty).
+--- @tparam number weight  Draw weight (clamped to minimum 1).
 function CardPool:add(type_name, weight)
+    assert(type(type_name) == "string" and #type_name > 0, "CardPool:add: type_name must be a non-empty string")
+    assert(weight == nil or type(weight) == "number", "CardPool:add: weight must be a number or nil")
     self.entries[#self.entries+1] = { type_name = type_name, weight = math.max(1, weight or 1) }
 end
 --- Remove all entries for the given type name.
@@ -670,7 +773,7 @@ local function weighted_pick(entries)
 end
 
 --- Draw n type names by weighted random selection (with replacement).
---- @param n number
+--- @tparam number n  Number of draws.
 --- @treturn table  Array of type name strings.
 function CardPool:drawTypes(n)
     local out = {}
@@ -678,6 +781,7 @@ function CardPool:drawTypes(n)
         local e = weighted_pick(self.entries)
         if e then out[#out+1] = e.type_name end
     end
+    _log_debug("pool '" .. self.name .. "' drew " .. #out .. " types")
     return out
 end
 --- Draw n Card instances by weighted random selection (with replacement).
@@ -883,9 +987,11 @@ function M.newDeckBuilder(name)
 end
 
 --- Add count copies of type_name to the build list.
---- @param type_name string
---- @param count number
+--- @tparam string type_name  Card type name (must be non-empty).
+--- @tparam number count  Number of copies (must be >= 1).
 function DeckBuilder:add(type_name, count)
+    assert(type(type_name) == "string" and #type_name > 0, "DeckBuilder:add: type_name must be a non-empty string")
+    assert(type(count) == "number" and count >= 1, "DeckBuilder:add: count must be >= 1")
     self.entries[#self.entries+1] = M.newBuildEntry(type_name, count)
 end
 
@@ -989,7 +1095,7 @@ end
 function DeckBuilder:build() return self:buildNamed(self.name) end
 
 --- Build and return a Stack with a custom name.
---- @param stack_name string
+--- @tparam string stack_name
 --- @treturn Stack
 function DeckBuilder:buildNamed(stack_name)
     local stack = M.newStack(stack_name)
@@ -1003,6 +1109,7 @@ function DeckBuilder:buildNamed(stack_name)
         end
     end
     if self.shuffle_on_build then stack:shuffle() end
+    _log_info("built deck '" .. stack_name .. "' with " .. stack:size() .. " cards")
     return stack
 end
 

@@ -773,4 +773,180 @@ describe("ContainerMode", function()
         expect_equal(c:slotCount(), 4)
     end)
 end)
+
+-- ─── Bug fix: expandable overflow ──────────────────────────────────────────────
+
+-- @description Validates that expandable containers respect the max_slots cap.
+describe("Container.expandable.bounds", function()
+    -- @description Verifies case: expand stops at max_slots.
+    it("expand stops at max_slots", function()
+        -- Start with 2 slots, max 4
+        local c = inventory.newContainer("pouch", "expandable", 2, 4)
+        expect_equal(c:slotCount(), 2)
+        expect_equal(c:getCapacity(), 4)
+        -- Expand by 5 — only 2 should be added (capped at 4 total)
+        local ok = c:expand(5)
+        expect_equal(ok, true)
+        expect_equal(c:slotCount(), 4)
+        -- Another expand should fail — already at cap
+        expect_equal(c:expand(1), false)
+        expect_equal(c:slotCount(), 4)
+    end)
+
+    -- @description Verifies case: setCapacity adjusts max for expandable.
+    it("setCapacity adjusts max for expandable", function()
+        local c = inventory.newContainer("pouch", "expandable", 2, 3)
+        expect_equal(c:getCapacity(), 3)
+        c:setCapacity(6)
+        expect_equal(c:getCapacity(), 6)
+        c:expand(4)
+        expect_equal(c:slotCount(), 6) -- capped at new max
+    end)
+
+    -- @description Verifies case: setCapacity cannot shrink below current count.
+    it("setCapacity cannot shrink below current count", function()
+        local c = inventory.newContainer("pouch", "expandable", 3, 5)
+        c:setCapacity(1) -- 3 slots already exist, so clamps to 3
+        expect_equal(c:getCapacity(), 3)
+    end)
+
+    -- @description Verifies case: addSlot respects max_slots in expandable mode.
+    it("addSlot respects max_slots in expandable mode", function()
+        local c = inventory.newContainer("pouch", "expandable", 2, 3)
+        c:addSlot(inventory.newSlot("any", inventory.SlotState.Active)) -- 3rd slot OK
+        expect_equal(c:slotCount(), 3)
+        c:addSlot(inventory.newSlot("any", inventory.SlotState.Active)) -- 4th blocked
+        expect_equal(c:slotCount(), 3)
+    end)
+
+    -- @description Verifies case: default max_slots equals initial slot_count.
+    it("default max_slots equals initial slot_count when no max given", function()
+        local c = inventory.newContainer("pouch", "expandable", 3)
+        expect_equal(c:getCapacity(), 3)
+        expect_equal(c:expand(1), false) -- already at cap
+    end)
+end)
+
+-- ─── Bug fix: multi-stack merge ─────────────────────────────────────────────
+
+-- @description Validates that addItem merges into ALL matching partial stacks.
+describe("Container.addItem.merge", function()
+    -- @description Verifies case: merges across multiple partial stacks.
+    it("merges across multiple partial stacks", function()
+        local c = inventory.newContainer("bag", "fixed", 3)
+        local arrow = inventory.newItem("arrow")
+        arrow:setStackLimit(10)
+        -- Manually place two partial stacks
+        c:getSlot(1):setStack(inventory.newItemStack(arrow, 7, 10))
+        c:getSlot(2):setStack(inventory.newItemStack(arrow, 6, 10))
+        -- Adding 5 should fill slot 1 (3 more) then slot 2 (2 more)
+        expect_equal(c:addItem(arrow, 5), true)
+        expect_equal(c:getSlot(1):getStack():getQuantity(), 10) -- filled
+        expect_equal(c:getSlot(2):getStack():getQuantity(), 8)  -- received 2
+        expect_equal(c:countItem("arrow"), 18) -- 7+6+5 = 18
+    end)
+
+    -- @description Verifies case: overflow goes into empty slot after filling stacks.
+    it("overflow goes into empty slot after filling stacks", function()
+        local c = inventory.newContainer("bag", "fixed", 3)
+        local coin = inventory.newItem("coin")
+        coin:setStackLimit(5)
+        c:getSlot(1):setStack(inventory.newItemStack(coin, 4, 5))
+        -- Add 8: 1 fills slot 1 (to 5), 5 goes to slot 2, 2 goes to slot 3
+        expect_equal(c:addItem(coin, 8), true)
+        expect_equal(c:getSlot(1):getStack():getQuantity(), 5)
+        expect_equal(c:getSlot(2):getStack():getQuantity(), 5)
+        expect_equal(c:getSlot(3):getStack():getQuantity(), 2)
+    end)
+end)
+
+-- ─── Tag-based slot filtering in containers ─────────────────────────────────
+
+-- @description Validates that tagged slots correctly accept/reject items via canAccept.
+describe("Container.tagFiltering", function()
+    -- @description Verifies case: typed slot in container accepts item with matching tag.
+    it("typed slot in container accepts item with matching tag via addItem", function()
+        -- Container with a "weapon" slot — item type is "magic_blade" but has "weapon" tag
+        local c = inventory.newContainer("equip", "fixed", 0)
+        local weapon_slot = inventory.newSlot("weapon", inventory.SlotState.Active)
+        c:addSlot(weapon_slot)
+
+        local blade = inventory.newItem("magic_blade")
+        blade:addTag("weapon")
+        expect_equal(c:addItem(blade, 1), true)
+        expect_equal(c:countItem("magic_blade"), 1)
+    end)
+
+    -- @description Verifies case: typed slot rejects item without matching type or tag.
+    it("typed slot rejects item without matching type or tag", function()
+        local c = inventory.newContainer("equip", "fixed", 0)
+        c:addSlot(inventory.newSlot("weapon", inventory.SlotState.Active))
+
+        local potion = inventory.newItem("potion")
+        expect_equal(c:addItem(potion, 1), false)
+        expect_equal(c:countItem("potion"), 0)
+    end)
+
+    -- @description Verifies case: item type match overrides tag check.
+    it("item type match satisfies slot type without needing tag", function()
+        local c = inventory.newContainer("equip", "fixed", 0)
+        c:addSlot(inventory.newSlot("sword", inventory.SlotState.Active))
+
+        local sword = inventory.newItem("sword")
+        expect_equal(c:addItem(sword, 1), true)
+    end)
+end)
+
+-- ─── Input validation ─────────────────────────────────────────────────────────
+
+-- @description Validates that input validation catches bad arguments early.
+describe("InputValidation", function()
+    -- @description Verifies case: newItem rejects empty string.
+    it("newItem rejects empty string", function()
+        expect_error(function() inventory.newItem("") end)
+    end)
+
+    -- @description Verifies case: newItem rejects nil.
+    it("newItem rejects nil", function()
+        expect_error(function() inventory.newItem(nil) end)
+    end)
+
+    -- @description Verifies case: setWeight rejects negative.
+    it("setWeight rejects negative", function()
+        local it = inventory.newItem("gem")
+        expect_error(function() it:setWeight(-1) end)
+    end)
+
+    -- @description Verifies case: addItem rejects zero quantity.
+    it("addItem rejects zero quantity", function()
+        local c = inventory.newContainer("bag", "unlimited", 0)
+        local it = inventory.newItem("coin")
+        expect_error(function() c:addItem(it, 0) end)
+    end)
+
+    -- @description Verifies case: addItem rejects negative quantity.
+    it("addItem rejects negative quantity", function()
+        local c = inventory.newContainer("bag", "unlimited", 0)
+        local it = inventory.newItem("coin")
+        expect_error(function() c:addItem(it, -5) end)
+    end)
+
+    -- @description Verifies case: removeItem rejects zero quantity.
+    it("removeItem rejects zero quantity", function()
+        local c = inventory.newContainer("bag", "unlimited", 0)
+        expect_error(function() c:removeItem("coin", 0) end)
+    end)
+
+    -- @description Verifies case: newContainer rejects invalid mode.
+    it("newContainer rejects invalid mode", function()
+        expect_error(function() inventory.newContainer("bag", "broken", 5) end)
+    end)
+
+    -- @description Verifies case: setWeightLimit rejects negative.
+    it("setWeightLimit rejects negative", function()
+        local c = inventory.newContainer("bag", "unlimited", 0)
+        expect_error(function() c:setWeightLimit(-1) end)
+    end)
+end)
+
 test_summary()

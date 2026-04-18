@@ -3,8 +3,25 @@
 All notable changes to Lurek2D are recorded here.
 
 ## [0.18.3] — 2026-04-17
-### Added
-- **tools/ui/render_layout.py**: New standalone Python tool — renders Lurek2D TOML UI layout
+### Changed
+- **tests/lua/unit/test_gui.lua**: Added 5 migrated behavioral tests — `SpinBox` increment with
+  custom step, increment clamps at max, `setValue` clamps to max, `setValue` clamps to min,
+  and `Badge.getDisplayText` at exactly the cap boundary (99 → "99").
+- **tests/lua/unit/test_scene.lua**: Added 2 migrated easing tests — linear easing produces
+  `getTransitionProgressEased() ≈ getTransitionProgress()` mid-transition, and ease_in easing
+  produces eased < raw before the midpoint.  Both use `lurek.scene.update()` to advance the
+  timer inside the Lua test VM.
+- **tests/rust/unit/gui_tests.rs**: Removed duplicate second block introduced by an earlier
+  append (duplicated 22 tests) — canonical tests retained in the first block.
+- **tests/rust/unit/scene_tests.rs**: Removed 3 now-redundant Lua-observable tests
+  (`active_transition_progress_eased_linear_matches_progress`,
+  `active_transition_progress_eased_ease_in_less_before_midpoint`,
+  `scene_stack_get_transition_progress_eased_linear_matches`) and updated module-level
+  docstring to reflect the new Lua-first testing rule.
+- **tests/rust/unit/patterns_tests.rs**: No changes — `Trie`/`BiMap` have no Lua binding and
+  all tests remain Rust-only as required.
+
+
   files to PNG wireframe previews without the game engine.  Each widget is drawn as a
   colour-coded filled rectangle with label (`widget_type [id] "text"`).  Canvas size is
   determined by `resolution = [w, h]` in the TOML, falling back to `root.w × root.h` then

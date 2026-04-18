@@ -1,0 +1,8 @@
+[window]
+title = "Maze Defense — Lurek2D"
+width = 780
+height = 580
+vsync = true
+
+[engine]
+target_fps = 60

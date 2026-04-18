@@ -8,9 +8,16 @@
 
 local M = {}
 
+-- Optional logging via lurek.log (no-op if unavailable)
+local _log = lurek and lurek.log or nil
+local function _logInfo(msg)  if _log then _log.info("[doll] " .. msg) end end
+local function _logWarn(msg)  if _log then _log.warn("[doll] " .. msg) end end
+
 -- ── Part ──────────────────────────────────────────────────────────────────────
 
 --- Create a new Part (visual element for attaching to a Doll socket).
+-- Parts carry texture, transform, colour, flip, draw-order, and arbitrary
+-- key-value attributes. Attach to a Doll socket with `doll:attach()`.
 -- @treturn Part blank part with defaults
 function M.newPart()
     local part = {}
@@ -49,13 +56,25 @@ function M.newPart()
     function part:getRotation()      return _rotation end
     function part:setRotation(r)     _rotation = r end
     function part:getScale()         return _scaleX, _scaleY end
-    function part:setScale(sx, sy)   _scaleX = sx; _scaleY = sy or sx end
+    --- Set part scale. Passing a single number sets uniform scale.
+    -- @tparam number sx horizontal scale
+    -- @tparam[opt=sx] number sy vertical scale
+    function part:setScale(sx, sy)
+        if type(sx) ~= "number" then error("setScale: sx must be a number", 2) end
+        if sy ~= nil and type(sy) ~= "number" then error("setScale: sy must be a number", 2) end
+        _scaleX = sx; _scaleY = sy or sx
+    end
     function part:getOrigin()        return _originX, _originY end
     function part:setOrigin(ox, oy)  _originX = ox; _originY = oy end
 
     -- Draw Order & Type
     function part:getDrawOrder()     return _drawOrder end
-    function part:setDrawOrder(n)    _drawOrder = n end
+    --- Set part draw order (z-sort key).
+    -- @tparam number n draw order value
+    function part:setDrawOrder(n)
+        if type(n) ~= "number" then error("setDrawOrder: n must be a number", 2) end
+        _drawOrder = n
+    end
     function part:getPartType()      return _partType end
     function part:setPartType(t)     _partType = t end
 
@@ -86,13 +105,32 @@ function M.newPart()
     function part:getFixture()       return _fixture end
     function part:setFixture(f)      _fixture = f end
 
+    --- Get the absolute scale magnitude, ignoring flip.
+    -- Useful when flip is used for mirroring but the caller needs the
+    -- positive magnitude (e.g. bounding-box calculation).
+    -- @treturn number absolute scaleX
+    -- @treturn number absolute scaleY
+    function part:getAbsoluteScale()
+        return math.abs(_scaleX), math.abs(_scaleY)
+    end
+
+    --- Get a shallow copy of all attributes.
+    -- @treturn table key-value copy of all stored attributes
+    function part:getAttributes()
+        local copy = {}
+        for k, v in pairs(_attributes) do copy[k] = v end
+        return copy
+    end
+
     return part
 end
 
 -- ── DollTemplate ──────────────────────────────────────────────────────────────
 
 --- Create a new DollTemplate (socket layout blueprint).
--- @param name string template name
+-- A template defines named sockets at fixed positions and rotations.
+-- Each socket has an acceptType filter and a drawOrder for z-sorting.
+-- @tparam[opt=""] string name template name
 -- @treturn DollTemplate empty template
 function M.newTemplate(name)
     local tmpl = {}
@@ -104,14 +142,24 @@ function M.newTemplate(name)
     function tmpl:setName(n)         _name = n end
 
     --- Add a socket to the template.
-    -- @param socketName string unique socket name
-    -- @param acceptType string part type filter ("" = accept anything)
-    -- @param x number offset X from doll origin (default 0)
-    -- @param y number offset Y from doll origin (default 0)
-    -- @param rotation number socket rotation in radians (default 0)
-    -- @param drawOrder number z-sort key (default 0)
+    -- Returns true on success, or false plus a message if the name is
+    -- invalid or already registered.
+    -- @tparam string socketName unique socket name (non-empty)
+    -- @tparam[opt=""] string acceptType part type filter ("" = accept anything)
+    -- @tparam[opt=0] number x offset X from doll origin
+    -- @tparam[opt=0] number y offset Y from doll origin
+    -- @tparam[opt=0] number rotation socket rotation in radians
+    -- @tparam[opt=0] number drawOrder z-sort key
+    -- @treturn boolean success
+    -- @treturn[opt] string error message on failure
     function tmpl:addSocket(socketName, acceptType, x, y, rotation, drawOrder)
-        if _index[socketName] then return end
+        if type(socketName) ~= "string" or socketName == "" then
+            return false, "socket name must be a non-empty string"
+        end
+        if _index[socketName] then
+            _logWarn("addSocket: duplicate socket name '" .. socketName .. "'")
+            return false, "socket already exists: " .. socketName
+        end
         local socket = {
             name       = socketName,
             acceptType = acceptType or "",
@@ -122,6 +170,7 @@ function M.newTemplate(name)
         }
         _sockets[#_sockets + 1] = socket
         _index[socketName] = #_sockets
+        return true
     end
 
     function tmpl:removeSocket(socketName)
@@ -169,7 +218,9 @@ end
 -- ── Doll ──────────────────────────────────────────────────────────────────────
 
 --- Create a new Doll (runtime composite instance of a template).
--- @param template DollTemplate socket layout to use
+-- A Doll binds a DollTemplate to a world-space transform and holds
+-- Part instances attached to template sockets.
+-- @tparam DollTemplate template socket layout to use
 -- @treturn Doll runtime doll instance
 function M.newDoll(template)
     local doll = {}
@@ -207,11 +258,14 @@ function M.newDoll(template)
     function doll:setUserData(v)     _userData = v end
 
     --- Attach a Part to a named socket.
-    -- Returns false if socket not found or type mismatch.
-    -- @param socketName string
-    -- @param part Part
+    -- Returns false if socket not found, type mismatch, or invalid args.
+    -- @tparam string socketName socket to attach to
+    -- @tparam Part part part instance to attach
     -- @treturn boolean success
     function doll:attach(socketName, part)
+        if type(socketName) ~= "string" or socketName == "" then
+            return false
+        end
         local socket = _template:getSocket(socketName)
         if not socket then return false end
         -- type compatibility check
@@ -220,15 +274,19 @@ function M.newDoll(template)
             return false
         end
         _slots[socketName] = part
+        _logInfo("attached '" .. (part:getPartType() or "?") .. "' to '" .. socketName .. "'")
         return true
     end
 
     --- Detach the Part from a socket, returning it.
-    -- @param socketName string
-    -- @treturn Part|nil detached part
+    -- @tparam string socketName socket to detach from
+    -- @treturn Part|nil detached part, or nil if socket was empty
     function doll:detach(socketName)
         local part = _slots[socketName]
         _slots[socketName] = nil
+        if part then
+            _logInfo("detached from '" .. socketName .. "'")
+        end
         return part
     end
 
@@ -264,7 +322,19 @@ function M.newDoll(template)
     end
 
     --- Compute world-transform draw list sorted by drawOrder.
-    -- Each entry: {socketName, part, x, y, rotation, scaleX, scaleY, drawOrder}
+    -- Each entry: {socketName, part, x, y, rotation, scaleX, scaleY,
+    -- originX, originY, drawOrder}.
+    --
+    -- **Flip behaviour**: Part flip flags produce negative scale values
+    -- (e.g. scaleX = -2 when flipX is true and doll+part scale = 2).
+    -- This is intentional — GPU scale-based mirroring. Use
+    -- `doll.getAbsoluteScale(entry)` if you need the positive magnitude.
+    --
+    -- **Transform order**: Part offset is rotated by socket rotation
+    -- before being added to the socket position (socket-local space).
+    -- The combined offset is then scaled by doll scale and rotated by
+    -- doll rotation.
+    --
     -- Does NOT filter by part visibility — caller handles that.
     -- @treturn table ordered draw list
     function doll:getDrawList()
@@ -276,8 +346,16 @@ function M.newDoll(template)
             local part = _slots[socket.name]
             if part then
                 local ox, oy = part:getOffset()
-                local localX = (socket.x + ox) * _scaleX
-                local localY = (socket.y + oy) * _scaleY
+
+                -- Rotate part offset by socket rotation so offsets are
+                -- relative to the socket's local coordinate frame.
+                local sock_cos = math.cos(socket.rotation)
+                local sock_sin = math.sin(socket.rotation)
+                local rotOX = ox * sock_cos - oy * sock_sin
+                local rotOY = ox * sock_sin + oy * sock_cos
+
+                local localX = (socket.x + rotOX) * _scaleX
+                local localY = (socket.y + rotOY) * _scaleY
 
                 local worldX = _x + localX * cos_r - localY * sin_r
                 local worldY = _y + localX * sin_r + localY * cos_r
@@ -295,6 +373,8 @@ function M.newDoll(template)
                 local worldSX = _scaleX * psx * (pfx and -1 or 1)
                 local worldSY = _scaleY * psy * (pfy and -1 or 1)
 
+                local partOX, partOY = part:getOrigin()
+
                 list[#list + 1] = {
                     socketName = socket.name,
                     part       = part,
@@ -303,6 +383,8 @@ function M.newDoll(template)
                     rotation   = worldRot,
                     scaleX     = worldSX,
                     scaleY     = worldSY,
+                    originX    = partOX,
+                    originY    = partOY,
                     drawOrder  = socket.drawOrder + part:getDrawOrder(),
                 }
             end
@@ -353,6 +435,15 @@ function M.newDoll(template)
     end
 
     return doll
+end
+
+--- Get the absolute scale magnitude from a draw-list entry.
+-- Strips the sign introduced by flip flags, returning positive values.
+-- @tparam table entry a draw-list entry from Doll:getDrawList()
+-- @treturn number absolute scaleX
+-- @treturn number absolute scaleY
+function M.getAbsoluteScale(entry)
+    return math.abs(entry.scaleX), math.abs(entry.scaleY)
 end
 
 return M

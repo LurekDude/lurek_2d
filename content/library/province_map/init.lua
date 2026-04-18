@@ -2,9 +2,29 @@
 --- Province-map data model: provinces, adjacency edges, definitions,
 --- borders, event bus, map modes, positions, routing, and faction helpers.
 --- Pure-Lua port and extension of src/province_map/.
+---
+--- **Coordinate system**: Pixel coordinates are 0-based (x: 0..width-1,
+--- y: 0..height-1). Internally, `pixel_lookup` uses 1-based Lua array
+--- indexing: index = y * width + x + 1.  Province IDs are arbitrary
+--- non-negative integers (typically derived from RGB colour via `colorToId`).
+---
+--- **Adjacency model**: Edges are undirected.  Both `adj_key` and
+--- `newAdjacencyEdge` normalise so that `province_a <= province_b`.
+--- `insertAdjacency` enforces the same invariant.  The canonical adjacency
+--- source is `ProvinceMap.adjacency`; call `getNeighbors(id)` for a
+--- province's neighbour list (computed dynamically from edges).
 --- @status full
 
 local M = {}
+
+--- Optional logging helpers.  Uses lurek.log when available (engine
+--- context), silent no-ops otherwise (standalone / test context).
+local function _log_info(msg)
+    if lurek and lurek.log and lurek.log.info then lurek.log.info("[province_map] " .. msg) end
+end
+local function _log_warn(msg)
+    if lurek and lurek.log and lurek.log.warn then lurek.log.warn("[province_map] " .. msg) end
+end
 
 -- ── Province ──────────────────────────────────────────────────────────────
 
@@ -12,10 +32,12 @@ local Province = {}
 Province.__index = Province
 
 --- Create a new province.
--- @param id     number  Unique province ID (from RGB colour).
--- @param color  table   {r, g, b} colour table.
+-- @tparam number id Unique province ID (from RGB colour).
+-- @tparam table color {r, g, b} colour table.
 -- @treturn Province
 function M.newProvince(id, color)
+    assert(type(id) == "number", "province id must be a number")
+    _log_info("create province " .. tostring(id))
     return setmetatable({
         id             = id,
         color          = color or {0, 0, 0},
@@ -32,22 +54,33 @@ function M.newProvince(id, color)
 end
 
 --- Set the faction that controls this province.
--- @param f string|nil
-function Province:setFaction(f)   self.faction = f          end
+-- @tparam string|nil f
+function Province:setFaction(f)
+    assert(f == nil or type(f) == "string", "faction must be a string or nil")
+    local old = self.faction
+    self.faction = f
+    if old ~= f then
+        _log_info("province " .. tostring(self.id) .. " faction: " .. tostring(old) .. " -> " .. tostring(f))
+    end
+end
 --- Get the controlling faction.
 -- @treturn string|nil
 function Province:getFaction()    return self.faction        end
 
 --- Set the defense rating (0–100).
--- @param v number
-function Province:setDefenseRating(v) self.defense_rating = v end
+-- @tparam number v
+function Province:setDefenseRating(v)
+    assert(type(v) == "number", "defense_rating must be a number")
+    self.defense_rating = v
+end
 --- Get the defense rating.
 -- @treturn number
 function Province:getDefenseRating()  return self.defense_rating end
 
 --- Add a building to this province.
--- @param building string
+-- @tparam string building
 function Province:addBuilding(b)
+    assert(type(b) == "string", "building name must be a string")
     self.buildings[#self.buildings+1] = b
 end
 --- Get all buildings.
@@ -58,14 +91,14 @@ function Province:getBuildings()
     return out
 end
 --- Return true if the province has the given building.
--- @param b string
+-- @tparam string b
 -- @treturn boolean
 function Province:hasBuilding(b)
     for _, x in ipairs(self.buildings) do if x == b then return true end end
     return false
 end
 --- Remove a building by name. Returns true if removed.
--- @param b string
+-- @tparam string b
 -- @treturn boolean
 function Province:removeBuilding(b)
     for i, x in ipairs(self.buildings) do
@@ -75,11 +108,15 @@ function Province:removeBuilding(b)
 end
 
 --- Set a produced resource amount.
--- @param res    string
--- @param amount number
-function Province:setResource(res, amount) self.resources[res] = amount end
+-- @tparam string res
+-- @tparam number amount
+function Province:setResource(res, amount)
+    assert(type(res) == "string", "resource name must be a string")
+    assert(type(amount) == "number" and amount >= 0, "resource amount must be a non-negative number")
+    self.resources[res] = amount
+end
 --- Get a produced resource amount (0 if not set).
--- @param res string
+-- @tparam string res
 -- @treturn number
 function Province:getResource(res) return self.resources[res] or 0 end
 --- Get the full resource table.
@@ -93,10 +130,12 @@ end
 -- ── AdjacencyEdge ─────────────────────────────────────────────────────────
 
 --- Create a new adjacency edge between two provinces.
--- @param province_a number
--- @param province_b number
+-- @tparam number province_a
+-- @tparam number province_b
 -- @treturn table
 function M.newAdjacencyEdge(province_a, province_b)
+    assert(type(province_a) == "number", "province_a must be a number")
+    assert(type(province_b) == "number", "province_b must be a number")
     local a, b = province_a, province_b
     if a > b then a, b = b, a end
     return {
@@ -111,25 +150,25 @@ function M.newAdjacencyEdge(province_a, province_b)
 end
 
 --- Add a tag to an adjacency edge.
--- @param edge table
--- @param tag  string
+-- @tparam table edge
+-- @tparam string tag
 function M.addEdgeTag(edge, tag) edge.tags[tag] = true end
 --- Remove a tag from an adjacency edge.
--- @param edge table
--- @param tag  string
+-- @tparam table edge
+-- @tparam string tag
 function M.removeEdgeTag(edge, tag) edge.tags[tag] = nil end
 --- Check if an adjacency edge has a tag.
--- @param edge table
--- @param tag  string
+-- @tparam table edge
+-- @tparam string tag
 -- @treturn boolean
 function M.hasEdgeTag(edge, tag) return edge.tags[tag] == true end
 
 -- ── ProvinceDefinition ────────────────────────────────────────────────────
 
 --- Create a province definition (lightweight descriptor for map building).
--- @param id     number
--- @param color  table
--- @param center table  {x, y}
+-- @tparam number id
+-- @tparam table color
+-- @tparam table center {x, y}
 -- @treturn table
 function M.newProvinceDefinition(id, color, center)
     return {
@@ -145,8 +184,8 @@ end
 -- ── BorderSegment ─────────────────────────────────────────────────────────
 
 --- Create a border segment between two provinces.
--- @param province_a number
--- @param province_b number
+-- @tparam number province_a
+-- @tparam number province_b
 -- @treturn table
 function M.newBorderSegment(province_a, province_b)
     return {
@@ -179,18 +218,18 @@ M.MapModeColorFn = {
 }
 
 --- Create a fixed colour map mode (each province has a fixed colour).
--- @param province_colors table  {[id] = {r, g, b}}
+-- @tparam table province_colors {[id] = {r, g, b}}
 -- @treturn table
 function M.newFixedColorFn(province_colors)
     return { type = 'fixed', colors = province_colors or {} }
 end
 
 --- Create a gradient colour map mode.
--- @param values     table   {[id] = number}
--- @param min_color  table   {r, g, b}
--- @param max_color  table   {r, g, b}
--- @param min_val    number
--- @param max_val    number
+-- @tparam table values {[id] = number}
+-- @tparam table min_color {r, g, b}
+-- @tparam table max_color {r, g, b}
+-- @tparam number min_val
+-- @tparam number max_val
 -- @treturn table
 function M.newGradientColorFn(values, min_color, max_color, min_val, max_val)
     return {
@@ -204,8 +243,8 @@ function M.newGradientColorFn(values, min_color, max_color, min_val, max_val)
 end
 
 --- Apply a gradient colour function to a province, returning a {r,g,b} colour.
--- @param fn    table  gradient colour function
--- @param id    number province id
+-- @tparam table fn gradient colour function
+-- @tparam number id province id
 -- @treturn table {r, g, b}
 function M.applyGradientColor(fn, id)
     local v = fn.values[id] or fn.min_val
@@ -218,9 +257,9 @@ function M.applyGradientColor(fn, id)
 end
 
 --- Create a category colour map mode.
--- @param categories    table  {[id] = category_string}
--- @param colors        table  {[category_string] = {r, g, b}}
--- @param default_color table  {r, g, b}
+-- @tparam table categories {[id] = category_string}
+-- @tparam table colors {[category_string] = {r, g, b}}
+-- @tparam table default_color {r, g, b}
 -- @treturn table
 function M.newCategoryColorFn(categories, colors, default_color)
     return {
@@ -232,8 +271,8 @@ function M.newCategoryColorFn(categories, colors, default_color)
 end
 
 --- Apply a category colour function to a province.
--- @param fn table category colour function
--- @param id number province id
+-- @tparam table fn category colour function
+-- @tparam number id province id
 -- @treturn table {r, g, b}
 function M.applyCategoryColor(fn, id)
     local cat = fn.categories[id]
@@ -244,8 +283,8 @@ end
 -- ── MapMode ───────────────────────────────────────────────────────────────
 
 --- Create a named map mode.
--- @param name     string
--- @param color_fn table|string
+-- @tparam string name
+-- @tparam table|string color_fn
 -- @treturn table
 function M.newMapMode(name, color_fn)
     return {
@@ -260,13 +299,17 @@ local ProvinceMap = {}
 ProvinceMap.__index = ProvinceMap
 
 --- Create a new empty province map.
--- @param width  number pixel width
--- @param height number pixel height
+-- @tparam number width pixel width
+-- @tparam number height pixel height
 -- @treturn ProvinceMap
 function M.newProvinceMap(width, height)
+    local w = width or 0
+    local h = height or 0
+    assert(type(w) == "number" and w >= 0, "width must be a non-negative number")
+    assert(type(h) == "number" and h >= 0, "height must be a non-negative number")
     return setmetatable({
-        _width       = width or 0,
-        _height      = height or 0,
+        _width       = w,
+        _height      = h,
         provinces    = {},
         pixel_lookup = {},
         adjacency    = {},
@@ -281,13 +324,13 @@ function ProvinceMap:width()  return self._width  end
 function ProvinceMap:height() return self._height end
 
 --- Insert or replace a province.
--- @param province Province
+-- @tparam Province province
 function ProvinceMap:insertProvince(province)
     self.provinces[province.id] = province
 end
 
 --- Remove a province by ID. Returns true if it existed.
--- @param id number
+-- @tparam number id
 -- @treturn boolean
 function ProvinceMap:removeProvince(id)
     if self.provinces[id] then
@@ -298,7 +341,7 @@ function ProvinceMap:removeProvince(id)
 end
 
 --- Look up a province by ID.
--- @param id number
+-- @tparam number id
 -- @treturn Province|nil
 function ProvinceMap:getProvince(id)
     return self.provinces[id]
@@ -321,52 +364,78 @@ function ProvinceMap:provinceIds()
     return ids
 end
 
---- Set pixel at (x, y) to the given province ID.
--- @param x          number 0-based
--- @param y          number 0-based
--- @param province_id number
-function ProvinceMap:setPixel(x, y, province_id)
-    if x < 0 or x >= self._width or y < 0 or y >= self._height then return end
-    self.pixel_lookup[y * self._width + x + 1] = province_id
-end
-
---- Return the province ID at pixel (x, y).
--- @param x number 0-based
--- @param y number 0-based
--- @treturn number|nil
-function ProvinceMap:getProvinceAt(x, y)
-    if x < 0 or x >= self._width or y < 0 or y >= self._height then return nil end
-    return self.pixel_lookup[y * self._width + x + 1]
-end
-
 local function adj_key(a, b)
     if a > b then a, b = b, a end
     return a .. ':' .. b
 end
 
+--- Set pixel at (x, y) to the given province ID.
+--- Coordinates are 0-based.  Internally stored in `pixel_lookup` at
+--- 1-based index `y * width + x + 1` (standard Lua array convention).
+--- After writing the pixel, adjacency edges are updated bidirectionally
+--- by checking all four cardinal neighbours.
+-- @tparam number x          0-based pixel column.
+-- @tparam number y          0-based pixel row.
+-- @tparam number province_id Province ID to assign to this pixel.
+function ProvinceMap:setPixel(x, y, province_id)
+    if x < 0 or x >= self._width or y < 0 or y >= self._height then return end
+    self.pixel_lookup[y * self._width + x + 1] = province_id
+    -- Bidirectional adjacency: check all four neighbours and create edges.
+    for _, d in ipairs({{1,0},{-1,0},{0,1},{0,-1}}) do
+        local nx, ny = x + d[1], y + d[2]
+        if nx >= 0 and nx < self._width and ny >= 0 and ny < self._height then
+            local nid = self.pixel_lookup[ny * self._width + nx + 1]
+            if nid and nid ~= province_id then
+                local key = adj_key(province_id, nid)
+                if not self.adjacency[key] then
+                    self.adjacency[key] = M.newAdjacencyEdge(province_id, nid)
+                end
+            end
+        end
+    end
+end
+
+--- Return the province ID at pixel (x, y).
+--- Coordinates are 0-based.  Returns nil for out-of-bounds queries.
+-- @tparam number x 0-based pixel column.
+-- @tparam number y 0-based pixel row.
+-- @treturn number|nil Province ID or nil.
+function ProvinceMap:getProvinceAt(x, y)
+    if x < 0 or x >= self._width or y < 0 or y >= self._height then return nil end
+    return self.pixel_lookup[y * self._width + x + 1]
+end
+
 --- Insert an adjacency edge.
--- @param edge table AdjacencyEdge
+--- Edge fields `province_a` / `province_b` are normalised on insertion so
+--- that `province_a <= province_b`, matching `adj_key` sort order.
+-- @tparam table edge AdjacencyEdge.
 function ProvinceMap:insertAdjacency(edge)
+    -- Normalise edge storage to match adj_key direction.
+    if edge.province_a > edge.province_b then
+        edge.province_a, edge.province_b = edge.province_b, edge.province_a
+    end
     local key = adj_key(edge.province_a, edge.province_b)
     self.adjacency[key] = edge
+    _log_info("adjacency " .. tostring(edge.province_a) .. " <-> " .. tostring(edge.province_b))
 end
 
 --- Remove an adjacency edge. Returns true if removed.
--- @param a number
--- @param b number
+-- @tparam number a
+-- @tparam number b
 -- @treturn boolean
 function ProvinceMap:removeAdjacency(a, b)
     local key = adj_key(a, b)
     if self.adjacency[key] then
         self.adjacency[key] = nil
+        _log_info("remove adjacency " .. tostring(a) .. " <-> " .. tostring(b))
         return true
     end
     return false
 end
 
 --- Get the adjacency edge between two provinces.
--- @param a number
--- @param b number
+-- @tparam number a
+-- @tparam number b
 -- @treturn table|nil
 function ProvinceMap:getAdjacency(a, b)
     return self.adjacency[adj_key(a, b)]
@@ -381,7 +450,7 @@ function ProvinceMap:adjacencyCount()
 end
 
 --- Return a sorted list of neighbour province IDs for the given province.
--- @param id number
+-- @tparam number id
 -- @treturn table
 function ProvinceMap:getNeighbors(id)
     local out = {}
@@ -398,10 +467,16 @@ function ProvinceMap:getNeighbors(id)
 end
 
 --- Set adjacency between two provinces (creates or updates edge).
--- @param a    number
--- @param b    number
--- @param tags table optional {tag=true, ...}
+--- The edge is stored with normalised province IDs (`province_a <= province_b`).
+--- Neighbours can always be queried via `getNeighbors(id)` which scans the
+--- adjacency table — there is no separate neighbours list to keep in sync.
+-- @tparam number a First province ID.
+-- @tparam number b Second province ID.
+-- @tparam table tags Optional {tag=true, ...} to merge into the edge.
+-- @treturn table The created or updated AdjacencyEdge.
 function ProvinceMap:setAdjacent(a, b, tags)
+    assert(type(a) == "number", "province id a must be a number")
+    assert(type(b) == "number", "province id b must be a number")
     local edge = self:getAdjacency(a, b)
     if not edge then
         edge = M.newAdjacencyEdge(a, b)
@@ -414,10 +489,12 @@ function ProvinceMap:setAdjacent(a, b, tags)
 end
 
 --- Euclidean centroid distance between two provinces.
--- @param a number
--- @param b number
+-- @tparam number a
+-- @tparam number b
 -- @treturn number
 function ProvinceMap:distance(a, b)
+    assert(type(a) == "number", "province id a must be a number")
+    assert(type(b) == "number", "province id b must be a number")
     local pa = self.provinces[a]
     local pb = self.provinces[b]
     if not pa or not pb then return 0 end
@@ -433,11 +510,13 @@ function ProvinceMap:pixelLookup() return self.pixel_lookup end
 --- BFS route from province `from_id` to `to_id`.
 -- Returns an ordered list of province IDs forming the path, or nil if unreachable.
 -- Passable edges (passable == true) and optional cost filter are respected.
--- @param from_id      number
--- @param to_id        number
--- @param passable_fn  function|nil  passable_fn(edge) → boolean (nil = all passable)
+-- @tparam number from_id
+-- @tparam number to_id
+-- @tparam function|nil passable_fn passable_fn(edge) → boolean (nil = all passable)
 -- @treturn table|nil  ordered province ID list including from_id and to_id
 function ProvinceMap:findRoute(from_id, to_id, passable_fn)
+    assert(type(from_id) == "number", "from_id must be a number")
+    assert(type(to_id) == "number", "to_id must be a number")
     if from_id == to_id then return {from_id} end
     passable_fn = passable_fn or function(e) return e.passable ~= false end
     local visited = {[from_id] = true}
@@ -472,7 +551,7 @@ function ProvinceMap:findRoute(from_id, to_id, passable_fn)
 end
 
 --- Return all province IDs controlled by the given faction.
--- @param faction string
+-- @tparam string faction
 -- @treturn table sorted list of province IDs
 function ProvinceMap:getProvincesByFaction(faction)
     local out = {}
@@ -484,8 +563,8 @@ function ProvinceMap:getProvincesByFaction(faction)
 end
 
 --- Sum a resource across all provinces belonging to a faction.
--- @param faction  string
--- @param resource string
+-- @tparam string faction
+-- @tparam string resource
 -- @treturn number
 function ProvinceMap:totalResourceForFaction(faction, resource)
     local total = 0
@@ -572,55 +651,55 @@ local function emit(self, name, data)
 end
 
 --- Emit a map-loaded event with province count.
--- @param count number
+-- @tparam number count
 function EventBus:emitMapLoaded(count)         emit(self, 'map_loaded',          {count = count or 0}) end
 --- Emit a province-added event.
--- @param id number
+-- @tparam number id
 function EventBus:emitProvinceAdded(id)        emit(self, 'province_added',      {id = id}) end
 --- Emit a province-removed event.
--- @param id number
+-- @tparam number id
 function EventBus:emitProvinceRemoved(id)      emit(self, 'province_removed',    {id = id}) end
 --- Emit adjacency-detected with edge count.
--- @param edge_count number
+-- @tparam number edge_count
 function EventBus:emitAdjacencyDetected(edge_count)
     emit(self, 'adjacency_detected', {edge_count = edge_count or 0})
 end
 --- Emit adjacency-changed for two provinces.
--- @param a number
--- @param b number
+-- @tparam number a
+-- @tparam number b
 function EventBus:emitAdjacencyChanged(a, b)   emit(self, 'adjacency_changed',   {a = a, b = b}) end
 --- Emit adjacency-removed for two provinces.
--- @param a number
--- @param b number
+-- @tparam number a
+-- @tparam number b
 function EventBus:emitAdjacencyRemoved(a, b)   emit(self, 'adjacency_removed',   {a = a, b = b}) end
 --- Emit borders-extracted with segment count.
--- @param count number
+-- @tparam number count
 function EventBus:emitBordersExtracted(count)  emit(self, 'borders_extracted',   {segment_count = count or 0}) end
 --- Emit map-mode-applied with mode name.
--- @param name string
+-- @tparam string name
 function EventBus:emitMapModeApplied(name)     emit(self, 'map_mode_applied',    {name = name}) end
 --- Emit positions-calculated with province count.
--- @param count number
+-- @tparam number count
 function EventBus:emitPositionsCalculated(count)
     emit(self, 'positions_calculated', {count = count or 0})
 end
 --- Emit province-selected at map position.
--- @param id number
--- @param x  number
--- @param y  number
+-- @tparam number id
+-- @tparam number x
+-- @tparam number y
 function EventBus:emitProvinceSelected(id, x, y) emit(self, 'province_selected', {id = id, x = x or 0, y = y or 0}) end
 --- Emit province-deselected.
--- @param id number
+-- @tparam number id
 function EventBus:emitProvinceDeselected(id)   emit(self, 'province_deselected', {id = id}) end
 --- Emit province-hovered at map position.
--- @param id number
--- @param x  number
--- @param y  number
+-- @tparam number id
+-- @tparam number x
+-- @tparam number y
 function EventBus:emitProvinceHovered(id, x, y) emit(self, 'province_hovered',  {id = id, x = x or 0, y = y or 0}) end
 --- Emit faction-changed for a province.
--- @param id         number
--- @param old_faction string|nil
--- @param new_faction string|nil
+-- @tparam number id
+-- @tparam string|nil old_faction
+-- @tparam string|nil new_faction
 function EventBus:emitFactionChanged(id, old_faction, new_faction)
     emit(self, 'faction_changed', {id = id, old_faction = old_faction, new_faction = new_faction})
 end
@@ -651,18 +730,21 @@ function EventBus:size() return #self.events end
 -- ── Free Functions ─────────────────────────────────────────────────────────
 
 --- Derive a province ID from an RGB colour.
--- @param r number 0–255
--- @param g number 0–255
--- @param b number 0–255
+-- @tparam number r 0–255
+-- @tparam number g 0–255
+-- @tparam number b 0–255
 -- @treturn number
 function M.colorToId(r, g, b)
+    assert(type(r) == "number" and r >= 0 and r <= 255, "r must be 0-255")
+    assert(type(g) == "number" and g >= 0 and g <= 255, "g must be 0-255")
+    assert(type(b) == "number" and b >= 0 and b <= 255, "b must be 0-255")
     return r * 65536 + g * 256 + b
 end
 
 --- Build a ProvinceMap from a list of province definitions.
--- @param defs   table  list of definition tables
--- @param width  number
--- @param height number
+-- @tparam table defs list of definition tables
+-- @tparam number width
+-- @tparam number height
 -- @treturn ProvinceMap
 function M.loadFromDefinitions(defs, width, height)
     local map = M.newProvinceMap(width, height)
@@ -690,7 +772,7 @@ function M.loadFromDefinitions(defs, width, height)
 end
 
 --- Detect province adjacencies from a pixel-lookup grid (single-pass O(w*h)).
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 function M.detectAdjacency(map)
     local w = map:width()
     local h = map:height()
@@ -719,7 +801,7 @@ function M.detectAdjacency(map)
 end
 
 --- Extract border segments for all adjacency edges.
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 -- @treturn table list of BorderSegment
 function M.extractAllBorders(map)
     local borders = {}
@@ -730,8 +812,8 @@ function M.extractAllBorders(map)
 end
 
 --- Extract border segments for edges that have a specific tag.
--- @param map ProvinceMap
--- @param tag string
+-- @tparam ProvinceMap map
+-- @tparam string tag
 -- @treturn table list of BorderSegment
 function M.extractBordersWithTag(map, tag)
     local borders = {}
@@ -744,8 +826,8 @@ function M.extractBordersWithTag(map, tag)
 end
 
 --- Get the centroid position of the province as the capital point.
--- @param map ProvinceMap
--- @param id  number
+-- @tparam ProvinceMap map
+-- @tparam number id
 -- @treturn table|nil {x, y}
 function M.calculateCapital(map, id)
     local prov = map:getProvince(id)
@@ -754,7 +836,7 @@ function M.calculateCapital(map, id)
 end
 
 --- Set all province center positions to their centroid.
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 function M.calculateAllPositions(map)
     for _, prov in pairs(map.provinces) do
         prov.center = { x = prov.centroid.x, y = prov.centroid.y }
@@ -762,14 +844,14 @@ function M.calculateAllPositions(map)
 end
 
 --- Count total adjacency edges across all provinces in the map.
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 -- @treturn number
 function M.totalEdgeCount(map)
     return map:adjacencyCount()
 end
 
 --- Get all unique faction names present in the map.
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 -- @treturn table sorted list of faction strings
 function M.allFactions(map)
     local seen = {}
@@ -789,8 +871,8 @@ end
 
 --- Return all border segments where the two bordering provinces have different
 --- values according to prop_fn.
--- @param map     ProvinceMap
--- @param prop_fn function  fn(province) -> value
+-- @tparam ProvinceMap map
+-- @tparam function prop_fn fn(province) -> value
 -- @treturn table  list of BorderSegment tables
 function M.extractBordersByProperty(map, prop_fn)
     local out = {}
@@ -813,8 +895,8 @@ end
 -- string.  When a tag pixel is adjacent to two distinct non-tag provinces,
 -- those provinces' shared edge is created (if absent) and tagged.
 --
--- @param map              ProvinceMap
--- @param tag_pixel_colors table  {[province_id] = tag_string}
+-- @tparam ProvinceMap map
+-- @tparam table tag_pixel_colors {[province_id] = tag_string}
 function M.detectAdjacencyWithTags(map, tag_pixel_colors)
     tag_pixel_colors = tag_pixel_colors or {}
 
@@ -877,7 +959,7 @@ end
 --- Convert a province map's adjacency structure to a generic graph table.
 -- Each unique province that appears in at least one edge becomes a node.
 -- Each adjacency edge becomes one undirected entry in the edges list.
--- @param map ProvinceMap
+-- @tparam ProvinceMap map
 -- @treturn table  { nodes = {province_id,...}, edges = {{a, b},...} }
 function M.adjacencyToGraph(map)
     local nodes_set = {}
@@ -904,8 +986,8 @@ end
 --- Resolve a colour for each province using the given map mode.
 -- Returns a table mapping province ID to a normalised {r, g, b, a} float
 -- colour (each component in the 0–1 range).
--- @param map  ProvinceMap
--- @param mode table  MapMode created with M.newMapMode
+-- @tparam ProvinceMap map
+-- @tparam table mode MapMode created with M.newMapMode
 -- @treturn table  {[province_id] = {r, g, b, a}}
 function M.resolveProvinceColors(map, mode)
     local out = {}
@@ -955,8 +1037,8 @@ end
 --
 -- Requires `lurek.img` to be available (Platform Services tier).
 --
--- @param png_path  string  path relative to the game folder (e.g. "maps/europe.png")
--- @param defs      table   optional list of province definition tables as accepted
+-- @tparam string png_path path relative to the game folder (e.g. "maps/europe.png")
+-- @tparam table defs optional list of province definition tables as accepted
 --                          by `M.loadFromDefinitions` — used to attach names,
 --                          factions, and other metadata. Pass nil to skip.
 -- @treturn ProvinceMap

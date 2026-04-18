@@ -1,0 +1,8 @@
+[window]
+title = "RTS — Lurek2D"
+width = 900
+height = 640
+vsync = true
+
+[engine]
+target_fps = 60

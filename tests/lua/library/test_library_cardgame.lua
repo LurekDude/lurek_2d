@@ -872,4 +872,260 @@ describe("Analysis helpers", function()
         expect_equal(#seqs, 0)
     end)
 end)
+
+-- ── ID counter ──────────────────────────────────────────────────────────
+
+-- @description Covers ID counter inspection and session reset behavior.
+describe("ID counter", function()
+    -- @description Verifies case: getIdCounter returns current value.
+    it("getIdCounter returns current value", function()
+        cg.clearCardTypes()
+        local before = cg.getIdCounter()
+        cg.newCard("x")
+        expect_equal(cg.getIdCounter(), before + 1)
+    end)
+
+    -- @description Verifies case: resetIdCounter resets to 1.
+    it("resetIdCounter resets to 1", function()
+        cg.clearCardTypes()
+        cg.newCard("x")
+        cg.newCard("y")
+        cg.resetIdCounter()
+        expect_equal(cg.getIdCounter(), 1)
+        local c = cg.newCard("z")
+        expect_equal(c.id, 1)
+    end)
+
+    -- @description Verifies case: IDs are sequential after reset.
+    it("IDs are sequential after reset", function()
+        cg.clearCardTypes()
+        cg.resetIdCounter()
+        local c1 = cg.newCard("a")
+        local c2 = cg.newCard("b")
+        expect_equal(c2.id, c1.id + 1)
+    end)
+end)
+
+-- ── Search return types ─────────────────────────────────────────────────
+
+-- @description Verifies search/find return types are consistent: searchBy* returns indices, findBy*All returns objects.
+describe("Search return types", function()
+    -- @description Verifies case: searchByType returns indices (numbers).
+    it("searchByType returns indices (numbers)", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        s:pushTop(cg.newCard("a"))
+        s:pushTop(cg.newCard("a"))
+        local result = s:searchByType("a")
+        expect_equal(type(result[1]), "number")
+        expect_equal(result[1], 1)
+        expect_equal(result[2], 2)
+    end)
+
+    -- @description Verifies case: searchByTag returns indices (numbers).
+    it("searchByTag returns indices (numbers)", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        local c = cg.newCard("a"); c:addTag("fire")
+        s:pushTop(c)
+        local result = s:searchByTag("fire")
+        expect_equal(type(result[1]), "number")
+        expect_equal(result[1], 1)
+    end)
+
+    -- @description Verifies case: findByTypeAll returns Card objects.
+    it("findByTypeAll returns Card objects", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        s:pushTop(cg.newCard("goblin"))
+        s:pushTop(cg.newCard("goblin"))
+        local result = s:findByTypeAll("goblin")
+        expect_equal(type(result[1]), "table")
+        expect_equal(result[1].card_type, "goblin")
+    end)
+
+    -- @description Verifies case: findByTagAll returns Card objects.
+    it("findByTagAll returns Card objects", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        local c1 = cg.newCard("a"); c1:addTag("magic")
+        local c2 = cg.newCard("b"); c2:addTag("magic")
+        s:pushTop(c1)
+        s:pushTop(c2)
+        local result = s:findByTagAll("magic")
+        expect_equal(#result, 2)
+        expect_equal(result[1].card_type, "a")
+    end)
+
+    -- @description Verifies case: searchByType on empty stack returns empty.
+    it("searchByType on empty stack returns empty", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        expect_equal(#s:searchByType("x"), 0)
+    end)
+
+    -- @description Verifies case: findByTagAll on empty stack returns empty.
+    it("findByTagAll on empty stack returns empty", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        expect_equal(#s:findByTagAll("x"), 0)
+    end)
+end)
+
+-- ── CardTypeDef fields ──────────────────────────────────────────────────
+
+-- @description Verifies CardTypeDef has all documented fields with correct defaults.
+describe("CardTypeDef fields", function()
+    -- @description Verifies case: newCardTypeDef has all documented fields.
+    it("newCardTypeDef has all documented fields", function()
+        local def = cg.newCardTypeDef("test")
+        expect_equal(def.name, "test")
+        expect_equal(def.category, "")
+        expect_equal(def.subtype, "")
+        expect_equal(def.rarity, "")
+        expect_equal(type(def.base_stats), "table")
+        expect_equal(type(def.base_tags), "table")
+        expect_equal(type(def.metadata), "table")
+        expect_equal(def.max_per_deck, nil)
+    end)
+
+    -- @description Verifies case: newCardTypeDef rejects empty name.
+    it("newCardTypeDef rejects empty name", function()
+        local ok, _ = pcall(cg.newCardTypeDef, "")
+        expect_equal(ok, false)
+    end)
+end)
+
+-- ── Empty stack / pool edge cases ───────────────────────────────────────
+
+-- @description Tests edge cases on empty stacks, slots, and pools.
+describe("Empty edge cases", function()
+    -- @description Verifies case: popTop on empty stack returns nil.
+    it("popTop on empty stack returns nil", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        expect_equal(s:popTop(), nil)
+    end)
+
+    -- @description Verifies case: popBottom on empty stack returns nil.
+    it("popBottom on empty stack returns nil", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        expect_equal(s:popBottom(), nil)
+    end)
+
+    -- @description Verifies case: popMany on empty stack returns empty table.
+    it("popMany on empty stack returns empty table", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        local result = s:popMany(5)
+        expect_equal(#result, 0)
+    end)
+
+    -- @description Verifies case: peekTop on empty stack returns nil.
+    it("peekTop on empty stack returns nil", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        expect_equal(s:peekTop(), nil)
+    end)
+
+    -- @description Verifies case: drawTypes from empty pool returns empty.
+    it("drawTypes from empty pool returns empty", function()
+        cg.clearCardTypes()
+        local pool = cg.newCardPool("z")
+        local result = pool:drawTypes(5)
+        expect_equal(#result, 0)
+    end)
+
+    -- @description Verifies case: drawUniqueTypes from empty pool returns empty.
+    it("drawUniqueTypes from empty pool returns empty", function()
+        cg.clearCardTypes()
+        local pool = cg.newCardPool("z")
+        local result = pool:drawUniqueTypes(3)
+        expect_equal(#result, 0)
+    end)
+
+    -- @description Verifies case: drawItems from empty pool returns empty.
+    it("drawItems from empty pool returns empty", function()
+        cg.clearCardTypes()
+        local pool = cg.newCardPool("z")
+        local result = pool:drawItems(3)
+        expect_equal(#result, 0)
+    end)
+
+    -- @description Verifies case: Slot pop on empty returns nil.
+    it("Slot pop on empty returns nil", function()
+        cg.clearCardTypes()
+        local s = cg.newSlot("z")
+        expect_equal(s:pop(), nil)
+    end)
+
+    -- @description Verifies case: Stack clear on empty returns empty table.
+    it("Stack clear on empty returns empty table", function()
+        cg.clearCardTypes()
+        local s = cg.newStack("z")
+        local result = s:clear()
+        expect_equal(#result, 0)
+    end)
+end)
+
+-- ── Input validation ────────────────────────────────────────────────────
+
+-- @description Tests that constructors and mutators reject invalid inputs.
+describe("Input validation", function()
+    -- @description Verifies case: defineCardType rejects non-string name.
+    it("defineCardType rejects non-string name", function()
+        cg.clearCardTypes()
+        local ok = pcall(cg.defineCardType, 42, {})
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: defineCardType rejects empty name.
+    it("defineCardType rejects empty name", function()
+        cg.clearCardTypes()
+        local ok = pcall(cg.defineCardType, "", {})
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: newCard rejects non-string type.
+    it("newCard rejects non-string type", function()
+        local ok = pcall(cg.newCard, 123)
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: newStackWithCapacity rejects zero capacity.
+    it("newStackWithCapacity rejects zero capacity", function()
+        local ok = pcall(cg.newStackWithCapacity, "z", 0)
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: newStackWithCapacity rejects negative capacity.
+    it("newStackWithCapacity rejects negative capacity", function()
+        local ok = pcall(cg.newStackWithCapacity, "z", -1)
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: newSlotWithCapacity rejects zero capacity.
+    it("newSlotWithCapacity rejects zero capacity", function()
+        local ok = pcall(cg.newSlotWithCapacity, "z", 0)
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: CardPool add rejects empty type_name.
+    it("CardPool add rejects empty type_name", function()
+        cg.clearCardTypes()
+        local pool = cg.newCardPool("z")
+        local ok = pcall(function() pool:add("", 1) end)
+        expect_equal(ok, false)
+    end)
+
+    -- @description Verifies case: DeckBuilder add rejects count < 1.
+    it("DeckBuilder add rejects count < 1", function()
+        cg.clearCardTypes()
+        local db = cg.newDeckBuilder("z")
+        local ok = pcall(function() db:add("card", 0) end)
+        expect_equal(ok, false)
+    end)
+end)
+
 test_summary()

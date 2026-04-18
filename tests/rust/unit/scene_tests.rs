@@ -5,15 +5,14 @@
 //! - `EasingType::apply(t)` — pure curve math with no Lua namespace
 //! - `EasingType::from_lua_str` / `TransitionType::from_lua_str` — enum-variant
 //!   equality that is unobservable from Lua
-//! - `ActiveTransition::update` and `SceneStack::update_transition` — Rust-only
-//!   timer advancement unavailable in headless Lua tests
+//! - `ActiveTransition::get_easing()` — internal field access unavailable in Lua
 //!
-//! Behavioral tests observable via `lurek.*` live in
+//! Tests observable via `lurek.scene.getTransitionProgress()` and
+//! `lurek.scene.getTransitionProgressEased()` live in
 //! `tests/lua/unit/test_scene.lua`.
 //!
 //! Naming: `<subject>_<scenario>_<expected>` — no `test_` prefix.
 
-use lurek2d::scene::stack::SceneStack;
 use lurek2d::scene::transition::{ActiveTransition, EasingType, TransitionType};
 
 // ── EasingType ────────────────────────────────────────────────────────────────
@@ -110,29 +109,8 @@ fn active_transition_new_with_easing_stores_curve() {
     assert_eq!(t.transition_type, TransitionType::Wipe);
 }
 
-#[test]
-fn active_transition_progress_eased_linear_matches_progress() {
-    let mut t = ActiveTransition::new(TransitionType::Fade, 2.0);
-    t.update(1.0);
-    assert!((t.progress() - t.progress_eased()).abs() < 1e-5);
-}
-
-#[test]
-fn active_transition_progress_eased_ease_in_less_before_midpoint() {
-    let mut t = ActiveTransition::new_with_easing(TransitionType::Fade, 2.0, EasingType::EaseIn);
-    t.update(0.5); // t = 0.25
-    assert!(t.progress_eased() < t.progress());
-}
-
-// ── SceneStack — transition progress (requires Rust-only update_transition) ───
-
-#[test]
-fn scene_stack_get_transition_progress_eased_linear_matches() {
-    let mut s = SceneStack::new();
-    let id = s.next_scene_id();
-    s.push(id, TransitionType::Fade, 1.0, EasingType::Linear);
-    s.update_transition(0.5);
-    let raw = s.get_transition_progress();
-    let eased = s.get_transition_progress_eased();
-    assert!((raw - eased).abs() < 1e-5);
-}
+// active_transition_progress_eased_linear_matches_progress,
+// active_transition_progress_eased_ease_in_less_before_midpoint, and
+// scene_stack_get_transition_progress_eased_linear_matches were migrated to
+// tests/lua/unit/test_scene.lua — they are observable via
+// lurek.scene.getTransitionProgress() and lurek.scene.getTransitionProgressEased().

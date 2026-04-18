@@ -597,243 +597,6 @@ describe("allFactions", function()
     end)
 end)
 
--- â”€â”€ Province extended â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
--- @description Verifies province faction, defense, building, and resource helpers that extend province state beyond its base identity.
-describe("Province.faction", function()
-    -- @covers library.province_map.newProvince
-    -- @description Verifies case: setFaction / getFaction.
-    it("setFaction / getFaction", function()
-        local p = pm.newProvince(1, {0,0,0})
-        expect_equal(p:getFaction(), nil)
-        p:setFaction("blue")
-        expect_equal(p:getFaction(), "blue")
-    end)
-
-    -- @description Verifies case: setDefenseRating / getDefenseRating.
-    it("setDefenseRating / getDefenseRating", function()
-        local p = pm.newProvince(1, {0,0,0})
-        p:setDefenseRating(75)
-        expect_equal(p:getDefenseRating(), 75)
-    end)
-
-    -- @description Verifies case: addBuilding / hasBuilding / getBuildings / removeBuilding.
-    it("addBuilding / hasBuilding / getBuildings / removeBuilding", function()
-        local p = pm.newProvince(1, {0,0,0})
-        p:addBuilding("barracks")
-        p:addBuilding("market")
-        expect_equal(p:hasBuilding("barracks"), true)
-        expect_equal(p:hasBuilding("castle"), false)
-        expect_equal(#p:getBuildings(), 2)
-        expect_equal(p:removeBuilding("market"), true)
-        expect_equal(#p:getBuildings(), 1)
-    end)
-
-    -- @description Verifies case: setResource / getResource / getResources.
-    it("setResource / getResource / getResources", function()
-        local p = pm.newProvince(1, {0,0,0})
-        p:setResource("gold", 50)
-        p:setResource("wood", 30)
-        expect_equal(p:getResource("gold"), 50)
-        expect_equal(p:getResource("stone"), 0)
-        local all = p:getResources()
-        expect_equal(all.gold, 50)
-    end)
-end)
-
--- â”€â”€ ProvinceMap extended â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
--- @description Tests route finding across direct, chained, blocked, and unreachable province graphs, including passable-edge predicates.
-describe("ProvinceMap.findRoute", function()
-    local function make_chain(n)
-        local map = pm.newProvinceMap(10, 10)
-        for i = 1, n do
-            map:insertProvince(pm.newProvince(i, {0,0,0}))
-        end
-        for i = 1, n - 1 do
-            map:insertAdjacency(pm.newAdjacencyEdge(i, i + 1))
-        end
-        return map
-    end
-
-    -- @description Verifies case: direct adjacency returns two-element path.
-    it("direct adjacency returns two-element path", function()
-        local map = make_chain(2)
-        local path = map:findRoute(1, 2)
-        expect_equal(#path, 2)
-        expect_equal(path[1], 1)
-        expect_equal(path[2], 2)
-    end)
-
-    -- @description Verifies case: chain path returns ordered ids.
-    it("chain path returns ordered ids", function()
-        local map = make_chain(4)
-        local path = map:findRoute(1, 4)
-        expect_equal(path[1], 1)
-        expect_equal(path[#path], 4)
-        expect_equal(#path, 4)
-    end)
-
-    -- @description Verifies case: same province returns single-element path.
-    it("same province returns single-element path", function()
-        local map = make_chain(3)
-        local path = map:findRoute(2, 2)
-        expect_equal(#path, 1)
-        expect_equal(path[1], 2)
-    end)
-
-    -- @description Verifies case: unreachable returns nil.
-    it("unreachable returns nil", function()
-        local map = pm.newProvinceMap(10, 10)
-        map:insertProvince(pm.newProvince(1, {0,0,0}))
-        map:insertProvince(pm.newProvince(5, {0,0,0}))
-        expect_equal(map:findRoute(1, 5), nil)
-    end)
-
-    -- @description Verifies case: passable_fn can block an edge.
-    it("passable_fn can block an edge", function()
-        local map = make_chain(3)
-        -- block 1-2 edge
-        local path = map:findRoute(1, 3, function(e)
-            return not (e.province_a == 1 and e.province_b == 2)
-        end)
-        expect_equal(path, nil)
-    end)
-end)
-
--- @description Covers faction-centric queries such as province listing, per-faction resource totals, and uncontrolled province discovery.
-describe("ProvinceMap.faction_queries", function()
-    -- @covers library.province_map.newProvinceMap
-    -- @description Verifies case: getProvincesByFaction returns matching IDs.
-    it("getProvincesByFaction returns matching IDs", function()
-        local map = pm.newProvinceMap(10, 10)
-        for i = 1, 5 do
-            local p = pm.newProvince(i, {0,0,0})
-            p:setFaction(i <= 3 and "red" or "blue")
-            map:insertProvince(p)
-        end
-        local reds = map:getProvincesByFaction("red")
-        expect_equal(#reds, 3)
-        expect_equal(reds[1], 1)
-    end)
-
-    -- @description Verifies case: totalResourceForFaction sums across provinces.
-    it("totalResourceForFaction sums across provinces", function()
-        local map = pm.newProvinceMap(10, 10)
-        for i = 1, 3 do
-            local p = pm.newProvince(i, {0,0,0})
-            p:setFaction("red")
-            p:setResource("gold", i * 10)
-            map:insertProvince(p)
-        end
-        expect_equal(map:totalResourceForFaction("red", "gold"), 60)
-    end)
-
-    -- @description Verifies case: getUncontrolledProvinces.
-    it("getUncontrolledProvinces", function()
-        local map = pm.newProvinceMap(10, 10)
-        local a = pm.newProvince(1, {0,0,0}); a:setFaction("red"); map:insertProvince(a)
-        local b = pm.newProvince(2, {0,0,0}); map:insertProvince(b)
-        local unc = map:getUncontrolledProvinces()
-        expect_equal(#unc, 1)
-        expect_equal(unc[1], 2)
-    end)
-end)
-
--- @description Verifies adjacency creation and in-place edge tag updates through the setAdjacent convenience helper.
-describe("ProvinceMap.setAdjacent", function()
-    -- @covers library.province_map.newProvinceMap
-    -- @description Verifies case: creates new edge.
-    it("creates new edge", function()
-        local map = pm.newProvinceMap(10, 10)
-        map:insertProvince(pm.newProvince(1, {0,0,0}))
-        map:insertProvince(pm.newProvince(2, {0,0,0}))
-        local edge = map:setAdjacent(1, 2, {river = true})
-        expect_equal(edge ~= nil, true)
-        expect_equal(edge.tags.river, true)
-        expect_equal(map:adjacencyCount(), 1)
-    end)
-
-    -- @description Verifies case: updates existing edge with new tags.
-    it("updates existing edge with new tags", function()
-        local map = pm.newProvinceMap(10, 10)
-        map:setAdjacent(1, 2, {road = true})
-        map:setAdjacent(1, 2, {wall = true})
-        local edge = map:getAdjacency(1, 2)
-        expect_equal(edge.tags.road, true)
-        expect_equal(edge.tags.wall, true)
-    end)
-end)
-
--- @description Tests graph-analysis helpers that find isolated provinces and connected components from adjacency data.
-describe("ProvinceMap.graph_analysis", function()
-    -- @covers library.province_map.newProvinceMap
-    -- @description Verifies case: findIsolatedProvinces returns unconnected ids.
-    it("findIsolatedProvinces returns unconnected ids", function()
-        local map = pm.newProvinceMap(10, 10)
-        map:insertProvince(pm.newProvince(1, {0,0,0}))
-        map:insertProvince(pm.newProvince(2, {0,0,0}))
-        map:insertProvince(pm.newProvince(3, {0,0,0}))
-        map:insertAdjacency(pm.newAdjacencyEdge(1, 2))
-        local iso = map:findIsolatedProvinces()
-        expect_equal(#iso, 1)
-        expect_equal(iso[1], 3)
-    end)
-
-    -- @description Verifies case: getConnectedComponents partitions provinces.
-    it("getConnectedComponents partitions provinces", function()
-        local map = pm.newProvinceMap(10, 10)
-        for i = 1, 4 do map:insertProvince(pm.newProvince(i, {0,0,0})) end
-        map:insertAdjacency(pm.newAdjacencyEdge(1, 2))
-        map:insertAdjacency(pm.newAdjacencyEdge(3, 4))
-        local comps = map:getConnectedComponents()
-        expect_equal(#comps, 2)
-    end)
-end)
-
--- @description Covers direct application of gradient and category colour functions to province ids.
-describe("ColorFn_apply", function()
-    -- @covers library.province_map.applyGradientColor
-    -- @covers library.province_map.applyCategoryColor
-    -- @description Verifies case: applyGradientColor interpolates.
-    it("applyGradientColor interpolates", function()
-        local fn = pm.newGradientColorFn({[1]=0}, {0,0,0}, {255,255,255}, 0, 100)
-        local c0 = pm.applyGradientColor(fn, 1)
-        expect_equal(c0[1], 0)
-        fn.values[1] = 100
-        local c1 = pm.applyGradientColor(fn, 1)
-        expect_equal(c1[1], 255)
-    end)
-
-    -- @description Verifies case: applyCategoryColor selects by category.
-    it("applyCategoryColor selects by category", function()
-        local fn = pm.newCategoryColorFn(
-            {[1]="hot"}, {hot={255,0,0}}, {0,0,0})
-        local c = pm.applyCategoryColor(fn, 1)
-        expect_equal(c[1], 255)
-        local def = pm.applyCategoryColor(fn, 99)
-        expect_equal(def[1], 0)
-    end)
-end)
-
--- @description Verifies faction enumeration returns unique faction names in sorted order.
-describe("allFactions", function()
-    -- @covers library.province_map.allFactions
-    -- @description Verifies case: returns sorted faction list.
-    it("returns sorted faction list", function()
-        local map = pm.newProvinceMap(10, 10)
-        for i, f in ipairs({"green","blue","red","blue"}) do
-            local p = pm.newProvince(i, {0,0,0})
-            p:setFaction(f)
-            map:insertProvince(p)
-        end
-        local factions = pm.allFactions(map)
-        expect_equal(factions[1], "blue")
-        expect_equal(factions[2], "green")
-        expect_equal(factions[3], "red")
-    end)
-end)
-
 -- â”€â”€ Gap coverage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Tests province removal for both existing and missing province ids.
@@ -1061,4 +824,255 @@ describe("resolveProvinceColors", function()
         expect_near(colors[1][2], 0.0, 0.001)
     end)
 end)
+
+-- ── Adjacency bidirectionality ────────────────────────────────────────────
+
+-- @description Verifies that adjacency edges are bidirectional and normalised.
+describe("Adjacency.bidirectionality", function()
+    -- @description Verifies case: insertAdjacency normalises edge direction.
+    it("insertAdjacency normalises edge direction", function()
+        local map = pm.newProvinceMap(10, 10)
+        -- Manually create an edge with reversed order (5 > 2).
+        local edge = { province_a = 5, province_b = 2, border_length = 0,
+                       border_segments = {}, tags = {}, passable = true, movement_cost = 1.0 }
+        map:insertAdjacency(edge)
+        -- After insertion, province_a should be the smaller ID.
+        expect_equal(edge.province_a, 2)
+        expect_equal(edge.province_b, 5)
+        -- Lookup works from both directions.
+        expect_equal(map:getAdjacency(2, 5) ~= nil, true)
+        expect_equal(map:getAdjacency(5, 2) ~= nil, true)
+    end)
+
+    -- @description Verifies case: setAdjacent stores normalised edge.
+    it("setAdjacent stores normalised edge", function()
+        local map = pm.newProvinceMap(10, 10)
+        local edge = map:setAdjacent(10, 3)
+        expect_equal(edge.province_a, 3)
+        expect_equal(edge.province_b, 10)
+    end)
+
+    -- @description Verifies case: getNeighbors returns both sides of an edge.
+    it("getNeighbors returns both sides of an edge", function()
+        local map = pm.newProvinceMap(10, 10)
+        map:insertProvince(pm.newProvince(1, {0,0,0}))
+        map:insertProvince(pm.newProvince(2, {0,0,0}))
+        map:setAdjacent(1, 2)
+        -- Querying from either side should find the other.
+        local nbrs1 = map:getNeighbors(1)
+        local nbrs2 = map:getNeighbors(2)
+        expect_equal(#nbrs1, 1)
+        expect_equal(nbrs1[1], 2)
+        expect_equal(#nbrs2, 1)
+        expect_equal(nbrs2[1], 1)
+    end)
+end)
+
+-- ── Pixel coordinate system ───────────────────────────────────────────────
+
+-- @description Verifies pixel coordinate system, 0-based addressing, and auto-adjacency on setPixel.
+describe("Pixel.coordinates", function()
+    -- @description Verifies case: pixel_lookup uses 1-based index internally.
+    it("pixel_lookup uses 1-based index internally", function()
+        local map = pm.newProvinceMap(3, 3)
+        map:setPixel(0, 0, 10)   -- index = 0*3 + 0 + 1 = 1
+        map:setPixel(2, 1, 20)   -- index = 1*3 + 2 + 1 = 6
+        local tbl = map:pixelLookup()
+        expect_equal(tbl[1], 10)
+        expect_equal(tbl[6], 20)
+    end)
+
+    -- @description Verifies case: out-of-bounds setPixel is silently ignored.
+    it("out-of-bounds setPixel is silently ignored", function()
+        local map = pm.newProvinceMap(2, 2)
+        map:setPixel(-1, 0, 1)
+        map:setPixel(0, 2, 1)
+        map:setPixel(2, 0, 1)
+        -- No pixels should be set.
+        expect_equal(map:getProvinceAt(0, 0), nil)
+    end)
+
+    -- @description Verifies case: setPixel auto-detects adjacency bidirectionally.
+    it("setPixel auto-detects adjacency bidirectionally", function()
+        local map = pm.newProvinceMap(3, 1)
+        map:setPixel(0, 0, 1)
+        map:setPixel(2, 0, 2)
+        -- No adjacency yet (pixels are not neighbours).
+        expect_equal(map:adjacencyCount(), 0)
+        -- Set middle pixel to province 3 — adjacent to both 1 and 2.
+        map:setPixel(1, 0, 3)
+        expect_equal(map:getAdjacency(1, 3) ~= nil, true)
+        expect_equal(map:getAdjacency(2, 3) ~= nil, true)
+    end)
+
+    -- @description Verifies case: setPixel adjacency checks all four directions.
+    it("setPixel adjacency checks all four directions", function()
+        local map = pm.newProvinceMap(3, 3)
+        -- Place province 1 at center neighbours.
+        map:setPixel(1, 0, 1)  -- above
+        map:setPixel(0, 1, 1)  -- left
+        map:setPixel(2, 1, 1)  -- right
+        map:setPixel(1, 2, 1)  -- below
+        -- Place province 2 in the center — should detect adjacency with 1.
+        map:setPixel(1, 1, 2)
+        local edge = map:getAdjacency(1, 2)
+        expect_equal(edge ~= nil, true)
+    end)
+end)
+
+-- ── Input validation ──────────────────────────────────────────────────────
+
+-- @description Verifies that invalid inputs are rejected with assertions.
+describe("Input.validation", function()
+    -- @description Verifies case: newProvince rejects non-number id.
+    it("newProvince rejects non-number id", function()
+        expect_error(function() pm.newProvince("bad", {0,0,0}) end)
+    end)
+
+    -- @description Verifies case: newAdjacencyEdge rejects non-number ids.
+    it("newAdjacencyEdge rejects non-number ids", function()
+        expect_error(function() pm.newAdjacencyEdge("a", 1) end)
+    end)
+
+    -- @description Verifies case: setFaction rejects non-string, non-nil.
+    it("setFaction rejects non-string, non-nil", function()
+        local p = pm.newProvince(1, {0,0,0})
+        expect_error(function() p:setFaction(123) end)
+    end)
+
+    -- @description Verifies case: setResource rejects negative amount.
+    it("setResource rejects negative amount", function()
+        local p = pm.newProvince(1, {0,0,0})
+        expect_error(function() p:setResource("gold", -5) end)
+    end)
+
+    -- @description Verifies case: colorToId rejects out-of-range values.
+    it("colorToId rejects out-of-range values", function()
+        expect_error(function() pm.colorToId(256, 0, 0) end)
+        expect_error(function() pm.colorToId(0, -1, 0) end)
+    end)
+
+    -- @description Verifies case: setAdjacent rejects non-number ids.
+    it("setAdjacent rejects non-number ids", function()
+        local map = pm.newProvinceMap(10, 10)
+        expect_error(function() map:setAdjacent("a", 1) end)
+    end)
+
+    -- @description Verifies case: findRoute rejects non-number ids.
+    it("findRoute rejects non-number ids", function()
+        local map = pm.newProvinceMap(10, 10)
+        expect_error(function() map:findRoute("a", 1) end)
+    end)
+end)
+
+-- ── Route finding edge cases ──────────────────────────────────────────────
+
+-- @description Additional route finding edge cases beyond the basic suite.
+describe("ProvinceMap.findRoute.edge_cases", function()
+    -- @description Verifies case: route avoids impassable edge.
+    it("route avoids impassable edge and takes detour", function()
+        -- Diamond: 1-2, 1-3, 2-4, 3-4.  Block 1-2 edge.
+        local map = pm.newProvinceMap(10, 10)
+        for i = 1, 4 do map:insertProvince(pm.newProvince(i, {0,0,0})) end
+        map:insertAdjacency(pm.newAdjacencyEdge(1, 2))
+        map:insertAdjacency(pm.newAdjacencyEdge(1, 3))
+        map:insertAdjacency(pm.newAdjacencyEdge(2, 4))
+        map:insertAdjacency(pm.newAdjacencyEdge(3, 4))
+        -- Block 1→2 direct edge.
+        local path = map:findRoute(1, 4, function(e)
+            return not (e.province_a == 1 and e.province_b == 2)
+        end)
+        expect_equal(path ~= nil, true)
+        expect_equal(path[1], 1)
+        expect_equal(path[#path], 4)
+        -- Detour goes through 3.
+        expect_equal(path[2], 3)
+    end)
+
+    -- @description Verifies case: route through single-node graph.
+    it("route through single-node graph", function()
+        local map = pm.newProvinceMap(10, 10)
+        map:insertProvince(pm.newProvince(42, {0,0,0}))
+        local path = map:findRoute(42, 42)
+        expect_equal(#path, 1)
+        expect_equal(path[1], 42)
+    end)
+
+    -- @description Verifies case: route in disconnected components returns nil.
+    it("route in disconnected components returns nil", function()
+        local map = pm.newProvinceMap(10, 10)
+        for i = 1, 4 do map:insertProvince(pm.newProvince(i, {0,0,0})) end
+        map:insertAdjacency(pm.newAdjacencyEdge(1, 2))
+        map:insertAdjacency(pm.newAdjacencyEdge(3, 4))
+        expect_equal(map:findRoute(1, 4), nil)
+    end)
+
+    -- @description Verifies case: all edges impassable returns nil.
+    it("all edges impassable returns nil", function()
+        local map = pm.newProvinceMap(10, 10)
+        map:insertProvince(pm.newProvince(1, {0,0,0}))
+        map:insertProvince(pm.newProvince(2, {0,0,0}))
+        map:insertAdjacency(pm.newAdjacencyEdge(1, 2))
+        local path = map:findRoute(1, 2, function() return false end)
+        expect_equal(path, nil)
+    end)
+end)
+
+-- ── Dual representation sync ──────────────────────────────────────────────
+
+-- @description Verifies that adjacency and getNeighbors stay in sync across all mutation paths.
+describe("DualRepresentation.sync", function()
+    -- @description Verifies case: setAdjacent is reflected in getNeighbors.
+    it("setAdjacent is reflected in getNeighbors", function()
+        local map = pm.newProvinceMap(10, 10)
+        map:insertProvince(pm.newProvince(1, {0,0,0}))
+        map:insertProvince(pm.newProvince(2, {0,0,0}))
+        map:insertProvince(pm.newProvince(3, {0,0,0}))
+        map:setAdjacent(1, 2)
+        map:setAdjacent(1, 3)
+        local nbrs = map:getNeighbors(1)
+        expect_equal(#nbrs, 2)
+        expect_equal(nbrs[1], 2)
+        expect_equal(nbrs[2], 3)
+    end)
+
+    -- @description Verifies case: removeAdjacency removes from getNeighbors.
+    it("removeAdjacency removes from getNeighbors", function()
+        local map = pm.newProvinceMap(10, 10)
+        map:insertProvince(pm.newProvince(1, {0,0,0}))
+        map:insertProvince(pm.newProvince(2, {0,0,0}))
+        map:setAdjacent(1, 2)
+        expect_equal(#map:getNeighbors(1), 1)
+        map:removeAdjacency(1, 2)
+        expect_equal(#map:getNeighbors(1), 0)
+    end)
+
+    -- @description Verifies case: pixel-based adjacency is visible in getNeighbors.
+    it("pixel-based adjacency is visible in getNeighbors", function()
+        local map = pm.newProvinceMap(2, 1)
+        map:insertProvince(pm.newProvince(1, {0,0,0}))
+        map:insertProvince(pm.newProvince(2, {0,0,0}))
+        map:setPixel(0, 0, 1)
+        map:setPixel(1, 0, 2)
+        -- setPixel auto-creates adjacency edges.
+        local nbrs = map:getNeighbors(1)
+        expect_equal(#nbrs, 1)
+        expect_equal(nbrs[1], 2)
+    end)
+
+    -- @description Verifies case: detectAdjacency edges are visible in getNeighbors.
+    it("detectAdjacency edges are visible in getNeighbors", function()
+        local map = pm.newProvinceMap(2, 1)
+        map:insertProvince(pm.newProvince(10, {0,0,0}))
+        map:insertProvince(pm.newProvince(20, {0,0,0}))
+        -- Use raw pixel_lookup to bypass auto-adjacency, then detect manually.
+        map.pixel_lookup[1] = 10
+        map.pixel_lookup[2] = 20
+        pm.detectAdjacency(map)
+        local nbrs = map:getNeighbors(10)
+        expect_equal(#nbrs, 1)
+        expect_equal(nbrs[1], 20)
+    end)
+end)
+
 test_summary()

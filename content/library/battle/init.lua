@@ -5,6 +5,30 @@
 local M = {}
 
 ---------------------------------------------------------------------------
+-- Internal helpers
+---------------------------------------------------------------------------
+
+--- Internal: deep-copy a value. Tables are copied recursively; metatables preserved.
+local function deep_copy(t)
+    if type(t) ~= "table" then return t end
+    local copy = {}
+    for k, v in pairs(t) do
+        copy[k] = deep_copy(v)
+    end
+    return setmetatable(copy, getmetatable(t))
+end
+
+--- Internal: log a message via lurek.log if available.
+--- @tparam string level  One of "debug", "info", "warn", "error".
+--- @tparam string msg
+local function _log(level, msg)
+    if type(lurek) == "table" and type(lurek.log) == "table"
+       and type(lurek.log[level]) == "function" then
+        lurek.log[level](msg)
+    end
+end
+
+---------------------------------------------------------------------------
 -- StatusEffect
 ---------------------------------------------------------------------------
 
@@ -12,12 +36,18 @@ local StatusEffect = {}
 StatusEffect.__index = StatusEffect
 
 --- Create a new status effect.
---- @tparam string name
+--- @tparam string name  Effect identifier (must be a non-empty string).
 --- @tparam[opt=-1] number duration  Turns remaining (-1 = permanent).
 --- @treturn StatusEffect
 function M.newStatusEffect(name, duration)
+    if type(name) ~= "string" or name == "" then
+        error("newStatusEffect: name must be a non-empty string", 2)
+    end
+    if duration ~= nil and type(duration) ~= "number" then
+        error("newStatusEffect: duration must be a number or nil", 2)
+    end
     local e = setmetatable({}, StatusEffect)
-    e.name     = name or ""
+    e.name     = name
     e.duration = duration or -1
     e.stacks   = 1
     e.data     = {}
@@ -25,19 +55,19 @@ function M.newStatusEffect(name, duration)
 end
 
 --- Get the effect name.
--- @return string
+--- @treturn string
 function StatusEffect:getName()       return self.name end
 --- Get remaining duration (-1 = permanent).
--- @return number
+--- @treturn number
 function StatusEffect:getDuration()   return self.duration end
 --- Set remaining duration.
--- @param v number
+--- @tparam number v
 function StatusEffect:setDuration(v)  self.duration = v end
 --- Get current stack count.
--- @return number
+--- @treturn number
 function StatusEffect:getStacks()     return self.stacks end
 --- Set stack count.
--- @param v number
+--- @tparam number v
 function StatusEffect:setStacks(v)    self.stacks = v end
 
 --- Tick one turn. Returns true when the effect has just expired.
@@ -45,7 +75,10 @@ function StatusEffect:setStacks(v)    self.stacks = v end
 function StatusEffect:tickTurn()
     if self.duration > 0 then
         self.duration = self.duration - 1
-        return self.duration == 0
+        if self.duration == 0 then
+            _log("debug", "StatusEffect expired: " .. self.name)
+            return true
+        end
     end
     return false
 end
@@ -64,11 +97,14 @@ local CombatAction = {}
 CombatAction.__index = CombatAction
 
 --- Create a new combat action.
---- @tparam string name
+--- @tparam string name  Action identifier (must be a non-empty string).
 --- @treturn CombatAction
 function M.newAction(name)
+    if type(name) ~= "string" or name == "" then
+        error("newAction: name must be a non-empty string", 2)
+    end
     local a = setmetatable({}, CombatAction)
-    a.name             = name or ""
+    a.name             = name
     a.damage_type      = "physical"
     a.base_damage      = 0
     a.accuracy         = 1.0
@@ -82,50 +118,51 @@ function M.newAction(name)
 end
 
 --- Get the action name.
--- @return string
+--- @treturn string
 function CombatAction:getName()           return self.name end
 --- Get base damage value.
--- @return number
+--- @treturn number
 function CombatAction:getBaseDamage()     return self.base_damage end
 --- Set base damage value.
--- @param v number
+--- @tparam number v
 function CombatAction:setBaseDamage(v)    self.base_damage = v end
 --- Get damage type string.
--- @return string
+--- @treturn string
 function CombatAction:getDamageType()     return self.damage_type end
 --- Set damage type string (defaults to "physical").
--- @param v string
+--- @tparam string v
 function CombatAction:setDamageType(v)    self.damage_type = v or "physical" end
 --- Get accuracy clamped to [0, 1].
--- @return number
+--- @treturn number
 function CombatAction:getAccuracy()       return self.accuracy end
 --- Set accuracy, clamped to [0, 1].
--- @param v number
+--- @tparam number v
 function CombatAction:setAccuracy(v)
+    if type(v) ~= "number" then error("setAccuracy: expected number", 2) end
     if v < 0 then v = 0 end
     if v > 1 then v = 1 end
     self.accuracy = v
 end
 --- Get max cooldown turns.
--- @return number
+--- @treturn number
 function CombatAction:getCooldown()        return self.cooldown end
 --- Set max cooldown turns.
--- @param v number
+--- @tparam number v
 function CombatAction:setCooldown(v)       self.cooldown = v end
 --- Get current remaining cooldown turns.
--- @return number
+--- @treturn number
 function CombatAction:getCurrentCooldown() return self.current_cooldown end
 --- Get HP cost to use this action.
--- @return number
+--- @treturn number
 function CombatAction:getCostHp()          return self.cost_hp end
 --- Set HP cost.
--- @param v number
+--- @tparam number v
 function CombatAction:setCostHp(v)         self.cost_hp = v end
 --- Get MP cost to use this action.
--- @return number
+--- @treturn number
 function CombatAction:getCostMp()          return self.cost_mp end
 --- Set MP cost.
--- @param v number
+--- @tparam number v
 function CombatAction:setCostMp(v)         self.cost_mp = v end
 
 --- Is the action off cooldown?
@@ -154,11 +191,14 @@ local Combatant = {}
 Combatant.__index = Combatant
 
 --- Create a new combatant.
---- @tparam string name
+--- @tparam string name  Combatant identifier (must be a non-empty string).
 --- @treturn Combatant
 function M.newCombatant(name)
+    if type(name) ~= "string" or name == "" then
+        error("newCombatant: name must be a non-empty string", 2)
+    end
     local c = setmetatable({}, Combatant)
-    c.name           = name or ""
+    c.name           = name
     c.team           = "player"
     c.hp             = 100
     c.max_hp         = 100
@@ -176,49 +216,49 @@ function M.newCombatant(name)
 end
 
 --- Get combatant name.
--- @return string
+--- @treturn string
 function Combatant:getName()     return self.name end
 --- Get team identifier string.
--- @return string
+--- @treturn string
 function Combatant:getTeam()     return self.team end
 --- Set team identifier (defaults to "player").
--- @param v string
+--- @tparam string v
 function Combatant:setTeam(v)    self.team = v or "player" end
 --- Get current HP.
--- @return number
+--- @treturn number
 function Combatant:getHp()       return self.hp end
 --- Set current HP directly (use takeDamage/heal for safe HP changes).
--- @param v number
+--- @tparam number v
 function Combatant:setHp(v)      self.hp = v end
 --- Get maximum HP.
--- @return number
+--- @treturn number
 function Combatant:getMaxHp()    return self.max_hp end
 --- Set maximum HP.
--- @param v number
+--- @tparam number v
 function Combatant:setMaxHp(v)   self.max_hp = v end
 --- Get current MP.
--- @return number
+--- @treturn number
 function Combatant:getMp()       return self.mp end
 --- Set current MP.
--- @param v number
+--- @tparam number v
 function Combatant:setMp(v)      self.mp = v end
 --- Get maximum MP.
--- @return number
+--- @treturn number
 function Combatant:getMaxMp()    return self.max_mp end
 --- Set maximum MP.
--- @param v number
+--- @tparam number v
 function Combatant:setMaxMp(v)   self.max_mp = v end
 --- Get speed (used for initiative ordering; higher = sooner).
--- @return number
+--- @treturn number
 function Combatant:getSpeed()    return self.speed end
 --- Set speed.
--- @param v number
+--- @tparam number v
 function Combatant:setSpeed(v)   self.speed = v end
 --- Get combatant level.
--- @return number
+--- @treturn number
 function Combatant:getLevel()    return self.level end
 --- Set combatant level.
--- @param v number
+--- @tparam number v
 function Combatant:setLevel(v)   self.level = v end
 
 --- Is the combatant alive?
@@ -228,24 +268,33 @@ function Combatant:isAlive()
 end
 
 --- Apply damage, factoring in resistance. Resistance is a multiplier (default 1.0).
---- @tparam number amount
+--- @tparam number amount  Raw damage amount (must be >= 0).
 --- @tparam[opt="physical"] string damage_type
 --- @treturn number actual damage dealt
 function Combatant:takeDamage(amount, damage_type)
+    if type(amount) ~= "number" or amount < 0 then
+        error("takeDamage: amount must be a non-negative number", 2)
+    end
     damage_type = damage_type or "physical"
     local resistance = self.resistances[damage_type] or 1.0
     local actual = amount * resistance
     if actual < 0 then actual = 0 end
     self.hp = self.hp - actual
     if self.hp < 0 then self.hp = 0 end
-    if self.hp <= 0 then self.alive = false end
+    if self.hp <= 0 then
+        self.alive = false
+        _log("debug", self.name .. " has been defeated")
+    end
     return actual
 end
 
 --- Heal the combatant.
---- @tparam number amount
+--- @tparam number amount  Heal amount (must be >= 0).
 --- @treturn number actual amount healed
 function Combatant:heal(amount)
+    if type(amount) ~= "number" or amount < 0 then
+        error("heal: amount must be a non-negative number", 2)
+    end
     local before = self.hp
     self.hp = self.hp + amount
     if self.hp > self.max_hp then self.hp = self.max_hp end
@@ -253,9 +302,12 @@ function Combatant:heal(amount)
 end
 
 --- Add or stack a status effect.
---- @tparam string name
+--- @tparam string name  Effect name (must be a non-empty string).
 --- @tparam[opt=-1] number duration
 function Combatant:addStatus(name, duration)
+    if type(name) ~= "string" or name == "" then
+        error("addStatus: name must be a non-empty string", 2)
+    end
     duration = duration or -1
     for _, e in ipairs(self.status_effects) do
         if e.name == name then
@@ -364,14 +416,18 @@ function Combatant:getMpPercent()
     return pct
 end
 
---- Add a combat action (clone of the action).
---- @tparam CombatAction action
+--- Add a combat action (deep clone of the action).
+--- @tparam CombatAction action  The action to clone and add.
 function Combatant:addAction(action)
-    -- shallow clone to avoid shared mutation
+    if type(action) ~= "table" then
+        error("addAction: action must be a table", 2)
+    end
     local a = setmetatable({}, CombatAction)
     for k, v in pairs(action) do a[k] = v end
-    a.tags     = {}; for i, t in ipairs(action.tags or {}) do a.tags[i] = t end
-    a.metadata = {}; for k2, v2 in pairs(action.metadata or {}) do a.metadata[k2] = v2 end
+    -- deep-clone tags (set-style: key->true)
+    a.tags = deep_copy(action.tags or {})
+    -- deep-clone metadata (values may be nested tables)
+    a.metadata = deep_copy(action.metadata or {})
     self.actions[#self.actions + 1] = a
 end
 
@@ -417,11 +473,12 @@ end
 
 --- Get metadata value.
 --- @tparam string key
---- @treturn string|nil
+--- @treturn any|nil
 function Combatant:getMeta(key) return self.metadata[key] end
 
 --- Set metadata value.
---- @tparam string key  @tparam string value
+--- @tparam string key
+--- @tparam any value
 function Combatant:setMeta(key, value) self.metadata[key] = value end
 
 ---------------------------------------------------------------------------
@@ -432,11 +489,15 @@ local CombatBattle = {}
 CombatBattle.__index = CombatBattle
 
 --- Create a new battle.
---- @tparam[opt=""] string name
+--- @tparam[opt=""] string name  Battle display name.
 --- @treturn CombatBattle
 function M.newBattle(name)
+    if name ~= nil and type(name) ~= "string" then
+        error("newBattle: name must be a string or nil", 2)
+    end
     local b = setmetatable({}, CombatBattle)
     b.name        = name or ""
+    _log("info", "Battle created: " .. (name or "(unnamed)"))
     b.combatants  = {}
     b.turn_index  = 1  -- 1-indexed
     b.turn_count  = 0
@@ -447,22 +508,27 @@ function M.newBattle(name)
 end
 
 --- Get battle display name.
--- @return string
+--- @treturn string
 function CombatBattle:getName()   return self.name end
 --- Get total number of combatants (alive and dead).
--- @return number
+--- @treturn number
 function CombatBattle:getCount()  return #self.combatants end
 --- Get total completed turn count.
--- @return number
+--- @treturn number
 function CombatBattle:getTurnCount() return self.turn_count end
 --- Returns true when the battle has ended.
--- @return boolean
+--- @treturn boolean
 function CombatBattle:isOver()    return self.over end
 --- Returns the winning team name, or nil if not yet over.
--- @return string|nil
-function CombatBattle:getWinner() return self.winner_team end
+--- When auto_detect is true, checks battle state before returning.
+--- @tparam[opt=false] boolean auto_detect  Run battle-over check first.
+--- @treturn string|nil
+function CombatBattle:getWinner(auto_detect)
+    if auto_detect then self:_checkBattleOver() end
+    return self.winner_team
+end
 --- Returns the battle log as an array of strings.
--- @return table
+--- @treturn table
 function CombatBattle:getLog()    return self.log end
 
 --- Add a log entry.
@@ -471,20 +537,24 @@ function CombatBattle:addToLog(msg)
     self.log[#self.log + 1] = msg
 end
 
---- Add a combatant (shallow clone).
---- @tparam Combatant c
+--- Add a combatant (deep clone).
+--- @tparam Combatant c  The combatant to clone and add.
 function CombatBattle:addCombatant(c)
+    if type(c) ~= "table" then
+        error("addCombatant: expected a combatant table", 2)
+    end
     -- clone combatant
     local clone = setmetatable({}, Combatant)
     for k, v in pairs(c) do clone[k] = v end
-    clone.stats = {}; for k2, v2 in pairs(c.stats or {}) do clone.stats[k2] = v2 end
-    clone.resistances = {}; for k2, v2 in pairs(c.resistances or {}) do clone.resistances[k2] = v2 end
-    clone.metadata = {}; for k2, v2 in pairs(c.metadata or {}) do clone.metadata[k2] = v2 end
+    clone.stats = deep_copy(c.stats or {})
+    clone.resistances = deep_copy(c.resistances or {})
+    clone.metadata = deep_copy(c.metadata or {})
     -- deep clone status effects
     clone.status_effects = {}
     for _, e in ipairs(c.status_effects or {}) do
         local se = M.newStatusEffect(e.name, e.duration)
         se.stacks = e.stacks
+        se.data = deep_copy(e.data or {})
         clone.status_effects[#clone.status_effects + 1] = se
     end
     -- deep clone actions
@@ -492,11 +562,12 @@ function CombatBattle:addCombatant(c)
     for _, a in ipairs(c.actions or {}) do
         local ac = setmetatable({}, CombatAction)
         for k2, v2 in pairs(a) do ac[k2] = v2 end
-        ac.tags = {}; for i, t in ipairs(a.tags or {}) do ac.tags[i] = t end
-        ac.metadata = {}; for k2, v2 in pairs(a.metadata or {}) do ac.metadata[k2] = v2 end
+        ac.tags = deep_copy(a.tags or {})
+        ac.metadata = deep_copy(a.metadata or {})
         clone.actions[#clone.actions + 1] = ac
     end
     self.combatants[#self.combatants + 1] = clone
+    _log("debug", "Combatant added to battle: " .. (c.name or "?"))
 end
 
 --- Get a combatant by name (returns reference inside battle).
@@ -592,6 +663,7 @@ function CombatBattle:attack(attacker_name, action_name, target_name)
         msg = string.format("%s missed %s", attacker_name, target_name)
     end
     self.log[#self.log + 1] = msg
+    _log("debug", msg)
 
     self:_checkBattleOver()
 
@@ -659,6 +731,18 @@ function CombatBattle:tickAllActions()
     end
 end
 
+--- Resolve end-of-round bookkeeping: tick all statuses, tick all cooldowns,
+--- and check whether the battle has ended.
+--- @treturn boolean true if the battle is still in progress
+function CombatBattle:resolve()
+    self:tickAllStatuses()
+    self:tickAllActions()
+    self:_checkBattleOver()
+    _log("debug", string.format("Battle '%s' resolve: turn %d, over=%s",
+        self.name, self.turn_count, tostring(self.over)))
+    return not self.over
+end
+
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- PARITY ADDITIONS — Phase 2A  (battle)
@@ -687,15 +771,15 @@ M.DamageType = {
 -- ── CombatAction: tag and metadata ops ────────────────────────────────
 
 --- Add a tag to this action (no-op if already present).
--- @param tag string
+--- @tparam string tag
 function CombatAction:addTag(tag)
     self.tags      = self.tags or {}
     self.tags[tag] = true
 end
 
 --- Remove a tag. Returns true if it existed.
--- @param tag string
--- @treturn boolean
+--- @tparam string tag
+--- @treturn boolean
 function CombatAction:removeTag(tag)
     if self.tags and self.tags[tag] then
         self.tags[tag] = nil
@@ -705,14 +789,14 @@ function CombatAction:removeTag(tag)
 end
 
 --- Return true if the action has the given tag.
--- @param tag string
--- @treturn boolean
+--- @tparam string tag
+--- @treturn boolean
 function CombatAction:hasTag(tag)
     return (self.tags or {})[tag] == true
 end
 
 --- Return a sorted list of all tags on this action.
--- @treturn table
+--- @treturn table
 function CombatAction:getTags()
     local out = {}
     for t in pairs(self.tags or {}) do out[#out+1] = t end
@@ -721,15 +805,15 @@ function CombatAction:getTags()
 end
 
 --- Get a metadata value (string key -> any).
--- @param key string
--- @treturn any
+--- @tparam string key
+--- @treturn any
 function CombatAction:getMeta(key)
     return (self.metadata or {})[key]
 end
 
 --- Set a metadata value.
--- @param key string
--- @param val any
+--- @tparam string key
+--- @tparam any val
 function CombatAction:setMeta(key, val)
     self.metadata      = self.metadata or {}
     self.metadata[key] = val
@@ -738,30 +822,30 @@ end
 -- ── StatusEffect: metadata ops ────────────────────────────────────────
 
 --- Get a metadata value from the status effect's data table.
--- @param key string
--- @treturn any
+--- @tparam string key
+--- @treturn any
 function StatusEffect:getMeta(key)
     return (self.data or {})[key]
 end
 
 --- Set a metadata value.
--- @param key string
--- @param val any
+--- @tparam string key
+--- @tparam any val
 function StatusEffect:setMeta(key, val)
     self.data      = self.data or {}
     self.data[key] = val
 end
 
 --- Alias: getMetadata (matches Rust name).
--- @param key string
--- @treturn any
+--- @tparam string key
+--- @treturn any
 function StatusEffect:getMetadata(key)
     return self:getMeta(key)
 end
 
 --- Alias: setMetadata (matches Rust name).
--- @param key string
--- @param val any
+--- @tparam string key
+--- @tparam any val
 function StatusEffect:setMetadata(key, val)
     self:setMeta(key, val)
 end

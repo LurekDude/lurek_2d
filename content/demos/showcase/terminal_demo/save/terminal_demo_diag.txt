@@ -1,2 +1,0 @@
-load ok
-draw ok

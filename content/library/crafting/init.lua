@@ -6,7 +6,16 @@
 
 local M = {}
 
--- ÔöÇÔöÇ Quality enum ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- Optional logging via lurek.log (no-op if unavailable)
+local _log
+do
+    local ok, log_mod = pcall(function() return lurek and lurek.log end)
+    if ok and log_mod then
+        _log = log_mod
+    else
+        _log = { info = function() end, warn = function() end, debug = function() end, error = function() end }
+    end
+end
 
 M.Quality = {
     Normal     = 'normal',
@@ -38,25 +47,45 @@ local Ingredient = {}
 Ingredient.__index = Ingredient
 
 --- Create ingredient by item type.
+--- @tparam string item_type  Item ID to require.
+--- @tparam number quantity   Positive count required (default 1).
+--- @treturn Ingredient
 function M.newIngredient(item_type, quantity)
+    quantity = quantity or 1
+    if type(quantity) ~= 'number' or quantity <= 0 then
+        _log.warn('newIngredient: quantity must be positive, got ' .. tostring(quantity))
+        quantity = 1
+    end
     return setmetatable({
         item_type = item_type or '',
-        quantity  = quantity or 1,
+        quantity  = quantity,
         consumed  = true,
         tag       = '',
     }, Ingredient)
 end
 
 --- Create ingredient by tag.
+--- @tparam string tag       Tag selector string.
+--- @tparam number quantity  Positive count required (default 1).
+--- @treturn Ingredient
 function M.newIngredientTag(tag, quantity)
+    quantity = quantity or 1
+    if type(quantity) ~= 'number' or quantity <= 0 then
+        _log.warn('newIngredientTag: quantity must be positive, got ' .. tostring(quantity))
+        quantity = 1
+    end
     return setmetatable({
         item_type = '',
-        quantity  = quantity or 1,
+        quantity  = quantity,
         consumed  = true,
         tag       = tag or '',
     }, Ingredient)
 end
 
+--- Return true if this ingredient selects by tag rather than item_type.
+--- **Precedence**: when both `tag` and `item_type` are non-empty, the tag
+--- takes precedence — matching code should check `isTag()` first.
+--- @treturn boolean
 function Ingredient:isTag() return self.tag ~= '' end
 
 -- ÔöÇÔöÇ RecipeOutput ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
@@ -65,13 +94,18 @@ local RecipeOutput = {}
 RecipeOutput.__index = RecipeOutput
 
 --- Create a guaranteed recipe output with normal quality.
--- @param item_type string  Item ID produced.
--- @param quantity  number  Number of items produced.
--- @treturn RecipeOutput
+--- @tparam string item_type  Item ID produced.
+--- @tparam number quantity   Positive count produced (default 1).
+--- @treturn RecipeOutput
 function M.newRecipeOutput(item_type, quantity)
+    quantity = quantity or 1
+    if type(quantity) ~= 'number' or quantity <= 0 then
+        _log.warn('newRecipeOutput: quantity must be positive, got ' .. tostring(quantity))
+        quantity = 1
+    end
     return setmetatable({
         item_type   = item_type or '',
-        quantity    = quantity or 1,
+        quantity    = quantity,
         quality     = M.Quality.Normal,
         chance      = 1.0,
         is_byproduct = false,
@@ -79,10 +113,10 @@ function M.newRecipeOutput(item_type, quantity)
 end
 
 --- Create a probabilistic recipe output with an explicit chance.
--- @param item_type string  Item ID produced.
--- @param quantity  number  Number of items produced.
--- @param chance    number  Probability in [0, 1].
--- @treturn RecipeOutput
+--- @tparam string item_type  Item ID produced.
+--- @tparam number quantity   Positive count produced (default 1).
+--- @tparam number chance     Probability in [0, 1].
+--- @treturn RecipeOutput
 function M.newRecipeOutputWithChance(item_type, quantity, chance)
     local o = M.newRecipeOutput(item_type, quantity)
     o.chance = clamp01(chance or 1.0)
@@ -95,8 +129,21 @@ local Recipe = {}
 Recipe.__index = Recipe
 
 --- Create a recipe with default metadata.
--- @param id string  Stable recipe identifier.
--- @treturn Recipe
+---
+--- A recipe holds: `id`, `recipe_type`, `name`, `description`, `category`,
+--- `station_type`, `station_level`, `time` (seconds), `cooldown`,
+--- `fuel_consumption_rate`, `ingredients` (list of Ingredient),
+--- `outputs` (list of RecipeOutput), `remainder_item`, `skill`, `skill_level`,
+--- `skill_xp`, `enabled`, `hand_craftable`, `tags`, `knowledge_mode`,
+--- `discovery_hint`, `grid_width`, `grid_height`, `grid_slots`, `grid_mirror`,
+--- `grid_rotation`, `required_nearby_stations`, `required_biome`,
+--- `required_location`, `orange/yellow/green/grey_threshold`,
+--- `upgrade_from`, `upgrade_to`, `alternatives`,
+--- `output_quality_scaling`, `random_modifier_pool`, `skill_up_curve`,
+--- `conditions`, `metadata`.
+---
+--- @tparam string id  Stable recipe identifier (must be non-empty).
+--- @treturn Recipe
 function M.newRecipe(id)
     return setmetatable({
         id                     = id,
@@ -171,11 +218,26 @@ function Recipe:hasTag(t)
 end
 
 --- Assign an item type to a shaped-recipe grid slot (0-based).
--- @param x         number  Grid column (0-based).
--- @param y         number  Grid row (0-based).
--- @param item_type string  Item ID expected in the slot.
+--- Returns false with a warning if coordinates are out of bounds.
+--- @tparam number x         Grid column (0-based, must be < grid_width).
+--- @tparam number y         Grid row (0-based, must be < grid_height).
+--- @tparam string item_type Item ID expected in the slot.
+--- @treturn boolean true if the slot was set, false if out of bounds.
 function Recipe:setGridSlot(x, y, item_type)
+    if self.grid_width <= 0 or self.grid_height <= 0 then
+        _log.warn('setGridSlot: grid dimensions not set (width=' .. tostring(self.grid_width) .. ', height=' .. tostring(self.grid_height) .. ')')
+        return false
+    end
+    if type(x) ~= 'number' or x < 0 or x >= self.grid_width then
+        _log.warn('setGridSlot: x=' .. tostring(x) .. ' out of bounds [0, ' .. tostring(self.grid_width - 1) .. ']')
+        return false
+    end
+    if type(y) ~= 'number' or y < 0 or y >= self.grid_height then
+        _log.warn('setGridSlot: y=' .. tostring(y) .. ' out of bounds [0, ' .. tostring(self.grid_height - 1) .. ']')
+        return false
+    end
     self.grid_slots[y * self.grid_width + x] = item_type
+    return true
 end
 
 --- Add a byproduct output with a drop chance.
@@ -212,8 +274,13 @@ function M.newRecipeRegistry()
 end
 
 --- Register a recipe in the registry.
--- @param recipe Recipe
+--- @tparam Recipe recipe  The recipe to register.
 function RecipeRegistry:add(recipe)
+    if not recipe or not recipe.id or recipe.id == '' then
+        _log.warn('RecipeRegistry:add: recipe must have a non-empty id')
+        return
+    end
+    _log.debug('RecipeRegistry: registered recipe "' .. recipe.id .. '"')
     self.recipes[recipe.id] = recipe
     self.order[#self.order+1] = recipe.id
 end
@@ -479,19 +546,30 @@ function M.newStation(name, station_type)
     }, Station)
 end
 
---- Add fuel, clamped to max_fuel.
--- @param amount number
--- @treturn number  New fuel level.
+--- Add fuel, clamped to max_fuel. Negative amounts are ignored.
+--- @tparam number amount  Fuel to add (must be non-negative).
+--- @treturn number  New fuel level.
 function Station:addFuel(amount)
+    if type(amount) ~= 'number' or amount < 0 then
+        _log.warn('Station:addFuel: amount must be non-negative, got ' .. tostring(amount))
+        return self.fuel
+    end
     self.fuel = math.min(self.fuel + amount, self.max_fuel)
     return self.fuel
 end
 
---- Consume fuel. Returns false if insufficient.
--- @param amount number
--- @treturn boolean
+--- Consume fuel. Returns false if insufficient or amount is invalid.
+--- @tparam number amount  Fuel to consume (must be non-negative).
+--- @treturn boolean  true if fuel was consumed, false otherwise.
 function Station:consumeFuel(amount)
-    if self.fuel < amount then return false end
+    if type(amount) ~= 'number' or amount < 0 then
+        _log.warn('Station:consumeFuel: amount must be non-negative, got ' .. tostring(amount))
+        return false
+    end
+    if self.fuel < amount then
+        _log.debug('Station:consumeFuel: insufficient fuel (' .. tostring(self.fuel) .. ' < ' .. tostring(amount) .. ')')
+        return false
+    end
     self.fuel = self.fuel - amount
     return true
 end
@@ -1006,9 +1084,10 @@ function CraftQueue:cancel(id)
 end
 
 --- Advance all jobs by dt seconds. Returns list of newly-completed job IDs.
--- Only up to `_max_concurrent` non-completed jobs advance simultaneously.
--- @param dt number
--- @treturn table
+--- Completed jobs are automatically removed from the active job list.
+--- Use `collectCompleted()` to retrieve and clear the cumulative completion log.
+--- @tparam number dt  Delta time in seconds.
+--- @treturn table  List of job IDs that completed this tick.
 function CraftQueue:update(dt)
     local done = {}
     local active = 0
@@ -1019,9 +1098,18 @@ function CraftQueue:update(dt)
                 if job:advance(dt) then
                     self._completed[#self._completed+1] = job.id
                     done[#done+1] = job.id
+                    _log.debug('CraftQueue: job ' .. tostring(job.id) .. ' (' .. tostring(job.recipe_id) .. ') completed')
                 end
             end
         end
+    end
+    -- Auto-remove completed jobs from the active list
+    if #done > 0 then
+        local kept = {}
+        for _, job in ipairs(self._jobs) do
+            if not job.completed then kept[#kept+1] = job end
+        end
+        self._jobs = kept
     end
     return done
 end

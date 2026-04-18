@@ -19,13 +19,20 @@ local function clamp(v, lo, hi)
     return v
 end
 
+--- Log a debug message if lurek.log is available.
+local function log_debug(msg)
+    if lurek and lurek.log and lurek.log.debug then
+        lurek.log.debug("[stats] " .. msg)
+    end
+end
+
 -- ÔöÇÔöÇ Attribute ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 local Attribute = {}
 Attribute.__index = Attribute
 
 --- Create a new attribute.
---- @param base number Base value.
+--- @tparam number base Base value.
 --- @treturn Attribute
 function M.newAttribute(base)
     return setmetatable({
@@ -43,11 +50,11 @@ local Buff = {}
 Buff.__index = Buff
 
 --- Create a new buff.
---- @param stat string Attribute name.
---- @param add number Additive bonus.
---- @param mul number Multiplicative factor (default 1).
---- @param duration number Seconds (-1 = permanent).
---- @param source string Descriptive source.
+--- @tparam string stat Attribute name.
+--- @tparam number add Additive bonus.
+--- @tparam number mul Multiplicative factor (default 1).
+--- @tparam number duration Seconds (-1 = permanent).
+--- @tparam string source Descriptive source.
 --- @treturn Buff
 function M.newBuff(stat, add, mul, duration, source)
     local dur = duration or -1
@@ -73,7 +80,7 @@ local Skill = {}
 Skill.__index = Skill
 
 --- Create a new skill.
---- @param opts table|nil Optional: max_level, resource, cost, cooldown.
+--- @tparam table|nil opts Optional: max_level, resource, cost, cooldown.
 --- @treturn Skill
 function M.newSkill(opts)
     opts = opts or {}
@@ -94,7 +101,7 @@ local Perk = {}
 Perk.__index = Perk
 
 --- Create a new perk.
---- @param opts table|nil Optional: require_level, trait_name.
+--- @tparam table|nil opts Optional: require_level, trait_name.
 --- @treturn Perk
 function M.newPerk(opts)
     opts = opts or {}
@@ -111,7 +118,7 @@ local ActionPoints = {}
 ActionPoints.__index = ActionPoints
 
 --- Create action points with the given maximum.
---- @param max_val number Maximum (and initial) action points.
+--- @tparam number max_val Maximum (and initial) action points.
 --- @treturn ActionPoints
 function M.newActionPoints(max_val)
     return setmetatable({ current = max_val, max = max_val }, ActionPoints)
@@ -123,7 +130,7 @@ local MoraleClass = {}
 MoraleClass.__index = MoraleClass
 
 --- Create a morale tracker with the given maximum (current starts at max).
---- @param max_val number Maximum morale value.
+--- @tparam number max_val Maximum morale value.
 --- @treturn Morale
 function M.newMorale(max_val)
     return setmetatable({
@@ -140,22 +147,22 @@ local LevelThresholds = {}
 LevelThresholds.__index = LevelThresholds
 
 --- Create table-based XP thresholds (one value per level).
---- @param values table Array of numbers; values[n] is XP required for level n.
+--- @tparam table values Array of numbers; values[n] is XP required for level n.
 --- @treturn LevelThresholds
 function M.newTableThresholds(values)
     return setmetatable({ kind = 'table', values = values }, LevelThresholds)
 end
 
 --- Create linear XP thresholds using the formula base + (level-1)*increment.
---- @param base number XP required for level 1.
---- @param increment number Additional XP required per subsequent level.
+--- @tparam number base XP required for level 1.
+--- @tparam number increment Additional XP required per subsequent level.
 --- @treturn LevelThresholds
 function M.newLinearThresholds(base, increment)
     return setmetatable({ kind = 'linear', base = base or 100, increment = increment or 100 }, LevelThresholds)
 end
 
 --- Return the XP required to advance past the given level.
---- @param level number Current level (1-based).
+--- @tparam number level Current level (1-based).
 --- @treturn number XP threshold (math.huge if beyond the table).
 function LevelThresholds:thresholdFor(level)
     if self.kind == 'table' then
@@ -172,7 +179,7 @@ end
 -- ÔöÇÔöÇ TraitDef ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Create a trait definition.
---- @param buffs table Array of {stat, add, mul} tables.
+--- @tparam table buffs Array of {stat, add, mul} tables.
 --- @treturn table TraitDef.
 function M.newTraitDef(buffs)
     return { buffs = buffs or {} }
@@ -185,16 +192,16 @@ local _races   = {}
 local _classes = {}
 
 --- Register a named trait definition in the module registry.
---- @param name string Unique trait name.
---- @param def table TraitDef created with M.newTraitDef.
+--- @tparam string name Unique trait name.
+--- @tparam table def TraitDef created with M.newTraitDef.
 function M.defineTrait(name, def) _traits[name]  = def end
 --- Register a named race archetype.
---- @param name string Unique race name.
---- @param def table Table with optional keys: bases (stat overrides) and traits (list of trait names).
+--- @tparam string name Unique race name.
+--- @tparam table def Table with optional keys: bases (stat overrides) and traits (list of trait names).
 function M.defineRace(name, def)  _races[name]   = def end
 --- Register a named class archetype.
---- @param name string Unique class name.
---- @param def table Table with optional keys: bases (stat overrides) and traits (list of trait names).
+--- @tparam string name Unique class name.
+--- @tparam table def Table with optional keys: bases (stat overrides) and traits (list of trait names).
 function M.defineClass(name, def) _classes[name] = def end
 
 --- Return a sorted list of all registered trait names.
@@ -215,9 +222,9 @@ end
 
 --- Apply race and/or class archetypes to an existing sheet.
 --- Base stat bonuses are added and listed traits are applied as permanent buffs.
---- @param sheet Sheet The target sheet.
---- @param race_name string|nil Registered race name, or nil to skip.
---- @param class_name string|nil Registered class name, or nil to skip.
+--- @tparam Sheet sheet The target sheet.
+--- @tparam string|nil race_name Registered race name, or nil to skip.
+--- @tparam string|nil class_name Registered class name, or nil to skip.
 function M.applyArchetypes(sheet, race_name, class_name)
     local function apply(archetype)
         if not archetype then return end
@@ -275,10 +282,11 @@ end
 -- ÔöÇÔöÇ Attributes ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Define a named attribute.
---- @param name string Attribute name.
---- @param base number Base value.
---- @param opts table|nil Optional: min, max, regen, growth.
+--- @tparam string name Attribute name.
+--- @tparam number base Base value.
+--- @tparam table|nil opts Optional: min, max, regen, growth.
 function Sheet:define(name, base, opts)
+    if type(name) ~= 'string' then return end
     opts = opts or {}
     local attr = M.newAttribute(base)
     if opts.min    then attr.min    = opts.min    end
@@ -288,9 +296,9 @@ function Sheet:define(name, base, opts)
     self._attributes[name] = attr
 end
 
---- Get effective value (base + buffs, clamped).
---- @param name string
---- @treturn number|nil
+--- Get effective value (base * multipliers + additive, clamped).
+--- @tparam string name Attribute name.
+--- @treturn number|nil Effective value or nil if attribute not defined.
 function Sheet:get(name)
     local attr = self._attributes[name]
     if not attr then return nil end
@@ -302,7 +310,7 @@ function Sheet:get(name)
             mul_prod = mul_prod * buff.mul
         end
     end
-    local effective = (attr.base + add_sum) * mul_prod
+    local effective = attr.base * mul_prod + add_sum
     return clamp(effective, attr.min, attr.max)
 end
 
@@ -321,37 +329,37 @@ function Sheet:setBase(name, value)
 end
 
 --- Set the minimum clamp value for an attribute.
---- @param name string Attribute name.
---- @param val number New minimum.
+--- @tparam string name Attribute name.
+--- @tparam number val New minimum.
 function Sheet:setMin(name, val)
     local a = self._attributes[name]; if a then a.min = val end
 end
 --- Set the maximum clamp value for an attribute.
---- @param name string Attribute name.
---- @param val number New maximum.
+--- @tparam string name Attribute name.
+--- @tparam number val New maximum.
 function Sheet:setMax(name, val)
     local a = self._attributes[name]; if a then a.max = val end
 end
 --- Get the current minimum clamp for an attribute.
---- @param name string Attribute name.
+--- @tparam string name Attribute name.
 --- @treturn number|nil
 function Sheet:getMin(name)
     local a = self._attributes[name]; return a and a.min
 end
 --- Get the current maximum clamp for an attribute.
---- @param name string Attribute name.
+--- @tparam string name Attribute name.
 --- @treturn number|nil
 function Sheet:getMax(name)
     local a = self._attributes[name]; return a and a.max
 end
 --- Set the regeneration rate for an attribute.
---- @param name string Attribute name.
---- @param val number Regen per second.
+--- @tparam string name Attribute name.
+--- @tparam number val Regen per second.
 function Sheet:setRegen(name, val)
     local a = self._attributes[name]; if a then a.regen = val end
 end
 --- Get the regeneration rate for an attribute.
---- @param name string Attribute name.
+--- @tparam string name Attribute name.
 --- @treturn number|nil
 function Sheet:getRegen(name)
     local a = self._attributes[name]; return a and a.regen
@@ -368,21 +376,47 @@ end
 -- ÔöÇÔöÇ Buffs ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Add a buff to the sheet and return its numeric handle.
---- @param stat string Attribute to modify.
---- @param add number Additive bonus.
---- @param mul number Multiplicative factor (1 = no change).
---- @param duration number Seconds until expiry (-1 = permanent).
---- @param source string Descriptive label.
---- @treturn number Handle for later removal.
-function Sheet:addBuff(stat, add, mul, duration, source)
+--- When stack_mode is provided and a duplicate buff exists (same stat + source),
+--- the mode controls behavior: None rejects, Duration extends, Intensity increases.
+--- @tparam string stat Attribute to modify.
+--- @tparam number add Additive bonus.
+--- @tparam number mul Multiplicative factor (1 = no change).
+--- @tparam number duration Seconds until expiry (-1 = permanent).
+--- @tparam string source Descriptive label.
+--- @tparam string|nil stack_mode StackMode value for duplicate handling (nil = always add).
+--- @treturn number|nil Handle for later removal, or nil if rejected by StackMode.None.
+function Sheet:addBuff(stat, add, mul, duration, source, stack_mode)
+    if type(stat) ~= 'string' then return nil end
+    -- Enforce stack mode for duplicate buffs (same stat + source)
+    if stack_mode and source and source ~= '' then
+        for h, b in pairs(self._buffs) do
+            if b.stat == stat and b.source == source and not b:isExpired() then
+                if stack_mode == M.StackMode.None then
+                    return nil
+                elseif stack_mode == M.StackMode.Duration then
+                    if duration and duration >= 0 then
+                        b.remaining = b.remaining + duration
+                        b.duration = b.duration + duration
+                    end
+                    log_debug("buff extended duration: " .. stat .. " from " .. source)
+                    return h
+                elseif stack_mode == M.StackMode.Intensity then
+                    b.add = b.add + (add or 0)
+                    log_debug("buff intensified: " .. stat .. " from " .. source)
+                    return h
+                end
+            end
+        end
+    end
     self._buff_counter = self._buff_counter + 1
     local handle = self._buff_counter
     self._buffs[handle] = M.newBuff(stat, add, mul, duration, source)
+    log_debug("buff added: " .. stat .. " from " .. (source or '?'))
     return handle
 end
 
 --- Remove a buff by its numeric handle.
---- @param handle number Handle returned by addBuff.
+--- @tparam number handle Handle returned by addBuff.
 --- @treturn boolean True if the buff was found and removed.
 function Sheet:removeBuff(handle)
     if self._buffs[handle] then self._buffs[handle] = nil; return true end
@@ -390,7 +424,7 @@ function Sheet:removeBuff(handle)
 end
 
 --- Remove all active buffs, or only those affecting a specific attribute.
---- @param stat string|nil If given, only buffs for this attribute are removed.
+--- @tparam string|nil stat If given, only buffs for this attribute are removed.
 function Sheet:clearBuffs(stat)
     if not stat then
         self._buffs = {}
@@ -403,7 +437,7 @@ end
 
 --- Return all active (non-expired) buffs as an array of info tables.
 --- Each entry has: handle, stat, add, mul, duration, remaining, source.
---- @param stat string|nil If given, filter to buffs affecting this attribute.
+--- @tparam string|nil stat If given, filter to buffs affecting this attribute.
 --- @treturn table Array of buff-info tables.
 function Sheet:getBuffs(stat)
     local out = {}
@@ -424,7 +458,7 @@ function Sheet:getBuffs(stat)
 end
 
 --- Count active (non-expired) buffs, optionally limited to one attribute.
---- @param stat string|nil If given, count only buffs for this attribute.
+--- @tparam string|nil stat If given, count only buffs for this attribute.
 --- @treturn number
 function Sheet:getBuffCount(stat)
     local n = 0
@@ -437,7 +471,7 @@ end
 -- ÔöÇÔöÇ Traits ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Apply a registered trait's permanent buffs to this sheet.
---- @param trait_name string Name of a trait registered with M.defineTrait.
+--- @tparam string trait_name Name of a trait registered with M.defineTrait.
 --- @treturn table Array of buff handles for the applied buffs.
 function Sheet:applyTraitBuffs(trait_name)
     local tdef = _traits[trait_name]
@@ -452,7 +486,7 @@ function Sheet:applyTraitBuffs(trait_name)
 end
 
 --- Remove all buffs that were applied by a named trait.
---- @param trait_name string Trait to remove.
+--- @tparam string trait_name Trait to remove.
 --- @treturn boolean True if the trait was active and its buffs were removed.
 function Sheet:removeTraitBuffs(trait_name)
     local handles = self._active_traits[trait_name]
@@ -463,7 +497,7 @@ function Sheet:removeTraitBuffs(trait_name)
 end
 
 --- Return true if a named trait is currently active on this sheet.
---- @param name string Trait name.
+--- @tparam string name Trait name.
 --- @treturn boolean
 function Sheet:hasTrait(name) return self._active_traits[name] ~= nil end
 
@@ -479,26 +513,27 @@ end
 -- ÔöÇÔöÇ Skills ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Define a named skill on this sheet.
---- @param name string Skill name.
---- @param opts table|nil Options: max_level, resource, cost, cooldown.
+--- @tparam string name Skill name.
+--- @tparam table|nil opts Options: max_level, resource, cost, cooldown.
 function Sheet:defineSkill(name, opts)
     self._skills[name] = M.newSkill(opts)
 end
 
 --- Advance a skill by one level. Returns false if already at max level or unknown.
---- @param name string Skill name.
+--- @tparam string name Skill name.
 --- @treturn boolean
 function Sheet:learnSkill(name)
     local sk = self._skills[name]
     if not sk then return false end
     if sk.level >= sk.max_level then return false end
     sk.level = sk.level + 1
+    log_debug("skill learned: " .. name .. " (level " .. sk.level .. ")")
     return true
 end
 
 --- Attempt to use a skill: deducts cost and starts cooldown.
 --- Returns false plus a reason string on failure.
---- @param name string Skill name.
+--- @tparam string name Skill name.
 --- @treturn boolean, string|nil Success flag and optional failure reason.
 function Sheet:useSkill(name)
     local sk = self._skills[name]
@@ -515,7 +550,7 @@ function Sheet:useSkill(name)
 end
 
 --- Get the current level of a named skill (0 = not learned).
---- @param name string Skill name.
+--- @tparam string name Skill name.
 --- @treturn number
 function Sheet:getSkillLevel(name)
     local sk = self._skills[name]
@@ -523,7 +558,7 @@ function Sheet:getSkillLevel(name)
 end
 
 --- Get the remaining cooldown in seconds for a named skill.
---- @param name string Skill name.
+--- @tparam string name Skill name.
 --- @treturn number Seconds remaining (0 when ready).
 function Sheet:getCooldownRemaining(name)
     local sk = self._skills[name]
@@ -533,14 +568,14 @@ end
 -- ÔöÇÔöÇ Perks ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Define a named perk on this sheet.
---- @param name string Perk name.
---- @param opts table|nil Options: require_level, trait_name.
+--- @tparam string name Perk name.
+--- @tparam table|nil opts Options: require_level, trait_name.
 function Sheet:definePerk(name, opts)
     self._perks[name] = M.newPerk(opts)
 end
 
 --- Acquire a perk if requirements are met. Returns false if already acquired or level too low.
---- @param name string Perk name.
+--- @tparam string name Perk name.
 --- @treturn boolean
 function Sheet:acquirePerk(name)
     local pk = self._perks[name]
@@ -553,7 +588,7 @@ function Sheet:acquirePerk(name)
 end
 
 --- Return true if a named perk has been acquired.
---- @param name string Perk name.
+--- @tparam string name Perk name.
 --- @treturn boolean
 function Sheet:hasPerk(name)
     local pk = self._perks[name]
@@ -563,13 +598,13 @@ end
 -- ÔöÇÔöÇ Flags ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Set a boolean flag on this sheet.
---- @param name string Flag name.
+--- @tparam string name Flag name.
 function Sheet:setFlag(name)   self._flags[name] = true end
 --- Clear (remove) a boolean flag.
---- @param name string Flag name.
+--- @tparam string name Flag name.
 function Sheet:clearFlag(name) self._flags[name] = nil  end
 --- Return true if a boolean flag is set.
---- @param name string Flag name.
+--- @tparam string name Flag name.
 --- @treturn boolean
 function Sheet:hasFlag(name)   return self._flags[name] == true end
 --- Return a sorted list of all set flag names.
@@ -584,10 +619,12 @@ end
 -- ÔöÇÔöÇ XP / Level ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Award XP and apply automatic level-ups. Returns the number of levels gained.
---- @param amount number XP to award.
---- @treturn number Levels gained (0 if none).
+--- @tparam number amount XP to award (must be non-negative).
+--- @treturn number Levels gained (0 if none or invalid input).
 function Sheet:addXP(amount)
-    self.xp = self.xp + (amount or 0)
+    amount = amount or 0
+    if type(amount) ~= 'number' or amount < 0 then return 0 end
+    self.xp = self.xp + amount
     local gained = 0
     while true do
         local threshold = self.level_thresholds:thresholdFor(self.level)
@@ -595,6 +632,7 @@ function Sheet:addXP(amount)
             self.xp = self.xp - threshold
             self.level = self.level + 1
             gained = gained + 1
+            log_debug("level up: " .. self.level)
         else
             break
         end
@@ -606,22 +644,22 @@ end
 --- @treturn number
 function Sheet:getXP()    return self.xp    end
 --- Directly set the accumulated XP (does not trigger level-ups).
---- @param v number
+--- @tparam number v
 function Sheet:setXP(v)   self.xp = v       end
 --- Return the current level.
 --- @treturn number
 function Sheet:getLevel() return self.level  end
 --- Directly set the character level.
---- @param v number
+--- @tparam number v
 function Sheet:setLevel(v) self.level = v    end
 --- Replace the level threshold configuration.
---- @param t LevelThresholds New thresholds object.
+--- @tparam LevelThresholds t New thresholds object.
 function Sheet:setLevelThresholds(t) self.level_thresholds = t end
 
 -- ÔöÇÔöÇ Use tracking ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Record a use of a stat for use-based levelling. Applies growth if configured.
---- @param name string Attribute name.
+--- @tparam string name Attribute name.
 function Sheet:recordUse(name)
     self._use_counts[name] = (self._use_counts[name] or 0) + 1
     local attr = self._attributes[name]
@@ -632,7 +670,7 @@ function Sheet:recordUse(name)
 end
 
 --- Return the number of recorded uses of an attribute.
---- @param name string Attribute name.
+--- @tparam string name Attribute name.
 --- @treturn number
 function Sheet:getUseCount(name)
     return self._use_counts[name] or 0
@@ -641,7 +679,7 @@ end
 -- ÔöÇÔöÇ Action Points ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Initialise action points with the given maximum (current also set to max).
---- @param max_val number Maximum AP.
+--- @tparam number max_val Maximum AP.
 function Sheet:setActionPoints(max_val)
     self.action_points = M.newActionPoints(max_val)
 end
@@ -654,7 +692,7 @@ function Sheet:getActionPoints()
 end
 
 --- Spend action points. Returns false if insufficient AP.
---- @param amount number AP to spend.
+--- @tparam number amount AP to spend.
 --- @treturn boolean
 function Sheet:spendActionPoints(amount)
     if not self.action_points then return false end
@@ -671,7 +709,7 @@ function Sheet:beginTurn()
 end
 
 --- Recover AP (partial restore), capped at maximum. Returns new current value.
---- @param amount number AP to recover.
+--- @tparam number amount AP to recover.
 --- @treturn number New current AP.
 function Sheet:recoverActionPoints(amount)
     if not self.action_points then return 0 end
@@ -682,7 +720,7 @@ end
 -- ÔöÇÔöÇ Morale ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Initialise the morale tracker with the given maximum.
---- @param max_val number Maximum morale value.
+--- @tparam number max_val Maximum morale value.
 function Sheet:setMorale(max_val)
     self.morale = M.newMorale(max_val)
 end
@@ -695,20 +733,20 @@ function Sheet:getMorale()
 end
 
 --- Adjust morale by a delta (positive or negative), clamped to [0, max].
---- @param delta number Change amount.
+--- @tparam number delta Change amount.
 function Sheet:adjustMorale(delta)
     if not self.morale then return end
     self.morale.current = clamp(self.morale.current + delta, 0, self.morale.max)
 end
 
 --- Set the morale value below which the unit enters panic.
---- @param val number Panic threshold.
+--- @tparam number val Panic threshold.
 function Sheet:setPanicThreshold(val)
     if self.morale then self.morale.panic_threshold = val end
 end
 
 --- Set the morale value below which the unit goes berserk.
---- @param val number Berserk threshold.
+--- @tparam number val Berserk threshold.
 function Sheet:setBerserkThreshold(val)
     if self.morale then self.morale.berserk_threshold = val end
 end
@@ -733,23 +771,23 @@ end
 -- ÔöÇÔöÇ Resistances ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Set resistance to a damage type (clamped to [0, 1]).
---- @param dtype string Damage type name (e.g. "fire").
---- @param val number Resistance fraction (0 = none, 1 = immune).
+--- @tparam string dtype Damage type name (e.g. "fire").
+--- @tparam number val Resistance fraction (0 = none, 1 = immune).
 function Sheet:setResistance(dtype, val)
     self._resistances[dtype] = clamp(val, 0, 1)
 end
 
 --- Return the resistance fraction for a damage type (default 0).
---- @param dtype string Damage type name.
+--- @tparam string dtype Damage type name.
 --- @treturn number
 function Sheet:getResistance(dtype)
     return self._resistances[dtype] or 0
 end
 
 --- Apply damage to an attribute, reduced by resistance. Returns actual damage dealt.
---- @param stat string Attribute to damage (typically "hp").
---- @param amount number Raw incoming damage.
---- @param dtype string|nil Damage type for resistance lookup.
+--- @tparam string stat Attribute to damage (typically "hp").
+--- @tparam number amount Raw incoming damage.
+--- @tparam string|nil dtype Damage type for resistance lookup.
 --- @treturn number Actual damage applied after resistance.
 function Sheet:applyDamage(stat, amount, dtype)
     local attr = self._attributes[stat]
@@ -763,8 +801,8 @@ end
 -- ÔöÇÔöÇ Encumbrance ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Set current encumbrance and its maximum capacity.
---- @param cur number Current carried weight.
---- @param max_val number Maximum capacity before encumbered.
+--- @tparam number cur Current carried weight.
+--- @tparam number max_val Maximum capacity before encumbered.
 function Sheet:setEncumbrance(cur, max_val)
     self.encumbrance = { cur, max_val }
 end
@@ -786,7 +824,7 @@ end
 -- ÔöÇÔöÇ Initiative ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Set the sheet's base initiative value.
---- @param val number Initiative value.
+--- @tparam number val Initiative value.
 function Sheet:setInitiative(val) self.initiative = val end
 --- Return the current initiative value.
 --- @treturn number
@@ -795,7 +833,7 @@ function Sheet:getInitiative()    return self.initiative end
 -- ÔöÇÔöÇ Update (tick) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 --- Advance time: tick buff durations, skill cooldowns, apply regen.
---- @param dt number Elapsed seconds.
+--- @tparam number dt Elapsed seconds.
 function Sheet:update(dt)
     -- Tick buffs
     for h, b in pairs(self._buffs) do
@@ -830,6 +868,14 @@ function Sheet:update(dt)
             attr.base = math.max(attr.base, attr.min)
         end
     end
+    -- Update encumbrance flag
+    if self.encumbrance then
+        if self.encumbrance[1] > self.encumbrance[2] then
+            self:setFlag('encumbered')
+        else
+            self:clearFlag('encumbered')
+        end
+    end
 end
 
 -- ÔöÇÔöÇ Snapshot / Restore ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
@@ -862,7 +908,7 @@ function Sheet:snapshot()
 end
 
 --- Restore sheet state from a snapshot previously created by Sheet:snapshot.
---- @param snap table Snapshot table created by Sheet:snapshot.
+--- @tparam table snap Snapshot table created by Sheet:snapshot.
 function Sheet:restore(snap)
     self._attributes = {}
     for name, data in pairs(snap.attributes or {}) do

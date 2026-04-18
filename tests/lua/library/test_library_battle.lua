@@ -580,4 +580,314 @@ describe("Combatant setLevel", function()
         expect_equal(c:getLevel(), 10)
     end)
 end)
-test_summary()
+---------------------------------------------------------------------------
+-- Input validation
+---------------------------------------------------------------------------
+
+-- @description Covers input validation for factory functions and key methods.
+describe("Input validation", function()
+    -- @covers library.battle.newCombatant
+    -- @description Verifies newCombatant rejects nil and empty names.
+    it("newCombatant rejects nil name", function()
+        expect_error(function() battle.newCombatant(nil) end)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies newCombatant rejects empty string name.
+    it("newCombatant rejects empty name", function()
+        expect_error(function() battle.newCombatant("") end)
+    end)
+
+    -- @covers library.battle.newAction
+    -- @description Verifies newAction rejects nil name.
+    it("newAction rejects nil name", function()
+        expect_error(function() battle.newAction(nil) end)
+    end)
+
+    -- @covers library.battle.newAction
+    -- @description Verifies newAction rejects empty string name.
+    it("newAction rejects empty name", function()
+        expect_error(function() battle.newAction("") end)
+    end)
+
+    -- @covers library.battle.newStatusEffect
+    -- @description Verifies newStatusEffect rejects nil name.
+    it("newStatusEffect rejects nil name", function()
+        expect_error(function() battle.newStatusEffect(nil) end)
+    end)
+
+    -- @covers library.battle.newStatusEffect
+    -- @description Verifies newStatusEffect rejects empty string name.
+    it("newStatusEffect rejects empty name", function()
+        expect_error(function() battle.newStatusEffect("") end)
+    end)
+
+    -- @covers library.battle.newStatusEffect
+    -- @description Verifies newStatusEffect rejects non-number duration.
+    it("newStatusEffect rejects non-number duration", function()
+        expect_error(function() battle.newStatusEffect("burn", "forever") end)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies takeDamage rejects negative amount.
+    it("takeDamage rejects negative amount", function()
+        local c = battle.newCombatant("hero")
+        expect_error(function() c:takeDamage(-10) end)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies heal rejects negative amount.
+    it("heal rejects negative amount", function()
+        local c = battle.newCombatant("hero")
+        expect_error(function() c:heal(-5) end)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies addStatus rejects nil name.
+    it("addStatus rejects nil name", function()
+        local c = battle.newCombatant("hero")
+        expect_error(function() c:addStatus(nil) end)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies setAccuracy rejects non-number input.
+    it("setAccuracy rejects non-number", function()
+        local a = battle.newAction("slash")
+        expect_error(function() a:setAccuracy("high") end)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @description Verifies newBattle rejects non-string name.
+    it("newBattle rejects non-string name", function()
+        expect_error(function() battle.newBattle(123) end)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @description Verifies newBattle accepts nil name (default).
+    it("newBattle accepts nil name", function()
+        local b = battle.newBattle(nil)
+        expect_equal(b:getName(), "")
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- Edge cases
+---------------------------------------------------------------------------
+
+-- @description Covers edge cases: zero damage, expired effects, empty battles, metadata deep cloning.
+describe("Edge cases", function()
+    -- @covers library.battle.newCombatant
+    -- @description Verifies zero damage does not alter HP or kill the combatant.
+    it("zero damage does not reduce HP", function()
+        local c = battle.newCombatant("hero")
+        local dmg = c:takeDamage(0, "physical")
+        expect_equal(dmg, 0)
+        expect_equal(c:getHp(), 100)
+        expect_equal(c:isAlive(), true)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies healing a full-HP combatant returns 0 and doesn't exceed max.
+    it("healing at full HP returns 0", function()
+        local c = battle.newCombatant("hero")
+        local healed = c:heal(50)
+        expect_equal(healed, 0)
+        expect_equal(c:getHp(), 100)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies removing a status that does not exist is a no-op.
+    it("removeStatus on non-existent status is safe", function()
+        local c = battle.newCombatant("hero")
+        c:removeStatus("nonexistent")
+        expect_equal(#c:getStatuses(), 0)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies tickStatuses on a combatant with no effects returns empty.
+    it("tickStatuses with no effects returns empty", function()
+        local c = battle.newCombatant("hero")
+        local expired = c:tickStatuses()
+        expect_equal(#expired, 0)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @description Verifies getCurrentCombatant returns nil for an empty battle.
+    it("empty battle getCurrentCombatant returns nil", function()
+        local b = battle.newBattle("empty")
+        expect_equal(b:getCurrentCombatant(), nil)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @description Verifies nextTurn returns false when no combatants exist.
+    it("empty battle nextTurn returns false", function()
+        local b = battle.newBattle("empty")
+        expect_equal(b:nextTurn(), false)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @description Verifies getAliveNames returns empty for battle with no combatants.
+    it("empty battle getAliveNames returns empty", function()
+        local b = battle.newBattle("empty")
+        expect_equal(#b:getAliveNames(), 0)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies getHpPercent returns 0 when max_hp is 0.
+    it("getHpPercent returns 0 when max_hp is 0", function()
+        local c = battle.newCombatant("hero")
+        c:setMaxHp(0)
+        expect_equal(c:getHpPercent(), 0)
+    end)
+
+    -- @covers library.battle.newCombatant
+    -- @description Verifies getMpPercent returns 0 when max_mp is 0.
+    it("getMpPercent returns 0 when max_mp is 0", function()
+        local c = battle.newCombatant("hero")
+        c:setMaxMp(0)
+        expect_equal(c:getMpPercent(), 0)
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- Deep clone (metadata)
+---------------------------------------------------------------------------
+
+-- @description Verifies addAction and addCombatant deep-clone nested metadata tables so mutations don't leak.
+describe("Deep clone metadata", function()
+    -- @covers library.battle.newCombatant
+    -- @covers library.battle.newAction
+    -- @description Verifies addAction deep-clones nested metadata so original is not mutated.
+    it("addAction deep-clones nested metadata", function()
+        local a = battle.newAction("fireball")
+        a:setMeta("scaling", { str = 1.5, int = 2.0 })
+        local c = battle.newCombatant("hero")
+        c:addAction(a)
+        -- mutate the clone's metadata
+        local cloned = c:getAction("fireball")
+        cloned:getMeta("scaling").str = 999
+        -- original must be unchanged
+        expect_equal(a:getMeta("scaling").str, 1.5)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @description Verifies addCombatant deep-clones combatant metadata so original is not mutated.
+    it("addCombatant deep-clones combatant metadata", function()
+        local c = battle.newCombatant("hero")
+        c:setMeta("perks", { bonus = 10 })
+        local b = battle.newBattle("arena")
+        b:addCombatant(c)
+        -- mutate the clone's metadata inside the battle
+        local cloned = b:getCombatant("hero")
+        cloned:getMeta("perks").bonus = 999
+        -- original must be unchanged
+        expect_equal(c:getMeta("perks").bonus, 10)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @covers library.battle.newAction
+    -- @description Verifies addCombatant deep-clones action metadata inside the combatant.
+    it("addCombatant deep-clones action metadata", function()
+        local a = battle.newAction("slash")
+        a:setMeta("effects", { bleed = true })
+        local c = battle.newCombatant("hero")
+        c:addAction(a)
+        local b = battle.newBattle("arena")
+        b:addCombatant(c)
+        -- mutate inside battle
+        local battle_hero = b:getCombatant("hero")
+        battle_hero:getAction("slash"):getMeta("effects").bleed = false
+        -- original action on original combatant must be unchanged
+        expect_equal(c:getAction("slash"):getMeta("effects").bleed, true)
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- resolve() method
+---------------------------------------------------------------------------
+
+-- @description Covers the resolve() end-of-round bookkeeping method.
+describe("CombatBattle resolve", function()
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @description Verifies resolve ticks statuses, cooldowns, and checks battle-over.
+    it("ticks statuses and cooldowns in one call", function()
+        local b = battle.newBattle("arena")
+        local c = battle.newCombatant("hero")
+        c:setTeam("player")
+        c:addStatus("burn", 1)
+        local a = battle.newAction("slash")
+        a:setCooldown(2)
+        a:useAction()
+        c:addAction(a)
+        b:addCombatant(c)
+        local still_going = b:resolve()
+        expect_equal(still_going, true) -- only one team, but let's check
+        local hero = b:getCombatant("hero")
+        expect_equal(hero:hasStatus("burn"), false)
+        expect_equal(hero:getAction("slash"):getCurrentCooldown(), 1)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @description Verifies resolve detects battle over when only one team remains.
+    it("detects battle over after resolve", function()
+        local b = battle.newBattle("arena")
+        local hero = battle.newCombatant("hero")
+        hero:setTeam("player")
+        local goblin = battle.newCombatant("goblin")
+        goblin:setTeam("enemy")
+        goblin:setHp(0)
+        goblin.alive = false
+        b:addCombatant(hero)
+        b:addCombatant(goblin)
+        local still_going = b:resolve()
+        expect_equal(still_going, false)
+        expect_equal(b:isOver(), true)
+        expect_equal(b:getWinner(), "player")
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- getWinner auto-detect
+---------------------------------------------------------------------------
+
+-- @description Covers getWinner with auto_detect parameter.
+describe("getWinner auto-detect", function()
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @description Verifies getWinner(true) auto-detects the winner without explicit battle-over marking.
+    it("auto-detects winner when one team alive", function()
+        local b = battle.newBattle("arena")
+        local hero = battle.newCombatant("hero")
+        hero:setTeam("player")
+        local goblin = battle.newCombatant("goblin")
+        goblin:setTeam("enemy")
+        goblin:setHp(0)
+        goblin.alive = false
+        b:addCombatant(hero)
+        b:addCombatant(goblin)
+        -- without auto_detect, winner is nil (battle not explicitly marked over)
+        expect_equal(b:getWinner(), nil)
+        -- with auto_detect, winner is found
+        expect_equal(b:getWinner(true), "player")
+        expect_equal(b:isOver(), true)
+    end)
+
+    -- @covers library.battle.newBattle
+    -- @covers library.battle.newCombatant
+    -- @description Verifies getWinner(true) returns nil when multiple teams are alive.
+    it("auto-detect returns nil when battle is not over", function()
+        local b = battle.newBattle("arena")
+        local hero = battle.newCombatant("hero")
+        hero:setTeam("player")
+        local goblin = battle.newCombatant("goblin")
+        goblin:setTeam("enemy")
+        b:addCombatant(hero)
+        b:addCombatant(goblin)
+        expect_equal(b:getWinner(true), nil)
+        expect_equal(b:isOver(), false)
+    end)
+end)test_summary()

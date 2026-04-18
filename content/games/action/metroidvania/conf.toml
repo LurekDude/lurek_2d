@@ -1,0 +1,13 @@
+[window]
+title = "Metroidvania — Lurek2D"
+width = 800
+height = 600
+resizable = false
+vsync = true
+
+[graphics]
+backend = "auto"
+power_preference = "low"
+
+[performance]
+target_fps = 60

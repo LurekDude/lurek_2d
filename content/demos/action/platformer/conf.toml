@@ -1,9 +1,0 @@
-# conf.toml — engine configuration for platformer
-
-[window]
-title = "Platformer Demo"
-width = 960
-height = 540
-
-[performance]
-target_fps = 60

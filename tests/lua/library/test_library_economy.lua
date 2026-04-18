@@ -761,4 +761,191 @@ describe("Enum constants", function()
         expect_equal(eco.ModifierType.SET,      "set")
     end)
 end)
+
+---------------------------------------------------------------------------
+-- Bug-fix regression tests
+---------------------------------------------------------------------------
+
+-- @description Regression tests for bugs found in audit: decay clamping, set-modifier short-circuit,
+-- expired conversion rates, wrap overflow edge case, and reserve bounds.
+describe("Bug-fix regressions", function()
+    -- @covers library.economy.newResource
+    -- @description Verifies getNetRate clamps so resource cannot go below minimum even with heavy decay.
+    it("getNetRate clamps to prevent going below minimum", function()
+        local r = eco.newResource("energy", 100)
+        r:add(10)
+        r:setMinimum(0)
+        r:setDecayPercent(5.0) -- 500% per second — way more than value
+        local net = r:getNetRate()
+        -- net should be clamped to -(value - minimum) = -10
+        expect_equal(net, -10)
+        -- After tick, value should be at minimum, not negative
+        r:tick(1.0)
+        expect_equal(r:getValue(), 0)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies getNetRate clamps with non-zero minimum floor.
+    it("getNetRate clamps to non-zero minimum", function()
+        local r = eco.newResource("hp", 100)
+        r:add(15)
+        r:setMinimum(10)
+        r:setDecayRate(100) -- massive flat decay
+        local net = r:getNetRate()
+        -- net should be clamped to -(15 - 10) = -5
+        expect_equal(net, -5)
+        r:tick(1.0)
+        expect_equal(r:getValue(), 10)
+    end)
+
+    -- @covers library.economy.newConversionRule
+    -- @description Verifies set-modifier short-circuit: when a set modifier exists, add/multiply do not affect the rate.
+    it("effectiveRate short-circuits on set modifier", function()
+        local rule = eco.newConversionRule("a", "b", 10)
+        rule:addModifier(eco.newModifier("add", 100, -1, "big_add"))
+        rule:addModifier(eco.newModifier("multiply", 50, -1, "big_mul"))
+        rule:addModifier(eco.newModifier("set", 7, -1, "override"))
+        -- set wins regardless of add/multiply
+        expect_equal(rule:effectiveRate(), 7)
+    end)
+
+    -- @covers library.economy.newConversionRule
+    -- @description Verifies expired set modifier does NOT override the base rate.
+    it("expired set modifier does not override rate", function()
+        local rule = eco.newConversionRule("a", "b", 10)
+        local m = eco.newModifier("set", 999, 1, "temp_override")
+        m:update(2) -- expire it
+        rule:addModifier(m)
+        -- expired set should be ignored, base rate applies
+        expect_equal(rule:effectiveRate(), 10)
+    end)
+
+    -- @covers library.economy.newConversionRule
+    -- @description Verifies effectiveRate ignores expired set but uses non-expired add/multiply.
+    it("effectiveRate with mixed expired set and live add", function()
+        local rule = eco.newConversionRule("a", "b", 10)
+        local set_mod = eco.newModifier("set", 999, 1, "expired_set")
+        set_mod:update(2) -- expire
+        rule:addModifier(set_mod)
+        rule:addModifier(eco.newModifier("add", 5, -1, "live_add"))
+        -- expired set ignored, add applies: (10 + 5) * 1 = 15
+        expect_equal(rule:effectiveRate(), 15)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies wrap overflow handles degenerate case where capacity < minimum.
+    it("wrap overflow with capacity < minimum clamps safely", function()
+        local r = eco.newResource("test", 5)
+        r:setOverflow("wrap")
+        r:setMinimum(10) -- degenerate: minimum > capacity
+        r:setValue(5) -- _clamp gives capacity=5
+        local excess = r:add(10)
+        -- With degenerate range, should clamp safely, not crash or produce NaN
+        expect_equal(excess, 0)
+        -- Value should be something valid (clamped)
+        local v = r:getValue()
+        expect_equal(type(v), "number")
+        expect_equal(v == v, true) -- not NaN
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies wrap overflow with capacity == minimum (zero range) clamps safely.
+    it("wrap overflow with zero range (capacity == minimum)", function()
+        local r = eco.newResource("test", 10)
+        r:setOverflow("wrap")
+        r:setMinimum(10) -- range = 0
+        r:setValue(10)
+        local excess = r:add(5)
+        expect_equal(excess, 0)
+        expect_equal(r:getValue(), 10)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies reserve clamps so reserved cannot exceed current value.
+    it("reserve clamps to value", function()
+        local r = eco.newResource("gold", 100)
+        r:add(30)
+        r:reserve(50) -- try to reserve more than value
+        expect_equal(r:getReserved(), 30) -- clamped to value
+        expect_equal(r:getAvailable(), 0)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies unreserve clamps reserved to value after value decreases.
+    it("unreserve clamps reserved to value", function()
+        local r = eco.newResource("gold", 100)
+        r:add(50)
+        r:reserve(40)
+        expect_equal(r:getReserved(), 40)
+        -- Now unreserve a small amount — reserved stays within value
+        r:unreserve(5)
+        expect_equal(r:getReserved(), 35)
+    end)
+end)
+
+---------------------------------------------------------------------------
+-- Input validation tests
+---------------------------------------------------------------------------
+
+-- @description Validates that factory functions reject invalid inputs with clear error messages.
+describe("Input validation", function()
+    -- @covers library.economy.newResource
+    -- @description Verifies newResource rejects nil and empty-string names.
+    it("newResource rejects nil name", function()
+        expect_error(function() eco.newResource(nil, 100) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies newResource rejects empty-string names.
+    it("newResource rejects empty name", function()
+        expect_error(function() eco.newResource("", 100) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies newResource rejects invalid capacity.
+    it("newResource rejects capacity below -1", function()
+        expect_error(function() eco.newResource("gold", -2) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies add rejects negative amounts.
+    it("add rejects negative amount", function()
+        local r = eco.newResource("gold", 100)
+        expect_error(function() r:add(-5) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies spend rejects negative amounts.
+    it("spend rejects negative amount", function()
+        local r = eco.newResource("gold", 100)
+        r:add(50)
+        expect_error(function() r:spend(-5) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies reserve rejects negative amounts.
+    it("reserve rejects negative amount", function()
+        local r = eco.newResource("gold", 100)
+        expect_error(function() r:reserve(-5) end)
+    end)
+
+    -- @covers library.economy.newResource
+    -- @description Verifies unreserve rejects negative amounts.
+    it("unreserve rejects negative amount", function()
+        local r = eco.newResource("gold", 100)
+        expect_error(function() r:unreserve(-5) end)
+    end)
+
+    -- @covers library.economy.newConversionRule
+    -- @description Verifies newConversionRule rejects empty source name.
+    it("newConversionRule rejects empty from", function()
+        expect_error(function() eco.newConversionRule("", "b", 1) end)
+    end)
+
+    -- @covers library.economy.newConversionRule
+    -- @description Verifies newConversionRule rejects empty target name.
+    it("newConversionRule rejects empty to", function()
+        expect_error(function() eco.newConversionRule("a", "", 1) end)
+    end)
+end)
 test_summary()

@@ -1981,6 +1981,44 @@ describe("lurek.ui.newSpinBox factory", function()
         sb.setRange(1, 99)
         expect_equal(true, true)
     end)
+
+    -- @covers lurek.ui.newSpinBox
+    -- @description increment advances value by the step amount set via setStep.
+    -- Migrated from Rust spin_box_increment_respects_step.
+    it("increment advances value by custom step", function()
+        local sb = lurek.ui.newSpinBox(0, 100)
+        sb.setStep(2.0)
+        sb.increment()
+        expect_near(2.0, sb.getValue(), 0.001)
+    end)
+
+    -- @covers lurek.ui.newSpinBox
+    -- @description increment clamps at max when step overshoots the upper bound.
+    -- Migrated from Rust spin_box_increment_clamps_at_max.
+    it("increment clamps at max when step overshoots", function()
+        local sb = lurek.ui.newSpinBox(0, 10)
+        sb.setStep(1000.0)
+        sb.increment()
+        expect_near(10.0, sb.getValue(), 0.001)
+    end)
+
+    -- @covers lurek.ui.newSpinBox
+    -- @description setValue clamps to max when the supplied value exceeds the range.
+    -- Migrated from Rust spin_box_set_value_clamps_to_range.
+    it("setValue clamps to max when value exceeds range", function()
+        local sb = lurek.ui.newSpinBox(0, 100)
+        sb.setValue(999)
+        expect_near(100.0, sb.getValue(), 0.001)
+    end)
+
+    -- @covers lurek.ui.newSpinBox
+    -- @description setValue clamps to min when the supplied value is below the range.
+    -- Migrated from Rust spin_box_set_value_clamps_to_range.
+    it("setValue clamps to min when value is below range", function()
+        local sb = lurek.ui.newSpinBox(5, 50)
+        sb.setValue(-1)
+        expect_near(5.0, sb.getValue(), 0.001)
+    end)
 end)
 
 describe("lurek.ui.newSwitch factory", function()
@@ -2064,6 +2102,14 @@ describe("lurek.ui.newBadge factory", function()
         local b = lurek.ui.newBadge(0)
         b.setCount(42)
         expect_equal(b.getCount(), 42)
+    end)
+
+    -- @covers lurek.ui.newBadge
+    -- @description getDisplayText shows exact count at the cap boundary (99 → "99", not "99+").
+    -- Migrated from Rust badge_display_text_at_max_shows_count.
+    it("getDisplayText shows exact count at cap boundary", function()
+        local b = lurek.ui.newBadge(99)
+        expect_equal(b.getDisplayText(), "99")
     end)
 end)
 

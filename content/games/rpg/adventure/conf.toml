@@ -1,0 +1,14 @@
+[window]
+title = "Point-and-Click Adventure — Lurek2D"
+width = 800
+height = 600
+vsync = true
+fullscreen = false
+resizable = true
+
+[graphics]
+backend = "auto"
+power_preference = "low"
+
+[performance]
+fps_cap = 60

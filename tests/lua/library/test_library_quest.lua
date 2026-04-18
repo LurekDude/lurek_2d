@@ -183,19 +183,19 @@ describe("Quest", function()
     it("start/complete/fail transitions", function()
         local q = quest.newQuest("q1", "Quest 1")
         expect_equal(q.status, "available")
-        q:start()
+        expect_equal(q:start(), true)
         expect_equal(q.status, "active")
-        q:complete()
+        expect_equal(q:complete(), true)
         expect_equal(q.status, "completed")
     end)
 
     -- @description Verifies case: start only works from available.
     it("start only works from available", function()
         local q = quest.newQuest("q1", "Quest 1")
-        q:start()
-        q:fail()
+        expect_equal(q:start(), true)
+        expect_equal(q:fail(), true)
         expect_equal(q.status, "failed")
-        q:start() -- should not change from failed
+        expect_equal(q:start(), false) -- should not change from failed
         expect_equal(q.status, "failed")
     end)
 
@@ -239,8 +239,8 @@ describe("Quest", function()
         expect_equal(q:getStage("nope"), nil)
     end)
 
-    -- @description Verifies case: advanceObjective works across stages.
-    it("advanceObjective works across stages", function()
+    -- @description Verifies case: advanceObjective works in the current stage.
+    it("advanceObjective works in the current stage", function()
         local q = quest.newQuest("main", "Main Quest")
         local s1 = quest.newQuestStage("s1", "Stage 1")
         s1:addObjective(quest.newObjective("obj1", "Objective 1", 3))
@@ -297,11 +297,11 @@ describe("Quest", function()
         expect_near(q:completionPercent(), 100.0, 0.01)
     end)
 
-    -- @description Verifies case: completionPercent with no objectives returns 100.
-    it("completionPercent with no objectives returns 100", function()
+    -- @description Verifies case: completionPercent with no objectives returns 0.
+    it("completionPercent with no objectives returns 0", function()
         local q = quest.newQuest("empty", "Empty")
         q:addStage(quest.newQuestStage("s1", "Stage 1"))
-        expect_near(q:completionPercent(), 100.0, 0.01)
+        expect_near(q:completionPercent(), 0.0, 0.01)
     end)
 
     -- @description Verifies case: activeObjectiveIds works.
@@ -630,4 +630,211 @@ describe("M.ObjectiveStatus enum", function()
         expect_equal(quest.ObjectiveStatus.FAILED,    "failed")
     end)
 end)
+-- ─── Bug-fix regression tests ─────────────────────────────────────────────────
+
+-- @description Tests that advanceObjective only searches the current stage by default.
+describe("Quest:advanceObjective current-stage scoping", function()
+    -- @description Verifies case: objective in a non-current stage is not found by default.
+    it("does not advance objective in a non-current stage", function()
+        local q = quest.newQuest("main", "Main Quest")
+        local s1 = quest.newQuestStage("s1", "Stage 1")
+        local s2 = quest.newQuestStage("s2", "Stage 2")
+        s1:addObjective(quest.newObjective("obj_s1", "S1 Obj", 3))
+        s2:addObjective(quest.newObjective("obj_s2", "S2 Obj", 3))
+        q:addStage(s1)
+        q:addStage(s2)
+        -- current_stage = 1 (s1), so obj_s2 should not be found
+        expect_equal(q:advanceObjective("obj_s2", 1), false)
+        expect_equal(s2:getObjective("obj_s2").current, 0)
+    end)
+
+    -- @description Verifies case: advancing with explicit stage_id targets that stage.
+    it("advances objective in explicit stage_id", function()
+        local q = quest.newQuest("main", "Main Quest")
+        local s1 = quest.newQuestStage("s1", "Stage 1")
+        local s2 = quest.newQuestStage("s2", "Stage 2")
+        s1:addObjective(quest.newObjective("obj_s1", "S1 Obj", 3))
+        s2:addObjective(quest.newObjective("obj_s2", "S2 Obj", 3))
+        q:addStage(s1)
+        q:addStage(s2)
+        -- Explicitly target s2
+        expect_equal(q:advanceObjective("obj_s2", 2, "s2"), true)
+        expect_equal(s2:getObjective("obj_s2").current, 2)
+    end)
+
+    -- @description Verifies case: after nextStage, the new current stage is searched.
+    it("after nextStage, new current stage is searched", function()
+        local q = quest.newQuest("main", "Main Quest")
+        local s1 = quest.newQuestStage("s1", "Stage 1")
+        local s2 = quest.newQuestStage("s2", "Stage 2")
+        s1:addObjective(quest.newObjective("obj_s1", "S1 Obj", 1))
+        s2:addObjective(quest.newObjective("obj_s2", "S2 Obj", 3))
+        q:addStage(s1)
+        q:addStage(s2)
+        q:nextStage()
+        expect_equal(q:advanceObjective("obj_s2", 1), true)
+        expect_equal(s2:getObjective("obj_s2").current, 1)
+        -- s1 objective should not be reachable from current stage
+        expect_equal(q:advanceObjective("obj_s1", 1), false)
+    end)
+end)
+
+-- @description Tests that completionPercent returns 0.0 for zero mandatory objectives.
+describe("Quest:completionPercent zero objectives", function()
+    -- @description Verifies case: quest with no stages returns 0%.
+    it("returns 0 for quest with no stages", function()
+        local q = quest.newQuest("empty", "Empty")
+        expect_near(q:completionPercent(), 0.0, 0.01)
+    end)
+
+    -- @description Verifies case: quest with only optional objectives returns 0%.
+    it("returns 0 for quest with only optional objectives", function()
+        local q = quest.newQuest("opt", "Optional Only")
+        local s = quest.newQuestStage("s1", "S1")
+        local obj = quest.newObjective("a", "A", 1)
+        obj.mandatory = false
+        s:addObjective(obj)
+        q:addStage(s)
+        expect_near(q:completionPercent(), 0.0, 0.01)
+    end)
+end)
+
+-- @description Tests that quest state machine rejects invalid transitions.
+describe("Quest state machine enforcement", function()
+    -- @description Verifies case: complete from available is rejected.
+    it("complete from available is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        expect_equal(q:complete(), false)
+        expect_equal(q.status, "available")
+    end)
+
+    -- @description Verifies case: fail from available is rejected.
+    it("fail from available is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        expect_equal(q:fail(), false)
+        expect_equal(q.status, "available")
+    end)
+
+    -- @description Verifies case: start from completed is rejected.
+    it("start from completed is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        q:start()
+        q:complete()
+        expect_equal(q:start(), false)
+        expect_equal(q.status, "completed")
+    end)
+
+    -- @description Verifies case: start from failed is rejected.
+    it("start from failed is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        q:start()
+        q:fail()
+        expect_equal(q:start(), false)
+        expect_equal(q.status, "failed")
+    end)
+
+    -- @description Verifies case: fail from completed is rejected.
+    it("fail from completed is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        q:start()
+        q:complete()
+        expect_equal(q:fail(), false)
+        expect_equal(q.status, "completed")
+    end)
+
+    -- @description Verifies case: complete from failed is rejected.
+    it("complete from failed is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        q:start()
+        q:fail()
+        expect_equal(q:complete(), false)
+        expect_equal(q.status, "failed")
+    end)
+
+    -- @description Verifies case: double start is rejected.
+    it("double start is rejected", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        expect_equal(q:start(), true)
+        expect_equal(q:start(), false)
+        expect_equal(q.status, "active")
+    end)
+end)
+
+-- @description Tests that journal entries are purged when max_journal_entries is set.
+describe("Quest journal max-entry limit", function()
+    -- @description Verifies case: journal respects max_journal_entries.
+    it("trims oldest entries when exceeding limit", function()
+        local q = quest.newQuest("q1", "Quest 1", 3)
+        q:addJournalEntry("entry1", "a")
+        q:addJournalEntry("entry2", "b")
+        q:addJournalEntry("entry3", "c")
+        expect_equal(#q.journal, 3)
+        q:addJournalEntry("entry4", "d")
+        expect_equal(#q.journal, 3)
+        -- oldest entry (entry1) should be gone
+        expect_equal(q.journal[1].text, "entry2")
+        expect_equal(q.journal[3].text, "entry4")
+    end)
+
+    -- @description Verifies case: nil max means unlimited.
+    it("nil max means unlimited journal", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        for i = 1, 100 do
+            q:addJournalEntry("entry" .. i)
+        end
+        expect_equal(#q.journal, 100)
+    end)
+
+    -- @description Verifies case: max of 1 keeps only latest.
+    it("max of 1 keeps only the latest entry", function()
+        local q = quest.newQuest("q1", "Quest 1", 1)
+        q:addJournalEntry("first")
+        q:addJournalEntry("second")
+        expect_equal(#q.journal, 1)
+        expect_equal(q.journal[1].text, "second")
+    end)
+end)
+
+-- @description Tests input validation for quest and objective constructors.
+describe("Input validation", function()
+    -- @description Verifies case: newQuest rejects empty id.
+    it("newQuest rejects empty id", function()
+        expect_error(function() quest.newQuest("", "Title") end)
+    end)
+
+    -- @description Verifies case: newQuest rejects non-string id.
+    it("newQuest rejects non-string id", function()
+        expect_error(function() quest.newQuest(123, "Title") end)
+    end)
+
+    -- @description Verifies case: newObjective rejects negative required.
+    it("newObjective rejects negative required", function()
+        expect_error(function() quest.newObjective("id", "desc", -1) end)
+    end)
+
+    -- @description Verifies case: advance rejects zero amount.
+    it("advance rejects zero amount", function()
+        local obj = quest.newObjective("id", "desc", 3)
+        expect_error(function() obj:advance(0) end)
+    end)
+
+    -- @description Verifies case: advance rejects negative amount.
+    it("advance rejects negative amount", function()
+        local obj = quest.newObjective("id", "desc", 3)
+        expect_error(function() obj:advance(-1) end)
+    end)
+
+    -- @description Verifies case: setProgress rejects non-number.
+    it("setProgress rejects non-number", function()
+        local obj = quest.newObjective("id", "desc", 3)
+        expect_error(function() obj:setProgress("abc") end)
+    end)
+
+    -- @description Verifies case: addJournalEntry rejects non-string text.
+    it("addJournalEntry rejects non-string text", function()
+        local q = quest.newQuest("q1", "Quest 1")
+        expect_error(function() q:addJournalEntry(123) end)
+    end)
+end)
+
 test_summary()

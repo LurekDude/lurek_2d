@@ -2,6 +2,7 @@
 --
 -- A pure-Lua replacement for the former `lurek.dialog` Rust binding.
 -- No engine dependencies; works in headless test VMs.
+-- Optional: uses `lurek.log.debug()` when available for dialog progression tracing.
 --
 -- Usage:
 --   local dialog = require("library.dialog")
@@ -20,6 +21,16 @@ local M = {}
 -- ÔöÇÔöÇÔöÇ Internal constants ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 local DEFAULT_CPS = 20  -- characters per second
+local MAX_JUMPS   = 100 -- max jumps per step() to prevent infinite loops
+
+-- Optional logging (safe in headless tests where lurek may not exist)
+local _log
+pcall(function()
+    _log = lurek and lurek.log
+end)
+local function log_debug(msg)
+    if _log then _log.debug(msg) end
+end
 
 -- ÔöÇÔöÇÔöÇ Node executor helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
@@ -64,6 +75,7 @@ function M.newSequencer()
     local _wait_timer = 0.0
     local _handlers   = {}   -- event_name Ôćĺ list of callbacks
     local _pending_nodes = nil  -- nodes injected mid-sequence by a branch
+    local _jump_count    = 0    -- jump counter for loop detection
 
     -- ÔöÇÔöÇ private helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
@@ -99,6 +111,7 @@ function M.newSequencer()
         end
 
         if _pc > #_nodes then
+            log_debug("dialog: sequence done")
             set_state("done")
             fire("finished")
             fire("done")
@@ -108,10 +121,16 @@ function M.newSequencer()
         local node = _nodes[_pc]
         _pc = _pc + 1
 
-        -- cond predicate: skip node when condition returns false
-        if type(node.cond) == "function" and not node.cond() then
-            step()
-            return
+        -- cond predicate: skip node when condition returns false (pcall for safety)
+        if type(node.cond) == "function" then
+            local ok, result = pcall(node.cond)
+            if not ok then
+                log_debug("dialog: cond() threw: " .. tostring(result))
+            end
+            if not ok or not result then
+                step()
+                return
+            end
         end
 
         if node.type == "say" then
@@ -119,12 +138,14 @@ function M.newSequencer()
             _text     = node.text or ""
             _revealed = 0.0
             set_state("typing")
+            log_debug("dialog: say [" .. _speaker .. "]")
             fire("line", _speaker, _text)
 
         elseif node.type == "choice" then
             _choice_txt  = node.text or ""
             _choice_opts = node.options or {}
             set_state("choice")
+            log_debug("dialog: choice (" .. #_choice_opts .. " options)")
             fire("choice")
 
         elseif node.type == "wait" then
@@ -144,8 +165,17 @@ function M.newSequencer()
             step()
 
         elseif node.type == "jump" then
+            _jump_count = _jump_count + 1
+            if _jump_count > MAX_JUMPS then
+                log_debug("dialog: jump loop detected (>" .. MAX_JUMPS .. " jumps), forcing done")
+                set_state("done")
+                fire("finished")
+                fire("done")
+                return
+            end
             -- find the node whose .label matches node.target and jump to it
             local target = node.target or node.label
+            log_debug("dialog: jump -> " .. tostring(target))
             for i, n in ipairs(_nodes) do
                 if n.label == target then
                     _pc = i
@@ -164,8 +194,11 @@ function M.newSequencer()
 
     --- Load a new script, replacing any existing one.
     -- Call start() afterwards to begin playback.
-    -- @param nodes table Array of node tables.
+    -- @tparam table nodes Array of node tables (nil treated as empty).
     function seq:load(nodes)
+        if nodes ~= nil and type(nodes) ~= "table" then
+            error("dialog:load() expects a table of nodes, got " .. type(nodes), 2)
+        end
         _nodes   = nodes or {}
         _pc      = 1
         _state   = "idle"
@@ -176,10 +209,12 @@ function M.newSequencer()
         _choice_opts = {}
         _wait_timer  = 0.0
         _pending_nodes = nil
+        _jump_count    = 0
     end
 
     --- Begin playback from the first node.
     function seq:start()
+        _jump_count = 0
         if #_nodes == 0 then
             set_state("done")
             fire("finished")
@@ -188,12 +223,17 @@ function M.newSequencer()
         end
         _pc = 1
         set_state("idle")
+        log_debug("dialog: start (" .. #_nodes .. " nodes)")
         step()
     end
 
     --- Advance per-frame. Call every frame while isActive() is true.
-    -- @param dt number Delta time in seconds.
+    -- @tparam number dt Delta time in seconds (clamped to >= 0).
     function seq:update(dt)
+        if type(dt) ~= "number" then
+            error("dialog:update() expects a number dt, got " .. type(dt), 2)
+        end
+        if dt <= 0 then return end
         if _state == "typing" then
             local old_revealed = _revealed
             _revealed = _revealed + _cps * dt
@@ -237,11 +277,20 @@ function M.newSequencer()
 
     --- Select a choice option by 1-based index.
     -- Only valid when state == "choice".
-    -- @param index number 1-based index into getChoiceLabels().
+    -- @tparam number index 1-based index into getChoiceLabels().
     function seq:choose(index)
         if _state ~= "choice" then return end
+        if type(index) ~= "number" then
+            error("dialog:choose() expects a number index, got " .. type(index), 2)
+        end
+        index = math.floor(index)
+        if index < 1 or index > #_choice_opts then
+            error("dialog:choose() index " .. index .. " out of range 1.." .. #_choice_opts, 2)
+        end
         local opt = _choice_opts[index]
         if not opt then return end
+
+        log_debug("dialog: chose option " .. index .. " [" .. (opt.label or "") .. "]")
 
         -- inject branch nodes
         if opt.branch and #opt.branch > 0 then
@@ -253,8 +302,11 @@ function M.newSequencer()
     end
 
     --- Set the typewriter reveal speed.
-    -- @param cps number Characters per second (default: 20).
+    -- @tparam number cps Characters per second (default: 20).
     function seq:setSpeed(cps)
+        if cps ~= nil and type(cps) ~= "number" then
+            error("dialog:setSpeed() expects a number, got " .. type(cps), 2)
+        end
         _cps = cps or DEFAULT_CPS
     end
 
@@ -318,10 +370,17 @@ function M.newSequencer()
     end
 
     --- Register a callback for a named event.
-    -- Events: "line" (speaker, text), "choice" (), "finished" ()
-    -- @param event string Event name.
-    -- @param fn function Callback function.
+    -- Events: "line" (speaker, text), "choice" (), "finished" (), "done" (),
+    -- "event" (name, data), "typewrite" (char, full_text).
+    -- @tparam string event Event name.
+    -- @tparam function fn Callback function.
     function seq:on(event, fn)
+        if type(event) ~= "string" then
+            error("dialog:on() expects a string event name, got " .. type(event), 2)
+        end
+        if type(fn) ~= "function" then
+            error("dialog:on() expects a function callback, got " .. type(fn), 2)
+        end
         if not _handlers[event] then
             _handlers[event] = {}
         end
@@ -329,8 +388,11 @@ function M.newSequencer()
     end
 
     --- Unregister all callbacks for a named event.
-    -- @param event string Event name.
+    -- @tparam string event Event name.
     function seq:off(event)
+        if type(event) ~= "string" then
+            error("dialog:off() expects a string event name, got " .. type(event), 2)
+        end
         _handlers[event] = nil
     end
 

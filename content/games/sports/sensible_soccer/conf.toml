@@ -1,0 +1,7 @@
+[window]
+title      = "Sensible Soccer — Lurek2D"
+width      = 960
+height     = 540  # 16:9 for wide pitch view
+
+[performance]
+target_fps = 60

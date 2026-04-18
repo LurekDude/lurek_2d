@@ -1012,4 +1012,199 @@ describe("RecipeKnowledge auto-discover isKnown", function()
         expect_equal(false, rk:isKnown("x"))
     end)
 end)
+
+-- ── Grid slot bounds checking ────────────────────────────────────────────
+
+-- @description Tests that setGridSlot validates coordinates against grid dimensions.
+describe("Recipe grid slot bounds", function()
+    -- @covers library.crafting.newRecipe
+    -- @description Verifies setGridSlot rejects out-of-bounds coordinates.
+    it("rejects out-of-bounds x", function()
+        local r = C.newRecipe("shaped")
+        r.grid_width = 3
+        r.grid_height = 3
+        expect_equal(r:setGridSlot(5, 0, "iron"), false)
+    end)
+
+    -- @description Verifies setGridSlot rejects negative coordinates.
+    it("rejects negative y", function()
+        local r = C.newRecipe("shaped")
+        r.grid_width = 3
+        r.grid_height = 3
+        expect_equal(r:setGridSlot(0, -1, "iron"), false)
+    end)
+
+    -- @description Verifies setGridSlot rejects when grid dimensions are zero.
+    it("rejects when grid not configured", function()
+        local r = C.newRecipe("shaped")
+        -- grid_width/grid_height default to 0
+        expect_equal(r:setGridSlot(0, 0, "iron"), false)
+    end)
+
+    -- @description Verifies setGridSlot accepts valid coordinates.
+    it("accepts valid coordinates", function()
+        local r = C.newRecipe("shaped")
+        r.grid_width = 3
+        r.grid_height = 3
+        expect_equal(r:setGridSlot(2, 2, "iron"), true)
+        expect_equal(r.grid_slots[2 * 3 + 2], "iron")
+    end)
+
+    -- @description Verifies setGridSlot boundary: max valid index.
+    it("accepts boundary coordinates", function()
+        local r = C.newRecipe("shaped")
+        r.grid_width = 2
+        r.grid_height = 2
+        expect_equal(r:setGridSlot(0, 0, "a"), true)
+        expect_equal(r:setGridSlot(1, 1, "b"), true)
+        expect_equal(r:setGridSlot(2, 0, "c"), false) -- x == grid_width
+    end)
+end)
+
+-- ── Ingredient tag precedence ────────────────────────────────────────────
+
+-- @description Tests ingredient tag vs item_type precedence behavior.
+describe("Ingredient tag precedence", function()
+    -- @covers library.crafting.newIngredient
+    -- @description Verifies item-type ingredient has empty tag.
+    it("item-type ingredient has empty tag", function()
+        local ing = C.newIngredient("wood", 3)
+        expect_equal(ing.tag, "")
+        expect_equal(ing:isTag(), false)
+    end)
+
+    -- @description Verifies tag ingredient has empty item_type.
+    it("tag ingredient has empty item_type", function()
+        local ing = C.newIngredientTag("metal", 2)
+        expect_equal(ing.item_type, "")
+        expect_equal(ing:isTag(), true)
+    end)
+
+    -- @description When both are set manually, isTag() returns true (tag takes precedence).
+    it("tag takes precedence when both set", function()
+        local ing = C.newIngredient("wood", 1)
+        ing.tag = "organic"  -- manually set both
+        expect_equal(ing:isTag(), true) -- tag wins
+    end)
+
+    -- @description Verifies invalid quantity defaults to 1.
+    it("invalid quantity defaults to 1", function()
+        local ing = C.newIngredient("wood", -5)
+        expect_equal(ing.quantity, 1)
+        local ing2 = C.newIngredientTag("metal", 0)
+        expect_equal(ing2.quantity, 1)
+    end)
+end)
+
+-- ── CraftQueue auto-collect ──────────────────────────────────────────────
+
+-- @description Tests that CraftQueue:update() auto-removes completed jobs.
+describe("CraftQueue auto-collect", function()
+    -- @covers library.crafting.newCraftQueue
+    -- @description Verifies update() removes completed jobs automatically.
+    it("update auto-removes completed jobs from count", function()
+        local q = C.newCraftQueue(5)
+        q:enqueue("sword", 2, 1)
+        q:enqueue("shield", 10, 1)
+        -- Complete first job
+        q:update(3)
+        -- Only the in-progress job should remain
+        expect_equal(q:count(), 1)
+    end)
+
+    -- @description Verifies completed IDs are still available via collectCompleted().
+    it("collectCompleted still returns IDs after auto-remove", function()
+        local q = C.newCraftQueue(5)
+        local id = q:enqueue("sword", 2, 1)
+        q:update(3)
+        local done = q:collectCompleted()
+        expect_equal(#done, 1)
+        expect_equal(done[1], id)
+    end)
+
+    -- @description Verifies queue slot is freed after auto-remove.
+    it("queue slot freed after auto-remove", function()
+        local q = C.newCraftQueue(2)
+        q:enqueue("a", 1, 1)
+        q:enqueue("b", 1, 1)
+        expect_equal(q:isFull(), true)
+        q:update(2) -- complete both
+        expect_equal(q:isFull(), false)
+        -- Can enqueue again
+        local id3 = q:enqueue("c", 1, 1)
+        expect_equal(id3 ~= nil, true)
+    end)
+
+    -- @description Verifies getJob returns nil for completed and removed jobs.
+    it("getJob returns nil for completed jobs", function()
+        local q = C.newCraftQueue(5)
+        local id = q:enqueue("sword", 1, 1)
+        q:update(2)
+        expect_equal(q:getJob(id), nil)
+    end)
+end)
+
+-- ── Station fuel edge cases ──────────────────────────────────────────────
+
+-- @description Tests Station fuel validation for negative and invalid inputs.
+describe("Station fuel edge cases", function()
+    -- @covers library.crafting.newStation
+    -- @description Verifies addFuel ignores negative amounts.
+    it("addFuel ignores negative amounts", function()
+        local s = C.newStation("Forge", "forge")
+        s:addFuel(50)
+        local result = s:addFuel(-30)
+        expect_equal(s.fuel, 50) -- unchanged
+        expect_equal(result, 50)
+    end)
+
+    -- @description Verifies consumeFuel rejects negative amounts.
+    it("consumeFuel rejects negative amounts", function()
+        local s = C.newStation("Forge", "forge")
+        s:addFuel(50)
+        expect_equal(s:consumeFuel(-10), false)
+        expect_equal(s.fuel, 50) -- unchanged
+    end)
+
+    -- @description Verifies consumeFuel returns false for zero fuel.
+    it("consumeFuel fails gracefully at zero fuel", function()
+        local s = C.newStation("Forge", "forge")
+        expect_equal(s.fuel, 0)
+        expect_equal(s:consumeFuel(1), false)
+    end)
+
+    -- @description Verifies consuming exactly all fuel works.
+    it("consume exact fuel succeeds", function()
+        local s = C.newStation("Forge", "forge")
+        s:addFuel(50)
+        expect_equal(s:consumeFuel(50), true)
+        expect_equal(s.fuel, 0)
+    end)
+
+    -- @description Verifies addFuel with zero is harmless.
+    it("addFuel with zero is no-op", function()
+        local s = C.newStation("Forge", "forge")
+        s:addFuel(0)
+        expect_equal(s.fuel, 0)
+    end)
+end)
+
+-- ── RecipeOutput quantity validation ─────────────────────────────────────
+
+-- @description Tests that RecipeOutput constructors validate quantity.
+describe("RecipeOutput quantity validation", function()
+    -- @covers library.crafting.newRecipeOutput
+    -- @description Verifies invalid quantity defaults to 1.
+    it("negative quantity defaults to 1", function()
+        local o = C.newRecipeOutput("sword", -3)
+        expect_equal(o.quantity, 1)
+    end)
+
+    -- @description Verifies zero quantity defaults to 1.
+    it("zero quantity defaults to 1", function()
+        local o = C.newRecipeOutput("sword", 0)
+        expect_equal(o.quantity, 1)
+    end)
+end)
+
 test_summary()

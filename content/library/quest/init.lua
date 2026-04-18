@@ -2,6 +2,16 @@
 --
 -- A pure-Lua replacement for the former `lurek.quest` Rust binding.
 -- No engine dependencies; works in headless test VMs.
+-- Optional: uses `lurek.log.debug()` / `lurek.log.info()` when available for
+-- quest state-change tracing.
+--
+-- **Quest lifecycle states and valid transitions**:
+--
+--  available → active  (via Quest:start)
+--  active    → completed (via Quest:complete)
+--  active    → failed    (via Quest:fail)
+--
+-- All other transitions are rejected and return false.
 --
 -- Usage:
 --   local quest = require("library.quest")
@@ -19,6 +29,21 @@
 -- @module library.quest
 
 local M = {}
+
+-- ─── Optional logging (safe in headless tests where lurek may not exist) ──────
+local _log
+pcall(function()
+    _log = lurek and lurek.log
+end)
+local function log_debug(msg)
+    if _log and _log.debug then _log.debug("[quest] " .. msg) end
+end
+local function log_info(msg)
+    if _log and _log.info then _log.info("[quest] " .. msg) end
+end
+local function log_warn(msg)
+    if _log and _log.warn then _log.warn("[quest] " .. msg) end
+end
 
 -- ─── Objective ────────────────────────────────────────────────────────────────
 
@@ -48,16 +73,18 @@ end
 
 --- Advance progress by amount. Automatically marks the objective as "done"
 -- when current >= required. Does nothing if already done or failed.
--- @tparam number amount Amount to advance (default 1).
+-- @tparam number amount Amount to advance (default 1). Must be positive.
 -- @treturn number New progress value.
 function Objective:advance(amount)
     amount = amount or 1
+    assert(type(amount) == "number" and amount > 0, "amount must be a positive number")
     if self.status == "done" or self.status == "failed" then
         return self.current
     end
     self.current = math.min(self.current + amount, self.required)
     if self.current >= self.required then
         self.status = "done"
+        log_debug("objective '" .. self.id .. "' completed")
     else
         self.status = "active"
     end
@@ -67,6 +94,7 @@ end
 --- Set progress directly. Clamps to [0, required].
 -- @tparam number value New progress value.
 function Objective:setProgress(value)
+    assert(type(value) == "number", "value must be a number")
     self.current = math.min(math.max(value, 0), self.required)
     if self.current >= self.required then
         self.status = "done"
@@ -178,12 +206,19 @@ local Quest = {}
 Quest.__index = Quest
 
 --- Create a new quest in the "available" state.
--- @tparam string id Unique identifier.
--- @tparam string title Display title.
+--
+-- Valid status transitions: available → active → completed | failed.
+-- @tparam string id Unique identifier (non-empty).
+-- @tparam string title Display title (non-empty).
+-- @tparam[opt] number max_journal_entries Maximum journal entries to keep. nil = unlimited.
 -- @treturn Quest
-function M.newQuest(id, title)
-    assert(type(id) == "string", "id must be a string")
-    assert(type(title) == "string", "title must be a string")
+function M.newQuest(id, title, max_journal_entries)
+    assert(type(id) == "string" and #id > 0, "id must be a non-empty string")
+    assert(type(title) == "string" and #title > 0, "title must be a non-empty string")
+    if max_journal_entries ~= nil then
+        assert(type(max_journal_entries) == "number" and max_journal_entries >= 1,
+               "max_journal_entries must be a positive integer or nil")
+    end
     local self = setmetatable({}, Quest)
     self.id = id
     self.title = title
@@ -196,6 +231,7 @@ function M.newQuest(id, title)
     self.visible = true
     self.reward = ""
     self._journal_counter = 0
+    self._max_journal = max_journal_entries
     return self
 end
 
@@ -226,6 +262,7 @@ end
 function Quest:nextStage()
     if self.current_stage < #self.stages then
         self.current_stage = self.current_stage + 1
+        log_debug("quest '" .. self.id .. "' advanced to stage " .. self.current_stage)
         return true
     end
     return false
@@ -244,19 +281,27 @@ function Quest:gotoStage(id)
     return false
 end
 
---- Advance progress on an objective across all stages.
--- Returns false if objective not found.
+--- Advance progress on an objective in the current stage (or a specific stage).
+-- Returns false if objective not found in the target stage.
 -- @tparam string obj_id Objective id.
--- @tparam number amount Amount to advance (default 1).
+-- @tparam[opt=1] number amount Amount to advance (default 1).
+-- @tparam[opt] string stage_id If provided, search this stage instead of the current one.
 -- @treturn boolean
-function Quest:advanceObjective(obj_id, amount)
+function Quest:advanceObjective(obj_id, amount, stage_id)
     amount = amount or 1
-    for _, stage in ipairs(self.stages) do
-        local obj = stage:getObjective(obj_id)
-        if obj then
-            obj:advance(amount)
-            return true
-        end
+    assert(type(obj_id) == "string" and #obj_id > 0, "obj_id must be a non-empty string")
+    local stage
+    if stage_id then
+        assert(type(stage_id) == "string", "stage_id must be a string")
+        stage = self:getStage(stage_id)
+    else
+        stage = self:getCurrentStage()
+    end
+    if not stage then return false end
+    local obj = stage:getObjective(obj_id)
+    if obj then
+        obj:advance(amount)
+        return true
     end
     return false
 end
@@ -277,27 +322,49 @@ function Quest:setObjectiveStatus(obj_id, status)
 end
 
 --- Start the quest (transition from "available" to "active").
+-- @treturn boolean true if the transition was valid.
 function Quest:start()
-    if self.status == "available" then
-        self.status = "active"
+    if self.status ~= "available" then
+        log_warn("cannot start quest '" .. self.id .. "' from status '" .. self.status .. "'")
+        return false
     end
+    self.status = "active"
+    log_info("quest '" .. self.id .. "' started")
+    return true
 end
 
---- Mark the quest as completed.
+--- Mark the quest as completed (transition from "active" to "completed").
+-- @treturn boolean true if the transition was valid.
 function Quest:complete()
+    if self.status ~= "active" then
+        log_warn("cannot complete quest '" .. self.id .. "' from status '" .. self.status .. "'")
+        return false
+    end
     self.status = "completed"
+    log_info("quest '" .. self.id .. "' completed")
+    return true
 end
 
---- Mark the quest as failed.
+--- Mark the quest as failed (transition from "active" to "failed").
+-- @treturn boolean true if the transition was valid.
 function Quest:fail()
+    if self.status ~= "active" then
+        log_warn("cannot fail quest '" .. self.id .. "' from status '" .. self.status .. "'")
+        return false
+    end
     self.status = "failed"
+    log_info("quest '" .. self.id .. "' failed")
+    return true
 end
 
 --- Append a journal entry. Returns the entry's index.
+-- If `max_journal_entries` was set on the quest, the oldest entries are
+-- removed to stay within the limit.
 -- @tparam string text Journal text body.
--- @tparam string tag Optional tag (default "").
+-- @tparam[opt=""] string tag Optional tag.
 -- @treturn number Entry index.
 function Quest:addJournalEntry(text, tag)
+    assert(type(text) == "string", "text must be a string")
     tag = tag or ""
     local idx = self._journal_counter
     table.insert(self.journal, {
@@ -306,6 +373,13 @@ function Quest:addJournalEntry(text, tag)
         tag = tag,
     })
     self._journal_counter = self._journal_counter + 1
+    -- Purge oldest entries if a cap is configured.
+    if self._max_journal and #self.journal > self._max_journal then
+        while #self.journal > self._max_journal do
+            table.remove(self.journal, 1)
+        end
+        log_debug("journal trimmed for quest '" .. self.id .. "' (max " .. self._max_journal .. ")")
+    end
     return idx
 end
 
@@ -324,6 +398,7 @@ function Quest:getMeta(key)
 end
 
 --- Returns percentage of mandatory objectives that are Done across all stages (0.0-100.0).
+-- Returns 0.0 when there are no mandatory objectives.
 -- @treturn number Completion percent.
 function Quest:completionPercent()
     local total = 0
@@ -338,7 +413,7 @@ function Quest:completionPercent()
             end
         end
     end
-    if total == 0 then return 100.0 end
+    if total == 0 then return 0.0 end
     return done / total * 100.0
 end
 
@@ -462,38 +537,35 @@ function QuestLog:questCount()
     return n
 end
 
---- Start quest by id (available -> active). Returns false if not found.
+--- Start quest by id (available -> active). Returns false if not found or invalid transition.
 -- @tparam string id Quest id.
 -- @treturn boolean
 function QuestLog:startQuest(id)
     local q = self._quests[id]
     if q then
-        q:start()
-        return true
+        return q:start()
     end
     return false
 end
 
---- Complete quest by id. Returns false if not found.
+--- Complete quest by id (active -> completed). Returns false if not found or invalid transition.
 -- @tparam string id Quest id.
 -- @treturn boolean
 function QuestLog:completeQuest(id)
     local q = self._quests[id]
     if q then
-        q:complete()
-        return true
+        return q:complete()
     end
     return false
 end
 
---- Fail quest by id. Returns false if not found.
+--- Fail quest by id (active -> failed). Returns false if not found or invalid transition.
 -- @tparam string id Quest id.
 -- @treturn boolean
 function QuestLog:failQuest(id)
     local q = self._quests[id]
     if q then
-        q:fail()
-        return true
+        return q:fail()
     end
     return false
 end
@@ -519,13 +591,14 @@ end
 --- Advance an objective in a specific quest. Returns false if quest or objective not found.
 -- @tparam string quest_id Quest id.
 -- @tparam string obj_id Objective id.
--- @tparam number amount Amount to advance (default 1).
+-- @tparam[opt=1] number amount Amount to advance (default 1).
+-- @tparam[opt] string stage_id If provided, advance in this stage instead of the current one.
 -- @treturn boolean
-function QuestLog:advanceObjective(quest_id, obj_id, amount)
+function QuestLog:advanceObjective(quest_id, obj_id, amount, stage_id)
     amount = amount or 1
     local q = self._quests[quest_id]
     if q then
-        return q:advanceObjective(obj_id, amount)
+        return q:advanceObjective(obj_id, amount, stage_id)
     end
     return false
 end

@@ -1,6 +1,0 @@
-# Province Map Demo — conf.toml
-
-[window]
-title = "Province Map Demo — Lurek2D"
-width = 1024
-height = 768

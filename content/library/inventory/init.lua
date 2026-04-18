@@ -16,6 +16,15 @@
 
 local M = {}
 
+--- Optional engine logger. Uses lurek.log when running inside the engine,
+-- silently no-ops in standalone Lua.
+local _log
+if lurek and lurek.log then
+    _log = lurek.log
+end
+local function _info(msg)  if _log then _log.info(msg) end end
+local function _warn(msg)  if _log then _log.warn(msg) end end
+
 -- ─── SlotState ────────────────────────────────────────────────────────────────
 
 --- Slot state constants.
@@ -28,9 +37,10 @@ M.SlotState = { Active = "active", Passive = "passive", Idle = "idle" }
 
 --- Create a lightweight inventory item definition.
 -- Each item has a type, weight, size, stack limit, tag set, and a property map.
--- @param type_name string Item type identifier (e.g. "sword").
+-- @tparam string type_name Item type identifier (e.g. "sword").
 -- @treturn table InvItem object.
 function M.newItem(type_name)
+    assert(type(type_name) == "string" and type_name ~= "", "newItem: type_name must be a non-empty string")
     local _weight      = 0.0
     local _size_w      = 1
     local _size_h      = 1
@@ -48,9 +58,13 @@ function M.newItem(type_name)
     -- @treturn number
     function item:getWeight()     return _weight end
 
-    --- Set physical weight.
-    -- @param w number
-    function item:setWeight(w)    _weight = w or 0.0 end
+    --- Set physical weight (must be non-negative).
+    -- @tparam number w Weight value.
+    function item:setWeight(w)
+        w = w or 0.0
+        assert(type(w) == "number" and w >= 0, "setWeight: weight must be a non-negative number")
+        _weight = w
+    end
 
     --- Return grid width.
     -- @treturn number
@@ -60,30 +74,36 @@ function M.newItem(type_name)
     -- @treturn number
     function item:getSizeH()      return _size_h end
 
-    --- Set grid size.
-    -- @param w number Width.
-    -- @param h number Height.
-    function item:setSize(w, h)   _size_w = w or 1; _size_h = h or 1 end
+    --- Set grid size (both dimensions clamped to >= 1).
+    -- @tparam number w Width.
+    -- @tparam number h Height.
+    function item:setSize(w, h)
+        _size_w = math.max(1, w or 1)
+        _size_h = math.max(1, h or 1)
+    end
 
     --- Return maximum items per stack.
     -- @treturn number
     function item:getStackLimit() return _stack_limit end
 
-    --- Set maximum stack size.
-    -- @param n number
+    --- Set maximum stack size (clamped to >= 1).
+    -- @tparam number n Maximum stack count.
     function item:setStackLimit(n) _stack_limit = math.max(1, n or 1) end
 
     --- Return true if the item has the given tag.
-    -- @param tag string
+    -- @tparam string tag Tag name.
     -- @treturn boolean
     function item:hasTag(tag)     return _tags[tag] == true end
 
     --- Add a tag (no-op if already present).
-    -- @param tag string
-    function item:addTag(tag)     _tags[tag] = true end
+    -- @tparam string tag Tag name to add.
+    function item:addTag(tag)
+        assert(type(tag) == "string" and tag ~= "", "addTag: tag must be a non-empty string")
+        _tags[tag] = true
+    end
 
     --- Remove a tag. Returns true if tag existed.
-    -- @param tag string
+    -- @tparam string tag Tag name to remove.
     -- @treturn boolean
     function item:removeTag(tag)
         if _tags[tag] then _tags[tag] = nil; return true end
@@ -100,12 +120,12 @@ function M.newItem(type_name)
     end
 
     --- Set a generic property.
-    -- @param key string
-    -- @param val any
+    -- @tparam string key Property key.
+    -- @param val any Property value.
     function item:setProperty(key, val) _props[key] = val end
 
     --- Get a generic property.
-    -- @param key string
+    -- @tparam string key Property key.
     -- @treturn any
     function item:getProperty(key) return _props[key] end
 
@@ -127,14 +147,17 @@ end
 -- ─── ItemStack ────────────────────────────────────────────────────────────────
 
 --- Create a counted stack of a single item type.
--- @param inv_item table InvItem definition.
--- @param quantity number Initial count.
--- @param max_quantity number Maximum stack size (clamped to >= 1).
+-- @tparam table inv_item InvItem definition.
+-- @tparam number quantity Initial count (clamped to 0..max).
+-- @tparam number max_quantity Maximum stack size (clamped to >= 1).
 -- @treturn table ItemStack object.
 function M.newItemStack(inv_item, quantity, max_quantity)
+    assert(inv_item ~= nil, "newItemStack: inv_item must not be nil")
+    quantity = quantity or 1
+    assert(type(quantity) == "number" and quantity >= 0, "newItemStack: quantity must be a non-negative number")
     local _item  = inv_item
     local _max   = math.max(1, max_quantity or inv_item:getStackLimit())
-    local _qty   = math.min(quantity or 1, _max)
+    local _qty   = math.min(quantity, _max)
 
     local stack = {}
 
@@ -147,7 +170,7 @@ function M.newItemStack(inv_item, quantity, max_quantity)
     function stack:getQuantity()    return _qty end
 
     --- Directly set quantity (clamped 0..max).
-    -- @param n number
+    -- @tparam number n New quantity.
     function stack:setQuantity(n)   _qty = math.max(0, math.min(n, _max)) end
 
     --- Return max quantity.
@@ -163,9 +186,10 @@ function M.newItemStack(inv_item, quantity, max_quantity)
     function stack:isEmpty()        return _qty == 0 end
 
     --- Add n items. Returns overflow (items that did not fit).
-    -- @param n number
+    -- @tparam number n Items to add.
     -- @treturn number overflow count
     function stack:add(n)
+        assert(type(n) == "number" and n >= 0, "ItemStack:add: n must be non-negative")
         local space = _max - _qty
         local added = math.min(n, space)
         _qty = _qty + added
@@ -173,16 +197,17 @@ function M.newItemStack(inv_item, quantity, max_quantity)
     end
 
     --- Remove n items. Returns count actually removed.
-    -- @param n number
+    -- @tparam number n Items to remove.
     -- @treturn number
     function stack:remove(n)
+        assert(type(n) == "number" and n >= 0, "ItemStack:remove: n must be non-negative")
         local taken = math.min(n, _qty)
         _qty = _qty - taken
         return taken
     end
 
     --- Split n items off into a new stack. Returns nil if n invalid.
-    -- @param n number
+    -- @tparam number n Items to split off.
     -- @treturn table|nil new ItemStack
     function stack:split(n)
         if n <= 0 or n > _qty then return nil end
@@ -191,7 +216,7 @@ function M.newItemStack(inv_item, quantity, max_quantity)
     end
 
     --- Merge another stack into this one. Returns leftover count.
-    -- @param other table ItemStack
+    -- @tparam table other ItemStack to merge from.
     -- @treturn number
     function stack:merge(other)
         local leftover = self:add(other:getQuantity())
@@ -205,12 +230,13 @@ end
 -- ─── Slot ─────────────────────────────────────────────────────────────────────
 
 --- Create a single inventory slot (holds one ItemStack).
--- @param slot_type string Filter type ("any" = accept all).
--- @param state string SlotState value.
+-- @tparam string slot_type Filter type ("any" = accept all).
+-- @tparam string state SlotState value.
 -- @treturn table Slot object.
 function M.newSlot(slot_type, state)
     local _type  = slot_type or "any"
     local _state = state or M.SlotState.Active
+    assert(type(_type) == "string", "newSlot: slot_type must be a string")
     local _stack = nil   -- ItemStack or nil
     local _cap_w = 1
     local _cap_h = 1
@@ -226,7 +252,7 @@ function M.newSlot(slot_type, state)
     function slot:getState()      return _state end
 
     --- Set state.
-    -- @param s string SlotState constant
+    -- @tparam string s SlotState constant.
     function slot:setState(s)     _state = s end
 
     --- Return true if no item is held.
@@ -244,7 +270,9 @@ function M.newSlot(slot_type, state)
     end
 
     --- Return true if the item fits size constraints and type filter.
-    -- @param item table InvItem
+    -- Items are accepted if the slot type is "any", or the item type matches
+    -- the slot type, or the item carries a tag matching the slot type.
+    -- @tparam table item InvItem to test.
     -- @treturn boolean
     function slot:canAccept(item)
         if _type ~= "any" and _type ~= item:getType() and not item:hasTag(_type) then
@@ -254,7 +282,7 @@ function M.newSlot(slot_type, state)
     end
 
     --- Place an ItemStack. Returns false if item not accepted.
-    -- @param s table ItemStack
+    -- @tparam table s ItemStack to place.
     -- @treturn boolean
     function slot:setStack(s)
         if not self:canAccept(s:getItem()) then return false end
@@ -277,16 +305,26 @@ end
 -- ─── Container ────────────────────────────────────────────────────────────────
 
 --- Create a named container managing a list of slots.
--- @param name string Container identifier.
--- @param mode string "fixed" | "unlimited" | "expandable"
--- @param slot_count number Initial number of slots (ignored for unlimited).
+-- For expandable mode, `max_slots` caps how far `expand()` can grow.
+-- @tparam string name Container identifier.
+-- @tparam string mode "fixed" | "unlimited" | "expandable".
+-- @tparam number slot_count Initial number of slots (ignored for unlimited).
+-- @tparam[opt] number max_slots Upper slot cap for expandable mode (defaults to slot_count).
 -- @treturn table Container object.
-function M.newContainer(name, mode, slot_count)
+function M.newContainer(name, mode, slot_count, max_slots)
     mode = mode or "unlimited"
-    slot_count = slot_count or 0
+    assert(mode == "fixed" or mode == "unlimited" or mode == "expandable",
+        "newContainer: mode must be 'fixed', 'unlimited', or 'expandable'")
+    slot_count = math.max(0, slot_count or 0)
     local _slots      = {}
     local _wt_limit   = 0.0   -- 0 = unlimited
-    local _max_slots  = (mode == "fixed") and slot_count or 0
+    local _max_slots  = 0
+    if mode == "fixed" then
+        _max_slots = slot_count
+    elseif mode == "expandable" then
+        _max_slots = math.max(slot_count, max_slots or slot_count)
+    end
+    -- 0 for unlimited means unbounded
 
     -- seed initial slots
     for i = 1, slot_count do
@@ -311,9 +349,13 @@ function M.newContainer(name, mode, slot_count)
     -- @treturn number
     function container:getCapacity()   return _max_slots end
 
-    --- Set weight limit. 0 = unlimited.
-    -- @param w number
-    function container:setWeightLimit(w) _wt_limit = w or 0.0 end
+    --- Set weight limit (must be non-negative). 0 = unlimited.
+    -- @tparam number w Weight limit.
+    function container:setWeightLimit(w)
+        w = w or 0.0
+        assert(type(w) == "number" and w >= 0, "setWeightLimit: value must be non-negative")
+        _wt_limit = w
+    end
 
     --- Return weight limit. 0 = unlimited.
     -- @treturn number
@@ -350,7 +392,7 @@ function M.newContainer(name, mode, slot_count)
     end
 
     --- Get a slot by 1-based index.
-    -- @param idx number 1-based
+    -- @tparam number idx 1-based slot index.
     -- @treturn table|nil
     function container:getSlot(idx)    return _slots[idx] end
 
@@ -363,14 +405,24 @@ function M.newContainer(name, mode, slot_count)
     end
 
     --- Add slot (respects mode limits).
-    -- @param sl table Slot object
+    -- @tparam table sl Slot object.
     function container:addSlot(sl)
         if mode == "fixed" and #_slots >= _max_slots then return end
+        if mode == "expandable" and _max_slots > 0 and #_slots >= _max_slots then return end
         table.insert(_slots, sl)
     end
 
+    --- Set the upper slot capacity (expandable mode only).
+    -- Clamped so it cannot be less than the current slot count.
+    -- @tparam number n New maximum slot count.
+    function container:setCapacity(n)
+        if mode ~= "expandable" then return end
+        _max_slots = math.max(#_slots, n or 0)
+    end
+
     --- Expand by n new empty slots (expandable mode only). Returns true if any added.
-    -- @param n number
+    -- Respects the max-slot capacity; stops adding once the limit is reached.
+    -- @tparam number n Number of slots to add.
     -- @treturn boolean
     function container:expand(n)
         if mode ~= "expandable" then return false end
@@ -383,15 +435,17 @@ function M.newContainer(name, mode, slot_count)
         return added > 0
     end
 
-    --- Auto-place item quantity. Merges into existing stacks first, then fills empty slots.
-    -- @param inv_item table InvItem
-    -- @param quantity number
-    -- @treturn boolean true if fully placed
+    --- Auto-place item quantity. Merges into ALL existing matching stacks first,
+    -- then fills empty slots. For unlimited containers, auto-grows as needed.
+    -- @tparam table inv_item InvItem definition.
+    -- @tparam number quantity Number of items to add (must be > 0).
+    -- @treturn boolean true if fully placed.
     function container:addItem(inv_item, quantity)
         quantity = quantity or 1
+        assert(type(quantity) == "number" and quantity > 0, "addItem: quantity must be a positive number")
         local remaining = quantity
 
-        -- merge into existing stacks
+        -- merge into ALL existing matching stacks (not just the first)
         for _, sl in ipairs(_slots) do
             if remaining == 0 then break end
             local st = sl:getStack()
@@ -421,15 +475,17 @@ function M.newContainer(name, mode, slot_count)
                     new_sl:setStack(M.newItemStack(inv_item, to_place, limit))
                     remaining = remaining - to_place
                 else
+                    _warn("addItem: could not place " .. remaining .. "x " .. inv_item:getType() .. " in '" .. name .. "'")
                     return false
                 end
             end
         end
+        _info("addItem: placed " .. quantity .. "x " .. inv_item:getType() .. " in '" .. name .. "'")
         return true
     end
 
     --- Count all items of a given type across all slots.
-    -- @param type_name string
+    -- @tparam string type_name Item type to count.
     -- @treturn number
     function container:countItem(type_name)
         local total = 0
@@ -443,19 +499,20 @@ function M.newContainer(name, mode, slot_count)
     end
 
     --- Return true if >= qty of type_name present.
-    -- @param type_name string
-    -- @param qty number
+    -- @tparam string type_name Item type.
+    -- @tparam number qty Required count.
     -- @treturn boolean
     function container:hasItem(type_name, qty)
         return self:countItem(type_name) >= (qty or 1)
     end
 
     --- Remove up to qty items of type_name. Returns count removed.
-    -- @param type_name string
-    -- @param qty number
+    -- @tparam string type_name Item type to remove.
+    -- @tparam number qty Maximum items to remove.
     -- @treturn number
     function container:removeItem(type_name, qty)
         qty = qty or 1
+        assert(type(qty) == "number" and qty > 0, "removeItem: qty must be a positive number")
         local remaining = qty
         for _, sl in ipairs(_slots) do
             if remaining == 0 then break end
@@ -466,12 +523,16 @@ function M.newContainer(name, mode, slot_count)
                 if st:isEmpty() then sl:clear() end
             end
         end
-        return qty - remaining
+        local removed = qty - remaining
+        if removed > 0 then
+            _info("removeItem: removed " .. removed .. "x " .. type_name .. " from '" .. name .. "'")
+        end
+        return removed
     end
 
     --- Return all items with the given tag.
-    -- @param tag string
-    -- @treturn table Array of InvItem
+    -- @tparam string tag Tag to filter by.
+    -- @treturn table Array of InvItem.
     function container:findByTag(tag)
         local out = {}
         for _, sl in ipairs(_slots) do
@@ -500,7 +561,7 @@ function M.newContainer(name, mode, slot_count)
 
 
     --- Remove the slot at a 1-based index. Shifts subsequent slots down.
-    -- @param idx number 1-based slot index.
+    -- @tparam number idx 1-based slot index.
     -- @treturn boolean true if the slot was removed, false if out of range.
     function container:removeSlot(idx)
         if idx < 1 or idx > #_slots then return false end
@@ -515,7 +576,7 @@ end
 
 --- Create a named item set (bonus condition).
 -- All requirements must be satisfied simultaneously for the set to be active.
--- @param name string Display name.
+-- @tparam string name Display name.
 -- @treturn table ItemSet object.
 function M.newItemSet(name)
     local _reqs = {}  -- { tag, slot_filter } list
@@ -527,8 +588,8 @@ function M.newItemSet(name)
     function iset:getName()             return name end
 
     --- Add a requirement: at least one equip slot must hold an item with `tag`.
-    -- @param tag string Required tag.
-    -- @param slot_filter string Check only this slot name, or "" for any.
+    -- @tparam string tag Required tag.
+    -- @tparam string slot_filter Check only this slot name, or "" for any.
     function iset:addRequirement(tag, slot_filter)
         table.insert(_reqs, { tag = tag, slot_filter = slot_filter or "" })
     end
@@ -542,7 +603,7 @@ function M.newItemSet(name)
     end
 
     --- Check if all requirements are satisfied given an equip_slots table {name -> Slot}.
-    -- @param equip_slots table
+    -- @tparam table equip_slots Map of slot name to Slot.
     -- @treturn boolean
     function iset:isSatisfied(equip_slots)
         for _, req in ipairs(_reqs) do
@@ -578,20 +639,20 @@ function M.newInventory()
     -- ── Containers ──────────────────────────────────────────────────────────
 
     --- Register a container. Replaces any existing container with the same name.
-    -- @param name string
-    -- @param container table Container object
+    -- @tparam string name Container name.
+    -- @tparam table container Container object.
     function inv:addContainer(name, container)
         if not _containers[name] then table.insert(_cont_order, name) end
         _containers[name] = container
     end
 
     --- Get a container by name.
-    -- @param name string
+    -- @tparam string name Container name.
     -- @treturn table|nil
     function inv:getContainer(name)  return _containers[name] end
 
     --- Remove a container. Returns true if it existed.
-    -- @param name string
+    -- @tparam string name Container name.
     -- @treturn boolean
     function inv:removeContainer(name)
         if not _containers[name] then return false end
@@ -613,20 +674,20 @@ function M.newInventory()
     -- ── Equip Slots ─────────────────────────────────────────────────────────
 
     --- Add or replace a named equip slot.
-    -- @param name string
-    -- @param slot table Slot object
+    -- @tparam string name Slot name.
+    -- @tparam table slot Slot object.
     function inv:addEquipSlot(name, slot)
         if not _equip_slots[name] then table.insert(_equip_order, name) end
         _equip_slots[name] = slot
     end
 
     --- Get an equip slot by name.
-    -- @param name string
+    -- @tparam string name Slot name.
     -- @treturn table|nil
     function inv:getEquipSlot(name)  return _equip_slots[name] end
 
     --- Remove an equip slot. Returns true if it existed.
-    -- @param name string
+    -- @tparam string name Slot name.
     -- @treturn boolean
     function inv:removeEquipSlot(name)
         if not _equip_slots[name] then return false end
@@ -646,29 +707,36 @@ function M.newInventory()
     end
 
     --- Equip an ItemStack into the named slot. Returns false if slot missing or item rejected.
-    -- @param slot_name string
-    -- @param stack table ItemStack
+    -- @tparam string slot_name Equip slot name.
+    -- @tparam table stack ItemStack to equip.
     -- @treturn boolean
     function inv:equip(slot_name, stack)
         local sl = _equip_slots[slot_name]
         if not sl then return false end
-        return sl:setStack(stack)
+        local ok = sl:setStack(stack)
+        if ok then
+            _info("equip: " .. stack:getItem():getType() .. " -> '" .. slot_name .. "'")
+        end
+        return ok
     end
 
     --- Unequip a slot and return its InvItem (not the full stack). Returns nil if empty.
-    -- @param slot_name string
+    -- @tparam string slot_name Equip slot name.
     -- @treturn table|nil InvItem
     function inv:unequip(slot_name)
         local sl = _equip_slots[slot_name]
         if not sl then return nil end
         local st = sl:takeStack()
+        if st then
+            _info("unequip: " .. st:getItem():getType() .. " <- '" .. slot_name .. "'")
+        end
         return st and st:getItem() or nil
     end
 
     -- ── Item Sets ────────────────────────────────────────────────────────────
 
     --- Register an item set.
-    -- @param iset table ItemSet object
+    -- @tparam table iset ItemSet object.
     function inv:addItemSet(iset)   table.insert(_item_sets, iset) end
 
     --- Return all registered item sets.
@@ -692,26 +760,26 @@ function M.newInventory()
     -- ── Subsystems ───────────────────────────────────────────────────────────
 
     --- Enable a named subsystem ("weight", "size", "stacking", "sets").
-    -- @param name string
+    -- @tparam string name Subsystem name.
     function inv:enableSubsystem(name)
         if _subsystems[name] ~= nil then _subsystems[name] = true end
     end
 
     --- Disable a named subsystem.
-    -- @param name string
+    -- @tparam string name Subsystem name.
     function inv:disableSubsystem(name)
         if _subsystems[name] ~= nil then _subsystems[name] = false end
     end
 
     --- Return true if the named subsystem is active.
-    -- @param name string
+    -- @tparam string name Subsystem name.
     -- @treturn boolean
     function inv:isSubsystemEnabled(name) return _subsystems[name] == true end
 
     -- ── Cross-container queries ───────────────────────────────────────────────
 
     --- Count items of a type across ALL containers.
-    -- @param type_name string
+    -- @tparam string type_name Item type.
     -- @treturn number
     function inv:countItem(type_name)
         local total = 0
@@ -722,17 +790,17 @@ function M.newInventory()
     end
 
     --- Return true if total count >= qty across all containers.
-    -- @param type_name string
-    -- @param qty number
+    -- @tparam string type_name Item type.
+    -- @tparam number qty Required count.
     -- @treturn boolean
     function inv:hasItem(type_name, qty)
         return self:countItem(type_name) >= (qty or 1)
     end
 
     --- Remove qty items of type_name from whichever containers have them.
-    -- @param type_name string
-    -- @param qty number
-    -- @treturn boolean true if full amount removed
+    -- @tparam string type_name Item type.
+    -- @tparam number qty Items to remove.
+    -- @treturn boolean true if full amount removed.
     function inv:removeFromAny(type_name, qty)
         if not self:hasItem(type_name, qty) then return false end
         local remaining = qty
@@ -749,11 +817,11 @@ function M.newInventory()
     end
 
     --- Transfer a stack from one container slot to another (1-based indices).
-    -- @param from_name string Source container name.
-    -- @param from_idx number Source slot index (1-based).
-    -- @param to_name string Destination container name.
-    -- @param to_idx number Destination slot index (1-based).
-    -- @treturn boolean true on success
+    -- @tparam string from_name Source container name.
+    -- @tparam number from_idx Source slot index (1-based).
+    -- @tparam string to_name Destination container name.
+    -- @tparam number to_idx Destination slot index (1-based).
+    -- @treturn boolean true on success.
     function inv:transfer(from_name, from_idx, to_name, to_idx)
         local fc = _containers[from_name]
         local tc = _containers[to_name]
@@ -777,9 +845,9 @@ function M.newInventory()
     --- Split `quantity` items from the stack at `slot_idx` in `container_name`
     -- into the first empty compatible slot in the same container.
     -- Returns true if the split succeeded.
-    -- @param container_name string Container name.
-    -- @param slot_idx number 1-based slot index of the source stack.
-    -- @param quantity number Number of items to split off.
+    -- @tparam string container_name Container name.
+    -- @tparam number slot_idx 1-based slot index of the source stack.
+    -- @tparam number quantity Number of items to split off.
     -- @treturn boolean
     function inv:splitStack(container_name, slot_idx, quantity)
         local c = _containers[container_name]
@@ -807,9 +875,9 @@ function M.newInventory()
     --- Merge the stack at `from_slot` into `to_slot` within `container_name`.
     -- If the destination is empty, the source stack is moved into it.
     -- Returns true if any items were merged or moved.
-    -- @param container_name string Container name.
-    -- @param from_slot number 1-based source slot index.
-    -- @param to_slot number 1-based destination slot index.
+    -- @tparam string container_name Container name.
+    -- @tparam number from_slot 1-based source slot index.
+    -- @tparam number to_slot 1-based destination slot index.
     -- @treturn boolean
     function inv:mergeStacks(container_name, from_slot, to_slot)
         local c = _containers[container_name]
@@ -836,10 +904,10 @@ function M.newInventory()
 
     --- Swap items between two container slots (may be in different containers).
     -- Returns true on success.
-    -- @param container_a string First container name.
-    -- @param slot_a number 1-based slot index in container_a.
-    -- @param container_b string Second container name.
-    -- @param slot_b number 1-based slot index in container_b.
+    -- @tparam string container_a First container name.
+    -- @tparam number slot_a 1-based slot index in container_a.
+    -- @tparam string container_b Second container name.
+    -- @tparam number slot_b 1-based slot index in container_b.
     -- @treturn boolean
     function inv:swap(container_a, slot_a, container_b, slot_b)
         local ca = _containers[container_a]

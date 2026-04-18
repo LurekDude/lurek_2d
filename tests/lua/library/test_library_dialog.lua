@@ -596,4 +596,203 @@ describe("done event", function()
         expect_equal(fired, true)
     end)
 end)
+
+-- ——— bug fixes ————————————————————————————————————————————————————————————
+
+describe("bug fixes", function()
+
+    describe("jump loop detection", function()
+        -- @covers library.dialog.newSequencer
+        -- @description A direct self-referencing jump label should hit the loop guard and force done.
+        it("direct self-jump loop forces done", function()
+            local seq = dialog.newSequencer()
+            local done_fired = false
+            seq:on("done", function() done_fired = true end)
+            seq:load({
+                { type = "jump", target = "loop", label = "loop" },
+            })
+            seq:start()
+            expect_equal(seq:getState(), "done")
+            expect_equal(done_fired, true)
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description An A->B->A mutual jump cycle should be caught by the 100-jump guard.
+        it("stops infinite A->B->A loop and forces done", function()
+            local seq = dialog.newSequencer()
+            local done_fired = false
+            seq:on("done", function() done_fired = true end)
+            seq:load({
+                { type = "say", speaker = "X", text = "start", label = "A" },
+                { type = "jump", target = "B" },
+                { type = "say", speaker = "Y", text = "mid", label = "B" },
+                { type = "jump", target = "A" },
+            })
+            seq:start()
+            -- First say node executes normally
+            expect_equal(seq:getState(), "typing")
+            -- Advance through the loop until guard kicks in
+            local safety = 0
+            while seq:isActive() and safety < 300 do
+                if seq:getState() == "typing" then
+                    seq:update(10)
+                end
+                if seq:getState() == "waiting" then
+                    seq:advance()
+                end
+                safety = safety + 1
+            end
+            expect_equal(seq:getState(), "done")
+            expect_equal(done_fired, true)
+        end)
+    end)
+
+    describe("choice index validation", function()
+        -- @covers library.dialog.newSequencer
+        -- @description Non-number choice index should raise an error.
+        it("errors on non-number index", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "choice", text = "Pick", options = {
+                    { label = "A", branch = {} },
+                }},
+            })
+            seq:start()
+            expect_equal(seq:getState(), "choice")
+            expect_error(function() seq:choose("bad") end)
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Index 0 is below the valid 1-based range and should error.
+        it("errors on index below 1", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "choice", text = "Pick", options = {
+                    { label = "A", branch = {} },
+                }},
+            })
+            seq:start()
+            expect_error(function() seq:choose(0) end)
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Index above the option count should error.
+        it("errors on index above option count", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "choice", text = "Pick", options = {
+                    { label = "A", branch = {} },
+                    { label = "B", branch = {} },
+                }},
+            })
+            seq:start()
+            expect_error(function() seq:choose(3) end)
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description choose() outside choice state should be silently ignored.
+        it("ignores choose when not in choice state", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "say", speaker = "A", text = "Hello" },
+            })
+            seq:start()
+            seq:choose(1)
+            expect_equal(seq:getState(), "typing")
+        end)
+    end)
+
+    describe("dt validation", function()
+        -- @covers library.dialog.newSequencer
+        -- @description Negative dt should not advance text reveal.
+        it("clamps negative dt to no-op", function()
+            local seq = dialog.newSequencer()
+            seq:setSpeed(100)
+            seq:load({
+                { type = "say", speaker = "A", text = "Hello" },
+            })
+            seq:start()
+            seq:update(-1.0)
+            expect_equal(seq:revealedText(), "")
+            expect_equal(seq:getState(), "typing")
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Zero dt should not advance text reveal.
+        it("clamps zero dt to no-op", function()
+            local seq = dialog.newSequencer()
+            seq:setSpeed(100)
+            seq:load({
+                { type = "say", speaker = "A", text = "Hello" },
+            })
+            seq:start()
+            seq:update(0)
+            expect_equal(seq:revealedText(), "")
+            expect_equal(seq:getState(), "typing")
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Non-number dt should raise an error.
+        it("errors on non-number dt", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "say", speaker = "A", text = "Hello" },
+            })
+            seq:start()
+            expect_error(function() seq:update("bad") end)
+            expect_error(function() seq:update(nil) end)
+        end)
+    end)
+
+    describe("load validation", function()
+        -- @covers library.dialog.newSequencer
+        -- @description nil argument to load should be treated as empty script.
+        it("treats nil as empty script", function()
+            local seq = dialog.newSequencer()
+            seq:load(nil)
+            seq:start()
+            expect_equal(seq:getState(), "done")
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Non-table argument to load should raise an error.
+        it("errors on non-table argument", function()
+            local seq = dialog.newSequencer()
+            expect_error(function() seq:load("bad") end)
+            expect_error(function() seq:load(42) end)
+        end)
+    end)
+
+    describe("cond error recovery", function()
+        -- @covers library.dialog.newSequencer
+        -- @description A cond() that throws should be caught by pcall and the node skipped.
+        it("skips node when cond() throws an error", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "say", speaker = "A", text = "skipped",
+                  cond = function() error("boom") end },
+                { type = "say", speaker = "B", text = "shown" },
+            })
+            seq:start()
+            expect_equal(seq:currentSpeaker(), "B")
+            expect_equal(seq:currentText(), "shown")
+        end)
+
+        -- @covers library.dialog.newSequencer
+        -- @description Multiple consecutive cond() errors should all be caught and skipped.
+        it("skips multiple nodes with throwing cond()", function()
+            local seq = dialog.newSequencer()
+            seq:load({
+                { type = "say", speaker = "A", text = "s1",
+                  cond = function() error("err1") end },
+                { type = "say", speaker = "B", text = "s2",
+                  cond = function() error("err2") end },
+                { type = "say", speaker = "C", text = "final" },
+            })
+            seq:start()
+            expect_equal(seq:currentSpeaker(), "C")
+        end)
+    end)
+end)
+
 test_summary()
