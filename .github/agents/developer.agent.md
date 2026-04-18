@@ -52,6 +52,9 @@ Developer is the EngDev workhorse for general Rust engine implementation across 
 7. Final gate: `cargo test && cargo clippy -- -D warnings`. Run [tool: cag_validate](tools/validate/cag_validate.py) only if `.github/` changed.
 8. Commit: confirm branch, `git add <explicit files>`, `git commit -m "feat|fix(scope): description"`.
 9. Hand off to `Tester` (new public API) or `Reviewer` (completed work). If `.github/` was touched, route final review to `CAG-Architect`.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
 
 ## Routing Table
 

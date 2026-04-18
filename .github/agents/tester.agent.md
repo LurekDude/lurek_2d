@@ -50,6 +50,10 @@ Tester serves the EngDev, GameTest, and EngTest personas by owning the two-layer
 6. Run [tool: test_coverage](tools/audit/test_coverage.py), [tool: lua_evidence_golden_contract_audit](tools/audit/lua_evidence_golden_contract_audit.py), [tool: lua_test_structure_audit](tools/audit/lua_test_structure_audit.py), and [tool: integration_coverage](tools/audit/integration_coverage.py).
 7. Final gate: `cargo test && cargo clippy -- -D warnings`. Update `docs/CHANGELOG.md` if needed.
 8. Commit: `git add tests/ Cargo.toml docs/CHANGELOG.md` then `git commit -m "test(scope): description"`. Hand off to `Developer` (production bug found), `Reviewer`, or other agent. If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
 
 ## Routing Table
 

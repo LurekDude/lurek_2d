@@ -46,6 +46,11 @@ Solver serves the EngDev persona on hard problems with no obvious answer. It acc
 6. Define a binary acceptance gate testable by `Tester` or `Manager`.
 7. Self-review: single-option report? Vague root cause? Implementation code instead of a decision document? Constraint blindness? Fix all before delivering.
 8. Solver produces no commit unless the report is saved under `work/{session}/reports/`. Hand off to `Developer` (or specialist), `Architect`, `Tester`, `Research`, or `Manager` per the routing table. If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
+13. **Commit changes**: stage only the specific files (`git add <paths>` — never `git add .`) and commit using `type(scope): description` (types: feat / fix / refactor / test / docs / chore).
 
 ## Routing Table
 

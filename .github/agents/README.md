@@ -2,6 +2,16 @@
 
 This README is the canonical layer-level map for all Lurek2D agents. Shared contracts live here — individual `*.agent.md` files carry specialist workflow only.
 
+For the full agent contract (frontmatter schema, routing rules, end-of-session CAG sweep, validator gates), see [docs/architecture/cag-system.md](../../docs/architecture/cag-system.md).
+
+## Session Work-Folder Layout
+
+Every multi-phase session creates `work/<session-name>/` with these subfolders:
+
+`scripts/` · `handovers/` · `reports/` · `data/` · `examples/` · `other/` · `temp/` · `logs/`
+
+Append one JSONL entry per completed phase to `work/<session-name>/logs/agent_log.jsonl` — never overwrite. Move completed sessions to `work/archive/`.
+
 ## Overview
 
 Lurek2D has 20 specialist agents. Each owns a distinct role in the game engine development workflow. This file defines shared execution defaults, the canonical handoff contract, routing heuristics, and boundary rules that apply across all agents.

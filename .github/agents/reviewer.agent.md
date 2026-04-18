@@ -48,6 +48,11 @@ Reviewer enforces Lurek2D conventions across diffs for the EngDev and GameDev pe
 5. Walk the Lua API checklist: `lurek.*` namespace, `register(lua, luna, state)` signature, `Rc` cloned per closure, no `RefCell` borrow held across a Lua callback, lowercase key names, at least one Lua test per new `lurek.*` function.
 6. Write findings; classify strictly (BLOCKER blocks merge, WARNING should be fixed, NOTE optional).
 7. Reviewer produces no commit. Hand off to `Developer` (changes), `Tester` (missing tests), `Security` (sandbox concerns), or `Architect` (structural concern). If `.github/` was touched, route final review to `CAG-Architect`.
+8. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+9. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+10. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+11. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
+12. **Commit changes**: stage only the specific files (`git add <paths>` — never `git add .`) and commit using `type(scope): description` (types: feat / fix / refactor / test / docs / chore).
 
 ## Routing Table
 

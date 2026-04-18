@@ -49,6 +49,9 @@ CAG-Architect owns the `.github/` Context-Augmented-Generation layer that every 
 6. Re-run [tool: cag_validate](tools/validate/cag_validate.py) `--baseline` and confirm no regressions; fix any new errors before continuing.
 7. Add a `docs/CHANGELOG.md` entry describing the CAG-layer change under the current version.
 8. Commit: `git add .github/ tools/validate/ tools/audit/ docs/CHANGELOG.md` then `git commit -m "chore(cag): description"`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **End-of-Session Sweep checks**: when invoked as the closing CAG sweep, verify (a) frontmatter on any new artifacts, (b) `cag_validate.py --baseline` exits 0, (c) no missing skills/prompts surfaced during the session, (d) persona coverage unchanged or improved, then route to `Manager` to close the session.
 
 ## Routing Table
 

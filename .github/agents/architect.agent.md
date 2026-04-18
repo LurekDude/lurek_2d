@@ -49,6 +49,10 @@ Architect produces module boundary, dependency direction, and crate-organisation
 6. Run [tool: validate_module_coverage](tools/validate/validate_module_coverage.py) to confirm spec compliance.
 7. Commit: `git add src/lib.rs <touched specs> docs/CHANGELOG.md` then `git commit -m "refactor(arch): <module> — <change>"`.
 8. Hand off to `Developer` (implementation) or `Manager` (next phase). If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
 
 ## Routing Table
 

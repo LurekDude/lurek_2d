@@ -47,6 +47,11 @@ Research closes information gaps for any builder agent — EngDev or GameDev —
 6. Assemble the report with inline citations and a one-sentence recommendation per question.
 7. Research produces no commit unless the report is saved as a session artifact under `work/{session}/reports/`.
 8. Hand off to the consumer agent (`Developer`, `Architect`, `Doc-Writer`, `Debugger`, or `Manager`). If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
+13. **Commit changes**: stage only the specific files (`git add <paths>` — never `git add .`) and commit using `type(scope): description` (types: feat / fix / refactor / test / docs / chore).
 
 ## Routing Table
 

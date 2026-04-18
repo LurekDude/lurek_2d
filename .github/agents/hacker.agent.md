@@ -49,6 +49,11 @@ Hacker covers the EngTest and GameTest personas by red-teaming the live `lurek.*
 6. Self-review: every finding must have expected vs actual behaviour and a minimal deterministic repro.
 7. Classify findings (CRITICAL/HIGH/MEDIUM/LOW) and write the report; commit probes only if they will live as regression candidates.
 8. Hand off to `Security` (sandbox/safety) or `Tester` (regression test). If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
+13. **Commit changes**: stage only the specific files (`git add <paths>` — never `git add .`) and commit using `type(scope): description` (types: feat / fix / refactor / test / docs / chore).
 
 ## Routing Table
 

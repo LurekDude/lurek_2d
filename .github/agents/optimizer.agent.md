@@ -51,6 +51,11 @@ Optimizer serves the EngDev and GameDev personas by measuring and recommending p
 6. Self-review: every claim must be backed by a number from the measurement, not a guess.
 7. Write the report with: methodology, ranked bottlenecks, per-recommendation estimated saving, residual risks.
 8. Hand off to `Developer` (general), `Renderer` (graphics), or `Physicist` (physics). If `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Commit**: stage only the specific files (`git add <paths>` — never `git add .`) and commit using `type(scope): description` (types: feat / fix / refactor / test / docs / chore).
+12. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+13. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
 
 ## Routing Table
 

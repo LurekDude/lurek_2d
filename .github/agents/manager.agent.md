@@ -48,7 +48,8 @@ Manager turns multi-step development requests for the EngDev persona into sequen
 5. When the specialist returns, verify the gate independently (re-read the diff, re-run the test command they cited). Reject sub-par returns rather than accepting them.
 6. Per-phase commit gate: run `cargo test && cargo clippy -- -D warnings` (skip if pure CAG/doc), then `git add <explicit files>` and `git commit -m "type(scope): description"`. Update `docs/CHANGELOG.md` in the same commit.
 7. Append a JSONL log entry for the phase, then route to the next agent.
-8. As the final phase, route to [`CAG-Architect`](.github/agents/cag-architect.agent.md) to run [tool: cag_validate](tools/validate/cag_validate.py) and confirm no CAG layer drift before the session closes.
+8. As the final phase, route to [`CAG-Architect`](.github/agents/cag-architect.agent.md) for the End-of-Session CAG Sweep ([docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)) and to run [tool: cag_validate](tools/validate/cag_validate.py); confirm no CAG-layer drift before the session closes.
+9. **Update CHANGELOG**: ensure each per-phase commit added a bullet under the current version in `docs/CHANGELOG.md` describing what changed.
 
 ## Routing Table
 

@@ -49,6 +49,10 @@ Doc-Writer keeps Lurek2D's user-facing documentation accurate and idiomatic for 
 6. Update `docs/CHANGELOG.md` for any user-facing doc change.
 7. Commit: `git add docs/ content/demos/ content/examples/ docs/CHANGELOG.md` then `git commit -m "docs(scope): description"`.
 8. Hand off to `Reviewer` for sign-off; if `.github/` was touched, route final review to `CAG-Architect`.
+9. **Confirm branch**: run `git rev-parse --abbrev-ref HEAD` and verify it matches the working branch before staging anything.
+10. **Persist artifacts**: write deliverables under `work/<session>/{reports,data,scripts,handovers}/` and append a JSONL log entry per phase to `work/<session>/logs/agent_log.jsonl`.
+11. **Update CHANGELOG**: add one bullet under the current version in `docs/CHANGELOG.md` describing what changed.
+12. **End-of-session handoff**: route to `Manager` (or your `routes_to` agent); for sessions touching `.github/`, ensure `CAG-Architect` performs an End-of-Session CAG Sweep (see [docs/architecture/cag-system.md § 7](../../docs/architecture/cag-system.md#7-end-of-session-cag-sweep-contract)).
 
 ## Routing Table
 
